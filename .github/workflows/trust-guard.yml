@@ -68,7 +68,13 @@ jobs:
 
           # The changed-file list comes from the API, not from a checkout, so
           # nothing in the pull request is fetched or executed here.
-          files="$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename')"
+          #
+          # One record per file: name, deletion count, and the patch base64'd so
+          # no diff content can inject a tab or newline into the loop below. The
+          # patch is DATA -- decoded and grepped, never executed, and nothing
+          # derived from it reaches a command position.
+          files="$(gh api --paginate "repos/$REPO/pulls/$PR/files" \
+            --jq '.[] | [.filename, (.deletions|tostring), (.patch // "" | @base64)] | @tsv')"
           if [ -z "$files" ]; then
             echo "::error::the API returned no files for PR #$PR. This job must" \
                  "not pass on an empty file list -- that is the vacuous pass it" \
@@ -111,18 +117,42 @@ jobs:
           # intact: neutering the checks that protect the records is itself a
           # trust-surface change.
           #
-          # The audit UMBRELLAS (`scripts/*Audit.lean`) are NOT excluded. They
-          # carry the contract prose and the import list, so a change there
-          # changes what the audit means rather than what it records.
+          # The audit UMBRELLAS (`scripts/*Audit.lean`) are NOT excluded by path.
+          # They carry the contract prose and the import list, so a change there
+          # generally changes what the audit means rather than what it records.
           # `DGCategoryAudit.lean` is umbrella and records in one file and stays
-          # guarded for the same reason.
+          # guarded for the same reason. One shape is carved out below.
           exclusions='
           ^scripts/AlgebraicGeometryAudit/
           ^scripts/StabilityConditionAudit/
           '
 
+          # ADDITIVE UMBRELLA IMPORTS -- the one umbrella edit that cannot lower
+          # coverage. A patch that deletes nothing and whose every added line is
+          # an `import <X>Audit.<Slice>` line only ever ADDS a record slice to
+          # the sweep.
+          #
+          # Adding a source module needs exactly this edit, so without the
+          # carve-out the job fires on work that strictly increases what is
+          # audited -- the same "a gate that fires on routine work stops being
+          # read" problem that excluded the record slices above.
+          #
+          # Every dangerous umbrella edit still trips, because each shows up as a
+          # deletion or as an added line that is not an import:
+          #
+          #   * dropping an import, silently removing a whole record slice from
+          #     the sweep -- deletions > 0;
+          #   * rewriting the contract prose -- a non-import added line, or a
+          #     deletion, or both;
+          #   * adding anything executable -- a non-import added line.
+          #
+          # FAILS CLOSED. GitHub omits `patch` for very large diffs; with nothing
+          # to inspect the file stays trust surface. A missing or non-zero
+          # deletion count does the same.
+          umbrella='^scripts/[A-Za-z0-9]+Audit\.lean$'
+
           touched=""
-          while IFS= read -r f; do
+          while IFS=$'\t' read -r f dels patch64; do
             [ -n "$f" ] || continue
             skip=""
             while IFS= read -r e; do
@@ -134,6 +164,21 @@ jobs:
               fi
             done <<< "$exclusions"
             [ -z "$skip" ] || continue
+
+            # The additive-umbrella-import carve-out. Every condition must hold;
+            # any one of them failing keeps the file guarded.
+            if printf '%s' "$f" | grep -Eq "$umbrella" \
+               && [ "${dels:-1}" = "0" ] && [ -n "${patch64:-}" ]; then
+              added="$(printf '%s' "$patch64" | base64 -d \
+                       | grep '^+' | grep -v '^+++' || true)"
+              if [ -n "$added" ] && ! printf '%s\n' "$added" \
+                   | grep -qvE '^\+import [A-Za-z0-9_]+Audit(\.[A-Za-z0-9_]+)+$'; then
+                echo "note: $f adds only audit imports and deletes nothing" \
+                     "-- not a trust-surface change"
+                continue
+              fi
+            fi
+
             while IFS= read -r p; do
               p="$(printf '%s' "$p" | tr -d '[:space:]')"
               [ -n "$p" ] || continue

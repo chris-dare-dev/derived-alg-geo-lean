@@ -49,32 +49,37 @@ sweep emits such modules under the `Unclassified` sentinel and
 `scripts/check_audit_complete.py` fails on any of them. Before #508 `none`
 meant invisible — a new source directory's declarations were neither counted
 as public nor reported as missing, so the audit-complete gate passed
-vacuously. Adding a directory now means adding a branch here, and forgetting
-is a red gate rather than a silent hole. Modules outside `DerivedAlgGeo`
-(Mathlib and the other dependencies) are still skipped: they are not this
-repository's to audit. -/
+vacuously. Modules outside `DerivedAlgGeo` (Mathlib and the other
+dependencies) are still skipped: they are not this repository's to audit.
+
+WHY `CategoryTheory` ROUTES BY SUBTREE RATHER THAN BY NAME. This used to
+enumerate every top-level module under `DerivedAlgGeo.CategoryTheory`
+individually, so adding one — a file or a directory — meant editing this file.
+That is a trust-surface path, so every such pull request tripped the trust
+guard and waited on a `trust-reviewed` label. The work being gated was the
+routine addition of a module, and #727 and #730 each spent a review cycle on a
+one-line `let`. A gate that fires on routine work is a gate that stops being
+read, which is the same reasoning that excluded the audit record slices from
+the guard.
+
+Routing the whole subtree keeps every protection. A new module is now counted
+automatically, so its unaudited declarations raise `missing` and fail
+`check_audit_complete.py` on both the ceiling and the absent-from-baseline
+identity check. A genuinely new top-level subject — `DerivedAlgGeo.Foo` —
+still falls through to `none`, lands under `Unclassified`, and still fails,
+which is the case that deserves a human decision. Only the forced edit is
+gone. -/
 private def libraryOf (m : Name) : Option String :=
   let dg := `DerivedAlgGeo.CategoryTheory.DGCategory
-  let triangulated := `DerivedAlgGeo.CategoryTheory.Triangulated
-  let constantSheafPullback := `DerivedAlgGeo.CategoryTheory.ConstantSheafPullback
-  let extDimensionShift := `DerivedAlgGeo.CategoryTheory.ExtDimensionShift
-  let equivalenceTransport := `DerivedAlgGeo.CategoryTheory.EquivalenceTransport
-  let sites := `DerivedAlgGeo.CategoryTheory.Sites
-  let pseudofunctorObjectProperty :=
-    `DerivedAlgGeo.CategoryTheory.PseudofunctorObjectProperty
+  let categoryTheory := `DerivedAlgGeo.CategoryTheory
   let linearAlgebra := `DerivedAlgGeo.LinearAlgebra
   let algebraicGeometry := `DerivedAlgGeo.AlgebraicGeometry
   let algebra := `DerivedAlgGeo.Algebra
   let topology := `DerivedAlgGeo.Topology
   let development := `DerivedAlgGeo.Development
+  -- `dg` first: `DGCategory` is itself under `CategoryTheory`.
   if m == dg || dg.isPrefixOf m then some "DGCategory"
-  else if m == triangulated || triangulated.isPrefixOf m ||
-      m == constantSheafPullback || constantSheafPullback.isPrefixOf m ||
-      m == extDimensionShift || extDimensionShift.isPrefixOf m ||
-      m == equivalenceTransport || equivalenceTransport.isPrefixOf m ||
-      m == sites || sites.isPrefixOf m ||
-      m == pseudofunctorObjectProperty ||
-        pseudofunctorObjectProperty.isPrefixOf m ||
+  else if m == categoryTheory || categoryTheory.isPrefixOf m ||
       m == linearAlgebra || linearAlgebra.isPrefixOf m then
     some "StabilityCondition"
   else if m == algebraicGeometry || algebraicGeometry.isPrefixOf m ||
