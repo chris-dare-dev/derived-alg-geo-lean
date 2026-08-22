@@ -29,22 +29,32 @@ Worth recording against the plan `#585` was written to.
 tool for reconciling two charts on their overlap, where the denominators come from a cover and
 radical membership is what makes the cover a cover. The chart-local step never reaches for it.
 
-## Dropping the tilde hypothesis
+## Both halves, and dropping the tilde hypothesis
 
-`exists_pow_smul_eq_res_of_top_of_isQuasicoherent` is the statement `#585` actually consumes: `N`
-is any quasi-coherent module sheaf on `Spec R`, not a tilde. It is the tilde case transported
-across `fromTildeΓ`, which quasi-coherence makes an isomorphism.
+Extension makes a local section global; `exists_pow_smul_res_eq_zero` is its injectivity
+companion — a global section restricting to `0` on `D(r)` is killed by a power of `r` — and the two
+together are what a gluing argument over a cover needs. The second rests on Mathlib's
+`isIso_toOpen_top`, so every section over `⊤` is `toOpen M ⊤ m` and the elementwise statement
+applies directly.
 
-Four of that proof's six lines are spelling rather than mathematics, and each cost a cycle:
+Both are stated for a tilde, and `#585` needs them for an arbitrary quasi-coherent sheaf. The
+transport is the same both times, so it is done **once**, as a linear equivalence on sections
+(`tildeΓSectionEquiv`) with its two restriction laws, rather than twice by hand.
 
-* `modulesSpecToSheaf` lands in an **induced** category, so `e.hom.val` does not project — the
-  natural transformation has to be reached through `TopCat.Sheaf.forget` instead;
-* `(modulesSpecToSheaf.obj N).presheaf.map` and `((modulesSpecToSheaf ⋙ forget).obj N).map` are the
-  same map in two spellings, and `rw` matches syntactically, so both the goal and the hypothesis
-  must be restated before naturality will fire;
-* inside `namespace AlgebraicGeometry.Scheme.Modules`, `map_smul` resolves to a *different* lemma,
-  about `presheaf.map`. It has to be written `_root_.map_smul`. Same class of hazard as
-  `references/instance-transparency.md`: a name that silently resolves to the wrong thing.
+That is not a stylistic preference; the by-hand version does not scale, and the second attempt at
+it did not go through at all. Two hazards, both worth knowing before writing in this file:
+
+* **`rw` does not see proof irrelevance.** Transporting the injectivity statement by rewriting
+  fails on patterns that print *character-identical* to the goal: the difference is inside the
+  elided `⋯`, where two elaborations of `le_top` give different proof terms. `simp only` does not
+  match either. What works is abandoning rewriting — `congrArg … |>.trans`, since `exact` unifies
+  up to defeq and proof irrelevance is definitional. Naming the transport as a `LinearEquiv`
+  confines this to one place.
+* **`_root_` shadowing.** Inside `AlgebraicGeometry.tilde` and `AlgebraicGeometry.Scheme.Modules`,
+  the bare names `map_smul` and `map_zero` resolve to *other* lemmas — about `presheaf.map` and
+  about `tilde.map`. Both must be written `_root_.map_smul` / `_root_.map_zero`. This cost four
+  cycles across the file. Same class of hazard as `references/instance-transparency.md`: a name
+  that silently resolves to the wrong thing.
 
 ## Scope
 
@@ -82,31 +92,116 @@ theorem exists_pow_smul_eq_res_of_top (r : R)
   rw [hm]
   rfl
 
+/-- **A global section vanishing on `D(r)` is killed by a power of `r`.**
+
+The injectivity companion of `exists_pow_smul_eq_toOpen`, and the other half of what a gluing
+argument needs: extension makes local sections global, this makes two of them agree. -/
+theorem exists_pow_smul_eq_zero (r : R) (m : M)
+    (h : toOpen M (basicOpen r) m = 0) :
+    ∃ n : ℕ, r ^ n • m = 0 := by
+  obtain ⟨t, ht⟩ :=
+    (IsLocalizedModule.eq_zero_iff (Submonoid.powers r)
+      (toOpen M (basicOpen r)).hom).mp h
+  obtain ⟨n, hn⟩ := t.2
+  exact ⟨n, by rw [show r ^ n = (t : R) from hn]; exact ht⟩
+
+/-- **The same on sections**: a global section restricting to `0` on `D(r)` is killed by a power
+of `r`. -/
+theorem exists_pow_smul_res_eq_zero (r : R)
+    (t : (modulesSpecToSheaf.obj (tilde M)).presheaf.obj (op ⊤))
+    (h : (modulesSpecToSheaf.obj (tilde M)).presheaf.map
+      (homOfLE (le_top (a := basicOpen r))).op t = 0) :
+    ∃ n : ℕ, r ^ n • t = 0 := by
+  obtain ⟨m, rfl⟩ := (ConcreteCategory.bijective_of_isIso (toOpen M ⊤)).2 t
+  obtain ⟨n, hn⟩ := exists_pow_smul_eq_zero M r m h
+  refine ⟨n, ?_⟩
+  rw [← _root_.map_smul, hn, _root_.map_zero]
+
 end AlgebraicGeometry.tilde
 
 namespace AlgebraicGeometry.Scheme.Modules
 
 variable {R : CommRingCat.{u}}
 
-/-- **The same for any quasi-coherent module sheaf on an affine**, not only a tilde. -/
+/-! ### Transporting across quasi-coherence
+
+Both statements above are about a tilde, and `#585` needs them for an arbitrary quasi-coherent
+sheaf. The transport is the same both times, so it is done once here as a **linear equivalence on
+sections** rather than twice by hand as natural-transformation rewriting.
+
+That is not a stylistic preference. Written inline, the transport is three `rw`s against a natural
+transformation, and they refuse to fire on patterns that *print identically* to the goal — the
+`le_top` proofs inside `homOfLE ⋯` differ, and `rw` matches syntactically. Named as a
+`LinearEquiv`, the same steps are `map_smul` and `map_zero` from the `LinearEquiv` API, which
+carry no such hazard. -/
+
+/-- **The quasi-coherence isomorphism on the sections over one open**, as a linear equivalence. -/
+noncomputable def tildeΓSectionEquiv (N : (Spec R).Modules) [IsIso (fromTildeΓ N)]
+    (U : (Spec R).Opens) :
+    (modulesSpecToSheaf.obj
+        (tilde ((modulesSpecToSheaf.obj N).presheaf.obj (op ⊤)))).presheaf.obj (op U) ≃ₗ[R]
+      (modulesSpecToSheaf.obj N).presheaf.obj (op U) :=
+  (((modulesSpecToSheaf ⋙ TopCat.Sheaf.forget (ModuleCat R) (Spec R)).mapIso
+    (asIso (fromTildeΓ N))).app (op U)).toLinearEquiv
+
+/-- **The equivalence commutes with restriction.** The one fact the transports need, proved once
+where the spelling is under this file's control. -/
+@[simp]
+theorem tildeΓSectionEquiv_res (N : (Spec R).Modules) [IsIso (fromTildeΓ N)]
+    {U V : (Spec R).Opens} (i : V ⟶ U)
+    (x : (modulesSpecToSheaf.obj
+      (tilde ((modulesSpecToSheaf.obj N).presheaf.obj (op ⊤)))).presheaf.obj (op U)) :
+    tildeΓSectionEquiv N V
+        ((modulesSpecToSheaf.obj
+          (tilde ((modulesSpecToSheaf.obj N).presheaf.obj (op ⊤)))).presheaf.map i.op x) =
+      (modulesSpecToSheaf.obj N).presheaf.map i.op (tildeΓSectionEquiv N U x) :=
+  NatTrans.naturality_apply
+    ((modulesSpecToSheaf ⋙ TopCat.Sheaf.forget (ModuleCat R) (Spec R)).mapIso
+      (asIso (fromTildeΓ N))).hom i.op x
+
+/-- **The inverse equivalence commutes with restriction**, which is the direction the injectivity
+transport needs. -/
+theorem tildeΓSectionEquiv_symm_res (N : (Spec R).Modules) [IsIso (fromTildeΓ N)]
+    {U V : (Spec R).Opens} (i : V ⟶ U)
+    (x : (modulesSpecToSheaf.obj N).presheaf.obj (op U)) :
+    (tildeΓSectionEquiv N V).symm ((modulesSpecToSheaf.obj N).presheaf.map i.op x) =
+      (modulesSpecToSheaf.obj
+          (tilde ((modulesSpecToSheaf.obj N).presheaf.obj (op ⊤)))).presheaf.map i.op
+        ((tildeΓSectionEquiv N U).symm x) := by
+  apply (tildeΓSectionEquiv N V).injective
+  rw [LinearEquiv.apply_symm_apply, tildeΓSectionEquiv_res, LinearEquiv.apply_symm_apply]
+
+/-- **The affine extension lemma for any quasi-coherent module sheaf**, not only a tilde. -/
 theorem exists_pow_smul_eq_res_of_top_of_isQuasicoherent (N : (Spec R).Modules)
     [IsIso (fromTildeΓ N)] (r : R)
     (s : (modulesSpecToSheaf.obj N).presheaf.obj (op (PrimeSpectrum.basicOpen r))) :
     ∃ (n : ℕ) (t : (modulesSpecToSheaf.obj N).presheaf.obj (op ⊤)),
       (modulesSpecToSheaf.obj N).presheaf.map (homOfLE le_top).op t = r ^ n • s := by
-  let e := (modulesSpecToSheaf ⋙ TopCat.Sheaf.forget (ModuleCat R) (Spec R)).mapIso
-    (asIso (fromTildeΓ N))
   obtain ⟨n, t', ht'⟩ :=
     AlgebraicGeometry.tilde.exists_pow_smul_eq_res_of_top _ r
-      (e.inv.app (op (PrimeSpectrum.basicOpen r)) s)
-  replace ht' : (((modulesSpecToSheaf ⋙ TopCat.Sheaf.forget (ModuleCat R) (Spec R)).obj
-      (tilde ((modulesSpecToSheaf.obj N).presheaf.obj (op ⊤)))).map (homOfLE le_top).op) t' =
-        r ^ n • e.inv.app (op (PrimeSpectrum.basicOpen r)) s := ht'
-  refine ⟨n, e.hom.app (op ⊤) t', ?_⟩
-  show (((modulesSpecToSheaf ⋙ TopCat.Sheaf.forget (ModuleCat R) (Spec R)).obj N).map
-    (homOfLE le_top).op) (e.hom.app (op ⊤) t') = _
-  rw [← NatTrans.naturality_apply e.hom (homOfLE le_top).op t', ht', _root_.map_smul]
-  congr 1
-  exact (e.app (op (PrimeSpectrum.basicOpen r))).inv_hom_id_apply s
+      ((tildeΓSectionEquiv N (PrimeSpectrum.basicOpen r)).symm s)
+  refine ⟨n, tildeΓSectionEquiv N ⊤ t', ?_⟩
+  rw [← tildeΓSectionEquiv_res N (homOfLE le_top) t', ht', _root_.map_smul,
+    LinearEquiv.apply_symm_apply]
+
+/-- **The injectivity companion for any quasi-coherent module sheaf.** -/
+theorem exists_pow_smul_res_eq_zero_of_isQuasicoherent (N : (Spec R).Modules)
+    [IsIso (fromTildeΓ N)] (r : R)
+    (t : (modulesSpecToSheaf.obj N).presheaf.obj (op ⊤))
+    (h : (modulesSpecToSheaf.obj N).presheaf.map
+      (homOfLE (le_top (a := PrimeSpectrum.basicOpen r))).op t = 0) :
+    ∃ n : ℕ, r ^ n • t = 0 := by
+  obtain ⟨n, hn⟩ :=
+    AlgebraicGeometry.tilde.exists_pow_smul_res_eq_zero _ r ((tildeΓSectionEquiv N ⊤).symm t) (by
+      have hnat := tildeΓSectionEquiv_symm_res N
+        (homOfLE (le_top (a := PrimeSpectrum.basicOpen r))) t
+      have h' : (modulesSpecToSheaf.obj N).presheaf.map
+          (homOfLE (le_top (a := PrimeSpectrum.basicOpen r))).op t = 0 := h
+      exact hnat.symm.trans
+        ((congrArg (⇑(tildeΓSectionEquiv N (PrimeSpectrum.basicOpen r)).symm) h').trans
+          (_root_.map_zero _)))
+  refine ⟨n, ?_⟩
+  have h2 := congrArg (⇑(tildeΓSectionEquiv N ⊤)) hn
+  rwa [_root_.map_smul, LinearEquiv.apply_symm_apply, _root_.map_zero] at h2
 
 end AlgebraicGeometry.Scheme.Modules
