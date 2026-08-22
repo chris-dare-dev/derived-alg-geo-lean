@@ -152,3 +152,5 @@ import StabilityConditionAudit.PhaseTopology
 import StabilityConditionAudit.MassDistance
 import StabilityConditionAudit.Families
 import StabilityConditionAudit.FourierMukai
+import StabilityConditionAudit.CohomologyShortExact
+import StabilityConditionAudit.ExtDimensionShift
