@@ -2646,6 +2646,32 @@ so #585 is not closed. -/
 #print axioms AlgebraicGeometry.Proj.isIso_fromTildeΓ_chartRestrict
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart
 
+/-! ## f^n on a degree-one chart is (f/g)^n (#585 bridge)
+
+The bridge between #585's two halves. The chart step clears a power of f/g on the chart through g;
+TwistSection multiplies by the global section f^n of O(n). These are the same thing, so the halves
+meet with NO correction factor.
+
+This comes BEFORE the glue, not after, which is the opposite of the obvious reading of #585. The
+chart step produces, per chart, a section obtained by clearing a DIFFERENT scalar (f/g_i)^n. Those
+are not sections of any one sheaf, so there is nothing to glue yet; twisting is what makes them
+comparable, since each becomes a section of the single sheaf F(n).
+
+The computation: intShiftZeroLinearEquiv_apply_mk on the constant fraction f^n/1 at d = n gives
+d.toNat = n and (-d).toNat = 0, hence f^n * g^0 over 1 * g^n; ext and simp clean it to f^n/g^n. The
+deg fields differ (0 + n against n) and it does not matter, because the embedding reads only
+numerator and denominator. f^n/g^n is isLocalizationElem hg hf ^ n, exactly the scalar
+exists_pow_smul_eq_res_chart clears.
+
+The section level is a one-liner: both sides are pointwise, so it is the fibre statement applied at
+the point. Same as #584's chartModuleTwistSectionEquiv_sectionTwistMul -- in this construction
+lifting from fibres to sections is free and the cost is in the fraction identity underneath.
+
+The glue is NOT here, so #585 is not closed. -/
+
+#print axioms AlgebraicGeometry.Proj.intShiftZeroLinearEquiv_constFraction
+#print axioms AlgebraicGeometry.Proj.intShiftSectionLinearEquivOn_sectionOfMem
+
 #print axioms AlgebraicGeometry.Proj.intCechCochainsDegreewiseAddEquiv_symm_smul
 #print axioms AlgebraicGeometry.Proj.intCech_d_apply_eq_zero_iff
 #print axioms AlgebraicGeometry.Proj.intCechBlockIncl
