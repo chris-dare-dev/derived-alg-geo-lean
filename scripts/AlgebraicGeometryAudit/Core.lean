@@ -2594,6 +2594,25 @@ F(n) are NOT here, so #585 is not closed. -/
 #print axioms AlgebraicGeometry.tilde.exists_pow_smul_eq_toOpen
 #print axioms AlgebraicGeometry.tilde.exists_pow_smul_eq_res_of_top
 #print axioms AlgebraicGeometry.Scheme.Modules.exists_pow_smul_eq_res_of_top_of_isQuasicoherent
+-- The injectivity companion, and the transport factored once. Extension makes a local section
+-- global; exists_pow_smul_res_eq_zero says a global section restricting to 0 on D(r) is killed by
+-- a power of r. Together they are what a gluing argument over a cover needs. The second rests on
+-- Mathlib's isIso_toOpen_top, so every section over top is toOpen m and the elementwise statement
+-- applies.
+--
+-- tildeGammaSectionEquiv names the quasi-coherence isomorphism on sections as a LinearEquiv, with
+-- its two restriction laws, so the transport is proved once rather than per statement. Written by
+-- hand the second transport does NOT go through: rw fails on patterns that print
+-- character-identical to the goal, because the difference is inside the elided le_top proof terms
+-- and rw does not see proof irrelevance; simp only does not match either. congrArg .trans does,
+-- since exact unifies up to defeq. Separately, inside these namespaces the bare names map_smul and
+-- map_zero resolve to OTHER lemmas and must be written _root_-qualified.
+#print axioms AlgebraicGeometry.tilde.exists_pow_smul_eq_zero
+#print axioms AlgebraicGeometry.tilde.exists_pow_smul_res_eq_zero
+#print axioms AlgebraicGeometry.Scheme.Modules.tildeΓSectionEquiv
+#print axioms AlgebraicGeometry.Scheme.Modules.tildeΓSectionEquiv_res
+#print axioms AlgebraicGeometry.Scheme.Modules.tildeΓSectionEquiv_symm_res
+#print axioms AlgebraicGeometry.Scheme.Modules.exists_pow_smul_res_eq_zero_of_isQuasicoherent
 
 /-! ## The degree-one chart, as seen by the affine extension lemma (#585 chart step)
 

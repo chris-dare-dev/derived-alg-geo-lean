@@ -173,6 +173,7 @@ echo "== gates ($MODE) =="
 # invisible: an invalid workflow does not produce a red check, it produces no
 # checks. In `fast` mode too, for the same reason.
 gate workflows scripts/check_workflows.sh
+gate trust-guard scripts/test_trust_guard.sh
 gate mathlib-style mathlib_style
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
