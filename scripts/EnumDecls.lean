@@ -58,6 +58,7 @@ private def libraryOf (m : Name) : Option String :=
   let triangulated := `DerivedAlgGeo.CategoryTheory.Triangulated
   let constantSheafPullback := `DerivedAlgGeo.CategoryTheory.ConstantSheafPullback
   let equivalenceTransport := `DerivedAlgGeo.CategoryTheory.EquivalenceTransport
+  let sites := `DerivedAlgGeo.CategoryTheory.Sites
   let pseudofunctorObjectProperty :=
     `DerivedAlgGeo.CategoryTheory.PseudofunctorObjectProperty
   let linearAlgebra := `DerivedAlgGeo.LinearAlgebra
@@ -69,6 +70,7 @@ private def libraryOf (m : Name) : Option String :=
   else if m == triangulated || triangulated.isPrefixOf m ||
       m == constantSheafPullback || constantSheafPullback.isPrefixOf m ||
       m == equivalenceTransport || equivalenceTransport.isPrefixOf m ||
+      m == sites || sites.isPrefixOf m ||
       m == pseudofunctorObjectProperty ||
         pseudofunctorObjectProperty.isPrefixOf m ||
       m == linearAlgebra || linearAlgebra.isPrefixOf m then

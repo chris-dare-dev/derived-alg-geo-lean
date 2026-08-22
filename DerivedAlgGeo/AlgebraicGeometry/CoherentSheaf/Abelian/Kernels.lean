@@ -362,12 +362,27 @@ namespace AlgebraicGeometry
 
 variable {R : CommRingCat.{u}}
 
-private noncomputable def moduleSpecSectionsFunctor (R : CommRingCat.{u})
+/-- Sections of an `𝒪_{Spec R}`-module over an open, as a functor to `R`-modules.
+
+This is Mathlib's `moduleSpecΓFunctor` for a general open — and, at `U = ⊤`,
+retyped. The retyping is the point: `moduleSpecΓFunctor` has domain
+`(Spec (.of R)).Modules`, which is defeq to `(Spec R).Modules` but not to
+instance search, so an instance proved for one is not found for the other.
+Everything downstream states its geometry over `(Spec R).Modules`, so it wants
+this one. `Modules/Affine/Equivalence.lean` records the same wrapper problem for
+`Scheme.Modules` itself.
+
+Public rather than private since #720: the quasi-coherent extension argument
+needs `ShortComplex.map` through it, which means the instances below have to be
+reachable from another file. -/
+noncomputable def moduleSpecSectionsFunctor (R : CommRingCat.{u})
     (U : (Spec R).Opens) : (Spec R).Modules ⥤ ModuleCat.{u} R :=
   modulesSpecToSheaf ⋙
     (TopCat.Sheaf.forget _ _ ⋙ (evaluation _ _).obj (.op U))
 
-private noncomputable instance (U : (Spec R).Opens) :
+/-- Sections over an open preserve finite limits. -/
+noncomputable instance moduleSpecSectionsFunctor_preservesFiniteLimits
+    (U : (Spec R).Opens) :
     PreservesFiniteLimits (moduleSpecSectionsFunctor R U) := by
   letI hModules : PreservesFiniteLimits (modulesSpecToSheaf (R := R)) :=
     modulesSpecToSheaf_preservesFiniteLimits R
@@ -381,7 +396,9 @@ private noncomputable instance (U : (Spec R).Opens) :
     @comp_preservesFiniteLimits _ _ _ _ _ _ _ _ hForget hEval
   exact @comp_preservesFiniteLimits _ _ _ _ _ _ _ _ hModules hForgetEval
 
-private noncomputable instance (U : (Spec R).Opens) :
+/-- Sections over an open preserve zero morphisms. -/
+noncomputable instance moduleSpecSectionsFunctor_preservesZeroMorphisms
+    (U : (Spec R).Opens) :
     (moduleSpecSectionsFunctor R U).PreservesZeroMorphisms := by
   infer_instance
 
