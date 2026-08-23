@@ -121,6 +121,25 @@ jobs:
     # that contains a pipe already sets `pipefail` itself, so there is no block
     # whose status this can change. Re-check that before adding a piped step
     # that does not set its own options.
+    #
+    # A SELF-HOSTED WINDOWS RUNNER MUST HAVE GIT BASH AHEAD OF System32 ON PATH.
+    # This is a property of the machine, not of this file, and it is recorded
+    # here because the failure is baffling if you have not seen it before. The
+    # runner resolves `shell: bash` by searching PATH. C:\Windows\System32
+    # contains bash.EXE -- the WSL launcher -- and if that wins, every step in
+    # this job dies immediately as:
+    #
+    #   shell: C:\Windows\system32\bash.EXE --noprofile --norc -e -o pipefail {0}
+    #   /bin/bash: C:actions-runnerderived-alg-geo-lean_work_temp<id>.sh:
+    #             No such file or directory
+    #
+    # Note that every backslash has vanished from the path: WSL bash read them
+    # as escapes. Git Bash converts a Windows path correctly. Hosted Windows
+    # runners ship with C:\Program Files\Git\bin ahead of System32, which is why
+    # this has never needed saying for them. Observed and fixed on owner-win,
+    # 2026-08-23, by launching the runner through a wrapper that prepends Git\bin
+    # to PATH for that process only -- doing it machine-wide would shadow
+    # find.exe and sort.exe for everything else on the box.
     defaults:
       run:
         shell: bash
