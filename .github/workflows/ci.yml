@@ -66,8 +66,83 @@ jobs:
     # mid-elaboration and left 661 and 558 of 677 commanded records, each
     # indistinguishable from a complete, smaller audit. Restricting the fast
     # lane to push/workflow_dispatch also reduces how many runs share it.
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && fromJSON('["self-hosted", "owner-mac"]') || 'ubuntu-latest' }}
+    #
+    # windows-lane 2026-08-23: the owner's Windows workstation is now a second
+    # self-hosted runner, label `owner-win`. It is deliberately wired to
+    # `workflow_dispatch` ONLY, and `push` still goes to the Mac.
+    #
+    # Staged on purpose. The Mac lane is the one `main` depends on every merge
+    # and it has a warm 8.3 GB `.lake`; pointing `push` at a runner that has
+    # never completed a real CI run would put every merge behind an unproven
+    # machine. Dispatch-only gives the Windows lane real runs to be judged on
+    # first. Moving `push` across later is a one-word edit to the second
+    # operand -- do it once, and only once, this lane has a run history.
+    #
+    # THE ROUTING INVARIANT IS UNCHANGED AND MUST STAY THAT WAY: both
+    # self-hosted branches key on `push` / `workflow_dispatch` and on nothing
+    # else. Both events require write access to produce at all, so neither can
+    # be forged by a pull request into either machine. Everything else -- and
+    # that specifically includes `pull_request` and `merge_group`, for the
+    # reasons spelled out above -- falls through to `ubuntu-latest`. Adding a
+    # third lane is only safe under the same rule.
+    #
+    # What was actually verified before this landed, stated precisely because
+    # the two claims are not the same one: `scripts/gates.sh full` was run ON
+    # THE WINDOWS MACHINE, directly, at 44f8d64 -- 21 of its 22 gates passed in
+    # 7m50s. THIS JOB HAS NEVER RUN ON THAT RUNNER. Nothing here is evidence
+    # that the `owner-win` lane completes a CI run; the first
+    # `workflow_dispatch` after this merges is that evidence, and until it is
+    # green the lane is unproven. That asymmetry is the whole reason `push`
+    # is not being moved in this change.
+    #
+    # The one gate that failed is `emit-build`, which this job does not run in
+    # any case -- `lake build emit` cannot link on Windows at all, because
+    # supportInterpreter pushes a Mathlib-scale environment past the PE export
+    # table (`too many exported symbols (got 134112, max 65535)`), as
+    # exe/Emit.lean records. That gate lives in cache-warm.yml on Linux and
+    # stays there.
+    #
+    # NOTE the indentation: in a `>-` scalar, a line indented DEEPER than the
+    # first is folded literally and keeps its newline. These three lines are
+    # deliberately flush with each other so this folds to one line.
+    runs-on: >-
+      ${{ github.event_name == 'workflow_dispatch' && fromJSON('["self-hosted", "owner-win"]')
+      || github.event_name == 'push' && fromJSON('["self-hosted", "owner-mac"]')
+      || 'ubuntu-latest' }}
     timeout-minutes: 90
+
+    # Every `run:` block in this job is bash. On the two Unix lanes that was the
+    # default and went unstated; on a Windows runner the default is `pwsh`, and
+    # each block would fail on its first `set -euo pipefail`.
+    #
+    # This is not a behaviour change for the existing lanes. `shell: bash` means
+    # `bash --noprofile --norc -eo pipefail`, so it turns pipefail ON where the
+    # implicit default (`bash -e`) had it off -- but every `run:` block here
+    # that contains a pipe already sets `pipefail` itself, so there is no block
+    # whose status this can change. Re-check that before adding a piped step
+    # that does not set its own options.
+    #
+    # A SELF-HOSTED WINDOWS RUNNER MUST HAVE GIT BASH AHEAD OF System32 ON PATH.
+    # This is a property of the machine, not of this file, and it is recorded
+    # here because the failure is baffling if you have not seen it before. The
+    # runner resolves `shell: bash` by searching PATH. C:\Windows\System32
+    # contains bash.EXE -- the WSL launcher -- and if that wins, every step in
+    # this job dies immediately as:
+    #
+    #   shell: C:\Windows\system32\bash.EXE --noprofile --norc -e -o pipefail {0}
+    #   /bin/bash: C:actions-runnerderived-alg-geo-lean_work_temp<id>.sh:
+    #             No such file or directory
+    #
+    # Note that every backslash has vanished from the path: WSL bash read them
+    # as escapes. Git Bash converts a Windows path correctly. Hosted Windows
+    # runners ship with C:\Program Files\Git\bin ahead of System32, which is why
+    # this has never needed saying for them. Observed and fixed on owner-win,
+    # 2026-08-23, by launching the runner through a wrapper that prepends Git\bin
+    # to PATH for that process only -- doing it machine-wide would shadow
+    # find.exe and sort.exe for everything else on the box.
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
         id: checkout
