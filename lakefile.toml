@@ -37,10 +37,12 @@ name = "DerivedAlgGeoSweep"
 [[lean_lib]]
 name = "AlgebraicGeometryAudit"
 srcDir = "scripts"
+globs = ["AlgebraicGeometryAudit.+"]
 
 [[lean_lib]]
 name = "StabilityConditionAudit"
 srcDir = "scripts"
+globs = ["StabilityConditionAudit.+"]
 
 [[lean_lib]]
 name = "DGCategoryAudit"

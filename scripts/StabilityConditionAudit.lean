@@ -1,8 +1,9 @@
 /-
 Axiom + sorry audit over a HAND-MAINTAINED LIST of this project's declarations.
 
-Run: `lake env lean scripts/StabilityConditionAudit.lean` (to read the output), or
-`lake build StabilityConditionAudit` (to check it still elaborates).
+Run: `lake build StabilityConditionAudit` -- that elaborates every slice and
+prints every record. Running this file alone prints nothing: records do not
+replay across an import boundary, and since 2026-08-22 it imports no slices.
 
 Part of the library build since 2026-08-04: a `lean_lib` with
 `srcDir = "scripts"`. Removed from `defaultTargets` on 2026-08-06 -- this file
@@ -134,23 +135,21 @@ on a name that no longer exists is a hard error, but a name never added is
 invisible.
 
 Since #480 the records live in the per-area submodules under
-`scripts/StabilityConditionAudit/`; this file is the imports-only umbrella that
-makes `lake build StabilityConditionAudit` elaborate every record. `#print
-axioms` output does NOT replay across the import boundary, so the
-gates run each area file directly; adding a declaration means adding
-it to the area file its module belongs to.
+`scripts/StabilityConditionAudit/`, and this file carries only the contract prose. It does NOT
+import them: the `lean_lib` in `lakefile.toml` globs `StabilityConditionAudit.+`, so
+`lake build StabilityConditionAudit` elaborates every slice in the directory whether
+or not anything imports it. Adding a slice therefore needs no edit here.
+
+That glob replaced a hand-maintained import list on 2026-08-22. The list had
+silently fallen behind -- two slices were missing from it, so `lake build`
+under-reported against the gates, which have always globbed the directory
+themselves. Keeping the list complete also meant editing a trust-surface file
+on every pull request that added a slice, which fired the trust guard on
+routine work; see the note in `.github/workflows/trust-guard.yml` about why
+that is how a gate stops being read.
+
+`#print axioms` output does NOT replay across the import boundary, which is why
+the gates run each area file directly rather than running this one; adding a
+declaration means adding it to the area file its module belongs to.
 -/
 
-import StabilityConditionAudit.Foundation
-import StabilityConditionAudit.TStructureCore
-import StabilityConditionAudit.Lattice
-import StabilityConditionAudit.Tilting
-import StabilityConditionAudit.WeakStability
-import StabilityConditionAudit.SupportWalls
-import StabilityConditionAudit.GroupAction
-import StabilityConditionAudit.PhaseTopology
-import StabilityConditionAudit.MassDistance
-import StabilityConditionAudit.Families
-import StabilityConditionAudit.FourierMukai
-import StabilityConditionAudit.CohomologyShortExact
-import StabilityConditionAudit.ExtDimensionShift
