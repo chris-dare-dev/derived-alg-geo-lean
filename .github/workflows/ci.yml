@@ -67,16 +67,29 @@ jobs:
     # indistinguishable from a complete, smaller audit. Restricting the fast
     # lane to push/workflow_dispatch also reduces how many runs share it.
     #
-    # windows-lane 2026-08-23: the owner's Windows workstation is now a second
-    # self-hosted runner, label `owner-win`. It is deliberately wired to
-    # `workflow_dispatch` ONLY, and `push` still goes to the Mac.
+    # windows-lane 2026-08-23: the owner's Windows workstation is a second
+    # self-hosted runner, label `owner-win`, and `push` now goes to it. The Mac
+    # keeps `workflow_dispatch`.
     #
-    # Staged on purpose. The Mac lane is the one `main` depends on every merge
-    # and it has a warm 8.3 GB `.lake`; pointing `push` at a runner that has
-    # never completed a real CI run would put every merge behind an unproven
-    # machine. Dispatch-only gives the Windows lane real runs to be judged on
-    # first. Moving `push` across later is a one-word edit to the second
-    # operand -- do it once, and only once, this lane has a run history.
+    # THE TWO EVENTS SWAPPED MACHINES; THEY DID NOT COLLAPSE ONTO ONE. That is
+    # deliberate. A manual dispatch is what you reach for when the automatic
+    # lane is suspect -- the runner is wedged, the workspace is dirty, a result
+    # looks wrong -- so the manual escape hatch must be the OTHER machine. Point
+    # both at `owner-win` and the escape hatch runs on the box you are trying to
+    # get a second opinion about, which is the moment it stops being one. It
+    # also keeps the Mac exercised rather than idle, so its `.lake` does not go
+    # cold and its first use after a problem is not also its first use in weeks.
+    #
+    # CAPACITY CHANGED WITH THIS EDIT AND IT IS THE THING MOST LIKELY TO BITE.
+    # The Mac lane had TWO registered runners; `owner-win` is ONE. Pushes that
+    # previously ran two-at-a-time now serialise, and at this repository's merge
+    # cadence (158 merges in the two days to 2026-08-15) a queue is the expected
+    # state, not an exceptional one. Worse, the owner also builds locally on the
+    # Windows box, and CI plus a local `lake build` contend for the same cores
+    # and memory -- which is the condition behind the 2026-08-07 truncated-audit
+    # incident in scripts/check_audit.py's docstring. Registering a second
+    # `owner-win` runner restores the old parallelism; until then, expect
+    # queuing and do not run local gates during a merge burst.
     #
     # THE ROUTING INVARIANT IS UNCHANGED AND MUST STAY THAT WAY: both
     # self-hosted branches key on `push` / `workflow_dispatch` and on nothing
@@ -86,14 +99,23 @@ jobs:
     # reasons spelled out above -- falls through to `ubuntu-latest`. Adding a
     # third lane is only safe under the same rule.
     #
-    # What was actually verified before this landed, stated precisely because
-    # the two claims are not the same one: `scripts/gates.sh full` was run ON
-    # THE WINDOWS MACHINE, directly, at 44f8d64 -- 21 of its 22 gates passed in
-    # 7m50s. THIS JOB HAS NEVER RUN ON THAT RUNNER. Nothing here is evidence
-    # that the `owner-win` lane completes a CI run; the first
-    # `workflow_dispatch` after this merges is that evidence, and until it is
-    # green the lane is unproven. That asymmetry is the whole reason `push`
-    # is not being moved in this change.
+    # What the dispatch-only staging bought, since it is the reason this edit
+    # is safe to make and the record is worth keeping. The `owner-win` lane
+    # failed twice before it ever completed, and both were real defects that no
+    # amount of local gate-running would have found:
+    #
+    #   1. `shell: bash` resolved to C:\Windows\System32\bash.EXE -- the WSL
+    #      launcher -- which read the backslashes in the Windows script path as
+    #      escapes. Every step died on the first one.
+    #   2. check_roadmap.py decoded 158421 bytes of `gh issue list` output as
+    #      cp1252 and died at offset 2839 on byte 0x81, part of U+207A
+    #      SUPERSCRIPT PLUS SIGN in an issue title. Silently: the error is
+    #      raised on subprocess's reader thread, so it surfaced as a TypeError
+    #      from json.loads naming neither the encoding nor the file.
+    #
+    # Had `push` been pointed here on day one, both would have landed on `main`
+    # instead of on a branch nobody depended on. Stage the next such move the
+    # same way.
     #
     # The one gate that failed is `emit-build`, which this job does not run in
     # any case -- `lake build emit` cannot link on Windows at all, because
@@ -106,8 +128,8 @@ jobs:
     # first is folded literally and keeps its newline. These three lines are
     # deliberately flush with each other so this folds to one line.
     runs-on: >-
-      ${{ github.event_name == 'workflow_dispatch' && fromJSON('["self-hosted", "owner-win"]')
-      || github.event_name == 'push' && fromJSON('["self-hosted", "owner-mac"]')
+      ${{ github.event_name == 'push' && fromJSON('["self-hosted", "owner-win"]')
+      || github.event_name == 'workflow_dispatch' && fromJSON('["self-hosted", "owner-mac"]')
       || 'ubuntu-latest' }}
     timeout-minutes: 90
 
