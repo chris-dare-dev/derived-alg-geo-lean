@@ -590,24 +590,29 @@ jobs:
           # A venv puts its executables in `bin` on Unix and in `Scripts` on
           # Windows. Hardcoding `bin` made every Windows runner fail here with
           # "No such file or directory" on the pip line, one step after paying
-          # for a full Lean build. Resolve it once, and export it, because two
-          # LATER STEPS in this job also reach into the venv -- `Contract
-          # gates` is not the only consumer, and a fix applied only here would
-          # move the failure rather than remove it.
+          # for a full Lean build.
+          #
+          # Every consumer of the venv is INSIDE THIS STEP -- the two later
+          # `python` invocations further down are the same `run:` block, not
+          # separate steps. So these stay plain shell variables. An earlier cut
+          # of this fix wrote them to $GITHUB_ENV and read them back as
+          # $MFC_VENV_*, which cannot work: $GITHUB_ENV publishes to SUBSEQUENT
+          # steps, never to the step doing the writing, so under `set -u` the
+          # first read died with `MFC_VENV_PY: unbound variable` -- on Linux and
+          # macOS, after a full build, having passed every Windows check it was
+          # written for.
           VENV_BIN=".mfc-venv/bin"
           [ -d "$VENV_BIN" ] || VENV_BIN=".mfc-venv/Scripts"
           [ -d "$VENV_BIN" ] || { echo "::error::venv has neither bin/ nor Scripts/"; exit 1; }
-          echo "MFC_VENV_BIN=$VENV_BIN" >> "$GITHUB_ENV"
 
           # The interpreter inside the venv is NOT reliably called `python`.
           # A venv names it after the base executable, and on Windows the base
           # here is `python3.exe` -- Windows CPython installs `python.exe` only,
           # so a `python3` on PATH is necessarily something else, and the venv
-          # inherits that name. `.mfc-venv/Scripts/python` then does not exist,
-          # which would fail two steps further on in `Emitter reproducibility`
-          # rather than here. Resolve it explicitly and fail loudly if none of
-          # the spellings exist. On Unix `bin/python` is present and wins first,
-          # so this changes nothing for the Mac and hosted lanes.
+          # inherits that name, leaving `.mfc-venv/Scripts/python` absent.
+          # Resolve it explicitly and fail loudly if no spelling exists. On Unix
+          # `bin/python` is present and wins first, so this changes nothing for
+          # the Mac and hosted lanes.
           VENV_PY=""
           for cand in "$VENV_BIN/python" "$VENV_BIN/python3" \
                       "$VENV_BIN/python.exe" "$VENV_BIN/python3.exe"; do
@@ -615,7 +620,6 @@ jobs:
           done
           [ -n "$VENV_PY" ] || { echo "::error::no interpreter in $VENV_BIN"; exit 1; }
           echo "using venv interpreter $VENV_PY"
-          echo "MFC_VENV_PY=$VENV_PY" >> "$GITHUB_ENV"
 
           "$VENV_BIN/pip" install --quiet \
             "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@a5af3b29047a3bbe974529462b26ff353086beea#subdirectory=contract"
@@ -681,7 +685,7 @@ jobs:
           # from running the offline gates -- but CI is the one environment
           # guaranteed to have the API, and a check that silently skips there
           # is the vacuous pass this repository keeps finding in new places.
-          "$MFC_VENV_PY" scripts/check_roadmap.py --require-api
+          "$VENV_PY" scripts/check_roadmap.py --require-api
 
           # ------------------------------------------------------------------
           # build.json, and the honest size of what it measured.
@@ -768,7 +772,7 @@ jobs:
           # review instead of whoever wrote this workflow.
           SEAL_REVIEW=()
           if [ -f attest/review.yaml ]; then
-            REVIEWER=$("$MFC_VENV_PY" -c "import yaml,sys; \
+            REVIEWER=$("$VENV_PY" -c "import yaml,sys; \
               print(yaml.safe_load(open('attest/review.yaml'))['reviews'][0]['reviewer']['name'])")
             SEAL_REVIEW=(--review attest/review.yaml
                          --review-produced-by "human:$REVIEWER")
