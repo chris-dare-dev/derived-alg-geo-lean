@@ -84,7 +84,7 @@ def is_bootstrap(paths: list[str]) -> bool:
 
 
 def gh_json(args: list[str]) -> object:
-    return json.loads(subprocess.check_output(["gh", *args], text=True))
+    return json.loads(subprocess.check_output(["gh", *args], text=True, encoding="utf-8"))
 
 
 def rollup(pr: dict) -> str:

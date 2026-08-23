@@ -68,7 +68,7 @@ def tracked_modules() -> dict[str, str]:
     """Every gated module, mapped back to the path that declares it."""
     out = subprocess.run(
         ["git", "ls-files", "*.lean"],
-        capture_output=True, text=True, check=True,
+        capture_output=True, text=True, check=True, encoding="utf-8",
     ).stdout.split()
     return {
         module_of(p): p
