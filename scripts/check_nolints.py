@@ -95,9 +95,17 @@ def main(argv: list[str]) -> int:
     # a swap. CI checks out with fetch-depth 0, so the ref is available there;
     # a local clone without it degrades to the count checks above, loudly.
     try:
+        # encoding="utf-8" is load-bearing, not decoration. `text=True` alone
+        # decodes with the LOCALE encoding, which is UTF-8 on Linux and macOS
+        # and cp1252 on Windows -- and nolints.json carries Lean declaration
+        # names, which are full of non-ASCII. The failure is also much worse
+        # than it looks: the UnicodeDecodeError is raised on subprocess's
+        # reader THREAD, so nothing propagates here, `.stdout` comes back None,
+        # and the traceback a reader actually sees is a TypeError from
+        # json.loads three lines down. Observed on a Windows runner 2026-08-23.
         baseline_raw = subprocess.run(
             ["git", "show", f"{BASELINE_REF}:{NOLINTS.as_posix()}"],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, encoding="utf-8",
         ).stdout
     except (subprocess.CalledProcessError, OSError):
         print(f"note: {BASELINE_REF} is not available; entry-identity check "

@@ -284,7 +284,7 @@ def renamed_paths(ref: str) -> dict[str, str]:
     try:
         out = subprocess.run(
             ["git", "diff", "--name-status", "--find-renames=20%", f"{ref}...HEAD"],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, encoding="utf-8",
         ).stdout
     except (subprocess.CalledProcessError, FileNotFoundError):
         return {}
@@ -310,7 +310,7 @@ def changed_lines(ref: str, path: Path) -> set[int] | None:
             paths.insert(0, source)
         out = subprocess.run(
             ["git", "diff", "--find-renames=20%", "-U0", f"{ref}...HEAD", "--", *paths],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, encoding="utf-8",
         ).stdout
     except (subprocess.CalledProcessError, FileNotFoundError):
         return None

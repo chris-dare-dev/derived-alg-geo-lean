@@ -149,7 +149,7 @@ def fetch_issues():
             ["gh", "issue", "list", "--repo", REPO, "--state", "all",
              "--limit", "1000", "--json",
              "number,state,parent,milestone,blockedBy,title"],
-            capture_output=True, text=True, timeout=180)
+            capture_output=True, text=True, timeout=180, encoding="utf-8")
     except (OSError, subprocess.SubprocessError) as exc:
         return None, f"could not run gh: {exc}"
     if proc.returncode != 0:
@@ -177,7 +177,7 @@ def fetch_open_milestones():
         proc = subprocess.run(
             ["gh", "api", f"repos/{REPO}/milestones?state=all&per_page=100",
              "--jq", ".[] | [.number, .state] | @tsv"],
-            capture_output=True, text=True, timeout=120)
+            capture_output=True, text=True, timeout=120, encoding="utf-8")
     except (OSError, subprocess.SubprocessError) as exc:
         return None, f"could not run gh: {exc}"
     if proc.returncode != 0:
