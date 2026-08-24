@@ -197,6 +197,25 @@ jobs:
           # was `lake exe cache get` and ~14m was a full rebuild.
           #
           # Cleaning still happens -- see the next step -- just not to `.lake`.
+          #
+          # Measured on chris-win-owner-runner-2, same workload either side:
+          #
+          #            lean-action step     whole build job
+          #   before       21m23s               39m50s
+          #   after         6m05s               31m57s
+          #
+          # Note the two do not reconcile -- 15m18s off the step but only 7m53s
+          # off the job -- because that pair was not a controlled A/B: the
+          # "after" run inherited a tree the "before" run had just rebuilt, so
+          # part of it is a first-run effect. The direction is not in doubt; the
+          # exact numbers are not steady state. If you are optimising this
+          # further, measure two consecutive runs on one runner rather than
+          # trusting the pair above.
+          #
+          # What is left in those 6m05s is mostly `lake exe cache get`
+          # re-verifying the Mathlib cache against a `.lake/packages` that did
+          # not change. That is the next thing worth attacking, and it is
+          # independent of this.
           clean: false
 
       # Exactly what checkout's clean: true would have done, minus `.lake`.
