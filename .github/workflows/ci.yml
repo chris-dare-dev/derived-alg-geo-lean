@@ -179,6 +179,68 @@ jobs:
           # lane the repository is already present, so this costs a fetch, not a
           # clone.
           fetch-depth: 0
+          # THE SELF-HOSTED LANE'S WHOLE PURPOSE DEPENDS ON THIS LINE.
+          #
+          # checkout defaults to clean: true, which runs `git clean -ffdx`. The
+          # -x removes IGNORED files, and .lake is ignored, so the default
+          # deleted the entire build tree at the start of every run. The log
+          # said so plainly and nobody had read it:
+          #
+          #   [command]git clean -ffdx
+          #   Removing .lake/
+          #
+          # So "self-hosted for SPEED, persistent .lake instead of a cold
+          # checkout every run" -- the reason this lane exists, stated at the
+          # top of this job -- was not true as configured. Every run re-cloned
+          # Mathlib, re-fetched 8639 cache files, and rebuilt from nothing.
+          # Measured on run 32673808417: 21m23s in lean-action, of which 6m25s
+          # was `lake exe cache get` and ~14m was a full rebuild.
+          #
+          # Cleaning still happens -- see the next step -- just not to `.lake`.
+          #
+          # Measured on chris-win-owner-runner-2, same workload either side:
+          #
+          #            lean-action step     whole build job
+          #   before       21m23s               39m50s
+          #   after         6m05s               31m57s
+          #
+          # Note the two do not reconcile -- 15m18s off the step but only 7m53s
+          # off the job -- because that pair was not a controlled A/B: the
+          # "after" run inherited a tree the "before" run had just rebuilt, so
+          # part of it is a first-run effect. The direction is not in doubt; the
+          # exact numbers are not steady state. If you are optimising this
+          # further, measure two consecutive runs on one runner rather than
+          # trusting the pair above.
+          #
+          # What is left in those 6m05s is mostly `lake exe cache get`
+          # re-verifying the Mathlib cache against a `.lake/packages` that did
+          # not change. That is the next thing worth attacking, and it is
+          # independent of this.
+          clean: false
+
+      # Exactly what checkout's clean: true would have done, minus `.lake`.
+      #
+      # `clean: false` ALONE IS NOT SAFE HERE and this step is not optional
+      # tidiness. Two things break without it:
+      #
+      #   * Untracked leftovers survive between runs, and `mfc build`/`seal`
+      #     refuse to attest a dirty worktree -- "the worktree has uncommitted
+      #     changes, so these measurements describe bytes that <sha> does not
+      #     contain". `mfc-lint-report.txt` is written by the Contract gates
+      #     step and is NOT gitignored, so it alone would fail every second run.
+      #   * checkout's clean also does `git reset --hard`; skipping it would let
+      #     a modified tracked file survive from a previous branch.
+      #
+      # Keeping `.lake` reintroduces the orphaned-artifact hazard that the
+      # "Prune orphaned build artifacts" step below already exists to handle --
+      # that step was written for the persistent-.lake case and until now had
+      # nothing to prune on this lane.
+      - name: Reset the tree, keeping .lake
+        run: |
+          set -euo pipefail
+          git reset --hard
+          git clean -ffdx -e .lake
+          echo "kept: $(du -sh .lake 2>/dev/null | cut -f1 || echo 'no .lake yet')"
 
       # Path scoping (2026-08-14). #362 removed the per-file sorry sweep, which
       # was 72.9% of a 54-minute run; what is left is dominated by three axiom
