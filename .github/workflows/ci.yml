@@ -67,18 +67,24 @@ jobs:
     # indistinguishable from a complete, smaller audit. Restricting the fast
     # lane to push/workflow_dispatch also reduces how many runs share it.
     #
-    # windows-lane 2026-08-23: the owner's Windows workstation is a second
-    # self-hosted runner, label `owner-win`, and `push` now goes to it. The Mac
-    # keeps `workflow_dispatch`.
+    # mac-retired 2026-08-23: THE `owner-mac` LANE IS GONE AND MUST NOT COME
+    # BACK. Both runners were deregistered from this repository on 2026-08-23.
     #
-    # THE TWO EVENTS SWAPPED MACHINES; THEY DID NOT COLLAPSE ONTO ONE. That is
-    # deliberate. A manual dispatch is what you reach for when the automatic
-    # lane is suspect -- the runner is wedged, the workspace is dirty, a result
-    # looks wrong -- so the manual escape hatch must be the OTHER machine. Point
-    # both at `owner-win` and the escape hatch runs on the box you are trying to
-    # get a second opinion about, which is the moment it stops being one. It
-    # also keeps the Mac exercised rather than idle, so its `.lake` does not go
-    # cold and its first use after a problem is not also its first use in weeks.
+    # They ran on the owner's EMPLOYER-ISSUED LAPTOP, and Lake builds are not
+    # authorised to run on it. This is a compliance boundary, not a preference
+    # or a performance decision -- every earlier comment in this file weighing
+    # the Mac's warm `.lake` against a cold checkout was arguing about the wrong
+    # axis. Do not reintroduce an `owner-mac` label, and do not add any
+    # self-hosted label that could resolve to that machine, whatever the speed
+    # argument. If a second machine is ever wanted, it has to be one the owner
+    # personally controls.
+    #
+    # Both self-hosted events therefore land on `owner-win`, which has two
+    # registered runners. `workflow_dispatch` used to go to the Mac as a
+    # deliberate second-opinion lane on a DIFFERENT machine; that property is
+    # simply gone and cannot be recovered from one workstation. If a clean-room
+    # check is wanted, route dispatch to `ubuntu-latest` rather than to any
+    # other physical box.
     #
     # CAPACITY CHANGED WITH THIS EDIT AND IT IS THE THING MOST LIKELY TO BITE.
     # The Mac lane had TWO registered runners; `owner-win` is ONE. Pushes that
@@ -128,8 +134,8 @@ jobs:
     # first is folded literally and keeps its newline. These three lines are
     # deliberately flush with each other so this folds to one line.
     runs-on: >-
-      ${{ github.event_name == 'push' && fromJSON('["self-hosted", "owner-win"]')
-      || github.event_name == 'workflow_dispatch' && fromJSON('["self-hosted", "owner-mac"]')
+      ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      && fromJSON('["self-hosted", "owner-win"]')
       || 'ubuntu-latest' }}
     timeout-minutes: 90
 
