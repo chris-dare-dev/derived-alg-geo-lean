@@ -771,6 +771,36 @@ theorem intShiftZeroLinearEquiv_apply_mk (hf : f ∈ 𝒜 1) (d : ℤ) (hfS : f 
   · ext
     exact mul_comm _ _
 
+/-- **The two degree-one trivializations of an integer twist differ by `gⁿ / fⁿ`.**
+
+`intShiftZeroLinearEquiv` is multiplication by `intTwistScalar`, which at a
+nonnegative twist `n` is `1 / fⁿ`. So trivializing at `f` and trivializing at `g`
+differ by the unit `gⁿ / fⁿ`, and the identity reduces to a cancellation in
+`Localization S`.
+
+This is the transition function of `O(n)` between two degree-one charts, and it
+is what an overlap comparison consumes: on `D₊(f) ⊓ D₊(g)` a section trivialized
+one way is `gⁿ/fⁿ` times the same section trivialized the other way.
+
+Stated on the underlying `LocalizedModule`, which drops the degree bookkeeping
+entirely — both sides are scalar multiples of the same `z`, so no `NumDenSameDeg`
+appears and no degree has to be matched. -/
+theorem intShiftZeroLinearEquiv_transition (hf : f ∈ 𝒜 1) {g : A} (hg : g ∈ 𝒜 1)
+    (hfS : f ∈ S) (hgS : g ∈ S) (n : ℕ)
+    (z : DegreeZeroLocalization 𝒜 (intShift 𝒜 (n : ℤ)) S) :
+    ((intShiftZeroLinearEquiv 𝒜 hf (n : ℤ) hfS z : LocalizedModule S A)) =
+      Localization.mk (g ^ n) (twistPowerOfMem (f := f) n hfS) •
+        ((intShiftZeroLinearEquiv 𝒜 hg (n : ℤ) hgS z : LocalizedModule S A)) := by
+  show intTwistScalar (f := f) (n : ℤ) hfS • (z : LocalizedModule S A) =
+    Localization.mk (g ^ n) (twistPowerOfMem (f := f) n hfS) •
+      (intTwistScalar (f := g) (n : ℤ) hgS • (z : LocalizedModule S A))
+  rw [smul_smul]
+  congr 1
+  simp only [intTwistScalar, twistPowerOfMem, Localization.mk_mul, Int.toNat_natCast,
+    Int.toNat_neg_natCast, pow_zero]
+  rw [Localization.mk_eq_mk_iff, Localization.r_iff_exists]
+  exact ⟨1, by simp⟩
+
 /-- The numerator of the inverse trivialization lies in the twist it should. -/
 theorem mul_pow_toNat_mem_intShift (hf : f ∈ 𝒜 1) (d : ℤ) (n : ℕ) (a : A)
     (ha : a ∈ intShift 𝒜 0 n) : a * f ^ d.toNat ∈ intShift 𝒜 d (n + (-d).toNat) := by

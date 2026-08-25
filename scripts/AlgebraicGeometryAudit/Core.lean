@@ -343,6 +343,7 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_toNat_mem_intShift_zero
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv_apply_mk
+#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv_transition
 #print axioms AlgebraicGeometry.Proj.intShiftFiberLinearEquivOfMem
 #print axioms AlgebraicGeometry.Proj.intShiftFiberLinearEquiv
 -- Sections over an open inside the chart. Because the two computation rules above are uniform
