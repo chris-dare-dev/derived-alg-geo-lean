@@ -329,7 +329,10 @@ and no geometry.
 -/
 
 #print axioms CategoryTheory.Triangulated.homLinearEquivOfFullyFaithful
+#print axioms CategoryTheory.Triangulated.homShiftLinearEquiv
 #print axioms CategoryTheory.Triangulated.finrank_hom_shift_map
+#print axioms CategoryTheory.Triangulated.homShiftLinearEquivOfEssSurj
+#print axioms CategoryTheory.Triangulated.HomFiniteBounded.of_essSurj
 #print axioms CategoryTheory.Triangulated.chiHom_map
 #print axioms CategoryTheory.Triangulated.chiK₀_map
 
