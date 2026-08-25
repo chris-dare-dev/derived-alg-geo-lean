@@ -353,3 +353,11 @@ claimed or used. -/
 #print axioms CategoryTheory.Triangulated.homFiniteBounded_fgModuleCat
 #print axioms FGModuleCat.instProjective
 #print axioms CategoryTheory.Triangulated.isKProjective_of_isStrictlyLE
+#print axioms CategoryTheory.Triangulated.isKProjective_bounded
+#print axioms CategoryTheory.Triangulated.boundedQh
+#print axioms CategoryTheory.Triangulated.boundedQh_full
+#print axioms CategoryTheory.Triangulated.boundedQh_faithful
+#print axioms CategoryTheory.Triangulated.boundedLift
+#print axioms CategoryTheory.Triangulated.boundedLift_linear
+#print axioms CategoryTheory.Triangulated.boundedLift_essSurj
+#print axioms CategoryTheory.Triangulated.homFiniteBounded_boundedDerived
