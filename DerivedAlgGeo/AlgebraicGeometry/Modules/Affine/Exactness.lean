@@ -6,6 +6,9 @@ import Mathlib.Algebra.Category.ModuleCat.Presheaf.Sheafification
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.Abelian
 import Mathlib.Algebra.Homology.ShortComplex.ShortExact
 import Mathlib.CategoryTheory.Sites.EpiMono
+import Mathlib.CategoryTheory.Sites.Abelian
+import Mathlib.Algebra.Category.Grp.EpiMono
+import Mathlib.Algebra.Category.Grp.Abelian
 
 /-!
 # The forgetful functor from sheaves of modules to abelian sheaves is exact
@@ -140,5 +143,51 @@ epimorphism survives. -/
 lemma shortExact_map_toSheaf {S : ShortComplex (SheafOfModules.{v} R)}
     (hS : S.ShortExact) : (S.map (toSheaf.{v} R)).ShortExact :=
   hS.map_of_exact (toSheaf.{v} R)
+
+end SheafOfModules
+
+namespace SheafOfModules
+
+section ReflectEpi
+
+universe w
+
+variable {C : Type w} [Category.{w} C] {J : GrothendieckTopology C}
+  {R : Sheaf J RingCat.{w}}
+
+/-- **A map of sheaves of modules that is locally surjective is an epimorphism.**
+
+`preservesEpimorphisms_toSheaf` above goes the other way, and only that direction was
+available: it turns an epimorphism of module sheaves into one of abelian sheaves. What a
+locality argument produces is the opposite — local surjectivity, hence an epimorphism of
+abelian sheaves — and to land back in `SheafOfModules` the functor must **reflect**
+epimorphisms.
+
+It does, and for a more elementary reason than preservation of cokernels: `toSheaf` is
+faithful, and `reflectsEpimorphisms_of_faithful` makes every faithful functor reflect
+epimorphisms. No exactness is involved. Both instances fire on their own; this lemma
+exists to assemble the chain rather than to supply a missing step, and to record that the
+chain is complete.
+
+## The intended use
+
+Combined with `isLocallySurjective_of_coversTop` (`Divisors/Tensor.lean`), which builds
+the hypothesis from local surjectivity on a `CoversTop` family, this is the step that
+checks a map of module sheaves is an epimorphism chart by chart — Serre's surjection
+`⊕ O(-d) ↠ F` being the case in view. The two are not combined into one statement here
+because that would make this file depend on `Divisors/`, which is a different subject. -/
+theorem epi_of_isLocallySurjective
+    [HasSheafify J AddCommGrpCat.{w}] [J.WEqualsLocallyBijective AddCommGrpCat.{w}]
+    {M N : SheafOfModules.{w} R} (f : M ⟶ N)
+    (h : Presheaf.IsLocallySurjective J ((toSheaf R).map f).hom) : Epi f :=
+  (toSheaf R).epi_of_epi_map
+    ((Sheaf.isLocallySurjective_iff_epi' (A := AddCommGrpCat.{w}) _).mp h)
+
+/-- `toSheaf` reflects epimorphisms, recorded as an instance so the chain above is
+available to instance search as well as to explicit application. -/
+instance reflectsEpimorphisms_toSheaf : (toSheaf.{w} R).ReflectsEpimorphisms :=
+  inferInstance
+
+end ReflectEpi
 
 end SheafOfModules
