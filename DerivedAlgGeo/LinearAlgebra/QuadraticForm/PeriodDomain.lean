@@ -438,4 +438,80 @@ theorem stdForm_hasSignatureTwo : HasSignatureTwo stdForm := by
 
 end Witness
 
+section SignatureOne
+
+variable [FiniteDimensional ℝ M]
+
+omit [FiniteDimensional ℝ M] in
+private theorem apply_smul_add_smul (Q : QuadraticForm ℝ M) (u v : M) (a b : ℝ) :
+    Q (a • u + b • v) = a ^ 2 * Q u + b ^ 2 * Q v + a * b * polar (⇑Q) u v := by
+  rw [QuadraticMap.map_add (⇑Q), QuadraticMap.map_smul, QuadraticMap.map_smul,
+    polar_smul_left, polar_smul_right]
+  ring
+
+/-- **`Q` is nonpositive on the orthogonal complement of a positive vector when
+`sigPos Q = 1`.**
+
+The signature-one companion of `nonpos_of_mem_orthogonal`, which is the same
+statement one dimension up. A vector of positive square orthogonal to `u` would
+span, with `u`, a two-dimensional positive definite subspace, and `sigPos Q = 1`
+forbids that.
+
+With `Q` the intersection form of `NS(X) ⊗ ℝ` this **is** the Hodge index
+theorem in the form §6 consumes: `c · ω = 0` and `ω² > 0` give `c² ≤ 0`. Stated
+here rather than in the Mukai files because it is a fact about a real quadratic
+space and mentions no geometry.
+
+Note the orthogonality hypothesis is on `polar`, which for a form built by
+`toQuadraticMap` is **twice** the underlying pairing; over `ℝ` that is
+immaterial for vanishing, but see `Mukai/RealForm.lean` on why the factor is
+not immaterial elsewhere. -/
+theorem nonpos_of_sigPos_eq_one (Q : QuadraticForm ℝ M) (hsig : sigPos Q = 1)
+    {u v : M} (hu : 0 < Q u) (horth : polar (⇑Q) u v = 0) : Q v ≤ 0 := by
+  by_contra hcon
+  push Not at hcon
+  have hu0 : u ≠ 0 := by rintro rfl; simp at hu
+  have hv0 : v ≠ 0 := by rintro rfl; simp at hcon
+  have hinf : (ℝ ∙ u) ⊓ (ℝ ∙ v) = ⊥ := by
+    rw [Submodule.eq_bot_iff]
+    rintro x ⟨hx1, hx2⟩
+    obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hx1
+    obtain ⟨b, hb⟩ := Submodule.mem_span_singleton.mp hx2
+    have h1 : polar (⇑Q) u (b • v) = 0 := by
+      rw [polar_smul_right, horth, smul_zero]
+    have h2 : polar (⇑Q) u (a • u) = 0 := by rw [← hb]; exact h1
+    rw [polar_smul_right, polar_self] at h2
+    have h3 : a * (2 * Q u) = 0 := by simpa [smul_eq_mul] using h2
+    have ha : a = 0 := by
+      rcases mul_eq_zero.mp h3 with h | h
+      · exact h
+      · exact absurd h (by positivity)
+    simp [ha]
+  have hpos : (Q.restrict ((ℝ ∙ u) ⊔ (ℝ ∙ v))).PosDef := by
+    rintro ⟨x, hx⟩ hx0
+    rw [Submodule.mem_sup] at hx
+    obtain ⟨w, hw, z, hz, rfl⟩ := hx
+    obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hw
+    obtain ⟨b, rfl⟩ := Submodule.mem_span_singleton.mp hz
+    rw [restrict_apply, apply_smul_add_smul Q u v a b, horth]
+    have hne : ¬(a = 0 ∧ b = 0) := by
+      rintro ⟨rfl, rfl⟩
+      simp at hx0
+    have h1 : 0 ≤ a ^ 2 * Q u := by positivity
+    have h2 : 0 ≤ b ^ 2 * Q v := by positivity
+    rcases not_and_or.mp hne with h | h
+    · have : 0 < a ^ 2 * Q u := by positivity
+      linarith
+    · have : 0 < b ^ 2 * Q v := by positivity
+      linarith
+  have hrank : Module.finrank ℝ ((ℝ ∙ u) ⊔ (ℝ ∙ v) : Submodule ℝ M) = 2 := by
+    have h := Submodule.finrank_sup_add_finrank_inf_eq (ℝ ∙ u) (ℝ ∙ v)
+    rw [hinf, finrank_span_singleton hu0, finrank_span_singleton hv0] at h
+    simpa using h
+  have hle := le_sigPos_of_posDef Q hpos
+  rw [hrank, hsig] at hle
+  omega
+
+end SignatureOne
+
 end PeriodDomain
