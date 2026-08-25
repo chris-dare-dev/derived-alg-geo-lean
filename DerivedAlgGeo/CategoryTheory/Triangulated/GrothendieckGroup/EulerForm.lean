@@ -287,18 +287,30 @@ noncomputable def homLinearEquivOfFullyFaithful (Φ : C ⥤ D) [Φ.Additive]
 
 omit [HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
   [HasZeroObject D] [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D] in
-/-- **The shifted Hom-spaces have the same `k`-dimension.**
+/-- **The shifted Hom-spaces are `k`-linearly equivalent** under a fully
+faithful `k`-linear functor commuting with the shift.
 
 Two linear equivalences composed: full faithfulness moves `Hom(X, Y⟦i⟧)` to
 `Hom(ΦX, Φ(Y⟦i⟧))`, and the `CommShift` isomorphism moves that to
-`Hom(ΦX, (ΦY)⟦i⟧)`. -/
+`Hom(ΦX, (ΦY)⟦i⟧)`.
+
+This was inline inside `finrank_hom_shift_map`. It is named because equality of
+dimensions is not enough to transport `HomFiniteBounded` — finite-dimensionality
+has to travel too, and for that the equivalence itself is needed. -/
+noncomputable def homShiftLinearEquiv (Φ : C ⥤ D) [Φ.Additive] [Φ.Linear k]
+    [Φ.CommShift ℤ] (hΦ : Φ.FullyFaithful) (X Y : C) (i : ℤ) :
+    (X ⟶ Y⟦i⟧) ≃ₗ[k] (Φ.obj X ⟶ (Φ.obj Y)⟦i⟧) :=
+  (homLinearEquivOfFullyFaithful Φ hΦ X (Y⟦i⟧)).trans
+    (Linear.homCongr k (Iso.refl (Φ.obj X)) ((Φ.commShiftIso i).app Y))
+
+omit [HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+  [HasZeroObject D] [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D] in
+/-- **The shifted Hom-spaces have the same `k`-dimension.** The dimension
+shadow of `homShiftLinearEquiv`. -/
 theorem finrank_hom_shift_map (Φ : C ⥤ D) [Φ.Additive] [Φ.Linear k]
     [Φ.CommShift ℤ] (hΦ : Φ.FullyFaithful) (X Y : C) (i : ℤ) :
-    finrank k (Φ.obj X ⟶ (Φ.obj Y)⟦i⟧) = finrank k (X ⟶ Y⟦i⟧) := by
-  have e : (X ⟶ Y⟦i⟧) ≃ₗ[k] (Φ.obj X ⟶ (Φ.obj Y)⟦i⟧) :=
-    (homLinearEquivOfFullyFaithful Φ hΦ X (Y⟦i⟧)).trans
-      (Linear.homCongr k (Iso.refl (Φ.obj X)) ((Φ.commShiftIso i).app Y))
-  exact (e.finrank_eq).symm
+    finrank k (Φ.obj X ⟶ (Φ.obj Y)⟦i⟧) = finrank k (X ⟶ Y⟦i⟧) :=
+  ((homShiftLinearEquiv Φ hΦ X Y i).finrank_eq).symm
 
 omit [HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
   [HasZeroObject D] [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D] in
@@ -311,6 +323,60 @@ theorem chiHom_map (Φ : C ⥤ D) [Φ.Additive] [Φ.Linear k] [Φ.CommShift ℤ]
     (hΦ : Φ.FullyFaithful) (X Y : C) :
     chiHom k D (Φ.obj X) (Φ.obj Y) = chiHom k C X Y :=
   finsum_congr fun i => by rw [finrank_hom_shift_map Φ hΦ X Y i]
+
+omit [HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+  [HasZeroObject D] [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D] in
+/-- The shifted Hom-spaces of `D`, carried back to `C` along a comparison that
+is also essentially surjective.
+
+`homShiftLinearEquiv` only reaches objects of the form `Φ.obj X`. Essential
+surjectivity supplies, for an arbitrary `Y : D`, a preimage and an isomorphism
+`Φ.obj (Φ.objPreimage Y) ≅ Y`; conjugating by it — and by its shift in the
+second variable — extends the equivalence to every pair of objects of `D`. -/
+noncomputable def homShiftLinearEquivOfEssSurj (Φ : C ⥤ D) [Φ.Additive]
+    [Φ.Linear k] [Φ.CommShift ℤ] (hΦ : Φ.FullyFaithful) [Φ.EssSurj]
+    (Y Y' : D) (i : ℤ) :
+    (Y ⟶ Y'⟦i⟧) ≃ₗ[k] (Φ.objPreimage Y ⟶ (Φ.objPreimage Y')⟦i⟧) :=
+  (Linear.homCongr k (Φ.objObjPreimageIso Y).symm
+      ((shiftFunctor D i).mapIso (Φ.objObjPreimageIso Y').symm)).trans
+    (homShiftLinearEquiv Φ hΦ (Φ.objPreimage Y) (Φ.objPreimage Y') i).symm
+
+omit [HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+  [HasZeroObject D] [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D] in
+/-- **`HomFiniteBounded` transports along a `k`-linear triangulated equivalence.**
+
+If `Φ` is fully faithful, `k`-linear, commutes with the shift and is essentially
+surjective — an equivalence, presented by the data an equivalence gives — then
+`D` inherits the property from `C`. Both fields move across
+`homShiftLinearEquivOfEssSurj`: finite-dimensionality by `Module.Finite.equiv`,
+and the support because the two dimension functions are *equal*, not merely
+both finite.
+
+This is what `finrank_hom_shift_map` alone could not do. Equality of dimensions
+says nothing about finiteness — `finrank` is junk-valued at `0` on an infinite-
+dimensional space, so two infinite-dimensional Hom-spaces have equal `finrank`
+and neither is finite. The equivalence itself has to travel, which is why
+`homShiftLinearEquiv` was factored out of that proof.
+
+## The intended use
+
+A concrete `HomFiniteBounded` category is built where the statement is
+elementary — `Kᵇ` of a Hom-finite linear category, in
+`GrothendieckGroup/HomFiniteWitness.lean` — and then moved to a category where
+proving it directly would be a theorem about a localization. Supplying the
+equivalence is the caller's problem and is not made easier here. -/
+theorem HomFiniteBounded.of_essSurj (Φ : C ⥤ D) [Φ.Additive] [Φ.Linear k]
+    [Φ.CommShift ℤ] (hΦ : Φ.FullyFaithful) [Φ.EssSurj] [HomFiniteBounded k C] :
+    HomFiniteBounded k D where
+  finite Y Y' i :=
+    Module.Finite.equiv (homShiftLinearEquivOfEssSurj Φ hΦ Y Y' i).symm
+  support_finite Y Y' := by
+    have h : (fun i : ℤ => (finrank k (Y ⟶ Y'⟦i⟧) : ℤ))
+        = fun i : ℤ => (finrank k (Φ.objPreimage Y ⟶ (Φ.objPreimage Y')⟦i⟧) : ℤ) := by
+      funext i
+      exact_mod_cast (homShiftLinearEquivOfEssSurj Φ hΦ Y Y' i).finrank_eq
+    rw [h]
+    exact HomFiniteBounded.support_finite _ _
 
 variable [HomFiniteBounded k C] [HomFiniteBounded k D]
   [∀ n : ℤ, (shiftFunctor C n).Linear k] [∀ n : ℤ, (shiftFunctor D n).Linear k]
