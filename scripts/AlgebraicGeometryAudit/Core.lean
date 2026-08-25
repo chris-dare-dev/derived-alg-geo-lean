@@ -1393,6 +1393,8 @@ is not closed. -/
 #print axioms SheafOfModules.preservesFiniteColimits_toSheaf'
 #print axioms SheafOfModules.preservesEpimorphisms_toSheaf
 #print axioms SheafOfModules.shortExact_map_toSheaf
+#print axioms SheafOfModules.epi_of_isLocallySurjective
+#print axioms SheafOfModules.reflectsEpimorphisms_toSheaf
 
 -- Layer B stage 3: the link between cosimplicial (Cech) and simplicial (extra degeneracy)
 -- machinery. Not the whole of the Cech vanishing chain -- see the module docstring of
