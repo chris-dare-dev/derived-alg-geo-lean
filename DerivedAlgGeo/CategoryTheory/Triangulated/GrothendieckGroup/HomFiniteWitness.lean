@@ -5,6 +5,8 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.BoundedHomotopyCategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import Mathlib.Algebra.Category.FGModuleCat.Abelian
+import Mathlib.Algebra.Category.ModuleCat.Projective
+import Mathlib.Algebra.Homology.DerivedCategory.KProjective
 
 /-!
 # A concrete `HomFiniteBounded` category (#543)
@@ -19,15 +21,22 @@ concrete witness.
 
 ## Why the homotopy category and not the derived category
 
-For `Dᵇ` the finiteness of Hom-spaces is a theorem *about the localization*,
-classically proved through semisimplicity (`Dᵇ(k‑vect) ≃ ℤ`-graded vector
-spaces) — machinery neither Mathlib nor this repository has. For `Kᵇ` every
-statement is elementary: a chain map out of a complex supported in a finite
-window is determined by finitely many components, each in a Hom-finite
-Hom-space, and homotopy classes are a quotient of that. Over a field the two
-categories are in fact equivalent (bounded complexes of vector spaces are
-K-projective), but **that equivalence is neither used nor claimed here**; the
-witness stands on its own as an honest `k`-linear pretriangulated category.
+For `Dᵇ` the finiteness of Hom-spaces is a theorem *about the localization*.
+For `Kᵇ` every statement is elementary: a chain map out of a complex supported
+in a finite window is determined by finitely many components, each in a
+Hom-finite Hom-space, and homotopy classes are a quotient of that. So `Kᵇ` is
+where the witness is built, and it stands on its own as an honest `k`-linear
+pretriangulated category.
+
+The route to `Dᵇ` does **not** need the semisimplicity argument
+(`Dᵇ(k‑vect) ≃ ℤ`-graded vector spaces) that an earlier reading of #543 took to
+be the only option. Over a field every bounded complex is K-projective, and
+`CochainComplex.IsKProjective.Qh_map_bijective` then says Hom in `Dᵇ` *is* Hom
+in `Kᵇ`. The `FGModuleCat` section below supplies the missing input for that —
+projectivity — and `isKProjective_of_isStrictlyLE` records the consequence.
+**The transport itself is not done here**: nothing below constructs a
+`HomFiniteBounded` instance on any derived category, and the `Kᵇ ≃ Dᵇ`
+equivalence is still neither used nor claimed.
 
 ## What this file proves and what it does not
 
@@ -39,8 +48,16 @@ witness stands on its own as an honest `k`-linear pretriangulated category.
 * `instHomFiniteBoundedBounded`: `Kᵇ(C)` satisfies `HomFiniteBounded k` for
   Hom-finite `k`-linear `C`; `homFiniteBounded_fgModuleCat` instantiates it
   at `C := FGModuleCat k`.
-* **Not** proved: anything about `Dᵇ`, any comparison of `chiHom` on `Kᵇ`
-  with an Euler characteristic of homology, or `IsRiemannRoch` for anything.
+* `FGModuleCat.instProjective`: every finite-dimensional vector space is a
+  projective object. Mathlib has this for `ModuleCat` but not for
+  `FGModuleCat`, and instance search does not find it unaided — it is an
+  upstream candidate.
+* `isKProjective_of_isStrictlyLE`: a bounded-above complex of
+  finite-dimensional vector spaces is K-projective, with no hypothesis beyond
+  the bound.
+* **Not** proved: any `HomFiniteBounded` instance on a derived category, any
+  comparison of `chiHom` on `Kᵇ` with an Euler characteristic of homology, or
+  `IsRiemannRoch` for anything.
   The obligation #513 named is discharged in the satisfiability sense only:
   the class has a genuine model, so the Euler-form chain is not vacuous.
 -/
@@ -189,6 +206,37 @@ vacuous: `HomFiniteBounded` has a model. -/
 theorem homFiniteBounded_fgModuleCat :
     HomFiniteBounded k (HomotopyCategory.Bounded (FGModuleCat k)) :=
   inferInstance
+
+/-- **Every finite-dimensional vector space is a projective object.**
+
+Over a field every module is free, hence `Module.Projective`, and
+`ModuleCat.projective_of_categoryTheory_projective` turns that into
+categorical projectivity in `ModuleCat k`. The step this instance adds is
+descending it along `forget₂`, which is full, faithful and epimorphism-
+preserving, so `Functor.projective_of_map_projective` applies.
+
+Instance search does **not** find this chain on its own — it times out at the
+default heartbeat budget — which is why the instance is written down rather
+than left implicit. Mathlib has no `Projective` result anywhere under
+`Algebra/Category/FGModuleCat/`; this is an upstream candidate. -/
+instance _root_.FGModuleCat.instProjective (V : FGModuleCat.{u} k) :
+    Projective V :=
+  (forget₂ (FGModuleCat.{u} k) (ModuleCat.{u} k)).projective_of_map_projective
+    (inferInstanceAs (Projective ((forget₂ _ _).obj V)))
+
+/-- **A bounded-above complex of finite-dimensional vector spaces is
+K-projective.**
+
+`CochainComplex.isKProjective_of_projective` asks for a bound above and
+degreewise projectivity; over a field the second hypothesis is free by
+`FGModuleCat.instProjective`, so only the bound survives.
+
+This is the input to `CochainComplex.IsKProjective.Qh_map_bijective`, which is
+what would carry `instHomFiniteBoundedBounded` across to a derived category.
+That transport is not performed here. -/
+theorem isKProjective_of_isStrictlyLE (K : CochainComplex (FGModuleCat.{u} k) ℤ)
+    (d : ℤ) [K.IsStrictlyLE d] : K.IsKProjective :=
+  CochainComplex.isKProjective_of_projective K d
 
 end FGModuleCat
 

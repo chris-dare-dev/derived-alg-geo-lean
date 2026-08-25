@@ -348,3 +348,5 @@ claimed or used. -/
 #print axioms CategoryTheory.Triangulated.instHomFiniteBoundedBounded
 #print axioms CategoryTheory.Triangulated.fgModuleCat_hom_finite
 #print axioms CategoryTheory.Triangulated.homFiniteBounded_fgModuleCat
+#print axioms FGModuleCat.instProjective
+#print axioms CategoryTheory.Triangulated.isKProjective_of_isStrictlyLE
