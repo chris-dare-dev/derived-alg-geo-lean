@@ -41,11 +41,25 @@ Technique 5 fixes it, in two steps, and the second is the one that is easy to mi
 
 With that, the instance and the theorem each elaborate in seconds.
 
+## Choosing one exponent
+
+`exists_pow_smul_eq_res_chart_of_le` raises the exponent — the extension times `(f/g)^(m-n)` works
+for any `m ≥ n`, because the restriction map is linear over the chart ring. With that,
+`exists_pow_smul_eq_res_chart_uniform` gives a **single** `n` for a finite family of charts: each
+supplies its own, finiteness bounds the range, and raising does the rest.
+
 ## Scope
 
-One chart, one other basic open. `#585` is not closed: choosing a single `n` across a finite cover
-of degree-one charts, and the passage from `(f / g)ⁿ ·` to multiplication into the twist `F(n)` by
-`twistBy`, are not here.
+`#585` is still not closed. What remains is everything after the exponent:
+
+* the sections produced here live on **different sheaves**, one per chart, so they cannot be
+  compared yet — `twistBy` carrying each into the single sheaf `F(n)` is the missing passage;
+* their agreement on overlaps, which is what `exists_pow_smul_res_eq_zero` is for;
+* the gluing itself, to a section over `⊤` of `Proj 𝒜` rather than over one chart.
+
+Note also that the cover is an input here, not a construction: `degreeOneCharts_coversTop`
+(`Proj/Modules/Finiteness.lean`) supplies it from `Algebra.adjoin (𝒜 0) (range g) = ⊤`, and the
+finiteness of the index is a separate hypothesis.
 -/
 
 universe u
@@ -126,5 +140,64 @@ theorem exists_pow_smul_eq_res_chart (F : (Proj 𝒜).Modules)
       (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map (homOfLE le_top).op t =
         HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • s :=
   Scheme.Modules.exists_pow_smul_eq_res_of_top_of_isQuasicoherent _ _ s
+
+/-- **The exponent can be raised.**
+
+If clearing `(f/g)ⁿ` extends `s` over the chart, so does clearing any higher
+power: multiply the extension by `(f/g)^(m-n)`. The restriction map is linear
+over the chart ring, so nothing but `pow_add` is involved.
+
+This is what makes a *single* `n` across a finite cover possible — each chart
+supplies its own exponent, and this raises them all to the maximum.
+
+No quasi-coherence hypothesis: unlike `exists_pow_smul_eq_res_chart`, which
+needs it to produce an extension at all, raising an exponent uses only that the
+restriction map is linear. -/
+theorem exists_pow_smul_eq_res_chart_of_le (F : (Proj 𝒜).Modules)
+    {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1)
+    (s : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj
+        (op (PrimeSpectrum.basicOpen
+          (HomogeneousLocalization.Away.isLocalizationElem hg hf))))
+    {n m : ℕ} (hnm : n ≤ m)
+    (h : ∃ t : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj (op ⊤),
+      (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map (homOfLE le_top).op t =
+        HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • s) :
+    ∃ t : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj (op ⊤),
+      (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map (homOfLE le_top).op t =
+        HomogeneousLocalization.Away.isLocalizationElem hg hf ^ m • s := by
+  obtain ⟨t, ht⟩ := h
+  refine ⟨HomogeneousLocalization.Away.isLocalizationElem hg hf ^ (m - n) • t, ?_⟩
+  rw [map_smul, ht, smul_smul, ← pow_add]
+  congr 2
+  omega
+
+/-- **One exponent for a finite family of charts.**
+
+Each chart supplies its own `nᵢ` from `exists_pow_smul_eq_res_chart`; finiteness
+of the index makes the range of exponents bounded, and
+`exists_pow_smul_eq_res_chart_of_le` raises every chart to the bound.
+
+This is the first of the three things `#585`'s glue needs. The other two — that
+the resulting local sections agree on overlaps once carried into `F(n)`, and
+that they therefore glue to a section over `⊤` of `Proj 𝒜` — are not here. Note
+in particular that the sections produced below still live on *different* sheaves,
+one per chart; `twistBy` is what makes them comparable, and it is not applied
+yet. -/
+theorem exists_pow_smul_eq_res_chart_uniform (F : (Proj 𝒜).Modules)
+    [SheafOfModules.IsQuasicoherent.{u, u, u}
+      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
+    {f : A} (hf : f ∈ 𝒜 1) {ι : Type*} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
+    (s : ∀ i, (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.obj
+        (op (PrimeSpectrum.basicOpen
+          (HomogeneousLocalization.Away.isLocalizationElem (hg i) hf)))) :
+    ∃ n : ℕ, ∀ i,
+      ∃ t : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.obj (op ⊤),
+        (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.map
+            (homOfLE le_top).op t =
+          HomogeneousLocalization.Away.isLocalizationElem (hg i) hf ^ n • s i := by
+  choose N t ht using fun i => exists_pow_smul_eq_res_chart 𝒜 F hf (hg i) (s i)
+  obtain ⟨n, hn⟩ := (Set.finite_range N).bddAbove
+  exact ⟨n, fun i =>
+    exists_pow_smul_eq_res_chart_of_le 𝒜 F hf (hg i) (s i) (hn ⟨i, rfl⟩) ⟨t i, ht i⟩⟩
 
 end AlgebraicGeometry.Proj
