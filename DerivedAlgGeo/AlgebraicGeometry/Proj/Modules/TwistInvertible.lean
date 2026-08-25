@@ -88,4 +88,23 @@ theorem twistingSheaf_isInvertible {I : Type u} (g : I → 𝒜 1) (d : ℤ)
   intro i
   exact twistingSheafOverUnitIso 𝒜 (g i) d
 
+/-- **On a degree-one chart, the twist is the sheaf itself.**
+
+`F(d) = F ⊗ O(d)` restricted to `D₊(f)` for `f` of degree one is just `F`
+restricted there, because `O(d)` is trivial on that chart
+(`twistingSheafOverUnitIso`) and tensoring with a trivialized factor does
+nothing to the restriction (`tensorOverIsoOfTrivializationRight`).
+
+`F` is **arbitrary** — not an associated sheaf, not coherent, not even
+quasi-coherent. This is the passage `#585` needs: the per-chart sections that
+`ChartExtension.lean` produces live on different sheaves, one per chart, and
+this is what carries each of them into the single sheaf `F(d)`. -/
+noncomputable def tensorTwistOverChartIso (F : (AlgebraicGeometry.Proj 𝒜).Modules)
+    (f : 𝒜 1) (d : ℤ) :
+    (AlgebraicGeometry.Scheme.Modules.tensorObj F (twistingSheaf 𝒜 d)).over
+        (standardAway 𝒜 (degreeOneStandardChart 𝒜 f)).opensRange ≅
+      F.over (standardAway 𝒜 (degreeOneStandardChart 𝒜 f)).opensRange :=
+  AlgebraicGeometry.Scheme.Modules.tensorOverIsoOfTrivializationRight F
+    (twistingSheaf 𝒜 d) _ (twistingSheafOverUnitIso 𝒜 f d)
+
 end AlgebraicGeometry.Proj

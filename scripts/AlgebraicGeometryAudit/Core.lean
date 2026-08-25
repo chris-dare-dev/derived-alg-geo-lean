@@ -1714,6 +1714,7 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.isIso_overSheafificationComparison
 #print axioms AlgebraicGeometry.Scheme.Modules.overTensorPresheafIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorOverIsoOfTrivializations
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorOverIsoOfTrivializationRight
 #print axioms AlgebraicGeometry.Scheme.Modules.isInvertible_tensorObj
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorSheafificationComparisonLeft
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorSheafificationComparisonRight
@@ -2473,6 +2474,7 @@ The twist F(d) itself, its two coherence isomorphisms, and coherence-preservatio
 #584 is not closed. -/
 
 #print axioms AlgebraicGeometry.Proj.twistingSheafOverUnitIso
+#print axioms AlgebraicGeometry.Proj.tensorTwistOverChartIso
 #print axioms AlgebraicGeometry.Proj.twistingSheaf_isInvertible
 
 /-! ## The twist F(d) = F (x) O(d) (#584, deliverables 1, 2a and 4)
