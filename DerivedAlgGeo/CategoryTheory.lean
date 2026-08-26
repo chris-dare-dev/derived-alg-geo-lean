@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.ConstantSheafPullback
+import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.ExtDimensionShift
 import DerivedAlgGeo.CategoryTheory.WeakSerreExact
 import DerivedAlgGeo.CategoryTheory.DGCategory
