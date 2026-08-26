@@ -1686,6 +1686,8 @@ is not closed. -/
 #print axioms SheafOfModules.IsInvertible.ofIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitLeftIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_id_comp
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_id_comp_assoc
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorCommIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorTripleAssocIso
 #print axioms AlgebraicGeometry.Scheme.Modules.PicardClass.mk_eq_mk_iff
@@ -2577,6 +2579,70 @@ cover, quasi-coherence on each chart, and exists_pow_smul_mem_of_isLocalized_rad
 #print axioms AlgebraicGeometry.Proj.unitToTwist
 #print axioms AlgebraicGeometry.Proj.unitToTwist_app_one
 #print axioms AlgebraicGeometry.Proj.twistBy
+
+/-! ## The two charts' multiplications differ by a MORPHISM (#585 glue)
+
+The comparison #585 needs between charts: over D+(g), multiplying by f^n is multiplying by f^n/g^n
+and then by g^n. The correction is carried as a morphism out of the unit, NOT as a scalar.
+
+That is forced, not stylistic. The scalar form needs the scalar to cross tensorHom at the next
+step and it cannot: Linear Gamma(X, top) X.PresheafOfModules does not synthesize, and supplying it
+would mean a Gamma-linear structure on presheaves, linearity of toPresheafOfModules and of
+associatedSheaf, and a MonoidalLinear instance -- none of which exist. As a morphism the next step
+only needs tensorHom (1 F) - to be FUNCTORIAL (tensorHom_id_comp), which it is.
+
+D+(g) is used as an OPEN SUBSCHEME, not through degreeOneChart: by ι_image_top its sections over
+top are definitionally sections of the structure sheaf over D+(g), so no GammaSpecIso and no
+degree-zero away ring appear here at all.
+
+chartUnitToTwist_app_one is load-bearing for the same reason unitToTwist_app_one is one level
+down -- restrictUnitIso and the restriction functor are both crossed before anything is applied.
+
+One step changes shape rather than content: Scheme.Modules.restrict_smul_eq moves the equation from
+the restricted sheaf's scalar action to the Proj one, which is where step A's pointwise lemma
+lives. That lemma is rfl -- the two actions ARE definitionally equal, and it is recorded here
+because an earlier draft of this file claimed the opposite. What is true, and much narrower, is
+only that ι_appIso is proved by ofRestrict_appIso (ext1 then simp only), not by rfl; that says
+nothing about the actions being defeq. The lemma earns its place by shape alone: Mathlib's
+smul_restrictAppIso_hom_apply wraps the same fact in two restrictAppIso.hom applications, and the
+bare form is what matches a goal written the obvious way. -/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.restrict_smul_eq
+#print axioms AlgebraicGeometry.Proj.fracPowSection
+#print axioms AlgebraicGeometry.Proj.pow_mem_deg
+#print axioms AlgebraicGeometry.Proj.chartOpen
+#print axioms AlgebraicGeometry.Proj.chartRestrictFunctor
+#print axioms AlgebraicGeometry.Proj.chartUnitToTwist
+#print axioms AlgebraicGeometry.Proj.chartOpen_image_le
+#print axioms AlgebraicGeometry.Proj.chartFracPowAt
+#print axioms AlgebraicGeometry.Proj.chartFracPowSections
+#print axioms AlgebraicGeometry.Proj.chartUnitToTwist_app_one
+#print axioms AlgebraicGeometry.Proj.chartFracPowMul
+#print axioms AlgebraicGeometry.Proj.chartUnitToTwist_eq
+
+/-! ## The same factorisation on an arbitrary F over the chart (#585 glue, step C)
+
+chartTwistBy is twistBy for a module sheaf on D+(g); chartTwistBy_eq is chartUnitToTwist_eq
+tensored with F. The ONLY input beyond it is that tensorHom (1 F) - preserves composition
+(tensorHom_id_comp) -- never that it is linear, which it is not. That is the payoff of carrying
+the correction as a morphism rather than a scalar.
+
+The correction is conjugated by the right unitor, not left in front. tensorHom lands in F (x) 1,
+so rho.inv followed by tensorHom (1 F) - cannot be pulled out of chartTwistBy's composite as it
+stands; chartFracPowOn conjugates it back onto F and the two unitors cancel mid-proof.
+
+The final step is congrArg, not rw. The pattern IS syntactically present, but the goal mentions
+(D+(g) as a scheme).ringCatSheaf and so is not type-correct under the instances transparency
+level, which stops rw and simp only matching inside it. congrArg works by defeq. Same failure mode
+as the one recorded for restrict_smul_eq; it is a property of these goals, not of either lemma.
+
+NOT here: identifying chartFracPowOn with multiplication by the section f^n/g^n on F (needs the
+right unitor on sections), and comparing chartTwistBy (F.restrict) with the restriction of
+twistBy F (needs restriction to commute with tensor). #585 stays open. -/
+
+#print axioms AlgebraicGeometry.Proj.chartTwistBy
+#print axioms AlgebraicGeometry.Proj.chartFracPowOn
+#print axioms AlgebraicGeometry.Proj.chartTwistBy_eq
 
 /-! ## Clearing a denominator on an affine (#585 chart-local engine)
 

@@ -632,3 +632,36 @@ theorem isFinitePresentation_over_iff_restrict (M : Y.Modules) :
 end Scheme.Hom
 
 end AlgebraicGeometry
+
+namespace AlgebraicGeometry.Scheme.Modules
+
+/-- **The restricted sheaf's scalar action is the original one, transported along `appIso`.**
+
+`Scheme.Modules.restrictAppIso` is `Iso.refl`, so both sides live in the same
+type and the statement is purely about which action is used.
+
+**This is `rfl`.** `by rfl` proves the statement verbatim; the proof term below
+just reads it off Mathlib's form. So it is not a defeq barrier, and reaching for
+it is never *forced* — do not read this lemma as evidence that a restricted
+scalar action cannot be closed definitionally, because it can.
+
+What it is for is *shape*. Mathlib's `smul_restrictAppIso_hom_apply` states the
+same fact with two `restrictAppIso.hom` applications wrapped around it; this
+states it bare, so that instantiating it as a `have` hands back an equation whose
+sides match a goal written in the obvious way. `Proj.chartUnitToTwist_eq` uses it
+exactly so — to move an equation from the restricted action to the original one,
+where the pointwise lemma about the original applies.
+
+A caveat on how to *use* it, learned the hard way: `rw` with it will fail on a
+goal carrying `show`-ascription residue, which Lean reports as the goal being
+"not type-correct under the `instances` transparency level". That is a property
+of the goal, not of this lemma. Instantiate it at explicit arguments as a `have`
+and combine with `Eq.trans`. -/
+theorem restrict_smul_eq {X Y : Scheme} (f : X ⟶ Y) [IsOpenImmersion f]
+    (M : Y.Modules) (U : X.Opens) (r : Γ(X, U)) (x : Γ(M.restrict f, U)) :
+    (r • x : Γ(M.restrict f, U))
+      = (show Γ(Y, f ''ᵁ U) from (Scheme.Hom.appIso f U).inv.hom r) •
+        (show Γ(M, f ''ᵁ U) from x) :=
+  Scheme.Modules.smul_restrictAppIso_hom_apply f M U r x
+
+end AlgebraicGeometry.Scheme.Modules

@@ -621,3 +621,4 @@ absent from Mathlib at this pin and is asserted nowhere.
 
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.SchemeQuasicoherentDerivedCategory.quasicoherent_isClosedUnderIsomorphisms
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.SchemeQuasicoherentDerivedCategory.quasicoherent_isClosedUnderCoproducts
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.SchemeQuasicoherentDerivedCategory.sigma_mem
