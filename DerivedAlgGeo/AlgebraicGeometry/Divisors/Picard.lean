@@ -343,6 +343,125 @@ theorem unitorConj_app (M : X.Modules)
   rw [hval]
   rfl
 
+/-- **A pure tensor of sections, as a section of the sheafified tensor.**
+
+The exportable handle on the sheafified tensor at section level. `tensorObj` is built from
+`toPresheafOfModules` and the monoidal structure on `X.PresheafOfModules`, neither of which is
+nameable outside this file — the first is used through a `private abbrev`, the second is a
+`local instance`. So a consumer cannot write `t ⊗ₜ y` at all, and any section-level statement about
+the tensor has to be phrased through a named constructor. This is it.
+
+It is the image of the honest pure tensor under the sheafification adjunction's unit. Sections of a
+sheafification are not in general sums of pure tensors, so this is a map *into* the sections, not a
+description of them — which is all the twist API needs. -/
+noncomputable def tmulSection (M N : X.Modules) (U : X.Opensᵒᵖ)
+    (t : Γ(M, U.unop)) (y : Γ(N, U.unop)) : Γ(tensorObj M N, U.unop) :=
+  ((PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app
+    ((toPresheafOfModules X).obj M ⊗ (toPresheafOfModules X).obj N)).app U
+      (t ⊗ₜ[Γ(X, U.unop)] y)
+
+
+/-- **A scalar moves across the pure tensor.**
+
+Tensor bilinearity plus linearity of the unit's component. What makes it usable downstream is the
+direction: a scalar sitting outside, where a chart extension leaves it, can be pushed onto the
+second factor, where the twist's own section lives. -/
+theorem smul_tmulSection (M N : X.Modules) (U : X.Opensᵒᵖ)
+    (r : Γ(X, U.unop)) (t : Γ(M, U.unop)) (y : Γ(N, U.unop)) :
+    r • tmulSection M N U t y = tmulSection M N U t (r • y) := by
+  have h1 : (t ⊗ₜ[Γ(X, U.unop)] (r • y)) = r • (t ⊗ₜ[Γ(X, U.unop)] y) :=
+    TensorProduct.tmul_smul _ _ _
+  rw [tmulSection, tmulSection]
+  set eta := ((PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app
+    ((toPresheafOfModules X).obj M ⊗ (toPresheafOfModules X).obj N)).app U with heta
+  have hsm : (ModuleCat.Hom.hom eta) (r • (t ⊗ₜ[Γ(X, U.unop)] y))
+      = r • (ModuleCat.Hom.hom eta) (t ⊗ₜ[Γ(X, U.unop)] y) := by
+    exact (ModuleCat.Hom.hom eta).map_smul r _
+  exact (hsm.symm.trans (congrArg _ h1.symm))
+
+/-- **The `twistBy` shape, applied to a section: it is the pure tensor with `ψ`'s value on `1`.**
+
+`(ρ.inv ≫ tensorHom (𝟙 F) ψ)` is exactly the shape of `Proj.twistBy` and of
+`Proj.chartTwistBy`. This says what it does to a section, which nothing in the tree did before.
+
+Proved the same way as `unitorConj_eq`, and sheafification is again never computed on sections.
+The counit's inverse *is* the adjunction unit — `hinv`, from the right triangle identity, assembled
+mono-free because `Mono` does not synthesize on a `.val`; then naturality of that unit carries a
+presheaf-level computation across, and the presheaf-level part (`t ↦ t ⊗ₜ 1 ↦ t ⊗ₜ ψ(1)`) is `rfl`.
+
+Every step is `congrArg`/`exact`: goals here mention `associatedSheaf` and are not type-correct
+under the `instances` transparency level, so `rw` will not match patterns that are syntactically
+present. The naturality step additionally needs `DFunLike.congr_fun` rather than `congrFun` — the
+components are bundled `LinearMap`s, not functions. -/
+theorem tensorUnitRight_inv_tensorHom_app (F N : X.Modules)
+    (ψ : (.unit X.ringCatSheaf : X.Modules) ⟶ N) (U : X.Opensᵒᵖ) (t : Γ(F, U.unop)) :
+    (((tensorUnitRightIso F).inv ≫ tensorHom (𝟙 F) ψ).val.app U).hom t
+      = tmulSection F N U t ((ψ.val.app U).hom (1 : Γ(X, U.unop))) := by
+  have htri := (PresheafOfModules.sheafificationAdjunction
+      (𝟙 X.ringCatSheaf.obj)).right_triangle_components F
+  have hinv : (((asIso (PresheafOfModules.sheafificationAdjunction
+        (𝟙 X.ringCatSheaf.obj)).counit).app F).inv).val
+      = (PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app
+        ((toPresheafOfModules X).obj F) := by
+    have h2 : (((asIso (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit).app F).hom).val ≫
+        (((asIso (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit).app F).inv).val = 𝟙 _ := by
+      rw [← SheafOfModules.comp_val, Iso.hom_inv_id]
+      rfl
+    refine Eq.symm ((Category.comp_id _).symm.trans ?_)
+    refine (congrArg (fun z => (PresheafOfModules.sheafificationAdjunction
+      (𝟙 X.ringCatSheaf.obj)).unit.app ((toPresheafOfModules X).obj F) ≫ z) h2.symm).trans ?_
+    exact (Category.assoc _ _ _).symm.trans
+      ((congrArg (fun z => z ≫ _) htri).trans (Category.id_comp _))
+  have hnat := ((PresheafOfModules.sheafificationAdjunction
+      (𝟙 X.ringCatSheaf.obj)).unit).naturality
+      ((ρ_ ((toPresheafOfModules X).obj F)).inv ≫
+        ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ (toPresheafOfModules X).map ψ))
+  rw [tensorUnitRightIso, tensorHom, tmulSection]
+  simp only [Iso.trans_inv, Functor.mapIso_inv, Category.assoc]
+  have hfuse : ((asIso (PresheafOfModules.sheafificationAdjunction
+        (𝟙 X.ringCatSheaf.obj)).counit).app F).inv ≫
+      (associatedSheaf X).map (ρ_ ((toPresheafOfModules X).obj F)).inv ≫
+        (associatedSheaf X).map ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ
+          (toPresheafOfModules X).map ψ)
+      = ((asIso (PresheafOfModules.sheafificationAdjunction
+        (𝟙 X.ringCatSheaf.obj)).counit).app F).inv ≫
+        (associatedSheaf X).map ((ρ_ ((toPresheafOfModules X).obj F)).inv ≫
+          ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ (toPresheafOfModules X).map ψ)) := by
+    rw [CategoryTheory.Functor.map_comp]
+    rfl
+  refine (congrArg (fun m => (ModuleCat.Hom.hom
+    ((m : F ⟶ tensorObj F N).val.app U)) t) hfuse).trans ?_
+  have hsplit : (ModuleCat.Hom.hom
+        ((((asIso (PresheafOfModules.sheafificationAdjunction
+              (𝟙 X.ringCatSheaf.obj)).counit).app F).inv ≫
+            (associatedSheaf X).map ((ρ_ ((toPresheafOfModules X).obj F)).inv ≫
+              ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ
+                (toPresheafOfModules X).map ψ))).val.app U)) t
+      = (ModuleCat.Hom.hom (((associatedSheaf X).map
+            ((ρ_ ((toPresheafOfModules X).obj F)).inv ≫
+              ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ
+                (toPresheafOfModules X).map ψ))).val.app U))
+          ((ModuleCat.Hom.hom ((((asIso (PresheafOfModules.sheafificationAdjunction
+              (𝟙 X.ringCatSheaf.obj)).counit).app F).inv).val.app U)) t) := rfl
+  refine hsplit.trans ?_
+  rw [hinv]
+  have hn : (ModuleCat.Hom.hom (((associatedSheaf X).map
+        ((ρ_ ((toPresheafOfModules X).obj F)).inv ≫
+          ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ
+            (toPresheafOfModules X).map ψ))).val.app U))
+      ((ModuleCat.Hom.hom (((PresheafOfModules.sheafificationAdjunction
+        (𝟙 X.ringCatSheaf.obj)).unit.app ((toPresheafOfModules X).obj F)).app U)) t)
+      = (ModuleCat.Hom.hom (((PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).unit.app ((toPresheafOfModules X).obj F ⊗
+            (toPresheafOfModules X).obj N)).app U))
+        ((ModuleCat.Hom.hom (((ρ_ ((toPresheafOfModules X).obj F)).inv ≫
+          ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ
+            (toPresheafOfModules X).map ψ)).app U)) t) := by
+    exact (DFunLike.congr_fun (congrArg (fun m => (ModuleCat.Hom.hom (m.app U))) hnat) t).symm
+  exact hn.trans rfl
+
 /-- The symmetry of the sheafified tensor product. -/
 noncomputable def tensorCommIso (M N : X.Modules) :
     tensorObj M N ≅ tensorObj N M :=
