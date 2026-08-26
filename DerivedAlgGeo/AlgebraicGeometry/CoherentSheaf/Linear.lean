@@ -64,6 +64,70 @@ open CategoryTheory AlgebraicGeometry.Cohomology
 
 namespace AlgebraicGeometry
 
+namespace Scheme
+
+variable (X : AlgebraicGeometry.Scheme.{u})
+
+/-- **Morphisms of module sheaves are a module over the global functions.**
+
+The scalar is a global section of the structure sheaf, not an element of a base
+field: `globalSectionAction M : Γ(X, ⊤) →+* End M` is already a ring
+homomorphism, and every clause below uses only that plus `Preadditive`. Nothing
+here is specific to a variety, and no field appears.
+
+`Variety.homModule` is this composed with `k → Γ(X, ⊤)`; it predates this and is
+left as it is. -/
+@[reducible]
+noncomputable def homModuleGlobal (M N : X.Modules) :
+    Module Γ(X, (⊤ : X.Opens)) (M ⟶ N) where
+  smul r f := globalSectionAction M r ≫ f
+  one_smul f := by
+    show globalSectionAction M 1 ≫ f = f
+    rw [map_one]
+    exact Category.id_comp f
+  mul_smul r s f := by
+    show globalSectionAction M (r * s) ≫ f
+      = globalSectionAction M r ≫ globalSectionAction M s ≫ f
+    rw [mul_comm, map_mul, End.mul_def, Category.assoc]
+  smul_zero r := by
+    show globalSectionAction M r ≫ (0 : M ⟶ N) = 0
+    exact Limits.comp_zero
+  smul_add r f g := by
+    show globalSectionAction M r ≫ (f + g)
+      = globalSectionAction M r ≫ f + globalSectionAction M r ≫ g
+    exact Preadditive.comp_add _ _ _ _ _ _
+  add_smul r s f := by
+    show globalSectionAction M (r + s) ≫ f
+      = globalSectionAction M r ≫ f + globalSectionAction M s ≫ f
+    rw [map_add]
+    exact Preadditive.add_comp _ _ _ _ _ _
+  zero_smul f := by
+    show globalSectionAction M 0 ≫ f = 0
+    rw [map_zero]
+    exact Limits.zero_comp
+
+/-- **Module sheaves on any scheme form a `Γ(X, ⊤)`-linear category.**
+
+`comp_smul` is the clause with content, and it is `globalSectionSmul_naturality`:
+multiplication by a global function is central on morphisms.
+
+This is what lets a *section-valued* scalar be moved across a morphism. The
+`Linear k` instance next door only ever moves elements of the base field, which
+is not enough when the scalar is a function like `fⁿ/gⁿ` on a chart. -/
+noncomputable instance modulesLinearGlobal :
+    Linear Γ(X, (⊤ : X.Opens)) X.Modules where
+  homModule M N := homModuleGlobal X M N
+  smul_comp M N P r f g := by
+    show (globalSectionAction M r ≫ f) ≫ g = globalSectionAction M r ≫ f ≫ g
+    exact Category.assoc _ _ _
+  comp_smul M N P f r g := by
+    show f ≫ globalSectionAction N r ≫ g = globalSectionAction M r ≫ f ≫ g
+    rw [← Category.assoc, ← Category.assoc]
+    congr 1
+    exact (globalSectionSmul_naturality f r).symm
+
+end Scheme
+
 namespace Variety
 
 variable {k : Type u} [Field k] (Y : Variety k)
