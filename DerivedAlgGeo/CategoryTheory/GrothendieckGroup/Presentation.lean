@@ -19,7 +19,7 @@ noncomputable section
 
 universe u v u' v' u'' v''
 
-namespace CategoryTheory.Triangulated
+namespace CategoryTheory
 
 /-- A presentation by three-term additive relations. -/
 structure GrothendieckPresentation (Generator : Type u) (Relation : Type v) where
@@ -168,4 +168,4 @@ theorem map_comp {Generator' : Type u'} {Relation' : Type v'}
 
 end GrothendieckPresentation
 
-end CategoryTheory.Triangulated
+end CategoryTheory

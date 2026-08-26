@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Slicing
-import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Presentation
+import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Presentation
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Functorial
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.PreStabilityCondition
