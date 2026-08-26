@@ -21,13 +21,13 @@ heart, which is exactly what a stability function's positivity obligation holds.
 
 ## What this file does
 
-`ofNumerical` builds the class map as a **composition of homs**
+`toMukaiChargeData` builds the class map as a **composition of homs**
 
 ```
 K₀Ab A --cl--> N --mukaiVectorHom--> MukaiLattice Λ --extendMapHom--> RealExtension W
 ```
 
-so `charge_ofNumerical` is definitional: the categorical charge of an object *is*
+so `charge_toMukaiChargeData` is definitional: the categorical charge of an object *is*
 the numerical charge of its class.  Nothing along the chain re-proves additivity,
 and a `MukaiChargeData` built this way cannot be unrelated to the geometry,
 because the geometry is what it is made of.
