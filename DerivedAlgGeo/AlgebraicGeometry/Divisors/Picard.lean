@@ -203,6 +203,39 @@ noncomputable def tensorHom {M M' N N' : X.Modules} (f : M ⟶ M') (g : N ⟶ N'
   (associatedSheaf X).map
     ((toPresheafOfModules X).map f ⊗ₘ (toPresheafOfModules X).map g)
 
+/-- **Tensoring with a fixed sheaf on the left preserves composition.**
+
+`tensorHom (𝟙 F) −` is functorial. Every layer of `tensorHom` is a functor, so
+this is `Functor.map_comp` on top of `tensorHom_comp_tensorHom`; no linearity
+is involved anywhere.
+
+That distinction is the point. A scalar cannot be moved across `tensorHom`:
+neither `X.Modules` nor `X.PresheafOfModules` carries the monoidal-linear
+structure that would need, and supplying it would mean a `Γ`-linear structure on
+presheaves, linearity of `toPresheafOfModules` and of `associatedSheaf`, and a
+`MonoidalLinear` instance — none of which exist. A *morphism* can be moved
+across it, by this lemma. So an argument that would multiply by a section should
+compose with multiplication-by-that-section instead.
+
+It has to live here rather than with its consumer: the monoidal structure on
+`X.PresheafOfModules` is a `local instance` in this namespace, so
+`MonoidalCategoryStruct X.PresheafOfModules` does not synthesize outside it and
+the presheaf-level identity below is not even statable elsewhere. -/
+@[reassoc]
+theorem tensorHom_id_comp (F : X.Modules) {M N P : X.Modules}
+    (β : M ⟶ N) (β' : N ⟶ P) :
+    tensorHom (𝟙 F) (β ≫ β') = tensorHom (𝟙 F) β ≫ tensorHom (𝟙 F) β' := by
+  have h : (toPresheafOfModules X).map (𝟙 F) ⊗ₘ
+        (toPresheafOfModules X).map (β ≫ β')
+      = ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ (toPresheafOfModules X).map β) ≫
+        ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ
+          (toPresheafOfModules X).map β') := by
+    rw [CategoryTheory.Functor.map_comp, CategoryTheory.Functor.map_id,
+      MonoidalCategory.tensorHom_comp_tensorHom, Category.comp_id]
+  unfold tensorHom
+  rw [h, CategoryTheory.Functor.map_comp]
+  rfl
+
 /-- Sheafification identifies tensoring with the structure sheaf on the left. -/
 noncomputable def tensorUnitLeftIso (M : X.Modules) :
     tensorObj (.unit X.ringCatSheaf) M ≅ M :=
