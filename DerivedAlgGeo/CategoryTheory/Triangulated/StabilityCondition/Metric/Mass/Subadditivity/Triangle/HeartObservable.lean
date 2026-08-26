@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HeartComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Distance.Topology
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.PolygonPerimeter
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.CohomologyExactness
@@ -79,24 +80,10 @@ def StabilityCondition.WithClassMap.observableStabilityFunctionOnHeart
   letI := t.hasHeartFullSubcategory
   letI : Abelian t.heart.FullSubcategory := t.heartFullSubcategoryAbelian
   refine
-    { charge := fun E ↦ σ.charge E.obj
-      map_zero := fun E hE ↦ σ.charge_isZero ((t.heart).ι.map_isZero hE)
-      map_iso := fun {E F} e ↦ by
-        exact congrArg σ.Z
-          (classOf_iso C v ((t.heart).ι.mapIso e))
-      additive := fun S hS ↦ by
-        letI := hS.mono_f
-        letI := hS.epi_g
-        obtain ⟨δ, hT⟩ :=
-          TStructure.heartFullSubcategory_shortExact_triangle (C := C) t
-            S.f S.g S.zero (fun {W} α hα ↦ by
-              have hker : IsLimit (KernelFork.ofι S.f S.zero) := hS.fIsKernel
-              exact ⟨hker.lift (KernelFork.ofι α hα),
-                hker.fac _ WalkingParallelPair.zero⟩)
-        simpa [PreStabilityCondition.WithClassMap.charge_def] using
-          congrArg σ.Z (classOf_triangle C v (Triangle.mk S.f.hom S.g.hom δ) hT)
+    { Z := σ.Z.comp (v.comp (K₀Ab.toAmbient t))
       nonzero_mem := fun E hE ↦ by
         classical
+        show σ.charge E.obj ∈ _
         have hEobj : ¬IsZero E.obj := fun h ↦
           hE (ObjectProperty.FullSubcategory.isZero_of_obj_isZero h)
         have hheart := (σ.slicing.toTStructure_heart_iff C E.obj).mp E.property
@@ -183,7 +170,9 @@ theorem StabilityCondition.WithClassMap.observableStabilityFunctionOnHeart_charg
     (E : σ.slicing.toTStructure.heart.FullSubcategory) :
     @StabilityFunction.charge _ _
       ((σ.slicing.toTStructure).heartFullSubcategoryAbelian)
-      σ.observableStabilityFunctionOnHeart E = σ.charge E.obj := rfl
+      σ.observableStabilityFunctionOnHeart E = σ.charge E.obj := by
+  simp [observableStabilityFunctionOnHeart, StabilityFunction.charge,
+    PreStabilityCondition.WithClassMap.charge_def, classOf]
 
 /-- On a nonzero heart object already lying in a slice, the phase of the
 restricted owner stability function is that slice parameter. -/
