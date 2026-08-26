@@ -2706,6 +2706,31 @@ twistBy F (needs restriction to commute with tensor). #585 stays open. -/
 #print axioms AlgebraicGeometry.Proj.chartFracPowOn
 #print axioms AlgebraicGeometry.Proj.chartTwistBy_eq
 
+/-! ## The overlap comparison, on SECTIONS and on Proj itself (#585 step D core)
+
+twistBy_app is what twistBy does to a section -- the section-level counterpart of
+unitToTwist_app_one, one tensor up. Until tensorUnitRight_inv_tensorHom_app existed, nothing in the
+tree said what any part of twistBy does to a section, and twistBy was opaque at every use site.
+
+twistBy_app_eq_smul is the agreement #585's glue needs: over an open inside D+(g), twisting a
+section by f^n is twisting by g^n and scaling by f^n/g^n. It is stated on Proj DIRECTLY -- no
+restriction functor and no chart appear.
+
+That is the point of stating it here rather than deriving it from chartTwistBy_eq. The
+morphism-level route lives on the open subscheme, and turning its conclusion back into a statement
+about sections of F(n) on Proj would need restriction to commute with the sheafified tensor
+product. No such compatibility exists in this repository or in Mathlib. Carrying the comparison on
+sections from the start avoids needing it.
+
+The proof is three rewrites and no geometry: twistBy_app twice, smul_tmulSection to push the scalar
+onto the twist factor, and step A lifted to sections. The geometry was spent in #751.
+
+NOT here: the cover, the single exponent across it, and the gluing. #585 stays open. -/
+
+#print axioms AlgebraicGeometry.Proj.twistBy_app
+#print axioms AlgebraicGeometry.Proj.fracPowSection_smul_sectionOfMem
+#print axioms AlgebraicGeometry.Proj.twistBy_app_eq_smul
+
 /-! ## Clearing a denominator on an affine (#585 chart-local engine)
 
 A section of a quasi-coherent sheaf over D(r), times a high enough power of r, is the restriction
