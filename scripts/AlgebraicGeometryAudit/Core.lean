@@ -2814,6 +2814,26 @@ so #585 is not closed. -/
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_of_le
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_uniform
 
+/-! ## The same three, for AGREEMENT rather than extension (#585 glue)
+
+Two charts' twisted sections are only visibly equal where D+(f) reaches: there each restricts to
+the same twistBy f^n of s. But TopCat.Sheaf.IsCompatible demands agreement on the whole pairwise
+overlap D+(g_i) inf D+(g_j), which is NOT contained in D+(f). The standing plan for #585 says
+agreement is "immediate"; it is immediate only on the overlap WITH D+(f), and closing that distance
+costs a second exponent.
+
+These three mirror the extension trio with exists_pow_smul_eq_of_res_eq_of_isQuasicoherent in place
+of the extension lemma: one gets an exponent per pair, one raises it, one unifies over a finite
+family. The uniform version's index is deliberately arbitrary rather than the chart index, because
+agreement must be forced on every PAIR at once and a pair type is what gets passed.
+
+The first is six lines for the same reason its extension sibling is: on a degree-one chart the
+sections over D(f/g) are a localization of the sections over the whole chart. -/
+
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart_of_le
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart_uniform
+
 /-! ## f^n on a degree-one chart is (f/g)^n (#585 bridge)
 
 The bridge between #585's two halves. The chart step clears a power of f/g on the chart through g;
