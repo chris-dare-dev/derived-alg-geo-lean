@@ -238,6 +238,63 @@ theorem coe_smul (a : HomogeneousLocalization 𝒜 S)
     ((a • x : DegreeZeroLocalization 𝒜 𝓜 S) : LocalizedModule S M) = a • (x : LocalizedModule S M) :=
   rfl
 
+/-- **The scalar action in explicit fractions**: `(p/q) • (m/s) = (p • m)/(q * s)`.
+
+The companion of `twistMul_mk` for the module action, and the rule a caller
+needs to rebuild a local-fraction certificate after multiplying by a scalar.
+Without it the action is opaque at a use site: `coe_smul` moves the problem into
+`LocalizedModule` but says nothing about which fraction comes out.
+
+The proof is the one already inside `IsDegreeZero.smul`, which constructs exactly
+this `NumDenSameDeg` in order to show the action stays degree zero; naming the
+computation separately means a caller no longer has to re-derive it.
+
+**Not `@[simp]`.** Its right-hand side is stated with `a.num` and `a.den`, the
+representative `HomogeneousLocalization` chooses, which is the *less* usable
+form — see `mk_smul_mk` below. Marking both would also be a `simpNF` conflict,
+since this one rewrites that one's left-hand side. -/
+theorem smul_mk (a : HomogeneousLocalization 𝒜 S) (c : NumDenSameDeg 𝒜 𝓜 S) :
+    a • (mk c : DegreeZeroLocalization 𝒜 𝓜 S) =
+      mk { deg := a.deg + c.deg
+           num := ⟨a.num • (c.num : M),
+             SetLike.GradedSMul.smul_mem a.num_mem_deg c.num.2⟩
+           den := ⟨a.den * (c.den : A),
+             SetLike.mul_mem_graded a.den_mem_deg c.den.2⟩
+           den_mem := S.mul_mem a.den_mem c.den_mem } := by
+  apply DegreeZeroLocalization.ext
+  rw [coe_smul, coe_mk, coe_mk]
+  show (algebraMap (HomogeneousLocalization 𝒜 S) (Localization S) a) •
+    LocalizedModule.mk (S := S) (c.num : M) (⟨(c.den : A), c.den_mem⟩ : S) = _
+  rw [HomogeneousLocalization.algebraMap_apply, a.eq_num_div_den,
+    LocalizedModule.mk_smul_mk]
+  rfl
+
+/-- **The scalar action on two explicit fractions.**
+
+`smul_mk` leaves the scalar as `a.num / a.den`, which are the representative
+`HomogeneousLocalization` chooses — *not* the fields of whatever
+`NumDenSameDeg` the caller built `a` from. When the scalar is itself written as
+`HomogeneousLocalization.mk c'`, that gap has to be closed again at every use
+site. This states the rule with both sides explicit, so it does not. -/
+@[simp]
+theorem mk_smul_mk (c' : HomogeneousLocalization.NumDenSameDeg 𝒜 S)
+    (c : NumDenSameDeg 𝒜 𝓜 S) :
+    HomogeneousLocalization.mk c' • (mk c : DegreeZeroLocalization 𝒜 𝓜 S) =
+      mk { deg := c'.deg + c.deg
+           num := ⟨(c'.num : A) • (c.num : M),
+             SetLike.GradedSMul.smul_mem c'.num.2 c.num.2⟩
+           den := ⟨(c'.den : A) * (c.den : A),
+             SetLike.mul_mem_graded c'.den.2 c.den.2⟩
+           den_mem := S.mul_mem c'.den_mem c.den_mem } := by
+  apply DegreeZeroLocalization.ext
+  rw [coe_smul, coe_mk, coe_mk]
+  show (algebraMap (HomogeneousLocalization 𝒜 S) (Localization S)
+      (HomogeneousLocalization.mk c')) •
+    LocalizedModule.mk (S := S) (c.num : M) (⟨(c.den : A), c.den_mem⟩ : S) = _
+  rw [HomogeneousLocalization.algebraMap_apply, HomogeneousLocalization.val_mk,
+    LocalizedModule.mk_smul_mk]
+  rfl
+
 /-! ### Maps induced by enlarging the denominator submonoid -/
 
 /-- Enlarging the denominator submonoid sends degree-zero homogeneous module fractions to
