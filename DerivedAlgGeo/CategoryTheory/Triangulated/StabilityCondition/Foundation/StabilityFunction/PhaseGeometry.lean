@@ -240,8 +240,9 @@ theorem phase_le_of_epi (Z : StabilityFunction A) {E Q : A}
     have hub := arg_add_le_max hker_mem hQ_mem
     have hQ_lt_max := lt_of_lt_of_le harg_Q hub
     have hker_gt_Q : arg (Z.charge Q) < arg (Z.charge (kernel p)) := by
-      simpa only [lt_max_iff, lt_irrefl, or_false] using hQ_lt_max
+      simpa only [lt_max_iff, lt_irrefl, or_false, abelianDatum_cl] using hQ_lt_max
     have hstrict := arg_add_lt_max hker_mem hQ_mem (ne_of_gt hker_gt_Q)
+    simp only [abelianDatum_cl] at hstrict
     rw [max_eq_left hker_gt_Q.le] at hstrict
     exact (not_lt_of_ge harg_ker) hstrict
 

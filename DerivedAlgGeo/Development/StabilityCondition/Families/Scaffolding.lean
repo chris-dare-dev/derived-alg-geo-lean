@@ -211,7 +211,7 @@ private def constantWeakSemistabilityProbe
 
 omit [IsTriangulated C] in
 private theorem constantWeakChargeProbe_isLocallyConstant
-    {t : TStructure C} (W : WeakStabilityCondition.WeakStabilityFunction t) (k : K₀ C) :
+    {t : TStructure C} (W : WeakStabilityFunction t) (k : K₀ C) :
     ((constantWeakChargeProbe PUnit.{1} PUnit.unit k).toChargeProbe
       (fun _ : PUnit.{1} ↦ W)).IsLocallyConstant := by
   unfold ChargeProbe.IsLocallyConstant WeakChargeProbe.toChargeProbe
@@ -220,7 +220,7 @@ private theorem constantWeakChargeProbe_isLocallyConstant
 
 omit [IsTriangulated C] in
 private theorem constantWeakSemistabilityProbe_isGenericallyOpen
-    {t : TStructure C} (W : WeakStabilityCondition.WeakStabilityFunction t) (E : C) :
+    {t : TStructure C} (W : WeakStabilityFunction t) (E : C) :
     ((constantWeakSemistabilityProbe PUnit.{1} PUnit.unit PUnit.unit E).toGenericProbe
       (fun _ : PUnit.{1} ↦ W)).IsGenericallyOpen := by
   intro hgeneric
@@ -229,7 +229,7 @@ private theorem constantWeakSemistabilityProbe_isGenericallyOpen
 
 omit [IsTriangulated C] in
 private theorem weakClauseZeroConstant
-    {t : TStructure C} (W : WeakStabilityCondition.WeakStabilityFunction t)
+    {t : TStructure C} (W : WeakStabilityFunction t)
     (hZ : HasGaussianRationalValues W.Z)
     (hN : IsNoetherianTorsionSubcategory t W.zeroCharge) :
     WeakDefinition20_5ClauseZero (fun _ : PUnit.{1} ↦ W) :=
@@ -237,18 +237,18 @@ private theorem weakClauseZeroConstant
 
 omit [IsTriangulated C] in
 private theorem weakSupportConstant
-    {t : TStructure C} {W : WeakStabilityCondition.WeakStabilityFunction t}
+    {t : TStructure C} {W : WeakStabilityFunction t}
     {V₀ : Submodule ℝ V} {Zlin : V →ₗ[ℝ] ℂ}
     {hV₀ : V₀ ≤ LinearMap.ker Zlin}
     (hQ : WeakQuotientQuadraticSupportData W v₀ V₀ Zlin hV₀) :
-    WeakStabilityCondition.WeakStabilityFunction.QuotientUniformQuadraticSupportData
+    WeakStabilityFunction.QuotientUniformQuadraticSupportData
       (fun _ : PUnit.{1} ↦ W) v₀ V₀ Zlin hV₀ :=
   ⟨fun _ ↦ hQ.charge_compatible, fun _ ↦ hQ.zero_class_mem,
     hQ.quadratic.constant_modulo V₀ Zlin hV₀ PUnit.{1}⟩
 
 omit [IsTriangulated C] in
 example
-    {t : TStructure C} (W : WeakStabilityCondition.WeakStabilityFunction t)
+    {t : TStructure C} (W : WeakStabilityFunction t)
     (hZ : HasGaussianRationalValues W.Z)
     (hN : IsNoetherianTorsionSubcategory t W.zeroCharge)
     (V₀ : Submodule ℝ V) (Zlin : V →ₗ[ℝ] ℂ)
