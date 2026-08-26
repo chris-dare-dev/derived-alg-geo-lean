@@ -7,6 +7,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
+import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
+import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HeartComparison
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
 
@@ -34,24 +36,44 @@ open CategoryTheory.Triangulated
 
 /-! ## Owner-controlled Grothendieck and pre-stability foundation (#228) -/
 
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.relationSubgroup
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.Group
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.instAddCommGroupGroup
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.of
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.of_relation
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.IsAdditive
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.lift
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.lift_of
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.hom_ext
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.hom_ext_iff
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.induction_on
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.isAdditive_of
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.map
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.map_of
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.IsAdditive.of_relationMap
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.map_id
-#print axioms CategoryTheory.Triangulated.GrothendieckPresentation.map_comp
+#print axioms CategoryTheory.GrothendieckPresentation
+#print axioms CategoryTheory.GrothendieckPresentation.relationSubgroup
+#print axioms CategoryTheory.GrothendieckPresentation.Group
+#print axioms CategoryTheory.GrothendieckPresentation.instAddCommGroupGroup
+#print axioms CategoryTheory.GrothendieckPresentation.of
+#print axioms CategoryTheory.GrothendieckPresentation.of_relation
+#print axioms CategoryTheory.GrothendieckPresentation.IsAdditive
+#print axioms CategoryTheory.GrothendieckPresentation.lift
+#print axioms CategoryTheory.GrothendieckPresentation.lift_of
+#print axioms CategoryTheory.GrothendieckPresentation.hom_ext
+#print axioms CategoryTheory.GrothendieckPresentation.hom_ext_iff
+#print axioms CategoryTheory.GrothendieckPresentation.induction_on
+#print axioms CategoryTheory.GrothendieckPresentation.isAdditive_of
+
+/-! ## The Grothendieck group of an abelian category
+
+`abelianPresentation` instantiates the generic presentation at short exact sequences.
+`of_isZero`, `of_iso` and `of_shortExact` are **theorems** here: the three fields that
+several structures in this repository carried as data (`map_zero`, `map_iso`,
+`additive`) are exactly this universal property written out longhand.
+-/
+
+#print axioms CategoryTheory.abelianPresentation
+#print axioms CategoryTheory.K₀Ab
+#print axioms CategoryTheory.K₀Ab.of
+#print axioms CategoryTheory.K₀Ab.of_shortExact
+#print axioms CategoryTheory.K₀Ab.of_isZero
+#print axioms CategoryTheory.K₀Ab.of_zero
+#print axioms CategoryTheory.K₀Ab.of_iso
+#print axioms CategoryTheory.K₀Ab.lift
+#print axioms CategoryTheory.K₀Ab.lift_of
+#print axioms CategoryTheory.K₀Ab.hom_ext
+#print axioms CategoryTheory.K₀Ab.hom_ext_iff
+#print axioms CategoryTheory.GrothendieckPresentation.map
+#print axioms CategoryTheory.GrothendieckPresentation.map_of
+#print axioms CategoryTheory.GrothendieckPresentation.IsAdditive.of_relationMap
+#print axioms CategoryTheory.GrothendieckPresentation.map_id
+#print axioms CategoryTheory.GrothendieckPresentation.map_comp
 #print axioms CategoryTheory.Triangulated.triangulatedPresentation
 #print axioms CategoryTheory.Triangulated.K₀
 #print axioms CategoryTheory.Triangulated.K₀.of
@@ -1000,3 +1022,54 @@ one -- the torsion sheaves, in the geometric case. -/
 #print axioms CategoryTheory.Triangulated.SlopeData.rank_eq_zero_of_shortExact
 #print axioms CategoryTheory.Triangulated.SlopeData.phase_eq_one_of_rank_zero
 #print axioms CategoryTheory.Triangulated.SlopeData.mem_hnTors_of_rank_zero
+
+/-! ## `K₀Ab` producers and the heart comparison (K₀ unification)
+
+`liftOf` is the universal property in the form producers want: additivity supplied as a
+proof, with `map_zero` and `map_iso` following. `toAmbient` is the comparison
+`K₀Ab 𝒜 →+ K₀ C` — the map, not the isomorphism `K(𝒜) ≅ K(D)` that the pin does not
+provide and that nothing here assumes.
+-/
+
+#print axioms CategoryTheory.K₀Ab.liftOf
+#print axioms CategoryTheory.K₀Ab.liftOf_of
+#print axioms CategoryTheory.Triangulated.TStructure.shortExactToTriangle
+#print axioms CategoryTheory.Triangulated.TStructure.toAmbient_isAdditive
+#print axioms CategoryTheory.K₀Ab.toAmbient
+#print axioms CategoryTheory.K₀Ab.toAmbient_of
+
+/-! ## Positivity as a predicate, and the weak/strict pair on an abelian category
+
+The weak and strict theories now share one carrier `K₀Ab A →+ ℂ` and differ only in a
+predicate, so `IsStabilityCharge.weak` is a one-line implication rather than a second
+structure with duplicated formal fields.
+-/
+
+#print axioms CategoryTheory.Triangulated.closedUpperHalfPlane
+#print axioms CategoryTheory.Triangulated.semiClosedUpperHalfPlane_subset_closed
+#print axioms CategoryTheory.Triangulated.IsStabilityCharge
+#print axioms CategoryTheory.Triangulated.IsWeakStabilityCharge
+#print axioms CategoryTheory.Triangulated.IsStabilityCharge.weak
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunction
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.mk
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.mk.inj
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.Z
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.nonzero_mem
+#print axioms CategoryTheory.Triangulated.StabilityFunction.toWeak
+#print axioms CategoryTheory.Triangulated.StabilityFunction.toWeak_Z
+
+/-! ## `StabilityFunction`, restated over `K₀Ab`
+
+`map_zero`, `map_iso` and `additive` are theorems now, not fields; the names and argument
+shapes are unchanged so consumers are untouched.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityFunction.mk
+#print axioms CategoryTheory.Triangulated.StabilityFunction.Z
+#print axioms CategoryTheory.Triangulated.StabilityFunction.nonzero_mem
+#print axioms CategoryTheory.Triangulated.StabilityFunction.charge_apply
+#print axioms CategoryTheory.Triangulated.StabilityFunction.map_zero
+#print axioms CategoryTheory.Triangulated.StabilityFunction.map_iso
+#print axioms CategoryTheory.Triangulated.StabilityFunction.additive
+#print axioms CategoryTheory.Triangulated.StabilityFunction.ext_iff
