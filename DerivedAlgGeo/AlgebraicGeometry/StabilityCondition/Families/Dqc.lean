@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
 import DerivedAlgGeo.CategoryTheory.Triangulated.CohomologyObjectProperty
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Quasicoherent.Extensions
+import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Quasicoherent.Coproducts
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.BoundedGeometry
 
 /-!
@@ -99,6 +100,30 @@ is recorded here because it is what `Dqc(X)` has to have for "compact object in 
 may make.  (`Pretriangulated` is data, not a proposition, so it is left as the
 Mathlib instance rather than restated here.) -/
 theorem ι_isTriangulated : (SchemeQuasicoherentDerivedCategory.ι X).IsTriangulated :=
+  inferInstance
+
+/-- **The abelian-side inputs to `Dqc(X)`'s coproduct structure are in place**
+(#721, third bullet).
+
+Quasi-coherence is closed under `ι`-indexed coproducts on an arbitrary scheme
+(`CoherentSheaf/Quasicoherent/Coproducts.lean`), and `X.Modules` has those
+coproducts. Closure under isomorphism is Mathlib's and is recorded alongside it.
+Together with `DerivedCategory.cohomologyIn_prop_coproduct` these are everything
+the third bullet needs **except** its derived-category half.
+
+That half is not available at this Mathlib pin and is not asserted anywhere:
+`SchemeDerivedCategory X` is not known to have small coproducts, and `Hⁿ` on it is
+not known to preserve them. Mathlib's `DerivedCategory` files contain no coproduct
+results at all. Until that lands, a consumer wanting closure of `Dqc(X)` under a
+coproduct must supply the existence and the preservation itself and call
+`DerivedCategory.cohomologyIn_prop_coproduct` directly. -/
+theorem quasicoherent_isClosedUnderIsomorphisms :
+    (SheafOfModules.isQuasicoherent X.ringCatSheaf).IsClosedUnderIsomorphisms :=
+  inferInstance
+
+theorem quasicoherent_isClosedUnderCoproducts (ι : Type u) :
+    (SheafOfModules.isQuasicoherent X.ringCatSheaf).IsClosedUnderColimitsOfShape
+      (Discrete ι) :=
   inferInstance
 
 /-- Membership in `Dqc(X)` is exactly quasi-coherence of every cohomology

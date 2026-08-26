@@ -610,3 +610,14 @@ transported along an unproved equivalence.
 
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.instIsTriangulatedSchemeDerivedCategorySchemeQuasicoherentCohomology
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.SchemeQuasicoherentDerivedCategory.ι_isTriangulated
+
+/-! ## The abelian-side inputs to `Dqc(X)`'s coproduct structure (#721)
+
+Quasi-coherence is closed under isomorphism and under `ι`-indexed coproducts, and both
+resolve in `Families/Dqc.lean`'s own context. The derived-category half of that bullet —
+that `SchemeDerivedCategory X` has small coproducts and that `Hⁿ` preserves them — is
+absent from Mathlib at this pin and is asserted nowhere.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.SchemeQuasicoherentDerivedCategory.quasicoherent_isClosedUnderIsomorphisms
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.SchemeQuasicoherentDerivedCategory.quasicoherent_isClosedUnderCoproducts
