@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
+import DerivedAlgGeo.CategoryTheory.Triangulated.CohomologyObjectProperty
+import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Quasicoherent.Extensions
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.BoundedGeometry
 
 /-!
@@ -13,13 +15,21 @@ The ambient `SchemeDerivedCategory X` is the derived category of **all**
 full subcategory whose cohomology sheaves are quasi-coherent.  This file makes
 that distinction part of the Lean type.
 
-At the current Mathlib pin the full subcategory of quasi-coherent sheaves on a
-general scheme is not yet available as an abelian category.  Consequently this
-file does not manufacture a triangulated instance on the quasi-coherent
-cohomology locus.  Instead it exposes the honest category and names the exact
-comparison statements that a later geometric realization must prove.
-Unsupported geometric cases therefore remain uninhabited rather than being
-silently identified with the all-sheaf derived category.
+`Dqc(X)` **is** a triangulated subcategory, and this file proves it rather than
+assuming it (#721).  The route does not need quasi-coherent sheaves to be an
+abelian subcategory of `X.Modules` — an earlier version of this docstring named
+that as the blocker.  What is needed is only the **weak Serre** property:
+closure under kernels, cokernels and extensions, which
+`CoherentSheaf/Quasicoherent/Kernels.lean` and
+`Cohomology/Quasicoherent/Extensions.lean` supply on an arbitrary scheme
+(#720).  `DerivedCategory.cohomologyIn` turns that into closure under cones via
+the five-term long exact homology sequence, so `Pretriangulated` on the locus
+and triangulatedness of the inclusion both follow from Mathlib.
+
+Comparison statements a later geometric realization must still prove — the
+bounded-coherent identification and the compact/perfect comparison — remain
+propositions with no unsupported inhabitant, so unsupported geometric cases are
+still not silently identified with the all-sheaf derived category.
 -/
 
 namespace CategoryTheory.Triangulated.StabilityCondition.Families
@@ -50,6 +60,25 @@ instance (X : Scheme.{u}) :
     (SheafOfModules.isQuasicoherent X.ringCatSheaf).prop_of_iso
       ((DerivedCategory.homologyFunctor X.Modules n).mapIso e) (hE n)
 
+/-- **`Dqc(X)` is a triangulated subcategory of the all-sheaf derived
+category** (#721).
+
+Quasi-coherence is a weak Serre subcategory of `X.Modules` — closed under
+kernels, cokernels and extensions, and containing zero — on an arbitrary
+scheme, with no noetherian or quasi-compactness hypothesis.  That is exactly
+the input `DerivedCategory.cohomologyIn_isTriangulated` asks for, and it is why
+closure under cones holds without quasi-coherent sheaves forming an abelian
+subcategory: the five-term homology sequence pays for the missing subobject and
+quotient closure.
+
+Note that quasi-coherence is *not* a Serre class here — a subsheaf of a
+quasi-coherent sheaf need not be quasi-coherent — so `IsSerreClass` and
+Mathlib's three-term `prop_X₂_of_exact` are unavailable, and nothing below
+uses them. -/
+instance (X : Scheme.{u}) : (schemeQuasicoherentCohomology X).IsTriangulated :=
+  inferInstanceAs ((DerivedCategory.cohomologyIn
+    (SheafOfModules.isQuasicoherent X.ringCatSheaf)).IsTriangulated)
+
 /-- The honest `Dqc(X)` object class: the full subcategory of the derived
 category of all module sheaves cut out by quasi-coherent cohomology. -/
 abbrev SchemeQuasicoherentDerivedCategory (X : Scheme.{u}) :=
@@ -63,6 +92,14 @@ variable (X : Scheme.{u})
 category of all module sheaves. -/
 abbrev ι : SchemeQuasicoherentDerivedCategory X ⥤ SchemeDerivedCategory X :=
   (schemeQuasicoherentCohomology X).ι
+
+/-- **The inclusion `Dqc(X) ⥤ D(X.Modules)` is a triangulated functor.**  This
+is a Mathlib instance once the object property is a triangulated subcategory; it
+is recorded here because it is what `Dqc(X)` has to have for "compact object in `Dqc(X)`" to be a statement one
+may make.  (`Pretriangulated` is data, not a proposition, so it is left as the
+Mathlib instance rather than restated here.) -/
+theorem ι_isTriangulated : (SchemeQuasicoherentDerivedCategory.ι X).IsTriangulated :=
+  inferInstance
 
 /-- Membership in `Dqc(X)` is exactly quasi-coherence of every cohomology
 sheaf. -/
