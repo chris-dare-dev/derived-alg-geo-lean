@@ -31,16 +31,16 @@ is, rather than linear, which it is not.
 `𝒪_Proj` over `D₊(g)`, so `fracPowSection` is already a global function there and no `ΓSpecIso` and
 no degree-zero away ring appear anywhere in this file.
 
-## What has to be named, and why
+## Two separate reasons things are spelled out here
 
-Two values are named at explicit result types rather than written inline, per
-`references/instance-transparency.md` technique 5.
+`chartFracPowAt` is named at an explicit result type, per
+`references/instance-transparency.md` technique 5: written inline the value elaborates at the
+`⋙ forget Ab` type of the unit's sections, where the scalar action does not synthesize at all.
 
-* `chartFracPowAt` — inline, the value elaborates at the `⋙ forget Ab` type of the unit's sections,
-  where the scalar action does not synthesize at all.
-* `chartUnitToTwist_app_one` — the same role `unitToTwist_app_one` plays one level down. Without it
-  the restricted map is opaque, because `restrictUnitIso` and the restriction functor are both
-  crossed before anything is applied.
+`chartUnitToTwist_app_one` is not that technique. It is the analogue of `unitToTwist_app_one` one
+level down — a theorem pinning what an otherwise opaque map does, where the opacity comes from
+`restrictUnitIso` and the restriction functor both being crossed before anything is applied.
+Without it the restricted map asserts nothing and a wrong definition would go unnoticed.
 
 `chartFracPowSections` is built openwise on the `Proj` side rather than by restricting one global
 function down from `⊤`. Restricting downward puts its values at points of the *subscheme*, which
@@ -158,10 +158,12 @@ The comparison `#585` needs between two charts, with the correction carried as a
 the unit rather than as a scalar. Applying `tensorHom (𝟙 F) −` to it — which preserves composition
 by `Scheme.Modules.tensorHom_id_comp` — is what carries it to `F(n)`.
 
-The proof is step A (`fracPow_smul_sectionOfMem`) read through `unitHomEquiv`, plus one bridge:
-the restricted sheaf's scalar action is the `Proj` one transported along `appIso`
-(`Scheme.Modules.restrict_smul_eq`), and for the inclusion of an open subscheme that transport is
-`Iso.refl` but *not* `rfl`. -/
+The proof is step A (`fracPow_smul_sectionOfMem`) read through `unitHomEquiv`, plus one change of
+shape: `Scheme.Modules.restrict_smul_eq` moves the equation from the restricted scalar action to
+the `Proj` one, which is where the pointwise lemma of step A lives. That lemma is `rfl` — the two
+actions *are* definitionally equal — so this is bookkeeping, not a defeq barrier. It is
+instantiated as a `have` rather than rewritten with, because the goal at that point carries
+`show`-ascription residue that `rw` will not match against. -/
 theorem chartUnitToTwist_eq :
     chartUnitToTwist 𝒜 (g := g) n (pow_mem_deg 𝒜 hf n)
       = chartFracPowMul 𝒜 hf hg n ≫ chartUnitToTwist 𝒜 (g := g) n (pow_mem_deg 𝒜 hg n) := by
