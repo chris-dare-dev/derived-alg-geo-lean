@@ -2244,6 +2244,8 @@ categories `k`-linear rather than merely preadditive. Mathlib then supplies
 `k`-vector space and hence what makes sphericity of an object expressible at
 all. It does NOT supply finite-dimensionality; see issue #332. -/
 
+#print axioms AlgebraicGeometry.Scheme.homModuleGlobal
+#print axioms AlgebraicGeometry.Scheme.modulesLinearGlobal
 #print axioms AlgebraicGeometry.Variety.homModule
 #print axioms AlgebraicGeometry.Variety.modulesLinear
 #print axioms AlgebraicGeometry.Variety.smul_eq_action_comp
