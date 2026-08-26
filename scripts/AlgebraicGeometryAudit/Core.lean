@@ -2580,6 +2580,41 @@ cover, quasi-coherence on each chart, and exists_pow_smul_mem_of_isLocalized_rad
 #print axioms AlgebraicGeometry.Proj.unitToTwist_app_one
 #print axioms AlgebraicGeometry.Proj.twistBy
 
+/-! ## The two charts' multiplications differ by a MORPHISM (#585 glue)
+
+The comparison #585 needs between charts: over D+(g), multiplying by f^n is multiplying by f^n/g^n
+and then by g^n. The correction is carried as a morphism out of the unit, NOT as a scalar.
+
+That is forced, not stylistic. The scalar form needs the scalar to cross tensorHom at the next
+step and it cannot: Linear Gamma(X, top) X.PresheafOfModules does not synthesize, and supplying it
+would mean a Gamma-linear structure on presheaves, linearity of toPresheafOfModules and of
+associatedSheaf, and a MonoidalLinear instance -- none of which exist. As a morphism the next step
+only needs tensorHom (1 F) - to be FUNCTORIAL (tensorHom_id_comp), which it is.
+
+D+(g) is used as an OPEN SUBSCHEME, not through degreeOneChart: by ι_image_top its sections over
+top are definitionally sections of the structure sheaf over D+(g), so no GammaSpecIso and no
+degree-zero away ring appear here at all.
+
+chartUnitToTwist_app_one is load-bearing for the same reason unitToTwist_app_one is one level
+down -- restrictUnitIso and the restriction functor are both crossed before anything is applied.
+
+One bridge is not defeq and has to be a lemma: the restricted sheaf's scalar action is the Proj one
+transported along appIso, and for an open subscheme's inclusion that transport is Iso.refl but NOT
+rfl (ι_appIso is proved by ofRestrict_appIso). See Scheme.Modules.restrict_smul_eq. -/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.restrict_smul_eq
+#print axioms AlgebraicGeometry.Proj.fracPowSection
+#print axioms AlgebraicGeometry.Proj.pow_mem_deg
+#print axioms AlgebraicGeometry.Proj.chartOpen
+#print axioms AlgebraicGeometry.Proj.chartRestrictFunctor
+#print axioms AlgebraicGeometry.Proj.chartUnitToTwist
+#print axioms AlgebraicGeometry.Proj.chartOpen_image_le
+#print axioms AlgebraicGeometry.Proj.chartFracPowAt
+#print axioms AlgebraicGeometry.Proj.chartFracPowSections
+#print axioms AlgebraicGeometry.Proj.chartUnitToTwist_app_one
+#print axioms AlgebraicGeometry.Proj.chartFracPowMul
+#print axioms AlgebraicGeometry.Proj.chartUnitToTwist_eq
+
 /-! ## Clearing a denominator on an affine (#585 chart-local engine)
 
 A section of a quasi-coherent sheaf over D(r), times a high enough power of r, is the restriction

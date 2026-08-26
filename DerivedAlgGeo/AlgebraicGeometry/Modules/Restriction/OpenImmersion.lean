@@ -632,3 +632,29 @@ theorem isFinitePresentation_over_iff_restrict (M : Y.Modules) :
 end Scheme.Hom
 
 end AlgebraicGeometry
+
+namespace AlgebraicGeometry.Scheme.Modules
+
+/-- **The restricted sheaf's scalar action is the original one, transported along `appIso`.**
+
+`Scheme.Modules.restrictAppIso` is `Iso.refl`, so both sides live in the same
+type and the statement is purely about which action is used.
+
+The two are *not* definitionally equal: `Scheme.Opens.ι_appIso` is proved by
+`ofRestrict_appIso`, not by `rfl`, so `rfl` does not close this even for the
+inclusion of an open subscheme. This is the bridge to use instead.
+
+It is stated rather than left to `simp` at each use site because Mathlib's own
+form carries the two `restrictAppIso.hom` applications, and those are invisible
+to `rw` and to `simp only` — `CategoryTheory.id_apply` will not fire on them,
+and introducing one on the goal side leaves `rw` a metavariable pattern. They
+are nonetheless *defeq* to the identity, which is why `exact` closes this and
+neither tactic does. -/
+theorem restrict_smul_eq {X Y : Scheme} (f : X ⟶ Y) [IsOpenImmersion f]
+    (M : Y.Modules) (U : X.Opens) (r : Γ(X, U)) (x : Γ(M.restrict f, U)) :
+    (r • x : Γ(M.restrict f, U))
+      = (show Γ(Y, f ''ᵁ U) from (Scheme.Hom.appIso f U).inv.hom r) •
+        (show Γ(M, f ''ᵁ U) from x) :=
+  Scheme.Modules.smul_restrictAppIso_hom_apply f M U r x
+
+end AlgebraicGeometry.Scheme.Modules
