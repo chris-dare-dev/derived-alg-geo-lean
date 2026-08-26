@@ -97,6 +97,41 @@ theorem intShiftSectionLinearEquivOn_sectionOfMem {f g : A} (hf : f ∈ 𝒜 1) 
           den_mem := Submonoid.pow_mem _ (hU x.2) n } :=
   intShiftZeroLinearEquiv_constFraction 𝒜 _ hf hg (hU x.2) n
 
+/-- The degree-zero fraction `fⁿ / gⁿ` at a point of `D₊(g)`.
+
+Named rather than written inline: as an anonymous `HomogeneousLocalization.mk`
+the denominator submonoid is a metavariable when it appears under a `•`, and
+`Submonoid.pow_mem _ hx n` will not elaborate. Naming it pins the submonoid. -/
+noncomputable def fracPow {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1) (n : ℕ)
+    {x : ProjectiveSpectrum 𝒜} (hx : x ∈ ProjectiveSpectrum.basicOpen 𝒜 g) :
+    HomogeneousLocalization 𝒜 x.asHomogeneousIdeal.toIdeal.primeCompl :=
+  HomogeneousLocalization.mk
+    { deg := n
+      num := ⟨f ^ n, by simpa using SetLike.pow_mem_graded n hf⟩
+      den := ⟨g ^ n, by simpa using SetLike.pow_mem_graded n hg⟩
+      den_mem := Submonoid.pow_mem _ hx n }
+
+/-- **Rescaling the section `gⁿ` of `O(n)` by `fⁿ/gⁿ` gives the section `fⁿ`.**
+
+`(fⁿ/gⁿ) · (gⁿ/1) = fⁿ/1`, at every point of an open inside `D₊(g)`.
+
+This is the identity that makes the per-chart extensions of `#585` glue, on the
+route that never trivializes: taking the section of `F(n)` over `D₊(g)` to be
+`twistBy gⁿ` applied to the chart extension, its restriction to `D₊(g) ⊓ D₊(f)`
+is `twistBy gⁿ` of `(f/g)ⁿ • s`, and this says that is `twistBy fⁿ` of `s` —
+the same object for every chart, so agreement is immediate and no transition
+function appears. -/
+theorem fracPow_smul_sectionOfMem {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1) (n : ℕ)
+    {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 g) (x : U) :
+    fracPow 𝒜 hf hg n (hU x.2) •
+        (sectionOfMem 𝒜 𝒜 U n (by simpa using SetLike.pow_mem_graded n hg)).1 x =
+      (sectionOfMem 𝒜 𝒜 U n (by simpa using SetLike.pow_mem_graded n hf)).1 x := by
+  rw [sectionOfMem_apply, sectionOfMem_apply, fracPow, DegreeZeroLocalization.mk_smul_mk]
+  apply DegreeZeroLocalization.ext
+  simp only [DegreeZeroLocalization.coe_mk, NumDenSameDeg.embedding, smul_eq_mul, mul_one]
+  rw [LocalizedModule.mk_eq]
+  exact ⟨1, by simp [Submonoid.smul_def, mul_comm]⟩
+
 end Sections
 
 end AlgebraicGeometry.Proj

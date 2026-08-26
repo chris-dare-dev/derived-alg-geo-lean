@@ -340,6 +340,8 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- as a parameter instead. intShiftZeroLinearEquiv decides the sign of d once, and nothing
 -- downstream sees the case split.
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.transitionScalar_mul
+#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.smul_mk
+#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mk_smul_mk
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftShiftLinearEquiv
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_toNat_mem_intShift_zero
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv
@@ -2566,6 +2568,8 @@ cover, quasi-coherence on each chart, and exists_pow_smul_mem_of_isLocalized_rad
 
 #print axioms AlgebraicGeometry.Proj.mem_intShift_zero_of_mem
 #print axioms AlgebraicGeometry.Proj.sectionOfMem
+#print axioms AlgebraicGeometry.Proj.fracPow
+#print axioms AlgebraicGeometry.Proj.fracPow_smul_sectionOfMem
 #print axioms AlgebraicGeometry.Proj.sectionOfMem_apply
 #print axioms AlgebraicGeometry.Proj.sectionsOfMem
 #print axioms AlgebraicGeometry.Proj.unitToTwist
