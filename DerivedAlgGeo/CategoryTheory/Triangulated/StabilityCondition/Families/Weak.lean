@@ -77,7 +77,7 @@ structure WeakChargeProbe (I Λ : Type*) where
 
 /-- Forget a bound weak charge probe to its derived complex-valued probe. -/
 def WeakChargeProbe.toChargeProbe {t : TStructure C}
-    (W : I → WeakStabilityCondition.WeakStabilityFunction t) (P : WeakChargeProbe I (K₀ C)) :
+    (W : I → WeakStabilityFunction t) (P : WeakChargeProbe I (K₀ C)) :
     ChargeProbe ℂ where
   Point := P.Point
   topology := P.topology
@@ -99,7 +99,7 @@ structure WeakSemistabilityProbe (I C : Type*) where
 
 /-- Forget a bound weak probe to the generic semistability locus it defines. -/
 def WeakSemistabilityProbe.toGenericProbe {t : TStructure C}
-    (W : I → WeakStabilityCondition.WeakStabilityFunction t) (P : WeakSemistabilityProbe I C) :
+    (W : I → WeakStabilityFunction t) (P : WeakSemistabilityProbe I C) :
     GenericSemistabilityProbe where
   Point := P.Point
   topology := P.topology
@@ -108,7 +108,7 @@ def WeakSemistabilityProbe.toGenericProbe {t : TStructure C}
 
 /-- Definition 20.5(0), bound to actual weak stability functions. -/
 structure WeakDefinition20_5ClauseZero {t : TStructure C}
-    (W : I → WeakStabilityCondition.WeakStabilityFunction t) : Prop where
+    (W : I → WeakStabilityFunction t) : Prop where
   /-- Every fiber charge is defined over `ℚ[i]`. -/
   gaussianRationalCharge : ∀ i, HasGaussianRationalValues (W i).Z
   /-- Every zero-charge class is a noetherian torsion subcategory. -/
@@ -118,7 +118,7 @@ structure WeakDefinition20_5ClauseZero {t : TStructure C}
 omit [IsTriangulated C] in
 /-- Clause (0) is preserved by reindexing. -/
 theorem WeakDefinition20_5ClauseZero.reindex {J : Type*}
-    {t : TStructure C} {W : I → WeakStabilityCondition.WeakStabilityFunction t}
+    {t : TStructure C} {W : I → WeakStabilityFunction t}
     (h : WeakDefinition20_5ClauseZero W) (f : J → I) :
     WeakDefinition20_5ClauseZero (fun j ↦ W (f j)) :=
   ⟨fun j ↦ h.gaussianRationalCharge (f j),
@@ -132,7 +132,7 @@ private local instance quotientSubmoduleClosed (V₀ : Submodule ℝ V) :
 /-- The actual one-fiber charge, zero-class, and quotient-quadratic-support
 package. -/
 structure WeakQuotientQuadraticSupportData {t : TStructure C}
-    (W : WeakStabilityCondition.WeakStabilityFunction t) (v : K₀ C →+ V)
+    (W : WeakStabilityFunction t) (v : K₀ C →+ V)
     (V₀ : Submodule ℝ V) (Zlin : V →ₗ[ℝ] ℂ)
     (hV₀ : V₀ ≤ LinearMap.ker Zlin) : Prop where
   /-- The real-linear charge realizes the weak charge. -/
@@ -147,13 +147,13 @@ structure WeakQuotientQuadraticSupportData {t : TStructure C}
 omit [IsTriangulated C] in
 /-- Quotient-uniform weak support is preserved by reindexing. -/
 theorem quotientUniformQuadraticSupportData_reindex {J : Type*}
-    {t : TStructure C} {W : I → WeakStabilityCondition.WeakStabilityFunction t}
+    {t : TStructure C} {W : I → WeakStabilityFunction t}
     {V₀ : Submodule ℝ V} {Zlin : V →ₗ[ℝ] ℂ}
     {hV₀ : V₀ ≤ LinearMap.ker Zlin}
-    (h : WeakStabilityCondition.WeakStabilityFunction.QuotientUniformQuadraticSupportData
+    (h : WeakStabilityFunction.QuotientUniformQuadraticSupportData
       W v V₀ Zlin hV₀)
     (f : J → I) :
-    WeakStabilityCondition.WeakStabilityFunction.QuotientUniformQuadraticSupportData
+    WeakStabilityFunction.QuotientUniformQuadraticSupportData
       (fun j ↦ W (f j)) v V₀ Zlin hV₀ :=
   ⟨fun j ↦ h.charge_compatible (f j),
     fun j ↦ h.zero_class_mem (f j), h.quadratic.reindex f⟩
@@ -167,7 +167,7 @@ quotient-uniform support package from issue #82.  Relative HN and boundedness
 remain explicit geometric inputs. -/
 structure WeakStabilityInFamiliesData
     {JCharge JGeneric D M : Type u} {t : TStructure C}
-    (W : I → WeakStabilityCondition.WeakStabilityFunction t)
+    (W : I → WeakStabilityFunction t)
     (charge : JCharge → WeakChargeProbe I (K₀ C))
     (semistable : JGeneric → WeakSemistabilityProbe I C)
     (dedekind : WeakDedekindHNProblem D)
@@ -182,7 +182,7 @@ structure WeakStabilityInFamiliesData
     (fun j ↦ (semistable j).toGenericProbe W) dedekind
   /-- Definition 21.15(4). -/
   uniformSupport :
-    WeakStabilityCondition.WeakStabilityFunction.QuotientUniformQuadraticSupportData
+    WeakStabilityFunction.QuotientUniformQuadraticSupportData
       W v V₀ Zlin hV₀
   /-- Definition 21.15(5), retained as a geometric premise. -/
   bounded : UniversalBoundedness boundedness

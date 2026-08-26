@@ -61,70 +61,93 @@ theorem arg_pos_of_mem_semiClosedUpperHalfPlane {z : ℂ}
 
 variable (A : Type u) [Category.{v} A] [Abelian A]
 
-/-- **Strict positivity**, as a predicate on a charge rather than a structure
-field.  Stating it this way is what lets the weak and strict theories share one
-carrier: they are two predicates on the same `K₀Ab A →+ ℂ`, not two structures
-with duplicated formal fields. -/
-def IsStabilityCharge {A : Type u} [Category.{v} A] [Abelian A]
-    (Z : K₀Ab A →+ ℂ) : Prop :=
-  ∀ E : A, ¬IsZero E → Z (K₀Ab.of E) ∈ semiClosedUpperHalfPlane
+/-- **What a positivity condition needs to know about a category.**
 
-/-- **Weak positivity**: the same statement with `0` allowed on the real axis. -/
-def IsWeakStabilityCharge {A : Type u} [Category.{v} A] [Abelian A]
-    (Z : K₀Ab A →+ ℂ) : Prop :=
-  ∀ E : A, ¬IsZero E → Z (K₀Ab.of E) ∈ closedUpperHalfPlane
+A charge condition speaks about *some* objects (the nonzero ones, or the nonzero
+ones lying in a heart) and reads their class in *some* abelian group.  Those two
+choices are the only thing that varies between the abelian-category theory and
+the ambient/t-structure theory, so they are the parameters.
 
-/-- An additive central charge on an abelian category whose nonzero values lie
-in the semi-closed upper half-plane.
+Making this a parameter rather than baking `K₀Ab` in is what stops the two
+theories being two structures with the same fields: they are one structure at two
+class data. -/
+structure ClassDatum (O : Type*) (G : Type*) [AddCommGroup G] where
+  /-- The objects the positivity condition speaks about. -/
+  Relevant : O → Prop
+  /-- The class of an object. -/
+  cl : O → G
 
-The charge is an `AddMonoidHom` out of `K₀Ab A`, not a bare function on objects
-with `map_zero` / `map_iso` / `additive` carried as fields.  Those three fields
-were exactly the universal property of the Grothendieck group written out
-longhand; they are now theorems (`map_zero`, `map_iso`, `additive` below) proved
-once in `CategoryTheory/GrothendieckGroup/Abelian.lean`, and every consumer keeps
-its existing call shape.
+variable {O : Type*} {G : Type*} [AddCommGroup G]
 
-`charge` remains available as an abbreviation, so `Z.charge E` still means what
-it always did. -/
-structure StabilityFunction where
-  /-- The central charge, as a hom out of the Grothendieck group. -/
-  Z : K₀Ab A →+ ℂ
-  /-- Every nonzero object has charge in the allowed half-plane. -/
-  nonzero_mem : IsStabilityCharge Z
+/-- A charge is positive for `D` into `P` when every relevant object's class has
+charge in `P`. -/
+def IsPositive (D : ClassDatum O G) (P : Set ℂ) (Z : G →+ ℂ) : Prop :=
+  ∀ E : O, D.Relevant E → Z (D.cl E) ∈ P
 
-variable {A}
+/-- **Strict positivity** — the half-plane that excludes `0`. -/
+abbrev IsStabilityCharge (D : ClassDatum O G) (Z : G →+ ℂ) : Prop :=
+  IsPositive D semiClosedUpperHalfPlane Z
 
-/-- **Strict implies weak.**  With positivity a predicate this is one line;
-between two structures it needed a `toWeak` definition of its own. -/
-theorem IsStabilityCharge.weak {Z : K₀Ab A →+ ℂ} (h : IsStabilityCharge Z) :
-    IsWeakStabilityCharge Z :=
+/-- **Weak positivity** — the same with `0` allowed on the real axis. -/
+abbrev IsWeakStabilityCharge (D : ClassDatum O G) (Z : G →+ ℂ) : Prop :=
+  IsPositive D closedUpperHalfPlane Z
+
+/-- **Strict implies weak**, once and for every class datum. -/
+theorem IsStabilityCharge.weak {D : ClassDatum O G} {Z : G →+ ℂ}
+    (h : IsStabilityCharge D Z) : IsWeakStabilityCharge D Z :=
   fun E hE ↦ semiClosedUpperHalfPlane_subset_closed (h E hE)
 
-variable (A)
+/-- **A stability function relative to a class datum.**  One structure; the
+abelian and ambient theories are two instantiations of it. -/
+structure StabilityFunctionOn (D : ClassDatum O G) where
+  /-- The central charge, as a hom out of the class group. -/
+  Z : G →+ ℂ
+  /-- Relevant objects have charge in the strict half-plane. -/
+  nonzero_mem : IsStabilityCharge D Z
 
-/-- A **weak** stability function on an abelian category: an additive charge
-whose nonzero values lie in the closed upper half-plane.
+/-- **A weak stability function relative to a class datum.** -/
+structure WeakStabilityFunctionOn (D : ClassDatum O G) where
+  /-- The central charge, as a hom out of the class group. -/
+  Z : G →+ ℂ
+  /-- Relevant objects have charge in the closed half-plane. -/
+  nonzero_mem : IsWeakStabilityCharge D Z
 
-This is what a polarised **surface** gives to `Coh X` through μ-slope: a
-skyscraper has zero rank and zero degree, so its charge is `0`, which the strict
-condition forbids and this one allows. -/
-structure WeakStabilityFunction where
-  /-- The central charge, as a hom out of the Grothendieck group. -/
-  Z : K₀Ab A →+ ℂ
-  /-- Every nonzero object has charge in the closed upper half-plane. -/
-  nonzero_mem : IsWeakStabilityCharge Z
-
-namespace StabilityFunction
-
-variable {A}
-
-/-- **Every stability function is a weak one.** -/
-def toWeak (Z : StabilityFunction A) : WeakStabilityFunction A where
+/-- **Every stability function is a weak one**, at any class datum. -/
+def StabilityFunctionOn.toWeak {D : ClassDatum O G} (Z : StabilityFunctionOn D) :
+    WeakStabilityFunctionOn D where
   Z := Z.Z
   nonzero_mem := Z.nonzero_mem.weak
 
 @[simp]
-theorem toWeak_Z (Z : StabilityFunction A) : Z.toWeak.Z = Z.Z := rfl
+theorem StabilityFunctionOn.toWeak_Z {D : ClassDatum O G} (Z : StabilityFunctionOn D) :
+    Z.toWeak.Z = Z.Z := rfl
+
+/-- The class datum of an abelian category: nonzero objects, classes in `K₀Ab`. -/
+def abelianDatum : ClassDatum A (K₀Ab A) where
+  Relevant E := ¬IsZero E
+  cl := K₀Ab.of
+
+/-- **An additive central charge on an abelian category** whose nonzero values
+lie in the semi-closed upper half-plane.
+
+This is `StabilityFunctionOn` at `abelianDatum`, not a structure of its own.
+`charge` remains available as an abbreviation and `map_zero` / `map_iso` /
+`additive` remain available as theorems, so consumers are unaffected. -/
+abbrev StabilityFunction := StabilityFunctionOn (abelianDatum A)
+
+variable {A}
+
+@[simp]
+theorem abelianDatum_cl (E : A) : (abelianDatum A).cl E = K₀Ab.of E := rfl
+
+@[simp]
+theorem abelianDatum_relevant (E : A) : (abelianDatum A).Relevant E ↔ ¬IsZero E := Iff.rfl
+
+variable (A)
+
+namespace StabilityFunction
+
+variable {A}
 
 /-- The central charge on objects. -/
 abbrev charge (Z : StabilityFunction A) (E : A) : ℂ := Z.Z (K₀Ab.of E)
@@ -157,7 +180,7 @@ what forces the two homs to agree. -/
 theorem ext {Z W : StabilityFunction A} (hcharge : Z.charge = W.charge) : Z = W := by
   obtain ⟨Z, _⟩ := Z
   obtain ⟨W, _⟩ := W
-  simp only [StabilityFunction.mk.injEq]
+  simp only [StabilityFunctionOn.mk.injEq]
   exact K₀Ab.hom_ext (fun X ↦ congrFun hcharge X)
 
 /-- The phase of an object, normalized to lie in `(0, 1]` when the object is
