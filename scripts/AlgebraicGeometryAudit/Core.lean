@@ -1719,6 +1719,37 @@ present. Same failure mode recorded for restrict_smul_eq and for chartTwistBy_eq
 #print axioms AlgebraicGeometry.Scheme.Modules.unitorConjPre
 #print axioms AlgebraicGeometry.Scheme.Modules.unitorConj_eq
 #print axioms AlgebraicGeometry.Scheme.Modules.unitorConj_app
+
+/-! ## A pure tensor of SECTIONS, and what the twistBy shape does to one (#585 step D prerequisite)
+
+tmulSection is the exportable handle on the sheafified tensor at section level. tensorObj is built
+from toPresheafOfModules and the monoidal structure on X.PresheafOfModules; the first is reached
+through a private abbrev here and the second is a local instance, so a consumer OUTSIDE this file
+cannot write a pure tensor at all. Any section-level statement about the tensor has to go through a
+named constructor, and this is it.
+
+It is the image of the honest pure tensor under the sheafification adjunction's unit. Sections of a
+sheafification are not in general sums of pure tensors, so this maps INTO the sections rather than
+describing them -- which is all the twist API needs.
+
+tensorUnitRight_inv_tensorHom_app is the payoff: (rho.inv followed by tensorHom (1 F) psi) is
+exactly the shape of Proj.twistBy and Proj.chartTwistBy, and this says what it does to a section.
+With smul_tmulSection it lets #585's glue compare the two charts WITHOUT restriction commuting with
+the tensor product -- which nothing in this repository or in Mathlib provides.
+
+Proved like unitorConj_eq, and again sheafification is never computed on sections: the counit's
+inverse IS the adjunction unit (right triangle identity, assembled mono-free because Mono does not
+synthesize on a .val), and naturality of that unit carries a presheaf-level computation across
+where it is rfl.
+
+Every step is congrArg/exact -- goals mentioning associatedSheaf are not type-correct under the
+instances transparency level, so rw will not match patterns that ARE syntactically present. The
+naturality step needs DFunLike.congr_fun and not congrFun: the components are bundled LinearMaps,
+not functions. -/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.tmulSection
+#print axioms AlgebraicGeometry.Scheme.Modules.smul_tmulSection
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitRight_inv_tensorHom_app
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorCommIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorTripleAssocIso
 #print axioms AlgebraicGeometry.Scheme.Modules.PicardClass.mk_eq_mk_iff
