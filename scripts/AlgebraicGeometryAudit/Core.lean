@@ -2620,6 +2620,30 @@ bare form is what matches a goal written the obvious way. -/
 #print axioms AlgebraicGeometry.Proj.chartFracPowMul
 #print axioms AlgebraicGeometry.Proj.chartUnitToTwist_eq
 
+/-! ## The same factorisation on an arbitrary F over the chart (#585 glue, step C)
+
+chartTwistBy is twistBy for a module sheaf on D+(g); chartTwistBy_eq is chartUnitToTwist_eq
+tensored with F. The ONLY input beyond it is that tensorHom (1 F) - preserves composition
+(tensorHom_id_comp) -- never that it is linear, which it is not. That is the payoff of carrying
+the correction as a morphism rather than a scalar.
+
+The correction is conjugated by the right unitor, not left in front. tensorHom lands in F (x) 1,
+so rho.inv followed by tensorHom (1 F) - cannot be pulled out of chartTwistBy's composite as it
+stands; chartFracPowOn conjugates it back onto F and the two unitors cancel mid-proof.
+
+The final step is congrArg, not rw. The pattern IS syntactically present, but the goal mentions
+(D+(g) as a scheme).ringCatSheaf and so is not type-correct under the instances transparency
+level, which stops rw and simp only matching inside it. congrArg works by defeq. Same failure mode
+as the one recorded for restrict_smul_eq; it is a property of these goals, not of either lemma.
+
+NOT here: identifying chartFracPowOn with multiplication by the section f^n/g^n on F (needs the
+right unitor on sections), and comparing chartTwistBy (F.restrict) with the restriction of
+twistBy F (needs restriction to commute with tensor). #585 stays open. -/
+
+#print axioms AlgebraicGeometry.Proj.chartTwistBy
+#print axioms AlgebraicGeometry.Proj.chartFracPowOn
+#print axioms AlgebraicGeometry.Proj.chartTwistBy_eq
+
 /-! ## Clearing a denominator on an affine (#585 chart-local engine)
 
 A section of a quasi-coherent sheaf over D(r), times a high enough power of r, is the restriction
