@@ -72,31 +72,54 @@ variable {A : Type u} [Category.{v} A] [Abelian A]
 to its category of coherent sheaves. See the module docstring — on a surface
 `degree_pos_of_rank_zero` is false for skyscrapers. -/
 structure SlopeData (A : Type u) [Category.{v} A] [Abelian A] where
-  /-- The rank. -/
-  rank : A → ℤ
-  /-- The degree, `c₁ · ω` in the geometric case. -/
-  degree : A → ℤ
+  /-- The rank, as a hom out of the Grothendieck group. -/
+  rankHom : K₀Ab A →+ ℤ
+  /-- The degree, as a hom out of the Grothendieck group. -/
+  degreeHom : K₀Ab A →+ ℤ
   /-- Rank is nonnegative — geometric input. -/
-  rank_nonneg : ∀ E : A, 0 ≤ rank E
-  /-- Zero objects have rank zero. -/
-  rank_zero : ∀ E : A, IsZero E → rank E = 0
-  /-- Zero objects have degree zero. -/
-  degree_zero : ∀ E : A, IsZero E → degree E = 0
-  /-- Rank is an isomorphism invariant. -/
-  rank_iso : ∀ {E F : A}, (E ≅ F) → rank E = rank F
-  /-- Degree is an isomorphism invariant. -/
-  degree_iso : ∀ {E F : A}, (E ≅ F) → degree E = degree F
-  /-- Rank is additive on short exact sequences. -/
-  rank_additive : ∀ S : ShortComplex A, S.ShortExact → rank S.X₂ = rank S.X₁ + rank S.X₃
-  /-- Degree is additive on short exact sequences. -/
-  degree_additive : ∀ S : ShortComplex A, S.ShortExact → degree S.X₂ = degree S.X₁ + degree S.X₃
+  rank_nonneg : ∀ E : A, 0 ≤ rankHom (K₀Ab.of E)
   /-- A nonzero object of rank zero has positive degree — geometric input, and
-  what puts torsion sheaves on the negative real axis. -/
-  degree_pos_of_rank_zero : ∀ E : A, ¬IsZero E → rank E = 0 → 0 < degree E
+  what puts torsion sheaves on the negative real axis. **True on a curve; false
+  on a surface**, where a skyscraper has `c₁ = 0` and so degree `0`. See the
+  module docstring. -/
+  degree_pos_of_rank_zero : ∀ E : A, ¬IsZero E → rankHom (K₀Ab.of E) = 0 →
+    0 < degreeHom (K₀Ab.of E)
 
 namespace SlopeData
 
 variable (D : SlopeData A)
+
+/-- The rank of an object. -/
+abbrev rank (E : A) : ℤ := D.rankHom (K₀Ab.of E)
+
+/-- The degree of an object. -/
+abbrev degree (E : A) : ℤ := D.degreeHom (K₀Ab.of E)
+
+/-! ### The six formal properties, now theorems
+
+`rank_zero`, `rank_iso`, `rank_additive` and their degree counterparts were fields.
+They are exactly `K₀Ab.of_isZero`, `of_iso` and `of_shortExact` composed with a hom,
+so they are proved here and the names and argument shapes are unchanged. -/
+
+theorem rank_zero (E : A) (hE : IsZero E) : D.rank E = 0 := by
+  rw [rank, K₀Ab.of_isZero hE, map_zero]
+
+theorem degree_zero (E : A) (hE : IsZero E) : D.degree E = 0 := by
+  rw [degree, K₀Ab.of_isZero hE, map_zero]
+
+theorem rank_iso {E F : A} (e : E ≅ F) : D.rank E = D.rank F := by
+  rw [rank, rank, K₀Ab.of_iso e]
+
+theorem degree_iso {E F : A} (e : E ≅ F) : D.degree E = D.degree F := by
+  rw [degree, degree, K₀Ab.of_iso e]
+
+theorem rank_additive (S : ShortComplex A) (hS : S.ShortExact) :
+    D.rank S.X₂ = D.rank S.X₁ + D.rank S.X₃ := by
+  rw [rank, rank, rank, K₀Ab.of_shortExact S hS, map_add]
+
+theorem degree_additive (S : ShortComplex A) (hS : S.ShortExact) :
+    D.degree S.X₂ = D.degree S.X₁ + D.degree S.X₃ := by
+  rw [degree, degree, degree, K₀Ab.of_shortExact S hS, map_add]
 
 /-- The charge `-degree + i * rank`. -/
 def charge (E : A) : ℂ := ⟨-(D.degree E : ℝ), (D.rank E : ℝ)⟩
