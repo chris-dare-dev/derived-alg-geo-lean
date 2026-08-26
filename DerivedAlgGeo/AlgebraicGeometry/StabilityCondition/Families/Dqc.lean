@@ -126,6 +126,41 @@ theorem quasicoherent_isClosedUnderCoproducts (ι : Type u) :
       (Discrete ι) :=
   inferInstance
 
+/-- **`Dqc(X)` is closed under a coproduct that cohomology preserves** (#721).
+
+Both hypotheses are carried explicitly rather than installed as instances, because
+neither holds by instance search at this pin: `SchemeDerivedCategory X` is not known
+to have small coproducts, and `Hⁿ` on it is not known to preserve them.  Supplying
+them unconditionally — equivalently, proving that `D(A)` has small coproducts and that
+homology preserves them for a Grothendieck `A` — is the open half of this issue's
+third bullet.
+
+Two pieces of plumbing here are deliberate and both cost real time to find.
+
+The `letI` is this file's house idiom, not an incantation: `Families/SchemeDerived.lean`
+carries the same line in every declaration that mentions the derived category.  The
+file-level `attribute [local instance]` does not reach a fresh mention of
+`DerivedCategory.cohomologyIn`, which is why `schemeQuasicoherentCohomology` — routed
+through the `SchemeDerivedCategory` abbrev, which carries its own `letI` — elaborates
+while a direct mention does not.
+
+The `@` and the named `quasicoherent_isClosedUnderCoproducts` are the second piece.
+Instance search cannot find that instance through this application even though
+`quasicoherent_isClosedUnderCoproducts` two declarations above finds it by
+`inferInstance`: unifying `A := X.Modules` routes the category through
+`Scheme.Modules.instCategory`, and the goal it then poses no longer matches the
+instance's own head.  Supplying it by name is not a workaround for an unproved fact —
+it is the same instance, named. -/
+theorem sigma_mem {ι : Type u} (E : ι → SchemeDerivedCategory X) [HasCoproduct E]
+    (hpres : ∀ n : ℤ, PreservesColimitsOfShape (Discrete ι)
+      (DerivedCategory.homologyFunctor X.Modules n))
+    (hE : ∀ i, schemeQuasicoherentCohomology X (E i)) :
+    schemeQuasicoherentCohomology X (∐ E) :=
+  letI := HasDerivedCategory.standard X.Modules
+  @DerivedCategory.cohomologyIn_prop_coproduct X.Modules _ _ _
+    (SheafOfModules.isQuasicoherent X.ringCatSheaf) ι
+    (quasicoherent_isClosedUnderCoproducts X ι) E _ hpres hE
+
 /-- Membership in `Dqc(X)` is exactly quasi-coherence of every cohomology
 sheaf. -/
 theorem mem_iff (E : SchemeDerivedCategory X) :
