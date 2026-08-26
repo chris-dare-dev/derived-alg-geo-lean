@@ -33,16 +33,3 @@ needed.
 #print axioms DerivedCategory.instIsStableUnderShiftCohomologyInIntOfIsClosedUnderIsomorphisms
 #print axioms DerivedCategory.cohomologyIn_isTriangulatedClosed₂
 #print axioms DerivedCategory.cohomologyIn_isTriangulated
-
-/-! ## Two elaboration artifacts, audited rather than exempted
-
-`ShortComplex.mk.congr_simp` and `ShortComplex.homologyData.congr_simp` are congruence
-lemmas Lean generates on first use; `WeakSerreExact.lean` is the first module in the
-build to trigger them, so the declaration sweep attributes them here and the
-completeness ratchet counts them. They are recorded rather than filtered because the
-alternative — adding `.congr_simp` to `autoSuffixes` in `scripts/EnumDecls.lean` — is a
-trust-surface edit, and this slice is not the place to make one.
--/
-
-#print axioms CategoryTheory.ShortComplex.mk.congr_simp
-#print axioms CategoryTheory.ShortComplex.homologyData.congr_simp
