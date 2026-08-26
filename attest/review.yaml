@@ -66,7 +66,7 @@ reviews:
                     (@CategoryTheory.Triangulated.K₀.{u, w} C inst inst_1 inst_2 inst_3 inst_4 inst_5)
                     (@QuotientAddGroup.Quotient.addGroup.{u} (FreeAbelianGroup.{u} C)
                       (@AddCommGroup.toAddGroup.{u} (FreeAbelianGroup.{u} C) (instAddCommGroupFreeAbelianGroup.{u} C))
-                      (@CategoryTheory.Triangulated.GrothendieckPresentation.relationSubgroup.{u, max u w} C
+                      (@CategoryTheory.GrothendieckPresentation.relationSubgroup.{u, max u w} C
                         (@Subtype.{max (u + 1) (w + 1)} (@CategoryTheory.Pretriangulated.Triangle.{w, u} C inst inst_2)
                           fun T =>
                           @Membership.mem.{max u w, max u w} (@CategoryTheory.Pretriangulated.Triangle.{w, u} C inst inst_2)
@@ -84,7 +84,7 @@ reviews:
                             (@AddCommMonoid.toAddCommSemigroup.{u} (FreeAbelianGroup.{u} C)
                               (@AddCommGroup.toAddCommMonoid.{u} (FreeAbelianGroup.{u} C)
                                 (instAddCommGroupFreeAbelianGroup.{u} C)))))
-                        (@CategoryTheory.Triangulated.GrothendieckPresentation.relationSubgroup.{u, max u w} C
+                        (@CategoryTheory.GrothendieckPresentation.relationSubgroup.{u, max u w} C
                           (@Subtype.{max (u + 1) (w + 1)} (@CategoryTheory.Pretriangulated.Triangle.{w, u} C inst inst_2)
                             fun T =>
                             @Membership.mem.{max u w, max u w} (@CategoryTheory.Pretriangulated.Triangle.{w, u} C inst inst_2)
@@ -190,7 +190,7 @@ reviews:
                     (@CategoryTheory.Triangulated.K₀.{u, w} C inst inst_1 inst_2 inst_3 inst_4 inst_5)
                     (@QuotientAddGroup.Quotient.addGroup.{u} (FreeAbelianGroup.{u} C)
                       (@AddCommGroup.toAddGroup.{u} (FreeAbelianGroup.{u} C) (instAddCommGroupFreeAbelianGroup.{u} C))
-                      (@CategoryTheory.Triangulated.GrothendieckPresentation.relationSubgroup.{u, max u w} C
+                      (@CategoryTheory.GrothendieckPresentation.relationSubgroup.{u, max u w} C
                         (@Subtype.{max (u + 1) (w + 1)} (@CategoryTheory.Pretriangulated.Triangle.{w, u} C inst inst_2)
                           fun T =>
                           @Membership.mem.{max u w, max u w} (@CategoryTheory.Pretriangulated.Triangle.{w, u} C inst inst_2)
@@ -208,7 +208,7 @@ reviews:
                             (@AddCommMonoid.toAddCommSemigroup.{u} (FreeAbelianGroup.{u} C)
                               (@AddCommGroup.toAddCommMonoid.{u} (FreeAbelianGroup.{u} C)
                                 (instAddCommGroupFreeAbelianGroup.{u} C)))))
-                        (@CategoryTheory.Triangulated.GrothendieckPresentation.relationSubgroup.{u, max u w} C
+                        (@CategoryTheory.GrothendieckPresentation.relationSubgroup.{u, max u w} C
                           (@Subtype.{max (u + 1) (w + 1)} (@CategoryTheory.Pretriangulated.Triangle.{w, u} C inst inst_2)
                             fun T =>
                             @Membership.mem.{max u w, max u w} (@CategoryTheory.Pretriangulated.Triangle.{w, u} C inst inst_2)
