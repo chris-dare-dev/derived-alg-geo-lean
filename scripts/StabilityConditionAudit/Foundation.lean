@@ -1111,3 +1111,10 @@ one.
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_zero
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_iso
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_additive
+
+/-! ## `extendMap`, bundled
+
+The Mukai-lattice leg of the charge chain was additive and unbundled like the numerical leg.
+-/
+
+#print axioms Mukai.extendMapHom
