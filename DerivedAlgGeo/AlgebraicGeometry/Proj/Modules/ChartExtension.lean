@@ -48,6 +48,20 @@ for any `m ≥ n`, because the restriction map is linear over the chart ring. Wi
 `exists_pow_smul_eq_res_chart_uniform` gives a **single** `n` for a finite family of charts: each
 supplies its own, finiteness bounds the range, and raising does the rest.
 
+## The same three, for *agreement* rather than extension
+
+`exists_pow_smul_eq_of_res_eq_chart`, `..._of_le` and `..._uniform` mirror the three above with
+`exists_pow_smul_eq_of_res_eq_of_isQuasicoherent` in place of the extension lemma, and are needed
+for a reason the obvious reading of `#585` misses.
+
+Two charts' twisted sections are only visibly equal where `D₊(f)` reaches: there each restricts to
+the same `twistBy fⁿ` of `s`. But `TopCat.Sheaf.IsCompatible` demands agreement on the whole
+pairwise overlap `D₊(gᵢ) ⊓ D₊(gⱼ)`, which is **not** contained in `D₊(f)`. Closing that distance
+costs a second exponent, and these raise and unify it exactly as the first three do.
+
+The uniform version's index is deliberately arbitrary rather than the chart index: agreement has to
+be forced on every *pair* at once, so a pair type is what gets passed.
+
 ## Scope
 
 `#585` is still not closed. What remains is everything after the exponent:
@@ -141,6 +155,47 @@ theorem exists_pow_smul_eq_res_chart (F : (Proj 𝒜).Modules)
         HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • s :=
   Scheme.Modules.exists_pow_smul_eq_res_of_top_of_isQuasicoherent _ _ s
 
+/-- **Two sections agreeing on a smaller chart agree after clearing a power.**
+
+The separatedness counterpart of `exists_pow_smul_eq_res_chart`, and the same six lines: on a
+degree-one chart the sections over `D(f/g)` are a localization of the sections over the whole
+chart, so two sections agreeing there differ by something a power of `f/g` kills.
+
+`#585`'s glue needs it because agreement between two charts is only visible where `D₊(f)` reaches,
+and `IsCompatible` demands it on the whole pairwise overlap. This is what closes that distance --
+at the cost of one more exponent, which `exists_pow_smul_eq_res_chart_of_le` absorbs the same way
+it absorbs the first. -/
+theorem exists_pow_smul_eq_of_res_eq_chart (F : (Proj 𝒜).Modules)
+    [SheafOfModules.IsQuasicoherent.{u, u, u}
+      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
+    {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1)
+    (t t' : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj (op ⊤))
+    (h : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map
+        (homOfLE (le_top (a := PrimeSpectrum.basicOpen
+          (HomogeneousLocalization.Away.isLocalizationElem hg hf)))).op t =
+      (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map
+        (homOfLE (le_top (a := PrimeSpectrum.basicOpen
+          (HomogeneousLocalization.Away.isLocalizationElem hg hf)))).op t') :
+    ∃ n : ℕ, HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • t =
+      HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • t' :=
+  Scheme.Modules.exists_pow_smul_eq_of_res_eq_of_isQuasicoherent _ _ t t' h
+
+/-- **That exponent can be raised too.**
+
+Same argument as `exists_pow_smul_eq_res_chart_of_le` and for the same reason: a single exponent
+across a finite family needs every member raised to the maximum. No quasi-coherence -- only that
+the action is by a monoid. -/
+theorem exists_pow_smul_eq_of_res_eq_chart_of_le (F : (Proj 𝒜).Modules)
+    {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1)
+    (t t' : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj (op ⊤))
+    {n m : ℕ} (hnm : n ≤ m)
+    (h : HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • t =
+      HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • t') :
+    HomogeneousLocalization.Away.isLocalizationElem hg hf ^ m • t =
+      HomogeneousLocalization.Away.isLocalizationElem hg hf ^ m • t' := by
+  have hm : m = (m - n) + n := by omega
+  rw [hm, pow_add, mul_smul, mul_smul, h]
+
 /-- **The exponent can be raised.**
 
 If clearing `(f/g)ⁿ` extends `s` over the chart, so does clearing any higher
@@ -170,6 +225,32 @@ theorem exists_pow_smul_eq_res_chart_of_le (F : (Proj 𝒜).Modules)
   rw [map_smul, ht, smul_smul, ← pow_add]
   congr 2
   omega
+
+/-- **One exponent for a finite family of agreements.**
+
+The separatedness counterpart of `exists_pow_smul_eq_res_chart_uniform`, and what `#585`'s glue
+calls: agreement has to be forced on every *pairwise* overlap at once, so the family here is
+indexed by pairs and the bound is taken over all of them.
+
+The index is arbitrary rather than the chart index, precisely so that a pair type can be passed. -/
+theorem exists_pow_smul_eq_of_res_eq_chart_uniform (F : (Proj 𝒜).Modules)
+    [SheafOfModules.IsQuasicoherent.{u, u, u}
+      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
+    {ι : Type*} [Finite ι] {f g : ι → A} (hf : ∀ i, f i ∈ 𝒜 1) (hg : ∀ i, g i ∈ 𝒜 1)
+    (t t' : ∀ i, (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.obj (op ⊤))
+    (h : ∀ i, (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.map
+        (homOfLE (le_top (a := PrimeSpectrum.basicOpen
+          (HomogeneousLocalization.Away.isLocalizationElem (hg i) (hf i))))).op (t i) =
+      (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.map
+        (homOfLE (le_top (a := PrimeSpectrum.basicOpen
+          (HomogeneousLocalization.Away.isLocalizationElem (hg i) (hf i))))).op (t' i)) :
+    ∃ n : ℕ, ∀ i,
+      HomogeneousLocalization.Away.isLocalizationElem (hg i) (hf i) ^ n • t i =
+        HomogeneousLocalization.Away.isLocalizationElem (hg i) (hf i) ^ n • t' i := by
+  choose N hN using fun i => exists_pow_smul_eq_of_res_eq_chart 𝒜 F (hf i) (hg i) (t i) (t' i) (h i)
+  obtain ⟨n, hn⟩ := (Set.finite_range N).bddAbove
+  exact ⟨n, fun i => exists_pow_smul_eq_of_res_eq_chart_of_le 𝒜 F (hf i) (hg i) (t i) (t' i)
+    (hn ⟨i, rfl⟩) (hN i)⟩
 
 /-- **One exponent for a finite family of charts.**
 
