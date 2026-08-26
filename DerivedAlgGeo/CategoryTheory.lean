@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.ConstantSheafPullback
 import DerivedAlgGeo.CategoryTheory.ExtDimensionShift
+import DerivedAlgGeo.CategoryTheory.WeakSerreExact
 import DerivedAlgGeo.CategoryTheory.DGCategory
 import DerivedAlgGeo.CategoryTheory.Sites
 import DerivedAlgGeo.CategoryTheory.Triangulated

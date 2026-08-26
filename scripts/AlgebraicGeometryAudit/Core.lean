@@ -2735,3 +2735,4 @@ about a quadratic space. -/
 #print axioms AlgebraicGeometry.isQuasicoherent_middle_affine
 #print axioms AlgebraicGeometry.isQuasicoherent_middle
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderExtensions
+#print axioms AlgebraicGeometry.quasicoherent_containsZero

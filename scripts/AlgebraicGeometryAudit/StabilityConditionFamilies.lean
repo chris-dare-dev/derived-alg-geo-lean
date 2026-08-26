@@ -599,3 +599,14 @@ existence proposition is an input.
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.FiniteTypeGeometricConsequences.genericOpenness
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.FiniteTypeGeometricConsequences.relativeHN
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.GeometricPreStabilityBaseChangeData.finiteTypeConsequences
+
+/-! ## `Dqc(X)` is a triangulated subcategory (#721)
+
+Quasi-coherence is a weak Serre subcategory of `X.Modules` containing zero, on an
+arbitrary scheme, so `DerivedCategory.cohomologyIn_isTriangulated` applies and the
+inclusion into the all-sheaf derived category is a triangulated functor. Neither is
+transported along an unproved equivalence.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.instIsTriangulatedSchemeDerivedCategorySchemeQuasicoherentCohomology
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.SchemeQuasicoherentDerivedCategory.ι_isTriangulated

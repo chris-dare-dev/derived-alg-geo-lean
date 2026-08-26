@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.ObjectProperty.Extensions
+import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Quasicoherent.Kernels
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineVanishing
 import DerivedAlgGeo.CategoryTheory.Sites.CohomologyShortExact
@@ -13,9 +14,13 @@ import DerivedAlgGeo.CategoryTheory.Sites.CohomologyShortExact
 With the kernel and cokernel closure of
 `CoherentSheaf/Quasicoherent/Kernels.lean`, this completes the **weak Serre
 property** for quasi-coherent sheaves on an arbitrary scheme — what `Dqc(X)`
-needs before it can carry a triangulated structure, since closure under cones is,
-through the homology long exact sequence, closure under subobjects, quotients,
-and extensions.
+needs before it can carry a triangulated structure.
+
+Through the **five-term** homology long exact sequence, closure under cones
+needs closure under kernels, cokernels and extensions — not under subobjects and
+quotients, which quasi-coherence does not have.  See
+`CategoryTheory/WeakSerreExact.lean`; an earlier version of this paragraph
+claimed the stronger closure, and it is not what the argument uses.
 
 ## Why cohomology, when the coherent case needed none
 
@@ -238,17 +243,37 @@ noncomputable instance quasicoherent_isClosedUnderExtensions (X : Scheme.{u}) :
   prop_X₂_of_shortExact hS h₁ h₃ := isQuasicoherent_middle hS h₁ h₃
 
 
+/-- **The zero sheaf is quasi-coherent.**
+
+`SheafOfModules.isFinitePresentation_containsZero` already exhibits a zero sheaf
+as finitely presented, and Mathlib turns finite presentation into
+quasi-coherence, so this needs no `QuasicoherentData` of its own.
+
+It is the fourth ingredient of the triangulated structure and the only one that
+is not a closure property: `ObjectProperty.IsTriangulated` extends
+`ContainsZero`, and closure under kernels cannot produce a first member of the
+class from nothing. -/
+noncomputable instance quasicoherent_containsZero (X : Scheme.{u}) :
+    (SheafOfModules.isQuasicoherent X.ringCatSheaf).ContainsZero where
+  exists_zero := by
+    obtain ⟨Z, hZ, hP⟩ :=
+      (SheafOfModules.isFinitePresentation X.ringCatSheaf).exists_prop_of_containsZero
+    letI : Z.IsFinitePresentation := hP
+    exact ⟨Z, hZ, inferInstance⟩
+
 /-- **The weak Serre property, assembled.**
 
 Kernels and cokernels come from `CoherentSheaf/Quasicoherent/Kernels.lean`,
-extensions from this file. Stated as a check rather than a definition: the point
-is that all three now resolve by instance search on an arbitrary scheme, which is
-what `Dqc(X)`'s triangulated structure will ask for. -/
+extensions and the zero object from this file. Stated as a check rather than a
+definition: the point is that all four now resolve by instance search on an
+arbitrary scheme, with no noetherian or quasi-compactness hypothesis, which is
+exactly what `Dqc(X)`'s triangulated structure asks for. -/
 example (X : Scheme.{u}) :
-    (SheafOfModules.isQuasicoherent X.ringCatSheaf).IsClosedUnderKernels ∧
+    (SheafOfModules.isQuasicoherent X.ringCatSheaf).ContainsZero ∧
+      (SheafOfModules.isQuasicoherent X.ringCatSheaf).IsClosedUnderKernels ∧
       (SheafOfModules.isQuasicoherent X.ringCatSheaf).IsClosedUnderCokernels ∧
       (SheafOfModules.isQuasicoherent X.ringCatSheaf).IsClosedUnderExtensions :=
-  ⟨inferInstance, inferInstance, inferInstance⟩
+  ⟨inferInstance, inferInstance, inferInstance, inferInstance⟩
 
 end
 
