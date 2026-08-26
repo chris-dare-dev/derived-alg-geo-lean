@@ -1,4 +1,5 @@
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.CentralCharge
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.CategoricalCharge
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Discriminant
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Dual
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.EulerPairing

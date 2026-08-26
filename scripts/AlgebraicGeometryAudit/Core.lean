@@ -2923,3 +2923,23 @@ about a quadratic space. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma_affine
 #print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderCoproducts
+
+/-! ## The numerical charge, bundled, and its bridge to the categorical side
+
+`numericalCharge` was proved additive and left unbundled, which is what kept the numerical
+lane from meeting the stability-function side — every charge there is an `AddMonoidHom`, and
+an equation is not one. `numericalCharge_zero` did not exist at all and is free once the hom
+does.
+
+`toMukaiChargeData` builds the categorical class map as a composition of homs, so
+`charge_toMukaiChargeData` is definitional: the categorical charge of an object IS the
+numerical charge of its class. That is the lemma that makes the numerical support-property
+theorems reachable from an object of an abelian category.
+-/
+
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.numericalChargeHom
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.numericalChargeHom_apply
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.numericalCharge_zero
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.toMukaiChargeData
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.toMukaiChargeData_mukai
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.charge_toMukaiChargeData

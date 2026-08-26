@@ -76,6 +76,30 @@ theorem numericalCharge_add (E F : N) :
   simp only [numericalCharge, Mukai.expCharge, map_add, Mukai.extendMap_add]
   exact PeriodDomain.centralCharge_add _ _ _ _
 
+variable (D bR f β ω)
+
+/-- **The charge as a bundled hom**, `N →+ ℂ`.
+
+`numericalCharge` was proved additive and then left unbundled, which is what kept
+the numerical lane from ever meeting the stability-function side: every charge
+there is an `AddMonoidHom`, and an equation is not one.  With this the chain from
+a numerical class to `ℂ` is a composition of homs and nothing along it re-proves
+additivity. -/
+noncomputable def numericalChargeHom : N →+ ℂ :=
+  AddMonoidHom.mk' (D.numericalCharge bR f β ω) (fun E F ↦ numericalCharge_add E F)
+
+@[simp]
+theorem numericalChargeHom_apply (E : N) :
+    D.numericalChargeHom bR f β ω E = D.numericalCharge bR f β ω E := rfl
+
+/-- The charge **kills the zero class** — free once it is a hom, and absent
+before. -/
+@[simp]
+theorem numericalCharge_zero : D.numericalCharge bR f β ω 0 = 0 :=
+  (D.numericalChargeHom bR f β ω).map_zero
+
+variable {D bR f β ω}
+
 /-- The real square of a class is half its Mukai square. -/
 theorem realForm_extendMap_mukaiVector
     (hf : ∀ x y : Λ, bR (f x) (f y) = ((D.b x) y : ℝ)) (E : N) :
