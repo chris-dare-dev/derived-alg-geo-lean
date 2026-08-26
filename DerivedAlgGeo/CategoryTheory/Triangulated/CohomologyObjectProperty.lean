@@ -48,13 +48,13 @@ not cohomological support in a subcategory.
   inclusion is triangulated.
 -/
 
-universe w v u
+universe t w v u
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 
 namespace DerivedCategory
 
-variable {A : Type u} [Category.{v} A] [Abelian A] [HasDerivedCategory.{w} A]
+variable {A : Type u} [Category.{v} A] [Abelian A] [HasDerivedCategory.{w} A] {n : ℤ}
 
 /-- The objects of `DerivedCategory A` all of whose cohomology objects satisfy
 `P`. For `P` quasi-coherence on a scheme this is the honest `Dqc(X)`. -/
@@ -85,6 +85,8 @@ instance [P.IsClosedUnderIsomorphisms] :
         exact P.prop_of_iso
           (((homologyFunctor A 0).shiftIso m n (m + n) rfl).app E).symm (hE (m + n)) }
 
+section WeakSerre
+
 variable [P.IsClosedUnderKernels] [P.IsClosedUnderCokernels]
   [P.IsClosedUnderExtensions] [P.IsClosedUnderIsomorphisms]
 
@@ -111,5 +113,41 @@ is `Pretriangulated` (and `IsTriangulated` when `DerivedCategory A` is), and
 `(cohomologyIn P).ι` is a triangulated functor. -/
 instance cohomologyIn_isTriangulated [P.ContainsZero] :
     (cohomologyIn P).IsTriangulated where
+
+end WeakSerre
+
+section Coproducts
+
+/-- **Closure under a coproduct that cohomology preserves.**
+
+The two hypotheses are exactly the ones that cannot be assumed at this Mathlib pin:
+`DerivedCategory A` is not known to have small coproducts, and `Hⁿ` on it is not
+known to preserve them.  Both are stated for the one indexing type at hand rather
+than installed as instances, so nothing here pretends the derived category has
+coproducts it has not been shown to have.
+
+Given them, the argument is one step: `Hⁿ(∐ Eᵢ)` *is* a colimit of the `Hⁿ(Eᵢ)`,
+each of which is in `P`, so `P`'s own closure under `ι`-indexed colimits applies. -/
+lemma cohomologyIn_coproduct {ι : Type t} [P.IsClosedUnderColimitsOfShape (Discrete ι)]
+    (E : ι → DerivedCategory A) [HasCoproduct E]
+    (hpres : PreservesColimitsOfShape (Discrete ι) (homologyFunctor A n))
+    (hE : ∀ i, cohomologyIn P (E i)) : P ((homologyFunctor A n).obj (∐ E)) := by
+  haveI := hpres
+  refine ObjectProperty.colimitsOfShape_le P (Discrete ι) _ ⟨?_⟩
+  exact
+    { diag := Discrete.functor E ⋙ homologyFunctor A n
+      ι := ((homologyFunctor A n).mapCocone (colimit.cocone (Discrete.functor E))).ι
+      isColimit := isColimitOfPreserves _ (colimit.isColimit (Discrete.functor E))
+      prop_diag_obj := fun j ↦ hE j.as n }
+
+/-- **`cohomologyIn P` is closed under a coproduct preserved by every `Hⁿ`.** -/
+lemma cohomologyIn_prop_coproduct {ι : Type t}
+    [P.IsClosedUnderColimitsOfShape (Discrete ι)]
+    (E : ι → DerivedCategory A) [HasCoproduct E]
+    (hpres : ∀ n : ℤ, PreservesColimitsOfShape (Discrete ι) (homologyFunctor A n))
+    (hE : ∀ i, cohomologyIn P (E i)) : cohomologyIn P (∐ E) :=
+  fun n ↦ cohomologyIn_coproduct P (n := n) E (hpres n) hE
+
+end Coproducts
 
 end DerivedCategory

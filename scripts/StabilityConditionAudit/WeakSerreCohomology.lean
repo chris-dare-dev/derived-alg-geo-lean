@@ -33,3 +33,15 @@ needed.
 #print axioms DerivedCategory.instIsStableUnderShiftCohomologyInIntOfIsClosedUnderIsomorphisms
 #print axioms DerivedCategory.cohomologyIn_isTriangulatedClosed₂
 #print axioms DerivedCategory.cohomologyIn_isTriangulated
+
+/-! ## Closure under a coproduct that cohomology preserves (#721)
+
+Stated relative to the coproduct existing and every `Hⁿ` preserving it. Neither is
+available for `DerivedCategory A` at this Mathlib pin, so both are hypotheses rather
+than instances, and nothing here asserts that the derived category has coproducts it
+has not been shown to have.
+-/
+
+#print axioms DerivedCategory.cohomologyIn_coproduct
+#print axioms DerivedCategory.cohomologyIn_prop_coproduct
+
