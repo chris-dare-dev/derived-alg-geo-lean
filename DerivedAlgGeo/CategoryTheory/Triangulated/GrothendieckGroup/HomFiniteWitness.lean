@@ -7,6 +7,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import Mathlib.Algebra.Category.FGModuleCat.Abelian
 import Mathlib.Algebra.Category.ModuleCat.Projective
 import Mathlib.Algebra.Homology.DerivedCategory.KProjective
+import Mathlib.Algebra.Homology.DerivedCategory.Linear
+import Mathlib.CategoryTheory.Triangulated.Subcategory
 
 /-!
 # A concrete `HomFiniteBounded` category (#543)
@@ -32,11 +34,13 @@ The route to `Dᵇ` does **not** need the semisimplicity argument
 (`Dᵇ(k‑vect) ≃ ℤ`-graded vector spaces) that an earlier reading of #543 took to
 be the only option. Over a field every bounded complex is K-projective, and
 `CochainComplex.IsKProjective.Qh_map_bijective` then says Hom in `Dᵇ` *is* Hom
-in `Kᵇ`. The `FGModuleCat` section below supplies the missing input for that —
-projectivity — and `isKProjective_of_isStrictlyLE` records the consequence.
-**The transport itself is not done here**: nothing below constructs a
-`HomFiniteBounded` instance on any derived category, and the `Kᵇ ≃ Dᵇ`
-equivalence is still neither used nor claimed.
+in `Kᵇ`. The `Derived` section below carries that out: `boundedQh` is fully
+faithful, its essential image is a triangulated subcategory of
+`D(FGModuleCat k)` and so `k`-linear pretriangulated, and
+`HomFiniteBounded.of_essSurj` moves the `Kᵇ` instance across.
+
+So `HomFiniteBounded` now has a model on a genuine derived category, and no
+equivalence `Dᵇ(k-vect) ≃ ℤ`-graded vector spaces is constructed anywhere.
 
 ## What this file proves and what it does not
 
@@ -55,9 +59,13 @@ equivalence is still neither used nor claimed.
 * `isKProjective_of_isStrictlyLE`: a bounded-above complex of
   finite-dimensional vector spaces is K-projective, with no hypothesis beyond
   the bound.
-* **Not** proved: any `HomFiniteBounded` instance on a derived category, any
-  comparison of `chiHom` on `Kᵇ` with an Euler characteristic of homology, or
-  `IsRiemannRoch` for anything.
+* `homFiniteBounded_boundedDerived`: `HomFiniteBounded k` on the essential
+  image of `boundedQh` — a full subcategory of `DerivedCategory (FGModuleCat k)`,
+  `k`-linear pretriangulated. This is the honest `Dᵇ` witness #543 asked for.
+* **Not** proved: that this essential image is all of the bounded derived
+  category — it is defined as an image, and no t-structure characterisation of
+  it is given. Nor any comparison of `chiHom` with an Euler characteristic of
+  homology, nor `IsRiemannRoch` for anything.
   The obligation #513 named is discharged in the satisfiability sense only:
   the class has a genuine model, so the Euler-form chain is not vacuous.
 -/
@@ -237,6 +245,82 @@ That transport is not performed here. -/
 theorem isKProjective_of_isStrictlyLE (K : CochainComplex (FGModuleCat.{u} k) ℤ)
     (d : ℤ) [K.IsStrictlyLE d] : K.IsKProjective :=
   CochainComplex.isKProjective_of_projective K d
+
+section Derived
+
+attribute [local instance] HasDerivedCategory.standard
+
+/-- Every object of `Kᵇ(FGModuleCat k)` is K-projective. Boundedness supplies
+the bound above; `FGModuleCat.instProjective` supplies the rest. -/
+instance isKProjective_bounded (X : HomotopyCategory.Bounded (FGModuleCat.{u} k)) :
+    CochainComplex.IsKProjective X.obj.as := by
+  have h : CochainComplex.bounded (FGModuleCat.{u} k) X.obj.as := by
+    rw [← HomotopyCategory.bounded_quotient_obj_iff]
+    exact X.property
+  obtain ⟨-, d, hd⟩ := h
+  exact isKProjective_of_isStrictlyLE k X.obj.as d
+
+/-- **`Kᵇ(FGModuleCat k) ⥤ D(FGModuleCat k)`.**
+
+An `abbrev` deliberately: as a `def` the composite is opaque to instance search,
+and every structural instance below — `CommShift`, `IsTriangulated`, `Additive`,
+`Linear` — is found by unfolding it. -/
+noncomputable abbrev boundedQh :
+    HomotopyCategory.Bounded (FGModuleCat.{u} k) ⥤ DerivedCategory (FGModuleCat.{u} k) :=
+  HomotopyCategory.Bounded.ι (FGModuleCat.{u} k) ⋙ DerivedCategory.Qh
+
+/-- Full, because a K-projective source makes `Qh` bijective on Hom. -/
+instance boundedQh_full : (boundedQh k).Full := by
+  constructor
+  intro X Y f
+  obtain ⟨g, hg⟩ := (CochainComplex.IsKProjective.Qh_map_bijective X.obj.as Y.obj).2 f
+  exact ⟨ObjectProperty.homMk g, hg⟩
+
+/-- Faithful, by the injective half of the same bijection. -/
+instance boundedQh_faithful : (boundedQh k).Faithful := by
+  constructor
+  intro X Y f g h
+  apply ObjectProperty.hom_ext
+  apply (CochainComplex.IsKProjective.Qh_map_bijective X.obj.as Y.obj).1
+  exact h
+
+/-- **The bounded derived locus**: the essential image of `boundedQh`, as a full
+subcategory of `D(FGModuleCat k)`.
+
+It is `k`-linear pretriangulated for free. Mathlib's
+`ObjectProperty.essImage.IsTriangulated` makes the essential image of a full
+triangulated functor a triangulated subcategory, and
+`ObjectProperty.instPretriangulatedFullSubcategory` equips the full subcategory
+of a triangulated subcategory. Nothing here has to build a t-structure. -/
+noncomputable abbrev boundedLift :
+    HomotopyCategory.Bounded (FGModuleCat.{u} k) ⥤ (boundedQh k).essImage.FullSubcategory :=
+  (boundedQh k).essImage.lift (boundedQh k) (fun X => (boundedQh k).obj_mem_essImage X)
+
+noncomputable instance boundedLift_linear : Functor.Linear k (boundedLift k) where
+  map_smul f r := by
+    apply ObjectProperty.hom_ext
+    exact (boundedQh k).map_smul r f
+
+noncomputable instance boundedLift_essSurj : (boundedLift k).EssSurj where
+  mem_essImage Y := by
+    obtain ⟨X, ⟨e⟩⟩ := Y.property
+    exact ⟨X, ⟨ObjectProperty.isoMk _ e⟩⟩
+
+/-- **The `Dᵇ` witness for #543.**
+
+`HomFiniteBounded` holds on a full subcategory of a genuine **derived**
+category, not merely on a homotopy category. The route is the one
+`HomFiniteWitness`'s docstring describes: bounded complexes of
+finite-dimensional vector spaces are K-projective, so `Qh` is fully faithful on
+them, and `HomFiniteBounded.of_essSurj` carries the `Kᵇ` instance across.
+
+Semisimplicity is not used, and no equivalence `Dᵇ(k-vect) ≃ ℤ`-graded vector
+spaces is constructed or needed. -/
+noncomputable instance homFiniteBounded_boundedDerived :
+    HomFiniteBounded k (boundedQh k).essImage.FullSubcategory :=
+  HomFiniteBounded.of_essSurj (boundedLift k) (Functor.FullyFaithful.ofFullyFaithful _)
+
+end Derived
 
 end FGModuleCat
 
