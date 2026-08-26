@@ -2739,3 +2739,6 @@ about a quadratic space. -/
 #print axioms AlgebraicGeometry.isQuasicoherent_middle
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderExtensions
 #print axioms AlgebraicGeometry.quasicoherent_containsZero
+#print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma_affine
+#print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma
+#print axioms AlgebraicGeometry.quasicoherent_isClosedUnderCoproducts
