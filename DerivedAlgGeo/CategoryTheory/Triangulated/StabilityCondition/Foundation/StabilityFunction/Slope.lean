@@ -7,8 +7,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.S
 /-!
 # Slope stability is a stability function
 
-Rank and degree data on an abelian category — what a polarised surface gives to
-`Coh X`, with `degree E = c₁ E · ω` — determine the charge
+Rank and degree data on an abelian category — what a polarised **curve** gives to
+`Coh X`, with `degree` the usual degree — determine the charge
 
 ```
 Z (E) = -degree E + i * rank E
@@ -39,10 +39,18 @@ is the form the tilting machinery consumes.
 ## What is data and what is proved
 
 `rank_nonneg` and `degree_pos_of_rank_zero` are **fields**: they are the
-geometric input. For `Coh X` with `ω` ample they say that a coherent sheaf has
-nonnegative rank and that a nonzero torsion sheaf has positive degree — true, and
-not provable here, since `A` is an arbitrary abelian category. Everything else is
-derived.
+geometric input, not provable here, since `A` is an arbitrary abelian category.
+
+**They are the CURVE case, not the surface case, and an earlier version of this
+docstring said surface.** On a curve a nonzero torsion sheaf has degree equal to
+its length, which is positive. On a **surface** it is false: a dimension-zero
+sheaf — a skyscraper — has `c₁ = 0`, hence `degree = c₁ · ω = 0`, so
+`degree_pos_of_rank_zero` fails on exactly those objects.
+
+The consequence is not cosmetic. μ-slope on a surface is a **weak** stability
+function, not a stability function: a skyscraper has zero rank and zero degree, so
+its charge is `0`, which `semiClosedUpperHalfPlane` excludes. That is why the weak
+theory exists, and it is why a surface lane must not instantiate `SlopeData`.
 
 The slope itself is `degree / rank`, which is junk at rank zero where the
 classical slope is `+∞`; every statement about it carries a positive-rank
@@ -60,8 +68,9 @@ namespace CategoryTheory.Triangulated
 
 variable {A : Type u} [Category.{v} A] [Abelian A]
 
-/-- Rank and degree data on an abelian category: what a polarised surface gives
-to its category of coherent sheaves. -/
+/-- Rank and degree data on an abelian category: what a polarised **curve** gives
+to its category of coherent sheaves. See the module docstring — on a surface
+`degree_pos_of_rank_zero` is false for skyscrapers. -/
 structure SlopeData (A : Type u) [Category.{v} A] [Abelian A] where
   /-- The rank. -/
   rank : A → ℤ
@@ -120,13 +129,13 @@ noncomputable def toStabilityFunction : StabilityFunction A where
       ring
     · simp [D.rank_additive S hS])
   nonzero_mem E hE := by
-    rw [K₀Ab.liftOf_of]
+    rw [abelianDatum_cl, K₀Ab.liftOf_of]
     exact D.charge_mem_semiClosedUpperHalfPlane hE
 
 @[simp]
 theorem toStabilityFunction_charge (E : A) :
     D.toStabilityFunction.charge E = D.charge E := by
-  simp [toStabilityFunction]
+  simp [toStabilityFunction, StabilityFunction.charge, abelianDatum_cl]
 
 /-- The **slope** `degree / rank`. It is junk at rank zero, where the classical
 slope is `+∞`; every statement below asks for positive rank. -/

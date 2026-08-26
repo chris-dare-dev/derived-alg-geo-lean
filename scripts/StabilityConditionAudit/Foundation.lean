@@ -1038,26 +1038,44 @@ provide and that nothing here assumes.
 #print axioms CategoryTheory.K₀Ab.toAmbient
 #print axioms CategoryTheory.K₀Ab.toAmbient_of
 
-/-! ## Positivity as a predicate, and the weak/strict pair on an abelian category
+/-! ## Positivity relative to a class datum
 
-The weak and strict theories now share one carrier `K₀Ab A →+ ℂ` and differ only in a
-predicate, so `IsStabilityCharge.weak` is a one-line implication rather than a second
-structure with duplicated formal fields.
+The abelian and ambient theories differ only in which objects the condition speaks about
+and which group carries the classes. `ClassDatum` makes those the parameters, so there is
+one structure at two class data rather than two structures with the same fields, and
+`IsStabilityCharge.weak` is proved once for every datum.
 -/
 
 #print axioms CategoryTheory.Triangulated.closedUpperHalfPlane
 #print axioms CategoryTheory.Triangulated.semiClosedUpperHalfPlane_subset_closed
+#print axioms CategoryTheory.Triangulated.ClassDatum
+#print axioms CategoryTheory.Triangulated.ClassDatum.mk
+#print axioms CategoryTheory.Triangulated.ClassDatum.mk.inj
+#print axioms CategoryTheory.Triangulated.ClassDatum.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.ClassDatum.Relevant
+#print axioms CategoryTheory.Triangulated.ClassDatum.cl
+#print axioms CategoryTheory.Triangulated.IsPositive
 #print axioms CategoryTheory.Triangulated.IsStabilityCharge
 #print axioms CategoryTheory.Triangulated.IsWeakStabilityCharge
 #print axioms CategoryTheory.Triangulated.IsStabilityCharge.weak
-#print axioms CategoryTheory.Triangulated.WeakStabilityFunction
-#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.mk
-#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.mk.inj
-#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.Z
-#print axioms CategoryTheory.Triangulated.WeakStabilityFunction.nonzero_mem
-#print axioms CategoryTheory.Triangulated.StabilityFunction.toWeak
-#print axioms CategoryTheory.Triangulated.StabilityFunction.toWeak_Z
+#print axioms CategoryTheory.Triangulated.StabilityFunctionOn
+#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk
+#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk.inj
+#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk.congr_simp
+#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.Z
+#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.nonzero_mem
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mk
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mk.inj
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.Z
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.nonzero_mem
+#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.toWeak
+#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.toWeak_Z
+#print axioms CategoryTheory.Triangulated.abelianDatum
+#print axioms CategoryTheory.Triangulated.abelianDatum_cl
+#print axioms CategoryTheory.Triangulated.abelianDatum_relevant
 
 /-! ## `StabilityFunction`, restated over `K₀Ab`
 
@@ -1065,11 +1083,7 @@ structure with duplicated formal fields.
 shapes are unchanged so consumers are untouched.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityFunction.mk
-#print axioms CategoryTheory.Triangulated.StabilityFunction.Z
-#print axioms CategoryTheory.Triangulated.StabilityFunction.nonzero_mem
 #print axioms CategoryTheory.Triangulated.StabilityFunction.charge_apply
 #print axioms CategoryTheory.Triangulated.StabilityFunction.map_zero
 #print axioms CategoryTheory.Triangulated.StabilityFunction.map_iso
 #print axioms CategoryTheory.Triangulated.StabilityFunction.additive
-#print axioms CategoryTheory.Triangulated.StabilityFunction.ext_iff

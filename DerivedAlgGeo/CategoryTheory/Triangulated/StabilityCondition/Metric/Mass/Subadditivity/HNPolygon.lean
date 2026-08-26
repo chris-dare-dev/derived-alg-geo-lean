@@ -957,6 +957,7 @@ theorem subobjectCharge_le_of_polygonVertex_isMax
           (im_nonneg_of_mem_semiClosedUpperHalfPlane (Z.nonzero_mem Qₛ hQₛ))
           (semiClosedUpperHalfPlane_ne_zero (Z.nonzero_mem Qₛ hQₛ)) hrne
           (by simpa [hrarg] using hargQ)
+        simp only [CategoryTheory.Triangulated.abelianDatum_cl] at hcross
         dsimp [l]
         rw [ComplexPolygonalPath.crossFunctional_apply]
         linarith
