@@ -640,16 +640,23 @@ namespace AlgebraicGeometry.Scheme.Modules
 `Scheme.Modules.restrictAppIso` is `Iso.refl`, so both sides live in the same
 type and the statement is purely about which action is used.
 
-The two are *not* definitionally equal: `Scheme.Opens.ι_appIso` is proved by
-`ofRestrict_appIso`, not by `rfl`, so `rfl` does not close this even for the
-inclusion of an open subscheme. This is the bridge to use instead.
+**This is `rfl`.** `by rfl` proves the statement verbatim; the proof term below
+just reads it off Mathlib's form. So it is not a defeq barrier, and reaching for
+it is never *forced* — do not read this lemma as evidence that a restricted
+scalar action cannot be closed definitionally, because it can.
 
-It is stated rather than left to `simp` at each use site because Mathlib's own
-form carries the two `restrictAppIso.hom` applications, and those are invisible
-to `rw` and to `simp only` — `CategoryTheory.id_apply` will not fire on them,
-and introducing one on the goal side leaves `rw` a metavariable pattern. They
-are nonetheless *defeq* to the identity, which is why `exact` closes this and
-neither tactic does. -/
+What it is for is *shape*. Mathlib's `smul_restrictAppIso_hom_apply` states the
+same fact with two `restrictAppIso.hom` applications wrapped around it; this
+states it bare, so that instantiating it as a `have` hands back an equation whose
+sides match a goal written in the obvious way. `Proj.chartUnitToTwist_eq` uses it
+exactly so — to move an equation from the restricted action to the original one,
+where the pointwise lemma about the original applies.
+
+A caveat on how to *use* it, learned the hard way: `rw` with it will fail on a
+goal carrying `show`-ascription residue, which Lean reports as the goal being
+"not type-correct under the `instances` transparency level". That is a property
+of the goal, not of this lemma. Instantiate it at explicit arguments as a `have`
+and combine with `Eq.trans`. -/
 theorem restrict_smul_eq {X Y : Scheme} (f : X ⟶ Y) [IsOpenImmersion f]
     (M : Y.Modules) (U : X.Opens) (r : Γ(X, U)) (x : Γ(M.restrict f, U)) :
     (r • x : Γ(M.restrict f, U))

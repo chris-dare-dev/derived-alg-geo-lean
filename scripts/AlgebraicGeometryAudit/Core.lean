@@ -2598,9 +2598,14 @@ degree-zero away ring appear here at all.
 chartUnitToTwist_app_one is load-bearing for the same reason unitToTwist_app_one is one level
 down -- restrictUnitIso and the restriction functor are both crossed before anything is applied.
 
-One bridge is not defeq and has to be a lemma: the restricted sheaf's scalar action is the Proj one
-transported along appIso, and for an open subscheme's inclusion that transport is Iso.refl but NOT
-rfl (ι_appIso is proved by ofRestrict_appIso). See Scheme.Modules.restrict_smul_eq. -/
+One step changes shape rather than content: Scheme.Modules.restrict_smul_eq moves the equation from
+the restricted sheaf's scalar action to the Proj one, which is where step A's pointwise lemma
+lives. That lemma is rfl -- the two actions ARE definitionally equal, and it is recorded here
+because an earlier draft of this file claimed the opposite. What is true, and much narrower, is
+only that ι_appIso is proved by ofRestrict_appIso (ext1 then simp only), not by rfl; that says
+nothing about the actions being defeq. The lemma earns its place by shape alone: Mathlib's
+smul_restrictAppIso_hom_apply wraps the same fact in two restrictAppIso.hom applications, and the
+bare form is what matches a goal written the obvious way. -/
 
 #print axioms AlgebraicGeometry.Scheme.Modules.restrict_smul_eq
 #print axioms AlgebraicGeometry.Proj.fracPowSection
