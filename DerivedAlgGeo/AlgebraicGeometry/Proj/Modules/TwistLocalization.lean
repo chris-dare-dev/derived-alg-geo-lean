@@ -199,6 +199,26 @@ private def twistInverseOfMem (hfS : f ∈ S) : Localization S :=
 private def twistForwardOfMem : Localization S :=
   Localization.mk (f ^ d) 1
 
+/-- **The transition cocycle**: `(g'/g)ⁿ · (f/g')ⁿ = (f/g)ⁿ`.
+
+Composing the transition from the `g'`-chart to the `g`-chart with the scalar
+that the `g'`-chart clears gives exactly the scalar the `g`-chart clears.
+
+This is why the per-chart extensions of `#585` agree where two charts meet: over
+`D₊(g)`, `s` is cleared by `(f/g)ⁿ`, and over `D₊(g')` by `(f/g')ⁿ`; this
+identity says that carrying the second across by the transition lands on the
+first, with no correction factor.
+
+Cancellation of `g'ⁿ`, and nothing else — note `f` never has to be a unit, it
+appears only in numerators. -/
+theorem transitionScalar_mul (n : ℕ) {g g' : A} (hgS : g ∈ S) (hg'S : g' ∈ S) :
+    Localization.mk (g' ^ n) (twistPowerOfMem (f := g) n hgS) *
+        Localization.mk (f ^ n) (twistPowerOfMem (f := g') n hg'S) =
+      Localization.mk (f ^ n) (twistPowerOfMem (f := g) n hgS) := by
+  rw [Localization.mk_mul, Localization.mk_eq_mk_iff, Localization.r_iff_exists]
+  exact ⟨1, by simp [twistPowerOfMem]; ring⟩
+
+
 /-- Divide an `A(d)` fraction by `f ^ d`, given that `f` itself lies in `S`.
 
 Membership is genuinely the hypothesis consumed, not merely invertibility of `f` in

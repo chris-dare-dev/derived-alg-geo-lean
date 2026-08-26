@@ -44,6 +44,14 @@ transport is the same both times, so it is done **once**, as a linear equivalenc
 That is not a stylistic preference; the by-hand version does not scale, and the second attempt at
 it did not go through at all. Two hazards, both worth knowing before writing in this file:
 
+* **`rw` does not find `map_sub` through `ConcreteCategory.hom`.**
+  `rw [LinearMap.map_sub]` on a goal of the form
+  `(ConcreteCategory.hom (P.map i)) (t - t') = 0` fails with "did not find an occurrence of the
+  pattern `?f (?x - ?y)`", and so does `simp only [map_sub]`. Spelling the additivity out as a
+  `have` with both sides written and closing it by `exact LinearMap.map_sub _ _ _` works, because
+  the explicit statement guides elaboration through the coercion. Same shape as the hazard below:
+  the term is right, the matcher cannot see it.
+
 * **`rw` does not see proof irrelevance.** Transporting the injectivity statement by rewriting
   fails on patterns that print *character-identical* to the goal: the difference is inside the
   elided `⋯`, where two elaborations of `le_top` give different proof terms. `simp only` does not
@@ -203,5 +211,35 @@ theorem exists_pow_smul_res_eq_zero_of_isQuasicoherent (N : (Spec R).Modules)
   refine ⟨n, ?_⟩
   have h2 := congrArg (⇑(tildeΓSectionEquiv N ⊤)) hn
   rwa [_root_.map_smul, LinearEquiv.apply_symm_apply, _root_.map_zero] at h2
+
+/-- **Two sections agreeing on `D(r)` agree after clearing a power of `r`.**
+
+The two-section form of `exists_pow_smul_res_eq_zero_of_isQuasicoherent`, applied
+to the difference. This is the shape a gluing argument consumes: a cover's local
+pieces are first shown to agree on the smaller open where a section is given,
+and this upgrades that to agreement on the whole overlap at the cost of raising
+the exponent — a raise the uniform-exponent step then absorbs.
+
+Note the conclusion is agreement of `r ^ n • t` with `r ^ n • t'`, not of `t`
+with `t'`: nothing here says the restriction is injective, and for a sheaf with
+`r`-torsion sections it is not. -/
+theorem exists_pow_smul_eq_of_res_eq_of_isQuasicoherent (N : (Spec R).Modules)
+    [IsIso (fromTildeΓ N)] (r : R)
+    (t t' : (modulesSpecToSheaf.obj N).presheaf.obj (op ⊤))
+    (h : (modulesSpecToSheaf.obj N).presheaf.map
+        (homOfLE (le_top (a := PrimeSpectrum.basicOpen r))).op t =
+      (modulesSpecToSheaf.obj N).presheaf.map
+        (homOfLE (le_top (a := PrimeSpectrum.basicOpen r))).op t') :
+    ∃ n : ℕ, r ^ n • t = r ^ n • t' := by
+  obtain ⟨n, hn⟩ := exists_pow_smul_res_eq_zero_of_isQuasicoherent N r (t - t') (by
+    have e : (modulesSpecToSheaf.obj N).presheaf.map
+          (homOfLE (le_top (a := PrimeSpectrum.basicOpen r))).op (t - t') =
+        (modulesSpecToSheaf.obj N).presheaf.map
+          (homOfLE (le_top (a := PrimeSpectrum.basicOpen r))).op t -
+        (modulesSpecToSheaf.obj N).presheaf.map
+          (homOfLE (le_top (a := PrimeSpectrum.basicOpen r))).op t' := by
+      exact LinearMap.map_sub _ _ _
+    rw [e, h, sub_self])
+  exact ⟨n, by rwa [smul_sub, sub_eq_zero] at hn⟩
 
 end AlgebraicGeometry.Scheme.Modules

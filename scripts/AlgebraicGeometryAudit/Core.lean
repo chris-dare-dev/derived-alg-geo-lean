@@ -339,6 +339,7 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- cannot be pointed at A(0) without a transport; the hypothesis-carrying form takes the target
 -- as a parameter instead. intShiftZeroLinearEquiv decides the sign of d once, and nothing
 -- downstream sees the case split.
+#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.transitionScalar_mul
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftShiftLinearEquiv
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_toNat_mem_intShift_zero
 #print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv
@@ -2618,6 +2619,7 @@ F(n) are NOT here, so #585 is not closed. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.tildeΓSectionEquiv_res
 #print axioms AlgebraicGeometry.Scheme.Modules.tildeΓSectionEquiv_symm_res
 #print axioms AlgebraicGeometry.Scheme.Modules.exists_pow_smul_res_eq_zero_of_isQuasicoherent
+#print axioms AlgebraicGeometry.Scheme.Modules.exists_pow_smul_eq_of_res_eq_of_isQuasicoherent
 
 /-! ## The degree-one chart, as seen by the affine extension lemma (#585 chart step)
 
