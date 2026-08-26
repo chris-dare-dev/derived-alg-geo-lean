@@ -47,9 +47,23 @@ function down from `⊤`. Restricting downward puts its values at points of the 
 then do not compare with `fracPow` at points of `Proj`; built openwise the compatibility is `rfl`
 and the comparison is `fracPow_smul_sectionOfMem` unchanged.
 
+## Carrying it up to `F`
+
+`chartTwistBy` is `twistBy` for a module sheaf on `D₊(g)`, and `chartTwistBy_eq` is the same
+factorisation there, with the correction now an endomorphism of `F` itself (`chartFracPowOn`).
+
+The correction has to be conjugated by the right unitor rather than left in front. `tensorHom`
+lands in `F ⊗ 𝟙`, so `ρ.inv ≫ tensorHom (𝟙 F) −` cannot simply be pulled out of a composite;
+`chartFracPowOn` is `ρ.inv ≫ tensorHom (𝟙 F) − ≫ ρ.hom`, and the two unitors cancel against each
+other in the middle of the proof. Nothing else is needed beyond `tensorHom_id_comp`.
+
 ## Scope
 
-The factorisation on the unit. Tensoring it up to `F` and gluing the charts are not here.
+The factorisation, on the unit and on an arbitrary `F` over the chart. Two things are **not** here:
+identifying `chartFracPowOn` with multiplication by the section `fⁿ/gⁿ` on `F` (which needs the
+right unitor's action on sections), and comparing `chartTwistBy (F.restrict ι)` with the
+restriction of `twistBy F` (which needs restriction to commute with the tensor product). Gluing
+the charts is not here either.
 -/
 
 noncomputable section
@@ -198,6 +212,48 @@ theorem chartUnitToTwist_eq :
   apply section_ext
   funext x
   exact fracPow_smul_sectionOfMem 𝒜 hf hg n (chartOpen_image_le 𝒜 (g := g) U.unop) x
+
+/-- **`twistBy`, for a module sheaf on the open subscheme `D₊(g)`.**
+
+The same shape as `twistBy`: tensor the map out of the unit with `F` and read it through the right
+unitor. `F` is arbitrary — nothing here asks it to come from `Proj 𝒜`. -/
+def chartTwistBy (F : (↑(chartOpen 𝒜 (g := g)) : Scheme).Modules) (m : ℕ) {a : A}
+    (ha : a ∈ 𝒜 m) :
+    F ⟶ Scheme.Modules.tensorObj F
+      ((chartRestrictFunctor 𝒜 (g := g)).obj
+        (show (Proj 𝒜).Modules from sheafTwist 𝒜 𝒜 (m : ℤ))) :=
+  (Scheme.Modules.tensorUnitRightIso F).inv ≫
+    Scheme.Modules.tensorHom (𝟙 F) (chartUnitToTwist 𝒜 (g := g) m ha)
+
+/-- **Multiplication by `fⁿ/gⁿ`, carried from the unit onto `F` itself.**
+
+Conjugated by the right unitor rather than left in front of the tensor. `tensorHom (𝟙 F) −` lands
+in `F ⊗ 𝟙`, so it cannot be pulled out of `chartTwistBy`'s composite as it stands; conjugating puts
+it back on `F`, and the two unitors then cancel against `chartTwistBy`'s own in
+`chartTwistBy_eq`. -/
+def chartFracPowOn (F : (↑(chartOpen 𝒜 (g := g)) : Scheme).Modules) : F ⟶ F :=
+  (Scheme.Modules.tensorUnitRightIso F).inv ≫
+    Scheme.Modules.tensorHom (𝟙 F) (chartFracPowMul 𝒜 hf hg n) ≫
+    (Scheme.Modules.tensorUnitRightIso F).hom
+
+/-- **The same factorisation, on an arbitrary `F` over the chart: `·fⁿ = ·(fⁿ/gⁿ)` then `·gⁿ`.**
+
+`chartUnitToTwist_eq` tensored with `F`. The only input beyond it is that `tensorHom (𝟙 F) −`
+preserves composition (`Scheme.Modules.tensorHom_id_comp`) — never that it is linear, which it is
+not. This is the whole payoff of carrying the correction as a morphism.
+
+The last step is `congrArg` rather than `rw`. The pattern is syntactically present in the goal, but
+the goal mentions `(↑(chartOpen 𝒜)).ringCatSheaf` and so is not type-correct under the `instances`
+transparency level, which is enough to stop `rw` and `simp only` matching inside it. `congrArg`
+works by defeq and is unaffected. -/
+theorem chartTwistBy_eq (F : (↑(chartOpen 𝒜 (g := g)) : Scheme).Modules) :
+    chartTwistBy 𝒜 (g := g) F n (pow_mem_deg 𝒜 hf n)
+      = chartFracPowOn 𝒜 hf hg n F ≫ chartTwistBy 𝒜 (g := g) F n (pow_mem_deg 𝒜 hg n) := by
+  simp only [chartTwistBy, chartFracPowOn, chartUnitToTwist_eq 𝒜 hf hg n,
+    Category.assoc, Iso.hom_inv_id_assoc]
+  exact congrArg (fun φ => (Scheme.Modules.tensorUnitRightIso F).inv ≫ φ)
+    (Scheme.Modules.tensorHom_id_comp F (chartFracPowMul 𝒜 hf hg n)
+      (chartUnitToTwist 𝒜 (g := g) n (pow_mem_deg 𝒜 hg n)))
 
 end Chart
 
