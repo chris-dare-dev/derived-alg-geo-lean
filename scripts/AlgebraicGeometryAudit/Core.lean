@@ -2649,6 +2649,8 @@ so #585 is not closed. -/
 #print axioms AlgebraicGeometry.Proj.chartRestrict_isQuasicoherent
 #print axioms AlgebraicGeometry.Proj.isIso_fromTildeΓ_chartRestrict
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_of_le
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_uniform
 
 /-! ## f^n on a degree-one chart is (f/g)^n (#585 bridge)
 
