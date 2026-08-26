@@ -23,11 +23,21 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Fourfold
 
 open Lean
 
-/-- Suffixes Lean generates on the author's behalf. -/
+/-- Suffixes Lean generates on the author's behalf.
+
+`.congr_simp` joined this list on 2026-08-26. Lean generates a structure's
+congruence lemma on first use and attributes it to the module that triggered it,
+which is whichever module in the build happens to mention the structure first --
+not the module that declared it, and never a module the author wrote it in. Two
+such lemmas for Mathlib's `ShortComplex` landed in
+`CategoryTheory/WeakSerreExact.lean` (#721) purely because it is the first module
+to `rw` with one, and the ratchet counted them as that file's unaudited public
+declarations. They are the same class of artifact as `.injEq` and
+`.noConfusion`, which have always been filtered here. -/
 private def autoSuffixes : List String :=
   [".casesOn", ".recOn", ".rec", ".brecOn", ".below", ".ibelow", ".binductionOn",
    ".noConfusion", ".noConfusionType", ".ctorIdx", ".toCtorIdx", ".sizeOf",
-   ".injEq", ".mk", ".ofNat", ".eq_def", ".induct"]
+   ".injEq", ".mk", ".ofNat", ".eq_def", ".induct", ".congr_simp"]
 
 /-- Is this a name a human wrote, rather than one elaboration produced? -/
 private def isAuthored (n : Name) : Bool := Id.run do
