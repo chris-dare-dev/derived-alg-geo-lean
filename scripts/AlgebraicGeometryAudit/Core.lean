@@ -1686,6 +1686,8 @@ is not closed. -/
 #print axioms SheafOfModules.IsInvertible.ofIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitLeftIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_id_comp
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_id_comp_assoc
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorCommIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorTripleAssocIso
 #print axioms AlgebraicGeometry.Scheme.Modules.PicardClass.mk_eq_mk_iff
