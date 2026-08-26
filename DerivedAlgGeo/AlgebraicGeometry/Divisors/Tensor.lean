@@ -607,6 +607,39 @@ noncomputable def tensorOverIsoOfTrivializations
         (SheafOfModules.unit (X.ringCatSheaf.over U))
 
 set_option maxHeartbeats 1600000 in
+/-- **Tensoring with a sheaf that is trivial on `U` does nothing to the restriction to `U`.**
+
+The one-sided companion of `tensorOverIsoOfTrivializations`, which needs *both*
+factors trivial and lands on the unit. Here only the right factor is trivialized
+and the left one is arbitrary, so the right unitor replaces the left one and the
+result is `L.over U` rather than the unit.
+
+This is the shape a twist consumes: `F(n) = F ⊗ O(n)` restricted to a chart where
+`O(n)` is trivial is just `F` restricted to that chart, with `F` arbitrary. -/
+noncomputable def tensorOverIsoOfTrivializationRight
+    (L M : X.Modules) (U : X.Opens)
+    (eM : SheafOfModules.unit (X.ringCatSheaf.over U) ≅ M.over U) :
+    (tensorObj L M).over U ≅ L.over U := by
+  letI : MonoidalCategory
+      (_root_.PresheafOfModules.{u} (X.ringCatSheaf.over U).obj) :=
+    PresheafOfModules.monoidalCategory (R := (X.sheaf.over U).obj)
+  let eMP := (SheafOfModules.forget (X.ringCatSheaf.over U)).mapIso eM
+  let aU := PresheafOfModules.sheafification
+    (𝟙 (X.ringCatSheaf.over U).obj)
+  let c := overSheafificationComparison
+    ((toPresheafOfModules X).obj L ⊗ (toPresheafOfModules X).obj M) U
+  let cL := overSheafificationComparison ((toPresheafOfModules X).obj L) U
+  exact (@asIso _ _ _ _ c (isIso_overSheafificationComparison _ _)).symm ≪≫
+    aU.mapIso (overTensorPresheafIso
+      ((toPresheafOfModules X).obj L) ((toPresheafOfModules X).obj M) U) ≪≫
+    aU.mapIso (MonoidalCategory.tensorIso (Iso.refl _) eMP.symm) ≪≫
+    aU.mapIso (ρ_ _) ≪≫
+    (@asIso _ _ _ _ cL (isIso_overSheafificationComparison _ _)) ≪≫
+    (SheafOfModules.overFunctor _ _).mapIso
+      ((asIso (PresheafOfModules.sheafificationAdjunction
+        (𝟙 X.ringCatSheaf.obj)).counit).app L)
+
+set_option maxHeartbeats 1600000 in
 /-- The sheafified tensor product of invertible sheaves is invertible. -/
 lemma isInvertible_tensorObj (L M : X.Modules)
     [SheafOfModules.IsInvertible.{u, u, u}
