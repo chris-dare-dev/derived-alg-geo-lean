@@ -107,22 +107,26 @@ theorem charge_mem_semiClosedUpperHalfPlane {E : A} (hE : ¬IsZero E) :
     have : (0 : ℝ) < (D.degree E : ℝ) := by exact_mod_cast hdeg
     simpa using this
 
-/-- **Slope stability is a stability function.** -/
-def toStabilityFunction : StabilityFunction A where
-  charge := D.charge
-  map_zero E hE := by
-    apply Complex.ext <;> simp [D.rank_zero E hE, D.degree_zero E hE]
-  map_iso e := by
-    apply Complex.ext <;> simp [D.rank_iso e, D.degree_iso e]
-  additive S hS := by
+/-- **Slope stability is a stability function.**
+
+`map_zero` and `map_iso` are gone: they were consequences of additivity all
+along, and `K₀Ab` proves them once.  Only the additivity of `charge` on short
+exact sequences is supplied here, and it is the same two-line computation the
+`additive` field used to carry. -/
+noncomputable def toStabilityFunction : StabilityFunction A where
+  Z := K₀Ab.liftOf D.charge (fun S hS ↦ by
     apply Complex.ext
     · simp [D.degree_additive S hS]
       ring
-    · simp [D.rank_additive S hS]
-  nonzero_mem E hE := D.charge_mem_semiClosedUpperHalfPlane hE
+    · simp [D.rank_additive S hS])
+  nonzero_mem E hE := by
+    rw [K₀Ab.liftOf_of]
+    exact D.charge_mem_semiClosedUpperHalfPlane hE
 
 @[simp]
-theorem toStabilityFunction_charge (E : A) : D.toStabilityFunction.charge E = D.charge E := rfl
+theorem toStabilityFunction_charge (E : A) :
+    D.toStabilityFunction.charge E = D.charge E := by
+  simp [toStabilityFunction]
 
 /-- The **slope** `degree / rank`. It is junk at rank zero, where the classical
 slope is `+∞`; every statement below asks for positive rank. -/
