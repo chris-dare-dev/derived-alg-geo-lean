@@ -1719,6 +1719,37 @@ present. Same failure mode recorded for restrict_smul_eq and for chartTwistBy_eq
 #print axioms AlgebraicGeometry.Scheme.Modules.unitorConjPre
 #print axioms AlgebraicGeometry.Scheme.Modules.unitorConj_eq
 #print axioms AlgebraicGeometry.Scheme.Modules.unitorConj_app
+
+/-! ## A pure tensor of SECTIONS, and what the twistBy shape does to one (#585 step D prerequisite)
+
+tmulSection is the exportable handle on the sheafified tensor at section level. tensorObj is built
+from toPresheafOfModules and the monoidal structure on X.PresheafOfModules; the first is reached
+through a private abbrev here and the second is a local instance, so a consumer OUTSIDE this file
+cannot write a pure tensor at all. Any section-level statement about the tensor has to go through a
+named constructor, and this is it.
+
+It is the image of the honest pure tensor under the sheafification adjunction's unit. Sections of a
+sheafification are not in general sums of pure tensors, so this maps INTO the sections rather than
+describing them -- which is all the twist API needs.
+
+tensorUnitRight_inv_tensorHom_app is the payoff: (rho.inv followed by tensorHom (1 F) psi) is
+exactly the shape of Proj.twistBy and Proj.chartTwistBy, and this says what it does to a section.
+With smul_tmulSection it lets #585's glue compare the two charts WITHOUT restriction commuting with
+the tensor product -- which nothing in this repository or in Mathlib provides.
+
+Proved like unitorConj_eq, and again sheafification is never computed on sections: the counit's
+inverse IS the adjunction unit (right triangle identity, assembled mono-free because Mono does not
+synthesize on a .val), and naturality of that unit carries a presheaf-level computation across
+where it is rfl.
+
+Every step is congrArg/exact -- goals mentioning associatedSheaf are not type-correct under the
+instances transparency level, so rw will not match patterns that ARE syntactically present. The
+naturality step needs DFunLike.congr_fun and not congrFun: the components are bundled LinearMaps,
+not functions. -/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.tmulSection
+#print axioms AlgebraicGeometry.Scheme.Modules.smul_tmulSection
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitRight_inv_tensorHom_app
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorCommIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorTripleAssocIso
 #print axioms AlgebraicGeometry.Scheme.Modules.PicardClass.mk_eq_mk_iff
@@ -2674,6 +2705,31 @@ twistBy F (needs restriction to commute with tensor). #585 stays open. -/
 #print axioms AlgebraicGeometry.Proj.chartTwistBy
 #print axioms AlgebraicGeometry.Proj.chartFracPowOn
 #print axioms AlgebraicGeometry.Proj.chartTwistBy_eq
+
+/-! ## The overlap comparison, on SECTIONS and on Proj itself (#585 step D core)
+
+twistBy_app is what twistBy does to a section -- the section-level counterpart of
+unitToTwist_app_one, one tensor up. Until tensorUnitRight_inv_tensorHom_app existed, nothing in the
+tree said what any part of twistBy does to a section, and twistBy was opaque at every use site.
+
+twistBy_app_eq_smul is the agreement #585's glue needs: over an open inside D+(g), twisting a
+section by f^n is twisting by g^n and scaling by f^n/g^n. It is stated on Proj DIRECTLY -- no
+restriction functor and no chart appear.
+
+That is the point of stating it here rather than deriving it from chartTwistBy_eq. The
+morphism-level route lives on the open subscheme, and turning its conclusion back into a statement
+about sections of F(n) on Proj would need restriction to commute with the sheafified tensor
+product. No such compatibility exists in this repository or in Mathlib. Carrying the comparison on
+sections from the start avoids needing it.
+
+The proof is three rewrites and no geometry: twistBy_app twice, smul_tmulSection to push the scalar
+onto the twist factor, and step A lifted to sections. The geometry was spent in #751.
+
+NOT here: the cover, the single exponent across it, and the gluing. #585 stays open. -/
+
+#print axioms AlgebraicGeometry.Proj.twistBy_app
+#print axioms AlgebraicGeometry.Proj.fracPowSection_smul_sectionOfMem
+#print axioms AlgebraicGeometry.Proj.twistBy_app_eq_smul
 
 /-! ## Clearing a denominator on an affine (#585 chart-local engine)
 
