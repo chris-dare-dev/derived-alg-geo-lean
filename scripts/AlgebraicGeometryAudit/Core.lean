@@ -1688,6 +1688,37 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_id_comp
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_id_comp_assoc
+
+/-! ## What the sheafified tensor does to a SECTION (#585 step P1)
+
+Before this the tree had no element-level rule for the sheafified tensor at all: not for tensorObj,
+not for tensorHom, not for either unitor. Every consumer used them at the morphism level only, and
+nothing anywhere said what one does to a section. That is what blocked #585's glue, which has to
+meet the chart-extension half -- and that half speaks in scalars acting on sections.
+
+unitorConj is M = M (x) 1 --(1 (x) phi)--> M (x) 1 = M, the way a map out of the structure sheaf
+acts on an arbitrary module sheaf when no linearity of the tensor is available. unitorConj_app says
+it multiplies by phi's value on 1.
+
+The route never computes sheafification on sections. unitorConjPre is the same conjugation one
+level down, on presheaves of modules, where Mathlib's Presheaf/Monoidal.lean gives the unitors and
+tensorHom openwise by rfl and the whole chain t |-> t (x) 1 |-> t (x) phi(1) |-> phi(1) . t is
+definitional. unitorConj_eq carries it across: toPresheafOfModules is fully faithful, so the
+presheaf endomorphism is the image of a unique sheaf endomorphism, and counit naturality collapses
+counit.inv followed by associatedSheaf.map followed by counit.hom onto exactly that. Given it,
+unitorConj_app is rfl.
+
+These live in Picard.lean and cannot move: associatedSheaf is a private abbrev there and the
+monoidal structure on X.PresheafOfModules is a local instance, so neither is nameable outside.
+
+Two steps use congrArg/exact rather than rw. Goals mentioning associatedSheaf are not type-correct
+under the instances transparency level, which stops rw matching patterns that ARE syntactically
+present. Same failure mode recorded for restrict_smul_eq and for chartTwistBy_eq. -/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.unitorConj
+#print axioms AlgebraicGeometry.Scheme.Modules.unitorConjPre
+#print axioms AlgebraicGeometry.Scheme.Modules.unitorConj_eq
+#print axioms AlgebraicGeometry.Scheme.Modules.unitorConj_app
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorCommIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorTripleAssocIso
 #print axioms AlgebraicGeometry.Scheme.Modules.PicardClass.mk_eq_mk_iff

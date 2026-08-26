@@ -250,6 +250,99 @@ noncomputable def tensorUnitRightIso (M : X.Modules) :
     (asIso (PresheafOfModules.sheafificationAdjunction
       (𝟙 X.ringCatSheaf.obj)).counit).app M
 
+/-- **Conjugating an endomorphism of the unit by the right unitor.**
+
+`M ≅ M ⊗ 𝟙 --(𝟙 ⊗ φ)--> M ⊗ 𝟙 ≅ M`. This is how a map out of the structure sheaf acts on an
+arbitrary module sheaf without any linearity of the tensor being available. -/
+noncomputable def unitorConj (M : X.Modules)
+    (φ : (.unit X.ringCatSheaf : X.Modules) ⟶ .unit X.ringCatSheaf) : M ⟶ M :=
+  (tensorUnitRightIso M).inv ≫ tensorHom (𝟙 M) φ ≫ (tensorUnitRightIso M).hom
+
+/-- **The same conjugation, one level down: a morphism of presheaves of modules.**
+
+This is where the computation happens. Mathlib's `PresheafOfModules/Monoidal.lean` gives the
+unitors and `⊗ₘ` openwise by `rfl`, reducing to `ModuleCat`'s own monoidal structure, so at this
+level `t ↦ t ⊗ₜ 1 ↦ t ⊗ₜ φ(1) ↦ φ(1) • t` is definitional. No such API exists a level up, on the
+sheafified tensor — `unitorConj_eq` is what carries the computation across. -/
+noncomputable def unitorConjPre (M : X.Modules)
+    (φ : (.unit X.ringCatSheaf : X.Modules) ⟶ .unit X.ringCatSheaf) :
+    (toPresheafOfModules X).obj M ⟶ (toPresheafOfModules X).obj M :=
+  (ρ_ ((toPresheafOfModules X).obj M)).inv ≫
+    ((toPresheafOfModules X).map (𝟙 M) ⊗ₘ (toPresheafOfModules X).map φ) ≫
+    (ρ_ ((toPresheafOfModules X).obj M)).hom
+
+/-- **The conjugate is the sheaf morphism whose presheaf image is `unitorConjPre`.**
+
+The point of the whole file's approach to this: sheafification is never computed on sections.
+`unitorConjPre` is a presheaf endomorphism of `M`'s underlying presheaf; `toPresheafOfModules` is
+fully faithful, so it is the image of a unique sheaf endomorphism, and naturality of the
+sheafification adjunction's counit collapses `counit.inv ≫ associatedSheaf.map _ ≫ counit.hom` to
+exactly that endomorphism.
+
+Two steps are `congrArg`/`exact` rather than `rw`: goals here mention `associatedSheaf`, and are
+not type-correct under the `instances` transparency level, which stops `rw` matching patterns that
+are syntactically present. -/
+theorem unitorConj_eq (M : X.Modules)
+    (φ : (.unit X.ringCatSheaf : X.Modules) ⟶ .unit X.ringCatSheaf) :
+    unitorConj M φ
+      = (Scheme.Modules.fullyFaithfulToPresheafOfModules (X := X)).preimage
+          (unitorConjPre M φ) := by
+  have hmap : (toPresheafOfModules X).map
+      ((Scheme.Modules.fullyFaithfulToPresheafOfModules (X := X)).preimage (unitorConjPre M φ))
+      = unitorConjPre M φ :=
+    (Scheme.Modules.fullyFaithfulToPresheafOfModules (X := X)).map_preimage _
+  have hnat := ((PresheafOfModules.sheafificationAdjunction
+      (𝟙 X.ringCatSheaf.obj)).counit).naturality
+      ((Scheme.Modules.fullyFaithfulToPresheafOfModules (X := X)).preimage (unitorConjPre M φ))
+  rw [unitorConj, Iso.inv_comp_eq]
+  have hpre : ((toPresheafOfModules X).map (𝟙 M) ⊗ₘ (toPresheafOfModules X).map φ) ≫
+        (ρ_ ((toPresheafOfModules X).obj M)).hom
+      = (ρ_ ((toPresheafOfModules X).obj M)).hom ≫ unitorConjPre M φ := by
+    rw [unitorConjPre, ← Category.assoc, Iso.hom_inv_id, Category.id_comp]
+    rfl
+  have hnat' : (associatedSheaf X).map (unitorConjPre M φ) ≫
+        ((asIso (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit).app M).hom
+      = ((asIso (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit).app M).hom ≫
+        (Scheme.Modules.fullyFaithfulToPresheafOfModules (X := X)).preimage
+          (unitorConjPre M φ) := by
+    rw [← hmap]; exact hnat
+  have hAB : (associatedSheaf X).map ((toPresheafOfModules X).map (𝟙 M) ⊗ₘ
+          (toPresheafOfModules X).map φ) ≫
+        (associatedSheaf X).map (ρ_ ((toPresheafOfModules X).obj M)).hom
+      = (associatedSheaf X).map (ρ_ ((toPresheafOfModules X).obj M)).hom ≫
+        (associatedSheaf X).map (unitorConjPre M φ) := by
+    rw [← CategoryTheory.Functor.map_comp, ← CategoryTheory.Functor.map_comp, hpre]
+    rfl
+  rw [tensorUnitRightIso, tensorHom]
+  simp only [Iso.trans_hom, Functor.mapIso_hom, Category.assoc]
+  exact ((Category.assoc _ _ _).symm.trans (congrArg (· ≫ _) hAB)).trans
+    ((Category.assoc _ _ _).trans (congrArg (_ ≫ ·) hnat'))
+
+
+/-- **What conjugation does to a section: it multiplies by `φ`'s value on `1`.**
+
+The element-level rule for the sheafified tensor that the twist API needed and did not have.
+Before this, no lemma anywhere in the tree said what any of `tensorObj`, `tensorHom` or
+`tensorUnitRightIso` does to a section — every consumer used them at the morphism level only.
+
+Given `unitorConj_eq` it is `rfl`: the sheaf morphism *is* `unitorConjPre`, and that computes
+openwise by Mathlib's presheaf-monoidal API.
+
+The scalar is ascribed at `Γ(X, U.unop)`. Written bare it elaborates at the unit sheaf's own
+section type, where the action on `Γ(M, U)` does not synthesize. -/
+theorem unitorConj_app (M : X.Modules)
+    (φ : (.unit X.ringCatSheaf : X.Modules) ⟶ .unit X.ringCatSheaf)
+    (U : X.Opensᵒᵖ) (t : Γ(M, U.unop)) :
+    ((unitorConj M φ).val.app U).hom t
+      = (show Γ(X, U.unop) from (φ.val.app U).hom (1 : Γ(X, U.unop))) • t := by
+  have hval : (unitorConj M φ).val = unitorConjPre M φ := by
+    rw [unitorConj_eq]
+    exact (Scheme.Modules.fullyFaithfulToPresheafOfModules (X := X)).map_preimage _
+  rw [hval]
+  rfl
+
 /-- The symmetry of the sheafified tensor product. -/
 noncomputable def tensorCommIso (M N : X.Modules) :
     tensorObj M N ≅ tensorObj N M :=
