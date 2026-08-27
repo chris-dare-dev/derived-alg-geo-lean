@@ -316,12 +316,26 @@ noncomputable def shiftMkCore : ShiftMkCore (H0 C) ℤ where
   zero_add_hom_app n X := shiftFunctorAddIso'_hom_app_zero_left C n (0 + n) rfl X
   add_zero_hom_app n X := shiftFunctorAddIso'_hom_app_zero_right C n (n + 0) rfl X
 
+
+
 /-- `H⁰` of a pretriangulated dg category has a shift by `ℤ`.
 
 This is the second clause of a `Pretriangulated` structure, and the one
 `dg-enhancements-e6` was sized around. -/
 noncomputable instance hasShift : HasShift (H0 C) ℤ :=
   hasShiftMk _ _ (shiftMkCore C)
+
+/-- The ambient `shiftFunctorZero` is the comparison this file built. `hasShiftMk`
+records `ShiftMkCore.zero` as the `shiftFunctorZero` of the resulting `HasShift`,
+so this is `ShiftMkCore.shiftFunctorZero_eq` read back through `shiftMkCore`. -/
+lemma shiftFunctorZero_eq :
+    CategoryTheory.shiftFunctorZero (H0 C) ℤ = shiftFunctorZeroIso C := by
+  rw [ShiftMkCore.shiftFunctorZero_eq]; rfl
+
+/-- The ambient `shiftFunctorAdd` is the comparison this file built. -/
+lemma shiftFunctorAdd_eq (a b : ℤ) :
+    CategoryTheory.shiftFunctorAdd (H0 C) a b = shiftFunctorAddIso C a b := by
+  rw [ShiftMkCore.shiftFunctorAdd_eq]; rfl
 
 
 end H0

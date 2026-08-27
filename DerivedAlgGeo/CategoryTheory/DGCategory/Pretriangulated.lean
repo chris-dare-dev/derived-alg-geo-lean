@@ -278,6 +278,8 @@ noncomputable def comp (s : IsShiftBy X n Y) (u : IsShiftBy Y m Z) :
     IsShiftBy X (n + m) Z :=
   comp' s u (n + m) rfl
 
+/-- `comp` is `comp'` at the definitional degree: the primed form carries the
+target degree as a free variable, this one fixes it at `n + m`. -/
 lemma comp_eq_comp' (s : IsShiftBy X n Y) (u : IsShiftBy Y m Z) :
     comp s u = comp' s u (n + m) rfl := rfl
 
@@ -464,6 +466,35 @@ lemma mapShift_self (X X' : C) (f : (dgHom X X').X 0) :
   rw [mapShift, self_inv]
   exact (congrArg (fun z => dgComp 0 (-0) 0 (by omega) z (dgId X')) (dgId_comp 0 f)).trans
     (dgComp_id 0 f)
+
+/-- **`mapShift` is determined by the square it makes commute.** An element `c`
+of degree zero with `s.hom ≫ c = f ≫ s'.hom` is `mapShift s s' f`.
+
+`mapShift` is built from `s.inv`, which is `Classical.choice`, so nothing about
+it can be unfolded. What can be used is that left composition with `s.hom` is
+injective -- `s.inv` is a left inverse for it by `inv_hom` -- and the defining
+square is exactly what that injectivity reads off. Every identification of
+`mapShift` with a concretely given morphism goes through here. -/
+lemma mapShift_unique (s : IsShiftBy X n Y) (s' : IsShiftBy X' n Y')
+    (f : (dgHom X X').X 0) (c : (dgHom Y Y').X 0)
+    (h : dgComp (-n) 0 (-n) (by omega) s.hom c =
+      dgComp 0 (-n) (-n) (by omega) f s'.hom) :
+    mapShift s s' f = c := by
+  have hc : dgComp n (-n) 0 (by omega) s.inv (dgComp (-n) 0 (-n) (by omega) s.hom c) = c := by
+    rw [← dgComp_assoc n (-n) 0 0 (-n) 0 (by omega) (by omega) (by omega), inv_hom, dgId_comp]
+  have hm : mapShift s s' f =
+      dgComp n (-n) 0 (by omega) s.inv (dgComp 0 (-n) (-n) (by omega) f s'.hom) :=
+    dgComp_assoc n 0 (-n) n (-n) 0 (by omega) (by omega) (by omega) s.inv f s'.hom
+  rw [hm, ← h, hc]
+
+/-- `compare` is `mapShift` at the identity, so it too is determined by its
+defining square. -/
+lemma compare_unique {Y' : C} (s : IsShiftBy X n Y) (t : IsShiftBy X n Y')
+    (c : (dgHom Y Y').X 0)
+    (h : dgComp (-n) 0 (-n) (by omega) s.hom c = t.hom) : compare s t = c := by
+  rw [compare_eq_mapShift]
+  refine mapShift_unique s t _ c ?_
+  rw [h, dgId_comp]
 
 end Map
 
