@@ -383,3 +383,25 @@ supplies it.
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricActStabOfDual
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransform_additive
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransform_isTriangulated
+
+
+/-! ## Composing two geometric transports
+
+The one statement that needs both kernel ledgers: transporting along two
+geometric Fourier--Mukai transforms is transporting along the transform of their
+CONVOLVED kernel.
+
+`KernelAutoequivalence.actStab_trans` proves this abstractly for a SUPPLIED
+`ConvolutionData`. Here the convolution data is `geometricConvolutionData`,
+whose own `conv` and `compIso` are derived rather than supplied -- so nothing in
+`KernelComposition.lean` is supplied at all, and it introduces no class and asks
+for no datum. A clean axiom list says the composition law follows from the two
+ledgers already on the table.
+
+It is the associativity clause of an action and nothing more. No identity law,
+no monoid, no group of geometric kernel autoequivalences, and no `toAutPair` for
+the composite.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricActStabTrans
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransKernelAutoequivalence
