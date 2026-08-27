@@ -2845,6 +2845,146 @@ sections over D(f/g) are a localization of the sections over the whole chart. -/
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart_of_le
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart_uniform
 
+/-! ## Fractions with an arbitrary numerator, and the twist comparison they give (#585)
+
+TwistBridge and TwistApp carry f^n/g^n for f and g of degree one. #585's glue needs the same
+statements for an arbitrary pair of homogeneous elements of the SAME degree, because the extension
+exponent n and the agreement exponent m are independent: the section that finally glues is
+twistBy (f^m * g_i^n) of the chart extension, and comparing two of those across an overlap needs
+the fraction f^m g_j^n / g_i^(n+m). No power of a single element has that shape.
+
+frac and fracSection are a/b at a point of D+(b) and as a section over any open inside D+(b);
+fracPow and fracPowSection are the special case a = f^n, b = g^n, and the bridging lemma is rfl.
+
+frac_eq is the workhorse for the bookkeeping: two fractions with the same VALUE are the same
+element whatever degrees they are written in, so (f^d)^n from a chart's distinguished element and
+f^(d*n) from a twist need no transport between them.
+
+twistBy_app_eq_smul' is twistBy_app_eq_smul for two homogeneous elements of the same degree; the
+older lemma is its a = f^n, b = g^n case. -/
+
+#print axioms AlgebraicGeometry.Proj.frac
+#print axioms AlgebraicGeometry.Proj.basicOpen_le_basicOpen_pow
+#print axioms AlgebraicGeometry.Proj.fracSection
+#print axioms AlgebraicGeometry.Proj.fracPowSection_eq_fracSection
+#print axioms AlgebraicGeometry.Proj.pow_mem_smul
+#print axioms AlgebraicGeometry.Proj.frac_eq
+#print axioms AlgebraicGeometry.Proj.fracSection_eq
+#print axioms AlgebraicGeometry.Proj.frac_pow
+#print axioms AlgebraicGeometry.Proj.fracSection_mul
+#print axioms AlgebraicGeometry.Proj.frac_smul_sectionOfMem
+#print axioms AlgebraicGeometry.Proj.fracSection_smul_sectionOfMem
+#print axioms AlgebraicGeometry.Proj.twistBy_app_eq_smul'
+
+/-! ## The chart of an element of any positive degree (#585 overlaps)
+
+ChartExtension works with degree-one charts, which is what #585's cover is made of. Its PAIRWISE
+OVERLAPS are not: D+(g_i) inf D+(g_j) = D+(g_i g_j) and g_i g_j has degree two. Forcing two chart
+extensions to agree on an overlap is an affine statement over that chart, so the same restriction
+has to exist one degree up.
+
+awayRestrict is chartRestrict for g in A_d with 0 < d, with the same instance-transparency
+discipline and for the same reason; chartRestrict is its d = 1 case by definition. The extension
+half is not repeated -- #585 extends only across degree-one charts. -/
+
+#print axioms AlgebraicGeometry.Proj.awayRestrict
+#print axioms AlgebraicGeometry.Proj.chartRestrict_eq_awayRestrict
+#print axioms AlgebraicGeometry.Proj.awayRestrict_isQuasicoherent
+#print axioms AlgebraicGeometry.Proj.isIso_fromTildeΓ_awayRestrict
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_away
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_away_of_le
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_away_uniform
+
+/-! ## The chart's scalar, read on Proj (#585 dictionary)
+
+#585's two halves speak different languages. ChartExtension produces sections of a chart and clears
+the chart ring's element isLocalizationElem; TwistApp compares twists of sections of F on Proj and
+scales by a structure-sheaf section. This is the dictionary, and it was the last genuinely open
+step of the issue.
+
+Nothing moves on the module side: restrictAppIso is Iso.refl, so the chart's sections ARE sections
+of F over the chart's image. What differs is the ring acting, and the comparison map is Mathlib's
+awayToSection.
+
+Two independent facts. awayToSection_isLocalizationElem_pow is elementary once the shapes line up:
+the base case is rfl, awayToSection is a ring hom, and the structure sheaf's ring operations are
+pointwise. GammaSpecIso_inv_appIso_inv is the one that costs something -- the scalar action reaches
+Gamma(Proj, D+(g)) through Scheme.GammaSpecIso and the open immersion's appIso, and nothing in
+Mathlib says that composite is awayToSection. It is proved by unfolding awayiota into
+basicOpenIsoSpec.inv followed by the open inclusion and quoting basicOpenToSpec_app_top, the single
+place Mathlib pins awayToSection against the scheme structure.
+
+It needs backward.isDefEq.respectTransparency false, as Mathlib's own basicOpenIsoAway does:
+without it the goal is reported as not type-correct under instances transparency after the first
+rewrite and every later rw, Category.assoc included, silently fails to match.
+
+The cover, the single exponent across it, and the gluing are NOT here, so #585 stays open. -/
+
+#print axioms AlgebraicGeometry.Proj.structureSheaf_pow_apply
+#print axioms AlgebraicGeometry.Proj.isLocalizationFrac
+#print axioms AlgebraicGeometry.Proj.awayToSection_isLocalizationElem_apply
+#print axioms AlgebraicGeometry.Proj.awayToSection_isLocalizationElem_pow
+#print axioms AlgebraicGeometry.Proj.awayι_image_top
+#print axioms AlgebraicGeometry.Proj.awayι_image_le
+#print axioms AlgebraicGeometry.Proj.awayι_image_basicOpen
+#print axioms AlgebraicGeometry.Proj.ΓSpecIso_inv_appIso_inv
+#print axioms AlgebraicGeometry.Proj.ΓSpecIso_inv_res_appIso_inv
+#print axioms AlgebraicGeometry.Proj.chart_smul_eq
+#print axioms AlgebraicGeometry.Proj.isLocalizationElem_pow_smul_eq
+
+/-! ## The chart lemmas, restated on Proj (#585)
+
+ChartExtension and AwayChart state extension and agreement in the chart's own coordinates; the glue
+consumes them on Proj -- sections of F over opens of Proj, scaled by a structure-sheaf section.
+
+The transport is a SUBSTITUTION, not a transport. restrictAppIso is Iso.refl, so the chart's
+sections already ARE sections of F over the chart's image; what is left is that the glue wants the
+opens spelled D+(g) and D+(g) inf D+(f) rather than as chart images, and those are equal only
+propositionally. Each statement here therefore takes the opens as VARIABLES with an equation
+pinning them to the chart's images; subst turns the statement into the chart's own, and the caller
+instantiates at whatever spelling it wants. Restriction maps and inequality proofs come along for
+free, because morphisms of Opens are proof-carrying data in a poset.
+
+The hypotheses are oriented "chart image = W" and not "W = chart image" because subst eliminates
+the variable, and the variable has to be the one that disappears.
+
+The cover, the twist that puts the family into one sheaf, and the gluing are NOT here. -/
+
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_image
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_image_uniform
+#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_image_uniform
+
+/-! ## #585: a section over D+(f), twisted, extends to Proj
+
+exists_globalSection_twistBy is the deliverable of #585 and the thing six earlier PRs built the
+ingredients for: for F quasi-coherent, f of degree one and a finite family of degree-one elements
+generating A over A_0, every section over D+(f) has an N with twistBy (f^N) of it the restriction
+of a GLOBAL section of F(N).
+
+The two exponents are independent and both are needed. n extends s across each chart; that is all
+the geometry there is, and it is not enough, because IsCompatible wants the extensions to agree on
+the WHOLE overlap D+(g_i) inf D+(g_j) and D+(f) is not contained in it. The second exponent closes
+that: t_i and (g_j/g_i)^n t_j DO agree on the overlap intersected with D+(f) -- the computation
+where the two charts' different denominators cancel -- so separatedness on the overlap, which is
+the chart of g_i g_j and therefore of degree two, gives m.
+
+The section that glues is twistBy (f^(2m) * g_i^n) of the chart extension, NOT twistBy (g_i^N).
+That choice keeps the whole comparison inside F(N): over an overlap the fraction
+f^(2m) g_i^n / (g_i g_j)^m g_i^n is exactly the scalar the agreement supplies, and over
+D+(g_i) inf D+(f) the fraction f^N / f^(2m) g_i^n is exactly (f/g_i)^n. Twisting by g_i^N instead
+would put the comparison in F(n) and force a passage from F(n)(2m) to F(N), which nothing in this
+repository or in Mathlib provides.
+
+The five restriction lemmas below are named because the proof composes restrictions constantly and
+rw cannot be used on goals carrying show-ascription residue. -/
+
+#print axioms AlgebraicGeometry.Proj.resSection_trans
+#print axioms AlgebraicGeometry.Proj.resSection_smul
+#print axioms AlgebraicGeometry.Proj.resΓ_fracSection
+#print axioms AlgebraicGeometry.Proj.homApp_res
+#print axioms AlgebraicGeometry.Proj.le_basicOpen_mul
+#print axioms AlgebraicGeometry.Proj.exists_globalSection_twistBy
+
 /-! ## f^n on a degree-one chart is (f/g)^n (#585 bridge)
 
 The bridge between #585's two halves. The chart step clears a power of f/g on the chart through g;

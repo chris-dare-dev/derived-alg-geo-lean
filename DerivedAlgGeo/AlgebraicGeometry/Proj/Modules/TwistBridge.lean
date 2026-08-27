@@ -39,9 +39,10 @@ identity underneath.
 
 ## Scope
 
-The scalar identity, at a localization and on sections. `#585` is not closed: the glue — one `n`
-across a finite cover of degree-one charts, and assembling the twisted local sections into a
-global section of `F(n)` — is not here.
+The scalar identity, at a localization and on sections. The glue — one `n` across a finite cover
+of degree-one charts, a second exponent for the overlaps, and the assembly of the twisted local
+sections into a global section of `F(N)` — is not here; it is
+`Proj/Modules/Glue.lean`'s `exists_globalSection_twistBy`.
 -/
 
 noncomputable section
