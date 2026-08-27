@@ -117,12 +117,20 @@ def main() -> int:
             if match is None:
                 continue
             module = match.group(1)
-            if source_owner == GENERIC_OWNER and module.startswith(
-                "Mathlib.AlgebraicGeometry"
-            ):
+            # Any subject ranked BELOW the geometry owner must stay clear of
+            # Mathlib's geometry. This used to test `source_owner ==
+            # GENERIC_OWNER`, which checked `CategoryTheory` and nothing else --
+            # so `Algebra`, `LinearAlgebra` and `Topology`, the three subjects
+            # that should be *most* restricted, were unchecked. A `Topology`
+            # module importing `Mathlib.AlgebraicGeometry.Scheme` passed this
+            # gate for as long as it existed.
+            if LAYER.get(source_owner, LAYER[GEOMETRY_OWNER]) < LAYER[
+                GEOMETRY_OWNER
+            ] and module.startswith("Mathlib.AlgebraicGeometry"):
                 failures.append(
-                    f"{path.relative_to(ROOT)}:{line_number}: generic owner "
-                    f"imports geometry module {module}"
+                    f"{path.relative_to(ROOT)}:{line_number}: {source_owner} "
+                    f"ranks below {GEOMETRY_OWNER} and imports geometry module "
+                    f"{module}"
                 )
             if not module.startswith("DerivedAlgGeo."):
                 continue

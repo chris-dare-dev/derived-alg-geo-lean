@@ -204,6 +204,7 @@ if [ "$MODE" != "fast" ]; then
   gate pin python3 scripts/check_pin.py
   gate source-independence python3 scripts/check_source_independence.py
   gate subject-layering python3 scripts/check_layering.py
+  gate umbrella-coverage python3 scripts/check_umbrella_coverage.py
   gate coherent-families python3 scripts/check_coherent_families.py
   gate coverage-map python3 scripts/check_coverage_map.py
   gate audit-complete audit_complete
