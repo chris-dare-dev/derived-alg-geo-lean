@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Affine
+import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.AffineChart
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Basic
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Descent
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Linear
