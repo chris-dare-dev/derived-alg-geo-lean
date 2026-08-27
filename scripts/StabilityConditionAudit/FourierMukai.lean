@@ -162,6 +162,10 @@ datum, not that any kernel provides it.
 equivalence is again one, with the derived-dual kernel, is classical geometry.
 What is proved from it is that both directions become kernel-computable, and
 that the two class maps are mutually inverse.
+
+Since #559 there is also an abstract constructor from adjunction data --
+see the adjoint-kernel section at the end of this file. It does not change
+the status of `DualKernel` as a supplied datum; it moves the supply point.
 -/
 
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel
@@ -361,3 +365,90 @@ claimed or used. -/
 #print axioms CategoryTheory.Triangulated.boundedLift_linear
 #print axioms CategoryTheory.Triangulated.boundedLift_essSurj
 #print axioms CategoryTheory.Triangulated.homFiniteBounded_boundedDerived
+
+
+/-! ## Kernel-presented adjoints (#559)
+
+`LeftAdjointKernelData` and `RightAdjointKernelData` are supplied, and are the
+lane's newest trust boundary: that a Fourier--Mukai transform has adjoints, let
+alone kernel-presented ones, is Grothendieck duality on smooth projective
+varieties. An abstract `Correspondence` assumes no adjunction between `pull`
+and `push`, so nothing here could produce one.
+
+A clean axiom list on these records says the interface is consistent and that
+its consequences follow from it. In particular it does NOT say that any
+transform has an adjoint. What follows from the supplied adjunction, with no
+further input, is uniqueness: `isoOfAdj` identifies any adjoint of the
+transform with the adjoint kernel's transform, and `isKernelFunctor_of_adj`
+turns that into membership of `IsKernelFunctor` for the opposite
+correspondence.
+
+No triangulated structure is used. The `transformIso` families are uniqueness
+of the adjoint *transform*, never of the adjoint *kernel* -- the converse is
+Orlov uniqueness, which this repository does not state.
+-/
+
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.adj
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.isKernelFunctor_of_adj
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.isLeftAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.isRightAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.isoOfAdj
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.mapAdjKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.mapAdjKernelIso_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.ofKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.ofKernelIso_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.toRightAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.toRightAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.transformIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.adj
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.isKernelFunctor_of_adj
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.isLeftAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.isRightAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.isoOfAdj
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.mapAdjKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.mapAdjKernelIso_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.ofKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.ofKernelIso_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.toLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.toLeftAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.transformIso
+
+/-! ## Dual kernels derived from adjunction data (#559)
+
+The consumer of the adjoint-kernel layer, and the first constructor of a
+`DualKernel` from anything other than a directly supplied `invIso`.
+`ofLeftAdjointKernel` and `ofRightAdjointKernel` build one by uniqueness of
+adjoints; `toLeftAdjointKernelData` and `toRightAdjointKernelData` go back, so
+for a kernel autoequivalence the data are interderivable and the derivation
+weakens no hypothesis. A clean axiom list here says exactly that -- the
+geometric content has moved into `LeftAdjointKernelData`, not disappeared.
+
+`UnitKernelData.toLeftAdjointKernelData` is the only production of adjoint
+kernel data in the repository, and it is the trivial one: `𝟭 C` is its own
+adjoint. `UnitKernelData.ofLeftAdjointKernel_dual` checks that running it
+through the derived constructor lands on the same kernel object as
+`toDualKernel` supplies -- on the kernel only; the two `invIso` fields are not
+claimed equal.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_toLeftAdjointKernelData_dual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_toRightAdjointKernelData_dual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toRightAdjointKernelData
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toRightAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.ofLeftAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.toLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.toLeftAdjointKernelData_adjKernel
