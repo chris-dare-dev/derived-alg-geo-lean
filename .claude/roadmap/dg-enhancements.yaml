@@ -215,7 +215,7 @@ items:
       - "Shift and cone are available at the dg level, and `IsPretriangulated` is a predicate on a dg category rather than an assumption carried in prose."
       - "`Enhancement T` is a structure bundling a dg category with an equivalence H⁰ A ≌ T, and it is inhabited by a constructed example before any theorem quantifies over it."
       - "A pretriangulated dg category transports a Pretriangulated (and, where the octahedral axiom is available, Triangulated) instance to its H⁰."
-      - "On K^dg(A) the transported structure is proved to agree with Mathlib's existing instance on HomotopyCategory A — an explicit comparison, stated as an isomorphism of triangulated structures, not left as a definitional coincidence."
+      - "On C^dg(A) the transported structure is proved to agree with Mathlib's existing instance on HomotopyCategory A — an explicit comparison, stated as an equality of the two `Set (Triangle _)` of distinguished triangles (`Cdg.seam_distinguishedTriangles_eq`, and `Cdg.distinguishedTriangles_eq` read on H⁰) with the shift compatibility carried by a `Functor.CommShift ℤ` on the seam (`Cdg.h0FunctorCommShift`), not left as a definitional coincidence. Amended in the PR closing #378: the original wording asked for 'an isomorphism of triangulated structures', a notion mathlib_rev 520045ab does not have — `Pretriangulated.distinguishedTriangles` is a field, so agreement is a set equality plus `CommShift`, and that is what was proved."
       - "Nonvacuity: K^dg(A) inhabits Enhancement (HomotopyCategory A) with the agreement theorem as its evidence."
       - "Zero sorries; all gates green; nothing anchor-free depends on the Anchor or Compatibility roots."
 
@@ -251,8 +251,8 @@ items:
     kind: epic
     parent: dg-enhancements-m2
     title: "K^dg(A) enhances the homotopy category, and the structures agree"
-    status: planned
-    summary: "The first inhabited enhancement, plus the agreement theorem against Mathlib's own triangulated instance. Without the agreement clause this epic would produce a second, incomparable triangulated structure on the same category. Mathlib already has Pretriangulated and IsTriangulated on HomotopyCategory at the pin, so the target structure is free and the cost moves to Functor.CommShift for Cdg.seam."
+    status: done
+    summary: "The first inhabited enhancement, plus the agreement theorem against Mathlib's own triangulated instance. Without the agreement clause this epic would produce a second, incomparable triangulated structure on the same category. Mathlib already has Pretriangulated and IsTriangulated on HomotopyCategory at the pin, so the target structure is free and the cost moves to Functor.CommShift for Cdg.seam. Delivered by #771, which closed #378; DGCategory/Model/Agreement.lean carries the agreement theorem in main."
     priority: must
     size: L
     tags: [lean, nonvacuity, agreement]

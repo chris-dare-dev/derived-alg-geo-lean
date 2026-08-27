@@ -59,6 +59,21 @@ lemma fst_inl_add_snd_inr :
       dgComp 0 0 0 (by omega) hc.snd hc.inr = dgId Z :=
   ((hc.bijective Z 0 1 (by omega)).surjective (dgId Z)).choose_spec
 
+/-- **The splitting of the identity is unique.** `fst` and `snd` are
+`Classical.choice` on a surjectivity, so the only handle on them is the equation
+they satisfy; the cone's injectivity clause turns that equation into a
+characterisation. Every identification of `fst` or `snd` with a concretely given
+element goes through here. -/
+lemma splitId_unique {a : (dgHom Z X).X 1} {b : (dgHom Z Y).X 0}
+    (h : dgComp 1 (-1) 0 (by omega) a hc.inl + dgComp 0 0 0 (by omega) b hc.inr = dgId Z) :
+    a = hc.fst ∧ b = hc.snd := by
+  have hpair := (hc.bijective Z 0 1 (by omega)).injective
+    (a₁ := (a, b)) (a₂ := (hc.fst, hc.snd)) ?_
+  · exact ⟨congrArg (fun ab => ab.1) hpair, congrArg (fun ab => ab.2) hpair⟩
+  · show dgComp 1 (-1) 0 (by omega) a hc.inl + dgComp 0 0 0 (by omega) b hc.inr =
+      dgComp 1 (-1) 0 (by omega) hc.fst hc.inl + dgComp 0 0 0 (by omega) hc.snd hc.inr
+    rw [h, hc.fst_inl_add_snd_inr]
+
 /-- Differentiating the splitting of the identity: the projection's differential
 composed into the cone equals the two `inr`-terms it has to cancel against.
 
@@ -200,6 +215,18 @@ lemma toShift_closed : ((dgHom Z X').d 0 1).hom (hc.toShift s) = 0 := by
 /-- So the connecting morphism is a morphism of `Z⁰`, and hence of `H⁰`. -/
 lemma toShift_mem_cocycles : hc.toShift s ∈ cocycles Z X' :=
   hc.toShift_closed s
+
+/-- **Changing the shift changes the connecting morphism by the comparison.**
+`toShift` reads its witness only through `hom`, and the comparison of two shifts
+cancels the first witness against the second. This is what lets the cone triangle
+be stated at the *chosen* shift and still be recognised in a model where a
+different shift is the natural one. -/
+lemma toShift_comp_compare {X'' : C} (t : IsShiftBy X 1 X'') :
+    dgComp 0 0 0 (by omega) (hc.toShift s) (IsShiftBy.compare s t) = hc.toShift t := by
+  rw [toShift, toShift, IsShiftBy.compare,
+    dgComp_assoc 1 (-1) 0 0 (-1) 0 (by omega) (by omega) (by omega),
+    ← dgComp_assoc (-1) 1 (-1) 0 0 (-1) (by omega) (by omega) (by omega),
+    IsShiftBy.hom_inv, dgId_comp]
 
 /-- The triangle composes to zero at the second vertex: `inr` followed by the
 connecting morphism vanishes on the nose, not merely up to homotopy. -/
