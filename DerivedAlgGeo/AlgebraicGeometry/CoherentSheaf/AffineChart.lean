@@ -47,20 +47,42 @@ only the latter is what `moduleFinite_globalSections` is stated about, and resta
 and it belongs with the `GeneratingSections` half, so this file says what it can prove directly
 and no more.
 
+## The reduction: generating sections ARE an epi from a free sheaf
+
+`GeneratingSections.ofFreeEpi` records that `SheafOfModules.GeneratingSections` carries no
+information beyond an epimorphism `free I ⟶ M`: the structure's `s` field is `freeHomEquiv p` and
+its `epi` field is the hypothesis. Mathlib has the other three directions — `ofEpi` along a map out
+of `M`, `equivOfIso`, `map` along a functor — but not this one, and without it every attempt at
+`#586` step 2 has to open the structure by hand.
+
+It is stated at full site generality rather than for `X.Modules`, because nothing in it is about
+schemes.
+
+What it buys is a sharper remaining goal. Step 2 is no longer "produce generating sections",
+which invites building the structure field by field; it is exactly
+
+> an epimorphism `free I ⟶ F.over U` with `I` finite,
+
+and `ofFreeEpi` closes the gap the moment one exists.
+
 ## What this file does not do
 
-**It produces no generating sections.** `Module.Finite` gives a finite generating *set* of the
-module; `SheafOfModules.GeneratingSections` wants a family with `Epi (freeHomEquiv.symm s)` on the
-sheaf, and getting from one to the other runs through the tilde comparison and then back across
-`opensRangeModulesEquivalence` to `F.over U`. That is the remaining half of `#586` step 2, it is
-where `Coh.affineEquivalence` and hence Noetherianity enter, and none of it is claimed here.
+**It produces no such epimorphism.** `Module.Finite` gives a finite generating *set* of the module
+of sections, and turning a spanning set into an epi of *sheaves* is the real content: on `Spec R`
+it means checking surjectivity on each basic open, where quasi-coherence identifies the sections
+with a localization and a spanning set stays spanning. `epi_of_isLocallySurjective`
+(`Modules/Affine/Exactness.lean`) and `isLocallySurjective_of_coversTop` (`Divisors/Tensor.lean`)
+are the two ends of that chain and both are in the tree; what is missing is the middle, and
+Mathlib has no "locally surjective from surjectivity on a basis" lemma to shorten it. This is
+also where `Coh.affineEquivalence`, and hence Noetherianity, would enter.
 
 ## Main results
 
 * `moduleFinite_sections_restrict_of_isCoherent` — the finite-module statement.
+* `SheafOfModules.GeneratingSections.ofFreeEpi` — the reduction above.
 -/
 
-universe u
+universe u u₁ v₁
 
 open CategoryTheory AlgebraicGeometry.Scheme.Modules
 
@@ -86,3 +108,33 @@ theorem moduleFinite_sections_restrict_of_isCoherent
     (Scheme.Modules.IsCoherent.restrict_of_isOpenImmersion hU.fromSpec F hF)
 
 end AlgebraicGeometry
+
+namespace SheafOfModules
+
+variable {C : Type u₁} [Category.{v₁} C] {J : GrothendieckTopology C} {R : Sheaf J RingCat.{u}}
+  [HasSheafify J AddCommGrpCat.{u}] [J.WEqualsLocallyBijective AddCommGrpCat.{u}]
+
+/-- **An epimorphism from a free sheaf of modules is a family of generating sections.**
+
+The converse of `GeneratingSections.π`, and the direction Mathlib does not have. Nothing is
+proved: `s` is `freeHomEquiv p` and the `epi` field is the hypothesis, transported across the
+equivalence. Its value is that it lets a caller work with a map rather than with the structure. -/
+noncomputable def GeneratingSections.ofFreeEpi (M : SheafOfModules.{u} R) {I : Type u}
+    (p : free I ⟶ M) [Epi p] : M.GeneratingSections where
+  I := I
+  s := M.freeHomEquiv p
+  epi := by simpa using (inferInstance : Epi p)
+
+/-- Finiteness of the index type is finiteness of the generating family. -/
+instance GeneratingSections.isFiniteType_ofFreeEpi (M : SheafOfModules.{u} R) {I : Type u}
+    [Finite I] (p : free I ⟶ M) [Epi p] :
+    (GeneratingSections.ofFreeEpi M p).IsFiniteType where
+  finite := inferInstanceAs (Finite I)
+
+/-- `ofFreeEpi` is a section of `π`: the epimorphism is recovered unchanged. -/
+@[simp]
+lemma GeneratingSections.ofFreeEpi_π (M : SheafOfModules.{u} R) {I : Type u}
+    (p : free I ⟶ M) [Epi p] : (GeneratingSections.ofFreeEpi M p).π = p :=
+  M.freeHomEquiv.symm_apply_apply p
+
+end SheafOfModules
