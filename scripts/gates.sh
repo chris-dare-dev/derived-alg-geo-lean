@@ -13,6 +13,21 @@
 #   scripts/gates.sh fast   build + style + axiom audits          (~minutes)
 #   scripts/gates.sh        everything CI runs, in CI's order
 #
+# The containment runs ONE WAY ONLY, and saying so is the point of this
+# paragraph. Every gate here runs in CI; CI is NOT every gate here. CI's
+# `Contract gates` step additionally runs the `mfc` contract tooling --
+# validate / env / bundle / lint / check-ilean-coverage against the pinned
+# registry -- from a venv it builds per run, and none of that is reproduced
+# below. A green `scripts/gates.sh` therefore does not imply a green CI.
+#
+# `roadmap` is the one piece of that step cheap enough to run here, and it was
+# added on 2026-08-27 after the gap bit: RM-07 went red on main and on every
+# open pull request for half an hour -- a roadmap entry left at `planned` after
+# its issue closed -- while `scripts/gates.sh` stayed green on all of them,
+# because it never looked. It is deliberately invoked WITHOUT `--require-api`:
+# the script's own contract is that a contributor with no `gh` gets a NOT_RUN
+# report rather than a blocked push, and CI passes the flag instead.
+#
 # Each gate prints `GATE <name>: pass|FAIL`. The script does not stop at the
 # first failure -- an unattended run wants the whole picture in one pass -- and
 # exits 1 if any gate failed.
@@ -192,6 +207,10 @@ if [ "$MODE" != "fast" ]; then
   gate coherent-families python3 scripts/check_coherent_families.py
   gate coverage-map python3 scripts/check_coverage_map.py
   gate audit-complete audit_complete
+  # No `--require-api`: see the header. Offline this reports NOT_RUN and passes,
+  # which is the script's documented local contract; CI runs it with the flag so
+  # the one environment guaranteed to have the API cannot silently skip.
+  gate roadmap python3 scripts/check_roadmap.py
   # emit-build keeps proving the executable still LINKS -- linking is the only
   # thing that exercises the native-object path at all, and exe/Emit.lean notes
   # it cannot be linked on Windows. It is the expensive gate on a cold tree
