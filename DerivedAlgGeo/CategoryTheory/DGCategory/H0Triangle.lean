@@ -77,11 +77,23 @@ instance shiftFunctor_additive' (n : ℤ) [IsPretriangulated C] :
 variable [IsPretriangulated C]
 
 /-- The triangle a cone determines: the morphism, the cone's inclusion of the
-target, and the connecting morphism into the chosen shift. -/
+target, and *minus* the connecting morphism into the chosen shift.
+
+## The sign is not decoration
+
+`IsConeOf.toShift` is `fst` followed by the shift, with no sign; the triangle's
+third map is its negative. That is the convention Mathlib fixes for the model:
+`CochainComplex.mappingCone.triangle` is built from `-mappingCone.fst`, and
+`Cdg.triangle_mor₃_eq` records that this repository's `toShift` is `+fst`
+followed by the shift on the nose. Without the sign here the two structures
+would differ in the third map, and `dg-enhancements-e7`'s agreement theorem
+would be false rather than hard: the sign patterns an isomorphism of triangles
+can produce are exactly those whose product over the three vertices is `+1`, and
+negating the third map alone is not one of them. -/
 noncomputable def coneTriangle {X Y : C} (f : cocycles X Y) {Z : C}
     (hc : IsConeOf f.1 Z) : Triangle (H0 C) :=
   Triangle.mk (homMk f) (homMk ⟨hc.inr, hc.inr_mem_cocycles⟩)
-    (homMk ⟨hc.toShift (IsPretriangulated.shiftWitness C X 1),
+    (-homMk ⟨hc.toShift (IsPretriangulated.shiftWitness C X 1),
       hc.toShift_mem_cocycles _⟩)
 
 /-- The cone triangle's first map. Stated so that the rotation proofs can rewrite
@@ -98,7 +110,7 @@ type-correctness at `instances` transparency: `H0 C` reduces to `C`, and the
 @[simp] lemma coneTriangle_mor₃ {X Y : C} (f : cocycles X Y) {Z : C}
     (hc : IsConeOf (f : (dgHom X Y).X 0) Z) :
     (coneTriangle f hc).mor₃ =
-      homMk ⟨hc.toShift (IsPretriangulated.shiftWitness C X 1),
+      -homMk ⟨hc.toShift (IsPretriangulated.shiftWitness C X 1),
         hc.toShift_mem_cocycles _⟩ := rfl
 
 variable (C) in
@@ -130,7 +142,7 @@ lemma distinguished_cocone_triangle {X Y : H0 C} (f : X ⟶ Y) :
   | _ f =>
     obtain ⟨Z, ⟨hc⟩⟩ := IsPretriangulated.exists_cone (C := C) (X := of C X) (Y := of C Y) f.1 f.2
     exact ⟨Z, @homMk C _ (of C Y) Z ⟨hc.inr, hc.inr_mem_cocycles⟩,
-      @homMk C _ Z (IsPretriangulated.shiftObj C (of C X) 1)
+      -@homMk C _ Z (IsPretriangulated.shiftObj C (of C X) 1)
         ⟨hc.toShift (IsPretriangulated.shiftWitness C (of C X) 1),
           hc.toShift_mem_cocycles _⟩,
       coneTriangle_mem (C := C) f hc⟩
@@ -224,21 +236,40 @@ noncomputable def rotateIso :
     (rotateIso hc hd).inv = homMk ⟨hc.rotateFwd hd (IsPretriangulated.shiftWitness C X 1),
       hc.rotateFwd_closed hd _⟩ := rfl
 
+/-- `rotateIso`, negated.
+
+The cone triangle's third map carries a sign (`coneTriangle`), so the rotation
+comparison has to carry one too: the second and third squares of
+`rotateConeTriangleIso` each acquire the sign twice, once from the source
+triangle and once from the target, and only the negated isomorphism cancels
+both. -/
+noncomputable def rotateIsoNeg :
+    (show H0 C from IsPretriangulated.shiftObj C X 1) ≅ (show H0 C from W) where
+  hom := -(rotateIso hc hd).hom
+  inv := -(rotateIso hc hd).inv
+  hom_inv_id := by
+    rw [Preadditive.neg_comp, Preadditive.comp_neg, neg_neg, Iso.hom_inv_id]
+  inv_hom_id := by
+    rw [Preadditive.neg_comp, Preadditive.comp_neg, neg_neg, Iso.inv_hom_id]
+
 /-- The rotation of a cone triangle is the cone triangle on its second map. -/
 noncomputable def rotateConeTriangleIso :
     (coneTriangle f hc).rotate ≅ coneTriangle ⟨hc.inr, hc.inr_mem_cocycles⟩ hd :=
-  Triangle.isoMk _ _ (Iso.refl _) (Iso.refl _) (rotateIso hc hd)
+  Triangle.isoMk _ _ (Iso.refl _) (Iso.refl _) (rotateIsoNeg hc hd)
     -- Term mode throughout: `rw` on these goals unfolds `H0 C` to `C`, and the
     -- categorical rewrites then fail as not type-correct at `instances`
     -- transparency. `exact` elaborates against the stated goal and never does.
     (by exact (Category.comp_id _).trans (Category.id_comp _).symm)
     (by
+      show (-homMk _) ≫ (-(rotateIso hc hd).hom) = 𝟙 _ ≫ homMk _
+      rw [Preadditive.neg_comp, Preadditive.comp_neg, neg_neg]
       exact ((homMk_comp _ _).trans
         (homMk_eq_homMk (hc.toShift_comp_rotateBwd_sub_inr hd _))).trans
         (Category.id_comp _).symm)
     (by
       have key : (rotateIso hc hd).hom ≫
-            (coneTriangle ⟨hc.inr, hc.inr_mem_cocycles⟩ hd).mor₃ =
+            homMk ⟨hd.toShift (IsPretriangulated.shiftWitness C Y 1),
+              hd.toShift_mem_cocycles _⟩ =
           -(CategoryTheory.shiftFunctor (H0 C) (1 : ℤ)).map (homMk f) :=
         (homMk_comp _ _).trans
           ((congrArg (@homMk C _ _ _) (Subtype.ext
@@ -246,7 +277,12 @@ noncomputable def rotateConeTriangleIso :
               (IsPretriangulated.shiftWitness C Y 1)))).trans
             ((homMk_neg (C := C) _).trans
               (congrArg Neg.neg (H0.shiftFunctor_map_mk (C := C) 1 f).symm)))
-      exact ((congrArg _ (Functor.map_id _ _)).trans (Category.comp_id _)).trans key.symm)
+      have h2 : (-(rotateIso hc hd).hom) ≫
+            (-homMk ⟨hd.toShift (IsPretriangulated.shiftWitness C Y 1),
+              hd.toShift_mem_cocycles _⟩) =
+          -(CategoryTheory.shiftFunctor (H0 C) (1 : ℤ)).map (homMk f) := by
+        rw [Preadditive.neg_comp, Preadditive.comp_neg, neg_neg, key]
+      exact ((congrArg _ (Functor.map_id _ _)).trans (Category.comp_id _)).trans h2.symm)
 
 /-- **`rotate_distinguished_triangle`, forward direction.** The rotation of a
 distinguished triangle is distinguished. -/
@@ -342,7 +378,11 @@ lemma complete_distinguished_triangle_morphism (T₁ T₂ : Triangle (H0 C))
     | _ b' =>
       intro comm'
       obtain ⟨c, h₁, h₂⟩ := exists_lift_of_comm hc₁ hc₂ a' b' comm'
-      exact ⟨@homMk C _ Z₁ Z₂ c, h₁, h₂⟩
+      refine ⟨@homMk C _ Z₁ Z₂ c, h₁, ?_⟩
+      -- Both cone triangles carry the sign, so it cancels: `exists_lift_of_comm`
+      -- is stated on `toShift` itself.
+      exact (Preadditive.neg_comp _ _).trans
+        ((congrArg Neg.neg h₂).trans (Preadditive.comp_neg _ _).symm)
 
 variable (C) in
 /-- **The five axioms `H⁰` proves.** Isomorphism-closure, the contractible
