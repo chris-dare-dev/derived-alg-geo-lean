@@ -66,8 +66,9 @@ is a transform of the **reversed** correspondence
 So `DualKernel.ofRightAdjointKernel` does not apply here, and nothing in this
 file pretends otherwise. Bridging the two needs an identification of the two
 correspondences' transforms — classically pullback along the swap
-`σ : X × X → X × X`, under which `Q` becomes `σ^* Q`. That is a further ledger,
-named in the closing section and not begun.
+`σ : X × X → X × X`. That is a further ledger, named in the closing section;
+`KernelSwap.lean` is it, and it lands `Rσ_* Q` rather than `σ^* Q` — the two
+agree for an involution isomorphism, which that file does not need to assume.
 
 ## What this file does not assert
 
@@ -236,11 +237,11 @@ Closing that needs, for an endocorrespondence `X = Y`:
    (geometricCorrespondence X X Z p q).transform (σ^* Q)`;
 * and only then, given a supplied `KernelAutoequivalence` on that
   correspondence, `DualKernel.ofRightAdjointKernel` applies and the dual kernel
-  is `σ^*(K^∨ ⊗ ω_q)` — the classical `P^∨ ⊗ p^* ω_X [dim X]`.
+  is `Rσ_*(K^∨ ⊗ ω_q)` — the classical `P^∨ ⊗ p^* ω_X [dim X]`.
 
-None of that is stated here. Note that the first two bullets are about the
-product's symmetry, not about duality: the duality half of the classical
-statement is finished once `HasDualizingTwist` is discharged.
+None of that is stated here; `KernelSwap.lean` states it. Note that all three
+bullets are about the product's symmetry, not about duality: the duality half
+of the classical statement is finished once `HasDualizingTwist` is discharged.
 -/
 
 end CategoryTheory.Triangulated.StabilityCondition.Families

@@ -290,3 +290,46 @@ product, which is not stated anywhere.
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointKernelData
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointKernelData_adjKernel
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjoint_isKernelFunctor
+
+
+/-! ## The swap, and a geometric dual kernel
+
+The previous ledger's `RightAdjointKernelData` had the REVERSED correspondence
+as its opposite; `DualKernel` needs the same one on both sides. `HasPullbackSwap`
+and `HasPushforwardSwap` close that gap. Both are SUPPLIED and uninhabited, and
+both carry their composition identity as a `comm` GUARD that the derivation does
+not consume -- the `HasPullbackRetraction` pattern.
+
+`geometricSwapIso` is the derivation, and its third input is
+`HasProjectionFormulaRight` at the swap: an EXISTING class, consumed here at a
+further site. A clean axiom list says the reversed transform is the original one
+with kernel `Rs_* Q`, and nothing more.
+
+`Rs_* Q` rather than `s^* Q` deliberately: the two agree when `s` is an
+involution isomorphism, and that hypothesis is NOT assumed anywhere -- the
+projection formula hands back the pushforward, so the pushforward is what the
+kernel is written with.
+
+`geometricDualKernel` is the end of the arc: a `DualKernel` whose dual is
+`Rs_*(K^v (x) w_q)`, the classical `P^v (x) p^* w_X [dim X]`. The EQUIVALENCE is
+still supplied -- `geometricKernelAutoequivalence` takes it and its comparison
+isomorphism as arguments, because that a geometric transform is an equivalence
+is the classical theorem the whole lane is conditional on. What is now geometric
+is the dual kernel of one, not the equivalence.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPullbackSwap
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPullbackSwap.comm
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPullbackSwap.iso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPushforwardSwap
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPushforwardSwap.comm
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPushforwardSwap.iso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualAdjointKernelData
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualKernelObj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualKernel_dual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricKernelAutoequivalence
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricSwapIso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.pullbackSwapIso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.pushforwardSwapIso
