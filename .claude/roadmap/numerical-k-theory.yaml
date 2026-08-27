@@ -52,7 +52,7 @@ goal:
       validation: "CONFIRMED by inspection: they are statements about objects, and a difference of classes can have negative rank. They are rephrased through the hom, never deleted. This is the single most likely way to get these epics wrong."
     - tier: should
       text: "The fourfold numerical formulas admit the same uniform shape as the surface and threefold ones, so one indexed type covers all three."
-      validation: "UNVALIDATED. If the fourfold case resists, NK2-e5 ships the surface/threefold unification and parks the fourfold with the obstruction written down. That is a permitted outcome, not a failure."
+      validation: "FALSIFIED 2026-08-27. The Chern-character coefficients are not uniform in dimension, and the repository already said so: `Fourfold/LinearSection.lean:54` records that the `7/12` and `-3/2` in entries 3 and 4 are 'the terms that do not follow the threefold pattern', coming from the expansion of `(1 - e^{-H})^k`. Concretely, threefold entry 3 is `E.2.1/6 - E.2.2.1 + E.2.2.2/d` and fourfold entry 3 is `E.2.1/6 - E.2.2.1 + E.2.2.2.1`: the `/d` degree normalisation sits in the top slot, so 'entry 3' denotes different things in dimension 3 and 4. A second disproof: `SurfaceNum` is shared by `ProjectivePlane.lean` and `Abelian.lean` with DIFFERENT chCoeff formulas, so these are not one-formula-per-dimension types at all -- they are coordinate types, and the formulas are per-variety data. e5 is parked; e6 carries the part that survives."
   wont:
     - "No new numerical mathematics. Every epic deletes a copy or parameterises an enumeration; none proves a new theorem about a variety."
     - "No merge of the Mukai lattice theory above the real quadratic extension. Mukai lattice structure is special to K3 and abelian surfaces and does not generalise to arbitrary dimension; only `ℝ × V × ℝ` with its pairing unifies."
@@ -75,7 +75,7 @@ items:
     gh_milestone: null
     kind: milestone
     title: "NK1 — Absorb: one Grothendieck group, and invariants as homs"
-    status: planned
+    status: done
     lane: now
     acceptance:
       - "`CoherentGrothendieckGroup`, `coherentGrothendieckRelations`, `CoherentGrothendieckRelation` and `coherentGrothendieckClass` no longer exist; every consumer names `K₀Ab (Coh X)`."
@@ -90,7 +90,7 @@ items:
     kind: epic
     parent: numerical-k-theory-m1
     title: "NumericalData's class map becomes a hom out of K₀Ab"
-    status: planned
+    status: done
     summary: "`NumericalData` (`Variety/Numerical.lean:63`) carried `classOf`, `classOf_iso`, `classOf_shortExact`. The two laws say the function factors through the Grothendieck group, so they were never data: three fields become `classOfHom : K₀Ab (Coh X) →+ N`, with `classOf` surviving as an object-level abbreviation and both laws as theorems of unchanged name and shape. This is the second of the three axiom triples #760 announced; #766 collapsed `SlopeData`. Scoped to `NumericalData` alone because it targets an abstract `N` and is therefore separable — see e2 for why `CoherentAdditiveInvariant` is not."
     priority: must
     size: M
@@ -102,7 +102,7 @@ items:
     kind: epic
     parent: numerical-k-theory-m1
     title: "Delete CoherentGrothendieckGroup, and with it CoherentAdditiveInvariant"
-    status: planned
+    status: done
     summary: "A second, complete Grothendieck group: `Additivity.lean:360-378` rebuilds the quotient, the class map and the universal property, with the property re-proved at `RiemannRoch/Grothendieck.lean` and the defining relation re-derived by hand at `Surface/Devissage.lean`. ~176 lines and 6 restated proofs. The `iso` relation generator is redundant because `K₀Ab.of_iso` is a theorem. **`CoherentAdditiveInvariant` is part of this epic, not e1.** Its only purpose is `grothendieckHom : CoherentGrothendieckGroup X →+ M`, so collapsing it onto `K₀Ab` IS deleting `CoherentGrothendieckGroup`; separating them would mean building a bridge between two Grothendieck groups in order to delete one. Discovered on contact with the code while implementing e1, and recorded here rather than left as a split that was abandoned."
     priority: must
     size: L
@@ -115,7 +115,7 @@ items:
     kind: epic
     parent: numerical-k-theory-m1
     title: "One ReconstructionSystem, obtained at n = 2 for surfaces"
-    status: planned
+    status: done
     summary: "Eleven declarations exist verbatim in `Surface/NumericalVariety.lean:102-206` and `HigherDimension/Hirzebruch.lean:124-222`; diffed with comments stripped, the only differences across ~80 code lines are line wrapping and two docstring phrasings. Both consume `CoherentGrothendieckGroup`, so the second K-group has already propagated into two copies of an API. Surface is the special case of higher-dimension. Blocked on e2 so the merge happens once, against the surviving carrier."
     priority: must
     size: M
@@ -140,7 +140,7 @@ items:
     kind: epic
     parent: numerical-k-theory-m2
     title: "One RealExtension, bundled"
-    status: planned
+    status: in_progress
     summary: "`RealMukai V := ℝ × V × ℝ` (`Walls/Spherical/Basic.lean:109`) and `RealExtension V := ℝ × V × ℝ` (`LinearAlgebra/Lattice/Mukai/RealForm.lean:79`) are the same type with the same pairing `q c c' - r·s' - r'·s`, in two different top-level subjects. One is a bare `def`, the other a bundled `BilinForm` plus `QuadraticForm`. `RealForm.lean:76` names the other in a docstring rather than importing it: the shared abstraction was seen, described in prose, and not written. Unify at the bundled form. The Mukai lattice structure above it does NOT generalise and is out of scope."
     priority: should
     size: M
@@ -152,9 +152,22 @@ items:
     kind: epic
     parent: numerical-k-theory-m2
     title: "Dimension as an index, not as tuple arity"
-    status: planned
-    summary: "`SurfaceNum : ℤ×ℤ×ℤ`, `ThreefoldNum : ℤ×ℤ×ℤ×ℤ`, `FourfoldNum : ℤ×ℤ×ℤ×ℤ×ℤ`, in three parallel directories with 1-to-1 declaration correspondence and `chi_eq` expanded six times. The parameter is `n` and the type is `Fin (n+1) → ℤ`. This is the only epic in the track that can fail on mathematics rather than plumbing; the fourfold formulas are the risk, and parking them with the obstruction recorded is a permitted outcome. Twelve hard-coded dimension names in CI move with this change."
+    status: parked
+    summary: "PARKED 2026-08-27, assumption falsified. The plan was to replace `SurfaceNum`, `ThreefoldNum` and `FourfoldNum` with `Fin (n+1) → ℤ` and share one set of Chern-character formulas. The formulas are not shareable: they differ per dimension by terms the repository itself documents as not following the pattern, and `SurfaceNum` carries different formulas for different surfaces besides. The type-level part of the idea survives and moves to e6; nothing of the formula-level part does. Parking rather than forcing it is the exit this epic was written to allow -- it was tagged `falsifiable` from the start."
     priority: should
     size: L
     tags: [lean, polymorphism, falsifiable]
     labels: [area:geometry, type:feature, type:finding]
+
+  - id: numerical-k-theory-e6
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: numerical-k-theory-m2
+    title: "Numerical coordinates as an indexed family, for the boilerplate alone"
+    status: planned
+    summary: "What survives e5's falsification, scoped on its own evidence rather than inherited from it. `Fin (n+1) → ℤ` replaces the three nested-tuple coordinate types. The claim is NOT that the Chern-character formulas unify -- they demonstrably do not -- but that the additivity proofs about them are boilerplate produced by the encoding: `threefoldChCoeff_add` is 63 lines and `fourfoldChCoeff_add` is 78, both case-splitting to show that projection from a nested tuple is additive, which `Pi.add_apply` gives for free. Rank also becomes `E 0` uniformly. Cost: every construction site across the eight Examples files, plus twelve hard-coded dimension names in CI. Worth measuring against that 141-line saving before starting."
+    priority: could
+    size: L
+    tags: [lean, polymorphism, boilerplate]
+    labels: [area:geometry, type:chore]
