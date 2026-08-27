@@ -1087,3 +1087,34 @@ shapes are unchanged so consumers are untouched.
 #print axioms CategoryTheory.Triangulated.StabilityFunction.map_zero
 #print axioms CategoryTheory.Triangulated.StabilityFunction.map_iso
 #print axioms CategoryTheory.Triangulated.StabilityFunction.additive
+
+/-! ## `SlopeData` and `MukaiChargeData`, collapsed onto `K₀Ab`
+
+`SlopeData` carried ten fields, six of them the axiom triple twice over. Rank and degree
+are now two homs and the six are theorems. `MukaiChargeData` carried four and now carries
+one.
+-/
+
+#print axioms CategoryTheory.Triangulated.SlopeData.rankHom
+#print axioms CategoryTheory.Triangulated.SlopeData.degreeHom
+#print axioms CategoryTheory.Triangulated.SlopeData.rank
+#print axioms CategoryTheory.Triangulated.SlopeData.degree
+#print axioms CategoryTheory.Triangulated.expCharge_zero
+#print axioms CategoryTheory.Triangulated.expCharge_add
+#print axioms CategoryTheory.Triangulated.MukaiChargeData
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.mk
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.mk.inj
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.mukai
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.charge
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_apply
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_zero
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_iso
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_additive
+
+/-! ## `extendMap`, bundled
+
+The Mukai-lattice leg of the charge chain was additive and unbundled like the numerical leg.
+-/
+
+#print axioms Mukai.extendMapHom
