@@ -6,9 +6,9 @@ import DerivedAlgGeo.AlgebraicGeometry.Divisors.AssociatedSheaf
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Equivalence
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Exactness
+import DerivedAlgGeo.AlgebraicGeometry.Modules.LocallySurjective
 import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion
 import Mathlib.CategoryTheory.Abelian.ShortExact
-import Mathlib.Topology.Sheaves.LocallySurjective
 
 /-!
 # Effective Cartier divisors
@@ -48,33 +48,19 @@ noncomputable def quotientMap (I : X.IdealSheafData) :
         (SheafOfModules.unit I.subscheme.ringCatSheaf)) :=
   SheafOfModules.unitToPushforwardObjUnit I.subschemeι.toRingCatSheafHom
 
-/-- The structure-sheaf quotient defining a closed subscheme is an epimorphism. -/
+/-- The structure-sheaf quotient defining a closed subscheme is an epimorphism.
+
+The affine opens are a basis, so every point of an open `U` sits in an affine `V ≤ U`, and
+`subschemeι_app_surjective` produces a preimage there. That is exactly the pointwise hypothesis
+of `Modules.epi_of_pointwise_preimages`, which runs the local-surjectivity chain. -/
 noncomputable instance quotientMap_epi (I : X.IdealSheafData) :
     Epi (C := X.Modules) I.quotientMap := by
-  let q := I.quotientMap
-  let q' := (Modules.toSheaf X).map q
-  have hloc : TopCat.Presheaf.IsLocallySurjective q'.hom :=
-    (TopCat.Presheaf.isLocallySurjective_iff q'.hom).2 (by
-      intro U t x hxU
-      obtain ⟨_, ⟨V : X.Opens, hV, rfl⟩, hxV, hVU⟩ :=
-        X.isBasis_affineOpens.exists_subset_of_mem_open hxU U.2
-      obtain ⟨s, hs⟩ := I.subschemeι_app_surjective ⟨V, hV⟩ (t |_ V)
-      refine ⟨V, hVU, ⟨s, ?_⟩, hxV⟩
-      exact hs)
-  haveI : Balanced (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) := by
-    infer_instance
-  haveI : Epi q' :=
-    (CategoryTheory.Sheaf.isLocallySurjective_iff_epi'
-      (A := AddCommGrpCat.{u}) q').mp hloc
-  letI : (Modules.toSheaf X).Faithful := by
-    constructor
-    intro A B f g h
-    apply Modules.hom_ext f g
-    intro U
-    ext x
-    exact ConcreteCategory.congr_hom
-      (congrArg (fun k ↦ k.hom.app (.op U)) h) x
-  exact (Modules.toSheaf X).epi_of_epi_map inferInstance
+  refine Modules.epi_of_pointwise_preimages _ ?_
+  intro U t x hxU
+  obtain ⟨_, ⟨V : X.Opens, hV, rfl⟩, hxV, hVU⟩ :=
+    X.isBasis_affineOpens.exists_subset_of_mem_open hxU U.2
+  obtain ⟨s, hs⟩ := I.subschemeι_app_surjective ⟨V, hV⟩ (t |_ V)
+  exact ⟨V, hVU, hxV, s, hs⟩
 
 end IdealSheafData
 
