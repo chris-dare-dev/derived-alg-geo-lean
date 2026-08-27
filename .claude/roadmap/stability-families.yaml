@@ -584,3 +584,53 @@ items:
     priority: must
     size: XL
     tags: [good-moduli, properness]
+
+  # ============ SF10 — the Fourier--Mukai adjoint substrate ============
+  #
+  # This milestone carries NO `gh_milestone`, deliberately. The lane's work is
+  # already merged and its two open issues are unparented on the tracker, so
+  # minting a GitHub milestone would create a roadmap-owned milestone whose
+  # RM-06 obligation someone then has to maintain -- for a lane whose remaining
+  # items are two issues. `numerical-k-theory.yaml` uses the same shape for the
+  # same reason. If the lane grows sub-issues, mint the milestone then.
+  #
+  # WHY THIS FILE. The lane is split across `CategoryTheory/Triangulated/
+  # FourierMukai/` and `AlgebraicGeometry/StabilityCondition/Families/`, and the
+  # second is this roadmap's own territory: the geometric ledgers below sit
+  # beside `KernelCorrespondence`, `KernelConvolution`, and `KernelUnit`, which
+  # this track already owns implicitly. The abstract half has no track and did
+  # not warrant minting one for two issues.
+  - id: stability-families-m10
+    kind: milestone
+    title: "SF10 — Fourier--Mukai adjoints, the dual kernel, and the equivalence"
+    status: in_progress
+    lane: next
+    acceptance:
+      - "Both adjoints of a kernel transform are kernel-presented, abstractly and geometrically."
+      - "A dual kernel is derived rather than supplied, from named contracts alone."
+      - "The equivalence stops being supplied data."
+      - "At least one contract in the adjoint ledger has an instance."
+
+  - id: stability-families-e16
+    gh_issue: 795
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m10
+    title: "Layer 3: derive the equivalence from the adjoint kernels, then find a criterion for it"
+    status: planned
+    summary: "Closing #559 left layer 3 undelivered: `KernelAutoequivalence` still takes its equivalence and comparison isomorphism as supplied data, and nothing proves any transform is an equivalence. The issue splits it in two, and the split is the useful part. Half one is nearly free and was verified against the pin rather than asserted -- a `RightAdjointKernelData` whose adjunction has pointwise-invertible unit and counit yields an equivalence through `Adjunction.toEquivalence` whose functor is the transform DEFINITIONALLY, so `iso` is `Iso.refl`; its consumer already exists, since `geometricKernelAutoequivalence` could then stop taking an equivalence at all. Half two is the actual theorem: nothing supplies that invertibility, and classically it is Bondal--Orlov plus Serre duality, neither of which this repository has. The ordering is load-bearing -- a class asserting invertibility filed before half one would be supplied data nothing consumes, which is the defect #559 existed to prevent."
+    priority: must
+    size: L
+    tags: [lean, fourier-mukai, adjunction, equivalence]
+
+  - id: stability-families-e17
+    gh_issue: 796
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m10
+    title: "Discharge the Fourier--Mukai adjoint ledger: ten uninhabited classes, no witness"
+    status: planned
+    summary: "The #559 arc (#768, #770, #777, #779, #780) landed `geometricDualKernel` with dual kernel `Rsigma_*(K^v (x) omega_q)` -- the classical `P^v (x) p^* omega_X [dim X]` -- assembled entirely from named contracts. Every one of those contracts is uninhabited: six new (`HasDerivedPullbackAdjunction`, `HasKernelDual`, `HasTwistedInversePullback`, `HasDualizingTwist`, `HasPullbackSwap`, `HasPushforwardSwap`) plus four pre-existing (`HasCoherentPullback`, `HasDerivedPushforward`, `HasCoherentDerivedTensor`, `HasProjectionFormulaRight`). So the result is a conditional statement with no witness, and the gain is separability rather than existence: ten distinct classical theorems, dischargeable one at a time with the consumer already waiting. The issue orders them easiest-first -- the two swap classes are pure functoriality, Grothendieck duality and the relative dualizing complex are last -- and records the two contracts easy to miss, `HasDerivedPushforward` at the PULLBACK's morphism and `HasCoherentPullback` at the PUSHFORWARD's, which together are what make the reversed correspondence expressible."
+    priority: should
+    size: XL
+    tags: [lean, geometry, fourier-mukai, ledger, inhabitance]
