@@ -353,3 +353,33 @@ satisfies it.
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualKernelOfAdjoint_dual
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricKernelAutoequivalenceOfAdjoint
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricKernelAutoequivalenceOfAdjoint_kernel
+
+
+/-! ## The geometric side reaches the stability transport
+
+`geometricCorrespondence` is now `@[reducible]`, as are the constructors above
+it, and `ofRightAdjointKernel` gives its equivalence's `functor` and `inverse`
+LITERALLY rather than through `Adjunction.toEquivalence`. Both changes exist for
+one reason: instance search does not unfold plain definitions, so the exactness
+the contracts already carry was unreachable at every use site that takes it as
+an instance argument.
+
+Hand-rolled instances were tried first and are the wrong tool here, for the
+reason `Symmetry/Autoequivalence/FourierMukai` already documents about
+`trans`: `IsTriangulated` is INDEXED BY the `CommShift` instance, so a copy
+stated against the ambient one is a different term from the one the use site
+synthesises. Reducibility reaches the originals, with the indexing intact.
+
+`geometricTransform_isTriangulated` and `geometricTransform_additive` are the
+first statements that the assembled geometric transform is exact.
+`geometricActStabOfDual` is what the lane was for: a geometric kernel
+autoequivalence transporting a Bridgeland stability condition, with the
+compatibility hypothesis stated against the CONSTRUCTED dual kernel rather than
+an opaque `K0.map`. Conditional on the whole uninhabited ledger, as ever -- a
+clean axiom list here says the transport follows from it, not that any scheme
+supplies it.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricActStabOfDual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransform_additive
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransform_isTriangulated

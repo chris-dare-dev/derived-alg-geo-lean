@@ -198,7 +198,7 @@ the ledger.
 
 It is **not** a `DualKernel`: that needs the opposite correspondence to be the
 same one, and this one is reversed. See the module docstring. -/
-noncomputable def geometricRightAdjointKernelData :
+@[reducible] noncomputable def geometricRightAdjointKernelData :
     RightAdjointKernelData (geometricCorrespondence X Y Z p q)
       (geometricCorrespondence Y X Z q p) K :=
   (geometricConstituentRightAdjoints X Y Z p q K).toRightAdjointKernelData

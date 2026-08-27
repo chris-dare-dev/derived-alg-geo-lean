@@ -153,7 +153,7 @@ opposite correspondence, that transform's kernel is a right adjoint kernel.
 field: the three adjunctions do not imply it.  Geometrically it is the
 projection formula together with the identification of `q^!` as a twisted
 pullback, which is what puts `ω[dim]` into the kernel `Q`. -/
-def toRightAdjointKernelData {C' : Correspondence 𝒴 𝒳 𝒵'} {Q : 𝒵'}
+@[reducible] def toRightAdjointKernelData {C' : Correspondence 𝒴 𝒳 𝒵'} {Q : 𝒵'}
     (e : A.rightAdjoint ≅ C'.transform Q) : RightAdjointKernelData C C' K where
   adjKernel := Q
   adj := A.adj.ofNatIsoRight e

@@ -206,7 +206,7 @@ noncomputable def geometricDualKernelObj :
 The previous ledger's datum, transported along the swap. Its opposite
 correspondence is now `geometricCorrespondence X X Z p q` itself, which is what
 `DualKernel` requires. -/
-noncomputable def geometricDualAdjointKernelData :
+@[reducible] noncomputable def geometricDualAdjointKernelData :
     RightAdjointKernelData (geometricCorrespondence X X Z p q)
       (geometricCorrespondence X X Z p q) K where
   adjKernel := geometricDualKernelObj X Z σ q K
@@ -287,7 +287,11 @@ Nothing here supplies it. -/
 Everything is now the ledger plus the invertibility of one adjunction's unit and
 counit. Compare `geometricKernelAutoequivalence`, which takes an equivalence and
 a comparison isomorphism outright. -/
-noncomputable def geometricKernelAutoequivalenceOfAdjoint
+-- `@[reducible]` so that instance search sees `ofRightAdjointKernel` and finds
+-- the six exactness instances stated against it; without this the geometric
+-- equivalence cannot reach `actStabOfDual`. Same reason `trans` and `id` are
+-- reducible in `Symmetry/Autoequivalence/FourierMukai`.
+@[reducible] noncomputable def geometricKernelAutoequivalenceOfAdjoint
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :
     Symmetry.KernelAutoequivalence
@@ -309,7 +313,7 @@ theorem geometricKernelAutoequivalenceOfAdjoint_kernel
 `invIso` is `Iso.refl` — the same datum that produced the equivalence produces
 the dual kernel, with no trip through `rightAdjointUniq`. The dual is
 `Rσ_*(K^∨ ⊗ ω_q)`, as before. -/
-noncomputable def geometricDualKernelOfAdjoint
+@[reducible] noncomputable def geometricDualKernelOfAdjoint
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :
     Symmetry.KernelAutoequivalence.DualKernel
@@ -324,6 +328,43 @@ theorem geometricDualKernelOfAdjoint_dual
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :
     (geometricDualKernelOfAdjoint X Z σ p q K).dual =
       geometricDualKernelObj X Z σ q K := rfl
+
+/-! ### The lane's payoff: a geometric transform transports a stability condition
+
+Everything above is machinery; this is what it was for. `KernelAutoequivalence`
+exists in order to act on `StabilityCondition.WithClassMap`, and until now the
+*geometric* side could not reach that action at all — not for a mathematical
+reason, but because instance search could not see through `geometricCorrespondence`
+and the constructors above it to the exactness the contracts already carry.
+
+`actStabOfDual` asks for twelve instance arguments about `A.corr` and
+`A.equiv`. They are now all reachable. -/
+
+/-- **A geometric kernel autoequivalence transports a stability condition.**
+
+`KernelAutoequivalence.actStabOfDual` at the geometric autoequivalence and its
+derived dual kernel. The compatibility hypothesis is stated against
+`transformK₀` of the *constructed* dual kernel `Rσ_*(K^∨ ⊗ ω_q)`, so it is
+checkable in kernel terms rather than against an opaque `K₀.map`.
+
+Conditional, as everything in this lane is: on the adjoint ledger, on the swap,
+and on the invertibility of the assembled adjunction's unit and counit. Nothing
+here supplies any of those. What it does show is that the geometric side reaches
+the transport once they are supplied — which, before this, it did not. -/
+noncomputable def geometricActStabOfDual
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)]
+    {Λ : Type u} [AddCommGroup Λ]
+    (v : K₀ (SchemeBoundedCoherentDerivedCategory X.left) →+ Λ)
+    (lam : Λ →+ Λ)
+    (hlam : ∀ x, v ((geometricCorrespondence X X Z p q).transformK₀
+        (geometricDualKernelObj X Z σ q K) x) = lam (v x))
+    (s : StabilityCondition.WithClassMap
+      (SchemeBoundedCoherentDerivedCategory X.left) v) :
+    StabilityCondition.WithClassMap
+      (SchemeBoundedCoherentDerivedCategory X.left) v :=
+  (geometricKernelAutoequivalenceOfAdjoint X Z σ p q K).actStabOfDual v
+    (geometricDualKernelOfAdjoint X Z σ p q K) lam hlam s
 
 end DualKernel
 
