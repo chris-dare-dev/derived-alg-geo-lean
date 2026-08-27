@@ -31,5 +31,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.AwayChart
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartScalar
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartProj
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Glue
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.GlueUniform
 
 /-! # Graded modules and their sheaves on `Proj` -/
