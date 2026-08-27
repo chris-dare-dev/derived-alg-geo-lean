@@ -37,21 +37,42 @@ change; it owns the human-facing placement and contribution rules.
 
 ## Required verification
 
-The normal build is:
+**Full verification runs on the self-hosted Windows runners, not on your machine.**
+`.github/workflows/ci.yml` routes `push` and `workflow_dispatch` to
+`["self-hosted", "owner-win"]`, and it triggers on `agent/**`. So pushing an agent
+branch already runs the whole gate there; to get a verdict without pushing, use
+
+```bash
+gh workflow run ci.yml --ref <branch>
+```
+
+Do **not** run `scripts/gates.sh` as a matter of course. Several agent lanes share
+one Mac, Lake takes one core per job by default, and four concurrent full gates
+oversubscribe a 14-core machine five times over — that is how a ten-minute gate
+becomes an hour. Run it locally only when you need a verdict that the runners
+cannot give you, and expect it to be slow when other lanes are building.
+
+Neither the local script nor the runner lane is CI-equivalent on its own, and the
+difference has bitten: every gate in `gates.sh` runs in CI, but CI also runs the
+`mfc` contract tooling, which the script does not reproduce. Say "N gates pass",
+not "CI is green". See `CONTRIBUTING.md`.
+
+The normal build, for iteration, stays local — Lean's `.olean` files are
+platform-specific, so the Windows runners can never warm this checkout:
 
 ```bash
 lake build
 ```
 
-The full local gate is:
+Cap its parallelism. `LEAN_NUM_THREADS=2` limits Lake to two concurrent `lean`
+processes; without it Lake takes one per core. On this machine it is set for every
+agent session in `~/.claude/settings.json`, so a plain `lake build` is already
+capped — set it explicitly if you are building from a shell that does not inherit
+that.
 
 ```bash
-scripts/gates.sh
+LEAN_NUM_THREADS=2 lake build
 ```
-
-It is not CI-equivalent, and the difference has bitten: every gate in it runs in
-CI, but CI also runs the `mfc` contract tooling, which the script does not
-reproduce. Treat a green run as necessary, not sufficient. See `CONTRIBUTING.md`.
 
 Useful focused commands are:
 
