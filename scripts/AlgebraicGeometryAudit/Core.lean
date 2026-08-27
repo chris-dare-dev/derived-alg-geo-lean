@@ -2627,8 +2627,9 @@ forbid the hypothesis outright, and nothing here uses the comparison.
 unitToTwist_app_one is load-bearing, not decoration: unitHomEquiv.symm is an equivalence's inverse,
 so a wrong sectionsOfMem would typecheck and go unnoticed at every use site. It pins 1 |-> m/1.
 
-The extension theorem itself is NOT here, so #585 is not closed. It needs the degree-one chart
-cover, quasi-coherence on each chart, and exists_pow_smul_mem_of_isLocalized_radical. -/
+The extension theorem itself is NOT here. It needs the degree-one chart cover and quasi-coherence
+on each chart; it is Proj/Modules/Glue.lean's exists_globalSection_twistBy, which closed #585.
+Note it does NOT need exists_pow_smul_mem_of_isLocalized_radical, which the plan expected. -/
 
 #print axioms AlgebraicGeometry.Proj.mem_intShift_zero_of_mem
 #print axioms AlgebraicGeometry.Proj.sectionOfMem
@@ -2698,7 +2699,8 @@ as the one recorded for restrict_smul_eq; it is a property of these goals, not o
 
 NOT here: identifying chartFracPowOn with multiplication by the section f^n/g^n on F (needs the
 right unitor on sections), and comparing chartTwistBy (F.restrict) with the restriction of
-twistBy F (needs restriction to commute with tensor). #585 stays open. -/
+twistBy F (needs restriction to commute with tensor). This whole route was abandoned: Glue.lean
+reaches #585 on sections instead, and these three have no consumer. -/
 
 #print axioms AlgebraicGeometry.Proj.chartTwistBy
 #print axioms AlgebraicGeometry.Proj.chartFracPowOn
@@ -2723,7 +2725,9 @@ sections from the start avoids needing it.
 The proof is three rewrites and no geometry: twistBy_app twice, smul_tmulSection to push the scalar
 onto the twist factor, and step A lifted to sections. The geometry was spent in #751.
 
-NOT here: the cover, the single exponent across it, and the gluing. #585 stays open. -/
+NOT here: the cover, the single exponent across it, and the gluing; those are Glue.lean, which
+closed #585. twistBy_app_eq_smul is superseded there by FracSection's twistBy_app_eq_smul', the
+same comparison for two homogeneous elements of the same degree. -/
 
 #print axioms AlgebraicGeometry.Proj.twistBy_app
 #print axioms AlgebraicGeometry.Proj.fracPowSection_smul_sectionOfMem
@@ -2741,9 +2745,9 @@ IsLocalizedModule.surj -- a section is m/r^n by the definition of the localizati
 theorem about it. The passage to a global section is toOpen_res, which is rfl.
 
 Recorded against the plan #585 was written to: exists_pow_smul_mem_of_isLocalized_radical, which
-was extracted into Algebra/Module/LocalizedRadical.lean for this issue, is NOT needed here. It
-stays the tool for reconciling two charts on their overlap, where radical membership is what makes
-the cover a cover.
+was extracted into Algebra/Module/LocalizedRadical.lean for this issue, is NOT needed here -- and
+in the end #585 did not use it anywhere. The plan expected it to reconcile two charts on their
+overlap; separatedness on the degree-two chart of g_i g_j did that instead.
 
 The isQuasicoherent form drops the tilde hypothesis by transporting across fromTildeGamma, which
 quasi-coherence makes an isomorphism. Four of its six lines are spelling: modulesSpecToSheaf lands
@@ -2752,7 +2756,7 @@ matches syntactically; and map_smul inside the Scheme.Modules namespace resolves
 lemma, needing _root_.map_smul.
 
 The Proj chart application, one n across a finite cover, and the passage to multiplication into
-F(n) are NOT here, so #585 is not closed. -/
+F(n) are NOT here; they are ChartExtension.lean and Glue.lean, where #585 is closed. -/
 
 #print axioms AlgebraicGeometry.tilde.exists_pow_smul_eq_toOpen
 #print axioms AlgebraicGeometry.tilde.exists_pow_smul_eq_res_of_top
@@ -2905,7 +2909,8 @@ It needs backward.isDefEq.respectTransparency false, as Mathlib's own basicOpenI
 without it the goal is reported as not type-correct under instances transparency after the first
 rewrite and every later rw, Category.assoc included, silently fails to match.
 
-The cover, the single exponent across it, and the gluing are NOT here, so #585 stays open. -/
+The cover, the single exponent across it, and the gluing are NOT here; they are Glue.lean, which
+closed #585. -/
 
 #print axioms AlgebraicGeometry.Proj.structureSheaf_pow_apply
 #print axioms AlgebraicGeometry.Proj.isLocalizationFrac

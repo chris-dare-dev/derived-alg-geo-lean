@@ -25,9 +25,11 @@ then `tilde.toOpen_res`, which is `rfl`.
 
 Worth recording against the plan `#585` was written to.
 `Submodule.exists_pow_smul_mem_of_isLocalized_radical` — extracted into
-`Algebra/Module/LocalizedRadical.lean` for this very issue — is **not** needed here. It stays the
-tool for reconciling two charts on their overlap, where the denominators come from a cover and
-radical membership is what makes the cover a cover. The chart-local step never reaches for it.
+`Algebra/Module/LocalizedRadical.lean` for this very issue — is **not** needed here, and in the end
+`#585` did not reach for it anywhere. The plan expected it to reconcile two charts on their overlap;
+what closed that step instead was separatedness on the overlap, which is the chart of `gᵢ gⱼ` and so
+of degree two (`Proj/Modules/AwayChart.lean`). The lemma's live consumer is the Čech
+affine-vanishing argument it was extracted from.
 
 ## Both halves, and dropping the tilde hypothesis
 
@@ -67,8 +69,9 @@ it did not go through at all. Two hazards, both worth knowing before writing in 
 ## Scope
 
 One affine, one basic open. The `Proj` chart application, the choice of one `n` across a finite
-cover, and the passage from `(f / g)ⁿ ·` to multiplication into the twist `F(n)` are not here, so
-`#585` is not closed.
+cover, and the passage from `(f / g)ⁿ ·` to multiplication into the twist `F(n)` are not here; they
+are `Proj/Modules/ChartExtension.lean` and `Proj/Modules/Glue.lean`, where `#585` is closed by
+`exists_globalSection_twistBy`.
 -/
 
 universe u
