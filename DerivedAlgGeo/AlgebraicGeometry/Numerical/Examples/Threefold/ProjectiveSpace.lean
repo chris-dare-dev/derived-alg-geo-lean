@@ -55,11 +55,11 @@ Every generator is the structure sheaf of a linear subspace, and `χ(O_{ℙᵏ})
 them, so `χ` is the plain sum of the coordinates. That this agrees with Riemann–Roch is the
 `hchi` obligation discharged in `p3NumericalVariety`. -/
 def p3Chi : ThreefoldNum →+ ℤ where
-  toFun E := E.1 + E.2.1 + E.2.2.1 + E.2.2.2
+  toFun E := E 0 + E 1 + E 2 + E 3
   map_zero' := rfl
   map_add' E F := by
-    show (E.1 + F.1) + (E.2.1 + F.2.1) + (E.2.2.1 + F.2.2.1) + (E.2.2.2 + F.2.2.2)
-      = (E.1 + E.2.1 + E.2.2.1 + E.2.2.2) + (F.1 + F.2.1 + F.2.2.1 + F.2.2.2)
+    show (E 0 + F 0) + (E 1 + F 1) + (E 2 + F 2) + (E 3 + F 3)
+      = (E 0 + E 1 + E 2 + E 3) + (F 0 + F 1 + F 2 + F 3)
     ring
 
 /-- **The model.** `ℙ³`, with `∫H³ = 1` and `td = 1 + 2H + (11/6)H² + H³`. -/
@@ -73,10 +73,10 @@ theorem p3NumericalVariety_satisfiesHRR : p3NumericalVariety.SatisfiesHRR :=
   rankOneNumericalVariety_satisfiesHRR 3 1 threefoldRank p3Chi (threefoldChCoeff 1) p3Todd
     (threefoldChCoeff_zero 1) (threefoldChCoeff_add 1) rfl (fun E => by
     rw [threefoldChi_sum]
-    show ((E.1 + E.2.1 + E.2.2.1 + E.2.2.2 : ℤ) : ℚ)
-      = 1 * ((E.1 : ℚ) * 1 + (E.2.1 : ℚ) * (11 / 6)
-        + (-(E.2.1 : ℚ) / 2 + (E.2.2.1 : ℚ)) * 2
-        + ((E.2.1 : ℚ) / 6 - (E.2.2.1 : ℚ) + (E.2.2.2 : ℚ) / 1) * 1)
+    show ((E 0 + E 1 + E 2 + E 3 : ℤ) : ℚ)
+      = 1 * ((E 0 : ℚ) * 1 + (E 1 : ℚ) * (11 / 6)
+        + (-(E 1 : ℚ) / 2 + (E 2 : ℚ)) * 2
+        + ((E 1 : ℚ) / 6 - (E 2 : ℚ) + (E 3 : ℚ) / 1) * 1)
     push_cast
     ring)
 
@@ -94,14 +94,14 @@ binomial coefficients `C(m+1,2)` and `C(m+2,3)`, so the class is integral for ev
 including negative `m`. Stated cleared of denominators to stay in `ℤ`. -/
 theorem p3Chi_lineBundle (m c e : ℤ) (hc : 2 * c = m * (m + 1))
     (he : 6 * e = m * (m + 1) * (m + 2)) :
-    6 * p3Chi (1, m, c, e) = (m + 1) * (m + 2) * (m + 3) := by
+    6 * p3Chi ![1, m, c, e] = (m + 1) * (m + 2) * (m + 3) := by
   show 6 * (1 + m + c + e) = (m + 1) * (m + 2) * (m + 3)
   linear_combination 3 * hc + he
 
 /-- The class of `p3Chi_lineBundle` really has `ch₂ = m²/2`. Without this and its
 codimension-three companion, `p3Chi_lineBundle` would only be arithmetic about a quadruple. -/
 theorem p3ChCoeff_lineBundle_two (m c e : ℤ) (hc : 2 * c = m * (m + 1)) :
-    threefoldChCoeff 1 (1, m, c, e) 2 = (m : ℚ) ^ 2 / 2 := by
+    threefoldChCoeff 1 ![1, m, c, e] 2 = (m : ℚ) ^ 2 / 2 := by
   show -(m : ℚ) / 2 + (c : ℚ) = (m : ℚ) ^ 2 / 2
   have h : (2 : ℚ) * (c : ℚ) = (m : ℚ) * ((m : ℚ) + 1) := by exact_mod_cast hc
   linarith
@@ -109,7 +109,7 @@ theorem p3ChCoeff_lineBundle_two (m c e : ℤ) (hc : 2 * c = m * (m + 1)) :
 /-- The class of `p3Chi_lineBundle` really has `ch₃ = m³/6`. -/
 theorem p3ChCoeff_lineBundle_three (m c e : ℤ) (hc : 2 * c = m * (m + 1))
     (he : 6 * e = m * (m + 1) * (m + 2)) :
-    threefoldChCoeff 1 (1, m, c, e) 3 = (m : ℚ) ^ 3 / 6 := by
+    threefoldChCoeff 1 ![1, m, c, e] 3 = (m : ℚ) ^ 3 / 6 := by
   show (m : ℚ) / 6 - (c : ℚ) + (e : ℚ) / 1 = (m : ℚ) ^ 3 / 6
   have hc' : (2 : ℚ) * (c : ℚ) = (m : ℚ) * ((m : ℚ) + 1) := by exact_mod_cast hc
   have he' : (6 : ℚ) * (e : ℚ) = (m : ℚ) * ((m : ℚ) + 1) * ((m : ℚ) + 2) := by exact_mod_cast he
