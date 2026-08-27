@@ -452,3 +452,60 @@ claimed equal.
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.ofLeftAdjointKernel_dual
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.toLeftAdjointKernelData
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.toLeftAdjointKernelData_adjKernel
+
+
+/-! ## The adjoint-kernel ledger: constituents plus a projection formula
+
+`ConstituentRightAdjoints` and `ConstituentLeftAdjoints` split the single
+opaque adjoint-kernel obligation into the three adjunctions a transform's
+constituents classically have -- pullback/pushforward, rigidity of the kernel,
+and Grothendieck duality -- and nothing constructs either structure.
+
+The composition is the FREE half: `adj` is `Adjunction.comp` applied twice, so
+a clean axiom list on it says the transform is adjoint to the composite as soon
+as its three constituents are adjoint, and says nothing else.
+
+The remaining half is an ARGUMENT, not a field. `toRightAdjointKernelData`
+takes an isomorphism `rightAdjoint = C'.transform Q` from the caller; that is
+the projection formula plus the identification of the shriek functor as a
+twisted pullback, and it is where a dualizing object would eventually appear.
+Keeping it out of the structure is deliberate -- the three adjunctions do not
+imply it, and a field would read as though they did.
+
+Direction of strength: this ledger is stronger input than the
+`LeftAdjointKernelData` / `RightAdjointKernelData` it produces, and nothing
+converts back. It does not lower the bar for an adjoint kernel; it replaces one
+compound obligation with four separately-classical ones.
+-/
+
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.adj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.isKernelFunctor_rightAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.isLeftAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.pullAdj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.pullRight
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.pushAdj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.pushRight
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.rightAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.toRightAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.toRightAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.twistAdj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.twistRight
+
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.adj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.isKernelFunctor_leftAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.isRightAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.leftAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.pullAdj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.pullLeft
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.pushAdj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.pushLeft
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.toLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.toLeftAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.twistAdj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.twistLeft
