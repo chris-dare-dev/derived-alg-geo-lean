@@ -37,9 +37,23 @@ Not `gᵢ ᴺ`. The section that glues is `twistBy (f²ᵐ gᵢⁿ)` of `tᵢ`, 
 Choosing `twistBy (gᵢ ᴺ)` instead would put the comparison in `F(n)` and force a passage from
 `F(n)(2m)` to `F(N)`; nothing provides that, and it is not needed.
 
+## The three-step shape
+
+The theorem is assembled from two lemmas that take the exponents as *data*, because a downstream
+caller needs to choose them rather than accept whatever the chart lemmas happen to produce.
+
+* `exists_overlap_exponent` takes the extension exponent `n` and the family `t` and produces the
+  overlap exponent `m`;
+* `exists_globalSection_twistBy_of_data` takes both exponents and the family and does the gluing.
+  It does **not** need quasi-coherence -- that hypothesis is spent entirely on producing `n`, `t`
+  and `m`, and nothing in the gluing itself uses it.
+
+`GlueUniform.lean` reuses the same two lemmas with `m` held fixed and `n` raised, which is how a
+single exponent is reached for a whole finite family.
+
 ## Scope
 
-The theorem and nothing else. The hypotheses are the honest ones: `F` quasi-coherent, the cover
+The theorem and its two halves. The hypotheses are the honest ones: `F` quasi-coherent, the cover
 given by finitely many degree-one elements generating `A` over `𝒜 0`, and `f` of degree one.
 -/
 
@@ -96,39 +110,215 @@ theorem le_basicOpen_mul {U : (Proj 𝒜).Opens} {a b : A}
   exact le_inf ha hb
 
 
-/-- **`#585`: a section over `D₊(f)`, twisted, is the restriction of a global section.**
+/-- **The glue, from the two exponents and the chart extensions as data.**
 
-For `F` quasi-coherent on `Proj 𝒜`, `f` of degree one, and a finite family of degree-one elements
-generating `A` over `𝒜 0`, every `s ∈ Γ(F, D₊(f))` has an `N` with `twistBy (f ᴺ) s` the
-restriction of a global section of `F(N)`.
+The mathematical content of `exists_globalSection_twistBy`, with the two exponents and the family
+of chart extensions taken as *inputs* rather than produced inside. `n`, `t` and `ht` are what
+`exists_pow_smul_eq_res_image_uniform` supplies; `m` and `hm` are what
+`exists_pow_smul_eq_of_res_eq_image_uniform` supplies once the overlap agreement is derived from
+`ht`.
 
-The two exponents are independent: `n` extends `s` across each chart, `m` forces agreement on the
-pairwise overlaps, and `N = 2m + n`. The section over `D₊(gᵢ)` that glues is `twistBy (f²ᵐ gᵢⁿ)` of
-the chart extension, not `twistBy (gᵢ ᴺ)`; that choice is what keeps the whole comparison inside
-`F(N)` and avoids a passage from `F(n)(2m)` that nothing provides. -/
-theorem exists_globalSection_twistBy (F : (Proj 𝒜).Modules)
-    [SheafOfModules.IsQuasicoherent.{u, u, u}
-      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {f : A} (hf : f ∈ 𝒜 1) {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
+Splitting it out is what makes the exponent controllable. The theorem below instantiates it at the
+exponents those two lemmas happen to produce, and `GlueUniform.lean` instantiates it at a
+*prescribed* `n`, which is how a single `N` is reached for a whole finite family of sections. -/
+theorem exists_globalSection_twistBy_of_data (F : (Proj 𝒜).Modules)
+    {f : A} (hf : f ∈ 𝒜 1) {ι : Type u} {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
     (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤)
-    (s : Γ(F, basicOpen 𝒜 f)) :
-    ∃ (N : ℕ) (σ : Γ(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ)), ⊤)),
-      (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ))).presheaf.map
+    (s : Γ(F, basicOpen 𝒜 f)) (n m : ℕ) (t : ∀ i, Γ(F, basicOpen 𝒜 (g i)))
+    (ht : ∀ i, F.presheaf.map (homOfLE (inf_le_left :
+        basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i))).op (t i)
+      = (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) from
+          isLocalizationFrac 𝒜 hf (hg i) n inf_le_left) •
+        F.presheaf.map (homOfLE (inf_le_right :
+          basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f)).op s)
+    (hm : ∀ p : ι × ι,
+      (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from
+          isLocalizationFrac 𝒜 hf (SetLike.mul_mem_graded (hg p.1) (hg p.2)) m
+            (le_of_eq (basicOpen_mul 𝒜 (g p.1) (g p.2)).symm)) •
+        F.presheaf.map (homOfLE (inf_le_left :
+          basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.1))).op (t p.1)
+      = (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from
+          isLocalizationFrac 𝒜 hf (SetLike.mul_mem_graded (hg p.1) (hg p.2)) m
+            (le_of_eq (basicOpen_mul 𝒜 (g p.1) (g p.2)).symm)) •
+        ((show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from
+            fracSection 𝒜 (pow_mem_deg 𝒜 (hg p.2) n) (pow_mem_deg 𝒜 (hg p.1) n)
+              (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) n))) •
+          F.presheaf.map (homOfLE (inf_le_right :
+            basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.2))).op (t p.2))) :
+    ∃ σ : Γ(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ)), ⊤),
+      (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ))).presheaf.map
           (homOfLE (le_top (a := basicOpen 𝒜 f))).op σ
-        = Scheme.Modules.Hom.app (twistBy 𝒜 N (pow_mem_deg 𝒜 hf N) F) (basicOpen 𝒜 f) s := by
+        = Scheme.Modules.Hom.app
+            (twistBy 𝒜 (2 * m + n) (pow_mem_deg 𝒜 hf (2 * m + n)) F) (basicOpen 𝒜 f) s := by
   classical
   have hcover : ⨆ i, basicOpen 𝒜 (g i) = ⊤ :=
     iSup_basicOpen_eq_top' 𝒜 g (fun i => ⟨1, hg i⟩) hcov
-  -- one exponent extending `s` across every degree-one chart
-  obtain ⟨n, hn⟩ := exists_pow_smul_eq_res_image_uniform 𝒜 F hf hg
-    (W := fun i => basicOpen 𝒜 (g i))
-    (V := fun i => basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)
-    (funext fun i => degreeOneChart_image_top 𝒜 (hg i))
-    (funext fun i => degreeOneChart_image_basicOpen 𝒜 hf (hg i))
-    (fun i => inf_le_left) (fun i => inf_le_left)
-    (fun i => F.presheaf.map (homOfLE (inf_le_right :
-      basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f)).op s)
-  choose t ht using hn
+  have hb2 : ∀ p : ι × ι, g p.1 * g p.2 ∈ 𝒜 2 := fun p =>
+    SetLike.mul_mem_graded (hg p.1) (hg p.2)
+  have hgn : ∀ p : ι × ι, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)
+      ≤ ProjectiveSpectrum.basicOpen 𝒜 (g p.1 ^ n) := fun p =>
+    inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) n)
+  -- the single exponent `N = 2m + n`, and the elements twisted by
+  have hA : ∀ i, f ^ (2 * m) * g i ^ n ∈ 𝒜 (2 * m + n) := fun i =>
+    SetLike.mul_mem_graded (pow_mem_deg 𝒜 hf (2 * m)) (pow_mem_deg 𝒜 (hg i) n)
+  have hBm : ∀ p : ι × ι, (g p.1 * g p.2) ^ m ∈ 𝒜 (2 * m) := fun p => by
+    have h := SetLike.pow_mem_graded m (hb2 p)
+    rwa [smul_eq_mul, Nat.mul_comm] at h
+  have hB : ∀ p : ι × ι, (g p.1 * g p.2) ^ m * g p.1 ^ n ∈ 𝒜 (2 * m + n) := fun p =>
+    SetLike.mul_mem_graded (hBm p) (pow_mem_deg 𝒜 (hg p.1) n)
+  have hWb : ∀ p : ι × ι, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)
+      ≤ ProjectiveSpectrum.basicOpen 𝒜 ((g p.1 * g p.2) ^ m * g p.1 ^ n) := fun p =>
+    le_basicOpen_mul 𝒜
+      ((le_of_eq (basicOpen_mul 𝒜 (g p.1) (g p.2)).symm).trans
+        (basicOpen_le_basicOpen_pow 𝒜 (g p.1 * g p.2) m))
+      (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) n))
+  -- the twisted local sections are compatible
+  have hcompat : TopCat.Presheaf.IsCompatible
+      (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ))).presheaf
+      (fun i => basicOpen 𝒜 (g i))
+      (fun i => Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hA i) F)
+        (basicOpen 𝒜 (g i)) (t i)) := by
+    intro i j
+    have hfracL :
+        (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
+            fracSection 𝒜 (hA i) (hB (i, j)) (hWb (i, j)))
+          = (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
+            isLocalizationFrac 𝒜 hf (hb2 (i, j)) m
+              (le_of_eq (basicOpen_mul 𝒜 (g i) (g j)).symm)) :=
+      fracSection_eq 𝒜 _ _ _ _ _ _ (by ring)
+    have hfracR :
+        (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
+            fracSection 𝒜 (hA j) (hB (i, j)) (hWb (i, j)))
+          = (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
+              isLocalizationFrac 𝒜 hf (hb2 (i, j)) m
+                (le_of_eq (basicOpen_mul 𝒜 (g i) (g j)).symm)) *
+            (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
+              fracSection 𝒜 (pow_mem_deg 𝒜 (hg j) n) (pow_mem_deg 𝒜 (hg i) n) (hgn (i, j))) :=
+      (fracSection_eq 𝒜 _ _ _ _ _
+        (le_basicOpen_mul 𝒜
+          (((le_of_eq (basicOpen_mul 𝒜 (g i) (g j)).symm).trans
+            (basicOpen_le_basicOpen_pow 𝒜 (g i * g j) 1)).trans
+              (basicOpen_le_basicOpen_pow 𝒜 ((g i * g j) ^ 1) m))
+          (hgn (i, j)))
+        (by ring)).trans (fracSection_mul 𝒜 _ _ _ _ _ _ _).symm
+    have hLfinal :=
+      (homApp_res (twistBy 𝒜 (2 * m + n) (hA i) F)
+        (inf_le_left : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j) ≤ basicOpen 𝒜 (g i)) (t i)).trans
+      (((twistBy_app_eq_smul' 𝒜 (hA i) (hB (i, j)) F (hWb (i, j)) _).trans
+        (congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) =>
+          r • Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hB (i, j)) F)
+            (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j))
+            (F.presheaf.map (homOfLE (inf_le_left : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)
+              ≤ basicOpen 𝒜 (g i))).op (t i))) hfracL)).trans
+        (Scheme.Modules.Hom.app_smul _ _ _).symm)
+    have hRfinal :=
+      (homApp_res (twistBy 𝒜 (2 * m + n) (hA j) F)
+        (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j) ≤ basicOpen 𝒜 (g j)) (t j)).trans
+      (((twistBy_app_eq_smul' 𝒜 (hA j) (hB (i, j)) F (hWb (i, j)) _).trans
+        (congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) =>
+          r • Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hB (i, j)) F)
+            (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j))
+            (F.presheaf.map (homOfLE (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)
+              ≤ basicOpen 𝒜 (g j))).op (t j))) hfracR)).trans
+        (((Scheme.Modules.Hom.app_smul _ _ _).trans
+          (congrArg (fun y : Γ(Scheme.Modules.tensorObj F
+              (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ)), basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) =>
+            (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
+              isLocalizationFrac 𝒜 hf (hb2 (i, j)) m
+                (le_of_eq (basicOpen_mul 𝒜 (g i) (g j)).symm)) • y)
+            (Scheme.Modules.Hom.app_smul _ _ _))).trans (mul_smul _ _ _).symm).symm)
+    exact hLfinal.trans ((congrArg
+      (Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hB (i, j)) F)
+        (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j))) (hm (i, j))).trans hRfinal.symm)
+  -- glue
+  obtain ⟨σ, hσ, -⟩ := TopCat.Sheaf.existsUnique_gluing'
+    (F := (⟨(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ))).presheaf,
+      Scheme.Modules.isSheaf _⟩ : TopCat.Sheaf Ab (Proj 𝒜)))
+    (fun i => basicOpen 𝒜 (g i)) ⊤ (fun i => homOfLE le_top) (le_of_eq hcover.symm) _ hcompat
+  refine ⟨σ, ?_⟩
+  -- the glued section restricts to the twist of `s`
+  have hDcover : ⨆ i, (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) = basicOpen 𝒜 f := by
+    rw [← iSup_inf_eq, hcover, top_inf_eq]
+  refine TopCat.Sheaf.eq_of_locally_eq'
+    (F := (⟨(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ))).presheaf,
+      Scheme.Modules.isSheaf _⟩ : TopCat.Sheaf Ab (Proj 𝒜)))
+    (fun i => basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) (basicOpen 𝒜 f)
+    (fun i => homOfLE inf_le_right) (le_of_eq hDcover.symm) _ _ ?_
+  intro i
+  have hAle : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f
+      ≤ ProjectiveSpectrum.basicOpen 𝒜 (f ^ (2 * m) * g i ^ n) :=
+    le_basicOpen_mul 𝒜 (inf_le_right.trans (basicOpen_le_basicOpen_pow 𝒜 f (2 * m)))
+      (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g i) n))
+  have hfracN :
+      (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) from
+          fracSection 𝒜 (pow_mem_deg 𝒜 hf (2 * m + n)) (hA i) hAle)
+        = (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) from
+          isLocalizationFrac 𝒜 hf (hg i) n inf_le_left) :=
+    fracSection_eq 𝒜 _ _ _ _ _ _ (by ring)
+  have hLeft :=
+    (resSection_trans 𝒜 (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ)))
+      (le_top (a := basicOpen 𝒜 f)) (inf_le_right :
+        basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f) σ).trans
+    ((resSection_trans 𝒜 (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ)))
+      (le_top (a := basicOpen 𝒜 (g i))) (inf_le_left :
+        basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i)) σ).symm.trans
+      ((congrArg (fun y : Γ(Scheme.Modules.tensorObj F
+          (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ)), basicOpen 𝒜 (g i)) =>
+        (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ))).presheaf.map
+          (homOfLE (inf_le_left : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f
+            ≤ basicOpen 𝒜 (g i))).op y) (hσ i)).trans
+        ((homApp_res (twistBy 𝒜 (2 * m + n) (hA i) F) (inf_le_left :
+          basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i)) (t i)).trans
+          ((congrArg (Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hA i) F)
+            (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)) (ht i)).trans
+            (Scheme.Modules.Hom.app_smul _ _ _)))))
+  have hRight :=
+    (homApp_res (twistBy 𝒜 (2 * m + n) (pow_mem_deg 𝒜 hf (2 * m + n)) F)
+      (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f) s).trans
+    ((twistBy_app_eq_smul' 𝒜 (pow_mem_deg 𝒜 hf (2 * m + n)) (hA i) F hAle _).trans
+      (congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) =>
+        r • Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hA i) F)
+          (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)
+          (F.presheaf.map (homOfLE (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f
+            ≤ basicOpen 𝒜 f)).op s)) hfracN))
+  exact hLeft.trans hRight.symm
+
+/-- **The overlap exponent, from the chart extensions as data.**
+
+The second half of `exists_globalSection_twistBy`'s recipe: given the family `t` extending `s`
+across each chart with exponent `n`, this is the exponent `m` that forces the extensions to agree
+on the *whole* pairwise overlap, not only where `D₊(f)` reaches.
+
+Like `exists_globalSection_twistBy_of_data`, it takes `n`, `t` and `ht` as inputs. That is what
+lets `GlueUniform.lean` fix one `m` and then vary `n` freely: the agreement at exponent `n + k` is
+the agreement at exponent `n` scaled by `(f / gᵢ)ᵏ`, so the same `m` serves every larger
+exponent. -/
+theorem exists_overlap_exponent (F : (Proj 𝒜).Modules)
+    [SheafOfModules.IsQuasicoherent.{u, u, u}
+      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
+    {f : A} (hf : f ∈ 𝒜 1) {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
+    (s : Γ(F, basicOpen 𝒜 f)) (n : ℕ) (t : ∀ i, Γ(F, basicOpen 𝒜 (g i)))
+    (ht : ∀ i, F.presheaf.map (homOfLE (inf_le_left :
+        basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i))).op (t i)
+      = (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) from
+          isLocalizationFrac 𝒜 hf (hg i) n inf_le_left) •
+        F.presheaf.map (homOfLE (inf_le_right :
+          basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f)).op s) :
+    ∃ m : ℕ, ∀ p : ι × ι,
+      (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from
+          isLocalizationFrac 𝒜 hf (SetLike.mul_mem_graded (hg p.1) (hg p.2)) m
+            (le_of_eq (basicOpen_mul 𝒜 (g p.1) (g p.2)).symm)) •
+        F.presheaf.map (homOfLE (inf_le_left :
+          basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.1))).op (t p.1)
+      = (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from
+          isLocalizationFrac 𝒜 hf (SetLike.mul_mem_graded (hg p.1) (hg p.2)) m
+            (le_of_eq (basicOpen_mul 𝒜 (g p.1) (g p.2)).symm)) •
+        ((show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from
+            fracSection 𝒜 (pow_mem_deg 𝒜 (hg p.2) n) (pow_mem_deg 𝒜 (hg p.1) n)
+              (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) n))) •
+          F.presheaf.map (homOfLE (inf_le_right :
+            basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.2))).op (t p.2)) := by
+  classical
   -- the extension property, restricted to any smaller open
   have key : ∀ (i : ι) (Z : (Proj 𝒜).Opens) (hZ : Z ≤ basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f),
       F.presheaf.map (homOfLE (hZ.trans inf_le_left)).op (t i)
@@ -217,7 +407,7 @@ theorem exists_globalSection_twistBy (F : (Proj 𝒜).Modules)
     exact congrArg (fun r : Γ(Proj 𝒜, (basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) ⊓
       basicOpen 𝒜 f) => r • F.presheaf.map (homOfLE (hZi.trans inf_le_right)).op s) hfrac.symm
   -- one exponent forcing agreement on every overlap
-  obtain ⟨m, hm⟩ := exists_pow_smul_eq_of_res_eq_image_uniform 𝒜 F
+  exact exists_pow_smul_eq_of_res_eq_image_uniform 𝒜 F
     (f := fun _ : ι × ι => f) (b := fun p : ι × ι => g p.1 * g p.2)
     (fun _ => hf) hb2 h2
     (W := fun p : ι × ι => basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2))
@@ -232,129 +422,39 @@ theorem exists_globalSection_twistBy (F : (Proj 𝒜).Modules)
       F.presheaf.map (homOfLE (inf_le_right :
         basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.2))).op (t p.2))
     (h := hagree)
-  -- the single exponent `N = 2m + n`, and the elements twisted by
-  have hA : ∀ i, f ^ (2 * m) * g i ^ n ∈ 𝒜 (2 * m + n) := fun i =>
-    SetLike.mul_mem_graded (pow_mem_deg 𝒜 hf (2 * m)) (pow_mem_deg 𝒜 (hg i) n)
-  have hBm : ∀ p : ι × ι, (g p.1 * g p.2) ^ m ∈ 𝒜 (2 * m) := fun p => by
-    have h := SetLike.pow_mem_graded m (hb2 p)
-    rwa [smul_eq_mul, Nat.mul_comm] at h
-  have hB : ∀ p : ι × ι, (g p.1 * g p.2) ^ m * g p.1 ^ n ∈ 𝒜 (2 * m + n) := fun p =>
-    SetLike.mul_mem_graded (hBm p) (pow_mem_deg 𝒜 (hg p.1) n)
-  have hWb : ∀ p : ι × ι, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)
-      ≤ ProjectiveSpectrum.basicOpen 𝒜 ((g p.1 * g p.2) ^ m * g p.1 ^ n) := fun p =>
-    le_basicOpen_mul 𝒜
-      ((le_of_eq (basicOpen_mul 𝒜 (g p.1) (g p.2)).symm).trans
-        (basicOpen_le_basicOpen_pow 𝒜 (g p.1 * g p.2) m))
-      (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) n))
-  -- the twisted local sections are compatible
-  have hcompat : TopCat.Presheaf.IsCompatible
-      (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ))).presheaf
-      (fun i => basicOpen 𝒜 (g i))
-      (fun i => Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hA i) F)
-        (basicOpen 𝒜 (g i)) (t i)) := by
-    intro i j
-    have hfracL :
-        (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
-            fracSection 𝒜 (hA i) (hB (i, j)) (hWb (i, j)))
-          = (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
-            isLocalizationFrac 𝒜 hf (hb2 (i, j)) m
-              (le_of_eq (basicOpen_mul 𝒜 (g i) (g j)).symm)) :=
-      fracSection_eq 𝒜 _ _ _ _ _ _ (by ring)
-    have hfracR :
-        (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
-            fracSection 𝒜 (hA j) (hB (i, j)) (hWb (i, j)))
-          = (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
-              isLocalizationFrac 𝒜 hf (hb2 (i, j)) m
-                (le_of_eq (basicOpen_mul 𝒜 (g i) (g j)).symm)) *
-            (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
-              fracSection 𝒜 (pow_mem_deg 𝒜 (hg j) n) (pow_mem_deg 𝒜 (hg i) n) (hgn (i, j))) :=
-      (fracSection_eq 𝒜 _ _ _ _ _
-        (le_basicOpen_mul 𝒜
-          (((le_of_eq (basicOpen_mul 𝒜 (g i) (g j)).symm).trans
-            (basicOpen_le_basicOpen_pow 𝒜 (g i * g j) 1)).trans
-              (basicOpen_le_basicOpen_pow 𝒜 ((g i * g j) ^ 1) m))
-          (hgn (i, j)))
-        (by ring)).trans (fracSection_mul 𝒜 _ _ _ _ _ _ _).symm
-    have hLfinal :=
-      (homApp_res (twistBy 𝒜 (2 * m + n) (hA i) F)
-        (inf_le_left : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j) ≤ basicOpen 𝒜 (g i)) (t i)).trans
-      (((twistBy_app_eq_smul' 𝒜 (hA i) (hB (i, j)) F (hWb (i, j)) _).trans
-        (congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) =>
-          r • Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hB (i, j)) F)
-            (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j))
-            (F.presheaf.map (homOfLE (inf_le_left : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)
-              ≤ basicOpen 𝒜 (g i))).op (t i))) hfracL)).trans
-        (Scheme.Modules.Hom.app_smul _ _ _).symm)
-    have hRfinal :=
-      (homApp_res (twistBy 𝒜 (2 * m + n) (hA j) F)
-        (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j) ≤ basicOpen 𝒜 (g j)) (t j)).trans
-      (((twistBy_app_eq_smul' 𝒜 (hA j) (hB (i, j)) F (hWb (i, j)) _).trans
-        (congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) =>
-          r • Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hB (i, j)) F)
-            (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j))
-            (F.presheaf.map (homOfLE (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)
-              ≤ basicOpen 𝒜 (g j))).op (t j))) hfracR)).trans
-        (((Scheme.Modules.Hom.app_smul _ _ _).trans
-          (congrArg (fun y : Γ(Scheme.Modules.tensorObj F
-              (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ)), basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) =>
-            (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) from
-              isLocalizationFrac 𝒜 hf (hb2 (i, j)) m
-                (le_of_eq (basicOpen_mul 𝒜 (g i) (g j)).symm)) • y)
-            (Scheme.Modules.Hom.app_smul _ _ _))).trans (mul_smul _ _ _).symm).symm)
-    exact hLfinal.trans ((congrArg
-      (Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hB (i, j)) F)
-        (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j))) (hm (i, j))).trans hRfinal.symm)
-  -- glue
-  obtain ⟨σ, hσ, -⟩ := TopCat.Sheaf.existsUnique_gluing'
-    (F := (⟨(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ))).presheaf,
-      Scheme.Modules.isSheaf _⟩ : TopCat.Sheaf Ab (Proj 𝒜)))
-    (fun i => basicOpen 𝒜 (g i)) ⊤ (fun i => homOfLE le_top) (le_of_eq hcover.symm) _ hcompat
-  refine ⟨2 * m + n, σ, ?_⟩
-  -- the glued section restricts to the twist of `s`
-  have hDcover : ⨆ i, (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) = basicOpen 𝒜 f := by
-    rw [← iSup_inf_eq, hcover, top_inf_eq]
-  refine TopCat.Sheaf.eq_of_locally_eq'
-    (F := (⟨(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ))).presheaf,
-      Scheme.Modules.isSheaf _⟩ : TopCat.Sheaf Ab (Proj 𝒜)))
-    (fun i => basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) (basicOpen 𝒜 f)
-    (fun i => homOfLE inf_le_right) (le_of_eq hDcover.symm) _ _ ?_
-  intro i
-  have hAle : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f
-      ≤ ProjectiveSpectrum.basicOpen 𝒜 (f ^ (2 * m) * g i ^ n) :=
-    le_basicOpen_mul 𝒜 (inf_le_right.trans (basicOpen_le_basicOpen_pow 𝒜 f (2 * m)))
-      (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g i) n))
-  have hfracN :
-      (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) from
-          fracSection 𝒜 (pow_mem_deg 𝒜 hf (2 * m + n)) (hA i) hAle)
-        = (show Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) from
-          isLocalizationFrac 𝒜 hf (hg i) n inf_le_left) :=
-    fracSection_eq 𝒜 _ _ _ _ _ _ (by ring)
-  have hLeft :=
-    (resSection_trans 𝒜 (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ)))
-      (le_top (a := basicOpen 𝒜 f)) (inf_le_right :
-        basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f) σ).trans
-    ((resSection_trans 𝒜 (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ)))
-      (le_top (a := basicOpen 𝒜 (g i))) (inf_le_left :
-        basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i)) σ).symm.trans
-      ((congrArg (fun y : Γ(Scheme.Modules.tensorObj F
-          (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ)), basicOpen 𝒜 (g i)) =>
-        (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((2 * m + n : ℕ) : ℤ))).presheaf.map
-          (homOfLE (inf_le_left : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f
-            ≤ basicOpen 𝒜 (g i))).op y) (hσ i)).trans
-        ((homApp_res (twistBy 𝒜 (2 * m + n) (hA i) F) (inf_le_left :
-          basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i)) (t i)).trans
-          ((congrArg (Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hA i) F)
-            (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)) (ht i)).trans
-            (Scheme.Modules.Hom.app_smul _ _ _)))))
-  have hRight :=
-    (homApp_res (twistBy 𝒜 (2 * m + n) (pow_mem_deg 𝒜 hf (2 * m + n)) F)
-      (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f) s).trans
-    ((twistBy_app_eq_smul' 𝒜 (pow_mem_deg 𝒜 hf (2 * m + n)) (hA i) F hAle _).trans
-      (congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) =>
-        r • Scheme.Modules.Hom.app (twistBy 𝒜 (2 * m + n) (hA i) F)
-          (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)
-          (F.presheaf.map (homOfLE (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f
-            ≤ basicOpen 𝒜 f)).op s)) hfracN))
-  exact hLeft.trans hRight.symm
+
+/-- **`#585`: a section over `D₊(f)`, twisted, is the restriction of a global section.**
+
+For `F` quasi-coherent on `Proj 𝒜`, `f` of degree one, and a finite family of degree-one elements
+generating `A` over `𝒜 0`, every `s ∈ Γ(F, D₊(f))` has an `N` with `twistBy (f ᴺ) s` the
+restriction of a global section of `F(N)`.
+
+The two exponents are independent: `n` extends `s` across each chart, `m` forces agreement on the
+pairwise overlaps, and `N = 2m + n`. The section over `D₊(gᵢ)` that glues is `twistBy (f²ᵐ gᵢⁿ)` of
+the chart extension, not `twistBy (gᵢ ᴺ)`; that choice is what keeps the whole comparison inside
+`F(N)` and avoids a passage from `F(n)(2m)` that nothing provides. -/
+theorem exists_globalSection_twistBy (F : (Proj 𝒜).Modules)
+    [SheafOfModules.IsQuasicoherent.{u, u, u}
+      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
+    {f : A} (hf : f ∈ 𝒜 1) {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
+    (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤)
+    (s : Γ(F, basicOpen 𝒜 f)) :
+    ∃ (N : ℕ) (σ : Γ(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ)), ⊤)),
+      (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ))).presheaf.map
+          (homOfLE (le_top (a := basicOpen 𝒜 f))).op σ
+        = Scheme.Modules.Hom.app (twistBy 𝒜 N (pow_mem_deg 𝒜 hf N) F) (basicOpen 𝒜 f) s := by
+  classical
+  -- one exponent extending `s` across every degree-one chart
+  obtain ⟨n, hn⟩ := exists_pow_smul_eq_res_image_uniform 𝒜 F hf hg
+    (W := fun i => basicOpen 𝒜 (g i))
+    (V := fun i => basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)
+    (funext fun i => degreeOneChart_image_top 𝒜 (hg i))
+    (funext fun i => degreeOneChart_image_basicOpen 𝒜 hf (hg i))
+    (fun i => inf_le_left) (fun i => inf_le_left)
+    (fun i => F.presheaf.map (homOfLE (inf_le_right :
+      basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f)).op s)
+  choose t ht using hn
+  obtain ⟨m, hm⟩ := exists_overlap_exponent 𝒜 F hf hg s n t ht
+  exact ⟨2 * m + n, exists_globalSection_twistBy_of_data 𝒜 F hf hg hcov s n m t ht hm⟩
 
 end AlgebraicGeometry.Proj

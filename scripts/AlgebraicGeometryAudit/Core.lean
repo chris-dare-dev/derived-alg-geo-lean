@@ -2975,7 +2975,47 @@ rw cannot be used on goals carrying show-ascription residue. -/
 #print axioms AlgebraicGeometry.Proj.resΓ_fracSection
 #print axioms AlgebraicGeometry.Proj.homApp_res
 #print axioms AlgebraicGeometry.Proj.le_basicOpen_mul
+#print axioms AlgebraicGeometry.Proj.exists_globalSection_twistBy_of_data
+#print axioms AlgebraicGeometry.Proj.exists_overlap_exponent
 #print axioms AlgebraicGeometry.Proj.exists_globalSection_twistBy
+
+/-! ## #586: one twist exponent for a whole finite family
+
+exists_globalSection_twistBy produces AN exponent, one per section. Serre's global generation needs
+a SINGLE exponent serving every generator of every chart at once, because the surjection it builds,
+free I -> F(N), has one target sheaf. exists_globalSection_twistBy_forall_ge upgrades the
+existential to "every sufficiently large N works" and exists_globalSection_twistBy_uniform takes
+the maximum over a finite family.
+
+Raising is done on the CHART EXTENSIONS, not at the sheaf level, and that is the whole content. The
+sheaf-level route -- multiply the global section of F(N) by f^(N'-N) and transport along
+F(N)(N'-N) = F(N') -- is not available: tensorTwistAddIso is stated for associated sheaves only,
+tensorAssocIso requires both OUTER tensor factors invertible and here the outer factor is the
+arbitrary F, and even granting the isomorphism the argument would have to compute what it does to a
+section, which is what #585 established these witnesses cannot do.
+
+One level down it is plain algebra in Gamma(F, -) on Proj. The extension at exponent n + k is the
+extension at exponent n multiplied by (f/g_i)^k, a section of the structure sheaf over the WHOLE of
+D+(g_i) because f and g_i both have degree one; the overlap discrepancy is therefore scaled by that
+same unit, so ONE overlap exponent m serves every larger n. Hence N = 2m + n' is reachable for
+every n' >= n, which is every N >= 2m + n.
+
+The multiplier is (f/g_i)^k and not a fixed monomial. g_i is inverted on D+(g_i) and nowhere else,
+and D+(g_i) is the only open where t_i is asked to say anything. A fraction with a different
+denominator is still a legitimate section wherever ITS denominator is invertible, so the raised
+statement would typecheck -- and be false, because that fraction vanishes somewhere on D+(g_i) and
+the raised family would no longer extend s. The denominator is fixed by the chart, not chosen.
+
+The two fraction identities are named because the degree bookkeeping is unreadable inline and
+because each is used under a scalar action, where the ascription at Gamma(Proj A, U) is mandatory.
+
+Generation, local surjectivity and free I are NOT here; those need the chart-local half of Serre's
+theorem. -/
+
+#print axioms AlgebraicGeometry.Proj.fracSection_pow_mul_isLocalizationFrac
+#print axioms AlgebraicGeometry.Proj.fracSection_pow_mul_comm
+#print axioms AlgebraicGeometry.Proj.exists_globalSection_twistBy_forall_ge
+#print axioms AlgebraicGeometry.Proj.exists_globalSection_twistBy_uniform
 
 /-! ## f^n on a degree-one chart is (f/g)^n (#585 bridge)
 
