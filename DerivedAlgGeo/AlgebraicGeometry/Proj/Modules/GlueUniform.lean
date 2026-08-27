@@ -18,11 +18,16 @@ over a finite family.
 ## Where the raising happens, and why not at the sheaf level
 
 The obvious way to raise a global section of `F(N)` to one of `F(N')` is to multiply by
-`f ^ (N' - N)` and then transport along `F(N)(N' - N) ≅ F(N')`. That route is **not available**:
-`tensorTwistAddIso` is stated for associated sheaves only, `tensorAssocIso` needs both *outer*
-tensor factors invertible and here the outer factor is the arbitrary `F`, and even granting the
-isomorphism the argument would have to compute what it does to a section — which is exactly what
-`#585` established these witnesses cannot do.
+`f ^ (N' - N)` and then transport along `F(N)(N' - N) ≅ F(N')`. That isomorphism **does not exist
+for an arbitrary `F`**, and `TensorTwist.lean`'s "What is not here, and why it cannot be got the
+easy way" is where the repository already records it: `tensorAssocIso` requires *both* outer
+factors invertible, and no rearrangement of `(F ⊗ O(d)) ⊗ O(e)` under `tensorCommIso` gets the
+non-invertible `F` off an outer slot. `TwistComparison.lean`'s `tensorTwistAddIso` supplies the
+composition only for `F` an associated sheaf, which is not the hypothesis here.
+
+Even granting the isomorphism the argument would still have to compute what it does to a *section*,
+and these witnesses are built by "sheafification inverts `W`" — which is exactly what `#585`
+established they cannot do.
 
 Raising is done one level down instead, on the **chart extensions**, where it is plain algebra.
 `exists_globalSection_twistBy`'s recipe has two exponents: `n` extends `s` across each chart and
@@ -37,6 +42,14 @@ Raising is done one level down instead, on the **chart extensions**, where it is
 
 So `N = 2m + n'` ranges over every integer `≥ 2m + n` with `m` held fixed, and no sheaf-level
 twist comparison is needed anywhere.
+
+This is the same move as `exists_pow_smul_eq_res_chart_of_le`, which raises the extension exponent
+in the chart's own coordinates by `isLocalizationElem ^ (m - n) • t`. Two differences matter:
+`ChartExtension.lean` is one chart at a time and in away-ring coordinates, and — the reason its
+existential form cannot be used here — it returns *some* extension at the larger exponent, while
+holding one overlap exponent `m` fixed needs the raised family to be the original one times a known
+unit. Discard that relation and `m` has to be re-derived at each `n`, which puts `N = 2m(n) + n`
+back out of reach.
 
 ## The multiplier is `(f / gᵢ)ᵏ`, not a fixed monomial
 
