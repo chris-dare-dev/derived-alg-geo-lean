@@ -25,6 +25,8 @@ docstring and #111). -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ofPre_Z
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityFunction
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.upper
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityFunction.upper
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityFunction.toWeak
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityFunction.toWeak_Z
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.charge

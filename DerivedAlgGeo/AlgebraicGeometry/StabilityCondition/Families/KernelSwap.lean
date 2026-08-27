@@ -1,0 +1,271 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.KernelDualizingTwist
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.FourierMukai
+
+/-!
+# The swap of an endocorrespondence, and a geometric dual kernel
+
+`KernelDualizingTwist.lean` produces a `RightAdjointKernelData` whose opposite
+is the **reversed** correspondence `geometricCorrespondence X X Z q p`.
+`KernelAutoequivalence.DualKernel` needs the **same** correspondence on both
+sides, and for `p ≠ q` those are different values. That mismatch — not any
+remaining duality — is all that stood between the previous file and a dual
+kernel.
+
+This file closes it. Classically `Z = X × X` and the missing ingredient is the
+swap `σ` exchanging the two factors, under which the reversed correspondence
+becomes the original one and the kernel is carried along.
+
+## The derivation, and why the kernel is `Rσ_*Q` rather than `σ^*Q`
+
+With `q = σ ≫ p` and `p = σ ≫ q`, pullback is contravariant and pushforward
+covariant, so `Lq^* ≅ Lp^* ⋙ Lσ^*` and `Rp_* ≅ Rσ_* ⋙ Rq_*`.  Substituting
+both into the reversed transform leaves
+
+`Lp^* ⋙ [ Lσ^* ⋙ (Q ⊗ −) ⋙ Rσ_* ] ⋙ Rq_*`
+
+and the bracket is exactly the right-slot projection formula at `σ`, which
+collapses it to `(Rσ_* Q) ⊗ −`.  So the transported kernel is `Rσ_* Q`.
+
+The classical statement uses `σ^* Q`, and the two agree because `σ` is an
+involution *isomorphism*. That hypothesis is **not** assumed here: nothing in
+the derivation needs `σ` invertible, and asking for it would be an unconsumed
+hypothesis. `Rσ_*` is what the projection formula hands back, so `Rσ_*` is what
+the kernel is written with.
+
+## The three inputs
+
+* `HasPullbackSwap σ p q` — `Lq^* ≅ Lp^* ⋙ Lσ^*`, with `σ ≫ p = q` as a
+  **guard**;
+* `HasPushforwardSwap σ p q` — `Rp_* ≅ Rσ_* ⋙ Rq_*`, with `σ ≫ q = p` as a
+  guard;
+* `HasProjectionFormulaRight σ` — an **existing** class, consumed here at a
+  further site.
+
+The guards follow `HasPullbackRetraction` and `HasPushforwardRetraction`: the
+composition identity is carried but not consumed, and the `iso` field is what
+the derivation uses. The guard is what makes `iso` the right thing to ask for.
+
+Neither swap class is reduced to `GeometricDerivedPullbackComposition`, for the
+reason `KernelConvolution.lean` already gives about a different pair: that class
+is stated at the literal `f ≫ g`, so bridging it to `q` would need `eqToHom`
+transport across compound terms.
+
+## What comes out
+
+`geometricDualAdjointKernelData` is a `RightAdjointKernelData` for the geometric
+correspondence **against itself**, so `DualKernel.ofRightAdjointKernel` applies.
+`geometricDualKernel` is the result: a `DualKernel` for a kernel
+autoequivalence built on the geometric correspondence, with dual kernel
+
+`Rσ_*(K^∨ ⊗ ω_q)`
+
+— the classical `P^∨ ⊗ p^*ω_X[dim X]`, assembled entirely from named contracts.
+
+## What this file does not assert
+
+* **Nothing constructs a `HasPullbackSwap` or a `HasPushforwardSwap`**, and no
+  morphism is shown to admit one. Inhabitant-free, like every ledger below it.
+* Nothing identifies `Z` with `X × X` or `σ` with an actual factor exchange;
+  the classes are stated at an arbitrary `σ : Z ⟶ Z` with the guards making the
+  intended instantiation precise.
+* `σ` is not assumed invertible, an involution, or an isomorphism, and
+  `Rσ_* ≅ σ^*` is not claimed.
+* **The equivalence is still supplied.** `geometricKernelAutoequivalence` takes
+  the equivalence and its comparison isomorphism as arguments. That a geometric
+  Fourier--Mukai transform *is* an equivalence is the classical theorem this
+  whole lane is conditional on, and it is not approached here. What is now
+  geometric is the *dual kernel of one*, not the equivalence.
+* No Serre duality, no smoothness, no properness, no relative dimension.
+-/
+
+universe u
+
+namespace CategoryTheory.Triangulated.StabilityCondition.Families
+
+open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
+open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
+open AlgebraicGeometry
+open SchemeBaseChange
+
+variable {S : Scheme.{u}}
+
+section Contracts
+
+/-- **Pullback along the swap, supplied.**
+
+`Lq^* ≅ Lp^* ⋙ Lσ^*` for `σ ≫ p = q`. The composition identity is a guard: the
+derivation uses `iso` alone, and the guard is what makes `iso` the right thing
+to ask for. -/
+class HasPullbackSwap {X Z : SchemeBaseChange S}
+    [IsLocallyNoetherian X.left] [IsLocallyNoetherian Z.left]
+    (σ : Z ⟶ Z) (p q : Z ⟶ X)
+    [HasCoherentPullback σ] [HasCoherentPullback p] [HasCoherentPullback q] where
+  /-- The composition identity. A guard, not consumed. -/
+  comm : σ ≫ p = q
+  /-- Pullback along `q` is pullback along `p` followed by pullback along `σ`. -/
+  iso : boundedCoherentDerivedPullback q ≅
+    boundedCoherentDerivedPullback p ⋙ boundedCoherentDerivedPullback σ
+
+/-- **Pushforward along the swap, supplied.**
+
+`Rp_* ≅ Rσ_* ⋙ Rq_*` for `σ ≫ q = p`. Guard as above. -/
+class HasPushforwardSwap {X Z : SchemeBaseChange S}
+    [IsLocallyNoetherian X.left] [IsLocallyNoetherian Z.left]
+    (σ : Z ⟶ Z) (p q : Z ⟶ X)
+    [HasDerivedPushforward σ] [HasDerivedPushforward p] [HasDerivedPushforward q] where
+  /-- The composition identity. A guard, not consumed. -/
+  comm : σ ≫ q = p
+  /-- Pushforward along `p` is pushforward along `σ` followed by along `q`. -/
+  iso : derivedPushforward p ≅ derivedPushforward σ ⋙ derivedPushforward q
+
+/-- The pullback swap comparison, named. -/
+def pullbackSwapIso {X Z : SchemeBaseChange S}
+    [IsLocallyNoetherian X.left] [IsLocallyNoetherian Z.left]
+    (σ : Z ⟶ Z) (p q : Z ⟶ X)
+    [HasCoherentPullback σ] [HasCoherentPullback p] [HasCoherentPullback q]
+    [HasPullbackSwap σ p q] :
+    boundedCoherentDerivedPullback q ≅
+      boundedCoherentDerivedPullback p ⋙ boundedCoherentDerivedPullback σ :=
+  HasPullbackSwap.iso
+
+/-- The pushforward swap comparison, named. -/
+def pushforwardSwapIso {X Z : SchemeBaseChange S}
+    [IsLocallyNoetherian X.left] [IsLocallyNoetherian Z.left]
+    (σ : Z ⟶ Z) (p q : Z ⟶ X)
+    [HasDerivedPushforward σ] [HasDerivedPushforward p] [HasDerivedPushforward q]
+    [HasPushforwardSwap σ p q] :
+    derivedPushforward p ≅ derivedPushforward σ ⋙ derivedPushforward q :=
+  HasPushforwardSwap.iso
+
+end Contracts
+
+section Swap
+
+variable (X Z : SchemeBaseChange S)
+  [IsLocallyNoetherian X.left] [IsLocallyNoetherian Z.left]
+  (σ : Z ⟶ Z) (p q : Z ⟶ X)
+  [HasCoherentPullback σ] [HasCoherentPullback p] [HasCoherentPullback q]
+  [HasDerivedPushforward σ] [HasDerivedPushforward p] [HasDerivedPushforward q]
+  [HasCoherentDerivedTensor Z]
+  [HasPullbackSwap σ p q] [HasPushforwardSwap σ p q]
+  [HasProjectionFormulaRight σ]
+
+/-- **The reversed transform is the original one with the swapped kernel.**
+
+The content of this file. Substitute the two swap comparisons into
+`(geometricCorrespondence X X Z q p).transform Q`, and the middle three factors
+`Lσ^* ⋙ (Q ⊗ −) ⋙ Rσ_*` are exactly the right-slot projection formula at `σ`,
+which collapses them to the twist by `Rσ_* Q`. -/
+noncomputable def geometricSwapIso (Q : SchemeBoundedCoherentDerivedCategory Z.left) :
+    (geometricCorrespondence X X Z q p).transform Q ≅
+      (geometricCorrespondence X X Z p q).transform
+        ((derivedPushforward σ).obj Q) :=
+  Functor.isoWhiskerRight (pullbackSwapIso σ p q)
+      ((derivedTensor Z).obj Q ⋙ derivedPushforward p) ≪≫
+    Functor.isoWhiskerLeft (boundedCoherentDerivedPullback p)
+        (Functor.isoWhiskerLeft
+          (boundedCoherentDerivedPullback σ ⋙ (derivedTensor Z).obj Q)
+          (pushforwardSwapIso σ p q)) ≪≫
+      Functor.isoWhiskerLeft (boundedCoherentDerivedPullback p)
+        (Functor.isoWhiskerRight (HasProjectionFormulaRight.iso Q)
+          (derivedPushforward q))
+
+end Swap
+
+section DualKernel
+
+variable (X Z : SchemeBaseChange S)
+  [IsLocallyNoetherian X.left] [IsLocallyNoetherian Z.left]
+  (σ : Z ⟶ Z) (p q : Z ⟶ X) (K : SchemeBoundedCoherentDerivedCategory Z.left)
+  [HasCoherentPullback σ] [HasCoherentPullback p] [HasCoherentPullback q]
+  [HasDerivedPushforward σ] [HasDerivedPushforward p] [HasDerivedPushforward q]
+  [HasCoherentDerivedTensor Z]
+  [HasPullbackSwap σ p q] [HasPushforwardSwap σ p q]
+  [HasProjectionFormulaRight σ]
+  [HasDerivedPullbackAdjunction p] [HasKernelDual Z K]
+  [HasTwistedInversePullback q] [HasDualizingTwist q]
+
+/-- **The geometric dual kernel object**: `Rσ_*(K^∨ ⊗ ω_q)`.
+
+The classical `P^∨ ⊗ p^*ω_X[dim X]`, with `ω_q` carrying the dualizing twist
+and `Rσ_*` the exchange of the two factors. Every ingredient is a `def`, not a
+supplied field. -/
+noncomputable def geometricDualKernelObj :
+    SchemeBoundedCoherentDerivedCategory Z.left :=
+  (derivedPushforward σ).obj (geometricAdjointKernel q K)
+
+/-- **A right adjoint kernel against the same correspondence.**
+
+The previous ledger's datum, transported along the swap. Its opposite
+correspondence is now `geometricCorrespondence X X Z p q` itself, which is what
+`DualKernel` requires. -/
+noncomputable def geometricDualAdjointKernelData :
+    RightAdjointKernelData (geometricCorrespondence X X Z p q)
+      (geometricCorrespondence X X Z p q) K where
+  adjKernel := geometricDualKernelObj X Z σ q K
+  adj := ((geometricRightAdjointKernelData X X Z p q K).adj).ofNatIsoRight
+    (geometricSwapIso X Z σ p q (geometricAdjointKernel q K))
+
+@[simp]
+theorem geometricDualAdjointKernelData_adjKernel :
+    (geometricDualAdjointKernelData X Z σ p q K).adjKernel =
+      geometricDualKernelObj X Z σ q K := rfl
+
+/-- **A kernel autoequivalence on the geometric correspondence**, from a
+supplied equivalence.
+
+The equivalence and its comparison isomorphism are arguments, exactly as in
+`KernelAutoequivalence` itself. That a geometric Fourier--Mukai transform *is*
+an equivalence is the classical theorem this lane is conditional on, and
+nothing here approaches it. The point of naming this is that its `corr` and
+`kernel` are the geometric ones definitionally, so the dual kernel below
+typechecks against it. -/
+noncomputable def geometricKernelAutoequivalence
+    (equiv : SchemeBoundedCoherentDerivedCategory X.left ≌
+      SchemeBoundedCoherentDerivedCategory X.left)
+    (iso : equiv.functor ≅
+      (geometricCorrespondence X X Z p q).transform K) :
+    Symmetry.KernelAutoequivalence
+      (SchemeBoundedCoherentDerivedCategory X.left)
+      (SchemeBoundedCoherentDerivedCategory Z.left) where
+  corr := geometricCorrespondence X X Z p q
+  kernel := K
+  equiv := equiv
+  iso := iso
+
+/-- **A geometric dual kernel.**
+
+The end of the arc. `DualKernel.ofRightAdjointKernel` at the swapped datum: the
+quasi-inverse of the supplied equivalence is the transform of the same
+correspondence with kernel `Rσ_*(K^∨ ⊗ ω_q)` — the classical
+`P^∨ ⊗ p^*ω_X[dim X]` — and every step from the three constituent adjunctions
+onward is derived rather than supplied.
+
+What is still supplied is the equivalence itself, and the geometric contracts.
+Nothing here constructs either. -/
+noncomputable def geometricDualKernel
+    (equiv : SchemeBoundedCoherentDerivedCategory X.left ≌
+      SchemeBoundedCoherentDerivedCategory X.left)
+    (iso : equiv.functor ≅
+      (geometricCorrespondence X X Z p q).transform K) :
+    Symmetry.KernelAutoequivalence.DualKernel
+      (geometricKernelAutoequivalence X Z p q K equiv iso) :=
+  Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel _
+    (geometricDualAdjointKernelData X Z σ p q K)
+
+@[simp]
+theorem geometricDualKernel_dual
+    (equiv : SchemeBoundedCoherentDerivedCategory X.left ≌
+      SchemeBoundedCoherentDerivedCategory X.left)
+    (iso : equiv.functor ≅
+      (geometricCorrespondence X X Z p q).transform K) :
+    (geometricDualKernel X Z σ p q K equiv iso).dual =
+      geometricDualKernelObj X Z σ q K := rfl
+
+end DualKernel
+
+end CategoryTheory.Triangulated.StabilityCondition.Families
