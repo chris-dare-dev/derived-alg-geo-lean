@@ -38,9 +38,11 @@ everything.  Nothing below excludes it.
 ## What is here and what is next
 
 `hom_eq_zero_of_mem_hnTors_of_mem_hnFree` is the Hom-vanishing half of a torsion
-pair.  The splitting half is `WeakSplitting.lean`; until both are present these
-are two classes with a Hom-vanishing property, and nothing here calls them a
-torsion pair.
+pair.  The splitting half is `WeakSplitting.lean`, and with both present the two
+classes **are** a torsion pair — assembled as
+`WeakStabilityFunctionOn.hnTorsionPair` in
+`Weak/Tilting/TorsionPair/WeakStabilityFunction.lean`.  This file still states
+only the Hom-vanishing, which is all it needs.
 -/
 
 noncomputable section
