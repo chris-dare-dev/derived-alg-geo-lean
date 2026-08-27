@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.HNPolygon
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting.TorsionPair.StabilityFunction
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.SlopeThreshold
 
 /-!
 # The cutoff bounds the object's own phase, not only its factors' phases
@@ -79,5 +80,38 @@ theorem phase_le_of_mem_hnFree (hHN : Z.HasHNProperty) {E : A} (hE : ¬IsZero E)
   exact le_trans F.phase_le_phiPlus ((mem_hnFree_iff_forall hHN hE).mp h F)
 
 end StabilityFunction
+
+namespace SlopeData
+
+variable (D : SlopeData A)
+
+/-- **The torsion class at a phase cutoff, read as a slope bound.**
+
+The composite of `lt_phase_of_mem_hnTors` with `lt_phase_iff_slopeOfPhase_lt`, and the
+statement cases 1--3 of Bridgeland's Lemma 6.2 actually consume: an object of the torsion
+class, of positive rank, has slope strictly above the cutoff's slope. From there
+`Mukai.im_expCharge_pos` puts the charge in the open upper half plane.
+
+Rank zero is excluded here and handled by `mem_hnTors_of_rank_zero` instead — a rank-zero
+object has phase one and no slope, so it belongs to every `T β` for arithmetic reasons rather
+than by any comparison. -/
+theorem slopeOfPhase_lt_of_mem_hnTors (hHN : D.toStabilityFunction.HasHNProperty) {E : A}
+    (hE : 0 < D.rank E) {β : ℝ} (hβ0 : 0 < β) (hβ1 : β < 1)
+    (h : E ∈ StabilityFunction.hnTors D.toStabilityFunction β) :
+    slopeOfPhase β < D.slope E := by
+  refine (D.lt_phase_iff_slopeOfPhase_lt hE hβ0 hβ1).mp ?_
+  refine StabilityFunction.lt_phase_of_mem_hnTors hHN (fun hzero => ?_) h
+  exact absurd (D.rank_zero E hzero) (Int.ne_of_gt hE)
+
+/-- **The torsion-free class, dually.** -/
+theorem slope_le_slopeOfPhase_of_mem_hnFree (hHN : D.toStabilityFunction.HasHNProperty) {E : A}
+    (hE : 0 < D.rank E) {β : ℝ} (hβ0 : 0 < β) (hβ1 : β < 1)
+    (h : E ∈ StabilityFunction.hnFree D.toStabilityFunction β) :
+    D.slope E ≤ slopeOfPhase β := by
+  refine (D.phase_le_iff_le_slopeOfPhase hE hβ0 hβ1).mp ?_
+  refine StabilityFunction.phase_le_of_mem_hnFree hHN (fun hzero => ?_) h
+  exact absurd (D.rank_zero E hzero) (Int.ne_of_gt hE)
+
+end SlopeData
 
 end CategoryTheory.Triangulated
