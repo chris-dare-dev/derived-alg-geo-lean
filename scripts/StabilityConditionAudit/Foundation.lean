@@ -953,6 +953,50 @@ of the interface the phase and Harder–Narasimhan machinery is already built on
 #print axioms CategoryTheory.Triangulated.SlopeData.charge_ne_zero_of_rank_pos
 #print axioms CategoryTheory.Triangulated.SlopeData.arg_pos_of_rank_pos
 #print axioms CategoryTheory.Triangulated.SlopeData.phase_le_iff_slope_le
+#print axioms CategoryTheory.Triangulated.SlopeData.toWeakSlopeData
+#print axioms CategoryTheory.Triangulated.SlopeData.toWeakSlopeData_rank
+#print axioms CategoryTheory.Triangulated.SlopeData.toWeakSlopeData_degree
+#print axioms CategoryTheory.Triangulated.SlopeData.toWeakSlopeData_charge
+#print axioms CategoryTheory.Triangulated.SlopeData.toWeakSlopeData_slope
+#print axioms CategoryTheory.Triangulated.SlopeData.toStabilityFunction_phase
+
+/-! ## μ-slope on a surface: the weak slope data
+
+`WeakSlopeData` is `SlopeData` with `0 ≤ degree` in place of `0 < degree` on
+nonzero objects of rank zero — the skyscraper, whose charge is exactly `0`. Its
+charge is therefore a `WeakStabilityFunctionOn (abelianDatum A)`, not a
+`StabilityFunctionOn`. `SlopeData.toWeakSlopeData` forgets the strict inequality,
+so the curve case is an instance of the surface case rather than a parallel
+theory, and `phase_le_iff_slope_le` is proved once here and inherited. -/
+
+#print axioms CategoryTheory.Triangulated.WeakSlopeData
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.mk.inj
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.rankHom
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.degreeHom
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.rank_nonneg
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.degree_nonneg_of_rank_zero
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.rank
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.degree
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.rank_zero
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.degree_zero
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.rank_iso
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.degree_iso
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.rank_additive
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.degree_additive
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.charge
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.charge_re
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.charge_im
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.charge_mem_closedUpperHalfPlane
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.toWeakStabilityFunction
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.toWeakStabilityFunction_Z
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.slope
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.phase
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.phase_eq_arg_div_pi
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.phaseCross_charge
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.charge_ne_zero_of_rank_pos
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.arg_pos_of_rank_pos
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.phase_le_iff_slope_le
 
 /-! ## The two classes at a phase cutoff
 
