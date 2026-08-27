@@ -917,17 +917,6 @@ is not closed. -/
 
 -- Layer B stage 5: the scheme-derived surface numerical-variety assembly. The geometric HRR
 -- input is stated on coherent sheaves; the audited theorem below descends it to every K₀Ab class.
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.rankInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.rankHom
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.rankHom_class
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom_class
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom_mem
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.intAlgebraMap
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom_zero
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom_add
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData.SatisfiesSheafHRR
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData.SatisfiesSheafHRR.eq
@@ -2068,12 +2057,24 @@ not functions. -/
 -- assumed. The dimension-three and dimension-four constructors expose a separate HRR witness.
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.reconstruction_eulerPic_one
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.degree_tauComponent_top_eq_eulerCharacteristic
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.rankInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.chernCharacterInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.rankHom
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.chernCharacterHom
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.chernCharacterHom_zero
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.mk.inj
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.eulerPic_iso
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.eulerPic_shortExact
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rank_iso
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rank_shortExact
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.reconstruction
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom_mem
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom_add
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rankHom_class
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom_class
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.intAlgebraMap
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rankInvariant
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterInvariant
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rankHom
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom_zero
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.reconstructedToddComponent
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.reconstructedToddComponent_mem
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.sheaf_hirzebruch_riemannRoch
