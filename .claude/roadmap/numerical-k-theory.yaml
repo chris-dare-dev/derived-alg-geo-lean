@@ -1,0 +1,160 @@
+schema: roadmap/1
+slug: numerical-k-theory
+project: derived-alg-geo-lean
+title: "The numerical lane — one Grothendieck group, and dimension as a parameter"
+status: active
+phase: sequenced          # init -> refined -> decomposed -> sequenced -> complete
+brief: |
+  This track exists because the lane it covers had no track.
+
+  As of 2026-08-27 four roadmaps are active — contract-v1, dg-enhancements,
+  stability-families, theorem22-2-dependencies — and none owns K-theory,
+  Riemann--Roch, or numerical geometry. That is 261 files under
+  `AlgebraicGeometry/` with no epic, no milestone, and no review pressure.
+
+  It is also, precisely, where the duplication is. An adversarial architecture
+  audit run on 2026-08-26 found a second complete hand-rolled Grothendieck
+  group, two surviving copies of the axiom triple that #760 announced it had
+  eliminated, an eleven-declaration verbatim fork between a Surface file and a
+  HigherDimension file, a documented-and-kept fork of the real Mukai extension,
+  and three parallel directories in which dimension is encoded as tuple arity.
+  Every one of those is in this lane. None is in the stability or dg lanes,
+  which are tracked.
+
+  The claim this track rests on is that the correlation is causal: untracked
+  work accretes duplicates because nothing is watching the shape. The
+  deletions below are the repair; the track itself is the fix.
+
+  What this is NOT: a rewrite of the numerical mathematics. Every epic here
+  either deletes a copy in favour of an existing definition or replaces an
+  enumeration with a parameter. No new mathematical content is claimed, and the
+  Riemann--Roch and intersection-theory statements are untouched except where
+  they name a type that moves.
+goal:
+  hmw: "How might we make the numerical lane carry the same abstraction tower the stability and dg lanes already do — one Grothendieck group, invariants as bundled homs, dimension as an index — without restating a single theorem of its mathematics?"
+  objective: "Collapse every hand-rolled Grothendieck-group construction and axiom-triple carrier in AlgebraicGeometry onto GrothendieckPresentation and K₀Ab, and replace the three dimension-indexed directories with one parameterised statement, lowering the AlgebraicGeometry unaudited ceiling in the process."
+  key_results:
+    - "Exactly one Grothendieck group construction exists in the repository; grep for a second returns nothing. `CoherentGrothendieckGroup` and its bespoke universal property are gone, replaced by `K₀Ab (Coh X)`."
+    - "No structure in AlgebraicGeometry carries a function together with `_iso` and `_shortExact` (or `_zero`) fields. Every additive invariant is an `AddMonoidHom` out of `K₀Ab`, and the isomorphism and additivity laws are theorems obtained from it rather than hypotheses supplied to it."
+    - "`ReconstructionSystem` exists once. The Surface case is obtained from the higher-dimensional one at n = 2 rather than by a second copy of eleven declarations."
+    - "`RealMukai` and `RealExtension` are one type with one bundled pairing; the cross-reference that names one in the other's docstring is replaced by an import."
+    - "Dimension is a parameter. `SurfaceNum`, `ThreefoldNum` and `FourfoldNum` are replaced by a single indexed type, and the hard-coded dimension names in CI move with it."
+    - "The AlgebraicGeometry ceiling in `scripts/check_audit_complete.py` is strictly lower at the end of this track than the 1059 it starts at, and every drop is recorded in the PR that causes it."
+  assumptions:
+    - tier: must
+      text: "`Coh X` is abelian for every `Variety k`, so `K₀Ab (Coh X)` is defined and is the same object `CoherentGrothendieckGroup` hand-rolls."
+      validation: "CONFIRMED 2026-08-26 against the tree: the `Abelian (Coh X)` instance is in `CoherentSheaf/Abelian/Basic.lean` and applies to every `Variety k`."
+    - tier: must
+      text: "The `iso` generator in `CoherentGrothendieckRelation` is redundant, so dropping it loses nothing."
+      validation: "CONFIRMED: `K₀Ab.of_iso` is a theorem in `CategoryTheory/GrothendieckGroup/Abelian.lean`, derived from the short exact sequence `X ≅ Y ⟶ 0`. The hand-rolled relation carries it as a constructor instead."
+    - tier: must
+      text: "The positivity fields of an invariant — `rank_nonneg`, `degree_pos_of_rank_zero` and their analogues — do NOT descend to K₀ and must survive as fields."
+      validation: "CONFIRMED by inspection: they are statements about objects, and a difference of classes can have negative rank. They are rephrased through the hom, never deleted. This is the single most likely way to get these epics wrong."
+    - tier: should
+      text: "The fourfold numerical formulas admit the same uniform shape as the surface and threefold ones, so one indexed type covers all three."
+      validation: "UNVALIDATED. If the fourfold case resists, NK2-e5 ships the surface/threefold unification and parks the fourfold with the obstruction written down. That is a permitted outcome, not a failure."
+  wont:
+    - "No new numerical mathematics. Every epic deletes a copy or parameterises an enumeration; none proves a new theorem about a variety."
+    - "No merge of the Mukai lattice theory above the real quadratic extension. Mukai lattice structure is special to K3 and abelian surfaces and does not generalise to arbitrary dimension; only `ℝ × V × ℝ` with its pairing unifies."
+    - "No isomorphism `K₀Ab 𝒜 ≅ K₀ C`. That needs a bounded t-structure and is not available at the pin. The comparison stays the one-way `K₀Ab.toAmbient` that #760 shipped."
+    - "No `sorry`, including as a refactoring convenience while a copy is being removed."
+    - "No stability-lane or dg-lane work. `ClassDatum`, `heartDatum` and the enhancement tower belong to stability-families and dg-enhancements respectively."
+  evidence:
+    - "The 2026-08-26 architecture audit: four adversarial critics over the tree at 3079d8a, each required to run a mathematical soundness gate and drop unifications that would force a `sorry`. Findings 02, 03, 05, 06 and 08 are this track's epics."
+    - "AlgebraicGeometry/Cohomology/EulerCharacteristic/Additivity.lean:360-378 — `CoherentGrothendieckGroup` rebuilds `FreeAbelianGroup ⧸ AddSubgroup.closure {relations}`, its own class map and its own lift, and imports nothing from `GrothendieckGroup/`."
+    - "AlgebraicGeometry/RiemannRoch/Grothendieck.lean:31 and AlgebraicGeometry/Variety/Numerical.lean:63 — the two axiom triples that survived #760, which claimed in `GrothendieckGroup/Abelian.lean` that those fields had stopped being data. #766 collapsed `SlopeData`; these two were not in it."
+    - "AlgebraicGeometry/RiemannRoch/Surface/NumericalVariety.lean:102-206 vs AlgebraicGeometry/RiemannRoch/HigherDimension/Hirzebruch.lean:124-222 — eleven declarations, ~80 code lines, differing only in line wrapping and two docstring phrasings. Diffed with comments stripped."
+    - "LinearAlgebra/Lattice/Mukai/RealForm.lean:76 — names `Walls/Spherical/Basic.lean`'s `RealMukai` in prose as 'the same underlying type carrying a bare pairing', rather than importing it. The fork was seen and kept."
+    - "AlgebraicGeometry/Numerical/Examples/{Surface/RankOne.lean:192, Threefold/LinearSection.lean:61, Fourfold/LinearSection.lean:50} — `ℤ×ℤ×ℤ`, `ℤ×ℤ×ℤ×ℤ`, `ℤ×ℤ×ℤ×ℤ×ℤ`. Dimension is the arity and the arity is typed out."
+    - ".claude/roadmap/{contract-v1,dg-enhancements,stability-families,theorem22-2-dependencies}.yaml — searched 2026-08-27 for K-theory, Grothendieck, Riemann--Roch and numerical ownership. Four incidental mentions, zero epics. This lane was unowned."
+generated_by: { agent: claude-opus-5, at: "2026-08-27" }
+generations:
+  - { rev: 1, at: "2026-08-27" }
+items:
+  - id: numerical-k-theory-m1
+    gh_milestone: null
+    kind: milestone
+    title: "NK1 — Absorb: one Grothendieck group, and invariants as homs"
+    status: planned
+    lane: now
+    acceptance:
+      - "`CoherentGrothendieckGroup`, `coherentGrothendieckRelations`, `CoherentGrothendieckRelation` and `coherentGrothendieckClass` no longer exist; every consumer names `K₀Ab (Coh X)`."
+      - "`CoherentAdditiveInvariant` and the `classOf` triple in `NumericalVarietyData` each carry one `AddMonoidHom` field where they carried a function and two laws."
+      - "Every positivity field that does not descend to K₀ is preserved and rephrased through the hom, and each such field is named in its PR description."
+      - "`ReconstructionSystem` is declared once; the Surface lane obtains it by instantiation."
+      - "The AlgebraicGeometry ceiling is lower than 1059 and the new figure is recorded, per CONTRIBUTING."
+      - "Zero sorries; all gates green, including `check_roadmap.py --require-api`."
+  - id: numerical-k-theory-e1
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: numerical-k-theory-m1
+    title: "NumericalData's class map becomes a hom out of K₀Ab"
+    status: planned
+    summary: "`NumericalData` (`Variety/Numerical.lean:63`) carried `classOf`, `classOf_iso`, `classOf_shortExact`. The two laws say the function factors through the Grothendieck group, so they were never data: three fields become `classOfHom : K₀Ab (Coh X) →+ N`, with `classOf` surviving as an object-level abbreviation and both laws as theorems of unchanged name and shape. This is the second of the three axiom triples #760 announced; #766 collapsed `SlopeData`. Scoped to `NumericalData` alone because it targets an abstract `N` and is therefore separable — see e2 for why `CoherentAdditiveInvariant` is not."
+    priority: must
+    size: M
+    tags: [lean, k-theory, refactor]
+    labels: [area:geometry, type:feature, type:finding]
+  - id: numerical-k-theory-e2
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: numerical-k-theory-m1
+    title: "Delete CoherentGrothendieckGroup, and with it CoherentAdditiveInvariant"
+    status: planned
+    summary: "A second, complete Grothendieck group: `Additivity.lean:360-378` rebuilds the quotient, the class map and the universal property, with the property re-proved at `RiemannRoch/Grothendieck.lean` and the defining relation re-derived by hand at `Surface/Devissage.lean`. ~176 lines and 6 restated proofs. The `iso` relation generator is redundant because `K₀Ab.of_iso` is a theorem. **`CoherentAdditiveInvariant` is part of this epic, not e1.** Its only purpose is `grothendieckHom : CoherentGrothendieckGroup X →+ M`, so collapsing it onto `K₀Ab` IS deleting `CoherentGrothendieckGroup`; separating them would mean building a bridge between two Grothendieck groups in order to delete one. Discovered on contact with the code while implementing e1, and recorded here rather than left as a split that was abandoned."
+    priority: must
+    size: L
+    tags: [lean, k-theory, deletion]
+    labels: [area:geometry, type:feature, type:finding]
+    blocked_by: [numerical-k-theory-e1]
+  - id: numerical-k-theory-e3
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: numerical-k-theory-m1
+    title: "One ReconstructionSystem, obtained at n = 2 for surfaces"
+    status: planned
+    summary: "Eleven declarations exist verbatim in `Surface/NumericalVariety.lean:102-206` and `HigherDimension/Hirzebruch.lean:124-222`; diffed with comments stripped, the only differences across ~80 code lines are line wrapping and two docstring phrasings. Both consume `CoherentGrothendieckGroup`, so the second K-group has already propagated into two copies of an API. Surface is the special case of higher-dimension. Blocked on e2 so the merge happens once, against the surviving carrier."
+    priority: must
+    size: M
+    tags: [lean, deduplication]
+    labels: [area:geometry, type:chore, type:finding]
+    blocked_by: [numerical-k-theory-e2]
+  - id: numerical-k-theory-m2
+    gh_milestone: null
+    kind: milestone
+    title: "NK2 — Unify: parameters, not enumerations"
+    status: planned
+    lane: next
+    acceptance:
+      - "One real quadratic extension type with one bundled pairing; the prose cross-reference in `RealForm.lean:76` is replaced by an import."
+      - "The Mukai lattice theory above the real extension is untouched, and the module docstring says why it does not generalise."
+      - "Dimension is an index. Either all three of surface, threefold and fourfold are covered by one type, or the fourfold case is parked with its obstruction stated — both are acceptable exits."
+      - "The hard-coded dimension names in CI move with the types, in the same change."
+      - "Zero sorries; all gates green."
+  - id: numerical-k-theory-e4
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: numerical-k-theory-m2
+    title: "One RealExtension, bundled"
+    status: planned
+    summary: "`RealMukai V := ℝ × V × ℝ` (`Walls/Spherical/Basic.lean:109`) and `RealExtension V := ℝ × V × ℝ` (`LinearAlgebra/Lattice/Mukai/RealForm.lean:79`) are the same type with the same pairing `q c c' - r·s' - r'·s`, in two different top-level subjects. One is a bare `def`, the other a bundled `BilinForm` plus `QuadraticForm`. `RealForm.lean:76` names the other in a docstring rather than importing it: the shared abstraction was seen, described in prose, and not written. Unify at the bundled form. The Mukai lattice structure above it does NOT generalise and is out of scope."
+    priority: should
+    size: M
+    tags: [lean, deduplication, lattice]
+    labels: [area:geometry, area:stability, type:chore, type:finding]
+  - id: numerical-k-theory-e5
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: numerical-k-theory-m2
+    title: "Dimension as an index, not as tuple arity"
+    status: planned
+    summary: "`SurfaceNum : ℤ×ℤ×ℤ`, `ThreefoldNum : ℤ×ℤ×ℤ×ℤ`, `FourfoldNum : ℤ×ℤ×ℤ×ℤ×ℤ`, in three parallel directories with 1-to-1 declaration correspondence and `chi_eq` expanded six times. The parameter is `n` and the type is `Fin (n+1) → ℤ`. This is the only epic in the track that can fail on mathematics rather than plumbing; the fourfold formulas are the risk, and parking them with the obstruction recorded is a permitted outcome. Twelve hard-coded dimension names in CI move with this change."
+    priority: should
+    size: L
+    tags: [lean, polymorphism, falsifiable]
+    labels: [area:geometry, type:feature, type:finding]

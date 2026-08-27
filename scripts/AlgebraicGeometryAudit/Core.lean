@@ -739,6 +739,17 @@ is not closed. -/
 #print axioms Variety.NumericalData.toNumericalVariety_satisfiesHRR
 #print axioms Variety.NumericalData.toNumericalVariety_chComp_four
 #print axioms Variety.NumericalData.toNumericalVariety_toddComp_four
+
+-- `classOf` was a function plus `classOf_iso` and `classOf_shortExact`; those two laws
+-- said the function factors through `K₀Ab`, so they were never data. One hom, and the
+-- laws as theorems under their original names.
+#print axioms Variety.NumericalData.classOfHom
+#print axioms Variety.NumericalData.classOf_apply
+#print axioms Variety.NumericalData.classOfHom_of_iso
+#print axioms Variety.NumericalData.classOfHom_of_shortExact
+#print axioms Variety.NumericalData.classOf_iso
+#print axioms Variety.NumericalData.classOf_shortExact
+
 #print axioms Variety.NumericalData.chernCharacter_classOf
 #print axioms Variety.NumericalData.chi_classOf
 #print axioms Variety.NumericalData.coherentChernCharacter_shortExact

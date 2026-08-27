@@ -43,11 +43,15 @@ The normal build is:
 lake build
 ```
 
-The CI-equivalent local command is:
+The full local gate is:
 
 ```bash
 scripts/gates.sh
 ```
+
+It is not CI-equivalent, and the difference has bitten: every gate in it runs in
+CI, but CI also runs the `mfc` contract tooling, which the script does not
+reproduce. Treat a green run as necessary, not sufficient. See `CONTRIBUTING.md`.
 
 Useful focused commands are:
 
