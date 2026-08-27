@@ -241,32 +241,18 @@ theorem discriminantDegree_eq_c2
 
 /-! ## Grothendieck-group compatibility -/
 
-/-- A short exact sequence gives the expected relation in the explicit coherent Grothendieck
-group from issue #32. -/
-theorem coherentGrothendieckClass_shortExact
-    {S : ShortComplex (Coh X.toVariety.toScheme)} (hS : S.ShortExact) :
-    coherentGrothendieckClass S.X₂ =
-      coherentGrothendieckClass S.X₁ + coherentGrothendieckClass S.X₃ := by
-  change QuotientAddGroup.mk' (coherentGrothendieckRelations X.toVariety)
-      (FreeAbelianGroup.of S.X₂) =
-    QuotientAddGroup.mk' (coherentGrothendieckRelations X.toVariety)
-      (FreeAbelianGroup.of S.X₁) +
-      QuotientAddGroup.mk' (coherentGrothendieckRelations X.toVariety)
-        (FreeAbelianGroup.of S.X₃)
-  rw [← sub_eq_zero]
-  rw [← map_add, ← map_sub]
-  apply (QuotientAddGroup.eq_zero_iff _).mpr
-  have hrel : FreeAbelianGroup.of S.X₂ - FreeAbelianGroup.of S.X₁ -
-      FreeAbelianGroup.of S.X₃ ∈ coherentGrothendieckRelations X.toVariety :=
-    AddSubgroup.subset_closure (CoherentGrothendieckRelation.shortExact S hS)
-  simpa only [sub_add_eq_sub_sub] using hrel
+/- `coherentGrothendieckClass_shortExact` stood here: fourteen lines deriving the
+defining relation of the coherent Grothendieck group by hand, through
+`QuotientAddGroup.mk'`, `AddSubgroup.subset_closure` and the `shortExact`
+constructor. It is `K₀Ab.of_shortExact`, proved once. Nothing referenced it but
+its own audit record. -/
 
 /-- The perfect surface formula computes exactly the value of the Grothendieck Euler
 homomorphism on the coherent-sheaf class. -/
 theorem grothendieckEulerHom_class_eq_perfect_formula
     {F : Coh X.toVariety.toScheme}
     (T : ToddData.Data P K) (Q : Coh.TwoTermPerfectDeterminantData F) :
-    (D.grothendieckEulerHom C (coherentGrothendieckClass F) : ℚ) =
+    (D.grothendieckEulerHom C (K₀Ab.of F) : ℚ) =
       (virtualRank Q : ℚ) * (P.intersection.eulerPic 1 : ℚ) +
         ((P.intersection.surfaceIntersectionPairing (picardFirstChernClass Q)
               (picardFirstChernClass Q) : ℤ) -

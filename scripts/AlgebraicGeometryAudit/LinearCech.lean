@@ -157,5 +157,13 @@ open AlgebraicGeometry
 #print axioms AlgebraicGeometry.Proj.polynomialIntShift_isCoherent
 #print axioms AlgebraicGeometry.Proj.projectiveSpaceTwist
 #print axioms AlgebraicGeometry.Proj.projectiveSpaceTwist_obj
+#print axioms AlgebraicGeometry.Proj.isLocallyNoetherian_projectiveSpace
+#print axioms AlgebraicGeometry.Proj.isLocallyNoetherian_projectiveSpaceVariety
+#print axioms AlgebraicGeometry.Proj.homogeneousZeroRingEquiv_toRingHom_eq_algebraMap
+#print axioms AlgebraicGeometry.Proj.projectiveSpaceToSpec_eq
+#print axioms AlgebraicGeometry.Proj.projectiveSpaceSelfEmbedding
+#print axioms AlgebraicGeometry.Proj.projectiveSpaceSelfEmbedding_isClosedImmersion
+#print axioms AlgebraicGeometry.Proj.projectiveSpaceSelfPresentation
+#print axioms AlgebraicGeometry.Proj.isProjective_projectiveSpaceVariety
 #print axioms TopologicalSpace.isPreirreducible_univ_of_cover
 #print axioms TopologicalSpace.irreducibleSpace_of_cover

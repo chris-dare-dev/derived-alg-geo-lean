@@ -3,11 +3,11 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Numerical
+import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch.Reconstruction
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Additivity
 import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.ChernCharacter.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Lattice
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface
-import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch.Grothendieck
 
 /-!
 # A geometric numerical variety for surfaces
@@ -48,43 +48,6 @@ variable {X : Variety k}
 
 noncomputable section
 
-/-! ## Additive invariants and the coherent Grothendieck group -/
-
-/- The dimension-independent implementation lives in `RiemannRoch/Grothendieck`.  These
-aliases preserve the original surface API while new dimensions use the common owner. -/
-abbrev CoherentAdditiveInvariant (X : Variety k) (M : Type v) [AddCommGroup M] :=
-  AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant X M
-
-namespace CoherentAdditiveInvariant
-
-variable {M : Type v} [AddCommGroup M]
-
-noncomputable abbrev freeHom (I : CoherentAdditiveInvariant X M) :
-    FreeAbelianGroup (Coh X.toScheme) →+ M :=
-  AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.freeHom I
-
-abbrev coherentGrothendieckRelations_le_ker (I : CoherentAdditiveInvariant X M) :
-    coherentGrothendieckRelations X ≤ I.freeHom.ker :=
-  AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.coherentGrothendieckRelations_le_ker I
-
-noncomputable abbrev grothendieckHom (I : CoherentAdditiveInvariant X M) :
-    CoherentGrothendieckGroup X →+ M :=
-  AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.grothendieckHom I
-
-abbrev grothendieckHom_class (I : CoherentAdditiveInvariant X M)
-    (F : Coh X.toScheme) :
-    I.grothendieckHom (coherentGrothendieckClass F) = I.obj F :=
-  AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.grothendieckHom_class I F
-
-end CoherentAdditiveInvariant
-
-abbrev coherentGrothendieckGroup_hom_ext {M : Type v} [AddCommGroup M]
-    {f g : CoherentGrothendieckGroup X →+ M}
-    (h : ∀ F : Coh X.toScheme,
-      f (coherentGrothendieckClass F) = g (coherentGrothendieckClass F)) :
-    f = g :=
-  AlgebraicGeometry.RiemannRoch.coherentGrothendieckGroup_hom_ext h
-
 /-! ## Reconstructed Chern characters on `K₀` -/
 
 variable {D : FiniteCohomology X}
@@ -94,116 +57,9 @@ variable {P : PairingContext D C 2 A}
 variable {O : Coh X.toScheme}
 variable (RO : P.ReconstructionData O)
 
-/-- A compatible choice of reconstruction data for every coherent sheaf.
+/- The surface `ReconstructionSystem` was the general one at `d = 2`, restated.
+It now comes from `RiemannRoch/Reconstruction.lean`. -/
 
-The comparison fields are the exact hypotheses needed by the reconstruction theorems.  They
-are separated from `GeometricData` because they already suffice to descend rank and Chern
-character to the coherent Grothendieck group. -/
-structure ReconstructionSystem where
-  /-- Reconstruction data for every coherent sheaf. -/
-  reconstruction : ∀ F : Coh X.toScheme, P.ReconstructionData F
-  /-- Rank is invariant under coherent-sheaf isomorphism. -/
-  rank_iso : ∀ {F G : Coh X.toScheme} (_e : F ≅ G),
-    (reconstruction F).rank = (reconstruction G).rank
-  /-- Twist Euler functions are invariant under coherent-sheaf isomorphism. -/
-  eulerPic_iso : ∀ {F G : Coh X.toScheme} (_e : F ≅ G),
-    (reconstruction F).twists.eulerPic = (reconstruction G).twists.eulerPic
-  /-- Rank is additive in a short exact sequence. -/
-  rank_shortExact : ∀ (S : ShortComplex (Coh X.toScheme)) (_hS : S.ShortExact),
-    (reconstruction S.X₂).rank =
-      (reconstruction S.X₁).rank + (reconstruction S.X₃).rank
-  /-- Twist Euler functions are additive in a short exact sequence. -/
-  eulerPic_shortExact : ∀ (S : ShortComplex (Coh X.toScheme)) (_hS : S.ShortExact),
-    (reconstruction S.X₂).twists.eulerPic =
-      (reconstruction S.X₁).twists.eulerPic +
-        (reconstruction S.X₃).twists.eulerPic
-
-namespace ReconstructionSystem
-
-/-- Rank as an additive invariant of coherent sheaves. -/
-def rankInvariant (R : ReconstructionSystem (P := P)) : CoherentAdditiveInvariant X ℤ where
-  obj F := (R.reconstruction F).rank
-  map_iso e := R.rank_iso e
-  map_shortExact S hS := R.rank_shortExact S hS
-
-/-- The reconstructed `i`-th Chern-character component, valued in its certified graded piece,
-as an additive invariant of coherent sheaves. -/
-noncomputable def chernCharacterInvariant (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (i : ℕ) :
-    CoherentAdditiveInvariant X (P.ring.piece i) where
-  obj F := ⟨chernCharacterComponent RO (R.reconstruction F) i,
-    chernCharacterComponent_mem RO (R.reconstruction F) i⟩
-  map_iso := by
-    intro F G e
-    apply Subtype.ext
-    exact chernCharacterComponent_iso RO (R.reconstruction F) (R.reconstruction G) e
-      (R.rank_iso e) (R.eulerPic_iso e) i
-  map_shortExact := by
-    intro S hS
-    apply Subtype.ext
-    exact chernCharacterComponent_add RO (R.reconstruction S.X₁)
-      (R.reconstruction S.X₃) (R.reconstruction S.X₂)
-      (R.rank_shortExact S hS) (R.eulerPic_shortExact S hS) i
-
-/-- Rank on `K₀(Coh X)`. -/
-noncomputable def rankHom (R : ReconstructionSystem (P := P)) :
-    CoherentGrothendieckGroup X →+ ℤ :=
-  R.rankInvariant.grothendieckHom
-
-/-- The reconstructed `i`-th Chern-character component on `K₀(Coh X)`. -/
-noncomputable def chernCharacterHom (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (i : ℕ) :
-    CoherentGrothendieckGroup X →+ A :=
-  (P.ring.piece i).subtype.toAddMonoidHom.comp
-    (R.chernCharacterInvariant RO i).grothendieckHom
-
-@[simp]
-theorem rankHom_class (R : ReconstructionSystem (P := P)) (F : Coh X.toScheme) :
-    R.rankHom (coherentGrothendieckClass F) = (R.reconstruction F).rank := by
-  simp [rankHom, rankInvariant]
-
-@[simp]
-theorem chernCharacterHom_class (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O)
-    (F : Coh X.toScheme) (i : ℕ) :
-    R.chernCharacterHom RO i (coherentGrothendieckClass F) =
-      chernCharacterComponent RO (R.reconstruction F) i := by
-  simp [chernCharacterHom, chernCharacterInvariant]
-
-/-- Every descended Chern-character component remains in the correct graded piece. -/
-theorem chernCharacterHom_mem (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O)
-    (E : CoherentGrothendieckGroup X) (i : ℕ) :
-    R.chernCharacterHom RO i E ∈ P.ring.piece i :=
-  ((R.chernCharacterInvariant RO i).grothendieckHom E).property
-
-/-- The rational algebra map restricted to integral ranks. -/
-noncomputable def intAlgebraMap : ℤ →+ A where
-  toFun r := algebraMap ℚ A (r : ℚ)
-  map_zero' := by simp
-  map_add' r s := by simp
-
-/-- The reconstructed zeroth Chern character is the algebra image of numerical rank on every
-Grothendieck class, not only on sheaf generators. -/
-theorem chernCharacterHom_zero (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O)
-    (E : CoherentGrothendieckGroup X) :
-    R.chernCharacterHom RO 0 E = algebraMap ℚ A (R.rankHom E : ℚ) := by
-  have hhom : R.chernCharacterHom RO 0 =
-      (intAlgebraMap (A := A)).comp R.rankHom := by
-    apply coherentGrothendieckGroup_hom_ext
-    intro F
-    simp [intAlgebraMap]
-  exact DFunLike.congr_fun hhom E
-
-theorem chernCharacterHom_add (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O)
-    (E F : CoherentGrothendieckGroup X) (i : ℕ) :
-    R.chernCharacterHom RO i (E + F) =
-      R.chernCharacterHom RO i E + R.chernCharacterHom RO i F :=
-  map_add _ _ _
-
-end ReconstructionSystem
 
 /-! ## Surface assembly and Hirzebruch--Riemann--Roch -/
 
@@ -239,7 +95,7 @@ variable {R : ReconstructionSystem (P := P)}
 
 /-- The total reconstructed Chern character as an additive homomorphism on `K₀`. -/
 noncomputable def totalChernCharacterHom (_G : GeometricData RO R) :
-    CoherentGrothendieckGroup X →+ A :=
+    K₀Ab (Coh X.toScheme) →+ A :=
   ∑ i ∈ Finset.range 3, R.chernCharacterHom RO i
 
 /-- The total geometric Todd class of the surface. -/
@@ -248,7 +104,7 @@ noncomputable def totalTodd (G : GeometricData RO R) : A :=
 
 /-- The right side of HRR, as an additive homomorphism on `K₀`. -/
 noncomputable def riemannRochHom (G : GeometricData RO R) :
-    CoherentGrothendieckGroup X →+ ℚ where
+    K₀Ab (Coh X.toScheme) →+ ℚ where
   toFun E := P.ring.degree
     (totalChernCharacterHom (RO := RO) G E * totalTodd (RO := RO) G)
   map_zero' := by simp [totalChernCharacterHom]
@@ -257,7 +113,7 @@ noncomputable def riemannRochHom (G : GeometricData RO R) :
 
 /-- Cast the cohomological Euler homomorphism from `ℤ` to `ℚ`. -/
 noncomputable def rationalEulerHom (_G : GeometricData RO R) :
-    CoherentGrothendieckGroup X →+ ℚ where
+    K₀Ab (Coh X.toScheme) →+ ℚ where
   toFun E := (D.grothendieckEulerHom C E : ℚ)
   map_zero' := by simp
   map_add' E F := by simp
@@ -265,7 +121,7 @@ noncomputable def rationalEulerHom (_G : GeometricData RO R) :
 @[simp]
 theorem totalChernCharacterHom_class (G : GeometricData RO R)
     (F : Coh X.toScheme) :
-    totalChernCharacterHom (RO := RO) G (coherentGrothendieckClass F) =
+    totalChernCharacterHom (RO := RO) G (K₀Ab.of F) =
       ∑ i ∈ Finset.range 3,
         chernCharacterComponent RO (R.reconstruction F) i := by
   simp [totalChernCharacterHom]
@@ -273,7 +129,7 @@ theorem totalChernCharacterHom_class (G : GeometricData RO R)
 @[simp]
 theorem riemannRochHom_class (G : GeometricData RO R)
     (F : Coh X.toScheme) :
-    riemannRochHom (RO := RO) G (coherentGrothendieckClass F) =
+    riemannRochHom (RO := RO) G (K₀Ab.of F) =
       P.ring.degree
         ((∑ i ∈ Finset.range 3,
             chernCharacterComponent RO (R.reconstruction F) i) *
@@ -283,19 +139,19 @@ theorem riemannRochHom_class (G : GeometricData RO R)
 @[simp]
 theorem rationalEulerHom_class (G : GeometricData RO R)
     (F : Coh X.toScheme) :
-    rationalEulerHom (RO := RO) G (coherentGrothendieckClass F) =
+    rationalEulerHom (RO := RO) G (K₀Ab.of F) =
       (D.eulerCharacteristic F : ℚ) := by
   simp [rationalEulerHom]
 
 /-- Geometric HRR descends from coherent sheaves to every virtual Grothendieck class. -/
 theorem hirzebruch_riemannRoch (G : GeometricData RO R)
     (hG : G.SatisfiesSheafHRR)
-    (E : CoherentGrothendieckGroup X) :
+    (E : K₀Ab (Coh X.toScheme)) :
     (D.grothendieckEulerHom C E : ℚ) = P.ring.degree
       ((∑ i ∈ Finset.range 3, R.chernCharacterHom RO i E) *
         (∑ j ∈ Finset.range 3, G.toddComponent j)) := by
   have hhom : rationalEulerHom (RO := RO) G = riemannRochHom (RO := RO) G := by
-    apply coherentGrothendieckGroup_hom_ext
+    apply K₀Ab.hom_ext
     intro F
     rw [rationalEulerHom_class (RO := RO) G,
       riemannRochHom_class (RO := RO) G]
@@ -307,7 +163,7 @@ theorem hirzebruch_riemannRoch (G : GeometricData RO R)
 `toNumericalVariety_satisfiesHRR`, proved by Grothendieck descent. -/
 @[reducible]
 noncomputable def toNumericalVariety (G : GeometricData RO R) :
-    NumericalVarietyData 2 A (CoherentGrothendieckGroup X) where
+    NumericalVarietyData 2 A (K₀Ab (Coh X.toScheme)) where
   ring := P.ring
   rank := R.rankHom
   chComp E i := R.chernCharacterHom RO i E
@@ -326,16 +182,16 @@ theorem toNumericalVariety_satisfiesHRR (G : GeometricData RO R)
 
 theorem toNumericalVariety_rank_class (G : GeometricData RO R)
     (F : Coh X.toScheme) :
-    G.toNumericalVariety.rank (coherentGrothendieckClass F) =
+    G.toNumericalVariety.rank (K₀Ab.of F) =
       (R.reconstruction F).rank := by
-  change R.rankHom (coherentGrothendieckClass F) = (R.reconstruction F).rank
+  change R.rankHom (K₀Ab.of F) = (R.reconstruction F).rank
   exact R.rankHom_class F
 
 theorem toNumericalVariety_chComp_class (G : GeometricData RO R)
     (F : Coh X.toScheme) (i : ℕ) :
-    G.toNumericalVariety.chComp (coherentGrothendieckClass F) i =
+    G.toNumericalVariety.chComp (K₀Ab.of F) i =
       chernCharacterComponent RO (R.reconstruction F) i := by
-  change R.chernCharacterHom RO i (coherentGrothendieckClass F) =
+  change R.chernCharacterHom RO i (K₀Ab.of F) =
     chernCharacterComponent RO (R.reconstruction F) i
   exact R.chernCharacterHom_class RO F i
 
@@ -346,9 +202,9 @@ theorem toNumericalVariety_toddComp (G : GeometricData RO R) (i : ℕ) :
 
 theorem toNumericalVariety_chi_class (G : GeometricData RO R)
     (F : Coh X.toScheme) :
-    G.toNumericalVariety.chi (coherentGrothendieckClass F) =
+    G.toNumericalVariety.chi (K₀Ab.of F) =
       D.eulerCharacteristic F := by
-  change D.grothendieckEulerHom C (coherentGrothendieckClass F) =
+  change D.grothendieckEulerHom C (K₀Ab.of F) =
     D.eulerCharacteristic F
   exact D.grothendieckEulerHom_class C F
 
@@ -366,7 +222,7 @@ theorem surface_chi_class_eq (G : GeometricData RO R)
         P.ring.degree
           (chernCharacterComponent RO (R.reconstruction F) 2) := by
   have h := AlgebraicGeometry.Numerical.Surface.chi_eq G.toNumericalVariety
-    (toNumericalVariety_satisfiesHRR (RO := RO) G hG) (coherentGrothendieckClass F)
+    (toNumericalVariety_satisfiesHRR (RO := RO) G hG) (K₀Ab.of F)
   rw [toNumericalVariety_chi_class (RO := RO) G F,
     toNumericalVariety_rank_class (RO := RO) G F,
     toNumericalVariety_toddComp (RO := RO) G 2,
@@ -398,7 +254,7 @@ theorem k3_eulerCharacteristic_eq (G : GeometricData RO R)
           (chernCharacterComponent RO (R.reconstruction F) 2) := by
   have h := K3.chi_eq G.toNumericalVariety
     (toNumericalVariety_satisfiesHRR (RO := RO) G hG)
-    (toIsK3 (RO := RO) G htoddOne htoddTwo) (coherentGrothendieckClass F)
+    (toIsK3 (RO := RO) G htoddOne htoddTwo) (K₀Ab.of F)
   rw [toNumericalVariety_chi_class (RO := RO) G F,
     toNumericalVariety_rank_class (RO := RO) G F,
     toNumericalVariety_chComp_class (RO := RO) G F 2] at h
@@ -408,7 +264,7 @@ theorem k3_eulerCharacteristic_eq (G : GeometricData RO R)
 Euler-radical quotient fixed by Layer A. -/
 noncomputable def numericalClass (G : GeometricData RO R) (F : Coh X.toScheme) :
     NumericalVarietyData.NumericalQuotient G.toNumericalVariety :=
-  Submodule.Quotient.mk (coherentGrothendieckClass F)
+  Submodule.Quotient.mk (K₀Ab.of F)
 
 end GeometricData
 
