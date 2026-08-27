@@ -73,7 +73,13 @@ noncomputable def weakStabilityFunctionOnHeart
     (σ : WeakPreStabilityCondition v) :
     WeakStabilityFunction σ.slicing.toTStructure where
   Z := σ.Z.comp v
-  upper E hE hne := by
+  nonzero_mem E hrel := by
+    obtain ⟨hE, hne⟩ := hrel
+    -- `heartDatum`'s positivity is membership of `closedUpperHalfPlane`, which
+    -- is this disjunction by definitional unfolding of the set union. Naming
+    -- it keeps the argument below in the shape it was written in.
+    show 0 < ((σ.Z.comp v) (K₀.of C E)).im ∨
+      (((σ.Z.comp v) (K₀.of C E)).im = 0 ∧ ((σ.Z.comp v) (K₀.of C E)).re ≤ 0)
     classical
     have hEheart := (σ.slicing.toTStructure_heart_iff C E).mp hE
     obtain ⟨F, hn, hfirst, hlast⟩ := σ.slicing.exists_hn_nonzero_boundaries C hne
