@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Basic
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
+import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Core.CharacteristicClasses
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Core.Definitions
@@ -59,13 +60,13 @@ structure NumericalData (X : Variety k) (n : ℕ) (A : Type u) (N : Type v)
   ring : NumericalRingData n A
   /-- The component formulas currently supplied cover every codimension of `X`. -/
   dimension_le_four : n ≤ 4
-  /-- The numerical class of a coherent sheaf. -/
-  classOf : Coh X.toScheme → N
-  /-- Isomorphic coherent sheaves have the same numerical class. -/
-  classOf_iso : ∀ {F G : Coh X.toScheme}, (F ≅ G) → classOf F = classOf G
-  /-- Numerical classes are additive in short exact sequences. -/
-  classOf_shortExact : ∀ (S : ShortComplex (Coh X.toScheme)), S.ShortExact →
-    classOf S.X₂ = classOf S.X₁ + classOf S.X₃
+  /-- The numerical class, as a hom out of the Grothendieck group of `Coh X`.
+
+  This was a function together with `classOf_iso` and `classOf_shortExact`. Those
+  two laws say exactly that the function factors through `K₀Ab`, so they are not
+  data: they are `K₀Ab.of_iso` and `K₀Ab.of_shortExact` composed with this hom,
+  and they survive as theorems of the same names and argument shapes below. -/
+  classOfHom : K₀Ab (Coh X.toScheme) →+ N
   /-- Rank on the numerical Grothendieck group. -/
   rank : N →+ ℤ
   /-- Chern classes of a numerical class. -/
@@ -76,7 +77,7 @@ structure NumericalData (X : Variety k) (n : ℕ) (A : Type u) (N : Type v)
   coherentChernClasses : Coh X.toScheme → ChernClassData A
   /-- Geometric Chern classes descend through the numerical class map. -/
   coherentChernClasses_classOf : ∀ F : Coh X.toScheme,
-    chernClasses (classOf F) = coherentChernClasses F
+    chernClasses (classOfHom (K₀Ab.of F)) = coherentChernClasses F
   /-- The universally computed Chern-character components have the expected grading. -/
   chernCharacter_mem : ∀ (E : N) (i : ℕ),
     ChernClassData.chernCharacterComponent (chernClasses E) i ∈ ring.piece i
@@ -97,7 +98,7 @@ structure NumericalData (X : Variety k) (n : ℕ) (A : Type u) (N : Type v)
   finiteCohomology : Cohomology.FiniteCohomology X
   /-- The cohomological Euler characteristic descends through the numerical class map. -/
   coherentEulerCharacteristic_classOf : ∀ F : Coh X.toScheme,
-    chi (classOf F) = finiteCohomology.eulerCharacteristic F
+    chi (classOfHom (K₀Ab.of F)) = finiteCohomology.eulerCharacteristic F
 
 namespace NumericalData
 
@@ -198,6 +199,39 @@ theorem toNumericalVariety_toddComp_four (D : NumericalData X n A N) :
 @[simp] theorem toNumericalVariety_chi (D : NumericalData X n A N) :
     D.toNumericalVariety.chi = D.chi := rfl
 
+/-- The numerical class of a coherent sheaf. -/
+noncomputable abbrev classOf (D : NumericalData X n A N) (F : Coh X.toScheme) : N :=
+  D.classOfHom (K₀Ab.of F)
+
+@[simp]
+theorem classOf_apply (D : NumericalData X n A N) (F : Coh X.toScheme) :
+    D.classOf F = D.classOfHom (K₀Ab.of F) := rfl
+
+theorem classOfHom_of_iso (D : NumericalData X n A N) {F G : Coh X.toScheme} (e : F ≅ G) :
+    D.classOfHom (K₀Ab.of F) = D.classOfHom (K₀Ab.of G) := by
+  rw [K₀Ab.of_iso e]
+
+theorem classOfHom_of_shortExact (D : NumericalData X n A N)
+    (S : ShortComplex (Coh X.toScheme)) (hS : S.ShortExact) :
+    D.classOfHom (K₀Ab.of S.X₂) =
+      D.classOfHom (K₀Ab.of S.X₁) + D.classOfHom (K₀Ab.of S.X₃) := by
+  rw [K₀Ab.of_shortExact S hS, map_add]
+
+/-! ### The two formal laws, now theorems
+
+`classOf_iso` and `classOf_shortExact` were fields. They are `K₀Ab.of_iso` and
+`K₀Ab.of_shortExact` composed with `classOfHom`, so they are proved here and the
+names and argument shapes are unchanged. -/
+
+theorem classOf_iso (D : NumericalData X n A N) {F G : Coh X.toScheme} (e : F ≅ G) :
+    D.classOf F = D.classOf G := by
+  rw [classOf, classOf, K₀Ab.of_iso e]
+
+theorem classOf_shortExact (D : NumericalData X n A N)
+    (S : ShortComplex (Coh X.toScheme)) (hS : S.ShortExact) :
+    D.classOf S.X₂ = D.classOf S.X₁ + D.classOf S.X₃ := by
+  rw [classOf, classOf, classOf, K₀Ab.of_shortExact S hS, map_add]
+
 /-- The numerical Chern character of a coherent sheaf is computed from its geometric Chern
 classes. -/
 theorem chernCharacter_classOf (D : NumericalData X n A N) (F : Coh X.toScheme) (i : ℕ) :
@@ -215,7 +249,8 @@ theorem coherentChernCharacter_iso (D : NumericalData X n A N) {F G : Coh X.toSc
     (e : F ≅ G) (i : ℕ) :
     ChernClassData.chernCharacterComponent (D.coherentChernClasses F) i =
       ChernClassData.chernCharacterComponent (D.coherentChernClasses G) i := by
-  rw [← D.coherentChernClasses_classOf, ← D.coherentChernClasses_classOf, D.classOf_iso e]
+  rw [← D.coherentChernClasses_classOf, ← D.coherentChernClasses_classOf,
+    D.classOfHom_of_iso e]
 
 /-- Geometric Chern-character components are additive in short exact sequences. This is the
 characteristic-class form of descent through the numerical Grothendieck group. -/
@@ -225,7 +260,7 @@ theorem coherentChernCharacter_shortExact (D : NumericalData X n A N)
       ChernClassData.chernCharacterComponent (D.coherentChernClasses S.X₁) i +
         ChernClassData.chernCharacterComponent (D.coherentChernClasses S.X₃) i := by
   rw [← D.coherentChernClasses_classOf, ← D.coherentChernClasses_classOf,
-    ← D.coherentChernClasses_classOf, D.classOf_shortExact S hS, D.chernCharacter_add]
+    ← D.coherentChernClasses_classOf, D.classOfHom_of_shortExact S hS, D.chernCharacter_add]
 
 /-- Geometric Euler characteristic is invariant under isomorphism of coherent sheaves. -/
 theorem coherentEulerCharacteristic_iso (D : NumericalData X n A N) {F G : Coh X.toScheme}
@@ -241,7 +276,7 @@ theorem coherentEulerCharacteristic_shortExact (D : NumericalData X n A N)
     D.finiteCohomology.eulerCharacteristic S.X₁ +
       D.finiteCohomology.eulerCharacteristic S.X₃
   rw [← D.coherentEulerCharacteristic_classOf, ← D.coherentEulerCharacteristic_classOf,
-    ← D.coherentEulerCharacteristic_classOf, D.classOf_shortExact S hS, map_add]
+    ← D.coherentEulerCharacteristic_classOf, D.classOfHom_of_shortExact S hS, map_add]
 
 end NumericalData
 
