@@ -22,6 +22,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.S
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.Uniqueness.MonoDescent
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.Uniqueness.SubobjectLattice
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.Uniqueness.Tail
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.WeakSlope
 
 /-!
 # Stability functions on an abelian category — umbrella
