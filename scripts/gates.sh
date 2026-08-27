@@ -117,6 +117,17 @@ dg_audit() {
   python3 scripts/check_audit.py "$GATE_TMP"/dg-audit.txt scripts/DGCategoryAudit.lean
 }
 
+single_instantiation() {
+  # The disease detector. `EnumInhabitants.lean` needs the same prerequisite
+  # build as the sweep above, and CI reuses whatever `audit_complete` already
+  # built, so this runs after it.
+  lake env lean scripts/EnumInhabitants.lean > "$GATE_TMP"/enum-inhabitants.txt 2>&1 || {
+    tail -20 "$GATE_TMP"/enum-inhabitants.txt
+    return 1
+  }
+  python3 scripts/check_single_instantiation.py "$GATE_TMP"/enum-inhabitants.txt
+}
+
 audit_complete() {
   # The other direction from check_audit.py: a new public declaration nobody
   # listed. Needs the same prerequisite build as coh_audit, because the sweep
@@ -207,6 +218,7 @@ if [ "$MODE" != "fast" ]; then
   gate coherent-families python3 scripts/check_coherent_families.py
   gate coverage-map python3 scripts/check_coverage_map.py
   gate audit-complete audit_complete
+  gate single-instantiation single_instantiation
   # No `--require-api`: see the header. Offline this reports NOT_RUN and passes,
   # which is the script's documented local contract; CI runs it with the flag so
   # the one environment guaranteed to have the API cannot silently skip.
