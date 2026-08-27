@@ -3,9 +3,11 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.ChernCharacter.Basic
+import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch.Reconstruction
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Fourfold
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Threefold
-import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch.Grothendieck
+import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Additivity
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Lattice
 
 /-!
 # Reconstructed Hirzebruch--Riemann--Roch through dimension four
@@ -118,108 +120,10 @@ theorem degree_tauComponent_top_eq_eulerCharacteristic
     _ = (D.eulerCharacteristic F : ℚ) := by
       exact_mod_cast reconstruction_eulerPic_one Q
 
-/-! ## Dimension-general descent through `K₀(Coh X)` -/
+/- `ReconstructionSystem` and its eleven declarations moved to
+`RiemannRoch/Reconstruction.lean`: nothing in them mentions a dimension, and
+`Surface/NumericalVariety.lean` had declared them a second time at `d = 2`. -/
 
-/-- A compatible choice of reconstruction data for every coherent sheaf in dimension `d`. -/
-structure ReconstructionSystem where
-  reconstruction : ∀ F : Coh X.toScheme, P.ReconstructionData F
-  rank_iso : ∀ {F G : Coh X.toScheme} (_e : F ≅ G),
-    (reconstruction F).rank = (reconstruction G).rank
-  eulerPic_iso : ∀ {F G : Coh X.toScheme} (_e : F ≅ G),
-    (reconstruction F).twists.eulerPic = (reconstruction G).twists.eulerPic
-  rank_shortExact : ∀ (S : ShortComplex (Coh X.toScheme)) (_hS : S.ShortExact),
-    (reconstruction S.X₂).rank =
-      (reconstruction S.X₁).rank + (reconstruction S.X₃).rank
-  eulerPic_shortExact : ∀ (S : ShortComplex (Coh X.toScheme)) (_hS : S.ShortExact),
-    (reconstruction S.X₂).twists.eulerPic =
-      (reconstruction S.X₁).twists.eulerPic +
-        (reconstruction S.X₃).twists.eulerPic
-
-namespace ReconstructionSystem
-
-/-- Reconstructed rank as an additive coherent-sheaf invariant. -/
-def rankInvariant (R : ReconstructionSystem (P := P)) :
-    CoherentAdditiveInvariant X ℤ where
-  obj F := (R.reconstruction F).rank
-  map_iso e := R.rank_iso e
-  map_shortExact S hS := R.rank_shortExact S hS
-
-/-- The reconstructed `i`-th Chern-character component as an additive coherent-sheaf
-invariant valued in the certified graded piece. -/
-noncomputable def chernCharacterInvariant (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (i : ℕ) :
-    CoherentAdditiveInvariant X
-      (P.ring.piece i) where
-  obj F := ⟨chernCharacterComponent RO (R.reconstruction F) i,
-    chernCharacterComponent_mem RO (R.reconstruction F) i⟩
-  map_iso := by
-    intro F G e
-    apply Subtype.ext
-    exact chernCharacterComponent_iso RO (R.reconstruction F) (R.reconstruction G) e
-      (R.rank_iso e) (R.eulerPic_iso e) i
-  map_shortExact := by
-    intro S hS
-    apply Subtype.ext
-    exact chernCharacterComponent_add RO (R.reconstruction S.X₁)
-      (R.reconstruction S.X₃) (R.reconstruction S.X₂)
-      (R.rank_shortExact S hS) (R.eulerPic_shortExact S hS) i
-
-/-- Reconstructed rank on `K₀(Coh X)`. -/
-noncomputable def rankHom (R : ReconstructionSystem (P := P)) :
-    CoherentGrothendieckGroup X →+ ℤ :=
-  R.rankInvariant.grothendieckHom
-
-/-- The reconstructed `i`-th Chern-character component on `K₀(Coh X)`. -/
-noncomputable def chernCharacterHom (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (i : ℕ) :
-    CoherentGrothendieckGroup X →+ A :=
-  (P.ring.piece i).subtype.toAddMonoidHom.comp
-    (R.chernCharacterInvariant RO i).grothendieckHom
-
-@[simp]
-theorem rankHom_class (R : ReconstructionSystem (P := P)) (F : Coh X.toScheme) :
-    R.rankHom (coherentGrothendieckClass F) = (R.reconstruction F).rank := by
-  simp [rankHom, rankInvariant]
-
-@[simp]
-theorem chernCharacterHom_class (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (F : Coh X.toScheme) (i : ℕ) :
-    R.chernCharacterHom RO i (coherentGrothendieckClass F) =
-      chernCharacterComponent RO (R.reconstruction F) i := by
-  simp [chernCharacterHom, chernCharacterInvariant]
-
-/-- Every descended Chern-character component remains in its graded piece. -/
-theorem chernCharacterHom_mem (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O)
-    (E : CoherentGrothendieckGroup X) (i : ℕ) :
-    R.chernCharacterHom RO i E ∈ P.ring.piece i :=
-  ((R.chernCharacterInvariant RO i).grothendieckHom E).property
-
-/-- The rational algebra map restricted to integral ranks. -/
-noncomputable def intAlgebraMap : ℤ →+ A where
-  toFun r := algebraMap ℚ A (r : ℚ)
-  map_zero' := by simp
-  map_add' r s := by simp
-
-/-- The descended zeroth Chern character is the algebra image of rank. -/
-theorem chernCharacterHom_zero (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (E : CoherentGrothendieckGroup X) :
-    R.chernCharacterHom RO 0 E = algebraMap ℚ A (R.rankHom E : ℚ) := by
-  have hhom : R.chernCharacterHom RO 0 =
-      (intAlgebraMap (A := A)).comp R.rankHom := by
-    apply coherentGrothendieckGroup_hom_ext
-    intro F
-    simp [intAlgebraMap]
-  exact DFunLike.congr_fun hhom E
-
-theorem chernCharacterHom_add (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O)
-    (E F : CoherentGrothendieckGroup X) (i : ℕ) :
-    R.chernCharacterHom RO i (E + F) =
-      R.chernCharacterHom RO i E + R.chernCharacterHom RO i F :=
-  map_add _ _ _
-
-end ReconstructionSystem
 
 /-! ## Reconstructed Todd components and the top convolution -/
 
@@ -294,7 +198,7 @@ theorem sheaf_hirzebruch_riemannRoch
 /-- The total reconstructed Chern character as an additive homomorphism on `K₀(Coh X)`. -/
 noncomputable def totalChernCharacterHom
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
-    CoherentGrothendieckGroup X →+ A :=
+    K₀Ab (Coh X.toScheme) →+ A :=
   ∑ i ∈ Finset.range (d + 1), R.chernCharacterHom RO i
 
 /-- The total reconstructed Todd representative through the geometric dimension. -/
@@ -304,7 +208,7 @@ noncomputable def totalTodd (RO : P.ReconstructionData O) : A :=
 /-- The reconstructed right side of HRR as an additive homomorphism on `K₀(Coh X)`. -/
 noncomputable def riemannRochHom
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
-    CoherentGrothendieckGroup X →+ ℚ where
+    K₀Ab (Coh X.toScheme) →+ ℚ where
   toFun E := P.ring.degree
     (totalChernCharacterHom RO R E * totalTodd RO)
   map_zero' := by simp [totalChernCharacterHom]
@@ -312,7 +216,7 @@ noncomputable def riemannRochHom
     rw [map_add, add_mul, map_add]
 
 /-- The cohomological Euler homomorphism cast from `ℤ` to `ℚ`. -/
-noncomputable def rationalEulerHom : CoherentGrothendieckGroup X →+ ℚ where
+noncomputable def rationalEulerHom : K₀Ab (Coh X.toScheme) →+ ℚ where
   toFun E := (D.grothendieckEulerHom C E : ℚ)
   map_zero' := by simp
   map_add' E F := by simp
@@ -321,7 +225,7 @@ noncomputable def rationalEulerHom : CoherentGrothendieckGroup X →+ ℚ where
 theorem totalChernCharacterHom_class
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
     (F : Coh X.toScheme) :
-    totalChernCharacterHom RO R (coherentGrothendieckClass F) =
+    totalChernCharacterHom RO R (K₀Ab.of F) =
       ∑ i ∈ Finset.range (d + 1),
         chernCharacterComponent RO (R.reconstruction F) i := by
   simp [totalChernCharacterHom]
@@ -330,7 +234,7 @@ theorem totalChernCharacterHom_class
 theorem riemannRochHom_class
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
     (F : Coh X.toScheme) :
-    riemannRochHom RO R (coherentGrothendieckClass F) =
+    riemannRochHom RO R (K₀Ab.of F) =
       P.ring.degree
         ((∑ i ∈ Finset.range (d + 1),
             chernCharacterComponent RO (R.reconstruction F) i) *
@@ -339,7 +243,7 @@ theorem riemannRochHom_class
 
 @[simp]
 theorem rationalEulerHom_class (F : Coh X.toScheme) :
-    rationalEulerHom (D := D) (C := C) (coherentGrothendieckClass F) =
+    rationalEulerHom (D := D) (C := C) (K₀Ab.of F) =
       (D.eulerCharacteristic F : ℚ) := by
   simp [rationalEulerHom]
 
@@ -347,12 +251,12 @@ theorem rationalEulerHom_class (F : Coh X.toScheme) :
 theorem hirzebruch_riemannRoch
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
     (hdpos : 1 ≤ d) (hd4 : d ≤ 4)
-    (E : CoherentGrothendieckGroup X) :
+    (E : K₀Ab (Coh X.toScheme)) :
     (D.grothendieckEulerHom C E : ℚ) = P.ring.degree
       ((∑ i ∈ Finset.range (d + 1), R.chernCharacterHom RO i E) *
         (∑ j ∈ Finset.range (d + 1), reconstructedToddComponent RO j)) := by
   have hhom : rationalEulerHom (D := D) (C := C) = riemannRochHom RO R := by
-    apply coherentGrothendieckGroup_hom_ext
+    apply K₀Ab.hom_ext
     intro F
     rw [rationalEulerHom_class, riemannRochHom_class]
     exact sheaf_hirzebruch_riemannRoch RO R hdpos hd4 F
@@ -366,7 +270,7 @@ bounds occur on `toNumericalVariety_satisfiesHRR`, where they are actually neede
 @[reducible]
 noncomputable def toNumericalVariety
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
-    NumericalVarietyData d A (CoherentGrothendieckGroup X) where
+    NumericalVarietyData d A (K₀Ab (Coh X.toScheme)) where
   ring := P.ring
   rank := R.rankHom
   chComp E i := R.chernCharacterHom RO i E
@@ -388,17 +292,17 @@ theorem toNumericalVariety_satisfiesHRR
 theorem toNumericalVariety_rank_class
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
     (F : Coh X.toScheme) :
-    (toNumericalVariety RO R).rank (coherentGrothendieckClass F) =
+    (toNumericalVariety RO R).rank (K₀Ab.of F) =
       (R.reconstruction F).rank := by
-  change R.rankHom (coherentGrothendieckClass F) = (R.reconstruction F).rank
+  change R.rankHom (K₀Ab.of F) = (R.reconstruction F).rank
   exact R.rankHom_class F
 
 theorem toNumericalVariety_chComp_class
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
     (F : Coh X.toScheme) (i : ℕ) :
-    (toNumericalVariety RO R).chComp (coherentGrothendieckClass F) i =
+    (toNumericalVariety RO R).chComp (K₀Ab.of F) i =
       chernCharacterComponent RO (R.reconstruction F) i := by
-  change R.chernCharacterHom RO i (coherentGrothendieckClass F) =
+  change R.chernCharacterHom RO i (K₀Ab.of F) =
     chernCharacterComponent RO (R.reconstruction F) i
   exact R.chernCharacterHom_class RO F i
 
@@ -412,9 +316,9 @@ theorem toNumericalVariety_toddComp
 theorem toNumericalVariety_chi_class
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
     (F : Coh X.toScheme) :
-    (toNumericalVariety RO R).chi (coherentGrothendieckClass F) =
+    (toNumericalVariety RO R).chi (K₀Ab.of F) =
       D.eulerCharacteristic F := by
-  change D.grothendieckEulerHom C (coherentGrothendieckClass F) =
+  change D.grothendieckEulerHom C (K₀Ab.of F) =
     D.eulerCharacteristic F
   exact D.grothendieckEulerHom_class C F
 
@@ -423,7 +327,7 @@ noncomputable def numericalClass
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
     (F : Coh X.toScheme) :
     NumericalVarietyData.NumericalQuotient (toNumericalVariety RO R) :=
-  Submodule.Quotient.mk (coherentGrothendieckClass F)
+  Submodule.Quotient.mk (K₀Ab.of F)
 
 /-! ### Explicit threefold and fourfold constructors -/
 
@@ -433,7 +337,7 @@ noncomputable def toThreefoldNumericalVariety
     {A : Type v} [CommRing A] [Algebra ℚ A]
     {P : PairingContext D C 3 A} {O : Coh X.toScheme}
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
-    NumericalVarietyData 3 A (CoherentGrothendieckGroup X) :=
+    NumericalVarietyData 3 A (K₀Ab (Coh X.toScheme)) :=
   toNumericalVariety RO R
 
 /-- The scheme-derived dimension-four bridge requested by issue #45. -/
@@ -442,7 +346,7 @@ noncomputable def toFourfoldNumericalVariety
     {A : Type v} [CommRing A] [Algebra ℚ A]
     {P : PairingContext D C 4 A} {O : Coh X.toScheme}
     (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
-    NumericalVarietyData 4 A (CoherentGrothendieckGroup X) :=
+    NumericalVarietyData 4 A (K₀Ab (Coh X.toScheme)) :=
   toNumericalVariety RO R
 
 /-- The existing Layer A threefold display, evaluated on a genuine coherent sheaf through the
@@ -466,7 +370,7 @@ theorem threefold_eulerCharacteristic_eq
   simpa [toThreefoldNumericalVariety, toNumericalVariety] using
     (Threefold.chi_eq (toThreefoldNumericalVariety RO R)
       (toNumericalVariety_satisfiesHRR RO R (by omega) (by omega))
-      (coherentGrothendieckClass F))
+      (K₀Ab.of F))
 
 /-- The existing Layer A fourfold display, evaluated on a genuine coherent sheaf through the
 scheme-derived bridge. -/
@@ -492,7 +396,7 @@ theorem fourfold_eulerCharacteristic_eq
   simpa [toFourfoldNumericalVariety, toNumericalVariety] using
     (Fourfold.chi_eq (toFourfoldNumericalVariety RO R)
       (toNumericalVariety_satisfiesHRR RO R (by omega) (by omega))
-      (coherentGrothendieckClass F))
+      (K₀Ab.of F))
 
 end
 

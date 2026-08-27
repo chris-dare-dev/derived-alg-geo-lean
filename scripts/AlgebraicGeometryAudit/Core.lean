@@ -908,39 +908,15 @@ is not closed. -/
 #print axioms Cohomology.FiniteCohomology.alternating_finrank_eq_zero_of_exact
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic_additive
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic_additive_modules
-#print axioms Cohomology.CoherentGrothendieckRelation
-#print axioms Cohomology.FiniteCohomology.coherentGrothendieckRelations_le_ker
 #print axioms Cohomology.FiniteCohomology.grothendieckEulerHom
 #print axioms Cohomology.FiniteCohomology.grothendieckEulerHom_class
 
--- Layer B stage 5: dimension-independent descent of additive coherent-sheaf invariants through
--- K₀. Surface compatibility aliases are audited immediately afterward.
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.freeHom
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.coherentGrothendieckRelations_le_ker
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.grothendieckHom
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.grothendieckHom_class
-#print axioms AlgebraicGeometry.RiemannRoch.coherentGrothendieckGroup_hom_ext
+-- Layer B stage 5: additive coherent-sheaf invariants ARE homs out of `K₀Ab (Coh X)`.
+-- `CoherentAdditiveInvariant`, its free-group route and its bespoke universal property are
+-- gone, and so are the surface compatibility aliases that forwarded to them.
 
 -- Layer B stage 5: the scheme-derived surface numerical-variety assembly. The geometric HRR
--- input is stated on coherent sheaves; the audited theorem below descends it to every K₀ class.
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant.freeHom
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant.coherentGrothendieckRelations_le_ker
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant.grothendieckHom
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant.grothendieckHom_class
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.coherentGrothendieckGroup_hom_ext
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.rankInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.rankHom
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.rankHom_class
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom_class
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom_mem
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.intAlgebraMap
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom_zero
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterHom_add
+-- input is stated on coherent sheaves; the audited theorem below descends it to every K₀Ab class.
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData.SatisfiesSheafHRR
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData.SatisfiesSheafHRR.eq
@@ -2052,7 +2028,6 @@ not functions. -/
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.perfectC2Degree
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.perfect_eulerCharacteristic_eq
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.discriminantDegree_eq_c2
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.coherentGrothendieckClass_shortExact
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.grothendieckEulerHom_class_eq_perfect_formula
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.NumericalVarietyComparison.chi_eq_geometric_terms
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.NumericalVarietyComparison.chi_eq_classical
@@ -2082,12 +2057,24 @@ not functions. -/
 -- assumed. The dimension-three and dimension-four constructors expose a separate HRR witness.
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.reconstruction_eulerPic_one
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.degree_tauComponent_top_eq_eulerCharacteristic
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.rankInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.chernCharacterInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.rankHom
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.chernCharacterHom
-#print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.ReconstructionSystem.chernCharacterHom_zero
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.mk.inj
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.eulerPic_iso
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.eulerPic_shortExact
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rank_iso
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rank_shortExact
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.reconstruction
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom_mem
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom_add
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rankHom_class
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom_class
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.intAlgebraMap
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rankInvariant
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterInvariant
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.rankHom
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom
+#print axioms AlgebraicGeometry.RiemannRoch.ReconstructionSystem.chernCharacterHom_zero
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.reconstructedToddComponent
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.reconstructedToddComponent_mem
 #print axioms AlgebraicGeometry.RiemannRoch.HigherDimension.sheaf_hirzebruch_riemannRoch
