@@ -275,3 +275,18 @@ ends of that triangle. -/
 #print axioms CategoryTheory.Triangulated.StabilityFunction.hnTilt_heart_iff
 #print axioms CategoryTheory.Triangulated.StabilityFunction.mem_hnTilt_heart_of_hnTors
 #print axioms CategoryTheory.Triangulated.StabilityFunction.shift_mem_hnTilt_heart_of_hnFree
+
+/-! ## The cutoff bounds the object's own phase
+
+`hnTors`/`hnFree` are defined by the HN extrema `φ⁻`/`φ⁺`, but every consumer that reads a
+cutoff against a charge needs the object's own phase. `HNPolygon.lean` already proved the
+bracketing, as `phase_le_first` and `last_le_phase`, with the extremal indices written out
+rather than as `φ±` -- which is why grepping `HarderNarasimhan.lean` for a bound on
+`Z.phase E` does not find it. These name it and draw the two cutoff corollaries;
+`lt_phase_of_mem_hnTors` is the categorical step cases 1--3 of #740 begin with.
+-/
+
+#print axioms CategoryTheory.Triangulated.AbelianHNFiltration.phiMinus_le_phase
+#print axioms CategoryTheory.Triangulated.AbelianHNFiltration.phase_le_phiPlus
+#print axioms CategoryTheory.Triangulated.StabilityFunction.lt_phase_of_mem_hnTors
+#print axioms CategoryTheory.Triangulated.StabilityFunction.phase_le_of_mem_hnFree
