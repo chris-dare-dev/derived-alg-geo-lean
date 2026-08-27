@@ -72,11 +72,11 @@ def quinticTodd : ℕ → ℚ
 /-- The Euler characteristic on the quintic in linear-section coordinates. See the module
 docstring for the four generator values this encodes. -/
 def quinticChi : ThreefoldNum →+ ℤ where
-  toFun E := 5 * E.2.1 - 5 * E.2.2.1 + E.2.2.2
+  toFun E := 5 * E 1 - 5 * E 2 + E 3
   map_zero' := rfl
   map_add' E F := by
-    show 5 * (E.2.1 + F.2.1) - 5 * (E.2.2.1 + F.2.2.1) + (E.2.2.2 + F.2.2.2)
-      = (5 * E.2.1 - 5 * E.2.2.1 + E.2.2.2) + (5 * F.2.1 - 5 * F.2.2.1 + F.2.2.2)
+    show 5 * (E 1 + F 1) - 5 * (E 2 + F 2) + (E 3 + F 3)
+      = (5 * E 1 - 5 * E 2 + E 3) + (5 * F 1 - 5 * F 2 + F 3)
     ring
 
 /-- **The model.** A smooth quintic threefold in `ℙ⁴`: `∫H³ = 5`, `td = 1 + (5/6)H²`. -/
@@ -92,10 +92,10 @@ theorem quinticNumericalVariety_satisfiesHRR : quinticNumericalVariety.Satisfies
   rankOneNumericalVariety_satisfiesHRR 3 5 threefoldRank quinticChi (threefoldChCoeff 5)
     quinticTodd (threefoldChCoeff_zero 5) (threefoldChCoeff_add 5) rfl (fun E => by
     rw [threefoldChi_sum]
-    show ((5 * E.2.1 - 5 * E.2.2.1 + E.2.2.2 : ℤ) : ℚ)
-      = 5 * ((E.1 : ℚ) * 0 + (E.2.1 : ℚ) * (5 / 6)
-        + (-(E.2.1 : ℚ) / 2 + (E.2.2.1 : ℚ)) * 0
-        + ((E.2.1 : ℚ) / 6 - (E.2.2.1 : ℚ) + (E.2.2.2 : ℚ) / 5) * 1)
+    show ((5 * E 1 - 5 * E 2 + E 3 : ℤ) : ℚ)
+      = 5 * ((E 0 : ℚ) * 0 + (E 1 : ℚ) * (5 / 6)
+        + (-(E 1 : ℚ) / 2 + (E 2 : ℚ)) * 0
+        + ((E 1 : ℚ) / 6 - (E 2 : ℚ) + (E 3 : ℚ) / 5) * 1)
     push_cast
     ring)
 
@@ -116,18 +116,18 @@ theorem quintic_isCalabiYau :
     norm_num [quinticTodd]
 
 /-- `χ(O_X) = 0` — the Calabi–Yau signature, read off the coordinates. -/
-theorem quinticChi_structureSheaf : quinticChi (1, 0, 0, 0) = 0 := rfl
+theorem quinticChi_structureSheaf : quinticChi ![1, 0, 0, 0] = 0 := rfl
 
 /-- `χ(O_{X∩H}) = 5`: a hyperplane section of the quintic is a smooth quintic surface in
 `ℙ³`, and a degree-`d` surface in `ℙ³` has `χ(O) = C(d−1,3) + 1`, which is `5` at `d = 5`. -/
-theorem quinticChi_hyperplaneSection : quinticChi (0, 1, 0, 0) = 5 := rfl
+theorem quinticChi_hyperplaneSection : quinticChi ![0, 1, 0, 0] = 5 := rfl
 
 /-- `χ(O_{X∩H²}) = −5`: a codimension-two linear section of the quintic is a plane quintic
 curve, of genus `(5−1)(5−2)/2 = 6`, so `χ(O) = 1 − 6`. -/
-theorem quinticChi_curveSection : quinticChi (0, 0, 1, 0) = -5 := rfl
+theorem quinticChi_curveSection : quinticChi ![0, 0, 1, 0] = -5 := rfl
 
 /-- `χ(O_pt) = 1`. -/
-theorem quinticChi_point : quinticChi (0, 0, 0, 1) = 1 := rfl
+theorem quinticChi_point : quinticChi ![0, 0, 0, 1] = 1 := rfl
 
 /-- **Riemann–Roch on the quintic reproduces `χ(O_X(m)) = 5m(m² + 5)/6`.**
 
@@ -139,7 +139,7 @@ At `m = 1` this gives `5`, which is `h⁰(O_X(1)) = 5` for the quintic embedded 
 `m = 0` it gives `0 = χ(O_X)`. Both are independent checks on the Todd coefficient. -/
 theorem quinticChi_lineBundle (m c e : ℤ) (hc : 2 * c = m * (m + 1))
     (he : 6 * e = 5 * (m * (m + 1) * (m + 2))) :
-    6 * quinticChi (1, m, c, e) = 5 * (m * (m ^ 2 + 5)) := by
+    6 * quinticChi ![1, m, c, e] = 5 * (m * (m ^ 2 + 5)) := by
   show 6 * (5 * m - 5 * c + e) = 5 * (m * (m ^ 2 + 5))
   linear_combination (-15) * hc + he
 

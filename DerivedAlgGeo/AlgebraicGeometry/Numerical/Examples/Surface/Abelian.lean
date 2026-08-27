@@ -82,7 +82,7 @@ and trivial Todd class. -/
 noncomputable def abelianNumericalVariety (d : ℕ) :
     NumericalVarietyData 2 SurfaceRing SurfaceNum where
   ring := surfaceNumericalRing (2 * (d : ℚ))
-  rank := { toFun := fun E => E.1, map_zero' := rfl, map_add' := fun _ _ => rfl }
+  rank := { toFun := fun E => E 0, map_zero' := rfl, map_add' := fun _ _ => rfl }
   chComp := surfaceCh k3ChCoeff
   chComp_mem := surfaceCh_mem k3ChCoeff
   chComp_zero := fun _ => rfl
@@ -91,18 +91,18 @@ noncomputable def abelianNumericalVariety (d : ℕ) :
   toddComp_mem := abelianTodd_mem
   toddComp_zero := rfl
   chi :=
-    { toFun := fun E => 2 * (d : ℤ) * E.2.2
+    { toFun := fun E => 2 * (d : ℤ) * E 2
       map_zero' := by simp
-      map_add' := by intro a b; show 2 * (d : ℤ) * (a.2.2 + b.2.2) = _; ring }
+      map_add' := by intro a b; show 2 * (d : ℤ) * (a 2 + b 2) = _; ring }
 
 /-- With trivial Todd class, HRR reduces to the top Chern-character coordinate multiplied by
 the polarization degree `2d`. -/
 theorem abelianNumericalVariety_satisfiesHRR (d : ℕ) :
     (abelianNumericalVariety d).SatisfiesHRR := by
   refine ⟨fun E => ?_⟩
-  show ((2 * (d : ℤ) * E.2.2 : ℤ) : ℚ) = surfaceDegree (2 * (d : ℚ)) _
+  show ((2 * (d : ℤ) * E 2 : ℤ) : ℚ) = surfaceDegree (2 * (d : ℚ)) _
   rw [surfaceCh_sum, abelianTodd_sum, surfaceDegree_ch_mul_todd]
-  show _ = 2 * (d : ℚ) * ((E.1 : ℚ) * 0 + (E.2.1 : ℚ) * 0 + (E.2.2 : ℚ))
+  show _ = 2 * (d : ℚ) * ((E 0 : ℚ) * 0 + (E 1 : ℚ) * 0 + (E 2 : ℚ))
   push_cast
   ring
 
@@ -140,15 +140,15 @@ theorem abelianChi_eq_of_chComp_two_eq (d : ℕ) (E F : SurfaceNum)
   -- `∫_A` renormalised to send `H²` to `1` is a coefficient extractor: it turns the equality
   -- of codimension-two components into the equality of the coordinates behind them. The
   -- model's own degree `2d` would not do, since it annihilates the coordinate when `d = 0`.
-  have hcoeff : ((E.2.2 : ℤ) : ℚ) = ((F.2.2 : ℤ) : ℚ) := by
+  have hcoeff : ((E 2 : ℤ) : ℚ) = ((F 2 : ℤ) : ℚ) := by
     -- the ascription is what unfolds `chComp` to its normal form; `congrArg` alone leaves
     -- the components folded and `simp` then has nothing to fire on
-    have h' : surfaceDegree 1 (algebraMap ℚ SurfaceRing ((E.2.2 : ℤ) : ℚ) * H ^ 2)
-        = surfaceDegree 1 (algebraMap ℚ SurfaceRing ((F.2.2 : ℤ) : ℚ) * H ^ 2) :=
+    have h' : surfaceDegree 1 (algebraMap ℚ SurfaceRing ((E 2 : ℤ) : ℚ) * H ^ 2)
+        = surfaceDegree 1 (algebraMap ℚ SurfaceRing ((F 2 : ℤ) : ℚ) * H ^ 2) :=
       congrArg (fun x => surfaceDegree 1 x) h
     simpa only [surfaceDegree_algebraMap_mul, surfaceDegree_Hsq, mul_one] using h'
-  show 2 * (d : ℤ) * E.2.2 = 2 * (d : ℤ) * F.2.2
-  rw [show E.2.2 = F.2.2 from by exact_mod_cast hcoeff]
+  show 2 * (d : ℤ) * E 2 = 2 * (d : ℤ) * F 2
+  rw [show E 2 = F 2 from by exact_mod_cast hcoeff]
 
 end Examples
 
