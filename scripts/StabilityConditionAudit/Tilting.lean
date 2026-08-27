@@ -290,3 +290,14 @@ rather than as `φ±` -- which is why grepping `HarderNarasimhan.lean` for a bou
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.phase_le_phiPlus
 #print axioms CategoryTheory.Triangulated.StabilityFunction.lt_phase_of_mem_hnTors
 #print axioms CategoryTheory.Triangulated.StabilityFunction.phase_le_of_mem_hnFree
+
+/-! ## From the torsion class to a slope bound
+
+The composite of `lt_phase_of_mem_hnTors` with `lt_phase_iff_slopeOfPhase_lt`, and the statement
+cases 1--3 of Lemma 6.2 actually consume: an object of the torsion class, of positive rank, has
+slope strictly above the cutoff's slope. `Mukai.im_expCharge_pos` takes it from there. Rank zero
+is excluded and handled by `mem_hnTors_of_rank_zero`, which is arithmetic rather than comparison.
+-/
+
+#print axioms CategoryTheory.Triangulated.SlopeData.slopeOfPhase_lt_of_mem_hnTors
+#print axioms CategoryTheory.Triangulated.SlopeData.slope_le_slopeOfPhase_of_mem_hnFree
