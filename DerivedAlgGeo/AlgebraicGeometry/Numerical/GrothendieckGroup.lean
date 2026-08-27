@@ -5,6 +5,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Dual
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.EulerPairing
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Lattice
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.MukaiVector
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.RadicalKernel
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Realization
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.EulerTransfer
 
