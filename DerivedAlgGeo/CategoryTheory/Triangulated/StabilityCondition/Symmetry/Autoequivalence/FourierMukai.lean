@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Adjunction
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Stability.ClassMap
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Stability.Composition
@@ -41,14 +42,23 @@ specialized here, not the Grothendieck-group functoriality.
   isomorphism to a transform are both supplied. That a Fourier--Mukai transform
   with a suitable kernel *is* an equivalence is the classical theorem, and it
   needs the geometry the abstract `Correspondence` does not carry.
-* **Nothing constructs a `DualKernel`.** That the quasi-inverse of a
-  Fourier--Mukai equivalence is again one — with the derived-dual kernel
+* **Nothing constructs a `DualKernel` from geometry.** That the quasi-inverse
+  of a Fourier--Mukai equivalence is again one — with the derived-dual kernel
   `P^∨ ⊗ p^*ω[dim]` — is classical, and supplying it is geometry. What this
   file does is make the *consequences* of having one available: given a
   `DualKernel`, the class-lattice compatibility `actStab` needs is stated in
   terms of the dual kernel's own class map rather than the opaque
   `K₀.map Φ.inverse` (`actStabOfDual`), and the two kernels' class maps are
   proved mutually inverse (`transformK₀_dual_comp`).
+
+  Since #559's adjunction stage there is one *abstract* constructor:
+  `DualKernel.ofLeftAdjointKernel` builds a dual kernel from a
+  `LeftAdjointKernelData`, by uniqueness of adjoints, and
+  `ofRightAdjointKernel` does the same on the other side. That moves the
+  supplied datum, it does not discharge it — `LeftAdjointKernelData` is itself
+  supplied in `FourierMukai/Adjunction.lean`, and
+  `DualKernel.toLeftAdjointKernelData` goes back, so for a kernel
+  autoequivalence the two are interderivable and neither is weaker.
 * **No group of kernel autoequivalences, and no monoid map into one.** The
   bundled group action on stability conditions exists elsewhere:
   `GroupAction.AutPairQuot v` in `Stability/ClassMap.lean` is a `Group` with a
@@ -68,6 +78,11 @@ specialized here, not the Grothendieck-group functoriality.
 * **Nothing constructs a `UnitKernelData`.** That `𝒪_Δ` presents the identity
   as a transform is the classical statement, and it needs the geometry the
   abstract `Correspondence` does not carry.
+* **Nothing constructs a non-trivial `LeftAdjointKernelData` or
+  `RightAdjointKernelData`.** `UnitKernelData.toLeftAdjointKernelData` produces
+  one from a unit kernel, but it is the statement that `𝟭 C` is its own
+  adjoint, transported across `unitIso`; it says nothing about `corr`. That a
+  general `Φ_P` has kernel-presented adjoints is Grothendieck duality.
 * Nothing about Bridgeland's `Stab(X)` as a manifold, and no continuity or
   local-homeomorphism claim for the induced map.
 -/
@@ -235,6 +250,120 @@ theorem transformK₀AddEquiv_symm_apply (x : K₀ C) :
 end DualKernel
 
 end Dual
+
+section Adjoint
+
+/-! ### Dual kernels derived from adjunction data
+
+`FourierMukai/Adjunction.lean` supplies `LeftAdjointKernelData` and
+`RightAdjointKernelData`: a kernel for the opposite correspondence together
+with an adjunction between the two transforms. For a kernel autoequivalence
+those give a `DualKernel` outright, by uniqueness of adjoints — the
+quasi-inverse of an equivalence is both its left and its right adjoint, so an
+adjoint presented by a kernel is isomorphic to it.
+
+`toLeftAdjointKernelData` and `toRightAdjointKernelData` go back, so for a
+kernel autoequivalence the three data are interderivable and the constructors
+below buy no new *existence*. What they buy is the shape of the input:
+`LeftAdjointKernelData` is stated for an arbitrary kernel with no equivalence
+in sight, which is the form a geometric adjunction theorem has, whereas
+`DualKernel.invIso` presupposes the equivalence and names its inverse. -/
+
+/-- **A dual kernel derived from left-adjoint kernel data.**
+
+`A.equiv.inverse` is left adjoint to `A.equiv.functor`, hence — across `A.iso`
+— to `A.corr.transform A.kernel`. `L.adj` says the same of
+`A.corr.transform L.adjKernel`. Uniqueness of left adjoints identifies the
+two, and that identification is exactly `DualKernel.invIso`.
+
+This is the first constructor of a `DualKernel` from something other than a
+directly supplied `invIso`. It is not a *geometric* construction: the
+adjunction is still supplied. -/
+def DualKernel.ofLeftAdjointKernel
+    (L : LeftAdjointKernelData A.corr A.corr A.kernel) : DualKernel A where
+  dual := L.adjKernel
+  invIso := L.isoOfAdj (A.equiv.symm.toAdjunction.ofNatIsoRight A.iso)
+
+omit [IsTriangulated C] in
+@[simp]
+theorem DualKernel.ofLeftAdjointKernel_dual
+    (L : LeftAdjointKernelData A.corr A.corr A.kernel) :
+    (DualKernel.ofLeftAdjointKernel A L).dual = L.adjKernel := rfl
+
+/-- **A dual kernel derived from right-adjoint kernel data.**
+
+The mirror of `ofLeftAdjointKernel`, through `Adjunction.rightAdjointUniq`.
+Both exist because the quasi-inverse of an equivalence is an adjoint on both
+sides; classically the two adjoint kernels of a general `Φ_P` differ by the
+dualizing twist, and it is Serre duality that collapses the difference when
+`Φ_P` is an equivalence.
+
+The collapse *is* reachable here — `(ofLeftAdjointKernel A L).toRightAdjointKernelData`
+is right-adjoint data with the same kernel `L.adjKernel` — but read where it
+comes from: the supplied `A.equiv`, whose inverse is an adjoint on both sides
+by construction. No dualizing object and no duality theorem is involved, and
+for a kernel with no equivalence attached `FourierMukai/Adjunction.lean` still
+relates the two sides not at all. -/
+def DualKernel.ofRightAdjointKernel
+    (R : RightAdjointKernelData A.corr A.corr A.kernel) : DualKernel A where
+  dual := R.adjKernel
+  invIso := R.isoOfAdj (A.equiv.toAdjunction.ofNatIsoLeft A.iso)
+
+omit [IsTriangulated C] in
+@[simp]
+theorem DualKernel.ofRightAdjointKernel_dual
+    (R : RightAdjointKernelData A.corr A.corr A.kernel) :
+    (DualKernel.ofRightAdjointKernel A R).dual = R.adjKernel := rfl
+
+/-- **A dual kernel already carries the left adjunction.**
+
+The converse of `ofLeftAdjointKernel`, and the reason its docstring does not
+claim to weaken the hypothesis: transporting `A.equiv.symm.toAdjunction` along
+`A.iso` and `D.invIso` recovers the adjunction. So for a kernel
+autoequivalence the two data are interderivable. -/
+def DualKernel.toLeftAdjointKernelData (D : DualKernel A) :
+    LeftAdjointKernelData A.corr A.corr A.kernel where
+  adjKernel := D.dual
+  adj := (A.equiv.symm.toAdjunction.ofNatIsoRight A.iso).ofNatIsoLeft D.invIso
+
+omit [IsTriangulated C] in
+@[simp]
+theorem DualKernel.toLeftAdjointKernelData_adjKernel (D : DualKernel A) :
+    (D.toLeftAdjointKernelData).adjKernel = D.dual := rfl
+
+/-- **A dual kernel already carries the right adjunction**, mirroring
+`toLeftAdjointKernelData`. -/
+def DualKernel.toRightAdjointKernelData (D : DualKernel A) :
+    RightAdjointKernelData A.corr A.corr A.kernel where
+  adjKernel := D.dual
+  adj := (A.equiv.toAdjunction.ofNatIsoLeft A.iso).ofNatIsoRight D.invIso
+
+omit [IsTriangulated C] in
+@[simp]
+theorem DualKernel.toRightAdjointKernelData_adjKernel (D : DualKernel A) :
+    (D.toRightAdjointKernelData).adjKernel = D.dual := rfl
+
+omit [IsTriangulated C] in
+/-- The left round trip is the identity **on the kernel**.
+
+Only on the kernel. The reconstructed dual kernel's `invIso` is `D.invIso`
+carried across two transports and `Adjunction.leftAdjointUniq`; it is not
+claimed equal to `D.invIso`, and proving it so would need that lemma's
+coherence statements, which nothing here consumes. -/
+theorem DualKernel.ofLeftAdjointKernel_toLeftAdjointKernelData_dual
+    (D : DualKernel A) :
+    (DualKernel.ofLeftAdjointKernel A D.toLeftAdjointKernelData).dual = D.dual :=
+  rfl
+
+omit [IsTriangulated C] in
+/-- The right round trip is the identity on the kernel, with the same
+caveat. -/
+theorem DualKernel.ofRightAdjointKernel_toRightAdjointKernelData_dual
+    (D : DualKernel A) :
+    (DualKernel.ofRightAdjointKernel A D.toRightAdjointKernelData).dual = D.dual :=
+  rfl
+
+end Adjoint
 
 section Action
 
@@ -543,6 +672,47 @@ omit [IsTriangulated C] in
 theorem UnitKernelData.toDualKernel_dual {corr : Correspondence C C 𝒲}
     (U : UnitKernelData corr) :
     U.toDualKernel.dual = U.unitKernel := rfl
+
+/-- **The unit kernel is a left adjoint kernel for itself.**
+
+`𝟭 C ⊣ 𝟭 C`, transported along `U.unitIso` on both sides. This is the only
+`LeftAdjointKernelData` this repository produces, and it is the trivial one:
+it says the identity is its own adjoint, which is true in any category and
+carries no information about `corr`.
+
+Its point is that `LeftAdjointKernelData` is inhabited from data the tree
+already has, so the adjunction layer is not an interface nothing can reach.
+A non-trivial instance is Grothendieck duality and is not available here. -/
+def UnitKernelData.toLeftAdjointKernelData {corr : Correspondence C C 𝒲}
+    (U : UnitKernelData corr) :
+    LeftAdjointKernelData corr corr U.unitKernel where
+  adjKernel := U.unitKernel
+  adj := (Adjunction.id.ofNatIsoLeft U.unitIso).ofNatIsoRight U.unitIso
+
+-- `LeftAdjointKernelData` asks for no triangulated structure, so this statement
+-- uses none of the ambient hypotheses beyond the two categories.
+omit [HasZeroObject C] [HasShift C ℤ] [Preadditive C]
+  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] [IsTriangulated C]
+  [HasZeroObject 𝒲] [HasShift 𝒲 ℤ] [Preadditive 𝒲]
+  [∀ n : ℤ, (shiftFunctor 𝒲 n).Additive] [Pretriangulated 𝒲] in
+@[simp]
+theorem UnitKernelData.toLeftAdjointKernelData_adjKernel
+    {corr : Correspondence C C 𝒲} (U : UnitKernelData corr) :
+    U.toLeftAdjointKernelData.adjKernel = U.unitKernel := rfl
+
+omit [IsTriangulated C] in
+/-- **The derived dual kernel of the identity is the supplied one.**
+
+On the kernel object. Running `U.toLeftAdjointKernelData` through
+`DualKernel.ofLeftAdjointKernel` lands on `U.unitKernel`, which is what
+`toDualKernel` supplies directly. The two `invIso` fields are not claimed
+equal — `toDualKernel` uses `U.unitIso` itself, while the derived one is the
+image of an adjunction under `Adjunction.leftAdjointUniq`. -/
+theorem UnitKernelData.ofLeftAdjointKernel_dual {corr : Correspondence C C 𝒲}
+    (U : UnitKernelData corr) :
+    (KernelAutoequivalence.DualKernel.ofLeftAdjointKernel
+        (KernelAutoequivalence.id corr U) U.toLeftAdjointKernelData).dual =
+      U.toDualKernel.dual := rfl
 
 end Identity
 

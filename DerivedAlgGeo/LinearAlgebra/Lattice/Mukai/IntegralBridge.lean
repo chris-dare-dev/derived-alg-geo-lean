@@ -125,6 +125,12 @@ theorem extendMap_add (f : N →ₗ[ℤ] V) (u w : MukaiLattice N) :
   push_cast
   rfl
 
+/-- **`extendMap` as a bundled hom.**  It was proved additive and left as a bare
+function, which is what forces every consumer to re-prove additivity of whatever
+composite it sits in. -/
+noncomputable def extendMapHom (f : N →ₗ[ℤ] V) : MukaiLattice N →+ RealExtension V :=
+  AddMonoidHom.mk' (extendMap f) (extendMap_add f)
+
 /-- **The two pairings agree.** For a map of middles that respects the forms, the
 integral Mukai pairing is the real one, cast. -/
 theorem realPairing_extendMap (bZ : N →ₗ[ℤ] N →ₗ[ℤ] ℤ) (bR : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)

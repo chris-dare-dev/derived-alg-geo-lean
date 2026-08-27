@@ -2923,3 +2923,45 @@ about a quadratic space. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma_affine
 #print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderCoproducts
+
+/-! ## The numerical charge, bundled, and its bridge to the categorical side
+
+`numericalCharge` was proved additive and left unbundled, which is what kept the numerical
+lane from meeting the stability-function side — every charge there is an `AddMonoidHom`, and
+an equation is not one. `numericalCharge_zero` did not exist at all and is free once the hom
+does.
+
+`toMukaiChargeData` builds the categorical class map as a composition of homs, so
+`charge_toMukaiChargeData` is definitional: the categorical charge of an object IS the
+numerical charge of its class. That is the lemma that makes the numerical support-property
+theorems reachable from an object of an abelian category.
+-/
+
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.numericalChargeHom
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.numericalChargeHom_apply
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.numericalCharge_zero
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.toMukaiChargeData
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.toMukaiChargeData_mukai
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.charge_toMukaiChargeData
+
+/-! ## The Euler radical against the kernel of the Mukai vector
+
+`CategoricalCharge` records the numerical quotient as bypassed: the geometric class map lands
+in `N ⧸ leftRadical` while `numericalCharge` is defined on `N`. This settles what closing that
+costs. One inclusion is free — `ker_le_leftRadical` follows from `mukaiForm_eq_neg_chi₂` with
+no nondegeneracy anywhere. The other is not, and is not true as stated: membership in
+`leftRadical` only says the Mukai vector pairs to zero against the **image** of the Mukai
+vector, so `DetectsRadical` carries the missing nondegeneracy as a named hypothesis rather
+than a pretended theorem — and `detectsRadical_of` reduces it to a point class, a rank-one
+class with vanishing `c₁`, and nondegeneracy of `b` against realized Chern classes, so it is
+not the conclusion renamed. `mukaiVectorQuotient` is what it buys.
+-/
+
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiForm_eq_zero_iff_chi₂_eq_zero
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.ker_le_leftRadical
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.DetectsRadical
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.detectsRadical_of
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.leftRadical_le_ker
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.leftRadical_eq_ker
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorQuotient
+#print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorQuotient_mk

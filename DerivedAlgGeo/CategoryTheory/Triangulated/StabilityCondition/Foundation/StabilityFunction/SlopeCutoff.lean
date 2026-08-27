@@ -46,8 +46,8 @@ additive and never negative. -/
 theorem rank_eq_zero_of_shortExact {S : ShortComplex A} (hS : S.ShortExact)
     (h : D.rank S.X₂ = 0) : D.rank S.X₁ = 0 ∧ D.rank S.X₃ = 0 := by
   have hadd := D.rank_additive S hS
-  have h1 := D.rank_nonneg S.X₁
-  have h3 := D.rank_nonneg S.X₃
+  have h1 : 0 ≤ D.rank S.X₁ := D.rank_nonneg S.X₁
+  have h3 : 0 ≤ D.rank S.X₃ := D.rank_nonneg S.X₃
   omega
 
 /-- **A nonzero object of rank zero has phase one.**  Its charge is
