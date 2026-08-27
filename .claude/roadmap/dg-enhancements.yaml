@@ -251,8 +251,8 @@ items:
     kind: epic
     parent: dg-enhancements-m2
     title: "K^dg(A) enhances the homotopy category, and the structures agree"
-    status: planned
-    summary: "The first inhabited enhancement, plus the agreement theorem against Mathlib's own triangulated instance. Without the agreement clause this epic would produce a second, incomparable triangulated structure on the same category. Mathlib already has Pretriangulated and IsTriangulated on HomotopyCategory at the pin, so the target structure is free and the cost moves to Functor.CommShift for Cdg.seam."
+    status: done
+    summary: "The first inhabited enhancement, plus the agreement theorem against Mathlib's own triangulated instance. Without the agreement clause this epic would produce a second, incomparable triangulated structure on the same category. Mathlib already has Pretriangulated and IsTriangulated on HomotopyCategory at the pin, so the target structure is free and the cost moves to Functor.CommShift for Cdg.seam. Delivered by #771, which closed #378; DGCategory/Model/Agreement.lean carries the agreement theorem in main."
     priority: must
     size: L
     tags: [lean, nonvacuity, agreement]
