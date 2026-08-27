@@ -509,3 +509,37 @@ compound obligation with four separately-classical ones.
 #print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.toLeftAdjointKernelData_adjKernel
 #print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.twistAdj
 #print axioms CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints.twistLeft
+
+
+/-! ## The equivalence, derived rather than supplied (#795 half one)
+
+`KernelAutoequivalence` took its equivalence and comparison isomorphism as
+supplied fields. `ofRightAdjointKernel` derives both: an adjunction with
+invertible unit and counit IS an equivalence by `Adjunction.toEquivalence`, and
+its functor is the transform DEFINITIONALLY, so `iso` is `Iso.refl` and nothing
+is transported. `dualKernelOfRightAdjointKernel` is the same datum's dual
+kernel, also at `Iso.refl` -- `toEquivalence`'s inverse is the right adjoint on
+the nose, so no trip through `rightAdjointUniq` is needed.
+
+`ofFullyFaithful` splits the hypothesis the way a criterion would deliver it:
+full faithfulness gives the unit through Mathlib's
+`unit_isIso_of_L_fully_faithful`, and the counit is the remaining
+essential-surjectivity half.
+
+`transform_isEquivalence`, `isIso_unit` and `isIso_counit` are the CONVERSE, and
+they are the honesty check: given a kernel autoequivalence and a right adjoint
+kernel, the unit and counit are already invertible. So none of the above lowers
+the bar -- it restates it pointwise, in the shape a geometric criterion
+(Bondal--Orlov) actually has. Nothing here supplies that invertibility.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.dualKernelOfRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.dualKernelOfRightAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.isIso_counit
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.isIso_unit
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofFullyFaithful
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofFullyFaithful_kernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel_corr
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel_kernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.transform_isEquivalence
