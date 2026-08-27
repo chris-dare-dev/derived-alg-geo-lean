@@ -70,22 +70,59 @@ namespace Mukai
 
 variable {V : Type*} [AddCommGroup V] [Module ℝ V] (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V)
 
-/-- **The imaginary part of `Z(β,ω)` is the intersection of `c - r•β` with `ω`.**
-So the boundary case of Lemma 6.2, `Im Z = 0`, is an orthogonality. -/
+/-- **The imaginary part of `Z(β,ω)`, expanded.**  The closed form claimed by
+Lemma 6.2 is `im_expCharge_eq_apply_sub_smul`, immediately below; this is the
+same quantity with `b ω (c - r•β)` multiplied out, which is the shape
+`expCharge_apply` hands over. -/
 theorem im_expCharge (hb : ∀ x y : V, b x y = b y x) (r : ℝ) (c : V) (s : ℝ) :
     (expCharge b β ω (r, c, s)).im = b ω c - r * b β ω := by
   rw [expCharge_apply b β ω hb]
   simp
+
+/-- **`Im Z(β,ω)` IS the intersection of `c - r•β` with `ω`.**
+
+This is the form every case of Lemma 6.2 reads: cases 1--3 conclude
+`Im Z > 0` by testing `c - r•β` against `ω`, and case 4 is the boundary
+`Im Z = 0`, which this makes an orthogonality outright rather than after a
+rearrangement.
+
+`im_expCharge` proves the same equation with the right-hand side multiplied
+out.  Both are wanted: that one matches what `expCharge_apply` produces, this
+one matches what the Hodge index theorem consumes. -/
+theorem im_expCharge_eq_apply_sub_smul (hb : ∀ x y : V, b x y = b y x)
+    (r : ℝ) (c : V) (s : ℝ) :
+    (expCharge b β ω (r, c, s)).im = b ω (c - r • β) := by
+  rw [im_expCharge b β ω hb]
+  simp only [map_sub, map_smul, smul_eq_mul]
+  rw [hb ω β]
 
 /-- The orthogonality that `Im Z = 0` encodes, in the form the Hodge index
 theorem consumes. -/
 theorem apply_sub_smul_eq_zero_of_im_eq_zero (hb : ∀ x y : V, b x y = b y x)
     {r : ℝ} {c : V} {s : ℝ} (him : (expCharge b β ω (r, c, s)).im = 0) :
     b ω (c - r • β) = 0 := by
-  rw [im_expCharge b β ω hb] at him
-  simp only [map_sub, map_smul, smul_eq_mul]
-  rw [hb ω β]
-  linarith [him]
+  rw [← im_expCharge_eq_apply_sub_smul b β ω hb r c s]
+  exact him
+
+/-- **The positive case, which is what cases 1--3 of Lemma 6.2 conclude.**
+
+Those three cases differ only in why `c - r•β` meets `ω` positively — torsion
+on a curve, torsion in dimension zero, or a torsion-free sheaf strictly above
+the cutoff.  Once that is known, the charge lands in the open upper half plane
+for the same one-line reason, which is this. -/
+theorem im_expCharge_pos (hb : ∀ x y : V, b x y = b y x)
+    {r : ℝ} {c : V} {s : ℝ} (h : 0 < b ω (c - r • β)) :
+    0 < (expCharge b β ω (r, c, s)).im := by
+  rw [im_expCharge_eq_apply_sub_smul b β ω hb]
+  exact h
+
+/-- The same statement without strictness, for a case that only knows the
+cutoff is not crossed downward. -/
+theorem im_expCharge_nonneg (hb : ∀ x y : V, b x y = b y x)
+    {r : ℝ} {c : V} {s : ℝ} (h : 0 ≤ b ω (c - r • β)) :
+    0 ≤ (expCharge b β ω (r, c, s)).im := by
+  rw [im_expCharge_eq_apply_sub_smul b β ω hb]
+  exact h
 
 /-- **The identity Lemma 6.2's hard case rests on.**
 
