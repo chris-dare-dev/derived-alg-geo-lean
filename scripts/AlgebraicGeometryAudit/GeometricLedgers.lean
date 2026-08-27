@@ -206,3 +206,50 @@ to abstract coherent convolution data. -/
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConvUnitRight
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConvolutionLeftUnitData
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConvolutionRightUnitData
+
+
+/-! ## The adjoint ledger: three constituent adjunctions on Db(Coh)
+
+`KernelCorrespondence.lean` names derived pullback, tensor, and pushforward but
+relates them not at all -- its docstring explicitly declines to claim that
+pushforward is right adjoint to pullback. These three classes are that claim
+and the two others a right adjoint of the transform needs: the
+pullback/pushforward adjunction at `p`, a dual for the kernel, and a right
+adjoint of pushforward along `q` (Grothendieck duality).
+
+All three are SUPPLIED and nothing constructs an instance of any of them. A
+clean axiom list here says the assembly follows from them, not that any scheme
+admits one.
+
+`geometricConstituentRightAdjoints` is the payoff: it produces a genuine
+`FourierMukai.ConstituentRightAdjoints`, so `geometricTransform_isLeftAdjoint`
+is the first statement in this repository that a geometric Fourier--Mukai
+transform has an adjoint at all.
+
+What it does NOT produce is a `RightAdjointKernelData`: that the composite
+adjoint is again a TRANSFORM is a further obligation, needing a dualizing
+object and tensor rearrangement, and `HasTwistedInversePullback` deliberately
+refuses to decompose the shriek functor so that the two stay separate.
+
+Only the right side is ledgered. The left adjoint of `Lp^*` is the exceptional
+`p_!`, and nothing consumes one.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPullbackAdjunction
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPullbackAdjunction.adj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasKernelDual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasKernelDual.adj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasKernelDual.dualKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasTwistedInversePullback
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasTwistedInversePullback.adj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasTwistedInversePullback.twistedInverse
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedPullbackAdjunction
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.dualKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints_pullRight
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints_pushRight
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints_twistRight
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransform_isLeftAdjoint
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.kernelDualAdjunction
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.twistedInverseAdjunction
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.twistedInversePullback
