@@ -333,3 +333,23 @@ is the dual kernel of one, not the equivalence.
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricSwapIso
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.pullbackSwapIso
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.pushforwardSwapIso
+
+
+/-! ## A geometric kernel autoequivalence with no supplied equivalence
+
+`geometricKernelAutoequivalenceOfAdjoint` is the consumer #795 said already
+existed: it derives the equivalence from the assembled adjoint kernel rather
+than taking one, and `geometricDualKernelOfAdjoint` gets the dual kernel with
+it at no further cost.
+
+The invertibility of the adjunction's unit and counit is still ASSUMED, as
+instance arguments, and nothing here establishes it -- classically that is the
+Bondal--Orlov criterion. A clean axiom list says the equivalence follows from
+the ledger plus that invertibility, and says nothing about whether any transform
+satisfies it.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualKernelOfAdjoint
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualKernelOfAdjoint_dual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricKernelAutoequivalenceOfAdjoint
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricKernelAutoequivalenceOfAdjoint_kernel
