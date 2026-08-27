@@ -253,3 +253,40 @@ Only the right side is ledgered. The left adjoint of `Lp^*` is the exceptional
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.kernelDualAdjunction
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.twistedInverseAdjunction
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.twistedInversePullback
+
+
+/-! ## The dualizing twist, and a geometric adjoint kernel
+
+`HasDualizingTwist f` is the shape `HasTwistedInversePullback` refused to
+assume: `f^!(-) = Lf^*(-) (x) w_f`. SUPPLIED, and nothing constructs one. The
+shift is folded into the object because no consumer uses a relative dimension,
+and the class needs `HasCoherentPullback` at the PUSHFORWARD's morphism -- the
+mirror of the previous ledger needing pushforward at the pullback's.
+
+`geometricAdjointKernel` is a def with a VALUE, not a field: `Q = K^v (x) w_q`,
+the classical dual kernel, built from classes already on the table.
+
+`geometricRightAdjointIso` is the derivation, and its only inputs are the
+dualizing decomposition plus `HasDerivedTensorAssoc` -- an EXISTING class,
+consumed here at a second site. A clean axiom list says the composite right
+adjoint is the reversed transform and says nothing more.
+
+`geometricRightAdjointKernelData` is a genuine
+`FourierMukai.RightAdjointKernelData` for the geometric correspondence.
+
+It is NOT a `DualKernel`. That structure asks for the quasi-inverse as a
+transform of the SAME correspondence; this is a transform of the REVERSED one,
+a different value whenever p and q differ. Bridging needs the swap of the
+product, which is not stated anywhere.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDualizingTwist
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDualizingTwist.dualizingTwist
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDualizingTwist.iso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.dualizingTwist
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.dualizingTwistIso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricAdjointKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointIso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointKernelData
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjoint_isKernelFunctor
