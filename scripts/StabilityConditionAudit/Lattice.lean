@@ -399,7 +399,10 @@ Grassmannian of positive planes is not used. -/
 #print axioms PeriodDomain.sameOrientation_iff_of_reference
 #print axioms PeriodDomain.nonpos_of_sigPos_eq_one
 #print axioms Mukai.im_expCharge
+#print axioms Mukai.im_expCharge_eq_apply_sub_smul
 #print axioms Mukai.apply_sub_smul_eq_zero_of_im_eq_zero
+#print axioms Mukai.im_expCharge_pos
+#print axioms Mukai.im_expCharge_nonneg
 #print axioms Mukai.two_mul_re_expCharge
 #print axioms Mukai.two_mul_re_expCharge_ge
 #print axioms Mukai.re_expCharge_pos_of_nonneg
