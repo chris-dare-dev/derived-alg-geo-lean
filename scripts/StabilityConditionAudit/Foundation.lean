@@ -1157,6 +1157,26 @@ See `WeakTruncation.lean`'s module docstring. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mem_hnTors_of_charge_eq_zero
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mem_hnTors_of_slope_eq_top
 
+/-! ### The cutoff read against the object's own slope (`WeakCutoffSlope.lean`)
+
+`hnTors`/`hnFree` are defined by the HN *extrema*; a charge comparison needs the
+object's own slope. The strict counterpart gets this from `HNPolygon.lean`'s
+`arg`-based convexity, which does not survive the weakening; here it is an
+induction along the chain on the see-saw of `WeakSlopeGeometry.lean`. Note
+`charge_mem_closedUpperHalfPlane` holds for *every* object, the zero one
+included -- `0` is in the closed half-plane and not in the semi-closed one --
+which is what removes the nonvanishing side conditions from that induction. -/
+
+#print axioms CategoryTheory.Triangulated.chargeSlope_add_mem_uIcc
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.charge_mem_closedUpperHalfPlane
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.charge_chain_succ
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μ_le_slope_chain_and_le_μPlus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.slope_le_μPlus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μMinus_le_slope
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.lt_slope_of_mem_hnTors
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_le_of_mem_hnFree
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.rank_pos_of_mem_hnFree
+
 /-! ### Truncating a weak HN filtration, and the torsion subobject (`WeakTruncation.lean`) -/
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.exists_crossIndex
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.map_restrictChain
@@ -1323,6 +1343,29 @@ one.
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_zero
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_iso
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_additive
+
+/-! ## `Z(β,ω)` read against the weak slope cutoff
+
+`ExpCharge.lean` stops at the charge and says why: `MukaiChargeData` asserts nothing about
+rank, slope or torsion, and bundling those as hypotheses would prove nothing.
+`MukaiWeakSlopeCompat` supplies the connection in the one form that is an *identification*
+rather than a discriminant -- the Mukai class's rank component is the rank, its `ω`-degree is
+the degree -- from which `Im Z(β,ω) = degree - rank·(β·ω)` and the sign statements follow.
+
+The torsion bound is `0 ≤ Im Z`, not `0 < Im Z`, and that is sharp:
+`rank_eq_zero_of_im_eq_zero_of_mem_hnTors` says the boundary is attained exactly on the
+skyscraper. This is still **not** Lemma 6.2, which is about the tilted heart. -/
+
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.rank_eq
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.degree_eq
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_pos_iff_of_rank_pos
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_eq_degree_of_rank_zero
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_nonneg_of_mem_hnTors
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_pos_of_mem_hnTors_of_rank_pos
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.rank_eq_zero_of_im_eq_zero_of_mem_hnTors
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_nonpos_of_mem_hnFree
 
 /-! ## `extendMap`, bundled
 

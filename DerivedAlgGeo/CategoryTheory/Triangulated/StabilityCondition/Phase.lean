@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.UniformContinuity
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Order
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.NormalizedShift
 
 /-!
 # Phase transformations
