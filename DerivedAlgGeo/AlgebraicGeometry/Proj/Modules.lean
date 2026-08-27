@@ -26,5 +26,9 @@ import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartExtension
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartUnitTwist
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistApp
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistBridge
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.FracSection
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.AwayChart
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartScalar
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartProj
 
 /-! # Graded modules and their sheaves on `Proj` -/
