@@ -810,9 +810,9 @@ several structures in this repository carried as data (`map_zero`, `map_iso`,
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.phaseBase_add_phaseIndex
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.phaseIndex_add_one
 
-#print axioms CategoryTheory.Triangulated.semiClosedUpperHalfPlane
-#print axioms CategoryTheory.Triangulated.semiClosedUpperHalfPlane_ne_zero
-#print axioms CategoryTheory.Triangulated.arg_pos_of_mem_semiClosedUpperHalfPlane
+#print axioms CategoryTheory.semiClosedUpperHalfPlane
+#print axioms CategoryTheory.semiClosedUpperHalfPlane_ne_zero
+#print axioms CategoryTheory.arg_pos_of_mem_semiClosedUpperHalfPlane
 #print axioms CategoryTheory.Triangulated.StabilityFunction
 #print axioms CategoryTheory.Triangulated.StabilityFunction.ext
 #print axioms CategoryTheory.Triangulated.StabilityFunction.phase
@@ -1290,18 +1290,18 @@ one structure at two class data rather than two structures with the same fields,
 `IsStabilityCharge.weak` is proved once for every datum.
 -/
 
-#print axioms CategoryTheory.Triangulated.closedUpperHalfPlane
-#print axioms CategoryTheory.Triangulated.semiClosedUpperHalfPlane_subset_closed
-#print axioms CategoryTheory.Triangulated.ClassDatum
-#print axioms CategoryTheory.Triangulated.ClassDatum.mk
-#print axioms CategoryTheory.Triangulated.ClassDatum.mk.inj
-#print axioms CategoryTheory.Triangulated.ClassDatum.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.ClassDatum.Relevant
-#print axioms CategoryTheory.Triangulated.ClassDatum.cl
-#print axioms CategoryTheory.Triangulated.IsPositive
-#print axioms CategoryTheory.Triangulated.IsStabilityCharge
-#print axioms CategoryTheory.Triangulated.IsWeakStabilityCharge
-#print axioms CategoryTheory.Triangulated.IsStabilityCharge.weak
+#print axioms CategoryTheory.closedUpperHalfPlane
+#print axioms CategoryTheory.semiClosedUpperHalfPlane_subset_closed
+#print axioms CategoryTheory.ClassDatum
+#print axioms CategoryTheory.ClassDatum.mk
+#print axioms CategoryTheory.ClassDatum.mk.inj
+#print axioms CategoryTheory.ClassDatum.mk.sizeOf_spec
+#print axioms CategoryTheory.ClassDatum.Relevant
+#print axioms CategoryTheory.ClassDatum.cl
+#print axioms CategoryTheory.IsPositive
+#print axioms CategoryTheory.IsStabilityCharge
+#print axioms CategoryTheory.IsWeakStabilityCharge
+#print axioms CategoryTheory.IsStabilityCharge.weak
 #print axioms CategoryTheory.Triangulated.StabilityFunctionOn
 #print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk
 #print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk.inj
