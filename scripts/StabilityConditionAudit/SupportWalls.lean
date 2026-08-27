@@ -166,7 +166,6 @@ tilt-stability walls above, sharing no declaration with them; see the module
 docstrings in
 `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/`. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.RealMukai
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairing
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairing_mk
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.selfPairing

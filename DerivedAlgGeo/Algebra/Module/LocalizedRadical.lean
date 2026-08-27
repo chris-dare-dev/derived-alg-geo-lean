@@ -20,8 +20,13 @@ that ideal, and radical membership then transports the conclusion from `span s` 
 
 This statement was proved as a `private` lemma inside the Čech affine-vanishing file, where it
 was needed once. It is stated here instead because it is pure commutative algebra with no Čech
-content, and because the projective-space section-extension argument (#585) needs it without
-wanting the cohomology stack it was buried in. Nothing about the proof changed in the move.
+content, and because the projective-space section-extension argument (#585) was expected to need it
+without wanting the cohomology stack it was buried in. Nothing about the proof changed in the move.
+
+That expectation did not hold: `#585` closed without using this lemma at all — the overlap step it
+was meant for is settled by separatedness on the degree-two chart of `gᵢ gⱼ` instead. The Čech
+affine-vanishing argument remains its live consumer, and the statement is still worth having on its
+own terms.
 
 It is not in Mathlib at the current pin under this or any neighbouring name, and it is
 `upstream-candidate` material.
