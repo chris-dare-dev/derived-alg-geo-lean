@@ -189,7 +189,7 @@ data. -/
 noncomputable def toNumericalVariety
     (T : ToddData.Data P K)
     (R : ReconstructionSystem (X := X.toVariety) (P := P)) :
-    NumericalVarietyData 2 A (CoherentGrothendieckGroup X.toVariety) :=
+    NumericalVarietyData 2 A (K₀Ab (Coh X.toVariety.toScheme)) :=
   (toGeometricData T R).toNumericalVariety
 
 /-- The assembled numerical presentation satisfies HRR. -/

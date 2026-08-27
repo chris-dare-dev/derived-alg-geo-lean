@@ -1,3 +1,2 @@
-import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch.Grothendieck
 import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch.HigherDimension
 import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch.Surface
