@@ -55,8 +55,10 @@ a `comm` **guard** — deliberately not consumed by the derivation, which uses
   adjunctions, and they *are* consumed — by
   `FourierMukai.ConstituentRightAdjoints`, and through it by
   `KernelAutoequivalence.DualKernel.ofRightAdjointKernel`. What remains true is
-  the other half: nothing discharges those classes, and the dualizing object
-  itself is still absent, so no `DualKernel` is available here.
+  the other half: nothing discharges those classes. A `DualKernel` is now
+  reachable — `KernelSwap.geometricDualKernel` assembles one — but only from
+  that whole uninhabited ledger plus a supplied equivalence, so this file's
+  own inputs still do not produce one.
 * This file alone does not prove the kernel is a unit *for convolution*;
   `KernelUnitConvolution.lean` derives those laws from additional section and
   base-change geometry.
