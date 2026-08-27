@@ -94,7 +94,7 @@ variable {q} (R : BoundedRegion q)
 /-- The two facts a wall through the region gives about the class, before any
 finiteness reasoning: the offset `Δ − rβ` is `q`-negative, and the wall
 inequality holds. -/
-theorem key (hq : ∀ x y : V, q x y = q y x) {δ : RealMukai V}
+theorem key (hq : ∀ x y : V, q x y = q y x) {δ : Mukai.RealExtension V}
     (hs : IsSpherical q δ) (hr : 0 < δ.1) {p : V × V} (hp : p ∈ R.carrier)
     (hw : p ∈ wall q δ) :
     q (δ.2.1 - δ.1 • p.1) (δ.2.1 - δ.1 • p.1) ≤ -R.coercivity * ‖δ.2.1 - δ.1 • p.1‖ ^ 2 ∧
@@ -107,7 +107,7 @@ theorem key (hq : ∀ x y : V, q x y = q y x) {δ : RealMukai V}
 
 This is the step that needs `ampleLower > 0`, and the step the printed argument
 performs by saying "`ω` is constrained to lie in a bounded region". -/
-theorem rk_sq_le (hq : ∀ x y : V, q x y = q y x) {δ : RealMukai V}
+theorem rk_sq_le (hq : ∀ x y : V, q x y = q y x) {δ : Mukai.RealExtension V}
     (hs : IsSpherical q δ) (hr : 0 < δ.1) {p : V × V} (hp : p ∈ R.carrier)
     (hw : p ∈ wall q δ) :
     δ.1 ^ 2 ≤ 2 / R.ampleLower := by
@@ -124,7 +124,7 @@ theorem rk_sq_le (hq : ∀ x y : V, q x y = q y x) {δ : RealMukai V}
 
 The same inequality as `rk_sq_le`, read for the other term: `r²·q(ω,ω) ≥ 0`
 absorbs the rank contribution and what is left bounds the offset. -/
-theorem normSq_sub_smul_le (hq : ∀ x y : V, q x y = q y x) {δ : RealMukai V}
+theorem normSq_sub_smul_le (hq : ∀ x y : V, q x y = q y x) {δ : Mukai.RealExtension V}
     (hs : IsSpherical q δ) (hr : 0 < δ.1) {p : V × V} (hp : p ∈ R.carrier)
     (hw : p ∈ wall q δ) :
     ‖δ.2.1 - δ.1 • p.1‖ ^ 2 ≤ 2 / R.coercivity := by
@@ -154,12 +154,12 @@ coordinate forced by sphericity.
 This is `corank_eq_of_isSpherical` read as a definition: on spherical classes of
 nonzero rank the third coordinate is not free, so `(n, Δ)` already determines
 the class and a finiteness statement never has to bound `s`. -/
-noncomputable def reconstruct (nΔ : ℤ × V) : RealMukai V :=
+noncomputable def reconstruct (nΔ : ℤ × V) : Mukai.RealExtension V :=
   ((nΔ.1 : ℝ), nΔ.2, (q nΔ.2 nΔ.2 + 2) / (2 * (nΔ.1 : ℝ)))
 
 /-- The spherical classes of positive integral rank, with middle coordinate in
 `Λ`, whose wall meets the region. -/
-def wallCandidates (R : BoundedRegion q) (Λ : Set V) : Set (RealMukai V) :=
+def wallCandidates (R : BoundedRegion q) (Λ : Set V) : Set (Mukai.RealExtension V) :=
   {δ | IsSpherical q δ ∧ 0 < δ.1 ∧ (∃ n : ℤ, (n : ℝ) = δ.1) ∧ δ.2.1 ∈ Λ ∧
     (wall q δ ∩ R.carrier).Nonempty}
 
