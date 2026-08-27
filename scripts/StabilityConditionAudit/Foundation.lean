@@ -1023,6 +1023,23 @@ one -- the torsion sheaves, in the geometric case. -/
 #print axioms CategoryTheory.Triangulated.SlopeData.phase_eq_one_of_rank_zero
 #print axioms CategoryTheory.Triangulated.SlopeData.mem_hnTors_of_rank_zero
 
+/-! ## A phase cutoff, read as a slope cutoff
+
+`Cutoff.lean` cuts by a phase; Bridgeland's §6 cuts by a slope. `phase_le_iff_slope_le` relates
+the two orders but only between two OBJECTS, so nothing turned a cutoff into a slope, and every
+case of Lemma 6.2 needs exactly that. `slopeOfPhase β = -cot(πβ)` is the translation: the charge
+`-degree + i·rank` puts a positive-rank object in the open upper half plane, testing against the
+ray at angle `πβ` is `phaseCross` with `cos(πβ) + sin(πβ)·i`, and that computes to
+`rank·cos(πβ) + degree·sin(πβ)`, whose positivity is `-cot(πβ) < degree/rank` after dividing by
+`rank·sin(πβ) > 0`. The hypotheses `0 < β < 1` and `0 < rank` are the geometry's own: the first
+makes `sin(πβ) > 0`, the second is why rank-zero objects go through `mem_hnTors_of_rank_zero`
+instead.
+-/
+
+#print axioms CategoryTheory.Triangulated.slopeOfPhase
+#print axioms CategoryTheory.Triangulated.SlopeData.lt_phase_iff_slopeOfPhase_lt
+#print axioms CategoryTheory.Triangulated.SlopeData.phase_le_iff_le_slopeOfPhase
+
 /-! ## `K₀Ab` producers and the heart comparison (K₀ unification)
 
 `liftOf` is the universal property in the form producers want: additivity supplied as a
@@ -1076,6 +1093,17 @@ one structure at two class data rather than two structures with the same fields,
 #print axioms CategoryTheory.Triangulated.abelianDatum
 #print axioms CategoryTheory.Triangulated.abelianDatum_cl
 #print axioms CategoryTheory.Triangulated.abelianDatum_relevant
+
+/-! ## `heartDatum` — the second instantiation
+
+`ClassDatum` was written to be instantiated twice and had been instantiated once. This is
+the ambient datum: nonzero objects of `t.heart`, classes in the ambient `K₀ C`. It needs
+`Pretriangulated` only, so the §14 base file keeps its typeclass strength.
+-/
+
+#print axioms CategoryTheory.Triangulated.heartDatum
+#print axioms CategoryTheory.Triangulated.heartDatum_cl
+#print axioms CategoryTheory.Triangulated.heartDatum_relevant
 
 /-! ## `StabilityFunction`, restated over `K₀Ab`
 

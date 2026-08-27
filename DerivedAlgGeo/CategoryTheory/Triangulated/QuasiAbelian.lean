@@ -38,11 +38,14 @@ path said specialized.
 
 ## What this file does not assert
 
-**No category is shown to be quasi-abelian, and the axioms of one are nowhere
-stated.**  The filename records which theory this vocabulary is drawn from, not
-a claim that the theory is developed here — `QuasiAbelian` appears in no
-declaration in this file.  What is developed is strictness of individual
-morphisms and the finiteness conditions built on it.
+**No category is shown to be quasi-abelian.**  The `QuasiAbelian` class below
+states the two stability axioms — strict epimorphisms stable under pullback,
+strict monomorphisms stable under pushout — but nothing in this repository
+supplies an instance of it, so the class is a statement layer and not a claim
+about any category here.
+
+Most of the file is prior to that class: strictness of individual morphisms and
+the finiteness conditions built on it, none of which needs the axioms.
 -/
 
 noncomputable section

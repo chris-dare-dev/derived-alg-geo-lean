@@ -206,3 +206,130 @@ to abstract coherent convolution data. -/
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConvUnitRight
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConvolutionLeftUnitData
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConvolutionRightUnitData
+
+
+/-! ## The adjoint ledger: three constituent adjunctions on Db(Coh)
+
+`KernelCorrespondence.lean` names derived pullback, tensor, and pushforward but
+relates them not at all -- its docstring explicitly declines to claim that
+pushforward is right adjoint to pullback. These three classes are that claim
+and the two others a right adjoint of the transform needs: the
+pullback/pushforward adjunction at `p`, a dual for the kernel, and a right
+adjoint of pushforward along `q` (Grothendieck duality).
+
+All three are SUPPLIED and nothing constructs an instance of any of them. A
+clean axiom list here says the assembly follows from them, not that any scheme
+admits one.
+
+`geometricConstituentRightAdjoints` is the payoff: it produces a genuine
+`FourierMukai.ConstituentRightAdjoints`, so `geometricTransform_isLeftAdjoint`
+is the first statement in this repository that a geometric Fourier--Mukai
+transform has an adjoint at all.
+
+What it does NOT produce is a `RightAdjointKernelData`: that the composite
+adjoint is again a TRANSFORM is a further obligation, needing a dualizing
+object and tensor rearrangement, and `HasTwistedInversePullback` deliberately
+refuses to decompose the shriek functor so that the two stay separate.
+
+Only the right side is ledgered. The left adjoint of `Lp^*` is the exceptional
+`p_!`, and nothing consumes one.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPullbackAdjunction
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPullbackAdjunction.adj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasKernelDual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasKernelDual.adj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasKernelDual.dualKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasTwistedInversePullback
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasTwistedInversePullback.adj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasTwistedInversePullback.twistedInverse
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedPullbackAdjunction
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.dualKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints_pullRight
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints_pushRight
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints_twistRight
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransform_isLeftAdjoint
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.kernelDualAdjunction
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.twistedInverseAdjunction
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.twistedInversePullback
+
+
+/-! ## The dualizing twist, and a geometric adjoint kernel
+
+`HasDualizingTwist f` is the shape `HasTwistedInversePullback` refused to
+assume: `f^!(-) = Lf^*(-) (x) w_f`. SUPPLIED, and nothing constructs one. The
+shift is folded into the object because no consumer uses a relative dimension,
+and the class needs `HasCoherentPullback` at the PUSHFORWARD's morphism -- the
+mirror of the previous ledger needing pushforward at the pullback's.
+
+`geometricAdjointKernel` is a def with a VALUE, not a field: `Q = K^v (x) w_q`,
+the classical dual kernel, built from classes already on the table.
+
+`geometricRightAdjointIso` is the derivation, and its only inputs are the
+dualizing decomposition plus `HasDerivedTensorAssoc` -- an EXISTING class,
+consumed here at a second site. A clean axiom list says the composite right
+adjoint is the reversed transform and says nothing more.
+
+`geometricRightAdjointKernelData` is a genuine
+`FourierMukai.RightAdjointKernelData` for the geometric correspondence.
+
+It is NOT a `DualKernel`. That structure asks for the quasi-inverse as a
+transform of the SAME correspondence; this is a transform of the REVERSED one,
+a different value whenever p and q differ. Bridging needs the swap of the
+product, which is not stated anywhere.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDualizingTwist
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDualizingTwist.dualizingTwist
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDualizingTwist.iso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.dualizingTwist
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.dualizingTwistIso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricAdjointKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointIso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointKernelData
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjoint_isKernelFunctor
+
+
+/-! ## The swap, and a geometric dual kernel
+
+The previous ledger's `RightAdjointKernelData` had the REVERSED correspondence
+as its opposite; `DualKernel` needs the same one on both sides. `HasPullbackSwap`
+and `HasPushforwardSwap` close that gap. Both are SUPPLIED and uninhabited, and
+both carry their composition identity as a `comm` GUARD that the derivation does
+not consume -- the `HasPullbackRetraction` pattern.
+
+`geometricSwapIso` is the derivation, and its third input is
+`HasProjectionFormulaRight` at the swap: an EXISTING class, consumed here at a
+further site. A clean axiom list says the reversed transform is the original one
+with kernel `Rs_* Q`, and nothing more.
+
+`Rs_* Q` rather than `s^* Q` deliberately: the two agree when `s` is an
+involution isomorphism, and that hypothesis is NOT assumed anywhere -- the
+projection formula hands back the pushforward, so the pushforward is what the
+kernel is written with.
+
+`geometricDualKernel` is the end of the arc: a `DualKernel` whose dual is
+`Rs_*(K^v (x) w_q)`, the classical `P^v (x) p^* w_X [dim X]`. The EQUIVALENCE is
+still supplied -- `geometricKernelAutoequivalence` takes it and its comparison
+isomorphism as arguments, because that a geometric transform is an equivalence
+is the classical theorem the whole lane is conditional on. What is now geometric
+is the dual kernel of one, not the equivalence.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPullbackSwap
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPullbackSwap.comm
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPullbackSwap.iso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPushforwardSwap
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPushforwardSwap.comm
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPushforwardSwap.iso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualAdjointKernelData
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualKernelObj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricDualKernel_dual
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricKernelAutoequivalence
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricSwapIso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.pullbackSwapIso
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.pushforwardSwapIso

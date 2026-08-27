@@ -48,9 +48,17 @@ a `comm` **guard** — deliberately not consumed by the derivation, which uses
   intended instantiation precise.
 * No `DualKernel`. The classical dual kernel is `P^∨ ⊗ p^* ω_X [dim X]`,
   which needs derived duals and a dualizing complex — machinery with no
-  substrate in this repository. It stays a named absence, not a ledger,
-  because a ledger for it would today be a list of classes nothing will
-  discharge and nothing consumes.
+  substrate in this repository when this file was written.
+
+  Half of that reason has since lapsed and the sentence is corrected rather
+  than left standing: `KernelAdjunction.lean` now ledgers the three constituent
+  adjunctions, and they *are* consumed — by
+  `FourierMukai.ConstituentRightAdjoints`, and through it by
+  `KernelAutoequivalence.DualKernel.ofRightAdjointKernel`. What remains true is
+  the other half: nothing discharges those classes. A `DualKernel` is now
+  reachable — `KernelSwap.geometricDualKernel` assembles one — but only from
+  that whole uninhabited ledger plus a supplied equivalence, so this file's
+  own inputs still do not produce one.
 * This file alone does not prove the kernel is a unit *for convolution*;
   `KernelUnitConvolution.lean` derives those laws from additional section and
   base-change geometry.

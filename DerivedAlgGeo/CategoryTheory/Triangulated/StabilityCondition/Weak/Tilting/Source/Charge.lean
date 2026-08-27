@@ -162,7 +162,11 @@ noncomputable def sourceTiltWeakStabilityFunction
     (sigma : WeakPreStabilityCondition v) (b : ℝ) :
     WeakStabilityFunction (sigma.slopeTorsionPair b).tilt where
   Z := sigma.sourceTiltCharge b
-  upper E hE _ := by
+  nonzero_mem E hmem := by
+    obtain ⟨hE, _⟩ := hmem
+    show 0 < ((sigma.sourceTiltCharge b) (K₀.of C E)).im ∨
+      (((sigma.sourceTiltCharge b) (K₀.of C E)).im = 0 ∧
+        ((sigma.sourceTiltCharge b) (K₀.of C E)).re ≤ 0)
     let theta := slopeCutPhase b
     let c := sourceTiltScale b
     let W := sigma.phaseTiltWeakStabilityFunction theta
