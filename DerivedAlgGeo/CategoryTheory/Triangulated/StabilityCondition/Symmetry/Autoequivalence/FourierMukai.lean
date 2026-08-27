@@ -716,6 +716,154 @@ theorem UnitKernelData.ofLeftAdjointKernel_dual {corr : Correspondence C C 𝒲}
 
 end Identity
 
+section FromAdjoint
+
+/-! ### The equivalence, derived rather than supplied
+
+`KernelAutoequivalence` takes its equivalence and the comparison isomorphism as
+supplied fields, and every consequence in this file is conditional on them. This
+section removes that particular supply point: a `RightAdjointKernelData` whose
+adjunction has invertible unit and counit already *is* an equivalence, by
+`Adjunction.toEquivalence`, and its functor is the transform definitionally — so
+the comparison isomorphism is `Iso.refl`.
+
+**This is not a weakening, and `isIso_unit`/`isIso_counit` below prove it.**
+Given a kernel autoequivalence together with a right adjoint kernel, the
+adjunction's unit and counit are invertible: Mathlib supplies that as instances
+once the functors are equivalences. So the two data are interderivable, exactly
+as `DualKernel` and `LeftAdjointKernelData` are.
+
+What changes is the *shape of the hypothesis*, and that is the whole point.
+"There exists an equivalence and an isomorphism to the transform" is not
+something a geometric theorem produces. "The unit and counit of this adjunction
+are isomorphisms" is: it is pointwise, it is checkable, and its two halves are
+full faithfulness and essential surjectivity — which is the form the
+Bondal--Orlov criterion actually takes. `ofFullyFaithful` below is that split,
+using Mathlib's `unit_isIso_of_L_fully_faithful`.
+
+Nothing here supplies the invertibility. That is the second half of the layer-3
+work and it needs geometry this repository does not have. -/
+
+variable (corr : Correspondence C C 𝒲) (K : 𝒲)
+
+/-- **A kernel autoequivalence, from an adjoint kernel with invertible unit and
+counit.**
+
+`Adjunction.toEquivalence` on the supplied adjunction. Its `functor` field is
+`corr.transform K` definitionally, so `iso` is `Iso.refl` and nothing is
+transported.
+
+The first constructor of a `KernelAutoequivalence` from anything other than a
+directly supplied equivalence. -/
+noncomputable def KernelAutoequivalence.ofRightAdjointKernel
+    (R : RightAdjointKernelData corr corr K)
+    [∀ X, IsIso (R.adj.unit.app X)] [∀ Y, IsIso (R.adj.counit.app Y)] :
+    KernelAutoequivalence C 𝒲 where
+  corr := corr
+  kernel := K
+  equiv := R.adj.toEquivalence
+  iso := Iso.refl _
+
+omit [IsTriangulated C] in
+@[simp]
+theorem KernelAutoequivalence.ofRightAdjointKernel_corr
+    (R : RightAdjointKernelData corr corr K)
+    [∀ X, IsIso (R.adj.unit.app X)] [∀ Y, IsIso (R.adj.counit.app Y)] :
+    (KernelAutoequivalence.ofRightAdjointKernel corr K R).corr = corr := rfl
+
+omit [IsTriangulated C] in
+@[simp]
+theorem KernelAutoequivalence.ofRightAdjointKernel_kernel
+    (R : RightAdjointKernelData corr corr K)
+    [∀ X, IsIso (R.adj.unit.app X)] [∀ Y, IsIso (R.adj.counit.app Y)] :
+    (KernelAutoequivalence.ofRightAdjointKernel corr K R).kernel = K := rfl
+
+/-- **The same datum also gives the dual kernel, for free.**
+
+`toEquivalence`'s `inverse` is the adjunction's right adjoint, which is
+`corr.transform R.adjKernel` definitionally — so `invIso` is `Iso.refl` and
+`DualKernel.ofRightAdjointKernel`'s trip through `Adjunction.rightAdjointUniq`
+is not needed here. One `RightAdjointKernelData` with invertible unit and counit
+yields the equivalence *and* its dual kernel. -/
+noncomputable def KernelAutoequivalence.dualKernelOfRightAdjointKernel
+    (R : RightAdjointKernelData corr corr K)
+    [∀ X, IsIso (R.adj.unit.app X)] [∀ Y, IsIso (R.adj.counit.app Y)] :
+    KernelAutoequivalence.DualKernel
+      (KernelAutoequivalence.ofRightAdjointKernel corr K R) where
+  dual := R.adjKernel
+  invIso := Iso.refl _
+
+omit [IsTriangulated C] in
+@[simp]
+theorem KernelAutoequivalence.dualKernelOfRightAdjointKernel_dual
+    (R : RightAdjointKernelData corr corr K)
+    [∀ X, IsIso (R.adj.unit.app X)] [∀ Y, IsIso (R.adj.counit.app Y)] :
+    (KernelAutoequivalence.dualKernelOfRightAdjointKernel corr K R).dual =
+      R.adjKernel := rfl
+
+/-- **The hypothesis split the way a criterion would deliver it.**
+
+Full faithfulness of the transform gives the unit, by Mathlib's
+`unit_isIso_of_L_fully_faithful`; the counit is still asked for, and it is the
+essential-surjectivity half. Stated because this is the shape Bondal--Orlov has
+— fully faithful, plus a condition — and a geometric criterion would land here
+rather than on the raw unit. -/
+noncomputable def KernelAutoequivalence.ofFullyFaithful
+    (R : RightAdjointKernelData corr corr K)
+    [(corr.transform K).Full] [(corr.transform K).Faithful]
+    [∀ Y, IsIso (R.adj.counit.app Y)] :
+    KernelAutoequivalence C 𝒲 :=
+  have : IsIso R.adj.unit := R.adj.unit_isIso_of_L_fully_faithful
+  have : ∀ X, IsIso (R.adj.unit.app X) := fun X => inferInstanceAs (IsIso (R.adj.unit.app X))
+  KernelAutoequivalence.ofRightAdjointKernel corr K R
+
+omit [IsTriangulated C] in
+@[simp]
+theorem KernelAutoequivalence.ofFullyFaithful_kernel
+    (R : RightAdjointKernelData corr corr K)
+    [(corr.transform K).Full] [(corr.transform K).Faithful]
+    [∀ Y, IsIso (R.adj.counit.app Y)] :
+    (KernelAutoequivalence.ofFullyFaithful corr K R).kernel = K := rfl
+
+/-! ### The converse: nothing above weakens the hypothesis
+
+If a kernel autoequivalence and a right adjoint kernel for the same kernel are
+both on the table, the adjunction's unit and counit are already invertible. So
+`ofRightAdjointKernel` does not lower the bar — it restates it in a form a
+geometric criterion can attack. This is the same honesty check
+`DualKernel.toLeftAdjointKernelData` performs one layer down. -/
+
+omit [IsTriangulated C] in
+/-- The transform of a kernel autoequivalence is an equivalence.  Transport of
+`A.equiv` along the supplied `A.iso`, and the hinge of both lemmas below. -/
+theorem KernelAutoequivalence.transform_isEquivalence
+    (A : KernelAutoequivalence C 𝒲) :
+    (A.corr.transform A.kernel).IsEquivalence :=
+  have : A.equiv.functor.IsEquivalence := inferInstance
+  Functor.isEquivalence_of_iso A.iso
+
+omit [IsTriangulated C] in
+/-- **The counit of any right adjoint kernel is invertible**, given the
+equivalence. -/
+theorem KernelAutoequivalence.isIso_counit (A : KernelAutoequivalence C 𝒲)
+    (R : RightAdjointKernelData A.corr A.corr A.kernel) : IsIso R.adj.counit :=
+  have := A.transform_isEquivalence
+  inferInstance
+
+omit [IsTriangulated C] in
+/-- **The unit of any right adjoint kernel is invertible**, given the
+equivalence.
+
+Through `isEquivalence_right_of_isEquivalence_left`: the right adjoint of an
+equivalence is an equivalence, and Mathlib's instance then gives the unit. -/
+theorem KernelAutoequivalence.isIso_unit (A : KernelAutoequivalence C 𝒲)
+    (R : RightAdjointKernelData A.corr A.corr A.kernel) : IsIso R.adj.unit :=
+  have := A.transform_isEquivalence
+  have := R.adj.isEquivalence_right_of_isEquivalence_left
+  inferInstance
+
+end FromAdjoint
+
 end
 
 end CategoryTheory.Triangulated.StabilityCondition.Symmetry
