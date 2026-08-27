@@ -1309,3 +1309,23 @@ The Mukai-lattice leg of the charge chain was additive and unbundled like the nu
 -/
 
 #print axioms Mukai.extendMapHom
+
+/-! ## The surface slope, honestly valued
+
+`WeakSlope.lean`'s slope is `degree / rank`, junk at rank zero where the classical slope is
+`+∞` -- which is why every statement there carries a positive-rank hypothesis.
+`WeakSlopeGeometry.lean`'s slope is `WithTop ℝ`-valued and `⊤` on the real boundary of the
+closed upper half-plane. `topSlope` is the second one, attached to a `WeakSlopeData`, and the
+two agreement lemmas say exactly where the first means anything. `topSlope_of_rank_zero` is the
+skyscraper: no positivity hypothesis anywhere, and it is what `mem_hnTors_of_slope_eq_top`
+reads, so the geometry and the cutoff agree about the same objects rather than each being
+separately correct about a different notion of slope.
+
+Deliverable 4 of the #740 surface redirect's item 2.
+-/
+
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_eq_chargeSlope
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_of_rank_pos
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_of_rank_zero
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_eq_of_iso
