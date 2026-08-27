@@ -63,14 +63,15 @@ open AlgebraicGeometry
 -- that transfers along an isomorphism, so the OBJECT-level statement suffices. The functor-level
 -- one is not built, and going through it is not merely more work: it means letting unification
 -- discover the two site functors underneath Scheme.Modules.pushforward and restrictFunctor, which
--- runs whnf past 200000 heartbeats -- the same failure ChartExtension.lean records for fromTildeGamma.
+-- runs whnf past 200000 heartbeats -- the same failure ChartExtension.lean records for
+-- fromTildeGamma.
 --
 -- restrictSquareSections_smul is the equality of sheaf-of-rings data that the first version of
 -- BaseChange.lean left open. Both sides' scalar actions unfold by rfl to actions through
 -- Scheme.Hom.app; Scheme.Opens.ι_appIso removes the open immersion's appIso and is the one step
 -- that is NOT definitional; Scheme.Modules.map_smul gives semilinearity over X's structure sheaf;
--- and morphismRestrict_app says the two structure-sheaf maps differ by exactly the transport being
--- compared, eqToHom direction included.
+-- and morphismRestrict_app says the two structure-sheaf maps differ by exactly the transport
+-- being compared, eqToHom direction included.
 --
 -- presheaf_map_square_eq is stated separately because in a clean context its rewrites fire, while
 -- the naturality goal it discharges carries the instances-transparency defect and admits only

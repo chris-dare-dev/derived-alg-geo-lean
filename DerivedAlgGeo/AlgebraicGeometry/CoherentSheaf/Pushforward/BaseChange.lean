@@ -215,9 +215,10 @@ noncomputable def restrictSquareSectionsEquiv (V : U.toScheme.Opens) :
 /-- **The base-change comparison, object by object.**
 
 Pushing forward along `f` and then restricting to `U` is restricting to `f ⁻¹ᵁ U` and then pushing
-forward along `f ∣_ U`. This is what `#572` step 2 consumes: `isCoherent_iff_restrict_affineOpenCover`
-asks for `IsFinitePresentation` of the restriction, which transfers along an isomorphism, so the
-object-level statement suffices and the functor-level one is not needed. -/
+forward along `f ∣_ U`. This is what `#572` step 2 consumes:
+`isCoherent_iff_restrict_affineOpenCover` asks for `IsFinitePresentation` of the restriction, which
+transfers along an isomorphism, so the object-level statement suffices and the functor-level one is
+not needed. -/
 noncomputable def pushforwardRestrictIso :
     ((Scheme.Modules.pushforward f).obj M).restrict U.ι ≅
       (Scheme.Modules.pushforward (f ∣_ U)).obj (M.restrict (f ⁻¹ᵁ U).ι) :=
