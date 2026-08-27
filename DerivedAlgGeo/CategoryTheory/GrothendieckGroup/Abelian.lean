@@ -28,11 +28,13 @@ through `AddMonoidHom` instead of restating them.
 
 ## Placement
 
-This file sits under `Triangulated/GrothendieckGroup/` because that is where
-`Presentation.lean` lives, and it consumes nothing triangulated.  Neither does
-`Presentation.lean`.  The honest home for both is `CategoryTheory/GrothendieckGroup/`;
-moving them is a rename of an existing directory and is deliberately not bundled
-into this change.
+This file and `Presentation.lean` sit under `CategoryTheory/GrothendieckGroup/`
+because neither consumes anything triangulated.  `K₀` itself, built on
+`distTriang`, stays under `Triangulated/GrothendieckGroup/`, where it belongs.
+
+The rule that places them — *a file belongs under `Triangulated/` only if it
+uses something triangulated* — is the same one that puts `heartDatum` beside the
+class datum it instantiates rather than beside the §14 lane that consumes it.
 
 ## Main results
 

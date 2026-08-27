@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.PreStabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.HeartDatum
 import Mathlib.CategoryTheory.Triangulated.TStructure.Heart
 import Mathlib.Tactic
 
@@ -106,33 +107,58 @@ variable (t : TStructure C)
 
 /-- A weak stability function on the heart of `t` (Definition 14.2): an
 additive charge whose value on every nonzero heart object lies in
-`ℍ ⊔ ℝ_{≤0} = {z : 0 < Im z} ∪ {z : Im z = 0 ∧ Re z ≤ 0}`. -/
-structure WeakStabilityFunction where
-  /-- The additive charge, on the ambient `K₀`. -/
-  Z : K₀ C →+ ℂ
-  /-- Values on nonzero heart objects lie in `ℍ ⊔ ℝ_{≤0}`. -/
-  upper : ∀ E : C, t.heart E → ¬IsZero E →
-    0 < (Z (K₀.of C E)).im ∨ ((Z (K₀.of C E)).im = 0 ∧ (Z (K₀.of C E)).re ≤ 0)
+`ℍ ⊔ ℝ_{≤0} = {z : 0 < Im z} ∪ {z : Im z = 0 ∧ Re z ≤ 0}`.
+
+This is `WeakStabilityFunctionOn` at `heartDatum t` — the ambient
+instantiation of the one charge-positivity structure — **not** a structure of
+its own. The half-plane it used to write out by hand is
+`closedUpperHalfPlane`, and the two agree definitionally. `Z` keeps its name
+as a field and `upper` keeps its name and argument shape as a theorem below,
+so consumers are unaffected. -/
+abbrev WeakStabilityFunction := WeakStabilityFunctionOn (heartDatum t)
 
 /-- An ordinary stability function on the heart of `t`: values on nonzero
 heart objects lie in `ℍ ⊔ ℝ_{<0}`, the *strict* form. Carried here so the
-embedding into the weak structure is a theorem rather than prose. -/
-structure StabilityFunction where
-  /-- The additive charge, on the ambient `K₀`. -/
-  Z : K₀ C →+ ℂ
-  /-- Values on nonzero heart objects lie in `ℍ ⊔ ℝ_{<0}`. -/
-  upper : ∀ E : C, t.heart E → ¬IsZero E →
-    0 < (Z (K₀.of C E)).im ∨ ((Z (K₀.of C E)).im = 0 ∧ (Z (K₀.of C E)).re < 0)
+embedding into the weak structure is a theorem rather than prose.
+
+This is `StabilityFunctionOn` at `heartDatum t`, at
+`semiClosedUpperHalfPlane`. The strict-implies-weak embedding is
+`StabilityFunctionOn.toWeak`, proved once for every class datum rather than
+once here. -/
+abbrev StabilityFunction := StabilityFunctionOn (heartDatum t)
+
+variable {t}
+
+/-- **Values on nonzero heart objects lie in `ℍ ⊔ ℝ_{≤0}`** — the defining
+positivity, in the curried argument shape consumers use. Formerly a structure
+field; now the datum's positivity condition, unfolded. -/
+theorem WeakStabilityFunction.upper (W : WeakStabilityFunction t) (E : C)
+    (hE : t.heart E) (hne : ¬IsZero E) :
+    0 < (W.Z (K₀.of C E)).im ∨
+      ((W.Z (K₀.of C E)).im = 0 ∧ (W.Z (K₀.of C E)).re ≤ 0) :=
+  W.nonzero_mem E ⟨hE, hne⟩
+
+/-- **Values on nonzero heart objects lie in `ℍ ⊔ ℝ_{<0}`** — the strict form,
+in the curried argument shape consumers use. -/
+theorem StabilityFunction.upper (Z : StabilityFunction t) (E : C)
+    (hE : t.heart E) (hne : ¬IsZero E) :
+    0 < (Z.Z (K₀.of C E)).im ∨
+      ((Z.Z (K₀.of C E)).im = 0 ∧ (Z.Z (K₀.of C E)).re < 0) :=
+  Z.nonzero_mem E ⟨hE, hne⟩
+
+variable (t)
 
 namespace StabilityFunction
 
 variable {t}
 
 /-- **Ordinary stability functions are weak stability functions**:
-`ℝ_{<0} ⊆ ℝ_{≤0}`, same charge. -/
-def toWeak (Z : StabilityFunction t) : WeakStabilityFunction t where
-  Z := Z.Z
-  upper E hE hne := (Z.upper E hE hne).imp id fun h => ⟨h.1, h.2.le⟩
+`ℝ_{<0} ⊆ ℝ_{≤0}`, same charge.
+
+The inclusion is `StabilityFunctionOn.toWeak`, proved once for every class
+datum. This wrapper preserves the name and signature the §14 lane uses. -/
+def toWeak (Z : StabilityFunction t) : WeakStabilityFunction t :=
+  StabilityFunctionOn.toWeak Z
 
 @[simp]
 theorem toWeak_Z (Z : StabilityFunction t) : Z.toWeak.Z = Z.Z := rfl
