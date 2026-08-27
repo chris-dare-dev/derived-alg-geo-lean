@@ -908,28 +908,15 @@ is not closed. -/
 #print axioms Cohomology.FiniteCohomology.alternating_finrank_eq_zero_of_exact
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic_additive
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic_additive_modules
-#print axioms Cohomology.CoherentGrothendieckRelation
-#print axioms Cohomology.FiniteCohomology.coherentGrothendieckRelations_le_ker
 #print axioms Cohomology.FiniteCohomology.grothendieckEulerHom
 #print axioms Cohomology.FiniteCohomology.grothendieckEulerHom_class
 
--- Layer B stage 5: dimension-independent descent of additive coherent-sheaf invariants through
--- K₀. Surface compatibility aliases are audited immediately afterward.
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.freeHom
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.coherentGrothendieckRelations_le_ker
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.grothendieckHom
-#print axioms AlgebraicGeometry.RiemannRoch.CoherentAdditiveInvariant.grothendieckHom_class
-#print axioms AlgebraicGeometry.RiemannRoch.coherentGrothendieckGroup_hom_ext
+-- Layer B stage 5: additive coherent-sheaf invariants ARE homs out of `K₀Ab (Coh X)`.
+-- `CoherentAdditiveInvariant`, its free-group route and its bespoke universal property are
+-- gone, and so are the surface compatibility aliases that forwarded to them.
 
 -- Layer B stage 5: the scheme-derived surface numerical-variety assembly. The geometric HRR
--- input is stated on coherent sheaves; the audited theorem below descends it to every K₀ class.
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant.freeHom
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant.coherentGrothendieckRelations_le_ker
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant.grothendieckHom
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.CoherentAdditiveInvariant.grothendieckHom_class
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.coherentGrothendieckGroup_hom_ext
+-- input is stated on coherent sheaves; the audited theorem below descends it to every K₀Ab class.
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.rankInvariant
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.ReconstructionSystem.chernCharacterInvariant
@@ -2052,7 +2039,6 @@ not functions. -/
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.perfectC2Degree
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.perfect_eulerCharacteristic_eq
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.discriminantDegree_eq_c2
-#print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.coherentGrothendieckClass_shortExact
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.grothendieckEulerHom_class_eq_perfect_formula
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.NumericalVarietyComparison.chi_eq_geometric_terms
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.Devissage.NumericalVarietyComparison.chi_eq_classical
