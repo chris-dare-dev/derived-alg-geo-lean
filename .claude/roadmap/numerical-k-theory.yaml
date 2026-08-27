@@ -89,9 +89,9 @@ items:
     gh_sub_issues: []
     kind: epic
     parent: numerical-k-theory-m1
-    title: "Additive invariants become homs out of K₀Ab"
+    title: "NumericalData's class map becomes a hom out of K₀Ab"
     status: planned
-    summary: "`CoherentAdditiveInvariant` (`RiemannRoch/Grothendieck.lean:31`) carries `obj`, `map_iso`, `map_shortExact`; `NumericalVarietyData` (`Variety/Numerical.lean:63`) carries `classOf`, `classOf_iso`, `classOf_shortExact`. Each triple IS an `AddMonoidHom` out of `K₀Ab (Coh X)` written longhand — 6 fields become 2. #760 announced this class of fix and #766 delivered it for `SlopeData`; these two were in neither. Sequenced first because it is additive in spirit: the hom replaces the fields, consumers keep their theorem names, and nothing is deleted that e2 has not yet made redundant."
+    summary: "`NumericalData` (`Variety/Numerical.lean:63`) carried `classOf`, `classOf_iso`, `classOf_shortExact`. The two laws say the function factors through the Grothendieck group, so they were never data: three fields become `classOfHom : K₀Ab (Coh X) →+ N`, with `classOf` surviving as an object-level abbreviation and both laws as theorems of unchanged name and shape. This is the second of the three axiom triples #760 announced; #766 collapsed `SlopeData`. Scoped to `NumericalData` alone because it targets an abstract `N` and is therefore separable — see e2 for why `CoherentAdditiveInvariant` is not."
     priority: must
     size: M
     tags: [lean, k-theory, refactor]
@@ -101,9 +101,9 @@ items:
     gh_sub_issues: []
     kind: epic
     parent: numerical-k-theory-m1
-    title: "Delete CoherentGrothendieckGroup in favour of K₀Ab (Coh X)"
+    title: "Delete CoherentGrothendieckGroup, and with it CoherentAdditiveInvariant"
     status: planned
-    summary: "A second, complete Grothendieck group: `Additivity.lean:360-378` rebuilds the quotient, the class map and the universal property, with the property re-proved at `RiemannRoch/Grothendieck.lean` and the defining relation re-derived by hand at `Surface/Devissage.lean`. ~176 lines and 6 restated proofs. The `iso` relation generator is redundant because `K₀Ab.of_iso` is a theorem. Blocked on e1: the invariants must already be homs before their carrier can change underneath them."
+    summary: "A second, complete Grothendieck group: `Additivity.lean:360-378` rebuilds the quotient, the class map and the universal property, with the property re-proved at `RiemannRoch/Grothendieck.lean` and the defining relation re-derived by hand at `Surface/Devissage.lean`. ~176 lines and 6 restated proofs. The `iso` relation generator is redundant because `K₀Ab.of_iso` is a theorem. **`CoherentAdditiveInvariant` is part of this epic, not e1.** Its only purpose is `grothendieckHom : CoherentGrothendieckGroup X →+ M`, so collapsing it onto `K₀Ab` IS deleting `CoherentGrothendieckGroup`; separating them would mean building a bridge between two Grothendieck groups in order to delete one. Discovered on contact with the code while implementing e1, and recorded here rather than left as a split that was abandoned."
     priority: must
     size: L
     tags: [lean, k-theory, deletion]
