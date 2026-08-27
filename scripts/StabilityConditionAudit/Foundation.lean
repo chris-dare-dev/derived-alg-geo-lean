@@ -1184,6 +1184,27 @@ one -- the torsion sheaves, in the geometric case. -/
 #print axioms CategoryTheory.Triangulated.SlopeData.phase_eq_one_of_rank_zero
 #print axioms CategoryTheory.Triangulated.SlopeData.mem_hnTors_of_rank_zero
 
+/-! ### The same question on a surface, answered in slopes
+
+On a surface `degree_pos_of_rank_zero` is false -- a skyscraper has `c₁ = 0`,
+hence charge `0`, hence no phase at all -- so the phase argument above is
+unavailable and `WeakSlope.lean` leaves the question open. `weakSlope` answers it
+in `WithTop ℝ`: rank zero gives `⊤`, so `μ⁻ = ⊤`, so the object is torsion at
+every cutoff short of `⊤`. This needs `rank_nonneg` and nothing else. The slope
+itself is `WeakSlopeTop.lean`'s `topSlope`; what is added here is that `⊤` occurs
+at rank zero and nowhere else, and the cutoff consequence. -/
+
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_eq_top_iff_rank_eq_zero
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_ne_top_iff_rank_pos
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_le_topSlope_iff_slope_le
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.phase_le_iff_topSlope_le
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_lt_topSlope_of_rank_pos_of_rank_zero
+#print axioms CategoryTheory.Triangulated.SlopeData.toWeakSlopeData_topSlope_eq_top_iff
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.rank_eq_zero_of_shortExact
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.μMinus_eq_top_of_rank_zero
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.mem_hnTors_of_rank_zero
+
+
 /-! ## A phase cutoff, read as a slope cutoff
 
 `Cutoff.lean` cuts by a phase; Bridgeland's §6 cuts by a slope. `phase_le_iff_slope_le` relates
