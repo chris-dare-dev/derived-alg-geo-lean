@@ -65,52 +65,12 @@ variable (F : A ⥤ D) [F.Full] [F.Faithful]
   (harr : ∀ {Y Z : D} (f : Y ⟶ Z) [Mono f], IsStrictMono f →
     IsStrictMono (Subobject.mk f).arrow)
 
-/-- The image of a strict subobject, landing in **strict** subobjects — which
-is what lets the hypothesis be strict rather than ordinary. -/
-noncomputable def strictImage {E : A} : StrictSubobject E → StrictSubobject (F.obj E) :=
-  fun B =>
-    letI hs : IsStrictMono (F.map B.1.arrow) := hF B.1.arrow B.2
-    letI : Mono (F.map B.1.arrow) := hs.mono
-    ⟨Subobject.mk (F.map B.1.arrow), harr _ hs⟩
-
-omit [F.Full] [F.Faithful] in
-theorem strictImage_monotone {E : A} :
-    Monotone (strictImage F hF harr (E := E)) := by
-  intro B₁ B₂ hB
-  letI hs₁ : IsStrictMono (F.map B₁.1.arrow) := hF B₁.1.arrow B₁.2
-  letI hs₂ : IsStrictMono (F.map B₂.1.arrow) := hF B₂.1.arrow B₂.2
-  letI : Mono (F.map B₁.1.arrow) := hs₁.mono
-  letI : Mono (F.map B₂.1.arrow) := hs₂.mono
-  have hB' : B₁.1 ≤ B₂.1 := by simpa using hB
-  have hmk : Subobject.mk B₁.1.arrow ≤ Subobject.mk B₂.1.arrow := by
-    simpa [Subobject.mk_arrow] using hB'
-  show Subobject.mk (F.map B₁.1.arrow) ≤ Subobject.mk (F.map B₂.1.arrow)
-  exact Subobject.mk_le_mk_of_comm (F.map (Subobject.ofMkLEMk B₁.1.arrow B₂.1.arrow hmk)) (by
-    rw [← F.map_comp]; exact congrArg F.map (Subobject.ofMkLEMk_comp hmk))
-
-theorem strictImage_injective {E : A} :
-    Function.Injective (strictImage F hF harr (E := E)) := by
-  intro B₁ B₂ hEq
-  letI hs₁ : IsStrictMono (F.map B₁.1.arrow) := hF B₁.1.arrow B₁.2
-  letI hs₂ : IsStrictMono (F.map B₂.1.arrow) := hF B₂.1.arrow B₂.2
-  letI : Mono (F.map B₁.1.arrow) := hs₁.mono
-  letI : Mono (F.map B₂.1.arrow) := hs₂.mono
-  apply Subtype.ext
-  have hEq' : Subobject.mk (F.map B₁.1.arrow) = Subobject.mk (F.map B₂.1.arrow) :=
-    congrArg Subtype.val hEq
-  simpa [Subobject.mk_arrow] using
-    (Subobject.mk_eq_mk_of_comm B₁.1.arrow B₂.1.arrow
-      (F.preimageIso (Subobject.isoOfMkEqMk _ _ hEq'))
-      (F.map_injective (by
-        simp only [Functor.preimageIso_hom, Functor.map_comp, Functor.map_preimage]
-        exact Subobject.ofMkLEMk_comp hEq'.le)))
-
-/-- Monotone + injective on a partial order is strictly monotone, which is what
-pulls well-foundedness back. -/
-theorem strictImage_strictMono {E : A} {a b : StrictSubobject E} (hab : a < b) :
-    strictImage F hF harr a < strictImage F hF harr b :=
-  lt_of_le_of_ne (strictImage_monotone F hF harr hab.le)
-    (fun h => absurd (strictImage_injective F hF harr h) (ne_of_lt hab))
+/- `strictImage` and its three lemmas stood here, redeclared. They are in
+`Foundation/Slicing/IntervalFiniteTransfer.lean`, which this file imports, and
+both copies sat in `namespace CategoryTheory.Triangulated` -- so both were
+`CategoryTheory.Triangulated.strictImage`, and only the upstream copy being
+`private` kept that from being a clash. The upstream one is now public and
+carries these docstrings. -/
 
 include hF harr in
 /-- **Strict-Artinian transfers, from a strict hypothesis.**

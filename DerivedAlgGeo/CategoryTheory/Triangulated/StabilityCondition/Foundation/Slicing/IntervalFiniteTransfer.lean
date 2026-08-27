@@ -30,14 +30,16 @@ variable (F : A ⥤ D) [F.Full] [F.Faithful]
   (harr : ∀ {Y Z : D} (f : Y ⟶ Z) [Mono f], IsStrictMono f →
     IsStrictMono (Subobject.mk f).arrow)
 
-private noncomputable def strictImage {E : A} :
+/-- The image of a strict subobject, landing in **strict** subobjects — which
+is what lets the hypothesis be strict rather than ordinary. -/
+noncomputable def strictImage {E : A} :
     StrictSubobject E → StrictSubobject (F.obj E) := fun B =>
   letI hs : IsStrictMono (F.map B.1.arrow) := hF B.1.arrow B.2
   letI : Mono (F.map B.1.arrow) := hs.mono
   ⟨Subobject.mk (F.map B.1.arrow), harr _ hs⟩
 
 omit [F.Full] [F.Faithful] in
-private theorem strictImage_monotone {E : A} :
+theorem strictImage_monotone {E : A} :
     Monotone (strictImage F hF harr (E := E)) := by
   intro B₁ B₂ hB
   letI hs₁ : IsStrictMono (F.map B₁.1.arrow) := hF B₁.1.arrow B₁.2
@@ -51,7 +53,7 @@ private theorem strictImage_monotone {E : A} :
       rw [← F.map_comp]
       exact congrArg F.map (Subobject.ofMkLEMk_comp hmk))
 
-private theorem strictImage_injective {E : A} :
+theorem strictImage_injective {E : A} :
     Function.Injective (strictImage F hF harr (E := E)) := by
   intro B₁ B₂ hEq
   letI hs₁ : IsStrictMono (F.map B₁.1.arrow) := hF B₁.1.arrow B₁.2
@@ -68,7 +70,9 @@ private theorem strictImage_injective {E : A} :
         simp only [Functor.preimageIso_hom, Functor.map_comp, Functor.map_preimage]
         exact Subobject.ofMkLEMk_comp hEq'.le)))
 
-private theorem strictImage_strictMono {E : A} {a b : StrictSubobject E}
+/-- Monotone + injective on a partial order is strictly monotone, which is what
+pulls well-foundedness back. -/
+theorem strictImage_strictMono {E : A} {a b : StrictSubobject E}
     (hab : a < b) : strictImage F hF harr a < strictImage F hF harr b :=
   lt_of_le_of_ne (strictImage_monotone F hF harr hab.le)
     (fun h => absurd (strictImage_injective F hF harr h) (ne_of_lt hab))
