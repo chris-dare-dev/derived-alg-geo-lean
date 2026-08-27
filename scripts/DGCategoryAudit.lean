@@ -364,3 +364,75 @@ import DerivedAlgGeo.CategoryTheory.DGCategory
 #print axioms CategoryTheory.H0.pretriangulatedAxioms
 #print axioms CategoryTheory.H0.pretriangulated
 #print axioms CategoryTheory.H0.mem_distTriang_iff
+
+-- Uniqueness handles for the two `Classical.choice` constructions
+-- (dg-enhancements-e7). `IsShiftBy.inv` and `IsConeOf.splitId` cannot be
+-- unfolded, so every identification of `mapShift`, `compare`, `fst` or `snd`
+-- with a concretely given element goes through one of these.
+#print axioms CategoryTheory.IsShiftBy.mapShift_unique
+#print axioms CategoryTheory.IsShiftBy.compare_unique
+#print axioms CategoryTheory.IsConeOf.splitId_unique
+#print axioms CategoryTheory.IsConeOf.toShift_comp_compare
+
+-- The sign on the cone triangle's connecting morphism (dg-enhancements-e7).
+-- `H0.coneTriangle` negates `IsConeOf.toShift`, so the rotation comparison is
+-- negated too; `Cdg.triangle_mor₃_eq` is what forces the sign.
+#print axioms CategoryTheory.H0.rotateIsoNeg
+
+-- The ambient shift on H⁰ is the one `H0Shift.lean` built (dg-enhancements-e7).
+#print axioms CategoryTheory.H0.shiftFunctorZero_eq
+#print axioms CategoryTheory.H0.shiftFunctorAdd_eq
+
+-- The model shift is Mathlib's shift (dg-enhancements-e7). Stated first on plain
+-- cochain complexes, where no `Cdg`/`CochainComplex` synonym has to be crossed
+-- inside a rewrite, and then read back on `C^dg`.
+#print axioms CategoryTheory.Cdg.rightShift_id_zero
+#print axioms CategoryTheory.Cdg.rightShift_id_comp
+#print axioms CategoryTheory.Cdg.shiftCocycle_v
+#print axioms CategoryTheory.Cdg.mapShift_isShiftBy
+#print axioms CategoryTheory.Cdg.shiftCocycle_zero
+#print axioms CategoryTheory.Cdg.comp_shiftCocycle
+
+-- `Cdg.toH0` and its commutation with the shift (dg-enhancements-e7). This is
+-- where the two coherence identities of a `CommShift` structure are discharged;
+-- both telescope into a single `IsShiftBy.compare`.
+#print axioms CategoryTheory.Cdg.toH0
+#print axioms CategoryTheory.Cdg.toH0_map
+#print axioms CategoryTheory.Cdg.instFullCochainComplexIntH0ToH0
+#print axioms CategoryTheory.Cdg.h0Functor_map_toH0_map
+#print axioms CategoryTheory.Cdg.toH0ShiftIso
+#print axioms CategoryTheory.Cdg.compare_isShiftBy_zero
+#print axioms CategoryTheory.Cdg.compare_isShiftBy_add
+#print axioms CategoryTheory.Cdg.toH0ShiftIso_zero_hom
+#print axioms CategoryTheory.Cdg.toH0ShiftIso_add_hom
+#print axioms CategoryTheory.Cdg.toH0CommShift
+
+-- **The seam commutes with the shift** (dg-enhancements-e7, #378). The issue
+-- calls this "the real content of this epic".
+#print axioms CategoryTheory.Cdg.seamShiftIso
+#print axioms CategoryTheory.Cdg.seamShiftIso_hom
+#print axioms CategoryTheory.Cdg.seamCommShiftIso
+#print axioms CategoryTheory.Cdg.seamCommShiftIso_hom_app
+#print axioms CategoryTheory.Cdg.h0FunctorCommShift
+#print axioms CategoryTheory.Cdg.h0Functor_commShiftIso_hom_app
+
+-- The model cone is Mathlib's mapping cone, sign included (dg-enhancements-e7).
+#print axioms CategoryTheory.Cdg.isConeOf_fst
+#print axioms CategoryTheory.Cdg.comp_shiftCocycle_id
+#print axioms CategoryTheory.Cdg.toShift_isShiftBy
+#print axioms CategoryTheory.Cdg.triangle_mor₃_eq
+#print axioms CategoryTheory.Cdg.mapTriangleConeTriangleIso
+
+-- **The agreement theorem** (dg-enhancements-e7, #378): the transported
+-- distinguished triangles are Mathlib's, as an equality of `Set (Triangle _)`,
+-- together with the octahedral half the pin supplies.
+#print axioms CategoryTheory.Cdg.h0FunctorIsTriangulated
+#print axioms CategoryTheory.Cdg.mem_distTriang_iff
+#print axioms CategoryTheory.Cdg.distinguishedTriangles_eq
+#print axioms CategoryTheory.Cdg.instIsTriangulatedH0
+#print axioms CategoryTheory.Cdg.seamFunctorCommShift
+#print axioms CategoryTheory.Cdg.seamInverseCommShift
+#print axioms CategoryTheory.Cdg.seamCommShift
+#print axioms CategoryTheory.Cdg.seamFunctorIsTriangulated
+#print axioms CategoryTheory.Cdg.seamIsTriangulated
+#print axioms CategoryTheory.Cdg.seam_distinguishedTriangles_eq
