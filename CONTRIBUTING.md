@@ -53,7 +53,7 @@ Run the fast gate before requesting review:
 scripts/gates.sh fast
 ```
 
-Run the complete CI-equivalent gate before merge:
+Run the full gate before merge:
 
 ```bash
 scripts/gates.sh
@@ -64,7 +64,21 @@ The full gate includes:
 - Mathlib-style and environment linting for `DerivedAlgGeo`;
 - all three axiom audits and the audit-completeness ratchet;
 - source-independence, pin, paper-coverage, and no-lint checks;
+- roadmap/tracker agreement, when `gh` is available;
 - repository-wide emission and `sorryAx` coverage checks.
+
+**A green `scripts/gates.sh` is not a green CI.** The containment runs one way:
+every gate in the script also runs in CI, but CI runs more than the script does.
+CI's `Contract gates` step additionally runs the `mfc` contract tooling —
+`validate`, `env`, `bundle`, `lint`, and `check-ilean-coverage` against the
+pinned registry — from a virtualenv it builds per run, and the script does not
+reproduce any of it. Expect to learn about those failures from CI.
+
+This file previously called the script "the complete CI-equivalent gate". It was
+not, and the difference is not academic: a roadmap entry left at `planned` after
+its issue closed reddened CI on `main` and on every open pull request while
+`scripts/gates.sh` stayed green on all of them. The `roadmap` gate above closes
+that particular hole; the `mfc` steps remain CI-only.
 
 For a focused audit run:
 

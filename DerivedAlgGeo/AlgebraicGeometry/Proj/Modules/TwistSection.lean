@@ -51,9 +51,9 @@ is the general case; Mathlib's own `unitHomEquiv_apply_coe` ascribes it for the 
 ## Scope
 
 The maps, and what they do to `1`. **The extension theorem of `#585` is not here** — it needs the
-degree-one chart cover, quasi-coherence to make each chart a module, and
-`Submodule.exists_pow_smul_mem_of_isLocalized_radical` to clear the denominator. With this API its
-statement elaborates, which is what it was blocked on.
+degree-one chart cover, quasi-coherence to make each chart a module, and an affine clearing lemma
+for the denominator. With this API its statement elaborates, which is what it was blocked on; it is
+proved in `Proj/Modules/Glue.lean` as `exists_globalSection_twistBy`.
 -/
 noncomputable section
 
