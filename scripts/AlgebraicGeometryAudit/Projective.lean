@@ -55,3 +55,35 @@ open AlgebraicGeometry
 
 -- The restriction square on opens (#572 step 2, base-change half).
 #print axioms AlgebraicGeometry.restrictSquareOpensIso
+
+-- The same square on MODULE sheaves, which is what #572 step 2 actually consumes: pushing forward
+-- along f and restricting to U is restricting to f^-1 U and pushing forward along f | U.
+--
+-- isCoherent_iff_restrict_affineOpenCover asks for IsFinitePresentation of the restriction, and
+-- that transfers along an isomorphism, so the OBJECT-level statement suffices. The functor-level
+-- one is not built, and going through it is not merely more work: it means letting unification
+-- discover the two site functors underneath Scheme.Modules.pushforward and restrictFunctor, which
+-- runs whnf past 200000 heartbeats -- the same failure ChartExtension.lean records for fromTildeGamma.
+--
+-- restrictSquareSections_smul is the equality of sheaf-of-rings data that the first version of
+-- BaseChange.lean left open. Both sides' scalar actions unfold by rfl to actions through
+-- Scheme.Hom.app; Scheme.Opens.ι_appIso removes the open immersion's appIso and is the one step
+-- that is NOT definitional; Scheme.Modules.map_smul gives semilinearity over X's structure sheaf;
+-- and morphismRestrict_app says the two structure-sheaf maps differ by exactly the transport being
+-- compared, eqToHom direction included.
+--
+-- presheaf_map_square_eq is stated separately because in a clean context its rewrites fire, while
+-- the naturality goal it discharges carries the instances-transparency defect and admits only
+-- exact. It is applied at its four opens morphisms SPELLED OUT, and that is why this file needs no
+-- maxHeartbeats raise: left as _, those morphisms are metavariables solved by unifying against the
+-- defective goal, which costs over twenty times the default budget and buys nothing, since they are
+-- determined and can be written down. The bump that a first attempt reached for meant the statement
+-- was underspecified, not that the proof was hard.
+#print axioms AlgebraicGeometry.restrictSquareSections
+#print axioms AlgebraicGeometry.restrictSquareSectionsInv
+#print axioms AlgebraicGeometry.restrictSquareSectionsInv_restrictSquareSections
+#print axioms AlgebraicGeometry.restrictSquareSections_restrictSquareSectionsInv
+#print axioms AlgebraicGeometry.restrictSquareSections_smul
+#print axioms AlgebraicGeometry.presheaf_map_square_eq
+#print axioms AlgebraicGeometry.restrictSquareSectionsEquiv
+#print axioms AlgebraicGeometry.pushforwardRestrictIso
