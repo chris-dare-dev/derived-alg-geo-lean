@@ -1056,6 +1056,123 @@ sub in `T β` and a quotient in `F β`. -/
 #print axioms CategoryTheory.Triangulated.StabilityFunction.exists_subobject_hnTors_cokernel_hnFree
 #print axioms CategoryTheory.Triangulated.StabilityFunction.exists_shortExact_hnTors_hnFree
 
+/-! ## The weak abelian cutoff classes, in slopes rather than phases
+
+Everything above this point cuts by a **phase** in `ℝ`, which needs a strict
+stability function: `arg` is only informative off `0`. These declarations cut by
+a **slope** in `WithTop ℝ` for a weak one, so that a nonzero object of charge
+`0` -- a skyscraper on a surface -- is carried honestly at `⊤` rather than
+excluded. The structures mirror `AbelianHNFiltration` and `hnTors`/`hnFree`
+above field for field, with `μ`/`μ_anti` in place of `phase`/`phase_strictAnti`.
+
+There is no weak `hnTorsionPair` here, and its absence is deliberate: the
+splitting half of the torsion-pair axiom rests on `tailAt`, whose supporting
+lemmas are proved from `semiClosedUpperHalfPlane_ne_zero` and so are strict-only.
+See `WeakTruncation.lean`'s module docstring. -/
+/-! ### The weak slope on a charge value, and weak semistability (`WeakSlopeGeometry.lean`) -/
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.IsSemistable
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.IsStable
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.IsStable.isSemistable
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.additive
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.charge
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.charge_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.charge_mem
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hom_eq_zero_of_semistable_slope_gt
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.isSemistable_iff_of_iso
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.isSemistable_of_iso
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.map_iso
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.map_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_eq_chargeSlope
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_eq_of_iso
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_eq_top_of_charge_eq_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_le_of_epi
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_of_im_nonpos
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_of_im_pos
+#print axioms CategoryTheory.Triangulated.chargeSlope
+#print axioms CategoryTheory.Triangulated.chargeSlope_add_lt_of_lt
+#print axioms CategoryTheory.Triangulated.chargeSlope_le_add_le_of_le
+#print axioms CategoryTheory.Triangulated.chargeSlope_lt_top_iff
+#print axioms CategoryTheory.Triangulated.chargeSlope_ne_top_iff
+#print axioms CategoryTheory.Triangulated.chargeSlope_of_im_nonpos
+#print axioms CategoryTheory.Triangulated.chargeSlope_of_im_pos
+#print axioms CategoryTheory.Triangulated.im_nonneg_of_mem_closedUpperHalfPlane
+#print axioms CategoryTheory.Triangulated.im_pos_of_chargeSlope_lt
+#print axioms CategoryTheory.Triangulated.re_nonpos_of_mem_closedUpperHalfPlane_of_im_eq_zero
+
+/-! ### The slope-indexed weak HN filtration (`WeakHarderNarasimhan.lean`) -/
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_bot
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_strictMono
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_top
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.factor
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.factor_not_isZero
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.factor_semistable
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.factor_slope
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.mk.inj
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.n
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.nonempty
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofSemistable
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofSemistable_μMinus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofSemistable_μPlus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μ
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μMinus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μMinus_le_μPlus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μPlus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μ_anti
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μ_mem_range
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.HasHNProperty
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.isSemistable_cokernel_mapMono_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.isSemistable_cokernel_ofLE_congr
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_cokernel_mapMono_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_cokernel_ofLE_congr
+
+/-! ### The extremal weak slopes and their monotonicity (`WeakExtrema.lean`) -/
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_one_eq
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_one_isSemistable
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_one_ne_bot
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.exists_epi_to_semistable_μ_μMinus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.hom_eq_zero_to_factor
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.hom_eq_zero_to_semistable_of_μ_lt_μMinus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.le_chain_of_semistable_μ_gt
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.semistable_μ_le_μPlus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μMinus_eq
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μMinus_le_of_epi
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μPlus_eq
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μPlus_le_of_mono
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.μ_chain_one
+
+/-! ### The two classes at a weak slope cutoff (`WeakCutoff.lean`) -/
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnFree
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTors
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hom_eq_zero_of_mem_hnTors_of_mem_hnFree
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hom_eq_zero_of_mem_hnTors_of_semistable
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.isZero_mem_hnFree
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.isZero_mem_hnTors
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.isZero_of_mem_hnTors_of_mem_hnFree
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mem_hnFree_iff_forall
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mem_hnTors_iff_forall
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mem_hnTors_of_charge_eq_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mem_hnTors_of_slope_eq_top
+
+/-! ### Truncating a weak HN filtration, and the torsion subobject (`WeakTruncation.lean`) -/
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.exists_crossIndex
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.map_restrictChain
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso_μMinus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso_μPlus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrict
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrictChain
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrictChain_le
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrict_n
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrict_μMinus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrict_μPlus
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.exists_subobject_hnTors
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnFree_of_iso
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTors_of_iso
+
 /-! ## Where the rank-zero objects go
 
 The charge `-degree + i·rank` puts a nonzero object of rank zero on the negative
