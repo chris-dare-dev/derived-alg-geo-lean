@@ -189,7 +189,7 @@ half-integer on `ℙ²` — see `Examples/Surface/ProjectivePlane.lean`. Coeffic
 therefore rational rather than integral. -/
 
 /-- A class is recorded by the three rational coefficients of `ch = a + b·H + c·H²`. -/
-abbrev SurfaceNum : Type := ℤ × ℤ × ℤ
+abbrev SurfaceNum : Type := Fin 3 → ℤ
 
 /-- The Chern character of `E`, given its coefficient functions. `chCoeff E i` is the
 coefficient of `Hⁱ`; keeping it abstract lets `ℙ²` use half-integers. -/

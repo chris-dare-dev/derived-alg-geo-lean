@@ -2802,8 +2802,8 @@ Spec (.of (coe R)) with R : CommRingCat and Lean cannot invert the coercion -- a
 is then written through chartRing, a reducible abbrev for the bundled ring, so R matches
 syntactically. That diagnostic shift is the real argument for the technique.
 
-Choosing one n across a finite cover, and the passage to multiplication into F(n), are NOT here,
-so #585 is not closed. -/
+Choosing one n across a finite cover, and the passage to multiplication into F(n), are NOT here;
+they are ChartExtension.lean's uniform trio and Glue.lean, where #585 is closed. -/
 
 #print axioms AlgebraicGeometry.Proj.degreeOneChart
 #print axioms AlgebraicGeometry.Proj.degreeOneChart_image_top
@@ -3046,7 +3046,7 @@ The section level is a one-liner: both sides are pointwise, so it is the fibre s
 the point. Same as #584's chartModuleTwistSectionEquiv_sectionTwistMul -- in this construction
 lifting from fibres to sections is free and the cost is in the fraction identity underneath.
 
-The glue is NOT here, so #585 is not closed. -/
+The glue is NOT here; it is Glue.lean and GlueUniform.lean, where #585 is closed. -/
 
 #print axioms AlgebraicGeometry.Proj.intShiftZeroLinearEquiv_constFraction
 #print axioms AlgebraicGeometry.Proj.intShiftSectionLinearEquivOn_sectionOfMem

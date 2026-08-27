@@ -34,24 +34,17 @@ namespace Examples
 
 /-- Chern-character coefficients: the class `(r, c, s)` has `ch = r + c·H + s·H²`. -/
 noncomputable def k3ChCoeff (E : SurfaceNum) : ℕ → ℚ
-  | 0 => (E.1 : ℚ)
-  | 1 => (E.2.1 : ℚ)
-  | 2 => (E.2.2 : ℚ)
+  | 0 => (E 0 : ℚ)
+  | 1 => (E 1 : ℚ)
+  | 2 => (E 2 : ℚ)
   | _ + 3 => 0
 
 theorem k3ChCoeff_add (E F : SurfaceNum) (i : ℕ) :
     k3ChCoeff (E + F) i = k3ChCoeff E i + k3ChCoeff F i := by
   match i with
-  | 0 =>
-    show ((E + F).1 : ℚ) = (E.1 : ℚ) + (F.1 : ℚ)
-    rw [show ((E + F).1 : ℤ) = E.1 + F.1 from rfl, Int.cast_add]
-  | 1 =>
-    show ((E + F).2.1 : ℚ) = (E.2.1 : ℚ) + (F.2.1 : ℚ)
-    rw [show ((E + F).2.1 : ℤ) = E.2.1 + F.2.1 from rfl, Int.cast_add]
-  | 2 =>
-    show ((E + F).2.2 : ℚ) = (E.2.2 : ℚ) + (F.2.2 : ℚ)
-    rw [show ((E + F).2.2 : ℤ) = E.2.2 + F.2.2 from rfl, Int.cast_add]
-  | _ + 3 => show (0 : ℚ) = 0 + 0; rw [add_zero]
+  | 0 | 1 => simp only [k3ChCoeff, Pi.add_apply, Int.cast_add]
+  | 2 => simp only [k3ChCoeff, Pi.add_apply, Int.cast_add]
+  | _ + 3 => simp only [k3ChCoeff, add_zero]
 
 /-- The Todd class of a K3: `td₁ = 0`, and `td₂` normalised so that `∫_X td₂ = 2`. -/
 noncomputable def k3Todd (d : ℚ) : ℕ → SurfaceRing
@@ -80,7 +73,7 @@ theorem k3Todd_sum (d : ℚ) :
 noncomputable def k3NumericalVariety (d : ℕ) :
     NumericalVarietyData 2 SurfaceRing SurfaceNum where
   ring := surfaceNumericalRing (2 * (d : ℚ))
-  rank := { toFun := fun E => E.1, map_zero' := rfl, map_add' := fun _ _ => rfl }
+  rank := { toFun := fun E => E 0, map_zero' := rfl, map_add' := fun _ _ => rfl }
   chComp := surfaceCh k3ChCoeff
   chComp_mem := surfaceCh_mem k3ChCoeff
   chComp_zero := fun _ => rfl
@@ -89,18 +82,18 @@ noncomputable def k3NumericalVariety (d : ℕ) :
   toddComp_mem := k3Todd_mem (d : ℚ)
   toddComp_zero := rfl
   chi :=
-    { toFun := fun E => 2 * E.1 + 2 * (d : ℤ) * E.2.2
+    { toFun := fun E => 2 * E 0 + 2 * (d : ℤ) * E 2
       map_zero' := by simp
-      map_add' := by intro a b; show 2 * (a.1 + b.1) + 2 * (d : ℤ) * (a.2.2 + b.2.2) = _; ring }
+      map_add' := by intro a b; show 2 * (a 0 + b 0) + 2 * (d : ℤ) * (a 2 + b 2) = _; ring }
 
 /-- The explicit K3 presentation satisfies Hirzebruch--Riemann--Roch. -/
 theorem k3NumericalVariety_satisfiesHRR (d : ℕ) (hd : d ≠ 0) :
     (k3NumericalVariety d).SatisfiesHRR := by
   refine ⟨fun E => ?_⟩
-  show ((2 * E.1 + 2 * (d : ℤ) * E.2.2 : ℤ) : ℚ) = surfaceDegree (2 * (d : ℚ)) _
+  show ((2 * E 0 + 2 * (d : ℤ) * E 2 : ℤ) : ℚ) = surfaceDegree (2 * (d : ℚ)) _
   rw [surfaceCh_sum, k3Todd_sum, surfaceDegree_ch_mul_todd]
   have hdq : (d : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr hd
-  show _ = 2 * (d : ℚ) * ((E.1 : ℚ) * (1 / (d : ℚ)) + (E.2.1 : ℚ) * 0 + (E.2.2 : ℚ))
+  show _ = 2 * (d : ℚ) * ((E 0 : ℚ) * (1 / (d : ℚ)) + (E 1 : ℚ) * 0 + (E 2 : ℚ))
   push_cast
   field_simp
   ring
