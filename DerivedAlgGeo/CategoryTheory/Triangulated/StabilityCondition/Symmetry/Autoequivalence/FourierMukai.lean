@@ -755,13 +755,26 @@ transported.
 
 The first constructor of a `KernelAutoequivalence` from anything other than a
 directly supplied equivalence. -/
-noncomputable def KernelAutoequivalence.ofRightAdjointKernel
+@[reducible] noncomputable def KernelAutoequivalence.ofRightAdjointKernel
     (R : RightAdjointKernelData corr corr K)
     [∀ X, IsIso (R.adj.unit.app X)] [∀ Y, IsIso (R.adj.counit.app Y)] :
     KernelAutoequivalence C 𝒲 where
   corr := corr
   kernel := K
-  equiv := R.adj.toEquivalence
+  -- `functor` and `inverse` are given LITERALLY rather than left as
+  -- `R.adj.toEquivalence`'s fields. `toEquivalence` is not reducible, so
+  -- `.equiv.functor` would not reduce for instance search, and every exactness
+  -- argument downstream (`actStab`, `actStabOfDual`, `toAutPair`) is
+  -- synthesised rather than rewritten. Written this way the projection lands on
+  -- `corr.transform _`, an abbrev, so the composite's own instances apply --
+  -- with the CommShift indexing that `IsTriangulated` depends on intact, which
+  -- a hand-rolled instance could not reproduce.
+  equiv :=
+    { functor := corr.transform K
+      inverse := corr.transform R.adjKernel
+      unitIso := R.adj.toEquivalence.unitIso
+      counitIso := R.adj.toEquivalence.counitIso
+      functor_unitIso_comp := R.adj.toEquivalence.functor_unitIso_comp }
   iso := Iso.refl _
 
 omit [IsTriangulated C] in
@@ -785,7 +798,7 @@ theorem KernelAutoequivalence.ofRightAdjointKernel_kernel
 `DualKernel.ofRightAdjointKernel`'s trip through `Adjunction.rightAdjointUniq`
 is not needed here. One `RightAdjointKernelData` with invertible unit and counit
 yields the equivalence *and* its dual kernel. -/
-noncomputable def KernelAutoequivalence.dualKernelOfRightAdjointKernel
+@[reducible] noncomputable def KernelAutoequivalence.dualKernelOfRightAdjointKernel
     (R : RightAdjointKernelData corr corr K)
     [∀ X, IsIso (R.adj.unit.app X)] [∀ Y, IsIso (R.adj.counit.app Y)] :
     KernelAutoequivalence.DualKernel
@@ -861,6 +874,7 @@ theorem KernelAutoequivalence.isIso_unit (A : KernelAutoequivalence C 𝒲)
   have := A.transform_isEquivalence
   have := R.adj.isEquivalence_right_of_isEquivalence_left
   inferInstance
+
 
 end FromAdjoint
 

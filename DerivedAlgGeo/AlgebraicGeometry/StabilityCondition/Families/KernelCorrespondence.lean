@@ -218,7 +218,7 @@ that these are exactly the inputs needed and there are no others. In particular
 `Z` is not required to be `X ×_S Y` and `p`, `q` are not required to be
 projections — `Correspondence` does not consume that, and requiring it here
 would be adding an unconsumed hypothesis. -/
-noncomputable def geometricCorrespondence (p : Z ⟶ X) (q : Z ⟶ Y)
+@[reducible] noncomputable def geometricCorrespondence (p : Z ⟶ X) (q : Z ⟶ Y)
     [HasCoherentPullback p] [HasDerivedTensor Z] [HasDerivedPushforward q] :
     Correspondence (SchemeBoundedCoherentDerivedCategory X.left)
       (SchemeBoundedCoherentDerivedCategory Y.left)
@@ -244,6 +244,54 @@ theorem geometricCorrespondence_push (p : Z ⟶ X) (q : Z ⟶ Y)
     [HasCoherentPullback p] [HasDerivedTensor Z] [HasDerivedPushforward q] :
     (geometricCorrespondence X Y Z p q).push = derivedPushforward q :=
   rfl
+
+/-! ### Exactness of the assembled correspondence, reachable by instance search
+
+`geometricCorrespondence` is `@[reducible]` so that instance search can unfold
+`.pull`, `.tensor` and `.push` to the contracts that carry their exactness. The
+three projection lemmas above are `rfl` and rewrite fine in a proof, but a
+`CommShift`/`IsTriangulated` argument is *synthesised*, not rewritten, and
+synthesis never sees them.
+
+That gap was not academic: without it, every downstream consumer stated against
+a `Correspondence` -- `transform_isTriangulated`, `transformK₀`, and through
+them `actStab` and `actStabOfDual` -- was unreachable for the geometric
+correspondence, so the geometric side of the lane could not reach the stability
+transport it exists for. It surfaced as a bare
+`failed to synthesize (geometricCorrespondence X X Z p q).pull.CommShift ℤ`.
+
+Reducibility rather than hand-rolled instances, and the difference matters:
+`IsTriangulated` is indexed by the `CommShift` instance, so an instance stated
+against the ambient one is a different term from the one a use site
+synthesises -- `CommShift` would resolve and `IsTriangulated` would not.
+`Symmetry/Autoequivalence/FourierMukai` documents the same trap for `trans`.
+Reducibility reaches the original instances with the indexing intact. -/
+
+section Exactness
+
+variable (X Y Z : SchemeBaseChange S)
+  [IsLocallyNoetherian X.left] [IsLocallyNoetherian Y.left]
+  [IsLocallyNoetherian Z.left]
+  (p : Z ⟶ X) (q : Z ⟶ Y)
+  [HasCoherentPullback p] [HasDerivedTensor Z] [HasDerivedPushforward q]
+
+/-- **The geometric transform is triangulated.**
+
+`FourierMukai.transform_isTriangulated` at the geometric correspondence — the
+first statement that the assembled transform is exact, and the thing the six
+instances above exist to make statable. -/
+theorem geometricTransform_isTriangulated
+    (K : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((geometricCorrespondence X Y Z p q).transform K).IsTriangulated :=
+  inferInstance
+
+/-- The geometric transform is additive. -/
+theorem geometricTransform_additive
+    (K : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((geometricCorrespondence X Y Z p q).transform K).Additive :=
+  inferInstance
+
+end Exactness
 
 end Assembly
 
