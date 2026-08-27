@@ -10,6 +10,7 @@ import DerivedAlgGeo.CategoryTheory.ExtDimensionShift
 import DerivedAlgGeo.CategoryTheory.WeakSerreExact
 import DerivedAlgGeo.CategoryTheory.DGCategory
 import DerivedAlgGeo.CategoryTheory.Sites
+import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated
 import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
 import DerivedAlgGeo.CategoryTheory.PseudofunctorObjectProperty

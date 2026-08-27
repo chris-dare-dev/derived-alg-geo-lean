@@ -10,6 +10,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HeartComparison
 import DerivedAlgGeo.LinearAlgebra
+import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 open CategoryTheory.Triangulated
 
 /-! ## Owner-controlled Bridgeland foundation (#226) -/
@@ -1055,6 +1056,28 @@ sub in `T β` and a quotient in `F β`. -/
 #print axioms CategoryTheory.Triangulated.StabilityFunction.hnFree_of_iso
 #print axioms CategoryTheory.Triangulated.StabilityFunction.exists_subobject_hnTors_cokernel_hnFree
 #print axioms CategoryTheory.Triangulated.StabilityFunction.exists_shortExact_hnTors_hnFree
+
+/-! ## The subobject correspondence for a quotient, proved without a charge
+
+`Uniqueness/SubobjectLattice.lean` proves `pullback_imageSubobject_eq` and
+`cokernelPullbackIso` from `semiClosedUpperHalfPlane_ne_zero` -- a nonzero object has nonzero
+charge, so a charge-zero cokernel or kernel vanishes. That is exactly the implication weak
+stability drops, and it fails on the skyscraper, so the truncation `tailAt` that rests on them
+does not port to the weak theory. These are the same statements with no charge anywhere; they
+are pure abelian-category facts and live in `CategoryTheory/SubobjectCorrespondence.lean`.
+
+They are recorded in this audit rather than the dg one because
+`check_audit_complete.py` routes them here. -/
+
+#print axioms CategoryTheory.Abelian.le_of_arrow_comp_cokernel_zero
+#print axioms CategoryTheory.Abelian.le_pullback_imageSubobject
+#print axioms CategoryTheory.Abelian.pullback_imageSubobject_eq
+#print axioms CategoryTheory.Abelian.le_pullback_cokernel
+#print axioms CategoryTheory.Abelian.epi_pullbackπ
+#print axioms CategoryTheory.Abelian.ofLE_pullbackπ_cokernel_eq_zero
+#print axioms CategoryTheory.Abelian.shortExact_ofLE_pullbackπ
+#print axioms CategoryTheory.Abelian.ofLE_pullback_comp_pullbackπ
+#print axioms CategoryTheory.Abelian.cokernelPullbackIso
 
 /-! ## The weak abelian cutoff classes, in slopes rather than phases
 
