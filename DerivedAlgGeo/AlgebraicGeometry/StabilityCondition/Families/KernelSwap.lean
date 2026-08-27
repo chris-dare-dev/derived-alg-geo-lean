@@ -74,11 +74,14 @@ autoequivalence built on the geometric correspondence, with dual kernel
   intended instantiation precise.
 * `σ` is not assumed invertible, an involution, or an isomorphism, and
   `Rσ_* ≅ σ^*` is not claimed.
-* **The equivalence is still supplied.** `geometricKernelAutoequivalence` takes
-  the equivalence and its comparison isomorphism as arguments. That a geometric
-  Fourier--Mukai transform *is* an equivalence is the classical theorem this
-  whole lane is conditional on, and it is not approached here. What is now
-  geometric is the *dual kernel of one*, not the equivalence.
+* **No criterion for the equivalence.** `geometricKernelAutoequivalence` takes
+  the equivalence and its comparison isomorphism as arguments.
+  `geometricKernelAutoequivalenceOfAdjoint` does not — it derives both from the
+  invertibility of one adjunction's unit and counit — but that invertibility is
+  itself assumed, and nothing here establishes it. Classically it is the
+  Bondal--Orlov criterion, which needs geometry this repository does not have.
+  So a transform is still never *shown* to be an equivalence; what changed is
+  only the shape of the assumption.
 * No Serre duality, no smoothness, no properness, no relative dimension.
 -/
 
@@ -264,6 +267,62 @@ theorem geometricDualKernel_dual
     (iso : equiv.functor ≅
       (geometricCorrespondence X X Z p q).transform K) :
     (geometricDualKernel X Z σ p q K equiv iso).dual =
+      geometricDualKernelObj X Z σ q K := rfl
+
+/-! ### The equivalence, no longer supplied
+
+`geometricKernelAutoequivalence` above takes the equivalence as an argument.
+This does not: given that the assembled adjunction's unit and counit are
+invertible, `KernelAutoequivalence.ofRightAdjointKernel` builds the equivalence,
+and the dual kernel comes with it at no further cost.
+
+The invertibility is still an assumption — it is the second half of the layer-3
+work, and classically it is the Bondal--Orlov criterion. What has changed is its
+shape: it is pointwise and checkable, and its two halves are full faithfulness
+and essential surjectivity, which is what a geometric criterion would deliver.
+Nothing here supplies it. -/
+
+/-- **A geometric kernel autoequivalence with no supplied equivalence.**
+
+Everything is now the ledger plus the invertibility of one adjunction's unit and
+counit. Compare `geometricKernelAutoequivalence`, which takes an equivalence and
+a comparison isomorphism outright. -/
+noncomputable def geometricKernelAutoequivalenceOfAdjoint
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :
+    Symmetry.KernelAutoequivalence
+      (SchemeBoundedCoherentDerivedCategory X.left)
+      (SchemeBoundedCoherentDerivedCategory Z.left) :=
+  Symmetry.KernelAutoequivalence.ofRightAdjointKernel
+    (geometricCorrespondence X X Z p q) K
+    (geometricDualAdjointKernelData X Z σ p q K)
+
+@[simp]
+theorem geometricKernelAutoequivalenceOfAdjoint_kernel
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :
+    (geometricKernelAutoequivalenceOfAdjoint X Z σ p q K).kernel = K := rfl
+
+/-- **Its dual kernel, for free.**
+
+`toEquivalence`'s inverse is the adjunction's right adjoint definitionally, so
+`invIso` is `Iso.refl` — the same datum that produced the equivalence produces
+the dual kernel, with no trip through `rightAdjointUniq`. The dual is
+`Rσ_*(K^∨ ⊗ ω_q)`, as before. -/
+noncomputable def geometricDualKernelOfAdjoint
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :
+    Symmetry.KernelAutoequivalence.DualKernel
+      (geometricKernelAutoequivalenceOfAdjoint X Z σ p q K) :=
+  Symmetry.KernelAutoequivalence.dualKernelOfRightAdjointKernel
+    (geometricCorrespondence X X Z p q) K
+    (geometricDualAdjointKernelData X Z σ p q K)
+
+@[simp]
+theorem geometricDualKernelOfAdjoint_dual
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :
+    (geometricDualKernelOfAdjoint X Z σ p q K).dual =
       geometricDualKernelObj X Z σ q K := rfl
 
 end DualKernel
