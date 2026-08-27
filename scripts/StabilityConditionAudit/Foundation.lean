@@ -1081,6 +1081,8 @@ instead.
 -/
 
 #print axioms CategoryTheory.Triangulated.slopeOfPhase
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.lt_phase_iff_slopeOfPhase_lt
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.phase_le_iff_le_slopeOfPhase
 #print axioms CategoryTheory.Triangulated.SlopeData.lt_phase_iff_slopeOfPhase_lt
 #print axioms CategoryTheory.Triangulated.SlopeData.phase_le_iff_le_slopeOfPhase
 
