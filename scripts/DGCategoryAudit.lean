@@ -436,3 +436,11 @@ import DerivedAlgGeo.CategoryTheory.DGCategory
 #print axioms CategoryTheory.Cdg.seamFunctorIsTriangulated
 #print axioms CategoryTheory.Cdg.seamIsTriangulated
 #print axioms CategoryTheory.Cdg.seam_distinguishedTriangles_eq
+
+-- The Grothendieck group of a pretriangulated dg category: `K₀` at the
+-- `Pretriangulated (H0 C)` instance above, not a new construction. The first
+-- downstream consumer of `H0.pretriangulated`.
+#print axioms CategoryTheory.DGCategory.K₀dg
+#print axioms CategoryTheory.DGCategory.K₀dg.of
+#print axioms CategoryTheory.DGCategory.K₀dg.of_eq
+#print axioms CategoryTheory.DGCategory.K₀dg.of_triangle
