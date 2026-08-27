@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.PhaseGeometry
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.WeakSlope
 
 /-!
 # Slope stability is a stability function
@@ -56,6 +56,16 @@ The slope itself is `degree / rank`, which is junk at rank zero where the
 classical slope is `+∞`; every statement about it carries a positive-rank
 hypothesis, and the torsion sheaves are handled by the charge rather than by the
 slope.
+
+## The surface case is the weakening, not a parallel theory
+
+`WeakSlopeData` (in `WeakSlope.lean`) replaces `degree_pos_of_rank_zero` by
+`degree_nonneg_of_rank_zero`, and `toWeakSlopeData` below is the forgetful map
+`0 < d → 0 ≤ d`. Everything in this file that carries a positive-rank hypothesis
+— `phaseCross_charge`, `charge_ne_zero_of_rank_pos`, `arg_pos_of_rank_pos` and
+the order bridge `phase_le_iff_slope_le` — is proved once on `WeakSlopeData` and
+inherited here, so the surface lane gets the order bridge without a second copy
+of its proof.
 -/
 
 noncomputable section
@@ -121,12 +131,32 @@ theorem degree_additive (S : ShortComplex A) (hS : S.ShortExact) :
     D.degree S.X₂ = D.degree S.X₁ + D.degree S.X₃ := by
   rw [degree, degree, degree, K₀Ab.of_shortExact S hS, map_add]
 
+/-! ### The curve case is an instance of the surface case
+
+`degree_pos_of_rank_zero` implies `degree_nonneg_of_rank_zero`, so every
+`SlopeData` is a `WeakSlopeData`.  Rank, degree, charge and slope are unchanged
+by the map: it forgets a hypothesis and nothing else. -/
+
+/-- **Forget `0 < degree` to `0 ≤ degree`.**  This is what makes `WeakSlopeData`
+a genuine weakening of `SlopeData` rather than a second parallel structure. -/
+def toWeakSlopeData : WeakSlopeData A where
+  rankHom := D.rankHom
+  degreeHom := D.degreeHom
+  rank_nonneg := D.rank_nonneg
+  degree_nonneg_of_rank_zero E hE hr := (D.degree_pos_of_rank_zero E hE hr).le
+
+@[simp] theorem toWeakSlopeData_rank (E : A) : D.toWeakSlopeData.rank E = D.rank E := rfl
+
+@[simp] theorem toWeakSlopeData_degree (E : A) : D.toWeakSlopeData.degree E = D.degree E := rfl
+
 /-- The charge `-degree + i * rank`. -/
 def charge (E : A) : ℂ := ⟨-(D.degree E : ℝ), (D.rank E : ℝ)⟩
 
 @[simp] theorem charge_re (E : A) : (D.charge E).re = -(D.degree E : ℝ) := rfl
 
 @[simp] theorem charge_im (E : A) : (D.charge E).im = (D.rank E : ℝ) := rfl
+
+@[simp] theorem toWeakSlopeData_charge (E : A) : D.toWeakSlopeData.charge E = D.charge E := rfl
 
 theorem charge_mem_semiClosedUpperHalfPlane {E : A} (hE : ¬IsZero E) :
     D.charge E ∈ semiClosedUpperHalfPlane := by
@@ -164,55 +194,40 @@ theorem toStabilityFunction_charge (E : A) :
 slope is `+∞`; every statement below asks for positive rank. -/
 def slope (E : A) : ℝ := (D.degree E : ℝ) / (D.rank E : ℝ)
 
+@[simp] theorem toWeakSlopeData_slope (E : A) : D.toWeakSlopeData.slope E = D.slope E := rfl
+
+/-- The phase of `toStabilityFunction` **is** the weak phase of `toWeakSlopeData`:
+both are `arg` of the same charge, normalised. This is the bridge along which the
+positive-rank results below are inherited. -/
+theorem toStabilityFunction_phase (E : A) :
+    D.toStabilityFunction.phase E = D.toWeakSlopeData.phase E := by
+  simp only [StabilityFunction.phase, toStabilityFunction_charge, WeakSlopeData.phase,
+    toWeakSlopeData_charge]
+
 theorem phaseCross_charge (E F : A) :
     phaseCross (D.charge E) (D.charge F)
-      = (D.rank E : ℝ) * (D.degree F : ℝ) - (D.degree E : ℝ) * (D.rank F : ℝ) := by
-  simp [phaseCross]
-  ring
+      = (D.rank E : ℝ) * (D.degree F : ℝ) - (D.degree E : ℝ) * (D.rank F : ℝ) :=
+  D.toWeakSlopeData.phaseCross_charge E F
 
-theorem charge_ne_zero_of_rank_pos {E : A} (hE : 0 < D.rank E) : D.charge E ≠ 0 := by
-  intro h
-  have him : (D.charge E).im = 0 := by rw [h]; rfl
-  rw [charge_im] at him
-  have : (0 : ℝ) < (D.rank E : ℝ) := by exact_mod_cast hE
-  linarith
+theorem charge_ne_zero_of_rank_pos {E : A} (hE : 0 < D.rank E) : D.charge E ≠ 0 :=
+  D.toWeakSlopeData.charge_ne_zero_of_rank_pos hE
 
-theorem arg_pos_of_rank_pos {E : A} (hE : 0 < D.rank E) : 0 < arg (D.charge E) := by
-  refine arg_pos_of_mem_semiClosedUpperHalfPlane ?_
-  left
-  have : (0 : ℝ) < (D.rank E : ℝ) := by exact_mod_cast hE
-  simpa using this
+theorem arg_pos_of_rank_pos {E : A} (hE : 0 < D.rank E) : 0 < arg (D.charge E) :=
+  D.toWeakSlopeData.arg_pos_of_rank_pos hE
 
 /-- **The phase order is the slope order** on objects of positive rank.
 
 `phaseCross` turns the comparison of arguments into the sign of
 `rank E * degree F - degree E * rank F`, which is the comparison of slopes once
-both ranks are positive. -/
+both ranks are positive.
+
+The proof is `WeakSlopeData.phase_le_iff_slope_le`, transported along
+`toWeakSlopeData`: nothing in it uses `degree_pos_of_rank_zero`, because a
+positive-rank charge is in the *open* upper half-plane. -/
 theorem phase_le_iff_slope_le {E F : A} (hE : 0 < D.rank E) (hF : 0 < D.rank F) :
     D.toStabilityFunction.phase E ≤ D.toStabilityFunction.phase F ↔ D.slope E ≤ D.slope F := by
-  have hEr : (0 : ℝ) < (D.rank E : ℝ) := by exact_mod_cast hE
-  have hFr : (0 : ℝ) < (D.rank F : ℝ) := by exact_mod_cast hF
-  have hcross : 0 ≤ phaseCross (D.charge E) (D.charge F) ↔ D.slope E ≤ D.slope F := by
-    rw [phaseCross_charge, slope, slope, div_le_div_iff₀ hEr hFr]
-    constructor <;> intro h <;> linarith
-  have harg : arg (D.charge E) ≤ arg (D.charge F) ↔ D.slope E ≤ D.slope F := by
-    refine ⟨fun h => hcross.mp ?_, fun h => ?_⟩
-    · refine phaseCross_nonneg_of_arg_le ?_ (D.charge_ne_zero_of_rank_pos hE)
-        (D.charge_ne_zero_of_rank_pos hF) h
-      simpa using hEr.le
-    · exact arg_le_of_phaseCross_nonneg (D.charge_ne_zero_of_rank_pos hE)
-        (D.charge_ne_zero_of_rank_pos hF) (D.arg_pos_of_rank_pos hF) (hcross.mpr h)
-  have hpi : (0 : ℝ) < Real.pi := Real.pi_pos
-  rw [StabilityFunction.phase, StabilityFunction.phase, toStabilityFunction_charge,
-    toStabilityFunction_charge]
-  constructor
-  · intro h
-    refine harg.mp ?_
-    have hmul := mul_le_mul_of_nonneg_right h hpi.le
-    rwa [div_mul_cancel₀ _ (ne_of_gt hpi), div_mul_cancel₀ _ (ne_of_gt hpi)] at hmul
-  · intro h
-    have hle := harg.mpr h
-    gcongr
+  rw [toStabilityFunction_phase, toStabilityFunction_phase]
+  simpa using D.toWeakSlopeData.phase_le_iff_slope_le hE hF
 
 end SlopeData
 
