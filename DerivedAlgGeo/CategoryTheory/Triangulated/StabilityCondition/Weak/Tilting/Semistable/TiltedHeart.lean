@@ -295,7 +295,11 @@ noncomputable def phaseTiltWeakStabilityFunction
     WeakStabilityFunction
       (slicingTorsionPair sigma.slicing hbeta0 hbeta1.le).tilt where
   Z := sigma.phaseTiltCharge beta
-  upper E hE _ := by
+  nonzero_mem E hrel := by
+    obtain ⟨hE, _⟩ := hrel
+    show 0 < ((sigma.phaseTiltCharge beta) (K₀.of C E)).im ∨
+      (((sigma.phaseTiltCharge beta) (K₀.of C E)).im = 0 ∧
+        ((sigma.phaseTiltCharge beta) (K₀.of C E)).re ≤ 0)
     obtain ⟨hgt, hle⟩ := sigma.phaseTiltHeart_interval hbeta0 hbeta1 hE
     have hclosed :=
       rotatedCharge_weakUpperClosed_of_interval sigma hgt hle

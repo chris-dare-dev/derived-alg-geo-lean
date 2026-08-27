@@ -1077,6 +1077,17 @@ one structure at two class data rather than two structures with the same fields,
 #print axioms CategoryTheory.Triangulated.abelianDatum_cl
 #print axioms CategoryTheory.Triangulated.abelianDatum_relevant
 
+/-! ## `heartDatum` — the second instantiation
+
+`ClassDatum` was written to be instantiated twice and had been instantiated once. This is
+the ambient datum: nonzero objects of `t.heart`, classes in the ambient `K₀ C`. It needs
+`Pretriangulated` only, so the §14 base file keeps its typeclass strength.
+-/
+
+#print axioms CategoryTheory.Triangulated.heartDatum
+#print axioms CategoryTheory.Triangulated.heartDatum_cl
+#print axioms CategoryTheory.Triangulated.heartDatum_relevant
+
 /-! ## `StabilityFunction`, restated over `K₀Ab`
 
 `map_zero`, `map_iso` and `additive` are theorems now, not fields; the names and argument
