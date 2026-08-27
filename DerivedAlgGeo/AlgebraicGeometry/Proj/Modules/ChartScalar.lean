@@ -131,6 +131,18 @@ theorem awayι_image_top {d : ℕ} {g : A} (hg : g ∈ 𝒜 d) (hd : 0 < d) :
       awayι 𝒜 g hg hd ⁻¹ᵁ ⊤ from rfl,
     Scheme.Hom.image_preimage_eq_opensRange_inf, inf_top_eq, opensRange_awayι 𝒜 g hg hd]
 
+/-- **A chart meets another basic open in the intersection of the two.**
+
+`degreeOneChart_image_basicOpen` at arbitrary positive degrees, which is what `#585` needs on a
+pairwise overlap: the chart is that of `gᵢ gⱼ` and the second element is `f`. -/
+theorem awayι_image_basicOpen {d e : ℕ} {a b : A} (hb : b ∈ 𝒜 d) (hd : 0 < d)
+    (ha : a ∈ 𝒜 e) (he : 0 < e) :
+    awayι 𝒜 b hb hd ''ᵁ
+        PrimeSpectrum.basicOpen (HomogeneousLocalization.Away.isLocalizationElem hb ha) =
+      basicOpen 𝒜 b ⊓ basicOpen 𝒜 a := by
+  rw [← awayι_preimage_basicOpen 𝒜 hb hd ha he,
+    Scheme.Hom.image_preimage_eq_opensRange_inf, opensRange_awayι 𝒜 b hb hd]
+
 /-- **Every open of the chart lands inside `D₊(g)`.** -/
 theorem awayι_image_le {d : ℕ} {g : A} (hg : g ∈ 𝒜 d) (hd : 0 < d)
     (U : (Spec (chartRing 𝒜 g)).Opens) :

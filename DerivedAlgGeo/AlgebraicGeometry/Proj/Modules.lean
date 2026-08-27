@@ -30,5 +30,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.FracSection
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.AwayChart
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartScalar
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartProj
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Glue
 
 /-! # Graded modules and their sheaves on `Proj` -/

@@ -64,12 +64,17 @@ be forced on every *pair* at once, so a pair type is what gets passed.
 
 ## Scope
 
-`#585` is still not closed. What remains is everything after the exponent:
+One chart, in the chart's own coordinates. Everything after the exponent is elsewhere:
 
 * the sections produced here live on **different sheaves**, one per chart, so they cannot be
-  compared yet — `twistBy` carrying each into the single sheaf `F(n)` is the missing passage;
-* their agreement on overlaps, which is what `exists_pow_smul_res_eq_zero` is for;
+  compared here — `twistBy` carrying each into a single sheaf `F(N)` is the passage, and
+  `Proj/Modules/Glue.lean` is where it is taken;
+* their agreement on overlaps, which needs a second exponent from `Proj/Modules/AwayChart.lean`
+  because the overlap is a degree-*two* chart;
 * the gluing itself, to a section over `⊤` of `Proj 𝒜` rather than over one chart.
+
+`ChartProj.lean` restates the six theorems here on `Proj 𝒜`, and `Glue.lean` assembles them into
+`exists_globalSection_twistBy`, which is `#585`'s deliverable.
 
 Note also that the cover is an input here, not a construction: `degreeOneCharts_coversTop`
 (`Proj/Modules/Finiteness.lean`) supplies it from `Algebra.adjoin (𝒜 0) (range g) = ⊤`, and the

@@ -2915,6 +2915,7 @@ The cover, the single exponent across it, and the gluing are NOT here, so #585 s
 #print axioms AlgebraicGeometry.Proj.awayToSection_isLocalizationElem_pow
 #print axioms AlgebraicGeometry.Proj.awayι_image_top
 #print axioms AlgebraicGeometry.Proj.awayι_image_le
+#print axioms AlgebraicGeometry.Proj.awayι_image_basicOpen
 #print axioms AlgebraicGeometry.Proj.ΓSpecIso_inv_appIso_inv
 #print axioms AlgebraicGeometry.Proj.ΓSpecIso_inv_res_appIso_inv
 #print axioms AlgebraicGeometry.Proj.chart_smul_eq
@@ -2941,6 +2942,37 @@ The cover, the twist that puts the family into one sheaf, and the gluing are NOT
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_image
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_image_uniform
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_image_uniform
+
+/-! ## #585: a section over D+(f), twisted, extends to Proj
+
+exists_globalSection_twistBy is the deliverable of #585 and the thing six earlier PRs built the
+ingredients for: for F quasi-coherent, f of degree one and a finite family of degree-one elements
+generating A over A_0, every section over D+(f) has an N with twistBy (f^N) of it the restriction
+of a GLOBAL section of F(N).
+
+The two exponents are independent and both are needed. n extends s across each chart; that is all
+the geometry there is, and it is not enough, because IsCompatible wants the extensions to agree on
+the WHOLE overlap D+(g_i) inf D+(g_j) and D+(f) is not contained in it. The second exponent closes
+that: t_i and (g_j/g_i)^n t_j DO agree on the overlap intersected with D+(f) -- the computation
+where the two charts' different denominators cancel -- so separatedness on the overlap, which is
+the chart of g_i g_j and therefore of degree two, gives m.
+
+The section that glues is twistBy (f^(2m) * g_i^n) of the chart extension, NOT twistBy (g_i^N).
+That choice keeps the whole comparison inside F(N): over an overlap the fraction
+f^(2m) g_i^n / (g_i g_j)^m g_i^n is exactly the scalar the agreement supplies, and over
+D+(g_i) inf D+(f) the fraction f^N / f^(2m) g_i^n is exactly (f/g_i)^n. Twisting by g_i^N instead
+would put the comparison in F(n) and force a passage from F(n)(2m) to F(N), which nothing in this
+repository or in Mathlib provides.
+
+The five restriction lemmas below are named because the proof composes restrictions constantly and
+rw cannot be used on goals carrying show-ascription residue. -/
+
+#print axioms AlgebraicGeometry.Proj.resSection_trans
+#print axioms AlgebraicGeometry.Proj.resSection_smul
+#print axioms AlgebraicGeometry.Proj.resΓ_fracSection
+#print axioms AlgebraicGeometry.Proj.homApp_res
+#print axioms AlgebraicGeometry.Proj.le_basicOpen_mul
+#print axioms AlgebraicGeometry.Proj.exists_globalSection_twistBy
 
 /-! ## f^n on a degree-one chart is (f/g)^n (#585 bridge)
 
