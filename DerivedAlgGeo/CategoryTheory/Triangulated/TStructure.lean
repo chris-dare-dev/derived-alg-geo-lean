@@ -7,6 +7,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Restriction
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Aisle
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Shift
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.ShiftNaturality
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HeartBridge
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.ImageFactorisation
 
 /-!
 # Abstract t-structure theory

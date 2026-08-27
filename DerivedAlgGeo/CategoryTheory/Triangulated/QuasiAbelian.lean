@@ -36,16 +36,24 @@ is still the caller.  A first consumer is not a layer, and the move is the one
 #454 made for `PostnikovTower` and `K₀`: the namespace said generic while the
 path said specialized.
 
-## What this file does not assert
+## What this file asserts, and where
 
-**No category is shown to be quasi-abelian.**  The `QuasiAbelian` class below
-states the two stability axioms — strict epimorphisms stable under pullback,
-strict monomorphisms stable under pushout — but nothing in this repository
-supplies an instance of it, so the class is a statement layer and not a claim
-about any category here.
+The `QuasiAbelian` class below states the two stability axioms — strict
+epimorphisms stable under pullback, strict monomorphisms stable under pushout.
+It is inhabited: `Slicing.intervalCat_quasiAbelian`
+(`Foundation/Slicing/IntervalStrictness.lean`) shows a thin owner slicing
+interval is quasi-abelian, and it is the only instance at the time of writing.
 
 Most of the file is prior to that class: strictness of individual morphisms and
 the finiteness conditions built on it, none of which needs the axioms.
+
+Two earlier versions of this section were wrong, in opposite directions. The
+first said `QuasiAbelian` "appears in no declaration in this file", which the
+class below contradicts. Its replacement said no category is shown to be
+quasi-abelian, which `intervalCat_quasiAbelian` contradicts — the search behind
+that claim matched one line at a time, and the instance carries its type on the
+next line. Neither claim should have been made without a search that could see
+a multi-line signature.
 -/
 
 noncomputable section

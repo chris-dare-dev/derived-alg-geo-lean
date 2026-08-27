@@ -2989,10 +2989,18 @@ the maximum over a finite family.
 
 Raising is done on the CHART EXTENSIONS, not at the sheaf level, and that is the whole content. The
 sheaf-level route -- multiply the global section of F(N) by f^(N'-N) and transport along
-F(N)(N'-N) = F(N') -- is not available: tensorTwistAddIso is stated for associated sheaves only,
-tensorAssocIso requires both OUTER tensor factors invertible and here the outer factor is the
-arbitrary F, and even granting the isomorphism the argument would have to compute what it does to a
-section, which is what #585 established these witnesses cannot do.
+F(N)(N'-N) = F(N') -- is not available, and TensorTwist.lean already records why: tensorAssocIso
+requires both OUTER tensor factors invertible, and no rearrangement of (F (x) O(d)) (x) O(e) under
+tensorCommIso gets the non-invertible F off an outer slot. tensorTwistAddIso supplies the
+composition for F an ASSOCIATED sheaf only, which is not the hypothesis here. Even granting the
+isomorphism the argument would have to compute what it does to a section, which is what #585
+established these witnesses cannot do.
+
+This is the same move as ChartExtension.lean's exists_pow_smul_eq_res_chart_of_le, which raises the
+extension exponent in the chart's own coordinates. Its existential form cannot be reused here: it
+returns SOME extension at the larger exponent, and holding one overlap exponent m fixed needs the
+raised family to be the original one times a KNOWN unit. Discard that relation and m has to be
+re-derived at each n, which puts N = 2m(n) + n back out of reach.
 
 One level down it is plain algebra in Gamma(F, -) on Proj. The extension at exponent n + k is the
 extension at exponent n multiplied by (f/g_i)^k, a section of the structure sheaf over the WHOLE of
@@ -3148,3 +3156,7 @@ not the conclusion renamed. `mukaiVectorQuotient` is what it buys.
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.leftRadical_eq_ker
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorQuotient
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorQuotient_mk
+#print axioms AlgebraicGeometry.moduleFinite_sections_restrict_of_isCoherent
+#print axioms SheafOfModules.GeneratingSections.ofFreeEpi
+#print axioms SheafOfModules.GeneratingSections.isFiniteType_ofFreeEpi
+#print axioms SheafOfModules.GeneratingSections.ofFreeEpi_π

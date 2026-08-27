@@ -9,6 +9,8 @@ import DerivedAlgGeo.CategoryTheory.WeakSerreExact
 import DerivedAlgGeo.CategoryTheory.DGCategory
 import DerivedAlgGeo.CategoryTheory.Sites
 import DerivedAlgGeo.CategoryTheory.Triangulated
+import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
+import DerivedAlgGeo.CategoryTheory.PseudofunctorObjectProperty
 
 /-! # Category theory
 
