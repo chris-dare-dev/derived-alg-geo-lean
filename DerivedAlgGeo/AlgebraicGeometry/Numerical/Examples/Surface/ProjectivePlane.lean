@@ -40,28 +40,19 @@ namespace Examples
 /-- Chern-character coefficients on `ℙ²`. The half-integer in codimension two is what forces
 the `(r, c, v)` coordinates — see the module docstring. -/
 noncomputable def p2ChCoeff (E : SurfaceNum) : ℕ → ℚ
-  | 0 => (E.1 : ℚ)
-  | 1 => (E.2.1 : ℚ)
-  | 2 => (E.2.1 : ℚ) / 2 + (E.2.2 : ℚ)
+  | 0 => (E 0 : ℚ)
+  | 1 => (E 1 : ℚ)
+  | 2 => (E 1 : ℚ) / 2 + (E 2 : ℚ)
   | _ + 3 => 0
 
 theorem p2ChCoeff_add (E F : SurfaceNum) (i : ℕ) :
     p2ChCoeff (E + F) i = p2ChCoeff E i + p2ChCoeff F i := by
   match i with
-  | 0 =>
-    show ((E + F).1 : ℚ) = (E.1 : ℚ) + (F.1 : ℚ)
-    rw [show ((E + F).1 : ℤ) = E.1 + F.1 from rfl, Int.cast_add]
-  | 1 =>
-    show ((E + F).2.1 : ℚ) = (E.2.1 : ℚ) + (F.2.1 : ℚ)
-    rw [show ((E + F).2.1 : ℤ) = E.2.1 + F.2.1 from rfl, Int.cast_add]
+  | 0 | 1 => simp only [p2ChCoeff, Pi.add_apply, Int.cast_add]
   | 2 =>
-    show ((E + F).2.1 : ℚ) / 2 + ((E + F).2.2 : ℚ)
-      = ((E.2.1 : ℚ) / 2 + (E.2.2 : ℚ)) + ((F.2.1 : ℚ) / 2 + (F.2.2 : ℚ))
-    rw [show ((E + F).2.1 : ℤ) = E.2.1 + F.2.1 from rfl,
-      show ((E + F).2.2 : ℤ) = E.2.2 + F.2.2 from rfl]
-    push_cast
+    simp only [p2ChCoeff, Pi.add_apply, Int.cast_add]
     ring
-  | _ + 3 => show (0 : ℚ) = 0 + 0; rw [add_zero]
+  | _ + 3 => simp only [p2ChCoeff, add_zero]
 
 /-- The Todd class of `ℙ²`: `td₁ = −K/2 = (3/2)H` and `td₂ = H²`, so `∫ td₂ = χ(O) = 1`. -/
 noncomputable def p2Todd : ℕ → SurfaceRing
@@ -90,13 +81,13 @@ theorem p2_chi_structureSheaf : surfaceDegree 1 (p2Todd 2) = 1 := by
   rw [surfaceDegree_Hsq]
 
 /-- The Euler characteristic on `ℙ²`, in the `(r, c, v)` coordinates. -/
-def p2Chi (E : SurfaceNum) : ℤ := E.1 + 2 * E.2.1 + E.2.2
+def p2Chi (E : SurfaceNum) : ℤ := E 0 + 2 * E 1 + E 2
 
 /-- **The model.** `ℙ²`, with `H² = 1` and `td = 1 + (3/2)H + H²`. -/
 @[reducible]
 noncomputable def p2NumericalVariety : NumericalVarietyData 2 SurfaceRing SurfaceNum where
   ring := surfaceNumericalRing 1
-  rank := { toFun := fun E => E.1, map_zero' := rfl, map_add' := fun _ _ => rfl }
+  rank := { toFun := fun E => E 0, map_zero' := rfl, map_add' := fun _ _ => rfl }
   chComp := surfaceCh p2ChCoeff
   chComp_mem := surfaceCh_mem p2ChCoeff
   chComp_zero := fun _ => rfl
@@ -109,8 +100,8 @@ noncomputable def p2NumericalVariety : NumericalVarietyData 2 SurfaceRing Surfac
       map_zero' := rfl
       map_add' := by
         intro a b
-        show a.1 + b.1 + 2 * (a.2.1 + b.2.1) + (a.2.2 + b.2.2)
-          = (a.1 + 2 * a.2.1 + a.2.2) + (b.1 + 2 * b.2.1 + b.2.2)
+        show a 0 + b 0 + 2 * (a 1 + b 1) + (a 2 + b 2)
+          = (a 0 + 2 * a 1 + a 2) + (b 0 + 2 * b 1 + b 2)
         ring }
 
 /-- The explicit projective-plane presentation satisfies Hirzebruch--Riemann--Roch. -/
@@ -118,8 +109,8 @@ theorem p2NumericalVariety_satisfiesHRR : p2NumericalVariety.SatisfiesHRR := by
   refine ⟨fun E => ?_⟩
   show ((p2Chi E : ℤ) : ℚ) = surfaceDegree 1 _
   rw [surfaceCh_sum, p2Todd_sum, surfaceDegree_ch_mul_todd]
-  show ((E.1 + 2 * E.2.1 + E.2.2 : ℤ) : ℚ)
-    = 1 * ((E.1 : ℚ) * 1 + (E.2.1 : ℚ) * (3 / 2) + ((E.2.1 : ℚ) / 2 + (E.2.2 : ℚ)))
+  show ((E 0 + 2 * E 1 + E 2 : ℤ) : ℚ)
+    = 1 * ((E 0 : ℚ) * 1 + (E 1 : ℚ) * (3 / 2) + ((E 1 : ℚ) / 2 + (E 2 : ℚ)))
   push_cast
   ring
 
@@ -131,14 +122,14 @@ theorem p2NumericalVariety_satisfiesHRR : p2NumericalVariety.SatisfiesHRR := by
 This is the check that `Surface.chi_eq`'s `c₁·td₁` term is right — the K3 model, where
 `td₁ = 0`, cannot see it. -/
 theorem p2Chi_lineBundle (n m : ℤ) (hm : 2 * m = n * (n - 1)) :
-    2 * p2Chi (1, n, m) = (n + 1) * (n + 2) := by
+    2 * p2Chi ![1, n, m] = (n + 1) * (n + 2) := by
   show 2 * (1 + 2 * n + m) = (n + 1) * (n + 2)
   linear_combination hm
 
 /-- The class `(1, n, m)` with `2m = n(n−1)` really has `ch₂ = n²/2`, i.e. really is
 `O(nH)`. Without this, `p2Chi_lineBundle` would only be arithmetic about a triple. -/
 theorem p2ChCoeff_lineBundle (n m : ℤ) (hm : 2 * m = n * (n - 1)) :
-    p2ChCoeff (1, n, m) 2 = (n : ℚ) ^ 2 / 2 := by
+    p2ChCoeff ![1, n, m] 2 = (n : ℚ) ^ 2 / 2 := by
   show (n : ℚ) / 2 + (m : ℚ) = (n : ℚ) ^ 2 / 2
   have h : (2 : ℚ) * (m : ℚ) = (n : ℚ) * ((n : ℚ) - 1) := by exact_mod_cast hm
   linarith

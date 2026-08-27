@@ -72,10 +72,13 @@ namespace Mukai
 
 variable {V : Type*} [AddCommGroup V] [Module ℝ V]
 
-/-- The real Mukai extension `ℝ ⊕ V ⊕ ℝ`. Not to be confused with
-`CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.RealMukai`, which
-is the same underlying type carrying a bare pairing for the wall arithmetic of
-the other chart. -/
+/-- The real Mukai extension `ℝ ⊕ V ⊕ ℝ`.
+
+The wall arithmetic in
+`CategoryTheory/Triangulated/StabilityCondition/Walls/Spherical/Basic.lean` used
+to declare this type and its pairing a second time, as `RealMukai`, and this
+docstring named that copy rather than the file importing this one. It now
+imports it. -/
 abbrev RealExtension (V : Type*) : Type _ := ℝ × V × ℝ
 
 variable (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)

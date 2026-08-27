@@ -50,13 +50,13 @@ def p4Todd : ℕ → ℚ
 structure sheaf of a linear subspace, with `χ(O_{ℙᵏ}) = 1`, so `χ` is the sum of the
 coordinates. -/
 def p4Chi : FourfoldNum →+ ℤ where
-  toFun E := E.1 + E.2.1 + E.2.2.1 + E.2.2.2.1 + E.2.2.2.2
+  toFun E := E 0 + E 1 + E 2 + E 3 + E 4
   map_zero' := rfl
   map_add' E F := by
-    show (E.1 + F.1) + (E.2.1 + F.2.1) + (E.2.2.1 + F.2.2.1) + (E.2.2.2.1 + F.2.2.2.1)
-        + (E.2.2.2.2 + F.2.2.2.2)
-      = (E.1 + E.2.1 + E.2.2.1 + E.2.2.2.1 + E.2.2.2.2)
-        + (F.1 + F.2.1 + F.2.2.1 + F.2.2.2.1 + F.2.2.2.2)
+    show (E 0 + F 0) + (E 1 + F 1) + (E 2 + F 2) + (E 3 + F 3)
+        + (E 4 + F 4)
+      = (E 0 + E 1 + E 2 + E 3 + E 4)
+        + (F 0 + F 1 + F 2 + F 3 + F 4)
     ring
 
 /-- **The model.** `ℙ⁴`, with `∫H⁴ = 1` and `td = 1 + (5/2)H + (35/12)H² + (25/12)H³ + H⁴`. -/
@@ -70,12 +70,12 @@ theorem p4NumericalVariety_satisfiesHRR : p4NumericalVariety.SatisfiesHRR :=
   rankOneNumericalVariety_satisfiesHRR 4 1 fourfoldRank p4Chi (fourfoldChCoeff 1) p4Todd
     (fourfoldChCoeff_zero 1) (fourfoldChCoeff_add 1) rfl (fun E => by
     rw [fourfoldChi_sum]
-    show ((E.1 + E.2.1 + E.2.2.1 + E.2.2.2.1 + E.2.2.2.2 : ℤ) : ℚ)
-      = 1 * ((E.1 : ℚ) * 1 + (E.2.1 : ℚ) * (25 / 12)
-        + (-(E.2.1 : ℚ) / 2 + (E.2.2.1 : ℚ)) * (35 / 12)
-        + ((E.2.1 : ℚ) / 6 - (E.2.2.1 : ℚ) + (E.2.2.2.1 : ℚ)) * (5 / 2)
-        + (-(E.2.1 : ℚ) / 24 + 7 * (E.2.2.1 : ℚ) / 12 - 3 * (E.2.2.2.1 : ℚ) / 2
-            + (E.2.2.2.2 : ℚ) / 1) * 1)
+    show ((E 0 + E 1 + E 2 + E 3 + E 4 : ℤ) : ℚ)
+      = 1 * ((E 0 : ℚ) * 1 + (E 1 : ℚ) * (25 / 12)
+        + (-(E 1 : ℚ) / 2 + (E 2 : ℚ)) * (35 / 12)
+        + ((E 1 : ℚ) / 6 - (E 2 : ℚ) + (E 3 : ℚ)) * (5 / 2)
+        + (-(E 1 : ℚ) / 24 + 7 * (E 2 : ℚ) / 12 - 3 * (E 3 : ℚ) / 2
+            + (E 4 : ℚ) / 1) * 1)
     push_cast
     ring)
 
@@ -94,7 +94,7 @@ the class is integral for every `m`. -/
 theorem p4Chi_lineBundle (m c e f : ℤ) (hc : 2 * c = m * (m + 1))
     (he : 6 * e = m * (m + 1) * (m + 2))
     (hf : 24 * f = m * (m + 1) * (m + 2) * (m + 3)) :
-    24 * p4Chi (1, m, c, e, f) = (m + 1) * (m + 2) * (m + 3) * (m + 4) := by
+    24 * p4Chi ![1, m, c, e, f] = (m + 1) * (m + 2) * (m + 3) * (m + 4) := by
   show 24 * (1 + m + c + e + f) = (m + 1) * (m + 2) * (m + 3) * (m + 4)
   linear_combination 12 * hc + 4 * he + hf
 
@@ -105,7 +105,7 @@ those numbers would surface. -/
 theorem p4ChCoeff_lineBundle_four (m c e f : ℤ) (hc : 2 * c = m * (m + 1))
     (he : 6 * e = m * (m + 1) * (m + 2))
     (hf : 24 * f = m * (m + 1) * (m + 2) * (m + 3)) :
-    fourfoldChCoeff 1 (1, m, c, e, f) 4 = (m : ℚ) ^ 4 / 24 := by
+    fourfoldChCoeff 1 ![1, m, c, e, f] 4 = (m : ℚ) ^ 4 / 24 := by
   show -(m : ℚ) / 24 + 7 * (c : ℚ) / 12 - 3 * (e : ℚ) / 2 + (f : ℚ) / 1 = (m : ℚ) ^ 4 / 24
   have hc' : (2 : ℚ) * (c : ℚ) = (m : ℚ) * ((m : ℚ) + 1) := by exact_mod_cast hc
   have he' : (6 : ℚ) * (e : ℚ) = (m : ℚ) * ((m : ℚ) + 1) * ((m : ℚ) + 2) := by exact_mod_cast he

@@ -72,13 +72,13 @@ def sexticTodd : ℕ → ℚ
 /-- The Euler characteristic on the sextic in linear-section coordinates. See the module
 docstring for the five generator values this encodes. -/
 def sexticChi : FourfoldNum →+ ℤ where
-  toFun E := 2 * E.1 - 4 * E.2.1 + 11 * E.2.2.1 - 9 * E.2.2.2.1 + E.2.2.2.2
+  toFun E := 2 * E 0 - 4 * E 1 + 11 * E 2 - 9 * E 3 + E 4
   map_zero' := rfl
   map_add' E F := by
-    show 2 * (E.1 + F.1) - 4 * (E.2.1 + F.2.1) + 11 * (E.2.2.1 + F.2.2.1)
-        - 9 * (E.2.2.2.1 + F.2.2.2.1) + (E.2.2.2.2 + F.2.2.2.2)
-      = (2 * E.1 - 4 * E.2.1 + 11 * E.2.2.1 - 9 * E.2.2.2.1 + E.2.2.2.2)
-        + (2 * F.1 - 4 * F.2.1 + 11 * F.2.2.1 - 9 * F.2.2.2.1 + F.2.2.2.2)
+    show 2 * (E 0 + F 0) - 4 * (E 1 + F 1) + 11 * (E 2 + F 2)
+        - 9 * (E 3 + F 3) + (E 4 + F 4)
+      = (2 * E 0 - 4 * E 1 + 11 * E 2 - 9 * E 3 + E 4)
+        + (2 * F 0 - 4 * F 1 + 11 * F 2 - 9 * F 3 + F 4)
     ring
 
 /-- **The model.** A smooth sextic fourfold in `ℙ⁵`: `∫H⁴ = 6`,
@@ -95,12 +95,12 @@ theorem sexticNumericalVariety_satisfiesHRR : sexticNumericalVariety.SatisfiesHR
   rankOneNumericalVariety_satisfiesHRR 4 6 fourfoldRank sexticChi (fourfoldChCoeff 6)
     sexticTodd (fourfoldChCoeff_zero 6) (fourfoldChCoeff_add 6) rfl (fun E => by
     rw [fourfoldChi_sum]
-    show ((2 * E.1 - 4 * E.2.1 + 11 * E.2.2.1 - 9 * E.2.2.2.1 + E.2.2.2.2 : ℤ) : ℚ)
-      = 6 * ((E.1 : ℚ) * (1 / 3) + (E.2.1 : ℚ) * 0
-        + (-(E.2.1 : ℚ) / 2 + (E.2.2.1 : ℚ)) * (5 / 4)
-        + ((E.2.1 : ℚ) / 6 - (E.2.2.1 : ℚ) + (E.2.2.2.1 : ℚ)) * 0
-        + (-(E.2.1 : ℚ) / 24 + 7 * (E.2.2.1 : ℚ) / 12 - 3 * (E.2.2.2.1 : ℚ) / 2
-            + (E.2.2.2.2 : ℚ) / 6) * 1)
+    show ((2 * E 0 - 4 * E 1 + 11 * E 2 - 9 * E 3 + E 4 : ℤ) : ℚ)
+      = 6 * ((E 0 : ℚ) * (1 / 3) + (E 1 : ℚ) * 0
+        + (-(E 1 : ℚ) / 2 + (E 2 : ℚ)) * (5 / 4)
+        + ((E 1 : ℚ) / 6 - (E 2 : ℚ) + (E 3 : ℚ)) * 0
+        + (-(E 1 : ℚ) / 24 + 7 * (E 2 : ℚ) / 12 - 3 * (E 3 : ℚ) / 2
+            + (E 4 : ℚ) / 6) * 1)
     push_cast
     ring)
 
@@ -123,23 +123,23 @@ theorem sextic_isCalabiYau :
     norm_num [sexticTodd]
 
 /-- `χ(O_X) = 2` — the Calabi–Yau fourfold signature, read off the coordinates. -/
-theorem sexticChi_structureSheaf : sexticChi (1, 0, 0, 0, 0) = 2 := rfl
+theorem sexticChi_structureSheaf : sexticChi ![1, 0, 0, 0, 0] = 2 := rfl
 
 /-- `χ(O_{X∩H}) = −4`: a hyperplane section of the sextic fourfold is a smooth sextic
 threefold in `ℙ⁴`, whose only nonzero Hodge number off the structure sheaf is
 `h^{3,0} = C(d−1,4) = 5`, so `χ(O) = 1 − 5`. -/
-theorem sexticChi_hyperplaneSection : sexticChi (0, 1, 0, 0, 0) = -4 := rfl
+theorem sexticChi_hyperplaneSection : sexticChi ![0, 1, 0, 0, 0] = -4 := rfl
 
 /-- `χ(O_{X∩H²}) = 11`: a codimension-two linear section is a smooth sextic surface in `ℙ³`,
 with `χ(O) = C(d−1,3) + 1 = 11`. -/
-theorem sexticChi_surfaceSection : sexticChi (0, 0, 1, 0, 0) = 11 := rfl
+theorem sexticChi_surfaceSection : sexticChi ![0, 0, 1, 0, 0] = 11 := rfl
 
 /-- `χ(O_{X∩H³}) = −9`: a codimension-three linear section is a plane sextic curve, of genus
 `(6−1)(6−2)/2 = 10`, so `χ(O) = 1 − 10`. -/
-theorem sexticChi_curveSection : sexticChi (0, 0, 0, 1, 0) = -9 := rfl
+theorem sexticChi_curveSection : sexticChi ![0, 0, 0, 1, 0] = -9 := rfl
 
 /-- `χ(O_pt) = 1`. -/
-theorem sexticChi_point : sexticChi (0, 0, 0, 0, 1) = 1 := rfl
+theorem sexticChi_point : sexticChi ![0, 0, 0, 0, 1] = 1 := rfl
 
 /-- **Riemann–Roch on the sextic reproduces `χ(O_X(m)) = (m⁴ + 15m² + 8)/4`.**
 
@@ -153,7 +153,7 @@ At `m = 1` this gives `6`, which is `h⁰(O_X(1)) = 6` for the sextic embedded i
 theorem sexticChi_lineBundle (m c e f : ℤ) (hc : 2 * c = m * (m + 1))
     (he : 6 * e = m * (m + 1) * (m + 2))
     (hf : 4 * f = m * (m + 1) * (m + 2) * (m + 3)) :
-    4 * sexticChi (1, m, c, e, f) = m ^ 4 + 15 * m ^ 2 + 8 := by
+    4 * sexticChi ![1, m, c, e, f] = m ^ 4 + 15 * m ^ 2 + 8 := by
   show 4 * (2 * 1 - 4 * m + 11 * c - 9 * e + f) = m ^ 4 + 15 * m ^ 2 + 8
   linear_combination 22 * hc - 6 * he + hf
 
