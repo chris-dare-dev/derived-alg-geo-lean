@@ -3,9 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Sites.CoversTop.Basic
+import Mathlib.Topology.Category.TopCat.Basic
 import Mathlib.CategoryTheory.Sites.Spaces
-import Mathlib.AlgebraicGeometry.Scheme
-import Mathlib.RingTheory.Spectrum.Prime.Topology
 
 /-!
 # Covering the terminal object of an open-set site
@@ -20,8 +19,9 @@ supplies both bridges.
 
 * `TopCat.Opens.grothendieckTopology_coversTop` — a family of opens with `⨆ i, U i = ⊤` covers
   the terminal object.
-* `AlgebraicGeometry.basicOpen_coversTop_of_span_eq_top` — on `Spec R`, basic opens `D(gᵢ)`
-  cover the terminal object as soon as `Ideal.span (Set.range g) = ⊤`.
+The `Spec R` companion, `AlgebraicGeometry.basicOpen_coversTop_of_span_eq_top`, lives in
+`AlgebraicGeometry/Spec/CoversTop.lean`. It used to live here, which made a `Topology` module
+import `Mathlib.AlgebraicGeometry.Scheme` — a layer-0 subject reaching into geometry.
 
 ## Why this is its own file
 
@@ -70,20 +70,3 @@ lemma grothendieckTopology_coversTop
   exact ⟨U i ⊓ V, homOfLE inf_le_right, ⟨i, ⟨homOfLE inf_le_left⟩⟩, hxi, hxV⟩
 
 end TopCat.Opens
-
-namespace AlgebraicGeometry
-
-variable {R : CommRingCat.{u}} {I : Type v}
-
-/-- **Basic opens whose defining elements generate the unit ideal cover `Spec R`.**
-
-This is the bridge from the algebraic side of quasi-compactness — a finite family with
-`Ideal.span (Set.range g) = ⊤` — to the `CoversTop` hypothesis that the site machinery takes. -/
-lemma basicOpen_coversTop_of_span_eq_top (g : I → R)
-    (hg : Ideal.span (Set.range g) = ⊤) :
-    (_root_.Opens.grothendieckTopology (Spec R)).CoversTop
-      (fun i => PrimeSpectrum.basicOpen (g i)) :=
-  TopCat.Opens.grothendieckTopology_coversTop _
-    (PrimeSpectrum.iSup_basicOpen_eq_top_iff.mpr hg)
-
-end AlgebraicGeometry
