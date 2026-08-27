@@ -20,22 +20,23 @@ weakening.
   `Subobject.map_obj_injective` and the successive-quotient congruences, and
   mentions no charge.  It ports verbatim, and is `restrict` below.
 * `Uniqueness/Tail.lean`'s `tailAt` — push the chain **above** an index down to
-  the quotient.  It does **not** port.  Its two supporting lemmas,
-  `pullback_imageSubobject_eq` and `cokernelPullbackIso`, are proved from
-  `semiClosedUpperHalfPlane_ne_zero`: a nonzero object has nonzero charge, so a
-  charge-zero cokernel or kernel must vanish.  That is precisely the implication
-  weak stability drops — a skyscraper is a nonzero object of charge `0` — so the
-  argument is unavailable here, and it is unavailable for the right reason
-  rather than by accident.
+  the quotient.  It did **not** port when this file was written: its two
+  supporting lemmas, `pullback_imageSubobject_eq` and `cokernelPullbackIso`, were
+  proved from `semiClosedUpperHalfPlane_ne_zero` — a nonzero object has nonzero
+  charge — which is precisely the implication weak stability drops, and which
+  fails on the skyscraper.
 
-Both statements are true in any abelian category, being the subobject
-correspondence for a quotient; the strict proofs merely take a charge shortcut.
-Supplying charge-free proofs is a piece of abelian-category infrastructure, not
-of stability theory, and it is deliberately not attempted here.
+  **That obstruction is gone.**  Both statements are true in any abelian
+  category, being the subobject correspondence for a quotient, and
+  `CategoryTheory/SubobjectCorrespondence.lean` proves them with no charge
+  anywhere.  `WeakTail.lean` ports `tailAt` on top of them.
 
-The consequence is recorded where it bites: `exists_subobject_hnTors` below
-gives the torsion **subobject** of the splitting, and the torsion-free quotient
-it would be paired with is not available, so this file states no torsion pair.
+`exists_subobject_hnTors` below gives the torsion **subobject** of the splitting.
+It is kept because it is the weaker statement and needs no truncation of the
+quotient, but it is **superseded** by
+`WeakStabilityFunctionOn.exists_subobject_hnTors_cokernel_hnFree`
+(`WeakSplitting.lean`), which supplies both halves — and hence by the weak
+`TorsionPair` in `Weak/Tilting/TorsionPair/WeakStabilityFunction.lean`.
 -/
 
 noncomputable section
@@ -220,9 +221,9 @@ theorem hnFree_of_iso {E E' : A} (e : E ≅ E') (h : E ∈ hnFree W μ₀) :
 /-- **The torsion subobject of the splitting.**  Cutting an HN filtration at its
 crossing index gives a subobject in `T μ₀`.
 
-This is one half of `exists_subobject_hnTors_cokernel_hnFree`.  The other half —
-that the cokernel of this subobject lies in `F μ₀` — needs `tailAt`, which does
-not port; see the module docstring.  Nothing here claims a torsion pair. -/
+This is one half of `exists_subobject_hnTors_cokernel_hnFree`, and is superseded
+by it: `WeakSplitting.lean` now supplies the torsion-free quotient too.  Kept
+because it is the weaker statement and does not truncate the quotient. -/
 theorem exists_subobject_hnTors (hHN : W.HasHNProperty) (E : A) :
     ∃ T : Subobject E, ((T : A) ∈ hnTors W μ₀) := by
   by_cases hE : IsZero E

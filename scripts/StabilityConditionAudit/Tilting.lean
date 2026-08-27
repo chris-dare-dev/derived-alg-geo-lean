@@ -301,3 +301,30 @@ is excluded and handled by `mem_hnTors_of_rank_zero`, which is arithmetic rather
 
 #print axioms CategoryTheory.Triangulated.SlopeData.slopeOfPhase_lt_of_mem_hnTors
 #print axioms CategoryTheory.Triangulated.SlopeData.slope_le_slopeOfPhase_of_mem_hnFree
+
+/-! ## The weak torsion pair, at a slope cutoff
+
+The strict pair above is cut by a phase in `ℝ`. This one is cut by a slope in `WithTop ℝ`,
+which is what lets a rank-zero object -- slope `⊤`, no phase at all -- sit in `T μ₀` at every
+finite cutoff.
+
+Its splitting axiom was blocked from #789 until `tailAt` could be ported, which needed the
+subobject correspondence proved without a charge (`CategoryTheory/SubobjectCorrespondence.lean`,
+#815). `WeakTail.lean` and `WeakSplitting.lean` are that port and its consequence. -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_cokernel_pullback_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.isSemistable_cokernel_pullback_iff
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.tailAt
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.tailAt_n
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.tailAt_μ
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.tailAt_μPlus
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.tailAt_μMinus
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.exists_subobject_hnTors_cokernel_hnFree
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.exists_shortExact_hnTors_hnFree
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTorsProperty
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnFreeProperty
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTorsProperty_isClosedUnderIsomorphisms
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnFreeProperty_isClosedUnderIsomorphisms
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTorsionPair
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTorsionPair_tors
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTorsionPair_free
