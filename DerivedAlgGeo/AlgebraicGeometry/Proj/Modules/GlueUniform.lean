@@ -168,7 +168,7 @@ theorem exists_globalSection_twistBy_forall_ge (F : (Proj 𝒜).Modules)
       fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg i) (e * k))
         (basicOpen_le_basicOpen_pow 𝒜 (g i) (e * k))) • t i) (fun i => ?_) (fun p => ?_)
   · -- the raised family still extends `s`, now with exponent `n + k`
-    refine (resSection_smul 𝒜 F (inf_le_left :
+    refine (Scheme.Modules.resSection_smul F (inf_le_left :
       basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i)) _ (t i)).trans ?_
     refine (congrArg₂ (fun (r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f))
       (y : Γ(F, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)) => r • y)
@@ -181,12 +181,12 @@ theorem exists_globalSection_twistBy_forall_ge (F : (Proj 𝒜).Modules)
           basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f)).op s)
       (fracSection_pow_mul_isLocalizationFrac 𝒜 hf (hg i) n k inf_le_left)
   · -- and the overlap agreement survives, with the *same* `m`
-    have hres₁ := resSection_smul 𝒜 F (inf_le_left :
+    have hres₁ := Scheme.Modules.resSection_smul F (inf_le_left :
         basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.1))
       (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1)) from
         fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.1) (e * k))
           (basicOpen_le_basicOpen_pow 𝒜 (g p.1) (e * k))) (t p.1)
-    have hres₂ := resSection_smul 𝒜 F (inf_le_right :
+    have hres₂ := Scheme.Modules.resSection_smul F (inf_le_right :
         basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.2))
       (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.2)) from
         fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.2) (e * k))

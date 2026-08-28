@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistApp
+import DerivedAlgGeo.AlgebraicGeometry.Proj.BasicOpenLemmas
 
 /-!
 # Degree-zero fractions with an arbitrary numerator, and the twist comparison they give
@@ -56,16 +57,6 @@ def frac {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k) (hb : b ∈ 𝒜 k)
     {x : ProjectiveSpectrum 𝒜} (hx : x ∈ ProjectiveSpectrum.basicOpen 𝒜 b) :
     HomogeneousLocalization 𝒜 x.asHomogeneousIdeal.toIdeal.primeCompl :=
   HomogeneousLocalization.mk { deg := k, num := ⟨a, ha⟩, den := ⟨b, hb⟩, den_mem := hx }
-
-/-- **A basic open is inside every basic open of a power of its element.**
-
-An equality when the exponent is positive (`ProjectiveSpectrum.basicOpen_pow`), but the inclusion
-is what `fracSection` needs and it holds for `n = 0` too. -/
-theorem basicOpen_le_basicOpen_pow (b : A) (n : ℕ) :
-    ProjectiveSpectrum.basicOpen 𝒜 b ≤ ProjectiveSpectrum.basicOpen 𝒜 (b ^ n) := by
-  intro x hx
-  have hx' : b ∈ x.asHomogeneousIdeal.toIdeal.primeCompl := hx
-  exact Submonoid.pow_mem _ hx' n
 
 /-- **`a / b` as a section of the structure sheaf over an open inside `D₊(b)`.**
 
