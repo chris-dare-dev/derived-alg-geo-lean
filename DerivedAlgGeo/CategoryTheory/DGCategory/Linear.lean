@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.DGCategory.Basic
+import DerivedAlgGeo.CategoryTheory.DGCategory.Functor
 
 /-!
 # `k`-linear dg categories
@@ -20,7 +20,7 @@ a first draft that baked `ModuleCat k` into `dgHom` collided with the
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u w
+universe v u u' u'' w
 
 namespace CategoryTheory
 
@@ -46,5 +46,47 @@ class DGLinear (k : Type w) [CommRing k] (C : Type u) [DGCategory.{v} C]
   comp_smul_right {X Y Z : C} (p q r : ℤ) (h : p + q = r) (c : k)
       (f : (dgHom X Y).X p) (g : (dgHom Y Z).X q) :
     dgComp p q r h f (c • g) = c • dgComp p q r h f g
+
+namespace DGFunctor
+
+/-- A scalar-preserving dg functor between `k`-linear dg categories. This is a
+refinement of `DGFunctor`, parallel to Mathlib's `Functor.Linear`; it records
+only linearity of the maps on Hom-complexes. -/
+class Linear (k : Type w) [CommRing k]
+    {C : Type u} {D : Type u'} [DGCategory.{v} C] [DGCategory.{v} D]
+    [∀ (X Y : C) (p : ℤ), Module k ((dgHom X Y).X p)]
+    [∀ (X Y : D) (p : ℤ), Module k ((dgHom X Y).X p)]
+    [DGLinear k C] [DGLinear k D] (F : DGFunctor C D) : Prop where
+  /-- A linear dg functor preserves scalar multiplication in every degree. -/
+  map_smul {X Y : C} (p : ℤ) (c : k) (f : (dgHom X Y).X p) :
+    F.map p (c • f) = c • F.map p f
+
+variable {k : Type w} [CommRing k]
+  {C : Type u} {D : Type u'} {E : Type u''}
+  [DGCategory.{v} C] [DGCategory.{v} D] [DGCategory.{v} E]
+  [∀ (X Y : C) (p : ℤ), Module k ((dgHom X Y).X p)]
+  [∀ (X Y : D) (p : ℤ), Module k ((dgHom X Y).X p)]
+  [∀ (X Y : E) (p : ℤ), Module k ((dgHom X Y).X p)]
+  [DGLinear k C] [DGLinear k D] [DGLinear k E]
+
+variable {F : DGFunctor C D} {G : DGFunctor D E}
+
+/-- A linear dg functor preserves scalar multiplication in every degree. -/
+@[simp]
+lemma map_smul [F.Linear k] {X Y : C} (p : ℤ) (c : k) (f : (dgHom X Y).X p) :
+    F.map p (c • f) = c • F.map p f :=
+  Linear.map_smul _ _ _
+
+/-- The identity dg functor is linear. -/
+instance idLinear : (DGFunctor.id C).Linear k where
+  map_smul _ _ _ := rfl
+
+/-- A composite of linear dg functors is linear. -/
+instance compLinear [F.Linear k] [G.Linear k] : (F.comp G).Linear k where
+  map_smul p c f := by
+    change G.map p (F.map p (c • f)) = c • G.map p (F.map p f)
+    rw [F.map_smul, G.map_smul]
+
+end DGFunctor
 
 end CategoryTheory

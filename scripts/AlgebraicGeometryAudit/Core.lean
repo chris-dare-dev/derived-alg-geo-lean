@@ -893,6 +893,41 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Duality.Serre.Data.SurfacePicardSymmetry
 #print axioms AlgebraicGeometry.Duality.Serre.Data.SurfacePicardSymmetry.canonical
 #print axioms AlgebraicGeometry.Duality.Serre.Data.SurfacePicardSymmetry.k3
+
+-- Serre duality in its bilinear form, `Ext^i(E,F)ᵛ ≃ Ext^(n-i)(F, E ⊗ ω)`. Supplied data in the
+-- same idiom as `DerivedStatement` and `Data` above, and for the same upstream reason: the pin
+-- has no derived global sections into `D(k)`, no coherent `RHom`, no Grothendieck duality.
+-- `Data.duality` supplies only duality into `ω_X`; the bilinear form is what specialises at
+-- `E = F` on a surface with trivial canonical to `Ext²(E,E) ≃ Hom(E,E)ᵛ`, which is what
+-- Bridgeland's Lemma 5.1 runs on. The consequences below are proved from it, and reduce Lemma 5.1
+-- to `hom(E,E) = 1` for a stable sheaf -- simplicity, which this repository does not have.
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.finrank_eq
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.finrank_eq_of_trivialCanonical
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.finrank_top_eq_finrank_hom
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.eulerChar
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_eq
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_le
+
+/- The `BilinearData` and `TrivialCanonical` fields, and the `HasExt` instance the file needs.
+
+These were unaudited not by omission but because `Bilinear.lean` did not elaborate: the sweep
+cannot see the declarations of a file that fails to build, so the completeness gate could not
+report them. They become visible with the instance fix, and are recorded here rather than in
+`audit_missing_baseline.txt`, which the gate reserves for declarations nobody has audited yet. -/
+
+#print axioms AlgebraicGeometry.Duality.Serre.hasExtCoh
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.extSpace
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.extComparison
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.extFinite
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.canonicalTwist
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.duality
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.mk.inj
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.twistIso
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.mk.inj
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.mk.sizeOf_spec
 #print axioms Cohomology.FiniteCohomology
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic
 #print axioms Cohomology.FiniteCohomology.finrankSupport_subset_range
