@@ -1,4 +1,5 @@
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.AssociatedSheaf
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Frac
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Finiteness
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.GradedLocalization
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentBasis

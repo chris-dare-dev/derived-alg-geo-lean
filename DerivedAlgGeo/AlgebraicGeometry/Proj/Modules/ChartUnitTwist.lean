@@ -81,22 +81,13 @@ local notation3 "X" => ProjectiveSpectrum.top 𝒜
 
 /-- **The function `fⁿ / gⁿ`, as a section of the structure sheaf over an open inside `D₊(g)`.**
 
-Pointwise `fracPow`, which is a fixed fraction, so the `IsFraction` witness is the open itself and
-restriction does not move it. -/
+`fracSection` at `a = fⁿ`, `b = gⁿ`. `#825` made this a definition rather than a second copy of the
+same construction with a `rfl` lemma bridging the two. -/
 def fracPowSection {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1) (n : ℕ)
     {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 g) :
     (ProjectiveSpectrum.Proj.structureSheaf 𝒜).1.obj (op U) :=
-  ⟨fun x => fracPow 𝒜 hf hg n (hU x.2),
-   fun x => ⟨U, x.2, 𝟙 _, n, ⟨f ^ n, by simpa using SetLike.pow_mem_graded n hf⟩,
-     ⟨g ^ n, by simpa using SetLike.pow_mem_graded n hg⟩,
-     fun y => by
-       show (g ^ n : A) ∈ y.1.asHomogeneousIdeal.toIdeal.primeCompl
-       exact Submonoid.pow_mem _ (hU y.2) n,
-     fun _ => rfl⟩⟩
-
-/-- A degree-one element raised to `n` has degree `n`. -/
-theorem pow_mem_deg {a : A} (ha : a ∈ 𝒜 1) (m : ℕ) : a ^ m ∈ 𝒜 m := by
-  simpa using SetLike.pow_mem_graded m ha
+  fracSection 𝒜 (pow_mem_deg 𝒜 hf n) (pow_mem_deg 𝒜 hg n)
+    (hU.trans (basicOpen_le_basicOpen_pow 𝒜 g n))
 
 section Chart
 
