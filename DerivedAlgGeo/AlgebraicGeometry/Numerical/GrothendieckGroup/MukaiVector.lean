@@ -228,6 +228,36 @@ theorem selfPairing_mukaiVector_eq_neg_chi₂
   rw [Mukai.selfPairing_eq_pairing, D.chi₂_eq_neg_pairing hHRR hK3]
   ring
 
+/-- **Bridgeland's Lemma 5.1, reduced to one inequality about `χ`.**
+
+Lemma 5.1 is `v(E)² ≥ −2` for a `μ`-stable sheaf on a K3, and it is the hypothesis that
+`Mukai.re_expCharge_pos_of_neg_one` takes as `−1 ≤ realForm b v` — the last thing standing
+between `ChargePositivity.lean` and case 4 of Lemma 6.2.
+
+This theorem **proves none of it**. It is a rewrite of `selfPairing_mukaiVector_eq_neg_chi₂`,
+and its only content is to state the remaining gap in its sharpest form: **Lemma 5.1 is exactly
+`χ(E,E) ≤ 2`**, a single inequality about the Euler form, rather than prose spread over three
+docstrings.
+
+Why the inequality is not available here, recorded so the next reader does not re-derive it:
+
+* `chi₂` is `∫ ch(E)ᵛ · ch(F) · td(X)`, with no `Ext` in it. The identity
+  `χ₂ E F = Σᵢ (−1)ⁱ dim Extⁱ(E,F)` is the bilinear Hirzebruch–Riemann–Roch, which
+  `EulerPairing.lean` records as belonging to a later layer and which `EulerTransfer.lean`
+  supplies as the hypothesis `IsRiemannRoch` rather than proving.
+* The classical argument is `χ(E,E) = hom − ext¹ + ext² = 2 − ext¹`, using simplicity of a
+  stable sheaf and Serre duality on a K3. Neither exists in this repository: there is no
+  `SerreDuality` and no "stable implies simple", and the stability here is numerical and is not
+  tied to `Hom` at all.
+
+See #332. -/
+theorem neg_two_le_selfPairing_mukaiVector_iff
+    (hHRR : V.SatisfiesHRR) (hK3 : IsK3 V) (E : N) :
+    -2 ≤ Mukai.selfPairing D.b (D.mukaiVector E) ↔ V.chi₂ E E ≤ 2 := by
+  rw [← @Int.cast_le ℚ, D.selfPairing_mukaiVector_eq_neg_chi₂ hHRR hK3]
+  push_cast
+  constructor <;> intro h <;> linarith
+
 /-- **A Mukai vector is spherical exactly when `χ(E,E) = 2`.**
 
 This is `Mukai.IsSpherical` — a property of the *lattice vector*, meaning

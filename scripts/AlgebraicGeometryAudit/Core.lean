@@ -1278,6 +1278,27 @@ is not closed. -/
 #print axioms Scheme.Modules.isIso_fromTildeΓ_restrictBasicOpen_of_quasicoherentData
 #print axioms Scheme.Modules.moduleFinite_globalSections_of_generatingSections
 #print axioms Scheme.Modules.moduleFinite_globalSections_of_presentation
+
+-- Layer B stage 1, the CONVERSE direction (#586). moduleFinite_globalSections_of_generatingSections
+-- above takes a finite generating family to a finite module of global sections; these three take a
+-- finite module of global sections back to a finite free EPIMORPHISM, which is the direction
+-- Serre's global generation needs. Paired with GeneratingSections.ofFreeEpi the loop closes.
+--
+-- The mathematics is short: tilde is a left adjoint (tilde.adjunction) so it preserves colimits and
+-- hence epimorphisms, Finsupp.linearCombination is surjective exactly when the span is everything,
+-- and the two outer maps are isomorphisms. The cost was entirely elaboration, and both hazards are
+-- recorded on epi_freeEpiOfSpan because each was diagnosed wrongly the first time:
+--
+--   * a PreservesEpimorphisms instance left in context makes later instance searches diverge, and
+--     the heartbeat timeout is REPORTED as a plain "failed to synthesize" -- which reads like a
+--     missing instance, and was misread here as a structural defect in the X.Modules wrapper. It is
+--     not: IsIso -> Epi synthesizes fine in that wrapper, checked by compiling both forms.
+--   * backward.isDefEq.respectTransparency false is required, the same trap #585 recorded: without
+--     it the goal is "not type-correct under the instances transparency level" and every later rw
+--     silently fails to match.
+#print axioms Scheme.Modules.freeEpiOfSpan
+#print axioms Scheme.Modules.epi_freeEpiOfSpan
+#print axioms Scheme.Modules.exists_finite_free_epi_of_moduleFinite
 #print axioms Scheme.Modules.exists_basicOpen_finiteGenerating_cover
 #print axioms Scheme.Modules.moduleFinite_globalSections_of_isFiniteType
 #print axioms Scheme.Modules.moduleFinite_globalSections
@@ -2206,6 +2227,7 @@ not functions. -/
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.selfPairing_mukaiVector
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.chi₂_eq_neg_pairing
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.selfPairing_mukaiVector_eq_neg_chi₂
+#print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.neg_two_le_selfPairing_mukaiVector_iff
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.isSpherical_mukaiVector_iff
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.isIsotropic_mukaiVector_iff
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.expectedDim_mukaiVector
@@ -2829,13 +2851,7 @@ syntactically. That diagnostic shift is the real argument for the technique.
 Choosing one n across a finite cover, and the passage to multiplication into F(n), are NOT here;
 they are ChartExtension.lean's uniform trio and Glue.lean, where #585 is closed. -/
 
-#print axioms AlgebraicGeometry.Proj.degreeOneChart
-#print axioms AlgebraicGeometry.Proj.degreeOneChart_image_top
-#print axioms AlgebraicGeometry.Proj.degreeOneChart_image_basicOpen
 #print axioms AlgebraicGeometry.Proj.chartRing
-#print axioms AlgebraicGeometry.Proj.chartRestrict
-#print axioms AlgebraicGeometry.Proj.chartRestrict_isQuasicoherent
-#print axioms AlgebraicGeometry.Proj.isIso_fromTildeΓ_chartRestrict
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_of_le
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_uniform
@@ -2856,9 +2872,6 @@ agreement must be forced on every PAIR at once and a pair type is what gets pass
 The first is six lines for the same reason its extension sibling is: on a degree-one chart the
 sections over D(f/g) are a localization of the sections over the whole chart. -/
 
-#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart
-#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart_of_le
-#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart_uniform
 
 /-! ## Fractions with an arbitrary numerator, and the twist comparison they give (#585)
 
@@ -2903,7 +2916,6 @@ discipline and for the same reason; chartRestrict is its d = 1 case by definitio
 half is not repeated -- #585 extends only across degree-one charts. -/
 
 #print axioms AlgebraicGeometry.Proj.awayRestrict
-#print axioms AlgebraicGeometry.Proj.chartRestrict_eq_awayRestrict
 #print axioms AlgebraicGeometry.Proj.awayRestrict_isQuasicoherent
 #print axioms AlgebraicGeometry.Proj.isIso_fromTildeΓ_awayRestrict
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_away
