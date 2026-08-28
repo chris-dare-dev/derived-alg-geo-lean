@@ -6,6 +6,8 @@ import Mathlib.Algebra.Homology.ShortComplex.ShortExact
 import Mathlib.CategoryTheory.Abelian.CommSq
 import Mathlib.CategoryTheory.ComposableArrows.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Iso
+import Mathlib.Data.Fin.Tuple.Basic
+import Mathlib.Data.List.OfFn
 
 /-!
 # Finite filtrations in an abelian category
@@ -109,6 +111,138 @@ theorem inclusion_toTop (T : FiniteExactTower C) (i : Fin T.length) :
   rw [← T.diagram_map_succ i]
   exact (T.diagram.map_comp
     (homOfLE i.castSucc_le_succ) (homOfLE (Fin.le_last i.succ))).symm
+
+/-- The ordered list of successive quotients in an exact tower. -/
+def gradedObjects (T : FiniteExactTower C) : List C :=
+  List.ofFn T.graded
+
+/-- Prepend one short exact step to an exact tower.
+
+This is the primitive from which endpoint-compatible towers are concatenated. Adding at the
+left edge keeps the `Fin` embeddings definitional, avoiding transports between the two distinct
+right-edge embeddings `i.castSucc.succ` and `i.succ.castSucc`. -/
+def prepend (T : FiniteExactTower C) {X G : C}
+    (f : X ⟶ T.object 0) (g : T.object 0 ⟶ G) (zero : f ≫ g = 0)
+    (shortExact : (ShortComplex.mk f g zero).ShortExact) : FiniteExactTower C where
+  length := T.length + 1
+  object := Fin.cons X T.object
+  inclusion := Fin.cons f T.inclusion
+  graded := Fin.cons G T.graded
+  projection := Fin.cons g T.projection
+  zero := Fin.cons zero T.zero
+  shortExact := Fin.cons shortExact T.shortExact
+
+@[simp]
+theorem prepend_length (T : FiniteExactTower C) {X G : C}
+    (f : X ⟶ T.object 0) (g : T.object 0 ⟶ G) (zero : f ≫ g = 0)
+    (shortExact : (ShortComplex.mk f g zero).ShortExact) :
+    (T.prepend f g zero shortExact).length = T.length + 1 :=
+  rfl
+
+private structure AppendData (T U : FiniteExactTower C) where
+  tower : FiniteExactTower C
+  length_eq : tower.length = T.length + U.length
+  graded_eq : List.ofFn tower.graded = List.ofFn T.graded ++ List.ofFn U.graded
+  initialIso : T.object 0 ≅ tower.object 0
+  terminalIso : tower.object (Fin.last tower.length) ≅ U.object (Fin.last U.length)
+
+/-- Recursive implementation of concatenation.
+
+The implementation consumes the left tower one step at a time. Its private result packages the
+two endpoint comparisons so that the public operation is total even when either tower has length
+zero. -/
+private noncomputable def appendData :
+    (T U : FiniteExactTower C) →
+      (T.object (Fin.last T.length) ≅ U.object 0) → AppendData T U
+  | {
+      length := 0, object := object, inclusion := inclusion, graded := graded,
+      projection := projection, zero := zero, shortExact := shortExact }, U, seam => {
+        tower := U
+        length_eq := by simp
+        graded_eq := by simp
+        initialIso := seam
+        terminalIso := Iso.refl _ }
+  | {
+      length := n + 1, object := object, inclusion := inclusion, graded := graded,
+      projection := projection, zero := zero, shortExact := shortExact }, U, seam => by
+      let tail : FiniteExactTower C := {
+        length := n
+        object := Fin.tail object
+        inclusion := Fin.tail inclusion
+        graded := Fin.tail graded
+        projection := Fin.tail projection
+        zero := Fin.tail zero
+        shortExact := Fin.tail shortExact }
+      let tailSeam : tail.object (Fin.last tail.length) ≅ U.object 0 := by
+        dsimp only [tail, Fin.tail]
+        refine (eqToIso ?_).trans seam
+        congr 1
+      let D := appendData tail U tailSeam
+      let e : object 1 ≅ D.tower.object 0 := D.initialIso
+      let f : object 0 ⟶ D.tower.object 0 := inclusion 0 ≫ e.hom
+      let g : D.tower.object 0 ⟶ graded 0 := e.inv ≫ projection 0
+      let z : f ≫ g = 0 := by
+        dsimp only [f, g]
+        simp [Category.assoc]
+        exact zero 0
+      let stepIso :
+          ShortComplex.mk (inclusion 0) (projection 0) (zero 0) ≅
+            ShortComplex.mk f g z :=
+        ShortComplex.isoMk (Iso.refl _) e (Iso.refl _)
+          (by simp [f]) (by simp [g])
+      let h : (ShortComplex.mk f g z).ShortExact :=
+        ShortComplex.shortExact_of_iso stepIso (shortExact 0)
+      let V := D.tower.prepend f g z h
+      exact {
+        tower := V
+        length_eq := by
+          dsimp only [V, prepend]
+          rw [D.length_eq]
+          dsimp only [tail]
+          omega
+        graded_eq := by
+          dsimp only [V, prepend]
+          rw [List.ofFn_cons, D.graded_eq]
+          dsimp only [tail]
+          rw [← Fin.cons_self_tail graded, List.ofFn_cons, List.cons_append]
+          simp
+        initialIso := Iso.refl _
+        terminalIso := by simpa [V, prepend] using D.terminalIso }
+termination_by T => T.length
+
+/-- Concatenate two exact towers along an isomorphism from the left endpoint to the right start.
+
+The result contains the graded pieces of `T`, followed by those of `U`. The seam is an
+isomorphism rather than an equality because pulled-back quotient filtrations meet their adjacent
+coarse stages canonically only up to isomorphism. -/
+noncomputable def append (T U : FiniteExactTower C)
+    (seam : T.object (Fin.last T.length) ≅ U.object 0) : FiniteExactTower C :=
+  (appendData T U seam).tower
+
+@[simp]
+theorem append_length (T U : FiniteExactTower C)
+    (seam : T.object (Fin.last T.length) ≅ U.object 0) :
+    (T.append U seam).length = T.length + U.length :=
+  (appendData T U seam).length_eq
+
+@[simp]
+theorem append_gradedObjects (T U : FiniteExactTower C)
+    (seam : T.object (Fin.last T.length) ≅ U.object 0) :
+    (T.append U seam).gradedObjects = T.gradedObjects ++ U.gradedObjects :=
+  (appendData T U seam).graded_eq
+
+/-- The start of a concatenation is canonically the start of its left tower. -/
+noncomputable def appendInitialIso (T U : FiniteExactTower C)
+    (seam : T.object (Fin.last T.length) ≅ U.object 0) :
+    T.object 0 ≅ (T.append U seam).object 0 :=
+  (appendData T U seam).initialIso
+
+/-- The end of a concatenation is canonically the end of its right tower. -/
+noncomputable def appendTerminalIso (T U : FiniteExactTower C)
+    (seam : T.object (Fin.last T.length) ≅ U.object 0) :
+    (T.append U seam).object (Fin.last (T.append U seam).length) ≅
+      U.object (Fin.last U.length) :=
+  (appendData T U seam).terminalIso
 
 /-- Apply an exact functor to an endpoint-free exact tower. -/
 def map (T : FiniteExactTower C) (G : C ⥤ D) [G.PreservesZeroMorphisms]
