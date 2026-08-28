@@ -204,8 +204,27 @@ noncomputable def restrictSquareSectionsEquiv (V : U.toScheme.Opens) :
 Pushing forward along `f` and then restricting to `U` is restricting to `f ⁻¹ᵁ U` and then pushing
 forward along `f ∣_ U`. This is what `#572` step 2 consumes:
 `isCoherent_iff_restrict_affineOpenCover` asks for `IsFinitePresentation` of the restriction, which
-transfers along an isomorphism, so the object-level statement suffices and the functor-level one is
-not needed. -/
+transfers along an isomorphism, so the object-level statement suffices.
+
+## The ceiling, and what lifting it would take
+
+This compares the two composites **at one `M`**. Naturality in `M` is not proved, so there is no
+natural isomorphism of functors
+
+    (pushforward f ⋙ restrict U.ι) ≅ (restrict (f ⁻¹ᵁ U).ι ⋙ pushforward (f ∣_ U))
+
+here — only its value at each object. That is enough for coherence, which needs a property
+transported along an iso and never needs the iso to vary coherently with `M`.
+
+It is not enough for a consumer that wants base change as a *square*: a projection formula, a
+derived base-change comparison, or anything that composes this with another natural transformation.
+Such a consumer will find the object-level iso, find it typechecks at each `M`, and only then
+discover there is no naturality to compose with. Lifting the ceiling means proving the square
+commutes for every `M ⟶ N`, which the component `restrictSquareSectionsEquiv` should support but
+nothing here does.
+
+`#572` step 3 asks for `Hⁱ(X, F) ≅ Hⁱ(Pⁿ, ι_* F)` *naturally in `F`*, so it is the likely first
+consumer to hit this. -/
 noncomputable def pushforwardRestrictIso :
     ((Scheme.Modules.pushforward f).obj M).restrict U.ι ≅
       (Scheme.Modules.pushforward (f ∣_ U)).obj (M.restrict (f ⁻¹ᵁ U).ι) :=
