@@ -273,7 +273,7 @@ items:
       - "Zero sorries; all gates green."
 
   - id: dg-enhancements-e8
-    gh_issue: null
+    gh_issue: 853
     gh_sub_issues: []
     kind: epic
     parent: dg-enhancements-m3
@@ -286,7 +286,7 @@ items:
     labels: [area:dg, area:derived, type:feature, source:1507.05509]
 
   - id: dg-enhancements-e9
-    gh_issue: null
+    gh_issue: 854
     gh_sub_issues: []
     kind: epic
     parent: dg-enhancements-m3
@@ -299,7 +299,7 @@ items:
     labels: [area:dg, area:derived, bridge:h0-seam, type:feature, source:2101.04404]
 
   - id: dg-enhancements-e10
-    gh_issue: null
+    gh_issue: 855
     gh_sub_issues: []
     kind: epic
     parent: dg-enhancements-m3
