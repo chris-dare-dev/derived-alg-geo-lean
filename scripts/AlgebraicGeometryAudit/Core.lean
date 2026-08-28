@@ -2897,6 +2897,7 @@ older lemma is its a = f^n, b = g^n case. -/
 #print axioms AlgebraicGeometry.Proj.fracSection
 #print axioms AlgebraicGeometry.Proj.fracPowSection_eq_fracSection
 #print axioms AlgebraicGeometry.Proj.pow_mem_smul
+#print axioms AlgebraicGeometry.Proj.pow_mem_mul
 #print axioms AlgebraicGeometry.Proj.frac_eq
 #print axioms AlgebraicGeometry.Proj.fracSection_eq
 #print axioms AlgebraicGeometry.Proj.frac_pow
