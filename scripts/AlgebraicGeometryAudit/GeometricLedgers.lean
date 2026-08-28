@@ -405,3 +405,30 @@ the composite.
 
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricActStabTrans
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransKernelAutoequivalence
+
+
+/-! ## The geometric transform as an element of the acting group
+
+`geometricActStabOfDual` is a FUNCTION on stability conditions.
+`Stability/ClassMap.lean` builds a genuine `Group` -- `GroupAction.AutPairQuot v`
+-- and "the transform transports" and "the transform is an element of the group
+that acts" are different claims. The abstract file proves the second for a
+`KernelAutoequivalence` with a `DualKernel`; both are available geometrically,
+so this is the geometric side reaching the group.
+
+The strengthening over `actStabOfDual` is `lam`'s INVERTIBILITY, and it is a
+real hypothesis rather than repackaging: a geometric kernel autoequivalence with
+a non-invertible compatible `lam` still transports stability conditions, it just
+is not a member of this group.
+
+`geometricMk_toAutPair_smul` is the statement at the quotient, where the
+`MulAction` lives: the transported condition is the image of a group element,
+not merely the value of a map. `rfl`, as abstractly -- worth stating for the
+same reason it was worth stating there.
+
+Still conditional on the whole uninhabited ledger, and still no monoid map: this
+is membership for ONE element, not a homomorphism from anything.
+-/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricMk_toAutPair_smul
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricToAutPair
