@@ -75,6 +75,7 @@ generations:
   - { rev: 2, at: "2026-08-28", note: "Implementation started in fresh non-overlapping worktrees for #850 (generic stack ownership) and #856 (Appendix B almost-disconnected morphisms). The relative numerical K-group #851 and semiorthogonal root #852 remain open research lanes." }
   - { rev: 3, at: "2026-08-28", note: "The merged stack-root lane closed #850. Issue #851 then started with a neutral saturated-quotient root and the algebraic core of Definition 8.7: fiber sum, connected-family relation quotient, universal property, induced-map laws, and connected-family/one-fiber tests. The geometric fiber overlattices and eta specialization classes remain the next slice." }
   - { rev: 4, at: "2026-08-28", note: "Issue #851 now packages admissible families as statement-layer comparison data over the same relative quotient root. Point-independence and its torsion-free universal property are inherited from the saturated quotient; the next geometric slice remains the fiber overlattice and eta specialization construction." }
+  - { rev: 5, at: "2026-08-28", note: "Issue #852 started at the generic triangulated root. The pinned Mathlib reconnaissance selects ObjectProperty orthogonals and the canonical triangulated envelope; the implementation separates the semiorthogonal carrier, triangulated components, classical fullness, strong fullness, and mapped-component orthogonality, with one-block and product-factor inhabitants before geometry." }
 items:
   - id: projective-families-m1
     gh_milestone: 33
@@ -122,10 +123,10 @@ items:
     kind: epic
     parent: projective-families-m1
     title: "Semiorthogonal decompositions and exceptional-collection root"
-    status: planned
+    status: in_progress
     priority: must
     size: XL
-    summary: "Build the generic categorical root used by the full strong exceptional collection on `(P¹)^n`, with trivial and product inhabitants before geometry and with base-change capabilities separated from their geometric realization."
+    summary: "The generic root is active: ordered ObjectProperty components reuse Mathlib orthogonals, while triangulated closure, classical fullness, strong fullness, and mapped-component orthogonality remain independent predicates or capabilities. One-block and product-factor inhabitants compile before geometry; exceptionality and mutation remain deferred until a theorem consumes them."
     tags: [semiorthogonal, exceptional-collection, research]
     labels: [area:derived, area:stability, prerequisite, source:2607.28411]
 
