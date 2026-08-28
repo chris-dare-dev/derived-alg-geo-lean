@@ -126,5 +126,6 @@ lake build DerivedAlgGeo:docs
 
 Structural changes must update imports, umbrellas, audit names, registry
 bindings, source-independence checks, documentation, and CI paths in the same
-change. A move is complete only when `scripts/gates.sh` passes from a clean
-checkout.
+change. A move is complete only when CI passes on the pushed branch from a clean
+checkout — not when a local `scripts/gates.sh` goes green, which is neither
+permitted here nor sufficient.
