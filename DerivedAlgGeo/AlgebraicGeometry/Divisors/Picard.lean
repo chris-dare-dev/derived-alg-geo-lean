@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.ModuleCat.Sheaf.LocallyFree
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 import Mathlib.CategoryTheory.ObjectProperty.FullSubcategory
 import Mathlib.CategoryTheory.Skeletal
+import Mathlib.LinearAlgebra.TensorProduct.Finiteness
+import Mathlib.Topology.Sheaves.LocallySurjective
 
 /-!
 # Invertible sheaves and the sheafified tensor product
@@ -378,6 +380,58 @@ theorem smul_tmulSection (M N : X.Modules) (U : X.Opensᵒᵖ)
       = r • (ModuleCat.Hom.hom eta) (t ⊗ₜ[Γ(X, U.unop)] y) := by
     exact (ModuleCat.Hom.hom eta).map_smul r _
   exact (hsm.symm.trans (congrArg _ h1.symm))
+
+/-- **The sheafification unit of a presheaf of modules is locally surjective.**
+
+Its underlying map of abelian presheaves *is* `toSheafify`
+(`toPresheaf_map_sheafificationAdjunction_unit_app`, by `rfl`), and that carries Mathlib's
+instance. Stated because instance search does not find it on its own: all three of
+`HasWeakSheafify`, `HasSheafCompose` and `PreservesSheafification` synthesize here, but the
+composite goal does not, and explicit application is what closes it. -/
+theorem isLocallySurjective_sheafificationUnit (P : X.PresheafOfModules) :
+    Presheaf.IsLocallySurjective (Opens.grothendieckTopology X)
+      ((PresheafOfModules.toPresheaf _).map
+        ((PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app P)) := by
+  rw [PresheafOfModules.toPresheaf_map_sheafificationAdjunction_unit_app]
+  exact Presheaf.isLocallySurjective_toSheafify' _ _
+
+/-- **Locally, a section of the sheafified tensor product is a finite sum of pure tensors.**
+
+`tmulSection`'s docstring warns that it is "a map *into* the sections, not a description of them",
+and globally that is right: sheafification does not preserve surjectivity of
+`M(U) ⊗ N(U) → Γ(M ⊗ N, U)` on the nose. **Locally it does**, and this is that statement — the
+missing converse, and the reason it can only live in this file.
+
+Nothing outside can state it. The monoidal structure on `X.PresheafOfModules` is a `local instance`
+here and `associatedSheaf` is a `private abbrev`, so a consumer cannot write `t ⊗ₜ y`, cannot name
+`M' ⊗ N'`, and therefore cannot say "a section of the sheafification comes from the presheaf
+tensor" at all. Anything needing to take a section of `M ⊗ N` apart has to be given this from
+inside.
+
+The proof is the three facts that were unavailable to a consumer: the sheafification unit is
+locally surjective, so `t` has a preimage `z` in the presheaf tensor near `x`;
+`TensorProduct.exists_finset` writes `z` as a finite sum of pure tensors; and the unit's component
+is additive, which turns that sum into a sum of `tmulSection`s by definition of `tmulSection`.
+
+The neighbourhood is genuinely needed: `V` is where the preimage exists, and no smaller claim about
+`U` itself is available. -/
+theorem exists_eq_sum_tmulSection (M N : X.Modules) {U : X.Opens}
+    (t : Γ(tensorObj M N, U)) (x : X) (hx : x ∈ U) :
+    ∃ (V : X.Opens) (hV : V ≤ U), x ∈ V ∧
+      ∃ s : Finset (Γ(M, V) × Γ(N, V)),
+        (tensorObj M N).presheaf.map (homOfLE hV).op t
+          = ∑ p ∈ s, tmulSection M N (Opposite.op V) p.1 p.2 := by
+  have hls : TopCat.Presheaf.IsLocallySurjective
+      ((PresheafOfModules.toPresheaf _).map
+        ((PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app
+          ((toPresheafOfModules X).obj M ⊗ (toPresheafOfModules X).obj N))) :=
+    isLocallySurjective_sheafificationUnit _
+  obtain ⟨V, hV, ⟨z, hz⟩, hxV⟩ :=
+    (TopCat.Presheaf.isLocallySurjective_iff _).mp hls U t x hx
+  obtain ⟨s, rfl⟩ := TensorProduct.exists_finset z
+  refine ⟨V, hV, hxV, s, ?_⟩
+  refine (hz.symm : _ = _).trans ?_
+  exact map_sum _ _ _
 
 /-- **The `twistBy` shape, applied to a section: it is the pure tensor with `ψ`'s value on `1`.**
 
