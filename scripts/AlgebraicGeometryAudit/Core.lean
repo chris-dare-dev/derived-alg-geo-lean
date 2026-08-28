@@ -2203,6 +2203,7 @@ not functions. -/
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.selfPairing_mukaiVector
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.chi₂_eq_neg_pairing
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.selfPairing_mukaiVector_eq_neg_chi₂
+#print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.neg_two_le_selfPairing_mukaiVector_iff
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.isSpherical_mukaiVector_iff
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.isIsotropic_mukaiVector_iff
 #print axioms AlgebraicGeometry.Numerical.K3.IntegralMukaiData.expectedDim_mukaiVector
