@@ -445,11 +445,11 @@ theorem exists_globalSection_twistBy (F : (Proj 𝒜).Modules)
         = Scheme.Modules.Hom.app (twistBy 𝒜 N (pow_mem_deg 𝒜 hf N) F) (basicOpen 𝒜 f) s := by
   classical
   -- one exponent extending `s` across every degree-one chart
-  obtain ⟨n, hn⟩ := exists_pow_smul_eq_res_image_uniform 𝒜 F hf hg
+  obtain ⟨n, hn⟩ := exists_pow_smul_eq_res_image_uniform 𝒜 F hf hg Nat.one_pos
     (W := fun i => basicOpen 𝒜 (g i))
     (V := fun i => basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)
-    (funext fun i => degreeOneChart_image_top 𝒜 (hg i))
-    (funext fun i => degreeOneChart_image_basicOpen 𝒜 hf (hg i))
+    (funext fun i => awayι_image_top 𝒜 (hg i) Nat.one_pos)
+    (funext fun i => awayι_image_basicOpen 𝒜 (hg i) Nat.one_pos hf Nat.one_pos)
     (fun i => inf_le_left) (fun i => inf_le_left)
     (fun i => F.presheaf.map (homOfLE (inf_le_right :
       basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f)).op s)

@@ -5,34 +5,25 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartExtension
 
 /-!
-# The chart of a homogeneous element of any positive degree
+# Agreement on the chart of a homogeneous element of any positive degree
 
-`ChartExtension.lean` works with degree-one charts, which is what `#585`'s cover is made of. Its
-*pairwise overlaps* are not: `D₊(gᵢ) ⊓ D₊(gⱼ) = D₊(gᵢ gⱼ)` and `gᵢ gⱼ` has degree two. Forcing two
-chart extensions to agree on an overlap is an affine statement over that chart, so the same
-restriction has to exist one degree up.
+`ChartExtension.lean` supplies the chart, its restriction `awayRestrict`, and the *extension* half
+of `Modules/Affine/Extension.lean` read on it. This file supplies the *separatedness* half.
 
-## What is here
+## Why it is a separate file rather than a separate degree
 
-`awayRestrict` is `chartRestrict` for `g ∈ 𝒜 d` with `0 < d`, with the same two instances and the
-same naming discipline -- `references/instance-transparency.md` technique 5, for the same reason:
-stated inline, `IsIso (F.restrict (awayι 𝒜 g hg hd)).fromTildeΓ` does not elaborate.
-
-`exists_pow_smul_eq_of_res_eq_away` is the separatedness half of `Modules/Affine/Extension.lean`
-read on such a chart. The extension half is not repeated: `#585` extends only across degree-one
-charts, and `ChartExtension.lean` already has it there.
-
-## Relation to `chartRestrict`
-
-`chartRestrict 𝒜 F hg` is `awayRestrict 𝒜 F hg Nat.one_pos` by definition, so a statement about one
-can be discharged by the other with `exact`. The degree-one name is kept because the extension
-lemmas that consume it are stated with it.
+It used to be both. `ChartExtension.lean` was degree-one only and this file repeated the same three
+statements one degree up, because `#585`'s cover is made of degree-one charts while its pairwise
+overlaps are not: `D₊(gᵢ) ⊓ D₊(gⱼ) = D₊(gᵢ gⱼ)` has degree two. The stated reason for the split --
+"`#585` extends only across degree-one charts" -- was true of `#585` and false as a design
+principle, and the two trios were the same theorem with one lemma swapped. `#822` collapsed that:
+`ChartExtension.lean` is now general in the degree, and what remains here is only the half it does
+not state.
 
 ## Scope
 
 One chart, one basic open of it. No cover, no gluing.
 -/
-
 universe u
 
 open CategoryTheory Opposite TopologicalSpace
@@ -41,29 +32,6 @@ namespace AlgebraicGeometry.Proj
 
 variable {A σA : Type u} [CommRing A] [SetLike σA A] [AddSubgroupClass σA A]
 variable (𝒜 : ℕ → σA) [GradedRing 𝒜]
-
-/-- **The restriction of `F` to the chart of a homogeneous element of positive degree**, named at
-its result type so that `fromTildeΓ`'s bundled ring is matched syntactically. -/
-noncomputable def awayRestrict (F : (Proj 𝒜).Modules) {d : ℕ} {g : A} (hg : g ∈ 𝒜 d)
-    (hd : 0 < d) : (Spec (.of ↑(chartRing 𝒜 g))).Modules :=
-  F.restrict (awayι 𝒜 g hg hd)
-
-/-- The degree-one chart is the case `d = 1`. -/
-theorem chartRestrict_eq_awayRestrict (F : (Proj 𝒜).Modules) {g : A} (hg : g ∈ 𝒜 1) :
-    chartRestrict 𝒜 F hg = awayRestrict 𝒜 F hg Nat.one_pos :=
-  rfl
-
-instance awayRestrict_isQuasicoherent (F : (Proj 𝒜).Modules)
-    [SheafOfModules.IsQuasicoherent.{u, u, u}
-      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {d : ℕ} {g : A} (hg : g ∈ 𝒜 d) (hd : 0 < d) : (awayRestrict 𝒜 F hg hd).IsQuasicoherent :=
-  inferInstanceAs ((F.restrict (awayι 𝒜 g hg hd)).IsQuasicoherent)
-
-instance isIso_fromTildeΓ_awayRestrict (F : (Proj 𝒜).Modules)
-    [SheafOfModules.IsQuasicoherent.{u, u, u}
-      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {d : ℕ} {g : A} (hg : g ∈ 𝒜 d) (hd : 0 < d) : IsIso (awayRestrict 𝒜 F hg hd).fromTildeΓ :=
-  Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent _
 
 /-- **Two sections of a chart agreeing on a basic open agree after clearing a power.**
 
