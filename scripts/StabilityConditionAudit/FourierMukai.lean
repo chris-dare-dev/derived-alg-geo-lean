@@ -543,3 +543,38 @@ the bar -- it restates it pointwise, in the shape a geometric criterion
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel_corr
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel_kernel
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.transform_isEquivalence
+
+
+/-! ## Satisfiability witnesses
+
+`Correspondence`, `ConstituentRightAdjoints` and `ConstituentLeftAdjoints` had
+NO inhabitant at all, and neither did `UnitKernelData`. An interface nobody has
+inhabited is one nobody has checked for consistency -- a structure whose fields
+cannot be met simultaneously looks exactly like a structure nobody has tried.
+
+`trivialCorrespondence` takes pull, push and every twist to be the identity. Its
+transform is then the identity DEFINITIONALLY (`trivialCorrespondence_transform`
+is `rfl`), so `Adjunction.id` discharges every adjunction field with no
+transport at all.
+
+A clean axiom list here says the interfaces are CONSISTENT. It says nothing
+else: not that any geometric Fourier--Mukai transform exists, not that any
+transform is an equivalence, and not that any contract in
+`AlgebraicGeometry/StabilityCondition/Families/` is dischargeable. The geometric
+ledger remains entirely uninhabited.
+
+Nothing here is an `instance`, deliberately: a global `Correspondence` instance
+would put the trivial one in front of every instance search mentioning the
+structure.
+-/
+
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialConstituentLeftAdjoints
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialConstituentRightAdjoints
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialCorrespondence
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialCorrespondence_transform
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialLeftAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialRightAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialRightAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.trivialUnitKernelData
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.trivialUnitKernelData_unitKernel
