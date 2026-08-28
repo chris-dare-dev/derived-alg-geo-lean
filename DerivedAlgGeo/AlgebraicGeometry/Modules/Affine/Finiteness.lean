@@ -181,8 +181,11 @@ theorem moduleFinite_globalSections_of_generatingSections (M : (Spec R).Modules)
 /-- **The map out of a free sheaf that a chosen spanning family provides.**
 
 Transport across `tildeFinsupp`, apply `tilde` to `Finsupp.linearCombination`, and land through the
-affine comparison. -/
-noncomputable def freeEpiOfSpan (M : (Spec R).Modules) [IsIso M.fromTildeΓ]
+affine comparison.
+
+`M.fromTildeΓ` is composed with, not inverted, so the map exists for any `M`. It is
+`epi_freeEpiOfSpan` that needs `[IsIso M.fromTildeΓ]`, and it takes it there. -/
+noncomputable def freeEpiOfSpan (M : (Spec R).Modules)
     (s : Set (moduleSpecΓFunctor.obj M)) :
     SheafOfModules.free.{u} s ⟶ M :=
   (tildeFinsupp s).inv ≫
