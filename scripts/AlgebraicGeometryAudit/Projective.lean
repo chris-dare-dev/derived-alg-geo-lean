@@ -88,3 +88,22 @@ open AlgebraicGeometry
 #print axioms AlgebraicGeometry.presheaf_map_square_eq
 #print axioms AlgebraicGeometry.restrictSquareSectionsEquiv
 #print axioms AlgebraicGeometry.pushforwardRestrictIso
+
+/-! ## Pushforward along an isomorphism (#572 step 2)
+
+The transport that lets `isCoherent_pushforward_of_surjective`, stated about `Spec.map`,
+reach a member of an affine open cover, which is an affine *scheme*.
+-/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.restrictEquiv
+#print axioms AlgebraicGeometry.Scheme.Modules.pushforwardIsoRestrict
+#print axioms AlgebraicGeometry.Scheme.Modules.isCoherent_pushforward_of_iso
+
+/-! ## Pushforward along a closed immersion (#572 step 2)
+
+The globalisation itself: `isCoherent_pushforward`.
+-/
+
+#print axioms AlgebraicGeometry.Scheme.isCoherent_pushforward_affine
+#print axioms AlgebraicGeometry.Scheme.isCoherent_restrict_chart
+#print axioms AlgebraicGeometry.Scheme.isCoherent_pushforward
