@@ -1,3 +1,4 @@
+CategoryTheory	AlgebraicGeometry.StackEquivalence
 CategoryTheory	CategoryTheory.DGFunctor.IsQuasiEquivalence
 CategoryTheory	CategoryTheory.DGLinear
 CategoryTheory	CategoryTheory.Enhancement
