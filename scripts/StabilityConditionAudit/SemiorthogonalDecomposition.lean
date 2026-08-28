@@ -5,6 +5,10 @@ triangulated category theory; this audit owns it alongside the other generic tri
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.semiorthogonal
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.mk.inj
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.total
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.component_le_total
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.hom_eq_zero
