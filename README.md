@@ -29,15 +29,18 @@ import DerivedAlgGeo.CategoryTheory.DGCategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 ```
 
-The repository is pinned to Lean and Mathlib v4.32.1. From a checkout:
+The repository is pinned to Lean and Mathlib v4.32.1. From a checkout, fetch the
+Mathlib cache and build the module you are working on:
 
 ```bash
 lake exe cache get
-lake build
+LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
 ```
 
-Run `scripts/gates.sh fast` while developing and `scripts/gates.sh` before
-requesting review.
+**Full verification runs on the self-hosted Windows runners, not on your
+machine.** Pushing an `agent/**` branch runs the whole gate there; a bare
+`lake build` and `scripts/gates.sh` are refused locally by a `PreToolUse` hook.
+See `CONTRIBUTING.md` §"Where verification runs".
 
 ## Layout
 
