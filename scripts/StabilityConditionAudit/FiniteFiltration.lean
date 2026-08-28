@@ -18,3 +18,9 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteFiltration.mk.sizeOf_spec
 #print axioms CategoryTheory.FiniteFiltration.step
 #print axioms CategoryTheory.FiniteFiltration.step_shortExact
+#print axioms CategoryTheory.FiniteFiltration.map
+#print axioms CategoryTheory.FiniteFiltration.map_length
+#print axioms CategoryTheory.FiniteFiltration.map_object
+#print axioms CategoryTheory.FiniteFiltration.map_graded
+#print axioms CategoryTheory.FiniteFiltration.map_id
+#print axioms CategoryTheory.FiniteFiltration.map_comp

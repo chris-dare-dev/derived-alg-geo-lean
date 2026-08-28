@@ -18,7 +18,7 @@ incompatible tower type.
 
 open CategoryTheory Limits
 
-universe v u
+universe v v₂ u u₂
 
 namespace CategoryTheory
 
@@ -52,6 +52,7 @@ structure FiniteFiltration (M : C) where
 namespace FiniteFiltration
 
 variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] {M : C}
+variable {D : Type u₂} [Category.{v₂} D] [HasZeroMorphisms D]
 
 /-- The short complex presenting the `i`th successive quotient. -/
 def step (F : FiniteFiltration C M) (i : Fin F.length) : ShortComplex C :=
@@ -60,6 +61,64 @@ def step (F : FiniteFiltration C M) (i : Fin F.length) : ShortComplex C :=
 theorem step_shortExact (F : FiniteFiltration C M) (i : Fin F.length) :
     (F.step i).ShortExact :=
   F.shortExact i
+
+/-- Apply an exact functor to every term and every successive quotient of a finite filtration.
+
+This is the common categorical operation used when a geometric filtration is pulled back by a
+flat morphism: the geometric leaf only has to identify its pullback functor and the images of the
+graded pieces.  Exactness stays here, rather than being rebuilt in each almost-disconnected or
+stability-condition consumer. -/
+def map (F : FiniteFiltration C M) (G : C ⥤ D) [G.PreservesZeroMorphisms]
+    [PreservesFiniteLimits G] [PreservesFiniteColimits G] :
+    FiniteFiltration D (G.obj M) where
+  length := F.length
+  object i := G.obj (F.object i)
+  inclusion i := G.map (F.inclusion i)
+  graded i := G.obj (F.graded i)
+  projection i := G.map (F.projection i)
+  zero i := by
+    rw [← G.map_comp, F.zero i, G.map_zero]
+  shortExact i := by
+    change ((F.step i).map G).ShortExact
+    exact (F.step_shortExact i).map_of_exact G
+  initialIsZero := G.map_isZero F.initialIsZero
+  terminalIso := G.mapIso F.terminalIso
+
+@[simp]
+theorem map_length (F : FiniteFiltration C M) (G : C ⥤ D) [G.PreservesZeroMorphisms]
+    [PreservesFiniteLimits G] [PreservesFiniteColimits G] :
+    (F.map G).length = F.length :=
+  rfl
+
+@[simp]
+theorem map_object (F : FiniteFiltration C M) (G : C ⥤ D) [G.PreservesZeroMorphisms]
+    [PreservesFiniteLimits G] [PreservesFiniteColimits G]
+    (i : Fin ((F.map G).length + 1)) :
+    (F.map G).object i = G.obj (F.object i) :=
+  rfl
+
+@[simp]
+theorem map_graded (F : FiniteFiltration C M) (G : C ⥤ D) [G.PreservesZeroMorphisms]
+    [PreservesFiniteLimits G] [PreservesFiniteColimits G]
+    (i : Fin (F.map G).length) :
+    (F.map G).graded i = G.obj (F.graded i) :=
+  rfl
+
+@[simp]
+theorem map_id (F : FiniteFiltration C M) : F.map (𝟭 C) = F := by
+  cases F
+  rfl
+
+attribute [local instance] comp_preservesFiniteLimits comp_preservesFiniteColimits
+
+@[simp]
+theorem map_comp (F : FiniteFiltration C M) (G : C ⥤ D) [G.PreservesZeroMorphisms]
+    [PreservesFiniteLimits G] [PreservesFiniteColimits G]
+    {E : Type*} [Category E] [HasZeroMorphisms E] (H : D ⥤ E)
+    [H.PreservesZeroMorphisms] [PreservesFiniteLimits H] [PreservesFiniteColimits H] :
+    F.map (G ⋙ H) = (F.map G).map H := by
+  cases F
+  rfl
 
 end FiniteFiltration
 
