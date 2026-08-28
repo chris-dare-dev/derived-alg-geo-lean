@@ -77,6 +77,7 @@ generations:
   - { rev: 4, at: "2026-08-28", note: "Issue #851 now packages admissible families as statement-layer comparison data over the same relative quotient root. Point-independence and its torsion-free universal property are inherited from the saturated quotient; the next geometric slice remains the fiber overlattice and eta specialization construction." }
   - { rev: 5, at: "2026-08-28", note: "Issue #852 started at the generic triangulated root. The pinned Mathlib reconnaissance selects ObjectProperty orthogonals and the canonical triangulated envelope; the implementation separates the semiorthogonal carrier, triangulated components, classical fullness, strong fullness, and mapped-component orthogonality, with one-block and product-factor inhabitants before geometry." }
   - { rev: 6, at: "2026-08-28", note: "Issue #852 merged its generic semiorthogonal root, including independent triangulated/fullness predicates and two compiled inhabitants. Work returns to #851 for the geometric fiber overlattice and eta-specialization adapter on the existing relative quotient." }
+  - { rev: 7, at: "2026-08-28", note: "Issue #851 now models each geometric fiber group as the image of its eta base-change homomorphism in a common ambient group, records finite relative index as a predicate, and transports admissible-family classes through this image into the existing saturated quotient. Proposition 8.10 functoriality is the next slice." }
 items:
   - id: projective-families-m1
     gh_milestone: 33
@@ -114,7 +115,7 @@ items:
     status: in_progress
     priority: must
     size: XL
-    summary: "The algebraic core of Definition 8.7 is active: a neutral saturation root now supports the fiber direct sum, a statement-layer family-relation system, quotient universal property, induced-map laws, point-independence, and the one-fiber test. Next construct the geometric fiber overlattices and eta specialization classes, then Proposition 8.10 functoriality. The uniformly numerical group and §10 image lattice are further quotients/images, never sibling K-groups."
+    summary: "The algebraic core of Definition 8.7 now supports the fiber direct sum, a statement-layer family-relation system, quotient universal property, induced-map laws, point-independence, and the one-fiber test. The geometric slice presents each fiber overlattice as the image of its eta base-change map, keeps finite relative index as a predicate, and factors admissible-family classes into that image before reusing the same quotient. Proposition 8.10 functoriality is next. The uniformly numerical group and §10 image lattice remain further quotients/images, never sibling K-groups."
     tags: [k-theory, numerical, relative, prerequisite]
     labels: [area:geometry, area:moduli, prerequisite, source:2607.28411]
 
