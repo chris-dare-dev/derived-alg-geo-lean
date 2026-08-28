@@ -94,7 +94,7 @@ items:
     kind: epic
     parent: projective-families-m1
     title: "Move generic stack roots above scheme geometry"
-    status: in_progress
+    status: complete
     priority: must
     size: L
     summary: "Relocate the generic contents of AlgebraicGeometry/Stacks/Basic to a CategoryTheory/Sites owner, preserve scheme-site adapters, and add a shrinking-allowlist gate for the current Moduli-to-StabilityCondition/Families reverse imports. This is an ownership refactor, not a new stack theorem."
