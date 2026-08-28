@@ -13,3 +13,4 @@ of spaces. The only non-instance input is exactness of `f_*`.
 #print axioms DerivedAlgGeo.Topology.isTerminalTopOpens
 #print axioms DerivedAlgGeo.Topology.terminal_opens_eq_top
 #print axioms DerivedAlgGeo.Topology.cohomologyPushforwardAddEquiv
+#print axioms DerivedAlgGeo.Topology.schemeCohomologyPushforwardAddEquiv
