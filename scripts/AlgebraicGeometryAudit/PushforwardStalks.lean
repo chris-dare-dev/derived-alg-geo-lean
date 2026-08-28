@@ -17,3 +17,4 @@ The half of the stalkwise picture Mathlib does not have. The other half, on the 
 #print axioms DerivedAlgGeo.Topology.stalkPushforward_naturality
 #print axioms DerivedAlgGeo.Topology.surjective_stalk_map_pushforward
 #print axioms DerivedAlgGeo.Topology.isLocallySurjective_pushforward
+#print axioms DerivedAlgGeo.Topology.preservesEpimorphisms_pushforward
