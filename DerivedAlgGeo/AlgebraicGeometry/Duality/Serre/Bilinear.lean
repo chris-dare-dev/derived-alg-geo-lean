@@ -76,6 +76,26 @@ failure mode; raising `synthInstance.maxHeartbeats` treats the symptom.
 local instance hasExtCoh : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
   HasExt.standard _
 
+-- The same `HasExt` witness `Serre/Cohomology.lean` supplies before its own `Data`, and
+-- for the same reason -- but it has to be repeated rather than inherited, because a
+-- `local instance` does not cross the import boundary. Without it, `Abelian.Ext` below
+-- sends synthesis looking for `HasSmallLocalizedHom` over the quasi-iso localization of
+-- `Coh X` from scratch, and that search does not converge: raising the budget only moves
+-- the timeout (`synthInstance` at 20000, then `isDefEq` at 200000, then `whnf` at
+-- 800000), which is why no heartbeat option belongs here.
+--
+-- It stays `local`, deliberately, and must not be promoted to a global instance.
+-- `Cohomology/Cech/Vanishing.lean` and `Development/Cohomology/Strategy.lean` both record
+-- why: `HasExt` is passed explicitly everywhere in this lane, because letting instance
+-- search pick would allow the small-site `HasExt.{u}` to name different groups than the
+-- `HasExt.{u + 1}` these statements mean.
+-- Named rather than anonymous: an unnamed `local instance` here is auto-disambiguated
+-- against `Cohomology.lean`'s into `instHasExtCohToSchemeToVariety_1`, a generated name
+-- that then has to be audited under a number nobody chose. A chosen name is stable and
+-- says what it is.
+local instance hasExtCohBilinear : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
+  HasExt.standard _
+
 /-- **Bilinear coherent Serre duality**, as supplied realization data.
 
 The fields mirror `Serre.Data`: a base-field-linear realization of the `Ext` groups, its
