@@ -909,6 +909,25 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.eulerChar
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_eq
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_le
+
+/- The `BilinearData` and `TrivialCanonical` fields, and the `HasExt` instance the file needs.
+
+These were unaudited not by omission but because `Bilinear.lean` did not elaborate: the sweep
+cannot see the declarations of a file that fails to build, so the completeness gate could not
+report them. They become visible with the instance fix, and are recorded here rather than in
+`audit_missing_baseline.txt`, which the gate reserves for declarations nobody has audited yet. -/
+
+#print axioms AlgebraicGeometry.Duality.Serre.hasExtCoh
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.extSpace
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.extComparison
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.extFinite
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.canonicalTwist
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.duality
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.mk.inj
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.twistIso
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.mk.inj
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.mk.sizeOf_spec
 #print axioms Cohomology.FiniteCohomology
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic
 #print axioms Cohomology.FiniteCohomology.finrankSupport_subset_range
@@ -2913,6 +2932,7 @@ older lemma is its a = f^n, b = g^n case. -/
 #print axioms AlgebraicGeometry.Proj.fracSection
 #print axioms AlgebraicGeometry.Proj.fracPowSection_eq_fracSection
 #print axioms AlgebraicGeometry.Proj.pow_mem_smul
+#print axioms AlgebraicGeometry.Proj.pow_mem_mul
 #print axioms AlgebraicGeometry.Proj.frac_eq
 #print axioms AlgebraicGeometry.Proj.fracSection_eq
 #print axioms AlgebraicGeometry.Proj.frac_pow
