@@ -3047,10 +3047,10 @@ repository or in Mathlib provides.
 The five restriction lemmas below are named because the proof composes restrictions constantly and
 rw cannot be used on goals carrying show-ascription residue. -/
 
-#print axioms AlgebraicGeometry.Proj.resSection_trans
-#print axioms AlgebraicGeometry.Proj.resSection_smul
+#print axioms AlgebraicGeometry.Scheme.Modules.resSection_trans
+#print axioms AlgebraicGeometry.Scheme.Modules.resSection_smul
 #print axioms AlgebraicGeometry.Proj.resΓ_fracSection
-#print axioms AlgebraicGeometry.Proj.homApp_res
+#print axioms AlgebraicGeometry.Scheme.Modules.homApp_res
 #print axioms AlgebraicGeometry.Proj.le_basicOpen_mul
 #print axioms AlgebraicGeometry.Proj.exists_globalSection_twistBy_of_data
 #print axioms AlgebraicGeometry.Proj.exists_overlap_exponent

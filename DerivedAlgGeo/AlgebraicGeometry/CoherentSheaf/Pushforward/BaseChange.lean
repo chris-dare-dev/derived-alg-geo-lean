@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.AlgebraicGeometry.Restrict
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.Sections
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 
 /-!
@@ -184,20 +185,6 @@ theorem restrictSquareSections_smul (V : U.toScheme.Opens) (r : Γ(U.toScheme, V
     (X.presheaf.map (eqToHom (image_morphismRestrict_preimage f U V)).op).hom
       ((f.app (U.ι ''ᵁ V)).hom s)) hι.symm
 
-/-- **Any two ways round a square of restrictions agree.**
-
-`Opens` is a poset, so the two composites are `M.presheaf.map` of parallel morphisms and
-`Subsingleton.elim` settles it. Stated on its own because in a clean context its rewrites fire,
-whereas at the use site the goal carries the transparency defect described above and only `exact`
-works. -/
-theorem presheaf_map_square_eq (M : X.Modules) {A B C D : X.Opens}
-    (α : op A ⟶ op B) (β : op B ⟶ op C) (γ : op A ⟶ op D) (δ : op D ⟶ op C) (x : Γ(M, A)) :
-    (M.presheaf.map β).hom ((M.presheaf.map α).hom x)
-      = (M.presheaf.map δ).hom ((M.presheaf.map γ).hom x) := by
-  rw [← ConcreteCategory.comp_apply, ← ConcreteCategory.comp_apply, ← Functor.map_comp,
-    ← Functor.map_comp]
-  exact congrArg (fun φ => (M.presheaf.map φ).hom x) (Subsingleton.elim _ _)
-
 /-- **The comparison on sections over one open, as a linear equivalence.**
 
 Named at the `Γ` spelling: written through the unfolded pushforward the `Module` instance does not
@@ -226,7 +213,7 @@ noncomputable def pushforwardRestrictIso :
     (PresheafOfModules.isoMk (fun V => (restrictSquareSectionsEquiv f U M V.unop).toModuleIso)
       (fun {V W} i => by
         ext x
-        exact presheaf_map_square_eq M
+        exact Scheme.Modules.presheaf_map_square_eq M
           ((Opens.map f.base).map (U.ι.opensFunctor.map i.unop)).op
           (eqToHom (image_morphismRestrict_preimage f U W.unop)).op
           (eqToHom (image_morphismRestrict_preimage f U V.unop)).op
