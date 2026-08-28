@@ -178,6 +178,78 @@ theorem moduleFinite_globalSections_of_generatingSections (M : (Spec R).Modules)
     Module.Finite.equiv e.toLinearEquiv
   exact Module.Finite.of_surjective h.hom ((ModuleCat.epi_iff_surjective h).mp inferInstance)
 
+/-- **The map out of a free sheaf that a chosen spanning family provides.**
+
+Transport across `tildeFinsupp`, apply `tilde` to `Finsupp.linearCombination`, and land through the
+affine comparison. -/
+noncomputable def freeEpiOfSpan (M : (Spec R).Modules) [IsIso M.fromTildeΓ]
+    (s : Set (moduleSpecΓFunctor.obj M)) :
+    SheafOfModules.free.{u} s ⟶ M :=
+  (tildeFinsupp s).inv ≫
+    (tilde.functor R).map
+      (ModuleCat.ofHom (Finsupp.linearCombination R ((↑) : s → moduleSpecΓFunctor.obj M))) ≫
+    M.fromTildeΓ
+
+set_option synthInstance.maxHeartbeats 1000000 in
+set_option backward.isDefEq.respectTransparency false in
+/-- **It is an epimorphism exactly when the chosen family spans.**
+
+`tilde` is a left adjoint (`tilde.adjunction`), so it preserves colimits and hence epimorphisms;
+`Finsupp.linearCombination` is surjective precisely when the span is everything
+(`Finsupp.range_linearCombination`); and the two outer maps are isomorphisms.
+
+Two elaboration hazards, both paid for once:
+
+1. **Keep `PreservesEpimorphisms` inside the `have`.** Left in context as a local instance it
+   makes every later instance search diverge, and the resulting heartbeat timeout is *reported* as
+   an ordinary "failed to synthesize", which reads like a missing instance rather than a budget.
+2. **`backward.isDefEq.respectTransparency false` is required**, as elsewhere in this repository:
+   without it the goal after the first rewrite is "not type-correct under the `instances`
+   transparency level" and `Iso.hom_inv_id_assoc` silently fails to match. -/
+theorem epi_freeEpiOfSpan (M : (Spec R).Modules) [IsIso M.fromTildeΓ]
+    (s : Set (moduleSpecΓFunctor.obj M)) (hs : Submodule.span R s = ⊤) :
+    Epi (freeEpiOfSpan M s) := by
+  haveI hmap : Epi ((tilde.functor R).map (ModuleCat.ofHom
+      (Finsupp.linearCombination R ((↑) : s → moduleSpecΓFunctor.obj M)))) := by
+    haveI : (tilde.functor R).PreservesEpimorphisms := by
+      haveI := (tilde.adjunction (R := R)).leftAdjoint_preservesColimits
+      infer_instance
+    haveI : Epi (ModuleCat.ofHom
+        (Finsupp.linearCombination R ((↑) : s → moduleSpecΓFunctor.obj M))) := by
+      rw [ModuleCat.epi_iff_surjective]
+      simp only [ModuleCat.hom_ofHom]
+      rw [← LinearMap.range_eq_top, Finsupp.range_linearCombination]
+      simpa using hs
+    infer_instance
+  haveI hfrom : Epi M.fromTildeΓ := inferInstance
+  haveI hq : Epi ((tilde.functor R).map (ModuleCat.ofHom
+      (Finsupp.linearCombination R ((↑) : s → moduleSpecΓFunctor.obj M))) ≫ M.fromTildeΓ) :=
+    epi_comp _ _
+  have hfac : (tildeFinsupp (R := R) s).hom ≫ freeEpiOfSpan M s
+      = (tilde.functor R).map (ModuleCat.ofHom
+        (Finsupp.linearCombination R ((↑) : s → moduleSpecΓFunctor.obj M))) ≫ M.fromTildeΓ := by
+    show (tildeFinsupp (R := R) s).hom ≫ (tildeFinsupp (R := R) s).inv ≫ _ = _
+    rw [Iso.hom_inv_id_assoc]
+  haveI : Epi ((tildeFinsupp (R := R) s).hom ≫ freeEpiOfSpan M s) := hfac ▸ hq
+  exact epi_of_epi (tildeFinsupp (R := R) s).hom _
+
+/-- **A finite module of global sections gives a finite free epimorphism.**
+
+The converse of `moduleFinite_globalSections_of_generatingSections`, and the direction Serre's
+global generation needs: paired with `GeneratingSections.ofFreeEpi` it turns `Module.Finite` of the
+global sections into an `M.GeneratingSections`, closing the loop between the two.
+
+The index type is a `Finset` of the global sections, so its finiteness is definitional rather than
+transported. -/
+theorem exists_finite_free_epi_of_moduleFinite (M : (Spec R).Modules) [IsIso M.fromTildeΓ]
+    [Module.Finite R (moduleSpecΓFunctor.obj M)] :
+    ∃ (I : Type u) (_ : Finite I) (p : SheafOfModules.free.{u} I ⟶ M), Epi p := by
+  obtain ⟨t, ht⟩ :=
+    (Module.finite_def.mp inferInstance :
+      (⊤ : Submodule R (moduleSpecΓFunctor.obj M)).FG)
+  exact ⟨(t : Set (moduleSpecΓFunctor.obj M)), inferInstance,
+    freeEpiOfSpan M _, epi_freeEpiOfSpan M _ ht⟩
+
 /-- A finite global presentation on an affine scheme gives finitely generated global sections. -/
 theorem moduleFinite_globalSections_of_presentation (M : (Spec R).Modules)
     (P : M.Presentation) [Presentation.IsFinite.{u, u, u} P] :

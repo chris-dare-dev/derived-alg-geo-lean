@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Adjunction
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Witness
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Stability.ClassMap
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Stability.Composition
@@ -713,6 +714,28 @@ theorem UnitKernelData.ofLeftAdjointKernel_dual {corr : Correspondence C C 𝒲}
     (KernelAutoequivalence.DualKernel.ofLeftAdjointKernel
         (KernelAutoequivalence.id corr U) U.toLeftAdjointKernelData).dual =
       U.toDualKernel.dual := rfl
+
+/-- **`UnitKernelData` is satisfiable.**
+
+The trivial correspondence's transform is the identity definitionally, so the
+identity functor is presented by every kernel and `unitIso` is `Iso.refl`.
+
+Satisfiability only, exactly as in `FourierMukai/Witness.lean`: this says the
+structure's fields can be met simultaneously. It says nothing about `𝒪_Δ`,
+nothing about any diagonal, and nothing about whether
+`Families.geometricUnitKernelData`'s contracts are dischargeable. -/
+def trivialUnitKernelData (K : C) :
+    UnitKernelData (FourierMukai.trivialCorrespondence C) where
+  unitKernel := K
+  unitIso := Iso.refl _
+
+omit [HasZeroObject C] [HasShift C ℤ] [Preadditive C]
+  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] [IsTriangulated C]
+  [HasZeroObject 𝒲] [HasShift 𝒲 ℤ] [Preadditive 𝒲]
+  [∀ n : ℤ, (shiftFunctor 𝒲 n).Additive] [Pretriangulated 𝒲] in
+@[simp]
+theorem trivialUnitKernelData_unitKernel (K : C) :
+    (trivialUnitKernelData K).unitKernel = K := rfl
 
 end Identity
 

@@ -347,3 +347,24 @@ stability function *on* this heart. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTilt_heart_iff
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mem_hnTilt_heart_of_hnTors
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.shift_mem_hnTilt_heart_of_hnFree
+
+/-! ## `Z(β,ω)` on the tilted heart: the imaginary half
+
+The obstruction was that `MukaiChargeData` is a charge on an *abelian* category while the tilted
+heart's objects are *ambient*. `ofAmbient` removes it by restriction rather than by hypothesis:
+take the charge on `K₀ C` as primitive and compose with `K₀Ab.toAmbient`, so compatibility is
+`rfl` and there is no new structure to inhabit. Only the **map** `K₀Ab 𝒜 →+ K₀ C` is used; the
+isomorphism `K(𝒜) ≅ K(D)` remains unavailable and unassumed.
+
+`im_ambientCharge_nonneg_of_mem_hnTilt_heart` is the payoff, and it is only the imaginary half.
+Lemma 6.2 needs `Re < 0` on the `Im = 0` boundary, which is blocked on Lemma 5.1 (#332) and on
+dimension-of-support data. -/
+
+#print axioms CategoryTheory.Triangulated.expCharge_neg
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.ofAmbient
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.ofAmbient_mukai
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientCharge
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientCharge_obj
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientCharge_triangle
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientCharge_shift
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_ambientCharge_nonneg_of_mem_hnTilt_heart

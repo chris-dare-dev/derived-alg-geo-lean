@@ -26,7 +26,7 @@ is, rather than linear, which it is not.
 
 ## The open subscheme, not the affine chart
 
-`D₊(g)` is used here as an open subscheme of `Proj 𝒜`, not through `degreeOneChart`. The reason is
+`D₊(g)` is used here as an open subscheme of `Proj 𝒜`, not through `awayι`. The reason is
 `Scheme.Opens.ι_image_top`: sections of the subscheme over `⊤` are *definitionally* sections of
 `𝒪_Proj` over `D₊(g)`, so `fracPowSection` is already a global function there and no `ΓSpecIso` and
 no degree-zero away ring appear anywhere in this file.
