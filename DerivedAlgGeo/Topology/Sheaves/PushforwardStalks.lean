@@ -14,6 +14,10 @@ import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.CategoryTheory.Sites.Abelian
 import Mathlib.CategoryTheory.ConcreteCategory.EpiMono
 import Mathlib.Topology.Sheaves.Functors
+import Mathlib.CategoryTheory.Abelian.Exact
+import Mathlib.CategoryTheory.Sites.LeftExact
+import Mathlib.Algebra.Category.Grp.AB
+import Mathlib.Topology.Sheaves.Abelian
 
 /-!
 # Stalks of a pushforward off a closed range
@@ -63,6 +67,8 @@ further work again, and is not begun here.
   `isLocallySurjective_iff_epi`) epimorphisms.
 * `preservesEpimorphisms_pushforward` — that, as a statement about the sheaf-level functor, which
   is the same functor the site-level `#572` machinery quantifies over.
+* `preservesFiniteColimits_pushforward` — hence exactness, with limits free from the adjunction.
+* `additive_pushforward`, `opensMap_obj_top` — the two small pieces the instantiation also needs.
 -/
 
 universe u
@@ -246,5 +252,41 @@ theorem preservesEpimorphisms_pushforward (hemb : Topology.IsInducing f)
   intro F G T hepi
   rw [← TopCat.Sheaf.isLocallySurjective_iff_epi] at hepi ⊢
   exact isLocallySurjective_pushforward f hemb hcl F G T.1 hepi
+
+/-! ## Exactness -/
+
+/-- The sheaf pushforward is additive.
+
+`Sheaf.pushforward_map` is `rfl`, so this is `rfl` on each pair of morphisms; it is stated because
+instance search does not find it and `Functor.additive_of_preservesBinaryBiproducts` does not
+apply without more setup than the fact deserves. -/
+instance additive_pushforward :
+    (TopCat.Sheaf.pushforward AddCommGrpCat.{u} f).Additive := by
+  constructor
+  intro F G a b
+  rfl
+
+/-- **Pushforward along a closed embedding is exact.**
+
+Limits it preserves for free, being a right adjoint. For colimits: preserving zero morphisms,
+epimorphisms and kernels gives `PreservesHomology`
+(`Functor.preservesHomology_of_preservesEpis_and_kernels`), and that gives finite colimits. The
+epimorphisms are `preservesEpimorphisms_pushforward`; the kernels come with the right adjoint.
+
+This is the input `#572` step 3 needs in order to instantiate the abstract cohomology comparison
+of `CategoryTheory/SheafCohomologyPushforward.lean` at a closed immersion. -/
+theorem preservesFiniteColimits_pushforward (hemb : Topology.IsInducing f)
+    (hcl : IsClosed (Set.range f)) :
+    PreservesFiniteColimits (TopCat.Sheaf.pushforward AddCommGrpCat.{u} f) := by
+  haveI := preservesEpimorphisms_pushforward f hemb hcl
+  haveI : (TopCat.Sheaf.pushforward AddCommGrpCat.{u} f).PreservesHomology :=
+    Functor.preservesHomology_of_preservesEpis_and_kernels _
+  exact Functor.preservesFiniteColimits_of_preservesHomology _
+
+/-- `Opens.map` sends the whole space to the whole space.
+
+Trivial, and recorded because the instantiation needs `IsTerminal ((Opens.map f).obj ⊤)` and
+`IsTerminal.ofUnique` does *not* discharge it -- the `Unique` instance it wants is not there. -/
+lemma opensMap_obj_top : (Opens.map f).obj ⊤ = ⊤ := rfl
 
 end DerivedAlgGeo.Topology
