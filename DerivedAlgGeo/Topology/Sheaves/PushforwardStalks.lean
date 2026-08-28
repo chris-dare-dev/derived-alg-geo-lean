@@ -8,6 +8,7 @@ import Mathlib.Algebra.Category.Grp.Zero
 import Mathlib.Algebra.Category.Grp.Limits
 import Mathlib.Algebra.Category.Grp.Colimits
 import Mathlib.Algebra.Category.Grp.FilteredColimits
+import Mathlib.Topology.Sheaves.LocallySurjective
 
 /-!
 # Stalks of a pushforward off a closed range
@@ -51,6 +52,10 @@ further work again, and is not begun here.
 * `offRange` and `preimage_eq_bot_of_le` — the open, and that it pulls back to nothing.
 * `subsingleton_of_isTerminal` — terminal objects of `AddCommGrpCat` have subsingleton carriers.
 * `subsingleton_stalk_pushforward` — the vanishing.
+* `stalkPushforward_naturality` — naturality in the presheaf, which Mathlib does not have.
+* `surjective_stalk_map_pushforward` and `isLocallySurjective_pushforward` — the two stalk facts
+  assembled: pushforward along a closed embedding preserves local surjectivity, hence (with
+  `isLocallySurjective_iff_epi`) epimorphisms.
 -/
 
 universe u
@@ -115,5 +120,94 @@ theorem subsingleton_stalk_pushforward (F : TopCat.Sheaf AddCommGrpCat.{u} X)
     congr 1
     exact Subsingleton.elim _ _
   rw [e1, e2]
+
+/-! ## Naturality of `stalkPushforward` -/
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- **`stalkPushforward` is natural in the presheaf.**
+
+Mathlib has `stalkPushforward.id` and `stalkPushforward.comp` — naturality in the *space* — but
+not this, naturality in the *presheaf*, which is what a stalkwise argument about a morphism of
+sheaves needs.
+
+**Both `set_option`s are load-bearing.** Without them `(pushforward C f).obj F` is a
+`Presheaf C Y`, which is not *reducibly* the functor category `(Opens Y)ᵒᵖ ⥤ C`, and every rewrite
+fails with an application type mismatch rather than a missing-pattern error. The pair is exactly
+what Mathlib itself puts on `stalkPushforward.id` and `stalkPushforward.comp` two declarations
+above the result this one sits beside; it is not a workaround invented here.
+
+They also change how dot-notation resolves: under them `F.stalkPushforward` in *tactic* position
+looks for `Functor.stalkPushforward` and fails, so a consumer must write
+`TopCat.Presheaf.stalkPushforward` in full. The statement below still uses dot-notation because
+the options apply to elaboration of the proof, not of the signature. -/
+theorem stalkPushforward_naturality (F G : X.Presheaf AddCommGrpCat.{u}) (T : F ⟶ G) (x : X) :
+    (stalkFunctor AddCommGrpCat.{u} (f x)).map ((Presheaf.pushforward _ f).map T) ≫
+        G.stalkPushforward _ f x
+      = F.stalkPushforward _ f x ≫ (stalkFunctor AddCommGrpCat.{u} x).map T := by
+  refine stalk_hom_ext _ fun U hU => ?_
+  rw [← Category.assoc, stalkFunctor_map_germ, Category.assoc, stalkPushforward_germ,
+    ← Category.assoc, stalkPushforward_germ, stalkFunctor_map_germ]
+  rfl
+
+/-! ## Surjectivity on stalks, and local surjectivity -/
+
+/-- **Pushforward along an inducing map is surjective on stalks**, given the vanishing off the
+range.
+
+Stated for presheaves, with the vanishing as a hypothesis rather than a sheaf condition: the two
+cases want different things, and only the off-range one needs `G` to be a sheaf. The caller
+supplies `hvan` from `subsingleton_stalk_pushforward`.
+
+On the range this is `stalkPushforward_naturality` plus the fact that both `stalkPushforward`s are
+isomorphisms; off it the target stalk is a subsingleton and there is nothing to check. -/
+theorem surjective_stalk_map_pushforward (hemb : Topology.IsInducing f)
+    (F G : X.Presheaf AddCommGrpCat.{u}) (T : F ⟶ G)
+    (hT : ∀ x : X, Function.Surjective ((stalkFunctor AddCommGrpCat.{u} x).map T))
+    (hvan : ∀ y : Y, y ∉ Set.range f → Subsingleton ((f _* G).stalk y)) (y : Y) :
+    Function.Surjective
+      ((stalkFunctor AddCommGrpCat.{u} y).map ((Presheaf.pushforward _ f).map T)) := by
+  by_cases hy : y ∈ Set.range f
+  · obtain ⟨x, rfl⟩ := hy
+    haveI iF : IsIso (F.stalkPushforward AddCommGrpCat.{u} f x) :=
+      stalkPushforward.stalkPushforward_iso_of_isInducing (C := AddCommGrpCat.{u}) (f := f) hemb F x
+    haveI iG : IsIso (G.stalkPushforward AddCommGrpCat.{u} f x) :=
+      stalkPushforward.stalkPushforward_iso_of_isInducing (C := AddCommGrpCat.{u}) (f := f) hemb G x
+    have hnat := stalkPushforward_naturality f F G T x
+    -- `iG` is passed to `inv` explicitly: instance search will not find it through the other
+    -- spelling of `stalkPushforward`, and the resulting error names `IsIso`, not the spelling.
+    have heq : (stalkFunctor AddCommGrpCat.{u} (f x)).map ((Presheaf.pushforward _ f).map T)
+        = F.stalkPushforward AddCommGrpCat.{u} f x ≫ (stalkFunctor AddCommGrpCat.{u} x).map T
+            ≫ @inv _ _ _ _ (G.stalkPushforward AddCommGrpCat.{u} f x) iG := by
+      rw [← Category.assoc, ← hnat]
+      simp
+    have h1 : Function.Surjective (F.stalkPushforward AddCommGrpCat.{u} f x) :=
+      (ConcreteCategory.bijective_of_isIso _).2
+    have h3 : Function.Surjective (@inv _ _ _ _ (G.stalkPushforward AddCommGrpCat.{u} f x) iG) :=
+      (ConcreteCategory.bijective_of_isIso _).2
+    -- State the surjectivity in the COMPOSITE spelling and rewrite the hypothesis into the goal's,
+    -- not the other way round. `rw [heq]` on the goal produces a term whose instance paths no
+    -- longer match anything stated separately; rewriting backwards in a hypothesis does not.
+    have hs : Function.Surjective
+        ⇑(F.stalkPushforward AddCommGrpCat.{u} f x ≫ (stalkFunctor AddCommGrpCat.{u} x).map T
+          ≫ @inv _ _ _ _ (G.stalkPushforward AddCommGrpCat.{u} f x) iG) :=
+      h3.comp ((hT x).comp h1)
+    rwa [← heq] at hs
+  · have hsub := hvan y hy
+    intro b
+    exact ⟨0, hsub.elim _ _⟩
+
+/-- **Pushforward along a closed embedding preserves local surjectivity.**
+
+With `TopCat.Sheaf.isLocallySurjective_iff_epi` this is preservation of epimorphisms, which is the
+half of exactness that `ι_*` does not get for free from being a right adjoint. -/
+theorem isLocallySurjective_pushforward (hemb : Topology.IsInducing f)
+    (hcl : IsClosed (Set.range f))
+    (F G : TopCat.Sheaf AddCommGrpCat.{u} X) (T : F.1 ⟶ G.1)
+    (hT : IsLocallySurjective T) :
+    IsLocallySurjective ((Presheaf.pushforward _ f).map T) := by
+  rw [locally_surjective_iff_surjective_on_stalks] at hT ⊢
+  exact fun y => surjective_stalk_map_pushforward f hemb F.1 G.1 T hT
+    (fun z hz => subsingleton_stalk_pushforward f G hcl z hz) y
 
 end DerivedAlgGeo.Topology
