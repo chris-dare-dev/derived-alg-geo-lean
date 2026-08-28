@@ -73,6 +73,8 @@ generated_by: { agent: codex, at: "2026-08-28" }
 generations:
   - { rev: 1, at: "2026-08-28", note: "Track created from a read of the pinned v1 paper, the live main tree, open PRs, worktrees, and all existing roadmaps. PF1 materialized as milestone #33 with issues #850--#852. DG3 materialized separately as #853--#855 because it is a parallel trunk." }
   - { rev: 2, at: "2026-08-28", note: "Implementation started in fresh non-overlapping worktrees for #850 (generic stack ownership) and #856 (Appendix B almost-disconnected morphisms). The relative numerical K-group #851 and semiorthogonal root #852 remain open research lanes." }
+  - { rev: 3, at: "2026-08-28", note: "The merged stack-root lane closed #850. Issue #851 then started with a neutral saturated-quotient root and the algebraic core of Definition 8.7: fiber sum, connected-family relation quotient, universal property, induced-map laws, and connected-family/one-fiber tests. The geometric fiber overlattices and eta specialization classes remain the next slice." }
+  - { rev: 4, at: "2026-08-28", note: "Issue #851 now packages admissible families as statement-layer comparison data over the same relative quotient root. Point-independence and its torsion-free universal property are inherited from the saturated quotient; the next geometric slice remains the fiber overlattice and eta specialization construction." }
 items:
   - id: projective-families-m1
     gh_milestone: 33
@@ -107,10 +109,10 @@ items:
     kind: epic
     parent: projective-families-m1
     title: "Relative numerical K-group on the canonical K-theory spine"
-    status: planned
+    status: in_progress
     priority: must
     size: XL
-    summary: "Implement Definition 8.7 as the saturated quotient by connected relative-perfect-family relations, then Proposition 8.10 functoriality. The uniformly numerical group and §10 image lattice are further quotients/images, never sibling K-groups."
+    summary: "The algebraic core of Definition 8.7 is active: a neutral saturation root now supports the fiber direct sum, a statement-layer family-relation system, quotient universal property, induced-map laws, point-independence, and the one-fiber test. Next construct the geometric fiber overlattices and eta specialization classes, then Proposition 8.10 functoriality. The uniformly numerical group and §10 image lattice are further quotients/images, never sibling K-groups."
     tags: [k-theory, numerical, relative, prerequisite]
     labels: [area:geometry, area:moduli, prerequisite, source:2607.28411]
 
