@@ -11,7 +11,6 @@ import Mathlib.CategoryTheory.Sites.LeftExact
 import Mathlib.CategoryTheory.Sites.Pullback
 import Mathlib.CategoryTheory.Abelian.GrothendieckCategory.EnoughInjectives
 import Mathlib.CategoryTheory.Abelian.GrothendieckCategory.HasExt
-import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion
 
 /-!
 # Cohomology is unchanged by pushforward along a closed embedding
@@ -65,10 +64,7 @@ criterion is phrased about schemes.
 
 ## Main results
 
-* `cohomologyPushforwardAddEquiv` — the comparison, for spaces.
-* `schemeCohomologyPushforwardAddEquiv` — the same at a closed immersion of schemes. Its docstring
-  records the two ways it is weaker than `#572`'s wording: it is not natural in `F`, and the
-  `HasExt` universe is pinned rather than a parameter.
+* `cohomologyPushforwardAddEquiv` — the comparison.
 -/
 
 universe u
@@ -122,40 +118,5 @@ noncomputable def cohomologyPushforwardAddEquiv (hemb : Topology.IsInducing f)
     rw [terminal_opens_eq_top, opensMap_obj_top]
     exact isTerminalTopOpens
   exact sheafHPushforwardAddEquiv (Opens.map f) hG F n
-
-/-! ## The scheme-level statement -/
-
-set_option maxHeartbeats 1000000 in
-/-- **`#572` step 3 at a closed immersion of schemes.**
-
-`Hⁿ(X, F) ≃+ Hⁿ(Y, ι_* F)`. A closed immersion is a closed embedding on underlying spaces
-(`IsClosedImmersion.isClosedEmbedding`), which supplies both hypotheses of the topological
-statement directly; there is nothing else to do.
-
-## Two ways this is weaker than `#572`'s wording, both real
-
-* **It is not natural in `F`.** The issue asks for the comparison "naturally in `F`", and this is
-  an isomorphism for each `F` separately. Naturality is not proved and is not implied — the
-  underlying abstract comparison is built from `Ext.precompAddEquiv` and `extAdjunctionAddEquiv`,
-  each of which *is* natural, so it should follow, but "should" is not a proof.
-* **The `HasExt` universe is not a parameter here.** `#572` asks for it to stay one. It does in
-  `CategoryTheory/SheafCohomologyPushforward.lean`; this instantiation lets it be found by
-  instance search, which pins it. A caller who needs it parametric should use the abstract
-  statement and discharge the instances as this file does.
-
-## And it is about abelian sheaves, not coherent ones
-
-`#572`'s acceptance criterion is stated for coherent `F` and the repository's own coherent
-cohomology. This is `CategoryTheory.Sheaf.H` on sheaves of abelian groups. Connecting the two is
-the `Coh`-to-`AddCommGrpCat` passage, which is a separate piece of work. -/
-noncomputable def schemeCohomologyPushforwardAddEquiv {X Y : AlgebraicGeometry.Scheme.{u}}
-    (g : X ⟶ Y) [AlgebraicGeometry.IsClosedImmersion g]
-    (F : Sheaf (Opens.grothendieckTopology X.carrier) AddCommGrpCat.{u}) (n : ℕ) :
-    Sheaf.H F n ≃+ Sheaf.H (((Opens.map g.base).sheafPushforwardContinuous AddCommGrpCat.{u}
-        (Opens.grothendieckTopology Y.carrier)
-        (Opens.grothendieckTopology X.carrier)).obj F) n :=
-  cohomologyPushforwardAddEquiv g.base
-    (AlgebraicGeometry.IsClosedImmersion.isClosedEmbedding g).isInducing
-    (AlgebraicGeometry.IsClosedImmersion.isClosedEmbedding g).isClosed_range F n
 
 end DerivedAlgGeo.Topology
