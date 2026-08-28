@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistApp
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Frac
+import DerivedAlgGeo.AlgebraicGeometry.Proj.BasicOpenLemmas
 
 /-!
 # Degree-zero fractions with an arbitrary numerator, and the twist comparison they give
@@ -20,7 +22,7 @@ special case `a = fⁿ`, `b = gⁿ`, and the two `..._eq_fracPow...` lemmas reco
 so nothing has to be transported between the two spellings.
 
 `twistBy_app_eq_smul'` is the comparison the glue consumes: over an open inside `D₊(b)`, twisting a
-section by `a` is twisting it by `b` and scaling by `a / b`. `TwistApp.twistBy_app_eq_smul` is its
+section by `a` is twisting it by `b` and scaling by `a / b`. The degree-one case was its
 `a = fⁿ`, `b = gⁿ` case.
 
 ## Why this is not just a generalisation for its own sake
@@ -48,43 +50,6 @@ variable (𝒜 : ℕ → σA) [GradedRing 𝒜]
 
 local notation3 "X" => ProjectiveSpectrum.top 𝒜
 
-/-- **The degree-zero fraction `a / b` at a point of `D₊(b)`**, for `a` and `b` of the same degree.
-
-Named rather than written inline for the reason `fracPow` is: as an anonymous
-`HomogeneousLocalization.mk` under a `•` the denominator submonoid is a metavariable. -/
-def frac {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k) (hb : b ∈ 𝒜 k)
-    {x : ProjectiveSpectrum 𝒜} (hx : x ∈ ProjectiveSpectrum.basicOpen 𝒜 b) :
-    HomogeneousLocalization 𝒜 x.asHomogeneousIdeal.toIdeal.primeCompl :=
-  HomogeneousLocalization.mk { deg := k, num := ⟨a, ha⟩, den := ⟨b, hb⟩, den_mem := hx }
-
-/-- **A basic open is inside every basic open of a power of its element.**
-
-An equality when the exponent is positive (`ProjectiveSpectrum.basicOpen_pow`), but the inclusion
-is what `fracSection` needs and it holds for `n = 0` too. -/
-theorem basicOpen_le_basicOpen_pow (b : A) (n : ℕ) :
-    ProjectiveSpectrum.basicOpen 𝒜 b ≤ ProjectiveSpectrum.basicOpen 𝒜 (b ^ n) := by
-  intro x hx
-  have hx' : b ∈ x.asHomogeneousIdeal.toIdeal.primeCompl := hx
-  exact Submonoid.pow_mem _ hx' n
-
-/-- **`a / b` as a section of the structure sheaf over an open inside `D₊(b)`.**
-
-Pointwise `frac`, which is a fixed fraction, so the `IsFraction` witness is the open itself and
-restriction does not move it. -/
-def fracSection {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k) (hb : b ∈ 𝒜 k)
-    {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 b) :
-    (ProjectiveSpectrum.Proj.structureSheaf 𝒜).1.obj (op U) :=
-  ⟨fun x => frac 𝒜 ha hb (hU x.2),
-   fun x => ⟨U, x.2, 𝟙 _, k, ⟨a, ha⟩, ⟨b, hb⟩, fun y => hU y.2, fun _ => rfl⟩⟩
-
-/-- `fracPowSection` is `fracSection` with a power for each of numerator and denominator. -/
-theorem fracPowSection_eq_fracSection {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1) (n : ℕ)
-    {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 g) :
-    fracPowSection 𝒜 hf hg n hU
-      = fracSection 𝒜 (pow_mem_deg 𝒜 hf n) (pow_mem_deg 𝒜 hg n)
-        (hU.trans (basicOpen_le_basicOpen_pow 𝒜 g n)) :=
-  rfl
-
 /-- **A power lands in the degree its exponent multiplies.**
 
 `SetLike.pow_mem_graded` states the degree as `d • e`; `#585` meets it as `e • d`, because the
@@ -97,7 +62,7 @@ theorem pow_mem_smul {a : A} {e : ℕ} (ha : a ∈ 𝒜 e) (d : ℕ) : a ^ d ∈
 
 `pow_mem_smul` is the spelling the localization elements produce; this is the spelling a twist
 degree is stated in, and `#823` needs both because the glue compares one against the other. The
-degree-one case is `ChartUnitTwist.pow_mem_deg`. -/
+degree-one case is `Frac.pow_mem_deg`. -/
 theorem pow_mem_mul {a : A} {e : ℕ} (ha : a ∈ 𝒜 e) (d : ℕ) : a ^ d ∈ 𝒜 (e * d) := by
   simpa [smul_eq_mul] using pow_mem_smul 𝒜 ha d
 
@@ -166,7 +131,8 @@ theorem fracSection_smul_sectionOfMem {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k) (h
 /-- **The overlap comparison for two homogeneous elements of the same degree.**
 
 Over an open inside `D₊(b)`, twisting a section by `a` is twisting it by `b` and scaling by
-`a / b`. `TwistApp.twistBy_app_eq_smul` is the case `a = fⁿ`, `b = gⁿ`.
+`a / b`. The case `a = fⁿ`, `b = gⁿ` was stated separately in `TwistApp.lean` until `#825`; it had
+no consumer once this one existed.
 
 The scalar is ascribed at `Γ(Proj 𝒜, U)` for the reason recorded there: written bare it elaborates
 at the structure sheaf's own section type, where the action on the twist's sections does not
