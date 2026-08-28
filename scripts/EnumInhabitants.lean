@@ -31,6 +31,15 @@ it.
 Projections come out correct without special handling: `S.field : S → F` has
 conclusion head `F`. Constructors do not, so `.mk` is filtered with the other
 generated suffixes, exactly as `EnumDecls.lean` filters them.
+
+The subobject projection is the exception, and is kept. `C.toP : C → P` for
+`structure C extends P` satisfies the definition above, and unlike a field
+projection the author did write it -- `extends` is the authorship. Filtering it
+with the rest reported `FiniteDimensionalCohomology` as uninhabited while
+`FiniteCohomology` extends it. One row per `extends` edge, not per term of the
+child: whether a given term of `C` yields a structurally new `P` is a
+value-level question this file cannot decide, and both answers to it produce a
+wrong count somewhere.
 -/
 import DerivedAlgGeo
 import DerivedAlgGeo.Development
@@ -53,6 +62,12 @@ private def isAuthored (n : Name) : Bool := Id.run do
   if (s.splitOn "match_").length > 1 then return false
   if (s.splitOn ".eq_").length > 1 then return false
   return true
+
+/-- Whether `n` is the `C.toP` of a `structure C extends P`, as opposed to a
+projection onto an ordinary field. -/
+private def isSubobjectProjection (env : Environment) : Name → Bool
+  | .str parent field => (isSubobjectField? env parent (Name.mkSimple field)).isSome
+  | _ => false
 
 /-- The head constant of a type's conclusion, with every leading binder
 stripped. This is the whole of the producer/consumer distinction. -/
@@ -92,8 +107,9 @@ run_cmd do
     -- known in advance.
     unless ci.isDefinition || ci.isTheorem do continue
     -- A projection whose field type is itself a structure produces a term of
-    -- that structure, but Lean wrote it, not the author.
-    if (env.getProjectionFnInfo? n).isSome then continue
+    -- that structure, but Lean wrote it, not the author. The subobject
+    -- projection is the one the author did write; see the header.
+    if (env.getProjectionFnInfo? n).isSome && !isSubobjectProjection env n then continue
     match env.getModuleIdxFor? n with
     | some idx =>
       let m := env.header.moduleNames[idx.toNat]!
