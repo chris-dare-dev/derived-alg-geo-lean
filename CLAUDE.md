@@ -46,33 +46,61 @@ branch already runs the whole gate there; to get a verdict without pushing, use
 gh workflow run ci.yml --ref <branch>
 ```
 
-Do **not** run `scripts/gates.sh` as a matter of course. Several agent lanes share
-one Mac, Lake takes one core per job by default, and four concurrent full gates
-oversubscribe a 14-core machine five times over — that is how a ten-minute gate
-becomes an hour. Run it locally only when you need a verdict that the runners
-cannot give you, and expect it to be slow when other lanes are building.
+**This is enforced, not advised.** A `PreToolUse` hook on `Bash`, wired in the
+tracked `.claude/settings.json` so it reaches every worktree, runs
+`scripts/check_local_build.py` and refuses two commands:
+
+* `scripts/gates.sh`, in any mode;
+* `lake build` with **no target**.
+
+Advice was what this section used to give, and advice is what failed: on
+2026-08-27 an agent read "the normal build stays local", ran a whole-library
+`lake build` on a cold tree, and spent three hours of the developer's machine on
+work the runners were idle and waiting to absorb.
+
+`gates.sh` was already discouraged here for a second reason worth keeping: several
+agent lanes share one Mac, Lake takes one core per job by default, and four
+concurrent full gates oversubscribe a 14-core machine five times over — that is
+how a ten-minute gate becomes an hour.
 
 Neither the local script nor the runner lane is CI-equivalent on its own, and the
 difference has bitten: every gate in `gates.sh` runs in CI, but CI also runs the
 `mfc` contract tooling, which the script does not reproduce. Say "N gates pass",
 not "CI is green". See `CONTRIBUTING.md`.
 
-The normal build, for iteration, stays local — Lean's `.olean` files are
-platform-specific, so the Windows runners can never warm this checkout:
+Build locally by **naming a target**, which the hook allows:
 
 ```bash
-lake build
+LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
 ```
 
-Cap its parallelism. `LEAN_NUM_THREADS=2` limits Lake to two concurrent `lean`
-processes; without it Lake takes one per core. On this machine it is set for every
-agent session in `~/.claude/settings.json`, so a plain `lake build` is already
-capped — set it explicitly if you are building from a shell that does not inherit
-that.
+`LEAN_NUM_THREADS=2` limits Lake to two concurrent `lean` processes; without it
+Lake takes one per core. It is set for every agent session in
+`~/.claude/settings.json`, so a plain `lake build <Target>` is already capped —
+set it explicitly if you are building from a shell that does not inherit that.
+
+`lake env lean scratch.lean` is **not** restricted and is not meant to be. It is
+the seconds-long probe interactive proof work depends on; routing each attempt at
+a lemma through CI would be a ~12 minute round trip and would stop anyone writing
+a proof at all.
+
+### The olean asymmetry, and why the rule still stands
+
+Lean's `.olean` files are platform-specific, so the Windows runners can never warm
+this checkout: a local build is the only way to get local oleans, and a targeted
+build still compiles its dependencies. **After a cache loss, naming a target does
+not make the cost go away.** That is the honest limit of this rule, and the answer
+is not to quietly run the whole-library build anyway — it is to take the verdict
+from the runners, which need no local oleans at all:
 
 ```bash
-LEAN_NUM_THREADS=2 lake build
+gh workflow run ci.yml --ref <branch>
 ```
+
+When a local build genuinely cannot be avoided, `DAG_ALLOW_LOCAL_BUILD=1`
+overrides the hook for one command. **Using it is a reportable event**: say so in
+the pull request or the session report, because a whole-library local build is
+precisely what this rule exists to keep off the developer's machine.
 
 Useful focused commands are:
 
