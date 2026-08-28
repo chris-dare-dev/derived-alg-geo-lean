@@ -2805,13 +2805,7 @@ syntactically. That diagnostic shift is the real argument for the technique.
 Choosing one n across a finite cover, and the passage to multiplication into F(n), are NOT here;
 they are ChartExtension.lean's uniform trio and Glue.lean, where #585 is closed. -/
 
-#print axioms AlgebraicGeometry.Proj.degreeOneChart
-#print axioms AlgebraicGeometry.Proj.degreeOneChart_image_top
-#print axioms AlgebraicGeometry.Proj.degreeOneChart_image_basicOpen
 #print axioms AlgebraicGeometry.Proj.chartRing
-#print axioms AlgebraicGeometry.Proj.chartRestrict
-#print axioms AlgebraicGeometry.Proj.chartRestrict_isQuasicoherent
-#print axioms AlgebraicGeometry.Proj.isIso_fromTildeΓ_chartRestrict
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_of_le
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_uniform
@@ -2832,9 +2826,6 @@ agreement must be forced on every PAIR at once and a pair type is what gets pass
 The first is six lines for the same reason its extension sibling is: on a degree-one chart the
 sections over D(f/g) are a localization of the sections over the whole chart. -/
 
-#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart
-#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart_of_le
-#print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_chart_uniform
 
 /-! ## Fractions with an arbitrary numerator, and the twist comparison they give (#585)
 
@@ -2879,7 +2870,6 @@ discipline and for the same reason; chartRestrict is its d = 1 case by definitio
 half is not repeated -- #585 extends only across degree-one charts. -/
 
 #print axioms AlgebraicGeometry.Proj.awayRestrict
-#print axioms AlgebraicGeometry.Proj.chartRestrict_eq_awayRestrict
 #print axioms AlgebraicGeometry.Proj.awayRestrict_isQuasicoherent
 #print axioms AlgebraicGeometry.Proj.isIso_fromTildeΓ_awayRestrict
 #print axioms AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_away
