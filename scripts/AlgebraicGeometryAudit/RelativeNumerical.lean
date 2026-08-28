@@ -3,7 +3,7 @@ The algebraic and relative-numerical roots introduced for Definition 8.7 of
 arXiv:2607.28411.  Saturation is audited here beside its first geometric
 consumer so the abstraction boundary remains visible.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Relative
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.RelativeOverlattice
 
 -- Neutral algebraic root: saturation and its torsion-free universal property.
 #print axioms AddSubgroup.saturation
@@ -64,3 +64,16 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Relative
 #print axioms AlgebraicGeometry.Numerical.Relative.singletonFold_of
 #print axioms AlgebraicGeometry.Numerical.Relative.singletonEquiv
 #print axioms AlgebraicGeometry.Numerical.Relative.singletonEquiv_of
+
+-- Geometric fibres: eta images, specialization, and the family adapter.
+#print axioms AlgebraicGeometry.Numerical.Relative.EtaImage
+#print axioms AlgebraicGeometry.Numerical.Relative.etaClass
+#print axioms AlgebraicGeometry.Numerical.Relative.etaClass_coe
+#print axioms AlgebraicGeometry.Numerical.Relative.IsFiniteIndexOverlattice
+#print axioms AlgebraicGeometry.Numerical.Relative.specializationMap
+#print axioms AlgebraicGeometry.Numerical.Relative.specializationMap_coe
+#print axioms AlgebraicGeometry.Numerical.Relative.specializationMap_self
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.ofEta
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.ofEta_classValue_coe
+#print axioms AlgebraicGeometry.Numerical.Relative.etaImageIdEquiv
+#print axioms AlgebraicGeometry.Numerical.Relative.etaImageIdEquiv_etaClass
