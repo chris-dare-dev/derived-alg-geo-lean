@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.Sections
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ChartProj
 
 /-!
@@ -77,26 +78,11 @@ universe u
 variable {A σA : Type u} [CommRing A] [SetLike σA A] [AddSubgroupClass σA A]
 variable (𝒜 : ℕ → σA) [GradedRing 𝒜]
 
-/-! ### Restriction of sections, spelled out
+/-! ### Restriction of sections
 
-Three one-line facts about restricting a section of a module sheaf on `Proj 𝒜`. They are named
-because the proof below composes restrictions constantly and `rw` cannot be used on goals carrying
-`show`-ascription residue. -/
-
-/-- **Restriction composes.** -/
-theorem resSection_trans (F : (Proj 𝒜).Modules) {U V W : (Proj 𝒜).Opens}
-    (h₁ : V ≤ U) (h₂ : W ≤ V) (x : Γ(F, U)) :
-    F.presheaf.map (homOfLE h₂).op (F.presheaf.map (homOfLE h₁).op x)
-      = F.presheaf.map (homOfLE (h₂.trans h₁)).op x := by
-  rw [← ConcreteCategory.comp_apply, ← Functor.map_comp]
-  rfl
-
-/-- **Restriction is semilinear over restriction of scalars.** -/
-theorem resSection_smul (F : (Proj 𝒜).Modules) {U V : (Proj 𝒜).Opens} (h : V ≤ U)
-    (r : Γ(Proj 𝒜, U)) (x : Γ(F, U)) :
-    F.presheaf.map (homOfLE h).op (r • x)
-      = (Proj 𝒜).presheaf.map (homOfLE h).op r • F.presheaf.map (homOfLE h).op x :=
-  Scheme.Modules.map_smul F _ r x
+The generic facts -- `resSection_trans`, `resSection_smul`, `homApp_res` -- moved to
+`Modules/Restriction/Sections.lean` in `#824`; they are stated for any scheme and never used the
+grading. What stays here is the one that is genuinely about `Proj`. -/
 
 /-- **A fraction restricts to the same fraction**, because it is defined pointwise. -/
 theorem resΓ_fracSection {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k) (hb : b ∈ 𝒜 k)
@@ -104,19 +90,6 @@ theorem resΓ_fracSection {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k) (hb : b ∈ �
     (hVb : V ≤ ProjectiveSpectrum.basicOpen 𝒜 b) :
     (Proj 𝒜).presheaf.map (homOfLE h).op (show Γ(Proj 𝒜, U) from fracSection 𝒜 ha hb hUb)
       = (show Γ(Proj 𝒜, V) from fracSection 𝒜 ha hb hVb) := rfl
-
-/-- **A morphism of module sheaves commutes with restriction.** -/
-theorem homApp_res {X : Scheme.{u}} {M N : X.Modules} (φ : M ⟶ N) {U V : X.Opens} (h : V ≤ U)
-    (x : Γ(M, U)) :
-    N.presheaf.map (homOfLE h).op (φ.app U x) = φ.app V (M.presheaf.map (homOfLE h).op x) :=
-  (NatTrans.naturality_apply φ.mapPresheaf (homOfLE h).op x).symm
-
-/-- **An open inside two basic opens is inside the basic open of the product.** -/
-theorem le_basicOpen_mul {U : (Proj 𝒜).Opens} {a b : A}
-    (ha : U ≤ ProjectiveSpectrum.basicOpen 𝒜 a) (hb : U ≤ ProjectiveSpectrum.basicOpen 𝒜 b) :
-    U ≤ ProjectiveSpectrum.basicOpen 𝒜 (a * b) := by
-  rw [ProjectiveSpectrum.basicOpen_mul]
-  exact le_inf ha hb
 
 
 /-- **The glue, from the two exponents and the chart extensions as data.**
@@ -216,7 +189,7 @@ theorem exists_globalSection_twistBy_of_data (F : (Proj 𝒜).Modules)
           (hgn (i, j)))
         (by ring)).trans (fracSection_mul 𝒜 _ _ _ _ _ _ _).symm
     have hLfinal :=
-      (homApp_res (twistBy 𝒜 (e * (2 * m + n)) (hA i) F)
+      (Scheme.Modules.homApp_res (twistBy 𝒜 (e * (2 * m + n)) (hA i) F)
         (inf_le_left : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j) ≤ basicOpen 𝒜 (g i)) (t i)).trans
       (((twistBy_app_eq_smul' 𝒜 (hA i) (hB (i, j)) F (hWb (i, j)) _).trans
         (congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) =>
@@ -226,7 +199,7 @@ theorem exists_globalSection_twistBy_of_data (F : (Proj 𝒜).Modules)
               ≤ basicOpen 𝒜 (g i))).op (t i))) hfracL)).trans
         (Scheme.Modules.Hom.app_smul _ _ _).symm)
     have hRfinal :=
-      (homApp_res (twistBy 𝒜 (e * (2 * m + n)) (hA j) F)
+      (Scheme.Modules.homApp_res (twistBy 𝒜 (e * (2 * m + n)) (hA j) F)
         (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j) ≤ basicOpen 𝒜 (g j)) (t j)).trans
       (((twistBy_app_eq_smul' 𝒜 (hA j) (hB (i, j)) F (hWb (i, j)) _).trans
         (congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) =>
@@ -270,10 +243,10 @@ theorem exists_globalSection_twistBy_of_data (F : (Proj 𝒜).Modules)
           isLocalizationFrac 𝒜 hf (hg i) n inf_le_left) :=
     fracSection_eq 𝒜 _ _ _ _ _ _ (by ring)
   have hLeft :=
-    (resSection_trans 𝒜 (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * (2 * m + n) : ℕ) : ℤ)))
+    (Scheme.Modules.resSection_trans (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * (2 * m + n) : ℕ) : ℤ)))
       (le_top (a := basicOpen 𝒜 f)) (inf_le_right :
         basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f) σ).trans
-    ((resSection_trans 𝒜 (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * (2 * m + n) : ℕ) : ℤ)))
+    ((Scheme.Modules.resSection_trans (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * (2 * m + n) : ℕ) : ℤ)))
       (le_top (a := basicOpen 𝒜 (g i))) (inf_le_left :
         basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i)) σ).symm.trans
       ((congrArg (fun y : Γ(Scheme.Modules.tensorObj F
@@ -281,13 +254,13 @@ theorem exists_globalSection_twistBy_of_data (F : (Proj 𝒜).Modules)
         (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * (2 * m + n) : ℕ) : ℤ))).presheaf.map
           (homOfLE (inf_le_left : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f
             ≤ basicOpen 𝒜 (g i))).op y) (hσ i)).trans
-        ((homApp_res (twistBy 𝒜 (e * (2 * m + n)) (hA i) F) (inf_le_left :
+        ((Scheme.Modules.homApp_res (twistBy 𝒜 (e * (2 * m + n)) (hA i) F) (inf_le_left :
           basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i)) (t i)).trans
           ((congrArg (Scheme.Modules.Hom.app (twistBy 𝒜 (e * (2 * m + n)) (hA i) F)
             (basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)) (ht i)).trans
             (Scheme.Modules.Hom.app_smul _ _ _)))))
   have hRight :=
-    (homApp_res (twistBy 𝒜 (e * (2 * m + n)) (pow_mem_mul 𝒜 hf (2 * m + n)) F)
+    (Scheme.Modules.homApp_res (twistBy 𝒜 (e * (2 * m + n)) (pow_mem_mul 𝒜 hf (2 * m + n)) F)
       (inf_le_right : basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f) s).trans
     ((twistBy_app_eq_smul' 𝒜 (pow_mem_mul 𝒜 hf (2 * m + n)) (hA i) F hAle _).trans
       (congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) =>
@@ -339,12 +312,12 @@ theorem exists_overlap_exponent (F : (Proj 𝒜).Modules)
         = (show Γ(Proj 𝒜, Z) from isLocalizationFrac 𝒜 hf (hg i) n (hZ.trans inf_le_left)) •
           F.presheaf.map (homOfLE (hZ.trans inf_le_right)).op s := by
     intro i Z hZ
-    refine (resSection_trans 𝒜 F inf_le_left hZ (t i)).symm.trans ?_
+    refine (Scheme.Modules.resSection_trans F inf_le_left hZ (t i)).symm.trans ?_
     refine (congrArg (fun y : Γ(F, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) =>
       F.presheaf.map (homOfLE hZ).op y) (ht i)).trans ?_
-    refine (resSection_smul 𝒜 F hZ _ _).trans ?_
+    refine (Scheme.Modules.resSection_smul F hZ _ _).trans ?_
     exact congrArg₂ (fun (r : Γ(Proj 𝒜, Z)) (y : Γ(F, Z)) => r • y)
-      (resΓ_fracSection 𝒜 _ _ hZ _ _) (resSection_trans 𝒜 F inf_le_right hZ s)
+      (resΓ_fracSection 𝒜 _ _ hZ _ _) (Scheme.Modules.resSection_trans F inf_le_right hZ s)
   -- the pairwise overlaps are the charts of the products, which have degree two
   have hb2 : ∀ p : ι × ι, g p.1 * g p.2 ∈ 𝒜 2 := fun p =>
     SetLike.mul_mem_graded (hg p.1) (hg p.2)
@@ -381,15 +354,15 @@ theorem exists_overlap_exponent (F : (Proj 𝒜).Modules)
     have hZj : (basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) ⊓ basicOpen 𝒜 f
         ≤ basicOpen 𝒜 (g p.2) ⊓ basicOpen 𝒜 f :=
       le_inf (inf_le_left.trans inf_le_right) inf_le_right
-    have hL := (resSection_trans 𝒜 F
+    have hL := (Scheme.Modules.resSection_trans F
       (inf_le_left : basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.1))
       (inf_le_left : (basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) ⊓ basicOpen 𝒜 f
         ≤ basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) (t p.1)).trans (key p.1 _ hZi)
-    have hR2 := (resSection_trans 𝒜 F
+    have hR2 := (Scheme.Modules.resSection_trans F
       (inf_le_right : basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.2))
       (inf_le_left : (basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) ⊓ basicOpen 𝒜 f
         ≤ basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) (t p.2)).trans (key p.2 _ hZj)
-    have hR1 := resSection_smul 𝒜 F
+    have hR1 := Scheme.Modules.resSection_smul F
       (inf_le_left : (basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) ⊓ basicOpen 𝒜 f
         ≤ basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2))
       (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from

@@ -85,7 +85,7 @@ open AlgebraicGeometry
 #print axioms AlgebraicGeometry.restrictSquareSectionsInv_restrictSquareSections
 #print axioms AlgebraicGeometry.restrictSquareSections_restrictSquareSectionsInv
 #print axioms AlgebraicGeometry.restrictSquareSections_smul
-#print axioms AlgebraicGeometry.presheaf_map_square_eq
+#print axioms AlgebraicGeometry.Scheme.Modules.presheaf_map_square_eq
 #print axioms AlgebraicGeometry.restrictSquareSectionsEquiv
 #print axioms AlgebraicGeometry.pushforwardRestrictIso
 
