@@ -6,7 +6,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Extension
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic
 
 /-!
-# The degree-one chart, as seen by the affine extension lemma
+# The chart of a positive-degree element, as seen by the affine extension lemma
 
 `#585`'s chart step. A section of a quasi-coherent `F` over `D₊(g) ⊓ D₊(f)` extends to a section
 over `D₊(g)` after clearing a power of `f / g`. `Modules/Affine/Extension.lean` supplies the
@@ -15,16 +15,14 @@ elaborate.
 
 ## The geometry is two rewrites
 
-`degreeOneChart_image_top` and `degreeOneChart_image_basicOpen` say the chart covers exactly
-`D₊(g)` and meets `D₊(f)` in `D₊(g) ⊓ D₊(f)`. Both fall out of
-`Scheme.Hom.image_preimage_eq_opensRange_inf` and `opensRange_awayι`, with
-`Proj.awayι_preimage_basicOpen` naming the element: for `f` and `g` both of degree one it is
-exactly `f / g`. Translating sections across the chart is free, because
-`Scheme.Modules.restrictAppIso` is `Iso.refl`.
+`ChartScalar.lean`'s `awayι_image_top` and `awayι_image_basicOpen` say the chart covers exactly
+`D₊(g)` and meets `D₊(f)` in `D₊(g) ⊓ D₊(f)`. They are stated there, one layer up, because that is
+where the scalar comparison needs them; this file only needs the chart itself. Translating sections
+across the chart is free, because `Scheme.Modules.restrictAppIso` is `Iso.refl`.
 
 ## The naming is not cosmetic
 
-Stated inline, `IsIso (F.restrict (degreeOneChart 𝒜 hg)).fromTildeΓ` **does not elaborate**: it
+Stated inline, `IsIso (F.restrict (awayι 𝒜 g hg hd)).fromTildeΓ` **does not elaborate**: it
 runs `isDefEq` past 1.6M heartbeats and gives up, and pinning the arguments explicitly
 (`references/instance-transparency.md` technique 7) does not rescue it. This is the
 `Scheme.Modules` wrapper that `Modules/Affine/Equivalence.lean` documents.
@@ -90,28 +88,6 @@ namespace AlgebraicGeometry.Proj
 variable {A σA : Type u} [CommRing A] [SetLike σA A] [AddSubgroupClass σA A]
 variable (𝒜 : ℕ → σA) [GradedRing 𝒜]
 
-/-- The degree-one chart through `g`. -/
-noncomputable abbrev degreeOneChart {g : A} (hg : g ∈ 𝒜 1) :
-    Spec (.of <| HomogeneousLocalization.Away 𝒜 g) ⟶ Proj 𝒜 :=
-  awayι 𝒜 g hg Nat.one_pos
-
-/-- **The chart covers exactly its own basic open.** -/
-theorem degreeOneChart_image_top {g : A} (hg : g ∈ 𝒜 1) :
-    degreeOneChart 𝒜 hg ''ᵁ ⊤ = basicOpen 𝒜 g := by
-  rw [show (⊤ : (Spec (.of <| HomogeneousLocalization.Away 𝒜 g)).Opens) =
-      degreeOneChart 𝒜 hg ⁻¹ᵁ ⊤ from rfl,
-    Scheme.Hom.image_preimage_eq_opensRange_inf, inf_top_eq,
-    opensRange_awayι 𝒜 g hg Nat.one_pos]
-
-/-- **A second chart meets the first in the intersection of their basic opens** — the open the
-affine extension lemma is applied over. -/
-theorem degreeOneChart_image_basicOpen {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1) :
-    degreeOneChart 𝒜 hg ''ᵁ
-        PrimeSpectrum.basicOpen (HomogeneousLocalization.Away.isLocalizationElem hg hf) =
-      basicOpen 𝒜 g ⊓ basicOpen 𝒜 f := by
-  rw [← awayι_preimage_basicOpen 𝒜 hg Nat.one_pos hf Nat.one_pos,
-    Scheme.Hom.image_preimage_eq_opensRange_inf, opensRange_awayι 𝒜 g hg Nat.one_pos]
-
 /-! ### Naming the restriction
 
 `references/instance-transparency.md` technique 5: naming the value with an explicit result type
@@ -127,103 +103,71 @@ the ring does not depend on the degree. -/
 noncomputable abbrev chartRing (g : A) : CommRingCat.{u} :=
   .of (HomogeneousLocalization.Away 𝒜 g)
 
-/-- **The restriction of `F` to the degree-one chart through `g`, named at its result type.** -/
-noncomputable def chartRestrict (F : (Proj 𝒜).Modules) {g : A} (hg : g ∈ 𝒜 1) :
-    (Spec (.of ↑(chartRing 𝒜 g))).Modules :=
-  F.restrict (degreeOneChart 𝒜 hg)
+/-- **The restriction of `F` to the chart of a homogeneous element of positive degree**, named at
+its result type so that `fromTildeΓ`'s bundled ring is matched syntactically.
 
-instance chartRestrict_isQuasicoherent (F : (Proj 𝒜).Modules)
+There is no separate degree-one spelling. `#585`'s cover is made of degree-one charts and its
+pairwise overlaps are not -- `D₊(gᵢ) ⊓ D₊(gⱼ) = D₊(gᵢ gⱼ)` has degree two -- so both degrees were
+needed from the start, and the two names for one definition were a `rfl` apart. -/
+noncomputable def awayRestrict (F : (Proj 𝒜).Modules) {d : ℕ} {g : A} (hg : g ∈ 𝒜 d)
+    (hd : 0 < d) : (Spec (.of ↑(chartRing 𝒜 g))).Modules :=
+  F.restrict (awayι 𝒜 g hg hd)
+
+instance awayRestrict_isQuasicoherent (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {g : A} (hg : g ∈ 𝒜 1) : (chartRestrict 𝒜 F hg).IsQuasicoherent :=
-  inferInstanceAs ((F.restrict (degreeOneChart 𝒜 hg)).IsQuasicoherent)
+    {d : ℕ} {g : A} (hg : g ∈ 𝒜 d) (hd : 0 < d) : (awayRestrict 𝒜 F hg hd).IsQuasicoherent :=
+  inferInstanceAs ((F.restrict (awayι 𝒜 g hg hd)).IsQuasicoherent)
 
-instance isIso_fromTildeΓ_chartRestrict (F : (Proj 𝒜).Modules)
+instance isIso_fromTildeΓ_awayRestrict (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {g : A} (hg : g ∈ 𝒜 1) : IsIso (chartRestrict 𝒜 F hg).fromTildeΓ :=
+    {d : ℕ} {g : A} (hg : g ∈ 𝒜 d) (hd : 0 < d) : IsIso (awayRestrict 𝒜 F hg hd).fromTildeΓ :=
   Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent _
 
-/-- **The affine extension lemma, over a degree-one chart.**
+/-- **The affine extension lemma, over the chart of a positive-degree element.**
 
 `s` lives over `D₊(g) ⊓ D₊(f)`, which in the chart is the basic open of `f / g`; a power of that
-element carries it to a section over the whole chart, i.e. over `D₊(g)`. -/
+element carries it to a section over the whole chart, i.e. over `D₊(g)`.
+
+The degrees of `f` and `g` are unconstrained apart from `0 < deg g`, which is what the chart itself
+needs. `#585` calls this at degree one; the pairwise overlaps of that cover are degree-two charts,
+and the agreement statements in `AwayChart.lean` were general from the start for exactly that
+reason. There is no mathematical asymmetry between the two, so there is none here either. -/
 theorem exists_pow_smul_eq_res_chart (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1)
-    (s : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj
+    {d e : ℕ} {f g : A} (hf : f ∈ 𝒜 e) (hg : g ∈ 𝒜 d) (hd : 0 < d)
+    (s : (modulesSpecToSheaf.obj (awayRestrict 𝒜 F hg hd)).presheaf.obj
         (op (PrimeSpectrum.basicOpen
           (HomogeneousLocalization.Away.isLocalizationElem hg hf)))) :
-    ∃ (n : ℕ) (t : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj (op ⊤)),
-      (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map (homOfLE le_top).op t =
+    ∃ (n : ℕ) (t : (modulesSpecToSheaf.obj (awayRestrict 𝒜 F hg hd)).presheaf.obj (op ⊤)),
+      (modulesSpecToSheaf.obj (awayRestrict 𝒜 F hg hd)).presheaf.map (homOfLE le_top).op t =
         HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • s :=
   Scheme.Modules.exists_pow_smul_eq_res_of_top_of_isQuasicoherent _ _ s
 
-/-- **Two sections agreeing on a smaller chart agree after clearing a power.**
-
-The separatedness counterpart of `exists_pow_smul_eq_res_chart`, and the same six lines: on a
-degree-one chart the sections over `D(f/g)` are a localization of the sections over the whole
-chart, so two sections agreeing there differ by something a power of `f/g` kills.
-
-`#585`'s glue needs it because agreement between two charts is only visible where `D₊(f)` reaches,
-and `IsCompatible` demands it on the whole pairwise overlap. This is what closes that distance --
-at the cost of one more exponent, which `exists_pow_smul_eq_res_chart_of_le` absorbs the same way
-it absorbs the first. -/
-theorem exists_pow_smul_eq_of_res_eq_chart (F : (Proj 𝒜).Modules)
-    [SheafOfModules.IsQuasicoherent.{u, u, u}
-      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1)
-    (t t' : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj (op ⊤))
-    (h : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map
-        (homOfLE (le_top (a := PrimeSpectrum.basicOpen
-          (HomogeneousLocalization.Away.isLocalizationElem hg hf)))).op t =
-      (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map
-        (homOfLE (le_top (a := PrimeSpectrum.basicOpen
-          (HomogeneousLocalization.Away.isLocalizationElem hg hf)))).op t') :
-    ∃ n : ℕ, HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • t =
-      HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • t' :=
-  Scheme.Modules.exists_pow_smul_eq_of_res_eq_of_isQuasicoherent _ _ t t' h
-
-/-- **That exponent can be raised too.**
-
-Same argument as `exists_pow_smul_eq_res_chart_of_le` and for the same reason: a single exponent
-across a finite family needs every member raised to the maximum. No quasi-coherence -- only that
-the action is by a monoid. -/
-theorem exists_pow_smul_eq_of_res_eq_chart_of_le (F : (Proj 𝒜).Modules)
-    {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1)
-    (t t' : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj (op ⊤))
-    {n m : ℕ} (hnm : n ≤ m)
-    (h : HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • t =
-      HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • t') :
-    HomogeneousLocalization.Away.isLocalizationElem hg hf ^ m • t =
-      HomogeneousLocalization.Away.isLocalizationElem hg hf ^ m • t' := by
-  have hm : m = (m - n) + n := by omega
-  rw [hm, pow_add, mul_smul, mul_smul, h]
-
 /-- **The exponent can be raised.**
 
-If clearing `(f/g)ⁿ` extends `s` over the chart, so does clearing any higher
-power: multiply the extension by `(f/g)^(m-n)`. The restriction map is linear
-over the chart ring, so nothing but `pow_add` is involved.
+If clearing `(f/g)ⁿ` extends `s` over the chart, so does clearing any higher power: multiply the
+extension by `(f/g)^(m-n)`. The restriction map is linear over the chart ring, so nothing but
+`pow_add` is involved.
 
-This is what makes a *single* `n` across a finite cover possible — each chart
-supplies its own exponent, and this raises them all to the maximum.
+This is what makes a *single* `n` across a finite cover possible — each chart supplies its own
+exponent, and this raises them all to the maximum.
 
-No quasi-coherence hypothesis: unlike `exists_pow_smul_eq_res_chart`, which
-needs it to produce an extension at all, raising an exponent uses only that the
-restriction map is linear. -/
+No quasi-coherence hypothesis: unlike `exists_pow_smul_eq_res_chart`, which needs it to produce an
+extension at all, raising an exponent uses only that the restriction map is linear. -/
 theorem exists_pow_smul_eq_res_chart_of_le (F : (Proj 𝒜).Modules)
-    {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1)
-    (s : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj
+    {d e : ℕ} {f g : A} (hf : f ∈ 𝒜 e) (hg : g ∈ 𝒜 d) (hd : 0 < d)
+    (s : (modulesSpecToSheaf.obj (awayRestrict 𝒜 F hg hd)).presheaf.obj
         (op (PrimeSpectrum.basicOpen
           (HomogeneousLocalization.Away.isLocalizationElem hg hf))))
     {n m : ℕ} (hnm : n ≤ m)
-    (h : ∃ t : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj (op ⊤),
-      (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map (homOfLE le_top).op t =
+    (h : ∃ t : (modulesSpecToSheaf.obj (awayRestrict 𝒜 F hg hd)).presheaf.obj (op ⊤),
+      (modulesSpecToSheaf.obj (awayRestrict 𝒜 F hg hd)).presheaf.map (homOfLE le_top).op t =
         HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n • s) :
-    ∃ t : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.obj (op ⊤),
-      (modulesSpecToSheaf.obj (chartRestrict 𝒜 F hg)).presheaf.map (homOfLE le_top).op t =
+    ∃ t : (modulesSpecToSheaf.obj (awayRestrict 𝒜 F hg hd)).presheaf.obj (op ⊤),
+      (modulesSpecToSheaf.obj (awayRestrict 𝒜 F hg hd)).presheaf.map (homOfLE le_top).op t =
         HomogeneousLocalization.Away.isLocalizationElem hg hf ^ m • s := by
   obtain ⟨t, ht⟩ := h
   refine ⟨HomogeneousLocalization.Away.isLocalizationElem hg hf ^ (m - n) • t, ?_⟩
@@ -231,59 +175,33 @@ theorem exists_pow_smul_eq_res_chart_of_le (F : (Proj 𝒜).Modules)
   congr 2
   omega
 
-/-- **One exponent for a finite family of agreements.**
-
-The separatedness counterpart of `exists_pow_smul_eq_res_chart_uniform`, and what `#585`'s glue
-calls: agreement has to be forced on every *pairwise* overlap at once, so the family here is
-indexed by pairs and the bound is taken over all of them.
-
-The index is arbitrary rather than the chart index, precisely so that a pair type can be passed. -/
-theorem exists_pow_smul_eq_of_res_eq_chart_uniform (F : (Proj 𝒜).Modules)
-    [SheafOfModules.IsQuasicoherent.{u, u, u}
-      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {ι : Type*} [Finite ι] {f g : ι → A} (hf : ∀ i, f i ∈ 𝒜 1) (hg : ∀ i, g i ∈ 𝒜 1)
-    (t t' : ∀ i, (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.obj (op ⊤))
-    (h : ∀ i, (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.map
-        (homOfLE (le_top (a := PrimeSpectrum.basicOpen
-          (HomogeneousLocalization.Away.isLocalizationElem (hg i) (hf i))))).op (t i) =
-      (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.map
-        (homOfLE (le_top (a := PrimeSpectrum.basicOpen
-          (HomogeneousLocalization.Away.isLocalizationElem (hg i) (hf i))))).op (t' i)) :
-    ∃ n : ℕ, ∀ i,
-      HomogeneousLocalization.Away.isLocalizationElem (hg i) (hf i) ^ n • t i =
-        HomogeneousLocalization.Away.isLocalizationElem (hg i) (hf i) ^ n • t' i := by
-  choose N hN using fun i => exists_pow_smul_eq_of_res_eq_chart 𝒜 F (hf i) (hg i) (t i) (t' i) (h i)
-  obtain ⟨n, hn⟩ := (Set.finite_range N).bddAbove
-  exact ⟨n, fun i => exists_pow_smul_eq_of_res_eq_chart_of_le 𝒜 F (hf i) (hg i) (t i) (t' i)
-    (hn ⟨i, rfl⟩) (hN i)⟩
-
 /-- **One exponent for a finite family of charts.**
 
-Each chart supplies its own `nᵢ` from `exists_pow_smul_eq_res_chart`; finiteness
-of the index makes the range of exponents bounded, and
-`exists_pow_smul_eq_res_chart_of_le` raises every chart to the bound.
+Each chart supplies its own `nᵢ` from `exists_pow_smul_eq_res_chart`; finiteness of the index makes
+the range of exponents bounded, and `exists_pow_smul_eq_res_chart_of_le` raises every chart to the
+bound.
 
-This is the first of the three things `#585`'s glue needs. The other two — that
-the resulting local sections agree on overlaps once carried into `F(n)`, and
-that they therefore glue to a section over `⊤` of `Proj 𝒜` — are not here. Note
-in particular that the sections produced below still live on *different* sheaves,
-one per chart; `twistBy` is what makes them comparable, and it is not applied
+This is the first of the three things `#585`'s glue needs. The other two — that the resulting local
+sections agree on overlaps once carried into `F(n)`, and that they therefore glue to a section over
+`⊤` of `Proj 𝒜` — are not here. Note in particular that the sections produced below still live on
+*different* sheaves, one per chart; `twistBy` is what makes them comparable, and it is not applied
 yet. -/
 theorem exists_pow_smul_eq_res_chart_uniform (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {f : A} (hf : f ∈ 𝒜 1) {ι : Type*} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
-    (s : ∀ i, (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.obj
+    {d e : ℕ} {f : A} (hf : f ∈ 𝒜 e) {ι : Type*} [Finite ι] {g : ι → A}
+    (hg : ∀ i, g i ∈ 𝒜 d) (hd : 0 < d)
+    (s : ∀ i, (modulesSpecToSheaf.obj (awayRestrict 𝒜 F (hg i) hd)).presheaf.obj
         (op (PrimeSpectrum.basicOpen
           (HomogeneousLocalization.Away.isLocalizationElem (hg i) hf)))) :
     ∃ n : ℕ, ∀ i,
-      ∃ t : (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.obj (op ⊤),
-        (modulesSpecToSheaf.obj (chartRestrict 𝒜 F (hg i))).presheaf.map
+      ∃ t : (modulesSpecToSheaf.obj (awayRestrict 𝒜 F (hg i) hd)).presheaf.obj (op ⊤),
+        (modulesSpecToSheaf.obj (awayRestrict 𝒜 F (hg i) hd)).presheaf.map
             (homOfLE le_top).op t =
           HomogeneousLocalization.Away.isLocalizationElem (hg i) hf ^ n • s i := by
-  choose N t ht using fun i => exists_pow_smul_eq_res_chart 𝒜 F hf (hg i) (s i)
+  choose N t ht using fun i => exists_pow_smul_eq_res_chart 𝒜 F hf (hg i) hd (s i)
   obtain ⟨n, hn⟩ := (Set.finite_range N).bddAbove
   exact ⟨n, fun i =>
-    exists_pow_smul_eq_res_chart_of_le 𝒜 F hf (hg i) (s i) (hn ⟨i, rfl⟩) ⟨t i, ht i⟩⟩
+    exists_pow_smul_eq_res_chart_of_le 𝒜 F hf (hg i) hd (s i) (hn ⟨i, rfl⟩) ⟨t i, ht i⟩⟩
 
 end AlgebraicGeometry.Proj
