@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Exactness
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 import Mathlib.Topology.Sheaves.LocallySurjective
 
@@ -12,23 +13,23 @@ import Mathlib.Topology.Sheaves.LocallySurjective
 map of module sheaves has to be shown surjective: it is enough that every section, near every
 point, has a preimage on some smaller open.
 
-## Why it is worth naming
+## What it adds, and what it does not
 
-The chain it packages is four links, and each one is a different library's idea of the same fact:
+**Most of this was already in the tree.** `SheafOfModules.epi_of_isLocallySurjective`
+(`Modules/Affine/Exactness.lean`) takes `Presheaf.IsLocallySurjective J` for a map of sheaves of
+modules over an arbitrary site and returns `Epi`, and its docstring already names Serre's
+surjection as the intended use. This lemma does **not** reprove that; it delegates to it.
 
-* `TopCat.Presheaf.isLocallySurjective_iff` — local surjectivity on `Opens X` is exactly the
-  pointwise statement, because `Opens.mem_grothendieckTopology` is `rfl`;
-* `CategoryTheory.Sheaf.IsLocallySurjective` — the sheaf-level class is that, on the underlying
-  presheaf map;
-* `epi_of_isLocallySurjective` — which gives `Epi` in `Sheaf J AddCommGrpCat`;
-* `Functor.epi_of_epi_map` along `SheafOfModules.toSheaf`, which reflects epimorphisms because it
-  is faithful.
+What is added is the entry point: on `Opens X`, `Presheaf.IsLocallySurjective` is exactly the
+pointwise statement, because `Opens.mem_grothendieckTopology` is `rfl` — so a caller who has local
+preimages at points, which is what a chart-by-chart argument actually produces, can hand them over
+directly. That step is `TopCat.Presheaf.isLocallySurjective_iff`, and it is the whole of the proof
+below.
 
-`Divisors/Effective.lean` runs precisely this chain inline for one specific quotient map, and
+`Divisors/Effective.lean` runs the entire chain inline for one specific quotient map, and
 hand-rolls the faithfulness of the forgetful functor while doing so — Mathlib's
-`instance : (toSheaf.{v} R).Faithful` already provides it, and `reflectsEpimorphisms_of_faithful`
-turns that into the reflection. Extracting the chain here is what stops the next caller rebuilding
-it a third time.
+`instance : (toSheaf.{v} R).Faithful` already provides it. That file is left alone here; folding it
+onto this lemma is a separate cleanup.
 
 ## What it is *not*
 
@@ -37,6 +38,11 @@ does not need `isLocallySurjective_of_coversTop`: the charts enter when the call
 open to work inside, at a point it has already been handed, and the hypothesis below is stated so
 that choice is all the caller has to make. That is why the criterion is pointwise rather than
 indexed by a cover.
+
+`epi_of_isLocallySurjective`'s docstring anticipates the other route — combining it with
+`isLocallySurjective_of_coversTop` to "check a map of module sheaves is an epimorphism chart by
+chart". That route works, and it is not the shortest one: assembling the covering family is
+avoidable, and this lemma is what avoids it.
 -/
 
 universe u
@@ -60,14 +66,13 @@ theorem epi_of_pointwise_preimages {F G : X.Modules} (φ : F ⟶ G)
       ∃ (V : X.Opens) (hV : V ≤ U), x ∈ V ∧ ∃ s : Γ(F, V),
         Scheme.Modules.Hom.app φ V s = G.presheaf.map (homOfLE hV).op t) :
     Epi φ := by
+  refine SheafOfModules.epi_of_isLocallySurjective φ ?_
   have hls : TopCat.Presheaf.IsLocallySurjective
       ((SheafOfModules.toSheaf X.ringCatSheaf).map φ).hom := by
     rw [TopCat.Presheaf.isLocallySurjective_iff]
     intro U t x hx
     obtain ⟨V, hV, hxV, s, hs⟩ := h U t x hx
     exact ⟨V, hV, ⟨s, hs⟩, hxV⟩
-  have : CategoryTheory.Sheaf.IsLocallySurjective
-      ((SheafOfModules.toSheaf X.ringCatSheaf).map φ) := ⟨hls.imageSieve_mem⟩
-  exact (SheafOfModules.toSheaf X.ringCatSheaf).epi_of_epi_map inferInstance
+  exact hls
 
 end AlgebraicGeometry.Scheme.Modules

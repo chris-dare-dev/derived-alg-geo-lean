@@ -1278,6 +1278,27 @@ is not closed. -/
 #print axioms Scheme.Modules.isIso_fromTildeΓ_restrictBasicOpen_of_quasicoherentData
 #print axioms Scheme.Modules.moduleFinite_globalSections_of_generatingSections
 #print axioms Scheme.Modules.moduleFinite_globalSections_of_presentation
+
+-- Layer B stage 1, the CONVERSE direction (#586). moduleFinite_globalSections_of_generatingSections
+-- above takes a finite generating family to a finite module of global sections; these three take a
+-- finite module of global sections back to a finite free EPIMORPHISM, which is the direction
+-- Serre's global generation needs. Paired with GeneratingSections.ofFreeEpi the loop closes.
+--
+-- The mathematics is short: tilde is a left adjoint (tilde.adjunction) so it preserves colimits and
+-- hence epimorphisms, Finsupp.linearCombination is surjective exactly when the span is everything,
+-- and the two outer maps are isomorphisms. The cost was entirely elaboration, and both hazards are
+-- recorded on epi_freeEpiOfSpan because each was diagnosed wrongly the first time:
+--
+--   * a PreservesEpimorphisms instance left in context makes later instance searches diverge, and
+--     the heartbeat timeout is REPORTED as a plain "failed to synthesize" -- which reads like a
+--     missing instance, and was misread here as a structural defect in the X.Modules wrapper. It is
+--     not: IsIso -> Epi synthesizes fine in that wrapper, checked by compiling both forms.
+--   * backward.isDefEq.respectTransparency false is required, the same trap #585 recorded: without
+--     it the goal is "not type-correct under the instances transparency level" and every later rw
+--     silently fails to match.
+#print axioms Scheme.Modules.freeEpiOfSpan
+#print axioms Scheme.Modules.epi_freeEpiOfSpan
+#print axioms Scheme.Modules.exists_finite_free_epi_of_moduleFinite
 #print axioms Scheme.Modules.exists_basicOpen_finiteGenerating_cover
 #print axioms Scheme.Modules.moduleFinite_globalSections_of_isFiniteType
 #print axioms Scheme.Modules.moduleFinite_globalSections
