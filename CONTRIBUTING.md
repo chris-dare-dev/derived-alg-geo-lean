@@ -23,6 +23,21 @@ specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one
 milestone or provenance boundary.
 
+## Choose the common root before the leaf
+
+Read [the canonical-root policy](docs/architecture/abstraction-tree.md) before
+adding a public structure, class, quotient carrier, category, or parallel
+presentation of an existing object.  The pull request must name the canonical
+root and explain how the specialization projects or compares to it.
+
+Do not create a paper-specific or geometry-specific sibling of an existing
+generic object.  In particular, use Mathlib's `Preadditive`/`Linear` hierarchy,
+the repository's `GrothendieckPresentation` specializations, and the generic
+site/descent stack roots.  When two presentations are independently useful,
+prove their comparison and agreement instead of selecting one silently.  When
+an apparent unification is mathematically false, record the obstruction and
+keep the leaves separate.
+
 ## Proof and trust policy
 
 Committed library code must not use `sorry`, `admit`, or hidden axioms. Explicit
