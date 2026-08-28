@@ -893,6 +893,22 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Duality.Serre.Data.SurfacePicardSymmetry
 #print axioms AlgebraicGeometry.Duality.Serre.Data.SurfacePicardSymmetry.canonical
 #print axioms AlgebraicGeometry.Duality.Serre.Data.SurfacePicardSymmetry.k3
+
+-- Serre duality in its bilinear form, `Ext^i(E,F)ᵛ ≃ Ext^(n-i)(F, E ⊗ ω)`. Supplied data in the
+-- same idiom as `DerivedStatement` and `Data` above, and for the same upstream reason: the pin
+-- has no derived global sections into `D(k)`, no coherent `RHom`, no Grothendieck duality.
+-- `Data.duality` supplies only duality into `ω_X`; the bilinear form is what specialises at
+-- `E = F` on a surface with trivial canonical to `Ext²(E,E) ≃ Hom(E,E)ᵛ`, which is what
+-- Bridgeland's Lemma 5.1 runs on. The consequences below are proved from it, and reduce Lemma 5.1
+-- to `hom(E,E) = 1` for a stable sheaf -- simplicity, which this repository does not have.
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.finrank_eq
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.finrank_eq_of_trivialCanonical
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.finrank_top_eq_finrank_hom
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.eulerChar
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_eq
+#print axioms AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_le
 #print axioms Cohomology.FiniteCohomology
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic
 #print axioms Cohomology.FiniteCohomology.finrankSupport_subset_range
