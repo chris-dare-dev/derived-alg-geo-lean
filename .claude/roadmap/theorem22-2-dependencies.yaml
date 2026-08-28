@@ -18,11 +18,11 @@ stable_inputs:
 
 missing_infrastructure:
   - id: relative-category-base-change
-    status: missing
-    requirement: "Relative categories and compatible pullback functors"
+    status: partial
+    requirement: "Complete the existing relative categories and compatible geometric pullback functors; abstract TriangulatedFiberFamily and partial Dqc pullback layers already exist"
   - id: semiorthogonal-base-change
     status: missing
-    requirement: "Base-change compatibility for semiorthogonal decompositions and t-structures"
+    requirement: "Base-change compatibility for semiorthogonal decompositions and t-structures; generic-root work is tracked by projective-families-e3 (#852)"
   - id: relative-hn-geometry
     status: partial
     requirement: "Geometric realization of fiberwise HN data in the deformation argument"

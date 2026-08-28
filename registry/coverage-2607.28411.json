@@ -98,6 +98,105 @@
   ],
   "near_term_coordinates": [
     {
+      "id": "sec-2-scalar-base-change",
+      "sections": [2],
+      "part": "I",
+      "status": "target",
+      "tracking": ".claude/roadmap/projective-families.yaml#projective-families-e7",
+      "note": "Theorem 2.8 and Definitions 2.9/2.11: scalar extension and geometric stability. Target only; no coverage claim."
+    },
+    {
+      "id": "sec-3-stability-transfer",
+      "sections": [3],
+      "part": "I",
+      "status": "target",
+      "tracking": ".claude/roadmap/projective-families.yaml#projective-families-e7",
+      "note": "Definitions 3.1/3.6 and Propositions 3.3/3.8, followed by the geometric Bayer/cofiltration criteria. Target only; the separate §3.4 coordinate records the existing candidate mapping."
+    },
+    {
+      "id": "secs-4-6-absolute-projective-construction",
+      "sections": [4, 5, 6],
+      "part": "I",
+      "status": "target",
+      "tracking": ".claude/roadmap/projective-families.yaml#projective-families-m3",
+      "note": "The elliptic-power family, algebraic `(P¹)^n` seed, transfer to `P^n`, pullback to `X`, and embedding-independent distinguished component. Target only."
+    },
+    {
+      "id": "sec-7-complements",
+      "sections": [7],
+      "part": "I",
+      "status": "target",
+      "tracking": ".claude/roadmap/projective-families.yaml#projective-families-m5",
+      "note": "Mass-Hom bounds, tilt comparisons, and supported derived categories of vector-bundle total spaces. Target only."
+    },
+    {
+      "id": "sec-8-1-relative-perfect-moduli",
+      "sections": [8],
+      "subsection": "8.1",
+      "part": "II",
+      "status": "target",
+      "tracking": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/517",
+      "note": "Definitions 8.2 and 8.4--8.6: relative-perfect/universally-gluable objects, M_pug, and boundedness. Substantial repository infrastructure exists, but this coordinate remains target pending source-faithfulness review."
+    },
+    {
+      "id": "sec-8-2-relative-numerical-k",
+      "sections": [8],
+      "subsection": "8.2",
+      "part": "II",
+      "status": "target",
+      "tracking": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/851",
+      "note": "Definition 8.7 and Proposition 8.10: the relative numerical K-group and its pushforward/pullback functoriality. Target only."
+    },
+    {
+      "id": "secs-8-3-8-4-relative-stability",
+      "sections": [8],
+      "subsection": "8.3--8.4",
+      "part": "II",
+      "status": "target",
+      "tracking": ".claude/roadmap/projective-families.yaml#projective-families-e10",
+      "note": "HN structures over Dedekind bases, stable/semistable moduli subfunctors, Definition 8.17, and the relative deformation theorem. Target only."
+    },
+    {
+      "id": "sec-9-relative-transfer",
+      "sections": [9],
+      "part": "II",
+      "status": "target",
+      "tracking": ".claude/roadmap/projective-families.yaml#projective-families-e11",
+      "note": "Theorem 9.1: finite pullback and faithfully-flat pushforward of stability conditions over a base. Target only."
+    },
+    {
+      "id": "sec-10-projective-families-main-theorem",
+      "sections": [10],
+      "part": "II",
+      "status": "target",
+      "tracking": ".claude/roadmap/projective-families.yaml#projective-families-e12",
+      "note": "Propositions 10.1--10.2, Theorem 10.3, and Corollary 10.5. Target only."
+    },
+    {
+      "id": "sec-11-skyscrapers-bondal-orlov",
+      "sections": [11],
+      "part": "II",
+      "status": "target",
+      "tracking": ".claude/roadmap/projective-families.yaml#projective-families-e16",
+      "note": "Skyscraper-sheaf stability, its moduli interpretation, and Bondal--Orlov reconstruction. Target only."
+    },
+    {
+      "id": "appendix-a-inducing-t-structures-slicings",
+      "sections": ["A"],
+      "part": "III",
+      "status": "target",
+      "tracking": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/475",
+      "note": "Inducing t-structures and slicings. SF7 delivered substantial candidate infrastructure, but this coordinate remains target pending direct source review."
+    },
+    {
+      "id": "appendix-b-almost-disconnected",
+      "sections": ["B"],
+      "part": "III",
+      "status": "target",
+      "tracking": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/856",
+      "note": "Almost-disconnected morphisms, the filtration property, and the `(P¹)^n → P^n` quotient. Target only."
+    },
+    {
       "id": "sec-3-4-bayer-property",
       "sections": [3],
       "subsection": "3.4",
