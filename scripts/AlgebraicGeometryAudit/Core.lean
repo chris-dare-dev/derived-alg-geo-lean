@@ -2629,6 +2629,7 @@ boundary. -/
 #print axioms AlgebraicGeometry.Proj.associatedTensorTwistIso
 #print axioms AlgebraicGeometry.Proj.associatedTensorTwistAddIso
 #print axioms AlgebraicGeometry.Proj.tensorTwist_isCoherent
+#print axioms AlgebraicGeometry.Proj.twistingSheafTensorAddIso
 
 /-! ## Homogeneous elements as sections of the twist (#585 prerequisite)
 

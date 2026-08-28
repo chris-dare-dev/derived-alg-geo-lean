@@ -312,21 +312,16 @@ theorem tensorObj_twistingSheaf_isCoherent {I : Type u} (g : I → 𝒜 1) (d : 
   SheafOfModules.IsFinitePresentation.of_iso.{u}
     (tensorTwistIso 𝒜 𝓜 g d hg).symm (intShiftModule_isCoherent 𝒜 𝓜 g d hg hM)
 
-end General
-
 /-! ## The `tensorTwist` spelling
 
-`tensorTwist` is stated for a graded algebra over a base ring, which is where `Divisors/Tensor`'s
-machinery lands; the comparison above needs only the general graded setting. These are the same
-three results in the names `#584` uses. -/
+The same three results in the names `#584` uses. `tensorTwist F d` is by definition
+`tensorObj F (twistingSheaf 𝒜 d)`, so each is its counterpart above under a different name and in
+the same graded setting — they are kept only because `#584`'s deliverables are stated in the
+`tensorTwist` spelling.
 
-section GradedAlgebra
-
-variable {R A : Type u} [CommRing R] [CommRing A] [Algebra R A]
-variable (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜]
-variable {M σM : Type u} [AddCommGroup M] [Module A M]
-variable [SetLike σM M] [AddSubgroupClass σM M]
-variable (𝓜 : ℕ → σM) [SetLike.GradedSMul 𝒜 𝓜]
+Both spellings live in the general graded setting. `Divisors/Tensor.lean`'s machinery needs a
+locally free rank-one factor, which `TwistInvertible.lean` supplies for `O(d)`; it does not need
+`A` to be an algebra over a base ring, and nothing in the twist API uses such a structure. -/
 
 /-- **`F ⊗ O(d) ≅ F(d)` for `F = M̃`**, deliverable 2a of `#584`. -/
 noncomputable def associatedTensorTwistIso {I : Type u} (g : I → 𝒜 1) (d : ℤ)
@@ -350,6 +345,27 @@ theorem tensorTwist_isCoherent {I : Type u} (g : I → 𝒜 1) (d : ℤ)
       (tensorTwist 𝒜 (associatedSheaf 𝒜 𝓜) d) :=
   tensorObj_twistingSheaf_isCoherent 𝒜 𝓜 g d hg hM
 
-end GradedAlgebra
+/-- **`O(d) ⊗ O(e) ≅ O(d + e)`, on the tensor side.**
+
+`twistingSheafAddIso` is the graded-shift form, `sheafTwist 𝒜 (intShift 𝒜 d) e ≅ O(d + e)`. This is
+the same statement written through `tensorObj`, which is the form `#806` needs in order to hand
+`O(-N)` to `IsInvertible` as a tensor inverse of `O(N)`.
+
+It is four lines because the graded ring as a module over itself is the unit: recognise each
+`O(·)` as `(Ã)(·)` with `associatedSelfTensorTwistIso`, apply the comparison at `𝓜 = 𝒜`, and
+recognise the result back.
+
+Both factors are `O(·)` rather than an arbitrary `F`, so this does not contradict what
+`TensorTwist.lean` records about `F(d)(e) ≅ F(d + e)`: there the obstruction is a non-invertible
+outer factor, and here there is none. -/
+noncomputable def twistingSheafTensorAddIso {I : Type u} (g : I → 𝒜 1) (d e : ℤ)
+    (hg : Algebra.adjoin (𝒜 0) (Set.range fun j => (g j : A)) = ⊤) :
+    AlgebraicGeometry.Scheme.Modules.tensorObj (twistingSheaf 𝒜 d) (twistingSheaf 𝒜 e) ≅
+      twistingSheaf 𝒜 (d + e) :=
+  AlgebraicGeometry.Scheme.Modules.tensorObjIso
+      (associatedSelfTensorTwistIso 𝒜 d).symm (Iso.refl _) ≪≫
+    tensorTwistAddIso 𝒜 𝒜 g d e hg ≪≫ associatedSelfTensorTwistIso 𝒜 (d + e)
+
+end General
 
 end AlgebraicGeometry.Proj
