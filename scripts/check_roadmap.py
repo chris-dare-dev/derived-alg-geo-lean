@@ -111,6 +111,36 @@ RM07_OPEN_STATUSES = frozenset(
 RM06_KNOWN_GAPS: set[int] = set()
 
 
+def force_utf8_output():
+    """Make stdout and stderr able to carry the text this script prints.
+
+    Every finding below quotes a roadmap title, and roadmap titles contain
+    non-ASCII: superscripts in `O(n)` and `H^i`, arrows, dashes. On the
+    self-hosted Windows runner `sys.stdout` defaults to cp1252, so printing one
+    of those raises `UnicodeEncodeError` *inside* `fail`, and the gate dies with
+    a traceback instead of reporting the finding it had already made.
+
+    That is the worst failure mode a reporting gate has: the diagnosis is
+    correct, computed, and then thrown away in the act of displaying it. CI
+    shows a Python traceback about `charmap`, which names neither the rule that
+    fired nor the entry at fault.
+
+    `errors="replace"` rather than `strict`: a report that renders one character
+    as `?` is still a report, and no roadmap title is worth losing a finding
+    over.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:  # not a TextIOWrapper; nothing to fix
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+        except (ValueError, OSError):
+            # Already detached, or a stream that refuses reconfiguration. The
+            # gate is still worth running; only the rendering is at risk.
+            pass
+
+
 def fail(rule, detail):
     print(f"FAIL  {rule}  {detail}")
 
@@ -191,6 +221,7 @@ def fetch_open_milestones():
 
 
 def main(argv):
+    force_utf8_output()
     require_api = "--require-api" in argv
     rest = [a for a in argv if not a.startswith("--")]
     root = pathlib.Path(rest[0]).resolve() if rest else pathlib.Path(__file__).resolve().parent.parent
