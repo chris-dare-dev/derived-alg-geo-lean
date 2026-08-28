@@ -68,8 +68,12 @@ theorem saturation_eq_self {H : AddSubgroup A} (hH : H.NSMulSaturated) :
 /-- The quotient by the saturation of a subgroup. -/
 abbrev SaturatedQuotient (H : AddSubgroup A) := A ⧸ H.saturation
 
-/-- Quotienting by a saturated subgroup removes all additive torsion. -/
-instance saturatedQuotient_isAddTorsionFree (H : AddSubgroup A) :
+/-- Quotienting by a saturated subgroup removes all additive torsion.
+
+This is deliberately not a global instance: matching an arbitrary type against
+a quotient during unrelated typeclass searches is prohibitively expensive.
+Consumers can install it locally when needed. -/
+def saturatedQuotient_isAddTorsionFree (H : AddSubgroup A) :
     IsAddTorsionFree H.SaturatedQuotient where
   nsmul_right_injective n hn x y hxy := by
     induction x using Quotient.inductionOn with
