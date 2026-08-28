@@ -8,6 +8,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Polishchuk
 import DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower
 import DerivedAlgGeo.CategoryTheory.Triangulated.QuasiAbelian
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
+import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HomFiniteWitness
@@ -24,7 +25,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
 /-! # Triangulated categories
 
 The pretriangulated axioms with rotation only forward, t-structures, compact
-generation, Postnikov towers, strict morphisms,
+generation, Postnikov towers, strict morphisms, semiorthogonal sequences,
 extension closures, the Grothendieck group, Fourier--Mukai kernel functors, and
 stability conditions on triangulated categories.
 
