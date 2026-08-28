@@ -51,6 +51,7 @@ further work again, and is not begun here.
 * `offRange` and `preimage_eq_bot_of_le` — the open, and that it pulls back to nothing.
 * `subsingleton_of_isTerminal` — terminal objects of `AddCommGrpCat` have subsingleton carriers.
 * `subsingleton_stalk_pushforward` — the vanishing.
+* `stalkPushforward_naturality` — naturality in the presheaf, which Mathlib does not have.
 -/
 
 universe u
@@ -115,5 +116,34 @@ theorem subsingleton_stalk_pushforward (F : TopCat.Sheaf AddCommGrpCat.{u} X)
     congr 1
     exact Subsingleton.elim _ _
   rw [e1, e2]
+
+/-! ## Naturality of `stalkPushforward` -/
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- **`stalkPushforward` is natural in the presheaf.**
+
+Mathlib has `stalkPushforward.id` and `stalkPushforward.comp` — naturality in the *space* — but
+not this, naturality in the *presheaf*, which is what a stalkwise argument about a morphism of
+sheaves needs.
+
+**Both `set_option`s are load-bearing.** Without them `(pushforward C f).obj F` is a
+`Presheaf C Y`, which is not *reducibly* the functor category `(Opens Y)ᵒᵖ ⥤ C`, and every rewrite
+fails with an application type mismatch rather than a missing-pattern error. The pair is exactly
+what Mathlib itself puts on `stalkPushforward.id` and `stalkPushforward.comp` two declarations
+above the result this one sits beside; it is not a workaround invented here.
+
+They also change how dot-notation resolves: under them `F.stalkPushforward` in *tactic* position
+looks for `Functor.stalkPushforward` and fails, so a consumer must write
+`TopCat.Presheaf.stalkPushforward` in full. The statement below still uses dot-notation because
+the options apply to elaboration of the proof, not of the signature. -/
+theorem stalkPushforward_naturality (F G : X.Presheaf AddCommGrpCat.{u}) (T : F ⟶ G) (x : X) :
+    (stalkFunctor AddCommGrpCat.{u} (f x)).map ((Presheaf.pushforward _ f).map T) ≫
+        G.stalkPushforward _ f x
+      = F.stalkPushforward _ f x ≫ (stalkFunctor AddCommGrpCat.{u} x).map T := by
+  refine stalk_hom_ext _ fun U hU => ?_
+  rw [← Category.assoc, stalkFunctor_map_germ, Category.assoc, stalkPushforward_germ,
+    ← Category.assoc, stalkPushforward_germ, stalkFunctor_map_germ]
+  rfl
 
 end DerivedAlgGeo.Topology

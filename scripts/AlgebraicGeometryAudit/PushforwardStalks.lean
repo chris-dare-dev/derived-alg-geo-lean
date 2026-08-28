@@ -14,3 +14,4 @@ The half of the stalkwise picture Mathlib does not have. The other half, on the 
 #print axioms DerivedAlgGeo.Topology.preimage_eq_bot_of_le
 #print axioms DerivedAlgGeo.Topology.subsingleton_of_isTerminal
 #print axioms DerivedAlgGeo.Topology.subsingleton_stalk_pushforward
+#print axioms DerivedAlgGeo.Topology.stalkPushforward_naturality
