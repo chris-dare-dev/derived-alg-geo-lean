@@ -22,6 +22,14 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteExactTower.toTop
 #print axioms CategoryTheory.FiniteExactTower.toTop_last
 #print axioms CategoryTheory.FiniteExactTower.inclusion_toTop
+#print axioms CategoryTheory.FiniteExactTower.gradedObjects
+#print axioms CategoryTheory.FiniteExactTower.prepend
+#print axioms CategoryTheory.FiniteExactTower.prepend_length
+#print axioms CategoryTheory.FiniteExactTower.append
+#print axioms CategoryTheory.FiniteExactTower.append_length
+#print axioms CategoryTheory.FiniteExactTower.append_gradedObjects
+#print axioms CategoryTheory.FiniteExactTower.appendInitialIso
+#print axioms CategoryTheory.FiniteExactTower.appendTerminalIso
 #print axioms CategoryTheory.FiniteExactTower.map
 #print axioms CategoryTheory.FiniteExactTower.map_length
 #print axioms CategoryTheory.FiniteExactTower.map_object
