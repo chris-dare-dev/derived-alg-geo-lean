@@ -39,25 +39,45 @@ Public declarations belong in the appropriate hand-maintained axiom audit:
 The completeness ratchet rejects growth in unaudited public declarations. When
 the ratchet improves, lower its ceiling; never raise one to make a change pass.
 
+## Where verification runs
+
+**Full verification runs on the self-hosted Windows runners, not on your
+machine.** `.github/workflows/ci.yml` routes `push` and `workflow_dispatch` to
+`["self-hosted", "owner-win"]` and triggers on `agent/**`, so pushing an agent
+branch already runs the whole gate there. For a verdict without pushing:
+
+```bash
+gh workflow run ci.yml --ref <branch>
+```
+
+This is enforced rather than advised. A `PreToolUse` hook in the tracked
+`.claude/settings.json` runs `scripts/check_local_build.py`, which refuses
+`scripts/gates.sh` in any mode and refuses `lake build` with no target.
+`DAG_ALLOW_LOCAL_BUILD=1` overrides it for one command; say so in the pull
+request when you use it.
+
+This section previously read "Build the stable root while developing:
+`lake build`", and told you to run the fast gate before review and the full gate
+before merge. All three instructions are withdrawn. `CLAUDE.md` was corrected
+first, in `c91374a`, and this file was left behind — so for a while the two
+disagreed about the most basic question a contributor asks. `CLAUDE.md`
+§"Required verification" is the fuller statement; this is the short form.
+
 ## Local workflow
 
-Build the stable root while developing:
+Build only what you changed, and probe freely:
 
 ```bash
-lake build
+LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
+lake env lean scratch.lean
 ```
 
-Run the fast gate before requesting review:
+`lake env lean` on a scratch file is deliberately unrestricted: it is the
+seconds-long probe interactive proof work depends on, and a push per attempt
+would make writing a lemma impractical.
 
-```bash
-scripts/gates.sh fast
-```
-
-Run the full gate before merge:
-
-```bash
-scripts/gates.sh
-```
+`scripts/gates.sh` remains the definition of what CI runs — read it to know what
+will be checked — but let the runners run it.
 
 The full gate includes:
 
@@ -106,5 +126,6 @@ lake build DerivedAlgGeo:docs
 
 Structural changes must update imports, umbrellas, audit names, registry
 bindings, source-independence checks, documentation, and CI paths in the same
-change. A move is complete only when `scripts/gates.sh` passes from a clean
-checkout.
+change. A move is complete only when CI passes on the pushed branch from a clean
+checkout — not when a local `scripts/gates.sh` goes green, which is neither
+permitted here nor sufficient.

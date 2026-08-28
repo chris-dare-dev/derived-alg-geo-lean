@@ -200,4 +200,70 @@ theorem im_charge_nonpos_of_mem_hnFree
 
 end MukaiWeakSlopeCompat
 
+/-! ## Inhabitants
+
+`MukaiWeakSlopeCompat` asserted a compatibility without exhibiting anything satisfying it, which
+is the shape `scripts/check_single_instantiation.py` exists to catch: an abstraction written for
+N cases and instantiated zero times.  These are the constructions that discharge it.
+
+The content is that the two fields constrain only the **first two** components of the Mukai
+class.  The third — `ch₂ + r` on a surface — is free, and is carried here as an arbitrary
+additive `s`, which is why it appears as a parameter rather than being pinned to zero.  A
+polarisation vector `v` normalised by `b ω v = 1` is exactly what turns the `ω`-degree of the
+`c₁` slot into the degree. -/
+
+namespace WeakSlopeData
+
+variable (S : WeakSlopeData A)
+
+/-- The `c₁` slot of the Mukai class built from a weak slope datum: the degree, scaled into a
+chosen direction `v`. -/
+def c₁Hom (v : V) : K₀Ab A →+ V :=
+  AddMonoidHom.mk' (fun x => ((S.degreeHom x : ℝ)) • v) (by
+    intro a b
+    simp only [map_add, Int.cast_add, add_smul])
+
+@[simp]
+theorem c₁Hom_apply (v : V) (x : K₀Ab A) :
+    S.c₁Hom v x = ((S.degreeHom x : ℝ)) • v := rfl
+
+/-- **A Mukai class map built from a weak slope datum**: rank in the first slot, the degree
+scaled into `v` in the second, and an arbitrary additive `s` in the third. -/
+def toMukaiChargeData (v : V) (s : K₀Ab A →+ ℝ) : MukaiChargeData A V where
+  mukai := ((Int.castAddHom ℝ).comp S.rankHom).prod ((S.c₁Hom v).prod s)
+
+@[simp]
+theorem toMukaiChargeData_mukai (v : V) (s : K₀Ab A →+ ℝ) (x : K₀Ab A) :
+    (S.toMukaiChargeData v s).mukai x =
+      (((S.rankHom x : ℝ)), ((S.degreeHom x : ℝ)) • v, s x) := rfl
+
+end WeakSlopeData
+
+namespace MukaiWeakSlopeCompat
+
+/-- **The compatibility is inhabited.**
+
+Given a weak slope datum and a direction `v` normalised against the polarisation by
+`b ω v = 1`, the Mukai class map of `WeakSlopeData.toMukaiChargeData` is compatible with it.
+The third component is arbitrary, which is the point: the two fields say nothing about it. -/
+theorem ofWeakSlopeData (S : WeakSlopeData A) (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (ω v : V)
+    (hv : b ω v = 1) (s : K₀Ab A →+ ℝ) :
+    MukaiWeakSlopeCompat (S.toMukaiChargeData v s) S b ω where
+  rank_eq _ := rfl
+  degree_eq E := by
+    rw [WeakSlopeData.toMukaiChargeData_mukai, map_smul, hv, smul_eq_mul, mul_one]
+
+/-- **The curve case is inhabited too**, through `SlopeData.toWeakSlopeData`.
+
+A second instantiation, at a different hypothesis class: `SlopeData` carries
+`degree_pos_of_rank_zero`, the curve condition, and forgets to a `WeakSlopeData` by weakening it
+to `0 ≤`.  So everything proved from `MukaiWeakSlopeCompat` applies on a curve as well as on a
+surface, and neither case is the only one. -/
+theorem ofSlopeData (D : SlopeData A) (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (ω v : V)
+    (hv : b ω v = 1) (s : K₀Ab A →+ ℝ) :
+    MukaiWeakSlopeCompat (D.toWeakSlopeData.toMukaiChargeData v s) D.toWeakSlopeData b ω :=
+  ofWeakSlopeData D.toWeakSlopeData b ω v hv s
+
+end MukaiWeakSlopeCompat
+
 end CategoryTheory.Triangulated

@@ -1390,6 +1390,22 @@ skyscraper. This is still **not** Lemma 6.2, which is about the tilted heart. -/
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.rank_eq_zero_of_im_eq_zero_of_mem_hnTors
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_nonpos_of_mem_hnFree
 
+/-! ### The compatibility is inhabited
+
+`MukaiWeakSlopeCompat` asserted a compatibility and nothing satisfied it, which
+`check_single_instantiation.py` flags and which was disclosed in #815 as a real gap. These are
+the constructions that close it: the two fields constrain only the rank and the `ω`-degree, so a
+weak slope datum plus a direction normalised by `b ω v = 1` supplies one, with the third Mukai
+component left free. `ofSlopeData` is the same at the curve hypothesis class, through
+`SlopeData.toWeakSlopeData`. -/
+
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.c₁Hom
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.c₁Hom_apply
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.toMukaiChargeData
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.toMukaiChargeData_mukai
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.ofWeakSlopeData
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.ofSlopeData
+
 /-! ## `extendMap`, bundled
 
 The Mukai-lattice leg of the charge chain was additive and unbundled like the numerical leg.

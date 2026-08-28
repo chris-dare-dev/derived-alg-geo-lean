@@ -17,6 +17,7 @@ import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.KernelUnitCon
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.KernelAdjunction
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.KernelDualizingTwist
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.KernelSwap
+import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.KernelComposition
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.Dqc
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.Dqc.Affine
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.Dqc.AffineDerivedEquivalence
