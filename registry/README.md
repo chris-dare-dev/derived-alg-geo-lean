@@ -39,11 +39,13 @@ the owner; agents propose it only by PR carrying the evidence fields.
 ## The 2607.28411v1 coverage map — zero-claim skeleton
 
 `coverage-2607.28411.json` pins arXiv:2607.28411**v1** (Li–Liu–Liu–Macrì–
-Perry–Stellari–Zhao) for issue #211 (transferred from source issue #141). Every part and its §3.4 near-term
-coordinate is `target`: candidate declarations on a branch do not promote a
-coordinate. The landing PR may propose §3.4 `target → mapped` only with the
-evidence object required by the validator; that status would still be only a
-candidate mapping, not a source-faithfulness or coverage verdict. Validate it
+Perry–Stellari–Zhao) for issue #211 (transferred from source issue #141).
+Section 3.4 has a `mapped` candidate binding with its required evidence; all
+other coordinates remain `target`. Neither status is theorem coverage. The
+dependency and issue workflow lives in
+`.claude/roadmap/projective-families.yaml`; the coverage map remains the
+version-pinned source ledger and is never inferred from roadmap progress.
+Validate it
 with:
 
 ```sh
