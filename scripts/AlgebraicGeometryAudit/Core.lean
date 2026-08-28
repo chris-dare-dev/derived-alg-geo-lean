@@ -1757,6 +1757,30 @@ not functions. -/
 
 #print axioms AlgebraicGeometry.Scheme.Modules.tmulSection
 #print axioms AlgebraicGeometry.Scheme.Modules.smul_tmulSection
+
+-- The CONVERSE of tmulSection, for #586. tmulSection's docstring warns it is "a map INTO the
+-- sections, not a description of them", and globally that is right. Locally it is a description:
+-- exists_eq_sum_tmulSection says a section of the sheafified tensor is, near every point, a finite
+-- sum of pure tensors.
+--
+-- It can only live in Picard.lean, and that is the point. The monoidal structure on
+-- X.PresheafOfModules is a local instance there and associatedSheaf is a private abbrev, so no
+-- consumer can write t (x)t y, name M' (x) N', or say "this section comes from the presheaf tensor"
+-- at all -- confirmed by compiling the attempt outside, where the tensor notation does not even
+-- parse. Anything that has to take a section of M (x) N apart must be handed this from inside.
+--
+-- Three facts, none of them reachable from outside: the sheafification unit is locally surjective,
+-- so the section has a preimage in the presheaf tensor near the point; TensorProduct.exists_finset
+-- writes that preimage as a finite sum of pure tensors; and the unit's component is additive, which
+-- turns the sum into a sum of tmulSections by the definition of tmulSection.
+--
+-- isLocallySurjective_sheafificationUnit is stated separately because instance search does not find
+-- it. All three of HasWeakSheafify, HasSheafCompose and PreservesSheafification synthesize for this
+-- site, and the composite goal still does not; rewriting the unit to toSheafify (which it IS, by
+-- rfl) and applying Mathlib's instance explicitly is what closes it. An instance-search failure is
+-- not evidence that a fact is missing.
+#print axioms AlgebraicGeometry.Scheme.Modules.isLocallySurjective_sheafificationUnit
+#print axioms AlgebraicGeometry.Scheme.Modules.exists_eq_sum_tmulSection
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitRight_inv_tensorHom_app
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorCommIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorTripleAssocIso
