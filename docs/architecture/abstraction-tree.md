@@ -50,6 +50,10 @@ Category
 └─ Sites / descent / stacks in groupoids
    └─ scheme-site realizations
 
+Algebra
+└─ saturation of an additive subgroup
+   └─ saturated quotient and torsion-free universal property
+
 AlgebraicGeometry
 ├─ scheme-derived category
 │  ├─ Dqc
@@ -57,7 +61,7 @@ AlgebraicGeometry
 │  └─ perfect / relative-perfect loci
 ├─ numerical K-theory
 │  └─ Euler quotient
-│     └─ relative numerical quotient
+│     └─ relative numerical quotient              uses Algebra root
 ├─ moduli
 │  ├─ replete subprestack
 │  ├─ boundedness witness
@@ -74,6 +78,9 @@ particular:
 - do not add a coherent, derived, dg, projective-space, or relative sibling of
   the Grothendieck group presentation; specialize the canonical presentation
   and prove comparison maps;
+- keep quotient mechanics such as additive-subgroup saturation in `Algebra`;
+  the relative numerical leaf supplies only its fibre groups and geometric
+  relation generators;
 - generic stacks, replete subprestacks, boundedness, and presentation data do
   not import stability-condition modules;
 - a paper-specific module may instantiate these roots but never becomes a root
