@@ -1,0 +1,29 @@
+/-
+Semiorthogonal-decomposition slice of the StabilityCondition audit.  The source is generic
+triangulated category theory; this audit owns it alongside the other generic triangulated roots.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
+
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.total
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.component_le_total
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.hom_eq_zero
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.HasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsFull
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsStronglyFull
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsStronglyFull.isFull
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.map
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.map_component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.reindex
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.reindex_component
+#print axioms CategoryTheory.Limits.productHasZeroMorphisms
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.single
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.single_component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.single_total
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.single_isStronglyFull
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.single_isFull
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.productComponent
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.productComponent_zero
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.productComponent_one
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.product
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.product_component
