@@ -877,6 +877,10 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Duality.Serre.DerivedStatement.linearDualShift
 #print axioms AlgebraicGeometry.Duality.Serre.DerivedStatement.dualizingObject
 #print axioms AlgebraicGeometry.Duality.Serre.DerivedStatement.canonicalShiftIso
+-- The `HasExt` witness `Bilinear.lean` supplies before `BilinearData`. Named rather than
+-- anonymous so that this record does not point at a generated `_1` suffix; the sibling in
+-- `Cohomology.lean` predates the convention and sits in `audit_missing_baseline.txt`.
+#print axioms AlgebraicGeometry.Duality.Serre.hasExtCohBilinear
 #print axioms AlgebraicGeometry.Duality.Serre.Data
 #print axioms AlgebraicGeometry.Duality.Serre.Data.coherentDualityEquiv
 #print axioms AlgebraicGeometry.Duality.Serre.Data.pairing
