@@ -25,6 +25,10 @@ Never add imports or namespaces rooted at `CohLean`, `DGLean`, or
 ## Editing rules
 
 - Prefer the narrowest import and the nearest umbrella.
+- Before introducing a public structure, class, quotient carrier, or category,
+  follow `docs/architecture/abstraction-tree.md`: reuse one canonical root and
+  make specializations reach it by an instance, projection, abbreviation, or
+  proved comparison.
 - Use Mathlib's namespace for extensions of an existing Mathlib API.
 - Keep generic layers independent of specialized geometric applications.
 - Preserve explicit trust boundaries; do not use `sorry`, `admit`, or a hidden

@@ -9,7 +9,7 @@ import Mathlib.CategoryTheory.Comma.StructuredArrow.Basic
 import Mathlib.CategoryTheory.Core
 import Mathlib.CategoryTheory.Groupoid.Discrete
 import Mathlib.CategoryTheory.Sites.EffectiveEpimorphic
-import DerivedAlgGeo.AlgebraicGeometry.Stacks.Basic
+import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids
 
 /-!
 # Discrete and representable stacks

@@ -366,6 +366,59 @@ noncomputable def geometricActStabOfDual
   (geometricKernelAutoequivalenceOfAdjoint X Z σ p q K).actStabOfDual v
     (geometricDualKernelOfAdjoint X Z σ p q K) lam hlam s
 
+/-! ### Into the group, not merely into a map
+
+`geometricActStabOfDual` is a *function* on stability conditions.
+`Stability/ClassMap.lean` builds a genuine `Group` — `GroupAction.AutPairQuot v`
+— acting on `WithClassMap C v`, and "the transform transports" and "the
+transform is an element of the group that acts" are different claims. The
+abstract file makes the point and proves the second for a `KernelAutoequivalence`
+with a `DualKernel`; both are now available geometrically, so the geometric side
+reaches the group too.
+
+The strengthening over `actStabOfDual` is `lam`'s **invertibility**, and it is a
+real hypothesis rather than repackaging: a geometric kernel autoequivalence with
+a non-invertible compatible `lam` still transports stability conditions, it just
+is not a member of this group. -/
+
+/-- **A geometric kernel autoequivalence is an element of the acting group.**
+
+`KernelAutoequivalence.toAutPair` at the geometric autoequivalence and its
+derived dual kernel, with the compatibility stated against the *constructed*
+dual kernel `Rσ_*(K^∨ ⊗ ω_q)` rather than an opaque `K₀.map`. -/
+noncomputable def geometricToAutPair
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)]
+    {Λ : Type u} [AddCommGroup Λ]
+    (v : K₀ (SchemeBoundedCoherentDerivedCategory X.left) →+ Λ)
+    (lam : Λ ≃+ Λ)
+    (hlam : ∀ x, v ((geometricCorrespondence X X Z p q).transformK₀
+        (geometricDualKernelObj X Z σ q K) x) = lam (v x)) :
+    GroupAction.AutPair v :=
+  (geometricKernelAutoequivalenceOfAdjoint X Z σ p q K).toAutPair v
+    (geometricDualKernelOfAdjoint X Z σ p q K) lam hlam
+
+/-- **The group element acts by the transport it came from.**
+
+At the quotient, where the `MulAction` actually lives. `rfl`, as in the abstract
+file — but worth stating for the same reason it was worth stating there: the
+transported stability condition is the image of `σ` under a group element, not
+merely the value of a map. -/
+theorem geometricMk_toAutPair_smul
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
+    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)]
+    {Λ : Type u} [AddCommGroup Λ]
+    (v : K₀ (SchemeBoundedCoherentDerivedCategory X.left) →+ Λ)
+    (lam : Λ ≃+ Λ)
+    (hlam : ∀ x, v ((geometricCorrespondence X X Z p q).transformK₀
+        (geometricDualKernelObj X Z σ q K) x) = lam (v x))
+    (s : StabilityCondition.WithClassMap
+      (SchemeBoundedCoherentDerivedCategory X.left) v) :
+    GroupAction.AutPairQuot.mk (geometricToAutPair X Z σ p q K v lam hlam) • s =
+      geometricActStabOfDual X Z σ p q K v lam.toAddMonoidHom
+        (fun x => hlam x) s :=
+  rfl
+
 end DualKernel
 
 end CategoryTheory.Triangulated.StabilityCondition.Families

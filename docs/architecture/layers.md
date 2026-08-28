@@ -44,6 +44,38 @@ graph from every tracked library import, rejects cycles and forbidden reverse
 edges, and verifies that the relocated geometric family modules do not return
 to their former owner.
 
+## AlgebraicGeometry sublayers
+
+The top-level graph alone cannot distinguish a reusable moduli root from a
+Bridgeland-family adapter because both collapse to `AlgebraicGeometry`. The
+finer direction is:
+
+```text
+StabilityCondition/Families
+  └→ Moduli / Stacks
+       ├→ AlgebraicGeometry/DerivedCategory   planned neutral scheme seam
+       └→ CategoryTheory/Sites               generic descent and stacks
+```
+
+`CategoryTheory/Sites/StackInGroupoids.lean` is the canonical module for the
+generic groupoid-valued stack extension. Its declaration namespace remains
+`AlgebraicGeometry` for source compatibility, and
+`AlgebraicGeometry/Stacks/Basic.lean` reexports the new owner for clients of
+the former import path. Scheme-specific representability and presentation
+data remain below `AlgebraicGeometry/Stacks`.
+
+Scheme-derived `Dqc`, derived pullback, and their preservation theorems
+currently live below `StabilityCondition/Families` while issues #721 and #554
+are active. Their intended neutral owner is
+`DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/`; this issue records that
+direction without moving those active surfaces.
+
+The layering gate rejects new imports from `Moduli` or `Stacks` into
+`StabilityCondition/Families`. Six measured legacy imports are recorded as
+exact source/module pairs in `scripts/layering_reverse_edges.txt`. The
+allowlist is a burn-down list: removing an underlying import requires removing
+its entry, and adding a new exception is not an accepted migration path.
+
 ## Migration compatibility
 
 The former CategoryTheory families umbrella mixed generic interfaces with
