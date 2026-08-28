@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Frac
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistSection
 
 /-!
@@ -100,17 +101,12 @@ theorem intShiftSectionLinearEquivOn_sectionOfMem {f g : A} (hf : f ∈ 𝒜 1) 
 
 /-- The degree-zero fraction `fⁿ / gⁿ` at a point of `D₊(g)`.
 
-Named rather than written inline: as an anonymous `HomogeneousLocalization.mk`
-the denominator submonoid is a metavariable when it appears under a `•`, and
-`Submonoid.pow_mem _ hx n` will not elaborate. Naming it pins the submonoid. -/
+`frac` at `a = fⁿ`, `b = gⁿ`, both of degree `n`. `#825` made this a definition rather than a
+second `HomogeneousLocalization.mk` with a `rfl` lemma bridging the two. -/
 noncomputable def fracPow {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1) (n : ℕ)
     {x : ProjectiveSpectrum 𝒜} (hx : x ∈ ProjectiveSpectrum.basicOpen 𝒜 g) :
     HomogeneousLocalization 𝒜 x.asHomogeneousIdeal.toIdeal.primeCompl :=
-  HomogeneousLocalization.mk
-    { deg := n
-      num := ⟨f ^ n, by simpa using SetLike.pow_mem_graded n hf⟩
-      den := ⟨g ^ n, by simpa using SetLike.pow_mem_graded n hg⟩
-      den_mem := Submonoid.pow_mem _ hx n }
+  frac 𝒜 (pow_mem_deg 𝒜 hf n) (pow_mem_deg 𝒜 hg n) (basicOpen_le_basicOpen_pow 𝒜 g n hx)
 
 /-- **Rescaling the section `gⁿ` of `O(n)` by `fⁿ/gⁿ` gives the section `fⁿ`.**
 
@@ -127,7 +123,7 @@ theorem fracPow_smul_sectionOfMem {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜
     fracPow 𝒜 hf hg n (hU x.2) •
         (sectionOfMem 𝒜 𝒜 U n (by simpa using SetLike.pow_mem_graded n hg)).1 x =
       (sectionOfMem 𝒜 𝒜 U n (by simpa using SetLike.pow_mem_graded n hf)).1 x := by
-  rw [sectionOfMem_apply, sectionOfMem_apply, fracPow, DegreeZeroLocalization.mk_smul_mk]
+  rw [sectionOfMem_apply, sectionOfMem_apply, fracPow, frac, DegreeZeroLocalization.mk_smul_mk]
   apply DegreeZeroLocalization.ext
   simp only [DegreeZeroLocalization.coe_mk, NumDenSameDeg.embedding, smul_eq_mul, mul_one]
   rw [LocalizedModule.mk_eq]

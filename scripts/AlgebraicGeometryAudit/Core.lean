@@ -2788,32 +2788,24 @@ reaches #585 on sections instead, and these three have no consumer. -/
 #print axioms AlgebraicGeometry.Proj.chartFracPowOn
 #print axioms AlgebraicGeometry.Proj.chartTwistBy_eq
 
-/-! ## The overlap comparison, on SECTIONS and on Proj itself (#585 step D core)
+/-! ## What twistBy does to a section (#585 step D core)
 
-twistBy_app is what twistBy does to a section -- the section-level counterpart of
-unitToTwist_app_one, one tensor up. Until tensorUnitRight_inv_tensorHom_app existed, nothing in the
-tree said what any part of twistBy does to a section, and twistBy was opaque at every use site.
+twistBy_app is the section-level counterpart of unitToTwist_app_one, one tensor up. Until
+tensorUnitRight_inv_tensorHom_app existed, nothing in the tree said what any part of twistBy does
+to a section, and twistBy was opaque at every use site.
 
-twistBy_app_eq_smul is the agreement #585's glue needs: over an open inside D+(g), twisting a
-section by f^n is twisting by g^n and scaling by f^n/g^n. It is stated on Proj DIRECTLY -- no
-restriction functor and no chart appear.
+The overlap comparison used to sit here too, as twistBy_app_eq_smul at f and g of degree one,
+with fracPowSection_smul_sectionOfMem as its step A. FracSection's twistBy_app_eq_smul' then
+proved the same thing for any two homogeneous elements of the same degree, which is what Glue.lean
+consumes; the degree-one pair kept no consumer and #825 removed it. Its records are removed with
+it rather than left pointing at nothing.
 
-That is the point of stating it here rather than deriving it from chartTwistBy_eq. The
-morphism-level route lives on the open subscheme, and turning its conclusion back into a statement
-about sections of F(n) on Proj would need restriction to commute with the sheafified tensor
-product. No such compatibility exists in this repository or in Mathlib. Carrying the comparison on
-sections from the start avoids needing it.
-
-The proof is three rewrites and no geometry: twistBy_app twice, smul_tmulSection to push the scalar
-onto the twist factor, and step A lifted to sections. The geometry was spent in #751.
-
-NOT here: the cover, the single exponent across it, and the gluing; those are Glue.lean, which
-closed #585. twistBy_app_eq_smul is superseded there by FracSection's twistBy_app_eq_smul', the
-same comparison for two homogeneous elements of the same degree. -/
+What made the degree-one version worth writing survives in the general one: it is stated on Proj
+DIRECTLY, with no restriction functor and no chart. The morphism-level route lives on the open
+subscheme, and turning its conclusion back into a statement about sections of F(n) on Proj would
+need restriction to commute with the sheafified tensor product, which nothing provides. -/
 
 #print axioms AlgebraicGeometry.Proj.twistBy_app
-#print axioms AlgebraicGeometry.Proj.fracPowSection_smul_sectionOfMem
-#print axioms AlgebraicGeometry.Proj.twistBy_app_eq_smul
 
 /-! ## Clearing a denominator on an affine (#585 chart-local engine)
 
@@ -2918,19 +2910,20 @@ twistBy (f^m * g_i^n) of the chart extension, and comparing two of those across 
 the fraction f^m g_j^n / g_i^(n+m). No power of a single element has that shape.
 
 frac and fracSection are a/b at a point of D+(b) and as a section over any open inside D+(b);
-fracPow and fracPowSection are the special case a = f^n, b = g^n, and the bridging lemma is rfl.
+fracPow and fracPowSection are the special case a = f^n, b = g^n. Since #825 they are
+DEFINED as that case rather than rebuilt alongside it, so the rfl bridge that used to relate
+them is gone: there is one construction with a specialisation, not two with a lemma between.
 
 frac_eq is the workhorse for the bookkeeping: two fractions with the same VALUE are the same
 element whatever degrees they are written in, so (f^d)^n from a chart's distinguished element and
 f^(d*n) from a twist need no transport between them.
 
-twistBy_app_eq_smul' is twistBy_app_eq_smul for two homogeneous elements of the same degree; the
+twistBy_app_eq_smul' is the overlap comparison for two homogeneous elements of the same degree; the
 older lemma is its a = f^n, b = g^n case. -/
 
 #print axioms AlgebraicGeometry.Proj.frac
 #print axioms AlgebraicGeometry.Proj.basicOpen_le_basicOpen_pow
 #print axioms AlgebraicGeometry.Proj.fracSection
-#print axioms AlgebraicGeometry.Proj.fracPowSection_eq_fracSection
 #print axioms AlgebraicGeometry.Proj.pow_mem_smul
 #print axioms AlgebraicGeometry.Proj.pow_mem_mul
 #print axioms AlgebraicGeometry.Proj.frac_eq
