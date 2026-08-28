@@ -62,6 +62,7 @@ AlgebraicGeometry
 ├─ numerical K-theory
 │  └─ Euler quotient
 │     └─ relative numerical quotient              uses Algebra root
+│        └─ family-relation system                 statement-layer adapter
 ├─ moduli
 │  ├─ replete subprestack
 │  ├─ boundedness witness
@@ -80,7 +81,9 @@ particular:
   and prove comparison maps;
 - keep quotient mechanics such as additive-subgroup saturation in `Algebra`;
   the relative numerical leaf supplies only its fibre groups and geometric
-  relation generators;
+  relation generators through the family-relation system; scheme connectivity
+  and relative perfection are proved by geometric inhabitants, not stored as
+  inert fields in the numerical root;
 - generic stacks, replete subprestacks, boundedness, and presentation data do
   not import stability-condition modules;
 - a paper-specific module may instantiate these roots but never becomes a root

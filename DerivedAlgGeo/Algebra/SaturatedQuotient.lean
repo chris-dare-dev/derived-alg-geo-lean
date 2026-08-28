@@ -73,7 +73,7 @@ abbrev SaturatedQuotient (H : AddSubgroup A) := A ⧸ H.saturation
 This is deliberately not a global instance: matching an arbitrary type against
 a quotient during unrelated typeclass searches is prohibitively expensive.
 Consumers can install it locally when needed. -/
-def saturatedQuotient_isAddTorsionFree (H : AddSubgroup A) :
+theorem saturatedQuotient_isAddTorsionFree (H : AddSubgroup A) :
     IsAddTorsionFree H.SaturatedQuotient where
   nsmul_right_injective n hn x y hxy := by
     induction x using Quotient.inductionOn with

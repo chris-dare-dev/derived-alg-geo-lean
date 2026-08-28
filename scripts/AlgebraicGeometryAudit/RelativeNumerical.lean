@@ -43,6 +43,15 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Relative
 #print axioms AlgebraicGeometry.Numerical.Relative.map_id
 #print axioms AlgebraicGeometry.Numerical.Relative.map_comp
 #print axioms AlgebraicGeometry.Numerical.Relative.hom_ext
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.relation
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.relations
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.relation_mem
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.RelativeGroup
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.pointClass
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.pointClass_eq
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.lift
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.lift_pointClass
 #print axioms AlgebraicGeometry.Numerical.Relative.singletonFold
 #print axioms AlgebraicGeometry.Numerical.Relative.singletonFold_of
 #print axioms AlgebraicGeometry.Numerical.Relative.singletonEquiv
