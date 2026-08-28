@@ -23,6 +23,16 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteExactTower.toTop_last
 #print axioms CategoryTheory.FiniteExactTower.inclusion_toTop
 #print axioms CategoryTheory.FiniteExactTower.gradedObjects
+#print axioms CategoryTheory.FiniteExactTower.take
+#print axioms CategoryTheory.FiniteExactTower.take_length
+#print axioms CategoryTheory.FiniteExactTower.take_gradedObjects
+#print axioms CategoryTheory.FiniteExactTower.takeInitialIso
+#print axioms CategoryTheory.FiniteExactTower.takeTerminalIso
+#print axioms CategoryTheory.FiniteExactTower.drop
+#print axioms CategoryTheory.FiniteExactTower.drop_length
+#print axioms CategoryTheory.FiniteExactTower.drop_gradedObjects
+#print axioms CategoryTheory.FiniteExactTower.dropInitialIso
+#print axioms CategoryTheory.FiniteExactTower.dropTerminalIso
 #print axioms CategoryTheory.FiniteExactTower.prepend
 #print axioms CategoryTheory.FiniteExactTower.prepend_length
 #print axioms CategoryTheory.FiniteExactTower.append
@@ -56,6 +66,9 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteFiltration.map_graded
 #print axioms CategoryTheory.FiniteFiltration.map_id
 #print axioms CategoryTheory.FiniteFiltration.map_comp
+#print axioms CategoryTheory.FiniteFiltration.spliceStep
+#print axioms CategoryTheory.FiniteFiltration.spliceStep_length
+#print axioms CategoryTheory.FiniteFiltration.spliceStep_gradedObjects
 #print axioms CategoryTheory.FiniteFiltration.pullbackObject
 #print axioms CategoryTheory.FiniteFiltration.pullbackInclusion
 #print axioms CategoryTheory.FiniteFiltration.pullbackInclusion_fst
@@ -71,6 +84,7 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteFiltration.pullbackTower_length
 #print axioms CategoryTheory.FiniteFiltration.pullbackTower_object
 #print axioms CategoryTheory.FiniteFiltration.pullbackTower_graded
+#print axioms CategoryTheory.FiniteFiltration.pullbackTower_gradedObjects
 #print axioms CategoryTheory.FiniteFiltration.pullbackTowerInitialKernelFork
 #print axioms CategoryTheory.FiniteFiltration.pullbackTowerInitialIsLimit
 #print axioms CategoryTheory.FiniteFiltration.pullbackTowerTerminalIso
@@ -78,3 +92,6 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteFiltration.refinementInitialIso
 #print axioms CategoryTheory.FiniteFiltration.refinementTerminalIso
 #print axioms CategoryTheory.FiniteFiltration.refinementInitialIso_hom_inclusion
+#print axioms CategoryTheory.FiniteFiltration.refineStep
+#print axioms CategoryTheory.FiniteFiltration.refineStep_length
+#print axioms CategoryTheory.FiniteFiltration.refineStep_gradedObjects

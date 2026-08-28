@@ -116,6 +116,77 @@ theorem inclusion_toTop (T : FiniteExactTower C) (i : Fin T.length) :
 def gradedObjects (T : FiniteExactTower C) : List C :=
   List.ofFn T.graded
 
+/-- The initial segment ending at a chosen stage of an exact tower. -/
+def take (T : FiniteExactTower C) (k : Fin (T.length + 1)) : FiniteExactTower C where
+  length := k.val
+  object j := T.object ⟨j.val, by omega⟩
+  inclusion j := T.inclusion ⟨j.val, by omega⟩
+  graded j := T.graded ⟨j.val, by omega⟩
+  projection j := T.projection ⟨j.val, by omega⟩
+  zero j := T.zero ⟨j.val, by omega⟩
+  shortExact j := T.shortExact ⟨j.val, by omega⟩
+
+@[simp]
+theorem take_length (T : FiniteExactTower C) (k : Fin (T.length + 1)) :
+    (T.take k).length = k.val :=
+  rfl
+
+@[simp]
+theorem take_gradedObjects (T : FiniteExactTower C) (k : Fin (T.length + 1)) :
+    (T.take k).gradedObjects = T.gradedObjects.take k.val := by
+  apply List.ext_get
+  · simp [gradedObjects, take]
+    omega
+  · intro n h₁ h₂
+    simp [gradedObjects, take]
+
+/-- The start of an initial segment agrees with the start of the original tower. -/
+noncomputable def takeInitialIso (T : FiniteExactTower C) (k : Fin (T.length + 1)) :
+    (T.take k).object 0 ≅ T.object 0 :=
+  eqToIso (congrArg T.object (by apply Fin.ext; rfl))
+
+/-- The end of an initial segment is its selected original stage. -/
+noncomputable def takeTerminalIso (T : FiniteExactTower C) (k : Fin (T.length + 1)) :
+    (T.take k).object (Fin.last (T.take k).length) ≅ T.object k :=
+  eqToIso (congrArg T.object (by apply Fin.ext; rfl))
+
+/-- The terminal segment beginning at a chosen stage of an exact tower. -/
+def drop (T : FiniteExactTower C) (k : Fin (T.length + 1)) : FiniteExactTower C where
+  length := T.length - k.val
+  object j := T.object ⟨k.val + j.val, by omega⟩
+  inclusion j := T.inclusion ⟨k.val + j.val, by omega⟩
+  graded j := T.graded ⟨k.val + j.val, by omega⟩
+  projection j := T.projection ⟨k.val + j.val, by omega⟩
+  zero j := T.zero ⟨k.val + j.val, by omega⟩
+  shortExact j := T.shortExact ⟨k.val + j.val, by omega⟩
+
+@[simp]
+theorem drop_length (T : FiniteExactTower C) (k : Fin (T.length + 1)) :
+    (T.drop k).length = T.length - k.val :=
+  rfl
+
+@[simp]
+theorem drop_gradedObjects (T : FiniteExactTower C) (k : Fin (T.length + 1)) :
+    (T.drop k).gradedObjects = T.gradedObjects.drop k.val := by
+  apply List.ext_get
+  · simp [gradedObjects, drop]
+  · intro n h₁ h₂
+    simp [gradedObjects, drop]
+
+/-- The start of a terminal segment is its selected original stage. -/
+noncomputable def dropInitialIso (T : FiniteExactTower C) (k : Fin (T.length + 1)) :
+    (T.drop k).object 0 ≅ T.object k :=
+  eqToIso (congrArg T.object (by apply Fin.ext; rfl))
+
+/-- The end of a terminal segment agrees with the end of the original tower. -/
+noncomputable def dropTerminalIso (T : FiniteExactTower C) (k : Fin (T.length + 1)) :
+    (T.drop k).object (Fin.last (T.drop k).length) ≅
+      T.object (Fin.last T.length) :=
+  eqToIso (congrArg T.object (by
+    apply Fin.ext
+    change k.val + (T.length - k.val) = T.length
+    omega))
+
 /-- Prepend one short exact step to an exact tower.
 
 This is the primitive from which endpoint-compatible towers are concatenated. Adding at the
@@ -384,6 +455,58 @@ theorem map_comp (F : FiniteFiltration C M) (G : C ⥤ D) [G.PreservesZeroMorphi
   cases F
   rfl
 
+/-- Replace one step of a filtration by an endpoint-compatible exact tower.
+
+The prefix and suffix come from the original filtration; the replacement tower supplies all
+steps between the adjacent coarse stages. This generic categorical operation is the common
+consumer of quotient pullback towers and does not depend on schemes or on the geometry of the
+graded pieces. -/
+noncomputable def spliceStep (F : FiniteFiltration C M) (i : Fin F.length)
+    (T : FiniteExactTower C)
+    (initialIso : T.object 0 ≅ F.object i.castSucc)
+    (terminalIso : T.object (Fin.last T.length) ≅ F.object i.succ) :
+    FiniteFiltration C M := by
+  let P := F.toFiniteExactTower.take i.castSucc
+  let S := F.toFiniteExactTower.drop i.succ
+  let leftSeam : P.object (Fin.last P.length) ≅ T.object 0 :=
+    (F.toFiniteExactTower.takeTerminalIso i.castSucc).trans initialIso.symm
+  let left := P.append T leftSeam
+  let rightSeam : left.object (Fin.last left.length) ≅ S.object 0 :=
+    ((P.appendTerminalIso T leftSeam).trans terminalIso).trans
+      (F.toFiniteExactTower.dropInitialIso i.succ).symm
+  let result := left.append S rightSeam
+  let startIso : F.object 0 ≅ result.object 0 :=
+    (((F.toFiniteExactTower.takeInitialIso i.castSucc).symm.trans
+      (P.appendInitialIso T leftSeam))).trans (left.appendInitialIso S rightSeam)
+  exact {
+    toFiniteExactTower := result
+    initialIsZero := IsZero.of_iso F.initialIsZero startIso.symm
+    terminalIso := ((left.appendTerminalIso S rightSeam).trans
+      (F.toFiniteExactTower.dropTerminalIso i.succ)).trans F.terminalIso }
+
+@[simp]
+theorem spliceStep_length (F : FiniteFiltration C M) (i : Fin F.length)
+    (T : FiniteExactTower C)
+    (initialIso : T.object 0 ≅ F.object i.castSucc)
+    (terminalIso : T.object (Fin.last T.length) ≅ F.object i.succ) :
+    (F.spliceStep i T initialIso terminalIso).length = F.length - 1 + T.length := by
+  simp only [spliceStep, FiniteExactTower.append_length]
+  dsimp only [FiniteExactTower.take, FiniteExactTower.drop]
+  change (i.val + T.length) + (F.length - (i.val + 1)) = F.length - 1 + T.length
+  omega
+
+@[simp]
+theorem spliceStep_gradedObjects (F : FiniteFiltration C M) (i : Fin F.length)
+    (T : FiniteExactTower C)
+    (initialIso : T.object 0 ≅ F.object i.castSucc)
+    (terminalIso : T.object (Fin.last T.length) ≅ F.object i.succ) :
+    (F.spliceStep i T initialIso terminalIso).toFiniteExactTower.gradedObjects =
+      F.toFiniteExactTower.gradedObjects.take i.val ++ T.gradedObjects ++
+        F.toFiniteExactTower.gradedObjects.drop (i.val + 1) := by
+  simp only [spliceStep, FiniteExactTower.append_gradedObjects,
+    FiniteExactTower.take_gradedObjects, FiniteExactTower.drop_gradedObjects]
+  simp only [Fin.val_castSucc, Fin.val_succ]
+
 end FiniteFiltration
 
 namespace FiniteFiltration
@@ -531,6 +654,11 @@ theorem pullbackTower_graded (i : Fin (F.pullbackTower p).length) :
     (F.pullbackTower p).graded i = F.graded i :=
   rfl
 
+@[simp]
+theorem pullbackTower_gradedObjects :
+    (F.pullbackTower p).gradedObjects = F.toFiniteExactTower.gradedObjects :=
+  rfl
+
 /-- The bottom inclusion of the pullback tower, regarded as a kernel fork for `p`. -/
 noncomputable def pullbackTowerInitialKernelFork : KernelFork p :=
   KernelFork.ofι (pullback.fst p (F.toObject 0)) (by
@@ -596,6 +724,28 @@ theorem refinementInitialIso_hom_inclusion :
   exact IsLimit.conePointUniqueUpToIso_hom_comp
     (R.pullbackTowerInitialIsLimit (F.projection i))
     (F.step_shortExact i).fIsKernel Limits.WalkingParallelPair.zero
+
+/-- Refine one graded quotient by pulling its filtration back to the adjacent coarse stages and
+splicing that exact tower into the original filtration. -/
+noncomputable def refineStep : FiniteFiltration C M := by
+  letI : Epi (F.projection i) := (F.step_shortExact i).epi_g
+  exact F.spliceStep i (R.pullbackTower (F.projection i))
+    (refinementInitialIso F i R) (refinementTerminalIso F i R)
+
+@[simp]
+theorem refineStep_length :
+    (refineStep F i R).length = F.length - 1 + R.length := by
+  letI : Epi (F.projection i) := (F.step_shortExact i).epi_g
+  simp [refineStep]
+
+@[simp]
+theorem refineStep_gradedObjects :
+    (refineStep F i R).toFiniteExactTower.gradedObjects =
+      F.toFiniteExactTower.gradedObjects.take i.val ++
+        R.toFiniteExactTower.gradedObjects ++
+          F.toFiniteExactTower.gradedObjects.drop (i.val + 1) := by
+  letI : Epi (F.projection i) := (F.step_shortExact i).epi_g
+  simp [refineStep]
 
 end StepRefinement
 
