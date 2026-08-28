@@ -1,0 +1,394 @@
+schema: roadmap/1
+slug: projective-families
+project: derived-alg-geo-lean
+title: "Projective families — meet arXiv:2607.28411 in the middle"
+status: active
+phase: sequenced
+brief: |
+  This track maps arXiv:2607.28411v1 onto the mathematics already present in
+  DerivedAlgGeo and starts only the missing, non-overlapping roots. The paper
+  is not a blank-slate moduli project: Appendix A, relative HN interfaces,
+  relative-perfect objects, a groupoid-valued moduli problem, Big-Zariski
+  stack data, boundedness witnesses, Quot presentations, and much of the
+  absolute stability foundation already exist.
+
+  The track has two trunks. The paper-critical trunk is classical:
+  relative-perfect and universally-gluable complexes lead to a groupoid-valued
+  moduli problem, open bounded semistable substacks, semistable reduction, and
+  good moduli. The dg-enhancement trunk is parallel, not a logical gate on the
+  paper. It meets the classical trunk at perfect complexes and negative Ext:
+  the future derived moduli object is expected to have a universally-gluable
+  one-truncated locus whose classical truncation is the existing moduli stack.
+
+  Every milestone follows `docs/architecture/abstraction-tree.md`. Shared
+  capabilities move upward before paper-specific leaves are added. No item
+  may introduce `KLinearCategory`, a sibling Grothendieck presentation, a
+  stability-owned generic stack, or a conclusion carried as a structure field.
+goal:
+  hmw: "How might we complete the prerequisites of arXiv:2607.28411 by joining its top-down construction to the repository's existing bottom-up roots, without producing a second category, K-group, derived category, or moduli hierarchy?"
+  objective: "Build the canonical relative numerical K-group, categorical transfer and semiorthogonal roots, neutral scheme-derived substrate, and classical moduli spine needed for Theorems 9.1 and 10.3; then assemble the absolute and relative projective-family constructions while the dg-derived enhancement proceeds independently."
+  key_results:
+    - "Definition 8.17 is represented by an inhabited geometric interface whose four conditions are theorems or explicit hypotheses at the correct layer."
+    - "The relative numerical K-group of Definition 8.7 is a saturated quotient of the canonical numerical K-theory spine and has the functoriality of Proposition 8.10."
+    - "Theorem 9.1 consumes one generic adjoint/exact transfer spine rather than separate absolute and relative copies."
+    - "The algebraic `(P¹)^n` seed, transfer to `P^n`, and pullback to projective `X` culminate in Theorems 6.2, 6.8, and 10.3."
+    - "The existing relative-perfect moduli work is completed through standard descent, algebraicity, semistable reduction, and good-moduli properness without overstating the current Big-Zariski presentation layer."
+    - "The dg enhancement has a proved classical derived seam, but no paper-critical milestone waits for derived moduli foundations."
+architecture_contract:
+  policy: "docs/architecture/abstraction-tree.md"
+  canonical_roots:
+    ordinary_linear: "Mathlib CategoryTheory.Preadditive and CategoryTheory.Linear"
+    dg_linear: "CategoryTheory.DGCategory plus DGLinear as a refinement"
+    grothendieck: "CategoryTheory.GrothendieckPresentation with K₀Ab, K₀, and K₀dg specializations"
+    stacks: "generic CategoryTheory.Sites/descent roots; AlgebraicGeometry supplies scheme-site leaves"
+    derived_geometry: "neutral AlgebraicGeometry derived-category modules; stability families are consumers"
+  required_review:
+    - "Name the canonical root and its neutral owning module."
+    - "Name two consumers or the statement-layer exception."
+    - "Provide a projection, instance, abbreviation, or proved comparison."
+    - "Prove agreement when the target already has an instance."
+    - "Record and retain counterexamples to false generalizations."
+  prohibited:
+    - "paper-specific roots imported by generic subjects"
+    - "parallel Grothendieck presentations or K-linear category hierarchies"
+    - "algebraicity, preservation, descent, boundedness, or properness represented by unproved conclusion fields"
+source:
+  work: "Li--Liu--Liu--Macrì--Perry--Stellari--Zhao, Stability conditions and moduli spaces on projective families"
+  arxiv: "2607.28411v1"
+  coverage_map: "registry/coverage-2607.28411.json"
+  pinned_pdf_sha256: "f8770154235fe2c82698513b4633b3ee509fa11f722190a4c9f573fca589a98c"
+evidence:
+  - "arXiv:2607.28411v1 §§2--11 and Appendices A--B."
+  - "arXiv:1902.08184v4 for relative stability, HN structures, boundedness, semistable reduction, and good-moduli inputs."
+  - "Mathlib pin and the measured repository surfaces recorded by the stability-families and dg-enhancements roadmaps."
+  - "ADR-0013 owns reusable moduli infrastructure in this monorepo."
+  - "The 2026-08-27 abstraction audit and numerical-k-theory roadmap record the Grothendieck-group failure and its repair."
+wont:
+  - "No claim that dg enhancements are a prerequisite of the paper as written."
+  - "No derived Artin-stack or Toën--Vaquié moduli construction before the required homotopical algebra exists."
+  - "No projectivity claim for good moduli spaces; §1.7 leaves it open."
+  - "No promotion of a coverage coordinate without the evidence and owner acceptance required by the coverage-map validator."
+  - "No forced unification of dimension-specific Chern-character formulas; the numerical roadmap already falsified that generalization."
+generated_by: { agent: codex, at: "2026-08-28" }
+generations:
+  - { rev: 1, at: "2026-08-28", note: "Track created from a read of the pinned v1 paper, the live main tree, open PRs, worktrees, and all existing roadmaps. PF1 materialized as milestone #33 with issues #850--#852. DG3 materialized separately as #853--#855 because it is a parallel trunk." }
+  - { rev: 2, at: "2026-08-28", note: "Implementation started in fresh non-overlapping worktrees for #850 (generic stack ownership) and #856 (Appendix B almost-disconnected morphisms). The relative numerical K-group #851 and semiorthogonal root #852 remain open research lanes." }
+  - { rev: 3, at: "2026-08-28", note: "The merged stack-root lane closed #850. Issue #851 then started with a neutral saturated-quotient root and the algebraic core of Definition 8.7: fiber sum, connected-family relation quotient, universal property, induced-map laws, and connected-family/one-fiber tests. The geometric fiber overlattices and eta specialization classes remain the next slice." }
+  - { rev: 4, at: "2026-08-28", note: "Issue #851 now packages admissible families as statement-layer comparison data over the same relative quotient root. Point-independence and its torsion-free universal property are inherited from the saturated quotient; the next geometric slice remains the fiber overlattice and eta specialization construction." }
+items:
+  - id: projective-families-m1
+    gh_milestone: 33
+    kind: milestone
+    title: "PF1 — Shared roots for projective families"
+    status: in_progress
+    lane: now
+    acceptance:
+      - "Generic stack-in-groupoids declarations live above scheme geometry, and a sublayer gate prevents moduli roots from importing stability-family leaves."
+      - "The relative numerical K-group is a quotient of the existing K-theory/numerical spine, with connected-family and one-fiber tests."
+      - "Semiorthogonal decomposition and exceptional-collection vocabulary has a generic categorical root with two inhabitants before the projective-family leaf consumes it."
+      - "Appendix B's almost-disconnected morphism and filtration property are geometric roots independent of the stability leaf."
+      - "DG3 proceeds on its own milestone; PF1 records the seam but does not block on it."
+      - "Zero sorries; relevant gates and runner verification are green."
+
+  - id: projective-families-e1
+    gh_issue: 850
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m1
+    title: "Move generic stack roots above scheme geometry"
+    status: complete
+    priority: must
+    size: L
+    summary: "Relocate the generic contents of AlgebraicGeometry/Stacks/Basic to a CategoryTheory/Sites owner, preserve scheme-site adapters, and add a shrinking-allowlist gate for the current Moduli-to-StabilityCondition/Families reverse imports. This is an ownership refactor, not a new stack theorem."
+    tags: [architecture, stacks, layering]
+    labels: [area:geometry, arch:layering, type:refactor, source:2607.28411]
+
+  - id: projective-families-e2
+    gh_issue: 851
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m1
+    title: "Relative numerical K-group on the canonical K-theory spine"
+    status: in_progress
+    priority: must
+    size: XL
+    summary: "The algebraic core of Definition 8.7 is active: a neutral saturation root now supports the fiber direct sum, a statement-layer family-relation system, quotient universal property, induced-map laws, point-independence, and the one-fiber test. Next construct the geometric fiber overlattices and eta specialization classes, then Proposition 8.10 functoriality. The uniformly numerical group and §10 image lattice are further quotients/images, never sibling K-groups."
+    tags: [k-theory, numerical, relative, prerequisite]
+    labels: [area:geometry, area:moduli, prerequisite, source:2607.28411]
+
+  - id: projective-families-e3
+    gh_issue: 852
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m1
+    title: "Semiorthogonal decompositions and exceptional-collection root"
+    status: planned
+    priority: must
+    size: XL
+    summary: "Build the generic categorical root used by the full strong exceptional collection on `(P¹)^n`, with trivial and product inhabitants before geometry and with base-change capabilities separated from their geometric realization."
+    tags: [semiorthogonal, exceptional-collection, research]
+    labels: [area:derived, area:stability, prerequisite, source:2607.28411]
+
+  - id: projective-families-e18
+    gh_issue: 856
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m1
+    title: "Almost-disconnected morphisms and the filtration property"
+    status: in_progress
+    priority: must
+    size: L
+    summary: "Formalize Appendix B in the neutral scheme-morphism hierarchy, including flat base change and the `(P¹)^n → P^n` quotient, then expose only an adapter to the stability-transfer leaf."
+    tags: [almost-disconnected, filtration, morphism-property]
+    labels: [area:geometry, prerequisite, source:2607.28411]
+
+  - id: projective-families-m2
+    gh_milestone: null
+    kind: milestone
+    title: "PF2 — Neutral derived geometry and classical moduli roots"
+    status: planned
+    lane: next
+    acceptance:
+      - "Dqc, bounded-coherent, perfect, relative-perfect, and derived-pullback modules have neutral AlgebraicGeometry owners; stability-family modules are adapters."
+      - "Replete subprestacks, boundedness witnesses, open substacks, and presentation data are generic roots consumed by perfect-complex moduli."
+      - "Arbitrary pullback preserves the universally-gluable relative-perfect locus with proved coherence and a nonflat example."
+      - "The active SF8/SF9 issues are consumed rather than duplicated."
+
+  - id: projective-families-e4
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m2
+    title: "Extract generic replete-subprestack and boundedness roots"
+    status: planned
+    priority: must
+    size: L
+    summary: "Generalize the reusable content now tied to RelativePerfectModuliSubproblem, FiniteTypeBoundednessWitness, and open Zariski presentations; perfect-complex names become thin specializations."
+    tags: [moduli, abstraction, boundedness]
+    labels: [area:moduli, arch:layering, type:refactor, source:2607.28411]
+
+  - id: projective-families-e5
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m2
+    title: "Neutral scheme-derived category and pullback spine"
+    status: blocked
+    priority: must
+    size: XL
+    summary: "Move the general Dqc/SchemeDerived/pullback substrate out of StabilityCondition/Families after coordinating with #528, #721--#723, and #554; retain compatibility reexports and do not disrupt active proofs."
+    tags: [dqc, derived-pullback, layering]
+    labels: [area:derived, area:geometry, blocked, source:2607.28411]
+    links:
+      issues: [528, 554, 721, 722, 723]
+      roadmaps: [stability-families]
+
+  - id: projective-families-e6
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m2
+    title: "Classical relative-perfect moduli stack to standard descent"
+    status: blocked
+    priority: must
+    size: XL
+    summary: "Complete arbitrary pullback, fppf or étale descent, the full M_pug diagonal and atlas, and honest open/bounded semistable substacks. Big-Zariski presentation data remains conservatively named until these theorems exist."
+    tags: [relative-perfect, algebraic-stack, descent]
+    labels: [area:moduli, blocked, source:2607.28411]
+    links:
+      issues: [516, 517, 522, 554]
+      roadmaps: [stability-families]
+
+  - id: projective-families-m3
+    gh_milestone: null
+    kind: milestone
+    title: "PF3 — Absolute construction on E^n, (P¹)^n, P^n, and X"
+    status: planned
+    lane: next
+    acceptance:
+      - "Theorems 4.2, 5.4, 5.6, 6.2, and 6.8 are connected by proved transfer maps."
+      - "The algebraic seed uses the generic exceptional-collection root and an actual finite-dimensional algebra realization."
+      - "Embedding independence is an agreement theorem over the common numerical root."
+
+  - id: projective-families-e7
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m3
+    title: "Absolute scalar base change and stability transfer"
+    status: planned
+    priority: must
+    size: XL
+    summary: "Finish §2 scalar extension/geometric stability and §3 finite pullback/proper faithfully-flat pushforward on the existing slicing/preimage/Bayer roots."
+    tags: [stability, base-change, transfer]
+    labels: [area:stability, source:2607.28411]
+
+  - id: projective-families-e8
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m3
+    title: "The algebraic `(P¹)^n` seed and transfer to projective space"
+    status: blocked
+    priority: must
+    size: XL
+    summary: "Build the §4 family on powers of an elliptic curve, identify the algebraic seed through the full strong exceptional collection, and push it through the finite quotients to `P^n`."
+    tags: [elliptic-curve, projective-space, exceptional-collection]
+    labels: [area:stability, blocked, source:2607.28411]
+
+  - id: projective-families-e9
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m3
+    title: "Pull the projective-space construction to projective schemes"
+    status: blocked
+    priority: must
+    size: XL
+    summary: "Use a closed projective presentation, finite-Tor pullback, and the canonical numerical image lattice to prove Theorems 6.2 and 6.8 without bundling a second projective variety or numerical K-group."
+    tags: [projective-scheme, closed-immersion, distinguished-component]
+    labels: [area:geometry, area:stability, blocked, source:2607.28411]
+    links:
+      issues: [572, 586]
+
+  - id: projective-families-m4
+    gh_milestone: null
+    kind: milestone
+    title: "PF4 — Relative stability and the main theorem"
+    status: planned
+    lane: later
+    acceptance:
+      - "Definition 8.17 and Theorem 8.19 consume the existing uniform-support, openness, relative-HN, and boundedness roots."
+      - "Theorem 9.1 is proved for the paper's finite/faithfully-flat hypotheses."
+      - "Propositions 10.1--10.2 and Theorem 10.3 assemble the projective-family construction over Setup 8.1 bases."
+      - "Theorem 1.1 is obtained from Theorems 6.2, 6.8, and 10.3 without an unproved global switch."
+
+  - id: projective-families-e10
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m4
+    title: "Relative stability over a base and deformation"
+    status: blocked
+    priority: must
+    size: XL
+    summary: "Assemble Definition 8.17, HN structures over Dedekind bases, the stable/semistable moduli subfunctors, and the relative deformation theorem on the canonical family interfaces."
+    tags: [relative-stability, hn, deformation]
+    labels: [area:families, blocked, source:2607.28411]
+
+  - id: projective-families-e11
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m4
+    title: "Relative transfer and the `(P¹_S)^n`/`P^n_S` construction"
+    status: blocked
+    priority: must
+    size: XL
+    summary: "Prove Theorem 9.1 and Propositions 10.1--10.2 from the absolute seed, relative K-theory, HN/moduli inputs, and the generic transfer spine."
+    tags: [relative-transfer, projective-family]
+    labels: [area:families, area:stability, blocked, source:2607.28411]
+
+  - id: projective-families-e12
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m4
+    title: "Theorem 10.3 and the distinguished projective-family component"
+    status: blocked
+    priority: must
+    size: XL
+    summary: "Pull from `P^n_S` to arbitrary flat projective `X/S`, construct the image lattice, prove embedding independence, and assemble Theorem 1.1 and Corollary 10.5."
+    tags: [main-theorem, projective-family, moduli]
+    labels: [area:families, area:geometry, blocked, source:2607.28411]
+
+  - id: projective-families-m5
+    gh_milestone: null
+    kind: milestone
+    title: "PF5 — Moduli consequences and complementary branches"
+    status: planned
+    lane: later
+    acceptance:
+      - "Mass-Hom bounds, tilt comparisons, supported total-space categories, and Bondal--Orlov reconstruction are separate consumers of the main spine."
+      - "Proper good moduli is proved only with the exact characteristic-zero and valuative hypotheses."
+      - "No projectivity claim is introduced."
+
+  - id: projective-families-e13
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m5
+    title: "Semistable reduction, quasi-properness, and good moduli"
+    status: blocked
+    priority: must
+    size: XL
+    summary: "Consume SF9's algebraic-stack result, relative HN/semistable reduction, and AHLH hypotheses to construct proper good moduli spaces in the supported characteristic-zero scope."
+    tags: [semistable-reduction, good-moduli, properness]
+    labels: [area:moduli, blocked, source:2607.28411]
+    links:
+      issues: [522, 524, 525]
+
+  - id: projective-families-e14
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m5
+    title: "Mass-Hom bounds and tilt-stability comparisons"
+    status: planned
+    priority: should
+    size: XL
+    summary: "Formalize Definition 7.1 and Theorem 7.5 on the mass root, then Propositions 7.6--7.7 as geometric leaf comparisons."
+    tags: [mass-hom, tilt-stability]
+    labels: [area:stability, source:2607.28411]
+
+  - id: projective-families-e15
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m5
+    title: "Supported derived categories of vector-bundle total spaces"
+    status: planned
+    priority: should
+    size: XL
+    summary: "Build the generic supported-derived-category and inducing-slicing inputs for Theorems 7.8--7.9 before specializing to total spaces and local Calabi--Yau examples."
+    tags: [supported-derived, vector-bundle, local-calabi-yau]
+    labels: [area:derived, area:geometry, source:2607.28411]
+
+  - id: projective-families-e16
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m5
+    title: "Skyscraper stability and Bondal--Orlov reconstruction"
+    status: planned
+    priority: should
+    size: XL
+    summary: "Construct the skyscraper-sheaf moduli leaf and prove Proposition 11.6 and Theorem 11.7 on the existing Fourier--Mukai/autoequivalence roots."
+    tags: [skyscraper, bondal-orlov, reconstruction]
+    labels: [area:geometry, area:stability, source:2607.28411]
+
+  - id: projective-families-m6
+    gh_milestone: null
+    kind: milestone
+    title: "PF6 — DG/classical moduli convergence"
+    status: parked
+    lane: later
+    acceptance:
+      - "This milestone never blocks PF1--PF5."
+      - "The derived-moduli foundations exist honestly before a derived stack is defined."
+      - "The universally-gluable locus is proved one-truncated and its classical truncation is compared with the classical relative-perfect stack."
+
+  - id: projective-families-e17
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m6
+    title: "Compare the dg-derived object moduli with the classical universally-gluable stack"
+    status: parked
+    priority: could
+    size: XL
+    summary: "Long-term Toën--Vaquié convergence: after spaces, derived affines, mapping stacks, and tangent complexes exist, prove negative Ext kills higher homotopy and compare the one-truncation with the Lieblich-style classical moduli stack."
+    tags: [dg-moduli, derived-stack, parked]
+    labels: [area:dg, area:moduli, parked]
+    links:
+      roadmaps: [dg-enhancements, stability-families]

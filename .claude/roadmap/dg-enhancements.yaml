@@ -100,6 +100,8 @@ generations:
   - { rev: 9, at: "2026-08-15", note: "DG2 epics filed as #376 (e5), #377 (e6), #378 (e7), each body written against a fresh measurement of mathlib_rev 520045ab rather than against the plan. Three results. (1) e2's summary claimed a shift on Hom-complexes that #343 never landed; the claim is corrected here and the work moves to e5. (2) Pretriangulated requires HasShift C ℤ, HasZeroObject and additivity of every shiftFunctor, and H0 C has only Preadditive -- that, not the six class fields, is e6's real cost, and it was invisible when e6 was sized XL. (3) m2's acceptance asks for agreement 'stated as an isomorphism of triangulated structures', a notion the pin does not have; since Pretriangulated.distinguishedTriangles is a field, agreement is an equality of Set (Triangle _) plus Functor.CommShift. That clause is left standing and #378 carries the obligation to amend it in the PR that proves the theorem, so the wording changes with the evidence rather than ahead of it. Also measured as already present at the pin: CochainComplex.mappingCone, HomotopyCategory.triangle and distinguishedTriangles, Pretriangulated and IsTriangulated on HomotopyCategory, Cochain.shift/rightShift/leftShift/rightUnshift/leftUnshift, and Localization.pretriangulated as candidate transport machinery. m2 moves to lane now." }
   - { rev: 10, at: "2026-08-15", note: "e5 landed as #382 and e6 opened. Two departures from e5 as filed, both in the implementation rather than the plan. (1) Shift and cone are stated as representability -- right composition with one fixed closed element is bijective in every degree from every object -- rather than as twisted-complex constructions. That is what makes naturality fall out of dgComp_assoc instead of becoming an axiom every witness must discharge. (2) IsPretriangulated carries a dg-level zero object, exists Z with dgId Z = 0, which is stronger than the literature: Cone (id X) is contractible so the cone clause alone would suffice, but contractibility is a statement about H0 and belongs to e6, so assuming it in e5 would invert the dependency. Every model here has a strict dg zero object, so it costs nothing. rev 9's measurement of e6 is confirmed independently: HasZeroObject (H0 C) is immediate from the zero clause and is done, and HasShift (H0 C) Z is the whole remaining cost. exists_shift gives an existential, not a choice, and HasShift needs a functor with shiftFunctorZero and shiftFunctorAdd coherence. e6 s first slice therefore lands the Enhancement structure, Cdg.enhancement as its first inhabitant, H0.hasZeroObject, and the uniqueness of shifts up to canonical isomorphism that any such functor will need; the functor itself is still open." }
   - { rev: 11, at: "2026-08-18", note: "e6 closed. H⁰ of a pretriangulated dg category is pretriangulated, with axioms [propext, Classical.choice, Quot.sound] and no sorry. The finding worth carrying forward is about the axiom system rather than about dg categories: Pretriangulated states TR2 as an iff, only the forward half is ever proved by a construction, and the reverse half follows from the other four axioms. It is proved once, generically, over Set (Triangle D), which also keeps it clear of the H0 C := C transparency hazard that shaped every proof in this track -- the proof never meets H0 C. Pretriangulated.Axioms and Axioms.pretriangulated are the reusable form: five obligations in, the class out. Also recorded against e6 acceptance criterion 4: Localization.pretriangulated is inapplicable here rather than merely expensive, because it transports from a category that already carries the structure. e7 is unblocked." }
+  - { rev: 12, at: "2026-08-28", note: "DG2 is complete: #378 closed through #771 and main contains Model/Agreement.lean. Milestone #21 is closed. DG3 is now materialized as #853 (the reusable K-injective model), #854 (the derived seam), and #855 (linear/exact H0 functors); #853 and #855 are independent ready lanes." }
+  - { rev: 13, at: "2026-08-28", note: "Implementation started on #855 in a fresh worktree. #853 remains the other independent ready lane; #854 stays blocked on the derived model rather than being represented by an empty seam structure." }
 retired: []
 
 # GitHub milestones are roadmap phases. Epic issues live inside them, and
@@ -209,7 +211,7 @@ items:
     gh_milestone: 21
     kind: milestone
     title: "DG2 — Pretriangulated dg categories and the enhancement structure"
-    status: in_progress
+    status: done
     lane: now
     acceptance:
       - "Shift and cone are available at the dg level, and `IsPretriangulated` is a predicate on a dg category rather than an assumption carried in prose."
@@ -262,8 +264,8 @@ items:
     gh_milestone: 22
     kind: milestone
     title: "DG3 — The derived enhancement and the classical seam"
-    status: planned
-    lane: next
+    status: in_progress
+    lane: now
     acceptance:
       - "D^dg(A) is constructed on the h-injective (or h-projective) model, reusing Mathlib's KInjective/KProjective rather than a new resolution theory."
       - "The seam theorem H⁰(D^dg A) ≌ DerivedCategory A is proved as an equivalence of triangulated categories under Mathlib's HasDerivedCategory hypotheses, with the universe conditions stated where a reader meets them."
@@ -291,7 +293,7 @@ items:
     kind: epic
     parent: dg-enhancements-m3
     title: "The seam theorem: H⁰(D^dg A) ≌ DerivedCategory A"
-    status: planned
+    status: blocked
     summary: "The theorem the track exists for. An equivalence of triangulated categories between the H⁰ of the derived enhancement and Mathlib's DerivedCategory, compatible with shift, triangles, and Ext."
     priority: must
     size: XL
@@ -304,7 +306,7 @@ items:
     kind: epic
     parent: dg-enhancements-m3
     title: "Dg functors induce exact functors, and quasi-equivalences induce equivalences"
-    status: planned
+    status: in_progress
     summary: "The functor half of the passage. This is where the programme's naturality claim first becomes testable: an induced functor should arrive with its compatibilities rather than acquire them by separate argument."
     priority: must
     size: L

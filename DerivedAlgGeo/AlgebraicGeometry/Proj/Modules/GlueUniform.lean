@@ -86,16 +86,16 @@ bookkeeping is unreadable inline and because each is used under a `•`, where t
 
 `(f / g)ᵏ · (f / g)ⁿ = (f / g)ⁿ⁺ᵏ`, with the right-hand fractions in the spelling
 `isLocalizationFrac` produces. -/
-theorem fracSection_pow_mul_isLocalizationFrac {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1) (n k : ℕ)
-    {U : (Proj 𝒜).Opens} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 g) :
-    (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 hg k)
-        (hU.trans (basicOpen_le_basicOpen_pow 𝒜 g k))) *
+theorem fracSection_pow_mul_isLocalizationFrac {e : ℕ} {f g : A} (hf : f ∈ 𝒜 e) (hg : g ∈ 𝒜 1)
+    (n k : ℕ) {U : (Proj 𝒜).Opens} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 g) :
+    (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 hg (e * k))
+        (hU.trans (basicOpen_le_basicOpen_pow 𝒜 g (e * k)))) *
         (show Γ(Proj 𝒜, U) from isLocalizationFrac 𝒜 hf hg n hU)
       = (show Γ(Proj 𝒜, U) from isLocalizationFrac 𝒜 hf hg (n + k) hU) :=
   (fracSection_mul 𝒜 _ _ _ _ _ _
-      (le_basicOpen_mul 𝒜 (hU.trans (basicOpen_le_basicOpen_pow 𝒜 g k))
-        (hU.trans ((basicOpen_le_basicOpen_pow 𝒜 g 1).trans
-          (basicOpen_le_basicOpen_pow 𝒜 (g ^ 1) n))))).trans
+      (le_basicOpen_mul 𝒜 (hU.trans (basicOpen_le_basicOpen_pow 𝒜 g (e * k)))
+        (hU.trans ((basicOpen_le_basicOpen_pow 𝒜 g e).trans
+          (basicOpen_le_basicOpen_pow 𝒜 (g ^ e) n))))).trans
     (fracSection_eq 𝒜 _ _ _ _ _ _ (by ring))
 
 /-- **Raising commutes with the overlap comparison.**
@@ -104,23 +104,26 @@ theorem fracSection_pow_mul_isLocalizationFrac {f g : A} (hf : f ∈ 𝒜 1) (hg
 every raised family: the two sides of the agreement are raised by *different* multipliers, one per
 chart, and this identity is exactly the statement that the difference between them is absorbed by
 the comparison fraction. -/
-theorem fracSection_pow_mul_comm {f g₁ g₂ : A} (hf : f ∈ 𝒜 1) (h₁ : g₁ ∈ 𝒜 1) (h₂ : g₂ ∈ 𝒜 1)
+theorem fracSection_pow_mul_comm {e : ℕ} {f g₁ g₂ : A} (hf : f ∈ 𝒜 e) (h₁ : g₁ ∈ 𝒜 1)
+    (h₂ : g₂ ∈ 𝒜 1)
     (n k : ℕ) {U : (Proj 𝒜).Opens} (hU₁ : U ≤ ProjectiveSpectrum.basicOpen 𝒜 g₁)
     (hU₂ : U ≤ ProjectiveSpectrum.basicOpen 𝒜 g₂) :
-    (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 h₁ k)
-        (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ k))) *
-        (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_deg 𝒜 h₂ n) (pow_mem_deg 𝒜 h₁ n)
-          (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ n)))
-      = (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_deg 𝒜 h₂ (n + k)) (pow_mem_deg 𝒜 h₁ (n + k))
-          (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ (n + k)))) *
-        (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 h₂ k)
-          (hU₂.trans (basicOpen_le_basicOpen_pow 𝒜 g₂ k))) := by
+    (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 h₁ (e * k))
+        (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ (e * k)))) *
+        (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_deg 𝒜 h₂ (e * n))
+          (pow_mem_deg 𝒜 h₁ (e * n))
+          (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ (e * n))))
+      = (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_deg 𝒜 h₂ (e * (n + k)))
+          (pow_mem_deg 𝒜 h₁ (e * (n + k)))
+          (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ (e * (n + k))))) *
+        (show Γ(Proj 𝒜, U) from fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 h₂ (e * k))
+          (hU₂.trans (basicOpen_le_basicOpen_pow 𝒜 g₂ (e * k)))) := by
   refine (fracSection_mul 𝒜 _ _ _ _ _ _
-    (le_basicOpen_mul 𝒜 (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ k))
-      (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ n)))).trans ?_
+    (le_basicOpen_mul 𝒜 (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ (e * k)))
+      (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ (e * n))))).trans ?_
   refine Eq.trans ?_ (fracSection_mul 𝒜 _ _ _ _ _ _
-    (le_basicOpen_mul 𝒜 (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ (n + k)))
-      (hU₂.trans (basicOpen_le_basicOpen_pow 𝒜 g₂ k)))).symm
+    (le_basicOpen_mul 𝒜 (hU₁.trans (basicOpen_le_basicOpen_pow 𝒜 g₁ (e * (n + k))))
+      (hU₂.trans (basicOpen_le_basicOpen_pow 𝒜 g₂ (e * k))))).symm
   exact fracSection_eq 𝒜 _ _ _ _ _ _ (by ring)
 
 /-- **The twist exponent can be taken as large as one likes.**
@@ -136,40 +139,42 @@ The proof holds the overlap exponent `m` fixed and raises the chart extensions: 
 theorem exists_globalSection_twistBy_forall_ge (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
-    {f : A} (hf : f ∈ 𝒜 1) {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
+    {e : ℕ} {f : A} (hf : f ∈ 𝒜 e) (he : 0 < e) {ι : Type u} [Finite ι] {g : ι → A}
+    (hg : ∀ i, g i ∈ 𝒜 1)
     (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤)
     (s : Γ(F, basicOpen 𝒜 f)) :
     ∃ N₀ : ℕ, ∀ N : ℕ, N₀ ≤ N →
-      ∃ σ : Γ(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ)), ⊤),
-        (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ))).presheaf.map
+      ∃ σ : Γ(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * N : ℕ) : ℤ)), ⊤),
+        (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * N : ℕ) : ℤ))).presheaf.map
             (homOfLE (le_top (a := basicOpen 𝒜 f))).op σ
-          = Scheme.Modules.Hom.app (twistBy 𝒜 N (pow_mem_deg 𝒜 hf N) F) (basicOpen 𝒜 f) s := by
+          = Scheme.Modules.Hom.app (twistBy 𝒜 (e * N) (pow_mem_mul 𝒜 hf N) F)
+              (basicOpen 𝒜 f) s := by
   classical
   obtain ⟨n, hn⟩ := exists_pow_smul_eq_res_image_uniform 𝒜 F hf hg Nat.one_pos
     (W := fun i => basicOpen 𝒜 (g i))
     (V := fun i => basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)
     (funext fun i => awayι_image_top 𝒜 (hg i) Nat.one_pos)
-    (funext fun i => awayι_image_basicOpen 𝒜 (hg i) Nat.one_pos hf Nat.one_pos)
+    (funext fun i => awayι_image_basicOpen 𝒜 (hg i) Nat.one_pos hf he)
     (fun i => inf_le_left) (fun i => inf_le_left)
     (fun i => F.presheaf.map (homOfLE (inf_le_right :
       basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 f)).op s)
   choose t ht using hn
-  obtain ⟨m, hm⟩ := exists_overlap_exponent 𝒜 F hf hg s n t ht
+  obtain ⟨m, hm⟩ := exists_overlap_exponent 𝒜 F hf he hg s n t ht
   refine ⟨2 * m + n, fun N hN => ?_⟩
   obtain ⟨k, rfl⟩ : ∃ k, N = 2 * m + (n + k) := ⟨N - (2 * m + n), by omega⟩
   -- the raised family: `tᵢ` multiplied by `(f / gᵢ)ᵏ`, a unit on the whole of `D₊(gᵢ)`
   refine exists_globalSection_twistBy_of_data 𝒜 F hf hg hcov s (n + k) m
     (fun i => (show Γ(Proj 𝒜, basicOpen 𝒜 (g i)) from
-      fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 (hg i) k)
-        (basicOpen_le_basicOpen_pow 𝒜 (g i) k)) • t i) (fun i => ?_) (fun p => ?_)
+      fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg i) (e * k))
+        (basicOpen_le_basicOpen_pow 𝒜 (g i) (e * k))) • t i) (fun i => ?_) (fun p => ?_)
   · -- the raised family still extends `s`, now with exponent `n + k`
     refine (resSection_smul 𝒜 F (inf_le_left :
       basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f ≤ basicOpen 𝒜 (g i)) _ (t i)).trans ?_
     refine (congrArg₂ (fun (r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f))
       (y : Γ(F, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f)) => r • y)
-      (resΓ_fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 (hg i) k) _
-        (basicOpen_le_basicOpen_pow 𝒜 (g i) k)
-        (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g i) k))) (ht i)).trans ?_
+      (resΓ_fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg i) (e * k)) _
+        (basicOpen_le_basicOpen_pow 𝒜 (g i) (e * k))
+        (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g i) (e * k)))) (ht i)).trans ?_
     rw [smul_smul]
     exact congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 f) =>
         r • F.presheaf.map (homOfLE (inf_le_right :
@@ -179,32 +184,32 @@ theorem exists_globalSection_twistBy_forall_ge (F : (Proj 𝒜).Modules)
     have hres₁ := resSection_smul 𝒜 F (inf_le_left :
         basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.1))
       (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1)) from
-        fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.1) k)
-          (basicOpen_le_basicOpen_pow 𝒜 (g p.1) k)) (t p.1)
+        fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.1) (e * k))
+          (basicOpen_le_basicOpen_pow 𝒜 (g p.1) (e * k))) (t p.1)
     have hres₂ := resSection_smul 𝒜 F (inf_le_right :
         basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.2))
       (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.2)) from
-        fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.2) k)
-          (basicOpen_le_basicOpen_pow 𝒜 (g p.2) k)) (t p.2)
-    have hc₁ := resΓ_fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.1) k)
+        fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.2) (e * k))
+          (basicOpen_le_basicOpen_pow 𝒜 (g p.2) (e * k))) (t p.2)
+    have hc₁ := resΓ_fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.1) (e * k))
       (inf_le_left : basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.1))
-      (basicOpen_le_basicOpen_pow 𝒜 (g p.1) k)
-      (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) k))
-    have hc₂ := resΓ_fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.2) k)
+      (basicOpen_le_basicOpen_pow 𝒜 (g p.1) (e * k))
+      (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) (e * k)))
+    have hc₂ := resΓ_fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.2) (e * k))
       (inf_le_right : basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.2))
-      (basicOpen_le_basicOpen_pow 𝒜 (g p.2) k)
-      (inf_le_right.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.2) k))
+      (basicOpen_le_basicOpen_pow 𝒜 (g p.2) (e * k))
+      (inf_le_right.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.2) (e * k)))
     rw [hres₁, hres₂, hc₁, hc₂, smul_smul, smul_smul, smul_smul, mul_comm _
       (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from
-        fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.1) k)
-          (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) k))), ← smul_smul,
+        fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.1) (e * k))
+          (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) (e * k)))), ← smul_smul,
       hm p, smul_smul, smul_smul]
     refine congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) =>
       r • F.presheaf.map (homOfLE (inf_le_right :
         basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2) ≤ basicOpen 𝒜 (g p.2))).op (t p.2)) ?_
     rw [mul_comm (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from
-        fracSection 𝒜 (pow_mem_deg 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.1) k)
-          (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) k))),
+        fracSection 𝒜 (pow_mem_mul 𝒜 hf k) (pow_mem_deg 𝒜 (hg p.1) (e * k))
+          (inf_le_left.trans (basicOpen_le_basicOpen_pow 𝒜 (g p.1) (e * k)))),
       mul_assoc, mul_assoc]
     exact congrArg (fun r : Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) =>
         (show Γ(Proj 𝒜, basicOpen 𝒜 (g p.1) ⊓ basicOpen 𝒜 (g p.2)) from
@@ -226,17 +231,17 @@ theorem exists_globalSection_twistBy_uniform (F : (Proj 𝒜).Modules)
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
     {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
     (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤)
-    {κ : Type u} [Finite κ] {f : κ → A} (hf : ∀ a, f a ∈ 𝒜 1)
+    {e : ℕ} {κ : Type u} [Finite κ] {f : κ → A} (hf : ∀ a, f a ∈ 𝒜 e) (he : 0 < e)
     (s : ∀ a, Γ(F, basicOpen 𝒜 (f a))) :
     ∃ N : ℕ, ∀ a : κ,
-      ∃ σ : Γ(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ)), ⊤),
-        (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ))).presheaf.map
+      ∃ σ : Γ(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * N : ℕ) : ℤ)), ⊤),
+        (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * N : ℕ) : ℤ))).presheaf.map
             (homOfLE (le_top (a := basicOpen 𝒜 (f a)))).op σ
-          = Scheme.Modules.Hom.app (twistBy 𝒜 N (pow_mem_deg 𝒜 (hf a) N) F)
+          = Scheme.Modules.Hom.app (twistBy 𝒜 (e * N) (pow_mem_mul 𝒜 (hf a) N) F)
               (basicOpen 𝒜 (f a)) (s a) := by
   classical
   choose N₀ hN₀ using fun a =>
-    exists_globalSection_twistBy_forall_ge 𝒜 F (hf a) hg hcov (s a)
+    exists_globalSection_twistBy_forall_ge 𝒜 F (hf a) he hg hcov (s a)
   obtain ⟨N, hN⟩ := (Set.finite_range N₀).bddAbove
   exact ⟨N, fun a => hN₀ a N (hN (Set.mem_range_self a))⟩
 

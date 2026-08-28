@@ -141,6 +141,17 @@ import DerivedAlgGeo.CategoryTheory.DGCategory
 #print axioms CategoryTheory.DGLinear.comp_smul_left
 #print axioms CategoryTheory.DGLinear.comp_smul_right
 #print axioms CategoryTheory.DGLinear.d_smul
+#print axioms CategoryTheory.DGFunctor.Linear
+#print axioms CategoryTheory.DGFunctor.Linear.map_smul
+#print axioms CategoryTheory.DGFunctor.compLinear
+#print axioms CategoryTheory.DGFunctor.h0Linear
+#print axioms CategoryTheory.DGFunctor.idLinear
+#print axioms CategoryTheory.DGFunctor.map_smul
+#print axioms CategoryTheory.H0.coboundariesSubmodule
+#print axioms CategoryTheory.H0.cocyclesModule
+#print axioms CategoryTheory.H0.cocyclesSubmodule
+#print axioms CategoryTheory.H0.homModule
+#print axioms CategoryTheory.H0.linear
 #print axioms CategoryTheory.Enhancement
 #print axioms CategoryTheory.Enhancement.dgCat
 #print axioms CategoryTheory.Enhancement.equiv

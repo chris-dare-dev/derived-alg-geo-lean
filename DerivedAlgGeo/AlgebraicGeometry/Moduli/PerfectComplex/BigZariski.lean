@@ -5,7 +5,7 @@ Released under the MIT license.
 import Mathlib.AlgebraicGeometry.Sites.BigZariski
 import Mathlib.CategoryTheory.Sites.Over
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Presheaf
-import DerivedAlgGeo.AlgebraicGeometry.Stacks.Basic
+import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids
 
 /-!
 # The relative-perfect presheaf on the big Zariski site over a base
