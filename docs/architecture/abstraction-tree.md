@@ -37,6 +37,9 @@ burn down, not exceptions that authorize more leaf-to-root imports.
 Category
 ├─ Preadditive
 │  └─ Linear k C                         Mathlib root
+├─ FiniteExactTower
+│  └─ FiniteFiltration                    zero-to-object endpoint refinement
+│     └─ almost-disconnected witness       scheme-geometric leaf
 ├─ DGCategory C
 │  ├─ DGLinear k C                       scalar refinement
 │  ├─ DGFunctor C D
