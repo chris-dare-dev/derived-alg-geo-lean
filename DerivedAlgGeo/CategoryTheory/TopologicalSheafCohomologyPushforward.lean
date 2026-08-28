@@ -22,9 +22,9 @@ range. This is `#572` step 3's statement, instantiated at an actual map of space
 ## Everything here is plumbing
 
 `CategoryTheory/SheafCohomologyPushforward.lean` proves the comparison abstractly, for a continuous
-functor of sites whose pullback and pushforward are both exact. This file discharges those
-hypotheses for `Opens.map f`. No mathematics happens: the one non-formal input, exactness of `f_*`,
-is `PushforwardStalks.lean`, and the rest is instance supply.
+functor of sites whose pullback and pushforward are both exact. This composition-layer file
+discharges those hypotheses for `Opens.map f`. No mathematics happens: the one non-formal input,
+exactness of `f_*`, is `PushforwardStalks.lean`, and the rest is instance supply.
 
 That was not obvious in advance and it is worth recording why. Three separate estimates of this
 step were wrong, each in the same direction:
