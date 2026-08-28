@@ -63,6 +63,19 @@ variable {X : SmoothProperVariety k} {n : ℕ}
 
 noncomputable section
 
+/-- The `Ext` groups below are Mathlib's `Abelian.Ext`, which needs `HasExt`.
+
+`Serre/Cohomology.lean` declares the same instance, but as a `local instance`, so it does not
+cross the import boundary into this file. Without it the elaborator does not report a missing
+instance: it tries to synthesize `HasSmallLocalizedHom` for the quasi-isomorphism localization
+from scratch and exhausts the `synthInstance` budget, and the timeout surfaces as an ordinary
+"failed to synthesize" on `extComparison`. `references/instance-transparency.md` names that
+failure mode; raising `synthInstance.maxHeartbeats` treats the symptom.
+
+`HasExt.standard` is the sanctioned route, and it is the one the sibling file takes. -/
+local instance hasExtCoh : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
+  HasExt.standard _
+
 /-- **Bilinear coherent Serre duality**, as supplied realization data.
 
 The fields mirror `Serre.Data`: a base-field-linear realization of the `Ext` groups, its

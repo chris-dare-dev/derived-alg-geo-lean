@@ -93,6 +93,14 @@ the degree that `g`'s exponent produces. -/
 theorem pow_mem_smul {a : A} {e : ℕ} (ha : a ∈ 𝒜 e) (d : ℕ) : a ^ d ∈ 𝒜 (e • d) := by
   simpa [smul_eq_mul, mul_comm] using SetLike.pow_mem_graded d ha
 
+/-- **The same, with the degree written as a product.**
+
+`pow_mem_smul` is the spelling the localization elements produce; this is the spelling a twist
+degree is stated in, and `#823` needs both because the glue compares one against the other. The
+degree-one case is `ChartUnitTwist.pow_mem_deg`. -/
+theorem pow_mem_mul {a : A} {e : ℕ} (ha : a ∈ 𝒜 e) (d : ℕ) : a ^ d ∈ 𝒜 (e * d) := by
+  simpa [smul_eq_mul] using pow_mem_smul 𝒜 ha d
+
 /-- **Two fractions with the same value are the same element**, whatever degrees they are written
 in.
 
