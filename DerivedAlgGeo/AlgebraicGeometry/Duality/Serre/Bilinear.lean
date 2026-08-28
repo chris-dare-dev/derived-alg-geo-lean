@@ -73,7 +73,7 @@ from scratch and exhausts the `synthInstance` budget, and the timeout surfaces a
 failure mode; raising `synthInstance.maxHeartbeats` treats the symptom.
 
 `HasExt.standard` is the sanctioned route, and it is the one the sibling file takes. -/
-local instance : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
+local instance hasExtCoh : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
   HasExt.standard _
 
 /-- **Bilinear coherent Serre duality**, as supplied realization data.
