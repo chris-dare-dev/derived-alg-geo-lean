@@ -21,6 +21,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Relative
 #print axioms AddSubgroup.saturatedQuotientMap
 #print axioms AddSubgroup.saturatedQuotientMap_mk
 #print axioms AddSubgroup.saturatedQuotientHom_ext
+#print axioms AddSubgroup.saturatedQuotientHom_ext_iff
 #print axioms AddSubgroup.saturatedQuotientMap_id
 #print axioms AddSubgroup.saturatedQuotientMap_comp
 
@@ -43,7 +44,14 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Relative
 #print axioms AlgebraicGeometry.Numerical.Relative.map_id
 #print axioms AlgebraicGeometry.Numerical.Relative.map_comp
 #print axioms AlgebraicGeometry.Numerical.Relative.hom_ext
+#print axioms AlgebraicGeometry.Numerical.Relative.hom_ext_iff
 #print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.mk.inj
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.Family
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.Point
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.index
+#print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.classValue
 #print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.relation
 #print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.relations
 #print axioms AlgebraicGeometry.Numerical.Relative.FamilyRelationSystem.relation_mem
