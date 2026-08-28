@@ -42,8 +42,8 @@ open CategoryTheory
 
 namespace AlgebraicGeometry.Proj
 
-variable {R A : Type u} [CommRing R] [CommRing A] [Algebra R A]
-  (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜]
+variable {A σA : Type u} [CommRing A] [SetLike σA A] [AddSubgroupClass σA A]
+variable (𝒜 : ℕ → σA) [GradedRing 𝒜]
 
 /-- **The twist `F(d) = F ⊗ O(d)` of a module sheaf on `Proj`.** -/
 noncomputable def tensorTwist (F : (AlgebraicGeometry.Proj 𝒜).Modules) (d : ℤ) :
