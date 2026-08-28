@@ -1,3 +1,4 @@
+import DerivedAlgGeo.AlgebraicGeometry.Cohomology.ClosedImmersion
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness
