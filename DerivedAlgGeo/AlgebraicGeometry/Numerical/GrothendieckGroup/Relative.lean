@@ -65,7 +65,6 @@ abbrev Group (relations : Set (FiberSum K)) :=
 def of (relations : Set (FiberSum K)) (i : I) : K i →+ Group K relations :=
   (relationSubgroup K relations).saturatedQuotientMk.comp (fiberInclusion K i)
 
-@[simp]
 theorem of_apply (relations : Set (FiberSum K)) (i : I) (x : K i) :
     of K relations i x =
       (relationSubgroup K relations).saturatedQuotientMk (fiberInclusion K i x) :=
