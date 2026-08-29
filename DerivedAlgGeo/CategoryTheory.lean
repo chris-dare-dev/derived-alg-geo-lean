@@ -10,7 +10,8 @@ import DerivedAlgGeo.CategoryTheory.TopologicalSheafCohomologyPushforward
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.ExtDimensionShift
 import DerivedAlgGeo.CategoryTheory.WeakSerreExact
-import DerivedAlgGeo.CategoryTheory.DGCategory
+import DerivedAlgGeo.CategoryTheory.Monoidal
+import DerivedAlgGeo.CategoryTheory.Enriched
 import DerivedAlgGeo.CategoryTheory.Sites
 import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated
@@ -20,7 +21,8 @@ import DerivedAlgGeo.CategoryTheory.StabilityCharge
 
 /-! # Category theory
 
-Dg categories, t-structures, the constant-sheaf/pullback comparison, generic
+Monoidal and enriched categories, dg categories, t-structures, the
+constant-sheaf/pullback comparison, generic
 sheaf-cohomology statements, and the categorical foundations of Bridgeland
 stability conditions.
 -/

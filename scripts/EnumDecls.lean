@@ -80,15 +80,22 @@ still falls through to `none`, lands under `Unclassified`, and still fails,
 which is the case that deserves a human decision. Only the forced edit is
 gone. -/
 private def libraryOf (m : Name) : Option String :=
-  let dg := `DerivedAlgGeo.CategoryTheory.DGCategory
+  let dg := `DerivedAlgGeo.CategoryTheory.Enriched.DGCategory
+  let dgEnhancement := `DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
   let categoryTheory := `DerivedAlgGeo.CategoryTheory
   let linearAlgebra := `DerivedAlgGeo.LinearAlgebra
   let algebraicGeometry := `DerivedAlgGeo.AlgebraicGeometry
   let algebra := `DerivedAlgGeo.Algebra
   let topology := `DerivedAlgGeo.Topology
   let development := `DerivedAlgGeo.Development
-  -- `dg` first: `DGCategory` is itself under `CategoryTheory`.
-  if m == dg || dg.isPrefixOf m then some "DGCategory"
+  let isGeometryInstance :=
+    (m.toString.splitOn ".Instances.AlgebraicGeometry").length > 1
+  -- Both dg subtrees precede the generic `CategoryTheory` route.
+  if isGeometryInstance then
+    some "AlgebraicGeometry"
+  else if m == dg || dg.isPrefixOf m ||
+      m == dgEnhancement || dgEnhancement.isPrefixOf m then
+    some "DGCategory"
   else if m == categoryTheory || categoryTheory.isPrefixOf m ||
       m == linearAlgebra || linearAlgebra.isPrefixOf m then
     some "StabilityCondition"

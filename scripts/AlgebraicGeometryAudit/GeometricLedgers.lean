@@ -4,6 +4,7 @@ their established stability-condition namespace while the owning modules and
 audit records live in the geometry layer.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families
+import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated.Instances.AlgebraicGeometry
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
@@ -60,6 +61,7 @@ strong-monoidal pullback laws together. The adapters are one-way only. -/
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCoherentDerivedTensor.commShift
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCoherentDerivedTensor.isTriangulated
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCoherentDerivedTensor.toMonoidalCategory
+#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.hasCoherentDerivedTensorIsCompatibleWithTriangulation
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.hasDerivedTensorOfCoherent
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.coherentDerivedTensorAssoc
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.coherentDerivedTensorUnit

@@ -25,7 +25,9 @@ Library code should prefer the narrowest useful subject import, such as:
 
 ```lean
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf
-import DerivedAlgGeo.CategoryTheory.DGCategory
+import DerivedAlgGeo.CategoryTheory.Monoidal
+import DerivedAlgGeo.CategoryTheory.Enriched.DGCategory
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 ```
 
@@ -46,8 +48,9 @@ See `CONTRIBUTING.md` §"Where verification runs".
 
 - `DerivedAlgGeo/AlgebraicGeometry` — coherent sheaves, cohomology, duality,
   intersection theory, Proj, and Riemann--Roch.
-- `DerivedAlgGeo/CategoryTheory` — dg categories, t-structures, and stability
-  conditions.
+- `DerivedAlgGeo/CategoryTheory` — monoidal and enriched category theory, raw
+  and pretriangulated dg categories, dg enhancements, t-structures, and
+  stability conditions.
 - `DerivedAlgGeo/Compatibility` — temporary leaf imports for staged module
   migrations; stable subjects never depend on it.
 - `DerivedAlgGeo/LinearAlgebra` — integral and Mukai lattices and matrix tools.
