@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Picard
+import DerivedAlgGeo.Algebra.Category.ModuleCat.StalkTensor
+import DerivedAlgGeo.Topology.Sheaves.StalkW
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.Localization
 
 /-!
@@ -13,8 +15,16 @@ rank-one sheaf is again inverted by sheafification. It supplies both orientation
 comparison between restriction and module sheafification, closure of invertible sheaves under
 the sheafified tensor product, and the resulting associator.
 
-The flatness hypothesis is essential for local injectivity. The proof detects local
-injectivity on a `CoversTop` family and reduces there to tensoring with the unit presheaf.
+Over a general site the rank-one hypothesis is essential for local injectivity: the proof
+detects local injectivity on a `CoversTop` family and reduces there to tensoring with the unit
+presheaf.
+
+**Over a topological space it is not needed at all.** `W_whiskerLeft_of_isIso_stalk` and
+`isIso_sheafification_map_whiskerLeft_unit` give the left comparison for an arbitrary
+whiskering factor, by working stalkwise: `PresheafOfModules.stalkTensorEquiv` identifies the
+stalk of a tensor with the tensor of the stalks, and tensoring with an isomorphism of stalks is
+an isomorphism whether or not the other factor is flat. The rank-one lemmas are kept as the
+general-site specialisation, which the stalkwise route cannot reach.
 -/
 
 open CategoryTheory Limits MonoidalCategory
@@ -464,6 +474,39 @@ end
 
 end SheafOfModules
 
+namespace PresheafOfModules
+
+section TopSpace
+
+variable {Y : TopCat.{u}} {R : Y.Presheaf CommRingCat.{u}}
+
+attribute [local instance] PresheafOfModules.monoidalCategory
+
+/-- **Sheafification inverts `M ◁ g` whenever it inverts `g`, for an arbitrary `M`.**
+
+On a topological space this is the general statement `#833` asks for: no flatness, no local
+freeness, no rank-one trivialization on the whiskering factor. The route is stalkwise —
+`PresheafOfModules.isIso_stalkMapAdd_whiskerLeft` carries a stalk isomorphism through the
+whiskering, and `TopCat.Presheaf.W_of_isIso_stalkFunctor_map` converts a stalkwise isomorphism
+back into a member of `J.W`. Note that `IsLocallyInjective` is never split off from
+`IsLocallySurjective`, which is what makes the stalkwise route available at all: Mathlib has a
+stalkwise criterion for `J.W` but none for the injective half on its own. -/
+lemma W_whiskerLeft_of_isIso_stalk
+    (M : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat))
+    {G₁ G₂ : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat)} (g : G₁ ⟶ G₂)
+    (hg : ∀ y : Y, IsIso (stalkMapAdd g y)) :
+    (Opens.grothendieckTopology Y).W
+      ((PresheafOfModules.toPresheaf (R ⋙ forget₂ CommRingCat RingCat)).map (M ◁ g)) := by
+  haveI := hg
+  haveI : ∀ y : Y, IsIso ((TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} y).map
+      ((PresheafOfModules.toPresheaf (R ⋙ forget₂ CommRingCat RingCat)).map (M ◁ g))) :=
+    fun y => isIso_stalkMapAdd_whiskerLeft M g y
+  exact TopCat.Presheaf.W_of_isIso_stalkFunctor_map _
+
+end TopSpace
+
+end PresheafOfModules
+
 namespace AlgebraicGeometry.Scheme.Modules
 
 variable {X : Scheme.{u}}
@@ -676,6 +719,24 @@ lemma isInvertible_tensorObj (L M : X.Modules)
 
 attribute [instance] isInvertible_tensorObj
 
+/-- **Sheafification inverts `M ◁ toSheafify` for an arbitrary `M`.**
+
+The general form of `SheafOfModules.isIso_sheafification_map_whiskerLeft_unit_of_rankOneData`,
+with the rank-one hypothesis on the whiskering factor gone. It is available here and not over a
+general site because the proof is stalkwise; see
+`PresheafOfModules.W_whiskerLeft_of_isIso_stalk`. -/
+lemma isIso_sheafification_map_whiskerLeft_unit (M P : X.PresheafOfModules) :
+    IsIso ((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+      (M ◁ (PresheafOfModules.sheafificationAdjunction
+        (𝟙 X.ringCatSheaf.obj)).unit.app P)) := by
+  apply Localization.inverts
+    (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj))
+    ((_root_.Opens.grothendieckTopology X).W.inverseImage
+      (PresheafOfModules.toPresheaf X.ringCatSheaf.obj))
+  apply PresheafOfModules.W_whiskerLeft_of_isIso_stalk (R := X.presheaf)
+  intro x
+  exact TopCat.Presheaf.stalkFunctor_map_unit_toSheafify_isIso x AddCommGrpCat.{u} P.presheaf
+
 /-- Comparison from tensoring before sheafification to tensoring with the associated sheaf. -/
 noncomputable def tensorSheafificationComparisonLeft
     (L : X.Modules) (P : X.PresheafOfModules) :
@@ -696,17 +757,15 @@ noncomputable def tensorSheafificationComparisonRight
       (𝟙 X.ringCatSheaf.obj)).unit.app P ▷
         (toPresheafOfModules X).obj L)
 
-lemma isIso_tensorSheafificationComparisonLeft (L : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
-    (P : X.PresheafOfModules) :
-    IsIso (tensorSheafificationComparisonLeft L P) := by
-  obtain ⟨q, hq, hrank⟩ :=
-    SheafOfModules.IsInvertible.exists_rankOneData
-      (M := show SheafOfModules X.ringCatSheaf from L)
-  letI : q.IsLocallyFreeData := hq
-  exact SheafOfModules.isIso_sheafification_map_whiskerLeft_unit_of_rankOneData
-    (S := X.sheaf) q hrank P
+/-- The left comparison is an isomorphism for **arbitrary** `L`.
+
+The invertibility hypothesis this carried until #833 was an artifact of proving local
+injectivity and local surjectivity separately: the injective half then needed `L` locally
+trivial. Going through stalks avoids the split — see
+`isIso_sheafification_map_whiskerLeft_unit`. -/
+lemma isIso_tensorSheafificationComparisonLeft (L : X.Modules) (P : X.PresheafOfModules) :
+    IsIso (tensorSheafificationComparisonLeft L P) :=
+  isIso_sheafification_map_whiskerLeft_unit ((toPresheafOfModules X).obj L) P
 
 lemma isIso_tensorSheafificationComparisonRight (P : X.PresheafOfModules) (L : X.Modules)
     [SheafOfModules.IsInvertible.{u, u, u}
@@ -722,10 +781,11 @@ lemma isIso_tensorSheafificationComparisonRight (P : X.PresheafOfModules) (L : X
 attribute [instance] isIso_tensorSheafificationComparisonLeft
   isIso_tensorSheafificationComparisonRight
 
-/-- Associativity of the sheafified tensor product when the outer factors are invertible. -/
+/-- Associativity of the sheafified tensor product when the **right-hand** factor is invertible.
+
+`L` and `M` are arbitrary. The hypothesis on `L` was dropped in #833; the one on `N` is what
+`isIso_tensorSheafificationComparisonRight` still needs, and generalising that is separate. -/
 noncomputable def tensorAssocIso (L M N : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
     [SheafOfModules.IsInvertible.{u, u, u}
       (show SheafOfModules X.ringCatSheaf from N)] :
     tensorObj (tensorObj L M) N ≅ tensorObj L (tensorObj M N) := by
