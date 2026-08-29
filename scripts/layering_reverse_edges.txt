@@ -1,12 +1,6 @@
-# Existing Moduli/Stacks -> StabilityCondition/Families imports on 2026-08-28.
+# Moduli/Stacks -> StabilityCondition/Families migration exceptions.
 # Format: source path relative to DerivedAlgGeo, TAB, exact imported module.
 #
-# This is a shrinking allowlist. Delete an entry when its import moves to the
-# neutral AlgebraicGeometry/DerivedCategory seam; stale entries fail the gate.
-# Never add an entry to land unrelated work.
-AlgebraicGeometry/Moduli/PerfectComplex/Boundedness.lean	DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.FiniteTypeGeometry
-AlgebraicGeometry/Moduli/PerfectComplex/Pullback.lean	DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.DerivedPullbackCoherence
-AlgebraicGeometry/Moduli/PerfectComplex/Pullback.lean	DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.LeftDerivedPullback
-AlgebraicGeometry/Moduli/PerfectComplex/Relative.lean	DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.Dqc
-AlgebraicGeometry/Moduli/PerfectComplex/Relative.lean	DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.OpenImmersionPullback
-AlgebraicGeometry/Moduli/Quot/Basic.lean	DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.ExactPullback
+# The cutover to AlgebraicGeometry/DerivedCategory burned this list to zero.
+# Do not add an exception: reusable moduli and stack roots must import the
+# neutral owner rather than a stability-specific leaf.

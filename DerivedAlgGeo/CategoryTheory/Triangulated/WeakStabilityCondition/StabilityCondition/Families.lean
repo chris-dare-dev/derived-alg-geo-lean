@@ -14,6 +14,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Stabilit
 # Abstract interfaces for stability conditions in families
 
 This umbrella is deliberately geometry-independent. Scheme-indexed
-realizations, derived pullback, `Dqc`, and Fourier--Mukai kernels are owned by
-`DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families`.
+derived categories, derived pullback, `Dqc`, and Fourier--Mukai kernels are
+owned by `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory`; geometric APIs that
+actually use stability data are owned by
+`DerivedAlgGeo.AlgebraicGeometry.StabilityCondition`.
 -/

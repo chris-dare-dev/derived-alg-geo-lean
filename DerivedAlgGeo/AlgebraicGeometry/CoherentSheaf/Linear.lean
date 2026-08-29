@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.FiniteDimensional
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.BoundedGeometry
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
 import Mathlib.Algebra.Homology.DerivedCategory.Linear
 
 /-!

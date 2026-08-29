@@ -65,10 +65,11 @@ AlgebraicGeometry
 │     ├─ determinant and Picard interpretations
 │     ├─ monoidal pullback and projection formula
 │     └─ almost-disconnected graded pieces   scheme-geometric leaf
-├─ scheme-derived category
-│  ├─ Dqc
+├─ scheme-derived category                     `DerivedCategory/`
+│  ├─ Dqc                                      neutral geometric locus
 │  ├─ bounded coherent locus
-│  └─ perfect / relative-perfect loci
+│  ├─ scheme pullback and geometric kernels
+│  └─ perfect / relative-perfect loci          `Moduli/PerfectComplex/`
 ├─ numerical K-theory
 │  └─ Euler quotient
 │     └─ relative numerical quotient              uses Algebra root
@@ -78,7 +79,7 @@ AlgebraicGeometry
 │  ├─ boundedness witness
 │  ├─ stack presentation
 │  └─ perfect-complex specialization
-└─ stability in families                 final geometric adapter
+└─ stability in families                       stability-dependent adapter only
 ```
 
 The arrows implied by this tree point downwards from consumers to roots.  In

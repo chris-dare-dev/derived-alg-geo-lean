@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.FlatPullback
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.DerivedPullbackCoherence
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FlatPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPullbackCoherence
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Phase.Transfer.InducingBoundary
 
 /-!

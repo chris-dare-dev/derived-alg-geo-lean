@@ -30,6 +30,14 @@ depend on them. Construct generic objects once—for example, obtain
 `DerivedCategory (Coh X)` from the abelian instance on `Coh X` rather than
 creating a second geometric derived-category theory.
 
+Scheme-specific specializations of that generic construction live under
+`AlgebraicGeometry/DerivedCategory/`: this is the owner for module-sheaf
+derived categories, `Dqc`, scheme-indexed derived pullback, and geometric
+Fourier--Mukai kernels. A registration-only adapter may instead use the generic
+construction's `Instances/AlgebraicGeometry/` leaf. Do not put neutral derived
+geometry under `AlgebraicGeometry/StabilityCondition/`; that subtree is only
+for APIs that consume weak or Bridgeland stability data.
+
 Enriched categories depend on a monoidal base; dg categories are the cochain-
 complex specialization of that pattern. This does not make every dg category
 monoidal, and monoidal and triangulated structures do not imply one another.
@@ -56,6 +64,12 @@ sibling `CategoryTheory/Triangulated/StabilityCondition/` path. Keep
 scheme-specific Mumford slope input geometry-owned, and place a valid
 promotion to Bridgeland stability below the strong theory through an explicit
 geometric realization.
+
+Within geometry, use `AlgebraicGeometry/StabilityCondition/Families/` for
+semistable loci, relative HN data, and stability base-change witnesses, and
+`AlgebraicGeometry/StabilityCondition/FourierMukai/` for kernel actions that
+actually use stability-condition autoequivalences. Their neutral prerequisites
+belong under `AlgebraicGeometry/DerivedCategory/`.
 
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is

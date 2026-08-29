@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.DerivedTensorCoherence
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.DerivedTensorCoherence
 
 /-!
 # Geometric derived tensors as monoidal-triangulated structures

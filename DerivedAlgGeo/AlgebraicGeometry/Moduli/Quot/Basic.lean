@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.ExactPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ExactPullback
 
 /-!
 # Quotient presentations of module sheaves

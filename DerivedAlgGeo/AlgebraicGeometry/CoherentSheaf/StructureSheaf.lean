@@ -16,7 +16,7 @@ in `Divisors/`, while the category it lands in lives in `CoherentSheaf/`.
 ## Relation to the copy under `StabilityCondition.Families`
 
 `Families.SchemePerfectDerivedCategory.structureSheafCoh` in
-`AlgebraicGeometry/StabilityCondition/Families/BoundedGeometry.lean` is the
+`AlgebraicGeometry/DerivedCategory/Families/BoundedGeometry.lean` is the
 **same object**, built there because the perfect-complex generator needed it.
 That one is not reusable from a general coherent-sheaf or variety context: it
 sits inside the stability-families namespace and its module drags in derived
