@@ -47,3 +47,21 @@ docstring in `DerivedAlgGeo/CategoryTheory/Triangulated/SphericalTwist/`. -/
 #print axioms SphericalTwist.MukaiRealization.map_twistK₀Equiv
 #print axioms SphericalTwist.MukaiRealization.chiK₀_twistK₀_twistK₀
 #print axioms SphericalTwist.MukaiRealization.chiK₀_comm
+
+/-! ## Braid lane — `τ_A τ_B τ_A = τ_B τ_A τ_B` on `K₀`
+
+`SphericalPairData` is a `Prop` structure, so it has no `mk.inj` /
+`mk.sizeOf_spec` to audit. The identity is the `K₀` shadow of Seidel--Thomas and
+does NOT imply the functorial braid relation; see the module docstring in
+`SphericalTwist/Braid.lean`. -/
+
+#print axioms SphericalTwist.chiK₀_twistK₀_right
+#print axioms SphericalTwist.SphericalPairData
+#print axioms SphericalTwist.SphericalPairData.chi_A
+#print axioms SphericalTwist.SphericalPairData.chi_B
+#print axioms SphericalTwist.SphericalPairData.a_two
+#print axioms SphericalTwist.SphericalPairData.symm
+#print axioms SphericalTwist.braid_expand
+#print axioms SphericalTwist.twistK₀_braid_apply
+#print axioms SphericalTwist.twistK₀_braid
+#print axioms SphericalTwist.MukaiRealization.reflect_braid
