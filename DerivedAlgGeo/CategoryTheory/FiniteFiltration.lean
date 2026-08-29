@@ -19,7 +19,9 @@ that its bottom is zero and a chosen identification of its top with `M`.
 When a graded piece is itself filtered, `FiniteFiltration.pullbackTower` pulls its stages back
 along the coarse quotient projection.  The endpoint comparison isomorphisms identify the new
 tower with the adjacent coarse stages, providing the categorical splice data used by
-almost-disconnected composition.
+almost-disconnected composition. `FiniteExactTower.replaceSteps` assembles a family of such
+replacement towers, and `FiniteFiltration.refineAll` supplies the abelian quotient-pullback
+specialization.
 
 Keeping this root independent of schemes prevents geometric filtrations (for example, the
 almost-disconnected filtrations of arXiv:2607.28411, Appendix B) from growing their own
@@ -315,6 +317,132 @@ noncomputable def appendTerminalIso (T U : FiniteExactTower C)
       U.object (Fin.last U.length) :=
   (appendData T U seam).terminalIso
 
+private structure ReplaceStepsData (T : FiniteExactTower C)
+    (R : ∀ _ : Fin T.length, FiniteExactTower C) where
+  tower : FiniteExactTower C
+  length_eq : tower.length = (List.ofFn fun i => (R i).length).sum
+  graded_eq : tower.gradedObjects =
+    (List.ofFn fun i => (R i).gradedObjects).flatten
+  initialIso : T.object 0 ≅ tower.object 0
+  terminalIso : tower.object (Fin.last tower.length) ≅
+    T.object (Fin.last T.length)
+
+/-- Recursive implementation of simultaneous step replacement.
+
+The recursion removes the first coarse step, recursively replaces the tail, and joins the first
+replacement tower to that result. Keeping the endpoint comparisons in the private result makes
+the public operation uniform for empty coarse towers and zero-length replacement towers. -/
+private noncomputable def replaceStepsData :
+    (T : FiniteExactTower C) →
+      (R : ∀ _ : Fin T.length, FiniteExactTower C) →
+      (∀ i, (R i).object 0 ≅ T.object i.castSucc) →
+      (∀ i, (R i).object (Fin.last (R i).length) ≅ T.object i.succ) →
+      ReplaceStepsData T R
+  | {
+      length := 0, object := object, inclusion := inclusion, graded := graded,
+      projection := projection, zero := zero, shortExact := shortExact }, R, start, finish => {
+        tower := {
+          length := 0, object := object, inclusion := inclusion, graded := graded,
+          projection := projection, zero := zero, shortExact := shortExact }
+        length_eq := by simp
+        graded_eq := by simp [gradedObjects]
+        initialIso := Iso.refl _
+        terminalIso := Iso.refl _ }
+  | {
+      length := n + 1, object := object, inclusion := inclusion, graded := graded,
+      projection := projection, zero := zero, shortExact := shortExact }, R, start, finish => by
+      let tail : FiniteExactTower C := {
+        length := n
+        object := Fin.tail object
+        inclusion := Fin.tail inclusion
+        graded := Fin.tail graded
+        projection := Fin.tail projection
+        zero := Fin.tail zero
+        shortExact := Fin.tail shortExact }
+      let tailR : ∀ j : Fin tail.length, FiniteExactTower C :=
+        fun j => R j.succ
+      let tailStart : ∀ j, (tailR j).object 0 ≅ tail.object j.castSucc := fun j =>
+        (start j.succ).trans (eqToIso (congrArg object (by apply Fin.ext; rfl)))
+      let tailFinish : ∀ j,
+          (tailR j).object (Fin.last (tailR j).length) ≅ tail.object j.succ := fun j =>
+        (finish j.succ).trans (eqToIso (congrArg object (by apply Fin.ext; rfl)))
+      let D := replaceStepsData tail tailR tailStart tailFinish
+      let first := R 0
+      let seam : first.object (Fin.last first.length) ≅ D.tower.object 0 :=
+        (finish 0).trans
+          ((eqToIso (congrArg object (by apply Fin.ext; rfl))).trans D.initialIso)
+      let result := first.append D.tower seam
+      exact {
+        tower := result
+        length_eq := by
+          dsimp only [result]
+          rw [append_length, D.length_eq]
+          rw [← Fin.cons_self_tail (fun i => (R i).length), List.ofFn_cons]
+          simp only [List.sum_cons]
+          rfl
+        graded_eq := by
+          dsimp only [result]
+          rw [append_gradedObjects, D.graded_eq]
+          rw [← Fin.cons_self_tail (fun i => (R i).gradedObjects), List.ofFn_cons]
+          simp only [List.flatten_cons]
+          rfl
+        initialIso := (start 0).symm.trans (first.appendInitialIso D.tower seam)
+        terminalIso := (first.appendTerminalIso D.tower seam).trans D.terminalIso }
+termination_by T => T.length
+
+/-- Simultaneously replace every step of an exact tower by an endpoint-compatible exact tower.
+
+This is the many-step parent of `FiniteFiltration.refineStep`. It is deliberately owned by
+`FiniteExactTower`: geometric consumers provide replacement towers, while their concatenation,
+ordering, and endpoint bookkeeping remain common categorical infrastructure. -/
+noncomputable def replaceSteps (T : FiniteExactTower C)
+    (R : ∀ _ : Fin T.length, FiniteExactTower C)
+    (start : ∀ i, (R i).object 0 ≅ T.object i.castSucc)
+    (finish : ∀ i,
+      (R i).object (Fin.last (R i).length) ≅ T.object i.succ) :
+    FiniteExactTower C :=
+  (replaceStepsData T R start finish).tower
+
+@[simp]
+theorem replaceSteps_length (T : FiniteExactTower C)
+    (R : ∀ _ : Fin T.length, FiniteExactTower C)
+    (start : ∀ i, (R i).object 0 ≅ T.object i.castSucc)
+    (finish : ∀ i,
+      (R i).object (Fin.last (R i).length) ≅ T.object i.succ) :
+    (T.replaceSteps R start finish).length =
+      (List.ofFn fun i => (R i).length).sum :=
+  (replaceStepsData T R start finish).length_eq
+
+@[simp]
+theorem replaceSteps_gradedObjects (T : FiniteExactTower C)
+    (R : ∀ _ : Fin T.length, FiniteExactTower C)
+    (start : ∀ i, (R i).object 0 ≅ T.object i.castSucc)
+    (finish : ∀ i,
+      (R i).object (Fin.last (R i).length) ≅ T.object i.succ) :
+    (T.replaceSteps R start finish).gradedObjects =
+      (List.ofFn fun i => (R i).gradedObjects).flatten :=
+  (replaceStepsData T R start finish).graded_eq
+
+/-- The simultaneous replacement starts at the original tower's initial object. -/
+noncomputable def replaceStepsInitialIso (T : FiniteExactTower C)
+    (R : ∀ _ : Fin T.length, FiniteExactTower C)
+    (start : ∀ i, (R i).object 0 ≅ T.object i.castSucc)
+    (finish : ∀ i,
+      (R i).object (Fin.last (R i).length) ≅ T.object i.succ) :
+    T.object 0 ≅ (T.replaceSteps R start finish).object 0 :=
+  (replaceStepsData T R start finish).initialIso
+
+/-- The simultaneous replacement ends at the original tower's terminal object. -/
+noncomputable def replaceStepsTerminalIso (T : FiniteExactTower C)
+    (R : ∀ _ : Fin T.length, FiniteExactTower C)
+    (start : ∀ i, (R i).object 0 ≅ T.object i.castSucc)
+    (finish : ∀ i,
+      (R i).object (Fin.last (R i).length) ≅ T.object i.succ) :
+    (T.replaceSteps R start finish).object
+        (Fin.last (T.replaceSteps R start finish).length) ≅
+      T.object (Fin.last T.length) :=
+  (replaceStepsData T R start finish).terminalIso
+
 /-- Apply an exact functor to an endpoint-free exact tower. -/
 def map (T : FiniteExactTower C) (G : C ⥤ D) [G.PreservesZeroMorphisms]
     [PreservesFiniteLimits G] [PreservesFiniteColimits G] : FiniteExactTower D where
@@ -454,6 +582,42 @@ theorem map_comp (F : FiniteFiltration C M) (G : C ⥤ D) [G.PreservesZeroMorphi
     F.map (G ⋙ H) = (F.map G).map H := by
   cases F
   rfl
+
+/-- Replace every step of a filtration by an endpoint-compatible exact tower.
+
+The endpoint-free work is delegated to `FiniteExactTower.replaceSteps`; this specialization only
+transports the zero bottom and the chosen identification of the top with the filtered object. -/
+noncomputable def replaceSteps (F : FiniteFiltration C M)
+    (R : ∀ _ : Fin F.length, FiniteExactTower C)
+    (start : ∀ i, (R i).object 0 ≅ F.object i.castSucc)
+    (finish : ∀ i,
+      (R i).object (Fin.last (R i).length) ≅ F.object i.succ) :
+    FiniteFiltration C M where
+  toFiniteExactTower := F.toFiniteExactTower.replaceSteps R start finish
+  initialIsZero := IsZero.of_iso F.initialIsZero
+    (F.toFiniteExactTower.replaceStepsInitialIso R start finish).symm
+  terminalIso :=
+    (F.toFiniteExactTower.replaceStepsTerminalIso R start finish).trans F.terminalIso
+
+@[simp]
+theorem replaceSteps_length (F : FiniteFiltration C M)
+    (R : ∀ _ : Fin F.length, FiniteExactTower C)
+    (start : ∀ i, (R i).object 0 ≅ F.object i.castSucc)
+    (finish : ∀ i,
+      (R i).object (Fin.last (R i).length) ≅ F.object i.succ) :
+    (F.replaceSteps R start finish).length =
+      (List.ofFn fun i => (R i).length).sum :=
+  F.toFiniteExactTower.replaceSteps_length R start finish
+
+@[simp]
+theorem replaceSteps_gradedObjects (F : FiniteFiltration C M)
+    (R : ∀ _ : Fin F.length, FiniteExactTower C)
+    (start : ∀ i, (R i).object 0 ≅ F.object i.castSucc)
+    (finish : ∀ i,
+      (R i).object (Fin.last (R i).length) ≅ F.object i.succ) :
+    (F.replaceSteps R start finish).toFiniteExactTower.gradedObjects =
+      (List.ofFn fun i => (R i).gradedObjects).flatten :=
+  F.toFiniteExactTower.replaceSteps_gradedObjects R start finish
 
 /-- Replace one step of a filtration by an endpoint-compatible exact tower.
 
@@ -748,6 +912,36 @@ theorem refineStep_gradedObjects :
   simp [refineStep]
 
 end StepRefinement
+
+section AllStepsRefinement
+
+variable {M : C} (F : FiniteFiltration C M)
+variable (R : ∀ i : Fin F.length, FiniteFiltration C (F.graded i))
+
+/-- Refine every graded quotient of a filtration at once.
+
+For each coarse step, its quotient filtration is pulled back to an exact tower between the
+adjacent coarse stages. `FiniteExactTower.replaceSteps` then concatenates those lifted towers in
+coarse-step order. This is the categorical refinement used in the composition argument for
+almost-disconnected morphisms. -/
+noncomputable def refineAll : FiniteFiltration C M :=
+  F.replaceSteps
+    (fun i => (R i).pullbackTower (F.projection i))
+    (fun i => refinementInitialIso F i (R i))
+    (fun i => refinementTerminalIso F i (R i))
+
+@[simp]
+theorem refineAll_length :
+    (refineAll F R).length = (List.ofFn fun i => (R i).length).sum := by
+  simp [refineAll]
+
+@[simp]
+theorem refineAll_gradedObjects :
+    (refineAll F R).toFiniteExactTower.gradedObjects =
+      (List.ofFn fun i => (R i).toFiniteExactTower.gradedObjects).flatten := by
+  simp [refineAll]
+
+end AllStepsRefinement
 
 end FiniteFiltration
 

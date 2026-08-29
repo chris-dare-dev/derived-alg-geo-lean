@@ -40,6 +40,11 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteExactTower.append_gradedObjects
 #print axioms CategoryTheory.FiniteExactTower.appendInitialIso
 #print axioms CategoryTheory.FiniteExactTower.appendTerminalIso
+#print axioms CategoryTheory.FiniteExactTower.replaceSteps
+#print axioms CategoryTheory.FiniteExactTower.replaceSteps_length
+#print axioms CategoryTheory.FiniteExactTower.replaceSteps_gradedObjects
+#print axioms CategoryTheory.FiniteExactTower.replaceStepsInitialIso
+#print axioms CategoryTheory.FiniteExactTower.replaceStepsTerminalIso
 #print axioms CategoryTheory.FiniteExactTower.map
 #print axioms CategoryTheory.FiniteExactTower.map_length
 #print axioms CategoryTheory.FiniteExactTower.map_object
@@ -66,6 +71,9 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteFiltration.map_graded
 #print axioms CategoryTheory.FiniteFiltration.map_id
 #print axioms CategoryTheory.FiniteFiltration.map_comp
+#print axioms CategoryTheory.FiniteFiltration.replaceSteps
+#print axioms CategoryTheory.FiniteFiltration.replaceSteps_length
+#print axioms CategoryTheory.FiniteFiltration.replaceSteps_gradedObjects
 #print axioms CategoryTheory.FiniteFiltration.spliceStep
 #print axioms CategoryTheory.FiniteFiltration.spliceStep_length
 #print axioms CategoryTheory.FiniteFiltration.spliceStep_gradedObjects
@@ -95,3 +103,6 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteFiltration.refineStep
 #print axioms CategoryTheory.FiniteFiltration.refineStep_length
 #print axioms CategoryTheory.FiniteFiltration.refineStep_gradedObjects
+#print axioms CategoryTheory.FiniteFiltration.refineAll
+#print axioms CategoryTheory.FiniteFiltration.refineAll_length
+#print axioms CategoryTheory.FiniteFiltration.refineAll_gradedObjects
