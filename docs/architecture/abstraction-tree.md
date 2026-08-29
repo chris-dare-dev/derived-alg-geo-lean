@@ -59,8 +59,11 @@ Algebra
 
 AlgebraicGeometry
 ├─ scheme module sheaves
-│  ├─ intrinsic IsInvertible
-│  │  └─ pullback preservation          theorem inherited by every consumer
+│  ├─ sheafified tensor / MonoidalCategory X.Modules
+│  │  ├─ intrinsic IsInvertible as ObjectProperty.IsMonoidal
+│  │  │  ├─ InvertibleSheaf              inherited full monoidal subcategory
+│  │  │  └─ pullback preservation        theorem inherited by every consumer
+│  │  └─ Functor.Monoidal pullback input standard tensor/unit comparison surface
 │  └─ LineBundleData                     invertible sheaf plus chosen tensor inverse
 │     ├─ determinant and Picard interpretations
 │     ├─ monoidal pullback and projection formula
@@ -96,6 +99,10 @@ particular:
   inert fields in the numerical root;
 - generic stacks, replete subprestacks, boundedness, and presentation data do
   not import stability-condition modules;
+- put the sheafified tensor and its coherence on all scheme-module sheaves;
+  invertible sheaves inherit that root through `ObjectProperty.IsMonoidal`, and
+  pullback monoidality uses Mathlib's `Functor.Monoidal` rather than a parallel
+  capability class;
 - a paper-specific module may instantiate these roots but never becomes a root
   imported by them.
 

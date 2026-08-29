@@ -1861,15 +1861,18 @@ not functions. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.isIso_tensorSheafificationComparisonRight
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorAssocIso
 
--- Layer B stage 2: the descended tensor product is coherently symmetric monoidal on
--- invertible sheaves, and its skeleton yields the Picard group. Pentagon and both hexagons
--- reduce to the corresponding presheaf identities; no coherence law is postulated.
+-- Layer B stage 2: the descended tensor product is monoidal on all scheme-module sheaves.
+-- Intrinsic invertibility is a monoidal object property, so invertible sheaves inherit the
+-- structure as a full monoidal subcategory rather than reimplementing it at the leaf.
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorSheafificationComparisonRight_naturality
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorSheafificationComparisonLeft_naturality
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorAssocIso_naturality
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_id_id
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_comp_tensorHom
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorSheafificationComparisonRight_comp_tensorAssocIso
+#print axioms AlgebraicGeometry.Scheme.Modules.modulesMonoidalCategoryStruct
+#print axioms AlgebraicGeometry.Scheme.Modules.modulesMonoidalCategory
+#print axioms AlgebraicGeometry.Scheme.Modules.isInvertibleIsMonoidal
 #print axioms AlgebraicGeometry.Scheme.Modules.invertibleSheafMonoidalCategoryStruct
 #print axioms AlgebraicGeometry.Scheme.Modules.invertibleSheafMonoidalCategory
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorCommIso_naturality
@@ -2633,20 +2636,17 @@ The twist F(d) itself, its two coherence isomorphisms, and coherence-preservatio
 /-! ## The twist F(d) = F (x) O(d) (#584, deliverables 1, 2a and 4)
 
 The three deliverables that need nothing beyond the tensor product twistingSheaf_isInvertible made
-applicable. tensorObjIso is the general half: tensorObj is not a bifunctor in this tree -- the
-monoidal structure exists only on the invertible sheaves -- but tensorHom_id_id and
-tensorHom_comp_tensorHom are exactly the functoriality an isomorphism needs.
+applicable. tensorObjIso is the objectwise comparison supplied before the canonical ambient
+monoidal structure on all module sheaves was packaged.
 
 F(d)(e) = F(d+e) is NOT here. It is built in the next section, on TwistComparison.lean, out of the
 comparison with the graded shift, after which sheafTwistAddIso finishes it with no associator at
 all; coherence preservation waits on the same comparison.
 
-The reason recorded here until #833 -- that tensorAssocIso requires BOTH outer factors invertible,
-so no rearrangement of (F (x) O(d)) (x) O(e) through tensorCommIso avoids leaving a non-invertible
-factor outermost -- NO LONGER HOLDS. isIso_tensorSheafificationComparisonLeft is now hypothesis-free
-and tensorAssocIso needs only its right-hand factor invertible, so tensorAssocIso F O(d) O(e) is
-legal. Whether the associator route is now preferable to the graded-shift one is not settled here;
-what is settled is that the obstruction this paragraph named is gone. -/
+The old obstruction recorded here no longer exists: both sheafification comparisons, and hence
+`tensorAssocIso`, now work for arbitrary module sheaves. Whether the associator route is preferable
+to the graded-shift comparison remains a consumer-level design question rather than a limitation
+of the tensor root. -/
 
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorObjIso
 #print axioms AlgebraicGeometry.Proj.tensorTwist
@@ -3064,9 +3064,9 @@ the maximum over a finite family.
 
 Raising is done on the CHART EXTENSIONS, not at the sheaf level, and that is the whole content. The
 sheaf-level route -- multiply the global section of F(N) by f^(N'-N) and transport along
-F(N)(N'-N) = F(N') -- was recorded as unavailable because tensorAssocIso required both OUTER tensor
-factors invertible. #833 removed that hypothesis from the left factor, so the associator itself is
-no longer the obstruction. The rest of the objection stands and is what still rules the route out:
+F(N)(N'-N) = F(N') -- was recorded as unavailable because `tensorAssocIso` had invertibility
+hypotheses. Those hypotheses are now gone, so the associator itself is no longer the obstruction.
+The rest of the objection stands and is what still rules the route out:
 tensorTwistAddIso supplies the composition for F an ASSOCIATED sheaf only, which is not the
 hypothesis here, and even granting the isomorphism the argument would have to compute what it does
 to a section, which is what #585 established these witnesses cannot do.
