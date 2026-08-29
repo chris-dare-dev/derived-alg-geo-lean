@@ -28,10 +28,10 @@ namespace AlgebraicGeometry.Scheme.Modules
 
 variable {X : Scheme.{u}}
 
-local instance tensorExact_category : Category X.Modules :=
+private local instance tensorExact_category : Category X.Modules :=
   inferInstanceAs (Category (SheafOfModules X.ringCatSheaf))
 
-noncomputable local instance tensorExact_monoidalCategory :
+private noncomputable local instance tensorExact_monoidalCategory :
     MonoidalCategory X.PresheafOfModules :=
   PresheafOfModules.monoidalCategory (R := X.presheaf)
 
