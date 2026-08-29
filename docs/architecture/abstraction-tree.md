@@ -58,6 +58,11 @@ Algebra
    └─ saturated quotient and torsion-free universal property
 
 AlgebraicGeometry
+├─ scheme module sheaves
+│  └─ LineBundleData                     invertible sheaf plus chosen tensor inverse
+│     ├─ determinant and Picard interpretations
+│     ├─ pullback and projection formula
+│     └─ almost-disconnected graded pieces   scheme-geometric leaf
 ├─ scheme-derived category
 │  ├─ Dqc
 │  ├─ bounded coherent locus

@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.ExteriorPower
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.PicardGroup
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
 import Mathlib.LinearAlgebra.ExteriorPower.Basis
 
 /-!
@@ -89,33 +90,7 @@ noncomputable def ofIso {E F : X.Modules} {n : ℕ}
 
 end FiniteLocallyFreeData
 
-/-- An invertible sheaf together with an explicit tensor inverse.
-
-Keeping the inverse in the data gives a canonical element of the repository's scheme-level
-Picard group, whose elements are units in the monoid of invertible-sheaf isomorphism classes. -/
-structure LineBundleData (X : Scheme.{u}) where
-  line : X.Modules
-  inverse : X.Modules
-  lineIsInvertible :
-    SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from line)
-  inverseIsInvertible :
-    SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from inverse)
-  tensorInverseIso :
-    tensorObj line inverse ≅ SheafOfModules.unit X.ringCatSheaf
-
 namespace LineBundleData
-
-instance (L : LineBundleData X) :
-    SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L.line) :=
-  L.lineIsInvertible
-
-instance (L : LineBundleData X) :
-    SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L.inverse) :=
-  L.inverseIsInvertible
 
 /-- The underlying sheaf of a line bundle is coherent. -/
 theorem isCoherent (L : LineBundleData X) : IsCoherent X L.line := by
@@ -144,37 +119,6 @@ noncomputable def finiteLocallyFree (L : LineBundleData X) :
             uniq := fun a => (hrank i).2.elim a _ }
         exact ⟨Equiv.ofUnique _ _⟩ }
 
-section Unit
-
-local instance : Category X.Opens :=
-  inferInstanceAs (Category (TopologicalSpace.Opens X))
-
-private theorem unitIsInvertible (X : Scheme.{u}) :
-    SheafOfModules.IsInvertible.{u, u, u}
-      (SheafOfModules.unit X.ringCatSheaf) := by
-  let q₀ := (SheafOfModules.free.generatingSections
-    (R := X.ringCatSheaf) PUnit.{u + 1}).localGeneratorsData
-  let e : SheafOfModules.free (R := X.ringCatSheaf) PUnit.{u + 1} ≅
-      SheafOfModules.unit X.ringCatSheaf := SheafOfModules.freePUnitIsoUnit
-  letI : q₀.IsLocallyFreeData := by
-    dsimp [q₀]
-    infer_instance
-  exact
-    { exists_rankOneData := ⟨q₀.ofIso e, inferInstance, by
-        intro i
-        change Nonempty PUnit ∧ Subsingleton PUnit
-        exact ⟨inferInstance, inferInstance⟩⟩ }
-
-/-- The structure sheaf with itself as tensor inverse. -/
-noncomputable def unit (X : Scheme.{u}) : LineBundleData X where
-  line := SheafOfModules.unit X.ringCatSheaf
-  inverse := SheafOfModules.unit X.ringCatSheaf
-  lineIsInvertible := unitIsInvertible X
-  inverseIsInvertible := unitIsInvertible X
-  tensorInverseIso := tensorUnitLeftIso _
-
-end Unit
-
 /-- The Picard-group element represented by a line bundle with its recorded inverse. -/
 noncomputable def toPic (L : LineBundleData X) : Pic X :=
   Pic.mkOfTensorInverse L.line L.inverse L.tensorInverseIso
@@ -190,40 +134,6 @@ theorem toPic_eq_of_iso (L M : LineBundleData X) (e : L.line ≅ M.line) :
   apply Units.ext
   change PicardClass.mk L.line = PicardClass.mk M.line
   exact (PicardClass.mk_eq_mk_iff _ _).2 ⟨e⟩
-
-private noncomputable def tensorIso
-    {L₁ L₂ M₁ M₂ : X.Modules} (e : L₁ ≅ L₂) (f : M₁ ≅ M₂) :
-    tensorObj L₁ M₁ ≅ tensorObj L₂ M₂ where
-  hom := tensorHom e.hom f.hom
-  inv := tensorHom e.inv f.inv
-  hom_inv_id := by
-    rw [tensorHom_comp_tensorHom, e.hom_inv_id, f.hom_inv_id,
-      tensorHom_id_id]
-  inv_hom_id := by
-    rw [tensorHom_comp_tensorHom, e.inv_hom_id, f.inv_hom_id,
-      tensorHom_id_id]
-
-/-- The inverse line bundle, with the two recorded representatives exchanged. -/
-noncomputable def dual (L : LineBundleData X) : LineBundleData X where
-  line := L.inverse
-  inverse := L.line
-  lineIsInvertible := L.inverseIsInvertible
-  inverseIsInvertible := L.lineIsInvertible
-  tensorInverseIso := tensorCommIso L.inverse L.line ≪≫ L.tensorInverseIso
-
-/-- Tensor product of explicitly invertible line bundles. -/
-noncomputable def tensor (L M : LineBundleData X) : LineBundleData X where
-  line := tensorObj L.line M.line
-  inverse := tensorObj M.inverse L.inverse
-  lineIsInvertible := isInvertible_tensorObj L.line M.line
-  inverseIsInvertible := isInvertible_tensorObj M.inverse L.inverse
-  tensorInverseIso :=
-    tensorAssocIso L.line M.line (tensorObj M.inverse L.inverse) ≪≫
-      tensorIso (Iso.refl L.line)
-        ((tensorAssocIso M.line M.inverse L.inverse).symm ≪≫
-          tensorIso M.tensorInverseIso (Iso.refl L.inverse) ≪≫
-          tensorUnitLeftIso L.inverse) ≪≫
-      L.tensorInverseIso
 
 @[simp]
 theorem toPic_dual (L : LineBundleData X) :
