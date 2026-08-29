@@ -26,3 +26,24 @@ docstring in `DerivedAlgGeo/CategoryTheory/Triangulated/SphericalTwist/`. -/
 #print axioms SphericalTwist.twistK₀_of_chi_eq_zero
 #print axioms SphericalTwist.chiK₀_twistK₀_eq_zero_iff
 #print axioms SphericalTwist.chiK₀_twistK₀_twistK₀
+
+/-! ## Mukai lane — `τ_E` transported to the lattice
+
+`MukaiRealization` is SUPPLIED data and nothing constructs one; its
+`chi_eq_neg_pairing` field is Mukai's theorem / HRR. See the module docstring in
+`SphericalTwist/Mukai.lean`. -/
+
+#print axioms SphericalTwist.MukaiRealization
+#print axioms SphericalTwist.MukaiRealization.mk.inj
+#print axioms SphericalTwist.MukaiRealization.mk.sizeOf_spec
+#print axioms SphericalTwist.MukaiRealization.v
+#print axioms SphericalTwist.MukaiRealization.symm
+#print axioms SphericalTwist.MukaiRealization.chi_eq_neg_pairing
+#print axioms SphericalTwist.MukaiRealization.isSpherical_of_chi_eq_two
+#print axioms SphericalTwist.MukaiRealization.map_twistK₀
+#print axioms SphericalTwist.MukaiRealization.isSpherical_map_twistK₀
+#print axioms SphericalTwist.MukaiRealization.isIsotropic_map_twistK₀
+#print axioms SphericalTwist.MukaiRealization.expectedDim_map_twistK₀
+#print axioms SphericalTwist.MukaiRealization.map_twistK₀Equiv
+#print axioms SphericalTwist.MukaiRealization.chiK₀_twistK₀_twistK₀
+#print axioms SphericalTwist.MukaiRealization.chiK₀_comm
