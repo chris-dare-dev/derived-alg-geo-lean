@@ -6,8 +6,29 @@ input.
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 
 #print axioms AlgebraicGeometry.AlmostDisconnected.structureSheaf
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.support
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.inclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.inclusion_isClosedImmersion
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.baseIso
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.baseIso_hom
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.mk.inj
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.instIsClosedImmersionInclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.identity
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp_support
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp_inclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp_baseIso
+#print axioms AlgebraicGeometry.AlmostDisconnected.GradedPieceData
+#print axioms AlgebraicGeometry.AlmostDisconnected.GradedPieceData.toSupportData
+#print axioms AlgebraicGeometry.AlmostDisconnected.GradedPieceData.lineBundle
+#print axioms AlgebraicGeometry.AlmostDisconnected.GradedPieceData.gradedIso
+#print axioms AlgebraicGeometry.AlmostDisconnected.GradedPieceData.mk.inj
+#print axioms AlgebraicGeometry.AlmostDisconnected.GradedPieceData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.filtration
+#print axioms AlgebraicGeometry.AlmostDisconnected.Witness.piece
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.support
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.inclusion
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.inclusion_isClosedImmersion
@@ -18,6 +39,11 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.mk.inj
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.instIsClosedImmersionInclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.Witness.CompositionIndex
+#print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionIndexEquiv
+#print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionSupportData
+#print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionSupportData_support
+#print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionSupportData_inclusion
 #print axioms AlgebraicGeometry.AlmostDisconnected.identityWitness
 #print axioms AlgebraicGeometry.IsAlmostDisconnected
 #print axioms AlgebraicGeometry.IsAlmostDisconnected.id
