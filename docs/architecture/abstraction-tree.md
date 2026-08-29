@@ -59,9 +59,11 @@ Algebra
 
 AlgebraicGeometry
 ├─ scheme module sheaves
+│  ├─ intrinsic IsInvertible
+│  │  └─ pullback preservation          theorem inherited by every consumer
 │  └─ LineBundleData                     invertible sheaf plus chosen tensor inverse
 │     ├─ determinant and Picard interpretations
-│     ├─ pullback and projection formula
+│     ├─ monoidal pullback and projection formula
 │     └─ almost-disconnected graded pieces   scheme-geometric leaf
 ├─ scheme-derived category
 │  ├─ Dqc
