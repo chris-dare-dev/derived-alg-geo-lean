@@ -2637,11 +2637,16 @@ applicable. tensorObjIso is the general half: tensorObj is not a bifunctor in th
 monoidal structure exists only on the invertible sheaves -- but tensorHom_id_id and
 tensorHom_comp_tensorHom are exactly the functoriality an isomorphism needs.
 
-F(d)(e) = F(d+e) is NOT here and cannot be got this way: tensorAssocIso requires BOTH outer factors
-invertible, and no rearrangement of (F (x) O(d)) (x) O(e) through tensorCommIso avoids leaving a
-non-invertible factor outermost. It needs the comparison with the graded shift, after which
-sheafTwistAddIso finishes it with no associator at all. Coherence preservation waits on the same
-comparison. Both land in the next section, on TwistComparison.lean. -/
+F(d)(e) = F(d+e) is NOT here. It is built in the next section, on TwistComparison.lean, out of the
+comparison with the graded shift, after which sheafTwistAddIso finishes it with no associator at
+all; coherence preservation waits on the same comparison.
+
+The reason recorded here until #833 -- that tensorAssocIso requires BOTH outer factors invertible,
+so no rearrangement of (F (x) O(d)) (x) O(e) through tensorCommIso avoids leaving a non-invertible
+factor outermost -- NO LONGER HOLDS. isIso_tensorSheafificationComparisonLeft is now hypothesis-free
+and tensorAssocIso needs only its right-hand factor invertible, so tensorAssocIso F O(d) O(e) is
+legal. Whether the associator route is now preferable to the graded-shift one is not settled here;
+what is settled is that the obstruction this paragraph named is gone. -/
 
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorObjIso
 #print axioms AlgebraicGeometry.Proj.tensorTwist
@@ -3059,12 +3064,12 @@ the maximum over a finite family.
 
 Raising is done on the CHART EXTENSIONS, not at the sheaf level, and that is the whole content. The
 sheaf-level route -- multiply the global section of F(N) by f^(N'-N) and transport along
-F(N)(N'-N) = F(N') -- is not available, and TensorTwist.lean already records why: tensorAssocIso
-requires both OUTER tensor factors invertible, and no rearrangement of (F (x) O(d)) (x) O(e) under
-tensorCommIso gets the non-invertible F off an outer slot. tensorTwistAddIso supplies the
-composition for F an ASSOCIATED sheaf only, which is not the hypothesis here. Even granting the
-isomorphism the argument would have to compute what it does to a section, which is what #585
-established these witnesses cannot do.
+F(N)(N'-N) = F(N') -- was recorded as unavailable because tensorAssocIso required both OUTER tensor
+factors invertible. #833 removed that hypothesis from the left factor, so the associator itself is
+no longer the obstruction. The rest of the objection stands and is what still rules the route out:
+tensorTwistAddIso supplies the composition for F an ASSOCIATED sheaf only, which is not the
+hypothesis here, and even granting the isomorphism the argument would have to compute what it does
+to a section, which is what #585 established these witnesses cannot do.
 
 This is the same move as ChartExtension.lean's exists_pow_smul_eq_res_chart_of_le, which raises the
 extension exponent in the chart's own coordinates. Its existential form cannot be reused here: it

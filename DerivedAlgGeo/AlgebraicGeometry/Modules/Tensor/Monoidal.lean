@@ -199,12 +199,10 @@ lemma tensorSheafificationComparisonLeft_naturality {L M : X.Modules} (f : L ⟶
       rw [MonoidalCategory.tensorHom_comp_tensorHom]
       rw [Category.id_comp]
 
+/-- Naturality of the associator. `L₁` and `L₂` carried invertibility hypotheses until #833
+made `tensorAssocIso` independent of its left-hand factor; only the right-hand ones remain. -/
 lemma tensorAssocIso_naturality
     {L₁ L₂ M₁ M₂ N₁ N₂ : X.Modules}
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L₁)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L₂)]
     [SheafOfModules.IsInvertible.{u, u, u}
       (show SheafOfModules X.ringCatSheaf from N₁)]
     [SheafOfModules.IsInvertible.{u, u, u}
@@ -465,10 +463,9 @@ private lemma tensorAssocIso_triangle (L M : X.Modules)
   congr 1
   exact MonoidalCategory.triangle A B
 
+/-- The right comparison composed with the associator. The hypothesis on `L` went with #833. -/
 lemma tensorSheafificationComparisonRight_comp_tensorAssocIso
     (L M N : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
     [SheafOfModules.IsInvertible.{u, u, u}
       (show SheafOfModules X.ringCatSheaf from N)] :
     tensorSheafificationComparisonRight
