@@ -7,7 +7,7 @@ replay across an import boundary, and since 2026-08-22 it imports no slices.
 
 Part of the library build since 2026-08-04: a `lean_lib` with
 `srcDir = "scripts"`. Removed from `defaultTargets` on 2026-08-06 -- this file
-does `import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition`, so it sits downstream of every module and was
+does `import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition`, so it sits downstream of every module and was
 making every edit anywhere re-elaborate all 497 records before `lake build`
 returned. It is still a `lean_lib` and CI's axiom-gate step still runs it, so
 nothing it guarded is lost; you just have to name it. Its output backs the
@@ -42,7 +42,7 @@ The revision below reported a real gap of **59**. The true figure was **29**.
 The other 30 were compiler-generated names the sweep did not recognise --
 `<Struct>.ctorIdx`, `<Struct>.mk.inj`, `<def>.congr_simp`, and generated
 `ext_iff`/`ext'_iff` companions of `@[ext]` theorems. Each family was then grepped for in
-`DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/` and occurs there **zero** times, so none is a declaration
+`DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/` and occurs there **zero** times, so none is a declaration
 anyone wrote or could list. A later census correction added the likewise
 source-absent `hcongr_*` family; `scripts/StabilityConditionCensus.lean` now filters all six.
 

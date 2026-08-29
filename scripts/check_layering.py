@@ -326,18 +326,66 @@ def main() -> int:
     if cycle is not None:
         failures.append("subject dependency cycle: " + " -> ".join(cycle))
 
-    legacy_root = (
+    legacy_stability_root = (
         SOURCE_ROOT
         / "CategoryTheory"
         / "Triangulated"
         / "StabilityCondition"
+    )
+    legacy_stability_umbrella = legacy_stability_root.with_suffix(".lean")
+    if legacy_stability_root.exists() or legacy_stability_umbrella.exists():
+        failures.append(
+            "legacy sibling CategoryTheory/Triangulated/StabilityCondition "
+            "path restored; Bridgeland stability is the child of "
+            "WeakStabilityCondition"
+        )
+
+    weak_stability_root = (
+        SOURCE_ROOT
+        / "CategoryTheory"
+        / "Triangulated"
+        / "WeakStabilityCondition"
+    )
+    weak_stability_umbrella = weak_stability_root.with_suffix(".lean")
+    strong_stability_root = weak_stability_root / "StabilityCondition"
+    strong_stability_umbrella = strong_stability_root.with_suffix(".lean")
+    weak_stability_module = (
+        "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition"
+    )
+    strong_stability_module = weak_stability_module + ".StabilityCondition"
+
+    weak_parent_paths = [weak_stability_umbrella]
+    weak_parent_paths.extend(
+        path
+        for path in sorted(weak_stability_root.rglob("*.lean"))
+        if path != strong_stability_umbrella
+        and strong_stability_root not in path.parents
+    )
+    for path in weak_parent_paths:
+        for module in imports_by_path[path]:
+            if module == strong_stability_module or module.startswith(
+                strong_stability_module + "."
+            ):
+                failures.append(
+                    f"{path.relative_to(ROOT)}: weak-stability parent imports "
+                    f"its Bridgeland child {module}"
+                )
+
+    if weak_stability_module not in imports_by_path[strong_stability_umbrella]:
+        failures.append(
+            "the Bridgeland StabilityCondition umbrella must import its "
+            "WeakStabilityCondition parent"
+        )
+
+    generic_families_root = (
+        strong_stability_root
         / "Families"
     )
     geometry_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "StabilityCondition" / "Families"
     )
     for module in sorted(GEOMETRY_FAMILY_MODULES):
-        legacy = legacy_root / f"{module}.lean"
+        legacy = generic_families_root / f"{module}.lean"
         relocated = geometry_root / f"{module}.lean"
         if legacy.exists():
             failures.append(
@@ -350,7 +398,7 @@ def main() -> int:
                 f"{relocated.relative_to(ROOT)}"
             )
 
-    legacy_dqc = legacy_root / "Dqc"
+    legacy_dqc = generic_families_root / "Dqc"
     relocated_dqc = geometry_root / "Dqc"
     if legacy_dqc.exists():
         failures.append(
@@ -446,6 +494,10 @@ def main() -> int:
     )
     print("ok: raw dg theory is independent of the dg-enhancement layer")
     print("ok: the monoidal layer precedes enrichment and does not import its children")
+    print(
+        "ok: weak stability is independent of, and directly parented by, "
+        "Bridgeland stability"
+    )
     print(
         f"ok: {len(GEOMETRY_FAMILY_MODULES)} geometric family roots have "
         "AlgebraicGeometry owners"

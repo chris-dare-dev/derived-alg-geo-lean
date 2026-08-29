@@ -2,7 +2,7 @@
 WeakStability slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
@@ -23,6 +23,9 @@ docstring and #111). -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ofPre
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ofPre_slicing
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ofPre_Z
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.toWeak
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.toWeak_slicing
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.toWeak_Z
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityFunction
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.upper
@@ -425,4 +428,3 @@ no source statement and make no §14 coverage promotion. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.heart_hom_zero_of_semistable_phase_gt
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.ambientPhasePredicate_hom_zero
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.reverseSlicingObligationsOfHN
-

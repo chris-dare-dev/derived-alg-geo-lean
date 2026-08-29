@@ -3,8 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.BoundedGeometry
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.PreStabilityBaseChange
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.InducingBoundary
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.PreStabilityBaseChange
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Phase.Transfer.InducingBoundary
 import Mathlib.CategoryTheory.Triangulated.Adjunction
 
 /-!

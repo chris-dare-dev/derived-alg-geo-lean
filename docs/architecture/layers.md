@@ -49,8 +49,12 @@ instance umbrella or the public repository root.
 
 In particular:
 
-- abstract stability-family data remain in
-  `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families`;
+- abstract fiber categories and pullback functors live in
+  `DerivedAlgGeo.CategoryTheory.Triangulated.Families`;
+- weak-family probes and weak stability data live in
+  `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families`;
+- ordinary Bridgeland family packages live in
+  `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`;
 - scheme, Dqc, pullback, finite-type, and kernel realizations live in
   `DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families`;
 - `CategoryTheory` must not import either `DerivedAlgGeo.AlgebraicGeometry` or
@@ -70,6 +74,29 @@ The source tree follows general constructions before concrete instances:
 - weak stability is the dependency parent of ordinary Bridgeland stability,
   and the Lean structures must expose the corresponding projection or
   constructor.
+
+The physical module tree records that refinement directly:
+
+```text
+CategoryTheory/Triangulated/Families
+  └─→ abstract fiber categories and pullback functors
+
+CategoryTheory/Triangulated/WeakStabilityCondition
+  ├─→ Foundation, Families, HarderNarasimhan, Support, Tilting
+  └─→ StabilityCondition
+        ├─→ Foundation, Phase, Metric, Symmetry, Support, Walls
+        ├─→ Families                         abstract categorical families
+        └─→ WeakCompatibility                strong-to-weak adapters
+
+AlgebraicGeometry/StabilityCondition
+  ├─→ Families                              scheme and Dqc realizations
+  └─→ future slope-to-Bridgeland instances  only under valid hypotheses
+```
+
+The weak umbrella is independently importable and the layering gate rejects
+imports from that parent into the `StabilityCondition` child. Declaration
+names remain in their established namespaces during this path cutover; module
+ownership and declaration namespace are separate compatibility concerns.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map
@@ -106,8 +133,10 @@ making every dg category triangulated.
 
 The source-layer gate in `scripts/check_layering.py` reconstructs the collapsed
 graph from every tracked library import, rejects cycles and forbidden reverse
-edges, and verifies that the relocated geometric family modules do not return
-to their former owner.
+edges, verifies that the weak-stability parent does not import its Bridgeland
+child, rejects restoration of the former sibling `StabilityCondition` path,
+and verifies that relocated geometric family modules do not return to their
+former owner.
 
 ## AlgebraicGeometry sublayers
 
@@ -151,7 +180,9 @@ only need to migrate imports:
 
 | Client need | Import |
 | --- | --- |
-| Generic family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families` |
+| Fiber categories and pullbacks | `DerivedAlgGeo.CategoryTheory.Triangulated.Families` |
+| Weak-stability family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families` |
+| Ordinary Bridgeland family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families` |
 | Scheme-specific realizations | `DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families` |
 | Former combined surface during migration | `DerivedAlgGeo.Compatibility.StabilityConditionFamilies` |
 

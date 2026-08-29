@@ -11,12 +11,11 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SOURCE_ROOT = ROOT / "DerivedAlgGeo"
 UMBRELLA = (
-    "DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation"
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Foundation"
 )
 ALLOWED_IMPORTERS = {
-    pathlib.Path("DerivedAlgGeo/CategoryTheory/Triangulated.lean"),
     pathlib.Path(
-        "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition.lean"
+        "DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition.lean"
     ),
 }
 IMPORT = re.compile(r"^\s*import\s+(\S+)")
@@ -40,9 +39,11 @@ def main() -> int:
             failures.append(
                 f"{relative}:{line_number}: imports the downstream Foundation "
                 "umbrella; import the narrow owning module instead (for example "
-                "Foundation.Slicing, Foundation.PreStabilityCondition, "
-                "Foundation.StabilityCondition, Foundation.IntervalCategory, "
-                "or a Foundation.StabilityFunction leaf)"
+                "the weak parent Foundation.Slicing or "
+                "Foundation.IntervalCategory, the strong child "
+                "Foundation.PreStabilityCondition or "
+                "Foundation.StabilityCondition, or a narrow "
+                "Foundation.StabilityFunction leaf)"
             )
 
     if failures:

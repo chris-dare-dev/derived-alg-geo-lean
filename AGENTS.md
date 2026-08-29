@@ -76,18 +76,26 @@ new derived-category theory.
 
 ## Stability conditions and geometric applications
 
-- Pure weak-stability and Bridgeland-stability theory belongs under
-  `CategoryTheory/Triangulated/`.
-- Weak stability is the dependency parent of ordinary Bridgeland stability;
-  strong conditions must canonically expose their weak data.
+- Pure weak-stability theory belongs under
+  `CategoryTheory/Triangulated/WeakStabilityCondition/`. Ordinary Bridgeland
+  stability is its stronger child under
+  `WeakStabilityCondition/StabilityCondition/`; do not restore a sibling
+  `CategoryTheory/Triangulated/StabilityCondition/` tree.
+- The weak parent must not import its Bridgeland child. Strong conditions must
+  canonically expose their weak data; adapters that require strong definitions
+  belong in the child's `WeakCompatibility/` leaf.
 - Abstract pullback, pseudofunctor, Fourier--Mukai correspondence, and kernel
   convolution interfaces stay categorical. Scheme pullback, geometric
   kernels, and integral-transform realizations go in their corresponding
-  `Instances/AlgebraicGeometry/` leaves.
+  `Instances/AlgebraicGeometry/` leaves. In particular, the base category,
+  fiber categories, and abstract pullback functors of a triangulated family
+  belong under `CategoryTheory/Triangulated/Families/` before any stability or
+  geometry is imposed.
 - General Mumford slope data belongs with weak geometric stability. A module
   constructing a Bridgeland stability condition from it belongs below the
-  Bridgeland theory only under the hypotheses where that construction is
-  valid, such as the appropriate curve case.
+  Bridgeland child only under the hypotheses where that construction is valid,
+  such as the appropriate curve case; intrinsically scheme-specific input
+  remains an algebraic-geometric instance or realization.
 
 ## Umbrellas and dependency direction
 

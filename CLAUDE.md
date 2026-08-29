@@ -18,8 +18,12 @@ The principal areas are:
 - `DerivedAlgGeo/CategoryTheory/Triangulated/DGEnhancement/` for the
   triangulated `H⁰` of a pretriangulated dg category and dg enhancements;
 - `DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/` for t-structures;
-- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/` for
-  Bridgeland stability foundations and applications;
+- `DerivedAlgGeo/CategoryTheory/Triangulated/Families/` for generic
+  contravariant families of triangulated categories and pullback functors;
+- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/` for weak
+  stability, generic stability functions, and shared slicing prerequisites;
+- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/` for
+  the stronger Bridgeland refinement and its categorical applications;
 - `DerivedAlgGeo/LinearAlgebra/` for lattice and matrix prerequisites;
 - `DerivedAlgGeo/Development/` for code intentionally excluded from the stable
   root.
@@ -79,12 +83,18 @@ cones needed for its `H⁰` to be triangulated. Consequently:
   category, until the relevant dg localization or resolution model is proved.
 
 Pure weak and Bridgeland stability theory remains categorical. Weak stability
-is the dependency parent of ordinary Bridgeland stability. Abstract pullback,
-pseudofunctor, and Fourier--Mukai interfaces remain categorical; their scheme
-and sheaf realizations belong in explicit `Instances/AlgebraicGeometry/`
-leaves. General Mumford slope data is weak-stability input, while a promotion
-to Bridgeland stability belongs below the strong theory only under hypotheses
-where that promotion is valid.
+is the independently importable dependency parent at
+`CategoryTheory/Triangulated/WeakStabilityCondition/`; ordinary Bridgeland
+stability is its child at `WeakStabilityCondition/StabilityCondition/`. Never
+restore a sibling `CategoryTheory/Triangulated/StabilityCondition/` tree, and
+keep strong-dependent adapters in the child's `WeakCompatibility/` leaf.
+Abstract pullback, pseudofunctor, and Fourier--Mukai interfaces remain
+categorical; their scheme and sheaf realizations belong in explicit
+`Instances/AlgebraicGeometry/` leaves. General Mumford slope data is
+weak-stability input, while a promotion to Bridgeland stability belongs below
+the strong child only under hypotheses where that promotion is valid.
+Scheme-specific data remains geometry-owned and realizes the categorical
+interface through an explicit bridge.
 
 Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
 generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural

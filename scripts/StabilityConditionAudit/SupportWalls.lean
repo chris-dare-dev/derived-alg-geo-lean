@@ -2,7 +2,7 @@
 SupportWalls slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
@@ -164,7 +164,7 @@ is a statement about a K3 surface: no Néron--Severi group, no ample cone, no
 Hodge index theorem, no stability condition. A separate structure from the
 tilt-stability walls above, sharing no declaration with them; see the module
 docstrings in
-`DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/`. -/
+`DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Walls/`. -/
 
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairing
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairing_mk

@@ -576,7 +576,7 @@ fidelity:
     2026-08-09. The two stacked weak-stability commits 6dbb425 and b699ff6
     add 34 authored public declarations: the forward slicing-to-heart bridge,
     isomorphism transport, and abelian weak HN filtrations with existence for
-    the induced heart function. StabilityCondition/Weak/Tilting/Cohomology/Basic.lean adds 29 more: a
+    the induced heart function. WeakStabilityCondition/Tilting/Cohomology/Basic.lean adds 29 more: a
     t-structure-only cohomology functor usable for both hearts, the canonical
     torsion-free H-minus-one and torsion H-zero factors of a tilted-heart
     object, their distinguished triangle and tilted-heart short exact
@@ -591,7 +591,7 @@ fidelity:
     new human faithfulness review or owner signoff inferred from compilation.
 
     COUNT UPDATE (six-term cohomology boundary), 2026-08-09.
-    StabilityCondition/Weak/Tilting/Cohomology/Sequence.lean adds 31 authored public declarations:
+    WeakStabilityCondition/Tilting/Cohomology/Sequence.lean adds 31 authored public declarations:
     13 theorems and 18 constructions. It supplies the shift/degree comparison,
     vanishing outside the tilted amplitude, the six-term sequence and its six
     canonical term identifications, the short-exact-to-triangle bridge for the
@@ -605,7 +605,7 @@ fidelity:
     coverage coordinate beyond mapped.
 
     COUNT UPDATE (homologicality of t-structure cohomology), 2026-08-09.
-    StabilityCondition/Weak/Tilting/Cohomology/Homological.lean adds 38 authored declarations:
+    WeakStabilityCondition/Tilting/Cohomology/Homological.lean adds 38 authored declarations:
     37 private proof helpers (29 theorems and 8 constructions) and the public
     theorem-instance originalHeartCohFunctor_isHomological. It proves that
     degree-zero cohomology of every t-structure sends distinguished triangles
@@ -653,9 +653,9 @@ fidelity:
 
     COUNT UPDATE (weak charge rays and ambient phase tilt), 2026-08-10. The
     11 additional audited declarations are 9 theorems and 2 constructions.
-    `StabilityCondition/Weak/Basic/ChargeRay.lean` proves the finite normalized-slope ray,
+    `WeakStabilityCondition/Basic/ChargeRay.lean` proves the finite normalized-slope ray,
     the nonnegative phase-1 boundary, integer ray translation, and ambient
-    shifted compatibility. `StabilityCondition/Weak/Tilting/PreStability.lean` uses those
+    shifted compatibility. `WeakStabilityCondition/Tilting/PreStability.lean` uses those
     results to remove the external compatibility field, construct a weak
     prestability condition from the heart obligations, and expose the direct
     phase-language constructor from `TiltingProperty`. Audit 1110 -> 1121.
@@ -670,7 +670,7 @@ fidelity:
     COUNT UPDATE (current-main H-zero exactness adapter), 2026-08-10. Issue
     #89 is implemented as a narrow bridge over the already-proved generic
     t-structure cohomology theorem, not as a wholesale port of stale draft PR
-    #100. `StabilityCondition/Metric/Mass/Subadditivity/CohomologyExactness.lean`
+    #100. `WeakStabilityCondition/StabilityCondition/Metric/Mass/Subadditivity/CohomologyExactness.lean`
     adds 7 audited public
     declarations: 5 theorems and 2 constructions. It records the definitional
     identification of the canonical `HeartStabilityData.H0Functor` with
@@ -1168,7 +1168,7 @@ fidelity:
     the parse hazard scripts/check_audit.py carries a regression test for.
 
     COUNT UPDATE (Tilting lane, heart increment), 2026-08-06. The 9 additional
-    records are DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Heart.lean: the
+    records are DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Tilting/TorsionPair/Heart.lean: the
     HeartTorsionPair datum, the two tilted aisles with their isomorphism-closure
     instances, the factorisation lemma and its uniqueness counterpart, the
     orthogonality characterisation of the torsion class, and the Hom-vanishing
@@ -1178,7 +1178,7 @@ fidelity:
     tiltGE are `def ... : ObjectProperty C`).
 
     COUNT UPDATE (Wall lane), 2026-08-06. The 21 additional records are the
-    whole of DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Numerical/Basic.lean: the class abbreviation and
+    whole of DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Walls/Numerical/Basic.lean: the class abbreviation and
     its three accessors, the two charge components, the three minors, the wall
     expression, the collapse identity, the circle and line forms, the shift and
     its four invariance lemmas, the charge-degeneracy criterion, and the
@@ -1187,14 +1187,14 @@ fidelity:
     constructions (9 def, 1 abbrev).
 
     COUNT UPDATE (FiniteLength lane), 2026-08-06. The 10 additional records are
-    the whole of DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundations/SimpleCharge.lean: the two
+    the whole of DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Foundations/SimpleCharge.lean: the two
     cone-closure lemmas the foundational library lacks, the charge construction and its two
     computation lemmas, the freeness/uniqueness pair, and the three half-plane
     consequences. Audit count 585 -> 595. Coverage complete: 10 top-level
     declarations, 0 private, 10 named. 9 are theorems; 1 is a construction.
 
     COUNT UPDATE (Support lane), 2026-08-06. The 11 additional records are the
-    whole of DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Support/Basic.lean: the support
+    whole of DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Support/Predicate/Basic.lean: the support
     property, the two hypothesis structures, the compact slice and its
     compactness, the normalisation lemma, both directions of the equivalence,
     the equivalence itself, and two elementary consequences. Audit count
@@ -1204,7 +1204,7 @@ fidelity:
     nothing about the property holding of anything.
 
     COUNT UPDATE (Tilting lane), 2026-08-06. The 11 additional records are the
-    whole of DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Basic.lean: the TorsionPair
+    whole of DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Tilting/TorsionPair/Basic.lean: the TorsionPair
     structure, the zero-intersection lemma, the two orthogonality
     characterisations, closure of the torsion-free class under subobjects and
     of the torsion class under quotients, closure of both under extensions, the
@@ -1671,7 +1671,7 @@ fidelity:
     plane are tilt-stability material (Arcara-Bertram, Maciocia,
     Bayer-Macri-Toda), not Bridgeland 2007. No @[cites], no registry entries.
 
-    StabilityCondition/Walls/Numerical/Basic.lean works with NumClass = R x R x R, a triple `(r, c, d)`
+    WeakStabilityCondition/StabilityCondition/Walls/Numerical/Basic.lean works with NumClass = R x R x R, a triple `(r, c, d)`
     standing for (ch0, ch1.H, ch2), and the twisted charge
     Re Z = -d + s c - (s^2/2) r + (t^2/2) r, Im Z = t (c - s r). The wall
     expression is the cross product of two charges. The central result,
@@ -1763,7 +1763,7 @@ fidelity:
     registry. They carry no `@[cites]` record and the mapping is not a
     reviewed source claim.
 
-    StabilityCondition/Support/Basic.lean works over a finite-dimensional real normed
+    WeakStabilityCondition/Support/Predicate/Basic.lean works over a finite-dimensional real normed
     space V, a linear charge Z : V -> W into a normed space, and an arbitrary
     subset S. It defines the support property as the uniform comparison
     ||v|| <= C ||Z v|| on S, and proves it equivalent to the existence of a
@@ -1778,7 +1778,7 @@ fidelity:
     Happel-Reiten-Smalo/Dickson material, not Bridgeland 2007, so like Mukai/
     it carries no @[cites] records and no registry entries.
 
-    StabilityCondition/Weak/Tilting/TorsionPair/Basic.lean defines a torsion pair on an abelian category as
+    WeakStabilityCondition/Tilting/TorsionPair/Basic.lean defines a torsion pair on an abelian category as
     two isomorphism-closed ObjectProperties with (i) every map from a torsion
     object to a torsion-free object zero and (ii) every object fitting in a
     short exact sequence with torsion sub and torsion-free quotient. MATHLIB
@@ -1830,7 +1830,7 @@ fidelity:
 
     Lattice/ maps to no single paper section: it is the rank-2 torsion-free
     arithmetic underlying the Enriques-Kuznetsov article's section 8.4-8.6
-    numerical steps. StabilityCondition/Symmetry/ targets Bridgeland 2007 section 8 (Lemma 8.2
+    numerical steps. WeakStabilityCondition/StabilityCondition/Symmetry/ targets Bridgeland 2007 section 8 (Lemma 8.2
     and the autoequivalence action). It now contains: NormalizedShift, the
     group of +1-equivariant order isomorphisms of R (step 1); and GLTilde,
     Bridgeland's concrete presentation of GL+(2,R)-tilde as pairs (T, f) of a
@@ -2010,7 +2010,7 @@ fidelity:
     What this is NOT is in known_divergences and must be read before citing it.
   known_divergences: >
     MASS-TRIANGLE MATHEMATICS CLOSED, GOVERNANCE REVIEW OPEN, 2026-08-11.
-    DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Mass/Subadditivity/Triangle.lean proves
+    DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Metric/Mass/Subadditivity/Triangle.lean proves
     arbitrary-phase semistable-left subadditivity, assembles it through the HN
     filtration to inhabit `StabilityMassTriangleInequality`, and applies that
     theorem to the topology-comparison substrate in
@@ -2090,9 +2090,9 @@ fidelity:
     T}. MATHLIB HAS NO BUNDLED H^n FUNCTOR INTO THE HEART AT THE PIN --
     TStructure/ carries truncLE, truncGE and the truncation triangle. This
     project constructs the functor in
-    StabilityCondition/Weak/Tilting/Cohomology/Basic.lean and proves it
-    homological in StabilityCondition/Weak/Tilting/Cohomology/Homological.lean;
-    StabilityCondition/Metric/Mass/Subadditivity/CohomologyExactness.lean
+    WeakStabilityCondition/Tilting/Cohomology/Basic.lean and proves it
+    homological in WeakStabilityCondition/Tilting/Cohomology/Homological.lean;
+    WeakStabilityCondition/StabilityCondition/Metric/Mass/Subadditivity/CohomologyExactness.lean
     transports that result to the stability-condition API. The original aisle
     construction remains defined by
     HOM-ORTHOGONALITY, which needs no cohomology functor: for X in D^{<=0} and
@@ -2309,7 +2309,7 @@ fidelity:
     CLAUDE.md section 4. Do not cite this lane as "the Bayer-Macri wall
     classification is formalized".
 
-    StabilityCondition/Symmetry/GLTilde/Basic.lean defines GLTilde as Bridgeland's pair presentation
+    WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Basic.lean defines GLTilde as Bridgeland's pair presentation
     of GL+(2,R)-tilde. The group, surjective projection, Z fibre, explicit
     section, global topology, continuity of the projection, contractibility,
     simple connectedness, covering-map property, and topological-group
@@ -2321,7 +2321,7 @@ fidelity:
     universal-cover predicate at this pin, so these exact declarations are the
     public trust surface rather than an inferred larger API.
 
-    StabilityCondition/Metric/Isometry/Phase.lean proves preservation of the foundational library's phase-only
+    WeakStabilityCondition/StabilityCondition/Metric/Isometry/Phase.lean proves preservation of the foundational library's phase-only
     slicingDist. StabilityMass.lean, HNMassUniqueness.lean, and
     StabilityDistance.lean now supply a literal finite HN-mass coordinate and
     AutFullIsometry.lean proves that AutPairQuot v preserves the resulting
@@ -2358,7 +2358,7 @@ fidelity:
     literal paper theorem; call it full-distance invariance for the compatible
     autoequivalence group and state the remaining group-level boundary.
 
-    StabilityCondition/Symmetry/Autoequivalence/Slicing/Quotient.lean defines AutQuot C as the quotient of
+    WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Slicing/Quotient.lean defines AutQuot C as the quotient of
     triangulated auto-equivalences by natural isomorphism of the forward
     functors. Inverse natural isomorphisms are derived from uniqueness of right
     adjoints. No separate external object named Aut(D) is identified with this

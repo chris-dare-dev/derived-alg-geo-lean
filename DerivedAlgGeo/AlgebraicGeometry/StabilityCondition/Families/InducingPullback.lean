@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.FlatPullback
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.DerivedPullbackCoherence
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.InducingBoundary
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Phase.Transfer.InducingBoundary
 
 /-!
 # Inducing data for scheme-derived pullback

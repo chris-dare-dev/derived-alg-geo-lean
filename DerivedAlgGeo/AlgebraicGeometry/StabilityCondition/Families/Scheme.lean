@@ -3,8 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.AlgebraicGeometry.Morphisms.Basic
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.BaseChange
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.Families.BaseChange
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families.Basic
 
 /-!
 # Scheme-facing stability-in-families interfaces

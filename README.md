@@ -28,7 +28,8 @@ import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf
 import DerivedAlgGeo.CategoryTheory.Monoidal
 import DerivedAlgGeo.CategoryTheory.Enriched.DGCategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 ```
 
 The repository is pinned to Lean and Mathlib v4.32.1. From a checkout, fetch the

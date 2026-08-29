@@ -45,6 +45,18 @@ Keep tensor products on sheaves, invertible sheaves, and scheme-derived
 categories in algebraic geometry. They should implement the generic monoidal
 interface instead of relocating their geometric object types.
 
+Weak stability is the parent categorical theory. Put it, the generic
+stability-function API, and shared slicing prerequisites under
+`CategoryTheory/Triangulated/WeakStabilityCondition/`. Put ordinary Bridgeland
+stability under its stronger
+`WeakStabilityCondition/StabilityCondition/` child. The weak parent may not
+import the child; a compatibility adapter that needs Bridgeland definitions
+belongs under the child's `WeakCompatibility/` leaf. Do not recreate the old
+sibling `CategoryTheory/Triangulated/StabilityCondition/` path. Keep
+scheme-specific Mumford slope input geometry-owned, and place a valid
+promotion to Bridgeland stability below the strong theory through an explicit
+geometric realization.
+
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one

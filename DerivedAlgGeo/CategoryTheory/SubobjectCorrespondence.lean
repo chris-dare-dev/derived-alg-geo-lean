@@ -17,7 +17,7 @@ Harder--Narasimhan truncation consumes.
 
 ## Why this file exists
 
-`StabilityCondition/Foundation/StabilityFunction/Uniqueness/SubobjectLattice.lean` already has
+`WeakStabilityCondition/Foundation/StabilityFunction/Uniqueness/SubobjectLattice.lean` already has
 this statement, as `AbelianHNFiltration.pullback_imageSubobject_eq`.  Its proof, however, runs
 through a **central charge**: it shows the offending cokernel has charge `0` and concludes it
 vanishes, by `semiClosedUpperHalfPlane_ne_zero` — a nonzero object has nonzero charge.
