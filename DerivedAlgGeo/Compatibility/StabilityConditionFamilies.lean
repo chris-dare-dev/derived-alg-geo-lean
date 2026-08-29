@@ -15,4 +15,8 @@ scheme-derived realizations, and stability-specific geometric adapters that
 formerly shared one families umbrella. It provides a staged migration path for
 clients that need the former combined surface. New code should import the
 narrow owner directly.
+
+This import preserves module availability, not retired qualified declaration
+names. Neutral categorical family declarations use
+`CategoryTheory.Triangulated.Families`.
 -/

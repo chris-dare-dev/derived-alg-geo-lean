@@ -27,6 +27,7 @@ parameter spaces remain later results.
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits
+open CategoryTheory.Triangulated.Families
 open CategoryTheory.Triangulated.StabilityCondition.Families
 
 noncomputable section

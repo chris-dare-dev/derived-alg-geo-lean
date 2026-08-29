@@ -24,6 +24,7 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
+open CategoryTheory.Triangulated.Families
 
 universe u v w uV
 

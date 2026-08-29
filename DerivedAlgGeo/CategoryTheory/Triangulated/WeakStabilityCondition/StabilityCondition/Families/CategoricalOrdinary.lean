@@ -23,6 +23,7 @@ namespace CategoryTheory.Triangulated.StabilityCondition.Families
 
 open CategoryTheory Limits Pretriangulated
 open CategoryTheory.Triangulated
+open CategoryTheory.Triangulated.Families
 open CategoryTheory.Triangulated.StabilityCondition.Support
 
 noncomputable section

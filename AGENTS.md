@@ -99,6 +99,10 @@ new derived-category theory.
   the base category, fiber categories, and abstract pullback functors of a
   triangulated family belong under `CategoryTheory/Triangulated/Families/`
   before any stability or geometry is imposed.
+- Declarations owned by that generic family root use the
+  `CategoryTheory.Triangulated.Families` namespace. Do not place
+  `TriangulatedFiberFamily`, shared boundedness interfaces, or future neutral
+  family APIs below a stability-condition namespace.
 - Generic moduli boundedness interfaces shared by weak stability and geometric
   moduli also belong under `CategoryTheory/Triangulated/Families/`; neither
   consumer owns the common root.
@@ -123,6 +127,9 @@ new derived-category theory.
   generic category theory.
 - Preserve established declaration namespaces during a path-only migration
   unless a namespace change is separately justified.
+- A separately justified namespace cutover must update every stable consumer,
+  audit record, declaration baseline, compatibility note, and regression gate
+  in the same change; do not leave parallel canonical names behind.
 
 Structural changes must update imports, umbrellas, audits, declaration-sweep
 routing, documentation, architecture checks, and CI paths in the same change.

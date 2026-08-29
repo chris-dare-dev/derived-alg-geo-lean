@@ -11,7 +11,7 @@ predicate that each is bounded. Stability-family packages may consume this
 interface, but boundedness itself does not depend on stability data.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.Families
 
 universe u
 
@@ -24,4 +24,4 @@ structure BoundednessProblem (M : Type u) where
 def UniversalBoundedness {M : Type u} (P : BoundednessProblem M) : Prop :=
   ∀ m, P.IsBounded m
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.Families
