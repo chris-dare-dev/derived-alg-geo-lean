@@ -50,7 +50,7 @@ import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.InducingPullb
 # Geometric stability conditions in families
 
 Algebraic-geometric realizations of the abstract interfaces in
-`DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families`.
+`DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
 
 The declarations retain their established
 `CategoryTheory.Triangulated.StabilityCondition.Families` namespace during the

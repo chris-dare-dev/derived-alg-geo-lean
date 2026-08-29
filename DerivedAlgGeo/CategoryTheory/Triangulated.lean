@@ -21,8 +21,9 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearOpposite
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.Families
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
 
 /-! # Triangulated categories

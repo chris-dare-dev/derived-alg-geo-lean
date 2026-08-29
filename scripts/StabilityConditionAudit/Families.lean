@@ -3,7 +3,7 @@ Generic families slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). Geometric family records are owned
 by `AlgebraicGeometryAudit/StabilityConditionFamilies.lean`.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
 import DerivedAlgGeo.CategoryTheory.PseudofunctorObjectProperty
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
