@@ -96,16 +96,19 @@ def comp {q : Y ⟶ Z} (D : SupportData p) (E : SupportData q) :
     simp only [Category.assoc]
     rw [h]
 
+/-- The first projection law for the geometric part of Lemma B.2. -/
 @[simp]
 theorem comp_support {q : Y ⟶ Z} (D : SupportData p) (E : SupportData q) :
     (D.comp E).support = E.support :=
   rfl
 
+/-- The factorization used later to compare composite pushforwards. -/
 @[simp]
 theorem comp_inclusion {q : Y ⟶ Z} (D : SupportData p) (E : SupportData q) :
     (D.comp E).inclusion = E.inclusion ≫ D.baseIso.inv ≫ D.inclusion :=
   rfl
 
+/-- The final-base projection law for the geometric part of Lemma B.2. -/
 @[simp]
 theorem comp_baseIso {q : Y ⟶ Z} (D : SupportData p) (E : SupportData q) :
     (D.comp E).baseIso = E.baseIso :=
@@ -149,6 +152,7 @@ abbrev inclusion (W : Witness p) (i : Fin W.filtration.length) : W.support i ⟶
   (W.piece i).inclusion
 
 /-- The closed-immersion certificate for the `i`th support. -/
+@[nolint defsWithUnderscore]
 abbrev inclusion_isClosedImmersion (W : Witness p) (i : Fin W.filtration.length) :
     IsClosedImmersion (W.inclusion i) :=
   (W.piece i).inclusion_isClosedImmersion
@@ -158,6 +162,7 @@ abbrev baseIso (W : Witness p) (i : Fin W.filtration.length) : W.support i ≅ Y
   (W.piece i).baseIso
 
 /-- The support identification is induced by the original morphism. -/
+@[nolint defsWithUnderscore]
 abbrev baseIso_hom (W : Witness p) (i : Fin W.filtration.length) :
     (W.baseIso i).hom = W.inclusion i ≫ p :=
   (W.piece i).baseIso_hom
@@ -193,12 +198,14 @@ def compositionSupportData {q : Y ⟶ Z} (W : Witness p) (V : Witness q)
     (ij : CompositionIndex W V) : SupportData (p ≫ q) :=
   (W.piece ij.1).toSupportData.comp (V.piece ij.2).toSupportData
 
+/-- Rewrite a product index to the inner support used by the eventual line-bundle lookup. -/
 @[simp]
 theorem compositionSupportData_support {q : Y ⟶ Z} (W : Witness p) (V : Witness q)
     (ij : CompositionIndex W V) :
     (compositionSupportData W V ij).support = V.support ij.2 :=
   rfl
 
+/-- The composite pair's inclusion is the root `SupportData.comp` inclusion. -/
 @[simp]
 theorem compositionSupportData_inclusion {q : Y ⟶ Z} (W : Witness p) (V : Witness q)
     (ij : CompositionIndex W V) :
