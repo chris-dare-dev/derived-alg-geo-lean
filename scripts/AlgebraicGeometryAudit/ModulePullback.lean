@@ -16,9 +16,9 @@ namespace AlgebraicGeometry.Scheme.Modules
 
 variable {X Y : Scheme.{u}} (f : X ⟶ Y) (M : Y.Modules)
 
-#print axioms pullbackOverIso
-#print axioms pullbackTrivializationOver
-#print axioms isInvertible_pullback
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackOverIso
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackTrivializationOver
+#print axioms AlgebraicGeometry.Scheme.Modules.isInvertible_pullback
 
 example [SheafOfModules.IsInvertible.{u, u, u}
     (show SheafOfModules Y.ringCatSheaf from M)] :
