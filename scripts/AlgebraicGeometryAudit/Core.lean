@@ -2614,7 +2614,7 @@ of global sections outright rather than a subquotient; its finiteness is a separ
 
 /-! ## The twisting sheaf is invertible (#584, step 1)
 
-`Divisors/Tensor.lean` is stated for a locally free rank-one factor, so `F(d) = F (x) O(d)` cannot
+`Modules/Tensor/Basic.lean` is stated for a locally free rank-one factor, so `F(d) = F (x) O(d)` cannot
 be built at all until `O(d)` is known invertible. The local triviality was already there --
 `TwistCoherence.lean` needed the same degree-one charts to prove `O(d)` coherent -- so this is
 `intShiftOverSelfIso` composed with `associatedSheafSelfIso` and handed to `of_trivializations`.

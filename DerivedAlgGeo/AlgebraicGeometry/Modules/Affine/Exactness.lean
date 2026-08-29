@@ -171,7 +171,7 @@ chain is complete.
 
 ## The intended use
 
-Combined with `isLocallySurjective_of_coversTop` (`Divisors/Tensor.lean`), which builds
+Combined with `isLocallySurjective_of_coversTop` (`Modules/Tensor/Basic.lean`), which builds
 the hypothesis from local surjectivity on a `CoversTop` family, this is the step that
 checks a map of module sheaves is an epimorphism chart by chart — Serre's surjection
 `⊕ O(-d) ↠ F` being the case in view. The two are not combined into one statement here
