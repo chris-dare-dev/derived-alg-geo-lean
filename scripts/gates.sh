@@ -200,6 +200,11 @@ echo "== gates ($MODE) =="
 # checks. In `fast` mode too, for the same reason.
 gate workflows scripts/check_workflows.sh
 gate trust-guard scripts/test_trust_guard.sh
+# Next to it for the same reason: `check_local_build.py` is a PreToolUse hook,
+# and a hook that has stopped refusing is indistinguishable from a hook with
+# nothing to catch. #837 found it silently allowing `lake build DerivedAlgGeo`
+# -- the whole library under a target name -- for as long as it had existed.
+gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
