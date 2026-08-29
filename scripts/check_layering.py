@@ -28,6 +28,10 @@ IMPORT = re.compile(
 )
 GENERIC_OWNER = "CategoryTheory"
 GEOMETRY_OWNER = "AlgebraicGeometry"
+GEOMETRY_INSTANCES_OWNER = "GeometryInstances"
+GEOMETRY_INSTANCE_UMBRELLAS = {
+    "DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated.Instances",
+}
 STABILITY_FAMILIES_ROOT = (
     "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families"
 )
@@ -50,8 +54,9 @@ LAYER = {
     "Topology": 0,
     GENERIC_OWNER: 1,
     GEOMETRY_OWNER: 2,
-    "Compatibility": 3,
-    "Development": 4,
+    GEOMETRY_INSTANCES_OWNER: 3,
+    "Compatibility": 4,
+    "Development": 5,
 }
 
 GEOMETRY_FAMILY_MODULES = {
@@ -86,6 +91,12 @@ GEOMETRY_FAMILY_MODULES = {
 
 def owner(path: pathlib.Path) -> str:
     relative = path.relative_to(SOURCE_ROOT)
+    parts = relative.parts
+    if parts[0] == GENERIC_OWNER:
+        module = "DerivedAlgGeo." + ".".join(parts).removesuffix(".lean")
+        if (has_geometry_instances_segment(parts) or
+                module in GEOMETRY_INSTANCE_UMBRELLAS):
+            return GEOMETRY_INSTANCES_OWNER
     return relative.parts[0] if len(relative.parts) > 1 else relative.stem
 
 
@@ -208,6 +219,26 @@ def check_layering_fixtures() -> list[str]:
     return failures
 
 
+def has_geometry_instances_segment(parts: tuple[str, ...] | list[str]) -> bool:
+    return any(
+        parts[index] == "Instances" and
+        pathlib.Path(parts[index + 1]).stem == GEOMETRY_OWNER
+        for index in range(len(parts) - 1)
+    )
+
+
+def dependency_owner(module: str, subjects: set[str]) -> str | None:
+    parts = module.split(".")
+    if len(parts) < 2 or parts[0] != "DerivedAlgGeo":
+        return None
+    if parts[1] == GENERIC_OWNER and (
+        has_geometry_instances_segment(parts[2:]) or
+        module in GEOMETRY_INSTANCE_UMBRELLAS
+    ):
+        return GEOMETRY_INSTANCES_OWNER
+    return parts[1] if parts[1] in subjects else None
+
+
 def find_cycle(graph: dict[str, set[str]]) -> list[str] | None:
     visited: set[str] = set()
     active: set[str] = set()
@@ -243,6 +274,7 @@ def main() -> int:
     }
     graph: dict[str, set[str]] = defaultdict(set)
     evidence: dict[tuple[str, str], list[str]] = defaultdict(list)
+    imports_by_path: dict[pathlib.Path, list[str]] = defaultdict(list)
     failures: list[str] = []
 
     for subject in sorted(subjects - LAYER.keys()):
@@ -257,6 +289,7 @@ def main() -> int:
             if match is None:
                 continue
             module = match.group(1)
+            imports_by_path[path].append(module)
             # Any subject ranked BELOW the geometry owner must stay clear of
             # Mathlib's geometry. This used to test `source_owner ==
             # GENERIC_OWNER`, which checked `CategoryTheory` and nothing else --
@@ -274,8 +307,8 @@ def main() -> int:
                 )
             if not module.startswith("DerivedAlgGeo."):
                 continue
-            dependency = module.split(".", 2)[1]
-            if dependency not in subjects or dependency == source_owner:
+            dependency = dependency_owner(module, subjects)
+            if dependency is None or dependency == source_owner:
                 continue
             graph[source_owner].add(dependency)
             evidence[(source_owner, dependency)].append(
@@ -351,6 +384,50 @@ def main() -> int:
             f"remove it from {REVERSE_EDGE_ALLOWLIST.relative_to(ROOT)}"
         )
 
+    legacy_dg_root = SOURCE_ROOT / "CategoryTheory" / "DGCategory"
+    legacy_dg_umbrella = legacy_dg_root.with_suffix(".lean")
+    if legacy_dg_root.exists() or legacy_dg_umbrella.exists():
+        failures.append(
+            "legacy monolithic CategoryTheory/DGCategory path restored"
+        )
+
+    raw_dg_root = SOURCE_ROOT / "CategoryTheory" / "Enriched" / "DGCategory"
+    enhancement_module = (
+        "DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement"
+    )
+    for path in sorted(raw_dg_root.rglob("*.lean")):
+        for line_number, line in enumerate(
+            path.read_text(encoding="utf-8").splitlines(), 1
+        ):
+            match = IMPORT.match(line)
+            if match is not None and match.group(1).startswith(enhancement_module):
+                failures.append(
+                    f"{path.relative_to(ROOT)}:{line_number}: raw dg theory "
+                    "imports the triangulated enhancement layer"
+                )
+
+    monoidal_root = SOURCE_ROOT / "CategoryTheory" / "Monoidal"
+    enriched_module = "DerivedAlgGeo.CategoryTheory.Enriched"
+    for path in sorted(monoidal_root.rglob("*.lean")):
+        for module in imports_by_path[path]:
+            if module == enriched_module or module.startswith(enriched_module + "."):
+                failures.append(
+                    f"{path.relative_to(ROOT)}: monoidal parent layer imports "
+                    f"its enriched child {module}"
+                )
+            if module.startswith(enhancement_module):
+                failures.append(
+                    f"{path.relative_to(ROOT)}: monoidal parent layer imports "
+                    f"the dg-enhancement child {module}"
+                )
+
+    enriched_umbrella = SOURCE_ROOT / "CategoryTheory" / "Enriched.lean"
+    monoidal_module = "DerivedAlgGeo.CategoryTheory.Monoidal"
+    if monoidal_module not in imports_by_path[enriched_umbrella]:
+        failures.append(
+            "CategoryTheory/Enriched.lean must import the monoidal parent layer"
+        )
+
     if failures:
         print("subject-layering gate failed:")
         for failure in failures:
@@ -363,7 +440,12 @@ def main() -> int:
         for dependency in sorted(graph[source])
     )
     print(f"ok: acyclic subject graph ({edge_text})")
-    print("ok: CategoryTheory has zero AlgebraicGeometry imports")
+    print(
+        "ok: generic CategoryTheory has zero AlgebraicGeometry imports; "
+        "explicit geometry-instance leaves are classified separately"
+    )
+    print("ok: raw dg theory is independent of the dg-enhancement layer")
+    print("ok: the monoidal layer precedes enrichment and does not import its children")
     print(
         f"ok: {len(GEOMETRY_FAMILY_MODULES)} geometric family roots have "
         "AlgebraicGeometry owners"

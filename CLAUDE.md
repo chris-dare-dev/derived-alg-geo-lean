@@ -11,7 +11,12 @@ The principal areas are:
 - `DerivedAlgGeo/AlgebraicGeometry/` for coherent sheaves, cohomology,
   divisors, duality, intersection theory, numerical geometry, and
   Riemann--Roch;
-- `DerivedAlgGeo/CategoryTheory/DGCategory/` for dg-category theory;
+- `DerivedAlgGeo/CategoryTheory/Monoidal/` for generic monoidal coherence and
+  compatibility interfaces;
+- `DerivedAlgGeo/CategoryTheory/Enriched/DGCategory/` for raw dg categories
+  and their internal pretriangulated structure;
+- `DerivedAlgGeo/CategoryTheory/Triangulated/DGEnhancement/` for the
+  triangulated `H⁰` of a pretriangulated dg category and dg enhancements;
 - `DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/` for t-structures;
 - `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/` for
   Bridgeland stability foundations and applications;
@@ -21,6 +26,70 @@ The principal areas are:
 
 Never add imports or namespaces rooted at `CohLean`, `DGLean`, or
 `BridgelandStabLean`; those migration artifacts are retired.
+
+## Structural ownership principles
+
+Organize code by its most general mathematical construction, then attach
+concrete applications through explicit instance leaves.
+
+- Arbitrary categorical, functorial, abelian, triangulated, or enriched
+  statements belong under `CategoryTheory/`.
+- Definitions and lemmas that intrinsically mention schemes, varieties,
+  sheaves, or geometric morphism properties belong under
+  `AlgebraicGeometry/`.
+- A geometric realization of a generic categorical interface belongs under
+  `CategoryTheory/<construction>/Instances/AlgebraicGeometry/`. Such a bridge
+  leaf may import geometry, but generic siblings and generic umbrellas must
+  never import it.
+- Stronger theories import weaker theories and expose the relationship in
+  Lean through a projection or constructor. Directory nesting is not a
+  replacement for the actual type-level refinement.
+
+In particular, derived-category theory is generic. Prove `[Abelian (Coh X)]`
+under the correct geometric hypotheses and then use
+`DerivedCategory (Coh X)`; do not build a second derived-category theory under
+algebraic geometry. `Dqc(X)` may be represented by the quasicoherent-cohomology
+locus until the abelian `QCoh X` construction and its derived comparison are
+available, but this is a geometric instance/comparison of the generic theory.
+
+Monoidal structure precedes enrichment in the dependency graph: a
+`V`-enriched category is defined relative to a monoidal category `V`, and a dg
+category specializes this pattern to cochain complexes. Monoidal and
+triangulated structures are otherwise independent, so neither is a superclass
+of the other. Put their compatibility under
+`CategoryTheory/Monoidal/Triangulated/`; put an optional monoidal refinement of
+a dg category under `CategoryTheory/Enriched/DGCategory/Monoidal/`, and put
+the induced monoidal structure on triangulated `H⁰` under
+`CategoryTheory/Triangulated/DGEnhancement/Monoidal/`.
+
+A bare tensor bifunctor is weaker than a coherent monoidal structure. Add
+associators, unitors, and coherence only at the stronger layer and provide a
+one-way forgetful adapter. Tensor products on sheaves and `Dᵇ(Coh X)` remain
+geometric inputs; they should instantiate the generic categorical interface.
+
+Raw dg categories are enriched categories, not automatically triangulated
+categories. A pretriangulated dg category has the zero objects, shifts, and
+cones needed for its `H⁰` to be triangulated. Consequently:
+
+- raw dg and pretriangulated-dg internals live under
+  `CategoryTheory/Enriched/DGCategory/`;
+- the `H⁰` triangulation, dg-enhancement interface, and enhancement models
+  live under `CategoryTheory/Triangulated/DGEnhancement/`;
+- a dg category of complexes enhances the homotopy category, not the derived
+  category, until the relevant dg localization or resolution model is proved.
+
+Pure weak and Bridgeland stability theory remains categorical. Weak stability
+is the dependency parent of ordinary Bridgeland stability. Abstract pullback,
+pseudofunctor, and Fourier--Mukai interfaces remain categorical; their scheme
+and sheaf realizations belong in explicit `Instances/AlgebraicGeometry/`
+leaves. General Mumford slope data is weak-stability input, while a promotion
+to Bridgeland stability belongs below the strong theory only under hypotheses
+where that promotion is valid.
+
+Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
+generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural
+move must update imports, umbrellas, audits, declaration-sweep routing,
+documentation, architecture checks, and CI paths together.
 
 ## Editing rules
 

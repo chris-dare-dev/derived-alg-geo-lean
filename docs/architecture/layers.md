@@ -5,13 +5,18 @@ means that modules owned by subject `A` may import modules owned by subject
 `B`. The graph is intentionally acyclic:
 
 ```text
-Development ─┬→ Compatibility ─┬→ AlgebraicGeometry ─┬→ CategoryTheory
-             │                 │                     ├→ Algebra
-             │                 │                     ├→ LinearAlgebra
-             │                 │                     └→ Topology
+Development ─┬→ Compatibility ─┬→ GeometryInstances ─┬→ AlgebraicGeometry
+             │                 │                       └→ CategoryTheory
+             │                 ├→ AlgebraicGeometry
              │                 └→ CategoryTheory
+             ├→ GeometryInstances
              ├→ AlgebraicGeometry
              └→ CategoryTheory
+
+AlgebraicGeometry ─┬→ CategoryTheory
+                  ├→ Algebra
+                  ├→ LinearAlgebra
+                  └→ Topology
 
 CategoryTheory → LinearAlgebra
 ```
@@ -20,6 +25,13 @@ The support subjects `Algebra`, `LinearAlgebra`, and `Topology` are lower
 layers. `DerivedAlgGeo.lean` is a public aggregation root, not a subject owner,
 so its imports do not add edges to this graph.
 
+`GeometryInstances` is a virtual leaf owner, not a top-level source directory.
+It consists exactly of modules below a path segment
+`Instances/AlgebraicGeometry/` inside `CategoryTheory`. This makes the generic
+construction the visible parent while keeping its geometric realizations out
+of generic umbrellas. The layering gate classifies those leaves separately;
+all other modules below `CategoryTheory` remain geometry-independent.
+
 ## Ownership rule
 
 `CategoryTheory` owns interfaces whose statements are independent of a
@@ -27,6 +39,13 @@ geometric realization. `AlgebraicGeometry` owns declarations specialized to
 schemes, sheaves, geometric fibers, `Dqc`, derived pullback, finite-type
 morphisms, or Fourier--Mukai kernels—even when their proofs are primarily
 category theoretic. Proof technique does not determine source ownership.
+
+When a geometric construction realizes a reusable categorical interface, its
+registration and comparison theorems may instead be placed in the generic
+construction's explicit `Instances/AlgebraicGeometry/` leaf. These modules may
+import both owners. Generic category-theory modules and algebraic-geometry
+modules may not import them; they are opt-in leaves exported only by an
+instance umbrella or the public repository root.
 
 In particular:
 
@@ -38,6 +57,52 @@ In particular:
   `Mathlib.AlgebraicGeometry`;
 - `Compatibility` and `Development` are leaf layers and must never become
   dependencies of stable subject modules.
+
+## Generic constructions and refinements
+
+The source tree follows general constructions before concrete instances:
+
+- derived categories are constructed once from an abelian category;
+  `DerivedCategory (Coh X)` is an instance, not a geometric reimplementation;
+- abstract pullback, pseudofunctor, and Fourier--Mukai interfaces are
+  categorical, while scheme and sheaf realizations are explicit geometric
+  instance leaves;
+- weak stability is the dependency parent of ordinary Bridgeland stability,
+  and the Lean structures must expose the corresponding projection or
+  constructor.
+
+Monoidal structure supplies the base for enrichment, but monoidality and
+triangulation are independent axes. The intended categorical refinement map
+is:
+
+```text
+CategoryTheory/Monoidal
+  ├─→ CategoryTheory/Enriched
+  │     └─→ DGCategory
+  │           └─→ Monoidal        (optional refinement)
+  └─→ Monoidal/Triangulated            (compatibility interface)
+                 └─→ geometric exact tensors via instance leaves
+
+CategoryTheory/Triangulated
+  └─→ DGEnhancement
+        └─→ Monoidal                    (compatibility on H⁰)
+```
+
+The arrows here mean dependency or refinement, not that every object in the
+parent has every structure shown below it. In particular, a tensor bifunctor
+need not carry associators or unitors, a dg category need not be monoidal, and
+a triangulated category need not be monoidal. Concrete tensor products on
+sheaves, invertible sheaves, and `Dᵇ(Coh X)` remain geometry-owned and expose
+instances of the generic compatibility interfaces.
+
+Raw dg categories require an additional distinction. A dg category is an
+enriched category and need not be triangulated, so its basic theory and its
+internal pretriangulated refinement live in
+`CategoryTheory.Enriched.DGCategory`. The triangulated structure on `H⁰` and
+the interface for a dg enhancement of an ordinary triangulated category live
+in `CategoryTheory.Triangulated.DGEnhancement`. Thus a dg-*enhanced*
+triangulated category is a child of the triangulated theory without falsely
+making every dg category triangulated.
 
 The source-layer gate in `scripts/check_layering.py` reconstructs the collapsed
 graph from every tracked library import, rejects cycles and forbidden reverse

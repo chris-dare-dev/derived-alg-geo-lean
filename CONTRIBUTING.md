@@ -9,14 +9,41 @@ roots.
 Choose the narrowest natural home:
 
 - geometric objects and theorems: `DerivedAlgGeo/AlgebraicGeometry/`;
-- dg, derived, triangulated, and stability-category theory:
+- generic monoidal coherence and tensor--triangulation compatibility:
+  `DerivedAlgGeo/CategoryTheory/Monoidal/`;
+- raw dg enrichment: `DerivedAlgGeo/CategoryTheory/Enriched/DGCategory/`;
+- derived, triangulated, dg-enhancement, and stability-category theory:
   `DerivedAlgGeo/CategoryTheory/`;
+- geometric realizations of categorical interfaces: an explicit
+  `Instances/AlgebraicGeometry/` leaf below the generic construction;
 - reusable lattice or matrix theory: `DerivedAlgGeo/LinearAlgebra/`;
 - exploratory API probes: `DerivedAlgGeo/Development/`.
 
 Use Mathlib's established namespace when extending a Mathlib concept. Add a
 same-named umbrella for a new non-leaf directory and export stable leaves
 through their nearest existing umbrellas.
+
+Generic umbrellas must not import `Instances/AlgebraicGeometry` descendants.
+Those bridge modules are opt-in leaves: they may import both category theory
+and geometry, but neither generic category theory nor algebraic geometry may
+depend on them. Construct generic objects once—for example, obtain
+`DerivedCategory (Coh X)` from the abelian instance on `Coh X` rather than
+creating a second geometric derived-category theory.
+
+Enriched categories depend on a monoidal base; dg categories are the cochain-
+complex specialization of that pattern. This does not make every dg category
+monoidal, and monoidal and triangulated structures do not imply one another.
+Place their intersections explicitly:
+
+- exact tensor compatibility in `CategoryTheory/Monoidal/Triangulated/`;
+- optional monoidal dg refinements in
+  `CategoryTheory/Enriched/DGCategory/Monoidal/`;
+- passage of that structure to triangulated `H⁰` in
+  `CategoryTheory/Triangulated/DGEnhancement/Monoidal/`.
+
+Keep tensor products on sheaves, invertible sheaves, and scheme-derived
+categories in algebraic geometry. They should implement the generic monoidal
+interface instead of relocating their geometric object types.
 
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is
