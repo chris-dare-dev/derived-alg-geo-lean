@@ -51,3 +51,17 @@ two-stage colimit construction of the backward map and the single cocone of the 
 #print axioms PresheafOfModules.stalkTensorEquiv
 #print axioms PresheafOfModules.stalkTensorEquiv_germ_tmul_germ
 #print axioms PresheafOfModules.stalkTensorEquiv_symm_germ
+
+/-! ## The stalk map of a morphism, and whiskering (#833)
+
+`isIso_stalkMapAdd_whiskerLeft` is the point: tensoring a stalk isomorphism with an arbitrary
+`Mₓ` is again an isomorphism, which is what removes the rank-one hypothesis downstream.
+-/
+
+#print axioms PresheafOfModules.stalkMapAdd
+#print axioms PresheafOfModules.stalkMapAdd_germ
+#print axioms PresheafOfModules.stalkMap
+#print axioms PresheafOfModules.stalkMap_germ
+#print axioms PresheafOfModules.whiskerLeft_app_tmul
+#print axioms PresheafOfModules.stalkMapAdd_whiskerLeft
+#print axioms PresheafOfModules.isIso_stalkMapAdd_whiskerLeft

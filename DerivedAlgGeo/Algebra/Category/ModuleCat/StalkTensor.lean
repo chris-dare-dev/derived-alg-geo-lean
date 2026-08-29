@@ -21,7 +21,13 @@ the statement that taking stalks commutes with the tensor product of presheaves 
   `germTmulBiadd` by `TensorProduct.lift`;
 * `PresheafOfModules.stalkTensorForward` — `(M ⊗ P)ₓ → Mₓ ⊗[Rₓ] Pₓ`, the colimit map of the
   cocone whose legs send `m ⊗ p` to `germ m ⊗ germ p`;
-* `PresheafOfModules.stalkTensorEquiv` — the two assembled into an `Rₓ`-linear equivalence.
+* `PresheafOfModules.stalkTensorEquiv` — the two assembled into an `Rₓ`-linear equivalence;
+* `PresheafOfModules.stalkMap` — the stalk map of a morphism of presheaves of modules, as an
+  `Rₓ`-linear map;
+* `PresheafOfModules.isIso_stalkMapAdd_whiskerLeft` — **whiskering preserves stalkwise
+  isomorphisms**, for an arbitrary whiskering factor. Tensoring is only right exact, but
+  tensoring with an isomorphism is an isomorphism, and `stalkTensorEquiv` is what makes that
+  visible on stalks.
 
 ## Implementation notes
 
@@ -32,7 +38,7 @@ The key input is `PresheafOfModules.germ_smul`, which makes germs `Rₓ`-linear.
 -/
 
 universe u
-open CategoryTheory Opposite TopologicalSpace TensorProduct Limits
+open CategoryTheory Opposite TopologicalSpace TensorProduct Limits MonoidalCategory
 
 namespace PresheafOfModules
 
@@ -601,5 +607,112 @@ lemma stalkTensorEquiv_symm_germ (U : Opens X) (hxU : x ∈ U)
           (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M P).presheaf U x hxU z)
       = stalkTensorLeg M P x U hxU z :=
   stalkTensorForward_germ M P x U hxU z
+
+section StalkMap
+
+variable {M N : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat)} (g : M ⟶ N) (x : X)
+
+/-- The stalk map of a morphism of presheaves of modules, as a morphism of abelian groups. -/
+noncomputable abbrev stalkMapAdd :
+    TopCat.Presheaf.stalk M.presheaf x ⟶ TopCat.Presheaf.stalk N.presheaf x :=
+  (TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x).map ((PresheafOfModules.toPresheaf _).map g)
+
+/-- The stalk map is computed by applying the morphism to a representing section: this is
+`TopCat.Presheaf.stalkFunctor_map_germ_apply`, restated at the spelling
+`PresheafOfModules` uses so that `rw` can see it. -/
+lemma stalkMapAdd_germ (U : Opens X) (hxU : x ∈ U) (m : M.obj (op U)) :
+    stalkMapAdd g x (TopCat.Presheaf.germ M.presheaf U x hxU m)
+      = TopCat.Presheaf.germ N.presheaf U x hxU (g.app (op U) m) :=
+  TopCat.Presheaf.stalkFunctor_map_germ_apply U x hxU
+    ((PresheafOfModules.toPresheaf _).map g) m
+
+/-- The stalk map of a morphism of presheaves of modules is `Rₓ`-linear. -/
+noncomputable def stalkMap :
+    ToType (TopCat.Presheaf.stalk M.presheaf x) →ₗ[R.stalk x]
+      ToType (TopCat.Presheaf.stalk N.presheaf x) where
+  toFun := stalkMapAdd g x
+  map_add' a b := map_add _ a b
+  map_smul' r ξ := by
+    obtain ⟨W, hxW, r₀, rfl⟩ := TopCat.Presheaf.exists_germ_eq R r
+    obtain ⟨U, hUW, hxU, m, rfl⟩ := TopCat.Presheaf.exists_le_germ_eq M.presheaf ξ hxW
+    show stalkMapAdd g x _ = (RingHom.id _ _) • stalkMapAdd g x _
+    rw [RingHom.id_apply, ← TopCat.Presheaf.germ_res_apply R (homOfLE hUW) x hxU r₀,
+      ← germ_smul M x U hxU, stalkMapAdd_germ, stalkMapAdd_germ, ← germ_smul N x U hxU]
+    congr 1
+    exact map_smul (g.app (op U)).hom _ _
+
+/-- `stalkMap` has the same computation rule as `stalkMapAdd`; the two differ only in carrying
+the `Rₓ`-module structure. -/
+@[simp]
+lemma stalkMap_germ (U : Opens X) (hxU : x ∈ U) (m : M.obj (op U)) :
+    stalkMap g x (TopCat.Presheaf.germ M.presheaf U x hxU m)
+      = TopCat.Presheaf.germ N.presheaf U x hxU (g.app (op U) m) :=
+  stalkMapAdd_germ g x U hxU m
+
+end StalkMap
+
+section Whisker
+
+variable (M : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat))
+  {P Q : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat)} (g : P ⟶ Q) (x : X)
+
+/-- Whiskering acts on a pure tensor of sections in the obvious way. -/
+lemma whiskerLeft_app_tmul (W : Opens X) (m : M.obj (op W)) (p : P.obj (op W)) :
+    (M ◁ g).app (op W) (m ⊗ₜ p) = m ⊗ₜ g.app (op W) p := rfl
+
+/-- **`stalkTensorEquiv` is natural in the second variable.** Under the identification of
+`(M ⊗ P)ₓ` with `Mₓ ⊗ Pₓ`, the stalk map of `M ◁ g` is `Mₓ ⊗ (stalk map of g)`. This is what
+turns a stalkwise iso into a stalkwise iso after whiskering. -/
+lemma stalkMapAdd_whiskerLeft (t : StalkTensor M P x) :
+    stalkMapAdd (M ◁ g) x (stalkTensorEquiv M P x t)
+      = stalkTensorEquiv M Q x (LinearMap.lTensor _ (stalkMap g x) t) := by
+  refine TensorProduct.induction_on t ?_ ?_ ?_
+  · exact ((congrArg _ (map_zero _)).trans (map_zero _)).trans
+      ((congrArg _ (map_zero _)).trans (map_zero _)).symm
+  · intro ξ η
+    obtain ⟨U, hxU, m, rfl⟩ := TopCat.Presheaf.exists_germ_eq M.presheaf ξ
+    obtain ⟨V, hxV, p, rfl⟩ := TopCat.Presheaf.exists_germ_eq P.presheaf η
+    rw [LinearMap.lTensor_tmul, stalkMap_germ, stalkTensorEquiv_germ_tmul_germ,
+      stalkTensorEquiv_germ_tmul_germ]
+    show stalkMapAdd (M ◁ g) x (TopCat.Presheaf.germ
+        (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M P).presheaf
+        (U ⊓ V) x ⟨hxU, hxV⟩
+        (M.map (homOfLE inf_le_left).op m ⊗ₜ P.map (homOfLE inf_le_right).op p)) = _
+    rw [stalkMapAdd_germ]
+    show TopCat.Presheaf.germ
+        (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M Q).presheaf
+        (U ⊓ V) x ⟨hxU, hxV⟩
+        (M.map (homOfLE inf_le_left).op m ⊗ₜ
+          g.app (op (U ⊓ V)) (P.map (homOfLE inf_le_right).op p)) = _
+    rw [naturality_apply]
+    rfl
+  · intro a b ha hb
+    simp only [map_add, ha, hb]
+
+
+/-- **Whiskering preserves stalkwise isomorphisms.** If `g` is a stalk isomorphism at `x`, so is
+`M ◁ g` — for *any* `M`, with no flatness or local-freeness hypothesis. Tensoring is only right
+exact in general, but tensoring with an isomorphism is an isomorphism, and `stalkTensorEquiv`
+is what makes that visible on stalks. -/
+lemma isIso_stalkMapAdd_whiskerLeft [IsIso (stalkMapAdd g x)] :
+    IsIso (stalkMapAdd (M ◁ g) x) := by
+  have hbij : Function.Bijective (stalkMap g x) :=
+    (ConcreteCategory.isIso_iff_bijective (stalkMapAdd g x)).mp inferInstance
+  let e : ToType (TopCat.Presheaf.stalk P.presheaf x) ≃ₗ[R.stalk x]
+      ToType (TopCat.Presheaf.stalk Q.presheaf x) := LinearEquiv.ofBijective (stalkMap g x) hbij
+  have hcomp : ⇑(stalkMapAdd (M ◁ g) x)
+      = ⇑(stalkTensorEquiv M Q x) ∘ ⇑(LinearEquiv.lTensor _ e) ∘
+        ⇑(stalkTensorEquiv M P x).symm := by
+    funext s
+    obtain ⟨t, rfl⟩ := (stalkTensorEquiv M P x).surjective s
+    show stalkMapAdd (M ◁ g) x (stalkTensorEquiv M P x t) = _
+    rw [stalkMapAdd_whiskerLeft]
+    simp only [Function.comp_apply, LinearEquiv.symm_apply_apply]
+    rfl
+  rw [ConcreteCategory.isIso_iff_bijective, hcomp]
+  exact (stalkTensorEquiv M Q x).bijective.comp
+    ((LinearEquiv.lTensor _ e).bijective.comp (stalkTensorEquiv M P x).symm.bijective)
+
+end Whisker
 
 end PresheafOfModules
