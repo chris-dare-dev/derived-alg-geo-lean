@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Data.Complex.Basic
 import Mathlib.Topology.LocallyConstant.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.Families.Boundedness
 
 /-!
 # Input conditions for stability conditions in families
@@ -21,8 +22,8 @@ base, or moduli stacks.  A caller supplies *all* geometric tests:
 * `DedekindHNProblem` and `WeakDedekindHNProblem` name the witnesses demanded
   after every eligible essentially-finite-type Dedekind base change
   (clauses (3) and (3'));
-* `BoundednessProblem` names the moduli problems whose boundedness is required
-  by Definition 21.15(5).
+* the generic `BoundednessProblem` interface names the moduli problems whose
+  boundedness is required by Definition 21.15(5).
 
 The word `eligible` is deliberate: this library has no scheme or base-change
 API, so it does not pretend to recognize Dedekind morphisms.  Instantiating
@@ -133,16 +134,6 @@ def WeakIntegratesAfterDedekindBaseChange {D : Type u}
     (P : WeakDedekindHNProblem D) : Prop :=
   ∀ d, P.IsEligible d →
     Nonempty (P.HNStructure d) ∧ P.ZeroChargeNoetherian d
-
-/-- Abstract moduli problems and the caller-supplied predicate expressing
-their boundedness. -/
-structure BoundednessProblem (M : Type u) where
-  /-- The geometric boundedness predicate for each numerical moduli problem. -/
-  IsBounded : M → Prop
-
-/-- Definition 21.15(5): every supplied semistable moduli problem is bounded. -/
-def UniversalBoundedness {M : Type u} (P : BoundednessProblem M) : Prop :=
-  ∀ m, P.IsBounded m
 
 /-- The three ordinary clauses of Definition 20.5, kept as separately named
 fields so a review can inspect their quantifier boundaries independently. -/

@@ -14,6 +14,11 @@ first application that motivated it.
   `Instances/AlgebraicGeometry/` leaf below the generic construction. These
   bridge leaves may import both subjects; generic siblings and their umbrellas
   must not import bridge leaves.
+- A category or locus intrinsically defined from a scheme remains a geometric
+  object. Put scheme-derived categories, `Dqc`, and their geometric pullback
+  machinery under `AlgebraicGeometry/DerivedCategory/`; reserve an
+  `Instances/AlgebraicGeometry/` leaf for registration or comparison adapters
+  whose parent generic interface is the primary object being realized.
 - Express refinement in the import tree from weak to strong. A stronger theory
   imports its weaker parent and supplies a projection or constructor in Lean;
   directory nesting alone is not a substitute for the type-level relationship.
@@ -54,8 +59,10 @@ new derived-category theory.
 - The derived category is a generic construction on an abelian category and
   belongs under `CategoryTheory/Abelian/DerivedCategory/`.
 - `Coh X`, `QCoh X`, and module-sheaf categories are geometric inputs. Their
-  abelian and derived-category registrations belong in explicit
-  `Instances/AlgebraicGeometry/` leaves.
+  scheme-specific categories and loci belong under
+  `AlgebraicGeometry/DerivedCategory/`; registration-only adapters for generic
+  categorical interfaces may live in explicit `Instances/AlgebraicGeometry/`
+  leaves.
 - Raw dg categories are categories enriched over cochain complexes. They live
   under `CategoryTheory/Enriched/DGCategory/` and are not assumed to be
   triangulated.
@@ -86,11 +93,19 @@ new derived-category theory.
   belong in the child's `WeakCompatibility/` leaf.
 - Abstract pullback, pseudofunctor, Fourier--Mukai correspondence, and kernel
   convolution interfaces stay categorical. Scheme pullback, geometric
-  kernels, and integral-transform realizations go in their corresponding
-  `Instances/AlgebraicGeometry/` leaves. In particular, the base category,
-  fiber categories, and abstract pullback functors of a triangulated family
-  belong under `CategoryTheory/Triangulated/Families/` before any stability or
-  geometry is imposed.
+  derived categories, `Dqc`, pullback constructions, and geometric kernels live
+  under `AlgebraicGeometry/DerivedCategory/`. Registration-only realizations may
+  go in a corresponding `Instances/AlgebraicGeometry/` leaf. In particular,
+  the base category, fiber categories, and abstract pullback functors of a
+  triangulated family belong under `CategoryTheory/Triangulated/Families/`
+  before any stability or geometry is imposed.
+- Generic moduli boundedness interfaces shared by weak stability and geometric
+  moduli also belong under `CategoryTheory/Triangulated/Families/`; neither
+  consumer owns the common root.
+- `AlgebraicGeometry/StabilityCondition/` may contain only constructions that
+  actually depend on weak or Bridgeland stability data. Scheme semistable loci,
+  relative HN data, and stability-specific Fourier--Mukai actions belong there;
+  neutral derived pullback, `Dqc`, and kernel convolution do not.
 - General Mumford slope data belongs with weak geometric stability. A module
   constructing a Bridgeland stability condition from it belongs below the
   Bridgeland child only under the hypotheses where that construction is valid,

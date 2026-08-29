@@ -3,7 +3,7 @@ Scheme-derived slice of the AlgebraicGeometry audit. The declarations keep
 their established stability-condition namespace while the owning modules and
 audit records live in the geometry layer.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda

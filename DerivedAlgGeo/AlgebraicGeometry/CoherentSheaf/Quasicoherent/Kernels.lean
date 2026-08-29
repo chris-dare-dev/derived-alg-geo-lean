@@ -17,7 +17,7 @@ inclusion of quasi-coherent sheaves into all module sheaves exact.
 ## Why this file exists at this layer
 
 The affine case was previously proved inside the moduli lane, in
-`StabilityCondition/Families/Dqc/AffineRealization.lean`, where it was reachable
+`DerivedCategory/Dqc/AffineRealization.lean`, where it was reachable
 only by that lane. Quasi-coherence closure is a general fact about schemes: the
 Serre lane wants it, and `Dqc(X)`'s triangulated structure wants it. So it lives
 here, under `AlgebraicGeometry`, and the moduli lane consumes it.

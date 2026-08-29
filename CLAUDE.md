@@ -54,7 +54,10 @@ under the correct geometric hypotheses and then use
 `DerivedCategory (Coh X)`; do not build a second derived-category theory under
 algebraic geometry. `Dqc(X)` may be represented by the quasicoherent-cohomology
 locus until the abelian `QCoh X` construction and its derived comparison are
-available, but this is a geometric instance/comparison of the generic theory.
+available, but this is a geometric specialization of the generic theory and
+lives under `AlgebraicGeometry/DerivedCategory/`, not below stability. Use an
+`Instances/AlgebraicGeometry/` leaf for registration-only adapters whose
+generic categorical interface is the primary owner.
 
 Monoidal structure precedes enrichment in the dependency graph: a
 `V`-enriched category is defined relative to a monoidal category `V`, and a dg
@@ -89,12 +92,20 @@ stability is its child at `WeakStabilityCondition/StabilityCondition/`. Never
 restore a sibling `CategoryTheory/Triangulated/StabilityCondition/` tree, and
 keep strong-dependent adapters in the child's `WeakCompatibility/` leaf.
 Abstract pullback, pseudofunctor, and Fourier--Mukai interfaces remain
-categorical; their scheme and sheaf realizations belong in explicit
-`Instances/AlgebraicGeometry/` leaves. General Mumford slope data is
+categorical. Scheme-derived categories, `Dqc`, geometric pullback, and kernel
+convolution live under `AlgebraicGeometry/DerivedCategory/`; only
+registration-only adapters belong in explicit `Instances/AlgebraicGeometry/`
+leaves. General Mumford slope data is
 weak-stability input, while a promotion to Bridgeland stability belongs below
 the strong child only under hypotheses where that promotion is valid.
 Scheme-specific data remains geometry-owned and realizes the categorical
 interface through an explicit bridge.
+
+`AlgebraicGeometry/StabilityCondition/` is reserved for modules that actually
+consume weak or Bridgeland stability data: semistable loci, relative HN
+constructions, stability base change, and stability-specific Fourier--Mukai
+actions. Never place neutral `Dqc`, derived pullback, or kernel convolution
+there merely because a later stability application uses it.
 
 Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
 generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural

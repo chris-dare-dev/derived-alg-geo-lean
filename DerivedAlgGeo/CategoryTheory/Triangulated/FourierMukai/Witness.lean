@@ -27,7 +27,7 @@ below with no transport at all.
 **This shows the interfaces are consistent.  It shows nothing else.**  In
 particular it does *not* show that any geometric Fourier--Mukai transform
 exists, that any transform is an equivalence, or that any contract in
-`AlgebraicGeometry/StabilityCondition/Families/` is dischargeable.  The whole
+`AlgebraicGeometry/DerivedCategory/FourierMukai/` is dischargeable.  The whole
 geometric ledger remains uninhabited, and a reader must not take a witness here
 as evidence about it.
 

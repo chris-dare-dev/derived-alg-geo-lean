@@ -560,8 +560,8 @@ transport at all.
 A clean axiom list here says the interfaces are CONSISTENT. It says nothing
 else: not that any geometric Fourier--Mukai transform exists, not that any
 transform is an equivalence, and not that any contract in
-`AlgebraicGeometry/StabilityCondition/Families/` is dischargeable. The geometric
-ledger remains entirely uninhabited.
+`AlgebraicGeometry/DerivedCategory/FourierMukai/` is dischargeable. The
+geometric ledger remains entirely uninhabited.
 
 Nothing here is an `instance`, deliberately: a global `Correspondence` instance
 would put the trivial one in front of every instance search mentioning the

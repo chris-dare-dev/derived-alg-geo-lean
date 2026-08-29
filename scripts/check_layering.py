@@ -8,9 +8,9 @@ AlgebraicGeometry ownership boundary introduced by issue #601.
 
 The top-level collapse cannot see a reusable moduli or stack root importing a
 Bridgeland-family leaf because both live below ``AlgebraicGeometry``. Issue
-#850 adds that finer boundary here. Its measured legacy edges are exact-pair
-allowlisted and stale entries fail, so the exception set can shrink but cannot
-silently become permanent.
+#850 adds that finer boundary here. The former exact-pair migration allowlist
+has been burned to zero; stale entries still fail so exceptions cannot return
+silently.
 """
 
 from __future__ import annotations
@@ -59,33 +59,59 @@ LAYER = {
     "Development": 5,
 }
 
-GEOMETRY_FAMILY_MODULES = {
+NEUTRAL_DERIVED_FAMILY_MODULES = {
     "BoundedGeometry",
     "DerivedPullbackCoherence",
     "DerivedPullbackLaws",
     "DerivedPullbackShift",
-    "DerivedTensorCoherence",
-    "Dqc",
     "ExactPullback",
     "ExactPullbackCoherence",
-    "FiniteTypeGeometry",
+    "FiniteType",
     "FlatPullback",
     "FlatPullbackResolution",
-    "GeometricBaseChange",
-    "InducingPullback",
-    "KernelAssociativity",
-    "KernelConvolution",
-    "KernelCorrespondence",
-    "KernelUnit",
-    "KernelUnitConvolution",
     "LeftDerivedPullback",
     "OpenImmersionPullback",
     "PullbackAcyclicResolution",
-    "RelativeHN",
     "ResidueFiber",
     "Scheme",
     "SchemeDerived",
+}
+RETIRED_STABILITY_FAMILY_MODULES = {
+    "BoundedGeometry",
+    "DerivedPullbackCoherence",
+    "DerivedPullbackLaws",
+    "DerivedPullbackShift",
+    "ExactPullback",
+    "ExactPullbackCoherence",
+    "FlatPullback",
+    "FlatPullbackResolution",
+    "LeftDerivedPullback",
+    "OpenImmersionPullback",
+    "PullbackAcyclicResolution",
+    "ResidueFiber",
+    "SchemeDerived",
+}
+GEOMETRIC_FOURIER_MUKAI_MODULES = {
+    "DerivedTensorCoherence",
+    "KernelAdjunction",
+    "KernelAssociativity",
+    "KernelConvolution",
+    "KernelCorrespondence",
+    "KernelDualizingTwist",
+}
+STABILITY_FAMILY_MODULES = {
+    "FiniteTypeGeometry",
+    "GeometricBaseChange",
+    "InducingPullback",
+    "RelativeHN",
+    "Scheme",
     "SchemeSemistableLocus",
+}
+STABILITY_FOURIER_MUKAI_MODULES = {
+    "KernelComposition",
+    "KernelSwap",
+    "KernelUnit",
+    "KernelUnitConvolution",
 }
 
 
@@ -377,33 +403,98 @@ def main() -> int:
             "WeakStabilityCondition parent"
         )
 
-    generic_families_root = (
-        strong_stability_root
-        / "Families"
-    )
-    geometry_root = (
+    generic_families_root = strong_stability_root / "Families"
+    stability_families_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "StabilityCondition" / "Families"
     )
-    for module in sorted(GEOMETRY_FAMILY_MODULES):
+    neutral_derived_families_root = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "Families"
+    )
+    geometric_fourier_mukai_root = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "FourierMukai"
+    )
+    stability_fourier_mukai_root = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "StabilityCondition" / "FourierMukai"
+    )
+
+    all_geometry_modules = (
+        NEUTRAL_DERIVED_FAMILY_MODULES
+        | GEOMETRIC_FOURIER_MUKAI_MODULES
+        | STABILITY_FAMILY_MODULES
+        | STABILITY_FOURIER_MUKAI_MODULES
+    )
+    for module in sorted(all_geometry_modules):
         legacy = generic_families_root / f"{module}.lean"
-        relocated = geometry_root / f"{module}.lean"
         if legacy.exists():
             failures.append(
                 f"geometry-owned module restored below CategoryTheory: "
                 f"{legacy.relative_to(ROOT)}"
             )
+
+    for module in sorted(NEUTRAL_DERIVED_FAMILY_MODULES):
+        relocated = neutral_derived_families_root / f"{module}.lean"
         if not relocated.exists():
             failures.append(
-                f"geometry-owned module missing from AlgebraicGeometry: "
+                f"neutral scheme-derived family module missing: "
                 f"{relocated.relative_to(ROOT)}"
             )
 
+    for module in sorted(RETIRED_STABILITY_FAMILY_MODULES):
+        legacy = stability_families_root / f"{module}.lean"
+        if legacy.exists():
+            failures.append(
+                f"neutral derived-category module restored below stability: "
+                f"{legacy.relative_to(ROOT)}"
+            )
+
+    for module in sorted(GEOMETRIC_FOURIER_MUKAI_MODULES):
+        relocated = geometric_fourier_mukai_root / f"{module}.lean"
+        legacy = stability_families_root / f"{module}.lean"
+        if not relocated.exists():
+            failures.append(
+                f"geometric Fourier--Mukai module missing: "
+                f"{relocated.relative_to(ROOT)}"
+            )
+        if legacy.exists():
+            failures.append(
+                f"neutral Fourier--Mukai module restored below stability: "
+                f"{legacy.relative_to(ROOT)}"
+            )
+
+    for module in sorted(STABILITY_FAMILY_MODULES):
+        relocated = stability_families_root / f"{module}.lean"
+        if not relocated.exists():
+            failures.append(
+                f"stability-specific family module missing: "
+                f"{relocated.relative_to(ROOT)}"
+            )
+
+    for module in sorted(STABILITY_FOURIER_MUKAI_MODULES):
+        relocated = stability_fourier_mukai_root / f"{module}.lean"
+        legacy = stability_families_root / f"{module}.lean"
+        if not relocated.exists():
+            failures.append(
+                f"stability-specific Fourier--Mukai module missing: "
+                f"{relocated.relative_to(ROOT)}"
+            )
+        if legacy.exists():
+            failures.append(
+                f"stability Fourier--Mukai module restored below Families: "
+                f"{legacy.relative_to(ROOT)}"
+            )
+
     legacy_dqc = generic_families_root / "Dqc"
-    relocated_dqc = geometry_root / "Dqc"
+    retired_stability_dqc = stability_families_root / "Dqc"
+    relocated_dqc = SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "Dqc"
     if legacy_dqc.exists():
         failures.append(
             f"geometry-owned subtree restored below CategoryTheory: "
             f"{legacy_dqc.relative_to(ROOT)}"
+        )
+    if retired_stability_dqc.exists():
+        failures.append(
+            f"neutral Dqc subtree restored below stability: "
+            f"{retired_stability_dqc.relative_to(ROOT)}"
         )
     if not relocated_dqc.is_dir():
         failures.append(
@@ -499,8 +590,8 @@ def main() -> int:
         "Bridgeland stability"
     )
     print(
-        f"ok: {len(GEOMETRY_FAMILY_MODULES)} geometric family roots have "
-        "AlgebraicGeometry owners"
+        "ok: neutral scheme-derived families, geometric Fourier--Mukai, and "
+        "stability-specific geometry have distinct AlgebraicGeometry owners"
     )
     print(
         "ok: Moduli/Stacks reverse-edge fixtures distinguish allowed and "
@@ -508,8 +599,7 @@ def main() -> int:
     )
     print(
         f"ok: {len(reverse_edges)} measured Moduli/Stacks -> "
-        "StabilityCondition/Families edge(s) exactly match the shrinking "
-        "allowlist"
+        "StabilityCondition/Families edge(s); the migration allowlist is empty"
     )
     return 0
 
