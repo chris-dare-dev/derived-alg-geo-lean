@@ -35,7 +35,7 @@ module.  Compile-only demonstrations of logical inhabitance live under
 `DerivedAlgGeo.Development.StabilityCondition.Families.Scaffolding`.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 universe u v u₁ u₂ u₃
 
@@ -164,4 +164,4 @@ structure WeakDefinition20_5Conditions
   /-- Definition 20.5(3'). -/
   dedekindWeakHN : WeakIntegratesAfterDedekindBaseChange dedekind
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.Families

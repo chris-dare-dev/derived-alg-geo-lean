@@ -103,6 +103,10 @@ new derived-category theory.
   `CategoryTheory.Triangulated.Families` namespace. Do not place
   `TriangulatedFiberFamily`, shared boundedness interfaces, or future neutral
   family APIs below a stability-condition namespace.
+- Declarations owned by weak-stability families use
+  `CategoryTheory.Triangulated.WeakStabilityCondition.Families`. Shared
+  Definition 20.5 probes and APIs bound to `WeakStabilityFunction` belong to
+  that weak parent, not to the Bridgeland family's declaration namespace.
 - Generic moduli boundedness interfaces shared by weak stability and geometric
   moduli also belong under `CategoryTheory/Triangulated/Families/`; neither
   consumer owns the common root.

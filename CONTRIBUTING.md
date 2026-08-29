@@ -79,6 +79,12 @@ consume them. Treat a namespace migration as an API cutover: update all stable
 consumers, audits, declaration baselines, documentation, and regression gates
 together.
 
+Weak-family declarations likewise use
+`CategoryTheory.Triangulated.WeakStabilityCondition.Families`. Put the shared
+Definition 20.5 probes and structures bound to `WeakStabilityFunction` in that
+namespace, and let ordinary Bridgeland family packages import them from the
+stronger child.
+
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one

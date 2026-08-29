@@ -41,6 +41,7 @@ namespace CategoryTheory.Triangulated.StabilityCondition.Families
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
+open CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 noncomputable section
 

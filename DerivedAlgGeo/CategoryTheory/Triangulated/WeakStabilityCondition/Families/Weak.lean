@@ -31,7 +31,7 @@ supply.  Constant and `PUnit` inhabitants used to test logical consistency
 live in the development scaffolding rather than this stable module.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 open CategoryTheory.Triangulated
 open CategoryTheory Limits Pretriangulated CategoryTheory.Triangulated
@@ -190,4 +190,4 @@ structure WeakStabilityInFamiliesData
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.Families

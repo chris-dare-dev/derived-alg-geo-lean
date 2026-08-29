@@ -26,6 +26,7 @@ namespace CategoryTheory.Triangulated.StabilityCondition.Families
 
 open CategoryTheory.Triangulated.Families
 open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 noncomputable section
 

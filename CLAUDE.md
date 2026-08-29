@@ -113,6 +113,11 @@ belong to `CategoryTheory.Triangulated.Families`, not to a nested stability
 namespace. Namespace migrations are separate from path moves and must update
 consumers, audits, baselines, documentation, and enforcement together.
 
+The weak family root follows the same rule. Shared family probes and APIs bound
+to `WeakStabilityFunction` use
+`CategoryTheory.Triangulated.WeakStabilityCondition.Families`; the stronger
+Bridgeland child consumes them instead of owning them.
+
 Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
 generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural
 move must update imports, umbrellas, audits, declaration-sweep routing,

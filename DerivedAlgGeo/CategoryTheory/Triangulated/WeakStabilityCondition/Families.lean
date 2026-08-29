@@ -10,4 +10,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 Shared family probes and their binding to weak stability data. Ordinary
 Bridgeland family packages remain in the stronger `StabilityCondition` child.
+
+The declarations use the matching
+`CategoryTheory.Triangulated.WeakStabilityCondition.Families` namespace.
 -/

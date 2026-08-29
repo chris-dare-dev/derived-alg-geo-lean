@@ -10,8 +10,8 @@ The top-level collapse cannot see a reusable moduli or stack root importing a
 Bridgeland-family leaf because both live below ``AlgebraicGeometry``. Issue
 #850 adds that finer boundary here. The former exact-pair migration allowlist
 has been burned to zero; stale entries still fail so exceptions cannot return
-silently. The gate also keeps neutral triangulated-family declarations in the
-namespace matching their generic owner.
+silently. The gate also keeps neutral and weak triangulated-family declarations
+in the namespaces matching their owners.
 """
 
 from __future__ import annotations
@@ -37,6 +37,9 @@ STABILITY_FAMILIES_ROOT = (
     "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families"
 )
 GENERIC_FAMILIES_NAMESPACE = "CategoryTheory.Triangulated.Families"
+WEAK_FAMILIES_NAMESPACE = (
+    "CategoryTheory.Triangulated.WeakStabilityCondition.Families"
+)
 LEGACY_GENERIC_FAMILY_DECLARATION = re.compile(
     r"CategoryTheory\.Triangulated\.StabilityCondition\.Families\."
     r"(?:TriangulatedFiberFamily|BoundednessProblem|UniversalBoundedness)\b"
@@ -408,6 +411,24 @@ def main() -> int:
     )
     strong_stability_module = weak_stability_module + ".StabilityCondition"
 
+    weak_families_source_root = weak_stability_root / "Families"
+    for module in ("Basic", "Weak"):
+        path = weak_families_source_root / f"{module}.lean"
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {WEAK_FAMILIES_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: weak-family declarations must "
+                f"use namespace {WEAK_FAMILIES_NAMESPACE}"
+            )
+        if (
+            "namespace CategoryTheory.Triangulated.StabilityCondition.Families"
+            in text
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: weak-family declarations restored "
+                "the legacy Bridgeland-family namespace"
+            )
+
     weak_parent_paths = [weak_stability_umbrella]
     weak_parent_paths.extend(
         path
@@ -620,6 +641,10 @@ def main() -> int:
     print(
         "ok: neutral triangulated-family declarations use the generic "
         "CategoryTheory.Triangulated.Families namespace"
+    )
+    print(
+        "ok: weak-stability family declarations use the matching "
+        "CategoryTheory.Triangulated.WeakStabilityCondition.Families namespace"
     )
     print(
         "ok: neutral scheme-derived families, geometric Fourier--Mukai, and "
