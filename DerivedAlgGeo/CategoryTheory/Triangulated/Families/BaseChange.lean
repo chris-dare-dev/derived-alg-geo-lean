@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Functorial
 
 /-!
-# Categorical base change for stability-condition fibers
+# Categorical base change for triangulated fibers
 
 The numerical family interfaces initially indexed unrelated triangulated
 categories by a type.  This file records the next layer needed for families:
@@ -27,7 +27,7 @@ open CategoryTheory.Triangulated
 
 universe u v w
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.Families
 
 variable {B : Type u} [Category.{v} B]
 
@@ -153,4 +153,4 @@ end CompatibleClassMaps
 
 end TriangulatedFiberFamily
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.Families

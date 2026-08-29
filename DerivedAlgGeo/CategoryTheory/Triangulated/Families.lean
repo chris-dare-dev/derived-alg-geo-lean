@@ -11,4 +11,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.Families.Boundedness
 Generic contravariant families of triangulated categories, their pullback
 functors, and shared boundedness interfaces. Stability data on such fibers is
 added by the weak- and Bridgeland-stability descendants.
+
+The neutral declarations use the matching
+`CategoryTheory.Triangulated.Families` namespace.
 -/

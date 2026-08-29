@@ -10,7 +10,8 @@ The top-level collapse cannot see a reusable moduli or stack root importing a
 Bridgeland-family leaf because both live below ``AlgebraicGeometry``. Issue
 #850 adds that finer boundary here. The former exact-pair migration allowlist
 has been burned to zero; stale entries still fail so exceptions cannot return
-silently.
+silently. The gate also keeps neutral triangulated-family declarations in the
+namespace matching their generic owner.
 """
 
 from __future__ import annotations
@@ -34,6 +35,11 @@ GEOMETRY_INSTANCE_UMBRELLAS = {
 }
 STABILITY_FAMILIES_ROOT = (
     "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families"
+)
+GENERIC_FAMILIES_NAMESPACE = "CategoryTheory.Triangulated.Families"
+LEGACY_GENERIC_FAMILY_DECLARATION = re.compile(
+    r"CategoryTheory\.Triangulated\.StabilityCondition\.Families\."
+    r"(?:TriangulatedFiberFamily|BoundednessProblem|UniversalBoundedness)\b"
 )
 PROTECTED_GEOMETRY_SUBTREES = {
     ("AlgebraicGeometry", "Moduli"),
@@ -366,6 +372,28 @@ def main() -> int:
             "WeakStabilityCondition"
         )
 
+    generic_families_source_root = (
+        SOURCE_ROOT / "CategoryTheory" / "Triangulated" / "Families"
+    )
+    for module in ("BaseChange", "Boundedness"):
+        path = generic_families_source_root / f"{module}.lean"
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {GENERIC_FAMILIES_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: generic family declarations must "
+                f"use namespace {GENERIC_FAMILIES_NAMESPACE}"
+            )
+
+    for path in sorted(SOURCE_ROOT.rglob("*.lean")):
+        for line_number, line in enumerate(
+            path.read_text(encoding="utf-8").splitlines(), 1
+        ):
+            if LEGACY_GENERIC_FAMILY_DECLARATION.search(line):
+                failures.append(
+                    f"{path.relative_to(ROOT)}:{line_number}: neutral family "
+                    "declaration restored below the legacy stability namespace"
+                )
+
     weak_stability_root = (
         SOURCE_ROOT
         / "CategoryTheory"
@@ -588,6 +616,10 @@ def main() -> int:
     print(
         "ok: weak stability is independent of, and directly parented by, "
         "Bridgeland stability"
+    )
+    print(
+        "ok: neutral triangulated-family declarations use the generic "
+        "CategoryTheory.Triangulated.Families namespace"
     )
     print(
         "ok: neutral scheme-derived families, geometric Fourier--Mukai, and "

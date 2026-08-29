@@ -1,7 +1,8 @@
 /-
-Generic families slice of the StabilityCondition audit, split out so concurrent
-branches append to different files (#480). Geometric family records are owned
-by `AlgebraicGeometryAudit/StabilityConditionFamilies.lean`.
+Categorical and stability families slice of the StabilityCondition audit,
+split out so concurrent branches append to different files (#480). Geometric
+family records are owned by
+`AlgebraicGeometryAudit/StabilityConditionFamilies.lean`.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
@@ -13,31 +14,34 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
 
-/-! ## Families lane -- abstract Definition 20.5/21.15 interfaces -/
+/-! ## Neutral categorical family interfaces -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.mk.inj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.fibers
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.fiberPreadditive
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.fiberZero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.fiberShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.fiberShiftAdditive
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.fiberPretriangulated
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.pullAdditive
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.pullCommShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.pullTriangulated
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.Fiber
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.pull
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.pullK₀
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.pullK₀_of
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.pullK₀_id
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.pullK₀_comp
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.constant
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.CompatibleClassMaps
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.CompatibleClassMaps.pull_compatible
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.CompatibleClassMaps.class_pull
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TriangulatedFiberFamily.CompatibleClassMaps.constant
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.mk.inj
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.fibers
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.fiberPreadditive
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.fiberZero
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.fiberShift
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.fiberShiftAdditive
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.fiberPretriangulated
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.pullAdditive
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.pullCommShift
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.pullTriangulated
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.Fiber
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.pull
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.pullK₀
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.pullK₀_of
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.pullK₀_id
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.pullK₀_comp
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.constant
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.CompatibleClassMaps
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.CompatibleClassMaps.pull_compatible
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.CompatibleClassMaps.class_pull
+#print axioms CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.CompatibleClassMaps.constant
+
+/-! ## Abstract Definition 20.5/21.15 family interfaces -/
+
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.FiberPreStabilityBaseChangeData
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.FiberPreStabilityBaseChangeData.classMap_compatible
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.FiberPreStabilityBaseChangeData.charge_compatible
@@ -102,8 +106,8 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.IntegratesAfterDedekindBaseChange
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.WeakDedekindHNProblem
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.WeakIntegratesAfterDedekindBaseChange
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.BoundednessProblem
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.UniversalBoundedness
+#print axioms CategoryTheory.Triangulated.Families.BoundednessProblem
+#print axioms CategoryTheory.Triangulated.Families.UniversalBoundedness
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.OrdinaryDefinition20_5Conditions
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.WeakDefinition20_5Conditions
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.OrdinaryStabilityInFamiliesData

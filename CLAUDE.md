@@ -107,6 +107,12 @@ constructions, stability base change, and stability-specific Fourier--Mukai
 actions. Never place neutral `Dqc`, derived pullback, or kernel convolution
 there merely because a later stability application uses it.
 
+The generic family root also owns its declaration namespace:
+`TriangulatedFiberFamily`, `BoundednessProblem`, and other neutral family APIs
+belong to `CategoryTheory.Triangulated.Families`, not to a nested stability
+namespace. Namespace migrations are separate from path moves and must update
+consumers, audits, baselines, documentation, and enforcement together.
+
 Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
 generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural
 move must update imports, umbrellas, audits, declaration-sweep routing,

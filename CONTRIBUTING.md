@@ -71,6 +71,14 @@ semistable loci, relative HN data, and stability base-change witnesses, and
 actually use stability-condition autoequivalences. Their neutral prerequisites
 belong under `AlgebraicGeometry/DerivedCategory/`.
 
+Neutral categorical family declarations use the matching
+`CategoryTheory.Triangulated.Families` namespace. In particular,
+`TriangulatedFiberFamily` and shared boundedness interfaces must not be declared
+inside a weak- or Bridgeland-stability namespace merely because those theories
+consume them. Treat a namespace migration as an API cutover: update all stable
+consumers, audits, declaration baselines, documentation, and regression gates
+together.
+
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one
