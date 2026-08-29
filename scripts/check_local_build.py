@@ -12,12 +12,19 @@ locally.
 Refused:
 
   * `lake build` with no target -- the whole library;
+  * `lake build DerivedAlgGeo` / `lake build DerivedAlgGeoSweep` -- naming an
+    all-library umbrella is the same whole-library build, because
+    `lakefile.toml` sets `defaultTargets = ["DerivedAlgGeo"]`. Until #837 this
+    passed, and on 2026-08-27 it ran for over an hour in a worktree that DID
+    have the hook;
   * `scripts/gates.sh`, in any mode, because its `build` gate is that same
     whole-library build.
 
 Allowed, deliberately:
 
-  * `lake build <Target>` with an explicit target, including the three audits;
+  * `lake build <Target>` for any target below an umbrella, including the three
+    audits and `DerivedAlgGeo.Development` (which `gates.sh` and `ci.yml` both
+    build by name);
   * `lake env lean <file>` -- the seconds-long probe that interactive proof work
     depends on. Routing those through CI would make each attempt a ~12 minute
     round trip and stop anyone from writing a proof at all;
@@ -50,6 +57,26 @@ import sys
 # such as `cd x && lake build` has to be examined segment by segment, or the
 # check is trivially evaded by prefixing anything.
 SEPARATORS = re.compile(r"\|\||&&|[;|&\n()]")
+
+# The all-library umbrellas. Naming one is the build that naming none does:
+# `lakefile.toml` sets `defaultTargets = ["DerivedAlgGeo"]`, so `lake build` and
+# `lake build DerivedAlgGeo` resolve to the same work. `DerivedAlgGeoSweep` is
+# worse -- it imports the stable root AND the development probes.
+#
+# Exact names only. `DerivedAlgGeo.Development` is a module target and is
+# precisely the targeted build this gate exists to permit: both `gates.sh` and
+# `ci.yml` build it by name before the audits.
+UMBRELLAS = {"DerivedAlgGeo", "DerivedAlgGeoSweep"}
+
+
+def target_name(token: str) -> str:
+    """The library or module a Lake target token names, bare.
+
+    `lake build DerivedAlgGeo:leanArts` and `lake build +DerivedAlgGeo` are the
+    same whole-library build as `lake build DerivedAlgGeo`. A check that
+    compared the raw token would be one colon away from being evaded.
+    """
+    return token.lstrip("@+").split(":", 1)[0]
 
 
 def segments(command: str) -> list[list[str]]:
@@ -99,6 +126,15 @@ def offence(tokens: list[str]) -> str | None:
                 "`lake build` with no target builds the whole library. Either "
                 "name the module you changed (`lake build DerivedAlgGeo.Foo`) "
                 "or push the branch and let the runner do it."
+            )
+        umbrellas = [t for t in targets if target_name(t) in UMBRELLAS]
+        if umbrellas:
+            return (
+                f"`lake build {umbrellas[0]}` names an all-library umbrella, "
+                "which is the same whole-library build as `lake build` with no "
+                "target at all. Naming it is not a targeted build. Either name "
+                "the module you changed (`lake build DerivedAlgGeo.Foo`) or "
+                "push the branch and let the runner do it."
             )
     return None
 
