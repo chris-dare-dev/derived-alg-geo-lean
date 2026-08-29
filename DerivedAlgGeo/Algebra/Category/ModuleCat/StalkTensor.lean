@@ -285,7 +285,6 @@ noncomputable def germTmulRight (U : Opens X) (hxU : x ∈ U) (m : M.obj (op U))
 
 /-- The defining computation rule for `germTmulRight`, which is a `colimit.desc` and so is
 pinned down entirely by its values on germs. Every later proof about it goes through here. -/
-@[simp]
 lemma germTmulRight_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p : P.obj (op V)) :
     germTmulRight M P x U hxU m (TopCat.Presheaf.germ P.presheaf V x hxV p)
@@ -346,7 +345,6 @@ noncomputable def germTmulBiadd :
 /-- Both colimit stages unwound at once. Since every element of a stalk is a germ, this and
 additivity determine `germTmulBiadd` completely — it is the only handle the bilinearity and
 inverse proofs use. -/
-@[simp]
 lemma germTmulBiadd_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p : P.obj (op V)) :
     germTmulBiadd M P x (TopCat.Presheaf.germ M.presheaf U x hxU m)
@@ -434,7 +432,6 @@ lemma stalkTensorBackward_tmul (ξ : ToType (TopCat.Presheaf.stalk M.presheaf x)
 
 /-- The backward map sends a pure tensor of germs to the germ of the pure tensor,
 taken over the intersection of the two neighbourhoods. -/
-@[simp]
 lemma stalkTensorBackward_germ_tmul_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p : P.obj (op V)) :
     stalkTensorBackward M P x
@@ -453,7 +450,6 @@ noncomputable def stalkTensorLeg (U : Opens X) (hx : x ∈ U) :
       (TensorProduct.lift (stalkTensorBilin M P x U hx)).toAddMonoidHom)
 
 /-- The forward leg computes on a pure tensor of sections. -/
-@[simp]
 lemma stalkTensorLeg_tmul (U : Opens X) (hx : x ∈ U)
     (m : M.obj (op U)) (p : P.obj (op U)) :
     stalkTensorLeg M P x U hx (m ⊗ₜ p)
@@ -505,7 +501,6 @@ noncomputable def stalkTensorForward :
   Limits.colimit.desc _ (stalkTensorForwardCocone M P x)
 
 /-- The forward map computes on a germ, by the leg at that neighbourhood. -/
-@[simp]
 lemma stalkTensorForward_germ (U : Opens X) (hxU : x ∈ U)
     (z : (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M P).presheaf.obj (op U)) :
     stalkTensorForward M P x
@@ -589,7 +584,6 @@ noncomputable def stalkTensorEquiv :
     right_inv := stalkTensorBackward_forward M P x }
 
 /-- `stalkTensorEquiv` computes on a pure tensor of germs. -/
-@[simp]
 lemma stalkTensorEquiv_germ_tmul_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p : P.obj (op V)) :
     stalkTensorEquiv M P x
@@ -599,7 +593,6 @@ lemma stalkTensorEquiv_germ_tmul_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x �
   germTmulBiadd_germ M P x U V hxU hxV m p
 
 /-- The inverse of `stalkTensorEquiv` computes on a germ. -/
-@[simp]
 lemma stalkTensorEquiv_symm_germ (U : Opens X) (hxU : x ∈ U)
     (z : (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M P).presheaf.obj (op U)) :
     (stalkTensorEquiv M P x).symm
@@ -643,7 +636,6 @@ noncomputable def stalkMap :
 
 /-- `stalkMap` has the same computation rule as `stalkMapAdd`; the two differ only in carrying
 the `Rₓ`-module structure. -/
-@[simp]
 lemma stalkMap_germ (U : Opens X) (hxU : x ∈ U) (m : M.obj (op U)) :
     stalkMap g x (TopCat.Presheaf.germ M.presheaf U x hxU m)
       = TopCat.Presheaf.germ N.presheaf U x hxU (g.app (op U) m) :=
