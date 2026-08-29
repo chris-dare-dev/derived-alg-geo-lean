@@ -71,7 +71,8 @@ and `ofFreeEpi` closes the gap the moment one exists.
 of sections, and turning a spanning set into an epi of *sheaves* is the real content: on `Spec R`
 it means checking surjectivity on each basic open, where quasi-coherence identifies the sections
 with a localization and a spanning set stays spanning. `epi_of_isLocallySurjective`
-(`Modules/Affine/Exactness.lean`) and `isLocallySurjective_of_coversTop` (`Divisors/Tensor.lean`)
+(`Modules/Affine/Exactness.lean`) and `isLocallySurjective_of_coversTop`
+(`Modules/Tensor/Basic.lean`)
 are the two ends of that chain and both are in the tree; what is missing is the middle, and
 Mathlib has no "locally surjective from surjectivity on a basis" lemma to shorten it. This is
 also where `Coh.affineEquivalence`, and hence Noetherianity, would enter.

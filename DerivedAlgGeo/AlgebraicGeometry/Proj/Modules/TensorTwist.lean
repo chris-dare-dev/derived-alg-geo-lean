@@ -15,7 +15,7 @@ normalization at zero, and the comparison — the three that need nothing beyond
 
 ## What is here, and what each costs
 
-* `tensorTwist F d` — the definition. `Divisors/Tensor.lean`'s machinery is stated for a locally
+* `tensorTwist F d` — the definition. `Modules/Tensor/Basic.lean`'s machinery is stated for a locally
   free rank-one factor, so this is well-behaved only because `twistingSheaf_isInvertible` holds;
 * `tensorTwistZeroIso` — `F(0) ≅ F`, which is `twistingSheafZeroIso` and `associatedSheafSelfIso`
   transported through the tensor and then `tensorUnitRightIso`;

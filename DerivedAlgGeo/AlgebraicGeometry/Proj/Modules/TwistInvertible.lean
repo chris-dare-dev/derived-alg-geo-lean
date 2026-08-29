@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistCoherence
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistingSheaf
-import DerivedAlgGeo.AlgebraicGeometry.Divisors.Tensor
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
 
 /-!
 # The twisting sheaf is invertible
@@ -15,7 +15,7 @@ over `𝒜 0`. This is the hypothesis quasi-coherence and coherence already take
 ## Why this file exists, and the route it fixes
 
 `#584` asks for the twist `F(d) = F ⊗ O(d)` of an arbitrary module sheaf on `Proj`. The sheafified
-tensor product in `Divisors/Tensor.lean` is stated for a **locally free rank-one** factor — its
+tensor product in `Modules/Tensor/Basic.lean` is stated for a **locally free rank-one** factor — its
 comparison maps are inverted by sheafification only there, and its associator needs the outer
 factors invertible. So `F(d)` cannot be built at all until `O(d)` is known to be invertible, and
 the issue left the route open between:
@@ -75,7 +75,7 @@ noncomputable def twistingSheafOverUnitIso (f : 𝒜 1) (d : ℤ) :
 /-- **The twisting sheaf `O(d)` is invertible**, at either sign of `d`, as soon as degree-one
 elements generate `A` over `𝒜 0`.
 
-This is what makes `Divisors/Tensor.lean` applicable to `O(d)`, and hence what lets `F(d)` be
+This is what makes `Modules/Tensor/Basic.lean` applicable to `O(d)`, and hence what lets `F(d)` be
 defined for an arbitrary module sheaf `F`. The hypothesis is the one coherence already takes. -/
 theorem twistingSheaf_isInvertible {I : Type u} (g : I → 𝒜 1) (d : ℤ)
     (hg : Algebra.adjoin (𝒜 0) (Set.range fun j => (g j : A)) = ⊤) :

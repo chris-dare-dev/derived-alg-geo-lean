@@ -106,6 +106,10 @@ noncomputable instance preservesFiniteColimits_toSheaf :
 instance preservesEpimorphisms_toSheaf : (toSheaf X).PreservesEpimorphisms :=
   inferInstanceAs (SheafOfModules.toSheaf.{u} X.ringCatSheaf).PreservesEpimorphisms
 
+/-- The wrapper-typed forgetful functor reflects epimorphisms. -/
+instance reflectsEpimorphisms_toSheaf : (toSheaf X).ReflectsEpimorphisms :=
+  inferInstanceAs (SheafOfModules.toSheaf.{u} X.ringCatSheaf).ReflectsEpimorphisms
+
 /-- A short exact sequence of `𝒪ₓ`-modules is short exact as a sequence of abelian sheaves.
 
 This is the `X.Modules`-level form of `SheafOfModules.shortExact_map_toSheaf`, and the shape

@@ -319,7 +319,7 @@ The same three results in the names `#584` uses. `tensorTwist F d` is by definit
 the same graded setting — they are kept only because `#584`'s deliverables are stated in the
 `tensorTwist` spelling.
 
-Both spellings live in the general graded setting. `Divisors/Tensor.lean`'s machinery needs a
+Both spellings live in the general graded setting. `Modules/Tensor/Basic.lean`'s machinery needs a
 locally free rank-one factor, which `TwistInvertible.lean` supplies for `O(d)`; it does not need
 `A` to be an algebra over a base ring, and nothing in the twist API uses such a structure. -/
 

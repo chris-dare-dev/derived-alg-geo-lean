@@ -40,7 +40,7 @@ those inputs and no others. The gap becomes enumerated instead of implicit.
   `TStructure/Exactness.lean` describing its t-exactness. This is where
   *properness* enters: pushforward preserves coherence only under a properness
   hypothesis, and `HasDerivedPushforward` is where a caller discharges it.
-* **Derived tensor product.** Likewise absent. `Divisors/Tensor.lean` tensors
+* **Derived tensor product.** Likewise absent. `Modules/Tensor/Basic.lean` tensors
   invertible sheaves and `Modules/` tensors module sheaves; neither is `⊗^L` on
   `Dᵇ(Coh)`.
 
