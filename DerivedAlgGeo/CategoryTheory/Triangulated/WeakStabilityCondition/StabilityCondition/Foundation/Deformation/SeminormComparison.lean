@@ -29,7 +29,7 @@ universe v u u'
 
 namespace CategoryTheory.Triangulated
 
-open Deformation
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 open PreStabilityCondition.WithClassMap (charge_congr charge_def)
 
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]

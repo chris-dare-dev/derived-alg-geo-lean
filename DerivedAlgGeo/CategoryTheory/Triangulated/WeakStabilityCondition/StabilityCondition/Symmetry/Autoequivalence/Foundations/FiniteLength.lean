@@ -50,6 +50,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 namespace CategoryTheory.Triangulated
 
 open CategoryTheory.Triangulated
+open WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat
 
 universe w u
 
@@ -160,8 +161,7 @@ theorem intervalInclusion_isAdmissibleSubobject
   refine ⟨I.obj Y, I.obj Q, I.map i, inferInstance, I.map q, ?_, δ, ?_⟩
   · subst A
     have hcanonical : IsStrictMono (Subobject.mk i).arrow :=
-      CategoryTheory.Triangulated.Deformation.Slicing.IntervalCat.subobject_arrow_strictMono
-        C i hiStrict
+      subobject_arrow_strictMono C i hiStrict
     have hcanonicalMap : IsStrictMono (I.map (Subobject.mk i).arrow) :=
       intervalInclusion_map_strictMono (C := C) h _ hcanonical
     letI : Mono (I.map (Subobject.mk i).arrow) := hcanonicalMap.mono

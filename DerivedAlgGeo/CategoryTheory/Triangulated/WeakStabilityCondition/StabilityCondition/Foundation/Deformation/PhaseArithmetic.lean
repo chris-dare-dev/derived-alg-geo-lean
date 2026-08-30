@@ -14,7 +14,7 @@ modules can use these results through the repository-owned foundation.
 
 noncomputable section
 
-namespace CategoryTheory.Triangulated.Deformation
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 /-- The imaginary part of a complex number after rotating phase `ψ` to the
 real axis. -/
@@ -190,4 +190,4 @@ theorem relativePhase_seesaw_dual {w w₁ w₂ : ℂ} {α ψ : ℝ}
     rw [← hsum, add_mul, Complex.add_im]
   linarith
 
-end CategoryTheory.Triangulated.Deformation
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation

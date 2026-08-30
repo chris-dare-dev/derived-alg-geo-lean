@@ -88,6 +88,7 @@ CategoryTheory/Triangulated/Families
 CategoryTheory/Triangulated/WeakStabilityCondition
   ├─→ Foundation, Families, HarderNarasimhan, Support, Tilting
   └─→ StabilityCondition
+        ├─→ Foundation/Deformation              Bridgeland deformation
         ├─→ Foundation, Phase, Metric, Symmetry, Support, Walls
         ├─→ Families                         abstract categorical families
         └─→ WeakCompatibility                strong-to-weak adapters
@@ -141,6 +142,13 @@ Only `Compatibility/StabilityConditionGroupActionReview.lean` retains
 deprecated aliases in the former sibling namespace so the immutable reviewed
 statement payloads continue to elaborate; that bridge is not a second public
 API and is removed after reviewer reconfirmation.
+Bridgeland deformation helpers have completed their cutover from the flattened
+`CategoryTheory.Triangulated.Deformation` namespace to
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`.
+Extensions of canonical structures remain in the established `Slicing`,
+`PreStabilityCondition.WithClassMap`, or `StabilityCondition.WithClassMap`
+namespace: directory placement groups the implementation, but does not create
+a second owner for those APIs.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map

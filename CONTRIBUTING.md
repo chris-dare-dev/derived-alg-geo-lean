@@ -140,6 +140,14 @@ immutable human-review payloads that predate this cutover; do not import that
 leaf from library code or add aliases to it. Remove it after the named reviewer
 reconfirms those payloads against the canonical declarations.
 
+Deformation-specific Bridgeland helpers use
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`.
+The flattened `CategoryTheory.Triangulated.Deformation` namespace is retired.
+Keep extensions of canonical structures such as `Slicing`,
+`PreStabilityCondition.WithClassMap`, and `StabilityCondition.WithClassMap` in
+their established namespaces even when the implementing module is physically
+grouped below `Foundation/Deformation/`.
+
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one

@@ -19,7 +19,7 @@ open scoped ENNReal
 
 universe u v u'
 
-namespace CategoryTheory.Triangulated.Deformation
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
@@ -166,4 +166,4 @@ theorem relativePhase_perturbation_of_stabilitySeminorm
     rwa [div_lt_iff₀ (charge_norm_pos C σ hP hE)] at hreal
   exact relativePhase_perturbation_of_charge C σ W hP hE hφα hε hε2 hbd
 
-end CategoryTheory.Triangulated.Deformation
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation

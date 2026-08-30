@@ -33,7 +33,7 @@ universe v u u'
 
 namespace CategoryTheory.Triangulated
 
-open Deformation
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
@@ -153,7 +153,7 @@ theorem StabilityCondition.WithClassMap.exists_epsilon0_sixteenth
     (σ : StabilityCondition.WithClassMap C v) :
     ∃ ε₀ : ℝ, 0 < ε₀ ∧ ε₀ < 1 / 16 ∧ WideSectorFiniteLength C σ ε₀ := by
   obtain ⟨ε₁, hε₁, hε₁8, hWide₁⟩ :=
-    Deformation.exists_wideSectorRadius C σ
+    WeakStabilityCondition.StabilityCondition.Deformation.exists_wideSectorRadius C σ
   refine ⟨ε₁ / 2, by positivity, by linarith, ?_⟩
   exact wideSectorFiniteLength_mono C σ hε₁ hε₁8 hWide₁
     (by positivity) (by linarith) (by linarith)

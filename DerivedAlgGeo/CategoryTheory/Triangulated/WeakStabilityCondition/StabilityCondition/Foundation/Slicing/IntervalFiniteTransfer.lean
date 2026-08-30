@@ -20,6 +20,8 @@ universe u v
 
 namespace CategoryTheory.Triangulated
 
+open WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat
+
 section General
 
 variable {A : Type u} [Category.{v} A] [Preadditive A] [HasKernels A] [HasCokernels A]
@@ -117,7 +119,7 @@ theorem intervalInclusion_map_strictMono
   let S : ShortComplex (s₁.IntervalCat C a₁ b₁) :=
     ShortComplex.mk f (cokernel.π f) (cokernel.condition f)
   have hS : StrictShortExact S :=
-    Deformation.Slicing.IntervalCat.strictShortExact_cokernel C f hf
+    strictShortExact_cokernel C f hf
   obtain ⟨δ, hT⟩ := Slicing.IntervalCat.exists_distinguished_of_strictShortExact C s₁ hS
   let I := ObjectProperty.ιOfLE h
   let SI := S.map I
