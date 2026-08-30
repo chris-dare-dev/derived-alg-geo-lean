@@ -108,6 +108,11 @@ Declarations owned by that stronger child use
 This namespace owns ordinary family packages and categorical pre-stability
 base change, not their scheme-specific realizations.
 
+Wall theory in the same strong child uses
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`.
+Do not put new wall declarations back under the former sibling
+`CategoryTheory.Triangulated.StabilityCondition.Wall` namespace.
+
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one

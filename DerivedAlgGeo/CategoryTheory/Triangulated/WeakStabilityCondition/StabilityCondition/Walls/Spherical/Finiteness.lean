@@ -57,7 +57,7 @@ not `NS(X)`.
 
 open CategoryTheory Bornology Set
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical
 
 variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
 variable (q : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
@@ -236,4 +236,4 @@ theorem finite_wallCandidates (hq : ∀ x y : V, q x y = q y x)
 
 end BoundedRegion
 
-end CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical

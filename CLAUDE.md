@@ -145,6 +145,10 @@ Ordinary Bridgeland family packages use the matching child namespace
 Geometric realizations consume that API but keep geometry-owned declarations
 separate.
 
+Bridgeland wall declarations likewise use the matching strong-child namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`,
+not the former sibling `CategoryTheory.Triangulated.StabilityCondition.Wall`.
+
 Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
 generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural
 move must update imports, umbrellas, audits, declaration-sweep routing,

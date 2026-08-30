@@ -121,6 +121,9 @@ stability-specific Fourier--Mukai actions have completed their cutovers to
 `AlgebraicGeometry.StabilityCondition.Families` and
 `AlgebraicGeometry.StabilityCondition.FourierMukai`. No geometry-owned
 declaration remains in the retired flattened categorical family namespace.
+Bridgeland wall declarations have also completed their cutover from the former
+sibling namespace to
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map
