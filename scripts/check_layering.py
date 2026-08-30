@@ -62,6 +62,12 @@ WEAK_SUPPORT_NAMESPACE = (
 RETIRED_SUPPORT_NAMESPACE = (
     "CategoryTheory.Triangulated.StabilityCondition.Support"
 )
+WEAK_FINITE_LENGTH_NAMESPACE = (
+    "CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength"
+)
+RETIRED_FINITE_LENGTH_NAMESPACE = (
+    "CategoryTheory.Triangulated.StabilityCondition.FiniteLength"
+)
 STRONG_FAMILIES_NAMESPACE = (
     "CategoryTheory.Triangulated.WeakStabilityCondition."
     "StabilityCondition.Families"
@@ -491,6 +497,24 @@ def main() -> int:
                 f"must use namespace {WEAK_SUPPORT_NAMESPACE}"
             )
 
+    weak_simple_charge = (
+        weak_stability_root / "Foundation" / "StabilityFunction"
+        / "SimpleCharge.lean"
+    )
+    weak_simple_charge_text = weak_simple_charge.read_text(encoding="utf-8")
+    if f"namespace {WEAK_FINITE_LENGTH_NAMESPACE}" not in weak_simple_charge_text:
+        failures.append(
+            f"{weak_simple_charge.relative_to(ROOT)}: finite-length simple-charge "
+            f"declarations must use namespace {WEAK_FINITE_LENGTH_NAMESPACE}"
+        )
+    retired_weak_foundations = weak_stability_root / "Foundations"
+    if retired_weak_foundations.exists() or retired_weak_foundations.with_suffix(
+        ".lean"
+    ).exists():
+        failures.append(
+            "the duplicate WeakStabilityCondition/Foundations tree was restored"
+        )
+
     strong_families_source_root = strong_stability_root / "Families"
     for module in (
         "CategoricalOrdinary",
@@ -693,6 +717,11 @@ def main() -> int:
             failures.append(
                 f"{path.relative_to(ROOT)}: declaration restored the retired "
                 f"strong-sibling namespace {RETIRED_SUPPORT_NAMESPACE}"
+            )
+        if RETIRED_FINITE_LENGTH_NAMESPACE in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: declaration restored the retired "
+                f"strong-sibling namespace {RETIRED_FINITE_LENGTH_NAMESPACE}"
             )
 
     all_geometry_modules = (
@@ -901,6 +930,10 @@ def main() -> int:
     print(
         "ok: weak support-predicate declarations use the matching "
         "CategoryTheory.Triangulated.WeakStabilityCondition.Support namespace"
+    )
+    print(
+        "ok: finite-length simple-charge declarations use the weak-parent "
+        "namespace and the duplicate Foundations tree is absent"
     )
     print(
         "ok: Bridgeland-family declarations use the matching strong-child "

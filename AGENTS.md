@@ -132,6 +132,12 @@ new derived-category theory.
   `CategoryTheory.Triangulated.WeakStabilityCondition.Support`. Do not restore
   the former strong-sibling
   `CategoryTheory.Triangulated.StabilityCondition.Support` namespace.
+- The finite-length simple-charge lattice model extends the weak
+  stability-function foundation. Keep it under
+  `WeakStabilityCondition/Foundation/StabilityFunction/` with namespace
+  `CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength`; do not
+  restore the duplicate plural `Foundations/` tree or its former strong
+  namespace.
 - Declarations owned by ordinary Bridgeland families use
   `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
   Strong family packages and pre-stability base-change data belong to that

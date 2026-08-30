@@ -91,16 +91,16 @@ family, HN structure over a curve, boundedness, or moduli theory. -/
 an identification: that is Jordan-Holder, which exists in neither Mathlib nor
 the foundational library. Every result is a theorem about `Fin n -> Z`. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.mem_cone_smul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.mem_cone_sum
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.chargeOf
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.chargeOf_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.chargeOf_single
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.eq_chargeOf
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.existsUnique_charge
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.mem_cone_natCombination
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.chargeOf_mem_cone
-#print axioms CategoryTheory.Triangulated.StabilityCondition.FiniteLength.chargeOf_ne_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.mem_cone_smul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.mem_cone_sum
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.chargeOf
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.chargeOf_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.chargeOf_single
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.eq_chargeOf
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.existsUnique_charge
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.mem_cone_natCombination
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.chargeOf_mem_cone
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.chargeOf_ne_zero
 
 /-! ## Wall lane — numerical walls in the (s, t) half plane
 

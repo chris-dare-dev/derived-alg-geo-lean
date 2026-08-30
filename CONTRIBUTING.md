@@ -108,6 +108,12 @@ from them use `CategoryTheory.Triangulated.WeakStabilityCondition.Support`.
 The former `CategoryTheory.Triangulated.StabilityCondition.Support` namespace
 is retired; consumers must not use it as a compatibility alias.
 
+Place the finite-length simple-charge lattice model with the weak
+stability-function foundation in
+`WeakStabilityCondition/Foundation/StabilityFunction/`, using namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength`. The former
+plural `WeakStabilityCondition/Foundations/` path is retired.
+
 Declarations owned by that stronger child use
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
 This namespace owns ordinary family packages and categorical pre-stability

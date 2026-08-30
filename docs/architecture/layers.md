@@ -127,6 +127,10 @@ sibling namespace to
 Generic numerical support predicates and their weak-stability bindings have
 completed their cutover from the former strong-sibling namespace to
 `CategoryTheory.Triangulated.WeakStabilityCondition.Support`.
+The finite-length simple-charge lattice model has moved from the duplicate
+plural `WeakStabilityCondition/Foundations/` tree into the canonical
+`WeakStabilityCondition/Foundation/StabilityFunction/` subtree, and now uses
+`CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength`.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map
