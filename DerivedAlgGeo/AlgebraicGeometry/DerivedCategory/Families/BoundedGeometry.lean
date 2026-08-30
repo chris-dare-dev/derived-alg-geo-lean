@@ -37,7 +37,7 @@ proofs are supplied.  No geometric slicing, openness, relative-HN existence,
 moduli theorem, or conclusion of Theorem 22.2 is asserted.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
@@ -372,12 +372,12 @@ noncomputable instance {T U : SchemeBaseChange S} (f : T ⟶ U)
     [HasCoherentPullback f] :
     NatTrans.CommShift (boundedCoherentDerivedPullbackCompInclusion f).hom ℤ := by
   dsimp [boundedCoherentDerivedPullbackCompInclusion]
-  exact Functor.CommShift.ofComp_compatibility _ _
+  exact CategoryTheory.Functor.CommShift.ofComp_compatibility _ _
 
 instance {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
     [HasCoherentPullback f] : (boundedCoherentDerivedPullback f).IsTriangulated := by
-  rw [Functor.isTriangulated_iff_comp_right
+  rw [CategoryTheory.Functor.isTriangulated_iff_comp_right
     (boundedCoherentDerivedPullbackCompInclusion f)]
   infer_instance
 
@@ -469,4 +469,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

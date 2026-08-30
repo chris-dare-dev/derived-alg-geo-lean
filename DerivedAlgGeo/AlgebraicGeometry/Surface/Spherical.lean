@@ -91,7 +91,9 @@ difference is the target category, not the mathematics.
 universe u
 
 open CategoryTheory CategoryTheory.Limits
-open CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 namespace AlgebraicGeometry
 
@@ -102,7 +104,7 @@ variable {k : Type u} [Field k] (X : K3Surface k)
 /-- The bounded derived category of coherent sheaves on a K3 surface.
 
 An abbreviation for readability only; everything about it comes from
-`Families.SchemeBoundedCoherentDerivedCategory`. -/
+`AlgebraicGeometry.DerivedCategory.Families.SchemeBoundedCoherentDerivedCategory`. -/
 abbrev DerivedCat : Type _ := SchemeBoundedCoherentDerivedCategory X.toScheme
 
 variable {X}

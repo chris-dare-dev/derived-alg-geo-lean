@@ -16,6 +16,9 @@ umbrella deliberately does not import this file.
 universe u
 
 namespace CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open AlgebraicGeometry SchemeBaseChange
 

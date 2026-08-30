@@ -20,7 +20,7 @@ pseudofunctor coherence is proved there, and exactness is not deduced from
 flatness.  Those constructions belong to later milestones.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
 
@@ -56,14 +56,14 @@ identity functor on cochain complexes. -/
 def complexPullbackId (T : SchemeBaseChange S) :
     complexPullback (𝟙 T) ≅ 𝟭 (CochainComplex T.left.Modules ℤ) :=
   NatIso.mapHomologicalComplex (modulePullbackId T) (ComplexShape.up ℤ) ≪≫
-    Functor.mapHomologicalComplexIdIso T.left.Modules (ComplexShape.up ℤ)
+    CategoryTheory.Functor.mapHomologicalComplexIdIso T.left.Modules (ComplexShape.up ℤ)
 
 /-- Degreewise pullback along a composite is naturally isomorphic to the
 composite of the two degreewise pullbacks. -/
 def complexPullbackComp {T U V : SchemeBaseChange S}
     (f : T ⟶ U) (g : U ⟶ V) :
     complexPullback g ⋙ complexPullback f ≅ complexPullback (f ≫ g) :=
-  Functor.mapHomologicalComplexCompIso (modulePullbackComp f g)
+  CategoryTheory.Functor.mapHomologicalComplexCompIso (modulePullbackComp f g)
     (ComplexShape.up ℤ)
 
 /-- The derived pullback functor attached to an identity morphism. -/
@@ -81,4 +81,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

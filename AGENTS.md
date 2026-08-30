@@ -103,6 +103,12 @@ new derived-category theory.
   `CategoryTheory.Triangulated.Families` namespace. Do not place
   `TriangulatedFiberFamily`, shared boundedness interfaces, or future neutral
   family APIs below a stability-condition namespace.
+- Scheme-derived category declarations owned by
+  `AlgebraicGeometry/DerivedCategory/Basic.lean` use the
+  `AlgebraicGeometry.DerivedCategory` namespace. Scheme base-change and
+  pullback declarations owned by `AlgebraicGeometry/DerivedCategory/Families/`
+  use `AlgebraicGeometry.DerivedCategory.Families`. Do not place these neutral
+  geometric APIs below a categorical stability-condition namespace.
 - Declarations owned by weak-stability families use
   `CategoryTheory.Triangulated.WeakStabilityCondition.Families`. Shared
   Definition 20.5 probes and APIs bound to `WeakStabilityFunction` belong to

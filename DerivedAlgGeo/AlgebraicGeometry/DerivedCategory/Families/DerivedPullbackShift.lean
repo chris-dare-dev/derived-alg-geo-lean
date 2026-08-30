@@ -12,13 +12,13 @@ forms commute with the integer shift.  Consequently the unit and compositor of
 exact derived pullback commute with shift as well.
 
 The compositor proof treats the two parenthesizations of a composite explicitly:
-the corresponding `Functor.CommShift` structures are not definitionally the same,
+the corresponding `CategoryTheory.Functor.CommShift` structures are not definitionally the same,
 even though the underlying composite functors are.  Naturality of the final
 pullback's shift isomorphism bridges that distinction before localization
 extensionality completes the proof.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory AlgebraicGeometry
 
@@ -60,17 +60,17 @@ instance complexPullbackComp_commShift {T U V : SchemeBaseChange S}
   apply HomologicalComplex.Hom.ext
   funext i
   dsimp [complexPullbackComp]
-  simp [Functor.commShiftIso_comp_hom_app,
-    Functor.mapHomologicalComplex_commShiftIso_hom_app_f]
-  erw [Functor.map_id, Category.id_comp]
+  simp [CategoryTheory.Functor.commShiftIso_comp_hom_app,
+    CategoryTheory.Functor.mapHomologicalComplex_commShiftIso_hom_app_f]
+  erw [CategoryTheory.Functor.map_id, Category.id_comp]
 
 /-- The localized complex-level identity isomorphism commutes with shift. -/
 instance complexPullbackIdLocalized_commShift (T : SchemeBaseChange S) :
     NatTrans.CommShift (complexPullbackIdLocalized T).hom ℤ := by
   change NatTrans.CommShift
-    (Functor.whiskerRight (complexPullbackId T).hom
+    (CategoryTheory.Functor.whiskerRight (complexPullbackId T).hom
       (SchemeDerivedCategory.Q T.left) ≫
-        (Functor.leftUnitor (SchemeDerivedCategory.Q T.left)).hom) ℤ
+        (CategoryTheory.Functor.leftUnitor (SchemeDerivedCategory.Q T.left)).hom) ℤ
   infer_instance
 
 /-- The localized complex-level pullback compositor commutes with shift. -/
@@ -79,10 +79,10 @@ instance complexPullbackCompLocalized_commShift
     [IsExactPullback f] :
     NatTrans.CommShift (complexPullbackCompLocalized f g).hom ℤ := by
   change NatTrans.CommShift
-    ((Functor.associator _ _ _).hom ≫
-      Functor.whiskerLeft (complexPullback g) (derivedPullbackFactors f).hom ≫
-        (Functor.associator _ _ _).inv ≫
-          Functor.whiskerRight (complexPullbackComp f g).hom
+    ((CategoryTheory.Functor.associator _ _ _).hom ≫
+      CategoryTheory.Functor.whiskerLeft (complexPullback g) (derivedPullbackFactors f).hom ≫
+        (CategoryTheory.Functor.associator _ _ _).inv ≫
+          CategoryTheory.Functor.whiskerRight (complexPullbackComp f g).hom
             (SchemeDerivedCategory.Q T.left)) ℤ
   infer_instance
 
@@ -97,7 +97,7 @@ instance derivedPullbackId_commShift (T : SchemeBaseChange S) :
     (HomologicalComplex.quasiIso T.left.Modules (ComplexShape.up ℤ))
   intro K
   dsimp
-  simp only [Functor.whiskerRight_app, Functor.whiskerLeft_app]
+  simp only [CategoryTheory.Functor.whiskerRight_app, CategoryTheory.Functor.whiskerLeft_app]
   let q := ((SchemeDerivedCategory.Q T.left).commShiftIso a).hom.app K
   have happ (X : CochainComplex T.left.Modules ℤ) :
       (derivedPullbackId T).hom.app
@@ -121,7 +121,7 @@ instance derivedPullbackId_commShift (T : SchemeBaseChange S) :
             (shiftFunctor T.DerivedFiber a).map
                 ((complexPullbackIdLocalized T).hom.app K) := by
     dsimp [q]
-    rw [Functor.commShiftIso_comp_hom_app]
+    rw [CategoryTheory.Functor.commShiftIso_comp_hom_app]
     exact (Category.assoc _ _ _).symm
   have hnatTail :
       (derivedPullback (𝟙 T)).map q ≫
@@ -141,7 +141,7 @@ instance derivedPullbackId_commShift (T : SchemeBaseChange S) :
   dsimp [q] at hnat ⊢
   rw [← cancel_epi ((derivedPullback (𝟙 T)).map
     q)]
-  rw [happ, Functor.map_comp]
+  rw [happ, CategoryTheory.Functor.map_comp]
   rw [hsource]
   rw [NatTrans.shift_app_comm_assoc
     (derivedPullbackFactors (𝟙 T)).hom a K]
@@ -163,15 +163,15 @@ instance derivedPullbackComp_commShift
     (HomologicalComplex.quasiIso V.left.Modules (ComplexShape.up ℤ))
   intro K
   dsimp
-  simp only [Functor.whiskerRight_app, Functor.whiskerLeft_app]
+  simp only [CategoryTheory.Functor.whiskerRight_app, CategoryTheory.Functor.whiskerLeft_app]
   let q := ((SchemeDerivedCategory.Q V.left).commShiftIso a).hom.app K
   let sourceFactor :
       SchemeDerivedCategory.Q V.left ⋙
           (derivedPullback g ⋙ derivedPullback f) ⟶
         (complexPullback g ⋙ SchemeDerivedCategory.Q U.left) ⋙
           derivedPullback f :=
-    (Functor.associator _ _ _).hom ≫
-      Functor.whiskerRight (derivedPullbackFactors g).hom
+    (CategoryTheory.Functor.associator _ _ _).hom ≫
+      CategoryTheory.Functor.whiskerRight (derivedPullbackFactors g).hom
         (derivedPullback f)
   letI hFactors : NatTrans.CommShift (derivedPullbackFactors g).hom ℤ :=
     derivedPullbackFactors_commShift g
@@ -203,7 +203,7 @@ instance derivedPullbackComp_commShift
               (shiftFunctor T.DerivedFiber a).map
                   ((derivedPullbackFactors (f ≫ g)).inv.app K) := by
     dsimp [q]
-    simp only [Functor.commShiftIso_comp_hom_app, Functor.comp_map,
+    simp only [CategoryTheory.Functor.commShiftIso_comp_hom_app, CategoryTheory.Functor.comp_map,
       Category.assoc]
   have hsourceFactor :
       ((SchemeDerivedCategory.Q V.left ⋙ derivedPullback g ⋙
@@ -214,21 +214,21 @@ instance derivedPullbackComp_commShift
         (((complexPullback g ⋙ SchemeDerivedCategory.Q U.left) ⋙
           derivedPullback f).commShiftIso a).hom.app K := by
     dsimp [sourceFactor]
-    simp only [Functor.commShiftIso_comp_hom_app,
-      Functor.associator_hom_app, Functor.whiskerRight_app,
-      Functor.comp_map]
+    simp only [CategoryTheory.Functor.commShiftIso_comp_hom_app,
+      CategoryTheory.Functor.associator_hom_app, CategoryTheory.Functor.whiskerRight_app,
+      CategoryTheory.Functor.comp_map]
     have hdf := ((derivedPullback f).commShiftIso a).hom.naturality
       ((derivedPullbackFactors g).hom.app K)
     have hfactor := NatTrans.shift_app_comm
       (derivedPullbackFactors g).hom a K
-    simp only [Functor.commShiftIso_comp_hom_app] at hfactor
+    simp only [CategoryTheory.Functor.commShiftIso_comp_hom_app] at hfactor
     erw [Category.id_comp]
     simp only [Category.assoc]
     erw [← hdf]
-    rw [← Functor.map_comp_assoc, ← Functor.map_comp_assoc]
-    erw [← Functor.map_comp_assoc]
+    rw [← CategoryTheory.Functor.map_comp_assoc, ← CategoryTheory.Functor.map_comp_assoc]
+    erw [← CategoryTheory.Functor.map_comp_assoc]
     rw [hfactor]
-    simp only [Functor.map_comp, Category.assoc]
+    simp only [CategoryTheory.Functor.map_comp, Category.assoc]
     erw [Category.id_comp]
   have hnatTail :
       (derivedPullback g ⋙ derivedPullback f).map q ≫
@@ -250,13 +250,13 @@ instance derivedPullbackComp_commShift
   dsimp [q] at hnat ⊢
   rw [← cancel_epi ((derivedPullback g ⋙ derivedPullback f).map
     q)]
-  rw [happ, Functor.map_comp, Functor.map_comp]
+  rw [happ, CategoryTheory.Functor.map_comp, CategoryTheory.Functor.map_comp]
   erw [hsource]
   rw [reassoc_of% hsourceFactor]
   rw [NatTrans.shift_app_comm_assoc
     (complexPullbackCompLocalized f g).hom a K]
   rw [NatTrans.shift_app_comm (derivedPullbackFactors (f ≫ g)).inv a K]
-  rw [Functor.commShiftIso_comp_hom_app]
+  rw [CategoryTheory.Functor.commShiftIso_comp_hom_app]
   rw [hnatTail]
   erw [happ]
   simp only [Category.assoc]
@@ -266,4 +266,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

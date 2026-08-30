@@ -13,7 +13,7 @@ This neutral geometric predicate is shared by derived-category families,
 moduli problems, and stability applications. It does not impose stability data.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory AlgebraicGeometry
 
@@ -24,4 +24,4 @@ locally of finite type and quasi-compact. -/
 def IsFiniteTypeBaseChange {S : Scheme.{u}} (T : SchemeBaseChange S) : Prop :=
   LocallyOfFiniteType T.hom ∧ QuasiCompact T.hom
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

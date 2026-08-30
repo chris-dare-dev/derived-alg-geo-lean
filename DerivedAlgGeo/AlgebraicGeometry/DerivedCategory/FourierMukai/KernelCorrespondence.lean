@@ -77,6 +77,9 @@ it is a hypothesis like any other.
 universe u
 
 namespace CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai

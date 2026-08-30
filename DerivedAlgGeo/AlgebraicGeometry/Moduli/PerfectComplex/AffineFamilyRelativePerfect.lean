@@ -26,6 +26,9 @@ pseudofunctor and all of its coherence automatically.
 -/
 
 namespace CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory AlgebraicGeometry
 

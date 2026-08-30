@@ -68,7 +68,7 @@ AUDITS = {
 # one: a change that leaves more declarations unaudited than it found is the
 # thing this gate exists to stop.
 CEILINGS = {
-    "AlgebraicGeometry": 1027,
+    "AlgebraicGeometry": 1025,
     "StabilityCondition": 296,
     "DGCategory": 0,
 }

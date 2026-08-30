@@ -21,7 +21,7 @@ structure, openness, boundedness, moduli construction, or Theorem 22.2
 conclusion is asserted.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
@@ -88,4 +88,4 @@ end SchemeTriangulatedFiberFamily
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

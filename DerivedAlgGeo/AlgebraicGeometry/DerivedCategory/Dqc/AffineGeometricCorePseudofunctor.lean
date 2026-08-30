@@ -19,6 +19,9 @@ derived-category pentagon and triangle identities.
 -/
 
 namespace CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Bicategory AlgebraicGeometry
 

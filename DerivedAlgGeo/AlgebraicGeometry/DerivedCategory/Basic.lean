@@ -15,7 +15,7 @@ scheme-specific specializations without introducing a second derived-category
 construction.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
@@ -57,4 +57,4 @@ end SchemeDerivedCategory
 end
 
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory

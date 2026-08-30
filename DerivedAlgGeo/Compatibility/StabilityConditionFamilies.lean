@@ -22,4 +22,7 @@ names. Neutral categorical family declarations use
 `CategoryTheory.Triangulated.WeakStabilityCondition.Families`; ordinary
 Bridgeland family declarations use
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
+Scheme-derived category declarations use `AlgebraicGeometry.DerivedCategory`,
+and scheme base-change and pullback declarations use
+`AlgebraicGeometry.DerivedCategory.Families`.
 -/

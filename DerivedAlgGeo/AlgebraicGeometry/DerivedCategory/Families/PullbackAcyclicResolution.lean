@@ -24,9 +24,9 @@ this interface. Keeping the condition in terms of the exact functor that must
 invert quasi-isomorphisms also permits narrower supported constructions.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
-open CategoryTheory AlgebraicGeometry Limits
+open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry Limits
 
 noncomputable section
 
@@ -89,8 +89,8 @@ def ofExact (f : T ⟶ U) [IsExactPullback f] :
     letI := hg
     infer_instance
   resolved_comparison_isIso K := by
-    simp only [Functor.id_obj, NatTrans.id_app, Functor.comp_map,
-      Functor.map_id]
+    simp only [CategoryTheory.Functor.id_obj, NatTrans.id_app, CategoryTheory.Functor.comp_map,
+      CategoryTheory.Functor.map_id]
     exact IsIso.id _
 
 /-- The functor on derived categories obtained by resolving, pulling back, and
@@ -127,8 +127,8 @@ def localizationComparison (R : PullbackAcyclicResolution f) :
       (SchemeDerivedCategory.Q U.left).map g
   have hc : R.resolution.map g ≫ R.comparison.app L =
       R.comparison.app K ≫ g := by
-    simpa only [Functor.id_map] using! R.comparison.naturality g
-  simpa only [← Functor.map_comp] using! congrArg
+    simpa only [CategoryTheory.Functor.id_map] using! R.comparison.naturality g
+  simpa only [← CategoryTheory.Functor.map_comp] using! congrArg
     (fun k ↦ (SchemeDerivedCategory.Q U.left).map k)
     hc
 
@@ -137,7 +137,7 @@ def counit (R : PullbackAcyclicResolution f) :
     SchemeDerivedCategory.Q U.left ⋙ R.derivedFunctor ⟶
       complexPullback f ⋙ SchemeDerivedCategory.Q T.left :=
   R.derivedFactors.hom ≫
-    Functor.whiskerRight R.comparison
+    CategoryTheory.Functor.whiskerRight R.comparison
       (complexPullback f ⋙ SchemeDerivedCategory.Q T.left)
 
 private abbrev ordinaryPullback (f : T ⟶ U) :=
@@ -160,9 +160,9 @@ def outerComparisonIso (R : PullbackAcyclicResolution f) :
   have hc : R.resolution.map (R.resolution.map g) ≫
       R.comparison.app (R.resolution.obj L) =
     R.comparison.app (R.resolution.obj K) ≫ R.resolution.map g := by
-    simpa only [Functor.id_map] using!
+    simpa only [CategoryTheory.Functor.id_map] using!
       R.comparison.naturality (R.resolution.map g)
-  simpa only [← Functor.map_comp] using!
+  simpa only [← CategoryTheory.Functor.map_comp] using!
     congrArg (fun k ↦ (ordinaryPullback f).map k)
       hc
 
@@ -183,8 +183,8 @@ def innerComparisonIso (R : PullbackAcyclicResolution f) :
       (ordinaryPullback f).map (R.resolution.map g)
   have hc : R.resolution.map g ≫ R.comparison.app L =
       R.comparison.app K ≫ g := by
-    simpa only [Functor.id_map] using! R.comparison.naturality g
-  simpa only [← Functor.map_comp] using!
+    simpa only [CategoryTheory.Functor.id_map] using! R.comparison.naturality g
+  simpa only [← CategoryTheory.Functor.map_comp] using!
     congrArg (fun k ↦ (ordinaryPullback f).map (R.resolution.map k))
       hc
 
@@ -207,9 +207,9 @@ def whiskeredLift (R : PullbackAcyclicResolution f)
     (β : SchemeDerivedCategory.Q U.left ⋙ G ⟶ ordinaryPullback f) :
     SchemeDerivedCategory.Q U.left ⋙ G ⟶
       SchemeDerivedCategory.Q U.left ⋙ R.derivedFunctor :=
-  (Functor.isoWhiskerRight R.localizationComparison G).inv ≫
-    (Functor.associator R.resolution (SchemeDerivedCategory.Q U.left) G).hom ≫
-    Functor.whiskerLeft R.resolution β ≫
+  (CategoryTheory.Functor.isoWhiskerRight R.localizationComparison G).inv ≫
+    (CategoryTheory.Functor.associator R.resolution (SchemeDerivedCategory.Q U.left) G).hom ≫
+    CategoryTheory.Functor.whiskerLeft R.resolution β ≫
     R.outerComparisonIso.inv ≫
     R.innerComparisonIso.hom ≫
     R.derivedFactors.inv
@@ -223,20 +223,20 @@ def lift (R : PullbackAcyclicResolution f)
     (SchemeDerivedCategory.Q U.left)
     (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ))
     T.DerivedFiber
-  exact ((Functor.whiskeringLeft _ _ _).obj
+  exact ((CategoryTheory.Functor.whiskeringLeft _ _ _).obj
     (SchemeDerivedCategory.Q U.left)).preimage (R.whiskeredLift G β)
 
 @[reassoc]
 lemma whiskerLeft_lift (R : PullbackAcyclicResolution f)
     (G : U.DerivedFiber ⥤ T.DerivedFiber)
     (β : SchemeDerivedCategory.Q U.left ⋙ G ⟶ ordinaryPullback f) :
-    Functor.whiskerLeft (SchemeDerivedCategory.Q U.left) (R.lift G β) =
+    CategoryTheory.Functor.whiskerLeft (SchemeDerivedCategory.Q U.left) (R.lift G β) =
       R.whiskeredLift G β := by
   letI := Localization.full_whiskeringLeft
     (SchemeDerivedCategory.Q U.left)
     (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ))
     T.DerivedFiber
-  apply ((Functor.whiskeringLeft _ _ _).obj
+  apply ((CategoryTheory.Functor.whiskeringLeft _ _ _).obj
     (SchemeDerivedCategory.Q U.left)).map_preimage
 
 set_option backward.defeqAttrib.useBackward true in
@@ -253,11 +253,11 @@ lemma whiskeredLift_fac (R : PullbackAcyclicResolution f)
       (R.comparison.app K)) ≫ β.app K =
       β.app (R.resolution.obj K) ≫
         (ordinaryPullback f).map (R.comparison.app K) := by
-    simpa only [Functor.comp_map, Functor.id_obj] using!
+    simpa only [CategoryTheory.Functor.comp_map, CategoryTheory.Functor.id_obj] using!
       β.naturality (R.comparison.app K)
   have hc : R.resolution.map (R.comparison.app K) ≫ R.comparison.app K =
       R.comparison.app (R.resolution.obj K) ≫ R.comparison.app K := by
-    simpa only [Functor.id_map] using!
+    simpa only [CategoryTheory.Functor.id_map] using!
       R.comparison.naturality (R.comparison.app K)
   have hFc : (ordinaryPullback f).map
         (R.resolution.map (R.comparison.app K)) ≫
@@ -265,7 +265,7 @@ lemma whiskeredLift_fac (R : PullbackAcyclicResolution f)
     (ordinaryPullback f).map
         (R.comparison.app (R.resolution.obj K)) ≫
       (ordinaryPullback f).map (R.comparison.app K) := by
-    simpa only [← Functor.map_comp] using! congrArg
+    simpa only [← CategoryTheory.Functor.map_comp] using! congrArg
       (fun k ↦ (ordinaryPullback f).map k) hc
   have hmiddle : @CategoryTheory.inv _ _ _ _ _
         (R.resolved_comparison_isIso K) ≫
@@ -310,20 +310,20 @@ lemma whiskeredLift_fac (R : PullbackAcyclicResolution f)
 lemma lift_fac (R : PullbackAcyclicResolution f)
     (G : U.DerivedFiber ⥤ T.DerivedFiber)
     (β : SchemeDerivedCategory.Q U.left ⋙ G ⟶ ordinaryPullback f) :
-    Functor.whiskerLeft (SchemeDerivedCategory.Q U.left) (R.lift G β) ≫
+    CategoryTheory.Functor.whiskerLeft (SchemeDerivedCategory.Q U.left) (R.lift G β) ≫
       R.counit = β := by
   rw [R.whiskerLeft_lift, R.whiskeredLift_fac]
 
 lemma counit_hom_ext (R : PullbackAcyclicResolution f)
     (G : U.DerivedFiber ⥤ T.DerivedFiber) (γ₁ γ₂ : G ⟶ R.derivedFunctor)
-    (hγ : Functor.whiskerLeft (SchemeDerivedCategory.Q U.left) γ₁ ≫ R.counit =
-      Functor.whiskerLeft (SchemeDerivedCategory.Q U.left) γ₂ ≫ R.counit) :
+    (hγ : CategoryTheory.Functor.whiskerLeft (SchemeDerivedCategory.Q U.left) γ₁ ≫ R.counit =
+      CategoryTheory.Functor.whiskerLeft (SchemeDerivedCategory.Q U.left) γ₂ ≫ R.counit) :
     γ₁ = γ₂ := by
   letI := Localization.faithful_whiskeringLeft
     (SchemeDerivedCategory.Q U.left)
     (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ))
     T.DerivedFiber
-  apply ((Functor.whiskeringLeft _ _ _).obj
+  apply ((CategoryTheory.Functor.whiskeringLeft _ _ _).obj
     (SchemeDerivedCategory.Q U.left)).map_injective
   ext K
   change γ₁.app ((SchemeDerivedCategory.Q U.left).obj K) =
@@ -336,7 +336,7 @@ lemma counit_hom_ext (R : PullbackAcyclicResolution f)
       (R.resolution.obj K)) =
     γ₂.app ((SchemeDerivedCategory.Q U.left).obj (R.resolution.obj K))
   apply (cancel_mono (R.counit.app (R.resolution.obj K))).mp
-  simpa only [NatTrans.comp_app, Functor.whiskerLeft_app] using!
+  simpa only [NatTrans.comp_app, CategoryTheory.Functor.whiskerLeft_app] using!
     NatTrans.congr_app hγ (R.resolution.obj K)
 
 /-- A pullback-acyclic resolution constructs the genuine left-derived
@@ -371,7 +371,7 @@ def exactComparison (f : T ⟶ U) [IsExactPullback f] :
 degreewise pullback. -/
 @[reassoc]
 lemma exactComparison_hom_counit (f : T ⟶ U) [IsExactPullback f] :
-    Functor.whiskerLeft (SchemeDerivedCategory.Q U.left)
+    CategoryTheory.Functor.whiskerLeft (SchemeDerivedCategory.Q U.left)
         (exactComparison f).hom ≫
       (derivedPullbackFactors f).hom =
         (ofExact f).counit := by
@@ -379,15 +379,15 @@ lemma exactComparison_hom_counit (f : T ⟶ U) [IsExactPullback f] :
       (derivedPullbackFactors f).hom
       (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ)) :=
     (LeftDerivedPullback.ofExact f).isLeftDerived
-  change Functor.whiskerLeft (SchemeDerivedCategory.Q U.left)
-      (Functor.leftDerivedNatTrans (ofExact f).derivedFunctor
+  change CategoryTheory.Functor.whiskerLeft (SchemeDerivedCategory.Q U.left)
+      (CategoryTheory.Functor.leftDerivedNatTrans (ofExact f).derivedFunctor
         (derivedPullback f) (ofExact f).counit
         (derivedPullbackFactors f).hom
         (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ))
         (𝟙 (complexPullback f ⋙ SchemeDerivedCategory.Q T.left))) ≫
     (derivedPullbackFactors f).hom = (ofExact f).counit
   simpa only [Category.comp_id] using
-    (Functor.leftDerivedNatTrans_fac
+    (CategoryTheory.Functor.leftDerivedNatTrans_fac
       (ofExact f).derivedFunctor (derivedPullback f)
       (ofExact f).counit (derivedPullbackFactors f).hom
       (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ))
@@ -399,4 +399,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

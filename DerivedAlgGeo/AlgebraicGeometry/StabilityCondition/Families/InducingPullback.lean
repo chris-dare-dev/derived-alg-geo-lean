@@ -24,6 +24,9 @@ coherent/perfect restriction, or conclusion of Theorem 22.2 is asserted.
 -/
 
 namespace CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry

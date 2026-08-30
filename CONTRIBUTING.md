@@ -38,6 +38,14 @@ construction's `Instances/AlgebraicGeometry/` leaf. Do not put neutral derived
 geometry under `AlgebraicGeometry/StabilityCondition/`; that subtree is only
 for APIs that consume weak or Bridgeland stability data.
 
+Declaration namespaces follow those owners. Use
+`AlgebraicGeometry.DerivedCategory` for the scheme-derived category API in
+`DerivedCategory/Basic.lean`, and
+`AlgebraicGeometry.DerivedCategory.Families` for scheme base-change and
+pullback declarations below `DerivedCategory/Families/`. A compatibility
+umbrella may preserve imports, but neutral geometric declarations must not
+remain qualified through a categorical stability-condition namespace.
+
 Enriched categories depend on a monoidal base; dg categories are the cochain-
 complex specialization of that pattern. This does not make every dg category
 monoidal, and monoidal and triangulated structures do not imply one another.

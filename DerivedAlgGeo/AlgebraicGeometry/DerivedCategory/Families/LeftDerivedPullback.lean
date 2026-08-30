@@ -31,7 +31,7 @@ provide inhabitants for nonexact morphisms through the same interface.
   general and exact constructions when ordinary pullback is exact.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory AlgebraicGeometry
 
@@ -72,7 +72,7 @@ interface. -/
 def ofExact (f : T ⟶ U) [IsExactPullback f] : LeftDerivedPullback f where
   functor := derivedPullback f
   counit := (derivedPullbackFactors f).hom
-  isLeftDerived := Functor.isLeftDerivedFunctor_of_inverts
+  isLeftDerived := CategoryTheory.Functor.isLeftDerivedFunctor_of_inverts
     (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ))
     (derivedPullback f) (derivedPullbackFactors f)
 
@@ -87,7 +87,7 @@ def exactComparison (P : LeftDerivedPullback f) [IsExactPullback f] :
   let E := ofExact f
   letI := P.isLeftDerived
   letI := E.isLeftDerived
-  exact Functor.leftDerivedUnique E.functor P.functor P.counit E.counit
+  exact CategoryTheory.Functor.leftDerivedUnique E.functor P.functor P.counit E.counit
     (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ))
 
 /-- Transport arbitrary derived-pullback data along equality of the
@@ -103,4 +103,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

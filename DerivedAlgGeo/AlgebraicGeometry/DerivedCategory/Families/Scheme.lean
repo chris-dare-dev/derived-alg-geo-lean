@@ -13,7 +13,7 @@ of schemes over a fixed scheme. The fibers and pullback functors remain
 client-supplied categorical data; no stability condition is imposed.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
@@ -45,4 +45,4 @@ end SchemeTriangulatedFiberFamily
 end
 
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

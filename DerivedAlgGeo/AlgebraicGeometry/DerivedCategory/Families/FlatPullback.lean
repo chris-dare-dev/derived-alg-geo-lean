@@ -29,7 +29,7 @@ morphism has exact module-sheaf pullback, with the result available directly
 to the derived pullback API.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits Opposite TopologicalSpace
 open AlgebraicGeometry
@@ -134,7 +134,7 @@ def presheafModuleStalkSheafificationIso
           (presheafModuleStalkFunctor X x).map
             (((PresheafOfModules.sheafification
               (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).map f).val)
-      rw [← Functor.map_comp, ← Functor.map_comp]
+      rw [← CategoryTheory.Functor.map_comp, ← CategoryTheory.Functor.map_comp]
       exact congr_arg (presheafModuleStalkFunctor X x).map
         ((PresheafOfModules.sheafificationAdjunction
           (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).unit.naturality f))
@@ -147,7 +147,7 @@ def moduleStalkForgetIso (X : Scheme.{u}) (x : X) :
       SheafOfModules.toSheaf X.ringCatSheaf ⋙
         (TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
           TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x) :=
-  Functor.associator _ _ _
+  CategoryTheory.Functor.associator _ _ _
 
 /-- Taking the stalk of a sheaf of modules preserves finite limits. -/
 theorem moduleStalkFunctor_preservesFiniteLimits
@@ -345,11 +345,11 @@ def modulePullbackStalkPresheafIso
       Scheme.Modules.toPresheafOfModules U.left ⋙
         presheafModulePullback f ⋙
           presheafModuleStalkFunctor T.left x :=
-  Functor.isoWhiskerRight
+  CategoryTheory.Functor.isoWhiskerRight
         (SheafOfModules.pullbackIso f.left.toRingCatSheafHom)
         (moduleStalkFunctor T.left x) ≪≫
-    Functor.associator _ _ _ ≪≫
-    Functor.isoWhiskerLeft
+    CategoryTheory.Functor.associator _ _ _ ≪≫
+    CategoryTheory.Functor.isoWhiskerLeft
       (Scheme.Modules.toPresheafOfModules U.left ⋙
         presheafModulePullback f)
       (presheafModuleStalkSheafificationIso T.left x).symm
@@ -807,7 +807,7 @@ private theorem skyscraperNeighborhoodHomEquiv_naturality_left
         X.ringCatSheaf.obj).map f ≫
         skyscraperNeighborhoodHomEquiv X x M N g := by
   simp [skyscraperNeighborhoodHomEquiv,
-    skyscraperHomToNeighborhoodHom, Functor.map_comp, Category.assoc]
+    skyscraperHomToNeighborhoodHom, CategoryTheory.Functor.map_comp, Category.assoc]
 
 private theorem skyscraperNeighborhoodHomEquiv_naturality_right
     (X : Scheme.{u}) (x : X)
@@ -847,7 +847,7 @@ private theorem skyscraperNeighborhoodHomEquiv_naturality_right
             X.ringCatSheaf.obj).map
             ((moduleSkyscraperPresheafFunctor X x).map g) ≫
           (neighborhoodModuleSkyscraperIso X x N').hom) := by
-        rw [Functor.map_comp, Category.assoc]
+        rw [CategoryTheory.Functor.map_comp, Category.assoc]
     _ = (PresheafOfModules.pushforward₀ (OpenNhds.inclusion x)
           X.ringCatSheaf.obj).map f ≫
         ((neighborhoodModuleSkyscraperIso X x N).hom ≫
@@ -1186,9 +1186,9 @@ def PresheafPullbackStalkComparison.toPullbackStalkComparison
     PullbackStalkComparison f where
   iso x :=
     modulePullbackStalkPresheafIso f x ≪≫
-      Functor.isoWhiskerLeft
+      CategoryTheory.Functor.isoWhiskerLeft
         (Scheme.Modules.toPresheafOfModules U.left) (h.iso x) ≪≫
-      (Functor.associator _ _ _).symm
+      (CategoryTheory.Functor.associator _ _ _).symm
 
 /-- The pullback-to-stalk comparison for the identity morphism, assembled
 from the identity laws for module pullback, stalk maps, and scalar extension. -/
@@ -1199,11 +1199,11 @@ def pullbackStalkComparisonId (T : SchemeBaseChange S) :
       moduleStalkFunctor T.left x ⋙
         ModuleCat.extendScalars ((𝟙 T.left : T.left ⟶ T.left).stalkMap x).hom
     rw [Scheme.Hom.stalkMap_id]
-    exact Functor.isoWhiskerRight (modulePullbackId T)
+    exact CategoryTheory.Functor.isoWhiskerRight (modulePullbackId T)
           (moduleStalkFunctor T.left x) ≪≫
-        Functor.leftUnitor _ ≪≫
-        (Functor.rightUnitor _).symm ≪≫
-        Functor.isoWhiskerLeft (moduleStalkFunctor T.left x)
+        CategoryTheory.Functor.leftUnitor _ ≪≫
+        (CategoryTheory.Functor.rightUnitor _).symm ≪≫
+        CategoryTheory.Functor.isoWhiskerLeft (moduleStalkFunctor T.left x)
           (ModuleCat.extendScalarsId _).symm
 
 /-- Pullback-to-stalk comparisons compose compatibly with module pullback,
@@ -1217,15 +1217,15 @@ def PullbackStalkComparison.comp
       moduleStalkFunctor V.left (g.left (f.left x)) ⋙
         ModuleCat.extendScalars ((f.left ≫ g.left).stalkMap x).hom
     rw [Scheme.Hom.stalkMap_comp]
-    exact Functor.isoWhiskerRight (modulePullbackComp f g).symm
+    exact CategoryTheory.Functor.isoWhiskerRight (modulePullbackComp f g).symm
           (moduleStalkFunctor T.left x) ≪≫
-        Functor.associator _ _ _ ≪≫
-        Functor.isoWhiskerLeft (modulePullback g) (hf.iso x) ≪≫
-        (Functor.associator _ _ _).symm ≪≫
-        Functor.isoWhiskerRight (hg.iso (f.left x))
+        CategoryTheory.Functor.associator _ _ _ ≪≫
+        CategoryTheory.Functor.isoWhiskerLeft (modulePullback g) (hf.iso x) ≪≫
+        (CategoryTheory.Functor.associator _ _ _).symm ≪≫
+        CategoryTheory.Functor.isoWhiskerRight (hg.iso (f.left x))
           (ModuleCat.extendScalars (f.left.stalkMap x).hom) ≪≫
-        Functor.associator _ _ _ ≪≫
-        Functor.isoWhiskerLeft
+        CategoryTheory.Functor.associator _ _ _ ≪≫
+        CategoryTheory.Functor.isoWhiskerLeft
           (moduleStalkFunctor V.left (g.left (f.left x)))
           (ModuleCat.extendScalarsComp (g.left.stalkMap (f.left x)).hom
             (f.left.stalkMap x).hom).symm
@@ -1286,4 +1286,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

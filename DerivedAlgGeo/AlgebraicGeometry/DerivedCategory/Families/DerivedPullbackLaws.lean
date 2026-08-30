@@ -19,7 +19,7 @@ these isomorphisms with the triangulated shift, characterize exact pullback by a
 geometric flatness criterion, or construct nonexact left-derived pullback.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory AlgebraicGeometry
 
@@ -37,9 +37,9 @@ theorem complexPullback_associativity
     {T U V W : SchemeBaseChange S}
     (f : T ⟶ U) (g : U ⟶ V) (h : V ⟶ W) :
     (complexPullbackComp f (g ≫ h)).inv ≫
-      Functor.whiskerRight (complexPullbackComp g h).inv _ ≫
-        (Functor.associator _ _ _).hom ≫
-          Functor.whiskerLeft _ (complexPullbackComp f g).hom ≫
+      CategoryTheory.Functor.whiskerRight (complexPullbackComp g h).inv _ ≫
+        (CategoryTheory.Functor.associator _ _ _).hom ≫
+          CategoryTheory.Functor.whiskerLeft _ (complexPullbackComp f g).hom ≫
             (complexPullbackComp (f ≫ g) h).hom =
       eqToHom (by simp) := by
   apply NatTrans.ext
@@ -55,8 +55,8 @@ set_option backward.isDefEq.respectTransparency false in
 theorem complexPullback_left_unitality
     {T U : SchemeBaseChange S} (f : T ⟶ U) :
     (complexPullbackComp f (𝟙 U)).inv ≫
-      Functor.whiskerRight (complexPullbackId U).hom (complexPullback f) ≫
-        (Functor.leftUnitor _).hom =
+      CategoryTheory.Functor.whiskerRight (complexPullbackId U).hom (complexPullback f) ≫
+        (CategoryTheory.Functor.leftUnitor _).hom =
       eqToHom (by simp) := by
   apply NatTrans.ext
   funext K
@@ -71,8 +71,8 @@ set_option backward.isDefEq.respectTransparency false in
 theorem complexPullback_right_unitality
     {T U : SchemeBaseChange S} (f : T ⟶ U) :
     (complexPullbackComp (𝟙 T) f).inv ≫
-      Functor.whiskerLeft (complexPullback f) (complexPullbackId T).hom ≫
-        (Functor.rightUnitor _).hom =
+      CategoryTheory.Functor.whiskerLeft (complexPullback f) (complexPullbackId T).hom ≫
+        (CategoryTheory.Functor.rightUnitor _).hom =
       eqToHom (by simp) := by
   apply NatTrans.ext
   funext K
@@ -108,7 +108,7 @@ def derivedPullbackCongr {T U : SchemeBaseChange S}
     (complexPullback f ⋙ SchemeDerivedCategory.Q T.left)
     (complexPullback g ⋙ SchemeDerivedCategory.Q T.left)
     (derivedPullback f) (derivedPullback g)
-    (Functor.isoWhiskerRight (complexPullbackCongr h)
+    (CategoryTheory.Functor.isoWhiskerRight (complexPullbackCongr h)
       (SchemeDerivedCategory.Q T.left))
 
 set_option backward.isDefEq.respectTransparency false in
@@ -117,8 +117,8 @@ set_option linter.tacticCheckInstances false in
 theorem derivedPullback_left_unitality
     {T U : SchemeBaseChange S} (f : T ⟶ U) [IsExactPullback f] :
     (derivedPullbackComp f (𝟙 U)).inv ≫
-      Functor.whiskerRight (derivedPullbackId U).hom (derivedPullback f) ≫
-        (Functor.leftUnitor _).hom =
+      CategoryTheory.Functor.whiskerRight (derivedPullbackId U).hom (derivedPullback f) ≫
+        (CategoryTheory.Functor.leftUnitor _).hom =
       (derivedPullbackCongr (Category.comp_id f)).hom := by
   apply Localization.natTrans_ext (SchemeDerivedCategory.Q U.left)
     (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ))
@@ -133,21 +133,21 @@ theorem derivedPullback_left_unitality
             𝟙 _ := (Category.comp_id _).symm
       _ = _ := congr_app (complexPullback_left_unitality f) K
   have hcomplex := congrArg (SchemeDerivedCategory.Q T.left).map hcomplexBase
-  simp only [Functor.map_comp] at hcomplex
+  simp only [CategoryTheory.Functor.map_comp] at hcomplex
   have hnat := (derivedPullbackFactors f).inv.naturality
     ((complexPullbackId U).hom.app K)
   simp [derivedPullbackComp, derivedPullbackId,
     Localization.liftNatTrans_app, complexPullbackIdLocalized,
     complexPullbackCompLocalized, derivedPullbackCongr]
   slice_lhs 3 6 =>
-    rw [← Functor.map_comp_assoc, Iso.inv_hom_id_app,
-      Functor.map_id, Category.id_comp]
+    rw [← CategoryTheory.Functor.map_comp_assoc, Iso.inv_hom_id_app,
+      CategoryTheory.Functor.map_id, Category.id_comp]
   slice_lhs 4 5 => simp
   slice_lhs 2 3 => erw [← hnat]
   slice_lhs 1 2 => erw [hcomplex]
   slice_lhs 2 4 => simp
   simp [complexPullbackCongr]
-  slice_lhs 3 4 => erw [Functor.map_id, Category.comp_id]
+  slice_lhs 3 4 => erw [CategoryTheory.Functor.map_id, Category.comp_id]
   slice_lhs 2 3 => erw [Category.comp_id]
 
 set_option backward.isDefEq.respectTransparency false in
@@ -156,8 +156,8 @@ set_option linter.tacticCheckInstances false in
 theorem derivedPullback_right_unitality
     {T U : SchemeBaseChange S} (f : T ⟶ U) [IsExactPullback f] :
     (derivedPullbackComp (𝟙 T) f).inv ≫
-      Functor.whiskerLeft (derivedPullback f) (derivedPullbackId T).hom ≫
-        (Functor.rightUnitor _).hom =
+      CategoryTheory.Functor.whiskerLeft (derivedPullback f) (derivedPullbackId T).hom ≫
+        (CategoryTheory.Functor.rightUnitor _).hom =
       (derivedPullbackCongr (Category.id_comp f)).hom := by
   apply Localization.natTrans_ext (SchemeDerivedCategory.Q U.left)
     (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ))
@@ -172,7 +172,7 @@ theorem derivedPullback_right_unitality
             𝟙 _ := (Category.comp_id _).symm
       _ = _ := congr_app (complexPullback_right_unitality f) K
   have hcomplex := congrArg (SchemeDerivedCategory.Q T.left).map hcomplexBase
-  simp only [Functor.map_comp] at hcomplex
+  simp only [CategoryTheory.Functor.map_comp] at hcomplex
   have hnat := (derivedPullbackId T).hom.naturality
     ((derivedPullbackFactors f).inv.app K)
   have heta :
@@ -180,7 +180,7 @@ theorem derivedPullback_right_unitality
           ((SchemeDerivedCategory.Q T.left).obj ((complexPullback f).obj K)) =
         (derivedPullbackFactors (𝟙 T)).hom.app ((complexPullback f).obj K) ≫
           (complexPullbackIdLocalized T).hom.app ((complexPullback f).obj K) ≫
-            (Functor.rightUnitor (SchemeDerivedCategory.Q T.left)).inv.app
+            (CategoryTheory.Functor.rightUnitor (SchemeDerivedCategory.Q T.left)).inv.app
               ((complexPullback f).obj K) := by
     simp [derivedPullbackId, Localization.liftNatTrans_app]
   simp [derivedPullbackComp, derivedPullbackId,
@@ -204,10 +204,10 @@ theorem derivedPullback_associativity
     (f : T ⟶ U) (g : U ⟶ V) (h : V ⟶ W)
     [IsExactPullback f] [IsExactPullback g] [IsExactPullback h] :
     (derivedPullbackComp f (g ≫ h)).inv ≫
-      Functor.whiskerRight (derivedPullbackComp g h).inv
+      CategoryTheory.Functor.whiskerRight (derivedPullbackComp g h).inv
         (derivedPullback f) ≫
-        (Functor.associator _ _ _).hom ≫
-          Functor.whiskerLeft (derivedPullback h)
+        (CategoryTheory.Functor.associator _ _ _).hom ≫
+          CategoryTheory.Functor.whiskerLeft (derivedPullback h)
             (derivedPullbackComp f g).hom ≫
             (derivedPullbackComp (f ≫ g) h).hom =
       (derivedPullbackCongr (by simp)).hom := by
@@ -223,7 +223,7 @@ theorem derivedPullback_associativity
     simpa [complexPullbackCongr] using
       congr_app (complexPullback_associativity f g h) K
   have hcomplex := congrArg (SchemeDerivedCategory.Q T.left).map hcomplexBase
-  simp only [Functor.map_comp] at hcomplex
+  simp only [CategoryTheory.Functor.map_comp] at hcomplex
   have hcomplexTail :
       (SchemeDerivedCategory.Q T.left).map
           ((complexPullbackComp f (g ≫ h)).inv.app K) ≫
@@ -279,7 +279,7 @@ theorem derivedPullback_associativity
   simp [derivedPullbackComp, Localization.liftNatTrans_app,
     complexPullbackCompLocalized, derivedPullbackCongr]
   rw [← (derivedPullback f).map_comp_assoc,
-    Iso.inv_hom_id_app, Functor.map_id, Category.id_comp]
+    Iso.inv_hom_id_app, CategoryTheory.Functor.map_id, Category.id_comp]
   slice_lhs 5 8 => erw [hnat]
   have hcancel :
       ((derivedPullbackComp f g).hom.app
@@ -288,8 +288,8 @@ theorem derivedPullback_associativity
           (derivedPullback (f ≫ g)).map ((derivedPullbackFactors h).hom.app K) =
         (derivedPullbackComp f g).hom.app
           ((complexPullback h ⋙ SchemeDerivedCategory.Q V.left).obj K) := by
-    rw [Category.assoc, ← Functor.map_comp, Iso.inv_hom_id_app,
-      Functor.map_id, Category.comp_id]
+    rw [Category.assoc, ← CategoryTheory.Functor.map_comp, Iso.inv_hom_id_app,
+      CategoryTheory.Functor.map_id, Category.comp_id]
   have hcancelg :
       (derivedPullback f).map
           ((derivedPullbackFactors g).inv.app ((complexPullback h).obj K)) ≫
@@ -310,7 +310,7 @@ theorem derivedPullback_associativity
               ((complexPullbackComp (f ≫ g) h).hom.app K) ≫
             (derivedPullbackFactors ((f ≫ g) ≫ h)).inv.app K := by
     rw [← (derivedPullback f).map_comp_assoc, Iso.inv_hom_id_app,
-      Functor.map_id, Category.id_comp]
+      CategoryTheory.Functor.map_id, Category.id_comp]
   rw [hcancel]
   erw [halpha]
   simp [complexPullbackCompLocalized]
@@ -323,4 +323,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

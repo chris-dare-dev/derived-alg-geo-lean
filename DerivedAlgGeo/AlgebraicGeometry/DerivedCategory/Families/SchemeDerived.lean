@@ -20,7 +20,7 @@ slicing witness, relative HN structure, openness, boundedness, moduli result,
 or conclusion of Theorem 22.2 of arXiv:1902.08184v4 is asserted.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
@@ -114,4 +114,4 @@ end SchemeTriangulatedFiberFamily
 end
 
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families
