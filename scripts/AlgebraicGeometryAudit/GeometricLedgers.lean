@@ -1,7 +1,8 @@
 /-
-Geometric-ledgers slice of the AlgebraicGeometry audit. The declarations keep
-their established stability-condition namespace while the owning modules and
-audit records live in the geometry layer.
+Geometric-ledgers slice of the AlgebraicGeometry audit. Neutral geometric
+Fourier--Mukai declarations use their derived-category namespace, while
+stability-specific geometric declarations retain their staged namespace until
+their separate cutover.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai
 import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai
@@ -29,52 +30,52 @@ scheme is deliberately NOT required to be a product: `Correspondence` does not
 consume that, and it is the composition law (`ConvolutionData`) that needs it.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPushforward
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPushforward.derivedPushforward
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPushforward.additive
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPushforward.commShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPushforward.isTriangulated
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedPushforward
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedTensor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedTensor.derivedTensor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedTensor.additive
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedTensor.commShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedTensor.isTriangulated
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedTensor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricCorrespondence
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricCorrespondence_pull
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricCorrespondence_tensor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricCorrespondence_push
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedPushforward_additive
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedPushforwardCommShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedPushforward_isTriangulated
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedTensor_additive
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedTensorCommShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedTensor_isTriangulated
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward.derivedPushforward
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward.additive
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward.commShift
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward.isTriangulated
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPushforward
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.derivedTensor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.additive
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.commShift
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.isTriangulated
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCorrespondence
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCorrespondence_pull
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCorrespondence_tensor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCorrespondence_push
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPushforward_additive
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPushforwardCommShift
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPushforward_isTriangulated
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensor_additive
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensorCommShift
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensor_isTriangulated
 
 /-! `HasDerivedTensor` above remains the intentionally raw first-ledger input.
 Stable convolution consumers now pass through the coherent monoidal root below;
 its parent structures own associator/unitor naturality, pentagon, triangle, and
 strong-monoidal pullback laws together. The adapters are one-way only. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCoherentDerivedTensor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCoherentDerivedTensor.additive
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCoherentDerivedTensor.commShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCoherentDerivedTensor.isTriangulated
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCoherentDerivedTensor.toMonoidalCategory
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.additive
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.commShift
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.isTriangulated
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.toMonoidalCategory
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.hasCoherentDerivedTensorIsCompatibleWithTriangulation
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.hasDerivedTensorOfCoherent
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.coherentDerivedTensorAssoc
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.coherentDerivedTensorUnit
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.coherentDerivedTensorLeftUnitor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.coherentDerivedTensorRightUnitor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.coherentDerivedTensor_pentagon
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.coherentDerivedTensor_triangle
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasMonoidalDerivedPullback
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasMonoidalDerivedPullback.toMonoidal
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.monoidalDerivedPullbackTensorIso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.monoidalDerivedPullbackLeftUnitor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.monoidalDerivedPullbackRightUnitor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.hasDerivedTensorOfCoherent
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensorAssoc
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensorUnit
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensorLeftUnitor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensorRightUnitor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensor_pentagon
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensor_triangle
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasMonoidalDerivedPullback
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasMonoidalDerivedPullback.toMonoidal
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.monoidalDerivedPullbackTensorIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.monoidalDerivedPullbackLeftUnitor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.monoidalDerivedPullbackRightUnitor
 
 /-! ## Convolution of kernels: the second ledger
 
@@ -93,35 +94,35 @@ A clean axiom line on `geometricCompIso` means the derivation adds nothing
 beyond its inputs; it is NOT evidence that any input is constructible, and
 nothing here constructs a `Correspondence`. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TripleProductGeometry
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TripleProductGeometry.mk.inj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TripleProductGeometry.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TripleProductGeometry.triple
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TripleProductGeometry.πXY
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TripleProductGeometry.πYW
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.TripleProductGeometry.πXW
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.convKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasProjectionFormula
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasProjectionFormula.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasFlatBaseChange
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasFlatBaseChange.comm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasFlatBaseChange.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPullbackTensor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPullbackTensor.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.hasDerivedPullbackTensorOfMonoidal
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedTensorAssoc
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedTensorAssoc.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.hasDerivedTensorAssocOfCoherent
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasProjectionFormulaRight
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasProjectionFormulaRight.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCommonPullbackRoute
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCommonPullbackRoute.comm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCommonPullbackRoute.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCommonPushforwardRoute
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCommonPushforwardRoute.comm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasCommonPushforwardRoute.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricCompIso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConvolutionData
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.TripleProductGeometry
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.TripleProductGeometry.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.TripleProductGeometry.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.TripleProductGeometry.triple
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.TripleProductGeometry.πXY
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.TripleProductGeometry.πYW
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.TripleProductGeometry.πXW
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.convKernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasProjectionFormula
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasProjectionFormula.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasFlatBaseChange
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasFlatBaseChange.comm
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasFlatBaseChange.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPullbackTensor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPullbackTensor.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.hasDerivedPullbackTensorOfMonoidal
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensorAssoc
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensorAssoc.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.hasDerivedTensorAssocOfCoherent
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasProjectionFormulaRight
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasProjectionFormulaRight.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCommonPullbackRoute
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCommonPullbackRoute.comm
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCommonPullbackRoute.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCommonPushforwardRoute
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCommonPushforwardRoute.comm
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCommonPushforwardRoute.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCompIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConvolutionData
 
 /-! ## The unit kernel: the third ledger
 
@@ -163,29 +164,29 @@ clean axiom line means the derivation adds nothing beyond its inputs; nothing
 constructs any input. The abstract coherent convolution root states a
 pentagon; this geometric layer has not yet assembled `convKernel` into it. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPullbackFactorization
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPullbackFactorization.comm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPullbackFactorization.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPushforwardFactorization
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPushforwardFactorization.comm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasPushforwardFactorization.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.mk.inj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.quad
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.ρ₁₂
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.ρ₂₃
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.ρ₃₄
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.ρ₁₄
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.σ₁₂₃
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.σ₂₃₄
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.σ₁₃₄
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.QuadrupleProductGeometry.σ₁₂₄
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.quadKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.leftAssocIso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.rightAssocIso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConvolutionAssoc
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConvolutionAssocData
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackFactorization
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackFactorization.comm
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackFactorization.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardFactorization
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardFactorization.comm
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardFactorization.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.quad
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.ρ₁₂
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.ρ₂₃
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.ρ₃₄
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.ρ₁₄
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.σ₁₂₃
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.σ₂₃₄
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.σ₁₃₄
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry.σ₁₂₄
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.quadKernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.leftAssocIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.rightAssocIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConvolutionAssoc
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConvolutionAssocData
 
 /-! ## The unit laws for the geometric convolution
 
@@ -238,24 +239,24 @@ Only the right side is ledgered. The left adjoint of `Lp^*` is the exceptional
 `p_!`, and nothing consumes one.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPullbackAdjunction
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDerivedPullbackAdjunction.adj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasKernelDual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasKernelDual.adj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasKernelDual.dualKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasTwistedInversePullback
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasTwistedInversePullback.adj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasTwistedInversePullback.twistedInverse
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.derivedPullbackAdjunction
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.dualKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints_pullRight
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints_pushRight
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricConstituentRightAdjoints_twistRight
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransform_isLeftAdjoint
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.kernelDualAdjunction
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.twistedInverseAdjunction
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.twistedInversePullback
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPullbackAdjunction
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPullbackAdjunction.adj
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasKernelDual
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasKernelDual.adj
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasKernelDual.dualKernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasTwistedInversePullback
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasTwistedInversePullback.adj
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasTwistedInversePullback.twistedInverse
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPullbackAdjunction
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.dualKernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConstituentRightAdjoints
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConstituentRightAdjoints_pullRight
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConstituentRightAdjoints_pushRight
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConstituentRightAdjoints_twistRight
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricTransform_isLeftAdjoint
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.kernelDualAdjunction
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.twistedInverseAdjunction
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.twistedInversePullback
 
 
 /-! ## The dualizing twist, and a geometric adjoint kernel
@@ -283,16 +284,16 @@ a different value whenever p and q differ. Bridging needs the swap of the
 product, which is not stated anywhere.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDualizingTwist
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDualizingTwist.dualizingTwist
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.HasDualizingTwist.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.dualizingTwist
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.dualizingTwistIso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricAdjointKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointIso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointKernelData
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjointKernelData_adjKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricRightAdjoint_isKernelFunctor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDualizingTwist
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDualizingTwist.dualizingTwist
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDualizingTwist.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.dualizingTwist
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.dualizingTwistIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricAdjointKernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricRightAdjointIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricRightAdjointKernelData
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricRightAdjointKernelData_adjKernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricRightAdjoint_isKernelFunctor
 
 
 /-! ## The swap, and a geometric dual kernel
@@ -384,8 +385,8 @@ supplies it.
 -/
 
 #print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricActStabOfDual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransform_additive
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Families.geometricTransform_isTriangulated
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricTransform_additive
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricTransform_isTriangulated
 
 
 /-! ## Composing two geometric transports

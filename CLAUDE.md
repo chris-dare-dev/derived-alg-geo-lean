@@ -107,9 +107,11 @@ category declarations in `AlgebraicGeometry/DerivedCategory/Basic.lean` use
 declarations in `AlgebraicGeometry/DerivedCategory/Families/` use
 `AlgebraicGeometry.DerivedCategory.Families`; quasicoherent-cohomology loci
 and affine realizations in `AlgebraicGeometry/DerivedCategory/Dqc.lean` and
-its `Dqc/` subtree use `AlgebraicGeometry.DerivedCategory.Dqc`. Do not retain
-neutral geometric declarations in a categorical stability-condition namespace
-merely for source compatibility.
+its `Dqc/` subtree use `AlgebraicGeometry.DerivedCategory.Dqc`; neutral
+geometric kernel declarations in `AlgebraicGeometry/DerivedCategory/FourierMukai/`
+use `AlgebraicGeometry.DerivedCategory.FourierMukai`. Do not retain neutral
+geometric declarations in a categorical stability-condition namespace merely
+for source compatibility.
 
 `AlgebraicGeometry/StabilityCondition/` is reserved for modules that actually
 consume weak or Bridgeland stability data: semistable loci, relative HN

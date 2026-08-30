@@ -76,7 +76,7 @@ it is a hypothesis like any other.
 
 universe u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -322,4 +322,4 @@ along the diagonal, and a `DualKernel` the derived dual `P^∨ ⊗ p^*ω[dim]` �
 both geometric, both absent.
 -/
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.FourierMukai

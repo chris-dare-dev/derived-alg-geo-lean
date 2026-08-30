@@ -73,7 +73,7 @@ is the shape both review rounds attacked.
 
 universe u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -580,4 +580,4 @@ Still unreachable geometrically, and not addressed by either ledger:
 associativity of convolution (needs a second comparison layer).
 -/
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.FourierMukai

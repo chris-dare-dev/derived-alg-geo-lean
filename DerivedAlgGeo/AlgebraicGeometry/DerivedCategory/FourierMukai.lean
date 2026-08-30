@@ -13,5 +13,6 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelDualiz
 # Geometric Fourier--Mukai constructions
 
 Scheme-derived kernels, convolution, associativity, and adjunction realizing
-the generic categorical Fourier--Mukai interfaces.
+the generic categorical Fourier--Mukai interfaces. Declarations in this
+subtree use `AlgebraicGeometry.DerivedCategory.FourierMukai`.
 -/

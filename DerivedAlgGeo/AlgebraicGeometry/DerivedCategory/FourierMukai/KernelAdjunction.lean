@@ -78,7 +78,7 @@ attacked twice.
 
 universe u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -280,4 +280,4 @@ through `KernelAutoequivalence.DualKernel.ofRightAdjointKernel`, a geometric
 `DualKernel` — become available. Neither is stated here.
 -/
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.FourierMukai

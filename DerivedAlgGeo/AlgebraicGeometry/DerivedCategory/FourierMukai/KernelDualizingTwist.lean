@@ -84,7 +84,7 @@ agree for an involution isomorphism, which that file does not need to assume.
 
 universe u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -247,4 +247,4 @@ bullets are about the product's symmetry, not about duality: the duality half
 of the classical statement is finished once `HasDualizingTwist` is discharged.
 -/
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.FourierMukai

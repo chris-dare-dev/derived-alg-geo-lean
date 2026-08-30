@@ -25,5 +25,6 @@ Bridgeland family declarations use
 Scheme-derived category declarations use `AlgebraicGeometry.DerivedCategory`,
 and scheme base-change and pullback declarations use
 `AlgebraicGeometry.DerivedCategory.Families`. `Dqc` declarations use
-`AlgebraicGeometry.DerivedCategory.Dqc`.
+`AlgebraicGeometry.DerivedCategory.Dqc`. Neutral geometric Fourier--Mukai
+declarations use `AlgebraicGeometry.DerivedCategory.FourierMukai`.
 -/

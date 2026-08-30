@@ -114,9 +114,10 @@ Bridgeland family APIs have now completed separate namespace cutovers to
 respectively. The scheme-derived category and family foundations have likewise
 completed their cutover to `AlgebraicGeometry.DerivedCategory` and
 `AlgebraicGeometry.DerivedCategory.Families`. The `Dqc` subtree has completed
-its cutover to `AlgebraicGeometry.DerivedCategory.Dqc`. Geometric
-Fourier--Mukai and stability-specific geometric declarations retain their
-staged namespaces until their separate cutovers.
+its cutover to `AlgebraicGeometry.DerivedCategory.Dqc`. Neutral geometric
+Fourier--Mukai declarations have completed their cutover to
+`AlgebraicGeometry.DerivedCategory.FourierMukai`. Stability-specific geometric
+declarations retain their staged namespace until their separate cutover.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map
@@ -205,9 +206,10 @@ Clients of all three groups must migrate imports and qualified names.
 Scheme-derived category, pullback, and `Dqc` declarations now use
 `AlgebraicGeometry.DerivedCategory` and
 `AlgebraicGeometry.DerivedCategory.Families`, and
-`AlgebraicGeometry.DerivedCategory.Dqc`, respectively. Remaining geometric
-Fourier--Mukai and stability-specific declarations keep their staged names
-until their own cutovers:
+`AlgebraicGeometry.DerivedCategory.Dqc`, respectively. Neutral geometric
+Fourier--Mukai declarations now use
+`AlgebraicGeometry.DerivedCategory.FourierMukai`; only stability-specific
+geometric declarations keep their staged names until their own cutover:
 
 | Client need | Import |
 | --- | --- |
@@ -225,4 +227,5 @@ New library code should use the narrow owner import. The Compatibility import
 is public but intentionally a leaf; it provides staged migration without
 reintroducing a CategoryTheory-to-geometry edge. It preserves the former
 combined import surface, not retired qualified names for neutral categorical,
-weak-stability, Bridgeland-family, or scheme-derived family declarations.
+weak-stability, Bridgeland-family, scheme-derived family, `Dqc`, or neutral
+geometric Fourier--Mukai declarations.

@@ -26,5 +26,6 @@ category: module-sheaf derived categories, `Dqc`, scheme-indexed pullback, and
 geometric Fourier--Mukai kernels. Foundational scheme-derived category
 declarations use `AlgebraicGeometry.DerivedCategory`; scheme-family
 declarations use `AlgebraicGeometry.DerivedCategory.Families`; `Dqc`
-declarations use `AlgebraicGeometry.DerivedCategory.Dqc`.
+declarations use `AlgebraicGeometry.DerivedCategory.Dqc`; geometric kernel
+declarations use `AlgebraicGeometry.DerivedCategory.FourierMukai`.
 -/

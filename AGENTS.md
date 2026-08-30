@@ -114,6 +114,11 @@ new derived-category theory.
   `AlgebraicGeometry.DerivedCategory.Dqc`. Consumers should open or qualify
   that namespace explicitly; do not route `Dqc` declarations through a
   stability-family namespace.
+- Neutral geometric Fourier--Mukai declarations owned by
+  `AlgebraicGeometry/DerivedCategory/FourierMukai/` use
+  `AlgebraicGeometry.DerivedCategory.FourierMukai`. Keep only kernel actions
+  that consume stability-condition data under
+  `AlgebraicGeometry/StabilityCondition/FourierMukai/`.
 - Declarations owned by weak-stability families use
   `CategoryTheory.Triangulated.WeakStabilityCondition.Families`. Shared
   Definition 20.5 probes and APIs bound to `WeakStabilityFunction` belong to
