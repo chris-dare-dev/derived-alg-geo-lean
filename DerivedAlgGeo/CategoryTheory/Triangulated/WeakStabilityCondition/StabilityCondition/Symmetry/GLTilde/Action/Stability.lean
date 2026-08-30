@@ -33,7 +33,7 @@ Together these convert a local-finiteness witness for the original slicing
 into a uniform witness for the relabelled slicing.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
@@ -129,4 +129,4 @@ theorem smul_stab_Z (x : GLTilde) (σ : StabilityCondition.WithClassMap C v) (a 
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

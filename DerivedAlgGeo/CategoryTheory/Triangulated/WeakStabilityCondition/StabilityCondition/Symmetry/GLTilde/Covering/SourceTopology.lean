@@ -39,7 +39,7 @@ covering map. `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Topolo
 and inversion are continuous for the transported topology.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix Real Set
 
@@ -430,4 +430,4 @@ theorem is proved separately in `WeakStabilityCondition/StabilityCondition/Symme
 noncomputable instance GLTilde.simplyConnectedSpace : SimplyConnectedSpace GLTilde :=
   SimplyConnectedSpace.ofContractible GLTilde
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

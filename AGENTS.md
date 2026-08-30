@@ -151,6 +151,15 @@ new derived-category theory.
   `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry`;
   do not restore the former sibling
   `CategoryTheory.Triangulated.StabilityCondition.Symmetry` namespace.
+- Group actions on slicings, pre-stability conditions, and Bridgeland stability
+  conditions use
+  `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
+  Do not restore the former sibling
+  `CategoryTheory.Triangulated.StabilityCondition.GroupAction` namespace. The
+  deprecated aliases in
+  `Compatibility/StabilityConditionGroupActionReview.lean` exist solely to
+  elaborate immutable human-review payloads; no library consumer may import
+  that leaf directly, and it should be removed after reviewer reconfirmation.
 - Generic moduli boundedness interfaces shared by weak stability and geometric
   moduli also belong under `CategoryTheory/Triangulated/Families/`; neither
   consumer owns the common root.

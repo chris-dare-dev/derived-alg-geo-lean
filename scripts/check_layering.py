@@ -81,6 +81,13 @@ STRONG_SYMMETRY_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Symmetry"
 RETIRED_STRONG_SYMMETRY_NAMESPACE = (
     "CategoryTheory.Triangulated.StabilityCondition.Symmetry"
 )
+STRONG_GROUP_ACTION_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.GroupAction"
+RETIRED_STRONG_GROUP_ACTION_NAMESPACE = (
+    "CategoryTheory.Triangulated.StabilityCondition.GroupAction"
+)
+REVIEW_GROUP_ACTION_COMPATIBILITY = (
+    SOURCE_ROOT / "Compatibility" / "StabilityConditionGroupActionReview.lean"
+)
 LEGACY_GENERIC_FAMILY_DECLARATION = re.compile(
     r"CategoryTheory\.Triangulated\.StabilityCondition\.Families\."
     r"(?:TriangulatedFiberFamily|BoundednessProblem|UniversalBoundedness)\b"
@@ -578,6 +585,75 @@ def main() -> int:
             f"{STRONG_SYMMETRY_NAMESPACE}"
         )
 
+    for relative in (
+        pathlib.Path("Phase") / "NormalizedShift.lean",
+        pathlib.Path("Symmetry") / "GLTilde" / "Basic.lean",
+        pathlib.Path("Symmetry") / "GLTilde" / "Action" / "Slicing.lean",
+        pathlib.Path("Symmetry")
+        / "Autoequivalence"
+        / "Stability"
+        / "ClassMap.lean",
+        pathlib.Path("Metric") / "Isometry" / "Full.lean",
+    ):
+        path = strong_stability_root / relative
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {STRONG_GROUP_ACTION_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: Bridgeland group-action "
+                f"declarations must use namespace {STRONG_GROUP_ACTION_NAMESPACE}"
+            )
+
+    review_group_action_text = REVIEW_GROUP_ACTION_COMPATIBILITY.read_text(
+        encoding="utf-8"
+    )
+    review_aliases = re.findall(
+        r"^alias (\w+) :=", review_group_action_text, re.MULTILINE
+    )
+    expected_review_aliases = [
+        "GLTilde",
+        "group",
+        "AutPairQuot",
+        "group",
+        "mulAction",
+        "gltildeSlicingMulAction",
+    ]
+    if review_aliases != expected_review_aliases:
+        failures.append(
+            f"{REVIEW_GROUP_ACTION_COMPATIBILITY.relative_to(ROOT)}: expected "
+            f"exactly the six human-review aliases {expected_review_aliases}, "
+            f"found {review_aliases}"
+        )
+    if review_group_action_text.count("@[deprecated") != len(
+        expected_review_aliases
+    ):
+        failures.append(
+            f"{REVIEW_GROUP_ACTION_COMPATIBILITY.relative_to(ROOT)}: every "
+            "human-review alias must be deprecated"
+        )
+    if STRONG_GROUP_ACTION_NAMESPACE not in review_group_action_text:
+        failures.append(
+            f"{REVIEW_GROUP_ACTION_COMPATIBILITY.relative_to(ROOT)}: review "
+            "aliases must point to the Bridgeland strong-child namespace"
+        )
+    review_group_action_module = (
+        "DerivedAlgGeo.Compatibility.StabilityConditionGroupActionReview"
+    )
+    compatibility_umbrella = SOURCE_ROOT / "Compatibility.lean"
+    if review_group_action_module not in imports_by_path[compatibility_umbrella]:
+        failures.append(
+            "DerivedAlgGeo/Compatibility.lean must export the temporary "
+            "GroupAction human-review bridge"
+        )
+    for path, modules in imports_by_path.items():
+        if (
+            path != compatibility_umbrella
+            and review_group_action_module in modules
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: only the Compatibility umbrella "
+                "may import the temporary GroupAction human-review bridge"
+            )
+
     weak_parent_paths = [weak_stability_umbrella]
     weak_parent_paths.extend(
         path
@@ -762,6 +838,14 @@ def main() -> int:
             failures.append(
                 f"{path.relative_to(ROOT)}: declaration restored the retired "
                 f"strong-sibling namespace {RETIRED_STRONG_SYMMETRY_NAMESPACE}"
+            )
+        if (
+            path != REVIEW_GROUP_ACTION_COMPATIBILITY
+            and RETIRED_STRONG_GROUP_ACTION_NAMESPACE in text
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: declaration restored the retired "
+                f"strong-sibling namespace {RETIRED_STRONG_GROUP_ACTION_NAMESPACE}"
             )
 
     all_geometry_modules = (
@@ -986,6 +1070,10 @@ def main() -> int:
     print(
         "ok: Bridgeland Fourier--Mukai symmetry declarations use the matching "
         "strong-child namespace"
+    )
+    print(
+        "ok: Bridgeland GroupAction declarations use the matching strong-child "
+        "namespace; only the human-review bridge retains the retired name"
     )
     print(
         "ok: scheme-derived categories, families, Dqc, and geometric "

@@ -12,90 +12,90 @@ open CategoryTheory.Triangulated
 
 /-! ## GroupAction lane — NormalizedShift (step 1) -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.toOrderIso_injective
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.ext'
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.symm_map_add_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.group
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.mul_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.one_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.inv_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.toOrderIso_injective
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.ext'
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.symm_map_add_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.group
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.mul_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.one_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.inv_apply
 
 /-! ## GroupAction lane — ShiftAnalysis (step 3c groundwork) -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.map_add_nat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.map_sub_nat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.map_add_int
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.uniformContinuous
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.NormalizedShift.exists_radius
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.map_add_nat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.map_sub_nat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.map_add_int
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.uniformContinuous
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.exists_radius
 
 /-! ## GroupAction lane — GLTilde (step 2) -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rayVec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rayVec_add_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rayVec_ne_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.OnRay
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.OnRay.refl
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.OnRay.trans
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.toMat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.toMat_mul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.toMat_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.Compatible
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.compat_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.compat_mul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.compat_inv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.ext'
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.group
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.mul_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.mul_shift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.one_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.one_shift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.inv_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.inv_shift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.toMatHom
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.toShiftHom
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rayVec
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rayVec_add_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rayVec_ne_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.OnRay
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.OnRay.refl
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.OnRay.trans
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.toMat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.toMat_mul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.toMat_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.Compatible
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.compat_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.compat_mul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.compat_inv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.ext'
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.group
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.mul_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.mul_shift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.one_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.one_shift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.inv_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.inv_shift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.toMatHom
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.toShiftHom
 
 /-! ## GroupAction lane — ComplexBridge (step 3 groundwork) -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cplxCoord
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cplxCoord_exp
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.compat_exp
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actC
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actC_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actC_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actC_mul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actC_exp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cplxCoord
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cplxCoord_exp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.compat_exp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actC
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actC_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actC_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actC_mul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actC_exp
 
 /-! ## GroupAction lane — SlicingAction (step 3a) -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.relabel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.relabel_P
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.slicingMulAction
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.smul_slicing_P
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.gltildeSlicingMulAction
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.gltilde_smul_slicing_P
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.relabel_intervalProp_iff
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.relabel_intervalProp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.relabel
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.relabel_P
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.slicingMulAction
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.smul_slicing_P
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.gltildeSlicingMulAction
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.gltilde_smul_slicing_P
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.relabel_intervalProp_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.relabel_intervalProp
 
 /-! ## GroupAction lane — PreStabilityAction (step 3b) -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actPre
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actPre_slicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actPre_Z
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.preMulAction
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.smul_pre_slicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.smul_pre_Z
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actPre
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actPre_slicing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actPre_Z
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.preMulAction
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.smul_pre_slicing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.smul_pre_Z
 
 /-! ## GroupAction lane — StabilityAction (step 3c) -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.relabel_isLocallyFinite
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actStab
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actStab_slicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.actStab_Z
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.stabMulAction
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.smul_stab_slicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.smul_stab_Z
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.relabel_isLocallyFinite
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actStab
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actStab_slicing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actStab_Z
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.stabMulAction
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.smul_stab_slicing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.smul_stab_Z
 
 /-! ## AutAction — transport along a triangulated auto-equivalence
 
@@ -108,37 +108,37 @@ These extend the foundational library's own namespace, since they are API for it
 
 /-! ## StrictAutAction — a strict subgroup of autoequivalences -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.comp_inv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.inv_comp
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.obj_inv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.obj_self
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.F_inv_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.F_inv_mul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.equiv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.equiv_functor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.equiv_inverse
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.actSlicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.actSlicing_P
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.StrictAut.mulActionSlicing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.comp_inv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.inv_comp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.obj_inv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.obj_self
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.F_inv_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.F_inv_mul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.equiv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.equiv_functor
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.equiv_inverse
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.actSlicing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.actSlicing_P
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut.mulActionSlicing
 
 /-! ## QuotAutAction — Aut(D) as an honest group, by quotienting -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv.id
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv.comp
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv.symm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv.act
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv.act_P
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv.act_id
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv.act_comp
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv.act_congr
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.TriEquiv.setoid
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutQuot
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutQuot.group
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutQuot.mulActionSlicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutQuot.mk
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutQuot.mk_smul_P
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.id
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.comp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.symm
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.act
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.act_P
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.act_id
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.act_comp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.act_congr
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.setoid
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot.group
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot.mulActionSlicing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot.mk
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot.mk_smul_P
 
 /-! ## K0Functor — K₀ is functorial in triangulated functors -/
 
@@ -164,19 +164,19 @@ These extend the foundational library's own namespace, since they are API for it
 
 /-! ## GLTildeFibre — the fibre of the projection is Z -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rayVec_eq_iff
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rayVec_eq_of_onRay
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.deckShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.deckShift_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.compat_one_deckShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.deck
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.deck_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.deck_shift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.exists_deckShift_of_mat_eq_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.deckHom
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.deckHom_injective
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.range_deckHom_eq_ker
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.kerEquiv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rayVec_eq_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rayVec_eq_of_onRay
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.deckShift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.deckShift_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.compat_one_deckShift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.deck
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.deck_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.deck_shift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.exists_deckShift_of_mat_eq_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.deckHom
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.deckHom_injective
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.range_deckHom_eq_ker
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.kerEquiv
 
 /-! ## GLTildeSurj — the projection is surjective
 
@@ -202,177 +202,177 @@ The list below is in SOURCE ORDER and is complete: 49 public declarations, plus
 structurally unlistable here. Keep the order when adding, so a reader can diff
 this against the file by eye. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cexpI
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cexpI_re
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cexpI_im
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cexpI_add
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.norm_cexpI
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cexpI_ne_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cplxCoord_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cplxCoord_cexpI
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cA
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cB
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.mulVec_rayVec_eq
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.normSq_cA_sub_normSq_cB
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.det_toMat_pos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.normSq_cB_lt_normSq_cA
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cA_ne_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.norm_cB_lt_norm_cA
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.ratio
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.norm_ratio_lt_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.Wmap
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.Wmap_re_pos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.Wmap_ne_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cexpI_neg_two_pi
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.Wmap_add_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.lift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.pi_mul_lift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.mulVec_rayVec_lift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.lift_scale_pos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.compatible_lift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.lift_add_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cross
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cross_rayVec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cross_mulVec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.cross_smul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.abs_arg_Wmap_lt
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.lift_lt_lift_of_lt_of_sub_lt_one
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.lift_add_nat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.lift_strictMono
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.lift_continuous
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.lift_surjective
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.liftShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.liftShift_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.compatible_liftShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.toMatHom_surjective
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.sect
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.sect_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.toMatHom_comp_sect
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.deck_injective
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.existsUnique_deck_mul_sect
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.exact_deckHom_toMatHom
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cexpI
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cexpI_re
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cexpI_im
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cexpI_add
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.norm_cexpI
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cexpI_ne_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cplxCoord_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cplxCoord_cexpI
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cA
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cB
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.mulVec_rayVec_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.normSq_cA_sub_normSq_cB
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.det_toMat_pos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.normSq_cB_lt_normSq_cA
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cA_ne_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.norm_cB_lt_norm_cA
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ratio
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.norm_ratio_lt_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.Wmap
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.Wmap_re_pos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.Wmap_ne_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cexpI_neg_two_pi
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.Wmap_add_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.lift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.pi_mul_lift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.mulVec_rayVec_lift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.lift_scale_pos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.compatible_lift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.lift_add_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cross
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cross_rayVec
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cross_mulVec
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cross_smul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.abs_arg_Wmap_lt
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.lift_lt_lift_of_lt_of_sub_lt_one
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.lift_add_nat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.lift_strictMono
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.lift_continuous
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.lift_surjective
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.liftShift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.liftShift_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.compatible_liftShift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.toMatHom_surjective
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.sect
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.sect_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.toMatHom_comp_sect
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.deck_injective
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.existsUnique_deck_mul_sect
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.exact_deckHom_toMatHom
 
 /-! ## GLTildeTopology — topology and simple connectedness -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rotationMatrix
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rotationMatrix_det
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rotationMatrix_mulVec_rayVec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rotationMatrix_neg_mul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rotationMatrix_mul_neg
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rotationGLPos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.rotationGLPos_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.phaseTranslation
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.phaseTranslation_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.compatible_rotation
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.liftedRotation
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.liftedRotation_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.liftedRotation_shift_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.ext_mat_shift_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.PositiveReal
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTildeCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperMatrix
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperMatrix_det
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperMatrixInv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperMatrix_mul_inv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperMatrix_inv_mul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperGLPos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperGLPos_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.alignedMatrix
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.alignedMatrix_zero_zero_pos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.alignedMatrix_one_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.alignedMatrix_one_one_pos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.matrixOfCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.matrixOfCoordinates_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperDeckIndex
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperDeckIndex_spec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperSectionZero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperSectionZero_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperSectionZero_shift_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeOfCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeOfCoordinates_shift_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeOfCoordinates_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.alignedMatrix_glTildeOfCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeCoordinates_ofCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeCoordinates_injective
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeCoordinates_surjective
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeCoordinateEquiv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeCoordinateEquiv_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.topologicalSpace
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeCoordinateHomeomorph
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.continuous_rotationMatrix
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeOfCoordinates_coordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.continuous_toMat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.contractibleSpace
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.simplyConnectedSpace
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rotationMatrix
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rotationMatrix_det
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rotationMatrix_mulVec_rayVec
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rotationMatrix_neg_mul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rotationMatrix_mul_neg
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rotationGLPos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rotationGLPos_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.phaseTranslation
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.phaseTranslation_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.compatible_rotation
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.liftedRotation
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.liftedRotation_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.liftedRotation_shift_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.ext_mat_shift_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.PositiveReal
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTildeCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperMatrix
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperMatrix_det
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperMatrixInv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperMatrix_mul_inv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperMatrix_inv_mul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperGLPos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperGLPos_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.alignedMatrix
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.alignedMatrix_zero_zero_pos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.alignedMatrix_one_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.alignedMatrix_one_one_pos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.matrixOfCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.matrixOfCoordinates_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperDeckIndex
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperDeckIndex_spec
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperSectionZero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperSectionZero_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperSectionZero_shift_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeOfCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeOfCoordinates_shift_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeOfCoordinates_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.alignedMatrix_glTildeOfCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeCoordinates_ofCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeCoordinates_injective
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeCoordinates_surjective
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeCoordinateEquiv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeCoordinateEquiv_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.topologicalSpace
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeCoordinateHomeomorph
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.continuous_rotationMatrix
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeOfCoordinates_coordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.continuous_toMat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.contractibleSpace
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.simplyConnectedSpace
 
 /-! ## GLTildeCover — base coordinates and the universal covering map -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.circleMatrix
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.circleMatrixInv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.circleMatrix_det
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.circleMatrix_mul_inv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.circleMatrix_inv_mul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.circleGLPos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.circleGLPos_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLPosCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.firstColumnComplex
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.firstColumnComplex_ne_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.firstColumnRadius
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.firstColumnDirection
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.firstColumnDirection_re
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.firstColumnDirection_im
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.secondColumnAlong
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.secondColumnPerp
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.secondColumnPerp_pos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glPosCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glPosOfCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glPosOfCoordinates_mat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.firstColumnDirection_glPosOfCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.secondColumnAlong_glPosOfCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.secondColumnPerp_glPosOfCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glPosCoordinates_ofCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glPosOfCoordinates_coordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.continuous_toMatGLPos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glPosCoordinateHomeomorph
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.isCoveringMap_prodMap_id
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.phaseCircle
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.phaseCircle_isCoveringMap
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.coordinateProjection
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.coordinateProjection_isCoveringMap
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.phaseCircle_coe
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.circleMatrix_phaseCircle
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glPosOfCoordinates_coordinateProjection
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.coordinateProjection_apply_glTildeCoordinates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.isCoveringMap_toMat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.universalCoverData
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.circleMatrix
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.circleMatrixInv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.circleMatrix_det
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.circleMatrix_mul_inv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.circleMatrix_inv_mul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.circleGLPos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.circleGLPos_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLPosCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.firstColumnComplex
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.firstColumnComplex_ne_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.firstColumnRadius
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.firstColumnDirection
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.firstColumnDirection_re
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.firstColumnDirection_im
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.secondColumnAlong
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.secondColumnPerp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.secondColumnPerp_pos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glPosCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glPosOfCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glPosOfCoordinates_mat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.firstColumnDirection_glPosOfCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.secondColumnAlong_glPosOfCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.secondColumnPerp_glPosOfCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glPosCoordinates_ofCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glPosOfCoordinates_coordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.continuous_toMatGLPos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glPosCoordinateHomeomorph
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.isCoveringMap_prodMap_id
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.phaseCircle
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.phaseCircle_isCoveringMap
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.coordinateProjection
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.coordinateProjection_isCoveringMap
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.phaseCircle_coe
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.circleMatrix_phaseCircle
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glPosOfCoordinates_coordinateProjection
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.coordinateProjection_apply_glTildeCoordinates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.isCoveringMap_toMat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.universalCoverData
 
 /-! ## GLTildeTopologicalGroup — compatibility of topology and group operations -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.upperSectionZero_shift_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.coordinateShift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.glTildeOfCoordinates_shift_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.continuous_shift_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.isTopologicalGroup
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.upperSectionZero_shift_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.coordinateShift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glTildeOfCoordinates_shift_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.continuous_shift_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.isTopologicalGroup
 
 /-! ## AutPairAction — the same action, as a genuine `MulAction` -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.id
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.mul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.inv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.setoid
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_slicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_Z
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_id
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_mul
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_congr
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.mk
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.group
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.mulAction
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.mk_smul_slicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.mk_smul_Z
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.toAutQuot
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.id
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.mul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.inv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.setoid
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_slicing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_Z
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_id
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_mul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_congr
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mk
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.group
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mulAction
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mk_smul_slicing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mk_smul_Z
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.toAutQuot
 

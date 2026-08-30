@@ -145,7 +145,7 @@ noncomputable def HNFiltration.mapF {P : ℝ → ObjectProperty C}
 /-- Transport a slicing along a triangulated auto-equivalence:
 `(Φ • s).P φ X = s.P φ (Φ⁻¹ X)`.
 
-Dual to `CategoryTheory.Triangulated.StabilityCondition.GroupAction.relabel`, which moves phases
+Dual to `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.relabel`, which moves phases
 and fixes
 objects.
 

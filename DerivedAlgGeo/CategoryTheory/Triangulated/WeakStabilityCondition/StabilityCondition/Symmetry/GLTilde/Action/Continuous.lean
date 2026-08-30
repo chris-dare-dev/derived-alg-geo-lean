@@ -30,7 +30,7 @@ open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated.Deformation
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 noncomputable section
 
@@ -316,4 +316,4 @@ noncomputable def combinedStabilityHomeomorph (p : GLTilde × AutPairQuot v) :
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

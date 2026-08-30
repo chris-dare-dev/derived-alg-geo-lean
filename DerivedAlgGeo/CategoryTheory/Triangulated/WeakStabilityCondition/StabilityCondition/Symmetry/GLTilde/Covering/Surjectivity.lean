@@ -60,7 +60,7 @@ Positivity of `det` is used **twice**, and differently: once to put `W` in the
 right half-plane, once to sign the cross product.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix Real Complex
 
@@ -470,4 +470,4 @@ theorem exact_deckHom_toMatHom :
       ∧ Function.Surjective GLTilde.toMatHom :=
   ⟨deckHom_injective, range_deckHom_eq_ker, toMatHom_surjective⟩
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

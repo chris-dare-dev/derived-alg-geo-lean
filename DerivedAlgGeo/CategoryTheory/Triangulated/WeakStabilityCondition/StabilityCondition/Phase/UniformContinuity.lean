@@ -27,7 +27,7 @@ that transfer, and `uniformContinuous` is the argument.
 local finiteness.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 namespace NormalizedShift
 
@@ -133,4 +133,4 @@ theorem exists_radius (f : NormalizedShift) {w M : ℝ} (hw : 0 < w) (hM : 0 < M
 
 end NormalizedShift
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

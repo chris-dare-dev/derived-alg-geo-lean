@@ -27,7 +27,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
 open scoped ENNReal
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair
 
 noncomputable section
 
@@ -38,7 +38,7 @@ variable {C : Type u} [Category.{w} C] [HasZeroObject C] [HasShift C ℤ]
   [IsTriangulated C]
 variable {Λ : Type u'} [AddCommGroup Λ] {v : K₀ C →+ Λ}
 
-variable (a : CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair v)
+variable (a : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair v)
 
 /-- The acted `φ⁺` discrepancy at `E` is the original discrepancy at `Φ⁻¹E`. -/
 theorem act_phiPlusDist (σ τ : StabilityCondition.WithClassMap C v) (E : C)
@@ -146,7 +146,7 @@ theorem act_stabilityDist (σ τ : StabilityCondition.WithClassMap C v) :
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair
 
 namespace CategoryTheory.Triangulated
 
@@ -163,7 +163,7 @@ variable {Λ : Type u'} [AddCommGroup Λ] (v : K₀ C →+ Λ)
 @[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := no_claim)
         (note := "Quotient-group form of AutPair.act_stabilityDist for the ordinary finite HN mass. The remaining boundary is group-theoretic: AutPairQuot v has extra compatible lattice data and is not proved equivalent to Aut(D).")]
 theorem AutPairQuot_smul_stabilityDist
-    (g : CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot v)
+    (g : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot v)
     (σ τ : StabilityCondition.WithClassMap C v) :
     stabilityDist (g • σ) (g • τ) = stabilityDist σ τ := by
   induction g using _root_.Quotient.inductionOn with

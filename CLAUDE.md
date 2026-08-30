@@ -166,6 +166,16 @@ matching strong-child namespace
 not the former sibling
 `CategoryTheory.Triangulated.StabilityCondition.Symmetry`.
 
+Group actions on slicings, pre-stability conditions, and Bridgeland stability
+conditions use the matching strong-child namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`,
+not the former sibling
+`CategoryTheory.Triangulated.StabilityCondition.GroupAction`. The deprecated
+aliases in `Compatibility/StabilityConditionGroupActionReview.lean` are a
+narrow exception for immutable human-review payloads: only the Compatibility
+umbrella may import them, and they should be removed after reviewer
+reconfirmation.
+
 Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
 generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural
 move must update imports, umbrellas, audits, declaration-sweep routing,
