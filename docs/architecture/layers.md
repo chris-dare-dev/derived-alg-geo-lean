@@ -179,11 +179,11 @@ Moduli / Stacks ─┬→ AlgebraicGeometry/DerivedCategory
 ```
 
 `CategoryTheory/Sites/StackInGroupoids.lean` is the canonical module for the
-generic groupoid-valued stack extension. Its declaration namespace remains
-`AlgebraicGeometry` for source compatibility, and
-`AlgebraicGeometry/Stacks/Basic.lean` reexports the new owner for clients of
-the former import path. Scheme-specific representability and presentation
-data remain below `AlgebraicGeometry/Stacks`.
+generic groupoid-valued stack extension. Its declarations use the matching
+`CategoryTheory` namespace. `AlgebraicGeometry/Stacks/Basic.lean` reexports the
+new owner for clients of the former import path, but does not preserve the
+retired geometric qualified names. Scheme-specific representability and
+presentation data remain below `AlgebraicGeometry/Stacks`.
 
 Scheme-derived `Dqc`, derived pullback, and their preservation theorems now
 live under `DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/`, including the

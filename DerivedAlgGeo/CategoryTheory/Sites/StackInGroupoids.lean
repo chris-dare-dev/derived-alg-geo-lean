@@ -14,15 +14,14 @@ objects: this layer does not replace them with parallel definitions.
 
 The construction is owned by `CategoryTheory/Sites`: it is generic in a
 category and a Grothendieck topology and imports no algebraic geometry.  The
-declaration namespace remains `AlgebraicGeometry` for source compatibility;
-new code should use this neutral module as the import boundary.
+declarations use the matching `CategoryTheory` namespace.
 
 `StackInGroupoids` deliberately contains no algebraicity, representability,
 boundedness, or finiteness assertion.  The only conditions are groupoid-valued
 fibers and effective descent for a chosen Grothendieck topology.
 -/
 
-namespace AlgebraicGeometry
+namespace CategoryTheory
 
 open CategoryTheory
 open CategoryTheory.Bicategory
@@ -191,4 +190,4 @@ def StackInGroupoids.ofEquivalence {C : Type u} [Category.{v} C]
 
 end
 
-end AlgebraicGeometry
+end CategoryTheory

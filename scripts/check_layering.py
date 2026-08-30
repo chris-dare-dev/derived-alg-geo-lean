@@ -37,6 +37,7 @@ STABILITY_FAMILIES_ROOT = (
     "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families"
 )
 GENERIC_FAMILIES_NAMESPACE = "CategoryTheory.Triangulated.Families"
+GENERIC_STACKS_NAMESPACE = "CategoryTheory"
 DERIVED_CATEGORY_NAMESPACE = "AlgebraicGeometry.DerivedCategory"
 DERIVED_FAMILIES_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Families"
 DQC_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Dqc"
@@ -392,6 +393,29 @@ def main() -> int:
             "legacy sibling CategoryTheory/Triangulated/StabilityCondition "
             "path restored; Bridgeland stability is the child of "
             "WeakStabilityCondition"
+        )
+
+    generic_stacks_source = (
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "StackInGroupoids.lean"
+    )
+    generic_stacks_text = generic_stacks_source.read_text(encoding="utf-8")
+    if not re.search(
+        rf"^namespace {GENERIC_STACKS_NAMESPACE}$",
+        generic_stacks_text,
+        re.MULTILINE,
+    ):
+        failures.append(
+            f"{generic_stacks_source.relative_to(ROOT)}: generic "
+            f"stack-in-groupoids declarations must use namespace "
+            f"{GENERIC_STACKS_NAMESPACE}"
+        )
+    if re.search(
+        r"^namespace AlgebraicGeometry$", generic_stacks_text, re.MULTILINE
+    ):
+        failures.append(
+            f"{generic_stacks_source.relative_to(ROOT)}: generic "
+            "stack-in-groupoids declarations restored the retired geometric "
+            "namespace"
         )
 
     generic_families_source_root = (
@@ -818,6 +842,9 @@ def main() -> int:
     print(
         "ok: neutral triangulated-family declarations use the generic "
         "CategoryTheory.Triangulated.Families namespace"
+    )
+    print(
+        "ok: generic stacks in groupoids use their CategoryTheory namespace"
     )
     print(
         "ok: weak-stability family declarations use the matching "

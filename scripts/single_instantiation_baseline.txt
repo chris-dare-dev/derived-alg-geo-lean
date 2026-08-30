@@ -1,5 +1,5 @@
-CategoryTheory	AlgebraicGeometry.StackEquivalence
-CategoryTheory	AlgebraicGeometry.StackInGroupoids.Cover
+CategoryTheory	CategoryTheory.StackEquivalence
+CategoryTheory	CategoryTheory.StackInGroupoids.Cover
 CategoryTheory	CategoryTheory.DGFunctor.IsQuasiEquivalence
 CategoryTheory	CategoryTheory.DGLinear
 CategoryTheory	CategoryTheory.Enhancement

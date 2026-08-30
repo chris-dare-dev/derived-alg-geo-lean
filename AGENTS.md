@@ -14,6 +14,10 @@ first application that motivated it.
   `Instances/AlgebraicGeometry/` leaf below the generic construction. These
   bridge leaves may import both subjects; generic siblings and their umbrellas
   must not import bridge leaves.
+- Generic stacks in groupoids and descent-equivalence data belong under
+  `CategoryTheory/Sites/` and use the `CategoryTheory` namespace. Scheme-level
+  representability, atlases, and algebraicity remain under
+  `AlgebraicGeometry/Stacks/`.
 - A category or locus intrinsically defined from a scheme remains a geometric
   object. Put scheme-derived categories, `Dqc`, and their geometric pullback
   machinery under `AlgebraicGeometry/DerivedCategory/`; reserve an

@@ -8,5 +8,6 @@ import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids
 /-! # Sites
 
 Site-theoretic descent and sheaf-cohomology statements that mention no
-geometry.
+geometry. Generic stacks in groupoids use the `CategoryTheory` declaration
+namespace.
 -/

@@ -41,6 +41,9 @@ concrete applications through explicit instance leaves.
 - Definitions and lemmas that intrinsically mention schemes, varieties,
   sheaves, or geometric morphism properties belong under
   `AlgebraicGeometry/`.
+- Generic stacks in groupoids and their descent-equivalence interface belong
+  under `CategoryTheory/Sites/` and use the `CategoryTheory` namespace;
+  scheme-specific representability and presentations remain geometric.
 - A geometric realization of a generic categorical interface belongs under
   `CategoryTheory/<construction>/Instances/AlgebraicGeometry/`. Such a bridge
   leaf may import geometry, but generic siblings and generic umbrellas must
