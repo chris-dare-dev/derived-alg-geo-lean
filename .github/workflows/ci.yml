@@ -571,7 +571,11 @@ jobs:
           # Nothing in this step needs the executable: `lake env lean` reads
           # oleans. See the "Emit combined environment" step for the same change
           # where it matters more.
-          lake build DerivedAlgGeoSweep
+          # RestateHistoricalNames is a separate executable-only library, not a
+          # dependency of the public or sweep umbrella. Build it explicitly so
+          # the source loop and the later interpreted restatement both work on
+          # a clean runner rather than relying on a cached olean.
+          lake build DerivedAlgGeoSweep RestateHistoricalNames
           : > lean-source-check.txt
           for f in exe/*.lean; do
             lake env lean "$f" 2>&1 | tee -a lean-source-check.txt
