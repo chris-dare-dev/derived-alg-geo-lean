@@ -23,7 +23,7 @@ Definition 21.9 quotient, and boundedness remain separate layers.
 namespace CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap
 
 open CategoryTheory Limits Pretriangulated
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 noncomputable section
 
@@ -60,7 +60,7 @@ theorem class_mem_semistableClasses
 locus. -/
 def HasSupportProperty (σ : PreStabilityCondition.WithClassMap C v)
     (Zlin : V →ₗ[ℝ] ℂ) : Prop :=
-  CategoryTheory.Triangulated.StabilityCondition.Support.HasSupportProperty Zlin
+  CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasSupportProperty Zlin
     σ.semistableClasses
 
 /-- Genuine quadratic support for one ordinary pre-stability condition,
@@ -73,7 +73,7 @@ structure QuadraticSupportData (σ : PreStabilityCondition.WithClassMap C v)
   /-- One genuine quadratic form has the required signs on the ordinary
   semistable locus and the kernel of the same charge. -/
   quadratic :
-    CategoryTheory.Triangulated.StabilityCondition.Support.HasQuadraticSupportProperty
+    CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasQuadraticSupportProperty
       Zlin σ.semistableClasses
 
 /-- Genuine quadratic support implies the norm-bound support property on the
@@ -92,7 +92,7 @@ structure UniformQuadraticSupportData
   charge_compatible : ∀ i (x : V), Zlin x = (σ i).Z x
   /-- One quadratic form controls every indexed ordinary semistable locus. -/
   quadratic :
-    CategoryTheory.Triangulated.StabilityCondition.Support.HasUniformQuadraticSupportProperty
+    CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasUniformQuadraticSupportProperty
       Zlin (fun i => (σ i).semistableClasses)
 
 omit [FiniteDimensional ℝ V] in

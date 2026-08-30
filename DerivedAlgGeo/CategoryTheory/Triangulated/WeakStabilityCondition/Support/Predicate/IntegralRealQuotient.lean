@@ -21,7 +21,7 @@ is *not* automatically an equivalence: the equivalence constructor below
 requires a proof that the scalar-extended comparison is bijective.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Support
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 namespace ZeroChargeLattice
 
@@ -135,4 +135,4 @@ end
 
 end ZeroChargeLattice
 
-end CategoryTheory.Triangulated.StabilityCondition.Support
+end CategoryTheory.Triangulated.WeakStabilityCondition.Support

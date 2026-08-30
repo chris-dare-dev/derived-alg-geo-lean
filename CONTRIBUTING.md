@@ -103,6 +103,11 @@ Definition 20.5 probes and structures bound to `WeakStabilityFunction` in that
 namespace, and let ordinary Bridgeland family packages import them from the
 stronger child.
 
+Generic numerical support predicates and the weak-stability packages built
+from them use `CategoryTheory.Triangulated.WeakStabilityCondition.Support`.
+The former `CategoryTheory.Triangulated.StabilityCondition.Support` namespace
+is retired; consumers must not use it as a compatibility alias.
+
 Declarations owned by that stronger child use
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
 This namespace owns ordinary family packages and categorical pre-stability

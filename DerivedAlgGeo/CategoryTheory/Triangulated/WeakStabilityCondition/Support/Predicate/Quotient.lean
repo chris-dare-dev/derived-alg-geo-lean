@@ -20,7 +20,7 @@ pullback form along `V₀.mkQ`; such a pullback necessarily vanishes on `V₀`
 and therefore cannot be negative definite on the original kernel.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Support
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 noncomputable section
 
@@ -119,4 +119,4 @@ theorem HasQuadraticSupportProperty.constant_modulo
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Support
+end CategoryTheory.Triangulated.WeakStabilityCondition.Support

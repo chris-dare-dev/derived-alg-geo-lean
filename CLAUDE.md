@@ -140,6 +140,11 @@ to `WeakStabilityFunction` use
 `CategoryTheory.Triangulated.WeakStabilityCondition.Families`; the stronger
 Bridgeland child consumes them instead of owning them.
 
+Generic numerical support predicates and their weak-stability bindings use
+`CategoryTheory.Triangulated.WeakStabilityCondition.Support`. Do not qualify
+them through the former strong-sibling
+`CategoryTheory.Triangulated.StabilityCondition.Support` namespace.
+
 Ordinary Bridgeland family packages use the matching child namespace
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
 Geometric realizations consume that API but keep geometry-owned declarations

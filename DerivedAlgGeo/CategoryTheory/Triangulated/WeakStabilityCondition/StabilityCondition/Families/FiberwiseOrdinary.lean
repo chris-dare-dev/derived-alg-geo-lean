@@ -24,7 +24,7 @@ namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.
 open CategoryTheory Limits Pretriangulated
 open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated.Families
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
 open CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 noncomputable section
@@ -129,7 +129,7 @@ theorem OrdinaryFiberStabilityInFamiliesData.quotientCharge_mkQ
     (h : OrdinaryFiberStabilityInFamiliesData charge stable dedekind
       V₀ Z hV₀ σ boundedness) (i : I) (x : V) :
     quotientCharge V₀ Z hV₀ (V₀.mkQ x) = (σ i).Z x := by
-  rw [CategoryTheory.Triangulated.StabilityCondition.Support.quotientCharge_mkQ]
+  rw [CategoryTheory.Triangulated.WeakStabilityCondition.Support.quotientCharge_mkQ]
   exact h.charge_compatible i x
 
 end
