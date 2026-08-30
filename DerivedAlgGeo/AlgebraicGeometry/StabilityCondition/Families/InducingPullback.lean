@@ -23,7 +23,7 @@ and compositor.  No geometric slicing, openness, relative HN, bounded
 coherent/perfect restriction, or conclusion of Theorem 22.2 is asserted.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.StabilityCondition.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -153,4 +153,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.StabilityCondition.Families

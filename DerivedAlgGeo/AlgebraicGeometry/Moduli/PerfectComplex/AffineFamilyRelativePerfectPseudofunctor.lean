@@ -20,7 +20,7 @@ relative-perfect locus by the pseudofunctor unit.  Proving the reverse
 containment is exactly the remaining preservation boundary.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory.Families
@@ -94,4 +94,4 @@ theorem affineFamilyUniversallyStableRelativePerfect_eq_fullLocus
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry

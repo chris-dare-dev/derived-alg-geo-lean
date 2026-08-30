@@ -18,8 +18,7 @@ interfaces in
 Neutral scheme-derived categories, `Dqc`, pullback, and kernels live under
 `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory`.
 
-The declarations retain their established
-`CategoryTheory.Triangulated.StabilityCondition.Families` namespace during the
-module migration. This keeps theorem names stable while module ownership and
-dependency direction become explicit.
+Declarations in this subtree use
+`AlgebraicGeometry.StabilityCondition.Families`, matching their geometric
+owner while remaining consumers of the generic categorical family interfaces.
 -/

@@ -27,4 +27,7 @@ and scheme base-change and pullback declarations use
 `AlgebraicGeometry.DerivedCategory.Families`. `Dqc` declarations use
 `AlgebraicGeometry.DerivedCategory.Dqc`. Neutral geometric Fourier--Mukai
 declarations use `AlgebraicGeometry.DerivedCategory.FourierMukai`.
+Stability-family geometry uses `AlgebraicGeometry.StabilityCondition.Families`,
+and stability-specific kernel actions use
+`AlgebraicGeometry.StabilityCondition.FourierMukai`.
 -/

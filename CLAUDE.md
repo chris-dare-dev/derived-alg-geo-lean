@@ -119,6 +119,13 @@ constructions, stability base change, and stability-specific Fourier--Mukai
 actions. Never place neutral `Dqc`, derived pullback, or kernel convolution
 there merely because a later stability application uses it.
 
+Match those specialized namespaces too. Stability-family geometry uses
+`AlgebraicGeometry.StabilityCondition.Families`, and stability-specific kernel
+actions use `AlgebraicGeometry.StabilityCondition.FourierMukai`. Neutral
+perfect-complex moduli and geometry-registration instances stay with their
+geometric owners; do not qualify any of these declarations through the retired
+flattened categorical stability-family namespace.
+
 The generic family root also owns its declaration namespace:
 `TriangulatedFiberFamily`, `BoundednessProblem`, and other neutral family APIs
 belong to `CategoryTheory.Triangulated.Families`, not to a nested stability

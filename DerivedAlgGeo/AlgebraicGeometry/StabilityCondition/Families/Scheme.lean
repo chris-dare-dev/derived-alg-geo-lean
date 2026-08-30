@@ -14,7 +14,7 @@ realizations of weak-stability topological probes on the underlying Zariski
 space of an actual scheme.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.StabilityCondition.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 
@@ -74,4 +74,4 @@ theorem GenericSemistabilityProbe.ofScheme_isGenericallyOpen_iff
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.StabilityCondition.Families
