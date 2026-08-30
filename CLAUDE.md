@@ -145,6 +145,12 @@ Generic numerical support predicates and their weak-stability bindings use
 them through the former strong-sibling
 `CategoryTheory.Triangulated.StabilityCondition.Support` namespace.
 
+The finite-length simple-charge lattice model belongs to the weak
+stability-function foundation under
+`WeakStabilityCondition/Foundation/StabilityFunction/` and uses
+`CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength`. Do not
+recreate the duplicate plural `WeakStabilityCondition/Foundations/` tree.
+
 Ordinary Bridgeland family packages use the matching child namespace
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
 Geometric realizations consume that API but keep geometry-owned declarations

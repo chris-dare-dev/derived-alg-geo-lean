@@ -58,7 +58,7 @@ and the foundation module is the one every stability-function consumer imports.
   exactly the additive maps out of the lattice, freely and uniquely.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.FiniteLength
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength
 
 open CategoryTheory.Triangulated
 open CategoryTheory Complex
@@ -195,4 +195,4 @@ theorem chargeOf_ne_zero {w : Fin n → ℂ} (hw : ∀ i, w i ∈ semiClosedUppe
     chargeOf w (fun i => (m i : ℤ)) ≠ 0 :=
   semiClosedUpperHalfPlane_ne_zero (chargeOf_mem_cone hw hm)
 
-end CategoryTheory.Triangulated.StabilityCondition.FiniteLength
+end CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength
