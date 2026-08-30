@@ -160,6 +160,12 @@ new derived-category theory.
   `Compatibility/StabilityConditionGroupActionReview.lean` exist solely to
   elaborate immutable human-review payloads; no library consumer may import
   that leaf directly, and it should be removed after reviewer reconfirmation.
+- Do not recreate the retired import-only shims under
+  `Divisors/{Tensor,Picard,Monoidal}.lean`, `Stacks/Basic.lean`, or
+  `Compatibility/StabilityConditionFamilies.lean`.
+  Consumers import the categorical or geometric owner directly. The temporary
+  GroupAction review bridge is the only compatibility leaf retained by the
+  public umbrella.
 - Helpers intrinsically about deforming a Bridgeland stability condition use
   `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`.
   Do not restore the flattened `CategoryTheory.Triangulated.Deformation`

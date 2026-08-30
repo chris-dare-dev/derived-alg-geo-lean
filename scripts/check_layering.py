@@ -90,6 +90,35 @@ RETIRED_STRONG_DEFORMATION_NAMESPACE = "CategoryTheory.Triangulated.Deformation"
 REVIEW_GROUP_ACTION_COMPATIBILITY = (
     SOURCE_ROOT / "Compatibility" / "StabilityConditionGroupActionReview.lean"
 )
+RETIRED_IMPORT_SHIMS = {
+    "DerivedAlgGeo.AlgebraicGeometry.Divisors.Tensor": (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "Tensor.lean",
+        "DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic",
+    ),
+    "DerivedAlgGeo.AlgebraicGeometry.Divisors.Picard": (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "Picard.lean",
+        "DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Picard",
+    ),
+    "DerivedAlgGeo.AlgebraicGeometry.Divisors.Monoidal": (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "Monoidal.lean",
+        "DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal",
+    ),
+    "DerivedAlgGeo.AlgebraicGeometry.Stacks.Basic": (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Stacks" / "Basic.lean",
+        "DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids",
+    ),
+    "DerivedAlgGeo.Compatibility.StabilityConditionFamilies": (
+        SOURCE_ROOT / "Compatibility" / "StabilityConditionFamilies.lean",
+        "the relevant narrow categorical or geometric owner",
+    ),
+}
+CENSUS_OWNER_IMPORTS = {
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+    "StabilityCondition.Families",
+    "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory",
+    "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families",
+    "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai",
+}
 LEGACY_GENERIC_FAMILY_DECLARATION = re.compile(
     r"CategoryTheory\.Triangulated\.StabilityCondition\.Families\."
     r"(?:TriangulatedFiberFamily|BoundednessProblem|UniversalBoundedness)\b"
@@ -399,6 +428,37 @@ def main() -> int:
             evidence[(source_owner, dependency)].append(
                 f"{path.relative_to(ROOT)}:{line_number}"
             )
+
+    for module, (retired_path, canonical_owner) in RETIRED_IMPORT_SHIMS.items():
+        if retired_path.exists():
+            failures.append(
+                f"retired import shim {retired_path.relative_to(ROOT)} was restored; "
+                f"consumers must import {canonical_owner}"
+            )
+        for path, modules in imports_by_path.items():
+            if module in modules:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: imports retired shim {module}"
+                )
+
+    census_path = ROOT / "scripts" / "StabilityConditionCensus.lean"
+    census_imports = {
+        match.group(1)
+        for line in census_path.read_text(encoding="utf-8").splitlines()
+        if (match := IMPORT.match(line)) is not None
+    }
+    missing_census_imports = CENSUS_OWNER_IMPORTS - census_imports
+    if missing_census_imports:
+        failures.append(
+            f"{census_path.relative_to(ROOT)}: missing canonical owner imports "
+            f"{sorted(missing_census_imports)}"
+        )
+    retired_census_imports = set(RETIRED_IMPORT_SHIMS) & census_imports
+    if retired_census_imports:
+        failures.append(
+            f"{census_path.relative_to(ROOT)}: imports retired compatibility "
+            f"modules {sorted(retired_census_imports)}"
+        )
 
     for edge, locations_found in sorted(evidence.items()):
         if LAYER.get(edge[0], -1) < LAYER.get(edge[1], -1):
@@ -1110,6 +1170,10 @@ def main() -> int:
     print(
         "ok: Bridgeland deformation helpers use the matching strong-child "
         "namespace"
+    )
+    print(
+        "ok: staged import-only compatibility shims are retired and the "
+        "stability census imports canonical owners"
     )
     print(
         "ok: scheme-derived categories, families, Dqc, and geometric "
