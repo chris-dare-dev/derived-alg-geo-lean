@@ -7,7 +7,6 @@ import DerivedAlgGeo.Algebra
 import DerivedAlgGeo.AlgebraicGeometry
 import DerivedAlgGeo.CategoryTheory
 import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated.Instances
-import DerivedAlgGeo.Compatibility
 import DerivedAlgGeo.LinearAlgebra
 import DerivedAlgGeo.Topology
 

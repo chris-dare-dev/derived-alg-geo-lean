@@ -87,9 +87,7 @@ RETIRED_STRONG_GROUP_ACTION_NAMESPACE = (
 )
 STRONG_DEFORMATION_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Deformation"
 RETIRED_STRONG_DEFORMATION_NAMESPACE = "CategoryTheory.Triangulated.Deformation"
-REVIEW_GROUP_ACTION_COMPATIBILITY = (
-    SOURCE_ROOT / "Compatibility" / "StabilityConditionGroupActionReview.lean"
-)
+RESTATE_GROUP_ACTION_NAMES = ROOT / "exe" / "RestateHistoricalNames.lean"
 RETIRED_IMPORT_SHIMS = {
     "DerivedAlgGeo.AlgebraicGeometry.Divisors.Tensor": (
         SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "Tensor.lean",
@@ -109,6 +107,14 @@ RETIRED_IMPORT_SHIMS = {
     ),
     "DerivedAlgGeo.Compatibility.StabilityConditionFamilies": (
         SOURCE_ROOT / "Compatibility" / "StabilityConditionFamilies.lean",
+        "the relevant narrow categorical or geometric owner",
+    ),
+    "DerivedAlgGeo.Compatibility.StabilityConditionGroupActionReview": (
+        SOURCE_ROOT / "Compatibility" / "StabilityConditionGroupActionReview.lean",
+        "the canonical GroupAction owner",
+    ),
+    "DerivedAlgGeo.Compatibility": (
+        SOURCE_ROOT / "Compatibility.lean",
         "the relevant narrow categorical or geometric owner",
     ),
 }
@@ -143,7 +149,6 @@ LAYER = {
     GENERIC_OWNER: 1,
     GEOMETRY_OWNER: 2,
     GEOMETRY_INSTANCES_OWNER: 3,
-    "Compatibility": 4,
     "Development": 5,
 }
 
@@ -690,55 +695,86 @@ def main() -> int:
                 f"declarations must use namespace {STRONG_GROUP_ACTION_NAMESPACE}"
             )
 
-    review_group_action_text = REVIEW_GROUP_ACTION_COMPATIBILITY.read_text(
+    review_group_action_text = RESTATE_GROUP_ACTION_NAMES.read_text(
         encoding="utf-8"
     )
     review_aliases = re.findall(
-        r"^alias (\w+) :=", review_group_action_text, re.MULTILINE
+        r"^alias (\w+) :=\s*\n?\s*(\S+)",
+        review_group_action_text,
+        re.MULTILINE,
     )
     expected_review_aliases = [
-        "GLTilde",
-        "group",
-        "AutPairQuot",
-        "group",
-        "mulAction",
-        "gltildeSlicingMulAction",
+        ("GLTilde", f"{STRONG_GROUP_ACTION_NAMESPACE}.GLTilde"),
+        ("group", f"{STRONG_GROUP_ACTION_NAMESPACE}.GLTilde.group"),
+        ("AutPairQuot", f"{STRONG_GROUP_ACTION_NAMESPACE}.AutPairQuot"),
+        ("group", f"{STRONG_GROUP_ACTION_NAMESPACE}.AutPairQuot.group"),
+        (
+            "mulAction",
+            f"{STRONG_GROUP_ACTION_NAMESPACE}.AutPairQuot.mulAction",
+        ),
+        (
+            "gltildeSlicingMulAction",
+            f"{STRONG_GROUP_ACTION_NAMESPACE}.gltildeSlicingMulAction",
+        ),
     ]
     if review_aliases != expected_review_aliases:
         failures.append(
-            f"{REVIEW_GROUP_ACTION_COMPATIBILITY.relative_to(ROOT)}: expected "
-            f"exactly the six human-review aliases {expected_review_aliases}, "
+            f"{RESTATE_GROUP_ACTION_NAMES.relative_to(ROOT)}: expected "
+            f"exactly the six restatement-only aliases {expected_review_aliases}, "
             f"found {review_aliases}"
         )
     if review_group_action_text.count("@[deprecated") != len(
         expected_review_aliases
     ):
         failures.append(
-            f"{REVIEW_GROUP_ACTION_COMPATIBILITY.relative_to(ROOT)}: every "
-            "human-review alias must be deprecated"
+            f"{RESTATE_GROUP_ACTION_NAMES.relative_to(ROOT)}: every "
+            "restatement-only alias must be deprecated"
         )
-    if STRONG_GROUP_ACTION_NAMESPACE not in review_group_action_text:
+    review_group_action_module = "RestateHistoricalNames"
+    restate_executable = ROOT / "exe" / "Restate.lean"
+    restate_text = restate_executable.read_text(encoding="utf-8")
+    restate_imports = [
+        match.group(1)
+        for line in restate_text.splitlines()
+        if (match := IMPORT.match(line)) is not None
+    ]
+    if review_group_action_module not in restate_imports:
         failures.append(
-            f"{REVIEW_GROUP_ACTION_COMPATIBILITY.relative_to(ROOT)}: review "
-            "aliases must point to the Bridgeland strong-child namespace"
+            "exe/Restate.lean must import the executable-only GroupAction "
+            "human-review bridge"
         )
-    review_group_action_module = (
-        "DerivedAlgGeo.Compatibility.StabilityConditionGroupActionReview"
-    )
-    compatibility_umbrella = SOURCE_ROOT / "Compatibility.lean"
-    if review_group_action_module not in imports_by_path[compatibility_umbrella]:
+    if not re.search(
+        r"additionalRoots\s*:=\s*\[[^\]]*`RestateHistoricalNames",
+        restate_text,
+        re.DOTALL,
+    ):
         failures.append(
-            "DerivedAlgGeo/Compatibility.lean must export the temporary "
-            "GroupAction human-review bridge"
+            "exe/Restate.lean must load RestateHistoricalNames into the "
+            "fresh restatement environment"
         )
-    for path, modules in imports_by_path.items():
+    tracked_lean_paths = list(SOURCE_ROOT.rglob("*.lean"))
+    tracked_lean_paths.extend((ROOT / "scripts").rglob("*.lean"))
+    tracked_lean_paths.extend((ROOT / "exe").rglob("*.lean"))
+    tracked_lean_paths.extend(ROOT.glob("*.lean"))
+    for path in sorted(set(tracked_lean_paths)):
+        path_text = path.read_text(encoding="utf-8")
+        modules = [
+            match.group(1)
+            for line in path_text.splitlines()
+            if (match := IMPORT.match(line)) is not None
+        ]
+        if path != restate_executable and review_group_action_module in modules:
+            failures.append(
+                f"{path.relative_to(ROOT)}: only the restatement executable "
+                "may import the GroupAction human-review bridge"
+            )
         if (
-            path != compatibility_umbrella
-            and review_group_action_module in modules
+            path != RESTATE_GROUP_ACTION_NAMES
+            and RETIRED_STRONG_GROUP_ACTION_NAMESPACE in path_text
         ):
             failures.append(
-                f"{path.relative_to(ROOT)}: only the Compatibility umbrella "
-                "may import the temporary GroupAction human-review bridge"
+                f"{path.relative_to(ROOT)}: only the executable restatement "
+                "bridge may mention the retired GroupAction namespace"
             )
 
     weak_parent_paths = [weak_stability_umbrella]
@@ -931,10 +967,7 @@ def main() -> int:
                 f"{path.relative_to(ROOT)}: declaration restored the retired "
                 f"namespace {RETIRED_STRONG_DEFORMATION_NAMESPACE}"
             )
-        if (
-            path != REVIEW_GROUP_ACTION_COMPATIBILITY
-            and RETIRED_STRONG_GROUP_ACTION_NAMESPACE in text
-        ):
+        if RETIRED_STRONG_GROUP_ACTION_NAMESPACE in text:
             failures.append(
                 f"{path.relative_to(ROOT)}: declaration restored the retired "
                 f"strong-sibling namespace {RETIRED_STRONG_GROUP_ACTION_NAMESPACE}"
@@ -1165,7 +1198,7 @@ def main() -> int:
     )
     print(
         "ok: Bridgeland GroupAction declarations use the matching strong-child "
-        "namespace; only the human-review bridge retains the retired name"
+        "namespace; retired names are confined to the executable restatement bridge"
     )
     print(
         "ok: Bridgeland deformation helpers use the matching strong-child "
