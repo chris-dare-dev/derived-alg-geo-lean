@@ -143,18 +143,18 @@ equivalence -- so a clean axiom list here says the transport follows from that
 datum, not that any kernel provides it.
 -/
 
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.mk.inj
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.corr
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.kernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.equiv
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.iso
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.map_eq_transformK₀
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.of_obj_eq
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.actStab
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.actStab_slicing
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.actStab_Z
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.corr
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.iso
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.map_eq_transformK₀
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.of_obj_eq
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStab
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStab_slicing
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStab_Z
 
 /-! ## The dual kernel
 
@@ -168,20 +168,20 @@ see the adjoint-kernel section at the end of this file. It does not change
 the status of `DualKernel` as a supplied datum; it moves the supply point.
 -/
 
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.mk.inj
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.dual
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.invIso
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.map_inverse_eq_transformK₀
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀_dual_comp
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀_comp_dual
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀AddEquiv
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀AddEquiv_apply
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀AddEquiv_symm_apply
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.actStabOfDual
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.actStabOfDual_slicing
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.actStabOfDual_Z
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.invIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.map_inverse_eq_transformK₀
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀_dual_comp
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀_comp_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀AddEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀AddEquiv_apply
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀AddEquiv_symm_apply
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStabOfDual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStabOfDual_slicing
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStabOfDual_Z
 
 /-! ## Kernel autoequivalences as elements of the acting group
 
@@ -193,11 +193,11 @@ kernel provides either. This is a map on elements only -- it is NOT a monoid
 homomorphism, and the module docstring says why.
 -/
 
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.toTriEquiv
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.toAutPair
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.toAutPair_lam
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.toAutPair_act
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.mk_toAutPair_smul
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.toTriEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.toAutPair
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.toAutPair_lam
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.toAutPair_act
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.mk_toAutPair_smul
 
 /-! ## Composing two transports
 
@@ -216,10 +216,10 @@ composite, whose kernel is the convolution.
 #print axioms CategoryTheory.Triangulated.Slicing.mapEquiv_trans
 #print axioms CategoryTheory.Triangulated.hlam_trans
 #print axioms CategoryTheory.Triangulated.actStabAut_trans
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.trans
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.trans_kernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.trans_equiv
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.actStab_trans
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.trans
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.trans_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.trans_equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStab_trans
 
 /-! ## The unit kernel
 
@@ -231,17 +231,17 @@ dual kernel -- `Equivalence.refl.inverse` is `𝟭 C` -- so every `DualKernel`
 consequence applies to `KernelAutoequivalence.id`.
 -/
 
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData.mk.inj
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData.unitKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData.unitIso
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.id
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.id_kernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.id_equiv
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.id_corr
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData.toDualKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData.toDualKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.unitKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.unitIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.id
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.id_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.id_equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.id_corr
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.toDualKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.toDualKernel_dual
 
 /-! ## The k-linear Yoneda functor is homological, and its shift sequence
 
@@ -439,19 +439,19 @@ through the derived constructor lands on the same kernel object as
 claimed equal.
 -/
 
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_dual
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_toLeftAdjointKernelData_dual
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_dual
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_toRightAdjointKernelData_dual
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData_adjKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toRightAdjointKernelData
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toRightAdjointKernelData_adjKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData.ofLeftAdjointKernel_dual
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData.toLeftAdjointKernelData
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.UnitKernelData.toLeftAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_toLeftAdjointKernelData_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_toRightAdjointKernelData_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.toRightAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.toRightAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.ofLeftAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.toLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.toLeftAdjointKernelData_adjKernel
 
 
 /-! ## The adjoint-kernel ledger: constituents plus a projection formula
@@ -533,16 +533,16 @@ the bar -- it restates it pointwise, in the shape a geometric criterion
 (Bondal--Orlov) actually has. Nothing here supplies that invertibility.
 -/
 
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.dualKernelOfRightAdjointKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.dualKernelOfRightAdjointKernel_dual
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.isIso_counit
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.isIso_unit
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.ofFullyFaithful
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.ofFullyFaithful_kernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel_corr
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel_kernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.KernelAutoequivalence.transform_isEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.dualKernelOfRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.dualKernelOfRightAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.isIso_counit
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.isIso_unit
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofFullyFaithful
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofFullyFaithful_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofRightAdjointKernel_corr
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofRightAdjointKernel_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.transform_isEquivalence
 
 
 /-! ## Satisfiability witnesses
@@ -576,5 +576,5 @@ structure.
 #print axioms CategoryTheory.Triangulated.FourierMukai.trivialLeftAdjointKernelData_adjKernel
 #print axioms CategoryTheory.Triangulated.FourierMukai.trivialRightAdjointKernelData
 #print axioms CategoryTheory.Triangulated.FourierMukai.trivialRightAdjointKernelData_adjKernel
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.trivialUnitKernelData
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.trivialUnitKernelData_unitKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialUnitKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialUnitKernelData_unitKernel

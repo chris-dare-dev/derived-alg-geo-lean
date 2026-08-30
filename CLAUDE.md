@@ -116,18 +116,24 @@ use `AlgebraicGeometry.DerivedCategory.FourierMukai`. Do not retain neutral
 geometric declarations in a categorical stability-condition namespace merely
 for source compatibility.
 
-`AlgebraicGeometry/StabilityCondition/` is reserved for modules that actually
-consume weak or Bridgeland stability data: semistable loci, relative HN
-constructions, stability base change, and stability-specific Fourier--Mukai
-actions. Never place neutral `Dqc`, derived pullback, or kernel convolution
-there merely because a later stability application uses it.
+The former `AlgebraicGeometry/StabilityCondition/` subtree and
+`AlgebraicGeometry.StabilityCondition` namespace are retired. Keep actual
+semistable loci and relative HN filtrations under
+`AlgebraicGeometry/Moduli/{Semistability,HarderNarasimhan}/`; keep neutral
+Fourier--Mukai kernels under `AlgebraicGeometry/DerivedCategory/FourierMukai/`.
+Attach the declarations that implement a weak- or Bridgeland-stability
+interface to that categorical source through its explicit
+`Instances/AlgebraicGeometry/` leaf. Geometric source modules must not import
+those leaves, so the direction remains categorical source plus geometry into
+the instance bridge.
 
-Match those specialized namespaces too. Stability-family geometry uses
-`AlgebraicGeometry.StabilityCondition.Families`, and stability-specific kernel
-actions use `AlgebraicGeometry.StabilityCondition.FourierMukai`. Neutral
-perfect-complex moduli and geometry-registration instances stay with their
-geometric owners; do not qualify any of these declarations through the retired
-flattened categorical stability-family namespace.
+The generic kernel-autoequivalence source lives under
+`CategoryTheory/Triangulated/FourierMukai/`. Its action on Bridgeland stability
+belongs under the strong stability child's `Symmetry/Autoequivalence/`
+subtree, and its scheme-specific action adapter belongs in that source's
+`Instances/AlgebraicGeometry/` leaf. A bridge may extend either its categorical
+source namespace or the namespace of the geometric object it realizes; its
+physical path records which interface it implements.
 
 The generic family root also owns its declaration namespace:
 `TriangulatedFiberFamily`, `BoundednessProblem`, and other neutral family APIs
@@ -160,11 +166,12 @@ Bridgeland wall declarations likewise use the matching strong-child namespace
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`,
 not the former sibling `CategoryTheory.Triangulated.StabilityCondition.Wall`.
 
-Categorical Fourier--Mukai actions on Bridgeland stability conditions use the
-matching strong-child namespace
-`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry`,
-not the former sibling
-`CategoryTheory.Triangulated.StabilityCondition.Symmetry`.
+Generic kernel autoequivalences and their Bridgeland-action extensions use the
+canonical `CategoryTheory.Triangulated.FourierMukai` namespace even though the
+strong-dependent implementation lives in the stability child's `Symmetry/`
+subtree. Do not route these declarations through either stability `Symmetry`
+namespace; the former sibling
+`CategoryTheory.Triangulated.StabilityCondition.Symmetry` remains retired.
 
 Group actions on slicings, pre-stability conditions, and Bridgeland stability
 conditions use the matching strong-child namespace

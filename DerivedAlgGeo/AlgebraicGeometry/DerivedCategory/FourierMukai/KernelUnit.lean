@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelConvolution
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.Autoequivalence.FourierMukai
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Autoequivalence
 
 /-!
 # The unit kernel `𝒪_Δ`: the third ledger
@@ -66,7 +66,7 @@ a `comm` **guard** — deliberately not consumed by the derivation, which uses
 
 universe u
 
-namespace AlgebraicGeometry.StabilityCondition.FourierMukai
+namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory.Families
@@ -74,8 +74,6 @@ open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
-open CategoryTheory.Triangulated.StabilityCondition
-open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 open AlgebraicGeometry
 open SchemeBaseChange
 
@@ -245,7 +243,8 @@ noncomputable def geometricUnitKernelData {X Z : SchemeBaseChange S}
     [HasDerivedPushforward q] [HasDerivedPushforward δ]
     [HasProjectionFormulaRight δ]
     [HasPullbackRetraction δ p] [HasPushforwardRetraction δ q] :
-    Symmetry.UnitKernelData (geometricCorrespondence X X Z p q) where
+    CategoryTheory.Triangulated.FourierMukai.UnitKernelData
+      (geometricCorrespondence X X Z p q) where
   unitKernel := diagonalKernel δ
   unitIso := geometricUnitIso p q δ
 
@@ -263,4 +262,4 @@ dualizing complex) and the unit's compatibility with convolution (needs
 `convKernel` with `diagonalKernel`).
 -/
 
-end AlgebraicGeometry.StabilityCondition.FourierMukai
+end AlgebraicGeometry.DerivedCategory.FourierMukai

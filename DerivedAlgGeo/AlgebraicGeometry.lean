@@ -16,7 +16,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical
 import DerivedAlgGeo.AlgebraicGeometry.Proj
 import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch
 import DerivedAlgGeo.AlgebraicGeometry.Stacks
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition
 import DerivedAlgGeo.AlgebraicGeometry.Surface
 import DerivedAlgGeo.AlgebraicGeometry.Variety
 import DerivedAlgGeo.AlgebraicGeometry.Spec

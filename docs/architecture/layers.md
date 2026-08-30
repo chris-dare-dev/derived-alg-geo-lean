@@ -55,9 +55,10 @@ In particular:
   `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`;
 - scheme-derived categories, `Dqc`, derived pullback, and geometric kernel
   realizations live below `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory`;
-- scheme semistable loci, relative HN data, and other constructions that
-  actually consume stability data live below
-  `DerivedAlgGeo.AlgebraicGeometry.StabilityCondition`;
+- actual semistable loci and relative HN filtrations live below
+  `DerivedAlgGeo.AlgebraicGeometry.Moduli`, while declarations realizing weak-
+  or Bridgeland-family interfaces live in those categorical sources' explicit
+  `Instances.AlgebraicGeometry` leaves;
 - `CategoryTheory` must not import either `DerivedAlgGeo.AlgebraicGeometry` or
   `Mathlib.AlgebraicGeometry`;
 - `Development` is a leaf layer and must never become a dependency of stable
@@ -88,7 +89,13 @@ CategoryTheory/Triangulated/WeakStabilityCondition
         ├─→ Foundation/Deformation              Bridgeland deformation
         ├─→ Foundation, Phase, Metric, Symmetry, Support, Walls
         ├─→ Families                         abstract categorical families
+        │     └─→ Instances/AlgebraicGeometry scheme-family realizations
+        ├─→ Symmetry/Autoequivalence
+        │     └─→ Instances/AlgebraicGeometry geometric kernel actions
         └─→ WeakCompatibility                strong-to-weak adapters
+
+CategoryTheory/Triangulated/FourierMukai
+  └─→ Autoequivalence                       generic kernel autoequivalences
 
 AlgebraicGeometry/DerivedCategory
   ├─→ Basic                                 module-sheaf derived categories
@@ -96,10 +103,9 @@ AlgebraicGeometry/DerivedCategory
   ├─→ Families                              scheme base change and pullback
   └─→ FourierMukai                          geometric kernels and convolution
 
-AlgebraicGeometry/StabilityCondition
-  ├─→ Families                              semistable loci and relative HN
-  ├─→ FourierMukai                          stability-specific kernel actions
-  └─→ future slope-to-Bridgeland instances  only under valid hypotheses
+AlgebraicGeometry/Moduli
+  ├─→ Semistability                         actual semistable loci
+  └─→ HarderNarasimhan                      actual relative HN filtrations
 ```
 
 The weak umbrella is independently importable and the layering gate rejects
@@ -114,11 +120,16 @@ completed their cutover to `AlgebraicGeometry.DerivedCategory` and
 `AlgebraicGeometry.DerivedCategory.Families`. The `Dqc` subtree has completed
 its cutover to `AlgebraicGeometry.DerivedCategory.Dqc`. Neutral geometric
 Fourier--Mukai declarations have completed their cutover to
-`AlgebraicGeometry.DerivedCategory.FourierMukai`. Stability-family geometry and
-stability-specific Fourier--Mukai actions have completed their cutovers to
-`AlgebraicGeometry.StabilityCondition.Families` and
-`AlgebraicGeometry.StabilityCondition.FourierMukai`. No geometry-owned
-declaration remains in the retired flattened categorical family namespace.
+`AlgebraicGeometry.DerivedCategory.FourierMukai`, and generic kernel
+autoequivalences now live in `CategoryTheory.Triangulated.FourierMukai`.
+Scheme-family and stability-action realizations are attached to their exact
+categorical sources through `Instances.AlgebraicGeometry` leaves. Actual
+semistable loci and relative HN filtrations live in
+`AlgebraicGeometry.Moduli.Semistability` and
+`AlgebraicGeometry.Moduli.HarderNarasimhan`. The former
+`AlgebraicGeometry.StabilityCondition` source and namespace are absent, and no
+geometry-owned declaration remains in the retired flattened categorical family
+namespace.
 Bridgeland wall declarations have also completed their cutover from the former
 sibling namespace to
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`.
@@ -129,9 +140,11 @@ The finite-length simple-charge lattice model has moved from the duplicate
 plural `WeakStabilityCondition/Foundations/` tree into the canonical
 `WeakStabilityCondition/Foundation/StabilityFunction/` subtree, and now uses
 `CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength`.
-The categorical Fourier--Mukai bridge acting on Bridgeland stability
-conditions has completed its cutover from the former sibling namespace to
-`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry`.
+Generic kernel autoequivalences and the strong-child extension that acts on
+Bridgeland stability conditions now share the canonical
+`CategoryTheory.Triangulated.FourierMukai` namespace. The strong-dependent
+implementation remains physically below the stability child's `Symmetry/`
+subtree without creating a second API owner.
 The associated slicing, pre-stability, and stability group actions have
 completed their cutover to
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
@@ -184,24 +197,22 @@ making every dg category triangulated.
 The source-layer gate in `scripts/check_layering.py` reconstructs the collapsed
 graph from every tracked library import, rejects cycles and forbidden reverse
 edges, verifies that the weak-stability parent does not import its Bridgeland
-child, rejects restoration of the former sibling `StabilityCondition` path,
-and verifies that neutral derived geometry does not return to the stability
-subtree.
+child, rejects restoration of either retired `StabilityCondition` path, and
+verifies that algebraic geometry does not import a categorical
+`Instances/AlgebraicGeometry` leaf.
 
 ## AlgebraicGeometry sublayers
 
-The top-level graph alone cannot distinguish a reusable moduli root from a
-Bridgeland-family adapter because both collapse to `AlgebraicGeometry`. The
-finer direction is:
+The top-level graph alone cannot distinguish a categorical source from its
+algebraic-geometric implementation. The finer direction is:
 
 ```text
-StabilityCondition/Families ─┬→ DerivedCategory/Families
-                             └→ categorical stability families
+CategoryTheory/<source>/Instances/AlgebraicGeometry
+  ├─→ CategoryTheory/<source>
+  └─→ AlgebraicGeometry/<geometric owner>
 
-StabilityCondition/FourierMukai → DerivedCategory/FourierMukai
-
-Moduli / Stacks ─┬→ AlgebraicGeometry/DerivedCategory
-                 └→ CategoryTheory/Sites
+AlgebraicGeometry/<geometric owner> → CategoryTheory/<source>
+AlgebraicGeometry/<geometric owner> ↛ Instances/AlgebraicGeometry
 ```
 
 `CategoryTheory/Sites/StackInGroupoids.lean` is the canonical module for the
@@ -217,9 +228,10 @@ active surfaces for issues #721 and #554. Relative-perfect adapters that
 intrinsically define a moduli problem live under `Moduli/PerfectComplex`, not
 under `Dqc`.
 
-The layering gate rejects imports from `Moduli` or `Stacks` into
-`StabilityCondition/Families`. The former six-edge migration allowlist in
-`scripts/layering_reverse_edges.txt` is now empty and must remain empty.
+The layering gate rejects imports from algebraic geometry back into any
+`Instances/AlgebraicGeometry` leaf and rejects restoration of the retired
+`AlgebraicGeometry/StabilityCondition` subtree. The former migration allowlist
+in `scripts/layering_reverse_edges.txt` is empty and must remain empty.
 
 ## Migration compatibility
 
@@ -237,10 +249,8 @@ Scheme-derived category, pullback, and `Dqc` declarations now use
 `AlgebraicGeometry.DerivedCategory.Families`, and
 `AlgebraicGeometry.DerivedCategory.Dqc`, respectively. Neutral geometric
 Fourier--Mukai declarations now use
-`AlgebraicGeometry.DerivedCategory.FourierMukai`. Stability-family geometry and
-stability-specific kernel actions now use
-`AlgebraicGeometry.StabilityCondition.Families` and
-`AlgebraicGeometry.StabilityCondition.FourierMukai`, respectively:
+`AlgebraicGeometry.DerivedCategory.FourierMukai`. Stability realizations use
+the explicit instance umbrellas attached to their categorical sources:
 
 | Client need | Import |
 | --- | --- |
@@ -250,8 +260,10 @@ stability-specific kernel actions now use
 | Scheme-derived categories and `Dqc` | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory` |
 | Scheme-derived pullback | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families` |
 | Geometric kernels and convolution | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai` |
-| Scheme semistability and relative HN | `DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families` |
-| Stability-specific kernel actions | `DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai` |
+| Actual semistable loci and relative HN | `DerivedAlgGeo.AlgebraicGeometry.Moduli` |
+| Weak scheme-family realization | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families.Instances` |
+| Bridgeland scheme-family realizations | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances` |
+| Geometric stability actions of kernels | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.Autoequivalence.Instances` |
 
 The former combined
 `DerivedAlgGeo.Compatibility.StabilityConditionFamilies` import has been

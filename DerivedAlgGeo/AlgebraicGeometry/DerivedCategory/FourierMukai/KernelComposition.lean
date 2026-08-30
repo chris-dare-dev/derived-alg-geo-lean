@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai.KernelSwap
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelSwap
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelConvolution
 
 /-!
@@ -50,7 +50,7 @@ could be joined, which needed the geometric autoequivalence to exist at all
 
 universe u
 
-namespace AlgebraicGeometry.StabilityCondition.FourierMukai
+namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory.Families
@@ -58,8 +58,6 @@ open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
-open CategoryTheory.Triangulated.StabilityCondition
-open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 open AlgebraicGeometry
 open SchemeBaseChange
 
@@ -111,7 +109,7 @@ adjoint-derived kernels, and its equivalence is the composite of the two.
 Nothing is supplied: the convolution data comes from
 `geometricConvolutionData`, whose own `conv` and `compIso` are derived. -/
 @[reducible] noncomputable def geometricTransKernelAutoequivalence :
-    Symmetry.KernelAutoequivalence
+    CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence
       (SchemeBoundedCoherentDerivedCategory X.left)
       (SchemeBoundedCoherentDerivedCategory Z₃.left) :=
   (geometricKernelAutoequivalenceOfAdjoint X Z₁ σ₁ p₁ q₁ K₁).trans
@@ -119,37 +117,6 @@ Nothing is supplied: the convolution data comes from
     (geometricCorrespondence X X Z₃ p₃ q₃)
     (geometricConvolutionData p₁ q₁ p₂ q₂ p₃ q₃ G)
 
-/-- **Transporting along two geometric transforms is transporting along the
-convolved one.**
-
-The composition law, geometrically. `KernelAutoequivalence.actStab_trans` at
-the two geometric autoequivalences and the derived convolution data — so the
-kernel that computes the composite action is `convKernel`, and the action on
-stability conditions is tracked by kernels the whole way.
-
-Conditional on both ledgers and on the invertibility of each assembled
-adjunction's unit and counit; nothing here supplies any of it. -/
-theorem geometricActStabTrans
-    {Λ : Type u} [AddCommGroup Λ]
-    (v : K₀ (SchemeBoundedCoherentDerivedCategory X.left) →+ Λ)
-    {lam₁ lam₂ : Λ →+ Λ}
-    (h₁ : ∀ x, v (K₀.map
-        (geometricKernelAutoequivalenceOfAdjoint X Z₁ σ₁ p₁ q₁ K₁).equiv.inverse x)
-      = lam₁ (v x))
-    (h₂ : ∀ x, v (K₀.map
-        (geometricKernelAutoequivalenceOfAdjoint X Z₂ σ₂ p₂ q₂ K₂).equiv.inverse x)
-      = lam₂ (v x))
-    (s : StabilityCondition.WithClassMap
-      (SchemeBoundedCoherentDerivedCategory X.left) v) :
-    (geometricKernelAutoequivalenceOfAdjoint X Z₂ σ₂ p₂ q₂ K₂).actStab v lam₂ h₂
-        ((geometricKernelAutoequivalenceOfAdjoint X Z₁ σ₁ p₁ q₁ K₁).actStab
-          v lam₁ h₁ s)
-      = (geometricTransKernelAutoequivalence X Z₁ Z₂ Z₃ σ₁ p₁ q₁ K₁ σ₂ p₂ q₂ K₂
-          p₃ q₃ G).actStab v (lam₁.comp lam₂)
-          (hlam_trans v _ _ h₁ h₂) s :=
-  Symmetry.KernelAutoequivalence.actStab_trans v _ _ _
-    (geometricConvolutionData p₁ q₁ p₂ q₂ p₃ q₃ G) h₁ h₂ s
-
 end Composition
 
-end AlgebraicGeometry.StabilityCondition.FourierMukai
+end AlgebraicGeometry.DerivedCategory.FourierMukai

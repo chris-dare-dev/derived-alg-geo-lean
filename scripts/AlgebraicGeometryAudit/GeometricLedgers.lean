@@ -5,7 +5,7 @@ stability-specific kernel actions use their matching algebraic-geometry
 namespace.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.Autoequivalence.Instances
 import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated.Instances.AlgebraicGeometry
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
@@ -138,19 +138,19 @@ the derivation adds nothing beyond its inputs, not that any input is
 constructible.
 -/
 
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasTensorUnit
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasTensorUnit.unit
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasTensorUnit.iso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.hasTensorUnitOfCoherent
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPullbackRetraction
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPullbackRetraction.comm
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPullbackRetraction.iso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPushforwardRetraction
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPushforwardRetraction.comm
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPushforwardRetraction.iso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.diagonalKernel
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricUnitIso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricUnitKernelData
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasTensorUnit
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasTensorUnit.unit
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasTensorUnit.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.hasTensorUnitOfCoherent
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackRetraction
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackRetraction.comm
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackRetraction.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardRetraction
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardRetraction.comm
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardRetraction.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.diagonalKernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricUnitIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricUnitKernelData
 
 /-! ## Associativity of the geometric convolution: the quadruple product
 
@@ -200,16 +200,16 @@ Nothing constructs any input. The tensor and pullback triangle laws now come
 from coherent roots; the remaining seam is promotion of `convKernel` itself
 to abstract coherent convolution data. -/
 
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasUnitPullbackRightUnitor
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasUnitPullbackRightUnitor.iso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasUnitPullbackLeftUnitor
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasUnitPullbackLeftUnitor.iso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.hasUnitPullbackRightUnitorOfMonoidal
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.hasUnitPullbackLeftUnitorOfMonoidal
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricConvUnitLeft
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricConvUnitRight
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricConvolutionLeftUnitData
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricConvolutionRightUnitData
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasUnitPullbackRightUnitor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasUnitPullbackRightUnitor.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasUnitPullbackLeftUnitor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasUnitPullbackLeftUnitor.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.hasUnitPullbackRightUnitorOfMonoidal
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.hasUnitPullbackLeftUnitorOfMonoidal
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConvUnitLeft
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConvUnitRight
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConvolutionLeftUnitData
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConvolutionRightUnitData
 
 
 /-! ## The adjoint ledger: three constituent adjunctions on Db(Coh)
@@ -322,21 +322,21 @@ is the classical theorem the whole lane is conditional on. What is now geometric
 is the dual kernel of one, not the equivalence.
 -/
 
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPullbackSwap
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPullbackSwap.comm
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPullbackSwap.iso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPushforwardSwap
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPushforwardSwap.comm
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.HasPushforwardSwap.iso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricDualAdjointKernelData
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricDualAdjointKernelData_adjKernel
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricDualKernel
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricDualKernelObj
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricDualKernel_dual
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricKernelAutoequivalence
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricSwapIso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.pullbackSwapIso
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.pushforwardSwapIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackSwap
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackSwap.comm
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackSwap.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardSwap
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardSwap.comm
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardSwap.iso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualAdjointKernelData
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualAdjointKernelData_adjKernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernelObj
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernel_dual
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricKernelAutoequivalence
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricSwapIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.pullbackSwapIso
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.pushforwardSwapIso
 
 
 /-! ## A geometric kernel autoequivalence with no supplied equivalence
@@ -353,10 +353,10 @@ the ledger plus that invertibility, and says nothing about whether any transform
 satisfies it.
 -/
 
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricDualKernelOfAdjoint
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricDualKernelOfAdjoint_dual
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricKernelAutoequivalenceOfAdjoint
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricKernelAutoequivalenceOfAdjoint_kernel
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernelOfAdjoint
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernelOfAdjoint_dual
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricKernelAutoequivalenceOfAdjoint
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricKernelAutoequivalenceOfAdjoint_kernel
 
 
 /-! ## The geometric side reaches the stability transport
@@ -384,7 +384,7 @@ clean axiom list here says the transport follows from it, not that any scheme
 supplies it.
 -/
 
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricActStabOfDual
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricActStabOfDual
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricTransform_additive
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricTransform_isTriangulated
 
@@ -407,8 +407,8 @@ no monoid, no group of geometric kernel autoequivalences, and no `toAutPair` for
 the composite.
 -/
 
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricActStabTrans
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricTransKernelAutoequivalence
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricActStabTrans
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricTransKernelAutoequivalence
 
 
 /-! ## The geometric transform as an element of the acting group
@@ -434,5 +434,5 @@ Still conditional on the whole uninhabited ledger, and still no monoid map: this
 is membership for ONE element, not a homomorphism from anything.
 -/
 
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricMk_toAutPair_smul
-#print axioms AlgebraicGeometry.StabilityCondition.FourierMukai.geometricToAutPair
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricMk_toAutPair_smul
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricToAutPair

@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai.KernelUnit
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelUnit
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelAssociativity
 
 /-!
@@ -53,7 +53,7 @@ unit comparison to its tensorator and whose source and target
 
 universe u
 
-namespace AlgebraicGeometry.StabilityCondition.FourierMukai
+namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory.Families
@@ -61,7 +61,6 @@ open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
-open CategoryTheory.Triangulated.StabilityCondition
 open AlgebraicGeometry
 open SchemeBaseChange
 
@@ -324,4 +323,4 @@ pullback coherence now come from the monoidal roots. Still absent is a proof
 that the geometric `convKernel` construction assembles the abstract
 `CoherentConvolutionData`, as well as `DualKernel`. -/
 
-end AlgebraicGeometry.StabilityCondition.FourierMukai
+end AlgebraicGeometry.DerivedCategory.FourierMukai

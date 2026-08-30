@@ -7,7 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPullbackC
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Phase.Transfer.InducingBoundary
 
 /-!
-# Inducing data for scheme-derived pullback
+# Scheme-derived pullback realizes categorical inducing data
 
 This file connects the concrete exact derived pullback on scheme fibers to the
 honest preimage-slicing boundary.  A `DerivedPullbackInducingData` records the
@@ -23,7 +23,7 @@ and compositor.  No geometric slicing, openness, relative HN, bounded
 coherent/perfect restriction, or conclusion of Theorem 22.2 is asserted.
 -/
 
-namespace AlgebraicGeometry.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -153,4 +153,4 @@ end SchemeBaseChange
 
 end
 
-end AlgebraicGeometry.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

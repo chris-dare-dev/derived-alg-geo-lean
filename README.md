@@ -26,7 +26,7 @@ Library code should prefer the narrowest useful subject import, such as:
 ```lean
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition
+import DerivedAlgGeo.AlgebraicGeometry.Moduli
 import DerivedAlgGeo.CategoryTheory.Monoidal
 import DerivedAlgGeo.CategoryTheory.Enriched.DGCategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
@@ -50,12 +50,12 @@ See `CONTRIBUTING.md` §"Where verification runs".
 ## Layout
 
 - `DerivedAlgGeo/AlgebraicGeometry` — coherent sheaves, scheme-derived
-  categories and `Dqc`, geometric Fourier--Mukai kernels, stability
-  applications, cohomology, duality, intersection theory, Proj, and
-  Riemann--Roch.
+  categories and `Dqc`, geometric Fourier--Mukai kernels, semistable moduli,
+  cohomology, duality, intersection theory, Proj, and Riemann--Roch.
 - `DerivedAlgGeo/CategoryTheory` — monoidal and enriched category theory, raw
   and pretriangulated dg categories, dg enhancements, t-structures, and
-  stability conditions.
+  stability conditions. Algebraic-geometric implementations of categorical
+  interfaces are explicit `Instances/AlgebraicGeometry/` leaves here.
 - `DerivedAlgGeo/LinearAlgebra` — integral and Mukai lattices and matrix tools.
 - `DerivedAlgGeo/Algebra` and `DerivedAlgGeo/Topology` — reusable supporting
   mathematics.

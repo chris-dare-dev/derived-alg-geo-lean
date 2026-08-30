@@ -6,12 +6,12 @@ by their declared owners. This gate collapses imports to the top-level subject
 directories, rejects cycles in that graph, and enforces the CategoryTheory /
 AlgebraicGeometry ownership boundary introduced by issue #601.
 
-The top-level collapse cannot see a reusable moduli or stack root importing a
-Bridgeland-family leaf because both live below ``AlgebraicGeometry``. Issue
-#850 adds that finer boundary here. The former exact-pair migration allowlist
-has been burned to zero; stale entries still fail so exceptions cannot return
-silently. The gate also keeps neutral, weak, Bridgeland, and geometric family
-declarations in the namespaces matching their owners.
+The virtual ``GeometryInstances`` owner records explicit
+``Instances/AlgebraicGeometry`` leaves below categorical sources. The gate
+forbids algebraic geometry from importing back into those realization leaves,
+rejects restoration of the retired geometric stability subtree, and keeps the
+migration allowlist burned to zero. It also keeps neutral, weak, Bridgeland,
+and geometric family declarations in the namespaces matching their owners.
 """
 
 from __future__ import annotations
@@ -32,10 +32,13 @@ GEOMETRY_OWNER = "AlgebraicGeometry"
 GEOMETRY_INSTANCES_OWNER = "GeometryInstances"
 GEOMETRY_INSTANCE_UMBRELLAS = {
     "DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated.Instances",
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+    "Families.Instances",
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+    "StabilityCondition.Families.Instances",
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+    "StabilityCondition.Symmetry.Autoequivalence.Instances",
 }
-STABILITY_FAMILIES_ROOT = (
-    "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families"
-)
 GENERIC_FAMILIES_NAMESPACE = "CategoryTheory.Triangulated.Families"
 GENERIC_STACKS_NAMESPACE = "CategoryTheory"
 DERIVED_CATEGORY_NAMESPACE = "AlgebraicGeometry.DerivedCategory"
@@ -44,12 +47,11 @@ DQC_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Dqc"
 GEOMETRIC_FOURIER_MUKAI_NAMESPACE = (
     "AlgebraicGeometry.DerivedCategory.FourierMukai"
 )
-STABILITY_GEOMETRY_FAMILIES_NAMESPACE = (
-    "AlgebraicGeometry.StabilityCondition.Families"
+CATEGORICAL_FOURIER_MUKAI_NAMESPACE = (
+    "CategoryTheory.Triangulated.FourierMukai"
 )
-STABILITY_GEOMETRY_FOURIER_MUKAI_NAMESPACE = (
-    "AlgebraicGeometry.StabilityCondition.FourierMukai"
-)
+GEOMETRIC_HN_NAMESPACE = "AlgebraicGeometry.Moduli.HarderNarasimhan"
+GEOMETRIC_SEMISTABILITY_NAMESPACE = "AlgebraicGeometry.Moduli.Semistability"
 RETIRED_FLATTENED_FAMILIES_NAMESPACE = (
     "CategoryTheory.Triangulated.StabilityCondition.Families"
 )
@@ -77,7 +79,6 @@ STRONG_WALL_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Wall"
 RETIRED_STRONG_WALL_NAMESPACE = (
     "CategoryTheory.Triangulated.StabilityCondition.Wall"
 )
-STRONG_SYMMETRY_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Symmetry"
 RETIRED_STRONG_SYMMETRY_NAMESPACE = (
     "CategoryTheory.Triangulated.StabilityCondition.Symmetry"
 )
@@ -122,21 +123,15 @@ CENSUS_OWNER_IMPORTS = {
     "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
     "StabilityCondition.Families",
     "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory",
-    "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families",
-    "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai",
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+    "StabilityCondition.Families.Instances",
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+    "StabilityCondition.Symmetry.Autoequivalence.Instances",
 }
 LEGACY_GENERIC_FAMILY_DECLARATION = re.compile(
     r"CategoryTheory\.Triangulated\.StabilityCondition\.Families\."
     r"(?:TriangulatedFiberFamily|BoundednessProblem|UniversalBoundedness)\b"
 )
-PROTECTED_GEOMETRY_SUBTREES = {
-    ("AlgebraicGeometry", "Moduli"),
-    ("AlgebraicGeometry", "Stacks"),
-}
-PROTECTED_GEOMETRY_UMBRELLAS = {
-    "AlgebraicGeometry/Moduli.lean",
-    "AlgebraicGeometry/Stacks.lean",
-}
 REVERSE_EDGE_ALLOWLIST = ROOT / "scripts" / "layering_reverse_edges.txt"
 LAYERING_FIXTURES = ROOT / "scripts" / "fixtures" / "layering"
 
@@ -169,21 +164,6 @@ NEUTRAL_DERIVED_FAMILY_MODULES = {
     "Scheme",
     "SchemeDerived",
 }
-RETIRED_STABILITY_FAMILY_MODULES = {
-    "BoundedGeometry",
-    "DerivedPullbackCoherence",
-    "DerivedPullbackLaws",
-    "DerivedPullbackShift",
-    "ExactPullback",
-    "ExactPullbackCoherence",
-    "FlatPullback",
-    "FlatPullbackResolution",
-    "LeftDerivedPullback",
-    "OpenImmersionPullback",
-    "PullbackAcyclicResolution",
-    "ResidueFiber",
-    "SchemeDerived",
-}
 GEOMETRIC_FOURIER_MUKAI_MODULES = {
     "DerivedTensorCoherence",
     "KernelAdjunction",
@@ -191,20 +171,49 @@ GEOMETRIC_FOURIER_MUKAI_MODULES = {
     "KernelConvolution",
     "KernelCorrespondence",
     "KernelDualizingTwist",
-}
-STABILITY_FAMILY_MODULES = {
-    "FiniteTypeGeometry",
-    "GeometricBaseChange",
-    "InducingPullback",
-    "RelativeHN",
-    "Scheme",
-    "SchemeSemistableLocus",
-}
-STABILITY_FOURIER_MUKAI_MODULES = {
     "KernelComposition",
     "KernelSwap",
     "KernelUnit",
     "KernelUnitConvolution",
+}
+GEOMETRIC_MODULI_MODULES = {
+    pathlib.Path("HarderNarasimhan") / "RelativeFiltration.lean":
+        GEOMETRIC_HN_NAMESPACE,
+    pathlib.Path("Semistability") / "Locus.lean":
+        GEOMETRIC_SEMISTABILITY_NAMESPACE,
+}
+GEOMETRIC_INSTANCE_MODULES = {
+    pathlib.Path("CategoryTheory/Triangulated/WeakStabilityCondition/Families/")
+    / "Instances/AlgebraicGeometry/Scheme.lean",
+    pathlib.Path(
+        "CategoryTheory/Triangulated/WeakStabilityCondition/"
+        "StabilityCondition/Families/Instances/AlgebraicGeometry/"
+        "DerivedPullback.lean"
+    ),
+    pathlib.Path(
+        "CategoryTheory/Triangulated/WeakStabilityCondition/"
+        "StabilityCondition/Families/Instances/AlgebraicGeometry/"
+        "BoundedCoherentBaseChange.lean"
+    ),
+    pathlib.Path(
+        "CategoryTheory/Triangulated/WeakStabilityCondition/"
+        "StabilityCondition/Families/Instances/AlgebraicGeometry/"
+        "SemistableLocus.lean"
+    ),
+    pathlib.Path(
+        "CategoryTheory/Triangulated/WeakStabilityCondition/"
+        "StabilityCondition/Families/Instances/AlgebraicGeometry/"
+        "RelativeHarderNarasimhan.lean"
+    ),
+    pathlib.Path(
+        "CategoryTheory/Triangulated/WeakStabilityCondition/"
+        "StabilityCondition/Families/Instances/AlgebraicGeometry/FiniteType.lean"
+    ),
+    pathlib.Path(
+        "CategoryTheory/Triangulated/WeakStabilityCondition/"
+        "StabilityCondition/Symmetry/Autoequivalence/Instances/"
+        "AlgebraicGeometry/FourierMukai.lean"
+    ),
 }
 
 
@@ -219,27 +228,30 @@ def owner(path: pathlib.Path) -> str:
     return relative.parts[0] if len(relative.parts) > 1 else relative.stem
 
 
-def is_stability_families_import(module: str) -> bool:
-    """Whether ``module`` is the family leaf forbidden to reusable AG roots."""
+def is_geometry_instance_import(module: str) -> bool:
+    """Whether ``module`` is an algebraic-geometric categorical bridge."""
 
-    return module == STABILITY_FAMILIES_ROOT or module.startswith(
-        STABILITY_FAMILIES_ROOT + "."
+    parts = module.split(".")
+    return (
+        module in GEOMETRY_INSTANCE_UMBRELLAS
+        or (
+            len(parts) >= 3
+            and parts[:2] == ["DerivedAlgGeo", GENERIC_OWNER]
+            and has_geometry_instances_segment(parts[2:])
+        )
     )
 
 
-def is_protected_geometry_source(relative: pathlib.PurePath) -> bool:
-    """Whether ``relative`` is a reusable Moduli/Stacks root module."""
+def is_geometry_source(relative: pathlib.PurePath) -> bool:
+    """Whether ``relative`` is owned by AlgebraicGeometry."""
 
-    return relative.as_posix() in PROTECTED_GEOMETRY_UMBRELLAS or (
-        len(relative.parts) >= 2
-        and tuple(relative.parts[:2]) in PROTECTED_GEOMETRY_SUBTREES
-    )
+    return bool(relative.parts) and relative.parts[0] == GEOMETRY_OWNER
 
 
 def collect_geometry_reverse_edges(
     source_root: pathlib.Path, pattern: str = "*.lean"
 ) -> list[tuple[str, int, str]]:
-    """Collect protected-root imports of stability-family leaves.
+    """Collect algebraic-geometry imports of categorical instance leaves.
 
     Source names are relative to ``source_root`` so the same scanner can run
     against both the repository and the known-answer fixture trees.
@@ -248,13 +260,13 @@ def collect_geometry_reverse_edges(
     edges: list[tuple[str, int, str]] = []
     for path in sorted(source_root.rglob(pattern)):
         relative = path.relative_to(source_root)
-        if not is_protected_geometry_source(relative):
+        if not is_geometry_source(relative):
             continue
         for line_number, line in enumerate(
             path.read_text(encoding="utf-8").splitlines(), 1
         ):
             match = IMPORT.match(line)
-            if match is not None and is_stability_families_import(match.group(1)):
+            if match is not None and is_geometry_instance_import(match.group(1)):
                 edges.append((relative.as_posix(), line_number, match.group(1)))
     return edges
 
@@ -285,12 +297,12 @@ def load_reverse_edge_allowlist() -> tuple[set[tuple[str, str]], list[str]]:
         source, module = fields
         source_path = pathlib.PurePosixPath(source)
         if (
-            not is_protected_geometry_source(source_path)
-            or not is_stability_families_import(module)
+            not is_geometry_source(source_path)
+            or not is_geometry_instance_import(module)
         ):
             failures.append(
                 f"{REVERSE_EDGE_ALLOWLIST.relative_to(ROOT)}:{line_number}: "
-                "entry is outside the guarded Moduli/Stacks-to-Families boundary"
+                "entry is outside the guarded geometry-to-instance boundary"
             )
             continue
         edge = (source, module)
@@ -327,7 +339,9 @@ def check_layering_fixtures() -> list[str]:
     expected = {
         (
             "AlgebraicGeometry/Stacks/Forbidden.imports",
-            STABILITY_FAMILIES_ROOT + ".Dqc",
+            "DerivedAlgGeo.CategoryTheory.Triangulated."
+            "WeakStabilityCondition.StabilityCondition.Families."
+            "Instances.AlgebraicGeometry.SemistableLocus",
         )
     }
     if actual != expected:
@@ -488,6 +502,22 @@ def main() -> int:
             "legacy sibling CategoryTheory/Triangulated/StabilityCondition "
             "path restored; Bridgeland stability is the child of "
             "WeakStabilityCondition"
+        )
+
+    retired_geometric_stability_root = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "StabilityCondition"
+    )
+    retired_geometric_stability_umbrella = (
+        retired_geometric_stability_root.with_suffix(".lean")
+    )
+    if (
+        retired_geometric_stability_root.exists()
+        or retired_geometric_stability_umbrella.exists()
+    ):
+        failures.append(
+            "retired AlgebraicGeometry/StabilityCondition path restored; "
+            "geometric objects belong to their geometric owner and adapters "
+            "belong to categorical Instances/AlgebraicGeometry leaves"
         )
 
     generic_stacks_source = (
@@ -668,13 +698,13 @@ def main() -> int:
         encoding="utf-8"
     )
     if (
-        f"namespace {STRONG_SYMMETRY_NAMESPACE}"
+        f"namespace {CATEGORICAL_FOURIER_MUKAI_NAMESPACE}"
         not in strong_symmetry_bridge_text
     ):
         failures.append(
             f"{strong_symmetry_bridge.relative_to(ROOT)}: Bridgeland "
-            f"Fourier--Mukai symmetry declarations must use namespace "
-            f"{STRONG_SYMMETRY_NAMESPACE}"
+            "Fourier--Mukai extensions must use the canonical kernel "
+            f"namespace {CATEGORICAL_FOURIER_MUKAI_NAMESPACE}"
         )
 
     for relative in (
@@ -801,9 +831,6 @@ def main() -> int:
         )
 
     generic_families_root = strong_stability_root / "Families"
-    stability_families_root = (
-        SOURCE_ROOT / "AlgebraicGeometry" / "StabilityCondition" / "Families"
-    )
     neutral_derived_families_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "Families"
     )
@@ -855,41 +882,50 @@ def main() -> int:
                 f"{path.relative_to(ROOT)}: geometric Fourier--Mukai "
                 "declarations restored the legacy stability namespace"
             )
-    stability_fourier_mukai_root = (
-        SOURCE_ROOT / "AlgebraicGeometry" / "StabilityCondition" / "FourierMukai"
+    categorical_fourier_mukai_autoequivalence = (
+        SOURCE_ROOT / "CategoryTheory" / "Triangulated" / "FourierMukai"
+        / "Autoequivalence.lean"
     )
-    for path in sorted(stability_families_root.glob("*.lean")):
-        text = path.read_text(encoding="utf-8")
-        if f"namespace {STABILITY_GEOMETRY_FAMILIES_NAMESPACE}" not in text:
+    categorical_fourier_mukai_text = (
+        categorical_fourier_mukai_autoequivalence.read_text(encoding="utf-8")
+    )
+    if (
+        f"namespace {CATEGORICAL_FOURIER_MUKAI_NAMESPACE}"
+        not in categorical_fourier_mukai_text
+    ):
+        failures.append(
+            f"{categorical_fourier_mukai_autoequivalence.relative_to(ROOT)}: "
+            "generic kernel autoequivalences must use namespace "
+            f"{CATEGORICAL_FOURIER_MUKAI_NAMESPACE}"
+        )
+
+    geometric_moduli_root = SOURCE_ROOT / "AlgebraicGeometry" / "Moduli"
+    for relative, namespace in GEOMETRIC_MODULI_MODULES.items():
+        path = geometric_moduli_root / relative
+        if not path.is_file():
             failures.append(
-                f"{path.relative_to(ROOT)}: stability-family geometry must "
-                f"use namespace {STABILITY_GEOMETRY_FAMILIES_NAMESPACE}"
+                f"geometric stability object missing: {path.relative_to(ROOT)}"
             )
-    for path in sorted(stability_fourier_mukai_root.glob("*.lean")):
+            continue
         text = path.read_text(encoding="utf-8")
-        if (
-            f"namespace {STABILITY_GEOMETRY_FOURIER_MUKAI_NAMESPACE}"
-            not in text
-        ):
+        if f"namespace {namespace}" not in text:
             failures.append(
-                f"{path.relative_to(ROOT)}: stability-specific "
-                f"Fourier--Mukai declarations must use namespace "
-                f"{STABILITY_GEOMETRY_FOURIER_MUKAI_NAMESPACE}"
+                f"{path.relative_to(ROOT)}: geometric stability objects must "
+                f"use namespace {namespace}"
             )
-        if re.search(
-            r"\bSymmetry\.(?:KernelAutoequivalence|UnitKernelData)\b", text
-        ):
-            uses_strong_child = (
-                f"open {STRONG_STABILITY_NAMESPACE}" in text
-                or STRONG_SYMMETRY_NAMESPACE in text
+
+    for relative in sorted(GEOMETRIC_INSTANCE_MODULES):
+        path = SOURCE_ROOT / relative
+        if not path.is_file():
+            failures.append(
+                f"algebraic-geometric categorical bridge missing: "
+                f"{path.relative_to(ROOT)}"
             )
-            if not uses_strong_child:
-                failures.append(
-                    f"{path.relative_to(ROOT)}: stability-specific "
-                    "Fourier--Mukai consumer must open or qualify the "
-                    f"Bridgeland strong-child namespace "
-                    f"{STRONG_STABILITY_NAMESPACE}"
-                )
+        elif owner(path) != GEOMETRY_INSTANCES_OWNER:
+            failures.append(
+                f"{path.relative_to(ROOT)}: bridge is not classified as "
+                f"{GEOMETRY_INSTANCES_OWNER}"
+            )
 
     perfect_complex_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Moduli" / "PerfectComplex"
@@ -942,6 +978,11 @@ def main() -> int:
 
     for path in sorted(SOURCE_ROOT.rglob("*.lean")):
         text = path.read_text(encoding="utf-8")
+        if "AlgebraicGeometry.StabilityCondition" in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: declaration or import restored the "
+                "retired AlgebraicGeometry.StabilityCondition namespace"
+            )
         if legacy_geometric_namespace in text:
             failures.append(
                 f"{path.relative_to(ROOT)}: declaration restored the retired "
@@ -974,10 +1015,7 @@ def main() -> int:
             )
 
     all_geometry_modules = (
-        NEUTRAL_DERIVED_FAMILY_MODULES
-        | GEOMETRIC_FOURIER_MUKAI_MODULES
-        | STABILITY_FAMILY_MODULES
-        | STABILITY_FOURIER_MUKAI_MODULES
+        NEUTRAL_DERIVED_FAMILY_MODULES | GEOMETRIC_FOURIER_MUKAI_MODULES
     )
     for module in sorted(all_geometry_modules):
         legacy = generic_families_root / f"{module}.lean"
@@ -995,62 +1033,20 @@ def main() -> int:
                 f"{relocated.relative_to(ROOT)}"
             )
 
-    for module in sorted(RETIRED_STABILITY_FAMILY_MODULES):
-        legacy = stability_families_root / f"{module}.lean"
-        if legacy.exists():
-            failures.append(
-                f"neutral derived-category module restored below stability: "
-                f"{legacy.relative_to(ROOT)}"
-            )
-
     for module in sorted(GEOMETRIC_FOURIER_MUKAI_MODULES):
         relocated = geometric_fourier_mukai_root / f"{module}.lean"
-        legacy = stability_families_root / f"{module}.lean"
         if not relocated.exists():
             failures.append(
                 f"geometric Fourier--Mukai module missing: "
                 f"{relocated.relative_to(ROOT)}"
             )
-        if legacy.exists():
-            failures.append(
-                f"neutral Fourier--Mukai module restored below stability: "
-                f"{legacy.relative_to(ROOT)}"
-            )
-
-    for module in sorted(STABILITY_FAMILY_MODULES):
-        relocated = stability_families_root / f"{module}.lean"
-        if not relocated.exists():
-            failures.append(
-                f"stability-specific family module missing: "
-                f"{relocated.relative_to(ROOT)}"
-            )
-
-    for module in sorted(STABILITY_FOURIER_MUKAI_MODULES):
-        relocated = stability_fourier_mukai_root / f"{module}.lean"
-        legacy = stability_families_root / f"{module}.lean"
-        if not relocated.exists():
-            failures.append(
-                f"stability-specific Fourier--Mukai module missing: "
-                f"{relocated.relative_to(ROOT)}"
-            )
-        if legacy.exists():
-            failures.append(
-                f"stability Fourier--Mukai module restored below Families: "
-                f"{legacy.relative_to(ROOT)}"
-            )
 
     legacy_dqc = generic_families_root / "Dqc"
-    retired_stability_dqc = stability_families_root / "Dqc"
     relocated_dqc = SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "Dqc"
     if legacy_dqc.exists():
         failures.append(
             f"geometry-owned subtree restored below CategoryTheory: "
             f"{legacy_dqc.relative_to(ROOT)}"
-        )
-    if retired_stability_dqc.exists():
-        failures.append(
-            f"neutral Dqc subtree restored below stability: "
-            f"{retired_stability_dqc.relative_to(ROOT)}"
         )
     if not relocated_dqc.is_dir():
         failures.append(
@@ -1088,8 +1084,8 @@ def main() -> int:
     for source, line_number, module in reverse_edges:
         if (source, module) not in allowed_reverse_edges:
             failures.append(
-                f"DerivedAlgGeo/{source}:{line_number}: reusable geometry root "
-                f"imports stability-family leaf {module}"
+                f"DerivedAlgGeo/{source}:{line_number}: algebraic geometry "
+                f"imports categorical realization leaf {module}"
             )
     for source, module in sorted(
         allowed_reverse_edges - observed_reverse_edges
@@ -1193,8 +1189,8 @@ def main() -> int:
         "namespace"
     )
     print(
-        "ok: Bridgeland Fourier--Mukai symmetry declarations use the matching "
-        "strong-child namespace"
+        "ok: generic kernel autoequivalences use the categorical Fourier--Mukai "
+        "namespace and Bridgeland actions extend it from the strong child"
     )
     print(
         "ok: Bridgeland GroupAction declarations use the matching strong-child "
@@ -1214,8 +1210,8 @@ def main() -> int:
         "namespaces"
     )
     print(
-        "ok: stability-family geometry and stability-specific Fourier--Mukai "
-        "actions use their matching AlgebraicGeometry namespaces"
+        "ok: semistable loci and relative HN filtrations use their Moduli "
+        "namespaces; categorical realizations use explicit geometry-instance leaves"
     )
     print(
         "ok: the retired flattened categorical stability-family namespace is "
@@ -1223,15 +1219,15 @@ def main() -> int:
     )
     print(
         "ok: neutral scheme-derived families, geometric Fourier--Mukai, and "
-        "stability-specific geometry have distinct AlgebraicGeometry owners"
+        "stability realizations have distinct owners"
     )
     print(
-        "ok: Moduli/Stacks reverse-edge fixtures distinguish allowed and "
-        "forbidden imports"
+        "ok: geometry-to-instance reverse-edge fixtures distinguish allowed "
+        "and forbidden imports"
     )
     print(
-        f"ok: {len(reverse_edges)} measured Moduli/Stacks -> "
-        "StabilityCondition/Families edge(s); the migration allowlist is empty"
+        f"ok: {len(reverse_edges)} measured AlgebraicGeometry -> "
+        "Instances/AlgebraicGeometry edge(s); the migration allowlist is empty"
     )
     return 0
 

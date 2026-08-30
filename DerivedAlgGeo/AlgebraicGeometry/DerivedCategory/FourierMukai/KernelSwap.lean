@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelDualizingTwist
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.Autoequivalence.FourierMukai
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Autoequivalence
 
 /-!
 # The swap of an endocorrespondence, and a geometric dual kernel
@@ -87,7 +87,7 @@ autoequivalence built on the geometric correspondence, with dual kernel
 
 universe u
 
-namespace AlgebraicGeometry.StabilityCondition.FourierMukai
+namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory.Families
@@ -95,8 +95,6 @@ open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
-open CategoryTheory.Triangulated.StabilityCondition
-open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 open AlgebraicGeometry
 open SchemeBaseChange
 
@@ -238,7 +236,7 @@ noncomputable def geometricKernelAutoequivalence
       SchemeBoundedCoherentDerivedCategory X.left)
     (iso : equiv.functor ≅
       (geometricCorrespondence X X Z p q).transform K) :
-    Symmetry.KernelAutoequivalence
+    CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence
       (SchemeBoundedCoherentDerivedCategory X.left)
       (SchemeBoundedCoherentDerivedCategory Z.left) where
   corr := geometricCorrespondence X X Z p q
@@ -261,9 +259,9 @@ noncomputable def geometricDualKernel
       SchemeBoundedCoherentDerivedCategory X.left)
     (iso : equiv.functor ≅
       (geometricCorrespondence X X Z p q).transform K) :
-    Symmetry.KernelAutoequivalence.DualKernel
+    CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel
       (geometricKernelAutoequivalence X Z p q K equiv iso) :=
-  Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel _
+  CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofRightAdjointKernel _
     (geometricDualAdjointKernelData X Z σ p q K)
 
 @[simp]
@@ -300,10 +298,10 @@ a comparison isomorphism outright. -/
 @[reducible] noncomputable def geometricKernelAutoequivalenceOfAdjoint
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :
-    Symmetry.KernelAutoequivalence
+    CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence
       (SchemeBoundedCoherentDerivedCategory X.left)
       (SchemeBoundedCoherentDerivedCategory Z.left) :=
-  Symmetry.KernelAutoequivalence.ofRightAdjointKernel
+  CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofRightAdjointKernel
     (geometricCorrespondence X X Z p q) K
     (geometricDualAdjointKernelData X Z σ p q K)
 
@@ -322,9 +320,9 @@ the dual kernel, with no trip through `rightAdjointUniq`. The dual is
 @[reducible] noncomputable def geometricDualKernelOfAdjoint
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :
-    Symmetry.KernelAutoequivalence.DualKernel
+    CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel
       (geometricKernelAutoequivalenceOfAdjoint X Z σ p q K) :=
-  Symmetry.KernelAutoequivalence.dualKernelOfRightAdjointKernel
+  CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.dualKernelOfRightAdjointKernel
     (geometricCorrespondence X X Z p q) K
     (geometricDualAdjointKernelData X Z σ p q K)
 
@@ -335,96 +333,6 @@ theorem geometricDualKernelOfAdjoint_dual
     (geometricDualKernelOfAdjoint X Z σ p q K).dual =
       geometricDualKernelObj X Z σ q K := rfl
 
-/-! ### The lane's payoff: a geometric transform transports a stability condition
-
-Everything above is machinery; this is what it was for. `KernelAutoequivalence`
-exists in order to act on `StabilityCondition.WithClassMap`, and until now the
-*geometric* side could not reach that action at all — not for a mathematical
-reason, but because instance search could not see through `geometricCorrespondence`
-and the constructors above it to the exactness the contracts already carry.
-
-`actStabOfDual` asks for twelve instance arguments about `A.corr` and
-`A.equiv`. They are now all reachable. -/
-
-/-- **A geometric kernel autoequivalence transports a stability condition.**
-
-`KernelAutoequivalence.actStabOfDual` at the geometric autoequivalence and its
-derived dual kernel. The compatibility hypothesis is stated against
-`transformK₀` of the *constructed* dual kernel `Rσ_*(K^∨ ⊗ ω_q)`, so it is
-checkable in kernel terms rather than against an opaque `K₀.map`.
-
-Conditional, as everything in this lane is: on the adjoint ledger, on the swap,
-and on the invertibility of the assembled adjunction's unit and counit. Nothing
-here supplies any of those. What it does show is that the geometric side reaches
-the transport once they are supplied — which, before this, it did not. -/
-noncomputable def geometricActStabOfDual
-    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
-    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)]
-    {Λ : Type u} [AddCommGroup Λ]
-    (v : K₀ (SchemeBoundedCoherentDerivedCategory X.left) →+ Λ)
-    (lam : Λ →+ Λ)
-    (hlam : ∀ x, v ((geometricCorrespondence X X Z p q).transformK₀
-        (geometricDualKernelObj X Z σ q K) x) = lam (v x))
-    (s : StabilityCondition.WithClassMap
-      (SchemeBoundedCoherentDerivedCategory X.left) v) :
-    StabilityCondition.WithClassMap
-      (SchemeBoundedCoherentDerivedCategory X.left) v :=
-  (geometricKernelAutoequivalenceOfAdjoint X Z σ p q K).actStabOfDual v
-    (geometricDualKernelOfAdjoint X Z σ p q K) lam hlam s
-
-/-! ### Into the group, not merely into a map
-
-`geometricActStabOfDual` is a *function* on stability conditions.
-`Stability/ClassMap.lean` builds a genuine `Group` — `GroupAction.AutPairQuot v`
-— acting on `WithClassMap C v`, and "the transform transports" and "the
-transform is an element of the group that acts" are different claims. The
-abstract file makes the point and proves the second for a `KernelAutoequivalence`
-with a `DualKernel`; both are now available geometrically, so the geometric side
-reaches the group too.
-
-The strengthening over `actStabOfDual` is `lam`'s **invertibility**, and it is a
-real hypothesis rather than repackaging: a geometric kernel autoequivalence with
-a non-invertible compatible `lam` still transports stability conditions, it just
-is not a member of this group. -/
-
-/-- **A geometric kernel autoequivalence is an element of the acting group.**
-
-`KernelAutoequivalence.toAutPair` at the geometric autoequivalence and its
-derived dual kernel, with the compatibility stated against the *constructed*
-dual kernel `Rσ_*(K^∨ ⊗ ω_q)` rather than an opaque `K₀.map`. -/
-noncomputable def geometricToAutPair
-    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
-    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)]
-    {Λ : Type u} [AddCommGroup Λ]
-    (v : K₀ (SchemeBoundedCoherentDerivedCategory X.left) →+ Λ)
-    (lam : Λ ≃+ Λ)
-    (hlam : ∀ x, v ((geometricCorrespondence X X Z p q).transformK₀
-        (geometricDualKernelObj X Z σ q K) x) = lam (v x)) :
-    GroupAction.AutPair v :=
-  (geometricKernelAutoequivalenceOfAdjoint X Z σ p q K).toAutPair v
-    (geometricDualKernelOfAdjoint X Z σ p q K) lam hlam
-
-/-- **The group element acts by the transport it came from.**
-
-At the quotient, where the `MulAction` actually lives. `rfl`, as in the abstract
-file — but worth stating for the same reason it was worth stating there: the
-transported stability condition is the image of `σ` under a group element, not
-merely the value of a map. -/
-theorem geometricMk_toAutPair_smul
-    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
-    [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)]
-    {Λ : Type u} [AddCommGroup Λ]
-    (v : K₀ (SchemeBoundedCoherentDerivedCategory X.left) →+ Λ)
-    (lam : Λ ≃+ Λ)
-    (hlam : ∀ x, v ((geometricCorrespondence X X Z p q).transformK₀
-        (geometricDualKernelObj X Z σ q K) x) = lam (v x))
-    (s : StabilityCondition.WithClassMap
-      (SchemeBoundedCoherentDerivedCategory X.left) v) :
-    GroupAction.AutPairQuot.mk (geometricToAutPair X Z σ p q K v lam hlam) • s =
-      geometricActStabOfDual X Z σ p q K v lam.toAddMonoidHom
-        (fun x => hlam x) s :=
-  rfl
-
 end DualKernel
 
-end AlgebraicGeometry.StabilityCondition.FourierMukai
+end AlgebraicGeometry.DerivedCategory.FourierMukai
