@@ -39,6 +39,7 @@ STABILITY_FAMILIES_ROOT = (
 GENERIC_FAMILIES_NAMESPACE = "CategoryTheory.Triangulated.Families"
 DERIVED_CATEGORY_NAMESPACE = "AlgebraicGeometry.DerivedCategory"
 DERIVED_FAMILIES_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Families"
+DQC_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Dqc"
 WEAK_FAMILIES_NAMESPACE = (
     "CategoryTheory.Triangulated.WeakStabilityCondition.Families"
 )
@@ -612,6 +613,26 @@ def main() -> int:
             f"geometry-owned subtree missing from AlgebraicGeometry: "
             f"{relocated_dqc.relative_to(ROOT)}"
         )
+    dqc_sources = [relocated_dqc.with_suffix(".lean")]
+    if relocated_dqc.is_dir():
+        dqc_sources.extend(sorted(relocated_dqc.glob("*.lean")))
+    for path in dqc_sources:
+        if not path.is_file():
+            failures.append(
+                f"geometry-owned Dqc module missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {DQC_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: Dqc declarations must use "
+                f"namespace {DQC_NAMESPACE}"
+            )
+        if legacy_geometric_namespace in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: Dqc declarations restored the "
+                "legacy stability namespace"
+            )
 
     failures.extend(check_layering_fixtures())
     allowed_reverse_edges, allowlist_failures = load_reverse_edge_allowlist()
@@ -713,7 +734,7 @@ def main() -> int:
         "namespace"
     )
     print(
-        "ok: scheme-derived categories and families use their matching "
+        "ok: scheme-derived categories, families, and Dqc use their matching "
         "AlgebraicGeometry namespaces"
     )
     print(

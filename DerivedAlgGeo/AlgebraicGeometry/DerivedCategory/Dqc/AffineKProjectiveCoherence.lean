@@ -19,7 +19,7 @@ relative-perfect pullback across big-Zariski covers. Identity, composition,
 and descent coherence are developed on top of this preserved locus.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -262,4 +262,4 @@ def affineBoundedAboveProjectiveDerivedPullbackCompIso
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Dqc

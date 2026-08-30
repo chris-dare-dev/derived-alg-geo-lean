@@ -28,8 +28,8 @@ namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits
 open CategoryTheory.Triangulated.Families
-open CategoryTheory.Triangulated.StabilityCondition.Families
 open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
