@@ -59,7 +59,7 @@ consumed by the derivation, in the pattern of the route classes.
 
 universe u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -493,4 +493,4 @@ functorial root, so it deliberately exports only the derived three-kernel
 comparison.
 -/
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.FourierMukai

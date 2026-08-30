@@ -68,6 +68,7 @@ universe u
 
 namespace CategoryTheory.Triangulated.StabilityCondition.Families
 open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 

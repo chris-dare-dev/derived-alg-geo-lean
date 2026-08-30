@@ -40,6 +40,9 @@ GENERIC_FAMILIES_NAMESPACE = "CategoryTheory.Triangulated.Families"
 DERIVED_CATEGORY_NAMESPACE = "AlgebraicGeometry.DerivedCategory"
 DERIVED_FAMILIES_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Families"
 DQC_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Dqc"
+GEOMETRIC_FOURIER_MUKAI_NAMESPACE = (
+    "AlgebraicGeometry.DerivedCategory.FourierMukai"
+)
 WEAK_FAMILIES_NAMESPACE = (
     "CategoryTheory.Triangulated.WeakStabilityCondition.Families"
 )
@@ -525,6 +528,19 @@ def main() -> int:
     geometric_fourier_mukai_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "FourierMukai"
     )
+    for path in sorted(geometric_fourier_mukai_root.glob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {GEOMETRIC_FOURIER_MUKAI_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: geometric Fourier--Mukai "
+                f"declarations must use namespace "
+                f"{GEOMETRIC_FOURIER_MUKAI_NAMESPACE}"
+            )
+        if legacy_geometric_namespace in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: geometric Fourier--Mukai "
+                "declarations restored the legacy stability namespace"
+            )
     stability_fourier_mukai_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "StabilityCondition" / "FourierMukai"
     )
@@ -734,8 +750,9 @@ def main() -> int:
         "namespace"
     )
     print(
-        "ok: scheme-derived categories, families, and Dqc use their matching "
-        "AlgebraicGeometry namespaces"
+        "ok: scheme-derived categories, families, Dqc, and geometric "
+        "Fourier--Mukai declarations use their matching AlgebraicGeometry "
+        "namespaces"
     )
     print(
         "ok: neutral scheme-derived families, geometric Fourier--Mukai, and "
