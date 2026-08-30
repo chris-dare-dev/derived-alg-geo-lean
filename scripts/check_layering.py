@@ -12,6 +12,8 @@ forbids algebraic geometry from importing back into those realization leaves,
 rejects restoration of the retired geometric stability subtree, and keeps the
 migration allowlist burned to zero. It also keeps neutral, weak, Bridgeland,
 and geometric family declarations in the namespaces matching their owners.
+It also guards the generic derived-category and stack roots and requires
+ordinary prestability to expose weak prestability structurally.
 """
 
 from __future__ import annotations
@@ -41,6 +43,7 @@ GEOMETRY_INSTANCE_UMBRELLAS = {
 }
 GENERIC_FAMILIES_NAMESPACE = "CategoryTheory.Triangulated.Families"
 GENERIC_STACKS_NAMESPACE = "CategoryTheory"
+GENERIC_DERIVED_NAMESPACE = "CategoryTheory"
 DERIVED_CATEGORY_NAMESPACE = "AlgebraicGeometry.DerivedCategory"
 DERIVED_FAMILIES_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Families"
 DQC_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Dqc"
@@ -520,28 +523,60 @@ def main() -> int:
             "belong to categorical Instances/AlgebraicGeometry leaves"
         )
 
-    generic_stacks_source = (
-        SOURCE_ROOT / "CategoryTheory" / "Sites" / "StackInGroupoids.lean"
+    generic_stacks_root = SOURCE_ROOT / "CategoryTheory" / "Sites"
+    generic_stack_sources = (
+        generic_stacks_root / "StackInGroupoids.lean",
+        generic_stacks_root / "StackInGroupoids" / "Discrete.lean",
+        generic_stacks_root / "StackInGroupoids" / "Morphism.lean",
     )
-    generic_stacks_text = generic_stacks_source.read_text(encoding="utf-8")
-    if not re.search(
-        rf"^namespace {GENERIC_STACKS_NAMESPACE}$",
-        generic_stacks_text,
-        re.MULTILINE,
+    for generic_stacks_source in generic_stack_sources:
+        if not generic_stacks_source.is_file():
+            failures.append(
+                f"generic stack module missing: {generic_stacks_source.relative_to(ROOT)}"
+            )
+            continue
+        generic_stacks_text = generic_stacks_source.read_text(encoding="utf-8")
+        if not re.search(
+            rf"^namespace {GENERIC_STACKS_NAMESPACE}$",
+            generic_stacks_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{generic_stacks_source.relative_to(ROOT)}: generic "
+                f"stack-in-groupoids declarations must use namespace "
+                f"{GENERIC_STACKS_NAMESPACE}"
+            )
+        if re.search(
+            r"^namespace AlgebraicGeometry$", generic_stacks_text, re.MULTILINE
+        ):
+            failures.append(
+                f"{generic_stacks_source.relative_to(ROOT)}: generic "
+                "stack-in-groupoids declarations restored the retired geometric "
+                "namespace"
+            )
+
+    geometric_representable_stack = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Stacks" / "Representable.lean"
+    )
+    geometric_representable_text = geometric_representable_stack.read_text(
+        encoding="utf-8"
+    )
+    for generic_name in (
+        "discretePseudofunctor",
+        "discretePseudofunctor_isStack",
+        "stackInGroupoidsOfSheaf",
+        "StackMorphism",
     ):
-        failures.append(
-            f"{generic_stacks_source.relative_to(ROOT)}: generic "
-            f"stack-in-groupoids declarations must use namespace "
-            f"{GENERIC_STACKS_NAMESPACE}"
-        )
-    if re.search(
-        r"^namespace AlgebraicGeometry$", generic_stacks_text, re.MULTILINE
-    ):
-        failures.append(
-            f"{generic_stacks_source.relative_to(ROOT)}: generic "
-            "stack-in-groupoids declarations restored the retired geometric "
-            "namespace"
-        )
+        if re.search(
+            rf"^(?:noncomputable\s+)?(?:def|abbrev|theorem|lemma|structure|class)\s+"
+            rf"{generic_name}\b",
+            geometric_representable_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{geometric_representable_stack.relative_to(ROOT)}: generic "
+                f"stack declaration {generic_name} returned to geometry"
+            )
 
     generic_families_source_root = (
         SOURCE_ROOT / "CategoryTheory" / "Triangulated" / "Families"
@@ -578,6 +613,28 @@ def main() -> int:
         "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition"
     )
     strong_stability_module = weak_stability_module + ".StabilityCondition"
+
+    retired_weak_compatibility = strong_stability_root / "WeakCompatibility"
+    if retired_weak_compatibility.exists() or retired_weak_compatibility.with_suffix(
+        ".lean"
+    ).exists():
+        failures.append(
+            "the retired StabilityCondition/WeakCompatibility adapter tree was "
+            "restored; ordinary prestability must expose its weak parent structurally"
+        )
+    strong_prestability_source = (
+        strong_stability_root / "Foundation" / "PreStabilityCondition.lean"
+    )
+    strong_prestability_text = strong_prestability_source.read_text(encoding="utf-8")
+    if not re.search(
+        r"extends\s+toWeak\s*:\s*"
+        r"WeakStabilityCondition\.WeakPreStabilityCondition",
+        strong_prestability_text,
+    ):
+        failures.append(
+            f"{strong_prestability_source.relative_to(ROOT)}: ordinary "
+            "prestability must structurally extend WeakPreStabilityCondition"
+        )
 
     weak_families_source_root = weak_stability_root / "Families"
     for module in ("Basic", "Weak"):
@@ -830,6 +887,37 @@ def main() -> int:
             "WeakStabilityCondition parent"
         )
 
+    generic_derived_root = (
+        SOURCE_ROOT / "CategoryTheory" / "Triangulated" / "DerivedCategory"
+    )
+    generic_derived_sources = (
+        generic_derived_root / "TStructure.lean",
+        generic_derived_root / "ExactFunctor.lean",
+        generic_derived_root / "Homology.lean",
+        generic_derived_root / "KProjective.lean",
+        generic_derived_root / "BoundedAboveProjective.lean",
+        generic_derived_root / "BoundedAboveProjective" / "Unitality.lean",
+    )
+    for path in generic_derived_sources:
+        if not path.is_file():
+            failures.append(
+                f"generic derived-category module missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        if not re.search(
+            rf"^namespace {GENERIC_DERIVED_NAMESPACE}$", text, re.MULTILINE
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: generic derived-category "
+                f"declarations must use namespace {GENERIC_DERIVED_NAMESPACE}"
+            )
+        if "namespace AlgebraicGeometry" in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: generic derived-category module "
+                "uses an AlgebraicGeometry declaration namespace"
+            )
+
     generic_families_root = strong_stability_root / "Families"
     neutral_derived_families_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "Families"
@@ -854,6 +942,74 @@ def main() -> int:
             f"{derived_category_basic.relative_to(ROOT)}: scheme-derived "
             "category declarations restored the legacy stability namespace"
         )
+    bounded_geometry_source = neutral_derived_families_root / "BoundedGeometry.lean"
+    bounded_geometry_text = bounded_geometry_source.read_text(encoding="utf-8")
+    dqc_source = neutral_derived_families_root.parent / "Dqc.lean"
+    dqc_text = dqc_source.read_text(encoding="utf-8")
+    geometric_generic_derived_names = {
+        bounded_geometry_source: (
+            "tStructureIsLE_of_retract",
+            "tStructureIsGE_of_retract",
+            "mapHomologicalComplex_isStrictlyLE",
+            "mapHomologicalComplex_isStrictlyGE",
+            "mapDerivedCategory_isLE",
+            "mapDerivedCategory_isGE",
+            "mapDerivedCategory_bounded",
+        ),
+        dqc_source: ("mapDerivedCategoryHomologyIso",),
+    }
+    for path, names in geometric_generic_derived_names.items():
+        text = bounded_geometry_text if path == bounded_geometry_source else dqc_text
+        for name in names:
+            if re.search(
+                rf"^(?:noncomputable\s+)?(?:def|abbrev|theorem|lemma|structure|class)\s+"
+                rf"{name}\b",
+                text,
+                re.MULTILINE,
+            ):
+                failures.append(
+                    f"{path.relative_to(ROOT)}: generic derived-category "
+                    f"declaration {name} returned to geometry"
+                )
+    affine_generic_declarations = {
+        "AffineKProjectivePullback.lean": (
+            "kProjectiveHomotopy",
+            "KProjectiveHomotopyCategory",
+            "kProjectiveQh",
+            "KProjectiveDerivedCategory",
+            "kProjectiveDerivedFunctor",
+            "kProjectiveLocusDerivedFunctor",
+        ),
+        "AffineKProjectiveCoherence.lean": (
+            "boundedAboveProjectiveHomotopy",
+            "BoundedAboveProjectiveHomotopyCategory",
+            "boundedAboveProjectiveQh",
+            "BoundedAboveProjectiveDerivedCategory",
+            "mapBoundedAboveProjectiveHomotopy",
+            "boundedAboveProjectiveDerivedFunctor",
+        ),
+        "AffineKProjectiveUnitality.lean": (
+            "mapBoundedAboveProjectiveHomotopyIso",
+            "mapBoundedAboveProjectiveHomotopyIdIso",
+            "boundedAboveProjectiveDerivedFunctorIso",
+            "boundedAboveProjectiveDerivedFunctorIdIso",
+        ),
+    }
+    dqc_subtree = neutral_derived_families_root.parent / "Dqc"
+    for filename, names in affine_generic_declarations.items():
+        path = dqc_subtree / filename
+        text = path.read_text(encoding="utf-8")
+        for name in names:
+            if re.search(
+                rf"^(?:noncomputable\s+)?(?:def|abbrev|theorem|lemma|structure|class)\s+"
+                rf"{name}\b",
+                text,
+                re.MULTILINE,
+            ):
+                failures.append(
+                    f"{path.relative_to(ROOT)}: generic derived-category "
+                    f"declaration {name} returned to the affine consumer"
+                )
     for path in sorted(neutral_derived_families_root.glob("*.lean")):
         text = path.read_text(encoding="utf-8")
         if f"namespace {DERIVED_FAMILIES_NAMESPACE}" not in text:
@@ -1158,8 +1314,8 @@ def main() -> int:
     print("ok: raw dg theory is independent of the dg-enhancement layer")
     print("ok: the monoidal layer precedes enrichment and does not import its children")
     print(
-        "ok: weak stability is independent of, and directly parented by, "
-        "Bridgeland stability"
+        "ok: weak stability is independent of, and structurally parented by, "
+        "Bridgeland stability; no compatibility adapter tree exists"
     )
     print(
         "ok: neutral triangulated-family declarations use the generic "
@@ -1167,6 +1323,10 @@ def main() -> int:
     )
     print(
         "ok: generic stacks in groupoids use their CategoryTheory namespace"
+    )
+    print(
+        "ok: generic derived-category, K-projective, and bounded-projective "
+        "APIs use the CategoryTheory owner; affine files contain only consumers"
     )
     print(
         "ok: weak-stability family declarations use the matching "

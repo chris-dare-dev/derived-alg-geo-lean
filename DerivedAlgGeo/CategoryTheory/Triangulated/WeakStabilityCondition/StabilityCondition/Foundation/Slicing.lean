@@ -10,7 +10,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Stabilit
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Foundation.Slicing.IntervalFiniteTransfer
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Foundation.Slicing.IntervalPreabelian
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Foundation.Slicing.IntervalStrictness
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Foundation.Slicing.TwoHeartEmbedding
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Foundation.Slicing.TwoHeartEmbedding
 
 /-!
 # Bridgeland slicing consequences

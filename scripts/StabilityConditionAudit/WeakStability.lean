@@ -20,12 +20,8 @@ theorems. Closes #107; no source binding is claimed (see the module
 docstring and #111). -/
 
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ofPre
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ofPre_slicing
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ofPre_Z
-#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.toWeak
-#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.toWeak_slicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.toWeak_Z
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.ofStrict
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.toWeak
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityFunction
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.upper

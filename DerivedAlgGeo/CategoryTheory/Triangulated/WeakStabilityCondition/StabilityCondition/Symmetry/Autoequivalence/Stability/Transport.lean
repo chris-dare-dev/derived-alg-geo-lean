@@ -239,9 +239,9 @@ noncomputable def actStabAut (lam : Λ →+ Λ)
     (hlam : ∀ x : K₀ C, v (K₀.map Φ.inverse x) = lam (v x))
     (σ : StabilityCondition.WithClassMap C v) : StabilityCondition.WithClassMap C v where
   toWithClassMap :=
-    { slicing := CategoryTheory.Triangulated.Slicing.mapEquiv σ.slicing Φ
-      Z := σ.Z.comp lam
-      compatible := by
+    PreStabilityCondition.WithClassMap.ofStrict
+      (CategoryTheory.Triangulated.Slicing.mapEquiv σ.slicing Φ)
+      (σ.Z.comp lam) (by
         intro φ E hP hE
         have hE' : ¬ IsZero (Φ.inverse.obj E) := fun h =>
           hE (IsZero.of_iso (Φ.functor.map_isZero h) (Φ.counitIso.app E).symm)
@@ -249,7 +249,7 @@ noncomputable def actStabAut (lam : Λ →+ Λ)
         refine ⟨m, hm, ?_⟩
         show σ.Z (lam (v (K₀.of C E))) = _
         rw [← hlam, K₀.map_of]
-        exact hZ }
+        exact hZ)
   locallyFinite := mapEquiv_isLocallyFinite Φ σ.slicing σ.locallyFinite
 
 @[simp] theorem actStabAut_slicing (lam : Λ →+ Λ) (hlam) (σ) :

@@ -30,6 +30,12 @@ depend on them. Construct generic objects once—for example, obtain
 `DerivedCategory (Coh X)` from the abelian instance on `Coh X` rather than
 creating a second geometric derived-category theory.
 
+Generic derived-category extensions belong under
+`CategoryTheory/Triangulated/DerivedCategory/`. This includes facts about the
+canonical t-structure, exact functors, homology comparison, and K-projective
+or bounded-above-projective models. Keep only the `Coh(X)`, `Dqc(X)`, module,
+and extension-of-scalars specializations below algebraic geometry.
+
 Scheme-specific specializations of that generic construction live under
 `AlgebraicGeometry/DerivedCategory/`: this is the owner for module-sheaf
 derived categories, `Dqc`, scheme-indexed derived pullback, and geometric
@@ -72,8 +78,8 @@ stability-function API, and shared slicing prerequisites under
 `CategoryTheory/Triangulated/WeakStabilityCondition/`. Put ordinary Bridgeland
 stability under its stronger
 `WeakStabilityCondition/StabilityCondition/` child. The weak parent may not
-import the child; a compatibility adapter that needs Bridgeland definitions
-belongs under the child's `WeakCompatibility/` leaf. Do not recreate the old
+import the child; the strong structure must expose its weak parent directly.
+Do not recreate a `WeakCompatibility/` adapter leaf or the old
 sibling `CategoryTheory/Triangulated/StabilityCondition/` path. Keep
 scheme-specific Mumford slope input geometry-owned, and place a valid
 promotion to Bridgeland stability below the strong theory through an explicit
@@ -97,6 +103,12 @@ their implementation bridge is physically attached to a categorical source.
 Registration declarations may extend the categorical source namespace. Never
 use the retired `AlgebraicGeometry.StabilityCondition` namespace or the
 retired flattened categorical stability-family namespace.
+
+Generic stack-in-groupoids construction, discrete stacks from sheaves, stack
+morphisms, and site-object representability belong under
+`CategoryTheory/Sites/StackInGroupoids/`. Big-Zariski representables and
+geometric properties of their representing scheme morphisms belong under
+`AlgebraicGeometry/Stacks/`.
 
 Neutral categorical family declarations use the matching
 `CategoryTheory.Triangulated.Families` namespace. In particular,

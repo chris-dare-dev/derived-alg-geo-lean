@@ -10,13 +10,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Stabilit
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Support
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Walls
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.WeakCompatibility
 
 /-!
 # Stability conditions
 
 The Bridgeland refinement of weak stability, together with phase analysis,
 symmetry actions, metric geometry, support properties, numerical walls, and
-abstract family interfaces. Forgetful adapters back to the weak parent are
-exported from `WeakCompatibility`.
+abstract family interfaces. Ordinary prestability and stability conditions
+carry their weak parent structurally.
 -/

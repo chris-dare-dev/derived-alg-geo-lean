@@ -69,7 +69,7 @@ AUDITS = {
 # thing this gate exists to stop.
 CEILINGS = {
     "AlgebraicGeometry": 1025,
-    "StabilityCondition": 296,
+    "StabilityCondition": 294,
     "DGCategory": 0,
 }
 

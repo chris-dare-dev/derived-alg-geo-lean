@@ -55,10 +55,13 @@ concrete applications through explicit instance leaves.
 In particular, derived-category theory is generic. Prove `[Abelian (Coh X)]`
 under the correct geometric hypotheses and then use
 `DerivedCategory (Coh X)`; do not build a second derived-category theory under
-algebraic geometry. `Dqc(X)` may be represented by the quasicoherent-cohomology
-locus until the abelian `QCoh X` construction and its derived comparison are
-available, but this is a geometric specialization of the generic theory and
-lives under `AlgebraicGeometry/DerivedCategory/`, not below stability. Use an
+algebraic geometry. Generic t-structure, exact-functor, homology-comparison,
+and K-projective results live under
+`CategoryTheory/Triangulated/DerivedCategory/`. `Dqc(X)` may be represented by
+the quasicoherent-cohomology locus until the abelian `QCoh X` construction and
+its derived comparison are available, but this is a geometric specialization
+of the generic theory and lives under `AlgebraicGeometry/DerivedCategory/`,
+not below stability. Use an
 `Instances/AlgebraicGeometry/` leaf for registration-only adapters whose
 generic categorical interface is the primary owner.
 
@@ -93,7 +96,8 @@ is the independently importable dependency parent at
 `CategoryTheory/Triangulated/WeakStabilityCondition/`; ordinary Bridgeland
 stability is its child at `WeakStabilityCondition/StabilityCondition/`. Never
 restore a sibling `CategoryTheory/Triangulated/StabilityCondition/` tree, and
-keep strong-dependent adapters in the child's `WeakCompatibility/` leaf.
+make ordinary prestability structurally expose its weak parent. Do not add a
+`WeakCompatibility/` leaf for data already provided by that projection.
 Abstract pullback, pseudofunctor, and Fourier--Mukai interfaces remain
 categorical. Scheme-derived categories, `Dqc`, geometric pullback, and kernel
 convolution live under `AlgebraicGeometry/DerivedCategory/`; only
@@ -103,6 +107,12 @@ weak-stability input, while a promotion to Bridgeland stability belongs below
 the strong child only under hypotheses where that promotion is valid.
 Scheme-specific data remains geometry-owned and realizes the categorical
 interface through an explicit bridge.
+
+Likewise, generic stack-in-groupoids construction, discrete stacks from
+sheaves, stack morphisms, and site-object representability live under
+`CategoryTheory/Sites/StackInGroupoids/`. Big-Zariski representable stacks and
+geometric properties of their representing morphisms remain under
+`AlgebraicGeometry/Stacks/`.
 
 Match declaration namespaces to those geometric owners. Scheme-derived
 category declarations in `AlgebraicGeometry/DerivedCategory/Basic.lean` use

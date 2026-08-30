@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids
+import DerivedAlgGeo.CategoryTheory.Sites
 
 /-!
 Audit records for the generic stack-in-groupoids root.
@@ -38,3 +38,22 @@ The module, declarations, and audit ownership are neutral category theory.
 #print axioms CategoryTheory.StackInGroupoids.ofEquivalence
 #print axioms CategoryTheory.StackInGroupoids.presheaf
 #print axioms CategoryTheory.StackInGroupoids.toCechDescent
+#print axioms CategoryTheory.StackMorphism
+#print axioms CategoryTheory.StackMorphism.FiberCategory
+#print axioms CategoryTheory.StackMorphism.FiberRepresentation
+#print axioms CategoryTheory.StackMorphism.FiberRepresentation.fiberEquivalence
+#print axioms CategoryTheory.StackMorphism.FiberRepresentation.mk.inj
+#print axioms CategoryTheory.StackMorphism.FiberRepresentation.mk.sizeOf_spec
+#print axioms CategoryTheory.StackMorphism.FiberRepresentation.representing
+#print axioms CategoryTheory.StackMorphism.IsRepresentable
+#print axioms CategoryTheory.StackMorphism.IsRepresentable.representation
+#print axioms CategoryTheory.StackMorphism.app
+#print axioms CategoryTheory.StackMorphism.comp
+#print axioms CategoryTheory.StackMorphism.id
+#print axioms CategoryTheory.StackMorphism.Modification
+#print axioms CategoryTheory.StackMorphism.pullbackIso
+#print axioms CategoryTheory.discretePseudofunctor
+#print axioms CategoryTheory.discretePseudofunctor_isStack
+#print axioms CategoryTheory.discretePseudofunctor_obj_isDiscrete
+#print axioms CategoryTheory.discretePseudofunctor_obj_isGroupoid
+#print axioms CategoryTheory.stackInGroupoidsOfSheaf

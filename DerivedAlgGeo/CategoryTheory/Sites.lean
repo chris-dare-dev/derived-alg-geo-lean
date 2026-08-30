@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Sites.CohomologyShortExact
 import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids
+import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids.Discrete
+import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids.Morphism
 
 /-! # Sites
 

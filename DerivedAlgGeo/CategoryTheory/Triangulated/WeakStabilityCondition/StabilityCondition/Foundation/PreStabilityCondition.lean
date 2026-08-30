@@ -5,7 +5,7 @@ Released under the MIT license.
 Portions adapted from mattrobball/BridgelandStability, revision 9e48f23
 (Apache-2.0, Copyright (c) 2026 Mathlib Contributors); see LICENSE.md.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Foundation.Slicing
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Basic.Definitions
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Basic
 import Mathlib.Analysis.Complex.Exponential
 
@@ -34,12 +34,13 @@ variable {Λ : Type u'} [AddCommGroup Λ]
 namespace PreStabilityCondition
 
 /-- A pre-stability condition whose central charge factors through a chosen
-class map `v : K₀ C → Λ`. -/
-structure WithClassMap (v : K₀ C →+ Λ) where
-  /-- The underlying slicing. -/
-  slicing : Slicing C
-  /-- The central charge on the target lattice. -/
-  Z : Λ →+ ℂ
+class map `v : K₀ C → Λ`.
+
+Ordinary prestability is a strict refinement of weak prestability.  The named
+parent projection makes that relationship part of the Lean type rather than a
+downstream compatibility adapter. -/
+structure WithClassMap (v : K₀ C →+ Λ)
+    extends toWeak : WeakStabilityCondition.WeakPreStabilityCondition (C := C) v where
   /-- A nonzero semistable object's charge lies on its positive phase ray. -/
   compatible : ∀ φ E, slicing.P φ E → ¬IsZero E →
     ∃ m : ℝ, 0 < m ∧
@@ -48,6 +49,22 @@ structure WithClassMap (v : K₀ C →+ Λ) where
 namespace WithClassMap
 
 variable {C}
+
+/-- Build ordinary prestability from its strict compatibility proof.  The
+weak compatibility field is derived canonically from strict positivity. -/
+def ofStrict {v : K₀ C →+ Λ} (slicing : Slicing C) (Z : Λ →+ ℂ)
+    (compatible : ∀ φ E, slicing.P φ E → ¬IsZero E →
+      ∃ m : ℝ, 0 < m ∧
+        Z (v (K₀.of C E)) = (m : ℂ) * Complex.exp ((Real.pi * φ : ℝ) * Complex.I)) :
+    WithClassMap C v where
+  toWeak :=
+    { slicing := slicing
+      Z := Z
+      compat' := by
+        intro φ E hP hE
+        obtain ⟨m, hm, heq⟩ := compatible φ E hP hE
+        exact ⟨m, hm.le, fun _ ↦ hm, heq⟩ }
+  compatible := compatible
 
 /-- The central charge evaluated on the class of an object. -/
 abbrev charge {v : K₀ C →+ Λ} (σ : WithClassMap C v) (E : C) : ℂ :=
@@ -80,11 +97,12 @@ theorem charge_postnikovTower_eq_sum {v : K₀ C →+ Λ}
 @[ext]
 theorem ext {v : K₀ C →+ Λ} {σ τ : WithClassMap C v}
     (hslicing : σ.slicing = τ.slicing) (hZ : σ.Z = τ.Z) : σ = τ := by
-  rcases σ with ⟨sσ, Zσ, cσ⟩
-  rcases τ with ⟨sτ, Zτ, cτ⟩
+  rcases σ with ⟨⟨sσ, Zσ, wσ⟩, cσ⟩
+  rcases τ with ⟨⟨sτ, Zτ, wτ⟩, cτ⟩
   simp at hslicing hZ
   cases hslicing
   cases hZ
+  cases Subsingleton.elim wσ wτ
   cases Subsingleton.elim cσ cτ
   rfl
 

@@ -58,9 +58,8 @@ variable {Λ : Type*} [AddCommGroup Λ]
 /-! ### Definition 14.1: weak prestability conditions
 
 The weak parent data has the compatibility ray closed at integer phases and
-open elsewhere. The forgetful construction from ordinary prestability lives
-downstream in `WeakStabilityCondition/StabilityCondition/WeakCompatibility/PreStability.lean`, so the
-weak layer does not import its stronger child. -/
+open elsewhere. Ordinary prestability extends this structure downstream, so
+the weak layer does not import its stronger child. -/
 
 /-- A weak prestability condition with respect to a class map `v : K₀ C →+ Λ`
 (Definition 14.1): a slicing and a central charge on `Λ` such that a nonzero
