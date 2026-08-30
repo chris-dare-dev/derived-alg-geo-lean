@@ -28,7 +28,7 @@ open CategoryTheory.Triangulated.Families
 
 universe u v w uV
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 variable {B : Type u} [Category.{v} B]
 
@@ -156,4 +156,4 @@ theorem class_mem_semistableClasses_pull
 
 end FiberPreStabilityBaseChangeData
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families

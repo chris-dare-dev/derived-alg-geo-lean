@@ -106,11 +106,12 @@ AlgebraicGeometry/StabilityCondition
 
 The weak umbrella is independently importable and the layering gate rejects
 imports from that parent into the `StabilityCondition` child. The path cutover
-initially preserved declaration names, but the neutral categorical and weak
-family APIs have now completed separate namespace cutovers to
+initially preserved declaration names, but the neutral categorical, weak, and
+Bridgeland family APIs have now completed separate namespace cutovers to
 `CategoryTheory.Triangulated.Families` and
-`CategoryTheory.Triangulated.WeakStabilityCondition.Families`, respectively.
-Bridgeland and geometric declarations retain their established namespaces
+`CategoryTheory.Triangulated.WeakStabilityCondition.Families`, and
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`,
+respectively. Geometry-owned declarations retain their established namespace
 until separately reviewed.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
@@ -193,9 +194,11 @@ geometric realizations. It now exports only the generic interfaces. Neutral
 declarations such as `TriangulatedFiberFamily`, `BoundednessProblem`, and
 `UniversalBoundedness` live in `CategoryTheory.Triangulated.Families`.
 Weak-family probes and structures live in
-`CategoryTheory.Triangulated.WeakStabilityCondition.Families`. Clients of both
-groups must migrate imports and qualified names. Bridgeland and geometric
-declarations keep their established
+`CategoryTheory.Triangulated.WeakStabilityCondition.Families`. Ordinary
+Bridgeland family packages live in
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
+Clients of all three groups must migrate imports and qualified names.
+Geometry-owned declarations keep their established
 `CategoryTheory.Triangulated.StabilityCondition.Families` names for now:
 
 | Client need | Import |
@@ -213,5 +216,5 @@ declarations keep their established
 New library code should use the narrow owner import. The Compatibility import
 is public but intentionally a leaf; it provides staged migration without
 reintroducing a CategoryTheory-to-geometry edge. It preserves the former
-combined import surface, not retired qualified names for neutral categorical
-or weak-stability family declarations.
+combined import surface, not retired qualified names for neutral categorical,
+weak-stability, or Bridgeland family declarations.

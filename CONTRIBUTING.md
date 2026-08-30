@@ -85,6 +85,11 @@ Definition 20.5 probes and structures bound to `WeakStabilityFunction` in that
 namespace, and let ordinary Bridgeland family packages import them from the
 stronger child.
 
+Declarations owned by that stronger child use
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
+This namespace owns ordinary family packages and categorical pre-stability
+base change, not their scheme-specific realizations.
+
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one

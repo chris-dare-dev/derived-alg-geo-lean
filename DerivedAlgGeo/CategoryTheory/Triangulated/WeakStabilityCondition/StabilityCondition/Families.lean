@@ -18,4 +18,8 @@ derived categories, derived pullback, `Dqc`, and Fourier--Mukai kernels are
 owned by `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory`; geometric APIs that
 actually use stability data are owned by
 `DerivedAlgGeo.AlgebraicGeometry.StabilityCondition`.
+
+The declarations use the matching
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`
+namespace.
 -/
