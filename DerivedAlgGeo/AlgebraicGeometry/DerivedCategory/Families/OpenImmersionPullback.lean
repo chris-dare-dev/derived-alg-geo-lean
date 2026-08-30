@@ -15,7 +15,7 @@ exact.  Consequently its ordinary module pullback descends to the concrete
 derived fibers without an additional exactness hypothesis.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits Opposite
 open AlgebraicGeometry
@@ -34,18 +34,18 @@ def openImmersionPullbackStalkForgetIso
         forget₂ (ModuleCat.{u} (X.presheaf.stalk x)) AddCommGrpCat.{u} ≅
       Scheme.Modules.toPresheaf Y ⋙
         TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} (f x) :=
-  Functor.associator _ _ _ ≪≫
-    Functor.isoWhiskerLeft (Scheme.Modules.pullback f)
+  CategoryTheory.Functor.associator _ _ _ ≪≫
+    CategoryTheory.Functor.isoWhiskerLeft (Scheme.Modules.pullback f)
       (moduleStalkForgetIso X x) ≪≫
-    Functor.isoWhiskerLeft (Scheme.Modules.pullback f)
-      (Functor.associator (SheafOfModules.toSheaf X.ringCatSheaf)
+    CategoryTheory.Functor.isoWhiskerLeft (Scheme.Modules.pullback f)
+      (CategoryTheory.Functor.associator (SheafOfModules.toSheaf X.ringCatSheaf)
         (TopCat.Sheaf.forget AddCommGrpCat.{u} X)
         (TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x)).symm ≪≫
-    Functor.isoWhiskerRight
+    CategoryTheory.Functor.isoWhiskerRight
       (Scheme.Modules.restrictFunctorIsoPullback f).symm
       (Scheme.Modules.toPresheaf X ⋙
         TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x) ≪≫
-    (Functor.associator (Scheme.Modules.restrictFunctor f)
+    (CategoryTheory.Functor.associator (Scheme.Modules.restrictFunctor f)
       (Scheme.Modules.toPresheaf X)
       (TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x)).symm ≪≫
     Scheme.Modules.restrictStalkNatIso f x
@@ -70,7 +70,7 @@ theorem openImmersionPullbackStalk_preservesFiniteLimits
       Scheme.Modules.toPresheaf Y ⋙
         TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} (f x) :=
     moduleStalkForgetIso Y (f x) ≪≫
-      (Functor.associator (SheafOfModules.toSheaf Y.ringCatSheaf)
+      (CategoryTheory.Functor.associator (SheafOfModules.toSheaf Y.ringCatSheaf)
         (TopCat.Sheaf.forget AddCommGrpCat.{u} Y)
         (TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} (f x))).symm
   have hRight : PreservesFiniteLimits
@@ -111,4 +111,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

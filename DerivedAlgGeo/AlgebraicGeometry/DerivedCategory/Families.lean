@@ -22,5 +22,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPullbackS
 # Scheme-derived categories in families
 
 Scheme base changes, residue fibers, derived realizations, and geometric
-pullback constructions that are independent of stability conditions.
+pullback constructions that are independent of stability conditions. Public
+declarations owned by this subtree use
+`AlgebraicGeometry.DerivedCategory.Families`.
 -/

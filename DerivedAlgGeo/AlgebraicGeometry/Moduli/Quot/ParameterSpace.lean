@@ -24,7 +24,9 @@ from SF8.3.
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits
-open CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open scoped ZeroObject
 
 noncomputable section

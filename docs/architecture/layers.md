@@ -111,8 +111,11 @@ Bridgeland family APIs have now completed separate namespace cutovers to
 `CategoryTheory.Triangulated.Families` and
 `CategoryTheory.Triangulated.WeakStabilityCondition.Families`, and
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`,
-respectively. Geometry-owned declarations retain their established namespace
-until separately reviewed.
+respectively. The scheme-derived category and family foundations have likewise
+completed their cutover to `AlgebraicGeometry.DerivedCategory` and
+`AlgebraicGeometry.DerivedCategory.Families`. `Dqc`, geometric Fourier--Mukai,
+and stability-specific geometric declarations retain their staged namespaces
+until their separate cutovers.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map
@@ -198,8 +201,11 @@ Weak-family probes and structures live in
 Bridgeland family packages live in
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
 Clients of all three groups must migrate imports and qualified names.
-Geometry-owned declarations keep their established
-`CategoryTheory.Triangulated.StabilityCondition.Families` names for now:
+Scheme-derived category and pullback declarations now use
+`AlgebraicGeometry.DerivedCategory` and
+`AlgebraicGeometry.DerivedCategory.Families`, respectively. Remaining `Dqc`,
+geometric Fourier--Mukai, and stability-specific declarations keep their
+staged names until their own cutovers:
 
 | Client need | Import |
 | --- | --- |
@@ -217,4 +223,4 @@ New library code should use the narrow owner import. The Compatibility import
 is public but intentionally a leaf; it provides staged migration without
 reintroducing a CategoryTheory-to-geometry edge. It preserves the former
 combined import surface, not retired qualified names for neutral categorical,
-weak-stability, or Bridgeland family declarations.
+weak-stability, Bridgeland-family, or scheme-derived family declarations.

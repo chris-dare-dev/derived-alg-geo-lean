@@ -22,7 +22,7 @@ categories.  It also asserts no geometric slicing, relative HN, openness,
 boundedness, moduli, or Theorem 22.2 conclusion.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
@@ -116,13 +116,13 @@ def derivedPullbackFactors {T U : SchemeBaseChange S} (f : T ⟶ U)
 instance {T U : SchemeBaseChange S} (f : T ⟶ U) [IsExactPullback f] :
     (derivedPullback f).CommShift ℤ := by
   dsimp [derivedPullback]
-  exact Functor.instCommShiftDerivedCategoryMapDerivedCategoryInt
+  exact CategoryTheory.Functor.instCommShiftDerivedCategoryMapDerivedCategoryInt
     (modulePullback f)
 
 instance {T U : SchemeBaseChange S} (f : T ⟶ U) [IsExactPullback f] :
     (derivedPullback f).IsTriangulated := by
   dsimp [derivedPullback]
-  exact Functor.instIsTriangulatedDerivedCategoryMapDerivedCategory
+  exact CategoryTheory.Functor.instIsTriangulatedDerivedCategoryMapDerivedCategory
     (modulePullback f)
 
 /-- Pullback on the triangulated Grothendieck groups of the concrete derived
@@ -161,4 +161,4 @@ end SchemeBaseChange
 end
 
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

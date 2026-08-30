@@ -33,6 +33,9 @@ associativity, and unit APIs require this coherent root.
 universe u
 
 namespace CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.MonoidalCategory
 open AlgebraicGeometry

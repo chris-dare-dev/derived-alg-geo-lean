@@ -37,6 +37,8 @@ STABILITY_FAMILIES_ROOT = (
     "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families"
 )
 GENERIC_FAMILIES_NAMESPACE = "CategoryTheory.Triangulated.Families"
+DERIVED_CATEGORY_NAMESPACE = "AlgebraicGeometry.DerivedCategory"
+DERIVED_FAMILIES_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Families"
 WEAK_FAMILIES_NAMESPACE = (
     "CategoryTheory.Triangulated.WeakStabilityCondition.Families"
 )
@@ -487,6 +489,38 @@ def main() -> int:
     neutral_derived_families_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "Families"
     )
+    derived_category_basic = neutral_derived_families_root.parent / "Basic.lean"
+    derived_category_basic_text = derived_category_basic.read_text(
+        encoding="utf-8"
+    )
+    if (
+        f"namespace {DERIVED_CATEGORY_NAMESPACE}"
+        not in derived_category_basic_text
+    ):
+        failures.append(
+            f"{derived_category_basic.relative_to(ROOT)}: scheme-derived "
+            f"category declarations must use namespace {DERIVED_CATEGORY_NAMESPACE}"
+        )
+    legacy_geometric_namespace = (
+        "namespace CategoryTheory.Triangulated.StabilityCondition.Families"
+    )
+    if legacy_geometric_namespace in derived_category_basic_text:
+        failures.append(
+            f"{derived_category_basic.relative_to(ROOT)}: scheme-derived "
+            "category declarations restored the legacy stability namespace"
+        )
+    for path in sorted(neutral_derived_families_root.glob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {DERIVED_FAMILIES_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: scheme-derived family declarations "
+                f"must use namespace {DERIVED_FAMILIES_NAMESPACE}"
+            )
+        if legacy_geometric_namespace in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: scheme-derived family declarations "
+                "restored the legacy stability namespace"
+            )
     geometric_fourier_mukai_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "FourierMukai"
     )
@@ -677,6 +711,10 @@ def main() -> int:
     print(
         "ok: Bridgeland-family declarations use the matching strong-child "
         "namespace"
+    )
+    print(
+        "ok: scheme-derived categories and families use their matching "
+        "AlgebraicGeometry namespaces"
     )
     print(
         "ok: neutral scheme-derived families, geometric Fourier--Mukai, and "

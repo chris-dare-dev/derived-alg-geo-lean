@@ -18,9 +18,9 @@ left-derived functor for nonexact pullback, or restrict the construction to
 bounded coherent or perfect complexes.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
-open CategoryTheory AlgebraicGeometry
+open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 
 noncomputable section
 
@@ -34,9 +34,9 @@ variable {S : Scheme.{u}}
 def complexPullbackIdLocalized (T : SchemeBaseChange S) :
     complexPullback (𝟙 T) ⋙ SchemeDerivedCategory.Q T.left ≅
       SchemeDerivedCategory.Q T.left :=
-  Functor.isoWhiskerRight (complexPullbackId T)
+  CategoryTheory.Functor.isoWhiskerRight (complexPullbackId T)
       (SchemeDerivedCategory.Q T.left) ≪≫
-    Functor.leftUnitor (SchemeDerivedCategory.Q T.left)
+    CategoryTheory.Functor.leftUnitor (SchemeDerivedCategory.Q T.left)
 
 /-- Exact derived pullback along an identity is naturally isomorphic to the
 identity functor. -/
@@ -60,10 +60,10 @@ def complexPullbackCompLocalized {T U V : SchemeBaseChange S}
     (complexPullback g ⋙ SchemeDerivedCategory.Q U.left) ⋙
         derivedPullback f ≅
       complexPullback (f ≫ g) ⋙ SchemeDerivedCategory.Q T.left :=
-  Functor.associator _ _ _ ≪≫
-    Functor.isoWhiskerLeft (complexPullback g) (derivedPullbackFactors f) ≪≫
-    (Functor.associator _ _ _).symm ≪≫
-    Functor.isoWhiskerRight (complexPullbackComp f g)
+  CategoryTheory.Functor.associator _ _ _ ≪≫
+    CategoryTheory.Functor.isoWhiskerLeft (complexPullback g) (derivedPullbackFactors f) ≪≫
+    (CategoryTheory.Functor.associator _ _ _).symm ≪≫
+    CategoryTheory.Functor.isoWhiskerRight (complexPullbackComp f g)
       (SchemeDerivedCategory.Q T.left)
 
 /-- The composite of two exact derived pullbacks is naturally isomorphic to
@@ -114,4 +114,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

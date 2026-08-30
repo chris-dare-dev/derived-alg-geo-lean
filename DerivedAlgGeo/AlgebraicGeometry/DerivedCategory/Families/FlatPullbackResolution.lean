@@ -18,7 +18,7 @@ derived pullback. This supplies a normalization test for later K-flat
 resolutions along genuinely non-flat morphisms.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory AlgebraicGeometry
 
@@ -46,7 +46,7 @@ def flatComparison (f : T ⟶ U) [Flat f.left] :
 degreewise pullback. -/
 @[reassoc]
 lemma flatComparison_hom_counit (f : T ⟶ U) [Flat f.left] :
-    Functor.whiskerLeft (SchemeDerivedCategory.Q U.left)
+    CategoryTheory.Functor.whiskerLeft (SchemeDerivedCategory.Q U.left)
         (flatComparison f).hom ≫
       (derivedPullbackFactors f).hom =
         (ofFlat f).counit := by
@@ -58,4 +58,4 @@ end SchemeBaseChange
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families
