@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistInvertible
-import DerivedAlgGeo.AlgebraicGeometry.Divisors.Monoidal
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal
 
 /-!
 # The twist `F(d) = F ⊗ O(d)` of a module sheaf on `Proj`

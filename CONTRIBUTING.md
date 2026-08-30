@@ -140,6 +140,12 @@ immutable human-review payloads that predate this cutover; do not import that
 leaf from library code or add aliases to it. Remove it after the named reviewer
 reconfirms those payloads against the canonical declarations.
 
+Import-only migration shims at `Divisors/{Tensor,Picard,Monoidal}.lean`,
+`Stacks/Basic.lean`, and `Compatibility/StabilityConditionFamilies.lean` have
+been retired. Import `AlgebraicGeometry.Modules.Tensor`,
+`CategoryTheory.Sites`, or the appropriate stability/derived-category owner
+directly. Do not restore a combined compatibility surface.
+
 Deformation-specific Bridgeland helpers use
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`.
 The flattened `CategoryTheory.Triangulated.Deformation` namespace is retired.

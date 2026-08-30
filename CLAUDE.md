@@ -176,6 +176,12 @@ narrow exception for immutable human-review payloads: only the Compatibility
 umbrella may import them, and they should be removed after reviewer
 reconfirmation.
 
+The staged import-only shims at `Divisors/{Tensor,Picard,Monoidal}.lean`,
+`Stacks/Basic.lean`, and `Compatibility/StabilityConditionFamilies.lean` are
+retired. Import the categorical or geometric owner directly; do not recreate a
+compatibility path that mixes owners. The GroupAction review bridge above is
+the only compatibility leaf retained by the public umbrella.
+
 Helpers intrinsically about deforming a Bridgeland stability condition use
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`,
 not the retired flattened `CategoryTheory.Triangulated.Deformation` namespace.

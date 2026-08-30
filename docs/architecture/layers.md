@@ -208,10 +208,10 @@ Moduli / Stacks ─┬→ AlgebraicGeometry/DerivedCategory
 
 `CategoryTheory/Sites/StackInGroupoids.lean` is the canonical module for the
 generic groupoid-valued stack extension. Its declarations use the matching
-`CategoryTheory` namespace. `AlgebraicGeometry/Stacks/Basic.lean` reexports the
-new owner for clients of the former import path, but does not preserve the
-retired geometric qualified names. Scheme-specific representability and
-presentation data remain below `AlgebraicGeometry/Stacks`.
+`CategoryTheory` namespace. The former `AlgebraicGeometry/Stacks/Basic.lean`
+reexport has been retired; clients import the canonical module directly.
+Scheme-specific representability and presentation data remain below
+`AlgebraicGeometry/Stacks`.
 
 Scheme-derived `Dqc`, derived pullback, and their preservation theorems now
 live under `DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/`, including the
@@ -254,11 +254,10 @@ stability-specific kernel actions now use
 | Geometric kernels and convolution | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai` |
 | Scheme semistability and relative HN | `DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families` |
 | Stability-specific kernel actions | `DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai` |
-| Former combined surface during migration | `DerivedAlgGeo.Compatibility.StabilityConditionFamilies` |
 
-New library code should use the narrow owner import. The Compatibility import
-is public but intentionally a leaf; it provides staged migration without
-reintroducing a CategoryTheory-to-geometry edge. It preserves the former
-combined import surface, not retired qualified names for neutral categorical,
-weak-stability, Bridgeland-family, scheme-derived family, `Dqc`, or neutral
-geometric Fourier--Mukai declarations, nor for stability-specific geometry.
+The former combined
+`DerivedAlgGeo.Compatibility.StabilityConditionFamilies` import has been
+retired now that all repository consumers use their narrow owner imports. The
+public `Compatibility` umbrella retains only the deprecated GroupAction aliases
+needed to elaborate immutable human-review payloads; it is not a general
+migration surface.

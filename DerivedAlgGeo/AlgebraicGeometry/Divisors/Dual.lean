@@ -3,9 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 -- Narrowed from `Divisors.Determinant` (2026-08-15). Everything below needs only
--- `Divisors.Tensor`; the single declaration that needed `Determinant` moved to
+-- `Modules.Tensor.Basic`; the single declaration that needed `Determinant` moved to
 -- `Divisors.LineBundleDual`, which took `Dual` off `ExteriorPower`'s critical path.
-import DerivedAlgGeo.AlgebraicGeometry.Divisors.Tensor
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
 
 /-!
 # Duals of invertible module sheaves

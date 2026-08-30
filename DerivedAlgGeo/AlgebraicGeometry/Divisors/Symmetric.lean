@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Divisors.Monoidal
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal
 
 /-!
 # Symmetry of the tensor product on invertible sheaves
