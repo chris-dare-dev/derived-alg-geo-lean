@@ -79,7 +79,7 @@ mentions it.
   needs the discriminant and is not proved here.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Wall
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall
 
 /-- A numerical class `(r, c, d)`.
 
@@ -507,4 +507,4 @@ theorem wall_eq_of_meet_needs_charge :
   refine ⟨(0, 1, 0), (1, 0, 0), ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
     norm_num [wallExpr, reZ, imZ, minA, minB, minC, degV, rk, deg, ch2]
 
-end CategoryTheory.Triangulated.StabilityCondition.Wall
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall

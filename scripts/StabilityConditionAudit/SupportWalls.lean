@@ -108,27 +108,27 @@ Arithmetic on triples of reals. There is NO surface: no coherent sheaf, no
 Chern character, no polarisation, and no Bogomolov-Gieseker inequality -- and
 none is axiomatised, because the wall equation is an identity and needs none. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.NumClass
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.NumClass.rk
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.NumClass.deg
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.NumClass.ch2
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.reZ
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.imZ
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.minA
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.minB
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.minC
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.wallExpr
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.wallExpr_eq
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.wall_iff_circle
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.wall_circle_eq
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.wall_line_eq
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.shift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.minA_shift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.minB_shift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.minC_shift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.wallExpr_shift
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.charge_eq_zero_iff
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.eq_of_two_walls
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.NumClass
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.NumClass.rk
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.NumClass.deg
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.NumClass.ch2
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.reZ
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.imZ
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.minA
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.minB
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.minC
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallExpr
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallExpr_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wall_iff_circle
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wall_circle_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wall_line_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.shift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.minA_shift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.minB_shift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.minC_shift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallExpr_shift
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.charge_eq_zero_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.eq_of_two_walls
 
 /-! ### Wall lane — the nested wall theorem
 
@@ -142,19 +142,19 @@ it exhibits two genuinely different walls meeting at the one point where `v`'s
 charge degenerates, which is what makes the charge hypothesis load-bearing
 rather than decorative. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.minor_orth
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.crossAB
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.crossAC
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.crossBC
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.crossAB_swap
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.crossAC_swap
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.crossBC_swap
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.minorCross_eq_zero_of_two_walls
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.wall_subset_of_crossZero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.wall_eq_of_meet
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.degV
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.degV_charge_eq_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.wall_eq_of_meet_needs_charge
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.minor_orth
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.crossAB
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.crossAC
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.crossBC
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.crossAB_swap
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.crossAC_swap
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.crossBC_swap
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.minorCross_eq_zero_of_two_walls
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wall_subset_of_crossZero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wall_eq_of_meet
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.degV
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.degV_charge_eq_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wall_eq_of_meet_needs_charge
 
 
 /-! ## Spherical walls — the `exp(β + iω)` chart
@@ -166,46 +166,46 @@ tilt-stability walls above, sharing no declaration with them; see the module
 docstrings in
 `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Walls/`. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairing_mk
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.selfPairing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.selfPairing_eq_pairing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.selfPairing_mk
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.chartRe
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.chartIm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairingRe
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairingIm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairingRe_eq
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairingIm_eq
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairingIm_eq_of_symm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.two_mul_rk_mul_pairingRe
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairingRe_eq_of_rk_ne_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.two_mul_rk_mul_pairingRe_of_rk_eq_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairingRe_of_rk_eq_zero
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.IsSpherical
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.isSpherical_iff
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.sphericalPlus
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.mem_sphericalPlus_iff
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.isSpherical_of_mem_sphericalPlus
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.rk_pos_of_mem_sphericalPlus
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.corank_eq_of_isSpherical
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.wall
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.mem_wall_iff
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.chamber
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.mem_chamber_iff
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.chamber_antitone
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.chamber_eq_compl_iUnion
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.mem_wall_iff_of_isSpherical
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.IntegralComparison
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.IntegralComparison.toFun
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.IntegralComparison.compat
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.IntegralComparison.mk.inj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.IntegralComparison.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.IntegralComparison.map
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.IntegralComparison.map_fst
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.pairing_map
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.selfPairing_map
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.isSpherical_map_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairing_mk
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.selfPairing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.selfPairing_eq_pairing
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.selfPairing_mk
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartRe
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartIm
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingRe
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingIm
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingRe_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingIm_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingIm_eq_of_symm
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.two_mul_rk_mul_pairingRe
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingRe_eq_of_rk_ne_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.two_mul_rk_mul_pairingRe_of_rk_eq_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingRe_of_rk_eq_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IsSpherical
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.isSpherical_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.sphericalPlus
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_sphericalPlus_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.isSpherical_of_mem_sphericalPlus
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.rk_pos_of_mem_sphericalPlus
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.corank_eq_of_isSpherical
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.wall
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_wall_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_chamber_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber_antitone
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber_eq_compl_iUnion
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_wall_iff_of_isSpherical
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison.toFun
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison.compat
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison.mk.inj
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison.map
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison.map_fst
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairing_map
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.selfPairing_map
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.isSpherical_map_iff
 
 /-! ## Spherical walls — local finiteness
 
@@ -215,22 +215,22 @@ geometric theory would get from Hodge index, and the positive lower bound on
 `q(ω,ω)` that its "bounded region" wording leaves implicit, are both fields of
 `BoundedRegion` and are supplied by the caller. Nothing here constructs one. -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.carrier
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.bounded
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.ampleLower
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.ampleLower_pos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.ample_le
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.coercivity
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.coercivity_pos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.neg_definite
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.mk.inj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.key
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.rk_sq_le
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.normSq_sub_smul_le
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.reconstruct
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.wallCandidates
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.exists_norm_fst_le
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.wallCandidates_subset
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical.BoundedRegion.finite_wallCandidates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.carrier
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.bounded
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.ampleLower
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.ampleLower_pos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.ample_le
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.coercivity
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.coercivity_pos
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.neg_definite
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.mk.inj
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.key
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.rk_sq_le
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.normSq_sub_smul_le
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.reconstruct
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.wallCandidates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.exists_norm_fst_le
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.wallCandidates_subset
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.finite_wallCandidates

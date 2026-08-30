@@ -60,6 +60,13 @@ STRONG_FAMILIES_NAMESPACE = (
     "CategoryTheory.Triangulated.WeakStabilityCondition."
     "StabilityCondition.Families"
 )
+STRONG_WALL_NAMESPACE = (
+    "CategoryTheory.Triangulated.WeakStabilityCondition."
+    "StabilityCondition.Wall"
+)
+RETIRED_STRONG_WALL_NAMESPACE = (
+    "CategoryTheory.Triangulated.StabilityCondition.Wall"
+)
 LEGACY_GENERIC_FAMILY_DECLARATION = re.compile(
     r"CategoryTheory\.Triangulated\.StabilityCondition\.Families\."
     r"(?:TriangulatedFiberFamily|BoundednessProblem|UniversalBoundedness)\b"
@@ -490,6 +497,27 @@ def main() -> int:
                 "restored the legacy flattened namespace"
             )
 
+    strong_walls_source_root = strong_stability_root / "Walls"
+    for relative in (
+        pathlib.Path("Numerical") / "Basic.lean",
+        pathlib.Path("Spherical") / "Basic.lean",
+        pathlib.Path("Spherical") / "Finiteness.lean",
+    ):
+        path = strong_walls_source_root / relative
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {STRONG_WALL_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: Bridgeland wall declarations "
+                f"must use namespace {STRONG_WALL_NAMESPACE}"
+            )
+    for path in sorted(strong_walls_source_root.rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {RETIRED_STRONG_WALL_NAMESPACE}" in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: Bridgeland wall declarations "
+                "restored the former sibling namespace"
+            )
+
     weak_parent_paths = [weak_stability_umbrella]
     weak_parent_paths.extend(
         path
@@ -852,6 +880,10 @@ def main() -> int:
     )
     print(
         "ok: Bridgeland-family declarations use the matching strong-child "
+        "namespace"
+    )
+    print(
+        "ok: Bridgeland wall declarations use the matching strong-child "
         "namespace"
     )
     print(

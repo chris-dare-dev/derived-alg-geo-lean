@@ -131,6 +131,10 @@ new derived-category theory.
   `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
   Strong family packages and pre-stability base-change data belong to that
   child; geometry-owned realizations remain separate consumers.
+- Bridgeland wall theory under the strong child's `Walls/` subtree uses
+  `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`;
+  do not restore the former sibling `CategoryTheory.Triangulated.StabilityCondition.Wall`
+  namespace.
 - Generic moduli boundedness interfaces shared by weak stability and geometric
   moduli also belong under `CategoryTheory/Triangulated/Families/`; neither
   consumer owns the common root.
