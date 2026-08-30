@@ -10,5 +10,6 @@ import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids
 The generic definitions are owned by
 `DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids`.  This module keeps the
 former import path working for algebraic-geometry clients; new generic code
-should import the neutral owner directly.
+should import the neutral owner directly. It preserves the import surface, not
+the retired `AlgebraicGeometry.StackInGroupoids` qualified name.
 -/

@@ -330,13 +330,15 @@ class StackInGroupoids.HasRepresentableDiagonal
     (F : StackInGroupoids Scheme.{u} Scheme.zariskiTopology) : Prop where
   representation {S : Scheme.{u}}
     (x y : F.presheaf.obj (.mk (op S))) :
-    Nonempty (F.DiagonalFiberRepresentation x y)
+    Nonempty
+      (AlgebraicGeometry.StackInGroupoids.DiagonalFiberRepresentation F x y)
 
 /-- For a representable stack, the diagonal fiber over two maps `x,y : S ⟶ X`
 is the scheme-theoretic equalizer of those maps. -/
 def representableZariskiDiagonalFiberRepresentation
     {X S : Scheme.{u}} (x y : Discrete (S ⟶ X)) :
-    (representableZariskiStack X).DiagonalFiberRepresentation x y where
+    AlgebraicGeometry.StackInGroupoids.DiagonalFiberRepresentation
+      (representableZariskiStack X) x y where
   representing := Over.mk (equalizer.ι x.as y.as)
   isomorphismEquiv T :=
     { toFun := fun a ↦ Discrete.eqToIso (by
@@ -364,7 +366,8 @@ def representableZariskiDiagonalFiberRepresentation
 
 instance representableZariskiStack_hasRepresentableDiagonal
     (X : Scheme.{u}) :
-    (representableZariskiStack X).HasRepresentableDiagonal where
+    AlgebraicGeometry.StackInGroupoids.HasRepresentableDiagonal
+      (representableZariskiStack X) where
   representation x y :=
     ⟨representableZariskiDiagonalFiberRepresentation x y⟩
 
@@ -381,7 +384,8 @@ structure ZariskiStackPresentation where
   /-- The diagonal is represented by schemes via its isomorphism functors.
   The scheme-level representability is explicit because it is stronger than
   the usual algebraic-space diagonal condition. -/
-  schemeDiagonal : toStackInGroupoids.HasRepresentableDiagonal
+  schemeDiagonal : AlgebraicGeometry.StackInGroupoids.HasRepresentableDiagonal
+    toStackInGroupoids
   /-- The scheme presenting the stack. -/
   atlasScheme : Scheme.{u}
   /-- The atlas morphism from the corresponding representable stack. -/

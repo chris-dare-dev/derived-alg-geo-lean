@@ -113,6 +113,12 @@ specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one
 milestone or provenance boundary.
 
+Generic stacks in groupoids and descent-equivalence data belong under
+`CategoryTheory/Sites/` and use the `CategoryTheory` namespace. Keep
+scheme-specific representability, atlases, and algebraicity under
+`AlgebraicGeometry/Stacks/`; a compatibility import must not retain a second
+canonical qualified name.
+
 ## Choose the common root before the leaf
 
 Read [the canonical-root policy](docs/architecture/abstraction-tree.md) before
