@@ -20,7 +20,7 @@ the derived category of all sheaves: that unbounded derived essential
 surjectivity theorem is not currently available in Mathlib.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -130,4 +130,4 @@ noncomputable def affineGammaDerivedHomologyIso
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Dqc

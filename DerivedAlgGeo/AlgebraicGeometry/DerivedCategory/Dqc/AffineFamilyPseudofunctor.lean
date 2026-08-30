@@ -21,7 +21,7 @@ pseudofunctor along this functor.  The result is the correctly indexed affine
 substrate for the relative-perfect and universally-gluable restriction.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -110,4 +110,4 @@ noncomputable def affineFamilyBoundedAboveProjectiveModuliForget
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Dqc

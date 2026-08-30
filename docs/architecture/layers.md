@@ -113,9 +113,10 @@ Bridgeland family APIs have now completed separate namespace cutovers to
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`,
 respectively. The scheme-derived category and family foundations have likewise
 completed their cutover to `AlgebraicGeometry.DerivedCategory` and
-`AlgebraicGeometry.DerivedCategory.Families`. `Dqc`, geometric Fourier--Mukai,
-and stability-specific geometric declarations retain their staged namespaces
-until their separate cutovers.
+`AlgebraicGeometry.DerivedCategory.Families`. The `Dqc` subtree has completed
+its cutover to `AlgebraicGeometry.DerivedCategory.Dqc`. Geometric
+Fourier--Mukai and stability-specific geometric declarations retain their
+staged namespaces until their separate cutovers.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map
@@ -201,11 +202,12 @@ Weak-family probes and structures live in
 Bridgeland family packages live in
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
 Clients of all three groups must migrate imports and qualified names.
-Scheme-derived category and pullback declarations now use
+Scheme-derived category, pullback, and `Dqc` declarations now use
 `AlgebraicGeometry.DerivedCategory` and
-`AlgebraicGeometry.DerivedCategory.Families`, respectively. Remaining `Dqc`,
-geometric Fourier--Mukai, and stability-specific declarations keep their
-staged names until their own cutovers:
+`AlgebraicGeometry.DerivedCategory.Families`, and
+`AlgebraicGeometry.DerivedCategory.Dqc`, respectively. Remaining geometric
+Fourier--Mukai and stability-specific declarations keep their staged names
+until their own cutovers:
 
 | Client need | Import |
 | --- | --- |

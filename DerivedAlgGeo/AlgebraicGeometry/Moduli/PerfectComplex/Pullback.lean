@@ -43,8 +43,8 @@ follows the contravariant order of scheme pullback.
 namespace AlgebraicGeometry
 
 open CategoryTheory
-open CategoryTheory.Triangulated.StabilityCondition.Families
 open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 

@@ -23,7 +23,7 @@ pullback; extending it to every relative-perfect object still requires
 functorial K-flat or K-projective representatives and geometric descent.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -205,4 +205,4 @@ def affineKProjectivePullbackObjIso {R A : CommRingCat.{u}} (f : R ⟶ A)
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Dqc

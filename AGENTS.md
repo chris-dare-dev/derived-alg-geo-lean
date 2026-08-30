@@ -109,6 +109,11 @@ new derived-category theory.
   pullback declarations owned by `AlgebraicGeometry/DerivedCategory/Families/`
   use `AlgebraicGeometry.DerivedCategory.Families`. Do not place these neutral
   geometric APIs below a categorical stability-condition namespace.
+- Quasicoherent-cohomology loci and affine `Dqc` realizations owned by
+  `AlgebraicGeometry/DerivedCategory/Dqc.lean` and its `Dqc/` subtree use
+  `AlgebraicGeometry.DerivedCategory.Dqc`. Consumers should open or qualify
+  that namespace explicitly; do not route `Dqc` declarations through a
+  stability-family namespace.
 - Declarations owned by weak-stability families use
   `CategoryTheory.Triangulated.WeakStabilityCondition.Families`. Shared
   Definition 20.5 probes and APIs bound to `WeakStabilityFunction` belong to

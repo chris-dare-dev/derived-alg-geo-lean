@@ -14,7 +14,7 @@ categories are quasi-inverse.  This identifies the genuine derived category
 of quasi-coherent sheaves on `Spec R` with the derived category of `R`-modules.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -130,4 +130,4 @@ theorem affineQuasicoherentDerivedEquivalence_inverse
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Dqc

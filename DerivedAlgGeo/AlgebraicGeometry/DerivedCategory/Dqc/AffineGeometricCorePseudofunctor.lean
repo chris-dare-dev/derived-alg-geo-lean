@@ -18,7 +18,7 @@ affine pseudofunctor.  Their coherence is proved from the corresponding
 derived-category pentagon and triangle identities.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -152,4 +152,4 @@ noncomputable def affineBoundedAboveProjectiveModuliForget
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Dqc

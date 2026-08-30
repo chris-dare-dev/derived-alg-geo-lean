@@ -14,7 +14,7 @@ these are the objectwise data needed to package arbitrary affine pullback as
 a pseudofunctor before passing to big-Zariski descent.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -141,4 +141,4 @@ def affineBoundedAboveProjectiveDerivedPullbackIdIso
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Dqc

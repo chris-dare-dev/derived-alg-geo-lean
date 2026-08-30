@@ -31,9 +31,12 @@ Comparison statements a later geometric realization must still prove — the
 bounded-coherent identification and the compact/perfect comparison — remain
 propositions with no unsupported inhabitant, so unsupported geometric cases are
 still not silently identified with the all-sheaf derived category.
+
+Declarations in this file and the affine realization subtree use the
+geometry-owned namespace `AlgebraicGeometry.DerivedCategory.Dqc`.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -392,4 +395,4 @@ def PerfectObjectsAreCompactInDqc
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Dqc

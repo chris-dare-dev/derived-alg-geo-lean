@@ -23,7 +23,7 @@ the unbounded `Dqc` locus.  That general affine realization theorem requires
 additional unbounded derived-category input.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -166,4 +166,4 @@ noncomputable def affineQuasicoherentDerivedToDqcCompInclusion
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Dqc
