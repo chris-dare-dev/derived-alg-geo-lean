@@ -5,11 +5,8 @@ means that modules owned by subject `A` may import modules owned by subject
 `B`. The graph is intentionally acyclic:
 
 ```text
-Development ─┬→ Compatibility ─┬→ GeometryInstances ─┬→ AlgebraicGeometry
-             │                 │                       └→ CategoryTheory
-             │                 ├→ AlgebraicGeometry
-             │                 └→ CategoryTheory
-             ├→ GeometryInstances
+Development ─┬→ GeometryInstances ─┬→ AlgebraicGeometry
+             │                     └→ CategoryTheory
              ├→ AlgebraicGeometry
              └→ CategoryTheory
 
@@ -63,8 +60,8 @@ In particular:
   `DerivedAlgGeo.AlgebraicGeometry.StabilityCondition`;
 - `CategoryTheory` must not import either `DerivedAlgGeo.AlgebraicGeometry` or
   `Mathlib.AlgebraicGeometry`;
-- `Compatibility` and `Development` are leaf layers and must never become
-  dependencies of stable subject modules.
+- `Development` is a leaf layer and must never become a dependency of stable
+  subject modules. The former public `Compatibility` layer has been retired.
 
 ## Generic constructions and refinements
 
@@ -138,10 +135,11 @@ conditions has completed its cutover from the former sibling namespace to
 The associated slicing, pre-stability, and stability group actions have
 completed their cutover to
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
-Only `Compatibility/StabilityConditionGroupActionReview.lean` retains
-deprecated aliases in the former sibling namespace so the immutable reviewed
-statement payloads continue to elaborate; that bridge is not a second public
-API and is removed after reviewer reconfirmation.
+No public module retains aliases in the former sibling namespace. The
+executable-only `exe/RestateHistoricalNames.lean` module supplies the exact
+historical names while immutable reviewed statements are re-elaborated; it is
+unreachable from the public and sweep umbrellas and therefore is not a second
+library API.
 Bridgeland deformation helpers have completed their cutover from the flattened
 `CategoryTheory.Triangulated.Deformation` namespace to
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`.
@@ -258,6 +256,7 @@ stability-specific kernel actions now use
 The former combined
 `DerivedAlgGeo.Compatibility.StabilityConditionFamilies` import has been
 retired now that all repository consumers use their narrow owner imports. The
-public `Compatibility` umbrella retains only the deprecated GroupAction aliases
-needed to elaborate immutable human-review payloads; it is not a general
-migration surface.
+`DerivedAlgGeo.Compatibility` umbrella and final GroupAction compatibility leaf
+are also retired. Immutable historical review text is supported only inside the
+restatement executable, while review-to-declaration joins follow canonical
+renames by statement digest.

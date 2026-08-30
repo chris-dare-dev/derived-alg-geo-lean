@@ -56,8 +56,6 @@ See `CONTRIBUTING.md` §"Where verification runs".
 - `DerivedAlgGeo/CategoryTheory` — monoidal and enriched category theory, raw
   and pretriangulated dg categories, dg enhancements, t-structures, and
   stability conditions.
-- `DerivedAlgGeo/Compatibility` — temporary leaf imports for staged module
-  migrations; stable subjects never depend on it.
 - `DerivedAlgGeo/LinearAlgebra` — integral and Mukai lattices and matrix tools.
 - `DerivedAlgGeo/Algebra` and `DerivedAlgGeo/Topology` — reusable supporting
   mathematics.

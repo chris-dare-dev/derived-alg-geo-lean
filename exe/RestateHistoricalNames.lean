@@ -6,16 +6,19 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Stabilit
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.GLTilde.Action.Slicing
 
 /-!
-# Human-review compatibility for the GroupAction namespace cutover
+# Historical names for restating immutable reviews
 
 The canonical declarations live in the Bridgeland strong-child namespace
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
-The aliases below exist only so the immutable, human-authored statement payloads
-in `attest/review.yaml` continue to elaborate after that namespace cutover.
+The aliases below are deliberately outside the `DerivedAlgGeo` library and are
+imported only by the restatement executable. They let the exact, immutable
+statement payloads in `attest/review.yaml` elaborate without exposing the
+retired namespace to library consumers or the declaration emitter.
 
-Do not add consumers or further aliases here. Once the named reviewer has
-reconfirmed the two affected entries against the canonical declarations, this
-module and its umbrella import should be removed.
+Do not import this module from library code, add aliases, or use these names in
+new review payloads. Review-to-declaration joins survive renames by statement
+digest; this bridge exists only because the stored pretty-printed statements
+must still resolve the names that the reviewer originally read.
 -/
 
 namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction

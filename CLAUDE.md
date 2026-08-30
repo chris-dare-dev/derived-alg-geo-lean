@@ -170,17 +170,17 @@ Group actions on slicings, pre-stability conditions, and Bridgeland stability
 conditions use the matching strong-child namespace
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`,
 not the former sibling
-`CategoryTheory.Triangulated.StabilityCondition.GroupAction`. The deprecated
-aliases in `Compatibility/StabilityConditionGroupActionReview.lean` are a
-narrow exception for immutable human-review payloads: only the Compatibility
-umbrella may import them, and they should be removed after reviewer
-reconfirmation.
+`CategoryTheory.Triangulated.StabilityCondition.GroupAction`. Public aliases in
+that retired namespace are forbidden. The executable-only
+`exe/RestateHistoricalNames.lean` bridge carries the historical names
+needed to elaborate immutable human-review payloads; library modules must not
+import it or redeclare those names.
 
 The staged import-only shims at `Divisors/{Tensor,Picard,Monoidal}.lean`,
 `Stacks/Basic.lean`, and `Compatibility/StabilityConditionFamilies.lean` are
 retired. Import the categorical or geometric owner directly; do not recreate a
-compatibility path that mixes owners. The GroupAction review bridge above is
-the only compatibility leaf retained by the public umbrella.
+compatibility path that mixes owners or restore the `DerivedAlgGeo.Compatibility`
+umbrella.
 
 Helpers intrinsically about deforming a Bridgeland stability condition use
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`,

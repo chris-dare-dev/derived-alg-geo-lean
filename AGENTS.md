@@ -156,16 +156,15 @@ new derived-category theory.
   `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
   Do not restore the former sibling
   `CategoryTheory.Triangulated.StabilityCondition.GroupAction` namespace. The
-  deprecated aliases in
-  `Compatibility/StabilityConditionGroupActionReview.lean` exist solely to
-  elaborate immutable human-review payloads; no library consumer may import
-  that leaf directly, and it should be removed after reviewer reconfirmation.
+  public compatibility aliases have been retired. Historical names embedded in
+  immutable review payloads are confined to the executable-only
+  `exe/RestateHistoricalNames.lean` bridge; no library module may import it
+  or redeclare those names.
 - Do not recreate the retired import-only shims under
   `Divisors/{Tensor,Picard,Monoidal}.lean`, `Stacks/Basic.lean`, or
-  `Compatibility/StabilityConditionFamilies.lean`.
-  Consumers import the categorical or geometric owner directly. The temporary
-  GroupAction review bridge is the only compatibility leaf retained by the
-  public umbrella.
+  `Compatibility/StabilityConditionFamilies.lean`, and do not restore the
+  `DerivedAlgGeo.Compatibility` umbrella. Consumers import the categorical or
+  geometric owner directly.
 - Helpers intrinsically about deforming a Bridgeland stability condition use
   `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`.
   Do not restore the flattened `CategoryTheory.Triangulated.Deformation`
