@@ -124,6 +124,12 @@ Wall theory in the same strong child uses
 Do not put new wall declarations back under the former sibling
 `CategoryTheory.Triangulated.StabilityCondition.Wall` namespace.
 
+Categorical Fourier--Mukai actions on Bridgeland stability conditions in the
+strong child's `Symmetry/` subtree use
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry`.
+The former sibling `CategoryTheory.Triangulated.StabilityCondition.Symmetry`
+namespace is retired.
+
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one

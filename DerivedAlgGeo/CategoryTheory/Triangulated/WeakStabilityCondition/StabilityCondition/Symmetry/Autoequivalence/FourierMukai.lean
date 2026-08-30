@@ -90,10 +90,11 @@ specialized here, not the Grothendieck-group functoriality.
 
 universe w u u' x t x₁ x₂ x₃ t₁ t₂ t₃
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Symmetry
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
+open CategoryTheory.Triangulated.StabilityCondition
 
 noncomputable section
 
@@ -903,4 +904,4 @@ end FromAdjoint
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Symmetry
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry
