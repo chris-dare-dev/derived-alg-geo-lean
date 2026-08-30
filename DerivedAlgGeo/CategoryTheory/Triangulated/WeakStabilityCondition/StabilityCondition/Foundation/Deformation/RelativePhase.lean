@@ -16,7 +16,7 @@ primitive rather than the retained package.
 
 noncomputable section
 
-namespace CategoryTheory.Triangulated.Deformation
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 /-- The lift of the phase of `w` whose branch is centred at `α`. -/
 def relativePhase (w : ℂ) (α : ℝ) : ℝ :=
@@ -168,4 +168,4 @@ theorem relativePhase_eq_of_mem {w : ℂ} (hw : w ≠ 0) (α β : ℝ)
   rw [← hpolar] at hrecognize
   exact hrecognize.symm
 
-end CategoryTheory.Triangulated.Deformation
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation

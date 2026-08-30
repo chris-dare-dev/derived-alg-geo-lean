@@ -160,6 +160,13 @@ new derived-category theory.
   `Compatibility/StabilityConditionGroupActionReview.lean` exist solely to
   elaborate immutable human-review payloads; no library consumer may import
   that leaf directly, and it should be removed after reviewer reconfirmation.
+- Helpers intrinsically about deforming a Bridgeland stability condition use
+  `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`.
+  Do not restore the flattened `CategoryTheory.Triangulated.Deformation`
+  namespace. A declaration extending a canonical structure such as `Slicing`,
+  `PreStabilityCondition.WithClassMap`, or `StabilityCondition.WithClassMap`
+  remains in that structure's established namespace; physical placement in the
+  deformation subtree does not override API ownership.
 - Generic moduli boundedness interfaces shared by weak stability and geometric
   moduli also belong under `CategoryTheory/Triangulated/Families/`; neither
   consumer owns the common root.

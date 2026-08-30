@@ -28,7 +28,7 @@ statement is proved in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTil
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.Deformation
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 

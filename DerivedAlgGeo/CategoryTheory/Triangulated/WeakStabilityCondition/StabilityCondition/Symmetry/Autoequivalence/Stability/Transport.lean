@@ -79,6 +79,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 namespace CategoryTheory.Triangulated
 
 open CategoryTheory.Triangulated
+open WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat
 
 universe w u u'
 
@@ -112,8 +113,7 @@ theorem autFunctor_strictMono (s : Slicing C) (a b : ℝ)
   let S : ShortComplex ((s.mapEquiv Φ).IntervalCat C a b) :=
     ShortComplex.mk f (cokernel.π f) (cokernel.condition f)
   have hsse : StrictShortExact S :=
-    CategoryTheory.Triangulated.Deformation.Slicing.IntervalCat.strictShortExact_cokernel
-      C f hf
+    strictShortExact_cokernel C f hf
   obtain ⟨δ, hδ⟩ :=
     CategoryTheory.Triangulated.Slicing.IntervalCat.exists_distinguished_of_strictShortExact
       C (s.mapEquiv Φ) hsse
@@ -154,8 +154,7 @@ theorem autFunctor_isAdmissibleSubobject (s : Slicing C) (a b : ℝ)
   refine ⟨F.obj Y, F.obj Q, F.map i, inferInstance, F.map q, ?_, δ', ?_⟩
   · subst A
     have hcanonical : IsStrictMono (Subobject.mk i).arrow :=
-      CategoryTheory.Triangulated.Deformation.Slicing.IntervalCat.subobject_arrow_strictMono
-        C i hiStrict
+      subobject_arrow_strictMono C i hiStrict
     have hcanonicalMap : IsStrictMono (F.map (Subobject.mk i).arrow) :=
       autFunctor_strictMono Φ s a b _ hcanonical
     letI : Mono (F.map (Subobject.mk i).arrow) := hcanonicalMap.mono

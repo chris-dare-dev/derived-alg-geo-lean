@@ -19,7 +19,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 
 universe u v u'
 
-namespace CategoryTheory.Triangulated.Deformation
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
@@ -58,4 +58,4 @@ theorem exists_sectorRadius (σ : StabilityCondition.WithClassMap C v) :
   rw [hscale]
   exact hfinite
 
-end CategoryTheory.Triangulated.Deformation
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation

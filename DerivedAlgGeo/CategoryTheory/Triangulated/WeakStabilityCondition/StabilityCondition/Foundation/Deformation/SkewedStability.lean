@@ -21,7 +21,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 
 universe u v u'
 
-namespace CategoryTheory.Triangulated.Deformation
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
@@ -209,4 +209,4 @@ theorem IsSemistable.ofCompatibleInterval
 
 end SkewedStabilityFunction
 
-end CategoryTheory.Triangulated.Deformation
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation

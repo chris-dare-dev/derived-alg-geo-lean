@@ -20,7 +20,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 
 universe u v u'
 
-namespace CategoryTheory.Triangulated.Deformation
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated.TStructure
@@ -600,4 +600,4 @@ theorem hn_exists
 
 end SkewedStabilityFunction
 
-end CategoryTheory.Triangulated.Deformation
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation

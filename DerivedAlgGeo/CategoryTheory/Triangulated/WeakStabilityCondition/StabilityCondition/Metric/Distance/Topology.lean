@@ -37,7 +37,7 @@ distance bound.  They feed the **easy** direction only —
 
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
-open CategoryTheory.Triangulated CategoryTheory.Triangulated.Deformation
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 open scoped ENNReal Topology
 
 namespace CategoryTheory.Triangulated

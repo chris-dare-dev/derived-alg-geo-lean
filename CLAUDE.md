@@ -176,6 +176,14 @@ narrow exception for immutable human-review payloads: only the Compatibility
 umbrella may import them, and they should be removed after reviewer
 reconfirmation.
 
+Helpers intrinsically about deforming a Bridgeland stability condition use
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`,
+not the retired flattened `CategoryTheory.Triangulated.Deformation` namespace.
+Declarations that extend canonical structures such as `Slicing`,
+`PreStabilityCondition.WithClassMap`, or `StabilityCondition.WithClassMap`
+remain in those structures' established namespaces even when their source
+files live in the deformation subtree.
+
 Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
 generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural
 move must update imports, umbrellas, audits, declaration-sweep routing,

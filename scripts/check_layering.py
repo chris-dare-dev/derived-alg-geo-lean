@@ -85,6 +85,8 @@ STRONG_GROUP_ACTION_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.GroupAction"
 RETIRED_STRONG_GROUP_ACTION_NAMESPACE = (
     "CategoryTheory.Triangulated.StabilityCondition.GroupAction"
 )
+STRONG_DEFORMATION_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Deformation"
+RETIRED_STRONG_DEFORMATION_NAMESPACE = "CategoryTheory.Triangulated.Deformation"
 REVIEW_GROUP_ACTION_COMPATIBILITY = (
     SOURCE_ROOT / "Compatibility" / "StabilityConditionGroupActionReview.lean"
 )
@@ -566,6 +568,31 @@ def main() -> int:
                 "restored the former sibling namespace"
             )
 
+    strong_deformation_source_root = (
+        strong_stability_root / "Foundation" / "Deformation"
+    )
+    for module in (
+        "ChargePerturbation",
+        "FiniteLengthHN",
+        "FirstStrictSES",
+        "LocalFiniteness",
+        "NearIdentity",
+        "PhaseArithmetic",
+        "PullbackCokernel",
+        "RelativePhase",
+        "SkewedStability",
+        "StabilitySeminorm",
+        "StabilityTopology",
+        "StrictMDQ",
+    ):
+        path = strong_deformation_source_root / f"{module}.lean"
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {STRONG_DEFORMATION_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: Bridgeland deformation helpers "
+                f"must use namespace {STRONG_DEFORMATION_NAMESPACE}"
+            )
+
     strong_symmetry_bridge = (
         strong_stability_root
         / "Symmetry"
@@ -839,6 +866,11 @@ def main() -> int:
                 f"{path.relative_to(ROOT)}: declaration restored the retired "
                 f"strong-sibling namespace {RETIRED_STRONG_SYMMETRY_NAMESPACE}"
             )
+        if RETIRED_STRONG_DEFORMATION_NAMESPACE in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: declaration restored the retired "
+                f"namespace {RETIRED_STRONG_DEFORMATION_NAMESPACE}"
+            )
         if (
             path != REVIEW_GROUP_ACTION_COMPATIBILITY
             and RETIRED_STRONG_GROUP_ACTION_NAMESPACE in text
@@ -1074,6 +1106,10 @@ def main() -> int:
     print(
         "ok: Bridgeland GroupAction declarations use the matching strong-child "
         "namespace; only the human-review bridge retains the retired name"
+    )
+    print(
+        "ok: Bridgeland deformation helpers use the matching strong-child "
+        "namespace"
     )
     print(
         "ok: scheme-derived categories, families, Dqc, and geometric "
