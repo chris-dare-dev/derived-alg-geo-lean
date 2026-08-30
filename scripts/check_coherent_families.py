@@ -20,9 +20,6 @@ LIBRARY = ROOT / "DerivedAlgGeo"
 GEOMETRIC_FOURIER_MUKAI = (
     "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai"
 )
-STABILITY_FOURIER_MUKAI = (
-    "DerivedAlgGeo/AlgebraicGeometry/StabilityCondition/FourierMukai"
-)
 
 # Class-name tokens, not binder substrings: `[i : HasDerivedTensorAssoc D]`, a
 # qualified name, or a line-wrapped binder must all count. The 2026-08-18
@@ -39,13 +36,13 @@ LEGACY_CLASSES = re.compile(
 # them and derive their one-way views from the coherent roots.
 LEGACY_DEFINING = {
     f"{GEOMETRIC_FOURIER_MUKAI}/KernelConvolution.lean",
-    f"{STABILITY_FOURIER_MUKAI}/KernelUnitConvolution.lean",
+    f"{GEOMETRIC_FOURIER_MUKAI}/KernelUnitConvolution.lean",
 }
 
 TENSOR_UNIT = re.compile(r"\bHasTensorUnit\b")
 TENSOR_UNIT_BINDER = re.compile(r"\[\s*(?:\w+\s*:\s*)?HasTensorUnit\b")
-TENSOR_UNIT_DEFINING = f"{STABILITY_FOURIER_MUKAI}/KernelUnit.lean"
-TENSOR_UNIT_COMPAT = f"{STABILITY_FOURIER_MUKAI}/KernelUnitConvolution.lean"
+TENSOR_UNIT_DEFINING = f"{GEOMETRIC_FOURIER_MUKAI}/KernelUnit.lean"
+TENSOR_UNIT_COMPAT = f"{GEOMETRIC_FOURIER_MUKAI}/KernelUnitConvolution.lean"
 
 
 def main() -> int:

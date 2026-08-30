@@ -37,7 +37,7 @@ bounded coherent/perfect realization, moduli construction, or conclusion of
 Theorem 22.2 is asserted.
 -/
 
-namespace AlgebraicGeometry.StabilityCondition.Families
+namespace AlgebraicGeometry.Moduli.HarderNarasimhan
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -267,73 +267,6 @@ theorem constant_nonempty
 
 end SchemeRelativeHNFiltration
 
-/-- The old Dedekind-HN problem specialized to actual regular curve base
-changes and object-level relative HN filtrations.  `IsEligible` is kept
-explicit for geometric conditions not encoded by `RegularCurveBaseChange`,
-such as an essentially-finite-type hypothesis. -/
-def schemeRelativeHNProblem
-    (IsEligible : RegularCurveBaseChange S → Prop) :
-    DedekindHNProblem (RegularCurveBaseChange S) where
-  IsEligible := IsEligible
-  HNStructure := fun T ↦
-    ∀ E : F.Fiber T.baseChange,
-      SchemeRelativeHNFiltration F classMap sigma E
-
-/-- The named general geometric existence premise for object-level relative
-HN filtrations on every eligible regular curve base change. -/
-def HasSchemeRelativeHNFiltrations
-    (IsEligible : RegularCurveBaseChange S → Prop) : Prop :=
-  ∀ (T : RegularCurveBaseChange S), IsEligible T →
-    ∀ E : F.Fiber T.baseChange,
-      Nonempty (SchemeRelativeHNFiltration F classMap sigma E)
-
-/-- Objectwise relative-HN existence supplies the legacy integration clause.
-The choice of one filtration for every object is made explicitly here. -/
-theorem integratesAfterDedekindBaseChange_of_relativeHN
-    {IsEligible : RegularCurveBaseChange S → Prop}
-    (h : HasSchemeRelativeHNFiltrations F classMap sigma IsEligible) :
-    IntegratesAfterDedekindBaseChange
-      (schemeRelativeHNProblem F classMap sigma IsEligible) := by
-  intro T hT
-  exact ⟨fun E ↦ (h T hT E).some⟩
-
-/-- The constant categorical family inhabits the named relative-HN existence
-premise on every supplied regular curve, for any explicit eligibility
-predicate. -/
-theorem hasSchemeRelativeHNFiltrations_constant
-    (S : Scheme.{u})
-    (C : Type w) [Category.{w} C] [Preadditive C] [HasZeroObject C]
-    [HasShift C ℤ] [∀ n : ℤ, (shiftFunctor C n).Additive]
-    [Pretriangulated C]
-    (V : Type uV) [AddCommGroup V] (v₀ : K₀ C →+ V)
-    (sigma₀ : PreStabilityCondition.WithClassMap C v₀)
-    (IsEligible : RegularCurveBaseChange S → Prop) :
-    HasSchemeRelativeHNFiltrations
-      (SchemeTriangulatedFiberFamily.constant S C)
-      (fun _ ↦ v₀) (fun _ ↦ sigma₀) IsEligible := by
-  intro T _ E
-  exact SchemeRelativeHNFiltration.constant_nonempty S C V v₀ sigma₀
-    T.baseChange E
-
-/-- Consequently the constant categorical family also inhabits the legacy
-Dedekind-HN integration interface with genuine object-level filtration data. -/
-theorem integratesAfterDedekindBaseChange_relativeHN_constant
-    (S : Scheme.{u})
-    (C : Type w) [Category.{w} C] [Preadditive C] [HasZeroObject C]
-    [HasShift C ℤ] [∀ n : ℤ, (shiftFunctor C n).Additive]
-    [Pretriangulated C]
-    (V : Type uV) [AddCommGroup V] (v₀ : K₀ C →+ V)
-    (sigma₀ : PreStabilityCondition.WithClassMap C v₀)
-    (IsEligible : RegularCurveBaseChange S → Prop) :
-    IntegratesAfterDedekindBaseChange
-      (schemeRelativeHNProblem
-        (SchemeTriangulatedFiberFamily.constant S C)
-        (fun _ ↦ v₀) (fun _ ↦ sigma₀) IsEligible) :=
-  integratesAfterDedekindBaseChange_of_relativeHN
-    (SchemeTriangulatedFiberFamily.constant S C)
-    (fun _ ↦ v₀) (fun _ ↦ sigma₀)
-    (hasSchemeRelativeHNFiltrations_constant S C V v₀ sigma₀ IsEligible)
-
 end
 
-end AlgebraicGeometry.StabilityCondition.Families
+end AlgebraicGeometry.Moduli.HarderNarasimhan

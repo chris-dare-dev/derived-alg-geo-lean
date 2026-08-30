@@ -1,6 +1,5 @@
-# Moduli/Stacks -> StabilityCondition/Families migration exceptions.
+# AlgebraicGeometry -> categorical Instances/AlgebraicGeometry exceptions.
 # Format: source path relative to DerivedAlgGeo, TAB, exact imported module.
 #
-# The cutover to AlgebraicGeometry/DerivedCategory burned this list to zero.
-# Do not add an exception: reusable moduli and stack roots must import the
-# neutral owner rather than a stability-specific leaf.
+# The structural cutover burned this list to zero. Do not add an exception:
+# geometric sources import the categorical source, never its realization leaf.

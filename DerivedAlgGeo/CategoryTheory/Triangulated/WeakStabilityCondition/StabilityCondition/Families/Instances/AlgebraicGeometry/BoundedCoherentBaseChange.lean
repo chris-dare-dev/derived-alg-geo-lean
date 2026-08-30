@@ -8,7 +8,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Stabilit
 import Mathlib.CategoryTheory.Triangulated.Adjunction
 
 /-!
-# Geometric pre-stability base change on bounded coherent fibers
+# Bounded coherent realization of categorical pre-stability base change
 
 This file connects the actual bounded coherent pullback from
 `Families.BoundedGeometry` to `FiberPreStabilityBaseChangeData`.
@@ -33,7 +33,7 @@ there is no global theorem switch and no preconstructed `Slicing.PreimageData`
 input.  Openness and relative-HN consequences are exported downstream.
 -/
 
-namespace AlgebraicGeometry.StabilityCondition.Families
+namespace AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -382,4 +382,4 @@ end GeometricPreStabilityBaseChangeData
 
 end
 
-end AlgebraicGeometry.StabilityCondition.Families
+end AlgebraicGeometry.DerivedCategory.Families

@@ -25,10 +25,11 @@ So the rule keys on content, not on position: a file that declares nothing and
 has a directory of its own name is an umbrella, and must cover it. A file that
 declares something is a module, and is left alone.
 
-There is one explicit abstraction boundary: the weak-stability umbrella must
-not re-export its stronger Bridgeland child. The subject-layering gate checks
-the import direction at that boundary. Keeping the exception as an exact
-umbrella/child pair prevents it from weakening coverage anywhere else.
+Explicit abstraction boundaries keep a generic umbrella from re-exporting a
+stronger child or an opt-in geometric instance umbrella. The subject-layering
+gate checks the import direction at those boundaries. Keeping every exception
+as an exact umbrella/child pair prevents it from weakening coverage anywhere
+else.
 """
 
 from __future__ import annotations
@@ -50,6 +51,20 @@ EXPLICIT_CHILD_BOUNDARIES = {
     "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition": {
         "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
         "StabilityCondition",
+    },
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families": {
+        "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+        "Families.Instances",
+    },
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+    "StabilityCondition.Families": {
+        "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+        "StabilityCondition.Families.Instances",
+    },
+    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+    "StabilityCondition.Symmetry.Autoequivalence": {
+        "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
+        "StabilityCondition.Symmetry.Autoequivalence.Instances",
     },
 }
 

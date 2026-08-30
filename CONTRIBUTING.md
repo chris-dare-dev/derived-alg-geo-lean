@@ -34,9 +34,11 @@ Scheme-specific specializations of that generic construction live under
 `AlgebraicGeometry/DerivedCategory/`: this is the owner for module-sheaf
 derived categories, `Dqc`, scheme-indexed derived pullback, and geometric
 Fourier--Mukai kernels. A registration-only adapter may instead use the generic
-construction's `Instances/AlgebraicGeometry/` leaf. Do not put neutral derived
-geometry under `AlgebraicGeometry/StabilityCondition/`; that subtree is only
-for APIs that consume weak or Bridgeland stability data.
+construction's `Instances/AlgebraicGeometry/` leaf. The former
+`AlgebraicGeometry/StabilityCondition/` subtree is retired: an API that
+implements weak or Bridgeland stability belongs in the corresponding
+categorical construction's `Instances/AlgebraicGeometry/` leaf, while the
+underlying geometric object or theorem remains with its geometric owner.
 
 Declaration namespaces follow those owners. Use
 `AlgebraicGeometry.DerivedCategory` for the scheme-derived category API in
@@ -77,17 +79,24 @@ scheme-specific Mumford slope input geometry-owned, and place a valid
 promotion to Bridgeland stability below the strong theory through an explicit
 geometric realization.
 
-Within geometry, use `AlgebraicGeometry/StabilityCondition/Families/` for
-semistable loci, relative HN data, and stability base-change witnesses, and
-`AlgebraicGeometry/StabilityCondition/FourierMukai/` for kernel actions that
-actually use stability-condition autoequivalences. Their neutral prerequisites
-belong under `AlgebraicGeometry/DerivedCategory/`.
+Place the geometric substance of semistability and relative HN theory under
+`AlgebraicGeometry/Moduli/Semistability/` and
+`AlgebraicGeometry/Moduli/HarderNarasimhan/`. Place their weak- or
+Bridgeland-family adapters under that categorical family's
+`Instances/AlgebraicGeometry/` leaf. Likewise, neutral kernels and convolution
+stay under `AlgebraicGeometry/DerivedCategory/FourierMukai/`; the generic
+kernel-autoequivalence interface stays under
+`CategoryTheory/Triangulated/FourierMukai/`; and an action on Bridgeland
+stability is implemented under
+`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/`, with
+its geometric realization in that source's `Instances/AlgebraicGeometry/`
+leaf. Algebraic-geometry modules must never import those instance leaves.
 
-Use the matching declaration namespaces
-`AlgebraicGeometry.StabilityCondition.Families` and
-`AlgebraicGeometry.StabilityCondition.FourierMukai`. Geometry-owned moduli and
-registration instances must also use a geometric namespace, never the retired
-flattened categorical stability-family namespace.
+Geometric declarations keep the namespace of their geometric owner even when
+their implementation bridge is physically attached to a categorical source.
+Registration declarations may extend the categorical source namespace. Never
+use the retired `AlgebraicGeometry.StabilityCondition` namespace or the
+retired flattened categorical stability-family namespace.
 
 Neutral categorical family declarations use the matching
 `CategoryTheory.Triangulated.Families` namespace. In particular,
@@ -124,11 +133,12 @@ Wall theory in the same strong child uses
 Do not put new wall declarations back under the former sibling
 `CategoryTheory.Triangulated.StabilityCondition.Wall` namespace.
 
-Categorical Fourier--Mukai actions on Bridgeland stability conditions in the
-strong child's `Symmetry/` subtree use
-`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry`.
-The former sibling `CategoryTheory.Triangulated.StabilityCondition.Symmetry`
-namespace is retired.
+Generic kernel autoequivalences and the Bridgeland-action extensions implemented
+in the strong child's `Symmetry/` subtree use their canonical
+`CategoryTheory.Triangulated.FourierMukai` namespace. Do not qualify them
+through either stability `Symmetry` namespace; the former sibling
+`CategoryTheory.Triangulated.StabilityCondition.Symmetry` namespace remains
+retired.
 
 Group actions on slicings, pre-stability conditions, and Bridgeland stability
 conditions use

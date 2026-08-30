@@ -47,12 +47,17 @@ BASELINE = ROOT / "scripts" / "single_instantiation_baseline.txt"
 
 # Subjects that exist in order to be instantiated. `AlgebraicGeometry` is not
 # one: a structure there describes a particular geometric situation, and having
-# one witness of it is the normal case rather than a smell.
+# one witness of it is the normal case rather than a smell. Explicit
+# `Instances/AlgebraicGeometry` bridges are classified with that geometric
+# owner even though their physical path is attached to the categorical source
+# they implement.
 GENERIC_SUBJECTS = {"CategoryTheory", "LinearAlgebra", "Algebra", "Topology"}
 THRESHOLD = 1
 
 
 def subject_of(module: str) -> str:
+    if ".Instances.AlgebraicGeometry" in module:
+        return "AlgebraicGeometry"
     parts = module.split(".")
     return parts[1] if len(parts) > 1 else ""
 

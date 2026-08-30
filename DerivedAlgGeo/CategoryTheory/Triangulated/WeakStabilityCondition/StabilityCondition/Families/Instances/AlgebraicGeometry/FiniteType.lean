@@ -3,9 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FiniteType
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.GeometricBaseChange
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.RelativeHN
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.SchemeSemistableLocus
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances.AlgebraicGeometry.BoundedCoherentBaseChange
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances.AlgebraicGeometry.RelativeHarderNarasimhan
+import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances.AlgebraicGeometry.SemistableLocus
 
 /-!
 # Finite-type openness and relative HN consequences
@@ -37,10 +37,11 @@ interface; it is not a formalization of semistable reduction, a moduli-space
 construction, or Theorem 22.2 of arXiv:1902.08184v4.
 -/
 
-namespace AlgebraicGeometry.StabilityCondition.Families
+namespace AlgebraicGeometry.Moduli.Semistability
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
+open AlgebraicGeometry.Moduli.HarderNarasimhan
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
@@ -182,4 +183,4 @@ theorem GeometricPreStabilityBaseChangeData.finiteTypeConsequences
 
 end
 
-end AlgebraicGeometry.StabilityCondition.Families
+end AlgebraicGeometry.Moduli.Semistability

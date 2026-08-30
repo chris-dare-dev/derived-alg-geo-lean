@@ -15,9 +15,10 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Stabilit
 
 This umbrella is deliberately geometry-independent. Scheme-indexed
 derived categories, derived pullback, `Dqc`, and Fourier--Mukai kernels are
-owned by `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory`; geometric APIs that
-actually use stability data are owned by
-`DerivedAlgGeo.AlgebraicGeometry.StabilityCondition`.
+owned by `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory`; actual semistable
+loci and relative HN filtrations are owned by `AlgebraicGeometry.Moduli`.
+Their realizations of the interfaces exported here are opt-in modules below
+`Families.Instances.AlgebraicGeometry`.
 
 The declarations use the matching
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`

@@ -6,7 +6,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.Scheme
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families.Basic
 
 /-!
-# Scheme-facing stability-in-families interfaces
+# Scheme realizations of weak-stability family probes
 
 The neutral scheme-indexed triangulated family lives under
 `AlgebraicGeometry.DerivedCategory.Families`. This file adds only the geometric
@@ -14,7 +14,7 @@ realizations of weak-stability topological probes on the underlying Zariski
 space of an actual scheme.
 -/
 
-namespace AlgebraicGeometry.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 
@@ -74,4 +74,4 @@ theorem GenericSemistabilityProbe.ofScheme_isGenericallyOpen_iff
 
 end
 
-end AlgebraicGeometry.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.Families
