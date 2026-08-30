@@ -31,6 +31,7 @@ open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated.Families
 open CategoryTheory.Triangulated.StabilityCondition.Support
 open CategoryTheory.Triangulated.WeakStabilityCondition
+open CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 noncomputable section
 
