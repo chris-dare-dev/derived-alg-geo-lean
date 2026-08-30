@@ -15,7 +15,7 @@ This file isolates that quantifier order.  In particular,
 form for each index.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Support
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 variable {I J V V' W : Type*}
   [NormedAddCommGroup V] [NormedSpace ℝ V]
@@ -155,4 +155,4 @@ theorem hasUniformQuadraticSupportProperty_transport_iff
   · intro h
     exact h.transport e
 
-end CategoryTheory.Triangulated.StabilityCondition.Support
+end CategoryTheory.Triangulated.WeakStabilityCondition.Support

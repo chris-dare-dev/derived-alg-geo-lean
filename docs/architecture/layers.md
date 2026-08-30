@@ -124,6 +124,9 @@ declaration remains in the retired flattened categorical family namespace.
 Bridgeland wall declarations have also completed their cutover from the former
 sibling namespace to
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`.
+Generic numerical support predicates and their weak-stability bindings have
+completed their cutover from the former strong-sibling namespace to
+`CategoryTheory.Triangulated.WeakStabilityCondition.Support`.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map

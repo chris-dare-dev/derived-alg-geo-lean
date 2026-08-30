@@ -43,7 +43,7 @@ quadratic form on a finite-dimensional real space satisfies it.
 * `hasSupportProperty_iff` — the equivalence.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Support
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 open Metric
 
@@ -269,4 +269,4 @@ theorem isOpen_hasSupportProperty :
     _ ≤ ‖Z' - Z‖ * ‖v‖ := ContinuousLinearMap.le_opNorm _ _
     _ ≤ ε * ‖v‖ := mul_le_mul_of_nonneg_right hle (norm_nonneg v)
 
-end CategoryTheory.Triangulated.StabilityCondition.Support
+end CategoryTheory.Triangulated.WeakStabilityCondition.Support

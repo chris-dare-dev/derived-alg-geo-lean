@@ -21,7 +21,7 @@ explicit witness built from the norm in `Support.Basic` need not be a quadratic
 form.  That asymmetry is deliberate and remains visible in the API.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Support
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 variable {V W : Type*}
   [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
@@ -76,4 +76,4 @@ theorem HasQuadraticSupportProperty.mono
   obtain ⟨Q, hQ⟩ := h
   exact ⟨Q, ⟨fun x hx => hQ.nonneg_of_mem x (hS hx), hQ.neg_of_ker⟩⟩
 
-end CategoryTheory.Triangulated.StabilityCondition.Support
+end CategoryTheory.Triangulated.WeakStabilityCondition.Support

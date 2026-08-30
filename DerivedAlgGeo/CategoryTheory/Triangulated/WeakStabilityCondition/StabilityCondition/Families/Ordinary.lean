@@ -25,7 +25,7 @@ support datum remain stable API.
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 open CategoryTheory.Triangulated.Families
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
 open CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 noncomputable section

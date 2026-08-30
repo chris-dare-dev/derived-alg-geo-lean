@@ -25,7 +25,7 @@ namespace CategoryTheory.Triangulated.WeakStabilityCondition
 
 open CategoryTheory.Triangulated
 open CategoryTheory Limits Pretriangulated CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 noncomputable section
 
@@ -48,7 +48,7 @@ def semistableClasses {t : TStructure C} (W : WeakStabilityFunction t)
 linear realization of its charge. -/
 def HasSupportProperty {t : TStructure C} (W : WeakStabilityFunction t)
     (v : K₀ C →+ V) (Zlin : V →ₗ[ℝ] ℂ) : Prop :=
-  CategoryTheory.Triangulated.StabilityCondition.Support.HasSupportProperty Zlin
+  CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasSupportProperty Zlin
     (W.semistableClasses v)
 
 omit [IsTriangulated C] in

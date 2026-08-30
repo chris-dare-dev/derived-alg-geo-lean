@@ -56,6 +56,12 @@ RETIRED_FLATTENED_FAMILIES_NAMESPACE = (
 WEAK_FAMILIES_NAMESPACE = (
     "CategoryTheory.Triangulated.WeakStabilityCondition.Families"
 )
+WEAK_SUPPORT_NAMESPACE = (
+    "CategoryTheory.Triangulated.WeakStabilityCondition.Support"
+)
+RETIRED_SUPPORT_NAMESPACE = (
+    "CategoryTheory.Triangulated.StabilityCondition.Support"
+)
 STRONG_FAMILIES_NAMESPACE = (
     "CategoryTheory.Triangulated.WeakStabilityCondition."
     "StabilityCondition.Families"
@@ -476,6 +482,15 @@ def main() -> int:
                 "the legacy Bridgeland-family namespace"
             )
 
+    weak_support_predicate_root = weak_stability_root / "Support" / "Predicate"
+    for path in sorted(weak_support_predicate_root.glob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {WEAK_SUPPORT_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: weak support-predicate declarations "
+                f"must use namespace {WEAK_SUPPORT_NAMESPACE}"
+            )
+
     strong_families_source_root = strong_stability_root / "Families"
     for module in (
         "CategoricalOrdinary",
@@ -673,6 +688,11 @@ def main() -> int:
             failures.append(
                 f"{path.relative_to(ROOT)}: declaration restored the retired "
                 f"flattened namespace {RETIRED_FLATTENED_FAMILIES_NAMESPACE}"
+            )
+        if RETIRED_SUPPORT_NAMESPACE in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: declaration restored the retired "
+                f"strong-sibling namespace {RETIRED_SUPPORT_NAMESPACE}"
             )
 
     all_geometry_modules = (
@@ -877,6 +897,10 @@ def main() -> int:
     print(
         "ok: weak-stability family declarations use the matching "
         "CategoryTheory.Triangulated.WeakStabilityCondition.Families namespace"
+    )
+    print(
+        "ok: weak support-predicate declarations use the matching "
+        "CategoryTheory.Triangulated.WeakStabilityCondition.Support namespace"
     )
     print(
         "ok: Bridgeland-family declarations use the matching strong-child "

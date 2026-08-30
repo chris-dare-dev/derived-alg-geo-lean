@@ -26,7 +26,7 @@ The declarations here isolate the saturation and descent statements that do
 not require those additional hypotheses.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Support
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 namespace ZeroChargeLattice
 
@@ -156,4 +156,4 @@ theorem quotientCharge_quotientClass [IsAddTorsionFree Γ]
 
 end ZeroChargeLattice
 
-end CategoryTheory.Triangulated.StabilityCondition.Support
+end CategoryTheory.Triangulated.WeakStabilityCondition.Support
