@@ -107,6 +107,10 @@ new derived-category theory.
   `CategoryTheory.Triangulated.WeakStabilityCondition.Families`. Shared
   Definition 20.5 probes and APIs bound to `WeakStabilityFunction` belong to
   that weak parent, not to the Bridgeland family's declaration namespace.
+- Declarations owned by ordinary Bridgeland families use
+  `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
+  Strong family packages and pre-stability base-change data belong to that
+  child; geometry-owned realizations remain separate consumers.
 - Generic moduli boundedness interfaces shared by weak stability and geometric
   moduli also belong under `CategoryTheory/Triangulated/Families/`; neither
   consumer owns the common root.

@@ -19,5 +19,7 @@ narrow owner directly.
 This import preserves module availability, not retired qualified declaration
 names. Neutral categorical family declarations use
 `CategoryTheory.Triangulated.Families`; weak-family declarations use
-`CategoryTheory.Triangulated.WeakStabilityCondition.Families`.
+`CategoryTheory.Triangulated.WeakStabilityCondition.Families`; ordinary
+Bridgeland family declarations use
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
 -/

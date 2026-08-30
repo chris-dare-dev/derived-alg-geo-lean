@@ -19,7 +19,7 @@ not construct a scheme, a relative category, base-change functors, relative
 Harder--Narasimhan structures, or bounded moduli spaces.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 open CategoryTheory Limits Pretriangulated
 open CategoryTheory.Triangulated
@@ -134,4 +134,4 @@ theorem OrdinaryFiberStabilityInFamiliesData.quotientCharge_mkQ
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families

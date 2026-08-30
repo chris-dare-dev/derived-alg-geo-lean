@@ -118,6 +118,11 @@ to `WeakStabilityFunction` use
 `CategoryTheory.Triangulated.WeakStabilityCondition.Families`; the stronger
 Bridgeland child consumes them instead of owning them.
 
+Ordinary Bridgeland family packages use the matching child namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
+Geometric realizations consume that API but keep geometry-owned declarations
+separate.
+
 Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
 generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural
 move must update imports, umbrellas, audits, declaration-sweep routing,

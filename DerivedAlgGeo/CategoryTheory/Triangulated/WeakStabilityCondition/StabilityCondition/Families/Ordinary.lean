@@ -22,7 +22,7 @@ of this stable interface; constant-family reindexings that consume a genuine
 support datum remain stable API.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 open CategoryTheory.Triangulated.Families
 open CategoryTheory.Triangulated.StabilityCondition.Support
@@ -77,4 +77,4 @@ structure OrdinaryDeformationInputConditions
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
