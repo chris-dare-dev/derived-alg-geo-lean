@@ -37,7 +37,7 @@ therefore give the required covering map.
 proving that the transported topology makes `GLTilde` a topological group.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Complex Matrix Real Set Topology
 
@@ -475,4 +475,4 @@ theorem GLTilde.universalCoverData :
       Function.Surjective GLTilde.mat ∧ SimplyConnectedSpace GLTilde :=
   ⟨GLTilde.isCoveringMap_toMat, toMatHom_surjective, inferInstance⟩
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

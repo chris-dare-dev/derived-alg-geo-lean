@@ -130,6 +130,16 @@ strong child's `Symmetry/` subtree use
 The former sibling `CategoryTheory.Triangulated.StabilityCondition.Symmetry`
 namespace is retired.
 
+Group actions on slicings, pre-stability conditions, and Bridgeland stability
+conditions use
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
+The former sibling `CategoryTheory.Triangulated.StabilityCondition.GroupAction`
+namespace is retired. The deprecated aliases in
+`Compatibility/StabilityConditionGroupActionReview.lean` are limited to the
+immutable human-review payloads that predate this cutover; do not import that
+leaf from library code or add aliases to it. Remove it after the named reviewer
+reconfirms those payloads against the canonical declarations.
+
 Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
 specialized geometry and stability applications. A new top-level subject is
 appropriate only for a coherent body of reusable mathematics, not for one

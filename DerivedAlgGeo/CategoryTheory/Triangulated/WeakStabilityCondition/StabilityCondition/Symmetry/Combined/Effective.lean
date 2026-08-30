@@ -36,7 +36,7 @@ open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 noncomputable section
 
@@ -56,7 +56,7 @@ NOT the structure under which `shiftFunctor C n` is triangulated -- the
 triangulated one carries the sign `(-1)^n` on the connecting map -- so a global
 instance here would silently win instance search at sites that wanted the
 triangulated structure. Scoping keeps it inside
-`CategoryTheory.Triangulated.StabilityCondition.GroupAction`, where the only consumer is the
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`, where the only consumer is the
 DOUBLE shift
 and the sign is `+1`. -/
 noncomputable scoped instance shiftFunctorCommShift (n : ℤ) :
@@ -274,4 +274,4 @@ theorem deck_one_shiftTwo_eq_one_in_effective (v : K₀ C →+ Λ) :
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

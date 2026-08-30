@@ -76,7 +76,7 @@ theorem Slicing.mapEquiv_leProp_iff (Phi : C ≌ C)
 
 end CategoryTheory.Triangulated
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 variable {C : Type u} [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
@@ -162,4 +162,4 @@ theorem AutPairQuot.precedesWeak_smul_stability_iff (q : AutPairQuot v)
   induction q using _root_.Quotient.inductionOn with
   | _ a => exact a.Φ.precedesWeak_act_iff sigma.slicing tau.slicing
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

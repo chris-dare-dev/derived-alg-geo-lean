@@ -36,7 +36,7 @@ Bridgeland's convention showing through, not an accident, and it is why
 `deckShift` is defined with `2 * n` rather than `n`.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix Real
 
@@ -240,4 +240,4 @@ noncomputable def kerEquiv : Multiplicative ℤ ≃* GLTilde.toMatHom.ker :=
   (MonoidHom.ofInjective deckHom_injective).trans
     (MulEquiv.subgroupCongr range_deckHom_eq_ker)
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

@@ -44,11 +44,11 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.stabilityMass_toReal_eq_sum
 #print axioms CategoryTheory.Triangulated.stabilityMass_eq_zero_iff
 #print axioms CategoryTheory.Triangulated.stabilityMass_toReal_pos
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_charge
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.mass_map_inverse
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.mass_map_functor
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_stabilityMass
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_stabilityMass_functor_obj
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_charge
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.mass_map_inverse
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.mass_map_functor
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_stabilityMass
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_stabilityMass_functor_obj
 
 /-! ## HNPolygon — abelian HN paths and positive-angle support -/
 
@@ -299,12 +299,12 @@ open CategoryTheory.Triangulated
 
 /-! ## AutFullIsometry — invariance of all three coordinates -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_phiPlusDist
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_phiMinusDist
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_massDist
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_stabilityDistTerm
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_stabilityDistTerm_functor_obj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair.act_stabilityDist
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_phiPlusDist
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_phiMinusDist
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_massDist
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_stabilityDistTerm
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_stabilityDistTerm_functor_obj
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_stabilityDist
 #print axioms CategoryTheory.Triangulated.AutPairQuot_smul_stabilityDist
 
 /-! ## Group-law spot checks
@@ -316,7 +316,7 @@ happens to typecheck. Both are `rfl`, so a wrong `mul` would fail here.
 
 section SpotChecks
 
-open CategoryTheory.Triangulated.StabilityCondition.GroupAction
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 example (f g : NormalizedShift) (φ : ℝ) :
     (f * g).toOrderIso φ = f.toOrderIso (g.toOrderIso φ) := rfl
@@ -356,7 +356,7 @@ section SlicingChecks
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
-  CategoryTheory.Triangulated.StabilityCondition.GroupAction
+  CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 -- Declared explicitly. `lake env lean` does not apply the package's
 -- `[leanOptions]`, so under a bare `lean` invocation `u` and `v` were

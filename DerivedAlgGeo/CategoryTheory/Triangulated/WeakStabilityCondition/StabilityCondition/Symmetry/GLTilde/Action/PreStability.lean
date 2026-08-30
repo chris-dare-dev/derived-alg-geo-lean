@@ -38,7 +38,7 @@ Note this file does **not** need `[IsTriangulated C]`:
 `PreStabilityCondition.WithClassMap` does not depend on it.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
@@ -116,4 +116,4 @@ theorem smul_pre_Z (x : GLTilde) (σ : PreStabilityCondition.WithClassMap C v) (
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

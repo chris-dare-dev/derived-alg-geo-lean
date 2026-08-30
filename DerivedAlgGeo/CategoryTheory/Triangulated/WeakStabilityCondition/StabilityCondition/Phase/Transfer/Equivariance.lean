@@ -22,7 +22,7 @@ noncomputable section
 
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
-open CategoryTheory.Triangulated.StabilityCondition.GroupAction
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 universe v₁ u₁ v₂ u₂ u₃ u₄
 
@@ -64,11 +64,11 @@ theorem Slicing.preimage_mapEquiv (PhiC : C ≌ C) (PhiD : D ≌ D)
     exact ObjectProperty.prop_of_iso _ (alpha.app E).symm hE
 
 variable [IsTriangulated C] [IsTriangulated D]
-open CategoryTheory.Triangulated.StabilityCondition.GroupAction
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 end CategoryTheory.Triangulated
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open CategoryTheory.Triangulated
 
@@ -100,4 +100,4 @@ theorem AutPair.preimage_representatives
   CategoryTheory.Triangulated.Slicing.preimage_mapEquiv
     s F h aC.Φ.e aD.Φ.e alpha hmap
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

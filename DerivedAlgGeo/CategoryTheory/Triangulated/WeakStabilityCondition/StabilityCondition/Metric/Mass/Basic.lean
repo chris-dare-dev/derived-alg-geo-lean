@@ -118,7 +118,7 @@ end
 
 end CategoryTheory.Triangulated
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair
 
 noncomputable section
 
@@ -131,7 +131,7 @@ variable {C : Type u} [Category.{w} C] [HasZeroObject C] [HasShift C ℤ]
   [IsTriangulated C]
 variable {Λ : Type u'} [AddCommGroup Λ] {v : K₀ C →+ Λ}
 
-variable (a : CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair v)
+variable (a : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair v)
 
 /-- The charge of an acted stability condition is the original charge of the
 inverse-image object. -/
@@ -211,4 +211,4 @@ theorem act_stabilityMass_functor_obj (σ : StabilityCondition.WithClassMap C v)
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair

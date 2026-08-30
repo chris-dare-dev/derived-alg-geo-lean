@@ -37,7 +37,7 @@ phase data, all of it lives in `HNFiltration`'s extra fields — and relabels
 the factor phases by `f`.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
@@ -154,4 +154,4 @@ theorem relabel_intervalProp (f : NormalizedShift) (s : Slicing C) (a b : ℝ) :
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

@@ -14,6 +14,11 @@ Auto-generated constructions are filtered here rather than in the consumer,
 because the environment is where the information lives: `.casesOn`, `.recOn`,
 `.noConfusion`, `.injEq`, and the `match_`/`proof_` internals are produced by
 declaring an inductive or by tactic elaboration, and no audit should list them.
+
+Deprecated declarations are excluded for the same ownership reason: they are
+compatibility spellings, not canonical public API. A compatibility module that
+contains any non-deprecated authored declaration still falls through to the
+`Unclassified` sentinel and fails the audit-completeness gate.
 -/
 import DerivedAlgGeo
 import DerivedAlgGeo.Development
@@ -109,7 +114,7 @@ run_cmd do
   let env ← Lean.getEnv
   let mut rows : Array String := #[]
   for (n, ci) in env.constants.toList do
-    if n.isInternal || !isAuthored n then continue
+    if n.isInternal || !isAuthored n || Linter.isDeprecated env n then continue
     unless ci.isTheorem || ci.isDefinition || ci.isInductive || ci.isCtor do continue
     match env.getModuleIdxFor? n with
     | some idx =>

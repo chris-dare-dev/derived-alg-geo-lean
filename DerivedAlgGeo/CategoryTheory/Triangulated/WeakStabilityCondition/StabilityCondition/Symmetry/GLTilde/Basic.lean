@@ -50,7 +50,7 @@ The `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/PreStabil
 group to define and prove the action on stability conditions.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix Real
 
@@ -218,4 +218,4 @@ def toShiftHom : GLTilde →* NormalizedShift where
 
 end GLTilde
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

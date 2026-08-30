@@ -21,7 +21,7 @@ They do, and `cplxCoord_exp` is the proof: under `Complex.basisOneI` (whose
 `![cos (π φ), sin (π φ)]`, which is exactly `rayVec φ`.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix
 
@@ -104,4 +104,4 @@ theorem actC_exp {T : Matrix.GLPos (Fin 2) ℝ} {f : NormalizedShift}
   refine ⟨r, hr, ?_⟩
   rw [actC_apply, hry, map_smul, LinearEquiv.symm_apply_apply]
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

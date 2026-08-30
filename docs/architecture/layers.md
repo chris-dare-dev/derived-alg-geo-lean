@@ -134,6 +134,13 @@ plural `WeakStabilityCondition/Foundations/` tree into the canonical
 The categorical Fourier--Mukai bridge acting on Bridgeland stability
 conditions has completed its cutover from the former sibling namespace to
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry`.
+The associated slicing, pre-stability, and stability group actions have
+completed their cutover to
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
+Only `Compatibility/StabilityConditionGroupActionReview.lean` retains
+deprecated aliases in the former sibling namespace so the immutable reviewed
+statement payloads continue to elaborate; that bridge is not a second public
+API and is removed after reviewer reconfirmation.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map
