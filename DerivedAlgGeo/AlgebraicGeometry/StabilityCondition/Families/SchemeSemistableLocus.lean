@@ -30,7 +30,7 @@ relative Harder--Narasimhan filtrations, or prove Theorem 22.2 of
 arXiv:1902.08184v4.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.StabilityCondition.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -259,4 +259,4 @@ theorem universalSchemeGenericSemistabilityOpenness_constant
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.StabilityCondition.Families

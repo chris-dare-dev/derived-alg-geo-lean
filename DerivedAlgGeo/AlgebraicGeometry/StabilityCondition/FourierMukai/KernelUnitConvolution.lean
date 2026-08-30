@@ -53,7 +53,7 @@ unit comparison to its tensorator and whose source and target
 
 universe u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.StabilityCondition.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory.Families
@@ -61,6 +61,7 @@ open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
+open CategoryTheory.Triangulated.StabilityCondition
 open AlgebraicGeometry
 open SchemeBaseChange
 
@@ -323,4 +324,4 @@ pullback coherence now come from the monoidal roots. Still absent is a proof
 that the geometric `convKernel` construction assembles the abstract
 `CoherentConvolutionData`, as well as `DualKernel`. -/
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.StabilityCondition.FourierMukai

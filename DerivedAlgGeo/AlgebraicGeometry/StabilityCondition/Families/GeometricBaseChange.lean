@@ -33,7 +33,7 @@ there is no global theorem switch and no preconstructed `Slicing.PreimageData`
 input.  Openness and relative-HN consequences are exported downstream.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.StabilityCondition.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -382,4 +382,4 @@ end GeometricPreStabilityBaseChangeData
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.StabilityCondition.Families

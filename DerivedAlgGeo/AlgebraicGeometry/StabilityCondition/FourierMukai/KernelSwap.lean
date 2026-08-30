@@ -87,7 +87,7 @@ autoequivalence built on the geometric correspondence, with dual kernel
 
 universe u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.StabilityCondition.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory.Families
@@ -95,6 +95,7 @@ open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
+open CategoryTheory.Triangulated.StabilityCondition
 open AlgebraicGeometry
 open SchemeBaseChange
 
@@ -425,4 +426,4 @@ theorem geometricMk_toAutPair_smul
 
 end DualKernel
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.StabilityCondition.FourierMukai

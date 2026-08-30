@@ -11,4 +11,7 @@ import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai
 Scheme-indexed semistability, relative Harder--Narasimhan, and Fourier--Mukai
 actions that intrinsically depend on weak or Bridgeland stability data. Neutral
 scheme-derived categories and kernels live under `AlgebraicGeometry.DerivedCategory`.
+The two child declaration namespaces are
+`AlgebraicGeometry.StabilityCondition.Families` and
+`AlgebraicGeometry.StabilityCondition.FourierMukai`.
 -/

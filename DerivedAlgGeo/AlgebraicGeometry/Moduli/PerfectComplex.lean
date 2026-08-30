@@ -11,4 +11,9 @@ import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.BigZariski
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Boundedness
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Algebraicity
 
-/-! # Moduli of perfect complexes -/
+/-!
+# Moduli of perfect complexes
+
+Declarations in this subtree use the geometry-owned `AlgebraicGeometry`
+namespace; neutral moduli objects do not belong to a stability namespace.
+-/

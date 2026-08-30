@@ -25,7 +25,7 @@ negative Ext vanishing.  Once those results are proved, Mathlib's
 pseudofunctor and all of its coherence automatically.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory.Families
@@ -119,4 +119,4 @@ noncomputable def affineFamilyUniversallyGluableRelativePerfectModuliForget
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry

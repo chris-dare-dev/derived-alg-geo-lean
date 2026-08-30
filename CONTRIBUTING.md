@@ -83,6 +83,12 @@ semistable loci, relative HN data, and stability base-change witnesses, and
 actually use stability-condition autoequivalences. Their neutral prerequisites
 belong under `AlgebraicGeometry/DerivedCategory/`.
 
+Use the matching declaration namespaces
+`AlgebraicGeometry.StabilityCondition.Families` and
+`AlgebraicGeometry.StabilityCondition.FourierMukai`. Geometry-owned moduli and
+registration instances must also use a geometric namespace, never the retired
+flattened categorical stability-family namespace.
+
 Neutral categorical family declarations use the matching
 `CategoryTheory.Triangulated.Families` namespace. In particular,
 `TriangulatedFiberFamily` and shared boundedness interfaces must not be declared

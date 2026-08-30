@@ -116,8 +116,11 @@ completed their cutover to `AlgebraicGeometry.DerivedCategory` and
 `AlgebraicGeometry.DerivedCategory.Families`. The `Dqc` subtree has completed
 its cutover to `AlgebraicGeometry.DerivedCategory.Dqc`. Neutral geometric
 Fourier--Mukai declarations have completed their cutover to
-`AlgebraicGeometry.DerivedCategory.FourierMukai`. Stability-specific geometric
-declarations retain their staged namespace until their separate cutover.
+`AlgebraicGeometry.DerivedCategory.FourierMukai`. Stability-family geometry and
+stability-specific Fourier--Mukai actions have completed their cutovers to
+`AlgebraicGeometry.StabilityCondition.Families` and
+`AlgebraicGeometry.StabilityCondition.FourierMukai`. No geometry-owned
+declaration remains in the retired flattened categorical family namespace.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map
@@ -208,8 +211,10 @@ Scheme-derived category, pullback, and `Dqc` declarations now use
 `AlgebraicGeometry.DerivedCategory.Families`, and
 `AlgebraicGeometry.DerivedCategory.Dqc`, respectively. Neutral geometric
 Fourier--Mukai declarations now use
-`AlgebraicGeometry.DerivedCategory.FourierMukai`; only stability-specific
-geometric declarations keep their staged names until their own cutover:
+`AlgebraicGeometry.DerivedCategory.FourierMukai`. Stability-family geometry and
+stability-specific kernel actions now use
+`AlgebraicGeometry.StabilityCondition.Families` and
+`AlgebraicGeometry.StabilityCondition.FourierMukai`, respectively:
 
 | Client need | Import |
 | --- | --- |
@@ -228,4 +233,4 @@ is public but intentionally a leaf; it provides staged migration without
 reintroducing a CategoryTheory-to-geometry edge. It preserves the former
 combined import surface, not retired qualified names for neutral categorical,
 weak-stability, Bridgeland-family, scheme-derived family, `Dqc`, or neutral
-geometric Fourier--Mukai declarations.
+geometric Fourier--Mukai declarations, nor for stability-specific geometry.

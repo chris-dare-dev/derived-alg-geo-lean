@@ -12,4 +12,6 @@ import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.FourierMukai.KernelCom
 
 The stability-specific adapters from geometric Fourier--Mukai kernels to
 autoequivalence actions and their unit, swap, and composition laws.
+Declarations in this subtree use
+`AlgebraicGeometry.StabilityCondition.FourierMukai`.
 -/

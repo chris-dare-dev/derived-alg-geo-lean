@@ -50,7 +50,7 @@ could be joined, which needed the geometric autoequivalence to exist at all
 
 universe u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.StabilityCondition.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory.Families
@@ -58,6 +58,7 @@ open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
+open CategoryTheory.Triangulated.StabilityCondition
 open AlgebraicGeometry
 open SchemeBaseChange
 
@@ -150,4 +151,4 @@ theorem geometricActStabTrans
 
 end Composition
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.StabilityCondition.FourierMukai

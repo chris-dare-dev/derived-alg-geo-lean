@@ -24,7 +24,7 @@ pre-stability input and asserts nothing vacuously (2026-08-18 adversarial
 review, finding P2-10).
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families.Development
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Development
 
 open CategoryTheory Limits Pretriangulated
 open CategoryTheory.Triangulated
@@ -279,4 +279,4 @@ example
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families.Development
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Development

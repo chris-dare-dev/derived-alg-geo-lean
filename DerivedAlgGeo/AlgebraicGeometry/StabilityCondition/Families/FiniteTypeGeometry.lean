@@ -37,7 +37,7 @@ interface; it is not a formalization of semistable reduction, a moduli-space
 construction, or Theorem 22.2 of arXiv:1902.08184v4.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.StabilityCondition.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
@@ -182,4 +182,4 @@ theorem GeometricPreStabilityBaseChangeData.finiteTypeConsequences
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.StabilityCondition.Families

@@ -10,8 +10,8 @@ The top-level collapse cannot see a reusable moduli or stack root importing a
 Bridgeland-family leaf because both live below ``AlgebraicGeometry``. Issue
 #850 adds that finer boundary here. The former exact-pair migration allowlist
 has been burned to zero; stale entries still fail so exceptions cannot return
-silently. The gate also keeps neutral, weak, and Bridgeland family declarations
-in the namespaces matching their owners.
+silently. The gate also keeps neutral, weak, Bridgeland, and geometric family
+declarations in the namespaces matching their owners.
 """
 
 from __future__ import annotations
@@ -42,6 +42,15 @@ DERIVED_FAMILIES_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Families"
 DQC_NAMESPACE = "AlgebraicGeometry.DerivedCategory.Dqc"
 GEOMETRIC_FOURIER_MUKAI_NAMESPACE = (
     "AlgebraicGeometry.DerivedCategory.FourierMukai"
+)
+STABILITY_GEOMETRY_FAMILIES_NAMESPACE = (
+    "AlgebraicGeometry.StabilityCondition.Families"
+)
+STABILITY_GEOMETRY_FOURIER_MUKAI_NAMESPACE = (
+    "AlgebraicGeometry.StabilityCondition.FourierMukai"
+)
+RETIRED_FLATTENED_FAMILIES_NAMESPACE = (
+    "CategoryTheory.Triangulated.StabilityCondition.Families"
 )
 WEAK_FAMILIES_NAMESPACE = (
     "CategoryTheory.Triangulated.WeakStabilityCondition.Families"
@@ -430,10 +439,7 @@ def main() -> int:
                 f"{path.relative_to(ROOT)}: weak-family declarations must "
                 f"use namespace {WEAK_FAMILIES_NAMESPACE}"
             )
-        if (
-            "namespace CategoryTheory.Triangulated.StabilityCondition.Families"
-            in text
-        ):
+        if f"namespace {RETIRED_FLATTENED_FAMILIES_NAMESPACE}" in text:
             failures.append(
                 f"{path.relative_to(ROOT)}: weak-family declarations restored "
                 "the legacy Bridgeland-family namespace"
@@ -454,10 +460,7 @@ def main() -> int:
                 f"{path.relative_to(ROOT)}: Bridgeland-family declarations "
                 f"must use namespace {STRONG_FAMILIES_NAMESPACE}"
             )
-        if (
-            "namespace CategoryTheory.Triangulated.StabilityCondition.Families"
-            in text
-        ):
+        if f"namespace {RETIRED_FLATTENED_FAMILIES_NAMESPACE}" in text:
             failures.append(
                 f"{path.relative_to(ROOT)}: Bridgeland-family declarations "
                 "restored the legacy flattened namespace"
@@ -506,7 +509,7 @@ def main() -> int:
             f"category declarations must use namespace {DERIVED_CATEGORY_NAMESPACE}"
         )
     legacy_geometric_namespace = (
-        "namespace CategoryTheory.Triangulated.StabilityCondition.Families"
+        f"namespace {RETIRED_FLATTENED_FAMILIES_NAMESPACE}"
     )
     if legacy_geometric_namespace in derived_category_basic_text:
         failures.append(
@@ -544,6 +547,81 @@ def main() -> int:
     stability_fourier_mukai_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "StabilityCondition" / "FourierMukai"
     )
+    for path in sorted(stability_families_root.glob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if f"namespace {STABILITY_GEOMETRY_FAMILIES_NAMESPACE}" not in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: stability-family geometry must "
+                f"use namespace {STABILITY_GEOMETRY_FAMILIES_NAMESPACE}"
+            )
+    for path in sorted(stability_fourier_mukai_root.glob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if (
+            f"namespace {STABILITY_GEOMETRY_FOURIER_MUKAI_NAMESPACE}"
+            not in text
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: stability-specific "
+                f"Fourier--Mukai declarations must use namespace "
+                f"{STABILITY_GEOMETRY_FOURIER_MUKAI_NAMESPACE}"
+            )
+
+    perfect_complex_root = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Moduli" / "PerfectComplex"
+    )
+    for module in (
+        "AffineFamilyRelativePerfect",
+        "AffineFamilyRelativePerfectPseudofunctor",
+    ):
+        path = perfect_complex_root / f"{module}.lean"
+        text = path.read_text(encoding="utf-8")
+        if not re.search(r"^namespace AlgebraicGeometry$", text, re.MULTILINE):
+            failures.append(
+                f"{path.relative_to(ROOT)}: neutral perfect-complex moduli "
+                "declarations must use namespace AlgebraicGeometry"
+            )
+
+    geometric_tensor_instance = (
+        SOURCE_ROOT
+        / "CategoryTheory"
+        / "Monoidal"
+        / "Triangulated"
+        / "Instances"
+        / "AlgebraicGeometry"
+        / "DerivedTensor.lean"
+    )
+    geometric_tensor_instance_text = geometric_tensor_instance.read_text(
+        encoding="utf-8"
+    )
+    if (
+        f"namespace {GEOMETRIC_FOURIER_MUKAI_NAMESPACE}"
+        not in geometric_tensor_instance_text
+    ):
+        failures.append(
+            f"{geometric_tensor_instance.relative_to(ROOT)}: geometric "
+            f"derived-tensor registration must use namespace "
+            f"{GEOMETRIC_FOURIER_MUKAI_NAMESPACE}"
+        )
+
+    development_scaffolding = (
+        SOURCE_ROOT / "Development" / "StabilityCondition" / "Families"
+        / "Scaffolding.lean"
+    )
+    development_namespace = f"{STRONG_FAMILIES_NAMESPACE}.Development"
+    development_text = development_scaffolding.read_text(encoding="utf-8")
+    if f"namespace {development_namespace}" not in development_text:
+        failures.append(
+            f"{development_scaffolding.relative_to(ROOT)}: strong-family "
+            f"development scaffolding must use namespace {development_namespace}"
+        )
+
+    for path in sorted(SOURCE_ROOT.rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if legacy_geometric_namespace in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: declaration restored the retired "
+                f"flattened namespace {RETIRED_FLATTENED_FAMILIES_NAMESPACE}"
+            )
 
     all_geometry_modules = (
         NEUTRAL_DERIVED_FAMILY_MODULES
@@ -753,6 +831,14 @@ def main() -> int:
         "ok: scheme-derived categories, families, Dqc, and geometric "
         "Fourier--Mukai declarations use their matching AlgebraicGeometry "
         "namespaces"
+    )
+    print(
+        "ok: stability-family geometry and stability-specific Fourier--Mukai "
+        "actions use their matching AlgebraicGeometry namespaces"
+    )
+    print(
+        "ok: the retired flattened categorical stability-family namespace is "
+        "absent from DerivedAlgGeo"
     )
     print(
         "ok: neutral scheme-derived families, geometric Fourier--Mukai, and "

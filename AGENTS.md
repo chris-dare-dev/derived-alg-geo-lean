@@ -134,6 +134,12 @@ new derived-category theory.
   actually depend on weak or Bridgeland stability data. Scheme semistable loci,
   relative HN data, and stability-specific Fourier--Mukai actions belong there;
   neutral derived pullback, `Dqc`, and kernel convolution do not.
+- Declarations below `AlgebraicGeometry/StabilityCondition/Families/` use
+  `AlgebraicGeometry.StabilityCondition.Families`; declarations below its
+  `FourierMukai/` sibling use
+  `AlgebraicGeometry.StabilityCondition.FourierMukai`. Geometry-owned moduli
+  and registration instances must likewise use their geometric namespace,
+  never the retired flattened categorical stability-family namespace.
 - General Mumford slope data belongs with weak geometric stability. A module
   constructing a Bridgeland stability condition from it belongs below the
   Bridgeland child only under the hypotheses where that construction is valid,

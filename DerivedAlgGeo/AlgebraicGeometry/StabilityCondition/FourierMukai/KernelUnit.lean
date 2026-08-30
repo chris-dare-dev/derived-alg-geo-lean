@@ -66,7 +66,7 @@ a `comm` **guard** — deliberately not consumed by the derivation, which uses
 
 universe u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace AlgebraicGeometry.StabilityCondition.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory.Families
@@ -74,6 +74,7 @@ open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
+open CategoryTheory.Triangulated.StabilityCondition
 open AlgebraicGeometry
 open SchemeBaseChange
 
@@ -261,4 +262,4 @@ dualizing complex) and the unit's compatibility with convolution (needs
 `convKernel` with `diagonalKernel`).
 -/
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end AlgebraicGeometry.StabilityCondition.FourierMukai
