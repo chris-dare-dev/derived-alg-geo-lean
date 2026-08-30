@@ -75,6 +75,7 @@ open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated CategoryTheory.Triangulated.FourierMukai
 open CategoryTheory.Triangulated.StabilityCondition
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 open AlgebraicGeometry
 open SchemeBaseChange
 

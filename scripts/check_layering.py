@@ -68,21 +68,16 @@ WEAK_FINITE_LENGTH_NAMESPACE = (
 RETIRED_FINITE_LENGTH_NAMESPACE = (
     "CategoryTheory.Triangulated.StabilityCondition.FiniteLength"
 )
-STRONG_FAMILIES_NAMESPACE = (
+STRONG_STABILITY_NAMESPACE = (
     "CategoryTheory.Triangulated.WeakStabilityCondition."
-    "StabilityCondition.Families"
+    "StabilityCondition"
 )
-STRONG_WALL_NAMESPACE = (
-    "CategoryTheory.Triangulated.WeakStabilityCondition."
-    "StabilityCondition.Wall"
-)
+STRONG_FAMILIES_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Families"
+STRONG_WALL_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Wall"
 RETIRED_STRONG_WALL_NAMESPACE = (
     "CategoryTheory.Triangulated.StabilityCondition.Wall"
 )
-STRONG_SYMMETRY_NAMESPACE = (
-    "CategoryTheory.Triangulated.WeakStabilityCondition."
-    "StabilityCondition.Symmetry"
-)
+STRONG_SYMMETRY_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Symmetry"
 RETIRED_STRONG_SYMMETRY_NAMESPACE = (
     "CategoryTheory.Triangulated.StabilityCondition.Symmetry"
 )
@@ -682,6 +677,20 @@ def main() -> int:
                 f"Fourier--Mukai declarations must use namespace "
                 f"{STABILITY_GEOMETRY_FOURIER_MUKAI_NAMESPACE}"
             )
+        if re.search(
+            r"\bSymmetry\.(?:KernelAutoequivalence|UnitKernelData)\b", text
+        ):
+            uses_strong_child = (
+                f"open {STRONG_STABILITY_NAMESPACE}" in text
+                or STRONG_SYMMETRY_NAMESPACE in text
+            )
+            if not uses_strong_child:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: stability-specific "
+                    "Fourier--Mukai consumer must open or qualify the "
+                    f"Bridgeland strong-child namespace "
+                    f"{STRONG_STABILITY_NAMESPACE}"
+                )
 
     perfect_complex_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Moduli" / "PerfectComplex"
