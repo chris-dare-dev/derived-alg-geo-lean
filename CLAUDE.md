@@ -160,6 +160,12 @@ Bridgeland wall declarations likewise use the matching strong-child namespace
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`,
 not the former sibling `CategoryTheory.Triangulated.StabilityCondition.Wall`.
 
+Categorical Fourier--Mukai actions on Bridgeland stability conditions use the
+matching strong-child namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry`,
+not the former sibling
+`CategoryTheory.Triangulated.StabilityCondition.Symmetry`.
+
 Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
 generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural
 move must update imports, umbrellas, audits, declaration-sweep routing,

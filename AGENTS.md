@@ -146,6 +146,11 @@ new derived-category theory.
   `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`;
   do not restore the former sibling `CategoryTheory.Triangulated.StabilityCondition.Wall`
   namespace.
+- Categorical Fourier--Mukai actions on Bridgeland stability conditions under
+  the strong child's `Symmetry/` subtree use
+  `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry`;
+  do not restore the former sibling
+  `CategoryTheory.Triangulated.StabilityCondition.Symmetry` namespace.
 - Generic moduli boundedness interfaces shared by weak stability and geometric
   moduli also belong under `CategoryTheory/Triangulated/Families/`; neither
   consumer owns the common root.

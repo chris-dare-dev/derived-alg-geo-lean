@@ -131,6 +131,9 @@ The finite-length simple-charge lattice model has moved from the duplicate
 plural `WeakStabilityCondition/Foundations/` tree into the canonical
 `WeakStabilityCondition/Foundation/StabilityFunction/` subtree, and now uses
 `CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength`.
+The categorical Fourier--Mukai bridge acting on Bridgeland stability
+conditions has completed its cutover from the former sibling namespace to
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry`.
 
 Monoidal structure supplies the base for enrichment, but monoidality and
 triangulation are independent axes. The intended categorical refinement map
