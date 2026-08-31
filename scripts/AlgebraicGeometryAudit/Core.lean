@@ -2128,7 +2128,7 @@ cover. See the module docstring in
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalClass_sq_eq_one
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalClass_ne_one
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.h1_vanishing
-#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalSquare_iso
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalSheaf_tensor_self_iso_unit
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalSheaf_not_iso_unit
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.antiCanonicalClass_eq_canonicalClass
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.not_isK3Surface
@@ -2141,7 +2141,7 @@ cover. See the module docstring in
 #print axioms AlgebraicGeometry.EnriquesSurface.toVariety
 #print axioms AlgebraicGeometry.EnriquesSurface.toScheme
 #print axioms AlgebraicGeometry.EnriquesSurface.instIsProjective
-#print axioms AlgebraicGeometry.EnriquesSurface.canonicalSquare_iso
+#print axioms AlgebraicGeometry.EnriquesSurface.canonicalSheaf_tensor_self_iso_unit
 #print axioms AlgebraicGeometry.EnriquesSurface.canonicalSheaf_not_iso_unit
 #print axioms AlgebraicGeometry.EnriquesSurface.h1_vanishing
 

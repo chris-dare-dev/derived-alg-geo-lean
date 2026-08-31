@@ -38,11 +38,16 @@ statement carry it even when unused.
 * **It exhibits no Enriques surface.** Nothing here constructs an `X`, a
   `CanonicalSheafData X 2`, or an `IsEnriquesSurface`; every statement is
   conditional on data nobody has yet produced, exactly as for `IsK3Surface`.
-* **It states no numerical consequence.** `χ(O_X) = 1` needs
-  Hirzebruch--Riemann--Roch and `H²(X, O_X) = 0` needs Serre duality against
-  the non-triviality of `ω_X`; neither exists at the pin, and
-  `Duality/Serre/` carries the latter as realization data. The numerical
-  shadow lives in `Numerical/Examples/Surface/`, with no bridge claimed.
+* **It states no numerical consequence.** Both `H²(X, O_X) = 0` and
+  `χ(O_X) = 1` reduce to one missing input: Serre duality against the
+  non-triviality of `ω_X`. It gives `H²(X, O_X) ≅ H⁰(X, ω_X)^∨ = 0`, because
+  a non-trivial torsion line bundle has no sections, and then
+  `χ(O_X) = h⁰ - h¹ + h² = 1` needs nothing further. `Duality/Serre/` carries
+  that duality as `DerivedStatement` realization data rather than as a
+  theorem, so neither consequence is available at the pin. No numerical
+  shadow exists either: `Numerical/Examples/Surface/` holds `Abelian`, `K3`,
+  `ProjectivePlane`, and `RankOne`, and the Enriques `NumericalVarietyData 2`
+  that would pair with them is not written.
 * **It does not construct the K3 double cover.** The 2-torsion class
   classically determines an étale double cover with trivial canonical class;
   no covering machinery exists at the pin and none is stated.
@@ -55,8 +60,8 @@ statement carry it even when unused.
 
 ## Main results
 
-* `IsEnriquesSurface.canonicalSquare_iso` — the sheaf-level trivialization
-  `ω_X ⊗ ω_X ≅ O_X` extracted from the class equation.
+* `IsEnriquesSurface.canonicalSheaf_tensor_self_iso_unit` — the sheaf-level
+  trivialization `ω_X ⊗ ω_X ≅ O_X` extracted from the class equation.
 * `IsEnriquesSurface.canonicalSheaf_not_iso_unit` — non-triviality at the
   sheaf level, through `canonicalClass_eq_one_iff`.
 * `IsEnriquesSurface.antiCanonicalClass_eq_canonicalClass` — a 2-torsion
@@ -102,8 +107,9 @@ structure IsEnriquesSurface (X : SmoothProperVariety k)
   /-- The surface is projective. Stronger than the properness already carried
   by `SmoothProperVariety`, and the standard hypothesis of the source papers. -/
   projective : X.toVariety.IsProjective
-  /-- `ω_X` is 2-torsion in `Pic X`. Equivalently, by `canonicalSquare_iso`,
-  there is an isomorphism `ω_X ⊗ ω_X ≅ O_X`. -/
+  /-- `ω_X` is 2-torsion in `Pic X`. Equivalently, by
+  `canonicalSheaf_tensor_self_iso_unit`, there is an isomorphism
+  `ω_X ⊗ ω_X ≅ O_X`. -/
   canonicalClass_sq_eq_one : C.canonicalClass ^ 2 = 1
   /-- `ω_X` is not trivial in `Pic X`. This is what separates an Enriques
   surface from a K3 surface; see `not_isK3Surface`. -/
@@ -126,7 +132,7 @@ The class equation `κ² = 1` is unpacked through
 `Scheme.Modules.LineBundleData.toPic_tensor` and
 `Scheme.Modules.LineBundleData.toPic_eq_iff`; the recorded tensor inverses
 play no part, which is why a bare `Nonempty` of isomorphisms comes out. -/
-theorem canonicalSquare_iso :
+theorem canonicalSheaf_tensor_self_iso_unit :
     Nonempty
       (Scheme.Modules.tensorObj C.canonicalSheaf C.canonicalSheaf ≅
         (Scheme.structureSheafCoh X.toVariety.toScheme).obj) := by
@@ -148,10 +154,14 @@ theorem canonicalSheaf_not_iso_unit :
   fun e =>
     h.canonicalClass_ne_one ((CanonicalSheafData.canonicalClass_eq_one_iff C).2 e)
 
-/-- **A 2-torsion canonical class is its own inverse**: the anticanonical class
-of an Enriques surface equals its canonical class. This is the form in which
-the 2-torsion hypothesis is consumed by Serre-duality statements, where
-twisting by `ω_X` and by `ω_X⁻¹` must agree. -/
+/-- **A 2-torsion canonical class is its own inverse**: `κ⁻¹ = κ`, since
+`κ * κ = 1`.
+
+Stated for Serre duality, whose surface-level statements twist by `κ * L⁻¹`
+(`Duality.Serre.SurfacePicardSymmetry`): on an Enriques surface the `ω_X` and
+`ω_X⁻¹` twists coincide, so the two directions of the duality agree without a
+case split. Nothing consumes it yet — those statements take the canonical
+class as a bare `Pic` parameter and never see a `CanonicalSheafData`. -/
 theorem antiCanonicalClass_eq_canonicalClass :
     C.antiCanonicalLineBundle.toPic = C.canonicalClass := by
   rw [C.antiCanonicalClass]
@@ -169,7 +179,12 @@ end IsEnriquesSurface
 
 end SmoothProperVariety
 
-/-! ### The bundled object -/
+/-! ### The bundled object
+
+The three theorems below restate the `IsEnriquesSurface` results with the
+canonical package implicit, so a caller holding `Y : EnriquesSurface k` never
+has to name `Y.canonical` to use them. They add no mathematics; every one is
+`Y.isEnriques.<same name>`. -/
 
 /-- An Enriques surface over `k`, with its canonical-sheaf package and the
 Enriques property bundled together.
@@ -202,12 +217,12 @@ renaming that field would silently move an audited declaration. -/
 instance instIsProjective : Y.toVariety.IsProjective := Y.isEnriques.projective
 
 /-- The square of the canonical sheaf of an Enriques surface is trivial. -/
-theorem canonicalSquare_iso :
+theorem canonicalSheaf_tensor_self_iso_unit :
     Nonempty
       (Scheme.Modules.tensorObj Y.canonical.canonicalSheaf
           Y.canonical.canonicalSheaf ≅
         (Scheme.structureSheafCoh Y.toScheme).obj) :=
-  Y.isEnriques.canonicalSquare_iso
+  Y.isEnriques.canonicalSheaf_tensor_self_iso_unit
 
 /-- The canonical sheaf of an Enriques surface is not trivial. -/
 theorem canonicalSheaf_not_iso_unit :
