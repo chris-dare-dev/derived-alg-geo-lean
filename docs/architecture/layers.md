@@ -108,7 +108,10 @@ Algebra/Module/Localization
   └─→ Kernels                                linear, ModuleCat, natural forms
 
 Algebra/MvPolynomial
-  └─→ DivMonomial                            homogeneous and factor identities
+  ├─→ DivMonomial                            homogeneous and factor identities
+  └─→ LaurentBasis → LaurentProjection
+          ├─→ LaurentBlock → LaurentHomotopy
+          └─→ LaurentBlock → LaurentFinite   one-localization algebra
 
 LinearAlgebra
   └─→ GradedBasis                            weighted spans and internal sums
@@ -183,7 +186,7 @@ AlgebraicGeometry/Numerical/Core
   └─→ GradedBasis                            NumericalRingData consumer
 
 AlgebraicGeometry/Proj/Modules
-  └─→ LaurentProjection                      consumes Algebra/MvPolynomial
+  └─→ CechHomotopy, CechFinite               consume Algebra/MvPolynomial
 
 AlgebraicGeometry/Moduli/PerfectComplex
   ├─→ Boundedness                          fiberwise replete selectors/witnesses

@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Proj.StructureSections
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.LinearCech
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentFinite
+import DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite
 
 /-!
 # The base field acting on sections of a twist

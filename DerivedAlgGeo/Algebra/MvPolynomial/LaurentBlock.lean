@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentProjection
+import DerivedAlgGeo.Algebra.MvPolynomial.LaurentProjection
 import Mathlib.Data.Int.Interval
 
 /-!
@@ -53,12 +53,12 @@ does, and everything must go through `blockProj_awayMk`; the definition itself h
 
 ## Tags
 
-Laurent monomial, negative support, block decomposition, projective space
+Laurent monomial, negative support, block decomposition, graded module
 -/
 
-open Finsupp GradedModule MvPolynomial
+open Finsupp GradedModule
 
-namespace AlgebraicGeometry.Proj
+namespace MvPolynomial
 
 universe u
 
@@ -598,4 +598,4 @@ theorem laurentFace_blockProj [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
     rintro a b ha hb rfl; rfl
   exact hgen _ _ _ _ hnum
 
-end AlgebraicGeometry.Proj
+end MvPolynomial

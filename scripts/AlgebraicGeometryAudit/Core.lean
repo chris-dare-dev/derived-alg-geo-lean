@@ -86,13 +86,13 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- The degree bookkeeping at either sign. The by_cases on the quotient is the only place the two
 -- signs behave differently: a negative twist can put the numerator's degree below m * c, and then
 -- the quotient is zero rather than a numerator of lower degree.
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.divMonomial_mem
+#print axioms MvPolynomial.IsPolynomialTwist.divMonomial_mem
 -- The other two readings the port needs: multiplying a numerator by a homogeneous factor, and
 -- filtering it to one block. Both are the same case split -- the numerator may be zero in a
 -- degree the twist names no graded piece for -- where the nonnegative versions read membership
 -- as homogeneity directly.
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.mul_mem_of_isHomogeneous
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.laurentFilter_mem
+#print axioms MvPolynomial.IsPolynomialTwist.mul_mem_of_isHomogeneous
+#print axioms MvPolynomial.IsPolynomialTwist.laurentFilter_mem
 -- The Cech term, cochains and face over an arbitrary twist, with the two instances recorded as
 -- definitional. Naming the construction once is what lets the contracting-homotopy layer above
 -- it be stated once instead of duplicated per twist.
@@ -134,10 +134,10 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms MvPolynomial.awayMk_eq_sum_monomial
 #print axioms MvPolynomial.exists_sum_awayMk_monomial
 #print axioms MvPolynomial.laurentExponent_mem_index
--- The numerator side of the sign projection (#491 -> #340). The generic
--- `MvPolynomial.divMonomial` identities are audited in `AlgebraMvPolynomial.lean`;
--- this is the first projective graded-localization consumer.
-#print axioms AlgebraicGeometry.Proj.divMonomial_mem_natShift
+-- The numerator side of the sign projection (#491 -> #340), now owned with the generic
+-- polynomial graded-localization API. The underlying `MvPolynomial.divMonomial` identities
+-- are audited in `AlgebraMvPolynomial.lean`.
+#print axioms MvPolynomial.divMonomial_mem_natShift
 -- Independence (#491): a vanishing monomial combination at a fixed denominator has vanishing
 -- coefficients. With exists_sum_awayMk_monomial this is the basis statement in usable form -- a
 -- map may be DEFINED by its effect on monomial fractions.
@@ -148,37 +148,37 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- that pins it down, and signProjection_laurentFace is the first of the two properties the
 -- contracting homotopy consumes. AwayRep's auto-generated projections are recorded too, since
 -- the completeness ratchet counts them.
-#print axioms AlgebraicGeometry.Proj.AwayRep
-#print axioms AlgebraicGeometry.Proj.AwayRep.mk.inj
-#print axioms AlgebraicGeometry.Proj.AwayRep.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.Proj.AwayRep.pow
-#print axioms AlgebraicGeometry.Proj.AwayRep.num
-#print axioms AlgebraicGeometry.Proj.AwayRep.num_mem
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_surjective
-#print axioms AlgebraicGeometry.Proj.AwayRep.project
-#print axioms AlgebraicGeometry.Proj.AwayRep.pow_mul_num_mem
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_project_raise
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_project_congr
-#print axioms AlgebraicGeometry.Proj.signProjection
-#print axioms AlgebraicGeometry.Proj.signProjection_frac
-#print axioms AlgebraicGeometry.Proj.signProjection_awayMk
-#print axioms AlgebraicGeometry.Proj.monomial_single_mem
-#print axioms AlgebraicGeometry.Proj.laurentFace_mul
-#print axioms AlgebraicGeometry.Proj.monomial_mem_add_degree
-#print axioms AlgebraicGeometry.Proj.laurentFace
-#print axioms AlgebraicGeometry.Proj.laurentFace_awayMk
-#print axioms AlgebraicGeometry.Proj.signProjection_laurentFace
+#print axioms MvPolynomial.AwayRep
+#print axioms MvPolynomial.AwayRep.mk.inj
+#print axioms MvPolynomial.AwayRep.mk.sizeOf_spec
+#print axioms MvPolynomial.AwayRep.pow
+#print axioms MvPolynomial.AwayRep.num
+#print axioms MvPolynomial.AwayRep.num_mem
+#print axioms MvPolynomial.AwayRep.frac
+#print axioms MvPolynomial.AwayRep.frac_surjective
+#print axioms MvPolynomial.AwayRep.project
+#print axioms MvPolynomial.AwayRep.pow_mul_num_mem
+#print axioms MvPolynomial.AwayRep.frac_project_raise
+#print axioms MvPolynomial.AwayRep.frac_project_congr
+#print axioms MvPolynomial.signProjection
+#print axioms MvPolynomial.signProjection_frac
+#print axioms MvPolynomial.signProjection_awayMk
+#print axioms MvPolynomial.monomial_single_mem
+#print axioms MvPolynomial.laurentFace_mul
+#print axioms MvPolynomial.monomial_mem_add_degree
+#print axioms MvPolynomial.laurentFace
+#print axioms MvPolynomial.laurentFace_awayMk
+#print axioms MvPolynomial.signProjection_laurentFace
 -- Additivity of the projection (#491 -> #340): the homotopy applies it to an alternating sum
 -- of faces, so it consumes the bundled additive form. signProjection_laurentFace_comm is the
 -- second and last property the homotopy needs -- the projection commutes with every face other
 -- than the retracted one; the delta' i0 = 0 hypothesis is the per-block restriction of the
 -- proof plan, and the unrestricted square at e = i0 is false rather than unproved.
-#print axioms AlgebraicGeometry.Proj.signProjection_add
-#print axioms AlgebraicGeometry.Proj.signProjectionHom
-#print axioms AlgebraicGeometry.Proj.signProjectionHom_apply
-#print axioms AlgebraicGeometry.Proj.monomial_single_pow_smul_mem
-#print axioms AlgebraicGeometry.Proj.signProjection_laurentFace_comm
+#print axioms MvPolynomial.signProjection_add
+#print axioms MvPolynomial.signProjectionHom
+#print axioms MvPolynomial.signProjectionHom_apply
+#print axioms MvPolynomial.monomial_single_pow_smul_mem
+#print axioms MvPolynomial.signProjection_laurentFace_comm
 -- The block decomposition (#340, step 2). Each away localization is decomposed by the negative
 -- support N(alpha) of the Laurent exponent: laurentFilter selects one block of a numerator,
 -- blockProj descends it to the localization (choice-based, pinned by blockProj_awayMk, same
@@ -187,39 +187,39 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- every block projection -- the differential preserves N(alpha). Deliberately NOT packaged as a
 -- direct-sum iso or a product-indexed complex: the vanishing argument consumes exactly these
 -- projections, elementwise, and nothing categorical.
-#print axioms AlgebraicGeometry.Proj.intNegSupport
-#print axioms AlgebraicGeometry.Proj.mem_intNegSupport
-#print axioms AlgebraicGeometry.Proj.intNegSupport_laurentExponent_subset
+#print axioms MvPolynomial.intNegSupport
+#print axioms MvPolynomial.mem_intNegSupport
+#print axioms MvPolynomial.intNegSupport_laurentExponent_subset
 -- The finite index set of the full block (#568 step 6.1). An exponent negative in every
 -- coordinate whose coordinates sum to d has each coordinate trapped in [d + card - 1, -1], so
 -- the exponents form a subset of a finite box. This is the finiteness the top cohomology rests
 -- on; it is empty unless d <= -(card iota), which is Serre's vanishing in exponent form.
-#print axioms AlgebraicGeometry.Proj.finite_setOf_degree_eq_of_neg
-#print axioms AlgebraicGeometry.Proj.laurentExponent_sub_of_add_eq
-#print axioms AlgebraicGeometry.Proj.laurentFilter
-#print axioms AlgebraicGeometry.Proj.coeff_laurentFilter_of_eq
-#print axioms AlgebraicGeometry.Proj.coeff_laurentFilter_of_ne
-#print axioms AlgebraicGeometry.Proj.laurentFilter_add
-#print axioms AlgebraicGeometry.Proj.laurentFilter_mem_natShift
-#print axioms AlgebraicGeometry.Proj.sum_laurentFilter_powerset
-#print axioms AlgebraicGeometry.Proj.laurentFilter_laurentFilter_self
-#print axioms AlgebraicGeometry.Proj.laurentFilter_laurentFilter_of_ne
-#print axioms AlgebraicGeometry.Proj.laurentFilter_eq_zero_of_not_subset
-#print axioms AlgebraicGeometry.Proj.laurentFilter_monomial_mul
-#print axioms AlgebraicGeometry.Proj.AwayRep.blockFilter
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_blockFilter_raise
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_blockFilter_congr
-#print axioms AlgebraicGeometry.Proj.blockProj
-#print axioms AlgebraicGeometry.Proj.blockProj_frac
-#print axioms AlgebraicGeometry.Proj.blockProj_awayMk
-#print axioms AlgebraicGeometry.Proj.blockProj_add
-#print axioms AlgebraicGeometry.Proj.blockProjHom
-#print axioms AlgebraicGeometry.Proj.blockProjHom_apply
-#print axioms AlgebraicGeometry.Proj.sum_blockProj
-#print axioms AlgebraicGeometry.Proj.blockProj_blockProj_self
-#print axioms AlgebraicGeometry.Proj.blockProj_blockProj_of_ne
-#print axioms AlgebraicGeometry.Proj.blockProj_eq_zero_of_not_subset
-#print axioms AlgebraicGeometry.Proj.laurentFace_blockProj
+#print axioms MvPolynomial.finite_setOf_degree_eq_of_neg
+#print axioms MvPolynomial.laurentExponent_sub_of_add_eq
+#print axioms MvPolynomial.laurentFilter
+#print axioms MvPolynomial.coeff_laurentFilter_of_eq
+#print axioms MvPolynomial.coeff_laurentFilter_of_ne
+#print axioms MvPolynomial.laurentFilter_add
+#print axioms MvPolynomial.laurentFilter_mem_natShift
+#print axioms MvPolynomial.sum_laurentFilter_powerset
+#print axioms MvPolynomial.laurentFilter_laurentFilter_self
+#print axioms MvPolynomial.laurentFilter_laurentFilter_of_ne
+#print axioms MvPolynomial.laurentFilter_eq_zero_of_not_subset
+#print axioms MvPolynomial.laurentFilter_monomial_mul
+#print axioms MvPolynomial.AwayRep.blockFilter
+#print axioms MvPolynomial.AwayRep.frac_blockFilter_raise
+#print axioms MvPolynomial.AwayRep.frac_blockFilter_congr
+#print axioms MvPolynomial.blockProj
+#print axioms MvPolynomial.blockProj_frac
+#print axioms MvPolynomial.blockProj_awayMk
+#print axioms MvPolynomial.blockProj_add
+#print axioms MvPolynomial.blockProjHom
+#print axioms MvPolynomial.blockProjHom_apply
+#print axioms MvPolynomial.sum_blockProj
+#print axioms MvPolynomial.blockProj_blockProj_self
+#print axioms MvPolynomial.blockProj_blockProj_of_ne
+#print axioms MvPolynomial.blockProj_eq_zero_of_not_subset
+#print axioms MvPolynomial.laurentFace_blockProj
 -- The contracting homotopy of a block (#340, step 3). laurentHomotopy projects out ALL of the
 -- cone variable and reinserts the surplus by a face, which makes it well defined whatever the
 -- tuple contains and buys the two identities the homotopy computation d h + h d = id consumes:
@@ -227,15 +227,15 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- face in the cone variable itself, where the surplus shifts by one and rebalances), and the
 -- retraction of the cone face on a block (laurentHomotopy_laurentFace_blockProj), which is the
 -- only identity that sees the block and the only place i0 not-in F is spent.
-#print axioms AlgebraicGeometry.Proj.monomial_mul_divMonomial_cancel
-#print axioms AlgebraicGeometry.Proj.laurentFilter_apply_ge
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_split
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_back
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_numerator_mem
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_awayMk
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_laurentFace_blockProj
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_laurentFace_comm
+#print axioms MvPolynomial.monomial_mul_divMonomial_cancel
+#print axioms MvPolynomial.laurentFilter_apply_ge
+#print axioms MvPolynomial.laurentHomotopy_split
+#print axioms MvPolynomial.laurentHomotopy_back
+#print axioms MvPolynomial.laurentHomotopy
+#print axioms MvPolynomial.laurentHomotopy_numerator_mem
+#print axioms MvPolynomial.laurentHomotopy_awayMk
+#print axioms MvPolynomial.laurentHomotopy_laurentFace_blockProj
+#print axioms MvPolynomial.laurentHomotopy_laurentFace_comm
 -- The block homotopy carried onto the variable Cech cover (#340, step 3). powersCongr
 -- transports a degree-zero localization along an equality of denominators (the element never
 -- moves; every equation is subst plus proof irrelevance), tupleExponent names the Cech
@@ -2214,16 +2214,16 @@ not reach a negative twist at all.
 action against `cechScalarAction` are not here, so #666's acceptance criterion is not met. -/
 
 #print axioms MvPolynomial.IsPolynomialTwist.smul_mem
-#print axioms AlgebraicGeometry.Proj.polynomialToHomogeneousLocalization
-#print axioms AlgebraicGeometry.Proj.degreeZeroLocalizationModule
-#print axioms AlgebraicGeometry.Proj.awayMk_smul
-#print axioms AlgebraicGeometry.Proj.awayMk_congr
-#print axioms AlgebraicGeometry.Proj.monomial_one_mem_of_mem_support
-#print axioms AlgebraicGeometry.Proj.intNegSupport_of_mem_support_laurentFilter
-#print axioms AlgebraicGeometry.Proj.blockRep
-#print axioms AlgebraicGeometry.Proj.awayMk_eq_blockRep
-#print axioms AlgebraicGeometry.Proj.blockProj_univ_mem_span
-#print axioms AlgebraicGeometry.Proj.fg_blockSpan
+#print axioms MvPolynomial.polynomialToHomogeneousLocalization
+#print axioms MvPolynomial.degreeZeroLocalizationModule
+#print axioms MvPolynomial.awayMk_smul
+#print axioms MvPolynomial.awayMk_congr
+#print axioms MvPolynomial.monomial_one_mem_of_mem_support
+#print axioms MvPolynomial.intNegSupport_of_mem_support_laurentFilter
+#print axioms MvPolynomial.blockRep
+#print axioms MvPolynomial.awayMk_eq_blockRep
+#print axioms MvPolynomial.blockProj_univ_mem_span
+#print axioms MvPolynomial.fg_blockSpan
 
 /-! ## The full blocks of a Čech degree, assembled (#666, S1b — in progress)
 
@@ -2286,8 +2286,8 @@ inherits the linearity of one pointwise `mapOfLE`.
 Still outstanding for #666: carrying this up from a single term to the Čech complex, and the
 `module_finite_linearCoherentH_of_cech` wiring. -/
 
-#print axioms AlgebraicGeometry.Proj.smul_mk
-#print axioms AlgebraicGeometry.Proj.mapOfLE_smul
+#print axioms MvPolynomial.smul_mk
+#print axioms MvPolynomial.mapOfLE_smul
 #print axioms AlgebraicGeometry.Proj.constSectionOn
 #print axioms AlgebraicGeometry.Proj.constSectionOn_basicOpen
 #print axioms AlgebraicGeometry.Proj.constSection

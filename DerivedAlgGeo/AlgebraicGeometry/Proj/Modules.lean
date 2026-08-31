@@ -3,11 +3,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Frac
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Finiteness
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechHomotopy
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechPrimitive
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentBlock
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentFinite
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechFinite
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentHomotopy
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentProjection
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.StructureModule
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistChart

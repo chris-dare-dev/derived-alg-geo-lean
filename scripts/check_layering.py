@@ -1498,9 +1498,8 @@ def main() -> int:
     div_monomial_owner = (
         SOURCE_ROOT / "Algebra" / "MvPolynomial" / "DivMonomial.lean"
     )
-    laurent_projection_consumer = (
-        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
-            "LaurentProjection.lean"
+    laurent_projection_owner = (
+        SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentProjection.lean"
     )
     if not div_monomial_owner.is_file():
         failures.append(
@@ -1535,9 +1534,9 @@ def main() -> int:
             )
 
     div_monomial_import = "DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial"
-    if div_monomial_import not in imports_by_path[laurent_projection_consumer]:
+    if div_monomial_import not in imports_by_path[laurent_projection_owner]:
         failures.append(
-            f"{laurent_projection_consumer.relative_to(ROOT)}: Laurent "
+            f"{laurent_projection_owner.relative_to(ROOT)}: Laurent "
             "projection must import the algebraic monomial-division owner directly"
         )
     for path in sorted((SOURCE_ROOT / "AlgebraicGeometry" / "Proj").rglob("*.lean")):
@@ -1639,6 +1638,28 @@ def main() -> int:
             "theorem exists_sum_awayMk_monomial",
             "theorem sum_awayMk_monomial_eq_zero_iff",
         ),
+        laurent_projection_owner: (
+            "namespace MvPolynomial",
+            "structure AwayRep",
+            "noncomputable def signProjectionHom",
+            "theorem signProjection_laurentFace_comm",
+        ),
+        SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentBlock.lean": (
+            "namespace MvPolynomial",
+            "noncomputable def intNegSupport",
+            "noncomputable def blockProjHom",
+            "theorem laurentFace_blockProj",
+        ),
+        SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentHomotopy.lean": (
+            "namespace MvPolynomial",
+            "noncomputable def laurentHomotopy",
+            "theorem laurentHomotopy_laurentFace_comm",
+        ),
+        SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentFinite.lean": (
+            "namespace MvPolynomial",
+            "noncomputable def polynomialToHomogeneousLocalization",
+            "theorem fg_blockSpan",
+        ),
     }
     for path, fragments in laurent_algebra_owners.items():
         if not path.is_file():
@@ -1674,12 +1695,24 @@ def main() -> int:
             "TwistLocalization.lean",
         SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
             "LaurentBasis.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "LaurentProjection.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "LaurentBlock.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "LaurentHomotopy.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "LaurentFinite.lean",
     )
     retired_proj_algebra_imports = {
         "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.GradedLocalization",
         "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Shift",
         "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistLocalization",
         "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentBasis",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentProjection",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentBlock",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentHomotopy",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentFinite",
     }
     for path in retired_proj_algebra_paths:
         if path.exists():
@@ -1693,27 +1726,65 @@ def main() -> int:
                 f"{path.relative_to(ROOT)}: imports retired Proj algebra "
                 f"path(s) {restored}"
             )
+    for path in sorted((SOURCE_ROOT / "AlgebraicGeometry" / "Proj").rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        for declaration in (
+            "AwayRep",
+            "signProjection",
+            "signProjectionHom",
+            "laurentFace",
+            "intNegSupport",
+            "laurentFilter",
+            "blockProj",
+            "blockProjHom",
+            "laurentHomotopy",
+            "polynomialToHomogeneousLocalization",
+            "blockRep",
+            "fg_blockSpan",
+        ):
+            if re.search(
+                rf"^(?:noncomputable\s+)?(?:def|structure|theorem)\s+{declaration}\b",
+                text,
+                re.MULTILINE,
+            ):
+                failures.append(
+                    f"{path.relative_to(ROOT)}: restored generic Laurent "
+                    f"localization declaration {declaration}"
+                )
 
-    graded_module_consumers = {
-        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
-            "AssociatedSheaf.lean":
-            "DerivedAlgGeo.Algebra.Module.GradedModule.Localization",
-        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
-            "TwistingSheaf.lean":
-            "DerivedAlgGeo.Algebra.Module.GradedModule.Shift",
-        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
-            "TwistChart.lean":
-            "DerivedAlgGeo.Algebra.Module.GradedModule.TwistLocalization",
-        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
-            "CechHomotopy.lean":
-            "DerivedAlgGeo.Algebra.Module.GradedModule.PowersCongr",
-        laurent_projection_consumer:
-            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentBasis",
-    }
-    for path, required_import in graded_module_consumers.items():
+    graded_module_consumers = (
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "AssociatedSheaf.lean",
+            "DerivedAlgGeo.Algebra.Module.GradedModule.Localization"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "TwistingSheaf.lean",
+            "DerivedAlgGeo.Algebra.Module.GradedModule.Shift"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "TwistChart.lean",
+            "DerivedAlgGeo.Algebra.Module.GradedModule.TwistLocalization"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "CechHomotopy.lean",
+            "DerivedAlgGeo.Algebra.Module.GradedModule.PowersCongr"),
+        (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentBlock.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentProjection"),
+        (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentHomotopy.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentBlock"),
+        (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentFinite.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentBlock"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "CechHomotopy.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentHomotopy"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "CechFinite.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Finiteness" /
+            "ProjectiveSpaceScalars.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite"),
+    )
+    for path, required_import in graded_module_consumers:
         if required_import not in imports_by_path[path]:
             failures.append(
-                f"{path.relative_to(ROOT)}: geometric consumer must import "
+                f"{path.relative_to(ROOT)}: Laurent consumer must import "
                 f"the algebraic owner {required_import} directly"
             )
 
@@ -1725,7 +1796,7 @@ def main() -> int:
         SOURCE_ROOT / "Algebra" / "Finsupp.lean":
             "DerivedAlgGeo.Algebra.Finsupp.LaurentExponent",
         SOURCE_ROOT / "Algebra" / "MvPolynomial.lean":
-            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentBasis",
+            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentHomotopy",
     }
     for path, required_import in graded_module_umbrellas.items():
         if not path.is_file():
@@ -2214,8 +2285,9 @@ def main() -> int:
         "monomial-division identities use Algebra; geometric files are consumers"
     )
     print(
-        "ok: graded-module localizations, shifts, and Laurent bases use "
-        "Algebra roots; Proj and Cech modules are direct consumers"
+        "ok: graded-module localizations, shifts, Laurent bases, projections, "
+        "blocks, homotopies, and finiteness use Algebra roots; Proj and Cech "
+        "modules are direct consumers"
     )
     print(
         "ok: weak-stability family declarations use the matching "
