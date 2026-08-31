@@ -78,17 +78,20 @@ Theorems stated only using `Finsupp`, `MvPolynomial`, homogeneity, and
 established `Finsupp` and `MvPolynomial` namespaces. Representative-independent
 maps on polynomial degree-zero localizations—including Laurent sign and block
 projections, their one-localization homotopies, and full-block finiteness—also
-belong under `Algebra/MvPolynomial/`. The projective Čech assembly imports
-these algebraic roots as a consumer.
+belong under `Algebra/MvPolynomial/`. Polynomial-variable Čech denominators,
+graded-localization terms, face maps, block homotopies, primitives, and
+finite-block assembly belong under `Algebra/MvPolynomial/Cech/`. Comparison of
+that diagram with projective basic opens, sheaf sections, or cohomology is the
+geometric consumer.
 
 Internally graded modules are algebra, not projective geometry. Extend
 Mathlib's `GradedModule` namespace under `Algebra/Module/GradedModule/` for
 degree-zero homogeneous localizations, natural or integer graded shifts,
 localization trivializations, and equality transport between denominator
 power submonoids. Pure exponent-vector arithmetic uses `Algebra/Finsupp/`, and
-polynomial specializations use `Algebra/MvPolynomial/`. A Proj sheaf or Čech
-module imports these roots and adds only the scheme, cover, or cohomological
-consumer.
+polynomial specializations use `Algebra/MvPolynomial/`. A projective sheaf,
+basic-open comparison, or cohomology module imports these roots and adds only
+the scheme, section, or cohomological consumer.
 
 ## Moduli and subprestacks
 

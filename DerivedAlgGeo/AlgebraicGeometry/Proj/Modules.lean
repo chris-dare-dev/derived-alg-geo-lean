@@ -1,9 +1,6 @@
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.AssociatedSheaf
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Frac
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Finiteness
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechHomotopy
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechPrimitive
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechFinite
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.StructureModule
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistChart

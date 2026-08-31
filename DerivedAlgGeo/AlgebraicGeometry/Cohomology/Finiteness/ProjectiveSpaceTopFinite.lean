@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.ProjectiveSpaceCechHomology
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechFinite
+import DerivedAlgGeo.Algebra.MvPolynomial.Cech.Finite
 
 /-!
 # `Hⁱ(Pⁿ, O(d))` is finite-dimensional in every positive degree
@@ -11,8 +11,9 @@ import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechFinite
 `Cech/Vanishing.lean` kills every degree whose tuples are too short to meet all the variables, by
 contracting every Laurent block. The top degree is exactly where that fails, and
 `Cech/TopDegree.lean` separates the surviving block instead: every class is carried by the full
-block. `Proj/Modules/CechFinite.lean` shows those full blocks form a finite-dimensional `k`-space.
-This file joins the two and discharges the finiteness interface.
+block. `Algebra/MvPolynomial/Cech/Finite.lean` shows those full blocks form a
+finite-dimensional `k`-space. This file joins the algebraic result to the geometric Čech complex
+and discharges the finiteness interface.
 
 ## The argument
 

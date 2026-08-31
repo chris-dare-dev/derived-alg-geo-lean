@@ -65,16 +65,25 @@ blocks should normally move it rather than add more declarations beside it.
   owns representative-independent sign projections, negative-support block
   projections, the one-localization contracting map, and full-block
   finite-generation results. The corresponding former Proj module paths are
-  retired; projective Čech assembly imports the algebraic leaves directly.
+  retired; the polynomial Čech algebra and its geometric consumers import the
+  algebraic leaves directly.
+- Polynomial variable Čech algebra:
+  `Algebra/MvPolynomial/Cech/{Basic,Homotopy,Primitive,Finite}.lean` owns the
+  denominator diagram, graded-localization terms and faces, block homotopy,
+  cocycle primitive, and finite-block assembly. The former
+  `AlgebraicGeometry/Proj/Modules/Cech{Homotopy,Primitive,Finite}.lean` paths
+  are retired. `Proj/Modules/ProjectiveSpace.lean` now begins at comparison
+  with projective basic opens and sections; geometric cohomology files import
+  the algebraic leaves directly.
 
 ## Confirmed next lanes
 
-1. Review the boundary beginning at
-   `AlgebraicGeometry/Proj/Modules/CechHomotopy.lean`: its current signatures
-   assemble the Laurent-localization maps against the polynomial variable Čech
-   terms, while later consumers connect those terms to projective sheaves and
-   cohomology. Separate any remaining algebraic Čech prefix before moving the
-   genuinely geometric comparison layer.
+1. Review the remaining algebraic prefix of
+   `AlgebraicGeometry/Proj/Modules/ProjectiveSpace.lean`, especially generic
+   polynomial-variable generation and homogeneous monomial-cancellation
+   lemmas. Move declarations whose signatures mention no `Proj`, basic open,
+   sheaf, or cohomology vocabulary into the appropriate `Algebra/MvPolynomial/`
+   owner while retaining the projective comparison layer as consumer.
 
 For each lane, remove the old path rather than retaining an import-only shim,
 update audits and umbrellas in the same pull request, and add a focused

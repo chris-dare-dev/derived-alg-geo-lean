@@ -249,7 +249,7 @@ noncomputable example := @AlgebraicGeometry.Proj.polynomialTwistingGlobalSection
 
 /-- Variable-cover Čech terms are explicit homogeneous localizations, without an incorrect
 termwise finite-dimensionality assertion. -/
-noncomputable example := AlgebraicGeometry.Proj.polynomialVariableCechTerm
+noncomputable example := MvPolynomial.polynomialVariableCechTerm
 
 /-- The exact output boundary for #29: a functorial linear lift of derived cohomology together
 with degreewise finite-dimensionality, but no #30 vanishing bound. -/

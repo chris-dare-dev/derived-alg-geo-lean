@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.MvPolynomial.Cech.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Finiteness
 import Mathlib.Algebra.MvPolynomial.Division
 import Mathlib.Algebra.Module.TransferInstance
@@ -18,11 +19,11 @@ The global-section comparison is stated over a field and for a nonempty finite v
 which is the projective-space range consumed by the Serre-finiteness argument.  These hypotheses
 make the generic-point and denominator-cancellation steps explicit.
 
-The global-section comparison is for a *nonnegative* twist.  The Čech terms below come in both
-flavours: `polynomialVariableCechTerm` for `d : ℕ` and `polynomialVariableIntCechTerm` for
-`d : ℤ`.  The two are not yet identified for a nonnegative `d`; the `ℕ` versions are what the
-landed Čech differential is stated against, and retiring them in favour of the `ℤ` ones is
-follow-up work once the integer comparison layer exists.
+The global-section comparison is for a *nonnegative* twist. The imported algebraic Čech terms
+come in both flavours: `polynomialVariableCechTerm` for `d : ℕ` and
+`polynomialVariableIntCechTerm` for `d : ℤ`. This file begins where geometry enters: it compares
+those terms with projective basic opens and sections. The two algebraic terms are not yet
+identified for a nonnegative `d`; the landed Čech differential still uses the `ℕ` version.
 -/
 
 noncomputable section
@@ -527,23 +528,7 @@ theorem polynomialIntShift_isQuasicoherent (ι k : Type u) [Field k] (d : ℤ) :
     (fun i => ⟨MvPolynomial.X i, MvPolynomial.isHomogeneous_X k i⟩) d
     (polynomialVariable_adjoin_eq_top ι k)
 
-/-! ## Degreewise algebra for the variable Čech cover -/
-
-/-- The product of the variables indexing one `(n + 1)`-fold Čech intersection. -/
-def polynomialVariableCechDenominator
-    (ι k : Type u) [Field k] {n : ℕ} (x : Fin (n + 1) → ι) :
-    MvPolynomial ι k :=
-  ∏ a, MvPolynomial.X (x a)
-
-/-- The Čech denominator for an `(n + 1)`-fold intersection is homogeneous of degree `n + 1`. -/
-theorem polynomialVariableCechDenominator_mem
-    (ι k : Type u) [Field k] {n : ℕ} (x : Fin (n + 1) → ι) :
-    polynomialVariableCechDenominator ι k x ∈ polynomialGrading ι k (n + 1) := by
-  classical
-  simpa [polynomialVariableCechDenominator] using
-    SetLike.prod_mem_graded (polynomialGrading ι k)
-      (fun _ : Fin (n + 1) => 1) (fun a => MvPolynomial.X (x a))
-      (F := Finset.univ) (fun a _ => MvPolynomial.isHomogeneous_X k (x a))
+/-! ## Comparing the algebraic variable Čech diagram with projective basic opens -/
 
 /-- The basic open of the product denominator is exactly the finite intersection of the
 corresponding variable charts. -/
@@ -571,159 +556,6 @@ theorem basicOpen_polynomialVariableCechDenominator
   | empty => simp
   | @insert a F ha ih =>
       rw [Finset.prod_insert ha, Finset.inf_insert, ProjectiveSpectrum.basicOpen_mul, ih]
-
-/-- The algebraic degree-`d` term attached to one variable Čech intersection.  It is a
-degree-zero homogeneous localization, with no finite-dimensionality assertion. -/
-abbrev polynomialVariableCechTerm
-    (ι k : Type u) [Field k] (d n : ℕ) (x : Fin (n + 1) → ι) :=
-  DegreeZeroLocalization (polynomialGrading ι k)
-    (natShift (polynomialGrading ι k) d)
-      (.powers (polynomialVariableCechDenominator ι k x))
-
-/-- Degree-`n` algebraic Čech cochains for the nonnegative twist `O(d)`, expressed as the
-product of the explicit homogeneous localizations over all variable tuples. -/
-abbrev polynomialVariableCechCochains
-    (ι k : Type u) [Field k] (d n : ℕ) :=
-  ∀ x : Fin (n + 1) → ι, polynomialVariableCechTerm ι k d n x
-
-/-! ## The algebraic Čech faces
-
-Dropping one index from a Čech tuple divides the denominator by exactly one variable. That is
-the `g₁ * h = g₂` shape `DegreeZeroLocalization.faceMap` consumes, and it is why the face maps
-cannot come from `mapOfLE`: `Submonoid.powers (∏ a ≠ j, X (x a))` is not contained in
-`Submonoid.powers (∏ a, X (x a))`. -/
-
-/-- Dropping the `j`-th index multiplies the Čech denominator back up by that variable. -/
-theorem polynomialVariableCechDenominator_succAbove
-    (ι k : Type u) [Field k] {n : ℕ} (x : Fin (n + 2) → ι) (j : Fin (n + 2)) :
-    polynomialVariableCechDenominator ι k (x ∘ j.succAbove) * MvPolynomial.X (x j) =
-      polynomialVariableCechDenominator ι k x := by
-  classical
-  rw [polynomialVariableCechDenominator, polynomialVariableCechDenominator,
-    Fin.prod_univ_succAbove (fun a : Fin (n + 2) => MvPolynomial.X (R := k) (x a)) j,
-    mul_comm]
-  rfl
-
-/-- The `j`-th Čech denominator divides the full one, in the `Submonoid.powers` form
-`faceMap` asks for. -/
-theorem polynomialVariableCechDenominator_succAbove_mem
-    (ι k : Type u) [Field k] {n : ℕ} (x : Fin (n + 2) → ι) (j : Fin (n + 2)) :
-    polynomialVariableCechDenominator ι k (x ∘ j.succAbove) * MvPolynomial.X (x j) ∈
-      Submonoid.powers (polynomialVariableCechDenominator ι k x) :=
-  ⟨1, by
-    show polynomialVariableCechDenominator ι k x ^ 1 = _
-    rw [pow_one, polynomialVariableCechDenominator_succAbove]⟩
-
-/-- The `j`-th face of the algebraic Čech complex: restrict a degree-`d` fraction from the
-`(n + 1)`-fold intersection indexed by `x ∘ j.succAbove` to the `(n + 2)`-fold one indexed
-by `x`. -/
-noncomputable def polynomialVariableCechFace
-    (ι k : Type u) [Field k] (d : ℕ) {n : ℕ} (x : Fin (n + 2) → ι) (j : Fin (n + 2)) :
-    polynomialVariableCechTerm ι k d n (x ∘ j.succAbove) →+
-      polynomialVariableCechTerm ι k d (n + 1) x :=
-  DegreeZeroLocalization.faceMap
-    (𝓜 := natShift (polynomialGrading ι k) d)
-    (MvPolynomial.isHomogeneous_X k (x j))
-    (polynomialVariableCechDenominator_succAbove_mem ι k x j)
-    (polynomialVariableCechDenominator_succAbove ι k x j)
-
-/-! ## Integer-twist Čech terms
-
-The same three objects for a twist of either sign. Nothing new is required:
-`DegreeZeroLocalization.faceMap` is generic in the grading, so the face instantiates at
-`intShift` with the identical denominator arithmetic, and the two membership facts it consumes —
-`polynomialVariableCechDenominator_succAbove` and its `Submonoid.powers` form — do not mention
-the twist at all. -/
-
-/-- The algebraic term attached to one variable Čech intersection, for an integer twist. -/
-abbrev polynomialVariableIntCechTerm
-    (ι k : Type u) [Field k] (d : ℤ) (n : ℕ) (x : Fin (n + 1) → ι) :=
-  DegreeZeroLocalization (polynomialGrading ι k)
-    (intShift (polynomialGrading ι k) d)
-      (.powers (polynomialVariableCechDenominator ι k x))
-
-/-- Degree-`n` algebraic Čech cochains for an integer twist. -/
-abbrev polynomialVariableIntCechCochains
-    (ι k : Type u) [Field k] (d : ℤ) (n : ℕ) :=
-  ∀ x : Fin (n + 1) → ι, polynomialVariableIntCechTerm ι k d n x
-
-/-- The `j`-th Čech face for an integer twist. -/
-noncomputable def polynomialVariableIntCechFace
-    (ι k : Type u) [Field k] (d : ℤ) {n : ℕ} (x : Fin (n + 2) → ι) (j : Fin (n + 2)) :
-    polynomialVariableIntCechTerm ι k d n (x ∘ j.succAbove) →+
-      polynomialVariableIntCechTerm ι k d (n + 1) x :=
-  DegreeZeroLocalization.faceMap
-    (𝓜 := intShift (polynomialGrading ι k) d)
-    (MvPolynomial.isHomogeneous_X k (x j))
-    (polynomialVariableCechDenominator_succAbove_mem ι k x j)
-    (polynomialVariableCechDenominator_succAbove ι k x j)
-
-/-! ## The same three objects over an arbitrary twist
-
-`polynomialVariableCechTerm` and `polynomialVariableIntCechTerm` are the same construction at two
-graded families, and the contracting-homotopy layer above them uses nothing else about the family.
-Naming the construction once lets that layer be stated once; the two twists are then instances,
-definitionally so, which is what `cechTerm_natShift` and friends record. -/
-
-/-- The algebraic term attached to one variable Čech intersection, for an arbitrary twist. -/
-abbrev cechTerm (ι k : Type u) [Field k] {σM : Type u} [SetLike σM (MvPolynomial ι k)]
-    [AddSubgroupClass σM (MvPolynomial ι k)] (𝓜 : ℕ → σM)
-    [SetLike.GradedSMul (polynomialGrading ι k) 𝓜] {n : ℕ} (x : Fin (n + 1) → ι) :=
-  DegreeZeroLocalization (polynomialGrading ι k) 𝓜
-    (.powers (polynomialVariableCechDenominator ι k x))
-
-/-- Degree-`n` algebraic Čech cochains for an arbitrary twist. -/
-abbrev cechCochains (ι k : Type u) [Field k] {σM : Type u} [SetLike σM (MvPolynomial ι k)]
-    [AddSubgroupClass σM (MvPolynomial ι k)] (𝓜 : ℕ → σM)
-    [SetLike.GradedSMul (polynomialGrading ι k) 𝓜] (n : ℕ) :=
-  ∀ x : Fin (n + 1) → ι, cechTerm ι k 𝓜 x
-
-/-- The `j`-th Čech face for an arbitrary twist. -/
-noncomputable def cechFace (ι k : Type u) [Field k] {σM : Type u}
-    [SetLike σM (MvPolynomial ι k)] [AddSubgroupClass σM (MvPolynomial ι k)] (𝓜 : ℕ → σM)
-    [SetLike.GradedSMul (polynomialGrading ι k) 𝓜] {n : ℕ} (x : Fin (n + 2) → ι)
-    (j : Fin (n + 2)) :
-    cechTerm ι k 𝓜 (x ∘ j.succAbove) →+ cechTerm ι k 𝓜 x :=
-  DegreeZeroLocalization.faceMap (𝓜 := 𝓜)
-    (MvPolynomial.isHomogeneous_X k (x j))
-    (polynomialVariableCechDenominator_succAbove_mem ι k x j)
-    (polynomialVariableCechDenominator_succAbove ι k x j)
-
-/-- The nonnegative face is the generic one at `natShift`. -/
-theorem cechFace_natShift (ι k : Type u) [Field k] (d : ℕ) {n : ℕ} (x : Fin (n + 2) → ι)
-    (j : Fin (n + 2)) :
-    cechFace ι k (natShift (polynomialGrading ι k) d) x j =
-      polynomialVariableCechFace ι k d x j :=
-  rfl
-
-/-- The integer face is the generic one at `intShift`. -/
-theorem cechFace_intShift (ι k : Type u) [Field k] (d : ℤ) {n : ℕ} (x : Fin (n + 2) → ι)
-    (j : Fin (n + 2)) :
-    cechFace ι k (intShift (polynomialGrading ι k) d) x j =
-      polynomialVariableIntCechFace ι k d x j :=
-  rfl
-
-/-! ## Comparing the algebraic Čech terms with sections -/
-
-/-- The product of all but the first variable in a Čech index. -/
-noncomputable def cechCofactor (ι k : Type u) [Field k] {n : ℕ} (x : Fin (n + 1) → ι) :
-    MvPolynomial ι k :=
-  ∏ a : Fin n, MvPolynomial.X (x a.succ)
-
-/-- Splitting the Čech denominator off its first variable.  This is what exhibits `X (x 0)` as
-invertible in the localization at the denominator, without it being a member. -/
-theorem X_mul_cechCofactor (ι k : Type u) [Field k] {n : ℕ} (x : Fin (n + 1) → ι) :
-    (MvPolynomial.X (x 0) : MvPolynomial ι k) * cechCofactor ι k x =
-      polynomialVariableCechDenominator ι k x :=
-  (Fin.prod_univ_succ (fun a => MvPolynomial.X (x a))).symm
-
-/-- The cofactor is homogeneous of degree `n`. -/
-theorem cechCofactor_mem (ι k : Type u) [Field k] {n : ℕ} (x : Fin (n + 1) → ι) :
-    cechCofactor ι k x ∈ polynomialGrading ι k n := by
-  unfold cechCofactor
-  simpa using SetLike.prod_mem_graded (polynomialGrading ι k) (fun _ : Fin n => 1)
-    (fun a => MvPolynomial.X (x a.succ)) (F := Finset.univ)
-    (fun a _ => MvPolynomial.isHomogeneous_X k (x a.succ))
 
 /-- A Čech intersection lies inside the chart of its first variable, which is the degree-one
 chart the sheaf-level trivialization needs. -/

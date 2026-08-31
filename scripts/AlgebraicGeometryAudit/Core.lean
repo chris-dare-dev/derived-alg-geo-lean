@@ -96,21 +96,21 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- The Cech term, cochains and face over an arbitrary twist, with the two instances recorded as
 -- definitional. Naming the construction once is what lets the contracting-homotopy layer above
 -- it be stated once instead of duplicated per twist.
-#print axioms AlgebraicGeometry.Proj.cechTerm
-#print axioms AlgebraicGeometry.Proj.cechCochains
-#print axioms AlgebraicGeometry.Proj.cechFace
-#print axioms AlgebraicGeometry.Proj.cechFace_natShift
-#print axioms AlgebraicGeometry.Proj.cechFace_intShift
+#print axioms MvPolynomial.cechTerm
+#print axioms MvPolynomial.cechCochains
+#print axioms MvPolynomial.cechFace
+#print axioms MvPolynomial.cechFace_natShift
+#print axioms MvPolynomial.cechFace_intShift
 -- The short-tuple vanishing input (#568). A block containing every variable has Fintype.card
 -- elements while a tuple of length n + 2 supports at most n + 2, so over a larger variable set
 -- the block cannot sit inside the tuple's support -- whatever the twist. This is what replaces
 -- the degree argument at a negative twist, and the first place the lane needs iota finite.
-#print axioms AlgebraicGeometry.Proj.tupleExponent_support_card_le
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_eq_zero_of_card_lt
+#print axioms MvPolynomial.tupleExponent_support_card_le
+#print axioms MvPolynomial.cechBlockProj_eq_zero_of_card_lt
 -- cechBlockProj and cechHomotopy now take the twist hypothesis, which is a Prop, so Lean emits
 -- congruence lemmas for them; recorded here for the same reason AwayRep's projections are.
-#print axioms AlgebraicGeometry.Proj.cechBlockProj.congr_simp
-#print axioms AlgebraicGeometry.Proj.cechHomotopy.congr_simp
+#print axioms MvPolynomial.cechBlockProj.congr_simp
+#print axioms MvPolynomial.cechHomotopy.congr_simp
 -- Vanishing below the top degree, either sign (#568). The nonnegative companion is stronger
 -- where it applies -- no finiteness, every positive degree -- and is not a corollary.
 #print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_exactAt
@@ -249,52 +249,52 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms GradedModule.DegreeZeroLocalization.powersCongr_symm_apply_apply
 #print axioms GradedModule.DegreeZeroLocalization.powersCongr_symm_trans
 #print axioms GradedModule.DegreeZeroLocalization.powersCongr_faceMap
-#print axioms AlgebraicGeometry.Proj.tupleExponent
-#print axioms AlgebraicGeometry.Proj.tupleDenominator_eq
-#print axioms AlgebraicGeometry.Proj.tupleExponent_cons
-#print axioms AlgebraicGeometry.Proj.tupleExponent_succAbove
-#print axioms AlgebraicGeometry.Proj.tupleDenominator_cons_eq
-#print axioms AlgebraicGeometry.Proj.cons_comp_succAbove_zero
-#print axioms AlgebraicGeometry.Proj.cons_comp_succAbove_succ
-#print axioms AlgebraicGeometry.Proj.cechTermEquiv
-#print axioms AlgebraicGeometry.Proj.cechTermEquiv_cechFace
-#print axioms AlgebraicGeometry.Proj.cechBlockProj
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_apply
-#print axioms AlgebraicGeometry.Proj.sum_cechBlockProj
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_eq_zero_of_not_subset
-#print axioms AlgebraicGeometry.Proj.cechFace_cechBlockProj
-#print axioms AlgebraicGeometry.Proj.cechHomotopy
-#print axioms AlgebraicGeometry.Proj.cechHomotopy_apply
-#print axioms AlgebraicGeometry.Proj.cechTermCongr
-#print axioms AlgebraicGeometry.Proj.cechTermCongr_apply_section
-#print axioms AlgebraicGeometry.Proj.cechTermCongr_symm_apply_section
-#print axioms AlgebraicGeometry.Proj.cechTermCongr_cechBlockProj
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_laurentFace_comm'
-#print axioms AlgebraicGeometry.Proj.cechHomotopy_cechFace_zero
-#print axioms AlgebraicGeometry.Proj.cechHomotopy_cechFace_succ
+#print axioms MvPolynomial.tupleExponent
+#print axioms MvPolynomial.tupleDenominator_eq
+#print axioms MvPolynomial.tupleExponent_cons
+#print axioms MvPolynomial.tupleExponent_succAbove
+#print axioms MvPolynomial.tupleDenominator_cons_eq
+#print axioms MvPolynomial.cons_comp_succAbove_zero
+#print axioms MvPolynomial.cons_comp_succAbove_succ
+#print axioms MvPolynomial.cechTermEquiv
+#print axioms MvPolynomial.cechTermEquiv_cechFace
+#print axioms MvPolynomial.cechBlockProj
+#print axioms MvPolynomial.cechBlockProj_apply
+#print axioms MvPolynomial.sum_cechBlockProj
+#print axioms MvPolynomial.cechBlockProj_eq_zero_of_not_subset
+#print axioms MvPolynomial.cechFace_cechBlockProj
+#print axioms MvPolynomial.cechHomotopy
+#print axioms MvPolynomial.cechHomotopy_apply
+#print axioms MvPolynomial.cechTermCongr
+#print axioms MvPolynomial.cechTermCongr_apply_section
+#print axioms MvPolynomial.cechTermCongr_symm_apply_section
+#print axioms MvPolynomial.cechTermCongr_cechBlockProj
+#print axioms MvPolynomial.laurentHomotopy_laurentFace_comm'
+#print axioms MvPolynomial.cechHomotopy_cechFace_zero
+#print axioms MvPolynomial.cechHomotopy_cechFace_succ
 -- The primitive of a Cech cocycle (#340, step 3): the vanishing computation in cochain form.
 -- Per block a cone point is chosen and the block component of the cocycle is contracted
 -- through the homotopy; blocks with no cone point are empty because a nonnegative twist
 -- cannot have every exponent negative (the ONLY place d >= 0 is spent); and the per-block
 -- identities reassemble over the finitely many blocks of each tuple.
 -- cechPrimitive_isPrimitive is the homotopy computation d h + h d = id itself.
-#print axioms AlgebraicGeometry.Proj.laurentFilter_eq_zero_of_forall_mem
-#print axioms AlgebraicGeometry.Proj.blockProj_eq_zero_of_forall_mem
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_eq_zero_of_forall_mem
-#print axioms AlgebraicGeometry.Proj.tupleExponent_support_succAbove
-#print axioms AlgebraicGeometry.Proj.subset_of_subset_cons
-#print axioms AlgebraicGeometry.Proj.cechTermCongr_symm_cechBlockProj
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_of_exists
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_of_forall
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_eq_zero_of_not_subset
-#print axioms AlgebraicGeometry.Proj.cechPrimitive
+#print axioms MvPolynomial.laurentFilter_eq_zero_of_forall_mem
+#print axioms MvPolynomial.blockProj_eq_zero_of_forall_mem
+#print axioms MvPolynomial.cechBlockProj_eq_zero_of_forall_mem
+#print axioms MvPolynomial.tupleExponent_support_succAbove
+#print axioms MvPolynomial.subset_of_subset_cons
+#print axioms MvPolynomial.cechTermCongr_symm_cechBlockProj
+#print axioms MvPolynomial.cechBlockPrimitive
+#print axioms MvPolynomial.cechBlockPrimitive_of_exists
+#print axioms MvPolynomial.cechBlockPrimitive_of_forall
+#print axioms MvPolynomial.cechBlockPrimitive_eq_zero_of_not_subset
+#print axioms MvPolynomial.cechPrimitive
 -- The cone-point case, separated out because it needs no hypothesis on the twist at all. Every
 -- block except the one containing every variable has a cone point, so this alone says the
 -- cohomology is carried entirely by the full block.
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_faces_of_exists
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_faces
-#print axioms AlgebraicGeometry.Proj.cechPrimitive_isPrimitive
+#print axioms MvPolynomial.cechBlockPrimitive_faces_of_exists
+#print axioms MvPolynomial.cechBlockPrimitive_faces
+#print axioms MvPolynomial.cechPrimitive_isPrimitive
 -- The headline of #340: H^n(P, O(d)) = 0 for n >= 1 and d >= 0, over an arbitrary --
 -- possibly infinite -- variable set. cechPrimitive_isPrimitive becomes exactness of the
 -- algebraic Cech complex through ab_exact_iff and the coordinate formula for the
@@ -649,19 +649,22 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Proj.polynomialNatGlobalSectionsAddEquiv
 #print axioms AlgebraicGeometry.Proj.polynomialTwistingGlobalSectionsAddEquiv
 #print axioms AlgebraicGeometry.Proj.polynomialTwistingGlobalSectionsModuleIso
-#print axioms AlgebraicGeometry.Proj.polynomialVariableCechDenominator_mem
+#print axioms MvPolynomial.polynomialVariableCechDenominator
+#print axioms MvPolynomial.polynomialVariableCechDenominator_mem
+#print axioms MvPolynomial.polynomialVariableCechTerm
+#print axioms MvPolynomial.polynomialVariableCechCochains
 -- The Cech faces (#340). Dropping index j divides the denominator by exactly one variable, so
 -- the face is DegreeZeroLocalization.faceMap and not mapOfLE: powers of the smaller denominator
 -- are not contained in powers of the larger one.
-#print axioms AlgebraicGeometry.Proj.polynomialVariableCechDenominator_succAbove
-#print axioms AlgebraicGeometry.Proj.polynomialVariableCechDenominator_succAbove_mem
-#print axioms AlgebraicGeometry.Proj.polynomialVariableCechFace
+#print axioms MvPolynomial.polynomialVariableCechDenominator_succAbove
+#print axioms MvPolynomial.polynomialVariableCechDenominator_succAbove_mem
+#print axioms MvPolynomial.polynomialVariableCechFace
 -- The same three objects for an integer twist (#467 step 2). faceMap is generic in the grading,
 -- so the face instantiates at intShift with the identical denominator arithmetic; the two
 -- membership facts it consumes do not mention the twist at all.
-#print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechTerm
-#print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechCochains
-#print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechFace
+#print axioms MvPolynomial.polynomialVariableIntCechTerm
+#print axioms MvPolynomial.polynomialVariableIntCechCochains
+#print axioms MvPolynomial.polynomialVariableIntCechFace
 -- The integer Cech comparison (#467 step 3). Five steps where the nonnegative case has three;
 -- the two extra ones are grading transports that move no data -- the integer trivializations
 -- land at A(0) while the section comparison is stated against A.
@@ -685,9 +688,9 @@ is not closed. -/
 -- denominator has degree n+1, so the algebraic trivialization goes through invertibility
 -- (X_mul_cechCofactor) rather than membership, and the sheaf-level one through the first
 -- variable's degree-one chart.
-#print axioms AlgebraicGeometry.Proj.cechCofactor
-#print axioms AlgebraicGeometry.Proj.X_mul_cechCofactor
-#print axioms AlgebraicGeometry.Proj.cechCofactor_mem
+#print axioms MvPolynomial.cechCofactor
+#print axioms MvPolynomial.X_mul_cechCofactor
+#print axioms MvPolynomial.cechCofactor_mem
 #print axioms AlgebraicGeometry.Proj.basicOpen_denominator_le
 #print axioms AlgebraicGeometry.Proj.cechTermSectionAddEquiv
 -- The comparison is the canonical pointwise fraction-to-section map, not merely some
@@ -2194,7 +2197,7 @@ block. The finiteness half — that the full block is a finite-dimensional `k`-s
 `finite_setOf_degree_eq_of_neg` — is NOT here, so #666's acceptance criterion is not met by these
 declarations. -/
 
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_cechBlockProj_self
+#print axioms MvPolynomial.cechBlockProj_cechBlockProj_self
 #print axioms AlgebraicGeometry.Proj.intCechFullBlock
 #print axioms AlgebraicGeometry.Proj.intCechFullBlock_cocycle
 #print axioms AlgebraicGeometry.Proj.exists_fullBlock_add_coboundary
@@ -2236,13 +2239,13 @@ Still the cochain side only — no differential, no cocycles, no cohomology, and
 `degreeZeroLocalizationModule` rather than the `cechScalarAction` the finiteness interface
 consumes. #666's acceptance criterion is not met. -/
 
-#print axioms AlgebraicGeometry.Proj.powersCongrLinear
-#print axioms AlgebraicGeometry.Proj.powersCongrLinear_apply
-#print axioms AlgebraicGeometry.Proj.powersCongrLinear_symm_apply
-#print axioms AlgebraicGeometry.Proj.cechBlockSpan
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_mem_cechBlockSpan
-#print axioms AlgebraicGeometry.Proj.fg_cechBlockSpan
-#print axioms AlgebraicGeometry.Proj.module_finite_pi_cechBlockSpan
+#print axioms MvPolynomial.powersCongrLinear
+#print axioms MvPolynomial.powersCongrLinear_apply
+#print axioms MvPolynomial.powersCongrLinear_symm_apply
+#print axioms MvPolynomial.cechBlockSpan
+#print axioms MvPolynomial.cechBlockProj_mem_cechBlockSpan
+#print axioms MvPolynomial.fg_cechBlockSpan
+#print axioms MvPolynomial.module_finite_pi_cechBlockSpan
 
 /-! ## A degree-zero element is the constant function (#666, S1b — the bridge)
 

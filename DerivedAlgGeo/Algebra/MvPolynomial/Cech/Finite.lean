@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechHomotopy
+import DerivedAlgGeo.Algebra.MvPolynomial.Cech.Homotopy
 import DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite
 
 /-!
@@ -31,9 +31,9 @@ that `module_finite_linearCoherentH_of_cech` consumes is a separate step and is 
 
 universe u
 
-open GradedModule MvPolynomial
+open GradedModule
 
-namespace AlgebraicGeometry.Proj
+namespace MvPolynomial
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
@@ -99,4 +99,4 @@ instance module_finite_pi_cechBlockSpan [Fintype ι] (d : ℤ) {n : ℕ} :
     Module.Finite.iff_fg.mpr (fg_cechBlockSpan ι k 𝓜 d x)
   infer_instance
 
-end AlgebraicGeometry.Proj
+end MvPolynomial

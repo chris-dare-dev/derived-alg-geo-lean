@@ -109,9 +109,13 @@ Algebra/Module/Localization
 
 Algebra/MvPolynomial
   ├─→ DivMonomial                            homogeneous and factor identities
-  └─→ LaurentBasis → LaurentProjection
+  ├─→ LaurentBasis → LaurentProjection
           ├─→ LaurentBlock → LaurentHomotopy
           └─→ LaurentBlock → LaurentFinite   one-localization algebra
+  └─→ Cech
+        └─→ Basic → Homotopy
+                    ├─→ Primitive            algebraic cocycle contraction
+                    └─→ Finite               finite full-block cochains
 
 LinearAlgebra
   └─→ GradedBasis                            weighted spans and internal sums
@@ -185,8 +189,11 @@ AlgebraicGeometry/DerivedCategory
 AlgebraicGeometry/Numerical/Core
   └─→ GradedBasis                            NumericalRingData consumer
 
-AlgebraicGeometry/Proj/Modules
-  └─→ CechHomotopy, CechFinite               consume Algebra/MvPolynomial
+AlgebraicGeometry/Proj/Modules/ProjectiveSpace
+  └─→ compares Algebra/MvPolynomial/Cech with basic opens and sections
+
+AlgebraicGeometry/Cohomology
+  └─→ projective Čech vanishing/finiteness consume the algebraic primitive/block
 
 AlgebraicGeometry/Moduli/PerfectComplex
   ├─→ Boundedness                          fiberwise replete selectors/witnesses
@@ -371,6 +378,8 @@ the explicit instance umbrellas attached to their categorical sources:
 | Generic derived-category extensions | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory` |
 | Generic spectral sequences | `DerivedAlgGeo.CategoryTheory.SpectralSequence` |
 | Generic site-theoretic Čech machinery | `DerivedAlgGeo.CategoryTheory.Sites.Cech` |
+| Polynomial-variable Čech algebra | `DerivedAlgGeo.Algebra.MvPolynomial.Cech` |
+| Projective basic-open and section comparison | `DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace` |
 | Generic abelian-category extensions | `DerivedAlgGeo.CategoryTheory.Abelian` |
 | Generic sheaves and ringed-site module sheaves | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves` |
 | Generic stacks and representable fibers | `DerivedAlgGeo.CategoryTheory.Sites` |

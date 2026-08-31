@@ -2,10 +2,10 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechHomotopy
+import DerivedAlgGeo.Algebra.MvPolynomial.Cech.Homotopy
 
 /-!
-# The primitive of a Čech cocycle of `O(d)`, `d ≥ 0`
+# The primitive of a polynomial variable Čech cocycle in nonnegative degree
 
 The vanishing computation of #340, in cochain form. Given a degree-`(n+1)` cochain `s` of the
 variable Čech cover whose differential vanishes, `cechPrimitive` is the cochain `t` with
@@ -31,12 +31,12 @@ exactness and the `Hⁿ(Pⁿ, O(d)) = 0` statement are derived downstream, where
 
 ## Tags
 
-contracting homotopy, Čech cohomology, projective space, vanishing
+contracting homotopy, Čech complex, multivariate polynomial, vanishing
 -/
 
-open Finsupp GradedModule MvPolynomial
+open Finsupp GradedModule
 
-namespace AlgebraicGeometry.Proj
+namespace MvPolynomial
 
 universe u
 
@@ -390,4 +390,4 @@ theorem cechPrimitive_isPrimitive (h𝓜 : IsPolynomialTwist 𝓜 d) {n : ℕ}
         Finset.sum_congr rfl fun F _ => cechBlockPrimitive_faces ι k h𝓜 s hs hfull x F
     _ = s x := sum_cechBlockProj ι k h𝓜 x (s x)
 
-end AlgebraicGeometry.Proj
+end MvPolynomial
