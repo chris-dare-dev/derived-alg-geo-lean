@@ -6,7 +6,7 @@ import Mathlib.CategoryTheory.ObjectProperty.Extensions
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Quasicoherent.Kernels
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineVanishing
-import DerivedAlgGeo.CategoryTheory.Sites.CohomologyShortExact
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CohomologyShortExact
 
 /-!
 # Quasi-coherence is closed under extensions
@@ -19,7 +19,7 @@ needs before it can carry a triangulated structure.
 Through the **five-term** homology long exact sequence, closure under cones
 needs closure under kernels, cokernels and extensions — not under subobjects and
 quotients, which quasi-coherence does not have.  See
-`CategoryTheory/WeakSerreExact.lean`; an earlier version of this paragraph
+`CategoryTheory/Abelian/WeakSerre.lean`; an earlier version of this paragraph
 claimed the stronger closure, and it is not what the argument uses.
 
 ## Why cohomology, when the coherent case needed none

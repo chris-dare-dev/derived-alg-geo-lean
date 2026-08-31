@@ -1206,12 +1206,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.sexticChi_point
 #print axioms Examples.sexticChi_lineBundle
 
--- Layer B: the Mathlib gap that blocks the local-to-global criterion for coherence.
-#print axioms SheafOfModules.Presentation.isFinite_of_isIso
-#print axioms SheafOfModules.Presentation.isFinite_map
-#print axioms SheafOfModules.Presentation.isFinitePresentation_quasicoherentData
-#print axioms SheafOfModules.IsFinitePresentation.of_presentation
-
 -- Layer B stage 1.
 #print axioms Scheme.Modules.IsCoherent
 #print axioms Coh
@@ -1422,19 +1416,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Scheme.CartierDivisor.coefficient_eq_zero_of_coheight_ne_one
 #print axioms Scheme.CartierPullbackData.localMap_localCartierClass
 #print axioms Scheme.CartierPullbackData.pullback_principal
-
--- Layer B stage 3: exactness of the bridge from sheaves of modules to abelian sheaves.
--- This is what lets a short exact sequence in `X.Modules` reach `Ext`, and hence the
--- cohomology long exact sequence. The first two are general category theory and have
--- nothing to do with sheaves.
-#print axioms CategoryTheory.Adjunction.preservesColimit_comp_left
-#print axioms CategoryTheory.Adjunction.preservesColimitsOfShape_of_comp_left
-#print axioms SheafOfModules.preservesFiniteColimits_toSheaf
-#print axioms SheafOfModules.preservesFiniteColimits_toSheaf'
-#print axioms SheafOfModules.preservesEpimorphisms_toSheaf
-#print axioms SheafOfModules.shortExact_map_toSheaf
-#print axioms SheafOfModules.epi_of_isLocallySurjective
-#print axioms SheafOfModules.reflectsEpimorphisms_toSheaf
 
 -- Layer B stage 3: Mathlib's construction assembling a spectral object into a spectral
 -- sequence, including its page-homology and first-page comparison isomorphisms.

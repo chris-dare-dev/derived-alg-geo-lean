@@ -71,7 +71,7 @@ theorem Presentation.isFinite_map {M : SheafOfModules.{u} R} (P : M.Presentation
 `map` and `of_isIso`, so these two instances are what any statement about finite presentation
 has to go through.
 
-The global case is done, in `DerivedAlgGeo/AlgebraicGeometry/Modules/Presentation/Finite.lean`:
+The global case is done in the sibling `Presentation/Finite.lean`:
 `IsFinitePresentation.of_presentation`. Two things were needed on top of the instances here,
 both recorded there — a hand-supplied `preservesColimitsOfSize_shrink`, and pinning `S` when
 applying `isFinite_map`, without which `J'` stays a metavariable and instance synthesis fails

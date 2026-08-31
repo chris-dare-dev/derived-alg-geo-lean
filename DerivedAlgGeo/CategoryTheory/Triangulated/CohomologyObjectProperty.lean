@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.WeakSerreExact
+import DerivedAlgGeo.CategoryTheory.Abelian.WeakSerre
 import Mathlib.Algebra.Homology.DerivedCategory.HomologySequence
 import Mathlib.CategoryTheory.Triangulated.Subcategory
 
@@ -23,7 +23,7 @@ inclusion triangulated.
 ## The one mathematical input
 
 Closure under cones is the only field with content, and it is exactly the
-five-term statement of `WeakSerreExact.lean` applied to the long exact homology
+five-term statement of `Abelian/WeakSerre.lean` applied to the long exact homology
 sequence. For a distinguished triangle `X₁ ⟶ X₂ ⟶ X₃ ⟶ X₁⟦1⟧` the sequence
 
 `Hⁿ⁻¹X₃ ⟶ HⁿX₁ ⟶ HⁿX₂ ⟶ HⁿX₃ ⟶ Hⁿ⁺¹X₁`

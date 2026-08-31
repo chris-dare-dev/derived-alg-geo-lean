@@ -5,11 +5,21 @@
 Organize stable code by its most general mathematical construction, not by the
 first application that motivated it.
 
+- Put ordinary ring and module theory that mentions no site or scheme under
+  `Algebra/`.
 - Put statements about arbitrary categories, functors, abelian categories,
-  triangulated categories, or enriched categories under `CategoryTheory/`.
+  triangulated categories, enriched categories, sites, or sheaves on an
+  arbitrary site under `CategoryTheory/`.
+- Reuse Mathlib's `CategoryTheory.Abelian` class. Repository-owned results for
+  arbitrary abelian categories belong under `CategoryTheory/Abelian/`; do not
+  define a competing abelian-category hierarchy.
+- Put generic sheaf theory under `CategoryTheory/Sites/Sheaves/`. This includes
+  sheaves of modules over a sheaf of rings on an arbitrary site; those belong
+  under `CategoryTheory/Sites/Sheaves/Modules/`, not under affine or scheme
+  geometry.
 - Put definitions and geometric lemmas that intrinsically mention schemes,
-  varieties, sheaves, or geometric morphism properties under
-  `AlgebraicGeometry/`.
+  varieties, scheme-indexed sheaf categories, or geometric morphism
+  properties under `AlgebraicGeometry/`.
 - Put a concrete realization of a generic categorical interface in an explicit
   `Instances/AlgebraicGeometry/` leaf below the generic construction. These
   bridge leaves may import both subjects; generic siblings and their umbrellas
@@ -23,6 +33,12 @@ first application that motivated it.
   machinery under `AlgebraicGeometry/DerivedCategory/`; reserve an
   `Instances/AlgebraicGeometry/` leaf for registration or comparison adapters
   whose parent generic interface is the primary object being realized.
+- The geometric specialization chain is `SheafOfModules(X) -> QCoh(X) ->
+  Coh(X)`: place scheme module sheaves under
+  `AlgebraicGeometry/SheafOfModules/`, quasicoherent refinements below
+  `QuasicoherentSheaf/`, and coherent refinements below `CoherentSheaf/` as
+  the staged cutover reaches them. Prove the relevant abelian instance for
+  `Coh(X)` in geometry, then consume the single generic derived construction.
 - Express refinement in the import tree from weak to strong. A stronger theory
   imports its weaker parent and supplies a projection or constructor in Lean;
   directory nesting alone is not a substitute for the type-level relationship.

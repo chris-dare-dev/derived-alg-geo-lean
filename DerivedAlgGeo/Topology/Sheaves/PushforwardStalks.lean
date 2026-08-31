@@ -28,7 +28,8 @@ stalk `(f _* F) y` of the pushforward of a sheaf of abelian groups is a subsingl
 ## Where this sits
 
 Exactness of `ι_*` along a closed immersion is the last input `#572` step 3 needs in order to be
-instantiated geometrically (`CategoryTheory/SheafCohomologyPushforward.lean` proves the abstract
+instantiated geometrically (`CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` proves the
+abstract
 statement). The standard proof is stalkwise, and it has two halves:
 
 * **on the range**, `(f _* F)_{f x} ≅ F_x`. This is **already in Mathlib**, as
@@ -274,7 +275,7 @@ epimorphisms and kernels gives `PreservesHomology`
 epimorphisms are `preservesEpimorphisms_pushforward`; the kernels come with the right adjoint.
 
 This is the input `#572` step 3 needs in order to instantiate the abstract cohomology comparison
-of `CategoryTheory/SheafCohomologyPushforward.lean` at a closed immersion. -/
+of `CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` at a closed immersion. -/
 theorem preservesFiniteColimits_pushforward (hemb : Topology.IsInducing f)
     (hcl : IsClosed (Set.range f)) :
     PreservesFiniteColimits (TopCat.Sheaf.pushforward AddCommGrpCat.{u} f) := by

@@ -11,6 +11,12 @@ The principal areas are:
 - `DerivedAlgGeo/AlgebraicGeometry/` for coherent sheaves, cohomology,
   divisors, duality, intersection theory, numerical geometry, and
   Riemann--Roch;
+- `DerivedAlgGeo/Algebra/` for ordinary ring and module theory independent of
+  sites and schemes;
+- `DerivedAlgGeo/CategoryTheory/Abelian/` for repository-owned results about
+  arbitrary abelian categories, extending Mathlib's abelian hierarchy;
+- `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/` for generic sheaf theory,
+  including module sheaves on an arbitrary ringed site;
 - `DerivedAlgGeo/CategoryTheory/Monoidal/` for generic monoidal coherence and
   compatibility interfaces;
 - `DerivedAlgGeo/CategoryTheory/Enriched/DGCategory/` for raw dg categories
@@ -36,11 +42,18 @@ Never add imports or namespaces rooted at `CohLean`, `DGLean`, or
 Organize code by its most general mathematical construction, then attach
 concrete applications through explicit instance leaves.
 
-- Arbitrary categorical, functorial, abelian, triangulated, or enriched
-  statements belong under `CategoryTheory/`.
+- Ordinary ring and module theory that mentions no site or scheme belongs
+  under `Algebra/`.
+- Arbitrary categorical, functorial, abelian, triangulated, enriched,
+  site-theoretic, or sheaf-theoretic statements belong under
+  `CategoryTheory/`. Reuse Mathlib's `CategoryTheory.Abelian` class and put
+  only missing generic results below `CategoryTheory/Abelian/`.
+- Generic sheaves belong under `CategoryTheory/Sites/Sheaves/`; sheaves of
+  modules over a sheaf of rings on an arbitrary site belong in its `Modules/`
+  child.
 - Definitions and lemmas that intrinsically mention schemes, varieties,
-  sheaves, or geometric morphism properties belong under
-  `AlgebraicGeometry/`.
+  scheme-indexed sheaf categories, or geometric morphism properties belong
+  under `AlgebraicGeometry/`.
 - Generic stacks in groupoids and their descent-equivalence interface belong
   under `CategoryTheory/Sites/` and use the `CategoryTheory` namespace;
   scheme-specific representability and presentations remain geometric.
@@ -64,6 +77,13 @@ of the generic theory and lives under `AlgebraicGeometry/DerivedCategory/`,
 not below stability. Use an
 `Instances/AlgebraicGeometry/` leaf for registration-only adapters whose
 generic categorical interface is the primary owner.
+
+The geometric specialization chain is `SheafOfModules(X) -> QCoh(X) ->
+Coh(X)`. Its scheme-owned source tree is
+`AlgebraicGeometry/SheafOfModules/QuasicoherentSheaf/CoherentSheaf/` as the
+staged cutover reaches those APIs. The fact that `Coh(X)` is abelian is a
+geometric instance; the derived-category construction it unlocks remains the
+single generic construction under category theory.
 
 The same ownership rule applies to cohomological infrastructure. Generic
 `Ext` adjunction, dimension shift, and injective-resolution naturality live
