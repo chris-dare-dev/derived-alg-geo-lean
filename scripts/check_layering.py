@@ -13,8 +13,9 @@ rejects restoration of the retired geometric stability subtree, and keeps the
 migration allowlist burned to zero. It also keeps neutral, weak, Bridgeland,
 and geometric family declarations in the namespaces matching their owners.
 It also guards the bicategorical adjunction and limit-preservation split, the
-generic derived-category, cohomological, and stack roots, and requires ordinary
-prestability to expose weak prestability structurally.
+generic derived-category, cohomological, and stack roots, the algebraic
+module-localization kernel owner, and requires ordinary prestability to expose
+weak prestability structurally.
 """
 
 from __future__ import annotations
@@ -1269,6 +1270,80 @@ def main() -> int:
                     f"declaration fragment {fragment!r} in a geometric consumer"
                 )
 
+    localization_kernels = (
+        SOURCE_ROOT / "Algebra" / "Module" / "Localization" / "Kernels.lean"
+    )
+    localization_umbrellas = {
+        SOURCE_ROOT / "Algebra" / "Module" / "Localization.lean":
+            "DerivedAlgGeo.Algebra.Module.Localization.Kernels",
+        SOURCE_ROOT / "Algebra" / "Module.lean":
+            "DerivedAlgGeo.Algebra.Module.Localization",
+        SOURCE_ROOT / "Algebra.lean":
+            "DerivedAlgGeo.Algebra.Module",
+    }
+    if not localization_kernels.is_file():
+        failures.append(
+            "canonical module-localization kernel owner is missing: "
+            f"{localization_kernels.relative_to(ROOT)}"
+        )
+    else:
+        localization_text = localization_kernels.read_text(encoding="utf-8")
+        for fragment in (
+            "def kerMap (a : M →ₗ",
+            "theorem kerMap (a : M →ₗ",
+            "theorem kernelMap {M M' N N' : ModuleCat",
+            "theorem kernelNatTrans",
+        ):
+            if fragment not in localization_text:
+                failures.append(
+                    f"{localization_kernels.relative_to(ROOT)}: missing "
+                    f"module-localization kernel declaration {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            localization_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{localization_kernels.relative_to(ROOT)}: algebraic "
+                "localization owner depends on or declares algebraic geometry"
+            )
+
+    for path, required_import in localization_umbrellas.items():
+        if not path.is_file():
+            failures.append(
+                f"module-localization umbrella missing: {path.relative_to(ROOT)}"
+            )
+        elif required_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: missing module-localization "
+                f"umbrella import {required_import}"
+            )
+
+    coherent_kernel_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "CoherentSheaf" / "Abelian" /
+            "Kernels.lean"
+    )
+    localization_import = "DerivedAlgGeo.Algebra.Module.Localization.Kernels"
+    if localization_import not in imports_by_path[coherent_kernel_consumer]:
+        failures.append(
+            f"{coherent_kernel_consumer.relative_to(ROOT)}: coherent-sheaf "
+            "kernels must import the algebraic localization owner directly"
+        )
+    coherent_kernel_text = coherent_kernel_consumer.read_text(encoding="utf-8")
+    for fragment in (
+        "def kerMap (a : M →ₗ",
+        "theorem kerMap (a : M →ₗ",
+        "theorem kernelMap {M M' N N' : ModuleCat",
+        "theorem kernelNatTrans",
+    ):
+        if fragment in coherent_kernel_text:
+            failures.append(
+                f"{coherent_kernel_consumer.relative_to(ROOT)}: restored "
+                f"generic module-localization declaration {fragment!r}"
+            )
+
     exterior_power_owners = {
         SOURCE_ROOT / "LinearAlgebra" / "ExteriorPower" /
             "Semilinear.lean": "namespace LinearMap\n",
@@ -1731,6 +1806,10 @@ def main() -> int:
     print(
         "ok: exterior-power algebra uses LinearAlgebra, arbitrary presheaf-module "
         "exterior powers use CategoryTheory, and geometry retains only consumers"
+    )
+    print(
+        "ok: module-localization kernel maps use the Algebra owner, and "
+        "coherent-sheaf geometry imports them as a direct consumer"
     )
     print(
         "ok: weak-stability family declarations use the matching "
