@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.SpectralSequence.FilteredTotalComplexAdjacent
+import DerivedAlgGeo.CategoryTheory.SpectralSequence.FilteredTotalComplexAdjacent
 import Mathlib.Algebra.Homology.HomologySequenceLemmas
 import Mathlib.Algebra.Homology.DerivedCategory.HomologySequence
 import Mathlib.Algebra.Homology.QuasiIso

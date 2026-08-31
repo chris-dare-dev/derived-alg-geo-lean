@@ -3,7 +3,7 @@ Ext-dimension-shift slice of the StabilityCondition audit, split out so concurre
 branches append to different files (#480). See the umbrella file for the contract and
 reading guide.
 -/
-import DerivedAlgGeo.CategoryTheory.ExtDimensionShift
+import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Ext.DimensionShift
 
 /-! ## Dimension shifting for `Ext` (#572 step 3)
 

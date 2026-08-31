@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.SpectralSequence.FilteredTotalComplex
+import DerivedAlgGeo.CategoryTheory.SpectralSequence.FilteredTotalComplex
 import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.Algebra.Homology.HomotopyCategory.ShortExact
 import Mathlib.Algebra.Homology.TotalComplexShift

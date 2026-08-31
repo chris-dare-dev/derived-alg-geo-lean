@@ -602,17 +602,6 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Proj.cechCochainsDegreewiseAddEquiv_apply
 #print axioms AlgebraicGeometry.Proj.cechCochainsDegreewiseAddEquiv_symm_apply
 #print axioms AlgebraicGeometry.Proj.cechIndexEquiv_map_face
--- Mathlib's Cech differential read in coordinates (#340). Both proofs finish with `exact`
--- rather than `rw`: the two sides differ in the HasProduct instance that Pi.pi carries, which
--- rw will not see through but definitional unification will.
-#print axioms CategoryTheory.cechNerve
-#print axioms CategoryTheory.cechCosimplicial
-#print axioms CategoryTheory.cechTermFamily
-#print axioms CategoryTheory.cechComplexFunctor_delta_π
-#print axioms CategoryTheory.cechComplexFunctor_d_π
--- The same projection statement for the map a morphism of presheaves induces, which is what
--- carries the base-field action from one Cech index up to a whole degree.
-#print axioms CategoryTheory.cechComplexFunctor_map_f_π
 -- The complex-level form (#340). The differential is carried across the degreewise comparison
 -- rather than defined as an alternating sum, so d-squared and the comparison isomorphism are
 -- both free; the alternating-sum formula is a separate lemma about this complex.
@@ -1467,64 +1456,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms CategoryTheory.Abelian.SpectralObject.spectralSequenceFirstPageXIso
 #print axioms CategoryTheory.Abelian.SpectralObject.spectralSequence_first_page_d_eq
 
--- Layer B stage 3: filtered complexes and column-filtered total complexes now feed the
--- spectral-object constructor above.  The last declaration is the packaged E₂ sequence.
-#print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
-#print axioms HomotopyCategory.filteredComplexSpectralObject
-#print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt
-#print axioms CategoryTheory.Abelian.SpectralObject.coreE₂ColumnFilteredCohomologicalInt
-#print axioms HomologicalComplex.stupidTruncGEι
-#print axioms HomologicalComplex.stupidTruncGEMap
-#print axioms HomologicalComplex₂.columnFiltrationBicomplex
-#print axioms HomologicalComplex₂.columnFilteredTotalComplex
-#print axioms HomologicalComplex₂.columnFilteredTotalι
-#print axioms HomologicalComplex₂.columnFilteredTotal_map_comp_ι
-#print axioms HomologicalComplex₂.columnFilteredTotalιNat
-#print axioms HomologicalComplex₂.columnFilteredTotalSpectralObject
-#print axioms HomologicalComplex₂.columnFilteredTotalSpectralSequence
-
--- Layer B stage 3: consecutive column truncations form a degreewise split short exact
--- sequence. Its totalized mapping cone is quasi-isomorphic to the newly added shifted column,
--- which identifies an adjacent filtration layer with fixed-column homology.
-#print axioms HomologicalComplex₂.truncatedBicomplex
-#print axioms HomologicalComplex₂.singleColumnBicomplex
-#print axioms HomologicalComplex₂.singleColumnXIso
-#print axioms HomologicalComplex₂.singleColumnXIso_hom_inv_f
-#print axioms HomologicalComplex₂.singleColumnXIso_inv_hom_f
-#print axioms HomologicalComplex₂.adjacentColumnInclusion
-#print axioms HomologicalComplex₂.adjacentColumnProjection
-#print axioms HomologicalComplex₂.adjacentColumnBicomplexShortComplex
-#print axioms HomologicalComplex₂.totalFunctor_additive
-#print axioms HomologicalComplex₂.adjacentColumnTotalShortComplex
-#print axioms HomologicalComplex₂.stupidTruncGEXIso
-#print axioms HomologicalComplex₂.stupidTruncXIso_eq_stupidTruncGEXIso
-#print axioms HomologicalComplex₂.stupidTruncGEXIso_inv_hom_f
-#print axioms HomologicalComplex₂.stupidTruncGEXIso_hom_inv_f
-#print axioms HomologicalComplex₂.complexIso_inv_hom_f
-#print axioms HomologicalComplex₂.complexIso_hom_inv_f
-#print axioms HomologicalComplex₂.adjacentColumnTotalRetraction
-#print axioms HomologicalComplex₂.adjacentColumnTotalSection
-#print axioms HomologicalComplex₂.adjacentColumnTotalDegreewiseSplitting
-#print axioms HomologicalComplex₂.singleZeroBicomplex
-#print axioms HomologicalComplex₂.singleZeroXIso
-#print axioms HomologicalComplex₂.singleZeroTotalXIso
-#print axioms HomologicalComplex₂.singleZeroTotalIso
-#print axioms HomologicalComplex₂.singleColumnShiftIso
-#print axioms HomologicalComplex₂.singleColumnTotalIso
-#print axioms HomologicalComplex₂.adjacentColumnTotalShortExact
-#print axioms HomologicalComplex₂.adjacentColumnConeToShift
-#print axioms HomologicalComplex₂.adjacentColumnConeToShift_quasiIso
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerComplex
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerComplex_eq
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerConeToShift
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerConeToShift_quasiIso
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerHomologyIso
-#print axioms HomologicalComplex₂.columnFilteredStageIso
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerIso
-#print axioms HomologicalComplex₂.columnFilteredInitialPageColumnHomologyIso
-#print axioms HomologicalComplex₂.columnFilteredFirstPage_d_eq
-#print axioms HomologicalComplex₂.columnFilteredInitialPage_d_eq_horizontalHomologyMap
-
 -- Layer B stage 3: an explicit injective resolution now produces the augmented Cech
 -- bicomplex, its total complex, the column-filtered spectral sequence, and the formal
 -- initial-page identification. Over a general site the pin still has no EnoughInjectives
@@ -1574,12 +1505,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- Layer B stage 3: first-quadrant total comparison and the Cech augmentation into the total
 -- complex of an explicit injective resolution. The general engine uses finite column tails;
 -- local Cech acyclicity supplies the columnwise quasi-isomorphisms.
-#print axioms CochainComplex.mappingCone.quasiIso_compMap
-#print axioms CochainComplex.mappingCone.quasiIsoAt_inr_of_isZero_X
-#print axioms HomologicalComplex.HomologySequence.quasiIso_τ₂
-#print axioms HomologicalComplex₂.IsVerticallyConnective
-#print axioms HomologicalComplex₂.IsHorizontallyConnective
-#print axioms HomologicalComplex₂.totalMap_quasiIso
 #print axioms CategoryTheory.Sheaf.cechInjectiveColumnAugmentation_quasiIso
 #print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSource_verticallyConnective
 #print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSource_horizontallyConnective

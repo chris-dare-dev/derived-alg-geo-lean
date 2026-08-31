@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.ConstantSheafPullback
-import DerivedAlgGeo.CategoryTheory.ExtAdjunction
+import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Ext.Adjunction
 import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.CategoryTheory.Sites.Abelian
 import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic

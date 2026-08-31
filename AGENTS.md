@@ -64,6 +64,10 @@ new derived-category theory.
   belongs under `CategoryTheory/Triangulated/DerivedCategory/`, together with
   its canonical t-structure, exact-functor, homology-comparison, and
   K-projective APIs.
+- Generic `Ext` adjunction, dimension shift, and injective-resolution
+  naturality belong under the derived-category root's `Ext/` child. Generic
+  filtered-complex and total-complex spectral-sequence machinery belongs under
+  `CategoryTheory/SpectralSequence/`.
 - `Coh X`, `QCoh X`, and module-sheaf categories are geometric inputs. Their
   scheme-specific categories and loci belong under
   `AlgebraicGeometry/DerivedCategory/`; registration-only adapters for generic
@@ -111,6 +115,9 @@ new derived-category theory.
   `CategoryTheory/Sites/StackInGroupoids/`. Big-Zariski representables,
   scheme-morphism properties, atlases, and algebraicity remain under
   `AlgebraicGeometry/Stacks/`.
+- Čech formulas for an arbitrary presheaf on a site belong under
+  `CategoryTheory/Sites/Cech/`. Scheme covers, sheaf comparisons, affine
+  acyclicity, and projective-space computations remain geometric consumers.
 - Declarations owned by that generic family root use the
   `CategoryTheory.Triangulated.Families` namespace. Do not place
   `TriangulatedFiberFamily`, shared boundedness interfaces, or future neutral

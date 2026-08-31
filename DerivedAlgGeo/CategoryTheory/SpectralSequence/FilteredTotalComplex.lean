@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.SpectralSequence.FilteredComplexSpectralObject
+import DerivedAlgGeo.CategoryTheory.SpectralSequence.FilteredComplexSpectralObject
 import Mathlib.Algebra.Homology.Embedding.CochainComplex
 import Mathlib.Algebra.Homology.Embedding.StupidTrunc
 import Mathlib.Algebra.Homology.SpectralObject.FirstPage

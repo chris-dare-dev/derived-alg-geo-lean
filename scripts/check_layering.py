@@ -12,8 +12,8 @@ forbids algebraic geometry from importing back into those realization leaves,
 rejects restoration of the retired geometric stability subtree, and keeps the
 migration allowlist burned to zero. It also keeps neutral, weak, Bridgeland,
 and geometric family declarations in the namespaces matching their owners.
-It also guards the generic derived-category and stack roots and requires
-ordinary prestability to expose weak prestability structurally.
+It also guards the generic derived-category, cohomological, and stack roots
+and requires ordinary prestability to expose weak prestability structurally.
 """
 
 from __future__ import annotations
@@ -918,6 +918,60 @@ def main() -> int:
                 "uses an AlgebraicGeometry declaration namespace"
             )
 
+    generic_cohomology_sources = (
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "Cech" / "Differential.lean",
+        SOURCE_ROOT / "CategoryTheory" / "SpectralSequence" /
+            "ExtendHomologyNaturality.lean",
+        SOURCE_ROOT / "CategoryTheory" / "SpectralSequence" /
+            "FilteredComplexSpectralObject.lean",
+        SOURCE_ROOT / "CategoryTheory" / "SpectralSequence" /
+            "FilteredTotalComplex.lean",
+        SOURCE_ROOT / "CategoryTheory" / "SpectralSequence" /
+            "FilteredTotalComplexAdjacent.lean",
+        SOURCE_ROOT / "CategoryTheory" / "SpectralSequence" /
+            "FilteredTotalComplexFirstPageDifferential.lean",
+        SOURCE_ROOT / "CategoryTheory" / "SpectralSequence" /
+            "TotalFlipNaturality.lean",
+        SOURCE_ROOT / "CategoryTheory" / "SpectralSequence" /
+            "TotalQuasiIso.lean",
+        generic_derived_root / "Ext" / "Adjunction.lean",
+        generic_derived_root / "Ext" / "DimensionShift.lean",
+        generic_derived_root / "Ext" / "InjectiveResolutionNaturality.lean",
+    )
+    for path in generic_cohomology_sources:
+        if not path.is_file():
+            failures.append(
+                f"generic cohomology module missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: generic cohomological machinery "
+                "depends on or declares algebraic geometry"
+            )
+
+    retired_generic_cohomology_paths = (
+        SOURCE_ROOT / "CategoryTheory" / "ExtAdjunction.lean",
+        SOURCE_ROOT / "CategoryTheory" / "ExtDimensionShift.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "SpectralSequence.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "SpectralSequence",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Derived" /
+            "ExtResolutionNaturality.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "Differential.lean",
+    )
+    for path in retired_generic_cohomology_paths:
+        if path.exists():
+            failures.append(
+                f"retired generic cohomology path restored: {path.relative_to(ROOT)}"
+            )
+
     generic_families_root = strong_stability_root / "Families"
     neutral_derived_families_root = (
         SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "Families"
@@ -1327,6 +1381,10 @@ def main() -> int:
     print(
         "ok: generic derived-category, K-projective, and bounded-projective "
         "APIs use the CategoryTheory owner; affine files contain only consumers"
+    )
+    print(
+        "ok: generic Ext, spectral-sequence, and presheaf Cech APIs use "
+        "categorical owners; geometric cohomology contains only consumers"
     )
     print(
         "ok: weak-stability family declarations use the matching "
