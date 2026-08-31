@@ -54,6 +54,11 @@ Category
 ├─ Derived-category extensions
 │  └─ Ext adjunction / dimension shift / resolution naturality
 ├─ filtered-complex spectral sequences
+├─ Moduli
+│  └─ BoundednessProblem                 neutral boundedness predicate
+├─ Cat-valued pseudofunctor object properties
+│  ├─ replete fiberwise locus            closed under isomorphisms
+│  └─ fullsubcategory                    restriction-stable subprestack
 ├─ GrothendieckPresentation
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
@@ -95,8 +100,7 @@ AlgebraicGeometry
 │     └─ relative numerical quotient              uses Algebra root
 │        └─ family-relation system                 statement-layer adapter
 ├─ moduli
-│  ├─ replete subprestack
-│  ├─ boundedness witness
+│  ├─ finite-type boundedness witness      consumes generic predicate
 │  ├─ stack presentation
 │  └─ perfect-complex specialization
 └─ stability in families                       stability-dependent adapter only
@@ -122,8 +126,9 @@ particular:
 - extend Mathlib's abelian-category hierarchy under `CategoryTheory/Abelian`
   and make the geometric proof that `Coh(X)` is abelian an input to the generic
   derived-category construction;
-- generic stacks, replete subprestacks, boundedness, and presentation data do
-  not import stability-condition modules;
+- generic stacks, replete subprestacks, and boundedness predicates do not
+  import stability-condition or geometric modules; scheme presentations and
+  finite-type witnesses remain geometric consumers;
 - a paper-specific module may instantiate these roots but never becomes a root
   imported by them.
 

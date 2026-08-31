@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Data.Complex.Basic
 import Mathlib.Topology.LocallyConstant.Basic
-import DerivedAlgGeo.CategoryTheory.Triangulated.Families.Boundedness
+import DerivedAlgGeo.CategoryTheory.Moduli.Boundedness
 
 /-!
 # Input conditions for stability conditions in families

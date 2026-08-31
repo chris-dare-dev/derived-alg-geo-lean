@@ -17,6 +17,10 @@ The principal areas are:
   arbitrary abelian categories, extending Mathlib's abelian hierarchy;
 - `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/` for generic sheaf theory,
   including module sheaves on an arbitrary ringed site;
+- `DerivedAlgGeo/CategoryTheory/Moduli/` for neutral moduli predicates such as
+  boundedness;
+- `DerivedAlgGeo/CategoryTheory/Pseudofunctor/ObjectProperty/` for generic
+  replete loci and subprestack machinery;
 - `DerivedAlgGeo/CategoryTheory/Monoidal/` for generic monoidal coherence and
   compatibility interfaces;
 - `DerivedAlgGeo/CategoryTheory/Enriched/DGCategory/` for raw dg categories
@@ -175,10 +179,19 @@ source namespace or the namespace of the geometric object it realizes; its
 physical path records which interface it implements.
 
 The generic family root also owns its declaration namespace:
-`TriangulatedFiberFamily`, `BoundednessProblem`, and other neutral family APIs
-belong to `CategoryTheory.Triangulated.Families`, not to a nested stability
-namespace. Namespace migrations are separate from path moves and must update
-consumers, audits, baselines, documentation, and enforcement together.
+`TriangulatedFiberFamily` belongs to
+`CategoryTheory.Triangulated.Families`. Neutral moduli boundedness is more
+general still: `BoundednessProblem` and `UniversalBoundedness` belong to
+`CategoryTheory.Moduli`, not to triangulated or stability families. Namespace
+migrations are separate from path moves and must update consumers, audits,
+baselines, documentation, and enforcement together.
+
+Mathlib's `Pseudofunctor.ObjectProperty` is the canonical fiberwise locus for
+a Cat-valued pseudofunctor. Closure under isomorphisms makes the locus replete;
+closure under mapped objects makes it restriction-stable; `fullsubcategory`
+constructs the corresponding subprestack. Repository extensions live under
+`CategoryTheory/Pseudofunctor/ObjectProperty/`. Do not add a competing
+`Subprestack` carrier below algebraic geometry.
 
 The weak family root follows the same rule. Shared family probes and APIs bound
 to `WeakStabilityFunction` use
@@ -244,6 +257,15 @@ documentation, architecture checks, and CI paths together.
 ## Editing rules
 
 - Prefer the narrowest import and the nearest umbrella.
+- Before editing public API, apply the declaration-signature decision table in
+  `docs/architecture/placement.md`. Motivation, filename, namespace, and proof
+  technique are not ownership evidence.
+- Ring/module/localization declarations with no site belong to `Algebra/`;
+  linear-map, basis, lattice, matrix, multilinear, and exterior-power
+  declarations with no site belong to `LinearAlgebra/`.
+- Inspect the surrounding consumer file for adjacent generic declarations. If
+  an identified block is not moved in the current slice, record it in
+  `docs/architecture/cutover-ledger.md` and do not extend it in place.
 - Before introducing a public structure, class, quotient carrier, or category,
   follow `docs/architecture/abstraction-tree.md`: reuse one canonical root and
   make specializations reach it by an instance, projection, abbreviation, or

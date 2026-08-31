@@ -15,6 +15,9 @@ Choose the narrowest natural home:
   `DerivedAlgGeo/CategoryTheory/Abelian/`;
 - generic sheaves, including module sheaves on an arbitrary ringed site:
   `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/`;
+- neutral moduli predicates: `DerivedAlgGeo/CategoryTheory/Moduli/`;
+- Cat-valued pseudofunctor loci and subprestacks:
+  `DerivedAlgGeo/CategoryTheory/Pseudofunctor/ObjectProperty/`;
 - generic monoidal coherence and tensor--triangulation compatibility:
   `DerivedAlgGeo/CategoryTheory/Monoidal/`;
 - raw dg enrichment: `DerivedAlgGeo/CategoryTheory/Enriched/DGCategory/`;
@@ -24,6 +27,19 @@ Choose the narrowest natural home:
   `Instances/AlgebraicGeometry/` leaf below the generic construction;
 - reusable lattice or matrix theory: `DerivedAlgGeo/LinearAlgebra/`;
 - exploratory API probes: `DerivedAlgGeo/Development/`.
+
+Apply the declaration-signature table in
+`docs/architecture/placement.md` before relying on this summary. The weakest
+vocabulary sufficient for the full public type determines the owner. A
+geometric motivation, a geometric first consumer, or a proof written with
+geometric lemmas does not make an otherwise ordinary algebra, linear algebra,
+or category-theory statement geometric.
+
+In particular, use `Algebra/` for ordinary module localization and ring
+operations, and `LinearAlgebra/` for generic linear maps, bases, lattices,
+matrices, multilinear constructions, and exterior powers. When a geometric
+file contains a generic helper followed by its scheme application, split the
+helper into its general root and import that root from the consumer.
 
 Use Mathlib's established namespace when extending a Mathlib concept. Add a
 same-named umbrella for a new non-leaf directory and export stable leaves
@@ -35,6 +51,14 @@ and geometry, but neither generic category theory nor algebraic geometry may
 depend on them. Construct generic objects once—for example, obtain
 `DerivedCategory (Coh X)` from the abelian instance on `Coh X` rather than
 creating a second geometric derived-category theory.
+
+Generic boundedness predicates for moduli problems live under
+`CategoryTheory/Moduli/`. Cat-valued prestack loci reuse Mathlib's
+`Pseudofunctor.ObjectProperty`: require closure under isomorphisms for a
+replete locus and closure under mapped objects before calling it a
+subprestack, then use `fullsubcategory`. Scheme parameter spaces, finite-type
+witnesses, atlases, and geometric presentations remain below
+`AlgebraicGeometry/Moduli/` and consume those roots.
 
 Do not classify all module or sheaf theory as algebraic geometry. Ordinary
 modules over rings belong under `Algebra/`. Sheaves on an arbitrary site, and
@@ -141,9 +165,10 @@ geometric properties of their representing scheme morphisms belong under
 
 Neutral categorical family declarations use the matching
 `CategoryTheory.Triangulated.Families` namespace. In particular,
-`TriangulatedFiberFamily` and shared boundedness interfaces must not be declared
-inside a weak- or Bridgeland-stability namespace merely because those theories
-consume them. Treat a namespace migration as an API cutover: update all stable
+`TriangulatedFiberFamily` must not be declared inside a weak- or
+Bridgeland-stability namespace merely because those theories consume it.
+Shared moduli boundedness uses the independent `CategoryTheory.Moduli`
+namespace. Treat a namespace migration as an API cutover: update all stable
 consumers, audits, declaration baselines, documentation, and regression gates
 together.
 
@@ -337,3 +362,7 @@ bindings, source-independence checks, documentation, and CI paths in the same
 change. A move is complete only when CI passes on the pushed branch from a clean
 checkout — not when a local `scripts/gates.sh` goes green, which is neither
 permitted here nor sufficient.
+
+Mark completed and newly confirmed ownership defects in
+`docs/architecture/cutover-ledger.md`. Do not use the ledger as an exception:
+new declarations must go directly to their canonical owner.

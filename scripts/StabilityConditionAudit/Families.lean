@@ -6,7 +6,7 @@ family records are owned by
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
-import DerivedAlgGeo.CategoryTheory.PseudofunctorObjectProperty
+import DerivedAlgGeo.CategoryTheory.Pseudofunctor.ObjectProperty.UniversallyStable
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
@@ -106,8 +106,8 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Families.IntegratesAfterDedekindBaseChange
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDedekindHNProblem
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakIntegratesAfterDedekindBaseChange
-#print axioms CategoryTheory.Triangulated.Families.BoundednessProblem
-#print axioms CategoryTheory.Triangulated.Families.UniversalBoundedness
+#print axioms CategoryTheory.Moduli.BoundednessProblem
+#print axioms CategoryTheory.Moduli.UniversalBoundedness
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Families.OrdinaryDefinition20_5Conditions
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDefinition20_5Conditions
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.OrdinaryStabilityInFamiliesData
