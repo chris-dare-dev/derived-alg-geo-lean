@@ -1686,6 +1686,59 @@ def main() -> int:
                 "on or declares algebraic geometry"
             )
 
+    polynomial_cech_root = SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Cech"
+    polynomial_cech_owners = {
+        polynomial_cech_root / "Basic.lean": (
+            "namespace MvPolynomial",
+            "def polynomialVariableCechDenominator",
+            "noncomputable def polynomialVariableCechFace",
+            "noncomputable def cechFace",
+            "noncomputable def cechCofactor",
+        ),
+        polynomial_cech_root / "Homotopy.lean": (
+            "namespace MvPolynomial",
+            "noncomputable def tupleExponent",
+            "noncomputable def cechBlockProj",
+            "noncomputable def cechHomotopy",
+        ),
+        polynomial_cech_root / "Primitive.lean": (
+            "namespace MvPolynomial",
+            "noncomputable def cechBlockPrimitive",
+            "noncomputable def cechPrimitive",
+            "theorem cechPrimitive_isPrimitive",
+        ),
+        polynomial_cech_root / "Finite.lean": (
+            "namespace MvPolynomial",
+            "noncomputable def cechBlockSpan",
+            "theorem fg_cechBlockSpan",
+            "instance module_finite_pi_cechBlockSpan",
+        ),
+    }
+    for path, fragments in polynomial_cech_owners.items():
+        if not path.is_file():
+            failures.append(
+                f"canonical polynomial Čech algebra owner is missing: "
+                f"{path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        for fragment in fragments:
+            if fragment not in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: missing polynomial Čech "
+                    f"declaration {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: polynomial Čech algebra owner "
+                "depends on or declares algebraic geometry"
+            )
+
     retired_proj_algebra_paths = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
             "GradedLocalization.lean",
@@ -1703,6 +1756,12 @@ def main() -> int:
             "LaurentHomotopy.lean",
         SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
             "LaurentFinite.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "CechHomotopy.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "CechPrimitive.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "CechFinite.lean",
     )
     retired_proj_algebra_imports = {
         "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.GradedLocalization",
@@ -1713,6 +1772,9 @@ def main() -> int:
         "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentBlock",
         "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentHomotopy",
         "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentFinite",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechHomotopy",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechPrimitive",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechFinite",
     }
     for path in retired_proj_algebra_paths:
         if path.exists():
@@ -1741,15 +1803,43 @@ def main() -> int:
             "polynomialToHomogeneousLocalization",
             "blockRep",
             "fg_blockSpan",
+            "polynomialVariableCechDenominator",
+            "polynomialVariableCechDenominator_mem",
+            "polynomialVariableCechDenominator_succAbove",
+            "polynomialVariableCechDenominator_succAbove_mem",
+            "polynomialVariableCechTerm",
+            "polynomialVariableCechCochains",
+            "polynomialVariableCechFace",
+            "polynomialVariableIntCechTerm",
+            "polynomialVariableIntCechCochains",
+            "polynomialVariableIntCechFace",
+            "cechTerm",
+            "cechCochains",
+            "cechFace",
+            "cechFace_natShift",
+            "cechFace_intShift",
+            "cechCofactor",
+            "X_mul_cechCofactor",
+            "tupleExponent",
+            "tupleDenominator_eq",
+            "cechTermEquiv",
+            "cechBlockProj",
+            "cechHomotopy",
+            "cechTermCongr",
+            "cechBlockPrimitive",
+            "cechPrimitive",
+            "powersCongrLinear",
+            "cechBlockSpan",
+            "fg_cechBlockSpan",
         ):
             if re.search(
-                rf"^(?:noncomputable\s+)?(?:def|structure|theorem)\s+{declaration}\b",
+                rf"^(?:noncomputable\s+)?(?:abbrev|def|structure|theorem)\s+{declaration}\b",
                 text,
                 re.MULTILINE,
             ):
                 failures.append(
-                    f"{path.relative_to(ROOT)}: restored generic Laurent "
-                    f"localization declaration {declaration}"
+                    f"{path.relative_to(ROOT)}: restored generic Laurent or "
+                    f"polynomial Čech declaration {declaration}"
                 )
 
     graded_module_consumers = (
@@ -1762,8 +1852,8 @@ def main() -> int:
         (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
             "TwistChart.lean",
             "DerivedAlgGeo.Algebra.Module.GradedModule.TwistLocalization"),
-        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
-            "CechHomotopy.lean",
+        (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Cech" /
+            "Homotopy.lean",
             "DerivedAlgGeo.Algebra.Module.GradedModule.PowersCongr"),
         (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentBlock.lean",
             "DerivedAlgGeo.Algebra.MvPolynomial.LaurentProjection"),
@@ -1771,12 +1861,30 @@ def main() -> int:
             "DerivedAlgGeo.Algebra.MvPolynomial.LaurentBlock"),
         (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentFinite.lean",
             "DerivedAlgGeo.Algebra.MvPolynomial.LaurentBlock"),
-        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
-            "CechHomotopy.lean",
+        (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Cech" /
+            "Homotopy.lean",
             "DerivedAlgGeo.Algebra.MvPolynomial.LaurentHomotopy"),
-        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
-            "CechFinite.lean",
+        (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Cech" /
+            "Homotopy.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Basic"),
+        (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Cech" /
+            "Primitive.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Homotopy"),
+        (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Cech" /
+            "Finite.lean",
             "DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite"),
+        (SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Cech" /
+            "Finite.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Homotopy"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "ProjectiveSpace.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Basic"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "Vanishing.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Primitive"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Finiteness" /
+            "ProjectiveSpaceTopFinite.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Finite"),
         (SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Finiteness" /
             "ProjectiveSpaceScalars.lean",
             "DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite"),
@@ -1808,6 +1916,30 @@ def main() -> int:
                 f"{path.relative_to(ROOT)}: missing graded Laurent umbrella "
                 f"import {required_import}"
             )
+
+    polynomial_cech_umbrellas = {
+        SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Cech.lean": (
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Basic",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Homotopy",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Primitive",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Finite",
+        ),
+        SOURCE_ROOT / "Algebra" / "MvPolynomial.lean": (
+            "DerivedAlgGeo.Algebra.MvPolynomial.Cech",
+        ),
+    }
+    for path, required_imports in polynomial_cech_umbrellas.items():
+        if not path.is_file():
+            failures.append(
+                f"polynomial Čech umbrella missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        for required_import in required_imports:
+            if required_import not in imports_by_path[path]:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: missing polynomial Čech "
+                    f"umbrella import {required_import}"
+                )
 
     exterior_power_owners = {
         SOURCE_ROOT / "LinearAlgebra" / "ExteriorPower" /
@@ -2286,8 +2418,8 @@ def main() -> int:
     )
     print(
         "ok: graded-module localizations, shifts, Laurent bases, projections, "
-        "blocks, homotopies, and finiteness use Algebra roots; Proj and Cech "
-        "modules are direct consumers"
+        "and polynomial variable Cech homotopies, primitives, and finiteness use "
+        "Algebra roots; Proj and geometric Cech modules are direct consumers"
     )
     print(
         "ok: weak-stability family declarations use the matching "

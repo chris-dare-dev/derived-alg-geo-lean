@@ -85,15 +85,19 @@ application, current file, namespace, or proof technique.
   `LinearAlgebra/GradedBasis.lean`; `NumericalRingData.ofGradedBasis` is the
   geometric consumer that adds numerical-intersection-ring data.
 - Facts stated only with `Finsupp`, `MvPolynomial`, homogeneity, and
-  `divMonomial` belong in `Algebra/MvPolynomial/`. Projective localization and
-  Čech modules import that root and begin at the graded-localization consumer.
+  `divMonomial` belong in `Algebra/MvPolynomial/`. Projective files import that
+  root and begin only when projective opens, sheaves, or cohomology enter the
+  signature.
 - Degree-zero localization of an internally graded module, graded shifts,
   twist trivializations, and denominator-equality transport belong in
   `Algebra/Module/GradedModule/` under Mathlib's `GradedModule` namespace.
   Laurent exponent vectors belong in `Algebra/Finsupp/`. Their polynomial
   localization basis, representative-independent sign and block projections,
   one-localization homotopies, and full-block finiteness belong in
-  `Algebra/MvPolynomial/`; projective Čech files are downstream consumers.
+  `Algebra/MvPolynomial/`. Polynomial-variable Čech denominators, terms, faces,
+  block homotopies, primitives, and finite-block results belong specifically in
+  `Algebra/MvPolynomial/Cech/`; projective basic-open, section, and cohomology
+  comparisons are downstream consumers.
 
 When editing a consumer file, inspect adjacent declarations for a generic
 prefix or suffix. Move an in-scope generic block with the consumer change, or

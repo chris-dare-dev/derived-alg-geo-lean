@@ -58,8 +58,10 @@ trivializations live under `Algebra/Module/GradedModule/` in Mathlib's
 `GradedModule` namespace. Laurent exponent vectors live under
 `Algebra/Finsupp/`. The multivariate-polynomial Laurent basis, localization
 projections, block decomposition, one-localization homotopy, and full-block
-finiteness live under `Algebra/MvPolynomial/`. Proj sheaves and Čech
-constructions import these algebraic roots directly.
+finiteness live under `Algebra/MvPolynomial/`. Polynomial-variable Čech
+denominators, terms, faces, block homotopies, primitives, and finite-block
+results live under `Algebra/MvPolynomial/Cech/`. Proj modules import these
+roots and add only basic-open, section, sheaf, or cohomology comparisons.
 
 Use Mathlib's established namespace when extending a Mathlib concept. Add a
 same-named umbrella for a new non-leaf directory and export stable leaves

@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace
+import DerivedAlgGeo.Algebra.MvPolynomial.Cech.Basic
 import DerivedAlgGeo.Algebra.MvPolynomial.LaurentHomotopy
 import DerivedAlgGeo.Algebra.Module.GradedModule.PowersCongr
 
@@ -43,12 +43,12 @@ vanishing computation never touches `succAbove` directly.
 
 ## Tags
 
-Čech complex, contracting homotopy, block decomposition, projective space
+Čech complex, contracting homotopy, block decomposition, multivariate polynomial
 -/
 
-open GradedModule MvPolynomial
+open GradedModule
 
-namespace AlgebraicGeometry.Proj
+namespace MvPolynomial
 
 universe u
 
@@ -371,4 +371,4 @@ theorem cechHomotopy_cechFace_succ (h𝓜 : IsPolynomialTwist 𝓜 d) (i₀ : ι
   rw [AddEquiv.apply_symm_apply, cechTermEquiv_cechFace, cechHomotopy_apply,
     AddEquiv.apply_symm_apply]
 
-end AlgebraicGeometry.Proj
+end MvPolynomial
