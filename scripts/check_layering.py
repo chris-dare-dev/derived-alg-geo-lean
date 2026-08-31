@@ -12,8 +12,9 @@ forbids algebraic geometry from importing back into those realization leaves,
 rejects restoration of the retired geometric stability subtree, and keeps the
 migration allowlist burned to zero. It also keeps neutral, weak, Bridgeland,
 and geometric family declarations in the namespaces matching their owners.
-It also guards the generic derived-category, cohomological, and stack roots
-and requires ordinary prestability to expose weak prestability structurally.
+It also guards the bicategorical adjunction and limit-preservation split, the
+generic derived-category, cohomological, and stack roots, and requires ordinary
+prestability to expose weak prestability structurally.
 """
 
 from __future__ import annotations
@@ -124,6 +125,16 @@ RETIRED_IMPORT_SHIMS = {
         SOURCE_ROOT / "CategoryTheory" / "Sites" /
             "CohomologyShortExact.lean",
         "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CohomologyShortExact",
+    ),
+    "DerivedAlgGeo.CategoryTheory.Adjunction": (
+        SOURCE_ROOT / "CategoryTheory" / "Adjunction.lean",
+        "DerivedAlgGeo.CategoryTheory.Bicategory.Adjunction or "
+        "DerivedAlgGeo.CategoryTheory.Limits.Preserves",
+    ),
+    "DerivedAlgGeo.CategoryTheory.Adjunction.PreservesColimits": (
+        SOURCE_ROOT / "CategoryTheory" / "Adjunction" /
+            "PreservesColimits.lean",
+        "DerivedAlgGeo.CategoryTheory.Limits.Preserves",
     ),
     "DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Exactness": (
         SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Affine" /
@@ -1069,21 +1080,30 @@ def main() -> int:
                 "depends on or declares algebraic geometry"
             )
 
-    generic_adjunction_root = SOURCE_ROOT / "CategoryTheory" / "Adjunction"
+    generic_bicategory_root = SOURCE_ROOT / "CategoryTheory" / "Bicategory"
+    generic_limits_root = SOURCE_ROOT / "CategoryTheory" / "Limits"
     generic_abelian_root = SOURCE_ROOT / "CategoryTheory" / "Abelian"
     generic_sheaves_root = SOURCE_ROOT / "CategoryTheory" / "Sites" / "Sheaves"
     generic_foundation_sources = (
         SOURCE_ROOT / "CategoryTheory" / "Abelian.lean",
-        SOURCE_ROOT / "CategoryTheory" / "Adjunction.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Bicategory.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Limits.lean",
         SOURCE_ROOT / "CategoryTheory" / "Sites" / "Sheaves.lean",
-        *sorted(generic_adjunction_root.rglob("*.lean")),
+        *sorted(generic_bicategory_root.rglob("*.lean")),
+        *sorted(generic_limits_root.rglob("*.lean")),
         *sorted(generic_abelian_root.rglob("*.lean")),
         *sorted(generic_sheaves_root.rglob("*.lean")),
     )
     required_generic_foundations = (
-        SOURCE_ROOT / "CategoryTheory" / "Adjunction.lean",
-        SOURCE_ROOT / "CategoryTheory" / "Adjunction" /
-            "PreservesColimits.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Bicategory.lean",
+        generic_bicategory_root / "Basic.lean",
+        generic_bicategory_root / "Adjunction.lean",
+        generic_bicategory_root / "Adjunction" / "Basic.lean",
+        generic_bicategory_root / "Adjunction" / "Cat.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Limits.lean",
+        generic_limits_root / "Preserves.lean",
+        generic_limits_root / "Preserves" / "Composition.lean",
+        generic_limits_root / "Preserves" / "Reflective.lean",
         generic_abelian_root / "WeakSerre.lean",
         generic_sheaves_root / "ConstantPullback.lean",
         generic_sheaves_root / "CohomologyShortExact.lean",
@@ -1096,12 +1116,12 @@ def main() -> int:
     for path in required_generic_foundations:
         if not path.is_file():
             failures.append(
-                f"canonical abelian/sheaf module missing: {path.relative_to(ROOT)}"
+                f"canonical categorical foundation missing: {path.relative_to(ROOT)}"
             )
     for path in generic_foundation_sources:
         if not path.is_file():
             failures.append(
-                f"generic abelian/sheaf umbrella missing: {path.relative_to(ROOT)}"
+                f"generic categorical umbrella missing: {path.relative_to(ROOT)}"
             )
             continue
         text = path.read_text(encoding="utf-8")
@@ -1112,8 +1132,67 @@ def main() -> int:
             re.MULTILINE,
         ):
             failures.append(
-                f"{path.relative_to(ROOT)}: generic abelian or sheaf "
+                f"{path.relative_to(ROOT)}: generic categorical "
                 "infrastructure depends on or declares algebraic geometry"
+            )
+
+    bicategorical_cat = (
+        generic_bicategory_root / "Adjunction" / "Cat.lean"
+    )
+    if bicategorical_cat.is_file() and "def bicategoricalEquiv" not in (
+        bicategorical_cat.read_text(encoding="utf-8")
+    ):
+        failures.append(
+            f"{bicategorical_cat.relative_to(ROOT)}: ordinary adjunctions must "
+            "expose their equivalence with bicategorical adjunctions in Cat"
+        )
+
+    preserves_composition = (
+        generic_limits_root / "Preserves" / "Composition.lean"
+    )
+    if preserves_composition.is_file():
+        preserves_composition_text = preserves_composition.read_text(encoding="utf-8")
+        if "namespace CategoryTheory.Limits" not in preserves_composition_text:
+            failures.append(
+                f"{preserves_composition.relative_to(ROOT)}: composition-only "
+                "preservation must use the CategoryTheory.Limits namespace"
+            )
+        if "Mathlib.CategoryTheory.Adjunction" in "\n".join(
+            imports_by_path[preserves_composition]
+        ):
+            failures.append(
+                f"{preserves_composition.relative_to(ROOT)}: adjunction-free "
+                "preservation imports an adjunction module"
+            )
+
+    preserves_reflective = (
+        generic_limits_root / "Preserves" / "Reflective.lean"
+    )
+    if preserves_reflective.is_file():
+        preserves_reflective_text = preserves_reflective.read_text(encoding="utf-8")
+        if "namespace CategoryTheory.Adjunction" not in preserves_reflective_text:
+            failures.append(
+                f"{preserves_reflective.relative_to(ROOT)}: reflective "
+                "preservation must extend Mathlib's ordinary Adjunction API"
+            )
+        if (
+            "DerivedAlgGeo.CategoryTheory.Limits.Preserves.Composition"
+            not in imports_by_path[preserves_reflective]
+        ):
+            failures.append(
+                f"{preserves_reflective.relative_to(ROOT)}: reflective "
+                "preservation must consume the adjunction-free composition root"
+            )
+
+    category_theory_umbrella = SOURCE_ROOT / "CategoryTheory.lean"
+    for required_import in (
+        "DerivedAlgGeo.CategoryTheory.Bicategory",
+        "DerivedAlgGeo.CategoryTheory.Limits",
+    ):
+        if required_import not in imports_by_path[category_theory_umbrella]:
+            failures.append(
+                f"{category_theory_umbrella.relative_to(ROOT)}: missing "
+                f"higher-categorical owner import {required_import}"
             )
 
     retired_generic_cohomology_paths = (
@@ -1644,6 +1723,10 @@ def main() -> int:
     print(
         "ok: generic abelian and ringed-site sheaf APIs use their categorical "
         "roots; the topological cohomology specialization uses the Topology owner"
+    )
+    print(
+        "ok: bicategorical adjunction is the higher source, ordinary adjunction "
+        "is its Cat specialization, and preservation results use the Limits owner"
     )
     print(
         "ok: exterior-power algebra uses LinearAlgebra, arbitrary presheaf-module "

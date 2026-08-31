@@ -15,6 +15,10 @@ The principal areas are:
   sites and schemes;
 - `DerivedAlgGeo/CategoryTheory/Abelian/` for repository-owned results about
   arbitrary abelian categories, extending Mathlib's abelian hierarchy;
+- `DerivedAlgGeo/CategoryTheory/Bicategory/` for higher-categorical
+  adjunctions, adjoint equivalences, mates, and their specialization to `Cat`;
+- `DerivedAlgGeo/CategoryTheory/Limits/` for generic limit and colimit
+  infrastructure, including preservation and reflective transport;
 - `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/` for generic sheaf theory,
   including module sheaves on an arbitrary ringed site;
 - `DerivedAlgGeo/CategoryTheory/Moduli/` for neutral moduli predicates such as
@@ -52,6 +56,10 @@ concrete applications through explicit instance leaves.
   site-theoretic, or sheaf-theoretic statements belong under
   `CategoryTheory/`. Reuse Mathlib's `CategoryTheory.Abelian` class and put
   only missing generic results below `CategoryTheory/Abelian/`.
+- Higher-categorical work begins with Mathlib's `CategoryTheory.Bicategory`.
+  Its `Bicategory.Adjunction` is the source-of-truth; ordinary adjoint functors
+  are the `Cat` specialization through `Adjunction.toCat` and `ofCat`, bundled
+  here by `Adjunction.bicategoricalEquiv`.
 - Generic sheaves belong under `CategoryTheory/Sites/Sheaves/`; sheaves of
   modules over a sheaf of rings on an arbitrary site belong in its `Modules/`
   child.
@@ -97,6 +105,15 @@ and site-theoretic Čech constructions, injective comparisons, compact-basis
 arguments, and finite-cover boundedness live under
 `CategoryTheory/Sites/Cech/`. Geometric cohomology modules consume these roots
 and add affine, scheme, and projective-space input.
+
+An adjunction hypothesis does not by itself make a theorem part of the
+adjunction foundation. Results whose conclusion is preservation of limits or
+colimits live under `CategoryTheory/Limits/`; generic `Ext` adjunctions remain
+with derived `Ext`, and Fourier--Mukai adjunction packages remain with their
+kernel consumers. The repository currently formalizes the higher-categorical
+spine through bicategories. Introduce general `n`-category or
+`(∞,1)`-category roots only when an actual reusable formal model is added, not
+as placeholder directories.
 
 Monoidal structure precedes enrichment in the dependency graph: a
 `V`-enriched category is defined relative to a monoidal category `V`, and a dg

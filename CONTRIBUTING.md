@@ -13,6 +13,10 @@ Choose the narrowest natural home:
   `DerivedAlgGeo/Algebra/`;
 - generic abelian-category results extending Mathlib's abelian hierarchy:
   `DerivedAlgGeo/CategoryTheory/Abelian/`;
+- bicategorical adjunctions, adjoint equivalences, mates, and their `Cat`
+  specialization: `DerivedAlgGeo/CategoryTheory/Bicategory/`;
+- generic preservation and reflective transport for limits and colimits:
+  `DerivedAlgGeo/CategoryTheory/Limits/`;
 - generic sheaves, including module sheaves on an arbitrary ringed site:
   `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/`;
 - neutral moduli predicates: `DerivedAlgGeo/CategoryTheory/Moduli/`;
@@ -44,6 +48,15 @@ helper into its general root and import that root from the consumer.
 Use Mathlib's established namespace when extending a Mathlib concept. Add a
 same-named umbrella for a new non-leaf directory and export stable leaves
 through their nearest existing umbrellas.
+
+Mathlib's `CategoryTheory.Bicategory.Adjunction` is the canonical general
+adjunction. Ordinary adjoint functors are its specialization in `Cat`; use
+`CategoryTheory.Adjunction.bicategoricalEquiv` when that comparison must be
+explicit. Place a theorem that assumes an adjunction by the rest of its
+signature: limit-preservation results under `CategoryTheory/Limits/`, derived
+`Ext` comparisons under the derived `Ext` root, and Fourier--Mukai adjunction
+data with its kernel consumer. Add broader `n`- or `(∞,1)`-category roots only
+with a concrete formal model and reusable API.
 
 Generic umbrellas must not import `Instances/AlgebraicGeometry` descendants.
 Those bridge modules are opt-in leaves: they may import both category theory

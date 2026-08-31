@@ -10,6 +10,10 @@ first application that motivated it.
 - Put statements about arbitrary categories, functors, abelian categories,
   triangulated categories, enriched categories, sites, or sheaves on an
   arbitrary site under `CategoryTheory/`.
+- Reuse Mathlib's `CategoryTheory.Bicategory` hierarchy for 2-categorical
+  mathematics. Adjunctions between 1-morphisms, adjoint equivalences, and
+  mates belong under `CategoryTheory/Bicategory/`; ordinary adjoint functors
+  are the specialization in the bicategory `Cat`.
 - Reuse Mathlib's `CategoryTheory.Abelian` class. Repository-owned results for
   arbitrary abelian categories belong under `CategoryTheory/Abelian/`; do not
   define a competing abelian-category hierarchy.
@@ -89,6 +93,24 @@ carrier, and do not call an indexed isomorphism-closed predicate a subprestack
 until restriction stability is present. Finite-type parameter schemes,
 geometric boundedness witnesses, atlases, and scheme presentations remain
 geometric consumers.
+
+## Higher categories, adjunctions, and limits
+
+- The canonical root for adjunction is Mathlib's
+  `CategoryTheory.Bicategory.Adjunction`. Do not define a repository-owned
+  competitor or treat ordinary functor adjunction as the more general notion.
+- The equivalence `CategoryTheory.Adjunction.bicategoricalEquiv` identifies an
+  ordinary `F ⊣ G` with the corresponding adjunction of 1-morphisms in `Cat`.
+  Use the ordinary presentation in a theorem whose remaining signature is
+  about functors, but keep the higher-categorical source explicit in the
+  architecture.
+- Classify results *using* an adjunction by their conclusion. Preservation of
+  limits or colimits belongs under `CategoryTheory/Limits/`; `Ext` adjunction
+  belongs under `Triangulated/DerivedCategory/Ext/`; kernel-adjunction data
+  belongs with the generic or geometric Fourier--Mukai consumer.
+- Bicategories are the current implemented higher-category layer. Add general
+  `n`-category or `(∞,1)`-category roots only together with an actual formal
+  model and reusable interfaces; do not create empty nominal hierarchies.
 
 ## Monoidal, derived, dg, and triangulated categories
 

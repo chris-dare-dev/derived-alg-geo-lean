@@ -15,7 +15,8 @@ can express it without importing a row below it.
 | --- | --- |
 | Rings, ideals, ordinary modules, localization, additive subgroups | `Algebra/` |
 | Linear maps, bases, lattices, matrices, bilinear or quadratic forms, exterior powers | `LinearAlgebra/` |
-| Categories, functors, adjunctions, abelian or triangulated structure | `CategoryTheory/` |
+| Bicategories, 1- and 2-morphisms, adjunctions between 1-morphisms, mates | `CategoryTheory/Bicategory/` |
+| Ordinary categories, functors, adjoint functors, limits, abelian or triangulated structure | the nearest `CategoryTheory/` subject root |
 | Cat-valued pseudofunctors and fiberwise object loci | `CategoryTheory/Pseudofunctor/` |
 | Grothendieck topologies, sites, sheaves, or descent | `CategoryTheory/Sites/` |
 | Topological spaces but no schemes | `Topology/` |
@@ -50,6 +51,13 @@ at the first declaration whose signature no longer needs the consumer's
 vocabulary. Namespace alone is not evidence of correct ownership: declarations
 inside `LinearMap`, `Module`, `Submodule`, `Matrix`, or similar namespaces must
 still live with their most general mathematical source.
+
+An adjunction in its most general implemented form is
+`CategoryTheory.Bicategory.Adjunction`. Mathlib identifies ordinary functor
+adjunctions with its `Cat` specialization. A theorem that merely assumes an
+ordinary adjunction is placed by the other vocabulary in its signature:
+preservation results belong with limits, `Ext` comparisons with derived `Ext`,
+and kernel packages with Fourier--Mukai theory.
 
 ## Moduli and subprestacks
 
