@@ -47,6 +47,11 @@ helper into its general root and import that root from the consumer.
 The canonical repository extension for localization commuting with kernels is
 `Algebra/Module/Localization/Kernels.lean`; scheme and coherent-sheaf files
 consume it directly rather than restating its linear-map or `ModuleCat` forms.
+The same rule puts weighted-basis decompositions in
+`LinearAlgebra/GradedBasis.lean` and pure multivariate-polynomial monomial
+division identities in `Algebra/MvPolynomial/DivMonomial.lean`. Numerical-ring
+constructors and projective graded localizations are consumers of those roots,
+not alternative owners.
 
 Use Mathlib's established namespace when extending a Mathlib concept. Add a
 same-named umbrella for a new non-leaf directory and export stable leaves

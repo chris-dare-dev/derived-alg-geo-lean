@@ -6,6 +6,7 @@ import DerivedAlgGeo.Algebra.Category.Grp.Preadditive
 import DerivedAlgGeo.Algebra.Category.Grp.Products
 import DerivedAlgGeo.Algebra.Category.ModuleCat.StalkTensor
 import DerivedAlgGeo.Algebra.Module
+import DerivedAlgGeo.Algebra.MvPolynomial
 import DerivedAlgGeo.Algebra.SaturatedQuotient
 
 /-! # Algebra

@@ -107,6 +107,12 @@ The physical module tree records that refinement directly:
 Algebra/Module/Localization
   └─→ Kernels                                linear, ModuleCat, natural forms
 
+Algebra/MvPolynomial
+  └─→ DivMonomial                            homogeneous and factor identities
+
+LinearAlgebra
+  └─→ GradedBasis                            weighted spans and internal sums
+
 CategoryTheory/Bicategory
   └─→ Adjunction
         ├─→ Basic                               adjunctions of 1-morphisms
@@ -172,6 +178,12 @@ AlgebraicGeometry/DerivedCategory
   ├─→ Dqc                                   quasicoherent-cohomology locus
   ├─→ Families                              scheme base change and pullback
   └─→ FourierMukai                          geometric kernels and convolution
+
+AlgebraicGeometry/Numerical/Core
+  └─→ GradedBasis                            NumericalRingData consumer
+
+AlgebraicGeometry/Proj/Modules
+  └─→ LaurentProjection                      consumes Algebra/MvPolynomial
 
 AlgebraicGeometry/Moduli/PerfectComplex
   ├─→ Boundedness                          fiberwise replete selectors/witnesses

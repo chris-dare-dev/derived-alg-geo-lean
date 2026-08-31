@@ -32,6 +32,7 @@ The check that the parametrisation is right is `p2Chi_lineBundle`: it recovers
 -/
 
 open Polynomial Submodule Set
+open DerivedAlgGeo.LinearAlgebra
 
 namespace AlgebraicGeometry.Numerical
 

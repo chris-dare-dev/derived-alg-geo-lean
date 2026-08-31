@@ -79,10 +79,17 @@ Category
    │  └─ compact-basis and finite-cover boundedness
    └─ scheme-site realizations
 
+LinearAlgebra
+└─ weighted-basis graded pieces
+   ├─ internal direct-sum decomposition
+   └─ NumericalRingData.ofGradedBasis       geometric numerical consumer
+
 Algebra
 ├─ ordinary ring and module theory
 │  └─ module localization
 │     └─ kernel maps                       consumed by coherent-sheaf geometry
+├─ multivariate polynomials
+│  └─ division by monomials                consumed by projective localization
 └─ saturation of an additive subgroup
    └─ saturated quotient and torsion-free universal property
 

@@ -133,14 +133,9 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.Proj.awayMk_eq_sum_monomial
 #print axioms AlgebraicGeometry.Proj.exists_sum_awayMk_monomial
 #print axioms AlgebraicGeometry.Proj.laurentExponent_mem_index
--- The numerator side of the sign projection (#491 -> #340). divMonomial_pow_mul is the
--- well-definedness identity: projecting commutes with raising a representative to a higher power
--- of the denominator, which is the move that relates any two representatives.
-#print axioms AlgebraicGeometry.Proj.degree_eq_weight_one_apply
-#print axioms AlgebraicGeometry.Proj.isHomogeneous_divMonomial
-#print axioms AlgebraicGeometry.Proj.divMonomial_monomial_mul_add
-#print axioms AlgebraicGeometry.Proj.divMonomial_monomial_mul_comm
-#print axioms AlgebraicGeometry.Proj.divMonomial_pow_mul
+-- The numerator side of the sign projection (#491 -> #340). The generic
+-- `MvPolynomial.divMonomial` identities are audited in `AlgebraMvPolynomial.lean`;
+-- this is the first projective graded-localization consumer.
 #print axioms AlgebraicGeometry.Proj.divMonomial_mem_natShift
 -- Independence (#491): a vanishing monomial combination at a fixed denominator has vanishing
 -- coefficients. With exists_sum_awayMk_monomial this is the basis statement in usable form -- a
@@ -958,20 +953,14 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData.k3_eulerCharacteristic_eq
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData.numericalClass
 
--- Layer A: the graded-basis constructor. `ofGradedBasis` is what every concrete model
--- goes through, so a sorry here would silently contaminate every instance in the repo.
+-- Layer A: the numerical graded-basis consumer. The generic weighted-basis
+-- decomposition is audited with LinearAlgebra in `StabilityConditionAudit/GradedBasis.lean`.
 #print axioms NumericalRingData
 #print axioms NumericalRingData.piece
 #print axioms NumericalRingData.degree
 #print axioms NumericalVarietyData
 #print axioms NumericalVarietyData.ring
 #print axioms NumericalVarietyData.chi
-#print axioms gradedPiece
-#print axioms gradedPiece_eq_bot
-#print axioms gradedPiece_iSupIndep
-#print axioms gradedPiece_iSup_eq_top
-#print axioms gradedPiece_isInternal
-#print axioms gradedPiece_mul_mem
 #print axioms NumericalRingData.ofGradedBasis
 
 -- Layer A: the general Riemann-Roch expansion and its surface specialisation.
