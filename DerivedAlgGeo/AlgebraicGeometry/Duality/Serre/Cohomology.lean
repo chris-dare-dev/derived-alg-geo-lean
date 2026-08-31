@@ -3,8 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Additivity
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.Duality.Canonical.Derived
-import DerivedAlgGeo.AlgebraicGeometry.Duality.Serre.LinearDual
+import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.LinearDual
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Determinant
 import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.Surface.Number
 import Mathlib.Algebra.Homology.DerivedCategory.Basic
@@ -41,19 +42,12 @@ namespace AlgebraicGeometry.Duality.Serre
 
 open AlgebraicGeometry
 open AlgebraicGeometry.Cohomology
+open AlgebraicGeometry.DerivedCategory
 
 variable {k : Type u} [Field k]
 variable {X : SmoothProperVariety k} {n : ℕ}
 
 noncomputable section
-
-local instance coherentHasDerivedCategory :
-    HasDerivedCategory.{u + 1} (Coh X.toVariety.toScheme) :=
-  HasDerivedCategory.standard _
-
-local instance moduleHasDerivedCategory :
-    HasDerivedCategory (ModuleCat.{u + 1} k) :=
-  HasDerivedCategory.standard _
 
 /-- The derived-category form of the missing Serre-duality construction.
 
@@ -65,20 +59,20 @@ The dualizing object itself is the constructed `K.dualizingComplex = ω_X[n]`. -
 structure DerivedStatement (K : X.CanonicalSheafData n) where
   /-- Derived global sections with its base-field-linear target. -/
   rGlobalSections :
-    DerivedCategory (Coh X.toVariety.toScheme) ⥤
+    SchemeCoherentDerivedCategory X.toVariety.toScheme ⥤
       DerivedCategory (ModuleCat.{u + 1} k)
   /-- Derived Hom into the chosen dualizing object. -/
   rHomDualizing :
-    (DerivedCategory (Coh X.toVariety.toScheme))ᵒᵖ ⥤
+    (SchemeCoherentDerivedCategory X.toVariety.toScheme)ᵒᵖ ⥤
       DerivedCategory (ModuleCat.{u + 1} k)
   /-- Comparison between the opposite derived category and the derived category of the opposite
   module category. -/
-  oppositeDerived : ModuleCat.DerivedOppositeComparison k
+  oppositeDerived : CategoryTheory.DerivedCategory.OppositeComparison
+    (ModuleCat.{u + 1} k)
   /-- The derived Serre-duality isomorphism. -/
   dualityIso :
     rHomDualizing ≅ rGlobalSections.op ⋙
-      ModuleCat.DerivedOppositeComparison.derivedLinearDualShift
-        k oppositeDerived (-(n : ℤ))
+      ModuleCat.derivedLinearDualShift k oppositeDerived (-(n : ℤ))
 
 namespace DerivedStatement
 
@@ -88,8 +82,7 @@ variable {K : X.CanonicalSheafData n}
 noncomputable def linearDualShift (S : DerivedStatement K) :
     (DerivedCategory (ModuleCat.{u + 1} k))ᵒᵖ ⥤
       DerivedCategory (ModuleCat.{u + 1} k) :=
-  ModuleCat.DerivedOppositeComparison.derivedLinearDualShift
-    k S.oppositeDerived (-(n : ℤ))
+  ModuleCat.derivedLinearDualShift k S.oppositeDerived (-(n : ℤ))
 
 /-- The dualizing object associated to a derived Serre statement is the constructed
 canonical complex `ω_X[n]`. -/

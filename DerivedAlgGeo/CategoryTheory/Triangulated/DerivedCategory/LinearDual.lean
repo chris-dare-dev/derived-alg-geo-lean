@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Opposite
 import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 import Mathlib.Algebra.Homology.DerivedCategory.ExactFunctor
@@ -10,19 +11,15 @@ import Mathlib.LinearAlgebra.Dual.Lemmas
 /-!
 # Exact linear duality and its derived lift
 
-Over a field, algebraic linear duality sends a module `V` to `Vᵛ = Hom(V, k)`.  This file
-bundles that construction as a contravariant additive functor, proves that it takes short exact
-sequences to short exact sequences, and therefore constructs its functor on derived categories.
+Over a field, algebraic linear duality sends a module `V` to
+`Vᵛ = Hom(V, k)`. This file bundles that construction as a contravariant
+additive functor, proves that it takes short exact sequences to short exact
+sequences, and therefore constructs its functor on derived categories.
 
-There is one genuinely separate categorical comparison needed to use this lift as a functor out
-of the opposite of a derived category:
-
-`(DerivedCategory C)ᵒᵖ ≃ DerivedCategory (Cᵒᵖ)`.
-
-The pinned Mathlib supplies the opposite equivalence for cochain complexes and the localization
-ingredients, but not this derived-category equivalence itself.  `DerivedOppositeComparison` keeps
-that remaining bridge explicit.  Given it, `derivedLinearDualFromOpposite` is the actual derived
-linear-dual functor required by the Serre-duality interface.
+To use this lift from the opposite of a derived category, a client supplies
+the generic `CategoryTheory.DerivedCategory.OppositeComparison`. The resulting
+derived linear-dual functors are categorical infrastructure; geometric Serre
+duality imports them as consumers.
 -/
 
 universe u
@@ -68,7 +65,8 @@ noncomputable instance : (linearDualFunctor k).Additive where
         (show Module.Dual k X.unop from φ) (g.unop.hom x)
     exact map_add (show Module.Dual k X.unop from φ) _ _
 
-/-- Linear duality reverses a short exact sequence of vector spaces to a short exact sequence. -/
+/-- Linear duality reverses a short exact sequence of vector spaces to a short
+exact sequence. -/
 theorem linearDualFunctor_map_shortExact
     (S : ShortComplex ((ModuleCat.{u + 1} k)ᵒᵖ)) (hS : S.ShortExact) :
     (S.map (linearDualFunctor k)).ShortExact := by
@@ -94,13 +92,8 @@ theorem linearDualFunctor_map_shortExact
     rw [LinearMap.dualMap_surjective_iff]
     exact hU.moduleCat_injective_f
 
-/-- Exactness of algebraic linear duality, in the form Mathlib's derived-functor
-construction consumes.
-
-`Functor.exact_tfae` is what does the work: preservation of short exact sequences, proved
-above by hand from the dual-annihilator lemmas, is one of its equivalent characterisations of
-exactness, and finite (co)limit preservation is another.  Both instances below project out of
-this one call, so the `tfae` is invoked once rather than per instance. -/
+/-- Exactness of algebraic linear duality, in the form Mathlib's
+derived-functor construction consumes. -/
 theorem linearDualFunctor_preservesFiniteLimits_and_colimits :
     CategoryTheory.Limits.PreservesFiniteLimits (linearDualFunctor k) ∧
       CategoryTheory.Limits.PreservesFiniteColimits (linearDualFunctor k) :=
@@ -126,47 +119,40 @@ noncomputable instance :
     CategoryTheory.Limits.PreservesFiniteColimits (linearDualFunctor k) :=
   linearDualFunctor_preservesFiniteColimits k
 
-noncomputable local instance moduleHasDerivedCategory :
+/-- The canonical derived-category localization for modules over a field. -/
+noncomputable instance moduleHasDerivedCategory :
     HasDerivedCategory (ModuleCat.{u + 1} k) :=
   HasDerivedCategory.standard _
 
-noncomputable local instance oppositeModuleHasDerivedCategory :
+/-- The canonical derived-category localization for the opposite category of
+modules over a field. -/
+noncomputable instance oppositeModuleHasDerivedCategory :
     HasDerivedCategory ((ModuleCat.{u + 1} k)ᵒᵖ) :=
   HasDerivedCategory.standard _
 
-/-- The derived functor induced by exact algebraic linear duality.  Its source is the derived
-category of the opposite abelian category. -/
+/-- The derived functor induced by exact algebraic linear duality. Its source
+is the derived category of the opposite abelian category. -/
 noncomputable def derivedLinearDualFunctor :
     DerivedCategory ((ModuleCat.{u + 1} k)ᵒᵖ) ⥤
       DerivedCategory (ModuleCat.{u + 1} k) :=
   (linearDualFunctor k).mapDerivedCategory
 
-/-- The remaining comparison between taking the opposite before and after forming a derived
-category.  It is kept as explicit data until the localization/opposite construction is available
-upstream. -/
-structure DerivedOppositeComparison where
-  equivalence :
-    (DerivedCategory (ModuleCat.{u + 1} k))ᵒᵖ ≌
-      DerivedCategory ((ModuleCat.{u + 1} k)ᵒᵖ)
-
-namespace DerivedOppositeComparison
-
-/-- Algebraic derived linear duality as a functor from the opposite derived category, once the
-explicit opposite/derived comparison is supplied. -/
+/-- Algebraic derived linear duality as a functor from the opposite derived
+category, once the explicit opposite/derived comparison is supplied. -/
 noncomputable def derivedLinearDualFromOpposite
-    (B : DerivedOppositeComparison k) :
+    (B : CategoryTheory.DerivedCategory.OppositeComparison
+      (ModuleCat.{u + 1} k)) :
     (DerivedCategory (ModuleCat.{u + 1} k))ᵒᵖ ⥤
       DerivedCategory (ModuleCat.{u + 1} k) :=
   B.equivalence.functor ⋙ derivedLinearDualFunctor k
 
 /-- Derived linear duality followed by a cohomological shift. -/
 noncomputable def derivedLinearDualShift
-    (B : DerivedOppositeComparison k) (n : ℤ) :
+    (B : CategoryTheory.DerivedCategory.OppositeComparison
+      (ModuleCat.{u + 1} k)) (n : ℤ) :
     (DerivedCategory (ModuleCat.{u + 1} k))ᵒᵖ ⥤
       DerivedCategory (ModuleCat.{u + 1} k) :=
-  B.derivedLinearDualFromOpposite ⋙
+  derivedLinearDualFromOpposite k B ⋙
     shiftFunctor (DerivedCategory (ModuleCat.{u + 1} k)) n
-
-end DerivedOppositeComparison
 
 end ModuleCat

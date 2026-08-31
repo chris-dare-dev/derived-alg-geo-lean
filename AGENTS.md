@@ -179,6 +179,13 @@ construct a subprestack, through the categorical `fullsubcategory` API.
   belongs under `CategoryTheory/Triangulated/DerivedCategory/`, together with
   its canonical t-structure, exact-functor, homology-comparison, and
   K-projective APIs.
+- The comparison `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` is generic
+  derived-category data and belongs in `DerivedCategory/Opposite.lean`.
+  Exact algebraic linear duality and its derived lift belong in the adjacent
+  `LinearDual.lean` specialization. A geometric duality theorem imports those
+  roots and the canonical `AlgebraicGeometry/DerivedCategory/Coherent.lean`
+  owner; it must not choose private replacement localizations for `Coh(X)` or
+  `ModuleCat`.
 - Generic `Ext` adjunction, dimension shift, and injective-resolution
   naturality belong under the derived-category root's `Ext/` child. Generic
   filtered-complex and total-complex spectral-sequence machinery belongs under

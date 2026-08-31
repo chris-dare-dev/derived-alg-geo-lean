@@ -59,6 +59,15 @@ ordinary adjunction is placed by the other vocabulary in its signature:
 preservation results belong with limits, `Ext` comparisons with derived `Ext`,
 and kernel packages with Fourier--Mukai theory.
 
+Comparison data of type
+`(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` uses only abelian and derived
+categories, so its canonical owner is
+`CategoryTheory/Triangulated/DerivedCategory/Opposite.lean`. Exact algebraic
+linear duality on `ModuleCat` and its derived lift are the categorical
+specialization in `LinearDual.lean`. A Serre-duality statement that mentions a
+scheme imports those roots and the canonical coherent-derived specialization;
+its geometric motivation does not move the generic functors into duality.
+
 Classify categorical dimension before applying the table. A declaration whose
 essential data are associators, unitors, pentagons, triangles, or other
 2-morphisms is not ordinary-category infrastructure merely because its `Cat`
