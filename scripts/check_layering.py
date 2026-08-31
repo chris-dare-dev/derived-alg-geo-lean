@@ -867,6 +867,55 @@ def main() -> int:
                     "declaration restored below the legacy stability namespace"
                 )
 
+    triangulated_family_source = (
+        SOURCE_ROOT / "CategoryTheory" / "Triangulated" / "Families" /
+        "BaseChange.lean"
+    )
+    triangulated_family_text = triangulated_family_source.read_text(
+        encoding="utf-8"
+    )
+    for required_fragment in (
+        "fibers : Pseudofunctor (LocallyDiscrete Bᵒᵖ) Cat",
+        "def pullIdIso",
+        "def pullCompIso",
+        "def ofFunctor",
+        "fibers := fibers.toPseudofunctor'",
+    ):
+        if required_fragment not in triangulated_family_text:
+            failures.append(
+                f"{triangulated_family_source.relative_to(ROOT)}: "
+                "pseudofunctorial triangulated-family root is missing "
+                f"{required_fragment!r}"
+            )
+    if re.search(
+        r"^\s*fibers\s*:\s*Functor\s+Bᵒᵖ\s+Cat",
+        triangulated_family_text,
+        re.MULTILINE,
+    ):
+        failures.append(
+            f"{triangulated_family_source.relative_to(ROOT)}: canonical "
+            "triangulated families must not regress to a strict functor root"
+        )
+    prestability_base_change = (
+        SOURCE_ROOT / "CategoryTheory" / "Triangulated" /
+        "WeakStabilityCondition" / "StabilityCondition" / "Families" /
+        "PreStabilityBaseChange.lean"
+    )
+    prestability_base_change_text = prestability_base_change.read_text(
+        encoding="utf-8"
+    )
+    for required_fragment in (
+        "preimageData_pullComp",
+        "F.pullCompIso f g",
+        "preimage_pullComp",
+    ):
+        if required_fragment not in prestability_base_change_text:
+            failures.append(
+                f"{prestability_base_change.relative_to(ROOT)}: stability "
+                "consumer must use pseudofunctor composition coherence via "
+                f"{required_fragment!r}"
+            )
+
     weak_stability_root = (
         SOURCE_ROOT
         / "CategoryTheory"

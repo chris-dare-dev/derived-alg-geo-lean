@@ -137,7 +137,8 @@ CategoryTheory/Limits/Preserves
   └─→ Reflective                               ordinary Cat-level consumer
 
 CategoryTheory/Triangulated/Families
-  └─→ abstract fiber categories, pullback functors, and boundedness
+  ├─→ pseudofunctorial fiber categories and pullback coherence
+  └─→ strict category-valued functors through `ofFunctor`
 
 CategoryTheory/Triangulated/DerivedCategory
   ├─→ TStructure, ExactFunctor, Homology       arbitrary abelian categories
@@ -359,7 +360,10 @@ in `scripts/layering_reverse_edges.txt` is empty and must remain empty.
 
 The former CategoryTheory families umbrella mixed generic interfaces with
 geometric realizations. It now exports only triangulated-family interfaces.
-`TriangulatedFiberFamily` lives in `CategoryTheory.Triangulated.Families`;
+`TriangulatedFiberFamily` lives in `CategoryTheory.Triangulated.Families` and
+is based on a Cat-valued pseudofunctor over `LocallyDiscrete Bᵒᵖ`; strict
+functors are admitted through `TriangulatedFiberFamily.ofFunctor` rather than
+serving as the root;
 the more general `BoundednessProblem` and `UniversalBoundedness` live in
 `CategoryTheory.Moduli` and are consumed by both stability and geometry.
 Weak-family probes and structures live in

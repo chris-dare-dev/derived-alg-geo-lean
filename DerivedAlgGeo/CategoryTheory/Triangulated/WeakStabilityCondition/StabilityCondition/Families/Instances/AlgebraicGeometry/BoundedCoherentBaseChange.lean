@@ -193,9 +193,9 @@ end BoundedCoherentPullbackInducingData
 
 end SchemeBaseChange
 
-/-- A strict triangulated fiber family realized by the genuine bounded
-coherent derived categories, with every abstract pullback identified with the
-actual bounded coherent pullback. -/
+/-- A pseudofunctorial triangulated fiber family realized by the genuine
+bounded coherent derived categories, with every abstract pullback identified
+with the actual bounded coherent pullback. -/
 structure BoundedCoherentDerivedRealization
     {S : Scheme.{u}} (F : SchemeTriangulatedFiberFamily S)
     [∀ T : SchemeBaseChange S, IsLocallyNoetherian T.left]
@@ -367,9 +367,9 @@ theorem phase_iff
       (sigma T).slicing.P phi ((F.pull f).obj E) :=
   h.toFiberPreStabilityBaseChangeData.phase_iff f phi E
 
-/-- The geometric witness inherits identity and composition compatibility
-from the strict fiber family after its pullbacks have been identified with
-bounded coherent derived pullback. -/
+/-- The geometric witness inherits pseudofunctorial composition compatibility
+after its pullbacks have been identified with bounded coherent derived
+pullback. -/
 theorem phase_iff_comp
     (h : GeometricPreStabilityBaseChangeData F R classMap sigma)
     {T U V' : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V')

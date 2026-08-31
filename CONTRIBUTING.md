@@ -216,7 +216,10 @@ geometric properties of their representing scheme morphisms belong under
 Neutral categorical family declarations use the matching
 `CategoryTheory.Triangulated.Families` namespace. In particular,
 `TriangulatedFiberFamily` must not be declared inside a weak- or
-Bridgeland-stability namespace merely because those theories consume it.
+Bridgeland-stability namespace merely because those theories consume it. Its
+canonical carrier is a pseudofunctor on `LocallyDiscrete Bᵒᵖ`; strict
+category-valued functors are specializations constructed by
+`TriangulatedFiberFamily.ofFunctor`.
 Shared moduli boundedness uses the independent `CategoryTheory.Moduli`
 namespace. Treat a namespace migration as an API cutover: update all stable
 consumers, audits, declaration baselines, documentation, and regression gates
