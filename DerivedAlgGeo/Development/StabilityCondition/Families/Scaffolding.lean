@@ -27,6 +27,7 @@ review, finding P2-10).
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Development
 
 open CategoryTheory Limits Pretriangulated
+open CategoryTheory.Moduli
 open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated.Families
 open CategoryTheory.Triangulated.WeakStabilityCondition.Support

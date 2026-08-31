@@ -9,14 +9,14 @@ import Mathlib.CategoryTheory.Bicategory.Functor.Cat.ObjectProperty
 
 For an object property `P` on a Cat-valued pseudofunctor `F`, this file
 defines the subproperty consisting of objects whose image along every
-outgoing morphism again satisfies `P`.  This universally stable closure is
+outgoing morphism again satisfies `P`. This universally stable closure is
 preserved by every transition by construction; the proof uses the compositor
-of `F`, so the resulting full subcategories form an actual pseudofunctor.
+of `F`, so Mathlib's `Pseudofunctor.ObjectProperty.fullsubcategory` turns it
+into an actual replete sub-pseudofunctor.
 
-The construction is useful when a geometric preservation theorem is still
-being developed: it provides an honest supported sub-pseudofunctor while
-keeping the stronger claim that every `P`-object is universally stable as a
-separate theorem.
+This is the repository's generic subprestack root. A geometric locus should
+supply an object property and the relevant preservation theorem instead of
+defining a second subprestack carrier in its consumer directory.
 -/
 
 namespace CategoryTheory.Pseudofunctor.ObjectProperty
@@ -50,7 +50,7 @@ instance universallyStable_isClosedUnderMapObj
       ((Cat.Hom.toNatIso (F.mapComp f g)).app _) (hM Z (f ≫ g))
 
 /-- A universally stable object satisfies the original property before base
-change.  The comparison is the unit isomorphism of the pseudofunctor. -/
+change. The comparison is the unit isomorphism of the pseudofunctor. -/
 theorem universallyStable_le_self [P.IsClosedUnderIsomorphisms]
     (X : B) : (universallyStable P).prop X ≤ P.prop X := by
   intro M hM
@@ -64,8 +64,8 @@ theorem le_universallyStable [P.IsClosedUnderMapObj]
   intro M hM Y f
   exact P.map_obj hM f
 
-/-- A transition-stable property agrees fiberwise with its universally
-stable closure. -/
+/-- A transition-stable property agrees fiberwise with its universally stable
+closure. -/
 theorem universallyStable_eq_self [P.IsClosedUnderIsomorphisms]
     [P.IsClosedUnderMapObj] (X : B) :
     (universallyStable P).prop X = P.prop X :=

@@ -35,7 +35,7 @@ namespace CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 open CategoryTheory.Triangulated
 open CategoryTheory Limits Pretriangulated CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.Families
+open CategoryTheory.Moduli
 open CategoryTheory.Triangulated.WeakStabilityCondition.Support
 open CategoryTheory.Triangulated.WeakStabilityCondition
 

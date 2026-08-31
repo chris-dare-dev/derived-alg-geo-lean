@@ -58,6 +58,38 @@ single generic `DerivedCategory (Coh X)` construction. A geometric module may
 provide notation, instances, or comparison theorems, but it must not present a
 new derived-category theory.
 
+### Mandatory placement check
+
+Before creating or moving a public declaration, classify its complete Lean
+signature using `docs/architecture/placement.md`. Ownership is determined by
+the weakest vocabulary needed to state the declaration, not by its motivating
+application, current file, namespace, or proof technique.
+
+- Ring, ideal, ordinary-module, and localization statements go to `Algebra/`.
+- Linear-map, basis, lattice, matrix, multilinear, and exterior-power
+  statements go to `LinearAlgebra/` when they require no site or scheme.
+- A declaration that needs categories or pseudofunctors but no geometry goes
+  to `CategoryTheory/`; prestack loci use
+  `CategoryTheory/Pseudofunctor/ObjectProperty/`.
+- A geometric consumer imports the general root directly. Do not preserve the
+  old consumer path with an import-only shim.
+
+When editing a consumer file, inspect adjacent declarations for a generic
+prefix or suffix. Move an in-scope generic block with the consumer change, or
+record it in `docs/architecture/cutover-ledger.md`; do not add more generic
+material beside a known misplaced block. Every structural pull request must
+identify its signature-test row, canonical root, consumer, and Lean-level
+specialization relationship in the pull-request checklist.
+
+Generic moduli predicates belong under `CategoryTheory/Moduli/`. A replete
+subprestack is represented by Mathlib's `Pseudofunctor.ObjectProperty` together
+with closure under isomorphisms and mapped objects; its canonical construction
+is `fullsubcategory`. Do not introduce a parallel geometric `Subprestack`
+carrier, and do not call an indexed isomorphism-closed predicate a subprestack
+until restriction stability is present. Finite-type parameter schemes,
+geometric boundedness witnesses, atlases, and scheme presentations remain
+geometric consumers.
+
 ## Monoidal, derived, dg, and triangulated categories
 
 - Generic monoidal structures, monoidal functors, and tensor coherence belong
@@ -139,8 +171,9 @@ new derived-category theory.
   geometric consumers.
 - Declarations owned by that generic family root use the
   `CategoryTheory.Triangulated.Families` namespace. Do not place
-  `TriangulatedFiberFamily`, shared boundedness interfaces, or future neutral
-  family APIs below a stability-condition namespace.
+  `TriangulatedFiberFamily` or future neutral family APIs below a
+  stability-condition namespace. Moduli boundedness uses the independent
+  `CategoryTheory.Moduli` namespace.
 - Scheme-derived category declarations owned by
   `AlgebraicGeometry/DerivedCategory/Basic.lean` use the
   `AlgebraicGeometry.DerivedCategory` namespace. Scheme base-change and
@@ -210,7 +243,7 @@ new derived-category theory.
   remains in that structure's established namespace; physical placement in the
   deformation subtree does not override API ownership.
 - Generic moduli boundedness interfaces shared by weak stability and geometric
-  moduli also belong under `CategoryTheory/Triangulated/Families/`; neither
+  moduli belong under `CategoryTheory/Moduli/`; neither
   consumer owns the common root.
 - Do not restore the retired `AlgebraicGeometry/StabilityCondition/` subtree or
   `AlgebraicGeometry.StabilityCondition` namespace. Put actual semistable loci
@@ -246,6 +279,8 @@ new derived-category theory.
 
 Structural changes must update imports, umbrellas, audits, declaration-sweep
 routing, documentation, architecture checks, and CI paths in the same change.
+They must also update `docs/architecture/cutover-ledger.md` when a known lane is
+completed or a new reverse-ownership block is confirmed.
 Build changed modules with explicit targets locally. Full verification belongs
 on the self-hosted Windows runners: pushing an `agent/**` branch triggers it.
 Do not run targetless `lake build` or `scripts/gates.sh` locally; see

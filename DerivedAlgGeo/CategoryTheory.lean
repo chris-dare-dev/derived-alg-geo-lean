@@ -14,12 +14,13 @@ import DerivedAlgGeo.CategoryTheory.SpectralSequence
 import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated
 import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
-import DerivedAlgGeo.CategoryTheory.PseudofunctorObjectProperty
+import DerivedAlgGeo.CategoryTheory.Moduli
+import DerivedAlgGeo.CategoryTheory.Pseudofunctor
 import DerivedAlgGeo.CategoryTheory.StabilityCharge
 
 /-! # Category theory
 
 Abelian, monoidal and enriched categories, dg categories, t-structures,
-site-theoretic sheaves, and the categorical foundations of Bridgeland stability
-conditions.
+Cat-valued pseudofunctors, neutral moduli interfaces, site-theoretic sheaves,
+and the categorical foundations of Bridgeland stability conditions.
 -/

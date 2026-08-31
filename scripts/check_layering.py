@@ -42,6 +42,7 @@ GEOMETRY_INSTANCE_UMBRELLAS = {
     "StabilityCondition.Symmetry.Autoequivalence.Instances",
 }
 GENERIC_FAMILIES_NAMESPACE = "CategoryTheory.Triangulated.Families"
+GENERIC_MODULI_NAMESPACE = "CategoryTheory.Moduli"
 GENERIC_STACKS_NAMESPACE = "CategoryTheory"
 GENERIC_DERIVED_NAMESPACE = "CategoryTheory"
 DERIVED_CATEGORY_NAMESPACE = "AlgebraicGeometry.DerivedCategory"
@@ -93,6 +94,15 @@ STRONG_DEFORMATION_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Deformation"
 RETIRED_STRONG_DEFORMATION_NAMESPACE = "CategoryTheory.Triangulated.Deformation"
 RESTATE_GROUP_ACTION_NAMES = ROOT / "exe" / "RestateHistoricalNames.lean"
 RETIRED_IMPORT_SHIMS = {
+    "DerivedAlgGeo.CategoryTheory.PseudofunctorObjectProperty": (
+        SOURCE_ROOT / "CategoryTheory" / "PseudofunctorObjectProperty.lean",
+        "DerivedAlgGeo.CategoryTheory.Pseudofunctor.ObjectProperty",
+    ),
+    "DerivedAlgGeo.CategoryTheory.Triangulated.Families.Boundedness": (
+        SOURCE_ROOT / "CategoryTheory" / "Triangulated" / "Families" /
+            "Boundedness.lean",
+        "DerivedAlgGeo.CategoryTheory.Moduli.Boundedness",
+    ),
     "DerivedAlgGeo.CategoryTheory.WeakSerreExact": (
         SOURCE_ROOT / "CategoryTheory" / "WeakSerreExact.lean",
         "DerivedAlgGeo.CategoryTheory.Abelian.WeakSerre",
@@ -622,13 +632,70 @@ def main() -> int:
     generic_families_source_root = (
         SOURCE_ROOT / "CategoryTheory" / "Triangulated" / "Families"
     )
-    for module in ("BaseChange", "Boundedness"):
+    for module in ("BaseChange",):
         path = generic_families_source_root / f"{module}.lean"
         text = path.read_text(encoding="utf-8")
         if f"namespace {GENERIC_FAMILIES_NAMESPACE}" not in text:
             failures.append(
                 f"{path.relative_to(ROOT)}: generic family declarations must "
                 f"use namespace {GENERIC_FAMILIES_NAMESPACE}"
+            )
+
+    generic_moduli_root = SOURCE_ROOT / "CategoryTheory" / "Moduli"
+    generic_moduli_sources = (
+        SOURCE_ROOT / "CategoryTheory" / "Moduli.lean",
+        generic_moduli_root / "Boundedness.lean",
+    )
+    for path in generic_moduli_sources:
+        if not path.is_file():
+            failures.append(
+                f"generic moduli module missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        if path.name == "Boundedness.lean" and not re.search(
+            rf"^namespace {GENERIC_MODULI_NAMESPACE}$", text, re.MULTILINE
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: generic moduli declarations must "
+                f"use namespace {GENERIC_MODULI_NAMESPACE}"
+            )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^import DerivedAlgGeo\.CategoryTheory\.Triangulated\."
+            r"WeakStabilityCondition|^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: generic moduli infrastructure "
+                "depends on a geometric or stability-specific consumer"
+            )
+
+    generic_pseudofunctor_root = SOURCE_ROOT / "CategoryTheory" / "Pseudofunctor"
+    generic_subprestack_sources = (
+        SOURCE_ROOT / "CategoryTheory" / "Pseudofunctor.lean",
+        generic_pseudofunctor_root / "ObjectProperty.lean",
+        generic_pseudofunctor_root / "ObjectProperty" /
+            "UniversallyStable.lean",
+    )
+    for path in generic_subprestack_sources:
+        if not path.is_file():
+            failures.append(
+                f"generic subprestack module missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        if re.search(
+            r"(?:^import (?:DerivedAlgGeo|Mathlib)\.AlgebraicGeometry|"
+            r"^import DerivedAlgGeo\.CategoryTheory\.Triangulated\."
+            r"WeakStabilityCondition|^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: generic subprestack infrastructure "
+                "depends on a geometric or stability-specific consumer"
             )
 
     for path in sorted(SOURCE_ROOT.rglob("*.lean")):
@@ -1514,6 +1581,10 @@ def main() -> int:
     print(
         "ok: neutral triangulated-family declarations use the generic "
         "CategoryTheory.Triangulated.Families namespace"
+    )
+    print(
+        "ok: neutral moduli boundedness and subprestack machinery use their "
+        "CategoryTheory.Moduli and CategoryTheory.Pseudofunctor roots"
     )
     print(
         "ok: generic stacks in groupoids use their CategoryTheory namespace"

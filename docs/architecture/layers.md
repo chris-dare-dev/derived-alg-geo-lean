@@ -57,9 +57,9 @@ In particular:
 - repository-owned theorems about arbitrary abelian categories live below
   `DerivedAlgGeo.CategoryTheory.Abelian` and extend Mathlib's existing
   `CategoryTheory.Abelian` typeclass;
-- abstract fiber categories, pullback functors, and shared boundedness
-  interfaces live in
-  `DerivedAlgGeo.CategoryTheory.Triangulated.Families`;
+- abstract fiber categories and pullback functors live in
+  `DerivedAlgGeo.CategoryTheory.Triangulated.Families`, while shared moduli
+  boundedness lives in `DerivedAlgGeo.CategoryTheory.Moduli`;
 - generic derived-category t-structure, exact-functor, homology-comparison,
   and K-projective APIs live below
   `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory`;
@@ -113,6 +113,12 @@ CategoryTheory/SpectralSequence
 CategoryTheory/Sites/StackInGroupoids
   ├─→ Discrete                                sheaves of types as stacks
   └─→ Morphism                                fibers and representability
+
+CategoryTheory/Pseudofunctor/ObjectProperty
+  └─→ UniversallyStable                       replete subprestack closure
+
+CategoryTheory/Moduli
+  └─→ Boundedness                              neutral moduli predicate
 
 CategoryTheory/Sites/Cech
   ├─→ Differential, Contractible               arbitrary presheaves on a site
@@ -305,9 +311,10 @@ in `scripts/layering_reverse_edges.txt` is empty and must remain empty.
 ## Migration compatibility
 
 The former CategoryTheory families umbrella mixed generic interfaces with
-geometric realizations. It now exports only the generic interfaces. Neutral
-declarations such as `TriangulatedFiberFamily`, `BoundednessProblem`, and
-`UniversalBoundedness` live in `CategoryTheory.Triangulated.Families`.
+geometric realizations. It now exports only triangulated-family interfaces.
+`TriangulatedFiberFamily` lives in `CategoryTheory.Triangulated.Families`;
+the more general `BoundednessProblem` and `UniversalBoundedness` live in
+`CategoryTheory.Moduli` and are consumed by both stability and geometry.
 Weak-family probes and structures live in
 `CategoryTheory.Triangulated.WeakStabilityCondition.Families`. Ordinary
 Bridgeland family packages live in
@@ -324,6 +331,8 @@ the explicit instance umbrellas attached to their categorical sources:
 | Client need | Import |
 | --- | --- |
 | Fiber categories and pullbacks | `DerivedAlgGeo.CategoryTheory.Triangulated.Families` |
+| Neutral moduli boundedness | `DerivedAlgGeo.CategoryTheory.Moduli` |
+| Pseudofunctor loci and subprestacks | `DerivedAlgGeo.CategoryTheory.Pseudofunctor.ObjectProperty` |
 | Generic derived-category extensions | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory` |
 | Generic spectral sequences | `DerivedAlgGeo.CategoryTheory.SpectralSequence` |
 | Generic site-theoretic Čech machinery | `DerivedAlgGeo.CategoryTheory.Sites.Cech` |

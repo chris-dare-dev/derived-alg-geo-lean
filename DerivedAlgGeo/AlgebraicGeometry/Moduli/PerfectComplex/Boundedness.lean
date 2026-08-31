@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Presheaf
-import DerivedAlgGeo.CategoryTheory.Triangulated.Families.Boundedness
+import DerivedAlgGeo.CategoryTheory.Moduli.Boundedness
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FiniteType
 
 /-!
@@ -27,6 +27,7 @@ parameter spaces remain later results.
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits
+open CategoryTheory.Moduli
 open CategoryTheory.Triangulated.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Dqc
