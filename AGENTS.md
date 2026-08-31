@@ -87,6 +87,12 @@ application, current file, namespace, or proof technique.
 - Facts stated only with `Finsupp`, `MvPolynomial`, homogeneity, and
   `divMonomial` belong in `Algebra/MvPolynomial/`. Projective localization and
   Čech modules import that root and begin at the graded-localization consumer.
+- Degree-zero localization of an internally graded module, graded shifts,
+  twist trivializations, and denominator-equality transport belong in
+  `Algebra/Module/GradedModule/` under Mathlib's `GradedModule` namespace.
+  Laurent exponent vectors belong in `Algebra/Finsupp/`, and their polynomial
+  localization basis belongs in `Algebra/MvPolynomial/`; Proj and Čech files
+  are downstream consumers.
 
 When editing a consumer file, inspect adjacent declarations for a generic
 prefix or suffix. Move an in-scope generic block with the consumer change, or

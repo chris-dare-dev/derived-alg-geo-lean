@@ -1572,6 +1572,172 @@ def main() -> int:
                 f"umbrella import {required_import}"
             )
 
+    graded_module_root = SOURCE_ROOT / "Algebra" / "Module" / "GradedModule"
+    graded_module_owners = {
+        graded_module_root / "Localization.lean": (
+            "namespace GradedModule",
+            "abbrev DegreeZeroLocalization",
+            "structure GradedLinearMap",
+        ),
+        graded_module_root / "Shift.lean": (
+            "namespace GradedModule",
+            "def natShift",
+            "def intShift",
+            "theorem isDegreeZero_intShift_intShift_iff",
+        ),
+        graded_module_root / "TwistLocalization.lean": (
+            "namespace GradedModule",
+            "namespace DegreeZeroLocalization",
+            "noncomputable def intShiftZeroLinearEquiv",
+        ),
+        graded_module_root / "PowersCongr.lean": (
+            "namespace GradedModule.DegreeZeroLocalization",
+            "noncomputable def powersCongr",
+            "theorem powersCongr_faceMap",
+        ),
+    }
+    for path, fragments in graded_module_owners.items():
+        if not path.is_file():
+            failures.append(
+                f"canonical graded-module algebra owner is missing: "
+                f"{path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        for fragment in fragments:
+            if fragment not in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: missing graded-module "
+                    f"declaration {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: graded-module algebra owner "
+                "depends on or declares algebraic geometry"
+            )
+
+    laurent_algebra_owners = {
+        SOURCE_ROOT / "Algebra" / "Finsupp" / "LaurentExponent.lean": (
+            "namespace Finsupp",
+            "def natToIntExponent",
+            "def laurentExponent",
+            "theorem degree_laurentExponent_int",
+        ),
+        SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Grading.lean": (
+            "namespace MvPolynomial",
+            "abbrev polynomialGrading",
+        ),
+        SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentBasis.lean": (
+            "namespace MvPolynomial",
+            "def IsPolynomialTwist",
+            "theorem awayMk_monomial_eq_iff_laurentExponent",
+            "theorem exists_sum_awayMk_monomial",
+            "theorem sum_awayMk_monomial_eq_zero_iff",
+        ),
+    }
+    for path, fragments in laurent_algebra_owners.items():
+        if not path.is_file():
+            failures.append(
+                f"canonical Laurent algebra owner is missing: "
+                f"{path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        for fragment in fragments:
+            if fragment not in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: missing Laurent algebra "
+                    f"declaration {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: Laurent algebra owner depends "
+                "on or declares algebraic geometry"
+            )
+
+    retired_proj_algebra_paths = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "GradedLocalization.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "Shift.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "TwistLocalization.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "LaurentBasis.lean",
+    )
+    retired_proj_algebra_imports = {
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.GradedLocalization",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Shift",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistLocalization",
+        "DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentBasis",
+    }
+    for path in retired_proj_algebra_paths:
+        if path.exists():
+            failures.append(
+                f"retired Proj algebra path restored: {path.relative_to(ROOT)}"
+            )
+    for path, modules in imports_by_path.items():
+        restored = sorted(retired_proj_algebra_imports.intersection(modules))
+        if restored:
+            failures.append(
+                f"{path.relative_to(ROOT)}: imports retired Proj algebra "
+                f"path(s) {restored}"
+            )
+
+    graded_module_consumers = {
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "AssociatedSheaf.lean":
+            "DerivedAlgGeo.Algebra.Module.GradedModule.Localization",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "TwistingSheaf.lean":
+            "DerivedAlgGeo.Algebra.Module.GradedModule.Shift",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "TwistChart.lean":
+            "DerivedAlgGeo.Algebra.Module.GradedModule.TwistLocalization",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "CechHomotopy.lean":
+            "DerivedAlgGeo.Algebra.Module.GradedModule.PowersCongr",
+        laurent_projection_consumer:
+            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentBasis",
+    }
+    for path, required_import in graded_module_consumers.items():
+        if required_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: geometric consumer must import "
+                f"the algebraic owner {required_import} directly"
+            )
+
+    graded_module_umbrellas = {
+        SOURCE_ROOT / "Algebra" / "Module" / "GradedModule.lean":
+            "DerivedAlgGeo.Algebra.Module.GradedModule.Localization",
+        SOURCE_ROOT / "Algebra" / "Module.lean":
+            "DerivedAlgGeo.Algebra.Module.GradedModule",
+        SOURCE_ROOT / "Algebra" / "Finsupp.lean":
+            "DerivedAlgGeo.Algebra.Finsupp.LaurentExponent",
+        SOURCE_ROOT / "Algebra" / "MvPolynomial.lean":
+            "DerivedAlgGeo.Algebra.MvPolynomial.LaurentBasis",
+    }
+    for path, required_import in graded_module_umbrellas.items():
+        if not path.is_file():
+            failures.append(
+                f"graded Laurent umbrella missing: {path.relative_to(ROOT)}"
+            )
+        elif required_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: missing graded Laurent umbrella "
+                f"import {required_import}"
+            )
+
     exterior_power_owners = {
         SOURCE_ROOT / "LinearAlgebra" / "ExteriorPower" /
             "Semilinear.lean": "namespace LinearMap\n",
@@ -2046,6 +2212,10 @@ def main() -> int:
     print(
         "ok: weighted-basis decompositions use LinearAlgebra and pure "
         "monomial-division identities use Algebra; geometric files are consumers"
+    )
+    print(
+        "ok: graded-module localizations, shifts, and Laurent bases use "
+        "Algebra roots; Proj and Cech modules are direct consumers"
     )
     print(
         "ok: weak-stability family declarations use the matching "

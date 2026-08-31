@@ -20,6 +20,8 @@ noncomputable section
 open CategoryTheory DirectSum Opposite SetLike TopCat TopologicalSpace
 open scoped DirectSum Pointwise
 
+open GradedModule
+
 namespace AlgebraicGeometry.Proj
 
 universe u

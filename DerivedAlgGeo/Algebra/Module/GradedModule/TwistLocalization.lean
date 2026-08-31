@@ -2,10 +2,10 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Shift
+import DerivedAlgGeo.Algebra.Module.GradedModule.Shift
 
 /-!
-# Trivializing a twist on a degree-one Proj chart
+# Trivializing a graded-module twist after degree-one localization
 
 If `f` is homogeneous of degree one, multiplication by `f ^ d` trivializes the natural shift
 `A(d)` after localizing away from `f`.  This file constructs that statement at the exact
@@ -21,7 +21,7 @@ noncomputable section
 open DirectSum SetLike
 open scoped Pointwise
 
-namespace AlgebraicGeometry.Proj
+namespace GradedModule
 
 universe u
 
@@ -1208,4 +1208,4 @@ end IntShift
 
 end DegreeZeroLocalization
 
-end AlgebraicGeometry.Proj
+end GradedModule

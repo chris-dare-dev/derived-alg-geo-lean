@@ -53,6 +53,8 @@ open scoped DirectSum Pointwise
 
 open CategoryTheory DirectSum Opposite SetLike TopCat TopologicalSpace
 
+open GradedModule
+
 namespace AlgebraicGeometry.Proj
 
 universe u

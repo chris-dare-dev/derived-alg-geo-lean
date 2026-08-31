@@ -59,6 +59,8 @@ noncomputable section
 
 open CategoryTheory DirectSum Opposite SetLike TopCat TopologicalSpace MonoidalCategory
 
+open GradedModule
+
 namespace AlgebraicGeometry.Proj
 
 universe u

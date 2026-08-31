@@ -79,6 +79,15 @@ established `Finsupp` and `MvPolynomial` namespaces. The Laurent-projection
 module imports this algebraic root directly before adding graded-localization
 and projective Čech consumers.
 
+Internally graded modules are algebra, not projective geometry. Extend
+Mathlib's `GradedModule` namespace under `Algebra/Module/GradedModule/` for
+degree-zero homogeneous localizations, natural or integer graded shifts,
+localization trivializations, and equality transport between denominator
+power submonoids. Pure exponent-vector arithmetic uses `Algebra/Finsupp/`, and
+polynomial specializations use `Algebra/MvPolynomial/`. A Proj sheaf or Čech
+module imports these roots and adds only the scheme, cover, or cohomological
+consumer.
+
 ## Moduli and subprestacks
 
 `CategoryTheory.Moduli.BoundednessProblem` is the neutral boundedness root. A

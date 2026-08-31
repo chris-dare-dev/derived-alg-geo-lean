@@ -38,7 +38,7 @@ happens to fire.
 ## Naming
 
 The grading used here is `MvPolynomial.homogeneousSubmodule ι k`, which is by definition
-`AlgebraicGeometry.Proj.polynomialGrading ι k` from `Proj/Modules/Finiteness.lean`. The Mathlib
+`MvPolynomial.polynomialGrading ι k` from `Algebra/MvPolynomial/Grading.lean`. The Mathlib
 spelling is used so that the variety layer does not import the Proj Čech-comparison stack; the
 two are the same term, so statements in either spelling compose.
 -/

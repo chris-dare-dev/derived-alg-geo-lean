@@ -33,6 +33,8 @@ universe u
 
 open CategoryTheory CategoryTheory.Limits TopologicalSpace
 
+open GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra

@@ -41,6 +41,8 @@ universe u
 
 open CategoryTheory CategoryTheory.Limits TopologicalSpace Opposite
 
+open GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra

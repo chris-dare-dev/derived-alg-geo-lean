@@ -2,8 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Shift
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistLocalization
+import DerivedAlgGeo.Algebra.Module.GradedModule.Shift
+import DerivedAlgGeo.Algebra.Module.GradedModule.TwistLocalization
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.AssociatedSheaf
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Monoidal
 
 /-!
@@ -70,6 +71,8 @@ the right unitor, and feeds the result to `Presheaf.W_of_coversTop` over
 noncomputable section
 
 open CategoryTheory DirectSum Opposite SetLike TopCat TopologicalSpace MonoidalCategory
+
+open GradedModule
 
 namespace AlgebraicGeometry.Proj
 

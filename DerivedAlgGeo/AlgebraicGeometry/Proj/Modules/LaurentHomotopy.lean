@@ -51,7 +51,7 @@ produces the identity through the retraction, and every other face cancels betwe
 contracting homotopy, Čech complex, homogeneous localization, projective space
 -/
 
-open MvPolynomial
+open Finsupp GradedModule MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 
@@ -150,7 +150,7 @@ theorem laurentHomotopy_numerator_mem (h𝓜 : IsPolynomialTwist 𝓜 d) (i₀ :
   have hdeg : γ.degree = γ i₀ + (γ.erase i₀).degree := by
     conv_lhs => rw [← Finsupp.single_add_erase i₀ γ]
     rw [map_add, Finsupp.degree_single]
-  have h1 := h𝓜.divMonomial_mem (laurentHomotopy_split i₀ γ) hq
+  have h1 := IsPolynomialTwist.divMonomial_mem h𝓜 (laurentHomotopy_split i₀ γ) hq
   have h2 := monomial_single_pow_smul_mem h𝓜 (e := i₀) (c' := γ i₀) h1
   rwa [← hdeg] at h2
 
@@ -173,7 +173,7 @@ theorem laurentHomotopy_awayMk [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (
   have hdeg : γ.degree = γ i₀ + (γ.erase i₀).degree := by
     conv_lhs => rw [← Finsupp.single_add_erase i₀ γ]
     rw [map_add, Finsupp.degree_single]
-  have h1 := h𝓜.divMonomial_mem (laurentHomotopy_split i₀ γ) hq
+  have h1 := IsPolynomialTwist.divMonomial_mem h𝓜 (laurentHomotopy_split i₀ γ) hq
   have hres := monomial_single_pow_smul_mem h𝓜 (e := i₀) (c' := γ i₀) h1
   rw [laurentHomotopy, AddMonoidHom.comp_apply, signProjectionHom_apply,
     signProjection_awayMk h𝓜 (laurentHomotopy_split i₀ γ) Finsupp.erase_same,
@@ -207,7 +207,7 @@ theorem laurentHomotopy_laurentFace_blockProj [IsDomain R] (h𝓜 : IsPolynomial
   rw [blockProj_awayMk h𝓜 γ F]
   have hq : laurentFilter γ m F q₀ ∈
       𝓜 (m • γ.degree) :=
-    h𝓜.laurentFilter_mem hq₀
+    IsPolynomialTwist.laurentFilter_mem h𝓜 hq₀
   have hdeg : (Finsupp.single i₀ 1 + γ).degree = 1 + γ.degree := by
     rw [map_add, Finsupp.degree_single]
   have hres := monomial_single_pow_smul_mem h𝓜 (e := i₀) (c' := 1) hq

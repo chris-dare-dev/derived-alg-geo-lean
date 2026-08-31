@@ -51,6 +51,8 @@ universe u
 
 open CategoryTheory
 
+open GradedModule
+
 namespace AlgebraicGeometry.Proj
 
 variable {A σA : Type u} [CommRing A] [SetLike σA A] [AddSubgroupClass σA A]
