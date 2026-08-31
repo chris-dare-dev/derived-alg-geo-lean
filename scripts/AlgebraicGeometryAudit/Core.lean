@@ -760,18 +760,9 @@ is not closed. -/
 -- Canonical-sheaf data is constructed from smooth relative differentials. Standard-smooth
 -- charts globalize through sheafification, their determinant line has an explicit dual inverse,
 -- and the derived object is constructed as `ω_X[n]`.
-#print axioms LinearMap.exteriorPower
-#print axioms LinearMap.exteriorPower_ιMulti
-#print axioms PresheafOfModules.exteriorPower
-#print axioms PresheafOfModules.exteriorPower.map
-#print axioms PresheafOfModules.exteriorPower.mapIso
-#print axioms PresheafOfModules.exteriorPowerFunctor
 #print axioms Scheme.Modules.exteriorPower
 #print axioms Scheme.Modules.exteriorPowerMapIso
 #print axioms Scheme.Modules.exteriorPowerSheafification
-#print axioms Scheme.Modules.topPowerset
-#print axioms Scheme.Modules.topExteriorFreeEquiv
-#print axioms Scheme.Modules.topExteriorFreeEquiv_ιMulti
 #print axioms Scheme.Modules.topExteriorFreeIso
 #print axioms Scheme.Modules.exteriorPowerOver
 #print axioms Scheme.Modules.exteriorPowerOverMapIsoOfIso
@@ -1713,7 +1704,6 @@ not functions. -/
 -- exterior powers; invertibility of a top exterior power and exact-sequence comparison remain
 -- explicit certificates. The coherent extension requires either finite locally free determinant
 -- data or a visible two-term finite locally free resolution.
-#print axioms Module.finrank_topExteriorPower
 #print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData
 #print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData.isLocallyFree
 #print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData.ofIso

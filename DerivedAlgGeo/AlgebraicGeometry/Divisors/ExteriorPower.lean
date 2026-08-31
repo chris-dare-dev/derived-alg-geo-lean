@@ -128,27 +128,27 @@ private noncomputable def topExteriorFreeOverPresheafIso
           (overConstantType (X := X) U (ULift.{u} (Fin n)))) n ≅
       PresheafOfModules.unit (X.ringCatSheaf.over U).obj :=
   PresheafOfModules.isoMk (fun V ↦
-    (topExteriorFreeEquiv ((X.sheaf.over U).obj.obj V) n).toModuleIso) (by
+    (Module.topExteriorFreeEquiv ((X.sheaf.over U).obj.obj V) n).toModuleIso) (by
       intro V W f
       apply ModuleCat.exteriorPower.hom_ext
       ext x
-      change topExteriorFreeEquiv ((X.sheaf.over U).obj.obj W) n
+      change Module.topExteriorFreeEquiv ((X.sheaf.over U).obj.obj W) n
           (LinearMap.exteriorPower n ((X.sheaf.over U).obj.map f).hom
             ((PresheafOfModules.freeObj (R := (X.ringCatSheaf.over U).obj)
               (overConstantType (X := X) U (ULift.{u} (Fin n)))).restrictₛₗ f)
             (_root_.exteriorPower.ιMulti ((X.sheaf.over U).obj.obj V) n x)) =
         (X.sheaf.over U).obj.map f
-          (topExteriorFreeEquiv ((X.sheaf.over U).obj.obj V) n
+          (Module.topExteriorFreeEquiv ((X.sheaf.over U).obj.obj V) n
             (_root_.exteriorPower.ιMulti ((X.sheaf.over U).obj.obj V) n x))
       rw [LinearMap.exteriorPower_ιMulti]
-      change topExteriorFreeEquiv ((X.sheaf.over U).obj.obj W) n
+      change Module.topExteriorFreeEquiv ((X.sheaf.over U).obj.obj W) n
           (_root_.exteriorPower.ιMulti ((X.sheaf.over U).obj.obj W) n
             (((PresheafOfModules.freeObj (R := (X.ringCatSheaf.over U).obj)
               (overConstantType (X := X) U (ULift.{u} (Fin n)))).restrictₛₗ f) ∘ x)) =
         (X.sheaf.over U).obj.map f
-          (topExteriorFreeEquiv ((X.sheaf.over U).obj.obj V) n
+          (Module.topExteriorFreeEquiv ((X.sheaf.over U).obj.obj V) n
             (_root_.exteriorPower.ιMulti ((X.sheaf.over U).obj.obj V) n x))
-      rw [topExteriorFreeEquiv_ιMulti, topExteriorFreeEquiv_ιMulti]
+      rw [Module.topExteriorFreeEquiv_ιMulti, Module.topExteriorFreeEquiv_ιMulti]
       let σ := ((X.sheaf.over U).obj.map f).hom
       have hmap (y : ULift.{u} (Fin n) →₀ (X.sheaf.over U).obj.obj V) :
           (show ULift.{u} (Fin n) →₀ (X.sheaf.over U).obj.obj W from
@@ -177,9 +177,9 @@ private noncomputable def topExteriorFreeOverPresheafIso
           (show ULift.{u} (Fin n) →₀ (X.sheaf.over U).obj.obj W from
             (((PresheafOfModules.freeObj (R := (X.ringCatSheaf.over U).obj)
               (overConstantType (X := X) U (ULift.{u} (Fin n)))).restrictₛₗ f) ∘ x) i)
-              (Set.powersetCard.ofFinEmbEquiv.symm (topPowerset.{u} n) j) =
+              (Set.powersetCard.ofFinEmbEquiv.symm (Module.topPowerset.{u} n) j) =
             σ ((show ULift.{u} (Fin n) →₀ (X.sheaf.over U).obj.obj V from x i)
-              (Set.powersetCard.ofFinEmbEquiv.symm (topPowerset.{u} n) j)) := by
+              (Set.powersetCard.ofFinEmbEquiv.symm (Module.topPowerset.{u} n) j)) := by
         change (show ULift.{u} (Fin n) →₀ (X.sheaf.over U).obj.obj W from
           (PresheafOfModules.freeObj (R := (X.ringCatSheaf.over U).obj)
             (overConstantType (X := X) U (ULift.{u} (Fin n)))).map f (x i)) _ = _

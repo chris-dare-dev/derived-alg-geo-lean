@@ -6,7 +6,7 @@ import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.ExteriorPower
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.PicardGroup
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
-import Mathlib.LinearAlgebra.ExteriorPower.Basis
+import DerivedAlgGeo.LinearAlgebra.ExteriorPower.Top
 
 /-!
 # Determinant lines and first Chern classes
@@ -35,21 +35,6 @@ stable determinant/`c₁` interface whose hypotheses are visible in theorem type
 open CategoryTheory Limits
 
 universe u
-
-namespace Module
-
-variable (R : Type u) [CommRing R]
-
-/-- The algebraic local model for the determinant of a free rank-`n` module. -/
-abbrev topExteriorPower (n : ℕ) := ⋀[R]^n (Fin n → R)
-
-/-- The top exterior power of a free rank-`n` module has rank one. -/
-theorem finrank_topExteriorPower [Nontrivial R] (n : ℕ) :
-    finrank R (topExteriorPower R n) = 1 := by
-  rw [exteriorPower.finrank_eq]
-  simp
-
-end Module
 
 namespace AlgebraicGeometry.Scheme.Modules
 

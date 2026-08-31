@@ -1157,6 +1157,17 @@ def main() -> int:
             )
 
     generic_declarations_retired_from_consumers = {
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" /
+            "ExteriorPower.lean": (
+                "namespace LinearMap\n",
+                "namespace PresheafOfModules\n",
+                "def topPowerset",
+                "noncomputable def topExteriorFreeEquiv",
+            ),
+        SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" /
+            "Determinant.lean": (
+                "namespace Module\n\nvariable (R",
+            ),
         SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
             "Affine.lean": (
                 "theorem cechComplex_exactAt_succ_of_isTerminal",
@@ -1175,9 +1186,42 @@ def main() -> int:
         for fragment in retired_fragments:
             if fragment in text:
                 failures.append(
-                    f"{path.relative_to(ROOT)}: restored generic Čech "
+                    f"{path.relative_to(ROOT)}: restored generic "
                     f"declaration fragment {fragment!r} in a geometric consumer"
                 )
+
+    exterior_power_owners = {
+        SOURCE_ROOT / "LinearAlgebra" / "ExteriorPower" /
+            "Semilinear.lean": "namespace LinearMap\n",
+        SOURCE_ROOT / "LinearAlgebra" / "ExteriorPower" /
+            "Top.lean": "namespace Module\n",
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "Sheaves" / "Modules" /
+            "ExteriorPower.lean": "namespace PresheafOfModules\n",
+    }
+    for path, owner_fragment in exterior_power_owners.items():
+        if not path.exists():
+            failures.append(
+                f"canonical exterior-power owner is missing: {path.relative_to(ROOT)}"
+            )
+        elif owner_fragment not in path.read_text(encoding="utf-8"):
+            failures.append(
+                f"{path.relative_to(ROOT)}: missing canonical exterior-power "
+                f"owner fragment {owner_fragment!r}"
+            )
+
+    exterior_power_umbrellas = {
+        SOURCE_ROOT / "LinearAlgebra.lean":
+            "DerivedAlgGeo.LinearAlgebra.ExteriorPower",
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "Sheaves" /
+            "Modules.lean":
+            "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.ExteriorPower",
+    }
+    for path, required_import in exterior_power_umbrellas.items():
+        if required_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: missing canonical exterior-power "
+                f"umbrella import {required_import}"
+            )
 
     generic_families_root = strong_stability_root / "Families"
     neutral_derived_families_root = (
@@ -1600,6 +1644,10 @@ def main() -> int:
     print(
         "ok: generic abelian and ringed-site sheaf APIs use their categorical "
         "roots; the topological cohomology specialization uses the Topology owner"
+    )
+    print(
+        "ok: exterior-power algebra uses LinearAlgebra, arbitrary presheaf-module "
+        "exterior powers use CategoryTheory, and geometry retains only consumers"
     )
     print(
         "ok: weak-stability family declarations use the matching "
