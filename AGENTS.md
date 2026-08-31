@@ -85,9 +85,11 @@ application, current file, namespace, or proof technique.
   `LinearAlgebra/GradedBasis.lean`; `NumericalRingData.ofGradedBasis` is the
   geometric consumer that adds numerical-intersection-ring data.
 - Facts stated only with `Finsupp`, `MvPolynomial`, homogeneity, and
-  `divMonomial` belong in `Algebra/MvPolynomial/`. Projective files import that
-  root and begin only when projective opens, sheaves, or cohomology enter the
-  signature.
+  `divMonomial` belong in `Algebra/MvPolynomial/DivMonomial.lean`. Standard
+  polynomial grading and generation over degree zero belong in `Grading.lean`;
+  the canonical `p / 1` element of a variable localization belongs in
+  `Cech/Basic.lean`. Projective files import those roots and begin only when
+  projective opens, sheaves, or cohomology enter the signature.
 - Degree-zero localization of an internally graded module, graded shifts,
   twist trivializations, and denominator-equality transport belong in
   `Algebra/Module/GradedModule/` under Mathlib's `GradedModule` namespace.

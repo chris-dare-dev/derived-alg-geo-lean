@@ -14,8 +14,9 @@ variable. The construction is entirely algebraic: it does not mention `Proj`, ba
 or cohomology.
 
 The natural- and integer-shift terms are definitional specializations of the arbitrary graded-family
-construction. Geometric consumers compare these localizations with sections on intersections of
-the variable basic-open cover.
+construction. This file also owns the canonical `p / 1` element in a one-variable term. Geometric
+consumers compare these localizations and elements with sections on intersections of the variable
+basic-open cover.
 
 ## Tags
 
@@ -64,6 +65,20 @@ abbrev polynomialVariableCechTerm
 abbrev polynomialVariableCechCochains
     (ι k : Type u) [Field k] (d n : ℕ) :=
   ∀ x : Fin (n + 1) → ι, polynomialVariableCechTerm ι k d n x
+
+/-- The canonical fraction `p / 1` in the degree-zero localization at one polynomial variable. -/
+def polynomialVariableFraction
+    (ι k : Type u) [Field k] (d : ℕ)
+    (p : homogeneousSubmodule ι k d) (i : ι) :
+    DegreeZeroLocalization (polynomialGrading ι k)
+      (natShift (polynomialGrading ι k) d) (.powers (X i)) :=
+  DegreeZeroLocalization.mk
+    { deg := 0
+      num := ⟨p.1, by
+        change p.1 ∈ polynomialGrading ι k (0 + d)
+        simpa only [zero_add] using p.2⟩
+      den := ⟨1, SetLike.one_mem_graded (polynomialGrading ι k)⟩
+      den_mem := Submonoid.one_mem _ }
 
 /-- Dropping the `j`-th index multiplies the Čech denominator back up by that variable. -/
 theorem polynomialVariableCechDenominator_succAbove

@@ -10,3 +10,6 @@ import DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial
 #print axioms MvPolynomial.divMonomial_monomial_mul_add
 #print axioms MvPolynomial.divMonomial_monomial_mul_comm
 #print axioms MvPolynomial.divMonomial_pow_mul
+#print axioms MvPolynomial.divMonomial_single_mem_homogeneousSubmodule
+#print axioms MvPolynomial.X_pow_mul_divMonomial_single
+#print axioms MvPolynomial.X_pow_dvd_of_cross_mul
