@@ -79,6 +79,14 @@ signature: limit-preservation results under `CategoryTheory/Limits/`, derived
 data with its kernel consumer. Add broader `n`- or `(∞,1)`-category roots only
 with a concrete formal model and reusable API.
 
+Classify categorical dimension before selecting the subject directory. Data
+and laws involving 2-morphisms, associators, unitors, pentagons, triangles,
+mates, pseudofunctors, strong transformations, or modifications belong under
+the bicategory or pseudofunctor root. Their ordinary functor and natural-iso
+formulas are `Cat` projections. In particular, reuse
+`CategoryTheory/Pseudofunctor/Transport.lean` for objectwise-equivalence
+transport; do not rebuild its coherence calculus inside a consumer.
+
 Generic umbrellas must not import `Instances/AlgebraicGeometry` descendants.
 Those bridge modules are opt-in leaves: they may import both category theory
 and geometry, but neither generic category theory nor algebraic geometry may

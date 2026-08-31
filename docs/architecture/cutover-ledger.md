@@ -26,6 +26,13 @@ blocks should normally move it rather than add more declarations beside it.
   `CategoryTheory.Bicategory.Adjunction`, extended under
   `CategoryTheory/Bicategory/Adjunction/`; ordinary adjoint functors are the
   `Cat` specialization through `Adjunction.bicategoricalEquiv`.
+- Pseudofunctor-presentation transport:
+  `CategoryTheory/Pseudofunctor/Transport.lean` owns conjugation through
+  objectwise equivalences together with transported units, compositors,
+  pentagon, and triangle equations. Both affine bounded-projective derived
+  realizations consume this root; the former
+  `CategoryTheory/EquivalenceTransport.lean` path and the private geometric
+  duplicate are retired.
 - Generic preservation through composition and reflective transport:
   `CategoryTheory/Limits/Preserves/`. The former repository
   `CategoryTheory/Adjunction/` root is retired.
@@ -93,11 +100,7 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-1. Replace the ordinary-category coherence assembled in
-   `CategoryTheory/EquivalenceTransport.lean` with transport rooted in
-   Mathlib's bicategory and pseudofunctor APIs. The `Cat` presentation remains
-   a specialization consumed by affine geometric derived pseudofunctors.
-2. Refine `CategoryTheory/Triangulated/Families/TriangulatedFiberFamily` from a
+1. Refine `CategoryTheory/Triangulated/Families/TriangulatedFiberFamily` from a
    strict `Bᵒᵖ ⥤ Cat` source to a pseudofunctor on `LocallyDiscrete Bᵒᵖ`, with
    strict functors admitted through a constructor rather than treated as the
    general root.

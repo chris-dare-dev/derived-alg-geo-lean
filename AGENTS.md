@@ -126,6 +126,12 @@ construct a subprestack, through the categorical `fullsubcategory` API.
 
 ## Higher categories, adjunctions, and limits
 
+- Classify categorical dimension before choosing a subject owner. Definitions
+  whose essential data are 2-morphisms, associators, unitors, pentagons,
+  triangles, mates, pseudofunctors, strong transformations, or modifications
+  belong at the bicategory or pseudofunctor root. An ordinary-functor or
+  natural-isomorphism formula is a `Cat` projection of that source, not a more
+  general owner.
 - The canonical root for adjunction is Mathlib's
   `CategoryTheory.Bicategory.Adjunction`. Do not define a repository-owned
   competitor or treat ordinary functor adjunction as the more general notion.
@@ -134,6 +140,11 @@ construct a subprestack, through the categorical `fullsubcategory` API.
   Use the ordinary presentation in a theorem whose remaining signature is
   about functors, but keep the higher-categorical source explicit in the
   architecture.
+- When duality in a monoidal category is genuinely being used as an
+  adjunction, use Mathlib's one-object bicategory bridge
+  (`MonoidalSingleObj`). This is a higher-categorical specialization, not a
+  claim that monoidal structure is a superclass of every dg or triangulated
+  category.
 - Classify results *using* an adjunction by their conclusion. Preservation of
   limits or colimits belongs under `CategoryTheory/Limits/`; `Ext` adjunction
   belongs under `Triangulated/DerivedCategory/Ext/`; kernel-adjunction data
@@ -141,6 +152,10 @@ construct a subprestack, through the categorical `fullsubcategory` API.
 - Bicategories are the current implemented higher-category layer. Add general
   `n`-category or `(∞,1)`-category roots only together with an actual formal
   model and reusable interfaces; do not create empty nominal hierarchies.
+- Objectwise-equivalence transport of Cat-valued pseudofunctor presentations
+  belongs in `CategoryTheory/Pseudofunctor/Transport.lean`. Geometric and
+  derived consumers must import that root and must not reproduce local
+  functor/unit/compositor/pentagon/triangle transport helpers.
 
 ## Monoidal, derived, dg, and triangulated categories
 

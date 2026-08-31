@@ -35,9 +35,12 @@ burn down, not exceptions that authorize more leaf-to-root imports.
 
 ```text
 Bicategory                              Mathlib higher-categorical root
-└─ Adjunction of 1-morphisms
-   ├─ adjoint equivalences and mates
-   └─ Cat specialization ≃ ordinary functor adjunction
+├─ Adjunction of 1-morphisms
+│  ├─ adjoint equivalences and mates
+│  └─ Cat specialization ≃ ordinary functor adjunction
+└─ Pseudofunctor
+   ├─ equivalence transport of Cat presentations
+   └─ fiberwise object properties / full subpseudofunctors
 
 Category
 ├─ Limits and colimits
@@ -62,9 +65,6 @@ Category
 ├─ filtered-complex spectral sequences
 ├─ Moduli
 │  └─ BoundednessProblem                 neutral boundedness predicate
-├─ Cat-valued pseudofunctor object properties
-│  ├─ replete fiberwise locus            closed under isomorphisms
-│  └─ fullsubcategory                    restriction-stable subprestack
 ├─ GrothendieckPresentation
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
