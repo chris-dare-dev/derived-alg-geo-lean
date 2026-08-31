@@ -76,6 +76,12 @@ subprestack, then use `fullsubcategory`. Scheme parameter spaces, finite-type
 witnesses, atlases, and geometric presentations remain below
 `AlgebraicGeometry/Moduli/` and consume those roots.
 
+Use `RelativePerfectModuliSelector` for geometric boundedness data that only
+selects replete loci independently in each fiber. Its `familyLocus` and
+`geometricLocus` fields do not imply restriction stability. Do not describe a
+selector as a subfunctor; construct a genuine subprestack only from a
+`Pseudofunctor.ObjectProperty` carrying `IsClosedUnderMapObj`.
+
 Do not classify all module or sheaf theory as algebraic geometry. Ordinary
 modules over rings belong under `Algebra/`. Sheaves on an arbitrary site, and
 sheaves of modules over a sheaf of rings on an arbitrary site, belong under

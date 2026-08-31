@@ -131,7 +131,7 @@ def zeroQuotientRelativePerfectModuliProblem
 witness from SF8.3, including geometric-point coverage. -/
 def zeroQuotientFiniteTypeBoundednessWitness
     (S : Scheme.{u}) [IsLocallyNoetherian S] :
-    FiniteTypeBoundednessWitness (zeroRelativePerfectModuliSubproblem S) :=
+    FiniteTypeBoundednessWitness (zeroRelativePerfectModuliSelector S) :=
   zeroFiniteTypeBoundednessWitness S
 
 /-- Consequently the supported zero Quot construction inhabits the SF8.3
@@ -139,7 +139,7 @@ geometric boundedness predicate. -/
 theorem zeroQuotient_isGeometricallyBounded
     (S : Scheme.{u}) [IsLocallyNoetherian S] :
     (relativePerfectGeometricBoundednessProblem S).IsBounded
-      (zeroRelativePerfectModuliSubproblem S) :=
+      (zeroRelativePerfectModuliSelector S) :=
   ⟨zeroQuotientFiniteTypeBoundednessWitness S⟩
 
 end

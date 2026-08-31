@@ -108,7 +108,9 @@ AlgebraicGeometry
 │     └─ relative numerical quotient              uses Algebra root
 │        └─ family-relation system                 statement-layer adapter
 ├─ moduli
-│  ├─ finite-type boundedness witness      consumes generic predicate
+│  ├─ fiberwise replete locus selector     not a subprestack
+│  ├─ finite-type boundedness witness      consumes selector + generic predicate
+│  ├─ affine stable subprestack            consumes pseudofunctor object property
 │  ├─ stack presentation
 │  └─ perfect-complex specialization
 └─ stability in families                       stability-dependent adapter only

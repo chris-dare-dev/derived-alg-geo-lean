@@ -710,6 +710,81 @@ def main() -> int:
                 "depends on a geometric or stability-specific consumer"
             )
 
+    geometric_moduli_root = SOURCE_ROOT / "AlgebraicGeometry" / "Moduli"
+    relative_perfect_selector = (
+        geometric_moduli_root / "PerfectComplex" / "Boundedness.lean"
+    )
+    relative_perfect_subprestack = (
+        geometric_moduli_root / "PerfectComplex" /
+            "AffineFamilyRelativePerfectPseudofunctor.lean"
+    )
+    selector_text = relative_perfect_selector.read_text(encoding="utf-8")
+    for required_fragment in (
+        "structure RelativePerfectModuliSelector",
+        "familyLocus (T : SchemeBaseChange S)",
+        "geometricLocus (T : SchemeBaseChange S)",
+        "familyLocus_iso (T : SchemeBaseChange S)",
+        "geometricLocus_iso (T : SchemeBaseChange S)",
+    ):
+        if required_fragment not in selector_text:
+            failures.append(
+                f"{relative_perfect_selector.relative_to(ROOT)}: fiberwise "
+                f"moduli selector is missing {required_fragment!r}"
+            )
+    if "subfunctor" in selector_text:
+        failures.append(
+            f"{relative_perfect_selector.relative_to(ROOT)}: an indexed "
+            "isomorphism-closed selector must not be described as a subfunctor"
+        )
+
+    retired_selector_name = "RelativePerfectModuliSubproblem"
+    for path in sorted(SOURCE_ROOT.rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if retired_selector_name in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: retired fiberwise selector name "
+                f"{retired_selector_name} restored"
+            )
+        if path.is_relative_to(geometric_moduli_root) and re.search(
+            r"(?:structure|class|def|abbrev)\s+\w*Subprestack\b", text
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: geometric moduli defines a "
+                "competing Subprestack carrier"
+            )
+        if (
+            path.is_relative_to(geometric_moduli_root)
+            and re.search(r"\)\.fullsubcategory\b", text)
+            and path != relative_perfect_subprestack
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: geometric moduli constructs a "
+                "sub-pseudofunctor outside the reviewed restriction-stable leaf"
+            )
+
+    subprestack_import = (
+        "DerivedAlgGeo.CategoryTheory.Pseudofunctor.ObjectProperty."
+        "UniversallyStable"
+    )
+    if subprestack_import not in imports_by_path[relative_perfect_subprestack]:
+        failures.append(
+            f"{relative_perfect_subprestack.relative_to(ROOT)}: genuine "
+            "geometric subprestack must import the generic object-property root"
+        )
+    relative_perfect_subprestack_text = relative_perfect_subprestack.read_text(
+        encoding="utf-8"
+    )
+    for required_fragment in (
+        "Pseudofunctor.ObjectProperty.universallyStable",
+        "Pseudofunctor.ObjectProperty.IsClosedUnderMapObj",
+        ".fullsubcategory",
+    ):
+        if required_fragment not in relative_perfect_subprestack_text:
+            failures.append(
+                f"{relative_perfect_subprestack.relative_to(ROOT)}: genuine "
+                f"subprestack is missing canonical step {required_fragment!r}"
+            )
+
     for path in sorted(SOURCE_ROOT.rglob("*.lean")):
         for line_number, line in enumerate(
             path.read_text(encoding="utf-8").splitlines(), 1
@@ -1783,6 +1858,10 @@ def main() -> int:
     print(
         "ok: neutral moduli boundedness and subprestack machinery use their "
         "CategoryTheory.Moduli and CategoryTheory.Pseudofunctor roots"
+    )
+    print(
+        "ok: relative-perfect selectors are explicitly fiberwise; the genuine "
+        "affine subprestack uses the generic restriction-stable object-property root"
     )
     print(
         "ok: generic stacks in groupoids use their CategoryTheory namespace"

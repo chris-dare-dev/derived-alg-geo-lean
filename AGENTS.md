@@ -98,6 +98,13 @@ until restriction stability is present. Finite-type parameter schemes,
 geometric boundedness witnesses, atlases, and scheme presentations remain
 geometric consumers.
 
+`AlgebraicGeometry.RelativePerfectModuliSelector` is intentionally weaker than
+a subprestack: its `familyLocus` and `geometricLocus` fields are independently
+indexed replete object properties and supply no restriction maps. Finite-type
+boundedness witnesses may consume that selector. Only after an ambient
+pseudofunctor and `IsClosedUnderMapObj` are available may a geometric module
+construct a subprestack, through the categorical `fullsubcategory` API.
+
 ## Higher categories, adjunctions, and limits
 
 - The canonical root for adjunction is Mathlib's

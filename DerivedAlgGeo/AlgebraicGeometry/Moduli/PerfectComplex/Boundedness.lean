@@ -38,49 +38,55 @@ noncomputable section
 
 universe u
 
-/-- A selected relative-perfect moduli subproblem.  `family` specifies which
-total families are admitted, while `geometric` specifies the objects that a
-finite-type parameter family must cover. -/
-structure RelativePerfectModuliSubproblem (S : Scheme.{u}) where
+/-- Two fiberwise, replete loci used to state a relative-perfect boundedness
+problem. `familyLocus` specifies which total families are admitted, while
+`geometricLocus` specifies the objects that a finite-type parameter family
+must cover.
+
+This is deliberately a selector, not a subprestack: it supplies neither an
+ambient pseudofunctor nor preservation under restriction. A genuine
+subprestack must separately use `Pseudofunctor.ObjectProperty` and prove
+`IsClosedUnderMapObj`. -/
+structure RelativePerfectModuliSelector (S : Scheme.{u}) where
   /-- Admissible total families on every actual base change. -/
-  family (T : SchemeBaseChange S) :
+  familyLocus (T : SchemeBaseChange S) :
     ObjectProperty (RelativePerfectModuliFiber T)
   /-- The selected geometric objects. -/
-  geometric (T : SchemeBaseChange S) :
+  geometricLocus (T : SchemeBaseChange S) :
     ObjectProperty (RelativePerfectModuliFiber T)
   /-- Family membership is invariant under isomorphism. -/
-  family_iso (T : SchemeBaseChange S) :
-    (family T).IsClosedUnderIsomorphisms
+  familyLocus_iso (T : SchemeBaseChange S) :
+    (familyLocus T).IsClosedUnderIsomorphisms
   /-- Geometric membership is invariant under isomorphism. -/
-  geometric_iso (T : SchemeBaseChange S) :
-    (geometric T).IsClosedUnderIsomorphisms
+  geometricLocus_iso (T : SchemeBaseChange S) :
+    (geometricLocus T).IsClosedUnderIsomorphisms
 
-namespace RelativePerfectModuliSubproblem
+namespace RelativePerfectModuliSelector
 
 variable {S : Scheme.{u}}
 
-instance family_isClosedUnderIsomorphisms
-    (P : RelativePerfectModuliSubproblem S) (T : SchemeBaseChange S) :
-    (P.family T).IsClosedUnderIsomorphisms :=
-  P.family_iso T
+instance familyLocus_isClosedUnderIsomorphisms
+    (P : RelativePerfectModuliSelector S) (T : SchemeBaseChange S) :
+    (P.familyLocus T).IsClosedUnderIsomorphisms :=
+  P.familyLocus_iso T
 
-instance geometric_isClosedUnderIsomorphisms
-    (P : RelativePerfectModuliSubproblem S) (T : SchemeBaseChange S) :
-    (P.geometric T).IsClosedUnderIsomorphisms :=
-  P.geometric_iso T
+instance geometricLocus_isClosedUnderIsomorphisms
+    (P : RelativePerfectModuliSelector S) (T : SchemeBaseChange S) :
+    (P.geometricLocus T).IsClosedUnderIsomorphisms :=
+  P.geometricLocus_iso T
 
 /-- Data sufficient to transport a boundedness witness from `P` to `Q`.
 Admissible families may be enlarged, while the geometric target may be
 shrunk. -/
-structure MonotoneTo (P Q : RelativePerfectModuliSubproblem S) : Prop where
+structure MonotoneTo (P Q : RelativePerfectModuliSelector S) : Prop where
   /-- Every `P`-family is admitted by `Q`. -/
-  family {T : SchemeBaseChange S} {E : RelativePerfectModuliFiber T} :
-    P.family T E → Q.family T E
+  familyLocus {T : SchemeBaseChange S} {E : RelativePerfectModuliFiber T} :
+    P.familyLocus T E → Q.familyLocus T E
   /-- Every geometric object requested by `Q` was already requested by `P`. -/
-  geometric {T : SchemeBaseChange S} {E : RelativePerfectModuliFiber T} :
-    Q.geometric T E → P.geometric T E
+  geometricLocus {T : SchemeBaseChange S} {E : RelativePerfectModuliFiber T} :
+    Q.geometricLocus T E → P.geometricLocus T E
 
-end RelativePerfectModuliSubproblem
+end RelativePerfectModuliSelector
 
 /-- Transport a moduli object across an equality of actual scheme base
 changes. -/
@@ -91,31 +97,31 @@ def castRelativePerfectModuliObject {S : Scheme.{u}}
   exact E
 
 /-- An actual finite-type parameter family covering a selected relative-
-perfect moduli subproblem. -/
+perfect moduli boundedness problem. -/
 structure FiniteTypeBoundednessWitness {S : Scheme.{u}}
-    (P : RelativePerfectModuliSubproblem S) where
+    (P : RelativePerfectModuliSelector S) where
   /-- The parameter scheme with its structure morphism to `S`. -/
   parameter : SchemeBaseChange S
   /-- The structure morphism is locally of finite type and quasi-compact. -/
   finiteType : IsFiniteTypeBaseChange parameter
   /-- The universal relative-perfect, universally-gluable family. -/
   universalFamily : RelativePerfectModuliFiber parameter
-  /-- The universal family belongs to the selected family subfunctor. -/
-  universalFamily_mem : P.family parameter universalFamily
+  /-- The universal family belongs to the selected family locus. -/
+  universalFamily_mem : P.familyLocus parameter universalFamily
   /-- A chosen geometric fiber over every point of the parameter scheme. -/
   geometricFiber (x : parameter.left) :
     RelativePerfectModuliFiber (parameter.residue x)
   /-- Every selected geometric object occurs as one of the chosen fibers, up
   to an isomorphism in the relative-perfect moduli groupoid. -/
   covers {T : SchemeBaseChange S} (E : RelativePerfectModuliFiber T) :
-    P.geometric T E →
+    P.geometricLocus T E →
       ∃ (x : parameter.left) (h : T = parameter.residue x),
         Nonempty (castRelativePerfectModuliObject h E ≅ geometricFiber x)
 
 namespace FiniteTypeBoundednessWitness
 
 variable {S : Scheme.{u}}
-  {P Q : RelativePerfectModuliSubproblem S}
+  {P Q : RelativePerfectModuliSelector S}
 
 /-- Boundedness is monotone under enlargement of the allowed family class
 and restriction of the geometric target. -/
@@ -124,24 +130,24 @@ def monotone (W : FiniteTypeBoundednessWitness P)
   parameter := W.parameter
   finiteType := W.finiteType
   universalFamily := W.universalFamily
-  universalFamily_mem := h.family W.universalFamily_mem
+  universalFamily_mem := h.familyLocus W.universalFamily_mem
   geometricFiber := W.geometricFiber
-  covers E hE := W.covers E (h.geometric hE)
+  covers E hE := W.covers E (h.geometricLocus hE)
 
 end FiniteTypeBoundednessWitness
 
 /-- The geometric boundedness problem attached to relative-perfect moduli
-subproblems.  Its predicate is existence of actual finite-type parameter
+selectors. Its predicate is existence of actual finite-type parameter
 data, rather than a caller-chosen proposition. -/
 def relativePerfectGeometricBoundednessProblem (S : Scheme.{u}) :
-    BoundednessProblem (RelativePerfectModuliSubproblem S) where
+    BoundednessProblem (RelativePerfectModuliSelector S) where
   IsBounded P := Nonempty (FiniteTypeBoundednessWitness P)
 
-/-- Finite-type witnesses for every selected subproblem discharge the
+/-- Finite-type witnesses for every selected locus selector discharge the
 boundedness clause of Definition 21.15(5). -/
 theorem universalRelativePerfectBoundedness_of_witnesses
     (S : Scheme.{u})
-    (h : ∀ P : RelativePerfectModuliSubproblem S,
+    (h : ∀ P : RelativePerfectModuliSelector S,
       Nonempty (FiniteTypeBoundednessWitness P)) :
     UniversalBoundedness (relativePerfectGeometricBoundednessProblem S) :=
   h
@@ -154,20 +160,20 @@ def identityRelativePerfectBaseChange (S : Scheme.{u}) :
     SchemeBaseChange S :=
   Over.mk (𝟙 S)
 
-/-- The supported zero subproblem.  Total families must be zero after
+/-- The supported zero selector. Total families must be zero after
 forgetting to the ambient derived category.  Its geometric objects are zero
 objects over residue-field base changes of actual points of `S`. -/
-def zeroRelativePerfectModuliSubproblem (S : Scheme.{u}) :
-    RelativePerfectModuliSubproblem S where
-  family T E := IsZero ((relativePerfectModuliForget T).obj E)
-  geometric T E :=
+def zeroRelativePerfectModuliSelector (S : Scheme.{u}) :
+    RelativePerfectModuliSelector S where
+  familyLocus T E := IsZero ((relativePerfectModuliForget T).obj E)
+  geometricLocus T E :=
     ∃ (x : S) (h : T = (identityRelativePerfectBaseChange S).residue x),
       IsZero ((relativePerfectModuliForget T).obj E)
-  family_iso T := by
+  familyLocus_iso T := by
     constructor
     intro E F e hE
     exact hE.of_iso ((relativePerfectModuliForget T).mapIso e.symm)
-  geometric_iso T := by
+  geometricLocus_iso T := by
     constructor
     intro E F e hE
     obtain ⟨x, hT, hzero⟩ := hE
@@ -175,10 +181,10 @@ def zeroRelativePerfectModuliSubproblem (S : Scheme.{u}) :
       hzero.of_iso ((relativePerfectModuliForget T).mapIso e.symm)⟩
 
 /-- The universal zero family is a selected family. -/
-theorem relativePerfectZeroObject_mem_zeroFamily
+theorem relativePerfectZeroObject_mem_zeroFamilyLocus
     {S : Scheme.{u}} (T : SchemeBaseChange S)
     [IsLocallyNoetherian T.left] :
-    (zeroRelativePerfectModuliSubproblem S).family T
+    (zeroRelativePerfectModuliSelector S).familyLocus T
       (relativePerfectZeroObject T) :=
   schemeQuasicoherentDerivedCategory_zero_obj_isZero T.left
 
@@ -197,7 +203,7 @@ def zeroRelativePerfectGeometricFiber (S : Scheme.{u}) (x : S) :
 finite-type boundedness witness. -/
 def zeroFiniteTypeBoundednessWitness (S : Scheme.{u})
     [IsLocallyNoetherian S] :
-    FiniteTypeBoundednessWitness (zeroRelativePerfectModuliSubproblem S) where
+    FiniteTypeBoundednessWitness (zeroRelativePerfectModuliSelector S) where
   parameter := identityRelativePerfectBaseChange S
   finiteType := by
     change LocallyOfFiniteType (𝟙 S) ∧ QuasiCompact (𝟙 S)
@@ -214,7 +220,7 @@ def zeroFiniteTypeBoundednessWitness (S : Scheme.{u})
       infer_instance
     change IsZero ((relativePerfectModuliForget (Over.mk (𝟙 S))).obj
       (relativePerfectZeroObject (Over.mk (𝟙 S))))
-    exact relativePerfectZeroObject_mem_zeroFamily (Over.mk (𝟙 S))
+    exact relativePerfectZeroObject_mem_zeroFamilyLocus (Over.mk (𝟙 S))
   geometricFiber := zeroRelativePerfectGeometricFiber S
   covers E hE := by
     obtain ⟨x, hT, hzero⟩ := hE
@@ -238,12 +244,12 @@ def zeroFiniteTypeBoundednessWitness (S : Scheme.{u})
       (schemeUniversallyGluableRelativePerfect
         ((identityRelativePerfectBaseChange S).residue x).hom) eDqc
 
-/-- The zero subproblem is geometrically bounded by an inhabited finite-type
+/-- The zero selector is geometrically bounded by an inhabited finite-type
 witness, not by a constant-true predicate. -/
-theorem zeroRelativePerfectModuliSubproblem_isBounded
+theorem zeroRelativePerfectModuliSelector_isBounded
     (S : Scheme.{u}) [IsLocallyNoetherian S] :
     (relativePerfectGeometricBoundednessProblem S).IsBounded
-      (zeroRelativePerfectModuliSubproblem S) :=
+      (zeroRelativePerfectModuliSelector S) :=
   ⟨zeroFiniteTypeBoundednessWitness S⟩
 
 /-- The supported zero boundedness construction is available after every
@@ -252,8 +258,8 @@ not claim a general pullback theorem for nonzero universal families. -/
 theorem zeroRelativePerfectBoundedness_afterBaseChange
     {S S' : Scheme.{u}} (_ : S' ⟶ S) [IsLocallyNoetherian S'] :
     (relativePerfectGeometricBoundednessProblem S').IsBounded
-      (zeroRelativePerfectModuliSubproblem S') :=
-  zeroRelativePerfectModuliSubproblem_isBounded S'
+      (zeroRelativePerfectModuliSelector S') :=
+  zeroRelativePerfectModuliSelector_isBounded S'
 
 /-- The Definition 21.15(5) adapter for the single supported zero
 subproblem. -/
@@ -261,14 +267,14 @@ def zeroRelativePerfectBoundednessProblem (S : Scheme.{u}) :
     BoundednessProblem PUnit where
   IsBounded _ :=
     (relativePerfectGeometricBoundednessProblem S).IsBounded
-      (zeroRelativePerfectModuliSubproblem S)
+      (zeroRelativePerfectModuliSelector S)
 
 /-- The supported zero model unconditionally satisfies its honest geometric
 boundedness problem on a locally Noetherian base. -/
 theorem universalBoundedness_zeroRelativePerfect
     (S : Scheme.{u}) [IsLocallyNoetherian S] :
     UniversalBoundedness (zeroRelativePerfectBoundednessProblem S) :=
-  fun _ ↦ zeroRelativePerfectModuliSubproblem_isBounded S
+  fun _ ↦ zeroRelativePerfectModuliSelector_isBounded S
 
 end
 

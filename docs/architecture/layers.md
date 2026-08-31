@@ -173,6 +173,11 @@ AlgebraicGeometry/DerivedCategory
   ├─→ Families                              scheme base change and pullback
   └─→ FourierMukai                          geometric kernels and convolution
 
+AlgebraicGeometry/Moduli/PerfectComplex
+  ├─→ Boundedness                          fiberwise replete selectors/witnesses
+  └─→ AffineFamilyRelativePerfectPseudofunctor
+        └─→ generic ObjectProperty.fullsubcategory
+
 AlgebraicGeometry/SheafOfModules
   └─→ QuasicoherentSheaf
         └─→ CoherentSheaf                   supplies `Abelian (Coh X)`
