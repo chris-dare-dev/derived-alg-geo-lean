@@ -35,8 +35,13 @@ burn down, not exceptions that authorize more leaf-to-root imports.
 
 ```text
 Category
+├─ Adjunction
+│  └─ reflective transport of colimit preservation
 ├─ Preadditive
 │  └─ Linear k C                         Mathlib root
+├─ Abelian                               Mathlib typeclass
+│  ├─ weak-Serre exactness               repository generic extension
+│  └─ DerivedCategory C                  generic construction
 ├─ FiniteExactTower
 │  └─ FiniteFiltration                    zero-to-object endpoint refinement
 │     └─ almost-disconnected witness       scheme-geometric leaf
@@ -54,16 +59,26 @@ Category
 │  ├─ K₀                                 triangle relations
 │  └─ K₀dg := K₀ (H0 C)                 reuse, not a third presentation
 └─ Sites / descent / stacks in groupoids
+   ├─ Sheaves
+   │  ├─ constant pullback and cohomology pushforward
+   │  └─ module sheaves on a ringed site
+   │     ├─ exact forgetful functor
+   │     └─ finite-presentation transport
    ├─ site-theoretic Čech complexes and derived comparison
    │  └─ compact-basis and finite-cover boundedness
    └─ scheme-site realizations
 
 Algebra
+├─ ordinary ring and module theory
 └─ saturation of an additive subgroup
    └─ saturated quotient and torsion-free universal property
 
 AlgebraicGeometry
-├─ scheme module sheaves
+├─ SheafOfModules(X)
+│  ├─ QuasicoherentSheaf(X)
+│  │  └─ CoherentSheaf(X)
+│  │     ├─ Abelian instance under geometric hypotheses
+│  │     └─ DerivedCategory (Coh X)     consumes the generic construction
 │  ├─ intrinsic IsInvertible
 │  │  └─ pullback preservation          theorem inherited by every consumer
 │  └─ LineBundleData                     invertible sheaf plus chosen tensor inverse
@@ -100,6 +115,13 @@ particular:
   relation generators through the family-relation system; scheme connectivity
   and relative perfection are proved by geometric inhabitants, not stored as
   inert fields in the numerical root;
+- keep ordinary module theory under `Algebra`, generic sheaves and module
+  sheaves on ringed sites under `CategoryTheory/Sites/Sheaves`, and only the
+  scheme-indexed `SheafOfModules(X) -> QCoh(X) -> Coh(X)` refinements under
+  algebraic geometry;
+- extend Mathlib's abelian-category hierarchy under `CategoryTheory/Abelian`
+  and make the geometric proof that `Coh(X)` is abelian an input to the generic
+  derived-category construction;
 - generic stacks, replete subprestacks, boundedness, and presentation data do
   not import stability-condition modules;
 - a paper-specific module may instantiate these roots but never becomes a root

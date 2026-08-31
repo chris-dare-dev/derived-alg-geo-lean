@@ -8,6 +8,7 @@ means that modules owned by subject `A` may import modules owned by subject
 Development ─┬→ GeometryInstances ─┬→ AlgebraicGeometry
              │                     └→ CategoryTheory
              ├→ AlgebraicGeometry
+             ├→ Topology
              └→ CategoryTheory
 
 AlgebraicGeometry ─┬→ CategoryTheory
@@ -15,12 +16,15 @@ AlgebraicGeometry ─┬→ CategoryTheory
                   ├→ LinearAlgebra
                   └→ Topology
 
+Topology → CategoryTheory
+
 CategoryTheory → LinearAlgebra
 ```
 
-The support subjects `Algebra`, `LinearAlgebra`, and `Topology` are lower
-layers. `DerivedAlgGeo.lean` is a public aggregation root, not a subject owner,
-so its imports do not add edges to this graph.
+The support subjects `Algebra` and `LinearAlgebra` are the lowest layers.
+`Topology` may consume generic categorical sheaf theory while remaining below
+scheme geometry. `DerivedAlgGeo.lean` is a public aggregation root, not a
+subject owner, so its imports do not add edges to this graph.
 
 `GeometryInstances` is a virtual leaf owner, not a top-level source directory.
 It consists exactly of modules below a path segment
@@ -32,8 +36,9 @@ all other modules below `CategoryTheory` remain geometry-independent.
 ## Ownership rule
 
 `CategoryTheory` owns interfaces whose statements are independent of a
-geometric realization. `AlgebraicGeometry` owns declarations specialized to
-schemes, sheaves, geometric fibers, `Dqc`, derived pullback, finite-type
+geometric realization, including sheaves on arbitrary sites.
+`AlgebraicGeometry` owns declarations specialized to schemes, scheme-indexed
+sheaf categories, geometric fibers, `Dqc`, derived pullback, finite-type
 morphisms, or Fourier--Mukai kernels—even when their proofs are primarily
 category theoretic. Proof technique does not determine source ownership.
 
@@ -46,6 +51,12 @@ instance umbrella or the public repository root.
 
 In particular:
 
+- ordinary module and ring theory lives under `DerivedAlgGeo.Algebra`, while
+  generic sheaves and sheaves of modules on arbitrary ringed sites live below
+  `DerivedAlgGeo.CategoryTheory.Sites.Sheaves`;
+- repository-owned theorems about arbitrary abelian categories live below
+  `DerivedAlgGeo.CategoryTheory.Abelian` and extend Mathlib's existing
+  `CategoryTheory.Abelian` typeclass;
 - abstract fiber categories, pullback functors, and shared boundedness
   interfaces live in
   `DerivedAlgGeo.CategoryTheory.Triangulated.Families`;
@@ -109,6 +120,18 @@ CategoryTheory/Sites/Cech
   ├─→ GlobalComparison, ComplexNaturality      Čech-to-derived comparison
   └─→ BasisComparison, Boundedness             topological-space sheaves
 
+CategoryTheory/Abelian
+  └─→ WeakSerre                                arbitrary abelian categories
+
+CategoryTheory/Adjunction
+  └─→ PreservesColimits                       reflective transport
+
+CategoryTheory/Sites/Sheaves
+  ├─→ ConstantPullback, CohomologyPushforward  arbitrary sites
+  └─→ Modules
+        ├─→ Exactness                           arbitrary ringed sites
+        └─→ Presentation                        finite-presentation transport
+
 CategoryTheory/Triangulated/WeakStabilityCondition
   ├─→ Foundation, Families, HarderNarasimhan, Support, Tilting
   └─→ StabilityCondition
@@ -128,6 +151,10 @@ AlgebraicGeometry/DerivedCategory
   ├─→ Dqc                                   quasicoherent-cohomology locus
   ├─→ Families                              scheme base change and pullback
   └─→ FourierMukai                          geometric kernels and convolution
+
+AlgebraicGeometry/SheafOfModules
+  └─→ QuasicoherentSheaf
+        └─→ CoherentSheaf                   supplies `Abelian (Coh X)`
 
 AlgebraicGeometry/Stacks
   ├─→ Representable                          big-Zariski scheme instances
@@ -215,6 +242,14 @@ a triangulated category need not be monoidal. Concrete tensor products on
 sheaves, invertible sheaves, and `Dᵇ(Coh X)` remain geometry-owned and expose
 instances of the generic compatibility interfaces.
 
+The word “module” does not by itself determine ownership. Ring/module theory
+with no site belongs to `Algebra`; module sheaves on an arbitrary ringed site
+belong to `CategoryTheory/Sites/Sheaves/Modules`; only scheme-indexed module,
+quasicoherent, and coherent sheaves belong to algebraic geometry. Likewise,
+the repository reuses Mathlib's abelian typeclass: the generic derived category
+depends on an arbitrary abelian category, while geometry proves that `Coh(X)`
+is one and then supplies registration or comparison consumers.
+
 Raw dg categories require an additional distinction. A dg category is an
 enriched category and need not be triangulated, so its basic theory and its
 internal pretriangulated refinement live in
@@ -292,6 +327,8 @@ the explicit instance umbrellas attached to their categorical sources:
 | Generic derived-category extensions | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory` |
 | Generic spectral sequences | `DerivedAlgGeo.CategoryTheory.SpectralSequence` |
 | Generic site-theoretic Čech machinery | `DerivedAlgGeo.CategoryTheory.Sites.Cech` |
+| Generic abelian-category extensions | `DerivedAlgGeo.CategoryTheory.Abelian` |
+| Generic sheaves and ringed-site module sheaves | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves` |
 | Generic stacks and representable fibers | `DerivedAlgGeo.CategoryTheory.Sites` |
 | Weak-stability family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families` |
 | Ordinary Bridgeland family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families` |

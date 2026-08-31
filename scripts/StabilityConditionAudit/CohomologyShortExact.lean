@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.CohomologyShortExact
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CohomologyShortExact
 
 /-! Audit records for the vanishing-`H¹` global-sections surjectivity bridge. -/
 

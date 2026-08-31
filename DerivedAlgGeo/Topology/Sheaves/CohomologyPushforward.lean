@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Topology.Sheaves.PushforwardStalks
-import DerivedAlgGeo.CategoryTheory.SheafCohomologyPushforward
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CohomologyPushforward
 import Mathlib.Topology.Sheaves.Functors
 import Mathlib.Topology.Sheaves.Abelian
 import Mathlib.Algebra.Category.Grp.AB
@@ -20,7 +20,7 @@ range. This is `#572` step 3's statement, instantiated at an actual map of space
 
 ## Everything here is plumbing
 
-`CategoryTheory/SheafCohomologyPushforward.lean` proves the comparison abstractly, for a continuous
+`CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` proves the comparison abstractly, for a continuous
 functor of sites whose pullback and pushforward are both exact. This composition-layer file
 discharges those hypotheses for `Opens.map f`. No mathematics happens: the one non-formal input,
 exactness of `f_*`, is `PushforwardStalks.lean`, and the rest is instance supply.

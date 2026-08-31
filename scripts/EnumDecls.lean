@@ -35,7 +35,7 @@ congruence lemma on first use and attributes it to the module that triggered it,
 which is whichever module in the build happens to mention the structure first --
 not the module that declared it, and never a module the author wrote it in. Two
 such lemmas for Mathlib's `ShortComplex` landed in
-`CategoryTheory/WeakSerreExact.lean` (#721) purely because it is the first module
+`CategoryTheory/Abelian/WeakSerre.lean` (#721) purely because it is the first module
 to `rw` with one, and the ratchet counted them as that file's unaudited public
 declarations. They are the same class of artifact as `.injEq` and
 `.noConfusion`, which have always been filtered here. -/

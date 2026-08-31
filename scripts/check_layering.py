@@ -93,6 +93,47 @@ STRONG_DEFORMATION_NAMESPACE = f"{STRONG_STABILITY_NAMESPACE}.Deformation"
 RETIRED_STRONG_DEFORMATION_NAMESPACE = "CategoryTheory.Triangulated.Deformation"
 RESTATE_GROUP_ACTION_NAMES = ROOT / "exe" / "RestateHistoricalNames.lean"
 RETIRED_IMPORT_SHIMS = {
+    "DerivedAlgGeo.CategoryTheory.WeakSerreExact": (
+        SOURCE_ROOT / "CategoryTheory" / "WeakSerreExact.lean",
+        "DerivedAlgGeo.CategoryTheory.Abelian.WeakSerre",
+    ),
+    "DerivedAlgGeo.CategoryTheory.ConstantSheafPullback": (
+        SOURCE_ROOT / "CategoryTheory" / "ConstantSheafPullback.lean",
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.ConstantPullback",
+    ),
+    "DerivedAlgGeo.CategoryTheory.SheafCohomologyPushforward": (
+        SOURCE_ROOT / "CategoryTheory" / "SheafCohomologyPushforward.lean",
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CohomologyPushforward",
+    ),
+    "DerivedAlgGeo.CategoryTheory.TopologicalSheafCohomologyPushforward": (
+        SOURCE_ROOT / "CategoryTheory" /
+            "TopologicalSheafCohomologyPushforward.lean",
+        "DerivedAlgGeo.Topology.Sheaves.CohomologyPushforward",
+    ),
+    "DerivedAlgGeo.CategoryTheory.Sites.CohomologyShortExact": (
+        SOURCE_ROOT / "CategoryTheory" / "Sites" /
+            "CohomologyShortExact.lean",
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CohomologyShortExact",
+    ),
+    "DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Exactness": (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Affine" /
+            "Exactness.lean",
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Exactness",
+    ),
+    "DerivedAlgGeo.AlgebraicGeometry.Modules.Presentation": (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Presentation.lean",
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation",
+    ),
+    "DerivedAlgGeo.AlgebraicGeometry.Modules.Presentation.Finite": (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Presentation" /
+            "Finite.lean",
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Finite",
+    ),
+    "DerivedAlgGeo.AlgebraicGeometry.Modules.Presentation.Transport": (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Presentation" /
+            "Transport.lean",
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Transport",
+    ),
     "DerivedAlgGeo.AlgebraicGeometry.Divisors.Tensor": (
         SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "Tensor.lean",
         "DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic",
@@ -143,10 +184,10 @@ LAYERING_FIXTURES = ROOT / "scripts" / "fixtures" / "layering"
 LAYER = {
     "Algebra": 0,
     "LinearAlgebra": 0,
-    "Topology": 0,
     GENERIC_OWNER: 1,
-    GEOMETRY_OWNER: 2,
-    GEOMETRY_INSTANCES_OWNER: 3,
+    "Topology": 2,
+    GEOMETRY_OWNER: 3,
+    GEOMETRY_INSTANCES_OWNER: 4,
     "Development": 5,
 }
 
@@ -961,6 +1002,53 @@ def main() -> int:
                 "depends on or declares algebraic geometry"
             )
 
+    generic_adjunction_root = SOURCE_ROOT / "CategoryTheory" / "Adjunction"
+    generic_abelian_root = SOURCE_ROOT / "CategoryTheory" / "Abelian"
+    generic_sheaves_root = SOURCE_ROOT / "CategoryTheory" / "Sites" / "Sheaves"
+    generic_foundation_sources = (
+        SOURCE_ROOT / "CategoryTheory" / "Abelian.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Adjunction.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "Sheaves.lean",
+        *sorted(generic_adjunction_root.rglob("*.lean")),
+        *sorted(generic_abelian_root.rglob("*.lean")),
+        *sorted(generic_sheaves_root.rglob("*.lean")),
+    )
+    required_generic_foundations = (
+        SOURCE_ROOT / "CategoryTheory" / "Adjunction.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Adjunction" /
+            "PreservesColimits.lean",
+        generic_abelian_root / "WeakSerre.lean",
+        generic_sheaves_root / "ConstantPullback.lean",
+        generic_sheaves_root / "CohomologyShortExact.lean",
+        generic_sheaves_root / "CohomologyPushforward.lean",
+        generic_sheaves_root / "Modules" / "Exactness.lean",
+        generic_sheaves_root / "Modules" / "Presentation" / "Transport.lean",
+        generic_sheaves_root / "Modules" / "Presentation" / "Finite.lean",
+        SOURCE_ROOT / "Topology" / "Sheaves" / "CohomologyPushforward.lean",
+    )
+    for path in required_generic_foundations:
+        if not path.is_file():
+            failures.append(
+                f"canonical abelian/sheaf module missing: {path.relative_to(ROOT)}"
+            )
+    for path in generic_foundation_sources:
+        if not path.is_file():
+            failures.append(
+                f"generic abelian/sheaf umbrella missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: generic abelian or sheaf "
+                "infrastructure depends on or declares algebraic geometry"
+            )
+
     retired_generic_cohomology_paths = (
         SOURCE_ROOT / "CategoryTheory" / "ExtAdjunction.lean",
         SOURCE_ROOT / "CategoryTheory" / "ExtDimensionShift.lean",
@@ -1437,6 +1525,10 @@ def main() -> int:
     print(
         "ok: generic Ext, spectral-sequence, simplicial, and site-theoretic "
         "Cech APIs use categorical owners; geometric cohomology contains only consumers"
+    )
+    print(
+        "ok: generic abelian and ringed-site sheaf APIs use their categorical "
+        "roots; the topological cohomology specialization uses the Topology owner"
     )
     print(
         "ok: weak-stability family declarations use the matching "

@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.ConstantSheafPullback
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.ConstantPullback
 import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Ext.Adjunction
 import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.CategoryTheory.Sites.Abelian
@@ -20,7 +20,7 @@ pushforward are both exact. This is `#572` step 3 — cohomology invariance alon
 `Sheaf.H F n` is `Ext ((constantSheaf J _).obj (ULift ℤ)) F n`, so the comparison is an `Ext`
 transport and not a Čech computation. It assembles from exactly two results and nothing else:
 
-* `constantSheafCompSheafPullbackIso` (`ConstantSheafPullback.lean`) moves the constant sheaf
+* `constantSheafCompSheafPullbackIso` (`ConstantPullback.lean`) moves the constant sheaf
   across `G⁻¹ ⊣ G_*`, giving `G⁻¹ ℤ_J ≅ ℤ_K`;
 * `extAdjunctionAddEquiv` (`ExtAdjunction.lean`) transports `Ext` across that same adjunction;
 * `Ext.precompAddEquiv` glues the two, because the first supplies an *isomorphism* rather than an
@@ -43,7 +43,7 @@ and there is only one `Preadditive`. Same family as `#662`.
 the `Abelian` instance is genuinely absent rather than duplicated.
 
 **The `Sites.Abelian` and `Grp.Abelian` imports are load-bearing.** Neither
-`ConstantSheafPullback.lean` nor `ExtAdjunction.lean` reaches them, and without them
+`ConstantPullback.lean` nor `ExtAdjunction.lean` reaches them, and without them
 `Abelian (Sheaf J AddCommGrpCat)` is not inferrable — which reads exactly like a missing
 mathematical input and is not one.
 

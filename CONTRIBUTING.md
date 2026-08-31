@@ -9,6 +9,12 @@ roots.
 Choose the narrowest natural home:
 
 - geometric objects and theorems: `DerivedAlgGeo/AlgebraicGeometry/`;
+- ordinary ring and module theory independent of sites and schemes:
+  `DerivedAlgGeo/Algebra/`;
+- generic abelian-category results extending Mathlib's abelian hierarchy:
+  `DerivedAlgGeo/CategoryTheory/Abelian/`;
+- generic sheaves, including module sheaves on an arbitrary ringed site:
+  `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/`;
 - generic monoidal coherence and tensor--triangulation compatibility:
   `DerivedAlgGeo/CategoryTheory/Monoidal/`;
 - raw dg enrichment: `DerivedAlgGeo/CategoryTheory/Enriched/DGCategory/`;
@@ -29,6 +35,20 @@ and geometry, but neither generic category theory nor algebraic geometry may
 depend on them. Construct generic objects once—for example, obtain
 `DerivedCategory (Coh X)` from the abelian instance on `Coh X` rather than
 creating a second geometric derived-category theory.
+
+Do not classify all module or sheaf theory as algebraic geometry. Ordinary
+modules over rings belong under `Algebra/`. Sheaves on an arbitrary site, and
+sheaves of modules over a sheaf of rings on an arbitrary site, belong under
+`CategoryTheory/Sites/Sheaves/`. Scheme-dependent specializations follow the
+geometric refinement chain `SheafOfModules(X) -> QCoh(X) -> Coh(X)` under
+`AlgebraicGeometry/SheafOfModules/`; the quasicoherent and coherent children
+must reuse their parent carriers and forgetful structure rather than creating
+parallel categories.
+
+Mathlib owns the `CategoryTheory.Abelian` typeclass. Add missing generic
+abelian results below `CategoryTheory/Abelian/`, prove the scheme-specific
+instance `[Abelian (Coh X)]` with the coherent-sheaf geometry, and let that
+instance feed the one generic derived-category construction.
 
 Generic derived-category extensions belong under
 `CategoryTheory/Triangulated/DerivedCategory/`. This includes facts about the
