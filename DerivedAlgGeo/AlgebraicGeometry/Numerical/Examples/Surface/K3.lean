@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.K3
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface
 
 /-!
 # A K3 surface of Picard rank one
@@ -111,6 +112,14 @@ theorem k3_isK3 (d : ℕ) (hd : d ≠ 0) :
   rw [surfaceDegree_algebraMap_mul, surfaceDegree_Hsq]
   have hdq : (d : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr hd
   field_simp
+
+/-- `∫_X td₂ = χ(O_X) = 2`, in `chiStructureSheaf` form. The number is the one
+`k3_isK3.degree_toddComp_two` already carries — `chiStructureSheaf` unfolds to
+`degree (toddComp 2)` — so this is a projection, not a second computation. It
+exists so the rank-one surface models can be compared through one function. -/
+theorem k3ChiStructureSheaf (d : ℕ) (hd : d ≠ 0) :
+    Surface.chiStructureSheaf (k3NumericalVariety d) = 2 :=
+  (k3_isK3 d hd).degree_toddComp_two
 
 end Examples
 

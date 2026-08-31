@@ -1073,6 +1073,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.k3NumericalVariety
 #print axioms Examples.k3NumericalVariety_satisfiesHRR
 #print axioms Examples.k3_isK3
+#print axioms Examples.k3ChiStructureSheaf
 
 -- Layer A: the projective plane. Its td1 is nonzero, so it is the model that can
 -- detect an error in the c1.td1 term of Surface.chi_eq.
@@ -1104,11 +1105,10 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.enriquesNumericalVariety_satisfiesHRR
 #print axioms Examples.enriquesToddComp_one
 #print axioms Examples.enriquesChiStructureSheaf
-#print axioms Examples.k3ChiStructureSheaf
 #print axioms Examples.k3EnriquesAbelianPresentations
-#print axioms Examples.enriquesChiStructureSheaf_ne_k3
-#print axioms Examples.enriquesChiStructureSheaf_ne_abelian
-#print axioms Examples.k3ChiStructureSheaf_ne_abelian
+#print axioms Examples.chiStructureSheaf_enriques_ne_k3
+#print axioms Examples.chiStructureSheaf_enriques_ne_abelian
+#print axioms Examples.chiStructureSheaf_k3_ne_abelian
 
 -- Layer A: the dimension-general Picard-rank-one construction. Every threefold and
 -- fourfold model below is built from it, so a sorry here would unmodel dimensions three
