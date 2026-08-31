@@ -67,6 +67,18 @@ prove its localization behavior, without mentioning a site or scheme.
 `AlgebraicGeometry/CoherentSheaf/Abelian/Kernels.lean` is a direct consumer and
 owns only the scheme restriction, affine comparison, and coherence steps.
 
+Weight-indexed spans of basis vectors and the resulting independence,
+spanning, internal-direct-sum, and multiplicativity lemmas are rooted at
+`LinearAlgebra/GradedBasis.lean`. The numerical consumer imports that module
+and adds the geometric `NumericalRingData.ofGradedBasis` constructor; it does
+not own another copy of the decomposition.
+
+Theorems stated only using `Finsupp`, `MvPolynomial`, homogeneity, and
+`divMonomial` are rooted at `Algebra/MvPolynomial/DivMonomial.lean` in the
+established `Finsupp` and `MvPolynomial` namespaces. The Laurent-projection
+module imports this algebraic root directly before adding graded-localization
+and projective Čech consumers.
+
 ## Moduli and subprestacks
 
 `CategoryTheory.Moduli.BoundednessProblem` is the neutral boundedness root. A

@@ -27,6 +27,7 @@ Riemann–Roch on this model reads `χ(r, c, s) = 2r + 2ds`.
 -/
 
 open Polynomial Submodule Set
+open DerivedAlgGeo.LinearAlgebra
 
 namespace AlgebraicGeometry.Numerical
 

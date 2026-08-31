@@ -52,6 +52,7 @@ does.
 -/
 
 open Polynomial Submodule Set
+open DerivedAlgGeo.LinearAlgebra
 
 namespace AlgebraicGeometry.Numerical
 

@@ -81,6 +81,12 @@ application, current file, namespace, or proof technique.
   formulation, belong under `Algebra/Module/Localization/`. Coherent-sheaf
   arguments import that algebraic owner and add only the scheme-dependent
   comparison and finiteness steps.
+- Weight-indexed spans and direct-sum arguments for a basis belong in
+  `LinearAlgebra/GradedBasis.lean`; `NumericalRingData.ofGradedBasis` is the
+  geometric consumer that adds numerical-intersection-ring data.
+- Facts stated only with `Finsupp`, `MvPolynomial`, homogeneity, and
+  `divMonomial` belong in `Algebra/MvPolynomial/`. Projective localization and
+  Čech modules import that root and begin at the graded-localization consumer.
 
 When editing a consumer file, inspect adjacent declarations for a generic
 prefix or suffix. Move an in-scope generic block with the consumer change, or

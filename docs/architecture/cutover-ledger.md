@@ -39,19 +39,28 @@ blocks should normally move it rather than add more declarations beside it.
   restriction maps. The genuine affine relative-perfect subprestack is built
   separately by `AffineFamilyRelativePerfectPseudofunctor.lean` through the
   generic `universallyStable` and `fullsubcategory` APIs.
+- Weighted-basis decompositions:
+  `LinearAlgebra/GradedBasis.lean` owns `gradedPiece`, its spanning and
+  independence results, and multiplicativity promoted from basis vectors.
+  `AlgebraicGeometry/Numerical/Core/GradedBasis.lean` retains only
+  `NumericalRingData.ofGradedBasis` and its smoke test.
+- Division by multivariate monomials:
+  `Algebra/MvPolynomial/DivMonomial.lean` owns the `Finsupp.degree` bridge,
+  homogeneous-degree result, factor-commutation identities, and
+  `MvPolynomial.divMonomial_pow_mul`. The projective Laurent projection imports
+  that root directly.
 
 ## Confirmed next lanes
 
-1. `AlgebraicGeometry/Numerical/Core/GradedBasis.lean` begins with generic
-   basis-weight submodules and direct-sum lemmas whose signatures contain no
-   geometry or numerical intersection-ring structure. Move that block to a
-   `LinearAlgebra/GradedBasis.lean` root; retain only
-   `NumericalRingData.ofGradedBasis` and its geometric consumers below
-   `AlgebraicGeometry/Numerical/`.
-2. `AlgebraicGeometry/Proj/Modules/LaurentProjection.lean` begins with generic
-   `Finsupp`/`MvPolynomial.divMonomial` degree and support lemmas. Extract the
-   geometry-free prefix to `Algebra/MvPolynomial/DivMonomial.lean` before the
-   projective-space localization and Čech consumers.
+1. Review `AlgebraicGeometry/Proj/Modules/LaurentBasis.lean`: its exponent-vector
+   arithmetic and several monomial/localization declarations still have only
+   `Finsupp`, `MvPolynomial`, graded-algebra, or degree-zero-localization
+   vocabulary. Separate those generic roots before retaining the projective
+   Čech specialization.
+2. After the Laurent-basis root is separated, review the remaining
+   `LaurentProjection.lean` API. `IsPolynomialTwist`, `AwayRep`, and the
+   representative-independent sign projection are algebraic in their current
+   signatures even though their motivating consumer is projective geometry.
 
 For each lane, remove the old path rather than retaining an import-only shim,
 update audits and umbrellas in the same pull request, and add a focused

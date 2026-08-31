@@ -1419,6 +1419,159 @@ def main() -> int:
                 f"generic module-localization declaration {fragment!r}"
             )
 
+    graded_basis_owner = SOURCE_ROOT / "LinearAlgebra" / "GradedBasis.lean"
+    numerical_graded_basis_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Numerical" / "Core" /
+            "GradedBasis.lean"
+    )
+    if not graded_basis_owner.is_file():
+        failures.append(
+            "canonical weighted-basis owner is missing: "
+            f"{graded_basis_owner.relative_to(ROOT)}"
+        )
+    else:
+        graded_basis_text = graded_basis_owner.read_text(encoding="utf-8")
+        for fragment in (
+            "namespace DerivedAlgGeo.LinearAlgebra",
+            "def gradedPiece",
+            "theorem gradedPiece_iSupIndep",
+            "theorem gradedPiece_iSup_eq_top",
+            "theorem gradedPiece_isInternal",
+            "theorem gradedPiece_mul_mem",
+        ):
+            if fragment not in graded_basis_text:
+                failures.append(
+                    f"{graded_basis_owner.relative_to(ROOT)}: missing generic "
+                    f"weighted-basis declaration {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            graded_basis_text,
+            re.MULTILINE,
+        ) or "NumericalRingData" in graded_basis_text:
+            failures.append(
+                f"{graded_basis_owner.relative_to(ROOT)}: weighted-basis owner "
+                "depends on its geometric numerical consumer"
+            )
+
+    graded_basis_import = "DerivedAlgGeo.LinearAlgebra.GradedBasis"
+    if graded_basis_import not in imports_by_path[numerical_graded_basis_consumer]:
+        failures.append(
+            f"{numerical_graded_basis_consumer.relative_to(ROOT)}: numerical "
+            "constructor must import the generic weighted-basis owner directly"
+        )
+    numerical_graded_basis_text = numerical_graded_basis_consumer.read_text(
+        encoding="utf-8"
+    )
+    if "def NumericalRingData.ofGradedBasis" not in numerical_graded_basis_text:
+        failures.append(
+            f"{numerical_graded_basis_consumer.relative_to(ROOT)}: missing "
+            "geometric NumericalRingData consumer"
+        )
+    for declaration in (
+        "gradedPiece",
+        "mem_gradedPiece",
+        "gradedPiece_eq_bot",
+        "gradedPiece_iSupIndep",
+        "gradedPiece_iSup_eq_top",
+        "gradedPiece_isInternal",
+        "gradedPiece_mul_mem",
+    ):
+        if re.search(
+            rf"^(?:def|theorem)\s+{declaration}\b",
+            numerical_graded_basis_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{numerical_graded_basis_consumer.relative_to(ROOT)}: restored "
+                f"generic weighted-basis declaration {declaration}"
+            )
+
+    graded_basis_umbrella = SOURCE_ROOT / "LinearAlgebra.lean"
+    if graded_basis_import not in imports_by_path[graded_basis_umbrella]:
+        failures.append(
+            f"{graded_basis_umbrella.relative_to(ROOT)}: missing weighted-basis "
+            "umbrella import"
+        )
+
+    div_monomial_owner = (
+        SOURCE_ROOT / "Algebra" / "MvPolynomial" / "DivMonomial.lean"
+    )
+    laurent_projection_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "LaurentProjection.lean"
+    )
+    if not div_monomial_owner.is_file():
+        failures.append(
+            "canonical multivariate monomial-division owner is missing: "
+            f"{div_monomial_owner.relative_to(ROOT)}"
+        )
+    else:
+        div_monomial_text = div_monomial_owner.read_text(encoding="utf-8")
+        for fragment in (
+            "namespace Finsupp",
+            "theorem degree_eq_weight_one_apply",
+            "namespace MvPolynomial",
+            "theorem isHomogeneous_divMonomial",
+            "theorem divMonomial_monomial_mul_add",
+            "theorem divMonomial_monomial_mul_comm",
+            "theorem divMonomial_pow_mul",
+        ):
+            if fragment not in div_monomial_text:
+                failures.append(
+                    f"{div_monomial_owner.relative_to(ROOT)}: missing generic "
+                    f"monomial-division declaration {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            div_monomial_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{div_monomial_owner.relative_to(ROOT)}: algebraic "
+                "monomial-division owner depends on geometry"
+            )
+
+    div_monomial_import = "DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial"
+    if div_monomial_import not in imports_by_path[laurent_projection_consumer]:
+        failures.append(
+            f"{laurent_projection_consumer.relative_to(ROOT)}: Laurent "
+            "projection must import the algebraic monomial-division owner directly"
+        )
+    for path in sorted((SOURCE_ROOT / "AlgebraicGeometry" / "Proj").rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        for declaration in (
+            "degree_eq_weight_one_apply",
+            "isHomogeneous_divMonomial",
+            "divMonomial_monomial_mul_add",
+            "divMonomial_monomial_mul_comm",
+            "divMonomial_pow_mul",
+        ):
+            if re.search(
+                rf"^(?:def|theorem)\s+{declaration}\b", text, re.MULTILINE
+            ):
+                failures.append(
+                    f"{path.relative_to(ROOT)}: restored generic "
+                    f"monomial-division declaration {declaration}"
+                )
+
+    div_monomial_umbrellas = {
+        SOURCE_ROOT / "Algebra" / "MvPolynomial.lean": div_monomial_import,
+        SOURCE_ROOT / "Algebra.lean": "DerivedAlgGeo.Algebra.MvPolynomial",
+    }
+    for path, required_import in div_monomial_umbrellas.items():
+        if not path.is_file():
+            failures.append(
+                f"monomial-division umbrella missing: {path.relative_to(ROOT)}"
+            )
+        elif required_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: missing monomial-division "
+                f"umbrella import {required_import}"
+            )
+
     exterior_power_owners = {
         SOURCE_ROOT / "LinearAlgebra" / "ExteriorPower" /
             "Semilinear.lean": "namespace LinearMap\n",
@@ -1889,6 +2042,10 @@ def main() -> int:
     print(
         "ok: module-localization kernel maps use the Algebra owner, and "
         "coherent-sheaf geometry imports them as a direct consumer"
+    )
+    print(
+        "ok: weighted-basis decompositions use LinearAlgebra and pure "
+        "monomial-division identities use Algebra; geometric files are consumers"
     )
     print(
         "ok: weak-stability family declarations use the matching "

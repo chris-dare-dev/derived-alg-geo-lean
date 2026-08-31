@@ -288,6 +288,12 @@ documentation, architecture checks, and CI paths together.
 - Ring/module/localization declarations with no site belong to `Algebra/`;
   linear-map, basis, lattice, matrix, multilinear, and exterior-power
   declarations with no site belong to `LinearAlgebra/`.
+- Weighted-basis submodules and their internal direct-sum proofs use
+  `LinearAlgebra/GradedBasis.lean`; numerical intersection-ring assembly
+  consumes them from algebraic geometry.
+- Pure `Finsupp` and `MvPolynomial.divMonomial` identities use
+  `Algebra/MvPolynomial/DivMonomial.lean`, even when their first application is
+  a projective Čech calculation.
 - Inspect the surrounding consumer file for adjacent generic declarations. If
   an identified block is not moved in the current slice, record it in
   `docs/architecture/cutover-ledger.md` and do not extend it in place.
