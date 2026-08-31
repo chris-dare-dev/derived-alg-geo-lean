@@ -24,9 +24,12 @@ of schemes or on pullback; those consumers live under `DerivedCategory/Families/
 The closing section gives every line bundle a canonical image in this
 category: `LineBundleData.coh` packages the underlying sheaf with its
 coherence proof, and `LineBundleData.derivedObject` places it in degree zero
-of `D(Coh X)`, where it is perfect and bounded. This is the adapter geometric
-consumers use to speak about a line bundle *as a derived object* without
-re-deriving the `Coh`-object and `singleFunctor` plumbing each time.
+of `D(Coh X)`, where it is perfect and bounded; `cohIso` and
+`derivedObjectIso` transport both along an isomorphism of underlying sheaves,
+so statements about a collection of line bundles are well-defined up to iso.
+This is the adapter geometric consumers use to speak about a line bundle *as
+a derived object* without re-deriving the `Coh`-object and `singleFunctor`
+plumbing each time.
 -/
 
 namespace AlgebraicGeometry.DerivedCategory
@@ -157,7 +160,7 @@ precedent of `LineBundleData.toPic_eq_iff` in `CoherentSheaf/StructureSheaf.lean
 
 namespace AlgebraicGeometry.Scheme.Modules.LineBundleData
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry.DerivedCategory
+open CategoryTheory AlgebraicGeometry.DerivedCategory
 
 noncomputable section
 
@@ -178,8 +181,10 @@ theorem coh_obj (L : LineBundleData X) : L.coh.obj = L.line :=
 
 /-- The unit line bundle's `Coh` avatar is the structure sheaf. Both sides are
 the same pair by definition; this records that the two routes to `O_X` in
-`Coh X` cannot drift apart. -/
-theorem unit_coh : (unit X).coh = Scheme.structureSheafCoh X :=
+`Coh X` cannot drift apart. `X` is explicit because nothing else in the
+statement determines it, matching `unit_toPic`. -/
+@[simp]
+theorem unit_coh (X : Scheme.{u}) : (unit X).coh = Scheme.structureSheafCoh X :=
   rfl
 
 /-- Lift an isomorphism of underlying sheaves to `Coh X`. The inclusion is
@@ -191,7 +196,11 @@ noncomputable def cohIso {L M : LineBundleData X} (e : L.line ≅ M.line) :
 
 variable [IsLocallyNoetherian X]
 
-/-- A line bundle as a degree-zero object of the coherent derived category. -/
+/-- A line bundle placed in degree zero of `D(Coh X)` — not `Dᵇ(Coh X)` and
+not `Perf(X)`, which is why `unit_derivedObject` has to project `.obj` off
+`SchemePerfectDerivedCategory.structureSheaf`. This is definitionally the same
+`singleFunctor` expression `schemeFiniteLocallyFreeGenerator` uses inline, so
+`derivedObject_mem_generator` closes on `Iso.refl`. -/
 noncomputable def derivedObject (L : LineBundleData X) :
     SchemeCoherentDerivedCategory X :=
   (DerivedCategory.singleFunctor (Coh X) 0).obj L.coh
@@ -230,7 +239,7 @@ noncomputable def derivedObjectIso {L M : LineBundleData X}
 canonical perfect structure sheaf. Definitional, so the two routes to `O_X`
 in `D(Coh X)` — through `LineBundleData` and through
 `SchemePerfectDerivedCategory.structureSheaf` — are identified for free. -/
-theorem unit_derivedObject :
+theorem unit_derivedObject (X : Scheme.{u}) [IsLocallyNoetherian X] :
     (unit X).derivedObject =
       (SchemePerfectDerivedCategory.structureSheaf X).obj :=
   rfl
