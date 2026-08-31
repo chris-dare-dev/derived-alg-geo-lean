@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentBasis
+import DerivedAlgGeo.Algebra.MvPolynomial.LaurentBasis
 import DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial
 
 /-!
@@ -59,7 +59,7 @@ The caller that matters is a Čech face, which produces the two pieces separatel
 monomial division, homogeneous localization, projective space
 -/
 
-open MvPolynomial
+open GradedModule MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 
@@ -212,7 +212,7 @@ noncomputable def AwayRep.project (h𝓜 : IsPolynomialTwist 𝓜 d) {γ γ' : �
     (hγ : γ = Finsupp.single i₀ c + γ') (r : AwayRep ι R 𝓜 γ) : AwayRep ι R 𝓜 γ' where
   pow := r.pow
   num := MvPolynomial.divMonomial r.num (Finsupp.single i₀ (r.pow * c))
-  num_mem := h𝓜.divMonomial_mem hγ r.num_mem
+  num_mem := IsPolynomialTwist.divMonomial_mem h𝓜 hγ r.num_mem
 
 omit [AddSubgroupClass σM (MvPolynomial ι R)]
   [SetLike.GradedSMul (polynomialGrading ι R) 𝓜] in
@@ -227,7 +227,7 @@ theorem AwayRep.pow_mul_num_mem (h𝓜 : IsPolynomialTwist 𝓜 d) {γ : ι →�
   have h1 : ((MvPolynomial.monomial γ (1 : R)) ^ t).IsHomogeneous (t * γ.degree) := by
     rw [monomial_one_pow]
     exact MvPolynomial.isHomogeneous_monomial 1 (by rw [map_nsmul, smul_eq_mul])
-  exact h𝓜.mul_mem_of_isHomogeneous h1 (by simp only [smul_eq_mul]; ring) r.num_mem
+  exact IsPolynomialTwist.mul_mem_of_isHomogeneous h𝓜 h1 (by simp only [smul_eq_mul]; ring) r.num_mem
 
 set_option maxHeartbeats 1200000 in
 /-- Projecting a representative is the same as raising it first and then projecting.
@@ -243,13 +243,13 @@ theorem AwayRep.frac_project_raise (h𝓜 : IsPolynomialTwist 𝓜 d) {γ γ' : 
         (monomial_one_mem_polynomialGrading (R := R) γ') (r.pow + t)
         (MvPolynomial.divMonomial ((MvPolynomial.monomial γ (1 : R)) ^ t * r.num)
           (Finsupp.single i₀ ((r.pow + t) * c)))
-        (h𝓜.divMonomial_mem hγ (r.pow_mul_num_mem h𝓜 t)) := by
+        (IsPolynomialTwist.divMonomial_mem h𝓜 hγ (r.pow_mul_num_mem h𝓜 t)) := by
   have hnum := divMonomial_pow_mul hγ hγ' r.pow t r.num
   have hmem2 : (MvPolynomial.monomial γ' (1 : R)) ^ t •
       MvPolynomial.divMonomial r.num (Finsupp.single i₀ (r.pow * c)) ∈
       𝓜 ((r.pow + t) • γ'.degree) := by
     simp only [smul_eq_mul, ← hnum]
-    exact h𝓜.divMonomial_mem hγ (r.pow_mul_num_mem h𝓜 t)
+    exact IsPolynomialTwist.divMonomial_mem h𝓜 hγ (r.pow_mul_num_mem h𝓜 t)
   have hcongr : ∀ (n : ℕ) (a b : MvPolynomial ι R)
       (ha : a ∈ 𝓜 (n • γ'.degree)) (hb : b ∈ 𝓜 (n • γ'.degree)), a = b →
       DegreeZeroLocalization.awayMk (𝓜 := 𝓜)
@@ -261,7 +261,7 @@ theorem AwayRep.frac_project_raise (h𝓜 : IsPolynomialTwist 𝓜 d) {γ γ' : 
   exact DegreeZeroLocalization.awayMk_shift
     (monomial_one_mem_polynomialGrading (R := R) γ') r.pow t
     (MvPolynomial.divMonomial r.num (Finsupp.single i₀ (r.pow * c)))
-    (h𝓜.divMonomial_mem hγ r.num_mem) hmem2
+    (IsPolynomialTwist.divMonomial_mem h𝓜 hγ r.num_mem) hmem2
 
 set_option maxHeartbeats 1200000 in
 /-- **Well-definedness.** Two representatives of one fraction project to the same fraction.
@@ -325,7 +325,7 @@ theorem signProjection_awayMk [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
       DegreeZeroLocalization.awayMk (𝓜 := 𝓜)
         (monomial_one_mem_polynomialGrading (R := R) γ') m
         (MvPolynomial.divMonomial p (Finsupp.single i₀ (m * c)))
-        (h𝓜.divMonomial_mem hγ hp) :=
+        (IsPolynomialTwist.divMonomial_mem h𝓜 hγ hp) :=
   signProjection_frac h𝓜 hγ hγ' ⟨m, p, hp⟩
 
 /-! ## The projection retracts the face inclusion -/
@@ -407,7 +407,7 @@ theorem signProjection_laurentFace [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 
       rw [hmono]
       exact MvPolynomial.isHomogeneous_monomial 1 (by rw [Finsupp.degree_single])
     rw [smul_eq_mul]
-    exact h𝓜.mul_mem_of_isHomogeneous h1 (by simp only [smul_eq_mul]; ring) hq
+    exact IsPolynomialTwist.mul_mem_of_isHomogeneous h𝓜 h1 (by simp only [smul_eq_mul]; ring) hq
   rw [laurentFace_awayMk hγ hq hres,
     DegreeZeroLocalization.awayMk_deg_congr hdeg.symm (monomial_mem_add_degree hγ)
       (monomial_one_mem_polynomialGrading (R := R) γ) m _ hres
@@ -453,7 +453,7 @@ theorem signProjection_add [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
     signProjection_awayMk h𝓜 hγ hγ', signProjection_awayMk h𝓜 hγ hγ',
     signProjection_awayMk h𝓜 hγ hγ',
     ← DegreeZeroLocalization.awayMk_add (monomial_one_mem_polynomialGrading (R := R) γ') m _ _
-      (h𝓜.divMonomial_mem hγ hp₁) (h𝓜.divMonomial_mem hγ hp₂)]
+      (IsPolynomialTwist.divMonomial_mem h𝓜 hγ hp₁) (IsPolynomialTwist.divMonomial_mem h𝓜 hγ hp₂)]
   have hcongr : ∀ (a b : MvPolynomial ι R)
       (ha : a ∈ 𝓜 (m • γ'.degree))
       (hb : b ∈ 𝓜 (m • γ'.degree)), a = b →
@@ -517,7 +517,7 @@ theorem monomial_single_pow_smul_mem (h𝓜 : IsPolynomialTwist 𝓜 d)
     rw [monomial_one_pow, Finsupp.smul_single, smul_eq_mul]
     exact MvPolynomial.isHomogeneous_monomial 1 (by rw [Finsupp.degree_single])
   rw [smul_eq_mul]
-  exact h𝓜.mul_mem_of_isHomogeneous h1 (by simp only [smul_eq_mul]; ring) hp
+  exact IsPolynomialTwist.mul_mem_of_isHomogeneous h𝓜 h1 (by simp only [smul_eq_mul]; ring) hp
 
 set_option maxHeartbeats 1200000 in
 /-- **The projection square.** Away from the retracted face, the sign projection commutes with
@@ -552,13 +552,13 @@ theorem signProjection_laurentFace_comm [IsDomain R] (h𝓜 : IsPolynomialTwist 
   have hres' : (MvPolynomial.monomial (Finsupp.single e c') (1 : R)) ^ m •
       MvPolynomial.divMonomial p (Finsupp.single i₀ (m * c)) ∈
       𝓜 (m • (c' + γ'.degree)) :=
-    monomial_single_pow_smul_mem h𝓜 (h𝓜.divMonomial_mem hγ hp)
+    monomial_single_pow_smul_mem h𝓜 (IsPolynomialTwist.divMonomial_mem h𝓜 hγ hp)
   rw [laurentFace_awayMk hδγ hp hres,
     DegreeZeroLocalization.awayMk_deg_congr hdegδ.symm (monomial_mem_add_degree hδγ)
       (monomial_one_mem_polynomialGrading (R := R) δ) m _ hres hresδ,
     signProjection_awayMk h𝓜 hδsplit hδ'₀,
     signProjection_awayMk h𝓜 hγ hγ',
-    laurentFace_awayMk hδγ' (h𝓜.divMonomial_mem hγ hp) hres',
+    laurentFace_awayMk hδγ' (IsPolynomialTwist.divMonomial_mem h𝓜 hγ hp) hres',
     DegreeZeroLocalization.awayMk_deg_congr hdegδ'.symm (monomial_mem_add_degree hδγ')
       (monomial_one_mem_polynomialGrading (R := R) δ') m _ hres'
       (by rw [hdegδ']; exact hres')]

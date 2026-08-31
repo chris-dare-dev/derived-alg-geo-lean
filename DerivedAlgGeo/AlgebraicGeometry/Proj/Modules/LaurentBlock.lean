@@ -56,7 +56,7 @@ does, and everything must go through `blockProj_awayMk`; the definition itself h
 Laurent monomial, negative support, block decomposition, projective space
 -/
 
-open MvPolynomial
+open Finsupp GradedModule MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 
@@ -314,7 +314,7 @@ noncomputable def AwayRep.blockFilter (h𝓜 : IsPolynomialTwist 𝓜 d) {γ : �
     (r : AwayRep ι R 𝓜 γ) : AwayRep ι R 𝓜 γ where
   pow := r.pow
   num := laurentFilter γ r.pow F r.num
-  num_mem := h𝓜.laurentFilter_mem r.num_mem
+  num_mem := IsPolynomialTwist.laurentFilter_mem h𝓜 r.num_mem
 
 set_option maxHeartbeats 800000 in
 /-- Filtering a representative is the same as raising it first and then filtering. This is
@@ -327,7 +327,7 @@ theorem AwayRep.frac_blockFilter_raise (h𝓜 : IsPolynomialTwist 𝓜 d) {γ : 
       DegreeZeroLocalization.awayMk (𝓜 := 𝓜)
         (monomial_one_mem_polynomialGrading (R := R) γ) (r.pow + t)
         (laurentFilter γ (r.pow + t) F ((MvPolynomial.monomial γ (1 : R)) ^ t * r.num))
-        (h𝓜.laurentFilter_mem (r.pow_mul_num_mem h𝓜 t)) := by
+        (IsPolynomialTwist.laurentFilter_mem h𝓜 (r.pow_mul_num_mem h𝓜 t)) := by
   have hσ : t • γ + r.pow • γ = (r.pow + t) • γ := by
     rw [← add_nsmul, Nat.add_comm t r.pow]
   have hnum : laurentFilter γ (r.pow + t) F ((MvPolynomial.monomial γ (1 : R)) ^ t * r.num) =
@@ -337,7 +337,7 @@ theorem AwayRep.frac_blockFilter_raise (h𝓜 : IsPolynomialTwist 𝓜 d) {γ : 
   have hmem2 : (MvPolynomial.monomial γ (1 : R)) ^ t • laurentFilter γ r.pow F r.num ∈
       𝓜 ((r.pow + t) • γ.degree) := by
     simp only [smul_eq_mul, ← hnum]
-    exact h𝓜.laurentFilter_mem (r.pow_mul_num_mem h𝓜 t)
+    exact IsPolynomialTwist.laurentFilter_mem h𝓜 (r.pow_mul_num_mem h𝓜 t)
   have hcongr : ∀ (a b : MvPolynomial ι R)
       (ha : a ∈ 𝓜 ((r.pow + t) • γ.degree))
       (hb : b ∈ 𝓜 ((r.pow + t) • γ.degree)), a = b →
@@ -349,7 +349,7 @@ theorem AwayRep.frac_blockFilter_raise (h𝓜 : IsPolynomialTwist 𝓜 d) {γ : 
   refine Eq.symm (Eq.trans (hcongr _ _ _ hmem2 hnum) ?_)
   exact DegreeZeroLocalization.awayMk_shift
     (monomial_one_mem_polynomialGrading (R := R) γ) r.pow t
-    (laurentFilter γ r.pow F r.num) (h𝓜.laurentFilter_mem r.num_mem) hmem2
+    (laurentFilter γ r.pow F r.num) (IsPolynomialTwist.laurentFilter_mem h𝓜 r.num_mem) hmem2
 
 set_option maxHeartbeats 800000 in
 /-- **Well-definedness.** Two representatives of one fraction filter to the same fraction. -/
@@ -404,7 +404,7 @@ theorem blockProj_awayMk [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : �
           (monomial_one_mem_polynomialGrading (R := R) γ) m p hp) =
       DegreeZeroLocalization.awayMk (𝓜 := 𝓜)
         (monomial_one_mem_polynomialGrading (R := R) γ) m (laurentFilter γ m F p)
-        (h𝓜.laurentFilter_mem hp) :=
+        (IsPolynomialTwist.laurentFilter_mem h𝓜 hp) :=
   blockProj_frac h𝓜 γ F ⟨m, p, hp⟩
 
 set_option maxHeartbeats 800000 in
@@ -422,7 +422,7 @@ theorem blockProj_add [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι �
       (monomial_one_mem_polynomialGrading (R := R) γ) m p₁ p₂ hp₁ hp₂,
     blockProj_awayMk h𝓜 γ F, blockProj_awayMk h𝓜 γ F, blockProj_awayMk h𝓜 γ F,
     ← DegreeZeroLocalization.awayMk_add (monomial_one_mem_polynomialGrading (R := R) γ) m _ _
-      (h𝓜.laurentFilter_mem hp₁) (h𝓜.laurentFilter_mem hp₂)]
+      (IsPolynomialTwist.laurentFilter_mem h𝓜 hp₁) (IsPolynomialTwist.laurentFilter_mem h𝓜 hp₂)]
   have hcongr : ∀ (a b : MvPolynomial ι R)
       (ha : a ∈ 𝓜 (m • γ.degree))
       (hb : b ∈ 𝓜 (m • γ.degree)), a = b →
@@ -477,15 +477,15 @@ theorem sum_blockProj [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι �
       = ∑ F ∈ γ.support.powerset,
           DegreeZeroLocalization.awayMk (𝓜 := 𝓜)
             (monomial_one_mem_polynomialGrading (R := R) γ) m (laurentFilter γ m F p)
-            (h𝓜.laurentFilter_mem hp) :=
+            (IsPolynomialTwist.laurentFilter_mem h𝓜 hp) :=
         Finset.sum_congr rfl fun F _ => blockProj_awayMk h𝓜 γ F hp
     _ = DegreeZeroLocalization.awayMk (𝓜 := 𝓜)
           (monomial_one_mem_polynomialGrading (R := R) γ) m
           (∑ F ∈ γ.support.powerset, laurentFilter γ m F p)
-          (sum_mem fun F _ => h𝓜.laurentFilter_mem hp) :=
+          (sum_mem fun F _ => IsPolynomialTwist.laurentFilter_mem h𝓜 hp) :=
         (DegreeZeroLocalization.awayMk_sum
           (monomial_one_mem_polynomialGrading (R := R) γ) m γ.support.powerset
-          (fun F => laurentFilter γ m F p) fun F => h𝓜.laurentFilter_mem hp).symm
+          (fun F => laurentFilter γ m F p) fun F => IsPolynomialTwist.laurentFilter_mem h𝓜 hp).symm
     _ = DegreeZeroLocalization.awayMk (𝓜 := 𝓜)
           (monomial_one_mem_polynomialGrading (R := R) γ) m p hp :=
         hcongr _ _ _ _ (sum_laurentFilter_powerset γ m p)
@@ -566,12 +566,12 @@ theorem laurentFace_blockProj [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
   have hres : (MvPolynomial.monomial (Finsupp.single e c) (1 : R)) ^ m •
       laurentFilter γ' m F q ∈
       𝓜 (m • (c + γ'.degree)) :=
-    monomial_single_pow_smul_mem h𝓜 (h𝓜.laurentFilter_mem hq)
+    monomial_single_pow_smul_mem h𝓜 (IsPolynomialTwist.laurentFilter_mem h𝓜 hq)
   have hres' : (MvPolynomial.monomial (Finsupp.single e c) (1 : R)) ^ m • q ∈
       𝓜 (m • (c + γ'.degree)) :=
     monomial_single_pow_smul_mem h𝓜 hq
   rw [blockProj_awayMk h𝓜 γ' F,
-    laurentFace_awayMk hγ (h𝓜.laurentFilter_mem hq) hres,
+    laurentFace_awayMk hγ (IsPolynomialTwist.laurentFilter_mem h𝓜 hq) hres,
     DegreeZeroLocalization.awayMk_deg_congr hdeg.symm (monomial_mem_add_degree hγ)
       (monomial_one_mem_polynomialGrading (R := R) γ) m _ hres (by rw [hdeg]; exact hres),
     laurentFace_awayMk hγ hq hres',

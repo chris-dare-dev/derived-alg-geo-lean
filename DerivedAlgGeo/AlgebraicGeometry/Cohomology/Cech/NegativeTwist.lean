@@ -57,6 +57,8 @@ universe u
 
 open CategoryTheory TopologicalSpace
 
+open GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra

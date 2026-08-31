@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.StructureModule
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistChart
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistingSheaf
+import DerivedAlgGeo.Algebra.MvPolynomial.Grading
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Affine
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Descent.Locality
 import Mathlib.RingTheory.MvPolynomial.Homogeneous
@@ -59,6 +60,8 @@ noncomputable section
 
 open CategoryTheory TopologicalSpace
 open scoped DirectSum Pointwise
+
+open GradedModule MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 
@@ -583,11 +586,6 @@ theorem TwistingSectionRange.globalSections_finite
   Module.Finite.equiv (c.comparison d hd).toLinearEquiv
 
 /-! ## Projective-space specialization -/
-
-/-- The standard grading on a multivariate polynomial ring. -/
-abbrev polynomialGrading (ι R : Type u) [CommRing R] :
-    ℕ → Submodule R (MvPolynomial ι R) :=
-  MvPolynomial.homogeneousSubmodule ι R
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 

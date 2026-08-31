@@ -2,7 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Shift
+import DerivedAlgGeo.Algebra.Module.GradedModule.Shift
+import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.AssociatedSheaf
 
 /-!
 # Twists and twisting sheaves on `Proj`
@@ -23,6 +24,8 @@ comparison belongs with the later quasi-coherence/basic-open equivalence.
 noncomputable section
 
 open CategoryTheory TopologicalSpace
+
+open GradedModule
 
 namespace AlgebraicGeometry.Proj
 

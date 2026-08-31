@@ -53,6 +53,8 @@ noncomputable section
 
 open CategoryTheory Opposite SetLike TopCat TopologicalSpace
 
+open GradedModule
+
 namespace AlgebraicGeometry.Proj
 
 universe u

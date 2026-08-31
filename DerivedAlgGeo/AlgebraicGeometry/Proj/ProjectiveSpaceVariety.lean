@@ -32,6 +32,8 @@ universe u
 
 open CategoryTheory MvPolynomial
 
+open GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 variable (ι k : Type u) [Field k]

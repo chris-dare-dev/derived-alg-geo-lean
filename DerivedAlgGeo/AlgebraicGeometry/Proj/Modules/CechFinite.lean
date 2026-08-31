@@ -31,6 +31,8 @@ that `module_finite_linearCoherentH_of_cech` consumes is a separate step and is 
 
 universe u
 
+open GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra

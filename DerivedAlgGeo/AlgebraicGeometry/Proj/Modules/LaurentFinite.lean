@@ -42,6 +42,8 @@ done here.
 
 universe u
 
+open Finsupp GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
@@ -164,7 +166,7 @@ theorem blockProj_univ_mem_span [Fintype ι] {d : ℤ} (h𝓜 : IsPolynomialTwis
   classical
   obtain ⟨m, p, hp, rfl⟩ := DegreeZeroLocalization.exists_awayMk
     (monomial_one_mem_polynomialGrading (R := k) γ) (monomial_one_pow_ne_zero γ) z
-  have hfilt := h𝓜.laurentFilter_mem (F := Finset.univ) (γ := γ) (m := m) hp
+  have hfilt := IsPolynomialTwist.laurentFilter_mem h𝓜 (F := Finset.univ) (γ := γ) (m := m) hp
   rw [blockProj_awayMk h𝓜 γ Finset.univ hp, awayMk_eq_sum_monomial h𝓜 γ _ hfilt]
   refine Submodule.sum_mem _ fun β hβ => ?_
   have hmem1 : MvPolynomial.monomial β (1 : k) ∈ 𝓜 (m • γ.degree) :=

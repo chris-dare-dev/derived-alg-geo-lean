@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.StructureModule
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistLocalization
+import DerivedAlgGeo.Algebra.Module.GradedModule.TwistLocalization
 
 /-!
 # Nonnegative twists on degree-one Proj charts
@@ -22,6 +22,8 @@ noncomputable section
 
 open CategoryTheory DirectSum Opposite SetLike TopCat TopologicalSpace
 open scoped DirectSum Pointwise
+
+open GradedModule
 
 namespace AlgebraicGeometry.Proj
 

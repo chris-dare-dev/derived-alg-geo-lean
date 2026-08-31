@@ -2,7 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Finiteness
+import DerivedAlgGeo.Algebra.Finsupp.LaurentExponent
+import DerivedAlgGeo.Algebra.Module.GradedModule.Shift
+import DerivedAlgGeo.Algebra.MvPolynomial.Grading
 
 /-!
 # Laurent exponents of monomial fractions
@@ -55,90 +57,13 @@ pair in hand.
 Laurent monomial, homogeneous localization, projective space
 -/
 
-open DirectSum SetLike MvPolynomial
+open DirectSum Finsupp GradedModule SetLike
 
-namespace AlgebraicGeometry.Proj
+namespace MvPolynomial
 
 universe u
 
-/-! ## Exponent vectors in `ℤ` -/
-
 variable {ι : Type u}
-
-/-- An exponent vector read in `ℤ`, so that an inverted variable can carry a negative
-exponent. -/
-noncomputable def natToIntExponent : (ι →₀ ℕ) →+ (ι →₀ ℤ) :=
-  Finsupp.mapRange.addMonoidHom (Nat.castAddMonoidHom ℤ)
-
-theorem natToIntExponent_injective :
-    Function.Injective (natToIntExponent (ι := ι)) := fun _ _ h =>
-  Finsupp.mapRange_injective (Nat.cast) Nat.cast_zero Nat.cast_injective h
-
-/-- Reading an exponent vector in `ℤ` does not change its total degree. -/
-theorem degree_natToIntExponent (β : ι →₀ ℕ) :
-    (natToIntExponent β).degree = (β.degree : ℤ) := by
-  classical
-  induction β using Finsupp.induction_linear with
-  | zero => simp
-  | add f g hf hg => simp [map_add, hf, hg]
-  | single a b => simp [natToIntExponent, Finsupp.degree_single]
-
-/-! ## The Laurent exponent of a monomial fraction -/
-
-/-- The Laurent exponent of the monomial fraction `Xᵝ / (Xᵞ)ᵐ`.
-
-Entries are negative exactly where `m • γ` exceeds `β`, which can only happen on the support of
-`γ` — the variables the localization inverts. -/
-noncomputable def laurentExponent (γ : ι →₀ ℕ) (m : ℕ) (β : ι →₀ ℕ) : ι →₀ ℤ :=
-  natToIntExponent β - m • natToIntExponent γ
-
-@[simp]
-theorem laurentExponent_apply (γ : ι →₀ ℕ) (m : ℕ) (β : ι →₀ ℕ) (j : ι) :
-    laurentExponent γ m β j = (β j : ℤ) - m * (γ j : ℤ) := by
-  simp [laurentExponent, natToIntExponent]
-
-/-- Two monomial fractions over powers of `Xᵞ` have the same Laurent exponent exactly when their
-numerators agree after clearing denominators. -/
-theorem laurentExponent_eq_iff (γ : ι →₀ ℕ) (m m' : ℕ) (β β' : ι →₀ ℕ) :
-    laurentExponent γ m β = laurentExponent γ m' β' ↔ m' • γ + β = m • γ + β' := by
-  rw [laurentExponent, laurentExponent, sub_eq_sub_iff_add_eq_add,
-    ← map_nsmul, ← map_nsmul, ← map_add, ← map_add,
-    Function.Injective.eq_iff natToIntExponent_injective]
-  constructor
-  · intro h; rw [add_comm (m' • γ), add_comm (m • γ)]; exact h
-  · intro h; rw [add_comm β, add_comm β']; exact h
-
-/-- **The Laurent exponent has total degree the twist.**
-
-The numerator of a degree-`d` fraction over `(Xᵞ)ᵐ` has degree `m • γ.degree + d`, and the
-exponent subtracts exactly the `m • γ.degree` back off. So `m` disappears: the total degree is
-`d` for every representative, which is what lets the exponent index a `d`-graded piece. -/
-theorem degree_laurentExponent (γ β : ι →₀ ℕ) (m d : ℕ)
-    (hβ : β.degree = m • γ.degree + d) :
-    (laurentExponent γ m β).degree = d := by
-  rw [laurentExponent, map_sub, map_nsmul, degree_natToIntExponent,
-    degree_natToIntExponent, hβ, nsmul_eq_mul, nsmul_eq_mul]
-  push_cast
-  ring
-
-/-- Off the support of `γ` the Laurent exponent is nonnegative: a variable the localization does
-not invert cannot acquire a negative exponent. -/
-theorem laurentExponent_nonneg_of_apply_eq_zero (γ : ι →₀ ℕ) (m : ℕ) (β : ι →₀ ℕ) {j : ι}
-    (hj : γ j = 0) : 0 ≤ laurentExponent γ m β j := by
-  simp [hj]
-
-/-- **The Laurent exponent has total degree the twist**, for a twist of either sign.
-
-This is `degree_laurentExponent` with the numerator's degree hypothesis read in `ℤ`, which is the
-only form available once the twist may be negative: `m • γ.degree + d` is an integer that happens
-to be a natural number, and the numerator's degree is the natural number it equals. -/
-theorem degree_laurentExponent_int (γ β : ι →₀ ℕ) (m : ℕ) (d : ℤ)
-    (hβ : (β.degree : ℤ) = m • (γ.degree : ℤ) + d) :
-    (laurentExponent γ m β).degree = d := by
-  rw [laurentExponent, map_sub, map_nsmul, degree_natToIntExponent,
-    degree_natToIntExponent, hβ]
-  push_cast
-  ring
 
 /-! ## Monomials as homogeneous denominators and numerators -/
 
@@ -446,4 +371,4 @@ theorem sum_awayMk_monomial_eq_zero_iff [IsDomain R] {γ : ι →₀ ℕ} {d m :
     DegreeZeroLocalization.awayMk_eq_zero_iff _ (monomial_one_ne_zero (R := R) γ),
     sum_monomial_eq_zero_iff]
 
-end AlgebraicGeometry.Proj
+end MvPolynomial

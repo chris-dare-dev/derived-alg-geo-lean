@@ -2,13 +2,13 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.AssociatedSheaf
+import DerivedAlgGeo.Algebra.Module.GradedModule.Localization
 
 /-!
 # Shifts of naturally graded modules
 
-`Proj` starts from an `ℕ`-graded ring, while twisting sheaves are conventionally indexed by
-`ℤ`.  This file keeps that boundary visible.
+An `ℕ`-graded ring can support module twists conventionally indexed by `ℤ`. This file keeps that
+boundary visible without assuming a geometric realization.
 
 * `natShift 𝓜 d` has degree-`n` piece `𝓜 (n + d)` and composes strictly.
 * `intShift 𝓜 d` uses the same formula with `n + d : ℤ`, extending `𝓜` by the zero subgroup
@@ -23,7 +23,7 @@ noncomputable section
 
 open scoped Pointwise
 
-namespace AlgebraicGeometry.Proj
+namespace GradedModule
 
 universe u
 
@@ -261,4 +261,4 @@ theorem isDegreeZero_intShift_intShift_iff (S : Submonoid A)
       simp only [one_smul, Submonoid.mk_smul, smul_smul]
       rw [mul_comm]
 
-end AlgebraicGeometry.Proj
+end GradedModule

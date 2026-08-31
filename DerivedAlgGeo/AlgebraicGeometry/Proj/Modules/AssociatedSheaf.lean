@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.GradedLocalization
+import DerivedAlgGeo.Algebra.Module.GradedModule.Localization
 import Mathlib.Algebra.Category.ModuleCat.Stalk
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic
@@ -26,6 +26,8 @@ noncomputable section
 open scoped DirectSum Pointwise
 
 open CategoryTheory DirectSum Opposite SetLike TopCat TopologicalSpace
+
+open GradedModule
 
 namespace AlgebraicGeometry.Proj
 

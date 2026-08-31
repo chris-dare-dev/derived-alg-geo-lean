@@ -16,8 +16,8 @@ the ordinary localized module `LocalizedModule S M`. We isolate inside the latte
 whose module numerator and ring denominator lie in matching graded pieces.
 
 The construction is intentionally indexed by the same additive grading monoid on the ring and
-the module. Integer shifts, which require reconciling the natural grading used by `Proj` with an
-integer grading on modules, belong to the later twisting-sheaf layer.
+the module. Integer shifts, which reconcile a natural grading on the ring with an integer-indexed
+family of module twists, belong to the separate graded-shift layer.
 
 ## Localizing away from one element
 
@@ -51,7 +51,7 @@ noncomputable section
 
 open DirectSum SetLike
 
-namespace AlgebraicGeometry.Proj
+namespace GradedModule
 
 universe u v
 
@@ -68,9 +68,13 @@ variable (S : Submonoid A)
 
 /-- A module fraction whose numerator and denominator lie in matching graded pieces. -/
 structure NumDenSameDeg where
+  /-- The common grading index of the numerator and denominator. -/
   deg : ι
+  /-- The homogeneous numerator. -/
   num : 𝓜 deg
+  /-- The homogeneous denominator. -/
   den : 𝒜 deg
+  /-- The denominator belongs to the submonoid being localized. -/
   den_mem : (den : A) ∈ S
 
 namespace NumDenSameDeg
@@ -760,7 +764,9 @@ but currently no corresponding bundled map for internally graded modules. -/
 @[ext]
 structure GradedLinearMap {N σN : Type*} [AddCommGroup N] [Module A N]
     [SetLike σN N] [AddSubgroupClass σN N] (𝓝 : ι → σN) where
+  /-- The underlying linear map. -/
   toLinearMap : M →ₗ[A] N
+  /-- The map preserves every homogeneous component. -/
   map_mem : ∀ i (m : M), m ∈ 𝓜 i → toLinearMap m ∈ 𝓝 i
 
 namespace GradedLinearMap
@@ -914,4 +920,4 @@ theorem selfLinearEquiv_symm_apply_mk (c : NumDenSameDeg 𝒜 𝒜 S) :
 
 end DegreeZeroLocalization
 
-end AlgebraicGeometry.Proj
+end GradedModule

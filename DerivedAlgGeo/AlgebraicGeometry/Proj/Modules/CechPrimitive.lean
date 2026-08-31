@@ -34,7 +34,7 @@ exactness and the `Hⁿ(Pⁿ, O(d)) = 0` statement are derived downstream, where
 contracting homotopy, Čech cohomology, projective space, vanishing
 -/
 
-open MvPolynomial
+open Finsupp GradedModule MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 

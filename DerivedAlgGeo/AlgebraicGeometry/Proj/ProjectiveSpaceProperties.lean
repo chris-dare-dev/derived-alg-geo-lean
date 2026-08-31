@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.MvPolynomial.Grading
 import DerivedAlgGeo.AlgebraicGeometry.Proj.ProjectiveSpaceVariety
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Projective
 import Mathlib.AlgebraicGeometry.Noetherian
@@ -41,7 +42,7 @@ They are built from different maps onto the degree-zero part of the grading:
 homomorphism, and it is the mathematical content of this half of the file; everything after it is
 transport.
 
-The two grading spellings are *not* content: `Proj.polynomialGrading` is an `abbrev` for
+The two grading spellings are *not* content: `MvPolynomial.polynomialGrading` is an `abbrev` for
 `MvPolynomial.homogeneousSubmodule`, so `projectiveSpace ι k` and
 `(projectiveSpaceVariety ι k).toScheme` are the same term and the identity typechecks between
 them without an `eqToHom`.
@@ -69,7 +70,7 @@ them without an `eqToHom`.
 
 universe u
 
-open CategoryTheory
+open CategoryTheory MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 

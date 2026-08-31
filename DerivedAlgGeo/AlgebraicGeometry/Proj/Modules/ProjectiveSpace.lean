@@ -30,6 +30,8 @@ noncomputable section
 open CategoryTheory DirectSum Opposite SetLike TopCat TopologicalSpace
 open scoped DirectSum Pointwise
 
+open GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 universe u
@@ -48,7 +50,7 @@ noncomputable def polynomialToNatGlobalSections (ι k : Type u) [Field k] (d : �
     MvPolynomial.homogeneousSubmodule ι k d →+
       polynomialNatGlobalSections ι k d where
   toFun p := by
-    let num : ↥(AlgebraicGeometry.Proj.natShift
+    let num : ↥(GradedModule.natShift
         (polynomialGrading ι k) d 0) :=
       ⟨p.1, by change p.1 ∈ polynomialGrading ι k (0 + d); simpa using p.2⟩
     let den : polynomialGrading ι k 0 :=

@@ -82,6 +82,8 @@ noncomputable section
 
 open CategoryTheory Limits DirectSum Opposite SetLike TopCat TopologicalSpace
 
+open GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 universe u

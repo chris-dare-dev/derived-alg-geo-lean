@@ -294,6 +294,11 @@ documentation, architecture checks, and CI paths together.
 - Pure `Finsupp` and `MvPolynomial.divMonomial` identities use
   `Algebra/MvPolynomial/DivMonomial.lean`, even when their first application is
   a projective Čech calculation.
+- Generic internally graded-module localization and shift APIs use
+  `Algebra/Module/GradedModule/` and the `GradedModule` namespace. Laurent
+  exponent arithmetic uses `Algebra/Finsupp/`; polynomial Laurent-basis
+  statements use `Algebra/MvPolynomial/`. Do not restore the former Proj
+  foundation paths or make algebra import a geometric consumer.
 - Inspect the surrounding consumer file for adjacent generic declarations. If
   an identified block is not moved in the current slice, record it in
   `docs/architecture/cutover-ledger.md` and do not extend it in place.

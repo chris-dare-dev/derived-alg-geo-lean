@@ -53,6 +53,13 @@ division identities in `Algebra/MvPolynomial/DivMonomial.lean`. Numerical-ring
 constructors and projective graded localizations are consumers of those roots,
 not alternative owners.
 
+Degree-zero homogeneous localization, graded shifts, and their algebraic
+trivializations live under `Algebra/Module/GradedModule/` in Mathlib's
+`GradedModule` namespace. Laurent exponent vectors live under
+`Algebra/Finsupp/`, and the multivariate-polynomial Laurent basis lives under
+`Algebra/MvPolynomial/`. Proj sheaves and Čech constructions import these
+algebraic roots directly.
+
 Use Mathlib's established namespace when extending a Mathlib concept. Add a
 same-named umbrella for a new non-leaf directory and export stable leaves
 through their nearest existing umbrellas.

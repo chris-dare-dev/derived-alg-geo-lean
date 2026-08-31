@@ -11,77 +11,78 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Fourfold
 open AlgebraicGeometry AlgebraicGeometry.Numerical
 
 
--- Proj foundations: degree-zero homogeneous module localization is a submodule of Mathlib's
--- ordinary localized module; every homogeneous and denominator certificate remains explicit.
-#print axioms AlgebraicGeometry.Proj.NumDenSameDeg
-#print axioms AlgebraicGeometry.Proj.degreeZeroSubmodule
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mk_surjective
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mk_eq_mk_iff
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mapOfLE
+-- Graded-module algebra consumed by Proj: degree-zero homogeneous module localization is a
+-- submodule of Mathlib's ordinary localized module; every homogeneous and denominator
+-- certificate remains explicit.
+#print axioms GradedModule.NumDenSameDeg
+#print axioms GradedModule.degreeZeroSubmodule
+#print axioms GradedModule.DegreeZeroLocalization.mk_surjective
+#print axioms GradedModule.DegreeZeroLocalization.mk_eq_mk_iff
+#print axioms GradedModule.DegreeZeroLocalization.mapOfLE
 -- mapOfLE needs S <= T, which a Cech face does not give: the denominators are .powers g1 and
 -- .powers g2 with g1 * h = g2, and divisibility does not nest powers submonoids. These two
 -- supply the universal-property route instead -- g1 is already invertible once g2 is.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.isUnit_algebraMap_localization_of_mul_mem
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.isUnit_algebraMap_end_of_mul_mem
+#print axioms GradedModule.DegreeZeroLocalization.isUnit_algebraMap_localization_of_mul_mem
+#print axioms GradedModule.DegreeZeroLocalization.isUnit_algebraMap_end_of_mul_mem
 -- The face map those two lemmas exist for. faceLift is the bare localized-module map from the
 -- universal property; faceMap is its restriction to the degree-zero part, and faceMap_mk is the
 -- explicit fraction m / g1^n |-> h^n m / g2^n that the Cech differential is computed with.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceLift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceLift_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.isDegreeZero_faceLift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceMap
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.coe_faceMap
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceMap_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk
+#print axioms GradedModule.DegreeZeroLocalization.faceLift
+#print axioms GradedModule.DegreeZeroLocalization.faceLift_mk
+#print axioms GradedModule.DegreeZeroLocalization.isDegreeZero_faceLift
+#print axioms GradedModule.DegreeZeroLocalization.faceMap
+#print axioms GradedModule.DegreeZeroLocalization.coe_faceMap
+#print axioms GradedModule.DegreeZeroLocalization.faceMap_mk
+#print axioms GradedModule.DegreeZeroLocalization.awayMk
 -- awayMk as a normal form (#491): every away fraction is one, and equality is decided by
 -- cross-multiplication rather than by the existential the general criterion leaves behind.
 -- Both are prerequisites for any basis of the away localization.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.exists_awayMk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_eq_awayMk_iff
+#print axioms GradedModule.DegreeZeroLocalization.exists_awayMk
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_eq_awayMk_iff
 -- Numerator additivity at a fixed denominator, and the common-denominator move. Together these
 -- are what a spanning argument over monomial numerators consumes; none needs cancellation.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_zero
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_add
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_sum
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_shift
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_zero
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_add
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_sum
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_shift
 -- Two fractions share a denominator (#491 -> #340): exists_awayMk twice plus awayMk_shift on
 -- each side. Every additivity statement about maps defined on awayMk representatives opens
 -- with this move.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.exists_awayMk_pair
+#print axioms GradedModule.DegreeZeroLocalization.exists_awayMk_pair
 -- A fraction is zero exactly when its numerator is (#491). This is what makes the numerator a
 -- faithful record: independence of fractions reduces to independence of numerators.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_eq_zero_iff
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_eq_zero_iff
 -- The face map in awayMk normal form, and the degree-index transport its callers need.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_deg_congr
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceMap_awayMk
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_deg_congr
+#print axioms GradedModule.DegreeZeroLocalization.faceMap_awayMk
 -- Auto-generated, not hand-written: `awayMk` carries its membership certificate as a dependent
 -- argument, so the first `rw [coe_awayMk]` in this file makes Lean emit a congruence lemma for
 -- it. It is a public declaration and the completeness ratchet counts it, so it is recorded here
 -- rather than left to widen the unaudited gap.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk.congr_simp
+#print axioms GradedModule.DegreeZeroLocalization.awayMk.congr_simp
 -- The Laurent exponent of a monomial fraction (#491). awayMk_monomial_eq_iff_laurentExponent is
 -- the load-bearing one: it makes beta - m * gamma a complete invariant, so the monomial
 -- fractions of a twist are indexed by exponents rather than by representatives. The other two
 -- statements cut that index down to the set the basis needs -- total degree the twist, and
 -- nonnegative off the support of gamma.
-#print axioms AlgebraicGeometry.Proj.natToIntExponent
-#print axioms AlgebraicGeometry.Proj.natToIntExponent_injective
-#print axioms AlgebraicGeometry.Proj.degree_natToIntExponent
-#print axioms AlgebraicGeometry.Proj.laurentExponent
-#print axioms AlgebraicGeometry.Proj.laurentExponent_apply
-#print axioms AlgebraicGeometry.Proj.laurentExponent_eq_iff
+#print axioms Finsupp.natToIntExponent
+#print axioms Finsupp.natToIntExponent_injective
+#print axioms Finsupp.degree_natToIntExponent
+#print axioms Finsupp.laurentExponent
+#print axioms Finsupp.laurentExponent_apply
+#print axioms Finsupp.laurentExponent_eq_iff
 -- The twist abstraction (#568). IsPolynomialTwist isolates the only reading of a numerator the
 -- Laurent argument makes -- an element of 𝓜 n is homogeneous of degree n + d -- so the stack can
 -- be stated once and instantiated at natShift for d : N and intShift for d : Z. The p = 0
 -- disjunct is what makes intShift fit: it carries zero in degrees where n + d is negative and
 -- there is no graded piece to name.
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist
-#print axioms AlgebraicGeometry.Proj.isPolynomialTwist_natShift
-#print axioms AlgebraicGeometry.Proj.isPolynomialTwist_intShift
-#print axioms AlgebraicGeometry.Proj.degree_laurentExponent_int
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.degree_eq_of_mem_support
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.monomial_coeff_mem
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.degree_laurentExponent_of_mem_support
+#print axioms MvPolynomial.IsPolynomialTwist
+#print axioms MvPolynomial.isPolynomialTwist_natShift
+#print axioms MvPolynomial.isPolynomialTwist_intShift
+#print axioms Finsupp.degree_laurentExponent_int
+#print axioms MvPolynomial.IsPolynomialTwist.degree_eq_of_mem_support
+#print axioms MvPolynomial.IsPolynomialTwist.monomial_coeff_mem
+#print axioms MvPolynomial.IsPolynomialTwist.degree_laurentExponent_of_mem_support
 -- The degree bookkeeping at either sign. The by_cases on the quotient is the only place the two
 -- signs behave differently: a negative twist can put the numerator's degree below m * c, and then
 -- the quotient is zero rather than a numerator of lower degree.
@@ -115,24 +116,24 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_exactAt
 #print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_homology_isZero
 #print axioms AlgebraicGeometry.Proj.polynomialIntTwisting_H_subsingleton
-#print axioms AlgebraicGeometry.Proj.degree_laurentExponent
-#print axioms AlgebraicGeometry.Proj.laurentExponent_nonneg_of_apply_eq_zero
-#print axioms AlgebraicGeometry.Proj.monomial_one_mem_polynomialGrading
-#print axioms AlgebraicGeometry.Proj.monomial_one_pow
-#print axioms AlgebraicGeometry.Proj.monomial_one_ne_zero
-#print axioms AlgebraicGeometry.Proj.monomial_mem_natShift
-#print axioms AlgebraicGeometry.Proj.awayMk_monomial_eq_iff
-#print axioms AlgebraicGeometry.Proj.awayMk_monomial_eq_iff_laurentExponent
+#print axioms Finsupp.degree_laurentExponent
+#print axioms Finsupp.laurentExponent_nonneg_of_apply_eq_zero
+#print axioms MvPolynomial.monomial_one_mem_polynomialGrading
+#print axioms MvPolynomial.monomial_one_pow
+#print axioms MvPolynomial.monomial_one_ne_zero
+#print axioms MvPolynomial.monomial_mem_natShift
+#print axioms MvPolynomial.awayMk_monomial_eq_iff
+#print axioms MvPolynomial.awayMk_monomial_eq_iff_laurentExponent
 -- Spanning (#491): the monomial fractions exhaust the localization. exists_sum_awayMk_monomial
 -- puts every element over ONE common denominator, so a map defined on monomial fractions extends
 -- with no further alignment; laurentExponent_mem_index says the exponents it contributes are
 -- exactly the admissible ones.
-#print axioms AlgebraicGeometry.Proj.monomial_one_pow_ne_zero
-#print axioms AlgebraicGeometry.Proj.degree_eq_of_mem_support
-#print axioms AlgebraicGeometry.Proj.monomial_coeff_mem_natShift
-#print axioms AlgebraicGeometry.Proj.awayMk_eq_sum_monomial
-#print axioms AlgebraicGeometry.Proj.exists_sum_awayMk_monomial
-#print axioms AlgebraicGeometry.Proj.laurentExponent_mem_index
+#print axioms MvPolynomial.monomial_one_pow_ne_zero
+#print axioms MvPolynomial.degree_eq_of_mem_support
+#print axioms MvPolynomial.monomial_coeff_mem_natShift
+#print axioms MvPolynomial.awayMk_eq_sum_monomial
+#print axioms MvPolynomial.exists_sum_awayMk_monomial
+#print axioms MvPolynomial.laurentExponent_mem_index
 -- The numerator side of the sign projection (#491 -> #340). The generic
 -- `MvPolynomial.divMonomial` identities are audited in `AlgebraMvPolynomial.lean`;
 -- this is the first projective graded-localization consumer.
@@ -140,8 +141,8 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- Independence (#491): a vanishing monomial combination at a fixed denominator has vanishing
 -- coefficients. With exists_sum_awayMk_monomial this is the basis statement in usable form -- a
 -- map may be DEFINED by its effect on monomial fractions.
-#print axioms AlgebraicGeometry.Proj.sum_monomial_eq_zero_iff
-#print axioms AlgebraicGeometry.Proj.sum_awayMk_monomial_eq_zero_iff
+#print axioms MvPolynomial.sum_monomial_eq_zero_iff
+#print axioms MvPolynomial.sum_awayMk_monomial_eq_zero_iff
 -- The projection descends to the localization and retracts the face inclusion (#491 -> #340).
 -- signProjection is defined by choosing a representative; signProjection_awayMk is the equation
 -- that pins it down, and signProjection_laurentFace is the first of the two properties the
@@ -242,12 +243,12 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- monomial-level maps conjugated by that transport. cechTermCongr_apply_section is the whole
 -- of the dependent rewriting the vanishing computation needs; the three identities it runs on
 -- are cechFace_cechBlockProj, cechHomotopy_cechFace_zero and cechHomotopy_cechFace_succ.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_awayMk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_trans
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_symm_apply_apply
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_symm_trans
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_faceMap
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_awayMk
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_trans
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_symm_apply_apply
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_symm_trans
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_faceMap
 #print axioms AlgebraicGeometry.Proj.tupleExponent
 #print axioms AlgebraicGeometry.Proj.tupleDenominator_eq
 #print axioms AlgebraicGeometry.Proj.tupleExponent_cons
@@ -302,19 +303,19 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.Proj.polynomialVariableCechComplex_exactAt
 #print axioms AlgebraicGeometry.Proj.polynomialVariableCechComplex_homology_isZero
 #print axioms AlgebraicGeometry.Proj.polynomialTwisting_H_subsingleton
-#print axioms AlgebraicGeometry.Proj.GradedLinearMap
-#print axioms AlgebraicGeometry.Proj.GradedLinearMap.map
-#print axioms AlgebraicGeometry.Proj.GradedLinearMap.map_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.selfLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftSelfLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftAwayLinearEquiv
+#print axioms GradedModule.GradedLinearMap
+#print axioms GradedModule.GradedLinearMap.map
+#print axioms GradedModule.GradedLinearMap.map_mk
+#print axioms GradedModule.DegreeZeroLocalization.selfLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.natShiftSelfLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.natShiftAwayLinearEquiv
 -- The trivialization needs f invertible in the localization, not a member of it. A
 -- homogeneous cofactor carrying f into S records that and keeps denominators inside S;
 -- h = 1 is the membership case. Required by the Cech intersections, where the denominator
 -- submonoid is .powers of a product and contains no degree-one element.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftToSelfLinearMapOfMulMem
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftLinearEquivOfMulMem
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftLinearEquivOfMem
+#print axioms GradedModule.DegreeZeroLocalization.natShiftToSelfLinearMapOfMulMem
+#print axioms GradedModule.DegreeZeroLocalization.natShiftLinearEquivOfMulMem
+#print axioms GradedModule.DegreeZeroLocalization.natShiftLinearEquivOfMem
 -- Integer twists (#439). The integer-shift membership condition depends only on the integer
 -- n + d, so lowering the twist by e while raising the fraction degree by e is literally the
 -- same condition -- the zero branch of the zero-extension needs no separate treatment, and the
@@ -322,42 +323,42 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- The two congruence lemmas elaboration generates for the integer-shift defs, audited rather
 -- than filtered: this repo already lists `.congr_simp` records elsewhere, and DGCategory needs
 -- them to reach ceiling 0, so the sweep must keep seeing them.
-#print axioms AlgebraicGeometry.Proj.intShift.congr_simp
-#print axioms AlgebraicGeometry.Proj.intShiftPiece.congr_simp
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mem_intShift_sub_natCast_add
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_mem_intShift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftLowerLinearMap
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftRaiseLinearMap
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftLowerLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftLowerLinearEquiv_apply_mk
+#print axioms GradedModule.intShift.congr_simp
+#print axioms GradedModule.intShiftPiece.congr_simp
+#print axioms GradedModule.DegreeZeroLocalization.mem_intShift_sub_natCast_add
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_mem_intShift
+#print axioms GradedModule.DegreeZeroLocalization.intShiftLowerLinearMap
+#print axioms GradedModule.DegreeZeroLocalization.intShiftRaiseLinearMap
+#print axioms GradedModule.DegreeZeroLocalization.intShiftLowerLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.intShiftLowerLinearEquiv_apply_mk
 -- Aiming at a prescribed twist. intShiftLowerLinearEquiv computes its target as d - e, which
 -- cannot be pointed at A(0) without a transport; the hypothesis-carrying form takes the target
 -- as a parameter instead. intShiftZeroLinearEquiv decides the sign of d once, and nothing
 -- downstream sees the case split.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.transitionScalar_mul
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.smul_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mk_smul_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftShiftLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_toNat_mem_intShift_zero
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv_apply_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv_transition
+#print axioms GradedModule.DegreeZeroLocalization.transitionScalar_mul
+#print axioms GradedModule.DegreeZeroLocalization.smul_mk
+#print axioms GradedModule.DegreeZeroLocalization.mk_smul_mk
+#print axioms GradedModule.DegreeZeroLocalization.intShiftShiftLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_toNat_mem_intShift_zero
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquiv_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquiv_transition
 #print axioms AlgebraicGeometry.Proj.intShiftFiberLinearEquivOfMem
 #print axioms AlgebraicGeometry.Proj.intShiftFiberLinearEquiv
 -- Sections over an open inside the chart. Because the two computation rules above are uniform
 -- in the sign of d, these are a direct mirror of the nonnegative constructions -- nothing here
 -- splits on the sign.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_toNat_mem_intShift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv_symm_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_toNat_mem_intShift
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquiv_symm_apply_mk
 -- The cofactor form (#467). A Cech intersection cannot supply f in S: its denominator has
 -- degree n+1, so for n >= 1 the powers submonoid contains no degree-one element. A homogeneous
 -- cofactor h with f*h in S is what is available. The scalar is parameterized by its exponents
 -- rather than by d, so the inverse is the same definition with the pair swapped -- writing it
 -- as the -d instance would put (- -d).toNat in the term, only propositionally d.toNat.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_mul_pow_mem_intShift_zero
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_mul_pow_mem_intShift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquivOfMulMem
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquivOfMulMem_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_mul_pow_mem_intShift_zero
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_mul_pow_mem_intShift
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquivOfMulMem
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquivOfMulMem_apply_mk
 #print axioms AlgebraicGeometry.Proj.intShiftSectionToZeroOn
 #print axioms AlgebraicGeometry.Proj.intShiftSectionFromZeroOn
 #print axioms AlgebraicGeometry.Proj.intShiftSectionAddEquivOn
@@ -377,9 +378,9 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.Proj.associatedMap
 #print axioms AlgebraicGeometry.Proj.associatedPresheaf_res_apply
 #print axioms AlgebraicGeometry.Proj.associatedIsoOfPiecewiseIff
-#print axioms AlgebraicGeometry.Proj.natShift
-#print axioms AlgebraicGeometry.Proj.intShift
-#print axioms AlgebraicGeometry.Proj.mem_intShift_ofNat_iff
+#print axioms GradedModule.natShift
+#print axioms GradedModule.intShift
+#print axioms GradedModule.mem_intShift_ofNat_iff
 -- Integer shifts compose only where the intermediate degree exists (#584). The unrestricted
 -- statement is false: an inner shift by a negative e asks for degree n + e, and when that integer
 -- is negative the zero extension supplies 0 while the single shift by d + e may still land in a
@@ -387,8 +388,8 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- a remark. It is a fact about the algebraic model only -- associatedSheaf reads these pieces
 -- through homogeneous localizations, where the missing degrees are inverted back in -- so the
 -- sheaf-level O(d)(e) = O(d+e) is not obstructed, but it cannot be transported from here.
-#print axioms AlgebraicGeometry.Proj.mem_intShift_add_iff_of_nonneg
-#print axioms AlgebraicGeometry.Proj.eq_zero_of_mem_intShift_intShift_of_neg
+#print axioms GradedModule.mem_intShift_add_iff_of_nonneg
+#print axioms GradedModule.eq_zero_of_mem_intShift_intShift_of_neg
 
 /-! ## The twisted multiplication A(d) (x) M -> M(d) (#584)
 
@@ -407,7 +408,7 @@ Module.compHom along algebraMap, so that map has to be named. Same gap as #695's
 The section map, the presheaf map through tensorLift, and the isomorphism proof are NOT here, so
 #584 is not closed. -/
 
-#print axioms AlgebraicGeometry.Proj.smul_mem_intShift
+#print axioms GradedModule.smul_mem_intShift
 #print axioms AlgebraicGeometry.Proj.twistMul
 #print axioms AlgebraicGeometry.Proj.coe_twistMul
 #print axioms AlgebraicGeometry.Proj.twistMul_mk
@@ -436,8 +437,8 @@ The section map, the presheaf map through tensorLift, and the isomorphism proof 
 -- record as unobtainable from an algebraic identity: at a localization whose denominators contain
 -- a homogeneous element of positive degree the two families have the same degree-zero part.
 -- Carrying this to the sections of the associated sheaf is NOT here, so #584 is not closed.
-#print axioms AlgebraicGeometry.Proj.mem_intShift_add_of_mem_intShift_intShift
-#print axioms AlgebraicGeometry.Proj.isDegreeZero_intShift_intShift_iff
+#print axioms GradedModule.mem_intShift_add_of_mem_intShift_intShift
+#print axioms GradedModule.isDegreeZero_intShift_intShift_iff
 
 /-! ## The twists compose, on the sheaf side (#584)
 
@@ -486,11 +487,11 @@ The section and .over halves follow below, completing the module trivialization 
 prerequisite the tensor comparison was blocked on. The comparison itself is still missing, so #584
 is not closed. -/
 
-#print axioms Proj.DegreeZeroLocalization.pow_smul_mem_intShift_zero
-#print axioms Proj.DegreeZeroLocalization.pow_smul_mem_intShift
-#print axioms Proj.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv
-#print axioms Proj.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv_apply_mk
-#print axioms Proj.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv_symm_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.pow_smul_mem_intShift_zero
+#print axioms GradedModule.DegreeZeroLocalization.pow_smul_mem_intShift
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv_symm_apply_mk
 #print axioms AlgebraicGeometry.Proj.intShiftModuleFiberLinearEquivOfMem
 -- The section and .over halves, which complete the module trivialization and with it the
 -- prerequisite the tensor comparison was blocked on. Ports of intShiftSectionToZeroOn and
@@ -664,8 +665,8 @@ is not closed. -/
 -- The integer Cech comparison (#467 step 3). Five steps where the nonnegative case has three;
 -- the two extra ones are grading transports that move no data -- the integer trivializations
 -- land at A(0) while the section comparison is stated against A.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.linearEquivOfMemIff
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.coe_linearEquivOfMemIff
+#print axioms GradedModule.DegreeZeroLocalization.linearEquivOfMemIff
+#print axioms GradedModule.DegreeZeroLocalization.coe_linearEquivOfMemIff
 #print axioms AlgebraicGeometry.Proj.sectionAddEquivOfMemIff
 #print axioms AlgebraicGeometry.Proj.intCechTermSectionAddEquiv
 -- Pointwise readings of the integer section maps, toward the bijectivity restatement (#467 3b).
@@ -676,7 +677,7 @@ is not closed. -/
 -- 3b closed. The five-step composite has to be named by `change` before anything rewrites:
 -- simp will not unfold it far enough to expose the mk argument, because two steps are AddEquiv
 -- transports whose apply lemmas only fire once the argument is already in mk form.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.linearEquivOfMemIff_mk
+#print axioms GradedModule.DegreeZeroLocalization.linearEquivOfMemIff_mk
 #print axioms AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_apply_mk
 #print axioms AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_toAddMonoidHom
 #print axioms AlgebraicGeometry.Proj.moduleAwayToSection_intCechDenominator_bijective
@@ -702,7 +703,7 @@ is not closed. -/
 -- in the graded module and never mentions the twist.
 #print axioms AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_res_face
 #print axioms AlgebraicGeometry.Proj.moduleAwayToSection_cechDenominator_bijective
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftLinearEquivOfMulMem_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.natShiftLinearEquivOfMulMem_apply_mk
 #print axioms AlgebraicGeometry.Proj.natShiftSectionFromSelfOn_apply
 #print axioms AlgebraicGeometry.Proj.natShiftFiberLinearEquivOfMem_symm_apply_mk
 #print axioms AlgebraicGeometry.Proj.natShiftSectionFromSelfOn_selfBasicOpenSectionAddEquiv_mk
@@ -2212,7 +2213,7 @@ not reach a negative twist at all.
 `fg_blockSpan` is one localization. Assembling the blocks of a Čech cochain and matching this
 action against `cechScalarAction` are not here, so #666's acceptance criterion is not met. -/
 
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.smul_mem
+#print axioms MvPolynomial.IsPolynomialTwist.smul_mem
 #print axioms AlgebraicGeometry.Proj.polynomialToHomogeneousLocalization
 #print axioms AlgebraicGeometry.Proj.degreeZeroLocalizationModule
 #print axioms AlgebraicGeometry.Proj.awayMk_smul

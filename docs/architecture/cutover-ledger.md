@@ -49,18 +49,25 @@ blocks should normally move it rather than add more declarations beside it.
   homogeneous-degree result, factor-commutation identities, and
   `MvPolynomial.divMonomial_pow_mul`. The projective Laurent projection imports
   that root directly.
+- Graded-module localization and shifts:
+  `Algebra/Module/GradedModule/` extends Mathlib's `GradedModule` namespace with
+  `DegreeZeroLocalization`, natural and integer shifts, twist
+  trivializations, and transport along equal power denominators. Proj sheaves
+  and Čech complexes import these roots as geometric consumers.
+- Laurent monomial bases:
+  `Algebra/Finsupp/LaurentExponent.lean` owns the exponent-vector arithmetic,
+  while `Algebra/MvPolynomial/{Grading,LaurentBasis}.lean` owns the standard
+  polynomial grading, polynomial twists, and the monomial spanning and
+  independence API for degree-zero localizations. The former
+  `AlgebraicGeometry/Proj/Modules/LaurentBasis.lean` path is retired.
 
 ## Confirmed next lanes
 
-1. Review `AlgebraicGeometry/Proj/Modules/LaurentBasis.lean`: its exponent-vector
-   arithmetic and several monomial/localization declarations still have only
-   `Finsupp`, `MvPolynomial`, graded-algebra, or degree-zero-localization
-   vocabulary. Separate those generic roots before retaining the projective
-   Čech specialization.
-2. After the Laurent-basis root is separated, review the remaining
-   `LaurentProjection.lean` API. `IsPolynomialTwist`, `AwayRep`, and the
-   representative-independent sign projection are algebraic in their current
-   signatures even though their motivating consumer is projective geometry.
+1. Review the remaining
+   `LaurentProjection.lean` API. Its `IsPolynomialTwist` numerator transforms,
+   `AwayRep`, and the representative-independent sign projection are algebraic
+   in their current signatures even though their motivating consumer is
+   projective geometry.
 
 For each lane, remove the old path rather than retaining an import-only shim,
 update audits and umbrellas in the same pull request, and add a focused
