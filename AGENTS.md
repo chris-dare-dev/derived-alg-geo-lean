@@ -90,9 +90,10 @@ application, current file, namespace, or proof technique.
 - Degree-zero localization of an internally graded module, graded shifts,
   twist trivializations, and denominator-equality transport belong in
   `Algebra/Module/GradedModule/` under Mathlib's `GradedModule` namespace.
-  Laurent exponent vectors belong in `Algebra/Finsupp/`, and their polynomial
-  localization basis belongs in `Algebra/MvPolynomial/`; Proj and Čech files
-  are downstream consumers.
+  Laurent exponent vectors belong in `Algebra/Finsupp/`. Their polynomial
+  localization basis, representative-independent sign and block projections,
+  one-localization homotopies, and full-block finiteness belong in
+  `Algebra/MvPolynomial/`; projective Čech files are downstream consumers.
 
 When editing a consumer file, inspect adjacent declarations for a generic
 prefix or suffix. Move an in-scope generic block with the consumer change, or

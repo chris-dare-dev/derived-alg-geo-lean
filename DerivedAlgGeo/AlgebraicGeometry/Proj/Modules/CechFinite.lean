@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.CechHomotopy
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentFinite
+import DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite
 
 /-!
 # The full blocks of a Čech degree, assembled

@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentBlock
+import DerivedAlgGeo.Algebra.MvPolynomial.LaurentBlock
 
 /-!
 # The base field acting on a homogeneous localization, and the finiteness of a full block
@@ -42,9 +42,9 @@ done here.
 
 universe u
 
-open Finsupp GradedModule MvPolynomial
+open Finsupp GradedModule
 
-namespace AlgebraicGeometry.Proj
+namespace MvPolynomial
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
@@ -231,4 +231,4 @@ theorem mapOfLE_smul {d : ℤ} (h𝓜 : IsPolynomialTwist 𝓜 d)
   rw [smul_mk ι k 𝓜 h𝓜, DegreeZeroLocalization.mapOfLE_mk,
     DegreeZeroLocalization.mapOfLE_mk, smul_mk ι k 𝓜 h𝓜]
 
-end AlgebraicGeometry.Proj
+end MvPolynomial

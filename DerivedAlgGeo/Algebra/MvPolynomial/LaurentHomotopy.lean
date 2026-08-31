@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.LaurentBlock
+import DerivedAlgGeo.Algebra.MvPolynomial.LaurentBlock
 
 /-!
 # The contracting homotopy of a block, one localization at a time
@@ -48,12 +48,12 @@ produces the identity through the retraction, and every other face cancels betwe
 
 ## Tags
 
-contracting homotopy, Čech complex, homogeneous localization, projective space
+contracting homotopy, Čech complex, homogeneous localization, graded module
 -/
 
-open Finsupp GradedModule MvPolynomial
+open Finsupp GradedModule
 
-namespace AlgebraicGeometry.Proj
+namespace MvPolynomial
 
 universe u
 
@@ -345,4 +345,4 @@ theorem laurentHomotopy_laurentFace_comm [IsDomain R] (h𝓜 : IsPolynomialTwist
     rintro a b ha hb rfl; rfl
   exact hgen _ _ _ _ hnum
 
-end AlgebraicGeometry.Proj
+end MvPolynomial

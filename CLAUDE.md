@@ -296,9 +296,10 @@ documentation, architecture checks, and CI paths together.
   a projective Čech calculation.
 - Generic internally graded-module localization and shift APIs use
   `Algebra/Module/GradedModule/` and the `GradedModule` namespace. Laurent
-  exponent arithmetic uses `Algebra/Finsupp/`; polynomial Laurent-basis
-  statements use `Algebra/MvPolynomial/`. Do not restore the former Proj
-  foundation paths or make algebra import a geometric consumer.
+  exponent arithmetic uses `Algebra/Finsupp/`; polynomial Laurent-basis,
+  projection, block, one-localization homotopy, and full-block finiteness APIs
+  use `Algebra/MvPolynomial/`. Do not restore the former Proj foundation paths
+  or make algebra import a geometric consumer.
 - Inspect the surrounding consumer file for adjacent generic declarations. If
   an identified block is not moved in the current slice, record it in
   `docs/architecture/cutover-ledger.md` and do not extend it in place.

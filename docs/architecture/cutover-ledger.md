@@ -60,14 +60,21 @@ blocks should normally move it rather than add more declarations beside it.
   polynomial grading, polynomial twists, and the monomial spanning and
   independence API for degree-zero localizations. The former
   `AlgebraicGeometry/Proj/Modules/LaurentBasis.lean` path is retired.
+- Laurent localization projections and blocks:
+  `Algebra/MvPolynomial/{LaurentProjection,LaurentBlock,LaurentHomotopy,LaurentFinite}.lean`
+  owns representative-independent sign projections, negative-support block
+  projections, the one-localization contracting map, and full-block
+  finite-generation results. The corresponding former Proj module paths are
+  retired; projective Čech assembly imports the algebraic leaves directly.
 
 ## Confirmed next lanes
 
-1. Review the remaining
-   `LaurentProjection.lean` API. Its `IsPolynomialTwist` numerator transforms,
-   `AwayRep`, and the representative-independent sign projection are algebraic
-   in their current signatures even though their motivating consumer is
-   projective geometry.
+1. Review the boundary beginning at
+   `AlgebraicGeometry/Proj/Modules/CechHomotopy.lean`: its current signatures
+   assemble the Laurent-localization maps against the polynomial variable Čech
+   terms, while later consumers connect those terms to projective sheaves and
+   cohomology. Separate any remaining algebraic Čech prefix before moving the
+   genuinely geometric comparison layer.
 
 For each lane, remove the old path rather than retaining an import-only shim,
 update audits and umbrellas in the same pull request, and add a focused

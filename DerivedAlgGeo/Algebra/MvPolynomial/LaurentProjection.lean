@@ -8,7 +8,7 @@ import DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial
 /-!
 # The numerator side of the sign projection
 
-The contracting homotopy of #340 needs a **sign projection**: given a monomial denominator
+The projective Čech contracting homotopy consumes a **sign projection**: given a monomial denominator
 `Xᵞ = X_{i₀}^c · Xᵞ'` with `γ' i₀ = 0`, a map
 
 ```
@@ -20,8 +20,8 @@ still admissible once `X_{i₀}` is no longer inverted.
 
 On a representative `p / (Xᵞ)ᵐ` that operation is *division by a monomial*: keep the terms of `p`
 divisible by `X_{i₀}^{m·c}` and shift them down. The geometry-free division identities live in
-`DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial`; this file begins where those facts are applied to
-projective graded localizations.
+`DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial`; this file applies them to degree-zero
+localizations of polynomially graded modules, without assuming a geometric realization.
 
 ## Main statements
 
@@ -56,12 +56,12 @@ The caller that matters is a Čech face, which produces the two pieces separatel
 
 ## Tags
 
-monomial division, homogeneous localization, projective space
+monomial division, homogeneous localization, graded module
 -/
 
-open GradedModule MvPolynomial
+open GradedModule
 
-namespace AlgebraicGeometry.Proj
+namespace MvPolynomial
 
 universe u
 
@@ -598,4 +598,4 @@ theorem signProjection_laurentFace_comm [IsDomain R] (h𝓜 : IsPolynomialTwist 
     rintro a b ha hb rfl; rfl
   exact hgen _ _ _ _ hnum
 
-end AlgebraicGeometry.Proj
+end MvPolynomial

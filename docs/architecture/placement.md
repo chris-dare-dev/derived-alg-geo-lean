@@ -75,9 +75,11 @@ not own another copy of the decomposition.
 
 Theorems stated only using `Finsupp`, `MvPolynomial`, homogeneity, and
 `divMonomial` are rooted at `Algebra/MvPolynomial/DivMonomial.lean` in the
-established `Finsupp` and `MvPolynomial` namespaces. The Laurent-projection
-module imports this algebraic root directly before adding graded-localization
-and projective Čech consumers.
+established `Finsupp` and `MvPolynomial` namespaces. Representative-independent
+maps on polynomial degree-zero localizations—including Laurent sign and block
+projections, their one-localization homotopies, and full-block finiteness—also
+belong under `Algebra/MvPolynomial/`. The projective Čech assembly imports
+these algebraic roots as a consumer.
 
 Internally graded modules are algebra, not projective geometry. Extend
 Mathlib's `GradedModule` namespace under `Algebra/Module/GradedModule/` for
