@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Comparison
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.Comparison
 import Mathlib.Algebra.Category.Grp.AB
 import Mathlib.CategoryTheory.Abelian.GrothendieckAxioms.Sheaf
 import Mathlib.CategoryTheory.Abelian.GrothendieckCategory.EnoughInjectives
@@ -12,8 +12,8 @@ import Mathlib.CategoryTheory.Sites.Spaces
 /-!
 # Choosing the injective resolution on a small site
 
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Bicomplex` and
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Comparison` thread an explicit
+`DerivedAlgGeo.CategoryTheory.Sites.Cech.Bicomplex` and
+`DerivedAlgGeo.CategoryTheory.Sites.Cech.Comparison` thread an explicit
 `InjectiveResolution F` through every construction, because no `EnoughInjectives` instance is
 available for abelian sheaves over an *arbitrary* site.  That restriction is narrower than it
 looks.  The pinned Mathlib derives enough injectives from `CategoryTheory.IsGrothendieckAbelian`,

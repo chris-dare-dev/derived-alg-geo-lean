@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.GlobalComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Ext.InjectiveResolutionNaturality
 import DerivedAlgGeo.CategoryTheory.SpectralSequence.ExtendHomologyNaturality
 import DerivedAlgGeo.CategoryTheory.SpectralSequence.TotalFlipNaturality
@@ -11,7 +11,7 @@ import DerivedAlgGeo.CategoryTheory.SpectralSequence.TotalFlipNaturality
 # The Čech comparison as a construction on complexes of sheaves
 
 Every step of the Čech-to-derived comparison built in
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison` reads its injective
+`DerivedAlgGeo.CategoryTheory.Sites.Cech.GlobalComparison` reads its injective
 resolution `I` only through the cochain complex `I.cochainComplex`. This file makes that
 dependence explicit: each construction is restated for an arbitrary cochain complex of sheaves,
 agreeing with the original by definition, and each is shown to commute with an arbitrary

@@ -39,9 +39,11 @@ and extension-of-scalars specializations below algebraic geometry.
 Put generic `Ext` adjunction, dimension-shift, and injective-resolution
 naturality below `CategoryTheory/Triangulated/DerivedCategory/Ext/`. Put
 filtered-complex and total-complex spectral-sequence machinery below
-`CategoryTheory/SpectralSequence/`, and generic presheaf Čech formulas below
-`CategoryTheory/Sites/Cech/`. Scheme covers, affine acyclicity, and geometric
-cohomology comparisons remain under `AlgebraicGeometry/Cohomology/`.
+`CategoryTheory/SpectralSequence/`, and generic site-theoretic Čech complexes,
+injective comparisons, compact-basis arguments, and finite-cover boundedness
+below `CategoryTheory/Sites/Cech/`. Affine acyclicity, distinguished-open
+bases, and projective-space computations remain under
+`AlgebraicGeometry/Cohomology/`.
 
 Scheme-specific specializations of that generic construction live under
 `AlgebraicGeometry/DerivedCategory/`: this is the owner for module-sheaf

@@ -54,7 +54,8 @@ Category
 │  ├─ K₀                                 triangle relations
 │  └─ K₀dg := K₀ (H0 C)                 reuse, not a third presentation
 └─ Sites / descent / stacks in groupoids
-   ├─ presheaf Čech formulas
+   ├─ site-theoretic Čech complexes and derived comparison
+   │  └─ compact-basis and finite-cover boundedness
    └─ scheme-site realizations
 
 Algebra

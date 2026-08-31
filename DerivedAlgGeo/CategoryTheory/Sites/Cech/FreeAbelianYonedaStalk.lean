@@ -2,7 +2,10 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Comparison
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.Comparison
+import Mathlib.Algebra.Category.Grp.FilteredColimits
+import Mathlib.Algebra.Category.Grp.Limits
+import Mathlib.CategoryTheory.Sites.LeftExact
 import Mathlib.Topology.Sheaves.Sheafify
 
 /-!

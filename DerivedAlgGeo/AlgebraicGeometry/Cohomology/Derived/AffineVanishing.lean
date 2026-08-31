@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Equivalence
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.AffineBasisComparison
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.GlobalComparison
 
 /-!
 # The affine derived-vanishing comparison

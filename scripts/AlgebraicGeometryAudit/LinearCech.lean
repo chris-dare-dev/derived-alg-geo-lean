@@ -1,79 +1,14 @@
 /-
-The `k`-linear Čech comparison slice of the AlgebraicGeometry audit (#569), split out so
-concurrent branches append to different files (#480). See the umbrella file for the contract.
+The linear cohomology and projective-geometry slice of the AlgebraicGeometry audit,
+split out so concurrent branches append to different files (#480). See the umbrella file
+for the contract.
 
-The records here cover the naturality of the Čech-to-derived comparison, its `k`-linear form
-against `coherentScalarAction`, integrality of `Proj` of a graded domain, and polynomial
-projective space as a variety.
+The records here cover the `k`-linear form against `coherentScalarAction`, integrality of
+`Proj` of a graded domain, and polynomial projective space as a variety.
 -/
 import DerivedAlgGeo.AlgebraicGeometry
 open AlgebraicGeometry
 
-#print axioms CategoryTheory.Sheaf.sectionsComplexUnlifted
-#print axioms CategoryTheory.Sheaf.cechBicomplexOfComplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplex_eq_cechBicomplexOfComplex
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplexUnlifted_eq
-#print axioms CategoryTheory.Sheaf.cechBicomplexMap
-#print axioms CategoryTheory.Sheaf.sectionsComplexMap
-#print axioms CategoryTheory.Sheaf.sectionsToCechZeroColumn
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechZeroColumn_eq
-#print axioms CategoryTheory.Sheaf.sectionsToCechZeroColumn_naturality
-#print axioms CategoryTheory.Sheaf.sectionsToCechBicomplexMap
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap_eq
-#print axioms CategoryTheory.Sheaf.sectionsToCechBicomplexMap_naturality
-#print axioms CategoryTheory.Sheaf.sectionsToCechTotalMap
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap_eq
-#print axioms CategoryTheory.Sheaf.sectionsToCechTotalMap_naturality
-#print axioms CategoryTheory.Sheaf.cechAugmentationMap
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSource_eq
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentation_eq
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSourceTotalIso_naturality
-#print axioms CategoryTheory.Sheaf.cechBicomplexMap_comp
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSourceTotalIso_inv_naturality
-#print axioms CategoryTheory.Sheaf.cechToTotalMap
-#print axioms CategoryTheory.Sheaf.cechToInjectiveTotalMap_eq
-#print axioms CategoryTheory.Sheaf.cechToTotalMap_naturality
-#print axioms CategoryTheory.Sheaf.cechCochainFunctorIntHomologyIso_naturality
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplexUnliftedIso_naturality
-#print axioms CategoryTheory.Sheaf.HPrimeAddEquivH_naturality
-#print axioms CategoryTheory.Sheaf.sectionsComplexLifted
-#print axioms CategoryTheory.Sheaf.yonedaHomComplexXIso
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaHomComplexXIso_eq
-#print axioms CategoryTheory.Sheaf.yonedaHomComplexIsoSections
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaHomComplexIsoSections_eq
-#print axioms CategoryTheory.Sheaf.fromSingleMk_comp_ofHom
-#print axioms CategoryTheory.Sheaf.yonedaHomComplexIsoSections_naturality
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplex_eq
-#print axioms CategoryTheory.Sheaf.cohomologyPresheafFunctor_map_app_apply
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsCohomologyAddEquivHPrime_naturality
-#print axioms CategoryTheory.Sheaf.cechToSectionsHomologyIso_hom_naturality
-#print axioms CategoryTheory.Sheaf.cechComparisonAddEquiv_naturality
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_comp_d
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_naturality
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt_comp_d
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt_naturality
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_exact
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_mono
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt_mono
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt_exact
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechRowMap
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechRowMap_quasiIso
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechZeroColumn
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMapFlipRowIso
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap_flip_row
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap_flip_row_quasiIso
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap_quasiIso
-#print axioms CategoryTheory.Sheaf.cechCochainFunctorIntHomologyIso
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplexUnliftedIso
-#print axioms CategoryTheory.Sheaf.cechToSectionsHomologyIso
-#print axioms CategoryTheory.Sheaf.cechComparisonAddEquiv
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology_opens
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomologyAt_opens
 #print axioms AlgebraicGeometry.Cohomology.coherentH
 #print axioms AlgebraicGeometry.Cohomology.LinearCohomology
 #print axioms AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology

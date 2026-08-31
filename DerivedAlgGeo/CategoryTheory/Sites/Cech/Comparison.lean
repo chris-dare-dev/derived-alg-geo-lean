@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Affine
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Bicomplex
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.Contractible
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.Bicomplex
 import Mathlib.Algebra.Category.Grp.Limits
 import Mathlib.Algebra.Category.Grp.Ulift
 import Mathlib.CategoryTheory.Adjunction.Additive
@@ -32,7 +32,7 @@ complex, a comparison morphism, or a theorem identifying the two.  We therefore:
 
 This file is a layer, not the whole comparison.  The nontrivial-cover step -- that
 `IsCechAcyclicCover U F` implies `CechComputesDerivedCohomologyAt U F n` -- is **proved**, in
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison`, by the augmented Cech
+`DerivedAlgGeo.CategoryTheory.Sites.Cech.GlobalComparison`, by the augmented Cech
 resolution and its column-filtration spectral sequence.  The chain runs:
 
 * `Bicomplex` builds `C^{p,q} = Cech^p(U, I^q)` from an injective resolution, totalizes its column
@@ -50,7 +50,7 @@ The declarations below take an explicit `InjectiveResolution F` because the site
 `C : Type u` with `Category.{a} C`, and the pinned Mathlib supplies `EnoughInjectives` for abelian
 sheaves only over a *small* site.  That is the only obstruction: on a small site the resolution is
 chosen rather than assumed.
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.SmallSiteResolution` restates this interface
+`DerivedAlgGeo.CategoryTheory.Sites.Cech.SmallSiteResolution` restates this interface
 without the resolution argument, and
 `GlobalComparison.isCechAcyclicCover_cechComputesDerivedCohomology_opens` states the comparison
 itself with neither a resolution nor a `HasExt` argument.

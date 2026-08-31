@@ -301,7 +301,7 @@ noncomputable def polynomialVariableCechComplex (d : ℕ) :
 /-- The Čech complex of `O(d)` over the variable charts *is* the explicit algebraic complex.
 
 Composed with the Čech-to-derived comparison of
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison`, this presents every
+`DerivedAlgGeo.CategoryTheory.Sites.Cech.GlobalComparison`, this presents every
 `Hⁱ(Pⁿ, O(d))` as the cohomology of a complex of homogeneous localizations. -/
 noncomputable def polynomialVariableCechComplexIso (d : ℕ) :
     cechComplexOfTwist ι k d ≅ polynomialVariableCechComplex ι k d :=

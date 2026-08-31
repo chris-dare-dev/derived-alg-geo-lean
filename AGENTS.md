@@ -115,9 +115,12 @@ new derived-category theory.
   `CategoryTheory/Sites/StackInGroupoids/`. Big-Zariski representables,
   scheme-morphism properties, atlases, and algebraicity remain under
   `AlgebraicGeometry/Stacks/`.
-- Čech formulas for an arbitrary presheaf on a site belong under
-  `CategoryTheory/Sites/Cech/`. Scheme covers, sheaf comparisons, affine
-  acyclicity, and projective-space computations remain geometric consumers.
+- Čech constructions for arbitrary presheaves or sheaves on a site belong
+  under `CategoryTheory/Sites/Cech/`. This includes cosimplicial exactness,
+  injective-resolution bicomplexes, Čech-to-derived comparison, compact-open
+  basis arguments, and finite-cover boundedness. Affine-scheme acyclicity,
+  distinguished-open bases, and projective-space computations remain
+  geometric consumers.
 - Declarations owned by that generic family root use the
   `CategoryTheory.Triangulated.Families` namespace. Do not place
   `TriangulatedFiberFamily`, shared boundedness interfaces, or future neutral

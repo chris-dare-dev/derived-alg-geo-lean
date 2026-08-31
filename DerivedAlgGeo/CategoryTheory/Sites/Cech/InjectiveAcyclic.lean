@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.FreeAbelianYonedaStalk
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.FreeAbelianYonedaStalk
 import Mathlib.AlgebraicTopology.ExtraDegeneracy
 import Mathlib.CategoryTheory.Limits.FormalCoproducts.ExtraDegeneracy
 import Mathlib.Topology.Sheaves.Abelian
