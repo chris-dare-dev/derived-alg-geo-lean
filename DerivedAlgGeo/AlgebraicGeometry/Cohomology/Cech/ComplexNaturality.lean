@@ -3,9 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.ExtResolutionNaturality
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.SpectralSequence.ExtendHomologyNaturality
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.SpectralSequence.TotalFlipNaturality
+import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Ext.InjectiveResolutionNaturality
+import DerivedAlgGeo.CategoryTheory.SpectralSequence.ExtendHomologyNaturality
+import DerivedAlgGeo.CategoryTheory.SpectralSequence.TotalFlipNaturality
 
 /-!
 # The Čech comparison as a construction on complexes of sheaves

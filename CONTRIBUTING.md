@@ -36,6 +36,13 @@ canonical t-structure, exact functors, homology comparison, and K-projective
 or bounded-above-projective models. Keep only the `Coh(X)`, `Dqc(X)`, module,
 and extension-of-scalars specializations below algebraic geometry.
 
+Put generic `Ext` adjunction, dimension-shift, and injective-resolution
+naturality below `CategoryTheory/Triangulated/DerivedCategory/Ext/`. Put
+filtered-complex and total-complex spectral-sequence machinery below
+`CategoryTheory/SpectralSequence/`, and generic presheaf Čech formulas below
+`CategoryTheory/Sites/Cech/`. Scheme covers, affine acyclicity, and geometric
+cohomology comparisons remain under `AlgebraicGeometry/Cohomology/`.
+
 Scheme-specific specializations of that generic construction live under
 `AlgebraicGeometry/DerivedCategory/`: this is the owner for module-sheaf
 derived categories, `Dqc`, scheme-indexed derived pullback, and geometric

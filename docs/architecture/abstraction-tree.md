@@ -46,11 +46,15 @@ Category
 │  ├─ H0 C
 │  └─ IsPretriangulated C
 │     └─ Enhancement T                   comparison data, not a class
+├─ Derived-category extensions
+│  └─ Ext adjunction / dimension shift / resolution naturality
+├─ filtered-complex spectral sequences
 ├─ GrothendieckPresentation
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
 │  └─ K₀dg := K₀ (H0 C)                 reuse, not a third presentation
 └─ Sites / descent / stacks in groupoids
+   ├─ presheaf Čech formulas
    └─ scheme-site realizations
 
 Algebra

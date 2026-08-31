@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.SpectralSequence.FilteredTotalComplexAdjacent
+import DerivedAlgGeo.CategoryTheory.SpectralSequence.FilteredTotalComplexAdjacent
 
 /-!
 # The first differential of a column-filtered total complex

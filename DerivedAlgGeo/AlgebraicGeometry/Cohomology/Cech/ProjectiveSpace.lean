@@ -6,7 +6,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace
 import DerivedAlgGeo.Topology.Opens.Limits
 import DerivedAlgGeo.Algebra.Category.Grp.Preadditive
 import DerivedAlgGeo.Algebra.Category.Grp.Products
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Differential
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.Differential
 import Mathlib.CategoryTheory.Sites.SheafCohomology.Cech
 
 /-!

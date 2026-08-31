@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.SpectralSequence.FilteredTotalComplexAdjacent
+import DerivedAlgGeo.CategoryTheory.SpectralSequence.FilteredTotalComplexAdjacent
 import Mathlib.Algebra.Category.Grp.Limits
 import Mathlib.CategoryTheory.Abelian.Injective.Extend
 import Mathlib.CategoryTheory.Abelian.Injective.Ext
@@ -20,7 +20,7 @@ file constructs the classical cohomological bicomplex
 The Cech direction is the first direction and the resolution direction is the second.  We also
 retain the augmentation induced by `F ⟶ I⁰`, and instantiate the column-filtered total-complex
 spectral sequence constructed in
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.SpectralSequence.FilteredTotalComplex`.
+`DerivedAlgGeo.CategoryTheory.SpectralSequence.FilteredTotalComplex`.
 
 The site here is a general `C : Type u` with `Category.{v} C`, and at the pinned Mathlib revision
 abelian sheaves over such a site carry no `EnoughInjectives` instance.  Accordingly, the
