@@ -31,13 +31,6 @@ noncomputable section
 
 universe u
 
-/-- The standard derived-category localization for module sheaves on a
-scheme.  Exposing it as an instance lets exact geometric functors use
-Mathlib's derived-functor API directly. -/
-noncomputable instance schemeModulesHasDerivedCategory (X : Scheme.{u}) :
-    HasDerivedCategory X.Modules :=
-  HasDerivedCategory.standard X.Modules
-
 namespace SchemeBaseChange
 
 variable {S : Scheme.{u}}

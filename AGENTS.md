@@ -242,11 +242,15 @@ construct a subprestack, through the categorical `fullsubcategory` API.
   stability-condition namespace. Moduli boundedness uses the independent
   `CategoryTheory.Moduli` namespace.
 - Scheme-derived category declarations owned by
-  `AlgebraicGeometry/DerivedCategory/Basic.lean` use the
-  `AlgebraicGeometry.DerivedCategory` namespace. Scheme base-change and
-  pullback declarations owned by `AlgebraicGeometry/DerivedCategory/Families/`
-  use `AlgebraicGeometry.DerivedCategory.Families`. Do not place these neutral
-  geometric APIs below a categorical stability-condition namespace.
+  `AlgebraicGeometry/DerivedCategory/{Basic,Coherent}.lean` use the
+  `AlgebraicGeometry.DerivedCategory` namespace. `Basic.lean` owns the
+  module-sheaf specialization; `Coherent.lean` owns `D(Coh X)`, `Dᵇ(Coh X)`,
+  and `Perf(X)` without importing family or pullback consumers. Scheme
+  base-change and pullback declarations owned by
+  `AlgebraicGeometry/DerivedCategory/Families/` use
+  `AlgebraicGeometry.DerivedCategory.Families` and consume those canonical
+  categories. Do not place these neutral geometric APIs below a categorical
+  stability-condition namespace.
 - Quasicoherent-cohomology loci and affine `Dqc` realizations owned by
   `AlgebraicGeometry/DerivedCategory/Dqc.lean` and its `Dqc/` subtree use
   `AlgebraicGeometry.DerivedCategory.Dqc`. Consumers should open or qualify

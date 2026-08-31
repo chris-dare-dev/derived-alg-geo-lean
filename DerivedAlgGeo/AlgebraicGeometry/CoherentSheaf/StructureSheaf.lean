@@ -13,20 +13,10 @@ It is a two-line definition, but it needs a home: coherence of `O_X` is
 `LineBundleData.isCoherent` applied to `LineBundleData.unit`, so the fact lives
 in `Divisors/`, while the category it lands in lives in `CoherentSheaf/`.
 
-## Relation to the copy under `StabilityCondition.Families`
-
-`Families.SchemePerfectDerivedCategory.structureSheafCoh` in
-`AlgebraicGeometry/DerivedCategory/Families/BoundedGeometry.lean` is the
-**same object**, built there because the perfect-complex generator needed it.
-That one is not reusable from a general coherent-sheaf or variety context: it
-sits inside the stability-families namespace and its module drags in derived
-categories, triangulated generators and t-structures, none of which the object
-itself requires.
-
-This file is the general home. Nothing here changes the existing declaration —
-folding it into this one is a follow-up that touches a merged module and its
-audit record, and is deliberately not bundled into the change that introduces
-this file.
+The coherent derived-category owner imports this module and uses this same
+object as the canonical degree-zero perfect object. Keeping the coherent sheaf
+here avoids making ordinary coherent-sheaf consumers depend on triangulated
+generators or t-structures.
 -/
 
 universe u

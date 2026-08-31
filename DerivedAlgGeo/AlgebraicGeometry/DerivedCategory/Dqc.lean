@@ -7,7 +7,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.CohomologyObjectProperty
 import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Homology
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Quasicoherent.Extensions
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Quasicoherent.Coproducts
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Basic
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 
 /-!
 # The quasi-coherent cohomology locus in a scheme-derived category
@@ -39,8 +40,6 @@ geometry-owned namespace `AlgebraicGeometry.DerivedCategory.Dqc`.
 
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
-open AlgebraicGeometry.DerivedCategory.Families
-open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
@@ -49,7 +48,6 @@ noncomputable section
 
 universe u v w
 
-attribute [local instance] HasDerivedCategory.standard
 attribute [local instance] Coh.ι_additive Coh.ι_preservesFiniteLimits
   Coh.ι_preservesFiniteColimits
 
@@ -142,16 +140,8 @@ them unconditionally — equivalently, proving that `D(A)` has small coproducts 
 homology preserves them for a Grothendieck `A` — is the open half of this issue's
 third bullet.
 
-Two pieces of plumbing here are deliberate and both cost real time to find.
-
-The `letI` is this file's house idiom, not an incantation: `Families/SchemeDerived.lean`
-carries the same line in every declaration that mentions the derived category.  The
-file-level `attribute [local instance]` does not reach a fresh mention of
-`DerivedCategory.cohomologyIn`, which is why `schemeQuasicoherentCohomology` — routed
-through the `SchemeDerivedCategory` abbrev, which carries its own `letI` — elaborates
-while a direct mention does not.
-
-The `@` and the named `quasicoherent_isClosedUnderCoproducts` are the second piece.
+One piece of plumbing here is deliberate and cost real time to find. The `@`
+and the named `quasicoherent_isClosedUnderCoproducts` are needed because
 Instance search cannot find that instance through this application even though
 `quasicoherent_isClosedUnderCoproducts` two declarations above finds it by
 `inferInstance`: unifying `A := X.Modules` routes the category through
@@ -163,7 +153,6 @@ theorem sigma_mem {ι : Type u} (E : ι → SchemeDerivedCategory X) [HasCoprodu
       (DerivedCategory.homologyFunctor X.Modules n))
     (hE : ∀ i, schemeQuasicoherentCohomology X (E i)) :
     schemeQuasicoherentCohomology X (∐ E) :=
-  letI := HasDerivedCategory.standard X.Modules
   @DerivedCategory.cohomologyIn_prop_coproduct X.Modules _ _ _
     (SheafOfModules.isQuasicoherent X.ringCatSheaf) ι
     (quasicoherent_isClosedUnderCoproducts X ι) E _ hpres hE

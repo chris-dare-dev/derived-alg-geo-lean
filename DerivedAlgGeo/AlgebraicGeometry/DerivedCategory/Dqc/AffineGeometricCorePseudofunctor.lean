@@ -20,8 +20,6 @@ derived-category pentagon and triangle identities.
 
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
-open AlgebraicGeometry.DerivedCategory.Families
-open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Bicategory AlgebraicGeometry
 
