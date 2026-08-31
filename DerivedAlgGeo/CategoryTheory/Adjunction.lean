@@ -1,1 +1,0 @@
-import DerivedAlgGeo.CategoryTheory.Adjunction.PreservesColimits

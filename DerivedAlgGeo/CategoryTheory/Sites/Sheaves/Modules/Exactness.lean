@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Adjunction.PreservesColimits
+import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Sheafification
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.Abelian
 import Mathlib.Algebra.Homology.ShortComplex.ShortExact
@@ -45,7 +45,7 @@ determined on colimits by its restriction along `L`: every diagram `d` there is 
 to `(d ⋙ G) ⋙ L`, so a colimit of `d` is the image under `L` of a colimit computed
 upstairs, and `L ⋙ toSheaf` preserving that colimit is the same statement as `toSheaf`
 preserving this one. That transport is `Adjunction.preservesColimitsOfShape_of_comp_left`,
-imported from the generic adjunction root because nothing in it is about sheaves.
+imported from the generic limit-preservation root because nothing in it is about sheaves.
 
 ## Not done here
 

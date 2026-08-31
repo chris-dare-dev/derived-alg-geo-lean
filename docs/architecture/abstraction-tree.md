@@ -34,9 +34,15 @@ This is the ownership target. Existing reverse edges are tracked defects to
 burn down, not exceptions that authorize more leaf-to-root imports.
 
 ```text
+Bicategory                              Mathlib higher-categorical root
+└─ Adjunction of 1-morphisms
+   ├─ adjoint equivalences and mates
+   └─ Cat specialization ≃ ordinary functor adjunction
+
 Category
-├─ Adjunction
-│  └─ reflective transport of colimit preservation
+├─ Limits and colimits
+│  ├─ preservation through composition
+│  └─ reflective transport using an ordinary adjunction
 ├─ Preadditive
 │  └─ Linear k C                         Mathlib root
 ├─ Abelian                               Mathlib typeclass
@@ -109,6 +115,10 @@ AlgebraicGeometry
 The arrows implied by this tree point downwards from consumers to roots.  In
 particular:
 
+- do not introduce a second adjunction hierarchy: reuse Mathlib's
+  `Bicategory.Adjunction`, and recover ordinary adjoint functors through the
+  bicategory `Cat`; place results that merely assume an adjunction with their
+  actual conclusion, such as limit preservation or derived `Ext`;
 - do not add `KLinearCategory`; use Mathlib's `Preadditive` and `Linear` and
   bridge `DGLinear` to them;
 - do not add a coherent, derived, dg, projective-space, or relative sibling of
@@ -131,6 +141,11 @@ particular:
   finite-type witnesses remain geometric consumers;
 - a paper-specific module may instantiate these roots but never becomes a root
   imported by them.
+
+Bicategories are the first implemented higher-categorical stage. A future
+general `n`-category or `(∞,1)`-category layer must name its formal model and
+its comparison with this spine; an empty directory does not establish an
+abstraction relationship.
 
 ## Root review before a new structure
 

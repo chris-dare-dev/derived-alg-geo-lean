@@ -51,6 +51,12 @@ instance umbrella or the public repository root.
 
 In particular:
 
+- bicategorical adjunctions, adjoint equivalences, and mates extend Mathlib
+  below `DerivedAlgGeo.CategoryTheory.Bicategory`; ordinary adjoint functors
+  are their specialization in `Cat`;
+- generic preservation and reflective transport results live below
+  `DerivedAlgGeo.CategoryTheory.Limits`, even when an ordinary adjunction is
+  one of their hypotheses;
 - ordinary module and ring theory lives under `DerivedAlgGeo.Algebra`, while
   generic sheaves and sheaves of modules on arbitrary ringed sites live below
   `DerivedAlgGeo.CategoryTheory.Sites.Sheaves`;
@@ -98,6 +104,15 @@ The source tree follows general constructions before concrete instances:
 The physical module tree records that refinement directly:
 
 ```text
+CategoryTheory/Bicategory
+  └─→ Adjunction
+        ├─→ Basic                               adjunctions of 1-morphisms
+        └─→ Cat                                 ordinary functor specialization
+
+CategoryTheory/Limits/Preserves
+  ├─→ Composition                              no adjunction required
+  └─→ Reflective                               ordinary Cat-level consumer
+
 CategoryTheory/Triangulated/Families
   └─→ abstract fiber categories, pullback functors, and boundedness
 
@@ -128,9 +143,6 @@ CategoryTheory/Sites/Cech
 
 CategoryTheory/Abelian
   └─→ WeakSerre                                arbitrary abelian categories
-
-CategoryTheory/Adjunction
-  └─→ PreservesColimits                       reflective transport
 
 CategoryTheory/Sites/Sheaves
   ├─→ ConstantPullback, CohomologyPushforward  arbitrary sites
