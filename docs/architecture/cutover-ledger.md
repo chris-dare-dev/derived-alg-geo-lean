@@ -41,6 +41,13 @@ blocks should normally move it rather than add more declarations beside it.
   realizations consume this root; the former
   `CategoryTheory/EquivalenceTransport.lean` path and the private geometric
   duplicate are retired.
+- Pseudofunctorial triangulated families:
+  `CategoryTheory/Triangulated/Families/TriangulatedFiberFamily` now owns a
+  Cat-valued pseudofunctor on `LocallyDiscrete Bᵒᵖ`, exposes its pullback unit
+  and compositor, and derives the `K₀` identity and composition laws through
+  those isomorphisms. Ordinary `Bᵒᵖ ⥤ Cat` families enter through
+  `TriangulatedFiberFamily.ofFunctor`. Pre-stability base change transports
+  its iterated preimage witness through the pseudofunctor compositor.
 - Generic preservation through composition and reflective transport:
   `CategoryTheory/Limits/Preserves/`. The former repository
   `CategoryTheory/Adjunction/` root is retired.
@@ -108,24 +115,19 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-1. Refine `CategoryTheory/Triangulated/Families/TriangulatedFiberFamily` from a
-   strict `Bᵒᵖ ⥤ Cat` source to a pseudofunctor on `LocallyDiscrete Bᵒᵖ`, with
-   strict functors admitted through a constructor rather than treated as the
-   general root.
-
-2. Rebind the coherent-duality consumers to the canonical
+1. Rebind the coherent-duality consumers to the canonical
    `AlgebraicGeometry/DerivedCategory/Coherent.lean` owner. Move the generic
    `ModuleCat.DerivedOppositeComparison` block from
    `AlgebraicGeometry/Duality/Serre/LinearDual.lean` to
    `CategoryTheory/Triangulated/DerivedCategory/Opposite.lean`; leave only the
    scheme-specific realization in duality.
 
-3. Make the existing `Dᵇ(Coh X) ⥤ Dqc(X)` comparison hypotheses actual inputs
+2. Make the existing `Dᵇ(Coh X) ⥤ Dqc(X)` comparison hypotheses actual inputs
    to downstream consumers before proving geometric inhabitants. Do not add a
    global equivalence or compact/perfect instance until the required
    hypotheses are proved, with the affine case the first intended realization.
 
-4. Document and compare the three current perfect-complex notions:
+3. Document and compare the three current perfect-complex notions:
    `schemePerfect` in `D(Coh X)`, `schemeRelativePerfect` in `Dqc`, and
    `TwoTermPerfectDeterminantData`. Move the canonical zero object for
    `SchemeQuasicoherentDerivedCategory` from the perfect-moduli consumer to the

@@ -208,8 +208,10 @@ physical path records which interface it implements.
 
 The generic family root also owns its declaration namespace:
 `TriangulatedFiberFamily` belongs to
-`CategoryTheory.Triangulated.Families`. Neutral moduli boundedness is more
-general still: `BoundednessProblem` and `UniversalBoundedness` belong to
+`CategoryTheory.Triangulated.Families`. Its source is a Cat-valued
+pseudofunctor on `LocallyDiscrete Bᵒᵖ`; an ordinary strict functor enters only
+through `TriangulatedFiberFamily.ofFunctor`. Neutral moduli boundedness is
+more general still: `BoundednessProblem` and `UniversalBoundedness` belong to
 `CategoryTheory.Moduli`, not to triangulated or stability families. Namespace
 migrations are separate from path moves and must update consumers, audits,
 baselines, documentation, and enforcement together.

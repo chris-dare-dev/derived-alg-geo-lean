@@ -32,9 +32,9 @@ inducing theorem.  Its exported phase equivalence has two consequences.
 No openness proposition or relative-HN existence proposition is an input.
 The finite-type proofs are not needed after restricting the quantifiers,
 because the geometric phase equivalence proves the stronger all-base-change
-statement.  This is a consequence of the deliberately strong strict-family
-interface; it is not a formalization of semistable reduction, a moduli-space
-construction, or Theorem 22.2 of arXiv:1902.08184v4.
+statement. This is a consequence of the deliberately strong pseudofunctorial
+family interface; it is not a formalization of semistable reduction, a
+moduli-space construction, or Theorem 22.2 of arXiv:1902.08184v4.
 -/
 
 namespace AlgebraicGeometry.Moduli.Semistability

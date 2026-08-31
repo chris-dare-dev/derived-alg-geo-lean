@@ -225,6 +225,11 @@ construct a subprestack, through the categorical `fullsubcategory` API.
   the base category, fiber categories, and abstract pullback functors of a
   triangulated family belong under `CategoryTheory/Triangulated/Families/`
   before any stability or geometry is imposed.
+- The underlying source of `TriangulatedFiberFamily` is a pseudofunctor
+  `LocallyDiscrete Bᵒᵖ ⥤ᵖ Cat`, and its identity and composition comparisons
+  come from that source. Admit an ordinary strict `Bᵒᵖ ⥤ Cat` only through
+  `TriangulatedFiberFamily.ofFunctor`; do not weaken the canonical root back
+  to a strict functor for the convenience of one consumer.
 - Generic stacks, discrete-stack construction from a sheaf, stack morphisms,
   and site-object representability belong under
   `CategoryTheory/Sites/StackInGroupoids/`. Big-Zariski representables,
