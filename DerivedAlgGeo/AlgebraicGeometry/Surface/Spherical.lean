@@ -92,8 +92,6 @@ universe u
 
 open CategoryTheory CategoryTheory.Limits
 open AlgebraicGeometry.DerivedCategory
-open AlgebraicGeometry.DerivedCategory.Families
-open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 namespace AlgebraicGeometry
 
@@ -104,7 +102,7 @@ variable {k : Type u} [Field k] (X : K3Surface k)
 /-- The bounded derived category of coherent sheaves on a K3 surface.
 
 An abbreviation for readability only; everything about it comes from
-`AlgebraicGeometry.DerivedCategory.Families.SchemeBoundedCoherentDerivedCategory`. -/
+`AlgebraicGeometry.DerivedCategory.SchemeBoundedCoherentDerivedCategory`. -/
 abbrev DerivedCat : Type _ := SchemeBoundedCoherentDerivedCategory X.toScheme
 
 variable {X}

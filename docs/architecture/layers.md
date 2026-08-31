@@ -186,8 +186,9 @@ CategoryTheory/Triangulated/FourierMukai
 
 AlgebraicGeometry/DerivedCategory
   ├─→ Basic                                 module-sheaf derived categories
+  ├─→ Coherent                              D(Coh X), Dᵇ(Coh X), and Perf(X)
   ├─→ Dqc                                   quasicoherent-cohomology locus
-  ├─→ Families                              scheme base change and pullback
+  ├─→ Families                              base-change and pullback consumers
   └─→ FourierMukai                          geometric kernels and convolution
 
 AlgebraicGeometry/Numerical/Core

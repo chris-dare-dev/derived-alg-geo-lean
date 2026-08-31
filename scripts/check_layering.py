@@ -2111,6 +2111,86 @@ def main() -> int:
         )
     bounded_geometry_source = neutral_derived_families_root / "BoundedGeometry.lean"
     bounded_geometry_text = bounded_geometry_source.read_text(encoding="utf-8")
+    coherent_derived_source = neutral_derived_families_root.parent / "Coherent.lean"
+    coherent_derived_text = coherent_derived_source.read_text(encoding="utf-8")
+    if f"namespace {DERIVED_CATEGORY_NAMESPACE}" not in coherent_derived_text:
+        failures.append(
+            f"{coherent_derived_source.relative_to(ROOT)}: coherent-derived "
+            f"declarations must use namespace {DERIVED_CATEGORY_NAMESPACE}"
+        )
+    if (
+        "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families"
+        in coherent_derived_text
+    ):
+        failures.append(
+            f"{coherent_derived_source.relative_to(ROOT)}: canonical D(Coh X), "
+            "Dᵇ(Coh X), and Perf(X) owner must not import family consumers"
+        )
+    if "DerivedAlgGeo.AlgebraicGeometry.Divisors.Determinant" in coherent_derived_text:
+        failures.append(
+            f"{coherent_derived_source.relative_to(ROOT)}: canonical coherent-"
+            "derived owner must not import determinant consumers"
+        )
+    coherent_owner_import = (
+        "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent"
+    )
+    if coherent_owner_import not in imports_by_path[bounded_geometry_source]:
+        failures.append(
+            f"{bounded_geometry_source.relative_to(ROOT)}: family pullback "
+            f"consumer must import canonical owner {coherent_owner_import}"
+        )
+    coherent_owner_declarations = (
+        "schemeCoherentHasDerivedCategory",
+        "SchemeCoherentDerivedCategory",
+        "SchemeBoundedCoherentDerivedCategory",
+        "schemeFiniteLocallyFreeGenerator",
+        "schemePerfect",
+        "SchemePerfectDerivedCategory",
+    )
+    for name in coherent_owner_declarations:
+        if re.search(
+            rf"^(?:noncomputable\s+)?(?:def|abbrev|theorem|lemma|structure|class|instance)\s+"
+            rf"{name}\b",
+            bounded_geometry_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{bounded_geometry_source.relative_to(ROOT)}: canonical "
+                f"coherent-derived declaration {name} returned to Families"
+            )
+    if not re.search(
+        r"instance(?:\s+\([^)]*\))?\s+schemeModulesHasDerivedCategory\b",
+        derived_category_basic_text,
+    ):
+        failures.append(
+            f"{derived_category_basic.relative_to(ROOT)}: module-sheaf derived "
+            "category instance must be registered at the canonical owner"
+        )
+    if not re.search(
+        r"instance(?:\s+\([^)]*\))?\s+schemeSheafOfModulesHasDerivedCategory\b",
+        derived_category_basic_text,
+    ):
+        failures.append(
+            f"{derived_category_basic.relative_to(ROOT)}: the explicit "
+            "SheafOfModules carrier must reuse the canonical scheme-module "
+            "derived-category instance"
+        )
+    if not re.search(
+        r"schemeSheafOfModulesHasDerivedCategory[\s\S]*?:=[\s\n]*"
+        r"schemeModulesHasDerivedCategory X",
+        derived_category_basic_text,
+    ):
+        failures.append(
+            f"{derived_category_basic.relative_to(ROOT)}: the explicit "
+            "SheafOfModules adapter must delegate to "
+            "schemeModulesHasDerivedCategory"
+        )
+    if "letI := HasDerivedCategory.standard X.Modules" in derived_category_basic_text:
+        failures.append(
+            f"{derived_category_basic.relative_to(ROOT)}: canonical abbreviations "
+            "must consume schemeModulesHasDerivedCategory instead of choosing "
+            "per-abbreviation instances"
+        )
     dqc_source = neutral_derived_families_root.parent / "Dqc.lean"
     dqc_text = dqc_source.read_text(encoding="utf-8")
     geometric_generic_derived_names = {

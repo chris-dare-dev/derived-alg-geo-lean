@@ -2,30 +2,16 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import Mathlib.CategoryTheory.Triangulated.Generators
-import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.ExactFunctor
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.StructureSheaf
-import DerivedAlgGeo.AlgebraicGeometry.Divisors.Determinant
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ExactPullback
 
 /-!
-# Bounded coherent and perfect scheme-derived fibers
+# Bounded coherent and perfect derived categories in scheme families
 
-This file supplies the geometric categories that were deliberately absent from
-`Families.SchemeDerived`.
-
-For a locally Noetherian scheme `X`, `SchemeBoundedCoherentDerivedCategory X`
-is Mathlib's bounded derived category of the repository-owned abelian category
-`Coh X`.  The perfect objects are defined inside the derived category of
-`Coh X` as the triangulated envelope of the degree-zero objects represented by
-finite locally free coherent sheaves.  Mathlib's `triangEnvelope` is the
-smallest triangulated object property closed under retracts that contains those
-generators, so this is the standard thick-envelope definition of `Perf(X)`.
-
-The structure sheaf gives a genuine perfect generator object, preventing the
-definition from being vacuous.  Scheme base changes and residue-field schemes
-expose both categories.
+The canonical geometric categories `D(Coh X)`, `Dᵇ(Coh X)`, and `Perf(X)`
+live in `DerivedCategory/Coherent.lean`. This file evaluates them on scheme
+base changes and records the contracts needed to lift coherent pullback to the
+bounded and perfect subcategories.
 
 Preservation under pullback is not automatic at this boundary.  In particular,
 an arbitrary pullback functor on all module sheaves has not yet been proved to
@@ -45,117 +31,8 @@ noncomputable section
 
 universe u
 
-attribute [local instance] HasDerivedCategory.standard
 attribute [local instance]
   preservesBinaryBiproducts_of_preservesBinaryProducts
-
-/-- The standard derived-category localization for coherent sheaves on a
-locally Noetherian scheme. -/
-noncomputable instance schemeCoherentHasDerivedCategory
-    (X : Scheme.{u}) [IsLocallyNoetherian X] : HasDerivedCategory (Coh X) :=
-  HasDerivedCategory.standard (Coh X)
-
-/-- The derived category of coherent sheaves on a locally Noetherian scheme. -/
-abbrev SchemeCoherentDerivedCategory (X : Scheme.{u}) [IsLocallyNoetherian X] :=
-  DerivedCategory (Coh X)
-
-/-- The bounded derived category `Dᵇ(Coh X)` of coherent sheaves on a locally
-Noetherian scheme. -/
-abbrev SchemeBoundedCoherentDerivedCategory
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :=
-  DerivedCategory.Bounded (Coh X)
-
-/-- Degree-zero derived objects represented by finite locally free coherent
-sheaves.  Shifts, finite sums, cones, and retracts are added by
-`ObjectProperty.triangEnvelope`. -/
-def schemeFiniteLocallyFreeGenerator
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    ObjectProperty (SchemeCoherentDerivedCategory X) :=
-  fun E ↦ ∃ (F : Coh X) (n : ℕ),
-    Nonempty (Scheme.Modules.FiniteLocallyFreeData F.1 n) ∧
-      Nonempty (E ≅ (DerivedCategory.singleFunctor (Coh X) 0).obj F)
-
-/-- The perfect-object property on the coherent derived category: the thick
-triangulated envelope of finite locally free coherent sheaves. -/
-def schemePerfect :
-    (X : Scheme.{u}) → [IsLocallyNoetherian X] →
-      ObjectProperty (SchemeCoherentDerivedCategory X) :=
-  fun X _ ↦ (schemeFiniteLocallyFreeGenerator X).triangEnvelope
-
-/-- Every finite-locally-free degree-zero generator is bounded for the
-canonical t-structure. -/
-theorem schemeFiniteLocallyFreeGenerator_le_bounded
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    schemeFiniteLocallyFreeGenerator X ≤
-      (DerivedCategory.TStructure.t (C := Coh X)).bounded := by
-  rintro E ⟨F, n, _, ⟨e⟩⟩
-  exact (DerivedCategory.TStructure.t (C := Coh X)).bounded.prop_of_iso e.symm
-    ⟨⟨0, inferInstance⟩, ⟨0, inferInstance⟩⟩
-
-/-- Every perfect complex is bounded coherent.  This is the universal-property
-proof from the thick-envelope definition, not an additional assumption. -/
-theorem schemePerfect_le_bounded (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    schemePerfect X ≤ (DerivedCategory.TStructure.t (C := Coh X)).bounded := by
-  change (schemeFiniteLocallyFreeGenerator X).triangEnvelope ≤ _
-  apply (ObjectProperty.triangEnvelope_le_iff
-    (P := schemeFiniteLocallyFreeGenerator X)
-    (Q := (DerivedCategory.TStructure.t (C := Coh X)).bounded)).2
-  exact schemeFiniteLocallyFreeGenerator_le_bounded X
-
-/-- `Perf(X)` as the full subcategory cut out by the thick envelope of finite
-locally free coherent sheaves. -/
-abbrev SchemePerfectDerivedCategory
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :=
-  (schemePerfect X).FullSubcategory
-
-namespace SchemePerfectDerivedCategory
-
-variable (X : Scheme.{u}) [IsLocallyNoetherian X]
-
-/-- The inclusion of perfect objects into the coherent derived category. -/
-abbrev ι : SchemePerfectDerivedCategory X ⥤ SchemeCoherentDerivedCategory X :=
-  (schemePerfect X).ι
-
-/-- The fully faithful inclusion `Perf(X) ⥤ Dᵇ(Coh X)`. -/
-abbrev toBounded :
-    SchemePerfectDerivedCategory X ⥤ SchemeBoundedCoherentDerivedCategory X :=
-  (schemePerfect X).ιOfLE (schemePerfect_le_bounded X)
-
-/-- The degree-zero structure sheaf lies in the finite-locally-free generating
-property.
-
-`O_X` as a coherent sheaf is `Scheme.structureSheafCoh`, in `CoherentSheaf/`.
-This module used to define its own copy: the object is a line bundle and its
-coherence is `LineBundleData.isCoherent`, so it needs none of the derived
-categories, triangulated generators or t-structures that this file imports, and
-a general context could not reach it inside the stability-families namespace. -/
-theorem structureSheaf_mem_generator :
-    schemeFiniteLocallyFreeGenerator X
-      ((DerivedCategory.singleFunctor (Coh X) 0).obj (Scheme.structureSheafCoh X)) := by
-  refine ⟨Scheme.structureSheafCoh X, 1, ⟨?_, ⟨Iso.refl _⟩⟩⟩
-  exact ⟨(Scheme.Modules.LineBundleData.unit X).finiteLocallyFree⟩
-
-/-- The degree-zero structure sheaf is a perfect object. -/
-theorem structureSheaf_mem :
-    schemePerfect X
-      ((DerivedCategory.singleFunctor (Coh X) 0).obj (Scheme.structureSheafCoh X)) :=
-  (schemeFiniteLocallyFreeGenerator X).le_triangEnvelope _
-    (structureSheaf_mem_generator X)
-
-/-- A canonical object of `Perf(X)` supplied by the structure sheaf. -/
-noncomputable def structureSheaf : SchemePerfectDerivedCategory X :=
-  ⟨(DerivedCategory.singleFunctor (Coh X) 0).obj (Scheme.structureSheafCoh X),
-    structureSheaf_mem X⟩
-
-/-- The finite-locally-free generating property is nonempty. -/
-instance : (schemeFiniteLocallyFreeGenerator X).Nonempty :=
-  ⟨_, structureSheaf_mem_generator X⟩
-
-/-- The perfect-object property is nonempty. -/
-instance : (schemePerfect X).Nonempty :=
-  ⟨_, (structureSheaf X).property⟩
-
-end SchemePerfectDerivedCategory
 
 namespace SchemeBaseChange
 

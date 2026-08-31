@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Basic
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Affine
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineDerivedEquivalence
@@ -22,10 +23,10 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai
 # Derived algebraic geometry
 
 The geometric inputs and realizations of the generic categorical derived
-category: module-sheaf derived categories, `Dqc`, scheme-indexed pullback, and
-geometric Fourier--Mukai kernels. Foundational scheme-derived category
-declarations use `AlgebraicGeometry.DerivedCategory`; scheme-family
-declarations use `AlgebraicGeometry.DerivedCategory.Families`; `Dqc`
-declarations use `AlgebraicGeometry.DerivedCategory.Dqc`; geometric kernel
-declarations use `AlgebraicGeometry.DerivedCategory.FourierMukai`.
+category: module-sheaf and coherent-sheaf derived categories, `Dqc`,
+scheme-indexed pullback, and geometric Fourier--Mukai kernels. Foundational
+scheme-derived declarations use `AlgebraicGeometry.DerivedCategory`;
+scheme-family declarations use `AlgebraicGeometry.DerivedCategory.Families`;
+`Dqc` declarations use `AlgebraicGeometry.DerivedCategory.Dqc`; geometric
+kernel declarations use `AlgebraicGeometry.DerivedCategory.FourierMukai`.
 -/

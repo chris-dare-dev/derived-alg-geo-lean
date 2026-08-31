@@ -17,6 +17,14 @@ blocks should normally move it rather than add more declarations beside it.
 - Generic abelian and derived-category infrastructure:
   `CategoryTheory/Abelian/` and
   `CategoryTheory/Triangulated/DerivedCategory/`.
+- Canonical scheme-derived specializations:
+  `AlgebraicGeometry/DerivedCategory/Basic.lean` registers the shared
+  module-sheaf derived-category instance, while
+  `AlgebraicGeometry/DerivedCategory/Coherent.lean` owns `D(Coh X)`,
+  `Dᵇ(Coh X)`, `Perf(X)`, and the structure-sheaf perfect object without
+  importing scheme-family, pullback, determinant, or moduli consumers.
+  `Families/BoundedGeometry.lean` now begins with base-change fiber aliases and
+  pullback-preservation contracts.
 - Ordinary semilinear and top exterior-power algebra:
   `LinearAlgebra/ExteriorPower/`.
 - Exterior powers of presheaves of modules over an arbitrary ring presheaf:
@@ -104,6 +112,24 @@ blocks should normally move it rather than add more declarations beside it.
    strict `Bᵒᵖ ⥤ Cat` source to a pseudofunctor on `LocallyDiscrete Bᵒᵖ`, with
    strict functors admitted through a constructor rather than treated as the
    general root.
+
+2. Rebind the coherent-duality consumers to the canonical
+   `AlgebraicGeometry/DerivedCategory/Coherent.lean` owner. Move the generic
+   `ModuleCat.DerivedOppositeComparison` block from
+   `AlgebraicGeometry/Duality/Serre/LinearDual.lean` to
+   `CategoryTheory/Triangulated/DerivedCategory/Opposite.lean`; leave only the
+   scheme-specific realization in duality.
+
+3. Make the existing `Dᵇ(Coh X) ⥤ Dqc(X)` comparison hypotheses actual inputs
+   to downstream consumers before proving geometric inhabitants. Do not add a
+   global equivalence or compact/perfect instance until the required
+   hypotheses are proved, with the affine case the first intended realization.
+
+4. Document and compare the three current perfect-complex notions:
+   `schemePerfect` in `D(Coh X)`, `schemeRelativePerfect` in `Dqc`, and
+   `TwoTermPerfectDeterminantData`. Move the canonical zero object for
+   `SchemeQuasicoherentDerivedCategory` from the perfect-moduli consumer to the
+   `Dqc` owner during that lane.
 
 For each lane, remove the old path rather than retaining an import-only shim,
 update audits and umbrellas in the same pull request, and add a focused

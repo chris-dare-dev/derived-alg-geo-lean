@@ -62,8 +62,8 @@ and nothing here discharges it.  For an actual smooth projective `X` the
 realization would be `K₀(D^b(Coh X)) → N(X)`.  The ingredients of that are
 missing or unconnected:
 
-* `D^b(Coh X)` itself now exists —
-  `Families.BoundedGeometry.SchemeBoundedCoherentDerivedCategory`, with
+* `D^b(Coh X)` itself now exists in `DerivedCategory/Coherent.lean` as
+  `SchemeBoundedCoherentDerivedCategory`, with
   `Perf(X)` inside it — but nothing connects it to this file: no class map
   out of its `K₀` is constructed, and this file does not import it;
 * the Chern character of an object of a derived category does not exist --

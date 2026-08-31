@@ -81,7 +81,8 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeTriangulatedFiberFamily.BoundedDerivedRealization.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeTriangulatedFiberFamily.BoundedDerivedRealization.fiberEquivalence
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeTriangulatedFiberFamily.BoundedDerivedRealization.residueFiberEquivalence
-#print axioms AlgebraicGeometry.DerivedCategory.Families.schemeModulesHasDerivedCategory
+#print axioms AlgebraicGeometry.DerivedCategory.schemeModulesHasDerivedCategory
+#print axioms AlgebraicGeometry.DerivedCategory.schemeSheafOfModulesHasDerivedCategory
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePullbackId
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePullbackComp
@@ -368,7 +369,7 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.Moduli.HarderNarasimhan.hasSchemeRelativeHNFiltrations_constant
 #print axioms AlgebraicGeometry.Moduli.HarderNarasimhan.integratesAfterDedekindBaseChange_relativeHN_constant
 
-/-! ## Bounded coherent and perfect scheme-derived fibers
+/-! ## Coherent and perfect scheme-derived categories and family fibers
 
 `schemePerfect` is the thick envelope of degree-zero finite locally free
 coherent sheaves.  The pullback records below are contracts: clean axiom lists
@@ -376,20 +377,20 @@ certify their constructions and consequences, not the existence of a
 geometric witness for every scheme morphism.
 -/
 
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeCoherentDerivedCategory
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBoundedCoherentDerivedCategory
-#print axioms AlgebraicGeometry.DerivedCategory.Families.schemeFiniteLocallyFreeGenerator
-#print axioms AlgebraicGeometry.DerivedCategory.Families.schemePerfect
-#print axioms AlgebraicGeometry.DerivedCategory.Families.schemeFiniteLocallyFreeGenerator_le_bounded
-#print axioms AlgebraicGeometry.DerivedCategory.Families.schemePerfect_le_bounded
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemePerfectDerivedCategory
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemePerfectDerivedCategory.ι
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemePerfectDerivedCategory.toBounded
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemePerfectDerivedCategory.structureSheaf_mem_generator
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemePerfectDerivedCategory.structureSheaf_mem
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemePerfectDerivedCategory.structureSheaf
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemePerfectDerivedCategory.instNonemptySchemeCoherentDerivedCategorySchemeFiniteLocallyFreeGenerator
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemePerfectDerivedCategory.instNonemptySchemeCoherentDerivedCategorySchemePerfect
+#print axioms AlgebraicGeometry.DerivedCategory.SchemeCoherentDerivedCategory
+#print axioms AlgebraicGeometry.DerivedCategory.SchemeBoundedCoherentDerivedCategory
+#print axioms AlgebraicGeometry.DerivedCategory.schemeFiniteLocallyFreeGenerator
+#print axioms AlgebraicGeometry.DerivedCategory.schemePerfect
+#print axioms AlgebraicGeometry.DerivedCategory.schemeFiniteLocallyFreeGenerator_le_bounded
+#print axioms AlgebraicGeometry.DerivedCategory.schemePerfect_le_bounded
+#print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory
+#print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.ι
+#print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.toBounded
+#print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.structureSheaf_mem_generator
+#print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.structureSheaf_mem
+#print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.structureSheaf
+#print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.instNonemptySchemeCoherentDerivedCategorySchemeFiniteLocallyFreeGenerator
+#print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.instNonemptySchemeCoherentDerivedCategorySchemePerfect
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentDerivedFiber
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.PerfectDerivedFiber
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.ResidueBoundedCoherentDerivedFiber
@@ -469,7 +470,7 @@ records below assert openness or relative-HN existence.
 -/
 
 #print axioms CategoryTheory.Triangulated.Slicing.preimage.congr_simp
-#print axioms AlgebraicGeometry.DerivedCategory.Families.schemeCoherentHasDerivedCategory
+#print axioms AlgebraicGeometry.DerivedCategory.schemeCoherentHasDerivedCategory
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback.derivedAdditive
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instAdditiveSchemeCoherentDerivedCategoryLeftSchemeCoherentDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instAdditiveBoundedCoherentDerivedFiberBoundedCoherentDerivedPullback

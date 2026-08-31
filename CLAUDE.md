@@ -173,9 +173,12 @@ geometric properties of their representing morphisms remain under
 `AlgebraicGeometry/Stacks/`.
 
 Match declaration namespaces to those geometric owners. Scheme-derived
-category declarations in `AlgebraicGeometry/DerivedCategory/Basic.lean` use
-`AlgebraicGeometry.DerivedCategory`; scheme base-change and pullback
-declarations in `AlgebraicGeometry/DerivedCategory/Families/` use
+category declarations in
+`AlgebraicGeometry/DerivedCategory/{Basic,Coherent}.lean` use
+`AlgebraicGeometry.DerivedCategory`: `Basic.lean` owns the module-sheaf
+specialization, while `Coherent.lean` owns `D(Coh X)`, `Dᵇ(Coh X)`, and
+`Perf(X)` independently of families and pullback. Scheme base-change and
+pullback declarations in `AlgebraicGeometry/DerivedCategory/Families/` use
 `AlgebraicGeometry.DerivedCategory.Families`; quasicoherent-cohomology loci
 and affine realizations in `AlgebraicGeometry/DerivedCategory/Dqc.lean` and
 its `Dqc/` subtree use `AlgebraicGeometry.DerivedCategory.Dqc`; neutral

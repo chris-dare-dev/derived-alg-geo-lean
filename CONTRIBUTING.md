@@ -138,9 +138,11 @@ bases, and projective-space computations remain under
 `AlgebraicGeometry/Cohomology/`.
 
 Scheme-specific specializations of that generic construction live under
-`AlgebraicGeometry/DerivedCategory/`: this is the owner for module-sheaf
-derived categories, `Dqc`, scheme-indexed derived pullback, and geometric
-Fourier--Mukai kernels. A registration-only adapter may instead use the generic
+`AlgebraicGeometry/DerivedCategory/`: `Basic.lean` owns module-sheaf derived
+categories, `Coherent.lean` owns `D(Coh X)`, `Dᵇ(Coh X)`, and `Perf(X)`, and
+the `Families/` subtree owns only scheme base-change and pullback consumers.
+The same geometric root owns `Dqc` and Fourier--Mukai kernels. A
+registration-only adapter may instead use the generic
 construction's `Instances/AlgebraicGeometry/` leaf. The former
 `AlgebraicGeometry/StabilityCondition/` subtree is retired: an API that
 implements weak or Bridgeland stability belongs in the corresponding

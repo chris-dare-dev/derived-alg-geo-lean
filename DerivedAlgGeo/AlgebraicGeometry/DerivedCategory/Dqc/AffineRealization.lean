@@ -25,8 +25,6 @@ additional unbounded derived-category input.
 
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
-open AlgebraicGeometry.DerivedCategory.Families
-open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
 
