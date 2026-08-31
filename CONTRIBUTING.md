@@ -44,6 +44,9 @@ operations, and `LinearAlgebra/` for generic linear maps, bases, lattices,
 matrices, multilinear constructions, and exterior powers. When a geometric
 file contains a generic helper followed by its scheme application, split the
 helper into its general root and import that root from the consumer.
+The canonical repository extension for localization commuting with kernels is
+`Algebra/Module/Localization/Kernels.lean`; scheme and coherent-sheaf files
+consume it directly rather than restating its linear-map or `ModuleCat` forms.
 
 Use Mathlib's established namespace when extending a Mathlib concept. Add a
 same-named umbrella for a new non-leaf directory and export stable leaves

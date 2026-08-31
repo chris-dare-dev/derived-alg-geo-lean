@@ -77,6 +77,10 @@ application, current file, namespace, or proof technique.
   `CategoryTheory/Pseudofunctor/ObjectProperty/`.
 - A geometric consumer imports the general root directly. Do not preserve the
   old consumer path with an import-only shim.
+- Kernel maps for ordinary localized modules, including their `ModuleCat`
+  formulation, belong under `Algebra/Module/Localization/`. Coherent-sheaf
+  arguments import that algebraic owner and add only the scheme-dependent
+  comparison and finiteness steps.
 
 When editing a consumer file, inspect adjacent declarations for a generic
 prefix or suffix. Move an in-scope generic block with the consumer change, or

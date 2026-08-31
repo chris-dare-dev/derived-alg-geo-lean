@@ -81,6 +81,8 @@ Category
 
 Algebra
 ├─ ordinary ring and module theory
+│  └─ module localization
+│     └─ kernel maps                       consumed by coherent-sheaf geometry
 └─ saturation of an additive subgroup
    └─ saturated quotient and torsion-free universal property
 
@@ -132,7 +134,8 @@ particular:
 - keep ordinary module theory under `Algebra`, generic sheaves and module
   sheaves on ringed sites under `CategoryTheory/Sites/Sheaves`, and only the
   scheme-indexed `SheafOfModules(X) -> QCoh(X) -> Coh(X)` refinements under
-  algebraic geometry;
+  algebraic geometry; in particular, coherent-sheaf kernels directly reuse
+  the module-localization kernel maps rather than owning them;
 - extend Mathlib's abelian-category hierarchy under `CategoryTheory/Abelian`
   and make the geometric proof that `Coh(X)` is abelian an input to the generic
   derived-category construction;

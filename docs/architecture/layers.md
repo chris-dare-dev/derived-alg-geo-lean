@@ -104,6 +104,9 @@ The source tree follows general constructions before concrete instances:
 The physical module tree records that refinement directly:
 
 ```text
+Algebra/Module/Localization
+  └─→ Kernels                                linear, ModuleCat, natural forms
+
 CategoryTheory/Bicategory
   └─→ Adjunction
         ├─→ Basic                               adjunctions of 1-morphisms

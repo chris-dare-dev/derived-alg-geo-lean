@@ -29,14 +29,14 @@ blocks should normally move it rather than add more declarations beside it.
 - Generic preservation through composition and reflective transport:
   `CategoryTheory/Limits/Preserves/`. The former repository
   `CategoryTheory/Adjunction/` root is retired.
+- Module-localization kernel maps:
+  `Algebra/Module/Localization/Kernels.lean`. This owns `LinearMap.kerMap` and
+  the `IsLocalizedModule.{kerMap,kernelMap,kernelNatTrans}` chain; the
+  coherent-sheaf kernel theorem imports and directly reuses that root.
 
 ## Confirmed next lanes
 
-1. `AlgebraicGeometry/CoherentSheaf/Abelian/Kernels.lean` contains
-   `LinearMap.kerMap` and `IsLocalizedModule.kerMap`. Their signatures mention
-   only modules, linear maps, and localization; move them under
-   `Algebra/Module/Localization/` before the coherent-sheaf consumer.
-2. Review geometric moduli selectors that are only indexed
+1. Review geometric moduli selectors that are only indexed
    isomorphism-closed predicates. Keep their finite-type witnesses geometric,
    but express every actual subprestack through the canonical pseudofunctor
    object-property root once restriction stability is proved.

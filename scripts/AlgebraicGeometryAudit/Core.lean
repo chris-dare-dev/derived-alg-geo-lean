@@ -1333,10 +1333,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- (co)kernels to finite modules. The final instances create (co)kernels in `Coh X`.
 #print axioms AlgebraicGeometry.modulesSpecToSheaf_preservesFiniteLimits
 #print axioms Scheme.Modules.restrictFunctor_preservesFiniteLimits
-#print axioms LinearMap.kerMap
-#print axioms IsLocalizedModule.kerMap
-#print axioms IsLocalizedModule.kernelMap
-#print axioms IsLocalizedModule.kernelNatTrans
 #print axioms Scheme.Modules.isLocalizedModule_basicOpenRestriction_kernel
 #print axioms Scheme.Modules.isCoherent_kernel_affine
 #print axioms Scheme.Modules.isCoherent_cokernel_affine

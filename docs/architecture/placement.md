@@ -59,6 +59,14 @@ ordinary adjunction is placed by the other vocabulary in its signature:
 preservation results belong with limits, `Ext` comparisons with derived `Ext`,
 and kernel packages with Fourier--Mukai theory.
 
+The module-localization kernel chain is rooted at
+`Algebra/Module/Localization/Kernels.lean`. Its linear-map, `ModuleCat`, and
+finite-limit-preserving natural-transformation forms are one algebraic chain:
+the first constructs the map on module kernels and the remaining declarations
+prove its localization behavior, without mentioning a site or scheme.
+`AlgebraicGeometry/CoherentSheaf/Abelian/Kernels.lean` is a direct consumer and
+owns only the scheme restriction, affine comparison, and coherence steps.
+
 ## Moduli and subprestacks
 
 `CategoryTheory.Moduli.BoundednessProblem` is the neutral boundedness root. A

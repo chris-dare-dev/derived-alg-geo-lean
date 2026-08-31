@@ -12,7 +12,8 @@ The principal areas are:
   divisors, duality, intersection theory, numerical geometry, and
   Riemann--Roch;
 - `DerivedAlgGeo/Algebra/` for ordinary ring and module theory independent of
-  sites and schemes;
+  sites and schemes, including localization and its kernel behavior under
+  `Algebra/Module/Localization/`;
 - `DerivedAlgGeo/CategoryTheory/Abelian/` for repository-owned results about
   arbitrary abelian categories, extending Mathlib's abelian hierarchy;
 - `DerivedAlgGeo/CategoryTheory/Bicategory/` for higher-categorical
