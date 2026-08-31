@@ -1,5 +1,6 @@
 CategoryTheory	CategoryTheory.DGFunctor.IsQuasiEquivalence
 CategoryTheory	CategoryTheory.DGLinear
+CategoryTheory	CategoryTheory.DerivedCategory.OppositeComparison
 CategoryTheory	CategoryTheory.Enhancement
 CategoryTheory	CategoryTheory.IsConeOf
 CategoryTheory	CategoryTheory.IsPretriangulated
@@ -9,7 +10,6 @@ CategoryTheory	CategoryTheory.StackEquivalence
 CategoryTheory	CategoryTheory.StackInGroupoids.Cover
 CategoryTheory	CategoryTheory.Triangulated.CofiltrationData
 CategoryTheory	CategoryTheory.Triangulated.ComponentTopologicalLinearLocalModel
-CategoryTheory	CategoryTheory.Triangulated.Families.TriangulatedFiberFamily
 CategoryTheory	CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.CompatibleClassMaps
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.CoherentConvolutionData
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints
