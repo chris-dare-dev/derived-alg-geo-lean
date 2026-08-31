@@ -15,9 +15,9 @@ can express it without importing a row below it.
 | --- | --- |
 | Rings, ideals, ordinary modules, localization, additive subgroups | `Algebra/` |
 | Linear maps, bases, lattices, matrices, bilinear or quadratic forms, exterior powers | `LinearAlgebra/` |
-| Bicategories, 1- and 2-morphisms, adjunctions between 1-morphisms, mates | `CategoryTheory/Bicategory/` |
+| Bicategories, 1- and 2-morphisms, adjunctions between 1-morphisms, mates, modifications | `CategoryTheory/Bicategory/` |
 | Ordinary categories, functors, adjoint functors, limits, abelian or triangulated structure | the nearest `CategoryTheory/` subject root |
-| Cat-valued pseudofunctors and fiberwise object loci | `CategoryTheory/Pseudofunctor/` |
+| Pseudofunctors, their coherence transport, and fiberwise object loci | `CategoryTheory/Pseudofunctor/` |
 | Grothendieck topologies, sites, sheaves, or descent | `CategoryTheory/Sites/` |
 | Topological spaces but no schemes | `Topology/` |
 | Schemes, varieties, geometric fibers, scheme morphism properties, `Dqc(X)`, `QCoh(X)`, or `Coh(X)` | `AlgebraicGeometry/` |
@@ -58,6 +58,15 @@ adjunctions with its `Cat` specialization. A theorem that merely assumes an
 ordinary adjunction is placed by the other vocabulary in its signature:
 preservation results belong with limits, `Ext` comparisons with derived `Ext`,
 and kernel packages with Fourier--Mukai theory.
+
+Classify categorical dimension before applying the table. A declaration whose
+essential data are associators, unitors, pentagons, triangles, or other
+2-morphisms is not ordinary-category infrastructure merely because its `Cat`
+specialization is written with functors and natural isomorphisms. Its root is
+the corresponding bicategory or pseudofunctor module. Thus conjugating a
+Cat-valued pseudofunctor presentation through objectwise equivalences is rooted
+at `CategoryTheory/Pseudofunctor/Transport.lean`; affine derived and geometric
+models import that root as consumers.
 
 The module-localization kernel chain is rooted at
 `Algebra/Module/Localization/Kernels.lean`. Its linear-map, `ModuleCat`, and

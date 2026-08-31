@@ -137,6 +137,10 @@ RETIRED_IMPORT_SHIMS = {
             "PreservesColimits.lean",
         "DerivedAlgGeo.CategoryTheory.Limits.Preserves",
     ),
+    "DerivedAlgGeo.CategoryTheory.EquivalenceTransport": (
+        SOURCE_ROOT / "CategoryTheory" / "EquivalenceTransport.lean",
+        "DerivedAlgGeo.CategoryTheory.Pseudofunctor.Transport",
+    ),
     "DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Exactness": (
         SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Affine" /
             "Exactness.lean",
@@ -708,6 +712,74 @@ def main() -> int:
             failures.append(
                 f"{path.relative_to(ROOT)}: generic subprestack infrastructure "
                 "depends on a geometric or stability-specific consumer"
+            )
+
+    pseudofunctor_transport = (
+        generic_pseudofunctor_root / "Transport.lean"
+    )
+    if not pseudofunctor_transport.is_file():
+        failures.append(
+            "generic pseudofunctor transport root missing: "
+            f"{pseudofunctor_transport.relative_to(ROOT)}"
+        )
+    else:
+        transport_text = pseudofunctor_transport.read_text(encoding="utf-8")
+        if "namespace CategoryTheory.Pseudofunctor" not in transport_text:
+            failures.append(
+                f"{pseudofunctor_transport.relative_to(ROOT)}: equivalence "
+                "transport must use the pseudofunctor namespace"
+            )
+        for required_name in (
+            "equivalenceTransportFunctor",
+            "equivalenceTransportCompIso",
+            "equivalenceTransportIdIso",
+            "equivalenceTransport_associativity",
+            "equivalenceTransport_leftUnitality",
+            "equivalenceTransport_rightUnitality",
+        ):
+            if required_name not in transport_text:
+                failures.append(
+                    f"{pseudofunctor_transport.relative_to(ROOT)}: missing "
+                    f"transport declaration {required_name}"
+                )
+        if re.search(
+            r"^import (?:DerivedAlgGeo|Mathlib)\.AlgebraicGeometry",
+            transport_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{pseudofunctor_transport.relative_to(ROOT)}: generic "
+                "pseudofunctor transport imports a geometric consumer"
+            )
+
+    transport_module = (
+        "DerivedAlgGeo.CategoryTheory.Pseudofunctor.Transport"
+    )
+    transport_consumers = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "Dqc" /
+            "AffineKProjectiveDerivedPseudofunctor.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "DerivedCategory" / "Dqc" /
+            "AffineGeometricPseudofunctor.lean",
+    )
+    for path in transport_consumers:
+        if transport_module not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: affine pseudofunctor consumer must "
+                "import the generic transport root directly"
+            )
+
+    geometric_source_root = SOURCE_ROOT / "AlgebraicGeometry"
+    local_transport_declaration = re.compile(
+        r"^(?:private\s+)?(?:def|theorem)\s+"
+        r"(?:qhTransport|equivalenceTransport)"
+        r"(?:Functor|CompIso|IdIso|_associativity|_leftUnitality|_rightUnitality)\b",
+        re.MULTILINE,
+    )
+    for path in sorted(geometric_source_root.rglob("*.lean")):
+        if local_transport_declaration.search(path.read_text(encoding="utf-8")):
+            failures.append(
+                f"{path.relative_to(ROOT)}: geometric consumer restored a "
+                "local copy of pseudofunctor equivalence transport"
             )
 
     geometric_moduli_root = SOURCE_ROOT / "AlgebraicGeometry" / "Moduli"

@@ -7,16 +7,16 @@ import Mathlib.CategoryTheory.Equivalence
 import Mathlib.Tactic.CategoryTheory.Slice
 
 /-!
-# Transporting functorial coherence through equivalences
+# Transporting pseudofunctor presentations through equivalences
 
-This file records the elementary construction that conjugates a functor by
-equivalences of its source and target.  It also transports compositors, units,
-the pentagon equation, and the two triangle equations.  These lemmas are
-useful when an objectwise model of a pseudofunctor is replaced by equivalent
-categories.
+This file centralizes the Cat-level transport used when an objectwise model of
+a pseudofunctor is replaced by equivalent categories. It conjugates transition
+functors and transports their compositors, units, pentagon equation, and two
+triangle equations. Concrete consumers provide the presentation being
+transported; the coherence calculus itself belongs to the pseudofunctor root.
 -/
 
-namespace CategoryTheory
+namespace CategoryTheory.Pseudofunctor
 
 noncomputable section
 
@@ -176,4 +176,4 @@ theorem equivalenceTransport_rightUnitality
 
 end
 
-end CategoryTheory
+end CategoryTheory.Pseudofunctor

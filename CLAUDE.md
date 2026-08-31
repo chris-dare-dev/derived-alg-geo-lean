@@ -61,6 +61,13 @@ concrete applications through explicit instance leaves.
   Its `Bicategory.Adjunction` is the source-of-truth; ordinary adjoint functors
   are the `Cat` specialization through `Adjunction.toCat` and `ofCat`, bundled
   here by `Adjunction.bicategoricalEquiv`.
+- Determine categorical dimension before subject ownership. Associators,
+  unitors, pentagons, triangles, mates, pseudofunctors, strong
+  transformations, and modifications are higher-categorical source data;
+  their ordinary functor and natural-isomorphism formulas are `Cat`
+  projections. Objectwise-equivalence transport of such a presentation is
+  owned by `CategoryTheory/Pseudofunctor/Transport.lean`, never by a geometric
+  consumer.
 - Generic sheaves belong under `CategoryTheory/Sites/Sheaves/`; sheaves of
   modules over a sheaf of rings on an arbitrary site belong in its `Modules/`
   child.

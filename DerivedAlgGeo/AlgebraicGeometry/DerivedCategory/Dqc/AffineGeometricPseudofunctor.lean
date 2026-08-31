@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
+import DerivedAlgGeo.CategoryTheory.Pseudofunctor.Transport
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectiveDerivedPseudofunctor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization
 
@@ -26,6 +26,7 @@ open AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 open CategoryTheory CategoryTheory.Bicategory AlgebraicGeometry
+open CategoryTheory.Pseudofunctor
 
 noncomputable section
 

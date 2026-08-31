@@ -5,7 +5,7 @@ family records are owned by
 `AlgebraicGeometryAudit/StabilityConditionFamilies.lean`.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
-import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
+import DerivedAlgGeo.CategoryTheory.Pseudofunctor.Transport
 import DerivedAlgGeo.CategoryTheory.Pseudofunctor.ObjectProperty.UniversallyStable
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
@@ -64,12 +64,12 @@ open CategoryTheory.Triangulated
 
 /-! ## Geometric affine bounded-above projective locus -/
 
-#print axioms CategoryTheory.equivalenceTransportFunctor
-#print axioms CategoryTheory.equivalenceTransportCompIso
-#print axioms CategoryTheory.equivalenceTransportIdIso
-#print axioms CategoryTheory.equivalenceTransport_associativity
-#print axioms CategoryTheory.equivalenceTransport_leftUnitality
-#print axioms CategoryTheory.equivalenceTransport_rightUnitality
+#print axioms CategoryTheory.Pseudofunctor.equivalenceTransportFunctor
+#print axioms CategoryTheory.Pseudofunctor.equivalenceTransportCompIso
+#print axioms CategoryTheory.Pseudofunctor.equivalenceTransportIdIso
+#print axioms CategoryTheory.Pseudofunctor.equivalenceTransport_associativity
+#print axioms CategoryTheory.Pseudofunctor.equivalenceTransport_leftUnitality
+#print axioms CategoryTheory.Pseudofunctor.equivalenceTransport_rightUnitality
 #print axioms CategoryTheory.Pseudofunctor.ObjectProperty.universallyStable
 #print axioms CategoryTheory.Pseudofunctor.ObjectProperty.universallyStable_isClosedUnderIsomorphisms
 #print axioms CategoryTheory.Pseudofunctor.ObjectProperty.universallyStable_isClosedUnderMapObj

@@ -127,6 +127,11 @@ CategoryTheory/Bicategory
         ├─→ Basic                               adjunctions of 1-morphisms
         └─→ Cat                                 ordinary functor specialization
 
+CategoryTheory/Pseudofunctor
+  ├─→ Transport                                 Cat-presentation coherence transport
+  └─→ ObjectProperty
+        └─→ UniversallyStable                   replete subprestack closure
+
 CategoryTheory/Limits/Preserves
   ├─→ Composition                              no adjunction required
   └─→ Reflective                               ordinary Cat-level consumer
@@ -146,9 +151,6 @@ CategoryTheory/SpectralSequence
 CategoryTheory/Sites/StackInGroupoids
   ├─→ Discrete                                sheaves of types as stacks
   └─→ Morphism                                fibers and representability
-
-CategoryTheory/Pseudofunctor/ObjectProperty
-  └─→ UniversallyStable                       replete subprestack closure
 
 CategoryTheory/Moduli
   └─→ Boundedness                              neutral moduli predicate
@@ -375,6 +377,7 @@ the explicit instance umbrellas attached to their categorical sources:
 | Client need | Import |
 | --- | --- |
 | Fiber categories and pullbacks | `DerivedAlgGeo.CategoryTheory.Triangulated.Families` |
+| Pseudofunctor-presentation transport through equivalences | `DerivedAlgGeo.CategoryTheory.Pseudofunctor.Transport` |
 | Neutral moduli boundedness | `DerivedAlgGeo.CategoryTheory.Moduli` |
 | Pseudofunctor loci and subprestacks | `DerivedAlgGeo.CategoryTheory.Pseudofunctor.ObjectProperty` |
 | Generic derived-category extensions | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory` |

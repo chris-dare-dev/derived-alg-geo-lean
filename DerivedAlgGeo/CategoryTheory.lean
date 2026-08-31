@@ -14,7 +14,6 @@ import DerivedAlgGeo.CategoryTheory.Simplicial
 import DerivedAlgGeo.CategoryTheory.SpectralSequence
 import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated
-import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
 import DerivedAlgGeo.CategoryTheory.Moduli
 import DerivedAlgGeo.CategoryTheory.Pseudofunctor
 import DerivedAlgGeo.CategoryTheory.StabilityCharge
