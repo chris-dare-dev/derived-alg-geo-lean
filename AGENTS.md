@@ -61,7 +61,9 @@ new derived-category theory.
   them, and expose a one-way forgetful map to the weaker tensor interface.
 
 - The derived category is a generic construction on an abelian category and
-  belongs under `CategoryTheory/Abelian/DerivedCategory/`.
+  belongs under `CategoryTheory/Triangulated/DerivedCategory/`, together with
+  its canonical t-structure, exact-functor, homology-comparison, and
+  K-projective APIs.
 - `Coh X`, `QCoh X`, and module-sheaf categories are geometric inputs. Their
   scheme-specific categories and loci belong under
   `AlgebraicGeometry/DerivedCategory/`; registration-only adapters for generic
@@ -93,8 +95,9 @@ new derived-category theory.
   `WeakStabilityCondition/StabilityCondition/`; do not restore a sibling
   `CategoryTheory/Triangulated/StabilityCondition/` tree.
 - The weak parent must not import its Bridgeland child. Strong conditions must
-  canonically expose their weak data; adapters that require strong definitions
-  belong in the child's `WeakCompatibility/` leaf.
+  extend or canonically contain their weak data. Do not add a parallel
+  `WeakCompatibility/` adapter leaf for a relationship already expressed by
+  the structure projection.
 - Abstract pullback, pseudofunctor, Fourier--Mukai correspondence, and kernel
   convolution interfaces stay categorical. Scheme pullback, geometric
   derived categories, `Dqc`, pullback constructions, and geometric kernels live
@@ -103,6 +106,11 @@ new derived-category theory.
   the base category, fiber categories, and abstract pullback functors of a
   triangulated family belong under `CategoryTheory/Triangulated/Families/`
   before any stability or geometry is imposed.
+- Generic stacks, discrete-stack construction from a sheaf, stack morphisms,
+  and site-object representability belong under
+  `CategoryTheory/Sites/StackInGroupoids/`. Big-Zariski representables,
+  scheme-morphism properties, atlases, and algebraicity remain under
+  `AlgebraicGeometry/Stacks/`.
 - Declarations owned by that generic family root use the
   `CategoryTheory.Triangulated.Families` namespace. Do not place
   `TriangulatedFiberFamily`, shared boundedness interfaces, or future neutral

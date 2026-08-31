@@ -2,9 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import Mathlib.Algebra.Homology.DerivedCategory.ExactFunctor
 import Mathlib.CategoryTheory.Triangulated.Generators
-import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLTGE
+import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.ExactFunctor
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.StructureSheaf
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Determinant
@@ -65,100 +64,6 @@ Noetherian scheme. -/
 abbrev SchemeBoundedCoherentDerivedCategory
     (X : Scheme.{u}) [IsLocallyNoetherian X] :=
   DerivedCategory.Bounded (Coh X)
-
-variable {C : Type*} [Category C] [Preadditive C] [HasZeroObject C] [HasShift C ℤ]
-  [∀ (n : ℤ), (shiftFunctor C n).Additive] [Pretriangulated C]
-
-/-- The `≤ n` part of a t-structure is stable under retracts. -/
-lemma tStructureIsLE_of_retract (t : TStructure C) {X Y : C} (r : Retract X Y) (n : ℤ)
-    (hY : t.IsLE Y n) : t.IsLE X n := by
-  rw [t.isLE_iff_orthogonal n (n + 1) rfl]
-  intro Z f hZ
-  have hzero : r.r ≫ f = 0 := t.zero_of_isLE_of_isGE (r.r ≫ f) n (n + 1)
-    (by omega) hY hZ
-  rw [← Category.id_comp f, ← r.retract, Category.assoc, hzero, comp_zero]
-
-/-- The `≥ n` part of a t-structure is stable under retracts. -/
-lemma tStructureIsGE_of_retract (t : TStructure C) {X Y : C} (r : Retract X Y) (n : ℤ)
-    (hY : t.IsGE Y n) : t.IsGE X n := by
-  rw [t.isGE_iff_orthogonal (n - 1) n (by omega)]
-  intro Z f hZ
-  have hzero : f ≫ r.i = 0 := t.zero_of_isLE_of_isGE (f ≫ r.i) (n - 1) n
-    (by omega) hZ hY
-  rw [← Category.comp_id f, ← r.retract, ← Category.assoc, hzero, zero_comp]
-
-instance (t : TStructure C) : t.minus.IsStableUnderRetracts where
-  of_retract r hY := ⟨hY.choose, tStructureIsLE_of_retract t r hY.choose hY.choose_spec⟩
-
-instance (t : TStructure C) : t.plus.IsStableUnderRetracts where
-  of_retract r hY := ⟨hY.choose, tStructureIsGE_of_retract t r hY.choose hY.choose_spec⟩
-
-instance (t : TStructure C) : t.bounded.IsStableUnderRetracts := by
-  constructor
-  intro X Y r hY
-  exact ⟨ObjectProperty.prop_of_retract t.plus r hY.1,
-    ObjectProperty.prop_of_retract t.minus r hY.2⟩
-
-variable {A B : Type*} [Category A] [Category B] [Abelian A] [Abelian B]
-
-/-- An additive functor sends a strictly bounded-above cochain complex to a
-strictly bounded-above cochain complex with the same bound. -/
-lemma mapHomologicalComplex_isStrictlyLE (F : A ⥤ B) [F.Additive]
-    (K : CochainComplex A ℤ) (n : ℤ) (hK : K.IsStrictlyLE n) :
-    CochainComplex.IsStrictlyLE
-      ((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K) n := by
-  rw [CochainComplex.isStrictlyLE_iff] at hK ⊢
-  intro i hi
-  exact F.map_isZero (hK i hi)
-
-/-- An additive functor sends a strictly bounded-below cochain complex to a
-strictly bounded-below cochain complex with the same bound. -/
-lemma mapHomologicalComplex_isStrictlyGE (F : A ⥤ B) [F.Additive]
-    (K : CochainComplex A ℤ) (n : ℤ) (hK : K.IsStrictlyGE n) :
-    CochainComplex.IsStrictlyGE
-      ((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K) n := by
-  rw [CochainComplex.isStrictlyGE_iff] at hK ⊢
-  intro i hi
-  exact F.map_isZero (hK i hi)
-
-variable [HasDerivedCategory A] [HasDerivedCategory B]
-
-/-- The functor on derived categories induced by an exact functor preserves
-the canonical `≤ n` truncation bound. -/
-lemma mapDerivedCategory_isLE (F : A ⥤ B) [F.Additive]
-    [PreservesFiniteLimits F] [PreservesFiniteColimits F]
-    (E : DerivedCategory A) (n : ℤ)
-    (hE : (DerivedCategory.TStructure.t (C := A)).IsLE E n) :
-    (DerivedCategory.TStructure.t (C := B)).IsLE
-      (F.mapDerivedCategory.obj E) n := by
-  obtain ⟨K, e, hK⟩ := hE
-  exact ⟨(F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K,
-    F.mapDerivedCategory.mapIso e ≪≫ F.mapDerivedCategoryFactors.app K,
-    mapHomologicalComplex_isStrictlyLE F K n hK⟩
-
-/-- The functor on derived categories induced by an exact functor preserves
-the canonical `≥ n` truncation bound. -/
-lemma mapDerivedCategory_isGE (F : A ⥤ B) [F.Additive]
-    [PreservesFiniteLimits F] [PreservesFiniteColimits F]
-    (E : DerivedCategory A) (n : ℤ)
-    (hE : (DerivedCategory.TStructure.t (C := A)).IsGE E n) :
-    (DerivedCategory.TStructure.t (C := B)).IsGE
-      (F.mapDerivedCategory.obj E) n := by
-  obtain ⟨K, e, hK⟩ := hE
-  exact ⟨(F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K,
-    F.mapDerivedCategory.mapIso e ≪≫ F.mapDerivedCategoryFactors.app K,
-    mapHomologicalComplex_isStrictlyGE F K n hK⟩
-
-/-- Exact functors preserve bounded objects in the canonical derived
-t-structures. -/
-lemma mapDerivedCategory_bounded (F : A ⥤ B) [F.Additive]
-    [PreservesFiniteLimits F] [PreservesFiniteColimits F]
-    (E : DerivedCategory A)
-    (hE : (DerivedCategory.TStructure.t (C := A)).bounded E) :
-    (DerivedCategory.TStructure.t (C := B)).bounded
-      (F.mapDerivedCategory.obj E) :=
-  ⟨⟨hE.1.choose, mapDerivedCategory_isGE F E hE.1.choose hE.1.choose_spec⟩,
-    ⟨hE.2.choose, mapDerivedCategory_isLE F E hE.2.choose hE.2.choose_spec⟩⟩
 
 /-- Degree-zero derived objects represented by finite locally free coherent
 sheaves.  Shifts, finite sums, cones, and retracts are added by

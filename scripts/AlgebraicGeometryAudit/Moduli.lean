@@ -156,29 +156,10 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 
 /-! ## Stacks in groupoids and scheme descent (#523) -/
 
-#print axioms AlgebraicGeometry.StackMorphism
-#print axioms AlgebraicGeometry.StackMorphism.FiberCategory
-#print axioms AlgebraicGeometry.StackMorphism.FiberRepresentation
-#print axioms AlgebraicGeometry.StackMorphism.FiberRepresentation.fiberEquivalence
-#print axioms AlgebraicGeometry.StackMorphism.FiberRepresentation.mk.inj
-#print axioms AlgebraicGeometry.StackMorphism.FiberRepresentation.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.StackMorphism.FiberRepresentation.representing
-#print axioms AlgebraicGeometry.StackMorphism.IsRepresentable
-#print axioms AlgebraicGeometry.StackMorphism.IsRepresentable.representation
-#print axioms AlgebraicGeometry.StackMorphism.app
-#print axioms AlgebraicGeometry.StackMorphism.comp
-#print axioms AlgebraicGeometry.StackMorphism.id
-#print axioms AlgebraicGeometry.StackMorphism.Modification
-#print axioms AlgebraicGeometry.StackMorphism.pullbackIso
-#print axioms AlgebraicGeometry.discretePseudofunctor
-#print axioms AlgebraicGeometry.discretePseudofunctor_isStack
-#print axioms AlgebraicGeometry.discretePseudofunctor_obj_isDiscrete
-#print axioms AlgebraicGeometry.discretePseudofunctor_obj_isGroupoid
 #print axioms AlgebraicGeometry.representableZariskiCechDescentEquivalence
 #print axioms AlgebraicGeometry.representableZariskiObject
 #print axioms AlgebraicGeometry.representableZariskiObject_injective
 #print axioms AlgebraicGeometry.representableZariskiStack
-#print axioms AlgebraicGeometry.stackInGroupoidsOfSheaf
 
 /-! ## Finite-type boundedness witnesses (#519) -/
 

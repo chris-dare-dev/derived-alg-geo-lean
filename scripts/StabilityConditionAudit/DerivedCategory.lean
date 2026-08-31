@@ -1,0 +1,61 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory
+
+/-!
+Audit records for generic derived-category extensions on arbitrary abelian
+categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
+-/
+
+/-! ## T-structures and exact derived functors -/
+
+#print axioms CategoryTheory.tStructureIsLE_of_retract
+#print axioms CategoryTheory.tStructureIsGE_of_retract
+#print axioms CategoryTheory.instIsStableUnderRetractsMinus_derivedAlgGeo
+#print axioms CategoryTheory.instIsStableUnderRetractsPlus_derivedAlgGeo
+#print axioms CategoryTheory.instIsStableUnderRetractsBounded_derivedAlgGeo
+#print axioms CategoryTheory.mapHomologicalComplex_isStrictlyLE
+#print axioms CategoryTheory.mapHomologicalComplex_isStrictlyGE
+#print axioms CategoryTheory.mapDerivedCategory_isLE
+#print axioms CategoryTheory.mapDerivedCategory_isGE
+#print axioms CategoryTheory.mapDerivedCategory_bounded
+#print axioms CategoryTheory.mapDerivedCategoryHomologyIso
+
+/-! ## K-projective derived functors -/
+
+#print axioms CategoryTheory.kProjectiveHomotopy
+#print axioms CategoryTheory.KProjectiveHomotopyCategory
+#print axioms CategoryTheory.kProjectiveHomotopyCategory_isKProjective
+#print axioms CategoryTheory.kProjectiveQh
+#print axioms CategoryTheory.kProjectiveQh_full
+#print axioms CategoryTheory.kProjectiveQh_faithful
+#print axioms CategoryTheory.KProjectiveDerivedCategory
+#print axioms CategoryTheory.kProjectiveQhEquivalence
+#print axioms CategoryTheory.KProjectiveHomotopyCategory.ofBoundedAboveProjectives
+#print axioms CategoryTheory.kProjectiveDerivedFunctor
+#print axioms CategoryTheory.kProjectiveLocusDerivedFunctor
+#print axioms CategoryTheory.kProjectiveLocusDerivedComparison
+#print axioms CategoryTheory.kProjectiveDerivedFunctorObjIso
+
+/-! ## Bounded-above projective locus -/
+
+#print axioms CategoryTheory.boundedAboveProjectiveHomotopy
+#print axioms CategoryTheory.BoundedAboveProjectiveHomotopyCategory
+#print axioms CategoryTheory.boundedAboveProjectiveHomotopy_le_kProjective
+#print axioms CategoryTheory.boundedAboveProjectiveToKProjective
+#print axioms CategoryTheory.boundedAboveProjectiveQh
+#print axioms CategoryTheory.boundedAboveProjectiveHomotopyCategory_isKProjective
+#print axioms CategoryTheory.boundedAboveProjectiveQh_full
+#print axioms CategoryTheory.boundedAboveProjectiveQh_faithful
+#print axioms CategoryTheory.BoundedAboveProjectiveDerivedCategory
+#print axioms CategoryTheory.boundedAboveProjectiveQhEquivalence
+#print axioms CategoryTheory.mapBoundedAboveProjectiveHomotopy
+#print axioms CategoryTheory.mapBoundedAboveProjectiveHomotopyCompIso
+#print axioms CategoryTheory.boundedAboveProjectiveDerivedFunctor
+#print axioms CategoryTheory.boundedAboveProjectiveDerivedFunctorCompIso
+#print axioms CategoryTheory.mapBoundedAboveProjectiveHomotopyIso
+#print axioms CategoryTheory.mapBoundedAboveProjectiveHomotopyIdIso
+#print axioms CategoryTheory.boundedAboveProjectiveDerivedFunctorIso
+#print axioms CategoryTheory.boundedAboveProjectiveDerivedFunctorIdIso

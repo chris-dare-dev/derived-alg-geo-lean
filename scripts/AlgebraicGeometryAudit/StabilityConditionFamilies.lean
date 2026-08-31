@@ -227,19 +227,6 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedToDqc
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedToDqcCompInclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineExtendScalars_additive
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveHomotopy
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.KProjectiveHomotopyCategory
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveHomotopyCategory_isKProjective
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveQh
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveQh_full
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveQh_faithful
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.KProjectiveDerivedCategory
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveQhEquivalence
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.KProjectiveHomotopyCategory.ofBoundedAboveProjectives
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveDerivedFunctor
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveLocusDerivedFunctor
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveLocusDerivedComparison
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.kProjectiveDerivedFunctorObjIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineKProjectivePullback
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineKProjectiveDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineKProjectiveDerivedPullbackComparison
@@ -247,29 +234,11 @@ open CategoryTheory.Triangulated
 
 /-! ## Preserved affine bounded-above projective locus -/
 
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveHomotopy
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.BoundedAboveProjectiveHomotopyCategory
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveHomotopy_le_kProjective
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveToKProjective
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveQh
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveHomotopyCategory_isKProjective
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveQh_full
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveQh_faithful
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.BoundedAboveProjectiveDerivedCategory
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveQhEquivalence
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.mapBoundedAboveProjectiveHomotopy
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.mapBoundedAboveProjectiveHomotopyCompIso
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveDerivedFunctor
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveDerivedFunctorCompIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineExtendScalars_preservesProjectiveObjects
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineBoundedAboveProjectiveHomotopyPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineBoundedAboveProjectiveHomotopyPullbackCompIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineBoundedAboveProjectiveDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineBoundedAboveProjectiveDerivedPullbackCompIso
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.mapBoundedAboveProjectiveHomotopyIso
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.mapBoundedAboveProjectiveHomotopyIdIso
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveDerivedFunctorIso
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedAboveProjectiveDerivedFunctorIdIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineBoundedAboveProjectiveHomotopyPullbackIdIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineBoundedAboveProjectiveDerivedPullbackIdIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineExtendScalarsComplex_associativity
@@ -409,16 +378,6 @@ geometric witness for every scheme morphism.
 
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeCoherentDerivedCategory
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBoundedCoherentDerivedCategory
-#print axioms AlgebraicGeometry.DerivedCategory.Families.tStructureIsLE_of_retract
-#print axioms AlgebraicGeometry.DerivedCategory.Families.tStructureIsGE_of_retract
-#print axioms AlgebraicGeometry.DerivedCategory.Families.instIsStableUnderRetractsMinus_derivedAlgGeo
-#print axioms AlgebraicGeometry.DerivedCategory.Families.instIsStableUnderRetractsPlus_derivedAlgGeo
-#print axioms AlgebraicGeometry.DerivedCategory.Families.instIsStableUnderRetractsBounded_derivedAlgGeo
-#print axioms AlgebraicGeometry.DerivedCategory.Families.mapHomologicalComplex_isStrictlyLE
-#print axioms AlgebraicGeometry.DerivedCategory.Families.mapHomologicalComplex_isStrictlyGE
-#print axioms AlgebraicGeometry.DerivedCategory.Families.mapDerivedCategory_isLE
-#print axioms AlgebraicGeometry.DerivedCategory.Families.mapDerivedCategory_isGE
-#print axioms AlgebraicGeometry.DerivedCategory.Families.mapDerivedCategory_bounded
 #print axioms AlgebraicGeometry.DerivedCategory.Families.schemeFiniteLocallyFreeGenerator
 #print axioms AlgebraicGeometry.DerivedCategory.Families.schemePerfect
 #print axioms AlgebraicGeometry.DerivedCategory.Families.schemeFiniteLocallyFreeGenerator_le_bounded
@@ -476,7 +435,6 @@ general-scheme equivalence and compact/perfect theorem still needed by A.14.
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.ι
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.mem_iff
-#print axioms AlgebraicGeometry.DerivedCategory.Dqc.mapDerivedCategoryHomologyIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.coherentDerivedInclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.coherentDerivedInclusion_mem_dqc
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.coherentDerivedToDqc

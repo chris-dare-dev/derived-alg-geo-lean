@@ -49,6 +49,9 @@ In particular:
 - abstract fiber categories, pullback functors, and shared boundedness
   interfaces live in
   `DerivedAlgGeo.CategoryTheory.Triangulated.Families`;
+- generic derived-category t-structure, exact-functor, homology-comparison,
+  and K-projective APIs live below
+  `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory`;
 - weak-family probes and weak stability data live in
   `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families`;
 - ordinary Bridgeland family packages live in
@@ -83,6 +86,15 @@ The physical module tree records that refinement directly:
 CategoryTheory/Triangulated/Families
   └─→ abstract fiber categories, pullback functors, and boundedness
 
+CategoryTheory/Triangulated/DerivedCategory
+  ├─→ TStructure, ExactFunctor, Homology       arbitrary abelian categories
+  ├─→ KProjective                             generic supported derivation
+  └─→ BoundedAboveProjective                  functorial projective locus
+
+CategoryTheory/Sites/StackInGroupoids
+  ├─→ Discrete                                sheaves of types as stacks
+  └─→ Morphism                                fibers and representability
+
 CategoryTheory/Triangulated/WeakStabilityCondition
   ├─→ Foundation, Families, HarderNarasimhan, Support, Tilting
   └─→ StabilityCondition
@@ -92,7 +104,7 @@ CategoryTheory/Triangulated/WeakStabilityCondition
         │     └─→ Instances/AlgebraicGeometry scheme-family realizations
         ├─→ Symmetry/Autoequivalence
         │     └─→ Instances/AlgebraicGeometry geometric kernel actions
-        └─→ WeakCompatibility                strong-to-weak adapters
+        └─→ structural projection to weak prestability
 
 CategoryTheory/Triangulated/FourierMukai
   └─→ Autoequivalence                       generic kernel autoequivalences
@@ -102,6 +114,10 @@ AlgebraicGeometry/DerivedCategory
   ├─→ Dqc                                   quasicoherent-cohomology locus
   ├─→ Families                              scheme base change and pullback
   └─→ FourierMukai                          geometric kernels and convolution
+
+AlgebraicGeometry/Stacks
+  ├─→ Representable                          big-Zariski scheme instances
+  └─→ Algebraic                              geometric representability data
 
 AlgebraicGeometry/Moduli
   ├─→ Semistability                         actual semistable loci
@@ -216,8 +232,9 @@ AlgebraicGeometry/<geometric owner> ↛ Instances/AlgebraicGeometry
 ```
 
 `CategoryTheory/Sites/StackInGroupoids.lean` is the canonical module for the
-generic groupoid-valued stack extension. Its declarations use the matching
-`CategoryTheory` namespace. The former `AlgebraicGeometry/Stacks/Basic.lean`
+generic groupoid-valued stack extension. Its `Discrete/` and `Morphism/`
+children own sheaf-to-stack construction and site-object representability;
+all use the matching `CategoryTheory` namespace. The former `AlgebraicGeometry/Stacks/Basic.lean`
 reexport has been retired; clients import the canonical module directly.
 Scheme-specific representability and presentation data remain below
 `AlgebraicGeometry/Stacks`.
@@ -226,7 +243,10 @@ Scheme-derived `Dqc`, derived pullback, and their preservation theorems now
 live under `DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/`, including the
 active surfaces for issues #721 and #554. Relative-perfect adapters that
 intrinsically define a moduli problem live under `Moduli/PerfectComplex`, not
-under `Dqc`.
+under `Dqc`. Generic derived t-structure, exact-functor, homology-comparison,
+K-projective, and bounded-above-projective results live instead under
+`DerivedAlgGeo/CategoryTheory/Triangulated/DerivedCategory/`; the affine
+subtree contains only ring/module specializations of those interfaces.
 
 The layering gate rejects imports from algebraic geometry back into any
 `Instances/AlgebraicGeometry` leaf and rejects restoration of the retired
@@ -255,6 +275,8 @@ the explicit instance umbrellas attached to their categorical sources:
 | Client need | Import |
 | --- | --- |
 | Fiber categories and pullbacks | `DerivedAlgGeo.CategoryTheory.Triangulated.Families` |
+| Generic derived-category extensions | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory` |
+| Generic stacks and representable fibers | `DerivedAlgGeo.CategoryTheory.Sites` |
 | Weak-stability family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families` |
 | Ordinary Bridgeland family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families` |
 | Scheme-derived categories and `Dqc` | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory` |

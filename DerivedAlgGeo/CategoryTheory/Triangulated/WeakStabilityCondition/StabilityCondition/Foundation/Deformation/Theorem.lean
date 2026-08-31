@@ -102,12 +102,13 @@ def deformed
     (hsin : stabilitySeminorm C σ (W - σ.Z) <
       ENNReal.ofReal (Real.sin (Real.pi * ε))) :
     StabilityCondition.WithClassMap C κ where
-  slicing := σ.deformedSlicing C W hr0 hr1 hW hε₀ hε₀16 hWide
-    hε hεhalf hε2 hε8 hsin
-  Z := W
-  compatible := fun ψ E hP hE => ⟨‖W (classOf C κ E)‖,
-    norm_pos_iff.mpr (σ.deformedPred_charge_ne C W hr0 hr1 hW hP hE),
-    σ.deformedPred_charge_polar C W hr0 hr1 hW hP hE⟩
+  toWithClassMap := PreStabilityCondition.WithClassMap.ofStrict
+    (σ.deformedSlicing C W hr0 hr1 hW hε₀ hε₀16 hWide
+      hε hεhalf hε2 hε8 hsin)
+    W
+    (fun ψ E hP hE => ⟨‖W (classOf C κ E)‖,
+      norm_pos_iff.mpr (σ.deformedPred_charge_ne C W hr0 hr1 hW hP hE),
+      σ.deformedPred_charge_polar C W hr0 hr1 hW hP hE⟩)
   locallyFinite := σ.deformedSlicing_isLocallyFinite C W hr0 hr1 hW
     hε₀ hε₀16 hWide hε hεhalf hε2 hε8 hsin
 

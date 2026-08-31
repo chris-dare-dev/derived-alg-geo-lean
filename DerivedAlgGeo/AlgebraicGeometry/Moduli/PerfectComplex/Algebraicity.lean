@@ -103,7 +103,8 @@ abbrev stack (A : RelativePerfectZariskiPresentation S P) :
 relative-perfect big-Zariski presentation. -/
 theorem locallyOfFinitePresentation
     (A : RelativePerfectZariskiPresentation S P) :
-    A.presentation.structureMorphism.IsLocallyOfFinitePresentation :=
+    StackMorphism.IsLocallyOfFinitePresentation
+      A.presentation.structureMorphism :=
   A.presentation.locallyOfFinitePresentation
 
 end RelativePerfectZariskiPresentation
@@ -161,7 +162,7 @@ structure RelativePerfectOpenZariskiPresentation (S : Scheme.{u})
     ambient.stack.toStackInGroupoids
   /-- Every scheme representing a fiber of the inclusion is an open
   subscheme of the test scheme. -/
-  isOpenImmersion : inclusion.IsOpenImmersion
+  isOpenImmersion : StackMorphism.IsOpenImmersion inclusion
   /-- The inclusion commutes with the actual structure morphisms to `S`. -/
   overBase (T : Scheme.{u}) :
     inclusion.app T ⋙ ambient.presentation.structureMorphism.app T ≅

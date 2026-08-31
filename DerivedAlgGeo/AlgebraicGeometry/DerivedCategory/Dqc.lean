@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
 import DerivedAlgGeo.CategoryTheory.Triangulated.CohomologyObjectProperty
+import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Homology
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Quasicoherent.Extensions
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Quasicoherent.Coproducts
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
@@ -176,35 +177,6 @@ theorem mem_iff (E : SchemeDerivedCategory X) :
   Iff.rfl
 
 end SchemeQuasicoherentDerivedCategory
-
-/-- Exact functors commute with cohomology after passage to derived
-categories.  The isomorphism is constructed from a representative complex,
-the two localization comparison isomorphisms, and preservation of homology.
--/
-noncomputable def mapDerivedCategoryHomologyIso
-    {A : Type u} {B : Type v} [Category A] [Category B]
-    [Abelian A] [Abelian B] [HasDerivedCategory.{w} A]
-    [HasDerivedCategory.{w} B] (F : A ⥤ B)
-    (hadd : F.Additive) (hlim : PreservesFiniteLimits F)
-    (hcolim : PreservesFiniteColimits F)
-    (E : DerivedCategory A) (n : ℤ) :
-    (DerivedCategory.homologyFunctor B n).obj (F.mapDerivedCategory.obj E) ≅
-      F.obj ((DerivedCategory.homologyFunctor A n).obj E) :=
-  by
-    letI : F.Additive := hadd
-    letI : PreservesFiniteLimits F := hlim
-    letI : PreservesFiniteColimits F := hcolim
-    let K := DerivedCategory.Q.objPreimage E
-    exact (DerivedCategory.homologyFunctor B n).mapIso
-        (F.mapDerivedCategory.mapIso (DerivedCategory.Q.objObjPreimageIso E).symm) ≪≫
-      (DerivedCategory.homologyFunctor B n).mapIso
-        (F.mapDerivedCategoryFactors.app K) ≪≫
-      (DerivedCategory.homologyFunctorFactors B n).app
-        ((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K) ≪≫
-      (K.sc n).mapHomologyIso F ≪≫
-      F.mapIso ((DerivedCategory.homologyFunctorFactors A n).app K).symm ≪≫
-      F.mapIso ((DerivedCategory.homologyFunctor A n).mapIso
-        (DerivedCategory.Q.objObjPreimageIso E))
 
 /-- The exact inclusion of coherent sheaves induces a concrete functor from
 their unbounded derived category to the all-module-sheaf derived category. -/
