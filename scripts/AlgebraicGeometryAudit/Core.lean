@@ -380,6 +380,7 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.Proj.associatedIsoOfPiecewiseIff
 #print axioms GradedModule.natShift
 #print axioms GradedModule.intShift
+#print axioms GradedModule.intShiftPiece_eq_bot_of_neg
 #print axioms GradedModule.mem_intShift_ofNat_iff
 -- Integer shifts compose only where the intermediate degree exists (#584). The unrestricted
 -- statement is false: an inner shift by a negative e asks for degree n + e, and when that integer
@@ -2176,9 +2177,6 @@ is the acceptance criterion of #665, as an abelian group: the `k`-vector-space s
 not assumed `k`-linear. `Nontrivial ι` is the only hypothesis on the variable set — at one variable
 the statement is false, and no finiteness is used. -/
 
-#print axioms AlgebraicGeometry.Proj.intShiftPiece_eq_bot_of_neg
-#print axioms AlgebraicGeometry.Proj.eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt
-#print axioms AlgebraicGeometry.Proj.num_eq_zero_of_cross_of_neg
 #print axioms AlgebraicGeometry.Proj.intCechComplex_homology_zero_isZero_of_ker
 #print axioms AlgebraicGeometry.Proj.num_eq_zero_of_intCechFace_eq_of_neg
 #print axioms AlgebraicGeometry.Proj.intCechTerm_eq_zero_of_face_eq_of_neg

@@ -150,4 +150,52 @@ theorem X_pow_dvd_of_cross_mul
   apply (X_prime (R := k) (i := i)).pow_dvd_of_dvd_mul_left n hnot
   exact ⟨q, hcross⟩
 
+/-- A homogeneous polynomial divisible by `X i ^ a` but of degree below `a`
+is zero.
+
+Every monomial of a multiple of `X i ^ a` carries `X i` to at least the
+power `a`, so its total degree is at least `a`. A homogeneous polynomial of
+degree `m < a` therefore has no monomials at all. -/
+theorem eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt
+    (ι k : Type u) [Field k] (i : ι) (a m : ℕ) (p : MvPolynomial ι k)
+    (hp : p ∈ homogeneousSubmodule ι k m)
+    (hdvd : (X i : MvPolynomial ι k) ^ a ∣ p)
+    (hlt : m < a) :
+    p = 0 := by
+  classical
+  by_contra hne
+  obtain ⟨s, hs⟩ : ∃ s, coeff s p ≠ 0 := by
+    by_contra hall
+    push Not at hall
+    exact hne (ext _ _ (by simpa using hall))
+  have hsi : a ≤ s i := by
+    by_contra hlt'
+    push Not at hlt'
+    obtain ⟨q, rfl⟩ := hdvd
+    rw [X_pow_eq_monomial, coeff_monomial_mul'] at hs
+    refine hs ?_
+    rw [if_neg]
+    intro hle
+    exact absurd (by simpa using hle i) (by omega)
+  have hdeg : (Finsupp.weight 1) s = m := hp hs
+  have hle : s i ≤ (Finsupp.weight 1) s := by
+    simpa [Finsupp.weight_apply, Finsupp.sum, smul_eq_mul] using
+      Finset.single_le_sum (f := fun j => s j) (fun _ _ => Nat.zero_le _)
+        (Finsupp.mem_support_iff.mpr (by omega : s i ≠ 0))
+  omega
+
+/-- A homogeneous numerator in a negative shifted degree vanishes when a
+cross-variable equation forces divisibility by its own denominator power.
+
+The cross equation makes `X i ^ a` divide `p`, while `m = a + d` and `d < 0`
+put the homogeneous degree of `p` strictly below `a`. -/
+theorem num_eq_zero_of_cross_of_neg
+    (ι k : Type u) [Field k] {i j : ι} (hij : i ≠ j) (d : ℤ) (hd : d < 0)
+    (a b m : ℕ) (p q : MvPolynomial ι k) (hm : (m : ℤ) = (a : ℤ) + d)
+    (hp : p ∈ homogeneousSubmodule ι k m)
+    (hcross : X j ^ b * p = X i ^ a * q) :
+    p = 0 :=
+  eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt ι k i a m p hp
+    (X_pow_dvd_of_cross_mul ι k hij a b p q hcross) (by omega)
+
 end MvPolynomial

@@ -13,3 +13,5 @@ import DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial
 #print axioms MvPolynomial.divMonomial_single_mem_homogeneousSubmodule
 #print axioms MvPolynomial.X_pow_mul_divMonomial_single
 #print axioms MvPolynomial.X_pow_dvd_of_cross_mul
+#print axioms MvPolynomial.eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt
+#print axioms MvPolynomial.num_eq_zero_of_cross_of_neg

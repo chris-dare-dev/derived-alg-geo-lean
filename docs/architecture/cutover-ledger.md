@@ -84,16 +84,23 @@ blocks should normally move it rather than add more declarations beside it.
   canonical localized fraction. `Proj/Modules/ProjectiveSpace.lean` now keeps
   only the generic-point, basic-open, section, and cohomology comparisons that
   introduce geometric vocabulary.
+- Negative-twist arithmetic prefix:
+  `Algebra/Module/GradedModule/Shift.lean` owns triviality of an integer-shifted
+  piece below degree zero, while `Algebra/MvPolynomial/DivMonomial.lean` owns
+  the homogeneous variable-power divisibility vanishing theorem and its
+  cross-variable corollary. `AlgebraicGeometry/Cohomology/Cech/NegativeTwist.lean`
+  now begins with the Čech overlap and projective-cohomology plumbing.
 
 ## Confirmed next lanes
 
-1. Extract the remaining generic arithmetic prefix of
-   `AlgebraicGeometry/Cohomology/Cech/NegativeTwist.lean` after signature
-   review. `intShiftPiece_eq_bot_of_neg` belongs with graded-module shifts;
-   `eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt` and
-   `num_eq_zero_of_cross_of_neg` use only multivariate-polynomial arithmetic and
-   belong in an `Algebra/MvPolynomial/` owner. Keep only the Čech-kernel and
-   projective-cohomology plumbing in the geometric consumer.
+1. Replace the ordinary-category coherence assembled in
+   `CategoryTheory/EquivalenceTransport.lean` with transport rooted in
+   Mathlib's bicategory and pseudofunctor APIs. The `Cat` presentation remains
+   a specialization consumed by affine geometric derived pseudofunctors.
+2. Refine `CategoryTheory/Triangulated/Families/TriangulatedFiberFamily` from a
+   strict `Bᵒᵖ ⥤ Cat` source to a pseudofunctor on `LocallyDiscrete Bᵒᵖ`, with
+   strict functors admitted through a constructor rather than treated as the
+   general root.
 
 For each lane, remove the old path rather than retaining an import-only shim,
 update audits and umbrellas in the same pull request, and add a focused
