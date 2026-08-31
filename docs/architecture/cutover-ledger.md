@@ -33,13 +33,25 @@ blocks should normally move it rather than add more declarations beside it.
   `Algebra/Module/Localization/Kernels.lean`. This owns `LinearMap.kerMap` and
   the `IsLocalizedModule.{kerMap,kernelMap,kernelNatTrans}` chain; the
   coherent-sheaf kernel theorem imports and directly reuses that root.
+- Relative-perfect moduli selectors are explicitly fiberwise:
+  `AlgebraicGeometry.RelativePerfectModuliSelector` exposes `familyLocus` and
+  `geometricLocus`, each closed under isomorphisms but with no claimed
+  restriction maps. The genuine affine relative-perfect subprestack is built
+  separately by `AffineFamilyRelativePerfectPseudofunctor.lean` through the
+  generic `universallyStable` and `fullsubcategory` APIs.
 
 ## Confirmed next lanes
 
-1. Review geometric moduli selectors that are only indexed
-   isomorphism-closed predicates. Keep their finite-type witnesses geometric,
-   but express every actual subprestack through the canonical pseudofunctor
-   object-property root once restriction stability is proved.
+1. `AlgebraicGeometry/Numerical/Core/GradedBasis.lean` begins with generic
+   basis-weight submodules and direct-sum lemmas whose signatures contain no
+   geometry or numerical intersection-ring structure. Move that block to a
+   `LinearAlgebra/GradedBasis.lean` root; retain only
+   `NumericalRingData.ofGradedBasis` and its geometric consumers below
+   `AlgebraicGeometry/Numerical/`.
+2. `AlgebraicGeometry/Proj/Modules/LaurentProjection.lean` begins with generic
+   `Finsupp`/`MvPolynomial.divMonomial` degree and support lemmas. Extract the
+   geometry-free prefix to `Algebra/MvPolynomial/DivMonomial.lean` before the
+   projective-space localization and Čech consumers.
 
 For each lane, remove the old path rather than retaining an import-only shim,
 update audits and umbrellas in the same pull request, and add a focused

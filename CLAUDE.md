@@ -211,6 +211,13 @@ constructs the corresponding subprestack. Repository extensions live under
 `CategoryTheory/Pseudofunctor/ObjectProperty/`. Do not add a competing
 `Subprestack` carrier below algebraic geometry.
 
+The geometric `RelativePerfectModuliSelector` is only a pair of indexed
+replete loci, named `familyLocus` and `geometricLocus`. It is valid input to a
+finite-type boundedness witness but is not a subfunctor or subprestack. The
+affine relative-perfect pseudofunctor applies the generic `universallyStable`
+construction and then Mathlib's `fullsubcategory`; use that pattern whenever
+restriction stability has actually been established.
+
 The weak family root follows the same rule. Shared family probes and APIs bound
 to `WeakStabilityFunction` use
 `CategoryTheory.Triangulated.WeakStabilityCondition.Families`; the stronger

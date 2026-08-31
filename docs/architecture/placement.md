@@ -92,6 +92,15 @@ objects, semistable loci, and Harder--Narasimhan filtrations remain under
 `AlgebraicGeometry/Moduli/` because their signatures intrinsically mention
 geometry.
 
+`AlgebraicGeometry.RelativePerfectModuliSelector` is the canonical name for
+the weaker geometric input used by finite-type boundedness: it stores the
+independent replete `familyLocus` and `geometricLocus` over each actual scheme
+base change. It is not a pseudofunctor object property and provides no
+restriction functors. The affine construction first places its locus on an
+actual Cat-valued pseudofunctor, applies `universallyStable`, and only then
+calls `fullsubcategory`; that is the root-to-consumer relationship required
+for a genuine subprestack.
+
 ## Review evidence
 
 Every structural pull request must include:
