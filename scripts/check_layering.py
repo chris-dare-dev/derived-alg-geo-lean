@@ -1852,6 +1852,23 @@ def main() -> int:
                     f"polynomial Čech declaration {declaration}"
                 )
 
+    for path in sorted((SOURCE_ROOT / "AlgebraicGeometry").rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        for declaration in (
+            "intShiftPiece_eq_bot_of_neg",
+            "eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt",
+            "num_eq_zero_of_cross_of_neg",
+        ):
+            if re.search(
+                rf"^(?:noncomputable\s+)?(?:abbrev|def|structure|theorem)\s+{declaration}\b",
+                text,
+                re.MULTILINE,
+            ):
+                failures.append(
+                    f"{path.relative_to(ROOT)}: restored generic negative-twist "
+                    f"arithmetic declaration {declaration}"
+                )
+
     graded_module_consumers = (
         (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
             "AssociatedSheaf.lean",

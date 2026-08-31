@@ -91,6 +91,24 @@ theorem mem_intShiftPiece {d : ℤ} {n : ℕ} {m : M} :
       m = 0 ∨ ∃ k : ℕ, (k : ℤ) = (n : ℤ) + d ∧ m ∈ 𝓜 k :=
   Iff.rfl
 
+/-- A shifted graded piece below degree zero is trivial.
+
+`intShift` is `ℕ`-indexed and `intShiftPiece 𝓜 d n` asks for an element of
+degree `n + d`. When that integer is negative, no natural degree witnesses
+membership, so only zero remains. -/
+theorem intShiftPiece_eq_bot_of_neg {M σM : Type u} [AddCommGroup M]
+    [SetLike σM M] [AddSubgroupClass σM M] (𝓜 : ℕ → σM) (d : ℤ) (n : ℕ)
+    (hn : (n : ℤ) + d < 0) :
+    intShiftPiece 𝓜 d n = ⊥ := by
+  ext m
+  simp only [AddSubgroup.mem_bot]
+  constructor
+  · rintro (h0 | ⟨j, hj, -⟩)
+    · exact h0
+    · exact absurd hj (by omega)
+  · rintro rfl
+    exact Or.inl rfl
+
 instance intShiftGradedSMul (d : ℤ) : SetLike.GradedSMul 𝒜 (intShift 𝓜 d) where
   smul_mem {i j} {a m} ha hm := by
     rcases hm with rfl | ⟨k, hk, hm⟩
