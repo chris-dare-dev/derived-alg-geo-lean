@@ -11,8 +11,9 @@ import Mathlib.RingTheory.MvPolynomial.Homogeneous
 This file extends Mathlib's `MvPolynomial.divMonomial` API with homogeneous
 degree bookkeeping and identities for moving monomial factors through a
 division. The statements depend only on finitely supported exponent vectors
-and multivariate polynomials; projective localization and Čech constructions
-consume them from algebraic geometry.
+and multivariate polynomials. They include exact division by a power of one
+variable and cross-variable cancellation; projective localization and Čech
+constructions import these facts as consumers.
 -/
 
 universe u
@@ -107,5 +108,46 @@ theorem divMonomial_pow_mul {γ γ' : ι →₀ ℕ} {i₀ : ι} {c : ℕ}
     · exact Or.inr (by simp [Ne.symm hj])
   rw [hpow, hsplit, mul_assoc, divMonomial_monomial_mul_add,
     divMonomial_monomial_mul_comm hdisj, monomial_pow, one_pow]
+
+/-! ## Exact division by a power of one variable -/
+
+/-- Dividing a homogeneous polynomial of degree `n + d` by `Xᵢⁿ`, when the division is exact,
+produces a homogeneous polynomial of degree `d`. -/
+theorem divMonomial_single_mem_homogeneousSubmodule
+    (ι k : Type u) [Field k] (i : ι) (n d : ℕ) (p : MvPolynomial ι k)
+    (hp : p ∈ homogeneousSubmodule ι k (n + d)) :
+    p.divMonomial (Finsupp.single i n) ∈ homogeneousSubmodule ι k d := by
+  intro s hs
+  have hcoeff : coeff (Finsupp.single i n + s) p ≠ 0 := by
+    simpa only [coeff_divMonomial] using hs
+  have hdeg := hp hcoeff
+  simp only [map_add, Finsupp.weight_single, Pi.one_apply, nsmul_eq_mul, mul_one] at hdeg
+  exact Nat.add_left_cancel hdeg
+
+/-- Exact division by `Xᵢⁿ` reconstructs the original polynomial. -/
+theorem X_pow_mul_divMonomial_single
+    (ι k : Type u) [Field k] (i : ι) (n : ℕ) (p : MvPolynomial ι k)
+    (hdiv : (X i : MvPolynomial ι k) ^ n ∣ p) :
+    X i ^ n * p.divMonomial (Finsupp.single i n) = p := by
+  rw [X_pow_eq_monomial]
+  have hmod : p.modMonomial (Finsupp.single i n) = 0 :=
+    monomial_one_dvd_iff_modMonomial_eq_zero.mp
+      (by simpa only [X_pow_eq_monomial] using hdiv)
+  simpa only [hmod, add_zero] using
+    divMonomial_add_modMonomial p (Finsupp.single i n)
+
+/-- If a fraction with denominator a power of `Xᵢ` also admits a denominator involving only a
+different variable, then its numerator is divisible by the entire power of `Xᵢ`. -/
+theorem X_pow_dvd_of_cross_mul
+    (ι k : Type u) [Field k] {i j : ι} (hij : i ≠ j) (n m : ℕ)
+    (p q : MvPolynomial ι k) (hcross : X j ^ m * p = X i ^ n * q) :
+    (X i : MvPolynomial ι k) ^ n ∣ p := by
+  have hnot : ¬(X i : MvPolynomial ι k) ∣ X j ^ m := by
+    intro h
+    have hX : (X i : MvPolynomial ι k) ∣ X j :=
+      (X_prime (R := k) (i := i)).dvd_of_dvd_pow h
+    exact hij (X_dvd_X.mp hX)
+  apply (X_prime (R := k) (i := i)).pow_dvd_of_dvd_mul_left n hnot
+  exact ⟨q, hcross⟩
 
 end MvPolynomial

@@ -75,14 +75,16 @@ not own another copy of the decomposition.
 
 Theorems stated only using `Finsupp`, `MvPolynomial`, homogeneity, and
 `divMonomial` are rooted at `Algebra/MvPolynomial/DivMonomial.lean` in the
-established `Finsupp` and `MvPolynomial` namespaces. Representative-independent
-maps on polynomial degree-zero localizations—including Laurent sign and block
+established `Finsupp` and `MvPolynomial` namespaces. The standard polynomial
+grading and generation by variables over degree zero belong in
+`Algebra/MvPolynomial/Grading.lean`. Representative-independent maps on
+polynomial degree-zero localizations—including Laurent sign and block
 projections, their one-localization homotopies, and full-block finiteness—also
 belong under `Algebra/MvPolynomial/`. Polynomial-variable Čech denominators,
-graded-localization terms, face maps, block homotopies, primitives, and
-finite-block assembly belong under `Algebra/MvPolynomial/Cech/`. Comparison of
-that diagram with projective basic opens, sheaf sections, or cohomology is the
-geometric consumer.
+graded-localization terms, the canonical `p / 1` variable-localization element,
+face maps, block homotopies, primitives, and finite-block assembly belong under
+`Algebra/MvPolynomial/Cech/`. Comparison of that diagram with projective basic
+opens, sheaf sections, or cohomology is the geometric consumer.
 
 Internally graded modules are algebra, not projective geometry. Extend
 Mathlib's `GradedModule` namespace under `Algebra/Module/GradedModule/` for

@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.MvPolynomial.Cech.Basic
+import DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial
+import DerivedAlgGeo.Algebra.MvPolynomial.Grading
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.Finiteness
 import Mathlib.Algebra.MvPolynomial.Division
 import Mathlib.Algebra.Module.TransferInstance
@@ -19,11 +21,12 @@ The global-section comparison is stated over a field and for a nonempty finite v
 which is the projective-space range consumed by the Serre-finiteness argument.  These hypotheses
 make the generic-point and denominator-cancellation steps explicit.
 
-The global-section comparison is for a *nonnegative* twist. The imported algebraic Čech terms
-come in both flavours: `polynomialVariableCechTerm` for `d : ℕ` and
-`polynomialVariableIntCechTerm` for `d : ℤ`. This file begins where geometry enters: it compares
-those terms with projective basic opens and sections. The two algebraic terms are not yet
-identified for a nonnegative `d`; the landed Čech differential still uses the `ℕ` version.
+The global-section comparison is for a *nonnegative* twist. The imported algebraic layer owns
+variable generation, exact monomial division, the canonical localization fraction, and both Čech
+terms: `polynomialVariableCechTerm` for `d : ℕ` and `polynomialVariableIntCechTerm` for `d : ℤ`.
+This file begins where geometry enters by comparing those terms with projective basic opens and
+sections. The two algebraic terms are not yet identified for a nonnegative `d`; the landed Čech
+differential still uses the `ℕ` version.
 -/
 
 noncomputable section
@@ -197,61 +200,6 @@ theorem variableFractionToGeneric_injective
   refine ⟨1, ?_⟩
   simpa [smul_eq_mul] using hcancel
 
-/-- Dividing a homogeneous polynomial of degree `n + d` by `Xᵢⁿ`, when the division is exact,
-produces a homogeneous polynomial of degree `d`. -/
-theorem divMonomial_single_mem_homogeneousSubmodule
-    (ι k : Type u) [Field k] (i : ι) (n d : ℕ) (p : MvPolynomial ι k)
-    (hp : p ∈ MvPolynomial.homogeneousSubmodule ι k (n + d)) :
-    p.divMonomial (Finsupp.single i n) ∈
-      MvPolynomial.homogeneousSubmodule ι k d := by
-  intro s hs
-  have hcoeff : MvPolynomial.coeff (Finsupp.single i n + s) p ≠ 0 := by
-    simpa only [MvPolynomial.coeff_divMonomial] using hs
-  have hdeg := hp hcoeff
-  simp only [map_add, Finsupp.weight_single, Pi.one_apply, nsmul_eq_mul, mul_one] at hdeg
-  exact Nat.add_left_cancel hdeg
-
-/-- Exact division by `Xᵢⁿ` reconstructs the original polynomial. -/
-theorem X_pow_mul_divMonomial_single
-    (ι k : Type u) [Field k] (i : ι) (n : ℕ) (p : MvPolynomial ι k)
-    (hdiv : (MvPolynomial.X i : MvPolynomial ι k) ^ n ∣ p) :
-    MvPolynomial.X i ^ n * p.divMonomial (Finsupp.single i n) = p := by
-  rw [MvPolynomial.X_pow_eq_monomial]
-  have hmod : p.modMonomial (Finsupp.single i n) = 0 :=
-    MvPolynomial.monomial_one_dvd_iff_modMonomial_eq_zero.mp
-      (by simpa only [MvPolynomial.X_pow_eq_monomial] using hdiv)
-  simpa only [hmod, add_zero] using
-    MvPolynomial.divMonomial_add_modMonomial p (Finsupp.single i n)
-
-/-- A fraction with denominator a power of `Xᵢ` that also admits a denominator involving only a
-different variable has numerator divisible by the entire power of `Xᵢ`. -/
-theorem X_pow_dvd_of_cross_mul
-    (ι k : Type u) [Field k] {i j : ι} (hij : i ≠ j) (n m : ℕ)
-    (p q : MvPolynomial ι k)
-    (hcross : MvPolynomial.X j ^ m * p = MvPolynomial.X i ^ n * q) :
-    (MvPolynomial.X i : MvPolynomial ι k) ^ n ∣ p := by
-  have hnot : ¬(MvPolynomial.X i : MvPolynomial ι k) ∣ MvPolynomial.X j ^ m := by
-    intro h
-    have hX : (MvPolynomial.X i : MvPolynomial ι k) ∣ MvPolynomial.X j :=
-      (MvPolynomial.X_prime (R := k) (i := i)).dvd_of_dvd_pow h
-    exact hij (MvPolynomial.X_dvd_X.mp hX)
-  apply (MvPolynomial.X_prime (R := k) (i := i)).pow_dvd_of_dvd_mul_left n hnot
-  exact ⟨q, hcross⟩
-
-/-- The chart fraction `p / 1` associated to a degree-`d` homogeneous polynomial. -/
-def polynomialVariableFraction
-    (ι k : Type u) [Field k] (d : ℕ)
-    (p : MvPolynomial.homogeneousSubmodule ι k d) (i : ι) :
-    DegreeZeroLocalization (polynomialGrading ι k)
-      (natShift (polynomialGrading ι k) d) (.powers (MvPolynomial.X i)) :=
-  DegreeZeroLocalization.mk
-    { deg := 0
-      num := ⟨p.1, by
-        change p.1 ∈ polynomialGrading ι k (0 + d)
-        simpa using p.2⟩
-      den := ⟨1, one_mem_graded (polynomialGrading ι k)⟩
-      den_mem := Submonoid.one_mem _ }
-
 /-- Restricting the polynomial section to a variable chart recovers the literal fraction
 `p / 1`. -/
 theorem variableFractionOfGlobalSection_polynomial
@@ -277,26 +225,6 @@ theorem polynomialVariableFractionToGeneric_independent
   simp only [variableFractionToGeneric, polynomialVariableFraction,
     DegreeZeroLocalization.mapOfLE_mk]
 
-/-- The variables generate the polynomial ring over its degree-zero part.
-
-This is the hypothesis `degreeOneCharts_coversTop` takes, extracted from the cover proof below
-so that the twist results can consume it directly. -/
-theorem polynomialVariable_adjoin_eq_top (ι k : Type u) [Field k] :
-    Algebra.adjoin (polynomialGrading ι k 0)
-      (Set.range fun i => ((MvPolynomial.X i : MvPolynomial ι k))) = ⊤ := by
-  set S := Algebra.adjoin (polynomialGrading ι k 0)
-    (Set.range fun i => ((MvPolynomial.X i : MvPolynomial ι k))) with hS
-  apply top_unique
-  intro p hp
-  clear hp
-  induction p using MvPolynomial.induction_on with
-  | C r =>
-      exact S.algebraMap_mem
-        ⟨MvPolynomial.C r, MvPolynomial.isHomogeneous_C (σ := ι) r⟩
-  | add p q hp hq => exact S.add_mem hp hq
-  | mul_X p i hp =>
-      exact S.mul_mem hp (Algebra.subset_adjoin (Set.mem_range_self i))
-
 /-- The standard variable basic opens cover polynomial projective space. -/
 theorem polynomialVariableBasicOpen_cover (ι k : Type u) [Field k] :
     (⨆ i : ι, ProjectiveSpectrum.basicOpen (polynomialGrading ι k)
@@ -304,19 +232,7 @@ theorem polynomialVariableBasicOpen_cover (ι k : Type u) [Field k] :
   apply AlgebraicGeometry.Proj.iSup_basicOpen_eq_top'
   · intro i
     exact ⟨1, MvPolynomial.isHomogeneous_X k i⟩
-  · let S := Algebra.adjoin (polynomialGrading ι k 0)
-      (Set.range (MvPolynomial.X : ι → MvPolynomial ι k))
-    change S = ⊤
-    apply top_unique
-    intro p hp
-    clear hp
-    induction p using MvPolynomial.induction_on with
-    | C r =>
-        exact S.algebraMap_mem
-          ⟨MvPolynomial.C r, MvPolynomial.isHomogeneous_C (σ := ι) r⟩
-    | add p q hp hq => exact S.add_mem hp hq
-    | mul_X p i hp =>
-        exact S.mul_mem hp (Algebra.subset_adjoin (Set.mem_range_self i))
+  · exact polynomialVariable_adjoin_eq_top ι k
 
 /-- A global section of a nonnegative twist on polynomial projective space is represented by a
 single homogeneous polynomial. -/

@@ -108,12 +108,14 @@ Algebra/Module/Localization
   └─→ Kernels                                linear, ModuleCat, natural forms
 
 Algebra/MvPolynomial
-  ├─→ DivMonomial                            homogeneous and factor identities
+  ├─→ Grading                                standard grading and variable generation
+  ├─→ DivMonomial                            homogeneous and exact-division identities
   ├─→ LaurentBasis → LaurentProjection
           ├─→ LaurentBlock → LaurentHomotopy
           └─→ LaurentBlock → LaurentFinite   one-localization algebra
   └─→ Cech
-        └─→ Basic → Homotopy
+        └─→ Basic                            denominators, terms, faces, canonical p/1
+              └─→ Homotopy
                     ├─→ Primitive            algebraic cocycle contraction
                     └─→ Finite               finite full-block cochains
 
@@ -190,7 +192,7 @@ AlgebraicGeometry/Numerical/Core
   └─→ GradedBasis                            NumericalRingData consumer
 
 AlgebraicGeometry/Proj/Modules/ProjectiveSpace
-  └─→ compares Algebra/MvPolynomial/Cech with basic opens and sections
+  └─→ consumes Grading, DivMonomial, and Cech/Basic for basic opens and sections
 
 AlgebraicGeometry/Cohomology
   └─→ projective Čech vanishing/finiteness consume the algebraic primitive/block

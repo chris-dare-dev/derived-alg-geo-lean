@@ -293,7 +293,9 @@ documentation, architecture checks, and CI paths together.
   consumes them from algebraic geometry.
 - Pure `Finsupp` and `MvPolynomial.divMonomial` identities use
   `Algebra/MvPolynomial/DivMonomial.lean`, even when their first application is
-  a projective Čech calculation.
+  a projective Čech calculation. Polynomial generation over the degree-zero
+  grading uses `Algebra/MvPolynomial/Grading.lean`, and a canonical `p / 1`
+  variable-localization element uses `Algebra/MvPolynomial/Cech/Basic.lean`.
 - Generic internally graded-module localization and shift APIs use
   `Algebra/Module/GradedModule/` and the `GradedModule` namespace. Laurent
   exponent arithmetic uses `Algebra/Finsupp/`; polynomial Laurent-basis,

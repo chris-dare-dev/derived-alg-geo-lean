@@ -47,8 +47,9 @@ blocks should normally move it rather than add more declarations beside it.
 - Division by multivariate monomials:
   `Algebra/MvPolynomial/DivMonomial.lean` owns the `Finsupp.degree` bridge,
   homogeneous-degree result, factor-commutation identities, and
-  `MvPolynomial.divMonomial_pow_mul`. The projective Laurent projection imports
-  that root directly.
+  `MvPolynomial.divMonomial_pow_mul`, exact division by a variable power, and
+  cross-variable cancellation. Projective Laurent and section comparisons
+  import that root directly.
 - Graded-module localization and shifts:
   `Algebra/Module/GradedModule/` extends Mathlib's `GradedModule` namespace with
   `DegreeZeroLocalization`, natural and integer shifts, twist
@@ -69,21 +70,30 @@ blocks should normally move it rather than add more declarations beside it.
   algebraic leaves directly.
 - Polynomial variable Čech algebra:
   `Algebra/MvPolynomial/Cech/{Basic,Homotopy,Primitive,Finite}.lean` owns the
-  denominator diagram, graded-localization terms and faces, block homotopy,
-  cocycle primitive, and finite-block assembly. The former
+  denominator diagram, graded-localization terms and faces, canonical `p / 1`
+  variable-localization element, block homotopy, cocycle primitive, and
+  finite-block assembly. The former
   `AlgebraicGeometry/Proj/Modules/Cech{Homotopy,Primitive,Finite}.lean` paths
   are retired. `Proj/Modules/ProjectiveSpace.lean` now begins at comparison
   with projective basic opens and sections; geometric cohomology files import
   the algebraic leaves directly.
+- Polynomial projective-space algebraic prefix:
+  `Algebra/MvPolynomial/Grading.lean` owns generation by the variables over the
+  degree-zero homogeneous submodule; `DivMonomial.lean` owns the exact-division
+  and cross-variable cancellation lemmas; and `Cech/Basic.lean` owns the
+  canonical localized fraction. `Proj/Modules/ProjectiveSpace.lean` now keeps
+  only the generic-point, basic-open, section, and cohomology comparisons that
+  introduce geometric vocabulary.
 
 ## Confirmed next lanes
 
-1. Review the remaining algebraic prefix of
-   `AlgebraicGeometry/Proj/Modules/ProjectiveSpace.lean`, especially generic
-   polynomial-variable generation and homogeneous monomial-cancellation
-   lemmas. Move declarations whose signatures mention no `Proj`, basic open,
-   sheaf, or cohomology vocabulary into the appropriate `Algebra/MvPolynomial/`
-   owner while retaining the projective comparison layer as consumer.
+1. Extract the remaining generic arithmetic prefix of
+   `AlgebraicGeometry/Cohomology/Cech/NegativeTwist.lean` after signature
+   review. `intShiftPiece_eq_bot_of_neg` belongs with graded-module shifts;
+   `eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt` and
+   `num_eq_zero_of_cross_of_neg` use only multivariate-polynomial arithmetic and
+   belong in an `Algebra/MvPolynomial/` owner. Keep only the Čech-kernel and
+   projective-cohomology plumbing in the geometric consumer.
 
 For each lane, remove the old path rather than retaining an import-only shim,
 update audits and umbrellas in the same pull request, and add a focused

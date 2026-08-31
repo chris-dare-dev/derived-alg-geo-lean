@@ -51,7 +51,10 @@ The same rule puts weighted-basis decompositions in
 `LinearAlgebra/GradedBasis.lean` and pure multivariate-polynomial monomial
 division identities in `Algebra/MvPolynomial/DivMonomial.lean`. Numerical-ring
 constructors and projective graded localizations are consumers of those roots,
-not alternative owners.
+not alternative owners. Generation of a polynomial ring by its variables over
+degree zero belongs in `Algebra/MvPolynomial/Grading.lean`, and the canonical
+`p / 1` term of a variable localization belongs in
+`Algebra/MvPolynomial/Cech/Basic.lean`.
 
 Degree-zero homogeneous localization, graded shifts, and their algebraic
 trivializations live under `Algebra/Module/GradedModule/` in Mathlib's

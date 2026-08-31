@@ -556,7 +556,7 @@ is not closed. -/
 -- complexes are related by transport rather than definitional equality. This is the shape
 -- devissage consumes, which needs Hⁱ(Pⁿ, O(d)) as an explicit complex at negative d.
 #print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_computesCohomology
-#print axioms AlgebraicGeometry.Proj.polynomialVariable_adjoin_eq_top
+#print axioms MvPolynomial.polynomialVariable_adjoin_eq_top
 #print axioms AlgebraicGeometry.Proj.natShiftQuasicoherentData
 #print axioms AlgebraicGeometry.Proj.natShift_isQuasicoherent
 -- Integer twists (#439). Same three steps as the nonnegative case; the only difference is that
@@ -653,6 +653,7 @@ is not closed. -/
 #print axioms MvPolynomial.polynomialVariableCechDenominator_mem
 #print axioms MvPolynomial.polynomialVariableCechTerm
 #print axioms MvPolynomial.polynomialVariableCechCochains
+#print axioms MvPolynomial.polynomialVariableFraction
 -- The Cech faces (#340). Dropping index j divides the denominator by exactly one variable, so
 -- the face is DegreeZeroLocalization.faceMap and not mapOfLE: powers of the smaller denominator
 -- are not contained in powers of the larger one.

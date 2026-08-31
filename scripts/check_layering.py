@@ -1516,6 +1516,9 @@ def main() -> int:
             "theorem divMonomial_monomial_mul_add",
             "theorem divMonomial_monomial_mul_comm",
             "theorem divMonomial_pow_mul",
+            "theorem divMonomial_single_mem_homogeneousSubmodule",
+            "theorem X_pow_mul_divMonomial_single",
+            "theorem X_pow_dvd_of_cross_mul",
         ):
             if fragment not in div_monomial_text:
                 failures.append(
@@ -1547,6 +1550,9 @@ def main() -> int:
             "divMonomial_monomial_mul_add",
             "divMonomial_monomial_mul_comm",
             "divMonomial_pow_mul",
+            "divMonomial_single_mem_homogeneousSubmodule",
+            "X_pow_mul_divMonomial_single",
+            "X_pow_dvd_of_cross_mul",
         ):
             if re.search(
                 rf"^(?:def|theorem)\s+{declaration}\b", text, re.MULTILINE
@@ -1630,6 +1636,7 @@ def main() -> int:
         SOURCE_ROOT / "Algebra" / "MvPolynomial" / "Grading.lean": (
             "namespace MvPolynomial",
             "abbrev polynomialGrading",
+            "theorem polynomialVariable_adjoin_eq_top",
         ),
         SOURCE_ROOT / "Algebra" / "MvPolynomial" / "LaurentBasis.lean": (
             "namespace MvPolynomial",
@@ -1691,6 +1698,7 @@ def main() -> int:
         polynomial_cech_root / "Basic.lean": (
             "namespace MvPolynomial",
             "def polynomialVariableCechDenominator",
+            "def polynomialVariableFraction",
             "noncomputable def polynomialVariableCechFace",
             "noncomputable def cechFace",
             "noncomputable def cechCofactor",
@@ -1810,6 +1818,7 @@ def main() -> int:
             "polynomialVariableCechTerm",
             "polynomialVariableCechCochains",
             "polynomialVariableCechFace",
+            "polynomialVariableFraction",
             "polynomialVariableIntCechTerm",
             "polynomialVariableIntCechCochains",
             "polynomialVariableIntCechFace",
@@ -1831,6 +1840,7 @@ def main() -> int:
             "powersCongrLinear",
             "cechBlockSpan",
             "fg_cechBlockSpan",
+            "polynomialVariable_adjoin_eq_top",
         ):
             if re.search(
                 rf"^(?:noncomputable\s+)?(?:abbrev|def|structure|theorem)\s+{declaration}\b",
@@ -1879,6 +1889,18 @@ def main() -> int:
         (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
             "ProjectiveSpace.lean",
             "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Basic"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "ProjectiveSpace.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "ProjectiveSpace.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Grading"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "NegativeTwist.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.DivMonomial"),
+        (SOURCE_ROOT / "AlgebraicGeometry" / "Proj" /
+            "ProjectiveSpaceVariety.lean",
+            "DerivedAlgGeo.Algebra.MvPolynomial.Grading"),
         (SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
             "Vanishing.lean",
             "DerivedAlgGeo.Algebra.MvPolynomial.Cech.Primitive"),
@@ -1892,7 +1914,7 @@ def main() -> int:
     for path, required_import in graded_module_consumers:
         if required_import not in imports_by_path[path]:
             failures.append(
-                f"{path.relative_to(ROOT)}: Laurent consumer must import "
+                f"{path.relative_to(ROOT)}: graded polynomial consumer must import "
                 f"the algebraic owner {required_import} directly"
             )
 
@@ -2417,8 +2439,8 @@ def main() -> int:
         "monomial-division identities use Algebra; geometric files are consumers"
     )
     print(
-        "ok: graded-module localizations, shifts, Laurent bases, projections, "
-        "and polynomial variable Cech homotopies, primitives, and finiteness use "
+        "ok: graded-module localizations, polynomial generation and exact division, "
+        "Laurent bases and projections, and polynomial variable Cech algebra use "
         "Algebra roots; Proj and geometric Cech modules are direct consumers"
     )
     print(
