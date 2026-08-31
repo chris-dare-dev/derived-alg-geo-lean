@@ -2,9 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.InjectiveAcyclic
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.SmallSiteResolution
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.TotalComparison
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.InjectiveAcyclic
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.SmallSiteResolution
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.TotalComparison
 import Mathlib.CategoryTheory.Abelian.GrothendieckCategory.HasExt
 import Mathlib.CategoryTheory.Sites.CoversTop.Basic
 

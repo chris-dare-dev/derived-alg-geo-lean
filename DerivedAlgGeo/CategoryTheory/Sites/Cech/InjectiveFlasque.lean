@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Comparison
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.Comparison
 import Mathlib.Topology.Sheaves.Flasque
 
 /-!

@@ -52,9 +52,10 @@ In particular:
 - generic derived-category t-structure, exact-functor, homology-comparison,
   and K-projective APIs live below
   `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory`;
-- generic `Ext`, filtered-complex spectral-sequence, and presheaf Čech
+- generic `Ext`, filtered-complex spectral-sequence, and site-theoretic Čech
   machinery live below their categorical derived, spectral-sequence, and site
-  roots;
+  roots; Čech injective comparisons and compact-basis boundedness remain
+  generic until an affine or projective object enters the statement;
 - weak-family probes and weak stability data live in
   `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families`;
 - ordinary Bridgeland family packages live in
@@ -103,7 +104,10 @@ CategoryTheory/Sites/StackInGroupoids
   └─→ Morphism                                fibers and representability
 
 CategoryTheory/Sites/Cech
-  └─→ Differential                            arbitrary presheaves on a site
+  ├─→ Differential, Contractible               arbitrary presheaves on a site
+  ├─→ Bicomplex, Comparison                    arbitrary sheaves on a site
+  ├─→ GlobalComparison, ComplexNaturality      Čech-to-derived comparison
+  └─→ BasisComparison, Boundedness             topological-space sheaves
 
 CategoryTheory/Triangulated/WeakStabilityCondition
   ├─→ Foundation, Families, HarderNarasimhan, Support, Tilting
@@ -287,7 +291,7 @@ the explicit instance umbrellas attached to their categorical sources:
 | Fiber categories and pullbacks | `DerivedAlgGeo.CategoryTheory.Triangulated.Families` |
 | Generic derived-category extensions | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory` |
 | Generic spectral sequences | `DerivedAlgGeo.CategoryTheory.SpectralSequence` |
-| Generic presheaf Čech formulas | `DerivedAlgGeo.CategoryTheory.Sites.Cech` |
+| Generic site-theoretic Čech machinery | `DerivedAlgGeo.CategoryTheory.Sites.Cech` |
 | Generic stacks and representable fibers | `DerivedAlgGeo.CategoryTheory.Sites` |
 | Weak-stability family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families` |
 | Ordinary Bridgeland family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families` |

@@ -69,8 +69,10 @@ The same ownership rule applies to cohomological infrastructure. Generic
 `Ext` adjunction, dimension shift, and injective-resolution naturality live
 under `CategoryTheory/Triangulated/DerivedCategory/Ext/`; filtered-complex and
 total-complex spectral sequences live under `CategoryTheory/SpectralSequence/`;
-and presheaf Čech formulas live under `CategoryTheory/Sites/Cech/`. Geometric
-cohomology modules consume these roots and add sheaf, affine, and scheme input.
+and site-theoretic Čech constructions, injective comparisons, compact-basis
+arguments, and finite-cover boundedness live under
+`CategoryTheory/Sites/Cech/`. Geometric cohomology modules consume these roots
+and add affine, scheme, and projective-space input.
 
 Monoidal structure precedes enrichment in the dependency graph: a
 `V`-enriched category is defined relative to a monoidal category `V`, and a dg

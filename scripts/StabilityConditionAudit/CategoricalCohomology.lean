@@ -2,21 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Cech
 import DerivedAlgGeo.CategoryTheory.SpectralSequence
 import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Ext.InjectiveResolutionNaturality
 
 /-!
 Audit records for generic cohomological infrastructure on arbitrary categories.
-Scheme and sheaf consumers remain in AlgebraicGeometryAudit.
+Scheme-specific consumers remain in AlgebraicGeometryAudit.
 -/
 
-#print axioms CategoryTheory.cechComplexFunctor_d_π
-#print axioms CategoryTheory.cechComplexFunctor_delta_π
-#print axioms CategoryTheory.cechComplexFunctor_map_f_π
-#print axioms CategoryTheory.cechCosimplicial
-#print axioms CategoryTheory.cechNerve
-#print axioms CategoryTheory.cechTermFamily
 #print axioms HomologicalComplex.extendCyclesIso_naturality
 #print axioms HomologicalComplex.extendCyclesIso_naturality_assoc
 #print axioms HomologicalComplex.extendHomologyIso_naturality

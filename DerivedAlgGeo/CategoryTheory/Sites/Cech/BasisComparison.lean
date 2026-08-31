@@ -2,9 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.InjectiveAcyclic
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.InjectiveFlasque
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.InjectiveAcyclic
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.GlobalComparison
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.InjectiveFlasque
 import Mathlib.Algebra.Homology.HomologySequenceLemmas
 import Mathlib.CategoryTheory.Abelian.GrothendieckAxioms.Sheaf
 import Mathlib.CategoryTheory.Abelian.GrothendieckCategory.EnoughInjectives

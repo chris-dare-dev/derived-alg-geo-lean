@@ -1436,16 +1436,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms SheafOfModules.epi_of_isLocallySurjective
 #print axioms SheafOfModules.reflectsEpimorphisms_toSheaf
 
--- Layer B stage 3: the link between cosimplicial (Cech) and simplicial (extra degeneracy)
--- machinery. Not the whole of the Cech vanishing chain -- see the module docstring of
--- DerivedAlgGeo/AlgebraicGeometry/Cohomology/Simplicial/ExtraCodegeneracy.lean
--- for what is still missing.
-#print axioms AlgebraicTopology.AlternatingCofaceMapComplex.opIso
-#print axioms AlgebraicTopology.AlternatingCofaceMapComplex.opIso_hom_f
-#print axioms AlgebraicTopology.AlternatingCofaceMapComplex.opIso_inv_f
-#print axioms AlgebraicTopology.exactAt_succ_of_extraDegeneracy
-#print axioms AlgebraicTopology.exactAt_succ_of_extraDegeneracy_map
-
 -- Layer B stage 3: Mathlib's construction assembling a spectral object into a spectral
 -- sequence, including its page-homology and first-page comparison isomorphisms.
 #print axioms CategoryTheory.Abelian.SpectralObject.SpectralSequence.HomologyData.isColimitCc
@@ -1455,86 +1445,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms CategoryTheory.Abelian.SpectralObject.spectralSequence_page_d_eq
 #print axioms CategoryTheory.Abelian.SpectralObject.spectralSequenceFirstPageXIso
 #print axioms CategoryTheory.Abelian.SpectralObject.spectralSequence_first_page_d_eq
-
--- Layer B stage 3: an explicit injective resolution now produces the augmented Cech
--- bicomplex, its total complex, the column-filtered spectral sequence, and the formal
--- initial-page identification. Over a general site the pin still has no EnoughInjectives
--- instance for sheaves, and SpectralSequence still has no convergence/abutment field;
--- neither gap is hidden by an axiom.
-#print axioms CategoryTheory.Limits.FormalCoproduct.evalOp_additive
-#print axioms CategoryTheory.Sheaf.cechComplexFunctor_additive
-#print axioms CategoryTheory.Sheaf.cechCochainFunctorInt
-#print axioms CategoryTheory.Sheaf.cechResolutionBicomplexUnflipped
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexXXIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentation
-#print axioms CategoryTheory.Sheaf.cechInjectiveTotalComplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveFilteredToTotal
-#print axioms CategoryTheory.Sheaf.cechInjectiveFilteredToTotalNat
-#print axioms CategoryTheory.Sheaf.cechInjectiveSpectralObject
-#print axioms CategoryTheory.Sheaf.cechInjectiveSpectralSequence
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageXIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveAdjacentLayerComplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveAdjacentLayerHomologyIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageColumnHomologyIso
-
--- Layer B stage 3: over a SMALL site the resolution hypothesis is redundant. Mathlib's
--- Grothendieck-abelian chain supplies enough injectives, so the Cech spectral sequence and
--- its acyclicity consequences are restated with no InjectiveResolution argument. These are
--- inferInstance and wrapper terms, not new instances or axioms.
-#print axioms CategoryTheory.Sheaf.enoughInjectives_of_small
-#print axioms CategoryTheory.Sheaf.hasInjectiveResolutions_of_small
-#print axioms CategoryTheory.Sheaf.enoughInjectives_opens
-#print axioms CategoryTheory.Sheaf.canonicalInjectiveResolution
-#print axioms CategoryTheory.Sheaf.canonicalSectionsCohomologyAddEquivHPrime
-#print axioms CategoryTheory.Sheaf.canonicalCechBicomplex
-#print axioms CategoryTheory.Sheaf.canonicalCechSpectralSequence
-#print axioms CategoryTheory.Sheaf.canonicalCechInitialPageColumnHomologyIso
-#print axioms CategoryTheory.Sheaf.isZero_canonicalCechInitialPage_of_isCechAcyclicFor
-#print axioms CategoryTheory.Sheaf.subsingleton_canonicalCechInitialPage_of_isCechAcyclicFor
-
--- Layer B stage 3: the initial page's degree-zero row, including its horizontal
--- differential, is the ordinary Cech complex. Consequently the following page is
--- ordinary Cech cohomology along that row.
-#print axioms CategoryTheory.Sheaf.cechInjectiveColumnAugmentationHomologyIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageZeroRowXIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageZeroRow_d
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageZeroRowIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveFollowingPageCechCohomologyIso
-
--- Layer B stage 3: first-quadrant total comparison and the Cech augmentation into the total
--- complex of an explicit injective resolution. The general engine uses finite column tails;
--- local Cech acyclicity supplies the columnwise quasi-isomorphisms.
-#print axioms CategoryTheory.Sheaf.cechInjectiveColumnAugmentation_quasiIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSource_verticallyConnective
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSource_horizontallyConnective
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplex_verticallyConnective
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplex_horizontallyConnective
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentation_total_quasiIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSourceTotalIso
-#print axioms CategoryTheory.Sheaf.cechToInjectiveTotalMap
-#print axioms CategoryTheory.Sheaf.cechToInjectiveTotalMap_quasiIso
-#print axioms CategoryTheory.Sheaf.cechCohomologyIsoInjectiveTotalHomology
-
--- Layer B stage 3: the global-sections edge of the Cech bicomplex. Sheaf gluing proves
--- exactness at degree zero, injectivity proves positive row exactness, and the resulting
--- rowwise quasi-isomorphism passes to first-quadrant totals. Together with local Cech
--- acyclicity this gives the full Cech-to-derived comparison for open covers.
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_exact
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_mono
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechRowMap_quasiIso
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap_quasiIso
-#print axioms CategoryTheory.Sheaf.cechCochainFunctorIntHomologyIso
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplexUnliftedIso
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology
-
--- On the small site Opens X the comparison needs no witness arguments at all: the
--- injective resolution and the HasExt instance both come from Mathlib's Grothendieck
--- abelian chain. The witness-carrying form above is retained for a general site.
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology_opens
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomologyAt_opens
 
 #print axioms AlgebraicGeometry.Cohomology.AffineTildeCechDerivedComparisonAt
 #print axioms AlgebraicGeometry.Cohomology.AffineTildeCechDerivedComparison
@@ -1554,36 +1464,15 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Cohomology.modules_H_subsingleton_of_iso_tilde
 #print axioms AlgebraicGeometry.Cohomology.modules_H_subsingleton_of_isQuasicoherent
 
--- Layer B stage 3: the non-circular compact-basis comparison (Stacks, Tag 01EW).
--- Compact refinements and Cech correction make the acyclicity condition stable under
--- injective quotients, so dimension shifting kills positive derived cohomology.
-#print axioms CategoryTheory.Sheaf.CompactOpenBasis
-#print axioms CategoryTheory.Sheaf.CompactOpenBasis.ofIsBasis
-#print axioms CategoryTheory.Sheaf.CompactOpenBasis.exists_finite_refinement
-#print axioms CategoryTheory.Sheaf.IsCechAcyclicOnCompactBasis
-#print axioms CategoryTheory.Sheaf.isCechAcyclicOnCompactBasis_of_injective
-#print axioms CategoryTheory.Sheaf.epi_app_of_isCechAcyclicOnCompactBasis
-#print axioms CategoryTheory.Sheaf.isCechAcyclicOnCompactBasis_quotient
-#print axioms CategoryTheory.Sheaf.HPrime_subsingleton_of_isCechAcyclicOnCompactBasis
-#print axioms CategoryTheory.Sheaf.H_subsingleton_of_isCechAcyclicOnCompactBasis
-
 -- Layer B stage 3: positive-degree exactness of the explicit Cech complex for a module
 -- sheaf on a finite distinguished-open cover of an affine scheme. This is the affine Cech
 -- vanishing theorem, not a comparison with derived-functor sheaf cohomology.
-#print axioms CategoryTheory.Sheaf.cechComplex_exactAt_succ_of_injective'
-#print axioms CategoryTheory.cechComplex_exactAt_succ_of_isTerminal
 #print axioms PrimeSpectrum.basicOpen_prod_eq_pi
 #print axioms AlgebraicGeometry.tilde_cechComplex_exactAt_succ
 #print axioms AlgebraicGeometry.tilde_cechComplex_exactAt_succ_of_eq_iSup
 #print axioms AlgebraicGeometry.tilde_cechComplex_exactAt_of_pos
 
--- Layer B stage 3: bridge the relative distinguished-open calculation through the
--- underlying additive-group functor and specialize the compact-basis criterion to affine
--- schemes.
-#print axioms CategoryTheory.evalOpForget₂AddCommGrpIso
-#print axioms CategoryTheory.map_alternatingCofaceMapComplex
-#print axioms CategoryTheory.cechComplexForget₂AddCommGrpIso
-#print axioms CategoryTheory.cechComplex_exactAt_forget₂AddCommGrp_of_exactAt
+-- Layer B stage 3: specialize the generic compact-basis criterion to affine schemes.
 #print axioms AlgebraicGeometry.Cohomology.affineBasicOpenBasis
 #print axioms AlgebraicGeometry.Cohomology.top_mem_affineBasicOpenBasis
 #print axioms AlgebraicGeometry.Cohomology.underlyingTilde_isCechAcyclicOnCompactBasis
@@ -1591,9 +1480,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- Layer B stage 3: finite-cover cohomological boundedness. Local compact-basis dimension
 -- shifting proves ambient `H'`-vanishing on affine opens; affine diagonal makes every finite
 -- intersection affine; Mayer--Vietoris then gives a numerical bound for actual `Sheaf.H`.
-#print axioms CategoryTheory.Sheaf.opensUnion
-#print axioms CategoryTheory.Sheaf.IntersectionAcyclic
-#print axioms CategoryTheory.Sheaf.HPrime_subsingleton_opensUnion_of_intersectionAcyclic
 #print axioms AlgebraicGeometry.Cohomology.affineBasicOpenBasisAt
 #print axioms AlgebraicGeometry.Cohomology.mem_affineBasicOpenBasisAt
 #print axioms AlgebraicGeometry.Cohomology.modulesSpec_isCechAcyclicOnCompactBasis
@@ -1607,35 +1493,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Cohomology.modules_H_subsingleton_of_cohomologicalBound
 #print axioms AlgebraicGeometry.Cohomology.coherent_H_subsingleton_of_cohomologicalBound
 #print axioms AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology.toFiniteCohomology
-
--- Layer B stage 3: the first Cech-to-derived comparison layer. The terminal-object
--- natural isomorphism closes the explicit TODO in Mathlib's sheaf-cohomology API; the
--- singleton theorem is the first positive-degree case of the Leray comparison.
-#print axioms CategoryTheory.cechCohomology_isZero_of_exactAt
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaPresheafIsoConstant
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaSheafIsoConstant
-#print axioms CategoryTheory.Sheaf.HPrimeNatIsoH
-#print axioms CategoryTheory.Sheaf.HPrimeAddEquivH
-#print axioms CategoryTheory.Sheaf.subsingleton_HPrime_iff_H
-#print axioms CategoryTheory.Sheaf.cechComputesDerivedCohomologyAt_singleton_terminal_of_pos
-
--- Layer B stage 3: sections of an explicit injective resolution compute the local `H'`
--- groups, and a fixed Cech column is their product over finite intersections. Local
--- acyclicity therefore kills every positive-resolution-degree column homology object.
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaPresheafHomAddEquiv
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaSheafHomAddEquiv
-#print axioms CategoryTheory.Sheaf.sectionsAtFunctor
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplex
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaHomComplexIsoSections
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsCohomologyAddEquivHPrime
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexColumnXIso
-#print axioms CategoryTheory.Sheaf.cechColumnSectionsComplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexColumnIsoSectionsComplex
-#print axioms CategoryTheory.Sheaf.cechColumnSectionsComplex_exactAt
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexColumn_exactAt_of_isCechAcyclicFor
-#print axioms CategoryTheory.Sheaf.subsingleton_cechInjectiveBicomplexColumnHomology_of_isCechAcyclicFor
-#print axioms CategoryTheory.Sheaf.isZero_cechInjectiveInitialPage_of_isCechAcyclicFor
-#print axioms CategoryTheory.Sheaf.subsingleton_cechInjectiveInitialPage_of_isCechAcyclicFor
 
 -- Layer B stage 3: the same results reached from the `X.Modules` wrapper, which instance
 -- search does not see through on its own. `Scheme.Modules.toSheaf` is the retyped functor
@@ -2159,16 +2016,6 @@ not functions. -/
 #print axioms AlgebraicGeometry.IntersectionTheory.ChernCharacter.chernCharacterComponent_lineBundle
 #print axioms AlgebraicGeometry.IntersectionTheory.ChernCharacter.degree_chernCharacterComponent_two_eq_surface
 #print axioms AlgebraicGeometry.IntersectionTheory.ChernCharacter.toChernClassData
-
--- Cohomology strategy: `DerivedAlgGeo/Development/Cohomology/Strategy.lean` contributes nothing here on
--- purpose. It is the compile-only API map for the B3 route decision and declares only
--- `example`s, which are anonymous and cannot be audited. Its guarantee is that it builds:
--- if an upstream declaration it names moves, `lake build` fails. The first real B3
--- theorem goes below this line.
-#print axioms CategoryTheory.Sheaf.isFlasque_of_injective
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaSheafMap_stalk_isIso
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaSheaf_stalk_isZero_of_not_mem
-#print axioms CategoryTheory.Sheaf.cechComplex_exactAt_succ_of_injective
 
 -- Mukai vector: the identification of the abstract Mukai extension with the
 -- numerical Mukai pairing. Every field of `IntegralMukaiData` is supplied

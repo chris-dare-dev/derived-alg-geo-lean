@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.InitialPage
+import DerivedAlgGeo.CategoryTheory.Sites.Cech.InitialPage
 import DerivedAlgGeo.CategoryTheory.SpectralSequence.TotalQuasiIso
 import Mathlib.Algebra.Homology.TotalComplexSymmetry
 

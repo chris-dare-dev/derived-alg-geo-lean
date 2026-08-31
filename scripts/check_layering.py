@@ -918,8 +918,13 @@ def main() -> int:
                 "uses an AlgebraicGeometry declaration namespace"
             )
 
+    generic_cech_root = SOURCE_ROOT / "CategoryTheory" / "Sites" / "Cech"
     generic_cohomology_sources = (
-        SOURCE_ROOT / "CategoryTheory" / "Sites" / "Cech" / "Differential.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "Cech.lean",
+        *sorted(generic_cech_root.glob("*.lean")),
+        SOURCE_ROOT / "CategoryTheory" / "Simplicial.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Simplicial" /
+            "ExtraCodegeneracy.lean",
         SOURCE_ROOT / "CategoryTheory" / "SpectralSequence" /
             "ExtendHomologyNaturality.lean",
         SOURCE_ROOT / "CategoryTheory" / "SpectralSequence" /
@@ -965,12 +970,59 @@ def main() -> int:
             "ExtResolutionNaturality.lean",
         SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
             "Differential.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "BasisComparison.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "Bicomplex.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "Comparison.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "ComplexNaturality.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "GlobalComparison.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "InitialPage.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "InjectiveAcyclic.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "SmallSiteResolution.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "TotalComparison.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Derived" /
+            "FreeAbelianYonedaStalk.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Derived" /
+            "InjectiveFlasque.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Simplicial.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Simplicial",
     )
     for path in retired_generic_cohomology_paths:
         if path.exists():
             failures.append(
                 f"retired generic cohomology path restored: {path.relative_to(ROOT)}"
             )
+
+    generic_declarations_retired_from_consumers = {
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "Affine.lean": (
+                "theorem cechComplex_exactAt_succ_of_isTerminal",
+            ),
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "AffineBasisComparison.lean": (
+                "namespace CategoryTheory\n",
+            ),
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Finiteness" /
+            "Boundedness.lean": (
+                "namespace CategoryTheory.Sheaf\n",
+            ),
+    }
+    for path, retired_fragments in generic_declarations_retired_from_consumers.items():
+        text = path.read_text(encoding="utf-8")
+        for fragment in retired_fragments:
+            if fragment in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: restored generic Čech "
+                    f"declaration fragment {fragment!r} in a geometric consumer"
+                )
 
     generic_families_root = strong_stability_root / "Families"
     neutral_derived_families_root = (
@@ -1383,8 +1435,8 @@ def main() -> int:
         "APIs use the CategoryTheory owner; affine files contain only consumers"
     )
     print(
-        "ok: generic Ext, spectral-sequence, and presheaf Cech APIs use "
-        "categorical owners; geometric cohomology contains only consumers"
+        "ok: generic Ext, spectral-sequence, simplicial, and site-theoretic "
+        "Cech APIs use categorical owners; geometric cohomology contains only consumers"
     )
     print(
         "ok: weak-stability family declarations use the matching "

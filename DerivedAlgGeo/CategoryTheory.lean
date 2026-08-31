@@ -11,6 +11,7 @@ import DerivedAlgGeo.CategoryTheory.WeakSerreExact
 import DerivedAlgGeo.CategoryTheory.Monoidal
 import DerivedAlgGeo.CategoryTheory.Enriched
 import DerivedAlgGeo.CategoryTheory.Sites
+import DerivedAlgGeo.CategoryTheory.Simplicial
 import DerivedAlgGeo.CategoryTheory.SpectralSequence
 import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated

@@ -27,7 +27,7 @@ abelian sheaves over such a site carry no `EnoughInjectives` instance.  Accordin
 construction takes an explicit `InjectiveResolution F`; it does not install its existence as an
 axiom or typeclass.  The obstruction is smallness alone: over a small site Mathlib does derive
 enough injectives, and
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.SmallSiteResolution` discharges the resolution
+`DerivedAlgGeo.CategoryTheory.Sites.Cech.SmallSiteResolution` discharges the resolution
 argument there.
 -/
 
