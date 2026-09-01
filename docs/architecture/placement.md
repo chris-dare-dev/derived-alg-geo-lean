@@ -135,6 +135,13 @@ wrappers. `NumericalVarietyData`, `chi₂`, Hirzebruch--Riemann--Roch hypotheses
 Mukai pairings, and their preservation theorems remain geometric consumers
 because their signatures introduce the numerical geometry.
 
+The finite-free abelian-group interface `ZLattice` and its construction from a
+finite torsion-free `ℤ`-module are rooted at
+`LinearAlgebra/Lattice/Basic.lean`. A theorem asserting that a quotient of a
+geometrically defined Euler pairing is a `ZLattice` remains with that numerical
+consumer: the class is generic, while the radical, quotient, and hypotheses
+connecting them to `NumericalVarietyData` are not.
+
 Weight-indexed spans of basis vectors and the resulting independence,
 spanning, internal-direct-sum, and multiplicativity lemmas are rooted at
 `LinearAlgebra/GradedBasis.lean`. The numerical consumer imports that module

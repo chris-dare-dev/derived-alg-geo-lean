@@ -330,6 +330,11 @@ documentation, architecture checks, and CI paths together.
 - Ring/module/localization declarations with no site belong to `Algebra/`;
   linear-map, basis, lattice, matrix, multilinear, and exterior-power
   declarations with no site belong to `LinearAlgebra/`.
+- Use the global `ZLattice` class from `LinearAlgebra/Lattice/Basic.lean` for
+  finite free abelian groups. Its construction from finite torsion-free groups
+  is generic; only the theorem applying it to a numerical Euler-radical
+  quotient remains geometric. Never restore the former
+  `AlgebraicGeometry.Numerical.ZLattice` namespace.
 - Indexed additive-group sums, saturated family-relation quotients,
   additive-map images, and finite-index-overlattice predicates use
   `Algebra/RelativeNumerical/`. A scheme consumer imports that root and adds

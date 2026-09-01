@@ -12,6 +12,10 @@ open CategoryTheory.Triangulated
 
 /-! ## Lattice lane -/
 
+#print axioms ZLattice
+#print axioms ZLattice.toModuleFinite
+#print axioms ZLattice.toModuleFree
+#print axioms ZLattice.ofFiniteTorsionFree
 #print axioms IntegralLattice.NumLattice
 #print axioms IntegralLattice.eq_zero_of_zsmul_eq_zero
 #print axioms IntegralLattice.eq_zero_of_two_zsmul_eq_zero

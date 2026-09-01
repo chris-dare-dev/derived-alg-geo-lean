@@ -157,13 +157,20 @@ blocks should normally move it rather than add more declarations beside it.
   The former geometry-owned one-field carriers `NumericalRealization` and
   `CategoricalEulerForm`, together with their parallel descent and preservation
   APIs, are retired rather than retained as compatibility wrappers.
+- Finite free integral lattices:
+  `LinearAlgebra/Lattice/Basic.lean` owns the global `ZLattice` class, its
+  finite/free instances, and `ZLattice.ofFiniteTorsionFree`.
+  `NumericalVarietyData.numericalZLattice` remains in
+  `AlgebraicGeometry/Numerical/GrothendieckGroup/Lattice.lean` because it
+  introduces the Euler radical and numerical quotient. The former
+  `AlgebraicGeometry.Numerical.ZLattice` namespace is retired rather than
+  retained as a compatibility alias.
 
 ## Confirmed next lanes
 
-1. The generic `ZLattice` class and its finite-torsion-free construction use
-   only finite free abelian groups. Move that root to
-   `LinearAlgebra/Lattice/`; retain the numerical-quotient theorem as its
-   geometric consumer.
+No additional ownership defect is currently confirmed by the signature test.
+Future candidates must be added here only after identifying their weakest
+public vocabulary, canonical root, and concrete consumer.
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and

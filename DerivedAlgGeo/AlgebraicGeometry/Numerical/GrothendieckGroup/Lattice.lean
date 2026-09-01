@@ -3,8 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.EulerPairing
-import Mathlib.LinearAlgebra.FreeModule.PID
-import Mathlib.RingTheory.Int.Basic
+import DerivedAlgGeo.LinearAlgebra.Lattice.Basic
 
 /-!
 # The numerical Grothendieck lattice
@@ -25,41 +24,15 @@ object is its underlying finite free `ℤ`-module.
   is symmetric.
 * `NumericalVarietyData.NumericalQuotient` is the quotient by the radical.
 * `NumericalVarietyData.numericalPairing` is the descended, nondegenerate pairing.
-* `ZLattice` packages a finite free abelian group; `numericalZLattice` constructs one from
-  explicit finite-generation and quotient torsion-freeness hypotheses.
+* The generic `ZLattice` interface comes from `LinearAlgebra/Lattice/Basic.lean`;
+  `numericalZLattice` constructs one from explicit finite-generation and
+  quotient torsion-freeness hypotheses.
 * `K3.numericalPairing_mk_eq_neg_mukaiPairing` fixes the K3 sign convention.
 -/
 
 universe u v w
 
 namespace AlgebraicGeometry.Numerical
-
-/-- A `ℤ`-lattice is a finite free abelian group.
-
-This is deliberately distinct from Mathlib's `IsZLattice`, which concerns discrete subgroups
-of normed real or complex vector spaces.  This algebraic notion is the one consumed by
-Bridgeland-stability constructions. -/
-class ZLattice (Λ : Type w) [AddCommGroup Λ] : Prop where
-  /-- The lattice is finitely generated over `ℤ`. -/
-  toModuleFinite : Module.Finite ℤ Λ
-  /-- The lattice is free over `ℤ`. -/
-  toModuleFree : Module.Free ℤ Λ
-
-attribute [instance] ZLattice.toModuleFinite ZLattice.toModuleFree
-
-namespace ZLattice
-
-/-- A finitely generated torsion-free abelian group is a `ℤ`-lattice.
-
-Both hypotheses are explicit.  Freeness is the structure theorem for finite modules over the
-principal ideal domain `ℤ`. -/
-theorem ofFiniteTorsionFree (Λ : Type w) [AddCommGroup Λ]
-    [Module.Finite ℤ Λ] [Module.IsTorsionFree ℤ Λ] : ZLattice Λ := by
-  exact
-    { toModuleFinite := inferInstance
-      toModuleFree := Module.free_of_finite_type_torsion_free' }
-
-end ZLattice
 
 namespace NumericalVarietyData
 

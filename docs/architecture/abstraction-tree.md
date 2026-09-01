@@ -87,9 +87,14 @@ Category
    └─ scheme-site realizations
 
 LinearAlgebra
+├─ finite free integral lattices
+│  ├─ ZLattice                              finite + free over ℤ
+│  └─ ZLattice.ofFiniteTorsionFree          generic construction
+│     └─ NumericalVarietyData.numericalZLattice
+│                                            geometric quotient consumer
 └─ weighted-basis graded pieces
    ├─ internal direct-sum decomposition
-   └─ NumericalRingData.ofGradedBasis       geometric numerical consumer
+   └─ NumericalRingData.ofGradedBasis        geometric numerical consumer
 
 Algebra
 ├─ ordinary ring and module theory
@@ -163,6 +168,10 @@ particular:
   predicates in `Algebra/RelativeNumerical`; a geometric consumer must
   introduce actual schemes, connectivity, relative perfection, or other
   geometric data and import this root directly;
+- keep the finite-free abelian-group interface `ZLattice` and its construction
+  from finite torsion-free groups in `LinearAlgebra/Lattice/Basic.lean`;
+  `NumericalVarietyData.numericalZLattice` remains the geometric theorem that
+  supplies those hypotheses for an Euler-radical quotient;
 - keep ordinary module theory under `Algebra`, generic sheaves and module
   sheaves on ringed sites under `CategoryTheory/Sites/Sheaves`, and only the
   scheme-indexed `SheafOfModules(X) -> QCoh(X) -> Coh(X)` refinements under
