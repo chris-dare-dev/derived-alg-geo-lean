@@ -407,3 +407,17 @@ Grassmannian of positive planes is not used. -/
 #print axioms Mukai.two_mul_re_expCharge_ge
 #print axioms Mukai.re_expCharge_pos_of_nonneg
 #print axioms Mukai.re_expCharge_pos_of_neg_one
+
+-- Isotropic sequences: the pairing skeleton of the Enriques half-fiber
+-- configurations, stated for an arbitrary Z-bilinear lattice with no
+-- symmetry hypothesis. Two geometry-free inhabitants keep the root honest.
+#print axioms IntegralLattice.IsIsotropicSequence
+#print axioms IntegralLattice.IsIsotropicSequence.self_isotropic
+#print axioms IntegralLattice.IsIsotropicSequence.pairing_one
+#print axioms IntegralLattice.IsIsotropicSequence.pairing_ite
+#print axioms IntegralLattice.IsIsotropicSequence.pairing_sum_left
+#print axioms IntegralLattice.IsIsotropicSequence.pairing_sum_sum
+#print axioms IntegralLattice.IsIsotropicSequence.linearIndependent
+#print axioms IntegralLattice.hyperbolicPairing
+#print axioms IntegralLattice.isIsotropicSequence_hyperbolic
+#print axioms IntegralLattice.isIsotropicSequence_zero_singleton
