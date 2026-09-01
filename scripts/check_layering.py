@@ -1805,6 +1805,10 @@ def main() -> int:
         SOURCE_ROOT / "Topology" / "Sheaves" / "ModuleTensor.lean"
     )
     topological_tensor_import = "DerivedAlgGeo.Topology.Sheaves.ModuleTensor"
+    topological_basis_owner = (
+        SOURCE_ROOT / "Topology" / "Sheaves" / "Basis.lean"
+    )
+    topological_basis_import = "DerivedAlgGeo.Topology.Sheaves.Basis"
     topological_stalk_tensor_owner = (
         SOURCE_ROOT / "Topology" / "Sheaves" / "ModuleTensor" / "StalkTensor.lean"
     )
@@ -1846,6 +1850,34 @@ def main() -> int:
         failures.append(
             f"{topological_tensor_owner.relative_to(ROOT)}: missing stalkwise "
             "module-tensor specialization"
+        )
+
+    topological_basis_fragments = (
+        "lemma stalkFunctor_map_surjective_of_isBasis",
+        "theorem isIso_of_isIso_app_of_isBasis",
+    )
+    if topological_basis_owner.is_file():
+        topological_basis_text = topological_basis_owner.read_text(encoding="utf-8")
+        for fragment in topological_basis_fragments:
+            if fragment not in topological_basis_text:
+                failures.append(
+                    f"{topological_basis_owner.relative_to(ROOT)}: missing basiswise "
+                    f"sheaf-isomorphism declaration {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            topological_basis_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{topological_basis_owner.relative_to(ROOT)}: topological "
+                "basiswise-isomorphism root depends on or declares algebraic geometry"
+            )
+    else:
+        failures.append(
+            "missing topological basiswise-isomorphism owner: "
+            f"{topological_basis_owner.relative_to(ROOT)}"
         )
 
     stalk_tensor_fragments = (
@@ -1903,11 +1935,33 @@ def main() -> int:
             )
 
     topology_sheaves_umbrella = SOURCE_ROOT / "Topology" / "Sheaves.lean"
+    if topological_basis_import not in imports_by_path[topology_sheaves_umbrella]:
+        failures.append(
+            f"{topology_sheaves_umbrella.relative_to(ROOT)}: missing topological "
+            f"basiswise-isomorphism umbrella import {topological_basis_import}"
+        )
     if topological_tensor_import not in imports_by_path[topology_sheaves_umbrella]:
         failures.append(
             f"{topology_sheaves_umbrella.relative_to(ROOT)}: missing topological "
             f"module-tensor umbrella import {topological_tensor_import}"
         )
+
+    affine_comparison_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Affine" /
+            "Comparison.lean"
+    )
+    if topological_basis_import not in imports_by_path[affine_comparison_consumer]:
+        failures.append(
+            f"{affine_comparison_consumer.relative_to(ROOT)}: affine comparison "
+            f"consumer must import {topological_basis_import} directly"
+        )
+    affine_comparison_text = affine_comparison_consumer.read_text(encoding="utf-8")
+    for fragment in topological_basis_fragments:
+        if fragment in affine_comparison_text:
+            failures.append(
+                f"{affine_comparison_consumer.relative_to(ROOT)}: restored topological "
+                f"basiswise-isomorphism declaration {fragment!r} in geometry"
+            )
 
     geometric_picard_consumer = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Tensor" / "Picard.lean"

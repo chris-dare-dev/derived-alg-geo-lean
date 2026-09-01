@@ -21,6 +21,10 @@ first application that motivated it.
   sheaves of modules over a sheaf of rings on an arbitrary site; those belong
   under `CategoryTheory/Sites/Sheaves/Modules/`, not under affine or scheme
   geometry.
+- Put sheaf results whose signatures intrinsically use the opens, bases,
+  germs, or stalks of a topological space under `Topology/Sheaves/`.
+  Basiswise detection of a sheaf isomorphism belongs in
+  `Topology/Sheaves/Basis.lean`; affine comparison imports it as a consumer.
 - Over-category cocontinuity for arbitrary sites belongs in
   `CategoryTheory/Sites/Over.lean`; restriction API for module sheaves on an
   arbitrary ringed site belongs in
@@ -135,6 +139,9 @@ application, current file, namespace, or proof technique.
   when its remaining types are ordinary modules. In particular, do not
   restore `Algebra/Category/ModuleCat/StalkTensor.lean`; consumers import the
   topological stalk-tensor owner directly.
+- A criterion detecting that a sheaf morphism is an isomorphism from its
+  components on a basis belongs in `Topology/Sheaves/Basis.lean`, not at the
+  front of an affine-scheme consumer.
 - Kernel maps for ordinary localized modules, including their `ModuleCat`
   formulation, belong under `Algebra/Module/Localization/`. Coherent-sheaf
   arguments import that algebraic owner and add only the scheme-dependent

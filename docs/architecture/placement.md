@@ -160,6 +160,13 @@ first row that can express it. The former
 `Algebra/Category/ModuleCat/StalkTensor.lean` path is retired without a shim;
 the topological consumer imports the topological owner directly.
 
+Likewise, detecting an isomorphism of sheaves from isomorphisms on a basis of
+opens is topological sheaf theory. Its canonical owner is
+`Topology/Sheaves/Basis.lean`: the signature uses `TopCat`, `Opens.IsBasis`,
+germs, and stalk functors but no scheme. An affine comparison may apply that
+criterion to the basis of distinguished opens only after importing the
+topological owner directly.
+
 Indexed families of additive commutative groups, their direct sums, saturated
 quotients by supplied relation sets, family-relation systems, additive-map
 ranges, and finite-relative-index predicates are rooted at

@@ -215,6 +215,9 @@ particular:
   `Topology/Sheaves/ModuleTensor/`: their use of open neighbourhoods, germs,
   and stalk functors makes them topological specializations of arbitrary-site
   sheaf theory, not ordinary module algebra;
+- keep basiswise detection of topological sheaf isomorphisms under
+  `Topology/Sheaves/Basis.lean`; affine comparison consumes it only after
+  introducing `Spec R`, distinguished opens, and module localization;
 - extend Mathlib's abelian-category hierarchy under `CategoryTheory/Abelian`
   and make the geometric proof that `Coh(X)` is abelian an input to the generic
   derived-category construction;

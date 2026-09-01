@@ -23,6 +23,8 @@ The principal areas are:
 - `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/` for generic sheaf theory,
   including coverwise local-equivalence detection and module sheaves on an
   arbitrary ringed site;
+- `DerivedAlgGeo/Topology/Sheaves/Basis.lean` for basiswise detection of
+  isomorphisms between sheaves on a topological space;
 - `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` for
   intrinsic rank-one module sheaves and local trivializations, with
   arbitrary-site tensor descent in the adjacent `Tensor.lean`;
@@ -79,6 +81,10 @@ concrete applications through explicit instance leaves.
 - Generic sheaves belong under `CategoryTheory/Sites/Sheaves/`; sheaves of
   modules over a sheaf of rings on an arbitrary site belong in its `Modules/`
   child.
+- Sheaf statements that intrinsically mention the opens, bases, germs, or
+  stalks of a topological space belong under `Topology/Sheaves/`. In
+  particular, basiswise isomorphism detection is owned by `Basis.lean`, not by
+  an affine-scheme comparison that consumes it.
 - Arbitrary-site over-category cocontinuity belongs in
   `CategoryTheory/Sites/Over.lean`; generic module-sheaf restriction to an
   over category belongs in `Sites/Sheaves/Modules/Over.lean`; and equivalence
@@ -373,6 +379,9 @@ documentation, architecture checks, and CI paths together.
   neighbourhoods, germs, or stalk functors belong under `Topology/Sheaves/`.
   Do not restore the retired `Algebra/Category/ModuleCat/StalkTensor.lean`
   path or route consumers through an algebra umbrella.
+- Basiswise detection of isomorphisms between sheaves on a topological space
+  belongs in `Topology/Sheaves/Basis.lean`; geometric comparison files import
+  that root directly and must not redeclare its generic prefix.
 - Use the global `ZLattice` class from `LinearAlgebra/Lattice/Basic.lean` for
   finite free abelian groups. Its construction from finite torsion-free groups
   is generic; only the theorem applying it to a numerical Euler-radical

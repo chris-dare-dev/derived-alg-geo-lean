@@ -75,6 +75,11 @@ remain geometric consumers. Do not place the stalk comparison under
 `Algebra/Category/ModuleCat/`: its public signatures intrinsically use opens,
 germs, and stalk functors on a topological space.
 
+The same topological boundary owns basiswise detection of sheaf
+isomorphisms. Put the stalk-surjectivity and resulting isomorphism criterion in
+`Topology/Sheaves/Basis.lean`; an affine comparison imports that owner and
+begins only when `Spec R`, basic opens, and localization enter the signature.
+
 In particular, use `Algebra/` for ordinary module localization and ring
 operations, and `LinearAlgebra/` for generic linear maps, bases, lattices,
 matrices, multilinear constructions, and exterior powers. When a geometric

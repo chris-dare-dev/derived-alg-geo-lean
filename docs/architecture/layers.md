@@ -68,6 +68,9 @@ In particular:
   `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules`; the stalk/tensor
   comparison and the resulting stalkwise arbitrary-factor strengthening
   belong below `DerivedAlgGeo.Topology`;
+- detecting sheaf isomorphisms from their components on a basis of opens
+  belongs below `DerivedAlgGeo.Topology.Sheaves`; affine-module comparison is
+  a geometric consumer of that criterion;
 - numerical functions on integer lattices and their mixed finite-difference
   calculus live under `DerivedAlgGeo.Algebra.NumericalPolynomial`; Snapper's
   theorem is the geometric consumer once Picard and coherent-sheaf data enter;
@@ -216,6 +219,7 @@ CategoryTheory/Sites/CoversTop
   └─→ equivalence transport                    arbitrary sites
 
 Topology/Sheaves
+  ├─→ Basis                                   basiswise isomorphism detection
   └─→ ModuleTensor
         ├─→ StalkTensor                         stalk/tensor comparison on spaces
         └─→ stalkwise arbitrary-factor tensor descent
@@ -369,6 +373,11 @@ for module presheaves, its signatures intrinsically use a topological space,
 open neighbourhoods, germs, and stalk functors. The parent topological module
 imports this comparison; the `Algebra` umbrella does not export it.
 
+The same ownership rule puts basiswise sheaf-isomorphism detection in
+`Topology/Sheaves/Basis.lean`. Its affine-module application to distinguished
+opens imports that root; the generic criterion does not import schemes,
+commutative-ring spectra, or localization machinery.
+
 Raw dg categories require an additional distinction. A dg category is an
 enriched category and need not be triangulated, so its basic theory and its
 internal pretriangulated refinement live in
@@ -482,6 +491,7 @@ the explicit instance umbrellas attached to their categorical sources:
 | Projective basic-open and section comparison | `DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace` |
 | Generic abelian-category extensions | `DerivedAlgGeo.CategoryTheory.Abelian` |
 | Generic sheaves and ringed-site module sheaves | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves` |
+| Basiswise isomorphism detection for topological sheaves | `DerivedAlgGeo.Topology.Sheaves.Basis` |
 | Over-site cocontinuity, covering-family transport, and module-sheaf restriction | `DerivedAlgGeo.CategoryTheory.Sites.Over`, `DerivedAlgGeo.CategoryTheory.Sites.CoversTop`, and `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Over` |
 | Presentation, generating-section, and quasicoherent-data restriction to over sites | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Over` |
 | Isomorphism invariance and covering-family locality of finite presentation | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Isomorphism` and `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Locality` |
