@@ -2421,6 +2421,15 @@ def main() -> int:
         SOURCE_ROOT / "AlgebraicGeometry" / "Moduli" / "PerfectComplex" /
             "Relative.lean"
     )
+    perfect_comparison_source = relative_perfect_source.parent / "Comparison.lean"
+    perfect_complex_umbrella = relative_perfect_source.parent.with_suffix(".lean")
+    perfect_presheaf_source = relative_perfect_source.parent / "Presheaf.lean"
+    perfect_boundedness_source = relative_perfect_source.parent / "Boundedness.lean"
+    perfect_algebraicity_source = relative_perfect_source.parent / "Algebraicity.lean"
+    perfect_quot_parameter_source = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Moduli" / "Quot" /
+            "ParameterSpace.lean"
+    )
     if not dqc_comparison_source.is_file():
         failures.append(
             f"conditional Dqc comparison consumer missing: "
@@ -2474,11 +2483,131 @@ def main() -> int:
             "(hE : schemeBoundedCoherentCohomology X E.obj)",
             "theorem perfect_iff_compact",
             "(h : PerfectObjectsAreCompactInDqc X)",
+            "SchemeQuasicoherentDerivedCategory.zero_obj_isZero",
         ):
             if required_fragment not in relative_perfect_text:
                 failures.append(
                     f"{relative_perfect_source.relative_to(ROOT)}: relative-perfect "
                     f"comparison consumer is missing {required_fragment!r}"
+                )
+        for retired_fragment in (
+            "def zeroSchemeDerivedObject",
+            "def zeroCoherentComplex",
+            "def zeroCoherentDerivedObject",
+            "def zeroBoundedCoherentDerivedObject",
+            "def SchemeQuasicoherentDerivedCategory.zero",
+            "theorem schemeQuasicoherentDerivedCategory_zero_obj_isZero",
+        ):
+            if retired_fragment in relative_perfect_text:
+                failures.append(
+                    f"{relative_perfect_source.relative_to(ROOT)}: ambient zero "
+                    f"infrastructure returned to the moduli consumer via "
+                    f"{retired_fragment!r}"
+                )
+        for general_zero_fragment in (
+            "theorem schemePseudoCoherent_zero\n    (X : Scheme.{u}) :",
+            "def zeroLocalFiniteTorAmplitudeChart {X S : Scheme.{u}}\n    (p",
+            "theorem schemeRelativePerfect_zero {X S : Scheme.{u}}\n    (p",
+            "def zeroGeometricFiberModel {X S : Scheme.{u}} (p",
+            "def universallyGluableDataZero {X S : Scheme.{u}} (p",
+        ):
+            if general_zero_fragment not in relative_perfect_text:
+                failures.append(
+                    f"{relative_perfect_source.relative_to(ROOT)}: canonical Dqc "
+                    f"zero consumer regained an unnecessary Noetherian dependency; "
+                    f"missing {general_zero_fragment!r}"
+                )
+    for required_fragment in (
+        "noncomputable def zero : SchemeQuasicoherentDerivedCategory X",
+        "theorem zero_isZero : IsZero (zero X)",
+        "theorem zero_obj_isZero : IsZero (zero X).obj",
+        "theorem perfectDerivedToDqc_obj_mem_schemePerfectInDqc",
+    ):
+        if required_fragment not in dqc_text:
+            failures.append(
+                f"{dqc_source.relative_to(ROOT)}: canonical Dqc zero/perfect "
+                f"comparison API is missing {required_fragment!r}"
+            )
+    if not perfect_comparison_source.is_file():
+        failures.append(
+            f"perfect-notion comparison leaf missing: "
+            f"{perfect_comparison_source.relative_to(ROOT)}"
+        )
+    else:
+        perfect_comparison_text = perfect_comparison_source.read_text(encoding="utf-8")
+        for required_import in (
+            "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc",
+            "DerivedAlgGeo.AlgebraicGeometry.Divisors.Determinant",
+            "DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Relative",
+        ):
+            if required_import not in imports_by_path[perfect_comparison_source]:
+                failures.append(
+                    f"{perfect_comparison_source.relative_to(ROOT)}: perfect-notion "
+                    f"comparison must directly import {required_import}"
+                )
+        for required_fragment in (
+            "namespace AlgebraicGeometry.Coh.TwoTermPerfectDeterminantData",
+            "theorem schemeRelativePerfect_le_schemePseudoCoherent",
+            "theorem derivedObject_mem_schemePerfect",
+            "noncomputable def toSchemePerfectDerivedCategory",
+            "noncomputable def toDqc",
+            "theorem toDqc_mem_schemePerfectInDqc",
+        ):
+            if required_fragment not in perfect_comparison_text:
+                failures.append(
+                    f"{perfect_comparison_source.relative_to(ROOT)}: perfect-notion "
+                    f"adapter is missing {required_fragment!r}"
+                )
+        for forbidden_fragment in (
+            "schemeRelativePerfect_iff_schemePerfect",
+            "schemePerfect_iff_schemeRelativePerfect",
+            "instance TwoTermPerfectDeterminantData",
+        ):
+            if forbidden_fragment in perfect_comparison_text:
+                failures.append(
+                    f"{perfect_comparison_source.relative_to(ROOT)}: unsupported "
+                    f"perfect-notion equivalence/instance appeared via "
+                    f"{forbidden_fragment!r}"
+                )
+    perfect_comparison_import = (
+        "DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Comparison"
+    )
+    if perfect_comparison_import not in imports_by_path[perfect_complex_umbrella]:
+        failures.append(
+            f"{perfect_complex_umbrella.relative_to(ROOT)}: perfect-complex umbrella "
+            f"must export {perfect_comparison_import}"
+        )
+    zero_consumer_fragments = {
+        perfect_presheaf_source: (
+            "def relativePerfectZeroObject {S : Scheme.{u}} (T : SchemeBaseChange S) :",
+        ),
+        perfect_boundedness_source: (
+            "def zeroFiniteTypeBoundednessWitness (S : Scheme.{u}) :",
+            "theorem zeroRelativePerfectModuliSelector_isBounded\n    (S : Scheme.{u}) :",
+            "theorem zeroRelativePerfectBoundedness_afterBaseChange\n"
+            "    {S S' : Scheme.{u}} (_ : S' ⟶ S) :",
+        ),
+        perfect_algebraicity_source: (
+            "def zeroBoundedRelativePerfectZariskiPresentation\n"
+            "    (S : Scheme.{u}) :",
+        ),
+        perfect_quot_parameter_source: (
+            "def zeroQuotientToRelativePerfect {S : Scheme.{u}}\n"
+            "    (T : SchemeBaseChange S) :",
+            "def zeroQuotientFiniteTypeBoundednessWitness\n"
+            "    (S : Scheme.{u}) :",
+            "theorem zeroQuotient_isGeometricallyBounded\n"
+            "    (S : Scheme.{u}) :",
+        ),
+    }
+    for path, required_fragments in zero_consumer_fragments.items():
+        text = path.read_text(encoding="utf-8")
+        for required_fragment in required_fragments:
+            if required_fragment not in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: zero-family consumer regained an "
+                    f"unnecessary Noetherian dependency; missing "
+                    f"{required_fragment!r}"
                 )
     for filename, names in affine_generic_declarations.items():
         path = dqc_subtree / filename
@@ -2894,6 +3023,10 @@ def main() -> int:
     print(
         "ok: conditional Dqc comparisons require explicit evidence and are "
         "consumed by relative-perfect geometry without global instances"
+    )
+    print(
+        "ok: Dqc owns its canonical zero; perfect notions are connected only "
+        "by the proved two-term-to-absolute-to-Dqc adapters"
     )
     print(
         "ok: semistable loci and relative HN filtrations use their Moduli "

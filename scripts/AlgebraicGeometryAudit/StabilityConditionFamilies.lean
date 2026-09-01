@@ -451,6 +451,9 @@ general-scheme equivalence and compact/perfect theorem still needed by A.14.
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.ι
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.mem_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.zero
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.zero_isZero
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.zero_obj_isZero
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.coherentDerivedInclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.coherentDerivedInclusion_mem_dqc
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.coherentDerivedToDqc
@@ -468,6 +471,7 @@ general-scheme equivalence and compact/perfect theorem still needed by A.14.
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeBoundedCoherentDqcCategory.ι
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.perfectDerivedToDqc
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.schemePerfectInDqc
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.perfectDerivedToDqc_obj_mem_schemePerfectInDqc
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.BoundedCoherentDqcIdentification
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.BoundedCoherentDqcIdentification.mk.inj
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.BoundedCoherentDqcIdentification.mk.sizeOf_spec

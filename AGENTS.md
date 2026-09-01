@@ -273,6 +273,18 @@ construct a subprestack, through the categorical `fullsubcategory` API.
   `Dqc/Comparison.lean` by passing evidence as an ordinary argument. Do not
   install an unconditional equivalence, essential-surjectivity instance, or
   compact/perfect instance for an unsupported scheme.
+- `SchemeQuasicoherentDerivedCategory.zero` is canonical `Dqc` infrastructure
+  and belongs in `AlgebraicGeometry/DerivedCategory/Dqc.lean`, with no local
+  Noetherian hypothesis. A moduli consumer may prove that this object is
+  pseudo-coherent, relative perfect, or universally gluable; it must not
+  reconstruct an ambient, coherent, or bounded-coherent zero to define it.
+- Keep the three perfect-complex notions distinct. `schemePerfect` is the
+  absolute thick envelope in `D(Coh X)`; `schemeRelativePerfect p` is the
+  base-dependent pseudo-coherent finite-Tor locus in `Dqc(X)`; and
+  `TwoTermPerfectDeterminantData` is explicit two-term presentation data for a
+  coherent sheaf. Cross-notion theorems live in
+  `Moduli/PerfectComplex/Comparison.lean`. Add only proved one-way adapters;
+  never infer an absolute/relative equivalence from the shared word “perfect”.
 - Neutral geometric Fourier--Mukai declarations owned by
   `AlgebraicGeometry/DerivedCategory/FourierMukai/` use
   `AlgebraicGeometry.DerivedCategory.FourierMukai`. Generic kernel

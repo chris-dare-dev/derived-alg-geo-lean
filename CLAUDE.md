@@ -106,6 +106,20 @@ membership comparisons. Do not turn either proposition into a global
 equivalence, essential-surjectivity instance, or compactness instance before
 the geometric theorem is proved.
 
+`SchemeQuasicoherentDerivedCategory.zero` is owned by `Dqc.lean` and is
+defined for every scheme. Perfect-moduli consumers prove their additional
+pseudo-coherent, finite-Tor, and gluing properties for that object instead of
+reconstructing zero through `D(Coh X)` or a bounded-coherent category.
+
+Do not collapse the repository's three uses of “perfect.” `schemePerfect` is
+the absolute thick envelope in `D(Coh X)`; `schemeRelativePerfect p` is the
+base-dependent pseudo-coherent finite-Tor locus in `Dqc(X)`; and
+`TwoTermPerfectDeterminantData` is explicit presentation data of two-term
+amplitude. `Moduli/PerfectComplex/Comparison.lean` owns cross-notion adapters:
+two-term data gives an absolute perfect degree-zero object, which maps to the
+canonical Dqc essential image. No converse or absolute/relative equivalence
+may be installed without a separate geometric proof.
+
 The opposite comparison `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` is
 generic derived-category data and belongs in
 `CategoryTheory/Triangulated/DerivedCategory/Opposite.lean`. Exact algebraic

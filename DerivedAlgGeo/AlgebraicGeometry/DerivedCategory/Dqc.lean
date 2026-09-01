@@ -36,6 +36,11 @@ into representatives and membership theorems only when a consumer passes the
 evidence explicitly, so unsupported geometric cases are still not silently
 identified with the all-sheaf derived category.
 
+The canonical zero object is different: it follows from the triangulated full
+subcategory structure already proved here, so this root constructs it for an
+arbitrary scheme. Moduli consumers reuse that object and add their own locus
+membership proofs.
+
 Declarations in this file and the affine realization subtree use the
 geometry-owned namespace `AlgebraicGeometry.DerivedCategory.Dqc`.
 -/
@@ -45,6 +50,7 @@ open AlgebraicGeometry.DerivedCategory
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
+open scoped ZeroObject
 
 noncomputable section
 
@@ -108,6 +114,20 @@ may make.  (`Pretriangulated` is data, not a proposition, so it is left as the
 Mathlib instance rather than restated here.) -/
 theorem ι_isTriangulated : (SchemeQuasicoherentDerivedCategory.ι X).IsTriangulated :=
   inferInstance
+
+/-- The canonical zero object of `Dqc(X)`, owned by the `Dqc` root rather than
+by any particular geometric consumer. -/
+noncomputable def zero : SchemeQuasicoherentDerivedCategory X :=
+  0
+
+/-- The canonical `Dqc(X)` zero is a zero object in the full subcategory. -/
+theorem zero_isZero : IsZero (zero X) :=
+  isZero_zero _
+
+/-- Forgetting the canonical `Dqc(X)` zero to the all-sheaf derived category
+still gives a zero object. -/
+theorem zero_obj_isZero : IsZero (zero X).obj :=
+  (ι X).map_isZero (zero_isZero X)
 
 /-- **The abelian-side inputs to `Dqc(X)`'s coproduct structure are in place**
 (#721, third bullet).
@@ -328,6 +348,17 @@ def schemePerfectInDqc
     (X : Scheme.{u}) [IsLocallyNoetherian X] :
     ObjectProperty (SchemeQuasicoherentDerivedCategory X) :=
   (perfectDerivedToDqc X ⋙ SchemeBoundedCoherentDqcCategory.ι X).essImage
+
+/-- Every object of the coherent-derived perfect category maps into the
+perfect essential image in `Dqc(X)`. This is the canonical absolute-perfect
+comparison and requires no bounded-coherent equivalence hypothesis. -/
+theorem perfectDerivedToDqc_obj_mem_schemePerfectInDqc
+    (X : Scheme.{u}) [IsLocallyNoetherian X]
+    (E : SchemePerfectDerivedCategory X) :
+    schemePerfectInDqc X
+      ((SchemeBoundedCoherentDqcCategory.ι X).obj
+        ((perfectDerivedToDqc X).obj E)) :=
+  Functor.obj_mem_essImage _ E
 
 /-- The exact missing general-scheme identification behind the standard
 notation `Dᵇ(Coh X) ⊂ Dqc(X)`.  The comparison field forces the equivalence
