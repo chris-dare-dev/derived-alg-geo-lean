@@ -413,11 +413,15 @@ Grassmannian of positive planes is not used. -/
 -- symmetry hypothesis. Two geometry-free inhabitants keep the root honest.
 #print axioms IntegralLattice.IsIsotropicSequence
 #print axioms IntegralLattice.IsIsotropicSequence.self_isotropic
-#print axioms IntegralLattice.IsIsotropicSequence.pairing_one
+#print axioms IntegralLattice.IsIsotropicSequence.pairwise_one
 #print axioms IntegralLattice.IsIsotropicSequence.pairing_ite
+#print axioms IntegralLattice.IsIsotropicSequence.pairing_smul_sum_left
 #print axioms IntegralLattice.IsIsotropicSequence.pairing_sum_left
+#print axioms IntegralLattice.IsIsotropicSequence.pairing_sum_right
 #print axioms IntegralLattice.IsIsotropicSequence.pairing_sum_sum
+#print axioms IntegralLattice.IsIsotropicSequence.coeffs_eq_zero_of_pairing_smul_sum_eq_zero
 #print axioms IntegralLattice.IsIsotropicSequence.linearIndependent
 #print axioms IntegralLattice.hyperbolicPairing
+#print axioms IntegralLattice.hyperbolicPairing_apply
 #print axioms IntegralLattice.isIsotropicSequence_hyperbolic
 #print axioms IntegralLattice.isIsotropicSequence_zero_singleton
