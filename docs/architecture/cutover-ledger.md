@@ -312,6 +312,15 @@ blocks should normally move it rather than add more declarations beside it.
   public root exports the two new subjects, and the sweep routes each moved
   subtree to the audit lane that holds its records. Declaration names and
   namespaces are unchanged.
+- Geometry organized by Mathlib's object names (2026-09-01):
+  `AlgebraicGeometry/Proj/` moved to `AlgebraicGeometry/ProjectiveSpectrum/`,
+  Mathlib's name for the directory whose `Proj` it extends, and
+  `AlgebraicGeometry/CoherentSheaf/` to `AlgebraicGeometry/Modules/Coherent/`
+  with its `Quasicoherent/` child beside it as `Modules/Quasicoherent/`, since
+  both are subcategories of the `X.Modules` that Mathlib defines in
+  `AlgebraicGeometry/Modules/Sheaf.lean`. Declaration names and namespaces
+  (`AlgebraicGeometry.Proj`, `Scheme.Modules`, `SheafOfModules`) are
+  unchanged.
 
 ## Confirmed next lanes
 
@@ -322,8 +331,6 @@ already names the target, and new code uses the target path immediately.
 
 | Current path | Target path |
 | --- | --- |
-| `AlgebraicGeometry/Proj/` | `AlgebraicGeometry/ProjectiveSpectrum/` |
-| `AlgebraicGeometry/CoherentSheaf/` | `AlgebraicGeometry/Modules/Coherent/`, with `Quasicoherent/` beside it |
 | `CategoryTheory/Triangulated/WeakStabilityCondition/` | `CategoryTheory/Triangulated/StabilityCondition/` with weak stability as the child `Weak/` |
 
 Confirmed type-level hazards, recorded for a separate lane because they are

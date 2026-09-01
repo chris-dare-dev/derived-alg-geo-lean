@@ -2,7 +2,7 @@
 Projective-variety slice of the AlgebraicGeometry audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Pushforward
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Projective
 open AlgebraicGeometry
 

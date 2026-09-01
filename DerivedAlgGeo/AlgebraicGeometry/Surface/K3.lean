@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.StructureSheaf
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.StructureSheaf
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.FiniteDimensional
 import DerivedAlgGeo.AlgebraicGeometry.Duality.Canonical
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Projective

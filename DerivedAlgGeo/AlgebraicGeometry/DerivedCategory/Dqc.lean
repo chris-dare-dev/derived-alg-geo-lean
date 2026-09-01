@@ -6,7 +6,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Quasicoherent.Extensions
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Quasicoherent.Coproducts
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Coproducts
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Basic
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 

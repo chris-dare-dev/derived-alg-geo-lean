@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.StructureSections
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.StructureSections
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.LinearCech
 import DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite
 

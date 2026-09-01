@@ -37,10 +37,10 @@ stability nor retract closure.
 ## What is deliberately out of scope
 
 Admissibility of `component i` needs finite-dimensional Hom-spaces
-(`AlgebraicGeometry/CoherentSheaf/Linear.lean`, issue #332) and is not
+(`AlgebraicGeometry/Modules/Coherent/Linear.lean`, issue #332) and is not
 claimed. Mutation is not filed in this milestone. Beilinson's collection
 `O, O(1), …, O(n)` on `P^n`, its fullness, and the decomposition of
-`D^b(P^n)` land in `AlgebraicGeometry/Proj/**` (issues #570, #586, #571,
+`D^b(P^n)` land in `AlgebraicGeometry/ProjectiveSpectrum/**` (issues #570, #586, #571,
 #332, #806, #833, #824–#828) and are deliberately NOT touched here; the
 concrete inhabitant of this structure is the `D^b(field)` example of the next
 issue in this lane.

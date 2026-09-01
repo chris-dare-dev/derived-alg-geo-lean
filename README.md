@@ -24,7 +24,7 @@ import DerivedAlgGeo
 Library code should prefer the narrowest useful subject import, such as:
 
 ```lean
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory
 import DerivedAlgGeo.AlgebraicGeometry.Moduli
 import DerivedAlgGeo.CategoryTheory.Monoidal

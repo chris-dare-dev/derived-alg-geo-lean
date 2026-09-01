@@ -2,7 +2,6 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology
 import DerivedAlgGeo.AlgebraicGeometry.CohomologyPushforward
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory
@@ -14,7 +13,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules
 import DerivedAlgGeo.AlgebraicGeometry.Moduli
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 import DerivedAlgGeo.AlgebraicGeometry.Numerical
-import DerivedAlgGeo.AlgebraicGeometry.Proj
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum
 import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch
 import DerivedAlgGeo.AlgebraicGeometry.Stacks
 import DerivedAlgGeo.AlgebraicGeometry.Surface

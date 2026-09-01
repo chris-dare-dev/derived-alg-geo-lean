@@ -26,14 +26,14 @@ import `Mathlib.AlgebraicGeometry.Scheme` — a layer-0 subject reaching into ge
 ## Why this is its own file
 
 `grothendieckTopology_coversTop` previously lived in
-`DerivedAlgGeo/AlgebraicGeometry/CoherentSheaf/Descent/Locality.lean`. It is a statement about
+`DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Descent/Locality.lean`. It is a statement about
 topological spaces with no reference to coherence, sheaves of modules, or schemes, and its position
 there made it unreachable from the lower-level topology and algebraic-geometry infrastructure
 without creating an import cycle.
 
 That was a live constraint rather than an aesthetic one — the remaining half of the affine
 comparison theorem (issue #46) needs `basicOpen_coversTop_of_span_eq_top` in
-`AlgebraicGeometry/CoherentSheaf/Affine/Comparison.lean`, which is exactly where the old
+`AlgebraicGeometry/Modules/Coherent/Affine/Comparison.lean`, which is exactly where the old
 placement blocked it. Moving the lemma into the topology domain keeps the dependency direction
 explicit.
 

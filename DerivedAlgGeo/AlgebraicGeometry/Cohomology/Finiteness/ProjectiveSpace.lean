@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.ProjectiveSpace
 import DerivedAlgGeo.Topology.Sheaves.Cech.GlobalComparison
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Boundedness

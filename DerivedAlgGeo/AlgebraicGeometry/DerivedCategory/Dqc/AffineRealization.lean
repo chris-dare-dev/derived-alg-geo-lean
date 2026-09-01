@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.ObjectProperty.Kernels
 import Mathlib.CategoryTheory.Preadditive.LeftExact
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Quasicoherent.Kernels
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Kernels
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineDerivedEquivalence
 

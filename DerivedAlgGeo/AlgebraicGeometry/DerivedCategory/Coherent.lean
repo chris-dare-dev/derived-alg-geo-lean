@@ -5,8 +5,8 @@ Released under the MIT license.
 import Mathlib.CategoryTheory.Triangulated.Generators
 import Mathlib.Algebra.Homology.DerivedCategory.TStructure
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.TStructure
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.StructureSheaf
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Abelian.Basic
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.StructureSheaf
 
 /-!
 # Derived categories of coherent sheaves on schemes

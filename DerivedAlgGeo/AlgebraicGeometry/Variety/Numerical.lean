@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Basic
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Abelian.Basic
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Core.CharacteristicClasses

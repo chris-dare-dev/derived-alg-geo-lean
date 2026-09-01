@@ -3,8 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.ObjectProperty.Extensions
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Quasicoherent.Kernels
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Abelian.Basic
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Kernels
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineVanishing
 import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CohomologyShortExact
 
