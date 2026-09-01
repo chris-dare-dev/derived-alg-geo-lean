@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistCoherence
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistingSheaf
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
 
 /-!
 # The twisting sheaf is invertible

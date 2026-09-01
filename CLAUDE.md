@@ -23,6 +23,11 @@ The principal areas are:
 - `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/` for generic sheaf theory,
   including coverwise local-equivalence detection and module sheaves on an
   arbitrary ringed site;
+- `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` for
+  intrinsic rank-one module sheaves and local trivializations, with
+  arbitrary-site tensor descent in the adjacent `Tensor.lean`;
+- `DerivedAlgGeo/Topology/Sheaves/ModuleTensor.lean` for the stalkwise
+  topological strengthening of module-tensor descent;
 - `DerivedAlgGeo/CategoryTheory/Moduli/` for neutral moduli predicates such as
   boundedness;
 - `DerivedAlgGeo/CategoryTheory/Pseudofunctor/ObjectProperty/` for generic
@@ -77,6 +82,9 @@ concrete applications through explicit instance leaves.
   detected on a `GrothendieckTopology.CoversTop` family. Their canonical owner
   is `CategoryTheory/Sites/Sheaves/CoversTop.lean`; geometric charts consume
   that root directly.
+- Rank-one local-generator data and `SheafOfModules.IsInvertible` are likewise
+  arbitrary-site module-sheaf notions. Scheme tensor and Picard modules import
+  those roots directly and begin only when `X.Modules` enters the signature.
 - Definitions and lemmas that intrinsically mention schemes, varieties,
   scheme-indexed sheaf categories, or geometric morphism properties belong
   under `AlgebraicGeometry/`.

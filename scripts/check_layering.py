@@ -1431,9 +1431,12 @@ def main() -> int:
         generic_sheaves_root / "CohomologyShortExact.lean",
         generic_sheaves_root / "CohomologyPushforward.lean",
         generic_sheaves_root / "Modules" / "Exactness.lean",
+        generic_sheaves_root / "Modules" / "Invertible.lean",
         generic_sheaves_root / "Modules" / "Presentation" / "Transport.lean",
         generic_sheaves_root / "Modules" / "Presentation" / "Finite.lean",
+        generic_sheaves_root / "Modules" / "Tensor.lean",
         SOURCE_ROOT / "Topology" / "Sheaves" / "CohomologyPushforward.lean",
+        SOURCE_ROOT / "Topology" / "Sheaves" / "ModuleTensor.lean",
     )
     for path in required_generic_foundations:
         if not path.is_file():
@@ -1506,6 +1509,117 @@ def main() -> int:
                 f"{geometric_tensor_consumer.relative_to(ROOT)}: restored arbitrary-site "
                 f"cover-detection declaration {fragment!r} in geometry"
             )
+
+    invertible_owner = generic_sheaves_root / "Modules" / "Invertible.lean"
+    invertible_import = (
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible"
+    )
+    tensor_descent_owner = generic_sheaves_root / "Modules" / "Tensor.lean"
+    tensor_descent_import = (
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Tensor"
+    )
+    topological_tensor_owner = (
+        SOURCE_ROOT / "Topology" / "Sheaves" / "ModuleTensor.lean"
+    )
+    topological_tensor_import = "DerivedAlgGeo.Topology.Sheaves.ModuleTensor"
+    invertible_fragments = (
+        "def IsRankOne",
+        "class IsInvertible",
+        "def rankOneTrivialization",
+        "lemma IsInvertible.of_trivializations",
+    )
+    tensor_descent_fragments = (
+        "lemma isLocallySurjective_whiskerLeft",
+        "lemma isLocallyInjective_whiskerLeft_of_rankOneData",
+        "lemma W_whiskerLeft_of_rankOneData",
+        "lemma isIso_sheafification_map_whiskerLeft_unit_of_rankOneData",
+    )
+    for owner_path, fragments in (
+        (invertible_owner, invertible_fragments),
+        (tensor_descent_owner, tensor_descent_fragments),
+    ):
+        if owner_path.is_file():
+            owner_text = owner_path.read_text(encoding="utf-8")
+            for fragment in fragments:
+                if fragment not in owner_text:
+                    failures.append(
+                        f"{owner_path.relative_to(ROOT)}: missing generic module-sheaf "
+                        f"declaration {fragment!r}"
+                    )
+
+    topological_tensor_fragment = "lemma W_whiskerLeft_of_isIso_stalk"
+    if topological_tensor_owner.is_file() and topological_tensor_fragment not in (
+        topological_tensor_owner.read_text(encoding="utf-8")
+    ):
+        failures.append(
+            f"{topological_tensor_owner.relative_to(ROOT)}: missing stalkwise "
+            "module-tensor specialization"
+        )
+
+    modules_umbrella = generic_sheaves_root / "Modules.lean"
+    for owner_import in (invertible_import, tensor_descent_import):
+        if owner_import not in imports_by_path[modules_umbrella]:
+            failures.append(
+                f"{modules_umbrella.relative_to(ROOT)}: missing generic module-sheaf "
+                f"umbrella import {owner_import}"
+            )
+
+    topology_sheaves_umbrella = SOURCE_ROOT / "Topology" / "Sheaves.lean"
+    if topological_tensor_import not in imports_by_path[topology_sheaves_umbrella]:
+        failures.append(
+            f"{topology_sheaves_umbrella.relative_to(ROOT)}: missing topological "
+            f"module-tensor umbrella import {topological_tensor_import}"
+        )
+
+    geometric_picard_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Tensor" / "Picard.lean"
+    )
+    if invertible_import not in imports_by_path[geometric_picard_consumer]:
+        failures.append(
+            f"{geometric_picard_consumer.relative_to(ROOT)}: Picard consumer must "
+            f"import the intrinsic invertibility owner {invertible_import} directly"
+        )
+    for owner_import in (
+        invertible_import,
+        tensor_descent_import,
+        topological_tensor_import,
+    ):
+        if owner_import not in imports_by_path[geometric_tensor_consumer]:
+            failures.append(
+                f"{geometric_tensor_consumer.relative_to(ROOT)}: scheme tensor "
+                f"consumer must import {owner_import} directly"
+            )
+
+    geometric_invertible_consumers = (
+        geometric_picard_consumer,
+        geometric_tensor_consumer,
+        SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "AssociatedSheaf" /
+            "Construction.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "Determinant.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "Dual.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Duality" / "Canonical" /
+            "Descent.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Pullback" /
+            "Invertible.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "TwistInvertible.lean",
+    )
+    for path in geometric_invertible_consumers:
+        if invertible_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: intrinsic invertibility consumer must "
+                f"import {invertible_import} directly"
+            )
+
+    for consumer in (geometric_picard_consumer, geometric_tensor_consumer):
+        consumer_text = consumer.read_text(encoding="utf-8")
+        for fragment in (*invertible_fragments, *tensor_descent_fragments,
+                         topological_tensor_fragment):
+            if fragment in consumer_text:
+                failures.append(
+                    f"{consumer.relative_to(ROOT)}: restored generic module-sheaf "
+                    f"declaration {fragment!r} in geometry"
+                )
 
     bicategorical_cat = (
         generic_bicategory_root / "Adjunction" / "Cat.lean"

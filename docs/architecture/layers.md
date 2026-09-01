@@ -63,6 +63,10 @@ In particular:
 - coverwise local-equivalence detection for additive presheaves belongs below
   `DerivedAlgGeo.CategoryTheory.Sites.Sheaves`; scheme tensor, divisor, and
   Proj cover arguments import it as consumers;
+- intrinsic rank-one and invertible module sheaves, together with
+  arbitrary-site tensor descent, belong below
+  `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules`; the stalkwise
+  arbitrary-factor strengthening belongs below `DerivedAlgGeo.Topology`;
 - numerical functions on integer lattices and their mixed finite-difference
   calculus live under `DerivedAlgGeo.Algebra.NumericalPolynomial`; Snapper's
   theorem is the geometric consumer once Picard and coherent-sheaf data enter;
@@ -196,7 +200,12 @@ CategoryTheory/Sites/Sheaves
   ├─→ ConstantPullback, CohomologyPushforward  arbitrary sites
   └─→ Modules
         ├─→ Exactness                           arbitrary ringed sites
+        ├─→ Invertible                          rank one and local trivializations
+        ├─→ Tensor                              rank-one tensor descent
         └─→ Presentation                        finite-presentation transport
+
+Topology/Sheaves
+  └─→ ModuleTensor                              stalkwise arbitrary-factor tensor descent
 
 CategoryTheory/Triangulated/WeakStabilityCondition
   ├─→ Foundation, Families, HarderNarasimhan, Support, Tilting
@@ -333,6 +342,12 @@ quasicoherent, and coherent sheaves belong to algebraic geometry. Likewise,
 the repository reuses Mathlib's abelian typeclass: the generic derived category
 depends on an arbitrary abelian category, while geometry proves that `Coh(X)`
 is one and then supplies registration or comparison consumers.
+
+In particular, `SheafOfModules.IsInvertible` is intrinsic arbitrary-site data,
+not a Picard-group definition. Scheme Picard classes and sheafified tensor
+objects directly consume it. The topological stalkwise tensor theorem is a
+stronger specialization and therefore imports the categorical site root, not
+the other way around.
 
 Raw dg categories require an additional distinction. A dg category is an
 enriched category and need not be triangulated, so its basic theory and its

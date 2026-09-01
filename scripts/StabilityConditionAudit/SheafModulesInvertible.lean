@@ -1,0 +1,34 @@
+/-
+Arbitrary-site invertible module sheaves, tensor descent, and the topological stalkwise
+specialization.
+-/
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Tensor
+import DerivedAlgGeo.Topology.Sheaves.ModuleTensor
+
+#print axioms SheafOfModules.freePUnitIsoUnit
+#print axioms SheafOfModules.LocalGeneratorsData.IsRankOne
+#print axioms SheafOfModules.LocalGeneratorsData.ofIso
+#print axioms SheafOfModules.LocalGeneratorsData.instIsLocallyFreeDataOfIso
+#print axioms SheafOfModules.LocalGeneratorsData.isRankOne_ofIso
+#print axioms SheafOfModules.IsInvertible
+#print axioms SheafOfModules.IsInvertible.exists_rankOneData
+#print axioms SheafOfModules.IsInvertible.isFinitePresentation
+#print axioms SheafOfModules.IsInvertible.ofIso
+#print axioms SheafOfModules.instIsLocallyFreeOfIsInvertible
+#print axioms SheafOfModules.instIsInvertibleFreePUnit
+#print axioms SheafOfModules.instIsInvertibleUnit
+#print axioms SheafOfModules.LocalGeneratorsData.rankOneTrivialization
+#print axioms SheafOfModules.LocalGeneratorsData.rankOneTrivializationOver
+#print axioms SheafOfModules.IsInvertible.of_trivializations
+#print axioms SheafOfModules.isLocallySurjective_whiskerLeft
+#print axioms SheafOfModules.isLocallyInjective_whiskerLeft_of_isoUnit
+#print axioms SheafOfModules.isLocallyInjective_whiskerLeft_of_rankOneData
+#print axioms SheafOfModules.W_whiskerLeft_of_rankOneData
+#print axioms SheafOfModules.isIso_sheafification_map_whiskerLeft_of_rankOneData
+#print axioms SheafOfModules.isIso_sheafification_map_whiskerRight_of_rankOneData
+#print axioms SheafOfModules.isIso_sheafification_map_whiskerLeft_unit_of_rankOneData
+#print axioms SheafOfModules.isIso_sheafification_map_whiskerRight_unit_of_rankOneData
+#print axioms SheafOfModules.instMonoidalCategoryPresheafOfModulesCompOppositeCommRingCatRingCatForget₂RingHomCarrierCarrier_derivedAlgGeo
+#print axioms SheafOfModules.instMonoidalCategoryPresheafOfModulesObjFunctorOppositeRingCatIsSheafRingSheaf
+#print axioms SheafOfModules.instSymmetricCategoryPresheafOfModulesObjFunctorOppositeRingCatIsSheafRingSheaf
