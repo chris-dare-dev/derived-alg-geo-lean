@@ -1235,11 +1235,11 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms isFinitePresentation_tilde
 #print axioms isCoherent_tilde
 #print axioms isCoherent_tilde_of_finite
--- Layer B stage 1: the geometric half of the affine comparison theorem. The first two
--- are general sheaf theory; the rest reduce `IsIso fromTildeΓ` to a statement about
--- localisation of modules.
+-- Layer B stage 1: the topological sheaf root consumed by the affine comparison.
 #print axioms TopCat.Presheaf.stalkFunctor_map_surjective_of_isBasis
 #print axioms TopCat.Sheaf.isIso_of_isIso_app_of_isBasis
+-- Layer B stage 1: the geometric half of the affine comparison theorem reduces
+-- `IsIso fromTildeΓ` to a statement about localisation of modules.
 #print axioms Scheme.Modules.basicOpenRestriction
 #print axioms Scheme.Modules.toOpen_comp_fromTildeΓ_app
 #print axioms Scheme.Modules.isLocalizedModule_basicOpenRestriction_tilde

@@ -231,13 +231,15 @@ blocks should normally move it rather than add more declarations beside it.
   arbitrary-factor stalkwise local-equivalence theorem. The former
   `Algebra/Category/ModuleCat/StalkTensor.lean` path and its export from the
   algebra umbrella are retired without a compatibility shim.
+- Basiswise detection of topological sheaf isomorphisms:
+  `Topology/Sheaves/Basis.lean` owns surjectivity of stalk maps detected on a
+  basis and the resulting criterion that a sheaf morphism is an isomorphism.
+  `AlgebraicGeometry/Modules/Affine/Comparison.lean` imports that root and now
+  begins with scheme modules, distinguished opens, and localization. Both
+  declaration names are preserved without a compatibility shim.
 
 ## Confirmed next lanes
 
-- Basiswise detection of isomorphisms for sheaves on a topological space
-  remains at the front of
-  `AlgebraicGeometry/Modules/Affine/Comparison.lean`; its canonical owner is
-  `Topology/Sheaves/`.
 - `PrimeSpectrum.basicOpen_prod_eq_pi` remains at the front of
   `AlgebraicGeometry/Cohomology/Cech/Affine.lean`; its signature requires only
   the prime spectrum of a commutative ring and belongs under `Algebra/`.
