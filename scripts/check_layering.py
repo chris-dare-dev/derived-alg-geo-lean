@@ -73,15 +73,15 @@ GEOMETRY_IMPORTERS = (GEOMETRY, DEVELOPMENT)
 # The two aggregation roots import everything and own nothing.
 AGGREGATION_ROOTS = {LIBRARY, f"{LIBRARY}Sweep"}
 
-# The stability tree. Weak stability is the dependency parent of Bridgeland
-# stability; the physical nesting is `WeakStabilityCondition/` with the
-# Bridgeland child `StabilityCondition/` below it, so a weak module is one in
-# the weak tree but outside the strong subtree.
-STABILITY_ROOT = f"{LIBRARY}.CategoryTheory.Triangulated.WeakStabilityCondition"
-WEAK_TREE = STABILITY_ROOT
-STRONG_TREE = f"{STABILITY_ROOT}.StabilityCondition"
+# The stability tree. Bridgeland stability is the canonical concept and names
+# the directory; weak stability, its dependency parent, is the child `Weak/`,
+# as `PseudoMetricSpace` is `MetricSpace/Pseudo/` in Mathlib. A weak module is
+# one below `Weak/`; a strong module is one in the tree but outside `Weak/`.
+STABILITY_ROOT = f"{LIBRARY}.CategoryTheory.Triangulated.StabilityCondition"
+WEAK_TREE = f"{STABILITY_ROOT}.Weak"
+STRONG_TREE = STABILITY_ROOT
 STRONG_PRESTABILITY_SOURCE = SOURCE_ROOT / (
-    "CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/"
+    "CategoryTheory/Triangulated/StabilityCondition/"
     "Foundation/PreStabilityCondition.lean"
 )
 STRONG_PRESTABILITY_EXTENDS = re.compile(
@@ -132,13 +132,13 @@ RETIRED_PATHS = (
     "CategoryTheory/WeakSerreExact.lean",
     "CategoryTheory/Monoidal/Triangulated/Instances",
     "CategoryTheory/Triangulated/Families/Boundedness.lean",
-    "CategoryTheory/Triangulated/WeakStabilityCondition/Foundations",
-    "CategoryTheory/Triangulated/WeakStabilityCondition/Families/Instances",
-    "CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/"
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Foundations",
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Instances",
+    "CategoryTheory/Triangulated/StabilityCondition/"
     "Families/Instances",
-    "CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/"
+    "CategoryTheory/Triangulated/StabilityCondition/"
     "Symmetry/Autoequivalence/Instances",
-    "CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/"
+    "CategoryTheory/Triangulated/StabilityCondition/"
     "WeakCompatibility",
 )
 
@@ -156,11 +156,11 @@ def in_tree(module: str, root: str) -> bool:
 
 
 def is_weak_module(module: str) -> bool:
-    return in_tree(module, WEAK_TREE) and not in_tree(module, STRONG_TREE)
+    return in_tree(module, WEAK_TREE)
 
 
 def is_strong_module(module: str) -> bool:
-    return in_tree(module, STRONG_TREE)
+    return in_tree(module, STRONG_TREE) and not in_tree(module, WEAK_TREE)
 
 
 def may_import_geometry(module: str) -> bool:

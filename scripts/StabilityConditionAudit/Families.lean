@@ -4,7 +4,7 @@ split out so concurrent branches append to different files (#480). Geometric
 family records are owned by
 `AlgebraicGeometryAudit/StabilityConditionFamilies.lean`.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.ObjectProperty.UniversallyStable
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai

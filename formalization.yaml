@@ -1168,7 +1168,7 @@ fidelity:
     the parse hazard scripts/check_audit.py carries a regression test for.
 
     COUNT UPDATE (Tilting lane, heart increment), 2026-08-06. The 9 additional
-    records are DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Tilting/TorsionPair/Heart.lean: the
+    records are DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Heart.lean: the
     HeartTorsionPair datum, the two tilted aisles with their isomorphism-closure
     instances, the factorisation lemma and its uniqueness counterpart, the
     orthogonality characterisation of the torsion class, and the Hom-vanishing
@@ -1178,7 +1178,7 @@ fidelity:
     tiltGE are `def ... : ObjectProperty C`).
 
     COUNT UPDATE (Wall lane), 2026-08-06. The 21 additional records are the
-    whole of DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Walls/Numerical/Basic.lean: the class abbreviation and
+    whole of DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Numerical/Basic.lean: the class abbreviation and
     its three accessors, the two charge components, the three minors, the wall
     expression, the collapse identity, the circle and line forms, the shift and
     its four invariance lemmas, the charge-degeneracy criterion, and the
@@ -1187,14 +1187,14 @@ fidelity:
     constructions (9 def, 1 abbrev).
 
     COUNT UPDATE (FiniteLength lane), 2026-08-06. The 10 additional records are
-    the whole of DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Foundations/SimpleCharge.lean: the two
+    the whole of DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundations/SimpleCharge.lean: the two
     cone-closure lemmas the foundational library lacks, the charge construction and its two
     computation lemmas, the freeness/uniqueness pair, and the three half-plane
     consequences. Audit count 585 -> 595. Coverage complete: 10 top-level
     declarations, 0 private, 10 named. 9 are theorems; 1 is a construction.
 
     COUNT UPDATE (Support lane), 2026-08-06. The 11 additional records are the
-    whole of DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Support/Predicate/Basic.lean: the support
+    whole of DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Support/Predicate/Basic.lean: the support
     property, the two hypothesis structures, the compact slice and its
     compactness, the normalisation lemma, both directions of the equivalence,
     the equivalence itself, and two elementary consequences. Audit count
@@ -1204,7 +1204,7 @@ fidelity:
     nothing about the property holding of anything.
 
     COUNT UPDATE (Tilting lane), 2026-08-06. The 11 additional records are the
-    whole of DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Tilting/TorsionPair/Basic.lean: the TorsionPair
+    whole of DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Basic.lean: the TorsionPair
     structure, the zero-intersection lemma, the two orthogonality
     characterisations, closure of the torsion-free class under subobjects and
     of the torsion class under quotients, closure of both under extensions, the
@@ -2010,7 +2010,7 @@ fidelity:
     What this is NOT is in known_divergences and must be read before citing it.
   known_divergences: >
     MASS-TRIANGLE MATHEMATICS CLOSED, GOVERNANCE REVIEW OPEN, 2026-08-11.
-    DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Metric/Mass/Subadditivity/Triangle.lean proves
+    DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Mass/Subadditivity/Triangle.lean proves
     arbitrary-phase semistable-left subadditivity, assembles it through the HN
     filtration to inhabit `StabilityMassTriangleInequality`, and applies that
     theorem to the topology-comparison substrate in

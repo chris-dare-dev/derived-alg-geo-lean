@@ -21,7 +21,7 @@ with the settings they instantiate at -- `abelianDatum` beside `K₀Ab`,
 
 ## Placement
 
-This was `Triangulated/WeakStabilityCondition/Foundation/StabilityFunction/Basic.lean`,
+This was `Triangulated/StabilityCondition/Weak/Foundation/StabilityFunction/Basic.lean`,
 in namespace `CategoryTheory.Triangulated`, where the only two occurrences of the
 word "triangulated" in the file were the namespace opening and closing it. Its
 imports were `ShortComplex.ShortExact`, `Complex.Arg`, `GrothendieckGroup.Abelian`,

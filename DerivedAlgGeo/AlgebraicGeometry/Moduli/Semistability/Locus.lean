@@ -2,9 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.PreStabilityBaseChange
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.PreStabilityBaseChange
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ResidueFiber
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Families.Basic
 
 /-!
 # Scheme semistable loci

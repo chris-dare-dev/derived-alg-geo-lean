@@ -11,11 +11,11 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SOURCE_ROOT = ROOT / "DerivedAlgGeo"
 UMBRELLA = (
-    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Foundation"
+    "DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation"
 )
 ALLOWED_IMPORTERS = {
     pathlib.Path(
-        "DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition.lean"
+        "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition.lean"
     ),
 }
 IMPORT = re.compile(r"^\s*import\s+(\S+)")

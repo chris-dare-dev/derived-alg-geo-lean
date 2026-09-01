@@ -31,11 +31,11 @@ The following repository-maintained files retain their Mathlib contributors'
 Apache-2.0 headers:
 
 - `DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/ImageFactorisation.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Foundation/Deformation/SeminormComparison.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Foundation/Deformation/LocalInjectivity.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Foundation/Deformation/LocalComparison.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Foundation/Deformation/ConnectedComponent.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Foundation/Deformation/LocalHomeomorphism.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/SeminormComparison.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/LocalInjectivity.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/LocalComparison.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/ConnectedComponent.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/LocalHomeomorphism.lean`
 
 The five deformation modules were derived from
 `mattrobball/BridgelandStability` at revision
@@ -58,10 +58,10 @@ the comparison oracle for the ownership migration, and have since been
 substantially rewritten against the repository-owned API:
 
 - `DerivedAlgGeo/CategoryTheory/Triangulated/PostnikovTower.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Foundation/Slicing.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/Foundation/IntervalCategory.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Foundation/PreStabilityCondition.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/Foundation/StabilityCondition.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/Slicing.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/IntervalCategory.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/PreStabilityCondition.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/StabilityCondition.lean`
 
 Their MIT headers cover the repository's own contributions. Portions
 originating in the upstream work remain Copyright (c) 2026 Mathlib

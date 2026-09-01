@@ -4,10 +4,10 @@ Released under the MIT license.
 -/
 import Mathlib.AlgebraicGeometry.Noetherian
 import Mathlib.RingTheory.RegularLocalRing.Defs
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families.Basic
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.PreStabilityBaseChange
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Families.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.PreStabilityBaseChange
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ResidueFiber
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.Autoequivalence.Slicing.Transport
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Slicing.Transport
 
 /-!
 # Relative Harder--Narasimhan filtrations over curve bases

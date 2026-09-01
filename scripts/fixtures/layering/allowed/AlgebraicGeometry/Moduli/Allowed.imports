@@ -2,4 +2,4 @@
 # subtree is one of the places geometry may reach the stability tree.
 import DerivedAlgGeo.CategoryTheory.Sites
 import DerivedAlgGeo.AlgebraicGeometry.Stacks.Representable
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak

@@ -321,17 +321,19 @@ blocks should normally move it rather than add more declarations beside it.
   `AlgebraicGeometry/Modules/Sheaf.lean`. Declaration names and namespaces
   (`AlgebraicGeometry.Proj`, `Scheme.Modules`, `SheafOfModules`) are
   unchanged.
+- Stability nested by name (2026-09-01): `CategoryTheory/Triangulated/WeakStabilityCondition/`
+  became `CategoryTheory/Triangulated/StabilityCondition/` with weak stability
+  as the child `Weak/`, following Mathlib's `MetricSpace/Pseudo/`: the
+  directory is named for the canonical concept and the variant by its
+  adjective, while the dependency still runs from Bridgeland to weak. The
+  strong umbrella imports its weak child, so the former explicit umbrella
+  boundary is gone; the layering gate still rejects any import from `Weak/`
+  into the Bridgeland theory and still requires `PreStabilityCondition` to
+  extend `WeakPreStabilityCondition`. Declaration namespaces are unchanged.
 
 ## Confirmed next lanes
 
-Confirmed 2026-09-01 by the Tier 1 rule in `placement.md`: each subtree below
-extends a Mathlib API from a path that is not that API's Mathlib path, or
-nests a named concept the wrong way round. The import guide in `layers.md`
-already names the target, and new code uses the target path immediately.
-
-| Current path | Target path |
-| --- | --- |
-| `CategoryTheory/Triangulated/WeakStabilityCondition/` | `CategoryTheory/Triangulated/StabilityCondition/` with weak stability as the child `Weak/` |
+Every path lane confirmed by the 2026-09-01 audit has landed.
 
 Confirmed type-level hazards, recorded for a separate lane because they are
 rewrites rather than moves: `LinearAlgebra/Lattice/Basic.lean` bundles

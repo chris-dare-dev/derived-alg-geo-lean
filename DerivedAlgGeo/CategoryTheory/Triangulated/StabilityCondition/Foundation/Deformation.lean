@@ -1,0 +1,60 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.BoundaryTransport
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.ChargePerturbation
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.ConnectedComponent
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedCuts
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedHom
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedPhaseControl
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedPredicate
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedShift
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedSlicing
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedTriangulated
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedTruncation
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.FiniteLengthHN
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.FirstStrictSES
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.GlobalHN
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.GlobalTruncation
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.HNExistence
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.HeartImage
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.IntervalHeart
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.IntervalIndependence
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.LocalComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.LocalFiniteness
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.LocalHomeomorphism
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.LocalInjectivity
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.LocalSurjectivity
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.MidpointHeart
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.NearIdentity
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.PhaseArithmetic
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.PhaseConfinement
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.PhaseSum
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.PhiPlusHN
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.PhiPlusMDQ
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.PhiPlusReduction
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.PhiPlusSplit
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.PullbackCokernel
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.RelativePhase
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.SeminormComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.SkewedStability
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.SlicingDistance
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.StabilitySeminorm
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.StabilityTopology
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.StrictMDQ
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.TargetTransport
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.Theorem
+
+/-!
+# Deformation of stability conditions — umbrella
+
+Re-exports the `Foundation.Deformation` leaves. At 43 files this is the largest
+single directory in the library and it had no same-named umbrella, which is why
+`Foundation.lean` reached it through 34 flat leaf imports.
+
+This is a re-export for discoverability, **not** an import target for
+implementation modules: `scripts/check_foundation_import_boundary.py` keeps the
+`Foundation` umbrella out of implementation modules and directs contributors to
+a narrow leaf, and the same discipline applies here.
+-/

@@ -1,0 +1,2 @@
+# The weak parent must not import its Bridgeland child.
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.PreStabilityBaseChange

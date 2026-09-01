@@ -23,12 +23,12 @@ The canonical modules are:
 
 | Concern | Owner module |
 |---|---|
-| Postnikov towers and HN filtrations | `DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower`, `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Foundation.Slicing` |
-| Slicings and phase truncation | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Foundation.Slicing` |
+| Postnikov towers and HN filtrations | `DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower`, `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing` |
+| Slicings and phase truncation | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing` |
 | Grothendieck group and class maps | `DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup`, `DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Presentation` |
-| Stability functions and abelian HN theory | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Foundation.StabilityFunction` |
-| Stability conditions and topology | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Foundation.StabilityCondition`, `.Deformation.StabilityTopology` |
-| Deformation theorem | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Foundation.Deformation.Theorem` |
+| Stability functions and abelian HN theory | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction` |
+| Stability conditions and topology | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityCondition`, `.Deformation.StabilityTopology` |
+| Deformation theorem | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.Theorem` |
 | Local comparison and injectivity | `.Deformation.LocalComparison`, `.Deformation.LocalInjectivity` |
 | Component local-homeomorphism theorem | `.Deformation.LocalHomeomorphism` |
 | T-structure heart bridge | `DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HeartBridge` |

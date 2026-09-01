@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.Scheme
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Families.Basic
 
 /-!
 # Scheme realizations of weak-stability family probes
