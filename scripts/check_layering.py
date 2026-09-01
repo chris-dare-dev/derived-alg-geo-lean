@@ -2253,6 +2253,11 @@ def main() -> int:
             "Boundedness.lean": (
                 "namespace CategoryTheory.Sheaf\n",
             ),
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" /
+            "EulerCharacteristic" / "Additivity.lean": (
+                "private theorem finrank_eq_range_add_range",
+                "theorem alternating_finrank_eq_zero_of_exact",
+            ),
     }
     for path, retired_fragments in generic_declarations_retired_from_consumers.items():
         text = path.read_text(encoding="utf-8")
@@ -2262,6 +2267,47 @@ def main() -> int:
                     f"{path.relative_to(ROOT)}: restored generic "
                     f"declaration fragment {fragment!r} in a geometric consumer"
                 )
+
+    alternating_finsum_owner = (
+        SOURCE_ROOT / "LinearAlgebra" / "AlternatingFinsum.lean"
+    )
+    alternating_finsum_import = "DerivedAlgGeo.LinearAlgebra.AlternatingFinsum"
+    euler_additivity_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" /
+        "EulerCharacteristic" / "Additivity.lean"
+    )
+    if not alternating_finsum_owner.is_file():
+        failures.append(
+            "canonical alternating-finrank linear-algebra owner is missing: "
+            f"{alternating_finsum_owner.relative_to(ROOT)}"
+        )
+    else:
+        alternating_finsum_text = alternating_finsum_owner.read_text(encoding="utf-8")
+        for required_fragment in (
+            "namespace DerivedAlgGeo.LinearAlgebra",
+            "theorem finrank_eq_range_add_range",
+            "theorem alternating_finrank_eq_zero_of_exact",
+            "theorem finsum_altDim_middle",
+        ):
+            if required_fragment not in alternating_finsum_text:
+                failures.append(
+                    f"{alternating_finsum_owner.relative_to(ROOT)}: missing "
+                    f"linear-algebra owner fragment {required_fragment!r}"
+                )
+        for forbidden_fragment in (
+            "import DerivedAlgGeo.AlgebraicGeometry",
+            "namespace AlgebraicGeometry",
+        ):
+            if forbidden_fragment in alternating_finsum_text:
+                failures.append(
+                    f"{alternating_finsum_owner.relative_to(ROOT)}: generic "
+                    f"alternating-finrank owner contains {forbidden_fragment!r}"
+                )
+    if alternating_finsum_import not in imports_by_path[euler_additivity_consumer]:
+        failures.append(
+            f"{euler_additivity_consumer.relative_to(ROOT)}: Euler-characteristic "
+            f"consumer must import {alternating_finsum_import} directly"
+        )
 
     localization_kernels = (
         SOURCE_ROOT / "Algebra" / "Module" / "Localization" / "Kernels.lean"
@@ -4130,6 +4176,10 @@ def main() -> int:
     print(
         "ok: weighted-basis decompositions use LinearAlgebra and pure "
         "monomial-division identities use Algebra; geometric files are consumers"
+    )
+    print(
+        "ok: bounded and unbounded alternating-finrank identities use the "
+        "LinearAlgebra owner; geometric Euler additivity is a direct consumer"
     )
     print(
         "ok: graded-module localizations, polynomial generation and exact division, "

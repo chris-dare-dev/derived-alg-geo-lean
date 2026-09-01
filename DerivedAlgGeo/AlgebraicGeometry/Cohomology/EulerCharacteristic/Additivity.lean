@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Basic
+import DerivedAlgGeo.LinearAlgebra.AlternatingFinsum
 import Mathlib.Algebra.Exact.Sequence
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.ExactSequences
 import Mathlib.CategoryTheory.Abelian.ShortExact
@@ -181,85 +182,6 @@ theorem injective_map_f_zero (D : FiniteCohomology X)
     _ = _ :=
       (ConcreteCategory.congr_hom ((D.comparison 0).hom.naturality S.f).symm y).symm
 
-section AlternatingFinrank
-
-variable {A B C : Type*}
-  [AddCommGroup A] [AddCommGroup B] [AddCommGroup C]
-  [Module k A] [Module k B] [Module k C]
-
-/-- Rank-nullity rewritten at an exact middle term. -/
-private theorem finrank_eq_range_add_range [Module.Finite k B]
-    (f : A →ₗ[k] B) (g : B →ₗ[k] C) (h : Function.Exact f g) :
-    Module.finrank k B = Module.finrank k f.range + Module.finrank k g.range := by
-  have hr := g.finrank_range_add_finrank_ker
-  rw [h.linearMap_ker_eq] at hr
-  omega
-
-variable (A B C : ℕ → Type*)
-  [∀ i, AddCommGroup (A i)] [∀ i, AddCommGroup (B i)] [∀ i, AddCommGroup (C i)]
-  [∀ i, Module k (A i)] [∀ i, Module k (B i)] [∀ i, Module k (C i)]
-  [∀ i, Module.Finite k (A i)] [∀ i, Module.Finite k (B i)] [∀ i, Module.Finite k (C i)]
-  (f : ∀ i, A i →ₗ[k] B i) (g : ∀ i, B i →ₗ[k] C i)
-  (δ : ∀ i, C i →ₗ[k] A (i + 1))
-
-/-- Alternating finite-dimensional dimensions cancel along a bounded long exact sequence.
-The endpoint hypothesis is stated as vanishing of the next `A` term, which makes the final
-connecting map surjective onto zero. -/
-theorem alternating_finrank_eq_zero_of_exact
-    (hinj : Function.Injective (f 0))
-    (hexact₂ : ∀ i, Function.Exact (f i) (g i))
-    (hexact₃ : ∀ i, Function.Exact (g i) (δ i))
-    (hexact₁ : ∀ i, Function.Exact (δ i) (f (i + 1)))
-    (n : ℕ) [Subsingleton (A (n + 1))] :
-    ∑ i ∈ Finset.range (n + 1), (-1 : ℤ) ^ i *
-      ((Module.finrank k (A i) : ℤ) - Module.finrank k (B i) + Module.finrank k (C i)) = 0 := by
-  have hA₀ : Module.finrank k (A 0) = Module.finrank k (LinearMap.range (f 0)) :=
-    (LinearMap.finrank_range_of_inj hinj).symm
-  have hB (i : ℕ) : Module.finrank k (B i) =
-      Module.finrank k (LinearMap.range (f i)) +
-        Module.finrank k (LinearMap.range (g i)) :=
-    finrank_eq_range_add_range (f i) (g i) (hexact₂ i)
-  have hC (i : ℕ) : Module.finrank k (C i) =
-      Module.finrank k (LinearMap.range (g i)) +
-        Module.finrank k (LinearMap.range (δ i)) :=
-    finrank_eq_range_add_range (g i) (δ i) (hexact₃ i)
-  have hA (i : ℕ) : Module.finrank k (A (i + 1)) =
-      Module.finrank k (LinearMap.range (δ i)) +
-        Module.finrank k (LinearMap.range (f (i + 1))) :=
-    finrank_eq_range_add_range (δ i) (f (i + 1)) (hexact₁ i)
-  have hδn : Module.finrank k (LinearMap.range (δ n)) = 0 := by
-    letI : Subsingleton (LinearMap.range (δ n)) := inferInstance
-    exact Module.finrank_zero_of_subsingleton
-  have hpartial (m : ℕ) :
-      ∑ i ∈ Finset.range (m + 1), (-1 : ℤ) ^ i *
-        ((Module.finrank k (A i) : ℤ) - Module.finrank k (B i) +
-          Module.finrank k (C i)) =
-        (-1 : ℤ) ^ m * Module.finrank k (LinearMap.range (δ m)) := by
-    induction m with
-    | zero =>
-        simp only [Nat.reduceAdd, Finset.range_one, Finset.sum_singleton, pow_zero, one_mul]
-        have hA₀' := hA₀
-        have hB' := hB 0
-        have hC' := hC 0
-        push_cast at hA₀' hB' hC'
-        omega
-    | succ m ih =>
-        rw [Finset.sum_range_succ, ih]
-        have hA' := hA m
-        have hB' := hB (m + 1)
-        have hC' := hC (m + 1)
-        have htriple :
-            (Module.finrank k (A (m + 1)) : ℤ) - Module.finrank k (B (m + 1)) +
-                Module.finrank k (C (m + 1)) =
-              Module.finrank k (LinearMap.range (δ m)) +
-                Module.finrank k (LinearMap.range (δ (m + 1))) := by
-          omega
-        rw [htriple, pow_succ]
-        ring
-  rw [hpartial n, hδn, Int.ofNat_zero, mul_zero]
-
-end AlternatingFinrank
-
 /-- The geometric Euler characteristic is additive on a short exact sequence of coherent
 sheaves, provided the additive `Ext` connecting maps have the stated linear lifts. -/
 theorem eulerCharacteristic_additive (D : FiniteCohomology X)
@@ -273,7 +195,7 @@ theorem eulerCharacteristic_additive (D : FiniteCohomology X)
   letI (i : ℕ) : Module.Finite k ((D.moduleH i).obj S.X₃) := D.finite i S.X₃
   letI : Subsingleton ((D.moduleH (n + 1)).obj S.X₁) :=
     D.vanishesAbove S.X₁ (n + 1) (Nat.lt_succ_of_le (le_max_left _ _))
-  have hsum := alternating_finrank_eq_zero_of_exact
+  have hsum := DerivedAlgGeo.LinearAlgebra.alternating_finrank_eq_zero_of_exact
     (A := fun i ↦ (D.moduleH i).obj S.X₁)
     (B := fun i ↦ (D.moduleH i).obj S.X₂)
     (C := fun i ↦ (D.moduleH i).obj S.X₃)

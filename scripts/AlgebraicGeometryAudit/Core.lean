@@ -916,7 +916,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Cohomology.FiniteCohomology.exact₂
 #print axioms Cohomology.FiniteCohomology.LinearConnectingMaps.exact₃
 #print axioms Cohomology.FiniteCohomology.LinearConnectingMaps.exact₁
-#print axioms Cohomology.FiniteCohomology.alternating_finrank_eq_zero_of_exact
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic_additive
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic_additive_modules
 #print axioms Cohomology.FiniteCohomology.grothendieckEulerHom
