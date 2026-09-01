@@ -31,3 +31,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.productComponent_one
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.product
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.product_component
+
+-- Orientation: the one place the direction convention is pinned. ofReverse
+-- reindexes a classically-ordered family along OrderDual; ofReverseFin lands
+-- the finite case back on Fin n through the root's own reindex.
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverse
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverse_component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverse_hom_eq_zero
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverseFin
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverseFin_component
