@@ -777,7 +777,6 @@ is not closed. -/
 #print axioms Scheme.Modules.tensorDualIso
 #print axioms Scheme.Modules.dualLine_isInvertible
 #print axioms Scheme.Modules.LineBundleData.ofIsInvertible
-#print axioms SheafOfModules.IsInvertible.isFinitePresentation
 #print axioms Scheme.Modules.LineBundleData.isCoherent
 #print axioms Scheme.Modules.LineBundleData.finiteLocallyFree
 #print axioms Scheme.Modules.LineBundleData.unit
@@ -1477,12 +1476,8 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Scheme.Modules.preservesEpimorphisms_toSheaf
 #print axioms Scheme.Modules.shortExact_map_toSheaf
 
--- Layer B stage 2: invertible sheaves and the raw sheafified tensor product. The final
--- Picard group law waits on tensor/sheafification coherence; these declarations expose the
--- complete foundation without postulating that missing theorem.
-#print axioms SheafOfModules.freePUnitIsoUnit
-#print axioms SheafOfModules.LocalGeneratorsData.isRankOne_ofIso
-#print axioms SheafOfModules.IsInvertible.ofIso
+-- Layer B stage 2: the scheme-level sheafified tensor product and Picard consumer. Intrinsic
+-- invertibility is audited with its arbitrary-site categorical owner.
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitLeftIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_id_comp
@@ -1577,19 +1572,8 @@ not functions. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorTripleAssocIso
 #print axioms AlgebraicGeometry.Scheme.Modules.PicardClass.mk_eq_mk_iff
 
--- Geometric tensor/sheafification descent for invertible sheaves. The arbitrary-site
--- cover-detection lemmas it consumes are audited with their categorical owner.
-#print axioms SheafOfModules.LocalGeneratorsData.rankOneTrivialization
-#print axioms SheafOfModules.isLocallySurjective_whiskerLeft
-#print axioms SheafOfModules.isLocallyInjective_whiskerLeft_of_isoUnit
-#print axioms SheafOfModules.isLocallyInjective_whiskerLeft_of_rankOneData
-#print axioms SheafOfModules.W_whiskerLeft_of_rankOneData
-#print axioms SheafOfModules.isIso_sheafification_map_whiskerLeft_of_rankOneData
-#print axioms SheafOfModules.isIso_sheafification_map_whiskerRight_of_rankOneData
-#print axioms SheafOfModules.isIso_sheafification_map_whiskerLeft_unit_of_rankOneData
-#print axioms SheafOfModules.isIso_sheafification_map_whiskerRight_unit_of_rankOneData
-#print axioms SheafOfModules.LocalGeneratorsData.rankOneTrivializationOver
-#print axioms SheafOfModules.IsInvertible.of_trivializations
+-- Scheme tensor/sheafification consumers. Intrinsic invertibility and arbitrary-site tensor
+-- descent are audited with their categorical owner.
 #print axioms AlgebraicGeometry.Scheme.Modules.overSheafificationComparison
 #print axioms AlgebraicGeometry.Scheme.Modules.isIso_overSheafificationComparison
 #print axioms AlgebraicGeometry.Scheme.Modules.overTensorPresheafIso

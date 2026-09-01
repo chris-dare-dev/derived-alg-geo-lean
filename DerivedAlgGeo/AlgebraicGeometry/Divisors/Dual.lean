@@ -7,6 +7,7 @@ Released under the MIT license.
 -- `Divisors.LineBundleDual`, which took `Dual` off `ExteriorPower`'s critical path.
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
 import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CoversTop
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
 
 /-!
 # Duals of invertible module sheaves

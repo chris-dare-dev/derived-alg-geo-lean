@@ -123,6 +123,17 @@ owner is `CategoryTheory/Sites/Sheaves/CoversTop.lean`. Scheme affine charts,
 divisor trivializations, Proj covers, and sheafified tensor products are
 consumers and import this owner directly.
 
+The predicate that local generator data has rank one, the intrinsic
+`SheafOfModules.IsInvertible` class, transport and local trivialization of that
+data, and reconstruction from a covering family require only a sheaf of rings
+on an arbitrary site. Their owner is
+`CategoryTheory/Sites/Sheaves/Modules/Invertible.lean`. Preservation of local
+equivalences by tensoring with such a factor belongs in the adjacent
+`Modules/Tensor.lean`. On a topological space, the stalkwise theorem for an
+arbitrary tensor factor belongs in `Topology/Sheaves/ModuleTensor.lean`.
+`Scheme.Modules.tensorObj`, Picard classes, and tensor closure remain geometric
+because their signatures introduce the scheme-indexed module category.
+
 Indexed families of additive commutative groups, their direct sums, saturated
 quotients by supplied relation sets, family-relation systems, additive-map
 ranges, and finite-relative-index predicates are rooted at

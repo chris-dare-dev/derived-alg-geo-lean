@@ -21,6 +21,11 @@ first application that motivated it.
   sheaves of modules over a sheaf of rings on an arbitrary site; those belong
   under `CategoryTheory/Sites/Sheaves/Modules/`, not under affine or scheme
   geometry.
+- Intrinsic rank-one and invertibility data for module sheaves belong in
+  `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean`. Tensoring a local
+  equivalence by a rank-one module sheaf on an arbitrary site belongs in the
+  adjacent `Tensor.lean`; the stalkwise strengthening for an arbitrary tensor
+  factor belongs under `Topology/Sheaves/ModuleTensor.lean`.
 - Detection of local injectivity, local surjectivity, and sheafification weak
   equivalences on a family covering the terminal object belongs in
   `CategoryTheory/Sites/Sheaves/CoversTop.lean`. Scheme charts, divisors, and
@@ -97,6 +102,10 @@ application, current file, namespace, or proof technique.
   site theory even when all current covers are scheme charts. In particular,
   do not redeclare the `Presheaf.{isLocallyInjective,isLocallySurjective,W}_of_coversTop`
   chain below algebraic geometry.
+- A rank-one predicate, intrinsic invertibility class, local trivialization, or
+  sheafification-whiskering theorem stated on an arbitrary ringed site belongs
+  with generic module sheaves. A scheme Picard class consumes that root; it
+  does not own another invertibility definition.
 - Kernel maps for ordinary localized modules, including their `ModuleCat`
   formulation, belong under `Algebra/Module/Localization/`. Coherent-sheaf
   arguments import that algebraic owner and add only the scheme-dependent

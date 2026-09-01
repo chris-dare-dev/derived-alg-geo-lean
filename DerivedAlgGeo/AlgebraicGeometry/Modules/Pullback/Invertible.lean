@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Restriction
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.PullbackFree
 import Mathlib.CategoryTheory.Filtered.Connected
 

@@ -181,18 +181,23 @@ blocks should normally move it rather than add more declarations beside it.
   the terminal object. Scheme tensor, divisor, associated-sheaf, and Proj
   modules import that arbitrary-site root directly; the declarations no
   longer live inside the scheme tensor consumer.
+- Generic invertible module sheaves and tensor/sheafification descent:
+  `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` owns rank-one local
+  generator data, intrinsic `SheafOfModules.IsInvertible`, transport, finite
+  presentation, and local trivializations. The adjacent `Tensor.lean` owns
+  preservation of local equivalences by tensoring with a rank-one factor on an
+  arbitrary site. `Topology/Sheaves/ModuleTensor.lean` owns the stalkwise
+  arbitrary-factor strengthening. Scheme tensor objects, tensor closure,
+  associativity, and Picard classes remain direct geometric consumers.
 
 ## Confirmed next lanes
 
-- Generic invertible module sheaves and tensor/sheafification descent: the
-  `SheafOfModules.LocalGeneratorsData.IsRankOne`,
-  `SheafOfModules.IsInvertible`, rank-one trivialization, and arbitrary-site
-  whiskering declarations currently preceding the scheme-specific portions of
-  `AlgebraicGeometry/Modules/Tensor/{Picard,Basic}.lean` mention no scheme.
-  Their canonical owner is
-  `CategoryTheory/Sites/Sheaves/Modules/`, with the stalkwise topological
-  specialization below `Topology/Sheaves/`; the scheme tensor product and
-  Picard-class construction remain geometric consumers.
+- Stalk tensor products of module presheaves: every public declaration in
+  `Algebra/Category/ModuleCat/StalkTensor.lean` requires a topological space,
+  its open neighborhoods, and stalk functors. The signature-test owner is
+  `Topology/Sheaves/ModuleTensor/`, where it supplies the stalk comparison
+  consumed by `Topology/Sheaves/ModuleTensor.lean`; the current `Algebra/`
+  path is a reverse subject placement and should be retired without a shim.
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and

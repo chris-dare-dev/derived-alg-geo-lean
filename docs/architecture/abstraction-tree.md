@@ -82,7 +82,11 @@ Category
    │  ├─ constant pullback and cohomology pushforward
    │  └─ module sheaves on a ringed site
    │     ├─ exact forgetful functor
-   │     └─ finite-presentation transport
+   │     ├─ finite-presentation transport
+   │     └─ intrinsic IsInvertible
+   │        ├─ rank-one local trivializations
+   │        ├─ arbitrary-site tensor descent
+   │        └─ stalkwise topological strengthening
    ├─ site-theoretic Čech complexes and derived comparison
    │  └─ compact-basis and finite-cover boundedness
    └─ scheme-site realizations
@@ -119,8 +123,7 @@ AlgebraicGeometry
 │  │  └─ CoherentSheaf(X)
 │  │     ├─ Abelian instance under geometric hypotheses
 │  │     └─ DerivedCategory (Coh X)     consumes the generic construction
-│  ├─ intrinsic IsInvertible
-│  │  └─ pullback preservation          theorem inherited by every consumer
+│  ├─ scheme tensor and Picard classes   consume intrinsic IsInvertible
 │  └─ LineBundleData                     invertible sheaf plus chosen tensor inverse
 │     ├─ determinant and Picard interpretations
 │     ├─ monoidal pullback and projection formula

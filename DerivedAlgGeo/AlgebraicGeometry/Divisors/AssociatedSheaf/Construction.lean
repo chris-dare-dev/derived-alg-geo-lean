@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.AssociatedSheaf.RationalSections
 import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CoversTop
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
 
 /-!
 # The associated sheaf of a Cartier divisor
