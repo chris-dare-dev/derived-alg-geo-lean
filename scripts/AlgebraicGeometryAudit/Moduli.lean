@@ -54,6 +54,7 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.schemeLocallyFiniteTorAmplitudeOver_isClosedUnderIsomorphisms
 #print axioms AlgebraicGeometry.schemeRelativePerfect
 #print axioms AlgebraicGeometry.schemeRelativePerfect_isClosedUnderIsomorphisms
+#print axioms AlgebraicGeometry.schemeRelativePerfect_le_schemePseudoCoherent
 #print axioms AlgebraicGeometry.SchemeRelativePerfectCategory
 #print axioms AlgebraicGeometry.SchemeRelativePerfectCategory.exists_boundedCoherentRepresentative
 #print axioms AlgebraicGeometry.SchemeRelativePerfectCategory.perfect_iff_compact
@@ -76,15 +77,6 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.SchemeUniversallyGluableCategory
 #print axioms AlgebraicGeometry.zeroModuleComplex
 #print axioms AlgebraicGeometry.zeroModuleComplex_isZero
-#print axioms AlgebraicGeometry.zeroSchemeDerivedObject
-#print axioms AlgebraicGeometry.zeroSchemeDerivedObject_isZero
-#print axioms AlgebraicGeometry.zeroCoherentComplex
-#print axioms AlgebraicGeometry.zeroCoherentDerivedObject
-#print axioms AlgebraicGeometry.zeroCoherentDerivedObject_isZero
-#print axioms AlgebraicGeometry.zeroBoundedCoherentDerivedObject
-#print axioms AlgebraicGeometry.zeroBoundedCoherentDerivedObject_isZero
-#print axioms AlgebraicGeometry.SchemeQuasicoherentDerivedCategory.zero
-#print axioms AlgebraicGeometry.schemeQuasicoherentDerivedCategory_zero_obj_isZero
 #print axioms AlgebraicGeometry.schemePseudoCoherent_zero
 #print axioms AlgebraicGeometry.zeroLocalFiniteTorAmplitudeChart
 #print axioms AlgebraicGeometry.schemeLocallyFiniteTorAmplitudeOver_zero
@@ -92,6 +84,14 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.zeroGeometricFiberModel
 #print axioms AlgebraicGeometry.universallyGluableDataZero
 #print axioms AlgebraicGeometry.schemeUniversallyGluableRelativePerfect_zero
+
+/-! ## Perfect-notion comparisons -/
+
+#print axioms AlgebraicGeometry.Coh.TwoTermPerfectDeterminantData.derivedObject
+#print axioms AlgebraicGeometry.Coh.TwoTermPerfectDeterminantData.derivedObject_mem_schemePerfect
+#print axioms AlgebraicGeometry.Coh.TwoTermPerfectDeterminantData.toSchemePerfectDerivedCategory
+#print axioms AlgebraicGeometry.Coh.TwoTermPerfectDeterminantData.toDqc
+#print axioms AlgebraicGeometry.Coh.TwoTermPerfectDeterminantData.toDqc_mem_schemePerfectInDqc
 
 /-! ## Pullback of universally-gluable relative-perfect complexes -/
 

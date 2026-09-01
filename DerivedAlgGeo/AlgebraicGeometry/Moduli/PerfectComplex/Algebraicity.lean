@@ -225,7 +225,7 @@ private def identityStackFiberEquivPUnit {S : Scheme.{u}}
     (Discrete.equivalence (Equiv.equivPUnit _))
 
 private def zeroRelativePerfectFiberEquivPUnit {S : Scheme.{u}}
-    (T : SchemeBaseChange S) [IsLocallyNoetherian T.left] :
+    (T : SchemeBaseChange S) :
     (zeroRelativePerfectModuliSelector S).Fiber T ≌
       Discrete PUnit.{u + 1} := by
   apply Nonempty.some
@@ -266,7 +266,7 @@ def zeroRelativePerfectZariskiPresentation (S : Scheme.{u}) :
 /-- The identity parameter scheme and universal zero family make the supported
 zero big-Zariski presentation genuinely finite-type bounded. -/
 def zeroBoundedRelativePerfectZariskiPresentation
-    (S : Scheme.{u}) [IsLocallyNoetherian S] :
+    (S : Scheme.{u}) :
     BoundedRelativePerfectZariskiPresentation S
       (zeroRelativePerfectModuliSelector S) where
   toRelativePerfectZariskiPresentation :=
