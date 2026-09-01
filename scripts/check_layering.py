@@ -1437,6 +1437,8 @@ def main() -> int:
         generic_sheaves_root / "Modules" / "Exactness.lean",
         generic_sheaves_root / "Modules" / "Invertible.lean",
         generic_sheaves_root / "Modules" / "Over.lean",
+        generic_sheaves_root / "Modules" / "Presentation" / "Isomorphism.lean",
+        generic_sheaves_root / "Modules" / "Presentation" / "Locality.lean",
         generic_sheaves_root / "Modules" / "Presentation" / "Over.lean",
         generic_sheaves_root / "Modules" / "Presentation" / "Transport.lean",
         generic_sheaves_root / "Modules" / "Presentation" / "Finite.lean",
@@ -1565,8 +1567,6 @@ def main() -> int:
                 presentation_over_fragments[3:],
         SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Affine" /
             "Finiteness.lean": presentation_over_fragments[1:3],
-        SOURCE_ROOT / "AlgebraicGeometry" / "CoherentSheaf" / "Descent" /
-            "Locality.lean": (),
     }
     for path, forbidden_fragments in presentation_over_consumers.items():
         if presentation_over_import not in imports_by_path[path]:
@@ -1580,6 +1580,82 @@ def main() -> int:
                 failures.append(
                     f"{path.relative_to(ROOT)}: restored arbitrary-site "
                     f"presentation-restriction declaration {fragment!r} in geometry"
+                )
+
+    presentation_iso_owner = (
+        generic_sheaves_root / "Modules" / "Presentation" / "Isomorphism.lean"
+    )
+    presentation_iso_import = (
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Isomorphism"
+    )
+    presentation_iso_fragments = (
+        "noncomputable def QuasicoherentData.ofIso",
+        "instance QuasicoherentData.isFinitePresentation_ofIso",
+        "theorem IsFinitePresentation.of_iso",
+        "instance isFinitePresentation_isClosedUnderIsomorphisms",
+    )
+    presentation_locality_owner = (
+        generic_sheaves_root / "Modules" / "Presentation" / "Locality.lean"
+    )
+    presentation_locality_import = (
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Locality"
+    )
+    presentation_locality_fragments = (
+        "instance QuasicoherentData.isFinitePresentation_over",
+        "theorem IsFinitePresentation.over",
+        "theorem IsFinitePresentation.of_coversTop",
+    )
+    if presentation_over_import not in imports_by_path[presentation_locality_owner]:
+        failures.append(
+            f"{presentation_locality_owner.relative_to(ROOT)}: finite-presentation "
+            f"locality must import its restriction parent {presentation_over_import} directly"
+        )
+    for path, fragments in (
+        (presentation_iso_owner, presentation_iso_fragments),
+        (presentation_locality_owner, presentation_locality_fragments),
+    ):
+        if path.is_file():
+            text = path.read_text(encoding="utf-8")
+            for fragment in fragments:
+                if fragment not in text:
+                    failures.append(
+                        f"{path.relative_to(ROOT)}: missing arbitrary-site "
+                        f"finite-presentation declaration {fragment!r}"
+                    )
+
+    for owner_import in (presentation_iso_import, presentation_locality_import):
+        if owner_import not in imports_by_path[presentation_umbrella]:
+            failures.append(
+                f"{presentation_umbrella.relative_to(ROOT)}: missing arbitrary-site "
+                f"finite-presentation umbrella import {owner_import}"
+            )
+
+    presentation_generic_consumers = (
+        (
+            SOURCE_ROOT / "AlgebraicGeometry" / "CoherentSheaf" / "Basic" /
+                "Isomorphism.lean",
+            presentation_iso_import,
+            presentation_iso_fragments,
+        ),
+        (
+            SOURCE_ROOT / "AlgebraicGeometry" / "CoherentSheaf" / "Descent" /
+                "Locality.lean",
+            presentation_locality_import,
+            presentation_locality_fragments,
+        ),
+    )
+    for path, owner_import, forbidden_fragments in presentation_generic_consumers:
+        if owner_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: coherent-sheaf consumer must import "
+                f"the categorical finite-presentation owner {owner_import} directly"
+            )
+        text = path.read_text(encoding="utf-8")
+        for fragment in forbidden_fragments:
+            if fragment in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: restored arbitrary-site "
+                    f"finite-presentation declaration {fragment!r} in geometry"
                 )
 
     open_immersion_consumer = (
@@ -3762,6 +3838,10 @@ def main() -> int:
     print(
         "ok: presentation, generating-section, and quasicoherent-data restriction "
         "to over sites use the arbitrary-site module-sheaf owner"
+    )
+    print(
+        "ok: finite-presentation isomorphism invariance and CoversTop locality "
+        "use categorical owners; coherent sheaves retain only geometric consumers"
     )
     print(
         "ok: bicategorical adjunction is the higher source, ordinary adjunction "

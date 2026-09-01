@@ -23,6 +23,17 @@ import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules
 #print axioms SheafOfModules.QuasicoherentData.over
 #print axioms SheafOfModules.instHasBinaryProductsOver_derivedAlgGeo
 
+/-! ## Isomorphism invariance and locality of finite presentation -/
+
+#print axioms SheafOfModules.QuasicoherentData.ofIso
+#print axioms SheafOfModules.QuasicoherentData.isFinitePresentation_ofIso
+#print axioms SheafOfModules.IsFinitePresentation.of_iso
+#print axioms SheafOfModules.isFinitePresentation_isClosedUnderIsomorphisms
+#print axioms SheafOfModules.QuasicoherentData.isFinitePresentation_over
+#print axioms SheafOfModules.IsFinitePresentation.over
+#print axioms SheafOfModules.IsFinitePresentation.of_coversTop
+#print axioms SheafOfModules.instHasBinaryProductsOver_derivedAlgGeo_1
+
 /-! ## Exactness of the forgetful functor to abelian sheaves -/
 
 #print axioms SheafOfModules.preservesFiniteColimits_toSheaf

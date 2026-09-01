@@ -56,6 +56,10 @@ these over sites belongs in
 `CategoryTheory/Sites/Sheaves/Modules/Presentation/Over.lean`. An algebraic-geometric
 open-immersion module imports these owners and contains only declarations whose
 types actually mention schemes, opens, or geometric morphism properties.
+Isomorphism invariance and `CoversTop` locality of finite presentation on an
+arbitrary ringed site likewise belong in
+`Presentation/{Isomorphism,Locality}.lean`; coherent-sheaf consumers begin
+only when `coherent X`, affine covers, or scheme restrictions enter the type.
 
 Intrinsic rank-one local-generator data, invertible module sheaves, their local
 trivializations, and tensor/sheafification descent with a rank-one factor use

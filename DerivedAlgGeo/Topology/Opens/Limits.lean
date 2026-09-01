@@ -45,9 +45,10 @@ be turned into finite presentation on a scheme at all. Mathlib never instantiate
 `quasicoherentData` at a scheme site, which is why the gap has not surfaced upstream.
 
 This file replaces two independent workarounds for the same gap — an earlier global
-`hasBinaryProducts` module and four `local instance`s in
-`DerivedAlgGeo/AlgebraicGeometry/CoherentSheaf/Descent/Locality.lean` — so that the explanation
-exists in one place and a third is not written next time.
+`hasBinaryProducts` module and local instances in the generic
+`CategoryTheory/Sites/Sheaves/Modules/Presentation/Locality.lean` argument — so that the
+topological specialization is supplied once rather than reconstructed by each geometric
+consumer.
 
 This is DerivedAlgGeo-owned infrastructure. If Mathlib later exposes equivalent reachable lattice
 instances, this module can be simplified or deleted; contributing that fix upstream is useful

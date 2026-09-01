@@ -205,6 +205,10 @@ particular:
 - keep restriction of presentations, generating sections, and quasicoherent
   presentation data under the generic ringed-site presentation root; affine
   geometry consumes that API only when it introduces `Spec R` and basic opens;
+- keep isomorphism invariance, over-site preservation, and covering-family
+  descent of finite presentation under the same generic presentation root;
+  coherent-sheaf geometry consumes them only for `coherent X` and affine-open
+  criteria;
 - keep stalk/tensor comparisons for module presheaves under
   `Topology/Sheaves/ModuleTensor/`: their use of open neighbourhoods, germs,
   and stalk functors makes them topological specializations of arbitrary-site

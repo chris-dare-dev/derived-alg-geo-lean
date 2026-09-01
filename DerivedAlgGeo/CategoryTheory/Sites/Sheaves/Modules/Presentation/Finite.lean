@@ -80,6 +80,8 @@ instance Presentation.isFinitePresentation_quasicoherentData {M : SheafOfModules
     -- `(S := R.over x)` is load-bearing; see the module docstring.
     exact Presentation.isFinite_map (S := R.over x) P _ _
 
+omit [J.HasSheafCompose (forget₂ RingCat AddCommGrpCat)]
+  [∀ X, (J.over X).HasSheafCompose (forget₂ RingCat AddCommGrpCat)] in
 /-- **A sheaf of modules with a finite global presentation is of finite presentation.** -/
 theorem IsFinitePresentation.of_presentation {M : SheafOfModules.{u} R}
     (P : M.Presentation) [P.IsFinite] : IsFinitePresentation M where

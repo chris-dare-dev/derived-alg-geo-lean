@@ -197,6 +197,15 @@ blocks should normally move it rather than add more declarations beside it.
   import that root directly and now begin with `Spec R`, distinguished opens,
   and affine finiteness. The seven declaration names are preserved without a
   compatibility shim.
+- Ringed-site finite-presentation invariance and locality:
+  `CategoryTheory/Sites/Sheaves/Modules/Presentation/{Isomorphism,Locality}.lean`
+  own transport across isomorphisms, closure of the finite-presentation object
+  property, restriction to over sites, and descent from a `CoversTop` family.
+  `AlgebraicGeometry/CoherentSheaf/Basic/Isomorphism.lean` now contains only
+  the `coherent X` instance, while `Descent/Locality.lean` contains only
+  scheme open-immersion and affine-cover consumers. The seven declaration
+  names are preserved without compatibility shims, and unnecessary hypotheses
+  are removed from five declarations in the presentation transport/locality chain.
 - Generic invertible module sheaves and tensor/sheafification descent:
   `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` owns rank-one local
   generator data, intrinsic `SheafOfModules.IsInvertible`, transport, finite
@@ -216,10 +225,6 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-- Finite-presentation isomorphism and locality APIs stated on arbitrary
-  ringed sites remain in
-  `AlgebraicGeometry/CoherentSheaf/{Basic/Isomorphism,Descent/Locality}.lean`;
-  their canonical owner is the categorical module-sheaf presentation subtree.
 - Closure of finite-presentation module sheaves under zero objects and
   extensions remains in
   `AlgebraicGeometry/CoherentSheaf/Abelian/{Basic,Extensions}.lean`; only the
