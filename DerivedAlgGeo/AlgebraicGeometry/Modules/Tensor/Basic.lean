@@ -4,8 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Picard
 import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CoversTop
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Tensor
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Tensor
 import DerivedAlgGeo.Topology.Sheaves.ModuleTensor
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.Localization
 
@@ -16,7 +16,7 @@ This file compares restriction with module sheafification, proves closure of inv
 module sheaves under the sheafified tensor product, and constructs the resulting associator.
 
 The intrinsic rank-one property and arbitrary-site tensor descent are imported from
-`CategoryTheory.Sites.Sheaves.Modules`; the stronger stalkwise tensor result is imported from
+`Algebra.Category.ModuleCat.Sheaf`; the stronger stalkwise tensor result is imported from
 `Topology.Sheaves.ModuleTensor`. This module begins only when the scheme-indexed module category
 and its topological site enter the signatures.
 -/

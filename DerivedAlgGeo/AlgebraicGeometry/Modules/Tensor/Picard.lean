@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Monoidal
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Sheafification
 import Mathlib.AlgebraicGeometry.Modules.Sheaf

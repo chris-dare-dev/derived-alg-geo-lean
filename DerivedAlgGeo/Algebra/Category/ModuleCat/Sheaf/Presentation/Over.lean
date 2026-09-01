@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Over
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Over
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.Quasicoherent
 import Mathlib.CategoryTheory.Limits.Constructions.Over.Products
 

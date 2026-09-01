@@ -2,8 +2,8 @@
 Arbitrary-site invertible module sheaves, tensor descent, and the topological stalkwise
 specialization.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Tensor
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Tensor
 import DerivedAlgGeo.Topology.Sheaves.ModuleTensor
 
 #print axioms SheafOfModules.freePUnitIsoUnit

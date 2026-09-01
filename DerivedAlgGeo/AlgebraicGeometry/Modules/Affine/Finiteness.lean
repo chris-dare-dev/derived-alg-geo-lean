@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Gluing
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Over
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Over
 import Mathlib.RingTheory.Localization.Finiteness
 
 /-!

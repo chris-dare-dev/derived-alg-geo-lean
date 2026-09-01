@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Topology.Opens.Limits
 import DerivedAlgGeo.Topology.Opens.CoversTop
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Over
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Over
 import Mathlib.AlgebraicGeometry.Modules.Tilde
 import Mathlib.CategoryTheory.Limits.Constructions.Over.Products
 
@@ -29,7 +29,7 @@ basis theorem for principal opens supplies a contained `D(g)` through that point
 unit-ideal condition.
 
 Restriction of presentations and quasicoherent data to arbitrary over sites is supplied by
-`CategoryTheory.Sites.Sheaves.Modules.Presentation.Over`; this file begins when the open-set site
+`Algebra.Category.ModuleCat.Sheaf.Presentation.Over`; this file begins when the open-set site
 is that of `Spec R` and the cover is refined to distinguished opens.
 -/
 

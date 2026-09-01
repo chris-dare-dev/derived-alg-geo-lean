@@ -291,6 +291,13 @@ blocks should normally move it rather than add more declarations beside it.
   `DGEnhancement/Instances` umbrella are retired. Declaration names and
   namespaces are unchanged; the declaration sweep routes the moved subtrees
   to the audit lanes that already hold their records.
+- Sheaves of modules at Mathlib's path (2026-09-01):
+  `CategoryTheory/Sites/Sheaves/Modules/` moved to
+  `Algebra/Category/ModuleCat/Sheaf/`, where Mathlib defines `SheafOfModules`.
+  `Algebra/Category`, `Algebra/Category/Grp`, and `Algebra/Category/ModuleCat`
+  gained the umbrellas the tree never had. Declaration names and namespaces
+  are unchanged; the sweep routes the subtree to the audit lane that holds its
+  records.
 
 ## Confirmed next lanes
 
@@ -301,7 +308,6 @@ already names the target, and new code uses the target path immediately.
 
 | Current path | Target path |
 | --- | --- |
-| `CategoryTheory/Sites/Sheaves/Modules/` | `Algebra/Category/ModuleCat/Sheaf/` |
 | `CategoryTheory/Sites/Cech/` | `CategoryTheory/Sites/SheafCohomology/Cech/` |
 | `CategoryTheory/Sites/StackInGroupoids/` | `CategoryTheory/Sites/Descent/StackInGroupoids/` |
 | `CategoryTheory/Pseudofunctor/` | `CategoryTheory/Bicategory/Functor/Cat/` |

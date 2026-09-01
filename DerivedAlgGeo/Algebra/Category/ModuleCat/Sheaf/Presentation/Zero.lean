@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Finite
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Finite
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.PullbackFree
 import Mathlib.CategoryTheory.ObjectProperty.ContainsZero
 import Mathlib.CategoryTheory.Sites.Abelian

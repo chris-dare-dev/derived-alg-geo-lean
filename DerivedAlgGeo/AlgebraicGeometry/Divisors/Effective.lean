@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.AssociatedSheaf
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Exactness
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Exactness
 import DerivedAlgGeo.AlgebraicGeometry.Modules.LocallySurjective
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Invertible
 import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion

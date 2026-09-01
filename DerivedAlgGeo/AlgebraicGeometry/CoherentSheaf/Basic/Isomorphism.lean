@@ -3,13 +3,13 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Basic.Definitions
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Isomorphism
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Isomorphism
 
 /-!
 # Isomorphism invariance of coherent sheaves
 
 Finite presentation is invariant under isomorphism on an arbitrary ringed site by
-`CategoryTheory.Sites.Sheaves.Modules.Presentation.Isomorphism`. This geometric consumer records
+`Algebra.Category.ModuleCat.Sheaf.Presentation.Isomorphism`. This geometric consumer records
 that coherent sheaves on a scheme are therefore closed under isomorphisms in the ambient category
 of sheaves of modules.
 -/

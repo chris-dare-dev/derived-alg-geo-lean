@@ -3,14 +3,14 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Kernels
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Extensions
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Extensions
 
 /-!
 # Extensions of coherent sheaves
 
 Finite presentation of module sheaves is closed under extensions on an arbitrary ringed site;
 the categorical proof lives in
-`DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Extensions`. This file applies
+`DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Extensions`. This file applies
 that result to the coherent object property on a scheme.
 
 ## Main result

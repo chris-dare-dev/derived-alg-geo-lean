@@ -6,7 +6,7 @@ import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.ExteriorPower
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.PicardGroup
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible
 import DerivedAlgGeo.LinearAlgebra.ExteriorPower.Top
 
 /-!

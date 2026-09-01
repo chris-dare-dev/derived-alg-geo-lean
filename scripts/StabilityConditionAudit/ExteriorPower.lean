@@ -3,7 +3,7 @@ Generic exterior-power slice of the StabilityCondition audit. Despite the
 audit's historical name, this slice covers linear algebra and categorical
 presheaf infrastructure independent of schemes.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.ExteriorPower
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.ExteriorPower
 import DerivedAlgGeo.LinearAlgebra.ExteriorPower
 
 /-! ## Semilinear exterior powers -/

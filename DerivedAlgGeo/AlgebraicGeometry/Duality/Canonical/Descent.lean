@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Duality.Canonical.Differentials
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.LineBundleDual
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Invertible
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible
 import DerivedAlgGeo.Topology.Opens.CoversTop
 
 /-!

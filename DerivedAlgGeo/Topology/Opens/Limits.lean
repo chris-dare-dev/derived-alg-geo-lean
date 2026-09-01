@@ -46,7 +46,7 @@ be turned into finite presentation on a scheme at all. Mathlib never instantiate
 
 This file replaces two independent workarounds for the same gap — an earlier global
 `hasBinaryProducts` module and local instances in the generic
-`CategoryTheory/Sites/Sheaves/Modules/Presentation/Locality.lean` argument — so that the
+`Algebra/Category/ModuleCat/Sheaf/Presentation/Locality.lean` argument — so that the
 topological specialization is supplied once rather than reconstructed by each geometric
 consumer.
 

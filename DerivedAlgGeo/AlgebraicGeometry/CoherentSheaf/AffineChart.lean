@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Descent.Locality
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Finiteness
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.GeneratingSections
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.GeneratingSections
 
 /-!
 # Sections of a coherent sheaf over an affine open
@@ -51,7 +51,7 @@ and no more.
 ## The categorical reduction: generating sections ARE an epi from a free sheaf
 
 The categorical owner
-`CategoryTheory/Sites/Sheaves/Modules/GeneratingSections.lean` supplies
+`Algebra/Category/ModuleCat/Sheaf/GeneratingSections.lean` supplies
 `GeneratingSections.ofFreeEpi`: a `SheafOfModules.GeneratingSections` carries no information
 beyond an epimorphism `free I ⟶ M`. Mathlib has the other three directions — `ofEpi` along a map
 out of `M`, `equivOfIso`, `map` along a functor — but not this one, and without it every attempt at

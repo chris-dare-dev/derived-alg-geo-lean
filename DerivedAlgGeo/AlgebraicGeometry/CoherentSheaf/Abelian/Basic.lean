@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Extensions
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Zero
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Zero
 import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 import Mathlib.CategoryTheory.Abelian.Subcategory
 

@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.ExteriorPower
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.ExteriorPower
 import DerivedAlgGeo.LinearAlgebra.ExteriorPower.Top
 import Mathlib.Algebra.Category.ModuleCat.Colimits
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Sheafification
@@ -14,7 +14,7 @@ import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 # Exterior powers of sheaves of modules
 
 This geometric consumer sheafifies the categorical objectwise exterior power
-from `CategoryTheory/Sites/Sheaves/Modules/ExteriorPower.lean`. It also proves
+from `Algebra/Category/ModuleCat/Sheaf/ExteriorPower.lean`. It also proves
 that the top exterior power of a free rank-`n` module sheaf is the structure
 sheaf. The semilinear algebra and free-module calculations live under
 `LinearAlgebra/ExteriorPower/`.

@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Basic.Isomorphism
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Locality
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Locality
 import DerivedAlgGeo.Topology.Opens.Limits
 import DerivedAlgGeo.Topology.Opens.CoversTop
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.OpenImmersion
@@ -15,7 +15,7 @@ import Mathlib.CategoryTheory.Limits.Constructions.Over.Products
 
 This file proves the scheme-level affine-local criterion for coherent sheaves. Preservation and
 descent of finite presentation on an arbitrary ringed site are supplied by
-`CategoryTheory.Sites.Sheaves.Modules.Presentation.Locality`.
+`Algebra.Category.ModuleCat.Sheaf.Presentation.Locality`.
 
 The site-local arguments below are expressed using `M.over U`, the canonical restriction to the
 slice site over an open `U`. The scheme-level restriction results use the equivalence with the

@@ -33,7 +33,7 @@ revisiting this.
 in `X.Modules` is proved in
 `DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Kernels`. Generic finite-presentation
 closure under extensions is proved in
-`DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Extensions`, and its coherent
+`DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Extensions`, and its coherent
 specialization is installed by `DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Extensions`.
 The module
 `DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic` installs the abelian instance and

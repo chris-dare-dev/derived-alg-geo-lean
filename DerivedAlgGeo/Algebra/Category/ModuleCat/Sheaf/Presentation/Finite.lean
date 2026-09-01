@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Transport
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Transport
 
 /-!
 # Finite global presentations give finitely presented sheaves

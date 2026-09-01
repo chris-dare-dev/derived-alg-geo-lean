@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Exactness
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Exactness
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 import Mathlib.Topology.Sheaves.LocallySurjective
 

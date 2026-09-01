@@ -3,7 +3,7 @@ Generic module-sheaf slice of the StabilityCondition audit. Despite the audit's
 historical name, this slice covers category-theoretic infrastructure independent
 of schemes.
 -/
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
 
 /-! ## Generating sections from free epimorphisms -/
 

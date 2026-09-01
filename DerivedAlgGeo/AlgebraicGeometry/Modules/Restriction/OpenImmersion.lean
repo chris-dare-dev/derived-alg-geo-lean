@@ -4,8 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Sites.CoversTop
 import DerivedAlgGeo.CategoryTheory.Sites.Over
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Over
-import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Transport
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Over
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Transport
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.Quasicoherent
 import Mathlib.Topology.Sheaves.Over
