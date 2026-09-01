@@ -475,6 +475,11 @@ general-scheme equivalence and compact/perfect theorem still needed by A.14.
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.BoundedCoherentDqcIdentification.comparison
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.HasBoundedCoherentDqcIdentification
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.PerfectObjectsAreCompactInDqc
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentDqcIdentification
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentDerivedToDqc_essSurj
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentRepresentative
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentRepresentativeIso
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.schemePerfectInDqc_iff_isCompact
 
 /-! ## Geometric bounded-coherent base change
 

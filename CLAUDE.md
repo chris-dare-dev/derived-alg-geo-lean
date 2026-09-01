@@ -98,6 +98,14 @@ not below stability. Use an
 `Instances/AlgebraicGeometry/` leaf for registration-only adapters whose
 generic categorical interface is the primary owner.
 
+The general identifications `Dᵇ(Coh X) ≃ Dᵇ_coh(Dqc X)` and
+`Perf(X) = Dqc(X)^c` remain explicit geometric propositions. Their consumer
+API is `AlgebraicGeometry/DerivedCategory/Dqc/Comparison.lean`: downstream
+theorems pass the evidence explicitly and obtain representatives or
+membership comparisons. Do not turn either proposition into a global
+equivalence, essential-surjectivity instance, or compactness instance before
+the geometric theorem is proved.
+
 The opposite comparison `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` is
 generic derived-category data and belongs in
 `CategoryTheory/Triangulated/DerivedCategory/Opposite.lean`. Exact algebraic

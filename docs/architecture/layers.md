@@ -191,6 +191,7 @@ AlgebraicGeometry/DerivedCategory
   ├─→ Basic                                 module-sheaf derived categories
   ├─→ Coherent                              D(Coh X), Dᵇ(Coh X), and Perf(X)
   ├─→ Dqc                                   quasicoherent-cohomology locus
+  │    └─→ Comparison                       explicit-evidence consumer API
   ├─→ Families                              base-change and pullback consumers
   └─→ FourierMukai                          geometric kernels and convolution
 
@@ -357,6 +358,11 @@ derived categories and the exact derived lift of algebraic linear duality.
 Canonical and Serre duality import that root together with
 `AlgebraicGeometry/DerivedCategory/Coherent.lean`; they do not construct
 parallel localizations of `Coh(X)` or `ModuleCat`.
+The bounded-coherent and compact/perfect identifications remain explicit
+propositions in `Dqc.lean`; `Dqc/Comparison.lean` consumes supplied evidence
+to construct representatives and membership equivalences without installing
+global instances. Relative-perfect geometry imports that conditional API and
+states the additional bounded-cohomology hypothesis at its actual use site.
 
 The layering gate rejects imports from algebraic geometry back into any
 `Instances/AlgebraicGeometry` leaf and rejects restoration of the retired

@@ -33,6 +33,13 @@ blocks should normally move it rather than add more declarations beside it.
   `AlgebraicGeometry/DerivedCategory/Coherent.lean`; the former geometric
   `Duality/Serre/LinearDual.lean` path and its ModuleCat-specific comparison
   carrier are retired.
+- Bounded-coherent and compact/perfect comparison consumption:
+  `AlgebraicGeometry/DerivedCategory/Dqc/Comparison.lean` converts the
+  explicit `HasBoundedCoherentDqcIdentification` and
+  `PerfectObjectsAreCompactInDqc` propositions into coherent representatives,
+  comparison isomorphisms, and membership equivalences without registering
+  global instances. The relative-perfect category is the first geometric
+  consumer and states bounded coherent cohomology at the use site.
 - Ordinary semilinear and top exterior-power algebra:
   `LinearAlgebra/ExteriorPower/`.
 - Exterior powers of presheaves of modules over an arbitrary ring presheaf:
@@ -123,12 +130,7 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-1. Make the existing `Dᵇ(Coh X) ⥤ Dqc(X)` comparison hypotheses actual inputs
-   to downstream consumers before proving geometric inhabitants. Do not add a
-   global equivalence or compact/perfect instance until the required
-   hypotheses are proved, with the affine case the first intended realization.
-
-2. Document and compare the three current perfect-complex notions:
+1. Document and compare the three current perfect-complex notions:
    `schemePerfect` in `D(Coh X)`, `schemeRelativePerfect` in `Dqc`, and
    `TwoTermPerfectDeterminantData`. Move the canonical zero object for
    `SchemeQuasicoherentDerivedCategory` from the perfect-moduli consumer to the
