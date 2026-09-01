@@ -141,6 +141,11 @@ RETIRED_IMPORT_SHIMS = {
         SOURCE_ROOT / "CategoryTheory" / "EquivalenceTransport.lean",
         "DerivedAlgGeo.CategoryTheory.Pseudofunctor.Transport",
     ),
+    "DerivedAlgGeo.AlgebraicGeometry.Duality.Serre.LinearDual": (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Duality" / "Serre" /
+            "LinearDual.lean",
+        "DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.LinearDual",
+    ),
     "DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Exactness": (
         SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Affine" /
             "Exactness.lean",
@@ -1233,6 +1238,125 @@ def main() -> int:
                 f"{path.relative_to(ROOT)}: generic derived-category module "
                 "uses an AlgebraicGeometry declaration namespace"
             )
+
+    derived_opposite_source = generic_derived_root / "Opposite.lean"
+    derived_linear_dual_source = generic_derived_root / "LinearDual.lean"
+    for path in (derived_opposite_source, derived_linear_dual_source):
+        if not path.is_file():
+            failures.append(
+                f"generic derived-duality module missing: {path.relative_to(ROOT)}"
+            )
+    if derived_opposite_source.is_file():
+        opposite_text = derived_opposite_source.read_text(encoding="utf-8")
+        for required_fragment in (
+            "namespace CategoryTheory.DerivedCategory",
+            "structure OppositeComparison",
+            "equivalence : (DerivedCategory C)ᵒᵖ ≌ DerivedCategory Cᵒᵖ",
+        ):
+            if required_fragment not in opposite_text:
+                failures.append(
+                    f"{derived_opposite_source.relative_to(ROOT)}: generic "
+                    f"derived/opposite root is missing {required_fragment!r}"
+                )
+    if derived_linear_dual_source.is_file():
+        linear_dual_text = derived_linear_dual_source.read_text(encoding="utf-8")
+        opposite_import = (
+            "DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Opposite"
+        )
+        if opposite_import not in imports_by_path[derived_linear_dual_source]:
+            failures.append(
+                f"{derived_linear_dual_source.relative_to(ROOT)}: exact linear "
+                f"duality must import its generic opposite root {opposite_import}"
+            )
+        for required_fragment in (
+            "noncomputable instance moduleHasDerivedCategory",
+            "noncomputable instance oppositeModuleHasDerivedCategory",
+            "noncomputable def derivedLinearDualFunctor",
+            "noncomputable def derivedLinearDualFromOpposite",
+            "noncomputable def derivedLinearDualShift",
+            "CategoryTheory.DerivedCategory.OppositeComparison",
+        ):
+            if required_fragment not in linear_dual_text:
+                failures.append(
+                    f"{derived_linear_dual_source.relative_to(ROOT)}: categorical "
+                    f"linear-dual specialization is missing {required_fragment!r}"
+                )
+        if "AlgebraicGeometry" in linear_dual_text:
+            failures.append(
+                f"{derived_linear_dual_source.relative_to(ROOT)}: generic exact "
+                "linear duality mentions algebraic geometry"
+            )
+
+    coherent_owner_module = (
+        "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent"
+    )
+    linear_dual_module = (
+        "DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.LinearDual"
+    )
+    canonical_duality_source = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Duality" / "Canonical" /
+            "Derived.lean"
+    )
+    serre_cohomology_source = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Duality" / "Serre" /
+            "Cohomology.lean"
+    )
+    if coherent_owner_module not in imports_by_path[canonical_duality_source]:
+        failures.append(
+            f"{canonical_duality_source.relative_to(ROOT)}: canonical duality "
+            f"must import coherent-derived owner {coherent_owner_module}"
+        )
+    for required_import in (coherent_owner_module, linear_dual_module):
+        if required_import not in imports_by_path[serre_cohomology_source]:
+            failures.append(
+                f"{serre_cohomology_source.relative_to(ROOT)}: Serre duality "
+                f"must import canonical source {required_import}"
+            )
+    for path in (canonical_duality_source, serre_cohomology_source):
+        text = path.read_text(encoding="utf-8")
+        for forbidden_fragment in (
+            "local instance coherentHasDerivedCategory",
+            "local instance moduleHasDerivedCategory",
+            "ModuleCat.DerivedOppositeComparison",
+        ):
+            if forbidden_fragment in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: geometric duality restored "
+                    f"private derived-category binding {forbidden_fragment!r}"
+                )
+    canonical_duality_text = canonical_duality_source.read_text(encoding="utf-8")
+    if "DerivedCategory.SchemeCoherentDerivedCategory" not in canonical_duality_text:
+        failures.append(
+            f"{canonical_duality_source.relative_to(ROOT)}: canonical dualizing "
+            "complex must use the coherent-derived owner"
+        )
+    serre_cohomology_text = serre_cohomology_source.read_text(encoding="utf-8")
+    for required_fragment in (
+        "SchemeCoherentDerivedCategory X.toVariety.toScheme",
+        "CategoryTheory.DerivedCategory.OppositeComparison",
+        "ModuleCat.derivedLinearDualShift",
+    ):
+        if required_fragment not in serre_cohomology_text:
+            failures.append(
+                f"{serre_cohomology_source.relative_to(ROOT)}: Serre-duality "
+                f"consumer is missing {required_fragment!r}"
+            )
+    for path in sorted((SOURCE_ROOT / "AlgebraicGeometry").rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        for declaration in (
+            "linearDualFunctor",
+            "derivedLinearDualFunctor",
+            "DerivedOppositeComparison",
+        ):
+            if re.search(
+                rf"^(?:noncomputable\s+)?(?:def|structure)\s+{declaration}\b",
+                text,
+                re.MULTILINE,
+            ):
+                failures.append(
+                    f"{path.relative_to(ROOT)}: restored generic derived-duality "
+                    f"declaration {declaration} inside algebraic geometry"
+                )
 
     generic_cech_root = SOURCE_ROOT / "CategoryTheory" / "Sites" / "Cech"
     generic_cohomology_sources = (
@@ -2629,8 +2753,9 @@ def main() -> int:
         "ok: generic stacks in groupoids use their CategoryTheory namespace"
     )
     print(
-        "ok: generic derived-category, K-projective, and bounded-projective "
-        "APIs use the CategoryTheory owner; affine files contain only consumers"
+        "ok: generic derived-category, opposite, linear-dual, K-projective, "
+        "and bounded-projective APIs use the CategoryTheory owner; geometric "
+        "duality and affine files contain only consumers"
     )
     print(
         "ok: generic Ext, spectral-sequence, simplicial, and site-theoretic "
