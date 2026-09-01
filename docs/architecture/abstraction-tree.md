@@ -51,6 +51,8 @@ Category
 ├─ Abelian                               Mathlib typeclass
 │  ├─ weak-Serre exactness               repository generic extension
 │  └─ DerivedCategory C                  generic construction
+│     └─ OppositeComparison C            explicit derived/opposite bridge
+│        └─ exact ModuleCat linear dual  categorical specialization
 ├─ FiniteExactTower
 │  └─ FiniteFiltration                    zero-to-object endpoint refinement
 │     └─ almost-disconnected witness       scheme-geometric leaf

@@ -142,6 +142,8 @@ CategoryTheory/Triangulated/Families
 
 CategoryTheory/Triangulated/DerivedCategory
   ├─→ TStructure, ExactFunctor, Homology       arbitrary abelian categories
+  ├─→ Opposite                                generic derived/opposite comparison
+  ├─→ LinearDual                              exact ModuleCat consumer of Opposite
   ├─→ Ext                                     adjunction and resolution naturality
   ├─→ KProjective                             generic supported derivation
   └─→ BoundedAboveProjective                  functorial projective locus
@@ -350,6 +352,11 @@ under `Dqc`. Generic derived t-structure, exact-functor, homology-comparison,
 K-projective, and bounded-above-projective results live instead under
 `DerivedAlgGeo/CategoryTheory/Triangulated/DerivedCategory/`; the affine
 subtree contains only ring/module specializations of those interfaces.
+The same generic root owns the explicit comparison between opposites and
+derived categories and the exact derived lift of algebraic linear duality.
+Canonical and Serre duality import that root together with
+`AlgebraicGeometry/DerivedCategory/Coherent.lean`; they do not construct
+parallel localizations of `Coh(X)` or `ModuleCat`.
 
 The layering gate rejects imports from algebraic geometry back into any
 `Instances/AlgebraicGeometry` leaf and rejects restoration of the retired
@@ -386,6 +393,7 @@ the explicit instance umbrellas attached to their categorical sources:
 | Neutral moduli boundedness | `DerivedAlgGeo.CategoryTheory.Moduli` |
 | Pseudofunctor loci and subprestacks | `DerivedAlgGeo.CategoryTheory.Pseudofunctor.ObjectProperty` |
 | Generic derived-category extensions | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory` |
+| Derived/opposite comparison and exact linear duality | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Opposite` and `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.LinearDual` |
 | Generic spectral sequences | `DerivedAlgGeo.CategoryTheory.SpectralSequence` |
 | Generic site-theoretic Čech machinery | `DerivedAlgGeo.CategoryTheory.Sites.Cech` |
 | Polynomial-variable Čech algebra | `DerivedAlgGeo.Algebra.MvPolynomial.Cech` |
