@@ -9,6 +9,28 @@ Audit records for generic derived-category extensions on arbitrary abelian
 categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 -/
 
+/-! ## Opposites and exact linear duality -/
+
+#print axioms CategoryTheory.DerivedCategory.OppositeComparison
+#print axioms CategoryTheory.DerivedCategory.OppositeComparison.mk.inj
+#print axioms CategoryTheory.DerivedCategory.OppositeComparison.mk.sizeOf_spec
+#print axioms CategoryTheory.DerivedCategory.OppositeComparison.equivalence
+#print axioms ModuleCat.linearDualFunctor
+#print axioms ModuleCat.linearDualFunctor_obj
+#print axioms ModuleCat.linearDualFunctor_map
+#print axioms ModuleCat.instAdditiveOppositeLinearDualFunctor
+#print axioms ModuleCat.linearDualFunctor_map_shortExact
+#print axioms ModuleCat.linearDualFunctor_preservesFiniteLimits_and_colimits
+#print axioms ModuleCat.linearDualFunctor_preservesFiniteLimits
+#print axioms ModuleCat.linearDualFunctor_preservesFiniteColimits
+#print axioms ModuleCat.instPreservesFiniteLimitsOppositeLinearDualFunctor
+#print axioms ModuleCat.instPreservesFiniteColimitsOppositeLinearDualFunctor
+#print axioms ModuleCat.moduleHasDerivedCategory
+#print axioms ModuleCat.oppositeModuleHasDerivedCategory
+#print axioms ModuleCat.derivedLinearDualFunctor
+#print axioms ModuleCat.derivedLinearDualFromOpposite
+#print axioms ModuleCat.derivedLinearDualShift
+
 /-! ## T-structures and exact derived functors -/
 
 #print axioms CategoryTheory.tStructureIsLE_of_retract

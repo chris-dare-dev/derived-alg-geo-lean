@@ -842,18 +842,10 @@ is not closed. -/
 #print axioms SmoothProperVariety.CanonicalSheafData.pointCanonicalSheafData_canonicalSheaf
 #print axioms SmoothProperVariety.CanonicalSheafData.pointDualizingComplexIso
 
--- Layer B stage 5: algebraic linear duality is an exact contravariant functor and therefore has
--- an actual derived lift. The comparison between the opposite derived category and the derived
--- category of the opposite remains explicit, as do geometric RHom and Grothendieck duality.
-#print axioms ModuleCat.linearDualFunctor
-#print axioms ModuleCat.linearDualFunctor_map_shortExact
-#print axioms ModuleCat.linearDualFunctor_preservesFiniteLimits_and_colimits
-#print axioms ModuleCat.linearDualFunctor_preservesFiniteLimits
-#print axioms ModuleCat.linearDualFunctor_preservesFiniteColimits
-#print axioms ModuleCat.derivedLinearDualFunctor
-#print axioms ModuleCat.DerivedOppositeComparison
-#print axioms ModuleCat.DerivedOppositeComparison.derivedLinearDualFromOpposite
-#print axioms ModuleCat.DerivedOppositeComparison.derivedLinearDualShift
+-- Layer B stage 5: geometric Serre duality consumes the generic derived
+-- opposite comparison and exact linear-dual lift audited in
+-- `StabilityConditionAudit/DerivedCategory.lean`. Geometric RHom and
+-- Grothendieck duality remain explicit realization data here.
 #print axioms AlgebraicGeometry.Duality.Serre.DerivedStatement
 #print axioms AlgebraicGeometry.Duality.Serre.DerivedStatement.linearDualShift
 #print axioms AlgebraicGeometry.Duality.Serre.DerivedStatement.dualizingObject
@@ -1073,6 +1065,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.k3NumericalVariety
 #print axioms Examples.k3NumericalVariety_satisfiesHRR
 #print axioms Examples.k3_isK3
+#print axioms Examples.k3ChiStructureSheaf
 
 -- Layer A: the projective plane. Its td1 is nonzero, so it is the model that can
 -- detect an error in the c1.td1 term of Surface.chi_eq.
@@ -1093,6 +1086,21 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.abelianToddComp_one
 #print axioms Examples.abelianChiStructureSheaf
 #print axioms Examples.abelianChi_eq_of_chComp_two_eq
+
+-- Layer A: the numerical Enriques surface. td1 = 0 like the abelian model but
+-- with chi(O) = 1, so the integral of td2 is the only rank-one invariant
+-- separating the two; the pairwise 2 != 1 != 0 distinctions are theorems.
+#print axioms Examples.enriquesTodd
+#print axioms Examples.enriquesTodd_mem
+#print axioms Examples.enriquesTodd_sum
+#print axioms Examples.enriquesNumericalVariety
+#print axioms Examples.enriquesNumericalVariety_satisfiesHRR
+#print axioms Examples.enriquesToddComp_one
+#print axioms Examples.enriquesChiStructureSheaf
+#print axioms Examples.k3EnriquesAbelianPresentations
+#print axioms Examples.chiStructureSheaf_enriques_ne_k3
+#print axioms Examples.chiStructureSheaf_enriques_ne_abelian
+#print axioms Examples.chiStructureSheaf_k3_ne_abelian
 
 -- Layer A: the dimension-general Picard-rank-one construction. Every threefold and
 -- fourfold model below is built from it, so a sorry here would unmodel dimensions three

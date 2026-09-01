@@ -11,8 +11,9 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.Scheme
 For a scheme base change `T ⟶ S` and a point `x : T`, Mathlib constructs the
 canonical morphism `Spec κ(x) ⟶ T`.  This file regards its composite with
 `T ⟶ S` as an object of `Over S`, then evaluates a client-supplied
-`SchemeTriangulatedFiberFamily S` there.  The family's contravariant functor
-supplies categorical and Grothendieck-group restriction to the residue fiber.
+`SchemeTriangulatedFiberFamily S` there. The family's contravariant
+pseudofunctor supplies categorical and Grothendieck-group restriction to the
+residue fiber.
 
 The residue-field schemes and morphisms are genuine geometric objects.  The
 triangulated categories and pullback functors remain client data: no derived

@@ -98,6 +98,14 @@ not below stability. Use an
 `Instances/AlgebraicGeometry/` leaf for registration-only adapters whose
 generic categorical interface is the primary owner.
 
+The opposite comparison `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` is
+generic derived-category data and belongs in
+`CategoryTheory/Triangulated/DerivedCategory/Opposite.lean`. Exact algebraic
+linear duality and its derived lift belong in the adjacent `LinearDual.lean`
+specialization. Geometric Serre or Grothendieck duality imports those roots and
+`AlgebraicGeometry/DerivedCategory/Coherent.lean`; it does not own replacement
+localizations for coherent sheaves or modules.
+
 The geometric specialization chain is `SheafOfModules(X) -> QCoh(X) ->
 Coh(X)`. Its scheme-owned source tree is
 `AlgebraicGeometry/SheafOfModules/QuasicoherentSheaf/CoherentSheaf/` as the
@@ -208,8 +216,10 @@ physical path records which interface it implements.
 
 The generic family root also owns its declaration namespace:
 `TriangulatedFiberFamily` belongs to
-`CategoryTheory.Triangulated.Families`. Neutral moduli boundedness is more
-general still: `BoundednessProblem` and `UniversalBoundedness` belong to
+`CategoryTheory.Triangulated.Families`. Its source is a Cat-valued
+pseudofunctor on `LocallyDiscrete Bᵒᵖ`; an ordinary strict functor enters only
+through `TriangulatedFiberFamily.ofFunctor`. Neutral moduli boundedness is
+more general still: `BoundednessProblem` and `UniversalBoundedness` belong to
 `CategoryTheory.Moduli`, not to triangulated or stability families. Namespace
 migrations are separate from path moves and must update consumers, audits,
 baselines, documentation, and enforcement together.

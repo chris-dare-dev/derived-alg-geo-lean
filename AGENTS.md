@@ -179,6 +179,13 @@ construct a subprestack, through the categorical `fullsubcategory` API.
   belongs under `CategoryTheory/Triangulated/DerivedCategory/`, together with
   its canonical t-structure, exact-functor, homology-comparison, and
   K-projective APIs.
+- The comparison `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` is generic
+  derived-category data and belongs in `DerivedCategory/Opposite.lean`.
+  Exact algebraic linear duality and its derived lift belong in the adjacent
+  `LinearDual.lean` specialization. A geometric duality theorem imports those
+  roots and the canonical `AlgebraicGeometry/DerivedCategory/Coherent.lean`
+  owner; it must not choose private replacement localizations for `Coh(X)` or
+  `ModuleCat`.
 - Generic `Ext` adjunction, dimension shift, and injective-resolution
   naturality belong under the derived-category root's `Ext/` child. Generic
   filtered-complex and total-complex spectral-sequence machinery belongs under
@@ -225,6 +232,11 @@ construct a subprestack, through the categorical `fullsubcategory` API.
   the base category, fiber categories, and abstract pullback functors of a
   triangulated family belong under `CategoryTheory/Triangulated/Families/`
   before any stability or geometry is imposed.
+- The underlying source of `TriangulatedFiberFamily` is a pseudofunctor
+  `LocallyDiscrete Bᵒᵖ ⥤ᵖ Cat`, and its identity and composition comparisons
+  come from that source. Admit an ordinary strict `Bᵒᵖ ⥤ Cat` only through
+  `TriangulatedFiberFamily.ofFunctor`; do not weaken the canonical root back
+  to a strict functor for the convenience of one consumer.
 - Generic stacks, discrete-stack construction from a sheaf, stack morphisms,
   and site-object representability belong under
   `CategoryTheory/Sites/StackInGroupoids/`. Big-Zariski representables,

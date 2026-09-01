@@ -128,6 +128,14 @@ canonical t-structure, exact functors, homology comparison, and K-projective
 or bounded-above-projective models. Keep only the `Coh(X)`, `Dqc(X)`, module,
 and extension-of-scalars specializations below algebraic geometry.
 
+Generic comparison of `(DerivedCategory C)ᵒᵖ` with
+`DerivedCategory Cᵒᵖ` belongs in
+`CategoryTheory/Triangulated/DerivedCategory/Opposite.lean`. The exact
+ModuleCat linear-dual functor and its derived lift belong in the adjacent
+`LinearDual.lean` specialization. A Serre-duality module is a geometric
+consumer: it imports those roots and the canonical coherent-derived owner
+instead of declaring local replacement derived-category instances.
+
 Put generic `Ext` adjunction, dimension-shift, and injective-resolution
 naturality below `CategoryTheory/Triangulated/DerivedCategory/Ext/`. Put
 filtered-complex and total-complex spectral-sequence machinery below
@@ -216,7 +224,10 @@ geometric properties of their representing scheme morphisms belong under
 Neutral categorical family declarations use the matching
 `CategoryTheory.Triangulated.Families` namespace. In particular,
 `TriangulatedFiberFamily` must not be declared inside a weak- or
-Bridgeland-stability namespace merely because those theories consume it.
+Bridgeland-stability namespace merely because those theories consume it. Its
+canonical carrier is a pseudofunctor on `LocallyDiscrete Bᵒᵖ`; strict
+category-valued functors are specializations constructed by
+`TriangulatedFiberFamily.ofFunctor`.
 Shared moduli boundedness uses the independent `CategoryTheory.Moduli`
 namespace. Treat a namespace migration as an API cutover: update all stable
 consumers, audits, declaration baselines, documentation, and regression gates

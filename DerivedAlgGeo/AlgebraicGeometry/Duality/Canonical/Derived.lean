@@ -3,8 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Boundedness
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.Duality.Canonical.Differentials
-import Mathlib.Algebra.Homology.DerivedCategory.Basic
 
 /-!
 # The canonical dualizing complex
@@ -55,10 +55,6 @@ namespace CanonicalSheafData
 
 variable {X : SmoothProperVariety k} {n : ℕ}
 
-noncomputable local instance coherentHasDerivedCategory :
-    HasDerivedCategory.{u + 1} (Coh X.toVariety.toScheme) :=
-  HasDerivedCategory.standard _
-
 /-- The canonical line bundle as an object of the coherent-sheaf category. Coherence follows
 automatically from invertibility. -/
 noncomputable def canonicalCohObject (K : X.CanonicalSheafData n) :
@@ -67,7 +63,7 @@ noncomputable def canonicalCohObject (K : X.CanonicalSheafData n) :
 
 /-- The canonical dualizing-complex candidate `ω_X[n]` in the coherent derived category. -/
 noncomputable def dualizingComplex (K : X.CanonicalSheafData n) :
-    DerivedCategory (Coh X.toVariety.toScheme) :=
+    DerivedCategory.SchemeCoherentDerivedCategory X.toVariety.toScheme :=
   (DerivedCategory.singleFunctor (Coh X.toVariety.toScheme) (n : ℤ)).obj
     K.canonicalCohObject
 

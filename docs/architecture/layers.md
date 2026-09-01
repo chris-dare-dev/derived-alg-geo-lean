@@ -137,10 +137,13 @@ CategoryTheory/Limits/Preserves
   └─→ Reflective                               ordinary Cat-level consumer
 
 CategoryTheory/Triangulated/Families
-  └─→ abstract fiber categories, pullback functors, and boundedness
+  ├─→ pseudofunctorial fiber categories and pullback coherence
+  └─→ strict category-valued functors through `ofFunctor`
 
 CategoryTheory/Triangulated/DerivedCategory
   ├─→ TStructure, ExactFunctor, Homology       arbitrary abelian categories
+  ├─→ Opposite                                generic derived/opposite comparison
+  ├─→ LinearDual                              exact ModuleCat consumer of Opposite
   ├─→ Ext                                     adjunction and resolution naturality
   ├─→ KProjective                             generic supported derivation
   └─→ BoundedAboveProjective                  functorial projective locus
@@ -349,6 +352,11 @@ under `Dqc`. Generic derived t-structure, exact-functor, homology-comparison,
 K-projective, and bounded-above-projective results live instead under
 `DerivedAlgGeo/CategoryTheory/Triangulated/DerivedCategory/`; the affine
 subtree contains only ring/module specializations of those interfaces.
+The same generic root owns the explicit comparison between opposites and
+derived categories and the exact derived lift of algebraic linear duality.
+Canonical and Serre duality import that root together with
+`AlgebraicGeometry/DerivedCategory/Coherent.lean`; they do not construct
+parallel localizations of `Coh(X)` or `ModuleCat`.
 
 The layering gate rejects imports from algebraic geometry back into any
 `Instances/AlgebraicGeometry` leaf and rejects restoration of the retired
@@ -359,7 +367,10 @@ in `scripts/layering_reverse_edges.txt` is empty and must remain empty.
 
 The former CategoryTheory families umbrella mixed generic interfaces with
 geometric realizations. It now exports only triangulated-family interfaces.
-`TriangulatedFiberFamily` lives in `CategoryTheory.Triangulated.Families`;
+`TriangulatedFiberFamily` lives in `CategoryTheory.Triangulated.Families` and
+is based on a Cat-valued pseudofunctor over `LocallyDiscrete Bᵒᵖ`; strict
+functors are admitted through `TriangulatedFiberFamily.ofFunctor` rather than
+serving as the root;
 the more general `BoundednessProblem` and `UniversalBoundedness` live in
 `CategoryTheory.Moduli` and are consumed by both stability and geometry.
 Weak-family probes and structures live in
@@ -382,6 +393,7 @@ the explicit instance umbrellas attached to their categorical sources:
 | Neutral moduli boundedness | `DerivedAlgGeo.CategoryTheory.Moduli` |
 | Pseudofunctor loci and subprestacks | `DerivedAlgGeo.CategoryTheory.Pseudofunctor.ObjectProperty` |
 | Generic derived-category extensions | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory` |
+| Derived/opposite comparison and exact linear duality | `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Opposite` and `DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.LinearDual` |
 | Generic spectral sequences | `DerivedAlgGeo.CategoryTheory.SpectralSequence` |
 | Generic site-theoretic Čech machinery | `DerivedAlgGeo.CategoryTheory.Sites.Cech` |
 | Polynomial-variable Čech algebra | `DerivedAlgGeo.Algebra.MvPolynomial.Cech` |
