@@ -116,6 +116,13 @@ prove its localization behavior, without mentioning a site or scheme.
 `AlgebraicGeometry/CoherentSheaf/Abelian/Kernels.lean` is a direct consumer and
 owns only the scheme restriction, affine comparison, and coherence steps.
 
+Local injectivity and local surjectivity of additive-presheaf morphisms, and
+their packaging as membership in `J.W`, require only an arbitrary
+Grothendieck topology when detected on a `J.CoversTop` family. Their canonical
+owner is `CategoryTheory/Sites/Sheaves/CoversTop.lean`. Scheme affine charts,
+divisor trivializations, Proj covers, and sheafified tensor products are
+consumers and import this owner directly.
+
 Indexed families of additive commutative groups, their direct sums, saturated
 quotients by supplied relation sets, family-relation systems, additive-map
 ranges, and finite-relative-index predicates are rooted at

@@ -21,6 +21,10 @@ first application that motivated it.
   sheaves of modules over a sheaf of rings on an arbitrary site; those belong
   under `CategoryTheory/Sites/Sheaves/Modules/`, not under affine or scheme
   geometry.
+- Detection of local injectivity, local surjectivity, and sheafification weak
+  equivalences on a family covering the terminal object belongs in
+  `CategoryTheory/Sites/Sheaves/CoversTop.lean`. Scheme charts, divisors, and
+  tensor constructions import that root as consumers.
 - Put definitions and geometric lemmas that intrinsically mention schemes,
   varieties, scheme-indexed sheaf categories, or geometric morphism
   properties under `AlgebraicGeometry/`.
@@ -89,6 +93,10 @@ application, current file, namespace, or proof technique.
   `PreservesCategoricalEuler` APIs.
 - A geometric consumer imports the general root directly. Do not preserve the
   old consumer path with an import-only shim.
+- A theorem about additive presheaves on an arbitrary Grothendieck site remains
+  site theory even when all current covers are scheme charts. In particular,
+  do not redeclare the `Presheaf.{isLocallyInjective,isLocallySurjective,W}_of_coversTop`
+  chain below algebraic geometry.
 - Kernel maps for ordinary localized modules, including their `ModuleCat`
   formulation, belong under `Algebra/Module/Localization/`. Coherent-sheaf
   arguments import that algebraic owner and add only the scheme-dependent

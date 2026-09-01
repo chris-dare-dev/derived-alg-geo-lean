@@ -175,12 +175,24 @@ blocks should normally move it rather than add more declarations beside it.
   `AlgebraicGeometry/IntersectionTheory/NumericalPolynomial/` paths, together
   with the `AlgebraicGeometry.IntersectionTheory.NumericalPolynomial`
   namespace, are retired rather than retained as compatibility shims.
+- Coverwise local equivalences of additive presheaves:
+  `CategoryTheory/Sites/Sheaves/CoversTop.lean` owns detection of local
+  injectivity, local surjectivity, and `J.W` membership on a family covering
+  the terminal object. Scheme tensor, divisor, associated-sheaf, and Proj
+  modules import that arbitrary-site root directly; the declarations no
+  longer live inside the scheme tensor consumer.
 
 ## Confirmed next lanes
 
-No additional ownership defect is currently confirmed by the signature test.
-Future candidates must be added here only after identifying their weakest
-public vocabulary, canonical root, and concrete consumer.
+- Generic invertible module sheaves and tensor/sheafification descent: the
+  `SheafOfModules.LocalGeneratorsData.IsRankOne`,
+  `SheafOfModules.IsInvertible`, rank-one trivialization, and arbitrary-site
+  whiskering declarations currently preceding the scheme-specific portions of
+  `AlgebraicGeometry/Modules/Tensor/{Picard,Basic}.lean` mention no scheme.
+  Their canonical owner is
+  `CategoryTheory/Sites/Sheaves/Modules/`, with the stalkwise topological
+  specialization below `Topology/Sheaves/`; the scheme tensor product and
+  Picard-class construction remain geometric consumers.
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and

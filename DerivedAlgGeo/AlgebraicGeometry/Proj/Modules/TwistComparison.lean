@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistMultiplication
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TensorTwist
 import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.TwistAdd
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CoversTop
 
 /-!
 # The comparison `F ⊗ O(d) ≅ F(d)`, and what follows from it

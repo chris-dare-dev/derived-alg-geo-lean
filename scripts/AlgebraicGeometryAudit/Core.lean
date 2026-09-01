@@ -1577,19 +1577,8 @@ not functions. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorTripleAssocIso
 #print axioms AlgebraicGeometry.Scheme.Modules.PicardClass.mk_eq_mk_iff
 
--- Layer B stage 2: tensor/sheafification descent for invertible sheaves. Local rank-one
--- trivializations make tensor preserve locally bijective maps; this supplies both comparison
--- orientations, restriction compatibility, tensor closure, and the sheafified associator.
-#print axioms CategoryTheory.Presheaf.isLocallyInjective_of_coversTop
--- Its companion, and the two packaged together. isLocallySurjective_of_coversTop was private in
--- Divisors/AssociatedSheaf/Construction.lean and hardcoded to Opens X, though its proof uses only
--- Sieve.ofObjects, J.transitive and Sieve.overEquiv -- all general. W_of_coversTop is the recipe
--- that file ran by hand at three sites: local injectivity and local surjectivity each descend
--- along a covering family, and together they are membership in J.W, which sheafification inverts.
--- That is the practical route to "isomorphism on a cover implies isomorphism after sheafification",
--- for which no direct lemma exists on SheafOfModules morphisms.
-#print axioms CategoryTheory.Presheaf.isLocallySurjective_of_coversTop
-#print axioms CategoryTheory.Presheaf.W_of_coversTop
+-- Geometric tensor/sheafification descent for invertible sheaves. The arbitrary-site
+-- cover-detection lemmas it consumes are audited with their categorical owner.
 #print axioms SheafOfModules.LocalGeneratorsData.rankOneTrivialization
 #print axioms SheafOfModules.isLocallySurjective_whiskerLeft
 #print axioms SheafOfModules.isLocallyInjective_whiskerLeft_of_isoUnit

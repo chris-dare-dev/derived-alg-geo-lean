@@ -6,6 +6,7 @@ Released under the MIT license.
 -- `Modules.Tensor.Basic`; the single declaration that needed `Determinant` moved to
 -- `Divisors.LineBundleDual`, which took `Dual` off `ExteriorPower`'s critical path.
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CoversTop
 
 /-!
 # Duals of invertible module sheaves

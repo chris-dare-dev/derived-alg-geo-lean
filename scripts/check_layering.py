@@ -1427,6 +1427,7 @@ def main() -> int:
         generic_limits_root / "Preserves" / "Reflective.lean",
         generic_abelian_root / "WeakSerre.lean",
         generic_sheaves_root / "ConstantPullback.lean",
+        generic_sheaves_root / "CoversTop.lean",
         generic_sheaves_root / "CohomologyShortExact.lean",
         generic_sheaves_root / "CohomologyPushforward.lean",
         generic_sheaves_root / "Modules" / "Exactness.lean",
@@ -1455,6 +1456,55 @@ def main() -> int:
             failures.append(
                 f"{path.relative_to(ROOT)}: generic categorical "
                 "infrastructure depends on or declares algebraic geometry"
+            )
+
+    covers_top_owner = generic_sheaves_root / "CoversTop.lean"
+    covers_top_import = "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CoversTop"
+    covers_top_fragments = (
+        "lemma isLocallyInjective_of_coversTop",
+        "lemma isLocallySurjective_of_coversTop",
+        "lemma W_of_coversTop",
+    )
+    if covers_top_owner.is_file():
+        covers_top_text = covers_top_owner.read_text(encoding="utf-8")
+        for fragment in covers_top_fragments:
+            if fragment not in covers_top_text:
+                failures.append(
+                    f"{covers_top_owner.relative_to(ROOT)}: missing arbitrary-site "
+                    f"cover-detection declaration {fragment!r}"
+                )
+
+    sheaves_umbrella = generic_sheaves_root.with_suffix(".lean")
+    if covers_top_import not in imports_by_path[sheaves_umbrella]:
+        failures.append(
+            f"{sheaves_umbrella.relative_to(ROOT)}: missing arbitrary-site "
+            f"cover-detection umbrella import {covers_top_import}"
+        )
+
+    geometric_tensor_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Tensor" / "Basic.lean"
+    )
+    geometric_cover_consumers = (
+        geometric_tensor_consumer,
+        SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "Dual.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Divisors" / "AssociatedSheaf" /
+            "Construction.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Proj" / "Modules" /
+            "TwistComparison.lean",
+    )
+    for path in geometric_cover_consumers:
+        if covers_top_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: coverwise local-equivalence consumer "
+                f"must import the categorical owner {covers_top_import} directly"
+            )
+
+    geometric_tensor_text = geometric_tensor_consumer.read_text(encoding="utf-8")
+    for fragment in covers_top_fragments:
+        if fragment in geometric_tensor_text:
+            failures.append(
+                f"{geometric_tensor_consumer.relative_to(ROOT)}: restored arbitrary-site "
+                f"cover-detection declaration {fragment!r} in geometry"
             )
 
     bicategorical_cat = (
@@ -3407,6 +3457,10 @@ def main() -> int:
     print(
         "ok: generic abelian and ringed-site sheaf APIs use their categorical "
         "roots; the topological cohomology specialization uses the Topology owner"
+    )
+    print(
+        "ok: coverwise local-equivalence detection for additive presheaves uses "
+        "the arbitrary-site sheaf root; geometric chart consumers import it directly"
     )
     print(
         "ok: bicategorical adjunction is the higher source, ordinary adjunction "
