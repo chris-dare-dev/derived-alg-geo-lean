@@ -109,6 +109,7 @@ AlgebraicGeometry
 │     └─ almost-disconnected graded pieces   scheme-geometric leaf
 ├─ scheme-derived category                     `DerivedCategory/`
 │  ├─ Dqc                                      neutral geometric locus
+│  │  └─ explicit comparison evidence          representatives, not instances
 │  ├─ bounded coherent locus
 │  ├─ scheme pullback and geometric kernels
 │  └─ perfect / relative-perfect loci          `Moduli/PerfectComplex/`

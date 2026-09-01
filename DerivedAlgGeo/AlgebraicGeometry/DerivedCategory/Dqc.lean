@@ -31,8 +31,10 @@ and triangulatedness of the inclusion both follow from Mathlib.
 
 Comparison statements a later geometric realization must still prove — the
 bounded-coherent identification and the compact/perfect comparison — remain
-propositions with no unsupported inhabitant, so unsupported geometric cases are
-still not silently identified with the all-sheaf derived category.
+propositions with no unsupported inhabitant. `Dqc/Comparison.lean` turns them
+into representatives and membership theorems only when a consumer passes the
+evidence explicitly, so unsupported geometric cases are still not silently
+identified with the all-sheaf derived category.
 
 Declarations in this file and the affine realization subtree use the
 geometry-owned namespace `AlgebraicGeometry.DerivedCategory.Dqc`.

@@ -20,6 +20,16 @@ Perfect objects are defined in `D(Coh X)` as the thick triangulated envelope
 of degree-zero finite locally free coherent sheaves. The structure sheaf gives
 a genuine object in that envelope. Nothing in this module depends on a family
 of schemes or on pullback; those consumers live under `DerivedCategory/Families/`.
+
+The closing section gives every line bundle a canonical image in this
+category: `LineBundleData.coh` packages the underlying sheaf with its
+coherence proof, and `LineBundleData.derivedObject` places it in degree zero
+of `D(Coh X)`, where it is perfect and bounded; `cohIso` and
+`derivedObjectIso` transport both along an isomorphism of underlying sheaves,
+so statements about a collection of line bundles are well-defined up to iso.
+This is the adapter geometric consumers use to speak about a line bundle *as
+a derived object* without re-deriving the `Coh`-object and `singleFunctor`
+plumbing each time.
 -/
 
 namespace AlgebraicGeometry.DerivedCategory
@@ -139,3 +149,101 @@ end SchemePerfectDerivedCategory
 end
 
 end AlgebraicGeometry.DerivedCategory
+
+/-! ### Line bundles as coherent derived objects
+
+A line bundle is coherent outright — `LineBundleData.isCoherent` needs no
+noetherian hypothesis — so it has a canonical `Coh X` avatar, and on a locally
+Noetherian scheme a canonical degree-zero derived object. The declarations
+live in the `LineBundleData` namespace for dot notation, following the
+precedent of `LineBundleData.toPic_eq_iff` in `CoherentSheaf/StructureSheaf.lean`. -/
+
+namespace AlgebraicGeometry.Scheme.Modules.LineBundleData
+
+open CategoryTheory AlgebraicGeometry.DerivedCategory
+
+noncomputable section
+
+universe u
+
+variable {X : Scheme.{u}}
+
+/-- A line bundle as an object of `Coh X`: the underlying sheaf paired with
+its coherence proof. No noetherian hypothesis enters, for the same reason as
+`Scheme.structureSheafCoh`: an invertible sheaf is of finite presentation
+outright. -/
+noncomputable def coh (L : LineBundleData X) : Coh X :=
+  ⟨L.line, L.isCoherent⟩
+
+@[simp]
+theorem coh_obj (L : LineBundleData X) : L.coh.obj = L.line :=
+  rfl
+
+/-- The unit line bundle's `Coh` avatar is the structure sheaf. Both sides are
+the same pair by definition; this records that the two routes to `O_X` in
+`Coh X` cannot drift apart. `X` is explicit because nothing else in the
+statement determines it, matching `unit_toPic`. -/
+@[simp]
+theorem unit_coh (X : Scheme.{u}) : (unit X).coh = Scheme.structureSheafCoh X :=
+  rfl
+
+/-- Lift an isomorphism of underlying sheaves to `Coh X`. The inclusion is
+fully faithful, so this is `ObjectProperty.isoMk`; it is what makes
+`coh` well-defined up to the choices a `LineBundleData` records. -/
+noncomputable def cohIso {L M : LineBundleData X} (e : L.line ≅ M.line) :
+    L.coh ≅ M.coh :=
+  ObjectProperty.isoMk (P := Scheme.coherent X) e
+
+variable [IsLocallyNoetherian X]
+
+/-- A line bundle placed in degree zero of `D(Coh X)` — not `Dᵇ(Coh X)` and
+not `Perf(X)`, which is why `unit_derivedObject` has to project `.obj` off
+`SchemePerfectDerivedCategory.structureSheaf`. This is definitionally the same
+`singleFunctor` expression `schemeFiniteLocallyFreeGenerator` uses inline, so
+`derivedObject_mem_generator` closes on `Iso.refl`. -/
+noncomputable def derivedObject (L : LineBundleData X) :
+    SchemeCoherentDerivedCategory X :=
+  (DerivedCategory.singleFunctor (Coh X) 0).obj L.coh
+
+/-- A line bundle satisfies the finite-locally-free generating property: its
+rank-one atlas `finiteLocallyFree` is exactly the witness the property asks
+for, in degree zero. -/
+theorem derivedObject_mem_generator (L : LineBundleData X) :
+    schemeFiniteLocallyFreeGenerator X L.derivedObject :=
+  ⟨L.coh, 1, ⟨L.finiteLocallyFree⟩, ⟨Iso.refl _⟩⟩
+
+/-- **Every line bundle is a perfect object** of the coherent derived
+category: it lies in the generating property itself, before the envelope
+adds shifts, sums, cones, and retracts. -/
+theorem derivedObject_perfect (L : LineBundleData X) :
+    schemePerfect X L.derivedObject :=
+  (schemeFiniteLocallyFreeGenerator X).le_triangEnvelope _
+    L.derivedObject_mem_generator
+
+/-- A line bundle is bounded for the canonical t-structure, through
+`schemeFiniteLocallyFreeGenerator_le_bounded` rather than a fresh degree
+computation. -/
+theorem derivedObject_bounded (L : LineBundleData X) :
+    (DerivedCategory.TStructure.t (C := Coh X)).bounded L.derivedObject :=
+  schemeFiniteLocallyFreeGenerator_le_bounded X _ L.derivedObject_mem_generator
+
+/-- Lift an isomorphism of underlying sheaves to the derived objects. Needed
+by any collection of line bundles stated up to isomorphism: it is what makes
+membership statements about `derivedObject` transportable along a change of
+representative. -/
+noncomputable def derivedObjectIso {L M : LineBundleData X}
+    (e : L.line ≅ M.line) : L.derivedObject ≅ M.derivedObject :=
+  (DerivedCategory.singleFunctor (Coh X) 0).mapIso (cohIso e)
+
+/-- The unit line bundle's derived object is the underlying object of the
+canonical perfect structure sheaf. Definitional, so the two routes to `O_X`
+in `D(Coh X)` — through `LineBundleData` and through
+`SchemePerfectDerivedCategory.structureSheaf` — are identified for free. -/
+theorem unit_derivedObject (X : Scheme.{u}) [IsLocallyNoetherian X] :
+    (unit X).derivedObject =
+      (SchemePerfectDerivedCategory.structureSheaf X).obj :=
+  rfl
+
+end
+
+end AlgebraicGeometry.Scheme.Modules.LineBundleData

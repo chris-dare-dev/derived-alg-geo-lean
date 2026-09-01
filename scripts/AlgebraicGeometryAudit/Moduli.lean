@@ -55,6 +55,8 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.schemeRelativePerfect
 #print axioms AlgebraicGeometry.schemeRelativePerfect_isClosedUnderIsomorphisms
 #print axioms AlgebraicGeometry.SchemeRelativePerfectCategory
+#print axioms AlgebraicGeometry.SchemeRelativePerfectCategory.exists_boundedCoherentRepresentative
+#print axioms AlgebraicGeometry.SchemeRelativePerfectCategory.perfect_iff_compact
 #print axioms AlgebraicGeometry.GeometricFiberModel
 #print axioms AlgebraicGeometry.GeometricFiberModel.fiberComplex
 #print axioms AlgebraicGeometry.GeometricFiberModel.fiberObject
