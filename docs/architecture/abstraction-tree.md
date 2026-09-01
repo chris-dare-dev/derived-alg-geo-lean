@@ -218,6 +218,9 @@ particular:
 - keep basiswise detection of topological sheaf isomorphisms under
   `Topology/Sheaves/Basis.lean`; affine comparison consumes it only after
   introducing `Spec R`, distinguished opens, and module localization;
+- keep identities involving the lattice and categorical products of
+  prime-spectrum opens under `Topology/PrimeSpectrum/`; the commutative-ring
+  input does not make their topological output ordinary `Algebra`;
 - extend Mathlib's abelian-category hierarchy under `CategoryTheory/Abelian`
   and make the geometric proof that `Coh(X)` is abelian an input to the generic
   derived-category construction;

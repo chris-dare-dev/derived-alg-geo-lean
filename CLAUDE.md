@@ -25,6 +25,8 @@ The principal areas are:
   arbitrary ringed site;
 - `DerivedAlgGeo/Topology/Sheaves/Basis.lean` for basiswise detection of
   isomorphisms between sheaves on a topological space;
+- `DerivedAlgGeo/Topology/PrimeSpectrum/` for results combining a commutative
+  ring's prime spectrum with the lattice and categorical limits of its opens;
 - `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` for
   intrinsic rank-one module sheaves and local trivializations, with
   arbitrary-site tensor descent in the adjacent `Tensor.lean`;
@@ -85,6 +87,10 @@ concrete applications through explicit instance leaves.
   stalks of a topological space belong under `Topology/Sheaves/`. In
   particular, basiswise isomorphism detection is owned by `Basis.lean`, not by
   an affine-scheme comparison that consumes it.
+- Prime-spectrum statements whose full signature uses opens or their
+  categorical finite products belong under `Topology/PrimeSpectrum/`, not the
+  lower `Algebra/` layer. Ring input alone does not erase the topological
+  output or justify duplicating the opens-limit infrastructure.
 - Arbitrary-site over-category cocontinuity belongs in
   `CategoryTheory/Sites/Over.lean`; generic module-sheaf restriction to an
   over category belongs in `Sites/Sheaves/Modules/Over.lean`; and equivalence
@@ -382,6 +388,9 @@ documentation, architecture checks, and CI paths together.
 - Basiswise detection of isomorphisms between sheaves on a topological space
   belongs in `Topology/Sheaves/Basis.lean`; geometric comparison files import
   that root directly and must not redeclare its generic prefix.
+- Finite-product identities for basic opens belong in
+  `Topology/PrimeSpectrum/BasicOpen.lean`. Affine Čech consumers import that
+  root directly and begin only when scheme sheaves and Čech complexes enter.
 - Use the global `ZLattice` class from `LinearAlgebra/Lattice/Basic.lean` for
   finite free abelian groups. Its construction from finite torsion-free groups
   is generic; only the theorem applying it to a numerical Euler-radical

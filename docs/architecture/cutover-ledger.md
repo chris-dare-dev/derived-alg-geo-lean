@@ -237,12 +237,22 @@ blocks should normally move it rather than add more declarations beside it.
   `AlgebraicGeometry/Modules/Affine/Comparison.lean` imports that root and now
   begins with scheme modules, distinguished opens, and localization. Both
   declaration names are preserved without a compatibility shim.
+- Finite products of prime-spectrum basic opens:
+  `Topology/PrimeSpectrum/BasicOpen.lean` owns
+  `PrimeSpectrum.basicOpen_prod_eq_pi`, while
+  `AlgebraicGeometry/Cohomology/Cech/Affine.lean` imports it and retains only
+  the private localization machinery and public affine Čech exactness
+  theorems. The declaration name and full signature are preserved without a
+  compatibility shim. The earlier queue classified this under `Algebra/` from
+  its ring input alone; the complete signature instead contains
+  `Opens (PrimeSpectrum R)` and a categorical finite product supplied by
+  `Topology/Opens/Limits`, so `Topology/PrimeSpectrum/` is the first valid
+  owner without a forbidden `Algebra -> Topology` edge.
 
 ## Confirmed next lanes
 
-- `PrimeSpectrum.basicOpen_prod_eq_pi` remains at the front of
-  `AlgebraicGeometry/Cohomology/Cech/Affine.lean`; its signature requires only
-  the prime spectrum of a commutative ring and belongs under `Algebra/`.
+No additional lane is confirmed by the current signature audit. Re-run the
+consumer-prefix census before adding another item to this queue.
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and

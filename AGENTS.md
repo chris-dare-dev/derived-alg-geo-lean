@@ -25,6 +25,10 @@ first application that motivated it.
   germs, or stalks of a topological space under `Topology/Sheaves/`.
   Basiswise detection of a sheaf isomorphism belongs in
   `Topology/Sheaves/Basis.lean`; affine comparison imports it as a consumer.
+- Put results combining a prime spectrum with its lattice of opens under
+  `Topology/PrimeSpectrum/`. Even when the input is only a commutative ring,
+  categorical products of basic opens require the topological opens-limit
+  owner and therefore do not belong in the lower `Algebra/` layer.
 - Over-category cocontinuity for arbitrary sites belongs in
   `CategoryTheory/Sites/Over.lean`; restriction API for module sheaves on an
   arbitrary ringed site belongs in
@@ -142,6 +146,10 @@ application, current file, namespace, or proof technique.
 - A criterion detecting that a sheaf morphism is an isomorphism from its
   components on a basis belongs in `Topology/Sheaves/Basis.lean`, not at the
   front of an affine-scheme consumer.
+- A theorem whose result is an equality of opens in `PrimeSpectrum R` belongs
+  under `Topology/PrimeSpectrum/` when its signature uses the lattice or
+  categorical products of opens. Do not force it into `Algebra/` by duplicating
+  or hiding the `Topology/Opens/Limits` dependency.
 - Kernel maps for ordinary localized modules, including their `ModuleCat`
   formulation, belong under `Algebra/Module/Localization/`. Coherent-sheaf
   arguments import that algebraic owner and add only the scheme-dependent
