@@ -480,6 +480,7 @@ the explicit instance umbrellas attached to their categorical sources:
 | Generic abelian-category extensions | `DerivedAlgGeo.CategoryTheory.Abelian` |
 | Generic sheaves and ringed-site module sheaves | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves` |
 | Over-site cocontinuity, covering-family transport, and module-sheaf restriction | `DerivedAlgGeo.CategoryTheory.Sites.Over`, `DerivedAlgGeo.CategoryTheory.Sites.CoversTop`, and `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Over` |
+| Presentation, generating-section, and quasicoherent-data restriction to over sites | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Over` |
 | Generic stacks and representable fibers | `DerivedAlgGeo.CategoryTheory.Sites` |
 | Weak-stability family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families` |
 | Ordinary Bridgeland family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families` |

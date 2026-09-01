@@ -202,6 +202,9 @@ particular:
   and equivalence transport of `CoversTop` families under the generic site and
   sheaf roots; open-immersion geometry consumes them only after introducing
   schemes and their open-set sites;
+- keep restriction of presentations, generating sections, and quasicoherent
+  presentation data under the generic ringed-site presentation root; affine
+  geometry consumes that API only when it introduces `Spec R` and basic opens;
 - keep stalk/tensor comparisons for module presheaves under
   `Topology/Sheaves/ModuleTensor/`: their use of open neighbourhoods, germs,
   and stalk functors makes them topological specializations of arbitrary-site

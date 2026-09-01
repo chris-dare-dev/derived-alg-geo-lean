@@ -189,6 +189,14 @@ blocks should normally move it rather than add more declarations beside it.
   equivalence. `AlgebraicGeometry/Modules/Restriction/OpenImmersion.lean`
   imports these roots and now begins at the scheme/open-site equivalence; the
   three declaration names are preserved without a compatibility shim.
+- Ringed-site presentation restriction:
+  `CategoryTheory/Sites/Sheaves/Modules/Presentation/Over.lean` owns
+  restriction of `Presentation`, `GeneratingSections`, and
+  `QuasicoherentData` to over sites, including preservation of a finite
+  generating index. `AlgebraicGeometry/Modules/Affine/{BasicOpen,Finiteness}.lean`
+  import that root directly and now begin with `Spec R`, distinguished opens,
+  and affine finiteness. The seven declaration names are preserved without a
+  compatibility shim.
 - Generic invertible module sheaves and tensor/sheafification descent:
   `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` owns rank-one local
   generator data, intrinsic `SheafOfModules.IsInvertible`, transport, finite
@@ -208,9 +216,21 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-- No additional reverse-ownership block was confirmed while moving the
-  over-site restriction prefix. The next lane should be selected by a fresh
-  signature audit of mixed-owner consumers.
+- Finite-presentation isomorphism and locality APIs stated on arbitrary
+  ringed sites remain in
+  `AlgebraicGeometry/CoherentSheaf/{Basic/Isomorphism,Descent/Locality}.lean`;
+  their canonical owner is the categorical module-sheaf presentation subtree.
+- Closure of finite-presentation module sheaves under zero objects and
+  extensions remains in
+  `AlgebraicGeometry/CoherentSheaf/Abelian/{Basic,Extensions}.lean`; only the
+  resulting coherent-sheaf instances are geometric.
+- Basiswise detection of isomorphisms for sheaves on a topological space
+  remains at the front of
+  `AlgebraicGeometry/Modules/Affine/Comparison.lean`; its canonical owner is
+  `Topology/Sheaves/`.
+- `PrimeSpectrum.basicOpen_prod_eq_pi` remains at the front of
+  `AlgebraicGeometry/Cohomology/Cech/Affine.lean`; its signature requires only
+  the prime spectrum of a commutative ring and belongs under `Algebra/`.
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and

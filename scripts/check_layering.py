@@ -1437,6 +1437,7 @@ def main() -> int:
         generic_sheaves_root / "Modules" / "Exactness.lean",
         generic_sheaves_root / "Modules" / "Invertible.lean",
         generic_sheaves_root / "Modules" / "Over.lean",
+        generic_sheaves_root / "Modules" / "Presentation" / "Over.lean",
         generic_sheaves_root / "Modules" / "Presentation" / "Transport.lean",
         generic_sheaves_root / "Modules" / "Presentation" / "Finite.lean",
         generic_sheaves_root / "Modules" / "Tensor.lean",
@@ -1526,6 +1527,60 @@ def main() -> int:
             f"{modules_umbrella.relative_to(ROOT)}: missing module-sheaf over-category "
             f"umbrella import {module_over_import}"
         )
+
+    presentation_over_owner = (
+        generic_sheaves_root / "Modules" / "Presentation" / "Over.lean"
+    )
+    presentation_over_import = (
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Over"
+    )
+    presentation_over_fragments = (
+        "noncomputable def Presentation.over",
+        "noncomputable def GeneratingSections.over",
+        "instance GeneratingSections.isFiniteType_over",
+        "noncomputable def QuasicoherentData.presentationOver",
+        "theorem QuasicoherentData.presentationOver_generators_I",
+        "theorem QuasicoherentData.presentationOver_relations_I",
+        "noncomputable def QuasicoherentData.over",
+    )
+    if presentation_over_owner.is_file():
+        presentation_over_text = presentation_over_owner.read_text(encoding="utf-8")
+        for fragment in presentation_over_fragments:
+            if fragment not in presentation_over_text:
+                failures.append(
+                    f"{presentation_over_owner.relative_to(ROOT)}: missing arbitrary-site "
+                    f"presentation-restriction declaration {fragment!r}"
+                )
+
+    presentation_umbrella = generic_sheaves_root / "Modules" / "Presentation.lean"
+    if presentation_over_import not in imports_by_path[presentation_umbrella]:
+        failures.append(
+            f"{presentation_umbrella.relative_to(ROOT)}: missing arbitrary-site "
+            f"presentation-restriction umbrella import {presentation_over_import}"
+        )
+
+    presentation_over_consumers = {
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Affine" /
+            "BasicOpen.lean": presentation_over_fragments[0:1] +
+                presentation_over_fragments[3:],
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Affine" /
+            "Finiteness.lean": presentation_over_fragments[1:3],
+        SOURCE_ROOT / "AlgebraicGeometry" / "CoherentSheaf" / "Descent" /
+            "Locality.lean": (),
+    }
+    for path, forbidden_fragments in presentation_over_consumers.items():
+        if presentation_over_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: geometric presentation consumer must "
+                f"import the categorical owner {presentation_over_import} directly"
+            )
+        text = path.read_text(encoding="utf-8")
+        for fragment in forbidden_fragments:
+            if fragment in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: restored arbitrary-site "
+                    f"presentation-restriction declaration {fragment!r} in geometry"
+                )
 
     open_immersion_consumer = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Restriction" /
@@ -3703,6 +3758,10 @@ def main() -> int:
     print(
         "ok: over-site cocontinuity, CoversTop equivalence transport, and "
         "module-sheaf restriction use categorical roots; open immersions consume them"
+    )
+    print(
+        "ok: presentation, generating-section, and quasicoherent-data restriction "
+        "to over sites use the arbitrary-site module-sheaf owner"
     )
     print(
         "ok: bicategorical adjunction is the higher source, ordinary adjunction "

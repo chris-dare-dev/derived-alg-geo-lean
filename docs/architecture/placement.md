@@ -127,10 +127,13 @@ The same signature test places cocontinuity of `Over.post F` at
 `CategoryTheory/Sites/Over.lean`, the definitional module-sheaf restriction API
 at `CategoryTheory/Sites/Sheaves/Modules/Over.lean`, and transport of a
 `CoversTop` family through a cover-preserving equivalence at
-`CategoryTheory/Sites/CoversTop.lean`. None of these signatures requires a
-scheme. `AlgebraicGeometry/Modules/Restriction/OpenImmersion.lean` is the
-consumer: it imports all three owners and begins with the equivalence between
-the over site of an open range and the source scheme's open-set site.
+`CategoryTheory/Sites/CoversTop.lean`. Restriction of `Presentation`,
+`GeneratingSections`, and `QuasicoherentData` along those over sites is rooted
+at `CategoryTheory/Sites/Sheaves/Modules/Presentation/Over.lean`. None of these
+signatures requires a scheme. The open-immersion and affine module files are
+consumers: they import these owners and begin with schemes, distinguished
+opens, or the equivalence between an open range and the source scheme's
+open-set site.
 
 The predicate that local generator data has rank one, the intrinsic
 `SheafOfModules.IsInvertible` class, transport and local trivialization of that

@@ -1207,10 +1207,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms SheafOfModules.IsFinitePresentation.of_iso
 #print axioms SheafOfModules.isFinitePresentation_isClosedUnderIsomorphisms
 #print axioms Scheme.coherent_isClosedUnderIsomorphisms
-#print axioms SheafOfModules.QuasicoherentData.presentationOver
-#print axioms SheafOfModules.QuasicoherentData.presentationOver_generators_I
-#print axioms SheafOfModules.QuasicoherentData.presentationOver_relations_I
-#print axioms SheafOfModules.QuasicoherentData.over
 #print axioms SheafOfModules.QuasicoherentData.isFinitePresentation_over
 #print axioms SheafOfModules.IsFinitePresentation.over
 #print axioms SheafOfModules.IsFinitePresentation.of_coversTop
@@ -1264,8 +1260,8 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule
 
 -- Layer B stage 1: a quasi-coherent sheaf on an affine scheme has presentations on a
--- basic-open cover. The first declaration is the reusable iterated-slice restriction step.
-#print axioms SheafOfModules.Presentation.over
+-- basic-open cover. The reusable iterated-slice restriction step is audited with its
+-- categorical owner.
 #print axioms Scheme.Modules.exists_basicOpen_presentation_cover
 #print axioms Scheme.Hom.opensRangeModulesEquivalenceInverseUnitIso
 #print axioms Scheme.Hom.restrictPresentation
@@ -1279,8 +1275,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- generators and presentations are transported to affine basic opens, where the comparison
 -- turns them into finite modules; localisation patching then returns to `Spec R`.
 #print axioms SheafOfModules.GeneratingSections.map
-#print axioms SheafOfModules.GeneratingSections.over
-#print axioms SheafOfModules.GeneratingSections.isFiniteType_over
 #print axioms Scheme.Modules.basicOpenSpecMap
 #print axioms Scheme.Modules.basicOpenSpecMap_opensRange
 #print axioms Scheme.Modules.restrictBasicOpenTopLinearEquiv
