@@ -19,7 +19,7 @@ needs before it can carry a triangulated structure.
 Through the **five-term** homology long exact sequence, closure under cones
 needs closure under kernels, cokernels and extensions — not under subobjects and
 quotients, which quasi-coherence does not have.  See
-`CategoryTheory/Abelian/WeakSerre.lean`; an earlier version of this paragraph
+`CategoryTheory/Abelian/SerreClass/Weak.lean`; an earlier version of this paragraph
 claimed the stronger closure, and it is not what the argument uses.
 
 ## Why cohomology, when the coherent case needed none

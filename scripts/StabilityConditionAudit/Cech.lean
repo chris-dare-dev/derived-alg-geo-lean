@@ -2,8 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Simplicial
-import DerivedAlgGeo.CategoryTheory.Sites.Cech
+import DerivedAlgGeo.AlgebraicTopology
+import DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech
+import DerivedAlgGeo.Topology.Sheaves.Cech
 
 /-!
 Axiom audit for generic cosimplicial exactness and site-theoretic Čech

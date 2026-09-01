@@ -4,8 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Basic.Isomorphism
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Locality
-import DerivedAlgGeo.Topology.Opens.Limits
-import DerivedAlgGeo.Topology.Opens.CoversTop
+import DerivedAlgGeo.Topology.Category.TopCat.Opens.Limits
+import DerivedAlgGeo.Topology.Category.TopCat.Opens.CoversTop
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.OpenImmersion
 import Mathlib.AlgebraicGeometry.Cover.Open
 import Mathlib.CategoryTheory.Limits.Constructions.Over.Products

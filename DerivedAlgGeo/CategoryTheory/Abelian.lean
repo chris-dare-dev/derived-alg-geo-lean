@@ -1,1 +1,1 @@
-import DerivedAlgGeo.CategoryTheory.Abelian.WeakSerre
+import DerivedAlgGeo.CategoryTheory.Abelian.SerreClass

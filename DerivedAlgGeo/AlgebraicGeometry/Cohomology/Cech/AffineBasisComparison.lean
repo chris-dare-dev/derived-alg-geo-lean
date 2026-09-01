@@ -4,8 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Equivalence
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Affine
-import DerivedAlgGeo.CategoryTheory.Sites.Cech.BasisComparison
-import DerivedAlgGeo.CategoryTheory.Sites.Cech.ModuleForget
+import DerivedAlgGeo.Topology.Sheaves.Cech.BasisComparison
+import DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech.ModuleForget
 
 /-!
 # Affine Čech-to-derived comparison on the distinguished-open basis

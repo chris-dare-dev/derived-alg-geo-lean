@@ -298,6 +298,20 @@ blocks should normally move it rather than add more declarations beside it.
   gained the umbrellas the tree never had. Declaration names and namespaces
   are unchanged; the sweep routes the subtree to the audit lane that holds its
   records.
+- Site, bicategory, abelian, simplicial, ring-theoretic, and topological
+  extensions at Mathlib's paths (2026-09-01): site-level Čech theory moved to
+  `CategoryTheory/Sites/SheafCohomology/Cech/` and its topological half
+  (compact-open bases, boundedness, the free abelian Yoneda stalk, global
+  sections, injective and flasque acyclicity) to `Topology/Sheaves/Cech/`;
+  stacks in groupoids to `CategoryTheory/Sites/Descent/StackInGroupoids/`;
+  pseudofunctor loci and transport to `CategoryTheory/Bicategory/Functor/Cat/`;
+  weak Serre classes to `CategoryTheory/Abelian/SerreClass/Weak.lean`; the
+  extra-codegeneracy contraction to `AlgebraicTopology/`; basic-open products
+  to `RingTheory/Spectrum/Prime/BasicOpen.lean`; and the opens category to
+  `Topology/Category/TopCat/Opens/`. Umbrellas exist at every new level, the
+  public root exports the two new subjects, and the sweep routes each moved
+  subtree to the audit lane that holds its records. Declaration names and
+  namespaces are unchanged.
 
 ## Confirmed next lanes
 
@@ -308,13 +322,6 @@ already names the target, and new code uses the target path immediately.
 
 | Current path | Target path |
 | --- | --- |
-| `CategoryTheory/Sites/Cech/` | `CategoryTheory/Sites/SheafCohomology/Cech/` |
-| `CategoryTheory/Sites/StackInGroupoids/` | `CategoryTheory/Sites/Descent/StackInGroupoids/` |
-| `CategoryTheory/Pseudofunctor/` | `CategoryTheory/Bicategory/Functor/Cat/` |
-| `CategoryTheory/Abelian/WeakSerre.lean` | `CategoryTheory/Abelian/SerreClass/Weak.lean` |
-| `CategoryTheory/Simplicial/` | `AlgebraicTopology/` |
-| `Topology/PrimeSpectrum/` | `RingTheory/Spectrum/Prime/` |
-| `Topology/Opens/` | `Topology/Category/TopCat/Opens/` |
 | `AlgebraicGeometry/Proj/` | `AlgebraicGeometry/ProjectiveSpectrum/` |
 | `AlgebraicGeometry/CoherentSheaf/` | `AlgebraicGeometry/Modules/Coherent/`, with `Quasicoherent/` beside it |
 | `CategoryTheory/Triangulated/WeakStabilityCondition/` | `CategoryTheory/Triangulated/StabilityCondition/` with weak stability as the child `Weak/` |

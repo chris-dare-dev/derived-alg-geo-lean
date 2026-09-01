@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Duality.Canonical.Differentials
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.LineBundleDual
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible
-import DerivedAlgGeo.Topology.Opens.CoversTop
+import DerivedAlgGeo.Topology.Category.TopCat.Opens.CoversTop
 
 /-!
 # Fixed-rank descent for the relative cotangent sheaf

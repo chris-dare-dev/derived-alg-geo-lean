@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Bicategory.Basic
 import DerivedAlgGeo.CategoryTheory.Bicategory.Adjunction
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor
 
 /-!
 # Bicategorical foundations

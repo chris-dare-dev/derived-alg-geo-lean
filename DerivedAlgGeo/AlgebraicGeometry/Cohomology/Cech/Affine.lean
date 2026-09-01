@@ -3,9 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Module.LocalizedRadical
-import DerivedAlgGeo.CategoryTheory.Sites.Cech.Contractible
-import DerivedAlgGeo.Topology.Opens.Limits
-import DerivedAlgGeo.Topology.PrimeSpectrum.BasicOpen
+import DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech.Contractible
+import DerivedAlgGeo.Topology.Category.TopCat.Opens.Limits
+import DerivedAlgGeo.RingTheory.Spectrum.Prime.BasicOpen
 import Mathlib.Algebra.Category.ModuleCat.Products
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 import Mathlib.AlgebraicGeometry.Modules.Tilde

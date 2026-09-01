@@ -5,8 +5,10 @@ Released under the MIT license.
 
 import DerivedAlgGeo.Algebra
 import DerivedAlgGeo.AlgebraicGeometry
+import DerivedAlgGeo.AlgebraicTopology
 import DerivedAlgGeo.CategoryTheory
 import DerivedAlgGeo.LinearAlgebra
+import DerivedAlgGeo.RingTheory
 import DerivedAlgGeo.Topology
 
 /-!

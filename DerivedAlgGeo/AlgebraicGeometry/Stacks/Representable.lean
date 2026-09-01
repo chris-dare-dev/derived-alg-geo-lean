@@ -3,15 +3,15 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.AlgebraicGeometry.Sites.BigZariski
-import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids.Discrete
-import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids.Morphism
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 
 /-!
 # Representable big-Zariski stacks
 
 The generic construction of a discrete stack from a sheaf and the generic
 notion of a representable stack morphism are owned by
-`CategoryTheory/Sites/StackInGroupoids`.  This geometric consumer applies
+`CategoryTheory/Sites/Descent/StackInGroupoids`.  This geometric consumer applies
 that API to the subcanonical big-Zariski site of schemes.
 -/
 

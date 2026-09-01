@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineVanishing
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Basic
-import DerivedAlgGeo.CategoryTheory.Sites.Cech.Boundedness
+import DerivedAlgGeo.Topology.Sheaves.Cech.Boundedness
 import Mathlib.AlgebraicGeometry.Morphisms.Affine
 import Mathlib.AlgebraicGeometry.Morphisms.QuasiCompact
 

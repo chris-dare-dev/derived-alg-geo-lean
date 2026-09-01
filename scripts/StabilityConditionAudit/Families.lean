@@ -5,8 +5,8 @@ family records are owned by
 `AlgebraicGeometryAudit/StabilityConditionFamilies.lean`.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
-import DerivedAlgGeo.CategoryTheory.Pseudofunctor.Transport
-import DerivedAlgGeo.CategoryTheory.Pseudofunctor.ObjectProperty.UniversallyStable
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.ObjectProperty.UniversallyStable
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda

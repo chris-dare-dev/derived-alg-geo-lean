@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Basic.Definitions
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Finiteness
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Finite
-import DerivedAlgGeo.Topology.Opens.Limits
+import DerivedAlgGeo.Topology.Category.TopCat.Opens.Limits
 import Mathlib.Algebra.Category.FGModuleCat.Basic
 import Mathlib.AlgebraicGeometry.Modules.Tilde
 import Mathlib.Algebra.Module.FinitePresentation

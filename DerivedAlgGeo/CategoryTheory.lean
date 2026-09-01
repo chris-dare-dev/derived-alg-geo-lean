@@ -9,11 +9,9 @@ import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Limits
 import DerivedAlgGeo.CategoryTheory.Monoidal
 import DerivedAlgGeo.CategoryTheory.Sites
-import DerivedAlgGeo.CategoryTheory.Simplicial
 import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated
 import DerivedAlgGeo.CategoryTheory.Moduli
-import DerivedAlgGeo.CategoryTheory.Pseudofunctor
 import DerivedAlgGeo.CategoryTheory.StabilityCharge
 
 /-! # Category theory
