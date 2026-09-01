@@ -2997,6 +2997,3 @@ not the conclusion renamed. `mukaiVectorQuotient` is what it buys.
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorQuotient
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorQuotient_mk
 #print axioms AlgebraicGeometry.moduleFinite_sections_restrict_of_isCoherent
-#print axioms SheafOfModules.GeneratingSections.ofFreeEpi
-#print axioms SheafOfModules.GeneratingSections.isFiniteType_ofFreeEpi
-#print axioms SheafOfModules.GeneratingSections.ofFreeEpi_π

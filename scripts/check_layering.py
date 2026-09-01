@@ -1532,6 +1532,60 @@ def main() -> int:
             f"umbrella import {module_over_import}"
         )
 
+    generating_sections_owner = (
+        generic_sheaves_root / "Modules" / "GeneratingSections.lean"
+    )
+    generating_sections_import = (
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.GeneratingSections"
+    )
+    generating_sections_fragments = (
+        "noncomputable def GeneratingSections.ofFreeEpi",
+        "instance GeneratingSections.isFiniteType_ofFreeEpi",
+        "lemma GeneratingSections.ofFreeEpi_π",
+    )
+    if not generating_sections_owner.is_file():
+        failures.append(
+            f"categorical generating-sections owner missing: "
+            f"{generating_sections_owner.relative_to(ROOT)}"
+        )
+    else:
+        generating_sections_text = generating_sections_owner.read_text(
+            encoding="utf-8"
+        )
+        for fragment in generating_sections_fragments:
+            if fragment not in generating_sections_text:
+                failures.append(
+                    f"{generating_sections_owner.relative_to(ROOT)}: missing "
+                    f"arbitrary-site generating-sections declaration {fragment!r}"
+                )
+        if "AlgebraicGeometry" in generating_sections_text:
+            failures.append(
+                f"{generating_sections_owner.relative_to(ROOT)}: categorical "
+                "generating-sections owner mentions algebraic geometry"
+            )
+
+    if generating_sections_import not in imports_by_path[modules_umbrella]:
+        failures.append(
+            f"{modules_umbrella.relative_to(ROOT)}: missing arbitrary-site "
+            f"generating-sections import {generating_sections_import}"
+        )
+
+    affine_chart_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "CoherentSheaf" / "AffineChart.lean"
+    )
+    if generating_sections_import not in imports_by_path[affine_chart_consumer]:
+        failures.append(
+            f"{affine_chart_consumer.relative_to(ROOT)}: affine-chart consumer "
+            f"must import the categorical owner {generating_sections_import} directly"
+        )
+    affine_chart_text = affine_chart_consumer.read_text(encoding="utf-8")
+    for fragment in generating_sections_fragments:
+        if fragment in affine_chart_text:
+            failures.append(
+                f"{affine_chart_consumer.relative_to(ROOT)}: restored arbitrary-site "
+                f"generating-sections declaration {fragment!r} in geometry"
+            )
+
     presentation_over_owner = (
         generic_sheaves_root / "Modules" / "Presentation" / "Over.lean"
     )

@@ -63,6 +63,11 @@ under short-exact extensions belong in `Presentation/{Zero,Extensions}.lean`.
 Coherent-sheaf consumers begin only when `coherent X`, `Coh X`, affine covers,
 or scheme restrictions enter the type.
 
+Constructing `SheafOfModules.GeneratingSections` from a free epimorphism is
+also arbitrary-site module-sheaf theory and belongs in
+`CategoryTheory/Sites/Sheaves/Modules/GeneratingSections.lean`; an affine
+chart imports that owner rather than declaring the generic construction.
+
 Intrinsic rank-one local-generator data, invertible module sheaves, their local
 trivializations, and tensor/sheafification descent with a rank-one factor use
 only an arbitrary ringed site. They belong in

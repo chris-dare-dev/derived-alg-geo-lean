@@ -140,6 +140,15 @@ coherent-sheaf files are consumers: they import these owners and begin with
 schemes, distinguished opens, `coherent X`, `Coh X`, or the equivalence between
 an open range and the source scheme's open-set site.
 
+The converse packaging of a free epimorphism
+`SheafOfModules.free I ⟶ M` as `M.GeneratingSections` is more general still:
+its full signature uses only a ring sheaf on an arbitrary site. Its owner is
+`CategoryTheory/Sites/Sheaves/Modules/GeneratingSections.lean`, together with
+the finite-index instance and the lemma recovering the original epimorphism.
+`AlgebraicGeometry/CoherentSheaf/AffineChart.lean` consumes that root and owns
+only the theorem whose signature introduces an affine scheme open and
+coherence.
+
 The predicate that local generator data has rank one, the intrinsic
 `SheafOfModules.IsInvertible` class, transport and local trivialization of that
 data, and reconstruction from a covering family require only a sheaf of rings

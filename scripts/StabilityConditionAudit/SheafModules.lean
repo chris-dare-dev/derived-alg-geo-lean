@@ -5,6 +5,12 @@ of schemes.
 -/
 import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules
 
+/-! ## Generating sections from free epimorphisms -/
+
+#print axioms SheafOfModules.GeneratingSections.ofFreeEpi
+#print axioms SheafOfModules.GeneratingSections.isFiniteType_ofFreeEpi
+#print axioms SheafOfModules.GeneratingSections.ofFreeEpi_π
+
 /-! ## Transporting finite presentations on a ringed site -/
 
 #print axioms SheafOfModules.Presentation.isFinite_of_isIso
