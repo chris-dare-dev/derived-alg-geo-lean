@@ -1,0 +1,170 @@
+schema: roadmap/1
+slug: enriques-torelli
+project: derived-alg-geo-lean
+title: "Enriques derived Torelli — foundations for arXiv:1912.04332 and 2104.13610"
+status: active
+phase: sequenced
+brief: |
+  This track builds the foundations for the refined derived Torelli theorem of
+  Li--Nuer--Stellari--Zhao: an Enriques surface is determined by its Kuznetsov
+  component. The mathematical chain is: the geometric definition (2-torsion
+  canonical class), the isotropic 10-sequence and its Fano-class arithmetic,
+  the ten associated line bundles as exceptional objects in `Dᵇ(Coh Y)`, the
+  semiorthogonal sequence they span, and its residual component.
+
+  The lane deliberately splits by ownership. Exceptionality, exceptional
+  collections, admissibility, and the generic residual component are
+  categorical and live under the semiorthogonal root that projective-families
+  epic #852 created and left deliberately inhabitant-free ("exceptionality
+  and mutation remain deferred until a theorem consumes them" — this lane is
+  the consuming theorem's arrival, tracked as #932--#936). The surface
+  definition, the collection data, the cohomological witnesses, and the
+  residual component of a concrete surface are geometric. The lattice
+  arithmetic of isotropic sequences is pure linear algebra and mentions no
+  geometry at all.
+
+  Foundations (milestone #43) landed 2026-08-31/09-01: the definition, the
+  line-bundle derived-object adapter, the numerical model, and the isotropic
+  sequence root. The remaining three epics are blocked on the categorical
+  exceptionality lane and on each other, in the order collection →
+  exceptionality → semiorthogonal sequence and residual component.
+goal:
+  hmw: "How might we state and eventually prove the refined derived Torelli theorem for Enriques surfaces on top of the repository's single derived-category construction, without a second exceptionality hierarchy, a premature Kuznetsov-component equivalence, or geometry leaking into the categorical root?"
+  objective: "Define Enriques surfaces and their semi-canonical ten-bundle configurations, bind the bundles to the generic exceptional-object interface through explicit cohomological witnesses, and assemble the semiorthogonal sequence whose residual component the source papers call Ku(Y)."
+  key_results:
+    - "IsEnriquesSurface is Prop-valued over supplied canonical-sheaf data, with both torsion clauses consumed by sheaf-level theorems and the char-2 exclusion documented rather than encoded."
+    - "Every line bundle has a canonical perfect, bounded degree-zero avatar in D(Coh X) through one adapter, not per-consumer plumbing."
+    - "The isotropic-sequence lattice root proves linear independence and the sum-vector identities behind Δ·F_i = 3 and Δ² = 10, with no symmetry hypothesis."
+    - "Exceptionality of the ten bundles is a reduction to named cohomological inputs in the fields-not-theorems idiom, never a silent axiom."
+    - "The residual component is stated through the generic semiorthogonal root and carries a neutral name until the identification with the papers' Ku(Y) is a theorem."
+architecture_contract:
+  policy: "docs/architecture/abstraction-tree.md"
+  canonical_roots:
+    surface_definition: "SmoothProperVariety + CanonicalSheafData, following the K3 pattern in AlgebraicGeometry/Surface/K3.lean"
+    derived_category: "AlgebraicGeometry/DerivedCategory/Coherent.lean; the generic construction is Mathlib's DerivedCategory"
+    semiorthogonal: "CategoryTheory/Triangulated/SemiorthogonalDecomposition/, the #852 root; exceptionality lands there via #932--#936"
+    lattice: "LinearAlgebra/Lattice/, IntegralLattice namespace, bilinear maps into ℤ"
+    line_bundles: "Scheme.Modules.LineBundleData; Pic X for torsion statements"
+  prohibited:
+    - "a second exceptionality or semiorthogonal carrier below algebraic geometry"
+    - "a declaration named for the papers' Kuznetsov component before the identification is a theorem (ADR-0005 vocabulary discipline)"
+    - "characteristic hypotheses as structure fields rather than per-theorem assumptions"
+    - "ampleness or polarization claims: no such API exists, and clauses needing it enter as supplied data with the gap recorded"
+source:
+  work: "Li--Nuer--Stellari--Zhao, A refined Derived Torelli Theorem for Enriques surfaces; Li--Stellari--Zhao, II: the non-generic case"
+  arxiv: "1912.04332"
+evidence:
+  - "arXiv:1912.04332v2 §§2--3 for the isotropic 10-sequence, the semi-canonical collection, and the semiorthogonal decomposition; arXiv:2104.13610v2 for the non-generic extension."
+  - "The 2026-08-31 derived-category binding audit (ag-lean-handoff/derived-category-binding-audit/) and its landed remediation: the Coherent.lean owner (#982), the Duality rebind (#993), and the Dqc identification consumer API (#995)."
+  - "The semiorthogonal reconnaissance note (.claude/notes/2026-08-28-semiorthogonal-reconnaissance.md) deferring exceptionality to the first consuming theorem."
+  - "Issue drafts and dependency graph: ag-lean-handoff/enriques-torelli-lane/ISSUES.md."
+wont:
+  - "No claim that any Enriques surface, canonical-sheaf package, or isotropic collection has been constructed; every foundation is conditional data in the repository's ledger idiom."
+  - "No derived Torelli statement until the exceptionality and fullness layers exist; the theorem is the destination, not a milestone entry."
+  - "No K3 double cover machinery in this milestone; paper II's arguments will file their own epics."
+  - "No numerical-to-geometric bridge: the rank-one Enriques model witnesses only the numerical shadow, as its module docstring records."
+generated_by: { agent: claude, at: "2026-09-01" }
+generations:
+  - { rev: 1, at: "2026-09-01", note: "Lane registered after the foundations landed. #984 (definition, PR #991), #985 (line-bundle derived objects, PR #992), #986 (numerical model, PR #994), #987 (isotropic sequences, PRs #996/#997) all merged; the review pass corrected the Fano-class arithmetic to Δ·F_i = 3 on the permanent record. #988--#990 remain blocked on the categorical exceptionality lane #932--#936 and on each other. The EnumDecls eq_-prefix sweep bug found during #987 is filed as #998 outside this lane." }
+items:
+  - id: enriques-torelli-m1
+    gh_milestone: 43
+    kind: milestone
+    title: "ENQ1 — Enriques derived Torelli foundations"
+    status: in_progress
+    lane: now
+    acceptance:
+      - "The geometric definition, the derived-object adapter, the numerical model, and the lattice root are merged with their reviews applied."
+      - "The collection, exceptionality, and residual-component epics consume the categorical exceptionality root #932--#936 rather than duplicating it."
+      - "Zero sorries; relevant gates and runner verification are green."
+
+  - id: enriques-torelli-e1
+    gh_issue: 984
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "An Enriques surface: 2-torsion canonical class over supplied canonical-sheaf data"
+    status: done
+    priority: must
+    size: M
+    summary: "IsEnriquesSurface mirrors IsK3Surface over a supplied CanonicalSheafData 2: projectivity, κ² = 1 and κ ≠ 1 in Pic, H¹(O) = 0. Both torsion clauses have sheaf-level consumers, the class is its own inverse, no package witnesses both this and IsK3Surface, and EnriquesSurface bundles the data. Merged as PR #991."
+    tags: [enriques, surface, canonical-class]
+    labels: [area:lean, area:geometry, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e2
+    gh_issue: 985
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "Line bundles as bounded coherent derived objects"
+    status: done
+    priority: must
+    size: S
+    summary: "LineBundleData.coh and derivedObject place a line bundle in degree zero of D(Coh X), where it satisfies the finite-locally-free generating property outright and is perfect and bounded; iso transports and the definitional O_X identifications complete the adapter. Merged as PR #992."
+    tags: [line-bundle, derived-category, adapter]
+    labels: [area:lean, area:derived, type:feature]
+
+  - id: enriques-torelli-e3
+    gh_issue: 986
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "Numerical Enriques surface on the rank-one carrier"
+    status: done
+    priority: should
+    size: S
+    summary: "The fourth surface Todd class: td₁ = 0 because torsion dies in the numerical quotient, ∫td₂ = χ(O) = 1 strictly between the K3's 2 and the abelian surface's 0, with the three-presentation witness and the pairwise distinctions as theorems. Merged as PR #994."
+    tags: [numerical, todd-class, enriques]
+    labels: [area:lean, area:geometry, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e7
+    gh_issue: 987
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "Isotropic sequences in an integral bilinear lattice"
+    status: done
+    priority: must
+    size: M
+    summary: "IsIsotropicSequence with no symmetry hypothesis; the weighted pairing identity, the sum-vector identities behind Δ·F_i = 3 and Δ² = 10, coefficient separation, and linear independence for n ≥ 2, with the hyperbolic plane and the degenerate singleton as inhabitants. Merged as PRs #996 and #997; division by 3 deferred to the rank-ten lattice."
+    tags: [lattice, isotropic-sequence, fano-class]
+    labels: [area:lean, area:algebra, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e4
+    gh_issue: 988
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "The isotropic 10-collection of line bundles on an Enriques surface"
+    status: blocked
+    priority: must
+    size: M
+    summary: "Ten LineBundleData with intersection constraints stated against a supplied IntersectionContext, and the semi-canonical normalization transcribed from the papers' §2.3; supplied-data clauses record any gap (no ampleness API exists). Blocked on #984's merge reaching consumers — unblocked in practice; next in the lane."
+    tags: [enriques, collection, line-bundle]
+    labels: [area:lean, area:geometry, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e5
+    gh_issue: 989
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "Exceptionality of line bundles on an Enriques surface"
+    status: blocked
+    priority: must
+    size: L
+    summary: "The reduction ExtComparison data + h¹/h² vanishing ⟹ IsExceptional k (L.derivedObject), in the Spherical.lean fields-not-theorems idiom, with every supplied field's seam named. Blocked on the categorical IsExceptional root (#933, itself behind #932) plus #984 and #985."
+    tags: [enriques, exceptional-object, binding]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e6
+    gh_issue: 990
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "The Enriques semiorthogonal sequence and its residual component"
+    status: blocked
+    priority: must
+    size: L
+    summary: "A SemiorthogonalSequence (DerivedCat Y) (Fin 10) from the collection with supplied semiorthogonality witnesses, and residualComponent as the right orthogonal of its total — neutrally named until the identification with the papers' Ku(Y) is a theorem, per ADR-0005 vocabulary discipline. Blocked on #935, #988, and #989."
+    tags: [enriques, semiorthogonal, residual-component]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
