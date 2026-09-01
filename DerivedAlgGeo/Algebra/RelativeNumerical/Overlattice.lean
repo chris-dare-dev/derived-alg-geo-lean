@@ -2,25 +2,20 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Relative
+import DerivedAlgGeo.Algebra.RelativeNumerical.Basic
 import Mathlib.GroupTheory.Index
 
 /-!
-# Geometric fibre groups for relative numerical K-theory
+# Images and finite-index overlattices of additive-group maps
 
-Definition 8.7 of Li--Liu--Liu--Macrì--Perry--Stellari--Zhao uses the image of
-the base-change map `ηᵛ` as the numerical group of a geometric fibre.  This
-file models that group by the canonical `AddMonoidHom.range`; it does not add a
-second lattice carrier or Grothendieck-group presentation.
-
-The finite-index assertion proved by the geometric base-change theory is kept
-as a predicate on two additive subgroups.  It is provenance for the fibre
-overlattice, not extra data needed by the relative quotient.  Finally,
-`FamilyRelationSystem.ofEta` transports the fibre class of every admissible
-family through `ηᵛ` and feeds it to the algebraic quotient in `Relative`.
+This file models an image by the canonical `AddMonoidHom.range`, records the
+finite-index-overlattice predicate for two additive subgroups, and factors
+family values through chosen image inclusions.  The terminology is motivated
+by relative numerical K-theory, but the public API uses only additive groups
+and homomorphisms; geometric base-change maps are consumers of this root.
 -/
 
-namespace AlgebraicGeometry.Numerical.Relative
+namespace DerivedAlgGeo.Algebra.RelativeNumerical
 
 universe u v w
 
@@ -28,7 +23,7 @@ universe u v w
 
 variable {A B V : Type*} [AddCommGroup A] [AddCommGroup B] [AddCommGroup V]
 
-/-- The geometric numerical group determined by a base-change map `ηᵛ`.
+/-- The image group determined by an additive map `η`.
 
 This is an abbreviation for the existing additive-subgroup range, so all
 subgroup, quotient, and finite-index API remains available without a parallel
@@ -44,15 +39,14 @@ theorem etaClass_coe (eta : A →+ V) (x : A) :
     (etaClass eta x : V) = eta x :=
   rfl
 
-/-- `geometric` is a finite-index overlattice of `base` inside their common
+/-- `larger` is a finite-index overlattice of `base` inside their common
 ambient additive group.  Containment and finite relative index are properties,
 not fields on a new carrier. -/
-def IsFiniteIndexOverlattice (base geometric : AddSubgroup V) : Prop :=
-  base ≤ geometric ∧ base.IsFiniteRelIndex geometric
+def IsFiniteIndexOverlattice (base larger : AddSubgroup V) : Prop :=
+  base ≤ larger ∧ base.IsFiniteRelIndex larger
 
-/-- Transport a class through a base-change map whose image lies in the chosen
-geometric-fibre image.  This is the formal factorization used in map (8.2) of
-arXiv:2607.28411v1. -/
+/-- Transport a class through an additive map whose range lies in a chosen
+second range. -/
 def specializationMap (eta : A →+ V) (geometricEta : B →+ V)
     (h : eta.range ≤ geometricEta.range) : A →+ EtaImage geometricEta :=
   eta.codRestrict geometricEta.range fun x ↦ h ⟨x, rfl⟩
@@ -75,15 +69,14 @@ namespace FamilyRelationSystem
 variable {I : Type u} {K V₀ : I → Type v}
   [∀ i, AddCommGroup (K i)] [∀ i, AddCommGroup (V₀ i)]
 
-/-- Construct the connected-family relation system from fibrewise `ηᵛ` maps.
+/-- Construct a family relation system from indexed additive maps.
 
-For each base index `i`, `geometricEta i` presents the numerical group of the
-geometric fibre as its image in `V₀ i`.  At a point `t` of an admissible family,
-`eta F t` is the corresponding specialization map into the same ambient group;
-`hEta` is precisely the factorization through the chosen geometric fibre.
-The resulting system is consumed by the saturated quotient already defined in
-`Relative`, so the geometric layer cannot accidentally create another relative
-Grothendieck group. -/
+For each index `i`, `geometricEta i` presents the target group as an image in
+`V₀ i`. At a point `t` of an admissible family, `eta F t` maps a source into
+the same ambient group; `hEta` is precisely its factorization through the
+chosen image. The resulting system is consumed by the saturated quotient in
+`Basic`. Geometric applications may instantiate these parameters with
+base-change maps, but no geometric vocabulary occurs in this root. -/
 def ofEta
     (geometricEta : ∀ i, K i →+ V₀ i)
     (Family : Type w) (Point : Family → Type w)
@@ -136,4 +129,4 @@ theorem etaImageIdEquiv_etaClass (A : Type*) [AddCommGroup A] (x : A) :
     etaImageIdEquiv A (etaClass (AddMonoidHom.id A) x) = x :=
   rfl
 
-end AlgebraicGeometry.Numerical.Relative
+end DerivedAlgGeo.Algebra.RelativeNumerical

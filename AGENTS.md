@@ -81,6 +81,12 @@ application, current file, namespace, or proof technique.
   formulation, belong under `Algebra/Module/Localization/`. Coherent-sheaf
   arguments import that algebraic owner and add only the scheme-dependent
   comparison and finiteness steps.
+- Indexed additive-group sums, saturated relation quotients,
+  family-relation systems, additive-map ranges, and finite-index-overlattice
+  predicates belong under `Algebra/RelativeNumerical/`. A geometric consumer
+  must mention actual geometric data and import this root directly; do not
+  restore the retired `AlgebraicGeometry/Numerical/GrothendieckGroup/Relative*`
+  paths.
 - Weight-indexed spans and direct-sum arguments for a basis belong in
   `LinearAlgebra/GradedBasis.lean`; `NumericalRingData.ofGradedBasis` is the
   geometric consumer that adds numerical-intersection-ring data.

@@ -107,6 +107,10 @@ The physical module tree records that refinement directly:
 Algebra/Module/Localization
   └─→ Kernels                                linear, ModuleCat, natural forms
 
+Algebra/RelativeNumerical
+  ├─→ Basic                                  indexed sums and saturated family quotients
+  └─→ Overlattice                            images, factorizations, finite relative index
+
 Algebra/MvPolynomial
   ├─→ Grading                                standard grading and variable generation
   ├─→ DivMonomial                            homogeneous and exact-division identities

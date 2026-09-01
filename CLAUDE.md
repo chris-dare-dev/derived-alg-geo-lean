@@ -330,6 +330,11 @@ documentation, architecture checks, and CI paths together.
 - Ring/module/localization declarations with no site belong to `Algebra/`;
   linear-map, basis, lattice, matrix, multilinear, and exterior-power
   declarations with no site belong to `LinearAlgebra/`.
+- Indexed additive-group sums, saturated family-relation quotients,
+  additive-map images, and finite-index-overlattice predicates use
+  `Algebra/RelativeNumerical/`. A scheme consumer imports that root and adds
+  genuine geometric data; never restore the former
+  `AlgebraicGeometry/Numerical/GrothendieckGroup/Relative*` paths.
 - Weighted-basis submodules and their internal direct-sum proofs use
   `LinearAlgebra/GradedBasis.lean`; numerical intersection-ring assembly
   consumes them from algebraic geometry.

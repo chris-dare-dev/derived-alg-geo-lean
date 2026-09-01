@@ -56,6 +56,13 @@ degree zero belongs in `Algebra/MvPolynomial/Grading.lean`, and the canonical
 `p / 1` term of a variable localization belongs in
 `Algebra/MvPolynomial/Cech/Basic.lean`.
 
+Indexed additive-group direct sums, saturated quotients by family relations,
+additive-map ranges, and finite-index-overlattice predicates belong in
+`Algebra/RelativeNumerical/`. A geometric relative-numerical construction must
+introduce a scheme or other genuinely geometric datum and consume that root
+directly. Do not retain or recreate import-only modules at the former
+`AlgebraicGeometry/Numerical/GrothendieckGroup/Relative*` paths.
+
 Degree-zero homogeneous localization, graded shifts, and their algebraic
 trivializations live under `Algebra/Module/GradedModule/` in Mathlib's
 `GradedModule` namespace. Laurent exponent vectors live under
