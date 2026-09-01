@@ -70,6 +70,11 @@ Category
 ├─ GrothendieckPresentation
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
+│  │  ├─ Realization := K₀ C →+ A        additive target
+│  │  │  └─ Descends                    commuting realization square
+│  │  └─ EulerForm := K₀ C →+ K₀ C →+ ℤ
+│  │     ├─ ofLinear                    canonical linear-category pairing
+│  │     └─ Preserves                   exact-functor compatibility
 │  └─ K₀dg := K₀ (H0 C)                 reuse, not a third presentation
 └─ Sites / descent / stacks in groupoids
    ├─ Sheaves
@@ -124,8 +129,10 @@ AlgebraicGeometry
 ├─ two-term determinant presentation           explicit finite-locally-free resolution
 │  └─ absolute perfect degree-zero object       proved comparison adapter
 ├─ numerical K-theory
-│  └─ Euler quotient
-│     └─ future scheme-specific relation generators consume Algebra root
+│  ├─ Euler quotient
+│  │  └─ future scheme-specific relation generators consume Algebra root
+│  └─ Riemann--Roch and Mukai transfer
+│     └─ consume categorical K₀ realizations and Euler forms
 ├─ moduli
 │  ├─ fiberwise replete locus selector     not a subprestack
 │  ├─ finite-type boundedness witness      consumes selector + generic predicate
@@ -147,6 +154,10 @@ particular:
 - do not add a coherent, derived, dg, projective-space, or relative sibling of
   the Grothendieck group presentation; specialize the canonical presentation
   and prove comparison maps;
+- represent additive K₀ targets and categorical Euler pairings by the canonical
+  `K₀.Realization` and `K₀.EulerForm` aliases. Their descent and preservation
+  laws stay with the triangulated Grothendieck-group root; geometric
+  `IsRiemannRoch`, Euler-transfer, and Mukai-pairing theorems consume them;
 - keep indexed additive-group sums, additive-subgroup saturation,
   family-relation systems, additive-map images, and finite-index-overlattice
   predicates in `Algebra/RelativeNumerical`; a geometric consumer must

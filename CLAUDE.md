@@ -335,6 +335,13 @@ documentation, architecture checks, and CI paths together.
   `Algebra/RelativeNumerical/`. A scheme consumer imports that root and adds
   genuine geometric data; never restore the former
   `AlgebraicGeometry/Numerical/GrothendieckGroup/Relative*` paths.
+- Additive triangulated `K₀` targets, exact-functor descent squares, and
+  categorical Euler pairings use
+  `CategoryTheory/Triangulated/GrothendieckGroup/`. Reuse the canonical
+  `K₀.Realization` and `K₀.EulerForm` aliases; numerical Riemann--Roch and
+  Mukai transfer remain geometric consumers. Never restore the former
+  geometry-owned `NumericalRealization`, `Descends`, `CategoricalEulerForm`,
+  or `PreservesCategoricalEuler` APIs.
 - Weighted-basis submodules and their internal direct-sum proofs use
   `LinearAlgebra/GradedBasis.lean`; numerical intersection-ring assembly
   consumes them from algebraic geometry.

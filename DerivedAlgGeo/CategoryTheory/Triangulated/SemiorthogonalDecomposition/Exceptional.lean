@@ -188,8 +188,7 @@ explicit hypothesis at this pin — see the module docstring — because without
 it `algebraMap` bijectivity does not move: the transport identifies
 `algebraMap` into `End (E⟦m⟧)` with the shift functor's action on `End E`,
 which is a `k`-algebra map only when the functor is `k`-linear. -/
-theorem shift [∀ n : ℤ, (shiftFunctor C n).Additive]
-    [∀ n : ℤ, (shiftFunctor C n).Linear k] (m : ℤ) :
+theorem shift [∀ n : ℤ, (shiftFunctor C n).Linear k] (m : ℤ) :
     IsExceptional k (E⟦m⟧) := by
   have hcomp : ∀ c : k,
       algebraMap k (End (E⟦m⟧)) c = (shiftFunctor C m).map (algebraMap k (End E) c) := by
