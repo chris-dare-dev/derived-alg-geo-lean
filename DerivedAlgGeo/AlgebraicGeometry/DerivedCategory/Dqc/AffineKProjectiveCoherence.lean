@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.BoundedAboveProjective
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
 
 /-!

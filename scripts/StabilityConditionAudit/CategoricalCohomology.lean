@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.SpectralSequence
-import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Ext.InjectiveResolutionNaturality
+import DerivedAlgGeo.Algebra.Homology.SpectralSequence
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNaturality
 
 /-!
 Audit records for generic cohomological infrastructure on arbitrary categories.

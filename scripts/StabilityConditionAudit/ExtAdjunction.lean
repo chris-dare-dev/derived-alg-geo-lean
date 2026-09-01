@@ -3,7 +3,7 @@ Ext-along-an-adjunction slice of the StabilityCondition audit, split out so conc
 branches append to different files (#480). See the umbrella file for the contract and
 reading guide.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.Ext.Adjunction
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.Adjunction
 
 /-! ## Ext along an adjunction with exact left adjoint (#572 step 3, slice 2)
 

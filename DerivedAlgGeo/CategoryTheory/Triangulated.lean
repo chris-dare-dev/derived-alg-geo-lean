@@ -15,9 +15,6 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HomFiniteWitness
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
-import DerivedAlgGeo.CategoryTheory.Triangulated.BoundedHomotopyCategory
-import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory
-import DerivedAlgGeo.CategoryTheory.Triangulated.CohomologyObjectProperty
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearOpposite
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda

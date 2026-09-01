@@ -28,7 +28,7 @@ import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory
 import DerivedAlgGeo.AlgebraicGeometry.Moduli
 import DerivedAlgGeo.CategoryTheory.Monoidal
-import DerivedAlgGeo.CategoryTheory.Enriched.DGCategory
+import DerivedAlgGeo.Algebra.Homology.DGCategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition

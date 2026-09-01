@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Triangulated.Generators
 import Mathlib.Algebra.Homology.DerivedCategory.TStructure
-import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.TStructure
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.TStructure
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.StructureSheaf
 

@@ -278,6 +278,19 @@ blocks should normally move it rather than add more declarations beside it.
   the subject rank order, and the reverse-edge allowlist are retired;
   `scripts/check_layering.py` now enforces the six policy edges in
   `layers.md`. Declaration names and namespaces are unchanged.
+- Homological algebra at Mathlib's paths (2026-09-01):
+  `CategoryTheory/Triangulated/DerivedCategory/` and
+  `Triangulated/CohomologyObjectProperty.lean` moved to
+  `Algebra/Homology/DerivedCategory/`; `Triangulated/BoundedHomotopyCategory.lean`
+  to `Algebra/Homology/HomotopyCategory/Bounded.lean`;
+  `Triangulated/DGEnhancement/Instances/HomotopyCategory/` to
+  `Algebra/Homology/HomotopyCategory/DGEnhancement/`;
+  `CategoryTheory/SpectralSequence/` to `Algebra/Homology/SpectralSequence/`;
+  and `CategoryTheory/Enriched/DGCategory/` to `Algebra/Homology/DGCategory/`
+  (ADR-0010 amendment). The `CategoryTheory/Enriched` umbrella and the
+  `DGEnhancement/Instances` umbrella are retired. Declaration names and
+  namespaces are unchanged; the declaration sweep routes the moved subtrees
+  to the audit lanes that already hold their records.
 
 ## Confirmed next lanes
 
@@ -288,11 +301,6 @@ already names the target, and new code uses the target path immediately.
 
 | Current path | Target path |
 | --- | --- |
-| `CategoryTheory/Triangulated/DerivedCategory/`, `Triangulated/CohomologyObjectProperty.lean` | `Algebra/Homology/DerivedCategory/` |
-| `CategoryTheory/Triangulated/BoundedHomotopyCategory.lean` | `Algebra/Homology/HomotopyCategory/Bounded.lean` |
-| `CategoryTheory/Triangulated/DGEnhancement/Instances/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/DGEnhancement/` |
-| `CategoryTheory/Enriched/DGCategory/` | `Algebra/Homology/DGCategory/` |
-| `CategoryTheory/SpectralSequence/` | `Algebra/Homology/SpectralSequence/` |
 | `CategoryTheory/Sites/Sheaves/Modules/` | `Algebra/Category/ModuleCat/Sheaf/` |
 | `CategoryTheory/Sites/Cech/` | `CategoryTheory/Sites/SheafCohomology/Cech/` |
 | `CategoryTheory/Sites/StackInGroupoids/` | `CategoryTheory/Sites/Descent/StackInGroupoids/` |

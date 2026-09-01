@@ -4,9 +4,9 @@ Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Triangulated.Pretriangulated
 import DerivedAlgGeo.CategoryTheory.Triangulated.PretriangulatedAxioms
-import DerivedAlgGeo.CategoryTheory.Enriched.DGCategory.Pretriangulated.Cone
-import DerivedAlgGeo.CategoryTheory.Enriched.DGCategory.Pretriangulated.Lift
-import DerivedAlgGeo.CategoryTheory.Enriched.DGCategory.Pretriangulated.Rotate
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Cone
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Lift
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Rotate
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Shift
 

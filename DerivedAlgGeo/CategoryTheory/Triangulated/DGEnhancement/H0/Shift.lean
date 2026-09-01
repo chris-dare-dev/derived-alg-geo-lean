@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Shift.Basic
-import DerivedAlgGeo.CategoryTheory.Enriched.DGCategory.Pretriangulated.Basic
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Basic
 
 /-!
 # The shift functor on `H⁰`

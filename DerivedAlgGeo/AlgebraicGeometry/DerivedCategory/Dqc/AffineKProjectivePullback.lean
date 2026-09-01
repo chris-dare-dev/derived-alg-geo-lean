@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
-import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.KProjective
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Affine
 
 /-!

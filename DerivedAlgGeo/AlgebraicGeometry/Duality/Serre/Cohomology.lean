@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Additivity
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.Duality.Canonical.Derived
-import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.LinearDual
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.LinearDual
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Determinant
 import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.Surface.Number
 import Mathlib.Algebra.Homology.DerivedCategory.Basic

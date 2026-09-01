@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Category.ModuleCat.Pseudofunctor
-import DerivedAlgGeo.CategoryTheory.Triangulated.DerivedCategory.BoundedAboveProjective.Unitality
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective.Unitality
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectiveCoherence
 
 /-!

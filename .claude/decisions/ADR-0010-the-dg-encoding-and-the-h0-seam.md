@@ -247,3 +247,19 @@ The DG4 dependency direction — whether the transport lemmas live in
 `DGLean/Enhancement/Transport` importing `BridgelandStabLean`, or in
 `BridgelandStabLean/` importing `DGLean`. Unchanged, still open, still an owner
 call, and still not needed until DG4.
+
+---
+
+## Amendment, 2026-09-01 — the path follows the encoding
+
+Option B is a bespoke class built on `Algebra/Homology/HomotopyCategory/HomComplex`,
+and it does not extend `EnrichedCategory`. Under the placement rule adopted on
+2026-09-01 (`CLAUDE.md`, "The placement rule"), a bespoke carrier lives beside
+the Mathlib API it is built on, so the subtree moved from
+`CategoryTheory/Enriched/DGCategory/` to `Algebra/Homology/DGCategory/`. The
+former path asserted an enrichment the type does not have.
+
+Namespaces are unchanged (`CategoryTheory.DGCategory` and its children). If
+Option A′ lands and `DGCategory` becomes an `EnrichedOrdinaryCategory`, the
+subtree moves under `CategoryTheory/Enriched/` in the same change; that is the
+reversal condition for this amendment.
