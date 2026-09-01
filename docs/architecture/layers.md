@@ -60,6 +60,9 @@ In particular:
 - ordinary module and ring theory lives under `DerivedAlgGeo.Algebra`, while
   generic sheaves and sheaves of modules on arbitrary ringed sites live below
   `DerivedAlgGeo.CategoryTheory.Sites.Sheaves`;
+- coverwise local-equivalence detection for additive presheaves belongs below
+  `DerivedAlgGeo.CategoryTheory.Sites.Sheaves`; scheme tensor, divisor, and
+  Proj cover arguments import it as consumers;
 - numerical functions on integer lattices and their mixed finite-difference
   calculus live under `DerivedAlgGeo.Algebra.NumericalPolynomial`; Snapper's
   theorem is the geometric consumer once Picard and coherent-sheaf data enter;
@@ -189,6 +192,7 @@ CategoryTheory/Abelian
   └─→ WeakSerre                                arbitrary abelian categories
 
 CategoryTheory/Sites/Sheaves
+  ├─→ CoversTop                              coverwise local equivalences
   ├─→ ConstantPullback, CohomologyPushforward  arbitrary sites
   └─→ Modules
         ├─→ Exactness                           arbitrary ringed sites

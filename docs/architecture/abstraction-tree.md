@@ -78,6 +78,7 @@ Category
 │  └─ K₀dg := K₀ (H0 C)                 reuse, not a third presentation
 └─ Sites / descent / stacks in groupoids
    ├─ Sheaves
+   │  ├─ coverwise detection of local equivalences
    │  ├─ constant pullback and cohomology pushforward
    │  └─ module sheaves on a ringed site
    │     ├─ exact forgetful functor
@@ -185,6 +186,9 @@ particular:
   scheme-indexed `SheafOfModules(X) -> QCoh(X) -> Coh(X)` refinements under
   algebraic geometry; in particular, coherent-sheaf kernels directly reuse
   the module-localization kernel maps rather than owning them;
+- keep detection of additive-presheaf local equivalences on a `CoversTop`
+  family under the generic site/sheaf root; scheme charts and sheafified
+  tensor constructions only consume that theorem chain;
 - extend Mathlib's abelian-category hierarchy under `CategoryTheory/Abelian`
   and make the geometric proof that `Coh(X)` is abelian an input to the generic
   derived-category construction;

@@ -21,7 +21,8 @@ The principal areas are:
 - `DerivedAlgGeo/CategoryTheory/Limits/` for generic limit and colimit
   infrastructure, including preservation and reflective transport;
 - `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/` for generic sheaf theory,
-  including module sheaves on an arbitrary ringed site;
+  including coverwise local-equivalence detection and module sheaves on an
+  arbitrary ringed site;
 - `DerivedAlgGeo/CategoryTheory/Moduli/` for neutral moduli predicates such as
   boundedness;
 - `DerivedAlgGeo/CategoryTheory/Pseudofunctor/ObjectProperty/` for generic
@@ -71,6 +72,11 @@ concrete applications through explicit instance leaves.
 - Generic sheaves belong under `CategoryTheory/Sites/Sheaves/`; sheaves of
   modules over a sheaf of rings on an arbitrary site belong in its `Modules/`
   child.
+- Local injectivity, local surjectivity, and membership in the weak-equivalence
+  class inverted by sheafification are arbitrary-site statements when they are
+  detected on a `GrothendieckTopology.CoversTop` family. Their canonical owner
+  is `CategoryTheory/Sites/Sheaves/CoversTop.lean`; geometric charts consume
+  that root directly.
 - Definitions and lemmas that intrinsically mention schemes, varieties,
   scheme-indexed sheaf categories, or geometric morphism properties belong
   under `AlgebraicGeometry/`.
@@ -330,6 +336,10 @@ documentation, architecture checks, and CI paths together.
 - Ring/module/localization declarations with no site belong to `Algebra/`;
   linear-map, basis, lattice, matrix, multilinear, and exterior-power
   declarations with no site belong to `LinearAlgebra/`.
+- Additive-presheaf local-equivalence declarations mentioning only a
+  Grothendieck topology and a covering family belong in
+  `CategoryTheory/Sites/Sheaves/CoversTop.lean`, not in a scheme tensor or
+  divisor consumer.
 - Use the global `ZLattice` class from `LinearAlgebra/Lattice/Basic.lean` for
   finite free abelian groups. Its construction from finite torsion-free groups
   is generic; only the theorem applying it to a numerical Euler-radical

@@ -39,6 +39,12 @@ geometric motivation, a geometric first consumer, or a proof written with
 geometric lemmas does not make an otherwise ordinary algebra, linear algebra,
 or category-theory statement geometric.
 
+The coverwise detection chain for local injectivity, local surjectivity, and
+the weak equivalences inverted by sheafification uses only an arbitrary site
+and additive presheaves. It belongs in
+`CategoryTheory/Sites/Sheaves/CoversTop.lean`; scheme-chart, divisor, Proj, and
+module-tensor files import that owner directly.
+
 In particular, use `Algebra/` for ordinary module localization and ring
 operations, and `LinearAlgebra/` for generic linear maps, bases, lattices,
 matrices, multilinear constructions, and exterior powers. When a geometric
