@@ -88,8 +88,10 @@ concrete applications through explicit instance leaves.
   `Sites/Sheaves/Modules/Presentation/Over.lean`.
   Isomorphism invariance and covering-family locality of finite presentation
   belong in the adjacent `Presentation/{Isomorphism,Locality}.lean` roots.
-  Scheme open immersions consume these roots and begin only where schemes or
-  topological opens enter the public signature.
+  Containment of zero and closure under short-exact extensions belong in
+  `Presentation/{Zero,Extensions}.lean`. Scheme open immersions and coherent
+  sheaves consume these roots and begin only where schemes, topological opens,
+  `coherent X`, or `Coh X` enter the public signature.
 - Local injectivity, local surjectivity, and membership in the weak-equivalence
   class inverted by sheafification are arbitrary-site statements when they are
   detected on a `GrothendieckTopology.CoversTop` family. Their canonical owner

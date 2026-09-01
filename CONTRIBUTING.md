@@ -58,8 +58,10 @@ open-immersion module imports these owners and contains only declarations whose
 types actually mention schemes, opens, or geometric morphism properties.
 Isomorphism invariance and `CoversTop` locality of finite presentation on an
 arbitrary ringed site likewise belong in
-`Presentation/{Isomorphism,Locality}.lean`; coherent-sheaf consumers begin
-only when `coherent X`, affine covers, or scheme restrictions enter the type.
+`Presentation/{Isomorphism,Locality}.lean`; containment of zero and closure
+under short-exact extensions belong in `Presentation/{Zero,Extensions}.lean`.
+Coherent-sheaf consumers begin only when `coherent X`, `Coh X`, affine covers,
+or scheme restrictions enter the type.
 
 Intrinsic rank-one local-generator data, invertible module sheaves, their local
 trivializations, and tensor/sheafification descent with a rank-one factor use

@@ -326,8 +326,8 @@ theorem schemePseudoCoherent_zero
     have hH : IsZero H :=
       (DerivedCategory.homologyFunctor X.Modules n).map_isZero hZ
     obtain ⟨Z, hZ', hP⟩ :=
-      (SheafOfModules.isFinitePresentation X.ringCatSheaf).exists_prop_of_containsZero
-    exact (SheafOfModules.isFinitePresentation X.ringCatSheaf).prop_of_iso
+      (Scheme.coherent X).exists_prop_of_containsZero
+    exact (Scheme.coherent X).prop_of_iso
       (IsZero.iso hZ' hH) hP
 
 /-- The zero object has a local finite-Tor-amplitude chart at every point. -/

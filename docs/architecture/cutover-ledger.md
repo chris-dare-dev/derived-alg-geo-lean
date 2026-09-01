@@ -206,6 +206,15 @@ blocks should normally move it rather than add more declarations beside it.
   scheme open-immersion and affine-cover consumers. The seven declaration
   names are preserved without compatibility shims, and unnecessary hypotheses
   are removed from five declarations in the presentation transport/locality chain.
+- Ringed-site finite-presentation closure:
+  `CategoryTheory/Sites/Sheaves/Modules/Presentation/{Zero,Extensions}.lean`
+  own the empty finite presentation of the zero module sheaf and the finite
+  horseshoe construction proving closure under short-exact extensions.
+  `AlgebraicGeometry/CoherentSheaf/Abelian/Extensions.lean` now contains only
+  the resulting `coherent X` extension instance, while `Abelian/Basic.lean`
+  retains the geometric zero, finite-product, abelian, and exact-inclusion
+  instances. Public declaration names are preserved without compatibility
+  shims.
 - Generic invertible module sheaves and tensor/sheafification descent:
   `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` owns rank-one local
   generator data, intrinsic `SheafOfModules.IsInvertible`, transport, finite
@@ -225,10 +234,6 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-- Closure of finite-presentation module sheaves under zero objects and
-  extensions remains in
-  `AlgebraicGeometry/CoherentSheaf/Abelian/{Basic,Extensions}.lean`; only the
-  resulting coherent-sheaf instances are geometric.
 - Basiswise detection of isomorphisms for sheaves on a topological space
   remains at the front of
   `AlgebraicGeometry/Modules/Affine/Comparison.lean`; its canonical owner is
