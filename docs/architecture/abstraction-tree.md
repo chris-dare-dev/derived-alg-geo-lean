@@ -92,8 +92,11 @@ Algebra
 │     └─ kernel maps                       consumed by coherent-sheaf geometry
 ├─ multivariate polynomials
 │  └─ division by monomials                consumed by projective localization
-└─ saturation of an additive subgroup
-   └─ saturated quotient and torsion-free universal property
+├─ saturation of an additive subgroup
+│  └─ saturated quotient and torsion-free universal property
+└─ relative numerical algebra
+   ├─ indexed sums and saturated family-relation quotients
+   └─ additive-map images and finite-index-overlattice predicates
 
 AlgebraicGeometry
 ├─ SheafOfModules(X)
@@ -122,8 +125,7 @@ AlgebraicGeometry
 │  └─ absolute perfect degree-zero object       proved comparison adapter
 ├─ numerical K-theory
 │  └─ Euler quotient
-│     └─ relative numerical quotient              uses Algebra root
-│        └─ family-relation system                 statement-layer adapter
+│     └─ future scheme-specific relation generators consume Algebra root
 ├─ moduli
 │  ├─ fiberwise replete locus selector     not a subprestack
 │  ├─ finite-type boundedness witness      consumes selector + generic predicate
@@ -145,11 +147,11 @@ particular:
 - do not add a coherent, derived, dg, projective-space, or relative sibling of
   the Grothendieck group presentation; specialize the canonical presentation
   and prove comparison maps;
-- keep quotient mechanics such as additive-subgroup saturation in `Algebra`;
-  the relative numerical leaf supplies only its fibre groups and geometric
-  relation generators through the family-relation system; scheme connectivity
-  and relative perfection are proved by geometric inhabitants, not stored as
-  inert fields in the numerical root;
+- keep indexed additive-group sums, additive-subgroup saturation,
+  family-relation systems, additive-map images, and finite-index-overlattice
+  predicates in `Algebra/RelativeNumerical`; a geometric consumer must
+  introduce actual schemes, connectivity, relative perfection, or other
+  geometric data and import this root directly;
 - keep ordinary module theory under `Algebra`, generic sheaves and module
   sheaves on ringed sites under `CategoryTheory/Sites/Sheaves`, and only the
   scheme-indexed `SheafOfModules(X) -> QCoh(X) -> Coh(X)` refinements under
@@ -218,5 +220,5 @@ The policy is partly mechanical and partly a review obligation:
 
 The projective-families roadmap carries the first finer-grained burn-down:
 generic stack roots move out of scheme geometry, moduli-to-stability reverse
-imports are removed, and the relative numerical K-group is built as a quotient
-of the existing K-theory spine.
+imports are removed, and geometric relative numerical K-theory consumes the
+indexed quotient machinery rooted in ordinary algebra.

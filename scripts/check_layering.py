@@ -1664,6 +1664,120 @@ def main() -> int:
                 f"generic module-localization declaration {fragment!r}"
             )
 
+    relative_numerical_root = (
+        SOURCE_ROOT / "Algebra" / "RelativeNumerical"
+    )
+    relative_numerical_basic = relative_numerical_root / "Basic.lean"
+    relative_numerical_overlattice = relative_numerical_root / "Overlattice.lean"
+    relative_numerical_umbrella = relative_numerical_root.with_suffix(".lean")
+    relative_numerical_namespace = "DerivedAlgGeo.Algebra.RelativeNumerical"
+    relative_numerical_modules = {
+        relative_numerical_basic: (
+            "DerivedAlgGeo.Algebra.SaturatedQuotient",
+            (
+                f"namespace {relative_numerical_namespace}",
+                "abbrev FiberSum",
+                "abbrev Group",
+                "structure FamilyRelationSystem",
+                "abbrev RelativeGroup",
+                "def singletonEquiv",
+            ),
+        ),
+        relative_numerical_overlattice: (
+            "DerivedAlgGeo.Algebra.RelativeNumerical.Basic",
+            (
+                f"namespace {relative_numerical_namespace}",
+                "abbrev EtaImage",
+                "def IsFiniteIndexOverlattice",
+                "def specializationMap",
+                "def ofEta",
+                "def etaImageIdEquiv",
+            ),
+        ),
+    }
+    for path, (required_import, required_fragments) in relative_numerical_modules.items():
+        if not path.is_file():
+            failures.append(
+                f"relative-numerical algebra owner missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        if required_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: relative-numerical root must import "
+                f"{required_import} directly"
+            )
+        for fragment in required_fragments:
+            if fragment not in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: missing relative-numerical "
+                    f"declaration fragment {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: additive-group root depends on or "
+                "declares algebraic geometry"
+            )
+
+    relative_numerical_umbrella_imports = {
+        relative_numerical_umbrella: (
+            "DerivedAlgGeo.Algebra.RelativeNumerical.Basic",
+            "DerivedAlgGeo.Algebra.RelativeNumerical.Overlattice",
+        ),
+        SOURCE_ROOT / "Algebra.lean": (
+            "DerivedAlgGeo.Algebra.RelativeNumerical",
+        ),
+    }
+    for path, required_imports in relative_numerical_umbrella_imports.items():
+        if not path.is_file():
+            failures.append(
+                f"relative-numerical umbrella missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        for required_import in required_imports:
+            if required_import not in imports_by_path[path]:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: missing relative-numerical "
+                    f"umbrella import {required_import}"
+                )
+
+    retired_relative_numerical_paths = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Numerical" /
+            "GrothendieckGroup" / "Relative.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "Numerical" /
+            "GrothendieckGroup" / "RelativeOverlattice.lean",
+    )
+    retired_relative_numerical_imports = {
+        "DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Relative",
+        "DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup."
+        "RelativeOverlattice",
+    }
+    for path in retired_relative_numerical_paths:
+        if path.exists():
+            failures.append(
+                f"retired geometric relative-numerical path restored: "
+                f"{path.relative_to(ROOT)}"
+            )
+    for path, modules in imports_by_path.items():
+        restored = sorted(retired_relative_numerical_imports.intersection(modules))
+        if restored:
+            failures.append(
+                f"{path.relative_to(ROOT)}: imports retired geometric "
+                f"relative-numerical path(s) {restored}"
+            )
+    for path in sorted((SOURCE_ROOT / "AlgebraicGeometry").rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if "namespace AlgebraicGeometry.Numerical.Relative" in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: restored additive-group-only "
+                "relative-numerical namespace in geometry"
+            )
+
     graded_basis_owner = SOURCE_ROOT / "LinearAlgebra" / "GradedBasis.lean"
     numerical_graded_basis_consumer = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Numerical" / "Core" /
@@ -2969,6 +3083,10 @@ def main() -> int:
     print(
         "ok: module-localization kernel maps use the Algebra owner, and "
         "coherent-sheaf geometry imports them as a direct consumer"
+    )
+    print(
+        "ok: relative numerical sums, family-relation quotients, images, and "
+        "overlattice predicates use the Algebra owner"
     )
     print(
         "ok: weighted-basis decompositions use LinearAlgebra and pure "

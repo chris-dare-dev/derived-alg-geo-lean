@@ -116,6 +116,16 @@ prove its localization behavior, without mentioning a site or scheme.
 `AlgebraicGeometry/CoherentSheaf/Abelian/Kernels.lean` is a direct consumer and
 owns only the scheme restriction, affine comparison, and coherence steps.
 
+Indexed families of additive commutative groups, their direct sums, saturated
+quotients by supplied relation sets, family-relation systems, additive-map
+ranges, and finite-relative-index predicates are rooted at
+`Algebra/RelativeNumerical/`. Names such as “fibre,” “specialization,” or
+“geometric eta” do not change that signature classification. An
+algebraic-geometry consumer must introduce an actual scheme, geometric family,
+connectivity condition, or relative-perfect object and import this algebraic
+root; it must not restore the retired numerical-Grothendieck-group paths as
+compatibility shims.
+
 Weight-indexed spans of basis vectors and the resulting independence,
 spanning, internal-direct-sum, and multiplicativity lemmas are rooted at
 `LinearAlgebra/GradedBasis.lean`. The numerical consumer imports that module

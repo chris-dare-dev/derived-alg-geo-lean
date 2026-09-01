@@ -136,13 +136,33 @@ blocks should normally move it rather than add more declarations beside it.
   the homogeneous variable-power divisibility vanishing theorem and its
   cross-variable corollary. `AlgebraicGeometry/Cohomology/Cech/NegativeTwist.lean`
   now begins with the Čech overlap and projective-cohomology plumbing.
+- Relative numerical algebra:
+  `Algebra/RelativeNumerical/Basic.lean` owns indexed direct sums, saturated
+  family-relation quotients, and their universal properties, while
+  `Overlattice.lean` owns additive-map images, factorizations, and
+  finite-relative-index predicates. The former
+  `AlgebraicGeometry/Numerical/GrothendieckGroup/Relative{,Overlattice}.lean`
+  paths are retired; a future geometric adapter must introduce actual scheme
+  data and import the algebra root directly. `FamilyRelationSystem` is
+  deliberately recorded by the single-instantiation ratchet as statement-layer
+  input: downstream applications supply admissible families, so this slice
+  does not fabricate a second library-owned inhabitant merely to satisfy a
+  count.
 
 ## Confirmed next lanes
 
-No further ownership defect is confirmed in the current audit. New candidates
-must first pass the signature and root-to-consumer tests in `placement.md`;
-they should not be added here merely because two concepts share terminology.
+1. Generic triangulated `K₀` realization and descent, together with the
+   categorical Euler carrier, currently have public signatures using only
+   categories, Grothendieck groups, and additive groups. Move that block to
+   `CategoryTheory/Triangulated/GrothendieckGroup/`; retain only the geometric
+   Riemann--Roch and numerical-pairing transfer consumers below
+   `AlgebraicGeometry/Numerical/`.
+2. The generic `ZLattice` class and its finite-torsion-free construction use
+   only finite free abelian groups. Move that root to
+   `LinearAlgebra/Lattice/`; retain the numerical-quotient theorem as its
+   geometric consumer.
 
-For each lane, remove the old path rather than retaining an import-only shim,
-update audits and umbrellas in the same pull request, and add a focused
-layering guard preventing the declaration from returning to its consumer.
+Take these lanes one per pull request. Remove the old path rather than retaining
+an import-only shim, update audits and umbrellas in the same pull request, and
+add a focused layering guard preventing the declaration from returning to its
+consumer.
