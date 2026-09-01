@@ -182,42 +182,28 @@ def zeroRelativePerfectModuliSelector (S : Scheme.{u}) :
 
 /-- The universal zero family is a selected family. -/
 theorem relativePerfectZeroObject_mem_zeroFamilyLocus
-    {S : Scheme.{u}} (T : SchemeBaseChange S)
-    [IsLocallyNoetherian T.left] :
+    {S : Scheme.{u}} (T : SchemeBaseChange S) :
     (zeroRelativePerfectModuliSelector S).familyLocus T
       (relativePerfectZeroObject T) :=
-  schemeQuasicoherentDerivedCategory_zero_obj_isZero T.left
+  SchemeQuasicoherentDerivedCategory.zero_obj_isZero T.left
 
 /-- The chosen zero fiber over a point of the identity parameter scheme. -/
 def zeroRelativePerfectGeometricFiber (S : Scheme.{u}) (x : S) :
     RelativePerfectModuliFiber
-      ((identityRelativePerfectBaseChange S).residue x) := by
-  letI : IsLocallyNoetherian
-      ((identityRelativePerfectBaseChange S).residue x).left := by
-    change IsLocallyNoetherian (Spec (S.residueField x))
-    infer_instance
-  exact relativePerfectZeroObject
+      ((identityRelativePerfectBaseChange S).residue x) :=
+  relativePerfectZeroObject
     ((identityRelativePerfectBaseChange S).residue x)
 
 /-- The identity parameter scheme and zero universal family form an actual
 finite-type boundedness witness. -/
-def zeroFiniteTypeBoundednessWitness (S : Scheme.{u})
-    [IsLocallyNoetherian S] :
+def zeroFiniteTypeBoundednessWitness (S : Scheme.{u}) :
     FiniteTypeBoundednessWitness (zeroRelativePerfectModuliSelector S) where
   parameter := identityRelativePerfectBaseChange S
   finiteType := by
     change LocallyOfFiniteType (𝟙 S) ∧ QuasiCompact (𝟙 S)
     exact ⟨by infer_instance, by infer_instance⟩
-  universalFamily := by
-    letI : IsLocallyNoetherian (Over.mk (𝟙 S)).left := by
-      change IsLocallyNoetherian S
-      infer_instance
-    change RelativePerfectModuliFiber (Over.mk (𝟙 S))
-    exact relativePerfectZeroObject (Over.mk (𝟙 S))
+  universalFamily := relativePerfectZeroObject (Over.mk (𝟙 S))
   universalFamily_mem := by
-    letI : IsLocallyNoetherian (Over.mk (𝟙 S)).left := by
-      change IsLocallyNoetherian S
-      infer_instance
     change IsZero ((relativePerfectModuliForget (Over.mk (𝟙 S))).obj
       (relativePerfectZeroObject (Over.mk (𝟙 S))))
     exact relativePerfectZeroObject_mem_zeroFamilyLocus (Over.mk (𝟙 S))
@@ -227,15 +213,11 @@ def zeroFiniteTypeBoundednessWitness (S : Scheme.{u})
     refine ⟨x, hT, ?_⟩
     cases hT
     refine ⟨Core.isoMk ?_⟩
-    letI : IsLocallyNoetherian
-        ((identityRelativePerfectBaseChange S).residue x).left := by
-      change IsLocallyNoetherian (Spec (S.residueField x))
-      infer_instance
     let Z := zeroRelativePerfectGeometricFiber S x
     have hZ : IsZero ((relativePerfectModuliForget
         ((identityRelativePerfectBaseChange S).residue x)).obj Z) := by
       dsimp [Z, zeroRelativePerfectGeometricFiber]
-      exact schemeQuasicoherentDerivedCategory_zero_obj_isZero _
+      exact SchemeQuasicoherentDerivedCategory.zero_obj_isZero _
     let eDerived := IsZero.iso hzero hZ
     let eDqc := ObjectProperty.isoMk
       (schemeQuasicoherentCohomology
@@ -247,16 +229,16 @@ def zeroFiniteTypeBoundednessWitness (S : Scheme.{u})
 /-- The zero selector is geometrically bounded by an inhabited finite-type
 witness, not by a constant-true predicate. -/
 theorem zeroRelativePerfectModuliSelector_isBounded
-    (S : Scheme.{u}) [IsLocallyNoetherian S] :
+    (S : Scheme.{u}) :
     (relativePerfectGeometricBoundednessProblem S).IsBounded
       (zeroRelativePerfectModuliSelector S) :=
   ⟨zeroFiniteTypeBoundednessWitness S⟩
 
 /-- The supported zero boundedness construction is available after every
-change of base whose source is locally Noetherian.  This deliberately does
+change of base.  This deliberately does
 not claim a general pullback theorem for nonzero universal families. -/
 theorem zeroRelativePerfectBoundedness_afterBaseChange
-    {S S' : Scheme.{u}} (_ : S' ⟶ S) [IsLocallyNoetherian S'] :
+    {S S' : Scheme.{u}} (_ : S' ⟶ S) :
     (relativePerfectGeometricBoundednessProblem S').IsBounded
       (zeroRelativePerfectModuliSelector S') :=
   zeroRelativePerfectModuliSelector_isBounded S'
@@ -270,9 +252,9 @@ def zeroRelativePerfectBoundednessProblem (S : Scheme.{u}) :
       (zeroRelativePerfectModuliSelector S)
 
 /-- The supported zero model unconditionally satisfies its honest geometric
-boundedness problem on a locally Noetherian base. -/
+boundedness problem. -/
 theorem universalBoundedness_zeroRelativePerfect
-    (S : Scheme.{u}) [IsLocallyNoetherian S] :
+    (S : Scheme.{u}) :
     UniversalBoundedness (zeroRelativePerfectBoundednessProblem S) :=
   fun _ ↦ zeroRelativePerfectModuliSelector_isBounded S
 

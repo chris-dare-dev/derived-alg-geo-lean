@@ -40,6 +40,15 @@ blocks should normally move it rather than add more declarations beside it.
   comparison isomorphisms, and membership equivalences without registering
   global instances. The relative-perfect category is the first geometric
   consumer and states bounded coherent cohomology at the use site.
+- Perfect-complex notion reconciliation:
+  `schemePerfect` remains the absolute thick envelope in `D(Coh X)`,
+  `schemeRelativePerfect` remains the base-dependent pseudo-coherent finite-Tor
+  locus in `Dqc(X)`, and `TwoTermPerfectDeterminantData` remains explicit
+  presentation data. `Moduli/PerfectComplex/Comparison.lean` proves the valid
+  two-term-to-absolute-to-Dqc direction without asserting a reverse or
+  absolute/relative equivalence. The canonical `Dqc(X)` zero now lives in
+  `DerivedCategory/Dqc.lean` for every scheme; the moduli consumer only proves
+  its additional relative properties.
 - Ordinary semilinear and top exterior-power algebra:
   `LinearAlgebra/ExteriorPower/`.
 - Exterior powers of presheaves of modules over an arbitrary ring presheaf:
@@ -130,11 +139,9 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-1. Document and compare the three current perfect-complex notions:
-   `schemePerfect` in `D(Coh X)`, `schemeRelativePerfect` in `Dqc`, and
-   `TwoTermPerfectDeterminantData`. Move the canonical zero object for
-   `SchemeQuasicoherentDerivedCategory` from the perfect-moduli consumer to the
-   `Dqc` owner during that lane.
+No further ownership defect is confirmed in the current audit. New candidates
+must first pass the signature and root-to-consumer tests in `placement.md`;
+they should not be added here merely because two concepts share terminology.
 
 For each lane, remove the old path rather than retaining an import-only shim,
 update audits and umbrellas in the same pull request, and add a focused

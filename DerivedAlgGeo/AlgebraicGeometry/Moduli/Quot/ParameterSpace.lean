@@ -115,7 +115,7 @@ theorem zeroQuotient_universal_eq (S : Scheme.{u}) :
 /-- The supported zero quotient maps to the actual relative-perfect moduli
 fiber by the zero complex. -/
 def zeroQuotientToRelativePerfect {S : Scheme.{u}}
-    (T : SchemeBaseChange S) [IsLocallyNoetherian T.left] :
+    (T : SchemeBaseChange S) :
     (zeroQuotientProblem S).obj (Opposite.op T) →
       RelativePerfectModuliFiber T :=
   fun _ ↦ relativePerfectZeroObject T
@@ -130,14 +130,14 @@ def zeroQuotientRelativePerfectModuliProblem
 /-- The finite-type zero Quot parameter realizes the honest boundedness
 witness from SF8.3, including geometric-point coverage. -/
 def zeroQuotientFiniteTypeBoundednessWitness
-    (S : Scheme.{u}) [IsLocallyNoetherian S] :
+    (S : Scheme.{u}) :
     FiniteTypeBoundednessWitness (zeroRelativePerfectModuliSelector S) :=
   zeroFiniteTypeBoundednessWitness S
 
 /-- Consequently the supported zero Quot construction inhabits the SF8.3
 geometric boundedness predicate. -/
 theorem zeroQuotient_isGeometricallyBounded
-    (S : Scheme.{u}) [IsLocallyNoetherian S] :
+    (S : Scheme.{u}) :
     (relativePerfectGeometricBoundednessProblem S).IsBounded
       (zeroRelativePerfectModuliSelector S) :=
   ⟨zeroQuotientFiniteTypeBoundednessWitness S⟩

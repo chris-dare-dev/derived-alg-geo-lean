@@ -190,7 +190,7 @@ CategoryTheory/Triangulated/FourierMukai
 AlgebraicGeometry/DerivedCategory
   ├─→ Basic                                 module-sheaf derived categories
   ├─→ Coherent                              D(Coh X), Dᵇ(Coh X), and Perf(X)
-  ├─→ Dqc                                   quasicoherent-cohomology locus
+  ├─→ Dqc                                   locus, canonical zero, perfect image
   │    └─→ Comparison                       explicit-evidence consumer API
   ├─→ Families                              base-change and pullback consumers
   └─→ FourierMukai                          geometric kernels and convolution
@@ -205,6 +205,8 @@ AlgebraicGeometry/Cohomology
   └─→ projective Čech vanishing/finiteness consume the algebraic primitive/block
 
 AlgebraicGeometry/Moduli/PerfectComplex
+  ├─→ Relative                             base-dependent perfect locus
+  ├─→ Comparison                           two-term → absolute → Dqc adapters
   ├─→ Boundedness                          fiberwise replete selectors/witnesses
   └─→ AffineFamilyRelativePerfectPseudofunctor
         └─→ generic ObjectProperty.fullsubcategory
@@ -363,6 +365,18 @@ propositions in `Dqc.lean`; `Dqc/Comparison.lean` consumes supplied evidence
 to construct representatives and membership equivalences without installing
 global instances. Relative-perfect geometry imports that conditional API and
 states the additional bounded-cohomology hypothesis at its actual use site.
+`Dqc.lean` also owns the canonical zero object of the full subcategory for an
+arbitrary scheme. The relative-perfect consumer proves pseudo-coherence,
+finite Tor amplitude, and universal gluability for that object; it does not
+rebuild zero objects in the coherent or ambient derived categories.
+
+Perfect-complex terminology is linked by proved one-way adapters rather than
+directory nesting. `schemePerfect` is absolute coherent-derived data,
+`schemeRelativePerfect` depends on a base morphism, and
+`TwoTermPerfectDeterminantData` is presentation data of fixed amplitude. The
+comparison leaf proves two-term presentation data gives an absolute perfect
+object and then uses the canonical Dqc essential-image map. No reverse or
+absolute/relative equivalence is registered.
 
 The layering gate rejects imports from algebraic geometry back into any
 `Instances/AlgebraicGeometry` leaf and rejects restoration of the retired

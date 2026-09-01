@@ -164,6 +164,18 @@ an ordinary argument to recover coherent representatives or compare perfect
 and compact membership. Do not register the resulting equivalence,
 essential-surjectivity proof, or compactness comparison globally.
 
+The canonical zero of `SchemeQuasicoherentDerivedCategory X` belongs in
+`DerivedCategory/Dqc.lean` and is available for an arbitrary scheme. A moduli
+file should prove its own locus membership for this root object, not construct
+the `Dqc` zero through a coherent or bounded-coherent detour.
+
+Use `docs/architecture/placement.md`'s perfect-complex ledger before relating
+perfect notions. Absolute `schemePerfect`, base-dependent
+`schemeRelativePerfect`, and two-term determinant presentation data have
+different signatures and owners. Put proved cross-notion arrows in
+`Moduli/PerfectComplex/Comparison.lean`; do not introduce a reverse map or an
+absolute/relative equivalence simply because the names overlap.
+
 Declaration namespaces follow those owners. Use
 `AlgebraicGeometry.DerivedCategory` for the scheme-derived category API in
 `DerivedCategory/Basic.lean`, and

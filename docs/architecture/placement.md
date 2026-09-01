@@ -77,6 +77,28 @@ conditional equality of the perfect and compact-object properties. A moduli
 consumer adds its relative-perfect and bounded-cohomology hypotheses without
 becoming the owner of either comparison.
 
+## Perfect-complex notion ledger
+
+The word “perfect” currently appears in three non-interchangeable APIs. Their
+ambient categories and formal relationships are:
+
+| Notion | Ambient object | Meaning and owner | Valid comparison |
+| --- | --- | --- | --- |
+| `schemePerfect X` | `D(Coh X)` | Thick envelope of degree-zero finite locally free coherent sheaves; `AlgebraicGeometry/DerivedCategory/Coherent.lean` | `perfectDerivedToDqc_obj_mem_schemePerfectInDqc` maps it into the defining perfect essential image in `Dqc(X)` |
+| `schemeRelativePerfect p` | `Dqc(X)` for `p : X ⟶ S` | Pseudo-coherence plus local finite Tor amplitude over the chosen base; `Moduli/PerfectComplex/Relative.lean` | It implies `schemePseudoCoherent`; it is not identified with absolute perfection without an additional geometric theorem |
+| `Coh.TwoTermPerfectDeterminantData F` | a coherent sheaf `F` plus presentation data | An explicit two-term finite locally free resolution used by determinant and Chern-class consumers; `Divisors/Determinant.lean` | `Moduli/PerfectComplex/Comparison.lean` forgets it to an absolute perfect degree-zero object and then to `schemePerfectInDqc` |
+
+`schemePerfectInDqc X` is the bridge, not a fourth competing definition: it
+is the essential image of `SchemePerfectDerivedCategory X` under the concrete
+coherent-derived functor. The general equality with compact objects remains
+explicit evidence. Neither relative perfection nor two-term amplitude is
+promoted to an equivalence with the full absolute perfect locus.
+
+The canonical zero of `SchemeQuasicoherentDerivedCategory X` belongs to
+`Dqc.lean` and is available for every scheme. Perfect-moduli files may prove
+that this root object satisfies their additional predicates, but may not
+reconstruct or rename the ambient zero.
+
 Classify categorical dimension before applying the table. A declaration whose
 essential data are associators, unitors, pentagons, triangles, or other
 2-morphisms is not ordinary-category infrastructure merely because its `Cat`

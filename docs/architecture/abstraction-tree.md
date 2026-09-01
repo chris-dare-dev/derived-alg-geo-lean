@@ -109,10 +109,17 @@ AlgebraicGeometry
 │     └─ almost-disconnected graded pieces   scheme-geometric leaf
 ├─ scheme-derived category                     `DerivedCategory/`
 │  ├─ Dqc                                      neutral geometric locus
+│  │  ├─ canonical zero                        owned by Dqc, all schemes
 │  │  └─ explicit comparison evidence          representatives, not instances
 │  ├─ bounded coherent locus
 │  ├─ scheme pullback and geometric kernels
-│  └─ perfect / relative-perfect loci          `Moduli/PerfectComplex/`
+│  └─ absolute perfect locus                   thick envelope in `D(Coh X)`
+│     └─ essential image in Dqc
+│        └─ compact objects                    only with explicit evidence
+├─ relative-perfect locus over `p : X ⟶ S`     `Moduli/PerfectComplex/Relative`
+│  └─ pseudo-coherent + finite Tor amplitude   not absolute perfection by definition
+├─ two-term determinant presentation           explicit finite-locally-free resolution
+│  └─ absolute perfect degree-zero object       proved comparison adapter
 ├─ numerical K-theory
 │  └─ Euler quotient
 │     └─ relative numerical quotient              uses Algebra root
