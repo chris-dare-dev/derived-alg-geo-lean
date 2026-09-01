@@ -55,3 +55,32 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.IsExceptional.hom_shift_shift_eq_zero
 #print axioms CategoryTheory.Triangulated.IsExceptional.shift
 #print axioms CategoryTheory.Triangulated.IsExceptional.of_equivalence
+
+-- Exceptional collections: the classical-direction structure, its envelope
+-- components, the semiorthogonality theorem via double envelope peeling, and
+-- the two upstream-candidate retract-stability instances for the orthogonals.
+#print axioms CategoryTheory.ObjectProperty.rightOrthogonal_isStableUnderRetracts
+#print axioms CategoryTheory.ObjectProperty.leftOrthogonal_isStableUnderRetracts
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.obj
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.exceptional
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.hom_shift_eq_zero
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.mk.inj
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.IsStrong
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.obj_mem_component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.component_nonempty
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.hom_shift_shift_eq_zero
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.semiorthogonal_component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequence
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequence_component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.IsFull
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.IsStronglyFull
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.IsStronglyFull.isFull
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.hasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.ofExceptional
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.reindex
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.reindex_toSemiorthogonalSequence
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequenceFin
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequenceFin_component
