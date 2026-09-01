@@ -35,8 +35,8 @@ because the geometry is what it is made of.
 ## What is still supplied, not proved
 
 `cl : K₀Ab A →+ N` is an argument.  Nothing in this repository constructs one —
-`NumericalRealization` says so about its own `cl` — so this file makes the
-comparison available without pretending the class map exists.
+The generic `K₀.Realization` root likewise treats such a class map as supplied,
+so this file makes the comparison available without pretending it exists.
 
 The **numerical quotient** is also still bypassed.  `N` is documented as
 `K(X)/≡`, but the lane quotients it again by `leftRadical`, and the only

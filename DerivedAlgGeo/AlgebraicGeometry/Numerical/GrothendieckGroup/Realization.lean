@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.MukaiVector
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.GrothendieckGroup
+import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Realization
 import Mathlib.LinearAlgebra.BilinearForm.IsometryEquiv
 
 /-!
@@ -56,11 +57,11 @@ bijection as an input.
 
 ## The realization is a hypothesis, and a large one
 
-`NumericalRealization` follows the convention the stability-families track uses
-for geometric input: the datum is named, so that the obligation is auditable,
-and nothing here discharges it.  For an actual smooth projective `X` the
-realization would be `K₀(D^b(Coh X)) → N(X)`.  The ingredients of that are
-missing or unconnected:
+The generic `K₀.Realization` root names the supplied class map without wrapping
+its additive homomorphism in another carrier. Nothing here constructs its
+geometric specialization. For an actual smooth projective `X` the realization
+would be `K₀(D^b(Coh X)) → N(X)`. The ingredients of that are missing or
+unconnected:
 
 * `D^b(Coh X)` itself now exists in `DerivedCategory/Coherent.lean` as
   `SchemeBoundedCoherentDerivedCategory`, with
@@ -77,8 +78,8 @@ does is make the distance explicit and let the categorical side be stated.
 
 ## What this file does not assert
 
-* Nothing constructs a `NumericalRealization`, and nothing constructs a
-  `Descends` witness.  Both are supplied.  Nothing constructs an
+* Nothing constructs a geometric `K₀.Realization`, and nothing constructs a
+  `K₀.Realization.Descends` witness. Both are supplied. Nothing constructs an
   `AdditiveMukaiData` either, so the isometry statements are conditional on a
   lattice-valued *additive* Chern class that no file produces.
 * **Nothing proves a Fourier--Mukai transform preserves the Euler pairing.**
@@ -106,59 +107,6 @@ namespace AlgebraicGeometry.Numerical
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
-
-section Realization
-
-variable (𝒯 : Type u₁) [Category.{v₁} 𝒯] [HasZeroObject 𝒯] [HasShift 𝒯 ℤ]
-  [Preadditive 𝒯] [∀ n : ℤ, (shiftFunctor 𝒯 n).Additive] [Pretriangulated 𝒯]
-  (N : Type x₁) [AddCommGroup N]
-
-/-- A **numerical realization** of a triangulated category: a homomorphism from
-its Grothendieck group to a numerical Grothendieck group.
-
-Geometrically this is the class map `K₀(D^b(Coh X)) → N(X)`.  It is supplied,
-never constructed -- see the module docstring for why every ingredient of the
-geometric construction is missing at the pin. -/
-structure NumericalRealization where
-  /-- The class map. -/
-  cl : K₀ 𝒯 →+ N
-
-end Realization
-
-section Descent
-
-variable {𝒳 : Type u₁} {𝒴 : Type u₂} {N : Type x₁} {N' : Type x₂}
-  [Category.{v₁} 𝒳] [Category.{v₂} 𝒴]
-  [HasZeroObject 𝒳] [HasShift 𝒳 ℤ] [Preadditive 𝒳]
-  [∀ n : ℤ, (shiftFunctor 𝒳 n).Additive] [Pretriangulated 𝒳]
-  [HasZeroObject 𝒴] [HasShift 𝒴 ℤ] [Preadditive 𝒴]
-  [∀ n : ℤ, (shiftFunctor 𝒴 n).Additive] [Pretriangulated 𝒴]
-  [AddCommGroup N] [AddCommGroup N']
-
-/-- `Φ` **descends** to `φ` along the two realizations: the square
-`cl' ∘ K₀.map Φ = φ ∘ cl` commutes. -/
-def Descends (R : NumericalRealization 𝒳 N) (R' : NumericalRealization 𝒴 N')
-    (Φ : 𝒳 ⥤ 𝒴) [Φ.CommShift ℤ] [Φ.IsTriangulated] (φ : N →+ N') : Prop :=
-  ∀ x : K₀ 𝒳, R'.cl (K₀.map Φ x) = φ (R.cl x)
-
-/-- A descent is determined on classes of objects. -/
-theorem Descends.apply_of {R : NumericalRealization 𝒳 N}
-    {R' : NumericalRealization 𝒴 N'} {Φ : 𝒳 ⥤ 𝒴} [Φ.CommShift ℤ]
-    [Φ.IsTriangulated] {φ : N →+ N'} (h : Descends R R' Φ φ) (E : 𝒳) :
-    R'.cl (K₀.of 𝒴 (Φ.obj E)) = φ (R.cl (K₀.of 𝒳 E)) := by
-  have := h (K₀.of 𝒳 E)
-  rwa [K₀.map_of] at this
-
-/-- Naturally isomorphic functors have the same descents. -/
-theorem Descends.of_natIso {R : NumericalRealization 𝒳 N}
-    {R' : NumericalRealization 𝒴 N'} {Φ Ψ : 𝒳 ⥤ 𝒴} [Φ.CommShift ℤ]
-    [Φ.IsTriangulated] [Ψ.CommShift ℤ] [Ψ.IsTriangulated] {φ : N →+ N'}
-    (h : Descends R R' Φ φ) (e : Φ ≅ Ψ) : Descends R R' Ψ φ := by
-  intro x
-  rw [← K₀.map_congr e]
-  exact h x
-
-end Descent
 
 section Euler
 
@@ -331,10 +279,10 @@ variable {𝒳 : Type u₁} {𝒴 : Type u₂} {𝒲 : Type u₃}
 given a descent of its class map that preserves the Euler form.
 
 Read the quantifiers carefully. The conclusion is an equality of pairings for
-the Mukai vectors of `R.cl x` and `R.cl y`, for classes `x y : K₀ 𝒳`. It is
+the Mukai vectors of `R x` and `R y`, for classes `x y : K₀ 𝒳`. It is
 NOT an isometry of Mukai lattices: no map between the two lattices is built,
 the statement says nothing at vectors outside the image of
-`mukaiVector ∘ R.cl`, and at this data level `mukaiVector` is not additive.
+`mukaiVector ∘ R`, and at this data level `mukaiVector` is not additive.
 `mukaiForm_eq_on_realized` is the `AdditiveMukaiData` restatement, where the
 two sides are values of a genuine bilinear form; even there the map whose
 isometry property it is, is `φ`, not a map of extensions.
@@ -347,18 +295,18 @@ theorem pairing_mukaiVector_eq_on_realized (C : Correspondence 𝒳 𝒴 𝒲) (
     [C.pull.CommShift ℤ] [(C.tensor.obj K).CommShift ℤ] [C.push.CommShift ℤ]
     [C.pull.IsTriangulated] [(C.tensor.obj K).IsTriangulated]
     [C.push.IsTriangulated]
-    (R : NumericalRealization 𝒳 N) (R' : NumericalRealization 𝒴 N')
-    (φ : N →+ N') (hd : Descends R R' (C.transform K) φ)
+    (R : K₀.Realization 𝒳 N) (R' : K₀.Realization 𝒴 N')
+    (φ : N →+ N') (hd : R.Descends R' (C.transform K) φ)
     (D : IntegralMukaiData V Λ) (D' : IntegralMukaiData V' Λ')
     (hHRR : V.SatisfiesHRR) (hHRR' : V'.SatisfiesHRR)
     (hK3 : IsK3 V) (hK3' : IsK3 V')
     (hφ : PreservesEuler V V' φ) (x y : K₀ 𝒳) :
-    Mukai.pairing D'.b (D'.mukaiVector (R'.cl (C.transformK₀ K x)))
-        (D'.mukaiVector (R'.cl (C.transformK₀ K y)))
-      = Mukai.pairing D.b (D.mukaiVector (R.cl x)) (D.mukaiVector (R.cl y)) := by
-  have hx : R'.cl (C.transformK₀ K x) = φ (R.cl x) := by
+    Mukai.pairing D'.b (D'.mukaiVector (R' (C.transformK₀ K x)))
+        (D'.mukaiVector (R' (C.transformK₀ K y)))
+      = Mukai.pairing D.b (D.mukaiVector (R x)) (D.mukaiVector (R y)) := by
+  have hx : R' (C.transformK₀ K x) = φ (R x) := by
     rw [Correspondence.transformK₀_eq]; exact hd x
-  have hy : R'.cl (C.transformK₀ K y) = φ (R.cl y) := by
+  have hy : R' (C.transformK₀ K y) = φ (R y) := by
     rw [Correspondence.transformK₀_eq]; exact hd y
   rw [hx, hy]
   exact pairing_mukaiVector_eq_of_preservesEuler D D' hHRR hHRR' hK3 hK3' φ hφ _ _
@@ -377,14 +325,14 @@ theorem mukaiForm_eq_on_realized (C : Correspondence 𝒳 𝒴 𝒲) (K : 𝒲)
     [C.pull.CommShift ℤ] [(C.tensor.obj K).CommShift ℤ] [C.push.CommShift ℤ]
     [C.pull.IsTriangulated] [(C.tensor.obj K).IsTriangulated]
     [C.push.IsTriangulated]
-    (R : NumericalRealization 𝒳 N) (R' : NumericalRealization 𝒴 N')
-    (φ : N →+ N') (hd : Descends R R' (C.transform K) φ)
+    (R : K₀.Realization 𝒳 N) (R' : K₀.Realization 𝒴 N')
+    (φ : N →+ N') (hd : R.Descends R' (C.transform K) φ)
     (D : AdditiveMukaiData V Λ) (D' : AdditiveMukaiData V' Λ')
     (hHRR : V.SatisfiesHRR) (hHRR' : V'.SatisfiesHRR)
     (hK3 : IsK3 V) (hK3' : IsK3 V')
     (hφ : PreservesEuler V V' φ) (x y : K₀ 𝒳) :
-    D'.mukaiForm (R'.cl (C.transformK₀ K x)) (R'.cl (C.transformK₀ K y))
-      = D.mukaiForm (R.cl x) (R.cl y) :=
+    D'.mukaiForm (R' (C.transformK₀ K x)) (R' (C.transformK₀ K y))
+      = D.mukaiForm (R x) (R y) :=
   pairing_mukaiVector_eq_on_realized C K R R' φ hd D.toIntegralMukaiData
     D'.toIntegralMukaiData hHRR hHRR' hK3 hK3' hφ x y
 

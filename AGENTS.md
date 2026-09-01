@@ -75,6 +75,13 @@ application, current file, namespace, or proof technique.
 - A declaration that needs categories or pseudofunctors but no geometry goes
   to `CategoryTheory/`; prestack loci use
   `CategoryTheory/Pseudofunctor/ObjectProperty/`.
+- Additive `K₀` targets, their exact-functor descent squares, and categorical
+  Euler pairings belong under
+  `CategoryTheory/Triangulated/GrothendieckGroup/`. Reuse `K₀.Realization` and
+  `K₀.EulerForm`; keep only numerical Riemann--Roch and Mukai consumers under
+  algebraic geometry. Do not restore the retired geometry-owned
+  `NumericalRealization`, `Descends`, `CategoricalEulerForm`, or
+  `PreservesCategoricalEuler` APIs.
 - A geometric consumer imports the general root directly. Do not preserve the
   old consumer path with an import-only shim.
 - Kernel maps for ordinary localized modules, including their `ModuleCat`

@@ -148,16 +148,19 @@ blocks should normally move it rather than add more declarations beside it.
   input: downstream applications supply admissible families, so this slice
   does not fabricate a second library-owned inhabitant merely to satisfy a
   count.
+- Triangulated Grothendieck-group realizations and Euler forms:
+  `CategoryTheory/Triangulated/GrothendieckGroup/Realization.lean` owns the
+  canonical `K₀.Realization` alias and exact-functor descent squares, while
+  `EulerForm.lean` owns `K₀.EulerForm`, its canonical linear-category form, and
+  preservation by exact functors. Numerical Riemann--Roch, Euler-pairing, and
+  Mukai-vector transfer remain in `AlgebraicGeometry/Numerical/` as consumers.
+  The former geometry-owned one-field carriers `NumericalRealization` and
+  `CategoricalEulerForm`, together with their parallel descent and preservation
+  APIs, are retired rather than retained as compatibility wrappers.
 
 ## Confirmed next lanes
 
-1. Generic triangulated `K₀` realization and descent, together with the
-   categorical Euler carrier, currently have public signatures using only
-   categories, Grothendieck groups, and additive groups. Move that block to
-   `CategoryTheory/Triangulated/GrothendieckGroup/`; retain only the geometric
-   Riemann--Roch and numerical-pairing transfer consumers below
-   `AlgebraicGeometry/Numerical/`.
-2. The generic `ZLattice` class and its finite-torsion-free construction use
+1. The generic `ZLattice` class and its finite-torsion-free construction use
    only finite free abelian groups. Move that root to
    `LinearAlgebra/Lattice/`; retain the numerical-quotient theorem as its
    geometric consumer.

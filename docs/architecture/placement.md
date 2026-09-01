@@ -126,6 +126,15 @@ connectivity condition, or relative-perfect object and import this algebraic
 root; it must not restore the retired numerical-Grothendieck-group paths as
 compatibility shims.
 
+Additive realizations of the triangulated Grothendieck group, commuting
+descent squares for exact functors, and bilinear Euler forms whose signatures
+use only `K₀`, additive commutative groups, and categorical linearity are rooted
+at `CategoryTheory/Triangulated/GrothendieckGroup/`. Use the canonical
+`K₀.Realization` and `K₀.EulerForm` aliases instead of geometry-owned one-field
+wrappers. `NumericalVarietyData`, `chi₂`, Hirzebruch--Riemann--Roch hypotheses,
+Mukai pairings, and their preservation theorems remain geometric consumers
+because their signatures introduce the numerical geometry.
+
 Weight-indexed spans of basis vectors and the resulting independence,
 spanning, internal-direct-sum, and multiplicativity lemmas are rooted at
 `LinearAlgebra/GradedBasis.lean`. The numerical consumer imports that module

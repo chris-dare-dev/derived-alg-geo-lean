@@ -144,6 +144,11 @@ CategoryTheory/Triangulated/Families
   ├─→ pseudofunctorial fiber categories and pullback coherence
   └─→ strict category-valued functors through `ofFunctor`
 
+CategoryTheory/Triangulated/GrothendieckGroup
+  ├─→ Basic, Functorial                       triangle K₀ and exact-functor maps
+  ├─→ Realization                            additive K₀ targets and descent squares
+  └─→ EulerForm                              categorical pairing and preservation
+
 CategoryTheory/Triangulated/DerivedCategory
   ├─→ TStructure, ExactFunctor, Homology       arbitrary abelian categories
   ├─→ Opposite                                generic derived/opposite comparison

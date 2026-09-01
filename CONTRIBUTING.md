@@ -63,6 +63,13 @@ introduce a scheme or other genuinely geometric datum and consume that root
 directly. Do not retain or recreate import-only modules at the former
 `AlgebraicGeometry/Numerical/GrothendieckGroup/Relative*` paths.
 
+Additive targets of a triangulated Grothendieck group, descent squares for
+exact functors, and categorical Euler pairings belong under
+`CategoryTheory/Triangulated/GrothendieckGroup/`. Use `K₀.Realization` and
+`K₀.EulerForm` directly. Numerical Riemann--Roch, Euler-transfer, and Mukai
+pairing theorems stay in algebraic geometry as consumers; do not recreate the
+retired geometry-owned carrier or compatibility names.
+
 Degree-zero homogeneous localization, graded shifts, and their algebraic
 trivializations live under `Algebra/Module/GradedModule/` in Mathlib's
 `GradedModule` namespace. Laurent exponent vectors live under

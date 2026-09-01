@@ -2037,18 +2037,10 @@ not functions. -/
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorIsometry
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorIsometry_apply
 
--- The K₀ bridge: realizing a triangulated Grothendieck group numerically.
--- `NumericalRealization`, `Descends` and `PreservesEuler` are all SUPPLIED
--- geometric input, none of it constructed here, so a clean axiom list on the
--- isometry theorems says they follow from that input -- not that any variety
--- or any Fourier-Mukai transform provides it.
-#print axioms AlgebraicGeometry.Numerical.NumericalRealization
-#print axioms AlgebraicGeometry.Numerical.NumericalRealization.mk.inj
-#print axioms AlgebraicGeometry.Numerical.NumericalRealization.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.Numerical.NumericalRealization.cl
-#print axioms AlgebraicGeometry.Numerical.Descends
-#print axioms AlgebraicGeometry.Numerical.Descends.apply_of
-#print axioms AlgebraicGeometry.Numerical.Descends.of_natIso
+-- Numerical consumers of the generic K₀ realization and descent root.
+-- `PreservesEuler` is supplied numerical-variety input; the pairing and
+-- isometry theorems follow from it without claiming that a variety or a
+-- Fourier--Mukai transform supplies the hypothesis.
 #print axioms AlgebraicGeometry.Numerical.PreservesEuler
 #print axioms AlgebraicGeometry.Numerical.pairing_mukaiVector_eq_of_preservesEuler
 #print axioms AlgebraicGeometry.Numerical.selfPairing_mukaiVector_eq_of_preservesEuler
@@ -2066,25 +2058,11 @@ not functions. -/
 #print axioms AlgebraicGeometry.Numerical.isometryEquivOfPreservesEuler
 #print axioms AlgebraicGeometry.Numerical.mukaiForm_eq_on_realized
 
--- Transferring Euler-form preservation across a realization. `IsRiemannRoch`
--- is bilinear HRR and `PreservesCategoricalEuler` is what full faithfulness
--- would give; both are supplied, and `CategoricalEulerForm` is supplied rather
--- than built from Hom. A clean axiom list here is a statement about the
--- bookkeeping, not about any variety or any functor.
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm
--- The Hom-built form, packaged. `ofLinear` is what retires the "nothing
--- constructs a CategoricalEulerForm" claim; the obligation moves to
--- HomFiniteBounded rather than disappearing.
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.ofLinear
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.ofLinear_chi
--- Step 6: the second of EulerTransfer's three obligations, discharged for
--- Hom-built forms. IsRiemannRoch remains supplied.
-#print axioms AlgebraicGeometry.Numerical.ofLinear_preservesCategoricalEuler
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.mk.inj
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.chi
+-- Transferring categorical Euler preservation across a realization.
+-- `IsRiemannRoch` is the genuinely numerical bilinear HRR comparison; the
+-- K₀ realization, Euler form, and preservation predicate are audited with
+-- their categorical owner.
 #print axioms AlgebraicGeometry.Numerical.IsRiemannRoch
-#print axioms AlgebraicGeometry.Numerical.PreservesCategoricalEuler
 #print axioms AlgebraicGeometry.Numerical.preservesEuler_of_descends
 #print axioms AlgebraicGeometry.Numerical.pairing_mukaiVector_eq_on_realized_of_categorical
 

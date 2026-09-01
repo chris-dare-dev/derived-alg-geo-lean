@@ -8,6 +8,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HomFiniteWitness
+import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Realization
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
 
@@ -339,6 +340,23 @@ and no geometry.
 #print axioms CategoryTheory.Triangulated.HomFiniteBounded.of_essSurj
 #print axioms CategoryTheory.Triangulated.chiHom_map
 #print axioms CategoryTheory.Triangulated.chiK₀_map
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm.Preserves
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm.ofLinear
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm.ofLinear_eq_chiK₀
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm.ofLinear_preserves
+
+/-! ## Realizations and descent of K₀
+
+A realization is the canonical additive-homomorphism type out of `K₀`, not a
+new carrier. The descent predicate records the commuting square for a
+triangulated functor and contains no numerical or geometric vocabulary.
+-/
+
+#print axioms CategoryTheory.Triangulated.K₀.Realization
+#print axioms CategoryTheory.Triangulated.K₀.Realization.Descends
+#print axioms CategoryTheory.Triangulated.K₀.Realization.Descends.apply_of
+#print axioms CategoryTheory.Triangulated.K₀.Realization.Descends.of_natIso
 
 /-! ## A concrete HomFiniteBounded model (#543)
 

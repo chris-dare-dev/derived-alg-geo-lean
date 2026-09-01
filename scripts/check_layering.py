@@ -1778,6 +1778,147 @@ def main() -> int:
                 "relative-numerical namespace in geometry"
             )
 
+    grothendieck_group_root = (
+        SOURCE_ROOT / "CategoryTheory" / "Triangulated" /
+            "GrothendieckGroup"
+    )
+    k0_realization_owner = grothendieck_group_root / "Realization.lean"
+    k0_euler_owner = grothendieck_group_root / "EulerForm.lean"
+    k0_generic_modules = {
+        k0_realization_owner: (
+            "DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup."
+            "Functorial",
+            (
+                "namespace CategoryTheory.Triangulated",
+                "abbrev K₀.Realization",
+                "def Descends",
+                "theorem Descends.apply_of",
+                "theorem Descends.of_natIso",
+            ),
+        ),
+        k0_euler_owner: (
+            "DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup."
+            "Functorial",
+            (
+                "namespace CategoryTheory.Triangulated",
+                "abbrev K₀.EulerForm",
+                "def Preserves",
+                "def K₀.EulerForm.ofLinear",
+                "theorem K₀.EulerForm.ofLinear_preserves",
+            ),
+        ),
+    }
+    for path, (required_import, required_fragments) in k0_generic_modules.items():
+        if not path.is_file():
+            failures.append(
+                f"triangulated K₀ owner missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        text = path.read_text(encoding="utf-8")
+        if required_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: K₀ root must import "
+                f"{required_import} directly"
+            )
+        for fragment in required_fragments:
+            if fragment not in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: missing generic K₀ "
+                    f"declaration fragment {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{path.relative_to(ROOT)}: generic K₀ owner depends on or "
+                "declares algebraic geometry"
+            )
+
+    grothendieck_group_umbrella = grothendieck_group_root.with_suffix(".lean")
+    for required_import in (
+        "DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup."
+        "EulerForm",
+        "DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup."
+        "Realization",
+    ):
+        if required_import not in imports_by_path[grothendieck_group_umbrella]:
+            failures.append(
+                f"{grothendieck_group_umbrella.relative_to(ROOT)}: missing "
+                f"generic K₀ umbrella import {required_import}"
+            )
+
+    numerical_grothendieck_root = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Numerical" /
+            "GrothendieckGroup"
+    )
+    numerical_realization_consumer = numerical_grothendieck_root / "Realization.lean"
+    numerical_euler_consumer = numerical_grothendieck_root / "EulerTransfer.lean"
+    k0_consumer_modules = {
+        numerical_realization_consumer: (
+            "DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup."
+            "Realization",
+            (
+                "def PreservesEuler",
+                "theorem pairing_mukaiVector_eq_on_realized",
+                "K₀.Realization",
+            ),
+        ),
+        numerical_euler_consumer: (
+            "DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup."
+            "EulerForm",
+            (
+                "def IsRiemannRoch",
+                "theorem preservesEuler_of_descends",
+                "K₀.Realization",
+                "K₀.EulerForm",
+            ),
+        ),
+    }
+    retired_k0_declarations = (
+        "structure NumericalRealization",
+        "def Descends (",
+        "structure CategoricalEulerForm",
+        "def PreservesCategoricalEuler",
+        "theorem ofLinear_preservesCategoricalEuler",
+    )
+    for path, (required_import, required_fragments) in k0_consumer_modules.items():
+        text = path.read_text(encoding="utf-8")
+        if required_import not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: numerical K₀ consumer must import "
+                f"the categorical owner {required_import} directly"
+            )
+        for fragment in required_fragments:
+            if fragment not in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: missing geometric K₀ consumer "
+                    f"fragment {fragment!r}"
+                )
+        for fragment in retired_k0_declarations:
+            if fragment in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: restored geometry-owned K₀ "
+                    f"declaration {fragment!r}"
+                )
+
+    retired_k0_names = (
+        "AlgebraicGeometry.Numerical.NumericalRealization",
+        "AlgebraicGeometry.Numerical.Descends",
+        "AlgebraicGeometry.Numerical.CategoricalEulerForm",
+        "AlgebraicGeometry.Numerical.PreservesCategoricalEuler",
+    )
+    for path in sorted(SOURCE_ROOT.rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        for retired_name in retired_k0_names:
+            if retired_name in text:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: restored retired K₀ name "
+                    f"{retired_name}"
+                )
+
     graded_basis_owner = SOURCE_ROOT / "LinearAlgebra" / "GradedBasis.lean"
     numerical_graded_basis_consumer = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Numerical" / "Core" /
@@ -3087,6 +3228,11 @@ def main() -> int:
     print(
         "ok: relative numerical sums, family-relation quotients, images, and "
         "overlattice predicates use the Algebra owner"
+    )
+    print(
+        "ok: K₀ realizations, descent squares, and categorical Euler forms use "
+        "the triangulated Grothendieck-group owner; numerical HRR and Mukai "
+        "transfer remain consumers"
     )
     print(
         "ok: weighted-basis decompositions use LinearAlgebra and pure "
