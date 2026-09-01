@@ -113,6 +113,7 @@ RETIRED_PATHS = (
     "AlgebraicGeometry/IntersectionTheory/NumericalPolynomial",
     "AlgebraicGeometry/Numerical/GrothendieckGroup/Relative.lean",
     "AlgebraicGeometry/Numerical/GrothendieckGroup/RelativeOverlattice.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/HomogeneousLocalizationDomain.lean",
     "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentBasis.lean",
     "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentProjection.lean",
     "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentBlock.lean",

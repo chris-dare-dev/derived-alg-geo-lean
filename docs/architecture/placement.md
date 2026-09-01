@@ -25,6 +25,7 @@ request would put it, so the move to Mathlib is a copy.
 | Simplicial objects and face-map complexes | `AlgebraicTopology/` | `AlgebraicTopology/` |
 | Sheaves on a topological space, stalks, the category of opens | `Topology/Sheaves/`, `Topology/Category/TopCat/` | `Topology/Sheaves/`, `Topology/Category/TopCat/` |
 | `PrimeSpectrum` and its topology | `RingTheory/Spectrum/Prime/` | `RingTheory/Spectrum/Prime/` |
+| `HomogeneousLocalization` and graded algebras | `RingTheory/GradedAlgebra/` | `RingTheory/GradedAlgebra/` |
 | Modules, localization, graded modules, polynomials | `Algebra/Module/`, `Algebra/MvPolynomial/` | the same |
 | Lattices, bilinear forms, exterior powers | `LinearAlgebra/` | `LinearAlgebra/` |
 | Schemes, `X.Modules`, `Proj`, morphism properties | `AlgebraicGeometry/` | `AlgebraicGeometry/`, with `ProjectiveSpectrum/` under Mathlib's name |

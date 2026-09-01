@@ -32,11 +32,6 @@ open AlgebraicGeometry
 #print axioms AlgebraicGeometry.Cohomology.canonicalLinearCohomology
 #print axioms AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology.dimension
 #print axioms AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology.dimension_iso
-#print axioms HomogeneousLocalization.isDomain_of_le_nonZeroDivisors
-#print axioms HomogeneousLocalization.nontrivial_of_le_nonZeroDivisors
-#print axioms HomogeneousLocalization.Away.nontrivial
-#print axioms HomogeneousLocalization.Away.isDomain
-#print axioms HomogeneousLocalization.Away.isReduced
 #print axioms AlgebraicGeometry.Proj.isReduced_spec_away
 #print axioms AlgebraicGeometry.Proj.isReduced
 #print axioms AlgebraicGeometry.Proj.isDomain_away

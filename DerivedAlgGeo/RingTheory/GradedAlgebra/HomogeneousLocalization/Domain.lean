@@ -6,16 +6,18 @@ import Mathlib.RingTheory.GradedAlgebra.HomogeneousLocalization
 import Mathlib.RingTheory.Localization.Defs
 
 /-!
-# Homogeneous localizations of a graded domain
+# Domain properties of homogeneous localizations
 
-`HomogeneousLocalization 𝒜 S` is by construction a subring of the ordinary localization
-`Localization S`, through the injective map `HomogeneousLocalization.val`. So when the ambient
-ring is a domain and `S` avoids zero, the homogeneous localization is a domain too.
+`HomogeneousLocalization 𝒜 S` is by construction a subring of the ordinary
+localization `Localization S`, through the injective map
+`HomogeneousLocalization.val`. Thus a homogeneous localization of a domain at
+nonzerodivisors is again a domain.
 
-This is the ring-theoretic input to irreducibility and reducedness of `Proj 𝒜`: the standard
-affine charts of `Proj` are spectra of the degree-zero homogeneous localizations
-`HomogeneousLocalization.Away 𝒜 f`, and those charts are irreducible and reduced exactly because
-those rings are domains.
+The `Away` specialization records nontriviality and the domain property away
+from a nonzero element, and reducedness for every element. These are statements
+about graded rings and localization only. Projective-spectrum geometry consumes
+them when proving that the standard affine charts of `Proj 𝒜` are reduced or
+integral.
 -/
 
 open scoped nonZeroDivisors

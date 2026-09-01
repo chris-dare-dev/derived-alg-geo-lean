@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.HomogeneousLocalizationDomain
+import DerivedAlgGeo.RingTheory.GradedAlgebra.HomogeneousLocalization.Domain
 import DerivedAlgGeo.Topology.IrreducibleCover
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic
 import Mathlib.AlgebraicGeometry.Properties
