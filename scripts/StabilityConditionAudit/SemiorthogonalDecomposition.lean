@@ -84,3 +84,15 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.reindex_toSemiorthogonalSequence
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequenceFin
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequenceFin_component
+
+-- The derived category of a field: the milestone's honest inhabitant. The
+-- residue field in degree zero is exceptional (endomorphisms via the fully
+-- faithful k-linear singleFunctor; positive shifts via projectivity and
+-- Ext-vanishing; negative shifts via the canonical t-structure), and its
+-- length-one collection lands in the root. Fullness is deliberately not
+-- claimed and is expected to be false in the unbounded derived category.
+#print axioms CategoryTheory.Triangulated.residueObject
+#print axioms CategoryTheory.ModuleCat.algebraMap_end_self_bijective
+#print axioms CategoryTheory.Triangulated.isExceptional_residueObject
+#print axioms CategoryTheory.Triangulated.exceptionalCollection_residueObject
+#print axioms CategoryTheory.Triangulated.exceptionalCollection_residueObject_component
