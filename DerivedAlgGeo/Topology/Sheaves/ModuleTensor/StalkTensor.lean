@@ -6,7 +6,7 @@ import Mathlib.Algebra.Category.ModuleCat.Stalk
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Monoidal
 
 /-!
-# The stalk of a tensor product of presheaves of modules
+# Stalks and tensor products of presheaves of modules
 
 Let `R` be a presheaf of commutative rings on a topological space `X`, and let `M` and `P` be
 presheaves of `R`-modules. This file proves
@@ -28,6 +28,10 @@ the statement that taking stalks commutes with the tensor product of presheaves 
   isomorphisms**, for an arbitrary whiskering factor. Tensoring is only right exact, but
   tensoring with an isomorphism is an isomorphism, and `stalkTensorEquiv` is what makes that
   visible on stalks.
+
+Every declaration in this module intrinsically uses the topology of `X` through open
+neighbourhoods, germs, or stalk functors. It is therefore the topological comparison root used
+by `DerivedAlgGeo.Topology.Sheaves.ModuleTensor`, not ordinary `ModuleCat` algebra.
 
 ## Implementation notes
 

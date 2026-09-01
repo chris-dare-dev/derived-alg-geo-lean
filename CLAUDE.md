@@ -26,8 +26,10 @@ The principal areas are:
 - `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` for
   intrinsic rank-one module sheaves and local trivializations, with
   arbitrary-site tensor descent in the adjacent `Tensor.lean`;
-- `DerivedAlgGeo/Topology/Sheaves/ModuleTensor.lean` for the stalkwise
-  topological strengthening of module-tensor descent;
+- `DerivedAlgGeo/Topology/Sheaves/ModuleTensor/StalkTensor.lean` for the
+  comparison between stalks and tensor products of module presheaves, and the
+  parent `ModuleTensor.lean` for the resulting stalkwise strengthening of
+  module-tensor descent;
 - `DerivedAlgGeo/CategoryTheory/Moduli/` for neutral moduli predicates such as
   boundedness;
 - `DerivedAlgGeo/CategoryTheory/Pseudofunctor/ObjectProperty/` for generic
@@ -85,6 +87,12 @@ concrete applications through explicit instance leaves.
 - Rank-one local-generator data and `SheafOfModules.IsInvertible` are likewise
   arbitrary-site module-sheaf notions. Scheme tensor and Picard modules import
   those roots directly and begin only when `X.Modules` enters the signature.
+- Stalk tensor products of module presheaves are topological sheaf theory:
+  their signatures use a topological space, its opens, germs, and stalk
+  functors. Their canonical owner is
+  `Topology/Sheaves/ModuleTensor/StalkTensor.lean`, not
+  `Algebra/Category/ModuleCat/`; the parent topological module consumes that
+  comparison to prove the arbitrary-factor stalkwise theorem.
 - Definitions and lemmas that intrinsically mention schemes, varieties,
   scheme-indexed sheaf categories, or geometric morphism properties belong
   under `AlgebraicGeometry/`.
@@ -348,6 +356,10 @@ documentation, architecture checks, and CI paths together.
   Grothendieck topology and a covering family belong in
   `CategoryTheory/Sites/Sheaves/CoversTop.lean`, not in a scheme tensor or
   divisor consumer.
+- Module-presheaf declarations mentioning a topological space, open
+  neighbourhoods, germs, or stalk functors belong under `Topology/Sheaves/`.
+  Do not restore the retired `Algebra/Category/ModuleCat/StalkTensor.lean`
+  path or route consumers through an algebra umbrella.
 - Use the global `ZLattice` class from `LinearAlgebra/Lattice/Basic.lean` for
   finite free abelian groups. Its construction from finite torsion-free groups
   is generic; only the theorem applying it to a numerical Euler-radical

@@ -189,15 +189,20 @@ blocks should normally move it rather than add more declarations beside it.
   arbitrary site. `Topology/Sheaves/ModuleTensor.lean` owns the stalkwise
   arbitrary-factor strengthening. Scheme tensor objects, tensor closure,
   associativity, and Picard classes remain direct geometric consumers.
+- Stalk tensor products of module presheaves:
+  `Topology/Sheaves/ModuleTensor/StalkTensor.lean` owns the comparison between
+  the stalk of a tensor product and the tensor product of stalks, together with
+  its open-neighbourhood, germ, and stalk-map infrastructure. The parent
+  `Topology/Sheaves/ModuleTensor.lean` imports that root to prove the
+  arbitrary-factor stalkwise local-equivalence theorem. The former
+  `Algebra/Category/ModuleCat/StalkTensor.lean` path and its export from the
+  algebra umbrella are retired without a compatibility shim.
 
 ## Confirmed next lanes
 
-- Stalk tensor products of module presheaves: every public declaration in
-  `Algebra/Category/ModuleCat/StalkTensor.lean` requires a topological space,
-  its open neighborhoods, and stalk functors. The signature-test owner is
-  `Topology/Sheaves/ModuleTensor/`, where it supplies the stalk comparison
-  consumed by `Topology/Sheaves/ModuleTensor.lean`; the current `Algebra/`
-  path is a reverse subject placement and should be retired without a shim.
+- No additional reverse-ownership block was confirmed while moving the
+  stalk-tensor root. The next lane should be selected by a fresh signature
+  audit of mixed-owner consumers.
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and

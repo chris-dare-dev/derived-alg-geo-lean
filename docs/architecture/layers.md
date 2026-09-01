@@ -65,8 +65,9 @@ In particular:
   Proj cover arguments import it as consumers;
 - intrinsic rank-one and invertible module sheaves, together with
   arbitrary-site tensor descent, belong below
-  `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules`; the stalkwise
-  arbitrary-factor strengthening belongs below `DerivedAlgGeo.Topology`;
+  `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules`; the stalk/tensor
+  comparison and the resulting stalkwise arbitrary-factor strengthening
+  belong below `DerivedAlgGeo.Topology`;
 - numerical functions on integer lattices and their mixed finite-difference
   calculus live under `DerivedAlgGeo.Algebra.NumericalPolynomial`; Snapper's
   theorem is the geometric consumer once Picard and coherent-sheaf data enter;
@@ -205,7 +206,9 @@ CategoryTheory/Sites/Sheaves
         └─→ Presentation                        finite-presentation transport
 
 Topology/Sheaves
-  └─→ ModuleTensor                              stalkwise arbitrary-factor tensor descent
+  └─→ ModuleTensor
+        ├─→ StalkTensor                         stalk/tensor comparison on spaces
+        └─→ stalkwise arbitrary-factor tensor descent
 
 CategoryTheory/Triangulated/WeakStabilityCondition
   ├─→ Foundation, Families, HarderNarasimhan, Support, Tilting
@@ -348,6 +351,13 @@ not a Picard-group definition. Scheme Picard classes and sheafified tensor
 objects directly consume it. The topological stalkwise tensor theorem is a
 stronger specialization and therefore imports the categorical site root, not
 the other way around.
+
+Likewise, the comparison between the stalk of a tensor product and the tensor
+product of stalks is owned by
+`Topology/Sheaves/ModuleTensor/StalkTensor.lean`. Although it is formulated
+for module presheaves, its signatures intrinsically use a topological space,
+open neighbourhoods, germs, and stalk functors. The parent topological module
+imports this comparison; the `Algebra` umbrella does not export it.
 
 Raw dg categories require an additional distinction. A dg category is an
 enriched category and need not be triangulated, so its basic theory and its

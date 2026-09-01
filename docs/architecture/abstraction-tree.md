@@ -86,7 +86,9 @@ Category
    │     └─ intrinsic IsInvertible
    │        ├─ rank-one local trivializations
    │        ├─ arbitrary-site tensor descent
-   │        └─ stalkwise topological strengthening
+   │        └─ topological specialization
+   │           ├─ stalk/tensor comparison
+   │           └─ stalkwise arbitrary-factor strengthening
    ├─ site-theoretic Čech complexes and derived comparison
    │  └─ compact-basis and finite-cover boundedness
    └─ scheme-site realizations
@@ -192,6 +194,10 @@ particular:
 - keep detection of additive-presheaf local equivalences on a `CoversTop`
   family under the generic site/sheaf root; scheme charts and sheafified
   tensor constructions only consume that theorem chain;
+- keep stalk/tensor comparisons for module presheaves under
+  `Topology/Sheaves/ModuleTensor/`: their use of open neighbourhoods, germs,
+  and stalk functors makes them topological specializations of arbitrary-site
+  sheaf theory, not ordinary module algebra;
 - extend Mathlib's abelian-category hierarchy under `CategoryTheory/Abelian`
   and make the geometric proof that `Coh(X)` is abelian an input to the generic
   derived-category construction;

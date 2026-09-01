@@ -1,8 +1,9 @@
 /-
-Stalk-tensor slice of the AlgebraicGeometry audit, split out so concurrent branches append to
-different files (#480). See the umbrella file for the contract.
+Topological stalk-tensor slice of the AlgebraicGeometry audit, split out so concurrent branches
+append to different files (#480). `EnumDecls.libraryOf` routes the `Topology` subject through
+this audit. See the umbrella file for the contract.
 -/
-import DerivedAlgGeo.Algebra.Category.ModuleCat.StalkTensor
+import DerivedAlgGeo.Topology.Sheaves.ModuleTensor.StalkTensor
 
 /-! ## The stalk of a tensor product of presheaves of modules (#833)
 

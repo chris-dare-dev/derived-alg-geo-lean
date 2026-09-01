@@ -1437,6 +1437,7 @@ def main() -> int:
         generic_sheaves_root / "Modules" / "Tensor.lean",
         SOURCE_ROOT / "Topology" / "Sheaves" / "CohomologyPushforward.lean",
         SOURCE_ROOT / "Topology" / "Sheaves" / "ModuleTensor.lean",
+        SOURCE_ROOT / "Topology" / "Sheaves" / "ModuleTensor" / "StalkTensor.lean",
     )
     for path in required_generic_foundations:
         if not path.is_file():
@@ -1522,6 +1523,15 @@ def main() -> int:
         SOURCE_ROOT / "Topology" / "Sheaves" / "ModuleTensor.lean"
     )
     topological_tensor_import = "DerivedAlgGeo.Topology.Sheaves.ModuleTensor"
+    topological_stalk_tensor_owner = (
+        SOURCE_ROOT / "Topology" / "Sheaves" / "ModuleTensor" / "StalkTensor.lean"
+    )
+    topological_stalk_tensor_import = (
+        "DerivedAlgGeo.Topology.Sheaves.ModuleTensor.StalkTensor"
+    )
+    retired_algebra_stalk_tensor = (
+        SOURCE_ROOT / "Algebra" / "Category" / "ModuleCat" / "StalkTensor.lean"
+    )
     invertible_fragments = (
         "def IsRankOne",
         "class IsInvertible",
@@ -1554,6 +1564,53 @@ def main() -> int:
         failures.append(
             f"{topological_tensor_owner.relative_to(ROOT)}: missing stalkwise "
             "module-tensor specialization"
+        )
+
+    stalk_tensor_fragments = (
+        "abbrev StalkTensor",
+        "noncomputable def stalkTensorEquiv",
+        "lemma stalkMapAdd_whiskerLeft",
+        "lemma isIso_stalkMapAdd_whiskerLeft",
+    )
+    if topological_stalk_tensor_owner.is_file():
+        stalk_tensor_text = topological_stalk_tensor_owner.read_text(encoding="utf-8")
+        for fragment in stalk_tensor_fragments:
+            if fragment not in stalk_tensor_text:
+                failures.append(
+                    f"{topological_stalk_tensor_owner.relative_to(ROOT)}: missing "
+                    f"topological stalk-tensor declaration {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            stalk_tensor_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{topological_stalk_tensor_owner.relative_to(ROOT)}: topological "
+                "stalk-tensor root depends on or declares algebraic geometry"
+            )
+
+    if retired_algebra_stalk_tensor.exists():
+        failures.append(
+            "retired algebra-owned stalk-tensor path restored: "
+            f"{retired_algebra_stalk_tensor.relative_to(ROOT)}"
+        )
+    retired_algebra_stalk_tensor_import = (
+        "DerivedAlgGeo.Algebra.Category.ModuleCat.StalkTensor"
+    )
+    for path, modules in imports_by_path.items():
+        if retired_algebra_stalk_tensor_import in modules:
+            failures.append(
+                f"{path.relative_to(ROOT)}: imports retired algebra-owned stalk-tensor "
+                f"path {retired_algebra_stalk_tensor_import}"
+            )
+
+    if topological_stalk_tensor_import not in imports_by_path[topological_tensor_owner]:
+        failures.append(
+            f"{topological_tensor_owner.relative_to(ROOT)}: stalkwise tensor consumer "
+            f"must import the topological comparison root "
+            f"{topological_stalk_tensor_import} directly"
         )
 
     modules_umbrella = generic_sheaves_root / "Modules.lean"
