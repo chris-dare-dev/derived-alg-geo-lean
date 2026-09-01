@@ -248,6 +248,14 @@ blocks should normally move it rather than add more declarations beside it.
   `Opens (PrimeSpectrum R)` and a categorical finite product supplied by
   `Topology/Opens/Limits`, so `Topology/PrimeSpectrum/` is the first valid
   owner without a forbidden `Algebra -> Topology` edge.
+- Generating sections from free epimorphisms:
+  `CategoryTheory/Sites/Sheaves/Modules/GeneratingSections.lean` owns
+  `SheafOfModules.GeneratingSections.ofFreeEpi`, its finite-index instance,
+  and the lemma recovering the original epimorphism. The full signatures use
+  only a ring sheaf on an arbitrary site. The affine coherent-chart module
+  imports this owner directly and now retains only its scheme/open/coherence
+  theorem; the declaration names and signatures are preserved without a
+  compatibility shim.
 
 ## Confirmed next lanes
 

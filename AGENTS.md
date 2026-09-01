@@ -127,6 +127,12 @@ application, current file, namespace, or proof technique.
   its full signature mentions no scheme. Put the presentation-restriction API
   in `CategoryTheory/Sites/Sheaves/Modules/Presentation/Over.lean`; scheme
   consumers import these roots directly rather than owning the generic prefix.
+- Converting an epimorphism `SheafOfModules.free I ⟶ M` into
+  `M.GeneratingSections`, including its finite-index and recovery lemmas,
+  belongs in
+  `CategoryTheory/Sites/Sheaves/Modules/GeneratingSections.lean`. An affine
+  chart is a consumer only after `Spec R`, a scheme open, or coherence enters
+  the signature.
 - Isomorphism invariance, restriction, and `CoversTop` descent of finite
   presentation for module sheaves on an arbitrary ringed site belong in
   `CategoryTheory/Sites/Sheaves/Modules/Presentation/{Isomorphism,Locality}.lean`.

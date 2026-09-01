@@ -112,6 +112,11 @@ concrete applications through explicit instance leaves.
 - Rank-one local-generator data and `SheafOfModules.IsInvertible` are likewise
   arbitrary-site module-sheaf notions. Scheme tensor and Picard modules import
   those roots directly and begin only when `X.Modules` enters the signature.
+- The conversion from a free epimorphism to
+  `SheafOfModules.GeneratingSections`, its finite-index instance, and its
+  recovery lemma belong in
+  `CategoryTheory/Sites/Sheaves/Modules/GeneratingSections.lean`. Affine
+  charts import that root and add only scheme, open-set, and coherence data.
 - Stalk tensor products of module presheaves are topological sheaf theory:
   their signatures use a topological space, its opens, germs, and stalk
   functors. Their canonical owner is
