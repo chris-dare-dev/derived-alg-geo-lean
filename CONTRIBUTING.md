@@ -157,6 +157,13 @@ implements weak or Bridgeland stability belongs in the corresponding
 categorical construction's `Instances/AlgebraicGeometry/` leaf, while the
 underlying geometric object or theorem remains with its geometric owner.
 
+Keep the bounded-coherent and compact/perfect identifications in `Dqc.lean`
+as explicit propositions until they are proved for a stated geometric class.
+`Dqc/Comparison.lean` is the conditional consumer API: pass the evidence as
+an ordinary argument to recover coherent representatives or compare perfect
+and compact membership. Do not register the resulting equivalence,
+essential-surjectivity proof, or compactness comparison globally.
+
 Declaration namespaces follow those owners. Use
 `AlgebraicGeometry.DerivedCategory` for the scheme-derived category API in
 `DerivedCategory/Basic.lean`, and

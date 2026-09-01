@@ -2416,6 +2416,70 @@ def main() -> int:
         ),
     }
     dqc_subtree = neutral_derived_families_root.parent / "Dqc"
+    dqc_comparison_source = dqc_subtree / "Comparison.lean"
+    relative_perfect_source = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Moduli" / "PerfectComplex" /
+            "Relative.lean"
+    )
+    if not dqc_comparison_source.is_file():
+        failures.append(
+            f"conditional Dqc comparison consumer missing: "
+            f"{dqc_comparison_source.relative_to(ROOT)}"
+        )
+    else:
+        dqc_comparison_text = dqc_comparison_source.read_text(encoding="utf-8")
+        dqc_root_import = "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc"
+        if dqc_root_import not in imports_by_path[dqc_comparison_source]:
+            failures.append(
+                f"{dqc_comparison_source.relative_to(ROOT)}: conditional "
+                f"comparison API must import its Dqc statement root {dqc_root_import}"
+            )
+        for required_fragment in (
+            "(h : HasBoundedCoherentDqcIdentification X)",
+            "theorem boundedCoherentDerivedToDqc_essSurj",
+            "noncomputable def boundedCoherentRepresentative",
+            "noncomputable def boundedCoherentRepresentativeIso",
+            "(h : PerfectObjectsAreCompactInDqc X)",
+            "theorem schemePerfectInDqc_iff_isCompact",
+        ):
+            if required_fragment not in dqc_comparison_text:
+                failures.append(
+                    f"{dqc_comparison_source.relative_to(ROOT)}: explicit-evidence "
+                    f"comparison API is missing {required_fragment!r}"
+                )
+        for forbidden_fragment in (
+            "instance boundedCoherentDerivedToDqc_essSurj",
+            "noncomputable instance boundedCoherentDerivedToDqc_essSurj",
+            "class HasBoundedCoherentDqcIdentification",
+            "class PerfectObjectsAreCompactInDqc",
+        ):
+            if forbidden_fragment in dqc_comparison_text:
+                failures.append(
+                    f"{dqc_comparison_source.relative_to(ROOT)}: conditional Dqc "
+                    f"evidence was promoted globally via {forbidden_fragment!r}"
+                )
+    if dqc_comparison_source.is_file():
+        comparison_import = (
+            "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Comparison"
+        )
+        if comparison_import not in imports_by_path[relative_perfect_source]:
+            failures.append(
+                f"{relative_perfect_source.relative_to(ROOT)}: relative-perfect "
+                f"consumer must import conditional comparison API {comparison_import}"
+            )
+        relative_perfect_text = relative_perfect_source.read_text(encoding="utf-8")
+        for required_fragment in (
+            "theorem exists_boundedCoherentRepresentative",
+            "(h : HasBoundedCoherentDqcIdentification X)",
+            "(hE : schemeBoundedCoherentCohomology X E.obj)",
+            "theorem perfect_iff_compact",
+            "(h : PerfectObjectsAreCompactInDqc X)",
+        ):
+            if required_fragment not in relative_perfect_text:
+                failures.append(
+                    f"{relative_perfect_source.relative_to(ROOT)}: relative-perfect "
+                    f"comparison consumer is missing {required_fragment!r}"
+                )
     for filename, names in affine_generic_declarations.items():
         path = dqc_subtree / filename
         text = path.read_text(encoding="utf-8")
@@ -2826,6 +2890,10 @@ def main() -> int:
         "ok: scheme-derived categories, families, Dqc, and geometric "
         "Fourier--Mukai declarations use their matching AlgebraicGeometry "
         "namespaces"
+    )
+    print(
+        "ok: conditional Dqc comparisons require explicit evidence and are "
+        "consumed by relative-perfect geometry without global instances"
     )
     print(
         "ok: semistable loci and relative HN filtrations use their Moduli "

@@ -5,7 +5,7 @@ Released under the MIT license.
 import Mathlib.AlgebraicGeometry.Fiber
 import Mathlib.AlgebraicGeometry.Morphisms.FinitePresentation
 import Mathlib.RingTheory.Flat.Basic
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.OpenImmersionPullback
 
 /-!
@@ -193,6 +193,34 @@ Noetherian hypotheses where they are actually used rather than storing inert
 typeclass arguments in the category abbreviation. -/
 abbrev SchemeRelativePerfectCategory {X S : Scheme.{u}} (p : X ⟶ S) :=
   (schemeRelativePerfect p).FullSubcategory
+
+namespace SchemeRelativePerfectCategory
+
+/-- A relative-perfect object with bounded coherent cohomology has a
+`Dᵇ(Coh X)` representative once the bounded-coherent `Dqc` identification is
+supplied explicitly. -/
+theorem exists_boundedCoherentRepresentative {X S : Scheme.{u}}
+    [IsLocallyNoetherian X] {p : X ⟶ S}
+    (h : HasBoundedCoherentDqcIdentification X)
+    (E : SchemeRelativePerfectCategory p)
+    (hE : schemeBoundedCoherentCohomology X E.obj) :
+    ∃ F : SchemeBoundedCoherentDerivedCategory X,
+      Nonempty (((boundedCoherentDerivedToDqc X).obj F).obj ≅ E.obj) := by
+  let E' : SchemeBoundedCoherentDqcCategory X := ⟨E.obj, hE⟩
+  refine ⟨boundedCoherentRepresentative X h E', ⟨?_⟩⟩
+  exact (SchemeBoundedCoherentDqcCategory.ι X).mapIso
+    (boundedCoherentRepresentativeIso X h E')
+
+/-- For a relative-perfect object, the explicit compact/perfect comparison
+identifies membership in the absolute perfect locus with compactness in
+`Dqc(X)`. -/
+theorem perfect_iff_compact {X S : Scheme.{u}} [IsLocallyNoetherian X]
+    {p : X ⟶ S} (h : PerfectObjectsAreCompactInDqc X)
+    (E : SchemeRelativePerfectCategory p) :
+    schemePerfectInDqc X E.obj ↔ IsCompactObject.{0} E.obj :=
+  schemePerfectInDqc_iff_isCompact X h E.obj
+
+end SchemeRelativePerfectCategory
 
 /-- A global stalkwise-flat model used to compute one geometric fiber. This
 does not inhabit the arbitrary left-derived pullback interface: it records the

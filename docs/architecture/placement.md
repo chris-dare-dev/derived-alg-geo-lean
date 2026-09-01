@@ -68,6 +68,15 @@ specialization in `LinearDual.lean`. A Serre-duality statement that mentions a
 scheme imports those roots and the canonical coherent-derived specialization;
 its geometric motivation does not move the generic functors into duality.
 
+The comparison `Dᵇ(Coh X) ≃ Dᵇ_coh(Dqc X)` intrinsically mentions a scheme,
+so its statement and conditional consumer API belong under
+`AlgebraicGeometry/DerivedCategory/Dqc/`. The existence proposition is not an
+instance: `Dqc/Comparison.lean` accepts it explicitly and produces a coherent
+representative and comparison isomorphism. The same rule applies to the
+conditional equality of the perfect and compact-object properties. A moduli
+consumer adds its relative-perfect and bounded-cohomology hypotheses without
+becoming the owner of either comparison.
+
 Classify categorical dimension before applying the table. A declaration whose
 essential data are associators, unitors, pentagons, triangles, or other
 2-morphisms is not ordinary-category infrastructure merely because its `Cat`

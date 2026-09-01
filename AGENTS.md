@@ -268,6 +268,11 @@ construct a subprestack, through the categorical `fullsubcategory` API.
   `AlgebraicGeometry.DerivedCategory.Dqc`. Consumers should open or qualify
   that namespace explicitly; do not route `Dqc` declarations through a
   stability-family namespace.
+- The general bounded-coherent and compact/perfect comparisons in `Dqc.lean`
+  are explicit propositions, not global instances. Consume them through
+  `Dqc/Comparison.lean` by passing evidence as an ordinary argument. Do not
+  install an unconditional equivalence, essential-surjectivity instance, or
+  compact/perfect instance for an unsupported scheme.
 - Neutral geometric Fourier--Mukai declarations owned by
   `AlgebraicGeometry/DerivedCategory/FourierMukai/` use
   `AlgebraicGeometry.DerivedCategory.FourierMukai`. Generic kernel
