@@ -50,7 +50,10 @@ and restriction by `SheafOfModules.overFunctor` is generic module-sheaf theory.
 Place their API in `CategoryTheory/Sites/Over.lean` and
 `CategoryTheory/Sites/Sheaves/Modules/Over.lean`, respectively. Likewise,
 transporting a `CoversTop` family through a cover-preserving equivalence stays
-in `CategoryTheory/Sites/CoversTop.lean`. An algebraic-geometric
+in `CategoryTheory/Sites/CoversTop.lean`. Restriction of module-sheaf
+presentations, generating sections, and quasicoherent presentation data along
+these over sites belongs in
+`CategoryTheory/Sites/Sheaves/Modules/Presentation/Over.lean`. An algebraic-geometric
 open-immersion module imports these owners and contains only declarations whose
 types actually mention schemes, opens, or geometric morphism properties.
 

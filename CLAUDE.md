@@ -83,6 +83,9 @@ concrete applications through explicit instance leaves.
   `CategoryTheory/Sites/Over.lean`; generic module-sheaf restriction to an
   over category belongs in `Sites/Sheaves/Modules/Over.lean`; and equivalence
   transport of a `CoversTop` family belongs in `Sites/CoversTop.lean`.
+  Restriction of presentations, generating sections, and quasicoherent
+  presentation data to those over sites belongs in
+  `Sites/Sheaves/Modules/Presentation/Over.lean`.
   Scheme open immersions consume these roots and begin only where schemes or
   topological opens enter the public signature.
 - Local injectivity, local surjectivity, and membership in the weak-equivalence

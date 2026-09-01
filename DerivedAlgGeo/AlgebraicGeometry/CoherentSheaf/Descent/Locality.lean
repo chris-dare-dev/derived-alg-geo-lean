@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Basic.Isomorphism
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.BasicOpen
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Over
 import DerivedAlgGeo.Topology.Opens.Limits
 import DerivedAlgGeo.Topology.Opens.CoversTop
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.OpenImmersion
@@ -74,7 +74,7 @@ instance QuasicoherentData.isFinitePresentation_over {M : SheafOfModules.{u} R}
       rw [QuasicoherentData.presentationOver_relations_I]
       infer_instance
 
-omit hasSheafifyOver hasSheafifyOverOver in
+omit hasSheafComposeOver hasSheafifyOver hasSheafComposeOverOver hasSheafifyOverOver in
 /-- Finite presentation is preserved by restriction to an object of the site. -/
 theorem IsFinitePresentation.over {M : SheafOfModules.{u} R}
     (hM : IsFinitePresentation M) (U : C) : IsFinitePresentation (M.over U) := by

@@ -12,6 +12,17 @@ import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules
 #print axioms SheafOfModules.Presentation.isFinitePresentation_quasicoherentData
 #print axioms SheafOfModules.IsFinitePresentation.of_presentation
 
+/-! ## Restricting presentations on over sites -/
+
+#print axioms SheafOfModules.Presentation.over
+#print axioms SheafOfModules.GeneratingSections.over
+#print axioms SheafOfModules.GeneratingSections.isFiniteType_over
+#print axioms SheafOfModules.QuasicoherentData.presentationOver
+#print axioms SheafOfModules.QuasicoherentData.presentationOver_generators_I
+#print axioms SheafOfModules.QuasicoherentData.presentationOver_relations_I
+#print axioms SheafOfModules.QuasicoherentData.over
+#print axioms SheafOfModules.instHasBinaryProductsOver_derivedAlgGeo
+
 /-! ## Exactness of the forgetful functor to abelian sheaves -/
 
 #print axioms SheafOfModules.preservesFiniteColimits_toSheaf

@@ -113,10 +113,12 @@ application, current file, namespace, or proof technique.
   site theory even when all current covers are scheme charts. In particular,
   do not redeclare the `Presheaf.{isLocallyInjective,isLocallySurjective,W}_of_coversTop`
   chain below algebraic geometry.
-- A theorem about `J.over X`, `Over.post F`, `SheafOfModules.over`, or transport
-  of `J.CoversTop` through an equivalence remains site theory when its full
-  signature mentions no scheme. Scheme open-immersion restriction imports
-  those roots directly rather than owning the generic prefix.
+- A theorem about `J.over X`, `Over.post F`, `SheafOfModules.over`, restriction
+  of a `Presentation`, `GeneratingSections`, or `QuasicoherentData`, or
+  transport of `J.CoversTop` through an equivalence remains site theory when
+  its full signature mentions no scheme. Put the presentation-restriction API
+  in `CategoryTheory/Sites/Sheaves/Modules/Presentation/Over.lean`; scheme
+  consumers import these roots directly rather than owning the generic prefix.
 - A rank-one predicate, intrinsic invertibility class, local trivialization, or
   sheafification-whiskering theorem stated on an arbitrary ringed site belongs
   with generic module sheaves. A scheme Picard class consumes that root; it
