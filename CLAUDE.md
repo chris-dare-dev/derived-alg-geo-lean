@@ -86,6 +86,8 @@ concrete applications through explicit instance leaves.
   Restriction of presentations, generating sections, and quasicoherent
   presentation data to those over sites belongs in
   `Sites/Sheaves/Modules/Presentation/Over.lean`.
+  Isomorphism invariance and covering-family locality of finite presentation
+  belong in the adjacent `Presentation/{Isomorphism,Locality}.lean` roots.
   Scheme open immersions consume these roots and begin only where schemes or
   topological opens enter the public signature.
 - Local injectivity, local surjectivity, and membership in the weak-equivalence
