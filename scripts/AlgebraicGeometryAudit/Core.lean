@@ -1347,16 +1347,14 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderKernels
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderCokernels
 
--- Layer B stage 1: extensions. Local lifts of finite generators and relations produce a
--- finite horseshoe presentation of the middle term, without a noetherian hypothesis.
-#print axioms SheafOfModules.IsFinitePresentation.middle_of_shortExact
-#print axioms SheafOfModules.isFinitePresentation_isClosedUnderExtensions
+-- Layer B stage 1: geometric specialization of the generic finite-presentation
+-- extension theorem. The horseshoe construction itself is audited in
+-- `StabilityConditionAudit/SheafModules.lean`.
 #print axioms Scheme.coherent_isClosedUnderExtensions
 
--- Layer B stage 1: abelianity and the exact inclusion. The full subcategory contains zero
--- and finite products; kernel/cokernel closure then supplies the abelian structure and makes
--- the inclusion preserve all finite limits and colimits.
-#print axioms SheafOfModules.isFinitePresentation_containsZero
+-- Layer B stage 1: abelianity and the exact inclusion. The coherent property consumes the
+-- generic zero theorem and is closed under finite products; kernel/cokernel closure then
+-- supplies the abelian structure and makes the inclusion preserve all finite limits and colimits.
 #print axioms Scheme.coherent_containsZero
 #print axioms Scheme.coherent_isClosedUnderBinaryProducts
 #print axioms Scheme.coherent_isClosedUnderFiniteProducts

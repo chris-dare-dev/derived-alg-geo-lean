@@ -31,7 +31,7 @@ BASELINE_REF = "origin/main"
 # Lower it whenever the real count drops -- `--relax` does that for you. It is
 # never raised: a change that needs a new exception needs a human argument for
 # that exception, in review, not a bumped constant.
-CEILING = 192
+CEILING = 182
 
 # Per-linter ceilings, for the same reason and with more resolution: they catch
 # an `--update` run from a library that lints clean today, which would add its
@@ -40,7 +40,7 @@ CEILING = 192
 # namespaces like `ModuleCat.` -- but any such update grows a count.
 PER_LINTER_CEILING = {
     "docBlame": 141,
-    "unusedArguments": 23,
+    "unusedArguments": 13,
     "defsWithUnderscore": 16,
     "simpNF": 12,
 }

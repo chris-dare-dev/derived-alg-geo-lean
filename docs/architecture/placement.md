@@ -133,9 +133,12 @@ at `CategoryTheory/Sites/Sheaves/Modules/Presentation/Over.lean`. None of these
 signatures requires a scheme. Isomorphism invariance of finite presentation
 and its restriction and descent along a `CoversTop` family are rooted in the
 adjacent `Presentation/Isomorphism.lean` and `Presentation/Locality.lean`.
-The open-immersion, affine-module, and coherent-sheaf files are consumers: they
-import these owners and begin with schemes, distinguished opens, `coherent X`,
-or the equivalence between an open range and the source scheme's open-set site.
+The empty presentation of zero and the finite horseshoe construction for
+short-exact extensions are rooted in `Presentation/Zero.lean` and
+`Presentation/Extensions.lean`. The open-immersion, affine-module, and
+coherent-sheaf files are consumers: they import these owners and begin with
+schemes, distinguished opens, `coherent X`, `Coh X`, or the equivalence between
+an open range and the source scheme's open-set site.
 
 The predicate that local generator data has rank one, the intrinsic
 `SheafOfModules.IsInvertible` class, transport and local trivialization of that

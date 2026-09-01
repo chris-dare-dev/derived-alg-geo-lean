@@ -122,8 +122,10 @@ application, current file, namespace, or proof technique.
 - Isomorphism invariance, restriction, and `CoversTop` descent of finite
   presentation for module sheaves on an arbitrary ringed site belong in
   `CategoryTheory/Sites/Sheaves/Modules/Presentation/{Isomorphism,Locality}.lean`.
-  `AlgebraicGeometry/CoherentSheaf/` owns only the resulting `coherent X`
-  instances and affine-open criteria.
+  The zero-object and short-exact extension closure belong in the adjacent
+  `Presentation/{Zero,Extensions}.lean` roots. `AlgebraicGeometry/CoherentSheaf/`
+  owns only the resulting `coherent X` instances, affine-open criteria, and
+  the abelian structure on `Coh X`.
 - A rank-one predicate, intrinsic invertibility class, local trivialization, or
   sheafification-whiskering theorem stated on an arbitrary ringed site belongs
   with generic module sheaves. A scheme Picard class consumes that root; it

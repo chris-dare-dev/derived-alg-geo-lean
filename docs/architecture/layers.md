@@ -485,6 +485,7 @@ the explicit instance umbrellas attached to their categorical sources:
 | Over-site cocontinuity, covering-family transport, and module-sheaf restriction | `DerivedAlgGeo.CategoryTheory.Sites.Over`, `DerivedAlgGeo.CategoryTheory.Sites.CoversTop`, and `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Over` |
 | Presentation, generating-section, and quasicoherent-data restriction to over sites | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Over` |
 | Isomorphism invariance and covering-family locality of finite presentation | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Isomorphism` and `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Locality` |
+| Zero-object and short-exact extension closure of finite presentation | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Zero` and `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Extensions` |
 | Generic stacks and representable fibers | `DerivedAlgGeo.CategoryTheory.Sites` |
 | Weak-stability family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families` |
 | Ordinary Bridgeland family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families` |

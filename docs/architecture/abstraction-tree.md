@@ -87,6 +87,8 @@ Category
    │     ├─ restriction to an over site
    │     ├─ exact forgetful functor
    │     ├─ finite-presentation transport
+   │     │  ├─ isomorphism invariance / cover locality
+   │     │  └─ zero objects / short-exact extensions
    │     └─ intrinsic IsInvertible
    │        ├─ rank-one local trivializations
    │        ├─ arbitrary-site tensor descent

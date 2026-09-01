@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Extensions
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Zero
 import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 import Mathlib.CategoryTheory.Abelian.Subcategory
 
@@ -24,33 +25,6 @@ hence preserves finite limits and finite colimits and is exact.
 universe u
 
 open CategoryTheory Limits ZeroObject
-
-namespace SheafOfModules
-
-variable {C : Type u} [Category.{u} C] {J : GrothendieckTopology C}
-  {R : Sheaf J RingCat.{u}}
-  [HasSheafify J AddCommGrpCat.{u}]
-  [J.WEqualsLocallyBijective AddCommGrpCat.{u}]
-  [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})]
-
-/-- The zero sheaf of modules has finite presentation. -/
-noncomputable instance isFinitePresentation_containsZero [HasBinaryProducts C] :
-    (isFinitePresentation R).ContainsZero where
-  exists_zero := by
-    let P := presentationOfIsCokernelFree
-      (𝟙 (free (R := R) PEmpty)) (0 : free (R := R) PEmpty ⟶ 0) (by simp)
-      (CokernelCofork.IsColimit.ofEpiOfIsZero _ (by infer_instance) (isZero_zero _))
-    letI : P.IsFinite := by
-      constructor
-      · refine ⟨?_⟩
-        change Finite PEmpty
-        infer_instance
-      · refine ⟨?_⟩
-        change Finite PEmpty
-        infer_instance
-    exact ⟨0, isZero_zero _, IsFinitePresentation.of_presentation.{u, u, u} P⟩
-
-end SheafOfModules
 
 namespace AlgebraicGeometry.Scheme
 

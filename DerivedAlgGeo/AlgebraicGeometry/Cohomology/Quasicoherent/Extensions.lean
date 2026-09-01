@@ -245,9 +245,9 @@ noncomputable instance quasicoherent_isClosedUnderExtensions (X : Scheme.{u}) :
 
 /-- **The zero sheaf is quasi-coherent.**
 
-`SheafOfModules.isFinitePresentation_containsZero` already exhibits a zero sheaf
-as finitely presented, and Mathlib turns finite presentation into
-quasi-coherence, so this needs no `QuasicoherentData` of its own.
+`Scheme.coherent_containsZero` specializes the arbitrary-ringed-site zero theorem
+to `X.Modules`, and Mathlib turns finite presentation into quasi-coherence, so
+this needs no `QuasicoherentData` of its own.
 
 It is the fourth ingredient of the triangulated structure and the only one that
 is not a closure property: `ObjectProperty.IsTriangulated` extends
@@ -257,7 +257,7 @@ noncomputable instance quasicoherent_containsZero (X : Scheme.{u}) :
     (SheafOfModules.isQuasicoherent X.ringCatSheaf).ContainsZero where
   exists_zero := by
     obtain ⟨Z, hZ, hP⟩ :=
-      (SheafOfModules.isFinitePresentation X.ringCatSheaf).exists_prop_of_containsZero
+      (Scheme.coherent X).exists_prop_of_containsZero
     letI : Z.IsFinitePresentation := hP
     exact ⟨Z, hZ, inferInstance⟩
 
