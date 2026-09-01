@@ -165,6 +165,16 @@ blocks should normally move it rather than add more declarations beside it.
   introduces the Euler radical and numerical quotient. The former
   `AlgebraicGeometry.Numerical.ZLattice` namespace is retired rather than
   retained as a compatibility alias.
+- Numerical polynomials and mixed finite differences:
+  `Algebra/NumericalPolynomial/Basic.lean` owns integer-lattice numerical
+  functions, mixed differences, degree bounds, Newton coefficients, and top
+  multilinear coefficients. `AlgebraicGeometry/IntersectionTheory/Snapper.lean`
+  imports that root and begins with Picard powers, coherent twists, Euler
+  characteristics, and the geometric induction certificate. The former
+  `AlgebraicGeometry/IntersectionTheory/NumericalPolynomial.lean` and
+  `AlgebraicGeometry/IntersectionTheory/NumericalPolynomial/` paths, together
+  with the `AlgebraicGeometry.IntersectionTheory.NumericalPolynomial`
+  namespace, are retired rather than retained as compatibility shims.
 
 ## Confirmed next lanes
 

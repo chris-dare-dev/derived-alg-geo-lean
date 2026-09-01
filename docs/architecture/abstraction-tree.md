@@ -100,6 +100,10 @@ Algebra
 ├─ ordinary ring and module theory
 │  └─ module localization
 │     └─ kernel maps                       consumed by coherent-sheaf geometry
+├─ numerical polynomials on integer lattices
+│  ├─ mixed finite differences and degree
+│  └─ top multilinear coefficients
+│     └─ Snapper polynomiality             geometric Picard/coherent consumer
 ├─ multivariate polynomials
 │  └─ division by monomials                consumed by projective localization
 ├─ saturation of an additive subgroup
@@ -168,6 +172,10 @@ particular:
   predicates in `Algebra/RelativeNumerical`; a geometric consumer must
   introduce actual schemes, connectivity, relative perfection, or other
   geometric data and import this root directly;
+- keep integer-lattice numerical functions, mixed forward differences,
+  finite-difference degree, Newton coefficients, and top multilinear
+  coefficients in `Algebra/NumericalPolynomial`; Snapper's theorem imports
+  that root and adds the Picard, coherent-sheaf, and Euler-characteristic data;
 - keep the finite-free abelian-group interface `ZLattice` and its construction
   from finite torsion-free groups in `LinearAlgebra/Lattice/Basic.lean`;
   `NumericalVarietyData.numericalZLattice` remains the geometric theorem that

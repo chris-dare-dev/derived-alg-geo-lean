@@ -99,6 +99,13 @@ application, current file, namespace, or proof technique.
   must mention actual geometric data and import this root directly; do not
   restore the retired `AlgebraicGeometry/Numerical/GrothendieckGroup/Relative*`
   paths.
+- Integer-lattice numerical functions, mixed forward differences, finite-
+  difference degree, Newton coefficients, and their multilinear top
+  coefficients belong under `Algebra/NumericalPolynomial/`. Snapper
+  polynomiality begins only when Picard classes, coherent sheaves, and Euler
+  characteristics enter the signature, and remains in
+  `AlgebraicGeometry/IntersectionTheory/Snapper.lean`. Do not restore the
+  former geometric `NumericalPolynomial` path or namespace.
 - Weight-indexed spans and direct-sum arguments for a basis belong in
   `LinearAlgebra/GradedBasis.lean`; `NumericalRingData.ofGradedBasis` is the
   geometric consumer that adds numerical-intersection-ring data.

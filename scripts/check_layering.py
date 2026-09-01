@@ -1778,6 +1778,118 @@ def main() -> int:
                 "relative-numerical namespace in geometry"
             )
 
+    numerical_polynomial_owner = (
+        SOURCE_ROOT / "Algebra" / "NumericalPolynomial" / "Basic.lean"
+    )
+    numerical_polynomial_umbrella = (
+        SOURCE_ROOT / "Algebra" / "NumericalPolynomial.lean"
+    )
+    numerical_polynomial_consumers = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "IntersectionTheory" / "Snapper.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "IntersectionTheory" / "Surface" /
+            "Number.lean",
+    )
+    if not numerical_polynomial_owner.is_file():
+        failures.append(
+            "numerical-polynomial algebra owner missing: "
+            f"{numerical_polynomial_owner.relative_to(ROOT)}"
+        )
+    else:
+        text = numerical_polynomial_owner.read_text(encoding="utf-8")
+        for fragment in (
+            "namespace NumericalPolynomial",
+            "abbrev Lattice",
+            "abbrev NumericalFunction",
+            "def difference",
+            "def mixedDifference",
+            "def DegreeLE",
+            "def coefficient",
+            "noncomputable def surfacePairing",
+        ):
+            if fragment not in text:
+                failures.append(
+                    f"{numerical_polynomial_owner.relative_to(ROOT)}: missing "
+                    f"numerical-polynomial declaration {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{numerical_polynomial_owner.relative_to(ROOT)}: mixed "
+                "finite-difference root depends on or declares algebraic geometry"
+            )
+
+    numerical_polynomial_umbrella_imports = {
+        numerical_polynomial_umbrella: (
+            "DerivedAlgGeo.Algebra.NumericalPolynomial.Basic",
+        ),
+        SOURCE_ROOT / "Algebra.lean": (
+            "DerivedAlgGeo.Algebra.NumericalPolynomial",
+        ),
+    }
+    for path, required_imports in numerical_polynomial_umbrella_imports.items():
+        if not path.is_file():
+            failures.append(
+                f"numerical-polynomial umbrella missing: {path.relative_to(ROOT)}"
+            )
+            continue
+        for required_import in required_imports:
+            if required_import not in imports_by_path[path]:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: missing numerical-polynomial "
+                    f"umbrella import {required_import}"
+                )
+
+    for path in numerical_polynomial_consumers:
+        if not path.is_file():
+            failures.append(
+                f"numerical-polynomial geometric consumer missing: "
+                f"{path.relative_to(ROOT)}"
+            )
+            continue
+        if "DerivedAlgGeo.Algebra.NumericalPolynomial.Basic" not in imports_by_path[path]:
+            failures.append(
+                f"{path.relative_to(ROOT)}: geometric numerical-polynomial "
+                "consumer must import the algebra root directly"
+            )
+
+    retired_numerical_polynomial_paths = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "IntersectionTheory" /
+            "NumericalPolynomial.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "IntersectionTheory" /
+            "NumericalPolynomial" / "Basic.lean",
+        SOURCE_ROOT / "AlgebraicGeometry" / "IntersectionTheory" /
+            "NumericalPolynomial" / "Snapper.lean",
+    )
+    retired_numerical_polynomial_imports = {
+        "DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.NumericalPolynomial",
+        "DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.Basic",
+        "DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.Snapper",
+    }
+    for path in retired_numerical_polynomial_paths:
+        if path.exists():
+            failures.append(
+                f"retired geometric numerical-polynomial path restored: "
+                f"{path.relative_to(ROOT)}"
+            )
+    for path, modules in imports_by_path.items():
+        restored = sorted(retired_numerical_polynomial_imports.intersection(modules))
+        if restored:
+            failures.append(
+                f"{path.relative_to(ROOT)}: imports retired geometric "
+                f"numerical-polynomial path(s) {restored}"
+            )
+    for path in sorted((SOURCE_ROOT / "AlgebraicGeometry").rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        if "AlgebraicGeometry.IntersectionTheory.NumericalPolynomial" in text:
+            failures.append(
+                f"{path.relative_to(ROOT)}: restored integer-lattice "
+                "finite-difference namespace in algebraic geometry"
+            )
+
     grothendieck_group_root = (
         SOURCE_ROOT / "CategoryTheory" / "Triangulated" /
             "GrothendieckGroup"
@@ -3311,6 +3423,10 @@ def main() -> int:
     print(
         "ok: relative numerical sums, family-relation quotients, images, and "
         "overlattice predicates use the Algebra owner"
+    )
+    print(
+        "ok: numerical functions and mixed finite differences use the Algebra "
+        "owner; Snapper and intersection numbers are direct geometric consumers"
     )
     print(
         "ok: K₀ realizations, descent squares, and categorical Euler forms use "

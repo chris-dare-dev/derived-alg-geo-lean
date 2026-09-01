@@ -3,7 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.AssociatedSheaf
-import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.Snapper
+import DerivedAlgGeo.Algebra.NumericalPolynomial.Basic
+import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.Snapper
 
 /-!
 # Intersection numbers from Snapper coefficients
@@ -28,7 +29,7 @@ open AlgebraicGeometry
 open AlgebraicGeometry.Cohomology
 open AlgebraicGeometry.Scheme
 open AlgebraicGeometry.Scheme.Modules
-open AlgebraicGeometry.IntersectionTheory.NumericalPolynomial
+open NumericalPolynomial
 open AlgebraicGeometry.IntersectionTheory.Snapper
 open scoped BigOperators
 

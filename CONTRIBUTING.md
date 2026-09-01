@@ -69,6 +69,14 @@ introduce a scheme or other genuinely geometric datum and consume that root
 directly. Do not retain or recreate import-only modules at the former
 `AlgebraicGeometry/Numerical/GrothendieckGroup/Relative*` paths.
 
+Integer-lattice numerical functions, mixed forward differences, finite-
+difference degree, Newton coefficients, and their multilinear top
+coefficients belong in `Algebra/NumericalPolynomial/`. The geometric bridge is
+`AlgebraicGeometry/IntersectionTheory/Snapper.lean`: it imports the algebra
+root and adds Picard powers, coherent twists, Euler characteristics, and the
+geometric induction certificate. Do not recreate the former geometric
+`NumericalPolynomial` directory or namespace.
+
 Additive targets of a triangulated Grothendieck group, descent squares for
 exact functors, and categorical Euler pairings belong under
 `CategoryTheory/Triangulated/GrothendieckGroup/`. Use `K₀.Realization` and
