@@ -202,8 +202,15 @@ CategoryTheory/Sites/Sheaves
   └─→ Modules
         ├─→ Exactness                           arbitrary ringed sites
         ├─→ Invertible                          rank one and local trivializations
+        ├─→ Over                                restriction to an over site
         ├─→ Tensor                              rank-one tensor descent
         └─→ Presentation                        finite-presentation transport
+
+CategoryTheory/Sites/Over
+  └─→ post cocontinuity                         arbitrary sites
+
+CategoryTheory/Sites/CoversTop
+  └─→ equivalence transport                    arbitrary sites
 
 Topology/Sheaves
   └─→ ModuleTensor
@@ -472,6 +479,7 @@ the explicit instance umbrellas attached to their categorical sources:
 | Projective basic-open and section comparison | `DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace` |
 | Generic abelian-category extensions | `DerivedAlgGeo.CategoryTheory.Abelian` |
 | Generic sheaves and ringed-site module sheaves | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves` |
+| Over-site cocontinuity, covering-family transport, and module-sheaf restriction | `DerivedAlgGeo.CategoryTheory.Sites.Over`, `DerivedAlgGeo.CategoryTheory.Sites.CoversTop`, and `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Over` |
 | Generic stacks and representable fibers | `DerivedAlgGeo.CategoryTheory.Sites` |
 | Weak-stability family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families` |
 | Ordinary Bridgeland family interfaces | `DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families` |

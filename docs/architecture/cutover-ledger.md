@@ -181,6 +181,14 @@ blocks should normally move it rather than add more declarations beside it.
   the terminal object. Scheme tensor, divisor, associated-sheaf, and Proj
   modules import that arbitrary-site root directly; the declarations no
   longer live inside the scheme tensor consumer.
+- Over-site restriction infrastructure:
+  `CategoryTheory/Sites/Over.lean` owns cocontinuity of `Over.post`,
+  `CategoryTheory/Sites/Sheaves/Modules/Over.lean` owns the module-sheaf
+  restriction API, and `CategoryTheory/Sites/CoversTop.lean` owns
+  transport of a terminal-covering family through a cover-preserving
+  equivalence. `AlgebraicGeometry/Modules/Restriction/OpenImmersion.lean`
+  imports these roots and now begins at the scheme/open-site equivalence; the
+  three declaration names are preserved without a compatibility shim.
 - Generic invertible module sheaves and tensor/sheafification descent:
   `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` owns rank-one local
   generator data, intrinsic `SheafOfModules.IsInvertible`, transport, finite
@@ -201,8 +209,8 @@ blocks should normally move it rather than add more declarations beside it.
 ## Confirmed next lanes
 
 - No additional reverse-ownership block was confirmed while moving the
-  stalk-tensor root. The next lane should be selected by a fresh signature
-  audit of mixed-owner consumers.
+  over-site restriction prefix. The next lane should be selected by a fresh
+  signature audit of mixed-owner consumers.
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and
