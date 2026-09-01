@@ -46,7 +46,7 @@ file.
 ## Main definitions
 
 * `residueObject` — the field in degree zero.
-* `exceptionalCollection_residueObject` — the length-one collection over
+* `residueObjectExceptionalCollection` — the length-one collection over
   `PUnit`, through `ExceptionalCollection.ofExceptional`.
 
 ## Main results
@@ -57,7 +57,7 @@ file.
   of higher `Ext`; negative shifts through the canonical t-structure.
 * `ModuleCat.algebraMap_end_self_bijective` — the base case: evaluation at
   `1` inverts `algebraMap` into the linear endomorphisms of the ring itself.
-* `exceptionalCollection_residueObject_component` — the single component is
+* `residueObjectExceptionalCollection_component` — the single component is
   the envelope of the shift closure of the residue object.
 
 ## References
@@ -152,15 +152,15 @@ theorem isExceptional_residueObject : IsExceptional k (residueObject k) := by
 inhabitant of `ExceptionalCollection` in the tree, through `ofExceptional`.
 Its semiorthogonal sequence exists by the collection layer; fullness is not
 claimed, and is expected to fail — see the module docstring. -/
-noncomputable def exceptionalCollection_residueObject :
+noncomputable def residueObjectExceptionalCollection :
     ExceptionalCollection k (DerivedCategory (ModuleCat.{u} k)) PUnit :=
   ExceptionalCollection.ofExceptional (isExceptional_residueObject k)
 
 /-- The single component of the length-one collection is the triangulated
 envelope of the shift closure of the residue object. -/
 @[simp]
-theorem exceptionalCollection_residueObject_component :
-    (exceptionalCollection_residueObject k).component PUnit.unit
+theorem residueObjectExceptionalCollection_component :
+    (residueObjectExceptionalCollection k).component PUnit.unit
       = (ObjectProperty.shiftClosure
           (fun X => X = residueObject k) ℤ).triangEnvelope :=
   rfl

@@ -4,7 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Category.Grp.Preadditive
 import DerivedAlgGeo.Algebra.Category.Grp.Products
-import DerivedAlgGeo.Algebra.Category.ModuleCat.StalkTensor
 import DerivedAlgGeo.Algebra.Finsupp
 import DerivedAlgGeo.Algebra.Module
 import DerivedAlgGeo.Algebra.MvPolynomial

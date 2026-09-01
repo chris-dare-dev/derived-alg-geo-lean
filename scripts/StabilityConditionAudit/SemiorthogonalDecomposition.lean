@@ -94,5 +94,5 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.residueObject
 #print axioms CategoryTheory.ModuleCat.algebraMap_end_self_bijective
 #print axioms CategoryTheory.Triangulated.isExceptional_residueObject
-#print axioms CategoryTheory.Triangulated.exceptionalCollection_residueObject
-#print axioms CategoryTheory.Triangulated.exceptionalCollection_residueObject_component
+#print axioms CategoryTheory.Triangulated.residueObjectExceptionalCollection
+#print axioms CategoryTheory.Triangulated.residueObjectExceptionalCollection_component

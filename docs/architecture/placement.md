@@ -130,9 +130,18 @@ on an arbitrary site. Their owner is
 `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean`. Preservation of local
 equivalences by tensoring with such a factor belongs in the adjacent
 `Modules/Tensor.lean`. On a topological space, the stalkwise theorem for an
-arbitrary tensor factor belongs in `Topology/Sheaves/ModuleTensor.lean`.
+arbitrary tensor factor belongs in `Topology/Sheaves/ModuleTensor.lean`; its
+comparison `(M ⊗ P)ₓ ≃ Mₓ ⊗[Rₓ] Pₓ` and the germ/stalk infrastructure used to
+prove it belong in `Topology/Sheaves/ModuleTensor/StalkTensor.lean`.
 `Scheme.Modules.tensorObj`, Picard classes, and tensor closure remain geometric
 because their signatures introduce the scheme-indexed module category.
+
+The name `ModuleCat` does not make the stalk comparison ordinary algebra.
+Every public signature in that comparison requires `TopCat`, `Opens`, germs,
+or a stalk functor, so the topological-space row of the signature table is the
+first row that can express it. The former
+`Algebra/Category/ModuleCat/StalkTensor.lean` path is retired without a shim;
+the topological consumer imports the topological owner directly.
 
 Indexed families of additive commutative groups, their direct sums, saturated
 quotients by supplied relation sets, family-relation systems, additive-map

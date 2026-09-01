@@ -24,8 +24,11 @@ first application that motivated it.
 - Intrinsic rank-one and invertibility data for module sheaves belong in
   `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean`. Tensoring a local
   equivalence by a rank-one module sheaf on an arbitrary site belongs in the
-  adjacent `Tensor.lean`; the stalkwise strengthening for an arbitrary tensor
-  factor belongs under `Topology/Sheaves/ModuleTensor.lean`.
+  adjacent `Tensor.lean`. The comparison between stalks and tensor products on
+  a topological space belongs in
+  `Topology/Sheaves/ModuleTensor/StalkTensor.lean`; the resulting stalkwise
+  strengthening for an arbitrary tensor factor belongs in the parent
+  `Topology/Sheaves/ModuleTensor.lean`. Neither belongs under `Algebra/`.
 - Detection of local injectivity, local surjectivity, and sheafification weak
   equivalences on a family covering the terminal object belongs in
   `CategoryTheory/Sites/Sheaves/CoversTop.lean`. Scheme charts, divisors, and
@@ -106,6 +109,11 @@ application, current file, namespace, or proof technique.
   sheafification-whiskering theorem stated on an arbitrary ringed site belongs
   with generic module sheaves. A scheme Picard class consumes that root; it
   does not own another invertibility definition.
+- A declaration whose signature uses a topological space together with open
+  neighbourhoods, germs, or stalk functors belongs under `Topology/`, even
+  when its remaining types are ordinary modules. In particular, do not
+  restore `Algebra/Category/ModuleCat/StalkTensor.lean`; consumers import the
+  topological stalk-tensor owner directly.
 - Kernel maps for ordinary localized modules, including their `ModuleCat`
   formulation, belong under `Algebra/Module/Localization/`. Coherent-sheaf
   arguments import that algebraic owner and add only the scheme-dependent

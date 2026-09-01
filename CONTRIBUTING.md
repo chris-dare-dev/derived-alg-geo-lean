@@ -48,10 +48,14 @@ module-tensor files import that owner directly.
 Intrinsic rank-one local-generator data, invertible module sheaves, their local
 trivializations, and tensor/sheafification descent with a rank-one factor use
 only an arbitrary ringed site. They belong in
-`CategoryTheory/Sites/Sheaves/Modules/{Invertible,Tensor}.lean`. The stronger
-stalkwise result for an arbitrary tensor factor belongs in
+`CategoryTheory/Sites/Sheaves/Modules/{Invertible,Tensor}.lean`. The
+topological comparison between stalks and tensor products belongs in
+`Topology/Sheaves/ModuleTensor/StalkTensor.lean`, and the stronger stalkwise
+result for an arbitrary tensor factor belongs in the parent
 `Topology/Sheaves/ModuleTensor.lean`; scheme tensor objects and Picard classes
-remain geometric consumers.
+remain geometric consumers. Do not place the stalk comparison under
+`Algebra/Category/ModuleCat/`: its public signatures intrinsically use opens,
+germs, and stalk functors on a topological space.
 
 In particular, use `Algebra/` for ordinary module localization and ring
 operations, and `LinearAlgebra/` for generic linear maps, bases, lattices,
