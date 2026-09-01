@@ -96,6 +96,11 @@ operations, and `LinearAlgebra/` for generic linear maps, bases, lattices,
 matrices, multilinear constructions, and exterior powers. When a geometric
 file contains a generic helper followed by its scheme application, split the
 helper into its general root and import that root from the consumer.
+This includes rank--nullity and alternating-finrank identities for abstract
+finite-dimensional modules and exact linear maps: their canonical owner is
+`LinearAlgebra/AlternatingFinsum.lean`. A geometric Euler-characteristic module
+begins only when its public type introduces `FiniteCohomology`, `Coh X`, or
+coherent-sheaf cohomology, and imports the linear-algebra owner directly.
 The canonical repository extension for localization commuting with kernels is
 `Algebra/Module/Localization/Kernels.lean`; scheme and coherent-sheaf files
 consume it directly rather than restating its linear-map or `ModuleCat` forms.

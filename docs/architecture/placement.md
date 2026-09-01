@@ -227,6 +227,14 @@ spanning, internal-direct-sum, and multiplicativity lemmas are rooted at
 and adds the geometric `NumericalRingData.ofGradedBasis` constructor; it does
 not own another copy of the decomposition.
 
+Rank--nullity decompositions and alternating-finrank identities whose complete
+signatures mention only finite-dimensional modules, linear maps, exactness, and
+finite sums are rooted at `LinearAlgebra/AlternatingFinsum.lean`. This includes
+both the boundary-free `ℤ`-indexed statement and its bounded `ℕ`-indexed
+companion. `AlgebraicGeometry/Cohomology/EulerCharacteristic/Additivity.lean`
+is the consumer: its geometric layer begins when a `FiniteCohomology` package
+constructs the long exact sequence for objects of `Coh X`.
+
 Theorems stated only using `Finsupp`, `MvPolynomial`, homogeneity, and
 `divMonomial` are rooted at `Algebra/MvPolynomial/DivMonomial.lean` in the
 established `Finsupp` and `MvPolynomial` namespaces. The standard polynomial

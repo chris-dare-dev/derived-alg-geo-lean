@@ -8,7 +8,7 @@ import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.LinearAlgebra.Dimension.Constructions
 
 /-!
-# The alternating sum along a `ℤ`-indexed long exact sequence
+# Alternating sums along long exact sequences
 
 For three `ℤ`-indexed families of finite-dimensional vector spaces assembled
 into a long exact sequence
@@ -34,14 +34,14 @@ transport arises.  The real reason that file is `ℕ`-indexed is that a
 single-family alternating sum is proved by *induction*, and an induction needs a
 base case.
 
-The three-family statement below needs no induction.  It telescopes by a
+The `ℤ`-indexed three-family statement below needs no induction.  It telescopes by a
 translation of the summation index — one `finsum_comp_equiv` along
 `Equiv.addRight 1` — and consequently carries **no injectivity at the bottom, no
-surjectivity at the top, and no `Subsingleton` at either end**.  Compare
-`AlgebraicGeometry.Cohomology.alternating_finrank_eq_zero_of_exact`, the
-`ℕ`-indexed three-family lemma already in this repository, which pays `hinj` and
-`[Subsingleton (A (n+1))]` for the same content.  Strictly weaker hypotheses is
-the whole argument for this file existing.
+surjectivity at the top, and no `Subsingleton` at either end**.  This file also
+owns the bounded `ℕ`-indexed companion, which pays injectivity at the bottom and
+`[Subsingleton (A (n+1))]` at the top.  Both statements are geometry-free
+linear algebra; geometric Euler-characteristic additivity consumes the bounded
+one after constructing the relevant long exact sequence.
 
 Finiteness enters as finiteness of the *support* of each dimension function
 rather than as a vanishing bound.  Given `Module.Finite`, over a division ring
@@ -68,7 +68,7 @@ three-family balance is what a distinguished triangle gives, and Mathlib already
 has the vanishing form for a finite exact sequence.
 -/
 
-universe u v
+universe u v w₁ w₂
 
 namespace DerivedAlgGeo.LinearAlgebra
 
@@ -81,12 +81,9 @@ variable {k : Type u} [DivisionRing k]
 /-- Rank--nullity rewritten at an exact middle term: an exact `A → B → C`
 splits `dim B` into the two ranks around it.
 
-The same statement as the `private` helper in
-`AlgebraicGeometry/Cohomology/EulerCharacteristic/Additivity.lean`; it is public
-here because both the `ℕ` and the `ℤ` alternating-sum arguments consume it, and
-duplicating a four-line rank--nullity rewrite in two files is worse than sharing
-it. -/
-theorem finrank_eq_range_add_range {A B C : Type v} [AddCommGroup A]
+It is public because both the bounded `ℕ` and the unbounded `ℤ`
+alternating-sum arguments consume it. -/
+theorem finrank_eq_range_add_range {A : Type v} {B : Type w₁} {C : Type w₂} [AddCommGroup A]
     [AddCommGroup B] [AddCommGroup C] [Module k A] [Module k B] [Module k C]
     [Module.Finite k B] (f : A →ₗ[k] B) (g : B →ₗ[k] C) (h : Function.Exact f g) :
     finrank k B = finrank k (LinearMap.range f) + finrank k (LinearMap.range g) := by
@@ -227,5 +224,73 @@ theorem finsum_altDim_middle
   ring
 
 end LongExact
+
+section BoundedLongExact
+
+variable {k : Type u} [Field k]
+variable (A : ℕ → Type v) (B : ℕ → Type w₁) (C : ℕ → Type w₂)
+  [∀ i, AddCommGroup (A i)] [∀ i, AddCommGroup (B i)] [∀ i, AddCommGroup (C i)]
+  [∀ i, Module k (A i)] [∀ i, Module k (B i)] [∀ i, Module k (C i)]
+  [∀ i, Module.Finite k (A i)] [∀ i, Module.Finite k (B i)] [∀ i, Module.Finite k (C i)]
+  (f : ∀ i, A i →ₗ[k] B i) (g : ∀ i, B i →ₗ[k] C i)
+  (δ : ∀ i, C i →ₗ[k] A (i + 1))
+
+/-- Alternating finite-dimensional dimensions cancel along a bounded long exact sequence.
+The endpoint hypothesis is stated as vanishing of the next `A` term, which makes the final
+connecting map surjective onto zero. -/
+theorem alternating_finrank_eq_zero_of_exact
+    (hinj : Function.Injective (f 0))
+    (hexact₂ : ∀ i, Function.Exact (f i) (g i))
+    (hexact₃ : ∀ i, Function.Exact (g i) (δ i))
+    (hexact₁ : ∀ i, Function.Exact (δ i) (f (i + 1)))
+    (n : ℕ) [Subsingleton (A (n + 1))] :
+    ∑ i ∈ Finset.range (n + 1), (-1 : ℤ) ^ i *
+      ((Module.finrank k (A i) : ℤ) - Module.finrank k (B i) + Module.finrank k (C i)) = 0 := by
+  have hA₀ : Module.finrank k (A 0) = Module.finrank k (LinearMap.range (f 0)) :=
+    (LinearMap.finrank_range_of_inj hinj).symm
+  have hB (i : ℕ) : Module.finrank k (B i) =
+      Module.finrank k (LinearMap.range (f i)) +
+        Module.finrank k (LinearMap.range (g i)) :=
+    finrank_eq_range_add_range (f i) (g i) (hexact₂ i)
+  have hC (i : ℕ) : Module.finrank k (C i) =
+      Module.finrank k (LinearMap.range (g i)) +
+        Module.finrank k (LinearMap.range (δ i)) :=
+    finrank_eq_range_add_range (g i) (δ i) (hexact₃ i)
+  have hA (i : ℕ) : Module.finrank k (A (i + 1)) =
+      Module.finrank k (LinearMap.range (δ i)) +
+        Module.finrank k (LinearMap.range (f (i + 1))) :=
+    finrank_eq_range_add_range (δ i) (f (i + 1)) (hexact₁ i)
+  have hδn : Module.finrank k (LinearMap.range (δ n)) = 0 := by
+    letI : Subsingleton (LinearMap.range (δ n)) := inferInstance
+    exact Module.finrank_zero_of_subsingleton
+  have hpartial (m : ℕ) :
+      ∑ i ∈ Finset.range (m + 1), (-1 : ℤ) ^ i *
+        ((Module.finrank k (A i) : ℤ) - Module.finrank k (B i) +
+          Module.finrank k (C i)) =
+        (-1 : ℤ) ^ m * Module.finrank k (LinearMap.range (δ m)) := by
+    induction m with
+    | zero =>
+        simp only [Nat.reduceAdd, Finset.range_one, Finset.sum_singleton, pow_zero, one_mul]
+        have hA₀' := hA₀
+        have hB' := hB 0
+        have hC' := hC 0
+        push_cast at hA₀' hB' hC'
+        omega
+    | succ m ih =>
+        rw [Finset.sum_range_succ, ih]
+        have hA' := hA m
+        have hB' := hB (m + 1)
+        have hC' := hC (m + 1)
+        have htriple :
+            (Module.finrank k (A (m + 1)) : ℤ) - Module.finrank k (B (m + 1)) +
+                Module.finrank k (C (m + 1)) =
+              Module.finrank k (LinearMap.range (δ m)) +
+                Module.finrank k (LinearMap.range (δ (m + 1))) := by
+          omega
+        rw [htriple, pow_succ]
+        ring
+  rw [hpartial n, hδn, Int.ofNat_zero, mul_zero]
+
+end BoundedLongExact
 
 end DerivedAlgGeo.LinearAlgebra

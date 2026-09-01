@@ -263,16 +263,16 @@ finiteness data nothing here provides.
 #print axioms CategoryTheory.Triangulated.linearYoneda_homologySequence_exact₂
 #print axioms CategoryTheory.Triangulated.linearYoneda_homologySequence_exact₃
 
-/-! ## The alternating sum along a `ℤ`-indexed long exact sequence
+/-! ## Alternating sums along three-family long exact sequences
 
-The arithmetic under a Hom-built Euler form. Indexed by `ℤ` and carrying NO
-boundary hypotheses -- no injectivity, no surjectivity, no `Subsingleton` --
-because the three-family statement telescopes by a translation of the summation
-index rather than by induction. `k` is a `DivisionRing`: rank-nullity is what
-forces it and commutativity is used nowhere.
+The arithmetic under a Hom-built Euler form. The `ℤ`-indexed version carries
+no boundary hypotheses because it telescopes by translation. The bounded
+`ℕ`-indexed companion instead records injectivity at the bottom and vanishing
+at the top. Neither theorem mentions a category or a geometric object.
 -/
 
 #print axioms DerivedAlgGeo.LinearAlgebra.finrank_eq_range_add_range
+#print axioms DerivedAlgGeo.LinearAlgebra.alternating_finrank_eq_zero_of_exact
 #print axioms DerivedAlgGeo.LinearAlgebra.altDim
 #print axioms DerivedAlgGeo.LinearAlgebra.support_altDim
 #print axioms DerivedAlgGeo.LinearAlgebra.support_range_subset

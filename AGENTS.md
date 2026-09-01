@@ -100,6 +100,11 @@ application, current file, namespace, or proof technique.
 - Ring, ideal, ordinary-module, and localization statements go to `Algebra/`.
 - Linear-map, basis, lattice, matrix, multilinear, and exterior-power
   statements go to `LinearAlgebra/` when they require no site or scheme.
+- Rank--nullity and alternating-finrank identities stated only for abstract
+  finite-dimensional modules and linear maps belong in
+  `LinearAlgebra/AlternatingFinsum.lean`. Geometric Euler-characteristic files
+  consume that owner only after `FiniteCohomology`, `Coh X`, or coherent-sheaf
+  cohomology enters the signature.
 - The finite-free abelian-group interface is the global `ZLattice` class in
   `LinearAlgebra/Lattice/Basic.lean`. Its finite-torsion-free constructor is
   generic; a numerical Euler-radical quotient imports that root and proves

@@ -256,6 +256,15 @@ blocks should normally move it rather than add more declarations beside it.
   imports this owner directly and now retains only its scheme/open/coherence
   theorem; the declaration names and signatures are preserved without a
   compatibility shim.
+- Alternating finranks along bounded long exact sequences:
+  `LinearAlgebra/AlternatingFinsum.lean` now owns
+  `DerivedAlgGeo.LinearAlgebra.alternating_finrank_eq_zero_of_exact` beside the
+  boundary-free `ℤ`-indexed theorem and their shared rank--nullity lemma. Its
+  complete signature uses only finite-dimensional vector spaces, linear maps,
+  exactness, and a finite alternating sum. The Euler-characteristic additivity
+  module imports this root and applies it to coherent cohomology; the former
+  `Cohomology.FiniteCohomology` declaration is retired without a compatibility
+  alias.
 
 ## Confirmed next lanes
 

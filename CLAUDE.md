@@ -422,6 +422,11 @@ documentation, architecture checks, and CI paths together.
 - Weighted-basis submodules and their internal direct-sum proofs use
   `LinearAlgebra/GradedBasis.lean`; numerical intersection-ring assembly
   consumes them from algebraic geometry.
+- Bounded and unbounded alternating-finrank identities for abstract exact
+  sequences of finite-dimensional modules use
+  `LinearAlgebra/AlternatingFinsum.lean`. Euler-characteristic additivity is a
+  geometric consumer only after `FiniteCohomology`, `Coh X`, or coherent-sheaf
+  cohomology appears; do not recreate the linear-algebra theorem beside it.
 - Pure `Finsupp` and `MvPolynomial.divMonomial` identities use
   `Algebra/MvPolynomial/DivMonomial.lean`, even when their first application is
   a projective Čech calculation. Polynomial generation over the degree-zero
