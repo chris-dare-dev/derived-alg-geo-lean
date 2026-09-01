@@ -318,7 +318,12 @@ def main() -> int:
         retired_modules.add(retired_module(entry))
         candidates = [path] if path.suffix else [path, path.with_suffix(".lean")]
         for candidate in candidates:
-            if candidate.exists():
+            # An empty directory is a leftover of a move, not a restoration:
+            # git does not track it, so a clean checkout never has one.
+            restored = candidate.is_file() or (
+                candidate.is_dir() and any(candidate.rglob("*.lean"))
+            )
+            if restored:
                 failures.append(
                     f"retired path restored: {candidate.relative_to(ROOT)}; "
                     "see docs/architecture/cutover-ledger.md for its owner"
