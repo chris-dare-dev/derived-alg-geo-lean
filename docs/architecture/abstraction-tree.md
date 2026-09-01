@@ -77,10 +77,14 @@ Category
 │  │     └─ Preserves                   exact-functor compatibility
 │  └─ K₀dg := K₀ (H0 C)                 reuse, not a third presentation
 └─ Sites / descent / stacks in groupoids
+   ├─ over-site functoriality
+   │  └─ cocontinuity of `Over.post`
+   ├─ `CoversTop` equivalence transport
    ├─ Sheaves
    │  ├─ coverwise detection of local equivalences
    │  ├─ constant pullback and cohomology pushforward
    │  └─ module sheaves on a ringed site
+   │     ├─ restriction to an over site
    │     ├─ exact forgetful functor
    │     ├─ finite-presentation transport
    │     └─ intrinsic IsInvertible
@@ -194,6 +198,10 @@ particular:
 - keep detection of additive-presheaf local equivalences on a `CoversTop`
   family under the generic site/sheaf root; scheme charts and sheafified
   tensor constructions only consume that theorem chain;
+- keep cocontinuity of `Over.post`, module-sheaf restriction to over sites,
+  and equivalence transport of `CoversTop` families under the generic site and
+  sheaf roots; open-immersion geometry consumes them only after introducing
+  schemes and their open-set sites;
 - keep stalk/tensor comparisons for module presheaves under
   `Topology/Sheaves/ModuleTensor/`: their use of open neighbourhoods, germs,
   and stalk functors makes them topological specializations of arbitrary-site

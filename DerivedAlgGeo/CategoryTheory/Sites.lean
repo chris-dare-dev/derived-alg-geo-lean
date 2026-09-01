@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Sites.Cech
+import DerivedAlgGeo.CategoryTheory.Sites.CoversTop
+import DerivedAlgGeo.CategoryTheory.Sites.Over
 import DerivedAlgGeo.CategoryTheory.Sites.Sheaves
 import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids.Discrete

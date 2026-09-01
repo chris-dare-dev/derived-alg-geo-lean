@@ -21,6 +21,14 @@ first application that motivated it.
   sheaves of modules over a sheaf of rings on an arbitrary site; those belong
   under `CategoryTheory/Sites/Sheaves/Modules/`, not under affine or scheme
   geometry.
+- Over-category cocontinuity for arbitrary sites belongs in
+  `CategoryTheory/Sites/Over.lean`; restriction API for module sheaves on an
+  arbitrary ringed site belongs in
+  `CategoryTheory/Sites/Sheaves/Modules/Over.lean`. Transport of a `CoversTop`
+  family through a cover-preserving equivalence belongs in the purely
+  site-theoretic `CategoryTheory/Sites/CoversTop.lean`. An open-immersion file
+  is a consumer only once its public signatures introduce schemes or
+  topological opens.
 - Intrinsic rank-one and invertibility data for module sheaves belong in
   `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean`. Tensoring a local
   equivalence by a rank-one module sheaf on an arbitrary site belongs in the
@@ -105,6 +113,10 @@ application, current file, namespace, or proof technique.
   site theory even when all current covers are scheme charts. In particular,
   do not redeclare the `Presheaf.{isLocallyInjective,isLocallySurjective,W}_of_coversTop`
   chain below algebraic geometry.
+- A theorem about `J.over X`, `Over.post F`, `SheafOfModules.over`, or transport
+  of `J.CoversTop` through an equivalence remains site theory when its full
+  signature mentions no scheme. Scheme open-immersion restriction imports
+  those roots directly rather than owning the generic prefix.
 - A rank-one predicate, intrinsic invertibility class, local trivialization, or
   sheafification-whiskering theorem stated on an arbitrary ringed site belongs
   with generic module sheaves. A scheme Picard class consumes that root; it

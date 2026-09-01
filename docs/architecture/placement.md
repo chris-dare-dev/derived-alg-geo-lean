@@ -123,6 +123,15 @@ owner is `CategoryTheory/Sites/Sheaves/CoversTop.lean`. Scheme affine charts,
 divisor trivializations, Proj covers, and sheafified tensor products are
 consumers and import this owner directly.
 
+The same signature test places cocontinuity of `Over.post F` at
+`CategoryTheory/Sites/Over.lean`, the definitional module-sheaf restriction API
+at `CategoryTheory/Sites/Sheaves/Modules/Over.lean`, and transport of a
+`CoversTop` family through a cover-preserving equivalence at
+`CategoryTheory/Sites/CoversTop.lean`. None of these signatures requires a
+scheme. `AlgebraicGeometry/Modules/Restriction/OpenImmersion.lean` is the
+consumer: it imports all three owners and begins with the equivalence between
+the over site of an open range and the source scheme's open-set site.
+
 The predicate that local generator data has rank one, the intrinsic
 `SheafOfModules.IsInvertible` class, transport and local trivialization of that
 data, and reconstruction from a covering family require only a sheaf of rings

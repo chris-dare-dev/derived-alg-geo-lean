@@ -79,6 +79,12 @@ concrete applications through explicit instance leaves.
 - Generic sheaves belong under `CategoryTheory/Sites/Sheaves/`; sheaves of
   modules over a sheaf of rings on an arbitrary site belong in its `Modules/`
   child.
+- Arbitrary-site over-category cocontinuity belongs in
+  `CategoryTheory/Sites/Over.lean`; generic module-sheaf restriction to an
+  over category belongs in `Sites/Sheaves/Modules/Over.lean`; and equivalence
+  transport of a `CoversTop` family belongs in `Sites/CoversTop.lean`.
+  Scheme open immersions consume these roots and begin only where schemes or
+  topological opens enter the public signature.
 - Local injectivity, local surjectivity, and membership in the weak-equivalence
   class inverted by sheafification are arbitrary-site statements when they are
   detected on a `GrothendieckTopology.CoversTop` family. Their canonical owner

@@ -45,6 +45,15 @@ and additive presheaves. It belongs in
 `CategoryTheory/Sites/Sheaves/CoversTop.lean`; scheme-chart, divisor, Proj, and
 module-tensor files import that owner directly.
 
+The induced functor `Over.post F` between over sites is generic site theory,
+and restriction by `SheafOfModules.overFunctor` is generic module-sheaf theory.
+Place their API in `CategoryTheory/Sites/Over.lean` and
+`CategoryTheory/Sites/Sheaves/Modules/Over.lean`, respectively. Likewise,
+transporting a `CoversTop` family through a cover-preserving equivalence stays
+in `CategoryTheory/Sites/CoversTop.lean`. An algebraic-geometric
+open-immersion module imports these owners and contains only declarations whose
+types actually mention schemes, opens, or geometric morphism properties.
+
 Intrinsic rank-one local-generator data, invertible module sheaves, their local
 trivializations, and tensor/sheafification descent with a rank-one factor use
 only an arbitrary ringed site. They belong in

@@ -1409,6 +1409,8 @@ def main() -> int:
         SOURCE_ROOT / "CategoryTheory" / "Abelian.lean",
         SOURCE_ROOT / "CategoryTheory" / "Bicategory.lean",
         SOURCE_ROOT / "CategoryTheory" / "Limits.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "CoversTop.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "Over.lean",
         SOURCE_ROOT / "CategoryTheory" / "Sites" / "Sheaves.lean",
         *sorted(generic_bicategory_root.rglob("*.lean")),
         *sorted(generic_limits_root.rglob("*.lean")),
@@ -1426,12 +1428,15 @@ def main() -> int:
         generic_limits_root / "Preserves" / "Composition.lean",
         generic_limits_root / "Preserves" / "Reflective.lean",
         generic_abelian_root / "WeakSerre.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "CoversTop.lean",
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "Over.lean",
         generic_sheaves_root / "ConstantPullback.lean",
         generic_sheaves_root / "CoversTop.lean",
         generic_sheaves_root / "CohomologyShortExact.lean",
         generic_sheaves_root / "CohomologyPushforward.lean",
         generic_sheaves_root / "Modules" / "Exactness.lean",
         generic_sheaves_root / "Modules" / "Invertible.lean",
+        generic_sheaves_root / "Modules" / "Over.lean",
         generic_sheaves_root / "Modules" / "Presentation" / "Transport.lean",
         generic_sheaves_root / "Modules" / "Presentation" / "Finite.lean",
         generic_sheaves_root / "Modules" / "Tensor.lean",
@@ -1484,6 +1489,69 @@ def main() -> int:
             f"{sheaves_umbrella.relative_to(ROOT)}: missing arbitrary-site "
             f"cover-detection umbrella import {covers_top_import}"
         )
+
+    site_over_owner = SOURCE_ROOT / "CategoryTheory" / "Sites" / "Over.lean"
+    site_over_import = "DerivedAlgGeo.CategoryTheory.Sites.Over"
+    site_covers_top_owner = (
+        SOURCE_ROOT / "CategoryTheory" / "Sites" / "CoversTop.lean"
+    )
+    site_covers_top_import = "DerivedAlgGeo.CategoryTheory.Sites.CoversTop"
+    module_over_owner = generic_sheaves_root / "Modules" / "Over.lean"
+    module_over_import = (
+        "DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Over"
+    )
+    over_owner_fragments = (
+        (site_over_owner, "instance post_isCocontinuous"),
+        (site_covers_top_owner, "lemma CoversTop.map_equivalence"),
+        (module_over_owner, "lemma overFunctor_obj"),
+    )
+    for path, fragment in over_owner_fragments:
+        if path.is_file() and fragment not in path.read_text(encoding="utf-8"):
+            failures.append(
+                f"{path.relative_to(ROOT)}: missing arbitrary-site over-category "
+                f"declaration {fragment!r}"
+            )
+
+    sites_umbrella = SOURCE_ROOT / "CategoryTheory" / "Sites.lean"
+    for owner_import in (site_over_import, site_covers_top_import):
+        if owner_import not in imports_by_path[sites_umbrella]:
+            failures.append(
+                f"{sites_umbrella.relative_to(ROOT)}: missing site/over "
+                f"umbrella import {owner_import}"
+            )
+
+    modules_umbrella = generic_sheaves_root / "Modules.lean"
+    if module_over_import not in imports_by_path[modules_umbrella]:
+        failures.append(
+            f"{modules_umbrella.relative_to(ROOT)}: missing module-sheaf over-category "
+            f"umbrella import {module_over_import}"
+        )
+
+    open_immersion_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Restriction" /
+            "OpenImmersion.lean"
+    )
+    for owner_import in (
+        site_over_import,
+        site_covers_top_import,
+        module_over_import,
+    ):
+        if owner_import not in imports_by_path[open_immersion_consumer]:
+            failures.append(
+                f"{open_immersion_consumer.relative_to(ROOT)}: open-immersion "
+                f"consumer must import the categorical owner {owner_import} directly"
+            )
+    open_immersion_text = open_immersion_consumer.read_text(encoding="utf-8")
+    for fragment in (
+        "instance post_isCocontinuous",
+        "lemma overFunctor_obj",
+        "lemma GrothendieckTopology.CoversTop.map_equivalence",
+    ):
+        if fragment in open_immersion_text:
+            failures.append(
+                f"{open_immersion_consumer.relative_to(ROOT)}: restored generic "
+                f"site/over declaration {fragment!r} in geometry"
+            )
 
     geometric_tensor_consumer = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Tensor" / "Basic.lean"
@@ -1613,7 +1681,6 @@ def main() -> int:
             f"{topological_stalk_tensor_import} directly"
         )
 
-    modules_umbrella = generic_sheaves_root / "Modules.lean"
     for owner_import in (invertible_import, tensor_descent_import):
         if owner_import not in imports_by_path[modules_umbrella]:
             failures.append(
@@ -3632,6 +3699,10 @@ def main() -> int:
     print(
         "ok: coverwise local-equivalence detection for additive presheaves uses "
         "the arbitrary-site sheaf root; geometric chart consumers import it directly"
+    )
+    print(
+        "ok: over-site cocontinuity, CoversTop equivalence transport, and "
+        "module-sheaf restriction use categorical roots; open immersions consume them"
     )
     print(
         "ok: bicategorical adjunction is the higher source, ordinary adjunction "
