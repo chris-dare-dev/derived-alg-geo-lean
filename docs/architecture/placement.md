@@ -167,6 +167,15 @@ germs, and stalk functors but no scheme. An affine comparison may apply that
 criterion to the basis of distinguished opens only after importing the
 topological owner directly.
 
+The finite-product identity for prime-spectrum basic opens is classified by
+its complete output, not just its ring input. The equality lives in
+`Opens (PrimeSpectrum R)` and uses a categorical finite product supplied by
+`Topology/Opens/Limits.lean`, so its canonical owner is
+`Topology/PrimeSpectrum/BasicOpen.lean`. Placing it in `Algebra/` would create
+the forbidden lower-to-higher dependency `Algebra -> Topology` or duplicate
+the opens-limit instance. Affine Čech cohomology is a direct geometric
+consumer.
+
 Indexed families of additive commutative groups, their direct sums, saturated
 quotients by supplied relation sets, family-relation systems, additive-map
 ranges, and finite-relative-index predicates are rooted at

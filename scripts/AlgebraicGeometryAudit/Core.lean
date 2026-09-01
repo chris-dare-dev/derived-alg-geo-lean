@@ -1418,10 +1418,11 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Cohomology.modules_H_subsingleton_of_iso_tilde
 #print axioms AlgebraicGeometry.Cohomology.modules_H_subsingleton_of_isQuasicoherent
 
+-- Topological prime-spectrum infrastructure consumed by the affine Cech argument.
+#print axioms PrimeSpectrum.basicOpen_prod_eq_pi
 -- Layer B stage 3: positive-degree exactness of the explicit Cech complex for a module
 -- sheaf on a finite distinguished-open cover of an affine scheme. This is the affine Cech
 -- vanishing theorem, not a comparison with derived-functor sheaf cohomology.
-#print axioms PrimeSpectrum.basicOpen_prod_eq_pi
 #print axioms AlgebraicGeometry.tilde_cechComplex_exactAt_succ
 #print axioms AlgebraicGeometry.tilde_cechComplex_exactAt_succ_of_eq_iSup
 #print axioms AlgebraicGeometry.tilde_cechComplex_exactAt_of_pos

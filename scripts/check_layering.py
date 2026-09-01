@@ -1809,6 +1809,12 @@ def main() -> int:
         SOURCE_ROOT / "Topology" / "Sheaves" / "Basis.lean"
     )
     topological_basis_import = "DerivedAlgGeo.Topology.Sheaves.Basis"
+    topological_prime_spectrum_owner = (
+        SOURCE_ROOT / "Topology" / "PrimeSpectrum" / "BasicOpen.lean"
+    )
+    topological_prime_spectrum_import = (
+        "DerivedAlgGeo.Topology.PrimeSpectrum.BasicOpen"
+    )
     topological_stalk_tensor_owner = (
         SOURCE_ROOT / "Topology" / "Sheaves" / "ModuleTensor" / "StalkTensor.lean"
     )
@@ -1880,6 +1886,32 @@ def main() -> int:
             f"{topological_basis_owner.relative_to(ROOT)}"
         )
 
+    prime_spectrum_fragment = "lemma basicOpen_prod_eq_pi"
+    if topological_prime_spectrum_owner.is_file():
+        topological_prime_spectrum_text = topological_prime_spectrum_owner.read_text(
+            encoding="utf-8"
+        )
+        if prime_spectrum_fragment not in topological_prime_spectrum_text:
+            failures.append(
+                f"{topological_prime_spectrum_owner.relative_to(ROOT)}: missing "
+                "finite-product theorem for prime-spectrum basic opens"
+            )
+        if re.search(
+            r"(?:^import (?:DerivedAlgGeo|Mathlib)\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            topological_prime_spectrum_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{topological_prime_spectrum_owner.relative_to(ROOT)}: "
+                "topological prime-spectrum root depends on or declares algebraic geometry"
+            )
+    else:
+        failures.append(
+            "missing topological prime-spectrum owner: "
+            f"{topological_prime_spectrum_owner.relative_to(ROOT)}"
+        )
+
     stalk_tensor_fragments = (
         "abbrev StalkTensor",
         "noncomputable def stalkTensorEquiv",
@@ -1946,6 +1978,22 @@ def main() -> int:
             f"module-tensor umbrella import {topological_tensor_import}"
         )
 
+    topology_prime_spectrum_umbrella = (
+        SOURCE_ROOT / "Topology" / "PrimeSpectrum.lean"
+    )
+    if topological_prime_spectrum_import not in imports_by_path[
+        topology_prime_spectrum_umbrella
+    ]:
+        failures.append(
+            f"{topology_prime_spectrum_umbrella.relative_to(ROOT)}: missing "
+            f"prime-spectrum umbrella import {topological_prime_spectrum_import}"
+        )
+    topology_umbrella = SOURCE_ROOT / "Topology.lean"
+    if "DerivedAlgGeo.Topology.PrimeSpectrum" not in imports_by_path[topology_umbrella]:
+        failures.append(
+            f"{topology_umbrella.relative_to(ROOT)}: missing prime-spectrum umbrella export"
+        )
+
     affine_comparison_consumer = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Affine" /
             "Comparison.lean"
@@ -1962,6 +2010,21 @@ def main() -> int:
                 f"{affine_comparison_consumer.relative_to(ROOT)}: restored topological "
                 f"basiswise-isomorphism declaration {fragment!r} in geometry"
             )
+
+    affine_cech_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Cohomology" / "Cech" /
+            "Affine.lean"
+    )
+    if topological_prime_spectrum_import not in imports_by_path[affine_cech_consumer]:
+        failures.append(
+            f"{affine_cech_consumer.relative_to(ROOT)}: affine Cech consumer "
+            f"must import {topological_prime_spectrum_import} directly"
+        )
+    if prime_spectrum_fragment in affine_cech_consumer.read_text(encoding="utf-8"):
+        failures.append(
+            f"{affine_cech_consumer.relative_to(ROOT)}: restored topological "
+            "prime-spectrum basic-open theorem in geometry"
+        )
 
     geometric_picard_consumer = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Modules" / "Tensor" / "Picard.lean"

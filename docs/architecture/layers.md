@@ -71,6 +71,9 @@ In particular:
 - detecting sheaf isomorphisms from their components on a basis of opens
   belongs below `DerivedAlgGeo.Topology.Sheaves`; affine-module comparison is
   a geometric consumer of that criterion;
+- finite-product identities in the lattice of opens of a prime spectrum belong
+  below `DerivedAlgGeo.Topology.PrimeSpectrum`; their ring input does not move
+  their topological output down into `Algebra`;
 - numerical functions on integer lattices and their mixed finite-difference
   calculus live under `DerivedAlgGeo.Algebra.NumericalPolynomial`; Snapper's
   theorem is the geometric consumer once Picard and coherent-sheaf data enter;
@@ -223,6 +226,9 @@ Topology/Sheaves
   └─→ ModuleTensor
         ├─→ StalkTensor                         stalk/tensor comparison on spaces
         └─→ stalkwise arbitrary-factor tensor descent
+
+Topology/PrimeSpectrum
+  └─→ BasicOpen                               finite products of basic opens
 
 CategoryTheory/Triangulated/WeakStabilityCondition
   ├─→ Foundation, Families, HarderNarasimhan, Support, Tilting
@@ -378,6 +384,12 @@ The same ownership rule puts basiswise sheaf-isomorphism detection in
 opens imports that root; the generic criterion does not import schemes,
 commutative-ring spectra, or localization machinery.
 
+Prime spectra sit on the same boundary. A theorem may take only ring data as
+input while still being topological because its result is an equality in the
+lattice of opens. `Topology/PrimeSpectrum/BasicOpen.lean` owns the finite
+product identity and imports the single opens-limit source; `Algebra/` remains
+independent of `Topology`, and affine Čech geometry imports the new owner.
+
 Raw dg categories require an additional distinction. A dg category is an
 enriched category and need not be triangulated, so its basic theory and its
 internal pretriangulated refinement live in
@@ -492,6 +504,7 @@ the explicit instance umbrellas attached to their categorical sources:
 | Generic abelian-category extensions | `DerivedAlgGeo.CategoryTheory.Abelian` |
 | Generic sheaves and ringed-site module sheaves | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves` |
 | Basiswise isomorphism detection for topological sheaves | `DerivedAlgGeo.Topology.Sheaves.Basis` |
+| Finite-product identities for prime-spectrum basic opens | `DerivedAlgGeo.Topology.PrimeSpectrum.BasicOpen` |
 | Over-site cocontinuity, covering-family transport, and module-sheaf restriction | `DerivedAlgGeo.CategoryTheory.Sites.Over`, `DerivedAlgGeo.CategoryTheory.Sites.CoversTop`, and `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Over` |
 | Presentation, generating-section, and quasicoherent-data restriction to over sites | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Over` |
 | Isomorphism invariance and covering-family locality of finite presentation | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Isomorphism` and `DerivedAlgGeo.CategoryTheory.Sites.Sheaves.Modules.Presentation.Locality` |

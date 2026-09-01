@@ -80,6 +80,12 @@ isomorphisms. Put the stalk-surjectivity and resulting isomorphism criterion in
 `Topology/Sheaves/Basis.lean`; an affine comparison imports that owner and
 begins only when `Spec R`, basic opens, and localization enter the signature.
 
+A prime-spectrum theorem is not automatically ordinary algebra. If its full
+signature is an equality of opens or uses their categorical products, place it
+under `Topology/PrimeSpectrum/`; that layer may consume
+`Topology/Opens/Limits`, whereas `Algebra/` may not. Affine Čech geometry
+imports the topological owner and adds the scheme-sheaf complex.
+
 In particular, use `Algebra/` for ordinary module localization and ring
 operations, and `LinearAlgebra/` for generic linear maps, bases, lattices,
 matrices, multilinear constructions, and exterior powers. When a geometric

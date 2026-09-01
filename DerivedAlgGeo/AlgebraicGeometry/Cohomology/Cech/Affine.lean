@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Module.LocalizedRadical
 import DerivedAlgGeo.CategoryTheory.Sites.Cech.Contractible
 import DerivedAlgGeo.Topology.Opens.Limits
+import DerivedAlgGeo.Topology.PrimeSpectrum.BasicOpen
 import Mathlib.Algebra.Category.ModuleCat.Products
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 import Mathlib.AlgebraicGeometry.Modules.Tilde
@@ -130,38 +131,6 @@ private lemma relativeAway (g f : R) (a : M →ₗ[R] M₁) (b : M →ₗ[R] M�
         ac_rfl
 
 end IsLocalizedModule
-
-namespace PrimeSpectrum
-
-open CategoryTheory Limits TopologicalSpace
-
-variable {R : CommRingCat} {α : Type*} [Fintype α]
-
-lemma basicOpen_prod_eq_pi (g : α → R) :
-    basicOpen (∏ a, g a) = ∏ᶜ (basicOpen ∘ g) := by
-  apply le_antisymm
-  · apply leOfHom
-    apply Pi.lift
-    intro a
-    apply homOfLE
-    intro p hp
-    rw [mem_basicOpen] at hp
-    change g a ∉ p.asIdeal
-    intro ha
-    apply hp
-    rw [Ideal.IsPrime.prod_mem_iff]
-    exact ⟨a, Finset.mem_univ _, ha⟩
-  · intro p hp
-    rw [mem_basicOpen]
-    intro hprod
-    rw [Ideal.IsPrime.prod_mem_iff] at hprod
-    obtain ⟨a, _, ha⟩ := hprod
-    have hga := leOfHom (Pi.π (basicOpen ∘ g) a) hp
-    change g a ∉ p.asIdeal at hga
-    exact hga ha
-
-end PrimeSpectrum
-
 
 /-- Exactness descends from localizations at a family whose span contains `d` up to radical,
 provided multiplication by `d` is invertible on the source and middle modules. -/
