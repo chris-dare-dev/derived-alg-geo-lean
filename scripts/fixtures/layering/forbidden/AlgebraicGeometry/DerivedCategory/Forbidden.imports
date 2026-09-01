@@ -1,0 +1,3 @@
+# Neutral scheme-derived geometry must not reach the stability tree, even
+# transitively: the semistable locus imports it.
+import DerivedAlgGeo.AlgebraicGeometry.Moduli.Semistability.Locus

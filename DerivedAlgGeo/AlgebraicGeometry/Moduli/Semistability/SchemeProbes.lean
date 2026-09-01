@@ -9,9 +9,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families
 # Scheme realizations of weak-stability family probes
 
 The neutral scheme-indexed triangulated family lives under
-`AlgebraicGeometry.DerivedCategory.Families`. This file adds only the geometric
-realizations of weak-stability topological probes on the underlying Zariski
-space of an actual scheme.
+`AlgebraicGeometry/DerivedCategory/Families/`. This file adds only the
+geometric realizations of weak-stability topological probes on the underlying
+Zariski space of an actual scheme. The declarations keep the namespace of the
+probe structures they extend so that dot notation such as
+`ChargeProbe.ofScheme` resolves; the file lives with the scheme because that
+is the object it is about.
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.Families

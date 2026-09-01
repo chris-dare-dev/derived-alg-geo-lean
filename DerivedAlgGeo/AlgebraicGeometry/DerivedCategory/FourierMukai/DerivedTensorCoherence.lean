@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Monoidal.Functor
+import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelCorrespondence
 
 /-!
@@ -170,6 +171,20 @@ def monoidalDerivedPullbackRightUnitor {T U : SchemeBaseChange S} (f : T ⟶ U)
   (derivedTensor T).flip.mapIso
       (Functor.Monoidal.εIso (boundedCoherentDerivedPullback f)).symm ≪≫
     coherentDerivedTensorRightUnitor T
+
+/-- A coherent geometric derived tensor realizes the generic compatibility
+interface between monoidal and triangulated structure from
+`CategoryTheory/Monoidal/Triangulated.lean`. The instance lives with the
+geometric object it is about, as `Abelian (ModuleCat R)` lives with
+`ModuleCat`, rather than in an instance leaf below the categorical source. -/
+instance hasCoherentDerivedTensorIsCompatibleWithTriangulation
+    (Z : SchemeBaseChange S) [IsLocallyNoetherian Z.left]
+    [HasCoherentDerivedTensor Z] :
+    CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation
+      (SchemeBoundedCoherentDerivedCategory Z.left) where
+  tensorAdditive := HasCoherentDerivedTensor.additive
+  tensorCommShift := HasCoherentDerivedTensor.commShift
+  tensorIsTriangulated := HasCoherentDerivedTensor.isTriangulated
 
 end
 

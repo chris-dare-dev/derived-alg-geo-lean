@@ -266,10 +266,52 @@ blocks should normally move it rather than add more declarations beside it.
   `Cohomology.FiniteCohomology` declaration is retired without a compatibility
   alias.
 
+- Geometric realizations live with the geometric object (2026-09-01): the
+  seven former `CategoryTheory/<source>/Instances/AlgebraicGeometry/` leaves
+  moved to
+  `AlgebraicGeometry/DerivedCategory/Stability/{BoundedCoherentBaseChange,DerivedPullback,FourierMukaiAction}.lean`,
+  `AlgebraicGeometry/Moduli/Semistability/{SchemeProbes,LocusProbes,FiniteType}.lean`,
+  and `AlgebraicGeometry/Moduli/HarderNarasimhan/DedekindProblem.lean`, and the
+  `IsCompatibleWithTriangulation` instance for `Dᵇ(Coh X)` merged into
+  `DerivedCategory/FourierMukai/DerivedTensorCoherence.lean` beside the class
+  it registers. The eight instance umbrellas, the `GeometryInstances` layer,
+  the subject rank order, and the reverse-edge allowlist are retired;
+  `scripts/check_layering.py` now enforces the six policy edges in
+  `layers.md`. Declaration names and namespaces are unchanged.
+
 ## Confirmed next lanes
 
-No additional lane is confirmed by the current signature audit. Re-run the
-consumer-prefix census before adding another item to this queue.
+Confirmed 2026-09-01 by the Tier 1 rule in `placement.md`: each subtree below
+extends a Mathlib API from a path that is not that API's Mathlib path, or
+nests a named concept the wrong way round. The import guide in `layers.md`
+already names the target, and new code uses the target path immediately.
+
+| Current path | Target path |
+| --- | --- |
+| `CategoryTheory/Triangulated/DerivedCategory/`, `Triangulated/CohomologyObjectProperty.lean` | `Algebra/Homology/DerivedCategory/` |
+| `CategoryTheory/Triangulated/BoundedHomotopyCategory.lean` | `Algebra/Homology/HomotopyCategory/Bounded.lean` |
+| `CategoryTheory/Triangulated/DGEnhancement/Instances/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/DGEnhancement/` |
+| `CategoryTheory/Enriched/DGCategory/` | `Algebra/Homology/DGCategory/` |
+| `CategoryTheory/SpectralSequence/` | `Algebra/Homology/SpectralSequence/` |
+| `CategoryTheory/Sites/Sheaves/Modules/` | `Algebra/Category/ModuleCat/Sheaf/` |
+| `CategoryTheory/Sites/Cech/` | `CategoryTheory/Sites/SheafCohomology/Cech/` |
+| `CategoryTheory/Sites/StackInGroupoids/` | `CategoryTheory/Sites/Descent/StackInGroupoids/` |
+| `CategoryTheory/Pseudofunctor/` | `CategoryTheory/Bicategory/Functor/Cat/` |
+| `CategoryTheory/Abelian/WeakSerre.lean` | `CategoryTheory/Abelian/SerreClass/Weak.lean` |
+| `CategoryTheory/Simplicial/` | `AlgebraicTopology/` |
+| `Topology/PrimeSpectrum/` | `RingTheory/Spectrum/Prime/` |
+| `Topology/Opens/` | `Topology/Category/TopCat/Opens/` |
+| `AlgebraicGeometry/Proj/` | `AlgebraicGeometry/ProjectiveSpectrum/` |
+| `AlgebraicGeometry/CoherentSheaf/` | `AlgebraicGeometry/Modules/Coherent/`, with `Quasicoherent/` beside it |
+| `CategoryTheory/Triangulated/WeakStabilityCondition/` | `CategoryTheory/Triangulated/StabilityCondition/` with weak stability as the child `Weak/` |
+
+Confirmed type-level hazards, recorded for a separate lane because they are
+rewrites rather than moves: `LinearAlgebra/Lattice/Basic.lean` bundles
+`Module.Finite ℤ` and `Module.Free ℤ` into a class named `ZLattice` that will
+collide with Mathlib's `IsZLattice` family; `AlgebraicGeometry/Variety/`
+bundles `Variety k` where Mathlib uses `Scheme` with `Over (Spec k)` and
+`Prop` classes; and `LinearAlgebra/AlternatingFinsum.lean` may overlap
+Mathlib's `Algebra/Homology/EulerCharacteristic.lean`.
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and

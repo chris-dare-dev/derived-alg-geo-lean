@@ -93,12 +93,8 @@ private def libraryOf (m : Name) : Option String :=
   let algebra := `DerivedAlgGeo.Algebra
   let topology := `DerivedAlgGeo.Topology
   let development := `DerivedAlgGeo.Development
-  let isGeometryInstance :=
-    (m.toString.splitOn ".Instances.AlgebraicGeometry").length > 1
   -- Both dg subtrees precede the generic `CategoryTheory` route.
-  if isGeometryInstance then
-    some "AlgebraicGeometry"
-  else if m == dg || dg.isPrefixOf m ||
+  if m == dg || dg.isPrefixOf m ||
       m == dgEnhancement || dgEnhancement.isPrefixOf m then
     some "DGCategory"
   else if m == categoryTheory || categoryTheory.isPrefixOf m ||

@@ -3,14 +3,15 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.Semistability.Locus
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families.Instances.AlgebraicGeometry.Scheme
+import DerivedAlgGeo.AlgebraicGeometry.Moduli.Semistability.SchemeProbes
 
 /-!
 # Scheme semistable loci as categorical openness probes
 
-The pointwise locus and its Zariski theorems are geometry-owned. This opt-in
-leaf realizes the weak-family `OpenLocusProbe`,
-`GenericSemistabilityProbe`, and universal openness interfaces.
+The pointwise locus and its Zariski theorems live in `Locus.lean`. This file
+realizes the weak-family `OpenLocusProbe`, `GenericSemistabilityProbe`, and
+universal openness interfaces for that locus. It lives with the geometric
+object it is about, not below the categorical interface it implements.
 -/
 
 namespace AlgebraicGeometry.Moduli.Semistability

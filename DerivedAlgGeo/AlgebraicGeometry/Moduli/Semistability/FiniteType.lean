@@ -3,9 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FiniteType
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances.AlgebraicGeometry.BoundedCoherentBaseChange
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances.AlgebraicGeometry.RelativeHarderNarasimhan
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances.AlgebraicGeometry.SemistableLocus
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability.BoundedCoherentBaseChange
+import DerivedAlgGeo.AlgebraicGeometry.Moduli.HarderNarasimhan.DedekindProblem
+import DerivedAlgGeo.AlgebraicGeometry.Moduli.Semistability.LocusProbes
 
 /-!
 # Finite-type openness and relative HN consequences

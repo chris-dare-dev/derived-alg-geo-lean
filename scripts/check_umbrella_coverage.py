@@ -26,8 +26,9 @@ has a directory of its own name is an umbrella, and must cover it. A file that
 declares something is a module, and is left alone.
 
 Explicit abstraction boundaries keep a generic umbrella from re-exporting a
-stronger child or an opt-in geometric instance umbrella. The subject-layering
-gate checks the import direction at those boundaries. Keeping every exception
+stronger child, and keep the neutral scheme-derived umbrella from re-exporting
+its stability-consuming child. The layering gate checks the import direction
+at those boundaries. Keeping every exception
 as an exact umbrella/child pair prevents it from weakening coverage anywhere
 else.
 """
@@ -48,23 +49,15 @@ DECLARES = re.compile(
     r"(def|theorem|lemma|abbrev|structure|class|inductive|instance|axiom|opaque)\b"
 )
 EXPLICIT_CHILD_BOUNDARIES = {
+    # Weak stability is importable without Bridgeland stability.
     "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition": {
         "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
         "StabilityCondition",
     },
-    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families": {
-        "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
-        "Families.Instances",
-    },
-    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
-    "StabilityCondition.Families": {
-        "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
-        "StabilityCondition.Families.Instances",
-    },
-    "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
-    "StabilityCondition.Symmetry.Autoequivalence": {
-        "DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition."
-        "StabilityCondition.Symmetry.Autoequivalence.Instances",
+    # Scheme-derived categories are importable without stability conditions.
+    # The top-level `AlgebraicGeometry` umbrella imports the `Stability` child.
+    "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory": {
+        "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability",
     },
 }
 

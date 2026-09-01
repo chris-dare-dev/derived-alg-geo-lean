@@ -19,8 +19,8 @@ automorphism of `K₀`.
 The Bridgeland action is deliberately absent. It is a consumer in
 `WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/`
 which imports this module. Algebraic-geometric constructions of these generic
-objects remain geometric, while registration and action adapters are exposed
-through explicit `Instances/AlgebraicGeometry/` leaves.
+objects, and the action of geometric kernels on stability conditions, live
+with the geometric objects under `AlgebraicGeometry/DerivedCategory/`.
 
 ## What this file does not assert
 

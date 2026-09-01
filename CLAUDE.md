@@ -2,456 +2,206 @@
 
 ## Repository shape
 
-This repository contains one public Lean library: `DerivedAlgGeo`. Its source
+This repository contains one public Lean library, `DerivedAlgGeo`. Its source
 root is `DerivedAlgGeo/` and its all-library umbrella is `DerivedAlgGeo.lean`.
-The layout follows Mathlib's subject hierarchy.
+The layout mirrors Mathlib's subject hierarchy, directory for directory, so
+that a file extending a Mathlib API sits where that API sits in Mathlib and an
+upstream pull request is a copy, not a relocation.
 
-The principal areas are:
-
-- `DerivedAlgGeo/AlgebraicGeometry/` for coherent sheaves, cohomology,
-  divisors, duality, intersection theory, numerical geometry, and
-  Riemann--Roch;
-- `DerivedAlgGeo/Algebra/` for ordinary ring and module theory independent of
-  sites and schemes, including localization and its kernel behavior under
-  `Algebra/Module/Localization/`;
-- `DerivedAlgGeo/CategoryTheory/Abelian/` for repository-owned results about
-  arbitrary abelian categories, extending Mathlib's abelian hierarchy;
-- `DerivedAlgGeo/CategoryTheory/Bicategory/` for higher-categorical
-  adjunctions, adjoint equivalences, mates, and their specialization to `Cat`;
-- `DerivedAlgGeo/CategoryTheory/Limits/` for generic limit and colimit
-  infrastructure, including preservation and reflective transport;
-- `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/` for generic sheaf theory,
-  including coverwise local-equivalence detection and module sheaves on an
-  arbitrary ringed site;
-- `DerivedAlgGeo/Topology/Sheaves/Basis.lean` for basiswise detection of
-  isomorphisms between sheaves on a topological space;
-- `DerivedAlgGeo/Topology/PrimeSpectrum/` for results combining a commutative
-  ring's prime spectrum with the lattice and categorical limits of its opens;
-- `DerivedAlgGeo/CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` for
-  intrinsic rank-one module sheaves and local trivializations, with
-  arbitrary-site tensor descent in the adjacent `Tensor.lean`;
-- `DerivedAlgGeo/Topology/Sheaves/ModuleTensor/StalkTensor.lean` for the
-  comparison between stalks and tensor products of module presheaves, and the
-  parent `ModuleTensor.lean` for the resulting stalkwise strengthening of
-  module-tensor descent;
-- `DerivedAlgGeo/CategoryTheory/Moduli/` for neutral moduli predicates such as
-  boundedness;
-- `DerivedAlgGeo/CategoryTheory/Pseudofunctor/ObjectProperty/` for generic
-  replete loci and subprestack machinery;
-- `DerivedAlgGeo/CategoryTheory/Monoidal/` for generic monoidal coherence and
-  compatibility interfaces;
-- `DerivedAlgGeo/CategoryTheory/Enriched/DGCategory/` for raw dg categories
-  and their internal pretriangulated structure;
-- `DerivedAlgGeo/CategoryTheory/Triangulated/DGEnhancement/` for the
-  triangulated `H⁰` of a pretriangulated dg category and dg enhancements;
-- `DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/` for t-structures;
-- `DerivedAlgGeo/CategoryTheory/Triangulated/Families/` for generic
-  contravariant families of triangulated categories and pullback functors;
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/` for weak
-  stability, generic stability functions, and shared slicing prerequisites;
-- `DerivedAlgGeo/CategoryTheory/Triangulated/WeakStabilityCondition/StabilityCondition/` for
-  the stronger Bridgeland refinement and its categorical applications;
-- `DerivedAlgGeo/LinearAlgebra/` for lattice and matrix prerequisites;
-- `DerivedAlgGeo/Development/` for code intentionally excluded from the stable
-  root.
+| Directory | Mathlib counterpart | What lives here |
+| --- | --- | --- |
+| `Algebra/` | `Mathlib/Algebra/` | ring, module, polynomial, and graded algebra; `Algebra/Category/ModuleCat/Sheaf/` extends Mathlib's `SheafOfModules` on an arbitrary ringed site; `Algebra/Homology/` extends Mathlib's homological algebra: derived categories, homotopy categories, spectral sequences, and the bespoke dg category built on `HomComplex` |
+| `AlgebraicGeometry/` | `Mathlib/AlgebraicGeometry/` | schemes and everything stated about them: `Modules/` (with its `Coherent/` and `Quasicoherent/` children), `ProjectiveSpectrum/`, `Cohomology/`, `DerivedCategory/`, `Divisors/`, `Duality/`, `IntersectionTheory/`, `Numerical/`, `RiemannRoch/`, `Moduli/`, `Stacks/`, `Surface/`, `Variety/` |
+| `AlgebraicTopology/` | `Mathlib/AlgebraicTopology/` | simplicial constructions |
+| `CategoryTheory/` | `Mathlib/CategoryTheory/` | abelian, bicategorical, limit, monoidal, and site theory; `Triangulated/` with its t-structures, stability conditions, dg enhancements, Grothendieck groups, Fourier--Mukai kernels, semiorthogonal decompositions, and compact generation |
+| `LinearAlgebra/` | `Mathlib/LinearAlgebra/` | lattices, quadratic forms, exterior powers, graded bases |
+| `RingTheory/` | `Mathlib/RingTheory/` | prime spectra |
+| `Topology/` | `Mathlib/Topology/` | sheaves on topological spaces and the category of opens |
+| `Development/` | none | probes intentionally excluded from the stable root |
 
 Never add imports or namespaces rooted at `CohLean`, `DGLean`, or
-`BridgelandStabLean`; those migration artifacts are retired.
+`BridgelandStabLean`; those migration artifacts are retired. Lanes still in
+flight toward this layout are listed under "Confirmed next lanes" in
+`docs/architecture/cutover-ledger.md`; a path named there is the target even
+before the move lands.
 
-## Structural ownership principles
+## The placement rule
 
-Organize code by its most general mathematical construction, then attach
-concrete applications through explicit instance leaves.
+Mathlib does not organize by abstraction level. It organizes by *definition
+site*: a file lives where the carrier it is about is defined, and extensions
+follow the definition. Two tiers.
 
-- Ordinary ring and module theory that mentions no site or scheme belongs
-  under `Algebra/`.
-- Arbitrary categorical, functorial, abelian, triangulated, enriched,
-  site-theoretic, or sheaf-theoretic statements belong under
-  `CategoryTheory/`. Reuse Mathlib's `CategoryTheory.Abelian` class and put
-  only missing generic results below `CategoryTheory/Abelian/`.
-- Higher-categorical work begins with Mathlib's `CategoryTheory.Bicategory`.
-  Its `Bicategory.Adjunction` is the source-of-truth; ordinary adjoint functors
-  are the `Cat` specialization through `Adjunction.toCat` and `ofCat`, bundled
-  here by `Adjunction.bicategoricalEquiv`.
-- Determine categorical dimension before subject ownership. Associators,
-  unitors, pentagons, triangles, mates, pseudofunctors, strong
-  transformations, and modifications are higher-categorical source data;
-  their ordinary functor and natural-isomorphism formulas are `Cat`
-  projections. Objectwise-equivalence transport of such a presentation is
-  owned by `CategoryTheory/Pseudofunctor/Transport.lean`, never by a geometric
-  consumer.
-- Generic sheaves belong under `CategoryTheory/Sites/Sheaves/`; sheaves of
-  modules over a sheaf of rings on an arbitrary site belong in its `Modules/`
-  child.
-- Sheaf statements that intrinsically mention the opens, bases, germs, or
-  stalks of a topological space belong under `Topology/Sheaves/`. In
-  particular, basiswise isomorphism detection is owned by `Basis.lean`, not by
-  an affine-scheme comparison that consumes it.
-- Prime-spectrum statements whose full signature uses opens or their
-  categorical finite products belong under `Topology/PrimeSpectrum/`, not the
-  lower `Algebra/` layer. Ring input alone does not erase the topological
-  output or justify duplicating the opens-limit infrastructure.
-- Arbitrary-site over-category cocontinuity belongs in
-  `CategoryTheory/Sites/Over.lean`; generic module-sheaf restriction to an
-  over category belongs in `Sites/Sheaves/Modules/Over.lean`; and equivalence
-  transport of a `CoversTop` family belongs in `Sites/CoversTop.lean`.
-  Restriction of presentations, generating sections, and quasicoherent
-  presentation data to those over sites belongs in
-  `Sites/Sheaves/Modules/Presentation/Over.lean`.
-  Isomorphism invariance and covering-family locality of finite presentation
-  belong in the adjacent `Presentation/{Isomorphism,Locality}.lean` roots.
-  Containment of zero and closure under short-exact extensions belong in
-  `Presentation/{Zero,Extensions}.lean`. Scheme open immersions and coherent
-  sheaves consume these roots and begin only where schemes, topological opens,
-  `coherent X`, or `Coh X` enter the public signature.
-- Local injectivity, local surjectivity, and membership in the weak-equivalence
-  class inverted by sheafification are arbitrary-site statements when they are
-  detected on a `GrothendieckTopology.CoversTop` family. Their canonical owner
-  is `CategoryTheory/Sites/Sheaves/CoversTop.lean`; geometric charts consume
-  that root directly.
-- Rank-one local-generator data and `SheafOfModules.IsInvertible` are likewise
-  arbitrary-site module-sheaf notions. Scheme tensor and Picard modules import
-  those roots directly and begin only when `X.Modules` enters the signature.
-- The conversion from a free epimorphism to
-  `SheafOfModules.GeneratingSections`, its finite-index instance, and its
-  recovery lemma belong in
-  `CategoryTheory/Sites/Sheaves/Modules/GeneratingSections.lean`. Affine
-  charts import that root and add only scheme, open-set, and coherence data.
-- Stalk tensor products of module presheaves are topological sheaf theory:
-  their signatures use a topological space, its opens, germs, and stalk
-  functors. Their canonical owner is
-  `Topology/Sheaves/ModuleTensor/StalkTensor.lean`, not
-  `Algebra/Category/ModuleCat/`; the parent topological module consumes that
-  comparison to prove the arbitrary-factor stalkwise theorem.
-- Definitions and lemmas that intrinsically mention schemes, varieties,
-  scheme-indexed sheaf categories, or geometric morphism properties belong
-  under `AlgebraicGeometry/`.
-- Generic stacks in groupoids and their descent-equivalence interface belong
-  under `CategoryTheory/Sites/` and use the `CategoryTheory` namespace;
-  scheme-specific representability and presentations remain geometric.
-- A geometric realization of a generic categorical interface belongs under
-  `CategoryTheory/<construction>/Instances/AlgebraicGeometry/`. Such a bridge
-  leaf may import geometry, but generic siblings and generic umbrellas must
-  never import it.
-- Stronger theories import weaker theories and expose the relationship in
-  Lean through a projection or constructor. Directory nesting is not a
-  replacement for the actual type-level refinement.
+**Tier 1. An extension of a Mathlib API lives at that API's Mathlib path,
+under `DerivedAlgGeo/`, in that API's namespace.** Nothing else decides it:
+not the abstraction level of the statement, not the weakest vocabulary in its
+signature, not its motivation, its first consumer, or its proof technique.
 
-In particular, derived-category theory is generic. Prove `[Abelian (Coh X)]`
-under the correct geometric hypotheses and then use
-`DerivedCategory (Coh X)`; do not build a second derived-category theory under
-algebraic geometry. Generic t-structure, exact-functor, homology-comparison,
-and K-projective results live under
-`CategoryTheory/Triangulated/DerivedCategory/`. `Dqc(X)` may be represented by
-the quasicoherent-cohomology locus until the abelian `QCoh X` construction and
-its derived comparison are available, but this is a geometric specialization
-of the generic theory and lives under `AlgebraicGeometry/DerivedCategory/`,
-not below stability. Use an
-`Instances/AlgebraicGeometry/` leaf for registration-only adapters whose
-generic categorical interface is the primary owner.
+| Concept | Mathlib defines it in | So it lives in |
+| --- | --- | --- |
+| `DerivedCategory C`, `Ext`, K-projectives, its t-structure, `Bounded` | `Algebra/Homology/DerivedCategory/` | `Algebra/Homology/DerivedCategory/` |
+| `HomotopyCategory`, `HomComplex`, bounded and plus variants | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
+| `SheafOfModules`, `GeneratingSections`, `IsQuasicoherent`, presentations, invertibility | `Algebra/Category/ModuleCat/Sheaf/` | `Algebra/Category/ModuleCat/Sheaf/` |
+| Čech cohomology on a site | `CategoryTheory/Sites/SheafCohomology/` | `CategoryTheory/Sites/SheafCohomology/Cech/` |
+| Spectral sequences and total complexes | `Algebra/Homology/SpectralSequence/`, `SpectralObject/` | `Algebra/Homology/SpectralSequence/` |
+| `Pseudofunctor.ObjectProperty`, Cat-valued pseudofunctor transport | `CategoryTheory/Bicategory/Functor/Cat/` | `CategoryTheory/Bicategory/Functor/Cat/` |
+| `IsStack`, descent data | `CategoryTheory/Sites/Descent/` | `CategoryTheory/Sites/Descent/` |
+| `PrimeSpectrum.basicOpen` | `RingTheory/Spectrum/Prime/` | `RingTheory/Spectrum/Prime/` |
+| `Abelian (ModuleCat R)`, `Abelian X.Modules` | with `ModuleCat`, with `X.Modules` | with the object, never below the interface |
 
-The general identifications `Dᵇ(Coh X) ≃ Dᵇ_coh(Dqc X)` and
-`Perf(X) = Dqc(X)^c` remain explicit geometric propositions. Their consumer
-API is `AlgebraicGeometry/DerivedCategory/Dqc/Comparison.lean`: downstream
-theorems pass the evidence explicitly and obtain representatives or
-membership comparisons. Do not turn either proposition into a global
-equivalence, essential-surjectivity instance, or compactness instance before
-the geometric theorem is proved.
+**Tier 2. A subject Mathlib lacks is placed by the nearest Mathlib
+precedent.**
 
-`SchemeQuasicoherentDerivedCategory.zero` is owned by `Dqc.lean` and is
-defined for every scheme. Perfect-moduli consumers prove their additional
-pseudo-coherent, finite-Tor, and gluing properties for that object instead of
-reconstructing zero through `D(Coh X)` or a bounded-coherent category.
+| Situation | Mathlib precedent | So it lives in |
+| --- | --- | --- |
+| A structure on an abstract triangulated category | `Triangulated/TStructure/`, `Subcategory`, `Orthogonal`, `Generators` | `CategoryTheory/Triangulated/<Name>/`: stability conditions, dg enhancements, K₀, Fourier--Mukai kernels, semiorthogonal decompositions, spherical twists, compact generation, families |
+| A weakened or strengthened variant of a named concept | `Topology/MetricSpace/Pseudo/`, `Monoidal/Braided/`, `Monoidal/Closed/` | a child directory named by the adjective: `Triangulated/StabilityCondition/Weak/` |
+| Compatibility between two independent structures | `Monoidal/Preadditive.lean`, `Monoidal/Linear.lean` | `CategoryTheory/Monoidal/Triangulated.lean` |
+| A geometric realization of a categorical interface | `Algebra/Category/ModuleCat/Abelian.lean`, `AlgebraicGeometry/Modules/Sheaf.lean` | with the geometric object under `AlgebraicGeometry/`; the declaration may keep the interface's namespace for dot notation |
+| A bespoke carrier built on a Mathlib API | definition site | beside that API: `DGCategory` on `HomComplex` is `Algebra/Homology/DGCategory/` |
+| A theorem whose signature mentions a scheme | `AlgebraicGeometry/` | `AlgebraicGeometry/`, even when the proof is entirely categorical |
 
-Do not collapse the repository's three uses of “perfect.” `schemePerfect` is
-the absolute thick envelope in `D(Coh X)`; `schemeRelativePerfect p` is the
-base-dependent pseudo-coherent finite-Tor locus in `Dqc(X)`; and
-`TwoTermPerfectDeterminantData` is explicit presentation data of two-term
-amplitude. `Moduli/PerfectComplex/Comparison.lean` owns cross-notion adapters:
-two-term data gives an absolute perfect degree-zero object, which maps to the
-canonical Dqc essential image. No converse or absolute/relative equivalence
-may be installed without a separate geometric proof.
+Three consequences follow, and each retires a former convention.
 
-The opposite comparison `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` is
-generic derived-category data and belongs in
-`CategoryTheory/Triangulated/DerivedCategory/Opposite.lean`. Exact algebraic
-linear duality and its derived lift belong in the adjacent `LinearDual.lean`
-specialization. Geometric Serre or Grothendieck duality imports those roots and
-`AlgebraicGeometry/DerivedCategory/Coherent.lean`; it does not own replacement
-localizations for coherent sheaves or modules.
+- **There are no `Instances/` directories below a generic subject.** Mathlib
+  has none. The instance of `IsCompatibleWithTriangulation` for `Dᵇ(Coh X)`
+  sits in `AlgebraicGeometry/DerivedCategory/FourierMukai/DerivedTensorCoherence.lean`
+  beside the class it registers; the scheme realizations of the stability
+  family interfaces sit under `AlgebraicGeometry/Moduli/` and
+  `AlgebraicGeometry/DerivedCategory/Stability/`. The former
+  `CategoryTheory/<source>/Instances/AlgebraicGeometry/` leaves and the
+  `GeometryInstances` virtual layer are retired.
+- **`AlgebraicGeometry/` is organized by geometric object, never as a mirror
+  of `CategoryTheory/`.** One object satisfies many interfaces: `Dᵇ(Coh X)` is
+  triangulated, has a t-structure, is conditionally monoidal, is a fiber of a
+  family, and carries stability conditions. Inside an object directory, files
+  are named by the structure they add, as Mathlib's `ModuleCat/` has
+  `Abelian.lean`, `Monoidal/`, and `Limits.lean`. So
+  `AlgebraicGeometry/DerivedCategory/{Coherent,Dqc,Families,FourierMukai,Stability}`,
+  never `AlgebraicGeometry/Triangulated/DerivedCategory/`.
+- **Directory nesting records names, not dependency direction.** Mathlib's
+  `MetricSpace/Defs.lean` imports its own child `MetricSpace/Pseudo/Defs.lean`.
+  Bridgeland stability is the canonical concept and imports weak stability,
+  so the tree is `Triangulated/StabilityCondition/` with `Weak/` as a child.
+  Declaration namespaces stay `CategoryTheory.Triangulated.WeakStabilityCondition`
+  and `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition`;
+  Mathlib's `Pseudo/` precedent has namespace and path differ too, and a
+  namespace cutover would invalidate the immutable review payloads the
+  `exe/RestateHistoricalNames.lean` bridge exists to protect.
 
-The geometric specialization chain is `SheafOfModules(X) -> QCoh(X) ->
-Coh(X)`. Its scheme-owned source tree is
-`AlgebraicGeometry/SheafOfModules/QuasicoherentSheaf/CoherentSheaf/` as the
-staged cutover reaches those APIs. The fact that `Coh(X)` is abelian is a
-geometric instance; the derived-category construction it unlocks remains the
-single generic construction under category theory.
+The weakest-vocabulary signature test in `docs/architecture/placement.md` is
+the tie-breaker within Tier 2, not the primary rule; it must not move an
+extension of a Mathlib API away from that API's path.
 
-The same ownership rule applies to cohomological infrastructure. Generic
-`Ext` adjunction, dimension shift, and injective-resolution naturality live
-under `CategoryTheory/Triangulated/DerivedCategory/Ext/`; filtered-complex and
-total-complex spectral sequences live under `CategoryTheory/SpectralSequence/`;
-and site-theoretic Čech constructions, injective comparisons, compact-basis
-arguments, and finite-cover boundedness live under
-`CategoryTheory/Sites/Cech/`. Geometric cohomology modules consume these roots
-and add affine, scheme, and projective-space input.
+## Dependency direction
 
-An adjunction hypothesis does not by itself make a theorem part of the
-adjunction foundation. Results whose conclusion is preservation of limits or
-colimits live under `CategoryTheory/Limits/`; generic `Ext` adjunctions remain
-with derived `Ext`, and Fourier--Mukai adjunction packages remain with their
-kernel consumers. The repository currently formalizes the higher-categorical
-spine through bicategories. Introduce general `n`-category or
-`(∞,1)`-category roots only when an actual reusable formal model is added, not
-as placeholder directories.
+Mathlib's subjects interleave: `Algebra/Homology` imports `CategoryTheory`,
+and `CategoryTheory/Linear` imports `Algebra`. There is therefore no rank
+order between subjects, and `scripts/check_layering.py` does not enforce one.
+Lean enforces module acyclicity. The policy edges are exactly these.
 
-Monoidal structure precedes enrichment in the dependency graph: a
-`V`-enriched category is defined relative to a monoidal category `V`, and a dg
-category specializes this pattern to cochain complexes. Monoidal and
-triangulated structures are otherwise independent, so neither is a superclass
-of the other. Put their compatibility under
-`CategoryTheory/Monoidal/Triangulated/`; put an optional monoidal refinement of
-a dg category under `CategoryTheory/Enriched/DGCategory/Monoidal/`, and put
-the induced monoidal structure on triangulated `H⁰` under
-`CategoryTheory/Triangulated/DGEnhancement/Monoidal/`.
+- **Geometry firewall.** Only modules below `AlgebraicGeometry/` and
+  `Development/` import `DerivedAlgGeo.AlgebraicGeometry` or
+  `Mathlib.AlgebraicGeometry`, and only they declare into the
+  `AlgebraicGeometry` namespace. Everything else is usable without schemes.
+- **`Development/` is a leaf.** No stable module imports it.
+- **Stability-neutral geometry.** Modules below `AlgebraicGeometry/` outside
+  `Moduli/`, `Numerical/`, and `DerivedCategory/Stability/` never reach the
+  stability tree, even transitively. The `AlgebraicGeometry/DerivedCategory`
+  umbrella therefore omits its `Stability` child; the top-level
+  `AlgebraicGeometry` umbrella imports it. This is what keeps `Dᵇ(Coh X)`,
+  `Dqc`, coherent sheaves, and cohomology importable without Bridgeland
+  stability.
+- **Weak stability is independent of Bridgeland stability**, and
+  `PreStabilityCondition` structurally extends `WeakPreStabilityCondition`.
+- **Retired paths stay retired.** The gate carries the list.
+- **A new top-level subject is deliberate**, added to the gate's
+  `KNOWN_SUBJECTS` by name.
 
-A bare tensor bifunctor is weaker than a coherent monoidal structure. Add
-associators, unitors, and coherence only at the stronger layer and provide a
-one-way forgetful adapter. Tensor products on sheaves and `Dᵇ(Coh X)` remain
-geometric inputs; they should instantiate the generic categorical interface.
+## Derived categories and `Dᵇ(Coh X)`
 
-Raw dg categories are enriched categories, not automatically triangulated
-categories. A pretriangulated dg category has the zero objects, shifts, and
-cones needed for its `H⁰` to be triangulated. Consequently:
+Derived-category theory is generic and is built once. Three declarations,
+three owners:
 
-- raw dg and pretriangulated-dg internals live under
-  `CategoryTheory/Enriched/DGCategory/`;
-- the `H⁰` triangulation, dg-enhancement interface, and enhancement models
-  live under `CategoryTheory/Triangulated/DGEnhancement/`;
-- a dg category of complexes enhances the homotopy category, not the derived
-  category, until the relevant dg localization or resolution model is proved.
+- the construction `DerivedCategory C` for an abelian `C` is Mathlib's, in
+  `Mathlib/Algebra/Homology/DerivedCategory/`;
+- repository extensions of it (t-structure results, `Ext` adjunction and
+  dimension shift, K-projective and bounded-above-projective models, the
+  opposite comparison, exact linear duality, cohomology object properties)
+  live in `Algebra/Homology/DerivedCategory/`;
+- `Abelian (Coh X)` is a geometric instance in
+  `AlgebraicGeometry/Modules/Coherent/Abelian/`, and the abbreviation
+  `Dᵇ(Coh X) := DerivedCategory.Bounded (Coh X)` together with everything
+  scheme-specific about it, `Perf(X)`, `Dqc(X)`, pullback, and kernels, lives
+  in `AlgebraicGeometry/DerivedCategory/`.
 
-Pure weak and Bridgeland stability theory remains categorical. Weak stability
-is the independently importable dependency parent at
-`CategoryTheory/Triangulated/WeakStabilityCondition/`; ordinary Bridgeland
-stability is its child at `WeakStabilityCondition/StabilityCondition/`. Never
-restore a sibling `CategoryTheory/Triangulated/StabilityCondition/` tree, and
-make ordinary prestability structurally expose its weak parent. Do not add a
-`WeakCompatibility/` leaf for data already provided by that projection.
-Abstract pullback, pseudofunctor, and Fourier--Mukai interfaces remain
-categorical. Scheme-derived categories, `Dqc`, geometric pullback, and kernel
-convolution live under `AlgebraicGeometry/DerivedCategory/`; only
-registration-only adapters belong in explicit `Instances/AlgebraicGeometry/`
-leaves. General Mumford slope data is
-weak-stability input, while a promotion to Bridgeland stability belongs below
-the strong child only under hypotheses where that promotion is valid.
-Scheme-specific data remains geometry-owned and realizes the categorical
-interface through an explicit bridge.
+Do not build a second derived-category theory under geometry. `Basic.lean`
+registers the shared module-sheaf localization; `Coherent.lean` owns
+`D(Coh X)`, `Dᵇ(Coh X)`, and `Perf(X)` without importing families, pullback,
+or moduli; `Dqc.lean` owns the quasicoherent-cohomology locus and its
+canonical zero for every scheme; `Families/` owns scheme base change and
+pullback; `FourierMukai/` owns neutral kernels and convolution; `Stability/`
+owns the three consumers that need stability conditions.
 
-Likewise, generic stack-in-groupoids construction, discrete stacks from
-sheaves, stack morphisms, and site-object representability live under
-`CategoryTheory/Sites/StackInGroupoids/`. Big-Zariski representable stacks and
-geometric properties of their representing morphisms remain under
-`AlgebraicGeometry/Stacks/`.
+The identifications `Dᵇ(Coh X) ≃ Dᵇ_coh(Dqc X)` and `Perf(X) = Dqc(X)^c`
+remain explicit propositions. `Dqc/Comparison.lean` consumes supplied
+evidence to produce representatives and membership comparisons; do not turn
+either into a global instance before the geometric theorem is proved. The
+three uses of "perfect" (`schemePerfect`, `schemeRelativePerfect`,
+`TwoTermPerfectDeterminantData`) are related only by the one-way adapters in
+`Moduli/PerfectComplex/Comparison.lean`; see the ledger in
+`docs/architecture/placement.md`.
 
-Match declaration namespaces to those geometric owners. Scheme-derived
-category declarations in
-`AlgebraicGeometry/DerivedCategory/{Basic,Coherent}.lean` use
-`AlgebraicGeometry.DerivedCategory`: `Basic.lean` owns the module-sheaf
-specialization, while `Coherent.lean` owns `D(Coh X)`, `Dᵇ(Coh X)`, and
-`Perf(X)` independently of families and pullback. Scheme base-change and
-pullback declarations in `AlgebraicGeometry/DerivedCategory/Families/` use
-`AlgebraicGeometry.DerivedCategory.Families`; quasicoherent-cohomology loci
-and affine realizations in `AlgebraicGeometry/DerivedCategory/Dqc.lean` and
-its `Dqc/` subtree use `AlgebraicGeometry.DerivedCategory.Dqc`; neutral
-geometric kernel declarations in `AlgebraicGeometry/DerivedCategory/FourierMukai/`
-use `AlgebraicGeometry.DerivedCategory.FourierMukai`. Do not retain neutral
-geometric declarations in a categorical stability-condition namespace merely
-for source compatibility.
+## dg categories, enhancements, and stability
 
-The former `AlgebraicGeometry/StabilityCondition/` subtree and
-`AlgebraicGeometry.StabilityCondition` namespace are retired. Keep actual
-semistable loci and relative HN filtrations under
-`AlgebraicGeometry/Moduli/{Semistability,HarderNarasimhan}/`; keep neutral
-Fourier--Mukai kernels under `AlgebraicGeometry/DerivedCategory/FourierMukai/`.
-Attach the declarations that implement a weak- or Bridgeland-stability
-interface to that categorical source through its explicit
-`Instances/AlgebraicGeometry/` leaf. Geometric source modules must not import
-those leaves, so the direction remains categorical source plus geometry into
-the instance bridge.
+- `DGCategory` is a bespoke class built on Mathlib's `HomComplex` (ADR-0010,
+  ADR-0011), so by definition site it lives in `Algebra/Homology/DGCategory/`
+  beside the `HomotopyCategory/` it enhances. It does not extend
+  `EnrichedCategory`; a path under `CategoryTheory/Enriched/` would assert an
+  `extends` that is not there. If the enriched encoding (ADR-0010 Option A′)
+  ever lands, the subtree moves under `CategoryTheory/Enriched/` in the same
+  change.
+- A dg enhancement is a structure on an abstract triangulated category and
+  lives in `CategoryTheory/Triangulated/DGEnhancement/`. Its realization for
+  Mathlib's homotopy category lives with that object, in
+  `Algebra/Homology/HomotopyCategory/DGEnhancement/`.
+- Monoidal and triangulated structures are independent; their compatibility
+  class is `CategoryTheory/Monoidal/Triangulated.lean`, and geometric exact
+  tensors instantiate it from geometry.
+- Stability conditions live in `CategoryTheory/Triangulated/StabilityCondition/`
+  with weak stability as the child `Weak/`. Weak stability never imports the
+  Bridgeland theory. Geometric consumers live under `AlgebraicGeometry/Moduli/`
+  (semistable loci, relative HN filtrations, finite-type openness, scheme
+  probes) and `AlgebraicGeometry/DerivedCategory/Stability/` (base change of
+  pre-stability data, the geometric Fourier--Mukai action).
 
-The generic kernel-autoequivalence source lives under
-`CategoryTheory/Triangulated/FourierMukai/`. Its action on Bridgeland stability
-belongs under the strong stability child's `Symmetry/Autoequivalence/`
-subtree, and its scheme-specific action adapter belongs in that source's
-`Instances/AlgebraicGeometry/` leaf. A bridge may extend either its categorical
-source namespace or the namespace of the geometric object it realizes; its
-physical path records which interface it implements.
+## Umbrellas
 
-The generic family root also owns its declaration namespace:
-`TriangulatedFiberFamily` belongs to
-`CategoryTheory.Triangulated.Families`. Its source is a Cat-valued
-pseudofunctor on `LocallyDiscrete Bᵒᵖ`; an ordinary strict functor enters only
-through `TriangulatedFiberFamily.ofFunctor`. Neutral moduli boundedness is
-more general still: `BoundednessProblem` and `UniversalBoundedness` belong to
-`CategoryTheory.Moduli`, not to triangulated or stability families. Namespace
-migrations are separate from path moves and must update consumers, audits,
-baselines, documentation, and enforcement together.
-
-Mathlib's `Pseudofunctor.ObjectProperty` is the canonical fiberwise locus for
-a Cat-valued pseudofunctor. Closure under isomorphisms makes the locus replete;
-closure under mapped objects makes it restriction-stable; `fullsubcategory`
-constructs the corresponding subprestack. Repository extensions live under
-`CategoryTheory/Pseudofunctor/ObjectProperty/`. Do not add a competing
-`Subprestack` carrier below algebraic geometry.
-
-The geometric `RelativePerfectModuliSelector` is only a pair of indexed
-replete loci, named `familyLocus` and `geometricLocus`. It is valid input to a
-finite-type boundedness witness but is not a subfunctor or subprestack. The
-affine relative-perfect pseudofunctor applies the generic `universallyStable`
-construction and then Mathlib's `fullsubcategory`; use that pattern whenever
-restriction stability has actually been established.
-
-The weak family root follows the same rule. Shared family probes and APIs bound
-to `WeakStabilityFunction` use
-`CategoryTheory.Triangulated.WeakStabilityCondition.Families`; the stronger
-Bridgeland child consumes them instead of owning them.
-
-Generic numerical support predicates and their weak-stability bindings use
-`CategoryTheory.Triangulated.WeakStabilityCondition.Support`. Do not qualify
-them through the former strong-sibling
-`CategoryTheory.Triangulated.StabilityCondition.Support` namespace.
-
-The finite-length simple-charge lattice model belongs to the weak
-stability-function foundation under
-`WeakStabilityCondition/Foundation/StabilityFunction/` and uses
-`CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength`. Do not
-recreate the duplicate plural `WeakStabilityCondition/Foundations/` tree.
-
-Ordinary Bridgeland family packages use the matching child namespace
-`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families`.
-Geometric realizations consume that API but keep geometry-owned declarations
-separate.
-
-Bridgeland wall declarations likewise use the matching strong-child namespace
-`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall`,
-not the former sibling `CategoryTheory.Triangulated.StabilityCondition.Wall`.
-
-Generic kernel autoequivalences and their Bridgeland-action extensions use the
-canonical `CategoryTheory.Triangulated.FourierMukai` namespace even though the
-strong-dependent implementation lives in the stability child's `Symmetry/`
-subtree. Do not route these declarations through either stability `Symmetry`
-namespace; the former sibling
-`CategoryTheory.Triangulated.StabilityCondition.Symmetry` remains retired.
-
-Group actions on slicings, pre-stability conditions, and Bridgeland stability
-conditions use the matching strong-child namespace
-`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`,
-not the former sibling
-`CategoryTheory.Triangulated.StabilityCondition.GroupAction`. Public aliases in
-that retired namespace are forbidden. The executable-only
-`exe/RestateHistoricalNames.lean` bridge carries the historical names
-needed to elaborate immutable human-review payloads; library modules must not
-import it or redeclare those names.
-
-The staged import-only shims at `Divisors/{Tensor,Picard,Monoidal}.lean`,
-`Stacks/Basic.lean`, and `Compatibility/StabilityConditionFamilies.lean` are
-retired. Import the categorical or geometric owner directly; do not recreate a
-compatibility path that mixes owners or restore the `DerivedAlgGeo.Compatibility`
-umbrella.
-
-Helpers intrinsically about deforming a Bridgeland stability condition use
-`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation`,
-not the retired flattened `CategoryTheory.Triangulated.Deformation` namespace.
-Declarations that extend canonical structures such as `Slicing`,
-`PreStabilityCondition.WithClassMap`, or `StabilityCondition.WithClassMap`
-remain in those structures' established namespaces even when their source
-files live in the deformation subtree.
-
-Every non-leaf directory needs a same-named umbrella. Generic umbrellas export
-generic theory only; `Instances/` umbrellas remain opt-in leaves. A structural
-move must update imports, umbrellas, audits, declaration-sweep routing,
-documentation, architecture checks, and CI paths together.
+Every non-leaf directory has a same-named umbrella that re-exports its direct
+children. Two umbrellas deliberately omit a child, and
+`scripts/check_umbrella_coverage.py` knows both: the weak stability umbrella
+omits the Bridgeland child, and `AlgebraicGeometry/DerivedCategory.lean` omits
+`Stability`. A module that shares a name with a directory of its consequences
+is not an umbrella and is left alone. A structural move updates imports,
+umbrellas, audits, declaration-sweep routing, documentation, the layering
+gate, and CI paths together.
 
 ## Editing rules
 
 - Prefer the narrowest import and the nearest umbrella.
-- Before editing public API, apply the declaration-signature decision table in
-  `docs/architecture/placement.md`. Motivation, filename, namespace, and proof
-  technique are not ownership evidence.
-- Ring/module/localization declarations with no site belong to `Algebra/`;
-  linear-map, basis, lattice, matrix, multilinear, and exterior-power
-  declarations with no site belong to `LinearAlgebra/`.
-- Additive-presheaf local-equivalence declarations mentioning only a
-  Grothendieck topology and a covering family belong in
-  `CategoryTheory/Sites/Sheaves/CoversTop.lean`, not in a scheme tensor or
-  divisor consumer.
-- Module-presheaf declarations mentioning a topological space, open
-  neighbourhoods, germs, or stalk functors belong under `Topology/Sheaves/`.
-  Do not restore the retired `Algebra/Category/ModuleCat/StalkTensor.lean`
-  path or route consumers through an algebra umbrella.
-- Basiswise detection of isomorphisms between sheaves on a topological space
-  belongs in `Topology/Sheaves/Basis.lean`; geometric comparison files import
-  that root directly and must not redeclare its generic prefix.
-- Finite-product identities for basic opens belong in
-  `Topology/PrimeSpectrum/BasicOpen.lean`. Affine Čech consumers import that
-  root directly and begin only when scheme sheaves and Čech complexes enter.
-- Use the global `ZLattice` class from `LinearAlgebra/Lattice/Basic.lean` for
-  finite free abelian groups. Its construction from finite torsion-free groups
-  is generic; only the theorem applying it to a numerical Euler-radical
-  quotient remains geometric. Never restore the former
-  `AlgebraicGeometry.Numerical.ZLattice` namespace.
-- Indexed additive-group sums, saturated family-relation quotients,
-  additive-map images, and finite-index-overlattice predicates use
-  `Algebra/RelativeNumerical/`. A scheme consumer imports that root and adds
-  genuine geometric data; never restore the former
-  `AlgebraicGeometry/Numerical/GrothendieckGroup/Relative*` paths.
-- Integer-lattice numerical functions, mixed forward differences, finite-
-  difference degree, Newton coefficients, and top multilinear coefficients
-  use `Algebra/NumericalPolynomial/`. Snapper polynomiality stays in
-  `AlgebraicGeometry/IntersectionTheory/Snapper.lean` because its signature
-  introduces Picard classes, coherent sheaves, and Euler characteristics.
-  Never restore the former geometric `NumericalPolynomial` path or namespace.
-- Additive triangulated `K₀` targets, exact-functor descent squares, and
-  categorical Euler pairings use
-  `CategoryTheory/Triangulated/GrothendieckGroup/`. Reuse the canonical
-  `K₀.Realization` and `K₀.EulerForm` aliases; numerical Riemann--Roch and
-  Mukai transfer remain geometric consumers. Never restore the former
-  geometry-owned `NumericalRealization`, `Descends`, `CategoricalEulerForm`,
-  or `PreservesCategoricalEuler` APIs.
-- Weighted-basis submodules and their internal direct-sum proofs use
-  `LinearAlgebra/GradedBasis.lean`; numerical intersection-ring assembly
-  consumes them from algebraic geometry.
-- Bounded and unbounded alternating-finrank identities for abstract exact
-  sequences of finite-dimensional modules use
-  `LinearAlgebra/AlternatingFinsum.lean`. Euler-characteristic additivity is a
-  geometric consumer only after `FiniteCohomology`, `Coh X`, or coherent-sheaf
-  cohomology appears; do not recreate the linear-algebra theorem beside it.
-- Pure `Finsupp` and `MvPolynomial.divMonomial` identities use
-  `Algebra/MvPolynomial/DivMonomial.lean`, even when their first application is
-  a projective Čech calculation. Polynomial generation over the degree-zero
-  grading uses `Algebra/MvPolynomial/Grading.lean`, and a canonical `p / 1`
-  variable-localization element uses `Algebra/MvPolynomial/Cech/Basic.lean`.
-- Generic internally graded-module localization and shift APIs use
-  `Algebra/Module/GradedModule/` and the `GradedModule` namespace. Laurent
-  exponent arithmetic uses `Algebra/Finsupp/`; polynomial Laurent-basis,
-  projection, block, one-localization homotopy, and full-block finiteness APIs
-  use `Algebra/MvPolynomial/`. The polynomial-variable Čech diagram and its
-  homotopy, primitive, and finite-block algebra use
-  `Algebra/MvPolynomial/Cech/`; only comparison with projective basic opens,
-  sections, and cohomology remains geometric. Do not restore the former Proj
-  foundation paths or make algebra import a geometric consumer.
-- Inspect the surrounding consumer file for adjacent generic declarations. If
-  an identified block is not moved in the current slice, record it in
-  `docs/architecture/cutover-ledger.md` and do not extend it in place.
-- Before introducing a public structure, class, quotient carrier, or category,
-  follow `docs/architecture/abstraction-tree.md`: reuse one canonical root and
-  make specializations reach it by an instance, projection, abbreviation, or
-  proved comparison.
+- Before editing public API, apply the two-tier rule above and the decision
+  table in `docs/architecture/placement.md`.
 - Use Mathlib's namespace for extensions of an existing Mathlib API.
-- Keep generic layers independent of specialized geometric applications.
-- Preserve explicit trust boundaries; do not use `sorry`, `admit`, or a hidden
-  axiom to cross an unfinished mathematical seam.
+- Before introducing a public structure, class, quotient carrier, or
+  category, follow `docs/architecture/abstraction-tree.md`: reuse one
+  canonical root and make specializations reach it by an instance,
+  projection, abbreviation, or proved comparison.
+- If a file contains a generic block followed by its geometric use, split at
+  the first declaration whose signature no longer needs the geometry. If the
+  block is not moved in the current slice, record it in
+  `docs/architecture/cutover-ledger.md` and do not extend it in place.
+- Preserve explicit trust boundaries; do not use `sorry`, `admit`, or a
+  hidden axiom to cross an unfinished mathematical seam.
+- Add every new public declaration to the relevant audit.
 - Do not edit generated build artifacts by hand.
 - Do not alter unrelated work in a dirty tree.
 
@@ -462,8 +212,8 @@ change; it owns the human-facing placement and contribution rules.
 
 **Full verification runs on the self-hosted Windows runners, not on your machine.**
 `.github/workflows/ci.yml` routes `push` and `workflow_dispatch` to
-`["self-hosted", "owner-win"]`, and it triggers on `agent/**`. So pushing an agent
-branch already runs the whole gate there; to get a verdict without pushing, use
+`["self-hosted", "owner-win"]`, and it triggers on `main` and `agent/**`. So
+pushing already runs the whole gate there; to get a verdict without pushing, use
 
 ```bash
 gh workflow run ci.yml --ref <branch>
@@ -532,6 +282,8 @@ lake build AlgebraicGeometryAudit StabilityConditionAudit DGCategoryAudit
 lake exe runLinter DerivedAlgGeo
 lake exe lint-style
 python3 scripts/check_source_independence.py
+python3 scripts/check_layering.py
+python3 scripts/check_umbrella_coverage.py
 python3 scripts/check_coverage_map.py
 ```
 

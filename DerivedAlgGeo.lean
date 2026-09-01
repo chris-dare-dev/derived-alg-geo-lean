@@ -6,10 +6,6 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra
 import DerivedAlgGeo.AlgebraicGeometry
 import DerivedAlgGeo.CategoryTheory
-import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated.Instances
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Families.Instances
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.Autoequivalence.Instances
 import DerivedAlgGeo.LinearAlgebra
 import DerivedAlgGeo.Topology
 

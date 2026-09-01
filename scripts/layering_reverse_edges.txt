@@ -1,5 +1,0 @@
-# AlgebraicGeometry -> categorical Instances/AlgebraicGeometry exceptions.
-# Format: source path relative to DerivedAlgGeo, TAB, exact imported module.
-#
-# The structural cutover burned this list to zero. Do not add an exception:
-# geometric sources import the categorical source, never its realization leaf.

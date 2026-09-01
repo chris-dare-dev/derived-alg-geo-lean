@@ -4,7 +4,8 @@ foundations, `Dqc`, Fourier--Mukai kernels, and stability-specific declarations
 use their geometry-owned namespaces.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability
+import DerivedAlgGeo.AlgebraicGeometry.Moduli
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda

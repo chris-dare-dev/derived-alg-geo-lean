@@ -1,35 +1,73 @@
-# Declaration placement by signature
+# Declaration placement
 
 This is the operational placement test for new declarations and structural
-moves. The canonical owner is determined by the weakest mathematical
-vocabulary needed to state a declaration after irrelevant local notation is
-expanded. The motivating theorem, current filename, first consumer, and proof
-technique do not determine ownership.
+moves. It has two tiers, and the first one is mechanical.
 
-## Signature test
+## Tier 1: an extension of a Mathlib API lives at that API's Mathlib path
 
-Read the complete public type of the declaration and choose the first row that
-can express it without importing a row below it.
+Mathlib organizes by definition site, not by abstraction level. A file that
+extends a Mathlib API goes at the path Mathlib uses for that API, under
+`DerivedAlgGeo/`, in that API's namespace. That is also where an upstream pull
+request would put it, so the move to Mathlib is a copy.
 
-| Minimal vocabulary in the public type | Canonical owner |
-| --- | --- |
-| Rings, ideals, ordinary modules, localization, additive subgroups | `Algebra/` |
-| Linear maps, bases, lattices, matrices, bilinear or quadratic forms, exterior powers | `LinearAlgebra/` |
-| Bicategories, 1- and 2-morphisms, adjunctions between 1-morphisms, mates, modifications | `CategoryTheory/Bicategory/` |
-| Ordinary categories, functors, adjoint functors, limits, abelian or triangulated structure | the nearest `CategoryTheory/` subject root |
-| Pseudofunctors, their coherence transport, and fiberwise object loci | `CategoryTheory/Pseudofunctor/` |
-| Grothendieck topologies, sites, sheaves, or descent | `CategoryTheory/Sites/` |
-| Topological spaces but no schemes | `Topology/` |
-| Schemes, varieties, geometric fibers, scheme morphism properties, `Dqc(X)`, `QCoh(X)`, or `Coh(X)` | `AlgebraicGeometry/` |
-| Registration of a geometric construction as a generic categorical interface | the interface's `Instances/AlgebraicGeometry/` leaf |
+| Concept the declaration extends | Mathlib path | Repository path |
+| --- | --- | --- |
+| `DerivedCategory C`, `Ext`, K-projectives, its t-structure, `Bounded` | `Algebra/Homology/DerivedCategory/` | `Algebra/Homology/DerivedCategory/` |
+| `HomotopyCategory`, `HomComplex`, bounded and plus variants | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
+| Spectral sequences and total complexes | `Algebra/Homology/SpectralSequence/` | `Algebra/Homology/SpectralSequence/` |
+| `SheafOfModules` and `PresheafOfModules` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` |
+| `ModuleCat`, `Grp` | `Algebra/Category/{ModuleCat,Grp}/` | `Algebra/Category/{ModuleCat,Grp}/` |
+| Sites, sheaves, sheaf cohomology, descent, stacks | `CategoryTheory/Sites/` | `CategoryTheory/Sites/`, with Čech theory under `SheafCohomology/Cech/` and stacks under `Descent/` |
+| Bicategories, pseudofunctors, `Pseudofunctor.ObjectProperty` | `CategoryTheory/Bicategory/` | `CategoryTheory/Bicategory/`, with Cat-valued pseudofunctor loci and transport under `Functor/Cat/` |
+| Abelian categories, Serre classes | `CategoryTheory/Abelian/` | `CategoryTheory/Abelian/` |
+| Pretriangulated and triangulated categories, t-structures | `CategoryTheory/Triangulated/` | `CategoryTheory/Triangulated/` |
+| Monoidal categories and their compatibility with other structure | `CategoryTheory/Monoidal/` | `CategoryTheory/Monoidal/` |
+| Simplicial objects and face-map complexes | `AlgebraicTopology/` | `AlgebraicTopology/` |
+| Sheaves on a topological space, stalks, the category of opens | `Topology/Sheaves/`, `Topology/Category/TopCat/` | `Topology/Sheaves/`, `Topology/Category/TopCat/` |
+| `PrimeSpectrum` and its topology | `RingTheory/Spectrum/Prime/` | `RingTheory/Spectrum/Prime/` |
+| Modules, localization, graded modules, polynomials | `Algebra/Module/`, `Algebra/MvPolynomial/` | the same |
+| Lattices, bilinear forms, exterior powers | `LinearAlgebra/` | `LinearAlgebra/` |
+| Schemes, `X.Modules`, `Proj`, morphism properties | `AlgebraicGeometry/` | `AlgebraicGeometry/`, with `ProjectiveSpectrum/` under Mathlib's name |
 
-A generic declaration does not become geometric because its only current use
-is geometric. Conversely, a theorem remains geometric when its signature
-intrinsically contains a scheme even if its proof is entirely algebraic or
-categorical. When `Algebra/` and `LinearAlgebra/` overlap, follow the nearest
-Mathlib hierarchy: module localization and ring operations are algebra;
-linear-map, basis, lattice, matrix, and multilinear constructions are linear
-algebra.
+If two rows seem to apply, the definition site of the *carrier* in the
+declaration's public type wins. `PrimeSpectrum.basicOpen_prod_eq_pi` is stated
+in the lattice of opens of a prime spectrum, but `basicOpen` is defined in
+`RingTheory/Spectrum/Prime/Topology.lean`, so it lives there and not in
+`Topology/` or `Algebra/`. Stalks of module presheaves are stated with
+`TopCat`, germs, and stalk functors, which Mathlib defines in
+`Topology/Sheaves/`, so they live there.
+
+## Tier 2: a subject Mathlib lacks is placed by the nearest precedent
+
+| Situation | Mathlib precedent | Repository placement |
+| --- | --- | --- |
+| A structure on an abstract triangulated category | `Triangulated/TStructure/`, `Subcategory`, `Orthogonal`, `LocalizingSubcategory`, `Generators` | `CategoryTheory/Triangulated/<Name>/` |
+| A weakened or strengthened variant of a named concept | `Topology/MetricSpace/Pseudo/`, `Monoidal/Braided/`, `Monoidal/Closed/` | a child directory named by the adjective, below the canonical concept |
+| Compatibility between two independent structures | `Monoidal/Preadditive.lean`, `Monoidal/Linear.lean` | `CategoryTheory/Monoidal/<Other>.lean` |
+| A structure on an abstract abelian category | `Abelian/SerreClass/`, `Abelian/GrothendieckCategory/` | `CategoryTheory/Abelian/<Name>/` |
+| A geometric realization of a categorical interface | `Algebra/Category/ModuleCat/Abelian.lean`, `AlgebraicGeometry/Modules/Sheaf.lean` | with the geometric object under `AlgebraicGeometry/`; the declaration may keep the interface's namespace for dot notation |
+| A bespoke carrier built on a Mathlib API | definition site | beside that API |
+| A neutral predicate on pseudofunctors used by both geometry and stability | `CategoryTheory/Bicategory/Functor/Cat/` | `CategoryTheory/Moduli/` until Mathlib has a home for it |
+| A theorem whose public type mentions a scheme, variety, `Coh X`, `Dqc X`, or a geometric morphism property | `AlgebraicGeometry/` | `AlgebraicGeometry/`, organized by geometric object |
+
+Within Tier 2, when the precedent does not decide, use the weakest vocabulary
+sufficient for the full public type as the tie-breaker: rings before linear
+algebra before categories before sites before topological spaces before
+schemes. That tie-breaker never overrides Tier 1.
+
+## What does not decide placement
+
+- The abstraction level of the statement. A derived category is a
+  triangulated category, and Mathlib still files it under `Algebra/Homology`.
+- The weakest vocabulary in the signature, when the carrier has a definition
+  site.
+- The motivating theorem, the current filename, the first consumer, or the
+  proof technique.
+- The namespace. Declarations inside `LinearMap`, `Module`, `SheafOfModules`,
+  or `ChargeProbe` still live at their carrier's path.
+- Which interface a geometric object happens to satisfy. `AlgebraicGeometry/`
+  is organized by object; inside an object directory the files are named by
+  the structure they add.
 
 ## Root and consumer test
 
@@ -39,18 +77,16 @@ Before adding or moving a public declaration:
 2. Name the canonical root module and the concrete consumer module.
 3. State the Lean relationship between them: direct reuse, `extends`, an
    instance, an `abbrev`, or a proved comparison.
-4. Verify that the root imports no consumer, paper-specific file, or instance
-   bridge.
+4. Verify that the root imports no consumer, paper-specific file, or
+   geometric realization.
 5. Import the root directly from the consumer. Do not add a compatibility shim
    merely to preserve the old motivational path.
-6. Update the nearest umbrella, axiom audit, declaration baseline, architecture
+6. Update the nearest umbrella, axiom audit, declaration baseline, layering
    gate, and this documentation in the same change.
 
 If a file contains both a generic block and its geometric use, split the block
 at the first declaration whose signature no longer needs the consumer's
-vocabulary. Namespace alone is not evidence of correct ownership: declarations
-inside `LinearMap`, `Module`, `Submodule`, `Matrix`, or similar namespaces must
-still live with their most general mathematical source.
+vocabulary.
 
 An adjunction in its most general implemented form is
 `CategoryTheory.Bicategory.Adjunction`. Mathlib identifies ordinary functor
@@ -59,14 +95,13 @@ ordinary adjunction is placed by the other vocabulary in its signature:
 preservation results belong with limits, `Ext` comparisons with derived `Ext`,
 and kernel packages with Fourier--Mukai theory.
 
-Comparison data of type
-`(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` uses only abelian and derived
-categories, so its canonical owner is
-`CategoryTheory/Triangulated/DerivedCategory/Opposite.lean`. Exact algebraic
-linear duality on `ModuleCat` and its derived lift are the categorical
-specialization in `LinearDual.lean`. A Serre-duality statement that mentions a
-scheme imports those roots and the canonical coherent-derived specialization;
-its geometric motivation does not move the generic functors into duality.
+Comparison data of type `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` extends
+Mathlib's derived category, so its owner is
+`Algebra/Homology/DerivedCategory/Opposite.lean`. Exact algebraic linear
+duality on `ModuleCat` and its derived lift are the specialization in the
+adjacent `LinearDual.lean`. A Serre-duality statement that mentions a scheme
+imports those roots and the canonical coherent-derived specialization; its
+geometric motivation does not move the generic functors into duality.
 
 The comparison `Dᵇ(Coh X) ≃ Dᵇ_coh(Dqc X)` intrinsically mentions a scheme,
 so its statement and conditional consumer API belong under
@@ -79,7 +114,7 @@ becoming the owner of either comparison.
 
 ## Perfect-complex notion ledger
 
-The word “perfect” currently appears in three non-interchangeable APIs. Their
+The word "perfect" currently appears in three non-interchangeable APIs. Their
 ambient categories and formal relationships are:
 
 | Notion | Ambient object | Meaning and owner | Valid comparison |
@@ -99,164 +134,6 @@ The canonical zero of `SchemeQuasicoherentDerivedCategory X` belongs to
 that this root object satisfies their additional predicates, but may not
 reconstruct or rename the ambient zero.
 
-Classify categorical dimension before applying the table. A declaration whose
-essential data are associators, unitors, pentagons, triangles, or other
-2-morphisms is not ordinary-category infrastructure merely because its `Cat`
-specialization is written with functors and natural isomorphisms. Its root is
-the corresponding bicategory or pseudofunctor module. Thus conjugating a
-Cat-valued pseudofunctor presentation through objectwise equivalences is rooted
-at `CategoryTheory/Pseudofunctor/Transport.lean`; affine derived and geometric
-models import that root as consumers.
-
-The module-localization kernel chain is rooted at
-`Algebra/Module/Localization/Kernels.lean`. Its linear-map, `ModuleCat`, and
-finite-limit-preserving natural-transformation forms are one algebraic chain:
-the first constructs the map on module kernels and the remaining declarations
-prove its localization behavior, without mentioning a site or scheme.
-`AlgebraicGeometry/CoherentSheaf/Abelian/Kernels.lean` is a direct consumer and
-owns only the scheme restriction, affine comparison, and coherence steps.
-
-Local injectivity and local surjectivity of additive-presheaf morphisms, and
-their packaging as membership in `J.W`, require only an arbitrary
-Grothendieck topology when detected on a `J.CoversTop` family. Their canonical
-owner is `CategoryTheory/Sites/Sheaves/CoversTop.lean`. Scheme affine charts,
-divisor trivializations, Proj covers, and sheafified tensor products are
-consumers and import this owner directly.
-
-The same signature test places cocontinuity of `Over.post F` at
-`CategoryTheory/Sites/Over.lean`, the definitional module-sheaf restriction API
-at `CategoryTheory/Sites/Sheaves/Modules/Over.lean`, and transport of a
-`CoversTop` family through a cover-preserving equivalence at
-`CategoryTheory/Sites/CoversTop.lean`. Restriction of `Presentation`,
-`GeneratingSections`, and `QuasicoherentData` along those over sites is rooted
-at `CategoryTheory/Sites/Sheaves/Modules/Presentation/Over.lean`. None of these
-signatures requires a scheme. Isomorphism invariance of finite presentation
-and its restriction and descent along a `CoversTop` family are rooted in the
-adjacent `Presentation/Isomorphism.lean` and `Presentation/Locality.lean`.
-The empty presentation of zero and the finite horseshoe construction for
-short-exact extensions are rooted in `Presentation/Zero.lean` and
-`Presentation/Extensions.lean`. The open-immersion, affine-module, and
-coherent-sheaf files are consumers: they import these owners and begin with
-schemes, distinguished opens, `coherent X`, `Coh X`, or the equivalence between
-an open range and the source scheme's open-set site.
-
-The converse packaging of a free epimorphism
-`SheafOfModules.free I ⟶ M` as `M.GeneratingSections` is more general still:
-its full signature uses only a ring sheaf on an arbitrary site. Its owner is
-`CategoryTheory/Sites/Sheaves/Modules/GeneratingSections.lean`, together with
-the finite-index instance and the lemma recovering the original epimorphism.
-`AlgebraicGeometry/CoherentSheaf/AffineChart.lean` consumes that root and owns
-only the theorem whose signature introduces an affine scheme open and
-coherence.
-
-The predicate that local generator data has rank one, the intrinsic
-`SheafOfModules.IsInvertible` class, transport and local trivialization of that
-data, and reconstruction from a covering family require only a sheaf of rings
-on an arbitrary site. Their owner is
-`CategoryTheory/Sites/Sheaves/Modules/Invertible.lean`. Preservation of local
-equivalences by tensoring with such a factor belongs in the adjacent
-`Modules/Tensor.lean`. On a topological space, the stalkwise theorem for an
-arbitrary tensor factor belongs in `Topology/Sheaves/ModuleTensor.lean`; its
-comparison `(M ⊗ P)ₓ ≃ Mₓ ⊗[Rₓ] Pₓ` and the germ/stalk infrastructure used to
-prove it belong in `Topology/Sheaves/ModuleTensor/StalkTensor.lean`.
-`Scheme.Modules.tensorObj`, Picard classes, and tensor closure remain geometric
-because their signatures introduce the scheme-indexed module category.
-
-The name `ModuleCat` does not make the stalk comparison ordinary algebra.
-Every public signature in that comparison requires `TopCat`, `Opens`, germs,
-or a stalk functor, so the topological-space row of the signature table is the
-first row that can express it. The former
-`Algebra/Category/ModuleCat/StalkTensor.lean` path is retired without a shim;
-the topological consumer imports the topological owner directly.
-
-Likewise, detecting an isomorphism of sheaves from isomorphisms on a basis of
-opens is topological sheaf theory. Its canonical owner is
-`Topology/Sheaves/Basis.lean`: the signature uses `TopCat`, `Opens.IsBasis`,
-germs, and stalk functors but no scheme. An affine comparison may apply that
-criterion to the basis of distinguished opens only after importing the
-topological owner directly.
-
-The finite-product identity for prime-spectrum basic opens is classified by
-its complete output, not just its ring input. The equality lives in
-`Opens (PrimeSpectrum R)` and uses a categorical finite product supplied by
-`Topology/Opens/Limits.lean`, so its canonical owner is
-`Topology/PrimeSpectrum/BasicOpen.lean`. Placing it in `Algebra/` would create
-the forbidden lower-to-higher dependency `Algebra -> Topology` or duplicate
-the opens-limit instance. Affine Čech cohomology is a direct geometric
-consumer.
-
-Indexed families of additive commutative groups, their direct sums, saturated
-quotients by supplied relation sets, family-relation systems, additive-map
-ranges, and finite-relative-index predicates are rooted at
-`Algebra/RelativeNumerical/`. Names such as “fibre,” “specialization,” or
-“geometric eta” do not change that signature classification. An
-algebraic-geometry consumer must introduce an actual scheme, geometric family,
-connectivity condition, or relative-perfect object and import this algebraic
-root; it must not restore the retired numerical-Grothendieck-group paths as
-compatibility shims.
-
-Integer-valued functions on lattices `ι → ℤ`, mixed forward differences,
-finite-difference degree, Newton coefficients, and the resulting multilinear
-top coefficients require only ordinary additive algebra. Their canonical root
-is `Algebra/NumericalPolynomial/Basic.lean`, in namespace
-`NumericalPolynomial`. Snapper polynomiality is the geometric consumer: it
-imports that root and adds Picard powers, coherent twists, Euler
-characteristics, and a geometric induction certificate. Neither the first
-application in intersection theory nor the name “numerical polynomial” moves
-the generic finite-difference API into algebraic geometry.
-
-Additive realizations of the triangulated Grothendieck group, commuting
-descent squares for exact functors, and bilinear Euler forms whose signatures
-use only `K₀`, additive commutative groups, and categorical linearity are rooted
-at `CategoryTheory/Triangulated/GrothendieckGroup/`. Use the canonical
-`K₀.Realization` and `K₀.EulerForm` aliases instead of geometry-owned one-field
-wrappers. `NumericalVarietyData`, `chi₂`, Hirzebruch--Riemann--Roch hypotheses,
-Mukai pairings, and their preservation theorems remain geometric consumers
-because their signatures introduce the numerical geometry.
-
-The finite-free abelian-group interface `ZLattice` and its construction from a
-finite torsion-free `ℤ`-module are rooted at
-`LinearAlgebra/Lattice/Basic.lean`. A theorem asserting that a quotient of a
-geometrically defined Euler pairing is a `ZLattice` remains with that numerical
-consumer: the class is generic, while the radical, quotient, and hypotheses
-connecting them to `NumericalVarietyData` are not.
-
-Weight-indexed spans of basis vectors and the resulting independence,
-spanning, internal-direct-sum, and multiplicativity lemmas are rooted at
-`LinearAlgebra/GradedBasis.lean`. The numerical consumer imports that module
-and adds the geometric `NumericalRingData.ofGradedBasis` constructor; it does
-not own another copy of the decomposition.
-
-Rank--nullity decompositions and alternating-finrank identities whose complete
-signatures mention only finite-dimensional modules, linear maps, exactness, and
-finite sums are rooted at `LinearAlgebra/AlternatingFinsum.lean`. This includes
-both the boundary-free `ℤ`-indexed statement and its bounded `ℕ`-indexed
-companion. `AlgebraicGeometry/Cohomology/EulerCharacteristic/Additivity.lean`
-is the consumer: its geometric layer begins when a `FiniteCohomology` package
-constructs the long exact sequence for objects of `Coh X`.
-
-Theorems stated only using `Finsupp`, `MvPolynomial`, homogeneity, and
-`divMonomial` are rooted at `Algebra/MvPolynomial/DivMonomial.lean` in the
-established `Finsupp` and `MvPolynomial` namespaces. The standard polynomial
-grading and generation by variables over degree zero belong in
-`Algebra/MvPolynomial/Grading.lean`. Representative-independent maps on
-polynomial degree-zero localizations—including Laurent sign and block
-projections, their one-localization homotopies, and full-block finiteness—also
-belong under `Algebra/MvPolynomial/`. Polynomial-variable Čech denominators,
-graded-localization terms, the canonical `p / 1` variable-localization element,
-face maps, block homotopies, primitives, and finite-block assembly belong under
-`Algebra/MvPolynomial/Cech/`. Comparison of that diagram with projective basic
-opens, sheaf sections, or cohomology is the geometric consumer.
-
-Internally graded modules are algebra, not projective geometry. Extend
-Mathlib's `GradedModule` namespace under `Algebra/Module/GradedModule/` for
-degree-zero homogeneous localizations, natural or integer graded shifts,
-localization trivializations, and equality transport between denominator
-power submonoids. Pure exponent-vector arithmetic uses `Algebra/Finsupp/`, and
-polynomial specializations use `Algebra/MvPolynomial/`. A projective sheaf,
-basic-open comparison, or cohomology module imports these roots and adds only
-the scheme, section, or cohomological consumer.
-
 ## Moduli and subprestacks
 
 `CategoryTheory.Moduli.BoundednessProblem` is the neutral boundedness root. A
@@ -272,10 +149,10 @@ Cat-valued pseudofunctor:
 - `fullsubcategory` and `ι` construct the sub-pseudofunctor and its inclusion.
 
 Repository extensions to that mechanism live under
-`CategoryTheory/Pseudofunctor/ObjectProperty/`. Do not introduce a parallel
-`Subprestack` carrier in algebraic geometry. An indexed collection of
-isomorphism-closed fiber predicates is not yet a subprestack until restriction
-stability is supplied.
+`CategoryTheory/Bicategory/Functor/Cat/ObjectProperty/`, where Mathlib defines
+it. Do not introduce a parallel `Subprestack` carrier in algebraic geometry. An
+indexed collection of isomorphism-closed fiber predicates is not yet a
+subprestack until restriction stability is supplied.
 
 Concrete finite-type witnesses, atlases, scheme presentations, relative-perfect
 objects, semistable loci, and Harder--Narasimhan filtrations remain under
@@ -295,7 +172,8 @@ for a genuine subprestack.
 
 Every structural pull request must include:
 
-- the signature-test row for each moved or new public root;
+- for each moved or new public root, the Tier 1 row or the Tier 2 precedent
+  that places it;
 - the root-to-consumer import direction;
 - the specialization map or a statement that the consumer directly reuses the
   root;

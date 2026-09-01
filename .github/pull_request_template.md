@@ -4,7 +4,7 @@
 
 ## Architecture
 
-- [ ] Signature-test row named for every new or moved public root.
+- [ ] Placement tier named for every new or moved public root: the Mathlib path it extends, or the Mathlib precedent it follows.
 - [ ] Canonical root named (declaration and module).
 - [ ] Root-to-consumer import direction stated; the old consumer path is not retained as a shim.
 - [ ] Specialization uses an instance, projection, `extends`, `abbrev`, or a proved comparison; it does not copy the root.

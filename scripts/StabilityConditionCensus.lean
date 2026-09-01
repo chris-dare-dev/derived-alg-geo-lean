@@ -25,8 +25,8 @@ DEMANGLED user name, not on the raw one.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Instances
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.Autoequivalence.Instances
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability
+import DerivedAlgGeo.AlgebraicGeometry.Moduli
 import DerivedAlgGeo.LinearAlgebra.Lattice
 
 open Lean

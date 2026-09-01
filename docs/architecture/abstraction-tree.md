@@ -1,8 +1,8 @@
 # Canonical roots and specialization trees
 
 This document is the repository contract for reusable abstractions.  The
-subject dependency DAG in `layers.md` decides which top-level subject may
-import which other subject.  This document decides the finer question: when
+dependency contract in `layers.md` decides which imports are forbidden
+between subjects.  This document decides the finer question: when
 two constructions share mathematical structure, where does that structure
 live and how do the specializations relate to it?
 
@@ -160,7 +160,8 @@ AlgebraicGeometry
 │  ├─ affine stable subprestack            consumes pseudofunctor object property
 │  ├─ stack presentation
 │  └─ perfect-complex specialization
-└─ stability in families                       stability-dependent adapter only
+└─ stability on scheme-derived categories      `DerivedCategory/Stability/`, the one
+                                               stability-consuming child
 ```
 
 The arrows implied by this tree point downwards from consumers to roots.  In
@@ -192,10 +193,11 @@ particular:
   from finite torsion-free groups in `LinearAlgebra/Lattice/Basic.lean`;
   `NumericalVarietyData.numericalZLattice` remains the geometric theorem that
   supplies those hypotheses for an Euler-radical quotient;
-- keep ordinary module theory under `Algebra`, generic sheaves and module
-  sheaves on ringed sites under `CategoryTheory/Sites/Sheaves`, and only the
-  scheme-indexed `SheafOfModules(X) -> QCoh(X) -> Coh(X)` refinements under
-  algebraic geometry; in particular, coherent-sheaf kernels directly reuse
+- keep ordinary module theory under `Algebra`, generic sheaves under
+  `CategoryTheory/Sites/Sheaves`, module sheaves on ringed sites under
+  `Algebra/Category/ModuleCat/Sheaf` where Mathlib defines `SheafOfModules`,
+  and only the scheme-indexed `SheafOfModules(X) -> QCoh(X) -> Coh(X)`
+  refinements under algebraic geometry; in particular, coherent-sheaf kernels directly reuse
   the module-localization kernel maps rather than owning them;
 - keep detection of additive-presheaf local equivalences on a `CoversTop`
   family under the generic site/sheaf root; scheme charts and sheafified
@@ -219,8 +221,9 @@ particular:
   `Topology/Sheaves/Basis.lean`; affine comparison consumes it only after
   introducing `Spec R`, distinguished opens, and module localization;
 - keep identities involving the lattice and categorical products of
-  prime-spectrum opens under `Topology/PrimeSpectrum/`; the commutative-ring
-  input does not make their topological output ordinary `Algebra`;
+  prime-spectrum opens under `RingTheory/Spectrum/Prime/`, where Mathlib
+  defines `basicOpen`; neither the ring input nor the topological output
+  moves them;
 - extend Mathlib's abelian-category hierarchy under `CategoryTheory/Abelian`
   and make the geometric proof that `Coh(X)` is abelian an input to the generic
   derived-category construction;
@@ -272,7 +275,7 @@ and classical versus derived moduli truncations.
 
 The policy is partly mechanical and partly a review obligation:
 
-- `scripts/check_layering.py` enforces the top-level dependency DAG;
+- `scripts/check_layering.py` enforces the policy edges in `layers.md`;
 - `scripts/check_umbrella_coverage.py` keeps every specialization in the public
   tree;
 - `scripts/check_single_instantiation.py` rejects new thin abstractions in the

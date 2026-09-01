@@ -8,10 +8,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.Stabilit
 /-!
 # Algebraic-geometric Fourier--Mukai actions on stability conditions
 
-This opt-in bridge applies the categorical stability action to geometric
-Fourier--Mukai autoequivalences. Neutral kernels, duals, swaps, and convolution
-remain in `AlgebraicGeometry.DerivedCategory.FourierMukai`; the generic action
-remains in the parent categorical source.
+This file applies the categorical stability action to geometric Fourier--Mukai
+autoequivalences. Neutral kernels, duals, swaps, and convolution live in
+`DerivedCategory/FourierMukai/`; the generic action lives under
+`CategoryTheory/Triangulated/`. This file is the one Fourier--Mukai module that
+imports the stability tree, which is why it sits under `DerivedCategory/Stability/`
+rather than beside the neutral kernels.
 -/
 
 universe u

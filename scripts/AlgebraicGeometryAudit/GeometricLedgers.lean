@@ -5,8 +5,7 @@ stability-specific kernel actions use their matching algebraic-geometry
 namespace.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai
-import DerivedAlgGeo.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Symmetry.Autoequivalence.Instances
-import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated.Instances.AlgebraicGeometry
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda

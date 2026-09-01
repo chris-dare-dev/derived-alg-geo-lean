@@ -7,9 +7,10 @@ import DerivedAlgGeo.AlgebraicGeometry.Moduli.HarderNarasimhan.RelativeFiltratio
 /-!
 # Relative Harder--Narasimhan realizations of categorical family interfaces
 
-The geometric filtration is owned by
-`AlgebraicGeometry.Moduli.HarderNarasimhan`. This opt-in leaf packages it as
-the generic `DedekindHNProblem` and its integration predicate.
+The geometric filtration lives in `RelativeFiltration.lean`. This file
+packages it as the generic `DedekindHNProblem` and its integration predicate.
+It lives with the geometric object it is about, not below the categorical
+interface it implements.
 -/
 
 namespace AlgebraicGeometry.Moduli.HarderNarasimhan
