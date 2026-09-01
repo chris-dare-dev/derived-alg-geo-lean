@@ -391,6 +391,21 @@ geometric witness for every scheme morphism.
 #print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.structureSheaf
 #print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.instNonemptySchemeCoherentDerivedCategorySchemeFiniteLocallyFreeGenerator
 #print axioms AlgebraicGeometry.DerivedCategory.SchemePerfectDerivedCategory.instNonemptySchemeCoherentDerivedCategorySchemePerfect
+
+-- Line bundles as coherent derived objects: the `LineBundleData` adapter into
+-- `D(Coh X)`. A line bundle is perfect and bounded outright; the unit lemmas
+-- identify the `LineBundleData` route to `O_X` with the perfect structure
+-- sheaf definitionally.
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.coh
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.coh_obj
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.unit_coh
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.cohIso
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.derivedObject
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.derivedObject_mem_generator
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.derivedObject_perfect
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.derivedObject_bounded
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.derivedObjectIso
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.unit_derivedObject
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentDerivedFiber
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.PerfectDerivedFiber
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.ResidueBoundedCoherentDerivedFiber
