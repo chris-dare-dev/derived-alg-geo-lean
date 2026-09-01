@@ -40,3 +40,18 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverse_hom_eq_zero
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverseFin
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverseFin_component
+
+-- Exceptional objects: no self-maps into a nonzero shift, endomorphism ring
+-- the base field via algebraMap bijectivity. Every clause has consuming
+-- theorems; the honest inhabitant is the D^b(field) example (exc-e5 / #936).
+#print axioms CategoryTheory.Triangulated.IsExceptional
+#print axioms CategoryTheory.Triangulated.IsExceptional.hom_shift_eq_zero
+#print axioms CategoryTheory.Triangulated.IsExceptional.algebraMap_bijective
+#print axioms CategoryTheory.algebraMap_end_apply
+#print axioms CategoryTheory.Triangulated.IsExceptional.end_eq_smul_id
+#print axioms CategoryTheory.Triangulated.IsExceptional.not_isZero
+#print axioms CategoryTheory.Triangulated.IsExceptional.end_eq_zero_or_eq_one_of_mul_self
+#print axioms CategoryTheory.Triangulated.IsExceptional.not_nonempty_iso_shift
+#print axioms CategoryTheory.Triangulated.IsExceptional.hom_shift_shift_eq_zero
+#print axioms CategoryTheory.Triangulated.IsExceptional.shift
+#print axioms CategoryTheory.Triangulated.IsExceptional.of_equivalence
