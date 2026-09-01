@@ -1010,11 +1010,10 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms K3.chi₂_eq_neg_mukaiPairing
 #print axioms K3.chi₂_self
 
--- Layer A: the numerical Grothendieck quotient and lattice. The pairing is descended only
--- under explicit symmetry, and the finite/free conclusion must retain its finiteness and
--- torsion-freeness hypotheses.
-#print axioms ZLattice
-#print axioms ZLattice.ofFiniteTorsionFree
+-- Layer A: the numerical Grothendieck quotient and its geometric lattice consumer. The
+-- generic finite-free lattice interface is audited with LinearAlgebra in the stability audit.
+-- The pairing is descended only under explicit symmetry, and the numerical quotient's
+-- finite/free conclusion must retain its finiteness and torsion-freeness hypotheses.
 #print axioms NumericalVarietyData.eulerPairingRow
 #print axioms NumericalVarietyData.eulerPairing
 #print axioms NumericalVarietyData.eulerPairingFlip

@@ -124,6 +124,10 @@ Algebra/MvPolynomial
                     └─→ Finite               finite full-block cochains
 
 LinearAlgebra
+  ├─→ Lattice
+  │     ├─→ Basic                            finite free integral lattices
+  │     ├─→ Arithmetic, IsotropicSequence    generic lattice calculations
+  │     └─→ Numerical, Mukai                  reusable lattice models
   └─→ GradedBasis                            weighted spans and internal sums
 
 CategoryTheory/Bicategory

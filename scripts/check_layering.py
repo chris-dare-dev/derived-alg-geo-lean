@@ -1919,6 +1919,89 @@ def main() -> int:
                     f"{retired_name}"
                 )
 
+    zlattice_owner = SOURCE_ROOT / "LinearAlgebra" / "Lattice" / "Basic.lean"
+    zlattice_umbrella = SOURCE_ROOT / "LinearAlgebra" / "Lattice.lean"
+    numerical_lattice_consumer = (
+        SOURCE_ROOT / "AlgebraicGeometry" / "Numerical" /
+            "GrothendieckGroup" / "Lattice.lean"
+    )
+    zlattice_owner_import = "Mathlib.LinearAlgebra.FreeModule.PID"
+    zlattice_consumer_import = "DerivedAlgGeo.LinearAlgebra.Lattice.Basic"
+    if not zlattice_owner.is_file():
+        failures.append(
+            f"canonical finite-free lattice owner missing: "
+            f"{zlattice_owner.relative_to(ROOT)}"
+        )
+    else:
+        zlattice_text = zlattice_owner.read_text(encoding="utf-8")
+        if zlattice_owner_import not in imports_by_path[zlattice_owner]:
+            failures.append(
+                f"{zlattice_owner.relative_to(ROOT)}: finite-free lattice root "
+                f"must import {zlattice_owner_import} directly"
+            )
+        for fragment in (
+            "class ZLattice",
+            "toModuleFinite : Module.Finite ℤ Λ",
+            "toModuleFree : Module.Free ℤ Λ",
+            "attribute [instance] ZLattice.toModuleFinite ZLattice.toModuleFree",
+            "namespace ZLattice",
+            "theorem ofFiniteTorsionFree",
+        ):
+            if fragment not in zlattice_text:
+                failures.append(
+                    f"{zlattice_owner.relative_to(ROOT)}: missing finite-free "
+                    f"lattice declaration fragment {fragment!r}"
+                )
+        if re.search(
+            r"(?:^import DerivedAlgGeo\.AlgebraicGeometry|"
+            r"^namespace AlgebraicGeometry)",
+            zlattice_text,
+            re.MULTILINE,
+        ):
+            failures.append(
+                f"{zlattice_owner.relative_to(ROOT)}: generic finite-free "
+                "lattice owner depends on or declares algebraic geometry"
+            )
+
+    if zlattice_consumer_import not in imports_by_path[zlattice_umbrella]:
+        failures.append(
+            f"{zlattice_umbrella.relative_to(ROOT)}: missing finite-free "
+            f"lattice umbrella import {zlattice_consumer_import}"
+        )
+
+    numerical_lattice_text = numerical_lattice_consumer.read_text(encoding="utf-8")
+    if zlattice_consumer_import not in imports_by_path[numerical_lattice_consumer]:
+        failures.append(
+            f"{numerical_lattice_consumer.relative_to(ROOT)}: numerical "
+            "lattice theorem must import the generic ZLattice owner directly"
+        )
+    for fragment in (
+        "theorem numericalZLattice",
+        "ZLattice (NumericalQuotient V)",
+        "ZLattice.ofFiniteTorsionFree",
+    ):
+        if fragment not in numerical_lattice_text:
+            failures.append(
+                f"{numerical_lattice_consumer.relative_to(ROOT)}: missing "
+                f"geometric lattice consumer fragment {fragment!r}"
+            )
+    for fragment in (
+        "class ZLattice",
+        "namespace ZLattice",
+        "theorem ofFiniteTorsionFree",
+    ):
+        if fragment in numerical_lattice_text:
+            failures.append(
+                f"{numerical_lattice_consumer.relative_to(ROOT)}: restored "
+                f"generic finite-free lattice declaration {fragment!r}"
+            )
+    for path in sorted(SOURCE_ROOT.rglob("*.lean")):
+        if "AlgebraicGeometry.Numerical.ZLattice" in path.read_text(encoding="utf-8"):
+            failures.append(
+                f"{path.relative_to(ROOT)}: restored retired geometric "
+                "ZLattice namespace"
+            )
+
     graded_basis_owner = SOURCE_ROOT / "LinearAlgebra" / "GradedBasis.lean"
     numerical_graded_basis_consumer = (
         SOURCE_ROOT / "AlgebraicGeometry" / "Numerical" / "Core" /
@@ -3233,6 +3316,10 @@ def main() -> int:
         "ok: K₀ realizations, descent squares, and categorical Euler forms use "
         "the triangulated Grothendieck-group owner; numerical HRR and Mukai "
         "transfer remain consumers"
+    )
+    print(
+        "ok: finite free integral lattices use the LinearAlgebra owner; the "
+        "numerical Euler-radical quotient remains a geometric consumer"
     )
     print(
         "ok: weighted-basis decompositions use LinearAlgebra and pure "

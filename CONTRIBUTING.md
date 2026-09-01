@@ -56,6 +56,12 @@ degree zero belongs in `Algebra/MvPolynomial/Grading.lean`, and the canonical
 `p / 1` term of a variable localization belongs in
 `Algebra/MvPolynomial/Cech/Basic.lean`.
 
+The global `ZLattice` class and its construction from finite torsion-free
+abelian groups belong in `LinearAlgebra/Lattice/Basic.lean`. A numerical
+Euler-radical quotient imports that interface and proves its own lattice
+theorem; do not recreate the former `AlgebraicGeometry.Numerical.ZLattice`
+namespace or an import-only compatibility alias.
+
 Indexed additive-group direct sums, saturated quotients by family relations,
 additive-map ranges, and finite-index-overlattice predicates belong in
 `Algebra/RelativeNumerical/`. A geometric relative-numerical construction must
