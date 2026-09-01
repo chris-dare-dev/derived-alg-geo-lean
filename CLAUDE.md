@@ -340,6 +340,12 @@ documentation, architecture checks, and CI paths together.
   `Algebra/RelativeNumerical/`. A scheme consumer imports that root and adds
   genuine geometric data; never restore the former
   `AlgebraicGeometry/Numerical/GrothendieckGroup/Relative*` paths.
+- Integer-lattice numerical functions, mixed forward differences, finite-
+  difference degree, Newton coefficients, and top multilinear coefficients
+  use `Algebra/NumericalPolynomial/`. Snapper polynomiality stays in
+  `AlgebraicGeometry/IntersectionTheory/Snapper.lean` because its signature
+  introduces Picard classes, coherent sheaves, and Euler characteristics.
+  Never restore the former geometric `NumericalPolynomial` path or namespace.
 - Additive triangulated `K₀` targets, exact-functor descent squares, and
   categorical Euler pairings use
   `CategoryTheory/Triangulated/GrothendieckGroup/`. Reuse the canonical

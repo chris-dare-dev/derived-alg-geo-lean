@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Additivity
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Effective
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.PicardGroup
-import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.Basic
+import DerivedAlgGeo.Algebra.NumericalPolynomial.Basic
 
 /-!
 # Snapper polynomiality for line-bundle twists
@@ -35,7 +35,7 @@ namespace AlgebraicGeometry.IntersectionTheory.Snapper
 open AlgebraicGeometry
 open AlgebraicGeometry.Cohomology
 open AlgebraicGeometry.Scheme.Modules
-open AlgebraicGeometry.IntersectionTheory.NumericalPolynomial
+open NumericalPolynomial
 
 variable {k : Type u} [Field k]
 variable {X : Variety k}

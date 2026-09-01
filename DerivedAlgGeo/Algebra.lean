@@ -8,6 +8,7 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.StalkTensor
 import DerivedAlgGeo.Algebra.Finsupp
 import DerivedAlgGeo.Algebra.Module
 import DerivedAlgGeo.Algebra.MvPolynomial
+import DerivedAlgGeo.Algebra.NumericalPolynomial
 import DerivedAlgGeo.Algebra.RelativeNumerical
 import DerivedAlgGeo.Algebra.SaturatedQuotient
 

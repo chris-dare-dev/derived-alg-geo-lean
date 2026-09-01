@@ -8,10 +8,10 @@ import Mathlib.LinearAlgebra.Multilinear.Basic
 /-!
 # Numerical polynomials and mixed finite differences
 
-This file supplies the algebraic finite-difference API used by Snapper's theorem.  It is
-deliberately independent of schemes, sheaves, and line bundles: a collection of tensor powers is
-represented by a point of the integer lattice `ι → ℤ`, and an Euler-characteristic-like invariant
-is simply a function `(ι → ℤ) → ℤ`.
+This file supplies an algebraic finite-difference API for integer-valued functions on integer
+lattices. A point of the lattice is a function `ι → ℤ`, and a numerical function is simply a
+function `(ι → ℤ) → ℤ`. No scheme, sheaf, or line-bundle vocabulary enters this root; geometric
+polynomiality theorems such as Snapper's theorem consume it from algebraic geometry.
 
 ## Upstream audit
 
@@ -38,7 +38,7 @@ multivariable layer missing from Mathlib and specialize back to Mathlib's `fwdDi
 * `surfacePairing` bundles the degree-two specialization as a symmetric bilinear form.
 -/
 
-namespace AlgebraicGeometry.IntersectionTheory.NumericalPolynomial
+namespace NumericalPolynomial
 
 open Function
 open scoped fwdDiff
@@ -452,4 +452,4 @@ theorem surfacePairing_symm {ι : Type*} (f : NumericalFunction ι)
   simp only [surfacePairing_apply]
   exact coefficient_eq_of_perm (List.Perm.swap v w []).symm f
 
-end AlgebraicGeometry.IntersectionTheory.NumericalPolynomial
+end NumericalPolynomial

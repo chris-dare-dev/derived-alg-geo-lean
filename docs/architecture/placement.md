@@ -126,6 +126,16 @@ connectivity condition, or relative-perfect object and import this algebraic
 root; it must not restore the retired numerical-Grothendieck-group paths as
 compatibility shims.
 
+Integer-valued functions on lattices `ι → ℤ`, mixed forward differences,
+finite-difference degree, Newton coefficients, and the resulting multilinear
+top coefficients require only ordinary additive algebra. Their canonical root
+is `Algebra/NumericalPolynomial/Basic.lean`, in namespace
+`NumericalPolynomial`. Snapper polynomiality is the geometric consumer: it
+imports that root and adds Picard powers, coherent twists, Euler
+characteristics, and a geometric induction certificate. Neither the first
+application in intersection theory nor the name “numerical polynomial” moves
+the generic finite-difference API into algebraic geometry.
+
 Additive realizations of the triangulated Grothendieck group, commuting
 descent squares for exact functors, and bilinear Euler forms whose signatures
 use only `K₀`, additive commutative groups, and categorical linearity are rooted

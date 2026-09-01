@@ -60,6 +60,9 @@ In particular:
 - ordinary module and ring theory lives under `DerivedAlgGeo.Algebra`, while
   generic sheaves and sheaves of modules on arbitrary ringed sites live below
   `DerivedAlgGeo.CategoryTheory.Sites.Sheaves`;
+- numerical functions on integer lattices and their mixed finite-difference
+  calculus live under `DerivedAlgGeo.Algebra.NumericalPolynomial`; Snapper's
+  theorem is the geometric consumer once Picard and coherent-sheaf data enter;
 - repository-owned theorems about arbitrary abelian categories live below
   `DerivedAlgGeo.CategoryTheory.Abelian` and extend Mathlib's existing
   `CategoryTheory.Abelian` typeclass;
@@ -110,6 +113,11 @@ Algebra/Module/Localization
 Algebra/RelativeNumerical
   ├─→ Basic                                  indexed sums and saturated family quotients
   └─→ Overlattice                            images, factorizations, finite relative index
+
+Algebra/NumericalPolynomial
+  └─→ Basic                                  mixed differences and top coefficients
+        └─→ AlgebraicGeometry/IntersectionTheory/Snapper
+                                              Picard/coherent geometric consumer
 
 Algebra/MvPolynomial
   ├─→ Grading                                standard grading and variable generation
@@ -430,6 +438,8 @@ the explicit instance umbrellas attached to their categorical sources:
 | Generic spectral sequences | `DerivedAlgGeo.CategoryTheory.SpectralSequence` |
 | Generic site-theoretic Čech machinery | `DerivedAlgGeo.CategoryTheory.Sites.Cech` |
 | Polynomial-variable Čech algebra | `DerivedAlgGeo.Algebra.MvPolynomial.Cech` |
+| Mixed finite differences and numerical functions | `DerivedAlgGeo.Algebra.NumericalPolynomial` |
+| Snapper polynomiality for coherent twists | `DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.Snapper` |
 | Projective basic-open and section comparison | `DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace` |
 | Generic abelian-category extensions | `DerivedAlgGeo.CategoryTheory.Abelian` |
 | Generic sheaves and ringed-site module sheaves | `DerivedAlgGeo.CategoryTheory.Sites.Sheaves` |
