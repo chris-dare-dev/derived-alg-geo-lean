@@ -2123,6 +2123,36 @@ docstring in `DerivedAlgGeo/AlgebraicGeometry/Surface/K3.lean`. -/
 #print axioms AlgebraicGeometry.K3Surface.canonicalSheaf_iso
 #print axioms AlgebraicGeometry.K3Surface.h1_vanishing
 
+/-! ## Enriques surfaces
+
+A smooth projective surface with `ω_X` 2-torsion but not trivial in `Pic`, and
+`H¹(X, O_X) = 0`. The torsion conditions are group equations in `Pic`; nothing
+here constructs such a surface, states `χ(O_X) = 1`, or builds the K3 double
+cover. See the module docstring in
+`DerivedAlgGeo/AlgebraicGeometry/Surface/Enriques.lean`. -/
+
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.projective
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalClass_sq_eq_one
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalClass_ne_one
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.h1_vanishing
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalSheaf_tensor_self_iso_unit
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalSheaf_not_iso_unit
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.antiCanonicalClass_eq_canonicalClass
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.not_isK3Surface
+#print axioms AlgebraicGeometry.EnriquesSurface
+#print axioms AlgebraicGeometry.EnriquesSurface.toSmoothProperVariety
+#print axioms AlgebraicGeometry.EnriquesSurface.canonical
+#print axioms AlgebraicGeometry.EnriquesSurface.isEnriques
+#print axioms AlgebraicGeometry.EnriquesSurface.mk.inj
+#print axioms AlgebraicGeometry.EnriquesSurface.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.EnriquesSurface.toVariety
+#print axioms AlgebraicGeometry.EnriquesSurface.toScheme
+#print axioms AlgebraicGeometry.EnriquesSurface.instIsProjective
+#print axioms AlgebraicGeometry.EnriquesSurface.canonicalSheaf_tensor_self_iso_unit
+#print axioms AlgebraicGeometry.EnriquesSurface.canonicalSheaf_not_iso_unit
+#print axioms AlgebraicGeometry.EnriquesSurface.h1_vanishing
+
 /-! ## The base field acts: module sheaves and `Coh` are `k`-linear
 
 Multiplication by a global function, composed with `k → Γ(X, O_X)`, makes the
