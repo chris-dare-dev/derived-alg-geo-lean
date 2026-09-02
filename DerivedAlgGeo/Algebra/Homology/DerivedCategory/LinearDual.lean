@@ -21,20 +21,11 @@ universe u
 
 open CategoryTheory
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace ModuleCat
 
 variable (k : Type u) [Field k]
-
-/-- The canonical derived-category localization for modules over a field. -/
-noncomputable instance moduleHasDerivedCategory :
-    HasDerivedCategory (ModuleCat.{u + 1} k) :=
-  HasDerivedCategory.standard _
-
-/-- The canonical derived-category localization for the opposite category of
-modules over a field. -/
-noncomputable instance oppositeModuleHasDerivedCategory :
-    HasDerivedCategory ((ModuleCat.{u + 1} k)ᵒᵖ) :=
-  HasDerivedCategory.standard _
 
 /-- The derived functor induced by exact algebraic linear duality. Its source
 is the derived category of the opposite abelian category. -/

@@ -25,6 +25,8 @@ negative Ext vanishing.  Once those results are proved, Mathlib's
 pseudofunctor and all of its coherence automatically.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Dqc

@@ -21,6 +21,8 @@ pseudofunctor along this functor.  The result is the correctly indexed affine
 substrate for the relative-perfect and universally-gluable restriction.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 

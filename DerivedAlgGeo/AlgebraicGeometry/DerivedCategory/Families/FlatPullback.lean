@@ -29,6 +29,8 @@ morphism has exact module-sheaf pullback, with the result available directly
 to the derived pullback API.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits Opposite TopologicalSpace

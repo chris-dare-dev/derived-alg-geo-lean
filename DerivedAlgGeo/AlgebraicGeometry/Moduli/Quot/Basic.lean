@@ -18,6 +18,8 @@ No scheme named `QuotScheme` is introduced here.  Representability, when it
 is available, is a separate Yoneda universal property.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits

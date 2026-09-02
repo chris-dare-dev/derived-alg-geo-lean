@@ -19,6 +19,8 @@ these isomorphisms with the triangulated shift, characterize exact pullback by a
 geometric flatness criterion, or construct nonexact left-derived pullback.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory AlgebraicGeometry

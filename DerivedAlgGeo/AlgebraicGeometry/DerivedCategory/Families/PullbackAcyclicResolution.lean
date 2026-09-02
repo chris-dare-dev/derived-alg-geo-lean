@@ -24,6 +24,8 @@ this interface. Keeping the condition in terms of the exact functor that must
 invert quasi-isomorphisms also permits narrower supported constructions.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry Limits

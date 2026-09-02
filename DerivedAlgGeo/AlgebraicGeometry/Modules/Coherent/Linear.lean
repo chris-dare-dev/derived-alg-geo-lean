@@ -62,6 +62,8 @@ universe u
 
 open CategoryTheory AlgebraicGeometry.Cohomology
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 namespace Scheme

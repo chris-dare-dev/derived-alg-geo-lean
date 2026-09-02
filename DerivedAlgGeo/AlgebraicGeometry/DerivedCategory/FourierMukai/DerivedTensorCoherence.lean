@@ -33,6 +33,8 @@ associativity, and unit APIs require this coherent root.
 
 universe u
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families

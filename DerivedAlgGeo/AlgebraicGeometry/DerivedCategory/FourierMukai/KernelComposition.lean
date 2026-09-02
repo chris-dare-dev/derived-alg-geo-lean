@@ -50,6 +50,8 @@ could be joined, which needed the geometric autoequivalence to exist at all
 
 universe u
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.FourierMukai

@@ -18,6 +18,8 @@ pullback's shift isomorphism bridges that distinction before localization
 extensionality completes the proof.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory AlgebraicGeometry

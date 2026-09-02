@@ -15,6 +15,8 @@ exact.  Consequently its ordinary module pullback descends to the concrete
 derived fibers without an additional exactness hypothesis.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits Opposite

@@ -28,6 +28,8 @@ concrete identity system and zero objects, including on geometric-point
 fibers.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory

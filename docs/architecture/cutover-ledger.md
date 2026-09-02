@@ -18,8 +18,9 @@ blocks should normally move it rather than add more declarations beside it.
   `CategoryTheory/Abelian/` and
   `Algebra/Homology/DerivedCategory/`.
 - Canonical scheme-derived specializations:
-  `AlgebraicGeometry/DerivedCategory/Basic.lean` registers the shared
-  module-sheaf derived-category instance, while
+  `AlgebraicGeometry/DerivedCategory/Basic.lean` names the derived categories
+  of module sheaves (the standard localization is a local instance in each
+  consumer, never a global one), while
   `AlgebraicGeometry/DerivedCategory/Coherent.lean` owns `D(Coh X)`,
   `Dᵇ(Coh X)`, `Perf(X)`, and the structure-sheaf perfect object without
   importing scheme-family, pullback, determinant, or moduli consumers.
@@ -395,6 +396,20 @@ blocks should normally move it rather than add more declarations beside it.
   lane. The four upper-half-plane facts in `Weak/Charge.lean` remain an upstream
   candidate for `Analysis/Complex/UpperHalfPlane/` under the `Complex` namespace,
   deferred by the name-stability rule.
+- The global `HasDerivedCategory.standard` registrations are retired
+  (2026-09-02). `AlgebraicGeometry/DerivedCategory/Basic.lean` (module sheaves,
+  in both spellings, with a priority hack), `Coherent.lean` (`Coh X`), and
+  `Algebra/Homology/DerivedCategory/LinearDual.lean` (`ModuleCat k` and its
+  opposite) registered Mathlib's standard localization as global instances,
+  against Mathlib's own guidance that a chosen localization be introduced
+  locally. Every consumer that spells a derived category now declares
+  `attribute [local instance] HasDerivedCategory.standard` after
+  its preamble, the idiom fifteen files already used; the instance term in every
+  signature is literally `HasDerivedCategory.standard _`, so definitions agree
+  across files and across the reducibly equal spellings `X.Modules` and
+  `SheafOfModules X.ringCatSheaf` without the priority hack. A consumer that
+  wants a different localization takes `[HasDerivedCategory C]` as a hypothesis,
+  as `SemiorthogonalDecomposition/DerivedField.lean` already does.
 
 ## Confirmed next lanes
 

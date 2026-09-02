@@ -26,6 +26,8 @@ universe u
 
 open CategoryTheory
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 namespace SmoothProperVariety

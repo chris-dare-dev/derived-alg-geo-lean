@@ -135,7 +135,8 @@ three owners:
   in `AlgebraicGeometry/DerivedCategory/`.
 
 Do not build a second derived-category theory under geometry. `Basic.lean`
-registers the shared module-sheaf localization; `Coherent.lean` owns
+names the derived categories of module sheaves, with the standard
+  localization as a local instance in each consumer and never a global one; `Coherent.lean` owns
 `D(Coh X)`, `Dᵇ(Coh X)`, and `Perf(X)` without importing families, pullback,
 or moduli; `Dqc.lean` owns the quasicoherent-cohomology locus and its
 canonical zero for every scheme; `Families/` owns scheme base change and

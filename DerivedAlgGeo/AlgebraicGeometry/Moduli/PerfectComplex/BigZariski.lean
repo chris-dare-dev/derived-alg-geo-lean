@@ -33,6 +33,8 @@ big-Zariski covering family.
   equivalence with Čech descent data.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Bicategory

@@ -25,8 +25,6 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms ModuleCat.linearDualFunctor_preservesFiniteColimits
 #print axioms ModuleCat.instPreservesFiniteLimitsOppositeLinearDualFunctor
 #print axioms ModuleCat.instPreservesFiniteColimitsOppositeLinearDualFunctor
-#print axioms ModuleCat.moduleHasDerivedCategory
-#print axioms ModuleCat.oppositeModuleHasDerivedCategory
 #print axioms ModuleCat.derivedLinearDualFunctor
 #print axioms ModuleCat.derivedLinearDualFromOpposite
 #print axioms ModuleCat.derivedLinearDualShift

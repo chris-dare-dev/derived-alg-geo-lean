@@ -20,6 +20,8 @@ pseudofunctor coherence is proved there, and exactness is not deduced from
 flatness.  Those constructions belong to later milestones.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry

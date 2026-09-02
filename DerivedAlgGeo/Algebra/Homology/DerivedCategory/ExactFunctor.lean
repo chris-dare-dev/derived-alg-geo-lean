@@ -14,6 +14,8 @@ bounds and therefore preserve the canonical derived t-structure and its
 bounded objects.  No scheme, sheaf, or other geometric input occurs here.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace CategoryTheory
 
 open Limits Pretriangulated Triangulated

@@ -27,6 +27,8 @@ perfection depends on the base morphism and is not identified with absolute
 perfection without an additional geometric theorem.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory

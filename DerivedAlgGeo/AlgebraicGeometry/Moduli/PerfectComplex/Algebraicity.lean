@@ -29,6 +29,8 @@ big-Zariski presentation, but it is not claimed to be an algebraic stack or
 the full relative-perfect moduli stack.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits

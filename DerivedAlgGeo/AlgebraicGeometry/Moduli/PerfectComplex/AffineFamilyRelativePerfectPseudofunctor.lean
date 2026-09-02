@@ -20,6 +20,8 @@ relative-perfect locus by the pseudofunctor unit.  Proving the reverse
 containment is exactly the remaining preservation boundary.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Dqc

@@ -18,6 +18,8 @@ derived pullback. This supplies a normalization test for later K-flat
 resolutions along genuinely non-flat morphisms.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory AlgebraicGeometry

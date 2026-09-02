@@ -37,6 +37,8 @@ family interface; it is not a formalization of semistable reduction, a
 moduli-space construction, or Theorem 22.2 of arXiv:1902.08184v4.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.Moduli.Semistability
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families

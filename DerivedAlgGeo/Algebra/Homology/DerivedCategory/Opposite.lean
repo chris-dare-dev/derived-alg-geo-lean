@@ -18,6 +18,8 @@ categorical data: a later construction may provide it for any abelian
 category, while module and geometric duality consume the same root.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 noncomputable section
 
 universe w v u

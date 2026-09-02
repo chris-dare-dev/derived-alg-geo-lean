@@ -32,6 +32,8 @@ a derived object* without re-deriving the `Coh`-object and `singleFunctor`
 plumbing each time.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
@@ -43,12 +45,6 @@ universe u
 
 attribute [local instance]
   preservesBinaryBiproducts_of_preservesBinaryProducts
-
-/-- The standard derived-category localization for coherent sheaves on a
-locally Noetherian scheme. -/
-noncomputable instance schemeCoherentHasDerivedCategory
-    (X : Scheme.{u}) [IsLocallyNoetherian X] : HasDerivedCategory (Coh X) :=
-  HasDerivedCategory.standard (Coh X)
 
 /-- The derived category of coherent sheaves on a locally Noetherian scheme. -/
 abbrev SchemeCoherentDerivedCategory (X : Scheme.{u}) [IsLocallyNoetherian X] :=

@@ -18,6 +18,8 @@ affine pseudofunctor.  Their coherence is proved from the corresponding
 derived-category pentagon and triangle identities.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 

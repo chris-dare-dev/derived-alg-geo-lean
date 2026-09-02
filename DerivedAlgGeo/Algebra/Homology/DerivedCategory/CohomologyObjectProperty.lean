@@ -52,6 +52,8 @@ universe t w v u
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace DerivedCategory
 
 variable {A : Type u} [Category.{v} A] [Abelian A] [HasDerivedCategory.{w} A] {n : ℤ}

@@ -33,6 +33,8 @@ there is no global theorem switch and no preconstructed `Slicing.PreimageData`
 input.  Openness and relative-HN consequences are exported downstream.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families

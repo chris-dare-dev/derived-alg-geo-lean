@@ -20,6 +20,8 @@ perfect/compact membership theorem. No instance is installed, so unsupported
 schemes cannot acquire either identification through typeclass search.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 
 open CategoryTheory AlgebraicGeometry

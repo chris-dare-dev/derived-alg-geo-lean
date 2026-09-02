@@ -82,8 +82,6 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeTriangulatedFiberFamily.BoundedDerivedRealization.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeTriangulatedFiberFamily.BoundedDerivedRealization.fiberEquivalence
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeTriangulatedFiberFamily.BoundedDerivedRealization.residueFiberEquivalence
-#print axioms AlgebraicGeometry.DerivedCategory.schemeModulesHasDerivedCategory
-#print axioms AlgebraicGeometry.DerivedCategory.schemeSheafOfModulesHasDerivedCategory
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePullbackId
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePullbackComp
@@ -495,7 +493,6 @@ records below assert openness or relative-HN existence.
 -/
 
 #print axioms CategoryTheory.Triangulated.Slicing.preimage.congr_simp
-#print axioms AlgebraicGeometry.DerivedCategory.schemeCoherentHasDerivedCategory
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback.derivedAdditive
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instAdditiveSchemeCoherentDerivedCategoryLeftSchemeCoherentDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instAdditiveBoundedCoherentDerivedFiberBoundedCoherentDerivedPullback

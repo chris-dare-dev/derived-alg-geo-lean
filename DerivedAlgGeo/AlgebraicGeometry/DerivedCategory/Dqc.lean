@@ -45,6 +45,8 @@ Declarations in this file and the affine realization subtree use the
 geometry-owned namespace `AlgebraicGeometry.DerivedCategory.Dqc`.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 open AlgebraicGeometry.DerivedCategory
 

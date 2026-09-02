@@ -84,6 +84,8 @@ agree for an involution isomorphism, which that file does not need to assume.
 
 universe u
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families

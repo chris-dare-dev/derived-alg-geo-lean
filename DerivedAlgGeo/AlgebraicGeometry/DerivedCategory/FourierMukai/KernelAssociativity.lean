@@ -59,6 +59,8 @@ consumed by the derivation, in the pattern of the route classes.
 
 universe u
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.FourierMukai
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families

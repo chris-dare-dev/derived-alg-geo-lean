@@ -93,6 +93,8 @@ universe u
 open CategoryTheory CategoryTheory.Limits
 open AlgebraicGeometry.DerivedCategory
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 namespace K3Surface

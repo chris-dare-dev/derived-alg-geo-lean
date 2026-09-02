@@ -23,6 +23,8 @@ and compositor.  No geometric slicing, openness, relative HN, bounded
 coherent/perfect restriction, or conclusion of Theorem 22.2 is asserted.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families

@@ -31,6 +31,8 @@ provide inhabitants for nonexact morphisms through the same interface.
   general and exact constructions when ordinary pullback is exact.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory AlgebraicGeometry

@@ -12,6 +12,8 @@ derived-category homology.  This is the generic comparison used by geometric
 realizations such as coherent sheaves and `Dqc(X)`.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace CategoryTheory
 
 open Limits

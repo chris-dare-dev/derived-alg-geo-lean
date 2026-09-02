@@ -40,6 +40,8 @@ oriented from the lifted functor to ambient derived pullback so composition
 follows the contravariant order of scheme pullback.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory

@@ -20,6 +20,8 @@ slicing witness, relative HN structure, openness, boundedness, moduli result,
 or conclusion of Theorem 22.2 of arXiv:1902.08184v4 is asserted.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated

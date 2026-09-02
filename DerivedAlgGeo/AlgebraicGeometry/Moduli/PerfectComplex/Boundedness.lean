@@ -24,6 +24,8 @@ base-change theorem.  General semistable-object boundedness and Quot
 parameter spaces remain later results.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits

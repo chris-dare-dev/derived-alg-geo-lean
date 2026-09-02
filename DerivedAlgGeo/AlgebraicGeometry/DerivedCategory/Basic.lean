@@ -24,20 +24,21 @@ noncomputable section
 
 universe u
 
-/-- The standard derived-category localization for module sheaves on a
-scheme. Registering it at the scheme-derived owner lets every geometric
-consumer use the same instance instead of choosing one locally. -/
-noncomputable instance (priority := 1100) schemeModulesHasDerivedCategory
-    (X : Scheme.{u}) : HasDerivedCategory X.Modules :=
-  HasDerivedCategory.standard X.Modules
+/-! ### The chosen localization
 
-/-- The same registered localization with the module-sheaf carrier exposed.
-This syntactic form is needed by generic sheaf APIs whose category parameter
-is written as `SheafOfModules X.ringCatSheaf` rather than `X.Modules`. -/
-noncomputable instance (priority := 1100) schemeSheafOfModulesHasDerivedCategory
-    (X : Scheme.{u}) :
-    HasDerivedCategory (SheafOfModules X.ringCatSheaf) :=
-  schemeModulesHasDerivedCategory X
+Mathlib's `HasDerivedCategory C` records a *chosen* localization at the
+quasi-isomorphisms, and its guidance is that the standard large localization
+`HasDerivedCategory.standard C` be introduced locally where a construction needs
+it, never registered globally. There is therefore no global instance here: this
+file and every geometric consumer that spells a derived category declare
+`attribute [local instance] HasDerivedCategory.standard` after
+their preamble, so that the instance argument elaborated into every signature is
+literally `HasDerivedCategory.standard _` and agrees across files and across the
+two spellings `X.Modules` and `SheafOfModules X.ringCatSheaf`, which are
+reducibly equal. A consumer that wants a different localization takes
+`[HasDerivedCategory C]` as a hypothesis instead. -/
+
+attribute [local instance] HasDerivedCategory.standard
 
 /-- The derived category of sheaves of modules on a scheme, constructed using
 Mathlib's standard localization at quasi-isomorphisms. -/

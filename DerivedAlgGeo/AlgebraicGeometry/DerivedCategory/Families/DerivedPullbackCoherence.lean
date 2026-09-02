@@ -18,6 +18,8 @@ left-derived functor for nonexact pullback, or restrict the construction to
 bounded coherent or perfect complexes.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry

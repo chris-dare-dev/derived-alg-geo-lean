@@ -38,6 +38,8 @@ universe u
 open CategoryTheory
 open scoped BigOperators
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.Duality.Serre
 
 open AlgebraicGeometry

@@ -21,6 +21,8 @@ parameter is finite type and its zero complex realizes the boundedness witness
 from SF8.3.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits
