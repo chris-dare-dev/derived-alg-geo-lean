@@ -41,15 +41,15 @@ open AlgebraicGeometry.IntersectionTheory.ChernCharacterSurface
 open AlgebraicGeometry.IntersectionTheory.Number
 
 variable {k : Type u} [Field k]
-variable {X : SmoothProperVariety k}
-variable {D : FiniteCohomology X.toVariety}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]
+variable {D : FiniteCohomology k X}
 variable {C : D.LinearConnectingSystem}
 variable {A : Type v} [CommRing A] [Algebra ℚ A]
 
 noncomputable section
 
 theorem homogeneousPicardCoefficient_nil
-    (d : ℕ) (f : Pic X.toVariety.toScheme → ℤ) :
+    (d : ℕ) (f : Pic X → ℤ) :
     homogeneousPicardCoefficient d [] f = (f 1 : ℚ) := by
   have hinj : Set.InjOn (fun j : ℕ ↦ (j : ℚ))
       (Finset.range (d + 1) : Set ℕ) := by
@@ -94,7 +94,7 @@ private theorem coeff_interpolate_range_three (q : ℕ → ℚ) (hq0 : q 0 = 0) 
 /-- The degree-one homogeneous coefficient of a quadratic Picard Euler function in one
 direction, written using its values at the first three powers. -/
 theorem homogeneousPicardCoefficient_singleton
-    (f : Pic X.toVariety.toScheme → ℤ) (L : Pic X.toVariety.toScheme) :
+    (f : Pic X → ℤ) (L : Pic X) :
     homogeneousPicardCoefficient 2 [L] f =
       2 * ((f L - f 1 : ℤ) : ℚ) - ((f (L ^ 2) - f 1 : ℤ) : ℚ) / 2 := by
   unfold homogeneousPicardCoefficient interpolatingPolynomial
@@ -113,7 +113,7 @@ the intersection context.  Serre symmetry is included because it is what identif
 linear Todd term with `-K_X/2`. -/
 structure Data
     (P : PairingContext D C 2 A)
-    (K : SmoothProperVariety.CanonicalSheafData X 2) where
+    (K : SmoothProperVariety.CanonicalSheafData k X 2) where
   structureData : P.ReconstructionData
     (structureSheafObject P.intersection.structureSheafCoherent)
   structure_rank : structureData.rank = 1
@@ -121,7 +121,7 @@ structure Data
   serre : Serre.Data.SurfacePicardSymmetry P.intersection K.canonicalClass
 
 variable {P : PairingContext D C 2 A}
-variable {K : SmoothProperVariety.CanonicalSheafData X 2}
+variable {K : SmoothProperVariety.CanonicalSheafData k X 2}
 
 /-- The canonical divisor class inside the chosen numerical intersection ring. -/
 noncomputable def numericalCanonicalClass : A :=
@@ -209,7 +209,7 @@ theorem degree_toddTwo_eq_structureSheafEulerCharacteristic (T : Data P K) :
 
 /-- Realization of the intersection of the numerical canonical class with a divisor class. -/
 theorem degree_numericalCanonicalClass_mul_divisorClass
-    (L : Additive (Pic X.toVariety.toScheme)) :
+    (L : Additive (Pic X)) :
     P.ring.degree
         (numericalCanonicalClass (P := P) (K := K) * P.divisorClass L) =
       (P.intersection.surfaceIntersectionPairing K.canonicalClassAdd L : ℤ) := by
@@ -222,7 +222,7 @@ theorem degree_numericalCanonicalClass_mul_divisorClass
 
 /-- Serre symmetry identifies the degree-one Todd functional with `-K_X/2`. -/
 theorem toddOnePairing_eq_neg_half_canonical (T : Data P K)
-    (L : Additive (Pic X.toVariety.toScheme)) :
+    (L : Additive (Pic X)) :
     toddOnePairing P.intersection L =
       -(P.intersection.surfaceIntersectionPairing K.canonicalClassAdd L : ℚ) / 2 := by
   have hrr := Surface.eulerPic_eq P.intersection T.serre L.toMul
@@ -244,7 +244,7 @@ theorem toddOnePairing_eq_neg_half_canonical (T : Data P K)
 
 /-- Ring-valued form of `td₁ = -K_X/2`, tested against every divisor class. -/
 theorem degree_toddOne_mul_divisorClass (T : Data P K)
-    (L : Additive (Pic X.toVariety.toScheme)) :
+    (L : Additive (Pic X)) :
     P.ring.degree
         (toddOne (P := P) (K := K) * P.divisorClass L) =
       toddOnePairing P.intersection L := by
@@ -300,7 +300,7 @@ structure NumericalVarietyComparison
     {B : Type v} [CommRing B] [Algebra ℚ B]
     {N : Type w} [AddCommGroup N] (V : NumericalVarietyData 2 B N)
     {PB : PairingContext D C 2 B}
-    {KB : SmoothProperVariety.CanonicalSheafData X 2}
+    {KB : SmoothProperVariety.CanonicalSheafData k X 2}
     (T : Data PB KB) : Prop where
   ring_eq : V.ring = PB.ring
   toddComp_eq : ∀ i,
@@ -312,7 +312,7 @@ variable {B : Type v} [CommRing B] [Algebra ℚ B]
 variable {N : Type w} [AddCommGroup N]
 variable (V : NumericalVarietyData 2 B N)
 variable {PB : PairingContext D C 2 B}
-variable {KB : SmoothProperVariety.CanonicalSheafData X 2}
+variable {KB : SmoothProperVariety.CanonicalSheafData k X 2}
 
 theorem toddComp_zero_eq (T : Data PB KB)
     (Q : NumericalVarietyComparison V T) : V.toddComp 0 = 1 := by

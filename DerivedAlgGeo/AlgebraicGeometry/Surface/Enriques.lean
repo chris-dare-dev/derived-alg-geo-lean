@@ -11,8 +11,8 @@ An Enriques surface is a smooth projective surface whose canonical class is
 2-torsion but not trivial, with no first cohomology. This file says exactly
 that, against the objects this repository already has:
 
-* the surface is `X : SmoothProperVariety k` carrying a
-  `CanonicalSheafData X 2`, exactly as for `IsK3Surface` — the dimension is
+* the surface is `X : Scheme` with `[IsSmoothProperVariety k X]` carrying a
+  `CanonicalSheafData k X 2`, exactly as for `IsK3Surface` — the dimension is
   the `2` in that package's `SmoothOfRelativeDimension`;
 * "2-torsion canonical class" is the pair of group equations
   `C.canonicalClass ^ 2 = 1` and `C.canonicalClass ≠ 1` in `Pic X`, which
@@ -36,7 +36,7 @@ statement carry it even when unused.
 ## What this file does not do
 
 * **It exhibits no Enriques surface.** Nothing here constructs an `X`, a
-  `CanonicalSheafData X 2`, or an `IsEnriquesSurface`; every statement is
+  `CanonicalSheafData k X 2`, or an `IsEnriquesSurface`; every statement is
   conditional on data nobody has yet produced, exactly as for `IsK3Surface`.
 * **It states no numerical consequence.** Both `H²(X, O_X) = 0` and
   `χ(O_X) = 1` reduce to one missing input: Serre duality against the
@@ -89,24 +89,25 @@ namespace AlgebraicGeometry
 
 namespace SmoothProperVariety
 
-variable {k : Type u} [Field k] {X : SmoothProperVariety k}
+variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]
 
 /-! ### The definition -/
 
+variable (k) in
 /-- **An Enriques surface**: a smooth projective surface whose canonical class
 is 2-torsion but not trivial, with vanishing first cohomology.
 
-`Prop`-valued over a chosen `CanonicalSheafData X 2`, for the same reason as
+`Prop`-valued over a chosen `CanonicalSheafData k X 2`, for the same reason as
 `IsK3Surface`: the canonical-sheaf package is genuine data, so bundling it
 into the predicate would make "being an Enriques surface" depend on a choice.
 The torsion conditions are ordinary group equations in `Pic X`; no
 torsion-subgroup API is involved. The characteristic `≠ 2` hypothesis of the
 classical theory is deliberately absent — see the module docstring. -/
-structure IsEnriquesSurface (X : SmoothProperVariety k)
-    (C : X.CanonicalSheafData 2) : Prop where
+class IsEnriquesSurface (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]
+    (C : SmoothProperVariety.CanonicalSheafData k X 2) : Prop where
   /-- The surface is projective. Stronger than the properness already carried
   by `SmoothProperVariety`, and the standard hypothesis of the source papers. -/
-  projective : X.toVariety.IsProjective
+  projective : Variety.IsProjective k X
   /-- `ω_X` is 2-torsion in `Pic X`. Equivalently, by
   `canonicalSheaf_tensor_self_iso_unit`, there is an isomorphism
   `ω_X ⊗ ω_X ≅ O_X`. -/
@@ -116,12 +117,12 @@ structure IsEnriquesSurface (X : SmoothProperVariety k)
   canonicalClass_ne_one : C.canonicalClass ≠ 1
   /-- `H¹(X, O_X) = 0`. -/
   h1_vanishing :
-    IsZero ((Cohomology.coherentH X.toVariety.toScheme 1).obj
-      (Scheme.structureSheafCoh X.toVariety.toScheme))
+    IsZero ((Cohomology.coherentH X 1).obj
+      (Scheme.structureSheafCoh X))
 
 namespace IsEnriquesSurface
 
-variable {C : X.CanonicalSheafData 2} (h : IsEnriquesSurface X C)
+variable {C : SmoothProperVariety.CanonicalSheafData k X 2} (h : IsEnriquesSurface k X C)
 
 include h
 
@@ -135,10 +136,10 @@ play no part, which is why a bare `Nonempty` of isomorphisms comes out. -/
 theorem canonicalSheaf_tensor_self_iso_unit :
     Nonempty
       (Scheme.Modules.tensorObj C.canonicalSheaf C.canonicalSheaf ≅
-        (Scheme.structureSheafCoh X.toVariety.toScheme).obj) := by
+        (Scheme.structureSheafCoh X).obj) := by
   have hsq :
       (C.canonicalLineBundle.tensor C.canonicalLineBundle).toPic =
-        (Scheme.Modules.LineBundleData.unit X.toVariety.toScheme).toPic := by
+        (Scheme.Modules.LineBundleData.unit X).toPic := by
     rw [Scheme.Modules.LineBundleData.toPic_tensor,
       Scheme.Modules.LineBundleData.unit_toPic, ← pow_two]
     exact h.canonicalClass_sq_eq_one
@@ -150,7 +151,7 @@ level. The contrapositive of `canonicalClass_eq_one_iff` applied to
 theorem canonicalSheaf_not_iso_unit :
     ¬ Nonempty
       (C.canonicalSheaf ≅
-        (Scheme.structureSheafCoh X.toVariety.toScheme).obj) :=
+        (Scheme.structureSheafCoh X).obj) :=
   fun e =>
     h.canonicalClass_ne_one ((CanonicalSheafData.canonicalClass_eq_one_iff C).2 e)
 
@@ -172,7 +173,7 @@ theorem antiCanonicalClass_eq_canonicalClass :
 surface is not a K3 surface. The two definitions disagree exactly at
 triviality of the canonical class, and this pins them against each other on
 the shared carrier. -/
-theorem not_isK3Surface : ¬ IsK3Surface X C :=
+theorem not_isK3Surface : ¬ IsK3Surface k X C :=
   fun hK3 => h.canonicalClass_ne_one hK3.canonicalClass_eq_one
 
 end IsEnriquesSurface
@@ -182,60 +183,27 @@ end SmoothProperVariety
 /-! ### The bundled object
 
 The three theorems below restate the `IsEnriquesSurface` results with the
-canonical package implicit, so a caller holding `Y : EnriquesSurface k` never
+canonical package implicit, so a caller holding an Enriques surface `Y` never
 has to name `Y.canonical` to use them. They add no mathematics; every one is
 `Y.isEnriques.<same name>`. -/
 
-/-- An Enriques surface over `k`, with its canonical-sheaf package and the
-Enriques property bundled together.
+/-! ### No bundled object
 
-Callers that only need "let `Y` be an Enriques surface" want this; callers
-proving things about a fixed canonical package want `IsEnriquesSurface`
-directly. Nothing in this repository constructs one. -/
-structure EnriquesSurface (k : Type u) [Field k] where
-  /-- The underlying smooth proper variety. -/
-  toSmoothProperVariety : SmoothProperVariety k
-  /-- Its chosen canonical-sheaf package in dimension two. -/
-  canonical : toSmoothProperVariety.CanonicalSheafData 2
-  /-- The Enriques conditions. -/
-  isEnriques :
-    SmoothProperVariety.IsEnriquesSurface toSmoothProperVariety canonical
+As for K3 surfaces, "let `Y` be an Enriques surface" is
+`(Y : Scheme) [Y.Over (Spec k)] [IsSmoothProperVariety k Y]
+(C : CanonicalSheafData k Y 2) [IsEnriquesSurface k Y C]`; the former an Enriques surface over `k`
+structure and its wrappers are gone, and `IsEnriquesSurface` holds the derived statements. -/
 
 namespace EnriquesSurface
 
-variable {k : Type u} [Field k] (Y : EnriquesSurface k)
+variable {k : Type u} [Field k] {Y : Scheme.{u}} [Y.Over (Spec (CommRingCat.of k))]
+  [IsSmoothProperVariety k Y] {C : SmoothProperVariety.CanonicalSheafData k Y 2}
 
-/-- The underlying variety. -/
-abbrev toVariety : Variety k := Y.toSmoothProperVariety.toVariety
-
-/-- The underlying scheme. -/
-abbrev toScheme : Scheme.{u} := Y.toVariety.toScheme
-
-/-- Named rather than anonymous, following `K3Surface.instIsProjective`: the
-generated name of an anonymous instance here is derived from `toVariety`, so
-renaming that field would silently move an audited declaration. -/
-instance instIsProjective : Y.toVariety.IsProjective := Y.isEnriques.projective
-
-/-- The square of the canonical sheaf of an Enriques surface is trivial. -/
-theorem canonicalSheaf_tensor_self_iso_unit :
-    Nonempty
-      (Scheme.Modules.tensorObj Y.canonical.canonicalSheaf
-          Y.canonical.canonicalSheaf ≅
-        (Scheme.structureSheafCoh Y.toScheme).obj) :=
-  Y.isEnriques.canonicalSheaf_tensor_self_iso_unit
-
-/-- The canonical sheaf of an Enriques surface is not trivial. -/
-theorem canonicalSheaf_not_iso_unit :
-    ¬ Nonempty
-      (Y.canonical.canonicalSheaf ≅
-        (Scheme.structureSheafCoh Y.toScheme).obj) :=
-  Y.isEnriques.canonicalSheaf_not_iso_unit
-
-/-- `H¹(Y, O_Y) = 0`. -/
-theorem h1_vanishing :
-    IsZero ((Cohomology.coherentH Y.toScheme 1).obj
-      (Scheme.structureSheafCoh Y.toScheme)) :=
-  Y.isEnriques.h1_vanishing
+/-- An Enriques surface is projective. Not an instance, for the reason given at
+`K3Surface.isProjective`. -/
+theorem isProjective [h : SmoothProperVariety.IsEnriquesSurface k Y C] :
+    Variety.IsProjective k Y :=
+  h.projective
 
 end EnriquesSurface
 

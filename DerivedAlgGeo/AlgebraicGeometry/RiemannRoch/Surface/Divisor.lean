@@ -42,22 +42,22 @@ open AlgebraicGeometry.Duality
 open AlgebraicGeometry.IntersectionTheory.Number
 
 variable {k : Type u} [Field k]
-variable {X : SmoothProperVariety k}
-variable {D : FiniteCohomology X.toVariety}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]
+variable {D : FiniteCohomology k X}
 variable {C : D.LinearConnectingSystem}
 variable (I : IntersectionContext D C 2)
 
 noncomputable section
 
 /-- The integral numerator in the surface divisor formula. -/
-def correctionNumerator (K L : Pic X.toVariety.toScheme) : ℤ :=
+def correctionNumerator (K L : Pic X) : ℤ :=
   I.surfaceIntersectionNumber L L - I.surfaceIntersectionNumber L K
 
 /-- Serre symmetry and bilinearity give the denominator-free surface formula. -/
 theorem twice_eulerPic_sub
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K)
-    (L : Pic X.toVariety.toScheme) :
+    (L : Pic X) :
     2 * (I.eulerPic L - I.eulerPic 1) = correctionNumerator I K L := by
   have hpair_inv :
       I.surfaceIntersectionNumber L L⁻¹ = -I.surfaceIntersectionNumber L L := by
@@ -87,9 +87,9 @@ theorem twice_eulerPic_sub
 
 /-- The factor `1/2` is integral: the intersection numerator is even. -/
 theorem correctionNumerator_even
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K)
-    (L : Pic X.toVariety.toScheme) :
+    (L : Pic X) :
     Even (correctionNumerator I K L) := by
   refine ⟨I.eulerPic L - I.eulerPic 1, ?_⟩
   have h := twice_eulerPic_sub I P L
@@ -98,9 +98,9 @@ theorem correctionNumerator_even
 
 /-- Intrinsic Picard-group surface Riemann--Roch. -/
 theorem eulerPic_eq
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K)
-    (L : Pic X.toVariety.toScheme) :
+    (L : Pic X) :
     (I.eulerPic L : ℚ) = (I.eulerPic 1 : ℚ) +
       (correctionNumerator I K L : ℚ) / 2 := by
   have h := twice_eulerPic_sub I P L
@@ -114,58 +114,58 @@ theorem eulerPic_eq
   linarith
 
 /-- The Euler characteristic of the Cartier line bundle `O_X(E)`, through its Picard class. -/
-def cartierEulerCharacteristic (E : CartierDivisor X.toVariety.toScheme) : ℤ :=
+def cartierEulerCharacteristic (E : CartierDivisor X) : ℤ :=
   I.eulerPic (CartierDivisor.toPic E)
 
 /-- The intersection numerator `E · (E-K)` for a Cartier divisor. -/
-def cartierCorrectionNumerator (K : Pic X.toVariety.toScheme)
-    (E : CartierDivisor X.toVariety.toScheme) : ℤ :=
+def cartierCorrectionNumerator (K : Pic X)
+    (E : CartierDivisor X) : ℤ :=
   correctionNumerator I K (CartierDivisor.toPic E)
 
 /-- Surface Riemann--Roch for an arbitrary Cartier divisor. -/
 theorem cartier_eulerCharacteristic_eq
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K)
-    (E : CartierDivisor X.toVariety.toScheme) :
+    (E : CartierDivisor X) :
     (cartierEulerCharacteristic I E : ℚ) = (I.eulerPic 1 : ℚ) +
       (cartierCorrectionNumerator I K E : ℚ) / 2 :=
   eulerPic_eq I P (CartierDivisor.toPic E)
 
 /-- The Cartier numerator is even before passing to rational coefficients. -/
 theorem cartierCorrectionNumerator_even
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K)
-    (E : CartierDivisor X.toVariety.toScheme) :
+    (E : CartierDivisor X) :
     Even (cartierCorrectionNumerator I K E) :=
   correctionNumerator_even I P (CartierDivisor.toPic E)
 
 /-- Principal-equivalent Cartier divisors have the same geometric Euler characteristic. -/
 theorem cartierEulerCharacteristic_eq_of_principalEquivalent
-    {E E' : CartierDivisor X.toVariety.toScheme}
-    (h : CartierDivisor.toClass X.toVariety.toScheme E =
-      CartierDivisor.toClass X.toVariety.toScheme E') :
+    {E E' : CartierDivisor X}
+    (h : CartierDivisor.toClass X E =
+      CartierDivisor.toClass X E') :
     cartierEulerCharacteristic I E = cartierEulerCharacteristic I E' := by
   unfold cartierEulerCharacteristic
   congr 1
   change CartierDivisor.classToPic
-      (Multiplicative.ofAdd (CartierDivisor.toClass X.toVariety.toScheme E)) =
+      (Multiplicative.ofAdd (CartierDivisor.toClass X E)) =
     CartierDivisor.classToPic
-      (Multiplicative.ofAdd (CartierDivisor.toClass X.toVariety.toScheme E'))
+      (Multiplicative.ofAdd (CartierDivisor.toClass X E'))
   rw [h]
 
 /-- The full Riemann--Roch expression is invariant under Cartier divisor-class equivalence. -/
 theorem cartier_formula_eq_of_principalEquivalent
-    {K : Pic X.toVariety.toScheme}
-    {E E' : CartierDivisor X.toVariety.toScheme}
-    (h : CartierDivisor.toClass X.toVariety.toScheme E =
-      CartierDivisor.toClass X.toVariety.toScheme E') :
+    {K : Pic X}
+    {E E' : CartierDivisor X}
+    (h : CartierDivisor.toClass X E =
+      CartierDivisor.toClass X E') :
     cartierEulerCharacteristic I E = cartierEulerCharacteristic I E' ∧
       cartierCorrectionNumerator I K E = cartierCorrectionNumerator I K E' := by
   have hPic : CartierDivisor.toPic E = CartierDivisor.toPic E' := by
     change CartierDivisor.classToPic
-        (Multiplicative.ofAdd (CartierDivisor.toClass X.toVariety.toScheme E)) =
+        (Multiplicative.ofAdd (CartierDivisor.toClass X E)) =
       CartierDivisor.classToPic
-        (Multiplicative.ofAdd (CartierDivisor.toClass X.toVariety.toScheme E'))
+        (Multiplicative.ofAdd (CartierDivisor.toClass X E'))
     rw [h]
   constructor
   · exact cartierEulerCharacteristic_eq_of_principalEquivalent I h
@@ -178,11 +178,11 @@ theorem cartier_formula_eq_of_principalEquivalent
 Euler function.  The quotient term needs no additional comparison: it is the actual coherent
 third object of that sequence. -/
 structure EffectiveSequenceRealization
-    (A : EffectiveCartierDivisor (X := X.toVariety.toScheme))
-    (E : CartierDivisor X.toVariety.toScheme) where
-  sourceCoherent : Scheme.coherent X.toVariety.toScheme
+    (A : EffectiveCartierDivisor (X := X))
+    (E : CartierDivisor X) where
+  sourceCoherent : Scheme.coherent X
     (CartierDivisor.associatedSheaf (E - A.divisor))
-  middleCoherent : Scheme.coherent X.toVariety.toScheme
+  middleCoherent : Scheme.coherent X
     (CartierDivisor.associatedSheaf E)
   sourceEuler :
     D.eulerCharacteristic
@@ -196,12 +196,12 @@ structure EffectiveSequenceRealization
 namespace EffectiveSequenceRealization
 
 variable {I}
-variable {A : EffectiveCartierDivisor (X := X.toVariety.toScheme)}
-variable {E : CartierDivisor X.toVariety.toScheme}
+variable {A : EffectiveCartierDivisor (X := X)}
+variable {E : CartierDivisor X}
 variable (R : EffectiveSequenceRealization I A E)
 
 /-- The coherent quotient term `O_X(E) ⊗ i_*O_A`. -/
-abbrev quotient : Coh X.toVariety.toScheme :=
+abbrev quotient : Coh X :=
   (A.cohTwistSequence E R.sourceCoherent R.middleCoherent).X₃
 
 /-- Euler additivity for the genuine twisted fundamental sequence. -/
@@ -223,9 +223,9 @@ theorem effective_euler_additivity
       D.eulerCharacteristic R.quotient := by
   subst E
   have hzero :
-      CartierDivisor.toPic (0 : CartierDivisor X.toVariety.toScheme) = 1 := by
+      CartierDivisor.toPic (0 : CartierDivisor X) = 1 := by
     have h := map_zero
-      (CartierDivisor.divisorToPicAdd (X := X.toVariety.toScheme))
+      (CartierDivisor.divisorToPicAdd (X := X))
     have h' := congrArg Additive.toMul h
     simpa using h'
   have h := R.euler_additivity
@@ -237,7 +237,7 @@ theorem effective_euler_additivity
 effective-divisor sequence.  Keeping this comparison explicit isolates the remaining adjunction
 input from the already-constructed coherent short exact sequence. -/
 structure QuotientIntersectionComparison
-    (K : Pic X.toVariety.toScheme) where
+    (K : Pic X) where
   quotientEuler :
     (D.eulerCharacteristic R.quotient : ℚ) =
       (cartierCorrectionNumerator I K A.divisor : ℚ) / 2
@@ -246,7 +246,7 @@ structure QuotientIntersectionComparison
 fundamental sequence and the geometric intersection computation on its quotient. -/
 theorem effective_divisor_formula_from_sequence
     (hself : E = A.divisor)
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (Q : R.QuotientIntersectionComparison K) :
     (cartierEulerCharacteristic I A.divisor : ℚ) = (I.eulerPic 1 : ℚ) +
       (cartierCorrectionNumerator I K A.divisor : ℚ) / 2 := by
@@ -261,7 +261,7 @@ theorem effective_divisor_formula_from_sequence
 /-- The effective-divisor specialization of surface Riemann--Roch. -/
 theorem effective_divisor_formula
     (_R : EffectiveSequenceRealization I A E)
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K) :
     (cartierEulerCharacteristic I A.divisor : ℚ) = (I.eulerPic 1 : ℚ) +
       (cartierCorrectionNumerator I K A.divisor : ℚ) / 2 :=
@@ -271,7 +271,7 @@ theorem effective_divisor_formula
 characteristic as half the intersection numerator. -/
 theorem quotient_eulerCharacteristic_eq_half_correction
     (hself : E = A.divisor)
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K) :
     (D.eulerCharacteristic R.quotient : ℚ) =
       (cartierCorrectionNumerator I K A.divisor : ℚ) / 2 := by
@@ -289,7 +289,7 @@ end EffectiveSequenceRealization
 /-! ## Normalizations and K3 specialization -/
 
 /-- `D = 0`: the correction term vanishes. -/
-theorem eulerPic_one (K : Pic X.toVariety.toScheme)
+theorem eulerPic_one (K : Pic X)
     (P : Serre.Data.SurfacePicardSymmetry I K) :
     (I.eulerPic 1 : ℚ) = (I.eulerPic 1 : ℚ) +
       (correctionNumerator I K 1 : ℚ) / 2 := by
@@ -297,7 +297,7 @@ theorem eulerPic_one (K : Pic X.toVariety.toScheme)
 
 /-- `D = K_X`: Serre duality gives `χ(O_X(K_X)) = χ(O_X)`. -/
 theorem eulerPic_canonical
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K) :
     I.eulerPic K = I.eulerPic 1 :=
   P.canonical
@@ -305,9 +305,9 @@ theorem eulerPic_canonical
 /-- K3 specialization: for trivial canonical class,
 `χ(L) = χ(O_X) + L²/2`. -/
 theorem k3_eulerPic_eq
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K)
-    (hK : K = 1) (L : Pic X.toVariety.toScheme) :
+    (hK : K = 1) (L : Pic X) :
     (I.eulerPic L : ℚ) = (I.eulerPic 1 : ℚ) +
       (I.surfaceIntersectionNumber L L : ℚ) / 2 := by
   have h := eulerPic_eq I P L
@@ -321,10 +321,10 @@ theorem k3_eulerPic_eq
 
 /-- K3 normalization with `χ(O_X)=2`, matching the audited Layer A numerical formula. -/
 theorem k3_eulerPic_eq_two
-    {K : Pic X.toVariety.toScheme}
+    {K : Pic X}
     (P : Serre.Data.SurfacePicardSymmetry I K)
     (hK : K = 1) (hchi : I.eulerPic 1 = 2)
-    (L : Pic X.toVariety.toScheme) :
+    (L : Pic X) :
     (I.eulerPic L : ℚ) = 2 +
       (I.surfaceIntersectionNumber L L : ℚ) / 2 := by
   have h := k3_eulerPic_eq I P hK L

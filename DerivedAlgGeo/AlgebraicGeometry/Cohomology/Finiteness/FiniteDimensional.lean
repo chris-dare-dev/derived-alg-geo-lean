@@ -46,25 +46,27 @@ noncomputable def coherentH (X : Scheme.{u}) (i : ℕ) :
   exact Coh.ι X ⋙ Scheme.Modules.toSheaf X ⋙
     Sheaf.functorH (Opens.grothendieckTopology X) i
 
+variable (k) in
 /-- A functorial base-field-linear realization of Mathlib's coherent sheaf cohomology.
 
 The natural comparison rules out an unrelated family of vector spaces with the desired
 dimensions: after forgetting scalars these are the actual `Sheaf.H` groups and maps. -/
-structure LinearCohomology (X : Variety k) where
+structure LinearCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] where
   /-- The base-field vector spaces `Hⁱ(X, F)`, functorial in the coherent sheaf `F`. -/
-  moduleH : ℕ → Coh X.toScheme ⥤ ModuleCat.{u + 1} k
+  moduleH : ℕ → Coh X ⥤ ModuleCat.{u + 1} k
   /-- Forgetting the vector-space structure recovers derived-functor sheaf cohomology. -/
   comparison : ∀ i,
     moduleH i ⋙ forget₂ (ModuleCat.{u + 1} k) AddCommGrpCat.{u + 1} ≅
-      coherentH X.toScheme i
+      coherentH X i
 
+variable (k) in
 /-- Degreewise finite-dimensional coherent cohomology, with no eventual-vanishing claim.
 
 This is the exact output interface for #29. A later boundedness result can extend it without
 re-proving or repackaging the linear comparison. -/
-structure FiniteDimensionalCohomology (X : Variety k) extends LinearCohomology X where
+structure FiniteDimensionalCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends LinearCohomology k X where
   /-- Every coherent cohomology vector space is finite-dimensional. -/
-  finite : ∀ (i : ℕ) (F : Coh X.toScheme), Module.Finite k ((moduleH i).obj F)
+  finite : ∀ (i : ℕ) (F : Coh X), Module.Finite k ((moduleH i).obj F)
 
 variable {X : Scheme.{u}}
 
@@ -233,43 +235,43 @@ theorem globalSectionSmul_naturality {M N : X.Modules} (f : M ⟶ N)
   exact (f.val.app U).hom.map_smul _ _
 
 /-- The structure morphism realizes base-field scalars as global functions on a variety. -/
-noncomputable def baseFieldToGlobalSections (Y : Variety k) :
-    k →+* Γ(Y.toScheme, (⊤ : Y.toScheme.Opens)) :=
+noncomputable def baseFieldToGlobalSections (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] :
+    k →+* Γ(Y, (⊤ : Y.Opens)) :=
   ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫
-    Y.structureMorphism.appTop).hom
+    (Y ↘ Spec (CommRingCat.of k)).appTop).hom
 
 /-- The canonical base-field action on a module sheaf over a variety. -/
-noncomputable def varietyScalarAction (Y : Variety k)
-    (M : Y.toScheme.Modules) : k →+* End M :=
+noncomputable def varietyScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
+    (M : Y.Modules) : k →+* End M :=
   (globalSectionAction M).comp (baseFieldToGlobalSections Y)
 
 /-- The canonical base-field action is central on morphisms of module sheaves. -/
-theorem varietyScalarAction_naturality (Y : Variety k)
-    {M N : Y.toScheme.Modules} (f : M ⟶ N) (r : k) :
+theorem varietyScalarAction_naturality (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
+    {M N : Y.Modules} (f : M ⟶ N) (r : k) :
     varietyScalarAction Y M r ≫ f = f ≫ varietyScalarAction Y N r :=
   globalSectionSmul_naturality f (baseFieldToGlobalSections Y r)
 
 /-- The canonical base-field action on a coherent sheaf. -/
-noncomputable def coherentScalarAction (Y : Variety k)
-    (F : Coh Y.toScheme) : k →+* End F where
+noncomputable def coherentScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
+    (F : Coh Y) : k →+* End F where
   toFun r := ObjectProperty.homMk
-    (varietyScalarAction Y ((Coh.ι Y.toScheme).obj F) r)
+    (varietyScalarAction Y ((Coh.ι Y).obj F) r)
   map_one' := by
     apply ObjectProperty.hom_ext
-    exact map_one (varietyScalarAction Y ((Coh.ι Y.toScheme).obj F))
+    exact map_one (varietyScalarAction Y ((Coh.ι Y).obj F))
   map_mul' r s := by
     apply ObjectProperty.hom_ext
-    exact map_mul (varietyScalarAction Y ((Coh.ι Y.toScheme).obj F)) r s
+    exact map_mul (varietyScalarAction Y ((Coh.ι Y).obj F)) r s
   map_zero' := by
     apply ObjectProperty.hom_ext
-    exact map_zero (varietyScalarAction Y ((Coh.ι Y.toScheme).obj F))
+    exact map_zero (varietyScalarAction Y ((Coh.ι Y).obj F))
   map_add' r s := by
     apply ObjectProperty.hom_ext
-    exact map_add (varietyScalarAction Y ((Coh.ι Y.toScheme).obj F)) r s
+    exact map_add (varietyScalarAction Y ((Coh.ι Y).obj F)) r s
 
 /-- The canonical base-field action is central on coherent-sheaf morphisms. -/
-theorem coherentScalarAction_naturality (Y : Variety k)
-    {F G : Coh Y.toScheme} (f : F ⟶ G) (r : k) :
+theorem coherentScalarAction_naturality (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
+    {F G : Coh Y} (f : F ⟶ G) (r : k) :
     coherentScalarAction Y F r ≫ f = f ≫ coherentScalarAction Y G r := by
   apply ObjectProperty.hom_ext
   exact varietyScalarAction_naturality Y f.hom r
@@ -291,83 +293,87 @@ noncomputable def addCommGrpEndRingHom (A : AddCommGrpCat) :
   map_zero' := rfl
   map_add' _ _ := rfl
 
-/-- Derived coherent cohomology is additive. -/
-noncomputable instance coherentH_additive (Y : Variety k) (i : ℕ) :
-    (coherentH Y.toScheme i).Additive := by
+/-- Derived coherent cohomology is additive, on any scheme. -/
+noncomputable instance coherentH_additive (Y : Scheme.{u}) (i : ℕ) :
+    (coherentH Y i).Additive := by
   dsimp [coherentH]
   infer_instance
 
+variable (k) in
 /-- The base-field action induced on a derived coherent cohomology group. -/
-noncomputable def coherentHScalarAction (Y : Variety k) (i : ℕ)
-    (F : Coh Y.toScheme) : k →+* AddMonoid.End ((coherentH Y.toScheme i).obj F) :=
-  (addCommGrpEndRingHom ((coherentH Y.toScheme i).obj F)).comp
-    ((additiveMapEndRingHom (coherentH Y.toScheme i) F).comp
+noncomputable def coherentHScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ)
+    (F : Coh Y) : k →+* AddMonoid.End ((coherentH Y i).obj F) :=
+  (addCommGrpEndRingHom ((coherentH Y i).obj F)).comp
+    ((additiveMapEndRingHom (coherentH Y i) F).comp
       (coherentScalarAction Y F))
 
+variable (k) in
 /-- The canonical base-field module structure on a derived coherent cohomology group. -/
 @[reducible]
-noncomputable def coherentHModule (Y : Variety k) (i : ℕ)
-    (F : Coh Y.toScheme) : Module k ((coherentH Y.toScheme i).obj F) :=
-  Module.compHom _ (coherentHScalarAction Y i F)
+noncomputable def coherentHModule (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ)
+    (F : Coh Y) : Module k ((coherentH Y i).obj F) :=
+  Module.compHom _ (coherentHScalarAction k Y i F)
 
 /-- Every derived coherent cohomology map respects the canonical base-field action. -/
-theorem coherentH_map_smul (Y : Variety k) (i : ℕ)
-    {F G : Coh Y.toScheme} (f : F ⟶ G) (r : k)
-    (x : (coherentH Y.toScheme i).obj F) :
-    letI := coherentHModule Y i F
-    letI := coherentHModule Y i G
-    (coherentH Y.toScheme i).map f (r • x) =
-      r • (coherentH Y.toScheme i).map f x := by
-  let H := coherentH Y.toScheme i
+theorem coherentH_map_smul (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ)
+    {F G : Coh Y} (f : F ⟶ G) (r : k)
+    (x : (coherentH Y i).obj F) :
+    letI := coherentHModule k Y i F
+    letI := coherentHModule k Y i G
+    (coherentH Y i).map f (r • x) =
+      r • (coherentH Y i).map f x := by
+  let H := coherentH Y i
   have h := congrArg H.map (coherentScalarAction_naturality Y f r)
   rw [Functor.map_comp, Functor.map_comp] at h
   exact ConcreteCategory.congr_hom h x
 
 set_option maxHeartbeats 400000 in
+variable (k) in
 /-- Coherent sheaf cohomology with its canonical functorial base-field module structure. -/
-noncomputable def linearCoherentH (Y : Variety k) (i : ℕ) :
-    Coh Y.toScheme ⥤ ModuleCat.{u + 1} k where
-  obj F := letI := coherentHModule Y i F
-    ModuleCat.of k ((coherentH Y.toScheme i).obj F)
+noncomputable def linearCoherentH (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ) :
+    Coh Y ⥤ ModuleCat.{u + 1} k where
+  obj F := letI := coherentHModule k Y i F
+    ModuleCat.of k ((coherentH Y i).obj F)
   map {F G} f := by
-    letI := coherentHModule Y i F
-    letI := coherentHModule Y i G
+    letI := coherentHModule k Y i F
+    letI := coherentHModule k Y i G
     exact ModuleCat.ofHom
-      { toFun := (coherentH Y.toScheme i).map f
+      { toFun := (coherentH Y i).map f
         map_add' := by simp
         map_smul' := coherentH_map_smul Y i f }
   map_id F := by
     apply (forget₂ (ModuleCat.{u + 1} k) AddCommGrpCat.{u + 1}).map_injective
-    exact (coherentH Y.toScheme i).map_id F
+    exact (coherentH Y i).map_id F
   map_comp f g := by
     apply (forget₂ (ModuleCat.{u + 1} k) AddCommGrpCat.{u + 1}).map_injective
-    exact (coherentH Y.toScheme i).map_comp f g
+    exact (coherentH Y i).map_comp f g
 
 set_option maxHeartbeats 400000 in
+variable (k) in
 /-- Forgetting scalars from `linearCoherentH` recovers Mathlib's derived cohomology functor. -/
-noncomputable def linearCoherentHComparison (Y : Variety k) (i : ℕ) :
-    linearCoherentH Y i ⋙ forget₂ (ModuleCat.{u + 1} k) AddCommGrpCat.{u + 1} ≅
-      coherentH Y.toScheme i :=
+noncomputable def linearCoherentHComparison (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ) :
+    linearCoherentH k Y i ⋙ forget₂ (ModuleCat.{u + 1} k) AddCommGrpCat.{u + 1} ≅
+      coherentH Y i :=
   NatIso.ofComponents (fun _ ↦ Iso.refl _)
 
 /-- The canonical functorial linear realization of coherent sheaf cohomology on a variety. -/
-noncomputable def canonicalLinearCohomology (Y : Variety k) :
-    LinearCohomology Y where
-  moduleH := linearCoherentH Y
-  comparison := linearCoherentHComparison Y
+noncomputable def canonicalLinearCohomology (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] [IsVariety k Y] :
+    LinearCohomology k Y where
+  moduleH := linearCoherentH k Y
+  comparison := linearCoherentHComparison k Y
 
 namespace FiniteDimensionalCohomology
 
-variable {X : Variety k}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
 /-- The dimension of degree-`i` coherent cohomology. -/
-noncomputable abbrev dimension (D : FiniteDimensionalCohomology X)
-    (F : Coh X.toScheme) (i : ℕ) : ℕ :=
+noncomputable abbrev dimension (D : FiniteDimensionalCohomology k X)
+    (F : Coh X) (i : ℕ) : ℕ :=
   Module.finrank k ((D.moduleH i).obj F)
 
 /-- Isomorphic coherent sheaves have equal cohomology dimensions in every degree. -/
-theorem dimension_iso (D : FiniteDimensionalCohomology X)
-    {F G : Coh X.toScheme} (e : F ≅ G) (i : ℕ) :
+theorem dimension_iso (D : FiniteDimensionalCohomology k X)
+    {F G : Coh X} (e : F ≅ G) (i : ℕ) :
     D.dimension F i = D.dimension G i :=
   ((D.moduleH i).mapIso e).toLinearEquiv.finrank_eq
 

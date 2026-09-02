@@ -15,9 +15,9 @@ import Mathlib.RingTheory.FiniteType
 /-!
 # Polynomial projective space as a variety over the base field
 
-`Variety k` asks for an integral scheme with a finite-type morphism to `Spec k`. For
+`IsVariety k X` asks for an integral scheme with a finite-type morphism to `Spec k`. For
 `Pⁿ = Proj k[Xᵢ]` the integrality is `AlgebraicGeometry.Proj.isIntegral`, and this file supplies
-the rest:
+the rest, as instances on `Proj (polynomialGrading ι k)` itself rather than on a bundle:
 
 * the degree-zero part of the standard grading is the constants, so the base field maps
   isomorphically onto `𝒜 0` and `Proj.toSpecZero` becomes a morphism to `Spec k`;
@@ -100,23 +100,22 @@ instance nonempty_projectiveSpace [Nonempty ι] :
     (MvPolynomial.isHomogeneous_X k i) Nat.one_pos (MvPolynomial.X_ne_zero i)
   exact ⟨x⟩
 
-/-- **Polynomial projective space as a variety over the base field.**
+/-- **Polynomial projective space is a scheme over the base field**, with structure morphism
+`projectiveSpaceToSpec`. This is the `Scheme.Over` instance every statement about `Pⁿ` over
+`k` consumes; `Proj (polynomialGrading ι k) ↘ Spec (CommRingCat.of k)` unfolds to it. -/
+noncomputable instance instOverProjectiveSpace :
+    (Proj (polynomialGrading ι k)).Over (Spec (CommRingCat.of k)) :=
+  ⟨projectiveSpaceToSpec ι k⟩
+
+/-- **Polynomial projective space is a variety over the base field.**
 
 Finiteness of the variable set is what makes the structure morphism of finite type;
 nonemptiness is what makes the space irreducible rather than vacuously so. -/
-noncomputable def projectiveSpaceVariety [Finite ι] [Nonempty ι] : Variety k :=
-  ⟨
-    { toScheme := Proj (polynomialGrading ι k)
-      structureMorphism := projectiveSpaceToSpec ι k },
-    { isIntegral := Proj.isIntegral (polynomialGrading ι k)
-      locallyOfFiniteType := inferInstance }
-  ⟩
-
-/-- The variety bundle changes nothing about the underlying scheme, so results proved about
-`Proj` apply to it directly. -/
-lemma projectiveSpaceVariety_toScheme [Finite ι] [Nonempty ι] :
-    (projectiveSpaceVariety ι k).toScheme = Proj (polynomialGrading ι k) :=
-  rfl
+instance isVariety_projectiveSpace [Finite ι] [Nonempty ι] :
+    IsVariety k (Proj (polynomialGrading ι k)) where
+  toIsIntegral := Proj.isIntegral (polynomialGrading ι k)
+  toLocallyOfFiniteType :=
+    inferInstanceAs (LocallyOfFiniteType (projectiveSpaceToSpec ι k))
 
 /-- The twisting sheaf `O(d)` on polynomial projective space is coherent. -/
 theorem polynomialIntShift_isCoherent (d : ℤ) :
@@ -127,19 +126,20 @@ theorem polynomialIntShift_isCoherent (d : ℤ) :
     (fun i => ⟨MvPolynomial.X i, MvPolynomial.isHomogeneous_X k i⟩) d
     (polynomialVariable_adjoin_eq_top ι k)
 
-/-- **`O(d)` as a coherent sheaf on projective space as a variety over `k`.**
+/-- **`O(d)` as a coherent sheaf on polynomial projective space.**
 
 This is the object `coherentScalarAction` and `linearCoherentH` are stated about, so with it the
-finiteness interface can name `Hⁱ(Pⁿ, O(d))` as a `k`-vector space. -/
-noncomputable def projectiveSpaceTwist [Finite ι] [Nonempty ι] (d : ℤ) :
-    Coh (projectiveSpaceVariety ι k).toScheme :=
+finiteness interface can name `Hⁱ(Pⁿ, O(d))` as a `k`-vector space. Coherence of `O(d)` needs
+no finiteness of the index type; that enters only through `isVariety_projectiveSpace`. -/
+noncomputable def projectiveSpaceTwist (d : ℤ) :
+    Coh (Proj (polynomialGrading ι k)) :=
   ⟨associatedSheaf (polynomialGrading ι k) (intShift (polynomialGrading ι k) d),
     polynomialIntShift_isCoherent ι k d⟩
 
 /-- The coherent-sheaf bundle changes nothing about the underlying module sheaf, so the Čech
 lane's results about the twist apply to it directly. -/
-lemma projectiveSpaceTwist_obj [Finite ι] [Nonempty ι] (d : ℤ) :
-    (Coh.ι (projectiveSpaceVariety ι k).toScheme).obj (projectiveSpaceTwist ι k d) =
+lemma projectiveSpaceTwist_obj (d : ℤ) :
+    (Coh.ι (Proj (polynomialGrading ι k))).obj (projectiveSpaceTwist ι k d) =
       associatedSheaf (polynomialGrading ι k) (intShift (polynomialGrading ι k) d) :=
   rfl
 

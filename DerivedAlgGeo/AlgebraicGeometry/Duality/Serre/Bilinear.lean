@@ -59,7 +59,7 @@ namespace AlgebraicGeometry.Duality.Serre
 open AlgebraicGeometry
 
 variable {k : Type u} [Field k]
-variable {X : SmoothProperVariety k} {n : ℕ}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}
 
 noncomputable section
 
@@ -73,7 +73,7 @@ from scratch and exhausts the `synthInstance` budget, and the timeout surfaces a
 failure mode; raising `synthInstance.maxHeartbeats` treats the symptom.
 
 `HasExt.standard` is the sanctioned route, and it is the one the sibling file takes. -/
-local instance hasExtCoh : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
+local instance hasExtCoh : HasExt.{u + 1} (Coh X) :=
   HasExt.standard _
 
 -- The same `HasExt` witness `Serre/Cohomology.lean` supplies before its own `Data`, and
@@ -93,7 +93,7 @@ local instance hasExtCoh : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
 -- against `Cohomology.lean`'s into `instHasExtCohToSchemeToVariety_1`, a generated name
 -- that then has to be audited under a number nobody chose. A chosen name is stable and
 -- says what it is.
-local instance hasExtCohBilinear : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
+local instance hasExtCohBilinear : HasExt.{u + 1} (Coh X) :=
   HasExt.standard _
 
 /-- **Bilinear coherent Serre duality**, as supplied realization data.
@@ -101,29 +101,29 @@ local instance hasExtCohBilinear : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
 The fields mirror `Serre.Data`: a base-field-linear realization of the `Ext` groups, its
 comparison with Mathlib's actual `Abelian.Ext`, finiteness, the canonical twist `E ⊗ ω_X`, and
 the duality isomorphism itself. -/
-structure BilinearData (K : X.CanonicalSheafData n) where
+structure BilinearData (K : SmoothProperVariety.CanonicalSheafData k X n) where
   /-- A base-field-linear realization of `Ext^j(E,F)`. -/
-  extSpace : Coh X.toVariety.toScheme → Coh X.toVariety.toScheme → ℕ → ModuleCat.{u + 1} k
+  extSpace : Coh X → Coh X → ℕ → ModuleCat.{u + 1} k
   /-- Forgetting scalars recovers Mathlib's actual Ext group. -/
-  extComparison : ∀ (E F : Coh X.toVariety.toScheme) (j : ℕ),
+  extComparison : ∀ (E F : Coh X) (j : ℕ),
     (forget₂ (ModuleCat.{u + 1} k) AddCommGrpCat.{u + 1}).obj (extSpace E F j) ≅
       AddCommGrpCat.of (Abelian.Ext.{u + 1} E F j)
   /-- The Ext spaces are finite-dimensional. -/
-  extFinite : ∀ (E F : Coh X.toVariety.toScheme) (j : ℕ),
+  extFinite : ∀ (E F : Coh X) (j : ℕ),
     Module.Finite k (extSpace E F j)
   /-- The canonical twist `E ⊗ ω_X`, carried explicitly because the present sheaf API does not
   construct internal tensor with the dualizing sheaf. -/
-  canonicalTwist : Coh X.toVariety.toScheme → Coh X.toVariety.toScheme
+  canonicalTwist : Coh X → Coh X
   /-- **Perfect bilinear Serre duality** in every degree in the geometric range. -/
-  duality : ∀ (E F : Coh X.toVariety.toScheme) (i : ℕ), i ≤ n →
+  duality : ∀ (E F : Coh X) (i : ℕ), i ≤ n →
     Module.Dual k (extSpace E F i) ≃ₗ[k] extSpace F (canonicalTwist E) (n - i)
 
 namespace BilinearData
 
-variable {K : X.CanonicalSheafData n} (S : BilinearData K)
+variable {K : SmoothProperVariety.CanonicalSheafData k X n} (S : BilinearData K)
 
 /-- Perfection gives equality of complementary Ext dimensions. -/
-theorem finrank_eq (E F : Coh X.toVariety.toScheme) (i : ℕ) (hi : i ≤ n) :
+theorem finrank_eq (E F : Coh X) (i : ℕ) (hi : i ≤ n) :
     Module.finrank k (S.extSpace E F i) =
       Module.finrank k (S.extSpace F (S.canonicalTwist E) (n - i)) := by
   letI := S.extFinite E F i
@@ -136,14 +136,14 @@ about.  It is stated on the realization rather than on the sheaf because the twi
 carried as a function, not constructed. -/
 structure TrivialCanonical where
   /-- Twisting by the canonical bundle does not change the realized `Ext` spaces. -/
-  twistIso : ∀ (E F : Coh X.toVariety.toScheme) (j : ℕ),
+  twistIso : ∀ (E F : Coh X) (j : ℕ),
     S.extSpace F (S.canonicalTwist E) j ≃ₗ[k] S.extSpace F E j
 
 variable {S}
 
 /-- With trivial canonical bundle, duality is symmetric in the two arguments. -/
 theorem finrank_eq_of_trivialCanonical (T : S.TrivialCanonical)
-    (E F : Coh X.toVariety.toScheme) (i : ℕ) (hi : i ≤ n) :
+    (E F : Coh X) (i : ℕ) (hi : i ≤ n) :
     Module.finrank k (S.extSpace E F i) =
       Module.finrank k (S.extSpace F E (n - i)) := by
   letI := S.extFinite F (S.canonicalTwist E) (n - i)
@@ -153,7 +153,7 @@ theorem finrank_eq_of_trivialCanonical (T : S.TrivialCanonical)
 /-- **`Ext^n(E,E)` and `Hom(E,E)` have the same dimension** when the canonical bundle is trivial.
 This is the case Bridgeland's Lemma 5.1 uses, at `n = 2`. -/
 theorem finrank_top_eq_finrank_hom (T : S.TrivialCanonical)
-    (E : Coh X.toVariety.toScheme) :
+    (E : Coh X) :
     Module.finrank k (S.extSpace E E n) = Module.finrank k (S.extSpace E E 0) := by
   have h := finrank_eq_of_trivialCanonical T E E 0 (Nat.zero_le n)
   simpa using h.symm
@@ -161,7 +161,7 @@ theorem finrank_top_eq_finrank_hom (T : S.TrivialCanonical)
 variable (S)
 
 /-- The categorical Euler characteristic of a pair, from the realized `Ext` dimensions. -/
-def eulerChar (E F : Coh X.toVariety.toScheme) : ℤ :=
+def eulerChar (E F : Coh X) : ℤ :=
   ∑ i ∈ Finset.range (n + 1), (-1) ^ i * (Module.finrank k (S.extSpace E F i) : ℤ)
 
 variable {S}
@@ -171,7 +171,7 @@ variable {S}
 The two ends of the sum are equal by `finrank_top_eq_finrank_hom`, which is where duality
 enters. -/
 theorem surface_selfEuler_eq (hn : n = 2) (T : S.TrivialCanonical)
-    (E : Coh X.toVariety.toScheme) :
+    (E : Coh X) :
     S.eulerChar E E =
       2 * (Module.finrank k (S.extSpace E E 0) : ℤ) -
         (Module.finrank k (S.extSpace E E 1) : ℤ) := by
@@ -188,7 +188,7 @@ sheaf — simplicity — which is not in this repository, and the bilinear Riema
 identify this `eulerChar` with `NumericalVarietyData.chi₂`, which is supplied rather than proved
 in `EulerTransfer.lean`. -/
 theorem surface_selfEuler_le (hn : n = 2) (T : S.TrivialCanonical)
-    (E : Coh X.toVariety.toScheme) :
+    (E : Coh X) :
     S.eulerChar E E ≤ 2 * (Module.finrank k (S.extSpace E E 0) : ℤ) := by
   rw [surface_selfEuler_eq hn T E]
   have : (0 : ℤ) ≤ (Module.finrank k (S.extSpace E E 1) : ℤ) := Int.natCast_nonneg _

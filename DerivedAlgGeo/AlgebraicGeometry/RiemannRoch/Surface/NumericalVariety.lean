@@ -44,17 +44,17 @@ open AlgebraicGeometry.IntersectionTheory.Number
 open scoped BigOperators
 
 variable {k : Type u} [Field k]
-variable {X : Variety k}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
 noncomputable section
 
 /-! ## Reconstructed Chern characters on `K₀` -/
 
-variable {D : FiniteCohomology X}
+variable {D : FiniteCohomology k X}
 variable {C : D.LinearConnectingSystem}
 variable {A : Type v} [CommRing A] [Algebra ℚ A]
 variable {P : PairingContext D C 2 A}
-variable {O : Coh X.toScheme}
+variable {O : Coh X}
 variable (RO : P.ReconstructionData O)
 
 /- The surface `ReconstructionSystem` was the general one at `d = 2`, restated.
@@ -83,7 +83,7 @@ property of the selected geometric data. -/
 structure GeometricData.SatisfiesSheafHRR
     {R : ReconstructionSystem (P := P)} (G : GeometricData RO R) : Prop where
   /-- Geometric surface HRR for coherent sheaves. -/
-  eq : ∀ F : Coh X.toScheme,
+  eq : ∀ F : Coh X,
     (D.eulerCharacteristic F : ℚ) = P.ring.degree
       ((∑ i ∈ Finset.range 3,
           chernCharacterComponent RO (R.reconstruction F) i) *
@@ -95,7 +95,7 @@ variable {R : ReconstructionSystem (P := P)}
 
 /-- The total reconstructed Chern character as an additive homomorphism on `K₀`. -/
 noncomputable def totalChernCharacterHom (_G : GeometricData RO R) :
-    K₀Ab (Coh X.toScheme) →+ A :=
+    K₀Ab (Coh X) →+ A :=
   ∑ i ∈ Finset.range 3, R.chernCharacterHom RO i
 
 /-- The total geometric Todd class of the surface. -/
@@ -104,7 +104,7 @@ noncomputable def totalTodd (G : GeometricData RO R) : A :=
 
 /-- The right side of HRR, as an additive homomorphism on `K₀`. -/
 noncomputable def riemannRochHom (G : GeometricData RO R) :
-    K₀Ab (Coh X.toScheme) →+ ℚ where
+    K₀Ab (Coh X) →+ ℚ where
   toFun E := P.ring.degree
     (totalChernCharacterHom (RO := RO) G E * totalTodd (RO := RO) G)
   map_zero' := by simp [totalChernCharacterHom]
@@ -113,14 +113,14 @@ noncomputable def riemannRochHom (G : GeometricData RO R) :
 
 /-- Cast the cohomological Euler homomorphism from `ℤ` to `ℚ`. -/
 noncomputable def rationalEulerHom (_G : GeometricData RO R) :
-    K₀Ab (Coh X.toScheme) →+ ℚ where
+    K₀Ab (Coh X) →+ ℚ where
   toFun E := (D.grothendieckEulerHom C E : ℚ)
   map_zero' := by simp
   map_add' E F := by simp
 
 @[simp]
 theorem totalChernCharacterHom_class (G : GeometricData RO R)
-    (F : Coh X.toScheme) :
+    (F : Coh X) :
     totalChernCharacterHom (RO := RO) G (K₀Ab.of F) =
       ∑ i ∈ Finset.range 3,
         chernCharacterComponent RO (R.reconstruction F) i := by
@@ -128,7 +128,7 @@ theorem totalChernCharacterHom_class (G : GeometricData RO R)
 
 @[simp]
 theorem riemannRochHom_class (G : GeometricData RO R)
-    (F : Coh X.toScheme) :
+    (F : Coh X) :
     riemannRochHom (RO := RO) G (K₀Ab.of F) =
       P.ring.degree
         ((∑ i ∈ Finset.range 3,
@@ -138,7 +138,7 @@ theorem riemannRochHom_class (G : GeometricData RO R)
 
 @[simp]
 theorem rationalEulerHom_class (G : GeometricData RO R)
-    (F : Coh X.toScheme) :
+    (F : Coh X) :
     rationalEulerHom (RO := RO) G (K₀Ab.of F) =
       (D.eulerCharacteristic F : ℚ) := by
   simp [rationalEulerHom]
@@ -146,7 +146,7 @@ theorem rationalEulerHom_class (G : GeometricData RO R)
 /-- Geometric HRR descends from coherent sheaves to every virtual Grothendieck class. -/
 theorem hirzebruch_riemannRoch (G : GeometricData RO R)
     (hG : G.SatisfiesSheafHRR)
-    (E : K₀Ab (Coh X.toScheme)) :
+    (E : K₀Ab (Coh X)) :
     (D.grothendieckEulerHom C E : ℚ) = P.ring.degree
       ((∑ i ∈ Finset.range 3, R.chernCharacterHom RO i E) *
         (∑ j ∈ Finset.range 3, G.toddComponent j)) := by
@@ -163,7 +163,7 @@ theorem hirzebruch_riemannRoch (G : GeometricData RO R)
 `toNumericalVariety_satisfiesHRR`, proved by Grothendieck descent. -/
 @[reducible]
 noncomputable def toNumericalVariety (G : GeometricData RO R) :
-    NumericalVarietyData 2 A (K₀Ab (Coh X.toScheme)) where
+    NumericalVarietyData 2 A (K₀Ab (Coh X)) where
   ring := P.ring
   rank := R.rankHom
   chComp E i := R.chernCharacterHom RO i E
@@ -181,14 +181,14 @@ theorem toNumericalVariety_satisfiesHRR (G : GeometricData RO R)
   ⟨hirzebruch_riemannRoch (RO := RO) G hG⟩
 
 theorem toNumericalVariety_rank_class (G : GeometricData RO R)
-    (F : Coh X.toScheme) :
+    (F : Coh X) :
     G.toNumericalVariety.rank (K₀Ab.of F) =
       (R.reconstruction F).rank := by
   change R.rankHom (K₀Ab.of F) = (R.reconstruction F).rank
   exact R.rankHom_class F
 
 theorem toNumericalVariety_chComp_class (G : GeometricData RO R)
-    (F : Coh X.toScheme) (i : ℕ) :
+    (F : Coh X) (i : ℕ) :
     G.toNumericalVariety.chComp (K₀Ab.of F) i =
       chernCharacterComponent RO (R.reconstruction F) i := by
   change R.chernCharacterHom RO i (K₀Ab.of F) =
@@ -201,7 +201,7 @@ theorem toNumericalVariety_toddComp (G : GeometricData RO R) (i : ℕ) :
   rfl
 
 theorem toNumericalVariety_chi_class (G : GeometricData RO R)
-    (F : Coh X.toScheme) :
+    (F : Coh X) :
     G.toNumericalVariety.chi (K₀Ab.of F) =
       D.eulerCharacteristic F := by
   change D.grothendieckEulerHom C (K₀Ab.of F) =
@@ -212,7 +212,7 @@ theorem toNumericalVariety_chi_class (G : GeometricData RO R)
 rank/`ch₁`/`ch₂` expansion used to construct the presentation. -/
 theorem surface_chi_class_eq (G : GeometricData RO R)
     (hG : G.SatisfiesSheafHRR)
-    (F : Coh X.toScheme) :
+    (F : Coh X) :
     (D.eulerCharacteristic F : ℚ) =
       ((R.reconstruction F).rank : ℚ) *
           P.ring.degree (G.toddComponent 2) +
@@ -247,7 +247,7 @@ theorem k3_eulerCharacteristic_eq (G : GeometricData RO R)
     (hG : G.SatisfiesSheafHRR)
     (htoddOne : G.toddComponent 1 = 0)
     (htoddTwo : P.ring.degree (G.toddComponent 2) = 2)
-    (F : Coh X.toScheme) :
+    (F : Coh X) :
     (D.eulerCharacteristic F : ℚ) =
       2 * ((R.reconstruction F).rank : ℚ) +
         P.ring.degree
@@ -262,7 +262,7 @@ theorem k3_eulerCharacteristic_eq (G : GeometricData RO R)
 
 /-- The numerical class of a coherent sheaf: first its coherent-Grothendieck class, then the
 Euler-radical quotient fixed by Layer A. -/
-noncomputable def numericalClass (G : GeometricData RO R) (F : Coh X.toScheme) :
+noncomputable def numericalClass (G : GeometricData RO R) (F : Coh X) :
     NumericalVarietyData.NumericalQuotient G.toNumericalVariety :=
   Submodule.Quotient.mk (K₀Ab.of F)
 

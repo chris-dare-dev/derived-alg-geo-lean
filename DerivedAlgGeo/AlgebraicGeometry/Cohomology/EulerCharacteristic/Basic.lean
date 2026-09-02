@@ -44,29 +44,30 @@ namespace Cohomology
 
 variable {k : Type u} [Field k]
 
+variable (k) in
 /-- Finite-dimensional coherent cohomology together with eventual vanishing.
 
 The inherited data is exactly the linear comparison and degreewise finiteness output of #29.
 The two fields added here are the separate #30 boundedness input needed to make the Euler sum
 finite. -/
-structure FiniteCohomology (X : Variety k) extends FiniteDimensionalCohomology X where
+structure FiniteCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends FiniteDimensionalCohomology k X where
   /-- A sheaf-dependent bound above which its cohomology vanishes. -/
-  bound : Coh X.toScheme → ℕ
+  bound : Coh X → ℕ
   /-- Cohomology vanishes strictly above `bound F`. -/
-  vanishesAbove : ∀ (F : Coh X.toScheme) (i : ℕ), bound F < i →
+  vanishesAbove : ∀ (F : Coh X) (i : ℕ), bound F < i →
     Subsingleton ((moduleH i).obj F)
 
 namespace FiniteCohomology
 
-variable {X : Variety k}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
 /-- The coherent cohomology groups of `F`, regarded as a graded family of `k`-modules. -/
-abbrev gradedModule (D : FiniteCohomology X) (F : Coh X.toScheme) :
+abbrev gradedModule (D : FiniteCohomology k X) (F : Coh X) :
     GradedObject ℕ (ModuleCat.{u + 1} k) :=
   fun i ↦ (D.moduleH i).obj F
 
 /-- The dimension of degree-`i` coherent cohomology. -/
-noncomputable abbrev dimension (D : FiniteCohomology X) (F : Coh X.toScheme) (i : ℕ) : ℕ :=
+noncomputable abbrev dimension (D : FiniteCohomology k X) (F : Coh X) (i : ℕ) : ℕ :=
   D.toFiniteDimensionalCohomology.dimension F i
 
 /-- The sign supplied by the cochain-complex shape is the usual `(-1)ⁱ`. -/
@@ -75,11 +76,11 @@ theorem upNat_sign (i : ℕ) : ((ComplexShape.up ℕ).χ i : ℤ) = (-1 : ℤ) ^
   exact Units.val_pow_eq_pow_val (-1 : ℤˣ) i
 
 /-- The geometric Euler characteristic of a coherent sheaf. -/
-noncomputable def eulerCharacteristic (D : FiniteCohomology X) (F : Coh X.toScheme) : ℤ :=
+noncomputable def eulerCharacteristic (D : FiniteCohomology k X) (F : Coh X) : ℤ :=
   GradedObject.eulerChar (ComplexShape.up ℕ) (D.gradedModule F)
 
 /-- The finite-rank support of coherent cohomology lies below the supplied vanishing bound. -/
-theorem finrankSupport_subset_range (D : FiniteCohomology X) (F : Coh X.toScheme) :
+theorem finrankSupport_subset_range (D : FiniteCohomology k X) (F : Coh X) :
     GradedObject.finrankSupport (D.gradedModule F) ⊆
       (Finset.range (D.bound F + 1) : Set ℕ) := by
   intro i hi
@@ -93,7 +94,7 @@ theorem finrankSupport_subset_range (D : FiniteCohomology X) (F : Coh X.toScheme
 
 /-- The Euler characteristic is the ordinary finite alternating sum through any supplied
 vanishing bound. In particular, the `finsum` used by Mathlib has no junk value here. -/
-theorem eulerCharacteristic_eq_sum (D : FiniteCohomology X) (F : Coh X.toScheme) :
+theorem eulerCharacteristic_eq_sum (D : FiniteCohomology k X) (F : Coh X) :
     D.eulerCharacteristic F =
       ∑ i ∈ Finset.range (D.bound F + 1), (-1 : ℤ) ^ i * D.dimension F i := by
   simpa only [eulerCharacteristic, dimension, gradedModule, upNat_sign] using
@@ -103,8 +104,8 @@ theorem eulerCharacteristic_eq_sum (D : FiniteCohomology X) (F : Coh X.toScheme)
 
 /-- The Euler characteristic may be summed through any bound at least as large as the
 sheaf-dependent vanishing bound. -/
-theorem eulerCharacteristic_eq_sum_of_bound (D : FiniteCohomology X)
-    (F : Coh X.toScheme) (n : ℕ) (h : D.bound F ≤ n) :
+theorem eulerCharacteristic_eq_sum_of_bound (D : FiniteCohomology k X)
+    (F : Coh X) (n : ℕ) (h : D.bound F ≤ n) :
     D.eulerCharacteristic F =
       ∑ i ∈ Finset.range (n + 1), (-1 : ℤ) ^ i * D.dimension F i := by
   simpa only [eulerCharacteristic, dimension, gradedModule, upNat_sign] using
@@ -118,12 +119,12 @@ theorem eulerCharacteristic_eq_sum_of_bound (D : FiniteCohomology X)
           lt_of_lt_of_le hi_lt (Nat.add_le_add_right h 1))
 
 /-- Isomorphic coherent sheaves have equal cohomology dimensions in every degree. -/
-theorem dimension_iso (D : FiniteCohomology X) {F G : Coh X.toScheme} (e : F ≅ G) (i : ℕ) :
+theorem dimension_iso (D : FiniteCohomology k X) {F G : Coh X} (e : F ≅ G) (i : ℕ) :
     D.dimension F i = D.dimension G i :=
   D.toFiniteDimensionalCohomology.dimension_iso e i
 
 /-- The geometric Euler characteristic is invariant under isomorphism of coherent sheaves. -/
-theorem eulerCharacteristic_iso (D : FiniteCohomology X) {F G : Coh X.toScheme} (e : F ≅ G) :
+theorem eulerCharacteristic_iso (D : FiniteCohomology k X) {F G : Coh X} (e : F ≅ G) :
     D.eulerCharacteristic F = D.eulerCharacteristic G := by
   apply finsum_congr
   intro i

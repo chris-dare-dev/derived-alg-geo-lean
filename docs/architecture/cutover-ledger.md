@@ -345,17 +345,46 @@ blocks should normally move it rather than add more declarations beside it.
   `NumericalVarietyData.numericalZLattice` became the instance
   `instFiniteNumericalQuotient`, and freeness of the torsion-free quotient is
   Mathlib's `Module.free_of_finite_type_torsion_free'`.
+- The bundled variety types are retired (2026-09-02): `SchemeOverField`,
+  `Variety k`, `SmoothProperVariety k`, `ProjectiveVariety k`, `K3Surface`,
+  and `EnriquesSurface` were second carriers for objects Mathlib already has.
+  A variety is now `X : Scheme` with `[X.Over (Spec (CommRingCat.of k))]`,
+  whose structure morphism is `X ↘ Spec (CommRingCat.of k)`, and the
+  `Prop` classes `IsVariety k X` (integral, locally of finite type over `k`),
+  `IsSmoothProperVariety k X`, `Variety.IsProjective k X`,
+  `SmoothProperVariety.IsK3Surface k X C`, and
+  `SmoothProperVariety.IsEnriquesSurface k X C` state the properties, as
+  `IsProper` does for a morphism. The base field is an `outParam` so that
+  `Variety.isLocallyNoetherian`, whose conclusion mentions no `k`, is found
+  by instance search. Data that was reached through the bundle takes the
+  field explicitly: `FiniteCohomology k X`, `FiniteDimensionalCohomology k X`,
+  `LinearCohomology k X`, `SmoothProperVariety.CanonicalSheafData k X n`,
+  `NumericalData k X n A N`, `SurfaceChernCharacter k X`,
+  `ProjectivePresentation k X`, `EulerRealization k X V`, and the relative
+  differentials `Variety.relativeDifferentials k X` with their derivation and
+  descent API. Projective space carries `instOverProjectiveSpace`,
+  `isVariety_projectiveSpace`, and `isProjective_projectiveSpace` in place of
+  `projectiveSpaceVariety`; the point `Spec k` carries
+  `isSmoothProperVariety_point`. The `Variety` and `SmoothProperVariety`
+  namespaces remain as the homes of the API; they are no longer types.
+  Unbundling exposed hypotheses the bundle had hidden: the base-field scalar
+  action on coherent cohomology, the relative differentials with their
+  descent API, and the twisting sheaf on projective space need only the
+  structure morphism; additivity of derived coherent cohomology holds on any
+  scheme; the projective-space scalar files no longer assume a finite
+  nonempty index, which only the finiteness theorems use as `[Fintype ι]`;
+  and the two Euler-additivity exactness lemmas assume
+  `IsLocallyNoetherian X`, which is what they use.
 
 ## Confirmed next lanes
 
 Every path lane confirmed by the 2026-09-01 audit has landed.
 
-Confirmed type-level hazards, recorded for a separate lane because they are
-rewrites rather than moves: `AlgebraicGeometry/Variety/` bundles `Variety k`
-where Mathlib uses `Scheme` with `Over (Spec k)` and `Prop` classes; and
-`LinearAlgebra/AlternatingFinsum.lean` may overlap Mathlib's
-`Algebra/Homology/EulerCharacteristic.lean`. The `ZLattice` class was the
-third and is retired above (2026-09-02).
+One confirmed type-level hazard remains, recorded for a separate lane because
+it is a rewrite rather than a move: `LinearAlgebra/AlternatingFinsum.lean` may
+overlap Mathlib's `Algebra/Homology/EulerCharacteristic.lean`. The `ZLattice`
+class and the bundled variety types were the other two and are retired above
+(2026-09-02).
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and

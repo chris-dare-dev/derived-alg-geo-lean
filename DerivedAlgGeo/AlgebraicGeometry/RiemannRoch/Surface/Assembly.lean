@@ -36,12 +36,12 @@ open AlgebraicGeometry.IntersectionTheory.Snapper
 open AlgebraicGeometry.RiemannRoch.Surface.ToddData
 
 variable {k : Type u} [Field k]
-variable {X : SmoothProperVariety k}
-variable {D : FiniteCohomology X.toVariety}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]
+variable {D : FiniteCohomology k X}
 variable {C : D.LinearConnectingSystem}
 variable {A : Type v} [CommRing A] [Algebra ℚ A]
 variable {P : PairingContext D C 2 A}
-variable {K : SmoothProperVariety.CanonicalSheafData X 2}
+variable {K : SmoothProperVariety.CanonicalSheafData k X 2}
 
 noncomputable section
 
@@ -49,10 +49,10 @@ noncomputable section
 
 /-- The Picard Euler function in any reconstruction package takes the trivial class to the
 actual Euler characteristic of its coherent sheaf. -/
-theorem reconstruction_eulerPic_one {F : Coh X.toVariety.toScheme}
+theorem reconstruction_eulerPic_one {F : Coh X}
     (Q : P.ReconstructionData F) :
     Q.twists.eulerPic 1 = D.eulerCharacteristic F := by
-  let L : Fin 0 → Pic X.toVariety.toScheme := fun i ↦ Fin.elim0 i
+  let L : Fin 0 → Pic X := fun i ↦ Fin.elim0 i
   have h := Q.twists.realization 0 L (0 : Fin 0 → ℤ)
   rw [picardMonomial_zero] at h
   calc
@@ -60,14 +60,14 @@ theorem reconstruction_eulerPic_one {F : Coh X.toVariety.toScheme}
         D.eulerCharacteristic ((Q.twists.twistFamily 0 L).obj 0) := h
     _ = D.eulerCharacteristic F := by
       apply D.eulerCharacteristic_iso
-      apply ObjectProperty.isoMk (Scheme.coherent X.toVariety.toScheme)
+      apply ObjectProperty.isoMk (Scheme.coherent X)
       simpa [CoherentTwistFamily.obj, twistModules, twistModulesAlong] using
         (Iso.refl F.1)
 
 /-- The degree of the top reconstructed Todd-weighted component is the coherent Euler
 characteristic. -/
 theorem degree_tauComponent_two_eq_eulerCharacteristic
-    {F : Coh X.toVariety.toScheme} (Q : P.ReconstructionData F) :
+    {F : Coh X} (Q : P.ReconstructionData F) :
     P.ring.degree (Q.tauComponent 2) =
       (D.eulerCharacteristic F : ℚ) := by
   have h := Q.degree_tauComponent_mul_divisorProduct 2 (by omega) [] (by simp)
@@ -123,8 +123,8 @@ private theorem degree_surface_total
 constructed Todd components. -/
 theorem sheaf_hirzebruch_riemannRoch
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P))
-    (F : Coh X.toVariety.toScheme) :
+    (R : ReconstructionSystem (X := X) (P := P))
+    (F : Coh X) :
     (D.eulerCharacteristic F : ℚ) = P.ring.degree
       ((∑ i ∈ Finset.range 3,
           chernCharacterComponent T.structureData (R.reconstruction F) i) *
@@ -170,7 +170,7 @@ theorem sheaf_hirzebruch_riemannRoch
 supplies its separate HRR witness rather than adding proof data here. -/
 noncomputable def toGeometricData
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P)) :
+    (R : ReconstructionSystem (X := X) (P := P)) :
     GeometricData T.structureData R where
   toddComponent := ToddData.toddComponent T
   toddComponent_mem := ToddData.toddComponent_mem T
@@ -179,7 +179,7 @@ noncomputable def toGeometricData
 /-- The constructed geometric data satisfies sheaf-level HRR. -/
 theorem toGeometricData_satisfiesSheafHRR
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P)) :
+    (R : ReconstructionSystem (X := X) (P := P)) :
     (toGeometricData T R).SatisfiesSheafHRR :=
   ⟨sheaf_hirzebruch_riemannRoch T R⟩
 
@@ -188,14 +188,14 @@ data. -/
 @[reducible]
 noncomputable def toNumericalVariety
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P)) :
-    NumericalVarietyData 2 A (K₀Ab (Coh X.toVariety.toScheme)) :=
+    (R : ReconstructionSystem (X := X) (P := P)) :
+    NumericalVarietyData 2 A (K₀Ab (Coh X)) :=
   (toGeometricData T R).toNumericalVariety
 
 /-- The assembled numerical presentation satisfies HRR. -/
 theorem toNumericalVariety_satisfiesHRR
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P)) :
+    (R : ReconstructionSystem (X := X) (P := P)) :
     (toNumericalVariety T R).SatisfiesHRR :=
   GeometricData.toNumericalVariety_satisfiesHRR
     (RO := T.structureData) (toGeometricData T R)
@@ -208,8 +208,8 @@ an actually supplied two-term finite locally free resolution.  No resolution is 
 coherence. -/
 structure PerfectReconstructionComparison
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P))
-    (F : Coh X.toVariety.toScheme) where
+    (R : ReconstructionSystem (X := X) (P := P))
+    (F : Coh X) where
   resolution : Coh.TwoTermPerfectDeterminantData F
   rank_eq : (R.reconstruction F).rank = virtualRank resolution
   firstChern_eq : chernCharacterComponent T.structureData (R.reconstruction F) 1 =
@@ -218,8 +218,8 @@ structure PerfectReconstructionComparison
 /-- The reconstructed rank of an explicitly perfect coherent sheaf is its virtual rank. -/
 theorem perfect_rank_eq
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P))
-    (F : Coh X.toVariety.toScheme)
+    (R : ReconstructionSystem (X := X) (P := P))
+    (F : Coh X)
     (Q : PerfectReconstructionComparison T R F) :
     (R.reconstruction F).rank = virtualRank Q.resolution :=
   Q.rank_eq
@@ -235,8 +235,8 @@ theorem perfect_toddTwo_degree
 Todd-one pairing. -/
 theorem perfect_toddOne_degree
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P))
-    (F : Coh X.toVariety.toScheme)
+    (R : ReconstructionSystem (X := X) (P := P))
+    (F : Coh X)
     (Q : PerfectReconstructionComparison T R F) :
     P.ring.degree
       (chernCharacterComponent T.structureData (R.reconstruction F) 1 *
@@ -250,8 +250,8 @@ theorem perfect_toddOne_degree
 degree computed by its supplied two-term resolution. -/
 theorem perfect_chTwo_degree
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P))
-    (F : Coh X.toVariety.toScheme)
+    (R : ReconstructionSystem (X := X) (P := P))
+    (F : Coh X)
     (Q : PerfectReconstructionComparison T R F) :
     P.ring.degree
       (chernCharacterComponent T.structureData (R.reconstruction F) 2) =
@@ -272,8 +272,8 @@ theorem perfect_chTwo_degree
 rank/Todd/`ch₂` expansion supplied by geometric dévissage. -/
 theorem perfect_surface_expansion
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P))
-    (F : Coh X.toVariety.toScheme)
+    (R : ReconstructionSystem (X := X) (P := P))
+    (F : Coh X)
     (Q : PerfectReconstructionComparison T R F) :
     (D.eulerCharacteristic F : ℚ) =
       (virtualRank Q.resolution : ℚ) * (P.intersection.eulerPic 1 : ℚ) +
@@ -297,8 +297,8 @@ theorem perfect_surface_expansion
 rank/`c₁`/`c₂` formula for every explicitly perfect coherent sheaf. -/
 theorem perfect_chi_eq_classical
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P))
-    (F : Coh X.toVariety.toScheme)
+    (R : ReconstructionSystem (X := X) (P := P))
+    (F : Coh X)
     (Q : PerfectReconstructionComparison T R F) :
     (D.eulerCharacteristic F : ℚ) =
       (virtualRank Q.resolution : ℚ) * (P.intersection.eulerPic 1 : ℚ) +
@@ -317,7 +317,7 @@ theorem perfect_chi_eq_classical
 scheme-derived numerical surface. -/
 theorem toIsK3
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P))
+    (R : ReconstructionSystem (X := X) (P := P))
     (hK : K.canonicalClass = 1)
     (hchi : P.intersection.eulerPic 1 = 2) :
     K3.IsK3 (toNumericalVariety T R) := by
@@ -330,10 +330,10 @@ theorem toIsK3
 for every coherent sheaf. -/
 theorem k3_eulerCharacteristic_eq
     (T : ToddData.Data P K)
-    (R : ReconstructionSystem (X := X.toVariety) (P := P))
+    (R : ReconstructionSystem (X := X) (P := P))
     (hK : K.canonicalClass = 1)
     (hchi : P.intersection.eulerPic 1 = 2)
-    (F : Coh X.toVariety.toScheme) :
+    (F : Coh X) :
     (D.eulerCharacteristic F : ℚ) =
       2 * ((R.reconstruction F).rank : ℚ) +
         P.ring.degree

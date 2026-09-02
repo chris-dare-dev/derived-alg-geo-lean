@@ -10,9 +10,9 @@ import Mathlib.RingTheory.Smooth.StandardSmoothCotangent
 # Relative differentials of a variety over a field
 
 For a variety `X` over `k`, this file constructs the relative cotangent module sheaf
-`Variety.relativeDifferentials X`.  The structure morphism supplies a map from the constant
+`Variety.relativeDifferentials k X`.  The structure morphism supplies a map from the constant
 `k`-presheaf to the structure presheaf.  Objectwise Kähler differentials for this map form a
-presheaf of modules; sheafifying it gives an object of `X.toScheme.Modules`.
+presheaf of modules; sheafifying it gives an object of `X.Modules`.
 
 The resulting sheaf represents `k`-linear derivations into module sheaves: the declarations
 `relativeDifferentialsDesc_fac` and `relativeDifferentialsDesc_unique` are its factorization and
@@ -36,219 +36,219 @@ namespace AlgebraicGeometry
 
 namespace Variety
 
-variable {k : Type u} [Field k] (X : Variety k)
+variable (k : Type u) [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))]
 
 /-- The constant base-field presheaf on the opens of a variety. -/
-noncomputable def baseFieldPresheaf : X.toScheme.Opensᵒᵖ ⥤ CommRingCat.{u} :=
-  (Functor.const X.toScheme.Opensᵒᵖ).obj (CommRingCat.of k)
+noncomputable def baseFieldPresheaf : X.Opensᵒᵖ ⥤ CommRingCat.{u} :=
+  (Functor.const X.Opensᵒᵖ).obj (CommRingCat.of k)
 
 /-- The map from the base field to global functions induced by the structure morphism. -/
 noncomputable def baseFieldToGlobalSections :
-    k →+* Γ(X.toScheme, (⊤ : X.toScheme.Opens)) :=
+    k →+* Γ(X, (⊤ : X.Opens)) :=
   ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫
-    X.structureMorphism.appTop).hom
+    (X ↘ Spec (CommRingCat.of k)).appTop).hom
 
 /-- The structure morphism, presented as a map from the constant base-field presheaf to the
 structure presheaf of `X`. -/
 noncomputable def baseFieldToStructurePresheaf :
-    baseFieldPresheaf X ⟶ X.toScheme.presheaf where
-  app U := CommRingCat.ofHom (baseFieldToGlobalSections X) ≫
-    X.toScheme.presheaf.map
-      (homOfLE (show U.unop ≤ (⊤ : X.toScheme.Opens) from le_top)).op
+    baseFieldPresheaf k X ⟶ X.presheaf where
+  app U := CommRingCat.ofHom (baseFieldToGlobalSections k X) ≫
+    X.presheaf.map
+      (homOfLE (show U.unop ≤ (⊤ : X.Opens) from le_top)).op
   naturality := by
     intro U V f
-    let rU : Opposite.op (⊤ : X.toScheme.Opens) ⟶ U :=
-      (homOfLE (show U.unop ≤ (⊤ : X.toScheme.Opens) from le_top)).op
-    let rV : Opposite.op (⊤ : X.toScheme.Opens) ⟶ V :=
-      (homOfLE (show V.unop ≤ (⊤ : X.toScheme.Opens) from le_top)).op
+    let rU : Opposite.op (⊤ : X.Opens) ⟶ U :=
+      (homOfLE (show U.unop ≤ (⊤ : X.Opens) from le_top)).op
+    let rV : Opposite.op (⊤ : X.Opens) ⟶ V :=
+      (homOfLE (show V.unop ≤ (⊤ : X.Opens) from le_top)).op
     change 𝟙 (CommRingCat.of k) ≫
-        (CommRingCat.ofHom (baseFieldToGlobalSections X) ≫
-          X.toScheme.presheaf.map rV) =
-      (CommRingCat.ofHom (baseFieldToGlobalSections X) ≫
-          X.toScheme.presheaf.map rU) ≫ X.toScheme.presheaf.map f
-    rw [Category.id_comp, Category.assoc, ← X.toScheme.presheaf.map_comp]
+        (CommRingCat.ofHom (baseFieldToGlobalSections k X) ≫
+          X.presheaf.map rV) =
+      (CommRingCat.ofHom (baseFieldToGlobalSections k X) ≫
+          X.presheaf.map rU) ≫ X.presheaf.map f
+    rw [Category.id_comp, Category.assoc, ← X.presheaf.map_comp]
     rw [Subsingleton.elim rV (rU ≫ f)]
 
 /-- The presheaf whose value on `U` is the Kähler differential module of
 `k → Γ(U, 𝒪_X)`. -/
-noncomputable def relativeDifferentialsPresheaf : X.toScheme.PresheafOfModules :=
+noncomputable def relativeDifferentialsPresheaf : X.PresheafOfModules :=
   PresheafOfModules.DifferentialsConstruction.relativeDifferentials'
-    (baseFieldToStructurePresheaf X)
+    (baseFieldToStructurePresheaf k X)
 
 /-- The relative cotangent sheaf `Ω¹_{X/k}`, obtained by sheafifying the objectwise Kähler
 differential presheaf. -/
-noncomputable def relativeDifferentials : X.toScheme.Modules :=
-  (PresheafOfModules.sheafification (𝟙 X.toScheme.ringCatSheaf.obj)).obj
-    (relativeDifferentialsPresheaf X)
+noncomputable def relativeDifferentials : X.Modules :=
+  (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).obj
+    (relativeDifferentialsPresheaf k X)
 
 /-- The objectwise universal derivation into the relative-differentials presheaf. -/
 noncomputable def relativeDerivationPresheaf :
-    (relativeDifferentialsPresheaf X).Derivation'
-      (baseFieldToStructurePresheaf X) :=
+    (relativeDifferentialsPresheaf k X).Derivation'
+      (baseFieldToStructurePresheaf k X) :=
   PresheafOfModules.DifferentialsConstruction.derivation'
-    (baseFieldToStructurePresheaf X)
+    (baseFieldToStructurePresheaf k X)
 
 /-- The sheafification unit from the objectwise Kähler differential presheaf to the underlying
 presheaf of the relative cotangent sheaf. -/
 noncomputable def relativeDifferentialsSheafification :
-    relativeDifferentialsPresheaf X ⟶
-      (SheafOfModules.forget X.toScheme.ringCatSheaf).obj
-        (relativeDifferentials X) :=
+    relativeDifferentialsPresheaf k X ⟶
+      (SheafOfModules.forget X.ringCatSheaf).obj
+        (relativeDifferentials k X) :=
   (PresheafOfModules.sheafificationAdjunction
-    (𝟙 X.toScheme.ringCatSheaf.obj)).unit.app
-      (relativeDifferentialsPresheaf X)
+    (𝟙 X.ringCatSheaf.obj)).unit.app
+      (relativeDifferentialsPresheaf k X)
 
 /-- The universal `k`-linear derivation `𝒪_X → Ω¹_{X/k}`. -/
 noncomputable def relativeDerivation :
-    ((SheafOfModules.forget X.toScheme.ringCatSheaf).obj
-      (relativeDifferentials X)).Derivation'
-        (baseFieldToStructurePresheaf X) :=
-  (relativeDerivationPresheaf X).postcomp
-    (relativeDifferentialsSheafification X)
+    ((SheafOfModules.forget X.ringCatSheaf).obj
+      (relativeDifferentials k X)).Derivation'
+        (baseFieldToStructurePresheaf k X) :=
+  (relativeDerivationPresheaf k X).postcomp
+    (relativeDifferentialsSheafification k X)
 
 /-- A `k`-linear derivation from `𝒪_X` into a module sheaf descends to a morphism from
 `Ω¹_{X/k}`. -/
 noncomputable def relativeDifferentialsDesc
-    (M : X.toScheme.Modules)
-    (d : ((SheafOfModules.forget X.toScheme.ringCatSheaf).obj M).Derivation'
-      (baseFieldToStructurePresheaf X)) :
-    relativeDifferentials X ⟶ M :=
+    (M : X.Modules)
+    (d : ((SheafOfModules.forget X.ringCatSheaf).obj M).Derivation'
+      (baseFieldToStructurePresheaf k X)) :
+    relativeDifferentials k X ⟶ M :=
   ((PresheafOfModules.sheafificationAdjunction
-    (𝟙 X.toScheme.ringCatSheaf.obj)).homEquiv
-      (relativeDifferentialsPresheaf X) M).symm
+    (𝟙 X.ringCatSheaf.obj)).homEquiv
+      (relativeDifferentialsPresheaf k X) M).symm
     ((PresheafOfModules.DifferentialsConstruction.isUniversal'
-      (baseFieldToStructurePresheaf X)).desc d)
+      (baseFieldToStructurePresheaf k X)).desc d)
 
 /-- The morphism descended from a derivation factors the universal derivation as prescribed. -/
 theorem relativeDifferentialsDesc_fac
-    (M : X.toScheme.Modules)
-    (d : ((SheafOfModules.forget X.toScheme.ringCatSheaf).obj M).Derivation'
-      (baseFieldToStructurePresheaf X)) :
-    (relativeDerivation X).postcomp
-      ((SheafOfModules.forget X.toScheme.ringCatSheaf).map
-        (relativeDifferentialsDesc X M d)) = d := by
+    (M : X.Modules)
+    (d : ((SheafOfModules.forget X.ringCatSheaf).obj M).Derivation'
+      (baseFieldToStructurePresheaf k X)) :
+    (relativeDerivation k X).postcomp
+      ((SheafOfModules.forget X.ringCatSheaf).map
+        (relativeDifferentialsDesc k X M d)) = d := by
   let adj := PresheafOfModules.sheafificationAdjunction
-    (𝟙 X.toScheme.ringCatSheaf.obj)
+    (𝟙 X.ringCatSheaf.obj)
   let universal := PresheafOfModules.DifferentialsConstruction.isUniversal'
-    (baseFieldToStructurePresheaf X)
-  have hdesc : relativeDifferentialsSheafification X ≫
-      (SheafOfModules.forget X.toScheme.ringCatSheaf).map
-        (relativeDifferentialsDesc X M d) = universal.desc d := by
-    change (adj.homEquiv (relativeDifferentialsPresheaf X) M)
-        (relativeDifferentialsDesc X M d) = universal.desc d
+    (baseFieldToStructurePresheaf k X)
+  have hdesc : relativeDifferentialsSheafification k X ≫
+      (SheafOfModules.forget X.ringCatSheaf).map
+        (relativeDifferentialsDesc k X M d) = universal.desc d := by
+    change (adj.homEquiv (relativeDifferentialsPresheaf k X) M)
+        (relativeDifferentialsDesc k X M d) = universal.desc d
     exact Equiv.apply_symm_apply _ _
-  change ((relativeDerivationPresheaf X).postcomp
-      (relativeDifferentialsSheafification X)).postcomp
-        ((SheafOfModules.forget X.toScheme.ringCatSheaf).map
-          (relativeDifferentialsDesc X M d)) = d
+  change ((relativeDerivationPresheaf k X).postcomp
+      (relativeDifferentialsSheafification k X)).postcomp
+        ((SheafOfModules.forget X.ringCatSheaf).map
+          (relativeDifferentialsDesc k X M d)) = d
   ext U x
-  change (((relativeDifferentialsSheafification X ≫
-      (SheafOfModules.forget X.toScheme.ringCatSheaf).map
-        (relativeDifferentialsDesc X M d)).app U).hom
-          ((relativeDerivationPresheaf X).d x)) = d.d x
+  change (((relativeDifferentialsSheafification k X ≫
+      (SheafOfModules.forget X.ringCatSheaf).map
+        (relativeDifferentialsDesc k X M d)).app U).hom
+          ((relativeDerivationPresheaf k X).d x)) = d.d x
   rw [hdesc]
   exact PresheafOfModules.Derivation.congr_d (universal.fac d) x
 
 /-- The morphism descended from a derivation is unique. -/
 theorem relativeDifferentialsDesc_unique
-    (M : X.toScheme.Modules)
-    (d : ((SheafOfModules.forget X.toScheme.ringCatSheaf).obj M).Derivation'
-      (baseFieldToStructurePresheaf X))
-    (f : relativeDifferentials X ⟶ M)
-    (hf : (relativeDerivation X).postcomp
-      ((SheafOfModules.forget X.toScheme.ringCatSheaf).map f) = d) :
-    f = relativeDifferentialsDesc X M d := by
+    (M : X.Modules)
+    (d : ((SheafOfModules.forget X.ringCatSheaf).obj M).Derivation'
+      (baseFieldToStructurePresheaf k X))
+    (f : relativeDifferentials k X ⟶ M)
+    (hf : (relativeDerivation k X).postcomp
+      ((SheafOfModules.forget X.ringCatSheaf).map f) = d) :
+    f = relativeDifferentialsDesc k X M d := by
   let adj := PresheafOfModules.sheafificationAdjunction
-    (𝟙 X.toScheme.ringCatSheaf.obj)
+    (𝟙 X.ringCatSheaf.obj)
   let universal := PresheafOfModules.DifferentialsConstruction.isUniversal'
-    (baseFieldToStructurePresheaf X)
-  apply (adj.homEquiv (relativeDifferentialsPresheaf X) M).injective
+    (baseFieldToStructurePresheaf k X)
+  apply (adj.homEquiv (relativeDifferentialsPresheaf k X) M).injective
   apply universal.postcomp_injective
-  have hf' : (relativeDerivationPresheaf X).postcomp
-      ((adj.homEquiv (relativeDifferentialsPresheaf X) M) f) = d := by
+  have hf' : (relativeDerivationPresheaf k X).postcomp
+      ((adj.homEquiv (relativeDifferentialsPresheaf k X) M) f) = d := by
     rw [Adjunction.homEquiv_unit]
     ext U x
     exact PresheafOfModules.Derivation.congr_d hf x
   have hdesc :
-      (adj.homEquiv (relativeDifferentialsPresheaf X) M)
-          (relativeDifferentialsDesc X M d) = universal.desc d :=
+      (adj.homEquiv (relativeDifferentialsPresheaf k X) M)
+          (relativeDifferentialsDesc k X M d) = universal.desc d :=
     Equiv.apply_symm_apply _ _
   exact hf'.trans ((universal.fac d).symm.trans
-    (congrArg (relativeDerivationPresheaf X).postcomp hdesc.symm))
+    (congrArg (relativeDerivationPresheaf k X).postcomp hdesc.symm))
 
 /-- Morphisms from `Ω¹_{X/k}` are determined by their composites with the universal
 derivation. -/
 theorem relativeDifferentials_hom_ext
-    (M : X.toScheme.Modules) (f g : relativeDifferentials X ⟶ M)
-    (h : (relativeDerivation X).postcomp
-        ((SheafOfModules.forget X.toScheme.ringCatSheaf).map f) =
-      (relativeDerivation X).postcomp
-        ((SheafOfModules.forget X.toScheme.ringCatSheaf).map g)) :
+    (M : X.Modules) (f g : relativeDifferentials k X ⟶ M)
+    (h : (relativeDerivation k X).postcomp
+        ((SheafOfModules.forget X.ringCatSheaf).map f) =
+      (relativeDerivation k X).postcomp
+        ((SheafOfModules.forget X.ringCatSheaf).map g)) :
     f = g := by
-  let d := (relativeDerivation X).postcomp
-    ((SheafOfModules.forget X.toScheme.ringCatSheaf).map f)
-  rw [relativeDifferentialsDesc_unique X M d f rfl]
-  rw [relativeDifferentialsDesc_unique X M d g h.symm]
+  let d := (relativeDerivation k X).postcomp
+    ((SheafOfModules.forget X.ringCatSheaf).map f)
+  rw [relativeDifferentialsDesc_unique k X M d f rfl]
+  rw [relativeDifferentialsDesc_unique k X M d g h.symm]
 
 /-- Before sheafification, the relative differentials on an open are exactly the ordinary
 Kähler differential module of its ring of functions over `k`. -/
 @[simp]
-theorem relativeDifferentialsPresheaf_obj (U : X.toScheme.Opensᵒᵖ) :
-    (relativeDifferentialsPresheaf X).obj U =
+theorem relativeDifferentialsPresheaf_obj (U : X.Opensᵒᵖ) :
+    (relativeDifferentialsPresheaf k X).obj U =
       CommRingCat.KaehlerDifferential
-        ((baseFieldToStructurePresheaf X).app U) := rfl
+        ((baseFieldToStructurePresheaf k X).app U) := rfl
 
 /-- The presheaf universal derivation is objectwise the ordinary Kähler derivation. -/
 @[simp]
-theorem relativeDerivationPresheaf_d {U : X.toScheme.Opensᵒᵖ}
-    (x : X.toScheme.presheaf.obj U) :
-    (relativeDerivationPresheaf X).d x =
+theorem relativeDerivationPresheaf_d {U : X.Opensᵒᵖ}
+    (x : X.presheaf.obj U) :
+    (relativeDerivationPresheaf k X).d x =
       CommRingCat.KaehlerDifferential.d x := rfl
 
 /-- On a standard-smooth affine chart, the objectwise relative differential module is free. -/
 theorem relativeDifferentialsPresheaf_obj_free
-    (U : X.toScheme.Opensᵒᵖ) (n : ℕ)
-    (h : ((baseFieldToStructurePresheaf X).app U).hom.IsStandardSmoothOfRelativeDimension n) :
-    Module.Free (X.toScheme.presheaf.obj U)
+    (U : X.Opensᵒᵖ) (n : ℕ)
+    (h : ((baseFieldToStructurePresheaf k X).app U).hom.IsStandardSmoothOfRelativeDimension n) :
+    Module.Free (X.presheaf.obj U)
       (CommRingCat.KaehlerDifferential
-        ((baseFieldToStructurePresheaf X).app U)) := by
+        ((baseFieldToStructurePresheaf k X).app U)) := by
   unfold CommRingCat.KaehlerDifferential
-  letI : Algebra (X.baseFieldPresheaf.obj U) (X.toScheme.presheaf.obj U) :=
-    ((baseFieldToStructurePresheaf X).app U).hom.toAlgebra
+  letI : Algebra ((baseFieldPresheaf k X).obj U) (X.presheaf.obj U) :=
+    ((baseFieldToStructurePresheaf k X).app U).hom.toAlgebra
   letI : Algebra.IsStandardSmoothOfRelativeDimension n
-      (X.baseFieldPresheaf.obj U) (X.toScheme.presheaf.obj U) := h
-  letI : Algebra.IsStandardSmooth (X.baseFieldPresheaf.obj U)
-      (X.toScheme.presheaf.obj U) :=
+      ((baseFieldPresheaf k X).obj U) (X.presheaf.obj U) := h
+  letI : Algebra.IsStandardSmooth ((baseFieldPresheaf k X).obj U)
+      (X.presheaf.obj U) :=
     Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth n
-  change Module.Free (X.toScheme.presheaf.obj U)
-    (_root_.KaehlerDifferential (X.baseFieldPresheaf.obj U)
-      (X.toScheme.presheaf.obj U))
+  change Module.Free (X.presheaf.obj U)
+    (_root_.KaehlerDifferential ((baseFieldPresheaf k X).obj U)
+      (X.presheaf.obj U))
   exact Algebra.IsStandardSmooth.free_kaehlerDifferential
 
 /-- On a standard-smooth affine chart of relative dimension `n`, objectwise relative
 differentials have rank `n`. -/
 theorem relativeDifferentialsPresheaf_obj_rank
-    (U : X.toScheme.Opensᵒᵖ) (n : ℕ)
-    (h : ((baseFieldToStructurePresheaf X).app U).hom.IsStandardSmoothOfRelativeDimension n)
-    [Nontrivial (X.toScheme.presheaf.obj U)] :
-    Module.rank (X.toScheme.presheaf.obj U)
+    (U : X.Opensᵒᵖ) (n : ℕ)
+    (h : ((baseFieldToStructurePresheaf k X).app U).hom.IsStandardSmoothOfRelativeDimension n)
+    [Nontrivial (X.presheaf.obj U)] :
+    Module.rank (X.presheaf.obj U)
       (CommRingCat.KaehlerDifferential
-        ((baseFieldToStructurePresheaf X).app U)) = n := by
+        ((baseFieldToStructurePresheaf k X).app U)) = n := by
   unfold CommRingCat.KaehlerDifferential
-  letI : Algebra (X.baseFieldPresheaf.obj U) (X.toScheme.presheaf.obj U) :=
-    ((baseFieldToStructurePresheaf X).app U).hom.toAlgebra
+  letI : Algebra ((baseFieldPresheaf k X).obj U) (X.presheaf.obj U) :=
+    ((baseFieldToStructurePresheaf k X).app U).hom.toAlgebra
   letI : Algebra.IsStandardSmoothOfRelativeDimension n
-      (X.baseFieldPresheaf.obj U) (X.toScheme.presheaf.obj U) := h
-  change Module.rank (X.toScheme.presheaf.obj U)
-    (_root_.KaehlerDifferential (X.baseFieldPresheaf.obj U)
-      (X.toScheme.presheaf.obj U)) = n
+      ((baseFieldPresheaf k X).obj U) (X.presheaf.obj U) := h
+  change Module.rank (X.presheaf.obj U)
+    (_root_.KaehlerDifferential ((baseFieldPresheaf k X).obj U)
+      (X.presheaf.obj U)) = n
   exact Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential n
 
 end Variety
 
 namespace SmoothProperVariety
 
-variable {k : Type u} [Field k] {X : SmoothProperVariety k} {n : ℕ}
+variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}
 
 namespace CanonicalSheafData
 
@@ -258,25 +258,26 @@ This low-level constructor retains explicit determinant data for callers with a 
 trivialization. The companion `Canonical.Descent` module provides the automatic constructor
 `ofSmoothRelativeDifferentials` from the smooth pure-dimension certificate alone. -/
 noncomputable def ofRelativeDifferentials
-    (hSmooth : SmoothOfRelativeDimension n X.toVariety.structureMorphism)
+    (hSmooth : SmoothOfRelativeDimension n (X ↘ Spec (CommRingCat.of k)))
     (D : Scheme.Modules.DeterminantData
-      (Variety.relativeDifferentials X.toVariety))
-    (hrank : D.rank = n) : CanonicalSheafData X n where
+      (Variety.relativeDifferentials k X))
+    (hrank : D.rank = n) : CanonicalSheafData k X n where
   smoothOfRelativeDimension := hSmooth
-  cotangent := Variety.relativeDifferentials X.toVariety
+  cotangent := Variety.relativeDifferentials k X
   cotangentDeterminant := D
   cotangent_rank := hrank
 
+omit [IsSmoothProperVariety k X] in
 /-- The cotangent field of `ofRelativeDifferentials` is the constructed relative cotangent
 sheaf. -/
 @[simp]
 theorem ofRelativeDifferentials_cotangent
-    (hSmooth : SmoothOfRelativeDimension n X.toVariety.structureMorphism)
+    (hSmooth : SmoothOfRelativeDimension n (X ↘ Spec (CommRingCat.of k)))
     (D : Scheme.Modules.DeterminantData
-      (Variety.relativeDifferentials X.toVariety))
+      (Variety.relativeDifferentials k X))
     (hrank : D.rank = n) :
     (ofRelativeDifferentials hSmooth D hrank).cotangent =
-      Variety.relativeDifferentials X.toVariety := rfl
+      Variety.relativeDifferentials k X := rfl
 
 end CanonicalSheafData
 

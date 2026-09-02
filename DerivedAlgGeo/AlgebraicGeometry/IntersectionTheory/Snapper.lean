@@ -38,54 +38,54 @@ open AlgebraicGeometry.Scheme.Modules
 open NumericalPolynomial
 
 variable {k : Type u} [Field k]
-variable {X : Variety k}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
 noncomputable section
 
 /-! ## Integer powers in the Picard group -/
 
 /-- The `n`th tensor power of a line-bundle class, including negative powers. -/
-def picardPower (L : Pic X.toScheme) (n : ℤ) : Pic X.toScheme :=
+def picardPower (L : Pic X) (n : ℤ) : Pic X :=
   L ^ n
 
 @[simp]
-theorem picardPower_zero (L : Pic X.toScheme) : picardPower L 0 = 1 := by
+theorem picardPower_zero (L : Pic X) : picardPower L 0 = 1 := by
   simp [picardPower]
 
 @[simp]
-theorem picardPower_add (L : Pic X.toScheme) (m n : ℤ) :
+theorem picardPower_add (L : Pic X) (m n : ℤ) :
     picardPower L (m + n) = picardPower L m * picardPower L n := by
   exact zpow_add L m n
 
 @[simp]
-theorem picardPower_neg (L : Pic X.toScheme) (n : ℤ) :
+theorem picardPower_neg (L : Pic X) (n : ℤ) :
     picardPower L (-n) = (picardPower L n)⁻¹ := by
   simp [picardPower]
 
 /-- A chosen invertible-sheaf representative of the integer Picard power `L ^ n`. -/
-noncomputable def linePower (L : Pic X.toScheme) (n : ℤ) : X.toScheme.Modules :=
-  ((CategoryTheory.fromSkeleton (InvertibleSheaf X.toScheme)).obj
-    (((picardPower L n : Pic X.toScheme) : PicardClass X.toScheme))).1
+noncomputable def linePower (L : Pic X) (n : ℤ) : X.Modules :=
+  ((CategoryTheory.fromSkeleton (InvertibleSheaf X)).obj
+    (((picardPower L n : Pic X) : PicardClass X))).1
 
-noncomputable instance linePower_isInvertible (L : Pic X.toScheme) (n : ℤ) :
+noncomputable instance linePower_isInvertible (L : Pic X) (n : ℤ) :
     SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.toScheme.ringCatSheaf from linePower L n) :=
-  ((CategoryTheory.fromSkeleton (InvertibleSheaf X.toScheme)).obj
-    (((picardPower L n : Pic X.toScheme) : PicardClass X.toScheme))).2
+      (show SheafOfModules X.ringCatSheaf from linePower L n) :=
+  ((CategoryTheory.fromSkeleton (InvertibleSheaf X)).obj
+    (((picardPower L n : Pic X) : PicardClass X))).2
 
 /-- The chosen representative has exactly the requested Picard class. -/
 @[simp]
-theorem linePower_picardClass (L : Pic X.toScheme) (n : ℤ) :
+theorem linePower_picardClass (L : Pic X) (n : ℤ) :
     PicardClass.mk (linePower L n) =
-      ((picardPower L n : Pic X.toScheme) : PicardClass X.toScheme) := by
+      ((picardPower L n : Pic X) : PicardClass X) := by
   exact CategoryTheory.toSkeleton_fromSkeleton_obj _
 
 /-! ## Multivariable twists -/
 
 /-- Tensor a module sheaf successively by the integer powers indexed by a list. -/
 noncomputable def twistModulesAlong {ι : Type v} :
-    List ι → (ι → Pic X.toScheme) → NumericalPolynomial.Lattice ι → X.toScheme.Modules →
-      X.toScheme.Modules
+    List ι → (ι → Pic X) → NumericalPolynomial.Lattice ι → X.Modules →
+      X.Modules
   | [], _, _, F => F
   | i :: indices, L, n, F =>
       tensorObj (linePower (L i) (n i)) (twistModulesAlong indices L n F)
@@ -93,14 +93,14 @@ noncomputable def twistModulesAlong {ι : Type v} :
 /-- The simultaneous line-bundle twist.  The list order is fixed by `Finset.univ.toList`; the
 Picard group records that different tensor orders are canonically isomorphic. -/
 noncomputable def twistModules {ι : Type v} [Fintype ι] [DecidableEq ι]
-    (L : ι → Pic X.toScheme) (n : NumericalPolynomial.Lattice ι) (F : X.toScheme.Modules) :
-    X.toScheme.Modules :=
+    (L : ι → Pic X) (n : NumericalPolynomial.Lattice ι) (F : X.Modules) :
+    X.Modules :=
   twistModulesAlong Finset.univ.toList L n F
 
 /-- Twisting carries an isomorphism of the underlying module sheaves through every tensor
 factor. -/
 noncomputable def twistModulesAlongMapIso {ι : Type v} (indices : List ι)
-    (L : ι → Pic X.toScheme) (n : NumericalPolynomial.Lattice ι) {F G : X.toScheme.Modules}
+    (L : ι → Pic X) (n : NumericalPolynomial.Lattice ι) {F G : X.Modules}
     (e : F ≅ G) :
     twistModulesAlong indices L n F ≅ twistModulesAlong indices L n G := by
   induction indices with
@@ -110,32 +110,32 @@ noncomputable def twistModulesAlongMapIso {ι : Type v} (indices : List ι)
 
 /-- Simultaneous twisting is functorial on isomorphisms. -/
 noncomputable def twistModulesMapIso {ι : Type v} [Fintype ι] [DecidableEq ι]
-    (L : ι → Pic X.toScheme) (n : NumericalPolynomial.Lattice ι) {F G : X.toScheme.Modules}
+    (L : ι → Pic X) (n : NumericalPolynomial.Lattice ι) {F G : X.Modules}
     (e : F ≅ G) : twistModules L n F ≅ twistModules L n G :=
   twistModulesAlongMapIso Finset.univ.toList L n e
 
 /-- Coherence of every integer twist.  This field isolates the current missing closure theorem
 for tensoring a finitely presented module sheaf by an invertible sheaf. -/
 structure CoherentTwistFamily {ι : Type v} [Fintype ι] [DecidableEq ι]
-    (F : Coh X.toScheme) (L : ι → Pic X.toScheme) where
+    (F : Coh X) (L : ι → Pic X) where
   coherent : ∀ n : NumericalPolynomial.Lattice ι,
-    Scheme.Modules.IsCoherent X.toScheme (twistModules L n F.1)
+    Scheme.Modules.IsCoherent X (twistModules L n F.1)
 
 namespace CoherentTwistFamily
 
 variable {ι : Type v} [Fintype ι] [DecidableEq ι]
-variable {F : Coh X.toScheme} {L : ι → Pic X.toScheme}
+variable {F : Coh X} {L : ι → Pic X}
 
 /-- The coherent sheaf represented by the twist at exponent `n`. -/
 noncomputable def obj (T : CoherentTwistFamily F L)
-    (n : NumericalPolynomial.Lattice ι) : Coh X.toScheme :=
+    (n : NumericalPolynomial.Lattice ι) : Coh X :=
   ⟨twistModules L n F.1, T.coherent n⟩
 
 end CoherentTwistFamily
 
 /-- Euler characteristic as a function on the full integer exponent lattice. -/
 noncomputable def eulerFunction {ι : Type v} [Fintype ι] [DecidableEq ι]
-    (D : FiniteCohomology X) {F : Coh X.toScheme} {L : ι → Pic X.toScheme}
+    (D : FiniteCohomology k X) {F : Coh X} {L : ι → Pic X}
     (T : CoherentTwistFamily F L) : NumericalFunction ι :=
   fun n ↦ D.eulerCharacteristic (T.obj n)
 
@@ -151,14 +151,14 @@ is exhibited by a short exact sequence
 
 After `d + 1` cuts the descended sheaf is zero. -/
 structure GeometricInduction {ι : Type v} [Fintype ι] [DecidableEq ι]
-    (D : FiniteCohomology X) {F : Coh X.toScheme} {L : ι → Pic X.toScheme}
+    (D : FiniteCohomology k X) {F : Coh X} {L : ι → Pic X}
     (T : CoherentTwistFamily F L) (d : ℕ) where
   descended : List (NumericalPolynomial.Lattice ι) →
-    NumericalPolynomial.Lattice ι → Coh X.toScheme
+    NumericalPolynomial.Lattice ι → Coh X
   baseIso : ∀ n, descended [] n ≅ T.obj n
   step : ∀ (_directions : List (NumericalPolynomial.Lattice ι))
     (_v : NumericalPolynomial.Lattice ι) (_n : NumericalPolynomial.Lattice ι),
-    ShortComplex (Coh X.toScheme)
+    ShortComplex (Coh X)
   stepShortExact : ∀ directions v n, (step directions v n).ShortExact
   stepX₁ : ∀ directions v n, (step directions v n).X₁ ≅ descended directions n
   stepX₂ : ∀ directions v n, (step directions v n).X₂ ≅ descended directions (n + v)
@@ -171,7 +171,7 @@ structure GeometricInduction {ι : Type v} [Fintype ι] [DecidableEq ι]
 namespace GeometricInduction
 
 variable {ι : Type v} [Fintype ι] [DecidableEq ι]
-variable {D : FiniteCohomology X} {F : Coh X.toScheme} {L : ι → Pic X.toScheme}
+variable {D : FiniteCohomology k X} {F : Coh X} {L : ι → Pic X}
 variable {T : CoherentTwistFamily F L} {d : ℕ}
 
 /-- Euler characteristic of the family after a list of geometric cuts. -/
@@ -209,11 +209,11 @@ end GeometricInduction
 
 /-- The zero coherent sheaf has Euler characteristic zero, using the same global choice of
 linear connecting maps required for all Euler-additivity arguments. -/
-theorem eulerCharacteristic_isZero (D : FiniteCohomology X)
-    (C : D.LinearConnectingSystem) {F : Coh X.toScheme} (hF : IsZero F) :
+theorem eulerCharacteristic_isZero (D : FiniteCohomology k X)
+    (C : D.LinearConnectingSystem) {F : Coh X} (hF : IsZero F) :
     D.eulerCharacteristic F = 0 := by
-  let S : ShortComplex (Coh X.toScheme) :=
-    ShortComplex.mk (0 : (0 : Coh X.toScheme) ⟶ 0) (0 : (0 : Coh X.toScheme) ⟶ 0)
+  let S : ShortComplex (Coh X) :=
+    ShortComplex.mk (0 : (0 : Coh X) ⟶ 0) (0 : (0 : Coh X) ⟶ 0)
       zero_comp
   have hS : S.ShortExact := by
     apply ShortComplex.ShortExact.mk'
@@ -221,18 +221,18 @@ theorem eulerCharacteristic_isZero (D : FiniteCohomology X)
     · exact (isZero_zero _).mono _
     · exact (isZero_zero _).epi _
   have hadd := D.eulerCharacteristic_additive (C S hS)
-  have hzero : D.eulerCharacteristic (0 : Coh X.toScheme) = 0 := by
-    change D.eulerCharacteristic (0 : Coh X.toScheme) =
-      D.eulerCharacteristic (0 : Coh X.toScheme) +
-        D.eulerCharacteristic (0 : Coh X.toScheme) at hadd
+  have hzero : D.eulerCharacteristic (0 : Coh X) = 0 := by
+    change D.eulerCharacteristic (0 : Coh X) =
+      D.eulerCharacteristic (0 : Coh X) +
+        D.eulerCharacteristic (0 : Coh X) at hadd
     omega
   exact (D.eulerCharacteristic_iso (hF.isoZero)).trans hzero
 
 /-- **Snapper polynomiality.**  Euler characteristics of simultaneous integer line-bundle twists
 have total finite-difference degree at most `d`. -/
 theorem snapper {ι : Type v} [Fintype ι] [DecidableEq ι]
-    (D : FiniteCohomology X) (C : D.LinearConnectingSystem)
-    {F : Coh X.toScheme} {L : ι → Pic X.toScheme} (T : CoherentTwistFamily F L) (d : ℕ)
+    (D : FiniteCohomology k X) (C : D.LinearConnectingSystem)
+    {F : Coh X} {L : ι → Pic X} (T : CoherentTwistFamily F L) (d : ℕ)
     (I : GeometricInduction D T d) : DegreeLE d (eulerFunction D T) := by
   intro directions hlength
   rw [I.mixedDifference_eulerFunction]
@@ -241,7 +241,7 @@ theorem snapper {ι : Type v} [Fintype ι] [DecidableEq ι]
 
 /-- The mixed-difference form needed by later intersection-theoretic constructions. -/
 theorem mixedDifference_eq_euler_descended {ι : Type v} [Fintype ι] [DecidableEq ι]
-    {D : FiniteCohomology X} {F : Coh X.toScheme} {L : ι → Pic X.toScheme}
+    {D : FiniteCohomology k X} {F : Coh X} {L : ι → Pic X}
     {T : CoherentTwistFamily F L} {d : ℕ} (I : GeometricInduction D T d)
     (directions : List (NumericalPolynomial.Lattice ι))
     (n : NumericalPolynomial.Lattice ι) :
@@ -251,7 +251,7 @@ theorem mixedDifference_eq_euler_descended {ι : Type v} [Fintype ι] [Decidable
 
 /-- A Newton coefficient is the Euler characteristic of the descended sheaf at the origin. -/
 theorem coefficient_eq_euler_descended {ι : Type v} [Fintype ι] [DecidableEq ι]
-    {D : FiniteCohomology X} {F : Coh X.toScheme} {L : ι → Pic X.toScheme}
+    {D : FiniteCohomology k X} {F : Coh X} {L : ι → Pic X}
     {T : CoherentTwistFamily F L} {d : ℕ} (I : GeometricInduction D T d)
     (directions : List (NumericalPolynomial.Lattice ι)) :
     coefficient directions (eulerFunction D T) =
@@ -262,35 +262,35 @@ theorem coefficient_eq_euler_descended {ι : Type v} [Fintype ι] [DecidableEq �
 
 /-- Euler-twist functions are invariant under isomorphism of the coherent base sheaf. -/
 theorem eulerFunction_eq_of_coherentSheafIso {ι : Type v} [Fintype ι] [DecidableEq ι]
-    (D : FiniteCohomology X) {F G : Coh X.toScheme} (e : F ≅ G)
-    {L : ι → Pic X.toScheme} (TF : CoherentTwistFamily F L)
+    (D : FiniteCohomology k X) {F G : Coh X} (e : F ≅ G)
+    {L : ι → Pic X} (TF : CoherentTwistFamily F L)
     (TG : CoherentTwistFamily G L) : eulerFunction D TF = eulerFunction D TG := by
   funext n
   apply D.eulerCharacteristic_iso
-  exact ObjectProperty.isoMk (Scheme.coherent X.toScheme)
-    (twistModulesMapIso L n ((Coh.ι X.toScheme).mapIso e))
+  exact ObjectProperty.isoMk (Scheme.coherent X)
+    (twistModulesMapIso L n ((Coh.ι X).mapIso e))
 
 /-- Equality in `Pic X` is precisely line-bundle isomorphism class equality, so pointwise equal
 Picard classes give the same Euler-twist function. -/
 theorem eulerFunction_eq_of_lineBundleIso {ι : Type v} [Fintype ι] [DecidableEq ι]
-    (D : FiniteCohomology X) {F : Coh X.toScheme}
-    {L M : ι → Pic X.toScheme} (h : ∀ i, L i = M i)
+    (D : FiniteCohomology k X) {F : Coh X}
+    {L M : ι → Pic X} (h : ∀ i, L i = M i)
     (TL : CoherentTwistFamily F L) (TM : CoherentTwistFamily F M) :
     eulerFunction D TL = eulerFunction D TM := by
   have hLM : L = M := funext h
   subst M
   funext n
   apply D.eulerCharacteristic_iso
-  exact ObjectProperty.isoMk (Scheme.coherent X.toScheme) (Iso.refl _)
+  exact ObjectProperty.isoMk (Scheme.coherent X) (Iso.refl _)
 
 /-- The ordinary one-variable Euler function attached to powers of one Picard class. -/
-noncomputable def oneVariableEulerFunction (D : FiniteCohomology X)
-    {F : Coh X.toScheme} (L : Pic X.toScheme)
+noncomputable def oneVariableEulerFunction (D : FiniteCohomology k X)
+    {F : Coh X} (L : Pic X)
     (T : CoherentTwistFamily F (fun _ : Fin 1 ↦ L)) : ℤ → ℤ :=
   fun n ↦ eulerFunction D T (oneVariablePoint n)
 
-theorem oneVariable_eulerFunction (D : FiniteCohomology X)
-    {F : Coh X.toScheme} (L : Pic X.toScheme)
+theorem oneVariable_eulerFunction (D : FiniteCohomology k X)
+    {F : Coh X} (L : Pic X)
     (T : CoherentTwistFamily F (fun _ : Fin 1 ↦ L)) :
     oneVariable (oneVariableEulerFunction D L T) = eulerFunction D T := by
   funext n
@@ -300,8 +300,8 @@ theorem oneVariable_eulerFunction (D : FiniteCohomology X)
   rfl
 
 /-- One-variable specialization: the `(d + 1)`st ordinary forward difference vanishes. -/
-theorem oneVariable_fwdDiff_euler_vanishes (D : FiniteCohomology X)
-    (C : D.LinearConnectingSystem) {F : Coh X.toScheme} (L : Pic X.toScheme)
+theorem oneVariable_fwdDiff_euler_vanishes (D : FiniteCohomology k X)
+    (C : D.LinearConnectingSystem) {F : Coh X} (L : Pic X)
     (T : CoherentTwistFamily F (fun _ : Fin 1 ↦ L)) (d : ℕ)
     (I : GeometricInduction D T d) :
     (fwdDiff (1 : ℤ))^[d + 1] (oneVariableEulerFunction D L T) = 0 := by

@@ -29,10 +29,6 @@ open AlgebraicGeometry
 #print axioms AlgebraicGeometry.Variety.IsProjective
 #print axioms AlgebraicGeometry.Variety.IsProjective.ofPresentation
 #print axioms AlgebraicGeometry.Variety.isProper_of_isProjective
-#print axioms AlgebraicGeometry.ProjectiveVariety
-#print axioms AlgebraicGeometry.ProjectiveVariety.toVariety
-#print axioms AlgebraicGeometry.ProjectiveVariety.instIsProjective
-#print axioms AlgebraicGeometry.ProjectiveVariety.ofPresentation
 
 -- The presentation's fields and elaborator artifacts. Listed rather than left to the ceiling:
 -- the fields *are* the trust boundary here — `embedding`, `isClosedImmersion` and `overBase` are

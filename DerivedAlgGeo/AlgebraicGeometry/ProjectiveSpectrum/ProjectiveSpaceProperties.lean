@@ -10,7 +10,7 @@ import Mathlib.AlgebraicGeometry.Noetherian
 /-!
 # Polynomial projective space is locally Noetherian, and is its own projective presentation
 
-`Proj/ProjectiveSpaceVariety.lean` exhibits `Pⁿ = Proj k[Xᵢ]` as a `Variety k` and `O(d)` as an
+`Proj/ProjectiveSpaceVariety.lean` exhibits `Pⁿ = Proj k[Xᵢ]` as a variety over `k` and `O(d)` as an
 object of `Coh Pⁿ`. Those are the only geometric objects this repository constructs, and until
 now nothing said that `Pⁿ` satisfies the two adjectives every consumer of a variety asks for.
 This file supplies both.
@@ -44,13 +44,13 @@ transport.
 
 The two grading spellings are *not* content: `MvPolynomial.polynomialGrading` is an `abbrev` for
 `MvPolynomial.homogeneousSubmodule`, so `projectiveSpace ι k` and
-`(projectiveSpaceVariety ι k).toScheme` are the same term and the identity typechecks between
+`Proj (polynomialGrading ι k)` are the same term and the identity typechecks between
 them without an `eqToHom`.
 
 ## What this file does not do
 
 * **It proves nothing about smoothness.** `SmoothProperVariety` and every K3 statement need
-  `Smooth (structureMorphism)`, which needs the relative cotangent complex of `Proj`; none of that
+  `Smooth (Pⁿ ↘ Spec k)`, which needs the relative cotangent complex of `Proj`; none of that
   is at the pin, and nothing here approaches it.
 * **It exhibits no new sheaf.** The consequences unlocked here are categorical — `Coh Pⁿ` is
   abelian, `Pⁿ` is projective hence proper — and the objects available on `Pⁿ` are still exactly
@@ -65,7 +65,7 @@ them without an `eqToHom`.
 * `homogeneousZeroRingEquiv_toRingHom_eq_algebraMap` — the two maps onto the degree-zero part
   agree.
 * `projectiveSpaceSelfPresentation` — `Pⁿ` presented in itself by the identity.
-* `isProjective_projectiveSpaceVariety` — `Pⁿ` is a projective variety.
+* `isProjective_projectiveSpace` — `Pⁿ` is projective over `k`.
 -/
 
 universe u
@@ -89,15 +89,6 @@ instance isLocallyNoetherian_projectiveSpace [Finite ι] :
     IsLocallyNoetherian (Proj (polynomialGrading ι k)) :=
   LocallyOfFiniteType.isLocallyNoetherian (projectiveSpaceToSpec ι k)
 
-/-- The same statement in the `Variety` spelling.
-
-`projectiveSpaceVariety` is a plain definition rather than an `abbrev`, so instance search will
-not unfold it; without this restatement the instance above does not fire for callers that hold a
-`Variety k`. In particular it is this form that makes `Coh (projectiveSpaceVariety ι k).toScheme`
-abelian. -/
-instance isLocallyNoetherian_projectiveSpaceVariety [Finite ι] [Nonempty ι] :
-    IsLocallyNoetherian (projectiveSpaceVariety ι k).toScheme :=
-  inferInstanceAs (IsLocallyNoetherian (Proj (polynomialGrading ι k)))
 
 /-! ## The identity presentation -/
 
@@ -112,10 +103,11 @@ theorem homogeneousZeroRingEquiv_toRingHom_eq_algebraMap :
   ext r
   rfl
 
-/-- The two lanes build the same structure morphism `Pⁿ ⟶ Spec k`. -/
-theorem projectiveSpaceToSpec_eq [Finite ι] [Nonempty ι] :
+/-- The two lanes build the same structure morphism `Pⁿ ⟶ Spec k`: the one the variety
+layer's `projectiveSpace` carries and the one the `Scheme.Over` instance on `Proj` records. -/
+theorem projectiveSpaceToSpec_eq :
     _root_.AlgebraicGeometry.projectiveSpaceToSpec ι k
-      = (projectiveSpaceVariety ι k).structureMorphism := by
+      = Proj (polynomialGrading ι k) ↘ Spec (CommRingCat.of k) := by
   show Proj.toSpecZero _ ≫
       Spec.map (CommRingCat.ofHom
         (_root_.AlgebraicGeometry.homogeneousZeroRingEquiv ι k).toRingHom)
@@ -123,19 +115,20 @@ theorem projectiveSpaceToSpec_eq [Finite ι] [Nonempty ι] :
       Spec.map (CommRingCat.ofHom (algebraMap k ↥(polynomialGrading ι k 0)))
   rw [homogeneousZeroRingEquiv_toRingHom_eq_algebraMap]
 
-/-- The identity, read as a map from `Pⁿ` as a variety into `Pⁿ` as an ambient projective space.
+/-- The identity, read as a map from `Pⁿ` as the Proj lane spells it into `Pⁿ` as the variety
+layer's ambient projective space.
 
 No `eqToHom` appears because there is no equation to transport along: the source and target are
 the same term, `polynomialGrading` being an `abbrev` for `MvPolynomial.homogeneousSubmodule`. -/
-noncomputable def projectiveSpaceSelfEmbedding [Finite ι] [Nonempty ι] :
-    (projectiveSpaceVariety ι k).toScheme ⟶ _root_.AlgebraicGeometry.projectiveSpace ι k :=
+noncomputable def projectiveSpaceSelfEmbedding :
+    Proj (polynomialGrading ι k) ⟶ _root_.AlgebraicGeometry.projectiveSpace ι k :=
   𝟙 (_root_.AlgebraicGeometry.projectiveSpace ι k)
 
 /-- The identity is a closed immersion.
 
 Stated rather than synthesized for the same reason as the Noetherian restatement above: instance
 search does not unfold `projectiveSpaceSelfEmbedding` to see the identity. -/
-instance projectiveSpaceSelfEmbedding_isClosedImmersion [Finite ι] [Nonempty ι] :
+instance projectiveSpaceSelfEmbedding_isClosedImmersion :
     IsClosedImmersion (projectiveSpaceSelfEmbedding ι k) :=
   inferInstanceAs (IsClosedImmersion (𝟙 (_root_.AlgebraicGeometry.projectiveSpace ι k)))
 
@@ -143,21 +136,21 @@ instance projectiveSpaceSelfEmbedding_isClosedImmersion [Finite ι] [Nonempty ι
 
 The ambient space of the presentation is `Pⁿ` itself and the embedding is the identity; the
 `overBase` field is `projectiveSpaceToSpec_eq` after cancelling that identity. -/
-noncomputable def projectiveSpaceSelfPresentation [Finite ι] [Nonempty ι] :
-    ProjectivePresentation (projectiveSpaceVariety ι k) where
+noncomputable def projectiveSpaceSelfPresentation [Finite ι] :
+    ProjectivePresentation k (Proj (polynomialGrading ι k)) where
   index := ι
   embedding := projectiveSpaceSelfEmbedding ι k
   overBase :=
     (Category.id_comp (_root_.AlgebraicGeometry.projectiveSpaceToSpec ι k)).trans
       (projectiveSpaceToSpec_eq ι k)
 
-/-- **Polynomial projective space is a projective variety.**
+/-- **Polynomial projective space is projective over the base field.**
 
 With this instance `Pⁿ` meets the hypothesis that `Variety.IsProjective` states, and properness
 of its structure morphism follows through `ProjectivePresentation.isProper_structureMorphism`
 rather than through a separate appeal to `Proj.toSpecZero`. -/
-instance isProjective_projectiveSpaceVariety [Finite ι] [Nonempty ι] :
-    (projectiveSpaceVariety ι k).IsProjective :=
+instance isProjective_projectiveSpace [Finite ι] :
+    Variety.IsProjective k (Proj (polynomialGrading ι k)) :=
   Variety.IsProjective.ofPresentation (projectiveSpaceSelfPresentation ι k)
 
 end AlgebraicGeometry.Proj

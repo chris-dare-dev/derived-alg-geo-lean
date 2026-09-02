@@ -253,11 +253,11 @@ noncomputable example := MvPolynomial.polynomialVariableCechTerm
 
 /-- The exact output boundary for #29: a functorial linear lift of derived cohomology together
 with degreewise finite-dimensionality, but no #30 vanishing bound. -/
-example {k : Type u} [Field k] (X : Variety k) := FiniteDimensionalCohomology X
+example {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] := FiniteDimensionalCohomology k X
 
 /-- The functorial linear lift itself is now canonical; #29 only still owes the geometric
 degreewise finite-dimensionality proof. -/
-noncomputable example {k : Type u} [Field k] (X : Variety k) :=
+noncomputable example {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] :=
   canonicalLinearCohomology X
 
 /-- Properness of `Proj` over its degree-zero part — the one piece of the classical

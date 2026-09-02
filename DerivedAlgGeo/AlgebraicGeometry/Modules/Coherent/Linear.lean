@@ -130,7 +130,7 @@ end Scheme
 
 namespace Variety
 
-variable {k : Type u} [Field k] (Y : Variety k)
+variable {k : Type u} [Field k] (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] [IsVariety k Y]
 
 /-- Morphisms of module sheaves on a variety form a `k`-module, by precomposing
 with multiplication by the corresponding global function.
@@ -139,7 +139,7 @@ Precomposition rather than postcomposition is an arbitrary choice;
 `varietyScalarAction_naturality` says the two agree, and `comp_smul` below is
 where that is spent. -/
 @[reducible]
-noncomputable def homModule (M N : Y.toScheme.Modules) : Module k (M ⟶ N) where
+noncomputable def homModule (M N : Y.Modules) : Module k (M ⟶ N) where
   smul r f := varietyScalarAction Y M r ≫ f
   one_smul f := by
     show varietyScalarAction Y M 1 ≫ f = f
@@ -172,7 +172,7 @@ noncomputable def homModule (M N : Y.toScheme.Modules) : Module k (M ⟶ N) wher
 says the action may be moved across a morphism, which is
 `varietyScalarAction_naturality`, itself `globalSectionSmul_naturality` — the
 statement that multiplication by a global function is central. -/
-noncomputable instance modulesLinear : Linear k Y.toScheme.Modules where
+noncomputable instance modulesLinear : Linear k Y.Modules where
   homModule M N := homModule Y M N
   smul_comp M N P r f g := by
     show (varietyScalarAction Y M r ≫ f) ≫ g = varietyScalarAction Y M r ≫ f ≫ g
@@ -181,9 +181,10 @@ noncomputable instance modulesLinear : Linear k Y.toScheme.Modules where
     show f ≫ varietyScalarAction Y N r ≫ g = varietyScalarAction Y M r ≫ f ≫ g
     rw [← Category.assoc, ← varietyScalarAction_naturality Y f r, Category.assoc]
 
+omit [IsVariety k Y] in
 /-- The scalar action, unfolded. This is the computation rule for everything
 above; `Linear k` alone says a `k`-module structure exists but not which one. -/
-theorem smul_eq_action_comp {M N : Y.toScheme.Modules} (r : k) (f : M ⟶ N) :
+theorem smul_eq_action_comp {M N : Y.Modules} (r : k) (f : M ⟶ N) :
     r • f = varietyScalarAction Y M r ≫ f :=
   rfl
 
@@ -193,8 +194,8 @@ the ambient module sheaves as a full subcategory.
 Declared rather than inferred because `Coh` is a `def`, so instance search does
 not see the `FullSubcategory` underneath it; the `Preadditive` and `Abelian`
 instances next door are stated the same way. -/
-noncomputable instance cohLinear : Linear k (Coh Y.toScheme) :=
-  inferInstanceAs (Linear k (Scheme.coherent Y.toScheme).FullSubcategory)
+noncomputable instance cohLinear : Linear k (Coh Y) :=
+  inferInstanceAs (Linear k (Scheme.coherent Y).FullSubcategory)
 
 /-! ### Propagation to the derived category
 
@@ -209,12 +210,12 @@ not interchangeable and what keeps them pinned. -/
 /-- Regression test for #662, in the shape that found it: search must reach
 `cohLinear` from a `Preadditive` argument that arrived via `Abelian`. -/
 noncomputable example :
-    @Linear k _ (Coh Y.toScheme) _ (Coh.abelian Y.toScheme).toPreadditive :=
+    @Linear k _ (Coh Y) _ (Coh.abelian Y).toPreadditive :=
   inferInstance
 
 /-- The derived category of coherent sheaves on a variety is `k`-linear. -/
 noncomputable instance derivedLinear :
-    Linear k (DerivedCategory (Coh Y.toScheme)) :=
+    Linear k (DerivedCategory (Coh Y)) :=
   inferInstance
 
 end Variety

@@ -57,9 +57,20 @@ either conditional on the same class (transport along a construction, as in
 `IsExactPullback` and `IsTriangleAdditive`) or specialized to a single named
 object (`𝟭 C` for the t-exactness classes, `free PUnit` and `unit R` for
 `IsInvertible`, `Cdg A` for `IsPretriangulated`, `P.of` for `IsAdditive`,
-`ProjectiveVariety` for `IsProjective`). None is discharged unconditionally
-for every inhabitant of its base type. `HasPhaseTruncations` was the only
-instance of the pattern.
+`Proj (polynomialGrading ι k)` for `Variety.IsProjective`). None is discharged
+unconditionally for every inhabitant of its base type. `HasPhaseTruncations`
+was the only instance of the pattern.
+
+The variety classes introduced when the bundled `Variety k` was retired
+(2026-09-02) follow the same rule. `IsVariety k X`, `IsSmoothProperVariety k X`,
+`Variety.IsProjective k X`, `SmoothProperVariety.IsK3Surface k X C`, and
+`SmoothProperVariety.IsEnriquesSurface k X C` are `Prop` classes on
+`X : Scheme` with `[X.Over (Spec (CommRingCat.of k))]`; their unconditional
+instances are for named objects only, `Proj (polynomialGrading ι k)` and the
+point `Spec (CommRingCat.of k)`, and every other instance is a parent
+projection or is conditional on a class of the same family. The base field is
+an `outParam` so that a conclusion mentioning no `k`, such as
+`IsLocallyNoetherian X`, can still be found from the variety instance in scope.
 
 ## Promoting a private helper to enable a module split
 

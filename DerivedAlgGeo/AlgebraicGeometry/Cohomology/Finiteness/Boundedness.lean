@@ -311,19 +311,19 @@ theorem coherent_H_subsingleton_of_cohomologicalBound
 
 namespace FiniteDimensionalCohomology
 
-variable {k : Type u} [Field k] {Y : Variety k}
+variable {k : Type u} [Field k] {Y : Scheme.{u}} [Y.Over (Spec (CommRingCat.of k))] [IsVariety k Y]
 
 /-- Add the independent finite-affine-cover vanishing theorem to degreewise finite-dimensional
 cohomology.  This is the constructor which turns the output of #29 into the `FiniteCohomology`
 package consumed by Euler characteristics. -/
-noncomputable def toFiniteCohomology (D : FiniteDimensionalCohomology Y)
-    [IsNoetherian Y.toScheme]
-    [IsAffineHom (pullback.diagonal (terminal.from Y.toScheme))] : FiniteCohomology Y where
+noncomputable def toFiniteCohomology (D : FiniteDimensionalCohomology k Y)
+    [IsNoetherian Y]
+    [IsAffineHom (pullback.diagonal (terminal.from Y))] : FiniteCohomology k Y where
   toFiniteDimensionalCohomology := D
-  bound := fun _ ↦ cohomologicalBound Y.toScheme
+  bound := fun _ ↦ cohomologicalBound Y
   vanishesAbove := by
     intro F i hi
-    have hH : Subsingleton ((coherentH Y.toScheme i).obj F) :=
+    have hH : Subsingleton ((coherentH Y i).obj F) :=
       coherent_H_subsingleton_of_cohomologicalBound F i hi
     let e := (D.comparison i).app F
     exact ⟨fun x y ↦

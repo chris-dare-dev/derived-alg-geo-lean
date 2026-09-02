@@ -715,10 +715,6 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Proj.basicOpen_polynomialVariableCechDenominator
 
 -- The geometric source has one over-scheme object and proof-irrelevant adjective layers.
-#print axioms SchemeOverField
-#print axioms SchemeOverField.IsVariety
-#print axioms Variety
-#print axioms SmoothProperVariety
 #print axioms ChernClassData.chernCharacterFour
 #print axioms ChernClassData.toddFour
 #print axioms ChernClassData.chernCharacterComponent
@@ -821,6 +817,22 @@ is not closed. -/
 #print axioms Variety.relativeDifferentialsDeterminantData
 #print axioms SmoothProperVariety.finiteCohomology
 #print axioms SmoothProperVariety.point
+#print axioms IsVariety
+#print axioms IsVariety.toIsIntegral
+#print axioms IsVariety.toLocallyOfFiniteType
+#print axioms IsSmoothProperVariety
+#print axioms IsSmoothProperVariety.toIsVariety
+#print axioms IsSmoothProperVariety.toSmooth
+#print axioms IsSmoothProperVariety.toIsProper
+#print axioms IsSmoothProperVariety.toIsSeparated
+#print axioms IsSmoothProperVariety.toUniversallyClosed
+#print axioms Variety.isLocallyNoetherian
+#print axioms Variety.isNoetherian_of_isProper
+#print axioms Variety.isSeparated_of_isProper
+#print axioms SmoothProperVariety.instOverPoint
+#print axioms SmoothProperVariety.isSmoothProperVariety_point
+#print axioms AlgebraicGeometry.K3Surface.isProjective
+#print axioms AlgebraicGeometry.EnriquesSurface.isProjective
 #print axioms SmoothProperVariety.CanonicalSheafData
 #print axioms SmoothProperVariety.CanonicalSheafData.ofRelativeDifferentials
 #print axioms SmoothProperVariety.CanonicalSheafData.ofRelativeDifferentials_cotangent
@@ -904,6 +916,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.twistIso
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.mk.inj
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.Duality.Serre.instHasExtCoh
 #print axioms Cohomology.FiniteCohomology
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic
 #print axioms Cohomology.FiniteCohomology.finrankSupport_subset_range
@@ -2070,17 +2083,6 @@ docstring in `DerivedAlgGeo/AlgebraicGeometry/Surface/K3.lean`. -/
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsK3Surface.h1_vanishing
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsK3Surface.canonicalSheaf_iso
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsK3Surface.antiCanonicalClass_eq_one
-#print axioms AlgebraicGeometry.K3Surface
-#print axioms AlgebraicGeometry.K3Surface.toSmoothProperVariety
-#print axioms AlgebraicGeometry.K3Surface.canonical
-#print axioms AlgebraicGeometry.K3Surface.isK3
-#print axioms AlgebraicGeometry.K3Surface.mk.inj
-#print axioms AlgebraicGeometry.K3Surface.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.K3Surface.toVariety
-#print axioms AlgebraicGeometry.K3Surface.toScheme
-#print axioms AlgebraicGeometry.K3Surface.instIsProjective
-#print axioms AlgebraicGeometry.K3Surface.canonicalSheaf_iso
-#print axioms AlgebraicGeometry.K3Surface.h1_vanishing
 
 /-! ## Enriques surfaces
 
@@ -2099,18 +2101,6 @@ cover. See the module docstring in
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalSheaf_not_iso_unit
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.antiCanonicalClass_eq_canonicalClass
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.not_isK3Surface
-#print axioms AlgebraicGeometry.EnriquesSurface
-#print axioms AlgebraicGeometry.EnriquesSurface.toSmoothProperVariety
-#print axioms AlgebraicGeometry.EnriquesSurface.canonical
-#print axioms AlgebraicGeometry.EnriquesSurface.isEnriques
-#print axioms AlgebraicGeometry.EnriquesSurface.mk.inj
-#print axioms AlgebraicGeometry.EnriquesSurface.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.EnriquesSurface.toVariety
-#print axioms AlgebraicGeometry.EnriquesSurface.toScheme
-#print axioms AlgebraicGeometry.EnriquesSurface.instIsProjective
-#print axioms AlgebraicGeometry.EnriquesSurface.canonicalSheaf_tensor_self_iso_unit
-#print axioms AlgebraicGeometry.EnriquesSurface.canonicalSheaf_not_iso_unit
-#print axioms AlgebraicGeometry.EnriquesSurface.h1_vanishing
 
 /-! ## The base field acts: module sheaves and `Coh` are `k`-linear
 

@@ -36,7 +36,7 @@ sends such a cocycle to its cohomology class, and the two halves are:
 `cechCohomologyFunctor` takes its space as an *implicit* argument, and `cechCohomologyModule`
 supplies the module instance at whatever spelling its `U` was elaborated with. Writing the chart
 family as `polynomialVariableChart ι k` fixes that space to `ProjectiveSpectrum.top _`, while the
-finiteness interface asks for `Y.toScheme`; the two are definitionally equal, so the instance is
+finiteness interface asks for `Y`; the two are definitionally equal, so the instance is
 inhabited, and *not* reducibly so, so instance search never finds it. `intChart` and
 `intTwistModules` are the same objects presented at the variety, and they exist only to make the
 one instance search meets be the one that is there. This is the transparency rule of
@@ -65,7 +65,7 @@ namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k] [Finite ι] [Nonempty ι]
+variable (ι k : Type u) [Field k]
 
 theorem intCechCochainsDegreewiseAddEquiv_symm_smul (d : ℤ) (n : ℕ) (r : k)
     (s : polynomialVariableIntCechCochains ι k d n) :
@@ -78,7 +78,6 @@ theorem intCechCochainsDegreewiseAddEquiv_symm_smul (d : ℤ) (n : ℕ) (r : k)
     AddEquiv.apply_symm_apply]
 
 set_option maxHeartbeats 400000 in
-omit [Finite ι] [Nonempty ι] in
 /-- The abstract cocycle condition, read as the explicit alternating sum. -/
 theorem intCech_d_apply_eq_zero_iff (d : ℤ) (n : ℕ)
     (t : ((intCechComplexOfTwist ι k d).X n : AddCommGrpCat)) :
@@ -332,30 +331,30 @@ theorem intCechBlockClass_surjective [Fintype ι] (d : ℤ) (n : ℕ) :
 /-- The twist `O(d)` as a sheaf of modules on projective space *as a variety*.
 
 The type ascription is the point: `associatedSheaf` lands in `(Proj 𝒜).Modules`, and the finiteness
-interface asks for `Y.toScheme.Modules`. Those are the same by `projectiveSpaceVariety_toScheme`,
+interface asks for `Y.Modules`. Those are the same term,
 but only the second spelling lets `cechCohomologyModule`'s instance be found. -/
 noncomputable abbrev intTwistModules (d : ℤ) :
-    (projectiveSpaceVariety ι k).toScheme.Modules :=
+    (Proj (polynomialGrading ι k)).Modules :=
   associatedSheaf (polynomialGrading ι k) (intShift (polynomialGrading ι k) d)
 
 /-- The variable charts, typed as opens of the *variety*.
 
 Same ascription trick as `intTwistModules`: `cechCohomologyFunctor` takes its space as an implicit
-argument, so the chart family has to be presented at `Y.toScheme` for the module instance
+argument, so the chart family has to be presented at `Y` for the module instance
 `cechCohomologyModule` supplies to be the one instance search meets. -/
-noncomputable abbrev intChart : ι → Opens (projectiveSpaceVariety ι k).toScheme :=
+noncomputable abbrev intChart : ι → Opens (Proj (polynomialGrading ι k)) :=
   polynomialVariableChart ι k
 
 set_option maxHeartbeats 1000000 in
 /-- **The class map, as a `k`-linear map into Čech cohomology.** -/
 noncomputable def intCechBlockClassLinear (d : ℤ) (n : ℕ) :
-    letI := Cohomology.cechCohomologyModule (projectiveSpaceVariety ι k)
+    letI := Cohomology.cechCohomologyModule k (Proj (polynomialGrading ι k))
       (intTwistModules ι k d) (intChart ι k) (n + 1)
     ↥(intCechBlockCocycles ι k d (n + 1)) →ₗ[k]
       ((Cohomology.cechCohomologyFunctor (intChart ι k) (n + 1)).obj
         ((_root_.AlgebraicGeometry.Scheme.Modules.toSheaf
-          (projectiveSpaceVariety ι k).toScheme).obj (intTwistModules ι k d))) :=
-  letI := Cohomology.cechCohomologyModule (projectiveSpaceVariety ι k)
+          (Proj (polynomialGrading ι k))).obj (intTwistModules ι k d))) :=
+  letI := Cohomology.cechCohomologyModule k (Proj (polynomialGrading ι k))
     (intTwistModules ι k d) (intChart ι k) (n + 1)
   { toFun := fun b => ConcreteCategory.hom (intCechBlockClass ι k d (n + 1)) b
     map_add' := fun a b => map_add _ a b
@@ -370,13 +369,13 @@ noncomputable def intCechBlockClassLinear (d : ℤ) (n : ℕ) :
 set_option maxHeartbeats 1000000 in
 /-- **`Hⁿ⁺¹` of an integer twist is finite-dimensional, on the Čech side.** -/
 theorem module_finite_cechCohomology_intTwist [Fintype ι] (d : ℤ) (n : ℕ) :
-    letI := Cohomology.cechCohomologyModule (projectiveSpaceVariety ι k)
+    letI := Cohomology.cechCohomologyModule k (Proj (polynomialGrading ι k))
       (intTwistModules ι k d) (intChart ι k) (n + 1)
     Module.Finite k
       ((Cohomology.cechCohomologyFunctor (intChart ι k) (n + 1)).obj
         ((_root_.AlgebraicGeometry.Scheme.Modules.toSheaf
-          (projectiveSpaceVariety ι k).toScheme).obj (intTwistModules ι k d))) :=
-  letI := Cohomology.cechCohomologyModule (projectiveSpaceVariety ι k)
+          (Proj (polynomialGrading ι k))).obj (intTwistModules ι k d))) :=
+  letI := Cohomology.cechCohomologyModule k (Proj (polynomialGrading ι k))
     (intTwistModules ι k d) (intChart ι k) (n + 1)
   Module.Finite.of_surjective (intCechBlockClassLinear ι k d n)
     (intCechBlockClass_surjective ι k d n)
@@ -393,9 +392,9 @@ The injective resolution is chosen rather than supplied: the site of opens is sm
 `HasExt.standard _`, which is the reconciliation `module_finite_linearCoherentH_of_cech`'s
 docstring describes. -/
 theorem module_finite_linearCoherentH_projectiveSpaceTwist [Fintype ι] (d : ℤ) (n : ℕ) :
-    Module.Finite k ((Cohomology.linearCoherentH (projectiveSpaceVariety ι k) (n + 1)).obj
+    Module.Finite k ((Cohomology.linearCoherentH k (Proj (polynomialGrading ι k)) (n + 1)).obj
       (projectiveSpaceTwist ι k d)) :=
-  Cohomology.module_finite_linearCoherentH_of_cech (projectiveSpaceVariety ι k)
+  Cohomology.module_finite_linearCoherentH_of_cech (Proj (polynomialGrading ι k))
     (projectiveSpaceTwist ι k d) (intChart ι k)
     (CategoryTheory.Sheaf.canonicalInjectiveResolution _)
     (polynomialVariableIntShift_isCechAcyclicCover ι k d (hExt := HasExt.standard _))
