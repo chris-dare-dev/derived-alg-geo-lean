@@ -31,8 +31,8 @@ brief: |
   #1028 completes exceptionality (#989), the semiorthogonal sequence, and its
   residual component (#990), closing the foundations milestone.
 
-  The second milestone starts the paper-content layer. PR work tracked by
-  #1029 combines the categorical Serre core (#894/#895) with half-integral
+  The second milestone starts the paper-content layer. PR #1030, tracked by
+  #1029, combines the categorical Serre core (#894/#895) with half-integral
   Enriques categories, the spherical and pseudoprojective object profiles,
   and exact supplied classification interfaces for both papers. Mutation,
   projection, candidate Ext computations, and equivalence transport remain
@@ -81,6 +81,7 @@ generations:
   - { rev: 3, at: "2026-09-02", note: "Combined #989/#990 implementation in progress: line bundles are packaged canonically in Dᵇ(Coh Y); explicit ExtComparison and H² inputs reduce each bundle to the generic IsExceptional predicate; supplied pairwise witnesses build the Fin 10 exceptional collection; and the generic residual helper defines the triangulated right orthogonal and its neutral full subcategory without fullness or admissibility claims." }
   - { rev: 4, at: "2026-09-02", note: "PR #1028 passed the full Windows build, axiom audits, declaration completeness, architecture gates, contracts, and emitter reproducibility. #989 and #990 are closed completed, milestone #43 is closed, and the roadmap records the residual only under its neutral formal name; the Torelli theorem itself remains future work." }
   - { rev: 5, at: "2026-09-02", note: "Paper-content milestone #44 and issue #1029 registered. One PR combines #894/#895 with the generic Serre and Enriques roots, the exact spherical and pseudoprojective profiles, supplied Paper I Proposition 4.10 / Paper II Theorem 2.7 classification data, and their Enriques residual-category specialization. The PR does not claim the missing mutation, projection, Ext-computation, Serre-transport, or geometric-realization theorems." }
+  - { rev: 6, at: "2026-09-02", note: "PR #1030 passed the full Windows build, all three axiom audits, declaration completeness, environment linters, architecture gates, the no-sorry check, contracts, and emitter reproducibility in run 33672165307. #894, #895, and #1029 are closed completed and milestone #44 is closed. #896--#899 remain open for uniqueness, equivalence, transport/shift coherence, and the geometric realization." }
 items:
   - id: enriques-torelli-m1
     gh_milestone: 43
@@ -188,7 +189,7 @@ items:
     gh_milestone: 44
     kind: milestone
     title: "ENQ2 — Serre and paper object interfaces"
-    status: in_progress
+    status: done
     lane: now
     acceptance:
       - "The categorical Serre root and half-integral Enriques-category refinement are registered without geometry imports."
@@ -202,9 +203,9 @@ items:
     kind: epic
     parent: enriques-torelli-m2
     title: "Serre and Enriques categories; spherical and pseudoprojective classification interfaces"
-    status: in_progress
+    status: done
     priority: must
     size: L
-    summary: "One PR with #894/#895: define Serre and Enriques category roots, the papers' spherical and pseudoprojective object profiles, generic supplied classification structures, and their degree-three specialization to the landed Enriques residual category. Mutation/projection, candidate Ext computations, Serre conjugation, geometric realization, and Paper II's equivalence obstruction remain explicit future work."
+    summary: "PR #1030 with #894/#895: Serre and Enriques category roots, the papers' spherical and pseudoprojective object profiles, generic supplied classification structures, and their degree-three specialization to the landed Enriques residual category. Full Windows verification passed in run 33672165307. Mutation/projection, candidate Ext computations, Serre conjugation, geometric realization, and Paper II's equivalence obstruction remain explicit future work."
     tags: [enriques, serre-functor, spherical-object, pseudoprojective-object]
     labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
