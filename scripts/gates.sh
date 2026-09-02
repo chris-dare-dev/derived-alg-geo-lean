@@ -225,6 +225,7 @@ if [ "$MODE" != "fast" ]; then
   gate source-independence python3 scripts/check_source_independence.py
   gate subject-layering python3 scripts/check_layering.py
   gate umbrella-coverage python3 scripts/check_umbrella_coverage.py
+  gate root-reachability python3 scripts/check_root_reachability.py
   gate coherent-families python3 scripts/check_coherent_families.py
   gate coverage-map python3 scripts/check_coverage_map.py
   gate audit-complete audit_complete

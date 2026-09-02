@@ -536,6 +536,12 @@ jobs:
       - name: Subject ownership layering
         run: python3 scripts/check_layering.py
 
+      - name: Umbrella coverage
+        run: python3 scripts/check_umbrella_coverage.py
+
+      - name: Root reachability
+        run: python3 scripts/check_root_reachability.py
+
       - name: Coherent families architecture
         run: python3 scripts/check_coherent_families.py
 
