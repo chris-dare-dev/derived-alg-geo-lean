@@ -7,6 +7,18 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Orthogonal exceptional blocks and residual projections:
+  `CategoryTheory/Triangulated/SemiorthogonalDecomposition/Blocks.lean`
+  owns positive-length mutually orthogonal exceptional blocks, their
+  triangulated spans, decomposition type, and residual right orthogonal;
+  `Projection.lean` owns a chosen right adjoint to a full-subcategory
+  inclusion and its universal Hom equivalence.  The Serre classification
+  adapter remains generic in `SerreFunctor/ProjectionObjects.lean`.
+  `AlgebraicGeometry/Surface/Enriques/PaperBlocks.lean` is only the geometric
+  consumer: it identifies the block members with the ten selected line
+  bundles and specializes the classified objects to their residual
+  projections.  Projection existence and the papers' Ext calculations are
+  supplied data, not constructed conclusions.
 - Generic moduli boundedness: `CategoryTheory/Moduli/Boundedness.lean`.
 - Generic replete subprestack machinery:
   `CategoryTheory/Bicategory/Functor/Cat/ObjectProperty/`, reusing Mathlib's

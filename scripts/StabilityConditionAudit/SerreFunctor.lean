@@ -97,3 +97,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.MixedClassificationData.pseudoprojective_candidate_not_isShiftOf
 #print axioms CategoryTheory.SerreFunctor.MixedClassificationData.spherical_iff
 #print axioms CategoryTheory.SerreFunctor.MixedClassificationData.pseudoprojective_iff
+
+-- Classification constructors whose candidates are the actual right
+-- projections of first objects of orthogonal exceptional blocks.
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.ofResidualProjections
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.ofResidualProjections_candidate
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.ofResidualProjections
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.ofResidualProjections_blockLength
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.ofResidualProjections_candidate
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.residualProjection_candidate_dichotomy

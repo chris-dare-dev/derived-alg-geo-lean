@@ -37,6 +37,14 @@ brief: |
   and exact supplied classification interfaces for both papers. Mutation,
   projection, candidate Ext computations, and equivalence transport remain
   visible future seams rather than being asserted by this statement layer.
+
+  The third milestone landed in PR #1032, tracked by #1031. It replaces the
+  arbitrary candidate families in those interfaces by the actual
+  right-adjoint projections of the first objects of positive-length
+  orthogonal exceptional blocks, and records the ten-bundle enumeration and
+  Paper II decomposition type. The projection functor and the papers'
+  Ext/classification arguments remain explicit supplied data; no mutation
+  cone or geometric existence theorem is claimed.
 goal:
   hmw: "How might we state and eventually prove the refined derived Torelli theorem for Enriques surfaces on top of the repository's single derived-category construction, without a second exceptionality hierarchy, a premature Kuznetsov-component equivalence, or geometry leaking into the categorical root?"
   objective: "Define Enriques surfaces and their semi-canonical ten-bundle configurations, assemble their residual category, and build the honest categorical interfaces needed to state the papers' Serre, spherical, and pseudoprojective classification results without fabricating their geometric proofs."
@@ -52,8 +60,8 @@ architecture_contract:
   canonical_roots:
     surface_definition: "SmoothProperVariety + CanonicalSheafData, following the K3 pattern in AlgebraicGeometry/Surface/K3.lean"
     derived_category: "AlgebraicGeometry/DerivedCategory/Coherent.lean; the generic construction is Mathlib's DerivedCategory"
-    semiorthogonal: "CategoryTheory/Triangulated/SemiorthogonalDecomposition/, the #852 root; exceptionality lands there via #932--#936"
-    serre: "CategoryTheory/Triangulated/SerreFunctor/: SerreFunctorData, SerreCategoryData, EnriquesCategoryData, and the generic object-classification roots"
+    semiorthogonal: "CategoryTheory/Triangulated/SemiorthogonalDecomposition/: exceptional collections, orthogonal blocks, residual right orthogonals, and chosen right projections"
+    serre: "CategoryTheory/Triangulated/SerreFunctor/: SerreFunctorData, SerreCategoryData, EnriquesCategoryData, generic object-classification roots, and their residual-projection constructors"
     lattice: "LinearAlgebra/Lattice/, IntegralLattice namespace, bilinear maps into ℤ"
     line_bundles: "Scheme.Modules.LineBundleData; Pic X for torsion statements"
   prohibited:
@@ -82,6 +90,8 @@ generations:
   - { rev: 4, at: "2026-09-02", note: "PR #1028 passed the full Windows build, axiom audits, declaration completeness, architecture gates, contracts, and emitter reproducibility. #989 and #990 are closed completed, milestone #43 is closed, and the roadmap records the residual only under its neutral formal name; the Torelli theorem itself remains future work." }
   - { rev: 5, at: "2026-09-02", note: "Paper-content milestone #44 and issue #1029 registered. One PR combines #894/#895 with the generic Serre and Enriques roots, the exact spherical and pseudoprojective profiles, supplied Paper I Proposition 4.10 / Paper II Theorem 2.7 classification data, and their Enriques residual-category specialization. The PR does not claim the missing mutation, projection, Ext-computation, Serre-transport, or geometric-realization theorems." }
   - { rev: 6, at: "2026-09-02", note: "PR #1030 passed the full Windows build, all three axiom audits, declaration completeness, environment linters, architecture gates, the no-sorry check, contracts, and emitter reproducibility in run 33672165307. #894, #895, and #1029 are closed completed and milestone #44 is closed. #896--#899 remain open for uniqueness, equivalence, transport/shift coherence, and the geometric realization." }
+  - { rev: 7, at: "2026-09-02", note: "ENQ3 milestone #45 and issue #1031 registered for one PR. The generic lane owns positive orthogonal exceptional blocks, their decomposition type and residual, chosen right-adjoint projections, and projection-bound Serre classification constructors. The Enriques adapter identifies the block members with the ten selected bundles and restates both papers' classification consequences for the actual projected objects. Projection existence, mutation triangles, (-2)-curve geometry, candidate Ext computations, and equivalence transport remain explicit seams." }
+  - { rev: 8, at: "2026-09-02", note: "PR #1032 passed the full Windows build, all three axiom audits, declaration completeness, environment linters, architecture gates, the no-sorry check, contracts, and emitter reproducibility in run 33682535182. #1031 and milestone #45 are closed completed. The same-projection theorem for every member of a longer Paper II block remains deferred because it needs the geometric curve-chain/mutation triangles, not merely abstract block orthogonality." }
 items:
   - id: enriques-torelli-m1
     gh_milestone: 43
@@ -208,4 +218,30 @@ items:
     size: L
     summary: "PR #1030 with #894/#895: Serre and Enriques category roots, the papers' spherical and pseudoprojective object profiles, generic supplied classification structures, and their degree-three specialization to the landed Enriques residual category. Full Windows verification passed in run 33672165307. Mutation/projection, candidate Ext computations, Serre conjugation, geometric realization, and Paper II's equivalence obstruction remain explicit future work."
     tags: [enriques, serre-functor, spherical-object, pseudoprojective-object]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-m3
+    gh_milestone: 45
+    kind: milestone
+    title: "ENQ3 — Exceptional blocks and residual projections"
+    status: done
+    lane: now
+    acceptance:
+      - "Positive-length mutually orthogonal exceptional blocks have a generic triangulated-category root, including their total length, decomposition type, and residual right orthogonal."
+      - "A chosen residual right adjoint supplies concrete projected objects, counits, and the universal Hom equivalence."
+      - "The Enriques specialization enumerates exactly the ten selected line bundles and states both papers' classification conclusions for their actual residual projections."
+      - "Projection existence, mutation triangles, (-2)-curve geometry, Ext calculations, and equivalence transport remain visible seams."
+      - "Zero sorries; relevant gates and Windows verification are green."
+
+  - id: enriques-torelli-e9
+    gh_issue: 1031
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m3
+    title: "Exceptional blocks and residual projection objects for the Enriques papers"
+    status: done
+    priority: must
+    size: L
+    summary: "PR #1032 adds generic orthogonal exceptional blocks, residual right-projection data and universal Hom properties, projection-bound Serre classification constructors, and the Enriques ten-bundle adapter. The Paper I/II spherical and pseudoprojective classification consequences concern the actual residual projections instead of arbitrary candidates. Full Windows verification passed in run 33682535182. Mutation, projection existence, curve-chain geometry, Ext calculations, and equivalence transport are not claimed."
+    tags: [enriques, exceptional-blocks, residual-projection, spherical-object, pseudoprojective-object]
     labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]

@@ -97,6 +97,17 @@ If a file contains both a generic block and its geometric use, split the block
 at the first declaration whose signature no longer needs the consumer's
 vocabulary.
 
+Orthogonal exceptional blocks and a chosen right adjoint to a residual
+full-subcategory inclusion are structures on abstract (pre)triangulated
+categories, so their canonical owner is
+`CategoryTheory/Triangulated/SemiorthogonalDecomposition/`.  Constructors
+linking their projected objects to spherical and pseudoprojective
+classification data live beside the generic Serre API.  Only the comparison
+with an Enriques surface's ten line bundles, its already-defined residual
+property, and the paper-specific degree-three conclusions belong under
+`AlgebraicGeometry/Surface/Enriques/`; the dependency runs from that consumer
+to both categorical roots.
+
 An adjunction in its most general implemented form is
 `CategoryTheory.Bicategory.Adjunction`. Mathlib identifies ordinary functor
 adjunctions with its `Cat` specialization. A theorem that merely assumes an

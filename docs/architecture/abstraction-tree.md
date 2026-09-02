@@ -47,6 +47,11 @@ Category
 │  ├─ preservation through composition
 │  └─ reflective transport using an ordinary adjunction
 ├─ Preadditive
+│  ├─ Triangulated category              Mathlib root
+│  │  └─ Semiorthogonal decomposition
+│  │     ├─ ExceptionalCollection
+│  │     ├─ OrthogonalExceptionalBlocks  positive blocks and residual
+│  │     └─ RightProjectionData          chosen adjoint and universal Hom
 │  └─ Linear k C                         Mathlib root
 │     └─ SerreFunctorData                duality on Hom spaces
 │        ├─ SerreCategoryData            chosen Serre autoequivalence
@@ -237,11 +242,13 @@ particular:
   finite-type witnesses remain geometric consumers;
 - a paper-specific module may instantiate these roots but never becomes a root
   imported by them.
-- keep Serre duality, Enriques-category relations, and spherical or
+- keep exceptional blocks, residual right orthogonals, chosen right-adjoint
+  projections, Serre duality, Enriques-category relations, and spherical or
   pseudoprojective self-Hom profiles under the generic triangulated-category
-  root.  A surface-specific residual category reuses those structures; its
-  mutation, projection, and Ext computations remain explicit geometric input
-  until constructed.
+  root.  A surface-specific residual category reuses those structures and
+  binds the candidates to projections of its actual line bundles; existence
+  of the projection and the mutation/Ext computations remain explicit
+  geometric input until constructed.
 
 Bicategories are the first implemented higher-categorical stage. A future
 general `n`-category or `(∞,1)`-category layer must name its formal model and
