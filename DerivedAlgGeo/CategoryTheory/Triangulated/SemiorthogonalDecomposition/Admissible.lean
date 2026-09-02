@@ -69,28 +69,30 @@ instance zeroObjectsIsTriangulated :
   toIsTriangulatedClosed₂ := .mk' (fun T hT h₁ h₃ ↦
     T.isZero₂_of_isZero₁₃ hT h₁ h₃)
 
-/-- A triangulated object property is right admissible when its inclusion has a right adjoint. -/
-def IsRightAdmissible (P : ObjectProperty C) [P.IsTriangulated] : Prop :=
-  ∃ G : C ⥤ P.FullSubcategory, Nonempty (P.ι ⊣ G)
+/-- An object property is right admissible when it is triangulated and its inclusion has a right
+adjoint. -/
+def IsRightAdmissible (P : ObjectProperty C) : Prop :=
+  P.IsTriangulated ∧ ∃ G : C ⥤ P.FullSubcategory, Nonempty (P.ι ⊣ G)
 
-/-- A triangulated object property is left admissible when its inclusion has a left adjoint. -/
-def IsLeftAdmissible (P : ObjectProperty C) [P.IsTriangulated] : Prop :=
-  ∃ L : C ⥤ P.FullSubcategory, Nonempty (L ⊣ P.ι)
+/-- An object property is left admissible when it is triangulated and its inclusion has a left
+adjoint. -/
+def IsLeftAdmissible (P : ObjectProperty C) : Prop :=
+  P.IsTriangulated ∧ ∃ L : C ⥤ P.FullSubcategory, Nonempty (L ⊣ P.ι)
 
 /-- A triangulated object property is admissible when it is both left and right admissible. -/
-def IsAdmissible (P : ObjectProperty C) [P.IsTriangulated] : Prop :=
+def IsAdmissible (P : ObjectProperty C) : Prop :=
   P.IsLeftAdmissible ∧ P.IsRightAdmissible
 
 /-- The top object property is right admissible, through its canonical equivalence with `C`. -/
 theorem top_isRightAdmissible :
     IsRightAdmissible (⊤ : ObjectProperty C) :=
-  ⟨(ObjectProperty.topEquivalence C).inverse,
+  ⟨inferInstance, (ObjectProperty.topEquivalence C).inverse,
     ⟨(ObjectProperty.topEquivalence C).toAdjunction⟩⟩
 
 /-- The top object property is left admissible, through its canonical equivalence with `C`. -/
 theorem top_isLeftAdmissible :
     IsLeftAdmissible (⊤ : ObjectProperty C) :=
-  ⟨(ObjectProperty.topEquivalence C).symm.functor,
+  ⟨inferInstance, (ObjectProperty.topEquivalence C).symm.functor,
     ⟨(ObjectProperty.topEquivalence C).symm.toAdjunction⟩⟩
 
 private noncomputable def zeroSubcategoryObject :
@@ -148,12 +150,12 @@ private noncomputable def zeroLeftAdjunction :
 /-- Zero objects are right admissible: the right adjoint is the constant zero functor. -/
 theorem zeroObjects_isRightAdmissible :
     IsRightAdmissible (zeroObjects (C := C)) :=
-  ⟨zeroProjection, ⟨zeroRightAdjunction⟩⟩
+  ⟨inferInstance, zeroProjection, ⟨zeroRightAdjunction⟩⟩
 
 /-- Zero objects are left admissible: the left adjoint is the constant zero functor. -/
 theorem zeroObjects_isLeftAdmissible :
     IsLeftAdmissible (zeroObjects (C := C)) :=
-  ⟨zeroProjection, ⟨zeroLeftAdjunction⟩⟩
+  ⟨inferInstance, zeroProjection, ⟨zeroLeftAdjunction⟩⟩
 
 /-- The counit triangle of a right-admissible property has its third vertex in the right
 orthogonal.  The right adjoint is triangulated because it is adjoint to the triangulated
@@ -162,7 +164,7 @@ cone a zero object. -/
 theorem IsRightAdmissible.exists_distTriang_mem_rightOrthogonal
     {P : ObjectProperty C} [P.IsTriangulated] (hP : P.IsRightAdmissible) (X : C) :
     P.extensionProduct P.rightOrthogonal X := by
-  obtain ⟨G, ⟨adj⟩⟩ := hP
+  obtain ⟨_, G, ⟨adj⟩⟩ := hP
   letI : P.ι.Full := P.fullyFaithfulι.full
   letI : P.ι.Faithful := P.fullyFaithfulι.faithful
   letI : IsIso adj.unit := adj.unit_isIso_of_L_fully_faithful
@@ -190,7 +192,7 @@ theorem IsRightAdmissible.exists_distTriang_mem_rightOrthogonal
 theorem IsLeftAdmissible.exists_distTriang_mem_leftOrthogonal
     {P : ObjectProperty C} [P.IsTriangulated] (hP : P.IsLeftAdmissible) (X : C) :
     P.leftOrthogonal.extensionProduct P X := by
-  obtain ⟨L, ⟨adj⟩⟩ := hP
+  obtain ⟨_, L, ⟨adj⟩⟩ := hP
   letI : P.ι.Full := P.fullyFaithfulι.full
   letI : P.ι.Faithful := P.fullyFaithfulι.faithful
   letI := adj.leftAdjointCommShift ℤ
