@@ -32,7 +32,7 @@ is the derived category of the opposite abelian category. -/
 noncomputable def derivedLinearDualFunctor :
     DerivedCategory ((ModuleCat.{u + 1} k)ᵒᵖ) ⥤
       DerivedCategory (ModuleCat.{u + 1} k) :=
-  (linearDualFunctor k).mapDerivedCategory
+  (linearDualFunctor.{u, u + 1} k).mapDerivedCategory
 
 /-- Algebraic derived linear duality as a functor from the opposite derived
 category, once the explicit opposite/derived comparison is supplied. -/

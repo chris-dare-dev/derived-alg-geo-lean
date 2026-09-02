@@ -28,9 +28,12 @@ blocks should normally move it rather than add more declarations beside it.
   pullback-preservation contracts.
 - Derived opposites and exact linear duality:
   `Algebra/Homology/DerivedCategory/Opposite.lean` owns the generic
-  `DerivedCategory.OppositeComparison`, while `LinearDual.lean` owns the exact
-  ModuleCat linear-dual functor and its derived lift. Canonical and Serre
-  duality consume those roots together with
+  `DerivedCategory.OppositeComparison`;
+  `CategoryTheory/ModuleCat/LinearDual.lean` owns the bare contravariant
+  ModuleCat linear-dual functor,
+  `Algebra/Category/ModuleCat/LinearDual.lean` proves its exactness, and
+  `Algebra/Homology/DerivedCategory/LinearDual.lean` owns the derived lift.
+  Canonical and Serre duality consume those roots together with
   `AlgebraicGeometry/DerivedCategory/Coherent.lean`; the former geometric
   `Duality/Serre/LinearDual.lean` path and its ModuleCat-specific comparison
   carrier are retired.

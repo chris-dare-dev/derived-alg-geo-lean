@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.CategoryTheory.ModuleCat.LinearDual
 import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 import Mathlib.LinearAlgebra.Dual.Lemmas
@@ -9,10 +10,12 @@ import Mathlib.LinearAlgebra.Dual.Lemmas
 /-!
 # Exact linear duality on modules over a field
 
-Over a field, algebraic linear duality sends a module `V` to `Vᵛ = Hom(V, k)`. This file
-bundles that construction as a contravariant additive functor on `ModuleCat k` and proves
-that it is exact: it takes short exact sequences to short exact sequences and preserves
-finite limits and colimits. Its derived lift is `Algebra/Homology/DerivedCategory/LinearDual.lean`.
+Over a field, algebraic linear duality sends a module `V` to
+`Vᵛ = Hom(V, k)`.  The contravariant additive functor is defined in
+`CategoryTheory/ModuleCat/LinearDual.lean`; this file proves that it is exact:
+it takes short exact sequences to short exact sequences and preserves finite
+limits and colimits.  Its derived lift is
+`Algebra/Homology/DerivedCategory/LinearDual.lean`.
 -/
 
 
@@ -24,46 +27,11 @@ namespace ModuleCat
 
 variable (k : Type u) [Field k]
 
-/-- Algebraic linear dual, viewed as a contravariant functor on `k`-modules. -/
-noncomputable def linearDualFunctor :
-    (ModuleCat.{u + 1} k)ᵒᵖ ⥤ ModuleCat.{u + 1} k where
-  obj V := ModuleCat.of k (Module.Dual k V.unop)
-  map f := ModuleCat.ofHom f.unop.hom.dualMap
-  map_id V := by
-    apply ModuleCat.hom_ext
-    exact LinearMap.dualMap_id
-  map_comp f g := by
-    apply ModuleCat.hom_ext
-    exact LinearMap.dualMap_comp_dualMap g.unop.hom f.unop.hom
-
-@[simp]
-theorem linearDualFunctor_obj (V : (ModuleCat.{u + 1} k)ᵒᵖ) :
-    (linearDualFunctor k).obj V = ModuleCat.of k (Module.Dual k V.unop) :=
-  rfl
-
-@[simp]
-theorem linearDualFunctor_map {V W : (ModuleCat.{u + 1} k)ᵒᵖ} (f : V ⟶ W) :
-    (linearDualFunctor k).map f = ModuleCat.ofHom f.unop.hom.dualMap :=
-  rfl
-
-noncomputable instance : (linearDualFunctor k).Additive where
-  map_add := by
-    intro X Y f g
-    apply ModuleCat.hom_ext
-    apply LinearMap.ext
-    intro φ
-    apply LinearMap.ext
-    intro x
-    change (show Module.Dual k X.unop from φ) (f.unop.hom x + g.unop.hom x) =
-      (show Module.Dual k X.unop from φ) (f.unop.hom x) +
-        (show Module.Dual k X.unop from φ) (g.unop.hom x)
-    exact map_add (show Module.Dual k X.unop from φ) _ _
-
 /-- Linear duality reverses a short exact sequence of vector spaces to a short
 exact sequence. -/
 theorem linearDualFunctor_map_shortExact
     (S : ShortComplex ((ModuleCat.{u + 1} k)ᵒᵖ)) (hS : S.ShortExact) :
-    (S.map (linearDualFunctor k)).ShortExact := by
+    (S.map (linearDualFunctor.{u, u + 1} k)).ShortExact := by
   have hU : S.unop.ShortExact := hS.unop
   refine
     { exact := ?_
@@ -89,28 +57,35 @@ theorem linearDualFunctor_map_shortExact
 /-- Exactness of algebraic linear duality, in the form Mathlib's
 derived-functor construction consumes. -/
 theorem linearDualFunctor_preservesFiniteLimits_and_colimits :
-    CategoryTheory.Limits.PreservesFiniteLimits (linearDualFunctor k) ∧
-      CategoryTheory.Limits.PreservesFiniteColimits (linearDualFunctor k) :=
-  (CategoryTheory.Functor.exact_tfae (linearDualFunctor k)).out 0 3 |>.mp
+    CategoryTheory.Limits.PreservesFiniteLimits
+        (linearDualFunctor.{u, u + 1} k) ∧
+      CategoryTheory.Limits.PreservesFiniteColimits
+        (linearDualFunctor.{u, u + 1} k) :=
+  (CategoryTheory.Functor.exact_tfae
+    (linearDualFunctor.{u, u + 1} k)).out 0 3 |>.mp
     fun (S : ShortComplex ((ModuleCat.{u + 1} k)ᵒᵖ)) hS ↦
       linearDualFunctor_map_shortExact k S hS
 
 /-- Linear duality preserves finite limits, being exact. -/
 theorem linearDualFunctor_preservesFiniteLimits :
-    CategoryTheory.Limits.PreservesFiniteLimits (linearDualFunctor k) :=
+    CategoryTheory.Limits.PreservesFiniteLimits
+      (linearDualFunctor.{u, u + 1} k) :=
   (linearDualFunctor_preservesFiniteLimits_and_colimits k).1
 
 /-- Linear duality preserves finite colimits, being exact. -/
 theorem linearDualFunctor_preservesFiniteColimits :
-    CategoryTheory.Limits.PreservesFiniteColimits (linearDualFunctor k) :=
+    CategoryTheory.Limits.PreservesFiniteColimits
+      (linearDualFunctor.{u, u + 1} k) :=
   (linearDualFunctor_preservesFiniteLimits_and_colimits k).2
 
 noncomputable instance :
-    CategoryTheory.Limits.PreservesFiniteLimits (linearDualFunctor k) :=
+    CategoryTheory.Limits.PreservesFiniteLimits
+      (linearDualFunctor.{u, u + 1} k) :=
   linearDualFunctor_preservesFiniteLimits k
 
 noncomputable instance :
-    CategoryTheory.Limits.PreservesFiniteColimits (linearDualFunctor k) :=
+    CategoryTheory.Limits.PreservesFiniteColimits
+      (linearDualFunctor.{u, u + 1} k) :=
   linearDualFunctor_preservesFiniteColimits k
 
 end ModuleCat

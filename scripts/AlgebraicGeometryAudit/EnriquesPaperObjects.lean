@@ -1,0 +1,27 @@
+/-
+Serre and classified-object slice of the AlgebraicGeometry audit.
+
+The ambient `2`-Enriques relation and residual Serre autoequivalence are
+SUPPLIED categorical data.  The classification packages likewise state the
+exact conclusions of the papers; they do not construct mutation, projection,
+or the candidates' Ext calculations.  A clean audit says the formal consumer
+consequences introduce no hidden axioms.
+-/
+import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperObjects
+
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCategoryData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCategoryData.ambientEnriques
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCategoryData.residualSerre
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCategoryData.mk.inj
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCategoryData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCategoryData.ambientSerreSquareObjIso
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCategoryData.residualSerreIsEquivalence
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperISphericalClassificationData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperISphericalClassificationData.spherical_iff
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperISphericalClassificationData.candidate_not_shift
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIObjectClassificationData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIObjectClassificationData.spherical_iff
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIObjectClassificationData.pseudoprojective_iff
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIObjectClassificationData.longer_candidate_not_spherical
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIObjectClassificationData.spherical_candidate_not_shift
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIObjectClassificationData.pseudoprojective_candidate_not_shift

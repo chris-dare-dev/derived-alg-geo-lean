@@ -30,21 +30,30 @@ brief: |
   admissibility (#934) and the geometric isotropic collection (#988). PR
   #1028 completes exceptionality (#989), the semiorthogonal sequence, and its
   residual component (#990), closing the foundations milestone.
+
+  The second milestone starts the paper-content layer. PR work tracked by
+  #1029 combines the categorical Serre core (#894/#895) with half-integral
+  Enriques categories, the spherical and pseudoprojective object profiles,
+  and exact supplied classification interfaces for both papers. Mutation,
+  projection, candidate Ext computations, and equivalence transport remain
+  visible future seams rather than being asserted by this statement layer.
 goal:
   hmw: "How might we state and eventually prove the refined derived Torelli theorem for Enriques surfaces on top of the repository's single derived-category construction, without a second exceptionality hierarchy, a premature Kuznetsov-component equivalence, or geometry leaking into the categorical root?"
-  objective: "Define Enriques surfaces and their semi-canonical ten-bundle configurations, bind the bundles to the generic exceptional-object interface through explicit cohomological witnesses, and assemble the semiorthogonal sequence whose residual component the source papers call Ku(Y)."
+  objective: "Define Enriques surfaces and their semi-canonical ten-bundle configurations, assemble their residual category, and build the honest categorical interfaces needed to state the papers' Serre, spherical, and pseudoprojective classification results without fabricating their geometric proofs."
   key_results:
     - "IsEnriquesSurface is Prop-valued over supplied canonical-sheaf data, with both torsion clauses consumed by sheaf-level theorems and the char-2 exclusion documented rather than encoded."
     - "Every line bundle has a canonical perfect, bounded degree-zero avatar in D(Coh X) through one adapter, not per-consumer plumbing."
     - "The isotropic-sequence lattice root proves linear independence and the sum-vector identities behind Δ·F_i = 3 and Δ² = 10, with no symmetry hypothesis."
     - "Exceptionality of the ten bundles is a reduction to named cohomological inputs in the fields-not-theorems idiom, never a silent axiom."
     - "The residual component is stated through the generic semiorthogonal root and carries a neutral name until the identification with the papers' Ku(Y) is a theorem."
+    - "The papers' 3-spherical and 3-pseudoprojective classifications are represented by generic supplied-data roots whose Enriques specialization reuses the constructed residual full subcategory."
 architecture_contract:
   policy: "docs/architecture/abstraction-tree.md"
   canonical_roots:
     surface_definition: "SmoothProperVariety + CanonicalSheafData, following the K3 pattern in AlgebraicGeometry/Surface/K3.lean"
     derived_category: "AlgebraicGeometry/DerivedCategory/Coherent.lean; the generic construction is Mathlib's DerivedCategory"
     semiorthogonal: "CategoryTheory/Triangulated/SemiorthogonalDecomposition/, the #852 root; exceptionality lands there via #932--#936"
+    serre: "CategoryTheory/Triangulated/SerreFunctor/: SerreFunctorData, SerreCategoryData, EnriquesCategoryData, and the generic object-classification roots"
     lattice: "LinearAlgebra/Lattice/, IntegralLattice namespace, bilinear maps into ℤ"
     line_bundles: "Scheme.Modules.LineBundleData; Pic X for torsion statements"
   prohibited:
@@ -71,6 +80,7 @@ generations:
   - { rev: 2, at: "2026-09-02", note: "Rebased after #932, #933, #935, #936, #984, and #985 landed and after the Enriques carrier was simplified to an ordinary Scheme with typeclass hypotheses. PR #1027 implements generic admissibility (#934) and #988. The normalization source is corrected to arXiv:1912.04332v2 Definition 3.2/equation (3.2) in §3.1: 3δ = Σf_i, hence Δ·F_i = 3 and Δ² = 10. #989 then depends only on #988; #990 depends on #988/#989 and owns the still-missing generic residual helper." }
   - { rev: 3, at: "2026-09-02", note: "Combined #989/#990 implementation in progress: line bundles are packaged canonically in Dᵇ(Coh Y); explicit ExtComparison and H² inputs reduce each bundle to the generic IsExceptional predicate; supplied pairwise witnesses build the Fin 10 exceptional collection; and the generic residual helper defines the triangulated right orthogonal and its neutral full subcategory without fullness or admissibility claims." }
   - { rev: 4, at: "2026-09-02", note: "PR #1028 passed the full Windows build, axiom audits, declaration completeness, architecture gates, contracts, and emitter reproducibility. #989 and #990 are closed completed, milestone #43 is closed, and the roadmap records the residual only under its neutral formal name; the Torelli theorem itself remains future work." }
+  - { rev: 5, at: "2026-09-02", note: "Paper-content milestone #44 and issue #1029 registered. One PR combines #894/#895 with the generic Serre and Enriques roots, the exact spherical and pseudoprojective profiles, supplied Paper I Proposition 4.10 / Paper II Theorem 2.7 classification data, and their Enriques residual-category specialization. The PR does not claim the missing mutation, projection, Ext-computation, Serre-transport, or geometric-realization theorems." }
 items:
   - id: enriques-torelli-m1
     gh_milestone: 43
@@ -172,4 +182,29 @@ items:
     size: L
     summary: "PR #1028: supplied pairwise witnesses build the Fin 10 ExceptionalCollection and root-oriented SemiorthogonalSequence; the generic residual helper is the right orthogonal of total, is triangulated from component closure, and supports membership, Hom-vanishing, and non-membership consumers. ResidualCategory remains neutral and makes no fullness, admissibility, mutation, or Ku(Y) identification claim."
     tags: [enriques, semiorthogonal, residual-component]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-m2
+    gh_milestone: 44
+    kind: milestone
+    title: "ENQ2 — Serre and paper object interfaces"
+    status: in_progress
+    lane: now
+    acceptance:
+      - "The categorical Serre root and half-integral Enriques-category refinement are registered without geometry imports."
+      - "Both papers' spherical and pseudoprojective definitions and classification conclusions have precise degree-three consumer APIs."
+      - "The Enriques residual category reuses those roots, with every missing geometric construction exposed as supplied data."
+      - "Zero sorries; relevant gates and Windows verification are green."
+
+  - id: enriques-torelli-e8
+    gh_issue: 1029
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m2
+    title: "Serre and Enriques categories; spherical and pseudoprojective classification interfaces"
+    status: in_progress
+    priority: must
+    size: L
+    summary: "One PR with #894/#895: define Serre and Enriques category roots, the papers' spherical and pseudoprojective object profiles, generic supplied classification structures, and their degree-three specialization to the landed Enriques residual category. Mutation/projection, candidate Ext computations, Serre conjugation, geometric realization, and Paper II's equivalence obstruction remain explicit future work."
+    tags: [enriques, serre-functor, spherical-object, pseudoprojective-object]
     labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
