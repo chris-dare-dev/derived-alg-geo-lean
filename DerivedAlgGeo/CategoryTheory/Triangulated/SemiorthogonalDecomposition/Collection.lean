@@ -301,6 +301,19 @@ theorem toSemiorthogonalSequenceFin_component (i : Fin n) :
     F.toSemiorthogonalSequenceFin.component i = F.component i.rev :=
   rfl
 
+/-- Every component of the finite sequence is triangulated. This is the
+`Fin n` counterpart of `hasTriangulatedComponents`; it is stated separately
+because `toSemiorthogonalSequenceFin` lands back in the original finite order
+rather than in `OrderDual (Fin n)`. -/
+theorem hasTriangulatedComponentsFin [IsTriangulated C] :
+    F.toSemiorthogonalSequenceFin.HasTriangulatedComponents := by
+  intro i
+  rw [toSemiorthogonalSequenceFin_component]
+  haveI : (ObjectProperty.shiftClosure
+      (fun X => X = F.obj i.rev) ℤ).Nonempty :=
+    ⟨F.obj i.rev, ObjectProperty.le_shiftClosure _ _ rfl⟩
+  infer_instance
+
 end Fin
 
 end ExceptionalCollection

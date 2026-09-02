@@ -10,9 +10,13 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.mk.inj
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.total
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.residual
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.component_le_total
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.hom_eq_zero
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.component_hom_residual_eq_zero
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.HasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.HasTriangulatedComponents.totalIsStableUnderShift
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.HasTriangulatedComponents.residual_isTriangulated
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsFull
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsStronglyFull
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsStronglyFull.isFull
@@ -113,6 +117,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.reindex_toSemiorthogonalSequence
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequenceFin
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequenceFin_component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.hasTriangulatedComponentsFin
 
 -- The derived category of a field: the milestone's honest inhabitant. The
 -- residue field in degree zero is exceptional (endomorphisms via the fully

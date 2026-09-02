@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.ObjectProperty.Orthogonal
 import Mathlib.CategoryTheory.Triangulated.Generators
+import Mathlib.CategoryTheory.Triangulated.Orthogonal
 
 /-!
 # Semiorthogonal sequences
@@ -44,6 +45,11 @@ variable (S : SemiorthogonalSequence C ι)
 by both classical and strong fullness. -/
 def total : ObjectProperty C := ⨆ i, S.component i
 
+/-- The residual object property of a semiorthogonal sequence: the right
+orthogonal to the union of its components. This definition does not assert
+that the sequence is full or that its components are admissible. -/
+def residual : ObjectProperty C := S.total.rightOrthogonal
+
 lemma component_le_total (i : ι) : S.component i ≤ S.total :=
   le_iSup S.component i
 
@@ -51,11 +57,45 @@ lemma hom_eq_zero ⦃i j : ι⦄ (hij : i < j) ⦃X Y : C⦄
     (hX : S.component i X) (hY : S.component j Y) (f : X ⟶ Y) : f = 0 :=
   S.semiorthogonal hij Y hY f hX
 
+/-- Maps from any component of the sequence to a residual object vanish. -/
+lemma component_hom_residual_eq_zero (i : ι) ⦃X Y : C⦄
+    (hX : S.component i X) (hY : S.residual Y) (f : X ⟶ Y) : f = 0 :=
+  hY f (S.component_le_total i X hX)
+
 /-- Each component is a triangulated object property.  This is independent of fullness. -/
 def HasTriangulatedComponents
     [Limits.HasZeroObject C] [HasShift C ℤ] [Preadditive C]
     [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] : Prop :=
   ∀ i, (S.component i).IsTriangulated
+
+/-- The union of triangulated components is stable under shifts. The union
+need not itself be extension-closed, which is why this conclusion is stated
+only at the strength needed by orthogonal closure. -/
+theorem HasTriangulatedComponents.totalIsStableUnderShift
+    [Limits.HasZeroObject C] [HasShift C ℤ] [Preadditive C]
+    [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+    (hS : S.HasTriangulatedComponents) : S.total.IsStableUnderShift ℤ := by
+  letI (i : ι) : (S.component i).IsTriangulated := hS i
+  constructor
+  intro n
+  constructor
+  · intro X hX
+    change S.total (X⟦n⟧)
+    rw [total, ObjectProperty.prop_iSup_iff] at hX ⊢
+    obtain ⟨i, hi⟩ := hX
+    exact ⟨i, (S.component i).le_shift n _ hi⟩
+
+/-- The residual of a sequence with triangulated components is triangulated.
+No fullness or admissibility hypothesis is required for this closure fact. -/
+theorem HasTriangulatedComponents.residual_isTriangulated
+    {D : Type*} [Category D] [Preadditive D] [Limits.HasZeroObject D]
+    [HasShift D ℤ] [∀ n : ℤ, (shiftFunctor D n).Additive]
+    [Pretriangulated D] {κ : Type*} [Preorder κ]
+    {T : SemiorthogonalSequence D κ} (hT : T.HasTriangulatedComponents) :
+    T.residual.IsTriangulated := by
+  letI : T.total.IsStableUnderShift ℤ := hT.totalIsStableUnderShift
+  change T.total.rightOrthogonal.IsTriangulated
+  infer_instance
 
 /-- Classical fullness: the union of the components generates under shifts, binary products,
 retracts, and arbitrarily many extensions. -/

@@ -2128,6 +2128,40 @@ existence, nefness, ampleness, or derived exceptionality is claimed. -/
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_intersection_fano
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fano_self_intersection
 
+/-! ## Exceptional Enriques line bundles and the residual category
+
+Exceptionality is proved from explicit self-Ext comparison data, the
+Enriques `H¹` clause, and supplied `H²` vanishing. Pairwise semiorthogonality
+is likewise supplied. The resulting residual is only the formal right
+orthogonal full subcategory: no fullness, admissibility, or identification
+with a Kuznetsov component is claimed. -/
+
+#print axioms AlgebraicGeometry.EnriquesSurface.DerivedCat
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison.endomorphisms
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison.ext_one
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison.ext_two
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison.outside_surface_range
+#print axioms AlgebraicGeometry.EnriquesSurface.isExceptional_of_extComparison
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ExceptionalityData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ExceptionalityData.h_two_vanishing
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ExceptionalityData.comparison
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ExceptionalityData.bundle_isExceptional
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.SemiorthogonalityData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.SemiorthogonalityData.hom_shift_eq_zero
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.exceptionalCollection
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.exceptionalCollection_obj
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.collectionSequence
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.collectionSequence_component
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_mem_collectionSequence_component
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.residualComponent
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ResidualCategory
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.residualComponent_isTriangulated
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.residualCategory_obj_mem
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_hom_residual_eq_zero
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_hom_residualCategory_eq_zero
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_not_mem_residualComponent
+
 /-! ## The base field acts: module sheaves and `Coh` are `k`-linear
 
 Multiplication by a global function, composed with `k → Γ(X, O_X)`, makes the
