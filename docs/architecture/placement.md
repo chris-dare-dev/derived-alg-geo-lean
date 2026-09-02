@@ -20,6 +20,12 @@ request would put it, so the move to Mathlib is a copy.
 | Sites, sheaves, sheaf cohomology, descent, stacks | `CategoryTheory/Sites/` | `CategoryTheory/Sites/`, with Čech theory under `SheafCohomology/Cech/` and stacks under `Descent/` |
 | Bicategories, pseudofunctors, `Pseudofunctor.ObjectProperty` | `CategoryTheory/Bicategory/` | `CategoryTheory/Bicategory/`, with Cat-valued pseudofunctor loci and transport under `Functor/Cat/` |
 | Abelian categories, Serre classes | `CategoryTheory/Abelian/` | `CategoryTheory/Abelian/` |
+| Quasi-abelian categories and strict morphisms | `CategoryTheory/Abelian/` (precedent `Abelian/NonPreadditive.lean`) | `CategoryTheory/Abelian/QuasiAbelian.lean` |
+| Linear categories and opposite linearity | `CategoryTheory/Linear/` | `CategoryTheory/Linear/` |
+| Compact objects and coproduct-preserving functors on a preadditive category | `CategoryTheory/Preadditive/` | `CategoryTheory/Preadditive/CompactObject.lean` |
+| `SmallShiftedHom` in a localization | `CategoryTheory/Localization/` | `CategoryTheory/Localization/` |
+| The opposite of a (pre)triangulated category and its shift | `CategoryTheory/Triangulated/Opposite/` | `CategoryTheory/Triangulated/Opposite/` |
+| `HomComplex` and its cohomology classes | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
 | Pretriangulated and triangulated categories, t-structures | `CategoryTheory/Triangulated/` | `CategoryTheory/Triangulated/` |
 | Monoidal categories and their compatibility with other structure | `CategoryTheory/Monoidal/` | `CategoryTheory/Monoidal/` |
 | Simplicial objects and face-map complexes | `AlgebraicTopology/` | `AlgebraicTopology/` |

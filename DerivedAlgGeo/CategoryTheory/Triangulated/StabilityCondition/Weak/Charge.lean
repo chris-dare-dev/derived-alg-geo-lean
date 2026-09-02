@@ -21,16 +21,22 @@ with the settings they instantiate at -- `abelianDatum` beside `K₀Ab`,
 
 ## Placement
 
-This was `Triangulated/StabilityCondition/Weak/Foundation/StabilityFunction/Basic.lean`,
-in namespace `CategoryTheory.Triangulated`, where the only two occurrences of the
-word "triangulated" in the file were the namespace opening and closing it. Its
-imports were `ShortComplex.ShortExact`, `Complex.Arg`, `GrothendieckGroup.Abelian`,
-`Abelian.Basic` and `Subobject.Lattice`: nothing triangulated among them.
+This file is internal support for the weak stability theory: nothing in it is
+triangulated, but every declaration exists to state a charge condition, and
+nothing else consumes it. It therefore lives under
+`Triangulated/StabilityCondition/Weak/`, beside its only consumer
+(`Weak/Foundation/StabilityFunction/Basic.lean`), placed by conceptual ownership
+rather than by the weakest vocabulary in its signature, which is only the Tier 2
+tie-breaker. It sat at the root of `CategoryTheory/` from #760 until 2026-09-02;
+the review of the Mathlib-mesh restructure observed that this promoted
+stability-specific support to a subject root it does not own.
 
-That is the same defect #760 corrected for `GrothendieckPresentation`, stating
-the rule as it went -- a file belongs under `Triangulated/` only if it uses
-something triangulated -- and then leaving this file, written beside it, in
-place. The rule applies here.
+The four upper-half-plane facts (`semiClosedUpperHalfPlane`,
+`closedUpperHalfPlane`, and their two lemmas) are an upstream candidate for
+`Mathlib/Analysis/Complex/UpperHalfPlane/` under the `Complex` namespace. They
+stay here for now because the namespace change would rename declarations, and
+declaration names are kept stable across moves so that the immutable review
+payloads the `exe/RestateHistoricalNames.lean` bridge protects keep resolving.
 -/
 
 noncomputable section

@@ -13,7 +13,7 @@ upstream pull request is a copy, not a relocation.
 | `Algebra/` | `Mathlib/Algebra/` | ring, module, polynomial, and graded algebra; `Algebra/Category/ModuleCat/Sheaf/` extends Mathlib's `SheafOfModules` on an arbitrary ringed site; `Algebra/Homology/` extends Mathlib's homological algebra: derived categories, homotopy categories, spectral sequences, and the bespoke dg category built on `HomComplex` |
 | `AlgebraicGeometry/` | `Mathlib/AlgebraicGeometry/` | schemes and everything stated about them: `Modules/` (with its `Coherent/` and `Quasicoherent/` children), `ProjectiveSpectrum/`, `Cohomology/`, `DerivedCategory/`, `Divisors/`, `Duality/`, `IntersectionTheory/`, `Numerical/`, `RiemannRoch/`, `Moduli/`, `Stacks/`, `Surface/`, `Variety/` |
 | `AlgebraicTopology/` | `Mathlib/AlgebraicTopology/` | simplicial constructions |
-| `CategoryTheory/` | `Mathlib/CategoryTheory/` | abelian, bicategorical, limit, monoidal, and site theory; `Triangulated/` with its t-structures, stability conditions, dg enhancements, Grothendieck groups, Fourier--Mukai kernels, semiorthogonal decompositions, and compact generation |
+| `CategoryTheory/` | `Mathlib/CategoryTheory/` | abelian, bicategorical, limit, linear, localization, monoidal, preadditive, shift, and site theory; `Triangulated/` with its t-structures, stability conditions, dg enhancements, Grothendieck groups, Fourier--Mukai kernels, semiorthogonal decompositions, and compact generation |
 | `LinearAlgebra/` | `Mathlib/LinearAlgebra/` | lattices, quadratic forms, exterior powers, graded bases |
 | `RingTheory/` | `Mathlib/RingTheory/` | prime spectra |
 | `Topology/` | `Mathlib/Topology/` | sheaves on topological spaces and the category of opens |

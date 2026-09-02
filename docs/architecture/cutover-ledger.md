@@ -9,14 +9,14 @@ blocks should normally move it rather than add more declarations beside it.
 
 - Generic moduli boundedness: `CategoryTheory/Moduli/Boundedness.lean`.
 - Generic replete subprestack machinery:
-  `CategoryTheory/Pseudofunctor/ObjectProperty/`, reusing Mathlib's
+  `CategoryTheory/Bicategory/Functor/Cat/ObjectProperty/`, reusing Mathlib's
   `Pseudofunctor.ObjectProperty.fullsubcategory`.
 - Ordinary ring/module helpers already extracted to `Algebra/Module/`.
 - Generic sheaves and ringed-site module sheaves:
-  `CategoryTheory/Sites/Sheaves/`.
+  `Algebra/Category/ModuleCat/Sheaf/`.
 - Generic abelian and derived-category infrastructure:
   `CategoryTheory/Abelian/` and
-  `CategoryTheory/Triangulated/DerivedCategory/`.
+  `Algebra/Homology/DerivedCategory/`.
 - Canonical scheme-derived specializations:
   `AlgebraicGeometry/DerivedCategory/Basic.lean` registers the shared
   module-sheaf derived-category instance, while
@@ -26,7 +26,7 @@ blocks should normally move it rather than add more declarations beside it.
   `Families/BoundedGeometry.lean` now begins with base-change fiber aliases and
   pullback-preservation contracts.
 - Derived opposites and exact linear duality:
-  `CategoryTheory/Triangulated/DerivedCategory/Opposite.lean` owns the generic
+  `Algebra/Homology/DerivedCategory/Opposite.lean` owns the generic
   `DerivedCategory.OppositeComparison`, while `LinearDual.lean` owns the exact
   ModuleCat linear-dual functor and its derived lift. Canonical and Serre
   duality consume those roots together with
@@ -52,14 +52,14 @@ blocks should normally move it rather than add more declarations beside it.
 - Ordinary semilinear and top exterior-power algebra:
   `LinearAlgebra/ExteriorPower/`.
 - Exterior powers of presheaves of modules over an arbitrary ring presheaf:
-  `CategoryTheory/Sites/Sheaves/Modules/ExteriorPower.lean`; scheme
+  `Algebra/Category/ModuleCat/Sheaf/ExteriorPower.lean`; scheme
   sheafification and restriction comparisons remain geometric consumers.
 - Higher-categorical adjunctions: Mathlib's
   `CategoryTheory.Bicategory.Adjunction`, extended under
   `CategoryTheory/Bicategory/Adjunction/`; ordinary adjoint functors are the
   `Cat` specialization through `Adjunction.bicategoricalEquiv`.
 - Pseudofunctor-presentation transport:
-  `CategoryTheory/Pseudofunctor/Transport.lean` owns conjugation through
+  `CategoryTheory/Bicategory/Functor/Cat/Transport.lean` owns conjugation through
   objectwise equivalences together with transported units, compositors,
   pentagon, and triangle equations. Both affine bounded-projective derived
   realizations consume this root; the former
@@ -105,7 +105,7 @@ blocks should normally move it rather than add more declarations beside it.
   `RingTheory/GradedAlgebra/HomogeneousLocalization/Domain.lean` owns the five
   `HomogeneousLocalization` declarations proving nontriviality, domain, and
   reducedness from nonzerodivisor hypotheses. Their complete signatures use no
-  projective spectrum or scheme. `AlgebraicGeometry/Proj/Integral.lean` imports
+  projective spectrum or scheme. `AlgebraicGeometry/ProjectiveSpectrum/Integral.lean` imports
   this owner directly and adds the geometric chart and integrality results;
   the former Proj-owned source path is retired without a compatibility shim.
 - Laurent monomial bases:
@@ -192,14 +192,14 @@ blocks should normally move it rather than add more declarations beside it.
   longer live inside the scheme tensor consumer.
 - Over-site restriction infrastructure:
   `CategoryTheory/Sites/Over.lean` owns cocontinuity of `Over.post`,
-  `CategoryTheory/Sites/Sheaves/Modules/Over.lean` owns the module-sheaf
+  `Algebra/Category/ModuleCat/Sheaf/Over.lean` owns the module-sheaf
   restriction API, and `CategoryTheory/Sites/CoversTop.lean` owns
   transport of a terminal-covering family through a cover-preserving
   equivalence. `AlgebraicGeometry/Modules/Restriction/OpenImmersion.lean`
   imports these roots and now begins at the scheme/open-site equivalence; the
   three declaration names are preserved without a compatibility shim.
 - Ringed-site presentation restriction:
-  `CategoryTheory/Sites/Sheaves/Modules/Presentation/Over.lean` owns
+  `Algebra/Category/ModuleCat/Sheaf/Presentation/Over.lean` owns
   restriction of `Presentation`, `GeneratingSections`, and
   `QuasicoherentData` to over sites, including preservation of a finite
   generating index. `AlgebraicGeometry/Modules/Affine/{BasicOpen,Finiteness}.lean`
@@ -210,7 +210,7 @@ blocks should normally move it rather than add more declarations beside it.
   `CategoryTheory/Sites/Sheaves/Modules/Presentation/{Isomorphism,Locality}.lean`
   own transport across isomorphisms, closure of the finite-presentation object
   property, restriction to over sites, and descent from a `CoversTop` family.
-  `AlgebraicGeometry/CoherentSheaf/Basic/Isomorphism.lean` now contains only
+  `AlgebraicGeometry/Modules/Coherent/Basic/Isomorphism.lean` now contains only
   the `coherent X` instance, while `Descent/Locality.lean` contains only
   scheme open-immersion and affine-cover consumers. The seven declaration
   names are preserved without compatibility shims, and unnecessary hypotheses
@@ -219,13 +219,13 @@ blocks should normally move it rather than add more declarations beside it.
   `CategoryTheory/Sites/Sheaves/Modules/Presentation/{Zero,Extensions}.lean`
   own the empty finite presentation of the zero module sheaf and the finite
   horseshoe construction proving closure under short-exact extensions.
-  `AlgebraicGeometry/CoherentSheaf/Abelian/Extensions.lean` now contains only
+  `AlgebraicGeometry/Modules/Coherent/Abelian/Extensions.lean` now contains only
   the resulting `coherent X` extension instance, while `Abelian/Basic.lean`
   retains the geometric zero, finite-product, abelian, and exact-inclusion
   instances. Public declaration names are preserved without compatibility
   shims.
 - Generic invertible module sheaves and tensor/sheafification descent:
-  `CategoryTheory/Sites/Sheaves/Modules/Invertible.lean` owns rank-one local
+  `Algebra/Category/ModuleCat/Sheaf/Invertible.lean` owns rank-one local
   generator data, intrinsic `SheafOfModules.IsInvertible`, transport, finite
   presentation, and local trivializations. The adjacent `Tensor.lean` owns
   preservation of local equivalences by tensoring with a rank-one factor on an
@@ -247,7 +247,7 @@ blocks should normally move it rather than add more declarations beside it.
   begins with scheme modules, distinguished opens, and localization. Both
   declaration names are preserved without a compatibility shim.
 - Finite products of prime-spectrum basic opens:
-  `Topology/PrimeSpectrum/BasicOpen.lean` owns
+  `RingTheory/Spectrum/Prime/BasicOpen.lean` owns
   `PrimeSpectrum.basicOpen_prod_eq_pi`, while
   `AlgebraicGeometry/Cohomology/Cech/Affine.lean` imports it and retains only
   the private localization machinery and public affine Čech exactness
@@ -255,10 +255,10 @@ blocks should normally move it rather than add more declarations beside it.
   compatibility shim. The earlier queue classified this under `Algebra/` from
   its ring input alone; the complete signature instead contains
   `Opens (PrimeSpectrum R)` and a categorical finite product supplied by
-  `Topology/Opens/Limits`, so `Topology/PrimeSpectrum/` is the first valid
+  `Topology/Category/TopCat/Opens/Limits`, so `RingTheory/Spectrum/Prime/` is the first valid
   owner without a forbidden `Algebra -> Topology` edge.
 - Generating sections from free epimorphisms:
-  `CategoryTheory/Sites/Sheaves/Modules/GeneratingSections.lean` owns
+  `Algebra/Category/ModuleCat/Sheaf/GeneratingSections.lean` owns
   `SheafOfModules.GeneratingSections.ofFreeEpi`, its finite-index instance,
   and the lemma recovering the original epimorphism. The full signatures use
   only a ring sheaf on an arbitrary site. The affine coherent-chart module
@@ -375,6 +375,26 @@ blocks should normally move it rather than add more declarations beside it.
   nonempty index, which only the finiteness theorems use as `[Fintype ι]`;
   and the two Euler-additivity exactness lemmas assume
   `IsLocallyNoetherian X`, which is what they use.
+- Adjacent placement defects found by the 2026-09-02 review of the restructure
+  (landed 2026-09-02). Generic t-structure retract closure moved from
+  `Algebra/Homology/DerivedCategory/TStructure.lean` to
+  `CategoryTheory/Triangulated/TStructure/Retracts.lean`; `QuasiAbelian.lean`
+  moved from `Triangulated/` to `CategoryTheory/Abelian/`;
+  `Triangulated/LinearOpposite.lean` split into `CategoryTheory/Linear/Opposite.lean`
+  and `Triangulated/Opposite/Linear.lean`; `DerivedCategory/LinearDual.lean` split,
+  with the ordinary `ModuleCat` duality at `Algebra/Category/ModuleCat/LinearDual.lean`;
+  `Ext/InjectiveResolutionNaturality.lean` split, with
+  `CategoryTheory/Localization/SmallShiftedHom.lean` and
+  `Algebra/Homology/HomotopyCategory/HomComplexPostcomp.lean`;
+  `Triangulated/CompactlyGenerated.lean` split, with the generic compact-object
+  vocabulary at `CategoryTheory/Preadditive/CompactObject.lean`; and
+  `CategoryTheory/StabilityCharge.lean` moved to
+  `Triangulated/StabilityCondition/Weak/Charge.lean`. Declaration names and
+  namespaces are unchanged; the old paths are retired in the layering gate; the
+  audit sweep routes all of `Algebra/Category/ModuleCat/` to the StabilityCondition
+  lane. The four upper-half-plane facts in `Weak/Charge.lean` remain an upstream
+  candidate for `Analysis/Complex/UpperHalfPlane/` under the `Complex` namespace,
+  deferred by the name-stability rule.
 
 ## Confirmed next lanes
 

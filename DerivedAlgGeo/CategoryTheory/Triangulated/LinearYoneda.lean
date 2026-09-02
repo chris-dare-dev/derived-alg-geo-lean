@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.LinearOpposite
+import DerivedAlgGeo.CategoryTheory.Triangulated.Opposite.Linear
 import Mathlib.CategoryTheory.Triangulated.Yoneda
 import Mathlib.CategoryTheory.Linear.Yoneda
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat

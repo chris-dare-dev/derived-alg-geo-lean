@@ -91,12 +91,12 @@ private def libraryOf (m : Name) : Option String :=
     `DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
   -- The audit lanes are historical (CohLean, BridgelandStabLean, DGLean), and
   -- routing follows the lane that holds a subtree's records, not its current
-  -- path. `Algebra/Homology/`, `Algebra/Category/ModuleCat/Sheaf/`,
+  -- path. `Algebra/Homology/`, `Algebra/Category/ModuleCat/`,
   -- `AlgebraicTopology/`, and `Topology/Sheaves/Cech/` were routed with
   -- `CategoryTheory` before the 2026-09-01 moves to Mathlib's paths, and
   -- `RingTheory/` with `Topology`.
   let homology := `DerivedAlgGeo.Algebra.Homology
-  let moduleSheaf := `DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
+  let moduleCat := `DerivedAlgGeo.Algebra.Category.ModuleCat
   let algebraicTopology := `DerivedAlgGeo.AlgebraicTopology
   let topologicalCech := `DerivedAlgGeo.Topology.Sheaves.Cech
   let ringTheory := `DerivedAlgGeo.RingTheory
@@ -113,7 +113,7 @@ private def libraryOf (m : Name) : Option String :=
     some "DGCategory"
   else if m == categoryTheory || categoryTheory.isPrefixOf m ||
       m == homology || homology.isPrefixOf m ||
-      m == moduleSheaf || moduleSheaf.isPrefixOf m ||
+      m == moduleCat || moduleCat.isPrefixOf m ||
       m == algebraicTopology || algebraicTopology.isPrefixOf m ||
       m == topologicalCech || topologicalCech.isPrefixOf m ||
       m == linearAlgebra || linearAlgebra.isPrefixOf m then

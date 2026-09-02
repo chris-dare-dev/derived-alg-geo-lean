@@ -7,7 +7,6 @@ import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Polishchuk
 import DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower
-import DerivedAlgGeo.CategoryTheory.Triangulated.QuasiAbelian
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup
@@ -16,13 +15,13 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HomFiniteWitn
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
-import DerivedAlgGeo.CategoryTheory.Triangulated.LinearOpposite
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
 import DerivedAlgGeo.CategoryTheory.Triangulated.Families
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
+import DerivedAlgGeo.CategoryTheory.Triangulated.Opposite
 
 /-! # Triangulated categories
 

@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.DerivedCategory.ExactFunctor
 import Mathlib.Algebra.Homology.DerivedCategory.TStructure
-import DerivedAlgGeo.Algebra.Homology.DerivedCategory.TStructure
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Retracts
 
 /-!
 # Exact functors between derived categories

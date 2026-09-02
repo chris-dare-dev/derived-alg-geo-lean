@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
+import DerivedAlgGeo.Algebra.Category.ModuleCat.LinearDual
 
 /-!
 # Categories of modules

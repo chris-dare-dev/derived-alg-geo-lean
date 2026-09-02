@@ -12,7 +12,9 @@ import DerivedAlgGeo.CategoryTheory.Sites
 import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated
 import DerivedAlgGeo.CategoryTheory.Moduli
-import DerivedAlgGeo.CategoryTheory.StabilityCharge
+import DerivedAlgGeo.CategoryTheory.Linear
+import DerivedAlgGeo.CategoryTheory.Localization
+import DerivedAlgGeo.CategoryTheory.Preadditive
 
 /-! # Category theory
 

@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexPostcomp
 
 /-!
 # The homotopy category

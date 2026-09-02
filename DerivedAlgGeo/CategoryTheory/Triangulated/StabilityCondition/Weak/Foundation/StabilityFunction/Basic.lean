@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.ShortComplex.ShortExact
-import DerivedAlgGeo.CategoryTheory.StabilityCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Charge
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 import Mathlib.CategoryTheory.Abelian.Basic
 import Mathlib.CategoryTheory.Subobject.Lattice

@@ -28,13 +28,18 @@ Four layers, in order:
 
 ## Placement
 
-Generic category theory: this file imports only Mathlib, mentions no stability
-condition, and lives in namespace `CategoryTheory.Triangulated`.  It sat under
-`StabilityCondition/Foundation/` until #488 because its first consumer was
-Bridgeland's thin-interval argument — `Foundation/Slicing/IntervalStrictness.lean`
-is still the caller.  A first consumer is not a layer, and the move is the one
-#454 made for `PostnikovTower` and `K₀`: the namespace said generic while the
-path said specialized.
+Generic category theory: this file imports only Mathlib's abelian, short-complex,
+pullback, and subobject material, mentions no stability condition, and uses
+nothing triangulated. It lives under `CategoryTheory/Abelian/`, beside Mathlib's
+`Abelian/NonPreadditive.lean` precedent for a category with exactness conditions
+weaker than abelian. It sat under `StabilityCondition/Foundation/` until #488
+because its first consumer was Bridgeland's thin-interval argument
+(`Foundation/Slicing/IntervalStrictness.lean` is still the caller), then under
+`Triangulated/` until 2026-09-02, when the review of the Mathlib-mesh restructure
+applied the rule that a file belongs under `Triangulated/` only if it uses
+something triangulated. The namespace stays `CategoryTheory.Triangulated`:
+declaration names are unchanged across moves so that the immutable review
+payloads the `exe/RestateHistoricalNames.lean` bridge protects keep resolving.
 
 ## What this file asserts, and where
 

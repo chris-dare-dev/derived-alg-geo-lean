@@ -10,7 +10,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Functorial
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.PreStabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.IntervalCategory
-import DerivedAlgGeo.CategoryTheory.Triangulated.QuasiAbelian
+import DerivedAlgGeo.CategoryTheory.Abelian.QuasiAbelian
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.PhaseBounds
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.FiltrationOperations
