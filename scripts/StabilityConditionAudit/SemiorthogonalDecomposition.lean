@@ -179,6 +179,35 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.projectedObjectHomEquiv
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.projectedObjectHomEquiv_id
 
+-- Objectwise mutation from a chosen right projection is constructed in a
+-- bare triangulated category.  The cone is not claimed functorial.  Once
+-- successive exceptional-block triangles are supplied, their orthogonal
+-- cones prove the same-projection theorem for every member of every block.
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.ofIsRightAdmissible
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.mutation
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.toMutation
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.connecting
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.distinguished
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.mutation_mem
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.mk.inj
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.mk.sizeOf_spec
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.counitTriangle
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.projectMap_isIso_of_distinguished
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.projectMapIsoOfDistinguished
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.stepMap
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.cone
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.toCone
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.connecting
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.distinguished
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.cone_mem
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.mk.inj
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.stepProjectionIso
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.projectionIsoFromFirst
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.projectionIso
+
 -- The derived category of a field: the milestone's honest inhabitant. The
 -- residue field in degree zero is exceptional (endomorphisms via the fully
 -- faithful k-linear singleFunctor; positive shifts via projectivity and

@@ -1,10 +1,12 @@
 /-
 Exceptional-block and residual-projection slice of the AlgebraicGeometry
-audit.  Block geometry, projection existence, Ext profiles, and completeness
-remain supplied data.  The checked consequences concern the actual ten
-derived line bundles and their actual residual projections.
+audit.  Admissibility, the numerical curve chains, the derived divisor
+triangles, Ext profiles, and completeness remain explicit data.  The chosen
+projection, objectwise mutation triangle, same-projection result, and
+Ext-to-classification consequences are constructions or theorems concerning
+the actual ten derived line bundles and their actual residual projections.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperBlocks
+import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperExtension
 
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperBlockData
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperBlockData.blocks
@@ -51,3 +53,42 @@ import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperBlocks
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionClassificationData.longer_projectedObject_not_spherical
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionClassificationData.singleton_projectedObject_not_shift
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionClassificationData.longer_projectedObject_not_shift
+
+-- The downstream paper-extension layer turns residual admissibility into a
+-- chosen projection, records the numerical (-2)-chain geometry and its
+-- divisor triangles, proves same projection throughout every block, and
+-- assembles the Ext computations into the two classification packages.
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperResidualAdmissibilityData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperResidualAdmissibilityData.rightAdmissible
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperResidualAdmissibilityData.projectionData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperBlockData.mutationTriangle
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.curve
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.selfIntersection
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.adjacentIntersection
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.nonAdjacentIntersection
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.mk.inj
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.prefixDivisor
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.prefixDivisor_zero
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.chain
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.memberClass
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.projectionTriangles
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.mk.inj
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.projectionIso
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIProjectionExtData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIProjectionExtData.selfExt
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIProjectionExtData.pairwise
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIProjectionExtData.toProjectionClassificationData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionExtData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionExtData.sphericalExt
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionExtData.pseudoprojectiveExt
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionExtData.serreShift
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionExtData.pairwise
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionExtData.spherical_of_singleton
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionExtData.pseudoprojective_of_longer
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionExtData.toProjectionClassificationData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperResidualKernelEquivalence
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperExceptionalBlockExtensionData

@@ -588,3 +588,62 @@ structure.
 #print axioms CategoryTheory.Triangulated.FourierMukai.trivialRightAdjointKernelData_adjKernel
 #print axioms CategoryTheory.Triangulated.FourierMukai.trivialUnitKernelData
 #print axioms CategoryTheory.Triangulated.FourierMukai.trivialUnitKernelData_unitKernel
+
+/-! ## Exceptional-block extension
+
+The one-step and finite extension records expose exactly where the dg cone
+construction remains supplied.  Once a final kernel-presented adjunction has
+invertible unit and counit, the ambient equivalence is derived rather than
+stored as an extra hypothesis.
+-/
+
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.iso
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.ofRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.ofRightAdjointKernel_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.adjoinObject
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.restrictionIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.newKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.kernelMap
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.agreesWithOld
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.transformCommShift
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.transformTriangulated
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.mapsAdjoin
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.enlargedEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.enlargedIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.agreesOnBase
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.objectIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.annihilates
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.restrictedFunctor
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.restrictedFunctorIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.rightAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.unitIsIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.counitIsIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.transformCommShift
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.transformTriangulated
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.residualIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.blockEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.length_eq
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.shift
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.objectIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.toKernelEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.toKernelEquivalence_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.transform_isEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.ambientEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.ambientEquivalence_functor

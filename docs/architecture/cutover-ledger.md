@@ -12,13 +12,17 @@ blocks should normally move it rather than add more declarations beside it.
   owns positive-length mutually orthogonal exceptional blocks, their
   triangulated spans, decomposition type, and residual right orthogonal;
   `Projection.lean` owns a chosen right adjoint to a full-subcategory
-  inclusion and its universal Hom equivalence.  The Serre classification
-  adapter remains generic in `SerreFunctor/ProjectionObjects.lean`.
-  `AlgebraicGeometry/Surface/Enriques/PaperBlocks.lean` is only the geometric
-  consumer: it identifies the block members with the ten selected line
-  bundles and specializes the classified objects to their residual
-  projections.  Projection existence and the papers' Ext calculations are
-  supplied data, not constructed conclusions.
+  inclusion and its universal Hom equivalence; `Mutation.lean` constructs the
+  objectwise counit triangle and proves the generic projection-chain theorem.
+  Ext profiles and their bidirectional transport remain generic in
+  `SerreFunctor/`, while the one-step and finite kernel-extension result
+  interfaces live in `FourierMukai/ExceptionalExtension.lean`.
+  `AlgebraicGeometry/Surface/Enriques/PaperBlocks.lean` and
+  `PaperExtension.lean` are geometric consumers: they identify the block
+  members with the ten selected line bundles, record the numerical
+  `(-2)`-chains, and specialize the projection and classification results.
+  Constructing the divisor triangles and functorial kernel cones remains
+  supplied data pending the dg enhancement lane.
 - Generic moduli boundedness: `CategoryTheory/Moduli/Boundedness.lean`.
 - Generic replete subprestack machinery:
   `CategoryTheory/Bicategory/Functor/Cat/ObjectProperty/`, reusing Mathlib's

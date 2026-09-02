@@ -3,10 +3,11 @@ Serre-functor and paper-object slice of the StabilityCondition audit.  These
 are generic linear/triangulated category interfaces; the Enriques geometric
 specialization is audited separately in AlgebraicGeometryAudit/Core.lean.
 
-The classification structures are SUPPLIED DATA.  A clean axiom list says
-that their formal consequences use no hidden axioms; it does not construct the
-mutation functors, projected objects, or Ext calculations assumed by the two
-papers.
+The classification structures are SUPPLIED DATA.  Ext-profile constructors
+and their bidirectional transport under a Serre-compatible equivalence are
+proved here.  A clean axiom list says that their formal consequences use no
+hidden axioms; it does not construct the geometric Ext calculations assumed
+by the two papers.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 
@@ -106,3 +107,39 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.MixedClassificationData.ofResidualProjections_blockLength
 #print axioms CategoryTheory.SerreFunctor.MixedClassificationData.ofResidualProjections_candidate
 #print axioms CategoryTheory.SerreFunctor.MixedClassificationData.residualProjection_candidate_dichotomy
+
+-- Ext computations are kept separate from the Serre-shift input.  A
+-- Serre-compatible equivalence carries comparison data in both directions,
+-- so spherical and pseudoprojective status is preserved and reflected.
+#print axioms CategoryTheory.SerreFunctor.SphericalExtProfile
+#print axioms CategoryTheory.SerreFunctor.SphericalExtProfile.vanishing
+#print axioms CategoryTheory.SerreFunctor.SphericalExtProfile.end_one
+#print axioms CategoryTheory.SerreFunctor.SphericalExtProfile.top_one
+#print axioms CategoryTheory.SerreFunctor.SphericalExtProfile.toIsSphericalObject
+#print axioms CategoryTheory.SerreFunctor.SphericalExtProfile.map
+#print axioms CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile
+#print axioms CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile.inRange_one
+#print axioms CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile.vanishing
+#print axioms CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile.toIsPseudoprojectiveObject
+#print axioms CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile.map
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.equiv
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.functorAdditive
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.functorLinear
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.functorCommShift
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.serreIso
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.inverseAdditive
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.inverseLinear
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.inverseCommShift
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.inverseSerreIso
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.mk.inj
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.mk.sizeOf_spec
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.symm
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.mapSpherical
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.mapPseudoprojective
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.spherical_iff
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.pseudoprojective_iff
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.mapIsShiftOf
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.isShiftOf_iff
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.mapIsGradedOrthogonal
+#print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.isGradedOrthogonal_iff
