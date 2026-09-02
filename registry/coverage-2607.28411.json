@@ -111,7 +111,7 @@
       "part": "I",
       "status": "target",
       "tracking": ".claude/roadmap/projective-families.yaml#projective-families-e7",
-      "note": "Definitions 3.1/3.6 and Propositions 3.3/3.8, followed by the geometric Bayer/cofiltration criteria. Target only; the separate §3.4 coordinate records the existing candidate mapping."
+      "note": "Definitions 3.1/3.6 and Propositions 3.3/3.8, followed by the geometric Bayer/cofiltration criteria. Target only; the separate §3.4 coordinate records the existing candidate mapping. Candidate categorical declarations for Definitions 3.1(2)-(3)/3.6(2)-(3), Remarks 3.2/3.7, and Lemmas 3.5/3.9(2)-(3) exist as of 2026-09-02 under CategoryTheory/Triangulated/StabilityCondition/Phase/Transfer/{PreStability,LocallyFinite}.lean and Support/Transfer.lean (PreStabilityCondition.WithClassMap.preimage, StabilityCondition.WithClassMap.preimage, their pullback/pushforward names, HasSupportProperty.preimage, QuadraticSupportData.preimage, slicingDist_preimage_le); the geometric realizations on D^b(Coh) and Propositions 3.3/3.8 are not represented."
     },
     {
       "id": "secs-4-6-absolute-projective-construction",
