@@ -1,0 +1,99 @@
+/-
+Serre-functor and paper-object slice of the StabilityCondition audit.  These
+are generic linear/triangulated category interfaces; the Enriques geometric
+specialization is audited separately in AlgebraicGeometryAudit/Core.lean.
+
+The classification structures are SUPPLIED DATA.  A clean axiom list says
+that their formal consequences use no hidden axioms; it does not construct the
+mutation functors, projected objects, or Ext calculations assumed by the two
+papers.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
+
+#print axioms ModuleCat.linearDualFunctor
+#print axioms CategoryTheory.SerreFunctor.HomFinite
+#print axioms CategoryTheory.SerreFunctor.HomFinite.finite
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.S
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.eta
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.naturality_left
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.naturality_right
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.mk.inj
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.mk.sizeOf_spec
+#print axioms CategoryTheory.SerreFunctor.HasSerreFunctor
+#print axioms CategoryTheory.SerreFunctor.SerreCategoryData
+#print axioms CategoryTheory.SerreFunctor.SerreCategoryData.serre
+#print axioms CategoryTheory.SerreFunctor.SerreCategoryData.serreIsEquivalence
+#print axioms CategoryTheory.SerreFunctor.SerreCategoryData.mk.inj
+#print axioms CategoryTheory.SerreFunctor.SerreCategoryData.mk.sizeOf_spec
+#print axioms CategoryTheory.SerreFunctor.SerreCategoryData.hasSerreEquivalence
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_apply
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_separating_left
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_separating_right
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.finrank_hom_eq
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.trace
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.trace_apply
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.trace_comp
+
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject.vanishing
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject.end_one
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject.top_one
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject.serre_shift
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject.not_isZero
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject.finrank_end
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject.finrank_top
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject.finrank_hom_eq_zero
+#print axioms CategoryTheory.SerreFunctor.IsSphericalObject.of_iso
+#print axioms CategoryTheory.SerreFunctor.IsPseudoprojectiveObject
+#print axioms CategoryTheory.SerreFunctor.IsPseudoprojectiveObject.inRange_one
+#print axioms CategoryTheory.SerreFunctor.IsPseudoprojectiveObject.vanishing
+#print axioms CategoryTheory.SerreFunctor.IsPseudoprojectiveObject.serre_shift
+#print axioms CategoryTheory.SerreFunctor.IsPseudoprojectiveObject.not_isZero
+#print axioms CategoryTheory.SerreFunctor.IsPseudoprojectiveObject.finrank_inRange
+#print axioms CategoryTheory.SerreFunctor.IsPseudoprojectiveObject.finrank_hom_eq_zero
+#print axioms CategoryTheory.SerreFunctor.IsPseudoprojectiveObject.of_iso
+#print axioms CategoryTheory.SerreFunctor.IsPseudoprojectiveObject.not_isSphericalObject
+#print axioms CategoryTheory.SerreFunctor.isSphericalObject_one_iff_isPseudoprojectiveObject_one
+
+#print axioms CategoryTheory.SerreFunctor.EnriquesCategoryData
+#print axioms CategoryTheory.SerreFunctor.EnriquesCategoryData.toSerreCategoryData
+#print axioms CategoryTheory.SerreFunctor.EnriquesCategoryData.squareShift
+#print axioms CategoryTheory.SerreFunctor.EnriquesCategoryData.mk.inj
+#print axioms CategoryTheory.SerreFunctor.EnriquesCategoryData.mk.sizeOf_spec
+#print axioms CategoryTheory.SerreFunctor.TwoEnriquesCategoryData
+#print axioms CategoryTheory.SerreFunctor.EnriquesCategoryData.dimension
+#print axioms CategoryTheory.SerreFunctor.EnriquesCategoryData.serreSquareIso
+#print axioms CategoryTheory.SerreFunctor.EnriquesCategoryData.serreSquareObjIso
+#print axioms CategoryTheory.SerreFunctor.EnriquesCategoryData.hasSerreEquivalence
+#print axioms CategoryTheory.SerreFunctor.no_exceptional_of_serre_iso_shift
+
+#print axioms CategoryTheory.SerreFunctor.IsShiftOf
+#print axioms CategoryTheory.SerreFunctor.IsGradedOrthogonal
+#print axioms CategoryTheory.SerreFunctor.not_isShiftOf_of_isGradedOrthogonal
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.candidate
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.candidate_spherical
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.pairwise_orthogonal
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.complete
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.mk.inj
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.mk.sizeOf_spec
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.candidate_not_isShiftOf
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.exists_candidate_shift
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.blockLength
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.candidate
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.spherical_of_length_one
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.pseudoprojective_of_two_le
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.pairwise_orthogonal
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.spherical_complete
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.pseudoprojective_complete
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.mk.inj
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.mk.sizeOf_spec
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.candidate_spherical
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.candidate_pseudoprojective
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.spherical_candidate_not_isShiftOf
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.pseudoprojective_candidate_not_isShiftOf
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.spherical_iff
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.pseudoprojective_iff

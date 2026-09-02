@@ -8,6 +8,7 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Limits
 import DerivedAlgGeo.CategoryTheory.Monoidal
+import DerivedAlgGeo.CategoryTheory.ModuleCat
 import DerivedAlgGeo.CategoryTheory.Sites
 import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated

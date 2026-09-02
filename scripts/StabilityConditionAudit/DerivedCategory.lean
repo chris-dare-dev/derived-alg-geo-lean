@@ -15,7 +15,6 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CategoryTheory.DerivedCategory.OppositeComparison.mk.inj
 #print axioms CategoryTheory.DerivedCategory.OppositeComparison.mk.sizeOf_spec
 #print axioms CategoryTheory.DerivedCategory.OppositeComparison.equivalence
-#print axioms ModuleCat.linearDualFunctor
 #print axioms ModuleCat.linearDualFunctor_obj
 #print axioms ModuleCat.linearDualFunctor_map
 #print axioms ModuleCat.instAdditiveOppositeLinearDualFunctor

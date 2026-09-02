@@ -48,6 +48,12 @@ Category
 │  └─ reflective transport using an ordinary adjunction
 ├─ Preadditive
 │  └─ Linear k C                         Mathlib root
+│     └─ SerreFunctorData                duality on Hom spaces
+│        ├─ SerreCategoryData            chosen Serre autoequivalence
+│        │  └─ EnriquesCategoryData      square-to-shift refinement
+│        ├─ IsSphericalObject            two-degree self-Hom profile
+│        ├─ IsPseudoprojectiveObject     interval self-Hom profile
+│        └─ classification data          supplied paper conclusions
 ├─ Abelian                               Mathlib typeclass
 │  ├─ weak-Serre exactness               repository generic extension
 │  └─ DerivedCategory C                  generic construction
@@ -231,6 +237,11 @@ particular:
   finite-type witnesses remain geometric consumers;
 - a paper-specific module may instantiate these roots but never becomes a root
   imported by them.
+- keep Serre duality, Enriques-category relations, and spherical or
+  pseudoprojective self-Hom profiles under the generic triangulated-category
+  root.  A surface-specific residual category reuses those structures; its
+  mutation, projection, and Ext computations remain explicit geometric input
+  until constructed.
 
 Bicategories are the first implemented higher-categorical stage. A future
 general `n`-category or `(∞,1)`-category layer must name its formal model and
