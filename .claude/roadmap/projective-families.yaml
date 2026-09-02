@@ -78,6 +78,7 @@ generations:
   - { rev: 5, at: "2026-08-28", note: "Issue #852 started at the generic triangulated root. The pinned Mathlib reconnaissance selects ObjectProperty orthogonals and the canonical triangulated envelope; the implementation separates the semiorthogonal carrier, triangulated components, classical fullness, strong fullness, and mapped-component orthogonality, with one-block and product-factor inhabitants before geometry." }
   - { rev: 6, at: "2026-08-28", note: "Issue #852 merged its generic semiorthogonal root, including independent triangulated/fullness predicates and two compiled inhabitants. Work returns to #851 for the geometric fiber overlattice and eta-specialization adapter on the existing relative quotient." }
   - { rev: 7, at: "2026-08-28", note: "Issue #851 now models each geometric fiber group as the image of its eta base-change homomorphism in a common ambient group, records finite relative index as a predicate, and transports admissible-family classes through this image into the existing saturated quotient. Proposition 8.10 functoriality is the next slice." }
+  - { rev: 8, at: "2026-09-02", note: "Epic e7 registered as #1033 and started with its categorical half: transfer of pre-stability and stability conditions along a phase-detecting functor (Definitions 3.1/3.6, Remarks 3.2/3.7, Lemmas 3.5/3.9) under Phase/Transfer/{PreStability,LocallyFinite}.lean and Support/Transfer.lean, in parallel with the Enriques lane. Conservativity is derived from Slicing.PreimageData rather than assumed. The geometric Dᵇ(Coh) realizations, Propositions 3.3/3.8, Lemma 3.10, and §2.2 remain open under the same epic; PF3 still has no GitHub milestone." }
 items:
   - id: projective-families-m1
     gh_milestone: 33
@@ -214,17 +215,17 @@ items:
       - "Embedding independence is an agreement theorem over the common numerical root."
 
   - id: projective-families-e7
-    gh_issue: null
+    gh_issue: 1033
     gh_sub_issues: []
     kind: epic
     parent: projective-families-m3
     title: "Absolute scalar base change and stability transfer"
-    status: planned
+    status: in_progress
     priority: must
     size: XL
-    summary: "Finish §2 scalar extension/geometric stability and §3 finite pullback/proper faithfully-flat pushforward on the existing slicing/preimage/Bayer roots."
+    summary: "The categorical half of §3 landed first: Definitions 3.1(2)--(3)/3.6(2)--(3) as one transfer operation on PreStabilityCondition.WithClassMap and StabilityCondition.WithClassMap with class map v ∘ K₀(F), conservativity derived from Slicing.PreimageData, support-property and local-finiteness transfer (Remarks 3.2/3.7), extreme phases and the slicing distance under transfer (Lemmas 3.5/3.9), and the two-witness slicing-order transfer (arXiv:2601.22994 Lemma 3.3). Still open: Propositions 3.3/3.8 as consumers of the owned A.17 output on Dᵇ(Coh), the Dᵇ(Coh) realizations of f^♯σ and f_♯σ, Lemma 3.10 base-change compatibility, and the §2.2 scalar extension."
     tags: [stability, base-change, transfer]
-    labels: [area:stability, source:2607.28411]
+    labels: [area:lean, area:stability, type:feature, source:2607.28411, source:2601.22994]
 
   - id: projective-families-e8
     gh_issue: null
