@@ -6,14 +6,14 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Functorial
-import DerivedAlgGeo.LinearAlgebra.AlternatingFinsum
+import DerivedAlgGeo.Algebra.Homology.EulerCharacteristic
 
 /-!
 # The Hom-built Euler form
 
 `χ(X, Y) = Σᵢ (-1)ⁱ · dimₖ Hom(X, Y⟦i⟧)`, built from the long exact Hom
 sequences of `LinearYoneda` and `LinearCoyoneda` and the `ℤ`-indexed
-alternating-sum arithmetic of `LinearAlgebra/AlternatingFinsum`.
+Euler-characteristic additivity of `Algebra/Homology/EulerCharacteristic`.
 
 The additive pairing itself is the generic `K₀.EulerForm` abbreviation in this
 file. `K₀.EulerForm.ofLinear` constructs it from the Hom-built form; geometric
@@ -70,7 +70,7 @@ universe w u v u' v'
 namespace CategoryTheory.Triangulated
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
-open Opposite Module DerivedAlgGeo.LinearAlgebra
+open Opposite Module
 
 /-- A biadditive integer-valued form on the triangulated Grothendieck group.
 This is an abbreviation for the canonical nested additive-homomorphism type,
@@ -144,13 +144,14 @@ noncomputable def chiHom (X Y : C) : ℤ :=
 variable {k C}
 
 omit [HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] in
-theorem chiHom_eq_finsum_altDim (X Y : C) :
-    chiHom k C X Y = ∑ᶠ i : ℤ, altDim (k := k) (fun i => X ⟶ Y⟦i⟧) i :=
+theorem chiHom_eq_eulerChar (X Y : C) :
+    chiHom k C X Y =
+      GradedObject.eulerChar (ComplexShape.up ℤ) (fun i : ℤ => ModuleCat.of k (X ⟶ Y⟦i⟧)) :=
   rfl
 
 /-- A `ShortComplex` exact in `ModuleCat k` gives `Function.Exact` of the
 underlying linear maps.  The bridge from the categorical homology sequence to
-the arithmetic of `AlternatingFinsum`. -/
+`GradedObject.eulerChar_eq_add_of_exact`. -/
 theorem exact_hom_of_shortComplex_exact {S : ShortComplex (ModuleCat k)}
     (hS : S.Exact) : Function.Exact S.f.hom S.g.hom :=
   LinearMap.exact_iff.mpr hS.moduleCat_range_eq_ker.symm
@@ -167,7 +168,7 @@ deliberate asymmetry with `chiHom_additive_left`. -/
 theorem chiHom_additive_right (X : C) (T : Triangle C) (hT : T ∈ distTriang C) :
     chiHom k C X T.obj₂ = chiHom k C X T.obj₁ + chiHom k C X T.obj₃ := by
   set F := (linearCoyoneda k C).obj (op X) with hF
-  refine finsum_altDim_middle (k := k)
+  refine GradedObject.eulerChar_eq_add_of_exact (k := k)
     (A := fun i => X ⟶ T.obj₁⟦i⟧) (B := fun i => X ⟶ T.obj₂⟦i⟧)
     (C := fun i => X ⟶ T.obj₃⟦i⟧)
     (fun i => ((F.shift i).map T.mor₁).hom)
@@ -202,7 +203,7 @@ theorem chiHom_additive_left (Y : C) (T : Triangle C) (hT : T ∈ distTriang C) 
   set T' := (triangleOpEquivalence C).functor.obj (op T) with hT'
   have hT'd : T' ∈ distTriang Cᵒᵖ := op_distinguished T hT
   have key : chiHom k C T.obj₂ Y = chiHom k C T.obj₃ Y + chiHom k C T.obj₁ Y :=
-    finsum_altDim_middle (k := k)
+    GradedObject.eulerChar_eq_add_of_exact (k := k)
       (A := fun i => T.obj₃ ⟶ Y⟦i⟧) (B := fun i => T.obj₂ ⟶ Y⟦i⟧)
       (C := fun i => T.obj₁ ⟶ Y⟦i⟧)
       (fun i => ((F.shift i).map T'.mor₁).hom)

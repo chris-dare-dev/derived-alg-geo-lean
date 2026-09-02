@@ -129,12 +129,6 @@ arithmetic engine a Hom-built Euler form would run on. It is NOT that form,
 and nothing here mentions a category.
 -/
 
-#print axioms DerivedAlgGeo.LinearAlgebra.diffRank
-#print axioms DerivedAlgGeo.LinearAlgebra.finrank_eq_finrank_ker_add_diffRank
-#print axioms DerivedAlgGeo.LinearAlgebra.finrank_eq_diffRank_add_diffRank
-#print axioms DerivedAlgGeo.LinearAlgebra.sum_range_succ_smul_finrank
-#print axioms DerivedAlgGeo.LinearAlgebra.sum_range_succ_smul_finrank_eq_zero
-#print axioms DerivedAlgGeo.LinearAlgebra.diffRank_eq_zero_of_subsingleton
 
 /-! ## Kernel functors acting on stability conditions
 
@@ -271,12 +265,10 @@ no boundary hypotheses because it telescopes by translation. The bounded
 at the top. Neither theorem mentions a category or a geometric object.
 -/
 
-#print axioms DerivedAlgGeo.LinearAlgebra.finrank_eq_range_add_range
-#print axioms DerivedAlgGeo.LinearAlgebra.alternating_finrank_eq_zero_of_exact
-#print axioms DerivedAlgGeo.LinearAlgebra.altDim
-#print axioms DerivedAlgGeo.LinearAlgebra.support_altDim
-#print axioms DerivedAlgGeo.LinearAlgebra.support_range_subset
-#print axioms DerivedAlgGeo.LinearAlgebra.finsum_altDim_middle
+#print axioms Function.Exact.finrank_eq_finrank_range_add_finrank_range
+#print axioms GradedObject.finrankSupport_eq_support_intCast
+#print axioms Module.support_finrank_range_subset
+#print axioms GradedObject.eulerChar_eq_add_of_exact
 
 /-! ## The k-linear coyoneda functor is homological
 
@@ -309,7 +301,7 @@ results require `HomFiniteBounded`.
 #print axioms CategoryTheory.Triangulated.HomFiniteBounded.finite
 #print axioms CategoryTheory.Triangulated.HomFiniteBounded.support_finite
 #print axioms CategoryTheory.Triangulated.chiHom
-#print axioms CategoryTheory.Triangulated.chiHom_eq_finsum_altDim
+#print axioms CategoryTheory.Triangulated.chiHom_eq_eulerChar
 #print axioms CategoryTheory.Triangulated.exact_hom_of_shortComplex_exact
 #print axioms CategoryTheory.Triangulated.chiHom_additive_right
 #print axioms CategoryTheory.Triangulated.chiHom_additive_left

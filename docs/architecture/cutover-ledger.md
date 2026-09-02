@@ -266,16 +266,18 @@ blocks should normally move it rather than add more declarations beside it.
   imports this owner directly and now retains only its scheme/open/coherence
   theorem; the declaration names and signatures are preserved without a
   compatibility shim.
-- Alternating finranks along bounded long exact sequences:
-  `LinearAlgebra/AlternatingFinsum.lean` now owns
-  `DerivedAlgGeo.LinearAlgebra.alternating_finrank_eq_zero_of_exact` beside the
-  boundary-free `ℤ`-indexed theorem and their shared rank--nullity lemma. Its
-  complete signature uses only finite-dimensional vector spaces, linear maps,
-  exactness, and a finite alternating sum. The Euler-characteristic additivity
-  module imports this root and applies it to coherent cohomology; the former
-  `Cohomology.FiniteCohomology` declaration is retired without a compatibility
-  alias.
-
+- Alternating finranks along long exact sequences: restated on Mathlib's API
+  (2026-09-02). `Algebra/Homology/EulerCharacteristic.lean` owns
+  `GradedObject.eulerChar_eq_add_of_exact`, the `ℤ`-indexed balance stated on
+  Mathlib's `GradedObject.eulerChar` with the signs of `ComplexShape.up ℤ`;
+  `Algebra/Exact/Sequence.lean` owns the bounded zig-zag companion
+  `Module.sum_neg_one_pow_finrank_eq_zero_of_longExact` beside Mathlib's
+  `Module.sum_neg_one_pow_finrank_eq_zero_of_exact`; and
+  `LinearAlgebra/FiniteDimensional/Lemmas.lean` owns their shared rank--nullity
+  lemma `Function.Exact.finrank_eq_finrank_range_add_finrank_range`. The former
+  `LinearAlgebra/AlternatingFinsum.lean` with its parallel `altDim` vocabulary,
+  and `LinearAlgebra/AlternatingSum.lean`, whose single-sequence theorem is
+  Mathlib's, are retired.
 - Geometric realizations live with the geometric object (2026-09-01): the
   seven former `CategoryTheory/<source>/Instances/AlgebraicGeometry/` leaves
   moved to
@@ -410,15 +412,18 @@ blocks should normally move it rather than add more declarations beside it.
   `SheafOfModules X.ringCatSheaf` without the priority hack. A consumer that
   wants a different localization takes `[HasDerivedCategory C]` as a hypothesis,
   as `SemiorthogonalDecomposition/DerivedField.lean` already does.
+- The alternating-finsum vocabulary is retired (2026-09-02) in favour of
+  Mathlib's `Algebra/Homology/EulerCharacteristic.lean`: see the owner entry
+  above. The Euler form `chiHom` is now `GradedObject.eulerChar` of the shifted
+  Hom family by `rfl`, and its additivity on distinguished triangles applies
+  `GradedObject.eulerChar_eq_add_of_exact` directly.
 
 ## Confirmed next lanes
 
 Every path lane confirmed by the 2026-09-01 audit has landed.
 
-One confirmed type-level hazard remains, recorded for a separate lane because
-it is a rewrite rather than a move: `LinearAlgebra/AlternatingFinsum.lean` may
-overlap Mathlib's `Algebra/Homology/EulerCharacteristic.lean`. The `ZLattice`
-class and the bundled variety types were the other two and are retired above
+No confirmed type-level hazard remains: the `ZLattice` class, the bundled
+variety types, and the alternating-finsum vocabulary are all retired above
 (2026-09-02).
 
 Take these lanes one per pull request. Remove the old path rather than retaining

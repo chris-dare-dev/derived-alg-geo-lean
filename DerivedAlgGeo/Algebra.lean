@@ -10,6 +10,7 @@ import DerivedAlgGeo.Algebra.MvPolynomial
 import DerivedAlgGeo.Algebra.NumericalPolynomial
 import DerivedAlgGeo.Algebra.RelativeNumerical
 import DerivedAlgGeo.Algebra.SaturatedQuotient
+import DerivedAlgGeo.Algebra.Exact
 
 /-! # Algebra
 

@@ -826,6 +826,7 @@ is not closed. -/
 #print axioms IsSmoothProperVariety.toIsProper
 #print axioms IsSmoothProperVariety.toIsSeparated
 #print axioms IsSmoothProperVariety.toUniversallyClosed
+#print axioms Module.sum_neg_one_pow_finrank_eq_zero_of_longExact
 #print axioms Variety.isLocallyNoetherian
 #print axioms Variety.isNoetherian_of_isProper
 #print axioms Variety.isSeparated_of_isProper

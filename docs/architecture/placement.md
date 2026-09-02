@@ -33,7 +33,9 @@ request would put it, so the move to Mathlib is a copy.
 | `PrimeSpectrum` and its topology | `RingTheory/Spectrum/Prime/` | `RingTheory/Spectrum/Prime/` |
 | `HomogeneousLocalization` and graded algebras | `RingTheory/GradedAlgebra/` | `RingTheory/GradedAlgebra/` |
 | Modules, localization, graded modules, polynomials | `Algebra/Module/`, `Algebra/MvPolynomial/` | the same |
-| Lattices, bilinear forms, exterior powers | `LinearAlgebra/` | `LinearAlgebra/` |
+| Lattices, bilinear forms, exterior powers, finite-dimensional lemmas | `LinearAlgebra/` | `LinearAlgebra/` |
+| Euler characteristics of graded objects | `Algebra/Homology/EulerCharacteristic.lean` | `Algebra/Homology/EulerCharacteristic.lean` |
+| Alternating sums along finite exact sequences | `Algebra/Exact/Sequence.lean` | `Algebra/Exact/Sequence.lean` |
 | Schemes, `X.Modules`, `Proj`, morphism properties | `AlgebraicGeometry/` | `AlgebraicGeometry/`, with `ProjectiveSpectrum/` under Mathlib's name |
 
 If two rows seem to apply, the definition site of the *carrier* in the

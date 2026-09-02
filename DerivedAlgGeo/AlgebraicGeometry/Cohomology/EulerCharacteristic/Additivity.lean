@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Basic
-import DerivedAlgGeo.LinearAlgebra.AlternatingFinsum
+import DerivedAlgGeo.Algebra.Exact.Sequence
 import Mathlib.Algebra.Exact.Sequence
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.ExactSequences
 import Mathlib.CategoryTheory.Abelian.ShortExact
@@ -195,7 +195,7 @@ theorem eulerCharacteristic_additive (D : FiniteCohomology k X)
   letI (i : ℕ) : Module.Finite k ((D.moduleH i).obj S.X₃) := D.finite i S.X₃
   letI : Subsingleton ((D.moduleH (n + 1)).obj S.X₁) :=
     D.vanishesAbove S.X₁ (n + 1) (Nat.lt_succ_of_le (le_max_left _ _))
-  have hsum := DerivedAlgGeo.LinearAlgebra.alternating_finrank_eq_zero_of_exact
+  have hsum := Module.sum_neg_one_pow_finrank_eq_zero_of_longExact
     (A := fun i ↦ (D.moduleH i).obj S.X₁)
     (B := fun i ↦ (D.moduleH i).obj S.X₂)
     (C := fun i ↦ (D.moduleH i).obj S.X₃)

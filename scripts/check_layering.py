@@ -99,6 +99,9 @@ STABILITY_CONSUMING_GEOMETRY = (
 # Paths removed by a structural cutover, relative to the source root. An entry
 # without a suffix names a directory and also forbids its same-named umbrella.
 RETIRED_PATHS = (
+    # 2026-09-02 Euler-characteristic lane: restated on Mathlib's GradedObject.eulerChar.
+    "LinearAlgebra/AlternatingFinsum.lean",
+    "LinearAlgebra/AlternatingSum.lean",
     # 2026-09-02 placement follow-ups to the Mathlib-mesh restructure.
     "Algebra/Homology/DerivedCategory/TStructure.lean",
     "CategoryTheory/Triangulated/QuasiAbelian.lean",
