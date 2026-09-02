@@ -101,6 +101,13 @@ blocks should normally move it rather than add more declarations beside it.
   `DegreeZeroLocalization`, natural and integer shifts, twist
   trivializations, and transport along equal power denominators. Proj sheaves
   and Čech complexes import these roots as geometric consumers.
+- Graded-ring homogeneous-localization domain properties:
+  `RingTheory/GradedAlgebra/HomogeneousLocalization/Domain.lean` owns the five
+  `HomogeneousLocalization` declarations proving nontriviality, domain, and
+  reducedness from nonzerodivisor hypotheses. Their complete signatures use no
+  projective spectrum or scheme. `AlgebraicGeometry/Proj/Integral.lean` imports
+  this owner directly and adds the geometric chart and integrality results;
+  the former Proj-owned source path is retired without a compatibility shim.
 - Laurent monomial bases:
   `Algebra/Finsupp/LaurentExponent.lean` owns the exponent-vector arithmetic,
   while `Algebra/MvPolynomial/{Grading,LaurentBasis}.lean` owns the standard
