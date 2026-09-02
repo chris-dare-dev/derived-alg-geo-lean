@@ -23,8 +23,9 @@ of schemes or on pullback; those consumers live under `DerivedCategory/Families/
 
 The closing section gives every line bundle a canonical image in this
 category: `LineBundleData.coh` packages the underlying sheaf with its
-coherence proof, and `LineBundleData.derivedObject` places it in degree zero
-of `D(Coh X)`, where it is perfect and bounded; `cohIso` and
+coherence proof, `LineBundleData.derivedObject` places it in degree zero
+of `D(Coh X)`, and `LineBundleData.boundedDerivedObject` packages its proved
+boundedness as an object of `Dᵇ(Coh X)`; `cohIso` and
 `derivedObjectIso` transport both along an isomorphism of underlying sheaves,
 so statements about a collection of line bundles are well-defined up to iso.
 This is the adapter geometric consumers use to speak about a line bundle *as
@@ -222,6 +223,18 @@ computation. -/
 theorem derivedObject_bounded (L : LineBundleData X) :
     (DerivedCategory.TStructure.t (C := Coh X)).bounded L.derivedObject :=
   schemeFiniteLocallyFreeGenerator_le_bounded X _ L.derivedObject_mem_generator
+
+/-- A line bundle as an object of the bounded coherent derived category.
+The underlying derived object is `derivedObject`; no second representative or
+comparison choice is introduced. -/
+noncomputable def boundedDerivedObject (L : LineBundleData X) :
+    SchemeBoundedCoherentDerivedCategory X :=
+  ⟨L.derivedObject, L.derivedObject_bounded⟩
+
+@[simp]
+theorem boundedDerivedObject_obj (L : LineBundleData X) :
+    L.boundedDerivedObject.obj = L.derivedObject :=
+  rfl
 
 /-- Lift an isomorphism of underlying sheaves to the derived objects. Needed
 by any collection of line bundles stated up to isomorphism: it is what makes

@@ -27,9 +27,9 @@ brief: |
   line-bundle derived-object adapter, the numerical model, and the isotropic
   sequence root. The categorical orientation, exceptional-object, and
   exceptional-collection roots have also landed. PR #1027 adds generic
-  admissibility (#934) and the geometric isotropic collection (#988); the
-  remaining order is exceptionality (#989) → semiorthogonal sequence and
-  residual component (#990).
+  admissibility (#934) and the geometric isotropic collection (#988). PR
+  #1028 completes exceptionality (#989), the semiorthogonal sequence, and its
+  residual component (#990), closing the foundations milestone.
 goal:
   hmw: "How might we state and eventually prove the refined derived Torelli theorem for Enriques surfaces on top of the repository's single derived-category construction, without a second exceptionality hierarchy, a premature Kuznetsov-component equivalence, or geometry leaking into the categorical root?"
   objective: "Define Enriques surfaces and their semi-canonical ten-bundle configurations, bind the bundles to the generic exceptional-object interface through explicit cohomological witnesses, and assemble the semiorthogonal sequence whose residual component the source papers call Ku(Y)."
@@ -69,12 +69,14 @@ generated_by: { agent: claude, at: "2026-09-01" }
 generations:
   - { rev: 1, at: "2026-09-01", note: "Lane registered after the foundations landed. #984 (definition, PR #991), #985 (line-bundle derived objects, PR #992), #986 (numerical model, PR #994), #987 (isotropic sequences, PRs #996/#997) all merged; the review pass corrected the Fano-class arithmetic to Δ·F_i = 3 on the permanent record. #988--#990 remain blocked on the categorical exceptionality lane #932--#936 and on each other. The EnumDecls eq_-prefix sweep bug found during #987 is filed as #998 outside this lane." }
   - { rev: 2, at: "2026-09-02", note: "Rebased after #932, #933, #935, #936, #984, and #985 landed and after the Enriques carrier was simplified to an ordinary Scheme with typeclass hypotheses. PR #1027 implements generic admissibility (#934) and #988. The normalization source is corrected to arXiv:1912.04332v2 Definition 3.2/equation (3.2) in §3.1: 3δ = Σf_i, hence Δ·F_i = 3 and Δ² = 10. #989 then depends only on #988; #990 depends on #988/#989 and owns the still-missing generic residual helper." }
+  - { rev: 3, at: "2026-09-02", note: "Combined #989/#990 implementation in progress: line bundles are packaged canonically in Dᵇ(Coh Y); explicit ExtComparison and H² inputs reduce each bundle to the generic IsExceptional predicate; supplied pairwise witnesses build the Fin 10 exceptional collection; and the generic residual helper defines the triangulated right orthogonal and its neutral full subcategory without fullness or admissibility claims." }
+  - { rev: 4, at: "2026-09-02", note: "PR #1028 passed the full Windows build, axiom audits, declaration completeness, architecture gates, contracts, and emitter reproducibility. #989 and #990 are closed completed, milestone #43 is closed, and the roadmap records the residual only under its neutral formal name; the Torelli theorem itself remains future work." }
 items:
   - id: enriques-torelli-m1
     gh_milestone: 43
     kind: milestone
     title: "ENQ1 — Enriques derived Torelli foundations"
-    status: in_progress
+    status: done
     lane: now
     acceptance:
       - "The geometric definition, the derived-object adapter, the numerical model, and the lattice root are merged with their reviews applied."
@@ -152,10 +154,10 @@ items:
     kind: epic
     parent: enriques-torelli-m1
     title: "Exceptionality of line bundles on an Enriques surface"
-    status: ready
+    status: done
     priority: must
     size: L
-    summary: "Next after PR #1027: ExtComparison data + h¹/h² vanishing ⟹ IsExceptional k (L.derivedObject), in the Spherical.lean fields-not-theorems idiom, with every supplied field's seam named. The categorical IsExceptional root, Scheme carrier, derived-object adapter, and #988 collection data have landed."
+    summary: "PR #1028: a canonical boundedDerivedObject packages each line bundle in Dᵇ(Coh Y); Prop-valued ExtComparison data, the existing H¹ clause, and supplied H² vanishing prove generic IsExceptional for every selected bundle. Every missing Ext/cohomological-dimension seam remains explicit and no inhabitant is claimed."
     tags: [enriques, exceptional-object, binding]
     labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
 
@@ -165,9 +167,9 @@ items:
     kind: epic
     parent: enriques-torelli-m1
     title: "The Enriques semiorthogonal sequence and its residual component"
-    status: blocked
+    status: done
     priority: must
     size: L
-    summary: "After #988/#989: a SemiorthogonalSequence (DerivedCat Y) (Fin 10) from the collection with supplied semiorthogonality witnesses, plus the generic residual helper still absent from the root and residualComponent as the right orthogonal of total. Neutral naming remains mandatory until identification with the papers' Ku(Y) is a theorem. #935 has landed."
+    summary: "PR #1028: supplied pairwise witnesses build the Fin 10 ExceptionalCollection and root-oriented SemiorthogonalSequence; the generic residual helper is the right orthogonal of total, is triangulated from component closure, and supports membership, Hom-vanishing, and non-membership consumers. ResidualCategory remains neutral and makes no fullness, admissibility, mutation, or Ku(Y) identification claim."
     tags: [enriques, semiorthogonal, residual-component]
     labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]

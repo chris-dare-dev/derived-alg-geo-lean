@@ -403,6 +403,8 @@ geometric witness for every scheme morphism.
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.derivedObject_mem_generator
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.derivedObject_perfect
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.derivedObject_bounded
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.boundedDerivedObject
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.boundedDerivedObject_obj
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.derivedObjectIso
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.unit_derivedObject
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentDerivedFiber
