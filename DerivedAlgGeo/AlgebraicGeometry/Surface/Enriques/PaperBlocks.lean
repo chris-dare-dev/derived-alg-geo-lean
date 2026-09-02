@@ -92,7 +92,6 @@ theorem totalLength_eq_ten : B.blocks.totalLength = 10 := by
 
 include B in
 /-- The entries of the unordered block-decomposition type sum to ten. -/
-@[simp]
 theorem decompositionType_sum_eq_ten : B.blocks.decompositionType.sum = 10 := by
   rw [B.blocks.decompositionType_sum, B.totalLength_eq_ten]
 
@@ -155,7 +154,6 @@ noncomputable def projectedObjectHomEquiv
 
 /-- The identity of `S_i` corresponds to its projection counit
 `S_i → L_{i1}`. -/
-@[simp]
 theorem projectedObjectHomEquiv_id
     (Q : T.PaperResidualProjectionData exceptional semiorthogonal) (i : ι) :
     B.projectedObjectHomEquiv Q (B.projectedObject Q i) i

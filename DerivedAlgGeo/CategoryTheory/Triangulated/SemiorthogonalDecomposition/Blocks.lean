@@ -181,10 +181,11 @@ theorem hasTriangulatedComponents [Preorder ι] [IsTriangulated C] :
   B.blockSpan_isTriangulated
 
 /-- The union of the block spans is stable under every integral shift. -/
-theorem total_isStableUnderShift [IsTriangulated C] :
+theorem total_isStableUnderShift :
     B.total.IsStableUnderShift ℤ := by
-  letI (i : ι) : (B.blockSpan i).IsTriangulated :=
-    B.blockSpan_isTriangulated i
+  letI (i : ι) : (B.blockSpan i).IsStableUnderShift ℤ := by
+    change (B.collection i).span.IsStableUnderShift ℤ
+    infer_instance
   constructor
   intro n
   constructor

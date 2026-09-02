@@ -68,7 +68,6 @@ def homEquivFromProject (R : P.FullSubcategory) (X : C) :
 
 /-- Under the universal Hom equivalence, the identity of a projected object
 corresponds to the counit map. -/
-@[simp]
 theorem homEquivFromProject_id (X : C) :
     Q.homEquivFromProject (Q.project X) X (𝟙 (Q.project X)) =
       Q.counitApp X :=
@@ -142,7 +141,6 @@ def projectedObjectHomEquiv (B : OrthogonalExceptionalBlocks k C ι)
 
 /-- The identity of a residual projection object corresponds to its counit
 map into the first exceptional object of the block. -/
-@[simp]
 theorem projectedObjectHomEquiv_id
     (B : OrthogonalExceptionalBlocks k C ι)
     (Q : B.ResidualProjectionData) (i : ι) :
