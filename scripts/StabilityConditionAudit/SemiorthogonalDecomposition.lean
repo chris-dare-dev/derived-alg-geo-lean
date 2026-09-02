@@ -41,6 +41,35 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverseFin
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverseFin_component
 
+-- Admissible object properties: the adjunction predicates, counit/unit
+-- triangles, the strong two-block decomposition, and its two non-vacuous
+-- inhabitants. Mutation remains object-level prose until an enhancement is
+-- available.
+#print axioms CategoryTheory.ObjectProperty.zeroObjects
+#print axioms CategoryTheory.ObjectProperty.topIsTriangulated
+#print axioms CategoryTheory.ObjectProperty.zeroObjectsIsClosedUnderIsomorphisms
+#print axioms CategoryTheory.ObjectProperty.zeroObjectsIsTriangulated
+#print axioms CategoryTheory.ObjectProperty.IsRightAdmissible
+#print axioms CategoryTheory.ObjectProperty.IsLeftAdmissible
+#print axioms CategoryTheory.ObjectProperty.IsAdmissible
+#print axioms CategoryTheory.ObjectProperty.top_isRightAdmissible
+#print axioms CategoryTheory.ObjectProperty.top_isLeftAdmissible
+#print axioms CategoryTheory.ObjectProperty.zeroObjects_isRightAdmissible
+#print axioms CategoryTheory.ObjectProperty.zeroObjects_isLeftAdmissible
+#print axioms CategoryTheory.ObjectProperty.IsRightAdmissible.exists_distTriang_mem_rightOrthogonal
+#print axioms CategoryTheory.ObjectProperty.IsLeftAdmissible.exists_distTriang_mem_leftOrthogonal
+#print axioms CategoryTheory.ObjectProperty.IsRightAdmissible.extensionProduct_rightOrthogonal_eq_top
+#print axioms CategoryTheory.ObjectProperty.IsLeftAdmissible.leftOrthogonal_extensionProduct_eq_top
+#print axioms CategoryTheory.ObjectProperty.top_rightOrthogonal
+#print axioms CategoryTheory.ObjectProperty.zeroObjects_rightOrthogonal
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_component_zero
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_component_one
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_hasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_isStronglyFull
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_top_component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_zeroObjects_component
+
 -- Exceptional objects: no self-maps into a nonzero shift, endomorphism ring
 -- the base field via algebraMap bijectivity. Every clause has consuming
 -- theorems; the honest inhabitant is the D^b(field) example (exc-e5 / #936).

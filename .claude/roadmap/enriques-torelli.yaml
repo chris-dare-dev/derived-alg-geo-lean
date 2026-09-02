@@ -25,9 +25,11 @@ brief: |
 
   Foundations (milestone #43) landed 2026-08-31/09-01: the definition, the
   line-bundle derived-object adapter, the numerical model, and the isotropic
-  sequence root. The remaining three epics are blocked on the categorical
-  exceptionality lane and on each other, in the order collection →
-  exceptionality → semiorthogonal sequence and residual component.
+  sequence root. The categorical orientation, exceptional-object, and
+  exceptional-collection roots have also landed. The current combined lane
+  adds generic admissibility (#934) and the geometric isotropic collection
+  (#988); the remaining order is exceptionality (#989) → semiorthogonal
+  sequence and residual component (#990).
 goal:
   hmw: "How might we state and eventually prove the refined derived Torelli theorem for Enriques surfaces on top of the repository's single derived-category construction, without a second exceptionality hierarchy, a premature Kuznetsov-component equivalence, or geometry leaking into the categorical root?"
   objective: "Define Enriques surfaces and their semi-canonical ten-bundle configurations, bind the bundles to the generic exceptional-object interface through explicit cohomological witnesses, and assemble the semiorthogonal sequence whose residual component the source papers call Ku(Y)."
@@ -54,7 +56,7 @@ source:
   work: "Li--Nuer--Stellari--Zhao, A refined Derived Torelli Theorem for Enriques surfaces; Li--Stellari--Zhao, II: the non-generic case"
   arxiv: "1912.04332"
 evidence:
-  - "arXiv:1912.04332v2 §§2--3 for the isotropic 10-sequence, the semi-canonical collection, and the semiorthogonal decomposition; arXiv:2104.13610v2 for the non-generic extension."
+  - "arXiv:1912.04332v2 §3.1, especially Definition 3.2 and equation (3.2), for the isotropic 10-sequence, Fano normalization, semi-canonical collection, and semiorthogonal decomposition; arXiv:2104.13610v2 for the non-generic extension."
   - "The 2026-08-31 derived-category binding audit (ag-lean-handoff/derived-category-binding-audit/) and its landed remediation: the Coherent.lean owner (#982), the Duality rebind (#993), and the Dqc identification consumer API (#995)."
   - "The semiorthogonal reconnaissance note (.claude/notes/2026-08-28-semiorthogonal-reconnaissance.md) deferring exceptionality to the first consuming theorem."
   - "Issue drafts and dependency graph: ag-lean-handoff/enriques-torelli-lane/ISSUES.md."
@@ -66,6 +68,7 @@ wont:
 generated_by: { agent: claude, at: "2026-09-01" }
 generations:
   - { rev: 1, at: "2026-09-01", note: "Lane registered after the foundations landed. #984 (definition, PR #991), #985 (line-bundle derived objects, PR #992), #986 (numerical model, PR #994), #987 (isotropic sequences, PRs #996/#997) all merged; the review pass corrected the Fano-class arithmetic to Δ·F_i = 3 on the permanent record. #988--#990 remain blocked on the categorical exceptionality lane #932--#936 and on each other. The EnumDecls eq_-prefix sweep bug found during #987 is filed as #998 outside this lane." }
+  - { rev: 2, at: "2026-09-02", note: "Rebased after #932, #933, #935, #936, #984, and #985 landed and after the Enriques carrier was simplified to an ordinary Scheme with typeclass hypotheses. The current combined PR implements generic admissibility (#934) and #988. The normalization source is corrected to arXiv:1912.04332v2 Definition 3.2/equation (3.2) in §3.1: 3δ = Σf_i, hence Δ·F_i = 3 and Δ² = 10. #989 then depends only on #988; #990 depends on #988/#989 and owns the still-missing generic residual helper." }
 items:
   - id: enriques-torelli-m1
     gh_milestone: 43
@@ -136,10 +139,10 @@ items:
     kind: epic
     parent: enriques-torelli-m1
     title: "The isotropic 10-collection of line bundles on an Enriques surface"
-    status: blocked
+    status: in_progress
     priority: must
     size: M
-    summary: "Ten LineBundleData with intersection constraints stated against a supplied IntersectionContext, and the semi-canonical normalization transcribed from the papers' §2.3; supplied-data clauses record any gap (no ampleness API exists). Blocked on #984's merge reaching consumers — unblocked in practice; next in the lane."
+    summary: "In the current combined PR: ten LineBundleData on the ordinary Scheme carrier, a supplied IntersectionContext, isotropic pairings, and equation (3.2) from arXiv:1912.04332v2 §3.1 expressed as numerical equivalence against every Picard intersection probe. Consuming theorems prove class distinctness, Δ·F_i = 3, and Δ² = 10; no Num(Y), nefness, ampleness, or existence is claimed."
     tags: [enriques, collection, line-bundle]
     labels: [area:lean, area:geometry, type:feature, source:1912.04332]
 
@@ -152,7 +155,7 @@ items:
     status: blocked
     priority: must
     size: L
-    summary: "The reduction ExtComparison data + h¹/h² vanishing ⟹ IsExceptional k (L.derivedObject), in the Spherical.lean fields-not-theorems idiom, with every supplied field's seam named. Blocked on the categorical IsExceptional root (#933, itself behind #932) plus #984 and #985."
+    summary: "Next after #988: ExtComparison data + h¹/h² vanishing ⟹ IsExceptional k (L.derivedObject), in the Spherical.lean fields-not-theorems idiom, with every supplied field's seam named. The categorical IsExceptional root, Scheme carrier, and derived-object adapter have landed; #988 is the only remaining dependency."
     tags: [enriques, exceptional-object, binding]
     labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
 
@@ -165,6 +168,6 @@ items:
     status: blocked
     priority: must
     size: L
-    summary: "A SemiorthogonalSequence (DerivedCat Y) (Fin 10) from the collection with supplied semiorthogonality witnesses, and residualComponent as the right orthogonal of its total — neutrally named until the identification with the papers' Ku(Y) is a theorem, per ADR-0005 vocabulary discipline. Blocked on #935, #988, and #989."
+    summary: "After #988/#989: a SemiorthogonalSequence (DerivedCat Y) (Fin 10) from the collection with supplied semiorthogonality witnesses, plus the generic residual helper still absent from the root and residualComponent as the right orthogonal of total. Neutral naming remains mandatory until identification with the papers' Ku(Y) is a theorem. #935 has landed."
     tags: [enriques, semiorthogonal, residual-component]
     labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]

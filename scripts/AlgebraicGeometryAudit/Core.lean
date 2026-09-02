@@ -2091,7 +2091,7 @@ A smooth projective surface with `ω_X` 2-torsion but not trivial in `Pic`, and
 `H¹(X, O_X) = 0`. The torsion conditions are group equations in `Pic`; nothing
 here constructs such a surface, states `χ(O_X) = 1`, or builds the K3 double
 cover. See the module docstring in
-`DerivedAlgGeo/AlgebraicGeometry/Surface/Enriques.lean`. -/
+`DerivedAlgGeo/AlgebraicGeometry/Surface/Enriques/Basic.lean`. -/
 
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.projective
@@ -2102,6 +2102,31 @@ cover. See the module docstring in
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalSheaf_not_iso_unit
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.antiCanonicalClass_eq_canonicalClass
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.not_isK3Surface
+
+/-! ## Isotropic 10-collections on Enriques surfaces
+
+The line bundles, Fano-class lift, Snapper intersection context, and equation
+`3δ = ∑ fᵢ` are supplied geometric data. The consuming theorems recover the
+generic lattice sequence, distinctness, `Δ · Fᵢ = 3`, and `Δ² = 10`. No
+existence, nefness, ampleness, or derived exceptionality is claimed. -/
+
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundles
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fano
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.intersection
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.self_isotropic
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.pairwise_one
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fano_normalization
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.mk.inj
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.classes
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.sumClass
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fanoClass
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.isIsotropicSequence
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundleClass_ne
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fano_intersection_bundle
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_intersection_fano
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fano_self_intersection
 
 /-! ## The base field acts: module sheaves and `Coh` are `k`-linear
 
