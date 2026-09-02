@@ -175,6 +175,10 @@ several structures in this repository carried as data (`map_zero`, `map_iso`,
 #print axioms CategoryTheory.Triangulated.Slicing.ltProp_of_triangle
 #print axioms CategoryTheory.Triangulated.Slicing.gtProp_of_triangle
 #print axioms CategoryTheory.Triangulated.Slicing.geProp_of_triangle
+#print axioms CategoryTheory.Triangulated.Slicing.leProp_of_postnikovTower
+#print axioms CategoryTheory.Triangulated.Slicing.ltProp_of_postnikovTower
+#print axioms CategoryTheory.Triangulated.Slicing.gtProp_of_postnikovTower
+#print axioms CategoryTheory.Triangulated.Slicing.geProp_of_postnikovTower
 #print axioms CategoryTheory.Triangulated.Slicing.exists_cutoff_truncation
 #print axioms CategoryTheory.Triangulated.Slicing.exists_cutoff_truncation_in_interval
 #print axioms CategoryTheory.Triangulated.Slicing.phiMinus_gt_of_gtProp
@@ -639,6 +643,7 @@ several structures in this repository carried as data (`map_zero`, `map_iso`,
 #print axioms CategoryTheory.Triangulated.Slicing.leProp_zero
 #print axioms CategoryTheory.Triangulated.Slicing.phiPlus_eq_phiMinus_of_semistable
 #print axioms CategoryTheory.Triangulated.Slicing.zero_of_geProp_ltProp_general
+#print axioms CategoryTheory.Triangulated.Slicing.geProp_of_forall_hom_eq_zero
 #print axioms CategoryTheory.Triangulated.HNFiltration.isZero_factor_last_of_hom_eq_zero
 #print axioms CategoryTheory.Triangulated.Slicing.zero_of_gtProp_leProp_general
 #print axioms CategoryTheory.Triangulated.Slicing.gtProp_zero

@@ -6,7 +6,9 @@ contract and reading guide.
 Covers the transfer of pre-stability and stability conditions along a
 phase-detecting functor (arXiv:2607.28411v1 Definitions 3.1 and 3.6, Remarks
 3.2 and 3.7, Lemmas 3.5 and 3.9; arXiv:2601.22994 Definition 3.1 and Lemma
-3.3), together with the support-property transfer.
+3.3), together with the support-property transfer, the twist, Bayer, and
+metric layer, and Proposition 3.8's adjoint transposition into the Corollary
+A.23 hypothesis.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 open CategoryTheory.Triangulated
@@ -71,3 +73,10 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.massDist_preimage
 #print axioms CategoryTheory.Triangulated.stabilityDistTerm_preimage
 #print axioms CategoryTheory.Triangulated.stabilityDist_preimage_le
+
+/-! ## The adjoint transposition behind Proposition 3.8 -/
+
+#print axioms CategoryTheory.Triangulated.Slicing.MapsSemistableLE
+#print axioms CategoryTheory.Triangulated.Slicing.MapsSemistableGE
+#print axioms CategoryTheory.Triangulated.Slicing.MapsSemistableLE.leProp_of_leProp
+#print axioms CategoryTheory.Triangulated.Slicing.MapsSemistableGE.of_mapsSemistableLE
