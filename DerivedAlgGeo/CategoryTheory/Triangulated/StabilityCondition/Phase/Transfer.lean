@@ -10,12 +10,16 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transf
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.InducingBoundary
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.PreStability
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.LocallyFinite
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Bayer
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Metric
 
 /-!
 # Transfer of slicings and stability conditions along functors
 
 Raw phase preimages, the explicit slicing-lifting criterion, phase and order
 transport, equivariance, phase-indexed induced t-structures, their finite
-phase-truncation HN theorem, the named Polishchuk/Ind theorem boundary, and
-the transfer of pre-stability and stability conditions themselves.
+phase-truncation HN theorem, the named Polishchuk/Ind theorem boundary, the
+transfer of pre-stability and stability conditions themselves, and the
+behaviour of the Bayer property, the mass, and the stability metric under
+that transfer.
 -/

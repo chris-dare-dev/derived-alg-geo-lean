@@ -53,3 +53,21 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.preimage_charge
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.pullback
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.pushforward
+
+/-! ## Twists, the Bayer property, mass, and the metric under transfer -/
+
+#print axioms CategoryTheory.Triangulated.Slicing.PreimageData.mapEquiv
+#print axioms CategoryTheory.Triangulated.Slicing.PreimageData.preimage_mapEquiv
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.preimage
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.preimage_Φ
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.preimage_lam
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.preimage_act
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.HasBayerProperty.preimage
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.BayerProperty.preimage
+#print axioms CategoryTheory.Triangulated.HNFiltration.mass_mapPreimage
+#print axioms CategoryTheory.Triangulated.stabilityMass_preimage
+#print axioms CategoryTheory.Triangulated.phiPlusDist_preimage
+#print axioms CategoryTheory.Triangulated.phiMinusDist_preimage
+#print axioms CategoryTheory.Triangulated.massDist_preimage
+#print axioms CategoryTheory.Triangulated.stabilityDistTerm_preimage
+#print axioms CategoryTheory.Triangulated.stabilityDist_preimage_le
