@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.IntrinsicPhases
+import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
 
 /-!
 # Extension closure of owner slicing phase cuts
@@ -10,6 +11,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundat
 The four HN phase cuts are closed under distinguished extensions.  The proof
 uses nonzero boundary factors, owner phase-gap Hom-vanishing, and the Yoneda
 exact sequences of a distinguished triangle.
+
+Closure under a single extension propagates along any owner Postnikov tower
+through `ExtensionClosure.le_of_closed`, so each cut is also closed under
+towers whose factors satisfy it; this is how a condition stated on semistable
+objects extends to every object with HN phases on one side of the cut once an
+exact functor has been applied factorwise.
 -/
 
 noncomputable section
@@ -142,5 +149,41 @@ theorem Slicing.geProp_of_triangle (s : Slicing C) {A E B : C} (t : ℝ)
     calc q = g ≫ k := hk
       _ = 0 := by rw [vanish hB k, comp_zero]
   exact hlast (F.lastFactor_isZero_of_hom_eq_zero C s hn hzero)
+
+/-- An owner Postnikov tower whose factors satisfy the upper phase cut has its
+total object satisfying it. -/
+theorem Slicing.leProp_of_postnikovTower (s : Slicing C) {E : C} {t : ℝ}
+    (P : PostnikovTower C E) (hfactors : ∀ i, s.leProp C t (P.factor i)) :
+    s.leProp C t E :=
+  ExtensionClosure.le_of_closed (fun hz => s.leProp_of_isZero C hz t) le_rfl
+    (fun hT hX hY => s.leProp_of_triangle C t hX hY hT) E
+    (ExtensionClosure.ofPostnikovTower P hfactors)
+
+/-- An owner Postnikov tower whose factors satisfy the strict upper phase cut
+has its total object satisfying it. -/
+theorem Slicing.ltProp_of_postnikovTower (s : Slicing C) {E : C} {t : ℝ}
+    (P : PostnikovTower C E) (hfactors : ∀ i, s.ltProp C t (P.factor i)) :
+    s.ltProp C t E :=
+  ExtensionClosure.le_of_closed (fun hz => s.ltProp_of_isZero C hz t) le_rfl
+    (fun hT hX hY => s.ltProp_of_triangle C t hX hY hT) E
+    (ExtensionClosure.ofPostnikovTower P hfactors)
+
+/-- An owner Postnikov tower whose factors satisfy the strict lower phase cut
+has its total object satisfying it. -/
+theorem Slicing.gtProp_of_postnikovTower (s : Slicing C) {E : C} {t : ℝ}
+    (P : PostnikovTower C E) (hfactors : ∀ i, s.gtProp C t (P.factor i)) :
+    s.gtProp C t E :=
+  ExtensionClosure.le_of_closed (fun hz => s.gtProp_of_isZero C hz t) le_rfl
+    (fun hT hX hY => s.gtProp_of_triangle C t hX hY hT) E
+    (ExtensionClosure.ofPostnikovTower P hfactors)
+
+/-- An owner Postnikov tower whose factors satisfy the lower phase cut has its
+total object satisfying it. -/
+theorem Slicing.geProp_of_postnikovTower (s : Slicing C) {E : C} {t : ℝ}
+    (P : PostnikovTower C E) (hfactors : ∀ i, s.geProp C t (P.factor i)) :
+    s.geProp C t E :=
+  ExtensionClosure.le_of_closed (fun hz => s.geProp_of_isZero C hz t) le_rfl
+    (fun hT hX hY => s.geProp_of_triangle C t hX hY hT) E
+    (ExtensionClosure.ofPostnikovTower P hfactors)
 
 end CategoryTheory.Triangulated

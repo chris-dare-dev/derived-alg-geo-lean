@@ -61,6 +61,32 @@ theorem zero_of_geProp_ltProp_general (s : Slicing C) (t : ℝ) {X Y : C}
     ((s.phaseShift_geProp_zero C t X).mpr hX)
     ((s.phaseShift_ltProp_zero C t Y).mpr hY) f
 
+/-- **Orthogonality characterizes the lower phase cut.**  An object with no
+nonzero morphism to any object of phases below `t` has all its HN phases at
+least `t`.  Take a filtration with nonzero boundary factors; if the lowest
+phase were below `t`, the last factor would itself lie in `𝒫(< t)`, so the
+hypothesis kills every map onto it and
+`HNFiltration.lastFactor_isZero_of_hom_eq_zero` makes it zero, contradicting
+the choice of filtration.  This is the converse of
+`Slicing.zero_of_geProp_ltProp_general`, and it is the step that turns a
+Hom-vanishing computation into membership in `𝒫(≥ t)`. -/
+theorem geProp_of_forall_hom_eq_zero (s : Slicing C) (t : ℝ) {E : C}
+    (hE : ∀ G : C, s.ltProp C t G → ∀ g : E ⟶ G, g = 0) : s.geProp C t E := by
+  by_cases hz : IsZero E
+  · exact s.geProp_of_isZero C hz t
+  obtain ⟨F, hn, -, hlast⟩ := s.exists_hn_nonzero_boundaries C hz
+  refine Or.inr ⟨F, hn, ?_⟩
+  by_contra hlt
+  push Not at hlt
+  apply hlast
+  apply F.lastFactor_isZero_of_hom_eq_zero C s hn
+  intro g
+  refine hE _ ?_ g
+  exact s.ltProp_of_hn C (HNFiltration.single C (F.factor ⟨F.n - 1, by omega⟩)
+      (F.φ ⟨F.n - 1, by omega⟩) (F.semistable ⟨F.n - 1, by omega⟩)) t
+    (fun _ => by simpa [HNFiltration.single, HNFiltration.phiMinus] using hlt)
+    (by change 0 < 1; omega)
+
 /-- A nonzero semistable object's two intrinsic phase extrema equal its phase. -/
 theorem phiPlus_eq_phiMinus_of_semistable (s : Slicing C) {E : C} {φ : ℝ}
     (hP : s.P φ E) (hE : ¬IsZero E) :
