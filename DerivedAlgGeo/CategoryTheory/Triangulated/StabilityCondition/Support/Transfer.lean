@@ -16,7 +16,7 @@ arXiv:2601.22994 makes the same observation for the norm-bound formulation.
 
 ## Main results
 
-* `PreStabilityCondition.WithClassMap.semistableClasses_preimage_subset`: the
+* `PreStabilityCondition.WithClassMap.preimage_semistableClasses_subset`: the
   semistable classes of the transported condition are semistable classes of
   the original one.  This is the whole content: every nonzero semistable
   object of the transported condition maps to a nonzero semistable object of
@@ -65,7 +65,7 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 of the original condition: a nonzero object semistable of phase `φ` for the
 preimage slicing has a nonzero image semistable of phase `φ`, and the class
 map `v ∘ K₀(F)` evaluates to the class of that image. -/
-theorem semistableClasses_preimage_subset :
+theorem preimage_semistableClasses_subset :
     (σ.preimage F h).semistableClasses ⊆ σ.semistableClasses := by
   rintro x ⟨φ, E, hP, hE, rfl⟩
   refine ⟨φ, F.obj E, hP, h.not_isZero_obj hE, ?_⟩
@@ -79,17 +79,20 @@ transported semistable locus is contained in the original one. -/
 theorem HasSupportProperty.preimage {Zlin : V →ₗ[ℝ] ℂ}
     (hσ : σ.HasSupportProperty Zlin) : (σ.preimage F h).HasSupportProperty Zlin :=
   WeakStabilityCondition.Support.HasSupportProperty.mono hσ
-    (σ.semistableClasses_preimage_subset F h)
+    (σ.preimage_semistableClasses_subset F h)
 
 omit [FiniteDimensional ℝ V] in
 /-- Genuine quadratic support transfers along a phase-detecting functor with
-the same quadratic form.  This is the support half of Remarks 3.2 and 3.7 of
-arXiv:2607.28411v1: the transported condition is a stability condition with
-respect to `(Λ, v ∘ K₀(F))` as soon as its slicing exists. -/
+the same quadratic form and the same charge: `HasQuadraticSupportProperty.mono`
+keeps the witness `Q` verbatim, since the transported semistable locus is a
+subset.  This is the support half of Remarks 3.2 and 3.7 of
+arXiv:2607.28411v1; the local-finiteness half is
+`Slicing.PreimageData.isLocallyFinite`, and only the two together give a
+stability condition for `(V, v ∘ K₀(F))`. -/
 theorem QuadraticSupportData.preimage {Zlin : V →ₗ[ℝ] ℂ}
     (hσ : σ.QuadraticSupportData Zlin) :
     (σ.preimage F h).QuadraticSupportData Zlin :=
-  ⟨hσ.charge_compatible, hσ.quadratic.mono (σ.semistableClasses_preimage_subset F h)⟩
+  ⟨hσ.charge_compatible, hσ.quadratic.mono (σ.preimage_semistableClasses_subset F h)⟩
 
 end
 

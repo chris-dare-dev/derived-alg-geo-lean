@@ -149,6 +149,8 @@ These extend the foundational library's own namespace, since they are API for it
 #print axioms CategoryTheory.Triangulated.strictImage_monotone
 #print axioms CategoryTheory.Triangulated.strictImage_injective
 #print axioms CategoryTheory.Triangulated.strictImage_strictMono
+#print axioms CategoryTheory.Triangulated.isStrictArtinianObject_of_strictMono
+#print axioms CategoryTheory.Triangulated.isStrictNoetherianObject_of_strictMono
 #print axioms CategoryTheory.Triangulated.isStrictArtinian_of_faithful_strict
 #print axioms CategoryTheory.Triangulated.isStrictNoetherian_of_faithful_strict
 #print axioms CategoryTheory.Triangulated.mapEquiv_intervalProp_iff

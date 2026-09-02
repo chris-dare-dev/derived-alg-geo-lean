@@ -24,7 +24,6 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.preimage
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.preimage_slicing
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.preimage_Z
-#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.preimage_P_iff
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.preimage_charge
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.preimage_phiPlus
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.preimage_phiMinus
@@ -33,20 +32,19 @@ open CategoryTheory.Triangulated
 
 /-! ## Support property under transfer -/
 
-#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.semistableClasses_preimage_subset
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.preimage_semistableClasses_subset
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.HasSupportProperty.preimage
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.QuadraticSupportData.preimage
 
 /-! ## Local finiteness under transfer and stability conditions -/
 
+#print axioms CategoryTheory.Triangulated.Slicing.preimage_intervalProp_iff
 #print axioms CategoryTheory.Triangulated.Slicing.PreimageData.reflectsIsomorphisms
-#print axioms CategoryTheory.Triangulated.Slicing.PreimageData.intervalProp_iff
 #print axioms CategoryTheory.Triangulated.Slicing.PreimageData.intervalFunctor
 #print axioms CategoryTheory.Triangulated.Slicing.PreimageData.intervalFunctor_map_strictMono
 #print axioms CategoryTheory.Triangulated.Slicing.PreimageData.strictImage
-#print axioms CategoryTheory.Triangulated.Slicing.PreimageData.strictImage_monotone
 #print axioms CategoryTheory.Triangulated.Slicing.PreimageData.strictImage_strictMono
-#print axioms CategoryTheory.Triangulated.Slicing.PreimageData.isStrictFiniteLengthObject
+#print axioms CategoryTheory.Triangulated.Slicing.PreimageData.isStrictFiniteLengthObject_of_intervalFunctor_obj
 #print axioms CategoryTheory.Triangulated.Slicing.PreimageData.isLocallyFinite
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.preimage
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.preimage_toWithClassMap

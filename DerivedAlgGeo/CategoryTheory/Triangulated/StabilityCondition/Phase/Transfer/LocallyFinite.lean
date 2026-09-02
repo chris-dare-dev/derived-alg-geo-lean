@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.PreStability
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.FirstStrictSES
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Slicing.IntervalFiniteTransfer
 
 /-!
 # Local finiteness under transfer, and transfer of stability conditions
@@ -15,33 +16,45 @@ phase-detecting functor, and therefore upgrades
 `PreStabilityCondition.WithClassMap.preimage` to
 `StabilityCondition.WithClassMap.preimage`.
 
+## Main definitions
+
+* `Slicing.PreimageData.intervalFunctor`: the detecting functor restricted to
+  a thin phase window, the carrier of the whole finite-length argument.
+* `Slicing.PreimageData.strictImage`: the induced map on strict subobjects,
+  an instance of the Foundation-level `strictImage`.
+* `StabilityCondition.WithClassMap.preimage`: the transported stability
+  condition, with its source-facing names `pullback` and `pushforward`.
+
 ## Main results
 
 * `Slicing.PreimageData.reflectsIsomorphisms`: a functor carrying
   slicing-lifting data reflects isomorphisms.  The cone of a morphism is
   killed by the functor exactly when the morphism becomes invertible, and the
   functor reflects zero objects.
-* `Slicing.PreimageData.intervalProp_iff`: thin-interval membership for the
+* `Slicing.preimage_intervalProp_iff`: thin-interval membership for the
   preimage slicing is detected by the functor, because both extreme phases
   are.
+* `Slicing.PreimageData.strictImage_strictMono`: the image map on strict
+  subobjects is strictly monotone, without fullness or faithfulness.
 * `Slicing.PreimageData.isLocallyFinite`: the preimage of a locally finite
   slicing is locally finite, with the same radius.
-* `StabilityCondition.WithClassMap.preimage`: the transported stability
-  condition, together with its source-facing names `pullback` and
-  `pushforward`.
 
 ## Implementation notes
 
 The proof follows `mapEquiv_isLocallyFinite` in
 `Symmetry/Autoequivalence/Stability/Transport.lean`, with one genuine
 difference.  There the functor was an equivalence, so the image map on strict
-subobjects was injective by fullness.  A phase-detecting functor need not be
-full or faithful, so injectivity is replaced by the argument that a strictly
-smaller subobject stays strictly smaller: if the images of `B₁ < B₂` agreed,
-the comparison `B₁ ⟶ B₂` would become invertible, and a functor that reflects
-isomorphisms would make it invertible already, contradicting `B₁ ≠ B₂`.  This
-is exactly the place where the Hom-vanishing half of `Slicing.PreimageData`
-is used, through `reflectsZeroObjects`.
+subobjects was injective by fullness (`strictImage_injective`).  A
+phase-detecting functor need not be full or faithful, so injectivity is
+replaced by the argument that a strictly smaller subobject stays strictly
+smaller: if the images of `B₁ < B₂` agreed, the comparison `B₁ ⟶ B₂` would
+become invertible, and a functor that reflects isomorphisms would make it
+invertible already, contradicting `B₁ ≠ B₂`.  This is exactly the place where
+the Hom-vanishing half of `Slicing.PreimageData` is used, through
+`reflectsZeroObjects`.  The image map itself and its monotonicity are the
+Foundation-level `strictImage` and `strictImage_monotone`, which need only
+preservation of strict monos; the well-foundedness transfer is
+`isStrictArtinianObject_of_strictMono` and its Noetherian twin.
 
 The image map is built on strict subobjects rather than on the intrinsic
 admissible subobjects.  The two orders agree in a thin interval by
@@ -69,6 +82,21 @@ variable {C : Type u₁} [Category.{v₁} C] [HasZeroObject C] [HasShift C ℤ]
 variable {D : Type u₂} [Category.{v₂} D] [HasZeroObject D] [HasShift D ℤ]
   [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D]
 
+/-- Thin-interval membership for the preimage slicing is detected by the
+functor: both extreme phases are computed on the image
+(`Slicing.preimage_phiPlus`, `Slicing.preimage_phiMinus`), and zero objects
+are reflected by the lifting witness.  The direct analogue of
+`Slicing.preimage_ltProp_iff` for the two-sided window. -/
+theorem Slicing.preimage_intervalProp_iff (s : Slicing D) (F : C ⥤ D) [F.Additive]
+    [F.CommShift ℤ] [F.IsTriangulated] (h : s.PreimageData F) (a b : ℝ) (E : C) :
+    (s.preimage F h).intervalProp C a b E ↔ s.intervalProp D a b (F.obj E) := by
+  by_cases hE : IsZero E
+  · exact iff_of_true (Or.inl hE) (Or.inl (F.map_isZero hE))
+  · rw [(s.preimage F h).intervalProp_iff_intrinsic_phases C hE,
+      s.intervalProp_iff_intrinsic_phases D (h.not_isZero_obj hE),
+      s.preimage_phiPlus F h h.reflectsZeroObjects E hE,
+      s.preimage_phiMinus F h h.reflectsZeroObjects E hE]
+
 namespace Slicing.PreimageData
 
 variable {s : Slicing D} {F : C ⥤ D} [F.Additive] [F.CommShift ℤ] [F.IsTriangulated]
@@ -92,18 +120,6 @@ theorem reflectsIsomorphisms : F.ReflectsIsomorphisms := by
 
 /-! ### Thin intervals -/
 
-/-- Thin-interval membership for the preimage slicing is detected by the
-functor: both extreme phases are computed on the image, and zero objects are
-reflected. -/
-theorem intervalProp_iff (a b : ℝ) (E : C) :
-    (s.preimage F h).intervalProp C a b E ↔ s.intervalProp D a b (F.obj E) := by
-  by_cases hE : IsZero E
-  · exact iff_of_true (Or.inl hE) (Or.inl (F.map_isZero hE))
-  · rw [(s.preimage F h).intervalProp_iff_intrinsic_phases C hE,
-      s.intervalProp_iff_intrinsic_phases D (h.not_isZero_obj hE),
-      s.preimage_phiPlus F h h.reflectsZeroObjects E hE,
-      s.preimage_phiMinus F h h.reflectsZeroObjects E hE]
-
 /-- The detecting functor restricted to a thin interval of the preimage
 slicing, landing in the same thin interval of the target slicing.
 
@@ -112,7 +128,7 @@ underlying `ObjectProperty.lift`. -/
 abbrev intervalFunctor (a b : ℝ) :
     (s.preimage F h).IntervalCat C a b ⥤ s.IntervalCat D a b :=
   (s.intervalProp D a b).lift (((s.preimage F h).intervalProp C a b).ι ⋙ F)
-    (fun X => (h.intervalProp_iff a b X.obj).mp X.property)
+    (fun X => (s.preimage_intervalProp_iff F h a b X.obj).mp X.property)
 
 variable [IsTriangulated C] [IsTriangulated D]
 
@@ -141,41 +157,29 @@ theorem intervalFunctor_map_strictMono
   have hSG := Slicing.IntervalCat.strictShortExact_of_distinguished (S := SG) D s hmap
   exact ⟨hSG.shortExact.mono_f, hSG.strict_f⟩
 
-/-- The image of a strict subobject under the restricted functor, as a strict
-subobject of the image object. -/
-def strictImage {E : (s.preimage F h).IntervalCat C a b} (B : StrictSubobject E) :
-    StrictSubobject ((h.intervalFunctor a b).obj E) :=
-  letI hs : IsStrictMono ((h.intervalFunctor a b).map B.1.arrow) :=
-    h.intervalFunctor_map_strictMono a b B.1.arrow B.2
-  letI : Mono ((h.intervalFunctor a b).map B.1.arrow) := hs.mono
-  ⟨Subobject.mk ((h.intervalFunctor a b).map B.1.arrow), subobject_arrow_strictMono D _ hs⟩
-
-/-- The image map on strict subobjects is monotone: a comparison morphism
-over `E` maps to a comparison morphism over the image of `E`. -/
-theorem strictImage_monotone {E : (s.preimage F h).IntervalCat C a b} :
-    Monotone (h.strictImage a b (E := E)) := by
-  intro B₁ B₂ hB
-  letI hs₁ : IsStrictMono ((h.intervalFunctor a b).map B₁.1.arrow) :=
-    h.intervalFunctor_map_strictMono a b B₁.1.arrow B₁.2
-  letI hs₂ : IsStrictMono ((h.intervalFunctor a b).map B₂.1.arrow) :=
-    h.intervalFunctor_map_strictMono a b B₂.1.arrow B₂.2
-  letI : Mono ((h.intervalFunctor a b).map B₁.1.arrow) := hs₁.mono
-  letI : Mono ((h.intervalFunctor a b).map B₂.1.arrow) := hs₂.mono
-  have hmk : Subobject.mk B₁.1.arrow ≤ Subobject.mk B₂.1.arrow := by
-    simpa [Subobject.mk_arrow] using (show B₁.1 ≤ B₂.1 from hB)
-  exact Subobject.mk_le_mk_of_comm
-    ((h.intervalFunctor a b).map (Subobject.ofMkLEMk B₁.1.arrow B₂.1.arrow hmk)) (by
-      rw [← Functor.map_comp]
-      exact congrArg (h.intervalFunctor a b).map (Subobject.ofMkLEMk_comp hmk))
+/-- The image of a strict subobject under the restricted functor, taken as a
+*strict* subobject rather than a bare `Subobject`: `intervalFunctor_map_strictMono`
+is what makes the canonical representative arrow strict, and strictness is
+what the finite-length orders are stated about.  This is the Foundation-level
+`strictImage` at the restricted functor, so `strictImage_monotone` applies
+verbatim.  Unlike `strictSubobjectImageOfFullFaithful`, this map is not
+injective in general, since the detecting functor need not be faithful; that
+is why `strictImage_strictMono` below goes through reflection of
+isomorphisms instead. -/
+abbrev strictImage {E : (s.preimage F h).IntervalCat C a b} :
+    StrictSubobject E → StrictSubobject ((h.intervalFunctor a b).obj E) :=
+  CategoryTheory.Triangulated.strictImage (h.intervalFunctor a b)
+    (fun f hf => h.intervalFunctor_map_strictMono a b f hf)
+    (fun f _ hf => intervalSubobject_arrow_strictMono (C := D) f hf)
 
 /-- The image map on strict subobjects is strictly monotone.  Monotonicity
 gives `≤`; if the images of `B₁ < B₂` were equal, the comparison morphism
 `B₁ ⟶ B₂` would map to an isomorphism, hence be an isomorphism because the
 functor reflects them, hence identify `B₁` with `B₂`. -/
-theorem strictImage_strictMono {E : (s.preimage F h).IntervalCat C a b}
-    {B₁ B₂ : StrictSubobject E} (hlt : B₁ < B₂) :
-    h.strictImage a b B₁ < h.strictImage a b B₂ := by
-  refine lt_of_le_of_ne (h.strictImage_monotone a b hlt.le) ?_
+theorem strictImage_strictMono {E : (s.preimage F h).IntervalCat C a b} :
+    StrictMono (h.strictImage a b (E := E)) := by
+  intro B₁ B₂ hlt
+  refine lt_of_le_of_ne (strictImage_monotone _ _ _ hlt.le) ?_
   intro hEq
   apply hlt.ne
   letI hs₁ : IsStrictMono ((h.intervalFunctor a b).map B₁.1.arrow) :=
@@ -207,22 +211,16 @@ theorem strictImage_strictMono {E : (s.preimage F h).IntervalCat C a b}
 
 /-- Strict finite length descends along the restricted functor: both chain
 conditions on strict subobjects of the image pull back through the strictly
-monotone image map. -/
-theorem isStrictFiniteLengthObject {E : (s.preimage F h).IntervalCat C a b}
+monotone image map, by `isStrictArtinianObject_of_strictMono` and its
+Noetherian twin. -/
+theorem isStrictFiniteLengthObject_of_intervalFunctor_obj
+    {E : (s.preimage F h).IntervalCat C a b}
     (hE : IsStrictFiniteLengthObject ((h.intervalFunctor a b).obj E)) :
     IsStrictFiniteLengthObject E := by
-  constructor
-  · letI : IsStrictArtinianObject ((h.intervalFunctor a b).obj E) := hE.1
-    exact ObjectProperty.is_of_prop _
-      (show WellFoundedLT (StrictSubobject E) from
-        ⟨Subrelation.wf (fun {x y} hxy => h.strictImage_strictMono a b hxy)
-          (InvImage.wf _ IsWellFounded.wf)⟩)
-  · letI : IsStrictNoetherianObject ((h.intervalFunctor a b).obj E) := hE.2
-    refine ObjectProperty.is_of_prop _ ⟨?_⟩
-    have hw : WellFounded (InvImage
-        (· > · : StrictSubobject ((h.intervalFunctor a b).obj E) → _ → Prop)
-        (h.strictImage a b)) := InvImage.wf _ IsWellFounded.wf
-    exact Subrelation.wf (fun {x y} hxy => h.strictImage_strictMono a b hxy) hw
+  letI : IsStrictArtinianObject ((h.intervalFunctor a b).obj E) := hE.1
+  letI : IsStrictNoetherianObject ((h.intervalFunctor a b).obj E) := hE.2
+  exact ⟨isStrictArtinianObject_of_strictMono _ (h.strictImage_strictMono a b),
+    isStrictNoetherianObject_of_strictMono _ (h.strictImage_strictMono a b)⟩
 
 end ThinInterval
 
@@ -240,7 +238,7 @@ theorem isLocallyFinite (hs : s.IsLocallyFinite D) :
   have hbig : s.IsFiniteLength D ((h.intervalFunctor (t - η) (t + η)).obj E) :=
     hlf t _
   exact Slicing.IntervalCat.isFiniteLength_of_isStrictFiniteLength C (s.preimage F h)
-    (h.isStrictFiniteLengthObject (t - η) (t + η)
+    (h.isStrictFiniteLengthObject_of_intervalFunctor_obj (t - η) (t + η)
       (isStrictFiniteLength_of_isFiniteLength D hbig))
 
 end Slicing.PreimageData
@@ -263,18 +261,21 @@ def preimage : StabilityCondition.WithClassMap C (v.comp (K₀.map F)) where
   locallyFinite := h.isLocallyFinite σ.locallyFinite
 
 /-- Forgetting local finiteness commutes with transfer.  Definitional;
-recorded so that pre-stability results about `preimage` apply verbatim. -/
+recorded so that every pre-stability result about `preimage` applies to the
+stability-level construction through one `simp` step. -/
 @[simp]
 theorem preimage_toWithClassMap :
     (σ.preimage F h).toWithClassMap = σ.toWithClassMap.preimage F h := rfl
 
 /-- The slicing of the transported stability condition is the preimage
-slicing.  Definitional; recorded for `simp`. -/
+slicing.  Restated at the stability-condition level so callers need not go
+through `preimage_toWithClassMap`. -/
 @[simp]
 theorem preimage_slicing : (σ.preimage F h).slicing = σ.slicing.preimage F h := rfl
 
-/-- Transfer leaves the central charge on `Λ` untouched.  Definitional;
-recorded for `simp`. -/
+/-- Transfer leaves the central charge on `Λ` untouched.  Restated at the
+stability-condition level so callers need not go through
+`preimage_toWithClassMap`. -/
 @[simp]
 theorem preimage_Z : (σ.preimage F h).Z = σ.Z := rfl
 
@@ -287,14 +288,16 @@ theorem preimage_charge (E : C) :
   σ.toWithClassMap.preimage_charge F h E
 
 /-- Definition 3.1(3) of arXiv:2607.28411v1 for stability conditions: the
-pullback `f^♯σ` is computed through the direct image `push = f_*`. -/
+pullback `f^♯σ` is computed through the direct image `push = f_*`.  The name
+follows `Slicing.pullback` in `Phase.Transfer.Basic`. -/
 abbrev pullback (push : C ⥤ D) [push.Additive] [push.CommShift ℤ]
     [push.IsTriangulated] (h : σ.slicing.PreimageData push) :
     StabilityCondition.WithClassMap C (v.comp (K₀.map push)) :=
   σ.preimage push h
 
 /-- Definition 3.6(3) of arXiv:2607.28411v1 for stability conditions: the
-pushforward `f_♯σ` is computed through the inverse image `pull = f^*`. -/
+pushforward `f_♯σ` is computed through the inverse image `pull = f^*`.  The
+name follows `Slicing.pushforward` in `Phase.Transfer.Basic`. -/
 abbrev pushforward (pull : C ⥤ D) [pull.Additive] [pull.CommShift ℤ]
     [pull.IsTriangulated] (h : σ.slicing.PreimageData pull) :
     StabilityCondition.WithClassMap C (v.comp (K₀.map pull)) :=
