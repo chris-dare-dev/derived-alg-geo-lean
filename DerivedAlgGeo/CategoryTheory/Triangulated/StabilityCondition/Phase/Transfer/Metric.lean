@@ -20,6 +20,8 @@ functor and the charges agree factor by factor.
 
 * `HNFiltration.mass_mapPreimage` and `stabilityMass_preimage`: the mass of
   an object for the transferred condition is the mass of its image.
+* `phiPlusDist_preimage`, `phiMinusDist_preimage`, `massDist_preimage`: the
+  three coordinates separately, each computed at the image object.
 * `stabilityDistTerm_preimage`: every objectwise three-coordinate term of
   the transferred conditions is the corresponding term of the originals at
   the image object.
@@ -58,17 +60,17 @@ variable {D : Type u₂} [Category.{v₂} D] [HasZeroObject D] [HasShift D ℤ]
   [IsTriangulated D]
 variable {Λ : Type u'} [AddCommGroup Λ] {v : K₀ D →+ Λ}
 variable (σ τ : StabilityCondition.WithClassMap D v) (F : C ⥤ D) [F.Additive]
-  [F.CommShift ℤ] [F.IsTriangulated] (h : σ.slicing.PreimageData F)
+  [F.CommShift ℤ] [F.IsTriangulated] (hσ : σ.slicing.PreimageData F)
   (hτ : τ.slicing.PreimageData F)
 
 /-- The pushed-forward HN filtration has the same mass: its factors are the
 images of the original factors, and the transferred charge of a factor is
 the charge of its image. -/
 theorem HNFiltration.mass_mapPreimage {E : C}
-    (Fil : HNFiltration C (σ.slicing.preimage F h).P E) :
-    (Fil.mapPreimage σ.slicing F h).mass σ = Fil.mass (σ.preimage F h) := by
+    (Fil : HNFiltration C (σ.slicing.preimage F hσ).P E) :
+    (Fil.mapPreimage σ.slicing F hσ).mass σ = Fil.mass (σ.preimage F hσ) := by
   show ∑ i : Fin Fil.n, ENNReal.ofReal ‖σ.charge (F.obj (Fil.factor i))‖ =
-    ∑ i : Fin Fil.n, ENNReal.ofReal ‖(σ.preimage F h).charge (Fil.factor i)‖
+    ∑ i : Fin Fil.n, ENNReal.ofReal ‖(σ.preimage F hσ).charge (Fil.factor i)‖
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [StabilityCondition.WithClassMap.preimage_charge]
 
@@ -77,41 +79,46 @@ transferred stability condition equals the HN mass of its image for the
 original one.  This is the mass coordinate behind Lemmas 3.5(3) and 3.9(3)
 of arXiv:2607.28411v1, which the paper states only for phases. -/
 theorem stabilityMass_preimage (E : C) :
-    stabilityMass (σ.preimage F h) E = stabilityMass σ (F.obj E) := by
-  obtain ⟨Fil⟩ := (σ.slicing.preimage F h).hn_exists E
-  rw [stabilityMass_eq_mass (σ.preimage F h) Fil,
-    stabilityMass_eq_mass σ (Fil.mapPreimage σ.slicing F h),
+    stabilityMass (σ.preimage F hσ) E = stabilityMass σ (F.obj E) := by
+  obtain ⟨Fil⟩ := (σ.slicing.preimage F hσ).hn_exists E
+  rw [stabilityMass_eq_mass (σ.preimage F hσ) Fil,
+    stabilityMass_eq_mass σ (Fil.mapPreimage σ.slicing F hσ),
     HNFiltration.mass_mapPreimage]
 
-/-- The `φ⁺` discrepancy of the transferred conditions at an object is the
-`φ⁺` discrepancy of the originals at its image. -/
+/-- The `φ⁺` coordinate transports exactly: both `φ⁺` values are computed on
+the image by `Slicing.preimage_phiPlus`, and the nonvanishing side condition
+at the image is supplied by `Slicing.PreimageData.not_isZero_obj`, so no
+conservativity hypothesis enters. -/
 theorem phiPlusDist_preimage (E : C) (hE : ¬IsZero E) :
-    phiPlusDist (σ.preimage F h) (τ.preimage F hτ) E hE =
-      phiPlusDist σ τ (F.obj E) (h.not_isZero_obj hE) := by
+    phiPlusDist (σ.preimage F hσ) (τ.preimage F hτ) E hE =
+      phiPlusDist σ τ (F.obj E) (hσ.not_isZero_obj hE) := by
   simp only [phiPlusDist, StabilityCondition.WithClassMap.preimage_slicing]
-  rw [σ.slicing.preimage_phiPlus F h h.reflectsZeroObjects E hE,
+  rw [σ.slicing.preimage_phiPlus F hσ hσ.reflectsZeroObjects E hE,
     τ.slicing.preimage_phiPlus F hτ hτ.reflectsZeroObjects E hE]
 
-/-- The `φ⁻` discrepancy of the transferred conditions at an object is the
-`φ⁻` discrepancy of the originals at its image. -/
+/-- The `φ⁻` coordinate transports exactly, by `Slicing.preimage_phiMinus`,
+mirroring `phiPlusDist_preimage`. -/
 theorem phiMinusDist_preimage (E : C) (hE : ¬IsZero E) :
-    phiMinusDist (σ.preimage F h) (τ.preimage F hτ) E hE =
-      phiMinusDist σ τ (F.obj E) (h.not_isZero_obj hE) := by
+    phiMinusDist (σ.preimage F hσ) (τ.preimage F hτ) E hE =
+      phiMinusDist σ τ (F.obj E) (hσ.not_isZero_obj hE) := by
   simp only [phiMinusDist, StabilityCondition.WithClassMap.preimage_slicing]
-  rw [σ.slicing.preimage_phiMinus F h h.reflectsZeroObjects E hE,
+  rw [σ.slicing.preimage_phiMinus F hσ hσ.reflectsZeroObjects E hE,
     τ.slicing.preimage_phiMinus F hτ hτ.reflectsZeroObjects E hE]
 
-/-- The mass discrepancy of the transferred conditions at an object is the
-mass discrepancy of the originals at its image. -/
+/-- The mass coordinate needs no phase argument at all: `stabilityMass_preimage`
+is an equality, so the logarithmic mass discrepancy transports without a
+`≤`, unlike the supremum in `stabilityDist_preimage_le`. -/
 theorem massDist_preimage (E : C) :
-    massDist (σ.preimage F h) (τ.preimage F hτ) E = massDist σ τ (F.obj E) := by
+    massDist (σ.preimage F hσ) (τ.preimage F hτ) E = massDist σ τ (F.obj E) := by
   simp only [massDist, stabilityMass_preimage]
 
-/-- Every objectwise term of the three-coordinate stability distance is
-computed on the image. -/
+/-- The `max` of the three coordinates transports termwise.  This is what
+makes `stabilityDist_preimage_le` a comparison of suprema over different index
+sets rather than an equality: the transferred supremum ranges over the image
+objects only. -/
 theorem stabilityDistTerm_preimage (E : C) (hE : ¬IsZero E) :
-    stabilityDistTerm (σ.preimage F h) (τ.preimage F hτ) E hE =
-      stabilityDistTerm σ τ (F.obj E) (h.not_isZero_obj hE) := by
+    stabilityDistTerm (σ.preimage F hσ) (τ.preimage F hτ) E hE =
+      stabilityDistTerm σ τ (F.obj E) (hσ.not_isZero_obj hE) := by
   simp only [stabilityDistTerm, phiPlusDist_preimage, phiMinusDist_preimage,
     massDist_preimage]
 
@@ -120,9 +127,9 @@ supremum runs over the terms of the original one at image objects, so it is
 bounded by the original supremum.  This extends `slicingDist_preimage_le`,
 Lemmas 3.5(3) and 3.9(3) of arXiv:2607.28411v1, by the mass coordinate. -/
 theorem stabilityDist_preimage_le :
-    stabilityDist (σ.preimage F h) (τ.preimage F hτ) ≤ stabilityDist σ τ := by
+    stabilityDist (σ.preimage F hσ) (τ.preimage F hτ) ≤ stabilityDist σ τ := by
   refine iSup₂_le fun E hE => ?_
   rw [stabilityDistTerm_preimage]
-  exact stabilityDistTerm_le_stabilityDist σ τ (F.obj E) (h.not_isZero_obj hE)
+  exact stabilityDistTerm_le_stabilityDist σ τ (F.obj E) (hσ.not_isZero_obj hE)
 
 end CategoryTheory.Triangulated

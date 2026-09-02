@@ -20,11 +20,29 @@ exists whenever the untwisted one does.  Together with
 arXiv:2607.28411v1 in full, and Lemma 3.2 of arXiv:2601.22994:
 `f^♯(𝒫 ⊗ L) = f^♯𝒫 ⊗ f^*L` *and* the left-hand side is a slicing.
 
-The final theorems spell this out for representatives of `AutPairQuot`.  The
-class-lattice components do not enter the slicing equality, but they do enter
-the stability-level statement: `AutPair.preimage` transports the compatible
-lattice datum along the functor, and `AutPair.preimage_act` is the
-charge-carrying form of the equality.
+`preimage` along `F` is `f^♯` when `F` is a direct image and `f_♯` when `F`
+is a pullback (`PreStabilityCondition.WithClassMap.pullback` and
+`pushforward`); both readings of every statement below are intended.
+
+## Main definitions
+
+* `AutPair.preimage`: the compatible class-lattice datum of a target pair,
+  transported to the class map `v ∘ K₀(F)` of the transferred condition.
+
+## Main results
+
+* `Slicing.preimage_mapEquiv`: transfer commutes with compatible
+  autoequivalences of slicings, given a lifting witness for the twisted
+  slicing.
+* `Slicing.PreimageData.mapEquiv` and `Slicing.PreimageData.preimage_mapEquiv`:
+  that witness is not an extra input; it transports along the twist.
+* `AutPair.preimage_act`: the charge-carrying form, `AutPair.act` commutes
+  with `StabilityCondition.WithClassMap.preimage`.
+
+## References
+
+* arXiv:2607.28411v1, Lemmas 3.5(1) and 3.9(1).
+* arXiv:2601.22994, Lemma 3.2.
 -/
 
 noncomputable section
@@ -127,9 +145,6 @@ theorem Slicing.PreimageData.preimage_mapEquiv (h : s.PreimageData F)
 
 end Twist
 
-variable [IsTriangulated C] [IsTriangulated D]
-open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
-
 end CategoryTheory.Triangulated
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
@@ -172,7 +187,11 @@ transferred class map `v ∘ K₀(F)`: the same `lam` works, because the
 intertwining isomorphism identifies `K₀(F) ∘ K₀(PhiC⁻¹)` with
 `K₀(PhiD⁻¹) ∘ K₀(F)`.  This is what lets an autoequivalence of the source
 act on transferred stability conditions with charges, not only on their
-slicings. -/
+slicings.
+
+Unrelated to `AutPair.preimage_representatives`, which is the slicing-level
+equality stated for two independent representatives and does not use this
+construction. -/
 def AutPair.preimage (aD : AutPair vD) (F : C ⥤ D) [F.Additive] [F.CommShift ℤ]
     [F.IsTriangulated] (PhiC : TriEquiv C)
     (alpha : F ⋙ aD.Φ.e.inverse ≅ PhiC.e.inverse ⋙ F) :
@@ -211,7 +230,8 @@ conditions.**  Acting by `aD` and then transferring along `F` is the same as
 transferring and then acting by the transported pair.  The slicing half is
 `Slicing.PreimageData.preimage_mapEquiv`; the charge half is definitional,
 since both sides carry `Z ∘ lam`.  This is Lemma 3.2 of arXiv:2601.22994 with
-its central charges: `(f_♯σ) ⊗ L = f_♯(σ ⊗ f^*L)`. -/
+its central charges, in the orientation of the Lean statement:
+`f_♯(σ ⊗ f^*L) = (f_♯σ) ⊗ L`. -/
 theorem AutPair.preimage_act (aD : AutPair vD)
     (σ : StabilityCondition.WithClassMap D vD) (F : C ⥤ D) [F.Additive]
     [F.CommShift ℤ] [F.IsTriangulated] (h : σ.slicing.PreimageData F)

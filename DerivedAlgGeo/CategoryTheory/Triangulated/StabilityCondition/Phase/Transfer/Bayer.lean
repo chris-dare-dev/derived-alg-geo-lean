@@ -32,9 +32,15 @@ phase translation through the transfer, and
 the weak order.  No conservativity hypothesis is taken; the lifting witness
 supplies it.
 
+Both theorems take a single lifting witness and are stated for
+representatives of the autoequivalence quotients.  There is no family-wide
+form to distinguish them from, so they carry the plain name `preimage`
+rather than the `preimage_of_preimageData` of the order lemmas.
+
 ## References
 
-* arXiv:2607.28411v1, Definition 3.16, Lemma 3.25, Remark 3.14(3).
+* arXiv:2607.28411v1, Lemma 3.5(1), Remark 3.14(3), Definition 3.16,
+  Lemma 3.25.
 -/
 
 noncomputable section
@@ -46,8 +52,6 @@ universe v₁ u₁ v₂ u₂ u'
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
-open CategoryTheory.Triangulated
-
 variable {C : Type u₁} [Category.{v₁} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
 variable {D : Type u₂} [Category.{v₂} D] [HasZeroObject D] [HasShift D ℤ]
@@ -55,9 +59,19 @@ variable {D : Type u₂} [Category.{v₂} D] [HasZeroObject D] [HasShift D ℤ]
 
 /-- **The Bayer property survives transfer.**  If `s ⪯ (PhiD • s)[l]` on the
 target and `PhiC` is the compatible twist on the source, then the transferred
-slicing satisfies `s_F ⪯ (PhiC • s_F)[l]`.  Geometrically: pullback and
-pushforward of a slicing with the Bayer property for `L` have the Bayer
-property for `f^*L`, as used in Lemma 3.25 of arXiv:2607.28411v1. -/
+slicing satisfies `s_F ⪯ (PhiC • s_F)[l]`.
+
+Geometrically this is both directions of Lemma 3.25 of arXiv:2607.28411v1:
+the pullback `f^♯` of a slicing with the Bayer property for `L` has it for
+`f^*L`, and dually the pushforward `f_♯` of a slicing with the Bayer property
+for `f^*L` has it for `L`.  Which reading applies is fixed by whether `F` is
+a direct image or a pullback, as in `PreStabilityCondition.WithClassMap.pullback`
+and `pushforward`.
+
+Stated for the representatives `PhiC`, `PhiD` rather than for classes in
+`AutQuot`: descent needs the intertwiner `alpha` to be independent of the
+representative, which is a property of the eventual family functors and is
+not available here, the same restriction as `AutPair.preimage_representatives`. -/
 theorem HasBayerProperty.preimage {s : Slicing D} {F : C ⥤ D} [F.Additive]
     [F.CommShift ℤ] [F.IsTriangulated] (h : s.PreimageData F)
     (PhiC : TriEquiv C) (PhiD : TriEquiv D)
@@ -76,9 +90,11 @@ variable {Λ : Type u'} [AddCommGroup Λ] {v : K₀ D →+ Λ}
 /-- The paper-facing Bayer property of a stability condition transfers, with
 the twist carried across the class map by `AutPair.preimage`.  Reduces to
 `HasBayerProperty.preimage` through `bayerProperty_iff`; the class-lattice
-component plays no role in the comparison of slicings. -/
+component plays no role in the comparison of slicings.  Stated for the
+representative `aD` rather than for `q : AutPairQuot v`, for the reason
+given at `HasBayerProperty.preimage`. -/
 theorem BayerProperty.preimage (σ : StabilityCondition.WithClassMap D v)
-    (F : C ⥤ D) [F.Additive] [F.CommShift ℤ] [F.IsTriangulated]
+    {F : C ⥤ D} [F.Additive] [F.CommShift ℤ] [F.IsTriangulated]
     (h : σ.slicing.PreimageData F) (aD : AutPair v) (PhiC : TriEquiv C)
     (alpha : F ⋙ aD.Φ.e.inverse ≅ PhiC.e.inverse ⋙ F) (l : ℤ)
     (hB : BayerProperty σ (AutPairQuot.mk aD) l) :
