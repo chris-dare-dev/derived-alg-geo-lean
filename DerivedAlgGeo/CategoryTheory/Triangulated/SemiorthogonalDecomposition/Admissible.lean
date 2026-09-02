@@ -162,8 +162,9 @@ orthogonal.  The right adjoint is triangulated because it is adjoint to the tria
 inclusion; after applying it, full faithfulness makes the mapped counit an isomorphism, hence its
 cone a zero object. -/
 theorem IsRightAdmissible.exists_distTriang_mem_rightOrthogonal
-    {P : ObjectProperty C} [P.IsTriangulated] (hP : P.IsRightAdmissible) (X : C) :
+    {P : ObjectProperty C} (hP : P.IsRightAdmissible) (X : C) :
     P.extensionProduct P.rightOrthogonal X := by
+  letI : P.IsTriangulated := hP.1
   obtain ⟨_, G, ⟨adj⟩⟩ := hP
   letI : P.ι.Full := P.fullyFaithfulι.full
   letI : P.ι.Faithful := P.fullyFaithfulι.faithful
@@ -190,8 +191,9 @@ theorem IsRightAdmissible.exists_distTriang_mem_rightOrthogonal
 
 /-- The unit triangle of a left-admissible property has its first vertex in the left orthogonal. -/
 theorem IsLeftAdmissible.exists_distTriang_mem_leftOrthogonal
-    {P : ObjectProperty C} [P.IsTriangulated] (hP : P.IsLeftAdmissible) (X : C) :
+    {P : ObjectProperty C} (hP : P.IsLeftAdmissible) (X : C) :
     P.leftOrthogonal.extensionProduct P X := by
+  letI : P.IsTriangulated := hP.1
   obtain ⟨_, L, ⟨adj⟩⟩ := hP
   letI : P.ι.Full := P.fullyFaithfulι.full
   letI : P.ι.Faithful := P.fullyFaithfulι.faithful
@@ -218,14 +220,14 @@ theorem IsLeftAdmissible.exists_distTriang_mem_leftOrthogonal
 /-- Right admissibility is equivalently consumed as the equality saying that every object is an
 extension of an object of `P` by an object of `P.rightOrthogonal`. -/
 theorem IsRightAdmissible.extensionProduct_rightOrthogonal_eq_top
-    {P : ObjectProperty C} [P.IsTriangulated] (hP : P.IsRightAdmissible) :
+    {P : ObjectProperty C} (hP : P.IsRightAdmissible) :
     P.extensionProduct P.rightOrthogonal = ⊤ := by
   rw [eq_top_iff]
   exact fun X _ ↦ hP.exists_distTriang_mem_rightOrthogonal X
 
 /-- The dual extension-product form of left admissibility. -/
 theorem IsLeftAdmissible.leftOrthogonal_extensionProduct_eq_top
-    {P : ObjectProperty C} [P.IsTriangulated] (hP : P.IsLeftAdmissible) :
+    {P : ObjectProperty C} (hP : P.IsLeftAdmissible) :
     P.leftOrthogonal.extensionProduct P = ⊤ := by
   rw [eq_top_iff]
   exact fun X _ ↦ hP.exists_distTriang_mem_leftOrthogonal X
@@ -268,12 +270,12 @@ variable {C : Type u} [Category.{v} C]
 variable [Limits.HasZeroObject C] [HasShift C ℤ] [Preadditive C]
   [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
 
-/-- The root-facing two-block sequence attached to a right-admissible `P`.
+/-- The root-facing two-block sequence attached to `P` and its right orthogonal.
 
 It is constructed by passing the classically ordered family `![P.rightOrthogonal, P]` to
 `ofReverseFin`; consequently component `0` is `P` and component `1` is `P.rightOrthogonal`.
 See `Orientation.lean` for the convention reversal. -/
-def twoBlock (P : ObjectProperty C) [P.IsTriangulated] (_hP : P.IsRightAdmissible) :
+def twoBlock (P : ObjectProperty C) :
     SemiorthogonalSequence C (Fin 2) :=
   ofReverseFin 2 ![P.rightOrthogonal, P] (by
     intro i j hij
@@ -283,22 +285,25 @@ def twoBlock (P : ObjectProperty C) [P.IsTriangulated] (_hP : P.IsRightAdmissibl
     subst j
     simp)
 
+omit [Limits.HasZeroObject C] [HasShift C ℤ]
+  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] in
 @[simp]
-theorem twoBlock_component_zero (P : ObjectProperty C) [P.IsTriangulated]
-    (hP : P.IsRightAdmissible) :
-    (twoBlock P hP).component 0 = P := by
+theorem twoBlock_component_zero (P : ObjectProperty C) :
+    (twoBlock P).component 0 = P := by
   simp [twoBlock]
 
+omit [Limits.HasZeroObject C] [HasShift C ℤ]
+  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] in
 @[simp]
-theorem twoBlock_component_one (P : ObjectProperty C) [P.IsTriangulated]
-    (hP : P.IsRightAdmissible) :
-    (twoBlock P hP).component 1 = P.rightOrthogonal := by
+theorem twoBlock_component_one (P : ObjectProperty C) :
+    (twoBlock P).component 1 = P.rightOrthogonal := by
   simp [twoBlock]
 
 /-- The two blocks are triangulated object properties. -/
-theorem twoBlock_hasTriangulatedComponents (P : ObjectProperty C) [P.IsTriangulated]
+theorem twoBlock_hasTriangulatedComponents (P : ObjectProperty C)
     (hP : P.IsRightAdmissible) :
-    (twoBlock P hP).HasTriangulatedComponents := by
+    (twoBlock P).HasTriangulatedComponents := by
+  letI : P.IsTriangulated := hP.1
   intro i
   by_cases hi : i = 0
   · subst i
@@ -312,37 +317,41 @@ theorem twoBlock_hasTriangulatedComponents (P : ObjectProperty C) [P.IsTriangula
 /-- A right-admissible two-block sequence is strongly full with the explicit bound `1`.
 `triangEnvelopeIter 0` already closes under shifts, binary products and retracts; the counit
 triangle contributes the single extension counted by `triangEnvelopeIter_succ`. -/
-theorem twoBlock_isStronglyFull (P : ObjectProperty C) [P.IsTriangulated]
+theorem twoBlock_isStronglyFull (P : ObjectProperty C)
     (hP : P.IsRightAdmissible) :
-    (twoBlock P hP).IsStronglyFull := by
+    (twoBlock P).IsStronglyFull := by
+  letI : P.IsTriangulated := hP.1
   refine ⟨1, ?_⟩
   rw [eq_top_iff]
   rintro X -
   obtain ⟨A, Z, f, g, h, hT, hA, hZ⟩ :=
     hP.exists_distTriang_mem_rightOrthogonal X
-  have hAtotal : (twoBlock P hP).total A :=
-    (twoBlock P hP).component_le_total 0 A (by simpa using hA)
-  have hZtotal : (twoBlock P hP).total Z :=
-    (twoBlock P hP).component_le_total 1 Z (by simpa using hZ)
+  have hAtotal : (twoBlock P).total A :=
+    (twoBlock P).component_le_total 0 A (by simpa using hA)
+  have hZtotal : (twoBlock P).total Z :=
+    (twoBlock P).component_le_total 1 Z (by simpa using hZ)
   rw [ObjectProperty.triangEnvelopeIter_succ]
   apply ObjectProperty.le_retractClosure
   exact ⟨A, Z, f, g, h, hT,
     (by simpa only [ObjectProperty.triangEnvelopeIter_zero] using
-      ((twoBlock P hP).total.le_triangEnvelopeIter 0 A hAtotal)),
-    (twoBlock P hP).total.le_triangEnvelopeIter 0 Z hZtotal⟩
+      ((twoBlock P).total.le_triangEnvelopeIter 0 A hAtotal)),
+    (twoBlock P).total.le_triangEnvelopeIter 0 Z hZtotal⟩
 
+omit [Limits.HasZeroObject C] [HasShift C ℤ]
+  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] in
 /-- For `P = ⊤`, the two blocks are all objects followed by the zero objects. -/
 @[simp]
 theorem twoBlock_top_component (i : Fin 2) :
-    (twoBlock (⊤ : ObjectProperty C) ObjectProperty.top_isRightAdmissible).component i =
+    (twoBlock (⊤ : ObjectProperty C)).component i =
       if i = 0 then ⊤ else ObjectProperty.zeroObjects := by
   fin_cases i <;> simp
 
+omit [Limits.HasZeroObject C] [HasShift C ℤ]
+  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] in
 /-- For the zero-object property, the two blocks are zero objects followed by all objects. -/
 @[simp]
 theorem twoBlock_zeroObjects_component (i : Fin 2) :
-    (twoBlock (ObjectProperty.zeroObjects (C := C))
-      ObjectProperty.zeroObjects_isRightAdmissible).component i =
+    (twoBlock (ObjectProperty.zeroObjects (C := C))).component i =
         if i = 0 then ObjectProperty.zeroObjects else ⊤ := by
   fin_cases i <;> simp
 
