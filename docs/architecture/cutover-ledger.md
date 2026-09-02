@@ -164,14 +164,16 @@ blocks should normally move it rather than add more declarations beside it.
   The former geometry-owned one-field carriers `NumericalRealization` and
   `CategoricalEulerForm`, together with their parallel descent and preservation
   APIs, are retired rather than retained as compatibility wrappers.
-- Finite free integral lattices:
-  `LinearAlgebra/Lattice/Basic.lean` owns the global `ZLattice` class, its
-  finite/free instances, and `ZLattice.ofFiniteTorsionFree`.
-  `NumericalVarietyData.numericalZLattice` remains in
+- Finite free integral lattices: there is no repository lattice class. The
+  interface is Mathlib's pair of instances `Module.Finite ℤ` and
+  `Module.Free ℤ`, the latter from `Module.free_of_finite_type_torsion_free'`
+  in `Mathlib/LinearAlgebra/FreeModule/PID.lean`.
+  `NumericalVarietyData.instFiniteNumericalQuotient` remains in
   `AlgebraicGeometry/Numerical/GrothendieckGroup/Lattice.lean` because it
   introduces the Euler radical and numerical quotient. The former
-  `AlgebraicGeometry.Numerical.ZLattice` namespace is retired rather than
-  retained as a compatibility alias.
+  `AlgebraicGeometry.Numerical.ZLattice` namespace and the former
+  `LinearAlgebra/Lattice/Basic.lean` are retired rather than retained as
+  compatibility aliases.
 - Numerical polynomials and mixed finite differences:
   `Algebra/NumericalPolynomial/Basic.lean` owns integer-lattice numerical
   functions, mixed differences, degree bounds, Newton coefficients, and top
@@ -349,12 +351,11 @@ blocks should normally move it rather than add more declarations beside it.
 Every path lane confirmed by the 2026-09-01 audit has landed.
 
 Confirmed type-level hazards, recorded for a separate lane because they are
-rewrites rather than moves: `LinearAlgebra/Lattice/Basic.lean` bundles
-`Module.Finite ℤ` and `Module.Free ℤ` into a class named `ZLattice` that will
-collide with Mathlib's `IsZLattice` family; `AlgebraicGeometry/Variety/`
-bundles `Variety k` where Mathlib uses `Scheme` with `Over (Spec k)` and
-`Prop` classes; and `LinearAlgebra/AlternatingFinsum.lean` may overlap
-Mathlib's `Algebra/Homology/EulerCharacteristic.lean`.
+rewrites rather than moves: `AlgebraicGeometry/Variety/` bundles `Variety k`
+where Mathlib uses `Scheme` with `Over (Spec k)` and `Prop` classes; and
+`LinearAlgebra/AlternatingFinsum.lean` may overlap Mathlib's
+`Algebra/Homology/EulerCharacteristic.lean`. The `ZLattice` class was the
+third and is retired above (2026-09-02).
 
 Take these lanes one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and
