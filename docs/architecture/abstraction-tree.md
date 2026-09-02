@@ -100,11 +100,9 @@ Category
    └─ scheme-site realizations
 
 LinearAlgebra
-├─ finite free integral lattices
-│  ├─ ZLattice                              finite + free over ℤ
-│  └─ ZLattice.ofFiniteTorsionFree          generic construction
-│     └─ NumericalVarietyData.numericalZLattice
-│                                            geometric quotient consumer
+├─ finite free integral lattices          Mathlib: [Module.Finite ℤ Λ] [Module.Free ℤ Λ]
+│  └─ NumericalVarietyData.NumericalQuotient finite by Module.Finite.quotient; free, once
+│                                            torsion-free, by Module.free_of_finite_type_torsion_free'
 └─ weighted-basis graded pieces
    ├─ internal direct-sum decomposition
    └─ NumericalRingData.ofGradedBasis        geometric numerical consumer
@@ -189,10 +187,11 @@ particular:
   finite-difference degree, Newton coefficients, and top multilinear
   coefficients in `Algebra/NumericalPolynomial`; Snapper's theorem imports
   that root and adds the Picard, coherent-sheaf, and Euler-characteristic data;
-- keep the finite-free abelian-group interface `ZLattice` and its construction
-  from finite torsion-free groups in `LinearAlgebra/Lattice/Basic.lean`;
-  `NumericalVarietyData.numericalZLattice` remains the geometric theorem that
-  supplies those hypotheses for an Euler-radical quotient;
+- do not add a class for finite free abelian groups: Mathlib's `Module.Finite ℤ`
+  and `Module.Free ℤ` instances are the interface, and freeness of a finitely
+  generated torsion-free group is Mathlib's instance
+  `Module.free_of_finite_type_torsion_free'`; the numerical Euler-radical
+  quotient supplies those hypotheses and nothing else;
 - keep ordinary module theory under `Algebra`, generic sheaves under
   `CategoryTheory/Sites/Sheaves`, module sheaves on ringed sites under
   `Algebra/Category/ModuleCat/Sheaf` where Mathlib defines `SheafOfModules`,

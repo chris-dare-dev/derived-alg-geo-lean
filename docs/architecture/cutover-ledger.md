@@ -337,6 +337,12 @@ blocks should normally move it rather than add more declarations beside it.
   boundary is gone; the layering gate still rejects any import from `Weak/`
   into the Bridgeland theory and still requires `PreStabilityCondition` to
   extend `WeakPreStabilityCondition`. Declaration namespaces are unchanged.
+- The `ZLattice` class is retired (2026-09-02): `LinearAlgebra/Lattice/Basic.lean`
+  bundled `Module.Finite ℤ` and `Module.Free ℤ` into a class whose name is
+  Mathlib's `ZLattice` namespace. The interface is Mathlib's pair of instances;
+  `NumericalVarietyData.numericalZLattice` became the instance
+  `instFiniteNumericalQuotient`, and freeness of the torsion-free quotient is
+  Mathlib's `Module.free_of_finite_type_torsion_free'`.
 
 ## Confirmed next lanes
 

@@ -1034,7 +1034,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms NumericalVarietyData.numericalPairing_left_nondegenerate
 #print axioms NumericalVarietyData.numericalPairing_right_nondegenerate
 #print axioms NumericalVarietyData.numericalPairing_ker_eq_bot
-#print axioms NumericalVarietyData.numericalZLattice
+#print axioms NumericalVarietyData.instFiniteNumericalQuotient
 #print axioms K3.isEulerPairingSymmetric
 #print axioms K3.leftRadical_eq_rightRadical
 #print axioms K3.numericalPairing_mk_eq_neg_mukaiPairing

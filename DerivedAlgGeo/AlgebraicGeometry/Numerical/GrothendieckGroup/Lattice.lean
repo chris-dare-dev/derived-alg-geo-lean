@@ -3,7 +3,6 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.EulerPairing
-import DerivedAlgGeo.LinearAlgebra.Lattice.Basic
 
 /-!
 # The numerical Grothendieck lattice
@@ -24,9 +23,12 @@ object is its underlying finite free `ℤ`-module.
   is symmetric.
 * `NumericalVarietyData.NumericalQuotient` is the quotient by the radical.
 * `NumericalVarietyData.numericalPairing` is the descended, nondegenerate pairing.
-* The generic `ZLattice` interface comes from `LinearAlgebra/Lattice/Basic.lean`;
-  `numericalZLattice` constructs one from explicit finite-generation and
-  quotient torsion-freeness hypotheses.
+* `NumericalQuotient` is finitely generated over `ℤ` whenever `N` is
+  (`instFiniteNumericalQuotient`, from `Module.Finite.quotient`), and free
+  whenever it is also torsion-free, by Mathlib's instance
+  `Module.free_of_finite_type_torsion_free'`. The lattice structure is
+  therefore Mathlib's `[Module.Finite ℤ _] [Module.Free ℤ _]`; the repository
+  no longer carries a class for it.
 * `K3.numericalPairing_mk_eq_neg_mukaiPairing` fixes the K3 sign convention.
 -/
 
@@ -231,17 +233,18 @@ theorem numericalPairing_ker_eq_bot
     simpa using DFunLike.congr_fun hzero y
   · exact bot_le
 
-/-- The numerical quotient is a `ℤ`-lattice once the original group is finitely generated and
-the quotient is torsion-free.
+/-- Finite generation passes to the numerical quotient. Stated as an instance
+so that consumers do not repeat the explicit `letI` the former
+`numericalZLattice` theorem needed to reach `Module.Finite.quotient`.
 
-Finite generation passes automatically to the quotient.  Torsion-freeness does not pass to an
-arbitrary quotient, so it is intentionally required on `NumericalQuotient` itself. -/
-theorem numericalZLattice [Module.Finite ℤ N]
-    [Module.IsTorsionFree ℤ (NumericalQuotient V)] :
-    ZLattice (NumericalQuotient V) := by
-  letI : Module.Finite ℤ (NumericalQuotient V) :=
-    Module.Finite.quotient ℤ V.leftRadical
-  exact ZLattice.ofFiniteTorsionFree _
+Torsion-freeness does not pass to an arbitrary quotient, so a consumer that
+needs the quotient to be free supplies `[Module.IsTorsionFree ℤ (NumericalQuotient V)]`
+and obtains `Module.Free ℤ (NumericalQuotient V)` from Mathlib's instance
+`Module.free_of_finite_type_torsion_free'`; a finite free `ℤ`-module is the
+lattice, and no repository class stands in for that pair of hypotheses. -/
+instance instFiniteNumericalQuotient [Module.Finite ℤ N] :
+    Module.Finite ℤ (NumericalQuotient V) :=
+  Module.Finite.quotient ℤ V.leftRadical
 
 end NumericalVarietyData
 
