@@ -7,6 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.Collection
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.Exceptional
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.Residual
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperObjects
+import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperBlocks
 
 /-!
 # Enriques surfaces
@@ -16,4 +17,7 @@ isotropic 10-collection of line bundles, its conditional exceptionality and
 semiorthogonality packages, and the formal residual full subcategory.
 It also exposes the Serre, spherical, and pseudoprojective classification
 interfaces used by the two refined derived Torelli papers.
+The paper-content layer additionally records orthogonal exceptional blocks,
+their residual right projections, and the resulting concrete classified
+objects.
 -/
