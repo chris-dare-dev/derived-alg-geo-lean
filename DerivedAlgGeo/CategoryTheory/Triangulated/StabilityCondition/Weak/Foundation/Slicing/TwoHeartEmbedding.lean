@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.IntervalHeart
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.BoundaryTruncation
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.ImageFactorisation
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
 
 /-!
 # Two-heart embeddings of owner interval categories
@@ -13,6 +14,12 @@ Every phase interval of width at most one embeds fully faithfully into two
 adjacent abelian slicing hearts.  The left heart controls kernels and images;
 the right half-open heart controls cokernels and coimages.  This is the owner
 foundation for the quasi-abelian interval machinery used by target transport.
+
+The file also owns the dual half-open t-structure of a slicing: the
+dictionary translating the degree-zero aisle and degree-one coaisle of the
+phase-shifted dual t-structure into the cuts `P(≥ t)` and `P(< t)`, and its
+boundedness, which is the one clause about the slicing itself that any
+larger-ambient extension of it has to be given.
 -/
 
 noncomputable section
@@ -76,6 +83,64 @@ theorem Slicing.toDualTStructure_heart_iff (s : Slicing C) (E : C) :
   change (s.toDualTStructure C).le 0 E ∧
       (s.toDualTStructure C).ge 0 E ↔ _
   simp only [Slicing.toDualTStructure, Int.cast_zero, neg_zero, sub_zero]
+
+/-- The connective half of the dual t-structure at the phase `t` is the lower
+phase cut `𝒫(≥ t)`.  This is the dictionary through which the phase-indexed
+family of dual t-structures `τ'_t = (𝒫(≥ t), 𝒫(< t + 1))` is read.  Not a
+`simp` lemma: the phase cut is not a normal form the simplifier should chase,
+and both consumers apply the dictionary by hand at a chosen degree. -/
+theorem Slicing.phaseShift_toDualTStructure_isLE_zero_iff (s : Slicing C) (t : ℝ) (E : C) :
+    ((s.phaseShift C t).toDualTStructure C).IsLE E 0 ↔ s.geProp C t E := by
+  constructor
+  · intro h
+    have h' := h.le
+    change (s.phaseShift C t).geProp C (-((0 : ℤ) : ℝ)) E at h'
+    exact (s.phaseShift_geProp_zero C t E).mp (by simpa using h')
+  · intro h
+    refine ⟨?_⟩
+    change (s.phaseShift C t).geProp C (-((0 : ℤ) : ℝ)) E
+    simpa using (s.phaseShift_geProp_zero C t E).mpr h
+
+/-- The degree-one coconnective half of the dual t-structure at the phase `t`
+is the strict upper phase cut `𝒫(< t)`. -/
+theorem Slicing.phaseShift_toDualTStructure_isGE_one_iff (s : Slicing C) (t : ℝ) (E : C) :
+    ((s.phaseShift C t).toDualTStructure C).IsGE E 1 ↔ s.ltProp C t E := by
+  constructor
+  · intro h
+    have h' := h.ge
+    change (s.phaseShift C t).ltProp C (1 - ((1 : ℤ) : ℝ)) E at h'
+    exact (s.phaseShift_ltProp_zero C t E).mp (by simpa using h')
+  · intro h
+    refine ⟨?_⟩
+    change (s.phaseShift C t).ltProp C (1 - ((1 : ℤ) : ℝ)) E
+    simpa using (s.phaseShift_ltProp_zero C t E).mpr h
+
+/-- The dual t-structure of a slicing is bounded: an HN filtration of an
+object confines its phases to a finite interval, which the integer degrees
+enclose.  Boundedness is the only obligation about the slicing itself that a
+larger-ambient extension of this t-structure cannot derive from its own aisle
+formula, so this is the lemma such a construction consumes
+(`TStructure.IndExtensionData.small_isBounded`). -/
+theorem Slicing.toDualTStructure_isBounded (s : Slicing C) :
+    (s.toDualTStructure C).IsBounded := by
+  intro E
+  by_cases hE : IsZero E
+  · exact ⟨⟨0, (s.toDualTStructure C).isGE_of_isZero hE 0⟩,
+      ⟨0, (s.toDualTStructure C).isLE_of_isZero hE 0⟩⟩
+  obtain ⟨F, hn, -, -⟩ := s.exists_hn_nonzero_boundaries C hE
+  refine ⟨⟨-⌈F.phiPlus C hn⌉, ⟨?_⟩⟩, ⟨-⌊F.phiMinus C hn⌋, ⟨?_⟩⟩⟩
+  · change s.ltProp C (1 - ((-⌈F.phiPlus C hn⌉ : ℤ) : ℝ)) E
+    refine s.ltProp_of_hn C F _ (fun i => ?_) hn
+    have h1 := (F.phase_mem_range C hn i).2
+    have h2 := Int.le_ceil (F.phiPlus C hn)
+    push_cast
+    linarith
+  · change s.geProp C (-((-⌊F.phiMinus C hn⌋ : ℤ) : ℝ)) E
+    refine s.geProp_of_hn C F _ (fun i => ?_) hn
+    have h1 := (F.phase_mem_range C hn i).1
+    have h2 := Int.floor_le (F.phiMinus C hn)
+    push_cast
+    linarith
 
 /-- Owner interval objects lie in the right adjacent half-open slicing heart
 `P([b-1,b))`. -/
