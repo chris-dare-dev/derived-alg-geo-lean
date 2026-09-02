@@ -196,7 +196,7 @@ theorem total_isStableUnderShift :
   exact ⟨i, (B.blockSpan i).le_shift n X hi⟩
 
 /-- The residual property of orthogonal exceptional blocks is triangulated. -/
-theorem residual_isTriangulated [IsTriangulated C] :
+theorem residual_isTriangulated :
     B.residual.IsTriangulated := by
   letI : B.total.IsStableUnderShift ℤ := B.total_isStableUnderShift
   change B.total.rightOrthogonal.IsTriangulated

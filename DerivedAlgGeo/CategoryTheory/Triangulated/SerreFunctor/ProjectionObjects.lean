@@ -36,7 +36,6 @@ variable {k : Type w} [Field k]
 variable {C : Type u} [Category.{v} C] [Preadditive C] [Linear k C]
   [Limits.HasZeroObject C] [HasShift C ℤ]
   [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
-  [IsTriangulated C]
 variable {ι : Type t}
 
 attribute [local instance] OrthogonalExceptionalBlocks.residual_isTriangulated
