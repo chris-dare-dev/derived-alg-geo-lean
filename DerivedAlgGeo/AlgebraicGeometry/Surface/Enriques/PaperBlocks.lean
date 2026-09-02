@@ -25,10 +25,9 @@ computations not yet constructed in the repository.  The new classification
 constructors ensure, however, that these theorems concern the actual residual
 projections of the actual block objects, rather than arbitrary candidates.
 
-The chains of `(-2)`-curves appearing in Paper II, Proposition 1.4 are not
-recorded here.  No theorem in this file consumes those curves; their only role
-in the cited paper is to establish the exceptional-block hypotheses supplied
-below.
+The chains of `(-2)`-curves appearing in Paper II, Proposition 1.4 and the
+mutation/Ext consequences they feed are recorded in the downstream
+`PaperExtension` module.
 -/
 
 universe u t

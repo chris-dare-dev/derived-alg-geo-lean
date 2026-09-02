@@ -51,13 +51,15 @@ Category
 │  │  └─ Semiorthogonal decomposition
 │  │     ├─ ExceptionalCollection
 │  │     ├─ OrthogonalExceptionalBlocks  positive blocks and residual
-│  │     └─ RightProjectionData          chosen adjoint and universal Hom
+│  │     ├─ RightProjectionData          chosen adjoint and universal Hom
+│  │     └─ mutation / projection chains objectwise cones and iteration
 │  └─ Linear k C                         Mathlib root
 │     └─ SerreFunctorData                duality on Hom spaces
 │        ├─ SerreCategoryData            chosen Serre autoequivalence
 │        │  └─ EnriquesCategoryData      square-to-shift refinement
 │        ├─ IsSphericalObject            two-degree self-Hom profile
 │        ├─ IsPseudoprojectiveObject     interval self-Hom profile
+│        ├─ Ext profiles / transport     Serre-compatible equivalences
 │        └─ classification data          supplied paper conclusions
 ├─ Abelian                               Mathlib typeclass
 │  ├─ weak-Serre exactness               repository generic extension
@@ -243,12 +245,14 @@ particular:
 - a paper-specific module may instantiate these roots but never becomes a root
   imported by them.
 - keep exceptional blocks, residual right orthogonals, chosen right-adjoint
-  projections, Serre duality, Enriques-category relations, and spherical or
-  pseudoprojective self-Hom profiles under the generic triangulated-category
-  root.  A surface-specific residual category reuses those structures and
-  binds the candidates to projections of its actual line bundles; existence
-  of the projection and the mutation/Ext computations remain explicit
-  geometric input until constructed.
+  projections, objectwise mutation and projection-chain arguments, Serre
+  duality, Enriques-category relations, and spherical or pseudoprojective
+  self-Hom profiles and transport under the generic triangulated-category
+  root.  Kernel-presented exceptional-block extension remains under the
+  Fourier--Mukai root.  A surface-specific residual category reuses those
+  structures and binds the candidates to projections of its actual line
+  bundles; the numerical curve chain is geometric, while its derived triangle
+  and the functorial kernel cone remain explicit inputs until constructed.
 
 Bicategories are the first implemented higher-categorical stage. A future
 general `n`-category or `(∞,1)`-category layer must name its formal model and
