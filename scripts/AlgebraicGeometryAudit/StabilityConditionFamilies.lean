@@ -591,3 +591,12 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.quasicoherent_isClosedUnderIsomorphisms
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.quasicoherent_isClosedUnderCoproducts
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.sigma_mem
+
+/-! ## Pushforward of stability conditions along bounded coherent pullback -/
+
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPushforward
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPushforward_slicing
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPushforwardOfInducing
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPushforward
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPushforward_slicing
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPushforwardOfInducing
