@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import Mathlib.CategoryTheory.Adjunction.Restrict
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
 
 /-!
@@ -17,6 +18,12 @@ target; these are formulas (A.3) and (A.4).
 The theorem is independent of schemes and of the compact-generation argument
 that constructs the large source t-structure in Step 1.
 
+The same file owns the restriction of an adjunction on either side of `F` to
+`Q` and `F⁻¹ Q`, which Proposition 3.8 transposes condition (3.2) through;
+these five `ObjectProperty` declarations need no t-structure and are recorded
+in `docs/architecture/cutover-ledger.md` as a block to move to
+`CategoryTheory/ObjectProperty/`.
+
 ## Main definitions
 
 * `ObjectProperty.preimageLift`: the functor between the two selected full
@@ -26,6 +33,14 @@ that constructs the large source t-structure in Step 1.
   hypothesis (iv) of A.17 produces, and `ObjectProperty.liftToInverseImage`,
   the restriction of a functor in the other direction whose composite with
   `F` preserves `Q`.
+* `Adjunction.restrictInverseImageLeft` and `restrictInverseImageRight`: an
+  adjunction on either side of `F` restricted to those subcategories, through
+  Mathlib's `Adjunction.restrictFullyFaithful`; the suffix names which adjoint
+  of `F` is restricted.
+
+## References
+
+* arXiv:2607.28411v1, Theorem A.17 (Steps 2 and 3) and Proposition 3.8.
 -/
 
 noncomputable section
@@ -97,7 +112,7 @@ instance instAdditivePreimageLift [F.Additive] (hmem : ∀ X : C, P X ↔ Q (F.o
     (preimageLift F hmem).Additive :=
   inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ (hmem X.obj).1 X.property)).Additive
 
-noncomputable instance instCommShiftPreimageLift [P.IsTriangulated] [Q.IsTriangulated]
+instance instCommShiftPreimageLift [P.IsTriangulated] [Q.IsTriangulated]
     [F.CommShift ℤ] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
     (preimageLift F hmem).CommShift ℤ :=
   inferInstanceAs ((Q.lift (P.ι ⋙ F) (fun X ↦ (hmem X.obj).1 X.property)).CommShift ℤ)
@@ -128,6 +143,34 @@ abbrev liftToInverseImage (F : Functor C D) (Q : ObjectProperty D) (L : Functor 
     (hL : ∀ E : D, Q E → Q (F.obj (L.obj E))) :
     Functor Q.FullSubcategory (Q.inverseImage F).FullSubcategory :=
   (Q.inverseImage F).lift (Q.ι ⋙ L) fun E ↦ hL E.obj E.property
+
+/-- An adjunction `L ⊣ F` restricts to `Q ⊆ D` and `F⁻¹ Q ⊆ C` when the monad
+`F L` preserves `Q`; the restricted functors are `liftToInverseImage` and
+`inverseImageLift`, and the comparison isomorphisms are `liftCompιIso`, so
+nothing is transported.  Geometrically this is `f_! ⊣ f^*` on `Dᵇ(Coh)`, under
+the hypothesis that the monad `f^* f_!` preserves bounded coherent complexes,
+which Proposition 3.8 of arXiv:2607.28411v1 obtains from `f_!(Dᵇ) ⊆ Dᵇ`,
+itself a consequence of perfectness of the relative dualizing complex. -/
+def _root_.CategoryTheory.Adjunction.restrictInverseImageLeft
+    {L : Functor D C} (adj : L ⊣ F) (Q : ObjectProperty D)
+    (hL : ∀ E : D, Q E → Q (F.obj (L.obj E))) :
+    liftToInverseImage F Q L hL ⊣ inverseImageLift F Q :=
+  adj.restrictFullyFaithful Q.fullyFaithfulι (Q.inverseImage F).fullyFaithfulι
+    ((Q.inverseImage F).liftCompιIso _ _).symm (Q.liftCompιIso _ _).symm
+
+/-- An adjunction `F ⊣ R` restricts to `F⁻¹ Q ⊆ C` and `Q ⊆ D` when the comonad
+`F R` preserves `Q`; the restricted functors are `inverseImageLift` and
+`liftToInverseImage`, and the comparison isomorphisms are `liftCompιIso`, so
+nothing is transported.  Geometrically this is `f^* ⊣ f_*` on `Dᵇ(Coh)`, under
+the hypothesis that the comonad `f^* f_*` preserves bounded coherent
+complexes, exactly what condition (3.2) of arXiv:2607.28411v1 needs in order
+to be stated there. -/
+def _root_.CategoryTheory.Adjunction.restrictInverseImageRight
+    {R : Functor D C} (adj : F ⊣ R) (Q : ObjectProperty D)
+    (hR : ∀ E : D, Q E → Q (F.obj (R.obj E))) :
+    inverseImageLift F Q ⊣ liftToInverseImage F Q R hR :=
+  adj.restrictFullyFaithful (Q.inverseImage F).fullyFaithfulι Q.fullyFaithfulι
+    (Q.liftCompιIso _ _).symm ((Q.inverseImage F).liftCompιIso _ _).symm
 
 /-- Formula (A.3) on the restricted categories.
 
