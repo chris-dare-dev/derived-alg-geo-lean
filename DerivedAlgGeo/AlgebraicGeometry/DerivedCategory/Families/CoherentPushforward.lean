@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.ClosedImmersion
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Finite
 
 /-!
 # Direct image on bounded coherent derived categories
@@ -24,11 +24,13 @@ functor degreewise, so `coherentDerivedPushforward` is Mathlib's
 structure are theorems (`mapDerivedCategory_bounded` and Mathlib's instances)
 rather than obligations of the instance.
 
-Closed immersions into locally Noetherian schemes inhabit the contract through
-`Coh.pushforward`.  Finite morphisms, the case Proposition 3.3 of the paper
-needs, would inhabit it once coherence of `f_*` along a finite morphism is
-proved; the contract is stated on an arbitrary morphism so that instance is an
-addition, not a rewrite.
+Finite morphisms between locally Noetherian schemes inhabit the contract
+through `Coh.pushforward`, closed immersions among them; this is the generality
+in which Proposition 3.3 of the paper and Definition 3.1 of arXiv:2601.22994
+use `f_*`.
+The contract is stated on an arbitrary morphism so that a further inhabitant,
+an affine morphism whose pushforward preserves coherence, is an addition rather
+than a rewrite.
 
 ## Main definitions
 
@@ -37,8 +39,8 @@ addition, not a rewrite.
 * `SchemeBaseChange.coherentDerivedPushforward` and
   `SchemeBaseChange.boundedCoherentDerivedPushforward`: `f_*` on `D(Coh)` and
   on `Dᵇ(Coh)`.
-* `SchemeBaseChange.hasCoherentPushforwardOfIsClosedImmersion`: closed
-  immersions inhabit the contract.
+* `SchemeBaseChange.hasCoherentPushforwardOfIsFinite`: finite morphisms
+  inhabit the contract.
 
 ## Main results
 
@@ -204,15 +206,18 @@ instance boundedCoherentDerivedPushforward_isTriangulated :
 
 end Derived
 
-/-- Closed immersions into locally Noetherian schemes inhabit the contract:
+/-- Finite morphisms between locally Noetherian schemes inhabit the contract:
 `Coh.pushforward` is exact and lands in coherent sheaves, and its comparison
 with module-sheaf pushforward is `Coh.pushforwardCompι`, an `Iso.refl`, so
-nothing is transported.  This is the case Theorem 6.2 of arXiv:2607.28411v1
-needs: it constructs stability conditions on a projective scheme `X` as the
-pullbacks `ι^♯σ` along a closed embedding `ι : X ↪ Pⁿ` of stability
-conditions `σ` on `Pⁿ`. -/
-instance hasCoherentPushforwardOfIsClosedImmersion {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left] [IsClosedImmersion f.left] :
+nothing is transported.  Closed immersions are finite (Mathlib's instance), so
+this covers Theorem 6.2 of arXiv:2607.28411v1, which constructs stability
+conditions on a projective scheme `X` as the pullbacks `ι^♯σ` along a closed
+embedding `ι : X ↪ Pⁿ` of stability conditions `σ` on `Pⁿ`, as well as the
+finite morphisms of Propositions 3.3 and 3.24, both stated for finite
+morphisms between noetherian schemes, and of Definition 3.1 of
+arXiv:2601.22994. -/
+instance hasCoherentPushforwardOfIsFinite {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left] [IsFinite f.left] :
     HasCoherentPushforward f where
   sheafPushforward := Coh.pushforward f.left
   preservesFiniteLimits := inferInstance

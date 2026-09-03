@@ -6,11 +6,19 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Basic.Isomorphism
 
 /-!
-# Pushforward of a coherent sheaf along an affine closed immersion
+# Coherence is preserved by pushforward along a finite map of affine schemes
 
-Step 2 of #572 asks for coherence of `ι_* F` along a closed immersion. This file proves the
-affine case, which is where the mathematical content is: everything else is the descent already
-in `CoherentSheaf/Descent/Locality.lean`.
+A finite morphism of schemes pushes coherent sheaves to coherent sheaves; `#572` step 2 asked
+for this along a closed immersion. This file proves the affine case, for a finite ring map
+`φ : R ⟶ S`, which is where the mathematical content is: everything else is the descent already
+in `Coherent/Descent/Locality.lean` and the chart argument in `Pushforward/Finite.lean`.
+
+## Main results
+
+* `moduleFinite_gammaPushforward_of_finite`, `isCoherent_pushforward_of_finite` — the
+  finite-ring-map statements.
+* `moduleFinite_gammaPushforward`, `isCoherent_pushforward_of_surjective` — their surjective
+  corollaries, the closed-immersion case.
 
 ## The route
 
@@ -26,9 +34,9 @@ Three facts do the work, and all three are at the pin:
 
 So the pushforward is the tilde of an `R`-module, and coherence reduces to that module being
 finitely generated over `R`. That is the only place the hypothesis on `φ` is used, and it is
-used through `Module.Finite R S`: surjectivity is sufficient, not necessary. The statement is
-phrased with surjectivity because that is what a closed immersion supplies
-(`Mathlib/AlgebraicGeometry/Morphisms/ClosedImmersion.lean:361`).
+used through `Module.Finite R S`, so the natural hypothesis is `φ.hom.Finite`, which is what a
+finite morphism of schemes supplies chart by chart (`Scheme.Hom.finite_appTop`). Surjectivity,
+what a closed immersion supplies, is the corollary `isCoherent_pushforward_of_surjective`.
 
 ## Noetherian hypotheses
 
@@ -59,9 +67,10 @@ noncomputable def gammaPushforwardIso (M : (Spec S).Modules) :
     ((AlgebraicGeometry.pushforwardCompModulesSpecToSheafIso φ).app M)
 
 /-- Global sections of a coherent sheaf stay finitely generated after restriction of scalars
-along a surjection. The surjection makes `S` a finite `R`-module, and finiteness composes down
-the tower. -/
-theorem moduleFinite_gammaPushforward (hφ : Function.Surjective φ.hom)
+along a finite ring map: `S` is a finite `R`-module, and finiteness composes down the tower.
+This is the hypothesis a finite morphism of schemes supplies chart by chart
+(`IsFinite.finite_app`); the surjective case below is the closed-immersion special case. -/
+theorem moduleFinite_gammaPushforward_of_finite (hφ : φ.hom.Finite)
     (M : (Spec S).Modules) (hM : Scheme.Modules.IsCoherent (Spec S) M) :
     Module.Finite R
       (moduleSpecΓFunctor.obj ((Scheme.Modules.pushforward (Spec.map φ)).obj M)) := by
@@ -69,7 +78,7 @@ theorem moduleFinite_gammaPushforward (hφ : Function.Surjective φ.hom)
   haveI : Module.Finite S (moduleSpecΓFunctor.obj M) :=
     Scheme.Modules.moduleFinite_globalSections M hM'
   algebraize [φ.hom]
-  haveI : Module.Finite R S := Module.Finite.of_surjective (Algebra.linearMap R S) hφ
+  haveI : Module.Finite R S := hφ
   -- The tower is not an instance: `ModuleCat.restrictScalars` leaves the carrier alone, so
   -- Mathlib's `RestrictScalars.isScalarTower` does not match. It is `mul_smul` all the same.
   letI : IsScalarTower R S
@@ -85,13 +94,21 @@ theorem moduleFinite_gammaPushforward (hφ : Function.Surjective φ.hom)
     Module.Finite.trans (R := R) S _
   exact Module.Finite.equiv (gammaPushforwardIso φ M).symm.toLinearEquiv
 
-/-- **Coherence is preserved by pushforward along an affine closed immersion.**
+/-- The surjective case of `moduleFinite_gammaPushforward_of_finite`, which is what a closed
+immersion supplies. -/
+theorem moduleFinite_gammaPushforward (hφ : Function.Surjective φ.hom)
+    (M : (Spec S).Modules) (hM : Scheme.Modules.IsCoherent (Spec S) M) :
+    Module.Finite R
+      (moduleSpecΓFunctor.obj ((Scheme.Modules.pushforward (Spec.map φ)).obj M)) :=
+  moduleFinite_gammaPushforward_of_finite φ (RingHom.Finite.of_surjective φ.hom hφ) M hM
+
+/-- **Coherence is preserved by pushforward along a finite map of affine schemes.**
 
 The tilde identification is what makes this true rather than merely plausible: the pushforward
 is not coherent because coherence is somehow local along `φ`, it is coherent because it *is* the
 tilde of a finitely generated module over a noetherian ring. -/
-theorem isCoherent_pushforward_of_surjective [IsNoetherianRing R]
-    (hφ : Function.Surjective φ.hom) (M : (Spec S).Modules)
+theorem isCoherent_pushforward_of_finite [IsNoetherianRing R]
+    (hφ : φ.hom.Finite) (M : (Spec S).Modules)
     (hM : Scheme.Modules.IsCoherent (Spec S) M) :
     Scheme.Modules.IsCoherent (Spec R)
       ((Scheme.Modules.pushforward (Spec.map φ)).obj M) := by
@@ -102,10 +119,19 @@ theorem isCoherent_pushforward_of_surjective [IsNoetherianRing R]
     isIso_fromTildeΓ_pushforward φ M
   haveI : Module.Finite R
       (moduleSpecΓFunctor.obj ((Scheme.Modules.pushforward (Spec.map φ)).obj M)) :=
-    moduleFinite_gammaPushforward φ hφ M hM
+    moduleFinite_gammaPushforward_of_finite φ hφ M hM
   exact (Scheme.coherent (Spec R)).prop_of_iso
     (asIso ((Scheme.Modules.pushforward (Spec.map φ)).obj M).fromTildeΓ)
     (isCoherent_tilde_of_finite
       (moduleSpecΓFunctor.obj ((Scheme.Modules.pushforward (Spec.map φ)).obj M)))
+
+/-- **Coherence is preserved by pushforward along an affine closed immersion**, the surjective
+case of `isCoherent_pushforward_of_finite`. -/
+theorem isCoherent_pushforward_of_surjective [IsNoetherianRing R]
+    (hφ : Function.Surjective φ.hom) (M : (Spec S).Modules)
+    (hM : Scheme.Modules.IsCoherent (Spec S) M) :
+    Scheme.Modules.IsCoherent (Spec R)
+      ((Scheme.Modules.pushforward (Spec.map φ)).obj M) :=
+  isCoherent_pushforward_of_finite φ (RingHom.Finite.of_surjective φ.hom hφ) M hM
 
 end AlgebraicGeometry

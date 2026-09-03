@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Affine
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.BaseChange
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.ClosedImmersion
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Finite
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Iso
 
 /-! # Pushforward of coherent sheaves -/

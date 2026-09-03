@@ -1469,6 +1469,15 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- downstream work should use; the two transfer instances cover the goals that still arrive
 -- on the wrong side.
 #print axioms Scheme.Modules.epi_sheafOfModules
+
+/-! ## Epimorphisms of quasi-coherent sheaves on affine sections
+
+Surjectivity on global sections over `Spec R`, over an affine scheme, and over an affine open,
+from the tilde equivalence. -/
+
+#print axioms Scheme.Modules.surjective_app_top_of_epi_spec
+#print axioms Scheme.Modules.surjective_app_top_of_epi_of_isAffine
+#print axioms Scheme.Modules.surjective_app_of_epi_of_isAffineOpen
 #print axioms Scheme.Modules.mono_sheafOfModules
 #print axioms Scheme.Modules.toSheaf
 #print axioms Scheme.Modules.additive_toSheaf

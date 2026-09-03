@@ -46,7 +46,9 @@ open AlgebraicGeometry
 -- Step 2 of #572, affine case: coherence survives pushforward along `Spec.map` of a surjection.
 -- The tilde identification is the content; the finiteness is a tower argument.
 #print axioms AlgebraicGeometry.gammaPushforwardIso
+#print axioms AlgebraicGeometry.moduleFinite_gammaPushforward_of_finite
 #print axioms AlgebraicGeometry.moduleFinite_gammaPushforward
+#print axioms AlgebraicGeometry.isCoherent_pushforward_of_finite
 #print axioms AlgebraicGeometry.isCoherent_pushforward_of_surjective
 
 -- The restriction square on opens (#572 step 2, base-change half).
@@ -95,23 +97,20 @@ reach a member of an affine open cover, which is an affine *scheme*.
 #print axioms AlgebraicGeometry.Scheme.Modules.pushforwardIsoRestrict
 #print axioms AlgebraicGeometry.Scheme.Modules.isCoherent_pushforward_of_iso
 
-/-! ## Pushforward along a closed immersion (#572 step 2)
+/-! ## Coherent pushforward along a finite morphism (#572 step 2, generalised)
 
-The globalisation itself: `isCoherent_pushforward`.
+Coherence along a finite morphism, stated once for finite morphisms since a closed immersion is
+finite, and the functor `Coh.pushforward : Coh X ⥤ Coh Y` with its exactness and additivity:
+left exactness and additivity reflected through the fully faithful `Coh.ι`, right exactness from
+affine-pushforward exactness on quasi-coherent sheaves.
 -/
 
 #print axioms AlgebraicGeometry.Scheme.isCoherent_pushforward_affine
 #print axioms AlgebraicGeometry.Scheme.isCoherent_restrict_chart
 #print axioms AlgebraicGeometry.Scheme.isCoherent_pushforward
-
-/-! ## The functor `f_* : Coh X ⥤ Coh Y` along a closed immersion
-
-`Coh.pushforward` with its exactness and additivity, reflected through the fully faithful
-`Coh.ι`.
--/
-
 #print axioms AlgebraicGeometry.Coh.pushforward
 #print axioms AlgebraicGeometry.Coh.pushforwardCompι
 #print axioms AlgebraicGeometry.Coh.pushforward_preservesFiniteLimits
-#print axioms AlgebraicGeometry.Coh.pushforward_preservesFiniteColimits
 #print axioms AlgebraicGeometry.Coh.pushforward_additive
+#print axioms AlgebraicGeometry.Coh.pushforward_preservesEpimorphisms
+#print axioms AlgebraicGeometry.Coh.pushforward_preservesFiniteColimits

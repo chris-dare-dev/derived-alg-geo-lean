@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CohomologyPushforward
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Equivalence
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.ClosedImmersion
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Finite
 
 /-!
 # Cohomology of a coherent sheaf along a closed immersion

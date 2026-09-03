@@ -316,7 +316,7 @@ items:
     kind: epic
     parent: enriques-torelli-m5
     title: "Classification matching, shift rigidity, and finite ambient extension for Enriques blocks"
-    status: in_progress
+    status: done
     priority: must
     size: L
     summary: "PR #1042 derives block matching from residual classification, exact length from two ordered prefix extensions, common shifts from adjacent Ext profiles, and the ambient Fourier--Mukai equivalence from a dependent finite extension sequence plus right-admissible generation. Kernel construction remains the explicit dg seam."

@@ -15,9 +15,8 @@ pushforward, a stability condition `σ` on `Dᵇ(Coh U)` whose slicing lifts
 along `f_* : Dᵇ(Coh T) ⥤ Dᵇ(Coh U)` pulls back to `f^♯σ` on `Dᵇ(Coh T)`,
 with class map `v ∘ f_*` and unchanged charge.  This is also the pullback
 half of Definition 3.1 of arXiv:2601.22994, where `f` is a finite morphism
-of smooth projective varieties, once finite morphisms inhabit
-`HasCoherentPushforward`; today only closed immersions do
-(`hasCoherentPushforwardOfIsClosedImmersion`).
+of smooth projective varieties; finite morphisms inhabit
+`HasCoherentPushforward` through `hasCoherentPushforwardOfIsFinite`.
 
 ## Main definitions
 
