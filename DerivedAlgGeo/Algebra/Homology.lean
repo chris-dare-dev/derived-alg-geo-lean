@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory
+import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLimits
+import DerivedAlgGeo.Algebra.Homology.Homotopy
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.EulerCharacteristic
@@ -13,8 +15,10 @@ import DerivedAlgGeo.Algebra.Homology.EulerCharacteristic
 
 Extensions of Mathlib's `Algebra/Homology/`, at Mathlib's paths: derived
 categories of abelian categories, the homotopy category and its dg
-enhancement, spectral sequences of filtered and total complexes, and the
-bespoke dg-category class built on Mathlib's `HomComplex`.
+enhancement, spectral sequences of filtered and total complexes, the
+bespoke dg-category class built on Mathlib's `HomComplex`, and the
+degreewise description of coproducts of complexes with the homotopies
+they carry.
 
 A derived category is a triangulated category, and Mathlib still files it
 here rather than under `CategoryTheory/Triangulated/`, because this is where

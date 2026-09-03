@@ -15,6 +15,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated
 import DerivedAlgGeo.CategoryTheory.Moduli
 import DerivedAlgGeo.CategoryTheory.Linear
 import DerivedAlgGeo.CategoryTheory.Localization
+import DerivedAlgGeo.CategoryTheory.MorphismProperty
 import DerivedAlgGeo.CategoryTheory.Preadditive
 
 /-! # Category theory
