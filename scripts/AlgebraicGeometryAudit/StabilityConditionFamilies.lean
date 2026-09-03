@@ -632,6 +632,8 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.quasicoherent_isClosedUnderIsomorphisms
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.quasicoherent_isClosedUnderCoproducts
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.sigma_mem
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.isClosedUnderColimitsOfShape_discrete
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.ι_preservesCoproductsOfShape
 
 /-! ## Pushforward of stability conditions along bounded coherent pullback -/
 

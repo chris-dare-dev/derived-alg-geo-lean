@@ -4,9 +4,11 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Quasicoherent.Extensions
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Coproducts
+import DerivedAlgGeo.AlgebraicGeometry.Modules.AB
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Basic
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 
@@ -23,7 +25,7 @@ assuming it (#721).  The route does not need quasi-coherent sheaves to be an
 abelian subcategory of `X.Modules` — an earlier version of this docstring named
 that as the blocker.  What is needed is only the **weak Serre** property:
 closure under kernels, cokernels and extensions, which
-`CoherentSheaf/Quasicoherent/Kernels.lean` and
+`Modules/Quasicoherent/Kernels.lean` and
 `Cohomology/Quasicoherent/Extensions.lean` supply on an arbitrary scheme
 (#720).  `DerivedCategory.cohomologyIn` turns that into closure under cones via
 the five-term long exact homology sequence, so `Pretriangulated` on the locus
@@ -131,21 +133,16 @@ still gives a zero object. -/
 theorem zero_obj_isZero : IsZero (zero X).obj :=
   (ι X).map_isZero (zero_isZero X)
 
-/-- **The abelian-side inputs to `Dqc(X)`'s coproduct structure are in place**
-(#721, third bullet).
+/-- **The abelian-side inputs to `Dqc(X)`'s coproduct structure** (#721, third
+bullet).
 
 Quasi-coherence is closed under `ι`-indexed coproducts on an arbitrary scheme
-(`CoherentSheaf/Quasicoherent/Coproducts.lean`), and `X.Modules` has those
-coproducts. Closure under isomorphism is Mathlib's and is recorded alongside it.
-Together with `DerivedCategory.cohomologyIn_prop_coproduct` these are everything
-the third bullet needs **except** its derived-category half.
-
-That half is not available at this Mathlib pin and is not asserted anywhere:
-`SchemeDerivedCategory X` is not known to have small coproducts, and `Hⁿ` on it is
-not known to preserve them. Mathlib's `DerivedCategory` files contain no coproduct
-results at all. Until that lands, a consumer wanting closure of `Dqc(X)` under a
-coproduct must supply the existence and the preservation itself and call
-`DerivedCategory.cohomologyIn_prop_coproduct` directly. -/
+(`Modules/Quasicoherent/Coproducts.lean`), and `X.Modules` has those coproducts.
+Closure under isomorphism is Mathlib's and is recorded alongside it. The
+derived-category half, that `SchemeDerivedCategory X` has coproducts and every
+`Hⁿ` preserves them, is `DerivedCategory.hasCoproductsOfShape` and
+`DerivedCategory.homologyFunctor_preservesCoproductsOfShape` at `X.Modules`, whose
+coproducts are exact (`Scheme.Modules.hasExactColimitsOfShape`). -/
 theorem quasicoherent_isClosedUnderIsomorphisms :
     (SheafOfModules.isQuasicoherent X.ringCatSheaf).IsClosedUnderIsomorphisms :=
   inferInstance
@@ -155,14 +152,12 @@ theorem quasicoherent_isClosedUnderCoproducts (ι : Type u) :
       (Discrete ι) :=
   inferInstance
 
-/-- **`Dqc(X)` is closed under a coproduct that cohomology preserves** (#721).
+/-- **`Dqc(X)` is closed under coproducts** (#721, third bullet, closure clause).
 
-Both hypotheses are carried explicitly rather than installed as instances, because
-neither holds by instance search at this pin: `SchemeDerivedCategory X` is not known
-to have small coproducts, and `Hⁿ` on it is not known to preserve them.  Supplying
-them unconditionally — equivalently, proving that `D(A)` has small coproducts and that
-homology preserves them for a Grothendieck `A` — is the open half of this issue's
-third bullet.
+`SchemeDerivedCategory X` has coproducts indexed by any type in the universe of
+`X`, and every `Hⁿ` preserves them, because coproducts in `X.Modules` are exact;
+both are found by instance search, so closure needs no hypothesis beyond
+membership of the summands.
 
 One piece of plumbing here is deliberate and cost real time to find. The `@`
 and the named `quasicoherent_isClosedUnderCoproducts` are needed because
@@ -172,14 +167,28 @@ Instance search cannot find that instance through this application even though
 `Scheme.Modules.instCategory`, and the goal it then poses no longer matches the
 instance's own head.  Supplying it by name is not a workaround for an unproved fact —
 it is the same instance, named. -/
-theorem sigma_mem {ι : Type u} (E : ι → SchemeDerivedCategory X) [HasCoproduct E]
-    (hpres : ∀ n : ℤ, PreservesColimitsOfShape (Discrete ι)
-      (DerivedCategory.homologyFunctor X.Modules n))
+theorem sigma_mem {ι : Type u} (E : ι → SchemeDerivedCategory X)
     (hE : ∀ i, schemeQuasicoherentCohomology X (E i)) :
     schemeQuasicoherentCohomology X (∐ E) :=
   @DerivedCategory.cohomologyIn_prop_coproduct X.Modules _ _ _
     (SheafOfModules.isQuasicoherent X.ringCatSheaf) ι
-    (quasicoherent_isClosedUnderCoproducts X ι) E _ hpres hE
+    (quasicoherent_isClosedUnderCoproducts X ι) E _ (fun _ => inferInstance) hE
+
+/-- **`Dqc(X)` is closed under coproducts as an object property**, so Mathlib gives
+`SchemeQuasicoherentDerivedCategory X` its coproducts and makes `ι` create them. -/
+instance isClosedUnderColimitsOfShape_discrete (ι : Type u) :
+    (schemeQuasicoherentCohomology X).IsClosedUnderColimitsOfShape (Discrete ι) :=
+  @DerivedCategory.cohomologyIn_isClosedUnderColimitsOfShape_discrete X.Modules _ _ _
+    (SheafOfModules.isQuasicoherent X.ringCatSheaf) ι
+    (quasicoherent_isClosedUnderCoproducts X ι) (quasicoherent_isClosedUnderIsomorphisms X) _
+    (fun _ => inferInstance)
+
+/-- **The inclusion `Dqc(X) ⥤ D(X.Modules)` preserves coproducts** (#721, third bullet, second
+clause).  A Mathlib instance once the object property is closed under them; recorded here, as
+`ι_isTriangulated` is, because it is the acceptance criterion of #721. -/
+theorem ι_preservesCoproductsOfShape (ι : Type u) :
+    PreservesColimitsOfShape (Discrete ι) (SchemeQuasicoherentDerivedCategory.ι X) :=
+  inferInstance
 
 /-- Membership in `Dqc(X)` is exactly quasi-coherence of every cohomology
 sheaf. -/
@@ -382,9 +391,9 @@ def HasBoundedCoherentDqcIdentification
   Nonempty (BoundedCoherentDqcIdentification X)
 
 /-- The exact compact/perfect comparison still required by the scheme-level
-A.14 realization. This file supplies no unsupported inhabitant; construction
-of the needed large triangulated and coproduct structure is a separate
-obligation. -/
+A.14 realization. This file supplies no unsupported inhabitant; `Dqc(X)` now
+has its coproducts, and what remains is compact generation by perfect
+complexes (`RΓ` commuting with coproducts), a separate obligation. -/
 def PerfectObjectsAreCompactInDqc
     (X : Scheme.{u}) [IsLocallyNoetherian X] : Prop :=
   schemePerfectInDqc X = ObjectProperty.compactObjects.{0}
