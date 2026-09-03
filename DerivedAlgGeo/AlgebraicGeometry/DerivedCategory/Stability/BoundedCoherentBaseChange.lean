@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.PerfectPullback
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.PreStabilityBaseChange
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Inducing
 import Mathlib.CategoryTheory.Triangulated.Adjunction
@@ -11,7 +11,8 @@ import Mathlib.CategoryTheory.Triangulated.Adjunction
 # Bounded coherent realization of categorical pre-stability base change
 
 This file connects the actual bounded coherent pullback from
-`Families.BoundedGeometry` to `FiberPreStabilityBaseChangeData`.
+`Families.BoundedGeometry`, with its identity and composition contracts from
+`Families.PerfectPullback`, to `FiberPreStabilityBaseChangeData`.
 
 The bridge has three layers.
 
@@ -79,7 +80,7 @@ def preimage (h : BoundedCoherentPullbackPreimageData f s) :
 witness. -/
 theorem identity (T : SchemeBaseChange S)
     [IsLocallyNoetherian T.left]
-    [HasCoherentPullback (𝟙 T)] [PreservesPerfectPullback (𝟙 T)]
+    [HasCoherentPullback (𝟙 T)]
     [GeometricDerivedPullbackIdentity T]
     (s : Slicing T.BoundedCoherentDerivedFiber) :
     BoundedCoherentPullbackPreimageData (𝟙 T) s where
@@ -90,7 +91,7 @@ theorem identity (T : SchemeBaseChange S)
 @[simp]
 theorem preimage_identity (T : SchemeBaseChange S)
     [IsLocallyNoetherian T.left]
-    [HasCoherentPullback (𝟙 T)] [PreservesPerfectPullback (𝟙 T)]
+    [HasCoherentPullback (𝟙 T)]
     [GeometricDerivedPullbackIdentity T]
     (s : Slicing T.BoundedCoherentDerivedFiber) :
     (identity T s).preimage = s := by
@@ -109,8 +110,6 @@ theorem comp {T U V : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V)
     [IsLocallyNoetherian V.left]
     [HasCoherentPullback f] [HasCoherentPullback g]
     [HasCoherentPullback (f ≫ g)]
-    [PreservesPerfectPullback f] [PreservesPerfectPullback g]
-    [PreservesPerfectPullback (f ≫ g)]
     [GeometricDerivedPullbackComposition f g]
     {s : Slicing T.BoundedCoherentDerivedFiber}
     (hf : BoundedCoherentPullbackPreimageData f s)
@@ -131,8 +130,6 @@ theorem preimage_comp {T U V : SchemeBaseChange S}
     [IsLocallyNoetherian V.left]
     [HasCoherentPullback f] [HasCoherentPullback g]
     [HasCoherentPullback (f ≫ g)]
-    [PreservesPerfectPullback f] [PreservesPerfectPullback g]
-    [PreservesPerfectPullback (f ≫ g)]
     [GeometricDerivedPullbackComposition f g]
     {s : Slicing T.BoundedCoherentDerivedFiber}
     (hf : BoundedCoherentPullbackPreimageData f s)
@@ -178,7 +175,7 @@ variable {T U : SchemeBaseChange S} {f : T ⟶ U}
 model to the concrete bounded-coherent identity pullback. -/
 def identity (T : SchemeBaseChange S)
     [IsLocallyNoetherian T.left]
-    [HasCoherentPullback (𝟙 T)] [PreservesPerfectPullback (𝟙 T)]
+    [HasCoherentPullback (𝟙 T)]
     [GeometricDerivedPullbackIdentity T]
     (s : Slicing T.BoundedCoherentDerivedFiber) :
     BoundedCoherentPullbackInducingData (𝟙 T) s where

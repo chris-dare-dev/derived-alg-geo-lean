@@ -271,8 +271,7 @@ never the two halves separately.
 
 Not reducible to `GeometricDerivedPullbackComposition`: that is stated at the
 literal `f ≫ g`, so bridging two different composites would need `eqToHom`
-transport across compound terms, and it additionally demands three
-`PreservesPerfectPullback` instances and carries a `perfectIso` field that
+transport across compound terms, and it carries a `perfectIso` field that
 nothing here touches. -/
 class HasCommonPullbackRoute {X T Z₁ Z₃ : SchemeBaseChange S}
     [IsLocallyNoetherian X.left] [IsLocallyNoetherian T.left]
