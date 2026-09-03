@@ -126,6 +126,29 @@ theorem obj_mem_total (i : ι) (j : Fin (B.length i)) :
     B.total ((B.collection i).obj j) :=
   le_iSup B.blockSpan i _ (B.obj_mem_blockSpan i j)
 
+/-- To prove that the total exceptional part lies in a triangulated,
+retract-closed property, it suffices to check every member of every block. -/
+theorem total_le_of_forall_obj [IsTriangulated C]
+    {P : ObjectProperty C} [P.IsTriangulated] [P.IsStableUnderRetracts]
+    (hP : ∀ (i : ι) (j : Fin (B.length i)),
+      P ((B.collection i).obj j)) :
+    B.total ≤ P := by
+  rw [total]
+  apply iSup_le
+  intro i
+  change (B.collection i).toSemiorthogonalSequence.total.triangEnvelope ≤ P
+  rw [ObjectProperty.triangEnvelope_le_iff]
+  rw [SemiorthogonalSequence.total]
+  apply iSup_le
+  intro j
+  change (ObjectProperty.shiftClosure
+    (fun X : C ↦ X = (B.collection i).obj j) ℤ).triangEnvelope ≤ P
+  rw [ObjectProperty.triangEnvelope_le_iff]
+  rw [ObjectProperty.shiftClosure_le_iff]
+  intro X hX
+  subst X
+  exact hP i j
+
 /-- A positive block length is either one or at least two. -/
 theorem length_eq_one_or_two_le (i : ι) :
     B.length i = 1 ∨ 2 ≤ B.length i := by

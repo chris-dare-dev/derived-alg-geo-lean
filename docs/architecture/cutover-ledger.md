@@ -14,13 +14,18 @@ blocks should normally move it rather than add more declarations beside it.
   `Projection.lean` owns a chosen right adjoint to a full-subcategory
   inclusion and its universal Hom equivalence; `Mutation.lean` constructs the
   objectwise counit triangle and proves the generic projection-chain theorem.
-  Ext profiles and their bidirectional transport remain generic in
-  `SerreFunctor/`, while the one-step and finite kernel-extension result
-  interfaces live in `FourierMukai/ExceptionalExtension.lean`.
+  Ext profiles, their bidirectional transport, and classification-induced
+  candidate matching remain generic in `SerreFunctor/`; adjacent Ext shift
+  rigidity and bidirectional ordered block-length comparison live in
+  `SemiorthogonalDecomposition/AdjacentExt.lean`.  The one-step criterion and
+  result interface live in `FourierMukai/ExceptionalExtension.lean`, while
+  `ExceptionalInduction.lean` owns dependent finite extension and derives
+  ambient generation from right admissibility.
   `AlgebraicGeometry/Surface/Enriques/PaperBlocks.lean` and
-  `PaperExtension.lean` are geometric consumers: they identify the block
-  members with the ten selected line bundles, record the numerical
-  `(-2)`-chains, and specialize the projection and classification results.
+  `PaperExtension.lean`, `PaperMatching.lean`, and `PaperTorelli.lean` are
+  geometric consumers: they identify the block members with the ten selected
+  line bundles, record the numerical `(-2)`-chains, and specialize projection,
+  classification matching, shift rigidity, and ambient kernel extension.
   Constructing the divisor triangles and functorial kernel cones remains
   supplied data pending the dg enhancement lane.
 - Generic moduli boundedness: `CategoryTheory/Moduli/Boundedness.lean`.

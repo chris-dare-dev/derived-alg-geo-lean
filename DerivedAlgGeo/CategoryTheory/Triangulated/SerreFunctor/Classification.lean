@@ -33,6 +33,47 @@ variable {k : Type w} [Field k] {C : Type u} [Category.{v} C]
 def IsShiftOf (E F : C) : Prop :=
   ∃ p : ℤ, Nonempty (E ≅ F⟦p⟧)
 
+namespace IsShiftOf
+
+omit [Preadditive C] in
+/-- Every object is a shift of itself, with shift zero. -/
+theorem refl (E : C) : IsShiftOf E E :=
+  ⟨0, ⟨((shiftFunctorZero C ℤ).app E).symm⟩⟩
+
+omit [Preadditive C] in
+/-- Being isomorphic up to an integral shift is symmetric. -/
+theorem symm {E F : C} (h : IsShiftOf E F) : IsShiftOf F E := by
+  obtain ⟨p, ⟨e⟩⟩ := h
+  refine ⟨-p, ⟨((shiftFunctorCompIsoId C p (-p) (by omega)).app F).symm ≪≫ ?_⟩⟩
+  exact (shiftFunctor C (-p)).mapIso e.symm
+
+omit [Preadditive C] in
+/-- Integral shifts compose, so `IsShiftOf` is transitive. -/
+theorem trans {E F G : C} (hEF : IsShiftOf E F) (hFG : IsShiftOf F G) :
+    IsShiftOf E G := by
+  obtain ⟨p, ⟨eEF⟩⟩ := hEF
+  obtain ⟨q, ⟨eFG⟩⟩ := hFG
+  refine ⟨q + p, ⟨eEF ≪≫ (shiftFunctor C p).mapIso eFG ≪≫ ?_⟩⟩
+  exact ((shiftFunctorAdd' C q p (q + p) rfl).app G).symm
+
+omit [Preadditive C] in
+/-- Replacing the left object by an isomorphic object preserves
+`IsShiftOf`. -/
+theorem of_iso_left {E E' F : C} (e : E ≅ E') (h : IsShiftOf E' F) :
+    IsShiftOf E F := by
+  obtain ⟨p, ⟨e'⟩⟩ := h
+  exact ⟨p, ⟨e ≪≫ e'⟩⟩
+
+omit [Preadditive C] in
+/-- Replacing the right object by an isomorphic object preserves
+`IsShiftOf`. -/
+theorem of_iso_right {E F F' : C} (h : IsShiftOf E F) (e : F ≅ F') :
+    IsShiftOf E F' := by
+  obtain ⟨p, ⟨e'⟩⟩ := h
+  exact ⟨p, ⟨e' ≪≫ (shiftFunctor C p).mapIso e⟩⟩
+
+end IsShiftOf
+
 /-- All shifted Homs from `E` to `F` vanish. -/
 def IsGradedOrthogonal (E F : C) : Prop :=
   ∀ p : ℤ, ∀ f : E ⟶ F⟦p⟧, f = 0
