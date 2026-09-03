@@ -300,6 +300,9 @@ several structures in this repository carried as data (`map_zero`, `map_iso`,
 #print axioms CategoryTheory.Triangulated.Slicing.intervalProp_implies_leftHeart
 #print axioms CategoryTheory.Triangulated.Slicing.toDualTStructure
 #print axioms CategoryTheory.Triangulated.Slicing.toDualTStructure_heart_iff
+#print axioms CategoryTheory.Triangulated.Slicing.phaseShift_toDualTStructure_isLE_zero_iff
+#print axioms CategoryTheory.Triangulated.Slicing.phaseShift_toDualTStructure_isGE_one_iff
+#print axioms CategoryTheory.Triangulated.Slicing.toDualTStructure_isBounded
 #print axioms CategoryTheory.Triangulated.Slicing.intervalProp_implies_rightHeart
 #print axioms CategoryTheory.Triangulated.Slicing.IntervalCat.toLeftHeart
 #print axioms CategoryTheory.Triangulated.Slicing.IntervalCat.toRightHeart

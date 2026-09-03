@@ -80,3 +80,27 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.MapsSemistableGE
 #print axioms CategoryTheory.Triangulated.Slicing.MapsSemistableLE.leProp_of_leProp
 #print axioms CategoryTheory.Triangulated.Slicing.MapsSemistableGE.of_mapsSemistableLE
+
+/-! ## Definition A.22: Ind-extensions of the dual t-structures of a slicing -/
+
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.tStructure
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.indExtensionData
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.mk.inj
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.ofCompactGenerators
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.ofBrown
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.instHasInducedTStructure
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isLE_zero_iff_geProp
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isGE_one_iff_ltProp
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.tStructure_isBounded
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.le_zero_anti
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.MapsSemistableAisle
+
+/-! ## Corollary A.23: the joint between Theorem A.17 and the phase truncation -/
+
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.mapsSemistableGE_iff
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.monad_isLE_zero_of_geProp
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.monad_isRightTExact
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.nonempty_inducedTStructures
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData

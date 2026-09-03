@@ -16,6 +16,16 @@ target; these are formulas (A.3) and (A.4).
 
 The theorem is independent of schemes and of the compact-generation argument
 that constructs the large source t-structure in Step 1.
+
+## Main definitions
+
+* `ObjectProperty.preimageLift`: the functor between the two selected full
+  subcategories, with the `Additive`, `CommShift ℤ`, and `IsTriangulated`
+  instances a slicing consumer needs of a detecting functor.
+* `ObjectProperty.inverseImageLift`: its `P = F⁻¹ Q` special case, the shape
+  hypothesis (iv) of A.17 produces, and `ObjectProperty.liftToInverseImage`,
+  the restriction of a functor in the other direction whose composite with
+  `F` preserves `Q`.
 -/
 
 noncomputable section
@@ -82,6 +92,42 @@ equivalence. -/
 def preimageLift (F : Functor C D) (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
     Functor P.FullSubcategory Q.FullSubcategory :=
   Q.lift (P.ι ⋙ F) (fun X ↦ (hmem X.obj).1 X.property)
+
+instance instAdditivePreimageLift [F.Additive] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
+    (preimageLift F hmem).Additive :=
+  inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ (hmem X.obj).1 X.property)).Additive
+
+noncomputable instance instCommShiftPreimageLift [P.IsTriangulated] [Q.IsTriangulated]
+    [F.CommShift ℤ] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
+    (preimageLift F hmem).CommShift ℤ :=
+  inferInstanceAs ((Q.lift (P.ι ⋙ F) (fun X ↦ (hmem X.obj).1 X.property)).CommShift ℤ)
+
+instance instIsTriangulatedPreimageLift [P.IsTriangulated] [Q.IsTriangulated] [F.CommShift ℤ]
+    [F.IsTriangulated] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
+    (preimageLift F hmem).IsTriangulated :=
+  inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ (hmem X.obj).1 X.property)).IsTriangulated
+
+/-- The restriction of `F` to the objects whose image lies in `Q`, landing
+in `Q`.  This is the functor between the selected subcategories under
+hypothesis (iv) of Theorem A.17 of arXiv:2607.28411v1, `P = F⁻¹ Q`, the
+form `Polishchuk.induce` produces.
+
+Kept an `abbrev`, hence reducible, so that a `Polishchuk.InducedTStructureData`
+field stated with `preimageLift F (fun _ ↦ Iff.rfl)` is definitionally the
+same functor; `Slicing.IndExtensions.nonempty_inducedTStructures` relies on
+that. -/
+abbrev inverseImageLift (F : Functor C D) (Q : ObjectProperty D) :
+    Functor (Q.inverseImage F).FullSubcategory Q.FullSubcategory :=
+  preimageLift F (P := Q.inverseImage F) (Q := Q) fun _ ↦ Iff.rfl
+
+/-- The restriction of `L : D ⥤ C` to `Q`, landing in `F⁻¹ Q`, when `F ∘ L`
+preserves `Q`.  For `L` a left adjoint of `F` this is the bounded left
+adjoint of `inverseImageLift F Q`; geometrically, `f_!` on `Dᵇ(Coh)` when it
+preserves bounded coherent complexes. -/
+abbrev liftToInverseImage (F : Functor C D) (Q : ObjectProperty D) (L : Functor D C)
+    (hL : ∀ E : D, Q E → Q (F.obj (L.obj E))) :
+    Functor Q.FullSubcategory (Q.inverseImage F).FullSubcategory :=
+  (Q.inverseImage F).lift (Q.ι ⋙ L) fun E ↦ hL E.obj E.property
 
 /-- Formula (A.3) on the restricted categories.
 
