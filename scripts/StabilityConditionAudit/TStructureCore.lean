@@ -222,6 +222,8 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.ObjectProperty.instIsTriangulatedPreimageLift
 #print axioms CategoryTheory.ObjectProperty.inverseImageLift
 #print axioms CategoryTheory.ObjectProperty.liftToInverseImage
+#print axioms CategoryTheory.Adjunction.restrictInverseImageLeft
+#print axioms CategoryTheory.Adjunction.restrictInverseImageRight
 #print axioms CategoryTheory.ObjectProperty.tStructure_isLE_iff_map
 #print axioms CategoryTheory.ObjectProperty.tStructure_isGE_iff_map
 #print axioms CategoryTheory.Triangulated.TStructure.boundedAisle
