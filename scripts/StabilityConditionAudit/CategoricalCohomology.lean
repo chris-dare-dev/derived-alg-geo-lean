@@ -3,7 +3,10 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNaturality
+import DerivedAlgGeo.CategoryTheory.Localization.Coproducts
+import DerivedAlgGeo.CategoryTheory.MorphismProperty.Limits
 
 /-!
 Audit records for generic cohomological infrastructure on arbitrary categories.
@@ -15,6 +18,23 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.extendHomologyIso_naturality
 #print axioms HomologicalComplex.extendHomologyIso_naturality_assoc
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
+#print axioms HomologicalComplex.sigmaXIso
+#print axioms HomologicalComplex.ι_sigmaXIso_inv
+#print axioms HomologicalComplex.ι_sigmaXIso_inv_assoc
+#print axioms HomologicalComplex.ι_f_sigmaXIso_hom
+#print axioms HomologicalComplex.ι_f_sigmaXIso_hom_assoc
+#print axioms HomologicalComplex.sigmaX_ext_from
+#print axioms HomologicalComplex.sigmaXDesc
+#print axioms HomologicalComplex.ι_f_sigmaXDesc
+#print axioms HomologicalComplex.ι_f_sigmaXDesc_assoc
+#print axioms Homotopy.sigma
+#print axioms HomotopyCategory.cofanDesc
+#print axioms HomotopyCategory.cofanDesc_fac
+#print axioms HomotopyCategory.cofanDesc_uniq
+#print axioms HomotopyCategory.isColimitCofan
+#print axioms HomotopyCategory.preservesColimit_discrete_functor
+#print axioms HomotopyCategory.quotient_preservesColimitsOfShape_discrete
+#print axioms HomotopyCategory.hasColimitsOfShape_discrete
 #print axioms HomotopyCategory.filteredComplexSpectralObject
 #print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt
 #print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt_deg
@@ -138,6 +158,18 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CategoryTheory.InjectiveResolution.descHom
 #print axioms CategoryTheory.InjectiveResolution.descHom_hom
 #print axioms CategoryTheory.InjectiveResolution.extEquivCohomologyClass_naturality
+#print axioms CategoryTheory.MorphismProperty.sigma_map
+#print axioms CategoryTheory.Localization.sigma_hom_ext
+#print axioms CategoryTheory.Localization.HasCoproductsOfShapeAux.cofanFraction
+#print axioms CategoryTheory.Localization.HasCoproductsOfShapeAux.cofanFraction_map
+#print axioms CategoryTheory.Localization.HasCoproductsOfShapeAux.isIso_map_sigma_map_cofanFraction_s
+#print axioms CategoryTheory.Localization.HasCoproductsOfShapeAux.cofanDesc
+#print axioms CategoryTheory.Localization.HasCoproductsOfShapeAux.cofanDesc_fac
+#print axioms CategoryTheory.Localization.isColimitCofan
+#print axioms CategoryTheory.Localization.preservesCoproductsOfShape
+#print axioms CategoryTheory.Localization.hasCoproductsOfShape
+#print axioms CategoryTheory.Localization.hasCoproductsOfShapeLocalization
+#print axioms CategoryTheory.Localization.preservesCoproductsOfShapeQ
 #print axioms CategoryTheory.Localization.SmallShiftedHom.mk_comp_mk₀
 #print axioms CategoryTheory.Localization.SmallShiftedHom.mk₀_comp_mk₀'
 #print axioms CochainComplex.HomComplex.Cocycle.postcompAddMonoidHom
