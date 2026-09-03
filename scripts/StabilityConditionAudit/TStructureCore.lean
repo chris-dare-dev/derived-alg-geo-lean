@@ -217,6 +217,11 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Adjunction.isTExact_of_compactlyGenerated
 #print axioms CategoryTheory.ObjectProperty.hasInducedTStructure_of_preimage
 #print axioms CategoryTheory.ObjectProperty.preimageLift
+#print axioms CategoryTheory.ObjectProperty.instAdditivePreimageLift
+#print axioms CategoryTheory.ObjectProperty.instCommShiftPreimageLift
+#print axioms CategoryTheory.ObjectProperty.instIsTriangulatedPreimageLift
+#print axioms CategoryTheory.ObjectProperty.inverseImageLift
+#print axioms CategoryTheory.ObjectProperty.liftToInverseImage
 #print axioms CategoryTheory.ObjectProperty.tStructure_isLE_iff_map
 #print axioms CategoryTheory.ObjectProperty.tStructure_isGE_iff_map
 #print axioms CategoryTheory.Triangulated.TStructure.boundedAisle

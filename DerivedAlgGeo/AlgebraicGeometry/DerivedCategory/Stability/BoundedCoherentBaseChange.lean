@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.PreStabilityBaseChange
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.InducingBoundary
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Inducing
 import Mathlib.CategoryTheory.Triangulated.Adjunction
 
 /-!

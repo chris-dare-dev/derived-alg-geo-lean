@@ -7,7 +7,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transf
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Equivariance
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.InducedTStructures
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.HN
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.InducingBoundary
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.IndExtensions
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Inducing
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.PreStability
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.LocallyFinite
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Bayer

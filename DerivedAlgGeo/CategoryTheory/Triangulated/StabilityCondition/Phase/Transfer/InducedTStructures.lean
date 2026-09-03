@@ -105,25 +105,7 @@ t-structure `P([phi, phi + 1))`. -/
 def Slicing.inducedTStructuresId (s : Slicing C) [IsTriangulated C] :
     s.InducedTStructures (Functor.id C) where
   tStructure phi := (s.phaseShift C phi).toDualTStructure C
-  le_zero_iff phi E := by
-    constructor
-    · intro h
-      have h' := h.le
-      change (s.phaseShift C phi).geProp C (-((0 : ℤ) : ℝ)) E at h'
-      exact (s.phaseShift_geProp_zero C phi E).mp (by simpa using h')
-    · intro h
-      refine ⟨?_⟩
-      change (s.phaseShift C phi).geProp C (-((0 : ℤ) : ℝ)) E
-      simpa using (s.phaseShift_geProp_zero C phi E).mpr h
-  ge_one_iff phi E := by
-    constructor
-    · intro h
-      have h' := h.ge
-      change (s.phaseShift C phi).ltProp C (1 - ((1 : ℤ) : ℝ)) E at h'
-      exact (s.phaseShift_ltProp_zero C phi E).mp (by simpa using h')
-    · intro h
-      refine ⟨?_⟩
-      change (s.phaseShift C phi).ltProp C (1 - ((1 : ℤ) : ℝ)) E
-      simpa using (s.phaseShift_ltProp_zero C phi E).mpr h
+  le_zero_iff phi E := s.phaseShift_toDualTStructure_isLE_zero_iff C phi E
+  ge_one_iff phi E := s.phaseShift_toDualTStructure_isGE_one_iff C phi E
 
 end CategoryTheory.Triangulated

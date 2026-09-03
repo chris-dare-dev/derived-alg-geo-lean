@@ -278,7 +278,7 @@ items:
     kind: epic
     parent: enriques-torelli-m4
     title: "Mutation, Ext transport, and Fourier--Mukai extension across Enriques exceptional blocks"
-    status: in_progress
+    status: done
     priority: must
     size: L
     summary: "One PR implements the objectwise mutation and projection-chain theorems, the Enriques (-2)-chain and Ext-computation adapters, bidirectional Serre-compatible transport, and precise one-step/blockwise Fourier--Mukai extension result data. Kernel cones and geometric divisor triangles remain named supplied seams until the dg chain lands."
