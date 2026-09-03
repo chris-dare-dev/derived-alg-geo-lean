@@ -49,10 +49,10 @@ The guards follow `HasPullbackRetraction` and `HasPushforwardRetraction`: the
 composition identity is carried but not consumed, and the `iso` field is what
 the derivation uses. The guard is what makes `iso` the right thing to ask for.
 
-Neither swap class is reduced to `GeometricDerivedPullbackComposition`, for the
-reason `KernelConvolution.lean` already gives about a different pair: that class
-is stated at the literal `f ≫ g`, so bridging it to `q` would need `eqToHom`
-transport across compound terms.
+Neither swap class is reduced to `boundedCoherentDerivedPullbackComp`, for the
+reason `KernelConvolution.lean` already gives about a different pair: that
+isomorphism is stated at the literal `f ≫ g`, so bridging it to `q` would need
+`eqToHom` transport across compound terms.
 
 ## What comes out
 

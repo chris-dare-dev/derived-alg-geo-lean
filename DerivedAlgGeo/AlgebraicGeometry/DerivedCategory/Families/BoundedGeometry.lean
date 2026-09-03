@@ -19,9 +19,10 @@ Coherence is preserved by every pullback (`Coh.pullback`, in
 the contract `HasCoherentPullback` records it and the bounded lift is
 constructed only from an instance; `Families/CoherentPullback.lean` discharges
 the contract for exact, in particular flat, pullback.  Preservation of the
-perfect envelope is a theorem for every instance; the perfect lift, and the
-identity and composition contracts for both the bounded lift defined here and
-the perfect one, live in `Families/PerfectPullback.lean`.  No geometric
+perfect envelope is a theorem for every instance; the perfect lift lives in
+`Families/PerfectPullback.lean`, and the identity and composition laws of the
+bounded and perfect lifts, theorems for every instance, in
+`Families/CoherentPullbackCoherence.lean`.  No geometric
 slicing, openness, relative-HN existence, moduli theorem, or conclusion of
 Theorem 22.2 is asserted.
 

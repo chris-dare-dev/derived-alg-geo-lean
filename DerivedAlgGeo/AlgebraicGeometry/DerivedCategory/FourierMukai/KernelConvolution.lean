@@ -269,10 +269,9 @@ Bundles functoriality of derived pullback with the commuting triangle
 `π₁ ≫ p₁ = π₃ ≫ p₃`, because the derivation needs exactly the composite and
 never the two halves separately.
 
-Not reducible to `GeometricDerivedPullbackComposition`: that is stated at the
+Not reducible to `boundedCoherentDerivedPullbackComp`: that is stated at the
 literal `f ≫ g`, so bridging two different composites would need `eqToHom`
-transport across compound terms, and it carries a `perfectIso` field that
-nothing here touches. -/
+transport across compound terms. -/
 class HasCommonPullbackRoute {X T Z₁ Z₃ : SchemeBaseChange S}
     [IsLocallyNoetherian X.left] [IsLocallyNoetherian T.left]
     [IsLocallyNoetherian Z₁.left] [IsLocallyNoetherian Z₃.left]
