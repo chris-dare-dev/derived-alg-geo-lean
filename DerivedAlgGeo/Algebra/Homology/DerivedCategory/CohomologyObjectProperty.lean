@@ -122,11 +122,12 @@ section Coproducts
 
 /-- **Closure under a coproduct that cohomology preserves.**
 
-The two hypotheses are exactly the ones that cannot be assumed at this Mathlib pin:
-`DerivedCategory A` is not known to have small coproducts, and `Hⁿ` on it is not
-known to preserve them.  Both are stated for the one indexing type at hand rather
-than installed as instances, so nothing here pretends the derived category has
-coproducts it has not been shown to have.
+The two hypotheses are stated for the one indexing type at hand rather than as
+instances on `A`: they hold by instance search when `A` has exact coproducts of
+that shape (`DerivedCategory.hasCoproductsOfShape` and
+`DerivedCategory.homologyFunctor_preservesCoproductsOfShape` in
+`DerivedCategory/Coproducts.lean`), and a consumer with a different source for
+them passes it here.
 
 Given them, the argument is one step: `Hⁿ(∐ Eᵢ)` *is* a colimit of the `Hⁿ(Eᵢ)`,
 each of which is in `P`, so `P`'s own closure under `ι`-indexed colimits applies. -/

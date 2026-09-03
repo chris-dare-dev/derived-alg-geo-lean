@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.HomotopyCategory
 import DerivedAlgGeo.Algebra.Homology.Homotopy.Sigma
+import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Shapes.Products
 
 /-!
 # Coproducts in the homotopy category
@@ -24,6 +25,9 @@ which assembles the homotopies witnessing agreement on each summand into one hom
   shape `κ` when the underlying category does.
 * `HomotopyCategory.quotient_preservesColimitsOfShape_discrete`: the quotient functor
   preserves them.
+* `HomotopyCategory.homologyFunctor_preservesCoproductsOfShape`: homology on the homotopy
+  category preserves coproducts when homology of complexes does, since it factors through the
+  quotient.
 
 ## Implementation notes
 
@@ -111,5 +115,15 @@ instance hasColimitsOfShape_discrete : HasColimitsOfShape (Discrete κ) (Homotop
   haveI : HasColimit (Discrete.functor fun k => (quotient C c).obj (X k)) :=
     ⟨⟨_, isColimitCofan X⟩⟩
   exact hasColimit_of_iso e
+
+/-- Homology on the homotopy category preserves coproducts of shape `κ` when homology of
+complexes does: it factors through the essentially surjective quotient functor, which preserves
+them. -/
+instance homologyFunctor_preservesCoproductsOfShape [CategoryWithHomology C] (n : ι)
+    [PreservesColimitsOfShape (Discrete κ) (HomologicalComplex.homologyFunctor C c n)] :
+    PreservesColimitsOfShape (Discrete κ) (homologyFunctor C c n) := by
+  haveI : PreservesColimitsOfShape (Discrete κ) (quotient C c ⋙ homologyFunctor C c n) :=
+    preservesColimitsOfShape_of_natIso (homologyFunctorFactors C c n).symm
+  exact preservesCoproductsOfShape_of_essSurj (quotient C c) (homologyFunctor C c n)
 
 end HomotopyCategory
