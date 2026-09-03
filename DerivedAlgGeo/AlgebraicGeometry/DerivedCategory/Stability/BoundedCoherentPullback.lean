@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.CoherentPushforward
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.CoherentPushforwardCoherence
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.HN
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.LocallyFinite
 
@@ -32,6 +32,9 @@ of smooth projective varieties; finite morphisms inhabit
 
 ## Main results
 
+* `SchemeBaseChange.BoundedCoherentPushforwardPreimageData.identity`, `comp`,
+  `preimage_identity`, and `preimage_comp`: the witnesses along an identity and
+  along a composite, and the slicings they produce.
 * `boundedCoherentPullback_slicing`, `boundedCoherentPullback_Z`, and
   `boundedCoherentPullback_charge`, in both namespaces: the slicing of `f^♯σ`
   is the geometric preimage slicing, the charge on `Λ` is unchanged, and the
@@ -47,10 +50,15 @@ the slicing distance under `f^♯`, are therefore available through
 `PreStabilityCondition.WithClassMap.preimage_phiPlus` and
 `slicingDist_preimage_le` at this functor with no further work.
 
-Unlike `BoundedCoherentPullbackPreimageData`, the witness structures carry no
-identity or composition laws, because `boundedCoherentDerivedPushforward`
-has no identity or composition isomorphisms yet; see the implementation notes
-of `Families/CoherentPushforward.lean`.
+The witness structures carry the same identity and composition laws as
+`BoundedCoherentPullbackPreimageData`, with one difference: the pullback side
+takes its bounded isomorphisms from the classes
+`GeometricDerivedPullbackIdentity` and `GeometricDerivedPullbackComposition`,
+which nothing inhabits, while here they are the theorems of
+`Families/CoherentPushforwardCoherence.lean`, so the laws hold for every
+instance of `HasCoherentPushforward`.  The composition law reads the two-step
+transfer inside out: pull back along `g` first, then along `f`, and the
+result is the transfer along `f ≫ g`.
 
 The declarations stay in
 `CategoryTheory.Triangulated.{Pre,}StabilityCondition.WithClassMap` so that
@@ -116,6 +124,69 @@ def preimage (h : BoundedCoherentPushforwardPreimageData f s) :
     Slicing T.BoundedCoherentDerivedFiber :=
   s.preimage (boundedCoherentDerivedPushforward f) h.preimageData
 
+/-- The identity direct image carries the identity witness, transported across
+`boundedCoherentDerivedPushforwardId`. -/
+theorem identity (T : SchemeBaseChange S) [IsLocallyNoetherian T.left]
+    [HasCoherentPushforward (𝟙 T)] (s : Slicing T.BoundedCoherentDerivedFiber) :
+    BoundedCoherentPushforwardPreimageData (𝟙 T) s where
+  preimageData := s.preimageData_id.ofIso (boundedCoherentDerivedPushforwardId T).symm
+
+/-- The slicing pulled back along the identity is the original slicing. -/
+@[simp]
+theorem preimage_identity (T : SchemeBaseChange S) [IsLocallyNoetherian T.left]
+    [HasCoherentPushforward (𝟙 T)] (s : Slicing T.BoundedCoherentDerivedFiber) :
+    (identity T s).preimage = s := by
+  calc
+    (identity T s).preimage =
+        s.preimage (Functor.id T.BoundedCoherentDerivedFiber) s.preimageData_id :=
+      Slicing.preimage_iso s _ _ s.preimageData_id
+        (boundedCoherentDerivedPushforwardId T).symm
+    _ = s := s.preimage_id
+
+/-- Witnesses compose: a witness for `g` on `s` and a witness for `f` on the
+slicing pulled back along `g` give a witness for `f ≫ g` on `s`, transported
+across `boundedCoherentDerivedPushforwardComp`.  The order of the two witnesses
+is the order in which the transfers are applied, `g` first. -/
+theorem comp {T U V : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V)
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
+    [IsLocallyNoetherian V.left]
+    [HasCoherentPushforward f] [HasCoherentPushforward g]
+    [HasCoherentPushforward (f ≫ g)]
+    {s : Slicing V.BoundedCoherentDerivedFiber}
+    (hg : BoundedCoherentPushforwardPreimageData g s)
+    (hf : BoundedCoherentPushforwardPreimageData f hg.preimage) :
+    BoundedCoherentPushforwardPreimageData (f ≫ g) s where
+  preimageData := by
+    have hfData := hf.preimageData
+    change (s.preimage (boundedCoherentDerivedPushforward g)
+      hg.preimageData).PreimageData (boundedCoherentDerivedPushforward f) at hfData
+    exact (hg.preimageData.comp hfData).ofIso (boundedCoherentDerivedPushforwardComp f g)
+
+/-- One-step and two-step pullbacks of a slicing agree. -/
+@[simp]
+theorem preimage_comp {T U V : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V)
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
+    [IsLocallyNoetherian V.left]
+    [HasCoherentPushforward f] [HasCoherentPushforward g]
+    [HasCoherentPushforward (f ≫ g)]
+    {s : Slicing V.BoundedCoherentDerivedFiber}
+    (hg : BoundedCoherentPushforwardPreimageData g s)
+    (hf : BoundedCoherentPushforwardPreimageData f hg.preimage) :
+    (hg.comp f g hf).preimage = hf.preimage := by
+  have hfData := hf.preimageData
+  change (s.preimage (boundedCoherentDerivedPushforward g)
+    hg.preimageData).PreimageData (boundedCoherentDerivedPushforward f) at hfData
+  calc
+    (hg.comp f g hf).preimage =
+        s.preimage
+          (boundedCoherentDerivedPushforward f ⋙ boundedCoherentDerivedPushforward g)
+          (hg.preimageData.comp hfData) :=
+      Slicing.preimage_iso s _ _ (hg.preimageData.comp hfData)
+        (boundedCoherentDerivedPushforwardComp f g)
+    _ = hf.preimage := by
+      apply Slicing.ext
+      rfl
+
 end BoundedCoherentPushforwardPreimageData
 
 /-- The phase-indexed A.17 output for `f_*`, given its own name so that
@@ -136,6 +207,14 @@ variable {T U : SchemeBaseChange S} {f : T ⟶ U}
   [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
   [HasCoherentPushforward f]
   {s : Slicing U.BoundedCoherentDerivedFiber}
+
+/-- The identity direct image carries the inhabited identity A.17 model,
+transported across `boundedCoherentDerivedPushforwardId`. -/
+def identity (T : SchemeBaseChange S) [IsLocallyNoetherian T.left]
+    [HasCoherentPushforward (𝟙 T)] (s : Slicing T.BoundedCoherentDerivedFiber) :
+    BoundedCoherentPushforwardInducingData (𝟙 T) s where
+  inducedTStructures :=
+    s.inducedTStructuresId.ofIso (boundedCoherentDerivedPushforwardId T).symm
 
 /-- Apply the owned finite phase-truncation theorem to the actual A.17
 output. -/
