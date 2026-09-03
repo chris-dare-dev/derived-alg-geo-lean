@@ -463,7 +463,7 @@ functor, restricted to `Dᵇ(Coh)`.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforwardCompInclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforwardCompInclusion_commShift
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforward_isTriangulated
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.hasCoherentPushforwardOfIsClosedImmersion
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.hasCoherentPushforwardOfIsFinite
 
 /-! ## Honest Dqc, bounded coherent, and perfect loci
 

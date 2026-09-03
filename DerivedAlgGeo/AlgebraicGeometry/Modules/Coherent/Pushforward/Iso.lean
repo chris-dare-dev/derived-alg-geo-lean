@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Descent.Locality
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.Iso
 
 /-!
 # Pushforward along an isomorphism of schemes
@@ -26,13 +27,11 @@ f = X.isoSpec.hom ≫ Spec.map f.appTop ≫ Y.isoSpec.inv
 knowing that the two outer pushforwards, both along isomorphisms, preserve coherence. That is
 what this file supplies, and it was the one missing input.
 
-## The argument is adjoint uniqueness, not a computation
+## The comparison lives one level down
 
-`Modules.restrictFunctor e.hom` and `Modules.restrictFunctor e.inv` are mutually inverse: compose
-them, collapse with `restrictFunctorComp`, rewrite the composite morphism to an identity, and
-finish with `restrictFunctorId`. So `restrictFunctor e.hom` has `restrictFunctor e.inv` as a right
-adjoint. It also has `Modules.pushforward e.hom` as one, by `Modules.restrictAdjunction`. Right
-adjoints are unique up to isomorphism, and `pushforwardIsoRestrict` is that isomorphism.
+`pushforwardIsoRestrict` (`Modules/Pushforward/Iso.lean`) identifies `e_*` with restriction
+along `e⁻¹` by uniqueness of right adjoints; it is stated on all module sheaves and needs
+nothing about coherence, which is why it is not here.
 
 Coherence then transfers because restriction along an open immersion already preserves it
 (`Modules.IsCoherent.restrict_of_isOpenImmersion`) and an isomorphism is an open immersion.
@@ -40,15 +39,8 @@ Coherence then transfers because restriction along an open immersion already pre
 Nothing here computes what the comparison does to a section, and nothing needs to: the consumer is
 a property closed under isomorphism.
 
-## Two traps, both costing time and neither visible in the statement
+## A trap, costing time and not visible in the statement
 
-* **`Equivalence.mk` resolves to the wrong `Equivalence`.** Under `open CategoryTheory` the root
-  `Equivalence.mk` — the constructor of the equivalence-relation structure — wins, and the error
-  is an inscrutable "expected `∀ (x : ?m), ?m x x`". Write
-  `CategoryTheory.Equivalence.mk`. It is also the constructor to want: it takes the two
-  isomorphisms and *adjointifies* the unit, so the triangle identity is not an obligation. Giving
-  the fields directly to the structure leaves that identity for `aesop`, which does not discharge
-  it here.
 * **`SheafOfModules.IsFinitePresentation.of_iso` does not pin its universes.** Its
   local-generators universe is unconstrained by the explicit arguments and defaults to `0`, so
   feeding it a `.{u, u, u}` hypothesis is a type mismatch even in tactic mode with the expected
@@ -63,8 +55,6 @@ theorem reach a cover member, not the theorem itself.
 
 ## Main results
 
-* `Modules.restrictEquiv` — restriction along an isomorphism, as an equivalence.
-* `Modules.pushforwardIsoRestrict` — `e_*` is restriction along `e⁻¹`.
 * `Modules.isCoherent_pushforward_of_iso` — coherence survives `e_*`.
 -/
 
@@ -75,26 +65,6 @@ open CategoryTheory
 namespace AlgebraicGeometry.Scheme.Modules
 
 variable {X Y : Scheme.{u}} (e : X ≅ Y)
-
-/-- **Restriction along an isomorphism, as an equivalence of module categories.**
-
-Built with `CategoryTheory.Equivalence.mk` rather than by giving the structure's fields: that
-constructor adjointifies the unit, so the triangle identity is discharged for us. See the module
-docstring — both halves of that sentence cost time to learn. -/
-noncomputable def restrictEquiv : X.Modules ≌ Y.Modules :=
-  CategoryTheory.Equivalence.mk (restrictFunctor e.inv) (restrictFunctor e.hom)
-    ((restrictFunctorComp e.hom e.inv).symm ≪≫
-      restrictFunctorCongr (by simp) ≪≫ restrictFunctorId).symm
-    ((restrictFunctorComp e.inv e.hom).symm ≪≫
-      restrictFunctorCongr (by simp) ≪≫ restrictFunctorId)
-
-/-- **Pushforward along an isomorphism is restriction along its inverse.**
-
-Both are right adjoint to `restrictFunctor e.hom` — the first by `restrictAdjunction`, the second
-because `restrictEquiv` makes it half of an equivalence — and right adjoints are unique. -/
-noncomputable def pushforwardIsoRestrict :
-    pushforward e.hom ≅ restrictFunctor e.inv :=
-  (restrictAdjunction e.hom).rightAdjointUniq (restrictEquiv e).symm.toAdjunction
 
 /-- **Coherence survives pushforward along an isomorphism of schemes.**
 
