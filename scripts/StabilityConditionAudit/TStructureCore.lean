@@ -76,6 +76,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.ObjectProperty.instIsTriangulatedClosed₂CoprodClosure
 #print axioms CategoryTheory.ObjectProperty.le_coprodClosure
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_le
+#print axioms CategoryTheory.ObjectProperty.coprodClosure_le_shift_of_le_shift
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_map_obj
 #print axioms CategoryTheory.Adjunction.isCompactObject_leftAdjoint_obj
 #print axioms CategoryTheory.Adjunction.compactObjects_map_leftAdjoint

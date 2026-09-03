@@ -24,6 +24,9 @@ The definitions here follow A.9--A.11 literally:
   file imports;
 * `ObjectProperty.coprodClosure` is the smallest isomorphism-, coproduct-, and
   extension-closed object property containing its generators;
+* `ObjectProperty.coprodClosure_le_shift_of_le_shift` transports that closure
+  into a shift of another property, which `coprodClosure_map_obj` cannot do
+  because Mathlib installs no `CommShift` instance on `shiftFunctor C n`;
 * `TStructure.IsCompactlyGeneratedBy` records compact generation of an
   already constructed t-structure.
 
@@ -99,6 +102,43 @@ lemma coprodClosure_le {Q : ObjectProperty C}
   | of_coproduct c hc _ ih => exact Q.prop_of_isColimit hc ih
   | of_extension T hT _ _ ih₁ ih₃ =>
       exact Q.ext_of_isTriangulatedClosed₂ T hT ih₁ ih₃
+
+/-- Universal property of `coprodClosure` across a shift: a shift-compatible
+containment of generators induces one of closures.
+
+The target is a shift of a *different* property, which is what distinguishes
+this from `coprodClosure_le_shift` in `CompactlyGenerated/Existence.lean`: that
+one is the homogeneous statement `G ≤ G.shift 1 → Coprod(G) ≤ Coprod(G).shift 1`
+(Remark A.12(1)), while the aisles this one compares sit at two different
+phases.
+
+It is `coprodClosure_le` at `Q := R.shift n`, which cannot be invoked
+directly: Mathlib carries `(R.shift n).IsClosedUnderIsomorphisms` but neither
+`(R.shift n).IsClosedUnderColimitsOfShape (Discrete ι)` nor
+`(R.shift n).IsTriangulatedClosed₂`, so the induction is run by hand.
+
+`coprodClosure_map_obj` is also unavailable, for a library reason rather than a
+mathematical one: Mathlib registers no `CommShift ℤ` instance on
+`shiftFunctor C n`. Three rotations of a distinguished triangle return the
+shift with all three morphisms negated (`Triangle.shiftFunctor` carries
+`n.negOnePow`), so only a sign-corrected commutation isomorphism makes the
+shift triangulated, and none is installed. The signs land on the morphisms,
+and `coprodClosure` constrains only the *objects* of the triangle in its
+extension constructor, so `Triangle.shift_distinguished` is enough. -/
+theorem coprodClosure_le_shift_of_le_shift {R : ObjectProperty C} (n : ℤ)
+    [R.IsClosedUnderIsomorphisms]
+    [∀ (ι : Type w), R.IsClosedUnderColimitsOfShape (Discrete ι)]
+    [R.IsTriangulatedClosed₂] (hPR : P ≤ R.shift n) :
+    P.coprodClosure.{w} ≤ R.shift n := by
+  intro X hX
+  induction hX with
+  | of_mem X hX => exact hPR X hX
+  | of_iso e _ ih => exact R.prop_of_iso ((shiftFunctor C n).mapIso e) ih
+  | @of_coproduct ι G c hc _ ih =>
+      exact R.prop_of_isColimit (isColimitOfPreserves (shiftFunctor C n) hc) ih
+  | of_extension T hT _ _ ih₁ ih₃ =>
+      exact R.ext_of_isTriangulatedClosed₂ ((Triangle.shiftFunctor C n).obj T)
+        (Triangle.shift_distinguished T hT n) ih₁ ih₃
 
 variable {P}
 

@@ -32,6 +32,11 @@ them; the Definition A.22 input is `Slicing.IndExtensions`.
 * `Slicing.IndExtensions.largePreimagePhase`: the phase collection
   `Slicing.IndExtensions.largePhase` pulls back to along the detecting
   functor, the large-target analogue of `Slicing.preimagePhase`.
+* `Slicing.IndExtensions.largePreimage`: the large-target analogue of
+  `Slicing.preimage`, and the shape in which Corollary A.23 produces Theorem
+  2.8(1)'s slicing.  Five of the six `Slicing` fields are discharged and `hn`
+  remains a hypothesis; identifying the result with the paper's `𝒫_ℓ` needs the
+  primed/unprimed cut comparison, which is open.
 
 ## Main results
 
@@ -79,19 +84,22 @@ That is the third shape, `InducedTStructuresLarge` and
 collection is `Slicing.IndExtensions.largePreimagePhase`, built from
 `largePhase`, which `largePhase_iff_semistable` identifies with `s.P` on `Q`.
 
-Assembling those into a `Slicing` is the accounting of `Slicing.PreimageData`
-with one entry moved.  Closure under isomorphisms and zero membership still
-follow formally, from the iso- and zero-invariance of `IsLE` and `IsGE`.  The
-shift law no longer does: there is no slicing on `D` to borrow `shift_iff`
-from, and `Slicing.IndExtensions` relates the aisles at two phases only by
-inclusion (`le_zero_anti`), never by the shift, so `𝒫̂(φ)⟦1⟧ = 𝒫̂(φ + 1)` has
-to be proved from `largeAisle` and a shift equality for
-`ObjectProperty.coprodClosure` that the repository does not have.  HN
-existence is the other open half: the bounded twin lifts a target HN
-filtration (`Slicing.InducedTStructures.hn_exists`), and the ambient category
-carries no slicing to lift one from, so it needs the finite phase-truncation
-argument run on the source -- which is why `InducedTStructuresLarge` keeps
-Step 4's boundedness that the bounded twin can afford to drop.
+Assembling those into a `Slicing` is `largePreimage`, and it is the accounting
+of `Slicing.PreimageData` with one entry moved.  Closure under isomorphisms and
+zero membership follow formally, from the iso- and zero-invariance of `IsLE`
+and `IsGE`.  The shift law does not: there is no slicing on `D` to borrow
+`shift_iff` from, and `Slicing.IndExtensions` relates the aisles at two phases
+only by inclusion (`le_zero_anti`), never by the shift.  It is nevertheless a
+theorem -- `Slicing.IndExtensions.largePhase_shift_iff`, proved from clause (i)
+of Lemma A.14 and `ObjectProperty.coprodClosure_shift_le` -- because clause (i)
+pins each aisle to `Coprod(𝒫(≥ φ))` and both factors commute with the shift.
+
+HN existence is what remains, and `largePreimage` takes it as a hypothesis.
+The bounded twin lifts a target HN filtration
+(`Slicing.InducedTStructures.hn_exists`), and the ambient category carries no
+slicing to lift one from, so it needs the finite phase-truncation argument run
+on the source -- which is why `InducedTStructuresLarge` keeps Step 4's
+boundedness that the bounded twin can afford to drop.
 
 Assumption (v') is `Slicing.IndExtensions.MapsSemistableAisle`, stated as the
 paper states it, on semistable objects and in the large category.  Extending
@@ -303,6 +311,55 @@ def ofInducedTStructures {G : C ⥤ Q.FullSubcategory} (h : s.InducedTStructures
 
 end InducedTStructuresLarge
 
+instance largePreimagePhase_isClosedUnderIsomorphisms (F : C ⥤ D) (φ : ℝ) :
+    (ind.largePreimagePhase F φ).IsClosedUnderIsomorphisms where
+  of_iso e hE := (ind.largePhase φ).prop_of_iso (F.mapIso e) hE
+
+/-- **The preimage slicing against the large target**, modulo Harder--Narasimhan existence:
+the large-target analogue of `Slicing.preimage`, and the categorical shape in which Corollary
+A.23 produces the slicing Theorem 2.8(1) of arXiv:2607.28411v1 calls `𝒫_ℓ`.
+
+**It is not yet identified with `𝒫_ℓ`.**  Theorem 2.8(1) pins `𝒫_ℓ` by the two cuts
+`𝒫̂(> φ)` and `𝒫̂(≤ φ + 1)` of the *unprimed* family `τ_φ`, while this collection is the
+intersection of the *primed* cuts (see `Slicing.IndExtensions.largePhase`).  Both the
+primed/unprimed comparison and the passage from a phase collection to those two cuts are
+open, alongside `hn` and the geometric inputs of `nonempty_inducedTStructuresLarge`.
+
+The six `Slicing` fields: `P` is `largePreimagePhase`; `closedUnderIso`, `zero_mem` and
+`shift_iff` are discharged by transport, from `largePhase_isClosedUnderIsomorphisms`,
+`largePhase_of_isZero`, and `largePhase_shift_iff` carried across `F.commShiftIso` -- though
+only the first two are formal at the `largePhase` end, the shift law itself being the theorem
+of `IndExtensions.lean`; `hom_vanishing` is `InducedTStructuresLarge.hom_vanishing`; and the
+sixth is `hn`.  The bounded shape gets `hn` by lifting a target HN filtration
+(`Slicing.InducedTStructures.hn_exists`); no slicing on the ambient category exists to lift
+one from here, so it stays a hypothesis until the finite phase-truncation argument is run on
+the source.
+
+`[F.Additive]` is omitted, unlike `Slicing.preimage`: Mathlib derives it from
+`[F.IsTriangulated]` at priority 100, so the binder is redundant in both signatures and only
+`Slicing.preimage`'s `@[nolint unusedArguments]` keeps it there. -/
+def largePreimage {F : C ⥤ D} [F.CommShift ℤ] [F.IsTriangulated]
+    (h : ind.InducedTStructuresLarge F)
+    (hn : ∀ E : C, Nonempty (HNFiltration C (ind.largePreimagePhase F) E)) : Slicing C where
+  P := ind.largePreimagePhase F
+  closedUnderIso φ := ind.largePreimagePhase_isClosedUnderIsomorphisms F φ
+  zero_mem φ := ind.largePhase_of_isZero φ (F.map_isZero (isZero_zero C))
+  shift_iff φ E :=
+    (ind.largePhase_shift_iff φ (F.obj E)).trans
+      ⟨fun hE => (ind.largePhase (φ + 1)).prop_of_iso ((F.commShiftIso (1 : ℤ)).app E).symm hE,
+        fun hE => (ind.largePhase (φ + 1)).prop_of_iso ((F.commShiftIso (1 : ℤ)).app E) hE⟩
+  hom_vanishing := h.hom_vanishing
+  hn_exists := hn
+
+/-- The phase collection of `largePreimage` is `largePhase` read through the detecting
+functor, by definition.  Stated so callers need no `change`, as `Slicing.preimage_P` is for
+the bounded shape; the `PreimageData`-style witness `hn` does not enter. -/
+@[simp]
+theorem largePreimage_P {F : C ⥤ D} [F.CommShift ℤ] [F.IsTriangulated]
+    (h : ind.InducedTStructuresLarge F)
+    (hn : ∀ E : C, Nonempty (HNFiltration C (ind.largePreimagePhase F) E)) (φ : ℝ) (E : C) :
+    (ind.largePreimage h hn).P φ E ↔ ind.largePhase φ (F.obj E) := Iff.rfl
+
 end Large
 
 section Induce
@@ -435,10 +492,10 @@ the one hypothesis this shape adds over `nonempty_inducedTStructures_of_le`, whi
 from `hle`.  It joins `hzero`, `hG`/`htC` and `htrunc` on the list of geometric inputs still to
 be supplied for `π : X_ℓ → X`.
 
-Two things still separate this from the slicing `𝒫_ℓ` itself, and both are open: the phase
-shift `𝒫̂(φ)⟦1⟧ = 𝒫̂(φ + 1)`, which `Slicing.IndExtensions` relates across phases only by the
-aisle inclusion `le_zero_anti`, and HN existence for `largePreimagePhase`.  See the
-implementation notes for the full accounting against `Slicing`'s fields. -/
+One thing still separates this from the slicing `𝒫_ℓ` itself: HN existence for
+`largePreimagePhase`, which `largePreimage` takes as a hypothesis.  The phase shift, open when
+this shape landed, is now `largePhase_shift_iff`.  See the implementation notes for the full
+accounting against `Slicing`'s fields. -/
 theorem nonempty_inducedTStructuresLarge (P : ObjectProperty C) [P.IsTriangulated]
     [P.IsClosedUnderIsomorphisms]
     (adj : L ⊣ F) (hF : F.PreservesSmallCoproducts.{w})
