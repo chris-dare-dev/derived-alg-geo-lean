@@ -104,3 +104,4 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.monad_isRightTExact
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.nonempty_inducedTStructures
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_mapsSemistableLE

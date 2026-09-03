@@ -35,6 +35,9 @@ them; the Definition A.22 input is `Slicing.IndExtensions`.
   bounded predicate `Slicing.MapsSemistableGE` of the monad restricted to
   `Q`, which `Slicing.MapsSemistableGE.of_mapsSemistableLE` produces from
   condition (3.2) of Proposition 3.8.
+* `Slicing.IndExtensions.preimageData_of_mapsSemistableLE`: **Proposition
+  3.8**, categorically: condition (3.2) on the restricted comonad, through the
+  adjunctions restricted to `Q` and `F⁻¹ Q`, gives the preimage slicing.
 
 ## Implementation notes
 
@@ -66,8 +69,11 @@ every declaration here, which is what `.{w}` binds.  Both categories share one
 hom universe `v`, as `Polishchuk.induce` requires.
 
 Nothing here is geometric.  Realizing `Slicing.IndExtensions` for the
-standard slicings of `Dᵇ(Coh)` inside `Dqc`, and the adjunction `f_! ⊣ f^*`
-on `Dqc`, are the remaining inputs of Proposition 3.8.
+standard slicings of `Dᵇ(Coh)` inside `Dqc`, the adjunctions `f_! ⊣ f^* ⊣ f_*`
+on `Dqc`, the preservation of `Dᵇ(Coh)` by `f^* f_!` and `f^* f_*`, and
+conservativity of `f^*` on bounded objects, which the paper gets from faithful
+flatness, are the remaining inputs of Proposition 3.8;
+`preimageData_of_mapsSemistableLE` states exactly what they must supply.
 
 ## References
 
@@ -218,6 +224,34 @@ theorem preimageData [IsTriangulated C] (adj : L ⊣ F) (hF : F.PreservesSmallCo
     (hv : ind.MapsSemistableAisle (L ⋙ F)) :
     s.PreimageData (ObjectProperty.inverseImageLift F Q) :=
   (ind.nonempty_inducedTStructures adj hF hsrc hzero hv).elim fun h => h.preimageData
+
+/-- **Proposition 3.8 of arXiv:2607.28411v1, the slicing half at `S = Spec ℤ`.**
+Let `F` have
+a left adjoint `L` and a right adjoint `R`, both of whose composites with
+`F` preserve `Q`, so that both adjunctions restrict to `Q` and `F⁻¹ Q`.  If
+the restricted comonad `F R` satisfies condition (3.2), sending `𝒫(φ)` into
+`𝒫(≤ φ)`, then under the Theorem A.17 hypotheses the preimage collection
+(A.7) is a slicing on `F⁻¹ Q`.  The proof is the paper's: (3.2) transposes
+through `Slicing.MapsSemistableGE.of_mapsSemistableLE` into the bounded
+Corollary A.23 hypothesis, `mapsSemistableGE_iff` reads it as assumption
+(v'), and `preimageData` is the corollary.  The S-local statement and the
+`f_♯σ` clause, which Proposition 3.8 derives from Remark 3.7, are outside the
+categorical layer and are not proved here.  Geometrically, `F = f^*`,
+`L = f_!`, `R = f_*`, and the slicing is `f_♯𝒫`. -/
+theorem preimageData_of_mapsSemistableLE [IsTriangulated C] {R : D ⥤ C}
+    [R.CommShift ℤ] [R.IsTriangulated]
+    (adj : L ⊣ F) (adjR : F ⊣ R) (hF : F.PreservesSmallCoproducts.{w})
+    (hsrc : ∀ φ : ℝ, ∃ (G : ObjectProperty D) (tC : TStructure C),
+      (ind.tStructure φ).IsCompactlyGeneratedBy.{w} G ∧
+        tC.IsCompactlyGeneratedBy.{w} (G.map L))
+    (hzero : ∀ E : C, Q (F.obj E) → IsZero (F.obj E) → IsZero E)
+    (hQL : ∀ E : D, Q E → Q (F.obj (L.obj E))) (hQR : ∀ E : D, Q E → Q (F.obj (R.obj E)))
+    (h32 : s.MapsSemistableLE (ObjectProperty.liftToInverseImage F Q R hQR ⋙
+      ObjectProperty.inverseImageLift F Q)) :
+    s.PreimageData (ObjectProperty.inverseImageLift F Q) :=
+  ind.preimageData adj hF hsrc hzero ((ind.mapsSemistableGE_iff hQL).1
+    (Slicing.MapsSemistableGE.of_mapsSemistableLE (adj.restrictInverseImageLeft Q hQL)
+      (adjR.restrictInverseImageRight Q hQR) h32))
 
 end Induce
 
