@@ -7,6 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ResidueFiber
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.SchemeDerived
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FiniteType
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.CoherentPushforward
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ExactPullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ExactPullbackCoherence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.LeftDerivedPullback
@@ -22,7 +23,8 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPullbackS
 # Scheme-derived categories in families
 
 Scheme base changes, residue fibers, derived realizations, and geometric
-pullback constructions that are independent of stability conditions. Public
+pullback and direct-image constructions that are independent of stability
+conditions. Public
 declarations owned by this subtree use
 `AlgebraicGeometry.DerivedCategory.Families`.
 -/

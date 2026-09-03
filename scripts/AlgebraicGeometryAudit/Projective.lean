@@ -103,3 +103,15 @@ The globalisation itself: `isCoherent_pushforward`.
 #print axioms AlgebraicGeometry.Scheme.isCoherent_pushforward_affine
 #print axioms AlgebraicGeometry.Scheme.isCoherent_restrict_chart
 #print axioms AlgebraicGeometry.Scheme.isCoherent_pushforward
+
+/-! ## The functor `f_* : Coh X ⥤ Coh Y` along a closed immersion
+
+`Coh.pushforward` with its exactness and additivity, reflected through the fully faithful
+`Coh.ι`.
+-/
+
+#print axioms AlgebraicGeometry.Coh.pushforward
+#print axioms AlgebraicGeometry.Coh.pushforwardCompι
+#print axioms AlgebraicGeometry.Coh.pushforward_preservesFiniteLimits
+#print axioms AlgebraicGeometry.Coh.pushforward_preservesFiniteColimits
+#print axioms AlgebraicGeometry.Coh.pushforward_additive

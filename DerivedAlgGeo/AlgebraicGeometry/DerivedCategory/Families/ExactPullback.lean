@@ -42,6 +42,14 @@ abbrev modulePullback {T U : SchemeBaseChange S} (f : T ⟶ U) :
     U.left.Modules ⥤ T.left.Modules :=
   Scheme.Modules.pullback f.left
 
+/-- Pushforward of sheaves of modules along a morphism of scheme base changes,
+the right adjoint of `modulePullback` through
+`Scheme.Modules.pullbackPushforwardAdjunction`.  Its coherent restriction and
+derived direct image live in `Families/CoherentPushforward.lean`. -/
+abbrev modulePushforward {T U : SchemeBaseChange S} (f : T ⟶ U) :
+    T.left.Modules ⥤ U.left.Modules :=
+  Scheme.Modules.pushforward f.left
+
 /-- Module pullback along the identity is naturally isomorphic to the
 identity functor. -/
 def modulePullbackId (T : SchemeBaseChange S) :
