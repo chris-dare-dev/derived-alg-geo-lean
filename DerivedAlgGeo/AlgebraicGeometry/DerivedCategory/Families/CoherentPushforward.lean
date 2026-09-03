@@ -52,13 +52,14 @@ than a rewrite.
 
 ## Implementation notes
 
-Identity and composition laws for `boundedCoherentDerivedPushforward` are not
-stated.  They need `Modules.pushforwardId` and `Modules.pushforwardComp`
-lifted through `Coh` and through `mapDerivedCategory`, which is the same
-coherence work `GeometricDerivedPullbackIdentity` and
-`GeometricDerivedPullbackComposition` record as pending for pullback; a
-consumer needing the laws for pullback-of-stability composition is the right
-place to add them.
+Identity and composition laws for `boundedCoherentDerivedPushforward` are in
+`Families/CoherentPushforwardCoherence.lean`, proved for every instance of
+the contract from the comparison isomorphism.
+
+`(f ≫ g).left` is definitionally `f.left ≫ g.left` but not reducibly so, hence
+Mathlib's composition instance for `IsFinite` does not reach it;
+`isFinite_comp_left` restates it in the form instance search meets, so that
+`hasCoherentPushforwardOfIsFinite` fires on a composite of finite morphisms.
 
 The contract keeps the sheaf-level functor as data, as `HasCoherentPushforward`'s
 mirror `HasCoherentPullback` does, although the comparison isomorphism
@@ -205,6 +206,14 @@ instance boundedCoherentDerivedPushforward_isTriangulated :
   infer_instance
 
 end Derived
+
+/-- A composite of finite morphisms of scheme base changes has finite
+underlying morphism.  Stated on `(f ≫ g).left`, the spelling instance search
+meets, because that projection only unfolds to `f.left ≫ g.left` at default
+transparency. -/
+instance isFinite_comp_left {T U V : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V)
+    [IsFinite f.left] [IsFinite g.left] : IsFinite (f ≫ g).left :=
+  inferInstanceAs (IsFinite (f.left ≫ g.left))
 
 /-- Finite morphisms between locally Noetherian schemes inhabit the contract:
 `Coh.pushforward` is exact and lands in coherent sheaves, and its comparison

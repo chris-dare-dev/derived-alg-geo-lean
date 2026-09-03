@@ -465,6 +465,16 @@ functor, restricted to `Dᵇ(Coh)`.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforward_isTriangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.hasCoherentPushforwardOfIsFinite
 
+/-! ## Identity and composition for the bounded coherent direct image -/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isFinite_comp_left
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPushforward.sheafPushforwardId
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPushforward.sheafPushforwardComp
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPushforwardId
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPushforwardComp
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforwardId
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforwardComp
+
 /-! ## Honest Dqc, bounded coherent, and perfect loci
 
 `SchemeQuasicoherentDerivedCategory` is cut out inside the all-module-sheaf
@@ -637,10 +647,15 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData.preimageData
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData.preimage
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData.identity
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData.preimage_identity
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData.comp
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData.preimage_comp
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData.mk.inj
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData.inducedTStructures
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData.identity
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData.toPreimageData
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPullback
 #print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPullback_slicing
