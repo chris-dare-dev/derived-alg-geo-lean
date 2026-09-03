@@ -151,6 +151,30 @@ lemma cohomologyIn_prop_coproduct {ι : Type t}
     (hE : ∀ i, cohomologyIn P (E i)) : cohomologyIn P (∐ E) :=
   fun n ↦ cohomologyIn_coproduct P (n := n) E (hpres n) hE
 
+/-- **`cohomologyIn P` is closed under coproducts of shape `ι` as an `ObjectProperty`**, so that
+Mathlib's full-subcategory machinery applies: `(cohomologyIn P).FullSubcategory` has coproducts
+of shape `ι` and `(cohomologyIn P).ι` creates and preserves them
+(`Limits.hasColimitsOfShape_of_closedUnderColimits`,
+`Limits.createsColimitsOfShapeFullSubcategoryInclusion`).
+
+The hypothesis `hpres` is stated rather than assumed as an instance for the same reason as in
+`cohomologyIn_prop_coproduct`.  A colimit of shape `Discrete ι` of a diagram `p.diag` is a
+coproduct of the family `i ↦ p.diag.obj ⟨i⟩` up to the isomorphism `Discrete.natIsoFunctor`, and
+`cohomologyIn_prop_coproduct` applies degreewise. -/
+lemma cohomologyIn_isClosedUnderColimitsOfShape_discrete {ι : Type t}
+    [P.IsClosedUnderColimitsOfShape (Discrete ι)] [P.IsClosedUnderIsomorphisms]
+    [HasCoproductsOfShape ι (DerivedCategory A)]
+    (hpres : ∀ n : ℤ, PreservesColimitsOfShape (Discrete ι) (homologyFunctor A n)) :
+    (cohomologyIn P).IsClosedUnderColimitsOfShape (Discrete ι) where
+  colimitsOfShape_le := by
+    rintro Y ⟨p⟩
+    have e : Y ≅ ∐ (fun i => p.diag.obj ⟨i⟩) :=
+      p.isColimit.coconePointUniqueUpToIso (colimit.isColimit p.diag) ≪≫
+        HasColimit.isoOfNatIso Discrete.natIsoFunctor
+    intro n
+    exact P.prop_of_iso ((homologyFunctor A n).mapIso e.symm)
+      (cohomologyIn_prop_coproduct P _ hpres (fun i => p.prop_diag_obj ⟨i⟩) n)
+
 end Coproducts
 
 end DerivedCategory

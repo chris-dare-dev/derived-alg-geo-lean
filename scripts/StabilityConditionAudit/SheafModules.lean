@@ -112,3 +112,11 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
 #print axioms SheafOfModules.shortExact_map_toSheaf
 #print axioms SheafOfModules.epi_of_isLocallySurjective
 #print axioms SheafOfModules.reflectsEpimorphisms_toSheaf
+#print axioms PresheafOfModules.hasExactColimitsOfShape
+#print axioms PresheafOfModules.hasFilteredColimitsOfSize
+#print axioms PresheafOfModules.ab4OfSize
+#print axioms PresheafOfModules.ab5OfSize
+#print axioms SheafOfModules.hasExactColimitsOfShape
+#print axioms SheafOfModules.hasFilteredColimitsOfSize
+#print axioms SheafOfModules.ab4OfSize
+#print axioms SheafOfModules.ab5OfSize
