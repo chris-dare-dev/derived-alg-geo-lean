@@ -372,9 +372,9 @@ open CategoryTheory.Triangulated
 /-! ## Coherent and perfect scheme-derived categories and family fibers
 
 `schemePerfect` is the thick envelope of degree-zero finite locally free
-coherent sheaves.  The pullback records below are contracts: clean axiom lists
-certify their constructions and consequences, not the existence of a
-geometric witness for every scheme morphism.
+coherent sheaves.  The pullback contract below is inhabited for exact, in
+particular flat, pullback, and preservation of perfect complexes is a theorem
+for every instance; the identity and composition contracts remain postulated.
 -/
 
 #print axioms AlgebraicGeometry.DerivedCategory.SchemeCoherentDerivedCategory
@@ -428,12 +428,9 @@ geometric witness for every scheme morphism.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instIsTriangulatedSchemeCoherentDerivedCategoryLeftSchemeCoherentDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPullbackCompInclusion
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.PreservesPerfectPullback
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.PreservesPerfectPullback.mapsGenerator
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPullback_preservesPerfect
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullbackSingleFunctor
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.schemeFiniteLocallyFreeGenerator_le_inverseImage_coherentDerivedPullback
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.preservesPerfectPullbackOfHasCoherentPullback
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPullback_preservesPerfect
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectDerivedPullbackCompInclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackIdentity

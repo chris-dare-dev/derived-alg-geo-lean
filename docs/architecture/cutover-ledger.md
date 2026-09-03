@@ -46,7 +46,8 @@ blocks should normally move it rather than add more declarations beside it.
   `Dᵇ(Coh X)`, `Perf(X)`, and the structure-sheaf perfect object without
   importing scheme-family, pullback, determinant, or moduli consumers.
   `Families/BoundedGeometry.lean` now begins with base-change fiber aliases and
-  pullback-preservation contracts.
+  the coherent pullback contract; the perfect lift and the pullback
+  identity/composition contracts are in `Families/PerfectPullback.lean`.
 - Derived opposites and exact linear duality:
   `Algebra/Homology/DerivedCategory/Opposite.lean` owns the generic
   `DerivedCategory.OppositeComparison`;
