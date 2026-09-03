@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Admissible
+import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.AdjacentExt
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Blocks
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Collection
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.DerivedField
