@@ -162,6 +162,31 @@ theorem exists_split_at_cutoff_with_upper_bound [IsTriangulated C]
     rw [hi]
     exact hI i⟩
 
+/-- Semistability of phase `φ`, cut into the two one-sided conditions the Ind-extensions read
+off a t-structure.  The upper cut is `∀ ψ > φ, ltProp ψ` rather than the single `leProp φ`
+because `Slicing.IndExtensions.isGE_one_iff_ltProp` delivers `ltProp`; the two agree here only
+after the fact, since `φ ≤ φ⁻ ≤ φ⁺ ≤ φ` squeezes both intrinsic phases onto `φ`.  Only `←` is
+new: `→` is `geProp_of_semistable` together with `ltProp_of_leProp_of_lt` applied to
+`leProp_of_semistable`. -/
+theorem semistable_iff_geProp_ltProp (s : Slicing C) (φ : ℝ) (Z : C) :
+    s.P φ Z ↔ (s.geProp C φ Z ∧ ∀ ψ, φ < ψ → s.ltProp C ψ Z) := by
+  constructor
+  · intro hZ
+    exact ⟨s.geProp_of_semistable C hZ,
+      fun ψ hψ => s.ltProp_of_leProp_of_lt C hψ Z (s.leProp_of_semistable C hZ le_rfl)⟩
+  · rintro ⟨hge, hlt⟩
+    by_cases hZ : IsZero Z
+    · exact s.zero_mem_of_isZero C φ Z hZ
+    · have h1 : φ ≤ s.phiMinus C Z hZ := s.phiMinus_ge_of_geProp C hZ hge
+      have h2 : s.phiPlus C Z hZ ≤ φ := by
+        by_contra hcon
+        push Not at hcon
+        exact lt_irrefl _ (s.phiPlus_lt_of_ltProp C hZ (hlt _ hcon))
+      have h3 := s.phiMinus_le_phiPlus C Z hZ
+      have heq : s.phiPlus C Z hZ = s.phiMinus C Z hZ := le_antisymm (h2.trans h1) h3
+      have hsemi := Slicing.semistable_of_phiPlus_eq_phiMinus C s hZ heq
+      rwa [show s.phiPlus C Z hZ = φ from le_antisymm h2 (h1.trans h3)] at hsemi
+
 end Slicing
 
 end CategoryTheory.Triangulated
