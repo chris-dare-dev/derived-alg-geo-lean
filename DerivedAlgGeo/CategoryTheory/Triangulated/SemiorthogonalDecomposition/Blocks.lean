@@ -128,7 +128,7 @@ theorem obj_mem_total (i : ι) (j : Fin (B.length i)) :
 
 /-- To prove that the total exceptional part lies in a triangulated,
 retract-closed property, it suffices to check every member of every block. -/
-theorem total_le_of_forall_obj [IsTriangulated C]
+theorem total_le_of_forall_obj
     {P : ObjectProperty C} [P.IsTriangulated] [P.IsStableUnderRetracts]
     (hP : ∀ (i : ι) (j : Fin (B.length i)),
       P ((B.collection i).obj j)) :
