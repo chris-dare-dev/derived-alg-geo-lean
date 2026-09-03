@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.IndExtension
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.CoreConsequences
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.TwoHeartEmbedding
 
 /-!
@@ -20,6 +21,8 @@ is read through the slicing.
 ## Main definitions
 
 * `Slicing.IndExtensions`: the primed half of Definition A.22.
+* `Slicing.IndExtensions.largePhase`: the semistable objects of phase `φ` of
+  the Ind-slicing `𝒫̂`, in the ambient category.
 * `Slicing.IndExtensions.MapsSemistableAisle`: assumption (v') of Corollary
   A.23 for an endofunctor `G` of the ambient category, `G 𝒫(φ) ⊆ τ̂'_φ^{≤ 0}`.
 * `Slicing.IndExtensions.ofCompactGenerators` and `ofBrown`: the two
@@ -37,6 +40,8 @@ is read through the slicing.
   `φ`.
 * `Slicing.IndExtensions.isLE_zero_of_semistable`: a semistable object lies in
   the aisle of its phase.
+* `Slicing.IndExtensions.largePhase_iff_semistable`: on `Q` the Ind-slicing's
+  phase collection is the slicing's own, so `largePhase` extends `s.P`.
 * `Slicing.IndExtensions.mapsSemistableAisle_of_coproduct`: assumption (v')
   holds for an endofunctor that sends each semistable object to a coproduct of
   copies of itself, the base-change mechanism of Theorem 2.8(1).
@@ -177,6 +182,28 @@ theorem le_zero_anti {φ ψ : ℝ} (h : φ ≤ ψ) :
   refine ⟨X, ?_, ⟨e⟩⟩
   exact ((s.phaseShift_toDualTStructure_isLE_zero_iff _ φ X).2
     (s.geProp_anti _ h X ((s.phaseShift_toDualTStructure_isLE_zero_iff _ ψ X).1 ⟨hX⟩))).le
+
+/-- The semistable objects of phase `φ` of the Ind-slicing `𝒫̂`, in the ambient category:
+the aisle of `τ̂'_φ` cut against the coaisles of `τ̂'_ψ` for every `ψ > φ`.  This is the phase
+collection Corollary A.23 recognizes the base-changed slicing against for an arbitrary field
+extension, where the direct image leaves `Q` and `s.P` is unavailable.  Theorem 2.8(1) states
+the recognition on the cuts `𝒫̂(> φ)` and `𝒫̂(≤ φ + 1)` of the unprimed family `τ_φ`; this
+file carries the primed family, of whose cuts the phase collection is the intersection.
+
+Written as `𝒫̂(≥ φ) ∩ ⋂_{ψ > φ} 𝒫̂(< ψ)` rather than `𝒫̂(≥ φ) ∩ 𝒫̂(≤ φ)` because the
+Ind-extensions supply the half-open cuts and not `𝒫̂(≤ φ)`; `largePhase_iff_semistable` shows
+the two agree on `Q`. -/
+def largePhase (φ : ℝ) : ObjectProperty D :=
+  fun Y => (ind.tStructure φ).IsLE Y 0 ∧ ∀ ψ, φ < ψ → (ind.tStructure ψ).IsGE Y 1
+
+/-- On `Q` the Ind-slicing's phase collection is the slicing's own, so `largePhase` extends
+`s.P` rather than competing with it.  Both halves are Lemma A.14(iii) read through the phase
+dictionary, and the reassembly is `Slicing.semistable_iff_geProp_ltProp`. -/
+theorem largePhase_iff_semistable (φ : ℝ) (X : Q.FullSubcategory) :
+    ind.largePhase φ X.obj ↔ s.P φ X := by
+  rw [s.semistable_iff_geProp_ltProp _ φ X]
+  exact and_congr (ind.isLE_zero_iff_geProp φ X)
+    (forall_congr' fun ψ => imp_congr_right fun _ => ind.isGE_one_iff_ltProp ψ X)
 
 /-- Assumption (v') of Corollary A.23 of arXiv:2607.28411v1 for an
 endofunctor `G` of the ambient category: `G` sends every semistable object of
