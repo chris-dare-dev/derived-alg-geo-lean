@@ -35,6 +35,11 @@ is read through the slicing.
   to `Q` is bounded.
 * `Slicing.IndExtensions.le_zero_anti`: the aisles `τ̂'_φ^{≤ 0}` decrease in
   `φ`.
+* `Slicing.IndExtensions.isLE_zero_of_semistable`: a semistable object lies in
+  the aisle of its phase.
+* `Slicing.IndExtensions.mapsSemistableAisle_of_coproduct`: assumption (v')
+  holds for an endofunctor that sends each semistable object to a coproduct of
+  copies of itself, the base-change mechanism of Theorem 2.8(1).
 
 ## Implementation notes
 
@@ -52,7 +57,7 @@ this file.
 
 ## References
 
-* arXiv:2607.28411v1, Lemma A.14 and Definition A.22.
+* arXiv:2607.28411v1, Lemma A.14, Definition A.22, Theorem 2.8, and Corollary A.23.
 -/
 
 noncomputable section
@@ -139,6 +144,12 @@ theorem isLE_zero_iff_geProp (φ : ℝ) (X : Q.FullSubcategory) :
   ((ind.indExtensionData φ).isLE_iff X 0).trans
     (s.phaseShift_toDualTStructure_isLE_zero_iff _ φ X)
 
+/-- A semistable object of phase `φ` lies in the aisle `τ̂'_φ^{≤ 0} = 𝒫̂(≥ φ)`: it lies in
+`𝒫(≥ φ)`, and Lemma A.14(iii) reads the large aisle on `Q` as the small one. -/
+theorem isLE_zero_of_semistable (φ : ℝ) (E : Q.FullSubcategory) (hE : s.P φ E) :
+    (ind.tStructure φ).IsLE E.obj 0 :=
+  (ind.isLE_zero_iff_geProp φ E).2 (geProp_of_semistable _ s hE)
+
 /-- The same at degree one.  Degree one and not zero because
 `τ'_φ = (𝒫(≥ φ), 𝒫(< φ + 1))`: its degree-zero coaisle is `𝒫(< φ + 1)`, and
 one shift lands on the cut `𝒫(< φ)` that (A.8) uses. -/
@@ -175,6 +186,25 @@ objects, as the paper states it; `Slicing.IndExtensions.monad_isLE_zero_of_gePro
 extends it to `𝒫(≥ φ)`. -/
 def MapsSemistableAisle (G : D ⥤ D) : Prop :=
   ∀ (φ : ℝ) (E : Q.FullSubcategory), s.P φ E → (ind.tStructure φ).IsLE (G.obj E.obj) 0
+
+/-- Assumption (v') holds for any endofunctor that sends each semistable object to a small
+coproduct of copies of itself, because the aisle `τ̂'_φ^{≤ 0} = Coprod(𝒫(≥ φ))` is closed under
+coproducts and contains the semistable objects of phase `φ`.  This is the mechanism of base
+change along a field extension `k ⊂ ℓ` in Theorem 2.8(1) of arXiv:2607.28411v1: the monad
+`π_* π^*` of `π : X_ℓ → X` sends `E` to `E ⊗_k ℓ`, a coproduct of copies of `E` indexed by a
+`k`-basis of `ℓ`, so (v') costs nothing there; the coproduct is infinite exactly when `ℓ/k`
+is, which is why the Ind-extension in `Dqc` is needed at all. -/
+theorem mapsSemistableAisle_of_coproduct (G : D ⥤ D)
+    (h : ∀ (φ : ℝ) (E : Q.FullSubcategory), s.P φ E →
+      ∃ (ι : Type w) (f : ι → (E.obj ⟶ G.obj E.obj)),
+        Nonempty (IsColimit (Cofan.mk (G.obj E.obj) f))) :
+    ind.MapsSemistableAisle G := by
+  intro φ E hE
+  obtain ⟨ι, f, ⟨hc⟩⟩ := h φ E hE
+  refine ⟨?_⟩
+  have hgen := (ind.isLE_zero_of_semistable φ E hE).le
+  rw [(ind.indExtensionData φ).largeAisle] at hgen ⊢
+  exact ObjectProperty.coprodClosure.of_coproduct (Cofan.mk (G.obj E.obj) f) hc fun _ => hgen
 
 end Slicing.IndExtensions
 

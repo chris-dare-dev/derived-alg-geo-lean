@@ -35,6 +35,10 @@ them; the Definition A.22 input is `Slicing.IndExtensions`.
   bounded predicate `Slicing.MapsSemistableGE` of the monad restricted to
   `Q`, which `Slicing.MapsSemistableGE.of_mapsSemistableLE` produces from
   condition (3.2) of Proposition 3.8.
+* `Slicing.IndExtensions.preimageData_of_coproduct`: Corollary A.23 when the
+  monad is a coproduct of identities, the categorical shape of Theorem 2.8(1)
+  on `F⁻¹ Q`; for infinite `ℓ/k` the paper's slicing on `Dᵇ(X_ℓ)` needs a
+  source subcategory other than `F⁻¹ Q` (see the docstring).
 * `Slicing.IndExtensions.preimageData_of_mapsSemistableLE`: **Proposition
   3.8**, categorically: condition (3.2) on the restricted comonad, through the
   adjunctions restricted to `Q` and `F⁻¹ Q`, gives the preimage slicing.
@@ -77,7 +81,7 @@ flatness, are the remaining inputs of Proposition 3.8;
 
 ## References
 
-* arXiv:2607.28411v1, Definition A.22, Corollary A.23, and the proof of
+* arXiv:2607.28411v1, Theorem 2.8, Definition A.22, Corollary A.23, and the proof of
   Proposition 3.8.
 -/
 
@@ -224,6 +228,28 @@ theorem preimageData [IsTriangulated C] (adj : L ⊣ F) (hF : F.PreservesSmallCo
     (hv : ind.MapsSemistableAisle (L ⋙ F)) :
     s.PreimageData (ObjectProperty.inverseImageLift F Q) :=
   (ind.nonempty_inducedTStructures adj hF hsrc hzero hv).elim fun h => h.preimageData
+
+/-- **Corollary A.23 for a monad that is a coproduct of identities**: when `F L` sends each
+semistable object to a small coproduct of copies of itself, assumption (v') is automatic
+(`Slicing.IndExtensions.mapsSemistableAisle_of_coproduct`) and the preimage collection (A.7)
+is a slicing on `F⁻¹ Q`.  The motivating monad is `π_* π^* = - ⊗_k ℓ` for the base change
+`π : X_ℓ → X` along a field extension `k ⊂ ℓ`, with `F = π_*`, `L = π^*`, `Q = Dᵇ(Coh X)`.
+This is not yet Theorem 2.8(1) of arXiv:2607.28411v1.  For finite `ℓ/k` the output lives on
+`F⁻¹ Q = Dᵇ(Coh X_ℓ)` and the coproduct is finite; for infinite `ℓ/k` no nonzero coherent
+object of `X_ℓ` has coherent direct image, so `F⁻¹ Q` meets `Dᵇ(Coh X_ℓ)` only in zero, and
+the paper's slicing on `Dᵇ(X_ℓ)` needs Corollary A.23 with the source subcategory chosen
+independently of `F`, which `Polishchuk.induce` (built-in `P = F⁻¹ Q`) does not yet allow. -/
+theorem preimageData_of_coproduct [IsTriangulated C] (adj : L ⊣ F)
+    (hF : F.PreservesSmallCoproducts.{w})
+    (hsrc : ∀ φ : ℝ, ∃ (G : ObjectProperty D) (tC : TStructure C),
+      (ind.tStructure φ).IsCompactlyGeneratedBy.{w} G ∧
+        tC.IsCompactlyGeneratedBy.{w} (G.map L))
+    (hzero : ∀ E : C, Q (F.obj E) → IsZero (F.obj E) → IsZero E)
+    (h : ∀ (φ : ℝ) (E : Q.FullSubcategory), s.P φ E →
+      ∃ (ι : Type w) (f : ι → (E.obj ⟶ F.obj (L.obj E.obj))),
+        Nonempty (IsColimit (Cofan.mk (F.obj (L.obj E.obj)) f))) :
+    s.PreimageData (ObjectProperty.inverseImageLift F Q) :=
+  ind.preimageData adj hF hsrc hzero (ind.mapsSemistableAisle_of_coproduct (L ⋙ F) h)
 
 /-- **Proposition 3.8 of arXiv:2607.28411v1, the slicing half at `S = Spec ℤ`.**
 Let `F` have
