@@ -84,6 +84,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.preimage_id
 #print axioms CategoryTheory.Triangulated.Slicing.preimage_comp
 #print axioms CategoryTheory.Triangulated.Slicing.preimage_iso
+#print axioms CategoryTheory.Triangulated.Slicing.preimage_square
 #print axioms CategoryTheory.Triangulated.Slicing.PreimageData.ofFaithful
 #print axioms CategoryTheory.Triangulated.Slicing.PreimageData.phaseShift
 #print axioms CategoryTheory.Triangulated.Slicing.pullback

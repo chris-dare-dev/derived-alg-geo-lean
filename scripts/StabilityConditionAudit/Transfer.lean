@@ -96,6 +96,8 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.tStructure_isBounded
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.le_zero_anti
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.MapsSemistableAisle
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isLE_zero_of_semistable
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.mapsSemistableAisle_of_coproduct
 
 /-! ## Corollary A.23: the joint between Theorem A.17 and the phase truncation -/
 
@@ -104,4 +106,5 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.monad_isRightTExact
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.nonempty_inducedTStructures
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_coproduct
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_mapsSemistableLE
