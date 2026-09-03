@@ -52,6 +52,42 @@ with:
 python scripts/check_coverage_map.py registry/coverage-2607.28411.json
 ```
 
+## The 1607.01262v3 coverage map — the exposition, named at last
+
+`coverage-1607.01262.json` pins arXiv:1607.01262**v3** ("Lectures on Bridgeland
+Stability", Macrì–Schmidt, v3 of 2019-10-30). Every part and every near-term
+coordinate is `target`, and none has ever held another status.
+
+It exists because the manuscript was cited **nowhere in the tree** while
+`Walls/Numerical/Basic.lean` proved the conic normal form for tilt walls in the
+`(s, t)` half plane — the subject of its §6.4, in `(α, β)` coordinates — and
+`Walls/Numerical/Discriminant.lean` then removed that theorem's excluded point.
+An untracked resemblance is the thing this directory exists to prevent, so the
+coordinate is now named. Naming it asserts **no** correspondence between any
+declaration and any statement of the source; that is status `mapped`, it needs
+the evidence fields the validator demands, and no such review has happened.
+
+Two cautions are recorded in the map itself and are worth repeating:
+
+- **A lecture note is a weak artifact to map a formalization against.** Where it
+  restates a theorem, the primary paper is what a future binding must be checked
+  against — Arcara–Bertram and Bridgeland `math/0307164` §6 for the surface
+  construction, Bayer–Macrì–Toda for the threefold material, Maciocia for the
+  nested-wall ordering. This is the same caution `coverage-2407.05946.json`
+  carries, for the same reason.
+- **The journal reference is not interchangeable with the pin.** The Springer
+  *Moduli of Curves* volume (2017) corresponds to v2; v3 postdates it by two
+  years.
+
+Section titles were read with `pdftotext -layout` from the pinned v3 PDF, not
+from ar5iv or arXiv HTML — §6.3's full title is "Sketch of the proof of Theorem
+6.10 and Theorem 6.13", and an HTML extraction that truncates it to "Sketch of
+the proof" is wrong. Validate with:
+
+```sh
+python scripts/check_coverage_map.py registry/coverage-1607.01262.json
+```
+
 ## The five dg-enhancement coverage maps — zero-claim skeletons
 
 `.claude/roadmap/dg-enhancements.yaml` reads five Canonaco–Stellari-school

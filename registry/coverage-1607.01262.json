@@ -1,0 +1,152 @@
+{
+  "_readme": [
+    "Coverage map for arXiv:1607.01262v3 -- 'Lectures on Bridgeland Stability', Emanuele Macri and Benjamin Schmidt.",
+    "",
+    "THIS IS NOT A TRUST RECORD AND NOT A MINT SURFACE. It is a zero-claim map of the manuscript's structure onto statuses. formalization.yaml's `source` remains the Bridgeland 2007 record, and registry/bridgeland2007.json remains the only mint surface; nothing in this file changes either, and nothing in this file may be cited as theorem coverage. The only status that ever counts as coverage is 'formalized'. Every entry here is 'target'.",
+    "",
+    "WHY THIS MAP EXISTS, AND WHAT IT DOES NOT ASSERT. The repository already proves, in DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Numerical/{Basic,Discriminant}.lean, that every numerical wall in the (s, t) half plane is cut out by a conic with no s*t term and centre on the s-axis, and that the walls of a class of nonnegative Bogomolov discriminant are pairwise disjoint. That is the subject matter of section 6.4 of this manuscript. Before this file the manuscript was cited nowhere in the tree, so the resemblance was untracked. Recording it as 'target' names the coordinate WITHOUT claiming the declarations are counterparts of its statements: that claim is 'mapped', it requires the evidence fields the validator demands, and no such review has been performed.",
+    "",
+    "A LECTURE NOTE IS A WEAK THING TO MAP A FORMALIZATION AGAINST. It is an exposition with proofs deferred to its sources, and where it restates a theorem the primary paper is the artifact any future binding must be checked against -- for the surface construction that is Bridgeland's math/0307164 and Arcara-Bertram, and for the threefold material Bayer-Macri-Toda. Use this map to locate a statement and to name a coordinate; do not use it as the artifact a quote is verified against. The same caution the five dg-enhancement maps record for arXiv:2407.05946 applies here and for the same reason.",
+    "",
+    "Validation: python scripts/check_coverage_map.py registry/coverage-1607.01262.json",
+    "Run it before and after every edit. It fails on any status outside the vocabulary, any non-target status without complete evidence, and any corpus-derived identifier key.",
+    "",
+    "Update ownership: the owner (Chris Dare) promotes statuses; agents may propose a promotion only by a landing PR carrying the evidence fields the validator demands, and 'formalized' additionally requires explicit owner acceptance recorded in the entry. Adding sections, fixing titles against the pinned PDF, and adding tracking links are ordinary edits; status promotion is not.",
+    "",
+    "Quotes: none are minted here. When a quote is later needed it must be checked directly against the v3 artifact identified in `source`, never against an unversioned corpus extraction."
+  ],
+  "schema": "coverage-map/1",
+  "created": "2026-09-03",
+  "source": {
+    "title": "Lectures on Bridgeland Stability",
+    "authors": [
+      "Emanuele Macri",
+      "Benjamin Schmidt"
+    ],
+    "author_note": "The title page spells the first author 'Macri' with a grave accent on the i. It is transliterated here because this file is compared byte-for-byte by scripts/check_coverage_map.py and the PDF stays authoritative for typography.",
+    "arxiv_id": "1607.01262",
+    "arxiv_version": "v3",
+    "version_submitted_utc": "2019-10-30T10:44:35Z",
+    "version_history": [
+      { "version": "v1", "submitted_utc": "2016-07-05T14:24:18Z", "source_size": "65 KB" },
+      { "version": "v2", "submitted_utc": "2017-03-27T15:17:18Z", "source_size": "66 KB" },
+      { "version": "v3", "submitted_utc": "2019-10-30T10:44:35Z", "source_size": "66 KB" }
+    ],
+    "latest_version_at_pin_time": "v3",
+    "doi": "10.48550/arXiv.1607.01262",
+    "journal_ref": "Moduli of curves, 139-211, Lect. Notes Unione Mat. Ital., 21, Springer, Cham, 2017",
+    "journal_ref_caveat": "The journal reference is to the 2017 Springer volume, which corresponds to v2. v3 postdates it by two years. Where the two differ the pinned v3 is what this map describes, and the published volume is NOT interchangeable with it.",
+    "primary_category": "math.AG",
+    "pinned_from": "https://arxiv.org/abs/1607.01262 (submission history and metadata) and https://arxiv.org/pdf/1607.01262v3 (section titles), fetched 2026-09-03.",
+    "pdf_sha256": "a44058db37cf60c6399b279dbe09b2607033f7e67db0cc8a1a0144aba5727dae",
+    "pdf_bytes": 695407,
+    "pdf_pages": 59,
+    "pdf_pin_caveat": "The hash pins the artifact as served on 2026-09-03. arXiv PDFs may be re-rendered without a content change; the durable identity is (arxiv_id, v3, version_submitted_utc, doi).",
+    "section_titles_read_from": "pdftotext -layout on the pinned v3 PDF, table of contents, not from ar5iv or arXiv HTML. Section 6.3's full title is 'Sketch of the proof of Theorem 6.10 and Theorem 6.13'; an HTML extraction that truncates it to 'Sketch of the proof' is wrong."
+  },
+  "corpus_note": {
+    "arxiv_version_in_corpus": "not used as evidence by this map",
+    "mint_rule": "No durable key in this repository may be derived from a chunk ID or notebook slug. This file contains neither."
+  },
+  "status_vocabulary": {
+    "target": "Named for future work. No claim of any kind.",
+    "mapped": "Specific Lean declarations are candidate counterparts of a specific v3 statement. Still no coverage claim; complete evidence is required.",
+    "reviewed": "A candidate binding has been reviewed against the pinned v3 artifact. Complete evidence is required.",
+    "formalized": "Reviewed and explicitly accepted by the owner. The only status that counts as coverage."
+  },
+  "parts": [
+    {
+      "part": "front",
+      "title": "Front matter",
+      "status": "target",
+      "note": "This manuscript declares no Parts. The front/body split below is an editorial grouping this repository invented so the schema's per-part status has something to hang on. Do not read 'body' as a claim about the source's structure.",
+      "sections": [
+        { "n": 1, "title": "Introduction" }
+      ]
+    },
+    {
+      "part": "body",
+      "title": "Lectures",
+      "status": "target",
+      "note": "Editorial grouping; see parts[0].note.",
+      "sections": [
+        { "n": 2, "title": "Stability on Curves",
+          "subsections": [
+            { "n": "2.1", "title": "The projective line" },
+            { "n": "2.2", "title": "Stability" },
+            { "n": "2.3", "title": "Moduli spaces" },
+            { "n": "2.4", "title": "Equivalent definitions for curves" },
+            { "n": "2.5", "title": "Applications and examples" }
+          ] },
+        { "n": 3, "title": "Generalizations to Higher Dimensions" },
+        { "n": 4, "title": "Stability in Abelian Categories" },
+        { "n": 5, "title": "Bridgeland Stability",
+          "subsections": [
+            { "n": "5.1", "title": "Heart of a bounded t-structure and slicing" },
+            { "n": "5.2", "title": "Bridgeland stability conditions: definition" },
+            { "n": "5.3", "title": "Bridgeland's deformation theorem" },
+            { "n": "5.4", "title": "Moduli spaces" },
+            { "n": "5.5", "title": "Wall and chamber structure" }
+          ] },
+        { "n": 6, "title": "Stability Conditions on Surfaces",
+          "subsections": [
+            { "n": "6.1", "title": "Tilting of t-structures" },
+            { "n": "6.2", "title": "Construction of Bridgeland stability conditions on surfaces" },
+            { "n": "6.3", "title": "Sketch of the proof of Theorem 6.10 and Theorem 6.13" },
+            { "n": "6.4", "title": "The wall and chamber structure in the (alpha, beta)-plane" },
+            { "n": "6.5", "title": "Examples of semistable objects" },
+            { "n": "6.6", "title": "Moduli spaces" }
+          ] },
+        { "n": 7, "title": "Applications and Examples",
+          "subsections": [
+            { "n": "7.1", "title": "The largest wall for Hilbert schemes" },
+            { "n": "7.2", "title": "Kodaira vanishing" },
+            { "n": "7.3", "title": "Stability of special objects" }
+          ] },
+        { "n": 8, "title": "Nef Divisors on Moduli Spaces of Bridgeland Stable Objects",
+          "subsections": [
+            { "n": "8.1", "title": "The Donaldson morphism" },
+            { "n": "8.2", "title": "Applications to Hilbert schemes of points" }
+          ] },
+        { "n": 9, "title": "Stability Conditions on Threefolds",
+          "subsections": [
+            { "n": "9.1", "title": "Tilt stability and the second tilt" },
+            { "n": "9.2", "title": "Castelnuovo's genus bound" }
+          ] },
+        { "n": "A", "title": "Appendix A. Background on Derived Categories" }
+      ]
+    }
+  ],
+  "near_term_coordinates": [
+    {
+      "id": "ms-6.4-wall-chamber-plane",
+      "coordinate": "Section 6.4, The wall and chamber structure in the (alpha, beta)-plane",
+      "status": "target",
+      "note": "The nearest coordinate to anything the tree already contains. Walls/Numerical/Basic.lean proves the conic normal form and the disjointness of distinct walls of a fixed class; Walls/Numerical/Discriminant.lean supplies the Bogomolov discriminant that removes Basic's excluded point. Both are statements about triples of reals with no surface anywhere, so even a completed reading of this section would bind only its arithmetic content. Naming candidate declarations here would be status 'mapped' and is deliberately not done."
+    },
+    {
+      "id": "ms-6.4-nested-walls",
+      "coordinate": "Section 6.4, nested wall structure (Maciocia's theorem as presented here)",
+      "status": "target",
+      "note": "The ordering half of the nested-wall theorem, tracked in this repository as issue #912. Basic.lean proves separation only and says so at wall_eq_of_meet."
+    },
+    {
+      "id": "ms-6.1-tilting",
+      "coordinate": "Section 6.1, Tilting of t-structures",
+      "status": "target",
+      "note": "The Happel-Reiten-Smalo tilt. The repository owns a tilt under StabilityCondition/Weak/Tilting/, bound to no source; see the Tilting paragraphs of formalization.yaml's known_divergences."
+    },
+    {
+      "id": "ms-6.2-surface-construction",
+      "coordinate": "Section 6.2, Construction of Bridgeland stability conditions on surfaces",
+      "status": "target",
+      "note": "The exposition of the Arcara-Bertram / Bridgeland surface construction. For a K3 the primary artifact is math/0307164 section 6, which this repository tracks separately and which is the artifact any future binding must be checked against -- not this section."
+    },
+    {
+      "id": "ms-9.1-second-tilt",
+      "coordinate": "Section 9.1, Tilt stability and the second tilt",
+      "status": "target",
+      "note": "The threefold BMT setting. Tracked in this repository as issue #916. Nothing in the tree reaches it."
+    }
+  ]
+}
