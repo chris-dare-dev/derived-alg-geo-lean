@@ -55,6 +55,15 @@ brief: |
   and adjunction roots. Constructing the divisor triangles and functorial
   cones of kernels remains explicit data pending the dg chain #855, #853, and
   #854.
+
+  The fifth milestone, tracked by #1041, performs the formal closing steps
+  after those interfaces. Residual classification now determines the block
+  reindexing; bidirectional prefix extension proves exact matched lengths;
+  adjacent Ext rigidity proves one common shift per block; and dependent
+  finite kernel extension plus right-admissible generation produces the
+  ambient Fourier--Mukai equivalence. The construction of each new kernel is
+  still the named dg seam, rather than a fabricated cone in a bare
+  triangulated category.
 goal:
   hmw: "How might we state and eventually prove the refined derived Torelli theorem for Enriques surfaces on top of the repository's single derived-category construction, without a second exceptionality hierarchy, a premature Kuznetsov-component equivalence, or geometry leaking into the categorical root?"
   objective: "Define Enriques surfaces and their semi-canonical ten-bundle configurations, assemble their residual category, and build the honest categorical interfaces needed to state the papers' Serre, spherical, and pseudoprojective classification results without fabricating their geometric proofs."
@@ -103,6 +112,8 @@ generations:
   - { rev: 7, at: "2026-09-02", note: "ENQ3 milestone #45 and issue #1031 registered for one PR. The generic lane owns positive orthogonal exceptional blocks, their decomposition type and residual, chosen right-adjoint projections, and projection-bound Serre classification constructors. The Enriques adapter identifies the block members with the ten selected bundles and restates both papers' classification consequences for the actual projected objects. Projection existence, mutation triangles, (-2)-curve geometry, candidate Ext computations, and equivalence transport remain explicit seams." }
   - { rev: 8, at: "2026-09-02", note: "PR #1032 passed the full Windows build, all three axiom audits, declaration completeness, environment linters, architecture gates, the no-sorry check, contracts, and emitter reproducibility in run 33682535182. #1031 and milestone #45 are closed completed. The same-projection theorem for every member of a longer Paper II block remains deferred because it needs the geometric curve-chain/mutation triangles, not merely abstract block orthogonality." }
   - { rev: 9, at: "2026-09-02", note: "ENQ4 milestone #46 and issue #1035 registered for one PR. The generic lane constructs objectwise counit mutation triangles and proves same projection by iterating successive triangles with orthogonal cones; separates Ext profiles from Serre shifts and transports the special-object predicates bidirectionally; and packages one-step and blockwise Fourier--Mukai extension conclusions with the ambient equivalence derived from adjunction data. The Enriques adapter records numerical (-2)-chains, prefix-divisor bundle classes, geometric projection existence, and the two papers' Ext-to-classification constructors. Functorial kernel cones and the divisor-sequence-to-derived-triangle bridge remain supplied pending #855/#853/#854." }
+  - { rev: 10, at: "2026-09-02", note: "PR #1037 merged ENQ4 after full Windows verification passed in run 33691711939. Issue #1035 and milestone #46 are closed. The landed one-step/blockwise structures deliberately state the geometric/dg extension output; the next milestone derives the classification matching, exact length/common-shift consequences, and finite ambient extension instead of storing those conclusions again." }
+  - { rev: 11, at: "2026-09-02", note: "ENQ5 milestone #47, issue #1041, and PR #1042 registered for three linked lanes: canonical block matching from residual classification; exact lengths from bidirectional prefix extension and common shifts from adjacent k ⊕ k[-1] Ext profiles; and dependent one-object kernel induction whose final ambient generation follows from right admissibility and exceptional-part coverage. Each enlarged-stage equivalence is constructed from full faithfulness and essential surjectivity. The dg construction of each extended kernel remains explicit pending #855/#853/#854." }
 items:
   - id: enriques-torelli-m1
     gh_milestone: 43
@@ -261,7 +272,7 @@ items:
     gh_milestone: 46
     kind: milestone
     title: "ENQ4 — Mutation and Fourier--Mukai extension"
-    status: in_progress
+    status: done
     lane: now
     acceptance:
       - "Right admissibility chooses a projection whose counit has an objectwise mutation triangle with orthogonal cone."
@@ -281,6 +292,33 @@ items:
     status: done
     priority: must
     size: L
-    summary: "One PR implements the objectwise mutation and projection-chain theorems, the Enriques (-2)-chain and Ext-computation adapters, bidirectional Serre-compatible transport, and precise one-step/blockwise Fourier--Mukai extension result data. Kernel cones and geometric divisor triangles remain named supplied seams until the dg chain lands."
+    summary: "PR #1037 implements the objectwise mutation and projection-chain theorems, the Enriques (-2)-chain and Ext-computation adapters, bidirectional Serre-compatible transport, and precise one-step/blockwise Fourier--Mukai extension result data. Full Windows verification passed in run 33691711939. Kernel cones and geometric divisor triangles remain named supplied seams until the dg chain lands."
     tags: [enriques, mutation, fourier-mukai, exceptional-blocks, serre-functor]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-m5
+    gh_milestone: 47
+    kind: milestone
+    title: "ENQ5 — Classification matching and extension induction"
+    status: in_progress
+    lane: now
+    acceptance:
+      - "A residual Serre-compatible equivalence and the spherical/pseudoprojective classifications derive a unique equivalence of block-index types."
+      - "Bidirectional ordered prefix extension derives exact matched block lengths, and adjacent k ⊕ k[-1] Ext profiles derive one common shift per block."
+      - "Each one-step enlarged equivalence follows from full faithfulness and essential surjectivity of the restricted extended transform."
+      - "Dependent finite extension retains the final kernel and restriction isomorphism, while admissibility and exceptional-part coverage prove both final spans are ambient."
+      - "The Enriques adapter exposes the Paper I Theorem 5.1 / Paper II Theorem 3.3 ambient Fourier--Mukai conclusion without asserting reconstruction of the surfaces."
+      - "Zero sorries; relevant gates and Windows verification are green."
+
+  - id: enriques-torelli-e11
+    gh_issue: 1041
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m5
+    title: "Classification matching, shift rigidity, and finite ambient extension for Enriques blocks"
+    status: in_progress
+    priority: must
+    size: L
+    summary: "PR #1042 derives block matching from residual classification, exact length from two ordered prefix extensions, common shifts from adjacent Ext profiles, and the ambient Fourier--Mukai equivalence from a dependent finite extension sequence plus right-admissible generation. Kernel construction remains the explicit dg seam."
+    tags: [enriques, classification, exceptional-blocks, fourier-mukai, serre-functor]
     labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]

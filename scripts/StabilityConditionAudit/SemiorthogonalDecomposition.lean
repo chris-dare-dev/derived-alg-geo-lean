@@ -140,6 +140,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ResidualCategory
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.obj_mem_blockSpan
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.obj_mem_total
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.total_le_of_forall_obj
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.length_eq_one_or_two_le
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.hom_eq_zero_of_ne
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.obj_hom_shift_eq_zero_of_ne
@@ -157,6 +158,37 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.decompositionType_card
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.decompositionType_sum
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.card_le_totalLength
+
+-- The adjacent k ⊕ k[-1] profile forces one common shift along a block.
+-- Bidirectional prefix extension separately derives exact block length.
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.zero_one
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.one_one
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.other_zero
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.shifts_eq_of_finrank_eq
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.shifts_eq
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData.profile
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.targetIndex
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.targetIndex_val
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.mk.inj
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.embedding
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.length_le
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.forward
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.backward
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.mk.inj
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.length_eq
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.targetIndex_eq_cast
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.shift
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.objectIso
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.mk.inj
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.shift_eq_first
 
 -- Chosen right adjoints supply concrete projection objects and the universal
 -- Hom property without pretending that functorial cones exist in a bare

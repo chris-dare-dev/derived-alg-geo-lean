@@ -71,6 +71,11 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.no_exceptional_of_serre_iso_shift
 
 #print axioms CategoryTheory.SerreFunctor.IsShiftOf
+#print axioms CategoryTheory.SerreFunctor.IsShiftOf.refl
+#print axioms CategoryTheory.SerreFunctor.IsShiftOf.symm
+#print axioms CategoryTheory.SerreFunctor.IsShiftOf.trans
+#print axioms CategoryTheory.SerreFunctor.IsShiftOf.of_iso_left
+#print axioms CategoryTheory.SerreFunctor.IsShiftOf.of_iso_right
 #print axioms CategoryTheory.SerreFunctor.IsGradedOrthogonal
 #print axioms CategoryTheory.SerreFunctor.not_isShiftOf_of_isGradedOrthogonal
 #print axioms CategoryTheory.SerreFunctor.SphericalClassificationData
@@ -98,6 +103,27 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.MixedClassificationData.pseudoprojective_candidate_not_isShiftOf
 #print axioms CategoryTheory.SerreFunctor.MixedClassificationData.spherical_iff
 #print axioms CategoryTheory.SerreFunctor.MixedClassificationData.pseudoprojective_iff
+
+-- Completeness and separation make the candidate matching across a
+-- Serre-compatible equivalence canonical.  The inverse classification proves
+-- bijectivity; the mixed version also preserves singleton/longer block kind.
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.matchIndex
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.matchIndex_spec
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.matchIndex_injective
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.reverse_matchIndex_injective
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.matchingEquiv
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.matchingEquiv_apply
+#print axioms CategoryTheory.SerreFunctor.SphericalClassificationData.matchingEquiv_spec
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchIndex
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchIndex_length_eq_one
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchIndex_length_two_le
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchIndex_spec
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchIndex_injective
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchingEquiv
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchingEquiv_apply
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchingEquiv_length_eq_one_iff
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchingEquiv_length_two_le_iff
+#print axioms CategoryTheory.SerreFunctor.MixedClassificationData.matchingEquiv_spec
 
 -- Classification constructors whose candidates are the actual right
 -- projections of first objects of orthogonal exceptional blocks.

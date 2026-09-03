@@ -9,6 +9,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.Residual
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperObjects
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperBlocks
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperExtension
+import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperMatching
+import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperTorelli
 
 /-!
 # Enriques surfaces

@@ -102,12 +102,15 @@ full-subcategory inclusion are structures on abstract (pre)triangulated
 categories, so their canonical owner is
 `CategoryTheory/Triangulated/SemiorthogonalDecomposition/`.  Constructors
 for objectwise mutation triangles and the same-projection theorem also live
-there; neither requires scheme vocabulary.  Ext profiles and transport of
-spherical and pseudoprojective objects live beside the generic Serre API, and
-kernel-presented extension across exceptional blocks lives beside the generic
-Fourier--Mukai API.  Only the comparison with an Enriques surface's ten line
-bundles, its already-defined residual property, the numerical `(-2)`-curve
-chains, and the paper-specific degree-three conclusions belong under
+there; neither requires scheme vocabulary.  Ext profiles, transport of
+spherical and pseudoprojective objects, and classification-induced matching
+live beside the generic Serre API.  Adjacent Ext shift rigidity and ordered
+block-length comparison belong with the semiorthogonal root.  One-step and
+dependent finite kernel extension, including generation from right
+admissibility, live beside the generic Fourier--Mukai API.  Only the comparison
+with an Enriques surface's ten line bundles, its already-defined residual
+property, the numerical `(-2)`-curve chains, and the paper-specific
+degree-three and ambient-equivalence conclusions belong under
 `AlgebraicGeometry/Surface/Enriques/`; the dependency runs from that consumer
 to the categorical roots.
 

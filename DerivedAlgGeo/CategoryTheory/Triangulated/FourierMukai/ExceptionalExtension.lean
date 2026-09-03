@@ -178,6 +178,103 @@ structure OneStepExtensionData
   annihilates : ∀ A : X, (adjoinObject P E).leftOrthogonal A →
     IsZero ((corr.transform newKernel).obj A)
 
+/-- The restriction of a kernel transform to a one-object enlargement,
+provided the transform maps that enlargement to the target enlargement. -/
+noncomputable def restrictedTransform
+    (P : ObjectProperty X) (Q : ObjectProperty Y) (E : X) (F : Y)
+    (corr : Correspondence X Y W) (kernel : W)
+    (mapsAdjoin : ∀ A : (adjoinObject P E).FullSubcategory,
+      adjoinObject Q F ((corr.transform kernel).obj A.obj)) :
+    Functor (adjoinObject P E).FullSubcategory
+      (adjoinObject Q F).FullSubcategory :=
+  (adjoinObject Q F).lift
+    ((adjoinObject P E).ι ⋙ corr.transform kernel) mapsAdjoin
+
+/-- A one-step extension criterion in the form proved in the papers.
+
+The enlarged equivalence is not a field: it follows from full faithfulness
+and essential surjectivity of the restricted extended transform.  This is the
+categorical implication in the final part of the one-object extension
+argument, separated from the geometric/dg construction of `newKernel`. -/
+structure OneStepExtensionCriterion
+    (P : ObjectProperty X) (Q : ObjectProperty Y) (E : X) (F : Y)
+    (base : P.FullSubcategory ≌ Q.FullSubcategory)
+    (corr : Correspondence X Y W) (oldKernel : W) where
+  /-- The extended Fourier--Mukai kernel. -/
+  newKernel : W
+  /-- The kernel morphism from the extension to the preceding kernel. -/
+  kernelMap : newKernel ⟶ oldKernel
+  /-- The extended transform agrees with the old one on the old component. -/
+  agreesWithOld :
+    P.ι ⋙ corr.transform newKernel ≅ P.ι ⋙ corr.transform oldKernel
+  /-- The extended transform commutes with shifts. -/
+  transformCommShift : (corr.transform newKernel).CommShift ℤ
+  /-- The extended transform is exact. -/
+  transformTriangulated : (corr.transform newKernel).IsTriangulated
+  /-- The extended transform preserves the enlarged spans. -/
+  mapsAdjoin : ∀ A : (adjoinObject P E).FullSubcategory,
+    adjoinObject Q F ((corr.transform newKernel).obj A.obj)
+  /-- The restricted transform is fully faithful. -/
+  restrictedFullyFaithful :
+    (restrictedTransform P Q E F corr newKernel mapsAdjoin).FullyFaithful
+  /-- The restricted transform is essentially surjective. -/
+  restrictedEssSurj :
+    (restrictedTransform P Q E F corr newKernel mapsAdjoin).EssSurj
+  /-- On the old component the new transform induces the old equivalence. -/
+  agreesOnBase :
+    P.ι ⋙ corr.transform newKernel ≅ base.functor ⋙ Q.ι
+  /-- The newly adjoined object maps to its target. -/
+  objectIso : (corr.transform newKernel).obj E ≅ F
+  /-- The remaining left orthogonal is annihilated. -/
+  annihilates : ∀ A : X, (adjoinObject P E).leftOrthogonal A →
+    IsZero ((corr.transform newKernel).obj A)
+
+namespace OneStepExtensionCriterion
+
+variable {P : ObjectProperty X} {Q : ObjectProperty Y} {E : X} {F : Y}
+  {base : P.FullSubcategory ≌ Q.FullSubcategory}
+  {corr : Correspondence X Y W} {oldKernel : W}
+  (A : OneStepExtensionCriterion P Q E F base corr oldKernel)
+
+/-- The equivalence of enlarged spans derived from full faithfulness and
+essential surjectivity of the restricted transform. -/
+noncomputable def enlargedEquiv :
+    (adjoinObject P E).FullSubcategory ≌
+      (adjoinObject Q F).FullSubcategory := by
+  let G := restrictedTransform P Q E F corr A.newKernel A.mapsAdjoin
+  letI : G.Full := A.restrictedFullyFaithful.full
+  letI : G.Faithful := A.restrictedFullyFaithful.faithful
+  letI : G.EssSurj := A.restrictedEssSurj
+  letI : G.IsEquivalence := {}
+  exact G.asEquivalence
+
+/-- The derived enlarged equivalence is induced by the extended kernel
+transform. -/
+noncomputable def enlargedIso :
+    (adjoinObject P E).ι ⋙ corr.transform A.newKernel ≅
+      A.enlargedEquiv.functor ⋙ (adjoinObject Q F).ι :=
+  ((adjoinObject Q F).liftCompιIso
+    ((adjoinObject P E).ι ⋙ corr.transform A.newKernel)
+    A.mapsAdjoin).symm
+
+/-- Package the criterion as the one-step result consumed by finite
+extension induction. -/
+noncomputable def toExtensionData :
+    OneStepExtensionData P Q E F base corr oldKernel where
+  newKernel := A.newKernel
+  kernelMap := A.kernelMap
+  agreesWithOld := A.agreesWithOld
+  transformCommShift := A.transformCommShift
+  transformTriangulated := A.transformTriangulated
+  mapsAdjoin := A.mapsAdjoin
+  enlargedEquiv := A.enlargedEquiv
+  enlargedIso := A.enlargedIso
+  agreesOnBase := A.agreesOnBase
+  objectIso := A.objectIso
+  annihilates := A.annihilates
+
+end OneStepExtensionCriterion
+
 namespace OneStepExtensionData
 
 variable {P : ObjectProperty X} {Q : ObjectProperty Y} {E : X} {F : Y}
@@ -189,8 +286,7 @@ variable {P : ObjectProperty X} {Q : ObjectProperty Y} {E : X} {F : Y}
 noncomputable def restrictedFunctor :
     Functor (adjoinObject P E).FullSubcategory
       (adjoinObject Q F).FullSubcategory :=
-  (adjoinObject Q F).lift
-    ((adjoinObject P E).ι ⋙ corr.transform A.newKernel) A.mapsAdjoin
+  restrictedTransform P Q E F corr A.newKernel A.mapsAdjoin
 
 /-- The supplied enlarged equivalence has the restricted transform as its
 underlying functor, up to natural isomorphism. -/
