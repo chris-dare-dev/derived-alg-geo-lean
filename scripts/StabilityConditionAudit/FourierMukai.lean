@@ -688,6 +688,15 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData
 #print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.nil
 #print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.cons
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.brecOn.eq
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.brecOn.go
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.cons.elim
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.cons.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.cons.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.ctorElim
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.ctorElimType
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.nil.elim
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.nil.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.finalStage
 #print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.finalKernel
 #print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.finalEquiv
