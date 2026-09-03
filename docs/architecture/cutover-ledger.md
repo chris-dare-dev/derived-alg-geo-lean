@@ -461,6 +461,21 @@ Every path lane confirmed by the 2026-09-01 audit has landed.
   request and leave the t-structure restriction theorems behind (recorded
   2026-09-02, projective-families lane).
 
+- `CompactlyGenerated/Coaisle.lean` and `CompactlyGenerated/IndExtension.lean`
+  each hand-roll the same induction over `ObjectProperty.coprodClosure` to show
+  that right orthogonality to a fixed object passes from the generators to
+  their closure; the `of_iso`, `of_coproduct`, and `of_extension` branches are
+  verbatim identical between the two. Two of the three are already Mathlib
+  instances on `ObjectProperty.leftOrthogonal`
+  (`IsClosedUnderIsomorphisms`, `IsTriangulatedClosed₂`); the missing one is
+  closure under coproducts, and with it both inductions collapse to a
+  `coprodClosure_le` application. Its canonical owner is
+  `CategoryTheory/ObjectProperty/Orthogonal.lean`, beside Mathlib's own
+  `Mathlib/CategoryTheory/ObjectProperty/Orthogonal.lean`, so it waits on the
+  `CategoryTheory/ObjectProperty/` cutover above rather than being added in
+  place (recorded 2026-09-03, projective-families lane; the instance and both
+  shortened proofs are written and compile).
+
 No confirmed type-level hazard remains: the `ZLattice` class, the bundled
 variety types, and the alternating-finsum vocabulary are all retired above
 (2026-09-02).

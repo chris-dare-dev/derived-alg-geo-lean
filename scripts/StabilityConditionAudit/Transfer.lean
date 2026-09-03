@@ -8,7 +8,7 @@ phase-detecting functor (arXiv:2607.28411v1 Definitions 3.1 and 3.6, Remarks
 3.2 and 3.7, Lemmas 3.5 and 3.9; arXiv:2601.22994 Definition 3.1 and Lemma
 3.3), together with the support-property transfer, the twist, Bayer, and
 metric layer, and Proposition 3.8's adjoint transposition into the Corollary
-A.23 hypothesis.
+A.23 hypothesis, and Theorem 2.8(3)'s categorical core.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 open CategoryTheory.Triangulated
@@ -111,3 +111,11 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_coproduct_of_le
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_coproduct
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_mapsSemistableLE
+
+/-! ## Theorem 2.8(3): semistability under base change -/
+
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isLE_zero_coproduct
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isGE_one_coproduct
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.semistable_iff_isLE_zero_and_isGE_one_of_iso_coproduct
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.semistable_iff_semistable_of_iso_coproduct
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.semistable_iff_preimage_of_coproduct

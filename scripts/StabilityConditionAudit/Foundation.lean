@@ -643,6 +643,7 @@ several structures in this repository carried as data (`map_zero`, `map_iso`,
 #print axioms CategoryTheory.Triangulated.Slicing.exists_split_at_cutoff_with_upper_bound
 #print axioms CategoryTheory.Triangulated.HNFiltration.isZero_factor_zero_of_hom_eq_zero
 #print axioms CategoryTheory.Triangulated.Slicing.semistable_of_phiPlus_eq_phiMinus
+#print axioms CategoryTheory.Triangulated.Slicing.semistable_iff_geProp_ltProp
 #print axioms CategoryTheory.Triangulated.Slicing.leProp_zero
 #print axioms CategoryTheory.Triangulated.Slicing.phiPlus_eq_phiMinus_of_semistable
 #print axioms CategoryTheory.Triangulated.Slicing.zero_of_geProp_ltProp_general

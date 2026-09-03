@@ -265,6 +265,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Polishchuk.induceOfApproximation
 #print axioms CategoryTheory.Triangulated.Polishchuk.induceOfBrown
 #print axioms CategoryTheory.Triangulated.Polishchuk.induceOfApproximationMaps
+#print axioms CategoryTheory.Triangulated.TStructure.IsCompactlyGeneratedBy.isGE_one_coproduct
 #print axioms CategoryTheory.Triangulated.TStructure.coprodBoundedAisle_rightOrthogonal_of_isGE
 #print axioms CategoryTheory.Triangulated.TStructure.boundedAisle_le_large
 #print axioms CategoryTheory.Triangulated.TStructure.large_isLE_zero_iff
