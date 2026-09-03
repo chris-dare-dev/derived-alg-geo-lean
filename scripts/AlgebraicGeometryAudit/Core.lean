@@ -1689,6 +1689,7 @@ not functions. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData
 #print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData.isLocallyFree
 #print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData.ofIso
+#print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData.pullback
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.toPic
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.coe_toPic

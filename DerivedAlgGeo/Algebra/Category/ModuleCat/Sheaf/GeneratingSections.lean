@@ -51,4 +51,13 @@ lemma GeneratingSections.ofFreeEpi_π (M : SheafOfModules.{u} R) {I : Type u}
     (p : free I ⟶ M) [Epi p] : (GeneratingSections.ofFreeEpi M p).π = p :=
   M.freeHomEquiv.symm_apply_apply p
 
+/-- Pushing a free presentation forward along an isomorphism keeps it a free presentation:
+the presentation of `σ.ofEpi p` is `σ.π ≫ p`.  Stated here, on a general ringed site, because
+the rewrite along `ofEpi_π` does not terminate in the default heartbeat budget once the sheaf
+carries scheme-level instances. -/
+lemma GeneratingSections.isIso_ofEpi_π {M N : SheafOfModules.{u} R} (σ : M.GeneratingSections)
+    (p : M ⟶ N) [Epi p] [IsIso σ.π] [IsIso p] : IsIso (σ.ofEpi p).π := by
+  rw [GeneratingSections.ofEpi_π]
+  exact IsIso.comp_isIso' ‹_› ‹_›
+
 end SheafOfModules

@@ -5,6 +5,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Divisors.Dual
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Effective
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.LineBundleDual
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.ExteriorPower
+import DerivedAlgGeo.AlgebraicGeometry.Divisors.FiniteLocallyFreePullback
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.PicardGroup
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Symmetric
 

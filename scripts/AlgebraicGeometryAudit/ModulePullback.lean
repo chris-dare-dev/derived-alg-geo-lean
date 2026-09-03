@@ -20,6 +20,10 @@ variable {X Y : Scheme.{u}} (f : X ⟶ Y) (M : Y.Modules)
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackOverIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackTrivializationOver
 #print axioms AlgebraicGeometry.Scheme.Modules.isInvertible_pullback
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackLocalGeneratorsData
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackLocalGeneratorsData_generators_I
+#print axioms AlgebraicGeometry.Scheme.Modules.isLocallyFreeData_pullbackLocalGeneratorsData
+#print axioms AlgebraicGeometry.Scheme.Modules.isLocallyFree_pullback
 
 /-! ## Pullback on slices, and the structure sheaf -/
 

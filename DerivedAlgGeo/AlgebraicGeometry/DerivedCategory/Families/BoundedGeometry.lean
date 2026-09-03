@@ -102,6 +102,7 @@ pullback: the derived fields are Mathlib's `Functor.mapDerivedCategory` of that 
 its instances, and boundedness is `mapDerivedCategory_bounded`.  Every inhabitant whose
 derived pullback is the degreewise one should come through here rather than restate those
 fields. -/
+@[reducible]
 def HasCoherentPullback.ofExactSheafPullback {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
     (F : Coh U.left ⥤ Coh T.left) [F.Additive] [PreservesFiniteLimits F]
@@ -190,10 +191,14 @@ instance {T U : SchemeBaseChange S} (f : T ⟶ U)
     (boundedCoherentDerivedPullbackCompInclusion f)]
   infer_instance
 
-/-- The remaining generator-level obligation for coherent pullback to
-restrict to perfect complexes.  It is deliberately stated only on the finite
-locally free generators; the thick-envelope theorem below propagates it to
-every perfect complex. -/
+/-- Coherent pullback sends the finite locally free generators to perfect
+complexes.  It is stated only on the generators, and the thick-envelope
+theorem below propagates it to every perfect complex.
+`Families/PerfectPullback.lean` discharges it for every instance of
+`HasCoherentPullback`: module-sheaf pullback preserves fixed-rank locally
+free atlases along every morphism of schemes.  It stays a class with that
+global instance for now, so that the binders naming it, here and in
+`Stability/BoundedCoherentBaseChange.lean`, can be retired in one change. -/
 class PreservesPerfectPullback {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
     [HasCoherentPullback f] : Prop where

@@ -44,6 +44,7 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CategoryTheory.NatIso.mapDerivedCategory
 #print axioms CategoryTheory.Functor.mapDerivedCategoryIdIso
 #print axioms CategoryTheory.Functor.mapDerivedCategoryCompIso
+#print axioms CategoryTheory.Functor.singleFunctorIsoOfFactors
 
 /-! ## K-projective derived functors -/
 
