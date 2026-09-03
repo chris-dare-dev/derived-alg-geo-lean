@@ -165,14 +165,10 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.AdjacentExtProfile.zero_one
 #print axioms CategoryTheory.Triangulated.AdjacentExtProfile.one_one
 #print axioms CategoryTheory.Triangulated.AdjacentExtProfile.other_zero
-#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.mk.inj
-#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.AdjacentExtProfile.shifts_eq_of_finrank_eq
 #print axioms CategoryTheory.Triangulated.AdjacentExtProfile.shifts_eq
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData.profile
-#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData.mk.inj
-#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData
 #print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.targetIndex
 #print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.targetIndex_val
