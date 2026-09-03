@@ -26,7 +26,9 @@ sheaf, or other geometric input occurs here.
 
 ## Main results
 
-* `mapDerivedCategory_bounded`: an exact functor preserves bounded objects.
+* `mapDerivedCategory_bounded`: an exact functor preserves bounded objects;
+* `Functor.singleFunctorIsoOfFactors`: the degree-`n` embedding commutes with any functor on
+  derived categories that factors degreewise through `F`.
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -149,5 +151,23 @@ noncomputable def Functor.mapDerivedCategoryCompIso {F : A ⥤ B} {G : B ⥤ C} 
       (Functor.associator _ _ _).symm ≪≫
       Functor.isoWhiskerRight
         (Functor.mapHomologicalComplexCompIso e (ComplexShape.up ℤ)) DerivedCategory.Q)
+
+/-- The degree-`n` embedding commutes with any functor `G` on derived categories that is
+degreewise `F` on complexes, `DerivedCategory.Q ⋙ G ≅ F.mapHomologicalComplex _ ⋙ Q`.  This
+is the argument of Mathlib's `Functor.mapDerivedCategorySingleFunctor`, whose `G` is
+`F.mapDerivedCategory`, run on an arbitrary factorization, so that a contract carrying its
+derived functor as data can use it. -/
+noncomputable def Functor.singleFunctorIsoOfFactors (F : A ⥤ B) [F.PreservesZeroMorphisms]
+    (G : DerivedCategory A ⥤ DerivedCategory B)
+    (e : DerivedCategory.Q ⋙ G ≅
+      F.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q) (n : ℤ) :
+    DerivedCategory.singleFunctor A n ⋙ G ≅ F ⋙ DerivedCategory.singleFunctor B n :=
+  Functor.isoWhiskerRight (DerivedCategory.singleFunctorIsoCompQ A n) _ ≪≫
+    Functor.associator _ _ _ ≪≫ Functor.isoWhiskerLeft _ e ≪≫
+    (Functor.associator _ _ _).symm ≪≫
+    Functor.isoWhiskerRight
+      (HomologicalComplex.singleMapHomologicalComplex F (ComplexShape.up ℤ) n) _ ≪≫
+    Functor.associator _ _ _ ≪≫
+    (Functor.isoWhiskerLeft _ (DerivedCategory.singleFunctorIsoCompQ B n)).symm
 
 end CategoryTheory

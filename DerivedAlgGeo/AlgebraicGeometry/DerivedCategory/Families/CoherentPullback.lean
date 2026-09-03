@@ -26,9 +26,9 @@ consumes.  The derived fields come from `HasCoherentPullback.ofExactSheafPullbac
 takes Mathlib's `Functor.mapDerivedCategory` of the exact functor; the comparison is
 `Coh.pullbackCompι`, an `Iso.refl`, so nothing is transported.
 
-`PreservesPerfectPullback` is not discharged here: it needs pullback to send finite locally free
-sheaves to finite locally free sheaves, which is a separate statement about
-`SheafOfModules.IsLocallyFree` under pullback.
+`PreservesPerfectPullback` holds for this instance as for every instance of the contract
+(`Families/PerfectPullback.lean`): module-sheaf pullback sends finite locally free sheaves to
+finite locally free sheaves along every morphism.
 
 ## References
 

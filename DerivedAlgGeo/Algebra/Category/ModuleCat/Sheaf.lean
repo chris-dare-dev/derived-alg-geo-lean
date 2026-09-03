@@ -2,6 +2,7 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Exactness
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.ExteriorPower
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.GeneratingSections
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.LocallyFree
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Over
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Tensor

@@ -10,6 +10,10 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
 #print axioms SheafOfModules.GeneratingSections.ofFreeEpi
 #print axioms SheafOfModules.GeneratingSections.isFiniteType_ofFreeEpi
 #print axioms SheafOfModules.GeneratingSections.ofFreeEpi_π
+#print axioms SheafOfModules.GeneratingSections.isIso_ofEpi_π
+#print axioms SheafOfModules.LocalGeneratorsData.transport
+#print axioms SheafOfModules.LocalGeneratorsData.transport_generators_I
+#print axioms SheafOfModules.LocalGeneratorsData.isLocallyFreeData_transport
 
 /-! ## Transporting finite presentations on a ringed site -/
 
