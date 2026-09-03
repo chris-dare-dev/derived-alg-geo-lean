@@ -95,6 +95,19 @@ instance : Category (Coh X) :=
 /-- The inclusion `Coh X ⥤ X.Modules`. -/
 def ι : Coh X ⥤ X.Modules := (Scheme.coherent X).ι
 
+/-- The inclusion of coherent sheaves is full.  Stated on `Coh.ι` itself, not inherited: `ι` is
+a `def`, so instance search does not unfold it to reach `ObjectProperty.full_ι`.  Together with
+`Coh.faithful_ι` this makes `Coh.ι` reflect finite limits and colimits
+(`fullyFaithful_reflectsLimits`), which is what `preservesFiniteLimits_of_reflects_of_preserves`
+needs to transfer exactness along the inclusion, as `Coh.pushforward` does. -/
+instance full_ι : (ι X).Full :=
+  inferInstanceAs (Scheme.coherent X).ι.Full
+
+/-- The inclusion of coherent sheaves is faithful; see `Coh.full_ι` for why this is stated on
+`Coh.ι` rather than inherited. -/
+instance faithful_ι : (ι X).Faithful :=
+  inferInstanceAs (Scheme.coherent X).ι.Faithful
+
 end Coh
 
 end AlgebraicGeometry

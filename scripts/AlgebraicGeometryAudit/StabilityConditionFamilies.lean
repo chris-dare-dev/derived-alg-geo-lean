@@ -83,6 +83,7 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeTriangulatedFiberFamily.BoundedDerivedRealization.fiberEquivalence
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeTriangulatedFiberFamily.BoundedDerivedRealization.residueFiberEquivalence
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePullback
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePushforward
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePullbackId
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePullbackComp
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.complexPullback
@@ -438,6 +439,32 @@ geometric witness for every scheme morphism.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackComposition.boundedIso
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackComposition.perfectIso
 
+/-! ## Direct image on bounded coherent derived categories
+
+`HasCoherentPushforward` is the exact coherent pushforward contract, inhabited by closed
+immersions; the derived direct image is Mathlib's `mapDerivedCategory` of the contract's
+functor, restricted to `Dᵇ(Coh)`.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPushforward
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPushforward.sheafPushforward
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPushforward.preservesFiniteLimits
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPushforward.preservesFiniteColimits
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPushforward.comparison
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPushforward.sheafPushforward_additive
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPushforward
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPushforwardFactors
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPushforwardCommShift
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPushforward_isTriangulated
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPushforward_bounded
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforward
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforward_additive
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforwardCommShift
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforwardCompInclusion
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforwardCompInclusion_commShift
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPushforward_isTriangulated
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.hasCoherentPushforwardOfIsClosedImmersion
+
 /-! ## Honest Dqc, bounded coherent, and perfect loci
 
 `SchemeQuasicoherentDerivedCategory` is cut out inside the all-module-sheaf
@@ -604,3 +631,24 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPushforward_Z
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPushforward_charge
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPushforwardOfInducing
+
+/-! ## Pullback of stability conditions along bounded coherent direct image -/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData.preimageData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardPreimageData.preimage
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData.inducedTStructures
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.BoundedCoherentPushforwardInducingData.toPreimageData
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPullback
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPullback_slicing
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPullback_Z
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPullback_charge
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.boundedCoherentPullbackOfInducing
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPullback
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPullback_slicing
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPullback_Z
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPullback_charge
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.boundedCoherentPullbackOfInducing

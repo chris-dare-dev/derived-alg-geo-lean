@@ -2,14 +2,16 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Affine
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.BaseChange
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Iso
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.ClosedImmersion
 import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion
 import Mathlib.AlgebraicGeometry.Noetherian
 
 /-!
-# Coherence is preserved by pushforward along a closed immersion
+# Coherent pushforward along a closed immersion
 
 `isCoherent_pushforward` — **`#572` step 2**. For `f : X ⟶ Y` a closed immersion into a locally
 Noetherian scheme and `F` coherent on `X`, the pushforward `f_* F` is coherent on `Y`.
@@ -54,11 +56,28 @@ chain condition; in particular the transports along isomorphisms do not.
 `X` is not assumed Noetherian, and does not need to be: a closed immersion into a locally
 Noetherian scheme makes it so, but the proof never asks.
 
+## Main definitions
+
+* `Coh.pushforward` — the functor `f_* : Coh X ⥤ Coh Y` that `isCoherent_pushforward` makes
+  available, and `Coh.pushforwardCompι`, its comparison with module-sheaf pushforward.
+
 ## Main results
 
 * `isCoherent_pushforward_affine` — the affine case.
 * `isCoherent_restrict_chart` — one chart of the globalisation.
 * `isCoherent_pushforward` — `#572` step 2.
+* `Coh.pushforward_preservesFiniteLimits` and `Coh.pushforward_preservesFiniteColimits` — the
+  functor is exact.
+
+## The functor, and why its exactness is reflected rather than proved
+
+`Coh.pushforward` is module-sheaf pushforward restricted to coherent sheaves, a lift of
+`Coh.ι X ⋙ Modules.pushforward f` through `Coh.ι Y`.  Its exactness is not a new argument: the
+composite `Coh.ι X ⋙ Modules.pushforward f` preserves finite limits (pushforward is a right
+adjoint) and finite colimits (`pushforward_preservesFiniteColimits_of_isClosedImmersion`, the
+closed-embedding argument), and `Coh.ι Y` is fully faithful, so it reflects both.  The same
+inclusion is faithful, so additivity is reflected the same way.  The derived direct image on
+`Dᵇ(Coh)` in `DerivedCategory/Families/CoherentPushforward.lean` is built from this functor.
 -/
 
 universe u
@@ -129,3 +148,60 @@ theorem isCoherent_pushforward [IsLocallyNoetherian Y] [IsClosedImmersion f]
     exact isCoherent_restrict_chart f M hM (i : Y.Opens) i.2
 
 end AlgebraicGeometry.Scheme
+
+namespace AlgebraicGeometry.Coh
+
+open Limits
+
+variable {X Y : Scheme.{u}} (f : X ⟶ Y) [IsLocallyNoetherian Y] [IsClosedImmersion f]
+
+/-- Pushforward of coherent sheaves along a closed immersion, `f_* : Coh X ⥤ Coh Y`.
+
+It is module-sheaf pushforward restricted to coherent sheaves, which lands in coherent sheaves by
+`Scheme.isCoherent_pushforward`.  The closed-immersion hypothesis buys two things at once:
+coherence of the image, and exactness of pushforward on *all* module sheaves.  Along a finite
+morphism `f_*` is still exact on coherent sheaves and still coherent, but neither is proved in
+this repository yet; a contract on scheme base changes
+(`SchemeBaseChange.HasCoherentPushforward`) is where a finite-morphism instance would go. -/
+noncomputable def pushforward : Coh X ⥤ Coh Y :=
+  (Scheme.coherent Y).lift (ι X ⋙ Scheme.Modules.pushforward f)
+    (fun M ↦ Scheme.isCoherent_pushforward f M.obj M.property)
+
+/-- Forgetting coherence after coherent pushforward is module-sheaf pushforward after forgetting
+coherence.  Definitional, since `ObjectProperty.liftCompιIso` is `Iso.refl`; recorded because a
+contract consuming `Coh.pushforward` asks for the comparison as data. -/
+noncomputable def pushforwardCompι :
+    pushforward f ⋙ ι Y ≅ ι X ⋙ Scheme.Modules.pushforward f :=
+  (Scheme.coherent Y).liftCompιIso _ _
+
+/-- Coherent pushforward along a closed immersion preserves finite limits.  Reflected through the
+fully faithful `Coh.ι Y` from the composite `Coh.ι X ⋙ Modules.pushforward f`, where pushforward
+is a right adjoint; `X` must be locally Noetherian for `Coh.ι X` to be left exact. -/
+instance pushforward_preservesFiniteLimits [IsLocallyNoetherian X] :
+    PreservesFiniteLimits (pushforward f) :=
+  haveI : PreservesFiniteLimits (pushforward f ⋙ ι Y) := by
+    change PreservesFiniteLimits (ι X ⋙ Scheme.Modules.pushforward f)
+    infer_instance
+  preservesFiniteLimits_of_reflects_of_preserves (pushforward f) (ι Y)
+
+/-- Coherent pushforward along a closed immersion preserves finite colimits.  This is where the
+closed-immersion hypothesis is spent: module-sheaf pushforward is right exact along a closed
+embedding (`pushforward_preservesFiniteColimits_of_isClosedImmersion`), and `Coh.ι Y` reflects
+it. -/
+instance pushforward_preservesFiniteColimits [IsLocallyNoetherian X] :
+    PreservesFiniteColimits (pushforward f) :=
+  haveI : PreservesFiniteColimits (pushforward f ⋙ ι Y) := by
+    change PreservesFiniteColimits (ι X ⋙ Scheme.Modules.pushforward f)
+    infer_instance
+  preservesFiniteColimits_of_reflects_of_preserves (pushforward f) (ι Y)
+
+/-- Coherent pushforward along a closed immersion is additive, reflected through the faithful
+additive inclusion `Coh.ι Y`.  Needed by `Functor.mapDerivedCategory`, which asks for additivity
+separately from exactness. -/
+instance pushforward_additive : (pushforward f).Additive :=
+  haveI : (pushforward f ⋙ ι Y).Additive := by
+    change (ι X ⋙ Scheme.Modules.pushforward f).Additive
+    infer_instance
+  Functor.additive_of_comp_faithful (pushforward f) (ι Y)
+
+end AlgebraicGeometry.Coh

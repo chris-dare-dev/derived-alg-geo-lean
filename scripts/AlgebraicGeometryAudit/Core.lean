@@ -1215,6 +1215,8 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Scheme.Modules.IsCoherent
 #print axioms Coh
 #print axioms Coh.ι
+#print axioms Coh.full_ι
+#print axioms Coh.faithful_ι
 #print axioms Scheme.coherent_isClosedUnderIsomorphisms
 #print axioms TopCat.Opens.grothendieckTopology_coversTop
 #print axioms basicOpen_coversTop_of_span_eq_top

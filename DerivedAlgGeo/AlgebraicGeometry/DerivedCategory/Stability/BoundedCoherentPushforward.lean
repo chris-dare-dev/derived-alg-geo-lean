@@ -50,10 +50,10 @@ carrier; this is the geometric-realization row of Tier 2 in
 `docs/architecture/placement.md`, which lets a realization keep the
 interface's namespace.
 
-The pullback `f^♯σ` of Definition 3.1(3), computed through a direct image
-`f_* : Dᵇ(Coh T) ⥤ Dᵇ(Coh U)`, has no realization yet: the repository owns
-no derived direct image on `Dᵇ(Coh)`.  That is a recorded seam, not an
-omission of this file.
+The pullback `f^♯σ` of Definition 3.1(3), computed through the direct image
+`f_* : Dᵇ(Coh T) ⥤ Dᵇ(Coh U)`, is `boundedCoherentPullback` in
+`Stability/BoundedCoherentPullback.lean`, for morphisms with an exact
+coherent pushforward.
 
 ## References
 
