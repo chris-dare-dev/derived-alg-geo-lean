@@ -97,6 +97,8 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.le_zero_anti
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.MapsSemistableAisle
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isLE_zero_of_semistable
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePhase
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePhase_iff_semistable
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.mapsSemistableAisle_of_coproduct
 
 /-! ## Corollary A.23: the joint between Theorem A.17 and the phase truncation -/
@@ -104,10 +106,23 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.mapsSemistableGE_iff
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.monad_isLE_zero_of_geProp
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.monad_isRightTExact
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePreimagePhase
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.tStructure
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.isBounded
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.le_zero_iff
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.ge_one_iff
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.mk.inj
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.hom_vanishing
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.ofIso
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.toInducedTStructures
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.ofInducedTStructures
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.nonempty_inducedTStructures
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.nonempty_inducedTStructures_of_le
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_le
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.nonempty_inducedTStructuresLarge
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_coproduct_of_le
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_coproduct
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.preimageData_of_mapsSemistableLE
@@ -116,6 +131,6 @@ open CategoryTheory.Triangulated
 
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isLE_zero_coproduct
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isGE_one_coproduct
-#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.semistable_iff_isLE_zero_and_isGE_one_of_iso_coproduct
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.semistable_iff_largePhase_of_iso_coproduct
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.semistable_iff_semistable_of_iso_coproduct
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.semistable_iff_preimage_of_coproduct

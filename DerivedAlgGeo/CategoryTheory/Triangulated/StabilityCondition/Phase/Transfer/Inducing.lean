@@ -21,6 +21,18 @@ argument: `Polishchuk.induce` is Theorem A.17, and
 argument that turns (A.8) into slicing data.  This file is the joint between
 them; the Definition A.22 input is `Slicing.IndExtensions`.
 
+## Main definitions
+
+* `Slicing.IndExtensions.InducedTStructuresLarge`: the large-target twin of
+  `Slicing.InducedTStructures`, with (A.8) read against the Ind-extensions
+  themselves and no target subcategory; `ofIso` transports it along a natural
+  isomorphism of the detecting functor, and `toInducedTStructures` /
+  `ofInducedTStructures` identify it with the bounded shape whenever the
+  detecting functor factors through `Q`.
+* `Slicing.IndExtensions.largePreimagePhase`: the phase collection
+  `Slicing.IndExtensions.largePhase` pulls back to along the detecting
+  functor, the large-target analogue of `Slicing.preimagePhase`.
+
 ## Main results
 
 * `Slicing.IndExtensions.monad_isRightTExact`: assumption (v') of Corollary
@@ -45,6 +57,11 @@ them; the Definition A.22 input is `Slicing.IndExtensions`.
 * `Slicing.IndExtensions.preimageData_of_mapsSemistableLE`: **Proposition
   3.8**, categorically: condition (3.2) on the restricted comonad, through the
   adjunctions restricted to `Q` and `F⁻¹ Q`, gives the preimage slicing.
+* `Slicing.IndExtensions.InducedTStructuresLarge.hom_vanishing`: the first
+  non-formal `Slicing` axiom for `largePreimagePhase`.
+* `Slicing.IndExtensions.nonempty_inducedTStructuresLarge`: Corollary A.23 in
+  that shape, the categorical half of Theorem 2.8(1) for an arbitrary field
+  extension at the level of the phase-indexed t-structures.
 
 ## Implementation notes
 
@@ -56,10 +73,25 @@ stability supplied, as in `Polishchuk.induceOfLE`.  The slicing lives on
 `Q`, and the detecting functor of the output is the restriction of `F`,
 `ObjectProperty.inverseImageLift F Q` or `ObjectProperty.liftOfLE F hle`.
 Theorem 2.8 for an infinite extension is in neither shape: it recognizes the
-base-changed slicing against the Ind-extensions on the large `D`, with no
-`Q` (`Polishchuk.induceLarge`); the twin of `Slicing.InducedTStructures` and
-`preimageData` that reads recognition formulas in the large `D` is the open
-categorical item.
+base-changed slicing against the Ind-extensions on the large `D`, with no `Q`.
+That is the third shape, `InducedTStructuresLarge` and
+`nonempty_inducedTStructuresLarge`, on `Polishchuk.induceLarge`; its phase
+collection is `Slicing.IndExtensions.largePreimagePhase`, built from
+`largePhase`, which `largePhase_iff_semistable` identifies with `s.P` on `Q`.
+
+Assembling those into a `Slicing` is the accounting of `Slicing.PreimageData`
+with one entry moved.  Closure under isomorphisms and zero membership still
+follow formally, from the iso- and zero-invariance of `IsLE` and `IsGE`.  The
+shift law no longer does: there is no slicing on `D` to borrow `shift_iff`
+from, and `Slicing.IndExtensions` relates the aisles at two phases only by
+inclusion (`le_zero_anti`), never by the shift, so `𝒫̂(φ)⟦1⟧ = 𝒫̂(φ + 1)` has
+to be proved from `largeAisle` and a shift equality for
+`ObjectProperty.coprodClosure` that the repository does not have.  HN
+existence is the other open half: the bounded twin lifts a target HN
+filtration (`Slicing.InducedTStructures.hn_exists`), and the ambient category
+carries no slicing to lift one from, so it needs the finite phase-truncation
+argument run on the source -- which is why `InducedTStructuresLarge` keeps
+Step 4's boundedness that the bounded twin can afford to drop.
 
 Assumption (v') is `Slicing.IndExtensions.MapsSemistableAisle`, stated as the
 paper states it, on semistable objects and in the large category.  Extending
@@ -182,6 +214,97 @@ theorem monad_isRightTExact (hLF : (L ⋙ F).PreservesSmallCoproducts.{w})
 
 end Monad
 
+section Large
+
+variable [HasZeroObject C] [HasShift C ℤ] [Preadditive C]
+  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+
+/-- The phase collection `largePhase` pulls back to along `F`: the large-target analogue of
+`Slicing.preimagePhase`, which cannot be used here because it needs a slicing on the target.
+This is the collection the eventual slicing `𝒫_ℓ` carries; `InducedTStructuresLarge.hom_vanishing`
+is one of its `Slicing` axioms. -/
+def largePreimagePhase (F : C ⥤ D) (φ : ℝ) : ObjectProperty C :=
+  fun E => ind.largePhase φ (F.obj E)
+
+/-- The large-target twin of `Slicing.InducedTStructures`: the bounded output of Theorem A.17
+at every phase, with the recognition formulas (A.8) read against the Ind-extensions on the
+ambient category rather than against the slicing on `Q`.
+
+This is the shape Theorem 2.8(1) of arXiv:2607.28411v1 needs for an arbitrary field extension
+`ℓ/k`.  There `F = π_*` sends no nonzero object of `Dᵇ(Coh X_ℓ)` into `Q = Dᵇ(Coh X)`, so
+`s.geProp` and `s.ltProp` are not defined at `F.obj E` and `Slicing.InducedTStructures` cannot
+be stated; the cuts of `τ̂'_φ` on the ambient `Dqc(X)` still are.  `toInducedTStructures` and
+`ofInducedTStructures` show the two structures agree whenever `F` does land in `Q`, so this is
+a genuine extension of the bounded shape and not a second notion. -/
+structure InducedTStructuresLarge (F : C ⥤ D) where
+  /-- The source t-structure induced at the phase `φ`. -/
+  tStructure : ℝ → TStructure C
+  /-- Formula (A.8), connective half, against `τ̂'_φ`. -/
+  le_zero_iff (φ : ℝ) (E : C) :
+    (tStructure φ).IsLE E 0 ↔ (ind.tStructure φ).IsLE (F.obj E) 0
+  /-- Formula (A.8), coconnective half, against `τ̂'_φ`. -/
+  ge_one_iff (φ : ℝ) (E : C) :
+    (tStructure φ).IsGE E 1 ↔ (ind.tStructure φ).IsGE (F.obj E) 1
+  /-- Step 4 of Theorem A.17: each induced source t-structure is bounded.  The bounded twin
+  has no such field because it never truncates on the source -- it lifts a target HN
+  filtration -- whereas the finite phase-truncation argument this shape needs does. -/
+  isBounded (φ : ℝ) : TStructure.IsBounded (tStructure φ)
+
+namespace InducedTStructuresLarge
+
+/-- Hom-vanishing for the large phase collection, the first non-formal slicing axiom.
+
+Shorter than its bounded twin: `largePhase` already carries the coaisle membership at every
+`ψ > φ₁`, so no HN filtration of the target is needed to move from phase `φ₂` up to `φ₁` --
+which is what makes this provable at all when the target has no slicing. -/
+theorem hom_vanishing {F : C ⥤ D} (h : ind.InducedTStructuresLarge F) :
+    ∀ (φ₁ φ₂ : ℝ) (A B : C), φ₂ < φ₁ →
+      ind.largePreimagePhase F φ₁ A → ind.largePreimagePhase F φ₂ B →
+        ∀ g : A ⟶ B, g = 0 := fun φ₁ φ₂ A B hφ hA hB g =>
+  (h.tStructure φ₁).zero_of_isLE_of_isGE g 0 1 (by omega)
+    ((h.le_zero_iff φ₁ A).2 hA.1) ((h.ge_one_iff φ₁ B).2 (hB.2 φ₁ hφ))
+
+/-- The recognition formulas are invariant under a natural isomorphism of the detecting
+functor, as in `Slicing.InducedTStructures.ofIso`; here the transport is through the aisle
+and coaisle of `τ̂'_φ` rather than through the phase cuts. -/
+def ofIso {F G : C ⥤ D} (h : ind.InducedTStructuresLarge F) (e : F ≅ G) :
+    ind.InducedTStructuresLarge G where
+  tStructure := h.tStructure
+  le_zero_iff φ E := (h.le_zero_iff φ E).trans
+    ⟨fun hE => letI := hE; (ind.tStructure φ).isLE_of_iso (e.app E) 0,
+      fun hE => letI := hE; (ind.tStructure φ).isLE_of_iso (e.app E).symm 0⟩
+  ge_one_iff φ E := (h.ge_one_iff φ E).trans
+    ⟨fun hE => letI := hE; (ind.tStructure φ).isGE_of_iso (e.app E) 1,
+      fun hE => letI := hE; (ind.tStructure φ).isGE_of_iso (e.app E).symm 1⟩
+  isBounded := h.isBounded
+
+/-- When the detecting functor lands in `Q`, the large twin is the bounded structure: both
+recognition formulas are Lemma A.14(iii). -/
+def toInducedTStructures {G : C ⥤ Q.FullSubcategory}
+    (h : ind.InducedTStructuresLarge (G ⋙ Q.ι)) : s.InducedTStructures G where
+  tStructure := h.tStructure
+  le_zero_iff φ E := (h.le_zero_iff φ E).trans (ind.isLE_zero_iff_geProp φ (G.obj E))
+  ge_one_iff φ E := (h.ge_one_iff φ E).trans (ind.isGE_one_iff_ltProp φ (G.obj E))
+
+/-- The converse: a bounded structure is a large one along the inclusion of `Q`.  With
+`toInducedTStructures` this makes the two structures interderivable whenever `F` factors
+through `Q`, which is the sense in which the bounded shape is the special case.
+
+Boundedness has to be supplied: `Slicing.InducedTStructures` carries no such field, because
+its own consumer never needs it.  Where the source t-structures come from Theorem A.17 it is
+`Polishchuk.InducedTStructureDataLarge.isBounded`. -/
+def ofInducedTStructures {G : C ⥤ Q.FullSubcategory} (h : s.InducedTStructures G)
+    (hb : ∀ φ : ℝ, TStructure.IsBounded (h.tStructure φ)) :
+    ind.InducedTStructuresLarge (G ⋙ Q.ι) where
+  tStructure := h.tStructure
+  le_zero_iff φ E := (h.le_zero_iff φ E).trans (ind.isLE_zero_iff_geProp φ (G.obj E)).symm
+  ge_one_iff φ E := (h.ge_one_iff φ E).trans (ind.isGE_one_iff_ltProp φ (G.obj E)).symm
+  isBounded := hb
+
+end InducedTStructuresLarge
+
+end Large
+
 section Induce
 
 variable [HasZeroObject C] [HasShift C ℤ] [Preadditive C]
@@ -298,6 +421,51 @@ theorem preimageData_of_le [IsTriangulated C] (P : ObjectProperty C) [P.IsTriang
     s.PreimageData (ObjectProperty.liftOfLE F hle) :=
   (ind.nonempty_inducedTStructures_of_le P hle adj hF G tC hG htC htrunc hzero hv).elim
     fun h => h.preimageData
+
+omit [Q.IsClosedUnderIsomorphisms] in
+/-- **Corollary A.23 with recognition against the large target.**  Theorem A.17 at every phase
+on a triangulated `P` with truncation stability supplied, recognized against the Ind-extensions
+themselves: no target subcategory appears, and `P` is not required to sit inside `F⁻¹ Q`.
+
+This is the categorical half of Theorem 2.8(1) of arXiv:2607.28411v1 for an arbitrary field
+extension, at the level of the phase-indexed t-structures.  `Polishchuk.induceLarge` supplies
+each phase.  `hbdd` is the hypothesis that `F` sends `P` into the `τ̂'_φ`-bounded objects,
+which for `F = π_*` is the descent-to-a-finite-subextension argument of Remark A.12(3); it is
+the one hypothesis this shape adds over `nonempty_inducedTStructures_of_le`, which bought it
+from `hle`.  It joins `hzero`, `hG`/`htC` and `htrunc` on the list of geometric inputs still to
+be supplied for `π : X_ℓ → X`.
+
+Two things still separate this from the slicing `𝒫_ℓ` itself, and both are open: the phase
+shift `𝒫̂(φ)⟦1⟧ = 𝒫̂(φ + 1)`, which `Slicing.IndExtensions` relates across phases only by the
+aisle inclusion `le_zero_anti`, and HN existence for `largePreimagePhase`.  See the
+implementation notes for the full accounting against `Slicing`'s fields. -/
+theorem nonempty_inducedTStructuresLarge (P : ObjectProperty C) [P.IsTriangulated]
+    [P.IsClosedUnderIsomorphisms]
+    (adj : L ⊣ F) (hF : F.PreservesSmallCoproducts.{w})
+    (G : ℝ → ObjectProperty D) (tC : ℝ → TStructure C)
+    (hG : ∀ φ : ℝ, (ind.tStructure φ).IsCompactlyGeneratedBy.{w} (G φ))
+    (htC : ∀ φ : ℝ, (tC φ).IsCompactlyGeneratedBy.{w} ((G φ).map L))
+    (htrunc : ∀ φ : ℝ, P.HasInducedTStructure (tC φ))
+    (hzero : ∀ E : C, P E → IsZero (F.obj E) → IsZero E)
+    (hbdd : ∀ φ : ℝ, P ≤ (ind.tStructure φ).bounded.inverseImage F)
+    (hv : ind.MapsSemistableAisle (L ⋙ F)) :
+    Nonempty (ind.InducedTStructuresLarge (P.ι ⋙ F)) := by
+  have hL : L.PreservesSmallCoproducts.{w} := fun ι ↦ by
+    haveI : PreservesColimitsOfShape (Discrete ι) L :=
+      adj.leftAdjoint_preservesColimits.preservesColimitsOfShape
+    infer_instance
+  have hLF : (L ⋙ F).PreservesSmallCoproducts.{w} := fun ι ↦ by
+    haveI := hL ι
+    haveI := hF ι
+    infer_instance
+  have hdata : ∀ φ : ℝ,
+      Nonempty (Polishchuk.InducedTStructureDataLarge F P (ind.tStructure φ)) := fun φ =>
+    ⟨Polishchuk.induceLarge adj P (htrunc φ) hF (hG φ) (htC φ)
+      (ind.monad_isRightTExact hLF hv φ) hzero (hbdd φ)⟩
+  exact ⟨{ tStructure := fun φ => (hdata φ).some.tStructure
+           le_zero_iff := fun φ E => (hdata φ).some.isLE_iff E 0
+           ge_one_iff := fun φ E => (hdata φ).some.isGE_iff E 1
+           isBounded := fun φ => (hdata φ).some.isBounded }⟩
 
 /-- **Corollary A.23 for a monad that is a coproduct of identities**: when `F L` sends each
 semistable object to a small coproduct of copies of itself, assumption (v') is automatic

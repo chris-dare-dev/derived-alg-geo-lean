@@ -16,7 +16,7 @@ base-changed slicing recognizes `π^* E` through `π_* π^* E`, the statement re
 semistable of phase `φ` if and only if a nonempty coproduct of copies of `E` lies in the aisle
 of `τ̂'_φ` and in the coaisles of `τ̂'_ψ` for every `ψ > φ`.
 
-That reduction is `semistable_iff_isLE_zero_and_isGE_one_of_iso_coproduct`, and it constrains
+That reduction is `semistable_iff_largePhase_of_iso_coproduct`, and it constrains
 the coproduct only as an object of the large category `D`.  It holds because the aisle is
 closed under coproducts by Lemma A.14(i), the coaisle is closed under coproducts because the
 t-structure is compactly generated
@@ -32,9 +32,9 @@ open will consume the `D`-level reduction and the two closure lemmas, not them.
 
 ## Main results
 
-* `Slicing.IndExtensions.semistable_iff_isLE_zero_and_isGE_one_of_iso_coproduct`: the reduction
-  of semistability to two one-sided conditions on a coproduct of copies, with no `Q`-membership
-  of the coproduct required.
+* `Slicing.IndExtensions.semistable_iff_largePhase_of_iso_coproduct`: the reduction of
+  semistability to semistability of a coproduct of copies for the Ind-slicing, with no
+  `Q`-membership of the coproduct required.
 * `Slicing.IndExtensions.isLE_zero_coproduct` and `isGE_one_coproduct`: the aisle and the
   coaisle of `τ̂'_φ` are closed under coproducts, the two closure facts that reduction rests on.
 * `Slicing.IndExtensions.semistable_iff_semistable_of_iso_coproduct`: its restatement when the
@@ -88,17 +88,19 @@ theorem isLE_zero_coproduct (φ : ℝ) {ι : Type} (X : ι → D) [HasCoproduct 
 
 include ind in
 /-- **The reduction behind Theorem 2.8(3).**  `E` is semistable of phase `φ` exactly when a
-nonempty coproduct of copies of it lies in the aisle of `τ̂'_φ` and in the coaisles of `τ̂'_ψ`
-for every `ψ > φ`.  Both directions are closure properties: `→` because aisle and coaisle are
-closed under coproducts (`isLE_zero_coproduct`, `isGE_one_coproduct`), `←` because they are
-closed under retracts and `E` is a retract of the coproduct, `ι` being nonempty.  The coproduct
-is constrained only as an object of `D`, which is what makes this the form the large-target
-Theorem 2.8(1) can consume: there `π_* π^* E = E ⊗_k ℓ` is not coherent. -/
-theorem semistable_iff_isLE_zero_and_isGE_one_of_iso_coproduct (φ : ℝ) (E : Q.FullSubcategory)
+nonempty coproduct of copies of it is semistable of phase `φ` for the Ind-slicing
+(`Slicing.IndExtensions.largePhase`, which unfolds to membership in the aisle of `τ̂'_φ` and in
+the coaisles of `τ̂'_ψ` for every `ψ > φ`).  Both directions are closure properties: `→` because
+aisle and coaisle are closed under coproducts (`isLE_zero_coproduct`, `isGE_one_coproduct`),
+`←` because they are closed under retracts and `E` is a retract of the coproduct, `ι` being
+nonempty.  The coproduct is constrained only as an object of `D`, which is what makes this the
+form the large-target Theorem 2.8(1) can consume: there `π_* π^* E = E ⊗_k ℓ` is not coherent,
+so no statement asking for it in `Q` applies. -/
+theorem semistable_iff_largePhase_of_iso_coproduct (φ : ℝ) (E : Q.FullSubcategory)
     {ι : Type} [Nonempty ι] [HasCoproduct fun _ : ι => E.obj] (Y : D)
-    (e : Y ≅ ∐ fun _ : ι => E.obj) :
-    s.P φ E ↔
-      ((ind.tStructure φ).IsLE Y 0 ∧ ∀ ψ, φ < ψ → (ind.tStructure ψ).IsGE Y 1) := by
+    (e : Y ≅ ∐ fun _ : ι => E.obj) : s.P φ E ↔ ind.largePhase φ Y := by
+  show s.P φ E ↔
+    ((ind.tStructure φ).IsLE Y 0 ∧ ∀ ψ, φ < ψ → (ind.tStructure ψ).IsGE Y 1)
   let r : Retract E.obj (∐ fun _ : ι => E.obj) :=
     { i := Sigma.ι (fun _ : ι => E.obj) (Classical.arbitrary ι)
       r := Sigma.desc fun _ => 𝟙 E.obj
@@ -135,12 +137,9 @@ back through `semistable_iff_geProp_ltProp` at `Y`.  The `Q`-membership is the w
 the restriction to a finite extension; without it only the two one-sided conditions survive. -/
 theorem semistable_iff_semistable_of_iso_coproduct (φ : ℝ) (E : Q.FullSubcategory) {ι : Type}
     [Nonempty ι] [HasCoproduct fun _ : ι => E.obj] (Y : Q.FullSubcategory)
-    (e : Y.obj ≅ ∐ fun _ : ι => E.obj) : s.P φ E ↔ s.P φ Y := by
-  rw [ind.semistable_iff_isLE_zero_and_isGE_one_of_iso_coproduct φ E Y.obj e,
-    s.semistable_iff_geProp_ltProp _ φ Y]
-  refine and_congr ?_ (forall_congr' fun ψ => imp_congr_right fun _ => ?_)
-  · rw [← ind.isLE_zero_iff_geProp]
-  · rw [← ind.isGE_one_iff_ltProp]
+    (e : Y.obj ≅ ∐ fun _ : ι => E.obj) : s.P φ E ↔ s.P φ Y :=
+  (ind.semistable_iff_largePhase_of_iso_coproduct φ E Y.obj e).trans
+    (ind.largePhase_iff_semistable φ Y)
 
 variable {C : Type u₁} [Category.{v} C] [HasZeroObject C] [HasShift C ℤ] [Preadditive C]
   [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
@@ -160,8 +159,8 @@ Geometrically `F = π_*`, `L = π^*` for the base change `π : X_ℓ → X` alon
 isomorphism `e`.  For an infinite extension `F (L E) = E ⊗_k ℓ` is not coherent, so `hQL`
 cannot hold at `E`, the hypotheses are unsatisfiable, and the preimage slicing is not the
 paper's `𝒫_ℓ` (see `preimageData_of_coproduct`); what the large-target statement consumes there
-is `semistable_iff_isLE_zero_and_isGE_one_of_iso_coproduct`, which constrains the coproduct only
-as an object of `D`. -/
+is `semistable_iff_largePhase_of_iso_coproduct`, which constrains the coproduct only as an
+object of `D`. -/
 theorem semistable_iff_preimage_of_coproduct [Q.IsClosedUnderIsomorphisms]
     (hd : s.PreimageData (ObjectProperty.inverseImageLift F Q))
     (hQL : ∀ X : D, Q X → Q (F.obj (L.obj X))) (φ : ℝ) (E : Q.FullSubcategory) {ι : Type}
