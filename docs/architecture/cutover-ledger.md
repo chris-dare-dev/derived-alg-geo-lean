@@ -449,10 +449,12 @@ blocks should normally move it rather than add more declarations beside it.
 Every path lane confirmed by the 2026-09-01 audit has landed.
 
 - `CategoryTheory/Triangulated/TStructure/Restriction.lean` carries a
-  five-declaration purely categorical `ObjectProperty` block with no
-  t-structure in its types: `preimageLift` (with its `Additive`, `CommShift`,
-  and `IsTriangulated` instances), `inverseImageLift`, `liftToInverseImage`,
-  and the restricted adjunctions `Adjunction.restrictInverseImageLeft` and
+  six-declaration purely categorical `ObjectProperty` block with no
+  t-structure in its types: `liftOfLE` (with its `Additive`, `CommShift`,
+  and `IsTriangulated` instances; the root of the block, `preimageLift` and
+  `inverseImageLift` are defined through it), `preimageLift` (with the same
+  three instances), `inverseImageLift`, `liftToInverseImage`, and the
+  restricted adjunctions `Adjunction.restrictInverseImageLeft` and
   `restrictInverseImageRight`. Its canonical owner is
   `CategoryTheory/ObjectProperty/`, where Mathlib defines `ObjectProperty.lift`,
   `inverseImage`, and `fullyFaithfulι`; move the block there in one pull
