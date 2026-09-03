@@ -102,6 +102,7 @@ pullback: the derived fields are Mathlib's `Functor.mapDerivedCategory` of that 
 its instances, and boundedness is `mapDerivedCategory_bounded`.  Every inhabitant whose
 derived pullback is the degreewise one should come through here rather than restate those
 fields. -/
+@[reducible]
 def HasCoherentPullback.ofExactSheafPullback {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
     (F : Coh U.left ⥤ Coh T.left) [F.Additive] [PreservesFiniteLimits F]
