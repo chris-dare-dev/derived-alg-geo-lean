@@ -422,6 +422,7 @@ geometric witness for every scheme morphism.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback.commShift
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback.isTriangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback.preservesBounded
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback.ofExactSheafPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instCommShiftSchemeCoherentDerivedCategoryLeftSchemeCoherentDerivedPullbackInt
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instIsTriangulatedSchemeCoherentDerivedCategoryLeftSchemeCoherentDerivedPullback
@@ -438,6 +439,7 @@ geometric witness for every scheme morphism.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackComposition
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackComposition.boundedIso
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackComposition.perfectIso
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.hasCoherentPullbackOfIsExactPullback
 
 /-! ## Direct image on bounded coherent derived categories
 

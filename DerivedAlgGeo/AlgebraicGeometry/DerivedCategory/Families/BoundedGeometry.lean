@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ExactPullback
 
@@ -13,13 +14,15 @@ live in `DerivedCategory/Coherent.lean`. This file evaluates them on scheme
 base changes and records the contracts needed to lift coherent pullback to the
 bounded and perfect subcategories.
 
-Preservation under pullback is not automatic at this boundary.  In particular,
-an arbitrary pullback functor on all module sheaves has not yet been proved to
-preserve coherent sheaves or the perfect envelope.  The restriction contracts
-at the end of the file therefore record those exact obligations and construct
-actual lifted functors only after the corresponding objectwise preservation
-proofs are supplied.  No geometric slicing, openness, relative-HN existence,
-moduli theorem, or conclusion of Theorem 22.2 is asserted.
+Preservation under pullback is not automatic at this boundary.  Coherence is
+preserved by every pullback (`Coh.pullback`, in `Modules/Coherent/Pullback.lean`),
+but exactness of the pullback and preservation of the perfect envelope are
+not.  The contracts at the end of the file therefore record the exact
+obligations and construct actual lifted functors only after the corresponding
+preservation proofs are supplied; `Families/CoherentPullback.lean` discharges
+`HasCoherentPullback` for exact, in particular flat, pullback.  No geometric
+slicing, openness, relative-HN existence, moduli theorem, or conclusion of
+Theorem 22.2 is asserted.
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -93,6 +96,28 @@ class HasCoherentPullback {T U : SchemeBaseChange S} (f : T ⟶ U)
 
 attribute [instance] HasCoherentPullback.preservesFiniteLimits
   HasCoherentPullback.preservesFiniteColimits
+
+/-- Build the contract from an exact functor on coherent sheaves that forgets to module-sheaf
+pullback: the derived fields are Mathlib's `Functor.mapDerivedCategory` of that functor with
+its instances, and boundedness is `mapDerivedCategory_bounded`.  Every inhabitant whose
+derived pullback is the degreewise one should come through here rather than restate those
+fields. -/
+def HasCoherentPullback.ofExactSheafPullback {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
+    (F : Coh U.left ⥤ Coh T.left) [F.Additive] [PreservesFiniteLimits F]
+    [PreservesFiniteColimits F]
+    (e : F ⋙ Coh.ι T.left ≅ Coh.ι U.left ⋙ modulePullback f) :
+    HasCoherentPullback f where
+  sheafPullback := F
+  preservesFiniteLimits := inferInstance
+  preservesFiniteColimits := inferInstance
+  comparison := e
+  derivedPullback := F.mapDerivedCategory
+  derivedFactors := F.mapDerivedCategoryFactors
+  derivedAdditive := inferInstance
+  commShift := inferInstance
+  isTriangulated := inferInstance
+  preservesBounded E hE := mapDerivedCategory_bounded F E hE
 
 /-- Coherent-sheaf pullback on unbounded derived categories. -/
 def coherentDerivedPullback {T U : SchemeBaseChange S} (f : T ⟶ U)
