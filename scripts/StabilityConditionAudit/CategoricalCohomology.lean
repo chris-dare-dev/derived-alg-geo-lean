@@ -4,7 +4,10 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
+import DerivedAlgGeo.Algebra.Homology.Localization
+import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNaturality
+import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Shapes.Products
 import DerivedAlgGeo.CategoryTheory.Localization.Coproducts
 import DerivedAlgGeo.CategoryTheory.MorphismProperty.Limits
 
@@ -27,6 +30,8 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.sigmaXDesc
 #print axioms HomologicalComplex.ι_f_sigmaXDesc
 #print axioms HomologicalComplex.ι_f_sigmaXDesc_assoc
+#print axioms HomologicalComplex.shortComplexFunctor_preservesColimitsOfShape
+#print axioms HomologicalComplex.homologyFunctor_preservesColimitsOfShape
 #print axioms Homotopy.sigma
 #print axioms HomotopyCategory.cofanDesc
 #print axioms HomotopyCategory.cofanDesc_fac
@@ -35,6 +40,16 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomotopyCategory.preservesColimit_discrete_functor
 #print axioms HomotopyCategory.quotient_preservesColimitsOfShape_discrete
 #print axioms HomotopyCategory.hasColimitsOfShape_discrete
+#print axioms HomotopyCategory.homologyFunctor_preservesCoproductsOfShape
+#print axioms HomotopyCategory.quasiIso_isStableUnderCoproductsOfShape
+#print axioms CategoryTheory.ShortComplex.colimCocone
+#print axioms CategoryTheory.ShortComplex.isColimitColimCocone
+#print axioms CategoryTheory.ShortComplex.homologyPointwiseIso
+#print axioms CategoryTheory.ShortComplex.isColimitMapCoconeColimCocone
+#print axioms CategoryTheory.ShortComplex.preservesColimit_homologyFunctor
+#print axioms CategoryTheory.ShortComplex.homologyFunctor_preservesColimitsOfShape
+#print axioms CategoryTheory.Limits.preservesCoproductsOfShape_of_essSurj
+#print axioms CategoryTheory.Limits.isIso_map_sigma_map
 #print axioms HomotopyCategory.filteredComplexSpectralObject
 #print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt
 #print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt_deg

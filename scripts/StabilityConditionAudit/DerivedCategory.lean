@@ -85,3 +85,8 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CategoryTheory.mapBoundedAboveProjectiveHomotopyIdIso
 #print axioms CategoryTheory.boundedAboveProjectiveDerivedFunctorIso
 #print axioms CategoryTheory.boundedAboveProjectiveDerivedFunctorIdIso
+#print axioms DerivedCategory.trW_subcategoryAcyclic_isStableUnderCoproductsOfShape
+#print axioms DerivedCategory.hasCoproductsOfShape
+#print axioms DerivedCategory.Qh_preservesCoproductsOfShape
+#print axioms DerivedCategory.Q_preservesCoproductsOfShape
+#print axioms DerivedCategory.homologyFunctor_preservesCoproductsOfShape
