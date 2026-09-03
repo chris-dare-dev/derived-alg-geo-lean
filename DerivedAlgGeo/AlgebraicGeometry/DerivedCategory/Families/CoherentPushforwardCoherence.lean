@@ -26,9 +26,8 @@ composite, up to natural isomorphism.  This file proves both for every instance 
 
 ## Implementation notes
 
-Unlike the pullback side, where `GeometricDerivedPullbackIdentity` and
-`GeometricDerivedPullbackComposition` postulate the bounded isomorphisms as classes with no
-inhabitant, nothing here is assumed: the contract's comparison isomorphism determines the
+As on the pullback side (`Families/CoherentPullbackCoherence.lean`), nothing here is
+assumed: the contract's comparison isomorphism determines the
 coherent pushforward up to isomorphism, so the laws are theorems about every instance.  The
 consumer is `Stability/BoundedCoherentPullback.lean`, where they give the identity and
 composition laws of the `f^♯` witnesses.

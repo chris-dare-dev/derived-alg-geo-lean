@@ -15,8 +15,8 @@ in the Fourier--Mukai lane is conditional on one being supplied. **Nothing in
 this repository supplies one.** This file is the ledger that says precisely
 what supplying one would take.
 
-It follows the pattern of `Families/BoundedGeometry.lean` and the
-inhabitant-free ledgers of the `SchemeDerived` track: each geometric input is a
+It follows the pattern of the inhabitant-free ledgers of the `SchemeDerived`
+track: each geometric input is a
 named class with a docstring, nothing is constructed, and the payoff is that
 `geometricCorrespondence` assembles a genuine `Correspondence` from exactly
 those inputs and no others. The gap becomes enumerated instead of implicit.

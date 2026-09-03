@@ -51,12 +51,10 @@ the slicing distance under `f^♯`, are therefore available through
 `slicingDist_preimage_le` at this functor with no further work.
 
 The witness structures carry the same identity and composition laws as
-`BoundedCoherentPullbackPreimageData`, with one difference: the pullback side
-takes its bounded isomorphisms from the classes
-`GeometricDerivedPullbackIdentity` and `GeometricDerivedPullbackComposition`,
-which nothing inhabits, while here they are the theorems of
-`Families/CoherentPushforwardCoherence.lean`, so the laws hold for every
-instance of `HasCoherentPushforward`.  The composition law reads the two-step
+`BoundedCoherentPullbackPreimageData`, and on both sides the bounded
+isomorphisms are theorems about every instance of the contract
+(`Families/CoherentPullbackCoherence.lean` there,
+`Families/CoherentPushforwardCoherence.lean` here).  The composition law reads the two-step
 transfer inside out: pull back along `g` first, then along `f`, and the
 result is the transfer along `f ≫ g`.
 

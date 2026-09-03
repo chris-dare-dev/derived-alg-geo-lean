@@ -22,13 +22,16 @@ sheaf, or other geometric input occurs here.
   `Functor.mapDerivedCategoryCompIso`: the pseudofunctoriality of
   `Functor.mapDerivedCategory`, each obtained from the corresponding
   isomorphism on complexes through the universal property of the
-  localization (`Localization.liftNatIso`).
+  localization (`Localization.liftNatIso`);
+* `Functor.singleFunctorIsoOfFactors`: the degree-`n` embedding commutes with any functor on
+  derived categories that factors degreewise through `F`;
+* `DerivedCategory.isoOfFactors`, with `DerivedCategory.idFactors` and
+  `DerivedCategory.compFactors`: functors on derived categories that factor degreewise through
+  isomorphic functors are isomorphic.
 
 ## Main results
 
-* `mapDerivedCategory_bounded`: an exact functor preserves bounded objects;
-* `Functor.singleFunctorIsoOfFactors`: the degree-`n` embedding commutes with any functor on
-  derived categories that factors degreewise through `F`.
+* `mapDerivedCategory_bounded`: an exact functor preserves bounded objects.
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -169,5 +172,56 @@ noncomputable def Functor.singleFunctorIsoOfFactors (F : A ⥤ B) [F.PreservesZe
       (HomologicalComplex.singleMapHomologicalComplex F (ComplexShape.up ℤ) n) _ ≪≫
     Functor.associator _ _ _ ≪≫
     (Functor.isoWhiskerLeft _ (DerivedCategory.singleFunctorIsoCompQ B n)).symm
+
+/-- Two functors on derived categories that factor degreewise through naturally isomorphic
+functors are isomorphic, by the universal property of the localization: the factorizations
+are the `Localization.Lifting` data that `Localization.liftNatIso` needs.  This is how a
+contract that carries its derived functor as data, with only a factorization
+`Q ⋙ G ≅ F.mapHomologicalComplex _ ⋙ Q`, obtains identity and composition laws. -/
+noncomputable def _root_.DerivedCategory.isoOfFactors {F₁ F₂ : A ⥤ B} [F₁.PreservesZeroMorphisms]
+    [F₂.PreservesZeroMorphisms] {G₁ G₂ : DerivedCategory A ⥤ DerivedCategory B}
+    (e₁ : DerivedCategory.Q ⋙ G₁ ≅
+      F₁.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q)
+    (e₂ : DerivedCategory.Q ⋙ G₂ ≅
+      F₂.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q)
+    (e : F₁ ≅ F₂) : G₁ ≅ G₂ :=
+  letI : Localization.Lifting DerivedCategory.Q
+    (HomologicalComplex.quasiIso A (ComplexShape.up ℤ))
+    (F₁.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q) G₁ := ⟨e₁⟩
+  letI : Localization.Lifting DerivedCategory.Q
+    (HomologicalComplex.quasiIso A (ComplexShape.up ℤ))
+    (F₂.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q) G₂ := ⟨e₂⟩
+  Localization.liftNatIso DerivedCategory.Q (HomologicalComplex.quasiIso A (ComplexShape.up ℤ))
+    (F₁.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q)
+    (F₂.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q) G₁ G₂
+    (Functor.isoWhiskerRight (NatIso.mapHomologicalComplex e (ComplexShape.up ℤ))
+      DerivedCategory.Q)
+
+variable (A) in
+/-- The identity of the derived category factors degreewise through the identity, by
+`Functor.mapHomologicalComplexIdIso`; the input of `DerivedCategory.isoOfFactors` for an identity
+law.  The category is explicit because nothing else determines it. -/
+noncomputable def _root_.DerivedCategory.idFactors :
+    DerivedCategory.Q ⋙ 𝟭 (DerivedCategory A) ≅
+      (𝟭 A).mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q :=
+  Functor.rightUnitor _ ≪≫
+    (Functor.isoWhiskerRight (Functor.mapHomologicalComplexIdIso A (ComplexShape.up ℤ))
+      DerivedCategory.Q ≪≫ Functor.leftUnitor _).symm
+
+/-- A composite of two functors that factor degreewise factors degreewise through the
+composite; `(F₁ ⋙ F₂).mapHomologicalComplex` is definitionally the composite of the two, so
+only associators enter.  The input of `DerivedCategory.isoOfFactors` for a composition law. -/
+noncomputable def _root_.DerivedCategory.compFactors {F₁ : A ⥤ B} {F₂ : B ⥤ C}
+    [F₁.PreservesZeroMorphisms] [F₂.PreservesZeroMorphisms]
+    {G₁ : DerivedCategory A ⥤ DerivedCategory B}
+    {G₂ : DerivedCategory B ⥤ DerivedCategory C}
+    (e₁ : DerivedCategory.Q ⋙ G₁ ≅
+      F₁.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q)
+    (e₂ : DerivedCategory.Q ⋙ G₂ ≅
+      F₂.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q) :
+    DerivedCategory.Q ⋙ (G₁ ⋙ G₂) ≅
+      (F₁ ⋙ F₂).mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q :=
+  (Functor.associator _ _ _).symm ≪≫ Functor.isoWhiskerRight e₁ G₂ ≪≫
+    Functor.associator _ _ _ ≪≫ Functor.isoWhiskerLeft _ e₂ ≪≫ (Functor.associator _ _ _).symm
 
 end CategoryTheory

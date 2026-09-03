@@ -16,19 +16,17 @@ module-sheaf pullback preserves fixed-rank locally free atlases along every morp
 (`FiniteLocallyFreeData.pullback`); and the contract's derived pullback commutes with the
 degree-zero embedding through its factorization `derivedFactors`
 (`Functor.singleFunctorIsoOfFactors`).  So perfect complexes are preserved by every
-instance of `HasCoherentPullback`, with no further hypothesis.  The perfect lift
-`perfectDerivedPullback` follows, and the identity and composition contracts for the bounded
-and perfect lifts are stated here because their `perfectIso` fields need it.  No flatness
-enters.
+instance of `HasCoherentPullback`, with no further hypothesis, and the perfect lift
+`perfectDerivedPullback` follows.  Its identity and composition laws are in
+`Families/CoherentPullbackCoherence.lean`.  No flatness enters.
 
 ## Main definitions
 
 * `SchemeBaseChange.derivedPullbackSingleFunctor`: the contract's derived pullback commutes
   with `DerivedCategory.singleFunctor`;
 * `SchemeBaseChange.perfectDerivedPullback`: pullback on perfect derived fibers;
-* `SchemeBaseChange.GeometricDerivedPullbackIdentity`,
-  `SchemeBaseChange.GeometricDerivedPullbackComposition`: the identity and composition
-  contracts for the bounded and perfect lifts.
+* `SchemeBaseChange.perfectDerivedPullbackCompInclusion`: the perfect lift forgets to coherent
+  derived pullback.
 
 ## Main results
 
@@ -36,15 +34,6 @@ enters.
   generators go to generators;
 * `SchemeBaseChange.coherentDerivedPullback_preservesPerfect`: every coherent pullback contract
   preserves perfect complexes.
-
-## Implementation notes
-
-`GeometricDerivedPullbackIdentity` and `GeometricDerivedPullbackComposition` are postulated:
-nothing inhabits them.  They sit here rather than beside `boundedCoherentDerivedPullback`
-only because their `perfectIso` fields need `perfectDerivedPullback`.  When they are
-discharged for every instance of `HasCoherentPullback` they follow the precedent of
-`Families/CoherentPushforwardCoherence.lean`, and the binders naming them in
-`Stability/BoundedCoherentBaseChange.lean` are retired with them.
 
 ## References
 
@@ -135,33 +124,6 @@ def perfectDerivedPullbackCompInclusion
     perfectDerivedPullback f ⋙ (schemePerfect T.left).ι ≅
       (schemePerfect U.left).ι ⋙ coherentDerivedPullback f :=
   Iso.refl _
-
-/-- Identity compatibility for the bounded-coherent and perfect pullback
-lifts on a locally Noetherian base change. -/
-class GeometricDerivedPullbackIdentity (T : SchemeBaseChange S)
-    [IsLocallyNoetherian T.left] [HasCoherentPullback (𝟙 T)] where
-  /-- Bounded coherent pullback along the identity is the identity functor. -/
-  boundedIso : boundedCoherentDerivedPullback (𝟙 T) ≅
-    𝟭 T.BoundedCoherentDerivedFiber
-  /-- Perfect pullback along the identity is the identity functor. -/
-  perfectIso : perfectDerivedPullback (𝟙 T) ≅ 𝟭 T.PerfectDerivedFiber
-
-/-- Composition compatibility for the bounded-coherent and perfect pullback
-lifts.  This is the typed geometric base-change compositor; coherence laws
-can subsequently be imposed and proved on these canonical isomorphisms. -/
-class GeometricDerivedPullbackComposition
-    {T U V : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [IsLocallyNoetherian V.left]
-    [HasCoherentPullback f] [HasCoherentPullback g]
-    [HasCoherentPullback (f ≫ g)] where
-  /-- Bounded coherent pullback reverses composition up to isomorphism. -/
-  boundedIso : boundedCoherentDerivedPullback g ⋙
-      boundedCoherentDerivedPullback f ≅
-    boundedCoherentDerivedPullback (f ≫ g)
-  /-- Perfect pullback reverses composition up to isomorphism. -/
-  perfectIso : perfectDerivedPullback g ⋙ perfectDerivedPullback f ≅
-    perfectDerivedPullback (f ≫ g)
 
 end SchemeBaseChange
 

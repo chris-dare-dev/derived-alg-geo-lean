@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.PerfectPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.CoherentPullbackCoherence
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.PreStabilityBaseChange
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Inducing
 import Mathlib.CategoryTheory.Triangulated.Adjunction
@@ -11,8 +11,8 @@ import Mathlib.CategoryTheory.Triangulated.Adjunction
 # Bounded coherent realization of categorical pre-stability base change
 
 This file connects the actual bounded coherent pullback from
-`Families.BoundedGeometry`, with its identity and composition contracts from
-`Families.PerfectPullback`, to `FiberPreStabilityBaseChangeData`.
+`Families.BoundedGeometry`, with its identity and composition laws from
+`Families.CoherentPullbackCoherence`, to `FiberPreStabilityBaseChangeData`.
 
 The bridge has three layers.
 
@@ -81,18 +81,16 @@ witness. -/
 theorem identity (T : SchemeBaseChange S)
     [IsLocallyNoetherian T.left]
     [HasCoherentPullback (𝟙 T)]
-    [GeometricDerivedPullbackIdentity T]
     (s : Slicing T.BoundedCoherentDerivedFiber) :
     BoundedCoherentPullbackPreimageData (𝟙 T) s where
   preimageData := s.preimageData_id.ofIso
-    (GeometricDerivedPullbackIdentity.boundedIso (T := T)).symm
+    (boundedCoherentDerivedPullbackId T).symm
 
 /-- The slicing induced along the identity is the original slicing. -/
 @[simp]
 theorem preimage_identity (T : SchemeBaseChange S)
     [IsLocallyNoetherian T.left]
     [HasCoherentPullback (𝟙 T)]
-    [GeometricDerivedPullbackIdentity T]
     (s : Slicing T.BoundedCoherentDerivedFiber) :
     (identity T s).preimage = s := by
   calc
@@ -100,7 +98,7 @@ theorem preimage_identity (T : SchemeBaseChange S)
         s.preimage (Functor.id T.BoundedCoherentDerivedFiber)
           s.preimageData_id :=
       Slicing.preimage_iso s _ _ s.preimageData_id
-        (GeometricDerivedPullbackIdentity.boundedIso (T := T)).symm
+        (boundedCoherentDerivedPullbackId T).symm
     _ = s := s.preimage_id
 
 /-- Geometric bounded coherent preimage witnesses compose through the actual
@@ -110,7 +108,6 @@ theorem comp {T U V : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V)
     [IsLocallyNoetherian V.left]
     [HasCoherentPullback f] [HasCoherentPullback g]
     [HasCoherentPullback (f ≫ g)]
-    [GeometricDerivedPullbackComposition f g]
     {s : Slicing T.BoundedCoherentDerivedFiber}
     (hf : BoundedCoherentPullbackPreimageData f s)
     (hg : BoundedCoherentPullbackPreimageData g hf.preimage) :
@@ -120,7 +117,7 @@ theorem comp {T U V : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V)
     change (s.preimage (boundedCoherentDerivedPullback f)
       hf.preimageData).PreimageData (boundedCoherentDerivedPullback g) at hgData
     exact (hf.preimageData.comp hgData).ofIso
-      (GeometricDerivedPullbackComposition.boundedIso (f := f) (g := g))
+      (boundedCoherentDerivedPullbackComp f g)
 
 /-- One-step and two-step geometric bounded coherent preimages agree. -/
 @[simp]
@@ -130,7 +127,6 @@ theorem preimage_comp {T U V : SchemeBaseChange S}
     [IsLocallyNoetherian V.left]
     [HasCoherentPullback f] [HasCoherentPullback g]
     [HasCoherentPullback (f ≫ g)]
-    [GeometricDerivedPullbackComposition f g]
     {s : Slicing T.BoundedCoherentDerivedFiber}
     (hf : BoundedCoherentPullbackPreimageData f s)
     (hg : BoundedCoherentPullbackPreimageData g hf.preimage) :
@@ -146,7 +142,7 @@ theorem preimage_comp {T U V : SchemeBaseChange S}
           (hf.preimageData.comp hgData) :=
       Slicing.preimage_iso s _ _
         (hf.preimageData.comp hgData)
-        (GeometricDerivedPullbackComposition.boundedIso (f := f) (g := g))
+        (boundedCoherentDerivedPullbackComp f g)
     _ = hg.preimage := by
       apply Slicing.ext
       rfl
@@ -176,11 +172,10 @@ model to the concrete bounded-coherent identity pullback. -/
 def identity (T : SchemeBaseChange S)
     [IsLocallyNoetherian T.left]
     [HasCoherentPullback (𝟙 T)]
-    [GeometricDerivedPullbackIdentity T]
     (s : Slicing T.BoundedCoherentDerivedFiber) :
     BoundedCoherentPullbackInducingData (𝟙 T) s where
   inducedTStructures := s.inducedTStructuresId.ofIso
-    (GeometricDerivedPullbackIdentity.boundedIso (T := T)).symm
+    (boundedCoherentDerivedPullbackId T).symm
 
 /-- Apply the owned finite phase-truncation theorem to the actual A.17
 output. -/

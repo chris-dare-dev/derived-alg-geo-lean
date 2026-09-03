@@ -374,7 +374,7 @@ open CategoryTheory.Triangulated
 `schemePerfect` is the thick envelope of degree-zero finite locally free
 coherent sheaves.  The pullback contract below is inhabited for exact, in
 particular flat, pullback, and preservation of perfect complexes is a theorem
-for every instance; the identity and composition contracts remain postulated.
+for every instance, as are the identity and composition laws.
 -/
 
 #print axioms AlgebraicGeometry.DerivedCategory.SchemeCoherentDerivedCategory
@@ -433,12 +433,14 @@ for every instance; the identity and composition contracts remain postulated.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPullback_preservesPerfect
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectDerivedPullbackCompInclusion
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackIdentity
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackIdentity.boundedIso
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackIdentity.perfectIso
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackComposition
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackComposition.boundedIso
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.GeometricDerivedPullbackComposition.perfectIso
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback.sheafPullbackId
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback.sheafPullbackComp
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPullbackId
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.coherentDerivedPullbackComp
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPullbackId
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.boundedCoherentDerivedPullbackComp
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectDerivedPullbackId
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectDerivedPullbackComp
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.hasCoherentPullbackOfIsExactPullback
 
 /-! ## Direct image on bounded coherent derived categories
