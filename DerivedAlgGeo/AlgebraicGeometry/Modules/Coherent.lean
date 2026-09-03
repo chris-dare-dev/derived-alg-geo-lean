@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.AffineChart
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Descent
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Linear
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pullback
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.StructureSheaf
 

@@ -1244,6 +1244,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- be turned into finite presentation on a scheme at all. One file, replacing the two
 -- independent workarounds that preceded it.
 #print axioms TopologicalSpace.Opens.hasBinaryProducts
+#print axioms TopologicalSpace.Opens.map_final
 #print axioms TopologicalSpace.Opens.hasFiniteLimits
 
 -- Layer B stage 1: the affine comparison, forward direction.
