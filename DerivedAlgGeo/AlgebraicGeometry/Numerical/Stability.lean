@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.BogomolovGieseker
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.Slope
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.WallTransport
 
 /-! # Polarised numerical data
 
