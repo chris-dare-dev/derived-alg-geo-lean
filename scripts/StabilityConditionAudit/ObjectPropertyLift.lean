@@ -2,7 +2,7 @@
 ObjectPropertyLift slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 
-This slice owns `DerivedAlgGeo/CategoryTheory/ObjectProperty/Lift.lean`. The twelve
+This slice owns `DerivedAlgGeo/CategoryTheory/ObjectProperty/`. The twelve
 declarations below were audited in `TStructureCore.lean` while they lived in the t-structure
 restriction file; they moved here with the block, so the sweep follows the declarations rather than
 the theorem that first needed them.
@@ -26,3 +26,7 @@ import DerivedAlgGeo.CategoryTheory.ObjectProperty
 
 #print axioms CategoryTheory.Adjunction.restrictInverseImageLeft
 #print axioms CategoryTheory.Adjunction.restrictInverseImageRight
+
+/-! ## Left orthogonals are closed under colimits -/
+
+#print axioms CategoryTheory.ObjectProperty.instIsClosedUnderColimitsOfShapeLeftOrthogonal

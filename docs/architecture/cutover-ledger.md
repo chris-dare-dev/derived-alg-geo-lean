@@ -7,6 +7,21 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Left orthogonals are closed under colimits (2026-09-04):
+  `CategoryTheory/ObjectProperty/Orthogonal.lean` owns
+  `instIsClosedUnderColimitsOfShapeLeftOrthogonal`, beside Mathlib's own
+  `Mathlib/CategoryTheory/ObjectProperty/Orthogonal.lean`. It is the one
+  hypothesis of `ObjectProperty.coprodClosure_le` that neither Mathlib file
+  supplied: `IsClosedUnderIsomorphisms` and `ContainsZero` come from
+  `ObjectProperty/Orthogonal.lean` and `IsTriangulatedClosed₂` from
+  `Triangulated/Orthogonal.lean`. `CompactlyGenerated/Coaisle.lean` and
+  `CompactlyGenerated/IndExtension.lean` each hand-rolled the same induction
+  over `coprodClosure` with verbatim identical `of_iso`, `of_coproduct`, and
+  `of_extension` branches; both now apply `coprodClosure_le` and prove only
+  their own generator case, which is 42 lines deleted for 29 added. The
+  instance is stated for an arbitrary colimit shape, not just `Discrete ι`,
+  because `IsColimit.hom_ext` is the entire proof; no dual for
+  `rightOrthogonal` under limits was added, as no consumer needs one.
 - Restricting a functor to the subcategories an `ObjectProperty` cuts out
   (2026-09-04): `CategoryTheory/ObjectProperty/Lift.lean` owns
   `liftOfLE` with its `Additive`, `CommShift ℤ`, and `IsTriangulated`
@@ -468,31 +483,16 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-Every path lane confirmed by the 2026-09-01 audit has landed, and so has the
-`ObjectProperty` lift block recorded 2026-09-02; it is the first entry under
-"Completed roots" above.
-
-- `CompactlyGenerated/Coaisle.lean` and `CompactlyGenerated/IndExtension.lean`
-  each hand-roll the same induction over `ObjectProperty.coprodClosure` to show
-  that right orthogonality to a fixed object passes from the generators to
-  their closure; the `of_iso`, `of_coproduct`, and `of_extension` branches are
-  verbatim identical between the two. Two of the three are already Mathlib
-  instances on `ObjectProperty.leftOrthogonal`
-  (`IsClosedUnderIsomorphisms`, `IsTriangulatedClosed₂`); the missing one is
-  closure under coproducts, and with it both inductions collapse to a
-  `coprodClosure_le` application. Its canonical owner is
-  `CategoryTheory/ObjectProperty/Orthogonal.lean`, beside Mathlib's own
-  `Mathlib/CategoryTheory/ObjectProperty/Orthogonal.lean`. It waited on the
-  `CategoryTheory/ObjectProperty/` cutover, which landed 2026-09-04, so the
-  directory now exists and this lane is unblocked (recorded 2026-09-03,
-  projective-families lane; the instance and both shortened proofs are
-  written and compile).
+Nothing is queued. Every path lane confirmed by the 2026-09-01 audit has
+landed, and so have both lanes recorded after it: the `ObjectProperty` lift
+block (2026-09-02) and the left-orthogonal colimit closure (2026-09-03).
+Both are entries under "Completed roots" above.
 
 No confirmed type-level hazard remains: the `ZLattice` class, the bundled
 variety types, and the alternating-finsum vocabulary are all retired above
 (2026-09-02).
 
-Take these lanes one per pull request. Remove the old path rather than retaining
+When a lane is added here, take it one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and
 add a focused layering guard preventing the declaration from returning to its
 consumer.

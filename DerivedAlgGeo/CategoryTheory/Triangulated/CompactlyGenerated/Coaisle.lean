@@ -2,6 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.CategoryTheory.ObjectProperty.Orthogonal
+import Mathlib.CategoryTheory.Triangulated.Orthogonal
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.FiniteSupport
 
 /-!
@@ -12,8 +14,9 @@ generators, so the degree-one coaisle is the right orthogonal of that closure.  
 objects of the coaisle is again right orthogonal to every generator, because a map from a
 compact generator into a coproduct is a finite sum of maps into the summands
 (`IsCompactObject.exists_finite_sum`), and right orthogonality to a fixed object passes from
-the generators to their closure by the same induction as in
-`TStructure.coprodBoundedAisle_rightOrthogonal_of_isGE` (Lemma A.14 of arXiv:2607.28411v1).
+the generators to their closure by `ObjectProperty.coprodClosure_le`: being left orthogonal to a
+fixed object is closed under isomorphisms, colimits, and extensions, which are exactly that
+lemma's three hypotheses. Only the generator case is specific to this file.
 
 ## Main results
 
@@ -52,24 +55,13 @@ theorem isGE_one_coproduct (h : t.IsCompactlyGeneratedBy.{0} G) {ι : Type} (X :
   have hZ' : G.coprodClosure.{0} Z := by
     rw [← h.le_zero_eq]
     exact hZ.le
-  clear hZ
-  induction hZ' with
-  | of_mem Z hZ =>
-      obtain ⟨s, g, rfl⟩ := IsCompactObject.exists_finite_sum (h.compact Z hZ) X f
-      refine Finset.sum_eq_zero fun i _ => ?_
-      rw [t.zero_of_isLE_of_isGE (g i) 0 1 (by omega) (h.isLE_zero_of_generator hZ) (hX i),
-        zero_comp]
-  | of_iso e _ ih =>
-      rw [← cancel_epi e.hom, comp_zero]
-      exact ih (e.hom ≫ f)
-  | of_coproduct c hc _ ih =>
-      apply hc.hom_ext
-      intro j
-      rw [comp_zero]
-      exact ih j (c.ι.app j ≫ f)
-  | of_extension T hT _ _ ih₁ ih₃ =>
-      have hzero : T.mor₁ ≫ f = 0 := ih₁ (T.mor₁ ≫ f)
-      obtain ⟨k, rfl⟩ := Triangle.yoneda_exact₂ T hT f hzero
-      rw [ih₃ k, comp_zero]
+  refine G.coprodClosure_le
+    (Q := ObjectProperty.leftOrthogonal (fun W => W = ∐ X))
+    (fun W hW => ?_) Z hZ' f rfl
+  rintro _ g rfl
+  obtain ⟨s, k, rfl⟩ := IsCompactObject.exists_finite_sum (h.compact W hW) X g
+  refine Finset.sum_eq_zero fun i _ => ?_
+  rw [t.zero_of_isLE_of_isGE (k i) 0 1 (by omega) (h.isLE_zero_of_generator hW) (hX i),
+    zero_comp]
 
 end CategoryTheory.Triangulated.TStructure.IsCompactlyGeneratedBy
