@@ -10,6 +10,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNat
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Shapes.Products
 import DerivedAlgGeo.CategoryTheory.Localization.Coproducts
 import DerivedAlgGeo.CategoryTheory.MorphismProperty.Limits
+import DerivedAlgGeo.Algebra.Homology.Subcomplex
 
 /-!
 Audit records for generic cohomological infrastructure on arbitrary categories.
@@ -204,3 +205,28 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.CohomologyClass.toSmallShiftedHom_postcomp
 #print axioms CochainComplex.HomComplex.postcompMap
 #print axioms CochainComplex.HomComplex.postcompMap_f_apply
+
+/-! ## Subcomplexes from degreewise subobject data -/
+
+#print axioms HomologicalComplex.SubcomplexData
+#print axioms HomologicalComplex.SubcomplexData.ι
+#print axioms HomologicalComplex.SubcomplexData.comm
+#print axioms HomologicalComplex.SubcomplexData.d
+#print axioms HomologicalComplex.SubcomplexData.instMonoToComplexι
+#print axioms HomologicalComplex.SubcomplexData.mk.inj
+#print axioms HomologicalComplex.SubcomplexData.mk.sizeOf_spec
+#print axioms HomologicalComplex.SubcomplexData.mono
+#print axioms HomologicalComplex.SubcomplexData.ofDegreewiseMono
+#print axioms HomologicalComplex.SubcomplexData.ofDegreewiseMono_ι
+#print axioms HomologicalComplex.SubcomplexData.ofDegreewiseMono_d
+#print axioms HomologicalComplex.SubcomplexData.ofDegreewiseMono_X
+#print axioms HomologicalComplex.SubcomplexData.toComplex
+#print axioms HomologicalComplex.SubcomplexData.toComplexι
+#print axioms HomologicalComplex.SubcomplexData.toComplex_d
+#print axioms HomologicalComplex.SubcomplexData.toComplexι_f
+#print axioms HomologicalComplex.SubcomplexData.toComplex_X
+#print axioms HomologicalComplex.SubcomplexData.top
+#print axioms HomologicalComplex.SubcomplexData.top_ι
+#print axioms HomologicalComplex.SubcomplexData.top_d
+#print axioms HomologicalComplex.SubcomplexData.top_X
+#print axioms HomologicalComplex.SubcomplexData.X
