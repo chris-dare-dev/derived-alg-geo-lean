@@ -14,9 +14,9 @@ Harder--Narasimhan slicing, so the paper's condition `muPlus F < +infinity`
 is phrased here as `phiPlus F < 1`: for an object of the slicing heart these
 say that the largest HN factor is off the real-axis boundary.  This is the
 same phase-language convention as
-`StabilityCondition/Weak/Tilting/TorsionPair/Slope.lean`.  The normalized
+`WeakStabilityCondition/Tilting/TorsionPair/Slope.lean`.  The normalized
 slope--phase ray identity is formalized downstream in
-`StabilityCondition/Weak/Basic/ChargeRay.lean`, and the exact finite-slope
+`WeakStabilityCondition/Basic/ChargeRay.lean`, and the exact finite-slope
 adapter is provided by `Tilting/TorsionPair/SourceSlope.lean`.  The coverage
 coordinate remains `mapped`; review and owner-gated promotion are separate
 governance steps.

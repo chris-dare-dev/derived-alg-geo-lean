@@ -60,6 +60,7 @@ the self-intersection of an integral class. The individual models take integer d
 universe v
 
 open Polynomial
+open DerivedAlgGeo.LinearAlgebra
 
 namespace AlgebraicGeometry.Numerical
 

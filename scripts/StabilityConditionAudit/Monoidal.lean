@@ -1,0 +1,9 @@
+/-
+Generic monoidal/triangulated compatibility slice of the CategoryTheory audit.
+-/
+import DerivedAlgGeo.CategoryTheory.Monoidal
+
+#print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation
+#print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorAdditive
+#print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorCommShift
+#print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorIsTriangulated

@@ -30,8 +30,8 @@ D^{≤0}_† = {X ∈ D^{≤0} : H⁰(X) ∈ T},   D^{≥0}_† = {X ∈ D^{≥-
 **Mathlib has no `Hⁿ` for a t-structure at the pin** — `TStructure/` carries
 `truncLE`, `truncGE` and the truncation triangle, but no cohomology functor
 into the heart. This project now constructs that functor and proves it
-homological in `StabilityCondition/Weak/Tilting/Cohomology/Homological.lean`;
-`StabilityCondition/Metric/Mass/Subadditivity/CohomologyExactness.lean`
+homological in `WeakStabilityCondition/Tilting/Cohomology/Homological.lean`;
+`WeakStabilityCondition/StabilityCondition/Metric/Mass/Subadditivity/CohomologyExactness.lean`
 transports the result to the stability-condition API. The aisle construction
 here predates that bridge and does not depend on it.
 
@@ -84,7 +84,7 @@ the heart as a category.
 Stating it in `C` avoids the full-subcategory plumbing that carrying an
 `Abelian` instance on the heart would require, and the decomposition axiom
 becomes a distinguished triangle — which for objects of the heart is the same
-thing as a short exact sequence there. `StabilityCondition/Weak/Tilting/TorsionPair/Basic.lean` is the
+thing as a short exact sequence there. `WeakStabilityCondition/Tilting/TorsionPair/Basic.lean` is the
 abelian-category version of the same notion; neither is derived from the other
 here. -/
 structure HeartTorsionPair where

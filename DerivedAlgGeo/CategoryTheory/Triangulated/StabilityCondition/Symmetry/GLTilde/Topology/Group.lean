@@ -30,7 +30,7 @@ so the potentially discontinuous global branch `arg (cA)` cancels.  Every
 `W φ` lies in the open right half-plane, where `arg` is continuous.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Complex Matrix Real Set Topology
 
@@ -311,4 +311,4 @@ noncomputable instance GLTilde.isTopologicalGroup : IsTopologicalGroup GLTilde w
   continuous_mul := continuous_mul_glTilde
   continuous_inv := continuous_inv_glTilde
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

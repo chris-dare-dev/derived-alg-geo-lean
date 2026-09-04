@@ -3,7 +3,7 @@ TStructureCore slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
-import DerivedAlgGeo.CategoryTheory.Triangulated.BoundedHomotopyCategory
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
@@ -76,6 +76,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.ObjectProperty.instIsTriangulatedClosed₂CoprodClosure
 #print axioms CategoryTheory.ObjectProperty.le_coprodClosure
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_le
+#print axioms CategoryTheory.ObjectProperty.coprodClosure_le_shift_of_le_shift
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_map_obj
 #print axioms CategoryTheory.Adjunction.isCompactObject_leftAdjoint_obj
 #print axioms CategoryTheory.Adjunction.compactObjects_map_leftAdjoint
@@ -217,8 +218,25 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Adjunction.isTExact_of_compactlyGenerated
 #print axioms CategoryTheory.ObjectProperty.hasInducedTStructure_of_preimage
 #print axioms CategoryTheory.ObjectProperty.preimageLift
+#print axioms CategoryTheory.ObjectProperty.instAdditivePreimageLift
+#print axioms CategoryTheory.ObjectProperty.instCommShiftPreimageLift
+#print axioms CategoryTheory.ObjectProperty.instIsTriangulatedPreimageLift
+#print axioms CategoryTheory.ObjectProperty.inverseImageLift
+#print axioms CategoryTheory.ObjectProperty.liftToInverseImage
+#print axioms CategoryTheory.Adjunction.restrictInverseImageLeft
+#print axioms CategoryTheory.Adjunction.restrictInverseImageRight
 #print axioms CategoryTheory.ObjectProperty.tStructure_isLE_iff_map
 #print axioms CategoryTheory.ObjectProperty.tStructure_isGE_iff_map
+#print axioms CategoryTheory.ObjectProperty.liftOfLE
+#print axioms CategoryTheory.ObjectProperty.instAdditiveLiftOfLE
+#print axioms CategoryTheory.ObjectProperty.instCommShiftLiftOfLE
+#print axioms CategoryTheory.ObjectProperty.instIsTriangulatedLiftOfLE
+#print axioms CategoryTheory.ObjectProperty.isLE_iff_isLE_map
+#print axioms CategoryTheory.ObjectProperty.isGE_iff_isGE_map
+#print axioms CategoryTheory.ObjectProperty.tStructure_isBounded_iff_le_bounded
+#print axioms CategoryTheory.ObjectProperty.tStructure_isBounded_of_le_bounded_inverseImage
+#print axioms CategoryTheory.ObjectProperty.tStructure_isLE_iff_map_of_le
+#print axioms CategoryTheory.ObjectProperty.tStructure_isGE_iff_map_of_le
 #print axioms CategoryTheory.Triangulated.TStructure.boundedAisle
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.small_isBounded
@@ -227,15 +245,28 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.hasInduced
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.isLE_iff
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.isGE_iff
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.tStructure
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.isBounded
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.isLE_iff
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.isGE_iff
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.mk.inj
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureData
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureData.tStructure
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureData.isBounded
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureData.isLE_iff
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureData.isGE_iff
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureData.mk.inj
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.toInducedTStructureData
+#print axioms CategoryTheory.Triangulated.Polishchuk.induceLarge
+#print axioms CategoryTheory.Triangulated.Polishchuk.induceOfLE
 #print axioms CategoryTheory.Triangulated.Polishchuk.induce
 #print axioms CategoryTheory.Triangulated.Polishchuk.induceOfApproximation
 #print axioms CategoryTheory.Triangulated.Polishchuk.induceOfBrown
 #print axioms CategoryTheory.Triangulated.Polishchuk.induceOfApproximationMaps
+#print axioms CategoryTheory.Triangulated.TStructure.IsCompactlyGeneratedBy.isGE_one_coproduct
 #print axioms CategoryTheory.Triangulated.TStructure.coprodBoundedAisle_rightOrthogonal_of_isGE
 #print axioms CategoryTheory.Triangulated.TStructure.boundedAisle_le_large
 #print axioms CategoryTheory.Triangulated.TStructure.large_isLE_zero_iff

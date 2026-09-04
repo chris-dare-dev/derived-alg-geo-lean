@@ -19,11 +19,14 @@ Harder--Narasimhan structures, openness, boundedness, or a moduli space, and it
 does not assert a deformation-theoretic conclusion.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 open CategoryTheory Limits Pretriangulated
+open CategoryTheory.Moduli
 open CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.Families
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 noncomputable section
 
@@ -101,4 +104,4 @@ end CategoricalOrdinaryFiberStabilityInFamiliesData
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families

@@ -11,9 +11,9 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLT
 Every `T ∈ GL⁺(2, ℝ)` admits a compatible phase relabelling, so `toMatHom`
 is onto.
 
-Together with `StabilityCondition/Symmetry/GLTilde/Covering/Fibre.lean` this closes the algebraic exact sequence.
-`StabilityCondition/Symmetry/GLTilde/Covering/SourceTopology.lean` now supplies a topology, continuity of the projection,
-and simple connectedness; `StabilityCondition/Symmetry/GLTilde/Covering/Map.lean` proves the covering-map property.
+Together with `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Fibre.lean` this closes the algebraic exact sequence.
+`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/SourceTopology.lean` now supplies a topology, continuity of the projection,
+and simple connectedness; `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean` proves the covering-map property.
 
 ## The construction, and why it needs no branch cut
 
@@ -60,7 +60,7 @@ Positivity of `det` is used **twice**, and differently: once to put `W` in the
 right half-plane, once to sign the cross product.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix Real Complex
 
@@ -463,11 +463,11 @@ range is exactly the kernel of the projection, and the projection is onto.
 
 This theorem packages the extension, not the topology.  The covering-map and
 simple-connectedness properties are packaged separately by
-`GLTilde.universalCoverData` in `StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`. -/
+`GLTilde.universalCoverData` in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`. -/
 theorem exact_deckHom_toMatHom :
     Function.Injective deckHom
       ∧ deckHom.range = GLTilde.toMatHom.ker
       ∧ Function.Surjective GLTilde.toMatHom :=
   ⟨deckHom_injective, range_deckHom_eq_ker, toMatHom_surjective⟩
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

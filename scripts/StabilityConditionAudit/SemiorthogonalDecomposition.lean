@@ -10,9 +10,13 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.mk.inj
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.total
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.residual
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.component_le_total
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.hom_eq_zero
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.component_hom_residual_eq_zero
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.HasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.HasTriangulatedComponents.totalIsStableUnderShift
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.HasTriangulatedComponents.residual_isTriangulated
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsFull
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsStronglyFull
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsStronglyFull.isFull
@@ -31,3 +35,219 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.productComponent_one
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.product
 #print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.product_component
+
+-- Orientation: the one place the direction convention is pinned. ofReverse
+-- reindexes a classically-ordered family along OrderDual; ofReverseFin lands
+-- the finite case back on Fin n through the root's own reindex.
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverse
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverse_component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverse_hom_eq_zero
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverseFin
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverseFin_component
+
+-- Admissible object properties: the adjunction predicates, counit/unit
+-- triangles, the strong two-block decomposition, and its two non-vacuous
+-- inhabitants. Mutation remains object-level prose until an enhancement is
+-- available.
+#print axioms CategoryTheory.ObjectProperty.zeroObjects
+#print axioms CategoryTheory.ObjectProperty.topIsTriangulated
+#print axioms CategoryTheory.ObjectProperty.zeroObjectsIsClosedUnderIsomorphisms
+#print axioms CategoryTheory.ObjectProperty.zeroObjectsIsTriangulated
+#print axioms CategoryTheory.ObjectProperty.IsRightAdmissible
+#print axioms CategoryTheory.ObjectProperty.IsLeftAdmissible
+#print axioms CategoryTheory.ObjectProperty.IsAdmissible
+#print axioms CategoryTheory.ObjectProperty.top_isRightAdmissible
+#print axioms CategoryTheory.ObjectProperty.top_isLeftAdmissible
+#print axioms CategoryTheory.ObjectProperty.zeroObjects_isRightAdmissible
+#print axioms CategoryTheory.ObjectProperty.zeroObjects_isLeftAdmissible
+#print axioms CategoryTheory.ObjectProperty.IsRightAdmissible.exists_distTriang_mem_rightOrthogonal
+#print axioms CategoryTheory.ObjectProperty.IsLeftAdmissible.exists_distTriang_mem_leftOrthogonal
+#print axioms CategoryTheory.ObjectProperty.IsRightAdmissible.extensionProduct_rightOrthogonal_eq_top
+#print axioms CategoryTheory.ObjectProperty.IsLeftAdmissible.leftOrthogonal_extensionProduct_eq_top
+#print axioms CategoryTheory.ObjectProperty.top_rightOrthogonal
+#print axioms CategoryTheory.ObjectProperty.zeroObjects_rightOrthogonal
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_component_zero
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_component_one
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_hasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_isStronglyFull
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_top_component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock_zeroObjects_component
+
+-- Exceptional objects: no self-maps into a nonzero shift, endomorphism ring
+-- the base field via algebraMap bijectivity. Every clause has consuming
+-- theorems; the honest inhabitant is the D^b(field) example (exc-e5 / #936).
+#print axioms CategoryTheory.Triangulated.IsExceptional
+#print axioms CategoryTheory.Triangulated.IsExceptional.hom_shift_eq_zero
+#print axioms CategoryTheory.Triangulated.IsExceptional.algebraMap_bijective
+#print axioms CategoryTheory.algebraMap_end_apply
+#print axioms CategoryTheory.Triangulated.IsExceptional.end_eq_smul_id
+#print axioms CategoryTheory.Triangulated.IsExceptional.not_isZero
+#print axioms CategoryTheory.Triangulated.IsExceptional.end_eq_zero_or_eq_one_of_mul_self
+#print axioms CategoryTheory.Triangulated.IsExceptional.not_nonempty_iso_shift
+#print axioms CategoryTheory.Triangulated.IsExceptional.hom_shift_shift_eq_zero
+#print axioms CategoryTheory.Triangulated.IsExceptional.shift
+#print axioms CategoryTheory.Triangulated.IsExceptional.of_equivalence
+
+-- Exceptional collections: the classical-direction structure, its envelope
+-- components, the semiorthogonality theorem via double envelope peeling, and
+-- the two upstream-candidate retract-stability instances for the orthogonals.
+#print axioms CategoryTheory.ObjectProperty.rightOrthogonal_isStableUnderRetracts
+#print axioms CategoryTheory.ObjectProperty.leftOrthogonal_isStableUnderRetracts
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.obj
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.exceptional
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.hom_shift_eq_zero
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.mk.inj
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.IsStrong
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.obj_mem_component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.component_nonempty
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.hom_shift_shift_eq_zero
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.semiorthogonal_component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequence
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequence_component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.IsFull
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.IsStronglyFull
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.IsStronglyFull.isFull
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.hasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.ofExceptional
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.reindex
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.reindex_toSemiorthogonalSequence
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequenceFin
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.toSemiorthogonalSequenceFin_component
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.hasTriangulatedComponentsFin
+
+-- Orthogonal exceptional blocks: positive-length exceptional collections,
+-- their triangulated spans, total exceptional part, residual right
+-- orthogonal, and the unordered decomposition type of Paper II.
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.span
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.obj_mem_span
+#print axioms CategoryTheory.Triangulated.ExceptionalCollection.span_isTriangulated
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.length
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.length_pos
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.collection
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.orthogonal
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.mk.inj
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.firstIndex
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.firstObject
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.blockSpan
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.total
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.residual
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ResidualCategory
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.obj_mem_blockSpan
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.obj_mem_total
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.total_le_of_forall_obj
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.length_eq_one_or_two_le
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.hom_eq_zero_of_ne
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.obj_hom_shift_eq_zero_of_ne
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.toSemiorthogonalSequence
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.toSemiorthogonalSequence_component
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.toSemiorthogonalSequence_total
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.toSemiorthogonalSequence_residual
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.blockSpan_isTriangulated
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.hasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.total_isStableUnderShift
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.residual_isTriangulated
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.obj_hom_residual_eq_zero
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.totalLength
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.decompositionType
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.decompositionType_card
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.decompositionType_sum
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.card_le_totalLength
+
+-- The adjacent k ⊕ k[-1] profile forces one common shift along a block.
+-- Bidirectional prefix extension separately derives exact block length.
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.zero_one
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.one_one
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.other_zero
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.shifts_eq_of_finrank_eq
+#print axioms CategoryTheory.Triangulated.AdjacentExtProfile.shifts_eq
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData.profile
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.targetIndex
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.targetIndex_val
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.mk.inj
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.embedding
+#print axioms CategoryTheory.Triangulated.PrefixBlockEmbeddingData.length_le
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.forward
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.backward
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.mk.inj
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.length_eq
+#print axioms CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData.targetIndex_eq_cast
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.shift
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.objectIso
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.mk.inj
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.MemberwiseBlockShiftData.shift_eq_first
+
+-- Chosen right adjoints supply concrete projection objects and the universal
+-- Hom property without pretending that functorial cones exist in a bare
+-- triangulated category.
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.projection
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.adjunction
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.mk.inj
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.mk.sizeOf_spec
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.project
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.projectObj
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.counitApp
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.homEquiv
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.homEquivFromProject
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.homEquivFromProject_id
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.isRightAdmissible
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.project_isZero_iff
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ResidualProjectionData
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.projectedObject
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.projectedObjectHomEquiv
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.projectedObjectHomEquiv_id
+
+-- Objectwise mutation from a chosen right projection is constructed in a
+-- bare triangulated category.  The cone is not claimed functorial.  Once
+-- successive exceptional-block triangles are supplied, their orthogonal
+-- cones prove the same-projection theorem for every member of every block.
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.ofIsRightAdmissible
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.mutation
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.toMutation
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.connecting
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.distinguished
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.mutation_mem
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.mk.inj
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle.mk.sizeOf_spec
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.counitTriangle
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.projectMap_isIso_of_distinguished
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.projectMapIsoOfDistinguished
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.stepMap
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.cone
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.toCone
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.connecting
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.distinguished
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.cone_mem
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.mk.inj
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.stepProjectionIso
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.projectionIsoFromFirst
+#print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData.projectionIso
+
+-- The derived category of a field: the milestone's honest inhabitant. The
+-- residue field in degree zero is exceptional (endomorphisms via the fully
+-- faithful k-linear singleFunctor; positive shifts via projectivity and
+-- Ext-vanishing; negative shifts via the canonical t-structure), and its
+-- length-one collection lands in the root. Fullness is deliberately not
+-- claimed and is expected to be false in the unbounded derived category.
+#print axioms CategoryTheory.Triangulated.residueObject
+#print axioms CategoryTheory.ModuleCat.algebraMap_end_self_bijective
+#print axioms CategoryTheory.Triangulated.isExceptional_residueObject
+#print axioms CategoryTheory.Triangulated.residueObjectExceptionalCollection
+#print axioms CategoryTheory.Triangulated.residueObjectExceptionalCollection_component

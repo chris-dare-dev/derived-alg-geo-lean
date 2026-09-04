@@ -95,7 +95,7 @@ the geometric obligation of exhibiting `NS(X)` with its intersection form, and
   inference.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical
 
 variable {V : Type*} [AddCommGroup V] [Module ℝ V]
 variable (q : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
@@ -381,4 +381,4 @@ theorem isSpherical_map_iff (c : IntegralComparison q b)
   rw [isSpherical_iff, selfPairing_map, Mukai.isSpherical_iff,
     show ((-2 : ℤ) : ℝ) = -2 by norm_num |>.symm, Int.cast_inj]
 
-end CategoryTheory.Triangulated.StabilityCondition.Wall.Spherical
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical

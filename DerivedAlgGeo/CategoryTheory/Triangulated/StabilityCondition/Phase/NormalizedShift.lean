@@ -19,7 +19,7 @@ acts on central charges. Splitting them exposes the algebraic and analytic
 properties of phase relabelling independently.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 /-- An order-isomorphism of `ℝ` commuting with `φ ↦ φ + 1`.
 
@@ -101,4 +101,4 @@ theorem inv_apply (f : NormalizedShift) (φ : ℝ) :
 
 end NormalizedShift
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

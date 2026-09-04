@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Basic
+import DerivedAlgGeo.Algebra.Exact.Sequence
 import Mathlib.Algebra.Exact.Sequence
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.ExactSequences
 import Mathlib.CategoryTheory.Abelian.ShortExact
@@ -29,30 +30,30 @@ namespace AlgebraicGeometry
 namespace Cohomology
 
 variable {k : Type u} [Field k]
-variable {X : Variety k}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
 /-- The short exact sequence of abelian sheaves underlying a short exact sequence of coherent
 sheaves. -/
-noncomputable abbrev coherentSheafShortComplex (S : ShortComplex (Coh X.toScheme)) :=
-  (S.map (Coh.ι X.toScheme)).map (Scheme.Modules.toSheaf X.toScheme)
+noncomputable abbrev coherentSheafShortComplex (S : ShortComplex (Coh X)) :=
+  (S.map (Coh.ι X)).map (Scheme.Modules.toSheaf X)
 
 /-- Exactness survives both forgetful functors from coherent module sheaves to abelian
 sheaves. -/
-theorem coherentSheafShortComplex_shortExact {S : ShortComplex (Coh X.toScheme)}
+theorem coherentSheafShortComplex_shortExact [IsLocallyNoetherian X] {S : ShortComplex (Coh X)}
     (hS : S.ShortExact) : (coherentSheafShortComplex S).ShortExact :=
-  Scheme.Modules.shortExact_map_toSheaf (Coh.shortExact_map_ι X.toScheme hS)
+  Scheme.Modules.shortExact_map_toSheaf (Coh.shortExact_map_ι X hS)
 
 /-- The additive connecting homomorphism in the `Ext` long exact sequence underlying coherent
 sheaf cohomology. -/
-noncomputable def coherentConnectingMap (S : ShortComplex (Coh X.toScheme))
+noncomputable def coherentConnectingMap (S : ShortComplex (Coh X))
     (hS : S.ShortExact) (i : ℕ) :
-    (coherentH X.toScheme i).obj S.X₃ ⟶ (coherentH X.toScheme (i + 1)).obj S.X₁ := by
+    (coherentH X i).obj S.X₃ ⟶ (coherentH X (i + 1)).obj S.X₁ := by
   letI : HasExt.{u + 1}
-      (Sheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}) :=
+      (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :=
     HasExt.standard _
   let hT := coherentSheafShortComplex_shortExact hS
   exact AddCommGrpCat.ofHom (hT.extClass.postcomp
-    ((constantSheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}).obj
+    ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}).obj
       (AddCommGrpCat.of (ULift ℤ))) rfl)
 
 namespace FiniteCohomology
@@ -70,8 +71,8 @@ private def isoToAddEquiv {A B : AddCommGrpCat.{u + 1}} (e : A ≅ B) : A ≃+ B
 Mathlib currently exposes the connecting morphisms only as additive group homomorphisms.
 The compatibility field says that `δ` forgets to exactly that morphism. Exactness is proved
 below from `Abelian.Ext.covariant_sequence_exact₁/₂/₃`; it is not stored here. -/
-structure LinearConnectingMaps (D : FiniteCohomology X)
-    (S : ShortComplex (Coh X.toScheme)) (hS : S.ShortExact) where
+structure LinearConnectingMaps (D : FiniteCohomology k X)
+    (S : ShortComplex (Coh X)) (hS : S.ShortExact) where
   /-- The degree-`i` linear connecting morphism. -/
   δ : ∀ i : ℕ, (D.moduleH i).obj S.X₃ ⟶ (D.moduleH (i + 1)).obj S.X₁
   /-- After forgetting scalars and applying `comparison`, `δ` is the `Ext` connecting map. -/
@@ -82,15 +83,15 @@ structure LinearConnectingMaps (D : FiniteCohomology X)
 
 /-- Exactness at the middle cohomology group in each degree, transported from Mathlib's
 `Ext` long exact sequence. -/
-theorem exact₂ (D : FiniteCohomology X) {S : ShortComplex (Coh X.toScheme)}
+theorem exact₂ (D : FiniteCohomology k X) {S : ShortComplex (Coh X)}
     (hS : S.ShortExact) (i : ℕ) :
     Function.Exact ((D.moduleH i).map S.f) ((D.moduleH i).map S.g) := by
   letI : HasExt.{u + 1}
-      (Sheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}) :=
+      (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :=
     HasExt.standard _
   let hT := coherentSheafShortComplex_shortExact hS
   have hExt := Abelian.Ext.covariant_sequence_exact₂'
-    ((constantSheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}).obj
+    ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}).obj
       (AddCommGrpCat.of (ULift ℤ))) hT i
   rw [ShortComplex.ab_exact_iff_function_exact] at hExt
   apply Function.Exact.of_ladder_addEquiv_of_exact'
@@ -106,16 +107,16 @@ theorem exact₂ (D : FiniteCohomology X) {S : ShortComplex (Coh X.toScheme)}
   · exact hExt
 
 /-- Exactness between the quotient map in degree `i` and the connecting morphism. -/
-theorem LinearConnectingMaps.exact₃ (D : FiniteCohomology X)
-    {S : ShortComplex (Coh X.toScheme)} {hS : S.ShortExact}
+theorem LinearConnectingMaps.exact₃ (D : FiniteCohomology k X)
+    {S : ShortComplex (Coh X)} {hS : S.ShortExact}
     (L : D.LinearConnectingMaps S hS) (i : ℕ) :
     Function.Exact ((D.moduleH i).map S.g) (L.δ i) := by
   letI : HasExt.{u + 1}
-      (Sheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}) :=
+      (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :=
     HasExt.standard _
   let hT := coherentSheafShortComplex_shortExact hS
   have hExt := Abelian.Ext.covariant_sequence_exact₃'
-    ((constantSheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}).obj
+    ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}).obj
       (AddCommGrpCat.of (ULift ℤ))) hT i (i + 1) rfl
   rw [ShortComplex.ab_exact_iff_function_exact] at hExt
   apply Function.Exact.of_ladder_addEquiv_of_exact'
@@ -132,16 +133,16 @@ theorem LinearConnectingMaps.exact₃ (D : FiniteCohomology X)
 
 /-- Exactness between the connecting morphism out of degree `i` and the inclusion map in
 degree `i + 1`. -/
-theorem LinearConnectingMaps.exact₁ (D : FiniteCohomology X)
-    {S : ShortComplex (Coh X.toScheme)} {hS : S.ShortExact}
+theorem LinearConnectingMaps.exact₁ (D : FiniteCohomology k X)
+    {S : ShortComplex (Coh X)} {hS : S.ShortExact}
     (L : D.LinearConnectingMaps S hS) (i : ℕ) :
     Function.Exact (L.δ i) ((D.moduleH (i + 1)).map S.f) := by
   letI : HasExt.{u + 1}
-      (Sheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}) :=
+      (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :=
     HasExt.standard _
   let hT := coherentSheafShortComplex_shortExact hS
   have hExt := Abelian.Ext.covariant_sequence_exact₁'
-    ((constantSheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}).obj
+    ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}).obj
       (AddCommGrpCat.of (ULift ℤ))) hT i (i + 1) rfl
   rw [ShortComplex.ab_exact_iff_function_exact] at hExt
   apply Function.Exact.of_ladder_addEquiv_of_exact'
@@ -158,16 +159,16 @@ theorem LinearConnectingMaps.exact₁ (D : FiniteCohomology X)
   · exact hExt
 
 /-- The first map of the long exact sequence is injective in degree zero. -/
-theorem injective_map_f_zero (D : FiniteCohomology X)
-    {S : ShortComplex (Coh X.toScheme)} (hS : S.ShortExact) :
+theorem injective_map_f_zero (D : FiniteCohomology k X)
+    {S : ShortComplex (Coh X)} (hS : S.ShortExact) :
     Function.Injective ((D.moduleH 0).map S.f) := by
   letI : HasExt.{u + 1}
-      (Sheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}) :=
+      (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :=
     HasExt.standard _
   let hT := coherentSheafShortComplex_shortExact hS
   letI : Mono (coherentSheafShortComplex S).f := hT.mono_f
   have hExt := Abelian.Ext.postcomp_mk₀_injective_of_mono
-    ((constantSheaf (Opens.grothendieckTopology X.toScheme) AddCommGrpCat.{u}).obj
+    ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}).obj
       (AddCommGrpCat.of (ULift ℤ))) (coherentSheafShortComplex S).f
   intro x y hxy
   apply (isoToAddEquiv ((D.comparison 0).app S.X₁)).injective
@@ -181,89 +182,10 @@ theorem injective_map_f_zero (D : FiniteCohomology X)
     _ = _ :=
       (ConcreteCategory.congr_hom ((D.comparison 0).hom.naturality S.f).symm y).symm
 
-section AlternatingFinrank
-
-variable {A B C : Type*}
-  [AddCommGroup A] [AddCommGroup B] [AddCommGroup C]
-  [Module k A] [Module k B] [Module k C]
-
-/-- Rank-nullity rewritten at an exact middle term. -/
-private theorem finrank_eq_range_add_range [Module.Finite k B]
-    (f : A →ₗ[k] B) (g : B →ₗ[k] C) (h : Function.Exact f g) :
-    Module.finrank k B = Module.finrank k f.range + Module.finrank k g.range := by
-  have hr := g.finrank_range_add_finrank_ker
-  rw [h.linearMap_ker_eq] at hr
-  omega
-
-variable (A B C : ℕ → Type*)
-  [∀ i, AddCommGroup (A i)] [∀ i, AddCommGroup (B i)] [∀ i, AddCommGroup (C i)]
-  [∀ i, Module k (A i)] [∀ i, Module k (B i)] [∀ i, Module k (C i)]
-  [∀ i, Module.Finite k (A i)] [∀ i, Module.Finite k (B i)] [∀ i, Module.Finite k (C i)]
-  (f : ∀ i, A i →ₗ[k] B i) (g : ∀ i, B i →ₗ[k] C i)
-  (δ : ∀ i, C i →ₗ[k] A (i + 1))
-
-/-- Alternating finite-dimensional dimensions cancel along a bounded long exact sequence.
-The endpoint hypothesis is stated as vanishing of the next `A` term, which makes the final
-connecting map surjective onto zero. -/
-theorem alternating_finrank_eq_zero_of_exact
-    (hinj : Function.Injective (f 0))
-    (hexact₂ : ∀ i, Function.Exact (f i) (g i))
-    (hexact₃ : ∀ i, Function.Exact (g i) (δ i))
-    (hexact₁ : ∀ i, Function.Exact (δ i) (f (i + 1)))
-    (n : ℕ) [Subsingleton (A (n + 1))] :
-    ∑ i ∈ Finset.range (n + 1), (-1 : ℤ) ^ i *
-      ((Module.finrank k (A i) : ℤ) - Module.finrank k (B i) + Module.finrank k (C i)) = 0 := by
-  have hA₀ : Module.finrank k (A 0) = Module.finrank k (LinearMap.range (f 0)) :=
-    (LinearMap.finrank_range_of_inj hinj).symm
-  have hB (i : ℕ) : Module.finrank k (B i) =
-      Module.finrank k (LinearMap.range (f i)) +
-        Module.finrank k (LinearMap.range (g i)) :=
-    finrank_eq_range_add_range (f i) (g i) (hexact₂ i)
-  have hC (i : ℕ) : Module.finrank k (C i) =
-      Module.finrank k (LinearMap.range (g i)) +
-        Module.finrank k (LinearMap.range (δ i)) :=
-    finrank_eq_range_add_range (g i) (δ i) (hexact₃ i)
-  have hA (i : ℕ) : Module.finrank k (A (i + 1)) =
-      Module.finrank k (LinearMap.range (δ i)) +
-        Module.finrank k (LinearMap.range (f (i + 1))) :=
-    finrank_eq_range_add_range (δ i) (f (i + 1)) (hexact₁ i)
-  have hδn : Module.finrank k (LinearMap.range (δ n)) = 0 := by
-    letI : Subsingleton (LinearMap.range (δ n)) := inferInstance
-    exact Module.finrank_zero_of_subsingleton
-  have hpartial (m : ℕ) :
-      ∑ i ∈ Finset.range (m + 1), (-1 : ℤ) ^ i *
-        ((Module.finrank k (A i) : ℤ) - Module.finrank k (B i) +
-          Module.finrank k (C i)) =
-        (-1 : ℤ) ^ m * Module.finrank k (LinearMap.range (δ m)) := by
-    induction m with
-    | zero =>
-        simp only [Nat.reduceAdd, Finset.range_one, Finset.sum_singleton, pow_zero, one_mul]
-        have hA₀' := hA₀
-        have hB' := hB 0
-        have hC' := hC 0
-        push_cast at hA₀' hB' hC'
-        omega
-    | succ m ih =>
-        rw [Finset.sum_range_succ, ih]
-        have hA' := hA m
-        have hB' := hB (m + 1)
-        have hC' := hC (m + 1)
-        have htriple :
-            (Module.finrank k (A (m + 1)) : ℤ) - Module.finrank k (B (m + 1)) +
-                Module.finrank k (C (m + 1)) =
-              Module.finrank k (LinearMap.range (δ m)) +
-                Module.finrank k (LinearMap.range (δ (m + 1))) := by
-          omega
-        rw [htriple, pow_succ]
-        ring
-  rw [hpartial n, hδn, Int.ofNat_zero, mul_zero]
-
-end AlternatingFinrank
-
 /-- The geometric Euler characteristic is additive on a short exact sequence of coherent
 sheaves, provided the additive `Ext` connecting maps have the stated linear lifts. -/
-theorem eulerCharacteristic_additive (D : FiniteCohomology X)
-    {S : ShortComplex (Coh X.toScheme)} {hS : S.ShortExact}
+theorem eulerCharacteristic_additive (D : FiniteCohomology k X)
+    {S : ShortComplex (Coh X)} {hS : S.ShortExact}
     (L : D.LinearConnectingMaps S hS) :
     D.eulerCharacteristic S.X₂ =
       D.eulerCharacteristic S.X₁ + D.eulerCharacteristic S.X₃ := by
@@ -273,7 +195,7 @@ theorem eulerCharacteristic_additive (D : FiniteCohomology X)
   letI (i : ℕ) : Module.Finite k ((D.moduleH i).obj S.X₃) := D.finite i S.X₃
   letI : Subsingleton ((D.moduleH (n + 1)).obj S.X₁) :=
     D.vanishesAbove S.X₁ (n + 1) (Nat.lt_succ_of_le (le_max_left _ _))
-  have hsum := alternating_finrank_eq_zero_of_exact
+  have hsum := Module.sum_neg_one_pow_finrank_eq_zero_of_longExact
     (A := fun i ↦ (D.moduleH i).obj S.X₁)
     (B := fun i ↦ (D.moduleH i).obj S.X₂)
     (C := fun i ↦ (D.moduleH i).obj S.X₃)
@@ -297,11 +219,11 @@ theorem eulerCharacteristic_additive (D : FiniteCohomology X)
 
 /-- Regard a short complex of module sheaves with coherent terms as a short complex in
 `Coh X`. -/
-def coherentShortComplex (S : ShortComplex X.toScheme.Modules)
-    (h₁ : Scheme.Modules.IsCoherent X.toScheme S.X₁)
-    (h₂ : Scheme.Modules.IsCoherent X.toScheme S.X₂)
-    (h₃ : Scheme.Modules.IsCoherent X.toScheme S.X₃) :
-    ShortComplex (Coh X.toScheme) where
+def coherentShortComplex (S : ShortComplex X.Modules)
+    (h₁ : Scheme.Modules.IsCoherent X S.X₁)
+    (h₂ : Scheme.Modules.IsCoherent X S.X₂)
+    (h₃ : Scheme.Modules.IsCoherent X S.X₃) :
+    ShortComplex (Coh X) where
   X₁ := ⟨S.X₁, h₁⟩
   X₂ := ⟨S.X₂, h₂⟩
   X₃ := ⟨S.X₃, h₃⟩
@@ -313,33 +235,33 @@ def coherentShortComplex (S : ShortComplex X.toScheme.Modules)
     exact S.zero
 
 @[simp]
-theorem coherentShortComplex_map_inclusion (S : ShortComplex X.toScheme.Modules)
-    (h₁ : Scheme.Modules.IsCoherent X.toScheme S.X₁)
-    (h₂ : Scheme.Modules.IsCoherent X.toScheme S.X₂)
-    (h₃ : Scheme.Modules.IsCoherent X.toScheme S.X₃) :
-    (coherentShortComplex S h₁ h₂ h₃).map (Coh.ι X.toScheme) = S := rfl
+theorem coherentShortComplex_map_inclusion (S : ShortComplex X.Modules)
+    (h₁ : Scheme.Modules.IsCoherent X S.X₁)
+    (h₂ : Scheme.Modules.IsCoherent X S.X₂)
+    (h₃ : Scheme.Modules.IsCoherent X S.X₃) :
+    (coherentShortComplex S h₁ h₂ h₃).map (Coh.ι X) = S := rfl
 
 /-- Exactness of a module-sheaf short complex reflects to the coherent full subcategory. -/
-theorem coherentShortComplex_shortExact {S : ShortComplex X.toScheme.Modules}
+theorem coherentShortComplex_shortExact [IsLocallyNoetherian X] {S : ShortComplex X.Modules}
     (hS : S.ShortExact)
-    (h₁ : Scheme.Modules.IsCoherent X.toScheme S.X₁)
-    (h₂ : Scheme.Modules.IsCoherent X.toScheme S.X₂)
-    (h₃ : Scheme.Modules.IsCoherent X.toScheme S.X₃) :
+    (h₁ : Scheme.Modules.IsCoherent X S.X₁)
+    (h₂ : Scheme.Modules.IsCoherent X S.X₂)
+    (h₃ : Scheme.Modules.IsCoherent X S.X₃) :
     (coherentShortComplex S h₁ h₂ h₃).ShortExact := by
-  letI : (Coh.ι X.toScheme).Faithful := by
-    change (Scheme.coherent X.toScheme).ι.Faithful
+  letI : (Coh.ι X).Faithful := by
+    change (Scheme.coherent X).ι.Faithful
     infer_instance
-  apply CategoryTheory.ShortExact.reflects_shortExact_of_faithful (Coh.ι X.toScheme)
+  apply CategoryTheory.ShortExact.reflects_shortExact_of_faithful (Coh.ι X)
   change S.ShortExact
   exact hS
 
 /-- `X.Modules`-level form of Euler additivity: coherent hypotheses on the three terms are
 enough to apply the coherent-sheaf theorem. -/
-theorem eulerCharacteristic_additive_modules (D : FiniteCohomology X)
-    {S : ShortComplex X.toScheme.Modules} (hS : S.ShortExact)
-    (h₁ : Scheme.Modules.IsCoherent X.toScheme S.X₁)
-    (h₂ : Scheme.Modules.IsCoherent X.toScheme S.X₂)
-    (h₃ : Scheme.Modules.IsCoherent X.toScheme S.X₃)
+theorem eulerCharacteristic_additive_modules (D : FiniteCohomology k X)
+    {S : ShortComplex X.Modules} (hS : S.ShortExact)
+    (h₁ : Scheme.Modules.IsCoherent X S.X₁)
+    (h₂ : Scheme.Modules.IsCoherent X S.X₂)
+    (h₃ : Scheme.Modules.IsCoherent X S.X₃)
     (L : D.LinearConnectingMaps (coherentShortComplex S h₁ h₂ h₃)
       (coherentShortComplex_shortExact hS h₁ h₂ h₃)) :
     D.eulerCharacteristic ⟨S.X₂, h₂⟩ =
@@ -348,15 +270,15 @@ theorem eulerCharacteristic_additive_modules (D : FiniteCohomology X)
 
 /-- Linear connecting maps, compatible with `Ext`, chosen for every short exact sequence.
 This is the precise temporary input needed for a global Grothendieck-group factorization. -/
-abbrev LinearConnectingSystem (D : FiniteCohomology X) :=
-  ∀ (S : ShortComplex (Coh X.toScheme)) (hS : S.ShortExact),
+abbrev LinearConnectingSystem (D : FiniteCohomology k X) :=
+  ∀ (S : ShortComplex (Coh X)) (hS : S.ShortExact),
     D.LinearConnectingMaps S hS
 
 end FiniteCohomology
 
 /-! ### The Euler homomorphism on `K₀(Coh X)`
 
-`Coh X` is abelian for every `Variety k`, so its Grothendieck group is `K₀Ab`.
+`Coh X` is abelian for every a variety over `k`, so its Grothendieck group is `K₀Ab`.
 This file used to build a second one by hand -- generators, a relation subgroup,
 a quotient, a class map and a bespoke universal property -- none of which was
 needed. The `iso` generator it carried was redundant too: `K₀Ab.of_iso` is a
@@ -371,14 +293,14 @@ namespace FiniteCohomology
 from `of_isZero` and `of_iso`, which are theorems. The old route to this hom went
 through `FreeAbelianGroup.lift`, an `AddSubgroup.closure_le` argument and
 `QuotientAddGroup.lift`, all of which are now `K₀Ab`'s. -/
-noncomputable def grothendieckEulerHom (D : FiniteCohomology X)
-    (L : D.LinearConnectingSystem) : K₀Ab (Coh X.toScheme) →+ ℤ :=
+noncomputable def grothendieckEulerHom (D : FiniteCohomology k X)
+    (L : D.LinearConnectingSystem) : K₀Ab (Coh X) →+ ℤ :=
   K₀Ab.liftOf D.eulerCharacteristic
     (fun S hS => D.eulerCharacteristic_additive (L S hS))
 
 @[simp]
-theorem grothendieckEulerHom_class (D : FiniteCohomology X)
-    (L : D.LinearConnectingSystem) (F : Coh X.toScheme) :
+theorem grothendieckEulerHom_class (D : FiniteCohomology k X)
+    (L : D.LinearConnectingSystem) (F : Coh X) :
     D.grothendieckEulerHom L (K₀Ab.of F) = D.eulerCharacteristic F :=
   K₀Ab.liftOf_of _ _ F
 

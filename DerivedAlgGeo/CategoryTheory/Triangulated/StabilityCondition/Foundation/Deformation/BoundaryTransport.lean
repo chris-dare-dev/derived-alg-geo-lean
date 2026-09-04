@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedPhaseControl
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Slicing.BoundaryTruncation
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.BoundaryTruncation
 
 /-!
 # Boundary transport for owner skewed semistability
@@ -23,7 +23,7 @@ universe u v u'
 
 namespace CategoryTheory.Triangulated
 
-open Deformation
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]

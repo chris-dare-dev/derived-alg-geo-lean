@@ -3,12 +3,12 @@ Ext-along-an-adjunction slice of the StabilityCondition audit, split out so conc
 branches append to different files (#480). See the umbrella file for the contract and
 reading guide.
 -/
-import DerivedAlgGeo.CategoryTheory.ExtAdjunction
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.Adjunction
 
 /-! ## Ext along an adjunction with exact left adjoint (#572 step 3, slice 2)
 
 `Sheaf.H` is `Ext` out of the constant sheaf, so cohomology invariance along a closed immersion
-is an `Ext` transport across `ι⁻¹ ⊣ ι_*`. `ConstantSheafPullback.lean` moved the constant sheaf;
+is an `Ext` transport across `ι⁻¹ ⊣ ι_*`. `ConstantPullback.lean` moved the constant sheaf;
 these records cover the comparison map, its naturality, and the theorem that it is bijective in
 every degree.
 -/

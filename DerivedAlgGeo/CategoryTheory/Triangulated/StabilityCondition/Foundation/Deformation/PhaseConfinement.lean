@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedPhaseControl
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.DeformedCuts
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Slicing.CutoffTruncation
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.CutoffTruncation
 
 /-!
 # Owner phase confinement for perturbed semistable objects
@@ -23,7 +23,7 @@ universe u v u'
 
 namespace CategoryTheory.Triangulated
 
-open Deformation
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]

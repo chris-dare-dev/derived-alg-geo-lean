@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.Topology.Opens.CoversTop
+import DerivedAlgGeo.Topology.Category.TopCat.Opens.CoversTop
 import Mathlib.AlgebraicGeometry.Scheme
 import Mathlib.RingTheory.Spectrum.Prime.Topology
 
@@ -15,7 +15,7 @@ machinery takes.
 
 ## Why it is here and not in `Topology/`
 
-It was in `Topology/Opens/CoversTop.lean`, beside the pure-topology lemma it is
+It was in `Topology/Category/TopCat/Opens/CoversTop.lean`, beside the pure-topology lemma it is
 built from. That made a layer-0 `Topology` module import
 `Mathlib.AlgebraicGeometry.Scheme`: a subject that must stay independent of
 geometry reaching directly into it. `scripts/check_layering.py` did not catch it

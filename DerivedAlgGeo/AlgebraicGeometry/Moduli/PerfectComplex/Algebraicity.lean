@@ -29,37 +29,43 @@ big-Zariski presentation, but it is not claimed to be an algebraic stack or
 the full relative-perfect moduli stack.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits
-open CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Dqc
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open Opposite
 
 noncomputable section
 
 universe u
 
-namespace RelativePerfectModuliSubproblem
+namespace RelativePerfectModuliSelector
 
 variable {S : Scheme.{u}}
 
-/-- The actual full subgroupoid of relative-perfect moduli objects selected
-by the family predicate of a subproblem. -/
-abbrev Fiber (P : RelativePerfectModuliSubproblem S)
+/-- The full subgroupoid selected inside one relative-perfect moduli fiber.
+This construction is fiberwise only: it does not provide transition functors
+and is not itself a subprestack. -/
+abbrev Fiber (P : RelativePerfectModuliSelector S)
     (T : SchemeBaseChange S) :=
-  (P.family T).FullSubcategory
+  (P.familyLocus T).FullSubcategory
 
-instance fiber_isGroupoid (P : RelativePerfectModuliSubproblem S)
+instance fiber_isGroupoid (P : RelativePerfectModuliSelector S)
     (T : SchemeBaseChange S) : IsGroupoid (P.Fiber T) := by
   change IsGroupoid (InducedCategory (RelativePerfectModuliFiber T)
     ObjectProperty.FullSubcategory.obj)
   infer_instance
 
-end RelativePerfectModuliSubproblem
+end RelativePerfectModuliSelector
 
 namespace FiniteTypeBoundednessWitness
 
-variable {S : Scheme.{u}} {P : RelativePerfectModuliSubproblem S}
+variable {S : Scheme.{u}} {P : RelativePerfectModuliSelector S}
 
 /-- Regard the universal family in a boundedness witness as an object of the
 selected full moduli subgroupoid. -/
@@ -76,7 +82,7 @@ subgroupoid of universally-gluable relative-perfect complexes on `T`.
 Restricting this field to the currently supported locally Noetherian locus
 keeps the unresolved arbitrary-scheme Dqc comparison visible. -/
 structure RelativePerfectZariskiPresentation (S : Scheme.{u})
-    (P : RelativePerfectModuliSubproblem S) where
+    (P : RelativePerfectModuliSelector S) where
   /-- The big-Zariski presentation locally of finite presentation over `S`. -/
   presentation : ZariskiStackPresentationOver S
   /-- Identification of each supported stack fiber with the selected
@@ -88,7 +94,7 @@ structure RelativePerfectZariskiPresentation (S : Scheme.{u})
 
 namespace RelativePerfectZariskiPresentation
 
-variable {S : Scheme.{u}} {P : RelativePerfectModuliSubproblem S}
+variable {S : Scheme.{u}} {P : RelativePerfectModuliSelector S}
 
 /-- The big-Zariski stack presentation underlying a relative-perfect
 presentation. -/
@@ -100,7 +106,8 @@ abbrev stack (A : RelativePerfectZariskiPresentation S P) :
 relative-perfect big-Zariski presentation. -/
 theorem locallyOfFinitePresentation
     (A : RelativePerfectZariskiPresentation S P) :
-    A.presentation.structureMorphism.IsLocallyOfFinitePresentation :=
+    StackMorphism.IsLocallyOfFinitePresentation
+      A.presentation.structureMorphism :=
   A.presentation.locallyOfFinitePresentation
 
 end RelativePerfectZariskiPresentation
@@ -109,14 +116,14 @@ end RelativePerfectZariskiPresentation
 boundedness witness with the SF9 stack presentation of the same selected
 relative-perfect moduli problem. -/
 structure BoundedRelativePerfectZariskiPresentation (S : Scheme.{u})
-    (P : RelativePerfectModuliSubproblem S)
+    (P : RelativePerfectModuliSelector S)
     extends RelativePerfectZariskiPresentation S P where
   /-- The actual finite-type parameter scheme and its universal family. -/
   boundedness : FiniteTypeBoundednessWitness P
 
 namespace BoundedRelativePerfectZariskiPresentation
 
-variable {S : Scheme.{u}} {P : RelativePerfectModuliSubproblem S}
+variable {S : Scheme.{u}} {P : RelativePerfectModuliSelector S}
   (A : BoundedRelativePerfectZariskiPresentation S P)
 
 /-- The SF8 universal family, lifted through the proved fiber equivalence to
@@ -141,24 +148,24 @@ end BoundedRelativePerfectZariskiPresentation
 
 /-- An open relative-perfect presentation keeps both moduli interpretations,
 an actual representable open immersion of their big-Zariski stacks, and the
-commuting triangle over the base.  `family_le` states that the open locus
-selects only objects of the ambient problem. -/
+commuting triangle over the base. `familyLocus_le` states that the open
+fiberwise locus selects only objects of the ambient problem. -/
 structure RelativePerfectOpenZariskiPresentation (S : Scheme.{u})
-    (ambientProblem openProblem : RelativePerfectModuliSubproblem S) where
+    (ambientProblem openProblem : RelativePerfectModuliSelector S) where
   /-- Big-Zariski presentation of the ambient selected problem. -/
   ambient : RelativePerfectZariskiPresentation S ambientProblem
   /-- Big-Zariski presentation of the open selected problem. -/
   openPresentation : RelativePerfectZariskiPresentation S openProblem
-  /-- The open family predicate is contained in the ambient predicate. -/
-  family_le {T : SchemeBaseChange S} {E : RelativePerfectModuliFiber T} :
-    openProblem.family T E → ambientProblem.family T E
+  /-- The open family locus is contained in the ambient fiberwise locus. -/
+  familyLocus_le {T : SchemeBaseChange S} {E : RelativePerfectModuliFiber T} :
+    openProblem.familyLocus T E → ambientProblem.familyLocus T E
   /-- The actual morphism from the open stack to the ambient stack. -/
   inclusion : StackMorphism
     openPresentation.stack.toStackInGroupoids
     ambient.stack.toStackInGroupoids
   /-- Every scheme representing a fiber of the inclusion is an open
   subscheme of the test scheme. -/
-  isOpenImmersion : inclusion.IsOpenImmersion
+  isOpenImmersion : StackMorphism.IsOpenImmersion inclusion
   /-- The inclusion commutes with the actual structure morphisms to `S`. -/
   overBase (T : Scheme.{u}) :
     inclusion.app T ⋙ ambient.presentation.structureMorphism.app T ≅
@@ -220,14 +227,14 @@ private def identityStackFiberEquivPUnit {S : Scheme.{u}}
     (Discrete.equivalence (Equiv.equivPUnit _))
 
 private def zeroRelativePerfectFiberEquivPUnit {S : Scheme.{u}}
-    (T : SchemeBaseChange S) [IsLocallyNoetherian T.left] :
-    (zeroRelativePerfectModuliSubproblem S).Fiber T ≌
+    (T : SchemeBaseChange S) :
+    (zeroRelativePerfectModuliSelector S).Fiber T ≌
       Discrete PUnit.{u + 1} := by
   apply Nonempty.some
   rw [equiv_punit_iff_unique]
   constructor
   · exact ⟨⟨relativePerfectZeroObject T,
-      relativePerfectZeroObject_mem_zeroFamily T⟩⟩
+      relativePerfectZeroObject_mem_zeroFamilyLocus T⟩⟩
   · intro E F
     let eDerived := IsZero.iso E.property F.property
     let eDqc := ObjectProperty.isoMk
@@ -252,7 +259,7 @@ presentation: the identity stack over `S`.  Its fibers and the groupoids of
 selected zero objects are both proved contractible. -/
 def zeroRelativePerfectZariskiPresentation (S : Scheme.{u}) :
     RelativePerfectZariskiPresentation S
-      (zeroRelativePerfectModuliSubproblem S) where
+      (zeroRelativePerfectModuliSelector S) where
   presentation := representableZariskiStackPresentationOver (𝟙 S)
   fiberEquivalence T :=
     (identityStackFiberEquivPUnit T).trans
@@ -261,9 +268,9 @@ def zeroRelativePerfectZariskiPresentation (S : Scheme.{u}) :
 /-- The identity parameter scheme and universal zero family make the supported
 zero big-Zariski presentation genuinely finite-type bounded. -/
 def zeroBoundedRelativePerfectZariskiPresentation
-    (S : Scheme.{u}) [IsLocallyNoetherian S] :
+    (S : Scheme.{u}) :
     BoundedRelativePerfectZariskiPresentation S
-      (zeroRelativePerfectModuliSubproblem S) where
+      (zeroRelativePerfectModuliSelector S) where
   toRelativePerfectZariskiPresentation :=
     zeroRelativePerfectZariskiPresentation S
   boundedness := zeroFiniteTypeBoundednessWitness S
@@ -273,7 +280,7 @@ bounded big-Zariski presentation of its zero relative-perfect subproblem. -/
 def integerZeroBoundedRelativePerfectZariskiPresentation :
     BoundedRelativePerfectZariskiPresentation
       (Spec (.of ℤ))
-      (zeroRelativePerfectModuliSubproblem (Spec (.of ℤ))) :=
+      (zeroRelativePerfectModuliSelector (Spec (.of ℤ))) :=
   zeroBoundedRelativePerfectZariskiPresentation (Spec (.of ℤ))
 
 end

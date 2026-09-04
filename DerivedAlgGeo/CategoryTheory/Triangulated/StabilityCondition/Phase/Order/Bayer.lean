@@ -34,7 +34,7 @@ open CategoryTheory.Triangulated
 
 universe v u
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 variable {C : Type u} [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
@@ -225,4 +225,4 @@ theorem bayerProperty_one_zero (sigma : StabilityCondition.WithClassMap C v) :
   rw [bayerProperty_iff]
   simpa using hasBayerProperty_one_zero sigma.slicing
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

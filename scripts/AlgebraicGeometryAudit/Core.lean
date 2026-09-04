@@ -11,178 +11,174 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Fourfold
 open AlgebraicGeometry AlgebraicGeometry.Numerical
 
 
--- Proj foundations: degree-zero homogeneous module localization is a submodule of Mathlib's
--- ordinary localized module; every homogeneous and denominator certificate remains explicit.
-#print axioms AlgebraicGeometry.Proj.NumDenSameDeg
-#print axioms AlgebraicGeometry.Proj.degreeZeroSubmodule
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mk_surjective
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mk_eq_mk_iff
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mapOfLE
+-- Graded-module algebra consumed by Proj: degree-zero homogeneous module localization is a
+-- submodule of Mathlib's ordinary localized module; every homogeneous and denominator
+-- certificate remains explicit.
+#print axioms GradedModule.NumDenSameDeg
+#print axioms GradedModule.degreeZeroSubmodule
+#print axioms GradedModule.DegreeZeroLocalization.mk_surjective
+#print axioms GradedModule.DegreeZeroLocalization.mk_eq_mk_iff
+#print axioms GradedModule.DegreeZeroLocalization.mapOfLE
 -- mapOfLE needs S <= T, which a Cech face does not give: the denominators are .powers g1 and
 -- .powers g2 with g1 * h = g2, and divisibility does not nest powers submonoids. These two
 -- supply the universal-property route instead -- g1 is already invertible once g2 is.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.isUnit_algebraMap_localization_of_mul_mem
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.isUnit_algebraMap_end_of_mul_mem
+#print axioms GradedModule.DegreeZeroLocalization.isUnit_algebraMap_localization_of_mul_mem
+#print axioms GradedModule.DegreeZeroLocalization.isUnit_algebraMap_end_of_mul_mem
 -- The face map those two lemmas exist for. faceLift is the bare localized-module map from the
 -- universal property; faceMap is its restriction to the degree-zero part, and faceMap_mk is the
 -- explicit fraction m / g1^n |-> h^n m / g2^n that the Cech differential is computed with.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceLift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceLift_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.isDegreeZero_faceLift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceMap
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.coe_faceMap
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceMap_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk
+#print axioms GradedModule.DegreeZeroLocalization.faceLift
+#print axioms GradedModule.DegreeZeroLocalization.faceLift_mk
+#print axioms GradedModule.DegreeZeroLocalization.isDegreeZero_faceLift
+#print axioms GradedModule.DegreeZeroLocalization.faceMap
+#print axioms GradedModule.DegreeZeroLocalization.coe_faceMap
+#print axioms GradedModule.DegreeZeroLocalization.faceMap_mk
+#print axioms GradedModule.DegreeZeroLocalization.awayMk
 -- awayMk as a normal form (#491): every away fraction is one, and equality is decided by
 -- cross-multiplication rather than by the existential the general criterion leaves behind.
 -- Both are prerequisites for any basis of the away localization.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.exists_awayMk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_eq_awayMk_iff
+#print axioms GradedModule.DegreeZeroLocalization.exists_awayMk
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_eq_awayMk_iff
 -- Numerator additivity at a fixed denominator, and the common-denominator move. Together these
 -- are what a spanning argument over monomial numerators consumes; none needs cancellation.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_zero
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_add
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_sum
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_shift
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_zero
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_add
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_sum
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_shift
 -- Two fractions share a denominator (#491 -> #340): exists_awayMk twice plus awayMk_shift on
 -- each side. Every additivity statement about maps defined on awayMk representatives opens
 -- with this move.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.exists_awayMk_pair
+#print axioms GradedModule.DegreeZeroLocalization.exists_awayMk_pair
 -- A fraction is zero exactly when its numerator is (#491). This is what makes the numerator a
 -- faithful record: independence of fractions reduces to independence of numerators.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_eq_zero_iff
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_eq_zero_iff
 -- The face map in awayMk normal form, and the degree-index transport its callers need.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk_deg_congr
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.faceMap_awayMk
+#print axioms GradedModule.DegreeZeroLocalization.awayMk_deg_congr
+#print axioms GradedModule.DegreeZeroLocalization.faceMap_awayMk
 -- Auto-generated, not hand-written: `awayMk` carries its membership certificate as a dependent
 -- argument, so the first `rw [coe_awayMk]` in this file makes Lean emit a congruence lemma for
 -- it. It is a public declaration and the completeness ratchet counts it, so it is recorded here
 -- rather than left to widen the unaudited gap.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.awayMk.congr_simp
+#print axioms GradedModule.DegreeZeroLocalization.awayMk.congr_simp
 -- The Laurent exponent of a monomial fraction (#491). awayMk_monomial_eq_iff_laurentExponent is
 -- the load-bearing one: it makes beta - m * gamma a complete invariant, so the monomial
 -- fractions of a twist are indexed by exponents rather than by representatives. The other two
 -- statements cut that index down to the set the basis needs -- total degree the twist, and
 -- nonnegative off the support of gamma.
-#print axioms AlgebraicGeometry.Proj.natToIntExponent
-#print axioms AlgebraicGeometry.Proj.natToIntExponent_injective
-#print axioms AlgebraicGeometry.Proj.degree_natToIntExponent
-#print axioms AlgebraicGeometry.Proj.laurentExponent
-#print axioms AlgebraicGeometry.Proj.laurentExponent_apply
-#print axioms AlgebraicGeometry.Proj.laurentExponent_eq_iff
+#print axioms Finsupp.natToIntExponent
+#print axioms Finsupp.natToIntExponent_injective
+#print axioms Finsupp.degree_natToIntExponent
+#print axioms Finsupp.laurentExponent
+#print axioms Finsupp.laurentExponent_apply
+#print axioms Finsupp.laurentExponent_eq_iff
 -- The twist abstraction (#568). IsPolynomialTwist isolates the only reading of a numerator the
 -- Laurent argument makes -- an element of 𝓜 n is homogeneous of degree n + d -- so the stack can
 -- be stated once and instantiated at natShift for d : N and intShift for d : Z. The p = 0
 -- disjunct is what makes intShift fit: it carries zero in degrees where n + d is negative and
 -- there is no graded piece to name.
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist
-#print axioms AlgebraicGeometry.Proj.isPolynomialTwist_natShift
-#print axioms AlgebraicGeometry.Proj.isPolynomialTwist_intShift
-#print axioms AlgebraicGeometry.Proj.degree_laurentExponent_int
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.degree_eq_of_mem_support
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.monomial_coeff_mem
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.degree_laurentExponent_of_mem_support
+#print axioms MvPolynomial.IsPolynomialTwist
+#print axioms MvPolynomial.isPolynomialTwist_natShift
+#print axioms MvPolynomial.isPolynomialTwist_intShift
+#print axioms Finsupp.degree_laurentExponent_int
+#print axioms MvPolynomial.IsPolynomialTwist.degree_eq_of_mem_support
+#print axioms MvPolynomial.IsPolynomialTwist.monomial_coeff_mem
+#print axioms MvPolynomial.IsPolynomialTwist.degree_laurentExponent_of_mem_support
 -- The degree bookkeeping at either sign. The by_cases on the quotient is the only place the two
 -- signs behave differently: a negative twist can put the numerator's degree below m * c, and then
 -- the quotient is zero rather than a numerator of lower degree.
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.divMonomial_mem
+#print axioms MvPolynomial.IsPolynomialTwist.divMonomial_mem
 -- The other two readings the port needs: multiplying a numerator by a homogeneous factor, and
 -- filtering it to one block. Both are the same case split -- the numerator may be zero in a
 -- degree the twist names no graded piece for -- where the nonnegative versions read membership
 -- as homogeneity directly.
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.mul_mem_of_isHomogeneous
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.laurentFilter_mem
+#print axioms MvPolynomial.IsPolynomialTwist.mul_mem_of_isHomogeneous
+#print axioms MvPolynomial.IsPolynomialTwist.laurentFilter_mem
 -- The Cech term, cochains and face over an arbitrary twist, with the two instances recorded as
 -- definitional. Naming the construction once is what lets the contracting-homotopy layer above
 -- it be stated once instead of duplicated per twist.
-#print axioms AlgebraicGeometry.Proj.cechTerm
-#print axioms AlgebraicGeometry.Proj.cechCochains
-#print axioms AlgebraicGeometry.Proj.cechFace
-#print axioms AlgebraicGeometry.Proj.cechFace_natShift
-#print axioms AlgebraicGeometry.Proj.cechFace_intShift
+#print axioms MvPolynomial.cechTerm
+#print axioms MvPolynomial.cechCochains
+#print axioms MvPolynomial.cechFace
+#print axioms MvPolynomial.cechFace_natShift
+#print axioms MvPolynomial.cechFace_intShift
 -- The short-tuple vanishing input (#568). A block containing every variable has Fintype.card
 -- elements while a tuple of length n + 2 supports at most n + 2, so over a larger variable set
 -- the block cannot sit inside the tuple's support -- whatever the twist. This is what replaces
 -- the degree argument at a negative twist, and the first place the lane needs iota finite.
-#print axioms AlgebraicGeometry.Proj.tupleExponent_support_card_le
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_eq_zero_of_card_lt
+#print axioms MvPolynomial.tupleExponent_support_card_le
+#print axioms MvPolynomial.cechBlockProj_eq_zero_of_card_lt
 -- cechBlockProj and cechHomotopy now take the twist hypothesis, which is a Prop, so Lean emits
 -- congruence lemmas for them; recorded here for the same reason AwayRep's projections are.
-#print axioms AlgebraicGeometry.Proj.cechBlockProj.congr_simp
-#print axioms AlgebraicGeometry.Proj.cechHomotopy.congr_simp
+#print axioms MvPolynomial.cechBlockProj.congr_simp
+#print axioms MvPolynomial.cechHomotopy.congr_simp
 -- Vanishing below the top degree, either sign (#568). The nonnegative companion is stronger
 -- where it applies -- no finiteness, every positive degree -- and is not a corollary.
 #print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_exactAt
 #print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_homology_isZero
 #print axioms AlgebraicGeometry.Proj.polynomialIntTwisting_H_subsingleton
-#print axioms AlgebraicGeometry.Proj.degree_laurentExponent
-#print axioms AlgebraicGeometry.Proj.laurentExponent_nonneg_of_apply_eq_zero
-#print axioms AlgebraicGeometry.Proj.monomial_one_mem_polynomialGrading
-#print axioms AlgebraicGeometry.Proj.monomial_one_pow
-#print axioms AlgebraicGeometry.Proj.monomial_one_ne_zero
-#print axioms AlgebraicGeometry.Proj.monomial_mem_natShift
-#print axioms AlgebraicGeometry.Proj.awayMk_monomial_eq_iff
-#print axioms AlgebraicGeometry.Proj.awayMk_monomial_eq_iff_laurentExponent
+#print axioms Finsupp.degree_laurentExponent
+#print axioms Finsupp.laurentExponent_nonneg_of_apply_eq_zero
+#print axioms MvPolynomial.monomial_one_mem_polynomialGrading
+#print axioms MvPolynomial.monomial_one_pow
+#print axioms MvPolynomial.monomial_one_ne_zero
+#print axioms MvPolynomial.monomial_mem_natShift
+#print axioms MvPolynomial.awayMk_monomial_eq_iff
+#print axioms MvPolynomial.awayMk_monomial_eq_iff_laurentExponent
 -- Spanning (#491): the monomial fractions exhaust the localization. exists_sum_awayMk_monomial
 -- puts every element over ONE common denominator, so a map defined on monomial fractions extends
 -- with no further alignment; laurentExponent_mem_index says the exponents it contributes are
 -- exactly the admissible ones.
-#print axioms AlgebraicGeometry.Proj.monomial_one_pow_ne_zero
-#print axioms AlgebraicGeometry.Proj.degree_eq_of_mem_support
-#print axioms AlgebraicGeometry.Proj.monomial_coeff_mem_natShift
-#print axioms AlgebraicGeometry.Proj.awayMk_eq_sum_monomial
-#print axioms AlgebraicGeometry.Proj.exists_sum_awayMk_monomial
-#print axioms AlgebraicGeometry.Proj.laurentExponent_mem_index
--- The numerator side of the sign projection (#491 -> #340). divMonomial_pow_mul is the
--- well-definedness identity: projecting commutes with raising a representative to a higher power
--- of the denominator, which is the move that relates any two representatives.
-#print axioms AlgebraicGeometry.Proj.degree_eq_weight_one_apply
-#print axioms AlgebraicGeometry.Proj.isHomogeneous_divMonomial
-#print axioms AlgebraicGeometry.Proj.divMonomial_monomial_mul_add
-#print axioms AlgebraicGeometry.Proj.divMonomial_monomial_mul_comm
-#print axioms AlgebraicGeometry.Proj.divMonomial_pow_mul
-#print axioms AlgebraicGeometry.Proj.divMonomial_mem_natShift
+#print axioms MvPolynomial.monomial_one_pow_ne_zero
+#print axioms MvPolynomial.degree_eq_of_mem_support
+#print axioms MvPolynomial.monomial_coeff_mem_natShift
+#print axioms MvPolynomial.awayMk_eq_sum_monomial
+#print axioms MvPolynomial.exists_sum_awayMk_monomial
+#print axioms MvPolynomial.laurentExponent_mem_index
+-- The numerator side of the sign projection (#491 -> #340), now owned with the generic
+-- polynomial graded-localization API. The underlying `MvPolynomial.divMonomial` identities
+-- are audited in `AlgebraMvPolynomial.lean`.
+#print axioms MvPolynomial.divMonomial_mem_natShift
 -- Independence (#491): a vanishing monomial combination at a fixed denominator has vanishing
 -- coefficients. With exists_sum_awayMk_monomial this is the basis statement in usable form -- a
 -- map may be DEFINED by its effect on monomial fractions.
-#print axioms AlgebraicGeometry.Proj.sum_monomial_eq_zero_iff
-#print axioms AlgebraicGeometry.Proj.sum_awayMk_monomial_eq_zero_iff
+#print axioms MvPolynomial.sum_monomial_eq_zero_iff
+#print axioms MvPolynomial.sum_awayMk_monomial_eq_zero_iff
 -- The projection descends to the localization and retracts the face inclusion (#491 -> #340).
 -- signProjection is defined by choosing a representative; signProjection_awayMk is the equation
 -- that pins it down, and signProjection_laurentFace is the first of the two properties the
 -- contracting homotopy consumes. AwayRep's auto-generated projections are recorded too, since
 -- the completeness ratchet counts them.
-#print axioms AlgebraicGeometry.Proj.AwayRep
-#print axioms AlgebraicGeometry.Proj.AwayRep.mk.inj
-#print axioms AlgebraicGeometry.Proj.AwayRep.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.Proj.AwayRep.pow
-#print axioms AlgebraicGeometry.Proj.AwayRep.num
-#print axioms AlgebraicGeometry.Proj.AwayRep.num_mem
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_surjective
-#print axioms AlgebraicGeometry.Proj.AwayRep.project
-#print axioms AlgebraicGeometry.Proj.AwayRep.pow_mul_num_mem
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_project_raise
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_project_congr
-#print axioms AlgebraicGeometry.Proj.signProjection
-#print axioms AlgebraicGeometry.Proj.signProjection_frac
-#print axioms AlgebraicGeometry.Proj.signProjection_awayMk
-#print axioms AlgebraicGeometry.Proj.monomial_single_mem
-#print axioms AlgebraicGeometry.Proj.laurentFace_mul
-#print axioms AlgebraicGeometry.Proj.monomial_mem_add_degree
-#print axioms AlgebraicGeometry.Proj.laurentFace
-#print axioms AlgebraicGeometry.Proj.laurentFace_awayMk
-#print axioms AlgebraicGeometry.Proj.signProjection_laurentFace
+#print axioms MvPolynomial.AwayRep
+#print axioms MvPolynomial.AwayRep.mk.inj
+#print axioms MvPolynomial.AwayRep.mk.sizeOf_spec
+#print axioms MvPolynomial.AwayRep.pow
+#print axioms MvPolynomial.AwayRep.num
+#print axioms MvPolynomial.AwayRep.num_mem
+#print axioms MvPolynomial.AwayRep.frac
+#print axioms MvPolynomial.AwayRep.frac_surjective
+#print axioms MvPolynomial.AwayRep.project
+#print axioms MvPolynomial.AwayRep.pow_mul_num_mem
+#print axioms MvPolynomial.AwayRep.frac_project_raise
+#print axioms MvPolynomial.AwayRep.frac_project_congr
+#print axioms MvPolynomial.signProjection
+#print axioms MvPolynomial.signProjection_frac
+#print axioms MvPolynomial.signProjection_awayMk
+#print axioms MvPolynomial.monomial_single_mem
+#print axioms MvPolynomial.laurentFace_mul
+#print axioms MvPolynomial.monomial_mem_add_degree
+#print axioms MvPolynomial.laurentFace
+#print axioms MvPolynomial.laurentFace_awayMk
+#print axioms MvPolynomial.signProjection_laurentFace
 -- Additivity of the projection (#491 -> #340): the homotopy applies it to an alternating sum
 -- of faces, so it consumes the bundled additive form. signProjection_laurentFace_comm is the
 -- second and last property the homotopy needs -- the projection commutes with every face other
 -- than the retracted one; the delta' i0 = 0 hypothesis is the per-block restriction of the
 -- proof plan, and the unrestricted square at e = i0 is false rather than unproved.
-#print axioms AlgebraicGeometry.Proj.signProjection_add
-#print axioms AlgebraicGeometry.Proj.signProjectionHom
-#print axioms AlgebraicGeometry.Proj.signProjectionHom_apply
-#print axioms AlgebraicGeometry.Proj.monomial_single_pow_smul_mem
-#print axioms AlgebraicGeometry.Proj.signProjection_laurentFace_comm
+#print axioms MvPolynomial.signProjection_add
+#print axioms MvPolynomial.signProjectionHom
+#print axioms MvPolynomial.signProjectionHom_apply
+#print axioms MvPolynomial.monomial_single_pow_smul_mem
+#print axioms MvPolynomial.signProjection_laurentFace_comm
 -- The block decomposition (#340, step 2). Each away localization is decomposed by the negative
 -- support N(alpha) of the Laurent exponent: laurentFilter selects one block of a numerator,
 -- blockProj descends it to the localization (choice-based, pinned by blockProj_awayMk, same
@@ -191,39 +187,39 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- every block projection -- the differential preserves N(alpha). Deliberately NOT packaged as a
 -- direct-sum iso or a product-indexed complex: the vanishing argument consumes exactly these
 -- projections, elementwise, and nothing categorical.
-#print axioms AlgebraicGeometry.Proj.intNegSupport
-#print axioms AlgebraicGeometry.Proj.mem_intNegSupport
-#print axioms AlgebraicGeometry.Proj.intNegSupport_laurentExponent_subset
+#print axioms MvPolynomial.intNegSupport
+#print axioms MvPolynomial.mem_intNegSupport
+#print axioms MvPolynomial.intNegSupport_laurentExponent_subset
 -- The finite index set of the full block (#568 step 6.1). An exponent negative in every
 -- coordinate whose coordinates sum to d has each coordinate trapped in [d + card - 1, -1], so
 -- the exponents form a subset of a finite box. This is the finiteness the top cohomology rests
 -- on; it is empty unless d <= -(card iota), which is Serre's vanishing in exponent form.
-#print axioms AlgebraicGeometry.Proj.finite_setOf_degree_eq_of_neg
-#print axioms AlgebraicGeometry.Proj.laurentExponent_sub_of_add_eq
-#print axioms AlgebraicGeometry.Proj.laurentFilter
-#print axioms AlgebraicGeometry.Proj.coeff_laurentFilter_of_eq
-#print axioms AlgebraicGeometry.Proj.coeff_laurentFilter_of_ne
-#print axioms AlgebraicGeometry.Proj.laurentFilter_add
-#print axioms AlgebraicGeometry.Proj.laurentFilter_mem_natShift
-#print axioms AlgebraicGeometry.Proj.sum_laurentFilter_powerset
-#print axioms AlgebraicGeometry.Proj.laurentFilter_laurentFilter_self
-#print axioms AlgebraicGeometry.Proj.laurentFilter_laurentFilter_of_ne
-#print axioms AlgebraicGeometry.Proj.laurentFilter_eq_zero_of_not_subset
-#print axioms AlgebraicGeometry.Proj.laurentFilter_monomial_mul
-#print axioms AlgebraicGeometry.Proj.AwayRep.blockFilter
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_blockFilter_raise
-#print axioms AlgebraicGeometry.Proj.AwayRep.frac_blockFilter_congr
-#print axioms AlgebraicGeometry.Proj.blockProj
-#print axioms AlgebraicGeometry.Proj.blockProj_frac
-#print axioms AlgebraicGeometry.Proj.blockProj_awayMk
-#print axioms AlgebraicGeometry.Proj.blockProj_add
-#print axioms AlgebraicGeometry.Proj.blockProjHom
-#print axioms AlgebraicGeometry.Proj.blockProjHom_apply
-#print axioms AlgebraicGeometry.Proj.sum_blockProj
-#print axioms AlgebraicGeometry.Proj.blockProj_blockProj_self
-#print axioms AlgebraicGeometry.Proj.blockProj_blockProj_of_ne
-#print axioms AlgebraicGeometry.Proj.blockProj_eq_zero_of_not_subset
-#print axioms AlgebraicGeometry.Proj.laurentFace_blockProj
+#print axioms MvPolynomial.finite_setOf_degree_eq_of_neg
+#print axioms MvPolynomial.laurentExponent_sub_of_add_eq
+#print axioms MvPolynomial.laurentFilter
+#print axioms MvPolynomial.coeff_laurentFilter_of_eq
+#print axioms MvPolynomial.coeff_laurentFilter_of_ne
+#print axioms MvPolynomial.laurentFilter_add
+#print axioms MvPolynomial.laurentFilter_mem_natShift
+#print axioms MvPolynomial.sum_laurentFilter_powerset
+#print axioms MvPolynomial.laurentFilter_laurentFilter_self
+#print axioms MvPolynomial.laurentFilter_laurentFilter_of_ne
+#print axioms MvPolynomial.laurentFilter_eq_zero_of_not_subset
+#print axioms MvPolynomial.laurentFilter_monomial_mul
+#print axioms MvPolynomial.AwayRep.blockFilter
+#print axioms MvPolynomial.AwayRep.frac_blockFilter_raise
+#print axioms MvPolynomial.AwayRep.frac_blockFilter_congr
+#print axioms MvPolynomial.blockProj
+#print axioms MvPolynomial.blockProj_frac
+#print axioms MvPolynomial.blockProj_awayMk
+#print axioms MvPolynomial.blockProj_add
+#print axioms MvPolynomial.blockProjHom
+#print axioms MvPolynomial.blockProjHom_apply
+#print axioms MvPolynomial.sum_blockProj
+#print axioms MvPolynomial.blockProj_blockProj_self
+#print axioms MvPolynomial.blockProj_blockProj_of_ne
+#print axioms MvPolynomial.blockProj_eq_zero_of_not_subset
+#print axioms MvPolynomial.laurentFace_blockProj
 -- The contracting homotopy of a block (#340, step 3). laurentHomotopy projects out ALL of the
 -- cone variable and reinserts the surplus by a face, which makes it well defined whatever the
 -- tuple contains and buys the two identities the homotopy computation d h + h d = id consumes:
@@ -231,15 +227,15 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- face in the cone variable itself, where the surplus shifts by one and rebalances), and the
 -- retraction of the cone face on a block (laurentHomotopy_laurentFace_blockProj), which is the
 -- only identity that sees the block and the only place i0 not-in F is spent.
-#print axioms AlgebraicGeometry.Proj.monomial_mul_divMonomial_cancel
-#print axioms AlgebraicGeometry.Proj.laurentFilter_apply_ge
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_split
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_back
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_numerator_mem
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_awayMk
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_laurentFace_blockProj
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_laurentFace_comm
+#print axioms MvPolynomial.monomial_mul_divMonomial_cancel
+#print axioms MvPolynomial.laurentFilter_apply_ge
+#print axioms MvPolynomial.laurentHomotopy_split
+#print axioms MvPolynomial.laurentHomotopy_back
+#print axioms MvPolynomial.laurentHomotopy
+#print axioms MvPolynomial.laurentHomotopy_numerator_mem
+#print axioms MvPolynomial.laurentHomotopy_awayMk
+#print axioms MvPolynomial.laurentHomotopy_laurentFace_blockProj
+#print axioms MvPolynomial.laurentHomotopy_laurentFace_comm
 -- The block homotopy carried onto the variable Cech cover (#340, step 3). powersCongr
 -- transports a degree-zero localization along an equality of denominators (the element never
 -- moves; every equation is subst plus proof irrelevance), tupleExponent names the Cech
@@ -247,58 +243,58 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- monomial-level maps conjugated by that transport. cechTermCongr_apply_section is the whole
 -- of the dependent rewriting the vanishing computation needs; the three identities it runs on
 -- are cechFace_cechBlockProj, cechHomotopy_cechFace_zero and cechHomotopy_cechFace_succ.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_awayMk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_trans
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_symm_apply_apply
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_symm_trans
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.powersCongr_faceMap
-#print axioms AlgebraicGeometry.Proj.tupleExponent
-#print axioms AlgebraicGeometry.Proj.tupleDenominator_eq
-#print axioms AlgebraicGeometry.Proj.tupleExponent_cons
-#print axioms AlgebraicGeometry.Proj.tupleExponent_succAbove
-#print axioms AlgebraicGeometry.Proj.tupleDenominator_cons_eq
-#print axioms AlgebraicGeometry.Proj.cons_comp_succAbove_zero
-#print axioms AlgebraicGeometry.Proj.cons_comp_succAbove_succ
-#print axioms AlgebraicGeometry.Proj.cechTermEquiv
-#print axioms AlgebraicGeometry.Proj.cechTermEquiv_cechFace
-#print axioms AlgebraicGeometry.Proj.cechBlockProj
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_apply
-#print axioms AlgebraicGeometry.Proj.sum_cechBlockProj
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_eq_zero_of_not_subset
-#print axioms AlgebraicGeometry.Proj.cechFace_cechBlockProj
-#print axioms AlgebraicGeometry.Proj.cechHomotopy
-#print axioms AlgebraicGeometry.Proj.cechHomotopy_apply
-#print axioms AlgebraicGeometry.Proj.cechTermCongr
-#print axioms AlgebraicGeometry.Proj.cechTermCongr_apply_section
-#print axioms AlgebraicGeometry.Proj.cechTermCongr_symm_apply_section
-#print axioms AlgebraicGeometry.Proj.cechTermCongr_cechBlockProj
-#print axioms AlgebraicGeometry.Proj.laurentHomotopy_laurentFace_comm'
-#print axioms AlgebraicGeometry.Proj.cechHomotopy_cechFace_zero
-#print axioms AlgebraicGeometry.Proj.cechHomotopy_cechFace_succ
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_awayMk
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_trans
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_symm_apply_apply
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_symm_trans
+#print axioms GradedModule.DegreeZeroLocalization.powersCongr_faceMap
+#print axioms MvPolynomial.tupleExponent
+#print axioms MvPolynomial.tupleDenominator_eq
+#print axioms MvPolynomial.tupleExponent_cons
+#print axioms MvPolynomial.tupleExponent_succAbove
+#print axioms MvPolynomial.tupleDenominator_cons_eq
+#print axioms MvPolynomial.cons_comp_succAbove_zero
+#print axioms MvPolynomial.cons_comp_succAbove_succ
+#print axioms MvPolynomial.cechTermEquiv
+#print axioms MvPolynomial.cechTermEquiv_cechFace
+#print axioms MvPolynomial.cechBlockProj
+#print axioms MvPolynomial.cechBlockProj_apply
+#print axioms MvPolynomial.sum_cechBlockProj
+#print axioms MvPolynomial.cechBlockProj_eq_zero_of_not_subset
+#print axioms MvPolynomial.cechFace_cechBlockProj
+#print axioms MvPolynomial.cechHomotopy
+#print axioms MvPolynomial.cechHomotopy_apply
+#print axioms MvPolynomial.cechTermCongr
+#print axioms MvPolynomial.cechTermCongr_apply_section
+#print axioms MvPolynomial.cechTermCongr_symm_apply_section
+#print axioms MvPolynomial.cechTermCongr_cechBlockProj
+#print axioms MvPolynomial.laurentHomotopy_laurentFace_comm'
+#print axioms MvPolynomial.cechHomotopy_cechFace_zero
+#print axioms MvPolynomial.cechHomotopy_cechFace_succ
 -- The primitive of a Cech cocycle (#340, step 3): the vanishing computation in cochain form.
 -- Per block a cone point is chosen and the block component of the cocycle is contracted
 -- through the homotopy; blocks with no cone point are empty because a nonnegative twist
 -- cannot have every exponent negative (the ONLY place d >= 0 is spent); and the per-block
 -- identities reassemble over the finitely many blocks of each tuple.
 -- cechPrimitive_isPrimitive is the homotopy computation d h + h d = id itself.
-#print axioms AlgebraicGeometry.Proj.laurentFilter_eq_zero_of_forall_mem
-#print axioms AlgebraicGeometry.Proj.blockProj_eq_zero_of_forall_mem
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_eq_zero_of_forall_mem
-#print axioms AlgebraicGeometry.Proj.tupleExponent_support_succAbove
-#print axioms AlgebraicGeometry.Proj.subset_of_subset_cons
-#print axioms AlgebraicGeometry.Proj.cechTermCongr_symm_cechBlockProj
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_of_exists
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_of_forall
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_eq_zero_of_not_subset
-#print axioms AlgebraicGeometry.Proj.cechPrimitive
+#print axioms MvPolynomial.laurentFilter_eq_zero_of_forall_mem
+#print axioms MvPolynomial.blockProj_eq_zero_of_forall_mem
+#print axioms MvPolynomial.cechBlockProj_eq_zero_of_forall_mem
+#print axioms MvPolynomial.tupleExponent_support_succAbove
+#print axioms MvPolynomial.subset_of_subset_cons
+#print axioms MvPolynomial.cechTermCongr_symm_cechBlockProj
+#print axioms MvPolynomial.cechBlockPrimitive
+#print axioms MvPolynomial.cechBlockPrimitive_of_exists
+#print axioms MvPolynomial.cechBlockPrimitive_of_forall
+#print axioms MvPolynomial.cechBlockPrimitive_eq_zero_of_not_subset
+#print axioms MvPolynomial.cechPrimitive
 -- The cone-point case, separated out because it needs no hypothesis on the twist at all. Every
 -- block except the one containing every variable has a cone point, so this alone says the
 -- cohomology is carried entirely by the full block.
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_faces_of_exists
-#print axioms AlgebraicGeometry.Proj.cechBlockPrimitive_faces
-#print axioms AlgebraicGeometry.Proj.cechPrimitive_isPrimitive
+#print axioms MvPolynomial.cechBlockPrimitive_faces_of_exists
+#print axioms MvPolynomial.cechBlockPrimitive_faces
+#print axioms MvPolynomial.cechPrimitive_isPrimitive
 -- The headline of #340: H^n(P, O(d)) = 0 for n >= 1 and d >= 0, over an arbitrary --
 -- possibly infinite -- variable set. cechPrimitive_isPrimitive becomes exactness of the
 -- algebraic Cech complex through ab_exact_iff and the coordinate formula for the
@@ -307,19 +303,19 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.Proj.polynomialVariableCechComplex_exactAt
 #print axioms AlgebraicGeometry.Proj.polynomialVariableCechComplex_homology_isZero
 #print axioms AlgebraicGeometry.Proj.polynomialTwisting_H_subsingleton
-#print axioms AlgebraicGeometry.Proj.GradedLinearMap
-#print axioms AlgebraicGeometry.Proj.GradedLinearMap.map
-#print axioms AlgebraicGeometry.Proj.GradedLinearMap.map_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.selfLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftSelfLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftAwayLinearEquiv
+#print axioms GradedModule.GradedLinearMap
+#print axioms GradedModule.GradedLinearMap.map
+#print axioms GradedModule.GradedLinearMap.map_mk
+#print axioms GradedModule.DegreeZeroLocalization.selfLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.natShiftSelfLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.natShiftAwayLinearEquiv
 -- The trivialization needs f invertible in the localization, not a member of it. A
 -- homogeneous cofactor carrying f into S records that and keeps denominators inside S;
 -- h = 1 is the membership case. Required by the Cech intersections, where the denominator
 -- submonoid is .powers of a product and contains no degree-one element.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftToSelfLinearMapOfMulMem
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftLinearEquivOfMulMem
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftLinearEquivOfMem
+#print axioms GradedModule.DegreeZeroLocalization.natShiftToSelfLinearMapOfMulMem
+#print axioms GradedModule.DegreeZeroLocalization.natShiftLinearEquivOfMulMem
+#print axioms GradedModule.DegreeZeroLocalization.natShiftLinearEquivOfMem
 -- Integer twists (#439). The integer-shift membership condition depends only on the integer
 -- n + d, so lowering the twist by e while raising the fraction degree by e is literally the
 -- same condition -- the zero branch of the zero-extension needs no separate treatment, and the
@@ -327,42 +323,42 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- The two congruence lemmas elaboration generates for the integer-shift defs, audited rather
 -- than filtered: this repo already lists `.congr_simp` records elsewhere, and DGCategory needs
 -- them to reach ceiling 0, so the sweep must keep seeing them.
-#print axioms AlgebraicGeometry.Proj.intShift.congr_simp
-#print axioms AlgebraicGeometry.Proj.intShiftPiece.congr_simp
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mem_intShift_sub_natCast_add
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_mem_intShift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftLowerLinearMap
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftRaiseLinearMap
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftLowerLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftLowerLinearEquiv_apply_mk
+#print axioms GradedModule.intShift.congr_simp
+#print axioms GradedModule.intShiftPiece.congr_simp
+#print axioms GradedModule.DegreeZeroLocalization.mem_intShift_sub_natCast_add
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_mem_intShift
+#print axioms GradedModule.DegreeZeroLocalization.intShiftLowerLinearMap
+#print axioms GradedModule.DegreeZeroLocalization.intShiftRaiseLinearMap
+#print axioms GradedModule.DegreeZeroLocalization.intShiftLowerLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.intShiftLowerLinearEquiv_apply_mk
 -- Aiming at a prescribed twist. intShiftLowerLinearEquiv computes its target as d - e, which
 -- cannot be pointed at A(0) without a transport; the hypothesis-carrying form takes the target
 -- as a parameter instead. intShiftZeroLinearEquiv decides the sign of d once, and nothing
 -- downstream sees the case split.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.transitionScalar_mul
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.smul_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mk_smul_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftShiftLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_toNat_mem_intShift_zero
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv_apply_mk
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv_transition
+#print axioms GradedModule.DegreeZeroLocalization.transitionScalar_mul
+#print axioms GradedModule.DegreeZeroLocalization.smul_mk
+#print axioms GradedModule.DegreeZeroLocalization.mk_smul_mk
+#print axioms GradedModule.DegreeZeroLocalization.intShiftShiftLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_toNat_mem_intShift_zero
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquiv_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquiv_transition
 #print axioms AlgebraicGeometry.Proj.intShiftFiberLinearEquivOfMem
 #print axioms AlgebraicGeometry.Proj.intShiftFiberLinearEquiv
 -- Sections over an open inside the chart. Because the two computation rules above are uniform
 -- in the sign of d, these are a direct mirror of the nonnegative constructions -- nothing here
 -- splits on the sign.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_toNat_mem_intShift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquiv_symm_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_toNat_mem_intShift
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquiv_symm_apply_mk
 -- The cofactor form (#467). A Cech intersection cannot supply f in S: its denominator has
 -- degree n+1, so for n >= 1 the powers submonoid contains no degree-one element. A homogeneous
 -- cofactor h with f*h in S is what is available. The scalar is parameterized by its exponents
 -- rather than by d, so the inverse is the same definition with the pair swapped -- writing it
 -- as the -d instance would put (- -d).toNat in the term, only propositionally d.toNat.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_mul_pow_mem_intShift_zero
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.mul_pow_mul_pow_mem_intShift
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquivOfMulMem
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.intShiftZeroLinearEquivOfMulMem_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_mul_pow_mem_intShift_zero
+#print axioms GradedModule.DegreeZeroLocalization.mul_pow_mul_pow_mem_intShift
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquivOfMulMem
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquivOfMulMem_apply_mk
 #print axioms AlgebraicGeometry.Proj.intShiftSectionToZeroOn
 #print axioms AlgebraicGeometry.Proj.intShiftSectionFromZeroOn
 #print axioms AlgebraicGeometry.Proj.intShiftSectionAddEquivOn
@@ -382,9 +378,10 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.Proj.associatedMap
 #print axioms AlgebraicGeometry.Proj.associatedPresheaf_res_apply
 #print axioms AlgebraicGeometry.Proj.associatedIsoOfPiecewiseIff
-#print axioms AlgebraicGeometry.Proj.natShift
-#print axioms AlgebraicGeometry.Proj.intShift
-#print axioms AlgebraicGeometry.Proj.mem_intShift_ofNat_iff
+#print axioms GradedModule.natShift
+#print axioms GradedModule.intShift
+#print axioms GradedModule.intShiftPiece_eq_bot_of_neg
+#print axioms GradedModule.mem_intShift_ofNat_iff
 -- Integer shifts compose only where the intermediate degree exists (#584). The unrestricted
 -- statement is false: an inner shift by a negative e asks for degree n + e, and when that integer
 -- is negative the zero extension supplies 0 while the single shift by d + e may still land in a
@@ -392,8 +389,8 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- a remark. It is a fact about the algebraic model only -- associatedSheaf reads these pieces
 -- through homogeneous localizations, where the missing degrees are inverted back in -- so the
 -- sheaf-level O(d)(e) = O(d+e) is not obstructed, but it cannot be transported from here.
-#print axioms AlgebraicGeometry.Proj.mem_intShift_add_iff_of_nonneg
-#print axioms AlgebraicGeometry.Proj.eq_zero_of_mem_intShift_intShift_of_neg
+#print axioms GradedModule.mem_intShift_add_iff_of_nonneg
+#print axioms GradedModule.eq_zero_of_mem_intShift_intShift_of_neg
 
 /-! ## The twisted multiplication A(d) (x) M -> M(d) (#584)
 
@@ -412,7 +409,7 @@ Module.compHom along algebraMap, so that map has to be named. Same gap as #695's
 The section map, the presheaf map through tensorLift, and the isomorphism proof are NOT here, so
 #584 is not closed. -/
 
-#print axioms AlgebraicGeometry.Proj.smul_mem_intShift
+#print axioms GradedModule.smul_mem_intShift
 #print axioms AlgebraicGeometry.Proj.twistMul
 #print axioms AlgebraicGeometry.Proj.coe_twistMul
 #print axioms AlgebraicGeometry.Proj.twistMul_mk
@@ -441,8 +438,8 @@ The section map, the presheaf map through tensorLift, and the isomorphism proof 
 -- record as unobtainable from an algebraic identity: at a localization whose denominators contain
 -- a homogeneous element of positive degree the two families have the same degree-zero part.
 -- Carrying this to the sections of the associated sheaf is NOT here, so #584 is not closed.
-#print axioms AlgebraicGeometry.Proj.mem_intShift_add_of_mem_intShift_intShift
-#print axioms AlgebraicGeometry.Proj.isDegreeZero_intShift_intShift_iff
+#print axioms GradedModule.mem_intShift_add_of_mem_intShift_intShift
+#print axioms GradedModule.isDegreeZero_intShift_intShift_iff
 
 /-! ## The twists compose, on the sheaf side (#584)
 
@@ -491,11 +488,11 @@ The section and .over halves follow below, completing the module trivialization 
 prerequisite the tensor comparison was blocked on. The comparison itself is still missing, so #584
 is not closed. -/
 
-#print axioms Proj.DegreeZeroLocalization.pow_smul_mem_intShift_zero
-#print axioms Proj.DegreeZeroLocalization.pow_smul_mem_intShift
-#print axioms Proj.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv
-#print axioms Proj.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv_apply_mk
-#print axioms Proj.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv_symm_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.pow_smul_mem_intShift_zero
+#print axioms GradedModule.DegreeZeroLocalization.pow_smul_mem_intShift
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.intShiftZeroModuleLinearEquiv_symm_apply_mk
 #print axioms AlgebraicGeometry.Proj.intShiftModuleFiberLinearEquivOfMem
 -- The section and .over halves, which complete the module trivialization and with it the
 -- prerequisite the tensor comparison was blocked on. Ports of intShiftSectionToZeroOn and
@@ -560,7 +557,7 @@ is not closed. -/
 -- complexes are related by transport rather than definitional equality. This is the shape
 -- devissage consumes, which needs Hⁱ(Pⁿ, O(d)) as an explicit complex at negative d.
 #print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_computesCohomology
-#print axioms AlgebraicGeometry.Proj.polynomialVariable_adjoin_eq_top
+#print axioms MvPolynomial.polynomialVariable_adjoin_eq_top
 #print axioms AlgebraicGeometry.Proj.natShiftQuasicoherentData
 #print axioms AlgebraicGeometry.Proj.natShift_isQuasicoherent
 -- Integer twists (#439). Same three steps as the nonnegative case; the only difference is that
@@ -602,17 +599,6 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Proj.cechCochainsDegreewiseAddEquiv_apply
 #print axioms AlgebraicGeometry.Proj.cechCochainsDegreewiseAddEquiv_symm_apply
 #print axioms AlgebraicGeometry.Proj.cechIndexEquiv_map_face
--- Mathlib's Cech differential read in coordinates (#340). Both proofs finish with `exact`
--- rather than `rw`: the two sides differ in the HasProduct instance that Pi.pi carries, which
--- rw will not see through but definitional unification will.
-#print axioms CategoryTheory.cechNerve
-#print axioms CategoryTheory.cechCosimplicial
-#print axioms CategoryTheory.cechTermFamily
-#print axioms CategoryTheory.cechComplexFunctor_delta_π
-#print axioms CategoryTheory.cechComplexFunctor_d_π
--- The same projection statement for the map a morphism of presheaves induces, which is what
--- carries the base-field action from one Cech index up to a whole degree.
-#print axioms CategoryTheory.cechComplexFunctor_map_f_π
 -- The complex-level form (#340). The differential is carried across the degreewise comparison
 -- rather than defined as an alternating sum, so d-squared and the comparison isomorphism are
 -- both free; the alternating-sum formula is a separate lemma about this complex.
@@ -664,24 +650,28 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Proj.polynomialNatGlobalSectionsAddEquiv
 #print axioms AlgebraicGeometry.Proj.polynomialTwistingGlobalSectionsAddEquiv
 #print axioms AlgebraicGeometry.Proj.polynomialTwistingGlobalSectionsModuleIso
-#print axioms AlgebraicGeometry.Proj.polynomialVariableCechDenominator_mem
+#print axioms MvPolynomial.polynomialVariableCechDenominator
+#print axioms MvPolynomial.polynomialVariableCechDenominator_mem
+#print axioms MvPolynomial.polynomialVariableCechTerm
+#print axioms MvPolynomial.polynomialVariableCechCochains
+#print axioms MvPolynomial.polynomialVariableFraction
 -- The Cech faces (#340). Dropping index j divides the denominator by exactly one variable, so
 -- the face is DegreeZeroLocalization.faceMap and not mapOfLE: powers of the smaller denominator
 -- are not contained in powers of the larger one.
-#print axioms AlgebraicGeometry.Proj.polynomialVariableCechDenominator_succAbove
-#print axioms AlgebraicGeometry.Proj.polynomialVariableCechDenominator_succAbove_mem
-#print axioms AlgebraicGeometry.Proj.polynomialVariableCechFace
+#print axioms MvPolynomial.polynomialVariableCechDenominator_succAbove
+#print axioms MvPolynomial.polynomialVariableCechDenominator_succAbove_mem
+#print axioms MvPolynomial.polynomialVariableCechFace
 -- The same three objects for an integer twist (#467 step 2). faceMap is generic in the grading,
 -- so the face instantiates at intShift with the identical denominator arithmetic; the two
 -- membership facts it consumes do not mention the twist at all.
-#print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechTerm
-#print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechCochains
-#print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechFace
+#print axioms MvPolynomial.polynomialVariableIntCechTerm
+#print axioms MvPolynomial.polynomialVariableIntCechCochains
+#print axioms MvPolynomial.polynomialVariableIntCechFace
 -- The integer Cech comparison (#467 step 3). Five steps where the nonnegative case has three;
 -- the two extra ones are grading transports that move no data -- the integer trivializations
 -- land at A(0) while the section comparison is stated against A.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.linearEquivOfMemIff
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.coe_linearEquivOfMemIff
+#print axioms GradedModule.DegreeZeroLocalization.linearEquivOfMemIff
+#print axioms GradedModule.DegreeZeroLocalization.coe_linearEquivOfMemIff
 #print axioms AlgebraicGeometry.Proj.sectionAddEquivOfMemIff
 #print axioms AlgebraicGeometry.Proj.intCechTermSectionAddEquiv
 -- Pointwise readings of the integer section maps, toward the bijectivity restatement (#467 3b).
@@ -692,7 +682,7 @@ is not closed. -/
 -- 3b closed. The five-step composite has to be named by `change` before anything rewrites:
 -- simp will not unfold it far enough to expose the mk argument, because two steps are AddEquiv
 -- transports whose apply lemmas only fire once the argument is already in mk form.
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.linearEquivOfMemIff_mk
+#print axioms GradedModule.DegreeZeroLocalization.linearEquivOfMemIff_mk
 #print axioms AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_apply_mk
 #print axioms AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_toAddMonoidHom
 #print axioms AlgebraicGeometry.Proj.moduleAwayToSection_intCechDenominator_bijective
@@ -700,9 +690,9 @@ is not closed. -/
 -- denominator has degree n+1, so the algebraic trivialization goes through invertibility
 -- (X_mul_cechCofactor) rather than membership, and the sheaf-level one through the first
 -- variable's degree-one chart.
-#print axioms AlgebraicGeometry.Proj.cechCofactor
-#print axioms AlgebraicGeometry.Proj.X_mul_cechCofactor
-#print axioms AlgebraicGeometry.Proj.cechCofactor_mem
+#print axioms MvPolynomial.cechCofactor
+#print axioms MvPolynomial.X_mul_cechCofactor
+#print axioms MvPolynomial.cechCofactor_mem
 #print axioms AlgebraicGeometry.Proj.basicOpen_denominator_le
 #print axioms AlgebraicGeometry.Proj.cechTermSectionAddEquiv
 -- The comparison is the canonical pointwise fraction-to-section map, not merely some
@@ -718,17 +708,13 @@ is not closed. -/
 -- in the graded module and never mentions the twist.
 #print axioms AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_res_face
 #print axioms AlgebraicGeometry.Proj.moduleAwayToSection_cechDenominator_bijective
-#print axioms AlgebraicGeometry.Proj.DegreeZeroLocalization.natShiftLinearEquivOfMulMem_apply_mk
+#print axioms GradedModule.DegreeZeroLocalization.natShiftLinearEquivOfMulMem_apply_mk
 #print axioms AlgebraicGeometry.Proj.natShiftSectionFromSelfOn_apply
 #print axioms AlgebraicGeometry.Proj.natShiftFiberLinearEquivOfMem_symm_apply_mk
 #print axioms AlgebraicGeometry.Proj.natShiftSectionFromSelfOn_selfBasicOpenSectionAddEquiv_mk
 #print axioms AlgebraicGeometry.Proj.basicOpen_polynomialVariableCechDenominator
 
 -- The geometric source has one over-scheme object and proof-irrelevant adjective layers.
-#print axioms SchemeOverField
-#print axioms SchemeOverField.IsVariety
-#print axioms Variety
-#print axioms SmoothProperVariety
 #print axioms ChernClassData.chernCharacterFour
 #print axioms ChernClassData.toddFour
 #print axioms ChernClassData.chernCharacterComponent
@@ -771,18 +757,9 @@ is not closed. -/
 -- Canonical-sheaf data is constructed from smooth relative differentials. Standard-smooth
 -- charts globalize through sheafification, their determinant line has an explicit dual inverse,
 -- and the derived object is constructed as `ω_X[n]`.
-#print axioms LinearMap.exteriorPower
-#print axioms LinearMap.exteriorPower_ιMulti
-#print axioms PresheafOfModules.exteriorPower
-#print axioms PresheafOfModules.exteriorPower.map
-#print axioms PresheafOfModules.exteriorPower.mapIso
-#print axioms PresheafOfModules.exteriorPowerFunctor
 #print axioms Scheme.Modules.exteriorPower
 #print axioms Scheme.Modules.exteriorPowerMapIso
 #print axioms Scheme.Modules.exteriorPowerSheafification
-#print axioms Scheme.Modules.topPowerset
-#print axioms Scheme.Modules.topExteriorFreeEquiv
-#print axioms Scheme.Modules.topExteriorFreeEquiv_ιMulti
 #print axioms Scheme.Modules.topExteriorFreeIso
 #print axioms Scheme.Modules.exteriorPowerOver
 #print axioms Scheme.Modules.exteriorPowerOverMapIsoOfIso
@@ -796,7 +773,6 @@ is not closed. -/
 #print axioms Scheme.Modules.tensorDualIso
 #print axioms Scheme.Modules.dualLine_isInvertible
 #print axioms Scheme.Modules.LineBundleData.ofIsInvertible
-#print axioms SheafOfModules.IsInvertible.isFinitePresentation
 #print axioms Scheme.Modules.LineBundleData.isCoherent
 #print axioms Scheme.Modules.LineBundleData.finiteLocallyFree
 #print axioms Scheme.Modules.LineBundleData.unit
@@ -841,6 +817,23 @@ is not closed. -/
 #print axioms Variety.relativeDifferentialsDeterminantData
 #print axioms SmoothProperVariety.finiteCohomology
 #print axioms SmoothProperVariety.point
+#print axioms IsVariety
+#print axioms IsVariety.toIsIntegral
+#print axioms IsVariety.toLocallyOfFiniteType
+#print axioms IsSmoothProperVariety
+#print axioms IsSmoothProperVariety.toIsVariety
+#print axioms IsSmoothProperVariety.toSmooth
+#print axioms IsSmoothProperVariety.toIsProper
+#print axioms IsSmoothProperVariety.toIsSeparated
+#print axioms IsSmoothProperVariety.toUniversallyClosed
+#print axioms Module.sum_neg_one_pow_finrank_eq_zero_of_longExact
+#print axioms Variety.isLocallyNoetherian
+#print axioms Variety.isNoetherian_of_isProper
+#print axioms Variety.isSeparated_of_isProper
+#print axioms SmoothProperVariety.instOverPoint
+#print axioms SmoothProperVariety.isSmoothProperVariety_point
+#print axioms AlgebraicGeometry.K3Surface.isProjective
+#print axioms AlgebraicGeometry.EnriquesSurface.isProjective
 #print axioms SmoothProperVariety.CanonicalSheafData
 #print axioms SmoothProperVariety.CanonicalSheafData.ofRelativeDifferentials
 #print axioms SmoothProperVariety.CanonicalSheafData.ofRelativeDifferentials_cotangent
@@ -861,18 +854,10 @@ is not closed. -/
 #print axioms SmoothProperVariety.CanonicalSheafData.pointCanonicalSheafData_canonicalSheaf
 #print axioms SmoothProperVariety.CanonicalSheafData.pointDualizingComplexIso
 
--- Layer B stage 5: algebraic linear duality is an exact contravariant functor and therefore has
--- an actual derived lift. The comparison between the opposite derived category and the derived
--- category of the opposite remains explicit, as do geometric RHom and Grothendieck duality.
-#print axioms ModuleCat.linearDualFunctor
-#print axioms ModuleCat.linearDualFunctor_map_shortExact
-#print axioms ModuleCat.linearDualFunctor_preservesFiniteLimits_and_colimits
-#print axioms ModuleCat.linearDualFunctor_preservesFiniteLimits
-#print axioms ModuleCat.linearDualFunctor_preservesFiniteColimits
-#print axioms ModuleCat.derivedLinearDualFunctor
-#print axioms ModuleCat.DerivedOppositeComparison
-#print axioms ModuleCat.DerivedOppositeComparison.derivedLinearDualFromOpposite
-#print axioms ModuleCat.DerivedOppositeComparison.derivedLinearDualShift
+-- Layer B stage 5: geometric Serre duality consumes the generic derived
+-- opposite comparison and exact linear-dual lift audited in
+-- `StabilityConditionAudit/DerivedCategory.lean`. Geometric RHom and
+-- Grothendieck duality remain explicit realization data here.
 #print axioms AlgebraicGeometry.Duality.Serre.DerivedStatement
 #print axioms AlgebraicGeometry.Duality.Serre.DerivedStatement.linearDualShift
 #print axioms AlgebraicGeometry.Duality.Serre.DerivedStatement.dualizingObject
@@ -932,6 +917,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.twistIso
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.mk.inj
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.Duality.Serre.instHasExtCoh
 #print axioms Cohomology.FiniteCohomology
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic
 #print axioms Cohomology.FiniteCohomology.finrankSupport_subset_range
@@ -944,7 +930,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Cohomology.FiniteCohomology.exact₂
 #print axioms Cohomology.FiniteCohomology.LinearConnectingMaps.exact₃
 #print axioms Cohomology.FiniteCohomology.LinearConnectingMaps.exact₁
-#print axioms Cohomology.FiniteCohomology.alternating_finrank_eq_zero_of_exact
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic_additive
 #print axioms Cohomology.FiniteCohomology.eulerCharacteristic_additive_modules
 #print axioms Cohomology.FiniteCohomology.grothendieckEulerHom
@@ -978,20 +963,14 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData.k3_eulerCharacteristic_eq
 #print axioms AlgebraicGeometry.RiemannRoch.Surface.GeometricData.numericalClass
 
--- Layer A: the graded-basis constructor. `ofGradedBasis` is what every concrete model
--- goes through, so a sorry here would silently contaminate every instance in the repo.
+-- Layer A: the numerical graded-basis consumer. The generic weighted-basis
+-- decomposition is audited with LinearAlgebra in `StabilityConditionAudit/GradedBasis.lean`.
 #print axioms NumericalRingData
 #print axioms NumericalRingData.piece
 #print axioms NumericalRingData.degree
 #print axioms NumericalVarietyData
 #print axioms NumericalVarietyData.ring
 #print axioms NumericalVarietyData.chi
-#print axioms gradedPiece
-#print axioms gradedPiece_eq_bot
-#print axioms gradedPiece_iSupIndep
-#print axioms gradedPiece_iSup_eq_top
-#print axioms gradedPiece_isInternal
-#print axioms gradedPiece_mul_mem
 #print axioms NumericalRingData.ofGradedBasis
 
 -- Layer A: the general Riemann-Roch expansion and its surface specialisation.
@@ -1043,11 +1022,10 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms K3.chi₂_eq_neg_mukaiPairing
 #print axioms K3.chi₂_self
 
--- Layer A: the numerical Grothendieck quotient and lattice. The pairing is descended only
--- under explicit symmetry, and the finite/free conclusion must retain its finiteness and
--- torsion-freeness hypotheses.
-#print axioms ZLattice
-#print axioms ZLattice.ofFiniteTorsionFree
+-- Layer A: the numerical Grothendieck quotient and its geometric lattice consumer. The
+-- generic finite-free lattice interface is audited with LinearAlgebra in the stability audit.
+-- The pairing is descended only under explicit symmetry, and the numerical quotient's
+-- finite/free conclusion must retain its finiteness and torsion-freeness hypotheses.
 #print axioms NumericalVarietyData.eulerPairingRow
 #print axioms NumericalVarietyData.eulerPairing
 #print axioms NumericalVarietyData.eulerPairingFlip
@@ -1070,7 +1048,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms NumericalVarietyData.numericalPairing_left_nondegenerate
 #print axioms NumericalVarietyData.numericalPairing_right_nondegenerate
 #print axioms NumericalVarietyData.numericalPairing_ker_eq_bot
-#print axioms NumericalVarietyData.numericalZLattice
+#print axioms NumericalVarietyData.instFiniteNumericalQuotient
 #print axioms K3.isEulerPairingSymmetric
 #print axioms K3.leftRadical_eq_rightRadical
 #print axioms K3.numericalPairing_mk_eq_neg_mukaiPairing
@@ -1098,6 +1076,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.k3NumericalVariety
 #print axioms Examples.k3NumericalVariety_satisfiesHRR
 #print axioms Examples.k3_isK3
+#print axioms Examples.k3ChiStructureSheaf
 
 -- Layer A: the projective plane. Its td1 is nonzero, so it is the model that can
 -- detect an error in the c1.td1 term of Surface.chi_eq.
@@ -1118,6 +1097,21 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.abelianToddComp_one
 #print axioms Examples.abelianChiStructureSheaf
 #print axioms Examples.abelianChi_eq_of_chComp_two_eq
+
+-- Layer A: the numerical Enriques surface. td1 = 0 like the abelian model but
+-- with chi(O) = 1, so the integral of td2 is the only rank-one invariant
+-- separating the two; the pairwise 2 != 1 != 0 distinctions are theorems.
+#print axioms Examples.enriquesTodd
+#print axioms Examples.enriquesTodd_mem
+#print axioms Examples.enriquesTodd_sum
+#print axioms Examples.enriquesNumericalVariety
+#print axioms Examples.enriquesNumericalVariety_satisfiesHRR
+#print axioms Examples.enriquesToddComp_one
+#print axioms Examples.enriquesChiStructureSheaf
+#print axioms Examples.k3EnriquesAbelianPresentations
+#print axioms Examples.chiStructureSheaf_enriques_ne_k3
+#print axioms Examples.chiStructureSheaf_enriques_ne_abelian
+#print axioms Examples.chiStructureSheaf_k3_ne_abelian
 
 -- Layer A: the dimension-general Picard-rank-one construction. Every threefold and
 -- fourfold model below is built from it, so a sorry here would unmodel dimensions three
@@ -1217,28 +1211,13 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.sexticChi_point
 #print axioms Examples.sexticChi_lineBundle
 
--- Layer B: the Mathlib gap that blocks the local-to-global criterion for coherence.
-#print axioms SheafOfModules.Presentation.isFinite_of_isIso
-#print axioms SheafOfModules.Presentation.isFinite_map
-#print axioms SheafOfModules.Presentation.isFinitePresentation_quasicoherentData
-#print axioms SheafOfModules.IsFinitePresentation.of_presentation
-
 -- Layer B stage 1.
 #print axioms Scheme.Modules.IsCoherent
 #print axioms Coh
 #print axioms Coh.ι
-#print axioms SheafOfModules.QuasicoherentData.ofIso
-#print axioms SheafOfModules.QuasicoherentData.isFinitePresentation_ofIso
-#print axioms SheafOfModules.IsFinitePresentation.of_iso
-#print axioms SheafOfModules.isFinitePresentation_isClosedUnderIsomorphisms
+#print axioms Coh.full_ι
+#print axioms Coh.faithful_ι
 #print axioms Scheme.coherent_isClosedUnderIsomorphisms
-#print axioms SheafOfModules.QuasicoherentData.presentationOver
-#print axioms SheafOfModules.QuasicoherentData.presentationOver_generators_I
-#print axioms SheafOfModules.QuasicoherentData.presentationOver_relations_I
-#print axioms SheafOfModules.QuasicoherentData.over
-#print axioms SheafOfModules.QuasicoherentData.isFinitePresentation_over
-#print axioms SheafOfModules.IsFinitePresentation.over
-#print axioms SheafOfModules.IsFinitePresentation.of_coversTop
 #print axioms TopCat.Opens.grothendieckTopology_coversTop
 #print axioms basicOpen_coversTop_of_span_eq_top
 #print axioms Scheme.Hom.opensRangeEquivalence
@@ -1265,17 +1244,18 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- be turned into finite presentation on a scheme at all. One file, replacing the two
 -- independent workarounds that preceded it.
 #print axioms TopologicalSpace.Opens.hasBinaryProducts
+#print axioms TopologicalSpace.Opens.map_final
 #print axioms TopologicalSpace.Opens.hasFiniteLimits
 
 -- Layer B stage 1: the affine comparison, forward direction.
 #print axioms isFinitePresentation_tilde
 #print axioms isCoherent_tilde
 #print axioms isCoherent_tilde_of_finite
--- Layer B stage 1: the geometric half of the affine comparison theorem. The first two
--- are general sheaf theory; the rest reduce `IsIso fromTildeΓ` to a statement about
--- localisation of modules.
+-- Layer B stage 1: the topological sheaf root consumed by the affine comparison.
 #print axioms TopCat.Presheaf.stalkFunctor_map_surjective_of_isBasis
 #print axioms TopCat.Sheaf.isIso_of_isIso_app_of_isBasis
+-- Layer B stage 1: the geometric half of the affine comparison theorem reduces
+-- `IsIso fromTildeΓ` to a statement about localisation of modules.
 #print axioms Scheme.Modules.basicOpenRestriction
 #print axioms Scheme.Modules.toOpen_comp_fromTildeΓ_app
 #print axioms Scheme.Modules.isLocalizedModule_basicOpenRestriction_tilde
@@ -1289,8 +1269,8 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule
 
 -- Layer B stage 1: a quasi-coherent sheaf on an affine scheme has presentations on a
--- basic-open cover. The first declaration is the reusable iterated-slice restriction step.
-#print axioms SheafOfModules.Presentation.over
+-- basic-open cover. The reusable iterated-slice restriction step is audited with its
+-- categorical owner.
 #print axioms Scheme.Modules.exists_basicOpen_presentation_cover
 #print axioms Scheme.Hom.opensRangeModulesEquivalenceInverseUnitIso
 #print axioms Scheme.Hom.restrictPresentation
@@ -1304,8 +1284,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- generators and presentations are transported to affine basic opens, where the comparison
 -- turns them into finite modules; localisation patching then returns to `Spec R`.
 #print axioms SheafOfModules.GeneratingSections.map
-#print axioms SheafOfModules.GeneratingSections.over
-#print axioms SheafOfModules.GeneratingSections.isFiniteType_over
 #print axioms Scheme.Modules.basicOpenSpecMap
 #print axioms Scheme.Modules.basicOpenSpecMap_opensRange
 #print axioms Scheme.Modules.restrictBasicOpenTopLinearEquiv
@@ -1359,10 +1337,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- (co)kernels to finite modules. The final instances create (co)kernels in `Coh X`.
 #print axioms AlgebraicGeometry.modulesSpecToSheaf_preservesFiniteLimits
 #print axioms Scheme.Modules.restrictFunctor_preservesFiniteLimits
-#print axioms LinearMap.kerMap
-#print axioms IsLocalizedModule.kerMap
-#print axioms IsLocalizedModule.kernelMap
-#print axioms IsLocalizedModule.kernelNatTrans
 #print axioms Scheme.Modules.isLocalizedModule_basicOpenRestriction_kernel
 #print axioms Scheme.Modules.isCoherent_kernel_affine
 #print axioms Scheme.Modules.isCoherent_cokernel_affine
@@ -1389,16 +1363,14 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderKernels
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderCokernels
 
--- Layer B stage 1: extensions. Local lifts of finite generators and relations produce a
--- finite horseshoe presentation of the middle term, without a noetherian hypothesis.
-#print axioms SheafOfModules.IsFinitePresentation.middle_of_shortExact
-#print axioms SheafOfModules.isFinitePresentation_isClosedUnderExtensions
+-- Layer B stage 1: geometric specialization of the generic finite-presentation
+-- extension theorem. The horseshoe construction itself is audited in
+-- `StabilityConditionAudit/SheafModules.lean`.
 #print axioms Scheme.coherent_isClosedUnderExtensions
 
--- Layer B stage 1: abelianity and the exact inclusion. The full subcategory contains zero
--- and finite products; kernel/cokernel closure then supplies the abelian structure and makes
--- the inclusion preserve all finite limits and colimits.
-#print axioms SheafOfModules.isFinitePresentation_containsZero
+-- Layer B stage 1: abelianity and the exact inclusion. The coherent property consumes the
+-- generic zero theorem and is closed under finite products; kernel/cokernel closure then
+-- supplies the abelian structure and makes the inclusion preserve all finite limits and colimits.
 #print axioms Scheme.coherent_containsZero
 #print axioms Scheme.coherent_isClosedUnderBinaryProducts
 #print axioms Scheme.coherent_isClosedUnderFiniteProducts
@@ -1434,29 +1406,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Scheme.CartierPullbackData.localMap_localCartierClass
 #print axioms Scheme.CartierPullbackData.pullback_principal
 
--- Layer B stage 3: exactness of the bridge from sheaves of modules to abelian sheaves.
--- This is what lets a short exact sequence in `X.Modules` reach `Ext`, and hence the
--- cohomology long exact sequence. The first two are general category theory and have
--- nothing to do with sheaves.
-#print axioms CategoryTheory.Adjunction.preservesColimit_comp_left
-#print axioms CategoryTheory.Adjunction.preservesColimitsOfShape_of_comp_left
-#print axioms SheafOfModules.preservesFiniteColimits_toSheaf
-#print axioms SheafOfModules.preservesFiniteColimits_toSheaf'
-#print axioms SheafOfModules.preservesEpimorphisms_toSheaf
-#print axioms SheafOfModules.shortExact_map_toSheaf
-#print axioms SheafOfModules.epi_of_isLocallySurjective
-#print axioms SheafOfModules.reflectsEpimorphisms_toSheaf
-
--- Layer B stage 3: the link between cosimplicial (Cech) and simplicial (extra degeneracy)
--- machinery. Not the whole of the Cech vanishing chain -- see the module docstring of
--- DerivedAlgGeo/AlgebraicGeometry/Cohomology/Simplicial/ExtraCodegeneracy.lean
--- for what is still missing.
-#print axioms AlgebraicTopology.AlternatingCofaceMapComplex.opIso
-#print axioms AlgebraicTopology.AlternatingCofaceMapComplex.opIso_hom_f
-#print axioms AlgebraicTopology.AlternatingCofaceMapComplex.opIso_inv_f
-#print axioms AlgebraicTopology.exactAt_succ_of_extraDegeneracy
-#print axioms AlgebraicTopology.exactAt_succ_of_extraDegeneracy_map
-
 -- Layer B stage 3: Mathlib's construction assembling a spectral object into a spectral
 -- sequence, including its page-homology and first-page comparison isomorphisms.
 #print axioms CategoryTheory.Abelian.SpectralObject.SpectralSequence.HomologyData.isColimitCc
@@ -1466,150 +1415,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms CategoryTheory.Abelian.SpectralObject.spectralSequence_page_d_eq
 #print axioms CategoryTheory.Abelian.SpectralObject.spectralSequenceFirstPageXIso
 #print axioms CategoryTheory.Abelian.SpectralObject.spectralSequence_first_page_d_eq
-
--- Layer B stage 3: filtered complexes and column-filtered total complexes now feed the
--- spectral-object constructor above.  The last declaration is the packaged E₂ sequence.
-#print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
-#print axioms HomotopyCategory.filteredComplexSpectralObject
-#print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt
-#print axioms CategoryTheory.Abelian.SpectralObject.coreE₂ColumnFilteredCohomologicalInt
-#print axioms HomologicalComplex.stupidTruncGEι
-#print axioms HomologicalComplex.stupidTruncGEMap
-#print axioms HomologicalComplex₂.columnFiltrationBicomplex
-#print axioms HomologicalComplex₂.columnFilteredTotalComplex
-#print axioms HomologicalComplex₂.columnFilteredTotalι
-#print axioms HomologicalComplex₂.columnFilteredTotal_map_comp_ι
-#print axioms HomologicalComplex₂.columnFilteredTotalιNat
-#print axioms HomologicalComplex₂.columnFilteredTotalSpectralObject
-#print axioms HomologicalComplex₂.columnFilteredTotalSpectralSequence
-
--- Layer B stage 3: consecutive column truncations form a degreewise split short exact
--- sequence. Its totalized mapping cone is quasi-isomorphic to the newly added shifted column,
--- which identifies an adjacent filtration layer with fixed-column homology.
-#print axioms HomologicalComplex₂.truncatedBicomplex
-#print axioms HomologicalComplex₂.singleColumnBicomplex
-#print axioms HomologicalComplex₂.singleColumnXIso
-#print axioms HomologicalComplex₂.singleColumnXIso_hom_inv_f
-#print axioms HomologicalComplex₂.singleColumnXIso_inv_hom_f
-#print axioms HomologicalComplex₂.adjacentColumnInclusion
-#print axioms HomologicalComplex₂.adjacentColumnProjection
-#print axioms HomologicalComplex₂.adjacentColumnBicomplexShortComplex
-#print axioms HomologicalComplex₂.totalFunctor_additive
-#print axioms HomologicalComplex₂.adjacentColumnTotalShortComplex
-#print axioms HomologicalComplex₂.stupidTruncGEXIso
-#print axioms HomologicalComplex₂.stupidTruncXIso_eq_stupidTruncGEXIso
-#print axioms HomologicalComplex₂.stupidTruncGEXIso_inv_hom_f
-#print axioms HomologicalComplex₂.stupidTruncGEXIso_hom_inv_f
-#print axioms HomologicalComplex₂.complexIso_inv_hom_f
-#print axioms HomologicalComplex₂.complexIso_hom_inv_f
-#print axioms HomologicalComplex₂.adjacentColumnTotalRetraction
-#print axioms HomologicalComplex₂.adjacentColumnTotalSection
-#print axioms HomologicalComplex₂.adjacentColumnTotalDegreewiseSplitting
-#print axioms HomologicalComplex₂.singleZeroBicomplex
-#print axioms HomologicalComplex₂.singleZeroXIso
-#print axioms HomologicalComplex₂.singleZeroTotalXIso
-#print axioms HomologicalComplex₂.singleZeroTotalIso
-#print axioms HomologicalComplex₂.singleColumnShiftIso
-#print axioms HomologicalComplex₂.singleColumnTotalIso
-#print axioms HomologicalComplex₂.adjacentColumnTotalShortExact
-#print axioms HomologicalComplex₂.adjacentColumnConeToShift
-#print axioms HomologicalComplex₂.adjacentColumnConeToShift_quasiIso
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerComplex
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerComplex_eq
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerConeToShift
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerConeToShift_quasiIso
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerHomologyIso
-#print axioms HomologicalComplex₂.columnFilteredStageIso
-#print axioms HomologicalComplex₂.columnFilteredAdjacentLayerIso
-#print axioms HomologicalComplex₂.columnFilteredInitialPageColumnHomologyIso
-#print axioms HomologicalComplex₂.columnFilteredFirstPage_d_eq
-#print axioms HomologicalComplex₂.columnFilteredInitialPage_d_eq_horizontalHomologyMap
-
--- Layer B stage 3: an explicit injective resolution now produces the augmented Cech
--- bicomplex, its total complex, the column-filtered spectral sequence, and the formal
--- initial-page identification. Over a general site the pin still has no EnoughInjectives
--- instance for sheaves, and SpectralSequence still has no convergence/abutment field;
--- neither gap is hidden by an axiom.
-#print axioms CategoryTheory.Limits.FormalCoproduct.evalOp_additive
-#print axioms CategoryTheory.Sheaf.cechComplexFunctor_additive
-#print axioms CategoryTheory.Sheaf.cechCochainFunctorInt
-#print axioms CategoryTheory.Sheaf.cechResolutionBicomplexUnflipped
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexXXIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentation
-#print axioms CategoryTheory.Sheaf.cechInjectiveTotalComplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveFilteredToTotal
-#print axioms CategoryTheory.Sheaf.cechInjectiveFilteredToTotalNat
-#print axioms CategoryTheory.Sheaf.cechInjectiveSpectralObject
-#print axioms CategoryTheory.Sheaf.cechInjectiveSpectralSequence
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageXIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveAdjacentLayerComplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveAdjacentLayerHomologyIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageColumnHomologyIso
-
--- Layer B stage 3: over a SMALL site the resolution hypothesis is redundant. Mathlib's
--- Grothendieck-abelian chain supplies enough injectives, so the Cech spectral sequence and
--- its acyclicity consequences are restated with no InjectiveResolution argument. These are
--- inferInstance and wrapper terms, not new instances or axioms.
-#print axioms CategoryTheory.Sheaf.enoughInjectives_of_small
-#print axioms CategoryTheory.Sheaf.hasInjectiveResolutions_of_small
-#print axioms CategoryTheory.Sheaf.enoughInjectives_opens
-#print axioms CategoryTheory.Sheaf.canonicalInjectiveResolution
-#print axioms CategoryTheory.Sheaf.canonicalSectionsCohomologyAddEquivHPrime
-#print axioms CategoryTheory.Sheaf.canonicalCechBicomplex
-#print axioms CategoryTheory.Sheaf.canonicalCechSpectralSequence
-#print axioms CategoryTheory.Sheaf.canonicalCechInitialPageColumnHomologyIso
-#print axioms CategoryTheory.Sheaf.isZero_canonicalCechInitialPage_of_isCechAcyclicFor
-#print axioms CategoryTheory.Sheaf.subsingleton_canonicalCechInitialPage_of_isCechAcyclicFor
-
--- Layer B stage 3: the initial page's degree-zero row, including its horizontal
--- differential, is the ordinary Cech complex. Consequently the following page is
--- ordinary Cech cohomology along that row.
-#print axioms CategoryTheory.Sheaf.cechInjectiveColumnAugmentationHomologyIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageZeroRowXIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageZeroRow_d
-#print axioms CategoryTheory.Sheaf.cechInjectiveInitialPageZeroRowIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveFollowingPageCechCohomologyIso
-
--- Layer B stage 3: first-quadrant total comparison and the Cech augmentation into the total
--- complex of an explicit injective resolution. The general engine uses finite column tails;
--- local Cech acyclicity supplies the columnwise quasi-isomorphisms.
-#print axioms CochainComplex.mappingCone.quasiIso_compMap
-#print axioms CochainComplex.mappingCone.quasiIsoAt_inr_of_isZero_X
-#print axioms HomologicalComplex.HomologySequence.quasiIso_τ₂
-#print axioms HomologicalComplex₂.IsVerticallyConnective
-#print axioms HomologicalComplex₂.IsHorizontallyConnective
-#print axioms HomologicalComplex₂.totalMap_quasiIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveColumnAugmentation_quasiIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSource_verticallyConnective
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSource_horizontallyConnective
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplex_verticallyConnective
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplex_horizontallyConnective
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentation_total_quasiIso
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSourceTotalIso
-#print axioms CategoryTheory.Sheaf.cechToInjectiveTotalMap
-#print axioms CategoryTheory.Sheaf.cechToInjectiveTotalMap_quasiIso
-#print axioms CategoryTheory.Sheaf.cechCohomologyIsoInjectiveTotalHomology
-
--- Layer B stage 3: the global-sections edge of the Cech bicomplex. Sheaf gluing proves
--- exactness at degree zero, injectivity proves positive row exactness, and the resulting
--- rowwise quasi-isomorphism passes to first-quadrant totals. Together with local Cech
--- acyclicity this gives the full Cech-to-derived comparison for open covers.
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_exact
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_mono
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechRowMap_quasiIso
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap_quasiIso
-#print axioms CategoryTheory.Sheaf.cechCochainFunctorIntHomologyIso
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplexUnliftedIso
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology
-
--- On the small site Opens X the comparison needs no witness arguments at all: the
--- injective resolution and the HasExt instance both come from Mathlib's Grothendieck
--- abelian chain. The witness-carrying form above is retained for a general site.
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology_opens
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomologyAt_opens
 
 #print axioms AlgebraicGeometry.Cohomology.AffineTildeCechDerivedComparisonAt
 #print axioms AlgebraicGeometry.Cohomology.AffineTildeCechDerivedComparison
@@ -1629,36 +1434,16 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Cohomology.modules_H_subsingleton_of_iso_tilde
 #print axioms AlgebraicGeometry.Cohomology.modules_H_subsingleton_of_isQuasicoherent
 
--- Layer B stage 3: the non-circular compact-basis comparison (Stacks, Tag 01EW).
--- Compact refinements and Cech correction make the acyclicity condition stable under
--- injective quotients, so dimension shifting kills positive derived cohomology.
-#print axioms CategoryTheory.Sheaf.CompactOpenBasis
-#print axioms CategoryTheory.Sheaf.CompactOpenBasis.ofIsBasis
-#print axioms CategoryTheory.Sheaf.CompactOpenBasis.exists_finite_refinement
-#print axioms CategoryTheory.Sheaf.IsCechAcyclicOnCompactBasis
-#print axioms CategoryTheory.Sheaf.isCechAcyclicOnCompactBasis_of_injective
-#print axioms CategoryTheory.Sheaf.epi_app_of_isCechAcyclicOnCompactBasis
-#print axioms CategoryTheory.Sheaf.isCechAcyclicOnCompactBasis_quotient
-#print axioms CategoryTheory.Sheaf.HPrime_subsingleton_of_isCechAcyclicOnCompactBasis
-#print axioms CategoryTheory.Sheaf.H_subsingleton_of_isCechAcyclicOnCompactBasis
-
+-- Topological prime-spectrum infrastructure consumed by the affine Cech argument.
+#print axioms PrimeSpectrum.basicOpen_prod_eq_pi
 -- Layer B stage 3: positive-degree exactness of the explicit Cech complex for a module
 -- sheaf on a finite distinguished-open cover of an affine scheme. This is the affine Cech
 -- vanishing theorem, not a comparison with derived-functor sheaf cohomology.
-#print axioms CategoryTheory.Sheaf.cechComplex_exactAt_succ_of_injective'
-#print axioms CategoryTheory.cechComplex_exactAt_succ_of_isTerminal
-#print axioms PrimeSpectrum.basicOpen_prod_eq_pi
 #print axioms AlgebraicGeometry.tilde_cechComplex_exactAt_succ
 #print axioms AlgebraicGeometry.tilde_cechComplex_exactAt_succ_of_eq_iSup
 #print axioms AlgebraicGeometry.tilde_cechComplex_exactAt_of_pos
 
--- Layer B stage 3: bridge the relative distinguished-open calculation through the
--- underlying additive-group functor and specialize the compact-basis criterion to affine
--- schemes.
-#print axioms CategoryTheory.evalOpForget₂AddCommGrpIso
-#print axioms CategoryTheory.map_alternatingCofaceMapComplex
-#print axioms CategoryTheory.cechComplexForget₂AddCommGrpIso
-#print axioms CategoryTheory.cechComplex_exactAt_forget₂AddCommGrp_of_exactAt
+-- Layer B stage 3: specialize the generic compact-basis criterion to affine schemes.
 #print axioms AlgebraicGeometry.Cohomology.affineBasicOpenBasis
 #print axioms AlgebraicGeometry.Cohomology.top_mem_affineBasicOpenBasis
 #print axioms AlgebraicGeometry.Cohomology.underlyingTilde_isCechAcyclicOnCompactBasis
@@ -1666,9 +1451,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 -- Layer B stage 3: finite-cover cohomological boundedness. Local compact-basis dimension
 -- shifting proves ambient `H'`-vanishing on affine opens; affine diagonal makes every finite
 -- intersection affine; Mayer--Vietoris then gives a numerical bound for actual `Sheaf.H`.
-#print axioms CategoryTheory.Sheaf.opensUnion
-#print axioms CategoryTheory.Sheaf.IntersectionAcyclic
-#print axioms CategoryTheory.Sheaf.HPrime_subsingleton_opensUnion_of_intersectionAcyclic
 #print axioms AlgebraicGeometry.Cohomology.affineBasicOpenBasisAt
 #print axioms AlgebraicGeometry.Cohomology.mem_affineBasicOpenBasisAt
 #print axioms AlgebraicGeometry.Cohomology.modulesSpec_isCechAcyclicOnCompactBasis
@@ -1683,40 +1465,20 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Cohomology.coherent_H_subsingleton_of_cohomologicalBound
 #print axioms AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology.toFiniteCohomology
 
--- Layer B stage 3: the first Cech-to-derived comparison layer. The terminal-object
--- natural isomorphism closes the explicit TODO in Mathlib's sheaf-cohomology API; the
--- singleton theorem is the first positive-degree case of the Leray comparison.
-#print axioms CategoryTheory.cechCohomology_isZero_of_exactAt
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaPresheafIsoConstant
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaSheafIsoConstant
-#print axioms CategoryTheory.Sheaf.HPrimeNatIsoH
-#print axioms CategoryTheory.Sheaf.HPrimeAddEquivH
-#print axioms CategoryTheory.Sheaf.subsingleton_HPrime_iff_H
-#print axioms CategoryTheory.Sheaf.cechComputesDerivedCohomologyAt_singleton_terminal_of_pos
-
--- Layer B stage 3: sections of an explicit injective resolution compute the local `H'`
--- groups, and a fixed Cech column is their product over finite intersections. Local
--- acyclicity therefore kills every positive-resolution-degree column homology object.
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaPresheafHomAddEquiv
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaSheafHomAddEquiv
-#print axioms CategoryTheory.Sheaf.sectionsAtFunctor
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplex
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaHomComplexIsoSections
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsCohomologyAddEquivHPrime
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexColumnXIso
-#print axioms CategoryTheory.Sheaf.cechColumnSectionsComplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexColumnIsoSectionsComplex
-#print axioms CategoryTheory.Sheaf.cechColumnSectionsComplex_exactAt
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexColumn_exactAt_of_isCechAcyclicFor
-#print axioms CategoryTheory.Sheaf.subsingleton_cechInjectiveBicomplexColumnHomology_of_isCechAcyclicFor
-#print axioms CategoryTheory.Sheaf.isZero_cechInjectiveInitialPage_of_isCechAcyclicFor
-#print axioms CategoryTheory.Sheaf.subsingleton_cechInjectiveInitialPage_of_isCechAcyclicFor
-
 -- Layer B stage 3: the same results reached from the `X.Modules` wrapper, which instance
 -- search does not see through on its own. `Scheme.Modules.toSheaf` is the retyped functor
 -- downstream work should use; the two transfer instances cover the goals that still arrive
 -- on the wrong side.
 #print axioms Scheme.Modules.epi_sheafOfModules
+
+/-! ## Epimorphisms of quasi-coherent sheaves on affine sections
+
+Surjectivity on global sections over `Spec R`, over an affine scheme, and over an affine open,
+from the tilde equivalence. -/
+
+#print axioms Scheme.Modules.surjective_app_top_of_epi_spec
+#print axioms Scheme.Modules.surjective_app_top_of_epi_of_isAffine
+#print axioms Scheme.Modules.surjective_app_of_epi_of_isAffineOpen
 #print axioms Scheme.Modules.mono_sheafOfModules
 #print axioms Scheme.Modules.toSheaf
 #print axioms Scheme.Modules.additive_toSheaf
@@ -1725,12 +1487,8 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Scheme.Modules.preservesEpimorphisms_toSheaf
 #print axioms Scheme.Modules.shortExact_map_toSheaf
 
--- Layer B stage 2: invertible sheaves and the raw sheafified tensor product. The final
--- Picard group law waits on tensor/sheafification coherence; these declarations expose the
--- complete foundation without postulating that missing theorem.
-#print axioms SheafOfModules.freePUnitIsoUnit
-#print axioms SheafOfModules.LocalGeneratorsData.isRankOne_ofIso
-#print axioms SheafOfModules.IsInvertible.ofIso
+-- Layer B stage 2: the scheme-level sheafified tensor product and Picard consumer. Intrinsic
+-- invertibility is audited with its arbitrary-site categorical owner.
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitLeftIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorHom_id_comp
@@ -1825,30 +1583,8 @@ not functions. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorTripleAssocIso
 #print axioms AlgebraicGeometry.Scheme.Modules.PicardClass.mk_eq_mk_iff
 
--- Layer B stage 2: tensor/sheafification descent for invertible sheaves. Local rank-one
--- trivializations make tensor preserve locally bijective maps; this supplies both comparison
--- orientations, restriction compatibility, tensor closure, and the sheafified associator.
-#print axioms CategoryTheory.Presheaf.isLocallyInjective_of_coversTop
--- Its companion, and the two packaged together. isLocallySurjective_of_coversTop was private in
--- Divisors/AssociatedSheaf/Construction.lean and hardcoded to Opens X, though its proof uses only
--- Sieve.ofObjects, J.transitive and Sieve.overEquiv -- all general. W_of_coversTop is the recipe
--- that file ran by hand at three sites: local injectivity and local surjectivity each descend
--- along a covering family, and together they are membership in J.W, which sheafification inverts.
--- That is the practical route to "isomorphism on a cover implies isomorphism after sheafification",
--- for which no direct lemma exists on SheafOfModules morphisms.
-#print axioms CategoryTheory.Presheaf.isLocallySurjective_of_coversTop
-#print axioms CategoryTheory.Presheaf.W_of_coversTop
-#print axioms SheafOfModules.LocalGeneratorsData.rankOneTrivialization
-#print axioms SheafOfModules.isLocallySurjective_whiskerLeft
-#print axioms SheafOfModules.isLocallyInjective_whiskerLeft_of_isoUnit
-#print axioms SheafOfModules.isLocallyInjective_whiskerLeft_of_rankOneData
-#print axioms SheafOfModules.W_whiskerLeft_of_rankOneData
-#print axioms SheafOfModules.isIso_sheafification_map_whiskerLeft_of_rankOneData
-#print axioms SheafOfModules.isIso_sheafification_map_whiskerRight_of_rankOneData
-#print axioms SheafOfModules.isIso_sheafification_map_whiskerLeft_unit_of_rankOneData
-#print axioms SheafOfModules.isIso_sheafification_map_whiskerRight_unit_of_rankOneData
-#print axioms SheafOfModules.LocalGeneratorsData.rankOneTrivializationOver
-#print axioms SheafOfModules.IsInvertible.of_trivializations
+-- Scheme tensor/sheafification consumers. Intrinsic invertibility and arbitrary-site tensor
+-- descent are audited with their categorical owner.
 #print axioms AlgebraicGeometry.Scheme.Modules.overSheafificationComparison
 #print axioms AlgebraicGeometry.Scheme.Modules.isIso_overSheafificationComparison
 #print axioms AlgebraicGeometry.Scheme.Modules.overTensorPresheafIso
@@ -1953,10 +1689,10 @@ not functions. -/
 -- exterior powers; invertibility of a top exterior power and exact-sequence comparison remain
 -- explicit certificates. The coherent extension requires either finite locally free determinant
 -- data or a visible two-term finite locally free resolution.
-#print axioms Module.finrank_topExteriorPower
 #print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData
 #print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData.isLocallyFree
 #print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData.ofIso
+#print axioms AlgebraicGeometry.Scheme.Modules.FiniteLocallyFreeData.pullback
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.toPic
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.coe_toPic
@@ -1994,38 +1730,62 @@ not functions. -/
 #print axioms AlgebraicGeometry.Coh.PerfectShortExactDeterminantData
 #print axioms AlgebraicGeometry.Coh.PerfectShortExactDeterminantData.firstChernClassAdd_eq_add
 
--- Layer B stage 4: dimension-general numerical-polynomial algebra and its geometric Snapper
--- bridge. The geometric induction and missing closure theorem are visible structure fields,
--- never hidden axioms.
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.difference
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.difference_comm
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.difference_add_direction
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.coordinateDifference
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.mixedDifference
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.mixedDifference_difference
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.mixedDifference_eq_of_perm
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.DegreeLE
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.degreeLE_iff_fin
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.DegreeLE.add
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.DegreeLE.succ
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.DegreeLE.mono
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.DegreeLE.difference
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.coefficient
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.coefficient_eq_of_perm
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.topCoefficient
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.topCoefficient_comp_perm
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.coordinateDirections
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.newtonCoefficient
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.mixedDifference_eq_coefficient_of_degreeLE
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.coefficient_cons_add
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.coefficient_middle_add
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.coefficientAddHom
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.coefficient_middle_zsmul
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.mixedDifference_oneVariable
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.oneVariable_fwdDiff_vanishes
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.coefficient_oneVariable
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.surfacePairing
-#print axioms AlgebraicGeometry.IntersectionTheory.NumericalPolynomial.surfacePairing_symm
+-- Dimension-general numerical-polynomial algebra and its geometric Snapper bridge. The generic
+-- mixed-difference API is rooted under Algebra; the geometric induction and missing closure
+-- theorem are visible structure fields, never hidden axioms.
+#print axioms NumericalPolynomial.Lattice
+#print axioms NumericalPolynomial.NumericalFunction
+#print axioms NumericalPolynomial.difference
+#print axioms NumericalPolynomial.difference_apply
+#print axioms NumericalPolynomial.difference_zero_direction
+#print axioms NumericalPolynomial.difference_zero_function
+#print axioms NumericalPolynomial.difference_add_function
+#print axioms NumericalPolynomial.difference_comm
+#print axioms NumericalPolynomial.difference_add_direction
+#print axioms NumericalPolynomial.coordinateDirection
+#print axioms NumericalPolynomial.coordinateDifference
+#print axioms NumericalPolynomial.coordinateDifference_apply
+#print axioms NumericalPolynomial.mixedDifference
+#print axioms NumericalPolynomial.mixedDifference_nil
+#print axioms NumericalPolynomial.mixedDifference_cons
+#print axioms NumericalPolynomial.mixedDifference_zero
+#print axioms NumericalPolynomial.mixedDifference_add
+#print axioms NumericalPolynomial.mixedDifference_difference
+#print axioms NumericalPolynomial.mixedDifference_eq_of_perm
+#print axioms NumericalPolynomial.DegreeLE
+#print axioms NumericalPolynomial.degreeLE_iff_vanishing
+#print axioms NumericalPolynomial.degreeLE_iff_fin
+#print axioms NumericalPolynomial.degreeLE_zero
+#print axioms NumericalPolynomial.DegreeLE.add
+#print axioms NumericalPolynomial.DegreeLE.succ
+#print axioms NumericalPolynomial.DegreeLE.mono
+#print axioms NumericalPolynomial.DegreeLE.difference
+#print axioms NumericalPolynomial.coefficient
+#print axioms NumericalPolynomial.coefficient_nil
+#print axioms NumericalPolynomial.coefficient_zero
+#print axioms NumericalPolynomial.coefficient_add
+#print axioms NumericalPolynomial.coefficient_eq_of_perm
+#print axioms NumericalPolynomial.topCoefficient
+#print axioms NumericalPolynomial.topCoefficient_comp_perm
+#print axioms NumericalPolynomial.coordinateDirections
+#print axioms NumericalPolynomial.coordinateDirections_length
+#print axioms NumericalPolynomial.newtonCoefficient
+#print axioms NumericalPolynomial.newtonCoefficient_zero_index
+#print axioms NumericalPolynomial.mixedDifference_eq_coefficient_of_degreeLE
+#print axioms NumericalPolynomial.coefficient_cons_add
+#print axioms NumericalPolynomial.coefficient_middle_add
+#print axioms NumericalPolynomial.coefficientAddHom
+#print axioms NumericalPolynomial.coefficientAddHom_apply
+#print axioms NumericalPolynomial.coefficient_middle_zsmul
+#print axioms NumericalPolynomial.oneVariablePoint
+#print axioms NumericalPolynomial.oneVariable
+#print axioms NumericalPolynomial.oneVariableDirection
+#print axioms NumericalPolynomial.mixedDifference_oneVariable
+#print axioms NumericalPolynomial.oneVariable_fwdDiff_vanishes
+#print axioms NumericalPolynomial.coefficient_oneVariable
+#print axioms NumericalPolynomial.surfacePairing
+#print axioms NumericalPolynomial.surfacePairing_apply
+#print axioms NumericalPolynomial.surfacePairing_symm
 #print axioms AlgebraicGeometry.IntersectionTheory.Snapper.picardPower
 #print axioms AlgebraicGeometry.IntersectionTheory.Snapper.linePower
 #print axioms AlgebraicGeometry.IntersectionTheory.Snapper.linePower_picardClass
@@ -2238,16 +1998,6 @@ not functions. -/
 #print axioms AlgebraicGeometry.IntersectionTheory.ChernCharacter.degree_chernCharacterComponent_two_eq_surface
 #print axioms AlgebraicGeometry.IntersectionTheory.ChernCharacter.toChernClassData
 
--- Cohomology strategy: `DerivedAlgGeo/Development/Cohomology/Strategy.lean` contributes nothing here on
--- purpose. It is the compile-only API map for the B3 route decision and declares only
--- `example`s, which are anonymous and cannot be audited. Its guarantee is that it builds:
--- if an upstream declaration it names moves, `lake build` fails. The first real B3
--- theorem goes below this line.
-#print axioms CategoryTheory.Sheaf.isFlasque_of_injective
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaSheafMap_stalk_isIso
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaSheaf_stalk_isZero_of_not_mem
-#print axioms CategoryTheory.Sheaf.cechComplex_exactAt_succ_of_injective
-
 -- Mukai vector: the identification of the abstract Mukai extension with the
 -- numerical Mukai pairing. Every field of `IntegralMukaiData` is supplied
 -- geometric data, so a clean axiom list here says the identification follows
@@ -2298,18 +2048,10 @@ not functions. -/
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorIsometry
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorIsometry_apply
 
--- The K₀ bridge: realizing a triangulated Grothendieck group numerically.
--- `NumericalRealization`, `Descends` and `PreservesEuler` are all SUPPLIED
--- geometric input, none of it constructed here, so a clean axiom list on the
--- isometry theorems says they follow from that input -- not that any variety
--- or any Fourier-Mukai transform provides it.
-#print axioms AlgebraicGeometry.Numerical.NumericalRealization
-#print axioms AlgebraicGeometry.Numerical.NumericalRealization.mk.inj
-#print axioms AlgebraicGeometry.Numerical.NumericalRealization.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.Numerical.NumericalRealization.cl
-#print axioms AlgebraicGeometry.Numerical.Descends
-#print axioms AlgebraicGeometry.Numerical.Descends.apply_of
-#print axioms AlgebraicGeometry.Numerical.Descends.of_natIso
+-- Numerical consumers of the generic K₀ realization and descent root.
+-- `PreservesEuler` is supplied numerical-variety input; the pairing and
+-- isometry theorems follow from it without claiming that a variety or a
+-- Fourier--Mukai transform supplies the hypothesis.
 #print axioms AlgebraicGeometry.Numerical.PreservesEuler
 #print axioms AlgebraicGeometry.Numerical.pairing_mukaiVector_eq_of_preservesEuler
 #print axioms AlgebraicGeometry.Numerical.selfPairing_mukaiVector_eq_of_preservesEuler
@@ -2327,25 +2069,11 @@ not functions. -/
 #print axioms AlgebraicGeometry.Numerical.isometryEquivOfPreservesEuler
 #print axioms AlgebraicGeometry.Numerical.mukaiForm_eq_on_realized
 
--- Transferring Euler-form preservation across a realization. `IsRiemannRoch`
--- is bilinear HRR and `PreservesCategoricalEuler` is what full faithfulness
--- would give; both are supplied, and `CategoricalEulerForm` is supplied rather
--- than built from Hom. A clean axiom list here is a statement about the
--- bookkeeping, not about any variety or any functor.
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm
--- The Hom-built form, packaged. `ofLinear` is what retires the "nothing
--- constructs a CategoricalEulerForm" claim; the obligation moves to
--- HomFiniteBounded rather than disappearing.
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.ofLinear
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.ofLinear_chi
--- Step 6: the second of EulerTransfer's three obligations, discharged for
--- Hom-built forms. IsRiemannRoch remains supplied.
-#print axioms AlgebraicGeometry.Numerical.ofLinear_preservesCategoricalEuler
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.mk.inj
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.Numerical.CategoricalEulerForm.chi
+-- Transferring categorical Euler preservation across a realization.
+-- `IsRiemannRoch` is the genuinely numerical bilinear HRR comparison; the
+-- K₀ realization, Euler form, and preservation predicate are audited with
+-- their categorical owner.
 #print axioms AlgebraicGeometry.Numerical.IsRiemannRoch
-#print axioms AlgebraicGeometry.Numerical.PreservesCategoricalEuler
 #print axioms AlgebraicGeometry.Numerical.preservesEuler_of_descends
 #print axioms AlgebraicGeometry.Numerical.pairing_mukaiVector_eq_on_realized_of_categorical
 
@@ -2372,17 +2100,83 @@ docstring in `DerivedAlgGeo/AlgebraicGeometry/Surface/K3.lean`. -/
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsK3Surface.h1_vanishing
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsK3Surface.canonicalSheaf_iso
 #print axioms AlgebraicGeometry.SmoothProperVariety.IsK3Surface.antiCanonicalClass_eq_one
-#print axioms AlgebraicGeometry.K3Surface
-#print axioms AlgebraicGeometry.K3Surface.toSmoothProperVariety
-#print axioms AlgebraicGeometry.K3Surface.canonical
-#print axioms AlgebraicGeometry.K3Surface.isK3
-#print axioms AlgebraicGeometry.K3Surface.mk.inj
-#print axioms AlgebraicGeometry.K3Surface.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.K3Surface.toVariety
-#print axioms AlgebraicGeometry.K3Surface.toScheme
-#print axioms AlgebraicGeometry.K3Surface.instIsProjective
-#print axioms AlgebraicGeometry.K3Surface.canonicalSheaf_iso
-#print axioms AlgebraicGeometry.K3Surface.h1_vanishing
+
+/-! ## Enriques surfaces
+
+A smooth projective surface with `ω_X` 2-torsion but not trivial in `Pic`, and
+`H¹(X, O_X) = 0`. The torsion conditions are group equations in `Pic`; nothing
+here constructs such a surface, states `χ(O_X) = 1`, or builds the K3 double
+cover. See the module docstring in
+`DerivedAlgGeo/AlgebraicGeometry/Surface/Enriques/Basic.lean`. -/
+
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.projective
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalClass_sq_eq_one
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalClass_ne_one
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.h1_vanishing
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalSheaf_tensor_self_iso_unit
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.canonicalSheaf_not_iso_unit
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.antiCanonicalClass_eq_canonicalClass
+#print axioms AlgebraicGeometry.SmoothProperVariety.IsEnriquesSurface.not_isK3Surface
+
+/-! ## Isotropic 10-collections on Enriques surfaces
+
+The line bundles, Fano-class lift, Snapper intersection context, and equation
+`3δ = ∑ fᵢ` are supplied geometric data. The consuming theorems recover the
+generic lattice sequence, distinctness, `Δ · Fᵢ = 3`, and `Δ² = 10`. No
+existence, nefness, ampleness, or derived exceptionality is claimed. -/
+
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundles
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fano
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.intersection
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.self_isotropic
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.pairwise_one
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fano_normalization
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.mk.inj
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.classes
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.sumClass
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fanoClass
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.isIsotropicSequence
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundleClass_ne
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fano_intersection_bundle
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_intersection_fano
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.fano_self_intersection
+
+/-! ## Exceptional Enriques line bundles and the residual category
+
+Exceptionality is proved from explicit self-Ext comparison data, the
+Enriques `H¹` clause, and supplied `H²` vanishing. Pairwise semiorthogonality
+is likewise supplied. The resulting residual is only the formal right
+orthogonal full subcategory: no fullness, admissibility, or identification
+with a Kuznetsov component is claimed. -/
+
+#print axioms AlgebraicGeometry.EnriquesSurface.DerivedCat
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison.endomorphisms
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison.ext_one
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison.ext_two
+#print axioms AlgebraicGeometry.EnriquesSurface.ExtComparison.outside_surface_range
+#print axioms AlgebraicGeometry.EnriquesSurface.isExceptional_of_extComparison
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ExceptionalityData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ExceptionalityData.h_two_vanishing
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ExceptionalityData.comparison
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ExceptionalityData.bundle_isExceptional
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.SemiorthogonalityData
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.SemiorthogonalityData.hom_shift_eq_zero
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.exceptionalCollection
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.exceptionalCollection_obj
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.collectionSequence
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.collectionSequence_component
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_mem_collectionSequence_component
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.residualComponent
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.ResidualCategory
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.residualComponent_isTriangulated
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.residualCategory_obj_mem
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_hom_residual_eq_zero
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_hom_residualCategory_eq_zero
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.bundle_not_mem_residualComponent
 
 /-! ## The base field acts: module sheaves and `Coh` are `k`-linear
 
@@ -2446,9 +2240,6 @@ is the acceptance criterion of #665, as an abelian group: the `k`-vector-space s
 not assumed `k`-linear. `Nontrivial ι` is the only hypothesis on the variable set — at one variable
 the statement is false, and no finiteness is used. -/
 
-#print axioms AlgebraicGeometry.Proj.intShiftPiece_eq_bot_of_neg
-#print axioms AlgebraicGeometry.Proj.eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt
-#print axioms AlgebraicGeometry.Proj.num_eq_zero_of_cross_of_neg
 #print axioms AlgebraicGeometry.Proj.intCechComplex_homology_zero_isZero_of_ker
 #print axioms AlgebraicGeometry.Proj.num_eq_zero_of_intCechFace_eq_of_neg
 #print axioms AlgebraicGeometry.Proj.intCechTerm_eq_zero_of_face_eq_of_neg
@@ -2468,7 +2259,7 @@ block. The finiteness half — that the full block is a finite-dimensional `k`-s
 `finite_setOf_degree_eq_of_neg` — is NOT here, so #666's acceptance criterion is not met by these
 declarations. -/
 
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_cechBlockProj_self
+#print axioms MvPolynomial.cechBlockProj_cechBlockProj_self
 #print axioms AlgebraicGeometry.Proj.intCechFullBlock
 #print axioms AlgebraicGeometry.Proj.intCechFullBlock_cocycle
 #print axioms AlgebraicGeometry.Proj.exists_fullBlock_add_coboundary
@@ -2487,17 +2278,17 @@ not reach a negative twist at all.
 `fg_blockSpan` is one localization. Assembling the blocks of a Čech cochain and matching this
 action against `cechScalarAction` are not here, so #666's acceptance criterion is not met. -/
 
-#print axioms AlgebraicGeometry.Proj.IsPolynomialTwist.smul_mem
-#print axioms AlgebraicGeometry.Proj.polynomialToHomogeneousLocalization
-#print axioms AlgebraicGeometry.Proj.degreeZeroLocalizationModule
-#print axioms AlgebraicGeometry.Proj.awayMk_smul
-#print axioms AlgebraicGeometry.Proj.awayMk_congr
-#print axioms AlgebraicGeometry.Proj.monomial_one_mem_of_mem_support
-#print axioms AlgebraicGeometry.Proj.intNegSupport_of_mem_support_laurentFilter
-#print axioms AlgebraicGeometry.Proj.blockRep
-#print axioms AlgebraicGeometry.Proj.awayMk_eq_blockRep
-#print axioms AlgebraicGeometry.Proj.blockProj_univ_mem_span
-#print axioms AlgebraicGeometry.Proj.fg_blockSpan
+#print axioms MvPolynomial.IsPolynomialTwist.smul_mem
+#print axioms MvPolynomial.polynomialToHomogeneousLocalization
+#print axioms MvPolynomial.degreeZeroLocalizationModule
+#print axioms MvPolynomial.awayMk_smul
+#print axioms MvPolynomial.awayMk_congr
+#print axioms MvPolynomial.monomial_one_mem_of_mem_support
+#print axioms MvPolynomial.intNegSupport_of_mem_support_laurentFilter
+#print axioms MvPolynomial.blockRep
+#print axioms MvPolynomial.awayMk_eq_blockRep
+#print axioms MvPolynomial.blockProj_univ_mem_span
+#print axioms MvPolynomial.fg_blockSpan
 
 /-! ## The full blocks of a Čech degree, assembled (#666, S1b — in progress)
 
@@ -2510,13 +2301,13 @@ Still the cochain side only — no differential, no cocycles, no cohomology, and
 `degreeZeroLocalizationModule` rather than the `cechScalarAction` the finiteness interface
 consumes. #666's acceptance criterion is not met. -/
 
-#print axioms AlgebraicGeometry.Proj.powersCongrLinear
-#print axioms AlgebraicGeometry.Proj.powersCongrLinear_apply
-#print axioms AlgebraicGeometry.Proj.powersCongrLinear_symm_apply
-#print axioms AlgebraicGeometry.Proj.cechBlockSpan
-#print axioms AlgebraicGeometry.Proj.cechBlockProj_mem_cechBlockSpan
-#print axioms AlgebraicGeometry.Proj.fg_cechBlockSpan
-#print axioms AlgebraicGeometry.Proj.module_finite_pi_cechBlockSpan
+#print axioms MvPolynomial.powersCongrLinear
+#print axioms MvPolynomial.powersCongrLinear_apply
+#print axioms MvPolynomial.powersCongrLinear_symm_apply
+#print axioms MvPolynomial.cechBlockSpan
+#print axioms MvPolynomial.cechBlockProj_mem_cechBlockSpan
+#print axioms MvPolynomial.fg_cechBlockSpan
+#print axioms MvPolynomial.module_finite_pi_cechBlockSpan
 
 /-! ## A degree-zero element is the constant function (#666, S1b — the bridge)
 
@@ -2560,8 +2351,8 @@ inherits the linearity of one pointwise `mapOfLE`.
 Still outstanding for #666: carrying this up from a single term to the Čech complex, and the
 `module_finite_linearCoherentH_of_cech` wiring. -/
 
-#print axioms AlgebraicGeometry.Proj.smul_mk
-#print axioms AlgebraicGeometry.Proj.mapOfLE_smul
+#print axioms MvPolynomial.smul_mk
+#print axioms MvPolynomial.mapOfLE_smul
 #print axioms AlgebraicGeometry.Proj.constSectionOn
 #print axioms AlgebraicGeometry.Proj.constSectionOn_basicOpen
 #print axioms AlgebraicGeometry.Proj.constSection
@@ -3268,6 +3059,6 @@ not the conclusion renamed. `mukaiVectorQuotient` is what it buys.
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorQuotient
 #print axioms AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorQuotient_mk
 #print axioms AlgebraicGeometry.moduleFinite_sections_restrict_of_isCoherent
-#print axioms SheafOfModules.GeneratingSections.ofFreeEpi
-#print axioms SheafOfModules.GeneratingSections.isFiniteType_ofFreeEpi
-#print axioms SheafOfModules.GeneratingSections.ofFreeEpi_π
+#print axioms AlgebraicGeometry.Scheme.Modules.hasExactColimitsOfShape
+#print axioms AlgebraicGeometry.Scheme.Modules.ab4
+#print axioms AlgebraicGeometry.Scheme.Modules.ab5

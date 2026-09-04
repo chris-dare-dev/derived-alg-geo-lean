@@ -5,7 +5,7 @@ Released under the MIT license.
 Portions adapted from mattrobball/BridgelandStability, revision 9e48f23
 (Apache-2.0, Copyright (c) 2026 Mathlib Contributors); see LICENSE.md.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.IntervalCategory
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.IntervalCategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.PreStabilityCondition
 
 /-!

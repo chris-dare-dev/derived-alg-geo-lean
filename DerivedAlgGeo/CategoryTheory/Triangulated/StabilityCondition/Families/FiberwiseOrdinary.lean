@@ -19,11 +19,13 @@ not construct a scheme, a relative category, base-change functors, relative
 Harder--Narasimhan structures, or bounded moduli spaces.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 open CategoryTheory Limits Pretriangulated
+open CategoryTheory.Moduli
 open CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 noncomputable section
 
@@ -127,9 +129,9 @@ theorem OrdinaryFiberStabilityInFamiliesData.quotientCharge_mkQ
     (h : OrdinaryFiberStabilityInFamiliesData charge stable dedekind
       V₀ Z hV₀ σ boundedness) (i : I) (x : V) :
     quotientCharge V₀ Z hV₀ (V₀.mkQ x) = (σ i).Z x := by
-  rw [CategoryTheory.Triangulated.StabilityCondition.Support.quotientCharge_mkQ]
+  rw [CategoryTheory.Triangulated.WeakStabilityCondition.Support.quotientCharge_mkQ]
   exact h.charge_compatible i x
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families

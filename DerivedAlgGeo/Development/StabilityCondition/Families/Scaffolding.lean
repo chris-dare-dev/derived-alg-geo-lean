@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.CategoricalOrdinary
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.Weak
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Families.Weak
 
 /-!
 # Compile-only scaffolding for abstract stability-in-families inputs
@@ -24,12 +24,16 @@ pre-stability input and asserts nothing vacuously (2026-08-18 adversarial
 review, finding P2-10).
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families.Development
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Development
 
 open CategoryTheory Limits Pretriangulated
+open CategoryTheory.Moduli
 open CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.Families
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
 open CategoryTheory.Triangulated.WeakStabilityCondition
+open CategoryTheory.Triangulated.WeakStabilityCondition.Families
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 noncomputable section
 
@@ -276,4 +280,4 @@ example
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families.Development
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Development

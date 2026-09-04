@@ -7,6 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability
 
 /-! # Numerical algebraic geometry
 

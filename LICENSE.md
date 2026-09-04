@@ -58,8 +58,8 @@ the comparison oracle for the ownership migration, and have since been
 substantially rewritten against the repository-owned API:
 
 - `DerivedAlgGeo/CategoryTheory/Triangulated/PostnikovTower.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Slicing.lean`
-- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/IntervalCategory.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/Slicing.lean`
+- `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/IntervalCategory.lean`
 - `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/PreStabilityCondition.lean`
 - `DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/StabilityCondition.lean`
 

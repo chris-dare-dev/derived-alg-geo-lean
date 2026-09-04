@@ -11,7 +11,7 @@ import Mathlib.Topology.Algebra.Group.Matrix
 # Source topology and simple connectedness of the lifted group
 
 This file begins the topological half of the universal-cover theorem.  The
-group-theoretic half is in `StabilityCondition/Symmetry/GLTilde/Covering/Fibre.lean` and `StabilityCondition/Symmetry/GLTilde/Covering/Surjectivity.lean`.
+group-theoretic half is in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Fibre.lean` and `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Surjectivity.lean`.
 
 The useful coordinates do not require a computation of `π₁(S¹)`.  If
 `x = (T, f) : GLTilde`, rotate the first column of `T` backwards through the
@@ -33,13 +33,13 @@ which are contractible.  We transport the product topology through this
 coordinate equivalence and obtain `ContractibleSpace GLTilde`, hence
 `SimplyConnectedSpace GLTilde`.
 
-`StabilityCondition/Symmetry/GLTilde/Covering/Map.lean` continues from these coordinates, gives global circle
+`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean` continues from these coordinates, gives global circle
 coordinates on `GL⁺(2, ℝ)`, and proves that the matrix projection is a
-covering map. `StabilityCondition/Symmetry/GLTilde/Topology/Group.lean` then proves that multiplication
+covering map. `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Topology/Group.lean` then proves that multiplication
 and inversion are continuous for the transported topology.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix Real Set
 
@@ -426,8 +426,8 @@ noncomputable instance GLTilde.contractibleSpace : ContractibleSpace GLTilde := 
 connected.**
 
 This proves the formerly missing simple-connectedness fact.  The covering-map
-theorem is proved separately in `StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`. -/
+theorem is proved separately in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`. -/
 noncomputable instance GLTilde.simplyConnectedSpace : SimplyConnectedSpace GLTilde :=
   SimplyConnectedSpace.ofContractible GLTilde
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

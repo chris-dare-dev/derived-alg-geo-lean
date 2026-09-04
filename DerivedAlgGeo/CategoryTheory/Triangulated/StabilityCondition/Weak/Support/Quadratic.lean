@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.Quotient
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.ZeroChargeLattice
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Support.Predicate.Quotient
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Support.Predicate.ZeroChargeLattice
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Support.Basic
 
 /-!
@@ -31,7 +31,7 @@ namespace CategoryTheory.Triangulated.WeakStabilityCondition
 
 open CategoryTheory.Triangulated
 open CategoryTheory Limits Pretriangulated CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 noncomputable section
 
@@ -60,7 +60,7 @@ structure QuadraticSupportData {t : TStructure C}
   /-- A bundled quadratic form has the required signs on semistable classes
   and the kernel of the linear charge. -/
   quadratic :
-    CategoryTheory.Triangulated.StabilityCondition.Support.HasQuadraticSupportProperty Zlin
+    CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasQuadraticSupportProperty Zlin
       (W.semistableClasses v)
 
 omit [IsTriangulated C] in
@@ -91,7 +91,7 @@ structure UniformQuadraticSupportData {t : TStructure C}
   charge_compatible : ∀ i (k : K₀ C), Zlin (v k) = (W i).Z k
   /-- One quadratic form controls every fiber semistable locus. -/
   quadratic :
-    CategoryTheory.Triangulated.StabilityCondition.Support.HasUniformQuadraticSupportProperty Zlin
+    CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasUniformQuadraticSupportProperty Zlin
       (fun i => (W i).semistableClasses v)
 
 omit [IsTriangulated C] [FiniteDimensional ℝ V] in
@@ -134,7 +134,7 @@ structure QuotientUniformQuadraticSupportData {t : TStructure C}
   /-- One genuine quadratic form on the quotient controls all mapped
   semistable classes. -/
   quadratic :
-    CategoryTheory.Triangulated.StabilityCondition.Support.HasUniformQuadraticSupportPropertyModulo
+    CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasUniformQuadraticSupportPropertyModulo
       V₀ Zlin hV₀ (fun i => (W i).semistableClasses v)
 
 omit [IsTriangulated C] in
@@ -144,8 +144,8 @@ theorem QuotientUniformQuadraticSupportData.fiber {t : TStructure C}
     {W : I → WeakStabilityFunction t} {V₀ : Submodule ℝ V}
     {Zlin : V →ₗ[ℝ] ℂ} {hV₀ : V₀ ≤ LinearMap.ker Zlin}
     (h : QuotientUniformQuadraticSupportData W v V₀ Zlin hV₀) (i : I) :
-    CategoryTheory.Triangulated.StabilityCondition.Support.HasQuadraticSupportProperty
-      (CategoryTheory.Triangulated.StabilityCondition.Support.quotientCharge V₀ Zlin hV₀)
+    CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasQuadraticSupportProperty
+      (CategoryTheory.Triangulated.WeakStabilityCondition.Support.quotientCharge V₀ Zlin hV₀)
       (V₀.mkQ '' (W i).semistableClasses v) :=
   h.quadratic.fiber i
 
@@ -157,7 +157,7 @@ theorem QuotientUniformQuadraticSupportData.zero_class_eq_zero {t : TStructure C
     (h : QuotientUniformQuadraticSupportData W v V₀ Zlin hV₀)
     (i : I) {E : C} (hE : (W i).zeroCharge E) :
     V₀.mkQ (v (K₀.of C E)) = 0 :=
-  CategoryTheory.Triangulated.StabilityCondition.Support.mkQ_eq_zero_of_mem V₀
+  CategoryTheory.Triangulated.WeakStabilityCondition.Support.mkQ_eq_zero_of_mem V₀
     (h.zero_class_mem i E hE)
 
 end WeakStabilityFunction

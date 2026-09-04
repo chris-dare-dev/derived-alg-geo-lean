@@ -1,4 +1,5 @@
-# A reusable moduli root may depend on the neutral stack owner and on a
-# scheme-specific stack realization.
-import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids
+# Geometry may import category theory and its own siblings, and the moduli
+# subtree is one of the places geometry may reach the stability tree.
+import DerivedAlgGeo.CategoryTheory.Sites
 import DerivedAlgGeo.AlgebraicGeometry.Stacks.Representable
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak

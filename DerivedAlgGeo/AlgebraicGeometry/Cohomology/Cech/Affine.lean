@@ -3,8 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Module.LocalizedRadical
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Simplicial.ExtraCodegeneracy
-import DerivedAlgGeo.Topology.Opens.Limits
+import DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech.Contractible
+import DerivedAlgGeo.Topology.Category.TopCat.Opens.Limits
+import DerivedAlgGeo.RingTheory.Spectrum.Prime.BasicOpen
 import Mathlib.Algebra.Category.ModuleCat.Products
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 import Mathlib.AlgebraicGeometry.Modules.Tilde
@@ -28,33 +29,9 @@ This is a statement about the explicit Cech complex. It does not assert a compar
 Cech cohomology and derived-functor sheaf cohomology.
 -/
 
-universe w v v' u u'
+universe w v u
 
 open CategoryTheory Limits
-
-namespace CategoryTheory
-
-variable {C : Type u} [Category.{v} C] [HasFiniteProducts C]
-  {A : Type u'} [Category.{v'} A] [Abelian A] [HasProducts.{w} A]
-  {ι : Type w} (U : ι → C) {T : C} (hT : IsTerminal T)
-  {i₀ : ι} (d : T ⟶ U i₀) (P : Cᵒᵖ ⥤ A)
-
-include hT d
-
-/-- A member of a family receiving a map from a terminal object contracts the positive-degree
-Cech complex of every presheaf on that family. -/
-theorem cechComplex_exactAt_succ_of_isTerminal (n : ℕ) :
-    ((cechComplexFunctor U).obj P).ExactAt (n + 1) := by
-  let V : FormalCoproduct.{w} C := FormalCoproduct.mk ι U
-  let X := V.cech.augmentOfIsTerminal (FormalCoproduct.isTerminalIncl T hT)
-  let ed : X.ExtraDegeneracy := V.extraDegeneracyCech hT d
-  let G := (FormalCoproduct.evalOp C A).obj P
-  let Y := (FormalCoproduct.cosimplicialObjectFunctor V.cech).obj P
-  change ((AlgebraicTopology.alternatingCofaceMapComplex A).obj Y).ExactAt (n + 1)
-  apply AlgebraicTopology.exactAt_succ_of_extraDegeneracy_map ed G (Y := Y) (n := n)
-  exact Iso.refl _
-
-end CategoryTheory
 
 namespace IsLocalizedModule
 
@@ -154,38 +131,6 @@ private lemma relativeAway (g f : R) (a : M →ₗ[R] M₁) (b : M →ₗ[R] M�
         ac_rfl
 
 end IsLocalizedModule
-
-namespace PrimeSpectrum
-
-open CategoryTheory Limits TopologicalSpace
-
-variable {R : CommRingCat} {α : Type*} [Fintype α]
-
-lemma basicOpen_prod_eq_pi (g : α → R) :
-    basicOpen (∏ a, g a) = ∏ᶜ (basicOpen ∘ g) := by
-  apply le_antisymm
-  · apply leOfHom
-    apply Pi.lift
-    intro a
-    apply homOfLE
-    intro p hp
-    rw [mem_basicOpen] at hp
-    change g a ∉ p.asIdeal
-    intro ha
-    apply hp
-    rw [Ideal.IsPrime.prod_mem_iff]
-    exact ⟨a, Finset.mem_univ _, ha⟩
-  · intro p hp
-    rw [mem_basicOpen]
-    intro hprod
-    rw [Ideal.IsPrime.prod_mem_iff] at hprod
-    obtain ⟨a, _, ha⟩ := hprod
-    have hga := leOfHom (Pi.π (basicOpen ∘ g) a) hp
-    change g a ∉ p.asIdeal at hga
-    exact hga ha
-
-end PrimeSpectrum
-
 
 /-- Exactness descends from localizations at a family whose span contains `d` up to radical,
 provided multiplication by `d` is invertible on the source and middle modules. -/

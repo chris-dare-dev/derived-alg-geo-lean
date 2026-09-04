@@ -16,11 +16,11 @@ identity matrix is one of these, and distinct `n` give distinct elements.
 **Proved in the companion files:**
 
 * **Surjectivity of `toMatHom`.** Not proved *here* — landed separately in
-  `StabilityCondition/Symmetry/GLTilde/Covering/Surjectivity.lean`, which writes the lift down in closed form rather than
+  `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Surjectivity.lean`, which writes the lift down in closed form rather than
   invoking covering-space machinery.
-* **Simple connectedness.** Landed separately in `StabilityCondition/Symmetry/GLTilde/Covering/SourceTopology.lean`, using
+* **Simple connectedness.** Landed separately in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/SourceTopology.lean`, using
   global contractible coordinates rather than a computation of `π₁(S¹)`.
-* **Covering-map property.** Landed in `StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`, by conjugating the
+* **Covering-map property.** Landed in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`, by conjugating the
   projection in global coordinates to the standard exponential cover
   `ℝ → S¹` times an identity map.
 
@@ -36,7 +36,7 @@ Bridgeland's convention showing through, not an accident, and it is why
 `deckShift` is defined with `2 * n` rather than `n`.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix Real
 
@@ -240,4 +240,4 @@ noncomputable def kerEquiv : Multiplicative ℤ ≃* GLTilde.toMatHom.ker :=
   (MonoidHom.ofInjective deckHom_injective).trans
     (MulEquiv.subgroupCongr range_deckHom_eq_ker)
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

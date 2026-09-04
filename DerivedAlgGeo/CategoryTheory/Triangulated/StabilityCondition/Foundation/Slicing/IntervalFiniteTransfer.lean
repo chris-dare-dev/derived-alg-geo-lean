@@ -16,22 +16,32 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 
-universe u v
+universe u v u' v'
 
 namespace CategoryTheory.Triangulated
+
+open WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat
 
 section General
 
 variable {A : Type u} [Category.{v} A] [Preadditive A] [HasKernels A] [HasCokernels A]
-variable {D : Type u} [Category.{v} D] [Preadditive D] [HasKernels D] [HasCokernels D]
+variable {D : Type u'} [Category.{v'} D] [Preadditive D] [HasKernels D] [HasCokernels D]
 
 variable (F : A ⥤ D) [F.Full] [F.Faithful]
   (hF : ∀ {X Y : A} (f : X ⟶ Y), IsStrictMono f → IsStrictMono (F.map f))
   (harr : ∀ {Y Z : D} (f : Y ⟶ Z) [Mono f], IsStrictMono f →
     IsStrictMono (Subobject.mk f).arrow)
 
+omit [F.Full] [F.Faithful] in
 /-- The image of a strict subobject, landing in **strict** subobjects — which
-is what lets the hypothesis be strict rather than ordinary. -/
+is what lets the hypothesis be strict rather than ordinary.
+
+Fullness and faithfulness are omitted: the construction and its monotonicity
+need only that `F` preserves strict monos.  They enter only through
+`strictImage_injective`, and a functor that is not full can still obtain
+strict monotonicity of the image map by other means — see
+`Slicing.PreimageData.strictImage_strictMono` in
+`Phase/Transfer/LocallyFinite.lean`, which uses reflection of isomorphisms. -/
 noncomputable def strictImage {E : A} :
     StrictSubobject E → StrictSubobject (F.obj E) := fun B =>
   letI hs : IsStrictMono (F.map B.1.arrow) := hF B.1.arrow B.2
@@ -77,24 +87,42 @@ theorem strictImage_strictMono {E : A} {a b : StrictSubobject E}
   lt_of_le_of_ne (strictImage_monotone F hF harr hab.le)
     (fun h => absurd (strictImage_injective F hF harr h) (ne_of_lt hab))
 
+/-- **The strict-Artinian condition descends along any strictly monotone map
+of strict subobjects.**  This is the whole content of the well-foundedness
+transfer: the descending chain condition on `StrictSubobject Y` pulls back
+through `G` by `InvImage.wf`, whatever produced `G`.  Stated for a bare map so
+that a functor which is not full, and so cannot use `strictImage_injective`,
+can still discharge it once it has strict monotonicity by another route. -/
+theorem isStrictArtinianObject_of_strictMono {X : A} {Y : D}
+    (G : StrictSubobject X → StrictSubobject Y) (hG : StrictMono G)
+    [IsStrictArtinianObject Y] : IsStrictArtinianObject X :=
+  ObjectProperty.is_of_prop _
+    (show WellFoundedLT (StrictSubobject X) from
+      ⟨Subrelation.wf (fun hab => hG hab)
+        (InvImage.wf G (IsWellFounded.wf :
+          WellFounded ((· < ·) : StrictSubobject Y → _ → Prop)))⟩)
+
+/-- **The strict-Noetherian condition descends along any strictly monotone map
+of strict subobjects**, by the same argument with the order reversed. -/
+theorem isStrictNoetherianObject_of_strictMono {X : A} {Y : D}
+    (G : StrictSubobject X → StrictSubobject Y) (hG : StrictMono G)
+    [IsStrictNoetherianObject Y] : IsStrictNoetherianObject X := by
+  refine ObjectProperty.is_of_prop _ ⟨?_⟩
+  have hw : WellFounded (InvImage (· > · : StrictSubobject Y → _ → Prop) G) :=
+    InvImage.wf _ IsWellFounded.wf
+  exact Subrelation.wf (fun hab => hG hab) hw
+
 include hF harr in
 private theorem isStrictArtinian_of_image {E : A}
     [IsStrictArtinianObject (F.obj E)] : IsStrictArtinianObject E :=
-  ObjectProperty.is_of_prop _
-    (show WellFoundedLT (StrictSubobject E) from
-      ⟨Subrelation.wf (strictImage_strictMono F hF harr)
-        (InvImage.wf _ IsWellFounded.wf)⟩)
+  isStrictArtinianObject_of_strictMono (strictImage F hF harr)
+    (fun _ _ hab => strictImage_strictMono F hF harr hab)
 
 include hF harr in
 private theorem isStrictNoetherian_of_image {E : A}
-    [IsStrictNoetherianObject (F.obj E)] : IsStrictNoetherianObject E := by
-  refine ObjectProperty.is_of_prop _ ⟨?_⟩
-  have hw : WellFounded (InvImage
-      (· > · : StrictSubobject (F.obj E) → _ → Prop)
-      (strictImage F hF harr)) := InvImage.wf _ IsWellFounded.wf
-  refine Subrelation.wf ?_ hw
-  intro a b hab
-  exact strictImage_strictMono F hF harr hab
+    [IsStrictNoetherianObject (F.obj E)] : IsStrictNoetherianObject E :=
+  isStrictNoetherianObject_of_strictMono (strictImage F hF harr)
+    (fun _ _ hab => strictImage_strictMono F hF harr hab)
 
 end General
 
@@ -117,7 +145,7 @@ theorem intervalInclusion_map_strictMono
   let S : ShortComplex (s₁.IntervalCat C a₁ b₁) :=
     ShortComplex.mk f (cokernel.π f) (cokernel.condition f)
   have hS : StrictShortExact S :=
-    Deformation.Slicing.IntervalCat.strictShortExact_cokernel C f hf
+    strictShortExact_cokernel C f hf
   obtain ⟨δ, hT⟩ := Slicing.IntervalCat.exists_distinguished_of_strictShortExact C s₁ hS
   let I := ObjectProperty.ιOfLE h
   let SI := S.map I

@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Slicing.PhaseShift
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.PhaseShift
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Slicing.Transport
 
 /-!
@@ -22,6 +22,24 @@ HN existence.
 This factorization is deliberately honest about the theorem boundary.  The
 geometric inducing results (Propositions 3.3 and 3.8, via Appendix A) are
 expected to construct `PreimageData`; bare adjunction and conservativity do not.
+
+## Main definitions
+
+* `Slicing.preimagePhase`, `Slicing.PreimageData`, `Slicing.preimage`: the raw
+  phase collection, its two non-formal axioms, and the slicing they produce.
+* `Slicing.pullback`, `Slicing.pushforward`: the source-facing names of
+  Definitions 3.1 and 3.6.
+
+## Main results
+
+* `Slicing.preimage_id`, `Slicing.preimage_comp`, `Slicing.preimage_iso`,
+  `Slicing.preimage_square`: the preimage slicing is functorial in the
+  detecting functor up to natural isomorphism; the square is the shape of
+  Lemma 3.10(1.b)/(2.b).
+
+## References
+
+* arXiv:2607.28411v1, Definitions 3.1 and 3.6, Remarks 3.2 and 3.7, Lemma 3.10.
 -/
 
 noncomputable section
@@ -30,7 +48,7 @@ open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open scoped ZeroObject
 
-universe v₁ u₁ v₂ u₂ v₃ u₃
+universe v₁ u₁ v₂ u₂ v₃ u₃ v₄ u₄
 
 namespace CategoryTheory.Triangulated
 
@@ -241,5 +259,36 @@ abbrev Slicing.pullback (s : Slicing D) (push : C ⥤ D) [push.Additive]
 abbrev Slicing.pushforward (s : Slicing D) (pull : C ⥤ D) [pull.Additive]
     [pull.CommShift ℤ] [pull.IsTriangulated] (h : s.PreimageData pull) :
     Slicing C := s.preimage pull h
+
+section Square
+
+variable {C' : Type u₄} [Category.{v₄} C'] [HasZeroObject C'] [HasShift C' ℤ]
+  [Preadditive C'] [∀ n : ℤ, (shiftFunctor C' n).Additive] [Pretriangulated C']
+
+/-- Two-step preimage slicings around a commuting square of detecting functors agree: the
+slicing pulled back along `G₂` and then along `F₁` is the slicing pulled back along `F₂` and
+then along `G₁`, when `F₁ ⋙ G₂ ≅ G₁ ⋙ F₂`.  This is the shape of Lemma 3.10(1.b) and (2.b) of
+arXiv:2607.28411v1, the compatibility of pullback and pushforward of slicings with base change
+along a field extension: base change and the geometric transfer are the two ways around the
+square, and the slicing does not see which is taken first.  Here `F₁ : C ⥤ D` and
+`F₂ : C' ⥤ E` are the transfer functors (`f_{ℓ*}`, `f_*` for (1.b); `f_ℓ^*`, `f^*` for (2.b))
+and `G₁`, `G₂` the base-change direct images `π_*`; all four run between bounded categories
+carrying slicings, which is the finite-extension case.  For an infinite extension the
+base-change slicing is not the preimage of a `Slicing` along `π_*`, whose target is the
+Ind-extension in `Dqc`, and only the shape is captured here. -/
+theorem Slicing.preimage_square (s : Slicing E)
+    {F₁ : C ⥤ D} {G₂ : D ⥤ E} {G₁ : C ⥤ C'} {F₂ : C' ⥤ E}
+    [F₁.Additive] [F₁.CommShift ℤ] [F₁.IsTriangulated]
+    [G₂.Additive] [G₂.CommShift ℤ] [G₂.IsTriangulated]
+    [G₁.Additive] [G₁.CommShift ℤ] [G₁.IsTriangulated]
+    [F₂.Additive] [F₂.CommShift ℤ] [F₂.IsTriangulated]
+    (e : F₁ ⋙ G₂ ≅ G₁ ⋙ F₂)
+    (hG₂ : s.PreimageData G₂) (hF₁ : (s.preimage G₂ hG₂).PreimageData F₁)
+    (hF₂ : s.PreimageData F₂) (hG₁ : (s.preimage F₂ hF₂).PreimageData G₁) :
+    (s.preimage G₂ hG₂).preimage F₁ hF₁ = (s.preimage F₂ hF₂).preimage G₁ hG₁ := by
+  rw [← s.preimage_comp G₂ hG₂ F₁ hF₁, ← s.preimage_comp F₂ hF₂ G₁ hG₁,
+    ← s.preimage_iso (F₁ ⋙ G₂) (G₁ ⋙ F₂) (hG₂.comp hF₁) e]
+
+end Square
 
 end CategoryTheory.Triangulated

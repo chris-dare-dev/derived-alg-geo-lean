@@ -47,11 +47,13 @@ universe u
 
 open CategoryTheory AlgebraicGeometry Opposite TopologicalSpace CategoryTheory.Limits
 
+open GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k] [Finite ι] [Nonempty ι]
+variable (ι k : Type u) [Field k]
 
 /-- **The endomorphism of the twist presheaf a base scalar induces.**
 
@@ -61,7 +63,7 @@ sheaf-side presheaf and the presheaf the explicit complex is built from are the 
 noncomputable def intTwistScalarHom (d : ℤ) (r : k) :
     intTwistPresheaf ι k d ⟶ intTwistPresheaf ι k d :=
   (sheafToPresheaf _ _).map ((_root_.AlgebraicGeometry.Scheme.Modules.toSheaf _).map
-    (Cohomology.varietyScalarAction (projectiveSpaceVariety ι k)
+    (Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
       (associatedSheaf (polynomialGrading ι k) (intShift (polynomialGrading ι k) d)) r))
 
 /-- The induced map on degree `n`, read at one Čech index.

@@ -55,11 +55,13 @@ universe u
 
 open CategoryTheory AlgebraicGeometry Opposite TopologicalSpace
 
+open GradedModule MvPolynomial
+
 namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k] [Finite ι] [Nonempty ι]
+variable (ι k : Type u) [Field k]
 
 /-- Transport along an equality of opens commutes with the endomorphism a scalar induces. -/
 theorem eqToIso_transport_varietyScalarAction (d : ℤ)
@@ -67,10 +69,10 @@ theorem eqToIso_transport_varietyScalarAction (d : ℤ)
     (s : (intTwistPresheaf ι k d).obj (op W)) :
     (eqToIso (congrArg (fun V => (intTwistPresheaf ι k d).obj (op V)) h)
         ).addCommGroupIsoToAddEquiv
-        (((Cohomology.varietyScalarAction (projectiveSpaceVariety ι k)
+        (((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
             (associatedSheaf (polynomialGrading ι k)
               (intShift (polynomialGrading ι k) d)) r).val.app (op W)).hom s) =
-      ((Cohomology.varietyScalarAction (projectiveSpaceVariety ι k)
+      ((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
           (associatedSheaf (polynomialGrading ι k)
             (intShift (polynomialGrading ι k) d)) r).val.app (op W')).hom
         ((eqToIso (congrArg (fun V => (intTwistPresheaf ι k d).obj (op V)) h)
@@ -85,7 +87,7 @@ theorem intCechTermSectionAddEquiv_symm_varietyScalarAction (d : ℤ) {n : ℕ}
       (op (ProjectiveSpectrum.basicOpen (polynomialGrading ι k)
         (polynomialVariableCechDenominator ι k x)))) :
     (intCechTermSectionAddEquiv ι k d x).symm
-        (((Cohomology.varietyScalarAction (projectiveSpaceVariety ι k)
+        (((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
             (associatedSheaf (polynomialGrading ι k)
               (intShift (polynomialGrading ι k) d)) r).val.app _).hom w) =
       r • (intCechTermSectionAddEquiv ι k d x).symm w := by
@@ -99,7 +101,7 @@ theorem intCechTermSectionAddEquiv_symm_varietyScalarAction (d : ℤ) {n : ℕ}
 theorem intCechIndexEquiv_smul (d : ℤ) {n : ℕ} (x : Fin (n + 1) → ι) (r : k)
     (s : (intTwistPresheaf ι k d).obj (op (∏ᶜ (polynomialVariableChart ι k ∘ x)))) :
     intCechIndexEquiv ι k d x
-        (((Cohomology.varietyScalarAction (projectiveSpaceVariety ι k)
+        (((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
             (associatedSheaf (polynomialGrading ι k)
               (intShift (polynomialGrading ι k) d)) r).val.app
           (op (∏ᶜ (polynomialVariableChart ι k ∘ x)))).hom s) =

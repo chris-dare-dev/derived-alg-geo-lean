@@ -3,7 +3,7 @@ Constant-sheaf/pullback slice of the StabilityCondition audit, split out so conc
 branches append to different files (#480). See the umbrella file for the contract and
 reading guide.
 -/
-import DerivedAlgGeo.CategoryTheory.ConstantSheafPullback
+import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.ConstantPullback
 
 /-! ## The pullback of a constant sheaf is constant (#572 step 3)
 

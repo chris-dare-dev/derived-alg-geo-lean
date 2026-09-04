@@ -8,7 +8,5 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.MukaiVector
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.RadicalKernel
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Realization
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.EulerTransfer
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Relative
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.RelativeOverlattice
 
 /-! # Numerical Grothendieck-group invariants -/

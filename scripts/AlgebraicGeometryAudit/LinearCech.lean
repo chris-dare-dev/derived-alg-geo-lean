@@ -1,99 +1,14 @@
 /-
-The `k`-linear Čech comparison slice of the AlgebraicGeometry audit (#569), split out so
-concurrent branches append to different files (#480). See the umbrella file for the contract.
+The linear cohomology and projective-geometry slice of the AlgebraicGeometry audit,
+split out so concurrent branches append to different files (#480). See the umbrella file
+for the contract.
 
-The records here cover the naturality of the Čech-to-derived comparison, its `k`-linear form
-against `coherentScalarAction`, integrality of `Proj` of a graded domain, and polynomial
-projective space as a variety.
+The records here cover the `k`-linear form against `coherentScalarAction`, integrality of
+`Proj` of a graded domain, and polynomial projective space as a variety.
 -/
 import DerivedAlgGeo.AlgebraicGeometry
 open AlgebraicGeometry
 
-#print axioms CategoryTheory.Sheaf.sectionsComplexUnlifted
-#print axioms CategoryTheory.Sheaf.cechBicomplexOfComplex
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplex_eq_cechBicomplexOfComplex
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplexUnlifted_eq
-#print axioms CategoryTheory.Sheaf.cechBicomplexMap
-#print axioms CategoryTheory.Sheaf.sectionsComplexMap
-#print axioms CategoryTheory.Sheaf.sectionsToCechZeroColumn
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechZeroColumn_eq
-#print axioms CategoryTheory.Sheaf.sectionsToCechZeroColumn_naturality
-#print axioms CategoryTheory.Sheaf.sectionsToCechBicomplexMap
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap_eq
-#print axioms CategoryTheory.Sheaf.sectionsToCechBicomplexMap_naturality
-#print axioms CategoryTheory.Sheaf.sectionsToCechTotalMap
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap_eq
-#print axioms CategoryTheory.Sheaf.sectionsToCechTotalMap_naturality
-#print axioms CategoryTheory.Sheaf.cechAugmentationMap
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSource_eq
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentation_eq
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSourceTotalIso_naturality
-#print axioms CategoryTheory.Sheaf.cechBicomplexMap_comp
-#print axioms CategoryTheory.Sheaf.cechInjectiveBicomplexAugmentationSourceTotalIso_inv_naturality
-#print axioms CategoryTheory.Sheaf.cechToTotalMap
-#print axioms CategoryTheory.Sheaf.cechToInjectiveTotalMap_eq
-#print axioms CategoryTheory.Sheaf.cechToTotalMap_naturality
-#print axioms CategoryTheory.Sheaf.cechCochainFunctorIntHomologyIso_naturality
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplexUnliftedIso_naturality
-#print axioms CategoryTheory.Sheaf.HPrimeAddEquivH_naturality
-#print axioms CategoryTheory.Sheaf.sectionsComplexLifted
-#print axioms CategoryTheory.Sheaf.yonedaHomComplexXIso
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaHomComplexXIso_eq
-#print axioms CategoryTheory.Sheaf.yonedaHomComplexIsoSections
-#print axioms CategoryTheory.Sheaf.freeAbelianYonedaHomComplexIsoSections_eq
-#print axioms CategoryTheory.Sheaf.fromSingleMk_comp_ofHom
-#print axioms CategoryTheory.Sheaf.yonedaHomComplexIsoSections_naturality
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplex_eq
-#print axioms CategoryTheory.Sheaf.cohomologyPresheafFunctor_map_app_apply
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsCohomologyAddEquivHPrime_naturality
-#print axioms CategoryTheory.Sheaf.cechToSectionsHomologyIso_hom_naturality
-#print axioms CategoryTheory.Sheaf.cechComparisonAddEquiv_naturality
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_comp_d
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_naturality
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt_comp_d
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt_naturality
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_exact
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZero_mono
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt_mono
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechZeroInt_exact
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechRowMap
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechRowMap_quasiIso
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechZeroColumn
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMapFlipRowIso
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap_flip_row
-#print axioms CategoryTheory.Sheaf.globalSectionsToCechBicomplexMap_flip_row_quasiIso
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsToCechTotalMap_quasiIso
-#print axioms CategoryTheory.Sheaf.cechCochainFunctorIntHomologyIso
-#print axioms CategoryTheory.Sheaf.injectiveResolutionSectionsComplexUnliftedIso
-#print axioms CategoryTheory.Sheaf.cechToSectionsHomologyIso
-#print axioms CategoryTheory.Sheaf.cechComparisonAddEquiv
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology_opens
-#print axioms CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomologyAt_opens
-#print axioms CategoryTheory.Localization.SmallShiftedHom.mk₀_comp_mk₀'
-#print axioms CategoryTheory.Localization.SmallShiftedHom.mk_comp_mk₀
-#print axioms CochainComplex.HomComplex.postcompMap
-#print axioms CochainComplex.HomComplex.Cocycle.postcompAddMonoidHom
-#print axioms CochainComplex.HomComplex.postcompMap_f_apply
-#print axioms CochainComplex.HomComplex.CohomologyClass.postcompCocycleAddMonoidHom
-#print axioms CochainComplex.HomComplex.CohomologyClass.postcomp
-#print axioms CochainComplex.HomComplex.CohomologyClass.postcomp_mk
-#print axioms CochainComplex.HomComplex.CohomologyClass.toSmallShiftedHom_postcomp
-#print axioms CochainComplex.HomComplex.CohomologyClass.postcompSc
-#print axioms CochainComplex.HomComplex.CohomologyClass.cocyclePostcomp
-#print axioms CochainComplex.HomComplex.CohomologyClass.classPostcomp
-#print axioms CochainComplex.HomComplex.CohomologyClass.postcompAddMonoidHom_comp_i
-#print axioms CochainComplex.HomComplex.CohomologyClass.cocyclePostcomp_comp_π
-#print axioms CochainComplex.HomComplex.CohomologyClass.cyclesIso_hom_naturality
-#print axioms CochainComplex.HomComplex.CohomologyClass.homologyIso_hom_naturality
-#print axioms CochainComplex.HomComplex.CohomologyClass.homologyAddEquiv_naturality
-#print axioms CategoryTheory.InjectiveResolution.descHom
-#print axioms CategoryTheory.InjectiveResolution.descHom_hom
-#print axioms CategoryTheory.InjectiveResolution.extEquivCohomologyClass_naturality
 #print axioms AlgebraicGeometry.Cohomology.coherentH
 #print axioms AlgebraicGeometry.Cohomology.LinearCohomology
 #print axioms AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology
@@ -117,25 +32,6 @@ open AlgebraicGeometry
 #print axioms AlgebraicGeometry.Cohomology.canonicalLinearCohomology
 #print axioms AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology.dimension
 #print axioms AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology.dimension_iso
-#print axioms HomologicalComplex.extendCyclesIso_naturality
-#print axioms HomologicalComplex.extendHomologyIso_naturality
-#print axioms HomologicalComplex₂.flipMap
-#print axioms HomologicalComplex₂.flipFunctor_hasTotal
-#print axioms HomologicalComplex₂.totalFlipIso_naturality
-#print axioms HomologicalComplex₂.totalFlipIso_inv_naturality
-#print axioms CochainComplex.mappingCone.quasiIso_compMap
-#print axioms CochainComplex.mappingCone.quasiIsoAt_inr_of_isZero_X
-#print axioms HomologicalComplex.HomologySequence.quasiIso_τ₂
-#print axioms HomologicalComplex₂.IsVerticallyConnective
-#print axioms HomologicalComplex₂.IsHorizontallyConnective
-#print axioms HomologicalComplex₂.singleZeroBicomplexMap
-#print axioms HomologicalComplex₂.singleZeroTotalIso_naturality
-#print axioms HomologicalComplex₂.totalMap_quasiIso
-#print axioms HomogeneousLocalization.isDomain_of_le_nonZeroDivisors
-#print axioms HomogeneousLocalization.nontrivial_of_le_nonZeroDivisors
-#print axioms HomogeneousLocalization.Away.nontrivial
-#print axioms HomogeneousLocalization.Away.isDomain
-#print axioms HomogeneousLocalization.Away.isReduced
 #print axioms AlgebraicGeometry.Proj.isReduced_spec_away
 #print axioms AlgebraicGeometry.Proj.isReduced
 #print axioms AlgebraicGeometry.Proj.isDomain_away
@@ -152,18 +48,17 @@ open AlgebraicGeometry
 #print axioms AlgebraicGeometry.Proj.projectiveSpaceToSpec
 #print axioms AlgebraicGeometry.Proj.locallyOfFiniteType_projectiveSpaceToSpec
 #print axioms AlgebraicGeometry.Proj.nonempty_projectiveSpace
-#print axioms AlgebraicGeometry.Proj.projectiveSpaceVariety
-#print axioms AlgebraicGeometry.Proj.projectiveSpaceVariety_toScheme
+#print axioms AlgebraicGeometry.Proj.instOverProjectiveSpace
+#print axioms AlgebraicGeometry.Proj.isVariety_projectiveSpace
 #print axioms AlgebraicGeometry.Proj.polynomialIntShift_isCoherent
 #print axioms AlgebraicGeometry.Proj.projectiveSpaceTwist
 #print axioms AlgebraicGeometry.Proj.projectiveSpaceTwist_obj
 #print axioms AlgebraicGeometry.Proj.isLocallyNoetherian_projectiveSpace
-#print axioms AlgebraicGeometry.Proj.isLocallyNoetherian_projectiveSpaceVariety
 #print axioms AlgebraicGeometry.Proj.homogeneousZeroRingEquiv_toRingHom_eq_algebraMap
 #print axioms AlgebraicGeometry.Proj.projectiveSpaceToSpec_eq
 #print axioms AlgebraicGeometry.Proj.projectiveSpaceSelfEmbedding
 #print axioms AlgebraicGeometry.Proj.projectiveSpaceSelfEmbedding_isClosedImmersion
 #print axioms AlgebraicGeometry.Proj.projectiveSpaceSelfPresentation
-#print axioms AlgebraicGeometry.Proj.isProjective_projectiveSpaceVariety
+#print axioms AlgebraicGeometry.Proj.isProjective_projectiveSpace
 #print axioms TopologicalSpace.isPreirreducible_univ_of_cover
 #print axioms TopologicalSpace.irreducibleSpace_of_cover

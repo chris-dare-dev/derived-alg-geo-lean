@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.ChernCharacter.Basic
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Core.CharacteristicClasses
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 
@@ -47,32 +47,32 @@ open scoped BigOperators
 noncomputable section
 
 variable {k : Type u} [Field k]
-variable {X : Variety k}
-variable {D : FiniteCohomology X}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
+variable {D : FiniteCohomology k X}
 variable {C : D.LinearConnectingSystem}
 variable {d : ℕ}
 variable {A : Type v} [CommRing A] [Algebra ℚ A]
 variable {P : PairingContext D C d A}
-variable {O : Coh X.toScheme}
+variable {O : Coh X}
 
 /-! ## Dimension-general descent through `K₀(Coh X)` -/
 
 /-- A compatible choice of reconstruction data for every coherent sheaf in dimension `d`. -/
 structure ReconstructionSystem where
   /-- Reconstruction data for every coherent sheaf. -/
-  reconstruction : ∀ F : Coh X.toScheme, P.ReconstructionData F
+  reconstruction : ∀ F : Coh X, P.ReconstructionData F
   /-- Rank is invariant under coherent-sheaf isomorphism. -/
-  rank_iso : ∀ {F G : Coh X.toScheme} (_e : F ≅ G),
+  rank_iso : ∀ {F G : Coh X} (_e : F ≅ G),
     (reconstruction F).rank = (reconstruction G).rank
   /-- Twist Euler functions are invariant under coherent-sheaf isomorphism. -/
-  eulerPic_iso : ∀ {F G : Coh X.toScheme} (_e : F ≅ G),
+  eulerPic_iso : ∀ {F G : Coh X} (_e : F ≅ G),
     (reconstruction F).twists.eulerPic = (reconstruction G).twists.eulerPic
   /-- Rank is additive in a short exact sequence. -/
-  rank_shortExact : ∀ (S : ShortComplex (Coh X.toScheme)) (_hS : S.ShortExact),
+  rank_shortExact : ∀ (S : ShortComplex (Coh X)) (_hS : S.ShortExact),
     (reconstruction S.X₂).rank =
       (reconstruction S.X₁).rank + (reconstruction S.X₃).rank
   /-- Twist Euler functions are additive in a short exact sequence. -/
-  eulerPic_shortExact : ∀ (S : ShortComplex (Coh X.toScheme)) (_hS : S.ShortExact),
+  eulerPic_shortExact : ∀ (S : ShortComplex (Coh X)) (_hS : S.ShortExact),
     (reconstruction S.X₂).twists.eulerPic =
       (reconstruction S.X₁).twists.eulerPic +
         (reconstruction S.X₃).twists.eulerPic
@@ -81,7 +81,7 @@ namespace ReconstructionSystem
 
 /-- Reconstructed rank as an additive coherent-sheaf invariant. -/
 noncomputable def rankInvariant (R : ReconstructionSystem (P := P)) :
-    K₀Ab (Coh X.toScheme) →+ ℤ :=
+    K₀Ab (Coh X) →+ ℤ :=
   K₀Ab.liftOf (fun F => (R.reconstruction F).rank)
     (fun S hS => R.rank_shortExact S hS)
 
@@ -89,7 +89,7 @@ noncomputable def rankInvariant (R : ReconstructionSystem (P := P)) :
 invariant valued in the certified graded piece. -/
 noncomputable def chernCharacterInvariant (R : ReconstructionSystem (P := P))
     (RO : P.ReconstructionData O) (i : ℕ) :
-    K₀Ab (Coh X.toScheme) →+ (P.ring.piece i) :=
+    K₀Ab (Coh X) →+ (P.ring.piece i) :=
   K₀Ab.liftOf
     (fun F => ⟨chernCharacterComponent RO (R.reconstruction F) i,
       chernCharacterComponent_mem RO (R.reconstruction F) i⟩)
@@ -102,24 +102,24 @@ noncomputable def chernCharacterInvariant (R : ReconstructionSystem (P := P))
 
 /-- Reconstructed rank on `K₀(Coh X)`. -/
 noncomputable def rankHom (R : ReconstructionSystem (P := P)) :
-    K₀Ab (Coh X.toScheme) →+ ℤ :=
+    K₀Ab (Coh X) →+ ℤ :=
   R.rankInvariant
 
 /-- The reconstructed `i`-th Chern-character component on `K₀(Coh X)`. -/
 noncomputable def chernCharacterHom (R : ReconstructionSystem (P := P))
     (RO : P.ReconstructionData O) (i : ℕ) :
-    K₀Ab (Coh X.toScheme) →+ A :=
+    K₀Ab (Coh X) →+ A :=
   (P.ring.piece i).subtype.toAddMonoidHom.comp
     (R.chernCharacterInvariant RO i)
 
 @[simp]
-theorem rankHom_class (R : ReconstructionSystem (P := P)) (F : Coh X.toScheme) :
+theorem rankHom_class (R : ReconstructionSystem (P := P)) (F : Coh X) :
     R.rankHom (K₀Ab.of F) = (R.reconstruction F).rank := by
   simp [rankHom, rankInvariant]
 
 @[simp]
 theorem chernCharacterHom_class (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (F : Coh X.toScheme) (i : ℕ) :
+    (RO : P.ReconstructionData O) (F : Coh X) (i : ℕ) :
     R.chernCharacterHom RO i (K₀Ab.of F) =
       chernCharacterComponent RO (R.reconstruction F) i := by
   simp [chernCharacterHom, chernCharacterInvariant]
@@ -127,7 +127,7 @@ theorem chernCharacterHom_class (R : ReconstructionSystem (P := P))
 /-- Every descended Chern-character component remains in its graded piece. -/
 theorem chernCharacterHom_mem (R : ReconstructionSystem (P := P))
     (RO : P.ReconstructionData O)
-    (E : K₀Ab (Coh X.toScheme)) (i : ℕ) :
+    (E : K₀Ab (Coh X)) (i : ℕ) :
     R.chernCharacterHom RO i E ∈ P.ring.piece i :=
   (R.chernCharacterInvariant RO i E).property
 
@@ -139,7 +139,7 @@ noncomputable def intAlgebraMap : ℤ →+ A where
 
 /-- The descended zeroth Chern character is the algebra image of rank. -/
 theorem chernCharacterHom_zero (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (E : K₀Ab (Coh X.toScheme)) :
+    (RO : P.ReconstructionData O) (E : K₀Ab (Coh X)) :
     R.chernCharacterHom RO 0 E = algebraMap ℚ A (R.rankHom E : ℚ) := by
   have hhom : R.chernCharacterHom RO 0 =
       (intAlgebraMap (A := A)).comp R.rankHom := by
@@ -150,7 +150,7 @@ theorem chernCharacterHom_zero (R : ReconstructionSystem (P := P))
 
 theorem chernCharacterHom_add (R : ReconstructionSystem (P := P))
     (RO : P.ReconstructionData O)
-    (E F : K₀Ab (Coh X.toScheme)) (i : ℕ) :
+    (E F : K₀Ab (Coh X)) (i : ℕ) :
     R.chernCharacterHom RO i (E + F) =
       R.chernCharacterHom RO i E + R.chernCharacterHom RO i F :=
   map_add _ _ _

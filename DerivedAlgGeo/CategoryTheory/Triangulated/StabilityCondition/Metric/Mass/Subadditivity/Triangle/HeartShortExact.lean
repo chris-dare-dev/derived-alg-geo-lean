@@ -24,7 +24,7 @@ set_option backward.isDefEq.respectTransparency false
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
   CategoryTheory.Triangulated Complex
-open CategoryTheory.Triangulated.StabilityCondition.GroupAction Matrix
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction Matrix
 open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated.WeakStabilityCondition
 open scoped ENNReal BigOperators ZeroObject

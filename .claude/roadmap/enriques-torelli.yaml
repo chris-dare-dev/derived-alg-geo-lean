@@ -1,0 +1,324 @@
+schema: roadmap/1
+slug: enriques-torelli
+project: derived-alg-geo-lean
+title: "Enriques derived Torelli — foundations for arXiv:1912.04332 and 2104.13610"
+status: active
+phase: sequenced
+brief: |
+  This track builds the foundations for the refined derived Torelli theorem of
+  Li--Nuer--Stellari--Zhao: an Enriques surface is determined by its Kuznetsov
+  component. The mathematical chain is: the geometric definition (2-torsion
+  canonical class), the isotropic 10-sequence and its Fano-class arithmetic,
+  the ten associated line bundles as exceptional objects in `Dᵇ(Coh Y)`, the
+  semiorthogonal sequence they span, and its residual component.
+
+  The lane deliberately splits by ownership. Exceptionality, exceptional
+  collections, admissibility, and the generic residual component are
+  categorical and live under the semiorthogonal root that projective-families
+  epic #852 created and left deliberately inhabitant-free ("exceptionality
+  and mutation remain deferred until a theorem consumes them" — this lane is
+  the consuming theorem's arrival, tracked as #932--#936). The surface
+  definition, the collection data, the cohomological witnesses, and the
+  residual component of a concrete surface are geometric. The lattice
+  arithmetic of isotropic sequences is pure linear algebra and mentions no
+  geometry at all.
+
+  Foundations (milestone #43) landed 2026-08-31/09-01: the definition, the
+  line-bundle derived-object adapter, the numerical model, and the isotropic
+  sequence root. The categorical orientation, exceptional-object, and
+  exceptional-collection roots have also landed. PR #1027 adds generic
+  admissibility (#934) and the geometric isotropic collection (#988). PR
+  #1028 completes exceptionality (#989), the semiorthogonal sequence, and its
+  residual component (#990), closing the foundations milestone.
+
+  The second milestone starts the paper-content layer. PR #1030, tracked by
+  #1029, combines the categorical Serre core (#894/#895) with half-integral
+  Enriques categories, the spherical and pseudoprojective object profiles,
+  and exact supplied classification interfaces for both papers. Mutation,
+  projection, candidate Ext computations, and equivalence transport remain
+  visible future seams rather than being asserted by this statement layer.
+
+  The third milestone landed in PR #1032, tracked by #1031. It replaces the
+  arbitrary candidate families in those interfaces by the actual
+  right-adjoint projections of the first objects of positive-length
+  orthogonal exceptional blocks, and records the ten-bundle enumeration and
+  Paper II decomposition type. The projection functor and the papers'
+  Ext/classification arguments remain explicit supplied data; no mutation
+  cone or geometric existence theorem is claimed.
+
+  The fourth milestone, tracked by #1035, supplies the next honest boundary:
+  admissibility chooses the residual projection; its counit gives an
+  objectwise mutation triangle; orthogonal-cone triangles prove the same
+  projection for every member of a longer block; and Ext profiles transport
+  through Serre-compatible equivalences. The papers' one-step and finite
+  Fourier--Mukai extension conclusions are stated over the existing kernel
+  and adjunction roots. Constructing the divisor triangles and functorial
+  cones of kernels remains explicit data pending the dg chain #855, #853, and
+  #854.
+
+  The fifth milestone, tracked by #1041, performs the formal closing steps
+  after those interfaces. Residual classification now determines the block
+  reindexing; bidirectional prefix extension proves exact matched lengths;
+  adjacent Ext rigidity proves one common shift per block; and dependent
+  finite kernel extension plus right-admissible generation produces the
+  ambient Fourier--Mukai equivalence. The construction of each new kernel is
+  still the named dg seam, rather than a fabricated cone in a bare
+  triangulated category.
+goal:
+  hmw: "How might we state and eventually prove the refined derived Torelli theorem for Enriques surfaces on top of the repository's single derived-category construction, without a second exceptionality hierarchy, a premature Kuznetsov-component equivalence, or geometry leaking into the categorical root?"
+  objective: "Define Enriques surfaces and their semi-canonical ten-bundle configurations, assemble their residual category, and build the honest categorical interfaces needed to state the papers' Serre, spherical, and pseudoprojective classification results without fabricating their geometric proofs."
+  key_results:
+    - "IsEnriquesSurface is Prop-valued over supplied canonical-sheaf data, with both torsion clauses consumed by sheaf-level theorems and the char-2 exclusion documented rather than encoded."
+    - "Every line bundle has a canonical perfect, bounded degree-zero avatar in D(Coh X) through one adapter, not per-consumer plumbing."
+    - "The isotropic-sequence lattice root proves linear independence and the sum-vector identities behind Δ·F_i = 3 and Δ² = 10, with no symmetry hypothesis."
+    - "Exceptionality of the ten bundles is a reduction to named cohomological inputs in the fields-not-theorems idiom, never a silent axiom."
+    - "The residual component is stated through the generic semiorthogonal root and carries a neutral name until the identification with the papers' Ku(Y) is a theorem."
+    - "The papers' 3-spherical and 3-pseudoprojective classifications are represented by generic supplied-data roots whose Enriques specialization reuses the constructed residual full subcategory."
+architecture_contract:
+  policy: "docs/architecture/abstraction-tree.md"
+  canonical_roots:
+    surface_definition: "SmoothProperVariety + CanonicalSheafData, following the K3 pattern in AlgebraicGeometry/Surface/K3.lean"
+    derived_category: "AlgebraicGeometry/DerivedCategory/Coherent.lean; the generic construction is Mathlib's DerivedCategory"
+    semiorthogonal: "CategoryTheory/Triangulated/SemiorthogonalDecomposition/: exceptional collections, orthogonal blocks, residual right orthogonals, and chosen right projections"
+    serre: "CategoryTheory/Triangulated/SerreFunctor/: SerreFunctorData, SerreCategoryData, EnriquesCategoryData, generic object-classification roots, and their residual-projection constructors"
+    lattice: "LinearAlgebra/Lattice/, IntegralLattice namespace, bilinear maps into ℤ"
+    line_bundles: "Scheme.Modules.LineBundleData; Pic X for torsion statements"
+  prohibited:
+    - "a second exceptionality or semiorthogonal carrier below algebraic geometry"
+    - "a declaration named for the papers' Kuznetsov component before the identification is a theorem (ADR-0005 vocabulary discipline)"
+    - "characteristic hypotheses as structure fields rather than per-theorem assumptions"
+    - "ampleness or polarization claims: no such API exists, and clauses needing it enter as supplied data with the gap recorded"
+source:
+  work: "Li--Nuer--Stellari--Zhao, A refined Derived Torelli Theorem for Enriques surfaces; Li--Stellari--Zhao, II: the non-generic case"
+  arxiv: "1912.04332"
+evidence:
+  - "arXiv:1912.04332v2 §3.1, especially Definition 3.2 and equation (3.2), for the isotropic 10-sequence, Fano normalization, semi-canonical collection, and semiorthogonal decomposition; arXiv:2104.13610v2 for the non-generic extension."
+  - "The 2026-08-31 derived-category binding audit (ag-lean-handoff/derived-category-binding-audit/) and its landed remediation: the Coherent.lean owner (#982), the Duality rebind (#993), and the Dqc identification consumer API (#995)."
+  - "The semiorthogonal reconnaissance note (.claude/notes/2026-08-28-semiorthogonal-reconnaissance.md) deferring exceptionality to the first consuming theorem."
+  - "Issue drafts and dependency graph: ag-lean-handoff/enriques-torelli-lane/ISSUES.md."
+wont:
+  - "No claim that any Enriques surface, canonical-sheaf package, or isotropic collection has been constructed; every foundation is conditional data in the repository's ledger idiom."
+  - "No derived Torelli statement until the exceptionality and fullness layers exist; the theorem is the destination, not a milestone entry."
+  - "No K3 double cover machinery in this milestone; paper II's arguments will file their own epics."
+  - "No numerical-to-geometric bridge: the rank-one Enriques model witnesses only the numerical shadow, as its module docstring records."
+generated_by: { agent: claude, at: "2026-09-01" }
+generations:
+  - { rev: 1, at: "2026-09-01", note: "Lane registered after the foundations landed. #984 (definition, PR #991), #985 (line-bundle derived objects, PR #992), #986 (numerical model, PR #994), #987 (isotropic sequences, PRs #996/#997) all merged; the review pass corrected the Fano-class arithmetic to Δ·F_i = 3 on the permanent record. #988--#990 remain blocked on the categorical exceptionality lane #932--#936 and on each other. The EnumDecls eq_-prefix sweep bug found during #987 is filed as #998 outside this lane." }
+  - { rev: 2, at: "2026-09-02", note: "Rebased after #932, #933, #935, #936, #984, and #985 landed and after the Enriques carrier was simplified to an ordinary Scheme with typeclass hypotheses. PR #1027 implements generic admissibility (#934) and #988. The normalization source is corrected to arXiv:1912.04332v2 Definition 3.2/equation (3.2) in §3.1: 3δ = Σf_i, hence Δ·F_i = 3 and Δ² = 10. #989 then depends only on #988; #990 depends on #988/#989 and owns the still-missing generic residual helper." }
+  - { rev: 3, at: "2026-09-02", note: "Combined #989/#990 implementation in progress: line bundles are packaged canonically in Dᵇ(Coh Y); explicit ExtComparison and H² inputs reduce each bundle to the generic IsExceptional predicate; supplied pairwise witnesses build the Fin 10 exceptional collection; and the generic residual helper defines the triangulated right orthogonal and its neutral full subcategory without fullness or admissibility claims." }
+  - { rev: 4, at: "2026-09-02", note: "PR #1028 passed the full Windows build, axiom audits, declaration completeness, architecture gates, contracts, and emitter reproducibility. #989 and #990 are closed completed, milestone #43 is closed, and the roadmap records the residual only under its neutral formal name; the Torelli theorem itself remains future work." }
+  - { rev: 5, at: "2026-09-02", note: "Paper-content milestone #44 and issue #1029 registered. One PR combines #894/#895 with the generic Serre and Enriques roots, the exact spherical and pseudoprojective profiles, supplied Paper I Proposition 4.10 / Paper II Theorem 2.7 classification data, and their Enriques residual-category specialization. The PR does not claim the missing mutation, projection, Ext-computation, Serre-transport, or geometric-realization theorems." }
+  - { rev: 6, at: "2026-09-02", note: "PR #1030 passed the full Windows build, all three axiom audits, declaration completeness, environment linters, architecture gates, the no-sorry check, contracts, and emitter reproducibility in run 33672165307. #894, #895, and #1029 are closed completed and milestone #44 is closed. #896--#899 remain open for uniqueness, equivalence, transport/shift coherence, and the geometric realization." }
+  - { rev: 7, at: "2026-09-02", note: "ENQ3 milestone #45 and issue #1031 registered for one PR. The generic lane owns positive orthogonal exceptional blocks, their decomposition type and residual, chosen right-adjoint projections, and projection-bound Serre classification constructors. The Enriques adapter identifies the block members with the ten selected bundles and restates both papers' classification consequences for the actual projected objects. Projection existence, mutation triangles, (-2)-curve geometry, candidate Ext computations, and equivalence transport remain explicit seams." }
+  - { rev: 8, at: "2026-09-02", note: "PR #1032 passed the full Windows build, all three axiom audits, declaration completeness, environment linters, architecture gates, the no-sorry check, contracts, and emitter reproducibility in run 33682535182. #1031 and milestone #45 are closed completed. The same-projection theorem for every member of a longer Paper II block remains deferred because it needs the geometric curve-chain/mutation triangles, not merely abstract block orthogonality." }
+  - { rev: 9, at: "2026-09-02", note: "ENQ4 milestone #46 and issue #1035 registered for one PR. The generic lane constructs objectwise counit mutation triangles and proves same projection by iterating successive triangles with orthogonal cones; separates Ext profiles from Serre shifts and transports the special-object predicates bidirectionally; and packages one-step and blockwise Fourier--Mukai extension conclusions with the ambient equivalence derived from adjunction data. The Enriques adapter records numerical (-2)-chains, prefix-divisor bundle classes, geometric projection existence, and the two papers' Ext-to-classification constructors. Functorial kernel cones and the divisor-sequence-to-derived-triangle bridge remain supplied pending #855/#853/#854." }
+  - { rev: 10, at: "2026-09-02", note: "PR #1037 merged ENQ4 after full Windows verification passed in run 33691711939. Issue #1035 and milestone #46 are closed. The landed one-step/blockwise structures deliberately state the geometric/dg extension output; the next milestone derives the classification matching, exact length/common-shift consequences, and finite ambient extension instead of storing those conclusions again." }
+  - { rev: 11, at: "2026-09-02", note: "ENQ5 milestone #47, issue #1041, and PR #1042 registered for three linked lanes: canonical block matching from residual classification; exact lengths from bidirectional prefix extension and common shifts from adjacent k ⊕ k[-1] Ext profiles; and dependent one-object kernel induction whose final ambient generation follows from right admissibility and exceptional-part coverage. Each enlarged-stage equivalence is constructed from full faithfulness and essential surjectivity. The dg construction of each extended kernel remains explicit pending #855/#853/#854." }
+items:
+  - id: enriques-torelli-m1
+    gh_milestone: 43
+    kind: milestone
+    title: "ENQ1 — Enriques derived Torelli foundations"
+    status: done
+    lane: now
+    acceptance:
+      - "The geometric definition, the derived-object adapter, the numerical model, and the lattice root are merged with their reviews applied."
+      - "The collection, exceptionality, and residual-component epics consume the categorical exceptionality root #932--#936 rather than duplicating it."
+      - "Zero sorries; relevant gates and runner verification are green."
+
+  - id: enriques-torelli-e1
+    gh_issue: 984
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "An Enriques surface: 2-torsion canonical class over supplied canonical-sheaf data"
+    status: done
+    priority: must
+    size: M
+    summary: "IsEnriquesSurface mirrors IsK3Surface over a supplied CanonicalSheafData 2: projectivity, κ² = 1 and κ ≠ 1 in Pic, H¹(O) = 0. Both torsion clauses have sheaf-level consumers, the class is its own inverse, no package witnesses both this and IsK3Surface, and EnriquesSurface bundles the data. Merged as PR #991."
+    tags: [enriques, surface, canonical-class]
+    labels: [area:lean, area:geometry, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e2
+    gh_issue: 985
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "Line bundles as bounded coherent derived objects"
+    status: done
+    priority: must
+    size: S
+    summary: "LineBundleData.coh and derivedObject place a line bundle in degree zero of D(Coh X), where it satisfies the finite-locally-free generating property outright and is perfect and bounded; iso transports and the definitional O_X identifications complete the adapter. Merged as PR #992."
+    tags: [line-bundle, derived-category, adapter]
+    labels: [area:lean, area:derived, type:feature]
+
+  - id: enriques-torelli-e3
+    gh_issue: 986
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "Numerical Enriques surface on the rank-one carrier"
+    status: done
+    priority: should
+    size: S
+    summary: "The fourth surface Todd class: td₁ = 0 because torsion dies in the numerical quotient, ∫td₂ = χ(O) = 1 strictly between the K3's 2 and the abelian surface's 0, with the three-presentation witness and the pairwise distinctions as theorems. Merged as PR #994."
+    tags: [numerical, todd-class, enriques]
+    labels: [area:lean, area:geometry, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e7
+    gh_issue: 987
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "Isotropic sequences in an integral bilinear lattice"
+    status: done
+    priority: must
+    size: M
+    summary: "IsIsotropicSequence with no symmetry hypothesis; the weighted pairing identity, the sum-vector identities behind Δ·F_i = 3 and Δ² = 10, coefficient separation, and linear independence for n ≥ 2, with the hyperbolic plane and the degenerate singleton as inhabitants. Merged as PRs #996 and #997; division by 3 deferred to the rank-ten lattice."
+    tags: [lattice, isotropic-sequence, fano-class]
+    labels: [area:lean, area:algebra, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e4
+    gh_issue: 988
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "The isotropic 10-collection of line bundles on an Enriques surface"
+    status: done
+    priority: must
+    size: M
+    summary: "PR #1027 implements ten LineBundleData on the ordinary Scheme carrier, a supplied IntersectionContext, isotropic pairings, and equation (3.2) from arXiv:1912.04332v2 §3.1 expressed as numerical equivalence against every Picard intersection probe. Consuming theorems prove class distinctness, Δ·F_i = 3, and Δ² = 10; no Num(Y), nefness, ampleness, or existence is claimed."
+    tags: [enriques, collection, line-bundle]
+    labels: [area:lean, area:geometry, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e5
+    gh_issue: 989
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "Exceptionality of line bundles on an Enriques surface"
+    status: done
+    priority: must
+    size: L
+    summary: "PR #1028: a canonical boundedDerivedObject packages each line bundle in Dᵇ(Coh Y); Prop-valued ExtComparison data, the existing H¹ clause, and supplied H² vanishing prove generic IsExceptional for every selected bundle. Every missing Ext/cohomological-dimension seam remains explicit and no inhabitant is claimed."
+    tags: [enriques, exceptional-object, binding]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-e6
+    gh_issue: 990
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m1
+    title: "The Enriques semiorthogonal sequence and its residual component"
+    status: done
+    priority: must
+    size: L
+    summary: "PR #1028: supplied pairwise witnesses build the Fin 10 ExceptionalCollection and root-oriented SemiorthogonalSequence; the generic residual helper is the right orthogonal of total, is triangulated from component closure, and supports membership, Hom-vanishing, and non-membership consumers. ResidualCategory remains neutral and makes no fullness, admissibility, mutation, or Ku(Y) identification claim."
+    tags: [enriques, semiorthogonal, residual-component]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-m2
+    gh_milestone: 44
+    kind: milestone
+    title: "ENQ2 — Serre and paper object interfaces"
+    status: done
+    lane: now
+    acceptance:
+      - "The categorical Serre root and half-integral Enriques-category refinement are registered without geometry imports."
+      - "Both papers' spherical and pseudoprojective definitions and classification conclusions have precise degree-three consumer APIs."
+      - "The Enriques residual category reuses those roots, with every missing geometric construction exposed as supplied data."
+      - "Zero sorries; relevant gates and Windows verification are green."
+
+  - id: enriques-torelli-e8
+    gh_issue: 1029
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m2
+    title: "Serre and Enriques categories; spherical and pseudoprojective classification interfaces"
+    status: done
+    priority: must
+    size: L
+    summary: "PR #1030 with #894/#895: Serre and Enriques category roots, the papers' spherical and pseudoprojective object profiles, generic supplied classification structures, and their degree-three specialization to the landed Enriques residual category. Full Windows verification passed in run 33672165307. Mutation/projection, candidate Ext computations, Serre conjugation, geometric realization, and Paper II's equivalence obstruction remain explicit future work."
+    tags: [enriques, serre-functor, spherical-object, pseudoprojective-object]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-m3
+    gh_milestone: 45
+    kind: milestone
+    title: "ENQ3 — Exceptional blocks and residual projections"
+    status: done
+    lane: now
+    acceptance:
+      - "Positive-length mutually orthogonal exceptional blocks have a generic triangulated-category root, including their total length, decomposition type, and residual right orthogonal."
+      - "A chosen residual right adjoint supplies concrete projected objects, counits, and the universal Hom equivalence."
+      - "The Enriques specialization enumerates exactly the ten selected line bundles and states both papers' classification conclusions for their actual residual projections."
+      - "Projection existence, mutation triangles, (-2)-curve geometry, Ext calculations, and equivalence transport remain visible seams."
+      - "Zero sorries; relevant gates and Windows verification are green."
+
+  - id: enriques-torelli-e9
+    gh_issue: 1031
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m3
+    title: "Exceptional blocks and residual projection objects for the Enriques papers"
+    status: done
+    priority: must
+    size: L
+    summary: "PR #1032 adds generic orthogonal exceptional blocks, residual right-projection data and universal Hom properties, projection-bound Serre classification constructors, and the Enriques ten-bundle adapter. The Paper I/II spherical and pseudoprojective classification consequences concern the actual residual projections instead of arbitrary candidates. Full Windows verification passed in run 33682535182. Mutation, projection existence, curve-chain geometry, Ext calculations, and equivalence transport are not claimed."
+    tags: [enriques, exceptional-blocks, residual-projection, spherical-object, pseudoprojective-object]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-m4
+    gh_milestone: 46
+    kind: milestone
+    title: "ENQ4 — Mutation and Fourier--Mukai extension"
+    status: done
+    lane: now
+    acceptance:
+      - "Right admissibility chooses a projection whose counit has an objectwise mutation triangle with orthogonal cone."
+      - "Supplied successive divisor triangles prove the same residual projection for every member of every exceptional block."
+      - "The Enriques specialization records the numerical (-2)-curve chains, line-bundle class formula, and Ext-to-classification constructors used by both papers."
+      - "Serre-compatible equivalences preserve and reflect spherical and pseudoprojective objects."
+      - "The one-step and finite Fourier--Mukai extension conclusions promote the residual equivalence to a kernel-presented ambient equivalence with common shifts across blocks."
+      - "The unavailable functorial cone constructions stay explicit supplied data tied to #855, #853, and #854."
+      - "Zero sorries; relevant gates and Windows verification are green."
+
+  - id: enriques-torelli-e10
+    gh_issue: 1035
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m4
+    title: "Mutation, Ext transport, and Fourier--Mukai extension across Enriques exceptional blocks"
+    status: done
+    priority: must
+    size: L
+    summary: "PR #1037 implements the objectwise mutation and projection-chain theorems, the Enriques (-2)-chain and Ext-computation adapters, bidirectional Serre-compatible transport, and precise one-step/blockwise Fourier--Mukai extension result data. Full Windows verification passed in run 33691711939. Kernel cones and geometric divisor triangles remain named supplied seams until the dg chain lands."
+    tags: [enriques, mutation, fourier-mukai, exceptional-blocks, serre-functor]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]
+
+  - id: enriques-torelli-m5
+    gh_milestone: 47
+    kind: milestone
+    title: "ENQ5 — Classification matching and extension induction"
+    status: in_progress
+    lane: now
+    acceptance:
+      - "A residual Serre-compatible equivalence and the spherical/pseudoprojective classifications derive a unique equivalence of block-index types."
+      - "Bidirectional ordered prefix extension derives exact matched block lengths, and adjacent k ⊕ k[-1] Ext profiles derive one common shift per block."
+      - "Each one-step enlarged equivalence follows from full faithfulness and essential surjectivity of the restricted extended transform."
+      - "Dependent finite extension retains the final kernel and restriction isomorphism, while admissibility and exceptional-part coverage prove both final spans are ambient."
+      - "The Enriques adapter exposes the Paper I Theorem 5.1 / Paper II Theorem 3.3 ambient Fourier--Mukai conclusion without asserting reconstruction of the surfaces."
+      - "Zero sorries; relevant gates and Windows verification are green."
+
+  - id: enriques-torelli-e11
+    gh_issue: 1041
+    gh_sub_issues: []
+    kind: epic
+    parent: enriques-torelli-m5
+    title: "Classification matching, shift rigidity, and finite ambient extension for Enriques blocks"
+    status: done
+    priority: must
+    size: L
+    summary: "PR #1042 derives block matching from residual classification, exact length from two ordered prefix extensions, common shifts from adjacent Ext profiles, and the ambient Fourier--Mukai equivalence from a dependent finite extension sequence plus right-admissible generation. Kernel construction remains the explicit dg seam."
+    tags: [enriques, classification, exceptional-blocks, fourier-mukai, serre-functor]
+    labels: [area:lean, area:geometry, area:derived, type:feature, source:1912.04332]

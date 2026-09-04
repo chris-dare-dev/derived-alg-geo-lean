@@ -13,7 +13,7 @@ Lemma 8.2 says `Aut(D)` acts on `Stab(D)` **by isometries**. This module proves
 the phase half of that clause, and is deliberate about which half it is.
 
 The distance it uses is `slicingDist`
-(`StabilityCondition/Foundation/Deformation/SlicingDistance.lean`), built for
+(`WeakStabilityCondition/StabilityCondition/Foundation/Deformation/SlicingDistance.lean`), built for
 the deformation theory of §7 and not, on its own, the §8 metric.
 
 ```
@@ -265,7 +265,7 @@ irrelevance discharges the descent. -/
 @[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := no_claim)
         (note := "The closest this repo gets to 'Aut(D) acts by isometries', and still not it, for two independent reasons already recorded elsewhere in this repo. (1) The distance is slicingDist, not Bridgeland's d -- see mapEquiv_slicingDist's note; neither statement implies the other. (2) AutPairQuot v is NOT Aut(D): its elements are pairs (Phi, lam), and the forgetful map to AutQuot C is proved neither injective nor surjective. Cite this as 'the group of autoequivalences carrying a compatible class-lattice automorphism preserves the phase distance'.")]
 theorem AutPairQuot_smul_slicingDist
-    (g : CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot v)
+    (g : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot v)
     (σ τ : StabilityCondition.WithClassMap C v) :
     slicingDist C (g • σ).slicing (g • τ).slicing = slicingDist C σ.slicing τ.slicing := by
   induction g using _root_.Quotient.inductionOn with

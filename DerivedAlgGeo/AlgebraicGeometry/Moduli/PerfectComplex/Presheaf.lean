@@ -28,11 +28,16 @@ concrete identity system and zero objects, including on geometric-point
 fibers.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory
 open CategoryTheory.Bicategory
-open CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Dqc
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 noncomputable section
 
@@ -184,26 +189,22 @@ abbrev RelativePerfectGeometricFiber {S : Scheme.{u}}
   RelativePerfectModuliFiber (T.residue x)
 
 /-- The zero complex as an object of the relative-perfect moduli groupoid. -/
-def relativePerfectZeroObject {S : Scheme.{u}} (T : SchemeBaseChange S)
-    [IsLocallyNoetherian T.left] : RelativePerfectModuliFiber T :=
+def relativePerfectZeroObject {S : Scheme.{u}} (T : SchemeBaseChange S) :
+    RelativePerfectModuliFiber T :=
   ⟨⟨SchemeQuasicoherentDerivedCategory.zero T.left,
       schemeUniversallyGluableRelativePerfect_zero T.hom⟩⟩
 
-/-- Every locally Noetherian scheme base change has a nonempty
-relative-perfect moduli groupoid. -/
+/-- Every scheme base change has a nonempty relative-perfect moduli groupoid. -/
 theorem relativePerfectModuliFiber_nonempty {S : Scheme.{u}}
-    (T : SchemeBaseChange S) [IsLocallyNoetherian T.left] :
+    (T : SchemeBaseChange S) :
     Nonempty (RelativePerfectModuliFiber T) :=
   ⟨relativePerfectZeroObject T⟩
 
 /-- Every geometric-point fiber has the concrete zero object. -/
 def relativePerfectGeometricZeroObject {S : Scheme.{u}}
     (T : SchemeBaseChange S) (x : T.left) :
-    RelativePerfectGeometricFiber T x := by
-  letI : IsLocallyNoetherian (T.residue x).left := by
-    change IsLocallyNoetherian (Spec (T.left.residueField x))
-    infer_instance
-  exact relativePerfectZeroObject (T.residue x)
+    RelativePerfectGeometricFiber T x :=
+  relativePerfectZeroObject (T.residue x)
 
 /-! ## The concrete identity moduli problem
 

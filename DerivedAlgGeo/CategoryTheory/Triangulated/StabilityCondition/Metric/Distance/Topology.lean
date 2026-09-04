@@ -31,13 +31,13 @@ distance bound.  They feed the **easy** direction only —
 `exists_stabilityDist_ball_subset_basisNhd`.  The hard direction,
 `exists_basisNhd_subset_stabilityDist_ball`, goes through
 `phiPlus_sub_lt_of_slicingDist`
-(`StabilityCondition/Foundation/Deformation/SlicingDistance.lean`) and
+(`WeakStabilityCondition/StabilityCondition/Foundation/Deformation/SlicingDistance.lean`) and
 `abs_log_mass_ratio_le_of_mem_basisNhd`, and touches none of them.
 -/
 
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
-open CategoryTheory.Triangulated CategoryTheory.Triangulated.Deformation
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 open scoped ENNReal Topology
 
 namespace CategoryTheory.Triangulated
@@ -1038,7 +1038,7 @@ distance ball.  This is one of the two cofinality directions in Proposition
 `hε8 : ε < 1 / 8` is stronger than this proof needs: it is consumed once, to
 derive `hε1 : ε < 1` for `Real.sin_pos_of_pos_of_lt_pi`.  It is kept because
 `ε < 1/8` is the radius convention of the whole `basisNhd` family
-(`StabilityCondition/Foundation/Deformation/StabilityTopology.lean`) and
+(`WeakStabilityCondition/StabilityCondition/Foundation/Deformation/StabilityTopology.lean`) and
 matches `basisNhdFamily`'s generating predicate; weakening it here alone would
 desynchronise this lemma from its siblings for no gain. -/
 theorem exists_stabilityDist_ball_subset_basisNhd

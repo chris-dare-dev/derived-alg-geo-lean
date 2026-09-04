@@ -1,2 +1,0 @@
-# Import modifiers must not bypass the sublayer boundary.
-public import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.Dqc

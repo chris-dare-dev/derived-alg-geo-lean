@@ -14,7 +14,7 @@ It is independent of categories and of the retained deformation library.
 
 noncomputable section
 
-namespace CategoryTheory.Triangulated.Deformation
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 /-- The imaginary coordinate is bounded by the product of the distance from
 one and the norm. -/
@@ -145,4 +145,4 @@ theorem relativePhase_perturbation {m φ α ε : ℝ} {u : ℂ}
     abs_div, abs_of_pos hπ, div_lt_iff₀ hπ]
   linarith
 
-end CategoryTheory.Triangulated.Deformation
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation

@@ -6,18 +6,18 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Functorial
-import DerivedAlgGeo.LinearAlgebra.AlternatingFinsum
+import DerivedAlgGeo.Algebra.Homology.EulerCharacteristic
 
 /-!
 # The Hom-built Euler form
 
 `χ(X, Y) = Σᵢ (-1)ⁱ · dimₖ Hom(X, Y⟦i⟧)`, built from the long exact Hom
 sequences of `LinearYoneda` and `LinearCoyoneda` and the `ℤ`-indexed
-alternating-sum arithmetic of `LinearAlgebra/AlternatingFinsum`.
+Euler-characteristic additivity of `Algebra/Homology/EulerCharacteristic`.
 
-This is the form `AlgebraicGeometry.Numerical.CategoricalEulerForm` supplies
-axiomatically; the adapter that discharges that structure lives in the numerical
-track, where the structure does.
+The additive pairing itself is the generic `K₀.EulerForm` abbreviation in this
+file. `K₀.EulerForm.ofLinear` constructs it from the Hom-built form; geometric
+Riemann--Roch comparisons consume that root separately.
 
 ## Restrictions, stated up front
 
@@ -61,8 +61,7 @@ of `chiHom` as evidence that a category has an Euler form.
   generality it is unprovable, see its docstring. A concrete model lives in
   `GrothendieckGroup/HomFiniteWitness.lean` (#543).
 * No relation to any geometric Euler characteristic, to `chi₂`, or to
-  Riemann--Roch. `IsRiemannRoch` remains supplied in the numerical track; this
-  file says nothing about it.
+  Riemann--Roch. Those comparisons remain supplied in the numerical track.
 * Nothing about Serre duality, or about `χ` being symmetric, or non-degenerate.
 -/
 
@@ -71,7 +70,31 @@ universe w u v u' v'
 namespace CategoryTheory.Triangulated
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
-open Opposite Module DerivedAlgGeo.LinearAlgebra
+open Opposite Module
+
+/-- A biadditive integer-valued form on the triangulated Grothendieck group.
+This is an abbreviation for the canonical nested additive-homomorphism type,
+not a parallel one-field structure. -/
+abbrev K₀.EulerForm (C : Type u) [Category.{v} C] [Preadditive C]
+    [HasZeroObject C] [HasShift C ℤ]
+    [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] :=
+  K₀ C →+ K₀ C →+ ℤ
+
+namespace K₀.EulerForm
+
+variable {C : Type u} {D : Type u'} [Category.{v} C] [Category.{v'} D]
+  [Preadditive C] [HasZeroObject C] [HasShift C ℤ]
+  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+  [Preadditive D] [HasZeroObject D] [HasShift D ℤ]
+  [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D]
+
+/-- A triangulated functor preserves two Euler forms when its `K₀` map
+preserves their values. -/
+def Preserves (E : K₀.EulerForm C) (E' : K₀.EulerForm D)
+    (F : C ⥤ D) [F.CommShift ℤ] [F.IsTriangulated] : Prop :=
+  ∀ x y : K₀ C, E' (K₀.map F x) (K₀.map F y) = E x y
+
+end K₀.EulerForm
 
 variable (k : Type w) [DivisionRing k] (C : Type u) [Category.{v} C] [Preadditive C]
   [Linear k C] [HasZeroObject C] [HasShift C ℤ]
@@ -121,13 +144,14 @@ noncomputable def chiHom (X Y : C) : ℤ :=
 variable {k C}
 
 omit [HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] in
-theorem chiHom_eq_finsum_altDim (X Y : C) :
-    chiHom k C X Y = ∑ᶠ i : ℤ, altDim (k := k) (fun i => X ⟶ Y⟦i⟧) i :=
+theorem chiHom_eq_eulerChar (X Y : C) :
+    chiHom k C X Y =
+      GradedObject.eulerChar (ComplexShape.up ℤ) (fun i : ℤ => ModuleCat.of k (X ⟶ Y⟦i⟧)) :=
   rfl
 
 /-- A `ShortComplex` exact in `ModuleCat k` gives `Function.Exact` of the
 underlying linear maps.  The bridge from the categorical homology sequence to
-the arithmetic of `AlternatingFinsum`. -/
+`GradedObject.eulerChar_eq_add_of_exact`. -/
 theorem exact_hom_of_shortComplex_exact {S : ShortComplex (ModuleCat k)}
     (hS : S.Exact) : Function.Exact S.f.hom S.g.hom :=
   LinearMap.exact_iff.mpr hS.moduleCat_range_eq_ker.symm
@@ -144,7 +168,7 @@ deliberate asymmetry with `chiHom_additive_left`. -/
 theorem chiHom_additive_right (X : C) (T : Triangle C) (hT : T ∈ distTriang C) :
     chiHom k C X T.obj₂ = chiHom k C X T.obj₁ + chiHom k C X T.obj₃ := by
   set F := (linearCoyoneda k C).obj (op X) with hF
-  refine finsum_altDim_middle (k := k)
+  refine GradedObject.eulerChar_eq_add_of_exact (k := k)
     (A := fun i => X ⟶ T.obj₁⟦i⟧) (B := fun i => X ⟶ T.obj₂⟦i⟧)
     (C := fun i => X ⟶ T.obj₃⟦i⟧)
     (fun i => ((F.shift i).map T.mor₁).hom)
@@ -179,7 +203,7 @@ theorem chiHom_additive_left (Y : C) (T : Triangle C) (hT : T ∈ distTriang C) 
   set T' := (triangleOpEquivalence C).functor.obj (op T) with hT'
   have hT'd : T' ∈ distTriang Cᵒᵖ := op_distinguished T hT
   have key : chiHom k C T.obj₂ Y = chiHom k C T.obj₃ Y + chiHom k C T.obj₁ Y :=
-    finsum_altDim_middle (k := k)
+    GradedObject.eulerChar_eq_add_of_exact (k := k)
       (A := fun i => T.obj₃ ⟶ Y⟦i⟧) (B := fun i => T.obj₂ ⟶ Y⟦i⟧)
       (C := fun i => T.obj₁ ⟶ Y⟦i⟧)
       (fun i => ((F.shift i).map T'.mor₁).hom)
@@ -231,8 +255,7 @@ instance isTriangleAdditive_chiRight :
 /-- **The Euler form on `K₀`.**
 
 `χ : K₀ C →+ K₀ C →+ ℤ`, biadditive by construction: the second variable
-descended in `chiRight`, the first descends here. This is the object
-`AlgebraicGeometry.Numerical.CategoricalEulerForm` axiomatises. -/
+descended in `chiRight`, the first descends here. -/
 noncomputable def chiK₀ : K₀ C →+ K₀ C →+ ℤ :=
   K₀.lift C (chiRight k C)
 
@@ -247,6 +270,14 @@ theorem chiK₀_of_of (X Y : C) :
     chiK₀ k C (K₀.of C X) (K₀.of C Y) = chiHom k C X Y := by
   rw [chiK₀_of, chiRight_of]
 
+/-- Package the Hom-built Euler pairing as the generic Euler-form alias. -/
+noncomputable def K₀.EulerForm.ofLinear : K₀.EulerForm C :=
+  chiK₀ k C
+
+theorem K₀.EulerForm.ofLinear_eq_chiK₀ :
+    K₀.EulerForm.ofLinear k C = chiK₀ k C :=
+  rfl
+
 end Descent
 
 section Preservation
@@ -260,10 +291,8 @@ the matched summands equal as `k`-*dimensions*. An additive fully faithful
 functor gives a bijection of Hom-groups, which fixes `finrank ℤ` but not
 `finrank k`.
 
-Before the Euler form was constructed this argument had nothing to run on —
-`EulerTransfer.PreservesCategoricalEuler` was a hypothesis precisely because
-with the form supplied abstractly there is no `Hom` for full faithfulness to
-act on. That is no longer the case. -/
+For the Hom-built form, full faithfulness and linearity prove the generic
+`K₀.EulerForm.Preserves` predicate below. -/
 
 variable {D : Type u'} [Category.{v'} D] [Preadditive D] [Linear k D]
   [HasZeroObject D] [HasShift D ℤ] [∀ n : ℤ, (shiftFunctor D n).Additive]
@@ -402,6 +431,24 @@ theorem chiK₀_map (k : Type w) [DivisionRing k] (C : Type u) [Category.{v} C]
     refine K₀.hom_ext C fun X => K₀.hom_ext C fun Y => ?_
     simp [K₀.map_of, chiHom_map Φ hΦ X Y]
   exact DFunLike.congr_fun (DFunLike.congr_fun outer x) y
+
+/-- A fully faithful linear triangulated functor preserves the Hom-built Euler
+forms on its source and target. -/
+theorem K₀.EulerForm.ofLinear_preserves (k : Type w) [DivisionRing k]
+    (C : Type u) [Category.{v} C] [Preadditive C] [Linear k C]
+    [HasZeroObject C] [HasShift C ℤ]
+    [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+    (D : Type u') [Category.{v'} D] [Preadditive D] [Linear k D]
+    [HasZeroObject D] [HasShift D ℤ]
+    [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D]
+    [HomFiniteBounded k C] [HomFiniteBounded k D]
+    [∀ n : ℤ, (shiftFunctor C n).Linear k]
+    [∀ n : ℤ, (shiftFunctor D n).Linear k]
+    (F : C ⥤ D) [F.Additive] [F.Linear k] [F.CommShift ℤ]
+    [F.IsTriangulated] (hF : F.FullyFaithful) :
+    (K₀.EulerForm.ofLinear k C).Preserves
+      (K₀.EulerForm.ofLinear k D) F :=
+  fun x y => chiK₀_map k C D F hF x y
 
 end Preservation
 

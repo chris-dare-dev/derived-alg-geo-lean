@@ -24,8 +24,8 @@ of composition is implemented here at the common `SupportData` root.  The full c
 are not yet asserted: composition still needs line-bundle pullback and the tensor--pushforward
 projection formula, while base change needs the arbitrary cartesian comparison
 `g^* i_* L ≅ i'_* g'^* L` and an exact scheme-module pullback API.  In particular, the
-repository's current exact flat-pullback theorem lives below `StabilityCondition/Families`, which
-this root must not import.
+repository's current exact flat-pullback theorem lives below
+`DerivedCategory/Families`, which this root must not import.
 -/
 
 open CategoryTheory Limits

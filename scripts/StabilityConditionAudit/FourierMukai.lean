@@ -8,6 +8,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HomFiniteWitness
+import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Realization
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
 
@@ -128,12 +129,6 @@ arithmetic engine a Hom-built Euler form would run on. It is NOT that form,
 and nothing here mentions a category.
 -/
 
-#print axioms DerivedAlgGeo.LinearAlgebra.diffRank
-#print axioms DerivedAlgGeo.LinearAlgebra.finrank_eq_finrank_ker_add_diffRank
-#print axioms DerivedAlgGeo.LinearAlgebra.finrank_eq_diffRank_add_diffRank
-#print axioms DerivedAlgGeo.LinearAlgebra.sum_range_succ_smul_finrank
-#print axioms DerivedAlgGeo.LinearAlgebra.sum_range_succ_smul_finrank_eq_zero
-#print axioms DerivedAlgGeo.LinearAlgebra.diffRank_eq_zero_of_subsingleton
 
 /-! ## Kernel functors acting on stability conditions
 
@@ -143,18 +138,18 @@ equivalence -- so a clean axiom list here says the transport follows from that
 datum, not that any kernel provides it.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.mk.inj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.corr
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.kernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.equiv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.iso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.map_eq_transformK₀
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.of_obj_eq
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.actStab
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.actStab_slicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.actStab_Z
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.corr
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.iso
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.map_eq_transformK₀
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.of_obj_eq
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStab
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStab_slicing
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStab_Z
 
 /-! ## The dual kernel
 
@@ -168,20 +163,20 @@ see the adjoint-kernel section at the end of this file. It does not change
 the status of `DualKernel` as a supplied datum; it moves the supply point.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.mk.inj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.dual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.invIso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.map_inverse_eq_transformK₀
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀_dual_comp
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀_comp_dual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀AddEquiv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀AddEquiv_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.transformK₀AddEquiv_symm_apply
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.actStabOfDual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.actStabOfDual_slicing
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.actStabOfDual_Z
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.invIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.map_inverse_eq_transformK₀
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀_dual_comp
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀_comp_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀AddEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀AddEquiv_apply
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.transformK₀AddEquiv_symm_apply
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStabOfDual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStabOfDual_slicing
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStabOfDual_Z
 
 /-! ## Kernel autoequivalences as elements of the acting group
 
@@ -193,11 +188,11 @@ kernel provides either. This is a map on elements only -- it is NOT a monoid
 homomorphism, and the module docstring says why.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.toTriEquiv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.toAutPair
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.toAutPair_lam
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.toAutPair_act
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.mk_toAutPair_smul
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.toTriEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.toAutPair
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.toAutPair_lam
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.toAutPair_act
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.mk_toAutPair_smul
 
 /-! ## Composing two transports
 
@@ -216,10 +211,10 @@ composite, whose kernel is the convolution.
 #print axioms CategoryTheory.Triangulated.Slicing.mapEquiv_trans
 #print axioms CategoryTheory.Triangulated.hlam_trans
 #print axioms CategoryTheory.Triangulated.actStabAut_trans
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.trans
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.trans_kernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.trans_equiv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.actStab_trans
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.trans
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.trans_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.trans_equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.actStab_trans
 
 /-! ## The unit kernel
 
@@ -231,17 +226,17 @@ dual kernel -- `Equivalence.refl.inverse` is `𝟭 C` -- so every `DualKernel`
 consequence applies to `KernelAutoequivalence.id`.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.mk.inj
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.unitKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.unitIso
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.id
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.id_kernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.id_equiv
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.id_corr
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.toDualKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.toDualKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.unitKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.unitIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.id
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.id_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.id_equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.id_corr
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.toDualKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.toDualKernel_dual
 
 /-! ## The k-linear Yoneda functor is homological, and its shift sequence
 
@@ -262,20 +257,18 @@ finiteness data nothing here provides.
 #print axioms CategoryTheory.Triangulated.linearYoneda_homologySequence_exact₂
 #print axioms CategoryTheory.Triangulated.linearYoneda_homologySequence_exact₃
 
-/-! ## The alternating sum along a `ℤ`-indexed long exact sequence
+/-! ## Alternating sums along three-family long exact sequences
 
-The arithmetic under a Hom-built Euler form. Indexed by `ℤ` and carrying NO
-boundary hypotheses -- no injectivity, no surjectivity, no `Subsingleton` --
-because the three-family statement telescopes by a translation of the summation
-index rather than by induction. `k` is a `DivisionRing`: rank-nullity is what
-forces it and commutativity is used nowhere.
+The arithmetic under a Hom-built Euler form. The `ℤ`-indexed version carries
+no boundary hypotheses because it telescopes by translation. The bounded
+`ℕ`-indexed companion instead records injectivity at the bottom and vanishing
+at the top. Neither theorem mentions a category or a geometric object.
 -/
 
-#print axioms DerivedAlgGeo.LinearAlgebra.finrank_eq_range_add_range
-#print axioms DerivedAlgGeo.LinearAlgebra.altDim
-#print axioms DerivedAlgGeo.LinearAlgebra.support_altDim
-#print axioms DerivedAlgGeo.LinearAlgebra.support_range_subset
-#print axioms DerivedAlgGeo.LinearAlgebra.finsum_altDim_middle
+#print axioms Function.Exact.finrank_eq_finrank_range_add_finrank_range
+#print axioms GradedObject.finrankSupport_eq_support_intCast
+#print axioms Module.support_finrank_range_subset
+#print axioms GradedObject.eulerChar_eq_add_of_exact
 
 /-! ## The k-linear coyoneda functor is homological
 
@@ -308,7 +301,7 @@ results require `HomFiniteBounded`.
 #print axioms CategoryTheory.Triangulated.HomFiniteBounded.finite
 #print axioms CategoryTheory.Triangulated.HomFiniteBounded.support_finite
 #print axioms CategoryTheory.Triangulated.chiHom
-#print axioms CategoryTheory.Triangulated.chiHom_eq_finsum_altDim
+#print axioms CategoryTheory.Triangulated.chiHom_eq_eulerChar
 #print axioms CategoryTheory.Triangulated.exact_hom_of_shortComplex_exact
 #print axioms CategoryTheory.Triangulated.chiHom_additive_right
 #print axioms CategoryTheory.Triangulated.chiHom_additive_left
@@ -339,6 +332,23 @@ and no geometry.
 #print axioms CategoryTheory.Triangulated.HomFiniteBounded.of_essSurj
 #print axioms CategoryTheory.Triangulated.chiHom_map
 #print axioms CategoryTheory.Triangulated.chiK₀_map
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm.Preserves
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm.ofLinear
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm.ofLinear_eq_chiK₀
+#print axioms CategoryTheory.Triangulated.K₀.EulerForm.ofLinear_preserves
+
+/-! ## Realizations and descent of K₀
+
+A realization is the canonical additive-homomorphism type out of `K₀`, not a
+new carrier. The descent predicate records the commuting square for a
+triangulated functor and contains no numerical or geometric vocabulary.
+-/
+
+#print axioms CategoryTheory.Triangulated.K₀.Realization
+#print axioms CategoryTheory.Triangulated.K₀.Realization.Descends
+#print axioms CategoryTheory.Triangulated.K₀.Realization.Descends.apply_of
+#print axioms CategoryTheory.Triangulated.K₀.Realization.Descends.of_natIso
 
 /-! ## A concrete HomFiniteBounded model (#543)
 
@@ -439,19 +449,19 @@ through the derived constructor lands on the same kernel object as
 claimed equal.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_dual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_toLeftAdjointKernelData_dual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_dual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_toRightAdjointKernelData_dual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData_adjKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toRightAdjointKernelData
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.DualKernel.toRightAdjointKernelData_adjKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.ofLeftAdjointKernel_dual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.toLeftAdjointKernelData
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.UnitKernelData.toLeftAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofLeftAdjointKernel_toLeftAdjointKernelData_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.ofRightAdjointKernel_toRightAdjointKernelData_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.toLeftAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.toRightAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel.toRightAdjointKernelData_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.ofLeftAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.toLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.UnitKernelData.toLeftAdjointKernelData_adjKernel
 
 
 /-! ## The adjoint-kernel ledger: constituents plus a projection formula
@@ -533,16 +543,16 @@ the bar -- it restates it pointwise, in the shape a geometric criterion
 (Bondal--Orlov) actually has. Nothing here supplies that invertibility.
 -/
 
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.dualKernelOfRightAdjointKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.dualKernelOfRightAdjointKernel_dual
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.isIso_counit
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.isIso_unit
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofFullyFaithful
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofFullyFaithful_kernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel_corr
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.ofRightAdjointKernel_kernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.KernelAutoequivalence.transform_isEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.dualKernelOfRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.dualKernelOfRightAdjointKernel_dual
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.isIso_counit
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.isIso_unit
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofFullyFaithful
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofFullyFaithful_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofRightAdjointKernel_corr
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.ofRightAdjointKernel_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.transform_isEquivalence
 
 
 /-! ## Satisfiability witnesses
@@ -560,8 +570,8 @@ transport at all.
 A clean axiom list here says the interfaces are CONSISTENT. It says nothing
 else: not that any geometric Fourier--Mukai transform exists, not that any
 transform is an equivalence, and not that any contract in
-`AlgebraicGeometry/StabilityCondition/Families/` is dischargeable. The geometric
-ledger remains entirely uninhabited.
+`AlgebraicGeometry/DerivedCategory/FourierMukai/` is dischargeable. The
+geometric ledger remains entirely uninhabited.
 
 Nothing here is an `instance`, deliberately: a global `Correspondence` instance
 would put the trivial one in front of every instance search mentioning the
@@ -576,5 +586,152 @@ structure.
 #print axioms CategoryTheory.Triangulated.FourierMukai.trivialLeftAdjointKernelData_adjKernel
 #print axioms CategoryTheory.Triangulated.FourierMukai.trivialRightAdjointKernelData
 #print axioms CategoryTheory.Triangulated.FourierMukai.trivialRightAdjointKernelData_adjKernel
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.trivialUnitKernelData
-#print axioms CategoryTheory.Triangulated.StabilityCondition.Symmetry.trivialUnitKernelData_unitKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialUnitKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.trivialUnitKernelData_unitKernel
+
+/-! ## Exceptional-block extension
+
+The one-step and finite extension records expose exactly where the dg cone
+construction remains supplied.  Once a final kernel-presented adjunction has
+invertible unit and counit, the ambient equivalence is derived rather than
+stored as an extra hypothesis.
+-/
+
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.iso
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.ofRightAdjointKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.ofRightAdjointKernel_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.adjoinObject
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.restrictionIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.newKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.kernelMap
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.agreesWithOld
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.transformCommShift
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.transformTriangulated
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.mapsAdjoin
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.enlargedEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.enlargedIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.agreesOnBase
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.objectIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.annihilates
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.restrictedFunctor
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.restrictedFunctorIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.restrictedTransform
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.newKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.kernelMap
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.agreesWithOld
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.transformCommShift
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.transformTriangulated
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.mapsAdjoin
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.restrictedFullyFaithful
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.restrictedEssSurj
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.agreesOnBase
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.objectIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.annihilates
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.enlargedEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.enlargedIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion.toExtensionData
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.rightAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.unitIsIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.counitIsIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.transformCommShift
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.transformTriangulated
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.residualIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.blockEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.length_eq
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.shift
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.objectIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.toKernelEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.toKernelEquivalence_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.transform_isEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.ambientEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData.ambientEquivalence_functor
+
+-- Finite one-object induction.  The final generation equalities follow from
+-- coverage of a right-admissible exceptional part, not from supplied ambient
+-- equivalence data.
+#print axioms CategoryTheory.Triangulated.FourierMukai.adjoinList
+#print axioms CategoryTheory.Triangulated.FourierMukai.adjoinList_nil
+#print axioms CategoryTheory.Triangulated.FourierMukai.adjoinList_cons
+#print axioms CategoryTheory.Triangulated.FourierMukai.le_adjoinList
+#print axioms CategoryTheory.Triangulated.FourierMukai.singleton_le_adjoinList_of_mem
+#print axioms CategoryTheory.Triangulated.FourierMukai.adjoinList_isTriangulated
+#print axioms CategoryTheory.Triangulated.FourierMukai.adjoinList_isStableUnderRetracts
+#print axioms CategoryTheory.Triangulated.FourierMukai.adjoinList_eq_top_of_rightAdmissible
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelExtensionStage
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelExtensionStage.kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelExtensionStage.equiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelExtensionStage.restrictionIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelExtensionStage.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelExtensionStage.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence.toStage
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.toStage
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.nil
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.cons
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.brecOn.eq
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.brecOn.go
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.cons.elim
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.cons.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.cons.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.ctorElim
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.ctorElimType
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.nil.elim
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.nil.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.finalStage
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.finalKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.finalEquiv
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.finalRestrictionIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.ambientEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.toKernelEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.sourceHead
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.sourceTail
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.targetHead
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.targetTail
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.sequence
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.sourceRightAdmissible
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.sourceCover
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.targetRightAdmissible
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.targetCover
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.sourceGenerates
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.targetGenerates
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.ambientEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData.toKernelEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.sourceHead
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.sourceTail
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.targetHead
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.targetTail
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.sequence
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.sourceMember
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.targetMember
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.sourceRightAdmissible
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.targetRightAdmissible
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.sourceCover
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.targetCover
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.toGeneratedExtensionSequenceData
+#print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.toKernelEquivalence

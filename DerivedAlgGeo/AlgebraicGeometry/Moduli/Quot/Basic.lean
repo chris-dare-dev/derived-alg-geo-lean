@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.ExactPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ExactPullback
 
 /-!
 # Quotient presentations of module sheaves
@@ -18,10 +18,14 @@ No scheme named `QuotScheme` is introduced here.  Representability, when it
 is available, is a separate Yoneda universal property.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits
-open CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open scoped ZeroObject
 
 noncomputable section

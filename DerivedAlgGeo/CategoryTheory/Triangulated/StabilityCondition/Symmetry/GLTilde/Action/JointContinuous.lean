@@ -9,7 +9,7 @@ import Mathlib.Topology.Compactness.Compact
 # Joint continuity of the lifted linear action
 
 This file strengthens the fixed-element continuity proved in
-`StabilityCondition/Symmetry/GLTilde/Action/Continuous.lean`.  The key estimates are local at the identity:
+`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/Continuous.lean`.  The key estimates are local at the identity:
 
 * `x.shift φ - φ` is uniformly small in `φ` when `x` is close to `1`;
   integer equivariance reduces this to the compact interval `[0, 1]`;
@@ -23,8 +23,9 @@ the action by the fixed element `x₀`.
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 noncomputable section
 
@@ -184,9 +185,9 @@ theorem norm_actC_sub_div_le (T : Matrix.GLPos (Fin 2) ℝ) (z w : ℂ) (hw : w 
 stability condition away from `σ` gives this affine seminorm bound. -/
 theorem stabSeminorm_near_identity_le (x : GLTilde)
     (σ τ : StabilityCondition.WithClassMap C v) :
-    CategoryTheory.Triangulated.Deformation.stabilitySeminorm C σ ((x • τ).Z - σ.Z) ≤
+    stabilitySeminorm C σ ((x • τ).Z - σ.Z) ≤
       ENNReal.ofReal ‖actCCLM x.mat‖ *
-        CategoryTheory.Triangulated.Deformation.stabilitySeminorm C σ (τ.Z - σ.Z) +
+        stabilitySeminorm C σ (τ.Z - σ.Z) +
         ENNReal.ofReal
           ‖actCCLM x.mat - ContinuousLinearMap.id ℝ ℂ‖ := by
   apply iSup_le
@@ -226,7 +227,7 @@ theorem stabSeminorm_near_identity_le (x : GLTilde)
           (norm_nonneg _),
         ENNReal.ofReal_mul (norm_nonneg _)]
     _ ≤ ENNReal.ofReal ‖actCCLM x.mat‖ *
-        CategoryTheory.Triangulated.Deformation.stabilitySeminorm C σ (τ.Z - σ.Z) +
+        stabilitySeminorm C σ (τ.Z - σ.Z) +
         ENNReal.ofReal
           ‖actCCLM x.mat - ContinuousLinearMap.id ℝ ℂ‖ := by
       apply add_le_add
@@ -246,8 +247,7 @@ theorem exists_identity_basisNhd_control
     ∃ d : ℝ, 0 < d ∧ d < 1 / 8 ∧
       ∀ᶠ x in nhds (1 : GLTilde),
         Set.MapsTo (fun τ ↦ x • τ)
-          (CategoryTheory.Triangulated.Deformation.basisNhd C σ d)
-          (CategoryTheory.Triangulated.Deformation.basisNhd C σ e) := by
+          (basisNhd C σ d) (basisNhd C σ e) := by
   let S := Real.sin (Real.pi * e)
   have hS : 0 < S := by
     dsimp [S]
@@ -319,17 +319,17 @@ theorem exists_identity_basisNhd_control
         _ = S / 8 := by
           dsimp [dZ]
           field_simp [Real.pi_ne_zero]
-    have hOld : CategoryTheory.Triangulated.Deformation.stabilitySeminorm C σ (τ.Z - σ.Z) <
+    have hOld : stabilitySeminorm C σ (τ.Z - σ.Z) <
         ENNReal.ofReal (S / 8) :=
       lt_of_lt_of_le hτ.1 (ENNReal.ofReal_le_ofReal hsinD)
     have hProd : ENNReal.ofReal N *
-        CategoryTheory.Triangulated.Deformation.stabilitySeminorm C σ (τ.Z - σ.Z) <
+        stabilitySeminorm C σ (τ.Z - σ.Z) <
         ENNReal.ofReal (S / 4) := by
       calc
         ENNReal.ofReal N *
-            CategoryTheory.Triangulated.Deformation.stabilitySeminorm C σ (τ.Z - σ.Z)
+            stabilitySeminorm C σ (τ.Z - σ.Z)
             ≤ ENNReal.ofReal 2 *
-              CategoryTheory.Triangulated.Deformation.stabilitySeminorm C σ (τ.Z - σ.Z) := by
+              stabilitySeminorm C σ (τ.Z - σ.Z) := by
               gcongr
         _ < ENNReal.ofReal 2 * ENNReal.ofReal (S / 8) := by
           exact ENNReal.mul_lt_mul_right
@@ -341,11 +341,10 @@ theorem exists_identity_basisNhd_control
     have hDof : ENNReal.ofReal D < ENNReal.ofReal (S / 4) :=
       (ENNReal.ofReal_lt_ofReal_iff (by positivity)).2 hDS4
     have hsum : ENNReal.ofReal N *
-        CategoryTheory.Triangulated.Deformation.stabilitySeminorm C σ (τ.Z - σ.Z) +
+        stabilitySeminorm C σ (τ.Z - σ.Z) +
         ENNReal.ofReal D < ENNReal.ofReal S := by
       calc
-        ENNReal.ofReal N * CategoryTheory.Triangulated.Deformation.stabilitySeminorm C
-          σ (τ.Z - σ.Z) + ENNReal.ofReal D
+        ENNReal.ofReal N * stabilitySeminorm C σ (τ.Z - σ.Z) + ENNReal.ofReal D
             < ENNReal.ofReal (S / 4) + ENNReal.ofReal (S / 4) :=
               ENNReal.add_lt_add hProd hDof
         _ = ENNReal.ofReal (S / 2) := by
@@ -377,11 +376,11 @@ theorem continuousAt_smul_identity
   obtain ⟨e, he, he8, heU⟩ :=
     CategoryTheory.Triangulated.exists_basisNhd_subset_of_mem_nhds C σ hU'
   obtain ⟨d, hd, hd8, hmaps⟩ := exists_identity_basisNhd_control σ he he8
-  have hdOpen : IsOpen (CategoryTheory.Triangulated.Deformation.basisNhd C σ d) :=
+  have hdOpen : IsOpen (basisNhd C σ d) :=
     TopologicalSpace.isOpen_generateFrom_of_mem ⟨σ, d, hd, hd8, rfl⟩
-  have hdNhd : CategoryTheory.Triangulated.Deformation.basisNhd C σ d ∈ nhds σ :=
+  have hdNhd : basisNhd C σ d ∈ nhds σ :=
     hdOpen.mem_nhds
-      (CategoryTheory.Triangulated.Deformation.self_mem_basisNhd C σ hd (by linarith))
+      (self_mem_basisNhd C σ hd (by linarith))
   rw [nhds_prod_eq]
   apply Filter.mem_of_superset (Filter.prod_mem_prod hmaps hdNhd)
   intro p hp
@@ -478,4 +477,4 @@ noncomputable instance combinedContinuousSMulStability :
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

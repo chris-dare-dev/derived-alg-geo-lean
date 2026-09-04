@@ -9,7 +9,7 @@ import MathFormalContract
 # The three-coordinate stability distance
 
 This file adds the mass coordinate to the two-coordinate `slicingDist` of
-`StabilityCondition/Foundation/Deformation/SlicingDistance.lean`.  For every
+`WeakStabilityCondition/StabilityCondition/Foundation/Deformation/SlicingDistance.lean`.  For every
 nonzero object it takes the maximum of
 
 * the `φ⁺` discrepancy;
@@ -19,7 +19,7 @@ nonzero object it takes the maximum of
 The supremum of those objectwise terms is an `ℝ≥0∞`-valued symmetric extended
 pseudodistance and satisfies the triangle inequality.
 
-`StabilityCondition/Metric/Mass/Uniqueness.lean` proves that the choice-free definition of
+`WeakStabilityCondition/StabilityCondition/Metric/Mass/Uniqueness.lean` proves that the choice-free definition of
 `stabilityMass` is equal to the finite mass sum of every HN filtration.
 `logMassDist` is nevertheless defined on all of `ℝ≥0∞`: it places `⊤` at
 infinite distance from finite values and at distance zero from itself.  On the
@@ -119,7 +119,7 @@ def stabilityDistTerm (σ τ : StabilityCondition.WithClassMap C v) (E : C)
 
 /-- The three-coordinate, `ℝ≥0∞`-valued stability distance. -/
 @[cites "stmt:a520a8d4f877:bridgeland2007.prop-8.1" (relation := no_claim)
-        (note := "The same three-coordinate formula, with stabilityMass proved equal to the finite mass sum of every HN filtration. StabilityCondition/Metric/Distance/Separation.lean proves separation for ordinary stability conditions and for surjective class maps. The comparison with the Section 6 topology is proved unconditionally as stabilityDistanceTopologyCompatible in StabilityCondition/Metric/Mass/Subadditivity/Triangle/Consequences.lean: full-distance balls are a neighbourhood basis for the basisNhd topology. The citation stays no_claim pending exact-head source-faithfulness review; no topology or metric instance is installed.")]
+        (note := "The same three-coordinate formula, with stabilityMass proved equal to the finite mass sum of every HN filtration. WeakStabilityCondition/StabilityCondition/Metric/Distance/Separation.lean proves separation for ordinary stability conditions and for surjective class maps. The comparison with the Section 6 topology is proved unconditionally as stabilityDistanceTopologyCompatible in WeakStabilityCondition/StabilityCondition/Metric/Mass/Subadditivity/Triangle/Consequences.lean: full-distance balls are a neighbourhood basis for the basisNhd topology. The citation stays no_claim pending exact-head source-faithfulness review; no topology or metric instance is installed.")]
 def stabilityDist (σ τ : StabilityCondition.WithClassMap C v) : ℝ≥0∞ :=
   ⨆ (E : C) (hE : ¬IsZero E), stabilityDistTerm σ τ E hE
 

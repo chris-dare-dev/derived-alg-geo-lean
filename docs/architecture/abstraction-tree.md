@@ -1,8 +1,8 @@
 # Canonical roots and specialization trees
 
 This document is the repository contract for reusable abstractions.  The
-subject dependency DAG in `layers.md` decides which top-level subject may
-import which other subject.  This document decides the finer question: when
+dependency contract in `layers.md` decides which imports are forbidden
+between subjects.  This document decides the finer question: when
 two constructions share mathematical structure, where does that structure
 live and how do the specializations relate to it?
 
@@ -34,9 +34,38 @@ This is the ownership target. Existing reverse edges are tracked defects to
 burn down, not exceptions that authorize more leaf-to-root imports.
 
 ```text
+Bicategory                              Mathlib higher-categorical root
+├─ Adjunction of 1-morphisms
+│  ├─ adjoint equivalences and mates
+│  └─ Cat specialization ≃ ordinary functor adjunction
+└─ Pseudofunctor
+   ├─ equivalence transport of Cat presentations
+   └─ fiberwise object properties / full subpseudofunctors
+
 Category
+├─ Limits and colimits
+│  ├─ preservation through composition
+│  └─ reflective transport using an ordinary adjunction
 ├─ Preadditive
+│  ├─ Triangulated category              Mathlib root
+│  │  └─ Semiorthogonal decomposition
+│  │     ├─ ExceptionalCollection
+│  │     ├─ OrthogonalExceptionalBlocks  positive blocks and residual
+│  │     ├─ RightProjectionData          chosen adjoint and universal Hom
+│  │     └─ mutation / projection chains objectwise cones and iteration
 │  └─ Linear k C                         Mathlib root
+│     └─ SerreFunctorData                duality on Hom spaces
+│        ├─ SerreCategoryData            chosen Serre autoequivalence
+│        │  └─ EnriquesCategoryData      square-to-shift refinement
+│        ├─ IsSphericalObject            two-degree self-Hom profile
+│        ├─ IsPseudoprojectiveObject     interval self-Hom profile
+│        ├─ Ext profiles / transport     Serre-compatible equivalences
+│        └─ classification data          supplied paper conclusions
+├─ Abelian                               Mathlib typeclass
+│  ├─ weak-Serre exactness               repository generic extension
+│  └─ DerivedCategory C                  generic construction
+│     └─ OppositeComparison C            explicit derived/opposite bridge
+│        └─ exact ModuleCat linear dual  categorical specialization
 ├─ FiniteExactTower
 │  └─ FiniteFiltration                    zero-to-object endpoint refinement
 │     └─ almost-disconnected witness       scheme-geometric leaf
@@ -46,65 +75,197 @@ Category
 │  ├─ H0 C
 │  └─ IsPretriangulated C
 │     └─ Enhancement T                   comparison data, not a class
+├─ Derived-category extensions
+│  └─ Ext adjunction / dimension shift / resolution naturality
+├─ filtered-complex spectral sequences
+├─ Moduli
+│  └─ BoundednessProblem                 neutral boundedness predicate
 ├─ GrothendieckPresentation
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
+│  │  ├─ Realization := K₀ C →+ A        additive target
+│  │  │  └─ Descends                    commuting realization square
+│  │  └─ EulerForm := K₀ C →+ K₀ C →+ ℤ
+│  │     ├─ ofLinear                    canonical linear-category pairing
+│  │     └─ Preserves                   exact-functor compatibility
 │  └─ K₀dg := K₀ (H0 C)                 reuse, not a third presentation
 └─ Sites / descent / stacks in groupoids
+   ├─ over-site functoriality
+   │  └─ cocontinuity of `Over.post`
+   ├─ `CoversTop` equivalence transport
+   ├─ Sheaves
+   │  ├─ coverwise detection of local equivalences
+   │  ├─ constant pullback and cohomology pushforward
+   │  └─ module sheaves on a ringed site
+   │     ├─ restriction to an over site
+   │     ├─ exact forgetful functor
+   │     ├─ finite-presentation transport
+   │     │  ├─ isomorphism invariance / cover locality
+   │     │  └─ zero objects / short-exact extensions
+   │     └─ intrinsic IsInvertible
+   │        ├─ rank-one local trivializations
+   │        ├─ arbitrary-site tensor descent
+   │        └─ topological specialization
+   │           ├─ stalk/tensor comparison
+   │           └─ stalkwise arbitrary-factor strengthening
+   ├─ site-theoretic Čech complexes and derived comparison
+   │  └─ compact-basis and finite-cover boundedness
    └─ scheme-site realizations
 
+LinearAlgebra
+├─ finite free integral lattices          Mathlib: [Module.Finite ℤ Λ] [Module.Free ℤ Λ]
+│  └─ NumericalVarietyData.NumericalQuotient finite by Module.Finite.quotient; free, once
+│                                            torsion-free, by Module.free_of_finite_type_torsion_free'
+└─ weighted-basis graded pieces
+   ├─ internal direct-sum decomposition
+   └─ NumericalRingData.ofGradedBasis        geometric numerical consumer
+
 Algebra
-└─ saturation of an additive subgroup
-   └─ saturated quotient and torsion-free universal property
+├─ ordinary ring and module theory
+│  └─ module localization
+│     └─ kernel maps                       consumed by coherent-sheaf geometry
+├─ numerical polynomials on integer lattices
+│  ├─ mixed finite differences and degree
+│  └─ top multilinear coefficients
+│     └─ Snapper polynomiality             geometric Picard/coherent consumer
+├─ multivariate polynomials
+│  └─ division by monomials                consumed by projective localization
+├─ saturation of an additive subgroup
+│  └─ saturated quotient and torsion-free universal property
+└─ relative numerical algebra
+   ├─ indexed sums and saturated family-relation quotients
+   └─ additive-map images and finite-index-overlattice predicates
 
 AlgebraicGeometry
-├─ scheme module sheaves
+├─ SheafOfModules(X)
+│  ├─ QuasicoherentSheaf(X)
+│  │  └─ CoherentSheaf(X)
+│  │     ├─ Abelian instance under geometric hypotheses
+│  │     └─ DerivedCategory (Coh X)     consumes the generic construction
 │  ├─ sheafified tensor / MonoidalCategory X.Modules
 │  │  ├─ intrinsic IsInvertible as ObjectProperty.IsMonoidal
 │  │  │  ├─ InvertibleSheaf              inherited full monoidal subcategory
 │  │  │  └─ pullback preservation        theorem inherited by every consumer
+│  │  ├─ Picard classes                  consume intrinsic IsInvertible
 │  │  └─ Functor.Monoidal pullback input standard tensor/unit comparison surface
 │  └─ LineBundleData                     invertible sheaf plus chosen tensor inverse
 │     ├─ determinant and Picard interpretations
 │     ├─ monoidal pullback and projection formula
 │     └─ almost-disconnected graded pieces   scheme-geometric leaf
-├─ scheme-derived category
-│  ├─ Dqc
+├─ scheme-derived category                     `DerivedCategory/`
+│  ├─ Dqc                                      neutral geometric locus
+│  │  ├─ canonical zero                        owned by Dqc, all schemes
+│  │  └─ explicit comparison evidence          representatives, not instances
 │  ├─ bounded coherent locus
-│  └─ perfect / relative-perfect loci
+│  ├─ scheme pullback and geometric kernels
+│  └─ absolute perfect locus                   thick envelope in `D(Coh X)`
+│     └─ essential image in Dqc
+│        └─ compact objects                    only with explicit evidence
+├─ relative-perfect locus over `p : X ⟶ S`     `Moduli/PerfectComplex/Relative`
+│  └─ pseudo-coherent + finite Tor amplitude   not absolute perfection by definition
+├─ two-term determinant presentation           explicit finite-locally-free resolution
+│  └─ absolute perfect degree-zero object       proved comparison adapter
 ├─ numerical K-theory
-│  └─ Euler quotient
-│     └─ relative numerical quotient              uses Algebra root
-│        └─ family-relation system                 statement-layer adapter
+│  ├─ Euler quotient
+│  │  └─ future scheme-specific relation generators consume Algebra root
+│  └─ Riemann--Roch and Mukai transfer
+│     └─ consume categorical K₀ realizations and Euler forms
 ├─ moduli
-│  ├─ replete subprestack
-│  ├─ boundedness witness
+│  ├─ fiberwise replete locus selector     not a subprestack
+│  ├─ finite-type boundedness witness      consumes selector + generic predicate
+│  ├─ affine stable subprestack            consumes pseudofunctor object property
 │  ├─ stack presentation
 │  └─ perfect-complex specialization
-└─ stability in families                 final geometric adapter
+└─ stability on scheme-derived categories      `DerivedCategory/Stability/`, the one
+                                               stability-consuming child
 ```
 
 The arrows implied by this tree point downwards from consumers to roots.  In
 particular:
 
+- do not introduce a second adjunction hierarchy: reuse Mathlib's
+  `Bicategory.Adjunction`, and recover ordinary adjoint functors through the
+  bicategory `Cat`; place results that merely assume an adjunction with their
+  actual conclusion, such as limit preservation or derived `Ext`;
 - do not add `KLinearCategory`; use Mathlib's `Preadditive` and `Linear` and
   bridge `DGLinear` to them;
 - do not add a coherent, derived, dg, projective-space, or relative sibling of
   the Grothendieck group presentation; specialize the canonical presentation
   and prove comparison maps;
-- keep quotient mechanics such as additive-subgroup saturation in `Algebra`;
-  the relative numerical leaf supplies only its fibre groups and geometric
-  relation generators through the family-relation system; scheme connectivity
-  and relative perfection are proved by geometric inhabitants, not stored as
-  inert fields in the numerical root;
-- generic stacks, replete subprestacks, boundedness, and presentation data do
-  not import stability-condition modules;
+- represent additive K₀ targets and categorical Euler pairings by the canonical
+  `K₀.Realization` and `K₀.EulerForm` aliases. Their descent and preservation
+  laws stay with the triangulated Grothendieck-group root; geometric
+  `IsRiemannRoch`, Euler-transfer, and Mukai-pairing theorems consume them;
+- keep indexed additive-group sums, additive-subgroup saturation,
+  family-relation systems, additive-map images, and finite-index-overlattice
+  predicates in `Algebra/RelativeNumerical`; a geometric consumer must
+  introduce actual schemes, connectivity, relative perfection, or other
+  geometric data and import this root directly;
+- keep integer-lattice numerical functions, mixed forward differences,
+  finite-difference degree, Newton coefficients, and top multilinear
+  coefficients in `Algebra/NumericalPolynomial`; Snapper's theorem imports
+  that root and adds the Picard, coherent-sheaf, and Euler-characteristic data;
+- do not add a class for finite free abelian groups: Mathlib's `Module.Finite ℤ`
+  and `Module.Free ℤ` instances are the interface, and freeness of a finitely
+  generated torsion-free group is Mathlib's instance
+  `Module.free_of_finite_type_torsion_free'`; the numerical Euler-radical
+  quotient supplies those hypotheses and nothing else;
+- keep ordinary module theory under `Algebra`, generic sheaves under
+  `CategoryTheory/Sites/Sheaves`, module sheaves on ringed sites under
+  `Algebra/Category/ModuleCat/Sheaf` where Mathlib defines `SheafOfModules`,
+  and only the scheme-indexed `SheafOfModules(X) -> QCoh(X) -> Coh(X)`
+  refinements under algebraic geometry; in particular, coherent-sheaf kernels directly reuse
+  the module-localization kernel maps rather than owning them;
+- keep detection of additive-presheaf local equivalences on a `CoversTop`
+  family under the generic site/sheaf root; scheme charts and sheafified
+  tensor constructions only consume that theorem chain;
+- keep cocontinuity of `Over.post`, module-sheaf restriction to over sites,
+  and equivalence transport of `CoversTop` families under the generic site and
+  sheaf roots; open-immersion geometry consumes them only after introducing
+  schemes and their open-set sites;
+- keep restriction of presentations, generating sections, and quasicoherent
+  presentation data under the generic ringed-site presentation root; affine
+  geometry consumes that API only when it introduces `Spec R` and basic opens;
+- keep isomorphism invariance, over-site preservation, and covering-family
+  descent of finite presentation under the same generic presentation root;
+  coherent-sheaf geometry consumes them only for `coherent X` and affine-open
+  criteria;
+- keep stalk/tensor comparisons for module presheaves under
+  `Topology/Sheaves/ModuleTensor/`: their use of open neighbourhoods, germs,
+  and stalk functors makes them topological specializations of arbitrary-site
+  sheaf theory, not ordinary module algebra;
 - put the sheafified tensor and its coherence on all scheme-module sheaves;
   invertible sheaves inherit that root through `ObjectProperty.IsMonoidal`, and
   pullback monoidality uses Mathlib's `Functor.Monoidal` rather than a parallel
   capability class;
-- a paper-specific module may instantiate these roots but never becomes a root
+- keep basiswise detection of topological sheaf isomorphisms under
+  `Topology/Sheaves/Basis.lean`; affine comparison consumes it only after
+  introducing `Spec R`, distinguished opens, and module localization;
+- keep identities involving the lattice and categorical products of
+  prime-spectrum opens under `RingTheory/Spectrum/Prime/`, where Mathlib
+  defines `basicOpen`; neither the ring input nor the topological output
+  moves them;
+- extend Mathlib's abelian-category hierarchy under `CategoryTheory/Abelian`
+  and make the geometric proof that `Coh(X)` is abelian an input to the generic
+  derived-category construction;
+- generic stacks, replete subprestacks, and boundedness predicates do not
+  import stability-condition or geometric modules; scheme presentations and
+  finite-type witnesses remain geometric consumers;- a paper-specific module may instantiate these roots but never becomes a root
   imported by them.
+- keep exceptional blocks, residual right orthogonals, chosen right-adjoint
+  projections, objectwise mutation and projection-chain arguments, Serre
+  duality, Enriques-category relations, and spherical or pseudoprojective
+  self-Hom profiles and transport under the generic triangulated-category
+  root.  Kernel-presented exceptional-block extension remains under the
+  Fourier--Mukai root.  A surface-specific residual category reuses those
+  structures and binds the candidates to projections of its actual line
+  bundles; the numerical curve chain is geometric, while its derived triangle
+  and the functorial kernel cone remain explicit inputs until constructed.
+
+Bicategories are the first implemented higher-categorical stage. A future
+general `n`-category or `(∞,1)`-category layer must name its formal model and
+its comparison with this spine; an empty directory does not establish an
+abstraction relationship.
 
 ## Root review before a new structure
 
@@ -143,7 +304,7 @@ and classical versus derived moduli truncations.
 
 The policy is partly mechanical and partly a review obligation:
 
-- `scripts/check_layering.py` enforces the top-level dependency DAG;
+- `scripts/check_layering.py` enforces the policy edges in `layers.md`;
 - `scripts/check_umbrella_coverage.py` keeps every specialization in the public
   tree;
 - `scripts/check_single_instantiation.py` rejects new thin abstractions in the
@@ -155,5 +316,5 @@ The policy is partly mechanical and partly a review obligation:
 
 The projective-families roadmap carries the first finer-grained burn-down:
 generic stack roots move out of scheme geometry, moduli-to-stability reverse
-imports are removed, and the relative numerical K-group is built as a quotient
-of the existing K-theory spine.
+imports are removed, and geometric relative numerical K-theory consumes the
+indexed quotient machinery rooted in ordinary algebra.

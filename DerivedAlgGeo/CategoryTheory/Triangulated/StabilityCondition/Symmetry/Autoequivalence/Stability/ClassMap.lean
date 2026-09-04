@@ -11,7 +11,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Aut
 /-!
 # The class-map-compatible autoequivalence action
 
-`StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean` produced `actStabAut`: a well-defined *map* on
+`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean` produced `actStabAut`: a well-defined *map* on
 `StabilityCondition.WithClassMap C v`, and said so carefully, because the thing
 doing the acting was a **pair** `(Φ, lam)` and `AutQuot` groups the `Φ`s alone.
 
@@ -69,7 +69,7 @@ open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 universe w u u'
 
@@ -237,7 +237,7 @@ def mk (a : AutPair v) : AutPairQuot v := _root_.Quotient.mk _ a
 
 /-- **The `Aut` half of §8, as a group action.**
 
-This is the statement `StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean` could not make. -/
+This is the statement `WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean` could not make. -/
 noncomputable instance mulAction :
     MulAction (AutPairQuot v) (StabilityCondition.WithClassMap C v) where
   smul q σ := _root_.Quotient.liftOn q (fun a => a.act σ) (fun _ _ h => AutPair.act_congr h σ)
@@ -269,4 +269,4 @@ def toAutQuot : AutPairQuot v →* AutQuot C where
 
 end AutPairQuot
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

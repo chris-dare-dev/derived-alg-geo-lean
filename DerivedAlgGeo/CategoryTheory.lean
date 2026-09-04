@@ -2,25 +2,28 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.ConstantSheafPullback
-import DerivedAlgGeo.CategoryTheory.ExtAdjunction
+import DerivedAlgGeo.CategoryTheory.Abelian
+import DerivedAlgGeo.CategoryTheory.Bicategory
 import DerivedAlgGeo.CategoryTheory.FiniteFiltration
-import DerivedAlgGeo.CategoryTheory.SheafCohomologyPushforward
-import DerivedAlgGeo.CategoryTheory.TopologicalSheafCohomologyPushforward
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
-import DerivedAlgGeo.CategoryTheory.ExtDimensionShift
-import DerivedAlgGeo.CategoryTheory.WeakSerreExact
-import DerivedAlgGeo.CategoryTheory.DGCategory
+import DerivedAlgGeo.CategoryTheory.Limits
+import DerivedAlgGeo.CategoryTheory.Monoidal
+import DerivedAlgGeo.CategoryTheory.ModuleCat
 import DerivedAlgGeo.CategoryTheory.Sites
 import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated
-import DerivedAlgGeo.CategoryTheory.EquivalenceTransport
-import DerivedAlgGeo.CategoryTheory.PseudofunctorObjectProperty
-import DerivedAlgGeo.CategoryTheory.StabilityCharge
+import DerivedAlgGeo.CategoryTheory.Moduli
+import DerivedAlgGeo.CategoryTheory.Linear
+import DerivedAlgGeo.CategoryTheory.Localization
+import DerivedAlgGeo.CategoryTheory.MorphismProperty
+import DerivedAlgGeo.CategoryTheory.Preadditive
 
 /-! # Category theory
 
-Dg categories, t-structures, the constant-sheaf/pullback comparison, generic
-sheaf-cohomology statements, and the categorical foundations of Bridgeland
-stability conditions.
+Bicategories and their adjunctions; ordinary categories, limits, abelian and
+monoidal categories; t-structures, dg enhancements, Cat-valued pseudofunctors,
+neutral moduli interfaces, site-theoretic sheaves, and the categorical
+foundations of Bridgeland stability conditions. Derived categories, the
+homotopy category, spectral sequences, and dg categories extend Mathlib's
+homological algebra and live under `Algebra/Homology/`.
 -/

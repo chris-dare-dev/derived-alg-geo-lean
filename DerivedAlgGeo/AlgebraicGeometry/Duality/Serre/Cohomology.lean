@@ -3,8 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Additivity
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.Duality.Canonical.Derived
-import DerivedAlgGeo.AlgebraicGeometry.Duality.Serre.LinearDual
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.LinearDual
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Determinant
 import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.Surface.Number
 import Mathlib.Algebra.Homology.DerivedCategory.Basic
@@ -37,23 +38,18 @@ universe u
 open CategoryTheory
 open scoped BigOperators
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry.Duality.Serre
 
 open AlgebraicGeometry
 open AlgebraicGeometry.Cohomology
+open AlgebraicGeometry.DerivedCategory
 
 variable {k : Type u} [Field k]
-variable {X : SmoothProperVariety k} {n : ℕ}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}
 
 noncomputable section
-
-local instance coherentHasDerivedCategory :
-    HasDerivedCategory.{u + 1} (Coh X.toVariety.toScheme) :=
-  HasDerivedCategory.standard _
-
-local instance moduleHasDerivedCategory :
-    HasDerivedCategory (ModuleCat.{u + 1} k) :=
-  HasDerivedCategory.standard _
 
 /-- The derived-category form of the missing Serre-duality construction.
 
@@ -62,34 +58,33 @@ the shift `[-n]`.  It is now constructed rather than supplied as an arbitrary fi
 remaining categorical input on this side is the explicit comparison
 `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory (Cᵒᵖ)`, which the pinned Mathlib does not yet bundle.
 The dualizing object itself is the constructed `K.dualizingComplex = ω_X[n]`. -/
-structure DerivedStatement (K : X.CanonicalSheafData n) where
+structure DerivedStatement (K : SmoothProperVariety.CanonicalSheafData k X n) where
   /-- Derived global sections with its base-field-linear target. -/
   rGlobalSections :
-    DerivedCategory (Coh X.toVariety.toScheme) ⥤
+    SchemeCoherentDerivedCategory X ⥤
       DerivedCategory (ModuleCat.{u + 1} k)
   /-- Derived Hom into the chosen dualizing object. -/
   rHomDualizing :
-    (DerivedCategory (Coh X.toVariety.toScheme))ᵒᵖ ⥤
+    (SchemeCoherentDerivedCategory X)ᵒᵖ ⥤
       DerivedCategory (ModuleCat.{u + 1} k)
   /-- Comparison between the opposite derived category and the derived category of the opposite
   module category. -/
-  oppositeDerived : ModuleCat.DerivedOppositeComparison k
+  oppositeDerived : CategoryTheory.DerivedCategory.OppositeComparison
+    (ModuleCat.{u + 1} k)
   /-- The derived Serre-duality isomorphism. -/
   dualityIso :
     rHomDualizing ≅ rGlobalSections.op ⋙
-      ModuleCat.DerivedOppositeComparison.derivedLinearDualShift
-        k oppositeDerived (-(n : ℤ))
+      ModuleCat.derivedLinearDualShift k oppositeDerived (-(n : ℤ))
 
 namespace DerivedStatement
 
-variable {K : X.CanonicalSheafData n}
+variable {K : SmoothProperVariety.CanonicalSheafData k X n}
 
 /-- The constructed derived linear-dual functor followed by the dimension shift. -/
 noncomputable def linearDualShift (S : DerivedStatement K) :
     (DerivedCategory (ModuleCat.{u + 1} k))ᵒᵖ ⥤
       DerivedCategory (ModuleCat.{u + 1} k) :=
-  ModuleCat.DerivedOppositeComparison.derivedLinearDualShift
-    k S.oppositeDerived (-(n : ℤ))
+  ModuleCat.derivedLinearDualShift k S.oppositeDerived (-(n : ℤ))
 
 /-- The dualizing object associated to a derived Serre statement is the constructed
 canonical complex `ω_X[n]`. -/
@@ -98,7 +93,7 @@ noncomputable abbrev dualizingObject (_ : DerivedStatement K) := K.dualizingComp
 /-- The canonical shift identification attached to every derived Serre statement. -/
 noncomputable def canonicalShiftIso (_ : DerivedStatement K) :
     K.dualizingComplex ≅
-      (DerivedCategory.singleFunctor (Coh X.toVariety.toScheme) (n : ℤ)).obj
+      (DerivedCategory.singleFunctor (Coh X) (n : ℤ)).obj
         K.canonicalCohObject :=
   K.dualizingComplexIso
 
@@ -106,7 +101,7 @@ end DerivedStatement
 
 section Ext
 
-local instance : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
+local instance : HasExt.{u + 1} (Coh X) :=
   HasExt.standard _
 
 /-- Explicit coherent Serre-duality data relative to a finite-cohomology realization.
@@ -116,38 +111,38 @@ local instance : HasExt.{u + 1} (Coh X.toVariety.toScheme) :=
 structure from being an unrelated replacement.  Perfection is carried by the linear
 equivalence `duality`; it is not asserted as a proposition with no map.
 -/
-structure Data (K : X.CanonicalSheafData n) (D : FiniteCohomology X.toVariety) where
+structure Data (K : SmoothProperVariety.CanonicalSheafData k X n) (D : FiniteCohomology k X) where
   /-- The derived-category statement from which this realization is intended to be extracted. -/
   derived : DerivedStatement K
   /-- A base-field-linear realization of `Ext^j(F, ω_X)`. -/
-  extSpace : Coh X.toVariety.toScheme → ℕ → ModuleCat.{u + 1} k
+  extSpace : Coh X → ℕ → ModuleCat.{u + 1} k
   /-- Forgetting scalars recovers Mathlib's actual Ext group. -/
-  extComparison : ∀ (F : Coh X.toVariety.toScheme) (j : ℕ),
+  extComparison : ∀ (F : Coh X) (j : ℕ),
     (forget₂ (ModuleCat.{u + 1} k) AddCommGrpCat.{u + 1}).obj (extSpace F j) ≅
       AddCommGrpCat.of (Abelian.Ext.{u + 1} F K.canonicalCohObject j)
   /-- The Ext spaces are finite-dimensional. -/
-  extFinite : ∀ (F : Coh X.toVariety.toScheme) (j : ℕ),
+  extFinite : ∀ (F : Coh X) (j : ℕ),
     Module.Finite k (extSpace F j)
   /-- Perfect coherent Serre duality in every degree in the geometric range. -/
-  duality : ∀ (F : Coh X.toVariety.toScheme) (i : ℕ) (_hi : i ≤ n),
+  duality : ∀ (F : Coh X) (i : ℕ) (_hi : i ≤ n),
     Module.Dual k ((D.moduleH i).obj F) ≃ₗ[k] extSpace F (n - i)
   /-- Cohomology above the relative dimension vanishes. -/
-  vanishesAboveDimension : ∀ (F : Coh X.toVariety.toScheme) (i : ℕ), n < i →
+  vanishesAboveDimension : ∀ (F : Coh X) (i : ℕ), n < i →
     Subsingleton ((D.moduleH i).obj F)
 
 namespace Data
 
-variable {K : X.CanonicalSheafData n}
-variable {D : FiniteCohomology X.toVariety} (S : Data K D)
+variable {K : SmoothProperVariety.CanonicalSheafData k X n}
+variable {D : FiniteCohomology k X} (S : Data K D)
 
 /-- The coherent cohomology-level Serre-duality equivalence in the geometric range. -/
-noncomputable def coherentDualityEquiv (F : Coh X.toVariety.toScheme)
+noncomputable def coherentDualityEquiv (F : Coh X)
     (i : ℕ) (hi : i ≤ n) :
     Module.Dual k ((D.moduleH i).obj F) ≃ₗ[k] S.extSpace F (n - i) :=
   S.duality F i hi
 
 /-- The perfect pairing `H^i(X,F) × Ext^(n-i)(F,ω_X) → k` extracted from duality. -/
-def pairing (F : Coh X.toVariety.toScheme) (i : ℕ) (hi : i ≤ n) :
+def pairing (F : Coh X) (i : ℕ) (hi : i ≤ n) :
     (D.moduleH i).obj F →ₗ[k] S.extSpace F (n - i) →ₗ[k] k where
   toFun x :=
     { toFun := fun y ↦ (S.duality F i hi).symm y x
@@ -163,14 +158,14 @@ def pairing (F : Coh X.toVariety.toScheme) (i : ℕ) (hi : i ≤ n) :
     exact map_smul ((S.duality F i hi).symm z) r x
 
 @[simp]
-theorem pairing_apply (F : Coh X.toVariety.toScheme) (i : ℕ) (hi : i ≤ n)
+theorem pairing_apply (F : Coh X) (i : ℕ) (hi : i ≤ n)
     (x : (D.moduleH i).obj F) (y : S.extSpace F (n - i)) :
     S.pairing F i hi x y = (S.duality F i hi).symm y x :=
   rfl
 
 /-- The displayed coherent Serre pairing is perfect in Mathlib's standard sense: both induced
 maps to the opposite dual space are bijective. -/
-noncomputable instance pairing_isPerfPair (F : Coh X.toVariety.toScheme)
+noncomputable instance pairing_isPerfPair (F : Coh X)
     (i : ℕ) (hi : i ≤ n) :
     (S.pairing F i hi).IsPerfPair := by
   letI := D.finite i F
@@ -182,7 +177,7 @@ noncomputable instance pairing_isPerfPair (F : Coh X.toVariety.toScheme)
   exact he.flip
 
 /-- Perfection gives equality of the cohomology and complementary Ext dimensions. -/
-theorem dimension_eq_ext (F : Coh X.toVariety.toScheme) (i : ℕ) (hi : i ≤ n) :
+theorem dimension_eq_ext (F : Coh X) (i : ℕ) (hi : i ≤ n) :
     D.dimension F i = Module.finrank k (S.extSpace F (n - i)) := by
   letI := D.finite i F
   letI := S.extFinite F (n - i)
@@ -191,19 +186,19 @@ theorem dimension_eq_ext (F : Coh X.toVariety.toScheme) (i : ℕ) (hi : i ≤ n)
 /-- A locally free specialization identifies Ext with the cohomology of
 `Fᵛ ⊗ ω_X`.  The dual twist is explicit because the present sheaf API does not yet construct
 internal Hom or prove its coherence automatically. -/
-structure LocallyFreeSpecialization (F : Coh X.toVariety.toScheme) where
+structure LocallyFreeSpecialization (F : Coh X) where
   /-- A fixed finite locally free certificate for `F`. -/
   rank : ℕ
   locallyFree : Scheme.Modules.FiniteLocallyFreeData F.1 rank
   /-- The coherent sheaf representing `Fᵛ ⊗ ω_X`. -/
-  dualCanonicalTwist : Coh X.toVariety.toScheme
+  dualCanonicalTwist : Coh X
   /-- `Ext^j(F,ω_X)` is the `j`th cohomology of the dual canonical twist. -/
   extToCohomology : ∀ j : ℕ,
     S.extSpace F j ≃ₗ[k] (D.moduleH j).obj dualCanonicalTwist
 
 namespace LocallyFreeSpecialization
 
-variable {S} {F : Coh X.toVariety.toScheme}
+variable {S} {F : Coh X}
 variable (L : S.LocallyFreeSpecialization F)
 
 /-- For a finite locally-free sheaf, coherent Serre duality becomes
@@ -221,7 +216,7 @@ theorem dimension_symmetry (i : ℕ) (hi : i ≤ n) :
 
 /-- The Euler characteristic may be summed exactly through the geometric dimension. -/
 theorem eulerCharacteristic_eq_sum_dimension
-    (S : Data K D) (G : Coh X.toVariety.toScheme) :
+    (S : Data K D) (G : Coh X) :
     D.eulerCharacteristic G =
       ∑ i ∈ Finset.range (n + 1), (-1 : ℤ) ^ i * D.dimension G i := by
   simpa only [FiniteCohomology.eulerCharacteristic, FiniteCohomology.dimension,
@@ -315,8 +310,8 @@ their dual canonical twists are identified in the Picard group. -/
 structure SurfacePicardSymmetry
     {C : D.LinearConnectingSystem}
     (I : AlgebraicGeometry.IntersectionTheory.Number.IntersectionContext D C 2)
-    (canonicalClass : Scheme.Modules.Pic X.toVariety.toScheme) where
-  symmetry : ∀ L : Scheme.Modules.Pic X.toVariety.toScheme,
+    (canonicalClass : Scheme.Modules.Pic X) where
+  symmetry : ∀ L : Scheme.Modules.Pic X,
     I.eulerPic L = I.eulerPic (canonicalClass * L⁻¹)
 
 /-- Geometric line-bundle representatives realizing the Picard Euler function and their
@@ -324,19 +319,19 @@ locally free Serre-dual twists. -/
 structure SurfaceLineBundleFamily
     {C : D.LinearConnectingSystem}
     (I : AlgebraicGeometry.IntersectionTheory.Number.IntersectionContext D C 2)
-    (canonicalClass : Scheme.Modules.Pic X.toVariety.toScheme) where
+    (canonicalClass : Scheme.Modules.Pic X) where
   /-- The geometric relative dimension is two. -/
   dimension_eq_two : n = 2
   /-- A coherent representative of each Picard class. -/
-  representative : Scheme.Modules.Pic X.toVariety.toScheme → Coh X.toVariety.toScheme
+  representative : Scheme.Modules.Pic X → Coh X
   /-- Locally free Serre duality for every representative. -/
-  specialization : ∀ L : Scheme.Modules.Pic X.toVariety.toScheme,
+  specialization : ∀ L : Scheme.Modules.Pic X,
     S.LocallyFreeSpecialization (representative L)
   /-- The representative realizes the intrinsic Picard Euler value. -/
-  representativeEuler : ∀ L : Scheme.Modules.Pic X.toVariety.toScheme,
+  representativeEuler : ∀ L : Scheme.Modules.Pic X,
     D.eulerCharacteristic (representative L) = I.eulerPic L
   /-- Its dual canonical twist realizes `K_X ⊗ L⁻¹`. -/
-  dualEuler : ∀ L : Scheme.Modules.Pic X.toVariety.toScheme,
+  dualEuler : ∀ L : Scheme.Modules.Pic X,
     D.eulerCharacteristic (specialization L).dualCanonicalTwist =
       I.eulerPic (canonicalClass * L⁻¹)
 
@@ -344,7 +339,7 @@ namespace SurfaceLineBundleFamily
 
 variable {C : D.LinearConnectingSystem}
 variable {I : AlgebraicGeometry.IntersectionTheory.Number.IntersectionContext D C 2}
-variable {canonicalClass : Scheme.Modules.Pic X.toVariety.toScheme}
+variable {canonicalClass : Scheme.Modules.Pic X}
 
 /-- Locally free Serre duality for the chosen representatives proves Picard Euler symmetry. -/
 theorem toSurfacePicardSymmetry
@@ -364,7 +359,7 @@ namespace SurfacePicardSymmetry
 
 variable {C : D.LinearConnectingSystem}
 variable {I : AlgebraicGeometry.IntersectionTheory.Number.IntersectionContext D C 2}
-variable {canonicalClass : Scheme.Modules.Pic X.toVariety.toScheme}
+variable {canonicalClass : Scheme.Modules.Pic X}
 
 /-- The trivial line bundle and the canonical bundle have the same Euler characteristic. -/
 theorem canonical (P : SurfacePicardSymmetry I canonicalClass) :
@@ -373,7 +368,7 @@ theorem canonical (P : SurfacePicardSymmetry I canonicalClass) :
 
 /-- K3 sign check: when the canonical class is trivial, `χ(L) = χ(L⁻¹)`. -/
 theorem k3 (P : SurfacePicardSymmetry I canonicalClass)
-    (hK : canonicalClass = 1) (L : Scheme.Modules.Pic X.toVariety.toScheme) :
+    (hK : canonicalClass = 1) (L : Scheme.Modules.Pic X) :
     I.eulerPic L = I.eulerPic L⁻¹ := by
   simpa [hK] using P.symmetry L
 

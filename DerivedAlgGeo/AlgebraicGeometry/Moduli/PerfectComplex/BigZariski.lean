@@ -5,7 +5,7 @@ Released under the MIT license.
 import Mathlib.AlgebraicGeometry.Sites.BigZariski
 import Mathlib.CategoryTheory.Sites.Over
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Presheaf
-import DerivedAlgGeo.CategoryTheory.Sites.StackInGroupoids
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 
 /-!
 # The relative-perfect presheaf on the big Zariski site over a base
@@ -33,10 +33,14 @@ big-Zariski covering family.
   equivalence with Čech descent data.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Bicategory
-open CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open Opposite
 
 noncomputable section

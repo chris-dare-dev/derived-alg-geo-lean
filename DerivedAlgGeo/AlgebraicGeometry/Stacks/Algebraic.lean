@@ -222,7 +222,7 @@ class StackMorphism.HasRepresentableProperty
     (P : MorphismProperty Scheme.{u}) (f : StackMorphism F G) : Prop where
   representation {S : Scheme.{u}}
     (y : G.presheaf.obj (.mk (op S))) :
-    Nonempty (f.FiberRepresentationWithProperty P y)
+    Nonempty (StackMorphism.FiberRepresentationWithProperty f P y)
 
 namespace StackMorphism
 
@@ -231,7 +231,7 @@ variable {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
 
 /-- Forgetting the geometric property recovers ordinary representability. -/
 theorem isRepresentable_of_hasRepresentableProperty
-    [f.HasRepresentableProperty P] : f.IsRepresentable := by
+    [HasRepresentableProperty P f] : f.IsRepresentable := by
   constructor
   intro S y
   obtain ⟨R⟩ := HasRepresentableProperty.representation (P := P) (f := f) y
@@ -240,7 +240,7 @@ theorem isRepresentable_of_hasRepresentableProperty
 /-- Representable properties are monotone under implication of the underlying
 scheme-morphism properties. -/
 theorem hasRepresentableProperty_mono (hPQ : P ≤ Q)
-    [f.HasRepresentableProperty P] : f.HasRepresentableProperty Q := by
+    [HasRepresentableProperty P f] : HasRepresentableProperty Q f := by
   constructor
   intro S y
   obtain ⟨R⟩ := HasRepresentableProperty.representation (P := P) (f := f) y
@@ -254,7 +254,7 @@ corresponding scheme-theoretic pullback. -/
 theorem representableZariskiStackMap_hasRepresentableProperty
     (P : MorphismProperty Scheme.{u}) [P.IsStableUnderBaseChange]
     {X Y : Scheme.{u}} (f : X ⟶ Y) (hf : P f) :
-    (representableZariskiStackMap f).HasRepresentableProperty P := by
+    StackMorphism.HasRepresentableProperty P (representableZariskiStackMap f) := by
   constructor
   intro S y
   exact ⟨{
@@ -266,27 +266,27 @@ representing scheme morphisms of all fibers. -/
 abbrev StackMorphism.IsLocallyOfFinitePresentation
     {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
     (f : StackMorphism F G) : Prop :=
-  f.HasRepresentableProperty @LocallyOfFinitePresentation
+  StackMorphism.HasRepresentableProperty @LocallyOfFinitePresentation f
 
 /-- A smooth-surjective stack cover is representable and every representing
 scheme morphism is both smooth and surjective. -/
 abbrev StackMorphism.IsSmoothSurjective
     {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
     (f : StackMorphism F G) : Prop :=
-  f.HasRepresentableProperty (@Smooth ⊓ @Surjective)
+  StackMorphism.HasRepresentableProperty (@Smooth ⊓ @Surjective) f
 
 /-- An open immersion of stacks is representable and is an open immersion
 on every actual scheme representing one of its fibers. -/
 abbrev StackMorphism.IsOpenImmersion
     {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
     (f : StackMorphism F G) : Prop :=
-  f.HasRepresentableProperty @AlgebraicGeometry.IsOpenImmersion
+  StackMorphism.HasRepresentableProperty @AlgebraicGeometry.IsOpenImmersion f
 
 /-- The identity atlas of every representable stack is an actual
 smooth-surjective representable morphism. -/
 theorem representableZariskiStackMap_id_isSmoothSurjective
     (X : Scheme.{u}) :
-    (representableZariskiStackMap (𝟙 X)).IsSmoothSurjective :=
+    StackMorphism.IsSmoothSurjective (representableZariskiStackMap (𝟙 X)) :=
   representableZariskiStackMap_hasRepresentableProperty
     (@Smooth ⊓ @Surjective) (𝟙 X) ⟨inferInstance, inferInstance⟩
 
@@ -294,7 +294,8 @@ theorem representableZariskiStackMap_id_isSmoothSurjective
 of finite presentation on all actual fiber schemes. -/
 theorem representableZariskiStackMap_id_isLocallyOfFinitePresentation
     (X : Scheme.{u}) :
-    (representableZariskiStackMap (𝟙 X)).IsLocallyOfFinitePresentation :=
+    StackMorphism.IsLocallyOfFinitePresentation
+      (representableZariskiStackMap (𝟙 X)) :=
   representableZariskiStackMap_hasRepresentableProperty
     @LocallyOfFinitePresentation (𝟙 X) inferInstance
 
@@ -302,7 +303,7 @@ theorem representableZariskiStackMap_id_isLocallyOfFinitePresentation
 representable big-Zariski stacks, checked on the actual pullback schemes. -/
 theorem representableZariskiStackMap_isOpenImmersion
     {X Y : Scheme.{u}} (f : X ⟶ Y) [IsOpenImmersion f] :
-    (representableZariskiStackMap f).IsOpenImmersion :=
+    StackMorphism.IsOpenImmersion (representableZariskiStackMap f) :=
   representableZariskiStackMap_hasRepresentableProperty
     @AlgebraicGeometry.IsOpenImmersion f inferInstance
 
@@ -330,13 +331,15 @@ class StackInGroupoids.HasRepresentableDiagonal
     (F : StackInGroupoids Scheme.{u} Scheme.zariskiTopology) : Prop where
   representation {S : Scheme.{u}}
     (x y : F.presheaf.obj (.mk (op S))) :
-    Nonempty (F.DiagonalFiberRepresentation x y)
+    Nonempty
+      (AlgebraicGeometry.StackInGroupoids.DiagonalFiberRepresentation F x y)
 
 /-- For a representable stack, the diagonal fiber over two maps `x,y : S ⟶ X`
 is the scheme-theoretic equalizer of those maps. -/
 def representableZariskiDiagonalFiberRepresentation
     {X S : Scheme.{u}} (x y : Discrete (S ⟶ X)) :
-    (representableZariskiStack X).DiagonalFiberRepresentation x y where
+    AlgebraicGeometry.StackInGroupoids.DiagonalFiberRepresentation
+      (representableZariskiStack X) x y where
   representing := Over.mk (equalizer.ι x.as y.as)
   isomorphismEquiv T :=
     { toFun := fun a ↦ Discrete.eqToIso (by
@@ -364,7 +367,8 @@ def representableZariskiDiagonalFiberRepresentation
 
 instance representableZariskiStack_hasRepresentableDiagonal
     (X : Scheme.{u}) :
-    (representableZariskiStack X).HasRepresentableDiagonal where
+    AlgebraicGeometry.StackInGroupoids.HasRepresentableDiagonal
+      (representableZariskiStack X) where
   representation x y :=
     ⟨representableZariskiDiagonalFiberRepresentation x y⟩
 
@@ -381,7 +385,8 @@ structure ZariskiStackPresentation where
   /-- The diagonal is represented by schemes via its isomorphism functors.
   The scheme-level representability is explicit because it is stronger than
   the usual algebraic-space diagonal condition. -/
-  schemeDiagonal : toStackInGroupoids.HasRepresentableDiagonal
+  schemeDiagonal : AlgebraicGeometry.StackInGroupoids.HasRepresentableDiagonal
+    toStackInGroupoids
   /-- The scheme presenting the stack. -/
   atlasScheme : Scheme.{u}
   /-- The atlas morphism from the corresponding representable stack. -/
@@ -389,7 +394,7 @@ structure ZariskiStackPresentation where
     toStackInGroupoids
   /-- Every base change of the atlas is an actual smooth-surjective scheme
   morphism. -/
-  atlasSmoothSurjective : atlas.IsSmoothSurjective
+  atlasSmoothSurjective : StackMorphism.IsSmoothSurjective atlas
 
 /-- Every representable big-Zariski stack has a Zariski presentation using its
 identity atlas and its scheme-theoretic equalizer diagonal. -/
@@ -415,7 +420,7 @@ structure ZariskiStackPresentationOver (S : Scheme.{u}) where
   /-- Local finite presentation is checked on all scheme representatives of
   the structural morphism. -/
   locallyOfFinitePresentation :
-    structureMorphism.IsLocallyOfFinitePresentation
+    StackMorphism.IsLocallyOfFinitePresentation structureMorphism
 
 /-- A locally finitely presented scheme morphism gives a locally finitely
 presented big-Zariski presentation over the target.  All fiber representatives

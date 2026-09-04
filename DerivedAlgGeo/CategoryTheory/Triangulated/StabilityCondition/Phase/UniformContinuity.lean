@@ -10,7 +10,7 @@ import Mathlib.Topology.UniformSpace.Compact
 # Uniform continuity of normalized phase shifts
 
 `Slicing.IsLocallyFinite`
-(`StabilityCondition/Foundation/StabilityCondition.lean`) quantifies **one**
+(`WeakStabilityCondition/StabilityCondition/Foundation/StabilityCondition.lean`) quantifies **one**
 radius `η` over
 **all** centres `t`: every window `(t - η, t + η)` must have finite-length
 objects. A normalized shift distorts windows, so transporting local finiteness
@@ -27,7 +27,7 @@ that transfer, and `uniformContinuous` is the argument.
 local finiteness.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 namespace NormalizedShift
 
@@ -133,4 +133,4 @@ theorem exists_radius (f : NormalizedShift) {w M : ℝ} (hw : 0 < w) (hM : 0 < M
 
 end NormalizedShift
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

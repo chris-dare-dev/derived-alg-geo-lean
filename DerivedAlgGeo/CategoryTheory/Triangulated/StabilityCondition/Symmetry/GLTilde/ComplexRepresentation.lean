@@ -21,7 +21,7 @@ They do, and `cplxCoord_exp` is the proof: under `Complex.basisOneI` (whose
 `![cos (π φ), sin (π φ)]`, which is exactly `rayVec φ`.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix
 
@@ -30,7 +30,7 @@ noncomputable def cplxCoord : ℂ ≃ₗ[ℝ] (Fin 2 → ℝ) :=
   Complex.basisOneI.equivFun
 
 /-- **The conventions agree.** The stability foundation writes its rays as
-`exp (i π φ)` (`StabilityCondition/Foundation/PreStabilityCondition.lean`); in
+`exp (i π φ)` (`WeakStabilityCondition/StabilityCondition/Foundation/PreStabilityCondition.lean`); in
 `basisOneI` coordinates that is `rayVec φ`.
 
 Proved through `Complex.basisOneI.repr` rather than `Basis.equivFun_apply`:
@@ -48,7 +48,7 @@ theorem cplxCoord_exp (φ : ℝ) :
 
 It says `T` carries the charge-ray at phase `φ` to the charge-ray at phase
 `f φ`, entirely in the `exp (i π ·)` vocabulary of
-`StabilityCondition/Foundation/PreStabilityCondition.lean`. -/
+`WeakStabilityCondition/StabilityCondition/Foundation/PreStabilityCondition.lean`. -/
 theorem compat_exp {T : Matrix.GLPos (Fin 2) ℝ} {f : NormalizedShift}
     (h : Compatible T f) (φ : ℝ) :
     ∃ r : ℝ, 0 < r ∧
@@ -104,4 +104,4 @@ theorem actC_exp {T : Matrix.GLPos (Fin 2) ℝ} {f : NormalizedShift}
   refine ⟨r, hr, ?_⟩
   rw [actC_apply, hry, map_smul, LinearEquiv.symm_apply_apply]
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

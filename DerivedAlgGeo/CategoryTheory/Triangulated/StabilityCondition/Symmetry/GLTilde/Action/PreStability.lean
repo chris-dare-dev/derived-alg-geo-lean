@@ -38,7 +38,7 @@ Note this file does **not** need `[IsTriangulated C]`:
 `PreStabilityCondition.WithClassMap` does not depend on it.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
@@ -55,10 +55,10 @@ variable {Λ : Type u'} [AddCommGroup Λ] (v : K₀ C →+ Λ)
 /-- `x = (T, f)` acting on a prestability condition: `f` relabels the slicing,
 `T` transforms the central charge. -/
 def actPre (x : GLTilde) (σ : PreStabilityCondition.WithClassMap C v) :
-    PreStabilityCondition.WithClassMap C v where
-  slicing := x • σ.slicing
-  Z := (actC x.mat).toAddMonoidHom.comp σ.Z
-  compatible φ E hP hE := by
+    PreStabilityCondition.WithClassMap C v :=
+  PreStabilityCondition.WithClassMap.ofStrict
+    (x • σ.slicing) ((actC x.mat).toAddMonoidHom.comp σ.Z) (by
+    intro φ E hP hE
     -- `hP : (x • σ.slicing).P φ E` is *definitionally* `σ.slicing.P (f⁻¹ φ) E`,
     -- which is why it can be handed straight to the old `compat'`.
     obtain ⟨m, hm, hZ⟩ := σ.compatible (x.shift⁻¹.toOrderIso φ) E hP hE
@@ -75,7 +75,7 @@ def actPre (x : GLTilde) (σ : PreStabilityCondition.WithClassMap C v) :
     rw [hZ, ← Complex.real_smul, map_smul, hr']
     simp only [Complex.real_smul]
     push_cast
-    ring
+    ring)
 
 @[simp]
 theorem actPre_slicing (x : GLTilde) (σ : PreStabilityCondition.WithClassMap C v) :
@@ -116,4 +116,4 @@ theorem smul_pre_Z (x : GLTilde) (σ : PreStabilityCondition.WithClassMap C v) (
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

@@ -5,8 +5,8 @@ Released under the MIT license.
 import Mathlib.AlgebraicGeometry.Fiber
 import Mathlib.AlgebraicGeometry.Morphisms.FinitePresentation
 import Mathlib.RingTheory.Flat.Basic
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.Dqc
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.OpenImmersionPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Comparison
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.OpenImmersionPullback
 
 /-!
 # Relative-perfect and universally-gluable complexes
@@ -36,7 +36,10 @@ namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Dqc
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open scoped ZeroObject
 
 noncomputable section
@@ -191,6 +194,34 @@ typeclass arguments in the category abbreviation. -/
 abbrev SchemeRelativePerfectCategory {X S : Scheme.{u}} (p : X ⟶ S) :=
   (schemeRelativePerfect p).FullSubcategory
 
+namespace SchemeRelativePerfectCategory
+
+/-- A relative-perfect object with bounded coherent cohomology has a
+`Dᵇ(Coh X)` representative once the bounded-coherent `Dqc` identification is
+supplied explicitly. -/
+theorem exists_boundedCoherentRepresentative {X S : Scheme.{u}}
+    [IsLocallyNoetherian X] {p : X ⟶ S}
+    (h : HasBoundedCoherentDqcIdentification X)
+    (E : SchemeRelativePerfectCategory p)
+    (hE : schemeBoundedCoherentCohomology X E.obj) :
+    ∃ F : SchemeBoundedCoherentDerivedCategory X,
+      Nonempty (((boundedCoherentDerivedToDqc X).obj F).obj ≅ E.obj) := by
+  let E' : SchemeBoundedCoherentDqcCategory X := ⟨E.obj, hE⟩
+  refine ⟨boundedCoherentRepresentative X h E', ⟨?_⟩⟩
+  exact (SchemeBoundedCoherentDqcCategory.ι X).mapIso
+    (boundedCoherentRepresentativeIso X h E')
+
+/-- For a relative-perfect object, the explicit compact/perfect comparison
+identifies membership in the absolute perfect locus with compactness in
+`Dqc(X)`. -/
+theorem perfect_iff_compact {X S : Scheme.{u}} [IsLocallyNoetherian X]
+    {p : X ⟶ S} (h : PerfectObjectsAreCompactInDqc X)
+    (E : SchemeRelativePerfectCategory p) :
+    schemePerfectInDqc X E.obj ↔ IsCompactObject.{0} E.obj :=
+  schemePerfectInDqc_iff_isCompact X h E.obj
+
+end SchemeRelativePerfectCategory
+
 /-- A global stalkwise-flat model used to compute one geometric fiber. This
 does not inhabit the arbitrary left-derived pullback interface: it records the
 precise model from which the displayed fiber object is computed. -/
@@ -269,7 +300,7 @@ instance schemeUniversallyGluableRelativePerfect_isClosedUnderIsomorphisms
 abbrev SchemeUniversallyGluableCategory {X S : Scheme.{u}} (p : X ⟶ S) :=
   (schemeUniversallyGluableRelativePerfect p).FullSubcategory
 
-/-! ## A concrete zero model -/
+/-! ## Concrete models for the canonical Dqc zero -/
 
 /-- The zero cochain complex of module sheaves, named explicitly because the
 object-level `0` notation is not exported by every derived-category import. -/
@@ -281,83 +312,27 @@ theorem zeroModuleComplex_isZero (X : Scheme.{u}) :
     IsZero (zeroModuleComplex X) :=
   HomologicalComplex.isZero_zero
 
-/-- The localized zero complex. -/
-def zeroSchemeDerivedObject (X : Scheme.{u}) : SchemeDerivedCategory X :=
-  (SchemeDerivedCategory.Q X).obj (zeroModuleComplex X)
-
-/-- The localized zero complex is a zero object in the derived category. -/
-theorem zeroSchemeDerivedObject_isZero (X : Scheme.{u}) :
-    IsZero (zeroSchemeDerivedObject X) :=
-  (SchemeDerivedCategory.Q X).map_isZero (zeroModuleComplex_isZero X)
-
-/-- The zero complex of coherent sheaves. -/
-def zeroCoherentComplex (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    CochainComplex (Coh X) ℤ :=
-  HomologicalComplex.zero
-
-/-- The localized zero coherent complex. -/
-def zeroCoherentDerivedObject (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    SchemeCoherentDerivedCategory X :=
-  DerivedCategory.Q.obj (zeroCoherentComplex X)
-
-/-- The localized zero coherent complex is a zero object. -/
-theorem zeroCoherentDerivedObject_isZero
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    IsZero (zeroCoherentDerivedObject X) :=
-  DerivedCategory.Q.map_isZero HomologicalComplex.isZero_zero
-
-/-- The zero coherent complex as a bounded object. -/
-def zeroBoundedCoherentDerivedObject
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    SchemeBoundedCoherentDerivedCategory X :=
-  ⟨zeroCoherentDerivedObject X,
-    ⟨⟨0, (DerivedCategory.TStructure.t (C := Coh X)).isGE_of_isZero
-      (zeroCoherentDerivedObject_isZero X) 0⟩,
-     ⟨0, (DerivedCategory.TStructure.t (C := Coh X)).isLE_of_isZero
-      (zeroCoherentDerivedObject_isZero X) 0⟩⟩⟩
-
-/-- The bounded zero coherent complex is a zero object. -/
-theorem zeroBoundedCoherentDerivedObject_isZero
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    IsZero (zeroBoundedCoherentDerivedObject X) :=
-  IsZero.of_full_of_faithful_of_isZero DerivedCategory.Bounded.ι _
-    (zeroCoherentDerivedObject_isZero X)
-
-/-- The zero object in the honest quasi-coherent-cohomology locus. -/
-def SchemeQuasicoherentDerivedCategory.zero
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    SchemeQuasicoherentDerivedCategory X :=
-  (boundedCoherentDerivedToDqc X ⋙
-    SchemeBoundedCoherentDqcCategory.ι X).obj
-      (zeroBoundedCoherentDerivedObject X)
-
-/-- The honest `Dqc` zero model is a zero object after forgetting to the
-ambient all-sheaf derived category. -/
-theorem schemeQuasicoherentDerivedCategory_zero_obj_isZero
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :
-    IsZero (SchemeQuasicoherentDerivedCategory.zero X).obj :=
-  by
-    change IsZero ((coherentDerivedInclusion X).obj
-      (zeroCoherentDerivedObject X))
-    letI : (coherentDerivedInclusion X).Additive := by
-      dsimp [coherentDerivedInclusion]
-      infer_instance
-    exact (coherentDerivedInclusion X).map_isZero
-      (zeroCoherentDerivedObject_isZero X)
-
 /-- The zero object is pseudo-coherent. -/
 theorem schemePseudoCoherent_zero
-    (X : Scheme.{u}) [IsLocallyNoetherian X] :
+    (X : Scheme.{u}) :
     schemePseudoCoherent X (SchemeQuasicoherentDerivedCategory.zero X) := by
-  let Z := (boundedCoherentDerivedToDqc X).obj
-    (zeroBoundedCoherentDerivedObject X)
+  have hZ := SchemeQuasicoherentDerivedCategory.zero_obj_isZero X
   constructor
-  · exact Z.property.1.2
-  · exact Z.property.2
+  · exact ⟨0,
+      (DerivedCategory.TStructure.t (C := X.Modules)).isLE_of_isZero hZ 0⟩
+  · intro n
+    let H := (DerivedCategory.homologyFunctor X.Modules n).obj
+      (SchemeQuasicoherentDerivedCategory.zero X).obj
+    have hH : IsZero H :=
+      (DerivedCategory.homologyFunctor X.Modules n).map_isZero hZ
+    obtain ⟨Z, hZ', hP⟩ :=
+      (Scheme.coherent X).exists_prop_of_containsZero
+    exact (Scheme.coherent X).prop_of_iso
+      (IsZero.iso hZ' hH) hP
 
 /-- The zero object has a local finite-Tor-amplitude chart at every point. -/
 def zeroLocalFiniteTorAmplitudeChart {X S : Scheme.{u}}
-    [IsLocallyNoetherian X] (p : X ⟶ S) (x : X) :
+    (p : X ⟶ S) (x : X) :
     LocalFiniteTorAmplitudeChart p
       (SchemeQuasicoherentDerivedCategory.zero X) x where
   openSubset := ⊤
@@ -394,30 +369,29 @@ def zeroLocalFiniteTorAmplitudeChart {X S : Scheme.{u}}
       (zeroModuleComplex_isZero ((⊤ : X.Opens).toScheme)))
     ((SchemeBaseChange.derivedPullback
       (relativeOpenTo p ⊤)).map_isZero
-        (schemeQuasicoherentDerivedCategory_zero_obj_isZero X))
+        (SchemeQuasicoherentDerivedCategory.zero_obj_isZero X))
 
 /-- The zero object has locally finite Tor amplitude over every base. -/
 theorem schemeLocallyFiniteTorAmplitudeOver_zero {X S : Scheme.{u}}
-    [IsLocallyNoetherian X] (p : X ⟶ S) :
+    (p : X ⟶ S) :
     schemeLocallyFiniteTorAmplitudeOver p
       (SchemeQuasicoherentDerivedCategory.zero X) :=
   fun x ↦ ⟨zeroLocalFiniteTorAmplitudeChart p x⟩
 
 /-- The zero object is relative perfect. -/
 theorem schemeRelativePerfect_zero {X S : Scheme.{u}}
-    [IsLocallyNoetherian X] (p : X ⟶ S) :
+    (p : X ⟶ S) :
     schemeRelativePerfect p (SchemeQuasicoherentDerivedCategory.zero X) :=
   ⟨schemePseudoCoherent_zero X, schemeLocallyFiniteTorAmplitudeOver_zero p⟩
 
 /-- The zero total complex computes the zero object on every geometric
 fiber. -/
-def zeroGeometricFiberModel {X S : Scheme.{u}} [IsLocallyNoetherian X]
-    (p : X ⟶ S) (s : S) :
+def zeroGeometricFiberModel {X S : Scheme.{u}} (p : X ⟶ S) (s : S) :
     GeometricFiberModel p (SchemeQuasicoherentDerivedCategory.zero X) s where
   totalModel := zeroModuleComplex X
   represents := IsZero.iso
     ((SchemeDerivedCategory.Q X).map_isZero (zeroModuleComplex_isZero X))
-    (schemeQuasicoherentDerivedCategory_zero_obj_isZero X)
+    (SchemeQuasicoherentDerivedCategory.zero_obj_isZero X)
   flatOverBase i x := by
     letI : PreservesFiniteLimits (SchemeBaseChange.moduleStalkFunctor X x) :=
       SchemeBaseChange.moduleStalkFunctor_preservesFiniteLimits X x
@@ -432,8 +406,7 @@ def zeroGeometricFiberModel {X S : Scheme.{u}} [IsLocallyNoetherian X]
     exact Module.Flat.of_free
 
 /-- The zero relative-perfect object is universally gluable. -/
-def universallyGluableDataZero {X S : Scheme.{u}} [IsLocallyNoetherian X]
-    (p : X ⟶ S) :
+def universallyGluableDataZero {X S : Scheme.{u}} (p : X ⟶ S) :
     UniversallyGluableData p
       (SchemeQuasicoherentDerivedCategory.zero X) where
   fiberModel := zeroGeometricFiberModel p
@@ -446,7 +419,7 @@ def universallyGluableDataZero {X S : Scheme.{u}} [IsLocallyNoetherian X]
 /-- The relative-perfect universally-gluable locus is nonempty: it contains
 the zero complex for every flat locally finitely presented family. -/
 theorem schemeUniversallyGluableRelativePerfect_zero
-    {X S : Scheme.{u}} [IsLocallyNoetherian X] (p : X ⟶ S) :
+    {X S : Scheme.{u}} (p : X ⟶ S) :
     schemeUniversallyGluableRelativePerfect p
       (SchemeQuasicoherentDerivedCategory.zero X) :=
   ⟨schemeRelativePerfect_zero p, ⟨universallyGluableDataZero p⟩⟩

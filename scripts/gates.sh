@@ -160,6 +160,10 @@ exe_sorry() {
   # The one file the emitter cannot cover: an `lean_exe` root is not part of the
   # environment built from its own imports. CI runs the same loop; see the
   # "No declaration uses sorry" step in .github/workflows/ci.yml.
+  # RestateHistoricalNames is deliberately outside both library umbrellas, so
+  # a clean tree must build that executable-only dependency explicitly before
+  # elaborating exe/Restate.lean.
+  lake build DerivedAlgGeoSweep RestateHistoricalNames || return 1
   local log="$GATE_TMP"/exe-sorry-check.txt
   : > "$log"
   for f in exe/*.lean; do
@@ -221,6 +225,7 @@ if [ "$MODE" != "fast" ]; then
   gate source-independence python3 scripts/check_source_independence.py
   gate subject-layering python3 scripts/check_layering.py
   gate umbrella-coverage python3 scripts/check_umbrella_coverage.py
+  gate root-reachability python3 scripts/check_root_reachability.py
   gate coherent-families python3 scripts/check_coherent_families.py
   gate coverage-map python3 scripts/check_coverage_map.py
   gate audit-complete audit_complete

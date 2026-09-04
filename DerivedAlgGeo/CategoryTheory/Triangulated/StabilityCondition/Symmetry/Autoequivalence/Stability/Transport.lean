@@ -19,7 +19,7 @@ autoequivalence does the opposite, and this file carries it all the way to
 Three things had to line up, and each is the *dual* of the corresponding step
 in the `G̃L⁺(2, ℝ)` track:
 
-* **Slicing** — `Slicing.mapEquiv` (`StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean`), dual to `relabel`.
+* **Slicing** — `Slicing.mapEquiv` (`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean`), dual to `relabel`.
 * **Local finiteness** — `mapEquiv_isLocallyFinite` below. Dual to
   `relabel_isLocallyFinite`, but *easier*: the interval endpoints do not move
   (`mapEquiv_intervalProp_iff`), so the **same `η` works** and no
@@ -38,7 +38,7 @@ triangulated, so the triangle stays distinguished and all three vertices stay
 in the *same* window — then read the strict mono back off with
 `strictMono_strictEpi_of_distTriang`. This is exactly how
 `intervalInclusion_map_strictMono`
-(`StabilityCondition/Foundation/Slicing/IntervalFiniteTransfer.lean`) works.
+(`WeakStabilityCondition/StabilityCondition/Foundation/Slicing/IntervalFiniteTransfer.lean`) works.
 
 The heart route would not have worked: `toRightHeart` lands in the heart of
 `phaseShift C (b - 1)`, and the two slicings' hearts are different
@@ -63,7 +63,7 @@ property, not a group action. The acting object is a *pair* `(Φ, lam)`, and
 `AutQuot` groups the `Φ`s alone — enough for slicings, not once a class lattice
 is in play.
 
-`StabilityCondition/Symmetry/Autoequivalence/Stability/ClassMap.lean` bundles the pair and supplies the `MulAction`. **Nothing
+`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Stability/ClassMap.lean` bundles the pair and supplies the `MulAction`. **Nothing
 here is superseded by it**, and the split is worth keeping: that file needs
 `lam : Λ ≃+ Λ`, because a group needs `lam⁻¹` and nothing produces one, while
 `actStabAut` below asks only for `lam : Λ →+ Λ`. A non-invertible compatible
@@ -79,6 +79,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 namespace CategoryTheory.Triangulated
 
 open CategoryTheory.Triangulated
+open WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat
 
 universe w u u'
 
@@ -112,8 +113,7 @@ theorem autFunctor_strictMono (s : Slicing C) (a b : ℝ)
   let S : ShortComplex ((s.mapEquiv Φ).IntervalCat C a b) :=
     ShortComplex.mk f (cokernel.π f) (cokernel.condition f)
   have hsse : StrictShortExact S :=
-    CategoryTheory.Triangulated.Deformation.Slicing.IntervalCat.strictShortExact_cokernel
-      C f hf
+    strictShortExact_cokernel C f hf
   obtain ⟨δ, hδ⟩ :=
     CategoryTheory.Triangulated.Slicing.IntervalCat.exists_distinguished_of_strictShortExact
       C (s.mapEquiv Φ) hsse
@@ -154,8 +154,7 @@ theorem autFunctor_isAdmissibleSubobject (s : Slicing C) (a b : ℝ)
   refine ⟨F.obj Y, F.obj Q, F.map i, inferInstance, F.map q, ?_, δ', ?_⟩
   · subst A
     have hcanonical : IsStrictMono (Subobject.mk i).arrow :=
-      CategoryTheory.Triangulated.Deformation.Slicing.IntervalCat.subobject_arrow_strictMono
-        C i hiStrict
+      subobject_arrow_strictMono C i hiStrict
     have hcanonicalMap : IsStrictMono (F.map (Subobject.mk i).arrow) :=
       autFunctor_strictMono Φ s a b _ hcanonical
     letI : Mono (F.map (Subobject.mk i).arrow) := hcanonicalMap.mono
@@ -224,7 +223,7 @@ theorem mapEquiv_isLocallyFinite (s : Slicing C) (hs : s.IsLocallyFinite C) :
 
 section ClassMap
 
--- `Λ` gets its own universe, as in `StabilityCondition/Symmetry/GLTilde/Action/Stability.lean`: nothing here
+-- `Λ` gets its own universe, as in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean`: nothing here
 -- relates the class lattice to the category's universe, and tying them
 -- together would make this track strictly less general than the `GL⁺` one.
 variable {Λ : Type u'} [AddCommGroup Λ] (v : K₀ C →+ Λ)
@@ -240,9 +239,9 @@ noncomputable def actStabAut (lam : Λ →+ Λ)
     (hlam : ∀ x : K₀ C, v (K₀.map Φ.inverse x) = lam (v x))
     (σ : StabilityCondition.WithClassMap C v) : StabilityCondition.WithClassMap C v where
   toWithClassMap :=
-    { slicing := CategoryTheory.Triangulated.Slicing.mapEquiv σ.slicing Φ
-      Z := σ.Z.comp lam
-      compatible := by
+    PreStabilityCondition.WithClassMap.ofStrict
+      (CategoryTheory.Triangulated.Slicing.mapEquiv σ.slicing Φ)
+      (σ.Z.comp lam) (by
         intro φ E hP hE
         have hE' : ¬ IsZero (Φ.inverse.obj E) := fun h =>
           hE (IsZero.of_iso (Φ.functor.map_isZero h) (Φ.counitIso.app E).symm)
@@ -250,7 +249,7 @@ noncomputable def actStabAut (lam : Λ →+ Λ)
         refine ⟨m, hm, ?_⟩
         show σ.Z (lam (v (K₀.of C E))) = _
         rw [← hlam, K₀.map_of]
-        exact hZ }
+        exact hZ)
   locallyFinite := mapEquiv_isLocallyFinite Φ σ.slicing σ.locallyFinite
 
 @[simp] theorem actStabAut_slicing (lam : Λ →+ Λ) (hlam) (σ) :

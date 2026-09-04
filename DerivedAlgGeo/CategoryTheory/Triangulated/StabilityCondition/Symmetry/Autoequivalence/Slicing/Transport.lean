@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Slicing
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Slicing.PhaseBounds
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.PhaseBounds
 import Mathlib.CategoryTheory.Triangulated.Functor
 import Mathlib.CategoryTheory.Shift.Adjunction
 
@@ -145,7 +145,7 @@ noncomputable def HNFiltration.mapF {P : ℝ → ObjectProperty C}
 /-- Transport a slicing along a triangulated auto-equivalence:
 `(Φ • s).P φ X = s.P φ (Φ⁻¹ X)`.
 
-Dual to `CategoryTheory.Triangulated.StabilityCondition.GroupAction.relabel`, which moves phases
+Dual to `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.relabel`, which moves phases
 and fixes
 objects.
 

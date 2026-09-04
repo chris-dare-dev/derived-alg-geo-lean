@@ -51,15 +51,15 @@ open Polynomial
 open scoped BigOperators
 
 variable {k : Type u} [Field k]
-variable {X : Variety k}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
 noncomputable section
 
 /-! ## Rational homogeneous coefficients -/
 
 /-- Scale every Picard direction by the same integer and take the resulting mixed coefficient. -/
-def scaledPicardCoefficient (classes : List (Pic X.toScheme))
-    (f : Pic X.toScheme → ℤ) (z : ℤ) : ℤ :=
+def scaledPicardCoefficient (classes : List (Pic X))
+    (f : Pic X → ℤ) (z : ℤ) : ℤ :=
   picardCoefficient (classes.map fun L ↦ L ^ z) f
 
 /-- The degree-`d` rational interpolation of an integer-valued function, using the nodes
@@ -75,11 +75,11 @@ For `r = classes.length`, this is the coefficient of `z^r` in the degree-`d` int
 coefficient; below top degree it removes the higher-degree contamination present in a raw
 finite difference. -/
 noncomputable def homogeneousPicardCoefficient (d : ℕ)
-    (classes : List (Pic X.toScheme)) (f : Pic X.toScheme → ℤ) : ℚ :=
+    (classes : List (Pic X)) (f : Pic X → ℤ) : ℚ :=
   (interpolatingPolynomial d (scaledPicardCoefficient classes f)).coeff classes.length
 
-theorem picardMixedDifference_add (classes : List (Pic X.toScheme))
-    (f g : Pic X.toScheme → ℤ) :
+theorem picardMixedDifference_add (classes : List (Pic X))
+    (f g : Pic X → ℤ) :
     picardMixedDifference classes (f + g) =
       picardMixedDifference classes f + picardMixedDifference classes g := by
   induction classes with
@@ -89,15 +89,15 @@ theorem picardMixedDifference_add (classes : List (Pic X.toScheme))
       simp only [picardMixedDifference_cons, picardDifference, Pi.add_apply, ih]
       omega
 
-theorem picardCoefficient_add (classes : List (Pic X.toScheme))
-    (f g : Pic X.toScheme → ℤ) :
+theorem picardCoefficient_add (classes : List (Pic X))
+    (f g : Pic X → ℤ) :
     picardCoefficient classes (f + g) =
       picardCoefficient classes f + picardCoefficient classes g := by
   simp only [picardCoefficient, picardMixedDifference_add, Pi.add_apply]
 
 @[simp]
-theorem scaledPicardCoefficient_add (classes : List (Pic X.toScheme))
-    (f g : Pic X.toScheme → ℤ) :
+theorem scaledPicardCoefficient_add (classes : List (Pic X))
+    (f g : Pic X → ℤ) :
     scaledPicardCoefficient classes (f + g) =
       scaledPicardCoefficient classes f + scaledPicardCoefficient classes g := by
   funext z
@@ -113,7 +113,7 @@ theorem interpolatingPolynomial_add (d : ℕ) (q r : ℤ → ℤ) :
   simp
 
 theorem homogeneousPicardCoefficient_add (d : ℕ)
-    (classes : List (Pic X.toScheme)) (f g : Pic X.toScheme → ℤ) :
+    (classes : List (Pic X)) (f g : Pic X → ℤ) :
     homogeneousPicardCoefficient d classes (f + g) =
       homogeneousPicardCoefficient d classes f +
         homogeneousPicardCoefficient d classes g := by
@@ -121,16 +121,16 @@ theorem homogeneousPicardCoefficient_add (d : ℕ)
     homogeneousPicardCoefficient, scaledPicardCoefficient_add,
     interpolatingPolynomial_add, coeff_add]
 
-theorem scaledPicardCoefficient_eq_of_perm {classes classes' : List (Pic X.toScheme)}
-    (h : classes.Perm classes') (f : Pic X.toScheme → ℤ) :
+theorem scaledPicardCoefficient_eq_of_perm {classes classes' : List (Pic X)}
+    (h : classes.Perm classes') (f : Pic X → ℤ) :
     scaledPicardCoefficient classes f = scaledPicardCoefficient classes' f := by
   funext z
   exact picardCoefficient_eq_of_perm (h.map fun L ↦ L ^ z) f
 
 /-- Homogeneous coefficients are symmetric in their Picard directions. -/
 theorem homogeneousPicardCoefficient_eq_of_perm
-    {classes classes' : List (Pic X.toScheme)} (h : classes.Perm classes')
-    (d : ℕ) (f : Pic X.toScheme → ℤ) :
+    {classes classes' : List (Pic X)} (h : classes.Perm classes')
+    (d : ℕ) (f : Pic X → ℤ) :
     homogeneousPicardCoefficient d classes f =
       homogeneousPicardCoefficient d classes' f := by
   rw [homogeneousPicardCoefficient, homogeneousPicardCoefficient,
@@ -139,16 +139,16 @@ theorem homogeneousPicardCoefficient_eq_of_perm
 
 /-! ## Explicit realization in a numerical ring -/
 
-variable {D : FiniteCohomology X} {C : D.LinearConnectingSystem}
+variable {D : FiniteCohomology k X} {C : D.LinearConnectingSystem}
 variable {d : ℕ} {A : Type v} [CommRing A] [Algebra ℚ A]
 
 /-- The product of the degree-one realizations of a list of Picard classes. -/
-def divisorProduct (divisorClass : Additive (Pic X.toScheme) →+ A)
-    (classes : List (Pic X.toScheme)) : A :=
+def divisorProduct (divisorClass : Additive (Pic X) →+ A)
+    (classes : List (Pic X)) : A :=
   (classes.map fun L ↦ divisorClass (Additive.ofMul L)).prod
 
 omit [Algebra ℚ A] in
-@[simp] theorem divisorProduct_nil (divisorClass : Additive (Pic X.toScheme) →+ A) :
+@[simp] theorem divisorProduct_nil (divisorClass : Additive (Pic X) →+ A) :
     divisorProduct divisorClass [] = 1 :=
   rfl
 
@@ -156,20 +156,20 @@ omit [Algebra ℚ A] in
 
 `divisorPairing_ext` is the required nondegeneracy statement: divisor products separate the
 chosen graded pieces.  It is intentionally a field rather than an instance or theorem. -/
-structure PairingContext (D : FiniteCohomology X) (C : D.LinearConnectingSystem)
+structure PairingContext (D : FiniteCohomology k X) (C : D.LinearConnectingSystem)
     (d : ℕ) (A : Type v) [CommRing A] [Algebra ℚ A] where
   /-- The selected numerical-ring presentation. -/
   ring : NumericalRingData d A
   intersection : IntersectionContext D C d
-  divisorClass : Additive (Pic X.toScheme) →+ A
+  divisorClass : Additive (Pic X) →+ A
   divisorClass_mem : ∀ L, divisorClass L ∈ ring.piece 1
-  degree_divisorProduct : ∀ (L : Fin d → Pic X.toScheme),
+  degree_divisorProduct : ∀ (L : Fin d → Pic X),
     ring.degree (divisorProduct divisorClass (List.ofFn L)) =
       (intersection.picardIntersectionNumber L : ℚ)
   divisorPairing_ext : ∀ (i : ℕ), i ≤ d → ∀ {x y : A},
     x ∈ ring.piece i →
     y ∈ ring.piece i →
-    (∀ classes : List (Pic X.toScheme), classes.length = d - i →
+    (∀ classes : List (Pic X), classes.length = d - i →
       ring.degree (x * divisorProduct divisorClass classes) =
         ring.degree (y * divisorProduct divisorClass classes)) →
     x = y
@@ -179,26 +179,26 @@ namespace PairingContext
 variable (P : PairingContext D C d A)
 
 /-- The divisor-tested rational functional extracted from a coherent sheaf's twist polynomial. -/
-noncomputable def twistPairing {F : Coh X.toScheme}
-    (T : TwistContext D F d) (_i : ℕ) (classes : List (Pic X.toScheme)) : ℚ :=
+noncomputable def twistPairing {F : Coh X}
+    (T : TwistContext D F d) (_i : ℕ) (classes : List (Pic X)) : ℚ :=
   homogeneousPicardCoefficient d classes T.eulerPic
 
 /-- Existence data for representatives of all Todd-weighted components of one coherent sheaf.
 
 This is separate from `PairingContext.divisorPairing_ext`: existence and uniqueness are distinct
 hypotheses. -/
-structure ReconstructionData (F : Coh X.toScheme) where
+structure ReconstructionData (F : Coh X) where
   twists : TwistContext D F d
   rank : ℤ
   representable : ∀ (i : ℕ), i ≤ d → ∃ x : A,
     x ∈ P.ring.piece i ∧
-      ∀ classes : List (Pic X.toScheme), classes.length = d - i →
+      ∀ classes : List (Pic X), classes.length = d - i →
         P.ring.degree (x * divisorProduct P.divisorClass classes) =
           twistPairing twists i classes
 
 namespace ReconstructionData
 
-variable {P : PairingContext D C d A} {F G H : Coh X.toScheme}
+variable {P : PairingContext D C d A} {F G H : Coh X}
 
 /-- The unique chosen representative of the Todd-weighted component `tau_i(F)` when `i ≤ d`,
 and zero above the dimension. -/
@@ -214,7 +214,7 @@ theorem tauComponent_mem (R : P.ReconstructionData F) (i : ℕ) :
     exact Submodule.zero_mem _
 
 theorem degree_tauComponent_mul_divisorProduct (R : P.ReconstructionData F)
-    (i : ℕ) (hi : i ≤ d) (classes : List (Pic X.toScheme))
+    (i : ℕ) (hi : i ≤ d) (classes : List (Pic X))
     (hlength : classes.length = d - i) :
     P.ring.degree
         (R.tauComponent i * divisorProduct P.divisorClass classes) =
@@ -224,7 +224,7 @@ theorem degree_tauComponent_mul_divisorProduct (R : P.ReconstructionData F)
 
 theorem tauComponent_eq_of_twistPairing_eq
     (R : P.ReconstructionData F) (S : P.ReconstructionData G) (i : ℕ)
-    (hpair : ∀ classes : List (Pic X.toScheme), classes.length = d - i →
+    (hpair : ∀ classes : List (Pic X), classes.length = d - i →
       twistPairing R.twists i classes = twistPairing S.twists i classes) :
     R.tauComponent i = S.tauComponent i := by
   by_cases hi : i ≤ d
@@ -269,12 +269,12 @@ end PairingContext
 open PairingContext.ReconstructionData
 
 variable {P : PairingContext D C d A}
-variable {O : Coh X.toScheme} (RO : P.ReconstructionData O)
+variable {O : Coh X} (RO : P.ReconstructionData O)
 
 /-- The reconstructed Todd component is the Todd-weighted component of the structure sheaf. -/
 noncomputable def toddComponent (i : ℕ) : A := RO.tauComponent i
 
-variable {F : Coh X.toScheme}
+variable {F : Coh X}
 
 /-- Chern-character components recovered from `tau(F) = ch(F) * td(X)`, through degree four. -/
 noncomputable def chernCharacterComponent (R : P.ReconstructionData F) : ℕ → A
@@ -418,7 +418,7 @@ theorem tauComponent_four_eq (R : P.ReconstructionData F) :
 /-! ## Invariance and exact-sequence additivity -/
 
 theorem chernCharacterComponent_eq_of_eulerPic_eq
-    {G : Coh X.toScheme} (R : P.ReconstructionData F) (S : P.ReconstructionData G)
+    {G : Coh X} (R : P.ReconstructionData F) (S : P.ReconstructionData G)
     (hrank : R.rank = S.rank) (heuler : R.twists.eulerPic = S.twists.eulerPic) (i : ℕ) :
     chernCharacterComponent RO R i = chernCharacterComponent RO S i := by
   have htau : ∀ j, R.tauComponent j = S.tauComponent j :=
@@ -430,14 +430,14 @@ theorem chernCharacterComponent_eq_of_eulerPic_eq
 compared.  The comparison hypotheses stay explicit because a bare coherent-sheaf isomorphism
 does not choose compatible `ReconstructionData`. -/
 theorem chernCharacterComponent_iso
-    {G : Coh X.toScheme} (R : P.ReconstructionData F) (S : P.ReconstructionData G)
+    {G : Coh X} (R : P.ReconstructionData F) (S : P.ReconstructionData G)
     (_e : F ≅ G) (hrank : R.rank = S.rank)
     (heuler : R.twists.eulerPic = S.twists.eulerPic) (i : ℕ) :
     chernCharacterComponent RO R i = chernCharacterComponent RO S i :=
   chernCharacterComponent_eq_of_eulerPic_eq RO R S hrank heuler i
 
 theorem chernCharacterComponent_add
-    {G H : Coh X.toScheme} (R : P.ReconstructionData F)
+    {G H : Coh X} (R : P.ReconstructionData F)
     (S : P.ReconstructionData G) (Q : P.ReconstructionData H)
     (hrank : Q.rank = R.rank + S.rank)
     (heuler : Q.twists.eulerPic = R.twists.eulerPic + S.twists.eulerPic)
@@ -497,13 +497,13 @@ noncomputable def lineTauCandidate (x : A) (i : ℕ) : A :=
 
 This is the precise missing translation/representability input.  It is stated on the extracted
 twist coefficients, not as the desired Chern-character equality. -/
-structure LineBundleComparison (R : P.ReconstructionData F) (L : Pic X.toScheme) where
+structure LineBundleComparison (R : P.ReconstructionData F) (L : Pic X) where
   rank_eq_one : R.rank = 1
   candidate_mem : ∀ (i : ℕ), i ≤ d → i ≤ 4 →
     lineTauCandidate RO (P.divisorClass (Additive.ofMul L)) i ∈
       P.ring.piece i
   coefficient_formula : ∀ (i : ℕ), i ≤ d → i ≤ 4 →
-    ∀ classes : List (Pic X.toScheme), classes.length = d - i →
+    ∀ classes : List (Pic X), classes.length = d - i →
       PairingContext.twistPairing R.twists i classes =
         P.ring.degree
           (lineTauCandidate RO (P.divisorClass (Additive.ofMul L)) i *
@@ -513,7 +513,7 @@ structure LineBundleComparison (R : P.ReconstructionData F) (L : Pic X.toScheme)
 The conclusion uses both the stated representability and the explicit divisor-pairing
 nondegeneracy from `PairingContext`. -/
 theorem tauComponent_eq_lineTauCandidate
-    (R : P.ReconstructionData F) (L : Pic X.toScheme)
+    (R : P.ReconstructionData F) (L : Pic X)
     (Q : LineBundleComparison RO R L) (i : ℕ) (hi : i ≤ d) (hi4 : i ≤ 4) :
     R.tauComponent i = lineTauCandidate RO (P.divisorClass (Additive.ofMul L)) i := by
   apply P.divisorPairing_ext i hi (tauComponent_mem R i) (Q.candidate_mem i hi hi4)
@@ -524,7 +524,7 @@ theorem tauComponent_eq_lineTauCandidate
 /-- Under the visible normalization `td₀ = 1`, the reconstructed Chern character of a line
 bundle is `exp(c₁)` through the supported degree four. -/
 theorem chernCharacterComponent_lineBundle
-    (R : P.ReconstructionData F) (L : Pic X.toScheme)
+    (R : P.ReconstructionData F) (L : Pic X)
     (Q : LineBundleComparison RO R L) (htoddZero : toddComponent RO 0 = 1)
     (i : ℕ) (hi : i ≤ d) (hi4 : i ≤ 4) :
     chernCharacterComponent RO R i =
@@ -608,9 +608,9 @@ open AlgebraicGeometry.IntersectionTheory.ChernCharacterSurface
 chosen rank, determinant class, and Todd-weighted representatives are explicitly compared.
 This does not turn the degree-level surface class into an unconditional element of `A`. -/
 theorem degree_chernCharacterComponent_two_eq_surface
-    {D : FiniteCohomology X} {C : D.LinearConnectingSystem}
+    {D : FiniteCohomology k X} {C : D.LinearConnectingSystem}
     {A : Type v} [CommRing A] [Algebra ℚ A]
-    (P : PairingContext D C 2 A) {O F : Coh X.toScheme}
+    (P : PairingContext D C 2 A) {O F : Coh X}
     (RO : P.ReconstructionData O) (R : P.ReconstructionData F)
     (Qdet : Coh.TwoTermPerfectDeterminantData F)
     (hrank : R.rank = virtualRank Qdet)

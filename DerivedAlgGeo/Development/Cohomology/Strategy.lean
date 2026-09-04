@@ -9,7 +9,7 @@ import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Proper
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.ExactSequences
 import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
 import Mathlib.CategoryTheory.Sites.SheafCohomology.Cech
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineVanishing
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.FiniteDimensional
 
@@ -249,15 +249,15 @@ noncomputable example := @AlgebraicGeometry.Proj.polynomialTwistingGlobalSection
 
 /-- Variable-cover Čech terms are explicit homogeneous localizations, without an incorrect
 termwise finite-dimensionality assertion. -/
-noncomputable example := AlgebraicGeometry.Proj.polynomialVariableCechTerm
+noncomputable example := MvPolynomial.polynomialVariableCechTerm
 
 /-- The exact output boundary for #29: a functorial linear lift of derived cohomology together
 with degreewise finite-dimensionality, but no #30 vanishing bound. -/
-example {k : Type u} [Field k] (X : Variety k) := FiniteDimensionalCohomology X
+example {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] := FiniteDimensionalCohomology k X
 
 /-- The functorial linear lift itself is now canonical; #29 only still owes the geometric
 degreewise finite-dimensionality proof. -/
-noncomputable example {k : Type u} [Field k] (X : Variety k) :=
+noncomputable example {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] :=
   canonicalLinearCohomology X
 
 /-- Properness of `Proj` over its degree-zero part — the one piece of the classical

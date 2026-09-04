@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Linear
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Linear
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.MukaiVector
 import DerivedAlgGeo.AlgebraicGeometry.Surface.K3
 
@@ -91,19 +91,22 @@ difference is the target category, not the mathematics.
 universe u
 
 open CategoryTheory CategoryTheory.Limits
-open CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+
+attribute [local instance] HasDerivedCategory.standard
 
 namespace AlgebraicGeometry
 
 namespace K3Surface
 
-variable {k : Type u} [Field k] (X : K3Surface k)
+variable {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))]
+  [IsSmoothProperVariety k X]
 
 /-- The bounded derived category of coherent sheaves on a K3 surface.
 
 An abbreviation for readability only; everything about it comes from
-`Families.SchemeBoundedCoherentDerivedCategory`. -/
-abbrev DerivedCat : Type _ := SchemeBoundedCoherentDerivedCategory X.toScheme
+`AlgebraicGeometry.DerivedCategory.SchemeBoundedCoherentDerivedCategory`. -/
+abbrev DerivedCat : Type _ := SchemeBoundedCoherentDerivedCategory X
 
 variable {X}
 
@@ -194,14 +197,16 @@ A definition for every object, but only the intended invariant for one whose
 `Hom`-groups vanish outside `0, 1, 2` — which on a K3 is what sphericity
 supplies. It is not claimed to agree with any numerical Euler pairing; that
 comparison is `EulerRealization`. -/
-noncomputable def selfEuler {X : K3Surface k} (E : DerivedCat X) : ℤ :=
+noncomputable def selfEuler {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))]
+    [IsSmoothProperVariety k X] (E : DerivedCat X) : ℤ :=
   (Module.finrank k (E ⟶ E) : ℤ)
     - (Module.finrank k (E ⟶ E⟦(1 : ℤ)⟧) : ℤ)
     + (Module.finrank k (E ⟶ E⟦(2 : ℤ)⟧) : ℤ)
 
 namespace IsSphericalObject
 
-variable {X : K3Surface k} {E : DerivedCat X} (h : IsSphericalObject E)
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]
+  {E : DerivedCat X} (h : IsSphericalObject E)
 
 include h
 
@@ -224,6 +229,7 @@ Hirzebruch--Riemann--Roch: the categorical Euler characteristic of an object
 equals the numerical one of its class. That is not available at the pin, so it
 is **supplied**, in the idiom of `Duality.Serre.DerivedStatement`. -/
 
+variable (k) in
 /-- The datum that identifies a categorical Euler characteristic with a
 numerical one.
 
@@ -233,7 +239,8 @@ repository constructs an `EulerRealization`; producing one is the geometric
 obligation, and it is the same obligation `MukaiVector.lean` records for
 `IntegralMukaiData`. -/
 structure EulerRealization {A : Type*} {N : Type*} [CommRing A] [Algebra ℚ A]
-    [AddCommGroup N] (X : K3Surface k) (V : Numerical.NumericalVarietyData 2 A N) where
+    [AddCommGroup N] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))]
+    [IsSmoothProperVariety k X] (V : Numerical.NumericalVarietyData 2 A N) where
   /-- The class of an object in the numerical Grothendieck group. -/
   cls : DerivedCat X → N
   /-- The two Euler characteristics agree on spherical objects. -/
@@ -252,8 +259,9 @@ realization carries that to the numerical layer, and
 The converse is the hard direction and is not proved: `MukaiVector.lean` records
 that it needs simplicity and Serre duality. -/
 theorem isSpherical_mukaiVector {A : Type*} {N : Type*} {Λ : Type*} [CommRing A]
-    [Algebra ℚ A] [AddCommGroup N] [AddCommGroup Λ] {X : K3Surface k}
-    {V : Numerical.NumericalVarietyData 2 A N} (R : EulerRealization X V)
+    [Algebra ℚ A] [AddCommGroup N] [AddCommGroup Λ] {X : Scheme.{u}}
+    [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]
+    {V : Numerical.NumericalVarietyData 2 A N} (R : EulerRealization k X V)
     (D : Numerical.K3.IntegralMukaiData V Λ) (hHRR : V.SatisfiesHRR)
     (hK3 : Numerical.K3.IsK3 V) {E : DerivedCat X} (h : IsSphericalObject E) :
     Mukai.IsSpherical D.b (D.mukaiVector (R.cls E)) := by

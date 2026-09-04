@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import MathFormalContract
+import RestateHistoricalNames
 
 /-!
 # The restate producer, pointed at this repository's combined library
@@ -26,6 +27,12 @@ outside the environment, and `restateOne` would return `not_checkable` —
 "declaration is not in this environment" — which carries nothing forward and
 looks like a tooling failure rather than a scope mistake.
 
+`RestateHistoricalNames` is executable-only support for immutable review
+payloads that contain names retired from the public library. It is imported by
+this producer and added to the restatement environment, but it is intentionally
+unreachable from both library roots and therefore absent from emitted
+declarations.
+
 Exit 0 whatever the outcomes. This writes the record; `mfc restate-check` is
 the gate that reads it.
 -/
@@ -33,5 +40,5 @@ the gate that reads it.
 def main (args : List String) : IO UInt32 :=
   MathFormalContract.restateMainForRoots
     (rootLib := `DerivedAlgGeoSweep)
-    (additionalRoots := [`DerivedAlgGeo])
+    (additionalRoots := [`DerivedAlgGeo, `RestateHistoricalNames])
     args

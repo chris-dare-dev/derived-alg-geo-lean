@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.BaseChange
+import DerivedAlgGeo.CategoryTheory.Triangulated.Families.BaseChange
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.Semistable
 
@@ -24,10 +24,11 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
+open CategoryTheory.Triangulated.Families
 
 universe u v w uV
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 variable {B : Type u} [Category.{v} B]
 
@@ -68,10 +69,9 @@ theorem phase_iff (h : FiberPreStabilityBaseChangeData F classMap sigma)
   rw [h.slicing_compatible f]
   exact Slicing.preimage_P _ _ _ _ _
 
-/-- The witnesses attached to two successive base changes compose to a
-witness for the corresponding composite of pullback functors.  This uses the
-strictly typed iterated functor; comparison with `F.pull (f ≫ g)` is supplied
-separately by the functoriality of the underlying category-valued family. -/
+/-- The witnesses attached to two successive base changes compose on the
+iterated pullback functor. Comparison with pullback along the composite is
+supplied by the pseudofunctor compositor. -/
 theorem preimageData_comp (h : FiberPreStabilityBaseChangeData F classMap sigma)
     {r s t : B} (f : r ⟶ s) (g : s ⟶ t) :
     (sigma r).slicing.PreimageData (F.pull g ⋙ F.pull f) := by
@@ -80,6 +80,27 @@ theorem preimageData_comp (h : FiberPreStabilityBaseChangeData F classMap sigma)
     rw [← h.slicing_compatible f]
     exact h.preimageData g
   exact (h.preimageData f).comp hg
+
+/-- Transport the iterated preimage witness to pullback along the composite
+using the pseudofunctor compositor. -/
+theorem preimageData_pullComp
+    (h : FiberPreStabilityBaseChangeData F classMap sigma)
+    {r s t : B} (f : r ⟶ s) (g : s ⟶ t) :
+    (sigma r).slicing.PreimageData (F.pull (f ≫ g)) :=
+  (h.preimageData_comp f g).ofIso (F.pullCompIso f g).symm
+
+/-- Preimage slicing along a composite pullback agrees with preimage slicing
+along the two pullback stages. -/
+@[simp]
+theorem preimage_pullComp
+    (h : FiberPreStabilityBaseChangeData F classMap sigma)
+    {r s t : B} (f : r ⟶ s) (g : s ⟶ t) :
+    (sigma r).slicing.preimage (F.pull (f ≫ g))
+        (h.preimageData_pullComp f g) =
+      (sigma r).slicing.preimage (F.pull g ⋙ F.pull f)
+        (h.preimageData_comp f g) :=
+  Slicing.preimage_iso (sigma r).slicing _ _
+    (h.preimageData_comp f g) (F.pullCompIso f g).symm
 
 /-- The slicing over the target of two successive base changes can be
 constructed in one step along the composite pullback functor. -/
@@ -94,6 +115,17 @@ theorem slicing_compatible_comp
   apply propext
   exact (h.phase_iff g phi E).trans
     (h.phase_iff f phi ((F.pull g).obj E))
+
+/-- The target slicing is also the preimage along pullback by the composite,
+with the witness transported through the pseudofunctor compositor. -/
+theorem slicing_compatible_pullComp
+    (h : FiberPreStabilityBaseChangeData F classMap sigma)
+    {r s t : B} (f : r ⟶ s) (g : s ⟶ t) :
+    (sigma t).slicing =
+      (sigma r).slicing.preimage (F.pull (f ≫ g))
+        (h.preimageData_pullComp f g) := by
+  rw [h.preimage_pullComp f g]
+  exact h.slicing_compatible_comp f g
 
 /-- Phase membership transported through a composite base change agrees with
 transport through its two stages. -/
@@ -155,4 +187,4 @@ theorem class_mem_semistableClasses_pull
 
 end FiberPreStabilityBaseChangeData
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families

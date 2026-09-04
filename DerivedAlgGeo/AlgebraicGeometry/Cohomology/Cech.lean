@@ -1,18 +1,8 @@
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Affine
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.AffineBasisComparison
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.BasisComparison
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Bicomplex
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Comparison
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.ComplexNaturality
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Differential
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.InitialPage
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.InjectiveAcyclic
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.NegativeTwist
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Vanishing
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.TopDegree
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.SmallSiteResolution
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.TotalComparison
 
 /-! # Čech cohomology -/

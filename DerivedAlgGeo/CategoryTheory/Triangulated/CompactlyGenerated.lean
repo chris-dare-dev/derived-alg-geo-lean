@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.CategoryTheory.Preadditive.CompactObject
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
 import Mathlib.CategoryTheory.Adjunction.Additive
 import Mathlib.CategoryTheory.Adjunction.Limits
@@ -18,11 +19,14 @@ a compact object or the coproduct-and-extension closure `Coprod(G)`.
 
 The definitions here follow A.9--A.11 literally:
 
-* `Functor.PreservesSmallCoproducts` means preservation of all coproducts
-  indexed in a fixed universe;
-* `IsCompactObject` means that `Hom(K, -)` preserves those coproducts;
+* `Functor.PreservesSmallCoproducts` and `IsCompactObject` (A.9, A.10) are the
+  preadditive vocabulary of `CategoryTheory/Preadditive/CompactObject.lean`, which this
+  file imports;
 * `ObjectProperty.coprodClosure` is the smallest isomorphism-, coproduct-, and
   extension-closed object property containing its generators;
+* `ObjectProperty.coprodClosure_le_shift_of_le_shift` transports that closure
+  into a shift of another property, which `coprodClosure_map_obj` cannot do
+  because Mathlib installs no `CommShift` instance on `shiftFunctor C n`;
 * `TStructure.IsCompactlyGeneratedBy` records compact generation of an
   already constructed t-structure.
 
@@ -42,83 +46,9 @@ universe w v u u₁ u₂
 
 namespace CategoryTheory
 
-namespace Functor
-
-variable {C : Type u₁} [Category.{v} C] {D : Type u₂} [Category.{v} D]
-
-/-- A functor preserves the coproducts indexed by types in universe `w`.
-
-Keeping the indexing universe explicit matches Mathlib's universe-sensitive
-colimit API and avoids pretending that one category has literally all
-large-universe coproducts. -/
-def PreservesSmallCoproducts (F : Functor C D) : Prop :=
-  ∀ (ι : Type w), PreservesColimitsOfShape (Discrete ι) F
-
-end Functor
-
 variable {C : Type u} [Category.{v} C] [Preadditive C]
 
-/-- Definition A.9: `K` is compact when `Hom(K, -)` preserves all small
-coproducts in the indexing universe `w`.
-
-The Hom functor is valued in additive commutative groups, so the colimit on
-the target side is the direct sum of Hom groups.  Using ordinary set-valued
-coyoneda here would instead form a disjoint union of Hom sets, which is not
-the triangulated notion of compactness. -/
-def IsCompactObject (K : C) : Prop :=
-  ∀ (ι : Type w),
-    PreservesColimitsOfShape (Discrete ι) (preadditiveCoyoneda.obj (op K))
-
-namespace IsCompactObject
-
-variable {K : C} (hK : IsCompactObject.{w} K)
-
-/-- The defining compactness comparison: maps from `K` into a coproduct form
-the direct sum of the Hom groups into its summands. -/
-noncomputable def coproductComparisonIso {ι : Type w} (X : ι → C)
-    [HasCoproduct X]
-    [HasColimit (Discrete.functor X ⋙ preadditiveCoyoneda.obj (op K))] :
-    (preadditiveCoyoneda.obj (op K)).obj (∐ X) ≅
-      colimit (Discrete.functor X ⋙ preadditiveCoyoneda.obj (op K)) := by
-  letI : PreservesColimitsOfShape (Discrete ι)
-      (preadditiveCoyoneda.obj (op K)) := hK ι
-  exact preservesColimitIso (preadditiveCoyoneda.obj (op K))
-    (Discrete.functor X)
-
-/-- Under the compactness comparison, postcomposition with a coproduct
-injection is the corresponding direct-sum injection. -/
-@[reassoc (attr := simp)]
-theorem map_ι_coproductComparisonIso_hom {ι : Type w} (X : ι → C)
-    [HasCoproduct X]
-    [HasColimit (Discrete.functor X ⋙ preadditiveCoyoneda.obj (op K))]
-    (i : ι) :
-    (preadditiveCoyoneda.obj (op K)).map (Sigma.ι X i) ≫
-      (hK.coproductComparisonIso X).hom =
-        colimit.ι (Discrete.functor X ⋙ preadditiveCoyoneda.obj (op K))
-          ⟨i⟩ := by
-  letI : PreservesColimitsOfShape (Discrete ι)
-      (preadditiveCoyoneda.obj (op K)) := hK ι
-  exact ι_preservesColimitIso_hom
-    (preadditiveCoyoneda.obj (op K)) (Discrete.functor X) ⟨i⟩
-
-end IsCompactObject
-
 namespace ObjectProperty
-
-/-- The object property of compact objects. -/
-def compactObjects : ObjectProperty C := fun K ↦ IsCompactObject.{w} K
-
-/-- Compactness is invariant under isomorphism. -/
-theorem isCompactObject_of_iso {K K' : C} (e : K ≅ K')
-    (hK : IsCompactObject.{w} K) : IsCompactObject.{w} K' := by
-  intro ι
-  letI : PreservesColimitsOfShape (Discrete ι)
-      (preadditiveCoyoneda.obj (op K)) := hK ι
-  exact preservesColimitsOfShape_of_natIso
-    (preadditiveCoyoneda.mapIso e.symm.op)
-
-instance : (compactObjects.{w} (C := C)).IsClosedUnderIsomorphisms where
-  of_iso e := isCompactObject_of_iso e
 
 variable [HasZeroObject C] [HasShift C ℤ]
   [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
@@ -173,6 +103,43 @@ lemma coprodClosure_le {Q : ObjectProperty C}
   | of_extension T hT _ _ ih₁ ih₃ =>
       exact Q.ext_of_isTriangulatedClosed₂ T hT ih₁ ih₃
 
+/-- Universal property of `coprodClosure` across a shift: a shift-compatible
+containment of generators induces one of closures.
+
+The target is a shift of a *different* property, which is what distinguishes
+this from `coprodClosure_le_shift` in `CompactlyGenerated/Existence.lean`: that
+one is the homogeneous statement `G ≤ G.shift 1 → Coprod(G) ≤ Coprod(G).shift 1`
+(Remark A.12(1)), while the aisles this one compares sit at two different
+phases.
+
+It is `coprodClosure_le` at `Q := R.shift n`, which cannot be invoked
+directly: Mathlib carries `(R.shift n).IsClosedUnderIsomorphisms` but neither
+`(R.shift n).IsClosedUnderColimitsOfShape (Discrete ι)` nor
+`(R.shift n).IsTriangulatedClosed₂`, so the induction is run by hand.
+
+`coprodClosure_map_obj` is also unavailable, for a library reason rather than a
+mathematical one: Mathlib registers no `CommShift ℤ` instance on
+`shiftFunctor C n`. Three rotations of a distinguished triangle return the
+shift with all three morphisms negated (`Triangle.shiftFunctor` carries
+`n.negOnePow`), so only a sign-corrected commutation isomorphism makes the
+shift triangulated, and none is installed. The signs land on the morphisms,
+and `coprodClosure` constrains only the *objects* of the triangle in its
+extension constructor, so `Triangle.shift_distinguished` is enough. -/
+theorem coprodClosure_le_shift_of_le_shift {R : ObjectProperty C} (n : ℤ)
+    [R.IsClosedUnderIsomorphisms]
+    [∀ (ι : Type w), R.IsClosedUnderColimitsOfShape (Discrete ι)]
+    [R.IsTriangulatedClosed₂] (hPR : P ≤ R.shift n) :
+    P.coprodClosure.{w} ≤ R.shift n := by
+  intro X hX
+  induction hX with
+  | of_mem X hX => exact hPR X hX
+  | of_iso e _ ih => exact R.prop_of_iso ((shiftFunctor C n).mapIso e) ih
+  | @of_coproduct ι G c hc _ ih =>
+      exact R.prop_of_isColimit (isColimitOfPreserves (shiftFunctor C n) hc) ih
+  | of_extension T hT _ _ ih₁ ih₃ =>
+      exact R.ext_of_isTriangulatedClosed₂ ((Triangle.shiftFunctor C n).obj T)
+        (Triangle.shift_distinguished T hT n) ih₁ ih₃
+
 variable {P}
 
 /-- A coproduct-preserving triangulated functor carries `Coprod(P)` into
@@ -197,44 +164,6 @@ theorem coprodClosure_map_obj
       exact .of_extension (F.mapTriangle.obj T) (F.map_distinguished T hT) ih₁ ih₃
 
 end ObjectProperty
-
-namespace Adjunction
-
-variable {C : Type u₁} [Category.{v} C] [Preadditive C]
-  {D : Type u₂} [Category.{v} D] [Preadditive D]
-  {L : Functor D C} {F : Functor C D} [L.Additive]
-
-/-- A left adjoint to a small-coproduct-preserving functor carries compact
-objects to compact objects. This is the compactness step in A.16 and A.17. -/
-theorem isCompactObject_leftAdjoint_obj (adj : L ⊣ F)
-    (hF : F.PreservesSmallCoproducts.{w}) {K : D}
-    (hK : IsCompactObject.{w} K) : IsCompactObject.{w} (L.obj K) := by
-  intro ι
-  letI : PreservesColimitsOfShape (Discrete ι) F := hF ι
-  letI : PreservesColimitsOfShape (Discrete ι)
-      (preadditiveCoyoneda.obj (op K)) := hK ι
-  haveI : PreservesColimitsOfShape (Discrete ι)
-      (F ⋙ preadditiveCoyoneda.obj (op K)) := inferInstance
-  let e : preadditiveCoyoneda.obj (op (L.obj K)) ≅
-      F ⋙ preadditiveCoyoneda.obj (op K) :=
-    NatIso.ofComponents
-      (fun X ↦ (adj.homAddEquiv K X).toAddCommGrpIso)
-      (fun f ↦ by
-        ext g
-        exact adj.homEquiv_naturality_right g f)
-  exact preservesColimitsOfShape_of_natIso e.symm
-
-/-- The essential image under a left adjoint of compact objects is compact
-when the right adjoint preserves small coproducts. -/
-theorem compactObjects_map_leftAdjoint (adj : L ⊣ F)
-    (hF : F.PreservesSmallCoproducts.{w}) {G : ObjectProperty D}
-    (hG : G ≤ ObjectProperty.compactObjects.{w} (C := D)) :
-    G.map L ≤ ObjectProperty.compactObjects.{w} (C := C) := by
-  rintro X ⟨Y, hY, ⟨e⟩⟩
-  exact ObjectProperty.isCompactObject_of_iso e
-    (adj.isCompactObject_leftAdjoint_obj hF (hG Y hY))
-
-end Adjunction
 
 namespace Triangulated.TStructure
 

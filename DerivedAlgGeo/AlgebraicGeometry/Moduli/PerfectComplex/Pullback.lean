@@ -3,8 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Relative
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.DerivedPullbackCoherence
-import DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families.LeftDerivedPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPullbackCoherence
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.LeftDerivedPullback
 
 /-!
 # Pullback of universally-gluable relative-perfect complexes
@@ -40,10 +40,15 @@ oriented from the lifted functor to ambient derived pullback so composition
 follows the contravariant order of scheme pullback.
 -/
 
+attribute [local instance] HasDerivedCategory.standard
+
 namespace AlgebraicGeometry
 
 open CategoryTheory
-open CategoryTheory.Triangulated.StabilityCondition.Families
+open AlgebraicGeometry.DerivedCategory
+open AlgebraicGeometry.DerivedCategory.Dqc
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 noncomputable section
 

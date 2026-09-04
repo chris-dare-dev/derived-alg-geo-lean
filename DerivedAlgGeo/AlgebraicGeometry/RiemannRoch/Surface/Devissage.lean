@@ -42,12 +42,12 @@ open AlgebraicGeometry.IntersectionTheory.Number
 open AlgebraicGeometry.RiemannRoch.Surface.ToddData
 
 variable {k : Type u} [Field k]
-variable {X : SmoothProperVariety k}
-variable {D : FiniteCohomology X.toVariety}
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]
+variable {D : FiniteCohomology k X}
 variable {C : D.LinearConnectingSystem}
 variable {A : Type v} [CommRing A] [Algebra ℚ A]
 variable {P : PairingContext D C 2 A}
-variable {K : SmoothProperVariety.CanonicalSheafData X 2}
+variable {K : SmoothProperVariety.CanonicalSheafData k X 2}
 
 noncomputable section
 
@@ -55,21 +55,21 @@ noncomputable section
 
 /-- The degree of `ch₂` of a determinant-equipped finite locally free coherent sheaf, recovered
 from its Euler characteristic and the geometric Todd terms. -/
-noncomputable def locallyFreeCh2Degree {F : Coh X.toVariety.toScheme}
+noncomputable def locallyFreeCh2Degree {F : Coh X}
     (_T : ToddData.Data P K) (E : Coh.DeterminantData F) : ℚ :=
   (D.eulerCharacteristic F : ℚ) -
     (E.rank : ℚ) * (P.intersection.eulerPic 1 : ℚ) -
       toddOnePairing P.intersection E.firstChernClassAdd
 
 /-- The degree of `c₂`, using `ch₂ = (c₁² - 2c₂)/2`. -/
-noncomputable def locallyFreeC2Degree {F : Coh X.toVariety.toScheme}
+noncomputable def locallyFreeC2Degree {F : Coh X}
     (T : ToddData.Data P K) (E : Coh.DeterminantData F) : ℚ :=
   (P.intersection.surfaceIntersectionPairing E.firstChernClassAdd
       E.firstChernClassAdd : ℤ) / 2 - locallyFreeCh2Degree T E
 
 /-- Riemann--Roch for a finite locally free sheaf in Todd-coordinate form. -/
 theorem locallyFree_eulerCharacteristic_eq_ch2
-    {F : Coh X.toVariety.toScheme}
+    {F : Coh X}
     (T : ToddData.Data P K) (E : Coh.DeterminantData F) :
     (D.eulerCharacteristic F : ℚ) =
       (E.rank : ℚ) * (P.intersection.eulerPic 1 : ℚ) +
@@ -81,7 +81,7 @@ theorem locallyFree_eulerCharacteristic_eq_ch2
 /-- Classical finite locally free surface formula
 `χ(E) = rχ(O_X) + (c₁²-c₁K_X)/2 - c₂`. -/
 theorem locallyFree_eulerCharacteristic_eq
-    {F : Coh X.toVariety.toScheme}
+    {F : Coh X}
     (T : ToddData.Data P K) (E : Coh.DeterminantData F) :
     (D.eulerCharacteristic F : ℚ) =
       (E.rank : ℚ) * (P.intersection.eulerPic 1 : ℚ) +
@@ -105,7 +105,7 @@ theorem locallyFree_eulerCharacteristic_eq
 /-- Degree-level `ch₂` is additive in a determinant-compatible short exact sequence of finite
 locally free coherent sheaves, once the chosen fixed ranks are explicitly compatible. -/
 theorem locallyFreeCh2Degree_shortExact
-    {S : ShortComplex (Coh X.toVariety.toScheme)}
+    {S : ShortComplex (Coh X)}
     (T : ToddData.Data P K) (E : Coh.ShortExactDeterminantData S)
     (hrank : E.middle.rank = E.left.rank + E.right.rank) :
     locallyFreeCh2Degree T E.middle =
@@ -120,7 +120,7 @@ theorem locallyFreeCh2Degree_shortExact
 /-- The degree-level Whitney formula
 `c₂(E₂)=c₂(E₁)+c₂(E₃)+c₁(E₁)c₁(E₃)`. -/
 theorem locallyFreeC2Degree_shortExact
-    {S : ShortComplex (Coh X.toVariety.toScheme)}
+    {S : ShortComplex (Coh X)}
     (T : ToddData.Data P K) (E : Coh.ShortExactDeterminantData S)
     (hrank : E.middle.rank = E.left.rank + E.right.rank) :
     locallyFreeC2Degree T E.middle =
@@ -146,7 +146,7 @@ theorem locallyFreeC2Degree_shortExact
 
 /-- The virtual first Chern class is the difference of the two finite locally free terms. -/
 theorem picardFirstChernClass_eq_middle_sub_left
-    {F : Coh X.toVariety.toScheme}
+    {F : Coh X}
     (Q : Coh.TwoTermPerfectDeterminantData F) :
     picardFirstChernClass Q =
       Q.middle.firstChernClassAdd - Q.left.firstChernClassAdd := by
@@ -157,7 +157,7 @@ theorem picardFirstChernClass_eq_middle_sub_left
 
 /-- Euler dévissage along the recorded finite locally free resolution. -/
 theorem eulerCharacteristic_eq_middle_sub_left
-    {F : Coh X.toVariety.toScheme}
+    {F : Coh X}
     (C : D.LinearConnectingSystem)
     (Q : Coh.TwoTermPerfectDeterminantData F) :
     D.eulerCharacteristic F =
@@ -170,7 +170,7 @@ theorem eulerCharacteristic_eq_middle_sub_left
 /-- The reconstructed `ch₂` of a perfect coherent sheaf is the difference of the `ch₂` values
 of the two finite locally free terms in its recorded resolution. -/
 theorem chernCharacterTwoDegree_eq_middle_sub_left
-    {F : Coh X.toVariety.toScheme}
+    {F : Coh X}
     (T : ToddData.Data P K) (Q : Coh.TwoTermPerfectDeterminantData F) :
     chernCharacterTwoDegree P.intersection Q =
       locallyFreeCh2Degree T Q.middle - locallyFreeCh2Degree T Q.left := by
@@ -182,7 +182,7 @@ theorem chernCharacterTwoDegree_eq_middle_sub_left
   ring
 
 /-- The degree of the second Chern class of a perfect coherent sheaf. -/
-noncomputable def perfectC2Degree {F : Coh X.toVariety.toScheme}
+noncomputable def perfectC2Degree {F : Coh X}
     (_T : ToddData.Data P K) (Q : Coh.TwoTermPerfectDeterminantData F) : ℚ :=
   (P.intersection.surfaceIntersectionPairing (picardFirstChernClass Q)
       (picardFirstChernClass Q) : ℤ) / 2 -
@@ -191,7 +191,7 @@ noncomputable def perfectC2Degree {F : Coh X.toVariety.toScheme}
 /-- Surface Riemann--Roch for a coherent sheaf with an explicit two-term finite locally free
 resolution, in rank/`c₁`/`ch₂` form. -/
 theorem perfect_eulerCharacteristic_eq_ch2
-    {F : Coh X.toVariety.toScheme}
+    {F : Coh X}
     (T : ToddData.Data P K) (Q : Coh.TwoTermPerfectDeterminantData F) :
     (D.eulerCharacteristic F : ℚ) =
       (virtualRank Q : ℚ) * (P.intersection.eulerPic 1 : ℚ) -
@@ -213,7 +213,7 @@ theorem perfect_eulerCharacteristic_eq_ch2
 
 /-- Classical rank/`c₁`/`c₂` surface formula for explicitly perfect coherent sheaves. -/
 theorem perfect_eulerCharacteristic_eq
-    {F : Coh X.toVariety.toScheme}
+    {F : Coh X}
     (T : ToddData.Data P K) (Q : Coh.TwoTermPerfectDeterminantData F) :
     (D.eulerCharacteristic F : ℚ) =
       (virtualRank Q : ℚ) * (P.intersection.eulerPic 1 : ℚ) +
@@ -229,7 +229,7 @@ theorem perfect_eulerCharacteristic_eq
 /-- The discriminant in `c₂` form:
 `Δ = 2r c₂ - (r-1)c₁²`. -/
 theorem discriminantDegree_eq_c2
-    {F : Coh X.toVariety.toScheme}
+    {F : Coh X}
     (T : ToddData.Data P K) (Q : Coh.TwoTermPerfectDeterminantData F) :
     discriminantDegree P.intersection Q =
       2 * (virtualRank Q : ℚ) * perfectC2Degree T Q -
@@ -250,7 +250,7 @@ its own audit record. -/
 /-- The perfect surface formula computes exactly the value of the Grothendieck Euler
 homomorphism on the coherent-sheaf class. -/
 theorem grothendieckEulerHom_class_eq_perfect_formula
-    {F : Coh X.toVariety.toScheme}
+    {F : Coh X}
     (T : ToddData.Data P K) (Q : Coh.TwoTermPerfectDeterminantData F) :
     (D.grothendieckEulerHom C (K₀Ab.of F) : ℚ) =
       (virtualRank Q : ℚ) * (P.intersection.eulerPic 1 : ℚ) +
@@ -271,8 +271,8 @@ structure NumericalVarietyComparison
     {B : Type v} [CommRing B] [Algebra ℚ B]
     {N : Type w} [AddCommGroup N] (V : NumericalVarietyData 2 B N)
     {PB : PairingContext D C 2 B}
-    {KB : SmoothProperVariety.CanonicalSheafData X 2}
-    {F : Coh X.toVariety.toScheme}
+    {KB : SmoothProperVariety.CanonicalSheafData k X 2}
+    {F : Coh X}
     (Q : Coh.TwoTermPerfectDeterminantData F) (E : N) : Prop where
   euler_eq : V.chi E = D.eulerCharacteristic F
   rank_eq : V.rank E = virtualRank Q
@@ -289,8 +289,8 @@ variable {B : Type v} [CommRing B] [Algebra ℚ B]
 variable {N : Type w} [AddCommGroup N]
 variable (V : NumericalVarietyData 2 B N)
 variable {PB : PairingContext D C 2 B}
-variable {KB : SmoothProperVariety.CanonicalSheafData X 2}
-variable {F : Coh X.toVariety.toScheme}
+variable {KB : SmoothProperVariety.CanonicalSheafData k X 2}
+variable {F : Coh X}
 variable {Q : Coh.TwoTermPerfectDeterminantData F} {E : N}
 
 /-- The Layer A surface expansion becomes exactly the geometric rank/Todd/`ch₂` expansion. -/

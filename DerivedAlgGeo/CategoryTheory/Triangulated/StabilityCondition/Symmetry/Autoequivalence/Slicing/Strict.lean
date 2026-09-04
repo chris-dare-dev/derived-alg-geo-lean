@@ -33,7 +33,7 @@ stability-foundation ownership record notes this deliberate restriction.
 
 ## What it does cover
 
-Everything hard is already in `StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean` — `PostnikovTower.mapF`,
+Everything hard is already in `WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean` — `PostnikovTower.mapF`,
 `HNFiltration.mapF`, `Slicing.mapEquiv`. This file only supplies the group
 packaging: `StrictAut.equiv` turns the strict data into an honest
 `Equivalence` (unit and counit are `eqToIso`, and the coherence field
@@ -48,7 +48,7 @@ open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 universe w u
 
@@ -143,7 +143,7 @@ the head `MulAction G (Slicing C)` claims *every* group acts on the slicings of
 
 Bring it into scope at the use site with `letI := ρ.mulActionSlicing`. For an
 action `•` can find on its own, use `AutQuot`
-(`StabilityCondition/Symmetry/Autoequivalence/Slicing/Quotient.lean`), where
+(`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Slicing/Quotient.lean`), where
 the acting object *is* the group.
 
 `@[reducible]` because Lean requires it of any `def` whose type is a class —
@@ -163,4 +163,4 @@ noncomputable def mulActionSlicing : MulAction G (Slicing C) where
 
 end StrictAut
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

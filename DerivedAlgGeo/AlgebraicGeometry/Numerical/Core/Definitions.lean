@@ -35,7 +35,7 @@ presentation. Hirzebruch--Riemann--Roch is the separate proposition-valued prope
 `NumericalVarietyData` records a selected presentation and its structural compatibility
 laws; it does not assert that the presentation comes from geometry. In particular HRR is
 not a field. Proving `SatisfiesHRR` is the job of Layer B
-(`DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf`), which builds `Coh X`, sheaf cohomology,
+(`DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent`), which builds `Coh X`, sheaf cohomology,
 `χ`, and intersection numbers from Mathlib's scheme theory. Any downstream result that uses
 HRR must receive that witness explicitly.
 

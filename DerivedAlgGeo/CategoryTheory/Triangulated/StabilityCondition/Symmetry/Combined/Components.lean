@@ -26,7 +26,7 @@ therefore acts on the corresponding component itself.
 open CategoryTheory.Triangulated
 open Set
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 noncomputable section
 
@@ -121,4 +121,4 @@ scoped instance componentStabilizerMulAction (cc : ConnectedComponents X) :
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

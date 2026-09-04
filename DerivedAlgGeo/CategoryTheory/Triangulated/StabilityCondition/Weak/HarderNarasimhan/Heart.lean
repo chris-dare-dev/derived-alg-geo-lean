@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.Uniqueness
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.Uniqueness
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Heart.Equivalence
 
 set_option backward.defeqAttrib.useBackward true
@@ -21,7 +21,7 @@ zero-charge boundary at phase `1` without assigning an argument to zero.
 
 The main construction reads the slicing HN filtration of a heart object as a
 weak abelian HN filtration.  It follows the ordinary heart-equivalence proof in
-`StabilityCondition/Weak/Heart/Equivalence.lean`, with phase comparisons
+`WeakStabilityCondition/Heart/Equivalence.lean`, with phase comparisons
 replaced by the weak phase--slope bridge proved here.
 -/
 

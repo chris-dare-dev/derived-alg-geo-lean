@@ -22,15 +22,15 @@ the definition of `basisNhd`:
 
 The resulting instance is `ContinuousConstSMul`: continuity in the stability
 condition for every fixed group element.  The separate, stronger joint
-statement is proved in `StabilityCondition/Symmetry/GLTilde/Action/JointContinuous.lean`.
+statement is proved in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/JointContinuous.lean`.
 -/
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.Deformation
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 noncomputable section
 
@@ -316,4 +316,4 @@ noncomputable def combinedStabilityHomeomorph (p : GLTilde × AutPairQuot v) :
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

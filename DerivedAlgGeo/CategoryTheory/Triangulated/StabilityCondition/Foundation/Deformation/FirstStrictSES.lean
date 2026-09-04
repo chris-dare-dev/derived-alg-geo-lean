@@ -21,7 +21,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 
 universe u v u'
 
-namespace CategoryTheory.Triangulated.Deformation
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 
 open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated.TStructure
@@ -363,4 +363,4 @@ theorem exists_first_strictShortExact_of_not_semistable
 
 end SkewedStabilityFunction
 
-end CategoryTheory.Triangulated.Deformation
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation

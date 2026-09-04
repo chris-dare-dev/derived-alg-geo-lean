@@ -2,14 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Support.Predicate.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting.Semistable
 
 /-!
 # Support property for weak stability and transport across a phase tilt
 
 This file binds the generic linear-algebraic support predicate from
-`StabilityCondition/Support/Basic.lean` to the numerical classes of nonzero weak
+`WeakStabilityCondition/Support/Predicate/Basic.lean` to the numerical classes of nonzero weak
 semistable heart objects.  It then proves the support-property transport used
 in Proposition 14.16.
 
@@ -25,7 +25,7 @@ namespace CategoryTheory.Triangulated.WeakStabilityCondition
 
 open CategoryTheory.Triangulated
 open CategoryTheory Limits Pretriangulated CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 noncomputable section
 
@@ -48,7 +48,7 @@ def semistableClasses {t : TStructure C} (W : WeakStabilityFunction t)
 linear realization of its charge. -/
 def HasSupportProperty {t : TStructure C} (W : WeakStabilityFunction t)
     (v : K₀ C →+ V) (Zlin : V →ₗ[ℝ] ℂ) : Prop :=
-  CategoryTheory.Triangulated.StabilityCondition.Support.HasSupportProperty Zlin
+  CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasSupportProperty Zlin
     (W.semistableClasses v)
 
 omit [IsTriangulated C] in

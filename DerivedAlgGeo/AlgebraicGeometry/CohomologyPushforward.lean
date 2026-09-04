@@ -2,14 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.TopologicalSheafCohomologyPushforward
+import DerivedAlgGeo.Topology.Sheaves.CohomologyPushforward
 import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion
 
 /-!
 # Cohomology and pushforward along a closed immersion
 
 This algebraic-geometry leaf specializes the space-level comparison from
-`CategoryTheory/TopologicalSheafCohomologyPushforward.lean` to the underlying map of a closed
+`Topology/Sheaves/CohomologyPushforward.lean` to the underlying map of a closed
 immersion of schemes. Keeping the specialization here prevents the generic CategoryTheory layer
 from importing algebraic geometry.
 -/

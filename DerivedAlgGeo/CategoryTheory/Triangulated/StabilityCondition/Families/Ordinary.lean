@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families.Basic
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.Quotient
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Families.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Support.Predicate.Quotient
 
 /-!
 # Ordinary stability-in-families interface
@@ -22,9 +22,11 @@ of this stable interface; constant-family reindexings that consume a genuine
 support datum remain stable API.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Moduli
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Families
 
 noncomputable section
 
@@ -75,4 +77,4 @@ structure OrdinaryDeformationInputConditions
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families

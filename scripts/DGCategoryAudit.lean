@@ -18,7 +18,9 @@ The dg-category subsystem was gated from its first commit rather than
 retrofitted. The algebraic-geometry subsystem needed a linter ratchet to catch
 up; this list starts complete and should stay that way.
 -/
-import DerivedAlgGeo.CategoryTheory.DGCategory
+import DerivedAlgGeo.Algebra.Homology.DGCategory
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 
 #print axioms CategoryTheory.Cdg
 #print axioms CategoryTheory.Cdg.coboundariesIn_le_comap

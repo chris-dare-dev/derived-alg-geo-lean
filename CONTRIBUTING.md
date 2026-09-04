@@ -2,26 +2,72 @@
 
 ## Place code by mathematics
 
-All stable Lean code lives below `DerivedAlgGeo/`. Follow the existing subject
-hierarchy; do not add new top-level libraries or restore retired repository
-roots.
+All stable Lean code lives below `DerivedAlgGeo/`, whose layout mirrors
+Mathlib's subject hierarchy directory for directory. Do not add new top-level
+libraries or restore retired repository roots; a new top-level subject must be
+a Mathlib subject and is added to `scripts/check_layering.py` by name.
 
-Choose the narrowest natural home:
+The placement rule has two tiers, stated in full in
+`docs/architecture/placement.md` and `CLAUDE.md`.
 
-- geometric objects and theorems: `DerivedAlgGeo/AlgebraicGeometry/`;
-- dg, derived, triangulated, and stability-category theory:
-  `DerivedAlgGeo/CategoryTheory/`;
-- reusable lattice or matrix theory: `DerivedAlgGeo/LinearAlgebra/`;
-- exploratory API probes: `DerivedAlgGeo/Development/`.
+1. **An extension of a Mathlib API lives at that API's Mathlib path**, under
+   `DerivedAlgGeo/`, in that API's namespace. Derived categories, `Ext`, and
+   K-projectives extend `Mathlib/Algebra/Homology/DerivedCategory/` and live in
+   `Algebra/Homology/DerivedCategory/`; sheaves of modules on a ringed site
+   extend `Mathlib/Algebra/Category/ModuleCat/Sheaf/` and live there; Čech
+   cohomology on a site lives under `CategoryTheory/Sites/SheafCohomology/`;
+   `PrimeSpectrum.basicOpen` lives under `RingTheory/Spectrum/Prime/`. Neither
+   the abstraction level of a statement nor the weakest vocabulary in its
+   signature moves it away from its carrier's definition site.
+2. **A subject Mathlib lacks is placed by the nearest Mathlib precedent.** A
+   structure on an abstract triangulated category goes under
+   `CategoryTheory/Triangulated/<Name>/` like `TStructure/`; a weakened or
+   strengthened variant of a named concept is a child directory named by its
+   adjective, like `MetricSpace/Pseudo/`, so weak stability is
+   `Triangulated/StabilityCondition/Weak/`; compatibility between two
+   independent structures is `Monoidal/<Other>.lean` like
+   `Monoidal/Preadditive.lean`; a geometric realization of a categorical
+   interface lives with the geometric object under `AlgebraicGeometry/`, as
+   `Algebra/Category/ModuleCat/Abelian.lean` lives with `ModuleCat`. Within
+   this tier, the weakest vocabulary sufficient for the full public type is
+   the tie-breaker.
 
-Use Mathlib's established namespace when extending a Mathlib concept. Add a
-same-named umbrella for a new non-leaf directory and export stable leaves
-through their nearest existing umbrellas.
+`AlgebraicGeometry/` is organized by geometric object and never mirrors
+`CategoryTheory/`. Inside an object directory, files are named by the
+structure they add:
+`DerivedCategory/{Basic,Coherent,Dqc,Families,FourierMukai,Stability}`. The
+`Stability/` child is the only part of `DerivedCategory/` that imports
+stability conditions; the `DerivedCategory` umbrella omits it and the
+`AlgebraicGeometry` umbrella imports it, so scheme-derived categories stay
+importable without Bridgeland stability. Geometric semistable loci, probes,
+finite-type openness, and relative HN filtrations live under
+`AlgebraicGeometry/Moduli/`.
 
-Keep generic `Algebra`, `Topology`, and `LinearAlgebra` modules independent of
-specialized geometry and stability applications. A new top-level subject is
-appropriate only for a coherent body of reusable mathematics, not for one
-milestone or provenance boundary.
+There are no `Instances/` directories below a generic subject. The former
+`CategoryTheory/<source>/Instances/AlgebraicGeometry/` leaves are retired;
+their contents live with the geometric objects they were about, and the
+layering gate rejects any path of that shape.
+
+Use Mathlib's established namespace when extending a Mathlib concept. A
+declaration in a geometric file may keep the namespace of the categorical
+structure it extends so that dot notation resolves. Add a same-named umbrella
+for a new non-leaf directory and export stable leaves through their nearest
+existing umbrellas.
+
+The dependency contract is `docs/architecture/layers.md`: only
+`AlgebraicGeometry/` and `Development/` import geometry, `Development/` is a
+leaf, geometry outside `Moduli/`, `Numerical/`, and
+`DerivedCategory/Stability/` never reaches the stability tree, weak stability
+never imports Bridgeland stability, and retired paths stay retired. Subjects
+are otherwise free to import one another as they do in Mathlib.
+
+Derived-category theory is built once: Mathlib constructs `DerivedCategory C`,
+this repository extends it under `Algebra/Homology/DerivedCategory/`, geometry
+proves `Abelian (Coh X)` and defines `Dᵇ(Coh X)` as an abbreviation under
+`AlgebraicGeometry/DerivedCategory/`. Keep the bounded-coherent and
+compact/perfect identifications in `Dqc.lean` as explicit propositions, and
+read the perfect-complex ledger in `docs/architecture/placement.md` before
+relating perfect notions.
 
 ## Choose the common root before the leaf
 
@@ -144,3 +190,7 @@ bindings, source-independence checks, documentation, and CI paths in the same
 change. A move is complete only when CI passes on the pushed branch from a clean
 checkout — not when a local `scripts/gates.sh` goes green, which is neither
 permitted here nor sufficient.
+
+Mark completed and newly confirmed ownership defects in
+`docs/architecture/cutover-ledger.md`. Do not use the ledger as an exception:
+new declarations must go directly to their canonical owner.

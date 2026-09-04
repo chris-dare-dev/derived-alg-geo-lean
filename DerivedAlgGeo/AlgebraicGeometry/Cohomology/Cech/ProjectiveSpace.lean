@@ -2,11 +2,11 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace
-import DerivedAlgGeo.Topology.Opens.Limits
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.ProjectiveSpace
+import DerivedAlgGeo.Topology.Category.TopCat.Opens.Limits
 import DerivedAlgGeo.Algebra.Category.Grp.Preadditive
 import DerivedAlgGeo.Algebra.Category.Grp.Products
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Differential
+import DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech.Differential
 import Mathlib.CategoryTheory.Sites.SheafCohomology.Cech
 
 /-!
@@ -81,6 +81,8 @@ than in the bare `Pi` type for anything to rewrite.
 noncomputable section
 
 open CategoryTheory Limits DirectSum Opposite SetLike TopCat TopologicalSpace
+
+open GradedModule MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 
@@ -301,7 +303,7 @@ noncomputable def polynomialVariableCechComplex (d : ℕ) :
 /-- The Čech complex of `O(d)` over the variable charts *is* the explicit algebraic complex.
 
 Composed with the Čech-to-derived comparison of
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison`, this presents every
+`DerivedAlgGeo.Topology.Sheaves.Cech.GlobalComparison`, this presents every
 `Hⁱ(Pⁿ, O(d))` as the cohomology of a complex of homogeneous localizations. -/
 noncomputable def polynomialVariableCechComplexIso (d : ℕ) :
     cechComplexOfTwist ι k d ≅ polynomialVariableCechComplex ι k d :=

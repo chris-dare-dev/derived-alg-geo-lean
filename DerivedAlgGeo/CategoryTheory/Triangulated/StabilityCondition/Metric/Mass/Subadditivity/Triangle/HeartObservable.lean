@@ -29,7 +29,7 @@ set_option backward.isDefEq.respectTransparency false
 open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
   CategoryTheory.Triangulated Complex
-open CategoryTheory.Triangulated.StabilityCondition.GroupAction Matrix
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction Matrix
 open CategoryTheory.Triangulated
 open CategoryTheory.Triangulated.WeakStabilityCondition
 open scoped ENNReal BigOperators ZeroObject
@@ -51,11 +51,10 @@ stability conditions.  It lets the ordinary heart-equivalence API be reused
 for a condition defined with an arbitrary class map. -/
 def StabilityCondition.WithClassMap.observable
     (σ : StabilityCondition.WithClassMap C v) : StabilityCondition C where
-  slicing := σ.slicing
-  Z := σ.Z.comp v
-  compatible := by
-    intro φ E hP hE
-    simpa using σ.compat φ E hP hE
+  toWithClassMap := PreStabilityCondition.WithClassMap.ofStrict
+    σ.slicing (σ.Z.comp v) (by
+      intro φ E hP hE
+      simpa using σ.compat φ E hP hE)
   locallyFinite := σ.locallyFinite
 
 omit [IsTriangulated C] in
@@ -221,8 +220,7 @@ theorem StabilityCondition.WithClassMap.observableStabilityFunctionOnHeart_phase
     ObjectProperty.FullSubcategory.isZero_of_obj_isZero
       (C := C) (P := t.heart) (X := E) hZ
   by_cases hplus : σ.slicing.phiPlus C E.obj hEobj < 1
-  · let τ := CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ofPre
-      σ.observable.toWithClassMap
+  · let τ := σ.observable.toWeak
     have hbound := τ.charge_mem_upperHalfPlane_and_arg_le_phiPlus
       E.obj E.property hEobj hplus
     have harg : Complex.arg (σ.charge E.obj) ≤
@@ -230,6 +228,7 @@ theorem StabilityCondition.WithClassMap.observableStabilityFunctionOnHeart_phase
       simpa [τ,
         WeakPreStabilityCondition.weakStabilityFunctionOnHeart_charge,
         StabilityCondition.WithClassMap.observable,
+        PreStabilityCondition.WithClassMap.ofStrict,
         PreStabilityCondition.WithClassMap.charge_def] using hbound.2
     change Complex.arg (σ.charge E.obj) / Real.pi ≤ _
     exact (div_le_iff₀ Real.pi_pos).2 (by simpa [mul_comm] using harg)

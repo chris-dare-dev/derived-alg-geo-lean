@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.CohomologyPushforward
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Equivalence
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Pushforward.ClosedImmersion
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Finite
 
 /-!
 # Cohomology of a coherent sheaf along a closed immersion
@@ -37,7 +37,8 @@ Both inherited from the abelian-sheaf statement:
 
 * **not natural in `F`** — an isomorphism for each `F`, with naturality unproved;
 * **the `HasExt` universe is pinned**, because the instantiation lets instance search find it.
-  `CategoryTheory/SheafCohomologyPushforward.lean` keeps it parametric for callers who need that.
+  `CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` keeps it parametric for callers who
+  need that.
 
 ## Main results
 

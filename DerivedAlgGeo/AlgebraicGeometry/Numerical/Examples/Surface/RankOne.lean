@@ -30,6 +30,7 @@ see the implementation notes there for why.
 -/
 
 open Polynomial Submodule Set
+open DerivedAlgGeo.LinearAlgebra
 
 namespace AlgebraicGeometry.Numerical
 

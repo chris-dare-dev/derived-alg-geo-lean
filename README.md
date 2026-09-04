@@ -24,8 +24,13 @@ import DerivedAlgGeo
 Library code should prefer the narrowest useful subject import, such as:
 
 ```lean
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf
-import DerivedAlgGeo.CategoryTheory.DGCategory
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory
+import DerivedAlgGeo.AlgebraicGeometry.Moduli
+import DerivedAlgGeo.CategoryTheory.Monoidal
+import DerivedAlgGeo.Algebra.Homology.DGCategory
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 ```
 
@@ -44,15 +49,25 @@ See `CONTRIBUTING.md` §"Where verification runs".
 
 ## Layout
 
-- `DerivedAlgGeo/AlgebraicGeometry` — coherent sheaves, cohomology, duality,
-  intersection theory, Proj, and Riemann--Roch.
-- `DerivedAlgGeo/CategoryTheory` — dg categories, t-structures, and stability
-  conditions.
-- `DerivedAlgGeo/Compatibility` — temporary leaf imports for staged module
-  migrations; stable subjects never depend on it.
-- `DerivedAlgGeo/LinearAlgebra` — integral and Mukai lattices and matrix tools.
-- `DerivedAlgGeo/Algebra` and `DerivedAlgGeo/Topology` — reusable supporting
-  mathematics.
+The source tree mirrors Mathlib's subject hierarchy, so a file extending a
+Mathlib API sits where that API sits in Mathlib. `CLAUDE.md` states the
+placement rule and `docs/architecture/layers.md` the dependency contract.
+
+- `DerivedAlgGeo/AlgebraicGeometry` — schemes and everything stated about
+  them: coherent sheaves, cohomology, scheme-derived categories and `Dqc`,
+  geometric Fourier--Mukai kernels, stability on scheme-derived categories,
+  semistable moduli, duality, intersection theory, Proj, and Riemann--Roch.
+  Organized by geometric object; geometric realizations of categorical
+  interfaces live here with the object they are about.
+- `DerivedAlgGeo/CategoryTheory` — abelian, bicategorical, monoidal, and site
+  theory; triangulated categories with t-structures, stability conditions,
+  dg enhancements, Grothendieck groups, and Fourier--Mukai kernels.
+- `DerivedAlgGeo/Algebra` — ring, module, and polynomial algebra; sheaves of
+  modules on ringed sites under `Algebra/Category/ModuleCat/Sheaf`; derived
+  categories, homotopy categories, dg categories, and spectral sequences
+  under `Algebra/Homology`.
+- `DerivedAlgGeo/LinearAlgebra`, `RingTheory`, `Topology`,
+  `AlgebraicTopology` — reusable supporting mathematics at Mathlib's paths.
 - `DerivedAlgGeo/Development` — exploratory code outside the stable umbrella.
 
 Generated API documentation is published at
@@ -60,7 +75,7 @@ Generated API documentation is published at
 See [CONTRIBUTING.md](CONTRIBUTING.md) for placement, proof, audit, and review
 requirements.
 
-The enforced subject dependency DAG is documented in
+The enforced dependency contract is documented in
 [docs/architecture/layers.md](docs/architecture/layers.md).
 
 ## License

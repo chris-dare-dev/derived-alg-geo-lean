@@ -3,8 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.AssociatedSheaf
-import DerivedAlgGeo.AlgebraicGeometry.CoherentSheaf.Abelian.Basic
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Exactness
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Abelian.Basic
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Exactness
 import DerivedAlgGeo.AlgebraicGeometry.Modules.LocallySurjective
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Invertible
 import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion

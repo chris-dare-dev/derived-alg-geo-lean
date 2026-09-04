@@ -14,6 +14,11 @@ Auto-generated constructions are filtered here rather than in the consumer,
 because the environment is where the information lives: `.casesOn`, `.recOn`,
 `.noConfusion`, `.injEq`, and the `match_`/`proof_` internals are produced by
 declaring an inductive or by tactic elaboration, and no audit should list them.
+
+Deprecated declarations are excluded for the same ownership reason: they are
+compatibility spellings, not canonical public API. A compatibility module that
+contains any non-deprecated authored declaration still falls through to the
+`Unclassified` sentinel and fails the audit-completeness gate.
 -/
 import DerivedAlgGeo
 import DerivedAlgGeo.Development
@@ -30,7 +35,7 @@ congruence lemma on first use and attributes it to the module that triggered it,
 which is whichever module in the build happens to mention the structure first --
 not the module that declared it, and never a module the author wrote it in. Two
 such lemmas for Mathlib's `ShortComplex` landed in
-`CategoryTheory/WeakSerreExact.lean` (#721) purely because it is the first module
+`CategoryTheory/Abelian/WeakSerre.lean` (#721) purely because it is the first module
 to `rw` with one, and the ratchet counted them as that file's unaudited public
 declarations. They are the same class of artifact as `.injEq` and
 `.noConfusion`, which have always been filtered here. -/
@@ -80,20 +85,42 @@ still falls through to `none`, lands under `Unclassified`, and still fails,
 which is the case that deserves a human decision. Only the forced edit is
 gone. -/
 private def libraryOf (m : Name) : Option String :=
-  let dg := `DerivedAlgGeo.CategoryTheory.DGCategory
+  let dg := `DerivedAlgGeo.Algebra.Homology.DGCategory
+  let dgEnhancement := `DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
+  let homotopyEnhancement :=
+    `DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
+  -- The audit lanes are historical (CohLean, BridgelandStabLean, DGLean), and
+  -- routing follows the lane that holds a subtree's records, not its current
+  -- path. `Algebra/Homology/`, `Algebra/Category/ModuleCat/`,
+  -- `AlgebraicTopology/`, and `Topology/Sheaves/Cech/` were routed with
+  -- `CategoryTheory` before the 2026-09-01 moves to Mathlib's paths, and
+  -- `RingTheory/` with `Topology`.
+  let homology := `DerivedAlgGeo.Algebra.Homology
+  let moduleCat := `DerivedAlgGeo.Algebra.Category.ModuleCat
+  let algebraicTopology := `DerivedAlgGeo.AlgebraicTopology
+  let topologicalCech := `DerivedAlgGeo.Topology.Sheaves.Cech
+  let ringTheory := `DerivedAlgGeo.RingTheory
   let categoryTheory := `DerivedAlgGeo.CategoryTheory
   let linearAlgebra := `DerivedAlgGeo.LinearAlgebra
   let algebraicGeometry := `DerivedAlgGeo.AlgebraicGeometry
   let algebra := `DerivedAlgGeo.Algebra
   let topology := `DerivedAlgGeo.Topology
   let development := `DerivedAlgGeo.Development
-  -- `dg` first: `DGCategory` is itself under `CategoryTheory`.
-  if m == dg || dg.isPrefixOf m then some "DGCategory"
+  -- Both dg subtrees precede the generic `CategoryTheory` route.
+  if m == dg || dg.isPrefixOf m ||
+      m == dgEnhancement || dgEnhancement.isPrefixOf m ||
+      m == homotopyEnhancement || homotopyEnhancement.isPrefixOf m then
+    some "DGCategory"
   else if m == categoryTheory || categoryTheory.isPrefixOf m ||
+      m == homology || homology.isPrefixOf m ||
+      m == moduleCat || moduleCat.isPrefixOf m ||
+      m == algebraicTopology || algebraicTopology.isPrefixOf m ||
+      m == topologicalCech || topologicalCech.isPrefixOf m ||
       m == linearAlgebra || linearAlgebra.isPrefixOf m then
     some "StabilityCondition"
   else if m == algebraicGeometry || algebraicGeometry.isPrefixOf m ||
       m == algebra || algebra.isPrefixOf m || m == topology || topology.isPrefixOf m ||
+      m == ringTheory || ringTheory.isPrefixOf m ||
       m == development || development.isPrefixOf m then
     some "AlgebraicGeometry"
   else none
@@ -102,7 +129,7 @@ run_cmd do
   let env ← Lean.getEnv
   let mut rows : Array String := #[]
   for (n, ci) in env.constants.toList do
-    if n.isInternal || !isAuthored n then continue
+    if n.isInternal || !isAuthored n || Linter.isDeprecated env n then continue
     unless ci.isTheorem || ci.isDefinition || ci.isInductive || ci.isCtor do continue
     match env.getModuleIdxFor? n with
     | some idx =>

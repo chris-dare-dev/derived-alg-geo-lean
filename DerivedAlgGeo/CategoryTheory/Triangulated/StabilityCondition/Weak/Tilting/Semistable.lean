@@ -14,7 +14,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting
 This umbrella exports the phase-language counterpart of Lemma 14.17 of
 arXiv:1902.08184v4.  The slope cutoff in the paper is represented by a phase
 cutoff `beta` in `[0, 1)`, as in
-`StabilityCondition/Weak/Tilting/TorsionPair/Slope.lean`.  The converse uses
+`WeakStabilityCondition/Tilting/TorsionPair/Slope.lean`.  The converse uses
 `0 < beta`, since a finite slope cutoff corresponds to a phase cut strictly
 inside `(0, 1)`.  The numerical reparameterisation between the two cutoffs is
 deliberately not asserted.

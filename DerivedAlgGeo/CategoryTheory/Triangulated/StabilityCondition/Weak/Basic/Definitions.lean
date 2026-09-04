@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.PreStabilityCondition
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityFunction.HeartDatum
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.HeartDatum
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing
 import Mathlib.CategoryTheory.Triangulated.TStructure.Heart
 import Mathlib.Tactic
 
@@ -28,7 +28,7 @@ properties under subobjects, quotients and extensions are proved here from
 ## Phrasing choices, stated for the reviewer
 
 * The heart is carried inside `C` as `t.heart`, following
-  `StabilityCondition/Weak/Tilting/TorsionPair/Heart.lean`.  The pinned Mathlib does supply
+  `WeakStabilityCondition/Tilting/TorsionPair/Heart.lean`.  The pinned Mathlib does supply
   `t.heartFullSubcategoryAbelian`; triangle-form subobject data is retained
   here because it stays in the ambient category where the charge and slicing
   live.  `TStructure.heartFullSubcategory_shortExact_of_distTriang` identifies
@@ -57,9 +57,9 @@ variable {Λ : Type*} [AddCommGroup Λ]
 
 /-! ### Definition 14.1: weak prestability conditions
 
-The same data as `PreStabilityCondition.WithClassMap`
-(`StabilityCondition/Foundation/PreStabilityCondition.lean`), with the
-compatibility ray closed at integer phases and open elsewhere. -/
+The weak parent data has the compatibility ray closed at integer phases and
+open elsewhere. Ordinary prestability extends this structure downstream, so
+the weak layer does not import its stronger child. -/
 
 /-- A weak prestability condition with respect to a class map `v : K₀ C →+ Λ`
 (Definition 14.1): a slicing and a central charge on `Λ` such that a nonzero
@@ -75,31 +75,6 @@ structure WeakPreStabilityCondition (v : K₀ C →+ Λ) where
   compat' : ∀ (φ : ℝ) (E : C), slicing.P φ E → ¬IsZero E →
     ∃ m : ℝ, 0 ≤ m ∧ ((∀ n : ℤ, φ ≠ (n : ℝ)) → 0 < m) ∧
       Z (v (K₀.of C E)) = ↑m * Complex.exp (↑(Real.pi * φ) * Complex.I)
-
-namespace WeakPreStabilityCondition
-
-/-- **Ordinary prestability embeds into weak prestability**: the open ray is
-inside the closed one, with the same slicing and the same charge — so phases
-and charges agree definitionally, which `ofPre_slicing` and `ofPre_Z`
-record. -/
-def ofPre {v : K₀ C →+ Λ} (σ : PreStabilityCondition.WithClassMap C v) :
-    WeakPreStabilityCondition v where
-  slicing := σ.slicing
-  Z := σ.Z
-  compat' φ E hP hE := by
-    obtain ⟨m, hm, heq⟩ := σ.compatible φ E hP hE
-    exact ⟨m, hm.le, fun _ => hm, heq⟩
-
-@[simp]
-theorem ofPre_slicing {v : K₀ C →+ Λ}
-    (σ : PreStabilityCondition.WithClassMap C v) :
-    (ofPre σ).slicing = σ.slicing := rfl
-
-@[simp]
-theorem ofPre_Z {v : K₀ C →+ Λ} (σ : PreStabilityCondition.WithClassMap C v) :
-    (ofPre σ).Z = σ.Z := rfl
-
-end WeakPreStabilityCondition
 
 /-! ### Definition 14.2: weak stability functions on a heart -/
 

@@ -37,8 +37,9 @@ namespace AlgebraicGeometry
 
 namespace SmoothProperVariety
 
-variable {k : Type u} [Field k] (X : SmoothProperVariety k)
+variable {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]
 
+variable (k) in
 /-- Explicit canonical-sheaf construction data on a smooth proper variety of pure dimension `n`.
 
 The cotangent object and determinant descent are fields because the current scheme-sheaf API does
@@ -47,9 +48,9 @@ property, not a numerical dimension assertion. -/
 structure CanonicalSheafData (n : ℕ) where
   /-- The structure morphism is smooth of pure relative dimension `n`. -/
   smoothOfRelativeDimension :
-    SmoothOfRelativeDimension n X.toVariety.structureMorphism
+    SmoothOfRelativeDimension n (X ↘ Spec (CommRingCat.of k))
   /-- The chosen relative cotangent module sheaf. -/
-  cotangent : X.toVariety.toScheme.Modules
+  cotangent : X.Modules
   /-- Fixed-rank and determinant data for the chosen cotangent sheaf. -/
   cotangentDeterminant : Scheme.Modules.DeterminantData cotangent
   /-- Its locally free rank agrees with the geometric relative dimension. -/
@@ -57,42 +58,45 @@ structure CanonicalSheafData (n : ℕ) where
 
 namespace CanonicalSheafData
 
-variable {X} {n : ℕ} (C : CanonicalSheafData X n)
+variable {X} {n : ℕ} (C : CanonicalSheafData k X n)
 
 /-- The canonical line bundle, defined as the determinant of the cotangent sheaf. -/
 noncomputable abbrev canonicalLineBundle :
-    Scheme.Modules.LineBundleData X.toVariety.toScheme :=
+    Scheme.Modules.LineBundleData X :=
   C.cotangentDeterminant.topExteriorPower
 
 /-- The underlying canonical module sheaf `ω_X`. -/
-noncomputable abbrev canonicalSheaf : X.toVariety.toScheme.Modules :=
+noncomputable abbrev canonicalSheaf : X.Modules :=
   C.canonicalLineBundle.line
 
 /-- The inverse, or anticanonical, line bundle. -/
 noncomputable def antiCanonicalLineBundle :
-    Scheme.Modules.LineBundleData X.toVariety.toScheme :=
+    Scheme.Modules.LineBundleData X :=
   C.canonicalLineBundle.dual
 
 /-- The canonical Picard class `[ω_X]`. -/
-noncomputable def canonicalClass : Scheme.Modules.Pic X.toVariety.toScheme :=
+noncomputable def canonicalClass : Scheme.Modules.Pic X :=
   C.canonicalLineBundle.toPic
 
 /-- The canonical class in additive notation. -/
-noncomputable def canonicalClassAdd : Additive (Scheme.Modules.Pic X.toVariety.toScheme) :=
+noncomputable def canonicalClassAdd : Additive (Scheme.Modules.Pic X) :=
   Additive.ofMul C.canonicalClass
 
+omit [IsSmoothProperVariety k X] in
 /-- The anticanonical Picard class is the inverse of the canonical class. -/
 @[simp]
 theorem antiCanonicalClass :
     C.antiCanonicalLineBundle.toPic = C.canonicalClass⁻¹ :=
   C.canonicalLineBundle.toPic_dual
 
+omit [IsSmoothProperVariety k X] in
 /-- The chosen cotangent determinant has the recorded pure relative dimension. -/
 theorem determinant_rank : C.cotangentDeterminant.rank = n :=
   C.cotangent_rank
 
+omit [IsSmoothProperVariety k X] in
 /-- Two canonical-sheaf packages with isomorphic line representatives define the same class. -/
-theorem canonicalClass_eq_of_iso {C' : CanonicalSheafData X n}
+theorem canonicalClass_eq_of_iso {C' : CanonicalSheafData k X n}
     (e : C.canonicalSheaf ≅ C'.canonicalSheaf) :
     C.canonicalClass = C'.canonicalClass :=
   C.canonicalLineBundle.toPic_eq_of_iso C'.canonicalLineBundle e
@@ -103,7 +107,7 @@ Existence is kept as data because the present Cartier-to-Picard API does not pro
 surjectivity for every line bundle. -/
 structure CanonicalDivisorData where
   /-- A Cartier divisor representing the canonical class. -/
-  divisor : Scheme.CartierDivisor X.toVariety.toScheme
+  divisor : Scheme.CartierDivisor X
   /-- Its associated invertible sheaf is the canonical sheaf. -/
   associatedSheafIso :
     Scheme.CartierDivisor.associatedSheaf divisor ≅ C.canonicalSheaf
@@ -123,8 +127,8 @@ theorem toPic_eq_canonicalClass :
 
 /-- The canonical Cartier divisor class. -/
 noncomputable def canonicalDivisorClass :
-    Scheme.CartierDivisor.ClassGroup X.toVariety.toScheme :=
-  Scheme.CartierDivisor.toClass X.toVariety.toScheme D.divisor
+    Scheme.CartierDivisor.ClassGroup X :=
+  Scheme.CartierDivisor.toClass X D.divisor
 
 /-- The Cartier class-to-Picard map sends the canonical divisor class to `[ω_X]`. -/
 theorem classToPic_eq_canonicalClass :
@@ -140,18 +144,19 @@ end CanonicalDivisorData
 This structure deliberately contains no field claiming that `dualizingCandidate` is dualizing;
 that property must come from a comparison with the constructed canonical complex. -/
 structure DualizingSheafComparison
-    (dualizingCandidate : X.toVariety.toScheme.Modules) where
+    (dualizingCandidate : X.Modules) where
   /-- On a smooth pure-dimensional target, the candidate is identified with `ω_X`. -/
   iso : dualizingCandidate ≅ C.canonicalSheaf
 
 namespace DualizingSheafComparison
 
-variable {C} {D : X.toVariety.toScheme.Modules}
+variable {C} {D : X.Modules}
 
+omit [IsSmoothProperVariety k X] in
 /-- A dualizing-candidate comparison determines the candidate's Picard class whenever it is
 equipped with line-bundle data. -/
 theorem candidateClass_eq (E : DualizingSheafComparison C D)
-    (L : Scheme.Modules.LineBundleData X.toVariety.toScheme)
+    (L : Scheme.Modules.LineBundleData X)
     (hL : L.line ≅ D) :
     L.toPic = C.canonicalClass :=
   L.toPic_eq_of_iso C.canonicalLineBundle (hL ≪≫ E.iso)

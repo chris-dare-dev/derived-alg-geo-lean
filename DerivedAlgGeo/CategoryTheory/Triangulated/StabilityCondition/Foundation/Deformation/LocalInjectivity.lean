@@ -5,7 +5,7 @@ Authors: Formalization
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.SeminormComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.PhaseArithmetic
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Slicing.CoreConsequences
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.CoreConsequences
 import Mathlib.Analysis.SpecialFunctions.Complex.Arg
 
 /-!
@@ -29,7 +29,7 @@ universe v u u'
 
 namespace CategoryTheory.Triangulated
 
-open Deformation
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation
 open PreStabilityCondition.WithClassMap (charge_congr charge_def)
 
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
@@ -98,8 +98,8 @@ theorem im_divided_of_semistable (σ : StabilityCondition.WithClassMap C v) {F :
   obtain ⟨b, hb, hbZ⟩ := σ.compat ψ F hss hne
   refine ⟨b, hb, ?_⟩
   rw [hbZ]
-  simpa [Deformation.rotatedIm] using
-    (Deformation.rotatedIm_polar b ψ φ)
+  simpa [WeakStabilityCondition.StabilityCondition.Deformation.rotatedIm] using
+    (WeakStabilityCondition.StabilityCondition.Deformation.rotatedIm_polar b ψ φ)
 
 /-! ### Lemma 6.4: Local injectivity -/
 

@@ -47,8 +47,13 @@ BASELINE = ROOT / "scripts" / "single_instantiation_baseline.txt"
 
 # Subjects that exist in order to be instantiated. `AlgebraicGeometry` is not
 # one: a structure there describes a particular geometric situation, and having
-# one witness of it is the normal case rather than a smell.
-GENERIC_SUBJECTS = {"CategoryTheory", "LinearAlgebra", "Algebra", "Topology"}
+# one witness of it is the normal case rather than a smell. A geometric
+# realization of a categorical interface lives with the geometric object, under
+# `AlgebraicGeometry/`, so no path below a generic subject is geometric.
+GENERIC_SUBJECTS = {
+    "CategoryTheory", "LinearAlgebra", "Algebra", "Topology", "RingTheory",
+    "AlgebraicTopology",
+}
 THRESHOLD = 1
 
 

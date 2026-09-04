@@ -17,7 +17,9 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LIBRARY = ROOT / "DerivedAlgGeo"
-FAMILIES = "DerivedAlgGeo/AlgebraicGeometry/StabilityCondition/Families"
+GEOMETRIC_FOURIER_MUKAI = (
+    "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai"
+)
 
 # Class-name tokens, not binder substrings: `[i : HasDerivedTensorAssoc D]`, a
 # qualified name, or a line-wrapped binder must all count. The 2026-08-18
@@ -33,14 +35,14 @@ LEGACY_CLASSES = re.compile(
 # The only modules allowed to mention the legacy classes: the two that define
 # them and derive their one-way views from the coherent roots.
 LEGACY_DEFINING = {
-    f"{FAMILIES}/KernelConvolution.lean",
-    f"{FAMILIES}/KernelUnitConvolution.lean",
+    f"{GEOMETRIC_FOURIER_MUKAI}/KernelConvolution.lean",
+    f"{GEOMETRIC_FOURIER_MUKAI}/KernelUnitConvolution.lean",
 }
 
 TENSOR_UNIT = re.compile(r"\bHasTensorUnit\b")
 TENSOR_UNIT_BINDER = re.compile(r"\[\s*(?:\w+\s*:\s*)?HasTensorUnit\b")
-TENSOR_UNIT_DEFINING = f"{FAMILIES}/KernelUnit.lean"
-TENSOR_UNIT_COMPAT = f"{FAMILIES}/KernelUnitConvolution.lean"
+TENSOR_UNIT_DEFINING = f"{GEOMETRIC_FOURIER_MUKAI}/KernelUnit.lean"
+TENSOR_UNIT_COMPAT = f"{GEOMETRIC_FOURIER_MUKAI}/KernelUnitConvolution.lean"
 
 
 def main() -> int:

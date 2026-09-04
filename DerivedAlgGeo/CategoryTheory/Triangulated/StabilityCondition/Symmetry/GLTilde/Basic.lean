@@ -30,27 +30,27 @@ This file proves that the compatible pairs form a group under componentwise
 multiplication, and that the type is nonempty (`compat_one` is the witness).
 The companion files prove the covering-space properties:
 
-* **Fibre `ℤ`** — **proved**, in `StabilityCondition/Symmetry/GLTilde/Covering/Fibre.lean`. The kernel of the
+* **Fibre `ℤ`** — **proved**, in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Fibre.lean`. The kernel of the
   projection is exactly the deck transformations `φ ↦ φ + 2n`.
-* **Surjectivity of the projection** — **proved**, in `StabilityCondition/Symmetry/GLTilde/Covering/Surjectivity.lean`. Every
+* **Surjectivity of the projection** — **proved**, in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Surjectivity.lean`. Every
   `T` of positive determinant carries a compatible phase relabelling.
-* **Simple connectedness** — **proved**, in `StabilityCondition/Symmetry/GLTilde/Covering/SourceTopology.lean`, by global
+* **Simple connectedness** — **proved**, in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/SourceTopology.lean`, by global
   coordinates `ℝ × (0,∞) × ℝ × (0,∞)` and contractibility.
-* **Covering-map property** — **proved**, in `StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`. Global base
+* **Covering-map property** — **proved**, in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`. Global base
   coordinates identify the projection with the standard exponential cover
   `ℝ → S¹` times an identity map.
 
 Thus `GLTilde.universalCoverData` packages the surjective covering-map and
 simple-connectedness properties, while `exact_deckHom_toMatHom` packages the
-extension with fibre `ℤ`. `StabilityCondition/Symmetry/GLTilde/Topology/Group.lean` proves continuity of
+extension with fibre `ℤ`. `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Topology/Group.lean` proves continuity of
 multiplication and inversion and installs `IsTopologicalGroup GLTilde`.
 
-The `StabilityCondition/Symmetry/GLTilde/Action/PreStability.lean` and
-`StabilityCondition/Symmetry/GLTilde/Action/Stability.lean` files use this
+The `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/PreStability.lean` and
+`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean` files use this
 group to define and prove the action on stability conditions.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
 open Matrix Real
 
@@ -218,4 +218,4 @@ def toShiftHom : GLTilde →* NormalizedShift where
 
 end GLTilde
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

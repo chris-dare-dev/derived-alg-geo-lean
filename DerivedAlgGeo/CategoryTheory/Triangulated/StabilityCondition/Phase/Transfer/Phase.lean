@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Order.Functoriality
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.SlicingDistance
 
 /-!
 # Phases and orders under preimage transfer
@@ -13,6 +14,12 @@ filtrations map forward without changing their phases.  If the functor also
 reflects zero objects, this identifies the intrinsic extreme phases, hence the
 strict and weak phase windows.  This proves Lemmas 3.5 and 3.9 and the order
 clause of Remark 3.14(3) of arXiv:2607.28411v1 at the categorical level.
+
+Reflection of zero objects is in fact a consequence of the lifting witness
+itself (`Slicing.PreimageData.reflectsZeroObjects`), so the two-witness forms
+of the order transfer (`Slicing.Precedes.preimage_of_preimageData`, Lemma 3.3
+of arXiv:2601.22994) and the distance inequality of Lemmas 3.5(3) and 3.9(3)
+(`slicingDist_preimage_le`) take no conservativity hypothesis at all.
 -/
 
 noncomputable section
@@ -62,6 +69,30 @@ theorem Functor.reflectsZeroObjects_of_conservative (F : C ⥤ D)
     Functor.ReflectsIsomorphisms.reflects F (0 : E ⟶ E)
   exact (isIsoZero_iff_source_target_isZero E E).mp
     (show IsIso (0 : E ⟶ E) from inferInstance) |>.1
+
+/-- The Hom-vanishing half of the slicing-lifting witness forces the detecting
+functor to reflect zero objects, so the conservativity that Remarks 3.2 and
+3.7 of arXiv:2607.28411v1 add by hand is a consequence rather than a
+hypothesis.  Take `E` with `F.obj E` zero; then `E` lies in the preimage
+slices of phases `1` and `0` at once, and Hom-vanishing from the higher to the
+lower phase forces `𝟙 E = 0`. -/
+theorem Slicing.PreimageData.reflectsZeroObjects {s : Slicing D} {F : C ⥤ D}
+    (h : s.PreimageData F) : ReflectsZeroObjects F := by
+  intro E hFE
+  rw [IsZero.iff_id_eq_zero]
+  exact h.hom_vanishing 1 0 E E zero_lt_one
+    (s.zero_mem_of_isZero D 1 (F.obj E) hFE)
+    (s.zero_mem_of_isZero D 0 (F.obj E) hFE) (𝟙 E)
+
+/-- The contrapositive of `Slicing.PreimageData.reflectsZeroObjects`, in the
+shape every downstream caller needs: `¬IsZero` is the hypothesis form taken by
+`Slicing.phiPlus`, `Slicing.phiMinus`, the positivity field of a
+pre-stability condition, and `semistableClasses`, so this is the form in
+which conservativity is actually consumed, never `ReflectsZeroObjects`
+itself. -/
+theorem Slicing.PreimageData.not_isZero_obj {s : Slicing D} {F : C ⥤ D}
+    (h : s.PreimageData F) {E : C} (hE : ¬IsZero E) : ¬IsZero (F.obj E) :=
+  fun hFE => hE (h.reflectsZeroObjects E hFE)
 
 variable (s : Slicing D) (F : C ⥤ D) [F.Additive] [F.CommShift ℤ]
   [F.IsTriangulated] (h : s.PreimageData F)
@@ -200,5 +231,57 @@ theorem Slicing.PrecedesWeak.preimage (F : C ⥤ D) [F.Additive]
     (hst : s.PrecedesWeak D t) :
     (s.preimage F (H s)).PrecedesWeak C (t.preimage F (H t)) :=
   (Slicing.preimageOrderData F H hzero).precedesWeak hst
+
+/-! ### Order and distance from two lifting witnesses
+
+`Slicing.Precedes.preimage` asks for lifting data on every slicing of the
+target.  The paper's statements only ever involve the two slicings being
+compared, so the two-witness forms below are the ones a geometric consumer
+can discharge, and the reflection of zero objects they need is supplied by
+the witnesses themselves. -/
+
+/-- Transfer preserves the strict slicing order, given lifting witnesses for
+the two slicings involved.  This is Lemma 3.3 of arXiv:2601.22994: an object
+semistable for the transferred `s` maps to an object semistable for `s`, whose
+HN phases for `t` are strictly below its phase, and those phases are the HN
+phases for the transferred `t`. -/
+theorem Slicing.Precedes.preimage_of_preimageData (F : C ⥤ D) [F.Additive]
+    [F.CommShift ℤ] [F.IsTriangulated] {s t : Slicing D}
+    (hs : s.PreimageData F) (ht : t.PreimageData F) (hst : s.Precedes D t) :
+    (s.preimage F hs).Precedes C (t.preimage F ht) := by
+  intro phi E hE
+  exact (t.preimage_ltProp_iff F ht ht.reflectsZeroObjects phi E).mpr
+    (hst phi (F.obj E) hE)
+
+/-- The `≤` twin of `Slicing.Precedes.preimage_of_preimageData`, proved the
+same way through `preimage_leProp_iff` instead of `preimage_ltProp_iff`; both
+are the two-witness form of Lemma 3.3 of arXiv:2601.22994, which is what a
+geometric consumer can discharge without the family-wide hypothesis of
+`Slicing.PrecedesWeak.preimage`. -/
+theorem Slicing.PrecedesWeak.preimage_of_preimageData (F : C ⥤ D) [F.Additive]
+    [F.CommShift ℤ] [F.IsTriangulated] {s t : Slicing D}
+    (hs : s.PreimageData F) (ht : t.PreimageData F) (hst : s.PrecedesWeak D t) :
+    (s.preimage F hs).PrecedesWeak C (t.preimage F ht) := by
+  intro phi E hE
+  exact (t.preimage_leProp_iff F ht ht.reflectsZeroObjects phi E).mpr
+    (hst phi (F.obj E) hE)
+
+/-- Transfer does not increase the generalized distance between slicings,
+Lemma 3.5(3) and Lemma 3.9(3) of arXiv:2607.28411v1.  Every phase discrepancy
+on the source is a phase discrepancy on the target at the image object, so the
+source supremum runs over a subset of the target terms. -/
+theorem slicingDist_preimage_le (F : C ⥤ D) [F.Additive] [F.CommShift ℤ]
+    [F.IsTriangulated] (s t : Slicing D)
+    (hs : s.PreimageData F) (ht : t.PreimageData F) :
+    slicingDist C (s.preimage F hs) (t.preimage F ht) ≤ slicingDist D s t := by
+  apply iSup_le
+  intro E
+  apply iSup_le
+  intro hE
+  rw [s.preimage_phiPlus F hs hs.reflectsZeroObjects E hE,
+    t.preimage_phiPlus F ht ht.reflectsZeroObjects E hE,
+    s.preimage_phiMinus F hs hs.reflectsZeroObjects E hE,
+    t.preimage_phiMinus F ht ht.reflectsZeroObjects E hE]
+  exact slicingDistTerm_le D s t (F.obj E) (hs.not_isZero_obj hE)
 
 end CategoryTheory.Triangulated

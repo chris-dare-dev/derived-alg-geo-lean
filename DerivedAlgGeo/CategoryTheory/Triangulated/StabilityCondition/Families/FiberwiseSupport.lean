@@ -20,11 +20,11 @@ relative category, or base-change functors, and it makes no openness, relative
 Harder--Narasimhan, or boundedness claim.
 -/
 
-namespace CategoryTheory.Triangulated.StabilityCondition.Families
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 open CategoryTheory Limits Pretriangulated
 open CategoryTheory.Triangulated
-open CategoryTheory.Triangulated.StabilityCondition.Support
+open CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
 noncomputable section
 
@@ -132,4 +132,4 @@ theorem ordinaryFiberUniformQuadraticSupportData_punit
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.Families
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families

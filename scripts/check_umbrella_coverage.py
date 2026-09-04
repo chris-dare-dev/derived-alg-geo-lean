@@ -23,8 +23,13 @@ children would invert the dependency and create a cycle.
 
 So the rule keys on content, not on position: a file that declares nothing and
 has a directory of its own name is an umbrella, and must cover it. A file that
-declares something is a module, and is left alone. That distinction is the whole
-of the heuristic, and it is the one the repository already follows.
+declares something is a module, and is left alone.
+
+An explicit abstraction boundary keeps the neutral scheme-derived umbrella
+from re-exporting its stability-consuming child. The layering gate checks the import direction
+at those boundaries. Keeping every exception
+as an exact umbrella/child pair prevents it from weakening coverage anywhere
+else.
 """
 
 from __future__ import annotations
@@ -42,6 +47,13 @@ DECLARES = re.compile(
     r"(?:private\s+|protected\s+|noncomputable\s+|partial\s+|unsafe\s+|scoped\s+)*"
     r"(def|theorem|lemma|abbrev|structure|class|inductive|instance|axiom|opaque)\b"
 )
+EXPLICIT_CHILD_BOUNDARIES = {
+    # Scheme-derived categories are importable without stability conditions.
+    # The top-level `AlgebraicGeometry` umbrella imports the `Stability` child.
+    "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory": {
+        "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability",
+    },
+}
 
 
 def module_name(path: pathlib.Path) -> str:
@@ -78,6 +90,9 @@ def main() -> int:
 
         checked += 1
         declared = imports_of(umbrella)
+        omitted_children = EXPLICIT_CHILD_BOUNDARIES.get(
+            module_name(umbrella), set()
+        )
         # Direct children only: a nested directory is covered by its own
         # umbrella, which this check reaches on its own pass.
         # A child `X.lean` beside a directory `X/` is reached by both loops
@@ -85,6 +100,8 @@ def main() -> int:
         seen: set[str] = set()
         for child in sorted(directory.glob("*.lean")):
             name = module_name(child)
+            if name in omitted_children:
+                continue
             if name not in declared and name not in seen:
                 seen.add(name)
                 failures.append(
@@ -94,6 +111,8 @@ def main() -> int:
         for sub in sorted(p for p in directory.iterdir() if p.is_dir()):
             sub_umbrella = sub.with_suffix(".lean")
             sub_name = module_name(sub_umbrella) if sub_umbrella.exists() else None
+            if sub_name in omitted_children:
+                continue
             if sub_name is not None and sub_name not in declared and sub_name not in seen:
                 seen.add(sub_name)
                 failures.append(

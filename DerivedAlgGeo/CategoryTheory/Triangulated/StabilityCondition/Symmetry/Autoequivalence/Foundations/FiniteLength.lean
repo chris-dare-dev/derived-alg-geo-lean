@@ -30,10 +30,10 @@ strict mono. It cannot be dropped: proving it needs strict monos to be closed
 under composition (with `Subobject.underlyingIso`), and **strict-mono
 composition is not available in general** — it is proved only for interval
 categories (`Slicing.IntervalCat.comp_strictMono`,
-`StabilityCondition/Foundation/Slicing/IntervalStrictness.lean`). Callers whose
+`WeakStabilityCondition/StabilityCondition/Foundation/Slicing/IntervalStrictness.lean`). Callers whose
 target is an interval category discharge `harr` with
 `intervalSubobject_arrow_strictMono`
-(`StabilityCondition/Foundation/Slicing/IntervalFiniteTransfer.lean`).
+(`WeakStabilityCondition/StabilityCondition/Foundation/Slicing/IntervalFiniteTransfer.lean`).
 
 ## Also here
 
@@ -50,6 +50,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 namespace CategoryTheory.Triangulated
 
 open CategoryTheory.Triangulated
+open WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat
 
 universe w u
 
@@ -160,8 +161,7 @@ theorem intervalInclusion_isAdmissibleSubobject
   refine ⟨I.obj Y, I.obj Q, I.map i, inferInstance, I.map q, ?_, δ, ?_⟩
   · subst A
     have hcanonical : IsStrictMono (Subobject.mk i).arrow :=
-      CategoryTheory.Triangulated.Deformation.Slicing.IntervalCat.subobject_arrow_strictMono
-        C i hiStrict
+      subobject_arrow_strictMono C i hiStrict
     have hcanonicalMap : IsStrictMono (I.map (Subobject.mk i).arrow) :=
       intervalInclusion_map_strictMono (C := C) h _ hcanonical
     letI : Mono (I.map (Subobject.mk i).arrow) := hcanonicalMap.mono

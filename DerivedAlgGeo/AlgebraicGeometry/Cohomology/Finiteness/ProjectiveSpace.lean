@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Proj.Modules.ProjectiveSpace
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.ProjectiveSpace
+import DerivedAlgGeo.Topology.Sheaves.Cech.GlobalComparison
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Boundedness
 
@@ -14,7 +14,7 @@ For polynomial projective space over a field, the standard cover by the variable
 `D₊(Xᵢ)` is Čech-acyclic for every quasi-coherent associated sheaf, and in particular for every
 nonnegative twist.  This is the hypothesis that the
 Čech-to-derived comparison of
-`DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.GlobalComparison` consumes, so with it
+`DerivedAlgGeo.Topology.Sheaves.Cech.GlobalComparison` consumes, so with it
 `Hⁱ(Pⁿ, O(d))` is the cohomology of an explicit complex of degree-zero homogeneous
 localizations.
 
@@ -40,6 +40,8 @@ different groups.
 universe u
 
 open CategoryTheory CategoryTheory.Limits TopologicalSpace Opposite
+
+open GradedModule MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 

@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Gluing
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Presentation.Transport
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Over
 import Mathlib.RingTheory.Localization.Finiteness
 
 /-!
@@ -16,7 +16,6 @@ can then be checked on a finite basic-open cover.
 
 ## Main results
 
-* `GeneratingSections.map` and `GeneratingSections.over` transport finite generating families;
 * `Scheme.Modules.exists_basicOpen_finiteGenerating_cover` refines finite-type data to basic
   opens whose defining elements span the unit ideal;
 * `Scheme.Modules.moduleFinite_globalSections_of_isFiniteType` patches the resulting finite
@@ -27,57 +26,6 @@ can then be checked on a finite basic-open cover.
 universe u
 
 open CategoryTheory Limits Opposite SheafOfModules TopologicalSpace
-
-namespace SheafOfModules
-
-variable {C C' : Type u} [Category.{u} C] [Category.{u} C']
-  {J : GrothendieckTopology C} {J' : GrothendieckTopology C'}
-  {R : Sheaf J RingCat.{u}} {S : Sheaf J' RingCat.{u}}
-  [HasSheafify J AddCommGrpCat] [J.WEqualsLocallyBijective AddCommGrpCat]
-  [HasSheafify J' AddCommGrpCat] [J'.WEqualsLocallyBijective AddCommGrpCat]
-  [J'.HasSheafCompose (forget₂ RingCat AddCommGrpCat)]
-
-variable
-  [hasSheafComposeOver : ∀ X,
-    (J.over X).HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})]
-  [hasSheafifyOver : ∀ X, HasSheafify (J.over X) AddCommGrpCat.{u}]
-  [hasWeakSheafifyOver : ∀ X, HasWeakSheafify (J.over X) AddCommGrpCat.{u}]
-  [wEqualsLocallyBijectiveOver : ∀ X,
-    (J.over X).WEqualsLocallyBijective AddCommGrpCat.{u}]
-  [hasSheafComposeOverOver : ∀ X Y, ((J.over X).over Y).HasSheafCompose
-    (forget₂ RingCat.{u} AddCommGrpCat.{u})]
-  [hasSheafifyOverOver : ∀ X Y,
-    HasSheafify ((J.over X).over Y) AddCommGrpCat.{u}]
-  [hasWeakSheafifyOverOver : ∀ X Y,
-    HasWeakSheafify ((J.over X).over Y) AddCommGrpCat.{u}]
-  [wEqualsLocallyBijectiveOverOver : ∀ X Y,
-    ((J.over X).over Y).WEqualsLocallyBijective AddCommGrpCat.{u}]
-
-set_option maxHeartbeats 1600000 in
-/-- Restrict generating sections on `U` along an object `W ⟶ U` of the slice site. -/
-noncomputable def GeneratingSections.over {M : SheafOfModules.{u} R} {U : C}
-    (σ : (M.over U).GeneratingSections) (W : Over U) [HasBinaryProducts (Over U)] :
-    (M.over W.left).GeneratingSections := by
-  haveI : PreservesColimitsOfSize.{u, u}
-      (pushforward.{u} (𝟙 ((R.over U).over W))) :=
-    preservesColimitsOfSize_shrink.{u, u, u, u} _
-  let σ' : ((M.over U).over W).GeneratingSections :=
-    σ.map (pushforward (𝟙 _)) (.refl _)
-  letI eW := pushforwardPushforwardEquivalence (Over.iteratedSliceEquiv W)
-    (S := (R.over U).over W) (R := R.over W.left) (𝟙 _) (𝟙 _)
-    (by ext : 2; exact R.1.map_id _) (by ext : 2; exact R.1.map_id _)
-  exact (σ'.map eW.inverse (.refl _)).ofEpi
-    (eW.fullyFaithfulFunctor.preimageIso
-      (by exact eW.counitIso.app ((M.over U).over W))).hom
-
-set_option maxHeartbeats 1600000 in
-/-- Restriction to a nested slice preserves finite generation. -/
-instance GeneratingSections.isFiniteType_over {M : SheafOfModules.{u} R} {U : C}
-    (σ : (M.over U).GeneratingSections) [σ.IsFiniteType]
-    (W : Over U) [HasBinaryProducts (Over U)] : (σ.over W).IsFiniteType where
-  finite := inferInstanceAs (Finite σ.I)
-
-end SheafOfModules
 
 namespace AlgebraicGeometry.Scheme.Modules
 

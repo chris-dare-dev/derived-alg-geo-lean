@@ -1,381 +1,400 @@
 #!/usr/bin/env python3
-"""Check the repository's subject and AlgebraicGeometry dependency direction.
+"""Enforce the repository's dependency direction.
 
-An acyclic Lean module graph can still hide a cycle after modules are grouped
-by their declared owners. This gate collapses imports to the top-level subject
-directories, rejects cycles in that graph, and enforces the CategoryTheory /
-AlgebraicGeometry ownership boundary introduced by issue #601.
+The source tree mirrors Mathlib's subject hierarchy, and Mathlib's subjects
+are not a tower: ``Algebra/Homology`` imports ``CategoryTheory`` and
+``CategoryTheory/Linear`` imports ``Algebra``. So this gate does not rank
+subjects and does not look for subject-level cycles. Lean already rejects
+module-level cycles, and that is the only acyclicity Mathlib has either.
 
-The top-level collapse cannot see a reusable moduli or stack root importing a
-Bridgeland-family leaf because both live below ``AlgebraicGeometry``. Issue
-#850 adds that finer boundary here. Its measured legacy edges are exact-pair
-allowlisted and stale entries fail, so the exception set can shrink but cannot
-silently become permanent.
+What it enforces is the short list of *policy* edges the layout promises and
+nothing else checks.
+
+1. **Geometry firewall.** Only modules below ``AlgebraicGeometry/`` and
+   ``Development/`` may import ``DerivedAlgGeo.AlgebraicGeometry`` or
+   ``Mathlib.AlgebraicGeometry``, and only they may declare into the
+   ``AlgebraicGeometry`` namespace. Everything else in the library is usable
+   without schemes. A geometric realization of a categorical interface
+   therefore lives with the geometric object, the way ``Abelian (ModuleCat R)``
+   lives in ``Algebra/Category/ModuleCat/Abelian.lean``; there are no
+   ``Instances/AlgebraicGeometry`` leaves below a generic subject.
+2. **Development is a leaf.** No stable module imports it.
+3. **Stability-neutral geometry.** Geometry outside the subtrees that exist to
+   consume stability conditions must not reach the stability tree, even
+   transitively. This is what lets ``Dᵇ(Coh X)``, ``Dqc``, coherent sheaves,
+   and cohomology be imported without Bridgeland stability.
+4. **Weak stability is independent of Bridgeland stability**, and the
+   Bridgeland pre-stability structure extends the weak one instead of copying
+   its fields.
+5. **Retired paths stay retired**, so a shim removed by a cutover cannot drift
+   back.
+6. **New top-level subjects are deliberate.** A directory directly below the
+   source root must be one of the Mathlib subjects this repository uses.
+
+Fixtures under ``scripts/fixtures/layering`` are known-answer tests: every
+``allowed`` fixture must pass rules 1-4 and every ``forbidden`` fixture must
+fail at least one of them, so an edit that silently stops rejecting anything
+is caught here rather than by the next regression.
 """
 
 from __future__ import annotations
 
-from collections import defaultdict
 import pathlib
 import re
 import sys
 
-
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SOURCE_ROOT = ROOT / "DerivedAlgGeo"
+LIBRARY = "DerivedAlgGeo"
+SOURCE_ROOT = ROOT / LIBRARY
+FIXTURES = ROOT / "scripts" / "fixtures" / "layering"
+
+# Lean's module system prefixes imports with `public`, `private`, or `meta`,
+# and `import all` re-exports; a plain `^import` regex misses every one.
 IMPORT = re.compile(
     r"^\s*(?:(?:public|private|meta)\s+)*import\s+(?:all\s+)?(\S+)"
 )
-GENERIC_OWNER = "CategoryTheory"
-GEOMETRY_OWNER = "AlgebraicGeometry"
-STABILITY_FAMILIES_ROOT = (
-    "DerivedAlgGeo.AlgebraicGeometry.StabilityCondition.Families"
+NAMESPACE = re.compile(r"^\s*namespace\s+(\S+)")
+
+KNOWN_SUBJECTS = {
+    "Algebra",
+    "AlgebraicGeometry",
+    "AlgebraicTopology",
+    "CategoryTheory",
+    "Development",
+    "LinearAlgebra",
+    "RingTheory",
+    "Topology",
+}
+
+GEOMETRY = f"{LIBRARY}.AlgebraicGeometry"
+DEVELOPMENT = f"{LIBRARY}.Development"
+MATHLIB_GEOMETRY = "Mathlib.AlgebraicGeometry"
+GEOMETRY_IMPORTERS = (GEOMETRY, DEVELOPMENT)
+# The two aggregation roots import everything and own nothing.
+AGGREGATION_ROOTS = {LIBRARY, f"{LIBRARY}Sweep"}
+
+# The stability tree. Bridgeland stability is the canonical concept and names
+# the directory; weak stability, its dependency parent, is the child `Weak/`,
+# as `PseudoMetricSpace` is `MetricSpace/Pseudo/` in Mathlib. A weak module is
+# one below `Weak/`; a strong module is one in the tree but outside `Weak/`.
+STABILITY_ROOT = f"{LIBRARY}.CategoryTheory.Triangulated.StabilityCondition"
+WEAK_TREE = f"{STABILITY_ROOT}.Weak"
+STRONG_TREE = STABILITY_ROOT
+STRONG_PRESTABILITY_SOURCE = SOURCE_ROOT / (
+    "CategoryTheory/Triangulated/StabilityCondition/"
+    "Foundation/PreStabilityCondition.lean"
 )
-PROTECTED_GEOMETRY_SUBTREES = {
-    ("AlgebraicGeometry", "Moduli"),
-    ("AlgebraicGeometry", "Stacks"),
-}
-PROTECTED_GEOMETRY_UMBRELLAS = {
-    "AlgebraicGeometry/Moduli.lean",
-    "AlgebraicGeometry/Stacks.lean",
-}
-REVERSE_EDGE_ALLOWLIST = ROOT / "scripts" / "layering_reverse_edges.txt"
-LAYERING_FIXTURES = ROOT / "scripts" / "fixtures" / "layering"
+STRONG_PRESTABILITY_EXTENDS = re.compile(
+    r"extends\s+toWeak\s*:\s*WeakStabilityCondition\.WeakPreStabilityCondition"
+)
 
-# Higher layers may import lower layers. Equal-rank support subjects may import
-# one another provided the observed graph remains acyclic.
-LAYER = {
-    "Algebra": 0,
-    "LinearAlgebra": 0,
-    "Topology": 0,
-    GENERIC_OWNER: 1,
-    GEOMETRY_OWNER: 2,
-    "Compatibility": 3,
-    "Development": 4,
-}
+# Geometry that exists to consume stability conditions. Every other module
+# below AlgebraicGeometry/ must be importable without the stability tree.
+STABILITY_CONSUMING_GEOMETRY = (
+    f"{GEOMETRY}.Moduli",
+    f"{GEOMETRY}.Numerical",
+    f"{GEOMETRY}.DerivedCategory.Stability",
+)
 
-GEOMETRY_FAMILY_MODULES = {
-    "BoundedGeometry",
-    "DerivedPullbackCoherence",
-    "DerivedPullbackLaws",
-    "DerivedPullbackShift",
-    "DerivedTensorCoherence",
-    "Dqc",
-    "ExactPullback",
-    "ExactPullbackCoherence",
-    "FiniteTypeGeometry",
-    "FlatPullback",
-    "FlatPullbackResolution",
-    "GeometricBaseChange",
-    "InducingPullback",
-    "KernelAssociativity",
-    "KernelConvolution",
-    "KernelCorrespondence",
-    "KernelUnit",
-    "KernelUnitConvolution",
-    "LeftDerivedPullback",
-    "OpenImmersionPullback",
-    "PullbackAcyclicResolution",
-    "RelativeHN",
-    "ResidueFiber",
-    "Scheme",
-    "SchemeDerived",
-    "SchemeSemistableLocus",
-}
+# Paths removed by a structural cutover, relative to the source root. An entry
+# without a suffix names a directory and also forbids its same-named umbrella.
+RETIRED_PATHS = (
+    # 2026-09-02 Euler-characteristic lane: restated on Mathlib's GradedObject.eulerChar.
+    "LinearAlgebra/AlternatingFinsum.lean",
+    "LinearAlgebra/AlternatingSum.lean",
+    # 2026-09-02 placement follow-ups to the Mathlib-mesh restructure.
+    "Algebra/Homology/DerivedCategory/TStructure.lean",
+    "CategoryTheory/Triangulated/QuasiAbelian.lean",
+    "CategoryTheory/Triangulated/LinearOpposite.lean",
+    "CategoryTheory/StabilityCharge.lean",
+    "Compatibility",
+    "AlgebraicGeometry/StabilityCondition",
+    "AlgebraicGeometry/Duality/Serre/LinearDual.lean",
+    "AlgebraicGeometry/Modules/Affine/Exactness.lean",
+    "AlgebraicGeometry/Modules/Presentation.lean",
+    "AlgebraicGeometry/Modules/Presentation/Finite.lean",
+    "AlgebraicGeometry/Modules/Presentation/Transport.lean",
+    "AlgebraicGeometry/Divisors/Tensor.lean",
+    "AlgebraicGeometry/Divisors/Picard.lean",
+    "AlgebraicGeometry/Divisors/Monoidal.lean",
+    "AlgebraicGeometry/Stacks/Basic.lean",
+    "AlgebraicGeometry/IntersectionTheory/NumericalPolynomial",
+    "AlgebraicGeometry/Numerical/GrothendieckGroup/Relative.lean",
+    "AlgebraicGeometry/Numerical/GrothendieckGroup/RelativeOverlattice.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/HomogeneousLocalizationDomain.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentBasis.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentProjection.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentBlock.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentHomotopy.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentFinite.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/Modules/CechHomotopy.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/Modules/CechPrimitive.lean",
+    "AlgebraicGeometry/ProjectiveSpectrum/Modules/CechFinite.lean",
+    "Algebra/Category/ModuleCat/StalkTensor.lean",
+    "CategoryTheory/Adjunction",
+    "CategoryTheory/ConstantSheafPullback.lean",
+    "CategoryTheory/EquivalenceTransport.lean",
+    "CategoryTheory/PseudofunctorObjectProperty.lean",
+    "CategoryTheory/SheafCohomologyPushforward.lean",
+    "CategoryTheory/Sites/CohomologyShortExact.lean",
+    "CategoryTheory/TopologicalSheafCohomologyPushforward.lean",
+    "CategoryTheory/WeakSerreExact.lean",
+    "CategoryTheory/Monoidal/Triangulated/Instances",
+    "CategoryTheory/Triangulated/Families/Boundedness.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Foundations",
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Instances",
+    "CategoryTheory/Triangulated/StabilityCondition/"
+    "Families/Instances",
+    "CategoryTheory/Triangulated/StabilityCondition/"
+    "Symmetry/Autoequivalence/Instances",
+    "CategoryTheory/Triangulated/StabilityCondition/"
+    "WeakCompatibility",
+)
 
 
-def owner(path: pathlib.Path) -> str:
-    relative = path.relative_to(SOURCE_ROOT)
-    return relative.parts[0] if len(relative.parts) > 1 else relative.stem
+def module_of(path: pathlib.Path) -> str:
+    return ".".join(path.relative_to(ROOT).with_suffix("").parts)
 
 
-def is_stability_families_import(module: str) -> bool:
-    """Whether ``module`` is the family leaf forbidden to reusable AG roots."""
+def retired_module(entry: str) -> str:
+    return f"{LIBRARY}." + ".".join(pathlib.PurePosixPath(entry).with_suffix("").parts)
 
-    return module == STABILITY_FAMILIES_ROOT or module.startswith(
-        STABILITY_FAMILIES_ROOT + "."
+
+def in_tree(module: str, root: str) -> bool:
+    return module == root or module.startswith(root + ".")
+
+
+def is_weak_module(module: str) -> bool:
+    return in_tree(module, WEAK_TREE)
+
+
+def is_strong_module(module: str) -> bool:
+    return in_tree(module, STRONG_TREE) and not in_tree(module, WEAK_TREE)
+
+
+def may_import_geometry(module: str) -> bool:
+    return module in AGGREGATION_ROOTS or any(
+        in_tree(module, root) for root in GEOMETRY_IMPORTERS
     )
 
 
-def is_protected_geometry_source(relative: pathlib.PurePath) -> bool:
-    """Whether ``relative`` is a reusable Moduli/Stacks root module."""
-
-    return relative.as_posix() in PROTECTED_GEOMETRY_UMBRELLAS or (
-        len(relative.parts) >= 2
-        and tuple(relative.parts[:2]) in PROTECTED_GEOMETRY_SUBTREES
-    )
-
-
-def collect_geometry_reverse_edges(
-    source_root: pathlib.Path, pattern: str = "*.lean"
-) -> list[tuple[str, int, str]]:
-    """Collect protected-root imports of stability-family leaves.
-
-    Source names are relative to ``source_root`` so the same scanner can run
-    against both the repository and the known-answer fixture trees.
-    """
-
-    edges: list[tuple[str, int, str]] = []
-    for path in sorted(source_root.rglob(pattern)):
-        relative = path.relative_to(source_root)
-        if not is_protected_geometry_source(relative):
-            continue
-        for line_number, line in enumerate(
-            path.read_text(encoding="utf-8").splitlines(), 1
-        ):
-            match = IMPORT.match(line)
-            if match is not None and is_stability_families_import(match.group(1)):
-                edges.append((relative.as_posix(), line_number, match.group(1)))
-    return edges
+def parse(path: pathlib.Path) -> tuple[list[str], list[str]]:
+    imports: list[str] = []
+    namespaces: list[str] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if match := IMPORT.match(line):
+            imports.append(match.group(1))
+        elif match := NAMESPACE.match(line):
+            namespaces.append(match.group(1))
+    return imports, namespaces
 
 
-def load_reverse_edge_allowlist() -> tuple[set[tuple[str, str]], list[str]]:
-    """Read the exact legacy-edge allowlist, rejecting malformed entries."""
+def load_modules() -> dict[str, tuple[pathlib.Path, list[str], list[str]]]:
+    modules: dict[str, tuple[pathlib.Path, list[str], list[str]]] = {}
+    sources = [*SOURCE_ROOT.rglob("*.lean")]
+    for root in AGGREGATION_ROOTS:
+        candidate = ROOT / f"{root}.lean"
+        if candidate.exists():
+            sources.append(candidate)
+    for path in sorted(sources):
+        imports, namespaces = parse(path)
+        modules[module_of(path)] = (path, imports, namespaces)
+    return modules
 
+
+class Closure:
+    """Transitive library imports, memoized. Lean guarantees the graph is acyclic."""
+
+    def __init__(self, graph: dict[str, list[str]]) -> None:
+        self.graph = graph
+        self.memo: dict[str, frozenset[str]] = {}
+
+    def of(self, module: str) -> frozenset[str]:
+        if module in self.memo:
+            return self.memo[module]
+        acc: set[str] = set()
+        for dep in self.graph.get(module, ()):
+            if not dep.startswith(LIBRARY):
+                continue
+            acc.add(dep)
+            acc |= self.of(dep)
+        result = frozenset(acc)
+        self.memo[module] = result
+        return result
+
+
+def direction_failures(
+    module: str, imports: list[str], namespaces: list[str], label: str
+) -> list[str]:
+    """Rules 1, 2, and the import half of rule 4, for one module."""
     failures: list[str] = []
-    allowed: set[tuple[str, str]] = set()
-    if not REVERSE_EDGE_ALLOWLIST.exists():
-        return allowed, [
-            f"missing reverse-edge allowlist: "
-            f"{REVERSE_EDGE_ALLOWLIST.relative_to(ROOT)}"
-        ]
-    for line_number, raw in enumerate(
-        REVERSE_EDGE_ALLOWLIST.read_text(encoding="utf-8").splitlines(), 1
-    ):
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        fields = line.split("\t")
-        if len(fields) != 2:
-            failures.append(
-                f"{REVERSE_EDGE_ALLOWLIST.relative_to(ROOT)}:{line_number}: "
-                "expected SOURCE<TAB>IMPORT"
-            )
-            continue
-        source, module = fields
-        source_path = pathlib.PurePosixPath(source)
-        if (
-            not is_protected_geometry_source(source_path)
-            or not is_stability_families_import(module)
+    for imp in imports:
+        if (in_tree(imp, GEOMETRY) or in_tree(imp, MATHLIB_GEOMETRY)) and (
+            not may_import_geometry(module)
         ):
             failures.append(
-                f"{REVERSE_EDGE_ALLOWLIST.relative_to(ROOT)}:{line_number}: "
-                "entry is outside the guarded Moduli/Stacks-to-Families boundary"
+                f"{label}: imports geometry ({imp}) from a geometry-independent "
+                "subject; only AlgebraicGeometry/ and Development/ may"
             )
-            continue
-        edge = (source, module)
-        if edge in allowed:
+        if in_tree(imp, DEVELOPMENT) and not (
+            in_tree(module, DEVELOPMENT) or module in AGGREGATION_ROOTS
+        ):
+            failures.append(f"{label}: imports the Development leaf ({imp})")
+        if is_weak_module(module) and is_strong_module(imp):
             failures.append(
-                f"{REVERSE_EDGE_ALLOWLIST.relative_to(ROOT)}:{line_number}: "
-                f"duplicate entry {source} -> {module}"
+                f"{label}: weak stability imports its Bridgeland child ({imp})"
             )
-        allowed.add(edge)
-    return allowed, failures
-
-
-def check_layering_fixtures() -> list[str]:
-    """Run known-answer examples through the production reverse-edge parser."""
-
-    failures: list[str] = []
-    allowed_root = LAYERING_FIXTURES / "allowed"
-    forbidden_root = LAYERING_FIXTURES / "forbidden"
-    if not allowed_root.is_dir() or not forbidden_root.is_dir():
-        return [
-            f"missing layering fixture trees below {LAYERING_FIXTURES.relative_to(ROOT)}"
-        ]
-
-    allowed_edges = collect_geometry_reverse_edges(allowed_root, "*.imports")
-    if allowed_edges:
-        rendered = ", ".join(
-            f"{source}:{line_number} -> {module}"
-            for source, line_number, module in allowed_edges
-        )
-        failures.append(f"allowed layering fixture was rejected: {rendered}")
-
-    forbidden_edges = collect_geometry_reverse_edges(forbidden_root, "*.imports")
-    actual = {(source, module) for source, _, module in forbidden_edges}
-    expected = {
-        (
-            "AlgebraicGeometry/Stacks/Forbidden.imports",
-            STABILITY_FAMILIES_ROOT + ".Dqc",
-        )
-    }
-    if actual != expected:
-        failures.append(
-            "forbidden layering fixture did not produce its known answer: "
-            f"expected {sorted(expected)}, found {sorted(actual)}"
-        )
+    if not may_import_geometry(module):
+        for namespace in namespaces:
+            if in_tree(namespace, "AlgebraicGeometry"):
+                failures.append(
+                    f"{label}: declares into namespace {namespace} outside "
+                    "AlgebraicGeometry/; a geometric realization of a categorical "
+                    "interface lives with the geometric object"
+                )
     return failures
 
 
-def find_cycle(graph: dict[str, set[str]]) -> list[str] | None:
-    visited: set[str] = set()
-    active: set[str] = set()
-    stack: list[str] = []
+def neutral_geometry_failures(
+    module: str, imports: list[str], closure: Closure, label: str
+) -> list[str]:
+    """Rule 3 for one geometry module."""
+    if not in_tree(module, GEOMETRY) or module == GEOMETRY:
+        return []
+    if any(in_tree(module, root) for root in STABILITY_CONSUMING_GEOMETRY):
+        return []
+    for imp in imports:
+        if in_tree(imp, STABILITY_ROOT) or any(
+            in_tree(dep, STABILITY_ROOT) for dep in closure.of(imp)
+        ):
+            return [
+                f"{label}: reaches the stability tree through {imp}; only "
+                + ", ".join(
+                    root.removeprefix(LIBRARY + ".").replace(".", "/") + "/"
+                    for root in STABILITY_CONSUMING_GEOMETRY
+                )
+                + " may, so that the rest of geometry is importable without "
+                "stability conditions"
+            ]
+    return []
 
-    def visit(node: str) -> list[str] | None:
-        visited.add(node)
-        active.add(node)
-        stack.append(node)
-        for dependency in sorted(graph.get(node, set())):
-            if dependency not in visited:
-                cycle = visit(dependency)
-                if cycle is not None:
-                    return cycle
-            elif dependency in active:
-                start = stack.index(dependency)
-                return stack[start:] + [dependency]
-        stack.pop()
-        active.remove(node)
-        return None
 
-    for node in sorted(graph):
-        if node not in visited:
-            cycle = visit(node)
-            if cycle is not None:
-                return cycle
-    return None
+def check_fixtures(closure: Closure) -> list[str]:
+    failures: list[str] = []
+    for verdict in ("allowed", "forbidden"):
+        base = FIXTURES / verdict
+        fixtures = sorted(base.rglob("*.imports")) if base.exists() else []
+        if not fixtures:
+            failures.append(f"no {verdict} layering fixtures found under {base}")
+            continue
+        for fixture in fixtures:
+            module = f"{LIBRARY}." + ".".join(
+                fixture.relative_to(base).with_suffix("").parts
+            )
+            imports, namespaces = parse(fixture)
+            label = str(fixture.relative_to(ROOT))
+            found = direction_failures(module, imports, namespaces, label)
+            found += neutral_geometry_failures(module, imports, closure, label)
+            if verdict == "allowed" and found:
+                failures.append(
+                    "allowed layering fixture was rejected: " + "; ".join(found)
+                )
+            if verdict == "forbidden" and not found:
+                failures.append(
+                    f"forbidden layering fixture {label} was not rejected"
+                )
+    return failures
 
 
 def main() -> int:
-    subjects = {
-        path.name for path in SOURCE_ROOT.iterdir() if path.is_dir()
-    }
-    graph: dict[str, set[str]] = defaultdict(set)
-    evidence: dict[tuple[str, str], list[str]] = defaultdict(list)
     failures: list[str] = []
+    modules = load_modules()
+    closure = Closure({m: imports for m, (_, imports, _) in modules.items()})
 
-    for subject in sorted(subjects - LAYER.keys()):
-        failures.append(f"subject has no declared layer: {subject}")
+    # Rule 6.
+    for entry in sorted(SOURCE_ROOT.iterdir()):
+        if entry.is_dir() and entry.name not in KNOWN_SUBJECTS:
+            failures.append(
+                f"{entry.relative_to(ROOT)}: not a known Mathlib subject; add "
+                "it to KNOWN_SUBJECTS deliberately or place the code below an "
+                "existing subject"
+            )
 
-    for path in sorted(SOURCE_ROOT.rglob("*.lean")):
-        source_owner = owner(path)
-        for line_number, line in enumerate(
-            path.read_text(encoding="utf-8").splitlines(), 1
-        ):
-            match = IMPORT.match(line)
-            if match is None:
-                continue
-            module = match.group(1)
-            # Any subject ranked BELOW the geometry owner must stay clear of
-            # Mathlib's geometry. This used to test `source_owner ==
-            # GENERIC_OWNER`, which checked `CategoryTheory` and nothing else --
-            # so `Algebra`, `LinearAlgebra` and `Topology`, the three subjects
-            # that should be *most* restricted, were unchecked. A `Topology`
-            # module importing `Mathlib.AlgebraicGeometry.Scheme` passed this
-            # gate for as long as it existed.
-            if LAYER.get(source_owner, LAYER[GEOMETRY_OWNER]) < LAYER[
-                GEOMETRY_OWNER
-            ] and module.startswith("Mathlib.AlgebraicGeometry"):
+    # Rule 5.
+    retired_modules: set[str] = set()
+    for entry in RETIRED_PATHS:
+        path = SOURCE_ROOT / entry
+        retired_modules.add(retired_module(entry))
+        candidates = [path] if path.suffix else [path, path.with_suffix(".lean")]
+        for candidate in candidates:
+            # An empty directory is a leftover of a move, not a restoration:
+            # git does not track it, so a clean checkout never has one.
+            restored = candidate.is_file() or (
+                candidate.is_dir() and any(candidate.rglob("*.lean"))
+            )
+            if restored:
                 failures.append(
-                    f"{path.relative_to(ROOT)}:{line_number}: {source_owner} "
-                    f"ranks below {GEOMETRY_OWNER} and imports geometry module "
-                    f"{module}"
+                    f"retired path restored: {candidate.relative_to(ROOT)}; "
+                    "see docs/architecture/cutover-ledger.md for its owner"
                 )
-            if not module.startswith("DerivedAlgGeo."):
-                continue
-            dependency = module.split(".", 2)[1]
-            if dependency not in subjects or dependency == source_owner:
-                continue
-            graph[source_owner].add(dependency)
-            evidence[(source_owner, dependency)].append(
-                f"{path.relative_to(ROOT)}:{line_number}"
-            )
-
-    for edge, locations_found in sorted(evidence.items()):
-        if LAYER.get(edge[0], -1) < LAYER.get(edge[1], -1):
-            locations = ", ".join(locations_found[:3])
+    for path in SOURCE_ROOT.rglob("*"):
+        parts = path.relative_to(SOURCE_ROOT).parts
+        if parts and parts[0] != "AlgebraicGeometry" and any(
+            parts[i] == "Instances" and parts[i + 1].startswith("AlgebraicGeometry")
+            for i in range(len(parts) - 1)
+        ):
             failures.append(
-                f"reverse subject edge {edge[0]} -> {edge[1]} at {locations}"
+                f"{path.relative_to(ROOT)}: geometric instance leaf below a "
+                "generic subject; the instance lives with the geometric object"
             )
 
-    cycle = find_cycle(graph)
-    if cycle is not None:
-        failures.append("subject dependency cycle: " + " -> ".join(cycle))
+    # Rules 1-4 per module.
+    for module, (path, imports, namespaces) in modules.items():
+        label = str(path.relative_to(ROOT))
+        failures += direction_failures(module, imports, namespaces, label)
+        failures += neutral_geometry_failures(module, imports, closure, label)
+        for imp in imports:
+            if imp in retired_modules or any(
+                in_tree(imp, retired) for retired in retired_modules
+            ):
+                failures.append(f"{label}: imports retired module {imp}")
 
-    legacy_root = (
-        SOURCE_ROOT
-        / "CategoryTheory"
-        / "Triangulated"
-        / "StabilityCondition"
-        / "Families"
-    )
-    geometry_root = (
-        SOURCE_ROOT / "AlgebraicGeometry" / "StabilityCondition" / "Families"
-    )
-    for module in sorted(GEOMETRY_FAMILY_MODULES):
-        legacy = legacy_root / f"{module}.lean"
-        relocated = geometry_root / f"{module}.lean"
-        if legacy.exists():
-            failures.append(
-                f"geometry-owned module restored below CategoryTheory: "
-                f"{legacy.relative_to(ROOT)}"
-            )
-        if not relocated.exists():
-            failures.append(
-                f"geometry-owned module missing from AlgebraicGeometry: "
-                f"{relocated.relative_to(ROOT)}"
-            )
-
-    legacy_dqc = legacy_root / "Dqc"
-    relocated_dqc = geometry_root / "Dqc"
-    if legacy_dqc.exists():
+    # Rule 4, structural half.
+    if not STRONG_PRESTABILITY_SOURCE.exists():
         failures.append(
-            f"geometry-owned subtree restored below CategoryTheory: "
-            f"{legacy_dqc.relative_to(ROOT)}"
+            f"missing {STRONG_PRESTABILITY_SOURCE.relative_to(ROOT)}: the "
+            "Bridgeland pre-stability structure is the seam rule 4 checks"
         )
-    if not relocated_dqc.is_dir():
-        failures.append(
-            f"geometry-owned subtree missing from AlgebraicGeometry: "
-            f"{relocated_dqc.relative_to(ROOT)}"
-        )
-
-    failures.extend(check_layering_fixtures())
-    allowed_reverse_edges, allowlist_failures = load_reverse_edge_allowlist()
-    failures.extend(allowlist_failures)
-    reverse_edges = collect_geometry_reverse_edges(SOURCE_ROOT)
-    observed_reverse_edges = {
-        (source, module) for source, _, module in reverse_edges
-    }
-    for source, line_number, module in reverse_edges:
-        if (source, module) not in allowed_reverse_edges:
-            failures.append(
-                f"DerivedAlgGeo/{source}:{line_number}: reusable geometry root "
-                f"imports stability-family leaf {module}"
-            )
-    for source, module in sorted(
-        allowed_reverse_edges - observed_reverse_edges
+    elif not STRONG_PRESTABILITY_EXTENDS.search(
+        STRONG_PRESTABILITY_SOURCE.read_text(encoding="utf-8")
     ):
         failures.append(
-            f"stale reverse-edge allowlist entry {source} -> {module}; "
-            f"remove it from {REVERSE_EDGE_ALLOWLIST.relative_to(ROOT)}"
+            f"{STRONG_PRESTABILITY_SOURCE.relative_to(ROOT)}: ordinary "
+            "prestability must structurally extend WeakPreStabilityCondition"
         )
 
+    failures += check_fixtures(closure)
+
     if failures:
-        print("subject-layering gate failed:")
+        print("layering gate failed:")
         for failure in failures:
             print(f"  - {failure}")
         return 1
 
-    edge_text = ", ".join(
-        f"{source}->{dependency}"
-        for source in sorted(graph)
-        for dependency in sorted(graph[source])
-    )
-    print(f"ok: acyclic subject graph ({edge_text})")
-    print("ok: CategoryTheory has zero AlgebraicGeometry imports")
-    print(
-        f"ok: {len(GEOMETRY_FAMILY_MODULES)} geometric family roots have "
-        "AlgebraicGeometry owners"
+    geometry = sum(1 for m in modules if in_tree(m, GEOMETRY))
+    neutral = sum(
+        1
+        for m in modules
+        if in_tree(m, GEOMETRY)
+        and m != GEOMETRY
+        and not any(in_tree(m, r) for r in STABILITY_CONSUMING_GEOMETRY)
     )
     print(
-        "ok: Moduli/Stacks reverse-edge fixtures distinguish allowed and "
-        "forbidden imports"
-    )
-    print(
-        f"ok: {len(reverse_edges)} measured Moduli/Stacks -> "
-        "StabilityCondition/Families edge(s) exactly match the shrinking "
-        "allowlist"
+        f"ok: {len(modules)} modules; only AlgebraicGeometry/ and Development/ "
+        f"import geometry; {neutral} of {geometry} geometry modules are "
+        "stability-neutral; weak stability is independent of, and structurally "
+        f"parented by, Bridgeland stability; {len(RETIRED_PATHS)} retired paths "
+        "absent"
     )
     return 0
 

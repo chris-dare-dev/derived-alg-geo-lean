@@ -3,7 +3,7 @@ Weak-Serre / cohomological-locus slice of the StabilityCondition audit, split ou
 concurrent branches append to different files (#480). See the umbrella file for the
 contract and reading guide.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.CohomologyObjectProperty
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
 
 /-! ## The middle of a five-term exact sequence (#721)
 

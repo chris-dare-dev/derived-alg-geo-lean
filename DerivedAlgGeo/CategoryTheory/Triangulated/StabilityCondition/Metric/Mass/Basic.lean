@@ -17,7 +17,7 @@ For an HN filtration `F` of `E`, its mass is the finite sum
   ∑ i, ‖Z(F.factor i)‖.
 ```
 
-`StabilityCondition/Foundation/Slicing/IntrinsicPhases.lean` proves that the
+`WeakStabilityCondition/Foundation/Slicing/IntrinsicPhases.lean` proves that the
 extreme phases of an HN filtration are intrinsic, but nothing exposes
 uniqueness of the complete HN filtration.  Defining the
 mass using `Classical.choice (s.hn_exists E)` would therefore make its
@@ -25,7 +25,7 @@ transport law depend on an arbitrary, non-functorial choice.  We first take
 the supremum of the masses of all HN filtrations.  This is choice-free and
 lives naturally in `ℝ≥0∞`.
 
-`StabilityCondition/Metric/Mass/Uniqueness.lean` subsequently proves that every term in this supremum
+`WeakStabilityCondition/StabilityCondition/Metric/Mass/Uniqueness.lean` subsequently proves that every term in this supremum
 is equal, identifying `stabilityMass` with the usual finite Bridgeland mass.
 -/
 
@@ -118,7 +118,7 @@ end
 
 end CategoryTheory.Triangulated
 
-namespace CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair
 
 noncomputable section
 
@@ -131,7 +131,7 @@ variable {C : Type u} [Category.{w} C] [HasZeroObject C] [HasShift C ℤ]
   [IsTriangulated C]
 variable {Λ : Type u'} [AddCommGroup Λ] {v : K₀ C →+ Λ}
 
-variable (a : CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair v)
+variable (a : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair v)
 
 /-- The charge of an acted stability condition is the original charge of the
 inverse-image object. -/
@@ -211,4 +211,4 @@ theorem act_stabilityMass_functor_obj (σ : StabilityCondition.WithClassMap C v)
 
 end
 
-end CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPair
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair
