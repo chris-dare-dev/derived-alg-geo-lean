@@ -114,6 +114,7 @@ generations:
   - { rev: 52, at: "2026-08-17", note: "SF9.2 (#522) now connects the SF8 relative-perfect layer to actual algebraic stacks. A relative-perfect algebraic presentation identifies every supported locally Noetherian fiber of its structure morphism with the selected full M_pug subgroupoid; the bounded refinement lifts the finite-type witness's universal family to an actual stack-fiber object. Open presentations carry an actual representable open immersion and structural triangle. The zero subproblem is proved contractible and presented by the identity stack, with its finite-type witness and a positive-dimensional Spec Z case. The full M_pug stack still needs arbitrary pullback/descent, diagonal and atlas constructions, so #522 remains open." }
   - { rev: 53, at: "2026-08-18", note: "Architecture review #598 corrects the rev-51/rev-52 terminology. The implemented data is now named ZariskiStackPresentation: it has big-Zariski descent, a scheme-representable diagonal, and a smooth-surjective scheme atlas, but no fppf or etale descent theorem. Relative-perfect and bounded interfaces are correspondingly named big-Zariski presentations. No declaration named AlgebraicStack remains until the standard stack condition and representability level are formalized." }
   - { rev: 54, at: "2026-08-18", note: "Architecture review #599 corrects the early logical-nonvacuity strategy. Constant, full-locus, constant-true, and PUnit constructors are removed from the stable family API and retained only as compile-only Development scaffolding. The theorem-numbered arbitrary-Prop dependency contract is removed from Lean; Theorem 22.2 gaps now live in theorem22-2-dependencies.yaml as explicitly non-mathematical planning metadata. Stable adapters project theorem-neutral OrdinaryDeformationInputConditions instead." }
+  - { rev: 55, at: "2026-09-03", note: "Spike: the projective-families lane (#1033) reached Slicing.IndExtensions.largePreimage (#1057), the slicing of Theorem 2.8(1) of arXiv:2607.28411v1 modulo Harder-Narasimhan existence, and could go no further. Reading that paper's appendix established why, and it is a citation chain rather than a gap in the lane. Corollary A.23 carries assumption (iv) of Theorem A.17 -- Phi(F) is bounded coherent exactly when F is -- which fails for pi_* along an infinite field extension, since pi_* of the structure sheaf is not coherent; Example A.18(1) verifies (i)-(iv) only for a FINITE morphism, which is the intended scope and is the case the lane already owns. A.23's own HN step takes its phases and its termination measure from an HN filtration of the TARGET, which is the argument Phase/Transfer/HN.lean already implements, so there is no large-target HN argument in that appendix at all. And Theorem 2.8 is not proved there: page 12 cites it as a combination of [7, Theorem 5.3, Proposition 5.9, Theorem 12.17], where [7] is arXiv:1902.08184v4 -- this roadmap's own pin. Reading [7]: the slicing P_l is built from base-changed HEARTS by (12.3), not from the Ind-extension, and the finiteness that gives HN existence comes from noetherian hearts (Theorem 5.7(2)) plus, for a non-finitely-generated extension, the descent of Proposition 5.9(3) to a finitely generated subfield. That is why an Ind-extension route reaches the phase-indexed t-structures and Hom-vanishing but stops short of HN: largePreimage never mentions a heart. Milestones SF11 (sections 3-6, #1060-#1066) and SF12 (section 12, #1067) are the scoped path, eight items, four XL. The costly one is #1060: base change categories D_T do not exist in the tree and every result in section 5 is stated relative to them. Note the reusable half -- Lemma 5.1 of [7] is close to Lemma A.14 of 2607.28411, which SF7 (#475) already owns as TStructure.IndExtensionData, so #1062 reconciles presentations rather than rebuilding. Nearer-term alternative, not on this path: #722 and #723 close the Dqc realization and unblock projective-families-e5 and milestone PF2 directly." }
 retired: []
 
 # GitHub milestones are roadmap phases. Epic issues live inside them, and
@@ -634,3 +635,121 @@ items:
     priority: should
     size: XL
     tags: [lean, geometry, fourier-mukai, ledger, inhabitance]
+
+  - id: stability-families-m11
+    kind: milestone
+    title: "SF11 — Base change of t-structures (§§3–6)"
+    status: planned
+    lane: next
+    acceptance:
+      - "Base change categories D_T exist as a construction, with their two functors as theorems about it."
+      - "S-local t-structures are inside the formalized layer rather than named as excluded."
+      - "Theorem 5.3 is proved on top of the Ind-extension the repository already owns, not a second copy of it."
+      - "Theorem 5.7(2), noetherianity is inherited under base change, is proved: everything downstream rests on it."
+      - "Proposition 5.9(3) holds for a not necessarily finitely generated extension."
+
+  - id: stability-families-e18
+    gh_issue: 1060
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m11
+    title: "Base change categories D_T for a morphism T to S (§3)"
+    status: planned
+    summary: "Every result in the chain from Theorem 12.17 down is stated relative to the base change category D_T of an S-linear strong semiorthogonal component along T to S, together with its quasi-coherent companion (Dqc)_T and the two base change functors between them. The repository has no such construction: a grep for BaseChangeCategory returns nothing. This is the infrastructure item and the real cost of the milestone. Includes Lemmas 3.17 and 3.18, which Step 4 of Theorem 5.7 and Step 2 of Theorem 12.17 both consume."
+    priority: must
+    size: XL
+    tags: [lean, derived, base-change, prerequisite]
+
+  - id: stability-families-e19
+    gh_issue: 1061
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m11
+    title: "S-local t-structures and S-local slicings (§4)"
+    status: planned
+    summary: "A t-structure is S-local when it restricts compatibly to every quasi-compact open of the base. Every theorem of section 5 takes one as input and Theorem 5.7 outputs one, but the repository currently names the notion only to exclude it: Phase/Transfer/Inducing.lean records that S-linearity and S-locality are outside the categorical layer. Also Lemma 4.15, noetherian is a local condition on the base, and Lemma 4.16(3), lifting a filtration along base change, both of which the finiteness arguments downstream consume."
+    priority: must
+    size: L
+    tags: [lean, derived, t-structure, locality]
+
+  - id: stability-families-e20
+    gh_issue: 1062
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m11
+    title: "Theorem 5.3: the base-changed t-structure on (Dqc)_T"
+    status: planned
+    summary: "The general base change theorem for local t-structures on the quasi-coherent side, with the flat-descent formula (5.1), the fpqc formula (5.2), and the four t-exactness clauses (4a)-(4d). Its Lemma 5.1 input, the Ind-extension of a t-structure from D to Dqc, is closely related to Lemma A.14 of arXiv:2607.28411v1, which the repository already owns as TStructure.IndExtensionData (SF7, #475, and slices 13-21 of #1033); the work is to reconcile the Coprod presentation the repository has with the Ind and filtered-colimit presentation 5.3 uses, rather than to build a second one."
+    priority: must
+    size: XL
+    tags: [lean, derived, base-change, ind-extension]
+
+  - id: stability-families-e21
+    gh_issue: 1063
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m11
+    title: "Theorems 5.6, 5.7 and Corollary 5.8: the bounded coherent case"
+    status: planned
+    summary: "Theorem 5.6 induces a t-structure on D_T for a finite perfect morphism, as the analogue of Polishchuk 2.3.5 -- a sibling of the Polishchuk 2.1.2 result the repository owns through SF7 and #1054-#1057, and the relationship should be recorded rather than assumed. Theorem 5.7 is the main base change result for essentially perfect morphisms, and its clause (2), that noetherianity is inherited, is the load-bearing one: Step 2 of Theorem 12.17 gets finiteness of an a priori infinite filtration from it. Corollary 5.8 specialises to a point of the base."
+    priority: must
+    size: XL
+    tags: [lean, derived, base-change, noetherian]
+
+  - id: stability-families-e22
+    gh_issue: 1064
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m11
+    title: "Proposition 5.9: base change of hearts along a field extension, with descent to a finitely generated subfield"
+    status: planned
+    summary: "For a not necessarily finitely generated extension k in l, the t-structure on (Dqc)_l induces a bounded one on D_l, base change is t-exact, and -- clause (3), the point of the item -- every object of the base-changed heart descends to a subfield finitely generated over k. That descent is what makes Theorem 12.17 work for arbitrary extensions, and its absence is exactly why Slicing.IndExtensions.largePreimage (#1057) can only carry HN existence as a hypothesis."
+    priority: must
+    size: L
+    tags: [lean, derived, base-change, descent]
+
+  - id: stability-families-e23
+    gh_issue: 1065
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m11
+    title: "Tilted-noetherian t-structures, and their comparison with the existing noetherian hearts"
+    status: planned
+    summary: "The standing hypothesis of Proposition 5.9 and the conclusion of Theorem 5.7(1). The repository has NoetherianTorsionSubcategory and SubobjectChain.Terminates in Weak/Heart/Noetherian.lean, and a Happel-Reiten-Smalo tilt in progress under SF1 (#192), but nothing named tilted-noetherian. The comparison with the existing heart vocabulary must be a proved theorem and not a second noetherianity hierarchy, per the abstraction tree."
+    priority: must
+    size: M
+    tags: [lean, stability, noetherian, tilting]
+
+  - id: stability-families-e24
+    gh_issue: 1066
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m11
+    title: "Flat, torsion and torsion-free objects over a base (§6)"
+    status: planned
+    summary: "Lemma 6.12, torsion-free implies flat, and Remark 6.16, both consumed by Step 2 of Theorem 12.17: by Lemma 12.12 and Theorem 5.7(2) the heart is noetherian, by Remark 6.16 the object may be assumed torsion free, and thus flat by Lemma 6.12. Forty-two files in the tree mention torsion-freeness, but they are numerical and sheaf-theoretic rather than the section 6 torsion theory relative to a base; any overlap must be a proved comparison."
+    priority: must
+    size: L
+    tags: [lean, geometry, torsion, flatness]
+
+  - id: stability-families-m12
+    kind: milestone
+    title: "SF12 — Stability conditions and base change (§12)"
+    status: planned
+    lane: later
+    acceptance:
+      - "Theorem 12.17(1)-(4) holds for an arbitrary, not necessarily finitely generated, field extension."
+      - "The construction (12.3) from base-changed hearts is proved equal to Slicing.IndExtensions.largePreimagePhase."
+      - "Slicing.IndExtensions.largePreimage loses its HN hypothesis, or the ledger records why it keeps it."
+
+  - id: stability-families-e25
+    gh_issue: 1067
+    gh_sub_issues: []
+    kind: epic
+    parent: stability-families-m12
+    title: "Theorem 12.17: stability conditions under an arbitrary field extension"
+    status: planned
+    summary: "This is Theorem 2.8 of arXiv:2607.28411v1, which that paper cites rather than proves, and the result the projective-families lane (#1033) has been building toward. The construction is via base-changed HEARTS: with A^phi the interval heart, P_l(phi) is the intersection of the A_l^phi' over the phases that cut it (12.3), from Proposition 5.9. The Ind-extension phrasing of Theorem 2.8(1) is a restatement, not the definition, which is why the lane's Ind-extension route reaches the phase-indexed t-structures and Hom-vanishing but not HN existence -- largePreimage never mentions a heart, and the finiteness lives there. Four steps: finite l by conservativity of the pushforward, which the lane already owns as semistable_iff_preimage_of_coproduct (#1055); l = k(x) with Z over Q[i] by noetherianity and discreteness; arbitrary l by the descent of Proposition 5.9(3); general Z by continuity and the GL2+(R) action. XL and expected to split after scoping, as #528 did."
+    priority: must
+    size: XL
+    tags: [lean, stability, base-change, field-extension]
