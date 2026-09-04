@@ -78,6 +78,52 @@ generates no mk.inj and no mk.sizeOf_spec. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.k3HodgeIndex
 #print axioms AlgebraicGeometry.Numerical.Examples.k3BogomolovSanity
 
+/-! ## The twisted Chern character and the BMT conjecture
+
+twistCoeff and twist mention no geometry: twist convolves an arbitrary family
+against the exponential coefficients of an arbitrary ring element, and
+twist_add_beta -- the group law that makes the notation e^{-beta H} honest --
+is proved there. chBetaComp is the specialisation and inherits it.
+
+BMTData is DIFFERENT IN KIND from BogomolovGiesekerData, and the difference
+matters. Both are supplied rather than proved, but Bogomolov-Gieseker is TRUE
+and merely out of reach here, whereas the BMT inequality is FALSE in general:
+it fails on the blow-up of P^3 at a point (Schmidt, IMRN 2017). BMTData is
+therefore unprovable as stated for all threefolds, nothing in this repository
+inhabits it, and a consumer must hypothesise it for one specific threefold.
+
+TiltSemistable is opaque one step further out than Semistable: it is a property
+of an object of a TILTED HEART, and this layer has neither hearts nor objects. -/
+
+#print axioms AlgebraicGeometry.Numerical.twistCoeff
+#print axioms AlgebraicGeometry.Numerical.twistCoeff_zero_beta
+#print axioms AlgebraicGeometry.Numerical.twistCoeff_add
+#print axioms AlgebraicGeometry.Numerical.twist
+#print axioms AlgebraicGeometry.Numerical.twist_add_beta
+#print axioms AlgebraicGeometry.Numerical.chBetaComp
+#print axioms AlgebraicGeometry.Numerical.chBetaComp_eq
+#print axioms AlgebraicGeometry.Numerical.chBetaComp_mem
+#print axioms AlgebraicGeometry.Numerical.chBetaComp_add
+#print axioms AlgebraicGeometry.Numerical.chBetaComp_zero_beta
+#print axioms AlgebraicGeometry.Numerical.chBetaComp_add_beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.degH1Beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.degH2Beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.deg3Beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.discrHBeta
+#print axioms AlgebraicGeometry.Numerical.Threefold.nu
+#print axioms AlgebraicGeometry.Numerical.Threefold.Q
+#print axioms AlgebraicGeometry.Numerical.Threefold.degH1Beta_zero_beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.degH2Beta_zero_beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.deg3Beta_zero_beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.discrHBeta_zero_beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.Q_zero_beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.nu_zero_alpha
+#print axioms AlgebraicGeometry.Numerical.Threefold.Q_zero_alpha
+#print axioms AlgebraicGeometry.Numerical.Threefold.BMTData
+#print axioms AlgebraicGeometry.Numerical.Threefold.BMTData.TiltSemistable
+#print axioms AlgebraicGeometry.Numerical.Threefold.BMTData.nonneg
+#print axioms AlgebraicGeometry.Numerical.Threefold.BMTData.mk.inj
+#print axioms AlgebraicGeometry.Numerical.Threefold.BMTData.mk.sizeOf_spec
 /-! ## The (s, t) transport — a polarised surface class as a wall-plane point
 
 The rank slot is WEIGHTED by the polarisation degree. That is derived from
