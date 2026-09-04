@@ -88,6 +88,35 @@ elif expected_cli != pins.get("mfc_rev"):
                     f"{pins.get('mfc_rev')!r}; the Lean emitter and the "
                     f"Python validator would read different schemas")
 
+# The FOURTH place these revisions are pinned: `docbuild/lake-manifest.json`.
+# `docbuild` is a nested package sharing the parent's `packagesDir`, and it
+# requires DerivedAlgGeo first precisely so shared dependencies resolve to the
+# top-level pins. But it still records its own revision per package, and until
+# 2026-09-04 nothing compared the two.
+#
+# They drifted, and the symptom was thoroughly misleading. 9c6eff20 bumped
+# MathFormalContract in `lake-manifest.json`, both keys of `pins.json` and the
+# ci.yml URL, and left docbuild on an older revision than any of them -- so
+# doc-gen died on `@[discharges "gltilde-universal-cover"]` with `unexpected
+# token; expected ']'`, a parse error in a file that compiles clean under
+# `lake build`. Mathlib matched throughout, which is why nothing looked wrong.
+#
+# Only SHARED packages are compared, and only where both record a revision:
+# docbuild carries doc-gen4 and its dependencies, which the parent neither has
+# nor should, and requires DerivedAlgGeo itself by path, which has no `rev`.
+doc_manifest = root / "docbuild" / "lake-manifest.json"
+if doc_manifest.exists():
+    doc_packages = {p["name"]: p.get("rev")
+                    for p in json.loads(doc_manifest.read_text())["packages"]}
+    for name, pin in sorted(packages.items()):
+        doc_rev = doc_packages.get(name)
+        if doc_rev is not None and pin.get("rev") is not None \
+                and doc_rev != pin.get("rev"):
+            failures.append(
+                f"docbuild/lake-manifest.json pins {name} at {doc_rev!r} but "
+                f"lake-manifest.json pins {pin.get('rev')!r}; the docs build "
+                f"would compile the library against a different {name}")
+
 if failures:
     print(f"FAIL  {pins['repo']} pin coherence ({len(failures)} problem(s)):")
     for f in failures:
