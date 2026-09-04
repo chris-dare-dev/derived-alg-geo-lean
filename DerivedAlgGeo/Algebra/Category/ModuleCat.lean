@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
 import DerivedAlgGeo.Algebra.Category.ModuleCat.LinearDual
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Limits
 
 /-!
 # Categories of modules

@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Limits
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory
 
 /-!
@@ -17,6 +18,11 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CategoryTheory.DerivedCategory.OppositeComparison.equivalence
 #print axioms ModuleCat.linearDualFunctor_obj
 #print axioms ModuleCat.linearDualFunctor_map
+#print axioms ModuleCat.fgSubmoduleDiagram
+#print axioms ModuleCat.fgSubmoduleCocone
+#print axioms ModuleCat.fgSubmoduleCocone_pt_carrier
+#print axioms ModuleCat.fgSubmoduleCocone_ι_app
+#print axioms ModuleCat.fgSubmoduleCoconeIsColimit
 #print axioms ModuleCat.instAdditiveOppositeLinearDualFunctor
 #print axioms ModuleCat.linearDualFunctor_map_shortExact
 #print axioms ModuleCat.linearDualFunctor_preservesFiniteLimits_and_colimits
