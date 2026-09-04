@@ -5,15 +5,15 @@
     "The stability-condition foundation is repository-owned and has no external source dependency."
   ],
   "repo": "derived-alg-geo-lean",
-  "recorded_at": "2026-08-18",
-  "recorded_from": "origin/main ae1424a",
+  "recorded_at": "2026-09-04",
+  "recorded_from": "origin/main a89c7114",
   "lean_toolchain": "leanprover/lean4:v4.32.1",
   "mathlib_rev": "520045ab14e26149ee970e2e617ca04b09bde5d6",
   "mathlib_input_rev": "v4.32.1",
   "mathlib_is_direct_require": true,
   "external_bridgeland_source_dependency": false,
   "literal_source_independence_recorded_at": "2026-08-14",
-  "mfc_rev": "a5af3b29047a3bbe974529462b26ff353086beea",
+  "mfc_rev": "b5a63cbab0cc2625cdfeacadfa9cb4b64a419598",
   "mfc_repo": "https://github.com/chris-dare-dev/math-formal-contract-lean",
   "mfc_has_lake_dependencies": false,
   "cross_repo": {
@@ -21,5 +21,5 @@
     "former_peer": "bridgeland-stab-lean",
     "note": "Both owner-authored histories now share this v4.32.1 monorepo branch."
   },
-  "mfc_cli_rev": "a5af3b29047a3bbe974529462b26ff353086beea"
+  "mfc_cli_rev": "b5a63cbab0cc2625cdfeacadfa9cb4b64a419598"
 }
