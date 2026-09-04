@@ -5,8 +5,8 @@
     "The stability-condition foundation is repository-owned and has no external source dependency."
   ],
   "repo": "derived-alg-geo-lean",
-  "recorded_at": "2026-08-18",
-  "recorded_from": "origin/main ae1424a",
+  "recorded_at": "2026-09-04",
+  "recorded_from": "origin/main 016d6ac3",
   "lean_toolchain": "leanprover/lean4:v4.32.1",
   "mathlib_rev": "520045ab14e26149ee970e2e617ca04b09bde5d6",
   "mathlib_input_rev": "v4.32.1",

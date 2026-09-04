@@ -704,6 +704,13 @@ jobs:
             exit 1
           fi
           echo "using $PY311 ($("$PY311" -V 2>&1))"
+          # Delete it first. On the self-hosted lane the workspace persists, and
+          # `python -m venv` over an existing directory does NOT reinstall what
+          # is already there. `pip install "mfc @ git+...@<sha>"` then compares
+          # by name and version, not by URL, so a pin bump that leaves the
+          # version string alone is treated as already satisfied and the OLD mfc
+          # survives the bump -- silently, and for as long as the runner lives.
+          rm -rf .mfc-venv
           "$PY311" -m venv .mfc-venv
 
           # A venv puts its executables in `bin` on Unix and in `Scripts` on
@@ -743,6 +750,20 @@ jobs:
           "$VENV_BIN/pip" install --quiet \
             "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@b5a63cbab0cc2625cdfeacadfa9cb4b64a419598#subdirectory=contract"
           MFC="$VENV_BIN/mfc"
+
+          # Assert the installed schema is the one the emitter writes against.
+          #
+          # When these disagree the symptom is 21167 near-identical lines, one
+          # per constant, none of which names the cause -- as happened on
+          # 2026-09-04, when a stale `contract/build/lib` shipped a schema whose
+          # `constant` had no `discharges`, `doc` or `scope` and whose `counts`
+          # had no `external` or `foreign`, all under `additionalProperties:
+          # false`. Upstream b5a63cbab0cc removed that directory, so this should
+          # now always pass; it is cheap, and it is the difference between one
+          # line that names the five fields and 21167 that name every constant
+          # in the library.
+          "$VENV_PY" -c 'import json,os,sys,mfc; p=os.path.join(os.path.dirname(mfc.__file__),"schema","emission-1.0.schema.json"); d=json.load(open(p,encoding="utf-8")); missing=({"discharges","doc","scope"}-set(d["$defs"]["constant"]["properties"]))|({"external","foreign"}-set(d["properties"]["counts"]["properties"])); sys.exit(0) if not missing else (print("::error::installed mfc emission schema is stale: it rejects "+", ".join(sorted(missing))+", which the emitter emits."), sys.exit(1))'
+          echo "emission schema accepts the emitter field set"
 
           "$MFC" validate attest/lean-emission.json
 
