@@ -285,41 +285,20 @@ lemma isIso_tensorSheafificationComparisonLeft (L : X.Modules) (P : X.PresheafOf
     IsIso (tensorSheafificationComparisonLeft L P) :=
   isIso_sheafification_map_whiskerLeft_unit ((toPresheafOfModules X).obj L) P
 
-set_option backward.isDefEq.respectTransparency false in
-/-- The right comparison is an isomorphism for arbitrary `L`.
+/-- The right comparison is an isomorphism for **arbitrary** `L`.
 
-The left comparison is already invertible without a finiteness or flatness hypothesis. Symmetry of
-the objectwise tensor conjugates the right comparison to that left comparison, so the same result
-holds on the other side. This removes the last rank-one restriction from associativity of the
+The left comparison is already invertible with no rank-one, finiteness, or flatness hypothesis,
+because its proof goes through stalks. Symmetry of the objectwise presheaf tensor then conjugates
+one whiskering into the other, and that conjugation holds on an arbitrary site: it is
+`SheafOfModules.isIso_sheafification_map_whiskerRight_of_whiskerLeft`, which lives with the rest of
+the arbitrary-site tensor descent. Only the stalkwise input it consumes is scheme-level, so nothing
+generic is restated here. This removes the last rank-one restriction from associativity of the
 sheafified tensor product. -/
 lemma isIso_tensorSheafificationComparisonRight (P : X.PresheafOfModules) (L : X.Modules) :
-    IsIso (tensorSheafificationComparisonRight P L) := by
-  let a := PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)
-  let U := (toPresheafOfModules X).obj L
-  let V := (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj) ⋙
-    SheafOfModules.forget X.ringCatSheaf ⋙
-    PresheafOfModules.restrictScalars (𝟙 X.ringCatSheaf.obj)).obj P
-  let eta := (PresheafOfModules.sheafificationAdjunction
-    (𝟙 X.ringCatSheaf.obj)).unit.app P
-  have hNat := BraidedCategory.braiding_naturality_right U eta
-  have h : eta ▷ U =
-      (β_ P U).hom ≫ (U ◁ eta) ≫ (β_ U V).hom := by
-    symm
-    dsimp only [V]
-    calc
-      (β_ P U).hom ≫ (U ◁ eta) ≫ (β_ U V).hom =
-          (β_ P U).hom ≫
-            (β_ U ((𝟭 X.PresheafOfModules).obj P)).hom ≫ (eta ▷ U) := by
-              rw [hNat]
-      _ = eta ▷ U := by
-        change (β_ P U).hom ≫ (β_ U P).hom ≫ (eta ▷ U) = eta ▷ U
-        simp
-  haveI hMiddle : IsIso (a.map (U ◁ eta)) := by
-    change IsIso (tensorSheafificationComparisonLeft L P)
-    exact isIso_tensorSheafificationComparisonLeft L P
-  change IsIso (a.map (eta ▷ U))
-  rw [h, Functor.map_comp, Functor.map_comp]
-  infer_instance
+    IsIso (tensorSheafificationComparisonRight P L) :=
+  SheafOfModules.isIso_sheafification_map_whiskerRight_of_whiskerLeft
+    (S := X.sheaf) ((toPresheafOfModules X).obj L) _
+    (isIso_tensorSheafificationComparisonLeft L P)
 
 attribute [instance] isIso_tensorSheafificationComparisonLeft
   isIso_tensorSheafificationComparisonRight

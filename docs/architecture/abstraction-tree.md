@@ -234,6 +234,11 @@ particular:
   `Topology/Sheaves/ModuleTensor/`: their use of open neighbourhoods, germs,
   and stalk functors makes them topological specializations of arbitrary-site
   sheaf theory, not ordinary module algebra;
+- keep the braided transfer between the two sheafification whiskering
+  comparisons under `Algebra/Category/ModuleCat/Sheaf/Tensor.lean`: conjugating
+  `M ◁ toSheafify` into `toSheafify ▷ M` uses only symmetry of the objectwise
+  presheaf tensor, so it holds on an arbitrary site and must not be restated
+  inside the scheme consumer that supplies its stalkwise hypothesis;
 - put the sheafified tensor and its coherence on all scheme-module sheaves;
   invertible sheaves inherit that root through `ObjectProperty.IsMonoidal`, and
   pullback monoidality uses Mathlib's `Functor.Monoidal` rather than a parallel
