@@ -4,6 +4,7 @@ concurrent branches append to different files (#480). See the umbrella file for 
 contract and reading guide.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
+import DerivedAlgGeo.CategoryTheory.Abelian.SerreClass.FullSubcategory
 
 /-! ## The middle of a five-term exact sequence (#721)
 
@@ -44,4 +45,5 @@ has not been shown to have.
 
 #print axioms DerivedCategory.cohomologyIn_coproduct
 #print axioms DerivedCategory.cohomologyIn_prop_coproduct
-
+#print axioms CategoryTheory.ObjectProperty.serreIsClosedUnderBinaryProducts
+#print axioms CategoryTheory.ObjectProperty.serreIsClosedUnderFiniteProducts
