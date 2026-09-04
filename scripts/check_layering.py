@@ -30,6 +30,10 @@ nothing else checks.
    back.
 6. **New top-level subjects are deliberate.** A directory directly below the
    source root must be one of the Mathlib subjects this repository uses.
+7. **The ``ObjectProperty`` lift block stays at its carrier's path.**
+   ``CategoryTheory/ObjectProperty/Lift.lean`` declares all six of
+   it and imports nothing from ``DerivedAlgGeo``; no other module redeclares
+   any of the six.
 
 Fixtures under ``scripts/fixtures/layering`` are known-answer tests: every
 ``allowed`` fixture must pass rules 1-4 and every ``forbidden`` fixture must
@@ -150,6 +154,35 @@ RETIRED_PATHS = (
     "CategoryTheory/Triangulated/StabilityCondition/"
     "WeakCompatibility",
 )
+
+
+# Rule 7. The `ObjectProperty` lift block was hoisted out of the t-structure
+# restriction file on 2026-09-04. It is generic by construction: its file needs
+# Mathlib alone. Both halves of that are checked, because either one drifting
+# back is how the block would return to its consumer -- an added `DerivedAlgGeo`
+# import first, then a declaration following it.
+OBJECT_PROPERTY_ROOT = "CategoryTheory/ObjectProperty/Lift.lean"
+OBJECT_PROPERTY_BLOCK = (
+    "liftOfLE",
+    "preimageLift",
+    "inverseImageLift",
+    "liftToInverseImage",
+    "restrictInverseImageLeft",
+    "restrictInverseImageRight",
+)
+DECLARES = re.compile(
+    r"^\s*(?:private\s+|protected\s+|noncomputable\s+)*"
+    r"(?:def|abbrev|instance|theorem|lemma)\s+(?:_root_\.)?(\S+)"
+)
+
+
+def declared_names(text: str) -> set[str]:
+    """Final name components declared in a module, for the rule 7 site check."""
+    return {
+        match.group(1).split(".")[-1]
+        for match in (DECLARES.match(line) for line in text.splitlines())
+        if match
+    }
 
 
 def module_of(path: pathlib.Path) -> str:
@@ -373,6 +406,41 @@ def main() -> int:
             "prestability must structurally extend WeakPreStabilityCondition"
         )
 
+    # Rule 7.
+    op_root = SOURCE_ROOT / OBJECT_PROPERTY_ROOT
+    if not op_root.is_file():
+        failures.append(
+            f"missing {op_root.relative_to(ROOT)}: it owns the ObjectProperty "
+            "lift block; see docs/architecture/cutover-ledger.md"
+        )
+    else:
+        op_module = module_of(op_root)
+        op_imports, _ = parse(op_root)
+        for imp in op_imports:
+            if in_tree(imp, LIBRARY):
+                failures.append(
+                    f"{op_root.relative_to(ROOT)}: imports {imp}; this root is "
+                    "generic and must need Mathlib alone"
+                )
+        op_declared = declared_names(op_root.read_text(encoding="utf-8"))
+        for name in OBJECT_PROPERTY_BLOCK:
+            if name not in op_declared:
+                failures.append(
+                    f"{op_root.relative_to(ROOT)}: no longer declares {name}; "
+                    "the lift block's canonical owner is this file"
+                )
+        for module, (path, _, _) in modules.items():
+            if module == op_module:
+                continue
+            stray = declared_names(path.read_text(encoding="utf-8")) & set(
+                OBJECT_PROPERTY_BLOCK
+            )
+            if stray:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)} from "
+                    f"the ObjectProperty lift block; import {op_module} instead"
+                )
+
     failures += check_fixtures(closure)
 
     if failures:
@@ -394,7 +462,8 @@ def main() -> int:
         f"import geometry; {neutral} of {geometry} geometry modules are "
         "stability-neutral; weak stability is independent of, and structurally "
         f"parented by, Bridgeland stability; {len(RETIRED_PATHS)} retired paths "
-        "absent"
+        f"absent; the {len(OBJECT_PROPERTY_BLOCK)}-declaration ObjectProperty "
+        "lift block is generic and declared once"
     )
     return 0
 

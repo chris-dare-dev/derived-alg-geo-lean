@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Brown
+import DerivedAlgGeo.CategoryTheory.ObjectProperty.Orthogonal
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Restriction
 
 /-!
@@ -44,33 +45,27 @@ def boundedAisle (P : ObjectProperty C) [P.IsTriangulated]
 /-- An object in the degree-one coaisle of the small t-structure is right
 orthogonal, in the ambient category, to the coproduct-and-extension closure of
 the mapped small aisle.  This is the orthogonality observation in the proof of
-Lemma A.14. -/
+Lemma A.14.
+
+Only the generator case is proved here: the three closure cases are
+`ObjectProperty.coprodClosure_le`'s hypotheses, and each is an instance on
+`ObjectProperty.leftOrthogonal`. -/
 theorem coprodBoundedAisle_rightOrthogonal_of_isGE
     (P : ObjectProperty C) [P.IsTriangulated]
     (small : TStructure P.FullSubcategory)
     (Y : P.FullSubcategory) (hY : small.IsGE Y 1) :
     (boundedAisle P small).coprodClosure.{w}.rightOrthogonal Y.obj := by
   intro Z f hZ
-  induction hZ with
-  | of_mem Z hZ =>
-      obtain ⟨X, hX, ⟨e⟩⟩ := hZ
-      rw [← cancel_epi e.hom, comp_zero]
-      have hzero : P.fullyFaithfulι.preimage (e.hom ≫ f) = 0 :=
-        small.zero_of_isLE_of_isGE _ 0 1 (by omega) ⟨hX⟩ hY
-      change ObjectProperty.homMk (e.hom ≫ f) = 0 at hzero
-      exact congrArg (fun q => q.hom) hzero
-  | of_iso e _ ih =>
-      rw [← cancel_epi e.hom, comp_zero]
-      exact ih (e.hom ≫ f)
-  | of_coproduct c hc _ ih =>
-      apply hc.hom_ext
-      intro j
-      rw [comp_zero]
-      exact ih j (c.ι.app j ≫ f)
-  | of_extension T hT _ _ ih₁ ih₃ =>
-      have hzero : T.mor₁ ≫ f = 0 := ih₁ (T.mor₁ ≫ f)
-      obtain ⟨k, rfl⟩ := Triangle.yoneda_exact₂ T hT f hzero
-      rw [ih₃ k, comp_zero]
+  refine (boundedAisle P small).coprodClosure_le
+    (Q := ObjectProperty.leftOrthogonal (fun W => W = Y.obj))
+    (fun W hW => ?_) Z hZ f rfl
+  obtain ⟨X, hX, ⟨e⟩⟩ := hW
+  rintro _ g rfl
+  rw [← cancel_epi e.hom, comp_zero]
+  have hzero : P.fullyFaithfulι.preimage (e.hom ≫ g) = 0 :=
+    small.zero_of_isLE_of_isGE _ 0 1 (by omega) ⟨hX⟩ hY
+  change ObjectProperty.homMk (e.hom ≫ g) = 0 at hzero
+  exact congrArg (fun q => q.hom) hzero
 
 /-- The mapped small aisle is contained in any large aisle whose degree-zero
 part is its coproduct-and-extension closure. -/
