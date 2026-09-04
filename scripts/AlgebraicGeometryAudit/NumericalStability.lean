@@ -24,6 +24,8 @@ formula requires it. They agree only when `∫H² = 1`. -/
 #print axioms AlgebraicGeometry.Numerical.Polarization.cls
 #print axioms AlgebraicGeometry.Numerical.Polarization.cls_mem
 #print axioms AlgebraicGeometry.Numerical.Polarization.degree_pow_pos
+#print axioms AlgebraicGeometry.Numerical.Polarization.mk.inj
+#print axioms AlgebraicGeometry.Numerical.Polarization.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.Numerical.Polarization.pow_mem
 #print axioms AlgebraicGeometry.Numerical.degH
 #print axioms AlgebraicGeometry.Numerical.degH_add
