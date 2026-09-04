@@ -79,6 +79,18 @@ theorem expCharge_add (v w : Mukai.RealExtension V) :
   push_cast
   ring
 
+/-- The exponential charge negates on negated classes, since it is additive.
+
+This is what the shift `E ↦ E⟦1⟧` costs: the class of the shift is `-v(E)`, so
+its charge is `-Z(E)`. Stated here beside `expCharge_add` and `expCharge_zero`
+rather than at either consumer, because both the tilt and the case analysis of
+Lemma 6.2 need it and neither owns it. -/
+theorem expCharge_neg (v : Mukai.RealExtension V) :
+    Mukai.expCharge b β ω (-v) = -Mukai.expCharge b β ω v := by
+  simp only [Mukai.expCharge, PeriodDomain.centralCharge, polar_neg_right]
+  push_cast
+  ring
+
 variable {A : Type u} [Category.{v} A] [Abelian A]
 
 /-- **A Mukai class map**, as a single hom out of the Grothendieck group.

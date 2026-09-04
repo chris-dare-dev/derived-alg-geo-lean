@@ -285,27 +285,26 @@ lemma isIso_tensorSheafificationComparisonLeft (L : X.Modules) (P : X.PresheafOf
     IsIso (tensorSheafificationComparisonLeft L P) :=
   isIso_sheafification_map_whiskerLeft_unit ((toPresheafOfModules X).obj L) P
 
-lemma isIso_tensorSheafificationComparisonRight (P : X.PresheafOfModules) (L : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)] :
-    IsIso (tensorSheafificationComparisonRight P L) := by
-  obtain ⟨q, hq, hrank⟩ :=
-    SheafOfModules.IsInvertible.exists_rankOneData
-      (M := show SheafOfModules X.ringCatSheaf from L)
-  letI : q.IsLocallyFreeData := hq
-  exact SheafOfModules.isIso_sheafification_map_whiskerRight_unit_of_rankOneData
-    (S := X.sheaf) q hrank P
+/-- The right comparison is an isomorphism for **arbitrary** `L`.
+
+The left comparison is already invertible with no rank-one, finiteness, or flatness hypothesis,
+because its proof goes through stalks. Symmetry of the objectwise presheaf tensor then conjugates
+one whiskering into the other, and that conjugation holds on an arbitrary site: it is
+`SheafOfModules.isIso_sheafification_map_whiskerRight_of_whiskerLeft`, which lives with the rest of
+the arbitrary-site tensor descent. Only the stalkwise input it consumes is scheme-level, so nothing
+generic is restated here. This removes the last rank-one restriction from associativity of the
+sheafified tensor product. -/
+lemma isIso_tensorSheafificationComparisonRight (P : X.PresheafOfModules) (L : X.Modules) :
+    IsIso (tensorSheafificationComparisonRight P L) :=
+  SheafOfModules.isIso_sheafification_map_whiskerRight_of_whiskerLeft
+    (S := X.sheaf) ((toPresheafOfModules X).obj L) _
+    (isIso_tensorSheafificationComparisonLeft L P)
 
 attribute [instance] isIso_tensorSheafificationComparisonLeft
   isIso_tensorSheafificationComparisonRight
 
-/-- Associativity of the sheafified tensor product when the **right-hand** factor is invertible.
-
-`L` and `M` are arbitrary. The hypothesis on `L` was dropped in #833; the one on `N` is what
-`isIso_tensorSheafificationComparisonRight` still needs, and generalising that is separate. -/
-noncomputable def tensorAssocIso (L M N : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N)] :
+/-- Associativity of the sheafified tensor product for arbitrary module sheaves. -/
+noncomputable def tensorAssocIso (L M N : X.Modules) :
     tensorObj (tensorObj L M) N ≅ tensorObj L (tensorObj M N) := by
   let cR := tensorSheafificationComparisonRight
     ((toPresheafOfModules X).obj L ⊗ (toPresheafOfModules X).obj M) N
