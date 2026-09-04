@@ -185,7 +185,6 @@ def declared_names(text: str) -> set[str]:
     }
 
 
-
 def module_of(path: pathlib.Path) -> str:
     return ".".join(path.relative_to(ROOT).with_suffix("").parts)
 
