@@ -722,7 +722,7 @@ jobs:
           echo "using venv interpreter $VENV_PY"
 
           "$VENV_BIN/pip" install --quiet \
-            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@a5af3b29047a3bbe974529462b26ff353086beea#subdirectory=contract"
+            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@b5a63cbab0cc2625cdfeacadfa9cb4b64a419598#subdirectory=contract"
           MFC="$VENV_BIN/mfc"
 
           "$MFC" validate attest/lean-emission.json
