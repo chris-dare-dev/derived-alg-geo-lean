@@ -142,7 +142,12 @@ AlgebraicGeometry
 │  │  └─ CoherentSheaf(X)
 │  │     ├─ Abelian instance under geometric hypotheses
 │  │     └─ DerivedCategory (Coh X)     consumes the generic construction
-│  ├─ scheme tensor and Picard classes   consume intrinsic IsInvertible
+│  ├─ sheafified tensor / MonoidalCategory X.Modules
+│  │  ├─ intrinsic IsInvertible as ObjectProperty.IsMonoidal
+│  │  │  ├─ InvertibleSheaf              inherited full monoidal subcategory
+│  │  │  └─ pullback preservation        theorem inherited by every consumer
+│  │  ├─ Picard classes                  consume intrinsic IsInvertible
+│  │  └─ Functor.Monoidal pullback input standard tensor/unit comparison surface
 │  └─ LineBundleData                     invertible sheaf plus chosen tensor inverse
 │     ├─ determinant and Picard interpretations
 │     ├─ monoidal pullback and projection formula
@@ -229,6 +234,15 @@ particular:
   `Topology/Sheaves/ModuleTensor/`: their use of open neighbourhoods, germs,
   and stalk functors makes them topological specializations of arbitrary-site
   sheaf theory, not ordinary module algebra;
+- keep the braided transfer between the two sheafification whiskering
+  comparisons under `Algebra/Category/ModuleCat/Sheaf/Tensor.lean`: conjugating
+  `M ◁ toSheafify` into `toSheafify ▷ M` uses only symmetry of the objectwise
+  presheaf tensor, so it holds on an arbitrary site and must not be restated
+  inside the scheme consumer that supplies its stalkwise hypothesis;
+- put the sheafified tensor and its coherence on all scheme-module sheaves;
+  invertible sheaves inherit that root through `ObjectProperty.IsMonoidal`, and
+  pullback monoidality uses Mathlib's `Functor.Monoidal` rather than a parallel
+  capability class;
 - keep basiswise detection of topological sheaf isomorphisms under
   `Topology/Sheaves/Basis.lean`; affine comparison consumes it only after
   introducing `Spec R`, distinguished opens, and module localization;
@@ -241,8 +255,7 @@ particular:
   derived-category construction;
 - generic stacks, replete subprestacks, and boundedness predicates do not
   import stability-condition or geometric modules; scheme presentations and
-  finite-type witnesses remain geometric consumers;
-- a paper-specific module may instantiate these roots but never becomes a root
+  finite-type witnesses remain geometric consumers;- a paper-specific module may instantiate these roots but never becomes a root
   imported by them.
 - keep exceptional blocks, residual right orthogonals, chosen right-adjoint
   projections, objectwise mutation and projection-chain arguments, Serre

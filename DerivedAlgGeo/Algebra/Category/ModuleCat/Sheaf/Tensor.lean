@@ -242,6 +242,31 @@ lemma isIso_sheafification_map_whiskerLeft_of_rankOneData
     (K.W.inverseImage (PresheafOfModules.toPresheaf (ringSheaf S).obj))
   exact W_whiskerLeft_of_rankOneData q hq g hg
 
+omit [∀ X, HasWeakSheafify (K.over X) AddCommGrpCat.{u}]
+  [∀ X, (K.over X).WEqualsLocallyBijective AddCommGrpCat.{u}] in
+/-- **The two whiskerings are interchangeable.**
+
+Symmetry of the objectwise tensor product of module presheaves conjugates `g ▷ M` into `M ◁ g`,
+and sheafification is a functor, so it inverts one exactly when it inverts the other. Nothing here
+depends on the site, on `M` being a sheaf, or on any rank, flatness, or finiteness hypothesis on
+`M`: every such hypothesis a caller carries is spent proving the left-hand input, never this
+transfer. That is why the scheme consumer, whose stalkwise proof of the left-hand input needs no
+rank-one restriction, reuses this lemma rather than restating the conjugation. -/
+lemma isIso_sheafification_map_whiskerRight_of_whiskerLeft
+    (M : PresheafOfModules.{u} (ringSheaf S).obj)
+    {G₁ G₂ : PresheafOfModules.{u} (ringSheaf S).obj}
+    (g : G₁ ⟶ G₂)
+    (h : IsIso ((PresheafOfModules.sheafification
+      (𝟙 (ringSheaf S).obj)).map (M ◁ g))) :
+    IsIso ((PresheafOfModules.sheafification
+      (𝟙 (ringSheaf S).obj)).map (g ▷ M)) := by
+  haveI := h
+  have hgm : g ▷ M = (β_ G₁ M).hom ≫ (M ◁ g) ≫ (β_ M G₂).hom := by
+    rw [← cancel_mono (β_ G₂ M).hom]
+    simp
+  rw [hgm, Functor.map_comp, Functor.map_comp]
+  infer_instance
+
 set_option maxHeartbeats 400000 in
 /-- Sheafification sends the right-whiskered local equivalence to an isomorphism. -/
 lemma isIso_sheafification_map_whiskerRight_of_rankOneData
@@ -251,16 +276,9 @@ lemma isIso_sheafification_map_whiskerRight_of_rankOneData
     (g : G₁ ⟶ G₂)
     (hg : K.W ((PresheafOfModules.toPresheaf _).map g)) :
     IsIso ((PresheafOfModules.sheafification
-      (𝟙 (ringSheaf S).obj)).map (g ▷ M.val)) := by
-  let a := PresheafOfModules.sheafification (𝟙 (ringSheaf S).obj)
-  haveI : IsIso (a.map (M.val ◁ g)) :=
-    isIso_sheafification_map_whiskerLeft_of_rankOneData q hq g hg
-  have hgm : g ▷ M.val =
-      (β_ G₁ M.val).hom ≫ (M.val ◁ g) ≫ (β_ M.val G₂).hom := by
-    rw [← cancel_mono (β_ G₂ M.val).hom]
-    simp
-  rw [hgm, Functor.map_comp, Functor.map_comp]
-  infer_instance
+      (𝟙 (ringSheaf S).obj)).map (g ▷ M.val)) :=
+  isIso_sheafification_map_whiskerRight_of_whiskerLeft M.val g
+    (isIso_sheafification_map_whiskerLeft_of_rankOneData q hq g hg)
 
 set_option maxHeartbeats 400000 in
 /-- Sheafification inverts left whiskering of its unit by a rank-one module sheaf. -/
