@@ -204,6 +204,7 @@ items:
       note: [".claude/decisions/ADR-0002-identity-is-minted-here.md", ".claude/decisions/ADR-0004-registry-lives-in-the-topic-repo.md"]
 
   - id: contract-v1-e6
+    status: done
     gh_issue: 133
     gh_sub_issues: [161, 162, 163, 164, 165, 166, 167, 168]
     kind: epic
@@ -215,6 +216,7 @@ items:
     tags: [value, identity, trust]
 
   - id: contract-v1-e7
+    status: done
     gh_issue: 134
     gh_sub_issues: [169, 170, 171, 172]
     kind: epic
@@ -226,6 +228,7 @@ items:
     tags: [enabler, corpus, cross-repo]
 
   - id: contract-v1-e8
+    status: done
     gh_issue: 135
     gh_sub_issues: [173, 174, 175, 176]
     kind: epic
