@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import Mathlib.CategoryTheory.Adjunction.Restrict
+import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
 
 /-!
@@ -20,26 +20,11 @@ Step 4.
 The theorem is independent of schemes and of the compact-generation argument
 that constructs the large source t-structure in Step 1.
 
-The same file owns the restriction of an adjunction on either side of `F` to
-`Q` and `F⁻¹ Q`, which Proposition 3.8 transposes condition (3.2) through;
-these six `ObjectProperty` declarations need no t-structure and are recorded
-in `docs/architecture/cutover-ledger.md` as a block to move to
-`CategoryTheory/ObjectProperty/`.
-
-## Main definitions
-
-* `ObjectProperty.liftOfLE`: the restriction of `F` to a subcategory
-  `P ≤ F⁻¹ Q`, landing in `Q`, with the `Additive`, `CommShift ℤ`, and
-  `IsTriangulated` instances a slicing consumer needs of a detecting functor;
-  `ObjectProperty.preimageLift` is its case of a two-way detection, and
-  `ObjectProperty.inverseImageLift` its `P = F⁻¹ Q` case, the shape
-  hypothesis (iv) of A.17 produces.
-* `ObjectProperty.liftToInverseImage`: the restriction of a functor in the
-  other direction whose composite with `F` preserves `Q`.
-* `Adjunction.restrictInverseImageLeft` and `restrictInverseImageRight`: an
-  adjunction on either side of `F` restricted to those subcategories, through
-  Mathlib's `Adjunction.restrictFullyFaithful`; the suffix names which adjoint
-  of `F` is restricted.
+The functor and adjunction restrictions this file used to own -- `liftOfLE`,
+`preimageLift`, `inverseImageLift`, `liftToInverseImage`, and the two
+`Adjunction.restrictInverseImage*` -- mention no t-structure and now live at
+their carrier's path, `CategoryTheory/ObjectProperty/Lift.lean`,
+which this file imports.
 
 ## Main results
 
@@ -119,98 +104,6 @@ theorem hasInducedTStructure_of_preimage
     exact Q.prop_of_iso (F.mapTruncGEIso t t' n X).symm
       (by simpa only [TD', TStructure.triangleLEGE_obj_obj₃] using hQ'.2)
 
-/-- The restriction of `F` to a full subcategory `P ≤ F⁻¹ Q`, landing in `Q`.
-Definitionally `ObjectProperty.ιOfLE hle ⋙ inverseImageLift F Q`, but defined
-as `Q.lift (P.ι ⋙ F) _` because Mathlib's `ιOfLE` carries no `Additive`,
-`CommShift`, or `IsTriangulated` instance while `lift` carries all three; the
-instances below are those, transported.  Its `F = 𝟭` case is `ιOfLE`. -/
-def liftOfLE (F : Functor C D) (hle : P ≤ Q.inverseImage F) :
-    Functor P.FullSubcategory Q.FullSubcategory :=
-  Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)
-
-instance instAdditiveLiftOfLE [F.Additive] (hle : P ≤ Q.inverseImage F) :
-    (liftOfLE F hle).Additive :=
-  inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).Additive
-
-instance instCommShiftLiftOfLE [P.IsTriangulated] [Q.IsTriangulated]
-    [F.CommShift ℤ] (hle : P ≤ Q.inverseImage F) :
-    (liftOfLE F hle).CommShift ℤ :=
-  inferInstanceAs ((Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).CommShift ℤ)
-
-instance instIsTriangulatedLiftOfLE [P.IsTriangulated] [Q.IsTriangulated] [F.CommShift ℤ]
-    [F.IsTriangulated] (hle : P ≤ Q.inverseImage F) :
-    (liftOfLE F hle).IsTriangulated :=
-  inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).IsTriangulated
-
-/-- The functor between the two full subcategories selected by a detection
-equivalence: `liftOfLE` along its forward direction, by definition. -/
-def preimageLift (F : Functor C D) (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
-    Functor P.FullSubcategory Q.FullSubcategory :=
-  liftOfLE F (fun X ↦ (hmem X).1)
-
-instance instAdditivePreimageLift [F.Additive] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
-    (preimageLift F hmem).Additive :=
-  inferInstanceAs (liftOfLE F (fun X ↦ (hmem X).1)).Additive
-
-instance instCommShiftPreimageLift [P.IsTriangulated] [Q.IsTriangulated]
-    [F.CommShift ℤ] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
-    (preimageLift F hmem).CommShift ℤ :=
-  inferInstanceAs ((liftOfLE F (fun X ↦ (hmem X).1)).CommShift ℤ)
-
-instance instIsTriangulatedPreimageLift [P.IsTriangulated] [Q.IsTriangulated] [F.CommShift ℤ]
-    [F.IsTriangulated] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
-    (preimageLift F hmem).IsTriangulated :=
-  inferInstanceAs (liftOfLE F (fun X ↦ (hmem X).1)).IsTriangulated
-
-/-- The restriction of `F` to the objects whose image lies in `Q`, landing
-in `Q`.  This is the functor between the selected subcategories under
-hypothesis (iv) of Theorem A.17 of arXiv:2607.28411v1, `P = F⁻¹ Q`, the
-form `Polishchuk.induce` produces.
-
-Kept an `abbrev`, hence reducible, so that a `Polishchuk.InducedTStructureData`
-field stated with `liftOfLE F le_rfl` (`Polishchuk.induce`) is definitionally
-this functor; `Slicing.IndExtensions.nonempty_inducedTStructures` relies on
-that. -/
-abbrev inverseImageLift (F : Functor C D) (Q : ObjectProperty D) :
-    Functor (Q.inverseImage F).FullSubcategory Q.FullSubcategory :=
-  liftOfLE F (P := Q.inverseImage F) (Q := Q) le_rfl
-
-/-- The restriction of `L : D ⥤ C` to `Q`, landing in `F⁻¹ Q`, when `F ∘ L`
-preserves `Q`.  For `L` a left adjoint of `F` this is the bounded left
-adjoint of `inverseImageLift F Q`; geometrically, `f_!` on `Dᵇ(Coh)` when it
-preserves bounded coherent complexes. -/
-abbrev liftToInverseImage (F : Functor C D) (Q : ObjectProperty D) (L : Functor D C)
-    (hL : ∀ E : D, Q E → Q (F.obj (L.obj E))) :
-    Functor Q.FullSubcategory (Q.inverseImage F).FullSubcategory :=
-  (Q.inverseImage F).lift (Q.ι ⋙ L) fun E ↦ hL E.obj E.property
-
-/-- An adjunction `L ⊣ F` restricts to `Q ⊆ D` and `F⁻¹ Q ⊆ C` when the monad
-`F L` preserves `Q`; the restricted functors are `liftToInverseImage` and
-`inverseImageLift`, and the comparison isomorphisms are `liftCompιIso`, so
-nothing is transported.  Geometrically this is `f_! ⊣ f^*` on `Dᵇ(Coh)`, under
-the hypothesis that the monad `f^* f_!` preserves bounded coherent complexes,
-which Proposition 3.8 of arXiv:2607.28411v1 obtains from `f_!(Dᵇ) ⊆ Dᵇ`,
-itself a consequence of perfectness of the relative dualizing complex. -/
-def _root_.CategoryTheory.Adjunction.restrictInverseImageLeft
-    {L : Functor D C} (adj : L ⊣ F) (Q : ObjectProperty D)
-    (hL : ∀ E : D, Q E → Q (F.obj (L.obj E))) :
-    liftToInverseImage F Q L hL ⊣ inverseImageLift F Q :=
-  adj.restrictFullyFaithful Q.fullyFaithfulι (Q.inverseImage F).fullyFaithfulι
-    ((Q.inverseImage F).liftCompιIso _ _).symm (Q.liftCompιIso _ _).symm
-
-/-- An adjunction `F ⊣ R` restricts to `F⁻¹ Q ⊆ C` and `Q ⊆ D` when the comonad
-`F R` preserves `Q`; the restricted functors are `inverseImageLift` and
-`liftToInverseImage`, and the comparison isomorphisms are `liftCompιIso`, so
-nothing is transported.  Geometrically this is `f^* ⊣ f_*` on `Dᵇ(Coh)`, under
-the hypothesis that the comonad `f^* f_*` preserves bounded coherent
-complexes, exactly what condition (3.2) of arXiv:2607.28411v1 needs in order
-to be stated there. -/
-def _root_.CategoryTheory.Adjunction.restrictInverseImageRight
-    {R : Functor D C} (adj : F ⊣ R) (Q : ObjectProperty D)
-    (hR : ∀ E : D, Q E → Q (F.obj (R.obj E))) :
-    inverseImageLift F Q ⊣ liftToInverseImage F Q R hR :=
-  adj.restrictFullyFaithful (Q.inverseImage F).fullyFaithfulι Q.fullyFaithfulι
-    (Q.liftCompιIso _ _).symm ((Q.inverseImage F).liftCompιIso _ _).symm
 
 /-- Formula (A.3) against the large target t-structure, with no target
 subcategory: the content of Step 3 of Theorem A.17, in the shape Theorem 2.8(1)
