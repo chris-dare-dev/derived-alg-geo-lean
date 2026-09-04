@@ -62,7 +62,23 @@ the theorem. Nothing is axiomatised.
 The discriminant does appear in the prose at `minorCross_eq_zero_of_two_walls`
 and `wall_eq_of_meet`, to say what the charge hypothesis costs and what
 nesting would need. It is discussion, not a hypothesis: no statement below
-mentions it.
+mentions it. `Walls/Numerical/Discriminant.lean` supplies it and removes the
+excluded point of `wall_eq_of_meet`.
+
+## Where this material is expounded
+
+The `(s, t)` half plane, the twisted charge, and the wall and chamber structure
+are Macrì–Schmidt, *Lectures on Bridgeland Stability* (`arXiv:1607.01262v3`),
+§6.4 — there in the `(α, β)` coordinates. The manuscript is pinned as
+`registry/coverage-1607.01262.json`, **at status `target` throughout**: naming
+it here says where a reader can find the surrounding theory, and asserts no
+correspondence between any declaration below and any statement of it. That
+claim would be status `mapped` and needs a review this file has not had.
+
+The primary artifacts stay primary. For the surface construction that is
+Arcara–Bertram and, on a K3, Bridgeland `math/0307164` §6; the nested-wall
+ordering is Maciocia's. A lecture note is where the material is explained, not
+what a future binding is checked against.
 
 ## Main results
 
