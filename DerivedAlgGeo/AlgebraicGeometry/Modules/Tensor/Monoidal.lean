@@ -3,13 +3,16 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
+import Mathlib.CategoryTheory.Monoidal.Subcategory
 
 /-!
-# The monoidal category of invertible module sheaves
+# The monoidal category of scheme-module sheaves
 
-The sheafified tensor product descends to invertible sheaves. Its associator is natural and
-satisfies the triangle and pentagon identities because the comparison maps cancel, reducing the
-coherence diagrams to those for the objectwise tensor product of presheaves.
+The sheafified tensor product equips all scheme-module sheaves with a monoidal structure. Its
+associator is natural and satisfies the triangle and pentagon identities because the comparison
+maps cancel, reducing the coherence diagrams to those for the objectwise tensor product of
+presheaves. Intrinsic invertibility is closed under this tensor, so invertible sheaves inherit the
+same structure as a full monoidal subcategory.
 -/
 
 open CategoryTheory MonoidalCategory BraidedCategory
@@ -33,27 +36,6 @@ local instance : MonoidalCategory X.PresheafOfModules :=
 
 local instance : SymmetricCategory X.PresheafOfModules :=
   PresheafOfModules.symmetricCategory (R := X.presheaf)
-
-private noncomputable abbrev invertibleTensor (L M : InvertibleSheaf X) :
-    InvertibleSheaf X := by
-  letI : SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L.1) := L.2
-  letI : SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from M.1) := M.2
-  exact ⟨tensorObj L.1 M.1, isInvertible_tensorObj L.1 M.1⟩
-
-private noncomputable abbrev invertibleAssoc (L M N : InvertibleSheaf X) :
-    invertibleTensor (invertibleTensor L M) N ≅
-      invertibleTensor L (invertibleTensor M N) := by
-  letI : SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L.1) := L.2
-  letI : SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N.1) := N.2
-  exact (isInvertible X).isoMk (tensorAssocIso L.1 M.1 N.1)
-
-private noncomputable abbrev invertibleUnit : InvertibleSheaf X :=
-  ⟨SheafOfModules.unit X.ringCatSheaf,
-    SheafOfModules.instIsInvertibleUnit.{u, u, u}⟩
 
 lemma tensorSheafificationComparisonRight_naturality {P Q : X.PresheafOfModules}
     (f : P ⟶ Q) {L M : X.Modules} (g : L ⟶ M) :
@@ -199,14 +181,9 @@ lemma tensorSheafificationComparisonLeft_naturality {L M : X.Modules} (f : L ⟶
       rw [MonoidalCategory.tensorHom_comp_tensorHom]
       rw [Category.id_comp]
 
-/-- Naturality of the associator. `L₁` and `L₂` carried invertibility hypotheses until #833
-made `tensorAssocIso` independent of its left-hand factor; only the right-hand ones remain. -/
+/-- Naturality of the associator on arbitrary module sheaves. -/
 lemma tensorAssocIso_naturality
     {L₁ L₂ M₁ M₂ N₁ N₂ : X.Modules}
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N₁)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N₂)]
     (f : L₁ ⟶ L₂) (g : M₁ ⟶ M₂) (h : N₁ ⟶ N₂) :
     tensorHom (tensorHom f g) h ≫ (tensorAssocIso L₂ M₂ N₂).hom =
       (tensorAssocIso L₁ M₁ N₁).hom ≫
@@ -293,9 +270,7 @@ lemma tensorHom_comp_tensorHom
 
 /-- Tensoring is functorial in each argument, so an isomorphism transports through it.
 
-`tensorObj` is not a bifunctor in this file — the monoidal structure is only available on the
-invertible sheaves — but the two lemmas above are exactly the functoriality an isomorphism needs,
-and transporting one factor is what a twist comparison does constantly. -/
+This is the objectwise form of the tensor bifunctor's action on isomorphisms. -/
 noncomputable def tensorObjIso {L L' M M' : X.Modules} (e : L ≅ L') (g : M ≅ M') :
     tensorObj L M ≅ tensorObj L' M' where
   hom := tensorHom e.hom g.hom
@@ -305,9 +280,7 @@ noncomputable def tensorObjIso {L L' M M' : X.Modules} (e : L ≅ L') (g : M ≅
   inv_hom_id := by
     rw [tensorHom_comp_tensorHom, e.inv_hom_id, g.inv_hom_id, tensorHom_id_id]
 
-private lemma comparisonLeft_counit (L M : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)] :
+private lemma comparisonLeft_counit (L M : X.Modules) :
     tensorSheafificationComparisonLeft L ((toPresheafOfModules X).obj M) ≫
       tensorHom (𝟙 L)
         ((PresheafOfModules.sheafificationAdjunction
@@ -357,9 +330,7 @@ private lemma comparisonLeft_counit (L M : X.Modules)
     tensorSheafificationComparisonLeft L P
   exact hn
 
-private lemma comparisonRight_counit (L M : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from M)] :
+private lemma comparisonRight_counit (L M : X.Modules) :
     tensorSheafificationComparisonRight ((toPresheafOfModules X).obj L) M ≫
       tensorHom
         ((PresheafOfModules.sheafificationAdjunction
@@ -409,11 +380,7 @@ private lemma comparisonRight_counit (L M : X.Modules)
     tensorSheafificationComparisonRight P M
   exact hn
 
-private lemma tensorAssocIso_triangle (L M : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from M)] :
+private lemma tensorAssocIso_triangle (L M : X.Modules) :
     (tensorAssocIso L (SheafOfModules.unit X.ringCatSheaf) M).hom ≫
         tensorHom (𝟙 L) (tensorUnitLeftIso M).hom =
       tensorHom (tensorUnitRightIso L).hom (𝟙 M) := by
@@ -463,11 +430,9 @@ private lemma tensorAssocIso_triangle (L M : X.Modules)
   congr 1
   exact MonoidalCategory.triangle A B
 
-/-- The right comparison composed with the associator. The hypothesis on `L` went with #833. -/
+/-- The right comparison composed with the associator. -/
 lemma tensorSheafificationComparisonRight_comp_tensorAssocIso
-    (L M N : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N)] :
+    (L M N : X.Modules) :
     tensorSheafificationComparisonRight
         ((toPresheafOfModules X).obj L ⊗ (toPresheafOfModules X).obj M) N ≫
       (tensorAssocIso L M N).hom =
@@ -482,15 +447,7 @@ lemma tensorSheafificationComparisonRight_comp_tensorAssocIso
     asIso_hom, asIso_inv, IsIso.hom_inv_id_assoc]
   rfl
 
-private lemma tensorAssocIso_pentagon (W L M N : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from W)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from M)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N)] :
+private lemma tensorAssocIso_pentagon (W L M N : X.Modules) :
     tensorHom (tensorAssocIso W L M).hom (𝟙 N) ≫
         (tensorAssocIso W (tensorObj L M) N).hom ≫
           tensorHom (𝟙 W) (tensorAssocIso L M N).hom =
@@ -677,180 +634,159 @@ private lemma tensorAssocIso_pentagon (W L M N : X.Modules)
   congr 1
   exact MonoidalCategory.pentagon A B C D
 
-noncomputable instance invertibleSheafMonoidalCategoryStruct :
-    MonoidalCategoryStruct (InvertibleSheaf X) where
-  tensorObj := invertibleTensor
-  whiskerLeft L _ _ f := ObjectProperty.homMk
-    (tensorHom (𝟙 L.1) f.hom)
-  whiskerRight f M := ObjectProperty.homMk
-    (tensorHom f.hom (𝟙 M.1))
-  tensorHom f g := ObjectProperty.homMk (tensorHom f.hom g.hom)
-  tensorUnit := invertibleUnit
-  associator := invertibleAssoc
-  leftUnitor L := (isInvertible X).isoMk (tensorUnitLeftIso L.1)
-  rightUnitor L := (isInvertible X).isoMk (tensorUnitRightIso L.1)
+private lemma tensorUnitLeftIso_naturality
+    {L M : X.Modules} (f : L ⟶ M) :
+    tensorHom (𝟙 (SheafOfModules.unit X.ringCatSheaf)) f ≫
+        (tensorUnitLeftIso M).hom =
+      (tensorUnitLeftIso L).hom ≫ f := by
+  change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+        ((toPresheafOfModules X).map
+            (𝟙 (SheafOfModules.unit X.ringCatSheaf)) ⊗ₘ
+          (toPresheafOfModules X).map f) ≫
+      ((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+          (λ_ ((toPresheafOfModules X).obj M)).hom ≫
+        (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit.app M) =
+    ((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+          (λ_ ((toPresheafOfModules X).obj L)).hom ≫
+        (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit.app L) ≫ f
+  have hId : (toPresheafOfModules X).map
+      (𝟙 (SheafOfModules.unit X.ringCatSheaf)) = 𝟙 _ :=
+    (toPresheafOfModules X).map_id _
+  rw [hId]
+  change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+        (𝟙_ X.PresheafOfModules ◁ (toPresheafOfModules X).map f) ≫
+      (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+          (λ_ ((toPresheafOfModules X).obj M)).hom ≫
+        (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit.app M = _
+  rw [← Functor.map_comp_assoc, MonoidalCategory.leftUnitor_naturality,
+    Functor.map_comp]
+  have hc := (PresheafOfModules.sheafificationAdjunction
+    (𝟙 X.ringCatSheaf.obj)).counit_naturality f
+  change (PresheafOfModules.sheafification
+        (𝟙 X.ringCatSheaf.obj)).map
+          (λ_ ((toPresheafOfModules X).obj L)).hom ≫
+      ((PresheafOfModules.sheafification
+        (𝟙 X.ringCatSheaf.obj)).map
+          ((SheafOfModules.forget X.ringCatSheaf ⋙
+            PresheafOfModules.restrictScalars
+              (𝟙 X.ringCatSheaf.obj)).map f) ≫
+        (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit.app M) = _
+  rw [hc, ← Category.assoc]
+
+private lemma tensorUnitRightIso_naturality
+    {L M : X.Modules} (f : L ⟶ M) :
+    tensorHom f (𝟙 (SheafOfModules.unit X.ringCatSheaf)) ≫
+        (tensorUnitRightIso M).hom =
+      (tensorUnitRightIso L).hom ≫ f := by
+  change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+        ((toPresheafOfModules X).map f ⊗ₘ
+          (toPresheafOfModules X).map
+            (𝟙 (SheafOfModules.unit X.ringCatSheaf))) ≫
+      ((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+          (ρ_ ((toPresheafOfModules X).obj M)).hom ≫
+        (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit.app M) =
+    ((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+          (ρ_ ((toPresheafOfModules X).obj L)).hom ≫
+        (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit.app L) ≫ f
+  have hId : (toPresheafOfModules X).map
+      (𝟙 (SheafOfModules.unit X.ringCatSheaf)) = 𝟙 _ :=
+    (toPresheafOfModules X).map_id _
+  rw [hId]
+  change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+        ((toPresheafOfModules X).map f ▷ 𝟙_ X.PresheafOfModules) ≫
+      (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+          (ρ_ ((toPresheafOfModules X).obj M)).hom ≫
+        (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit.app M = _
+  rw [← Functor.map_comp_assoc, MonoidalCategory.rightUnitor_naturality,
+    Functor.map_comp]
+  have hc := (PresheafOfModules.sheafificationAdjunction
+    (𝟙 X.ringCatSheaf.obj)).counit_naturality f
+  change (PresheafOfModules.sheafification
+        (𝟙 X.ringCatSheaf.obj)).map
+          (ρ_ ((toPresheafOfModules X).obj L)).hom ≫
+      ((PresheafOfModules.sheafification
+        (𝟙 X.ringCatSheaf.obj)).map
+          ((SheafOfModules.forget X.ringCatSheaf ⋙
+            PresheafOfModules.restrictScalars
+              (𝟙 X.ringCatSheaf.obj)).map f) ≫
+        (PresheafOfModules.sheafificationAdjunction
+          (𝟙 X.ringCatSheaf.obj)).counit.app M) = _
+  rw [hc, ← Category.assoc]
+
+/-- The canonical tensor on all scheme-module sheaves. -/
+noncomputable instance modulesMonoidalCategoryStruct :
+    MonoidalCategoryStruct X.Modules where
+  tensorObj := tensorObj
+  whiskerLeft L _ _ f := tensorHom (𝟙 L) f
+  whiskerRight f M := tensorHom f (𝟙 M)
+  tensorHom f g := tensorHom f g
+  tensorUnit := SheafOfModules.unit X.ringCatSheaf
+  associator := tensorAssocIso
+  leftUnitor := tensorUnitLeftIso
+  rightUnitor := tensorUnitRightIso
 
 set_option maxHeartbeats 800000 in
-noncomputable instance invertibleSheafMonoidalCategory :
-    MonoidalCategory (InvertibleSheaf X) where
+/-- Scheme-module sheaves form a monoidal category under the sheafified tensor product.
+
+This is the canonical ambient root. Invertible sheaves inherit their monoidal structure as a full
+monoidal subcategory, so the tensor, associator, and unitors are definitionally shared rather than
+reimplemented at the leaf. -/
+noncomputable instance modulesMonoidalCategory : MonoidalCategory X.Modules where
   tensorHom_def f g := by
-    apply ObjectProperty.hom_ext
-    change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-        ((toPresheafOfModules X).map f.hom ⊗ₘ
-          (toPresheafOfModules X).map g.hom) =
-      (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-          ((toPresheafOfModules X).map f.hom ▷ _) ≫
-        (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-          (_ ◁ (toPresheafOfModules X).map g.hom)
-    rw [← Functor.map_comp, MonoidalCategory.tensorHom_def]
-  id_tensorHom_id L M := by
-    apply ObjectProperty.hom_ext
-    change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-        (𝟙 _ ⊗ₘ 𝟙 _) = 𝟙 _
-    rw [MonoidalCategory.id_tensorHom_id]
-    exact (PresheafOfModules.sheafification
-      (𝟙 X.ringCatSheaf.obj)).map_id _
-  tensorHom_comp_tensorHom f f' g g' := by
-    apply ObjectProperty.hom_ext
-    change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map _ ≫
-        (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map _ =
-      (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map _
-    rw [← Functor.map_comp, MonoidalCategory.tensorHom_comp_tensorHom,
-      ObjectProperty.FullSubcategory.comp_hom,
-      ObjectProperty.FullSubcategory.comp_hom,
-      Functor.map_comp, Functor.map_comp]
-  whiskerLeft_id L M := by
-    apply ObjectProperty.hom_ext
-    change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-        (𝟙 _ ⊗ₘ 𝟙 _) = 𝟙 _
-    rw [MonoidalCategory.id_tensorHom_id]
-    exact (PresheafOfModules.sheafification
-      (𝟙 X.ringCatSheaf.obj)).map_id _
-  id_whiskerRight L M := by
-    apply ObjectProperty.hom_ext
-    change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-        (𝟙 _ ⊗ₘ 𝟙 _) = 𝟙 _
-    rw [MonoidalCategory.id_tensorHom_id]
-    exact (PresheafOfModules.sheafification
-      (𝟙 X.ringCatSheaf.obj)).map_id _
-  associator_naturality := by
-    intro X₁ X₂ X₃ Y₁ Y₂ Y₃ f₁ f₂ f₃
+    change tensorHom f g =
+      tensorHom f (𝟙 _) ≫ tensorHom (𝟙 _) g
+    symm
+    rw [tensorHom_comp_tensorHom]
+    simp
+  id_tensorHom_id := tensorHom_id_id
+  tensorHom_comp_tensorHom := tensorHom_comp_tensorHom
+  whiskerLeft_id := tensorHom_id_id
+  id_whiskerRight := tensorHom_id_id
+  associator_naturality := tensorAssocIso_naturality
+  leftUnitor_naturality := tensorUnitLeftIso_naturality
+  rightUnitor_naturality := tensorUnitRightIso_naturality
+  pentagon := tensorAssocIso_pentagon
+  triangle := tensorAssocIso_triangle
+
+/-- Intrinsic invertibility is a monoidal object property of scheme-module sheaves. -/
+noncomputable instance isInvertibleIsMonoidal :
+    (isInvertible X).IsMonoidal where
+  prop_unit := SheafOfModules.instIsInvertibleUnit.{u, u, u}
+  prop_tensor L M hL hM := by
+    change SheafOfModules.IsInvertible.{u, u, u}
+      (show SheafOfModules X.ringCatSheaf from L) at hL
+    change SheafOfModules.IsInvertible.{u, u, u}
+      (show SheafOfModules X.ringCatSheaf from M) at hM
     letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from X₁.1) := X₁.2
+        (show SheafOfModules X.ringCatSheaf from L) := hL
     letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from X₃.1) := X₃.2
-    letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from Y₁.1) := Y₁.2
-    letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from Y₃.1) := Y₃.2
-    apply ObjectProperty.hom_ext
-    exact tensorAssocIso_naturality f₁.hom f₂.hom f₃.hom
-  leftUnitor_naturality := by
-    intro X₁ X₂ f
-    apply ObjectProperty.hom_ext
-    change tensorHom (𝟙 (SheafOfModules.unit X.ringCatSheaf)) f.hom ≫
-        (tensorUnitLeftIso X₂.1).hom =
-      (tensorUnitLeftIso X₁.1).hom ≫ f.hom
-    change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-          ((toPresheafOfModules X).map
-              (𝟙 (SheafOfModules.unit X.ringCatSheaf)) ⊗ₘ
-            (toPresheafOfModules X).map f.hom) ≫
-        ((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-            (λ_ ((toPresheafOfModules X).obj X₂.1)).hom ≫
-          (PresheafOfModules.sheafificationAdjunction
-            (𝟙 X.ringCatSheaf.obj)).counit.app X₂.1) =
-      ((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-            (λ_ ((toPresheafOfModules X).obj X₁.1)).hom ≫
-          (PresheafOfModules.sheafificationAdjunction
-            (𝟙 X.ringCatSheaf.obj)).counit.app X₁.1) ≫ f.hom
-    have hId : (toPresheafOfModules X).map
-        (𝟙 (SheafOfModules.unit X.ringCatSheaf)) = 𝟙 _ :=
-      (toPresheafOfModules X).map_id _
-    rw [hId]
-    change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-          (𝟙_ X.PresheafOfModules ◁ (toPresheafOfModules X).map f.hom) ≫
-        (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-            (λ_ ((toPresheafOfModules X).obj X₂.1)).hom ≫
-          (PresheafOfModules.sheafificationAdjunction
-            (𝟙 X.ringCatSheaf.obj)).counit.app X₂.1 = _
-    rw [← Functor.map_comp_assoc, MonoidalCategory.leftUnitor_naturality,
-      Functor.map_comp]
-    have hc := (PresheafOfModules.sheafificationAdjunction
-      (𝟙 X.ringCatSheaf.obj)).counit_naturality f.hom
-    change (PresheafOfModules.sheafification
-          (𝟙 X.ringCatSheaf.obj)).map
-            (λ_ ((toPresheafOfModules X).obj X₁.1)).hom ≫
-        ((PresheafOfModules.sheafification
-          (𝟙 X.ringCatSheaf.obj)).map
-            ((SheafOfModules.forget X.ringCatSheaf ⋙
-              PresheafOfModules.restrictScalars
-                (𝟙 X.ringCatSheaf.obj)).map f.hom) ≫
-          (PresheafOfModules.sheafificationAdjunction
-            (𝟙 X.ringCatSheaf.obj)).counit.app X₂.1) = _
-    rw [hc, ← Category.assoc]
-  rightUnitor_naturality := by
-    intro X₁ X₂ f
-    apply ObjectProperty.hom_ext
-    change tensorHom f.hom (𝟙 (SheafOfModules.unit X.ringCatSheaf)) ≫
-        (tensorUnitRightIso X₂.1).hom =
-      (tensorUnitRightIso X₁.1).hom ≫ f.hom
-    change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-          ((toPresheafOfModules X).map f.hom ⊗ₘ
-            (toPresheafOfModules X).map
-              (𝟙 (SheafOfModules.unit X.ringCatSheaf))) ≫
-        ((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-            (ρ_ ((toPresheafOfModules X).obj X₂.1)).hom ≫
-          (PresheafOfModules.sheafificationAdjunction
-            (𝟙 X.ringCatSheaf.obj)).counit.app X₂.1) =
-      ((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-            (ρ_ ((toPresheafOfModules X).obj X₁.1)).hom ≫
-          (PresheafOfModules.sheafificationAdjunction
-            (𝟙 X.ringCatSheaf.obj)).counit.app X₁.1) ≫ f.hom
-    have hId : (toPresheafOfModules X).map
-        (𝟙 (SheafOfModules.unit X.ringCatSheaf)) = 𝟙 _ :=
-      (toPresheafOfModules X).map_id _
-    rw [hId]
-    change (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-          ((toPresheafOfModules X).map f.hom ▷ 𝟙_ X.PresheafOfModules) ≫
-        (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
-            (ρ_ ((toPresheafOfModules X).obj X₂.1)).hom ≫
-          (PresheafOfModules.sheafificationAdjunction
-            (𝟙 X.ringCatSheaf.obj)).counit.app X₂.1 = _
-    rw [← Functor.map_comp_assoc, MonoidalCategory.rightUnitor_naturality,
-      Functor.map_comp]
-    have hc := (PresheafOfModules.sheafificationAdjunction
-      (𝟙 X.ringCatSheaf.obj)).counit_naturality f.hom
-    change (PresheafOfModules.sheafification
-          (𝟙 X.ringCatSheaf.obj)).map
-            (ρ_ ((toPresheafOfModules X).obj X₁.1)).hom ≫
-        ((PresheafOfModules.sheafification
-          (𝟙 X.ringCatSheaf.obj)).map
-            ((SheafOfModules.forget X.ringCatSheaf ⋙
-              PresheafOfModules.restrictScalars
-                (𝟙 X.ringCatSheaf.obj)).map f.hom) ≫
-          (PresheafOfModules.sheafificationAdjunction
-            (𝟙 X.ringCatSheaf.obj)).counit.app X₂.1) = _
-    rw [hc, ← Category.assoc]
-  pentagon := by
-    intro W₁ X₁ Y₁ Z₁
-    letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from W₁.1) := W₁.2
-    letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from X₁.1) := X₁.2
-    letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from Y₁.1) := Y₁.2
-    letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from Z₁.1) := Z₁.2
-    apply ObjectProperty.hom_ext
-    exact tensorAssocIso_pentagon W₁.1 X₁.1 Y₁.1 Z₁.1
-  triangle := by
-    intro X₁ Y₁
-    letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from X₁.1) := X₁.2
-    letI : SheafOfModules.IsInvertible.{u, u, u}
-        (show SheafOfModules X.ringCatSheaf from Y₁.1) := Y₁.2
-    apply ObjectProperty.hom_ext
-    exact tensorAssocIso_triangle X₁.1 Y₁.1
+        (show SheafOfModules X.ringCatSheaf from M) := hM
+    exact isInvertible_tensorObj L M
+
+/-- Compatibility name for the inherited monoidal-category structure on invertible sheaves. -/
+noncomputable instance invertibleSheafMonoidalCategoryStruct :
+    MonoidalCategoryStruct (InvertibleSheaf X) :=
+  ObjectProperty.instMonoidalCategoryStructFullSubcategory (isInvertible X)
+
+/-- Compatibility name for the monoidal structure inherited by invertible sheaves. -/
+noncomputable instance invertibleSheafMonoidalCategory :
+    MonoidalCategory (InvertibleSheaf X) :=
+  ObjectProperty.fullMonoidalSubcategory (isInvertible X)
+
+-- Guard against an instance diamond: the compatibility names above are definitionally the
+-- structures supplied by Mathlib's full-monoidal-subcategory inheritance path.
+example : (inferInstance : MonoidalCategoryStruct (InvertibleSheaf X)) =
+    ObjectProperty.instMonoidalCategoryStructFullSubcategory (isInvertible X) := rfl
+
+example : (inferInstance : MonoidalCategory (InvertibleSheaf X)) =
+    ObjectProperty.fullMonoidalSubcategory (isInvertible X) := rfl
 
 end
 
