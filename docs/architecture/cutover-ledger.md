@@ -7,6 +7,28 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Restricting a functor to the subcategories an `ObjectProperty` cuts out
+  (2026-09-04): `CategoryTheory/ObjectProperty/Lift.lean` owns
+  `liftOfLE` with its `Additive`, `CommShift ℤ`, and `IsTriangulated`
+  instances, `preimageLift` with the same three, `inverseImageLift`,
+  `liftToInverseImage`, and `Adjunction.restrictInverseImageLeft` and
+  `restrictInverseImageRight`. Mathlib defines `lift`, `ι`, `ιOfLE`,
+  `liftCompιIso`, and `fullyFaithfulι` in
+  `Mathlib/CategoryTheory/ObjectProperty/FullSubcategory.lean`, so the file
+  mirrors that directory; it is named `Lift.lean` and not `FullSubcategory.lean`
+  because the latter is one of the two paths `check_source_independence.py`
+  keeps retired. The block needs Mathlib alone and imports nothing from
+  `DerivedAlgGeo`, which is what makes it generic rather than t-structure
+  theory. `CategoryTheory/Triangulated/TStructure/Restriction.lean` keeps
+  Steps 2--4 of Theorem A.17 and now imports the root; `Polishchuk.lean`,
+  `Phase/Transfer/Inducing.lean`, and `Phase/Transfer/BaseChange.lean` import
+  it directly rather than through the t-structure file, and no compatibility
+  shim was left behind. The twelve `#print axioms` entries moved from
+  `StabilityConditionAudit/TStructureCore.lean` to the new
+  `StabilityConditionAudit/ObjectPropertyLift.lean`. Rule 7 of
+  `scripts/check_layering.py` keeps the block at that path: the root must
+  import no `DerivedAlgGeo` module, must declare all six, and no other module
+  may redeclare any of them.
 - Orthogonal exceptional blocks and residual projections:
   `CategoryTheory/Triangulated/SemiorthogonalDecomposition/Blocks.lean`
   owns positive-length mutually orthogonal exceptional blocks, their
@@ -446,20 +468,9 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-Every path lane confirmed by the 2026-09-01 audit has landed.
-
-- `CategoryTheory/Triangulated/TStructure/Restriction.lean` carries a
-  six-declaration purely categorical `ObjectProperty` block with no
-  t-structure in its types: `liftOfLE` (with its `Additive`, `CommShift`,
-  and `IsTriangulated` instances; the root of the block, `preimageLift` and
-  `inverseImageLift` are defined through it), `preimageLift` (with the same
-  three instances), `inverseImageLift`, `liftToInverseImage`, and the
-  restricted adjunctions `Adjunction.restrictInverseImageLeft` and
-  `restrictInverseImageRight`. Its canonical owner is
-  `CategoryTheory/ObjectProperty/`, where Mathlib defines `ObjectProperty.lift`,
-  `inverseImage`, and `fullyFaithfulι`; move the block there in one pull
-  request and leave the t-structure restriction theorems behind (recorded
-  2026-09-02, projective-families lane).
+Every path lane confirmed by the 2026-09-01 audit has landed, and so has the
+`ObjectProperty` lift block recorded 2026-09-02; it is the first entry under
+"Completed roots" above.
 
 - `CompactlyGenerated/Coaisle.lean` and `CompactlyGenerated/IndExtension.lean`
   each hand-roll the same induction over `ObjectProperty.coprodClosure` to show
@@ -471,10 +482,11 @@ Every path lane confirmed by the 2026-09-01 audit has landed.
   closure under coproducts, and with it both inductions collapse to a
   `coprodClosure_le` application. Its canonical owner is
   `CategoryTheory/ObjectProperty/Orthogonal.lean`, beside Mathlib's own
-  `Mathlib/CategoryTheory/ObjectProperty/Orthogonal.lean`, so it waits on the
-  `CategoryTheory/ObjectProperty/` cutover above rather than being added in
-  place (recorded 2026-09-03, projective-families lane; the instance and both
-  shortened proofs are written and compile).
+  `Mathlib/CategoryTheory/ObjectProperty/Orthogonal.lean`. It waited on the
+  `CategoryTheory/ObjectProperty/` cutover, which landed 2026-09-04, so the
+  directory now exists and this lane is unblocked (recorded 2026-09-03,
+  projective-families lane; the instance and both shortened proofs are
+  written and compile).
 
 No confirmed type-level hazard remains: the `ZLattice` class, the bundled
 variety types, and the alternating-finsum vocabulary are all retired above
