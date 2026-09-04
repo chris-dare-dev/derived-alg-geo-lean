@@ -34,3 +34,28 @@ strictly in the negative regime, so `wall_eq_of_meet_needs_charge` and
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.charge_ne_zero_of_discr_nonneg
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wall_eq_of_meet_of_discr_nonneg
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.discr_degV
+
+/-! ### Wall lane — nesting, the ordering half of Bertram's theorem
+
+Still arithmetic on triples of reals. `walls_nested_of_discr_nonneg` is NOT the
+geometric nested-wall theorem: it orders circles in the (s, t) half plane and
+says nothing about semistable objects, which is not expressible at the pin.
+
+The same-family hypothesis is load-bearing, and
+`walls_not_nested_of_opposite_offset` is the counterexample that shows it --
+two walls of a class with nonnegative discriminant, disjoint but side by side
+across the vertical wall. Dropping the hypothesis makes the theorem false, not
+merely unproved. -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallCentre
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallRadiusSq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallOffset
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallCentre_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallRadiusSq_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallOffset_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallCentre_eq_sub_offset
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wallRadiusSq_eq_offset
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.nesting_identity
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.nested_of_offsets
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.walls_nested_of_discr_nonneg
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.walls_not_nested_of_opposite_offset
