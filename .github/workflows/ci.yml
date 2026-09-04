@@ -22,8 +22,27 @@ concurrency:
   # public repo. (Note also that the obvious collapse key does not collapse:
   # github.event.pull_request.head.ref is `agent/x` while github.ref is
   # `refs/heads/agent/x`; it would take github.head_ref || github.ref_name.)
+  #
+  # `main` and the merge queue are EXEMPT from cancellation, and that exemption
+  # is what keeps the README's CI badge honest. The badge renders the newest
+  # run of this workflow on `main`; with a blanket `cancel-in-progress: true`
+  # every merge cancelled the run the previous merge had just started, so at
+  # this repository's cadence -- 51 of the last 60 `main` runs were cancelled,
+  # against 5 successes -- the newest completed run was almost always
+  # `cancelled`, which the badge draws as a failure. Nothing was broken; the
+  # badge was reporting the concurrency rule, not the build.
+  #
+  # This does NOT queue one run per merge. GitHub keeps at most one PENDING run
+  # per concurrency group: a third arrival cancels the second while it is still
+  # waiting, so the exemption costs one extra in-flight run on `owner-win`, not
+  # a backlog. The run that survives is always the newest, which is the one the
+  # badge reads.
+  #
+  # Branch lanes keep the old behaviour deliberately -- an agent branch that is
+  # pushed five times in a minute has no reason to build the first four.
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: >-
+    ${{ github.ref != 'refs/heads/main' && github.event_name != 'merge_group' }}
 
 jobs:
   build:
