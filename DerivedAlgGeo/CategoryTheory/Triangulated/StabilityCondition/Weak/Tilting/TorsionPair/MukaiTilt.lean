@@ -69,13 +69,6 @@ variable {C : Type*} [Category C] [Preadditive C] [HasZeroObject C] [HasShift C 
   [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] [IsTriangulated C]
 variable {V : Type*} [AddCommGroup V] [Module ℝ V]
 
-/-- The exponential charge negates on negated classes, since it is additive. -/
-theorem expCharge_neg (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V) (v : Mukai.RealExtension V) :
-    Mukai.expCharge b β ω (-v) = -Mukai.expCharge b β ω v := by
-  have h := expCharge_add b β ω v (-v)
-  rw [add_neg_cancel, expCharge_zero] at h
-  linear_combination -h
-
 namespace MukaiChargeData
 
 variable (t : TStructure C)

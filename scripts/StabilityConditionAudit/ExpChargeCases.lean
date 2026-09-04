@@ -22,7 +22,6 @@ boundary case is its shift; `Re Z(E) > 0` is therefore exactly what puts the
 heart object on the NEGATIVE real axis. The two reversals cancel, and getting
 it backwards yields a false statement that compiles. No gate catches that. -/
 
-#print axioms CategoryTheory.Triangulated.expCharge_neg
 #print axioms CategoryTheory.Triangulated.mem_semiClosedUpperHalfPlane_of_im_pos
 #print axioms CategoryTheory.Triangulated.mem_semiClosedUpperHalfPlane_of_im_zero_of_re_neg
 #print axioms CategoryTheory.Triangulated.mem_semiClosedUpperHalfPlane_of_apply_sub_smul_pos

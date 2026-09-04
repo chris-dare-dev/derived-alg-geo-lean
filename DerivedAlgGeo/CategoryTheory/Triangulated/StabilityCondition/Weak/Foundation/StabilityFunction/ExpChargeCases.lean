@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Charge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.ExpCharge
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
 
 /-!
@@ -61,7 +62,10 @@ separately because the caller reaches them from opposite sides of the cutoff.
 
 ## Main results
 
-* `expCharge_neg` — `Z(-v) = -Z(v)`, which is what the shift costs.
+`expCharge_neg` — `Z(-v) = -Z(v)`, what the shift costs — lives upstream in
+`ExpCharge.lean` beside `expCharge_add`; it was moved there in this change so the
+tilt and this file share one copy.
+
 * `mem_semiClosedUpperHalfPlane_of_apply_sub_smul_pos` — cases 1 and 3.
 * `mem_semiClosedUpperHalfPlane_of_dimension_zero` — case 2.
 * `neg_mem_semiClosedUpperHalfPlane_of_apply_sub_smul_neg` — below the cutoff.
@@ -75,18 +79,6 @@ namespace CategoryTheory.Triangulated
 
 variable {V : Type*} [AddCommGroup V] [Module ℝ V]
 variable (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V)
-
-/-! ### The shift -/
-
-/-- **The charge of the shifted class.** `E⟦1⟧` has class `-v(E)`, so its charge
-is `-Z(E)`. This is the whole arithmetic content of the shift, and it is what
-makes `Re Z(E) > 0` the *right* conclusion for a heart object on the negative
-real axis. -/
-theorem expCharge_neg (v : Mukai.RealExtension V) :
-    Mukai.expCharge b β ω (-v) = -Mukai.expCharge b β ω v := by
-  simp only [Mukai.expCharge, PeriodDomain.centralCharge, polar_neg_right]
-  push_cast
-  ring
 
 /-! ### Membership, from the two analytic shapes -/
 
