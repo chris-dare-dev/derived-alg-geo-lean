@@ -77,3 +77,33 @@ generates no mk.inj and no mk.sizeOf_spec. -/
 #print axioms AlgebraicGeometry.Numerical.K3.neg_two_le_selfPairing_mukaiVector_of_rank_le_one
 #print axioms AlgebraicGeometry.Numerical.Examples.k3HodgeIndex
 #print axioms AlgebraicGeometry.Numerical.Examples.k3BogomolovSanity
+
+/-! ## The (s, t) transport — a polarised surface class as a wall-plane point
+
+The rank slot is WEIGHTED by the polarisation degree. That is derived from
+Basic.lean reZ/imZ term by term, not guessed, and the unweighted reading does
+not satisfy the charge formula.
+
+discr_toNumClass is stated against Surface.discrH and NOT against the integral
+of the discriminant. The latter is FALSE: it would need equality in Hodge index
+together with a unit polarisation degree, and it fails on this lane K3 witness.
+An earlier draft of the lane claimed it; the docstring records why not.
+
+The bridge is one-way. This is the first module importing the Walls lane from
+AlgebraicGeometry; no file under CategoryTheory is edited or added to, and
+check_layering holds that boundary. Every declaration quantifies over N -- none
+says a wall is a wall FOR AN OBJECT, nor mentions mass or Hom. -/
+
+#print axioms AlgebraicGeometry.Numerical.Surface.toNumClass
+#print axioms AlgebraicGeometry.Numerical.Surface.toNumClass_rk
+#print axioms AlgebraicGeometry.Numerical.Surface.toNumClass_deg
+#print axioms AlgebraicGeometry.Numerical.Surface.toNumClass_ch2
+#print axioms AlgebraicGeometry.Numerical.Surface.toNumClass_add
+#print axioms AlgebraicGeometry.Numerical.Surface.discr_toNumClass
+#print axioms AlgebraicGeometry.Numerical.Surface.toNumClass_ne_zero_of_rank_ne_zero
+#print axioms AlgebraicGeometry.Numerical.Surface.discr_toNumClass_nonneg
+#print axioms AlgebraicGeometry.Numerical.Surface.charge_ne_zero_of_semistable
+#print axioms AlgebraicGeometry.Numerical.Surface.wall_eq_of_meet_of_semistable
+#print axioms AlgebraicGeometry.Numerical.Surface.walls_nested_of_semistable
+#print axioms AlgebraicGeometry.Numerical.Examples.toNumClass_k3
+#print axioms AlgebraicGeometry.Numerical.Examples.discr_toNumClass_k3
