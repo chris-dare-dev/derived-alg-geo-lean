@@ -42,6 +42,14 @@ is read through the slicing.
   the aisle of its phase.
 * `Slicing.IndExtensions.largePhase_iff_semistable`: on `Q` the Ind-slicing's
   phase collection is the slicing's own, so `largePhase` extends `s.P`.
+* `Slicing.IndExtensions.isLE_zero_shift` and `isGE_one_shift`: the aisles and
+  coaisles of the Ind-extensions shift with the phase.  Definition A.22 relates
+  no two phases; this is a theorem, from clause (i) of Lemma A.14 and the
+  shift-compatibility of `𝒫(≥ φ)` and of `ObjectProperty.coprodClosure`.
+* `Slicing.IndExtensions.largePhase_shift` and `largePhase_shift_iff`: the
+  phase shift `𝒫̂(φ)⟦1⟧ = 𝒫̂(φ + 1)`, which with
+  `largePhase_isClosedUnderIsomorphisms` and `largePhase_of_isZero` gives the
+  three formal `Slicing` axioms for `largePhase`.
 * `Slicing.IndExtensions.mapsSemistableAisle_of_coproduct`: assumption (v')
   holds for an endofunctor that sends each semistable object to a coproduct of
   copies of itself, the base-change mechanism of Theorem 2.8(1).
@@ -77,6 +85,17 @@ namespace CategoryTheory.Triangulated
 variable {D : Type u} [Category.{v} D] [HasZeroObject D] [HasShift D ℤ]
   [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D]
   [IsTriangulated D] {Q : ObjectProperty D} [Q.IsTriangulated]
+
+/-- The bounded aisle of `τ'_φ` shifts with the phase, because the cut `𝒫(≥ φ)` does
+(`Slicing.geProp_shift`) and `Q` is closed under the shift.  This is the phase-dictionary
+input of `Slicing.IndExtensions.isLE_zero_shift`; it mentions no Ind-extension data. -/
+theorem Slicing.boundedAisle_shift (s : Slicing Q.FullSubcategory) (φ : ℝ) (a : ℤ) (Y : D)
+    (h : TStructure.boundedAisle Q ((s.phaseShift _ φ).toDualTStructure _) Y) :
+    TStructure.boundedAisle Q ((s.phaseShift _ (φ + a)).toDualTStructure _) (Y⟦a⟧) := by
+  obtain ⟨X, hX, ⟨e⟩⟩ := h
+  refine ⟨X⟦a⟧, ?_, ⟨(Q.ι.commShiftIso a).app X ≪≫ (shiftFunctor D a).mapIso e⟩⟩
+  exact ((s.phaseShift_toDualTStructure_isLE_zero_iff _ (φ + a) _).2
+    (s.geProp_shift _ φ X a ((s.phaseShift_toDualTStructure_isLE_zero_iff _ φ X).1 ⟨hX⟩))).le
 
 /-- The primed half of Definition A.22 of arXiv:2607.28411v1: the
 Ind-extensions, in the sense of Lemma A.14, of the dual t-structures
@@ -204,6 +223,81 @@ theorem largePhase_iff_semistable (φ : ℝ) (X : Q.FullSubcategory) :
   rw [s.semistable_iff_geProp_ltProp _ φ X]
   exact and_congr (ind.isLE_zero_iff_geProp φ X)
     (forall_congr' fun ψ => imp_congr_right fun _ => ind.isGE_one_iff_ltProp ψ X)
+
+/-- **The aisles of the Ind-extensions shift with the phase**: `τ̂'_{φ+a}` is the `a`-shift of
+`τ̂'_φ`.  This is not part of Definition A.22 -- `Slicing.IndExtensions` asserts nothing relating
+two phases beyond the inclusion `le_zero_anti` -- but it is a theorem, because clause (i) of
+Lemma A.14 pins each aisle to `Coprod(𝒫(≥ φ))` and both `𝒫(≥ φ)` and `Coprod` commute with the
+shift (`boundedAisle_shift`, `ObjectProperty.coprodClosure_le_shift_of_le_shift`). -/
+theorem isLE_zero_shift (φ : ℝ) (a : ℤ) (Y : D) (h : (ind.tStructure φ).IsLE Y 0) :
+    (ind.tStructure (φ + a)).IsLE (Y⟦a⟧) 0 := by
+  refine ⟨?_⟩
+  rw [(ind.indExtensionData (φ + a)).largeAisle]
+  refine ObjectProperty.coprodClosure_le_shift_of_le_shift
+    (TStructure.boundedAisle Q ((s.phaseShift _ φ).toDualTStructure _)) a
+    (R := (TStructure.boundedAisle Q
+      ((s.phaseShift _ (φ + a)).toDualTStructure _)).coprodClosure.{w})
+    (fun Z hZ => ObjectProperty.le_coprodClosure _ _ (s.boundedAisle_shift φ a Z hZ)) Y ?_
+  · rw [← (ind.indExtensionData φ).largeAisle]; exact h.le
+
+/-- The coaisles shift too.  Not a second argument: the coaisle is the right orthogonal of the
+aisle (`isGE_iff_orthogonal`), so `isLE_zero_shift` at `-a` transports a test object back and
+the shift is fully faithful. -/
+theorem isGE_one_shift (φ : ℝ) (a : ℤ) (Y : D) (h : (ind.tStructure φ).IsGE Y 1) :
+    (ind.tStructure (φ + a)).IsGE (Y⟦a⟧) 1 := by
+  -- at `(𝟭 D).obj Y`, not `Y`: that is the codomain of `shiftFunctorCompIsoId`, and
+  -- instance search does not unfold it.
+  haveI : (ind.tStructure φ).IsGE ((𝟭 D).obj Y) 1 := h
+  rw [(ind.tStructure (φ + a)).isGE_iff_orthogonal 0 1 rfl]
+  intro Z f hZ
+  haveI : (ind.tStructure φ).IsLE (Z⟦(-a : ℤ)⟧) 0 := by
+    have := ind.isLE_zero_shift (φ + a) (-a) Z hZ
+    rwa [show φ + (a : ℝ) + ((-a : ℤ) : ℝ) = φ by push_cast; ring] at this
+  haveI : (ind.tStructure φ).IsGE ((Y⟦a⟧)⟦(-a : ℤ)⟧) 1 :=
+    (ind.tStructure φ).isGE_of_iso
+      ((shiftFunctorCompIsoId D a (-a) (by ring)).app Y).symm 1
+  exact (shiftFunctor D (-a)).map_injective
+    (by simpa using (ind.tStructure φ).zero ((shiftFunctor D (-a)).map f) 0 1 (by omega))
+
+instance largePhase_isClosedUnderIsomorphisms (φ : ℝ) :
+    (ind.largePhase φ).IsClosedUnderIsomorphisms where
+  of_iso e h := by
+    refine ⟨?_, fun ψ hψ => ?_⟩
+    · haveI := h.1; exact (ind.tStructure φ).isLE_of_iso e 0
+    · haveI := h.2 ψ hψ; exact (ind.tStructure ψ).isGE_of_iso e 1
+
+/-- The zero object is semistable of every phase for the Ind-slicing.  Stated at an arbitrary
+zero object, not at `(0 : D)`, because `largePreimage` needs it at `F.obj 0`, which is only *a*
+zero object; this is the `largePhase` analogue of `Slicing.zero_mem_of_isZero`, which exists
+beside the `zero_mem` field for the same reason. -/
+theorem largePhase_of_isZero (φ : ℝ) {Y : D} (hY : IsZero Y) : ind.largePhase φ Y :=
+  ⟨(ind.tStructure φ).isLE_of_isZero hY 0,
+    fun ψ _ => (ind.tStructure ψ).isGE_of_isZero hY 1⟩
+
+/-- **The phase shift for the Ind-slicing**: `𝒫̂(φ)⟦a⟧ = 𝒫̂(φ + a)`, from the aisle and coaisle
+shifts.  With `largePhase_isClosedUnderIsomorphisms` and `largePhase_of_isZero` this is the
+third of the three formal `Slicing` axioms for `largePhase`. -/
+theorem largePhase_shift (φ : ℝ) (a : ℤ) (Y : D) (h : ind.largePhase φ Y) :
+    ind.largePhase (φ + a) (Y⟦a⟧) := by
+  refine ⟨ind.isLE_zero_shift φ a Y h.1, fun ψ hψ => ?_⟩
+  have := ind.isGE_one_shift (ψ - a) a Y (h.2 _ (by linarith))
+  rwa [show ψ - (a : ℝ) + (a : ℝ) = ψ by ring] at this
+
+/-- The shift law as an equivalence, at every integer shift.  Only `→` is proved directly;
+`←` is the same statement at `-a`, transported back along `shiftFunctorCompIsoId`, which is
+why `largePhase_shift` is stated as an implication and this as the `Iff`. -/
+theorem largePhase_shift_int (φ : ℝ) (a : ℤ) (Y : D) :
+    ind.largePhase φ Y ↔ ind.largePhase (φ + a) (Y⟦a⟧) := by
+  refine ⟨ind.largePhase_shift φ a Y, fun h => ?_⟩
+  have h2 := ind.largePhase_shift (φ + a) (-a) _ h
+  rw [show φ + (a : ℝ) + ((-a : ℤ) : ℝ) = φ by push_cast; ring] at h2
+  exact (ind.largePhase φ).prop_of_iso
+    ((shiftFunctorCompIsoId D a (-a) (by ring)).app Y) h2
+
+/-- The shift law in the form `Slicing.shift_iff` takes it. -/
+theorem largePhase_shift_iff (φ : ℝ) (Y : D) :
+    ind.largePhase φ Y ↔ ind.largePhase (φ + 1) (Y⟦(1 : ℤ)⟧) := by
+  simpa using ind.largePhase_shift_int φ 1 Y
 
 /-- Assumption (v') of Corollary A.23 of arXiv:2607.28411v1 for an
 endofunctor `G` of the ambient category: `G` sends every semistable object of

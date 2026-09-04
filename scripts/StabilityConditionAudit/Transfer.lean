@@ -99,6 +99,14 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isLE_zero_of_semistable
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePhase
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePhase_iff_semistable
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePhase_isClosedUnderIsomorphisms
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePhase_of_isZero
+#print axioms CategoryTheory.Triangulated.Slicing.boundedAisle_shift
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isLE_zero_shift
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.isGE_one_shift
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePhase_shift
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePhase_shift_int
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePhase_shift_iff
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.mapsSemistableAisle_of_coproduct
 
 /-! ## Corollary A.23: the joint between Theorem A.17 and the phase truncation -/
@@ -107,6 +115,9 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.monad_isLE_zero_of_geProp
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.monad_isRightTExact
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePreimagePhase
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePreimagePhase_isClosedUnderIsomorphisms
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePreimage
+#print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.largePreimage_P
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.tStructure
 #print axioms CategoryTheory.Triangulated.Slicing.IndExtensions.InducedTStructuresLarge.isBounded
