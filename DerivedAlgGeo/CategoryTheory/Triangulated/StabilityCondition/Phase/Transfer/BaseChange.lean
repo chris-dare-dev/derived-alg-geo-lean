@@ -27,8 +27,10 @@ When the coproduct itself lies in `Q`, the two one-sided conditions reassemble i
 semistability there (`semistable_iff_semistable_of_iso_coproduct`), and Theorem 2.8(3) follows
 for the preimage slicing on `F⁻¹ Q`.  That is the **finite** extension: for an infinite `ℓ/k`
 the object `E ⊗_k ℓ` is not coherent, so no such object of `Q` exists and both `Q`-level
-statements are vacuous.  The large-target form of Theorem 2.8(1) that the roadmap records as
-open will consume the `D`-level reduction and the two closure lemmas, not them.
+statements are vacuous.  The large-target form of Theorem 2.8(1) is
+`Slicing.IndExtensions.largePreimage`, which is built from the aisle and coaisle shifts rather
+than from these; the `D`-level reduction and the two closure lemmas here are what a
+large-target Theorem 2.8(3) will consume.
 
 ## Main results
 
