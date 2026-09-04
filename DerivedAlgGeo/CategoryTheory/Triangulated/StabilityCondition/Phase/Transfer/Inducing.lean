@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.Adjoint
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.HN
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.IndExtensions
+import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Polishchuk
 
 /-!
