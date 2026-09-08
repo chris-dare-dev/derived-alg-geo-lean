@@ -70,7 +70,6 @@ stability.  Their canonical numerical owners are now `Mukai.expCharge_zero`,
 -/
 
 /-- The exponential charge kills the zero class. -/
-@[simp]
 theorem expCharge_zero : Mukai.expCharge b β ω 0 = 0 :=
   Mukai.expCharge_zero b β ω
 
