@@ -410,6 +410,9 @@ Grassmannian of positive planes is not used. -/
 #print axioms Mukai.im_expCharge_nonneg
 #print axioms Mukai.two_mul_re_expCharge
 #print axioms Mukai.two_mul_re_expCharge_ge
+#print axioms Mukai.re_expCharge_pos_of_boundary_margin
+#print axioms Mukai.re_expCharge_pos_of_lower_bound
+#print axioms Mukai.re_expCharge_pos_of_lower_bound_of_one_le_rank
 #print axioms Mukai.re_expCharge_pos_of_nonneg
 #print axioms Mukai.re_expCharge_pos_of_neg_one
 

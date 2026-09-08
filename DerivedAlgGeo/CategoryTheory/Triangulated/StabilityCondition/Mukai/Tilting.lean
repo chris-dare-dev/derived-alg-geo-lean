@@ -47,12 +47,11 @@ when their numerical hypotheses are supplied explicitly.
 
 The remaining geometric and torsion work is outside this lane:
 
-* the non-spherical and spherical cases (`Mukai.re_expCharge_pos_of_nonneg`,
-  `re_expCharge_pos_of_neg_one`) both take the Mukai square as a **hypothesis**.  The
-  assembly-safe boundary adapter takes that bound factorwise; supplying it for
-  each `μ`-stable factor is the paper's Lemma 5.1 — Serre duality,
-  Riemann--Roch, finite-dimensional `Hom` — which is not in this repository
-  (#332);
+* the exact-margin and uniform-lower-bound boundary theorems both take their
+  numerical inequality as a **hypothesis**. The assembly-safe adapter takes it
+  factorwise; for K3 surfaces, supplying `realForm ≥ -1` for each `μ`-stable
+  factor is the paper's Lemma 5.1 — Serre duality, Riemann--Roch,
+  finite-dimensional `Hom` — which is not in this repository (#332);
 * the torsion cases split by **dimension of support** and use ampleness, and `WeakSlopeData`
   carries a rank and a degree and nothing else.
 
@@ -223,7 +222,55 @@ section Boundary
 
 variable [FiniteDimensional ℝ V]
 
-/-- **The boundary free-generator case, assembled from factorwise bounds.**
+/-- **The boundary free-generator case under the exact factorwise Hodge
+margin.**
+
+This is the maximal parent theorem used by the assembly. It asks each boundary
+factor to satisfy the precise positive expression that the Hodge-index estimate
+needs, so factors may have unrelated ranks and quadratic lower bounds. The
+uniform `δ` theorem below is derived from this result. -/
+theorem mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_margin
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1)
+    (hω : 0 < b ω ω)
+    {S : WeakSlopeData t.heart.FullSubcategory}
+    (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
+    {F₀ : t.heart.FullSubcategory} {n : ℕ} (hn : 0 < n)
+    (G : Fin n → t.heart.FullSubcategory)
+    (hclass : (ofAmbient t m).mukai (K₀Ab.of F₀) =
+      ∑ i, (ofAmbient t m).mukai (K₀Ab.of (G i)))
+    (hGrank : ∀ i, 0 < S.rank (G i))
+    (hGslope : ∀ i, S.slope (G i) = b β ω)
+    (hGmargin : ∀ i, 0 < 2 * Mukai.realForm b
+        ((ofAmbient t m).mukai (K₀Ab.of (G i))) +
+      ((ofAmbient t m).mukai (K₀Ab.of (G i))).1 ^ 2 * b ω ω) :
+    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
+  classical
+  let v : Fin n → Mukai.RealExtension V := fun i ↦
+    (ofAmbient t m).mukai (K₀Ab.of (G i))
+  have hr : ∀ i, 0 < (v i).1 := by
+    intro i
+    have hri : (0 : ℝ) < (S.rank (G i) : ℝ) := by exact_mod_cast hGrank i
+    change (0 : ℝ) < ((ofAmbient t m).mukai (K₀Ab.of (G i))).1
+    rw [Cpt.rank_eq]
+    exact hri
+  have him : ∀ i, (Mukai.expCharge b β ω (v i)).im = 0 := by
+    intro i
+    change ((ofAmbient t m).charge b β ω (G i)).im = 0
+    exact Cpt.im_charge_eq_zero_of_rank_pos_of_slope_eq hb β (hGrank i) (hGslope i)
+  have hmargin : ∀ i, 0 < 2 * Mukai.realForm b (v i) + (v i).1 ^ 2 * b ω ω := by
+    intro i
+    simpa [v] using hGmargin i
+  have hcase := neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_margin
+    (b := b) (β := β) (ω := ω) hb hsigPos hω hn v hr him hmargin
+  have hclass' : m (K₀.of C F₀.obj) = ∑ i, v i := by
+    rw [← ofAmbient_mukai t m F₀, hclass]
+  rw [ambientCharge_shift, ambientCharge, ambientChargeHom_apply, hclass', ← expCharge_neg]
+  exact hcase
+
+/-- **The boundary free-generator case for an arbitrary factorwise lower
+bound.**
 
 `G` is the nonempty family of boundary factors whose Mukai classes sum to the
 class of `F₀`.  Positive rank and equality with the cutoff force every factor's
@@ -231,9 +278,49 @@ imaginary charge to vanish; the Mukai-square hypothesis is imposed separately
 on every factor.  The numerical factorwise theorem then adds their positive
 real charges before applying the shift.
 
-This is the API intended for final Lemma 6.2 assembly.  A geometric consumer
-should instantiate `G` with stable factors and prove `hGsquare` from the K3
-stable-sheaf bound. -/
+This is the general API intended for final tilted-heart assembly. A geometric
+consumer instantiates `G` with stable factors, supplies a uniform lower bound
+`realForm ≥ -δ`, and proves the corresponding polarization threshold
+`2δ < ω²`. Bridgeland's K3 argument is the specialization `δ = 1`; the
+factorization itself does not own that constant. -/
+theorem mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_lower_bound
+    (δ : ℝ)
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1)
+    (hω : 0 < b ω ω) (hωδ : 2 * δ < b ω ω)
+    {S : WeakSlopeData t.heart.FullSubcategory}
+    (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
+    {F₀ : t.heart.FullSubcategory} {n : ℕ} (hn : 0 < n)
+    (G : Fin n → t.heart.FullSubcategory)
+    (hclass : (ofAmbient t m).mukai (K₀Ab.of F₀) =
+      ∑ i, (ofAmbient t m).mukai (K₀Ab.of (G i)))
+    (hGrank : ∀ i, 0 < S.rank (G i))
+    (hGslope : ∀ i, S.slope (G i) = b β ω)
+    (hGsquare : ∀ i, -δ ≤ Mukai.realForm b
+      ((ofAmbient t m).mukai (K₀Ab.of (G i)))) :
+    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
+  refine mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_margin
+    (t := t) hb hsigPos hω Cpt hn G hclass hGrank hGslope ?_
+  intro i
+  have hri : (1 : ℤ) ≤ S.rank (G i) := by
+    have hpos := hGrank i
+    omega
+  have hri' : (1 : ℝ) ≤ (S.rank (G i) : ℝ) := by exact_mod_cast hri
+  have hr : (1 : ℝ) ≤ ((ofAmbient t m).mukai (K₀Ab.of (G i))).1 := by
+    rw [Cpt.rank_eq]
+    exact hri'
+  have hsq : b ω ω ≤
+      ((ofAmbient t m).mukai (K₀Ab.of (G i))).1 ^ 2 * b ω ω := by
+    nlinarith [sq_nonneg (((ofAmbient t m).mukai (K₀Ab.of (G i))).1 - 1)]
+  nlinarith [hGsquare i]
+
+/-- The K3-normalized boundary-factor theorem, recovered at `δ = 1`.
+
+The assumption `ω² > 2` supplies both positivity of the polarization and the
+uniform threshold `2δ < ω²`. New geometric children should use
+`mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_lower_bound`
+and state their own lower bound. -/
 theorem mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
     (hb : ∀ x y : V, b x y = b y x)
@@ -250,45 +337,54 @@ theorem mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors
     (hGsquare : ∀ i, -1 ≤ Mukai.realForm b
       ((ofAmbient t m).mukai (K₀Ab.of (G i)))) :
     ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
-  classical
-  let v : Fin n → Mukai.RealExtension V := fun i ↦
-    (ofAmbient t m).mukai (K₀Ab.of (G i))
-  have hr : ∀ i, (1 : ℝ) ≤ (v i).1 := by
-    intro i
-    have hpos := hGrank i
-    have hri : (1 : ℤ) ≤ S.rank (G i) := by omega
-    have hri' : (1 : ℝ) ≤ (S.rank (G i) : ℝ) := by exact_mod_cast hri
-    change (1 : ℝ) ≤ ((ofAmbient t m).mukai (K₀Ab.of (G i))).1
-    rw [Cpt.rank_eq]
-    exact hri'
-  have him : ∀ i, (Mukai.expCharge b β ω (v i)).im = 0 := by
-    intro i
-    change ((ofAmbient t m).charge b β ω (G i)).im = 0
-    exact Cpt.im_charge_eq_zero_of_rank_pos_of_slope_eq hb β (hGrank i) (hGslope i)
-  have hv : ∀ i, -1 ≤ Mukai.realForm b (v i) := by
-    intro i
-    simpa [v] using hGsquare i
-  have hcase := neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one
-    (b := b) (β := β) (ω := ω) hb hsigPos hω hn v hr him hv
-  have hclass' : m (K₀.of C F₀.obj) = ∑ i, v i := by
-    rw [← ofAmbient_mukai t m F₀, hclass]
-  rw [ambientCharge_shift, ambientCharge, ambientChargeHom_apply, hclass', ← expCharge_neg]
-  exact hcase
+  have hω0 : 0 < b ω ω := by linarith
+  exact mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_lower_bound
+    (t := t) (b := b) (β := β) (ω := ω) 1 hb hsigPos hω0 (by simpa using hω)
+      Cpt hn G hclass
+      hGrank hGslope (by simpa using hGsquare)
 
-/-- **Low-level one-class boundary adapter with an explicit Mukai-square input.**
+/-- **Low-level one-class boundary adapter with an arbitrary explicit lower
+bound.**
 
 If the weak HN torsion-free generator lies exactly on the cutoff, the imaginary
-part vanishes.  The supplied bound `-1 ≤ Mukai.realForm` is the halved Mukai
-square bound for the boundary sheaf; together with `ω² > 2`, the existing
-numerical positivity theorem puts the shifted charge on the allowed negative
-real ray.
+part vanishes. The supplied bound `-δ ≤ Mukai.realForm`, together with
+`2δ < ω²`, puts the shifted charge on the allowed negative real ray.
 
 The Mukai-square bound is intentionally a theorem input rather than a field of
 `MukaiChargeData`.  This theorem is useful when a bound on the whole class is
-already available, but it is **not** the final assembly seam: `-1 ≤ v²` is not
-preserved by extensions.  Use
-`mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors` when the bound is
-known only for stable factors. -/
+already available, but it is **not** the final assembly seam: a quadratic
+lower bound on `v²` is not preserved by extensions. Use
+`mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_lower_bound` when
+the bound is known only for stable factors. -/
+theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_lower_bound
+    (δ : ℝ)
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1)
+    (hω : 0 < b ω ω) (hωδ : 2 * δ < b ω ω)
+    {S : WeakSlopeData t.heart.FullSubcategory}
+    (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
+    (hHN : S.toWeakStabilityFunction.HasHNProperty)
+    {F₀ : t.heart.FullSubcategory} (hF₀ : ¬IsZero F₀)
+    (hF : F₀ ∈ WeakStabilityFunctionOn.hnFree S.toWeakStabilityFunction
+      ((b β ω : ℝ) : WithTop ℝ))
+    (heq : S.slope F₀ = b β ω)
+    (hMukaiSquare : -δ ≤ Mukai.realForm b
+      ((ofAmbient t m).mukai (K₀Ab.of F₀))) :
+    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
+  have hrank : 0 < S.rank F₀ := S.rank_pos_of_mem_hnFree hHN hF₀ hF
+  refine mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_lower_bound
+    (t := t) (n := 1) δ hb hsigPos hω hωδ Cpt Nat.one_pos (fun _ ↦ F₀) ?_ ?_ ?_ ?_
+  · simp
+  · intro
+    exact hrank
+  · intro
+    exact heq
+  · intro
+    exact hMukaiSquare
+
+/-- The historical one-class K3 boundary adapter, obtained from the arbitrary
+lower-bound theorem with `δ = 1`. -/
 theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_mukai_square_ge_neg_one
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
     (hb : ∀ x y : V, b x y = b y x)
@@ -304,16 +400,11 @@ theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_mukai_square
     (hMukaiSquare : -1 ≤ Mukai.realForm b
       ((ofAmbient t m).mukai (K₀Ab.of F₀))) :
     ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
-  have hrank : 0 < S.rank F₀ := S.rank_pos_of_mem_hnFree hHN hF₀ hF
-  refine mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors
-    (t := t) (n := 1) hb hsigPos hω Cpt Nat.one_pos (fun _ ↦ F₀) ?_ ?_ ?_ ?_
-  · simp
-  · intro
-    exact hrank
-  · intro
-    exact heq
-  · intro
-    exact hMukaiSquare
+  have hω0 : 0 < b ω ω := by linarith
+  exact mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_lower_bound
+    (t := t) (b := b) (β := β) (ω := ω) 1 hb hsigPos hω0 (by simpa using hω)
+      Cpt hHN hF₀ hF heq
+      (by simpa using hMukaiSquare)
 
 end Boundary
 

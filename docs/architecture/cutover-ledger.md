@@ -22,11 +22,17 @@ blocks should normally move it rather than add more declarations beside it.
   numerical lemmas are `Mukai.expCharge_zero`, `expCharge_add`, and
   `expCharge_neg`; their historical `CategoryTheory.Triangulated` names remain
   stable as aliases in `Mukai/Charge.lean`. `GeometricInput.lean` now isolates
-  the two remaining K3 obligations as independent propositions: classification
-  of rank-and-degree-zero torsion classes and a factorwise boundary Mukai
-  decomposition. `Assembly.lean` proves the Mukai generator cases and returns
-  the actual stability function on the tilted heart. Its extension argument is
-  not Mukai-specific: the reusable constructor lives at
+  the two remaining geometric obligations as independent propositions:
+  classification of rank-and-degree-zero torsion classes and a factorwise
+  boundary Mukai decomposition. The broad boundary contract stores the exact
+  positive Hodge margin factor by factor; a uniform `realForm ≥ -δ` contract is
+  a reusable specialization, and the historical K3 contract is only `δ = 1`.
+  `Assembly.lean` carries the same hierarchy through
+  `tiltStabilityFunctionOfMargin`, `tiltStabilityFunctionOfLowerBound`, and the
+  legacy `tiltStabilityFunction`. Todd normalization remains upstream in the
+  additive class map, so this categorical construction has no surface-type
+  flag. Its extension argument is not Mukai-specific: the reusable constructor
+  lives at
   `Weak/Tilting/TorsionPair/HnTiltStabilityFunction.lean` and consumes any
   additive ambient charge positive on nonzero torsion and shifted-free
   generators.

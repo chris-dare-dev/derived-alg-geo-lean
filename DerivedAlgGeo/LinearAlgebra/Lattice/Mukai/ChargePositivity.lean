@@ -5,10 +5,12 @@ Released under the MIT license.
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.CentralCharge
 
 /-!
-# The real part of `Z(β,ω)` on the boundary, and Bridgeland's `ω² > 2`
+# Boundary positivity for exponential Mukai charges
 
-This is the numerical core of Bridgeland's Lemma 6.2 (`math/0307164`, §6): the
-one case of that lemma which is not immediate, isolated from every sheaf.
+This file isolates the Hodge-index calculation governing the real part of
+`Z(β,ω)` when its imaginary part vanishes. Bridgeland's K3 Lemma 6.2
+(`math/0307164`, §6) is one specialization; the core and its exact-margin
+interface contain no K3 normalization and are isolated from every sheaf.
 
 ## The boundary
 
@@ -62,6 +64,37 @@ No sheaf, no heart, no stability function. In particular the input
 it is the paper's Lemma 5.1, which runs through Serre duality and
 Riemann–Roch and hence through finite-dimensional `Hom`, and is not in this
 repository. See #740 and #332.
+
+## General lower bounds
+
+Bridgeland's K3 argument uses the uniform bound `realForm b v ≥ -1` and the
+rank-independent sufficient hypothesis `ω² > 2`; see Lemmas 5.1 and 6.2 of
+<https://arxiv.org/abs/math/0307164>. Those constants are geometric input,
+not part of the Hodge-index calculation. The calculation itself only needs
+
+```
+0 < 2 * realForm b v + r² * ω².
+```
+
+The theorems below therefore expose that sharp margin first, then derive a
+rank-sensitive version from an arbitrary lower bound `realForm b v ≥ -δ`, and
+only finally recover the uniform K3 statement. This also covers settings with
+a stronger lower bound, such as the abelian-surface case discussed in §15 of
+the same paper, without changing the charge or duplicating the proof.
+
+For a general smooth projective surface, the usual tilted charge is written
+as an integral of `exp(-(D+iH)) * ch`; see Arcara--Miles,
+<https://arxiv.org/abs/1401.6149>. K3 and other K-trivial treatments may instead
+package the Todd correction into the Mukai vector; see Arcara--Bertram,
+<https://arxiv.org/abs/0708.2247>. This file deliberately sees neither choice:
+it starts from an abstract triple and bilinear form. Todd normalization belongs
+in the geometric class map that constructs that triple, not in a boolean flag
+on the boundary inequality.
+
+The arbitrary-`δ` and exact-margin statements are formal consequences of the
+displayed Hodge-index estimate. They do **not** assert that every surface has a
+uniform bound; a geometric child must prove whichever margin or lower-bound
+hypothesis it supplies.
 -/
 
 open QuadraticMap
@@ -159,6 +192,63 @@ theorem two_mul_re_expCharge_ge (hb : ∀ x y : V, b x y = b y x)
   simp only [LinearMap.BilinMap.toQuadraticMap_apply] at hnonpos
   linarith
 
+/-- **The sharp boundary-margin criterion.**
+
+On the boundary `Im Z = 0`, Hodge index gives
+
+`2 * realForm b v + r² * ω² ≤ 2 * r * Re Z(v)`.
+
+Thus positive rank and positivity of the left-hand side are the exact inputs
+used by this argument. No lower-bound constant, integrality of the rank, or
+K3 normalization appears here. -/
+theorem re_expCharge_pos_of_boundary_margin (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1) (hω : 0 < b ω ω)
+    {r : ℝ} (hr : 0 < r) {c : V} {s : ℝ}
+    (him : (expCharge b β ω (r, c, s)).im = 0)
+    (hmargin : 0 < 2 * realForm b (r, c, s) + r ^ 2 * b ω ω) :
+    0 < (expCharge b β ω (r, c, s)).re := by
+  have hge := two_mul_re_expCharge_ge b β ω hb hsigPos hω him
+  nlinarith
+
+/-- **Boundary positivity from an arbitrary quadratic lower bound.**
+
+If `realForm b v ≥ -δ`, the sharp margin is positive as soon as
+`2δ < r² * ω²`. This rank-sensitive threshold is strictly more general than
+the familiar K3 hypothesis `ω² > 2`: it allows any real lower bound and uses
+the actual positive rank of the class.
+
+The parameter `δ` is not required to be nonnegative. A negative value simply
+records a positive lower bound for `realForm`; the two displayed hypotheses
+already say exactly what the proof needs. -/
+theorem re_expCharge_pos_of_lower_bound (δ : ℝ)
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1) (hω : 0 < b ω ω)
+    {r : ℝ} (hr : 0 < r) {c : V} {s : ℝ}
+    (him : (expCharge b β ω (r, c, s)).im = 0)
+    (hv : -δ ≤ realForm b (r, c, s))
+    (hthreshold : 2 * δ < r ^ 2 * b ω ω) :
+    0 < (expCharge b β ω (r, c, s)).re := by
+  apply re_expCharge_pos_of_boundary_margin b β ω hb hsigPos hω hr him
+  linarith
+
+/-- A rank-independent threshold for integral positive ranks.
+
+When `1 ≤ r`, the uniform inequality `2δ < ω²` implies the rank-sensitive
+condition `2δ < r² * ω²`. Geometric children whose factors have integral
+positive rank can use this form; children with better rank information should
+prefer `re_expCharge_pos_of_lower_bound`. -/
+theorem re_expCharge_pos_of_lower_bound_of_one_le_rank (δ : ℝ)
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1) (hω : 0 < b ω ω)
+    (hωδ : 2 * δ < b ω ω) {r : ℝ} (hr : 1 ≤ r) {c : V} {s : ℝ}
+    (him : (expCharge b β ω (r, c, s)).im = 0)
+    (hv : -δ ≤ realForm b (r, c, s)) :
+    0 < (expCharge b β ω (r, c, s)).re := by
+  have hr0 : (0 : ℝ) < r := by linarith
+  have hsq : b ω ω ≤ r ^ 2 * b ω ω := by nlinarith [sq_nonneg (r - 1)]
+  exact re_expCharge_pos_of_lower_bound b β ω δ hb hsigPos hω hr0 him hv
+    (lt_of_lt_of_le hωδ hsq)
+
 /-- **Lemma 6.2, non-spherical case.** A class of nonnegative Mukai square on
 the boundary has `Re Z > 0`, on the strength of `ω² > 0` alone. -/
 theorem re_expCharge_pos_of_nonneg (hb : ∀ x y : V, b x y = b y x)
@@ -166,9 +256,9 @@ theorem re_expCharge_pos_of_nonneg (hb : ∀ x y : V, b x y = b y x)
     {r : ℝ} (hr : 0 < r) {c : V} {s : ℝ}
     (him : (expCharge b β ω (r, c, s)).im = 0) (hv : 0 ≤ realForm b (r, c, s)) :
     0 < (expCharge b β ω (r, c, s)).re := by
-  have hge := two_mul_re_expCharge_ge b β ω hb hsigPos hω him
   have hpos : 0 < r ^ 2 * b ω ω := by positivity
-  nlinarith [hge, hv, hpos, hr]
+  exact re_expCharge_pos_of_lower_bound b β ω 0 hb hsigPos hω hr him (by simpa using hv)
+    (by simpa using hpos)
 
 /-- **Lemma 6.2, spherical case.** For a class of Mukai square `-1` — the
 paper's `v(E)² = -2` in this repository's halved convention — the boundary
@@ -180,16 +270,8 @@ theorem re_expCharge_pos_of_neg_one (hb : ∀ x y : V, b x y = b y x)
     (him : (expCharge b β ω (r, c, s)).im = 0) (hv : -1 ≤ realForm b (r, c, s)) :
     0 < (expCharge b β ω (r, c, s)).re := by
   have hω0 : 0 < b ω ω := by linarith
-  have hge := two_mul_re_expCharge_ge b β ω hb hsigPos hω0 him
-  have hr0 : (0 : ℝ) < r := by linarith
-  -- `1 ≤ r` is what makes `ω² > 2` enough: it gives `r² * ω² ≥ ω² > 2`.
-  have hsq : b ω ω ≤ r ^ 2 * b ω ω := by nlinarith [sq_nonneg (r - 1)]
-  have hmul : 0 < 2 * r * (expCharge b β ω (r, c, s)).re := by linarith
-  by_contra hle
-  push Not at hle
-  have hprod : 0 ≤ r * -(expCharge b β ω (r, c, s)).re :=
-    mul_nonneg hr0.le (by linarith)
-  linarith
+  exact re_expCharge_pos_of_lower_bound_of_one_le_rank b β ω 1 hb hsigPos hω0
+    (by simpa using hω) hr him (by simpa using hv)
 
 end HodgeIndex
 
