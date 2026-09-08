@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.BogomolovGieseker
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Numerical.ChargeFamily
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Numerical.Nested
 
 /-!
@@ -67,6 +68,8 @@ mass or `Hom`.
 ## Main results
 
 * `Surface.toNumClass` and its three component lemmas, plus `toNumClass_add`.
+* `Surface.toNumClassHom` and `Surface.wallChargeFamily` — the additive
+  pullback that places every polarised surface below the generic wall root.
 * `Surface.discr_toNumClass` — the identity the bridge turns on.
 * `Surface.toNumClass_ne_zero_of_rank_ne_zero` — nonzero rank suffices.
 * `Surface.charge_ne_zero_of_semistable` — the charge hypothesis, discharged.
@@ -122,6 +125,38 @@ theorem toNumClass_add (E F : N) :
     degH_add, map_add, hch, Prod.mk.injEq]
   push_cast
   refine ⟨by ring, by ring, by ring⟩
+
+/-- The numerical-class transport bundled as an additive map.
+
+Bundling is what lets the surface model inherit generic wall constructions by
+`ChargeFamily.pullback`, rather than rebuilding wall equations for each
+surface presentation. -/
+noncomputable def toNumClassHom : N →+ Wall.NumClass :=
+  AddMonoidHom.mk' (toNumClass V P) (by
+    intro E F
+    exact toNumClass_add V P E F)
+
+@[simp]
+theorem toNumClassHom_apply (E : N) :
+    toNumClassHom V P E = toNumClass V P E := rfl
+
+/-- The `(s,t)` numerical wall family pulled back to any polarised surface
+presentation. -/
+noncomputable def wallChargeFamily : Wall.ChargeFamily (ℝ × ℝ) N :=
+  Wall.stChargeFamily.pullback (toNumClassHom V P)
+
+@[simp]
+theorem wallChargeFamily_charge (p : ℝ × ℝ) (E : N) :
+    (wallChargeFamily V P).charge p E =
+      Wall.stCharge p.1 p.2 (toNumClass V P E) := rfl
+
+/-- Surface walls are inherited pullbacks of the generic determinant, whose
+specialized value is the established `(s,t)` polynomial. -/
+@[simp]
+theorem wallChargeFamily_wallValue (p : ℝ × ℝ) (E F : N) :
+    (wallChargeFamily V P).wallValue p E F =
+      Wall.wallExpr p.1 p.2 (toNumClass V P E) (toNumClass V P F) := by
+  simp [wallChargeFamily]
 
 /-- **The identity the bridge turns on.** The wall-plane discriminant of a
 transported class is exactly the tilt discriminant `Surface.discrH`.
@@ -251,6 +286,24 @@ theorem toNumClass_k3 (d : ℕ) (hd : d ≠ 0) (E : SurfaceNum) :
   simp only [Surface.toNumClass, hHsq, hch2, hrank, degH_k3 d hd E, Prod.mk.injEq]
   push_cast
   refine ⟨by ring, by ring, by ring⟩
+
+/-- The rank-one K3 model as a concrete child of the generic wall-family
+hierarchy, through the polarised-surface transport. -/
+noncomputable def k3WallChargeFamily (d : ℕ) (hd : d ≠ 0) :
+    Wall.ChargeFamily (ℝ × ℝ) SurfaceNum :=
+  Surface.wallChargeFamily (k3NumericalVariety d) (k3Polarization d hd)
+
+/-- The K3 child evaluates through the degree-weighted numerical triple. -/
+@[simp]
+theorem k3WallChargeFamily_charge (d : ℕ) (hd : d ≠ 0)
+    (s t : ℝ) (E : SurfaceNum) :
+    (k3WallChargeFamily d hd).charge (s, t) E =
+      Wall.stCharge s t
+        ((2 * (d : ℝ) * (E 0 : ℝ)),
+          (2 * (d : ℝ) * (E 1 : ℝ)),
+          ((E 2 : ℝ) * (2 * (d : ℝ)))) := by
+  rw [k3WallChargeFamily, Surface.wallChargeFamily_charge,
+    toNumClass_k3]
 
 /-- Both sides of `discr_toNumClass` on the K3 model, as one explicit rational:
 `Δ = 4d²·(E 1)² − 8d²·(E 0)·(E 2)`.

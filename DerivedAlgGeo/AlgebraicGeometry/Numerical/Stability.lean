@@ -5,13 +5,20 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.BMT
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.BogomolovGieseker
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.Slope
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.SurfaceCharge
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.SurfaceChargeNumerical
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialCharge
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeNumerical
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeScalarExtension
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallSlice
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.TwistedChern
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.WallTransport
 
 /-! # Polarised numerical data
 
-The polarisation and the Mumford slope; the two `H`-discriminants; the twisted
-Chern character; and the two supplied inequalities.
+The polarisation and the Mumford slope; the generic surface charge coordinates;
+the two `H`-discriminants; the twisted Chern character; and the two supplied
+inequalities.
 
 The inequalities are not alike. `BogomolovGiesekerData` is true and merely out
 of reach here. `BMTData` is **false in general** — it fails on the blow-up of
