@@ -3,14 +3,14 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting.TorsionPair.WeakHnTilt
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.MukaiWeakCutoff
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.ExpChargeCases
-import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HeartComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Slope
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.NumericalCases
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Ambient
 
 /-!
-# `Z(β,ω)` on the tilted heart: the imaginary half
+# The Mukai exponential charge on an HN-tilted heart
 
-`MukaiWeakCutoff.lean` (#808) reads the sign of `Im Z(β,ω)` against the cutoff classes of the
+`Mukai.Slope` reads the sign of `Im Z(β,ω)` against the cutoff classes of the
 **untilted** heart.  `WeakHnTilt.lean` builds the tilt.  This file joins them: **every object of
 the tilted heart has `0 ≤ Im Z(β,ω)`.**
 
@@ -24,7 +24,7 @@ about `Z(X)` at all: the additivity was available, the charge was not.
 **The fix is a restriction, not a hypothesis.**  Take the charge on `K₀ C` as the primitive and
 *define* the heart datum by composing with `K₀Ab.toAmbient` (`GrothendieckGroup/HeartComparison.lean`).
 Compatibility is then `rfl` rather than a field, so there is no new structure to inhabit and no
-new assumption to discharge — which is the failure mode `ExpCharge.lean` warns about and that the
+new assumption to discharge — which is the failure mode `Mukai.Charge` warns about and that the
 `single-instantiation` gate now catches.
 
 Note this uses only the **map** `K₀Ab 𝒜 →+ K₀ C`.  The *isomorphism* `K(𝒜) ≅ K(D)` is
@@ -41,15 +41,18 @@ signs combine.  The zero object is handled separately at each end, where the cha
 
 It is **not** Bridgeland's Lemma 6.2.  Lemma 6.2 needs the charge in
 `semiClosedUpperHalfPlane` — `Im > 0`, or `Im = 0` **and `Re < 0`**.  This supplies only the
-imaginary half for arbitrary tilted-heart objects.  The two free-generator adapters below close
-the strict-below and boundary cases when their numerical hypotheses are supplied explicitly.
+imaginary half for arbitrary tilted-heart objects.  The adapters below close the
+strict-below, positive-rank torsion, dimension-zero, and boundary-generator cases
+when their numerical hypotheses are supplied explicitly.
 
 The remaining geometric and torsion work is outside this lane:
 
 * the non-spherical and spherical cases (`Mukai.re_expCharge_pos_of_nonneg`,
-  `re_expCharge_pos_of_neg_one`) both take the Mukai square as a **hypothesis**, and supplying it
-  for a `μ`-stable sheaf is the paper's Lemma 5.1 — Serre duality, Riemann--Roch, finite
-  dimensional `Hom` — which is not in this repository (#332);
+  `re_expCharge_pos_of_neg_one`) both take the Mukai square as a **hypothesis**.  The
+  assembly-safe boundary adapter takes that bound factorwise; supplying it for
+  each `μ`-stable factor is the paper's Lemma 5.1 — Serre duality,
+  Riemann--Roch, finite-dimensional `Hom` — which is not in this repository
+  (#332);
 * the torsion cases split by **dimension of support** and use ampleness, and `WeakSlopeData`
   carries a rank and a degree and nothing else.
 
@@ -73,49 +76,23 @@ variable {V : Type*} [AddCommGroup V] [Module ℝ V]
 
 namespace MukaiChargeData
 
-variable (t : TStructure C)
+variable {t : TStructure C}
 
-/-- **The heart datum of an ambient Mukai class map**, by restriction along `K₀Ab.toAmbient`.
+/-- **The zero-dimensional torsion numerical shadow.**
 
-This is the whole content of the "ambient charge" problem: take the charge on `K₀ C` as
-primitive and restrict, rather than take the heart charge as primitive and postulate a lift. -/
-def ofAmbient (m : K₀ C →+ Mukai.RealExtension V) :
-    MukaiChargeData t.heart.FullSubcategory V where
-  mukai := m.comp (K₀Ab.toAmbient t)
-
-@[simp]
-theorem ofAmbient_mukai (m : K₀ C →+ Mukai.RealExtension V)
-    (E : t.heart.FullSubcategory) :
-    (ofAmbient t m).mukai (K₀Ab.of E) = m (K₀.of C E.obj) := by
-  simp [ofAmbient]
-
-/-- The ambient charge, on any object of `C`. -/
-def ambientCharge (m : K₀ C →+ Mukai.RealExtension V)
-    (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V) (X : C) : ℂ :=
-  Mukai.expCharge b β ω (m (K₀.of C X))
-
-/-- On a heart object the ambient charge is the restricted heart charge — by construction. -/
-@[simp]
-theorem ambientCharge_obj (m : K₀ C →+ Mukai.RealExtension V)
-    (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V) (E : t.heart.FullSubcategory) :
-    ambientCharge m b β ω E.obj = (ofAmbient t m).charge b β ω E := by
-  rw [ambientCharge, MukaiChargeData.charge_apply, ofAmbient_mukai]
-
-omit [IsTriangulated C] in
-/-- The ambient charge is additive on distinguished triangles. -/
-theorem ambientCharge_triangle (m : K₀ C →+ Mukai.RealExtension V)
-    (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V) {T : Triangle C} (hT : T ∈ distTriang C) :
-    ambientCharge m b β ω T.obj₂ =
-      ambientCharge m b β ω T.obj₁ + ambientCharge m b β ω T.obj₃ := by
-  rw [ambientCharge, ambientCharge, ambientCharge, K₀.of_triangle C T hT, map_add,
-    expCharge_add]
-
-omit [IsTriangulated C] in
-/-- A shift negates the ambient charge. -/
-theorem ambientCharge_shift (m : K₀ C →+ Mukai.RealExtension V)
-    (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V) (X : C) :
-    ambientCharge m b β ω (X⟦(1 : ℤ)⟧) = -ambientCharge m b β ω X := by
-  rw [ambientCharge, ambientCharge, K₀.of_shift_one, map_neg, expCharge_neg]
+If a heart object has Mukai class `(0, 0, s)` with `0 < s`, its ambient
+charge lies on the negative real ray.  The class equation is an explicit
+support-dimension input; this theorem does not assert that an arbitrary
+rank-zero object has that class. -/
+theorem mem_semiClosedUpperHalfPlane_of_ambientCharge_of_dimension_zero
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    {T₀ : t.heart.FullSubcategory} {s : ℝ}
+    (hclass : (ofAmbient t m).mukai (K₀Ab.of T₀) = ((0 : ℝ), (0 : V), s))
+    (hs : 0 < s) :
+    ambientCharge m b β ω T₀.obj ∈ semiClosedUpperHalfPlane := by
+  rw [ambientCharge_obj, charge_apply, hclass]
+  exact mem_semiClosedUpperHalfPlane_of_dimension_zero b β ω hb hs
 
 end MukaiChargeData
 
@@ -218,7 +195,7 @@ theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_lt
   have hcase := neg_mem_semiClosedUpperHalfPlane_of_apply_sub_smul_neg
     (b := b) (β := β) (ω := ω) (r := v.1) (c := v.2.1) (s := v.2.2) hb hbelow'
   rw [ambientCharge_shift]
-  rw [ambientCharge, ← expCharge_neg]
+  rw [ambientCharge, ambientChargeHom_apply, ← expCharge_neg]
   simpa [v] using hcase
 
 /-- **The positive-rank HN-torsion generator case.**
@@ -242,27 +219,63 @@ theorem mem_semiClosedUpperHalfPlane_of_hnTors_of_rank_pos
   exact mem_semiClosedUpperHalfPlane_of_im_pos
     (Cpt.im_charge_pos_of_mem_hnTors_of_rank_pos hb β hHN hT₀ hrank hT)
 
-/-- **The zero-dimensional torsion numerical shadow.**
-
-If a heart object has Mukai class `(0, 0, s)` with `0 < s`, the existing
-dimension-zero exponential-charge lemma puts its ambient charge on the negative
-real ray.  The class equation is an explicit support-dimension input; this
-theorem does not assert that an arbitrary rank-zero object has that class. -/
-theorem mem_semiClosedUpperHalfPlane_of_ambientCharge_of_dimension_zero
-    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
-    (hb : ∀ x y : V, b x y = b y x)
-    {T₀ : t.heart.FullSubcategory} {s : ℝ}
-    (hclass : (ofAmbient t m).mukai (K₀Ab.of T₀) = ((0 : ℝ), (0 : V), s))
-    (hs : 0 < s) :
-    ambientCharge m b β ω T₀.obj ∈ semiClosedUpperHalfPlane := by
-  rw [ambientCharge_obj, MukaiChargeData.charge_apply, hclass]
-  exact mem_semiClosedUpperHalfPlane_of_dimension_zero b β ω hb hs
-
 section Boundary
 
 variable [FiniteDimensional ℝ V]
 
-/-- **The boundary free-generator case with an explicit Mukai-square input.**
+/-- **The boundary free-generator case, assembled from factorwise bounds.**
+
+`G` is the nonempty family of boundary factors whose Mukai classes sum to the
+class of `F₀`.  Positive rank and equality with the cutoff force every factor's
+imaginary charge to vanish; the Mukai-square hypothesis is imposed separately
+on every factor.  The numerical factorwise theorem then adds their positive
+real charges before applying the shift.
+
+This is the API intended for final Lemma 6.2 assembly.  A geometric consumer
+should instantiate `G` with stable factors and prove `hGsquare` from the K3
+stable-sheaf bound. -/
+theorem mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1)
+    (hω : 2 < b ω ω)
+    {S : WeakSlopeData t.heart.FullSubcategory}
+    (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
+    {F₀ : t.heart.FullSubcategory} {n : ℕ} (hn : 0 < n)
+    (G : Fin n → t.heart.FullSubcategory)
+    (hclass : (ofAmbient t m).mukai (K₀Ab.of F₀) =
+      ∑ i, (ofAmbient t m).mukai (K₀Ab.of (G i)))
+    (hGrank : ∀ i, 0 < S.rank (G i))
+    (hGslope : ∀ i, S.slope (G i) = b β ω)
+    (hGsquare : ∀ i, -1 ≤ Mukai.realForm b
+      ((ofAmbient t m).mukai (K₀Ab.of (G i)))) :
+    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
+  classical
+  let v : Fin n → Mukai.RealExtension V := fun i ↦
+    (ofAmbient t m).mukai (K₀Ab.of (G i))
+  have hr : ∀ i, (1 : ℝ) ≤ (v i).1 := by
+    intro i
+    have hpos := hGrank i
+    have hri : (1 : ℤ) ≤ S.rank (G i) := by omega
+    have hri' : (1 : ℝ) ≤ (S.rank (G i) : ℝ) := by exact_mod_cast hri
+    change (1 : ℝ) ≤ ((ofAmbient t m).mukai (K₀Ab.of (G i))).1
+    rw [Cpt.rank_eq]
+    exact hri'
+  have him : ∀ i, (Mukai.expCharge b β ω (v i)).im = 0 := by
+    intro i
+    change ((ofAmbient t m).charge b β ω (G i)).im = 0
+    exact Cpt.im_charge_eq_zero_of_rank_pos_of_slope_eq hb β (hGrank i) (hGslope i)
+  have hv : ∀ i, -1 ≤ Mukai.realForm b (v i) := by
+    intro i
+    simpa [v] using hGsquare i
+  have hcase := neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one
+    (b := b) (β := β) (ω := ω) hb hsigPos hω hn v hr him hv
+  have hclass' : m (K₀.of C F₀.obj) = ∑ i, v i := by
+    rw [← ofAmbient_mukai t m F₀, hclass]
+  rw [ambientCharge_shift, ambientCharge, ambientChargeHom_apply, hclass', ← expCharge_neg]
+  exact hcase
+
+/-- **Low-level one-class boundary adapter with an explicit Mukai-square input.**
 
 If the weak HN torsion-free generator lies exactly on the cutoff, the imaginary
 part vanishes.  The supplied bound `-1 ≤ Mukai.realForm` is the halved Mukai
@@ -271,9 +284,11 @@ numerical positivity theorem puts the shifted charge on the allowed negative
 real ray.
 
 The Mukai-square bound is intentionally a theorem input rather than a field of
-`MukaiChargeData`: proving it for stable sheaves is the geometric K3/Bogomolov
-seam.  This theorem therefore closes the boundary adapter without claiming that
-the generic charge data already comes from a geometric K3. -/
+`MukaiChargeData`.  This theorem is useful when a bound on the whole class is
+already available, but it is **not** the final assembly seam: `-1 ≤ v²` is not
+preserved by extensions.  Use
+`mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors` when the bound is
+known only for stable factors. -/
 theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_mukai_square_ge_neg_one
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
     (hb : ∀ x y : V, b x y = b y x)
@@ -290,33 +305,15 @@ theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_mukai_square
       ((ofAmbient t m).mukai (K₀Ab.of F₀))) :
     ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
   have hrank : 0 < S.rank F₀ := S.rank_pos_of_mem_hnFree hHN hF₀ hF
-  have hr0 : (0 : ℝ) < (S.rank F₀ : ℝ) := by exact_mod_cast hrank
-  have hr : (1 : ℝ) ≤ (S.rank F₀ : ℝ) := by
-    have hrank_one : (1 : ℤ) ≤ S.rank F₀ := by omega
-    exact_mod_cast hrank_one
-  have hdegree : (S.degree F₀ : ℝ) = b β ω * (S.rank F₀ : ℝ) := by
-    rw [WeakSlopeData.slope] at heq
-    rw [div_eq_iff (ne_of_gt hr0)] at heq
+  refine mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors
+    (t := t) (n := 1) hb hsigPos hω Cpt Nat.one_pos (fun _ ↦ F₀) ?_ ?_ ?_ ?_
+  · simp
+  · intro
+    exact hrank
+  · intro
     exact heq
-  have him_charge : ((ofAmbient t m).charge b β ω F₀).im = 0 := by
-    rw [Cpt.im_charge hb β F₀, hdegree]
-    ring
-  let v : Mukai.RealExtension V := (ofAmbient t m).mukai (K₀Ab.of F₀)
-  have hr' : (1 : ℝ) ≤ v.1 := by
-    change (1 : ℝ) ≤ ((ofAmbient t m).mukai (K₀Ab.of F₀)).1
-    rw [Cpt.rank_eq]
-    exact hr
-  have him : (Mukai.expCharge b β ω v).im = 0 := by
-    change ((ofAmbient t m).charge b β ω F₀).im = 0
-    exact him_charge
-  have hMukaiSquare' : -1 ≤ Mukai.realForm b v := by
-    simpa [v] using hMukaiSquare
-  have hcase := neg_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one
-    (b := b) (β := β) (ω := ω) (r := v.1) (c := v.2.1) (s := v.2.2)
-    hb hsigPos hω hr' him hMukaiSquare'
-  rw [ambientCharge_shift]
-  rw [ambientCharge, ← expCharge_neg]
-  simpa [v] using hcase
+  · intro
+    exact hMukaiSquare
 
 end Boundary
 

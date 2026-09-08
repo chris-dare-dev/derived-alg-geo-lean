@@ -357,13 +357,16 @@ take the charge on `K₀ C` as primitive and compose with `K₀Ab.toAmbient`, so
 isomorphism `K(𝒜) ≅ K(D)` remains unavailable and unassumed.
 
 `im_ambientCharge_nonneg_of_mem_hnTilt_heart` is the payoff, and the strict-below and boundary
-free-generator cases are now adapter theorems.  The boundary theorem takes the halved Mukai-square
-bound explicitly; the geometric proof of that input and the rank-zero torsion/point cases remain
+free-generator cases are adapter theorems.  The existing boundary leaf takes a whole-object
+Mukai-square bound; final assembly must instead obtain the bound factorwise from stable factors,
+because that bound is not additive.  The geometric proof and the factorwise assembly remain
 outside this lane. -/
 
 #print axioms CategoryTheory.Triangulated.expCharge_neg
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.ofAmbient
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.ofAmbient_mukai
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientChargeHom
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientChargeHom_apply
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientCharge
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientCharge_obj
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientCharge_triangle
@@ -371,5 +374,6 @@ outside this lane. -/
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_ambientCharge_nonneg_of_mem_hnTilt_heart
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_lt
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_hnTors_of_rank_pos
-#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_ambientCharge_of_dimension_zero
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.mem_semiClosedUpperHalfPlane_of_ambientCharge_of_dimension_zero
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_mukai_square_ge_neg_one

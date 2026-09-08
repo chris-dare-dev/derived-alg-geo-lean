@@ -348,6 +348,11 @@ support property. `expCharge` is Bridgeland's `Z(β,ω)`. -/
 #print axioms PeriodDomain.mem_periodDomain₀_iff_centralCharge_ne_zero
 #print axioms Mukai.expCharge
 #print axioms Mukai.expCharge_apply
+#print axioms Mukai.expChargeHom
+#print axioms Mukai.expChargeHom_apply
+#print axioms Mukai.expCharge_zero
+#print axioms Mukai.expCharge_add
+#print axioms Mukai.expCharge_neg
 #print axioms Mukai.neg_of_expCharge_eq_zero
 #print axioms Mukai.expCharge_ne_zero_of_nonneg
 #print axioms Mukai.mem_wall_iff_expCharge_eq_zero

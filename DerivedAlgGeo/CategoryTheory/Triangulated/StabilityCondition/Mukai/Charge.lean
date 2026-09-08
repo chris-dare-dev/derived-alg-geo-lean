@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.Slope
-import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
+import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.CentralCharge
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 
 /-!
@@ -47,11 +47,9 @@ statement that compiles.
 
 ## Additivity of the charge
 
-`expCharge_add` and `expCharge_zero` are stated here rather than in
-`LinearAlgebra/Lattice/Mukai/CentralCharge.lean`, where they arguably belong:
-they are consequences of `polar` being additive in its second argument, and are
-the only two facts about `expCharge` this bridge needs.  Moving them upstream is
-a reasonable follow-up.
+`Mukai.expChargeHom` owns additivity at the numerical layer.  This file only
+composes that homomorphism with a Mukai class map and then evaluates it on
+Grothendieck classes of objects.
 -/
 
 noncomputable section
@@ -65,31 +63,27 @@ namespace CategoryTheory.Triangulated
 variable {V : Type*} [AddCommGroup V] [Module ℝ V]
 variable (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V)
 
+/-!
+The following historical names remain in the categorical namespace for API
+stability.  Their canonical numerical owners are now `Mukai.expCharge_zero`,
+`Mukai.expCharge_add`, and `Mukai.expCharge_neg`.
+-/
+
 /-- The exponential charge kills the zero class. -/
 @[simp]
-theorem expCharge_zero : Mukai.expCharge b β ω 0 = 0 := by
-  simp [Mukai.expCharge, PeriodDomain.centralCharge]
+theorem expCharge_zero : Mukai.expCharge b β ω 0 = 0 :=
+  Mukai.expCharge_zero b β ω
 
-/-- The exponential charge is additive in the Mukai class, because `polar` is
-additive in its second argument. -/
+/-- The exponential charge is additive in the Mukai class. -/
 theorem expCharge_add (v w : Mukai.RealExtension V) :
-    Mukai.expCharge b β ω (v + w)
-      = Mukai.expCharge b β ω v + Mukai.expCharge b β ω w := by
-  simp only [Mukai.expCharge, PeriodDomain.centralCharge, polar_add_right]
-  push_cast
-  ring
+    Mukai.expCharge b β ω (v + w) =
+      Mukai.expCharge b β ω v + Mukai.expCharge b β ω w :=
+  Mukai.expCharge_add b β ω v w
 
-/-- The exponential charge negates on negated classes, since it is additive.
-
-This is what the shift `E ↦ E⟦1⟧` costs: the class of the shift is `-v(E)`, so
-its charge is `-Z(E)`. Stated here beside `expCharge_add` and `expCharge_zero`
-rather than at either consumer, because both the tilt and the case analysis of
-Lemma 6.2 need it and neither owns it. -/
+/-- The exponential charge negates on negated classes. -/
 theorem expCharge_neg (v : Mukai.RealExtension V) :
-    Mukai.expCharge b β ω (-v) = -Mukai.expCharge b β ω v := by
-  simp only [Mukai.expCharge, PeriodDomain.centralCharge, polar_neg_right]
-  push_cast
-  ring
+    Mukai.expCharge b β ω (-v) = -Mukai.expCharge b β ω v :=
+  Mukai.expCharge_neg b β ω v
 
 variable {A : Type u} [Category.{v} A] [Abelian A]
 
@@ -100,12 +94,11 @@ data.  They are the universal property of `K₀Ab`, so they are gone: one field
 remains, and the three formal properties come from `AddMonoidHom` and
 `K₀Ab.of_isZero` / `of_iso` / `of_shortExact`.
 
-**Still not connected to the numerical lane.**  `mukai` here is an arbitrary hom
-into the real Mukai extension; nothing forces it to be the Mukai vector of an
-object's numerical class.  Making it factor through `N` and the numerical
-quotient — and proving `charge` agrees with `numericalCharge` — is the next step,
-and until it lands the support-property theorems proved on the numerical side are
-unreachable from an object of a heart. -/
+This generic carrier deliberately accepts any such hom.  Concrete geometric
+consumers must construct it from their numerical class map; the K3 numerical
+lane does so in
+`AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalCharge.lean`, where
+the resulting charge is proved definitionally equal to `numericalCharge`. -/
 structure MukaiChargeData (A : Type u) [Category.{v} A] [Abelian A]
     (V : Type*) [AddCommGroup V] [Module ℝ V] where
   /-- The Mukai class, as a hom out of the Grothendieck group. -/
@@ -115,8 +108,16 @@ namespace MukaiChargeData
 
 variable (D : MukaiChargeData A V)
 
+/-- `Z(β,ω)` as an additive homomorphism on the heart's Grothendieck group. -/
+noncomputable def chargeHom : K₀Ab A →+ ℂ :=
+  (Mukai.expChargeHom b β ω).comp D.mukai
+
+@[simp]
+theorem chargeHom_apply (x : K₀Ab A) :
+    D.chargeHom b β ω x = Mukai.expCharge b β ω (D.mukai x) := rfl
+
 /-- `Z(β,ω)` as a charge on objects. -/
-def charge (E : A) : ℂ := Mukai.expCharge b β ω (D.mukai (K₀Ab.of E))
+def charge (E : A) : ℂ := D.chargeHom b β ω (K₀Ab.of E)
 
 @[simp]
 theorem charge_apply (E : A) :

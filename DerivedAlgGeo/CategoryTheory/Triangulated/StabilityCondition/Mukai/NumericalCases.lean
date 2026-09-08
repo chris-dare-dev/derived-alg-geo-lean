@@ -3,7 +3,6 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Charge
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.ExpCharge
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
 
 /-!
@@ -34,7 +33,7 @@ below are stated on `-v` explicitly rather than left to the caller.
 ## What this is not
 
 **It is not Lemma 6.2**, and it is deliberately not wired into
-`MukaiChargeData`. `ExpCharge.lean` says why, and the reason stands: bundling
+`MukaiChargeData`. `Mukai.Charge` says why, and the reason stands: bundling
 these case discriminants as fields of that structure would make `nonzero_mem` a
 one-line case split over invented assumptions — it would compile, pass every
 gate, and prove nothing. Lemma 6.2 requires *proving* which objects of the
@@ -62,18 +61,20 @@ separately because the caller reaches them from opposite sides of the cutoff.
 
 ## Main results
 
-`expCharge_neg` — `Z(-v) = -Z(v)`, what the shift costs — lives upstream in
-`ExpCharge.lean` beside `expCharge_add`; it was moved there in this change so the
-tilt and this file share one copy.
+`Mukai.expCharge_neg` — `Z(-v) = -Z(v)`, what the shift costs — is derived
+upstream from `Mukai.expChargeHom` in the numerical Mukai layer.
 
 * `mem_semiClosedUpperHalfPlane_of_apply_sub_smul_pos` — cases 1 and 3.
 * `mem_semiClosedUpperHalfPlane_of_dimension_zero` — case 2.
 * `neg_mem_semiClosedUpperHalfPlane_of_apply_sub_smul_neg` — below the cutoff.
 * `neg_mem_semiClosedUpperHalfPlane_of_boundary_of_nonneg` and
   `…_of_neg_one` — the boundary, non-spherical and spherical.
+* `neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one` — the
+  assembly-safe factorwise boundary case.
 -/
 
 open Complex QuadraticMap
+open scoped BigOperators
 
 namespace CategoryTheory.Triangulated
 
@@ -134,7 +135,8 @@ theorem neg_mem_semiClosedUpperHalfPlane_of_apply_sub_smul_neg
     (h : b ω (c - r • β) < 0) :
     Mukai.expCharge b β ω (-(r, c, s)) ∈ semiClosedUpperHalfPlane := by
   refine mem_semiClosedUpperHalfPlane_of_im_pos ?_
-  rw [expCharge_neg b β ω, Complex.neg_im, Mukai.im_expCharge_eq_apply_sub_smul b β ω hb]
+  rw [Mukai.expCharge_neg b β ω, Complex.neg_im,
+    Mukai.im_expCharge_eq_apply_sub_smul b β ω hb]
   linarith
 
 section Boundary
@@ -155,7 +157,7 @@ theorem neg_mem_semiClosedUpperHalfPlane_of_boundary_of_nonneg
     Mukai.expCharge b β ω (-(r, c, s)) ∈ semiClosedUpperHalfPlane := by
   have hre := Mukai.re_expCharge_pos_of_nonneg b β ω hb hsigPos hω hr him hv
   refine mem_semiClosedUpperHalfPlane_of_im_zero_of_re_neg ?_ ?_ <;>
-    rw [expCharge_neg b β ω]
+    rw [Mukai.expCharge_neg b β ω]
   · rw [Complex.neg_im, him, neg_zero]
   · rw [Complex.neg_re]; linarith
 
@@ -175,9 +177,51 @@ theorem neg_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one
     Mukai.expCharge b β ω (-(r, c, s)) ∈ semiClosedUpperHalfPlane := by
   have hre := Mukai.re_expCharge_pos_of_neg_one b β ω hb hsigPos hω hr him hv
   refine mem_semiClosedUpperHalfPlane_of_im_zero_of_re_neg ?_ ?_ <;>
-    rw [expCharge_neg b β ω]
+    rw [Mukai.expCharge_neg b β ω]
   · rw [Complex.neg_im, him, neg_zero]
   · rw [Complex.neg_re]; linarith
+
+/-- **The boundary case assembled factorwise.**
+
+Every member of a nonempty finite family lies on the boundary, has positive
+rank, and satisfies the stable-factor Mukai-square bound.  Each unshifted
+charge therefore has positive real part and zero imaginary part, so the charge
+of the negative of their sum lies on the allowed negative real ray.
+
+This is the assembly-safe form of the boundary argument: the bound
+`-1 ≤ realForm b (v i)` is required for each factor, never for their sum.  The
+latter condition is not additive. -/
+theorem neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1) (hω : 2 < b ω ω)
+    {n : ℕ} (hn : 0 < n) (v : Fin n → Mukai.RealExtension V)
+    (hr : ∀ i, 1 ≤ (v i).1)
+    (him : ∀ i, (Mukai.expCharge b β ω (v i)).im = 0)
+    (hv : ∀ i, -1 ≤ Mukai.realForm b (v i)) :
+    Mukai.expCharge b β ω (-(∑ i, v i)) ∈ semiClosedUpperHalfPlane := by
+  classical
+  let i₀ : Fin n := ⟨0, hn⟩
+  have hre : ∀ i, 0 < (Mukai.expCharge b β ω (v i)).re := fun i ↦
+    Mukai.re_expCharge_pos_of_neg_one b β ω hb hsigPos hω (hr i) (him i) (hv i)
+  have hcharge_sum :
+      Mukai.expCharge b β ω (∑ i, v i) = ∑ i, Mukai.expCharge b β ω (v i) := by
+    simpa only [Mukai.expChargeHom_apply] using
+      map_sum (Mukai.expChargeHom b β ω) v Finset.univ
+  refine mem_semiClosedUpperHalfPlane_of_im_zero_of_re_neg ?_ ?_
+  · rw [Mukai.expCharge_neg b β ω, Complex.neg_im, hcharge_sum]
+    have him_sum : (∑ i, Mukai.expCharge b β ω (v i)).im =
+        ∑ i, (Mukai.expCharge b β ω (v i)).im := by
+      simpa only [show ∀ z : ℂ, Complex.imAddGroupHom z = z.im from fun _ ↦ rfl] using
+        map_sum Complex.imAddGroupHom (fun i ↦ Mukai.expCharge b β ω (v i)) Finset.univ
+    rw [him_sum]
+    simp [him]
+  · rw [Mukai.expCharge_neg b β ω, Complex.neg_re, hcharge_sum]
+    have hre_sum : (∑ i, Mukai.expCharge b β ω (v i)).re =
+        ∑ i, (Mukai.expCharge b β ω (v i)).re := by
+      simpa only [show ∀ z : ℂ, Complex.reAddGroupHom z = z.re from fun _ ↦ rfl] using
+        map_sum Complex.reAddGroupHom (fun i ↦ Mukai.expCharge b β ω (v i)) Finset.univ
+    rw [hre_sum]
+    exact neg_neg_of_pos (Finset.sum_pos (fun i _ ↦ hre i) ⟨i₀, Finset.mem_univ i₀⟩)
 
 end Boundary
 

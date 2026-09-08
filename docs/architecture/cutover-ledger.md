@@ -7,6 +7,21 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Mukai stability-condition specialization (2026-09-08):
+  `CategoryTheory/Triangulated/StabilityCondition/Mukai/` is the sibling
+  consumer of generic weak stability and tilting. `Charge.lean` owns the
+  categorical Mukai class map and its additive charge, `Slope.lean` owns weak
+  slope compatibility, `NumericalCases.lean` owns the four numerical
+  half-plane adapters, `Ambient.lean` owns restriction from `K₀ C` to a heart,
+  and `Tilting.lean` owns the HN-tilt consumers. The generic
+  `Weak/Foundation/StabilityFunction` and `Weak/Tilting/TorsionPair` umbrellas
+  no longer import this specialization. At the lower layer,
+  `LinearAlgebra/Lattice/Mukai/CentralCharge.lean` now exposes
+  `Mukai.expChargeHom`, so heart and ambient charges compose additive
+  homomorphisms instead of reproving additivity. The historical declaration
+  numerical lemmas are `Mukai.expCharge_zero`, `expCharge_add`, and
+  `expCharge_neg`; their historical `CategoryTheory.Triangulated` names remain
+  stable as aliases in `Mukai/Charge.lean`.
 - Left orthogonals are closed under colimits (2026-09-04):
   `CategoryTheory/ObjectProperty/Orthogonal.lean` owns
   `instIsClosedUnderColimitsOfShapeLeftOrthogonal`, beside Mathlib's own

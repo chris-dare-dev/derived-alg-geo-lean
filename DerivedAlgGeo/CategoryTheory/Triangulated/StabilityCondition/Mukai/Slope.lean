@@ -2,14 +2,15 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.ExpCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Charge
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakCutoffSlope
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakSlopeCutoff
+import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
 
 /-!
 # `Z(β,ω)` read against the weak slope cutoff
 
-`ExpCharge.lean` carries a Mukai class map into an abelian category and makes
+`Mukai.Charge` carries a Mukai class map into an abelian category and makes
 `Z(β,ω)` a charge on objects.  It stops there, deliberately: its own docstring
 records that `MukaiChargeData` asserts nothing about rank, slope or torsion, and
 that bundling those as hypotheses would make the positivity a case split over
@@ -137,6 +138,19 @@ theorem im_charge_eq_degree_of_rank_zero {E : A} (h : S.rank E = 0) :
     (D.charge b β ω E).im = (S.degree E : ℝ) := by
   rw [C.im_charge hb β E, h]
   push_cast
+  ring
+
+/-- A positive-rank object exactly at the slope cutoff has zero imaginary
+Mukai charge. -/
+theorem im_charge_eq_zero_of_rank_pos_of_slope_eq {E : A}
+    (hrank : 0 < S.rank E) (heq : S.slope E = b β ω) :
+    (D.charge b β ω E).im = 0 := by
+  have hr : (0 : ℝ) < (S.rank E : ℝ) := by exact_mod_cast hrank
+  have hdegree : (S.degree E : ℝ) = b β ω * (S.rank E : ℝ) := by
+    rw [WeakSlopeData.slope] at heq
+    rw [div_eq_iff (ne_of_gt hr)] at heq
+    exact heq
+  rw [C.im_charge hb β E, hdegree]
   ring
 
 /-- **The torsion class has nonnegative `Im Z(β,ω)`.**
