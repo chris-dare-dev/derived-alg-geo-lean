@@ -21,7 +21,15 @@ blocks should normally move it rather than add more declarations beside it.
   homomorphisms instead of reproving additivity. The historical declaration
   numerical lemmas are `Mukai.expCharge_zero`, `expCharge_add`, and
   `expCharge_neg`; their historical `CategoryTheory.Triangulated` names remain
-  stable as aliases in `Mukai/Charge.lean`.
+  stable as aliases in `Mukai/Charge.lean`. `GeometricInput.lean` now isolates
+  the two remaining K3 obligations as independent propositions: classification
+  of rank-and-degree-zero torsion classes and a factorwise boundary Mukai
+  decomposition. `Assembly.lean` proves the Mukai generator cases and returns
+  the actual stability function on the tilted heart. Its extension argument is
+  not Mukai-specific: the reusable constructor lives at
+  `Weak/Tilting/TorsionPair/HnTiltStabilityFunction.lean` and consumes any
+  additive ambient charge positive on nonzero torsion and shifted-free
+  generators.
 - Left orthogonals are closed under colimits (2026-09-04):
   `CategoryTheory/ObjectProperty/Orthogonal.lean` owns
   `instIsClosedUnderColimitsOfShapeLeftOrthogonal`, beside Mathlib's own

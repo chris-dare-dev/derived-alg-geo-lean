@@ -356,11 +356,11 @@ take the charge on `K₀ C` as primitive and compose with `K₀Ab.toAmbient`, so
 `rfl` and there is no new structure to inhabit. Only the **map** `K₀Ab 𝒜 →+ K₀ C` is used; the
 isomorphism `K(𝒜) ≅ K(D)` remains unavailable and unassumed.
 
-`im_ambientCharge_nonneg_of_mem_hnTilt_heart` is the payoff, and the strict-below and boundary
-free-generator cases are adapter theorems.  The existing boundary leaf takes a whole-object
-Mukai-square bound; final assembly must instead obtain the bound factorwise from stable factors,
-because that bound is not additive.  The geometric proof and the factorwise assembly remain
-outside this lane. -/
+`im_ambientCharge_nonneg_of_mem_hnTilt_heart` is the imaginary-half payoff. The strict-below,
+torsion, and factorwise boundary leaves are the generator adapters. Generic HRS assembly now
+lives in `Weak/Tilting/TorsionPair/HnTiltStabilityFunction.lean`; the Mukai consumer applies it
+under two named geometric propositions. Proving those propositions for coherent sheaves on a
+K3 surface remains the geometric work. -/
 
 #print axioms CategoryTheory.Triangulated.expCharge_neg
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.ofAmbient
@@ -377,3 +377,21 @@ outside this lane. -/
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.mem_semiClosedUpperHalfPlane_of_ambientCharge_of_dimension_zero
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_mukai_square_ge_neg_one
+
+/-! ## Stability-function assembly on the weak HN tilt
+
+The first three declarations are generic: positivity on the two kinds of HRS
+generators extends to every nonzero object and packages the ambient charge as a
+strict stability function. The remaining declarations specialize the two
+generator obligations to the exponential Mukai charge. -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTiltStabilityFunction
+#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTiltStabilityFunction_Z
+#print axioms CategoryTheory.Triangulated.MukaiTilt.HasDimensionZeroTorsionClasses
+#print axioms CategoryTheory.Triangulated.MukaiTilt.HasBoundaryMukaiDecomposition
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_hnTors
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_hnFree
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.tiltStabilityFunction
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.tiltStabilityFunction_Z
