@@ -93,8 +93,15 @@ end WeakSlopeData
 /-- **The Mukai class map computes the rank and the `ω`-degree.**
 
 Two identifications, no discriminants: nothing here mentions torsion, a cutoff,
-or the Mukai square. On a polarised surface both hold by the definition of the
-Mukai vector `v(E) = (r(E), c₁(E), ch₂(E) + r(E))` together with `degree = ω·c₁`.
+or the Mukai square. For any class map whose first two coordinates are the rank
+and `c₁` the first holds by definition and the second reads `degree = ω·c₁`; the
+third coordinate (`ch₂ + r` on a K3 surface, `ch₂` for the plain Chern
+character) is not constrained.
+
+Because `WeakSlopeData` carries an integer-valued degree, `degree_eq` also
+forces `ω·c₁(E) ∈ ℤ` for every object. The identification is therefore
+available for an integral polarisation `ω`, not for an arbitrary real ample
+class; lifting that restriction means a real-valued degree upstream.
 
 Compare `SlopeData`'s geometric fields, which are of the same kind. What is
 deliberately *not* here is any hypothesis of the shape "E is torsion" or

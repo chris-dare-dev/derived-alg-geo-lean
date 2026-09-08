@@ -14,19 +14,18 @@ from `Mukai.GeometricInput` and proves positivity for torsion generators,
 shifted torsion-free generators, and their extensions. The ambient exponential
 Mukai charge is consequently a `StabilityFunction` on the HN-tilted heart.
 
-The boundary contract and the resulting constructor are parameterized by an
-arbitrary factorwise lower bound `realForm ≥ -δ`. The parent assembly needs
-only `2δ < ω²`; the historical K3 interface is retained as the specialization
-`δ = 1`. Thus the categorical layer does not decide whether the geometric
-bound comes from the K3 stable-simple Ext calculation, a stronger abelian
-surface result, or another surface realization.
-
-More generally, `tiltStabilityFunctionOfMargin` consumes the exact positive
-Hodge margin separately on every factor. `tiltStabilityFunctionOfLowerBound`
-derives that contract from a uniform `δ`, and `tiltStabilityFunction` is the
-legacy K3-normalized child. None of these constructors chooses between `ch`
-and `ch * sqrt(td)`; that choice has already been made by the additive Mukai
-class map `m`.
+The parent constructor `tiltStabilityFunctionOfPred` takes the boundary
+contract for an arbitrary predicate `P` on the factors together with a proof
+that `P` forces positive real charge on a positive-rank factor at the cutoff.
+No Hodge-index hypothesis reaches it. `tiltStabilityFunctionOfMargin` chooses
+the exact Hodge margin as `P`; `tiltStabilityFunctionOfLowerBound` chooses a
+uniform lower bound `realForm ≥ -δ` and needs only `2δ < ω²`; and
+`tiltStabilityFunction` is the legacy K3-normalized child `δ = 1`. Thus the
+categorical layer does not decide whether the geometric bound comes from the
+K3 stable-simple Ext calculation, a stronger abelian surface result, or another
+surface realization. None of these constructors chooses between `ch` and
+`ch * sqrt(td)`; that choice has already been made by the additive Mukai class
+map `m`.
 
 No Harder--Narasimhan property for the resulting stability function is claimed.
 The HN hypothesis below belongs only to the weak slope function used to define
@@ -81,20 +80,22 @@ theorem mem_semiClosedUpperHalfPlane_of_hnTors
       exact MukaiChargeData.mem_semiClosedUpperHalfPlane_of_ambientCharge_of_dimension_zero
         hb hclass hs
 
-variable [FiniteDimensional ℝ V]
-
-/-- The complete shifted torsion-free generator case under the exact
-factorwise Hodge margin. Strictly below the cutoff is formal slope arithmetic;
-equality is discharged by the broadest boundary decomposition contract. -/
-theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_margin
+/-- The complete shifted torsion-free generator case for a boundary
+decomposition into factors satisfying a predicate `P`, given that `P` forces
+positive real charge on a positive-rank factor at the cutoff. Strictly below
+the cutoff is formal slope arithmetic; equality is discharged by the
+decomposition contract. No Hodge-index hypothesis appears: whatever justifies
+`hP` stays with the consumer that chose `P`. -/
+theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_pred
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
     (hb : ∀ x y : V, b x y = b y x)
-    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1)
-    (hω : 0 < b ω ω)
     {S : WeakSlopeData t.heart.FullSubcategory}
     (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
     (hHN : S.toWeakStabilityFunction.HasHNProperty)
-    (hboundary : MukaiTilt.HasBoundaryMukaiDecompositionWithMargin m b β ω S)
+    {P : t.heart.FullSubcategory → Prop}
+    (hP : ∀ G : t.heart.FullSubcategory, 0 < S.rank G → S.slope G = b β ω → P G →
+      0 < ((ofAmbient t m).charge b β ω G).re)
+    (hboundary : MukaiTilt.HasBoundaryMukaiDecompositionWith m b β ω S P)
     {F₀ : t.heart.FullSubcategory} (hF₀ : ¬IsZero F₀)
     (hF : F₀ ∈ hnFree S.toWeakStabilityFunction
       ((b β ω : ℝ) : WithTop ℝ)) :
@@ -108,15 +109,104 @@ theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_margin
   rcases hslope.lt_or_eq with hbelow | heq
   · exact Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_lt
       hb hHN hF₀ hF hbelow
-  · obtain ⟨n, hn, G, hclass, hGrank, hGslope, hGmargin⟩ :=
-      hboundary F₀ hF₀ hF heq
-    exact Cpt.mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_margin
-      hb hsigPos hω hn G hclass hGrank hGslope hGmargin
+  · obtain ⟨n, hn, G, hclass, hGrank, hGslope, hGP⟩ := hboundary F₀ hF₀ hF heq
+    exact Cpt.mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_re_pos
+      hb hn G hclass hGrank hGslope fun i ↦ hP (G i) (hGrank i) (hGslope i) (hGP i)
+
+/-- **The exponential Mukai charge is positive on every nonzero object of the
+HN-tilted heart**, for any boundary predicate whose real positivity has been
+proved. The generic HRS assembly reduces this to the two Mukai generator
+theorems. -/
+theorem mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart_of_pred
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    {S : WeakSlopeData t.heart.FullSubcategory}
+    (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
+    (hHN : S.toWeakStabilityFunction.HasHNProperty)
+    (hzero : MukaiTilt.HasDimensionZeroTorsionClasses m b β ω S)
+    {P : t.heart.FullSubcategory → Prop}
+    (hP : ∀ G : t.heart.FullSubcategory, 0 < S.rank G → S.slope G = b β ω → P G →
+      0 < ((ofAmbient t m).charge b β ω G).re)
+    (hboundary : MukaiTilt.HasBoundaryMukaiDecompositionWith m b β ω S P)
+    {X : C}
+    (hX : (S.toWeakStabilityFunction.hnTilt
+      ((b β ω : ℝ) : WithTop ℝ) hHN).heart X)
+    (hX0 : ¬IsZero X) :
+    ambientCharge m b β ω X ∈ semiClosedUpperHalfPlane :=
+  S.toWeakStabilityFunction.mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart
+    ((b β ω : ℝ) : WithTop ℝ) hHN (ambientChargeHom m b β ω)
+    (fun _ hT₀ hT ↦ Cpt.mem_semiClosedUpperHalfPlane_of_hnTors
+      hb hHN hzero hT₀ hT)
+    (fun _ hF₀ hF ↦ Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_pred
+      hb hHN hP hboundary hF₀ hF)
+    hX hX0
+
+/-- **The exponential Mukai charge as a stability function on the tilted
+heart**, for any boundary predicate whose real positivity has been proved. This
+is the parent constructor: every other constructor in this file chooses `P` and
+supplies `hP`. It does not assert an HN property for the new stability
+function. -/
+def tiltStabilityFunctionOfPred
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    {S : WeakSlopeData t.heart.FullSubcategory}
+    (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
+    (hHN : S.toWeakStabilityFunction.HasHNProperty)
+    (hzero : MukaiTilt.HasDimensionZeroTorsionClasses m b β ω S)
+    {P : t.heart.FullSubcategory → Prop}
+    (hP : ∀ G : t.heart.FullSubcategory, 0 < S.rank G → S.slope G = b β ω → P G →
+      0 < ((ofAmbient t m).charge b β ω G).re)
+    (hboundary : MukaiTilt.HasBoundaryMukaiDecompositionWith m b β ω S P) :
+    WeakStabilityCondition.StabilityFunction
+      (S.toWeakStabilityFunction.hnTilt ((b β ω : ℝ) : WithTop ℝ) hHN) :=
+  S.toWeakStabilityFunction.hnTiltStabilityFunction
+    ((b β ω : ℝ) : WithTop ℝ) hHN (ambientChargeHom m b β ω)
+    (fun _ hT₀ hT ↦ Cpt.mem_semiClosedUpperHalfPlane_of_hnTors
+      hb hHN hzero hT₀ hT)
+    (fun _ hF₀ hF ↦ Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_pred
+      hb hHN hP hboundary hF₀ hF)
+
+@[simp]
+theorem tiltStabilityFunctionOfPred_Z
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    {S : WeakSlopeData t.heart.FullSubcategory}
+    (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
+    (hHN : S.toWeakStabilityFunction.HasHNProperty)
+    (hzero : MukaiTilt.HasDimensionZeroTorsionClasses m b β ω S)
+    {P : t.heart.FullSubcategory → Prop}
+    (hP : ∀ G : t.heart.FullSubcategory, 0 < S.rank G → S.slope G = b β ω → P G →
+      0 < ((ofAmbient t m).charge b β ω G).re)
+    (hboundary : MukaiTilt.HasBoundaryMukaiDecompositionWith m b β ω S P) :
+    (Cpt.tiltStabilityFunctionOfPred hb hHN hzero hP hboundary).Z =
+      ambientChargeHom m b β ω := rfl
+
+variable [FiniteDimensional ℝ V]
+
+/-- The complete shifted torsion-free generator case under the exact
+factorwise Hodge margin: `tiltStabilityFunctionOfPred`'s predicate is the
+margin and `re_charge_pos_of_margin` is the positivity proof. -/
+theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_margin
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1)
+    (hω : 0 < b ω ω)
+    {S : WeakSlopeData t.heart.FullSubcategory}
+    (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
+    (hHN : S.toWeakStabilityFunction.HasHNProperty)
+    (hboundary : MukaiTilt.HasBoundaryMukaiDecompositionWithMargin m b β ω S)
+    {F₀ : t.heart.FullSubcategory} (hF₀ : ¬IsZero F₀)
+    (hF : F₀ ∈ hnFree S.toWeakStabilityFunction
+      ((b β ω : ℝ) : WithTop ℝ)) :
+    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane :=
+  Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_pred hb hHN
+    (fun _ hrank hslope hmargin ↦
+      Cpt.re_charge_pos_of_margin hb hsigPos hω hrank hslope hmargin)
+    hboundary hF₀ hF
 
 /-- The complete shifted torsion-free generator case for an arbitrary
-factorwise quadratic lower bound. Strictly below the cutoff is formal slope
-arithmetic; equality is discharged by the supplied factorwise Mukai
-decomposition and the uniform threshold `2δ < ω²`. -/
+factorwise quadratic lower bound: the predicate is `realForm ≥ -δ` and
+`re_charge_pos_of_lower_bound` supplies positivity from `2δ < ω²`. -/
 theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_lower_bound
     (δ : ℝ)
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
@@ -130,20 +220,11 @@ theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_lower_bound
     {F₀ : t.heart.FullSubcategory} (hF₀ : ¬IsZero F₀)
     (hF : F₀ ∈ hnFree S.toWeakStabilityFunction
       ((b β ω : ℝ) : WithTop ℝ)) :
-    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
-  have hrank : 0 < S.rank F₀ := S.rank_pos_of_mem_hnFree hHN hF₀ hF
-  have hslope : S.slope F₀ ≤ b β ω := by
-    have htop := slope_le_of_mem_hnFree hHN hF₀ hF
-    rw [show S.toWeakStabilityFunction.slope F₀ = S.topSlope F₀ from rfl,
-      S.topSlope_of_rank_pos hrank, WithTop.coe_le_coe] at htop
-    exact htop
-  rcases hslope.lt_or_eq with hbelow | heq
-  · exact Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_lt
-      hb hHN hF₀ hF hbelow
-  · obtain ⟨n, hn, G, hclass, hGrank, hGslope, hGsquare⟩ :=
-      hboundary F₀ hF₀ hF heq
-    exact Cpt.mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_lower_bound
-      δ hb hsigPos hω hωδ hn G hclass hGrank hGslope hGsquare
+    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane :=
+  Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_pred hb hHN
+    (fun _ hrank hslope hv ↦
+      Cpt.re_charge_pos_of_lower_bound δ hb hsigPos hω hωδ hrank hslope hv)
+    hboundary hF₀ hF
 
 /-- The K3-normalized shifted-free theorem, obtained from the general lower
 bound with `δ = 1`. -/
@@ -159,14 +240,12 @@ theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree
     {F₀ : t.heart.FullSubcategory} (hF₀ : ¬IsZero F₀)
     (hF : F₀ ∈ hnFree S.toWeakStabilityFunction
       ((b β ω : ℝ) : WithTop ℝ)) :
-    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
-  have hω0 : 0 < b ω ω := by linarith
-  exact Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_lower_bound
-    1 hb hsigPos hω0 (by simpa using hω) hHN hboundary hF₀ hF
+    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane :=
+  Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_lower_bound
+    1 hb hsigPos (by linarith) (by simpa using hω) hHN hboundary hF₀ hF
 
 /-- **The exponential Mukai charge is positive on every nonzero object of the
-HN-tilted heart under the exact factorwise Hodge margin.** This is the broadest
-whole-heart result; lower-bound variants are convenience specializations. -/
+HN-tilted heart under the exact factorwise Hodge margin.** -/
 theorem mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart_of_margin
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
     (hb : ∀ x y : V, b x y = b y x)
@@ -181,18 +260,14 @@ theorem mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart_of_margin
     (hX : (S.toWeakStabilityFunction.hnTilt
       ((b β ω : ℝ) : WithTop ℝ) hHN).heart X)
     (hX0 : ¬IsZero X) :
-    ambientCharge m b β ω X ∈ semiClosedUpperHalfPlane := by
-  exact S.toWeakStabilityFunction.mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart
-    ((b β ω : ℝ) : WithTop ℝ) hHN (ambientChargeHom m b β ω)
-    (fun _ hT₀ hT ↦ Cpt.mem_semiClosedUpperHalfPlane_of_hnTors
-      hb hHN hzero hT₀ hT)
-    (fun _ hF₀ hF ↦ Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_margin
-      hb hsigPos hω hHN hboundary hF₀ hF)
-    hX hX0
+    ambientCharge m b β ω X ∈ semiClosedUpperHalfPlane :=
+  Cpt.mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart_of_pred hb hHN hzero
+    (fun _ hrank hslope hmargin ↦
+      Cpt.re_charge_pos_of_margin hb hsigPos hω hrank hslope hmargin)
+    hboundary hX hX0
 
 /-- **The exponential Mukai charge is positive on every nonzero object of the
-HN-tilted heart under an arbitrary factorwise lower bound.** The generic HRS
-assembly reduces this to the two Mukai generator theorems above. -/
+HN-tilted heart under an arbitrary factorwise lower bound.** -/
 theorem mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart_of_lower_bound
     (δ : ℝ)
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
@@ -208,14 +283,11 @@ theorem mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart_of_lower_bound
     (hX : (S.toWeakStabilityFunction.hnTilt
       ((b β ω : ℝ) : WithTop ℝ) hHN).heart X)
     (hX0 : ¬IsZero X) :
-    ambientCharge m b β ω X ∈ semiClosedUpperHalfPlane := by
-  exact S.toWeakStabilityFunction.mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart
-    ((b β ω : ℝ) : WithTop ℝ) hHN (ambientChargeHom m b β ω)
-    (fun _ hT₀ hT ↦ Cpt.mem_semiClosedUpperHalfPlane_of_hnTors
-      hb hHN hzero hT₀ hT)
-    (fun _ hF₀ hF ↦ Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_lower_bound
-      δ hb hsigPos hω hωδ hHN hboundary hF₀ hF)
-    hX hX0
+    ambientCharge m b β ω X ∈ semiClosedUpperHalfPlane :=
+  Cpt.mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart_of_pred hb hHN hzero
+    (fun _ hrank hslope hv ↦
+      Cpt.re_charge_pos_of_lower_bound δ hb hsigPos hω hωδ hrank hslope hv)
+    hboundary hX hX0
 
 /-- The K3-normalized whole-heart positivity theorem, recovered at `δ = 1`. -/
 theorem mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart
@@ -232,15 +304,13 @@ theorem mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart
     (hX : (S.toWeakStabilityFunction.hnTilt
       ((b β ω : ℝ) : WithTop ℝ) hHN).heart X)
     (hX0 : ¬IsZero X) :
-    ambientCharge m b β ω X ∈ semiClosedUpperHalfPlane := by
-  have hω0 : 0 < b ω ω := by linarith
-  exact Cpt.mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart_of_lower_bound
-    1 hb hsigPos hω0 (by simpa using hω) hHN hzero hboundary hX hX0
+    ambientCharge m b β ω X ∈ semiClosedUpperHalfPlane :=
+  Cpt.mem_semiClosedUpperHalfPlane_of_mem_hnTilt_heart_of_lower_bound
+    1 hb hsigPos (by linarith) (by simpa using hω) hHN hzero hboundary hX hX0
 
 /-- **The exponential Mukai charge as a stability function on the tilted
-heart under the exact factorwise Hodge margin.** This is the parent
-constructor: it assumes only what the numerical Hodge-index proof consumes and
-does not impose a uniform quadratic lower bound. -/
+heart under the exact factorwise Hodge margin.** The predicate is the margin
+of each factor; `re_charge_pos_of_margin` is the only Hodge-index input. -/
 def tiltStabilityFunctionOfMargin
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
     (hb : ∀ x y : V, b x y = b y x)
@@ -253,12 +323,10 @@ def tiltStabilityFunctionOfMargin
     (hboundary : MukaiTilt.HasBoundaryMukaiDecompositionWithMargin m b β ω S) :
     WeakStabilityCondition.StabilityFunction
       (S.toWeakStabilityFunction.hnTilt ((b β ω : ℝ) : WithTop ℝ) hHN) :=
-  S.toWeakStabilityFunction.hnTiltStabilityFunction
-    ((b β ω : ℝ) : WithTop ℝ) hHN (ambientChargeHom m b β ω)
-    (fun _ hT₀ hT ↦ Cpt.mem_semiClosedUpperHalfPlane_of_hnTors
-      hb hHN hzero hT₀ hT)
-    (fun _ hF₀ hF ↦ Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_margin
-      hb hsigPos hω hHN hboundary hF₀ hF)
+  Cpt.tiltStabilityFunctionOfPred hb hHN hzero
+    (fun _ hrank hslope hmargin ↦
+      Cpt.re_charge_pos_of_margin hb hsigPos hω hrank hslope hmargin)
+    hboundary
 
 /-- **The exponential Mukai charge as a stability function on the tilted
 heart, parameterized by a factorwise quadratic lower bound.** This is the
@@ -277,12 +345,10 @@ def tiltStabilityFunctionOfLowerBound
     (hboundary : MukaiTilt.HasBoundaryMukaiDecompositionWithLowerBound m b β ω S δ) :
     WeakStabilityCondition.StabilityFunction
       (S.toWeakStabilityFunction.hnTilt ((b β ω : ℝ) : WithTop ℝ) hHN) :=
-  S.toWeakStabilityFunction.hnTiltStabilityFunction
-    ((b β ω : ℝ) : WithTop ℝ) hHN (ambientChargeHom m b β ω)
-    (fun _ hT₀ hT ↦ Cpt.mem_semiClosedUpperHalfPlane_of_hnTors
-      hb hHN hzero hT₀ hT)
-    (fun _ hF₀ hF ↦ Cpt.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_lower_bound
-      δ hb hsigPos hω hωδ hHN hboundary hF₀ hF)
+  Cpt.tiltStabilityFunctionOfPred hb hHN hzero
+    (fun _ hrank hslope hv ↦
+      Cpt.re_charge_pos_of_lower_bound δ hb hsigPos hω hωδ hrank hslope hv)
+    hboundary
 
 /-- The historical K3-normalized stability-function constructor.
 
@@ -301,9 +367,8 @@ def tiltStabilityFunction
     (hzero : MukaiTilt.HasDimensionZeroTorsionClasses m b β ω S)
     (hboundary : MukaiTilt.HasBoundaryMukaiDecomposition m b β ω S) :
     WeakStabilityCondition.StabilityFunction
-      (S.toWeakStabilityFunction.hnTilt ((b β ω : ℝ) : WithTop ℝ) hHN) := by
-  have hω0 : 0 < b ω ω := by linarith
-  exact Cpt.tiltStabilityFunctionOfLowerBound 1 hb hsigPos hω0 (by simpa using hω)
+      (S.toWeakStabilityFunction.hnTilt ((b β ω : ℝ) : WithTop ℝ) hHN) :=
+  Cpt.tiltStabilityFunctionOfLowerBound 1 hb hsigPos (by linarith) (by simpa using hω)
     hHN hzero hboundary
 
 @[simp]

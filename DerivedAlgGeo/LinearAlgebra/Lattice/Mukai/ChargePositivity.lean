@@ -47,10 +47,10 @@ complement of `ω` is negative semi-definite, which is
 `re_expCharge_pos_of_nonneg` is the non-spherical case: `realForm b v ≥ 0`
 makes the bound positive using only `b ω ω > 0`.
 
-`re_expCharge_pos_of_neg_one` is the spherical case, `realForm b v = -1` — the
-paper's `v(E)² = -2`, halved by this repository's convention (see
-`Mukai/RealForm.lean`). There the bound is `r^2 * b ω ω - 2`, so positivity
-needs `r^2 * b ω ω > 2`.
+`re_expCharge_pos_of_neg_one` admits spherical classes: its hypothesis is only
+`realForm b v ≥ -1` — the paper's `v(E)² ≥ -2`, halved by this repository's
+convention (see `Mukai/RealForm.lean`). At `realForm b v = -1` the bound is
+`r^2 * b ω ω - 2`, so positivity needs `r^2 * b ω ω > 2`.
 
 Bridgeland states the hypothesis as `ω² > 2`. That is sufficient **only because
 `r` is an integer rank**, so `1 ≤ r`: over the reals `0 < r` leaves

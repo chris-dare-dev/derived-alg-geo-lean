@@ -863,6 +863,7 @@ several structures in this repository carried as data (`map_zero`, `map_iso`,
 #print axioms CategoryTheory.Triangulated.StabilityFunction.pullback_obj_injective_of_epi
 #print axioms CategoryTheory.Triangulated.im_nonneg_of_mem_semiClosedUpperHalfPlane
 #print axioms CategoryTheory.Triangulated.add_mem_semiClosedUpperHalfPlane
+#print axioms CategoryTheory.Triangulated.neg_sum_mem_semiClosedUpperHalfPlane_of_im_eq_zero_of_re_pos
 #print axioms CategoryTheory.Triangulated.phaseCross
 #print axioms CategoryTheory.Triangulated.phaseCross_eq_norm_mul_sin
 #print axioms CategoryTheory.Triangulated.phaseCross_nonneg_of_arg_le

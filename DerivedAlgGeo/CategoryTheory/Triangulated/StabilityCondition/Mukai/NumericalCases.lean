@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Charge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.PhaseGeometry
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
 
 /-!
@@ -54,15 +55,21 @@ With `v = (r, c, s)`, writing `Im Z = ω·(c - r•β)`:
 | curve torsion, or free above the cutoff | `0 < ω·(c - r•β)` | `Z v` upper half plane |
 | torsion in dimension zero | `r = 0`, `c = 0`, `0 < s` | `Z v` negative real axis |
 | torsion-free below the cutoff | `ω·(c - r•β) < 0` | `Z (-v)` upper half plane |
-| the boundary | `ω·(c - r•β) = 0`, Hodge index, Bogomolov | `Z (-v)` negative real axis |
+| the boundary | `ω·(c - r•β) = 0`, Hodge index, factor bound | `Z (-v)` negative real axis |
 
 The first and third are the same fact read at `v` and at `-v`; they are stated
 separately because the caller reaches them from opposite sides of the cutoff.
+The factor bound of the fourth row enters only as a hypothesis. In Bridgeland's
+K3 argument it is Lemma 5.1 (Serre duality and Riemann--Roch for a stable
+sheaf); on a general surface it is the Bogomolov--Gieseker inequality.
 
 ## Main results
 
 `Mukai.expCharge_neg` — `Z(-v) = -Z(v)`, what the shift costs — is derived
 upstream from `Mukai.expChargeHom` in the numerical Mukai layer.
+The additive step, `neg_sum_mem_semiClosedUpperHalfPlane_of_im_eq_zero_of_re_pos`,
+lives upstream in `PhaseGeometry.lean`; the factorwise theorems below only
+supply `Re > 0` per factor before calling it.
 
 * `mem_semiClosedUpperHalfPlane_of_apply_sub_smul_pos` — cases 1 and 3.
 * `mem_semiClosedUpperHalfPlane_of_dimension_zero` — case 2.
@@ -228,8 +235,6 @@ theorem neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_margin
     (him : ∀ i, (Mukai.expCharge b β ω (v i)).im = 0)
     (hmargin : ∀ i, 0 < 2 * Mukai.realForm b (v i) + (v i).1 ^ 2 * b ω ω) :
     Mukai.expCharge b β ω (-(∑ i, v i)) ∈ semiClosedUpperHalfPlane := by
-  classical
-  let i₀ : Fin n := ⟨0, hn⟩
   have hre : ∀ i, 0 < (Mukai.expCharge b β ω (v i)).re := fun i ↦
     Mukai.re_expCharge_pos_of_boundary_margin b β ω hb hsigPos hω (hr i) (him i)
       (hmargin i)
@@ -237,21 +242,8 @@ theorem neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_margin
       Mukai.expCharge b β ω (∑ i, v i) = ∑ i, Mukai.expCharge b β ω (v i) := by
     simpa only [Mukai.expChargeHom_apply] using
       map_sum (Mukai.expChargeHom b β ω) v Finset.univ
-  refine mem_semiClosedUpperHalfPlane_of_im_zero_of_re_neg ?_ ?_
-  · rw [Mukai.expCharge_neg b β ω, Complex.neg_im, hcharge_sum]
-    have him_sum : (∑ i, Mukai.expCharge b β ω (v i)).im =
-        ∑ i, (Mukai.expCharge b β ω (v i)).im := by
-      simpa only [show ∀ z : ℂ, Complex.imAddGroupHom z = z.im from fun _ ↦ rfl] using
-        map_sum Complex.imAddGroupHom (fun i ↦ Mukai.expCharge b β ω (v i)) Finset.univ
-    rw [him_sum]
-    simp [him]
-  · rw [Mukai.expCharge_neg b β ω, Complex.neg_re, hcharge_sum]
-    have hre_sum : (∑ i, Mukai.expCharge b β ω (v i)).re =
-        ∑ i, (Mukai.expCharge b β ω (v i)).re := by
-      simpa only [show ∀ z : ℂ, Complex.reAddGroupHom z = z.re from fun _ ↦ rfl] using
-        map_sum Complex.reAddGroupHom (fun i ↦ Mukai.expCharge b β ω (v i)) Finset.univ
-    rw [hre_sum]
-    exact neg_neg_of_pos (Finset.sum_pos (fun i _ ↦ hre i) ⟨i₀, Finset.mem_univ i₀⟩)
+  rw [Mukai.expCharge_neg b β ω, hcharge_sum]
+  exact neg_sum_mem_semiClosedUpperHalfPlane_of_im_eq_zero_of_re_pos hn _ him hre
 
 /-- **A nonempty boundary sum with an arbitrary uniform lower bound.**
 

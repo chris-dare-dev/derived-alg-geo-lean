@@ -14,8 +14,7 @@ remain before the exponential charge is a stability function:
 * a nonzero rank-and-degree-zero torsion object has zero-dimensional Mukai
   class `(0, 0, s)` with `s > 0`;
 * an object on the torsion-free boundary has a finite, nonempty decomposition
-  into positive-rank boundary classes satisfying a supplied quadratic lower
-  bound.
+  into positive-rank boundary factors satisfying a supplied predicate.
 
 This file names those obligations without adding them to `MukaiChargeData` or
 `MukaiWeakSlopeCompat`. They are object-classification results, not part of the
@@ -27,10 +26,13 @@ The contracts are propositions rather than a bundled structure. They can be
 proved independently, and consumers that need only one do not acquire the
 other as an artificial field.
 
-The most general boundary contract records the exact positive Hodge margin of
-each factor. A second contract packages the common geometric situation in
-which every factor satisfies one uniform lower bound `realForm ≥ -δ`. The K3
-contract is only the child specialization `δ = 1`.
+The boundary contract is parameterized by a predicate on the factors:
+`HasBoundaryMukaiDecompositionWith P` asks only for a nonempty decomposition
+into positive-rank factors at the cutoff, each satisfying `P`. Which predicate
+a surface can supply, and why it forces `Re Z > 0`, is decided by the consumer;
+`Mukai/Tilting.lean` proves it for the exact Hodge margin and for a uniform
+lower bound `realForm ≥ -δ`. The margin and `δ` contracts are abbreviations of
+the parent, and the K3 contract is only the child specialization `δ = 1`.
 -/
 
 noncomputable section
@@ -64,20 +66,25 @@ def HasDimensionZeroTorsionClasses
     ∃ s : ℝ, 0 < s ∧
       (MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of T₀) = ((0 : ℝ), (0 : V), s)
 
-/-- **The factorwise input under the exact boundary margin.**
+/-- **Boundary decomposition into factors satisfying a predicate.**
 
-This is the broadest geometric contract consumed by the Hodge-index assembly:
-after decomposing a boundary object, every positive-rank factor must make
+This is the parent contract of the boundary case. A nonzero object of the
+torsion-free class sitting exactly on the cutoff must admit a nonempty finite
+family of factors whose Mukai classes sum to its class, each of positive rank,
+each on the cutoff, and each satisfying `P`. Positive rank and the cutoff slope
+are what put every factor on `Im Z = 0`; they are not surface-specific. The
+predicate `P` is the only surface-specific input, and the contract does not say
+how `P` forces `Re Z > 0`: a consumer proves that separately and hands it to
+`MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_pred`.
 
-`2 * realForm b v + rank(v)² * b ω ω`
-
-strictly positive. Different factors may use different bounds, and no
-integrality estimate or global constant is encoded. Surface-specific APIs can
-prove this directly or derive it from a more recognizable inequality such as
-`realForm ≥ -δ`. -/
-def HasBoundaryMukaiDecompositionWithMargin
+For coherent sheaves the factors are the Jordan--Hölder factors of a
+`μ`-semistable sheaf (an object of the torsion-free class whose slope equals
+the cutoff is forced to be semistable), and `P` records whatever bound the
+surface provides for a stable sheaf. Different surfaces differ only in `P`. -/
+def HasBoundaryMukaiDecompositionWith
     (m : K₀ C →+ Mukai.RealExtension V) (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
-    (β ω : V) (S : WeakSlopeData t.heart.FullSubcategory) : Prop :=
+    (β ω : V) (S : WeakSlopeData t.heart.FullSubcategory)
+    (P : t.heart.FullSubcategory → Prop) : Prop :=
   ∀ (F₀ : t.heart.FullSubcategory), ¬IsZero F₀ →
     F₀ ∈ WeakStabilityFunctionOn.hnFree S.toWeakStabilityFunction
       ((b β ω : ℝ) : WithTop ℝ) →
@@ -87,15 +94,29 @@ def HasBoundaryMukaiDecompositionWithMargin
           ∑ i, (MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of (G i)) ∧
         (∀ i, 0 < S.rank (G i)) ∧
         (∀ i, S.slope (G i) = b β ω) ∧
-        (∀ i, 0 < 2 * Mukai.realForm b
-            ((MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of (G i))) +
-          ((MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of (G i))).1 ^ 2 * b ω ω)
+        (∀ i, P (G i))
+
+/-- **The factorwise input under the exact boundary margin.**
+
+The predicate is the exact quantity the Hodge-index estimate places below
+`2 * r * Re Z`:
+
+`0 < 2 * realForm b v + rank(v)² * b ω ω`.
+
+Different factors may use different bounds, and no integrality estimate or
+global constant is encoded. Surface-specific APIs can prove this directly or
+derive it from a more recognizable inequality such as `realForm ≥ -δ`. -/
+def HasBoundaryMukaiDecompositionWithMargin
+    (m : K₀ C →+ Mukai.RealExtension V) (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
+    (β ω : V) (S : WeakSlopeData t.heart.FullSubcategory) : Prop :=
+  HasBoundaryMukaiDecompositionWith m b β ω S fun G ↦
+    0 < 2 * Mukai.realForm b ((MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of G)) +
+      ((MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of G)).1 ^ 2 * b ω ω
 
 /-- **The factorwise Mukai input at the torsion-free boundary, with an
 arbitrary lower bound.**
 
-The class equality is what additivity uses. Every factor is required to have
-positive rank, the cutoff slope, and `realForm` at least `-δ`. No stability
+Every factor is required to have `realForm` at least `-δ`. No stability
 predicate is invented here: once a geometric Jordan--Hölder API exists, its
 stable factors should be used to prove this proposition.
 
@@ -105,17 +126,8 @@ It remains factorwise because a quadratic lower bound is not additive. -/
 def HasBoundaryMukaiDecompositionWithLowerBound
     (m : K₀ C →+ Mukai.RealExtension V) (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
     (β ω : V) (S : WeakSlopeData t.heart.FullSubcategory) (δ : ℝ) : Prop :=
-  ∀ (F₀ : t.heart.FullSubcategory), ¬IsZero F₀ →
-    F₀ ∈ WeakStabilityFunctionOn.hnFree S.toWeakStabilityFunction
-      ((b β ω : ℝ) : WithTop ℝ) →
-    S.slope F₀ = b β ω →
-    ∃ (n : ℕ) (_hn : 0 < n) (G : Fin n → t.heart.FullSubcategory),
-      (MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of F₀) =
-          ∑ i, (MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of (G i)) ∧
-        (∀ i, 0 < S.rank (G i)) ∧
-        (∀ i, S.slope (G i) = b β ω) ∧
-        (∀ i, -δ ≤ Mukai.realForm b
-          ((MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of (G i))))
+  HasBoundaryMukaiDecompositionWith m b β ω S fun G ↦
+    -δ ≤ Mukai.realForm b ((MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of G))
 
 /-- The historical K3-normalized boundary contract.
 
