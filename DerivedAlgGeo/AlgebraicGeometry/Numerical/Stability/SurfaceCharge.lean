@@ -128,7 +128,6 @@ theorem centralCharge_apply (a : ℝ) (E : N) :
         + (a * Complex.I) * Complex.ofReal (D.degree E) := rfl
 
 /-- Additivity gives the neutral-element law needed by charge consumers. -/
-@[simp]
 theorem centralCharge_zero (a : ℝ) : D.centralCharge a 0 = 0 :=
   (D.centralCharge a).map_zero
 

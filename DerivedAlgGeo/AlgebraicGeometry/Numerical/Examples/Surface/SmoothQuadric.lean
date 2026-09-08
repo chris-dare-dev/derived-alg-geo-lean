@@ -170,24 +170,17 @@ theorem basis_mul_mem (p q : Fin 4) :
   · simpa using (mem_gradedPiece (b := (basis : Fin 4 → Ring)) (w := weight) 2)
   · simpa using (mem_gradedPiece (b := (basis : Fin 4 → Ring)) (w := weight) 3)
   · simpa using (mem_gradedPiece (b := (basis : Fin 4 → Ring)) (w := weight) 1)
-  · simpa using (Submodule.zero_mem
-      (gradedPiece (basis : Fin 4 → Ring) weight 2))
+  · simp
   · simpa using (mem_gradedPiece (b := (basis : Fin 4 → Ring)) (w := weight) 3)
-  · simpa using (Submodule.zero_mem
-      (gradedPiece (basis : Fin 4 → Ring) weight 3))
+  · simp
   · simpa using (mem_gradedPiece (b := (basis : Fin 4 → Ring)) (w := weight) 2)
   · simpa using (mem_gradedPiece (b := (basis : Fin 4 → Ring)) (w := weight) 3)
-  · simpa using (Submodule.zero_mem
-      (gradedPiece (basis : Fin 4 → Ring) weight 2))
-  · simpa using (Submodule.zero_mem
-      (gradedPiece (basis : Fin 4 → Ring) weight 3))
+  · simp
+  · simp
   · simpa using (mem_gradedPiece (b := (basis : Fin 4 → Ring)) (w := weight) 3)
-  · simpa using (Submodule.zero_mem
-      (gradedPiece (basis : Fin 4 → Ring) weight 3))
-  · simpa using (Submodule.zero_mem
-      (gradedPiece (basis : Fin 4 → Ring) weight 3))
-  · simpa using (Submodule.zero_mem
-      (gradedPiece (basis : Fin 4 → Ring) weight 4))
+  · simp
+  · simp
+  · simp
 
 /-- Integration extracts the coefficient of `f₁f₂`. -/
 def degree : Ring →ₗ[ℚ] ℚ where
@@ -211,9 +204,9 @@ theorem degree_pointQ : degree pointQ = 1 := rfl
 theorem degree_basis_of_ne (i : Fin 4) (hi : weight i ≠ 2) :
     degree (basis i) = 0 := by
   fin_cases i
-  · simpa using degree_one
-  · simpa using degree_rulingOneQ
-  · simpa using degree_rulingTwoQ
+  · simp
+  · simp
+  · simp
   · exact (hi rfl).elim
 
 /-- The rational numerical intersection ring of the smooth quadric. -/
@@ -225,7 +218,6 @@ def numericalRing : NumericalRingData 2 Ring :=
         (w := weight) 0))
     basis_mul_mem degree degree_basis_of_ne
 
-@[simp]
 theorem degree_ruling_product : numericalRing.degree (rulingOneQ * rulingTwoQ) = 1 := by
   rw [rulingOneQ_mul_rulingTwoQ]
   rfl
@@ -365,7 +357,6 @@ theorem numericalVariety_satisfiesHRR : numericalVariety.SatisfiesHRR := by
 /-- The Segre polarization `f₁+f₂` in the rational intersection ring. -/
 def segreQ : Ring := rulingOneQ + rulingTwoQ
 
-@[simp]
 theorem segreQ_eq : segreQ = (((0, 1), (1, 0)) : Ring) := by
   ext <;> norm_num [segreQ, rulingOneQ, rulingTwoQ]
 

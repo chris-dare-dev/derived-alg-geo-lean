@@ -14,17 +14,39 @@ import Mathlib.Data.Fin.VecNotation
 
 This file instantiates the intrinsic divisorial surface construction for
 `ℙ²`.  Its divisor space is one-dimensional, with the hyperplane class `H`
-normalized by `H² = 1`.  Both the explicit projective-family coordinates and
-the existing `SurfaceNum` presentation carry a full `Surface.ChernCharacter`,
-and their comparison is made before choosing `B` and `omega`.
+normalized by `H² = 1`.  Two class carriers carry a full
+`Surface.ChernCharacter`: a placeholder integral triple `(r, c, v)` and the
+existing `SurfaceNum` presentation.  Their comparison is made before choosing
+`B` and `omega`.
+
+## What is, and is not, compared here
+
+The two carriers have identical coordinates: on both, `ch₂ = c/2 + v`, and
+the comparison map `p2ProjectiveToSurface` is the identity on coordinates.
+The theorem `p2ProjectiveCharge_eq_surfaceCharge` is therefore an instance of
+`ChernCharacter.Pullback.centralCharge_eq` applied to an identity witness; it
+is **not** a comparison between Li's image lattice `Λ_ι` and the surface
+lattice, because nothing in this file is `Λ_ι` or `v_ι`.  The mathematical
+content is the identity `-∫ exp(-(b + i a) H) ch = Z_{aH, bH}`, which is
+`Surface.ChargeCoordinates.centralCharge_twistByScalar_apply` and holds on
+every polarised surface; `p2ProjectiveCharge_apply` records it in the
+`(r, c, v)` coordinates.  The only `ℙ²`-specific input is `H² = 1`, which makes
+the compressed degree `H · ch₁` equal to the full first Chern class.
+
+The exponential presentation is the projective-space charge of the
+projective-family construction for the identity embedding `ℙ² ⊂ ℙ²`, the one
+case in which no Todd correction appears (arXiv:2607.28411v1, (5.5) and
+Remark 6.3).  For any other embedding the pulled-back charge is not of this
+form until the GRR/Todd term has been computed.
 
 The older scalar `Surface.ChargeCoordinates` objects are derived compatibility
 views.  Thus the projective-plane charge is a child of the same parent as the
 smooth-quadric charge, rather than a parent or a separate charge polynomial.
 
-The adapter is still only arithmetic.  It does not claim that the source
-carrier is `K₀(ℙ²)`, nor does it provide the geometric family map or the C1/C2
-properties needed by the eventual stability comparison.
+The adapter is only arithmetic.  It does not claim that either carrier is
+`K₀(ℙ²)` or `Λ_ι`, does not compare stability conditions, hearts, or slicings,
+and does not provide the geometric family map or the C1/C2 properties needed
+by the eventual stability comparison.
 -/
 
 open Complex
@@ -64,10 +86,13 @@ theorem p2Hyperplane_square :
 
 /-! ### The two full Chern-character presentations -/
 
-/-- The integral `(r, c, v)` coordinates used on the projective-family side.
+/-- A placeholder integral `(r, c, v)` carrier for the exponential
+presentation of the charge.
 
-This is intentionally not an alias of `SurfaceNum`: the adapter below must
-carry an explicit source-to-target map. -/
+It has the same coordinates as `SurfaceNum` (`ch₂ = c/2 + v` on both) and is
+a separate Lean type only so that the adapter below carries an explicit
+source-to-target map, where a geometric class map can later be substituted.
+It is not Li's image lattice `Λ_ι` and carries no information about `K₀(ℙ²)`. -/
 abbrev P2ProjectiveCoordinates : Type := ℤ × ℤ × ℤ
 
 /-- The full Chern character on the explicit projective-family coordinates. -/
@@ -423,8 +448,10 @@ a specialization of the parent parameter space. -/
 def p2Parameters (a b : ℝ) : Surface.StabilityParameters P2Divisor :=
   Surface.StabilityParameters.rankOne p2Hyperplane a b
 
-/-- Li's projective-space charge on the `(r, c, v)` carrier, instantiated from
-the intrinsic divisorial parent. -/
+/-- The divisorial parent charge on the placeholder `(r, c, v)` carrier at
+`B = bH`, `omega = aH`.  Its expansion `p2ProjectiveCharge_apply` is the
+projective-space exponential `-∫ exp(-(b + i a) H) ch`; the carrier is not
+Li's image lattice. -/
 noncomputable def p2ProjectiveCharge (a b : ℝ) :
     P2ProjectiveCoordinates →+ ℂ :=
   p2ProjectiveChernCharacter.centralCharge p2DivisorSpace (p2Parameters a b)
@@ -469,7 +496,6 @@ theorem p2ProjectiveWallFamily_charge (a b : ℝ)
   rw [hparameters]
 
 /-- The projective charge respects the additive zero class. -/
-@[simp]
 theorem p2ProjectiveCharge_zero (a b : ℝ) :
     p2ProjectiveCharge a b 0 = 0 :=
   (p2ProjectiveCharge a b).map_zero
@@ -491,10 +517,13 @@ theorem p2SurfaceCharge_eq_BFieldCharge (a : ℝ) (β : ℚ) (E : SurfaceNum) :
     (Surface.NumericalRealization.centralCharge_eq_ofNumericalDataB
       p2NumericalRealization p2Polarization (p2BField β) a E)
 
-/-- Li's charge is the standard surface charge under the identity parameter map.
+/-- The two presentations of the parent charge agree under the identity
+parameter map and the coordinate map `p2ProjectiveToSurface`.
 
-The only nontrivial map here is the explicit map between the two numerical
-class presentations. -/
+This is `ChernCharacter.Pullback.centralCharge_eq` for the identity-on-
+coordinates witness `p2ChernCharacterPullback`; it compares two Lean carriers
+with the same coordinates, not two different lattices.  See the module
+docstring for what this does and does not establish. -/
 theorem p2ProjectiveCharge_eq_surfaceCharge (a b : ℝ)
     (E : P2ProjectiveCoordinates) :
     p2ProjectiveCharge a b E =
@@ -503,7 +532,9 @@ theorem p2ProjectiveCharge_eq_surfaceCharge (a b : ℝ)
     (Surface.ChernCharacter.Pullback.centralCharge_eq
       p2ChernCharacterPullback p2DivisorSpace (p2Parameters a b) E)
 
-/-- Li's exponential notation expanded in the projective `(r,c,v)` coordinates. -/
+/-- The projective-space exponential `-∫ exp(-(b + i a) H) ch` in the
+`(r, c, v)` coordinates: the surface charge at `B = bH`, `omega = aH` equals the
+exponential presentation with `H² = 1`. -/
 @[simp]
 theorem p2ProjectiveCharge_apply (a b : ℝ) (E : P2ProjectiveCoordinates) :
     p2ProjectiveCharge a b E =

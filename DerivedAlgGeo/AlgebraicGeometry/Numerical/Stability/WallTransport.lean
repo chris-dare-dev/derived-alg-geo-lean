@@ -65,6 +65,17 @@ Every declaration quantifies over `N`. Nothing here says a wall is a wall *for
 an object*, that an object changes semistability across one, or anything about
 mass or `Hom`.
 
+## This is the `H`-slice, not the full wall family
+
+`toNumClass` keeps only `∫c₁·H`, so on a surface of Picard rank greater than
+one it discards the components of `c₁` orthogonal to `H`. The resulting
+`wallChargeFamily` is the `(s,t)`-plane `B = sH`, `ω = tH` of the divisorial
+family, and nothing more; two classes with different `c₁` but the same
+`H`-degree are indistinguishable here (Altavilla, arXiv:1905.10636, §2.2).
+The arbitrary-`(B,ω)` family lives in `DivisorialWallSlice.lean`, and
+`DivisorialWallTransport.lean` proves that this file's family is its rank-one
+reindexing.
+
 ## Main results
 
 * `Surface.toNumClass` and its three component lemmas, plus `toNumClass_add`.

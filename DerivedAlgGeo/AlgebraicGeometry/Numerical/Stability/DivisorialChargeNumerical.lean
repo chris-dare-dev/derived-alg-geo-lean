@@ -150,7 +150,7 @@ theorem twist_chTwo_eq (B : BField V.ring) (E : N) :
       algebraMap ℚ A (1 / 2) * algebraMap ℚ A (V.rank E : ℚ) * B.cls ^ 2 =
         algebraMap ℚ A ((1 / 2) * (V.rank E : ℚ)) * B.cls ^ 2 := by
     rw [map_mul]
-  rw [hquadratic, NumericalRingData.degree_algebraMap_mul]
+  rw [hquadratic, NumericalRingData.degree_algebraMap_mul, ← pow_two]
   push_cast
   ring
 

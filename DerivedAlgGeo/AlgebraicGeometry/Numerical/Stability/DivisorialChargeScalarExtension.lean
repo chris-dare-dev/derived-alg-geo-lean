@@ -122,7 +122,7 @@ theorem pair_tmul (a b : ℝ) (x y : S.piece 1) :
 theorem pair_ofRational (x y : S.piece 1) :
     (divisorSpace S).pair (ofRational S x) (ofRational S y) =
       ((S.degree (x.1 * y.1) : ℚ) : ℝ) := by
-  simpa [ofRational] using pair_tmul S (1 : ℝ) (1 : ℝ) x y
+  simp [ofRational, pair_tmul]
 
 end RealDivisorClass
 
@@ -270,7 +270,6 @@ variable (R : NumericalRealization V.ring (D := D))
 
 /-- The concrete first Chern class is the image of the canonical
 scalar-extended first Chern class. -/
-@[simp]
 theorem map_chernCharacter_chOne (E : N) :
     R.extendDivisorClass ((chernCharacter (V := V)).chOne E) =
       R.chernCharacter.chOne E := by

@@ -11,6 +11,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialCharge
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeNumerical
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeScalarExtension
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallSlice
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallTransport
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.TwistedChern
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.WallTransport
 

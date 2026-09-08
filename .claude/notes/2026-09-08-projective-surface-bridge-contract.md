@@ -32,8 +32,15 @@ The relevant source locations in that v1 artifact are:
   distinguished component;
 * Lemma 6.5 (`lem:Numerical Data Equal`) and the following Theorem 6.8,
   embedding independence of the numerical data and component;
-* Proposition 7.6 (`prop:MassHomBoundSurfaces`), the surface comparison in the
-  complements section.
+* Proposition 7.6 (`prop:MassHomBoundSurfaces`), the mass-Hom bound for
+  surfaces. The surface comparison itself is the paragraph preceding it in
+  Section 7.2: for a geometric condition in the distinguished component,
+  the source cites Dell, *Stability conditions on free abelian quotients*
+  (Épijournal Géom. Algébrique 9 (2025), art. 16), Theorem 5.10 for the
+  `GL⁺₂(ℝ)`-classification of geometric conditions, Proposition 5.35 for
+  the full support property with respect to `K_num(X)`, and Theorem 5.36
+  for connectedness of the geometric conditions. None of these is proved in
+  the projective-family paper; Dell is the owner of that classification.
 
 The handoff's labels “Theorem 6.8”, “Proposition 7.6”, and “Theorem 10.3”
 refer to the numbered results in the full v1 PDF. The arXiv HTML conversion
@@ -80,11 +87,15 @@ Throughout this note:
   literal expansion would have the opposite sign in the imaginary part; the
   explicit real/imaginary formula and the upper-half-plane convention fix the
   intended sign used by this contract.
-* Consequently, on `P²` with its standard hyperplane class, Li's parameters
-  specialize to the standard surface parameters by the identity map
-  `(a,b) ↦ (ω,B) = (aH,bH)`. The two central charges are equal, not complex
-  conjugate. If an embedding has `H = mH_X`, the scalar coordinates relative
-  to `H_X` instead rescale to `(ma,mb)`.
+* Consequently, on `P²` with its standard hyperplane class and the identity
+  embedding, Li's parameters specialize to the standard surface parameters by
+  the identity map `(a,b) ↦ (ω,B) = (aH,bH)`. The two central charges are
+  equal, not complex conjugate. The identity embedding is the only case in
+  which no Todd correction appears: for any other embedding with
+  `H = mH_X`, the exponential factor alone rescales the scalar coordinates
+  relative to `H_X` to `(ma,mb)`, but by Remark 6.3 the pulled-back charge
+  is then *not* `-∫ exp(-(mb + i ma) H_X) ch`; the GRR/Todd term of C1–C2
+  must be computed first.
 * The standard heart is
   `Coh^{ω,B}(X) = ⟨F_{ω,B}[1], T_{ω,B}⟩`, where the torsion pair is cut at
   `μ_{ω,B} = 0`. The surface parameters allow arbitrary ample
@@ -115,7 +126,10 @@ lattice `Λ_surf`, supply:
    named upper-triangular normalization;
 5. the hypotheses making the comparison numerical: smoothness, properness,
    the embedding class, and the GRR statement used to identify pushforward
-   coordinates.
+   coordinates, namely `ch(ι_* E) · td(Pⁿ) = ι_*(ch(E) · td_X)`, so that the
+   pushforward class is read through `td(Pⁿ)^{-1}` as well as `td_X`;
+6. the factorization of `v_ι` through `K_num(X)` (used in the proof of
+   Lemma 6.5 through `K_num(D_perf(X))`).
 
 `Λ_surf` must be chosen deliberately. In Picard rank one it can be the full
 three-coordinate surface numerical lattice. In higher Picard rank the Li
@@ -149,10 +163,24 @@ The `td_X` correction in C1 is part of this calculation. The raw pulled-back
 Li charge is not to be rewritten as the untwisted surface exponential charge
 until the Todd factor has been computed and absorbed by a proved coordinate
 change or by `g`. The first test cases are `P²`, `P¹ × P¹` with the Segre
-polarization, and a Picard-rank-one K3 numerical model. The landed `P²`
-arithmetic adapter now proves the central-charge identity with
-`(ω,B) = (aH,bH)`. It still does not define the geometric `vLi` map or the
-identity embedding's stability condition.
+polarization, and a Picard-rank-one K3 numerical model.
+
+What the landed `P²` adapter proves, exactly: the arithmetic identity
+`-∫ exp(-(b + i a)H) ch = Z_{aH,bH}` on a placeholder integral carrier
+`(r,c,v)` that is coordinate-for-coordinate the existing `SurfaceNum`
+presentation (`ch₂ = c/2 + v` on both sides), under the identity map of
+coordinates. It does **not** define Li's `Λ_ι` or `v_ι`, does not compare two
+different lattices, and does not compare stability conditions, hearts, or
+slicings. The general identity behind it is
+`Surface.ChargeCoordinates.centralCharge_twistByScalar_apply`, which holds on
+every polarised surface. The `P²`-specific content is only that `H² = 1`
+makes the compressed and full first Chern class coincide.
+
+Li's parameter domain is `a > a₀`, with `a₀` depending on the Hilbert
+polynomial of the embedding (Theorem 6.2). No Lean parameter space in the
+repository records this threshold; every comparison statement is therefore
+about the full `(a,b)` plane and must be restricted to Li's domain before it
+is read as a statement about Li's stability conditions.
 
 ### C3. Heart and slicing comparison
 
@@ -194,6 +222,27 @@ On the Li side, supply the support form for the pulled-back condition and the
 comparison of that form with the surface form under C1/C2. Geometricity alone
 does not identify support forms or connected components.
 
+Two numerical obligations sit between the landed divisorial layer and this
+comparison and are not yet stated in Lean:
+
+* the Macrì--Schmidt support forms in the full divisor space: the
+  discriminant `Δ = (ch₁)² - 2 ch₀ ch₂` as a quadratic form on the intrinsic
+  `ChernCharacter`, and the two `(ω,B)`-forms `Δ^C_{ω,B} = Δ + C (ω·ch₁^B)²`
+  and `\bar Δ^B_ω = (ω·ch₁^B)² - 2 (ω²) ch₀^B ch₂^B` of Definition 6.12 /
+  Theorem 6.13. Only the compressed `Surface.discrH` exists today, in the
+  `(s,t)` branch;
+* the bridge from the existing `HodgeIndexStatement V P` to the new
+  `OrthogonalSlice.IsHodge` certificate: for an ample `H`, the intrinsic
+  `fullOrthogonal S H` slice is Hodge (positive `H²`, negative definite
+  `H^⊥`). Nothing connects the two certificates yet.
+
+Separately, `Wall.ChargeFamily.wall v w` is the proportionality locus of the
+two charges and is all of the parameter space when `w ∈ ℤ v` or `Z(v) = 0`
+(`wall_self`, `wallValue_zsmul_right`). An *actual* wall additionally needs
+semistable objects with those classes on it (Macrì--Schmidt Proposition
+6.22(7)); that comparison is a stability-condition obligation, not a
+numerical one.
+
 ### C5. Distinguished component
 
 For fixed `H_X`, supply or prove the following path statement:
@@ -205,12 +254,13 @@ component of the chosen numerical stability space.
 ```
 
 The Li source gives embedding-independence of its distinguished component and
-the large-parameter construction. The surface comparison in the complements
-section places the relevant geometric surface conditions in the numerical
-distinguished component, using the classification of geometric surface
-conditions up to the `GL⁺(2,ℝ)`-cover action. The repository's existing
+the large-parameter construction. The paragraph before Proposition 7.6 places
+the relevant geometric surface conditions in the numerical distinguished
+component, using Dell's classification of geometric surface conditions up to
+the `GL⁺(2,ℝ)`-cover action (Dell, Theorem 5.10, Propositions 5.15 and 5.35,
+Theorem 5.36; see the source list above). The repository's existing
 deformation/component APIs can consume such a path, but they do not construct
-this geometric path.
+this geometric path, and the repository does not yet cite or pin Dell.
 
 For Picard rank one, the direct parameter comparison is the first target:
 write `ω = αH` and `B = βH` only after C2 fixes the coordinate map. For higher
@@ -264,10 +314,12 @@ The arithmetic boundary is split across composable components:
   coordinates, and proves that `B = βH` agrees with the scalar notation; and
 * `Numerical/Examples/Surface/ProjectivePlaneCharge.lean` is a concrete
   rank-one child of the divisorial construction. It supplies the divisor
-  space `N¹(P²)_R`, full Chern characters on the `(r,c,v)` projective carrier
-  and the `SurfaceNum` target, their explicit full-character map, the
-  rank-one `p2BField`, and the exact equality of Li's and the standard surface
-  charge presentations;
+  space `N¹(P²)_R`, full Chern characters on a placeholder integral `(r,c,v)`
+  carrier and on the `SurfaceNum` presentation, the coordinate map between
+  them (which is the identity on coordinates), the rank-one `p2BField`, and
+  the arithmetic identity between the exponential presentation
+  `-∫ exp(-(b + i a)H) ch` and the twisted surface presentation `Z_{aH,bH}`.
+  The `(r,c,v)` carrier is **not** Li's image lattice `Λ_ι`; see C2;
 * `Numerical/Stability/DivisorialCharge.lean` supplies the intrinsic
   higher-Picard-rank layer: a real divisor space with symmetric intersection
   form, uncompressed additive Chern-character coordinates, independent
@@ -307,7 +359,17 @@ The arithmetic boundary is split across composable components:
   surface transport as an additive map and pulls back the generic `(s,t)`
   charge family.  The Picard-rank-one K3 model is an explicit child of this
   route.  This is an ordinary-Chern-coordinate wall adapter; a Todd-corrected
-  Mukai charge must remain a separately named class-map adapter.
+  Mukai charge must remain a separately named class-map adapter.  The
+  transport compresses the first Chern class to `H · ch₁`, so on a surface of
+  Picard rank greater than one it is the `H`-slice only, never the full wall
+  family of the surface; and
+* `Numerical/Stability/DivisorialWallTransport.lean` joins the two branches
+  of the hierarchy below.  For any `NumericalRealization`, the compressed
+  `(s,t)` family pulled back through `toNumClassHom` is literally the
+  reindexing of the intrinsic divisorial family along the rank-one slice
+  `B = sH`, `omega = tH` (`wallChargeFamily_eq_rankOne_reindex`).  Every
+  rank-one child therefore reaches both the circle/line/nesting theorems of
+  the `(s,t)` polynomial and the arbitrary-`(B,omega)` divisorial layer.
 
 `NumericalRingData` is presently a rational intersection ring, so its
 arbitrary `BField` is rational. The divisorial layer handles a fully arbitrary
@@ -323,11 +385,11 @@ The shared parent is the construction in `DivisorialCharge.lean`:
 `StabilityParameters` determine the intrinsic central charge. Both `P²` and
 the smooth quadric instantiate those parent inputs; neither example owns the
 general formula. In Lean this is structural composition rather than nominal
-object-oriented subclassing. The two `P²` class carriers remain intentionally
-distinct and are connected by a full-character `Pullback` before choosing
-`B` and `omega`, so one comparison theorem transports every parameter choice.
-This leaves room for a later geometric `vLi` map without identifying
-arithmetic coordinates with `K₀(P²)` prematurely.
+object-oriented subclassing. The two `P²` class carriers are distinct Lean
+types with identical coordinates, connected by a full-character `Pullback`
+before choosing `B` and `omega`, so one comparison theorem transports every
+parameter choice. The carrier distinction is a placeholder for a later
+geometric `vLi` map; it carries no information about `K₀(P²)` or `Λ_ι` today.
 
 This module is intentionally still not a geometric `K₀(ℙ²)` image, a
 stability condition, a heart, or a source-backed projective-family theorem.
@@ -365,9 +427,10 @@ extrapolating the `P²` coordinate record:
   `H=(1,2)` because the compressed invariant `H.ch₁` can otherwise identify
   distinct divisor classes. This is direct evidence against making the
   compressed degree the source of truth.
-* [Mizuno--Yoshida, arXiv:2502.18894](https://arxiv.org/abs/2502.18894)
-  treats the blow-up of `P²` at two points. It chooses an orthogonal basis
-  `H,G₁,G₂` of signature `(1,2)` and uses
+* [Mizuno--Yoshida, arXiv:2502.18894v2](https://arxiv.org/abs/2502.18894v2)
+  (v2, 2025-05-21) treats the blow-up of `P²` at two points. Its Section 2.1
+  chooses an orthogonal basis `H,G₁,G₂` with `H² = 1`, `G₁² = G₂² = -1`
+  (signature `(1,2)`) and uses
   `D=sH+u₁G₁+u₂G₂`, `omega=tH`, producing a four-real-parameter slice. The
   number of orthogonal `u` coordinates grows with Picard rank, while the
   intrinsic data remain one divisor vector `B` and one ample vector `omega`.
@@ -409,11 +472,21 @@ Wall.ChargeFamily P N                         arbitrary variety/family root
       `- SmoothQuadric.wallChargeFamily       U=R, G(u)=u(f1-f2)
 ```
 
+The two branches are joined by `wallChargeFamily_eq_rankOne_reindex` in
+`DivisorialWallTransport.lean`: for every `NumericalRealization`, the left
+branch is the reindexing of the right branch along `B = sH`, `omega = tH`.
+Until that theorem existed the hierarchy was a forest with two independent
+formula owners (`reZ`/`imZ` and `ChernCharacter.centralCharge`); the theorem
+is what makes it one tree.
+
 This is structural composition and pullback, not nominal object-oriented
 inheritance.  It leaves the universal wall determinant usable for future
 threefold/BMT charges and for any smooth projective variety, while keeping
 circle and nesting calculations where their special polynomial form is
-actually available.
+actually available.  A dependent variant `charge : (p : P) → N p →+ ℂ`, for a
+local system of lattices with monodromy, is not modelled and is not needed
+for the projective-family case, where one lattice serves the whole family
+(Theorem 10.3).
 
 The next honest coding boundary is one of:
 

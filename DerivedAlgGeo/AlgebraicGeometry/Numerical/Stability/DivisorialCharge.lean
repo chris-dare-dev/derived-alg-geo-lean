@@ -70,7 +70,6 @@ variable (S : DivisorSpace D)
 /-- Dot notation for the intersection pairing. -/
 def pair (x y : D) : ℝ := S.intersection x y
 
-@[simp]
 theorem pair_apply (x y : D) : S.pair x y = S.intersection x y := rfl
 
 /-- Symmetry of the numerical intersection product. -/
@@ -348,7 +347,8 @@ theorem centralCharge_apply_twisted
         + Complex.ofReal (S.pair P.omega P.omega * ch.rank E / 2)
         + Complex.I * Complex.ofReal
             (S.pair P.omega ((ch.twist S P.B).chOne E)) := by
-  simp [centralCharge, ChargeCoordinates.centralCharge_apply, chargeCoordinates]
+  simp [centralCharge, ChargeCoordinates.centralCharge_apply, chargeCoordinates,
+    DivisorSpace.pair]
 
 /-- Expansion in untwisted Chern-character coordinates.
 

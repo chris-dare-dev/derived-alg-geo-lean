@@ -85,6 +85,29 @@ composition in the two independent inputs. -/
 theorem reindex_pullback_charge (f : Q → P) (g : M →+ N) (q : Q) (v : M) :
     ((Z.reindex f).pullback g).charge q v = Z.charge (f q) (g v) := rfl
 
+/-! ### Functoriality of reindexing and pullback
+
+Reindexing is contravariant in the parameter map and pullback is contravariant
+in the class map; the two commute.  All of these are definitional, and they are
+recorded so that a chain of slices and class presentations can be normalised
+to one reindexing of one pullback. -/
+
+@[simp]
+theorem reindex_id : Z.reindex id = Z := rfl
+
+theorem reindex_reindex {R : Type*} (f : Q → P) (g : R → Q) :
+    (Z.reindex f).reindex g = Z.reindex (f ∘ g) := rfl
+
+@[simp]
+theorem pullback_id : Z.pullback (AddMonoidHom.id N) = Z := rfl
+
+theorem pullback_pullback {L : Type*} [AddCommGroup L] (f : M →+ N) (g : L →+ M) :
+    (Z.pullback f).pullback g = Z.pullback (f.comp g) := rfl
+
+/-- Reindexing and pullback act on independent inputs, so they commute. -/
+theorem pullback_reindex (f : Q → P) (g : M →+ N) :
+    (Z.pullback g).reindex f = (Z.reindex f).pullback g := rfl
+
 /-- The real part of the central charge of a class. -/
 def re (p : P) (v : N) : ℝ := (Z.charge p v).re
 
@@ -95,7 +118,14 @@ def im (p : P) (v : N) : ℝ := (Z.charge p v).im
 def wallValue (p : P) (v w : N) : ℝ :=
   Z.re p v * Z.im p w - Z.im p v * Z.re p w
 
-/-- The numerical wall locus of two classes in the parameter space. -/
+/-- The numerical wall locus of two classes in the parameter space.
+
+This is the *numerical* wall (the pseudo-wall of Maciocia, the numerical wall
+of Arcara--Miles): the locus where the two charges are real-proportional.  It
+is the whole parameter space when `w` is an integral multiple of `v`
+(`wall_self`, `wall_add_zsmul_right`) and wherever `Z(v) = 0`.  An actual wall
+additionally needs nonvanishing charges and semistable objects with these
+classes; those hypotheses belong to stability-condition layers, not here. -/
 def wall (v w : N) : Set P := {p | Z.wallValue p v w = 0}
 
 @[simp]
@@ -145,7 +175,6 @@ theorem wallValue_swap (p : P) (v w : N) :
   simp only [wallValue]
   ring
 
-@[simp]
 theorem wall_swap (v w : N) : Z.wall w v = Z.wall v w := by
   ext p
   change Z.wallValue p w v = 0 ↔ Z.wallValue p v w = 0
