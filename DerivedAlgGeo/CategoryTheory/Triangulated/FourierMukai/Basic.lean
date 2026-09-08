@@ -100,6 +100,70 @@ theorem transform_map (C : Correspondence 𝒳 𝒴 𝒵) (K : 𝒵) {E F : 𝒳
       C.push.map ((C.tensor.obj K).map (C.pull.map f)) :=
   rfl
 
+/-- A morphism of kernels induces a natural transformation of transforms. This
+  is the categorical map needed before a cone of kernels can be transported;
+  it uses only the functoriality already present in the abstract correspondence
+  and makes no claim that a suitable kernel morphism or cone exists. -/
+def transformMap (C : Correspondence 𝒳 𝒴 𝒵) {K L : 𝒵} (f : K ⟶ L) :
+    C.transform K ⟶ C.transform L :=
+  Functor.whiskerLeft C.pull (Functor.whiskerRight (C.tensor.map f) C.push)
+
+@[simp]
+theorem transformMap_app (C : Correspondence 𝒳 𝒴 𝒵) {K L : 𝒵} (f : K ⟶ L)
+    (E : 𝒳) :
+    (C.transformMap f).app E = C.push.map ((C.tensor.map f).app (C.pull.obj E)) :=
+  rfl
+
+@[simp]
+theorem transformMap_id (C : Correspondence 𝒳 𝒴 𝒵) (K : 𝒵) :
+    C.transformMap (𝟙 K) = 𝟙 (C.transform K) := by
+  simp [transformMap]
+
+@[simp]
+theorem transformMap_comp (C : Correspondence 𝒳 𝒴 𝒵) {K L M : 𝒵}
+    (f : K ⟶ L) (g : L ⟶ M) :
+    C.transformMap (f ≫ g) = C.transformMap f ≫ C.transformMap g := by
+  simp [transformMap]
+
+/-- The Fourier--Mukai transform as a functor of its kernel.
+
+Packaging `transform` and `transformMap` into one functor is the canonical
+interface for constructions, such as dg cones, which vary the kernel.  It
+also makes the identity and composition laws available through ordinary
+functoriality rather than requiring each consumer to restate them. -/
+def kernelTransform (C : Correspondence 𝒳 𝒴 𝒵) :
+    𝒵 ⥤ (𝒳 ⥤ 𝒴) where
+  obj K := C.transform K
+  map f := C.transformMap f
+  map_id K := C.transformMap_id K
+  map_comp f g := C.transformMap_comp f g
+
+@[simp]
+theorem kernelTransform_obj (C : Correspondence 𝒳 𝒴 𝒵) (K : 𝒵) :
+    C.kernelTransform.obj K = C.transform K := rfl
+
+@[simp]
+theorem kernelTransform_map (C : Correspondence 𝒳 𝒴 𝒵) {K L : 𝒵}
+    (f : K ⟶ L) :
+    C.kernelTransform.map f = C.transformMap f := rfl
+
+/-- Evaluate the kernel-variable transform functor on one source object.
+This is the exact functor whose preservation of a kernel triangle says that
+the corresponding transforms form a pointwise distinguished triangle. -/
+def kernelEvaluation (C : Correspondence 𝒳 𝒴 𝒵) (E : 𝒳) :
+    𝒵 ⥤ 𝒴 :=
+  C.kernelTransform ⋙ (evaluation 𝒳 𝒴).obj E
+
+@[simp]
+theorem kernelEvaluation_obj (C : Correspondence 𝒳 𝒴 𝒵) (E : 𝒳)
+    (K : 𝒵) :
+    (C.kernelEvaluation E).obj K = (C.transform K).obj E := rfl
+
+@[simp]
+theorem kernelEvaluation_map (C : Correspondence 𝒳 𝒴 𝒵) (E : 𝒳)
+    {K L : 𝒵} (f : K ⟶ L) :
+    (C.kernelEvaluation E).map f = (C.transformMap f).app E := rfl
+
 /-- Isomorphic kernels give isomorphic transforms.  This is the only
 comparison between two kernels that holds with no hypothesis on `tensor`; the
 converse is the hard direction and is not asserted anywhere in this file. -/
@@ -107,6 +171,11 @@ def transformMapIso (C : Correspondence 𝒳 𝒴 𝒵) {K L : 𝒵} (e : K ≅ 
     C.transform K ≅ C.transform L :=
   Functor.isoWhiskerLeft C.pull
     (Functor.isoWhiskerRight (C.tensor.mapIso e) C.push)
+
+@[simp]
+theorem transformMapIso_hom (C : Correspondence 𝒳 𝒴 𝒵) {K L : 𝒵} (e : K ≅ L) :
+    (C.transformMapIso e).hom = C.transformMap e.hom := by
+  rfl
 
 @[simp]
 theorem transformMapIso_refl (C : Correspondence 𝒳 𝒴 𝒵) (K : 𝒵) :

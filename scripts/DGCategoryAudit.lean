@@ -370,6 +370,84 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsConeOf.lift_comp_toShift
 #print axioms CategoryTheory.H0.exists_lift_of_comm
 
+-- Functorial dg cones retain the chosen homotopy and the closed cone map.
+-- Their category laws are proved before passage to H⁰.
+#print axioms CategoryTheory.DGCategory.HomotopySquare
+#print axioms CategoryTheory.DGCategory.HomotopySquare.ext
+#print axioms CategoryTheory.DGCategory.HomotopySquare.id
+#print axioms CategoryTheory.DGCategory.HomotopySquare.comp
+#print axioms CategoryTheory.IsConeOf.Morphism
+#print axioms CategoryTheory.IsConeOf.Morphism.a_closed
+#print axioms CategoryTheory.IsConeOf.Morphism.b_closed
+#print axioms CategoryTheory.IsConeOf.Morphism.homotopy
+#print axioms CategoryTheory.IsConeOf.Morphism.homotopy_boundary
+#print axioms CategoryTheory.IsConeOf.Morphism.ext
+#print axioms CategoryTheory.IsConeOf.liftMorphism
+#print axioms CategoryTheory.IsConeOf.Morphism.id
+#print axioms CategoryTheory.IsConeOf.Morphism.compAt
+#print axioms CategoryTheory.IsConeOf.Morphism.comp
+#print axioms CategoryTheory.DGCategory.ConePresentation
+#print axioms CategoryTheory.DGCategory.ConePresentation.source
+#print axioms CategoryTheory.DGCategory.ConePresentation.target
+#print axioms CategoryTheory.DGCategory.ConePresentation.arrow
+#print axioms CategoryTheory.DGCategory.ConePresentation.cone
+#print axioms CategoryTheory.DGCategory.ConePresentation.isCone
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom.source
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom.target
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom.coneMorphism
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom.ext
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom.id
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom.comp
+#print axioms CategoryTheory.DGCategory.ConePresentation.id_source
+#print axioms CategoryTheory.DGCategory.ConePresentation.id_target
+#print axioms CategoryTheory.DGCategory.ConePresentation.comp_source
+#print axioms CategoryTheory.DGCategory.ConePresentation.comp_target
+#print axioms CategoryTheory.IsConeOf.Morphism.toTriangleMorphism
+#print axioms CategoryTheory.IsConeOf.Morphism.toTriangleMorphism_id
+#print axioms CategoryTheory.IsConeOf.Morphism.toTriangleMorphism_compAt
+#print axioms CategoryTheory.H0.coneSourceFunctor
+#print axioms CategoryTheory.H0.coneTargetFunctor
+#print axioms CategoryTheory.H0.coneObjectFunctor
+#print axioms CategoryTheory.H0.coneSourceFunctor_obj
+#print axioms CategoryTheory.H0.coneSourceFunctor_map
+#print axioms CategoryTheory.H0.coneTargetFunctor_obj
+#print axioms CategoryTheory.H0.coneTargetFunctor_map
+#print axioms CategoryTheory.H0.coneObjectFunctor_obj
+#print axioms CategoryTheory.H0.coneObjectFunctor_map
+#print axioms CategoryTheory.H0.coneTriangleFunctor
+#print axioms CategoryTheory.H0.coneTriangleFunctor_obj
+#print axioms CategoryTheory.H0.coneTriangleFunctor_map
+#print axioms CategoryTheory.H0.coneTriangleFunctor_obj_distinguished
+#print axioms CategoryTheory.H0.distinguishedConeTriangleFunctor
+#print axioms CategoryTheory.H0.distinguishedConeTriangleFunctor_obj_val
+
+-- Shift/cone preservation by dg functors is composable at the dg layer and
+-- derives ordinary exactness on H⁰.
+#print axioms CategoryTheory.IsShiftBy.compare_congr_left
+#print axioms CategoryTheory.DGFunctor.PreservesShifts
+#print axioms CategoryTheory.DGFunctor.PreservesShifts.id
+#print axioms CategoryTheory.DGFunctor.PreservesShifts.comp
+#print axioms CategoryTheory.DGFunctor.mapHomotopySquare
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.id
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.comp
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.map_cone_fst
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.map_cone_snd
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.map_cone_toShift
+#print axioms CategoryTheory.DGFunctor.map_shift_inv_eq
+#print axioms CategoryTheory.DGFunctor.map_mapShift
+#print axioms CategoryTheory.DGFunctor.map_compare
+#print axioms CategoryTheory.DGFunctor.shiftCommIso
+#print axioms CategoryTheory.DGFunctor.shiftCommIso_zero_hom_app
+#print axioms CategoryTheory.DGFunctor.shiftCommIso_add_hom_app
+#print axioms CategoryTheory.DGFunctor.commShift
+#print axioms CategoryTheory.DGFunctor.PreservesConeTriangles
+#print axioms CategoryTheory.DGFunctor.preservesConeTriangles_of_preservesChosenCones
+#print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesConeTriangles
+#print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesShifts_and_coneTriangles
+#print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones
+
 -- The instance itself (dg-enhancements-e6, #377): the completion axiom for
 -- arbitrary distinguished triangles, the five axioms H⁰ proves, and the
 -- `Pretriangulated (H0 C)` they assemble into.

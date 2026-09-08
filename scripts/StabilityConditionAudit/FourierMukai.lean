@@ -28,6 +28,16 @@ says that the interface is consistent, not that any functor is of kernel type.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transform
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transform_obj
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transform_map
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMap
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMap_app
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMap_id
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMap_comp
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelTransform
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelTransform_obj
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelTransform_map
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelEvaluation
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelEvaluation_obj
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelEvaluation_map
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMapIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMapIso_refl
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.IsKernelFunctor
@@ -37,6 +47,22 @@ says that the interface is consistent, not that any functor is of kernel type.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.IsKernelFunctor.iso
 #print axioms CategoryTheory.Triangulated.FourierMukai.transform_isTriangulated
 #print axioms CategoryTheory.Triangulated.FourierMukai.transform_additive
+
+/-! ## Fourier--Mukai lane -- enhanced kernel cones -/
+
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.distinguishedConeTriangleFunctor
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.distinguishedConeTriangleFunctor_obj_val
 
 /-! ## Fourier--Mukai lane -- convolution of kernels
 

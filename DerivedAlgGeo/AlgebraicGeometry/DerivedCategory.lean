@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Basic
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.CartierDivisor
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.DivisorSequence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Affine

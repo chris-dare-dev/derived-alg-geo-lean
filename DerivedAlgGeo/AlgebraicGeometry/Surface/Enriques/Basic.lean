@@ -38,16 +38,17 @@ statement carry it even when unused.
 * **It exhibits no Enriques surface.** Nothing here constructs an `X`, a
   `CanonicalSheafData k X 2`, or an `IsEnriquesSurface`; every statement is
   conditional on data nobody has yet produced, exactly as for `IsK3Surface`.
-* **It states no numerical consequence.** Both `H²(X, O_X) = 0` and
+* **It states no geometric numerical consequence.** Both `H²(X, O_X) = 0` and
   `χ(O_X) = 1` reduce to one missing input: Serre duality against the
   non-triviality of `ω_X`. It gives `H²(X, O_X) ≅ H⁰(X, ω_X)^∨ = 0`, because
   a non-trivial torsion line bundle has no sections, and then
   `χ(O_X) = h⁰ - h¹ + h² = 1` needs nothing further. `Duality/Serre/` carries
   that duality as `DerivedStatement` realization data rather than as a
-  theorem, so neither consequence is available at the pin. No numerical
-  shadow exists either: `Numerical/Examples/Surface/` holds `Abelian`, `K3`,
-  `ProjectivePlane`, and `RankOne`, and the Enriques `NumericalVarietyData 2`
-  that would pair with them is not written.
+  theorem, so neither geometric consequence is available at the pin. A
+  separate numerical shadow now exists in
+  `Numerical/Examples/Surface/Enriques.lean`, including a degree-one witness
+  of `td₁ = 0` and `∫td₂ = 1`; no bridge from that numerical model to a
+  geometric `Scheme` or to `IsEnriquesSurface` is claimed.
 * **It does not construct the K3 double cover.** The 2-torsion class
   classically determines an étale double cover with trivial canonical class;
   no covering machinery exists at the pin and none is stated.

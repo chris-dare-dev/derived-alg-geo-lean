@@ -11,6 +11,18 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
 
+/-! ## Full triangulated subcategory triangle lifts -/
+
+#print axioms CategoryTheory.ObjectProperty.OnTriangle
+#print axioms CategoryTheory.ObjectProperty.liftTriangle
+#print axioms CategoryTheory.ObjectProperty.liftTriangleIso
+#print axioms CategoryTheory.ObjectProperty.liftTriangle_distinguished
+#print axioms CategoryTheory.ObjectProperty.liftTriangleMap
+#print axioms CategoryTheory.ObjectProperty.map_liftTriangleMap
+#print axioms CategoryTheory.ObjectProperty.liftTriangleMap_ambient
+#print axioms CategoryTheory.ObjectProperty.liftTriangleMap_id
+#print axioms CategoryTheory.ObjectProperty.liftTriangleMap_comp
+
 /-! ## Cohomology exactness (#146) -/
 
 #print axioms CategoryTheory.Triangulated.Tilting.originalHeartCoh_exact_of_distTriang

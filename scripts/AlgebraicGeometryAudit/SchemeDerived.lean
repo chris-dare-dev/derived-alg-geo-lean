@@ -10,6 +10,51 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
 
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactTriangle
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactTriangle_distinguished
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactTriangle_onBounded
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactBoundedTriangle
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactBoundedTriangleInclusionIso
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactBoundedTriangle_distinguished
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactTriangleMap
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactTriangleMap_id
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactTriangleMap_comp
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactBoundedTriangleMap
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactBoundedTriangleMap_id
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactBoundedTriangleMap_comp
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactBoundedTriangleMap_ambient
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohTwistTriangle
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohTwistTriangle_distinguished
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohTwistBoundedTriangle
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohTwistBoundedTriangleInclusionIso
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohTwistBoundedTriangle_distinguished
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.lineBundleTwistSequence
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.lineBundleTwistSequence_shortExact
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.lineBundleTwistCokernelIso
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.lineBundleTwistTarget_isCoherent
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistSequence
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistSequence_shortExact
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistTriangle
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistTriangle_distinguished
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistBoundedTriangle
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistBoundedTriangle_distinguished
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistBoundedTriangleObj₁Iso
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistBoundedTriangleObj₂Iso
+
+/-! ## Cartier divisors as line bundles and derived objects -/
+
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.lineBundleData
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.lineBundleData_toPic
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.associatedSheaf_isCoherent
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.coh
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.cohIso
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.derivedObject
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.derivedObject_perfect
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.derivedObject_bounded
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.derivedObjectIso
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.boundedDerivedObject
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.boundedDerivedObjectIso
+
 /-! ## Affine quasi-coherent derived realization (#528) -/
 
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.AffineQuasicoherentDerivedCategory

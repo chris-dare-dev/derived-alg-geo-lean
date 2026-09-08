@@ -9,17 +9,17 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelCorres
 /-!
 # Coherent derived tensor products
 
-`HasDerivedTensor` is the intentionally raw Fourier--Mukai input: it supplies
-only a bifunctor whose left twists are exact.  Kernel composition needs more.
+`HasDerivedTensor` is the Fourier--Mukai input for a bifunctor exact in both
+variables.  Kernel composition needs additional monoidal coherence.
 In particular, independently choosing an associator and two unitors does not
 say that different routes through a fourfold tensor product agree.
 
 `HasCoherentDerivedTensor` is the stable root for consumers that rebracket or
 unitalize derived tensor products.  It packages the tensor as a Mathlib
 `MonoidalCategory`, so naturality, the pentagon, and the triangle are fields of
-one structure rather than unrelated theorem-specific capabilities.  The
-exactness fields retain the part of `HasDerivedTensor` used by
-Fourier--Mukai transforms.
+one structure rather than unrelated theorem-specific capabilities.  Its
+`ExactBifunctor` field retains the complete two-slot exactness and Koszul shift
+coherence used by Fourier--Mukai transforms and kernel variation.
 
 The instance below is the one-way migration adapter
 
@@ -52,20 +52,48 @@ noncomputable section
 
 Extending `MonoidalCategory` makes functoriality, associator and unitor
 naturality, the pentagon, and the triangle part of the same root structure.
-The remaining fields record exactness of each left twist, as required by the
-Fourier--Mukai correspondence layer. -/
+The remaining field records exactness and compatible shifts of the complete
+tensor bifunctor. -/
 class HasCoherentDerivedTensor (Z : SchemeBaseChange S)
     [IsLocallyNoetherian Z.left]
     extends MonoidalCategory (SchemeBoundedCoherentDerivedCategory Z.left) where
-  /-- Every left tensor twist is additive. -/
-  additive : ∀ K, ((curriedTensor
-    (SchemeBoundedCoherentDerivedCategory Z.left)).obj K).Additive
-  /-- Every left tensor twist commutes with the triangulated shift. -/
-  commShift : ∀ K, ((curriedTensor
-    (SchemeBoundedCoherentDerivedCategory Z.left)).obj K).CommShift ℤ
-  /-- Every left tensor twist is triangulated. -/
-  isTriangulated : ∀ K, ((curriedTensor
-    (SchemeBoundedCoherentDerivedCategory Z.left)).obj K).IsTriangulated
+  /-- Exactness and coherent shifts of tensor in both variables. -/
+  exact : Functor.ExactBifunctor
+    (curriedTensor (SchemeBoundedCoherentDerivedCategory Z.left))
+
+namespace HasCoherentDerivedTensor
+
+variable {Z : SchemeBaseChange S} [IsLocallyNoetherian Z.left]
+  [HasCoherentDerivedTensor Z]
+
+/-- The exact-bifunctor witness carried by coherent derived tensor. -/
+def exactBifunctor : Functor.ExactBifunctor
+    (curriedTensor (SchemeBoundedCoherentDerivedCategory Z.left)) :=
+  HasCoherentDerivedTensor.exact
+
+/-- Legacy projection: additivity of each left tensor twist. -/
+theorem additive (K : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((curriedTensor
+      (SchemeBoundedCoherentDerivedCategory Z.left)).obj K).Additive := by
+  letI := exactBifunctor |>.secondCommShift K
+  letI := exactBifunctor |>.secondTriangulated K
+  infer_instance
+
+/-- Legacy projection: shift coherence of each left tensor twist. -/
+@[reducible] def commShift
+    (K : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((curriedTensor
+      (SchemeBoundedCoherentDerivedCategory Z.left)).obj K).CommShift ℤ :=
+  exactBifunctor |>.secondCommShift K
+
+/-- Legacy projection: triangulatedness of each left tensor twist. -/
+theorem isTriangulated (K : SchemeBoundedCoherentDerivedCategory Z.left) :
+    letI := commShift K
+    ((curriedTensor
+      (SchemeBoundedCoherentDerivedCategory Z.left)).obj K).IsTriangulated :=
+  exactBifunctor |>.secondTriangulated K
+
+end HasCoherentDerivedTensor
 
 /-- Forget coherence when a consumer only needs the raw tensor bifunctor.
 
@@ -75,9 +103,7 @@ instance hasDerivedTensorOfCoherent (Z : SchemeBaseChange S)
     [IsLocallyNoetherian Z.left] [HasCoherentDerivedTensor Z] :
     HasDerivedTensor Z where
   derivedTensor := curriedTensor (SchemeBoundedCoherentDerivedCategory Z.left)
-  additive := HasCoherentDerivedTensor.additive
-  commShift := HasCoherentDerivedTensor.commShift
-  isTriangulated := HasCoherentDerivedTensor.isTriangulated
+  exact := HasCoherentDerivedTensor.exactBifunctor
 
 /-- The coherent associator in the orientation used by the kernel ledgers:
 `A ⊗ (B ⊗ -) ≅ (A ⊗ B) ⊗ -`. -/
@@ -184,9 +210,7 @@ instance hasCoherentDerivedTensorIsCompatibleWithTriangulation
     [HasCoherentDerivedTensor Z] :
     CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation
       (SchemeBoundedCoherentDerivedCategory Z.left) where
-  tensorAdditive := HasCoherentDerivedTensor.additive
-  tensorCommShift := HasCoherentDerivedTensor.commShift
-  tensorIsTriangulated := HasCoherentDerivedTensor.isTriangulated
+  tensorExact := HasCoherentDerivedTensor.exactBifunctor
 
 end
 

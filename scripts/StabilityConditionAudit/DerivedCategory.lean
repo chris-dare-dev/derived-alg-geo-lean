@@ -10,6 +10,11 @@ Audit records for generic derived-category extensions on arbitrary abelian
 categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 -/
 
+/-! ## Short-exact derived triangles -/
+
+#print axioms CategoryTheory.ShortComplex.ShortExact.singleTriangle.map_id
+#print axioms CategoryTheory.ShortComplex.ShortExact.singleTriangle.map_comp
+
 /-! ## Opposites and exact linear duality -/
 
 #print axioms CategoryTheory.DerivedCategory.OppositeComparison

@@ -9,6 +9,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Coaisle
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Polishchuk
 import DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
+import DerivedAlgGeo.CategoryTheory.Triangulated.ExactFunctorFamily
+import DerivedAlgGeo.CategoryTheory.Triangulated.FullSubcategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup
@@ -28,8 +30,9 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.Opposite
 /-! # Triangulated categories
 
 The compatibility interface for monoidal tensor products, the
-pretriangulated axioms with rotation only forward, t-structures, compact
-generation, Postnikov towers, strict morphisms, semiorthogonal sequences,
+pretriangulated axioms with rotation only forward, t-structures, objectwise
+triangle lifts to full triangulated subcategories, compact generation,
+Postnikov towers, strict morphisms, semiorthogonal sequences,
 extension closures, the Grothendieck group, the spherical twist on `K₀`,
 Fourier--Mukai kernel functors, dg enhancements, and stability conditions on
 triangulated categories.
