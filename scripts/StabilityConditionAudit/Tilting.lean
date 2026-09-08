@@ -356,8 +356,10 @@ take the charge on `K₀ C` as primitive and compose with `K₀Ab.toAmbient`, so
 `rfl` and there is no new structure to inhabit. Only the **map** `K₀Ab 𝒜 →+ K₀ C` is used; the
 isomorphism `K(𝒜) ≅ K(D)` remains unavailable and unassumed.
 
-`im_ambientCharge_nonneg_of_mem_hnTilt_heart` is the payoff, and it is only the imaginary half.
-Lemma 6.2 needs `Re < 0` on the `Im = 0` boundary, which is blocked on Lemma 5.1 (#332) and on
+`im_ambientCharge_nonneg_of_mem_hnTilt_heart` is the payoff, and the strict-below free-generator
+case is now closed by `mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_lt`.  This is still
+only a case of Lemma 6.2: the equality boundary and rank-zero torsion/point cases need the
+geometric Mukai-square and support-dimension inputs blocked on Lemma 5.1 (#332) and on
 dimension-of-support data. -/
 
 #print axioms CategoryTheory.Triangulated.expCharge_neg
@@ -368,3 +370,4 @@ dimension-of-support data. -/
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientCharge_triangle
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.ambientCharge_shift
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_ambientCharge_nonneg_of_mem_hnTilt_heart
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_lt

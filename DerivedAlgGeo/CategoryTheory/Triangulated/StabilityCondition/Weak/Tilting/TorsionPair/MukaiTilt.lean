@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting.TorsionPair.WeakHnTilt
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.MukaiWeakCutoff
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.ExpChargeCases
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HeartComparison
 
 /-!
@@ -172,6 +173,52 @@ theorem im_ambientCharge_nonneg_of_mem_hnTilt_heart
   rw [hsplit]
   simp only [Complex.add_im, Complex.neg_im]
   linarith
+
+/-- **The strict-below free-generator case of the upper-half-plane argument.**
+
+If `F₀` is a nonzero object of the weak HN torsion-free class at the cutoff and its
+slope is strictly below `b β ω`, then the shifted object `F₀⟦1⟧` has ambient charge in
+`semiClosedUpperHalfPlane`.  The proof exposes the paper's sign convention: the
+charge of `F₀` has negative imaginary part, and the shift negates it.
+
+This closes only the strict-below generator case (case 3), not the full Lemma 6.2
+theorem.  The boundary equality case and the rank-zero torsion/point cases still
+need the geometric Mukai-square and support-dimension inputs described in the module
+docstring.  `MukaiWeakSlopeCompat` contributes only the rank/degree compatibility;
+no K3 or Bogomolov--Gieseker statement is assumed here. -/
+theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_lt
+    {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
+    (hb : ∀ x y : V, b x y = b y x)
+    {S : WeakSlopeData t.heart.FullSubcategory}
+    (Cpt : MukaiWeakSlopeCompat (ofAmbient t m) S b ω)
+    (hHN : S.toWeakStabilityFunction.HasHNProperty)
+    {F₀ : t.heart.FullSubcategory} (hF₀ : ¬IsZero F₀)
+    (hF : F₀ ∈ WeakStabilityFunctionOn.hnFree S.toWeakStabilityFunction
+      ((b β ω : ℝ) : WithTop ℝ))
+    (hbelow : S.slope F₀ < b β ω) :
+    ambientCharge m b β ω (F₀.obj⟦(1 : ℤ)⟧) ∈ semiClosedUpperHalfPlane := by
+  have hrank : 0 < S.rank F₀ := S.rank_pos_of_mem_hnFree hHN hF₀ hF
+  have him : (ofAmbient t m).charge b β ω F₀ =
+      Mukai.expCharge b β ω ((ofAmbient t m).mukai (K₀Ab.of F₀)) := rfl
+  have him_neg : ((ofAmbient t m).charge b β ω F₀).im < 0 := by
+    rw [Cpt.im_charge hb β F₀]
+    rw [WeakSlopeData.slope] at hbelow
+    have hr : (0 : ℝ) < (S.rank F₀ : ℝ) := by exact_mod_cast hrank
+    have hbelow' : (S.degree F₀ : ℝ) < b β ω * (S.rank F₀ : ℝ) := by
+      rw [div_lt_iff₀ hr] at hbelow
+      exact hbelow
+    exact sub_neg.mpr (by simpa [mul_comm] using hbelow')
+  let v : Mukai.RealExtension V := (ofAmbient t m).mukai (K₀Ab.of F₀)
+  have hbelow' : b ω (v.2.1 - v.1 • β) < 0 := by
+    rw [← Mukai.im_expCharge_eq_apply_sub_smul b β ω hb]
+    change (Mukai.expCharge b β ω v).im < 0
+    rw [← him]
+    exact him_neg
+  have hcase := neg_mem_semiClosedUpperHalfPlane_of_apply_sub_smul_neg
+    (b := b) (β := β) (ω := ω) (r := v.1) (c := v.2.1) (s := v.2.2) hb hbelow'
+  rw [ambientCharge_shift]
+  rw [ambientCharge, ← expCharge_neg]
+  simpa [v] using hcase
 
 end MukaiWeakSlopeCompat
 
