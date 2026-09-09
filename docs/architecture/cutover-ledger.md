@@ -483,10 +483,28 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-Nothing is queued. Every path lane confirmed by the 2026-09-01 audit has
-landed, and so have both lanes recorded after it: the `ObjectProperty` lift
-block (2026-09-02) and the left-orthogonal colimit closure (2026-09-03).
-Both are entries under "Completed roots" above.
+Every path lane confirmed by the 2026-09-01 audit has landed, and so have
+both lanes recorded after it: the `ObjectProperty` lift block (2026-09-02)
+and the left-orthogonal colimit closure (2026-09-03). Both are entries under
+"Completed roots" above.
+
+One candidate lane is recorded, not yet confirmed (2026-09-08, review of
+#1098):
+
+- **Divisorial surface-charge generic layer.**
+  `AlgebraicGeometry/Numerical/Stability/SurfaceCharge.lean` and
+  `AlgebraicGeometry/Numerical/Stability/DivisorialCharge.lean` mention no
+  scheme and import nothing geometric: `ChargeCoordinates`, `DivisorSpace`,
+  `ChernCharacter`, `StabilityParameters`, and the charge polynomial are
+  linear algebra over `ℝ` and `ℂ`. By the placement rule they are a generic
+  block whose geometric use starts in `SurfaceChargeNumerical.lean`. The
+  repository precedent is `CategoryTheory/Triangulated/StabilityCondition/Walls/Numerical/Basic.lean`,
+  which is the same kind of pure arithmetic and lives with the wall lane.
+  Moving the two files beside it would also let the `(s,t)` child
+  `Wall.stChargeFamily` be defined as a reindexing of
+  `ChernCharacter.fullChargeFamily`, removing the second formula owner that
+  `DivisorialWallTransport.lean` currently reconciles by theorem. Until the
+  move, do not extend the generic block in place.
 
 No confirmed type-level hazard remains: the `ZLattice` class, the bundled
 variety types, and the alternating-finsum vocabulary are all retired above
