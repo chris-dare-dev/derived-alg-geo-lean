@@ -222,19 +222,25 @@ On the Li side, supply the support form for the pulled-back condition and the
 comparison of that form with the surface form under C1/C2. Geometricity alone
 does not identify support forms or connected components.
 
-Two numerical obligations sit between the landed divisorial layer and this
-comparison and are not yet stated in Lean:
+Two numerical obligations that sat between the landed divisorial layer and
+this comparison are now stated in `Numerical/Stability/DivisorialDiscriminant.lean`:
 
-* the Macrì--Schmidt support forms in the full divisor space: the
-  discriminant `Δ = (ch₁)² - 2 ch₀ ch₂` as a quadratic form on the intrinsic
-  `ChernCharacter`, and the two `(ω,B)`-forms `Δ^C_{ω,B} = Δ + C (ω·ch₁^B)²`
-  and `\bar Δ^B_ω = (ω·ch₁^B)² - 2 (ω²) ch₀^B ch₂^B` of Definition 6.12 /
-  Theorem 6.13. Only the compressed `Surface.discrH` exists today, in the
-  `(s,t)` branch;
-* the bridge from the existing `HodgeIndexStatement V P` to the new
-  `OrthogonalSlice.IsHodge` certificate: for an ample `H`, the intrinsic
-  `fullOrthogonal S H` slice is Hodge (positive `H²`, negative definite
-  `H^⊥`). Nothing connects the two certificates yet.
+* the Macrì--Schmidt forms in the full divisor space: `ChernCharacter.discriminant`
+  (`Δ = (ch₁)² - 2 ch₀ ch₂`, proved `B`-invariant), `barDiscriminant`
+  (`ar Δ^B_ω`), and `discriminantC` (`Δ^C_{ω,B}`) of Definition 6.12, with
+  `ω² Δ ≤ ar Δ^B_ω` under a Hodge index at `ω` and the identification of the
+  bar form on the rank-one slice with `α² · discrH`, hence with the wall-plane
+  discriminant of the transported class;
+* the Hodge bridge: `DivisorSpace.HodgeIndex S H` is the real-divisor-space
+  certificate; it yields the numerical `HodgeIndexStatement`, while the
+  numerical statement yields only the inequality on realized first Chern
+  classes. `OrthogonalSlice.isHodge_of_hodgeIndex` derives the slice
+  certificate from the inequality plus nondegeneracy of the transverse
+  pairing; the rank-one slice is Hodge from `H² > 0` alone.
+
+What remains supplied, not proved: the Hodge index theorem itself for a
+geometric surface, Bogomolov's inequality (`BogomolovGiesekerData`), and the
+Bridgeland-semistable half of Theorem 6.13.
 
 Separately, `Wall.ChargeFamily.wall v w` is the proportionality locus of the
 two charges and is all of the parameter space when `w ∈ ℤ v` or `Z(v) = 0`
@@ -369,7 +375,14 @@ The arithmetic boundary is split across composable components:
   reindexing of the intrinsic divisorial family along the rank-one slice
   `B = sH`, `omega = tH` (`wallChargeFamily_eq_rankOne_reindex`).  Every
   rank-one child therefore reaches both the circle/line/nesting theorems of
-  the `(s,t)` polynomial and the arbitrary-`(B,omega)` divisorial layer.
+  the `(s,t)` polynomial and the arbitrary-`(B,omega)` divisorial layer; and
+* `Numerical/Stability/DivisorialDiscriminant.lean` supplies the
+  Macrì--Schmidt discriminants `Δ`, `ar Δ^B_ω`, `Δ^C_{ω,B}` on the intrinsic
+  character, the divisor-space Hodge index certificate `DivisorSpace.HodgeIndex`
+  with its one-directional bridge to the numerical `HodgeIndexStatement`, the
+  derivation of `OrthogonalSlice.IsHodge` from the inequality plus
+  nondegeneracy, and the transport of `BogomolovGiesekerData` to
+  `0 ≤ ar Δ^B_ω` under a Hodge index at `omega`.
 
 `NumericalRingData` is presently a rational intersection ring, so its
 arbitrary `BField` is rational. The divisorial layer handles a fully arbitrary
