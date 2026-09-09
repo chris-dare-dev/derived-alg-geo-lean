@@ -369,6 +369,20 @@ The arithmetic boundary is split across composable components:
   transport compresses the first Chern class to `H · ch₁`, so on a surface of
   Picard rank greater than one it is the `H`-slice only, never the full wall
   family of the surface; and
+* `Walls/Threefold/Basic.lean` and
+  `Numerical/Stability/ThreefoldWallTransport.lean` are the threefold child of
+  the wall root: four compressed `H`-degrees `(∫H³ch₀, ∫H²ch₁, ∫H·ch₂, ∫ch₃)`
+  with the first slot weighted, and the real and imaginary parts of
+  `-∫exp(-(β+iα)H)ch` expanded to codimension three.  `betaTwist` is the twist
+  on those four coordinates, with its group law, and
+  `reZ_eq_betaTwist`/`imZ_eq_betaTwist` are the checks that make `β` a twist
+  rather than a coordinate.  The geometric side proves that the compressed twist
+  agrees with the twisted degrees `BMT.lean` reads off `chBetaComp`, so
+  `Threefold.Q` and `Threefold.nu` are identified with the existing definitions
+  and the library has one `Q`.  The Bayer--Macrì--Toda inequality is
+  **transported, not proved**: it stays the supplied `BMTData`, which is false
+  for some threefolds; and
+
 * `Walls/Divisorial/Mukai.lean` and
   `Numerical/Stability/DivisorialMukai.lean` give the Mukai presentation its own
   name instead of overloading the ordinary Chern character.  `SqrtTodd` carries
@@ -535,21 +549,17 @@ for the projective-family case, where one lattice serves the whole family
 The generic layer moved out of `AlgebraicGeometry/` on 2026-09-09; see the
 "Divisorial charge block" entry in `docs/architecture/cutover-ledger.md`, which
 also records where this note's earlier claim about that move was wrong.  The
-named Mukai adapter landed the same day.
+named Mukai adapter and the threefold/BMT charge family landed the same day.
 
 The next honest coding boundary is one of:
 
-1. define a threefold/BMT central-charge family as another child of
-   `Wall.ChargeFamily`, with its own character structure carrying `ch₃` and a
-   cubic twist, without promoting the conjectural BMT inequality to a generic
-   fact;
-2. add topological chamber and connected-component structure above generic wall
+1. add topological chamber and connected-component structure above generic wall
    sets, only when a topology and local-finiteness hypotheses are explicitly
    available;
-3. connect `Wall.ChargeFamily` to the existing categorical family interfaces
+2. connect `Wall.ChargeFamily` to the existing categorical family interfaces
    once #851 supplies the common relative numerical class-map data, using
    reindexing for base change rather than inventing a second family carrier; or
-4. implement the C1 numerical comparison after the geometric `vLi`/GRR data
+3. implement the C1 numerical comparison after the geometric `vLi`/GRR data
    have an honest owner.
 
 The current layer fixes the formulas, source locations, normalization choices,
