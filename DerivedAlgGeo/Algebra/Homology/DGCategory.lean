@@ -15,6 +15,7 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Opposite
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Product
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Shift
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Whiskering
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Model
 

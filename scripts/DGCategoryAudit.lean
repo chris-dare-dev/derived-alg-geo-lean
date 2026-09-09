@@ -751,3 +751,31 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorWitness
 #print axioms CategoryTheory.DGFunctor.exists_shift_dgFunctor
 #print axioms CategoryTheory.DGFunctor.isPretriangulated_dgFunctor
+
+-- Whiskering a homogeneous dg natural transformation by a dg functor on either
+-- side.  Neither operation carries a sign, because a dg functor preserves the
+-- graded composition on the nose; the Koszul sign of the horizontal composite
+-- lives in `interchange`, where it is the naturality sign of the second
+-- transformation evaluated at a component of the first.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeft
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeft_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeft_zero
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeft_add
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeftHom
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeftHom_apply
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeft_id
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeft_composition
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeft_differential
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.IsClosed.whiskerLeft
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRight
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRight_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRight_zero
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRight_add
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRightHom
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRightHom_apply
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRight_id
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRight_composition
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRight_differential
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.IsClosed.whiskerRight
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.interchange_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.interchange

@@ -33,6 +33,8 @@ have been discharged.
 DGFunctor.HomogeneousNatTrans
 ├─ all integer degrees and Koszul naturality
 ├─ pointwise differential and vertical composition
+├─ whiskerLeft / whiskerRight (both sign-free) and additive-hom packaging
+│  └─ interchange: the Godement sign (-1)^(m n) is naturality of the second
 └─ DGCategory (DGFunctor A B)
    └─ IsClosed
 
