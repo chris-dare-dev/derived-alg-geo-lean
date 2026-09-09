@@ -52,6 +52,27 @@ theorem add_mem_semiClosedUpperHalfPlane {z w : ℂ}
     · exact h
   exact ⟨by simp [hz_zero, hw_zero], by simpa using add_neg hz_re hw_re⟩
 
+/-- **The additive step of every boundary argument.** A nonempty finite family of
+charges on the positive real axis has its negated sum on the negative real axis,
+hence in the semi-closed upper half-plane. Nothing here asks how each `0 < Re`
+was obtained. -/
+theorem neg_sum_mem_semiClosedUpperHalfPlane_of_im_eq_zero_of_re_pos
+    {n : ℕ} (hn : 0 < n) (z : Fin n → ℂ)
+    (him : ∀ i, (z i).im = 0) (hre : ∀ i, 0 < (z i).re) :
+    -(∑ i, z i) ∈ semiClosedUpperHalfPlane := by
+  have him_sum : (∑ i, z i).im = ∑ i, (z i).im := by
+    simpa only [show ∀ w : ℂ, Complex.imAddGroupHom w = w.im from fun _ ↦ rfl] using
+      map_sum Complex.imAddGroupHom z Finset.univ
+  have hre_sum : (∑ i, z i).re = ∑ i, (z i).re := by
+    simpa only [show ∀ w : ℂ, Complex.reAddGroupHom w = w.re from fun _ ↦ rfl] using
+      map_sum Complex.reAddGroupHom z Finset.univ
+  refine Or.inr ⟨?_, ?_⟩
+  · rw [Complex.neg_im, him_sum]
+    simp [him]
+  · rw [Complex.neg_re, hre_sum]
+    exact neg_neg_of_pos
+      (Finset.sum_pos (fun i _ ↦ hre i) ⟨⟨0, hn⟩, Finset.mem_univ _⟩)
+
 /-- The oriented determinant of two complex vectors. -/
 def phaseCross (z w : ℂ) : ℝ := z.re * w.im - z.im * w.re
 

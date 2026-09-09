@@ -863,6 +863,7 @@ several structures in this repository carried as data (`map_zero`, `map_iso`,
 #print axioms CategoryTheory.Triangulated.StabilityFunction.pullback_obj_injective_of_epi
 #print axioms CategoryTheory.Triangulated.im_nonneg_of_mem_semiClosedUpperHalfPlane
 #print axioms CategoryTheory.Triangulated.add_mem_semiClosedUpperHalfPlane
+#print axioms CategoryTheory.Triangulated.neg_sum_mem_semiClosedUpperHalfPlane_of_im_eq_zero_of_re_pos
 #print axioms CategoryTheory.Triangulated.phaseCross
 #print axioms CategoryTheory.Triangulated.phaseCross_eq_norm_mul_sin
 #print axioms CategoryTheory.Triangulated.phaseCross_nonneg_of_arg_le
@@ -1370,6 +1371,8 @@ one.
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.mk.inj
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.mukai
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.chargeHom
+#print axioms CategoryTheory.Triangulated.MukaiChargeData.chargeHom_apply
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.charge
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_apply
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.charge_zero
@@ -1378,7 +1381,8 @@ one.
 
 /-! ## `Z(β,ω)` read against the weak slope cutoff
 
-`ExpCharge.lean` stops at the charge and says why: `MukaiChargeData` asserts nothing about
+`StabilityCondition/Mukai/Charge.lean` stops at the charge and says why:
+`MukaiChargeData` asserts nothing about
 rank, slope or torsion, and bundling those as hypotheses would prove nothing.
 `MukaiWeakSlopeCompat` supplies the connection in the one form that is an *identification*
 rather than a discriminant -- the Mukai class's rank component is the rank, its `ω`-degree is
@@ -1394,6 +1398,7 @@ skyscraper. This is still **not** Lemma 6.2, which is about the tilted heart. -/
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_pos_iff_of_rank_pos
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_eq_degree_of_rank_zero
+#print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_eq_zero_of_rank_pos_of_slope_eq
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_nonneg_of_mem_hnTors
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.im_charge_pos_of_mem_hnTors_of_rank_pos
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.rank_eq_zero_of_im_eq_zero_of_mem_hnTors

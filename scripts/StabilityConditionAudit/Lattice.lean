@@ -348,6 +348,11 @@ support property. `expCharge` is Bridgeland's `Z(β,ω)`. -/
 #print axioms PeriodDomain.mem_periodDomain₀_iff_centralCharge_ne_zero
 #print axioms Mukai.expCharge
 #print axioms Mukai.expCharge_apply
+#print axioms Mukai.expChargeHom
+#print axioms Mukai.expChargeHom_apply
+#print axioms Mukai.expCharge_zero
+#print axioms Mukai.expCharge_add
+#print axioms Mukai.expCharge_neg
 #print axioms Mukai.neg_of_expCharge_eq_zero
 #print axioms Mukai.expCharge_ne_zero_of_nonneg
 #print axioms Mukai.mem_wall_iff_expCharge_eq_zero
@@ -405,6 +410,9 @@ Grassmannian of positive planes is not used. -/
 #print axioms Mukai.im_expCharge_nonneg
 #print axioms Mukai.two_mul_re_expCharge
 #print axioms Mukai.two_mul_re_expCharge_ge
+#print axioms Mukai.re_expCharge_pos_of_boundary_margin
+#print axioms Mukai.re_expCharge_pos_of_lower_bound
+#print axioms Mukai.re_expCharge_pos_of_lower_bound_of_one_le_rank
 #print axioms Mukai.re_expCharge_pos_of_nonneg
 #print axioms Mukai.re_expCharge_pos_of_neg_one
 

@@ -7,6 +7,38 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Mukai stability-condition specialization (2026-09-08):
+  `CategoryTheory/Triangulated/StabilityCondition/Mukai/` is the sibling
+  consumer of generic weak stability and tilting. `Charge.lean` owns the
+  categorical Mukai class map and its additive charge, `Slope.lean` owns weak
+  slope compatibility, `NumericalCases.lean` owns the four numerical
+  half-plane adapters, `Ambient.lean` owns restriction from `K₀ C` to a heart,
+  and `Tilting.lean` owns the HN-tilt consumers. The generic
+  `Weak/Foundation/StabilityFunction` and `Weak/Tilting/TorsionPair` umbrellas
+  no longer import this specialization. At the lower layer,
+  `LinearAlgebra/Lattice/Mukai/CentralCharge.lean` now exposes
+  `Mukai.expChargeHom`, so heart and ambient charges compose additive
+  homomorphisms instead of reproving additivity. The canonical
+  numerical lemmas are `Mukai.expCharge_zero`, `expCharge_add`, and
+  `expCharge_neg`; their historical `CategoryTheory.Triangulated` names remain
+  stable as aliases in `Mukai/Charge.lean`. `GeometricInput.lean` now isolates
+  the two remaining geometric obligations as independent propositions:
+  classification of rank-and-degree-zero torsion classes and a factorwise
+  boundary Mukai decomposition. The boundary contract
+  `HasBoundaryMukaiDecompositionWith` is parameterized by a predicate on the
+  factors; the exact-Hodge-margin contract and the uniform `realForm ≥ -δ`
+  contract are its abbreviations, the historical K3 contract is only `δ = 1`,
+  and the theorems turning each predicate into `Re Z > 0` live in
+  `Tilting.lean` rather than in the contract.
+  `Assembly.lean` carries the same hierarchy through
+  `tiltStabilityFunctionOfMargin`, `tiltStabilityFunctionOfLowerBound`, and the
+  legacy `tiltStabilityFunction`. Todd normalization remains upstream in the
+  additive class map, so this categorical construction has no surface-type
+  flag. Its extension argument is not Mukai-specific: the reusable constructor
+  lives at
+  `Weak/Tilting/TorsionPair/HnTiltStabilityFunction.lean` and consumes any
+  additive ambient charge positive on nonzero torsion and shifted-free
+  generators.
 - Left orthogonals are closed under colimits (2026-09-04):
   `CategoryTheory/ObjectProperty/Orthogonal.lean` owns
   `instIsClosedUnderColimitsOfShapeLeftOrthogonal`, beside Mathlib's own

@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Charge
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.ExpCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.PhaseGeometry
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
 
 /-!
@@ -34,7 +34,7 @@ below are stated on `-v` explicitly rather than left to the caller.
 ## What this is not
 
 **It is not Lemma 6.2**, and it is deliberately not wired into
-`MukaiChargeData`. `ExpCharge.lean` says why, and the reason stands: bundling
+`MukaiChargeData`. `Mukai.Charge` says why, and the reason stands: bundling
 these case discriminants as fields of that structure would make `nonzero_mem` a
 one-line case split over invented assumptions — it would compile, pass every
 gate, and prove nothing. Lemma 6.2 requires *proving* which objects of the
@@ -55,25 +55,39 @@ With `v = (r, c, s)`, writing `Im Z = ω·(c - r•β)`:
 | curve torsion, or free above the cutoff | `0 < ω·(c - r•β)` | `Z v` upper half plane |
 | torsion in dimension zero | `r = 0`, `c = 0`, `0 < s` | `Z v` negative real axis |
 | torsion-free below the cutoff | `ω·(c - r•β) < 0` | `Z (-v)` upper half plane |
-| the boundary | `ω·(c - r•β) = 0`, Hodge index, Bogomolov | `Z (-v)` negative real axis |
+| the boundary | `ω·(c - r•β) = 0`, Hodge index, factor bound | `Z (-v)` negative real axis |
 
 The first and third are the same fact read at `v` and at `-v`; they are stated
 separately because the caller reaches them from opposite sides of the cutoff.
+The factor bound of the fourth row enters only as a hypothesis. In Bridgeland's
+K3 argument it is Lemma 5.1 (Serre duality and Riemann--Roch for a stable
+sheaf); on a general surface it is the Bogomolov--Gieseker inequality.
 
 ## Main results
 
-`expCharge_neg` — `Z(-v) = -Z(v)`, what the shift costs — lives upstream in
-`ExpCharge.lean` beside `expCharge_add`; it was moved there in this change so the
-tilt and this file share one copy.
+`Mukai.expCharge_neg` — `Z(-v) = -Z(v)`, what the shift costs — is derived
+upstream from `Mukai.expChargeHom` in the numerical Mukai layer.
+The additive step, `neg_sum_mem_semiClosedUpperHalfPlane_of_im_eq_zero_of_re_pos`,
+lives upstream in `PhaseGeometry.lean`; the factorwise theorems below only
+supply `Re > 0` per factor before calling it.
 
 * `mem_semiClosedUpperHalfPlane_of_apply_sub_smul_pos` — cases 1 and 3.
 * `mem_semiClosedUpperHalfPlane_of_dimension_zero` — case 2.
 * `neg_mem_semiClosedUpperHalfPlane_of_apply_sub_smul_neg` — below the cutoff.
+* `neg_mem_semiClosedUpperHalfPlane_of_boundary_of_lower_bound` — the sharp
+  rank-sensitive boundary theorem for `realForm ≥ -δ`.
 * `neg_mem_semiClosedUpperHalfPlane_of_boundary_of_nonneg` and
   `…_of_neg_one` — the boundary, non-spherical and spherical.
+* `neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_margin` — the most general
+  factorwise assembly theorem, using the exact Hodge-index margin of each
+  positive-rank factor.
+* `neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_lower_bound` — the
+  assembly-safe factorwise theorem; the `…_of_neg_one` declaration is its K3
+  specialization.
 -/
 
 open Complex QuadraticMap
+open scoped BigOperators
 
 namespace CategoryTheory.Triangulated
 
@@ -134,12 +148,34 @@ theorem neg_mem_semiClosedUpperHalfPlane_of_apply_sub_smul_neg
     (h : b ω (c - r • β) < 0) :
     Mukai.expCharge b β ω (-(r, c, s)) ∈ semiClosedUpperHalfPlane := by
   refine mem_semiClosedUpperHalfPlane_of_im_pos ?_
-  rw [expCharge_neg b β ω, Complex.neg_im, Mukai.im_expCharge_eq_apply_sub_smul b β ω hb]
+  rw [Mukai.expCharge_neg b β ω, Complex.neg_im,
+    Mukai.im_expCharge_eq_apply_sub_smul b β ω hb]
   linarith
 
 section Boundary
 
 variable [FiniteDimensional ℝ V]
+
+/-- **The boundary case for an arbitrary quadratic lower bound.**
+
+For a positive-rank class on `Im Z = 0`, a bound
+`realForm b v ≥ -δ` puts the shifted charge on the allowed negative real ray
+whenever the rank-sensitive threshold `2δ < r² * ω²` holds. This is the
+half-plane form of `Mukai.re_expCharge_pos_of_lower_bound`; neither `δ = 1`
+nor integrality of the rank is built into it. -/
+theorem neg_mem_semiClosedUpperHalfPlane_of_boundary_of_lower_bound (δ : ℝ)
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1) (hω : 0 < b ω ω)
+    {r : ℝ} (hr : 0 < r) {c : V} {s : ℝ}
+    (him : (Mukai.expCharge b β ω (r, c, s)).im = 0)
+    (hv : -δ ≤ Mukai.realForm b (r, c, s))
+    (hthreshold : 2 * δ < r ^ 2 * b ω ω) :
+    Mukai.expCharge b β ω (-(r, c, s)) ∈ semiClosedUpperHalfPlane := by
+  have hre := Mukai.re_expCharge_pos_of_lower_bound b β ω δ hb hsigPos hω hr him hv hthreshold
+  refine mem_semiClosedUpperHalfPlane_of_im_zero_of_re_neg ?_ ?_ <;>
+    rw [Mukai.expCharge_neg b β ω]
+  · rw [Complex.neg_im, him, neg_zero]
+  · rw [Complex.neg_re]; linarith
 
 /-- **The boundary, non-spherical case.** `μ_ω(E) = β·ω` and `v(E)² ≥ 0`, so
 `Re Z(E) > 0` and the heart object `E⟦1⟧` sits on the negative real axis.
@@ -153,11 +189,10 @@ theorem neg_mem_semiClosedUpperHalfPlane_of_boundary_of_nonneg
     (him : (Mukai.expCharge b β ω (r, c, s)).im = 0)
     (hv : 0 ≤ Mukai.realForm b (r, c, s)) :
     Mukai.expCharge b β ω (-(r, c, s)) ∈ semiClosedUpperHalfPlane := by
-  have hre := Mukai.re_expCharge_pos_of_nonneg b β ω hb hsigPos hω hr him hv
-  refine mem_semiClosedUpperHalfPlane_of_im_zero_of_re_neg ?_ ?_ <;>
-    rw [expCharge_neg b β ω]
-  · rw [Complex.neg_im, him, neg_zero]
-  · rw [Complex.neg_re]; linarith
+  have hthreshold : 2 * (0 : ℝ) < r ^ 2 * b ω ω := by
+    simpa using mul_pos (pow_pos hr 2) hω
+  exact neg_mem_semiClosedUpperHalfPlane_of_boundary_of_lower_bound
+    (b := b) (β := β) (ω := ω) 0 hb hsigPos hω hr him (by simpa using hv) hthreshold
 
 /-- **The boundary, spherical case.** `v(E)² = -2` in the paper — `realForm = -1`
 here — still gives `Re Z(E) > 0`, but now needs `ω² > 2`, and that is enough only
@@ -173,11 +208,93 @@ theorem neg_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one
     (him : (Mukai.expCharge b β ω (r, c, s)).im = 0)
     (hv : -1 ≤ Mukai.realForm b (r, c, s)) :
     Mukai.expCharge b β ω (-(r, c, s)) ∈ semiClosedUpperHalfPlane := by
-  have hre := Mukai.re_expCharge_pos_of_neg_one b β ω hb hsigPos hω hr him hv
-  refine mem_semiClosedUpperHalfPlane_of_im_zero_of_re_neg ?_ ?_ <;>
-    rw [expCharge_neg b β ω]
-  · rw [Complex.neg_im, him, neg_zero]
-  · rw [Complex.neg_re]; linarith
+  have hω0 : 0 < b ω ω := by linarith
+  have hr0 : (0 : ℝ) < r := by linarith
+  have hsq : b ω ω ≤ r ^ 2 * b ω ω := by nlinarith [sq_nonneg (r - 1)]
+  exact neg_mem_semiClosedUpperHalfPlane_of_boundary_of_lower_bound
+    (b := b) (β := β) (ω := ω) 1 hb hsigPos hω0 hr0 him (by simpa using hv)
+      (lt_of_lt_of_le (by simpa using hω) hsq)
+
+/-- **A nonempty boundary sum under the exact factorwise Hodge margin.**
+
+This is the most general additive form of the numerical argument. Every
+factor may have a different rank and a different quadratic value; the only
+common requirement is positivity of the quantity that Hodge index places
+below `2 * r * Re Z`:
+
+`0 < 2 * realForm b vᵢ + rᵢ² * ω²`.
+
+No uniform lower-bound constant and no integral-rank estimate is used here.
+The parameterized `δ` theorem below is a convenient sufficient criterion for
+geometric settings with a uniform stable-factor bound. -/
+theorem neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_margin
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1) (hω : 0 < b ω ω)
+    {n : ℕ} (hn : 0 < n) (v : Fin n → Mukai.RealExtension V)
+    (hr : ∀ i, 0 < (v i).1)
+    (him : ∀ i, (Mukai.expCharge b β ω (v i)).im = 0)
+    (hmargin : ∀ i, 0 < 2 * Mukai.realForm b (v i) + (v i).1 ^ 2 * b ω ω) :
+    Mukai.expCharge b β ω (-(∑ i, v i)) ∈ semiClosedUpperHalfPlane := by
+  have hre : ∀ i, 0 < (Mukai.expCharge b β ω (v i)).re := fun i ↦
+    Mukai.re_expCharge_pos_of_boundary_margin b β ω hb hsigPos hω (hr i) (him i)
+      (hmargin i)
+  have hcharge_sum :
+      Mukai.expCharge b β ω (∑ i, v i) = ∑ i, Mukai.expCharge b β ω (v i) := by
+    simpa only [Mukai.expChargeHom_apply] using
+      map_sum (Mukai.expChargeHom b β ω) v Finset.univ
+  rw [Mukai.expCharge_neg b β ω, hcharge_sum]
+  exact neg_sum_mem_semiClosedUpperHalfPlane_of_im_eq_zero_of_re_pos hn _ him hre
+
+/-- **A nonempty boundary sum with an arbitrary uniform lower bound.**
+
+Each factor has integral positive rank (`1 ≤ r`), lies on `Im Z = 0`, and has
+`realForm ≥ -δ`. The single polarization inequality `2δ < ω²` therefore gives
+positive real charge for every unshifted factor. Additivity then places the
+negative of their sum on the permitted negative real ray.
+
+The lower bound remains factorwise because quadratic bounds are not additive.
+The parameter is uniform only so geometric children can expose one bound for
+their stable factors; the underlying one-class theorem remains rank-sensitive. -/
+theorem neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_lower_bound (δ : ℝ)
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1) (hω : 0 < b ω ω)
+    (hωδ : 2 * δ < b ω ω)
+    {n : ℕ} (hn : 0 < n) (v : Fin n → Mukai.RealExtension V)
+    (hr : ∀ i, 1 ≤ (v i).1)
+    (him : ∀ i, (Mukai.expCharge b β ω (v i)).im = 0)
+    (hv : ∀ i, -δ ≤ Mukai.realForm b (v i)) :
+    Mukai.expCharge b β ω (-(∑ i, v i)) ∈ semiClosedUpperHalfPlane := by
+  have hr0 : ∀ i, 0 < (v i).1 := fun i ↦ by linarith [hr i]
+  have hmargin : ∀ i, 0 < 2 * Mukai.realForm b (v i) + (v i).1 ^ 2 * b ω ω := by
+    intro i
+    have hsq : b ω ω ≤ (v i).1 ^ 2 * b ω ω := by
+      nlinarith [hr i, sq_nonneg ((v i).1 - 1)]
+    nlinarith [hv i]
+  exact neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_margin
+    (b := b) (β := β) (ω := ω) hb hsigPos hω hn v hr0 him hmargin
+
+/-- **The boundary case assembled factorwise.**
+
+Every member of a nonempty finite family lies on the boundary, has positive
+rank, and satisfies the stable-factor Mukai-square bound.  Each unshifted
+charge therefore has positive real part and zero imaginary part, so the charge
+of the negative of their sum lies on the allowed negative real ray.
+
+This is the assembly-safe form of the boundary argument: the bound
+`-1 ≤ realForm b (v i)` is required for each factor, never for their sum.  The
+latter condition is not additive. -/
+theorem neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one
+    (hb : ∀ x y : V, b x y = b y x)
+    (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1) (hω : 2 < b ω ω)
+    {n : ℕ} (hn : 0 < n) (v : Fin n → Mukai.RealExtension V)
+    (hr : ∀ i, 1 ≤ (v i).1)
+    (him : ∀ i, (Mukai.expCharge b β ω (v i)).im = 0)
+    (hv : ∀ i, -1 ≤ Mukai.realForm b (v i)) :
+    Mukai.expCharge b β ω (-(∑ i, v i)) ∈ semiClosedUpperHalfPlane := by
+  have hω0 : 0 < b ω ω := by linarith
+  exact neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_lower_bound
+    (b := b) (β := β) (ω := ω) 1 hb hsigPos hω0 (by simpa using hω) hn v hr him
+      (by simpa using hv)
 
 end Boundary
 

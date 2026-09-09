@@ -36,6 +36,24 @@ variable {V : Type*} [AddCommGroup V] [Module ℝ V] (b : V →ₗ[ℝ] V →ₗ
 noncomputable def expCharge (v : RealExtension V) : ℂ :=
   PeriodDomain.centralCharge (realForm b) (expRe b β ω) (expIm b β ω) v
 
+/-- **`Z(β,ω)` as an additive homomorphism.**
+
+The exponential charge is linear in the Mukai class.  Exposing that structure
+at the numerical layer lets categorical consumers compose class maps with the
+charge instead of rebuilding its additivity object by object. -/
+noncomputable def expChargeHom : RealExtension V →+ ℂ where
+  toFun := expCharge b β ω
+  map_zero' := by
+    simp [expCharge, PeriodDomain.centralCharge]
+  map_add' v w := by
+    simp only [expCharge, PeriodDomain.centralCharge, polar_add_right]
+    push_cast
+    ring
+
+@[simp]
+theorem expChargeHom_apply (v : RealExtension V) :
+    expChargeHom b β ω v = expCharge b β ω v := rfl
+
 /-- The charge written out on a triple. This is Bridgeland's formula. -/
 theorem expCharge_apply (hb : ∀ x y : V, b x y = b y x) (r : ℝ) (c : V) (s : ℝ) :
     expCharge b β ω (r, c, s)
@@ -87,5 +105,30 @@ theorem mem_periodDomain₀_iff_expCharge_ne_zero (hb : ∀ x y : V, b x y = b y
     (isPositivePair_exp b β ω hb hω) Δ
 
 end FiniteDimensional
+
+end Mukai
+
+namespace Mukai
+
+variable {V : Type*} [AddCommGroup V] [Module ℝ V]
+variable (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V)
+
+/-! The elementary charge identities are projections of `expChargeHom`. -/
+
+/-- The exponential charge kills the zero class. -/
+@[simp]
+theorem expCharge_zero : Mukai.expCharge b β ω 0 = 0 :=
+  (expChargeHom b β ω).map_zero
+
+/-- The exponential charge is additive in the Mukai class. -/
+theorem expCharge_add (v w : Mukai.RealExtension V) :
+    Mukai.expCharge b β ω (v + w) =
+      Mukai.expCharge b β ω v + Mukai.expCharge b β ω w :=
+  (expChargeHom b β ω).map_add v w
+
+/-- The exponential charge negates on negated classes. -/
+theorem expCharge_neg (v : Mukai.RealExtension V) :
+    Mukai.expCharge b β ω (-v) = -Mukai.expCharge b β ω v :=
+  (expChargeHom b β ω).map_neg v
 
 end Mukai
