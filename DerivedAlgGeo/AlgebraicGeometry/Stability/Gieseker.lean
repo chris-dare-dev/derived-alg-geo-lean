@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.Coefficients
+import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HilbertPolynomial
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.MuStability
 
