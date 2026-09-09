@@ -85,6 +85,7 @@ Arrows point from a refinement or consumer to the root it builds on.
 Algebra/Homology
   ├─→ DerivedCategory                         extends Mathlib's DerivedCategory
   │     ├─→ TStructure, ExactFunctor, Homology, CohomologyObjectProperty
+  │     ├─→ SingleTriangle                    identity/composition laws for maps
   │     ├─→ Opposite → LinearDual
   │     ├─→ Ext (adjunction, dimension shift, resolution naturality)
   │     └─→ KProjective, BoundedAboveProjective
@@ -94,7 +95,9 @@ Algebra/Homology
   │                                           Mathlib's shift and triangles
   ├─→ DGCategory                              bespoke class on HomComplex (ADR-0010/0011)
   │     ├─→ Functor, Opposite, Product, Linear, Shift, H0, LinearH0
-  │     ├─→ Pretriangulated                   cones, shifts, rotation inside the dg category
+  │     ├─→ Pretriangulated                   cones, shifts, rotation, chosen homotopy squares
+  │     │     ├─→ ConeCategory                chosen cones and homotopy-coherent maps
+  │     │     └─→ Functor                     composable shift/cone preservation capabilities
   │     └─→ Model/Complexes                   C^dg(A)
   └─→ SpectralSequence                        filtered and total complexes
 
@@ -117,11 +120,15 @@ CategoryTheory/Bicategory
 
 CategoryTheory/Triangulated
   ├─→ PretriangulatedAxioms, TStructure, PostnikovTower, ExtensionClosure, QuasiAbelian
+  ├─→ FullSubcategory                         objectwise triangle and map lifts
   ├─→ GrothendieckGroup                        K₀, realizations, Euler forms
   ├─→ CompactlyGenerated, SemiorthogonalDecomposition, SphericalTwist
-  ├─→ FourierMukai                            generic kernel autoequivalences
+  ├─→ FourierMukai                            generic kernel autoequivalences;
+  │                                           kernels vary through `kernelTransform`,
+  │                                           enhanced cones map pointwise to transform triangles
   ├─→ Families                                pseudofunctorial fiber categories
-  ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation
+  ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation,
+  │                                           functorial distinguished cone triangles
   └─→ StabilityCondition                      Bridgeland stability (canonical concept)
         ├─→ Weak                              weak stability: the dependency parent
         │     └─→ Foundation, Families, HarderNarasimhan, Support, Tilting
@@ -146,11 +153,20 @@ AlgebraicGeometry
   ├─→ Cohomology                              affine and projective Čech, finiteness, Euler characteristic
   ├─→ DerivedCategory
   │     ├─→ Basic, Coherent                   D(X.Modules), D(Coh X), Dᵇ(Coh X), Perf(X)
+  │     ├─→ CartierDivisor                   canonical coherent/derived/bounded objects
+  │     ├─→ DivisorSequence                   short-exact triangles; arbitrary-line
+  │     │                                     Cartier twists; bounded lift
+  │     │                                          consumes generic FullSubcategory API
   │     ├─→ Dqc → Comparison                  locus, canonical zero, explicit comparison evidence
   │     ├─→ Families                          base change and pullback consumers
   │     ├─→ FourierMukai                      geometric kernels and convolution; the monoidal-triangulated instance
   │     └─→ Stability                         base change of pre-stability data; kernel actions on stability
-  ├─→ Divisors, Duality, IntersectionTheory, RiemannRoch, Numerical
+  ├─→ Divisors
+  │     ├─→ CartierLineBundle                 associated sheaf as LineBundleData;
+  │     │                                     agreement with direct Picard class
+  │     └─→ EffectiveLineBundle               exact Cartier sequences tensored by
+  │                                           arbitrary line-bundle data
+  ├─→ Duality, IntersectionTheory, RiemannRoch, Numerical
   ├─→ Moduli
   │     ├─→ PerfectComplex, Quot
   │     ├─→ Semistability                     loci, scheme probes, locus probes, finite-type openness
@@ -180,6 +196,9 @@ AlgebraicGeometry
 | Basiswise isomorphism detection for topological sheaves | `DerivedAlgGeo.Topology.Sheaves.Basis` |
 | Finite products of prime-spectrum basic opens | `DerivedAlgGeo.RingTheory.Spectrum.Prime.BasicOpen` |
 | Coherent sheaves | `DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent` |
+| Cartier divisors as line bundles | `DerivedAlgGeo.AlgebraicGeometry.Divisors.CartierLineBundle` |
+| Effective-divisor sequences twisted by line bundles | `DerivedAlgGeo.AlgebraicGeometry.Divisors.EffectiveLineBundle` |
+| Cartier divisors as coherent derived objects | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.CartierDivisor` |
 | Scheme-derived categories and `Dqc`, without stability | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory` |
 | Scheme-derived pullback | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families` |
 | Geometric kernels and convolution | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai` |

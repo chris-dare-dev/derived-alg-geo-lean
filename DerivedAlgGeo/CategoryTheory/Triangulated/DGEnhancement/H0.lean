@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Shift
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Triangle
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ConeFunctor
 
 /-!
 # The triangulated homotopy category of a dg category

@@ -23,10 +23,13 @@ arXiv:2104.13610v2, Theorem 3.3.
    of the total exceptional parts, promotes the residual equivalence to an
    ambient kernel equivalence.
 
-The geometric construction of each new kernel is still precisely the dg cone
-seam isolated in `OneStepExtensionCriterion`.  No ambient equivalence, length
-equality, or common-shift conclusion is accepted as an extra axiom here: each
-is derived from its corresponding categorical input.
+The functorial dg cone and its pointwise transform triangle now live below this
+paper layer.  The remaining geometric seam in `OneStepExtensionCriterion` is
+to realize the paper's kernel category as an `H⁰`, lift its actual kernel
+morphism to that enhancement, and prove exactness of kernel evaluation.  No
+ambient equivalence, length equality, or common-shift conclusion is accepted
+as an extra axiom here: each is derived from its corresponding categorical
+input.
 -/
 
 universe u t t'
@@ -214,6 +217,14 @@ noncomputable def toKernelEquivalence : KernelEquivalence corr :=
 /-- The underlying promoted equivalence of ambient derived categories. -/
 noncomputable def ambientEquivalence : DerivedCat Y₁ ≌ DerivedCat Y₂ :=
   A.toKernelEquivalence.equiv
+
+/-- The final Fourier--Mukai transform is an equivalence of the ambient
+derived categories. -/
+theorem transform_isEquivalence :
+    (corr.transform A.sequence.finalKernel).IsEquivalence :=
+  A.sequence.finalTransform_isEquivalence
+    A.toGeneratedExtensionSequenceData.sourceGenerates
+    A.toGeneratedExtensionSequenceData.targetGenerates
 
 end PaperGeneratedExtensionSequenceData
 

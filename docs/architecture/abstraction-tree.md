@@ -48,6 +48,9 @@ Category
 │  └─ reflective transport using an ordinary adjunction
 ├─ Preadditive
 │  ├─ Triangulated category              Mathlib root
+│  │  ├─ ObjectProperty.OnTriangle       objectwise subcategory witness
+│  │  │  └─ liftTriangle / liftTriangleMap
+│  │  │     full-subcategory lift, comparison iso, functorial laws
 │  │  └─ Semiorthogonal decomposition
 │  │     ├─ ExceptionalCollection
 │  │     ├─ OrthogonalExceptionalBlocks  positive blocks and residual
@@ -64,6 +67,8 @@ Category
 ├─ Abelian                               Mathlib typeclass
 │  ├─ weak-Serre exactness               repository generic extension
 │  └─ DerivedCategory C                  generic construction
+│     ├─ ShortExact.singleTriangle       Mathlib triangle construction
+│     │  └─ map identity/composition     neutral functoriality laws
 │     └─ OppositeComparison C            explicit derived/opposite bridge
 │        └─ exact ModuleCat linear dual  categorical specialization
 ├─ FiniteExactTower
@@ -72,9 +77,34 @@ Category
 ├─ DGCategory C
 │  ├─ DGLinear k C                       scalar refinement
 │  ├─ DGFunctor C D
+│  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
+│  │  │  └─ IsClosed                     shared cocycle predicate for transformations
+│  │  ├─ PreservesShifts                 composable dg capability
+│  │  └─ PreservesChosenCones            strong witness-preserving capability
+│  │     └─ H0 exactness                 derived weak cone-triangle certificate
+│  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
+│  ├─ HomotopySquare                     chosen degree-minus-one witness
+│  │  └─ IsConeOf.Morphism               derived cone map with strict squares
+│  │     └─ ConePresentation category    coherent identity/composition
+│  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
+│  │  └─ IsConeOf.homogeneousLift        all-degree cone maps, d/id/add/comp laws
+│  │     └─ HomogeneousNatTrans.ConeData objectwise cones assemble to a dg functor
+│  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
 │  ├─ H0 C
+│  │  └─ coneTriangleFunctor             functor to distinguished triangles
 │  └─ IsPretriangulated C
 │     └─ Enhancement T                   comparison data, not a class
+├─ Fourier--Mukai correspondence
+│  ├─ kernelTransform                     functor from kernels to transforms
+│  ├─ kernelEvaluation                    one source object's kernel-variable functor
+│  ├─ ExactFamily / ExactBifunctor         globally shift-coherent exactness roots
+│  ├─ kernelConeTransformTriangleFunctor  pointwise image of enhanced dg cones
+│  └─ CounitKernelConeData                kernel arrow realizing an adjunction counit
+│     └─ kernel-presented twist candidate exact image of its dg cone
+├─ Enhanced spherical-functor lane
+│  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
+│  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
+│     └─ full sphericality                 pending Morita/shifted-comparison theorem
 ├─ Derived-category extensions
 │  └─ Ext adjunction / dimension shift / resolution naturality
 ├─ filtered-complex spectral sequences
@@ -151,12 +181,17 @@ AlgebraicGeometry
 │  └─ LineBundleData                     invertible sheaf plus chosen tensor inverse
 │     ├─ determinant and Picard interpretations
 │     ├─ monoidal pullback and projection formula
+│     ├─ CartierDivisor.lineBundleData   associated-sheaf/Picard agreement leaf
+│     │  ├─ coherent, derived, bounded-derived canonical objects
+│     │  └─ effective-divisor sequences twisted by arbitrary line bundles
 │     └─ almost-disconnected graded pieces   scheme-geometric leaf
 ├─ scheme-derived category                     `DerivedCategory/`
 │  ├─ Dqc                                      neutral geometric locus
 │  │  ├─ canonical zero                        owned by Dqc, all schemes
 │  │  └─ explicit comparison evidence          representatives, not instances
-│  ├─ bounded coherent locus
+│  ├─ bounded coherent locus                   consumes generic triangle lift
+│  │  ├─ Cartier-divisor objects            consume canonical line-bundle bridge
+│  │  └─ short-exact triangles/maps         includes arbitrary line-bundle twists
 │  ├─ scheme pullback and geometric kernels
 │  └─ absolute perfect locus                   thick envelope in `D(Coh X)`
 │     └─ essential image in Dqc
@@ -264,8 +299,12 @@ particular:
   root.  Kernel-presented exceptional-block extension remains under the
   Fourier--Mukai root.  A surface-specific residual category reuses those
   structures and binds the candidates to projections of its actual line
-  bundles; the numerical curve chain is geometric, while its derived triangle
-  and the functorial kernel cone remain explicit inputs until constructed.
+  bundles; the numerical curve chain is geometric, its derived triangles and
+  successive block maps consume the reusable Cartier-sequence roots, and only
+  quotient orthogonality remains an explicit geometric input.  Functorial dg
+  cones and their pointwise transform triangles now have generic roots; the
+  enhanced geometric kernel category, actual kernel morphism, and exactness of
+  kernel evaluation remain explicit realization inputs.
 
 Bicategories are the first implemented higher-categorical stage. A future
 general `n`-category or `(∞,1)`-category layer must name its formal model and

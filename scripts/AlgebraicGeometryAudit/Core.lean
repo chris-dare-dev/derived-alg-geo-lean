@@ -1108,6 +1108,16 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.enriquesNumericalVariety_satisfiesHRR
 #print axioms Examples.enriquesToddComp_one
 #print axioms Examples.enriquesChiStructureSheaf
+-- The numerical Enriques signature, its Riemann--Roch form, and the named
+-- degree-one witness.
+#print axioms Enriques.IsEnriques
+#print axioms Enriques.IsEnriques.toddComp_one
+#print axioms Enriques.IsEnriques.degree_toddComp_two
+#print axioms Enriques.chi_eq
+#print axioms Examples.enriques_isEnriques
+#print axioms Examples.standardEnriquesNumericalVariety
+#print axioms Examples.standardEnriquesNumericalVariety_satisfiesHRR
+#print axioms Examples.standardEnriquesNumericalVariety_isEnriques
 #print axioms Examples.k3EnriquesAbelianPresentations
 #print axioms Examples.chiStructureSheaf_enriques_ne_k3
 #print axioms Examples.chiStructureSheaf_enriques_ne_abelian

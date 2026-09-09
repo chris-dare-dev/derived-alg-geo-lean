@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Adjunction
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Mutation
+import Mathlib.CategoryTheory.Adjunction.Restrict
 
 /-!
 # Fourier--Mukai extension across exceptional blocks
@@ -25,13 +26,17 @@ There are three layers.
   ambient kernel equivalence extending the residual equivalence and matching
   every object of every exceptional block, with one common shift per block.
 
-The kernel constructed in the papers is a cone of a morphism of kernels.
-Functorial construction of that morphism and cone belongs to the dg
-enhancement chain #855, #853, #854 and is not available at the current pin.
-Accordingly the two extension structures are explicitly *result data*.  They
-state the paper theorems without pretending to construct their geometric/dg
-input.  Once their adjunction fields are supplied, however, the ambient
-equivalence itself is derived through `Adjunction.toEquivalence`.
+The kernel constructed in the papers is a cone of a morphism of kernels.  The
+abstract functorial dg-cone construction is rooted at
+`DGFunctor.HomogeneousNatTrans.ConeData`; `FourierMukai.KernelCone` maps such
+cones pointwise through a correspondence, and
+`FourierMukai.CounitKernelConeData` is the reusable specialization when the
+kernel morphism realizes an adjunction counit.  The geometric identification
+of the kernel category with an `H⁰`, the actual enhanced kernel morphism, and
+exactness of kernel evaluation remain the #853--#855 realization boundary.
+Accordingly the two extension structures are still explicitly *result data*.
+Once their adjunction fields are supplied, however, the ambient equivalence
+itself is derived through `Adjunction.toEquivalence`.
 -/
 
 open CategoryTheory
@@ -82,6 +87,12 @@ theorem ofRightAdjointKernel_kernel
     (R : RightAdjointKernelData corr corr' K)
     [∀ A, IsIso (R.adj.unit.app A)] [∀ B, IsIso (R.adj.counit.app B)] :
     (ofRightAdjointKernel corr corr' K R).kernel = K := rfl
+
+/-- The transform presented by a kernel equivalence is an equivalence. -/
+theorem transform_isEquivalence (corr : Correspondence X Y W)
+    (A : KernelEquivalence corr) :
+    (corr.transform A.kernel).IsEquivalence := by
+  exact Functor.isEquivalence_of_iso A.iso
 
 end KernelEquivalence
 
@@ -297,7 +308,140 @@ noncomputable def restrictedFunctorIso :
         ((adjoinObject P E).ι ⋙ corr.transform A.newKernel)
         A.mapsAdjoin) ≪≫ A.enlargedIso)
 
+/-- The supplied kernel map has a canonical transform map. This is the
+  natural-transformation seam consumed by an eventual dg kernel-cone
+  construction; the extension data still supplies the kernel and the map. -/
+def transformKernelMap :
+    corr.transform A.newKernel ⟶ corr.transform oldKernel :=
+  corr.kernelTransform.map A.kernelMap
+
+@[simp]
+theorem transformKernelMap_app (E : X) :
+    (A.transformKernelMap).app E =
+      corr.push.map ((corr.tensor.map A.kernelMap).app (corr.pull.obj E)) :=
+  rfl
+
+/-- The old transform also presents the original base equivalence.
+
+The supplied comparison `agreesWithOld` points from the new transform to the
+old one, while `agreesOnBase` points from the new transform to the base
+equivalence.  Cancelling the former is the restriction statement that is
+needed when the kernel-cone stage is fed into the next induction step. -/
+def oldAgreesOnBase :
+    P.ι ⋙ corr.transform oldKernel ≅ base.functor ⋙ Q.ι :=
+  A.agreesWithOld.symm ≪≫ A.agreesOnBase
+
+/-- The restricted transform, followed by the target inclusion, is the
+ambient transform restricted to the enlarged source.
+
+This is the canonical comparison supplied by the full-subcategory lift; it
+does not use the enlarged equivalence and therefore remains available at the
+kernel-cone boundary. -/
+def restrictedTransformCompιIso :
+    A.restrictedFunctor ⋙ (adjoinObject Q F).ι ≅
+      (adjoinObject P E).ι ⋙ corr.transform A.newKernel :=
+  (adjoinObject Q F).liftCompιIso
+    ((adjoinObject P E).ι ⋙ corr.transform A.newKernel)
+    A.mapsAdjoin
+
+/-- The enlarged equivalence with its functor changed to the actual
+restricted transform. -/
+noncomputable def restrictedEquivalence :
+    (adjoinObject P E).FullSubcategory ≌
+      (adjoinObject Q F).FullSubcategory :=
+  A.enlargedEquiv.changeFunctor A.restrictedFunctorIso.symm
+
+@[simp]
+theorem restrictedEquivalence_functor :
+    A.restrictedEquivalence.functor = A.restrictedFunctor :=
+  rfl
+
+/-- The adjunction between the restricted transform and the inverse of the
+enlarged equivalence.  It is derived from the equivalence and the comparison
+`restrictedFunctorIso`; no ambient adjoint is being asserted here. -/
+noncomputable def restrictedAdjunction :
+    A.restrictedFunctor ⊣ A.enlargedEquiv.inverse :=
+  A.enlargedEquiv.toAdjunction.ofNatIsoLeft A.restrictedFunctorIso.symm
+
+theorem restrictedFunctor_isEquivalence :
+    A.restrictedFunctor.IsEquivalence :=
+  A.restrictedEquivalence.isEquivalence_functor
+
 end OneStepExtensionData
+
+/-! ### Kernel-presented adjunctions on one extension stages -/
+
+section OneStepRightAdjunction
+
+variable {P : ObjectProperty X} {Q : ObjectProperty Y} {E : X} {F : Y}
+  {base : P.FullSubcategory ≌ Q.FullSubcategory}
+  {corr : Correspondence X Y W} {oldKernel : W}
+  (A : OneStepExtensionData P Q E F base corr oldKernel)
+
+/-- Data which restricts a kernel-presented ambient right adjoint to the
+enlarged one-step stages.
+
+The ambient adjunction and the target-to-source preservation are genuine
+geometric inputs.  The comparison between the restricted right adjoint and
+the inverse of the enlarged equivalence is deliberately not a field: both are
+right adjoint to the same restricted transform, so right-adjoint uniqueness
+supplies the canonical comparison. -/
+structure RightAdjunctionData
+    {W' : Type u'''} [Category.{v'''} W']
+    (corr' : Correspondence Y X W') where
+  /-- A kernel-presented right adjoint of the extended transform. -/
+  rightAdjoint : RightAdjointKernelData corr corr' A.newKernel
+  /-- The right-adjoint transform preserves the target enlarged span. -/
+  mapsAdjoin : ∀ B : (adjoinObject Q F).FullSubcategory,
+    adjoinObject P E ((corr'.transform rightAdjoint.adjKernel).obj B.obj)
+
+namespace RightAdjunctionData
+
+variable {W' : Type u'''} [Category.{v'''} W']
+  {corr' : Correspondence Y X W'}
+  (R : RightAdjunctionData A corr')
+
+/-- The right adjoint restricted to the enlarged target and source spans. -/
+noncomputable def restrictedRightAdjoint :
+    Functor (adjoinObject Q F).FullSubcategory
+      (adjoinObject P E).FullSubcategory :=
+  restrictedTransform Q P F E corr' R.rightAdjoint.adjKernel R.mapsAdjoin
+
+/-- Restrict the ambient kernel-presented adjunction to the two enlarged
+stages.  The two comparison isomorphisms are the canonical lift comparisons,
+so the construction is exactly `Adjunction.restrictFullyFaithful`. -/
+noncomputable def kernelRestrictedAdjunction :
+    A.restrictedFunctor ⊣ R.restrictedRightAdjoint :=
+  R.rightAdjoint.adj.restrictFullyFaithful
+    (adjoinObject P E).fullyFaithfulι
+    (adjoinObject Q F).fullyFaithfulι
+    A.restrictedTransformCompιIso.symm
+    ((adjoinObject P E).liftCompιIso
+      ((adjoinObject Q F).ι ⋙ corr'.transform R.rightAdjoint.adjKernel)
+      R.mapsAdjoin).symm
+
+/-- The canonical comparison between the restricted kernel-presented right
+adjoint and the inverse of the enlarged equivalence.  It is forced by the two
+adjunctions with common left adjoint `A.restrictedFunctor`. -/
+noncomputable def restrictedInverseIso :
+    R.restrictedRightAdjoint ≅ A.enlargedEquiv.inverse :=
+  Adjunction.rightAdjointUniq R.kernelRestrictedAdjunction A.restrictedAdjunction
+
+/-- The restricted kernel-presented right adjoint is an equivalence because it
+is canonically isomorphic to the inverse of the enlarged equivalence. -/
+theorem restrictedRightAdjoint_isEquivalence :
+    R.restrictedRightAdjoint.IsEquivalence := by
+  exact Functor.isEquivalence_of_iso R.restrictedInverseIso.symm
+
+/-- Express the canonical restricted kernel adjunction with the inverse of the
+supplied stage equivalence as its right adjoint. -/
+noncomputable def stageAdjunction :
+    A.restrictedFunctor ⊣ A.enlargedEquiv.inverse :=
+  R.kernelRestrictedAdjunction.ofNatIsoRight R.restrictedInverseIso
+
+end RightAdjunctionData
+
+end OneStepRightAdjunction
 
 /-- The finite blockwise extension conclusion of Paper I, Theorem 5.1 and
 Paper II, Theorem 3.3.

@@ -95,8 +95,23 @@ blocks should normally move it rather than add more declarations beside it.
   geometric consumers: they identify the block members with the ten selected
   line bundles, record the numerical `(-2)`-chains, and specialize projection,
   classification matching, shift rigidity, and ambient kernel extension.
-  Constructing the divisor triangles and functorial kernel cones remains
-  supplied data pending the dg enhancement lane.
+  `Divisors/EffectiveLineBundle.lean` and
+  `DerivedCategory/DivisorSequence.lean` now construct the line-bundle-twisted
+  divisor triangles; `PaperExtension.lean` transports them to the chosen block
+  representatives and derives the projection-chain maps. Curve-quotient
+  residual orthogonality remains supplied geometric data.
+- Functorial dg cones and kernel-variable transforms:
+  `Algebra/Homology/DGCategory/Pretriangulated/ConeCategory.lean` owns the
+  category of chosen dg cones and homotopy-coherent cone morphisms;
+  `DGEnhancement/H0/ConeFunctor.lean` maps it functorially into distinguished
+  `H⁰` triangles.  `FourierMukai/Basic.lean` owns the functor from kernels to
+  transforms and its objectwise evaluation, while `FourierMukai/KernelCone.lean`
+  maps enhanced kernel cones to pointwise transform triangles and packages an
+  exact kernel evaluation as a functor valued in distinguished triangles.  The
+  geometric `H⁰` model
+  of the kernel category, the paper's actual enhanced kernel morphism, and the
+  exactness instance for its evaluation remain realization tasks; the generic
+  cone itself is no longer a supplied paper-layer seam.
 - Generic moduli boundedness: `CategoryTheory/Moduli/Boundedness.lean`.
 - Generic replete subprestack machinery:
   `CategoryTheory/Bicategory/Functor/Cat/ObjectProperty/`, reusing Mathlib's

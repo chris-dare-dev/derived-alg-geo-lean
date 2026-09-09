@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.Abelian
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.Enriques
 
 /-!
 # A numerical Enriques surface of Picard rank one
@@ -43,11 +44,14 @@ the abelian one.
 ## Main definitions
 
 * `enriquesNumericalVariety` — the model.
+* `standardEnriquesNumericalVariety` — a named degree-one witness.
 * `k3EnriquesAbelianPresentations` — the three presentations on one carrier.
 
 ## Main results
 
 * `enriquesNumericalVariety_satisfiesHRR` — the presentation satisfies HRR.
+* `enriques_isEnriques` — the model satisfies the numerical Enriques
+  signature.
 * `enriquesChiStructureSheaf` — `∫_Y td₂ = χ(O_Y) = 1`.
 * `enriquesToddComp_one` — `td₁ = 0`: the canonical class is numerically
   trivial, though not trivial in `Pic`.
@@ -138,10 +142,10 @@ different geometric reason behind it — see the module docstring. -/
 theorem enriquesToddComp_one (d : ℕ) :
     (enriquesNumericalVariety d).toddComp 1 = 0 := rfl
 
-/-- `∫_Y td₂ = χ(O_Y) = 1`. Stated as two theorems with `enriquesToddComp_one`
-because — like abelian surfaces and unlike K3s — numerical Enriques surfaces
-have no property class in this library to inhabit. `hd` is needed because
-`(1/(2d)) · ∫H² = 1` fails at `d = 0`, where the degree map is zero. -/
+/-- `∫_Y td₂ = χ(O_Y) = 1`. Stated separately from
+`enriquesToddComp_one` because the numerical signature has two independent
+components. `hd` is needed because `(1/(2d)) · ∫H² = 1` fails at `d = 0`,
+where the degree map is zero. -/
 theorem enriquesChiStructureSheaf (d : ℕ) (hd : d ≠ 0) :
     Surface.chiStructureSheaf (enriquesNumericalVariety d) = 1 := by
   show surfaceDegree (2 * (d : ℚ))
@@ -149,6 +153,30 @@ theorem enriquesChiStructureSheaf (d : ℕ) (hd : d ≠ 0) :
   rw [surfaceDegree_algebraMap_mul, surfaceDegree_Hsq]
   have hdq : (d : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr hd
   field_simp
+
+/-- The explicit model has the numerical Enriques signature. This is a
+concrete numerical witness, not a construction of a geometric Enriques
+surface. -/
+theorem enriques_isEnriques (d : ℕ) (hd : d ≠ 0) :
+    Enriques.IsEnriques (enriquesNumericalVariety d) :=
+  ⟨enriquesToddComp_one d, enriquesChiStructureSheaf d hd⟩
+
+/-- A named degree-one numerical Enriques model. The degree-one choice is the
+smallest nonzero polarization parameter on the rank-one carrier. -/
+@[reducible]
+noncomputable def standardEnriquesNumericalVariety :
+    NumericalVarietyData 2 SurfaceRing SurfaceNum :=
+  enriquesNumericalVariety 1
+
+theorem standardEnriquesNumericalVariety_satisfiesHRR :
+    standardEnriquesNumericalVariety.SatisfiesHRR := by
+  simpa [standardEnriquesNumericalVariety] using
+    enriquesNumericalVariety_satisfiesHRR 1 (by norm_num)
+
+theorem standardEnriquesNumericalVariety_isEnriques :
+    Enriques.IsEnriques standardEnriquesNumericalVariety := by
+  simpa [standardEnriquesNumericalVariety] using
+    enriques_isEnriques 1 (by norm_num)
 
 /-- Three numerical presentations on the same carriers coexist as ordinary
 data, extending `k3AndAbelianPresentations`. This is a regression test against

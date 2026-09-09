@@ -28,6 +28,16 @@ says that the interface is consistent, not that any functor is of kernel type.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transform
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transform_obj
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transform_map
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMap
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMap_app
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMap_id
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMap_comp
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelTransform
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelTransform_obj
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelTransform_map
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelEvaluation
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelEvaluation_obj
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelEvaluation_map
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMapIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMapIso_refl
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.IsKernelFunctor
@@ -37,6 +47,22 @@ says that the interface is consistent, not that any functor is of kernel type.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.IsKernelFunctor.iso
 #print axioms CategoryTheory.Triangulated.FourierMukai.transform_isTriangulated
 #print axioms CategoryTheory.Triangulated.FourierMukai.transform_additive
+
+/-! ## Fourier--Mukai lane -- enhanced kernel cones -/
+
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.kernelConeTransformTriangleFunctor_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleFunctor_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.distinguishedConeTriangleFunctor
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.distinguishedConeTriangleFunctor_obj_val
 
 /-! ## Fourier--Mukai lane -- convolution of kernels
 
@@ -735,3 +761,69 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.targetCover
 #print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.toGeneratedExtensionSequenceData
 #print axioms CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData.toKernelEquivalence
+
+/-! ## Fourier--Mukai lane -- source-natural transform triangles -/
+
+-- A fixed enhanced kernel cone as a functor from source objects to
+-- distinguished transform triangles, under one globally coherent exact-family
+-- hypothesis on kernel evaluation.
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleInSource_obj
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleInSource_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleInSource_obj_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleInSource_obj_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.coneTriangleInSource_obj_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.distinguishedConeTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.distinguishedConeTriangleInSource_obj_val
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.pointwiseDistinguishedTriangleProperty
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMapIso_hom
+
+/-! ## Fourier--Mukai lane -- counit kernel cones -/
+
+-- A supplied closed kernel arrow from the convolution kernel to the unit
+-- kernel, the equation identifying its transform with the adjunction counit,
+-- and the kernel-presented twist candidate its dg cone produces.
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.arrow
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.cone
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.isCone
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentation
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentation_cone
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentation_source
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentation_target
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.transform_arrow
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.triangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.triangleInSource_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.triangleInSource_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.triangleInSource_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.triangleInSource_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.twist
+
+/-! ## Fourier--Mukai lane -- kernel-presented adjunctions on extension stages -/
+
+-- The transform of a supplied kernel map, the restricted equivalence and
+-- adjunction of one extension stage, kernel-presented right adjoints restricted
+-- to the enlarged stages, and equivalence of the final transform.
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.finalTransform_isEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.ExtensionSequenceData.toKernelEquivalence_kernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.KernelEquivalence.transform_isEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.oldAgreesOnBase
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.restrictedAdjunction
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.restrictedEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.restrictedEquivalence_functor
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.restrictedFunctor_isEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.restrictedTransformCompιIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.transformKernelMap
+#print axioms CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData.transformKernelMap_app
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData.kernelRestrictedAdjunction
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData.mapsAdjoin
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData.restrictedInverseIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData.restrictedRightAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData.restrictedRightAdjoint_isEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData.rightAdjoint
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData.stageAdjunction
