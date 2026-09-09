@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformation
+import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformationH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.HomogeneousLift
 
 /-!
@@ -36,14 +36,6 @@ namespace DGFunctor.HomogeneousNatTrans
 variable {C : Type u} {D : Type u'}
   [DGCategory.{v} C] [DGCategory.{v} D]
   {F G : DGFunctor C D}
-
-/-- A closed dg natural transformation has closed components. -/
-lemma IsClosed.app_mem_cocycles {α : HomogeneousNatTrans F G 0}
-    (hα : IsClosed α) (X : C) :
-    app α X ∈ cocycles (F.obj X) (G.obj X) := by
-  rw [mem_cocycles_iff]
-  rw [← show (0 : ℤ) + 1 = 1 by omega]
-  exact hα.app_d X
 
 /-- The minimal choices needed to turn componentwise cones of `α` into a dg
 functor.  No compatibility fields are necessary: graded naturality of `α`

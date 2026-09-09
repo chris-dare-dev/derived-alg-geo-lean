@@ -352,6 +352,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.H0.homMk_eq_homMk
 #print axioms CategoryTheory.H0.homMk_neg
 #print axioms CategoryTheory.H0.homMk_comp
+#print axioms CategoryTheory.H0.homMk_id
 #print axioms CategoryTheory.H0.coneTriangle_mor₁
 #print axioms CategoryTheory.H0.coneTriangle_mor₂
 #print axioms CategoryTheory.H0.coneTriangle_mor₃
@@ -684,3 +685,18 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₂
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₃
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_distinguished
+
+-- Closed degree-zero dg natural transformations descend to `H⁰`, and a dg
+-- adjunction is an adjunction there.  This is the adapter that makes dg data
+-- comparable with the ordinary categorical data the rest of the library uses.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_id
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.isClosed_id
+#print axioms CategoryTheory.DGAdjunction.h0Unit
+#print axioms CategoryTheory.DGAdjunction.h0Counit
+#print axioms CategoryTheory.DGAdjunction.h0Unit_app
+#print axioms CategoryTheory.DGAdjunction.h0Counit_app
+#print axioms CategoryTheory.DGAdjunction.h0
+#print axioms CategoryTheory.DGAdjunction.h0_unit
+#print axioms CategoryTheory.DGAdjunction.h0_counit
