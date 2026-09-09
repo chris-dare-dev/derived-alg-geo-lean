@@ -177,3 +177,16 @@ has a greatest element. -/
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_maximalDestabilizing
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.maximalDestabilizing_isSemistable
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.topSlope_maximalDestabilizing_eq_top_iff
+
+/-! ## The see-saw inequality (groundwork for #905)
+
+Additivity of multiplicity and of the degree coefficient on a short exact sequence, and the
+mediant inequality they give: a sub of slope at most the quotient has slope at most the whole.
+The abstract weak-slope theory has no such inequality, and this one is not abstract — its
+multiplicity-zero case is decided by the geometric input in `MuPositivityData`. The
+Harder-Narasimhan recursion of #905 consumes it to prove that the slope drops strictly on the
+quotient by the maximal destabilizing subobject. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_shortExact
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertDegreeCoefficient_shortExact
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.topSlope_le_of_shortExact
