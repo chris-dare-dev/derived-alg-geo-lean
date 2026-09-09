@@ -15,6 +15,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 import DerivedAlgGeo.AlgebraicGeometry.Numerical
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum
 import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch
+import DerivedAlgGeo.AlgebraicGeometry.Stability
 import DerivedAlgGeo.AlgebraicGeometry.Stacks
 import DerivedAlgGeo.AlgebraicGeometry.Surface
 import DerivedAlgGeo.AlgebraicGeometry.Variety
