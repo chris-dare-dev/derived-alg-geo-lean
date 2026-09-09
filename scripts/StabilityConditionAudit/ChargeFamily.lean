@@ -78,3 +78,27 @@ this child and are NOT assumptions of the root. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.stChargeFamily_wallValue
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.stCharge_im
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.stCharge_re
+
+/-! ## The real-linear action on charges
+
+A stability condition may be post-composed with a real-linear automorphism of
+the complex numbers; the universal cover of GL+(2, R) acts that way and the
+numerical wall is one of the things it preserves. realDet is the determinant in
+the basis 1, I; wallValue_linearAct is the determinant law, wallValue being the
+determinant of the 2x2 matrix of real and imaginary parts. wall_linearAct and
+wall_smul need only invertibility, NOT orientation: the wall is preserved by
+every invertible real-linear map, while the phase is not, which is why GL+
+rather than GL appears downstream. Only the numerical half of the action is
+here; no heart or slicing is transported. -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.linearAct
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.linearAct_charge
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.map_eq_smul_add_smul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.realDet
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.realDet_mulLeft
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.smul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.smul_charge
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.wallValue_linearAct
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.wallValue_smul
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.wall_linearAct
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily.wall_smul
