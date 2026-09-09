@@ -223,7 +223,7 @@ comparison of that form with the surface form under C1/C2. Geometricity alone
 does not identify support forms or connected components.
 
 Two numerical obligations that sat between the landed divisorial layer and
-this comparison are now stated in `Numerical/Stability/DivisorialDiscriminant.lean`:
+this comparison are now stated in `Walls/Divisorial/Discriminant.lean`:
 
 * the Macrì--Schmidt forms in the full divisor space: `ChernCharacter.discriminant`
   (`Δ = (ch₁)² - 2 ch₀ ch₂`, proved `B`-invariant), `barDiscriminant`
@@ -311,7 +311,7 @@ The arithmetic boundary is split across composable components:
   codimension-one `BField`, the components of `ch^B = exp(-B)ch`, their
   degree-zero/one/two expansions, and the theorem identifying the notation
   `B = βH` with the existing `chBetaComp` notation;
-* `Numerical/Stability/SurfaceCharge.lean` contains the pure additive charge
+* `Walls/Divisorial/Coordinates.lean` contains the pure additive charge
   coordinates after twisting, the canonical shared charge polynomial, the
   real scalar specialization `B = bH`, and the coordinate-preserving map
   interface;
@@ -326,14 +326,14 @@ The arithmetic boundary is split across composable components:
   the arithmetic identity between the exponential presentation
   `-∫ exp(-(b + i a)H) ch` and the twisted surface presentation `Z_{aH,bH}`.
   The `(r,c,v)` carrier is **not** Li's image lattice `Λ_ι`; see C2;
-* `Numerical/Stability/DivisorialCharge.lean` supplies the intrinsic
+* `Walls/Divisorial/Charge.lean` supplies the intrinsic
   higher-Picard-rank layer: a real divisor space with symmetric intersection
   form, uncompressed additive Chern-character coordinates, independent
   `(B,omega)` parameters, an optional ample-cone witness, the arbitrary real
   `B`-twist, the general divisorial charge, its Mukai-pairing expression, and
   the theorem recovering the existing scalar-twist API on
   `B = beta H`, `omega = alpha H`; and
-* `Numerical/Stability/DivisorialWallSlice.lean` makes the arbitrary
+* `Walls/Divisorial/Slice.lean` makes the arbitrary
   `(B,omega)` divisorial charge into a full wall family.  Orthogonal slices are
   literal parameter reindexings of that parent, with an arbitrary real
   transverse parameter space.  The intrinsic `H-perp` constructor and its
@@ -376,14 +376,14 @@ The arithmetic boundary is split across composable components:
   `B = sH`, `omega = tH` (`wallChargeFamily_eq_rankOne_reindex`).  Every
   rank-one child therefore reaches both the circle/line/nesting theorems of
   the `(s,t)` polynomial and the arbitrary-`(B,omega)` divisorial layer; and
-* `Numerical/Stability/DivisorialDiscriminant.lean` supplies the
+* `Walls/Divisorial/Discriminant.lean` supplies the
   Macrì--Schmidt discriminants `Δ`, `ar Δ^B_ω`, `Δ^C_{ω,B}` on the intrinsic
   character, the divisor-space Hodge index certificate `DivisorSpace.HodgeIndex`
   with its one-directional bridge to the numerical `HodgeIndexStatement`, the
   derivation of `OrthogonalSlice.IsHodge` from the inequality plus
   nondegeneracy, and the transport of `BogomolovGiesekerData` to
   `0 ≤ ar Δ^B_ω` under a Hodge index at `omega`; and
-* `Numerical/Stability/DivisorialWallCircle.lean` proves that fixing the
+* `Walls/Divisorial/Circle.lean` proves that fixing the
   transverse parameter turns a divisorial slice into the `(s,t)` model itself:
   `chargeFamily_reindex_ofST` identifies the reindexed family with
   `stChargeFamily` pulled back along the degree-weighted triple of the
@@ -514,28 +514,27 @@ local system of lattices with monodromy, is not modelled and is not needed
 for the projective-family case, where one lattice serves the whole family
 (Theorem 10.3).
 
+The generic layer moved out of `AlgebraicGeometry/` on 2026-09-09; see the
+"Divisorial charge block" entry in `docs/architecture/cutover-ledger.md`, which
+also records where this note's earlier claim about that move was wrong.
+
 The next honest coding boundary is one of:
 
-1. move the generic `SurfaceCharge`/`DivisorialCharge` layer out of
-   `AlgebraicGeometry/` (the candidate lane recorded in
-   `docs/architecture/cutover-ledger.md`) and redefine `Wall.stChargeFamily` as
-   a reindexing of `ChernCharacter.fullChargeFamily`, so that one formula owner
-   remains and `DivisorialWallTransport.lean`'s bridge becomes a definition;
-2. name the Mukai adapter explicitly: a `ChernCharacter → Mukai.RealExtension`
+1. name the Mukai adapter explicitly: a `ChernCharacter → Mukai.RealExtension`
    map whose third slot is `ch₂ + rank`, tied to `Examples/Surface/K3Mukai.lean`,
    so Bridgeland's charge is a second child rather than an overload of a field
    whose contract says it holds the ordinary Chern character;
-3. define a threefold/BMT central-charge family as another child of
+2. define a threefold/BMT central-charge family as another child of
    `Wall.ChargeFamily`, with its own character structure carrying `ch₃` and a
    cubic twist, without promoting the conjectural BMT inequality to a generic
    fact;
-4. add topological chamber and connected-component structure above generic wall
+3. add topological chamber and connected-component structure above generic wall
    sets, only when a topology and local-finiteness hypotheses are explicitly
    available;
-5. connect `Wall.ChargeFamily` to the existing categorical family interfaces
+4. connect `Wall.ChargeFamily` to the existing categorical family interfaces
    once #851 supplies the common relative numerical class-map data, using
    reindexing for base change rather than inventing a second family carrier; or
-6. implement the C1 numerical comparison after the geometric `vLi`/GRR data
+5. implement the C1 numerical comparison after the geometric `vLi`/GRR data
    have an honest owner.
 
 The current layer fixes the formulas, source locations, normalization choices,

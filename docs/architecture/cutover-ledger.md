@@ -7,6 +7,49 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Divisorial charge block (2026-09-09):
+  `CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/` owns the
+  central-charge arithmetic that `Walls/Numerical/` performs in three
+  compressed real coordinates, carried out instead on an uncompressed real
+  divisor space. `Coordinates.lean` owns `ChargeCoordinates` and the charge
+  polynomial, `Charge.lean` owns `DivisorSpace`, `ChernCharacter`,
+  `StabilityParameters` and the intrinsic charge, `Slice.lean` owns
+  `fullChargeFamily` and `OrthogonalSlice`, `Discriminant.lean` owns the
+  Macri--Schmidt quadratic forms and the `DivisorSpace.HodgeIndex` certificate,
+  and `Circle.lean` owns the identification of a fixed-`u` slice with the
+  `(s,t)` model. None of the five needs a scheme, a sheaf, or a numerical
+  intersection ring. The precedent for the placement is
+  `Walls/Numerical/Basic.lean`, which is the same kind of pure arithmetic, and
+  `Walls/Spherical/Basic.lean`, which already consumes `LinearAlgebra/` from
+  this subtree rather than living in it.
+
+  The geometric adapters stay under `AlgebraicGeometry/Numerical/Stability/`:
+  `SurfaceChargeNumerical.lean`, `DivisorialChargeNumerical.lean`,
+  `DivisorialChargeScalarExtension.lean`, `DivisorialWallTransport.lean`, and
+  the numerical-realization halves of `DivisorialDiscriminant.lean` and
+  `DivisorialWallCircle.lean`. The old paths are removed rather than shimmed.
+  `SurfaceChargeNumerical.lean` declares its adapters into
+  `Wall.Divisorial.ChargeCoordinates` so dot notation keeps working on the
+  coordinates they produce, which the placement rule permits; its module is
+  still under `AlgebraicGeometry/`, so its records stay in the
+  algebraic-geometry audit lane, while the 177 moved declarations are audited
+  in `scripts/StabilityConditionAudit/Divisorial.lean`. Rule 8 of
+  `scripts/check_layering.py` pins the six structures to the Walls subtree and
+  fails if a geometric module declares them again.
+
+  **The candidate entry for this lane overstated its payoff.** It said the move
+  would let `Wall.stChargeFamily` be defined as a reindexing of
+  `ChernCharacter.fullChargeFamily`, leaving one formula owner. That is not
+  what the move buys. `reZ` and `imZ` in `Walls/Numerical/Basic.lean` remain
+  the definition the circle, line, disjointness and nesting theorems are stated
+  against, and redefining them would rewrite that whole development. The two
+  presentations stay related by the proved bridges
+  `ChargeCoordinates.stCharge_toNumClass` and
+  `OrthogonalSlice.chargeFamily_reindex_ofST`. What the move buys is the
+  placement itself, and that a future threefold or BMT charge family, or the
+  spherical wall lane, can now consume the divisorial layer without importing
+  geometry.
+
 - Mukai stability-condition specialization (2026-09-08):
   `CategoryTheory/Triangulated/StabilityCondition/Mukai/` is the sibling
   consumer of generic weak stability and tilting. `Charge.lean` owns the
@@ -539,27 +582,9 @@ both lanes recorded after it: the `ObjectProperty` lift block (2026-09-02)
 and the left-orthogonal colimit closure (2026-09-03). Both are entries under
 "Completed roots" above.
 
-One candidate lane is recorded, not yet confirmed (2026-09-08, review of
-#1098):
-
-- **Divisorial surface-charge generic layer.**
-  `AlgebraicGeometry/Numerical/Stability/SurfaceCharge.lean` and
-  `AlgebraicGeometry/Numerical/Stability/DivisorialCharge.lean` mention no
-  scheme and import nothing geometric: `ChargeCoordinates`, `DivisorSpace`,
-  `ChernCharacter`, `StabilityParameters`, and the charge polynomial are
-  linear algebra over `ℝ` and `ℂ`. By the placement rule they are a generic
-  block whose geometric use starts in `SurfaceChargeNumerical.lean`. The
-  repository precedent is `CategoryTheory/Triangulated/StabilityCondition/Walls/Numerical/Basic.lean`,
-  which is the same kind of pure arithmetic and lives with the wall lane.
-  Moving the two files beside it would also let the `(s,t)` child
-  `Wall.stChargeFamily` be defined as a reindexing of
-  `ChernCharacter.fullChargeFamily`, removing the second formula owner that
-  `DivisorialWallTransport.lean` currently reconciles by theorem. Until the
-  move, do not extend the generic block in place.
-
-No confirmed type-level hazard remains: the `ZLattice` class, the bundled
-variety types, and the alternating-finsum vocabulary are all retired above
-(2026-09-02).
+The divisorial charge block recorded here as a candidate on 2026-09-08 landed
+on 2026-09-09 and is now an entry under "Completed roots" above; the entry
+also records where that candidate's stated payoff was wrong.
 
 When a lane is added here, take it one per pull request. Remove the old path rather than retaining
 an import-only shim, update audits and umbrellas in the same pull request, and

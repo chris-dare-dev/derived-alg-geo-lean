@@ -175,6 +175,39 @@ OBJECT_PROPERTY_BLOCK = (
     "restrictInverseImageLeft",
     "restrictInverseImageRight",
 )
+# Rule 8. The divisorial charge layer moved out of AlgebraicGeometry/ on
+# 2026-09-09 (cutover-ledger.md). Its carriers are a real vector space with a
+# symmetric bilinear form, an additive coordinate triple valued in it, and two
+# divisor parameters; nothing in the block needs a scheme, a sheaf, or a
+# numerical intersection ring, and its geometric adapters now import it rather
+# than owning it. The guard is the one the ledger asks for: the block's
+# structures stay declared in the Walls subtree, and no module below
+# AlgebraicGeometry/ declares them again. A geometric file may still add
+# lemmas INTO these namespaces for dot notation -- that is what the placement
+# rule permits -- so only the structure declarations are pinned here.
+DIVISORIAL_ROOT_DIR = "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial"
+DIVISORIAL_BLOCK = (
+    "ChargeCoordinates",
+    "ChernCharacter",
+    "DivisorSpace",
+    "DivisorialParameters",
+    "OrthogonalSlice",
+    "StabilityParameters",
+)
+STRUCTURE_DECLARES = re.compile(
+    r"^\s*(?:private\s+|protected\s+|noncomputable\s+)*structure\s+(\S+)"
+)
+
+
+def structure_names(text: str) -> set[str]:
+    """Structure names a module declares, for the rule 8 site check."""
+    return {
+        match.group(1)
+        for match in (STRUCTURE_DECLARES.match(line) for line in text.splitlines())
+        if match
+    }
+
+
 DECLARES = re.compile(
     r"^\s*(?:private\s+|protected\s+|noncomputable\s+)*"
     r"(?:def|abbrev|instance|theorem|lemma)\s+(?:_root_\.)?(\S+)"
@@ -446,6 +479,37 @@ def main() -> int:
                     f"the ObjectProperty lift block; import {op_module} instead"
                 )
 
+    # Rule 8.
+    div_dir = SOURCE_ROOT / DIVISORIAL_ROOT_DIR
+    if not div_dir.is_dir():
+        failures.append(
+            f"missing {div_dir.relative_to(ROOT)}: it owns the divisorial "
+            "charge block; see docs/architecture/cutover-ledger.md"
+        )
+    else:
+        div_declared: set[str] = set()
+        for path in sorted(div_dir.glob("*.lean")):
+            div_declared |= structure_names(path.read_text(encoding="utf-8"))
+        for name in DIVISORIAL_BLOCK:
+            if name not in div_declared:
+                failures.append(
+                    f"{div_dir.relative_to(ROOT)}: no longer declares {name}; "
+                    "the divisorial charge block's canonical owner is this "
+                    "subtree"
+                )
+        for module, (path, _, _) in modules.items():
+            if not may_import_geometry(module):
+                continue
+            stray = structure_names(path.read_text(encoding="utf-8")) & set(
+                DIVISORIAL_BLOCK
+            )
+            if stray:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)} from "
+                    "the divisorial charge block; import "
+                    f"{module_of(next(div_dir.glob('Charge.lean')))} instead"
+                )
+
     failures += check_fixtures(closure)
 
     if failures:
@@ -468,7 +532,9 @@ def main() -> int:
         "stability-neutral; weak stability is independent of, and structurally "
         f"parented by, Bridgeland stability; {len(RETIRED_PATHS)} retired paths "
         f"absent; the {len(OBJECT_PROPERTY_BLOCK)}-declaration ObjectProperty "
-        "lift block is generic and declared once"
+        "lift block is generic and declared once; the "
+        f"{len(DIVISORIAL_BLOCK)}-structure divisorial charge block lives in "
+        "the Walls subtree and is declared once"
     )
     return 0
 

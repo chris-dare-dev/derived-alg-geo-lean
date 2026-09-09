@@ -5,10 +5,10 @@ Released under the MIT license.
 import Mathlib.Data.Complex.Basic
 
 /-!
-# Additive central charges on numerical surfaces
+# Additive central charges in compressed coordinates
 
 The surface charge polynomial is independent of a particular surface model.
-For a polarised numerical surface and an already chosen `B`-field twist it
+For a polarised numerical class group and an already chosen `B`-field twist it
 only needs the three additive quantities
 
 * `rank`,
@@ -19,17 +19,15 @@ together with `∫ H²`.  This file packages those quantities and builds the
 single charge polynomial shared by the projective-space and surface
 presentations.
 
-The package is deliberately a derived view rather than another
-`NumericalVarietyData` subtype.  The numerical carrier may support several
+The package is deliberately a derived view rather than a subtype of any
+particular presentation.  A numerical carrier may support several
 presentations, and a charge is obtained by composing additive coordinate maps
 with the charge polynomial.  No geometry, heart, support property, or
 projective-family realization is asserted here.
 -/
 
 open Complex
-namespace AlgebraicGeometry.Numerical
-
-namespace Surface
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
 
 noncomputable section
 
@@ -225,6 +223,4 @@ end ChargeCoordinates
 
 end
 
-end Surface
-
-end AlgebraicGeometry.Numerical
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
