@@ -243,6 +243,39 @@ instance preadditive : Preadditive (H0 C) where
         | _ g' => exact congrArg _ (Subtype.ext (by
             simp [AddSubgroup.coe_add, map_add]))
 
+/-- **The morphism of `H⁰` a cocycle represents.**  Every construction that
+descends a dg morphism to `H⁰` goes through this constructor, and the three
+computation rules below are what downstream files rewrite with. -/
+def homMk {X Y : C} (f : cocycles X Y) : (show H0 C from X) ⟶ (show H0 C from Y) :=
+  QuotientAddGroup.mk f
+
+/-- Two cocycles represent the same morphism of `H⁰` when they differ by a
+coboundary. The quotient's own `eq_iff_sub_mem` says so; this restates it on the
+underlying elements, which is the form every homotopy produces. -/
+lemma homMk_eq_homMk {X Y : C} {a b : cocycles X Y}
+    (h : (a : (dgHom X Y).X 0) - (b : (dgHom X Y).X 0) ∈ coboundaries X Y) :
+    homMk a = homMk b := by
+  refine QuotientAddGroup.eq_iff_sub_mem.2 ?_
+  show ((a - b : cocycles X Y) : (dgHom X Y).X 0) ∈ coboundaries X Y
+  rw [AddSubgroupClass.coe_sub]
+  exact h
+
+/-- Negation of an `H⁰` morphism is negation of a representative. -/
+lemma homMk_neg {X Y : C} (a : cocycles X Y) : homMk (-a) = -homMk a := rfl
+
+/-- Composition of `H⁰` morphisms is `dgComp` of representatives. -/
+lemma homMk_comp {X Y Z : C} (a : cocycles X Y) (b : cocycles Y Z) :
+    homMk a ≫ homMk b =
+      homMk ⟨dgComp 0 0 0 (by omega) (a : (dgHom X Y).X 0) (b : (dgHom Y Z).X 0),
+        Z0.comp_mem a.2 b.2⟩ :=
+  rfl
+
+/-- The identity of `H⁰` is represented by the dg identity. -/
+lemma homMk_id (X : C) :
+    homMk (⟨dgId X, dgId_cocycle X⟩ : cocycles X X) =
+      𝟙 (show H0 C from X) :=
+  rfl
+
 end H0
 
 namespace DGFunctor

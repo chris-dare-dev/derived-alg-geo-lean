@@ -106,12 +106,16 @@ blocks should normally move it rather than add more declarations beside it.
   `DGEnhancement/H0/ConeFunctor.lean` maps it functorially into distinguished
   `H⁰` triangles.  `FourierMukai/Basic.lean` owns the functor from kernels to
   transforms and its objectwise evaluation, while `FourierMukai/KernelCone.lean`
-  maps enhanced kernel cones to pointwise transform triangles and packages an
-  exact kernel evaluation as a functor valued in distinguished triangles.  The
-  geometric `H⁰` model
-  of the kernel category, the paper's actual enhanced kernel morphism, and the
-  exactness instance for its evaluation remain realization tasks; the generic
-  cone itself is no longer a supplied paper-layer seam.
+  maps dg cones of an enhanced kernel category to pointwise transform
+  triangles and packages an exact kernel evaluation as a functor valued in
+  distinguished triangles.  The kernel category enters through an
+  `Enhancement`, never as an `H⁰` on the nose; the cone lift has one owner
+  (`homogeneousLift`, with `lift` and `HomotopySquare` its degree-zero case);
+  and cone morphisms carry the shift-free `fst` square, so the cone category
+  needs no pretriangulated instance.  The enhancement of the geometric kernel
+  category with an exact comparison, the paper's actual enhanced kernel
+  morphism, and the exactness instance for its evaluation remain realization
+  tasks; the generic cone itself is no longer a supplied paper-layer seam.
 - Generic moduli boundedness: `CategoryTheory/Moduli/Boundedness.lean`.
 - Generic replete subprestack machinery:
   `CategoryTheory/Bicategory/Functor/Cat/ObjectProperty/`, reusing Mathlib's

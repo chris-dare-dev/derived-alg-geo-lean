@@ -74,32 +74,39 @@ Category
 ├─ FiniteExactTower
 │  └─ FiniteFiltration                    zero-to-object endpoint refinement
 │     └─ almost-disconnected witness       scheme-geometric leaf
+├─ HasShift C A                          Mathlib root
+│  └─ HasShift (X ⥤ Y) A                 pointwise, from the target's shift
+│     └─ evaluation commutes strictly    identity comparison, both laws free
 ├─ DGCategory C
 │  ├─ DGLinear k C                       scalar refinement
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
-│  │  │  └─ IsClosed                     shared cocycle predicate for transformations
+│  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
+│  │  │  └─ h0                           closed degree zero becomes an ordinary NatTrans
 │  │  ├─ PreservesShifts                 composable dg capability
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
-│  ├─ HomotopySquare                     chosen degree-minus-one witness
-│  │  └─ IsConeOf.Morphism               derived cone map with strict squares
-│  │     └─ ConePresentation category    coherent identity/composition
+│  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
+│  │  ├─ HomotopySquare                  degree zero with closed vertical maps
 │  │  └─ IsConeOf.homogeneousLift        all-degree cone maps, d/id/add/comp laws
+│  │     ├─ IsConeOf.lift                the degree-zero case, not a second owner
+│  │     │  └─ IsConeOf.Morphism         cone map with strict `inr` and `fst` squares
+│  │     │     └─ ConePresentation category  composes without a shift witness
 │  │     └─ HomogeneousNatTrans.ConeData objectwise cones assemble to a dg functor
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
 │  ├─ H0 C
 │  │  └─ coneTriangleFunctor             functor to distinguished triangles
 │  └─ IsPretriangulated C
 │     └─ Enhancement T                   comparison data, not a class
+│        └─ coneTriangleFunctor          dg cones read in `T` through the equivalence
 ├─ Fourier--Mukai correspondence
 │  ├─ kernelTransform                     functor from kernels to transforms
 │  ├─ kernelEvaluation                    one source object's kernel-variable functor
 │  ├─ ExactFamily / ExactBifunctor         globally shift-coherent exactness roots
-│  ├─ kernelConeTransformTriangleFunctor  pointwise image of enhanced dg cones
-│  └─ CounitKernelConeData                kernel arrow realizing an adjunction counit
+│  ├─ kernelConeTransformTriangleFunctor  pointwise image of dg cones of an enhanced kernel category
+│  └─ CounitKernelConeData                kernel arrow realizing an adjunction counit, in an enhancement
 │     └─ kernel-presented twist candidate exact image of its dg cone
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
@@ -302,9 +309,11 @@ particular:
   bundles; the numerical curve chain is geometric, its derived triangles and
   successive block maps consume the reusable Cartier-sequence roots, and only
   quotient orthogonality remains an explicit geometric input.  Functorial dg
-  cones and their pointwise transform triangles now have generic roots; the
-  enhanced geometric kernel category, actual kernel morphism, and exactness of
-  kernel evaluation remain explicit realization inputs.
+  cones and their pointwise transform triangles now have generic roots, and
+  the kernel category enters through an `Enhancement` rather than as an `H⁰`
+  on the nose; the enhancement of the geometric kernel category with its
+  exact comparison, the actual kernel morphism, and exactness of kernel
+  evaluation remain explicit realization inputs.
 
 Bicategories are the first implemented higher-categorical stage. A future
 general `n`-category or `(∞,1)`-category layer must name its formal model and

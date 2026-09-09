@@ -95,6 +95,8 @@ Algebra/Homology
   │                                           Mathlib's shift and triangles
   ├─→ DGCategory                              bespoke class on HomComplex (ADR-0010/0011)
   │     ├─→ Functor, Opposite, Product, Linear, Shift, H0, LinearH0
+  │     ├─→ NaturalTransformationH0            closed degree-zero transformations on H⁰
+  │     ├─→ AdjunctionH0                       a dg adjunction as a Mathlib adjunction
   │     ├─→ Pretriangulated                   cones, shifts, rotation, chosen homotopy squares
   │     │     ├─→ ConeCategory                chosen cones and homotopy-coherent maps
   │     │     └─→ Functor                     composable shift/cone preservation capabilities
@@ -118,6 +120,10 @@ CategoryTheory/Bicategory
   ├─→ Adjunction                              adjunctions of 1-morphisms; Cat specialization
   └─→ Functor/Cat                             pseudofunctor transport; ObjectProperty/UniversallyStable
 
+CategoryTheory/Shift
+  └─→ FunctorCategory                         pointwise shift on `X ⥤ Y`; strict
+                                              commutation of the evaluations
+
 CategoryTheory/Triangulated
   ├─→ PretriangulatedAxioms, TStructure, PostnikovTower, ExtensionClosure, QuasiAbelian
   ├─→ FullSubcategory                         objectwise triangle and map lifts
@@ -128,7 +134,9 @@ CategoryTheory/Triangulated
   │                                           enhanced cones map pointwise to transform triangles
   ├─→ Families                                pseudofunctorial fiber categories
   ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation,
-  │                                           functorial distinguished cone triangles
+  │                                           functorial distinguished cone triangles;
+  │                                           H0/Triangle owns the triangles, H0/Functor
+  │                                           the transport of dg-functor capabilities
   └─→ StabilityCondition                      Bridgeland stability (canonical concept)
         ├─→ Weak                              weak stability: the dependency parent
         │     └─→ Foundation, Families, HarderNarasimhan, Support, Tilting

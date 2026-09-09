@@ -19,7 +19,14 @@ degree-`p-1` homotopy with boundary
 
 The induced cone map has degree `p`.  Its source-component term is multiplied
 by `(-1)^p`; this sign is forced by the diagrammatic Leibniz convention.  With
-it, differentiating the lift gives the lift of `d a` and `d b`.
+it, differentiating the lift of a homogeneous square gives the strict lift of
+`d a` and `d b` (`homogeneousLift_d`); the homotopy contributes exactly the
+term that cancels the failure of the square to commute.
+
+This file is the single owner of the cone lift.  The degree-zero
+`IsConeOf.lift` of `Pretriangulated.Lift` is `homogeneousLift 0`, and
+`HomotopySquare` there is a `HomogeneousSquare` of degree zero whose vertical
+maps are closed.
 -/
 
 set_option autoImplicit false
@@ -216,6 +223,12 @@ lemma homogeneousLift_id :
   exact homogeneousLift_id_aux hc₁ (0 - 1) (by omega)
     (by omega) (by omega) (by omega)
 
+/-- The homogeneous lift of the zero square is zero. -/
+@[simp]
+lemma homogeneousLift_zero (p : ℤ) :
+    hc₁.homogeneousLift hc₂ p 0 0 0 = 0 := by
+  simp [homogeneousLift]
+
 /-- The strict homogeneous lift is additive in the vertical maps. -/
 lemma homogeneousLift_strict_add (p : ℤ)
     (a a' : (dgHom X₁ X₂).X p) (b b' : (dgHom Y₁ Y₂).X p) :
@@ -225,17 +238,18 @@ lemma homogeneousLift_strict_add (p : ℤ)
   simp [homogeneousLift, map_add, smul_add]
   abel
 
-/-- The source projection reads the signed source component of a strict
-homogeneous cone lift. -/
+/-- The source projection reads the signed source component of a homogeneous
+cone lift.  The homotopy term dies against `inr ≫ fst = 0`, so no strictness
+is needed. -/
 lemma homogeneousLift_comp_fst (p : ℤ)
-    (a : (dgHom X₁ X₂).X p) (b : (dgHom Y₁ Y₂).X p) :
+    (a : (dgHom X₁ X₂).X p) (b : (dgHom Y₁ Y₂).X p)
+    (k : (dgHom X₁ Y₂).X (p - 1)) :
     dgComp p 1 (p + 1) (by omega)
-        (hc₁.homogeneousLift hc₂ p a b 0) hc₂.fst =
+        (hc₁.homogeneousLift hc₂ p a b k) hc₂.fst =
       p.negOnePow • dgComp 1 p (p + 1) (by omega) hc₁.fst a := by
   rw [homogeneousLift, map_add, map_add]
   simp only [AddMonoidHom.add_apply]
   rw [dgComp_units_smul_left]
-  simp only [map_zero, AddMonoidHom.zero_apply]
   rw [DGCategory.dgComp_assoc 1 (p - 1) 1 p p (p + 1)
       (by omega) (by omega) (by omega),
     DGCategory.dgComp_assoc p (-1) 1 (p - 1) 0 p
@@ -244,6 +258,11 @@ lemma homogeneousLift_comp_fst (p : ℤ)
     DGCategory.dgComp_assoc 0 p 1 p (p + 1) (p + 1)
       (by omega) (by omega) (by omega),
     DGCategory.dgComp_assoc p 0 1 p 1 (p + 1)
+      (by omega) (by omega) (by omega),
+    hc₂.inr_comp_fst,
+    DGCategory.dgComp_assoc 1 (p - 1) 1 p p (p + 1)
+      (by omega) (by omega) (by omega),
+    DGCategory.dgComp_assoc (p - 1) 0 1 (p - 1) 1 p
       (by omega) (by omega) (by omega),
     hc₂.inr_comp_fst]
   simp
@@ -375,17 +394,22 @@ private lemma homogeneousLift_succ (p : ℤ)
   exact homogeneousLift_succ_aux hc₁ hc₂ p (p + 1 - 1)
     (by omega) (by omega) (by omega) a b
 
-/-- The homogeneous lift of a strict square commutes with the differential.
+/-- **The homogeneous lift of a homotopy-commutative square commutes with the
+differential.**  The differential of the degree-`p` lift is the strict
+degree-`p+1` lift of the differentials of its two vertical maps: the
+`a`-term's differential is `fst ≫ a ≫ f₂ ≫ inr`, the `b`-term's is
+`-(fst ≫ f₁) ≫ b ≫ inr` -- the cone's own correction -- and the boundary of
+the homotopy is exactly their difference, so the three cancel and only the
+`d a` and `d b` components survive.
 
-The differential of the degree-`p` lift is the degree-`p+1` lift of the
-differentials of its two vertical maps.  This is the chain-map identity needed
-when objectwise cones are assembled into a dg functor. -/
-lemma homogeneousLift_strict_d (p : ℤ)
+This is the chain-map identity behind every cone functor in the repository;
+the strict case `homogeneousLift_strict_d` and the degree-zero
+`IsConeOf.lift_closed` are both instances of it. -/
+lemma homogeneousLift_d (p : ℤ)
     (a : (dgHom X₁ X₂).X p) (b : (dgHom Y₁ Y₂).X p)
-    (hsquare : dgComp 0 p p (by omega) f₁ b =
-      dgComp p 0 p (by omega) a f₂) :
+    (s : DGCategory.HomogeneousSquare f₁ f₂ p a b) :
     ((dgHom Z₁ Z₂).d p (p + 1)).hom
-        (hc₁.homogeneousLift hc₂ p a b 0) =
+        (hc₁.homogeneousLift hc₂ p a b s.homotopy) =
       hc₁.homogeneousLift hc₂ (p + 1)
         (((dgHom X₁ X₂).d p (p + 1)).hom a)
         (((dgHom Y₁ Y₂).d p (p + 1)).hom b) 0 := by
@@ -406,6 +430,14 @@ lemma homogeneousLift_strict_d (p : ℤ)
         (((dgHom Y₁ Y₂).d p (p + 1)).hom b) hc₂.inr := by
     have h := dgComp_leibniz_general p 0 (p + 1) 1 p (p + 1)
       (by omega) (by omega) (by omega) (by omega) b hc₂.inr
+    rw [hc₂.inr_closed] at h
+    simpa using h
+  have hK : ((dgHom X₁ Z₂).d (p - 1) p).hom
+        (dgComp (p - 1) 0 (p - 1) (by omega) s.homotopy hc₂.inr) =
+      dgComp p 0 p (by omega)
+        (((dgHom X₁ Y₂).d (p - 1) p).hom s.homotopy) hc₂.inr := by
+    have h := dgComp_leibniz_general (p - 1) 0 p 1 (p - 1) p
+      (by omega) (by omega) (by omega) (by omega) s.homotopy hc₂.inr
     rw [hc₂.inr_closed] at h
     simpa using h
   have hT₁ : ((dgHom Z₁ Z₂).d p (p + 1)).hom
@@ -438,6 +470,20 @@ lemma homogeneousLift_strict_d (p : ℤ)
       (by omega) (by omega) (by omega) (by omega) hc₁.snd
         (dgComp p 0 p (by omega) b hc₂.inr)
     rw [h, hB, hc₁.delta_snd]
+  have hT₃ : ((dgHom Z₁ Z₂).d p (p + 1)).hom
+        (dgComp 1 (p - 1) p (by omega) hc₁.fst
+          (dgComp (p - 1) 0 (p - 1) (by omega) s.homotopy hc₂.inr)) =
+      p.negOnePow •
+        dgComp 1 p (p + 1) (by omega) hc₁.fst
+          (dgComp p 0 p (by omega)
+            (dgComp 0 p p (by omega) f₁ b - dgComp p 0 p (by omega) a f₂)
+            hc₂.inr) := by
+    have h := dgComp_leibniz_general 1 (p - 1) 2 p p (p + 1)
+      (by omega) (by omega) (by omega) (by omega) hc₁.fst
+        (dgComp (p - 1) 0 (p - 1) (by omega) s.homotopy hc₂.inr)
+    rw [h, hK, s.homotopy_boundary, hc₁.delta_fst,
+      dgComp_units_smul_left, dgComp_units_smul_right]
+    simp
   have hfb :
       dgComp 1 p (p + 1) (by omega)
           (-dgComp 1 0 1 (by omega) hc₁.fst f₁)
@@ -450,16 +496,33 @@ lemma homogeneousLift_strict_d (p : ℤ)
         (by omega) (by omega) (by omega),
       ← DGCategory.dgComp_assoc 0 p 0 p p p
         (by omega) (by omega) (by omega)]
-  rw [homogeneousLift, map_add, map_add, hT₁, hT₂,
+  have hfa :
+      dgComp 1 p (p + 1) (by omega) hc₁.fst
+          (dgComp p 0 p (by omega) a
+            (dgComp 0 0 0 (by omega) f₂ hc₂.inr)) =
+        dgComp 1 p (p + 1) (by omega) hc₁.fst
+          (dgComp p 0 p (by omega)
+            (dgComp p 0 p (by omega) a f₂) hc₂.inr) := by
+    rw [← DGCategory.dgComp_assoc p 0 0 p 0 p
+      (by omega) (by omega) (by omega)]
+  rw [homogeneousLift, map_add, map_add, hT₁, hT₂, hT₃, hfb,
     homogeneousLift_succ]
-  simp only [map_zero, AddMonoidHom.zero_apply, add_zero, smul_sub,
-    map_sub, Int.negOnePow_succ, Units.neg_smul]
-  rw [← dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega)
-      a f₂ hc₂.inr,
-    hfb,
-    hsquare]
-  simp only [smul_neg]
+  simp only [smul_sub, map_sub, AddMonoidHom.sub_apply, Int.negOnePow_succ,
+    Units.neg_smul, smul_neg, hfa]
   abel
+
+/-- The strict case of `homogeneousLift_d`: with a zero homotopy the square
+commutes on the nose and the lift is a chain map. -/
+lemma homogeneousLift_strict_d (p : ℤ)
+    (a : (dgHom X₁ X₂).X p) (b : (dgHom Y₁ Y₂).X p)
+    (hsquare : dgComp 0 p p (by omega) f₁ b =
+      dgComp p 0 p (by omega) a f₂) :
+    ((dgHom Z₁ Z₂).d p (p + 1)).hom
+        (hc₁.homogeneousLift hc₂ p a b 0) =
+      hc₁.homogeneousLift hc₂ (p + 1)
+        (((dgHom X₁ X₂).d p (p + 1)).hom a)
+        (((dgHom Y₁ Y₂).d p (p + 1)).hom b) 0 :=
+  hc₁.homogeneousLift_d hc₂ p a b (DGCategory.HomogeneousSquare.strict hsquare)
 
 /-- The differential law for a strict homogeneous lift in arbitrary source
 and target degrees.  Off the cochain-complex successor diagonal all three

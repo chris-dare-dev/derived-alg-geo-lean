@@ -14,9 +14,9 @@ and its morphisms are the homotopy squares and closed cone maps constructed in
 `Pretriangulated.Lift`.
 
 The resulting category is the reusable dg-level owner of functorial cones.
-Its composition uses the explicit composite homotopy and cone map; the
-pretriangulated instance is used only to choose the intermediate shift needed
-to certify the connecting square.  Passage to ordinary distinguished
+Its composition uses the explicit composite homotopy and cone map, and both
+cone squares are stated on the cone projections, so no shift witness and no
+pretriangulated instance are needed.  Passage to ordinary distinguished
 triangles belongs to the `DGEnhancement/H0` layer.
 -/
 
@@ -95,8 +95,7 @@ def id (A : ConePresentation C) : Hom A A where
   coneMorphism := IsConeOf.Morphism.id A.isCone
 
 /-- Composition of morphisms of chosen cone presentations. -/
-noncomputable def comp [IsPretriangulated C]
-    (m : Hom A B) (n : Hom B D) : Hom A D where
+def comp (m : Hom A B) (n : Hom B D) : Hom A D where
   source := dgComp 0 0 0 (by omega) m.source n.source
   target := dgComp 0 0 0 (by omega) m.target n.target
   coneMorphism := IsConeOf.Morphism.comp
@@ -107,7 +106,7 @@ end Hom
 
 /-- Chosen dg cones and their homotopy-coherent cone morphisms form a
 category. -/
-noncomputable instance [IsPretriangulated C] : Category.{v} (ConePresentation C) where
+instance : Category.{v} (ConePresentation C) where
   Hom := Hom
   id := Hom.id
   comp := Hom.comp
@@ -116,33 +115,31 @@ noncomputable instance [IsPretriangulated C] : Category.{v} (ConePresentation C)
     apply Hom.ext
     · exact dgId_comp 0 m.source
     · exact dgId_comp 0 m.target
-    · dsimp only [Hom.comp, IsConeOf.Morphism.comp,
-        IsConeOf.Morphism.compAt, Hom.id, IsConeOf.Morphism.id,
-        IsConeOf.Morphism.homotopy, HomotopySquare.comp,
-        HomotopySquare.id]
+    · dsimp only [Hom.comp, IsConeOf.Morphism.comp, Hom.id,
+        IsConeOf.Morphism.id, IsConeOf.Morphism.homotopy,
+        HomotopySquare.comp, HomotopySquare.id, HomotopySquare.ofBoundary]
       change dgComp (-1) 0 (-1) (by omega) 0 m.target +
           dgComp 0 (-1) (-1) (by omega) (dgId A.source)
             m.coneMorphism.homotopy = m.coneMorphism.homotopy
       simp only [map_zero, AddMonoidHom.zero_apply, zero_add, dgId_comp]
-    · dsimp only [Hom.comp, IsConeOf.Morphism.comp,
-        IsConeOf.Morphism.compAt, Hom.id, IsConeOf.Morphism.id]
+    · dsimp only [Hom.comp, IsConeOf.Morphism.comp, Hom.id,
+        IsConeOf.Morphism.id]
       exact dgId_comp 0 m.coneMorphism.hom.1
   comp_id := by
     intro A B m
     apply Hom.ext
     · exact dgComp_id 0 m.source
     · exact dgComp_id 0 m.target
-    · dsimp only [Hom.comp, IsConeOf.Morphism.comp,
-        IsConeOf.Morphism.compAt, Hom.id, IsConeOf.Morphism.id,
-        IsConeOf.Morphism.homotopy, HomotopySquare.comp,
-        HomotopySquare.id]
+    · dsimp only [Hom.comp, IsConeOf.Morphism.comp, Hom.id,
+        IsConeOf.Morphism.id, IsConeOf.Morphism.homotopy,
+        HomotopySquare.comp, HomotopySquare.id, HomotopySquare.ofBoundary]
       change dgComp (-1) 0 (-1) (by omega)
           m.coneMorphism.homotopy (dgId B.target) +
           dgComp 0 (-1) (-1) (by omega) m.source 0 =
             m.coneMorphism.homotopy
       simp only [dgComp_id, map_zero, add_zero]
-    · dsimp only [Hom.comp, IsConeOf.Morphism.comp,
-        IsConeOf.Morphism.compAt, Hom.id, IsConeOf.Morphism.id]
+    · dsimp only [Hom.comp, IsConeOf.Morphism.comp, Hom.id,
+        IsConeOf.Morphism.id]
       exact dgComp_id 0 m.coneMorphism.hom.1
   assoc := by
     intro A B D E m n p
@@ -152,8 +149,8 @@ noncomputable instance [IsPretriangulated C] : Category.{v} (ConePresentation C)
     · exact dgComp_assoc 0 0 0 0 0 0 (by omega) (by omega) (by omega)
         m.target n.target p.target
     · dsimp only [Hom.comp, IsConeOf.Morphism.comp,
-        IsConeOf.Morphism.compAt, IsConeOf.Morphism.homotopy,
-        HomotopySquare.comp]
+        IsConeOf.Morphism.homotopy, HomotopySquare.comp,
+        HomotopySquare.ofBoundary]
       change
         dgComp (-1) 0 (-1) (by omega)
             (dgComp (-1) 0 (-1) (by omega)
@@ -176,26 +173,25 @@ noncomputable instance [IsPretriangulated C] : Category.{v} (ConePresentation C)
         dgComp_assoc 0 (-1) 0 (-1) (-1) (-1) (by omega) (by omega) (by omega),
         dgComp_assoc 0 0 (-1) 0 (-1) (-1) (by omega) (by omega) (by omega)]
       abel
-    · dsimp only [Hom.comp, IsConeOf.Morphism.comp,
-        IsConeOf.Morphism.compAt]
+    · dsimp only [Hom.comp, IsConeOf.Morphism.comp]
       exact dgComp_assoc 0 0 0 0 0 0 (by omega) (by omega) (by omega)
         m.coneMorphism.hom.1 n.coneMorphism.hom.1 p.coneMorphism.hom.1
 
 @[simp]
-lemma id_source [IsPretriangulated C] (A : ConePresentation C) :
+lemma id_source (A : ConePresentation C) :
     (CategoryStruct.id A : Hom A A).source = dgId A.source := rfl
 
 @[simp]
-lemma id_target [IsPretriangulated C] (A : ConePresentation C) :
+lemma id_target (A : ConePresentation C) :
     (CategoryStruct.id A : Hom A A).target = dgId A.target := rfl
 
 @[simp]
-lemma comp_source [IsPretriangulated C]
+lemma comp_source
     {A B D : ConePresentation C} (m : A ⟶ B) (n : B ⟶ D) :
     (m ≫ n).source = dgComp 0 0 0 (by omega) m.source n.source := rfl
 
 @[simp]
-lemma comp_target [IsPretriangulated C]
+lemma comp_target
     {A B D : ConePresentation C} (m : A ⟶ B) (n : B ⟶ D) :
     (m ≫ n).target = dgComp 0 0 0 (by omega) m.target n.target := rfl
 

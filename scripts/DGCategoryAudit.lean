@@ -352,6 +352,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.H0.homMk_eq_homMk
 #print axioms CategoryTheory.H0.homMk_neg
 #print axioms CategoryTheory.H0.homMk_comp
+#print axioms CategoryTheory.H0.homMk_id
 #print axioms CategoryTheory.H0.coneTriangle_mor₁
 #print axioms CategoryTheory.H0.coneTriangle_mor₂
 #print axioms CategoryTheory.H0.coneTriangle_mor₃
@@ -384,7 +385,6 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsConeOf.Morphism.ext
 #print axioms CategoryTheory.IsConeOf.liftMorphism
 #print axioms CategoryTheory.IsConeOf.Morphism.id
-#print axioms CategoryTheory.IsConeOf.Morphism.compAt
 #print axioms CategoryTheory.IsConeOf.Morphism.comp
 #print axioms CategoryTheory.DGCategory.ConePresentation
 #print axioms CategoryTheory.DGCategory.ConePresentation.source
@@ -405,7 +405,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGCategory.ConePresentation.comp_target
 #print axioms CategoryTheory.IsConeOf.Morphism.toTriangleMorphism
 #print axioms CategoryTheory.IsConeOf.Morphism.toTriangleMorphism_id
-#print axioms CategoryTheory.IsConeOf.Morphism.toTriangleMorphism_compAt
+#print axioms CategoryTheory.IsConeOf.Morphism.toTriangleMorphism_comp
 #print axioms CategoryTheory.H0.coneSourceFunctor
 #print axioms CategoryTheory.H0.coneTargetFunctor
 #print axioms CategoryTheory.H0.coneObjectFunctor
@@ -643,14 +643,12 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGCategory.ConePresentation.Hom.ext_iff
 #print axioms CategoryTheory.DGCategory.ConePresentation.Hom.mk.inj
 #print axioms CategoryTheory.DGCategory.ConePresentation.Hom.mk.sizeOf_spec
-#print axioms CategoryTheory.DGCategory.ConePresentation.instCategoryOfIsPretriangulated
+#print axioms CategoryTheory.DGCategory.ConePresentation.instCategory
 #print axioms CategoryTheory.DGCategory.ConePresentation.mk.inj
 #print axioms CategoryTheory.DGCategory.ConePresentation.mk.sizeOf_spec
 #print axioms CategoryTheory.DGCategory.HomotopySquare.a_closed
 #print axioms CategoryTheory.DGCategory.HomotopySquare.b_closed
 #print axioms CategoryTheory.DGCategory.HomotopySquare.ext_iff
-#print axioms CategoryTheory.DGCategory.HomotopySquare.homotopy
-#print axioms CategoryTheory.DGCategory.HomotopySquare.homotopy_boundary
 #print axioms CategoryTheory.DGCategory.HomotopySquare.mk.inj
 #print axioms CategoryTheory.DGCategory.HomotopySquare.mk.sizeOf_spec
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone
@@ -671,3 +669,34 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsConeOf.Morphism.mk.sizeOf_spec
 #print axioms CategoryTheory.IsConeOf.Morphism.square
 #print axioms CategoryTheory.IsConeOf.Morphism.toShift_comm
+#print axioms CategoryTheory.IsConeOf.Morphism.fst_comm
+#print axioms CategoryTheory.IsConeOf.lift_comp_fst
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_d
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_zero
+#print axioms CategoryTheory.DGCategory.HomotopySquare.toHomogeneousSquare
+#print axioms CategoryTheory.DGCategory.HomotopySquare.boundary
+#print axioms CategoryTheory.DGCategory.HomotopySquare.ofBoundary
+#print axioms CategoryTheory.DGCategory.HomotopySquare.ofBoundary_homotopy
+#print axioms CategoryTheory.DGCategory.HomotopySquare.id_homotopy
+#print axioms CategoryTheory.DGCategory.HomotopySquare.comp_homotopy
+#print axioms CategoryTheory.DGFunctor.mapHomotopySquare_homotopy
+#print axioms CategoryTheory.Enhancement.coneTriangleFunctor
+#print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₁
+#print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₂
+#print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₃
+#print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_distinguished
+
+-- Closed degree-zero dg natural transformations descend to `H⁰`, and a dg
+-- adjunction is an adjunction there.  This is the adapter that makes dg data
+-- comparable with the ordinary categorical data the rest of the library uses.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_id
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.isClosed_id
+#print axioms CategoryTheory.DGAdjunction.h0Unit
+#print axioms CategoryTheory.DGAdjunction.h0Counit
+#print axioms CategoryTheory.DGAdjunction.h0Unit_app
+#print axioms CategoryTheory.DGAdjunction.h0Counit_app
+#print axioms CategoryTheory.DGAdjunction.h0
+#print axioms CategoryTheory.DGAdjunction.h0_unit
+#print axioms CategoryTheory.DGAdjunction.h0_counit
