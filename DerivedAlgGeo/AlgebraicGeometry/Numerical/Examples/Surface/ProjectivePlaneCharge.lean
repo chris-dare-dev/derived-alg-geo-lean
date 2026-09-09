@@ -3,9 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.ProjectivePlane
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Charge
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeNumerical
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallSlice
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Slice
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.SurfaceChargeNumerical
 import Mathlib.Data.Fin.VecNotation
 
@@ -15,7 +15,7 @@ import Mathlib.Data.Fin.VecNotation
 This file instantiates the intrinsic divisorial surface construction for
 `ℙ²`.  Its divisor space is one-dimensional, with the hyperplane class `H`
 normalized by `H² = 1`.  Two class carriers carry a full
-`Surface.ChernCharacter`: a placeholder integral triple `(r, c, v)` and the
+`ChernCharacter`: a placeholder integral triple `(r, c, v)` and the
 existing `SurfaceNum` presentation.  Their comparison is made before choosing
 `B` and `omega`.
 
@@ -28,7 +28,7 @@ The theorem `p2ProjectiveCharge_eq_surfaceCharge` is therefore an instance of
 is **not** a comparison between Li's image lattice `Λ_ι` and the surface
 lattice, because nothing in this file is `Λ_ι` or `v_ι`.  The mathematical
 content is the identity `-∫ exp(-(b + i a) H) ch = Z_{aH, bH}`, which is
-`Surface.ChargeCoordinates.centralCharge_twistByScalar_apply` and holds on
+`ChargeCoordinates.centralCharge_twistByScalar_apply` and holds on
 every polarised surface; `p2ProjectiveCharge_apply` records it in the
 `(r, c, v)` coordinates.  The only `ℙ²`-specific input is `H² = 1`, which makes
 the compressed degree `H · ch₁` equal to the full first Chern class.
@@ -39,7 +39,7 @@ case in which no Todd correction appears (arXiv:2607.28411v1, (5.5) and
 Remark 6.3).  For any other embedding the pulled-back charge is not of this
 form until the GRR/Todd term has been computed.
 
-The older scalar `Surface.ChargeCoordinates` objects are derived compatibility
+The older scalar `ChargeCoordinates` objects are derived compatibility
 views.  Thus the projective-plane charge is a child of the same parent as the
 smooth-quadric charge, rather than a parent or a separate charge polynomial.
 
@@ -50,6 +50,8 @@ by the eventual stability comparison.
 -/
 
 open Complex
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
+
 namespace AlgebraicGeometry.Numerical
 
 namespace Examples
@@ -71,7 +73,7 @@ def p2IntersectionForm : LinearMap.BilinForm ℝ P2Divisor :=
     (fun _ _ _ => by ring)
 
 /-- The rank-one numerical divisor space of `ℙ²`. -/
-def p2DivisorSpace : Surface.DivisorSpace P2Divisor where
+def p2DivisorSpace : DivisorSpace P2Divisor where
   intersection := p2IntersectionForm
   intersection_symm := ⟨by intro x y; simp [p2IntersectionForm]; ring⟩
 
@@ -81,7 +83,7 @@ def p2Hyperplane : P2Divisor := 1
 @[simp]
 theorem p2Hyperplane_square :
     p2DivisorSpace.pair p2Hyperplane p2Hyperplane = 1 := by
-  norm_num [Surface.DivisorSpace.pair, p2DivisorSpace, p2IntersectionForm,
+  norm_num [DivisorSpace.pair, p2DivisorSpace, p2IntersectionForm,
     p2Hyperplane]
 
 /-! ### The two full Chern-character presentations -/
@@ -97,7 +99,7 @@ abbrev P2ProjectiveCoordinates : Type := ℤ × ℤ × ℤ
 
 /-- The full Chern character on the explicit projective-family coordinates. -/
 noncomputable def p2ProjectiveChernCharacter :
-    Surface.ChernCharacter P2ProjectiveCoordinates P2Divisor where
+    ChernCharacter P2ProjectiveCoordinates P2Divisor where
   rank := AddMonoidHom.mk' (fun E => (E.1 : ℝ)) (by
     intro E F
     change ((E.1 + F.1 : ℤ) : ℝ) = (E.1 : ℝ) + (F.1 : ℝ)
@@ -118,7 +120,7 @@ noncomputable def p2ProjectiveChernCharacter :
 
 /-- The old scalar-coordinate view, derived from the full character at `H`. -/
 noncomputable def p2ProjectiveChargeCoordinates :
-    Surface.ChargeCoordinates P2ProjectiveCoordinates :=
+    ChargeCoordinates P2ProjectiveCoordinates :=
   p2ProjectiveChernCharacter.coordinatesAt p2DivisorSpace p2Hyperplane
 
 /-- The source rank coordinate is the first projective triple entry. -/
@@ -132,7 +134,7 @@ theorem p2ProjectiveChargeCoordinates_rank (E : P2ProjectiveCoordinates) :
 theorem p2ProjectiveChargeCoordinates_degree (E : P2ProjectiveCoordinates) :
     p2ProjectiveChargeCoordinates.degree E = (E.2.1 : ℝ) := by
   simp [p2ProjectiveChargeCoordinates, p2ProjectiveChernCharacter,
-    p2DivisorSpace, p2IntersectionForm, p2Hyperplane, Surface.DivisorSpace.pair]
+    p2DivisorSpace, p2IntersectionForm, p2Hyperplane, DivisorSpace.pair]
 
 /-- The source `ch₂` coordinate is `c/2 + v`. -/
 @[simp]
@@ -292,15 +294,15 @@ theorem p2NumericalRealization_BField (β : ℚ) :
 
 /-- The surface-side charge coordinates induced by the numerical presentation. -/
 noncomputable def p2SurfaceChargeCoordinates :
-    Surface.ChargeCoordinates SurfaceNum :=
-  Surface.ChargeCoordinates.ofNumericalData p2NumericalVariety p2Polarization
+    ChargeCoordinates SurfaceNum :=
+  ChargeCoordinates.ofNumericalData p2NumericalVariety p2Polarization
 
 /-- The full Chern character on the existing surface numerical presentation.
 
 Because `N¹(ℙ²)_ℝ = ℝH` and `H² = 1`, the old `H`-degree is exactly the
 coefficient of the full first Chern class. -/
 noncomputable def p2SurfaceChernCharacter :
-    Surface.ChernCharacter SurfaceNum P2Divisor :=
+    ChernCharacter SurfaceNum P2Divisor :=
   p2NumericalRealization.chernCharacter
 
 /-! ### The explicit numerical comparison map -/
@@ -373,7 +375,7 @@ theorem p2SurfaceChernCharacter_chTwo (E : SurfaceNum) :
 choice of `B`-field or ample class.  Consequently this one witness compares
 all projective-plane divisorial charges. -/
 noncomputable def p2ChernCharacterPullback :
-    Surface.ChernCharacter.Pullback
+    ChernCharacter.Pullback
       p2ProjectiveChernCharacter p2SurfaceChernCharacter where
   map := p2ProjectiveToSurface
   rank_eq := by
@@ -399,7 +401,7 @@ noncomputable def p2ChernCharacterPullback :
 legacy numerical coordinates.  This bridge exists only because `H² = 1` on
 the chosen rank-one basis. -/
 noncomputable def p2SurfaceCoordinatesPullback :
-    Surface.ChargeCoordinates.Pullback
+    ChargeCoordinates.Pullback
       (p2SurfaceChernCharacter.coordinatesAt p2DivisorSpace p2Hyperplane)
       p2SurfaceChargeCoordinates where
   map := AddMonoidHom.id SurfaceNum
@@ -408,21 +410,21 @@ noncomputable def p2SurfaceCoordinatesPullback :
     rfl
   degree_eq := by
     intro E
-    rw [Surface.ChernCharacter.coordinatesAt_degree,
+    rw [ChernCharacter.coordinatesAt_degree,
       p2SurfaceChernCharacter_chOne, p2SurfaceChargeCoordinates_degree]
     simp [p2DivisorSpace, p2IntersectionForm, p2Hyperplane,
-      Surface.DivisorSpace.pair]
+      DivisorSpace.pair]
   chTwo_eq := by
     intro E
     rfl
   hyperplaneSquare_eq := by
-    rw [Surface.ChernCharacter.coordinatesAt_hyperplaneSquare,
+    rw [ChernCharacter.coordinatesAt_hyperplaneSquare,
       p2Hyperplane_square, p2SurfaceChargeCoordinates_hyperplaneSquare]
 
 /-- The full-character comparison induces the legacy scalar-coordinate
 comparison at the projective hyperplane. -/
 noncomputable def p2ChargePullback :
-    Surface.ChargeCoordinates.Pullback
+    ChargeCoordinates.Pullback
       p2ProjectiveChargeCoordinates p2SurfaceChargeCoordinates where
   map := p2ProjectiveToSurface
   rank_eq := by
@@ -445,8 +447,8 @@ noncomputable def p2ChargePullback :
 
 /-- The projective-plane rank-one family `B = bH`, `omega = aH`, obtained as
 a specialization of the parent parameter space. -/
-def p2Parameters (a b : ℝ) : Surface.StabilityParameters P2Divisor :=
-  Surface.StabilityParameters.rankOne p2Hyperplane a b
+def p2Parameters (a b : ℝ) : StabilityParameters P2Divisor :=
+  StabilityParameters.rankOne p2Hyperplane a b
 
 /-- The divisorial parent charge on the placeholder `(r, c, v)` carrier at
 `B = bH`, `omega = aH`.  Its expansion `p2ProjectiveCharge_apply` is the
@@ -465,14 +467,14 @@ noncomputable def p2SurfaceCharge (a b : ℝ) :
 
 /-- The projective-plane wall slice has no transverse directions. -/
 def p2WallSlice :
-    Surface.OrthogonalSlice p2DivisorSpace (Fin 0 → ℝ) :=
-  Surface.OrthogonalSlice.rankOne p2DivisorSpace p2Hyperplane
+    OrthogonalSlice p2DivisorSpace (Fin 0 → ℝ) :=
+  OrthogonalSlice.rankOne p2DivisorSpace p2Hyperplane
 
 /-- The projective-coordinate charge as a child of the generic wall-family
 and orthogonal-slice layers. -/
 def p2ProjectiveWallFamily :
     CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily
-      (Surface.OrthogonalSlice.Point (Fin 0 → ℝ)) P2ProjectiveCoordinates :=
+      (OrthogonalSlice.Point (Fin 0 → ℝ)) P2ProjectiveCoordinates :=
   p2WallSlice.chargeFamily p2ProjectiveChernCharacter
 
 /-- Evaluating the inherited rank-one family recovers the existing
@@ -481,18 +483,18 @@ projective-plane charge. -/
 theorem p2ProjectiveWallFamily_charge (a b : ℝ)
     (E : P2ProjectiveCoordinates) :
     p2ProjectiveWallFamily.charge
-        (Surface.OrthogonalSlice.Point.rankOne b a) E =
+        (OrthogonalSlice.Point.rankOne b a) E =
       p2ProjectiveCharge a b E := by
   rw [p2ProjectiveCharge]
   have hparameters :
-      p2WallSlice.parameters (Surface.OrthogonalSlice.Point.rankOne b a) =
+      p2WallSlice.parameters (OrthogonalSlice.Point.rankOne b a) =
         p2Parameters a b := by
-    apply congrArg₂ Surface.StabilityParameters.mk
+    apply congrArg₂ StabilityParameters.mk
     · change b • p2Hyperplane + 0 = b • p2Hyperplane
       simp
     · rfl
   change p2ProjectiveChernCharacter.centralCharge p2DivisorSpace
-      (p2WallSlice.parameters (Surface.OrthogonalSlice.Point.rankOne b a)) E = _
+      (p2WallSlice.parameters (OrthogonalSlice.Point.rankOne b a)) E = _
   rw [hparameters]
 
 /-- The projective charge respects the additive zero class. -/
@@ -510,10 +512,10 @@ theorem p2SurfaceCharge_zero (a b : ℝ) :
 built from the general twisted Chern character at `B = βH`. -/
 theorem p2SurfaceCharge_eq_BFieldCharge (a : ℝ) (β : ℚ) (E : SurfaceNum) :
     p2SurfaceCharge a (β : ℝ) E =
-      (Surface.ChargeCoordinates.ofNumericalDataB
+      (ChargeCoordinates.ofNumericalDataB
         p2NumericalVariety p2Polarization (p2BField β)).centralCharge a E := by
   simpa [p2SurfaceCharge, p2SurfaceChernCharacter, p2Parameters,
-    Surface.NumericalRealization.parameters, Surface.StabilityParameters.rankOne] using
+    Surface.NumericalRealization.parameters, StabilityParameters.rankOne] using
     (Surface.NumericalRealization.centralCharge_eq_ofNumericalDataB
       p2NumericalRealization p2Polarization (p2BField β) a E)
 
@@ -529,7 +531,7 @@ theorem p2ProjectiveCharge_eq_surfaceCharge (a b : ℝ)
     p2ProjectiveCharge a b E =
       p2SurfaceCharge a b (p2ProjectiveToSurface E) := by
   simpa [p2ProjectiveCharge, p2SurfaceCharge, p2ChernCharacterPullback] using
-    (Surface.ChernCharacter.Pullback.centralCharge_eq
+    (ChernCharacter.Pullback.centralCharge_eq
       p2ChernCharacterPullback p2DivisorSpace (p2Parameters a b) E)
 
 /-- The projective-space exponential `-∫ exp(-(b + i a) H) ch` in the
@@ -545,10 +547,10 @@ theorem p2ProjectiveCharge_apply (a b : ℝ) (E : P2ProjectiveCoordinates) :
     p2ProjectiveCharge a b E =
         (p2ProjectiveChargeCoordinates.twistByScalar b).centralCharge a E := by
       simpa [p2ProjectiveCharge, p2Parameters, p2ProjectiveChargeCoordinates] using
-        (Surface.ChernCharacter.centralCharge_rankOne_eq p2ProjectiveChernCharacter
+        (ChernCharacter.centralCharge_rankOne_eq p2ProjectiveChernCharacter
           p2DivisorSpace p2Hyperplane a b E)
     _ = _ := by
-      rw [Surface.ChargeCoordinates.centralCharge_twistByScalar_apply]
+      rw [ChargeCoordinates.centralCharge_twistByScalar_apply]
       simp
 
 /-! ### Coordinate formulas -/

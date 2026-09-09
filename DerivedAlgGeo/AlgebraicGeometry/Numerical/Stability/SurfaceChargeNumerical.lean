@@ -2,21 +2,21 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.SurfaceCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Coordinates
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.TwistedChern
 
 /-!
 # Surface charge coordinates from numerical variety data
 
-This is the numerical adapter for `Surface.ChargeCoordinates`.  The pure
+This is the numerical adapter for `ChargeCoordinates`.  The pure
 charge polynomial lives in `SurfaceCharge.lean`; this file supplies both the
 untwisted view and the general `BField`-twisted view from
 `NumericalVarietyData` and `Polarization`.
 -/
 
-namespace AlgebraicGeometry.Numerical
+open AlgebraicGeometry.Numerical
 
-namespace Surface.ChargeCoordinates
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates
 
 noncomputable section
 
@@ -233,6 +233,4 @@ theorem centralCharge_ofNumericalDataB_along_eq (V : NumericalVarietyData 2 A N)
 
 end
 
-end Surface.ChargeCoordinates
-
-end AlgebraicGeometry.Numerical
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates

@@ -98,6 +98,19 @@ If a file contains both a generic block and its geometric use, split the block
 at the first declaration whose signature no longer needs the consumer's
 vocabulary.
 
+The divisorial central charge -- a real vector space with a symmetric
+intersection form, an additive Chern-character triple valued in it, two
+independent divisor parameters, and the resulting complex charge -- is
+arithmetic in the vocabulary of bilinear forms, so it does not belong under
+`AlgebraicGeometry/`.  Its canonical owner is
+`CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/`, beside the
+compressed three-coordinate model of `Walls/Numerical/` and the spherical wall
+lane, both of which are the same kind of pure arithmetic.  Adapters from a
+rational `NumericalRingData`, the scalar extension to `N¹(X)_ℝ`, and the
+projective-plane, smooth-quadric and K3 models are its consumers and live under
+`AlgebraicGeometry/Numerical/Stability/`; a consumer may declare lemmas into the
+block's own namespace when dot notation needs it.
+
 Orthogonal exceptional blocks and a chosen right adjoint to a residual
 full-subcategory inclusion are structures on abstract (pre)triangulated
 categories, so their canonical owner is
