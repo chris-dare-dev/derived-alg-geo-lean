@@ -12,6 +12,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialDiscriminan
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialMukai
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallCircle
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallTransport
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.ThreefoldWallTransport
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.TwistedChern
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.WallTransport
 
