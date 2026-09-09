@@ -5,10 +5,11 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.Slope
 
 /-!
-# The `β`-twisted Chern character
+# Twisted Chern characters
 
-For a polarised variety and a rational `β`, the twisted Chern character is
-`ch^β = e^{−βH}·ch`, component by component:
+For a numerical divisor class `B`, the twisted Chern character is
+`ch^B = e^{−B}·ch`, component by component.  A rational scalar `β` and a
+polarisation `H` give the familiar specialization `B = βH`:
 
 ```
 ch^β_i(E) = ∑_{j ≤ i} ((−β)^(i−j) / (i−j)!) · ch_j(E) · H^(i−j)
@@ -51,9 +52,10 @@ never uses.
 
 * `twistCoeff`, `twistCoeff_add` — the scalar exponential coefficients.
 * `twist`, `twist_add_beta` — the convolution and **the group law**.
-* `chBetaComp` — `ch^β_i(E)`, with `chBetaComp_mem` placing it in codimension
-  `i`, `chBetaComp_add` additive in the class, `chBetaComp_zero_beta` the
-  untwisted specialisation, and `chBetaComp_add_beta` the group law.
+* `BField` and `chBComp` — an arbitrary rational numerical `B`-field and
+  `ch^B_i(E)`;
+* `chBetaComp` — the Picard-rank-one notation `ch^(βH)_i(E)`, with
+  `chBComp_along_eq_chBetaComp` proving that the two notations agree.
 -/
 
 open Finset
@@ -158,10 +160,117 @@ theorem twist_add_beta (H : A) (β₁ β₂ : ℚ) (c : ℕ → A) (i : ℕ) :
     congr 2 <;> omega
   rw [← Finset.sum_mul, ← Finset.sum_mul, ← map_sum, hscalar]
 
+/-- Absorbing a scalar into the twisting class does not change the twist:
+`e^{-(βH)} = e^{-βH}`. -/
+theorem twist_algebraMap_mul (H : A) (β : ℚ) (c : ℕ → A) (i : ℕ) :
+    twist (algebraMap ℚ A β * H) 1 c i = twist H β c i := by
+  simp only [twist]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  have hcoeff : twistCoeff 1 (i - j) * β ^ (i - j) = twistCoeff β (i - j) := by
+    unfold twistCoeff
+    have hfactorial : ((i - j).factorial : ℚ) ≠ 0 := by positivity
+    field_simp
+    rw [← mul_pow]
+    ring
+  rw [mul_pow, ← map_pow]
+  calc
+    algebraMap ℚ A (twistCoeff 1 (i - j)) * c j *
+          (algebraMap ℚ A (β ^ (i - j)) * H ^ (i - j)) =
+        algebraMap ℚ A (twistCoeff 1 (i - j) * β ^ (i - j)) * c j * H ^ (i - j) := by
+          rw [map_mul]
+          ring
+    _ = _ := by rw [hcoeff]
+
 /-! ### The twisted Chern character -/
 
 variable {N : Type v} [AddCommGroup N] {n : ℕ}
-variable (V : NumericalVarietyData n A N) (P : Polarization V.ring)
+variable (V : NumericalVarietyData n A N)
+
+/-- A numerical `B`-field: an arbitrary rational codimension-one class.
+
+No positivity is required.  The rational scalar restriction comes from the
+current `NumericalRingData`, whose intersection ring and degree map are over
+`ℚ`; it is not a mathematical restriction on the usual real `B`-field. -/
+structure BField (R : NumericalRingData n A) where
+  /-- The numerical divisor class `B`. -/
+  cls : A
+  /-- The class lies in codimension one. -/
+  cls_mem : cls ∈ R.piece 1
+
+namespace BField
+
+variable {R : NumericalRingData n A}
+
+/-- Powers of a `B`-field have their expected codimension. -/
+theorem pow_mem (B : BField R) (i : ℕ) : B.cls ^ i ∈ R.piece i := by
+  induction i with
+  | zero => simpa using R.one_mem_piece_zero
+  | succ i ih => simpa [pow_succ] using R.mul_mem_piece ih B.cls_mem
+
+/-- The `B`-field `βH` determined by a polarisation and a rational scalar. -/
+noncomputable def along (P : Polarization R) (β : ℚ) : BField R where
+  cls := algebraMap ℚ A β * P.cls
+  cls_mem := by
+    simpa using R.mul_mem_piece (R.algebraMap_mem_piece_zero β) P.cls_mem
+
+/-- The class underlying the scalar `B`-field is literally `βH`. -/
+@[simp]
+theorem along_cls (P : Polarization R) (β : ℚ) :
+    (along P β).cls = algebraMap ℚ A β * P.cls := rfl
+
+end BField
+
+/-- The `B`-twisted Chern-character component `ch^B_i(E)`. -/
+noncomputable def chBComp (B : BField V.ring) (E : N) (i : ℕ) : A :=
+  twist B.cls 1 (V.chComp E) i
+
+/-- The component formula obtained by expanding the truncated exponential `e^{-B}`. -/
+theorem chBComp_eq (B : BField V.ring) (E : N) (i : ℕ) :
+    chBComp V B E i =
+      ∑ j ∈ range (i + 1),
+        algebraMap ℚ A (twistCoeff 1 (i - j)) * V.chComp E j * B.cls ^ (i - j) := rfl
+
+/-- `ch^B_i(E)` remains in codimension `i`. -/
+theorem chBComp_mem (B : BField V.ring) (E : N) (i : ℕ) :
+    chBComp V B E i ∈ V.ring.piece i := by
+  rw [chBComp_eq]
+  refine Submodule.sum_mem _ fun j hj => ?_
+  have hji : j ≤ i := Nat.lt_succ_iff.mp (Finset.mem_range.mp hj)
+  have h0 : algebraMap ℚ A (twistCoeff 1 (i - j)) * V.chComp E j ∈ V.ring.piece j := by
+    have := V.ring.mul_mem_piece (V.ring.algebraMap_mem_piece_zero (twistCoeff 1 (i - j)))
+      (V.chComp_mem E j)
+    simpa using this
+  have := V.ring.mul_mem_piece h0 (B.pow_mem (i - j))
+  rwa [Nat.add_sub_cancel' hji] at this
+
+/-- The `B`-twisted Chern character is additive in the numerical class. -/
+theorem chBComp_add (B : BField V.ring) (E F : N) (i : ℕ) :
+    chBComp V B (E + F) i = chBComp V B E i + chBComp V B F i := by
+  simp only [chBComp_eq, V.chComp_add, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  ring
+
+/-- The codimension-zero component is unchanged by a `B`-field twist. -/
+theorem chBComp_zero (B : BField V.ring) (E : N) :
+    chBComp V B E 0 = V.chComp E 0 := by
+  simp [chBComp, twist, twistCoeff]
+
+/-- The first twisted component is `ch₁^B = ch₁ - B ch₀`. -/
+theorem chBComp_one (B : BField V.ring) (E : N) :
+    chBComp V B E 1 = V.chComp E 1 - V.chComp E 0 * B.cls := by
+  norm_num [chBComp, twist, twistCoeff, Finset.sum_range_succ]
+  ring
+
+/-- The second twisted component is
+`ch₂^B = ch₂ - B ch₁ + (B²/2) ch₀`. -/
+theorem chBComp_two (B : BField V.ring) (E : N) :
+    chBComp V B E 2 =
+      V.chComp E 2 - V.chComp E 1 * B.cls
+        + algebraMap ℚ A (1 / 2) * V.chComp E 0 * B.cls ^ 2 := by
+  norm_num [chBComp, twist, twistCoeff, Finset.sum_range_succ]
+  ring
+
+variable (P : Polarization V.ring)
 
 /-- **The `β`-twisted Chern character** `ch^β_i(E)`. -/
 noncomputable def chBetaComp (β : ℚ) (E : N) (i : ℕ) : A :=
@@ -209,5 +318,10 @@ theorem chBetaComp_zero_beta (E : N) (i : ℕ) :
 theorem chBetaComp_add_beta (β₁ β₂ : ℚ) (E : N) (i : ℕ) :
     chBetaComp V P (β₁ + β₂) E i = twist P.cls β₁ (chBetaComp V P β₂ E) i :=
   twist_add_beta P.cls β₁ β₂ (V.chComp E) i
+
+/-- The arbitrary-class notation and the scalar notation agree at `B = βH`. -/
+theorem chBComp_along_eq_chBetaComp (β : ℚ) (E : N) (i : ℕ) :
+    chBComp V (BField.along P β) E i = chBetaComp V P β E i := by
+  exact twist_algebraMap_mul P.cls β (V.chComp E) i
 
 end AlgebraicGeometry.Numerical
