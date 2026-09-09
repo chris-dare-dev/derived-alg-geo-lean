@@ -37,11 +37,14 @@ DGFunctor.HomogeneousNatTrans
    └─ IsClosed
 
 IsConeOf
-└─ homogeneousLift
-   ├─ arbitrary-degree strict squares
-   ├─ additivity, identity, composition, and differential laws
-   └─ projection and inclusion formulas
-      └─ HomogeneousNatTrans.ConeData
+└─ homogeneousLift (one owner of the cone lift)
+   ├─ arbitrary-degree squares with homotopy: differential law
+   ├─ additivity, identity, composition laws for strict squares
+   ├─ projection and inclusion formulas
+   ├─ lift := homogeneousLift 0, HomotopySquare := degree-zero square + closedness
+   │  └─ IsConeOf.Morphism with the shift-free `fst` square
+   │     └─ ConePresentation category, no pretriangulated instance needed
+   └─ HomogeneousNatTrans.ConeData
          ├─ objectwise cone choices
          ├─ assembled cone DGFunctor
          └─ canonical inr/inl transformations and boundary equation
@@ -57,13 +60,22 @@ EnhancedAdjunctionCones
 ├─ unshifted cones underlying dual twist and cotwist
 └─ TwistCotwistEquivalenceConditions
 
-FourierMukai.CounitKernelConeData
-├─ convolution kernel Q * P
-├─ closed kernel arrow Q * P ⟶ O_Δ
-├─ equality identifying its transform with the adjunction counit
-└─ dg cone kernel
-   └─ exact kernel evaluation gives pointwise distinguished twist triangles
+Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
+└─ coneTriangleFunctor: dg cones read in W through the comparison equivalence
+   └─ FourierMukai.KernelCone: pointwise and source-natural transform triangles
+      └─ FourierMukai.CounitKernelConeData
+         ├─ convolution kernel conv Q P, the kernel of Φ_Q ⋙ Φ_P (diagrammatic;
+         │  Huybrechts writes P ∘ Q)
+         ├─ closed dg arrow between the enhancement's lifts of conv Q P and O_Δ
+         ├─ equality identifying its transform with the adjunction counit
+         └─ dg cone kernel
+            └─ exact kernel evaluation gives pointwise distinguished twist triangles
 ```
+
+The kernel category is never required to *be* an `H⁰`: the comparison
+equivalence of an `Enhancement` carries a geometric kernel category such as
+`Dᵇ(Coh(Y × Y))` to the dg side, and the shift and exactness compatibility of
+that comparison are instance hypotheses to be discharged by the realization.
 
 ## Deliberately open seams
 
@@ -80,7 +92,9 @@ FourierMukai.CounitKernelConeData
    missing.
 4. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
-   transformed arrow is the counit.
+   transformed arrow is the counit.  The enhancement of the kernel category,
+   with `CommShift` and `IsTriangulated` for its comparison functor, is
+   likewise supplied.
 5. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
