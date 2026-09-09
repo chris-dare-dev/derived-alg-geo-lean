@@ -28,6 +28,8 @@ Chern-character map from coherent sheaves.
 
 open DerivedAlgGeo.LinearAlgebra
 
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
+
 namespace AlgebraicGeometry.Numerical.Examples.SmoothQuadric
 
 noncomputable section
@@ -441,21 +443,21 @@ theorem intersectionForm_apply (x y : Divisor) :
     intersectionForm x y = x.1 * y.2 + x.2 * y.1 := rfl
 
 /-- The rank-two real divisor space of the smooth quadric. -/
-def divisorSpace : Surface.DivisorSpace Divisor where
+def divisorSpace : DivisorSpace Divisor where
   intersection := intersectionForm
   intersection_symm := ⟨by intro x y; simp [intersectionForm]; ring⟩
 
 @[simp]
 theorem rulingOne_sq : divisorSpace.pair rulingOne rulingOne = 0 := by
-  norm_num [Surface.DivisorSpace.pair, divisorSpace, intersectionForm, rulingOne]
+  norm_num [DivisorSpace.pair, divisorSpace, intersectionForm, rulingOne]
 
 @[simp]
 theorem rulingTwo_sq : divisorSpace.pair rulingTwo rulingTwo = 0 := by
-  norm_num [Surface.DivisorSpace.pair, divisorSpace, intersectionForm, rulingTwo]
+  norm_num [DivisorSpace.pair, divisorSpace, intersectionForm, rulingTwo]
 
 @[simp]
 theorem rulingOne_pair_rulingTwo : divisorSpace.pair rulingOne rulingTwo = 1 := by
-  norm_num [Surface.DivisorSpace.pair, divisorSpace, intersectionForm, rulingOne, rulingTwo]
+  norm_num [DivisorSpace.pair, divisorSpace, intersectionForm, rulingOne, rulingTwo]
 
 /-- The weight-one basis vectors are precisely the two rational rulings. -/
 theorem weightOneBasis :
@@ -527,7 +529,7 @@ noncomputable def numericalRealization :
 /-- The full real Chern character induced from the rational numerical
 presentation. -/
 noncomputable def chernCharacter :
-    Surface.ChernCharacter NumericalClass Divisor :=
+    ChernCharacter NumericalClass Divisor :=
   Surface.NumericalRealization.chernCharacter
     (V := numericalVariety) numericalRealization
 

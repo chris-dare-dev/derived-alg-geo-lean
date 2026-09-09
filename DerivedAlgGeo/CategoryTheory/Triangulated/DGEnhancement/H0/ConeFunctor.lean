@@ -16,6 +16,9 @@ sends that category functorially to the category of triangles in `H⁰ C`.
 This is stronger than choosing a triangulated cone object-by-object: identity
 and composition are inherited from the explicit dg homotopies and cone maps,
 and every object lands in the full subcategory of distinguished triangles.
+The pretriangulated instance is needed only for the `H⁰` side, where the
+chosen shift functor lives; the category of cone presentations itself needs
+none.
 Kernel categories and other enhanced consumers can therefore carry one
 coherent cone diagram instead of separately supplying a cone and naturality
 proof at every object.
@@ -24,7 +27,7 @@ proof at every object.
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u
+universe v v' u u'
 
 namespace CategoryTheory
 
@@ -32,7 +35,7 @@ open DGCategoryStruct DGCategory Pretriangulated
 
 namespace H0
 
-variable (C : Type u) [DGCategory.{v} C] [IsPretriangulated C]
+variable (C : Type u) [DGCategory.{v} C]
 
 /-- The source vertex of a chosen dg cone presentation, functorially in
 homotopy-coherent maps of presentations. -/
@@ -110,6 +113,8 @@ theorem coneObjectFunctor_map
     {A B : DGCategory.ConePresentation C} (m : A ⟶ B) :
     (coneObjectFunctor C).map m = homMk m.coneMorphism.hom := rfl
 
+variable [IsPretriangulated C]
+
 /-- A chosen dg cone presentation determines a triangle in `H⁰`, and a
 homotopy-coherent cone morphism determines a morphism of those triangles.
 The construction preserves identities and composition. -/
@@ -129,10 +134,8 @@ noncomputable def coneTriangleFunctor :
           m.coneMorphism ≫
         IsConeOf.Morphism.toTriangleMorphism B.isCone D.isCone
           n.coneMorphism
-    dsimp only [IsConeOf.Morphism.comp]
-    exact IsConeOf.Morphism.toTriangleMorphism_compAt
+    exact IsConeOf.Morphism.toTriangleMorphism_comp
       A.isCone B.isCone D.isCone m.coneMorphism n.coneMorphism
-      ((IsPretriangulated.exists_shift B.source 1).choose_spec.some)
 
 @[simp]
 theorem coneTriangleFunctor_obj (A : DGCategory.ConePresentation C) :
@@ -171,5 +174,43 @@ theorem distinguishedConeTriangleFunctor_obj_val
       coneTriangle A.arrow A.isCone := rfl
 
 end H0
+
+namespace Enhancement
+
+variable {W : Type u'} [Category.{v'} W] [HasShift W ℤ]
+  (e : Enhancement.{v, u} W) [e.equiv.functor.CommShift ℤ]
+
+/-- The functorial dg cone triangles of an enhancement, read in the enhanced
+category through the comparison equivalence.  This is the form in which an
+enhanced kernel category, or any other enhanced triangulated category, hands
+its chosen cones to ordinary triangulated consumers. -/
+noncomputable def coneTriangleFunctor :
+    DGCategory.ConePresentation e.dgCat ⥤ Triangle W :=
+  H0.coneTriangleFunctor e.dgCat ⋙ e.equiv.functor.mapTriangle
+
+@[simp]
+theorem coneTriangleFunctor_obj_obj₁ (A : DGCategory.ConePresentation e.dgCat) :
+    (e.coneTriangleFunctor.obj A).obj₁ = e.equiv.functor.obj A.source := rfl
+
+@[simp]
+theorem coneTriangleFunctor_obj_obj₂ (A : DGCategory.ConePresentation e.dgCat) :
+    (e.coneTriangleFunctor.obj A).obj₂ = e.equiv.functor.obj A.target := rfl
+
+@[simp]
+theorem coneTriangleFunctor_obj_obj₃ (A : DGCategory.ConePresentation e.dgCat) :
+    (e.coneTriangleFunctor.obj A).obj₃ = e.equiv.functor.obj A.cone := rfl
+
+/-- When the comparison equivalence is exact, every transported cone triangle
+is distinguished in the enhanced category. -/
+theorem coneTriangleFunctor_obj_distinguished
+    [Limits.HasZeroObject W] [Preadditive W]
+    [∀ n : ℤ, (shiftFunctor W n).Additive] [Pretriangulated W]
+    [e.equiv.functor.IsTriangulated]
+    (A : DGCategory.ConePresentation e.dgCat) :
+    e.coneTriangleFunctor.obj A ∈ distTriang W :=
+  e.equiv.functor.map_distinguished _
+    (H0.coneTriangleFunctor_obj_distinguished e.dgCat A)
+
+end Enhancement
 
 end CategoryTheory

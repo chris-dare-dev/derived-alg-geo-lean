@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.SurfaceCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Coordinates
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.RealForm
 
 /-!
@@ -43,7 +43,7 @@ tilted heart, prove ampleness, or establish the support property.
 
 open Complex
 
-namespace AlgebraicGeometry.Numerical.Surface
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
 
 noncomputable section
 
@@ -75,6 +75,14 @@ theorem pair_apply (x y : D) : S.pair x y = S.intersection x y := rfl
 /-- Symmetry of the numerical intersection product. -/
 theorem pair_comm (x y : D) : S.pair x y = S.pair y x :=
   S.intersection_symm.eq x y
+
+@[simp]
+theorem pair_zero_left (x : D) : S.pair 0 x = 0 := by
+  simp [pair]
+
+@[simp]
+theorem pair_zero_right (x : D) : S.pair x 0 = 0 := by
+  simp [pair]
 
 end DivisorSpace
 
@@ -410,4 +418,4 @@ end ChernCharacter
 
 end
 
-end AlgebraicGeometry.Numerical.Surface
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial

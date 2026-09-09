@@ -37,18 +37,26 @@ DGFunctor.HomogeneousNatTrans
    └─ IsClosed
 
 IsConeOf
-└─ homogeneousLift
-   ├─ arbitrary-degree strict squares
-   ├─ additivity, identity, composition, and differential laws
-   └─ projection and inclusion formulas
-      └─ HomogeneousNatTrans.ConeData
+└─ homogeneousLift (one owner of the cone lift)
+   ├─ arbitrary-degree squares with homotopy: differential law
+   ├─ additivity, identity, composition laws for strict squares
+   ├─ projection and inclusion formulas
+   ├─ lift := homogeneousLift 0, HomotopySquare := degree-zero square + closedness
+   │  └─ IsConeOf.Morphism with the shift-free `fst` square
+   │     └─ ConePresentation category, no pretriangulated instance needed
+   └─ HomogeneousNatTrans.ConeData
          ├─ objectwise cone choices
          ├─ assembled cone DGFunctor
-         └─ canonical inr/inl transformations and boundary equation
+         ├─ canonical inr/inl transformations and boundary equation
+         ├─ fst / snd: the cone projections, graded-natural in degrees 1 and 0
+         └─ isConeOf: a cone in the dg category DGFunctor C D itself, so the
+            twist candidate is a cone OF FUNCTORS, the form in which
+            Anno--Logvinenko state SR ⟶ Id_B ⟶ T
 
 DGAdjunction
 ├─ closed unit and counit
 ├─ dg triangle identities
+├─ h0 : an ordinary Mathlib adjunction between the H⁰ functors
 └─ CounitConeData
    └─ twist candidate Cone(LR ⟶ id)
 
@@ -57,34 +65,66 @@ EnhancedAdjunctionCones
 ├─ unshifted cones underlying dual twist and cotwist
 └─ TwistCotwistEquivalenceConditions
 
-FourierMukai.CounitKernelConeData
-├─ convolution kernel Q * P
-├─ closed kernel arrow Q * P ⟶ O_Δ
-├─ equality identifying its transform with the adjunction counit
-└─ dg cone kernel
-   └─ exact kernel evaluation gives pointwise distinguished twist triangles
+Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
+└─ coneTriangleFunctor: dg cones read in W through the comparison equivalence
+   └─ FourierMukai.KernelCone: pointwise and source-natural transform triangles
+      └─ FourierMukai.CounitKernelConeData
+         ├─ convolution kernel conv Q P, the kernel of Φ_Q ⋙ Φ_P (diagrammatic;
+         │  Huybrechts writes P ∘ Q)
+         ├─ closed dg arrow between the enhancement's lifts of conv Q P and O_Δ
+         ├─ equality identifying its transform with the adjunction counit
+         └─ dg cone kernel
+            └─ exact kernel evaluation gives pointwise distinguished twist triangles
 ```
+
+The kernel category is never required to *be* an `H⁰`: the comparison
+equivalence of an `Enhancement` carries a geometric kernel category such as
+`Dᵇ(Coh(Y × Y))` to the dg side, and the shift and exactness compatibility of
+that comparison are instance hypotheses to be discharged by the realization.
 
 ## Deliberately open seams
 
-1. There is no functorial shift of dg-category objects yet.  Objectwise
-   `IsShiftBy` witnesses exist, but the shifted comparison maps needed for the
-   full Anno--Logvinenko definition are not packaged as dg functors.
+1. `IsPretriangulated (DGFunctor C D)` is registered whenever `D` is
+   pretriangulated (`DGFunctor.isPretriangulated_dgFunctor`), so a cone of dg
+   functors is now a cone in a pretriangulated dg category rather than a
+   pointwise construction.  The shift is `DGFunctor.shiftedFunctor`, whose
+   action on a degree-`p` morphism carries the sign `(-1)^(n * p)`; the
+   Leibniz rule forces it (`IsShiftBy.shiftMap_d`) and no constant sign works.
+
+   What remains open here is the *comparison* data, not the shift itself.
+   Anno--Logvinenko's definition needs the shifted comparison maps between two
+   chosen shifts of the same functor, and `IsShiftBy.compare` supplies those
+   only objectwise; nothing packages them as a natural transformation of the
+   shifted functors, and no coherence between `shiftedFunctor` for `n` and for
+   `m` is proved.  So the shift exists as a field of the instance and not yet
+   as a shift *functor* with an additive structure on the degree.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
-   sphericality.
-3. No generic `RHom(E,-) ⊗ E` dg functor or evaluation transformation has been
+   sphericality.  `DGAdjunction.h0` now compares a dg adjunction with an
+   ordinary one on `H⁰`, but the dg notion is the strict one: Anno--Logvinenko
+   work with homotopy adjunctions of bimodules, and no comparison with those
+   exists.
+3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
+   shift on a functor category, which is what `Functor.ExactFamily` should be
+   built on.  That rewiring is still open, and it is not an API-only change:
+   `ExactBifunctor` records triangulatedness against the shift structure it
+   chose, while the family needs it against that choice composed with the
+   strict comparison for evaluation, so the transport needs a lemma comparing
+   the two `mapTriangle`s.
+4. No generic `RHom(E,-) ⊗ E` dg functor or evaluation transformation has been
    constructed.  The current monoidal/exact-bifunctor roots are the intended
    lower dependency, but closed monoidal/Hom-complex representability is still
    missing.
-4. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
+5. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
-   transformed arrow is the counit.
-5. No theorem currently identifies a categorical spherical object with a
+   transformed arrow is the counit.  The enhancement of the kernel category,
+   with `CommShift` and `IsTriangulated` for its comparison functor, is
+   likewise supplied.
+6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
-6. The Enriques classification layer supplies categorical spherical objects
+7. The Enriques classification layer supplies categorical spherical objects
    and paper-level Fourier--Mukai conclusions through explicit seams.  It does
    not yet provide the dg evaluation functor, counit kernel arrow, or a
    concrete Enriques surface needed to instantiate this tree.

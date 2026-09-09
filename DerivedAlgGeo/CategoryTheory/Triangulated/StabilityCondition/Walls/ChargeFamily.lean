@@ -245,6 +245,86 @@ theorem wallValue_add_nsmul_right (p : P) (n : ℕ) (v w : N) :
   | succ n ih =>
       rw [succ_nsmul, ← add_assoc, wallValue_add_right, ih, wallValue_self, add_zero]
 
+/-! ### The real-linear action on charges
+
+A stability condition may be post-composed with a real-linear automorphism of
+`ℂ`; the universal cover of `GL⁺(2, ℝ)` acts on the space of stability
+conditions this way, and the numerical wall of a pair of classes is one of the
+things that action preserves.  Only the numerical half of that is available
+here: the action on charges, and the determinant law for `wallValue`.  Nothing
+below mentions a heart or a slicing, and no orientation is required — the wall
+is preserved by every invertible real-linear map, while the *phase* is not,
+which is why `GL⁺` rather than `GL` appears downstream. -/
+
+/-- The determinant of a real-linear endomorphism of `ℂ`, computed in the basis
+`1, I`.  This is the factor by which the map scales `wallValue`. -/
+def realDet (g : ℂ →ₗ[ℝ] ℂ) : ℝ :=
+  (g 1).re * (g Complex.I).im - (g 1).im * (g Complex.I).re
+
+/-- A real-linear map of `ℂ` is determined by its values on `1` and `I`. -/
+theorem map_eq_smul_add_smul (g : ℂ →ₗ[ℝ] ℂ) (z : ℂ) :
+    g z = z.re • g 1 + z.im • g Complex.I := by
+  have hz : z = z.re • (1 : ℂ) + z.im • Complex.I := by
+    apply Complex.ext <;> simp
+  conv_lhs => rw [hz]
+  rw [map_add, map_smul, map_smul]
+
+/-- Post-compose every charge of a family with a real-linear map of `ℂ`. -/
+def linearAct (g : ℂ →ₗ[ℝ] ℂ) : ChargeFamily P N where
+  charge p := g.toAddMonoidHom.comp (Z.charge p)
+
+@[simp]
+theorem linearAct_charge (g : ℂ →ₗ[ℝ] ℂ) (p : P) (v : N) :
+    (Z.linearAct g).charge p v = g (Z.charge p v) := rfl
+
+/-- **The determinant law.**  `wallValue` is the determinant of the `2 × 2`
+matrix of real and imaginary parts of the two charges, so post-composing with a
+real-linear map multiplies it by that map's determinant. -/
+theorem wallValue_linearAct (g : ℂ →ₗ[ℝ] ℂ) (p : P) (v w : N) :
+    (Z.linearAct g).wallValue p v w = realDet g * Z.wallValue p v w := by
+  simp only [wallValue, re, im, linearAct_charge, realDet]
+  rw [map_eq_smul_add_smul g (Z.charge p v), map_eq_smul_add_smul g (Z.charge p w)]
+  simp only [Complex.add_re, Complex.add_im, Complex.real_smul, Complex.mul_re,
+    Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im, zero_mul,
+    sub_zero, add_zero]
+  ring
+
+/-- An invertible real-linear change of charge leaves every numerical wall
+where it was. -/
+theorem wall_linearAct {g : ℂ →ₗ[ℝ] ℂ} (hg : realDet g ≠ 0) (v w : N) :
+    (Z.linearAct g).wall v w = Z.wall v w := by
+  ext p
+  simp only [mem_wall, wallValue_linearAct, mul_eq_zero]
+  exact or_iff_right hg
+
+/-- Rescale every charge by a complex scalar.  This is the scalar part of the
+real-linear action. -/
+def smul (c : ℂ) : ChargeFamily P N := Z.linearAct (LinearMap.mulLeft ℝ c)
+
+@[simp]
+theorem smul_charge (c : ℂ) (p : P) (v : N) :
+    (Z.smul c).charge p v = c * Z.charge p v := rfl
+
+/-- Multiplication by `c` has determinant `‖c‖²` as a real-linear map. -/
+@[simp]
+theorem realDet_mulLeft (c : ℂ) :
+    realDet (LinearMap.mulLeft ℝ c) = Complex.normSq c := by
+  simp only [realDet, LinearMap.mulLeft_apply, mul_one, Complex.mul_re, Complex.mul_im,
+    Complex.I_re, Complex.I_im, Complex.normSq_apply]
+  ring
+
+/-- Rescaling the charges by `c` scales every wall expression by `‖c‖²`. -/
+theorem wallValue_smul (c : ℂ) (p : P) (v w : N) :
+    (Z.smul c).wallValue p v w = Complex.normSq c * Z.wallValue p v w := by
+  rw [smul, wallValue_linearAct, realDet_mulLeft]
+
+/-- **Numerical walls are invariant under rescaling the central charge.** -/
+theorem wall_smul {c : ℂ} (hc : c ≠ 0) (v w : N) :
+    (Z.smul c).wall v w = Z.wall v w :=
+  Z.wall_linearAct (by
+    rw [realDet_mulLeft]
+    exact fun h => hc (Complex.normSq_eq_zero.mp h)) v w
+
 /-- Reindexing a charge family pulls its wall locus back as a set. -/
 theorem reindex_wall (f : Q → P) (v w : N) :
     (Z.reindex f).wall v w = f ⁻¹' Z.wall v w := rfl

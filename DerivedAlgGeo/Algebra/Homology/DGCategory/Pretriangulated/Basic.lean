@@ -24,6 +24,30 @@ whose dg module of maps *in* is prescribed:
 Both are conditions a dg category may or may not satisfy, so `IsPretriangulated`
 is a class asserting that it does.
 
+## Which notion this is: *strongly* pretriangulated
+
+Each condition asks for a **strict** isomorphism: right composition with the
+closed witness is bijective in every degree, from every `W`, so `Hom(-, X)[n]`
+and `Hom(-, Y)` agree in `Z⁰` of the dg module category and not merely up to
+homotopy. That is Drinfeld's *strongly pretriangulated*, and it is stronger than
+what Bondal--Kapranov and Keller call pretriangulated, where the shift and the
+cone need only be representable up to homotopy equivalence.
+
+Strong implies weak, so nothing proved from `[IsPretriangulated C]` is in doubt;
+the class simply has fewer inhabitants than its name suggests. The choice costs
+nothing for the models — every dg category in this repository has strict shifts
+and cones, and strictness is what lets `H⁰` be triangulated by a construction
+rather than by a homotopy argument — and it loses no *object*, since every
+pretriangulated dg category is quasi-equivalent to a strongly pretriangulated
+one. What it does change is the meaning of any statement that quantifies over dg
+categories, and there is exactly one of those planned: uniqueness of
+enhancements, which read over this class is a different and weaker statement
+than the literature's. See `CategoryTheory/Triangulated/DGEnhancement/Basic.lean`.
+
+References: Bondal--Kapranov, *Enhanced triangulated categories* (1990) §3;
+Drinfeld, *DG quotients of DG categories* (2004) §2.4; Keller, *On differential
+graded categories*, ICM 2006, §4.5.
+
 ## Naturality is not an axiom here
 
 Each condition is stated as *right composition with one fixed element is
@@ -608,8 +632,12 @@ lemma inr_mem_cocycles (hc : IsConeOf f Z) : hc.inr ∈ cocycles Y Z :=
 
 end IsConeOf
 
-/-- A pretriangulated dg category: it has a zero object, a shift in every
-degree, and a cone on every closed degree-zero morphism. -/
+/-- A **strongly** pretriangulated dg category: it has a zero object, a shift in
+every degree, and a cone on every closed degree-zero morphism, each represented
+strictly rather than up to homotopy equivalence.
+
+The name is the short one for readability; see the module docstring on why this
+is Drinfeld's strong notion and not Bondal--Kapranov's. -/
 class IsPretriangulated (C : Type u) [DGCategory.{v} C] : Prop where
   /-- Some object has zero identity, so `Z⁰ C` and `H⁰ C` have a zero object. -/
   exists_zero : ∃ Z : C, dgId Z = 0

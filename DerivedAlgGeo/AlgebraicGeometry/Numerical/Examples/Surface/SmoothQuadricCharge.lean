@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.SmoothQuadric
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeScalarExtension
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallSlice
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Slice
 
 /-!
 # The divisorial central charge on a smooth quadric surface
@@ -34,6 +34,8 @@ coordinate polynomial.
 open Complex
 open scoped TensorProduct
 
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
+
 namespace AlgebraicGeometry.Numerical.Examples.SmoothQuadric
 
 open Surface
@@ -41,7 +43,7 @@ open Surface
 noncomputable section
 
 /-- Independent real parameters in the ruling basis. -/
-def parameters (h₁ h₂ b₁ b₂ : ℝ) : Surface.StabilityParameters Divisor where
+def parameters (h₁ h₂ b₁ b₂ : ℝ) : StabilityParameters Divisor where
   B := (b₁, b₂)
   omega := (h₁, h₂)
 
@@ -76,7 +78,7 @@ theorem extendDivisorClass_surjective :
 /-- Independent real `B` and `omega` in the scalar extension of the quadric's
 rational numerical ring. -/
 def scalarExtendedParameters (h₁ h₂ b₁ b₂ : ℝ) :
-    Surface.StabilityParameters (Surface.RealDivisorClass numericalRing) where
+    StabilityParameters (Surface.RealDivisorClass numericalRing) where
   B := scalarExtendedDivisor b₁ b₂
   omega := scalarExtendedDivisor h₁ h₂
 
@@ -87,7 +89,7 @@ theorem realize_scalarExtendedParameters (h₁ h₂ b₁ b₂ : ℝ) :
     numericalRealization.realizeParameters
         (scalarExtendedParameters h₁ h₂ b₁ b₂) =
       parameters h₁ h₂ b₁ b₂ := by
-  apply congrArg₂ Surface.StabilityParameters.mk
+  apply congrArg₂ StabilityParameters.mk
   · exact realize_scalarExtendedDivisor b₁ b₂
   · exact realize_scalarExtendedDivisor h₁ h₂
 
@@ -122,7 +124,7 @@ def ampleCone : Set Divisor := {H | 0 < H.1 ∧ 0 < H.2}
 /-- Bundle the geometric ampleness side condition without changing the charge
 arithmetic. -/
 def divisorialParameters (h₁ h₂ b₁ b₂ : ℝ) (hh₁ : 0 < h₁) (hh₂ : 0 < h₂) :
-    Surface.DivisorialParameters ampleCone where
+    DivisorialParameters ampleCone where
   B := (b₁, b₂)
   omega := (h₁, h₂)
   omega_ample := ⟨hh₁, hh₂⟩
@@ -130,7 +132,7 @@ def divisorialParameters (h₁ h₂ b₁ b₂ : ℝ) (hh₁ : 0 < h₁) (hh₂ :
 /-- The polarization square is `2 h₁ h₂`. -/
 theorem omega_square (h₁ h₂ : ℝ) :
     divisorSpace.pair (h₁, h₂) (h₁, h₂) = 2 * h₁ * h₂ := by
-  simp [Surface.DivisorSpace.pair, divisorSpace, intersectionForm]
+  simp [DivisorSpace.pair, divisorSpace, intersectionForm]
   ring
 
 /-- An ample class on the smooth quadric has positive square.  This is a
@@ -153,10 +155,10 @@ theorem centralCharge_apply (h₁ h₂ b₁ b₂ : ℝ) (r c d v : ℤ) :
           (-(v : ℝ) + b₁ * d + b₂ * c + (h₁ * h₂ - b₁ * b₂) * r)
         + Complex.I * Complex.ofReal
           (h₁ * d + h₂ * c - (h₁ * b₂ + h₂ * b₁) * r) := by
-  rw [charge, Surface.ChernCharacter.centralCharge_apply]
+  rw [charge, ChernCharacter.centralCharge_apply]
   simp only [chernCharacter_rank, chernCharacter_chOne, chernCharacter_chTwo]
   simp [parameters, divisorSpace, intersectionForm,
-    Surface.DivisorSpace.pair]
+    DivisorSpace.pair]
   ring
 
 /-- The intrinsic real charge agrees with the generic numerical-ring charge
@@ -165,19 +167,19 @@ theorem charge_eq_numericalBField
     (a : ℝ) (h₁ h₂ b₁ b₂ : ℚ) (hh₁ : 0 < h₁) (hh₂ : 0 < h₂)
     (E : NumericalClass) :
     charge (a * (h₁ : ℝ)) (a * (h₂ : ℝ)) (b₁ : ℝ) (b₂ : ℝ) E =
-      (Surface.ChargeCoordinates.ofNumericalDataB numericalVariety
+      (ChargeCoordinates.ofNumericalDataB numericalVariety
         (polarization h₁ h₂ hh₁ hh₂) (bField b₁ b₂)).centralCharge a E := by
   have hparameters :
       parameters (a * (h₁ : ℝ)) (a * (h₂ : ℝ)) (b₁ : ℝ) (b₂ : ℝ) =
         numericalRealization.parameters
           (polarization h₁ h₂ hh₁ hh₂) (bField b₁ b₂) a := by
-    change Surface.StabilityParameters.mk ((b₁ : ℝ), (b₂ : ℝ))
+    change StabilityParameters.mk ((b₁ : ℝ), (b₂ : ℝ))
         (a * (h₁ : ℝ), a * (h₂ : ℝ)) =
-      Surface.StabilityParameters.mk
+      StabilityParameters.mk
         (numericalRealization.realizeBField (bField b₁ b₂))
         (a • numericalRealization.realizePolarization
           (polarization h₁ h₂ hh₁ hh₂))
-    apply congrArg₂ Surface.StabilityParameters.mk
+    apply congrArg₂ StabilityParameters.mk
     · exact (numericalRealization_bField b₁ b₂).symm
     · rw [numericalRealization_polarization]
       ext <;> simp
@@ -191,7 +193,7 @@ def antiDiagonal (u : ℝ) : Divisor := (u, -u)
 @[simp]
 theorem segre_pair_antiDiagonal (u : ℝ) :
     divisorSpace.pair segre (antiDiagonal u) = 0 := by
-  simp [Surface.DivisorSpace.pair, divisorSpace, intersectionForm, segre, antiDiagonal]
+  simp [DivisorSpace.pair, divisorSpace, intersectionForm, segre, antiDiagonal]
 
 /-! ### The inherited orthogonal wall slice -/
 
@@ -207,7 +209,7 @@ def antiDiagonalMap : ℝ →ₗ[ℝ] Divisor where
 
 /-- The full rank-two wall slice of the quadric, as a child of the basis-free
 orthogonal-slice construction. -/
-def wallSlice : Surface.OrthogonalSlice divisorSpace ℝ where
+def wallSlice : OrthogonalSlice divisorSpace ℝ where
   H := segre
   transverse := antiDiagonalMap
   orthogonal := segre_pair_antiDiagonal
@@ -215,7 +217,7 @@ def wallSlice : Surface.OrthogonalSlice divisorSpace ℝ where
 /-- The generic wall family specialized to the smooth quadric. -/
 def wallChargeFamily :
     CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily
-      (Surface.OrthogonalSlice.Point ℝ) NumericalClass :=
+      (OrthogonalSlice.Point ℝ) NumericalClass :=
   wallSlice.chargeFamily chernCharacter
 
 /-- Evaluating the inherited wall family gives the existing arbitrary-real
@@ -228,7 +230,7 @@ theorem wallChargeFamily_charge (s u t : ℝ) (E : NumericalClass) :
   have hparameters :
       wallSlice.parameters ⟨s, u, t⟩ =
         parameters t t (s + u) (s - u) := by
-    apply congrArg₂ Surface.StabilityParameters.mk
+    apply congrArg₂ StabilityParameters.mk
     · change s • segre + antiDiagonalMap u = (s + u, s - u)
       ext <;> simp [antiDiagonalMap, antiDiagonal, segre, sub_eq_add_neg]
     · change t • segre = (t, t)
