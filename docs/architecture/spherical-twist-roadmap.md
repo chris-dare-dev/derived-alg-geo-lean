@@ -84,17 +84,20 @@ that comparison are instance hypotheses to be discharged by the realization.
 
 ## Deliberately open seams
 
-1. There is no functorial shift of dg-category objects yet.  Objectwise
-   `IsShiftBy` witnesses exist, but the shifted comparison maps needed for the
-   full Anno--Logvinenko definition are not packaged as dg functors.
+1. `IsPretriangulated (DGFunctor C D)` is registered whenever `D` is
+   pretriangulated (`DGFunctor.isPretriangulated_dgFunctor`), so a cone of dg
+   functors is now a cone in a pretriangulated dg category rather than a
+   pointwise construction.  The shift is `DGFunctor.shiftedFunctor`, whose
+   action on a degree-`p` morphism carries the sign `(-1)^(n * p)`; the
+   Leibniz rule forces it (`IsShiftBy.shiftMap_d`) and no constant sign works.
 
-   This is now the *only* missing field of `IsPretriangulated (DGFunctor C D)`:
-   the zero object and the cone are built (`DGFunctor.exists_zero_dgFunctor`,
-   `DGFunctor.exists_cone_dgFunctor`).  The shifted functor's action on a
-   degree-`p` morphism must carry the sign `(-1)^(n * p)`, which the Leibniz
-   rule forces and which a constant sign cannot supply; the derivation is in
-   the docstring of
-   `Algebra/Homology/DGCategory/Pretriangulated/FunctorCategory.lean`.
+   What remains open here is the *comparison* data, not the shift itself.
+   Anno--Logvinenko's definition needs the shifted comparison maps between two
+   chosen shifts of the same functor, and `IsShiftBy.compare` supplies those
+   only objectwise; nothing packages them as a natural transformation of the
+   shifted functors, and no coherence between `shiftedFunctor` for `n` and for
+   `m` is proved.  So the shift exists as a field of the instance and not yet
+   as a shift *functor* with an additive structure on the degree.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
