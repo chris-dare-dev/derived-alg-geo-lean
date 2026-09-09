@@ -71,15 +71,22 @@ def mapHomotopySquare (F : DGFunctor C D)
     {a : (dgHom X₁ X₂).X 0} {b : (dgHom Y₁ Y₂).X 0}
     (s : DGCategory.HomotopySquare f₁ f₂ a b) :
     DGCategory.HomotopySquare
-      (F.map 0 f₁) (F.map 0 f₂) (F.map 0 a) (F.map 0 b) where
-  a_closed := by
-    rw [← F.map_d 0 1 a, s.a_closed, map_zero]
-  b_closed := by
-    rw [← F.map_d 0 1 b, s.b_closed, map_zero]
-  homotopy := F.map (-1) s.homotopy
-  homotopy_boundary := by
-    rw [← F.map_d (-1) 0 s.homotopy, s.homotopy_boundary, map_sub,
-      F.map_comp, F.map_comp]
+      (F.map 0 f₁) (F.map 0 f₂) (F.map 0 a) (F.map 0 b) :=
+  DGCategory.HomotopySquare.ofBoundary
+    (by rw [← F.map_d 0 1 a, s.a_closed, map_zero])
+    (by rw [← F.map_d 0 1 b, s.b_closed, map_zero])
+    (F.map (-1) s.homotopy)
+    (by rw [← F.map_d (-1) 0 s.homotopy, s.boundary, map_sub,
+      F.map_comp, F.map_comp])
+
+@[simp]
+lemma mapHomotopySquare_homotopy (F : DGFunctor C D)
+    {X₁ Y₁ X₂ Y₂ : C}
+    {f₁ : (dgHom X₁ Y₁).X 0} {f₂ : (dgHom X₂ Y₂).X 0}
+    {a : (dgHom X₁ X₂).X 0} {b : (dgHom Y₁ Y₂).X 0}
+    (s : DGCategory.HomotopySquare f₁ f₂ a b) :
+    (F.mapHomotopySquare s).homotopy = F.map (-1) s.homotopy :=
+  rfl
 
 /-- Strong dg-level preservation of cone witnesses.
 

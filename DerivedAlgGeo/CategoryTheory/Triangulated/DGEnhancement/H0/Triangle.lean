@@ -332,10 +332,7 @@ lemma exists_lift_of_comm (a : cocycles X₁ X₂) (b : cocycles Y₁ Y₂)
   let s : DGCategory.HomotopySquare
       (f₁ : (dgHom X₁ Y₁).X 0) (f₂ : (dgHom X₂ Y₂).X 0)
       (a : (dgHom X₁ X₂).X 0) (b : (dgHom Y₁ Y₂).X 0) :=
-    { a_closed := a.2
-      b_closed := b.2
-      homotopy := k
-      homotopy_boundary := hk }
+    DGCategory.HomotopySquare.ofBoundary a.2 b.2 k hk
   let m := hc₁.liftMorphism hc₂
     (a : (dgHom X₁ X₂).X 0) (b : (dgHom Y₁ Y₂).X 0) s
   refine ⟨m.hom, ?_, ?_⟩
@@ -461,16 +458,13 @@ variable {X₁ Y₁ Z₁ X₂ Y₂ Z₂ X₃ Y₃ Z₃ : C}
   (hc₂ : IsConeOf (f₂ : (dgHom X₂ Y₂).X 0) Z₂)
   (hc₃ : IsConeOf (f₃ : (dgHom X₃ Y₃).X 0) Z₃)
 
-/-- The H⁰ adapter preserves composition of dg cone morphisms. The chosen
-middle shift affects only the proof that the dg composite is a cone morphism,
-not any of the three H⁰ components. -/
-lemma IsConeOf.Morphism.toTriangleMorphism_compAt
+/-- The H⁰ adapter preserves composition of dg cone morphisms. -/
+lemma IsConeOf.Morphism.toTriangleMorphism_comp
     (m₁ : IsConeOf.Morphism hc₁ hc₂ a₁ b₁)
-    (m₂ : IsConeOf.Morphism hc₂ hc₃ a₂ b₂)
-    {X₂' : C} (s₂ : IsShiftBy X₂ 1 X₂') :
+    (m₂ : IsConeOf.Morphism hc₂ hc₃ a₂ b₂) :
     IsConeOf.Morphism.toTriangleMorphism hc₁ hc₃
-        (IsConeOf.Morphism.compAt (hc₁ := hc₁) (hc₂ := hc₂) (hc₃ := hc₃)
-          m₁ m₂ s₂) =
+        (IsConeOf.Morphism.comp (hc₁ := hc₁) (hc₂ := hc₂) (hc₃ := hc₃)
+          m₁ m₂) =
       IsConeOf.Morphism.toTriangleMorphism hc₁ hc₂ m₁ ≫
         IsConeOf.Morphism.toTriangleMorphism hc₂ hc₃ m₂ := by
   apply Triangle.hom_ext
