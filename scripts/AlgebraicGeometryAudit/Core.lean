@@ -2213,14 +2213,14 @@ triviality of the canonical class, so no derived tensor product is needed.
 connects the definition to `Mukai.IsSpherical`. -/
 
 #print axioms AlgebraicGeometry.K3Surface.DerivedCat
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.vanishing
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.end_one
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.ext_two
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.not_isZero
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.finrank_end
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.finrank_ext_two
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.of_iso
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.vanishing
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.end_one
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.ext_two
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.not_isZero
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.finrank_end
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.finrank_ext_two
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.of_iso
 
 /-! ## The numerical shadow of sphericity
 
@@ -2231,15 +2231,15 @@ and nothing here constructs one. `isSpherical_mukaiVector` is the forward
 direction only; the converse needs simplicity and Serre duality, as
 `MukaiVector.lean` records. -/
 
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.finrank_hom_eq_zero
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.finrank_hom_eq_zero
 #print axioms AlgebraicGeometry.K3Surface.selfEuler
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.selfEuler_eq_two
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.selfEuler_eq_two
 #print axioms AlgebraicGeometry.K3Surface.EulerRealization
 #print axioms AlgebraicGeometry.K3Surface.EulerRealization.cls
 #print axioms AlgebraicGeometry.K3Surface.EulerRealization.chi₂_eq
 #print axioms AlgebraicGeometry.K3Surface.EulerRealization.mk.inj
 #print axioms AlgebraicGeometry.K3Surface.EulerRealization.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.K3Surface.IsSphericalObject.isSpherical_mukaiVector
+#print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.isSpherical_mukaiVector
 
 /-! ## `H⁰(Pⁿ, O(d)) = 0` for `d < 0` (#665, S1a)
 

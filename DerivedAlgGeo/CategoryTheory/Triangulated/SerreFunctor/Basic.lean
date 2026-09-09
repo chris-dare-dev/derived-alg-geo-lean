@@ -19,6 +19,23 @@ The pointwise equivalences and their two naturality equations are the fields of
 functor, not a `...Data` wrapper meaning that an unproved theorem has silently
 been postulated.  Geometric consumers may later supply such data explicitly.
 
+## Which notion this is: a *right* Serre functor
+
+`SerreFunctorData` asks for the duality and its naturality and **nothing
+else**.  It does not ask that `S` be an equivalence, so what it defines is
+Reiten--Van den Bergh's *right* Serre functor, not the Serre functor of
+Bondal--Kapranov and Huybrechts, who additionally require `S` to be a `k`-linear
+autoequivalence.  That extra clause is `SerreCategoryData.serreIsEquivalence`
+below, and the geometric consumers take that stronger package.
+
+The weaker notion is the useful one to state theorems from, and the split is
+deliberate: everything proved here holds for a right Serre functor, and a
+consumer that genuinely needs essential surjectivity asks for it by taking
+`SerreCategoryData`.  The gap is real rather than cosmetic — a right Serre
+functor is fully faithful under Hom-finiteness but need not be essentially
+surjective — so `HasRightSerreFunctor` must not be read as "this category has a
+Serre functor" in the Bondal--Kapranov sense.
+
 No shift or triangulation is needed for the definition.  Hom-finiteness is a
 separate property and appears only where double-dual or dimension arguments
 actually spend it.
@@ -66,10 +83,18 @@ structure SerreFunctorData where
     eta A B' (phi.comp (Linear.rightComp k A g)) =
       g ≫ eta A B phi
 
-/-- The property that a category admits some Serre functor. -/
-abbrev HasSerreFunctor : Prop := Nonempty (SerreFunctorData k C)
+/-- The property that a category admits some *right* Serre functor.
+
+Named for the weaker notion on purpose; see the module docstring.  For the
+Bondal--Kapranov notion, which additionally requires `S` to be an
+autoequivalence, use `Nonempty (SerreCategoryData k C)`. -/
+abbrev HasRightSerreFunctor : Prop := Nonempty (SerreFunctorData k C)
 
 /-- A chosen Serre functor which is an autoequivalence.
+
+This is the Bondal--Kapranov / Huybrechts notion: `SerreFunctorData` supplies
+the duality, and `serreIsEquivalence` supplies the clause that makes it a Serre
+functor rather than only a right one.
 
 This is the common categorical package used by geometric residual categories.
 The stronger `EnriquesCategoryData` adds a specified relation between the

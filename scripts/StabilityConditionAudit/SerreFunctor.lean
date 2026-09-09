@@ -21,7 +21,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.naturality_right
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.mk.inj
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.mk.sizeOf_spec
-#print axioms CategoryTheory.SerreFunctor.HasSerreFunctor
+#print axioms CategoryTheory.SerreFunctor.HasRightSerreFunctor
 #print axioms CategoryTheory.SerreFunctor.SerreCategoryData
 #print axioms CategoryTheory.SerreFunctor.SerreCategoryData.serre
 #print axioms CategoryTheory.SerreFunctor.SerreCategoryData.serreIsEquivalence

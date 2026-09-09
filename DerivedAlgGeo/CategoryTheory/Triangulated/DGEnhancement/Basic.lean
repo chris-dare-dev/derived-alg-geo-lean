@@ -13,6 +13,31 @@ of the notion is that structure carried on `A` can be pushed across the
 equivalence and read off on `T`; this file starts that transport with the zero
 object, and defines the structure that later transports are stated against.
 
+## How this differs from the literature's enhancement, and why
+
+Bondal--Kapranov and Lunts--Orlov take `T` to be *triangulated* and require the
+comparison to be an *exact* equivalence. Neither is a field here: `T` is an
+arbitrary `Category`, and `equiv` is a plain equivalence with no `CommShift` and
+no preservation of distinguished triangles. The dg side is correspondingly
+narrower — `IsPretriangulated` is the strong notion, see its module docstring.
+
+That is the repository's usual split, not an oversight: the structure carries
+the minimum, and the agreement with an existing triangulated structure is a
+separately named theorem where there is one to agree with. For the only
+inhabitant, `Cdg.enhancement`, exactness *is* proved — as an equality of the two
+`Set (Triangle _)` (`Cdg.seam_distinguishedTriangles_eq`) together with a
+`Functor.CommShift ℤ` on the seam (`Cdg.h0FunctorCommShift`), in
+`Algebra/Homology/HomotopyCategory/DGEnhancement/`.
+
+**The consequence to keep in view.** Nothing proved from this structure today is
+in doubt; `hasZeroObject` below is the only consumer. But a statement that
+quantifies over enhancements is not the literature's statement when read here.
+Uniqueness of enhancements (`dg-enhancements-e15`) is the case that matters: over
+a bare equivalence of underlying categories it is false, since two dg categories
+can have equivalent `H⁰` as plain categories without being quasi-equivalent. When
+that lane is written, the statement must quantify over exact comparisons — either
+by strengthening this structure or by carrying the clause at the statement.
+
 ## What is transported here, and what is not
 
 `H⁰` of a pretriangulated dg category has a zero object: `IsPretriangulated`
@@ -62,6 +87,10 @@ end Transport
 set_option linter.checkUnivs false in
 /-- A dg enhancement of an ordinary category `T`: a pretriangulated dg category
 whose `H⁰` is equivalent to `T`.
+
+`equiv` is a plain equivalence and `T` is a plain category; the literature asks
+for a triangulated `T` and an exact comparison. See the module docstring for why
+the clause is carried outside the structure and what it costs.
 
 The dg category is bundled rather than a parameter because the interesting
 statements quantify over enhancements of a fixed `T` — uniqueness of
