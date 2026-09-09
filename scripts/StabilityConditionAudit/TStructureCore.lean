@@ -5,6 +5,7 @@ branches append to different files (#480). See the umbrella file for the contrac
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
+import DerivedAlgGeo.CategoryTheory.Triangulated.FullSubcategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
@@ -22,6 +23,49 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.ObjectProperty.liftTriangleMap_ambient
 #print axioms CategoryTheory.ObjectProperty.liftTriangleMap_id
 #print axioms CategoryTheory.ObjectProperty.liftTriangleMap_comp
+#print axioms CategoryTheory.ObjectProperty.OnTriangle.obj₁
+#print axioms CategoryTheory.ObjectProperty.OnTriangle.obj₂
+#print axioms CategoryTheory.ObjectProperty.OnTriangle.obj₃
+
+/-! ## Exact functor families and exact bifunctors -/
+
+-- Shift-coherent functor-valued families, their global shift isomorphism,
+-- pointwise exactness, and the bifunctor root built on Mathlib's `CommShift₂Int`.
+#print axioms CategoryTheory.Functor.ExactBifunctor
+#print axioms CategoryTheory.Functor.ExactBifunctor.firstCommShift
+#print axioms CategoryTheory.Functor.ExactBifunctor.firstFamily
+#print axioms CategoryTheory.Functor.ExactBifunctor.firstTriangulated
+#print axioms CategoryTheory.Functor.ExactBifunctor.mk.inj
+#print axioms CategoryTheory.Functor.ExactBifunctor.mk.sizeOf_spec
+#print axioms CategoryTheory.Functor.ExactBifunctor.secondCommShift
+#print axioms CategoryTheory.Functor.ExactBifunctor.secondFamily
+#print axioms CategoryTheory.Functor.ExactBifunctor.secondTriangulated
+#print axioms CategoryTheory.Functor.ExactBifunctor.toCommShift₂
+#print axioms CategoryTheory.Functor.ExactFamily
+#print axioms CategoryTheory.Functor.ExactFamily.distinguishedTriangleProperty
+#print axioms CategoryTheory.Functor.ExactFamily.evaluationCommShift
+#print axioms CategoryTheory.Functor.ExactFamily.mapDistinguishedTriangle
+#print axioms CategoryTheory.Functor.ExactFamily.mapDistinguishedTriangle_obj_val
+#print axioms CategoryTheory.Functor.ExactFamily.mapTriangle
+#print axioms CategoryTheory.Functor.ExactFamily.mapTriangle_obj
+#print axioms CategoryTheory.Functor.ExactFamily.mapTriangle_obj_distinguished
+#print axioms CategoryTheory.Functor.ExactFamily.mapTriangle_obj_obj₁
+#print axioms CategoryTheory.Functor.ExactFamily.mapTriangle_obj_obj₂
+#print axioms CategoryTheory.Functor.ExactFamily.mapTriangle_obj_obj₃
+#print axioms CategoryTheory.Functor.ExactFamily.mk.inj
+#print axioms CategoryTheory.Functor.ExactFamily.mk.sizeOf_spec
+#print axioms CategoryTheory.Functor.ExactFamily.toFamilyCommShift
+#print axioms CategoryTheory.Functor.ExactFamily.triangulated
+#print axioms CategoryTheory.Functor.FamilyCommShift
+#print axioms CategoryTheory.Functor.FamilyCommShift.commShift
+#print axioms CategoryTheory.Functor.FamilyCommShift.commShift_naturality
+#print axioms CategoryTheory.Functor.FamilyCommShift.mk.inj
+#print axioms CategoryTheory.Functor.FamilyCommShift.mk.sizeOf_spec
+#print axioms CategoryTheory.Functor.FamilyCommShift.postShift
+#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIso
+#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIsoApp
+#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIso_hom_app_app
+#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIso_inv_app_app
 
 /-! ## Cohomology exactness (#146) -/
 

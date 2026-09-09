@@ -7,3 +7,10 @@ import DerivedAlgGeo.CategoryTheory.Monoidal
 #print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorAdditive
 #print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorCommShift
 #print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorIsTriangulated
+
+-- The exact-bifunctor root and the right-twist projections of the compatibility class.
+#print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.exactBifunctor
+#print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorExact
+#print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorFlipAdditive
+#print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorFlipCommShift
+#print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorFlipIsTriangulated

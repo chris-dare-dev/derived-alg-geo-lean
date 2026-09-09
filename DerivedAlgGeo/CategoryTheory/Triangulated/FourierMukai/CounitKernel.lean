@@ -82,20 +82,20 @@ def presentation : DGCategory.ConePresentation K where
   cone := S.cone
   isCone := S.isCone
 
-@[simp]
 omit [IsPretriangulated K] in
+@[simp]
 theorem presentation_source :
     S.presentation.source = H0.of K (D.conv R.adjKernel P) :=
   rfl
 
-@[simp]
 omit [IsPretriangulated K] in
+@[simp]
 theorem presentation_target :
     S.presentation.target = H0.of K U.unitKernel :=
   rfl
 
-@[simp]
 omit [IsPretriangulated K] in
+@[simp]
 theorem presentation_cone : S.presentation.cone = S.cone :=
   rfl
 

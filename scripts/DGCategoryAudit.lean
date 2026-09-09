@@ -535,3 +535,139 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGCategory.K₀dg.of
 #print axioms CategoryTheory.DGCategory.K₀dg.of_eq
 #print axioms CategoryTheory.DGCategory.K₀dg.of_triangle
+
+-- Homogeneous dg natural transformations of every integer degree, their
+-- pointwise differential and vertical composition, and the dg category of dg
+-- functors they form.
+#print axioms CategoryTheory.DGFunctor.HomogeneousFamily
+#print axioms CategoryTheory.DGFunctor.HomogeneousFamily.IsNatural
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.IsClosed
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.IsClosed.app_d
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.add_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.comp
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.comp_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.complex
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.complex_X
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.complex_d_apply
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.composition
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.composition_apply_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.differential
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.differentialHom
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.differentialHom_apply
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.differential_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.differential_differential
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ext
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ext_iff
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.id
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.id_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.naturality
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.neg_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.units_smul_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.zero_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.zsmul_app
+#print axioms CategoryTheory.DGFunctor.dgCategory
+#print axioms CategoryTheory.DGFunctor.homogeneousNatTransSubgroup
+
+-- Signed cone lifts of homogeneous squares in every degree: the identity,
+-- additivity, composition, differential, and projection formulas that make
+-- objectwise cones a strict dg functor.
+#print axioms CategoryTheory.DGCategory.HomogeneousSquare
+#print axioms CategoryTheory.DGCategory.HomogeneousSquare.homotopy
+#print axioms CategoryTheory.DGCategory.HomogeneousSquare.homotopy_boundary
+#print axioms CategoryTheory.DGCategory.HomogeneousSquare.mk.inj
+#print axioms CategoryTheory.DGCategory.HomogeneousSquare.mk.sizeOf_spec
+#print axioms CategoryTheory.DGCategory.HomogeneousSquare.strict
+#print axioms CategoryTheory.DGCategory.HomogeneousSquare.strict_homotopy
+#print axioms CategoryTheory.IsConeOf.homogeneousLift
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_comp_fst
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_comp_snd
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_id
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_strict_add
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_strict_comp
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_strict_d
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_strict_map_d
+#print axioms CategoryTheory.IsConeOf.homogeneous_ext
+#print axioms CategoryTheory.IsConeOf.inl_comp_homogeneousLift_strict
+#print axioms CategoryTheory.IsConeOf.inl_comp_homogeneousLift_strict_general
+#print axioms CategoryTheory.IsConeOf.inr_comp_homogeneousLift
+#print axioms CategoryTheory.IsConeOf.inr_comp_homogeneousLift_general
+
+-- Objectwise cones of a closed degree-zero dg natural transformation, the
+-- assembled cone dg functor, and its canonical inclusion transformations.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.differential_inl
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.functor
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.functor_map
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.functor_obj
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inl
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inl_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inr
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inr_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inr_isClosed
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isCone
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.mk.inj
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.mk.sizeOf_spec
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.obj
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.IsClosed.app_mem_cocycles
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.chosenConeData
+
+-- Dg adjunctions (closed unit and counit with componentwise triangle
+-- identities) and the unshifted cones of their unit and counit.
+#print axioms CategoryTheory.DGAdjunction
+#print axioms CategoryTheory.DGAdjunction.CounitConeData
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.boundary
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.differential_boundary
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.inclusion
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.inclusion_isClosed
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twist
+#print axioms CategoryTheory.DGAdjunction.UnitConeData
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.unitCone
+#print axioms CategoryTheory.DGAdjunction.chosenCounitConeData
+#print axioms CategoryTheory.DGAdjunction.chosenUnitConeData
+#print axioms CategoryTheory.DGAdjunction.counit
+#print axioms CategoryTheory.DGAdjunction.counitEndofunctor
+#print axioms CategoryTheory.DGAdjunction.counit_isClosed
+#print axioms CategoryTheory.DGAdjunction.left_triangle
+#print axioms CategoryTheory.DGAdjunction.mk.inj
+#print axioms CategoryTheory.DGAdjunction.mk.sizeOf_spec
+#print axioms CategoryTheory.DGAdjunction.right_triangle
+#print axioms CategoryTheory.DGAdjunction.unit
+#print axioms CategoryTheory.DGAdjunction.unitEndofunctor
+#print axioms CategoryTheory.DGAdjunction.unit_isClosed
+
+-- Generated projections, injectivity and extensionality lemmas of the new dg
+-- structures, plus the cone-category instance and the H⁰ distinguished-triangle
+-- object property.
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom.ext_iff
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom.mk.inj
+#print axioms CategoryTheory.DGCategory.ConePresentation.Hom.mk.sizeOf_spec
+#print axioms CategoryTheory.DGCategory.ConePresentation.instCategoryOfIsPretriangulated
+#print axioms CategoryTheory.DGCategory.ConePresentation.mk.inj
+#print axioms CategoryTheory.DGCategory.ConePresentation.mk.sizeOf_spec
+#print axioms CategoryTheory.DGCategory.HomotopySquare.a_closed
+#print axioms CategoryTheory.DGCategory.HomotopySquare.b_closed
+#print axioms CategoryTheory.DGCategory.HomotopySquare.ext_iff
+#print axioms CategoryTheory.DGCategory.HomotopySquare.homotopy
+#print axioms CategoryTheory.DGCategory.HomotopySquare.homotopy_boundary
+#print axioms CategoryTheory.DGCategory.HomotopySquare.mk.inj
+#print axioms CategoryTheory.DGCategory.HomotopySquare.mk.sizeOf_spec
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.map_cone
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.map_cone_inl
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.map_cone_inr
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mk.inj
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mk.sizeOf_spec
+#print axioms CategoryTheory.DGFunctor.PreservesConeTriangles.map_cone
+#print axioms CategoryTheory.DGFunctor.PreservesShifts.map_shift
+#print axioms CategoryTheory.DGFunctor.PreservesShifts.map_shift_hom
+#print axioms CategoryTheory.DGFunctor.PreservesShifts.mk.inj
+#print axioms CategoryTheory.DGFunctor.PreservesShifts.mk.sizeOf_spec
+#print axioms CategoryTheory.H0.distinguishedTriangleProperty
+#print axioms CategoryTheory.IsConeOf.Morphism.ext_iff
+#print axioms CategoryTheory.IsConeOf.Morphism.hom
+#print axioms CategoryTheory.IsConeOf.Morphism.inr_comm
+#print axioms CategoryTheory.IsConeOf.Morphism.mk.inj
+#print axioms CategoryTheory.IsConeOf.Morphism.mk.sizeOf_spec
+#print axioms CategoryTheory.IsConeOf.Morphism.square
+#print axioms CategoryTheory.IsConeOf.Morphism.toShift_comm

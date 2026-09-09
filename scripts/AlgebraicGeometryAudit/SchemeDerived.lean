@@ -40,6 +40,12 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistBoundedTriangle_distinguished
 #print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistBoundedTriangleObj₁Iso
 #print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.cohLineBundleTwistBoundedTriangleObj₂Iso
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactBoundedTriangleMap_comp_assoc
+#print axioms AlgebraicGeometry.DerivedCategory.cohShortExactTriangleMap_comp_assoc
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.lineBundleTwistMiddle_isCoherent
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.lineBundleTwistSequence_X₁
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.lineBundleTwistSequence_X₂
+#print axioms AlgebraicGeometry.Scheme.EffectiveCartierDivisor.lineBundleTwistSource_isCoherent
 
 /-! ## Cartier divisors as line bundles and derived objects -/
 
@@ -54,6 +60,13 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.Scheme.CartierDivisor.derivedObjectIso
 #print axioms AlgebraicGeometry.Scheme.CartierDivisor.boundedDerivedObject
 #print axioms AlgebraicGeometry.Scheme.CartierDivisor.boundedDerivedObjectIso
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.boundedDerivedObjectOfCoherence
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.boundedDerivedObjectOfCoherence_obj
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.boundedDerivedObject_obj
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.coh_obj
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.derivedObject_eq_single
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.lineBundleData_inverse
+#print axioms AlgebraicGeometry.Scheme.CartierDivisor.lineBundleData_line
 
 /-! ## Affine quasi-coherent derived realization (#528) -/
 

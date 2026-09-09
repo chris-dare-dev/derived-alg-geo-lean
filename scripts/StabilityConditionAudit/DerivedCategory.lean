@@ -14,6 +14,7 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 
 #print axioms CategoryTheory.ShortComplex.ShortExact.singleTriangle.map_id
 #print axioms CategoryTheory.ShortComplex.ShortExact.singleTriangle.map_comp
+#print axioms CategoryTheory.ShortComplex.ShortExact.singleTriangle.map_comp_assoc
 
 /-! ## Opposites and exact linear duality -/
 

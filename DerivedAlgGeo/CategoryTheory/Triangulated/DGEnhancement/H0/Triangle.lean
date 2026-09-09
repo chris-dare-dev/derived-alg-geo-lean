@@ -359,8 +359,18 @@ lemma exists_lift_of_comm (a : cocycles X₁ X₂) (b : cocycles Y₁ Y₂)
 
 end Lift
 
+end H0
+
+/-! ### Dg cone morphisms as morphisms of `H⁰` cone triangles
+
+The adapter below is a construction on `IsConeOf.Morphism`, so it lives in that
+namespace rather than in `H0`; the `H0` names it uses are opened locally. -/
+
 section DgMorphism
 
+open H0
+
+variable {C : Type u} [DGCategory.{v} C] [IsPretriangulated C]
 variable {X₁ Y₁ Z₁ X₂ Y₂ Z₂ : C} {f₁ : cocycles X₁ Y₁} {f₂ : cocycles X₂ Y₂}
   {a : (dgHom X₁ X₂).X 0} {b : (dgHom Y₁ Y₂).X 0}
   (hc₁ : IsConeOf (f₁ : (dgHom X₁ Y₁).X 0) Z₁)
@@ -440,6 +450,9 @@ end DgMorphism
 
 section DgMorphismComposition
 
+open H0
+
+variable {C : Type u} [DGCategory.{v} C] [IsPretriangulated C]
 variable {X₁ Y₁ Z₁ X₂ Y₂ Z₂ X₃ Y₃ Z₃ : C}
   {f₁ : cocycles X₁ Y₁} {f₂ : cocycles X₂ Y₂} {f₃ : cocycles X₃ Y₃}
   {a₁ : (dgHom X₁ X₂).X 0} {b₁ : (dgHom Y₁ Y₂).X 0}
@@ -480,6 +493,10 @@ lemma IsConeOf.Morphism.toTriangleMorphism_compAt
     rw [H0.homMk_comp]
 
 end DgMorphismComposition
+
+namespace H0
+
+variable {C : Type u} [DGCategory.{v} C] [IsPretriangulated C]
 
 section Instance
 
