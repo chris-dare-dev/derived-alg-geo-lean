@@ -290,6 +290,28 @@ lemma homogeneousLift_comp_snd (p : ℤ)
     hc₂.inr_comp_snd, DGCategory.dgComp_id]
   simp
 
+/-- `homogeneousLift_comp_fst` with an arbitrary common result-degree name.
+This is the form degree-one graded naturality asks for. -/
+lemma homogeneousLift_comp_fst_general (p r : ℤ)
+    (hp1 : p + 1 = r) (h1p : 1 + p = r)
+    (a : (dgHom X₁ X₂).X p) (b : (dgHom Y₁ Y₂).X p)
+    (k : (dgHom X₁ Y₂).X (p - 1)) :
+    dgComp p 1 r hp1 (hc₁.homogeneousLift hc₂ p a b k) hc₂.fst =
+      p.negOnePow • dgComp 1 p r h1p hc₁.fst a := by
+  have hr : r = p + 1 := by omega
+  cases hr
+  exact hc₁.homogeneousLift_comp_fst hc₂ p a b k
+
+/-- `homogeneousLift_comp_snd` with an arbitrary common result-degree name. -/
+lemma homogeneousLift_comp_snd_general (p r : ℤ)
+    (hp0 : p + 0 = r) (h0p : 0 + p = r)
+    (a : (dgHom X₁ X₂).X p) (b : (dgHom Y₁ Y₂).X p) :
+    dgComp p 0 r hp0 (hc₁.homogeneousLift hc₂ p a b 0) hc₂.snd =
+      dgComp 0 p r h0p hc₁.snd b := by
+  have hr : r = p := by omega
+  cases hr
+  exact hc₁.homogeneousLift_comp_snd hc₂ p a b
+
 /-- Two homogeneous maps into a cone are equal when their two cone
 projections agree.  This is the all-degree analogue of extensionality for a
 binary direct sum, derived from the cone's splitting of the identity. -/

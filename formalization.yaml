@@ -2139,9 +2139,23 @@ fidelity:
     last field.
 
     WHAT THE TILT IS NOT. `tilt` is a t-structure on a triangulated category.
-    NOTHING connects it to a stability condition -- that is a further theorem,
-    targeted by the #81 weak-stability program and not attempted here. Do not
-    cite this lane as "stability conditions on surfaces". The HEART, by
+    It does NOT produce a Bridgeland stability condition: nothing here gives a
+    `StabilityCondition`, local finiteness of a tilted slicing is not proved,
+    and no surface is in sight. Do not cite this lane as "stability conditions
+    on surfaces".
+
+    It DOES reach the weak layer, and an earlier form of this paragraph, which
+    said NOTHING connects the tilt to a stability condition at all, was wrong by
+    the time it was written. `WeakStabilityCondition/Tilting/PreStability.lean`
+    builds `phaseTiltWeakPreStabilityConditionOfTiltingProperty`, a
+    `WeakPreStabilityCondition` whose heart is the tilt of
+    `slicingTorsionPair`; the intermediate obligations route through
+    `(slicingTorsionPair ...).tilt` explicitly. TWO THINGS BOUND THAT CLAIM, and
+    both matter more than the construction. It is a WEAK PRE-stability
+    condition -- no local finiteness, no support property. And it is
+    CONDITIONAL on `TiltingProperty`, a hypothesis structure with NO CONSTRUCTED
+    INHABITANT anywhere in this repository, so no object is exhibited and the
+    #81 program's real content is untouched. The HEART, by
     contrast, IS identified as of #106: tilt_heart_iff says membership in
     `tilt.heart` is exactly being an extension of a torsion object by a
     shifted torsion-free one -- the textbook extension closure of T and F[1],
@@ -2260,22 +2274,33 @@ fidelity:
     dependency contract has no theorem producing a complex manifold or local
     isomorphism.
 
-    THE HAPPEL-REITEN-SMALO TILT IS NOT FORMALIZED, and the directory name
-    `Tilting/` invites the opposite reading, so it is stated here rather than
-    left to a docstring. What exists is the torsion pair -- the INPUT datum --
-    and its elementary theory. The tilt is the construction, from a torsion
-    pair in the heart of a t-structure, of a second t-structure whose heart is
-    the extension of the torsion class by the shifted torsion-free class. It is
-    a much larger obligation: Mathlib's `Triangulated.TStructure` requires an
-    `exists_triangle_zero_one` field, and producing that triangle for the
-    tilted aisles needs the octahedral axiom. None of it is attempted here and
-    no declaration below asserts it.
+    TWO CLAIMS THIS RECORD PREVIOUSLY CARRIED HERE, now withdrawn and replaced
+    by this note, because a reader who acted on them was misled and is owed the
+    correction rather than a silent deletion. The withdrawn text said, first,
+    "THE HAPPEL-REITEN-SMALO TILT IS NOT FORMALIZED, and the directory name
+    `Tilting/` invites the opposite reading" -- that only the torsion pair, the
+    INPUT datum, existed, and that producing `exists_triangle_zero_one` for the
+    tilted aisles was "not attempted here and no declaration below asserts it".
+    Second, that "NOTHING IN Tilting/ CONNECTS TO A STABILITY CONDITION YET".
 
-    A consequence worth being explicit about: NOTHING IN Tilting/ CONNECTS TO
-    A STABILITY CONDITION YET. The reason a torsion pair is interesting for
-    this repo is that the tilt is the engine behind every construction of
-    stability conditions on a surface. That motivation is recorded in the
-    module docstring as motivation, not as a formalized link.
+    BOTH ARE FALSE, and both were already contradicted by the TILTING LANE
+    paragraphs above at the time this field was last revised. `tilt`
+    (WeakStabilityCondition/Tilting/TorsionPair/Heart.lean) assembles every
+    field of `Triangulated.TStructure`, with `exists_tilt_triangle` supplying
+    `exists_triangle_zero_one` from two octahedra, as of #76; `tilt_heart_iff`
+    identifies the tilted heart as of #106; and the tilt does reach a weak
+    prestability condition, under the bounds recorded in the WHAT THE TILT IS
+    NOT paragraph above. The stale text survived several revisions of this
+    field and was found by an external statement-vs-source review on
+    2026-09-09.
+
+    THE LESSON IS ABOUT THIS FILE, not about the tilt. `known_divergences` is
+    the field a reader is told to consult before citing anything, and it is
+    append-heavy: paragraphs were added as lanes advanced without re-reading
+    what earlier paragraphs asserted, so the field held a claim and its
+    negation at once. A paragraph that a later paragraph falsifies must be
+    withdrawn in the same commit that falsifies it, in the form used here and
+    under A CORRECTION THIS RECORD PREVIOUSLY CARRIED above.
 
     Mukai/ IS THE SAME DIVERGENCE, ONE LEVEL UP, and is recorded separately
     because the suggestive naming makes it easier to misread. `MukaiLattice N`

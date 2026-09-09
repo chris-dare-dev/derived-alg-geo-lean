@@ -95,6 +95,8 @@ Category
 │  │     │  └─ IsConeOf.Morphism         cone map with strict `inr` and `fst` squares
 │  │     │     └─ ConePresentation category  composes without a shift witness
 │  │     └─ HomogeneousNatTrans.ConeData objectwise cones assemble to a dg functor
+│  │        ├─ fst / snd                 cone projections, graded-natural
+│  │        ├─ isConeOf                  a cone in the dg category of dg functors
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
 │  ├─ H0 C
 │  │  └─ coneTriangleFunctor             functor to distinguished triangles
