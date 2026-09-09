@@ -76,6 +76,14 @@ theorem pair_apply (x y : D) : S.pair x y = S.intersection x y := rfl
 theorem pair_comm (x y : D) : S.pair x y = S.pair y x :=
   S.intersection_symm.eq x y
 
+@[simp]
+theorem pair_zero_left (x : D) : S.pair 0 x = 0 := by
+  simp [pair]
+
+@[simp]
+theorem pair_zero_right (x : D) : S.pair x 0 = 0 := by
+  simp [pair]
+
 end DivisorSpace
 
 /-- Additive Chern-character coordinates with an uncompressed first Chern
