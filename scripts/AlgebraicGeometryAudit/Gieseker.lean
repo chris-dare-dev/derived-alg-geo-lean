@@ -1,6 +1,6 @@
 /-
 Gieseker slice of the AlgebraicGeometry audit: the Hilbert function of a coherent sheaf against a
-supplied polarization and the slope theory built from it (#900, #901, #902, #903). Split out so
+supplied polarization and the slope theory built from it (#900, #901, #902, #903, #904). Split out so
 concurrent branches append to different files; see the umbrella file for the contract and reading
 guide.
 -/
@@ -155,3 +155,25 @@ purity to rule out the multiplicity-zero subobject that would otherwise have slo
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_topSlope_eq_normalizedCoefficient
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_topSlope_of_multiplicity_pos
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_topSlope_of_multiplicity_zero
+
+/-! ## The maximal destabilizing subobject (#904)
+
+`MuHNInput` supplies the two facts sheaf-level Harder-Narasimhan theory needs and this pin
+cannot prove: termination of ascending subobject chains, and Grothendieck's boundedness lemma.
+Neither the maximal destabilizing subobject nor `HasHNProperty` is a field. The boundedness
+field takes a REAL bound rather than one in `WithTop`, because a `WithTop` bound is satisfied
+vacuously by the top element. That the bounded slope is actually attained needs no third input:
+multiplicity is additive and nonnegative, so subobject multiplicities are bounded by that of the
+ambient sheaf, every slope is a multiple of one over its factorial, and such a set bounded above
+has a greatest element. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput.noetherian
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput.slope_bddAbove
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_le_of_mono
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_subobject_le
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_slopeMax
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.IsMaximalDestabilizing
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_maximalDestabilizing
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.maximalDestabilizing_isSemistable
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.topSlope_maximalDestabilizing_eq_top_iff
