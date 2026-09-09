@@ -393,7 +393,25 @@ def HasBoundedCoherentDqcIdentification
 /-- The exact compact/perfect comparison still required by the scheme-level
 A.14 realization. This file supplies no unsupported inhabitant; `Dqc(X)` now
 has its coproducts, and what remains is compact generation by perfect
-complexes (`RΓ` commuting with coproducts), a separate obligation. -/
+complexes (`RΓ` commuting with coproducts), a separate obligation.
+
+**This is not Neeman's compact-equals-perfect theorem, and `IsLocallyNoetherian`
+is not enough to inhabit it.** Two gaps, both about the left-hand side. Neeman's
+theorem identifies the compact objects of `Dqc(X)` with the *perfect* complexes,
+those locally quasi-isomorphic to a bounded complex of finite locally free
+sheaves, for `X` quasi-compact and separated. The left side here is
+`schemePerfectInDqc`, the essential image of the **absolute** thick envelope of
+finite locally free sheaves (`schemePerfect`, `DerivedCategory/Coherent.lean`),
+and that envelope is all of `Perf(X)` only when `X` has the resolution property.
+So an inhabitant must carry quasi-compactness, separatedness, and the resolution
+property; none of the three is in this signature, and the repository has no
+vocabulary for the third. The `.{0}` is a third narrowing: it tests compactness
+against `Type`-indexed coproducts only.
+
+Left at this generality on purpose — it names the comparison the realization
+needs without inventing a resolution-property class before a consumer exists for
+one. Do not cite it as the literature's theorem, and do not inhabit it without
+first adding the hypotheses. -/
 def PerfectObjectsAreCompactInDqc
     (X : Scheme.{u}) [IsLocallyNoetherian X] : Prop :=
   schemePerfectInDqc X = ObjectProperty.compactObjects.{0}
