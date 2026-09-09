@@ -47,7 +47,11 @@ IsConeOf
    └─ HomogeneousNatTrans.ConeData
          ├─ objectwise cone choices
          ├─ assembled cone DGFunctor
-         └─ canonical inr/inl transformations and boundary equation
+         ├─ canonical inr/inl transformations and boundary equation
+         ├─ fst / snd: the cone projections, graded-natural in degrees 1 and 0
+         └─ isConeOf: a cone in the dg category DGFunctor C D itself, so the
+            twist candidate is a cone OF FUNCTORS, the form in which
+            Anno--Logvinenko state SR ⟶ Id_B ⟶ T
 
 DGAdjunction
 ├─ closed unit and counit
@@ -83,6 +87,14 @@ that comparison are instance hypotheses to be discharged by the realization.
 1. There is no functorial shift of dg-category objects yet.  Objectwise
    `IsShiftBy` witnesses exist, but the shifted comparison maps needed for the
    full Anno--Logvinenko definition are not packaged as dg functors.
+
+   This is now the *only* missing field of `IsPretriangulated (DGFunctor C D)`:
+   the zero object and the cone are built (`DGFunctor.exists_zero_dgFunctor`,
+   `DGFunctor.exists_cone_dgFunctor`).  The shifted functor's action on a
+   degree-`p` morphism must carry the sign `(-1)^(n * p)`, which the Leibniz
+   rule forces and which a constant sign cannot supply; the derivation is in
+   the docstring of
+   `Algebra/Homology/DGCategory/Pretriangulated/FunctorCategory.lean`.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full

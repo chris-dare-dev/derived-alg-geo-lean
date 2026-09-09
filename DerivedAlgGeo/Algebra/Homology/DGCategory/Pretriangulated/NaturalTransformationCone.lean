@@ -174,6 +174,126 @@ theorem differential_inl :
   ext X
   exact (K.isCone X).δ_inl
 
+
+/-- The cone projections to the source form a degree-one homogeneous dg
+natural transformation `Cone(α) ⟶ F`.
+
+Graded naturality at degree one is exactly `homogeneousLift_comp_fst`: the
+sign `(-1)^p` that lemma produces is the Koszul sign `(-1)^(1 * p)` the
+naturality convention asks for, which is why the cone projection is natural
+on the nose and not only up to homotopy. -/
+noncomputable def fst : HomogeneousNatTrans K.functor F 1 :=
+  ⟨fun X => (K.isCone X).fst, by
+    intro X Y p r hpr hrp f
+    rw [one_mul]
+    exact (K.isCone X).homogeneousLift_comp_fst_general (K.isCone Y) p r
+      hpr hrp (F.map p f) (G.map p f) 0⟩
+
+@[simp]
+theorem fst_app (X : C) : app K.fst X = (K.isCone X).fst :=
+  rfl
+
+/-- The cone projections to the target form a closed degree-zero homogeneous
+dg natural transformation `Cone(α) ⟶ G`. -/
+noncomputable def snd : HomogeneousNatTrans K.functor G 0 :=
+  ⟨fun X => (K.isCone X).snd, by
+    intro X Y p r hpr hrp f
+    rw [zero_mul, Int.negOnePow_zero, one_smul]
+    exact (K.isCone X).homogeneousLift_comp_snd_general (K.isCone Y) p r
+      hpr hrp (F.map p f) (G.map p f)⟩
+
+@[simp]
+theorem snd_app (X : C) : app K.snd X = (K.isCone X).snd :=
+  rfl
+
+/-- **The objectwise cones assemble into a cone in the dg category of dg
+functors.**
+
+This is what upgrades `ConeData` from a family of cones to a cone: the two
+inclusions are the transformations already built, and a homogeneous
+transformation into the cone splits along them objectwise.  The splitting is
+natural because `fst` and `snd` are, which is the content of the two
+constructions above.
+
+Anno--Logvinenko's triangles are triangles *of functors*; this is the
+statement that the repository's objectwise construction produces one.
+
+## Why every step is a `show`
+
+Composition and the differential of the dg category `DGFunctor C D` are
+`HomogeneousNatTrans.composition` and the pointwise differential *by
+definition*, so a goal stated with `dgComp` is definitionally a goal about
+components — but not syntactically, and `rw` matches syntactically.  Each
+`show` below is that definitional step, made explicit so the rest of the
+proof can be an ordinary calculation in `D`. -/
+noncomputable def isConeOf : IsConeOf (α : (dgHom F G).X 0) K.functor where
+  inr := K.inr
+  inr_closed := K.inr_isClosed
+  inl := K.inl
+  δ_inl := by
+    show differential K.inl = _
+    rw [K.differential_inl]
+    apply HomogeneousNatTrans.ext
+    intro X
+    show dgComp 0 0 0 (by omega) (app α X) (app K.inr X) = _
+    rfl
+  bijective W p q hq := by
+    -- The splitting map, written with `composition` rather than `dgComp`.
+    -- The two are the same by definition of the dg category of dg functors,
+    -- but only `composition` has a component lemma to rewrite with.
+    set Φ : (dgHom W F).X q × (dgHom W G).X p → (dgHom W K.functor).X p :=
+      fun ab =>
+        HomogeneousNatTrans.composition W F K.functor q (-1) p (by omega)
+            ab.1 K.inl +
+          HomogeneousNatTrans.composition W G K.functor p 0 p (by omega)
+            ab.2 K.inr with hΦ
+    have happ : ∀ (ab : (dgHom W F).X q × (dgHom W G).X p) (X : C),
+        app (Φ ab) X =
+          dgComp q (-1) p (by omega) (app ab.1 X) ((K.isCone X).inl) +
+            dgComp p 0 p (by omega) (app ab.2 X) ((K.isCone X).inr) := by
+      intro ab X
+      rw [hΦ]
+      rw [show app (HomogeneousNatTrans.composition W F K.functor q (-1) p
+              (by omega) ab.1 K.inl +
+            HomogeneousNatTrans.composition W G K.functor p 0 p
+              (by omega) ab.2 K.inr) X =
+          app (HomogeneousNatTrans.composition W F K.functor q (-1) p
+              (by omega) ab.1 K.inl) X +
+            app (HomogeneousNatTrans.composition W G K.functor p 0 p
+              (by omega) ab.2 K.inr) X from rfl,
+        composition_apply_app, composition_apply_app, inl_app, inr_app]
+    show Function.Bijective Φ
+    constructor
+    · rintro ⟨θ₁, ρ₁⟩ ⟨θ₂, ρ₂⟩ h
+      have hX : ∀ X : C, (app θ₁ X, app ρ₁ X) = (app θ₂ X, app ρ₂ X) := by
+        intro X
+        refine ((K.isCone X).bijective (W.obj X) p q hq).injective ?_
+        have := congrArg (fun σ => HomogeneousNatTrans.app σ X) h
+        rw [happ (θ₁, ρ₁) X, happ (θ₂, ρ₂) X] at this
+        exact this
+      have h₁ : θ₁ = θ₂ := by
+        apply HomogeneousNatTrans.ext
+        intro X
+        exact congrArg (fun z => z.1) (hX X)
+      have h₂ : ρ₁ = ρ₂ := by
+        apply HomogeneousNatTrans.ext
+        intro X
+        exact congrArg (fun z => z.2) (hX X)
+      rw [h₁, h₂]
+    · intro σ
+      refine ⟨(HomogeneousNatTrans.composition W K.functor F p 1 q (by omega)
+          σ K.fst,
+        HomogeneousNatTrans.composition W K.functor G p 0 p (by omega)
+          σ K.snd), ?_⟩
+      apply HomogeneousNatTrans.ext
+      intro X
+      rw [happ]
+      dsimp only
+      rw [composition_apply_app, composition_apply_app, fst_app, snd_app,
+        dgComp_assoc p 1 (-1) q 0 p (by omega) (by omega) (by omega),
+        dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega),
+        ← map_add, (K.isCone X).fst_inl_add_snd_inr, dgComp_id]
+
 end ConeData
 
 end DGFunctor.HomogeneousNatTrans

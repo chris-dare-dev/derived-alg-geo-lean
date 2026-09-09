@@ -700,3 +700,21 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.h0
 #print axioms CategoryTheory.DGAdjunction.h0_unit
 #print axioms CategoryTheory.DGAdjunction.h0_counit
+
+-- The cone projections are graded-natural, so the objectwise cones of a closed
+-- degree-zero dg natural transformation assemble into a cone in the dg category
+-- of dg functors.  With the zero object below this is two of the three fields
+-- of a pretriangulated structure on `DGFunctor C D`; the shift is not yet built.
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_comp_fst_general
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_comp_snd_general
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf
+#print axioms CategoryTheory.DGFunctor.constZero
+#print axioms CategoryTheory.DGFunctor.constZero_obj
+#print axioms CategoryTheory.DGFunctor.constZero_map
+#print axioms CategoryTheory.DGFunctor.dgId_constZero_eq_zero
+#print axioms CategoryTheory.DGFunctor.exists_zero_dgFunctor
+#print axioms CategoryTheory.DGFunctor.exists_cone_dgFunctor
