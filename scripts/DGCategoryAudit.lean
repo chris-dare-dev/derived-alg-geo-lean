@@ -700,3 +700,54 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.h0
 #print axioms CategoryTheory.DGAdjunction.h0_unit
 #print axioms CategoryTheory.DGAdjunction.h0_counit
+
+-- The cone projections are graded-natural, so the objectwise cones of a closed
+-- degree-zero dg natural transformation assemble into a cone in the dg category
+-- of dg functors.  With the zero object and the shift below, that is all three
+-- fields of a pretriangulated structure on `DGFunctor C D`.
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_comp_fst_general
+#print axioms CategoryTheory.IsConeOf.homogeneousLift_comp_snd_general
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf
+#print axioms CategoryTheory.DGFunctor.constZero
+#print axioms CategoryTheory.DGFunctor.constZero_obj
+#print axioms CategoryTheory.DGFunctor.constZero_map
+#print axioms CategoryTheory.DGFunctor.dgId_constZero_eq_zero
+#print axioms CategoryTheory.DGFunctor.exists_zero_dgFunctor
+#print axioms CategoryTheory.DGFunctor.exists_cone_dgFunctor
+
+-- Transport of a homogeneous morphism across chosen shifts, and the sign it
+-- forces.  `shiftMap_d` is the identity that rules out the naive shift
+-- functor: transport anticommutes with the differential by `(-1)^n`, so the
+-- shift of a dg functor has to carry `(-1)^(n * p)` in degree `p`.
+#print axioms CategoryTheory.dgComp_units_smul_left
+#print axioms CategoryTheory.dgComp_units_smul_right
+#print axioms CategoryTheory.IsShiftBy.shiftMap
+#print axioms CategoryTheory.IsShiftBy.hom_comp_shiftMap
+#print axioms CategoryTheory.IsShiftBy.shiftMap_unique
+#print axioms CategoryTheory.IsShiftBy.shiftMap_add
+#print axioms CategoryTheory.IsShiftBy.shiftMap_zero
+#print axioms CategoryTheory.IsShiftBy.shiftMap_id
+#print axioms CategoryTheory.IsShiftBy.shiftMap_comp
+#print axioms CategoryTheory.IsShiftBy.shiftMap_comp_inv
+#print axioms CategoryTheory.IsShiftBy.shiftMap_d
+#print axioms CategoryTheory.IsShiftBy.comp_inv_naturality
+#print axioms CategoryTheory.IsShiftBy.comp_inv_comp_hom
+
+-- The shift of a dg functor, and the resulting pretriangulated structure on
+-- the dg category of dg functors.  This is what makes the objectwise twist a
+-- genuine cone of functors: Anno--Logvinenko's triangle read in `DGFunctor C D`
+-- rather than objectwise in `D`.
+#print axioms CategoryTheory.DGFunctor.shiftObj
+#print axioms CategoryTheory.DGFunctor.shiftWitness
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_obj
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_map
+#print axioms CategoryTheory.DGFunctor.shiftHom
+#print axioms CategoryTheory.DGFunctor.shiftHom_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorWitness
+#print axioms CategoryTheory.DGFunctor.exists_shift_dgFunctor
+#print axioms CategoryTheory.DGFunctor.isPretriangulated_dgFunctor
