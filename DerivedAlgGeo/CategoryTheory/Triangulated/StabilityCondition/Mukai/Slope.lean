@@ -98,10 +98,9 @@ and `c₁` the first holds by definition and the second reads `degree = ω·c₁
 third coordinate (`ch₂ + r` on a K3 surface, `ch₂` for the plain Chern
 character) is not constrained.
 
-Because `WeakSlopeData` carries an integer-valued degree, `degree_eq` also
-forces `ω·c₁(E) ∈ ℤ` for every object. The identification is therefore
-available for an integral polarisation `ω`, not for an arbitrary real ample
-class; lifting that restriction means a real-valued degree upstream.
+The degree of `WeakSlopeData` is real-valued, so `ω` may be any real class,
+as in Bridgeland's construction. The rank is integral, and that integrality is
+what the boundary argument's passage from `0 < r` to `1 ≤ r` uses.
 
 Compare `SlopeData`'s geometric fields, which are of the same kind. What is
 deliberately *not* here is any hypothesis of the shape "E is torsion" or
@@ -242,7 +241,7 @@ chosen direction `v`. -/
 def c₁Hom (v : V) : K₀Ab A →+ V :=
   AddMonoidHom.mk' (fun x => ((S.degreeHom x : ℝ)) • v) (by
     intro a b
-    simp only [map_add, Int.cast_add, add_smul])
+    simp only [map_add, add_smul])
 
 @[simp]
 theorem c₁Hom_apply (v : V) (x : K₀Ab A) :
