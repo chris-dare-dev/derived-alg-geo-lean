@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Charge
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.SurfaceChargeNumerical
 
 /-!
@@ -16,7 +16,7 @@ A `Surface.NumericalRealization` sends the codimension-one piece of a numerical
 intersection ring additively into a real divisor space, respects rational
 scalars after the inclusion `ℚ → ℝ`, and identifies multiplication followed by
 degree with the real intersection form.  Given any `NumericalVarietyData`
-using that ring, it then constructs the full `Surface.ChernCharacter`; no
+using that ring, it then constructs the full `ChernCharacter`; no
 basis or Picard-rank hypothesis is involved.
 
 The main compatibility theorem identifies the resulting intrinsic divisorial
@@ -30,6 +30,8 @@ children of `DivisorialCharge`, rather than a competing central-charge API.
 -/
 
 open Complex
+
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
 
 namespace AlgebraicGeometry.Numerical.Surface
 
