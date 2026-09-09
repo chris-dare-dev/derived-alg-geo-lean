@@ -5,10 +5,12 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Shift
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Triangle
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ConeFunctor
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Functor
 
 /-!
 # The triangulated homotopy category of a dg category
 
 Shifts and distinguished triangles on `H⁰` induced by pretriangulated dg
-structure.
+structure, the functorial dg cone diagrams they carry, and the transport of
+dg-functor capabilities to `H⁰`.
 -/

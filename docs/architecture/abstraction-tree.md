@@ -74,15 +74,20 @@ Category
 ├─ FiniteExactTower
 │  └─ FiniteFiltration                    zero-to-object endpoint refinement
 │     └─ almost-disconnected witness       scheme-geometric leaf
+├─ HasShift C A                          Mathlib root
+│  └─ HasShift (X ⥤ Y) A                 pointwise, from the target's shift
+│     └─ evaluation commutes strictly    identity comparison, both laws free
 ├─ DGCategory C
 │  ├─ DGLinear k C                       scalar refinement
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
-│  │  │  └─ IsClosed                     shared cocycle predicate for transformations
+│  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
+│  │  │  └─ h0                           closed degree zero becomes an ordinary NatTrans
 │  │  ├─ PreservesShifts                 composable dg capability
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
+│  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps
 │  │  └─ IsConeOf.homogeneousLift        all-degree cone maps, d/id/add/comp laws

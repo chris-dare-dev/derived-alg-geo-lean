@@ -52,6 +52,7 @@ IsConeOf
 DGAdjunction
 ├─ closed unit and counit
 ├─ dg triangle identities
+├─ h0 : an ordinary Mathlib adjunction between the H⁰ functors
 └─ CounitConeData
    └─ twist candidate Cone(LR ⟶ id)
 
@@ -85,20 +86,30 @@ that comparison are instance hypotheses to be discharged by the realization.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
-   sphericality.
-3. No generic `RHom(E,-) ⊗ E` dg functor or evaluation transformation has been
+   sphericality.  `DGAdjunction.h0` now compares a dg adjunction with an
+   ordinary one on `H⁰`, but the dg notion is the strict one: Anno--Logvinenko
+   work with homotopy adjunctions of bimodules, and no comparison with those
+   exists.
+3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
+   shift on a functor category, which is what `Functor.ExactFamily` should be
+   built on.  That rewiring is still open, and it is not an API-only change:
+   `ExactBifunctor` records triangulatedness against the shift structure it
+   chose, while the family needs it against that choice composed with the
+   strict comparison for evaluation, so the transport needs a lemma comparing
+   the two `mapTriangle`s.
+4. No generic `RHom(E,-) ⊗ E` dg functor or evaluation transformation has been
    constructed.  The current monoidal/exact-bifunctor roots are the intended
    lower dependency, but closed monoidal/Hom-complex representability is still
    missing.
-4. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
+5. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
    transformed arrow is the counit.  The enhancement of the kernel category,
    with `CommShift` and `IsTriangulated` for its comparison functor, is
    likewise supplied.
-5. No theorem currently identifies a categorical spherical object with a
+6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
-6. The Enriques classification layer supplies categorical spherical objects
+7. The Enriques classification layer supplies categorical spherical objects
    and paper-level Fourier--Mukai conclusions through explicit seams.  It does
    not yet provide the dg evaluation functor, counit kernel arrow, or a
    concrete Enriques surface needed to instantiate this tree.
