@@ -2,14 +2,15 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.ExpCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Charge
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakCutoffSlope
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakSlopeCutoff
+import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
 
 /-!
 # `Z(β,ω)` read against the weak slope cutoff
 
-`ExpCharge.lean` carries a Mukai class map into an abelian category and makes
+`Mukai.Charge` carries a Mukai class map into an abelian category and makes
 `Z(β,ω)` a charge on objects.  It stops there, deliberately: its own docstring
 records that `MukaiChargeData` asserts nothing about rank, slope or torsion, and
 that bundling those as hypotheses would make the positivity a case split over
@@ -92,8 +93,14 @@ end WeakSlopeData
 /-- **The Mukai class map computes the rank and the `ω`-degree.**
 
 Two identifications, no discriminants: nothing here mentions torsion, a cutoff,
-or the Mukai square. On a polarised surface both hold by the definition of the
-Mukai vector `v(E) = (r(E), c₁(E), ch₂(E) + r(E))` together with `degree = ω·c₁`.
+or the Mukai square. For any class map whose first two coordinates are the rank
+and `c₁` the first holds by definition and the second reads `degree = ω·c₁`; the
+third coordinate (`ch₂ + r` on a K3 surface, `ch₂` for the plain Chern
+character) is not constrained.
+
+The degree of `WeakSlopeData` is real-valued, so `ω` may be any real class,
+as in Bridgeland's construction. The rank is integral, and that integrality is
+what the boundary argument's passage from `0 < r` to `1 ≤ r` uses.
 
 Compare `SlopeData`'s geometric fields, which are of the same kind. What is
 deliberately *not* here is any hypothesis of the shape "E is torsion" or
@@ -137,6 +144,19 @@ theorem im_charge_eq_degree_of_rank_zero {E : A} (h : S.rank E = 0) :
     (D.charge b β ω E).im = (S.degree E : ℝ) := by
   rw [C.im_charge hb β E, h]
   push_cast
+  ring
+
+/-- A positive-rank object exactly at the slope cutoff has zero imaginary
+Mukai charge. -/
+theorem im_charge_eq_zero_of_rank_pos_of_slope_eq {E : A}
+    (hrank : 0 < S.rank E) (heq : S.slope E = b β ω) :
+    (D.charge b β ω E).im = 0 := by
+  have hr : (0 : ℝ) < (S.rank E : ℝ) := by exact_mod_cast hrank
+  have hdegree : (S.degree E : ℝ) = b β ω * (S.rank E : ℝ) := by
+    rw [WeakSlopeData.slope] at heq
+    rw [div_eq_iff (ne_of_gt hr)] at heq
+    exact heq
+  rw [C.im_charge hb β E, hdegree]
   ring
 
 /-- **The torsion class has nonnegative `Im Z(β,ω)`.**
@@ -221,7 +241,7 @@ chosen direction `v`. -/
 def c₁Hom (v : V) : K₀Ab A →+ V :=
   AddMonoidHom.mk' (fun x => ((S.degreeHom x : ℝ)) • v) (by
     intro a b
-    simp only [map_add, Int.cast_add, add_smul])
+    simp only [map_add, add_smul])
 
 @[simp]
 theorem c₁Hom_apply (v : V) (x : K₀Ab A) :

@@ -41,8 +41,9 @@ in the ambient `K₀ C`.
 
 It is not Bridgeland's Lemma 6.2.  This says *what the tilted heart is*; Lemma 6.2 says that
 `Z(β,ω)` is a stability function **on** it, which is the four-case positivity argument and needs
-the real part as well as the imaginary one.  `MukaiWeakCutoff.lean` supplies the imaginary half
-against the untilted classes; nothing here closes the gap.
+the real part as well as the imaginary one.  `StabilityCondition/Mukai/Slope.lean`
+supplies the imaginary half against the untilted classes; nothing here closes
+the gap.
 -/
 
 noncomputable section

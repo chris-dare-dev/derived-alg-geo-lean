@@ -7,6 +7,38 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Mukai stability-condition specialization (2026-09-08):
+  `CategoryTheory/Triangulated/StabilityCondition/Mukai/` is the sibling
+  consumer of generic weak stability and tilting. `Charge.lean` owns the
+  categorical Mukai class map and its additive charge, `Slope.lean` owns weak
+  slope compatibility, `NumericalCases.lean` owns the four numerical
+  half-plane adapters, `Ambient.lean` owns restriction from `K₀ C` to a heart,
+  and `Tilting.lean` owns the HN-tilt consumers. The generic
+  `Weak/Foundation/StabilityFunction` and `Weak/Tilting/TorsionPair` umbrellas
+  no longer import this specialization. At the lower layer,
+  `LinearAlgebra/Lattice/Mukai/CentralCharge.lean` now exposes
+  `Mukai.expChargeHom`, so heart and ambient charges compose additive
+  homomorphisms instead of reproving additivity. The canonical
+  numerical lemmas are `Mukai.expCharge_zero`, `expCharge_add`, and
+  `expCharge_neg`; their historical `CategoryTheory.Triangulated` names remain
+  stable as aliases in `Mukai/Charge.lean`. `GeometricInput.lean` now isolates
+  the two remaining geometric obligations as independent propositions:
+  classification of rank-and-degree-zero torsion classes and a factorwise
+  boundary Mukai decomposition. The boundary contract
+  `HasBoundaryMukaiDecompositionWith` is parameterized by a predicate on the
+  factors; the exact-Hodge-margin contract and the uniform `realForm ≥ -δ`
+  contract are its abbreviations, the historical K3 contract is only `δ = 1`,
+  and the theorems turning each predicate into `Re Z > 0` live in
+  `Tilting.lean` rather than in the contract.
+  `Assembly.lean` carries the same hierarchy through
+  `tiltStabilityFunctionOfMargin`, `tiltStabilityFunctionOfLowerBound`, and the
+  legacy `tiltStabilityFunction`. Todd normalization remains upstream in the
+  additive class map, so this categorical construction has no surface-type
+  flag. Its extension argument is not Mukai-specific: the reusable constructor
+  lives at
+  `Weak/Tilting/TorsionPair/HnTiltStabilityFunction.lean` and consumes any
+  additive ambient charge positive on nonzero torsion and shifted-free
+  generators.
 - Left orthogonals are closed under colimits (2026-09-04):
   `CategoryTheory/ObjectProperty/Orthogonal.lean` owns
   `instIsClosedUnderColimitsOfShapeLeftOrthogonal`, beside Mathlib's own
@@ -498,10 +530,28 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Confirmed next lanes
 
-Nothing is queued. Every path lane confirmed by the 2026-09-01 audit has
-landed, and so have both lanes recorded after it: the `ObjectProperty` lift
-block (2026-09-02) and the left-orthogonal colimit closure (2026-09-03).
-Both are entries under "Completed roots" above.
+Every path lane confirmed by the 2026-09-01 audit has landed, and so have
+both lanes recorded after it: the `ObjectProperty` lift block (2026-09-02)
+and the left-orthogonal colimit closure (2026-09-03). Both are entries under
+"Completed roots" above.
+
+One candidate lane is recorded, not yet confirmed (2026-09-08, review of
+#1098):
+
+- **Divisorial surface-charge generic layer.**
+  `AlgebraicGeometry/Numerical/Stability/SurfaceCharge.lean` and
+  `AlgebraicGeometry/Numerical/Stability/DivisorialCharge.lean` mention no
+  scheme and import nothing geometric: `ChargeCoordinates`, `DivisorSpace`,
+  `ChernCharacter`, `StabilityParameters`, and the charge polynomial are
+  linear algebra over `ℝ` and `ℂ`. By the placement rule they are a generic
+  block whose geometric use starts in `SurfaceChargeNumerical.lean`. The
+  repository precedent is `CategoryTheory/Triangulated/StabilityCondition/Walls/Numerical/Basic.lean`,
+  which is the same kind of pure arithmetic and lives with the wall lane.
+  Moving the two files beside it would also let the `(s,t)` child
+  `Wall.stChargeFamily` be defined as a reindexing of
+  `ChernCharacter.fullChargeFamily`, removing the second formula owner that
+  `DivisorialWallTransport.lean` currently reconciles by theorem. Until the
+  move, do not extend the generic block in place.
 
 No confirmed type-level hazard remains: the `ZLattice` class, the bundled
 variety types, and the alternating-finsum vocabulary are all retired above
