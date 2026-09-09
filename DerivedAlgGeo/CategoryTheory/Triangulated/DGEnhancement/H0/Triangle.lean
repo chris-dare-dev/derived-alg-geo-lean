@@ -576,7 +576,7 @@ noncomputable def shiftCommIso (F : DGFunctor C D) (hF : PreservesShifts F) (n :
       F.h0 ⋙ CategoryTheory.shiftFunctor (H0 D) n :=
   NatIso.ofComponents
     (fun X => H0.compareIso (C := D)
-      (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) n))
+      (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) n))
       (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) n))
     (by
       intro X Y f
@@ -589,11 +589,11 @@ noncomputable def shiftCommIso (F : DGFunctor C D) (hF : PreservesShifts F) (n :
                 (IsPretriangulated.shiftWitness C (H0.of C Y) n) f.1), _⟩ ≫
             H0.homMk (C := D)
               ⟨IsShiftBy.compare
-                (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C Y) n))
+                (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C Y) n))
                 (IsPretriangulated.shiftWitness D (F.obj (H0.of C Y)) n), _⟩ =
           H0.homMk (C := D)
               ⟨IsShiftBy.compare
-                (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) n))
+                (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) n))
                 (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) n), _⟩ ≫
             H0.homMk (C := D)
               ⟨IsShiftBy.mapShift
@@ -605,15 +605,15 @@ noncomputable def shiftCommIso (F : DGFunctor C D) (hF : PreservesShifts F) (n :
         refine congrArg _ (Subtype.ext ?_)
         refine (congrArg (fun z => dgComp 0 0 0 (by omega) z
             (IsShiftBy.compare
-              (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C Y) n))
+              (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C Y) n))
               (IsPretriangulated.shiftWitness D (F.obj (H0.of C Y)) n)))
           (DGFunctor.map_mapShift hF
             (IsPretriangulated.shiftWitness C (H0.of C X) n)
             (IsPretriangulated.shiftWitness C (H0.of C Y) n) f.1)).trans ?_
         exact IsShiftBy.mapShift_compare
-          (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) n))
+          (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) n))
           (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) n)
-          (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C Y) n))
+          (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C Y) n))
           (IsPretriangulated.shiftWitness D (F.obj (H0.of C Y)) n)
           (F.map 0 f.1))
 
@@ -632,7 +632,7 @@ lemma shiftCommIso_zero_hom_app (F : DGFunctor C D)
   refine congrArg _ (Subtype.ext ?_)
   change
     IsShiftBy.compare
-        (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) 0))
+        (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) 0))
         (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) 0) =
       dgComp 0 0 0 (by omega)
         (F.map 0 (IsShiftBy.compare
@@ -642,20 +642,20 @@ lemma shiftCommIso_zero_hom_app (F : DGFunctor C D)
           (IsShiftBy.self (F.obj (H0.of C X)))
           (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) 0))
   have hself :
-      (hF.map_shift (IsShiftBy.self (H0.of C X))).hom =
+      (hF.mapShift (IsShiftBy.self (H0.of C X))).hom =
         (IsShiftBy.self (F.obj (H0.of C X))).hom := by
-    rw [hF.map_shift_hom]
+    rw [hF.mapShift_hom]
     simpa [IsShiftBy.self] using F.map_id (H0.of C X)
   calc
     IsShiftBy.compare
-          (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) 0))
+          (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) 0))
           (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) 0) =
         dgComp 0 0 0 (by omega)
           (IsShiftBy.compare
-            (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) 0))
-            (hF.map_shift (IsShiftBy.self (H0.of C X))))
+            (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) 0))
+            (hF.mapShift (IsShiftBy.self (H0.of C X))))
           (IsShiftBy.compare
-            (hF.map_shift (IsShiftBy.self (H0.of C X)))
+            (hF.mapShift (IsShiftBy.self (H0.of C X)))
             (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) 0)) :=
       (IsShiftBy.compare_trans _ _ _).symm
     _ = dgComp 0 0 0 (by omega)
@@ -669,7 +669,7 @@ lemma shiftCommIso_zero_hom_app (F : DGFunctor C D)
         (IsPretriangulated.shiftWitness C (H0.of C X) 0)
         (IsShiftBy.self (H0.of C X)),
         IsShiftBy.compare_congr_left
-          (hF.map_shift (IsShiftBy.self (H0.of C X)))
+          (hF.mapShift (IsShiftBy.self (H0.of C X)))
           (IsShiftBy.self (F.obj (H0.of C X)))
           (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) 0) hself]
 
@@ -691,7 +691,7 @@ lemma shiftCommIso_add_hom_app (F : DGFunctor C D)
   refine congrArg _ (Subtype.ext ?_)
   change
     IsShiftBy.compare
-        (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) (a + b)))
+        (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) (a + b)))
         (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) (a + b)) =
       dgComp 0 0 0 (by omega)
         (F.map 0 (IsShiftBy.compare
@@ -699,7 +699,7 @@ lemma shiftCommIso_add_hom_app (F : DGFunctor C D)
           (H0.shiftCompWitness C (H0.of C X) a b)))
         (dgComp 0 0 0 (by omega)
           (IsShiftBy.compare
-            (hF.map_shift (IsPretriangulated.shiftWitness C
+            (hF.mapShift (IsPretriangulated.shiftWitness C
               (IsPretriangulated.shiftObj C (H0.of C X) a) b))
             (IsPretriangulated.shiftWitness D
               (F.obj (IsPretriangulated.shiftObj C (H0.of C X) a)) b))
@@ -710,45 +710,45 @@ lemma shiftCommIso_add_hom_app (F : DGFunctor C D)
               (IsPretriangulated.shiftWitness D
                 (IsPretriangulated.shiftObj D (F.obj (H0.of C X)) a) b)
               (IsShiftBy.compare
-                (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) a))
+                (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) a))
                 (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) a)))
             (IsShiftBy.compare
               (H0.shiftCompWitness D (F.obj (H0.of C X)) a b)
               (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) (a + b)))))
   have hcomp :
-      (hF.map_shift (H0.shiftCompWitness C (H0.of C X) a b)).hom =
+      (hF.mapShift (H0.shiftCompWitness C (H0.of C X) a b)).hom =
         (IsShiftBy.comp'
-          (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) a))
-          (hF.map_shift (IsPretriangulated.shiftWitness C
+          (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) a))
+          (hF.mapShift (IsPretriangulated.shiftWitness C
             (IsPretriangulated.shiftObj C (H0.of C X) a) b))
           (a + b) rfl).hom := by
-    rw [hF.map_shift_hom (s := H0.shiftCompWitness C (H0.of C X) a b)]
+    rw [hF.mapShift_hom (s := H0.shiftCompWitness C (H0.of C X) a b)]
     change F.map (-(a + b))
           (dgComp (-a) (-b) (-(a + b)) (by omega)
             (IsPretriangulated.shiftWitness C (H0.of C X) a).hom
             (IsPretriangulated.shiftWitness C
               (IsPretriangulated.shiftObj C (H0.of C X) a) b).hom) =
         dgComp (-a) (-b) (-(a + b)) (by omega)
-          (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) a)).hom
-          (hF.map_shift (IsPretriangulated.shiftWitness C
+          (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) a)).hom
+          (hF.mapShift (IsPretriangulated.shiftWitness C
             (IsPretriangulated.shiftObj C (H0.of C X) a) b)).hom
-    rw [F.map_comp, hF.map_shift_hom, hF.map_shift_hom]
+    rw [F.map_comp, hF.mapShift_hom, hF.mapShift_hom]
   symm
   rw [DGFunctor.map_compare hF
         (IsPretriangulated.shiftWitness C (H0.of C X) (a + b))
         (H0.shiftCompWitness C (H0.of C X) a b),
       IsShiftBy.compare_congr
-        (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) (a + b)))
-        (hF.map_shift (H0.shiftCompWitness C (H0.of C X) a b))
+        (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) (a + b)))
+        (hF.mapShift (H0.shiftCompWitness C (H0.of C X) a b))
         (IsShiftBy.comp'
-          (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) a))
-          (hF.map_shift (IsPretriangulated.shiftWitness C
+          (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) a))
+          (hF.mapShift (IsPretriangulated.shiftWitness C
             (IsPretriangulated.shiftObj C (H0.of C X) a) b))
           (a + b) rfl) hcomp]
   have hBC :
       dgComp 0 0 0 (by omega)
           (IsShiftBy.compare
-            (hF.map_shift (IsPretriangulated.shiftWitness C
+            (hF.mapShift (IsPretriangulated.shiftWitness C
               (IsPretriangulated.shiftObj C (H0.of C X) a) b))
             (IsPretriangulated.shiftWitness D
               (F.obj (IsPretriangulated.shiftObj C (H0.of C X) a)) b))
@@ -759,26 +759,26 @@ lemma shiftCommIso_add_hom_app (F : DGFunctor C D)
               (IsPretriangulated.shiftWitness D
                 (IsPretriangulated.shiftObj D (F.obj (H0.of C X)) a) b)
               (IsShiftBy.compare
-                (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) a))
+                (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) a))
                 (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) a)))
             (IsShiftBy.compare
               (H0.shiftCompWitness D (F.obj (H0.of C X)) a b)
               (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) (a + b)))) =
         dgComp 0 0 0 (by omega)
           (IsShiftBy.mapShift
-            (hF.map_shift (IsPretriangulated.shiftWitness C
+            (hF.mapShift (IsPretriangulated.shiftWitness C
               (IsPretriangulated.shiftObj C (H0.of C X) a) b))
             (IsPretriangulated.shiftWitness D
               (IsPretriangulated.shiftObj D (F.obj (H0.of C X)) a) b)
             (IsShiftBy.compare
-              (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) a))
+              (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) a))
               (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) a)))
           (IsShiftBy.compare
             (H0.shiftCompWitness D (F.obj (H0.of C X)) a b)
             (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) (a + b))) := by
     rw [← dgComp_assoc 0 0 0 0 0 0 (by omega) (by omega) (by omega),
       ← IsShiftBy.mapShift_compare
-        (hF.map_shift (IsPretriangulated.shiftWitness C
+        (hF.mapShift (IsPretriangulated.shiftWitness C
           (IsPretriangulated.shiftObj C (H0.of C X) a) b))
         (IsPretriangulated.shiftWitness D
           (F.obj (IsPretriangulated.shiftObj C (H0.of C X) a)) b)
@@ -787,14 +787,14 @@ lemma shiftCommIso_add_hom_app (F : DGFunctor C D)
         (IsPretriangulated.shiftWitness D
           (IsPretriangulated.shiftObj D (F.obj (H0.of C X)) a) b)
         (IsShiftBy.compare
-          (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) a))
+          (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) a))
           (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) a)),
       IsShiftBy.compare_self, dgComp_id]
   rw [hBC]
   rw [IsShiftBy.mapShift_compare_comp'
-    (hF.map_shift (IsPretriangulated.shiftWitness C (H0.of C X) a))
+    (hF.mapShift (IsPretriangulated.shiftWitness C (H0.of C X) a))
     (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) a)
-    (hF.map_shift (IsPretriangulated.shiftWitness C
+    (hF.mapShift (IsPretriangulated.shiftWitness C
       (IsPretriangulated.shiftObj C (H0.of C X) a) b))
     (IsPretriangulated.shiftWitness D
       (IsPretriangulated.shiftObj D (F.obj (H0.of C X)) a) b)
@@ -868,18 +868,18 @@ theorem preservesConeTriangles_of_preservesChosenCones
   letI : F.h0.CommShift ℤ := commShift F hShift
   constructor
   intro X Y f Z hc
-  refine ⟨F.obj Z, hCone.map_cone hc, ⟨?_⟩⟩
+  refine ⟨F.obj Z, hCone.mapCone hc, ⟨?_⟩⟩
   refine Triangle.isoMk _ _ (Iso.refl _) (Iso.refl _) (Iso.refl _) ?_ ?_ ?_
   · exact (Category.comp_id _).trans (Category.id_comp _).symm
   · refine (Category.comp_id _).trans ?_
     refine Eq.trans ?_ (Category.id_comp _).symm
     change F.h0.map (H0.homMk (C := C) ⟨hc.inr, hc.inr_mem_cocycles⟩) =
       H0.homMk (C := D)
-        ⟨(hCone.map_cone hc).inr, (hCone.map_cone hc).inr_mem_cocycles⟩
+        ⟨(hCone.mapCone hc).inr, (hCone.mapCone hc).inr_mem_cocycles⟩
     exact (F.h0_map_mk
       (X := (show H0 C from Y)) (Y := (show H0 C from Z))
       ⟨hc.inr, hc.inr_mem_cocycles⟩).trans
-        (congrArg _ (Subtype.ext (hCone.map_cone_inr hc).symm))
+        (congrArg _ (Subtype.ext (hCone.mapCone_inr hc).symm))
   · let sC := IsPretriangulated.shiftWitness C X 1
     let sD := IsPretriangulated.shiftWitness D (F.obj X) 1
     simp only [Iso.refl_hom]
@@ -889,11 +889,11 @@ theorem preservesConeTriangles_of_preservesChosenCones
     change F.h0.map (-H0.homMk (C := C)
           ⟨hc.toShift sC, hc.toShift_mem_cocycles sC⟩) ≫
         H0.homMk (C := D)
-          ⟨IsShiftBy.compare (hShift.map_shift sC) sD,
+          ⟨IsShiftBy.compare (hShift.mapShift sC) sD,
             IsShiftBy.compare_mem_cocycles _ _⟩ =
       -H0.homMk (C := D)
-        ⟨(hCone.map_cone hc).toShift sD,
-          (hCone.map_cone hc).toShift_mem_cocycles sD⟩
+        ⟨(hCone.mapCone hc).toShift sD,
+          (hCone.mapCone hc).toShift_mem_cocycles sD⟩
     have hmap : F.h0.map (-H0.homMk (C := C)
           ⟨hc.toShift sC, hc.toShift_mem_cocycles sC⟩) =
         -H0.homMk (C := D)
@@ -921,9 +921,9 @@ theorem preservesConeTriangles_of_preservesChosenCones
     rw [hmap, Preadditive.neg_comp, H0.homMk_comp]
     refine congrArg Neg.neg (congrArg _ (Subtype.ext ?_))
     exact (congrArg (fun q => dgComp 0 0 0 (by omega) q
-      (IsShiftBy.compare (hShift.map_shift sC) sD))
-        (hCone.map_cone_toShift hShift hc sC)).trans
-      ((hCone.map_cone hc).toShift_comp_compare (hShift.map_shift sC) sD)
+      (IsShiftBy.compare (hShift.mapShift sC) sD))
+        (hCone.mapCone_toShift hShift hc sC)).trans
+      ((hCone.mapCone hc).toShift_comp_compare (hShift.mapShift sC) sD)
 
 /-- A dg functor with cone-generator preservation induces a triangulated
 functor on `H⁰`. The proof is the generator argument built into the definition

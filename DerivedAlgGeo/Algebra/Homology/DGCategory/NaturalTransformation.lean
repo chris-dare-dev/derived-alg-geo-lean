@@ -300,7 +300,6 @@ theorem complex_X (F G : DGFunctor C D) (n : ℤ) :
     (complex F G).X n = AddCommGrpCat.of (HomogeneousNatTrans F G n) :=
   rfl
 
-@[simp]
 theorem complex_d_apply (η : HomogeneousNatTrans F G n) :
     ((complex F G).d n (n + 1)).hom η = differential η := by
   simp [complex, CochainComplex.of.d]

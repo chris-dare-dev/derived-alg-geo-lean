@@ -90,7 +90,6 @@ theorem map_liftTriangleMap {T₁ T₂ : Triangle C}
 
 /-- After identifying both images with their ambient triangles, a lifted map
 is exactly the original triangle map. -/
-@[simp]
 theorem liftTriangleMap_ambient {T₁ T₂ : Triangle C}
     (hT₁ : P.OnTriangle T₁) (hT₂ : P.OnTriangle T₂) (f : T₁ ⟶ T₂) :
     (P.liftTriangleIso T₁ hT₁).inv ≫
@@ -106,7 +105,6 @@ theorem liftTriangleMap_ambient {T₁ T₂ : Triangle C}
         Category.comp_id]
 
 /-- Lifting preserves identity triangle maps. -/
-@[simp]
 theorem liftTriangleMap_id (T : Triangle C) (hT : P.OnTriangle T) :
     P.liftTriangleMap hT hT (𝟙 T) = 𝟙 (P.liftTriangle T hT) := by
   apply P.ι.mapTriangle.map_injective
@@ -114,7 +112,6 @@ theorem liftTriangleMap_id (T : Triangle C) (hT : P.OnTriangle T) :
   simpa only [Category.id_comp] using (P.liftTriangleIso T hT).hom_inv_id
 
 /-- Lifting preserves composition of triangle maps. -/
-@[simp]
 theorem liftTriangleMap_comp {T₁ T₂ T₃ : Triangle C}
     (hT₁ : P.OnTriangle T₁) (hT₂ : P.OnTriangle T₂)
     (hT₃ : P.OnTriangle T₃) (f : T₁ ⟶ T₂) (g : T₂ ⟶ T₃) :
