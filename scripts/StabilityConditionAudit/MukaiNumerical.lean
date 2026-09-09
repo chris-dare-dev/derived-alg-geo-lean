@@ -1,5 +1,5 @@
 /-
-ExpChargeCases slice of the StabilityCondition audit, split out so concurrent
+Mukai numerical slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
@@ -27,5 +27,9 @@ it backwards yields a false statement that compiles. No gate catches that. -/
 #print axioms CategoryTheory.Triangulated.mem_semiClosedUpperHalfPlane_of_apply_sub_smul_pos
 #print axioms CategoryTheory.Triangulated.mem_semiClosedUpperHalfPlane_of_dimension_zero
 #print axioms CategoryTheory.Triangulated.neg_mem_semiClosedUpperHalfPlane_of_apply_sub_smul_neg
+#print axioms CategoryTheory.Triangulated.neg_mem_semiClosedUpperHalfPlane_of_boundary_of_lower_bound
 #print axioms CategoryTheory.Triangulated.neg_mem_semiClosedUpperHalfPlane_of_boundary_of_nonneg
 #print axioms CategoryTheory.Triangulated.neg_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one
+#print axioms CategoryTheory.Triangulated.neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_margin
+#print axioms CategoryTheory.Triangulated.neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_lower_bound
+#print axioms CategoryTheory.Triangulated.neg_sum_mem_semiClosedUpperHalfPlane_of_boundary_of_neg_one

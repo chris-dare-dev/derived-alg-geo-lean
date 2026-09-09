@@ -65,3 +65,24 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms SphericalTwist.twistK₀_braid_apply
 #print axioms SphericalTwist.twistK₀_braid
 #print axioms SphericalTwist.MukaiRealization.reflect_braid
+
+-- Enhanced spherical-functor lane: the four adjunction-map cone choices for a
+-- dg functor with left and right dg adjoints, and the explicit twist/cotwist
+-- equivalence conditions. No sphericality theorem is recorded.
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.chosen
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistCone
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConeFunctor
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwist
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistFunctor
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualTwistCone
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualTwistConeFunctor
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.leftAdj
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.mk.inj
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.rightAdj
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctor
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.cotwist
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.twist

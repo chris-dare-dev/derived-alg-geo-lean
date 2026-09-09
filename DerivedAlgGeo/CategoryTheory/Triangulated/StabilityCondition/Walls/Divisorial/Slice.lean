@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialCharge
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.ChargeFamily
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Charge
 
 /-!
 # Orthogonal slices of divisorial surface-charge families
@@ -30,9 +30,8 @@ is required to define the charge family or its numerical walls.
 -/
 
 open Complex
-open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 
-namespace AlgebraicGeometry.Numerical.Surface
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
 
 noncomputable section
 
@@ -288,4 +287,4 @@ end OrthogonalSlice
 end
 
 
-end AlgebraicGeometry.Numerical.Surface
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial

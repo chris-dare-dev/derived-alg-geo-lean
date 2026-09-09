@@ -222,19 +222,25 @@ On the Li side, supply the support form for the pulled-back condition and the
 comparison of that form with the surface form under C1/C2. Geometricity alone
 does not identify support forms or connected components.
 
-Two numerical obligations sit between the landed divisorial layer and this
-comparison and are not yet stated in Lean:
+Two numerical obligations that sat between the landed divisorial layer and
+this comparison are now stated in `Walls/Divisorial/Discriminant.lean`:
 
-* the Macrì--Schmidt support forms in the full divisor space: the
-  discriminant `Δ = (ch₁)² - 2 ch₀ ch₂` as a quadratic form on the intrinsic
-  `ChernCharacter`, and the two `(ω,B)`-forms `Δ^C_{ω,B} = Δ + C (ω·ch₁^B)²`
-  and `\bar Δ^B_ω = (ω·ch₁^B)² - 2 (ω²) ch₀^B ch₂^B` of Definition 6.12 /
-  Theorem 6.13. Only the compressed `Surface.discrH` exists today, in the
-  `(s,t)` branch;
-* the bridge from the existing `HodgeIndexStatement V P` to the new
-  `OrthogonalSlice.IsHodge` certificate: for an ample `H`, the intrinsic
-  `fullOrthogonal S H` slice is Hodge (positive `H²`, negative definite
-  `H^⊥`). Nothing connects the two certificates yet.
+* the Macrì--Schmidt forms in the full divisor space: `ChernCharacter.discriminant`
+  (`Δ = (ch₁)² - 2 ch₀ ch₂`, proved `B`-invariant), `barDiscriminant`
+  (`ar Δ^B_ω`), and `discriminantC` (`Δ^C_{ω,B}`) of Definition 6.12, with
+  `ω² Δ ≤ ar Δ^B_ω` under a Hodge index at `ω` and the identification of the
+  bar form on the rank-one slice with `α² · discrH`, hence with the wall-plane
+  discriminant of the transported class;
+* the Hodge bridge: `DivisorSpace.HodgeIndex S H` is the real-divisor-space
+  certificate; it yields the numerical `HodgeIndexStatement`, while the
+  numerical statement yields only the inequality on realized first Chern
+  classes. `OrthogonalSlice.isHodge_of_hodgeIndex` derives the slice
+  certificate from the inequality plus nondegeneracy of the transverse
+  pairing; the rank-one slice is Hodge from `H² > 0` alone.
+
+What remains supplied, not proved: the Hodge index theorem itself for a
+geometric surface, Bogomolov's inequality (`BogomolovGiesekerData`), and the
+Bridgeland-semistable half of Theorem 6.13.
 
 Separately, `Wall.ChargeFamily.wall v w` is the proportionality locus of the
 two charges and is all of the parameter space when `w ∈ ℤ v` or `Z(v) = 0`
@@ -305,7 +311,7 @@ The arithmetic boundary is split across composable components:
   codimension-one `BField`, the components of `ch^B = exp(-B)ch`, their
   degree-zero/one/two expansions, and the theorem identifying the notation
   `B = βH` with the existing `chBetaComp` notation;
-* `Numerical/Stability/SurfaceCharge.lean` contains the pure additive charge
+* `Walls/Divisorial/Coordinates.lean` contains the pure additive charge
   coordinates after twisting, the canonical shared charge polynomial, the
   real scalar specialization `B = bH`, and the coordinate-preserving map
   interface;
@@ -320,14 +326,14 @@ The arithmetic boundary is split across composable components:
   the arithmetic identity between the exponential presentation
   `-∫ exp(-(b + i a)H) ch` and the twisted surface presentation `Z_{aH,bH}`.
   The `(r,c,v)` carrier is **not** Li's image lattice `Λ_ι`; see C2;
-* `Numerical/Stability/DivisorialCharge.lean` supplies the intrinsic
+* `Walls/Divisorial/Charge.lean` supplies the intrinsic
   higher-Picard-rank layer: a real divisor space with symmetric intersection
   form, uncompressed additive Chern-character coordinates, independent
   `(B,omega)` parameters, an optional ample-cone witness, the arbitrary real
   `B`-twist, the general divisorial charge, its Mukai-pairing expression, and
   the theorem recovering the existing scalar-twist API on
   `B = beta H`, `omega = alpha H`; and
-* `Numerical/Stability/DivisorialWallSlice.lean` makes the arbitrary
+* `Walls/Divisorial/Slice.lean` makes the arbitrary
   `(B,omega)` divisorial charge into a full wall family.  Orthogonal slices are
   literal parameter reindexings of that parent, with an arbitrary real
   transverse parameter space.  The intrinsic `H-perp` constructor and its
@@ -369,7 +375,27 @@ The arithmetic boundary is split across composable components:
   reindexing of the intrinsic divisorial family along the rank-one slice
   `B = sH`, `omega = tH` (`wallChargeFamily_eq_rankOne_reindex`).  Every
   rank-one child therefore reaches both the circle/line/nesting theorems of
-  the `(s,t)` polynomial and the arbitrary-`(B,omega)` divisorial layer.
+  the `(s,t)` polynomial and the arbitrary-`(B,omega)` divisorial layer; and
+* `Walls/Divisorial/Discriminant.lean` supplies the
+  Macrì--Schmidt discriminants `Δ`, `ar Δ^B_ω`, `Δ^C_{ω,B}` on the intrinsic
+  character, the divisor-space Hodge index certificate `DivisorSpace.HodgeIndex`
+  with its one-directional bridge to the numerical `HodgeIndexStatement`, the
+  derivation of `OrthogonalSlice.IsHodge` from the inequality plus
+  nondegeneracy, and the transport of `BogomolovGiesekerData` to
+  `0 ≤ ar Δ^B_ω` under a Hodge index at `omega`; and
+* `Walls/Divisorial/Circle.lean` proves that fixing the
+  transverse parameter turns a divisorial slice into the `(s,t)` model itself:
+  `chargeFamily_reindex_ofST` identifies the reindexed family with
+  `stChargeFamily` pulled back along the degree-weighted triple of the
+  `G(u)`-twisted character.  The circle, vertical-line, disjointness and
+  nesting results of `Walls/Numerical/` therefore hold on every `u`-plane of a
+  surface of arbitrary Picard rank, and `barDiscriminant_parameters` discharges
+  their `0 ≤ discr` hypothesis from the supplied Bogomolov and Hodge data.  The
+  walls do move with `u`: `discr_sliceCoordinates` records by how much.  The
+  wall root additionally carries the real-linear action on charges, with
+  `wallValue_linearAct` the determinant law and `wall_linearAct`/`wall_smul` its
+  invariance consequence — the numerical half of the `GL⁺(2,ℝ)` action that C5
+  needs.
 
 `NumericalRingData` is presently a rational intersection ring, so its
 arbitrary `BField` is rational. The divisorial layer handles a fully arbitrary
@@ -488,19 +514,28 @@ local system of lattices with monodromy, is not modelled and is not needed
 for the projective-family case, where one lattice serves the whole family
 (Theorem 10.3).
 
+The generic layer moved out of `AlgebraicGeometry/` on 2026-09-09; see the
+"Divisorial charge block" entry in `docs/architecture/cutover-ledger.md`, which
+also records where this note's earlier claim about that move was wrong.
+
 The next honest coding boundary is one of:
 
-1. define a threefold/BMT central-charge family as another child of
-   `Wall.ChargeFamily`, without promoting the conjectural BMT inequality to a
-   generic fact;
-2. connect `Wall.ChargeFamily` to the existing categorical family interfaces
-   once #851 supplies the common relative numerical class-map data, using
-   reindexing for base change rather than inventing a second family carrier;
-3. implement the C1 numerical comparison after the geometric `vLi`/GRR data
-   have an honest owner; or
-4. add topological chamber/connected-component structure above generic wall
+1. name the Mukai adapter explicitly: a `ChernCharacter → Mukai.RealExtension`
+   map whose third slot is `ch₂ + rank`, tied to `Examples/Surface/K3Mukai.lean`,
+   so Bridgeland's charge is a second child rather than an overload of a field
+   whose contract says it holds the ordinary Chern character;
+2. define a threefold/BMT central-charge family as another child of
+   `Wall.ChargeFamily`, with its own character structure carrying `ch₃` and a
+   cubic twist, without promoting the conjectural BMT inequality to a generic
+   fact;
+3. add topological chamber and connected-component structure above generic wall
    sets, only when a topology and local-finiteness hypotheses are explicitly
-   available.
+   available;
+4. connect `Wall.ChargeFamily` to the existing categorical family interfaces
+   once #851 supplies the common relative numerical class-map data, using
+   reindexing for base change rather than inventing a second family carrier; or
+5. implement the C1 numerical comparison after the geometric `vLi`/GRR data
+   have an honest owner.
 
 The current layer fixes the formulas, source locations, normalization choices,
 and supplied hypotheses without claiming that the two stability conditions

@@ -35,4 +35,9 @@ the current Mathlib API.
 
 Importing this module is equivalent to the former single-file surface; new
 code should prefer the narrowest owning module above.
+
+The heavier bridge from `associatedSheaf D` to explicit `LineBundleData`
+lives separately in `Divisors.CartierLineBundle`. It is intentionally absent
+from this umbrella so effective-divisor consumers do not acquire the
+determinant/dual dependency merely by importing the associated-sheaf API.
 -/

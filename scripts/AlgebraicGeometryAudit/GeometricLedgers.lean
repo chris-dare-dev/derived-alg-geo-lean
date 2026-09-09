@@ -435,3 +435,18 @@ is membership for ONE element, not a homomorphism from anything.
 
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricMk_toAutPair_smul
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricToAutPair
+
+-- Derived tensor exactness stored once as an `ExactBifunctor`, with the legacy
+-- one-slot projections and the right-twist projections derived from it.
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.exact
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.exactBifunctor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.exact
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.exactBifunctor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.firstFamily
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.flipAdditive
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.flipCommShift
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.flipIsTriangulated
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.secondFamily
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensorExactBifunctor
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensorFlipCommShift
+#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensorFlip_isTriangulated

@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Effective
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.DivisorSequence
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperBlocks
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.ExceptionalExtension
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Transport
@@ -17,29 +18,33 @@ arXiv:1912.04332v2 and arXiv:2104.13610v2.
 * the projection counit gives the paper's mutation triangle;
 * an `A_n` chain of effective Cartier divisors records the `(-2)`-curve
   geometry of Paper II, Proposition 1.4;
-* the line-bundle class formula and successive distinguished triangles are
-  packaged together, and the generic projection-chain theorem proves that
-  every member of a longer block has the same residual projection;
+* the line-bundle class formula supplies isomorphisms from the selected
+  representatives to Cartier-prefix twists, whose exact sequences construct
+  the successive distinguished triangles and block maps;
 * self-Ext computations are separated from the Serre-shift and classification
   arguments, with constructors rebuilding the Paper I and Paper II theorem
   packages; and
 * the closing aliases specialize the generic Fourier--Mukai extension result
   to the actual residual and ambient categories used here.
 
-The remaining geometric gaps stay visible.  In particular, the current
-Cartier-divisor API has no predicate saying that an effective divisor is an
-irreducible curve, and the derived-category API does not yet turn the twisted
-short exact divisor sequence into the required distinguished triangle
-functorially.  Those facts are supplied in `PaperCurveChainData`; once
-supplied, the same-projection result below is proved.  Likewise, constructing
-the extended Fourier--Mukai kernel from a cone waits on #855, #853, and #854,
-while its categorical consequences use the existing kernel/adjunction roots
-immediately.
+The remaining geometric gaps stay visible. The current Cartier-divisor API
+has no predicate saying that an effective divisor is an irreducible curve,
+and `PaperCurveChainData` still supplies residual orthogonality of each curve
+quotient. It no longer supplies the triangles themselves. Likewise,
+the abstract dg cone and its pointwise transform triangle are now functorial,
+with `DGFunctor.HomogeneousNatTrans.ConeData` as the construction root and
+`FourierMukai.CounitKernelConeData` as the adjunction-counit specialization.
+Constructing the paper's extended Fourier--Mukai kernel still waits on the
+geometric `H⁰` model, the paper's enhanced kernel morphism, and exactness of
+kernel evaluation (#853--#855); it is not silently identified with the counit
+specialization.  Its categorical consequences continue to use the existing
+kernel/adjunction roots immediately.
 -/
 
 universe u t
 
-open CategoryTheory CategoryTheory.Limits CategoryTheory.Triangulated
+open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
+open CategoryTheory.Triangulated
 open CategoryTheory.ObjectProperty CategoryTheory.SerreFunctor
 open CategoryTheory.Triangulated.FourierMukai
 open AlgebraicGeometry.DerivedCategory
@@ -153,6 +158,54 @@ noncomputable def prefixDivisor (j : ℕ) (hj : j ≤ n) : CartierDivisor Y :=
 theorem prefixDivisor_zero : A.prefixDivisor 0 (Nat.zero_le n) = 0 := by
   simp [prefixDivisor]
 
+/-- Adding the next curve extends the prefix divisor by that curve. -/
+theorem prefixDivisor_succ (j : ℕ) (hj : j < n) :
+    A.prefixDivisor (j + 1) (by omega) =
+      A.prefixDivisor j (by omega) + (A.curve ⟨j, hj⟩).divisor := by
+  simp [prefixDivisor, Fin.sum_univ_castSucc]
+
+/-- The source divisor in the normalized sequence for the next curve is the
+preceding prefix. -/
+theorem prefixDivisor_succ_sub (j : ℕ) (hj : j < n) :
+    A.prefixDivisor (j + 1) (by omega) - (A.curve ⟨j, hj⟩).divisor =
+      A.prefixDivisor j (by omega) := by
+  rw [A.prefixDivisor_succ j hj]
+  simp
+
+/-- The canonical bounded-derived triangle for one step of the divisor
+chain, after tensoring by an arbitrary base line bundle. Its first two
+vertices are `L ⊗ O(prefix j)` and `L ⊗ O(prefix (j+1))`. -/
+noncomputable def lineBundleStepTriangle (L : LineBundleData Y)
+    (j : ℕ) (hj : j < n) : Triangle (DerivedCat Y) :=
+  (A.curve ⟨j, hj⟩).cohLineBundleTwistBoundedTriangle L
+    (A.prefixDivisor (j + 1) (by omega))
+
+/-- A divisor-chain step triangle is distinguished. -/
+theorem lineBundleStepTriangle_distinguished (L : LineBundleData Y)
+    (j : ℕ) (hj : j < n) :
+    A.lineBundleStepTriangle L j hj ∈ distTriang (DerivedCat Y) :=
+  (A.curve ⟨j, hj⟩).cohLineBundleTwistBoundedTriangle_distinguished L
+    (A.prefixDivisor (j + 1) (by omega))
+
+/-- The first vertex of a divisor-chain step is the preceding prefix twist. -/
+noncomputable def lineBundleStepTriangleObj₁Iso (L : LineBundleData Y)
+    (j : ℕ) (hj : j < n) :
+    (A.lineBundleStepTriangle L j hj).obj₁ ≅
+      (L.tensor (CartierDivisor.lineBundleData
+        (A.prefixDivisor j (by omega)))).boundedDerivedObject := by
+  simpa only [lineBundleStepTriangle, A.prefixDivisor_succ_sub j hj] using
+    (A.curve ⟨j, hj⟩).cohLineBundleTwistBoundedTriangleObj₁Iso L
+      (A.prefixDivisor (j + 1) (by omega))
+
+/-- The second vertex of a divisor-chain step is the extended prefix twist. -/
+noncomputable def lineBundleStepTriangleObj₂Iso (L : LineBundleData Y)
+    (j : ℕ) (hj : j < n) :
+    (A.lineBundleStepTriangle L j hj).obj₂ ≅
+      (L.tensor (CartierDivisor.lineBundleData
+        (A.prefixDivisor (j + 1) (by omega)))).boundedDerivedObject :=
+  (A.curve ⟨j, hj⟩).cohLineBundleTwistBoundedTriangleObj₂Iso L
+    (A.prefixDivisor (j + 1) (by omega))
+
 end MinusTwoCurveChain
 
 /-- The geometric data behind a block decomposition in Paper II,
@@ -160,9 +213,11 @@ Proposition 1.4 and Lemma 1.9.
 
 `memberClass` is the formula
 `L_{ij} = L_{i1} ⊗ O(R_{i1}+⋯+R_{i,j-1})` in the Picard group.
-`projectionTriangles` is the derived exact-sequence consequence needed below;
-it is separate because the current derived embedding does not yet construct
-that triangle from `EffectiveCartierDivisor.cohTwistSequence` automatically. -/
+The Picard formula proves that each supplied line-bundle representative is
+isomorphic to the corresponding tensor product by `O(prefix j)`; the adapter
+chooses such isomorphisms. The divisor-derived triangle is therefore
+constructed below rather than stored. Only residual orthogonality of its
+quotient remains supplied. -/
 structure PaperCurveChainData
     {exceptional : T.ExceptionalityData}
     {semiorthogonal : T.SemiorthogonalityData}
@@ -178,11 +233,15 @@ structure PaperCurveChainData
           ((chain i).prefixDivisor j.1 (by
             have := j.2
             omega))
-  /-- Successive line bundles fit into distinguished triangles whose quotient
-  terms are killed by the residual projection. -/
-  projectionTriangles :
-    OrthogonalExceptionalBlocks.ProjectionChainData B.blocks
-      (T.residualComponent exceptional semiorthogonal)
+  /-- The quotient in each canonical divisor-chain step is killed by the
+  residual projection. This is the remaining geometric input after the
+  distinguished triangle itself has been constructed from the Cartier
+  sequence. -/
+  quotientOrthogonal : ∀ (i : I) (j : ℕ)
+    (hj : j + 1 < B.blocks.length i),
+    (T.residualComponent exceptional semiorthogonal).rightOrthogonal
+      (((chain i).lineBundleStepTriangle
+        (T.bundles (B.firstBundleIndex i)) j (by omega)).obj₃)
 
 namespace PaperCurveChainData
 
@@ -192,6 +251,115 @@ variable {exceptional : T.ExceptionalityData}
 variable {I : Type t} [Fintype I]
 variable {B : T.PaperBlockData exceptional semiorthogonal I}
 variable (A : T.PaperCurveChainData B)
+
+/-- The Picard-class formula chooses an isomorphism from each selected bundle
+to the first bundle tensored by the corresponding Cartier prefix. -/
+noncomputable def memberLineIso (i : I) (j : Fin (B.blocks.length i)) :
+    (T.bundles (B.bundleIndex ⟨i, j⟩)).line ≅
+      ((T.bundles (B.firstBundleIndex i)).tensor
+        (CartierDivisor.lineBundleData
+          ((A.chain i).prefixDivisor j.1 (by omega)))).line :=
+  Classical.choice
+    ((LineBundleData.toPic_eq_iff _ _).1 (by
+      simpa using A.memberClass i j))
+
+/-- The member-line isomorphism lifted to bounded coherent derived objects. -/
+noncomputable def memberBoundedDerivedIso
+    (i : I) (j : Fin (B.blocks.length i)) :
+    (T.bundles (B.bundleIndex ⟨i, j⟩)).boundedDerivedObject ≅
+      ((T.bundles (B.firstBundleIndex i)).tensor
+        (CartierDivisor.lineBundleData
+          ((A.chain i).prefixDivisor j.1 (by omega)))).boundedDerivedObject :=
+  ObjectProperty.isoMk
+    (P := (DerivedCategory.TStructure.t (C := Coh Y)).bounded)
+    (LineBundleData.derivedObjectIso (A.memberLineIso i j))
+
+/-- Identify a block member with its canonical tensor-by-prefix derived
+object, combining the block presentation and the Picard-class formula. -/
+noncomputable def blockMemberTensorIso
+    (i : I) (j : Fin (B.blocks.length i)) :
+    (B.blocks.collection i).obj j ≅
+      ((T.bundles (B.firstBundleIndex i)).tensor
+        (CartierDivisor.lineBundleData
+          ((A.chain i).prefixDivisor j.1 (by omega)))).boundedDerivedObject :=
+  B.bundleIso ⟨i, j⟩ ≪≫ A.memberBoundedDerivedIso i j
+
+/-- The canonical divisor-derived triangle underlying the `j`-th step of a
+paper block. -/
+noncomputable def stepTriangle (i : I) (j : ℕ)
+    (hj : j + 1 < B.blocks.length i) : Triangle (DerivedCat Y) :=
+  (A.chain i).lineBundleStepTriangle
+    (T.bundles (B.firstBundleIndex i)) j (by omega)
+
+/-- Identify the source of the canonical step triangle with the `j`-th block
+member. -/
+noncomputable def stepTriangleObj₁Iso (i : I) (j : ℕ)
+    (hj : j + 1 < B.blocks.length i) :
+    (A.stepTriangle i j hj).obj₁ ≅
+      (B.blocks.collection i).obj ⟨j, by omega⟩ :=
+  (A.chain i).lineBundleStepTriangleObj₁Iso
+      (T.bundles (B.firstBundleIndex i)) j (by omega) ≪≫
+    (A.blockMemberTensorIso i ⟨j, by omega⟩).symm
+
+/-- Identify the target of the canonical step triangle with the next block
+member. -/
+noncomputable def stepTriangleObj₂Iso (i : I) (j : ℕ)
+    (hj : j + 1 < B.blocks.length i) :
+    (A.stepTriangle i j hj).obj₂ ≅
+      (B.blocks.collection i).obj ⟨j + 1, hj⟩ :=
+  (A.chain i).lineBundleStepTriangleObj₂Iso
+      (T.bundles (B.firstBundleIndex i)) j (by omega) ≪≫
+    (A.blockMemberTensorIso i ⟨j + 1, hj⟩).symm
+
+/-- The canonical divisor triangle transported to the paper's chosen block
+representatives. Its first morphism is the required successive block map. -/
+noncomputable def projectionTriangle (i : I) (j : ℕ)
+    (hj : j + 1 < B.blocks.length i) : Triangle (DerivedCat Y) where
+  obj₁ := (B.blocks.collection i).obj ⟨j, by omega⟩
+  obj₂ := (B.blocks.collection i).obj ⟨j + 1, hj⟩
+  obj₃ := (A.stepTriangle i j hj).obj₃
+  mor₁ := (A.stepTriangleObj₁Iso i j hj).inv ≫
+    (A.stepTriangle i j hj).mor₁ ≫
+      (A.stepTriangleObj₂Iso i j hj).hom
+  mor₂ := (A.stepTriangleObj₂Iso i j hj).inv ≫
+    (A.stepTriangle i j hj).mor₂
+  mor₃ := (A.stepTriangle i j hj).mor₃ ≫
+    (A.stepTriangleObj₁Iso i j hj).hom⟦(1 : ℤ)⟧'
+
+/-- Canonical comparison from the divisor step triangle to its transport onto
+the selected block representatives. -/
+noncomputable def stepTriangleIso (i : I) (j : ℕ)
+    (hj : j + 1 < B.blocks.length i) :
+    A.stepTriangle i j hj ≅ A.projectionTriangle i j hj := by
+  dsimp only [projectionTriangle]
+  refine Triangle.isoMk _ _
+    (A.stepTriangleObj₁Iso i j hj)
+    (A.stepTriangleObj₂Iso i j hj) (Iso.refl _) ?_ ?_ ?_
+  · simp only [Iso.hom_inv_id_assoc]
+  · simp only [Iso.refl_hom, Category.comp_id, Iso.hom_inv_id_assoc]
+  · simp only [Iso.refl_hom, Category.id_comp]
+
+/-- The transported paper-block step triangle is distinguished. -/
+theorem projectionTriangle_distinguished (i : I) (j : ℕ)
+    (hj : j + 1 < B.blocks.length i) :
+    A.projectionTriangle i j hj ∈ distTriang (DerivedCat Y) :=
+  isomorphic_distinguished _
+    ((A.chain i).lineBundleStepTriangle_distinguished
+      (T.bundles (B.firstBundleIndex i)) j (by omega)) _
+    (A.stepTriangleIso i j hj).symm
+
+/-- Construct the complete projection-chain triangle data from Cartier
+sequences, Picard-class identifications, and the supplied quotient
+orthogonality. -/
+noncomputable def projectionTriangles :
+    OrthogonalExceptionalBlocks.ProjectionChainData B.blocks
+      (T.residualComponent exceptional semiorthogonal) where
+  stepMap i j hj := (A.projectionTriangle i j hj).mor₁
+  cone i j hj := (A.projectionTriangle i j hj).obj₃
+  toCone i j hj := (A.projectionTriangle i j hj).mor₂
+  connecting i j hj := (A.projectionTriangle i j hj).mor₃
+  distinguished i j hj := A.projectionTriangle_distinguished i j hj
+  cone_mem i j hj := A.quotientOrthogonal i j hj
 
 /-- **Paper II, Remark 2.3(ii): every member of a block has the same residual
 projection as its first member.**

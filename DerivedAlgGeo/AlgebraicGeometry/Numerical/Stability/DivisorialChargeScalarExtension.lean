@@ -32,6 +32,8 @@ No basis, Picard-rank hypothesis, or choice of generators occurs here.
 open Complex
 open scoped TensorProduct
 
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
+
 namespace AlgebraicGeometry.Numerical.Surface
 
 noncomputable section

@@ -212,6 +212,20 @@ variable {P : ObjectProperty X} {Q : ObjectProperty Y}
   {source : List X} {target : List Y}
 variable (A : ExtensionSequenceData corr stage source target)
 
+omit [Preadditive X] [HasShift X ℤ] [HasZeroObject X]
+  [∀ n : ℤ, (shiftFunctor X n).Additive]
+  [Pretriangulated X] [HasZeroObject Y]
+  [Preadditive Y] [HasShift Y ℤ]
+  [∀ n : ℤ, (shiftFunctor Y n).Additive] [Pretriangulated Y] in
+private theorem kernel_transport
+    {P P' : ObjectProperty X} {Q Q' : ObjectProperty Y}
+    (hP : P = P') (hQ : Q = Q')
+    (s : KernelExtensionStage P Q corr) :
+    (hQ ▸ hP ▸ s).kernel = s.kernel := by
+  cases hP
+  cases hQ
+  rfl
+
 /-- The final stage obtained by recursively consuming all one-step
 extensions. -/
 noncomputable def finalStage :
@@ -262,6 +276,23 @@ noncomputable def toKernelEquivalence
       iso := ?_ }
   exact ((ObjectProperty.topEquivalence X).inverse.isoWhiskerLeft
     final.restrictionIso).symm
+
+@[simp]
+theorem toKernelEquivalence_kernel
+    (hX : adjoinList P source = (⊤ : ObjectProperty X))
+    (hY : adjoinList Q target = (⊤ : ObjectProperty Y)) :
+    (A.toKernelEquivalence hX hY).kernel = A.finalKernel := by
+  change (hY ▸ hX ▸ A.finalStage).kernel = A.finalStage.kernel
+  exact kernel_transport hX hY A.finalStage
+
+/-- The final kernel transform is an equivalence once the iterated spans
+exhaust both ambient categories. -/
+theorem finalTransform_isEquivalence
+    (hX : adjoinList P source = (⊤ : ObjectProperty X))
+    (hY : adjoinList Q target = (⊤ : ObjectProperty Y)) :
+    (corr.transform A.finalKernel).IsEquivalence :=
+  by simpa only [toKernelEquivalence_kernel] using
+    (A.toKernelEquivalence hX hY).transform_isEquivalence
 
 end ExtensionSequenceData
 

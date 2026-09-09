@@ -5,12 +5,11 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.BMT
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.BogomolovGieseker
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.Slope
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.SurfaceCharge
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.SurfaceChargeNumerical
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialCharge
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeNumerical
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeScalarExtension
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallSlice
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialDiscriminant
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallCircle
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallTransport
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.TwistedChern
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.WallTransport

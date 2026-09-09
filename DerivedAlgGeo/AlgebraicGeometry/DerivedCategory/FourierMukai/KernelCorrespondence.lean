@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
+import DerivedAlgGeo.CategoryTheory.Triangulated.ExactFunctorFamily
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Basic
 
 /-!
@@ -151,14 +152,16 @@ section Tensor
 /-- **Derived tensor product on `Dᵇ(Coh Z)`, supplied.**
 
 The `⊗^L` slot.  Stated as a bifunctor, matching `Correspondence.tensor`, so
-that `tensor.obj K` is "twist by the kernel `K`".
+that `tensor.obj K` is "twist by the kernel `K`".  Its exactness is packaged
+once as an `ExactBifunctor`: both partial tensor functors are exact, the shift
+comparisons are natural in the fixed variable, and the two shift directions
+satisfy Mathlib's Koszul compatibility law.
 
-Exactness is asked of each *twist* rather than of the bifunctor: the
-Fourier--Mukai transform with kernel `K` needs `− ⊗^L K` to be triangulated, and
-demanding it for every `K` at once is the honest reading of that, but it is
-strictly more than any single transform consumes.  A caller who can only supply
-exactness for particular kernels should weaken this class rather than
-instantiate it dishonestly.
+This two-slot contract is what kernel variation actually needs.  A fixed
+Fourier--Mukai transform consumes exactness in the second tensor variable,
+whereas varying the kernel and taking its cone consumes exactness in the first.
+Independent one-slot witnesses would not supply the required global
+naturality.
 
 No monoidal structure is asked for: not associativity, not symmetry, not a
 unit.  `Correspondence` uses none of them, and `FourierMukai/Basic.lean`'s own
@@ -169,12 +172,67 @@ class HasDerivedTensor (Z : SchemeBaseChange S) [IsLocallyNoetherian Z.left] whe
     SchemeBoundedCoherentDerivedCategory Z.left ⥤
       SchemeBoundedCoherentDerivedCategory Z.left ⥤
         SchemeBoundedCoherentDerivedCategory Z.left
-  /-- Each twist is additive. -/
-  additive : ∀ K, (derivedTensor.obj K).Additive
-  /-- Each twist commutes with the shift. -/
-  commShift : ∀ K, (derivedTensor.obj K).CommShift ℤ
-  /-- Each twist is triangulated. -/
-  isTriangulated : ∀ K, (derivedTensor.obj K).IsTriangulated
+  /-- Exactness and coherent shift behavior in both tensor variables. -/
+  exact : Functor.ExactBifunctor derivedTensor
+
+namespace HasDerivedTensor
+
+variable {Z : SchemeBaseChange S} [IsLocallyNoetherian Z.left]
+  [HasDerivedTensor Z]
+
+/-- The exact-bifunctor witness selected by the derived tensor contract. -/
+def exactBifunctor : Functor.ExactBifunctor (HasDerivedTensor.derivedTensor (Z := Z)) :=
+  HasDerivedTensor.exact
+
+/-- Exactness of the family obtained by varying the first (kernel) input. -/
+noncomputable def firstFamily :
+    Functor.ExactFamily (HasDerivedTensor.derivedTensor (Z := Z)) :=
+  exactBifunctor |>.firstFamily
+
+/-- Exactness of the family obtained by varying the second input. -/
+noncomputable def secondFamily :
+    Functor.ExactFamily (HasDerivedTensor.derivedTensor (Z := Z)).flip :=
+  exactBifunctor |>.secondFamily
+
+/-- A fixed first input gives a shift-coherent partial tensor functor. -/
+@[reducible] noncomputable def commShift
+    (K : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((HasDerivedTensor.derivedTensor (Z := Z)).obj K).CommShift ℤ :=
+  exactBifunctor |>.secondCommShift K
+
+/-- A fixed first input gives a triangulated partial tensor functor. -/
+theorem isTriangulated (K : SchemeBoundedCoherentDerivedCategory Z.left) :
+    letI := commShift K
+    ((HasDerivedTensor.derivedTensor (Z := Z)).obj K).IsTriangulated :=
+  exactBifunctor |>.secondTriangulated K
+
+/-- A fixed first input gives an additive partial tensor functor. -/
+theorem additive (K : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((HasDerivedTensor.derivedTensor (Z := Z)).obj K).Additive := by
+  letI := commShift K
+  letI := isTriangulated K
+  infer_instance
+
+/-- A fixed second input gives a shift-coherent partial tensor functor. -/
+@[reducible] noncomputable def flipCommShift
+    (E : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((HasDerivedTensor.derivedTensor (Z := Z)).flip.obj E).CommShift ℤ :=
+  exactBifunctor |>.firstCommShift E
+
+/-- A fixed second input gives a triangulated partial tensor functor. -/
+theorem flipIsTriangulated (E : SchemeBoundedCoherentDerivedCategory Z.left) :
+    letI := flipCommShift E
+    ((HasDerivedTensor.derivedTensor (Z := Z)).flip.obj E).IsTriangulated :=
+  exactBifunctor |>.firstTriangulated E
+
+/-- A fixed second input gives an additive partial tensor functor. -/
+theorem flipAdditive (E : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((HasDerivedTensor.derivedTensor (Z := Z)).flip.obj E).Additive := by
+  letI := flipCommShift E
+  letI := flipIsTriangulated E
+  infer_instance
+
+end HasDerivedTensor
 
 /-- The derived tensor bifunctor, named. -/
 def derivedTensor (Z : SchemeBaseChange S) [IsLocallyNoetherian Z.left]
@@ -190,7 +248,8 @@ instance derivedTensor_additive (Z : SchemeBaseChange S) [IsLocallyNoetherian Z.
   dsimp [derivedTensor]
   exact HasDerivedTensor.additive K
 
-instance derivedTensorCommShift (Z : SchemeBaseChange S) [IsLocallyNoetherian Z.left]
+noncomputable instance derivedTensorCommShift (Z : SchemeBaseChange S)
+    [IsLocallyNoetherian Z.left]
     [HasDerivedTensor Z] (K : SchemeBoundedCoherentDerivedCategory Z.left) :
     ((derivedTensor Z).obj K).CommShift ℤ := by
   dsimp [derivedTensor]
@@ -201,6 +260,26 @@ instance derivedTensor_isTriangulated (Z : SchemeBaseChange S) [IsLocallyNoether
     ((derivedTensor Z).obj K).IsTriangulated := by
   dsimp [derivedTensor]
   exact HasDerivedTensor.isTriangulated K
+
+noncomputable instance derivedTensorFlipCommShift (Z : SchemeBaseChange S)
+    [IsLocallyNoetherian Z.left] [HasDerivedTensor Z]
+    (E : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((derivedTensor Z).flip.obj E).CommShift ℤ := by
+  dsimp [derivedTensor]
+  exact HasDerivedTensor.flipCommShift E
+
+instance derivedTensorFlip_isTriangulated (Z : SchemeBaseChange S)
+    [IsLocallyNoetherian Z.left] [HasDerivedTensor Z]
+    (E : SchemeBoundedCoherentDerivedCategory Z.left) :
+    ((derivedTensor Z).flip.obj E).IsTriangulated := by
+  dsimp [derivedTensor]
+  exact HasDerivedTensor.flipIsTriangulated E
+
+/-- The derived tensor bifunctor with its exactness in both variables exposed. -/
+noncomputable def derivedTensorExactBifunctor (Z : SchemeBaseChange S)
+    [IsLocallyNoetherian Z.left] [HasDerivedTensor Z] :
+    Functor.ExactBifunctor (derivedTensor Z) :=
+  HasDerivedTensor.exactBifunctor
 
 end Tensor
 

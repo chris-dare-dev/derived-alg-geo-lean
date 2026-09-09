@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import Mathlib.CategoryTheory.Triangulated.Functor
 import Mathlib.CategoryTheory.Triangulated.Pretriangulated
 import DerivedAlgGeo.CategoryTheory.Triangulated.PretriangulatedAxioms
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Cone
@@ -61,10 +62,6 @@ open DGCategoryStruct DGCategory Limits Pretriangulated
 namespace H0
 
 variable {C : Type u} [DGCategory.{v} C]
-
-/-- The morphism of `H⁰` a cocycle represents. -/
-def homMk {X Y : C} (f : cocycles X Y) : (show H0 C from X) ⟶ (show H0 C from Y) :=
-  QuotientAddGroup.mk f
 
 variable (C) in
 /-- The shift functors of `H⁰` are additive. `HasShift` unfolds to
@@ -179,30 +176,6 @@ lemma contractible_distinguished (X : H0 C) :
   · exact (Category.comp_id _).trans (Category.id_comp _).symm
   · exact hZ.eq_of_tgt _ _
   · exact (isZero_zero (H0 C)).eq_of_src _ _
-
-omit [IsPretriangulated C] in
-/-- Two cocycles represent the same morphism of `H⁰` when they differ by a
-coboundary. The quotient's own `eq_iff_sub_mem` says so; this restates it on the
-underlying elements, which is the form every homotopy in the track produces. -/
-lemma homMk_eq_homMk {X Y : C} {a b : cocycles X Y}
-    (h : (a : (dgHom X Y).X 0) - (b : (dgHom X Y).X 0) ∈ coboundaries X Y) :
-    homMk a = homMk b := by
-  refine QuotientAddGroup.eq_iff_sub_mem.2 ?_
-  show ((a - b : cocycles X Y) : (dgHom X Y).X 0) ∈ coboundaries X Y
-  rw [AddSubgroupClass.coe_sub]
-  exact h
-
-omit [IsPretriangulated C] in
-/-- Negation of an `H⁰` morphism is negation of a representative. -/
-lemma homMk_neg {X Y : C} (a : cocycles X Y) : homMk (-a) = -homMk a := rfl
-
-omit [IsPretriangulated C] in
-/-- Composition of `H⁰` morphisms is `dgComp` of representatives. -/
-lemma homMk_comp {X Y Z : C} (a : cocycles X Y) (b : cocycles Y Z) :
-    homMk a ≫ homMk b =
-      homMk ⟨dgComp 0 0 0 (by omega) (a : (dgHom X Y).X 0) (b : (dgHom Y Z).X 0),
-        Z0.comp_mem a.2 b.2⟩ :=
-  rfl
 
 section Rotate
 
@@ -327,29 +300,168 @@ lemma exists_lift_of_comm (a : cocycles X₁ X₂) (b : cocycles Y₁ Y₂)
     rw [coboundariesIn, AddSubgroup.mem_addSubgroupOf] at h
     exact h
   obtain ⟨k, hk⟩ := hsub
-  refine ⟨⟨hc₁.lift hc₂ (a : (dgHom X₁ X₂).X 0) (b : (dgHom Y₁ Y₂).X 0) k,
-    hc₁.lift_closed hc₂ _ _ _ a.2 b.2 hk⟩, ?_, ?_⟩
+  let s : DGCategory.HomotopySquare
+      (f₁ : (dgHom X₁ Y₁).X 0) (f₂ : (dgHom X₂ Y₂).X 0)
+      (a : (dgHom X₁ X₂).X 0) (b : (dgHom Y₁ Y₂).X 0) :=
+    DGCategory.HomotopySquare.ofBoundary a.2 b.2 k hk
+  let m := hc₁.liftMorphism hc₂
+    (a : (dgHom X₁ X₂).X 0) (b : (dgHom Y₁ Y₂).X 0) s
+  refine ⟨m.hom, ?_, ?_⟩
   · exact (homMk_comp _ _).trans
-      ((congrArg (@homMk C _ _ _) (Subtype.ext (hc₁.inr_comp_lift hc₂ _ _ _))).trans
+      ((congrArg (@homMk C _ _ _) (Subtype.ext m.inr_comm)).trans
         (homMk_comp _ _).symm)
-  · have h1 : homMk ⟨hc₁.lift hc₂ (a : (dgHom X₁ X₂).X 0) (b : (dgHom Y₁ Y₂).X 0) k,
-          hc₁.lift_closed hc₂ _ _ _ a.2 b.2 hk⟩ ≫
+  · have h1 : homMk m.hom ≫
         homMk ⟨hc₂.toShift (IsPretriangulated.shiftWitness C X₂ 1),
           hc₂.toShift_mem_cocycles _⟩ =
       homMk ⟨dgComp 0 0 0 (by omega)
           (hc₁.toShift (IsPretriangulated.shiftWitness C X₁ 1))
-          (IsShiftBy.mapShift (IsPretriangulated.shiftWitness C X₁ 1)
+        (IsShiftBy.mapShift (IsPretriangulated.shiftWitness C X₁ 1)
             (IsPretriangulated.shiftWitness C X₂ 1) (a : (dgHom X₁ X₂).X 0)),
         Z0.comp_mem (hc₁.toShift_mem_cocycles _)
           (IsShiftBy.mapShift_mem_cocycles _ _ a.2)⟩ :=
       (homMk_comp _ _).trans (congrArg (@homMk C _ _ _) (Subtype.ext
-        (hc₁.lift_comp_toShift hc₂ (a : (dgHom X₁ X₂).X 0) (b : (dgHom Y₁ Y₂).X 0) k
-          (IsPretriangulated.shiftWitness C X₁ 1)
+        (m.toShift_comm (IsPretriangulated.shiftWitness C X₁ 1)
           (IsPretriangulated.shiftWitness C X₂ 1))))
     exact ((congrArg _ (H0.shiftFunctor_map_mk (C := C) 1 a)).trans
       (homMk_comp _ _)).trans h1.symm
 
 end Lift
+
+end H0
+
+/-! ### Dg cone morphisms as morphisms of `H⁰` cone triangles
+
+The adapter below is a construction on `IsConeOf.Morphism`, so it lives in that
+namespace rather than in `H0`; the `H0` names it uses are opened locally. -/
+
+section DgMorphism
+
+open H0
+
+variable {C : Type u} [DGCategory.{v} C] [IsPretriangulated C]
+variable {X₁ Y₁ Z₁ X₂ Y₂ Z₂ : C} {f₁ : cocycles X₁ Y₁} {f₂ : cocycles X₂ Y₂}
+  {a : (dgHom X₁ X₂).X 0} {b : (dgHom Y₁ Y₂).X 0}
+  (hc₁ : IsConeOf (f₁ : (dgHom X₁ Y₁).X 0) Z₁)
+  (hc₂ : IsConeOf (f₂ : (dgHom X₂ Y₂).X 0) Z₂)
+
+/-- A dg cone morphism descends to a morphism of the associated `H⁰` cone
+triangles. The retained degree-minus-one homotopy supplies the first square;
+the two strict cone squares supply the other two. -/
+noncomputable def IsConeOf.Morphism.toTriangleMorphism
+    (m : IsConeOf.Morphism hc₁ hc₂ a b) :
+    coneTriangle f₁ hc₁ ⟶ coneTriangle f₂ hc₂ := by
+  refine Triangle.homMk _ _
+    (H0.homMk (C := C) ⟨a, m.a_closed⟩)
+    (H0.homMk (C := C) ⟨b, m.b_closed⟩) (H0.homMk (C := C) m.hom) ?_ ?_ ?_
+  · change H0.homMk (C := C) f₁ ≫ H0.homMk (C := C) ⟨b, m.b_closed⟩ =
+      H0.homMk (C := C) ⟨a, m.a_closed⟩ ≫ H0.homMk (C := C) f₂
+    rw [H0.homMk_comp, H0.homMk_comp]
+    apply QuotientAddGroup.eq_iff_sub_mem.mpr
+    rw [coboundariesIn, AddSubgroup.mem_addSubgroupOf]
+    exact ⟨m.homotopy, m.homotopy_boundary⟩
+  · change H0.homMk (C := C) ⟨hc₁.inr, hc₁.inr_mem_cocycles⟩ ≫
+        H0.homMk (C := C) m.hom =
+      H0.homMk (C := C) ⟨b, m.b_closed⟩ ≫
+        H0.homMk (C := C) ⟨hc₂.inr, hc₂.inr_mem_cocycles⟩
+    rw [H0.homMk_comp, H0.homMk_comp]
+    exact congrArg _ (Subtype.ext m.inr_comm)
+  · change (-H0.homMk (C := C) ⟨hc₁.toShift
+        (IsPretriangulated.shiftWitness C X₁ 1), hc₁.toShift_mem_cocycles _⟩) ≫
+      (CategoryTheory.shiftFunctor (H0 C) (1 : ℤ)).map
+        (H0.homMk (C := C) ⟨a, m.a_closed⟩) =
+      H0.homMk (C := C) m.hom ≫
+        (-H0.homMk (C := C) ⟨hc₂.toShift
+          (IsPretriangulated.shiftWitness C X₂ 1), hc₂.toShift_mem_cocycles _⟩)
+    let s₁ := IsPretriangulated.shiftWitness C X₁ 1
+    let s₂ := IsPretriangulated.shiftWitness C X₂ 1
+    have h : H0.homMk (C := C) m.hom ≫
+          H0.homMk (C := C) ⟨hc₂.toShift s₂, hc₂.toShift_mem_cocycles s₂⟩ =
+        H0.homMk (C := C) ⟨hc₁.toShift s₁, hc₁.toShift_mem_cocycles s₁⟩ ≫
+          H0.homMk (C := C) ⟨IsShiftBy.mapShift s₁ s₂ a,
+            IsShiftBy.mapShift_mem_cocycles s₁ s₂ m.a_closed⟩ := by
+      exact (H0.homMk_comp _ _).trans
+        (congrArg _ (Subtype.ext (m.toShift_comm s₁ s₂)))
+    have hs : H0.homMk (C := C) ⟨hc₁.toShift s₁, hc₁.toShift_mem_cocycles s₁⟩ ≫
+          (CategoryTheory.shiftFunctor (H0 C) (1 : ℤ)).map
+            (H0.homMk (C := C) (⟨a, m.a_closed⟩ : cocycles X₁ X₂)) =
+        H0.homMk (C := C) m.hom ≫
+          H0.homMk (C := C) ⟨hc₂.toShift s₂, hc₂.toShift_mem_cocycles s₂⟩ := by
+      exact ((congrArg _ (shiftFunctor_map_mk (C := C) 1
+        (⟨a, m.a_closed⟩ : cocycles X₁ X₂))).trans
+        (H0.homMk_comp _ _)).trans h.symm
+    calc
+      (-H0.homMk (C := C) ⟨hc₁.toShift s₁, hc₁.toShift_mem_cocycles s₁⟩) ≫
+            (CategoryTheory.shiftFunctor (H0 C) (1 : ℤ)).map
+              (H0.homMk (C := C) (⟨a, m.a_closed⟩ : cocycles X₁ X₂)) =
+          -(H0.homMk (C := C) ⟨hc₁.toShift s₁, hc₁.toShift_mem_cocycles s₁⟩ ≫
+            (CategoryTheory.shiftFunctor (H0 C) (1 : ℤ)).map
+              (H0.homMk (C := C) (⟨a, m.a_closed⟩ : cocycles X₁ X₂))) :=
+        Preadditive.neg_comp _ _
+      _ = -(H0.homMk (C := C) m.hom ≫
+          H0.homMk (C := C) ⟨hc₂.toShift s₂, hc₂.toShift_mem_cocycles s₂⟩) :=
+        congrArg Neg.neg hs
+      _ = H0.homMk (C := C) m.hom ≫
+          (-H0.homMk (C := C) ⟨hc₂.toShift s₂, hc₂.toShift_mem_cocycles s₂⟩) :=
+        (Preadditive.comp_neg _ _).symm
+
+/-- The `H⁰` adapter sends the canonical identity cone morphism to the
+identity triangle morphism. -/
+@[simp]
+lemma IsConeOf.Morphism.toTriangleMorphism_id
+    {X Y Z : C} {f : cocycles X Y}
+    (hc : IsConeOf (f : (dgHom X Y).X 0) Z) :
+    IsConeOf.Morphism.toTriangleMorphism hc hc (IsConeOf.Morphism.id hc) =
+      𝟙 (coneTriangle f hc) := by
+  apply Triangle.hom_ext <;> rfl
+
+end DgMorphism
+
+section DgMorphismComposition
+
+open H0
+
+variable {C : Type u} [DGCategory.{v} C] [IsPretriangulated C]
+variable {X₁ Y₁ Z₁ X₂ Y₂ Z₂ X₃ Y₃ Z₃ : C}
+  {f₁ : cocycles X₁ Y₁} {f₂ : cocycles X₂ Y₂} {f₃ : cocycles X₃ Y₃}
+  {a₁ : (dgHom X₁ X₂).X 0} {b₁ : (dgHom Y₁ Y₂).X 0}
+  {a₂ : (dgHom X₂ X₃).X 0} {b₂ : (dgHom Y₂ Y₃).X 0}
+  (hc₁ : IsConeOf (f₁ : (dgHom X₁ Y₁).X 0) Z₁)
+  (hc₂ : IsConeOf (f₂ : (dgHom X₂ Y₂).X 0) Z₂)
+  (hc₃ : IsConeOf (f₃ : (dgHom X₃ Y₃).X 0) Z₃)
+
+/-- The H⁰ adapter preserves composition of dg cone morphisms. -/
+lemma IsConeOf.Morphism.toTriangleMorphism_comp
+    (m₁ : IsConeOf.Morphism hc₁ hc₂ a₁ b₁)
+    (m₂ : IsConeOf.Morphism hc₂ hc₃ a₂ b₂) :
+    IsConeOf.Morphism.toTriangleMorphism hc₁ hc₃
+        (IsConeOf.Morphism.comp (hc₁ := hc₁) (hc₂ := hc₂) (hc₃ := hc₃)
+          m₁ m₂) =
+      IsConeOf.Morphism.toTriangleMorphism hc₁ hc₂ m₁ ≫
+        IsConeOf.Morphism.toTriangleMorphism hc₂ hc₃ m₂ := by
+  apply Triangle.hom_ext
+  · change H0.homMk (C := C)
+        ⟨dgComp 0 0 0 (by omega) a₁ a₂,
+          dgComp_closed (by omega) (by omega) m₁.a_closed m₂.a_closed⟩ =
+      H0.homMk (C := C) ⟨a₁, m₁.a_closed⟩ ≫
+        H0.homMk (C := C) ⟨a₂, m₂.a_closed⟩
+    rw [H0.homMk_comp]
+  · change H0.homMk (C := C)
+        ⟨dgComp 0 0 0 (by omega) b₁ b₂,
+          dgComp_closed (by omega) (by omega) m₁.b_closed m₂.b_closed⟩ =
+      H0.homMk (C := C) ⟨b₁, m₁.b_closed⟩ ≫
+        H0.homMk (C := C) ⟨b₂, m₂.b_closed⟩
+    rw [H0.homMk_comp]
+  · change H0.homMk (C := C)
+        ⟨dgComp 0 0 0 (by omega) m₁.hom.1 m₂.hom.1,
+          dgComp_closed (by omega) (by omega) m₁.hom.2 m₂.hom.2⟩ =
+      H0.homMk (C := C) m₁.hom ≫ H0.homMk (C := C) m₂.hom
+    rw [H0.homMk_comp]
+
+end DgMorphismComposition
+
+namespace H0
+
+variable {C : Type u} [DGCategory.{v} C] [IsPretriangulated C]
 
 section Instance
 

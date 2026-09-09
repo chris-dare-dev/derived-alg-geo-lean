@@ -84,8 +84,9 @@ to its category of coherent sheaves. See the module docstring — on a surface
 structure SlopeData (A : Type u) [Category.{v} A] [Abelian A] where
   /-- The rank, as a hom out of the Grothendieck group. -/
   rankHom : K₀Ab A →+ ℤ
-  /-- The degree, as a hom out of the Grothendieck group. -/
-  degreeHom : K₀Ab A →+ ℤ
+  /-- The degree, as a hom out of the Grothendieck group. Real-valued, as in
+  `WeakSlopeData`, so that a real polarisation can supply it. -/
+  degreeHom : K₀Ab A →+ ℝ
   /-- Rank is nonnegative — geometric input. -/
   rank_nonneg : ∀ E : A, 0 ≤ rankHom (K₀Ab.of E)
   /-- A nonzero object of rank zero has positive degree — geometric input, and
@@ -103,7 +104,7 @@ variable (D : SlopeData A)
 abbrev rank (E : A) : ℤ := D.rankHom (K₀Ab.of E)
 
 /-- The degree of an object. -/
-abbrev degree (E : A) : ℤ := D.degreeHom (K₀Ab.of E)
+abbrev degree (E : A) : ℝ := D.degreeHom (K₀Ab.of E)
 
 /-! ### The six formal properties, now theorems
 
@@ -178,7 +179,7 @@ exact sequences is supplied here, and it is the same two-line computation the
 noncomputable def toStabilityFunction : StabilityFunction A where
   Z := K₀Ab.liftOf D.charge (fun S hS ↦ by
     apply Complex.ext
-    · simp [D.degree_additive S hS]
+    · simp only [charge_re, Complex.add_re, D.degree_additive S hS]
       ring
     · simp [D.rank_additive S hS])
   nonzero_mem E hE := by

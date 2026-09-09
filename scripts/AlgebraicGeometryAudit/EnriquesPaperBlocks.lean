@@ -55,8 +55,9 @@ import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperTorelli
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperIIProjectionClassificationData.longer_projectedObject_not_shift
 
 -- The downstream paper-extension layer turns residual admissibility into a
--- chosen projection, records the numerical (-2)-chain geometry and its
--- divisor triangles, proves same projection throughout every block, and
+-- chosen projection, records the numerical (-2)-chain geometry and quotient
+-- orthogonality, constructs its divisor triangles and maps, proves same
+-- projection throughout every block, and
 -- assembles the Ext computations into the two classification packages.
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperResidualAdmissibilityData
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperResidualAdmissibilityData.rightAdmissible
@@ -71,9 +72,25 @@ import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperTorelli
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.prefixDivisor
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.prefixDivisor_zero
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.prefixDivisor_succ
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.prefixDivisor_succ_sub
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.lineBundleStepTriangle
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.lineBundleStepTriangle_distinguished
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.lineBundleStepTriangleObj₁Iso
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.MinusTwoCurveChain.lineBundleStepTriangleObj₂Iso
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.chain
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.memberClass
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.quotientOrthogonal
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.memberLineIso
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.memberBoundedDerivedIso
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.blockMemberTensorIso
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.stepTriangle
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.stepTriangleObj₁Iso
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.stepTriangleObj₂Iso
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.projectionTriangle
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.stepTriangleIso
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.projectionTriangle_distinguished
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.projectionTriangles
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.mk.inj
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperCurveChainData.mk.sizeOf_spec
@@ -115,3 +132,4 @@ import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques.PaperTorelli
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperGeneratedExtensionSequenceData
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperGeneratedExtensionSequenceData.toKernelEquivalence
 #print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperGeneratedExtensionSequenceData.ambientEquivalence
+#print axioms AlgebraicGeometry.EnriquesSurface.IsotropicCollection.PaperGeneratedExtensionSequenceData.transform_isEquivalence

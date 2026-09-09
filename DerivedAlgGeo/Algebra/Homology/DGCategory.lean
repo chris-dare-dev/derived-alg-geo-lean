@@ -3,7 +3,11 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Basic
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Adjunction
+import DerivedAlgGeo.Algebra.Homology.DGCategory.AdjunctionH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Functor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformation
+import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformationH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.H0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Instances
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Linear

@@ -577,6 +577,14 @@ lemma compare_congr {n : ℤ} (s : IsShiftBy X n Y) (t t' : IsShiftBy X n Y')
     (h : t.hom = t'.hom) : compare s t = compare s t' := by
   rw [compare, compare, h]
 
+/-- `compare` also reads its source witness only through its closed element. -/
+lemma compare_congr_left {n : ℤ} (s s' : IsShiftBy X n Y) (t : IsShiftBy X n Y')
+    (h : s.hom = s'.hom) : compare s t = compare s' t := by
+  apply compare_unique s t
+  rw [h, compare]
+  rw [← dgComp_assoc (-n) n (-n) 0 0 (-n) (by omega) (by omega) (by omega),
+    s'.hom_inv, dgId_comp]
+
 /-- The two bracketings of a threefold composite shift carry the same element.
 This is `dgComp_assoc` on the three `hom`s, and nothing more -- which is why
 the associativity coherence is not a diagram chase either. -/

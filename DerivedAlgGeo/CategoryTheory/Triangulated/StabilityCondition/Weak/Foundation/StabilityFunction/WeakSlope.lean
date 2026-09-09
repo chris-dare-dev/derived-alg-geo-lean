@@ -84,8 +84,11 @@ degree at least zero. See the module docstring — the single difference from
 structure WeakSlopeData (A : Type u) [Category.{v} A] [Abelian A] where
   /-- The rank, as a hom out of the Grothendieck group. -/
   rankHom : K₀Ab A →+ ℤ
-  /-- The degree, as a hom out of the Grothendieck group. -/
-  degreeHom : K₀Ab A →+ ℤ
+  /-- The degree, as a hom out of the Grothendieck group. It is real-valued so
+  that a real polarisation `ω` can supply `ω·c₁`; the rank stays integral
+  because integrality of the rank, not of the degree, is what the positivity
+  arguments downstream use. -/
+  degreeHom : K₀Ab A →+ ℝ
   /-- Rank is nonnegative — geometric input. -/
   rank_nonneg : ∀ E : A, 0 ≤ rankHom (K₀Ab.of E)
   /-- A nonzero object of rank zero has nonnegative degree — geometric input,
@@ -103,7 +106,7 @@ variable (D : WeakSlopeData A)
 abbrev rank (E : A) : ℤ := D.rankHom (K₀Ab.of E)
 
 /-- The degree of an object. -/
-abbrev degree (E : A) : ℤ := D.degreeHom (K₀Ab.of E)
+abbrev degree (E : A) : ℝ := D.degreeHom (K₀Ab.of E)
 
 /-! ### The six formal properties
 
@@ -162,7 +165,7 @@ There is no `WeakStabilityFunction A` abbreviation to land in: the name
 noncomputable def toWeakStabilityFunction : WeakStabilityFunctionOn (abelianDatum A) where
   Z := K₀Ab.liftOf D.charge (fun S hS ↦ by
     apply Complex.ext
-    · simp [D.degree_additive S hS]
+    · simp only [charge_re, Complex.add_re, D.degree_additive S hS]
       ring
     · simp [D.rank_additive S hS])
   nonzero_mem E hE := by
@@ -190,7 +193,7 @@ theorem phase_eq_arg_div_pi (E : A) :
 theorem phaseCross_charge (E F : A) :
     phaseCross (D.charge E) (D.charge F)
       = (D.rank E : ℝ) * (D.degree F : ℝ) - (D.degree E : ℝ) * (D.rank F : ℝ) := by
-  simp [phaseCross]
+  simp only [phaseCross, charge_re, charge_im]
   ring
 
 theorem charge_ne_zero_of_rank_pos {E : A} (hE : 0 < D.rank E) : D.charge E ≠ 0 := by

@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeNumerical
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallSlice
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Slice
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.WallTransport
 
 /-!
@@ -33,6 +33,8 @@ presentations of `-∫ ch₂^B + (ω²/2) ch₀ + i ω·ch₁^B`.
 open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 
 universe u v w
+
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
 
 namespace AlgebraicGeometry.Numerical.Surface
 

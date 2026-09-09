@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.SurfaceCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Coordinates
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.RealForm
 
 /-!
@@ -43,7 +43,7 @@ tilted heart, prove ampleness, or establish the support property.
 
 open Complex
 
-namespace AlgebraicGeometry.Numerical.Surface
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
 
 noncomputable section
 
@@ -410,4 +410,4 @@ end ChernCharacter
 
 end
 
-end AlgebraicGeometry.Numerical.Surface
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
