@@ -252,3 +252,53 @@ walls genuinely move with u, and barDiscriminant_parameters discharges the
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.wall_ofST_circle_eq
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.wall_ofST_iff_circle
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.wall_ofST_line_eq
+
+/-! ## The Mukai presentation, as a second child
+
+SqrtTodd carries the only two components of sqrt(td_X) a surface Mukai vector
+can see: the codimension-one class and the integrated codimension-two number.
+It is SUPPLIED data; no theorem here claims it comes from a geometric Todd
+class. mukaiVector is ch . sqrt(td_X), whose third coordinate is deliberately
+NOT ch_2, and mukaiCharge is Bridgeland's (exp(B + i omega), v(E)) built from
+the SAME Mukai.expChargeHom the ordinary charge uses -- recorded by
+centralCharge_eq_expChargeHom, which is what makes the divisorial layer and the
+Mukai lattice layer share one charge formula rather than two.
+
+The two presentations are two values of one parameter: mukaiCharge_trivial says
+the ordinary divisorial charge is the Mukai charge at SqrtTodd.trivial, and
+mukaiCharge_k3 says the K3 Mukai charge is the ordinary charge minus the rank.
+That difference is additive in the class and is not a scalar multiple of the
+charge, so wall_smul does not apply and the two families have different walls;
+keeping them apart is the point. mukaiVector_trivial and mukaiVector_k3 are
+deliberately not simp lemmas -- with pair_zero_left they are simp-provable and
+the normal-form linter rejects the attribute -- but they are the statements that
+identify the vector with Bridgeland's (r, c_1, s), s = ch_2 + rank.
+pair_zero_left and pair_zero_right are the two elementary bilinear-form
+simplifications that identification needs. -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.centralCharge_eq_expChargeHom
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiCharge
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiChargeFamily
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiChargeFamily_charge
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiChargeFamily_trivial
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiCharge_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiCharge_eq_centralCharge_add
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiCharge_k3
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiCharge_trivial
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiVector
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiVector_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiVector_k3
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.mukaiVector_trivial
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.pair_zero_left
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.pair_zero_right
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.divisor
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.k3
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.k3_divisor
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.k3_number
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.mk.inj
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.number
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.trivial
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.trivial_divisor
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.SqrtTodd.trivial_number

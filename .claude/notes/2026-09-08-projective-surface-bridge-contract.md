@@ -369,6 +369,23 @@ The arithmetic boundary is split across composable components:
   transport compresses the first Chern class to `H · ch₁`, so on a surface of
   Picard rank greater than one it is the `H`-slice only, never the full wall
   family of the surface; and
+* `Walls/Divisorial/Mukai.lean` and
+  `Numerical/Stability/DivisorialMukai.lean` give the Mukai presentation its own
+  name instead of overloading the ordinary Chern character.  `SqrtTodd` carries
+  the two components of `√td_X` a surface Mukai vector can see; `mukaiVector` is
+  `ch·√td_X`, whose third coordinate is `ch₂ + √td₁·c₁ + r∫√td₂`; and
+  `mukaiCharge` is Bridgeland's `(exp(B+iω), v(E))` built from the same
+  `Mukai.expChargeHom` the ordinary charge uses, which
+  `centralCharge_eq_expChargeHom` records — so the divisorial layer and the
+  Mukai lattice layer share one charge formula rather than two.  The two
+  presentations are two values of one parameter: at `SqrtTodd.trivial` the
+  Mukai charge is the ordinary charge, and at `SqrtTodd.k3` it is the ordinary
+  charge minus the rank.  The geometric side builds `SqrtTodd` from
+  `sqrtToddComp`, proves `√td = 1 + [pt]` on a K3, and identifies the third
+  coordinate with the repository's existing `K3.mukaiS` and `K3.mukaiSInt`.
+  Not done: a numerical realization for the K3 model itself, and the comparison
+  with the integral `Mukai.MukaiLattice`; and
+
 * `Numerical/Stability/DivisorialWallTransport.lean` joins the two branches
   of the hierarchy below.  For any `NumericalRealization`, the compressed
   `(s,t)` family pulled back through `toNumClassHom` is literally the
@@ -431,8 +448,9 @@ extrapolating the `P²` coordinate record:
   `v(E)=ch(E)sqrt(td_X)` and writes its charge as the Mukai pairing with
   `exp(B+i omega)`. The divisor slot and its intersection form corroborate the
   same intrinsic layer, but the third coordinate is `s=ch₂+rank`, not raw
-  `ch₂`. A future Mukai adapter must therefore be explicit and must not inhabit
-  a field whose contract says it contains the ordinary Chern character.
+  `ch₂`. That adapter landed on 2026-09-09 as `Walls/Divisorial/Mukai.lean`: it
+  is explicitly named and does not inhabit a field whose contract says it
+  contains the ordinary Chern character.
 * [Maciocia, arXiv:1202.4587](https://arxiv.org/abs/1202.4587) identifies
   numerical classes with `(r,c₁,ch₂)`, takes `B=beta` in the full
   `NS(X)_R`, and writes the central charge explicitly using the intersection
@@ -516,25 +534,22 @@ for the projective-family case, where one lattice serves the whole family
 
 The generic layer moved out of `AlgebraicGeometry/` on 2026-09-09; see the
 "Divisorial charge block" entry in `docs/architecture/cutover-ledger.md`, which
-also records where this note's earlier claim about that move was wrong.
+also records where this note's earlier claim about that move was wrong.  The
+named Mukai adapter landed the same day.
 
 The next honest coding boundary is one of:
 
-1. name the Mukai adapter explicitly: a `ChernCharacter → Mukai.RealExtension`
-   map whose third slot is `ch₂ + rank`, tied to `Examples/Surface/K3Mukai.lean`,
-   so Bridgeland's charge is a second child rather than an overload of a field
-   whose contract says it holds the ordinary Chern character;
-2. define a threefold/BMT central-charge family as another child of
+1. define a threefold/BMT central-charge family as another child of
    `Wall.ChargeFamily`, with its own character structure carrying `ch₃` and a
    cubic twist, without promoting the conjectural BMT inequality to a generic
    fact;
-3. add topological chamber and connected-component structure above generic wall
+2. add topological chamber and connected-component structure above generic wall
    sets, only when a topology and local-finiteness hypotheses are explicitly
    available;
-4. connect `Wall.ChargeFamily` to the existing categorical family interfaces
+3. connect `Wall.ChargeFamily` to the existing categorical family interfaces
    once #851 supplies the common relative numerical class-map data, using
    reindexing for base change rather than inventing a second family carrier; or
-5. implement the C1 numerical comparison after the geometric `vLi`/GRR data
+4. implement the C1 numerical comparison after the geometric `vLi`/GRR data
    have an honest owner.
 
 The current layer fixes the formulas, source locations, normalization choices,
