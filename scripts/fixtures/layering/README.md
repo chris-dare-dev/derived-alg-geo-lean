@@ -12,6 +12,7 @@ caught here rather than by the next regression.
 | --- | --- |
 | `allowed/AlgebraicGeometry/Moduli` | geometry imports category theory, geometry, and the stability tree |
 | `allowed/AlgebraicGeometry/DerivedCategory` | neutral derived geometry imports derived-category theory and coherent sheaves |
+| `allowed/AlgebraicGeometry/Stability` | sheaf stability imports intersection theory and the weak slope tree |
 | `forbidden/CategoryTheory/Triangulated` | category theory importing geometry, through an import modifier |
 | `forbidden/AlgebraicGeometry/DerivedCategory` | neutral derived geometry reaching the stability tree transitively |
 | `forbidden/CategoryTheory/Triangulated/StabilityCondition/Weak/Families` | weak stability importing the Bridgeland theory |

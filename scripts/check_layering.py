@@ -98,6 +98,11 @@ STABILITY_CONSUMING_GEOMETRY = (
     f"{GEOMETRY}.Moduli",
     f"{GEOMETRY}.Numerical",
     f"{GEOMETRY}.DerivedCategory.Stability",
+    # Stability of sheaves: slope and Gieseker theory on `Coh X`, whose whole
+    # purpose is to instantiate the abstract slope theory, so it necessarily
+    # reaches the stability tree. Distinct from `DerivedCategory.Stability`,
+    # which is the Dqc/families lane.
+    f"{GEOMETRY}.Stability",
 )
 
 # Paths removed by a structural cutover, relative to the source root. An entry

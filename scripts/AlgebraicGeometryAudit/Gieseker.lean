@@ -1,6 +1,6 @@
 /-
 Gieseker slice of the AlgebraicGeometry audit: the Hilbert function of a coherent sheaf against a
-supplied polarization and the slope theory built from it (#900, #901, #902). Split out so
+supplied polarization and the slope theory built from it (#900, #901, #902, #903). Split out so
 concurrent branches append to different files; see the umbrella file for the contract and reading
 guide.
 -/
@@ -120,3 +120,38 @@ polynomial, not by the argument of a complex charge. -/
 #print axioms AlgebraicGeometry.Stability.Gieseker.exists_top_ne_zero
 #print axioms AlgebraicGeometry.Stability.Gieseker.sum_binomial_eq_of_vanishing
 #print axioms AlgebraicGeometry.Stability.Gieseker.sum_binomial_succ_sub
+
+/-! ## The weak slope datum on `Coh X` (#903)
+
+`MuPositivityData` is the supplied geometric input, two consequences of ampleness that this pin
+cannot prove. Everything else is an instantiation of the existing abstract slope theory: the
+multiplicity homomorphism is `rankHom` verbatim, the degree coefficient is composed with
+`Int.castAddHom ℝ` because `WeakSlopeData.degreeHom` is real-valued, and the slope, charge and
+`WithTop ℝ` honest slope are read off in both the positive-multiplicity and the zero regimes. The
+comparison with Gieseker semistability is delivered in one direction only, and its proof uses
+purity to rule out the multiplicity-zero subobject that would otherwise have slope `⊤`. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuCurvePositivityData
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuCurvePositivityData.degree_pos_of_multiplicity_zero
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuCurvePositivityData.multiplicity_nonneg
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuCurvePositivityData.toMuPositivityData
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuPositivityData
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuPositivityData.degree_nonneg_of_multiplicity_zero
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuPositivityData.multiplicity_nonneg
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_implies_muSemistable
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.slopeData
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.slopeData_charge
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.slopeData_degree
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.slopeData_rank
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.slopeData_slope
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.toWeakSlopeData_slopeData
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.topSlope_le_of_giesekerLE
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_charge
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_degree
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_rank
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_slope
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_slope_eq_normalizedCoefficient
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_topSlope_eq_normalizedCoefficient
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_topSlope_of_multiplicity_pos
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.weakSlopeData_topSlope_of_multiplicity_zero
