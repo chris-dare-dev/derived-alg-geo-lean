@@ -838,3 +838,18 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleFunctor_map_hom₂
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleFunctor_map_hom₃
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleFunctor_obj_mem_distinguishedTriangles
+
+-- Naturality of that functor in the transformation.  A strictly commuting
+-- square of closed degree-zero dg natural transformations gives a natural
+-- transformation of triangle functors, and the cone lifts are natural on the
+-- nose rather than up to homotopy -- which is exactly what the square being
+-- strict buys.  The homotopy-coherent case is not treated.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.squareAt
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.squareConeMorphism
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.squareTriangleMorphism
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.functor_map_comp_lift
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.squareTriangleMorphism_hom₁
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.squareTriangleMorphism_hom₂
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.squareTriangleMorphism_hom₃
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleNatTrans
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleNatTrans_app

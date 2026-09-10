@@ -58,6 +58,10 @@ IsConeOf
          │  Anno--Logvinenko state SR ⟶ Id_B ⟶ T
          └─ triangleFunctor: H⁰ C ⥤ Triangle (H⁰ D), every value distinguished;
             the third square is the connecting map, carried by IsConeOf.Morphism
+            └─ triangleNatTrans: natural in a STRICT square of closed
+               degree-zero transformations; the cone lifts are natural on the
+               nose.  The homotopy-coherent case needs uniqueness of the lift
+               up to homotopy, which the repository does not have.
 
 DGAdjunction
 ├─ closed unit and counit
