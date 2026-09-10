@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Spherical.Finiteness
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Spherical.WallComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Region
 
 /-!
@@ -83,6 +84,22 @@ theorem ofDivisorSpace_carrier (h : S.HodgeDefinite H) {K : Set (D × D)} (hK : 
     (ofDivisorSpace h hK hpos).carrier = K := rfl
 
 end BoundedRegion
+
+/-! ### The two charts are one -/
+
+omit [FiniteDimensional ℝ D] in
+/-- **The divisorial exponential plane is the spherical chart plane.**
+
+`Divisorial/Region.lean` builds the plane of `exp(B + iω)` for a divisor space,
+and `Spherical/WallComparison.lean` builds it in the `(β, ω)` chart.  Since
+`Spherical/Basic.lean` now spells its chart with `Mukai.expRe` and
+`Mukai.expIm`, the two are the same submodule and this is `rfl`.
+
+With it, `mem_periodDomainWall_iff_mem_wall` reads as a statement about a
+divisor space: the walls counted by `Divisorial/Region.lean` are the vanishing
+locus inside the half-walls counted here. -/
+theorem expPlane_eq_chartPlane (S : Divisorial.DivisorSpace D) (B omega : D) :
+    S.expPlane B omega = chartPlane S.intersection B omega := rfl
 
 /-! ### The consequences, now non-vacuous -/
 

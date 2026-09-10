@@ -143,31 +143,51 @@ computed componentwise because the Mukai form is extended `ℂ`-bilinearly. -/
 
 /-- The real part of `exp(β + iω)`.
 
-`noncomputable` because `Real` division is: the `/2` comes from `(β + iω)²/2`
-and there is no way around it. `chartIm` needs no such marker. -/
-noncomputable def chartRe (β ω : V) : Mukai.RealExtension V :=
-  (1, β, (q β β - q ω ω) / 2)
+**This is `Mukai.expRe`, not a second definition of it.**  This file used to
+declare the exponential chart a second time, exactly as it used to declare the
+pairing a second time — the same `(1, β, (q β β - q ω ω)/2)`, in a file that
+already imports `Mukai/RealForm.lean`.  The names are kept because the wall
+statements below read better with them, but they are abbreviations now, so the
+`(β, ω)` chart of this subtree and the exponential chart of the period-domain
+subtree are one object rather than two. -/
+noncomputable abbrev chartRe (β ω : V) : Mukai.RealExtension V :=
+  Mukai.expRe q β ω
 
-/-- The imaginary part of `exp(β + iω)`. -/
-def chartIm (β ω : V) : Mukai.RealExtension V :=
-  (0, ω, q β ω)
+/-- The imaginary part of `exp(β + iω)`.  As with `chartRe`, this is
+`Mukai.expIm` and not a second definition. -/
+noncomputable abbrev chartIm (β ω : V) : Mukai.RealExtension V :=
+  Mukai.expIm q β ω
+
+/-- The chart in coordinates.  **Not** a `simp` lemma: `chartRe` is an
+abbreviation for `Mukai.expRe`, so tagging this would unfold the exponential
+chart globally and displace the normal form the period-domain layer already
+uses — `Mukai.realPairing_expRe_expRe` and its siblings would become redundant.
+The two proofs below name it explicitly instead. -/
+theorem chartRe_eq (β ω : V) : chartRe q β ω = (1, β, (q β β - q ω ω) / 2) := rfl
+
+/-- The imaginary part in coordinates.  Not a `simp` lemma, for the reason given
+at `chartRe_eq`. -/
+theorem chartIm_eq (β ω : V) : chartIm q β ω = (0, ω, q β ω) := rfl
 
 /-- `Re (℧, δ)` for `℧ = exp(β + iω)`. Inherits `noncomputable` from
 `chartRe`. -/
 noncomputable def pairingRe (β ω : V) (δ : Mukai.RealExtension V) : ℝ :=
   pairing q (chartRe q β ω) δ
 
-/-- `Im (℧, δ)` for `℧ = exp(β + iω)`. -/
-def pairingIm (β ω : V) (δ : Mukai.RealExtension V) : ℝ :=
+/-- `Im (℧, δ)` for `℧ = exp(β + iω)`.
+
+`noncomputable` since `Mukai.expIm` is; the marker is bookkeeping, not
+mathematics, and it is the price of the two charts being one object. -/
+noncomputable def pairingIm (β ω : V) (δ : Mukai.RealExtension V) : ℝ :=
   pairing q (chartIm q β ω) δ
 
 theorem pairingRe_eq (β ω : V) (δ : Mukai.RealExtension V) :
     pairingRe q β ω δ = q β δ.2.1 - δ.2.2 - δ.1 * ((q β β - q ω ω) / 2) := by
-  simp only [pairingRe, pairing, Mukai.realPairing, chartRe, one_mul]
+  simp only [pairingRe, pairing, Mukai.realPairing, chartRe_eq, one_mul]
 
 theorem pairingIm_eq (β ω : V) (δ : Mukai.RealExtension V) :
     pairingIm q β ω δ = q ω δ.2.1 - δ.1 * q β ω := by
-  simp only [pairingIm, pairing, Mukai.realPairing, chartIm, zero_mul, sub_zero]
+  simp only [pairingIm, pairing, Mukai.realPairing, chartIm_eq, zero_mul, sub_zero]
 
 /-! ### The two identities
 
