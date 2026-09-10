@@ -33,6 +33,7 @@ have been discharged.
 DGFunctor.HomogeneousNatTrans
 ├─ all integer degrees and Koszul naturality
 ├─ pointwise differential and vertical composition
+├─ h0Comparison: H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D), no fullness or faithfulness
 ├─ whiskerLeft / whiskerRight (both sign-free) and additive-hom packaging
 │  ├─ interchange: the Godement sign (-1)^(m n) is naturality of the second
 │  └─ hcomp: the Godement product, graded Leibniz, strictly associative
@@ -52,9 +53,15 @@ IsConeOf
          ├─ assembled cone DGFunctor
          ├─ canonical inr/inl transformations and boundary equation
          ├─ fst / snd: the cone projections, graded-natural in degrees 1 and 0
-         └─ isConeOf: a cone in the dg category DGFunctor C D itself, so the
-            twist candidate is a cone OF FUNCTORS, the form in which
-            Anno--Logvinenko state SR ⟶ Id_B ⟶ T
+         ├─ isConeOf: a cone in the dg category DGFunctor C D itself, so the
+         │  twist candidate is a cone OF FUNCTORS, the form in which
+         │  Anno--Logvinenko state SR ⟶ Id_B ⟶ T
+         └─ triangleFunctor: H⁰ C ⥤ Triangle (H⁰ D), every value distinguished;
+            the third square is the connecting map, carried by IsConeOf.Morphism
+            └─ triangleNatTrans: natural in a STRICT square of closed
+               degree-zero transformations; the cone lifts are natural on the
+               nose.  The homotopy-coherent case needs uniqueness of the lift
+               up to homotopy, which the repository does not have.
 
 DGAdjunction
 ├─ closed unit and counit
