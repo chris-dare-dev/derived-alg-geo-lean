@@ -1547,6 +1547,7 @@ a subobject. -/
 
 #print axioms CategoryTheory.Subobject.mapFunctorIso
 #print axioms CategoryTheory.Subobject.mapFunctorIso_hom_arrow
+#print axioms CategoryTheory.Subobject.mapFunctorIso_hom_arrow_assoc
 #print axioms CategoryTheory.Subobject.ofLE_mapFunctor
 #print axioms CategoryTheory.Subobject.cokernelOfLEMapFunctorIso
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.not_isZero_functor_obj

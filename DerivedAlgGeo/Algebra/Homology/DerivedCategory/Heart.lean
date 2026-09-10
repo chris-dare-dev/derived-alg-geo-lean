@@ -91,13 +91,13 @@ noncomputable def toHeart : C ⥤ (TStructure.t (C := C)).heart.FullSubcategory 
 theorem toHeart_comp_ι :
     toHeart C ⋙ (TStructure.t (C := C)).heart.ι = singleFunctor C 0 := rfl
 
-instance : (toHeart C).Full :=
+instance toHeart_full : (toHeart C).Full :=
   inferInstanceAs (ObjectProperty.lift _ (singleFunctor C 0) (heart_singleFunctor_obj C)).Full
 
-instance : (toHeart C).Faithful :=
+instance toHeart_faithful : (toHeart C).Faithful :=
   inferInstanceAs (ObjectProperty.lift _ (singleFunctor C 0) (heart_singleFunctor_obj C)).Faithful
 
-instance : (toHeart C).EssSurj where
+instance toHeart_essSurj : (toHeart C).EssSurj where
   mem_essImage := by
     rintro ⟨X, hX⟩
     rw [TStructure.mem_heart_iff] at hX
@@ -107,7 +107,7 @@ instance : (toHeart C).EssSurj where
     obtain ⟨Y, ⟨e⟩⟩ := exists_iso_singleFunctor_obj_of_isGE_of_isLE X 0
     exact ⟨Y, ⟨((TStructure.t (C := C)).heart.ι).preimageIso e.symm⟩⟩
 
-instance : (toHeart C).IsEquivalence where
+instance toHeart_isEquivalence : (toHeart C).IsEquivalence where
 
 /-- **The heart of the canonical t-structure is `C`.**
 

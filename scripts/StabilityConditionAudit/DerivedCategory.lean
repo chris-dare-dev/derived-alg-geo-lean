@@ -119,6 +119,10 @@ numerical data written on `C` onto the heart. -/
 #print axioms DerivedCategory.ιHeart_eq
 #print axioms DerivedCategory.toHeart
 #print axioms DerivedCategory.toHeart_comp_ι
+#print axioms DerivedCategory.toHeart_full
+#print axioms DerivedCategory.toHeart_faithful
+#print axioms DerivedCategory.toHeart_essSurj
+#print axioms DerivedCategory.toHeart_isEquivalence
 #print axioms DerivedCategory.toHeart_obj_obj
 #print axioms DerivedCategory.heartEquivalence
 #print axioms DerivedCategory.heartEquivalence_functor
