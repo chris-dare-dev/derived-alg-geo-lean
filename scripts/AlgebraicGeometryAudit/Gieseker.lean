@@ -1,6 +1,6 @@
 /-
 Gieseker slice of the AlgebraicGeometry audit: the Hilbert function of a coherent sheaf against a
-supplied polarization and the slope theory built from it (#900, #901, #902, #903, #904). Split out so
+supplied polarization and the slope theory built from it (#900, #901, #902, #903, #904, #905). Split out so
 concurrent branches append to different files; see the umbrella file for the contract and reading
 guide.
 -/
@@ -249,3 +249,45 @@ criterion indexes by `Fin G.n` with `G.n` opaque, which cannot be case-split. -/
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.firstFactorIso
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muZero_lt_topSlope
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.splice
+
+/-! ## The recursion, and the weak HN property (#905)
+
+`hasHNProperty` is the payoff of the lane: the abstract engine has never before been run on a
+geometric category. Termination is NOT the chain condition of `MuHNInput`, as #905 states -- that
+condition makes the maximal destabilizing subobject exist at each step. What descends is
+multiplicity, and a single induction on it fails, because multiplicity is additive and a torsion
+maximal destabilizing subobject has multiplicity zero. That step happens at most once, since
+`isPure_cokernel` makes the quotient pure, so the recursion is staged:
+`exists_filtration_of_pure` inducts on multiplicity and `exists_filtration` splits off the single
+torsion step first. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.isSemistable_of_maximalDestabilizing_eq_top
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.not_isZero_cokernel_of_ne_top
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_cokernel
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.isPure_cokernel
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_filtration_of_pure
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_filtration
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hasHNProperty
+
+/-! ## What the HN property unlocks (#905, items 4-6)
+
+Pure application of the abstract API to the filtration above: no re-proof. `hnFiltration` picks
+one of the filtrations with choice, so `muPlus` and `muMinus` are about that choice; the one
+statement with mathematical content, `filtration_muPlus_ne_top_of_isPure`, is proved for an
+arbitrary filtration and only then specialized. The `hnTors`/`hnFree` splitting comes verbatim
+from `Foundation/StabilityFunction/WeakSplitting.lean`. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hnFiltration
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muPlus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muMinus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muMinus_le_muPlus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muPlus_eq_topSlope_chain_one
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.not_isZero_chain_one
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.filtration_muPlus_ne_top_of_isPure
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muPlus_ne_top_of_isPure
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_implies_hn_trivial
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_hn_trivial_n
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_hn_trivial_muPlus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_hn_trivial_muMinus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_subobject_hnTors_cokernel_hnFree
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_shortExact_hnTors_hnFree
