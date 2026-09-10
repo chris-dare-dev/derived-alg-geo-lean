@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Subobject.Lattice
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Zero
+import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
+import Mathlib.CategoryTheory.Abelian.Basic
 
 /-!
 # Subobjects along a functor, and the order isomorphism from an equivalence
@@ -178,5 +180,51 @@ theorem mapEquivalence_apply (X : A) (P : Subobject X) :
     mapEquivalence e X P = mapFunctor e.functor P := rfl
 
 end MapEquivalence
+
+section Cokernel
+
+variable [Abelian A] [Abelian B] (F : A ⥤ B) [F.PreservesZeroMorphisms]
+  [F.PreservesMonomorphisms] [PreservesFiniteColimits F]
+
+/-- **The underlying object of a pushed-forward subobject** is the image of the underlying object.
+
+`mapFunctor F P` is only propositionally `mk (F.map P.arrow)`, so this is an `isoOfEqMk` rather
+than a definitional equality. -/
+noncomputable def mapFunctorIso {X : A} (P : Subobject X) :
+    ((mapFunctor F P : Subobject (F.obj X)) : B) ≅ F.obj (P : A) :=
+  Subobject.isoOfEqMk _ (F.map P.arrow) (mapFunctor_eq_mk_arrow F P)
+
+omit [Abelian A] [Abelian B] [F.PreservesZeroMorphisms] [PreservesFiniteColimits F] in
+@[reassoc (attr := simp)]
+theorem mapFunctorIso_hom_arrow {X : A} (P : Subobject X) :
+    (mapFunctorIso F P).hom ≫ F.map P.arrow = (mapFunctor F P).arrow := by
+  simp [mapFunctorIso]
+
+omit [Abelian A] [Abelian B] [F.PreservesZeroMorphisms] [PreservesFiniteColimits F] in
+/-- **The chain step transports.** Both sides are maps into a subobject, so it is enough to compose
+with its arrow, which is a mono. -/
+theorem ofLE_mapFunctor {X : A} {P Q : Subobject X} (h : P ≤ Q) :
+    Subobject.ofLE (mapFunctor F P) (mapFunctor F Q) (mapFunctor_monotone F h) ≫
+        (mapFunctorIso F Q).hom =
+      (mapFunctorIso F P).hom ≫ F.map (Subobject.ofLE P Q h) := by
+  haveI : Mono (F.map Q.arrow) := inferInstance
+  refine (cancel_mono (F.map Q.arrow)).1 ?_
+  rw [Category.assoc, mapFunctorIso_hom_arrow, Subobject.ofLE_arrow, Category.assoc,
+    ← F.map_comp, Subobject.ofLE_arrow, mapFunctorIso_hom_arrow]
+
+/-- **The successive quotient transports.**
+
+This is what a Harder–Narasimhan filtration needs beyond the order isomorphism: its factors are
+cokernels of chain steps, and they must be identified with the images of the original factors.
+The square of `ofLE_mapFunctor` is an isomorphism square, so the cokernels agree; then `F`
+preserving finite colimits moves the cokernel inside. -/
+noncomputable def cokernelOfLEMapFunctorIso {X : A} {P Q : Subobject X} (h : P ≤ Q) :
+    cokernel (Subobject.ofLE (mapFunctor F P) (mapFunctor F Q) (mapFunctor_monotone F h)) ≅
+      F.obj (cokernel (Subobject.ofLE P Q h)) :=
+  (cokernel.mapIso _ (F.map (Subobject.ofLE P Q h)) (mapFunctorIso F P) (mapFunctorIso F Q)
+      (ofLE_mapFunctor F h)).trans
+    (PreservesCokernel.iso F (Subobject.ofLE P Q h)).symm
+
+end Cokernel
 
 end CategoryTheory.Subobject

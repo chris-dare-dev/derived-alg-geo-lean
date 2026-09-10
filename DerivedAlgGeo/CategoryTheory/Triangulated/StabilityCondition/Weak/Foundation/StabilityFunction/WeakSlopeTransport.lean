@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakSlopeTop
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Functorial
+import DerivedAlgGeo.CategoryTheory.SubobjectEquivalence
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakSlopeGeometry
 
 /-!
 # Transporting weak slope data along an equivalence of abelian categories
@@ -28,11 +30,18 @@ definition, and `congr_rank_functor` is the one a consumer starting from an obje
 Nothing is transported by `rfl` alone — `congr_rank_functor` needs the unit isomorphism, which is
 why it is a theorem and not a `simp` unfolding.
 
+## Semistability
+
+Semistability is not a statement about a homomorphism: it quantifies over the subobjects of an
+object. It transports because `Subobject.mapEquivalence` is an order isomorphism and in particular
+surjective, so every subobject of the image is the image of a subobject, and its slope is the
+original slope by `mapFunctorIso`.
+
 ## What is not here
 
-The Harder–Narasimhan property is not transported. That is a statement about chains of subobjects
-and their cokernels rather than about a homomorphism, so it needs the equivalence to be carried
-through `Subobject` and `cokernel`, and it is a separate piece of work.
+The Harder–Narasimhan property itself. A filtration also names the cokernel of each chain step, so
+transporting one needs `Subobject.cokernelOfLEMapFunctorIso` and an isomorphism-invariance lemma
+for filtrations that does not yet exist.
 -/
 
 universe v₁ v₂ u₁ u₂
@@ -132,6 +141,46 @@ theorem congr_topSlope_functor (X : A) :
       D.topSlope_of_rank_zero (by rw [← hrank]; exact h.symm)]
   · rw [(D.congr e).topSlope_of_rank_pos h,
       D.topSlope_of_rank_pos (by rw [← hrank]; exact h), congr_slope_functor]
+
+/-- An equivalence carries nonzero objects to nonzero objects. -/
+theorem not_isZero_functor_obj {Z : A} (hZ : ¬IsZero Z) : ¬IsZero (e.functor.obj Z) := by
+  intro hz
+  exact hZ ((e.inverse.map_isZero hz).of_iso (e.unitIso.app Z))
+
+/-- **The slope of a transported subobject is the original slope.** -/
+theorem congr_topSlope_mapFunctor {Z : A} (P : Subobject Z)
+    [e.functor.PreservesMonomorphisms] :
+    (D.congr e).topSlope
+        ((Subobject.mapFunctor e.functor P : Subobject (e.functor.obj Z)) : B) =
+      D.topSlope ((P : A)) := by
+  rw [show (D.congr e).topSlope
+      ((Subobject.mapFunctor e.functor P : Subobject (e.functor.obj Z)) : B) =
+      (D.congr e).topSlope (e.functor.obj (P : A)) from
+    (D.congr e).toWeakStabilityFunction.slope_eq_of_iso
+      (Subobject.mapFunctorIso e.functor P)]
+  exact congr_topSlope_functor D e _
+
+/-- **Semistability transports along an equivalence.**
+
+Every subobject of the image is the image of a subobject, because `Subobject.mapEquivalence` is an
+order isomorphism and so surjective; its slope is the original slope. -/
+theorem congr_isSemistable [e.functor.PreservesMonomorphisms]
+    [e.inverse.PreservesMonomorphisms] {Z : A}
+    (h : D.toWeakStabilityFunction.IsSemistable Z) :
+    (D.congr e).toWeakStabilityFunction.IsSemistable (e.functor.obj Z) := by
+  refine ⟨not_isZero_functor_obj e h.1, ?_⟩
+  intro P' hP'
+  obtain ⟨P, rfl⟩ := (Subobject.mapEquivalence e Z).surjective P'
+  rw [Subobject.mapEquivalence_apply] at hP' ⊢
+  have hP : ¬IsZero ((P : A)) := by
+    intro hz
+    exact hP' ((e.functor.map_isZero hz).of_iso
+      (Subobject.mapFunctorIso e.functor P))
+  have hslope := congr_topSlope_mapFunctor D e P
+  have hZ := congr_topSlope_functor D e Z
+  show (D.congr e).topSlope _ ≤ (D.congr e).topSlope _
+  rw [hslope, hZ]
+  exact h.2 P hP
 
 end WeakSlopeData
 

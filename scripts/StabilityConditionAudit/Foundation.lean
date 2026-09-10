@@ -1533,3 +1533,23 @@ dependent in the ambient object. `map_inv_map_hom` exists for the same reason --
 #print axioms CategoryTheory.Subobject.mapFunctor_inverse_functor
 #print axioms CategoryTheory.Subobject.mapEquivalence
 #print axioms CategoryTheory.Subobject.mapEquivalence_apply
+
+/-! ### Subobject cokernels along a functor, and semistability transport (#1121)
+
+`mapFunctorIso` identifies the underlying object of a pushed-forward subobject with the image of
+the underlying object; it is an `isoOfEqMk` rather than a definitional equality because
+`mapFunctor F P` is only propositionally `mk (F.map P.arrow)`. `cokernelOfLEMapFunctorIso` is what
+a Harder-Narasimhan filtration needs beyond the order isomorphism: a filtration's factors are
+cokernels of chain steps, so they must be identified with the images of the original factors.
+
+Semistability is not a statement about a homomorphism -- it quantifies over subobjects -- and it
+transports because `mapEquivalence` is surjective, so every subobject of the image is the image of
+a subobject. -/
+
+#print axioms CategoryTheory.Subobject.mapFunctorIso
+#print axioms CategoryTheory.Subobject.mapFunctorIso_hom_arrow
+#print axioms CategoryTheory.Subobject.ofLE_mapFunctor
+#print axioms CategoryTheory.Subobject.cokernelOfLEMapFunctorIso
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.not_isZero_functor_obj
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope_mapFunctor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_isSemistable
