@@ -109,13 +109,19 @@ that comparison are instance hypotheses to be discharged by the realization.
    action on a degree-`p` morphism carries the sign `(-1)^(n * p)`; the
    Leibniz rule forces it (`IsShiftBy.shiftMap_d`) and no constant sign works.
 
-   What remains open here is the *comparison* data, not the shift itself.
-   Anno--Logvinenko's definition needs the shifted comparison maps between two
-   chosen shifts of the same functor, and `IsShiftBy.compare` supplies those
-   only objectwise; nothing packages them as a natural transformation of the
-   shifted functors, and no coherence between `shiftedFunctor` for `n` and for
-   `m` is proved.  So the shift exists as a field of the instance and not yet
-   as a shift *functor* with an additive structure on the degree.
+   The comparison data is now there too.  `IsShiftBy.shiftMap_compare` makes
+   the objectwise comparison of two chosen shifts natural in every degree, and
+   `IsShiftBy.comp'_shiftMap` says transport across a composite shift is the
+   two transports in turn.  On top of those, `DGFunctor.shiftedFunctorAdd` and
+   `DGFunctor.shiftedFunctorZero` are the two coherences -- shifting by `n`
+   then `m` agrees with shifting by `n + m`, and shifting by `0` changes
+   nothing -- each closed and invertible, so each is an isomorphism in the dg
+   category of dg functors rather than merely a map.
+
+   What is still missing is the *associativity* coherence between the two
+   `shiftedFunctorAdd` isomorphisms for a triple `n, m, k`, and any statement
+   assembling the family into a `HasShift`-style structure.  Neither is needed
+   by the triangles below, which is why this slice stopped here.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
