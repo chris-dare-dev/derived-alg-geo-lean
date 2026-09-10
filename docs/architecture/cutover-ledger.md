@@ -7,6 +7,54 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Bounded dévissage for the derived functor of an exact functor
+  (2026-09-10, #1069/#1070/#1071):
+  `Algebra/Homology/DerivedCategory/CohomologyObjectProperty/Bounded.lean` owns
+  `DerivedCategory.bounded_induction` and the truncation stability of
+  `cohomologyIn`; `Algebra/Homology/DerivedCategory/ExactFunctor/Bounded.lean`
+  owns `Functor.mapDerivedCategory_map_bijective_of_bounded` and
+  `Functor.exists_bounded_iso_mapDerivedCategory_obj`. For an exact
+  `F : A ⥤ B` between abelian categories that is bijective on every `Ext`
+  group, the derived functor is fully faithful on bounded objects and hits
+  every bounded object whose cohomology lies in the essential image of `F`;
+  that is `Dᵇ(A) ≌ Dᵇ_{F(A)}(B)`, stated in Mathlib's namespace with no
+  geometry, and it is an upstream candidate. The one geometric consumer,
+  `AlgebraicGeometry/DerivedCategory/Dqc/Identification.lean`, reduces
+  `BoundedCoherentDqcIdentification X` on a locally noetherian scheme to the
+  single proposition `CoherentExtComparison X`: `Coh.ι X` is bijective on
+  `Ext^n(F, G)` for coherent `F`, `G`. The `comparison` field is `Iso.refl _`.
+  Three decisions are recorded here so the sub-issues do not reopen them.
+  1. *The #1069 formulation fork is settled as: neither form is on the path.*
+     The identification as typed lands in `D(X.Modules)`, not in a derived
+     category of quasi-coherent sheaves, and `Dqc.lean` pins the functor to
+     `mapDerivedCategory (Coh.ι X)`. Once full faithfulness is known,
+     essential surjectivity is the formal cone argument above, so the
+     dévissage that classically consumes coherent subsheaves (subobject form,
+     Stacks 01PG) is not consumed, and the Ind form is not either. The
+     scheme-level approximation statement becomes relevant only for a route
+     through an abelian category of quasi-coherent sheaves, which the
+     repository does not have; it stays unwritten until such a route exists.
+  2. *The #1070 route taken is the general root, not the special case.* The
+     route not taken, a direct proof for `Coh ⊂ QCoh`, would not have reached
+     the stated target anyway: the surjection-lifting hypothesis of Stacks
+     0FCL fails for `Coh X ⊆ X.Modules`. On `X = 𝔸¹`, the module sheaf
+     `F := ⨁_{U ⊊ X open} j_{U!}𝒪_U` surjects onto `𝒪_X`, but `Γ(X, F) = 0`
+     because a nonzero section of `𝒪_U` on a proper open of an integral scheme
+     has support `U`, which is not closed; so `Hom(M~, F) = Hom(M, Γ(X, F)) = 0`
+     for every quasi-coherent `M~`, and no coherent sheaf maps onto `𝒪_X`
+     through `F`. The Ext comparison is therefore genuine geometric content.
+  3. *What supplies `CoherentExtComparison X` remains open.* The classical
+     proofs pass through `D(QCoh X) ≌ D_qc(X)` (Stacks 08DB, the coherator) or
+     through quasi-coherent injectives being injective in `X.Modules`
+     (Hartshorne, *Residues and Duality* II.7.18); neither is available at
+     this Mathlib pin. Mathlib's own sufficient conditions,
+     `Functor.mapExt_bijective_of_preservesProjectiveObjects` and
+     `…_of_preservesInjectiveObjects`, do not apply: `Coh X` has neither
+     enough projectives nor enough injectives. For an affine noetherian `X`
+     the comparison appears reachable from the affine vanishing already in
+     `AlgebraicGeometry/Cohomology/Derived/AffineVanishing.lean` together with
+     finite free resolutions and the truncation argument, and that is the
+     natural next slice; it has not been attempted.
 - Divisorial charge block (2026-09-09):
   `CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/` owns the
   central-charge arithmetic that `Walls/Numerical/` performs in three
