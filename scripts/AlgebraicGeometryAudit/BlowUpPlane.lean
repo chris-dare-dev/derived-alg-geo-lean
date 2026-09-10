@@ -146,6 +146,7 @@ records the ample cone for the reader; no theorem uses it. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.hQ_mul_pointQ
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.hQ_ptCoeff
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.hasQuadraticSupportProperty
+#print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.hasSignatureTwo
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.hasSupportProperty
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.hodgeDefinite
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.hodgeDefinite_antiCanonical
