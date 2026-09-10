@@ -305,6 +305,269 @@ theorem exists_shift_dgFunctor (F : DGFunctor C D) (n : ℤ) :
 
 end Shift
 
+/-! ### Coherence of the shift in the degree
+
+`shiftedFunctor` shifts by one integer.  A shift *functor* also needs the two
+coherences: shifting by `n` and then by `m` agrees with shifting by `n + m`,
+and shifting by `0` changes nothing.  Both hold up to a canonical
+isomorphism and not on the nose, because the shifted objects are chosen and
+two choices are only canonically isomorphic.
+
+Both comparisons below are `IsShiftBy.compare` at every object.  What has to
+be proved is that the objectwise comparison is *natural*, and that is
+`IsShiftBy.shiftMap_compare` together with `IsShiftBy.comp'_shiftMap`.  The
+signs take care of themselves: the two composed shifts contribute
+`(-1)^(m p)` and `(-1)^(n p)`, whose product is the `(-1)^(r p)` of the single
+shift because `n p + m p = r p`. -/
+
+section Coherence
+
+variable [IsPretriangulated D] (F : DGFunctor C D)
+
+/-- The two chosen shift witnesses at one object, composed into a single
+witness for the total degree. -/
+noncomputable def shiftWitnessComp (n m r : ℤ) (h : n + m = r) (X : C) :
+    IsShiftBy (F.obj X) r ((F.shiftedFunctor n).shiftObj m X) :=
+  (F.shiftWitness n X).comp' ((F.shiftedFunctor n).shiftWitness m X) r h
+
+/-- **Shifting twice is shifting once, up to the canonical comparison.**
+
+The component is `IsShiftBy.compare`; naturality is
+`IsShiftBy.comp'_shiftMap_smul` followed by `IsShiftBy.shiftMap_compare`, and
+the two signs merge because `n p + m p = r p`. -/
+noncomputable def shiftedFunctorAdd (n m r : ℤ) (h : n + m = r) :
+    HomogeneousNatTrans ((F.shiftedFunctor n).shiftedFunctor m)
+      (F.shiftedFunctor r) 0 :=
+  ⟨fun X => IsShiftBy.compare
+      ((F.shiftWitness n X).comp' ((F.shiftedFunctor n).shiftWitness m X) r h)
+      (F.shiftWitness r X), by
+    intro X Y p q hpq hqp f
+    -- The transformation has degree zero, so the result index is `p`; the
+    -- comparison lemmas are stated there and `rw` matches syntactically.
+    have hq : q = p := by omega
+    cases hq
+    rw [zero_mul, Int.negOnePow_zero, one_smul]
+    show dgComp p 0 p hpq
+        ((m * p).negOnePow •
+          ((F.shiftedFunctor n).shiftWitness m X).shiftMap
+            ((F.shiftedFunctor n).shiftWitness m Y) p
+            ((n * p).negOnePow •
+              (F.shiftWitness n X).shiftMap (F.shiftWitness n Y) p (F.map p f)))
+        (IsShiftBy.compare
+          ((F.shiftWitness n Y).comp' ((F.shiftedFunctor n).shiftWitness m Y) r h)
+          (F.shiftWitness r Y)) =
+      dgComp 0 p p hqp
+        (IsShiftBy.compare
+          ((F.shiftWitness n X).comp' ((F.shiftedFunctor n).shiftWitness m X) r h)
+          (F.shiftWitness r X))
+        ((r * p).negOnePow •
+          (F.shiftWitness r X).shiftMap (F.shiftWitness r Y) p (F.map p f))
+    -- The merged-sign composition lemma is applied through `congrArg` rather
+    -- than `rw`: its left-hand side mentions the shifted object under the
+    -- spelling `(F.shiftedFunctor n).obj X`, and a rewrite that has to choose
+    -- between that and `F.shiftObj n X` does not match.
+    refine Eq.trans (congrArg (fun z => dgComp p 0 p hpq z
+      (IsShiftBy.compare
+        ((F.shiftWitness n Y).comp' ((F.shiftedFunctor n).shiftWitness m Y) r h)
+        (F.shiftWitness r Y)))
+      (IsShiftBy.comp'_shiftMap_smul (F.shiftWitness n X)
+        ((F.shiftedFunctor n).shiftWitness m X) (F.shiftWitness n Y)
+        ((F.shiftedFunctor n).shiftWitness m Y) r h p (F.map p f))) ?_
+    rw [dgComp_units_smul_left,
+      IsShiftBy.shiftMap_compare
+        ((F.shiftWitness n X).comp' ((F.shiftedFunctor n).shiftWitness m X) r h)
+        (F.shiftWitness r X)
+        ((F.shiftWitness n Y).comp' ((F.shiftedFunctor n).shiftWitness m Y) r h)
+        (F.shiftWitness r Y) p (F.map p f),
+      dgComp_units_smul_right]⟩
+
+/-- The comparison in the other direction. -/
+noncomputable def shiftedFunctorAddInv (n m r : ℤ) (h : n + m = r) :
+    HomogeneousNatTrans (F.shiftedFunctor r)
+      ((F.shiftedFunctor n).shiftedFunctor m) 0 :=
+  ⟨fun X => IsShiftBy.compare (F.shiftWitness r X)
+      ((F.shiftWitness n X).comp' ((F.shiftedFunctor n).shiftWitness m X) r h),
+    by
+    intro X Y p q hpq hqp f
+    -- The transformation has degree zero, so the result index is `p`; the
+    -- comparison lemmas are stated there and `rw` matches syntactically.
+    have hq : q = p := by omega
+    cases hq
+    rw [zero_mul, Int.negOnePow_zero, one_smul]
+    show dgComp p 0 p hpq
+        ((r * p).negOnePow •
+          (F.shiftWitness r X).shiftMap (F.shiftWitness r Y) p (F.map p f))
+        (IsShiftBy.compare (F.shiftWitness r Y)
+          ((F.shiftWitness n Y).comp'
+            ((F.shiftedFunctor n).shiftWitness m Y) r h)) =
+      dgComp 0 p p hqp
+        (IsShiftBy.compare (F.shiftWitness r X)
+          ((F.shiftWitness n X).comp'
+            ((F.shiftedFunctor n).shiftWitness m X) r h))
+        ((m * p).negOnePow •
+          ((F.shiftedFunctor n).shiftWitness m X).shiftMap
+            ((F.shiftedFunctor n).shiftWitness m Y) p
+            ((n * p).negOnePow •
+              (F.shiftWitness n X).shiftMap (F.shiftWitness n Y) p (F.map p f)))
+    refine Eq.trans ?_ (congrArg (fun z => dgComp 0 p p hqp
+      (IsShiftBy.compare (F.shiftWitness r X)
+        ((F.shiftWitness n X).comp'
+          ((F.shiftedFunctor n).shiftWitness m X) r h)) z)
+      (IsShiftBy.comp'_shiftMap_smul (F.shiftWitness n X)
+        ((F.shiftedFunctor n).shiftWitness m X) (F.shiftWitness n Y)
+        ((F.shiftedFunctor n).shiftWitness m Y) r h p (F.map p f)).symm)
+    rw [dgComp_units_smul_left,
+      IsShiftBy.shiftMap_compare (F.shiftWitness r X)
+        ((F.shiftWitness n X).comp' ((F.shiftedFunctor n).shiftWitness m X) r h)
+        (F.shiftWitness r Y)
+        ((F.shiftWitness n Y).comp' ((F.shiftedFunctor n).shiftWitness m Y) r h)
+        p (F.map p f),
+      dgComp_units_smul_right]⟩
+
+@[simp]
+theorem shiftedFunctorAdd_app (n m r : ℤ) (h : n + m = r) (X : C) :
+    HomogeneousNatTrans.app (F.shiftedFunctorAdd n m r h) X =
+      IsShiftBy.compare (F.shiftWitnessComp n m r h X) (F.shiftWitness r X) :=
+  rfl
+
+@[simp]
+theorem shiftedFunctorAddInv_app (n m r : ℤ) (h : n + m = r) (X : C) :
+    HomogeneousNatTrans.app (F.shiftedFunctorAddInv n m r h) X =
+      IsShiftBy.compare (F.shiftWitness r X) (F.shiftWitnessComp n m r h X) :=
+  rfl
+
+/-- **Shifting by zero changes nothing, up to the canonical comparison.** -/
+noncomputable def shiftedFunctorZero :
+    HomogeneousNatTrans (F.shiftedFunctor 0) F 0 :=
+  ⟨fun X => IsShiftBy.compare (F.shiftWitness 0 X) (IsShiftBy.self (F.obj X)), by
+    intro X Y p q hpq hqp f
+    -- The transformation has degree zero, so the result index is `p`; the
+    -- comparison lemmas are stated there and `rw` matches syntactically.
+    have hq : q = p := by omega
+    cases hq
+    rw [zero_mul, Int.negOnePow_zero, one_smul]
+    show dgComp p 0 p hpq
+        ((0 * p).negOnePow •
+          (F.shiftWitness 0 X).shiftMap (F.shiftWitness 0 Y) p (F.map p f))
+        (IsShiftBy.compare (F.shiftWitness 0 Y) (IsShiftBy.self (F.obj Y))) =
+      dgComp 0 p p hqp
+        (IsShiftBy.compare (F.shiftWitness 0 X) (IsShiftBy.self (F.obj X)))
+        (F.map p f)
+    -- The comparison first, then the identity transport.  In the other order
+    -- `← shiftMap_self` rewrites both copies of `F.map p f`, including the one
+    -- inside the transport that is not meant to change.
+    rw [zero_mul, Int.negOnePow_zero, one_smul,
+      IsShiftBy.shiftMap_compare (F.shiftWitness 0 X) (IsShiftBy.self (F.obj X))
+        (F.shiftWitness 0 Y) (IsShiftBy.self (F.obj Y)) p (F.map p f),
+      IsShiftBy.shiftMap_self p (F.map p f)]⟩
+
+@[simp]
+theorem shiftedFunctorZero_app (X : C) :
+    HomogeneousNatTrans.app F.shiftedFunctorZero X =
+      IsShiftBy.compare (F.shiftWitness 0 X) (IsShiftBy.self (F.obj X)) :=
+  rfl
+
+
+/-- The comparison from `F` to its shift by zero. -/
+noncomputable def shiftedFunctorZeroInv :
+    HomogeneousNatTrans F (F.shiftedFunctor 0) 0 :=
+  ⟨fun X => IsShiftBy.compare (IsShiftBy.self (F.obj X)) (F.shiftWitness 0 X), by
+    intro X Y p q hpq hqp f
+    have hq : q = p := by omega
+    cases hq
+    rw [zero_mul, Int.negOnePow_zero, one_smul]
+    show dgComp p 0 p hpq (F.map p f)
+        (IsShiftBy.compare (IsShiftBy.self (F.obj Y)) (F.shiftWitness 0 Y)) =
+      dgComp 0 p p hqp
+        (IsShiftBy.compare (IsShiftBy.self (F.obj X)) (F.shiftWitness 0 X))
+        ((0 * p).negOnePow •
+          (F.shiftWitness 0 X).shiftMap (F.shiftWitness 0 Y) p (F.map p f))
+    -- Backwards through the comparison first: it puts the identity transport
+    -- exactly where `shiftMap_self` should act, whereas rewriting with
+    -- `← shiftMap_self` first hits both copies of `F.map p f`.
+    rw [zero_mul, Int.negOnePow_zero, one_smul,
+      ← IsShiftBy.shiftMap_compare (IsShiftBy.self (F.obj X))
+        (F.shiftWitness 0 X) (IsShiftBy.self (F.obj Y)) (F.shiftWitness 0 Y) p
+        (F.map p f),
+      IsShiftBy.shiftMap_self p (F.map p f)]⟩
+
+@[simp]
+theorem shiftedFunctorZeroInv_app (X : C) :
+    HomogeneousNatTrans.app F.shiftedFunctorZeroInv X =
+      IsShiftBy.compare (IsShiftBy.self (F.obj X)) (F.shiftWitness 0 X) :=
+  rfl
+
+/-! Each comparison is closed, and each pair is mutually inverse.  Together
+these say the two coherences are isomorphisms in the dg category of dg
+functors, not merely maps. -/
+
+theorem shiftedFunctorAdd_isClosed (n m r : ℤ) (h : n + m = r) :
+    HomogeneousNatTrans.IsClosed (F.shiftedFunctorAdd n m r h) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  exact IsShiftBy.compare_mem_cocycles _ _
+
+theorem shiftedFunctorAddInv_isClosed (n m r : ℤ) (h : n + m = r) :
+    HomogeneousNatTrans.IsClosed (F.shiftedFunctorAddInv n m r h) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  exact IsShiftBy.compare_mem_cocycles _ _
+
+theorem shiftedFunctorZero_isClosed :
+    HomogeneousNatTrans.IsClosed F.shiftedFunctorZero := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  exact IsShiftBy.compare_mem_cocycles _ _
+
+theorem shiftedFunctorZeroInv_isClosed :
+    HomogeneousNatTrans.IsClosed F.shiftedFunctorZeroInv := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  exact IsShiftBy.compare_mem_cocycles _ _
+
+theorem shiftedFunctorAdd_comp_inv (n m r : ℤ) (h : n + m = r) :
+    HomogeneousNatTrans.composition _ _ _ 0 0 0 (by omega)
+        (F.shiftedFunctorAdd n m r h) (F.shiftedFunctorAddInv n m r h) =
+      HomogeneousNatTrans.id ((F.shiftedFunctor n).shiftedFunctor m) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  rw [HomogeneousNatTrans.composition_apply_app, shiftedFunctorAdd_app,
+    shiftedFunctorAddInv_app, HomogeneousNatTrans.id_app]
+  exact IsShiftBy.compare_comp_compare _ _
+
+theorem shiftedFunctorAddInv_comp (n m r : ℤ) (h : n + m = r) :
+    HomogeneousNatTrans.composition _ _ _ 0 0 0 (by omega)
+        (F.shiftedFunctorAddInv n m r h) (F.shiftedFunctorAdd n m r h) =
+      HomogeneousNatTrans.id (F.shiftedFunctor r) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  rw [HomogeneousNatTrans.composition_apply_app, shiftedFunctorAddInv_app,
+    shiftedFunctorAdd_app, HomogeneousNatTrans.id_app]
+  exact IsShiftBy.compare_comp_compare _ _
+
+theorem shiftedFunctorZero_comp_inv :
+    HomogeneousNatTrans.composition _ _ _ 0 0 0 (by omega)
+        F.shiftedFunctorZero F.shiftedFunctorZeroInv =
+      HomogeneousNatTrans.id (F.shiftedFunctor 0) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  rw [HomogeneousNatTrans.composition_apply_app, shiftedFunctorZero_app,
+    shiftedFunctorZeroInv_app, HomogeneousNatTrans.id_app]
+  exact IsShiftBy.compare_comp_compare _ _
+
+theorem shiftedFunctorZeroInv_comp :
+    HomogeneousNatTrans.composition _ _ _ 0 0 0 (by omega)
+        F.shiftedFunctorZeroInv F.shiftedFunctorZero =
+      HomogeneousNatTrans.id F := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  rw [HomogeneousNatTrans.composition_apply_app, shiftedFunctorZeroInv_app,
+    shiftedFunctorZero_app, HomogeneousNatTrans.id_app]
+  exact IsShiftBy.compare_comp_compare _ _
+
+end Coherence
+
+
 /-- **The dg category of dg functors is pretriangulated whenever the target
 is.**
 

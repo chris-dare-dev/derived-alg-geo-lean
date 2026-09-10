@@ -87,6 +87,8 @@ Category
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
 │  │  │  └─ h0                           closed degree zero becomes an ordinary NatTrans
 │  │  │     └─ h0Comparison              H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D); no fullness claimed
+│  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
+│  │  │  └─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
 │  │  ├─ PreservesShifts                 composable dg capability
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
