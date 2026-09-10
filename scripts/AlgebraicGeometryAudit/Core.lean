@@ -3072,3 +3072,4 @@ not the conclusion renamed. `mukaiVectorQuotient` is what it buys.
 #print axioms AlgebraicGeometry.Scheme.Modules.hasExactColimitsOfShape
 #print axioms AlgebraicGeometry.Scheme.Modules.ab4
 #print axioms AlgebraicGeometry.Scheme.Modules.ab5
+#print axioms AlgebraicGeometry.Scheme.Modules.isGrothendieckAbelian
