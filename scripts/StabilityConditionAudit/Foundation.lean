@@ -1239,7 +1239,6 @@ which is what removes the nonvanishing side conditions from that induction. -/
 /-! ### Truncating a weak HN filtration, and the torsion subobject (`WeakTruncation.lean`) -/
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.exists_crossIndex
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.map_restrictChain
-#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso_μMinus
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso_μPlus
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrict
@@ -1553,3 +1552,24 @@ a subobject. -/
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.not_isZero_functor_obj
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope_mapFunctor
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_isSemistable
+
+/-! ### Transporting Harder-Narasimhan filtrations (#1121)
+
+The payoff of the transport chain: an existence theorem proved on one abelian category becomes an
+existence theorem on any equivalent one.
+
+A filtration is not a homomorphism, so precomposition does not reach it. Three things move and each
+needs its own input: the chain, by the ORDER isomorphism on subobject lattices, which is why a
+merely monotone map would not do -- strictness and the two endpoints would not survive; the
+factors, which are cokernels of chain steps rather than subobjects, by
+`cokernelOfLEMapFunctorIso`; and the slope and semistability of those factors.
+
+The last step crosses a counit isomorphism: transporting a filtration of `Z` gives a filtration of
+the image of `Z`, while `HasHNProperty` on the target asks for a filtration of an arbitrary object,
+so taking the pullback of that object leaves an isomorphism to cross. `AbelianWeakHNFiltration.ofIso`
+in `WeakTruncation.lean` already does that and is reused. -/
+
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congrFiltration
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congrFiltration_n
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congrFiltration_μ
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_hasHNProperty
