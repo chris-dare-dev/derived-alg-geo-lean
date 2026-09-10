@@ -2,6 +2,7 @@
 Foundation slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
+import DerivedAlgGeo.CategoryTheory.SubobjectEquivalence
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
@@ -1498,3 +1499,37 @@ subobjects and their cokernels rather than about a homomorphism. -/
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_slope_functor
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope_functor
+
+/-! ## Subobjects along a functor, and the order isomorphism from an equivalence (#1121)
+
+Mathlib maps subobjects along a morphism and along an isomorphism of objects, both inside one
+category; it does not map them along a FUNCTOR, so an equivalence of categories did not carry
+subobject lattices to subobject lattices. `mapFunctor` supplies the pushforward and
+`mapEquivalence` upgrades it to an order isomorphism.
+
+An order isomorphism is what the consumers need rather than a monotone map: a monotone map carries
+a chain to a chain but need not carry a STRICTLY increasing chain to a strictly increasing one, nor
+the bottom and top to the bottom and top. All three are required to transport a Harder-Narasimhan
+filtration.
+
+`unitAt` exists for a concrete reason worth keeping: `e.unitIso.app X` has type
+`(𝟭 A).obj X ≅ (e.functor ⋙ e.inverse).obj X`, which is definitionally but not syntactically the
+isomorphism wanted, and the difference defeats `rw` on `Subobject.map`, whose statements are
+dependent in the ambient object. `map_inv_map_hom` exists for the same reason -- reaching it by
+`rw [← map_comp]` fails with a motive that is not type correct, because `Subobject.map` carries a
+`Mono` instance argument that changes under the rewrite. -/
+
+#print axioms CategoryTheory.Subobject.mapFunctor
+#print axioms CategoryTheory.Subobject.mapFunctor_mk
+#print axioms CategoryTheory.Subobject.mapFunctor_eq_mk_arrow
+#print axioms CategoryTheory.Subobject.mapFunctor_monotone
+#print axioms CategoryTheory.Subobject.mapFunctor_id
+#print axioms CategoryTheory.Subobject.mapFunctor_comp
+#print axioms CategoryTheory.Subobject.mapFunctor_map_hom
+#print axioms CategoryTheory.Subobject.map_inv_map_hom
+#print axioms CategoryTheory.Subobject.map_hom_map_inv
+#print axioms CategoryTheory.Subobject.unitAt
+#print axioms CategoryTheory.Subobject.unitAt_naturality
+#print axioms CategoryTheory.Subobject.mapFunctor_inverse_functor
+#print axioms CategoryTheory.Subobject.mapEquivalence
+#print axioms CategoryTheory.Subobject.mapEquivalence_apply
