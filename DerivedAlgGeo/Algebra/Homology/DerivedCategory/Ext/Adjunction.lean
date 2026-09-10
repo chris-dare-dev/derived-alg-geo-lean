@@ -227,6 +227,7 @@ section Bijective
 
 variable [EnoughInjectives D]
 
+omit [L.Additive] [PreservesFiniteLimits L] [PreservesFiniteColimits L] [EnoughInjectives D] in
 /-- **In degree zero the comparison is bijective**: it is the adjunction hom-equivalence
 transported through `Ext.mk₀`. -/
 theorem bijective_extAdjunctionMap_zero (A : C) (B : D) :
