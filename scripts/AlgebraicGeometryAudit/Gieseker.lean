@@ -204,3 +204,18 @@ positive multiplicity and the next quotient has strictly smaller multiplicity. -
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.not_isZero_of_le
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.topSlope_lt_of_maximalDestabilizing
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_pos_of_maximalDestabilizing
+
+/-! ## Lifting a filtration through the subobject correspondence (#905 splice)
+
+Lattice-level facts, none of them about slopes, that the Harder-Narasimhan splice consumes: the
+bottom of the quotient pulls back to the subobject itself, so a spliced chain really begins
+`bot < B`; a strict inclusion has a nonzero successive quotient, and therefore pulls back to a
+strict inclusion, which is what makes the spliced chain strictly monotone; and the first
+successive quotient of a spliced chain is the subobject itself, which is how the first factor
+inherits its slope and semistability from the maximal destabilizing subobject. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.pullback_bot
+#print axioms AlgebraicGeometry.Stability.Gieseker.ofLE_bot_eq_zero
+#print axioms AlgebraicGeometry.Stability.Gieseker.cokernelOfLEBotIso
+#print axioms AlgebraicGeometry.Stability.Gieseker.cokernel_not_isZero_of_lt
+#print axioms AlgebraicGeometry.Stability.Gieseker.pullback_lt_of_lt
