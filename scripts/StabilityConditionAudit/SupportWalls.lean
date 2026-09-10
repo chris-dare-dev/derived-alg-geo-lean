@@ -173,6 +173,8 @@ docstrings in
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.selfPairing_mk
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartRe
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartIm
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartRe_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartIm_eq
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingRe
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingIm
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.pairingRe_eq
@@ -260,3 +262,32 @@ geometric surface. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.ofDivisorSpace_carrier
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber_inter_ofDivisorSpace
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.finite_wallCandidates_ofDivisorSpace
+
+/-! ## The two wall notions, compared
+
+Spherical/Basic works in the (beta, omega) chart and its wall is Bridgeland's
+H(delta): the locus where the pairing is REAL AND NON-POSITIVE. PeriodDomain
+works with planes and its wall is the positive planes ORTHOGONAL to delta.
+Until now nothing related them, and Spherical/Basic redeclared the exponential
+chart rather than using Mukai.expRe and Mukai.expIm, in a file that already
+imported them; chartRe and chartIm are abbreviations now, so the charts are one
+object and chartRe_eq / chartIm_eq are the normal forms.
+
+The loci are NOT equal, and that is the content. Orthogonality to the plane is
+the vanishing of BOTH pairings, so mem_periodDomainWall_iff_mem_wall says the
+period-domain wall is the sub-locus of the spherical half-wall where the real
+pairing also vanishes; the inclusion goes ONE WAY only, and is strict wherever
+the real pairing is negative. That is also why the two finiteness theorems are
+not restatements of each other.
+
+expPlane_eq_chartPlane records that the divisorial exponential plane is the
+same submodule. No stability condition, heart, or semistable object appears. -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartPlane
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartPlane_eq_span
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.isPositivePlane_chartPlane
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_periodDomainWall_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_periodDomainWall_iff_mem_wall
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_wall_of_mem_periodDomainWall
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.not_mem_periodDomainWall_of_mem_chamber
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.expPlane_eq_chartPlane

@@ -292,3 +292,23 @@ from `Foundation/StabilityFunction/WeakSplitting.lean`. -/
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_hn_trivial_muMinus
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_subobject_hnTors_cokernel_hnFree
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_shortExact_hnTors_hnFree
+
+/-! ## The mu-slope read on the heart (#1121)
+
+The Gieseker lane builds the mu-slope on `Coh X` and proves the Harder-Narasimhan property there;
+the abstract stability machinery is written against the heart of a t-structure. Joining the two
+needed two things that did not exist before this lane: the identification of the heart of the
+canonical t-structure on `D(Coh X)` with `Coh X` itself, and the transport of weak slope data and
+the Harder-Narasimhan property along an equivalence of abelian categories. Composing them is all
+that happens here.
+
+`heart_hasHNProperty` STILL TAKES `MuHNInput`, exactly as `hasHNProperty` does. Neither of that
+structure's two fields has ever been proved for a projective surface -- one asks for `Coh X` to be
+a Noetherian category, the other IS Grothendieck's boundedness lemma -- and carrying the result to
+the heart does not make either easier. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.cohHeart
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.heartWeakSlopeData
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.heart_hasHNProperty
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.heartWeakSlopeData_rank_functor
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.heartWeakSlopeData_topSlope_functor
