@@ -36,3 +36,35 @@ content of "sqrt td(X) = 1 + [pt]", which RiemannRoch/K3.lean states in prose. -
 #print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.sqrtToddComp_convolution
 #print axioms AlgebraicGeometry.Numerical.K3.sqrtToddComp_one
 #print axioms AlgebraicGeometry.Numerical.K3.degree_sqrtToddComp_two
+
+/-! ## The Mukai vector as a class in the intersection ring (#908)
+
+Until now the Mukai vector existed only as a FORMULA: `IntegralMukaiData` asserts the triple
+`(rank, c₁, s)` by fiat, and `RiemannRoch/K3.lean` explained in a docstring that the triple is what
+`ch(E)·√td(X)` comes to on a K3. `mukaiComp` computes that class, and the three comparison theorems
+turn the docstring into theorems.
+
+`mukaiComp` is defined for ARBITRARY dimension; the K3 statements are a section, not the
+definition, because the Fourier-Mukai and higher-dimensional lanes want `v(E)` on a threefold.
+
+`mukaiS` is deliberately NOT redefined as the degree of the top component -- `degree_mukaiComp_two`
+is the comparison theorem instead. Redefining it would ripple through the Euler pairing, the Mukai
+vector, the transfer and the realization files.
+
+The middle coordinate is compared THROUGH THE FORM `b` rather than by an equation in the lattice:
+in `IntegralMukaiData` the class `c₁` is a bare function with no additivity and no relation to the
+intersection ring, so no equation in the lattice is available to state. -/
+
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiClass
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp_mem
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp_add
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiClass_add
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp_zero
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.degree_mukaiComp_mul_mukaiComp_eq_zero
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiComp_one
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiComp_two
+#print axioms AlgebraicGeometry.Numerical.K3.degree_mukaiComp_two
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiVector_fst_eq
+#print axioms AlgebraicGeometry.Numerical.K3.b_mukaiVector_snd_eq_degree
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiVector_thd_eq_degree
