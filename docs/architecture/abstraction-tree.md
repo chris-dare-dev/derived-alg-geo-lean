@@ -95,6 +95,12 @@ Category
 │  │  ├─ PreservesShifts                 composable dg capability
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
+│  ├─ IsCopowerOf K X Z                   `Z = K ⊗ X`, by its universal property
+│  │  ├─ lift / lift_unique              cochains out of `K` are morphisms out of `Z`
+│  │  ├─ compare                         any two copowers, canonically isomorphic
+│  │  └─ EvaluationData E                a chosen copower of `E` by `dgHom E -`
+│  │     ├─ functor                      the dg functor `RHom(E,-) ⊗ E`
+│  │     └─ evaluation                   its degree-zero map to the identity
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy

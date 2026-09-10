@@ -968,3 +968,45 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_obj₃
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_mor₁
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleIso
+
+-- Tensoring a dg object by a complex, stated by its universal property the way
+-- `IsShiftBy` states the shift: `IsCopowerOf K X Z` says degree-`p` morphisms
+-- out of `Z` are degree-`p` cochains out of `K` into `dgHom X -`.  Nothing here
+-- constructs a copower, so nothing here produces an `EvaluationData`; a
+-- category with enough copowers has to supply one.
+#print axioms CategoryTheory.copowerCochain
+#print axioms CategoryTheory.copowerCochain_apply
+#print axioms CategoryTheory.IsCopowerOf
+#print axioms CategoryTheory.IsCopowerOf.univ
+#print axioms CategoryTheory.IsCopowerOf.univ_d
+#print axioms CategoryTheory.IsCopowerOf.bijective
+#print axioms CategoryTheory.IsCopowerOf.mk.inj
+#print axioms CategoryTheory.IsCopowerOf.mk.sizeOf_spec
+#print axioms CategoryTheory.IsCopowerOf.lift_unique
+#print axioms CategoryTheory.IsCopowerOf.lift
+#print axioms CategoryTheory.IsCopowerOf.univ_comp_lift
+#print axioms CategoryTheory.IsCopowerOf.compare
+#print axioms CategoryTheory.IsCopowerOf.univ_comp_compare
+#print axioms CategoryTheory.IsCopowerOf.compare_comp_compare
+#print axioms CategoryTheory.IsCopowerOf.compare_self
+
+-- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
+-- identity.  Every one of the functor's four laws is `lift_unique` applied to
+-- the cochain each side induces; only `map_d` needs more than associativity,
+-- and there it is the Leibniz rule twice, once in `C` and once in the
+-- Hom-complex out of `E`.  No relation to a spherical object is claimed.
+#print axioms CategoryTheory.EvaluationData
+#print axioms CategoryTheory.EvaluationData.obj
+#print axioms CategoryTheory.EvaluationData.isCopower
+#print axioms CategoryTheory.EvaluationData.mk.inj
+#print axioms CategoryTheory.EvaluationData.mk.sizeOf_spec
+#print axioms CategoryTheory.EvaluationData.map
+#print axioms CategoryTheory.EvaluationData.univ_comp_map
+#print axioms CategoryTheory.EvaluationData.map_zero
+#print axioms CategoryTheory.EvaluationData.map_add
+#print axioms CategoryTheory.EvaluationData.functor
+#print axioms CategoryTheory.EvaluationData.functor_obj
+#print axioms CategoryTheory.EvaluationData.functor_map
+#print axioms CategoryTheory.EvaluationData.evalHom
+#print axioms CategoryTheory.EvaluationData.univ_comp_evalHom
+#print axioms CategoryTheory.EvaluationData.evaluation
