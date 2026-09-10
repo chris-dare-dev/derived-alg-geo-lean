@@ -86,6 +86,7 @@ Category
 │  │  │  │  ├─ interchange               Godement, with the Koszul sign (-1)^(m n)
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
 │  │  │  └─ h0                           closed degree zero becomes an ordinary NatTrans
+│  │  │     └─ h0Comparison              H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D); no fullness claimed
 │  │  ├─ PreservesShifts                 composable dg capability
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
@@ -100,6 +101,7 @@ Category
 │  │     └─ HomogeneousNatTrans.ConeData objectwise cones assemble to a dg functor
 │  │        ├─ fst / snd                 cone projections, graded-natural
 │  │        ├─ isConeOf                  a cone in the dg category of dg functors
+│  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
 │  ├─ H0 C
 │  │  └─ coneTriangleFunctor             functor to distinguished triangles
