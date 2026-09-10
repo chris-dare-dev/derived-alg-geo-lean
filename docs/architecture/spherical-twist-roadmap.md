@@ -154,10 +154,20 @@ that comparison are instance hypotheses to be discharged by the realization.
    chose, while the family needs it against that choice composed with the
    strict comparison for evaluation, so the transport needs a lemma comparing
    the two `mapTriangle`s.
-4. No generic `RHom(E,-) ⊗ E` dg functor or evaluation transformation has been
-   constructed.  The current monoidal/exact-bifunctor roots are the intended
-   lower dependency, but closed monoidal/Hom-complex representability is still
-   missing.
+4. `EvaluationData.functor` is the generic `RHom(E,-) ⊗ E` dg functor and
+   `EvaluationData.evaluation` its degree-zero transformation to the identity,
+   both in `Algebra/Homology/DGCategory/Copower.lean`.  They are built on
+   `IsCopowerOf`, which states the tensoring the way `IsShiftBy` states the
+   shift -- by its universal property, as data plus a bijectivity condition --
+   because `HomologicalComplex.HasTensor` does not synthesize for the
+   `ℤ`-indexed shape at the pin, so there is no tensor product of complexes to
+   build the object with.
+
+   What is open is *existence*.  Nothing constructs a copower, so nothing
+   produces an `EvaluationData`; a dg category with enough copowers has to
+   supply one, exactly as `IsPretriangulated` supplies cone and shift choices.
+   And no theorem relates this functor to a spherical object: that comparison
+   needs `Perf(k)` as a dg category, which the repository does not have.
 5. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
    transformed arrow is the counit.  The enhancement of the kernel category,
