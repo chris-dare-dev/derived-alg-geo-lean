@@ -222,4 +222,60 @@ theorem sigPos_eq_add (hcompl : IsCompl W W')
   rw [h2rad] at h2tot
   omega
 
+/-! ### Definite forms and their indices of inertia
+
+Sylvester's law pins the two indices for a definite form.  Mathlib has the
+defining maximality property of `sigPos` and the counting identity, but not the
+two corollaries every consumer wants, so they are proved here beside the
+additivity they are used with. -/
+
+section Definite
+
+variable {N : Type*} [AddCommGroup N] [Module ℝ N]
+
+/-- An anisotropic form is nondegenerate: the radical sits inside the zero
+locus. -/
+theorem nondegenerate_of_anisotropic {Q : QuadraticForm ℝ N} (h : Q.Anisotropic) :
+    Q.Nondegenerate := by
+  rw [QuadraticMap.nondegenerate_iff_radical_eq_bot, Submodule.eq_bot_iff]
+  intro x hx
+  exact h x hx.1
+
+variable [FiniteDimensional ℝ N]
+
+/-- **A positive definite form has `sigPos = dim` and `sigNeg = 0`.** -/
+theorem sigPos_eq_finrank_of_posDef {Q : QuadraticForm ℝ N} (h : Q.PosDef) :
+    sigPos Q = Module.finrank ℝ N ∧ sigNeg Q = 0 ∧ Q.Nondegenerate := by
+  have hnd : Q.Nondegenerate := nondegenerate_of_anisotropic h.anisotropic
+  have htop : (Q.restrict (⊤ : Submodule ℝ N)).PosDef := by
+    intro x hx
+    have hx' : (x : N) ≠ 0 := fun hc => hx (Subtype.ext hc)
+    exact h _ hx'
+  have hle : Module.finrank ℝ (⊤ : Submodule ℝ N) ≤ sigPos Q :=
+    le_sigPos_of_posDef Q htop
+  rw [finrank_top] at hle
+  have hpos : sigPos Q = Module.finrank ℝ N :=
+    le_antisymm (sigPos_le_finrank Q) hle
+  refine ⟨hpos, ?_, hnd⟩
+  have htot := QuadraticForm.sigPos_add_sigNeg_add_radical (Q := Q)
+  have hrad : Module.finrank ℝ Q.radical = 0 := by rw [hnd.radical_eq_bot]; simp
+  omega
+
+/-- **A negative definite form has `sigNeg = dim` and `sigPos = 0`.**
+
+"Negative definite" is spelled the way `sigNeg` is defined, as positive
+definiteness of `-Q`. -/
+theorem sigNeg_eq_finrank_of_negDef {Q : QuadraticForm ℝ N} (h : (-Q).PosDef) :
+    sigNeg Q = Module.finrank ℝ N ∧ sigPos Q = 0 ∧ Q.Nondegenerate := by
+  obtain ⟨hpos, hneg, hnd⟩ := sigPos_eq_finrank_of_posDef h
+  refine ⟨hpos, ?_, ?_⟩
+  · have hswap : sigPos Q = sigNeg (-Q) := by rw [sigNeg, neg_neg]
+    rw [hswap, hneg]
+  · refine nondegenerate_of_anisotropic ?_
+    intro x hx
+    refine h.anisotropic x ?_
+    simp [hx]
+
+end Definite
+
 end QuadraticMap
