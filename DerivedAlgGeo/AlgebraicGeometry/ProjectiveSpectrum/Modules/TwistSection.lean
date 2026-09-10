@@ -107,6 +107,25 @@ theorem sectionOfMem_apply (U : Opens X) (n : ℕ) {m : M} (hm : m ∈ 𝓜 n) (
         den := ⟨1, SetLike.one_mem_graded 𝒜⟩
         den_mem := Ideal.IsPrime.one_notMem inferInstance } := rfl
 
+/-- **Two spellings of the same element give the same section.**
+
+`g ^ N` and `g ^ (1 * N)` are equal but not syntactically so, and a twist produced at degree
+`e * N` with `e = 1` carries the second spelling while the generator lemmas carry the first. -/
+theorem sectionOfMem_congr (U : Opens X) (n : ℕ) {m m' : M} (h : m = m') (hm : m ∈ 𝓜 n)
+    (hm' : m' ∈ 𝓜 n) : sectionOfMem 𝒜 𝓜 U n hm = sectionOfMem 𝒜 𝓜 U n hm' := by
+  subst h
+  rfl
+
+/-- **The section `m / 1` restricts to the section `m / 1`**: nothing is inverted, so the same
+fraction is valid at every point of every open. -/
+theorem res_sectionOfMem {U V : Opens X} (h : V ≤ U) (n : ℕ) {m : M} (hm : m ∈ 𝓜 n) :
+    (show SheafOfModules (AlgebraicGeometry.Proj 𝒜).ringCatSheaf from
+        sheafTwist 𝒜 𝓜 (n : ℤ)).val.map (homOfLE h).op (sectionOfMem 𝒜 𝓜 U n hm)
+      = sectionOfMem 𝒜 𝓜 V n hm := by
+  apply section_ext
+  funext x
+  rfl
+
 /-- **The compatible family the fractions `m / 1` form**, which is what a map out of the unit
 consumes. -/
 def sectionsOfMem (n : ℕ) {m : M} (hm : m ∈ 𝓜 n) :
@@ -149,5 +168,11 @@ def twistBy (n : ℕ) {f : A} (hf : f ∈ 𝒜 n) (F : (AlgebraicGeometry.Proj �
     F ⟶ AlgebraicGeometry.Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (n : ℤ)) :=
   (AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso F).inv ≫
     AlgebraicGeometry.Scheme.Modules.tensorHom (𝟙 F) (unitToTwist 𝒜 𝒜 n hf)
+
+/-- **Multiplying by two spellings of the same element is the same map.** -/
+theorem twistBy_congr (n : ℕ) {f f' : A} (h : f = f') (hf : f ∈ 𝒜 n) (hf' : f' ∈ 𝒜 n)
+    (F : (AlgebraicGeometry.Proj 𝒜).Modules) : twistBy 𝒜 n hf F = twistBy 𝒜 n hf' F := by
+  subst h
+  rfl
 
 end AlgebraicGeometry.Proj
