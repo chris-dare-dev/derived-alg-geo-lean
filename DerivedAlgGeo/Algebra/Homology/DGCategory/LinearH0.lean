@@ -19,9 +19,14 @@ A scalar-preserving dg functor therefore induces a Mathlib-linear functor on
 
 This leaf deliberately does not package exactness. The present `DGFunctor` API
 does not yet express preservation of the chosen dg shifts and cones from which
-`Functor.IsTriangulated` could be proved. Likewise, identifying a general
-`H⁰`-Hom quotient with Mathlib's chosen homology object is a separate seam
-needed before `IsQuasiEquivalence` can supply full faithfulness on `H⁰`.
+`Functor.IsTriangulated` could be proved.
+
+The other seam this file used to flag, identifying a general `H⁰`-Hom quotient
+with Mathlib's chosen homology object, is crossed in
+`DGCategory/QuasiEquivalence.lean`: not by comparing the two descriptions of
+homology, but by building one `ShortComplex.LeftHomologyMapData` whose `φH` is
+the map on cocycles modulo coboundaries. `IsQuasiEquivalence` now does supply
+full faithfulness on `H⁰`.
 -/
 
 set_option autoImplicit false

@@ -137,6 +137,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    ordinary one on `H⁰`, but the dg notion is the strict one: Anno--Logvinenko
    work with homotopy adjunctions of bimodules, and no comparison with those
    exists.
+
+   The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
+   (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
+   `H⁰`, so `twistH0Equivalence` and `cotwistConeH0Equivalence` make the twist
+   and the unshifted cotwist cone autoequivalences of `H⁰`.  That is the first
+   categorical invertibility statement about a twist here; everything earlier
+   was numerical, on `K₀`, or a construction with no invertibility attached.
+   What it is not is exactness: `DGFunctor.PreservesShifts` and
+   `PreservesChosenCones` still have no instances, so the equivalence is one of
+   ordinary categories.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
    shift on a functor category, which is what `Functor.ExactFamily` should be
    built on.  That rewiring is still open, and it is not an API-only change:
