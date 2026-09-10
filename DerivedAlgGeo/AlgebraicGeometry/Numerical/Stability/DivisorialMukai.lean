@@ -31,15 +31,19 @@ Three things are proved.
 * `mukaiCharge_of_isK3`: Bridgeland's charge is the ordinary divisorial charge
   minus the rank.
 
-## What this does not do
+## What this does not do, and what has since been done elsewhere
 
-It does not construct a numerical realization for the K3 model of
-`Examples/Surface/K3.lean`; the statements below hold for any realization of any
-`NumericalVarietyData 2` satisfying `IsK3`, and the K3 model's own realization
-is a separate piece of work.  It also does not compare the real Mukai extension
-used here with the integral `Mukai.MukaiLattice` of
-`GrothendieckGroup/MukaiVector.lean`; that comparison needs a realization of the
-integral lattice inside the real divisor space and is not attempted.
+The statements below hold for any realization of any `NumericalVarietyData 2`
+satisfying `IsK3`; this file constructs none.
+
+Two gaps this section used to record are now closed, in the examples rather than
+here.  `Examples/Surface/RankOneRealization.lean` constructs the numerical
+realization of the K3 model of `Examples/Surface/K3.lean`, and
+`Examples/Surface/K3MukaiComparison.lean` compares the real Mukai extension used
+here with the integral `Mukai.MukaiLattice` of
+`GrothendieckGroup/MukaiVector.lean`, through the lattice map that
+`Mukai/IntegralBridge.lean` asks for.  Both remain outside this file, which
+stays free of any particular model.
 -/
 
 open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
