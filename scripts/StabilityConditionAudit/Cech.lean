@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicTopology
 import DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech
 import DerivedAlgGeo.Topology.Sheaves.Cech
+import DerivedAlgGeo.Topology.Sheaves.Flasque
 
 /-!
 Axiom audit for generic cosimplicial exactness and site-theoretic Čech
@@ -28,6 +29,10 @@ constructions, resolutions, comparison maps, and compact-basis arguments.
 #print axioms CategoryTheory.Sheaf.CompactOpenBasis.ofIsBasis
 #print axioms CategoryTheory.Sheaf.HPrime_subsingleton_of_isCechAcyclicOnCompactBasis
 #print axioms CategoryTheory.Sheaf.H_subsingleton_of_isCechAcyclicOnCompactBasis
+#print axioms CategoryTheory.Sheaf.derivedH
+#print axioms CategoryTheory.Sheaf.H_one_subsingleton_of_sections_epi
+#print axioms CategoryTheory.Sheaf.H_succ_subsingleton_of_shortExact
+#print axioms TopCat.Sheaf.subsingleton_H_of_isFlasque
 #print axioms CategoryTheory.Sheaf.IsCechAcyclicOnCompactBasis
 #print axioms CategoryTheory.Sheaf.epi_app_of_isCechAcyclicOnCompactBasis
 #print axioms CategoryTheory.Sheaf.isCechAcyclicOnCompactBasis_of_injective
