@@ -190,3 +190,17 @@ quotient by the maximal destabilizing subobject. -/
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_shortExact
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertDegreeCoefficient_shortExact
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.topSlope_le_of_shortExact
+
+/-! ## The strict slope drop past the maximal destabilizing subobject (#905 core)
+
+Every nonzero subobject of the quotient by the maximal destabilizing subobject has strictly
+smaller slope. The proof uses the see-saw inequality together with BOTH clauses of
+`IsMaximalDestabilizing`: the slope-maximality bounds the extension from above, and the
+order-maximality among slope-attaining subobjects rules out equality. Two consequences follow at
+once, and they are the two things the Harder-Narasimhan recursion needs: successive factor slopes
+strictly decrease, and the quotient is pure, so its own maximal destabilizing subobject has
+positive multiplicity and the next quotient has strictly smaller multiplicity. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.not_isZero_of_le
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.topSlope_lt_of_maximalDestabilizing
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_pos_of_maximalDestabilizing
