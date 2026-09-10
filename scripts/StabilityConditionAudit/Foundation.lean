@@ -1239,6 +1239,7 @@ which is what removes the nonvanishing side conditions from that induction. -/
 /-! ### Truncating a weak HN filtration, and the torsion subobject (`WeakTruncation.lean`) -/
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.exists_crossIndex
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.map_restrictChain
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso_μMinus
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso_μPlus
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrict
