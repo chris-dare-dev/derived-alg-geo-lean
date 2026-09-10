@@ -43,7 +43,7 @@ result degree.
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u u' u''
+universe v u u' u'' u'''
 
 namespace CategoryTheory
 
@@ -51,8 +51,8 @@ open DGCategoryStruct DGCategory
 
 namespace DGFunctor.HomogeneousNatTrans
 
-variable {C : Type u} {D : Type u'} {E : Type u''}
-  [DGCategory.{v} C] [DGCategory.{v} D] [DGCategory.{v} E]
+variable {C : Type u} {D : Type u'} {E : Type u''} {B : Type u'''}
+  [DGCategory.{v} C] [DGCategory.{v} D] [DGCategory.{v} E] [DGCategory.{v} B]
 
 /-! ### Left whiskering -/
 
@@ -226,6 +226,36 @@ theorem IsClosed.whiskerRight {η : HomogeneousNatTrans F G n} (hη : IsClosed �
   rfl
 
 end WhiskerRight
+
+/-! ### Whiskering by a composite
+
+All three laws hold by `rfl`, because `DGFunctor.comp` composes the object maps
+and the `AddMonoidHom`s directly.  They are what makes horizontal composition
+of dg natural transformations strictly associative. -/
+
+section Compat
+
+variable {F F' : DGFunctor C D} {G G' : DGFunctor D E} {n m : ℤ}
+
+/-- Whiskering twice on the right is whiskering by the composite. -/
+theorem whiskerRight_whiskerRight (α : HomogeneousNatTrans F F' n)
+    (G : DGFunctor D E) (K : DGFunctor E B) :
+    whiskerRight (whiskerRight α G) K = whiskerRight α (G.comp K) :=
+  rfl
+
+/-- Whiskering twice on the left is whiskering by the composite. -/
+theorem whiskerLeft_whiskerLeft (F : DGFunctor C D) (G : DGFunctor D E)
+    {K K' : DGFunctor E B} (β : HomogeneousNatTrans K K' n) :
+    whiskerLeft F (whiskerLeft G β) = whiskerLeft (F.comp G) β :=
+  rfl
+
+/-- Whiskering on the two sides commutes. -/
+theorem whiskerRight_whiskerLeft (F : DGFunctor C D)
+    (β : HomogeneousNatTrans G G' m) (K : DGFunctor E B) :
+    whiskerRight (whiskerLeft F β) K = whiskerLeft F (whiskerRight β K) :=
+  rfl
+
+end Compat
 
 /-! ### The interchange law -/
 

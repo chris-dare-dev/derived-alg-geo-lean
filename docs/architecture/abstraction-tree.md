@@ -83,7 +83,8 @@ Category
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
 │  │  │  ├─ whiskerLeft / whiskerRight   both sign-free, additive, degree-preserving
-│  │  │  │  └─ interchange               Godement, with the Koszul sign (-1)^(m n)
+│  │  │  │  ├─ interchange               Godement, with the Koszul sign (-1)^(m n)
+│  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
 │  │  │  └─ h0                           closed degree zero becomes an ordinary NatTrans
 │  │  ├─ PreservesShifts                 composable dg capability
 │  │  └─ PreservesChosenCones            strong witness-preserving capability

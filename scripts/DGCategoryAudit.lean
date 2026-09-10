@@ -779,3 +779,34 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.IsClosed.whiskerRight
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.interchange_app
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.interchange
+
+-- Dg functors compose strictly: associativity and both unit laws are `rfl`.
+-- These are what let a law about horizontally composed transformations be
+-- stated at all, since the two sides then have definitionally equal types.
+#print axioms CategoryTheory.DGFunctor.id_comp
+#print axioms CategoryTheory.DGFunctor.comp_id
+#print axioms CategoryTheory.DGFunctor.comp_assoc
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRight_whiskerRight
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerLeft_whiskerLeft
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.whiskerRight_whiskerLeft
+
+-- The Godement product of homogeneous dg natural transformations, its graded
+-- Leibniz rule, and strict associativity.  `hcomp` fixes one of the two
+-- readings of the horizontal composite; `hcomp_eq_smul_swap` is the price of
+-- the other, and it is the `(-1)^(m n)` of `interchange`.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp_eq_smul_swap
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp_app_swap
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp_zero_left
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp_zero_right
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp_add_left
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp_add_right
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.horizontalComposition
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.horizontalComposition_apply
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.id_hcomp
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp_id
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.id_hcomp_id
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.differential_hcomp
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.IsClosed.hcomp
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.hcomp_assoc
