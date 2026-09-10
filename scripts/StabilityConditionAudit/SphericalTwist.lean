@@ -118,6 +118,14 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistTriangleFunctor_obj_obj₃
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistTriangleFunctor_obj_mor₂
 
+-- The equivalence conditions, spent: the twist and the unshifted cotwist cone
+-- are autoequivalences of `H⁰`.  This is the first categorical invertibility
+-- statement about a twist here; everything earlier was numerical, on `K₀`, or
+-- a construction with no invertibility attached.  Exactness is the next block;
+-- sphericality is still out of reach.
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistH0Equivalence
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConeH0Equivalence
+
 -- Exactness for the twist: it preserves shifts and chosen cones, so `H⁰` of it
 -- commutes with the shift and is a triangulated functor.  Not sphericality:
 -- that needs all four Anno--Logvinenko conditions and Morita quasi-functors.

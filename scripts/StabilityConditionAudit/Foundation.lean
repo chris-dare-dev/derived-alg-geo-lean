@@ -2,6 +2,7 @@
 Foundation slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
+import DerivedAlgGeo.CategoryTheory.SubobjectEquivalence
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
@@ -70,6 +71,31 @@ several structures in this repository carried as data (`map_zero`, `map_iso`,
 #print axioms CategoryTheory.K₀Ab.lift_of
 #print axioms CategoryTheory.K₀Ab.hom_ext
 #print axioms CategoryTheory.K₀Ab.hom_ext_iff
+
+/-! ### Functoriality of `K₀Ab` (#1121)
+
+`K₀Ab` had no map `K₀Ab A →+ K₀Ab B` at all; every hom out of it in the tree landed in a fixed
+abelian group through `liftOf`. `map` supplies it from the weakest hypothesis the presentation
+allows -- a functor carrying short exact sequences to short exact ones, which is strictly weaker
+than exactness -- and `mapOfExact` is the wrapper for a functor preserving finite limits and
+colimits. `congr` upgrades an equivalence of abelian categories to an isomorphism of Grothendieck
+groups, with the round trips proved by `of_iso` on the unit and counit.
+
+This is the first half of transporting numerical data along an equivalence, which is what
+identifying `Coh X` with the heart of the standard t-structure on its derived category will need. -/
+
+#print axioms CategoryTheory.K₀Ab.map
+#print axioms CategoryTheory.K₀Ab.map_of
+#print axioms CategoryTheory.K₀Ab.map_id
+#print axioms CategoryTheory.K₀Ab.map_comp
+#print axioms CategoryTheory.K₀Ab.map_congr
+#print axioms CategoryTheory.K₀Ab.mapOfExact
+#print axioms CategoryTheory.K₀Ab.mapOfExact_of
+#print axioms CategoryTheory.K₀Ab.congr
+#print axioms CategoryTheory.K₀Ab.congr_of
+#print axioms CategoryTheory.K₀Ab.congr_symm_of
+#print axioms CategoryTheory.K₀Ab.congrHom
+#print axioms CategoryTheory.K₀Ab.congrHom_of
 #print axioms CategoryTheory.GrothendieckPresentation.map
 #print axioms CategoryTheory.GrothendieckPresentation.map_of
 #print axioms CategoryTheory.GrothendieckPresentation.IsAdditive.of_relationMap
@@ -1446,3 +1472,106 @@ Deliverable 4 of the #740 surface redirect's item 2.
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_of_rank_pos
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_of_rank_zero
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_eq_of_iso
+
+/-! ## Transporting weak slope data along an equivalence (#1121)
+
+`WeakSlopeData` is two homomorphisms out of `K₀Ab` plus two sign conditions, so an equivalence of
+abelian categories carries it by precomposition with `K₀Ab.congr`. The transported data reads an
+object by pulling it back through the inverse functor, which is why every statement comes in two
+readings: the `e.inverse` form holds by definition and carries the `simp` attribute, and the
+`e.functor` form is the one a consumer starting on the source category wants and needs the unit
+isomorphism. The two cannot both be `simp` lemmas -- the first rewrites the left-hand side of the
+second.
+
+The Harder-Narasimhan property is NOT transported here; it is a statement about chains of
+subobjects and their cokernels rather than about a homomorphism. -/
+
+#print axioms CategoryTheory.Triangulated.not_isZero_inverse_obj
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_rank
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_degree
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_symm_of_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_rank_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_degree_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_charge
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_charge_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_slope
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_slope_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope_functor
+
+/-! ## Subobjects along a functor, and the order isomorphism from an equivalence (#1121)
+
+Mathlib maps subobjects along a morphism and along an isomorphism of objects, both inside one
+category; it does not map them along a FUNCTOR, so an equivalence of categories did not carry
+subobject lattices to subobject lattices. `mapFunctor` supplies the pushforward and
+`mapEquivalence` upgrades it to an order isomorphism.
+
+An order isomorphism is what the consumers need rather than a monotone map: a monotone map carries
+a chain to a chain but need not carry a STRICTLY increasing chain to a strictly increasing one, nor
+the bottom and top to the bottom and top. All three are required to transport a Harder-Narasimhan
+filtration.
+
+`unitAt` exists for a concrete reason worth keeping: `e.unitIso.app X` has type
+`(𝟭 A).obj X ≅ (e.functor ⋙ e.inverse).obj X`, which is definitionally but not syntactically the
+isomorphism wanted, and the difference defeats `rw` on `Subobject.map`, whose statements are
+dependent in the ambient object. `map_inv_map_hom` exists for the same reason -- reaching it by
+`rw [← map_comp]` fails with a motive that is not type correct, because `Subobject.map` carries a
+`Mono` instance argument that changes under the rewrite. -/
+
+#print axioms CategoryTheory.Subobject.mapFunctor
+#print axioms CategoryTheory.Subobject.mapFunctor_mk
+#print axioms CategoryTheory.Subobject.mapFunctor_eq_mk_arrow
+#print axioms CategoryTheory.Subobject.mapFunctor_monotone
+#print axioms CategoryTheory.Subobject.mapFunctor_id
+#print axioms CategoryTheory.Subobject.mapFunctor_comp
+#print axioms CategoryTheory.Subobject.mapFunctor_map_hom
+#print axioms CategoryTheory.Subobject.map_inv_map_hom
+#print axioms CategoryTheory.Subobject.map_hom_map_inv
+#print axioms CategoryTheory.Subobject.unitAt
+#print axioms CategoryTheory.Subobject.unitAt_naturality
+#print axioms CategoryTheory.Subobject.mapFunctor_inverse_functor
+#print axioms CategoryTheory.Subobject.mapEquivalence
+#print axioms CategoryTheory.Subobject.mapEquivalence_apply
+
+/-! ### Subobject cokernels along a functor, and semistability transport (#1121)
+
+`mapFunctorIso` identifies the underlying object of a pushed-forward subobject with the image of
+the underlying object; it is an `isoOfEqMk` rather than a definitional equality because
+`mapFunctor F P` is only propositionally `mk (F.map P.arrow)`. `cokernelOfLEMapFunctorIso` is what
+a Harder-Narasimhan filtration needs beyond the order isomorphism: a filtration's factors are
+cokernels of chain steps, so they must be identified with the images of the original factors.
+
+Semistability is not a statement about a homomorphism -- it quantifies over subobjects -- and it
+transports because `mapEquivalence` is surjective, so every subobject of the image is the image of
+a subobject. -/
+
+#print axioms CategoryTheory.Subobject.mapFunctorIso
+#print axioms CategoryTheory.Subobject.mapFunctorIso_hom_arrow
+#print axioms CategoryTheory.Subobject.mapFunctorIso_hom_arrow_assoc
+#print axioms CategoryTheory.Subobject.ofLE_mapFunctor
+#print axioms CategoryTheory.Subobject.cokernelOfLEMapFunctorIso
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.not_isZero_functor_obj
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope_mapFunctor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_isSemistable
+
+/-! ### Transporting Harder-Narasimhan filtrations (#1121)
+
+The payoff of the transport chain: an existence theorem proved on one abelian category becomes an
+existence theorem on any equivalent one.
+
+A filtration is not a homomorphism, so precomposition does not reach it. Three things move and each
+needs its own input: the chain, by the ORDER isomorphism on subobject lattices, which is why a
+merely monotone map would not do -- strictness and the two endpoints would not survive; the
+factors, which are cokernels of chain steps rather than subobjects, by
+`cokernelOfLEMapFunctorIso`; and the slope and semistability of those factors.
+
+The last step crosses a counit isomorphism: transporting a filtration of `Z` gives a filtration of
+the image of `Z`, while `HasHNProperty` on the target asks for a filtration of an arbitrary object,
+so taking the pullback of that object leaves an isomorphism to cross. `AbelianWeakHNFiltration.ofIso`
+in `WeakTruncation.lean` already does that and is reused. -/
+
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congrFiltration
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congrFiltration_n
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congrFiltration_μ
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_hasHNProperty

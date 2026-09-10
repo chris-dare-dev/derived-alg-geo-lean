@@ -756,6 +756,26 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_obj
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_map
 
+-- `dg-enhancements-e10`: a quasi-equivalence of dg categories induces an
+-- equivalence on `H⁰`.  The seam between the `H⁰` Hom quotient and Mathlib's
+-- homology is crossed with a hand-built `LeftHomologyMapData`, whose `φH` is
+-- the map on cocycles modulo coboundaries; `quasiIso_iff` then reads the
+-- hypothesis off it directly, and no naturality of `abHomologyIso` is needed.
+#print axioms CategoryTheory.homSc
+#print axioms CategoryTheory.range_abToCycles
+#print axioms CategoryTheory.DGFunctor.mapHomSc
+#print axioms CategoryTheory.DGFunctor.mapCocycles
+#print axioms CategoryTheory.DGFunctor.mapH0Hom
+#print axioms CategoryTheory.DGFunctor.mapHomScData
+#print axioms CategoryTheory.DGFunctor.h0_map_eq_mapH0Hom
+#print axioms CategoryTheory.DGFunctor.homologyQuotientEquiv
+#print axioms CategoryTheory.DGFunctor.mapH0Hom_comp_homologyQuotientEquiv
+#print axioms CategoryTheory.DGFunctor.bijective_mapH0Hom
+#print axioms CategoryTheory.DGFunctor.faithful_h0
+#print axioms CategoryTheory.DGFunctor.full_h0
+#print axioms CategoryTheory.DGFunctor.isEquivalence_h0
+#print axioms CategoryTheory.DGFunctor.h0Equivalence
+
 -- Shifting twice agrees with shifting once, and shifting by zero changes
 -- nothing -- both up to a canonical comparison that is closed and invertible,
 -- so these are isomorphisms in the dg category of dg functors and not merely

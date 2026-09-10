@@ -141,6 +141,20 @@ that comparison are instance hypotheses to be discharged by the realization.
    ordinary one on `H⁰`, but the dg notion is the strict one: Anno--Logvinenko
    work with homotopy adjunctions of bimodules, and no comparison with those
    exists.
+
+   The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
+   (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
+   `H⁰`, so `twistH0Equivalence` and `cotwistConeH0Equivalence` make the twist
+   and the unshifted cotwist cone autoequivalences of `H⁰`.  That is the first
+   categorical invertibility statement about a twist here; everything earlier
+   was numerical, on `K₀`, or a construction with no invertibility attached.
+   Exactness is separate, and now supplied: `DGFunctor.PreservesShifts` and
+   `PreservesChosenCones` are instantiated for a cone functor whenever its two
+   ends carry them, so `twistH0IsTriangulated` makes `H⁰` of the twist a
+   triangulated functor.  Together with the equivalence above that is an exact
+   autoequivalence -- which is still not sphericality, since that needs all
+   four Anno--Logvinenko conditions and the Morita framework the first
+   paragraph rules out.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
    shift on a functor category, which is what `Functor.ExactFamily` should be
    built on.  That rewiring is still open, and it is not an API-only change:
