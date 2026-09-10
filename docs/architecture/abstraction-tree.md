@@ -102,7 +102,8 @@ Category
 │  │        ├─ fst / snd                 cone projections, graded-natural
 │  │        ├─ isConeOf                  a cone in the dg category of dg functors
 │  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
-│  │        │  └─ triangleNatTrans       natural in a STRICT square of transformations
+│  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
+│  │        │  └─ compareIso             the cone choices do not matter, canonically
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
 │  ├─ H0 C
 │  │  └─ coneTriangleFunctor             functor to distinguished triangles
