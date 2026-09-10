@@ -80,10 +80,10 @@ DGAdjunction
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
-├─ twistPreservesShifts: the twist preserves shifts as soon as S and R do, so
-│  twistH0CommShift makes H⁰ of it commute with the shift.  Half of exactness.
-│  The other half, PreservesChosenCones for a cone functor, is a 3-by-3 lemma
-│  and is NOT proved, so the twist is not yet known to be exact.
+├─ the twist is EXACT on H⁰ (twistH0IsTriangulated), as soon as S and R preserve
+│  shifts and chosen cones.  A cone functor preserves both when its two ends do;
+│  the cone half is the 3-by-3 lemma, whose proof is block diagonal in the four
+│  coordinates of the two splittings rather than merely triangular.
 ├─ unshifted cones underlying dual twist and cotwist
 ├─ the four triangles as functors on H⁰, every value distinguished, each first
 │  map the corresponding unit or counit.  The dual twist and the cotwist are

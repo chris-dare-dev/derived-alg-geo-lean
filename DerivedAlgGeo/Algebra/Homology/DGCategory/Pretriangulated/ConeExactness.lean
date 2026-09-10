@@ -36,12 +36,22 @@ sign is a unit, so the product is bijective.
 No property of `α` beyond being a closed degree-zero transformation is used, and
 the argument never touches the differential.
 
+## Both halves
+
+`preservesChosenCones` is the other one: the 3-by-3 lemma, in the strict form
+the capability asks for.  Its proof has the same shape with four factors instead
+of two, and the point is that in those coordinates the map is *block diagonal*
+rather than merely triangular.
+
+With both, `H⁰ (Cone α)` is a triangulated functor.  For the twist candidate of
+a dg adjunction that is exactness, and it is what the word "twist" is supposed
+to mean once the twist/cotwist conditions make it an equivalence.
+
 ## What this does not give
 
-The other half.  `PreservesChosenCones` for a cone functor is the statement that
-`Cone(α)` carries a cone of `f` to a cone of `Cone(α)(f)`, which is a 3-by-3
-lemma and is not proved here.  So `H⁰ (Cone α)` is not yet known to be
-triangulated; what it has is a shift comparison.
+Nothing about sphericality.  Exactness and invertibility of the twist are two of
+Anno--Logvinenko's conditions, not all four, and the implication from the
+recorded pair to the rest needs Morita quasi-functors.
 -/
 
 set_option autoImplicit false
@@ -156,6 +166,174 @@ noncomputable def preservesShifts (hF : PreservesShifts F)
   mapShift_hom _ := rfl
 
 
+/-! ### Cones
+
+The second capability.  A cone of `f` in the source goes to a cone of
+`Cone(α)(f)`, so a cone functor preserves chosen cones when its two ends do.
+
+The argument is the same shape as for shifts, with four factors instead of
+two.  A morphism into `Cone(α) Z` splits along the `Z`-cone of `α` into an
+`F Z` part and a `G Z` part, and each of those splits again along the image
+under `F` or `G` of the cone of `f`.  A pair of morphisms into `Cone(α) X` and
+`Cone(α) Y` splits along the `X`- and `Y`-cones of `α` into the same four
+groups, in a different order.  In those coordinates the map is *block
+diagonal*, not merely triangular: the `F` block is the cone splitting `F`
+supplies and the `G` block is the one `G` supplies, with a single sign on one
+factor coming from `inl_comp_homogeneousLift_strict`. -/
+
+/-- **The cone splitting of `Cone(α)`, in coordinates.**
+
+Both inclusions of the cone of `Cone(α)(f)` are computed on a morphism already
+split along the `X`- and `Y`-cones of `α`.  The result is split along the
+`Z`-cone of `α`, and each component is the corresponding cone splitting of `F`
+or of `G`. -/
+theorem coneSplit_functor_map {X Y Z : C} {f : (dgHom X Y).X 0}
+    (hc : IsConeOf f Z) (W : D) (p : ℤ)
+    (a₁ : (dgHom W (F.obj X)).X (p + 1 + 1))
+    (a₂ : (dgHom W (G.obj X)).X (p + 1))
+    (b₁ : (dgHom W (F.obj Y)).X (p + 1))
+    (b₂ : (dgHom W (G.obj Y)).X p) :
+    dgComp (p + 1) (-1) p (by omega)
+        (dgComp (p + 1 + 1) (-1) (p + 1) (by omega) a₁ (K.isCone X).inl +
+          dgComp (p + 1) 0 (p + 1) (by omega) a₂ (K.isCone X).inr)
+        (K.functor.map (-1) hc.inl) +
+      dgComp p 0 p (by omega)
+        (dgComp (p + 1) (-1) p (by omega) b₁ (K.isCone Y).inl +
+          dgComp p 0 p (by omega) b₂ (K.isCone Y).inr)
+        (K.functor.map 0 hc.inr) =
+    dgComp (p + 1) (-1) p (by omega)
+        (dgComp (p + 1 + 1) (-1) (p + 1) (by omega)
+            ((-1 : ℤ).negOnePow • a₁) (F.map (-1) hc.inl) +
+          dgComp (p + 1) 0 (p + 1) (by omega) b₁ (F.map 0 hc.inr))
+        (K.isCone Z).inl +
+      dgComp p 0 p (by omega)
+        (dgComp (p + 1) (-1) p (by omega) a₂ (G.map (-1) hc.inl) +
+          dgComp p 0 p (by omega) b₂ (G.map 0 hc.inr))
+        (K.isCone Z).inr := by
+  rw [map_add, AddMonoidHom.add_apply, map_add, AddMonoidHom.add_apply,
+    K.functor_map, K.functor_map,
+    -- the four `inl`/`inr` composites with the two lifts
+    dgComp_assoc (p + 1 + 1) (-1) (-1) (p + 1) (-1 + -1) p
+      (by omega) (by omega) (by omega),
+    dgComp_assoc (p + 1) 0 (-1) (p + 1) (0 + -1) p
+      (by omega) (by omega) (by omega),
+    dgComp_assoc (p + 1) (-1) 0 p (-1 + 0) p
+      (by omega) (by omega) (by omega),
+    dgComp_assoc p 0 0 p (0 + 0) p (by omega) (by omega) (by omega),
+    (K.isCone X).inl_comp_homogeneousLift_strict_general (K.isCone Z) (-1)
+      (-1 + -1) (by omega) (by omega) (F.map (-1) hc.inl) (G.map (-1) hc.inl),
+    (K.isCone X).inr_comp_homogeneousLift_general (K.isCone Z) (-1) (0 + -1)
+      (by omega) (by omega) (F.map (-1) hc.inl) (G.map (-1) hc.inl) 0,
+    (K.isCone Y).inl_comp_homogeneousLift_strict_general (K.isCone Z) 0
+      (-1 + 0) (by omega) (by omega) (F.map 0 hc.inr) (G.map 0 hc.inr),
+    (K.isCone Y).inr_comp_homogeneousLift_general (K.isCone Z) 0 (0 + 0)
+      (by omega) (by omega) (F.map 0 hc.inr) (G.map 0 hc.inr) 0,
+    -- reassociate each of the four back onto `inl_Z` or `inr_Z`
+    dgComp_units_smul_right, dgComp_units_smul_right,
+    ← dgComp_assoc (p + 1 + 1) (-1) (-1) (p + 1) (-1 + -1) p
+      (by omega) (by omega) (by omega),
+    ← dgComp_assoc (p + 1) (-1) 0 p (0 + -1) p
+      (by omega) (by omega) (by omega),
+    ← dgComp_assoc (p + 1) 0 (-1) (p + 1) (-1 + 0) p
+      (by omega) (by omega) (by omega),
+    ← dgComp_assoc p 0 0 p (0 + 0) p (by omega) (by omega) (by omega)]
+  -- The sign is left as `(-1)^(-1) •`, exactly as
+  -- `inl_comp_homogeneousLift_strict` produces it; only its position moves.
+  simp only [Int.negOnePow_zero, one_smul, map_add, AddMonoidHom.add_apply,
+    dgComp_units_smul_left]
+  abel
+
+/-- **A cone functor preserves chosen cones.**
+
+The 3-by-3 lemma, in the strict dg form the capability asks for.  Both
+inclusions of the image cone are the images of the inclusions, and the
+splitting is `coneSplit_functor_map`: in the four coordinates the map is block
+diagonal, with the `F` block and the `G` block the cone splittings that `F` and
+`G` supply. -/
+noncomputable def preservesChosenCones (hF : PreservesChosenCones F)
+    (hG : PreservesChosenCones G) : PreservesChosenCones K.functor where
+  mapCone {X Y Z f} hc :=
+    { inr := K.functor.map 0 hc.inr
+      inr_closed := by
+        rw [← K.functor.map_d 0 1 hc.inr, hc.inr_closed, map_zero]
+      inl := K.functor.map (-1) hc.inl
+      δ_inl := by
+        rw [← K.functor.map_d (-1) 0 hc.inl, hc.δ_inl,
+          K.functor.map_comp 0 0 0 (by omega)]
+      bijective W p q hq := by
+        cases hq
+        have hsX := (K.isCone X).bijective W (p + 1) (p + 1 + 1) (by omega)
+        have hsY := (K.isCone Y).bijective W p (p + 1) (by omega)
+        have hsZ := (K.isCone Z).bijective W p (p + 1) (by omega)
+        have hFc := (hF.mapCone hc).bijective W (p + 1) (p + 1 + 1) (by omega)
+        have hGc := (hG.mapCone hc).bijective W p (p + 1) (by omega)
+        rw [hF.mapCone_inl hc, hF.mapCone_inr hc] at hFc
+        rw [hG.mapCone_inl hc, hG.mapCone_inr hc] at hGc
+        have hsign : Function.Bijective
+            (fun x : (dgHom W (F.obj X)).X (p + 1 + 1) =>
+              (-1 : ℤ).negOnePow • x) :=
+          (MulAction.toPerm ((-1 : ℤ).negOnePow)).bijective
+        -- Each `injective` below is applied to an explicitly ascribed
+        -- equation.  Without the ascription Lean has to solve `?pair.1 = …`,
+        -- a projection of a metavariable, and unification fails.
+        constructor
+        · rintro ⟨a, b⟩ ⟨a', b'⟩ hab
+          obtain ⟨⟨a₁, a₂⟩, rfl⟩ := hsX.surjective a
+          obtain ⟨⟨b₁, b₂⟩, rfl⟩ := hsY.surjective b
+          obtain ⟨⟨a₁', a₂'⟩, rfl⟩ := hsX.surjective a'
+          obtain ⟨⟨b₁', b₂'⟩, rfl⟩ := hsY.surjective b'
+          simp only at hab
+          rw [K.coneSplit_functor_map hc W p a₁ a₂ b₁ b₂,
+            K.coneSplit_functor_map hc W p a₁' a₂' b₁' b₂'] at hab
+          have hz : ((dgComp (p + 1 + 1) (-1) (p + 1) (by omega)
+                    ((-1 : ℤ).negOnePow • a₁) (F.map (-1) hc.inl) +
+                  dgComp (p + 1) 0 (p + 1) (by omega) b₁ (F.map 0 hc.inr),
+                dgComp (p + 1) (-1) p (by omega) a₂ (G.map (-1) hc.inl) +
+                  dgComp p 0 p (by omega) b₂ (G.map 0 hc.inr)) :
+                (dgHom W (F.obj Z)).X (p + 1) × (dgHom W (G.obj Z)).X p) =
+              (dgComp (p + 1 + 1) (-1) (p + 1) (by omega)
+                    ((-1 : ℤ).negOnePow • a₁') (F.map (-1) hc.inl) +
+                  dgComp (p + 1) 0 (p + 1) (by omega) b₁' (F.map 0 hc.inr),
+                dgComp (p + 1) (-1) p (by omega) a₂' (G.map (-1) hc.inl) +
+                  dgComp p 0 p (by omega) b₂' (G.map 0 hc.inr)) :=
+            hsZ.injective hab
+          have hf : ((-1 : ℤ).negOnePow • a₁, b₁) =
+              ((-1 : ℤ).negOnePow • a₁', b₁') := by
+            refine hFc.injective ?_
+            simpa using congrArg _root_.Prod.fst hz
+          have hg : (a₂, b₂) = (a₂', b₂') := by
+            refine hGc.injective ?_
+            simpa using congrArg _root_.Prod.snd hz
+          -- `Prod.fst` here is the projection, not `CategoryTheory.Prod.fst`,
+          -- and the sign is cancelled with the group action's injectivity.
+          have ha : a₁ = a₁' :=
+            MulAction.injective ((-1 : ℤ).negOnePow) (congrArg _root_.Prod.fst hf)
+          have hb : b₁ = b₁' := congrArg _root_.Prod.snd hf
+          have hc₂ : a₂ = a₂' := congrArg _root_.Prod.fst hg
+          have hd : b₂ = b₂' := congrArg _root_.Prod.snd hg
+          rw [ha, hb, hc₂, hd]
+        · intro c
+          obtain ⟨⟨c₁, c₂⟩, rfl⟩ := hsZ.surjective c
+          obtain ⟨⟨u, v⟩, hu⟩ := hFc.surjective c₁
+          obtain ⟨⟨u', v'⟩, hu'⟩ := hGc.surjective c₂
+          obtain ⟨a₁, ha₁⟩ := hsign.surjective u
+          have ha₁' : (-1 : ℤ).negOnePow • a₁ = u := ha₁
+          have hu₂ : dgComp (p + 1 + 1) (-1) (p + 1) (by omega) u
+                (F.map (-1) hc.inl) +
+              dgComp (p + 1) 0 (p + 1) (by omega) v (F.map 0 hc.inr) = c₁ := hu
+          have hu₃ : dgComp (p + 1) (-1) p (by omega) u'
+                (G.map (-1) hc.inl) +
+              dgComp p 0 p (by omega) v' (G.map 0 hc.inr) = c₂ := hu'
+          refine ⟨(dgComp (p + 1 + 1) (-1) (p + 1) (by omega) a₁
+                (K.isCone X).inl +
+              dgComp (p + 1) 0 (p + 1) (by omega) u' (K.isCone X).inr,
+            dgComp (p + 1) (-1) p (by omega) v (K.isCone Y).inl +
+              dgComp p 0 p (by omega) v' (K.isCone Y).inr), ?_⟩
+          simp only
+          rw [K.coneSplit_functor_map hc W p a₁ u' v v', ha₁', hu₂, hu₃] }
+  mapCone_inr _ := rfl
+  mapCone_inl _ := rfl
+
 end DGFunctor.HomogeneousNatTrans.ConeData
 
 namespace DGAdjunction
@@ -173,6 +351,26 @@ noncomputable def CounitConeData.preservesShifts (K : A.CounitConeData)
     DGFunctor.PreservesShifts K.twist :=
   DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts K
     (DGFunctor.PreservesShifts.comp hR hL) (DGFunctor.PreservesShifts.id D)
+
+/-- **The twist candidate preserves chosen cones.**  The 3-by-3 lemma applied
+to the counit's cone: with `preservesShifts` this is full dg-level exactness
+data for the twist. -/
+noncomputable def CounitConeData.preservesChosenCones (K : A.CounitConeData)
+    (hL : DGFunctor.PreservesChosenCones L)
+    (hR : DGFunctor.PreservesChosenCones R) :
+    DGFunctor.PreservesChosenCones K.twist :=
+  DGFunctor.HomogeneousNatTrans.ConeData.preservesChosenCones K
+    (DGFunctor.PreservesChosenCones.comp hR hL)
+    (DGFunctor.PreservesChosenCones.id D)
+
+/-- The unit cone preserves chosen cones too. -/
+noncomputable def UnitConeData.preservesChosenCones (K : A.UnitConeData)
+    (hL : DGFunctor.PreservesChosenCones L)
+    (hR : DGFunctor.PreservesChosenCones R) :
+    DGFunctor.PreservesChosenCones K.unitCone :=
+  DGFunctor.HomogeneousNatTrans.ConeData.preservesChosenCones K
+    (DGFunctor.PreservesChosenCones.id C)
+    (DGFunctor.PreservesChosenCones.comp hL hR)
 
 /-- The unit cone preserves shifts too. -/
 noncomputable def UnitConeData.preservesShifts (K : A.UnitConeData)
