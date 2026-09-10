@@ -913,6 +913,17 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
 
+-- A cone functor preserves shifts when its two ends do, so the twist candidate
+-- of a dg adjunction does as soon as the adjoints do.  This is HALF of
+-- exactness: `PreservesChosenCones` for a cone functor is a 3-by-3 lemma and is
+-- not proved.  The argument is the cone splitting, not a computation: right
+-- composition with the lift is, through the splitting, the product of right
+-- composition with the two shift elements, one scaled by a sign.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compRight_functor_map
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesShifts
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.preservesShifts
+
 -- Anno--Logvinenko's twist triangle, read as a triangle of functors on `H⁰`.
 -- The counit's chosen cones give `X ↦ (L R X ⟶ X ⟶ T X ⟶ (L R X)⟦1⟧)`, every
 -- value distinguished, with the first two maps the adjunction's own counit and

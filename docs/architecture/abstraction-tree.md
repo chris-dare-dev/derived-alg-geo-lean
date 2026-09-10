@@ -104,6 +104,7 @@ Category
 │  │     └─ HomogeneousNatTrans.ConeData objectwise cones assemble to a dg functor
 │  │        ├─ fst / snd                 cone projections, graded-natural
 │  │        ├─ isConeOf                  a cone in the dg category of dg functors
+│  │        ├─ preservesShifts           a cone functor preserves shifts if its ends do
 │  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
 │  │        │  └─ compareIso             the cone choices do not matter, canonically

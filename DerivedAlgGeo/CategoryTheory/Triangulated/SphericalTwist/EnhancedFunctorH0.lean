@@ -2,7 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.ConeExactness
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionCone
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Functor
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctor
 
@@ -223,6 +225,40 @@ theorem dualCotwistTriangleFunctor_obj_mor₁ (X : H0 A) :
     P.dualCotwist X
 
 end Source
+
+/-! ### Half of exactness -/
+
+section Shifts
+
+variable (hS : DGFunctor.PreservesShifts S) (hR : DGFunctor.PreservesShifts R)
+
+/-- **The twist preserves shifts, as soon as `S` and `R` do.**
+
+The twist is the cone of the right adjunction's counit, and a cone functor
+preserves shifts when its two ends do.  This is half of exactness; the other
+half is `PreservesChosenCones`, which for a cone functor is a 3-by-3 lemma and
+is not available. -/
+noncomputable def twistPreservesShifts :
+    DGFunctor.PreservesShifts P.twistFunctor :=
+  DGAdjunction.CounitConeData.preservesShifts P.rightAdj P.twist hS hR
+
+/-- The unshifted cotwist cone preserves shifts too. -/
+noncomputable def cotwistConePreservesShifts :
+    DGFunctor.PreservesShifts P.cotwistConeFunctor :=
+  DGAdjunction.UnitConeData.preservesShifts P.rightAdj P.cotwistCone hS hR
+
+/-- **The twist commutes with the shift on `H⁰`.**
+
+`DGFunctor.commShift` spends the dg-level shift preservation on the ordinary
+functor.  What is still missing before the word "exact" applies is that the
+twist carries distinguished triangles to distinguished triangles, which needs
+the cone half. -/
+@[reducible]
+noncomputable def twistH0CommShift [IsPretriangulated B] :
+    P.twistFunctor.h0.CommShift ℤ :=
+  DGFunctor.commShift _ (P.twistPreservesShifts hS hR)
+
+end Shifts
 
 end EnhancedAdjunctionCones
 

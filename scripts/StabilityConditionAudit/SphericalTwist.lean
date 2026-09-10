@@ -117,6 +117,13 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistTriangleFunctor_obj_obj₂
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistTriangleFunctor_obj_obj₃
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistTriangleFunctor_obj_mor₂
+
+-- Half of exactness for the twist: it preserves shifts, hence commutes with the
+-- shift on `H⁰`.  Not exactness itself, which also needs distinguished
+-- triangles to go to distinguished triangles.
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistPreservesShifts
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConePreservesShifts
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistH0CommShift
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctor
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions
