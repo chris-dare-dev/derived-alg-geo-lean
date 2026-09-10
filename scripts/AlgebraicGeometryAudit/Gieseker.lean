@@ -219,3 +219,20 @@ inherits its slope and semistability from the maximal destabilizing subobject. -
 #print axioms AlgebraicGeometry.Stability.Gieseker.cokernelOfLEBotIso
 #print axioms AlgebraicGeometry.Stability.Gieseker.cokernel_not_isZero_of_lt
 #print axioms AlgebraicGeometry.Stability.Gieseker.pullback_lt_of_lt
+
+/-! ## The spliced chain (#905 splice, continued)
+
+The chain of the spliced filtration and the facts the structure's fields need: it starts at
+bottom, its first step is the maximal destabilizing subobject, it is strictly monotone, it ends
+at the top, its first successive quotient is that subobject, and each later one is the
+corresponding quotient downstairs. Strict monotonicity reduces to adjacent steps by the `Fin`
+criterion, so only two cases arise: the opening `bot < B`, and a pullback of a strict step. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.cokernelOfLECongr
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain_zero
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain_succ
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain_strictMono
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain_top
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceFactorZeroIso
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceFactorSuccIso
