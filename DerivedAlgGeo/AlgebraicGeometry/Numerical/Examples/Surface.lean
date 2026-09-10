@@ -1,4 +1,5 @@
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.Abelian
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.BlowUpPlane
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.Enriques
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3Mukai
@@ -7,5 +8,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.ProjectivePlan
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.SmoothQuadric
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.SmoothQuadricCharge
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOneRealization
 
 /-! # Surface examples -/
