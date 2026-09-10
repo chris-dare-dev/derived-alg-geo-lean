@@ -1471,3 +1471,30 @@ Deliverable 4 of the #740 surface redirect's item 2.
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_of_rank_pos
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_of_rank_zero
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.topSlope_eq_of_iso
+
+/-! ## Transporting weak slope data along an equivalence (#1121)
+
+`WeakSlopeData` is two homomorphisms out of `K₀Ab` plus two sign conditions, so an equivalence of
+abelian categories carries it by precomposition with `K₀Ab.congr`. The transported data reads an
+object by pulling it back through the inverse functor, which is why every statement comes in two
+readings: the `e.inverse` form holds by definition and carries the `simp` attribute, and the
+`e.functor` form is the one a consumer starting on the source category wants and needs the unit
+isomorphism. The two cannot both be `simp` lemmas -- the first rewrites the left-hand side of the
+second.
+
+The Harder-Narasimhan property is NOT transported here; it is a statement about chains of
+subobjects and their cokernels rather than about a homomorphism. -/
+
+#print axioms CategoryTheory.Triangulated.not_isZero_inverse_obj
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_rank
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_degree
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_symm_of_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_rank_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_degree_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_charge
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_charge_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_slope
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_slope_functor
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope_functor
