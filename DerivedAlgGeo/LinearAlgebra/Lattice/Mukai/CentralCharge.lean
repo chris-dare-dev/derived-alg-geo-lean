@@ -54,6 +54,25 @@ noncomputable def expChargeHom : RealExtension V →+ ℂ where
 theorem expChargeHom_apply (v : RealExtension V) :
     expChargeHom b β ω v = expCharge b β ω v := rfl
 
+/-- **`Z(β,ω)` as an `ℝ`-linear map.**
+
+The additive homomorphism above is enough for the wall arithmetic, but the
+support property of
+`Triangulated/StabilityCondition/Weak/Support/Predicate/Quadratic.lean` is
+stated for an `ℝ`-linear charge, because its quadratic form is.  Real
+homogeneity comes from `PeriodDomain.centralCharge_smul`; nothing new is
+computed. -/
+noncomputable def expChargeLinearMap : RealExtension V →ₗ[ℝ] ℂ where
+  toFun := expCharge b β ω
+  map_add' := (expChargeHom b β ω).map_add
+  map_smul' a v := by
+    show expCharge b β ω (a • v) = (a : ℝ) • expCharge b β ω v
+    rw [expCharge, expCharge, PeriodDomain.centralCharge_smul, Complex.real_smul]
+
+@[simp]
+theorem expChargeLinearMap_apply (v : RealExtension V) :
+    expChargeLinearMap b β ω v = expCharge b β ω v := rfl
+
 /-- The charge written out on a triple. This is Bridgeland's formula. -/
 theorem expCharge_apply (hb : ∀ x y : V, b x y = b y x) (r : ℝ) (c : V) (s : ℝ) :
     expCharge b β ω (r, c, s)
