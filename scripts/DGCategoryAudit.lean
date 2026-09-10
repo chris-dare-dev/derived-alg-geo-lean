@@ -737,6 +737,39 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsShiftBy.comp_inv_naturality
 #print axioms CategoryTheory.IsShiftBy.comp_inv_comp_hom
 
+-- Comparing two chosen shifts, and composing shifts, in every degree.  These
+-- are what make the objectwise comparison of `IsShiftBy.compare` natural, and
+-- with them the shift of a dg functor is coherent in the degree rather than
+-- only defined for each degree separately.
+#print axioms CategoryTheory.IsShiftBy.shiftMap_units_smul
+#print axioms CategoryTheory.IsShiftBy.hom_comp_compare
+#print axioms CategoryTheory.IsShiftBy.shiftMap_compare
+#print axioms CategoryTheory.IsShiftBy.comp'_shiftMap
+#print axioms CategoryTheory.IsShiftBy.comp'_shiftMap_smul
+#print axioms CategoryTheory.IsShiftBy.shiftMap_self
+
+-- Shifting twice agrees with shifting once, and shifting by zero changes
+-- nothing -- both up to a canonical comparison that is closed and invertible,
+-- so these are isomorphisms in the dg category of dg functors and not merely
+-- maps.  The signs merge because `n p + m p = r p`.
+#print axioms CategoryTheory.DGFunctor.shiftWitnessComp
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAdd
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAddInv
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAdd_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAddInv_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorZero
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorZero_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorZeroInv
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorZeroInv_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAdd_isClosed
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAddInv_isClosed
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorZero_isClosed
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorZeroInv_isClosed
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAdd_comp_inv
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAddInv_comp
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorZero_comp_inv
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorZeroInv_comp
+
 -- The shift of a dg functor, and the resulting pretriangulated structure on
 -- the dg category of dg functors.  This is what makes the objectwise twist a
 -- genuine cone of functors: Anno--Logvinenko's triangle read in `DGFunctor C D`
