@@ -747,6 +747,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsShiftBy.comp'_shiftMap
 #print axioms CategoryTheory.IsShiftBy.comp'_shiftMap_smul
 #print axioms CategoryTheory.IsShiftBy.shiftMap_self
+#print axioms CategoryTheory.IsShiftBy.shiftMap_zero_eq_mapShift
+
+-- The dg shift of a functor computes the `H⁰` shift, on objects by `rfl` and
+-- on morphisms because the Koszul sign is `+1` in degree zero and the two
+-- transports agree.  This is what makes "the cotwist is the shift of the cone
+-- functor" a statement about the dg functor rather than only about each value.
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_obj
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_map
 
 -- Shifting twice agrees with shifting once, and shifting by zero changes
 -- nothing -- both up to a canonical comparison that is closed and invertible,

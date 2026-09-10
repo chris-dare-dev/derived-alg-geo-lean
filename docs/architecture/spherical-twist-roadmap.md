@@ -82,11 +82,13 @@ EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
 ├─ unshifted cones underlying dual twist and cotwist
 ├─ the four triangles as functors on H⁰, every value distinguished, each first
-│  map the corresponding unit or counit: twistTriangleFunctor and
-│  dualTwistConeTriangleFunctor into Triangle (H⁰ B), cotwistConeTriangleFunctor
-│  and dualCotwistTriangleFunctor into Triangle (H⁰ A).  Two of the four are of
-│  the UNSHIFTED cones; the conventional dual twist and cotwist are their ⟦-1⟧
-│  shifts, which are not taken.  No sphericality and no relation among the four.
+│  map the corresponding unit or counit.  The dual twist and the cotwist are
+│  the INVERSE ROTATIONS of their unshifted cone triangles: invRotate applies
+│  the ⟦-1⟧ shift and reorders in one step, and the first vertex is the value
+│  of the dg shifted cone functor on the nose (DGFunctor.shiftedFunctor_h0_obj).
+│  The unshifted forms are kept, since TwistCotwistEquivalenceConditions is
+│  stated against the unshifted cone functors.  No sphericality, and no relation
+│  among the four.
 └─ TwistCotwistEquivalenceConditions
 
 Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
