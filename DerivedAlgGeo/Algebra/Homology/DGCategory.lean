@@ -15,6 +15,7 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Linear
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Opposite
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Product
+import DerivedAlgGeo.Algebra.Homology.DGCategory.QuasiEquivalence
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Shift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.HorizontalComposition
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Whiskering

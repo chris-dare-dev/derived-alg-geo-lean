@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.DGCategory.QuasiEquivalence
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionCone
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctor
@@ -223,6 +224,39 @@ theorem dualCotwistTriangleFunctor_obj_mor₁ (X : H0 A) :
     P.dualCotwist X
 
 end Source
+
+
+/-! ### The equivalence conditions, spent -/
+
+section Equivalences
+
+/-- **The twist is an autoequivalence of `H⁰ B`.**
+
+`TwistCotwistEquivalenceConditions` records that the twist is a
+quasi-equivalence, and `DGFunctor.h0Equivalence` turns a quasi-equivalence into
+an equivalence on `H⁰`.  This is the first categorical invertibility statement
+about a twist in this repository: everything before it was either numerical, on
+`K₀`, or a construction with no invertibility attached.
+
+No pretriangulated hypothesis is needed: this is an equivalence of ordinary
+categories, and the cone triangles above play no part in it.  Nothing here says
+the equivalence is exact, and nothing here calls the functor spherical: the Anno--Logvinenko implication from
+this pair of conditions to all four spherical conditions is still out of
+reach. -/
+noncomputable def twistH0Equivalence
+    (h : TwistCotwistEquivalenceConditions P) : H0 B ≌ H0 B :=
+  P.twistFunctor.h0Equivalence h.twist
+
+/-- **The unshifted cotwist cone is an autoequivalence of `H⁰ A`.**
+
+The conventional cotwist is its `⟦-1⟧` shift; requiring the unshifted cone
+functor to be a quasi-equivalence is the shift-free form of the same
+condition. -/
+noncomputable def cotwistConeH0Equivalence
+    (h : TwistCotwistEquivalenceConditions P) : H0 A ≌ H0 A :=
+  P.cotwistConeFunctor.h0Equivalence h.cotwist
+
+end Equivalences
 
 end EnhancedAdjunctionCones
 
