@@ -322,6 +322,22 @@ lemma comp'_shiftMap_smul {E E'' : C} {m : ℤ} (s : IsShiftBy A n A')
     show m * p + n * p = nm * p by rw [← hnm]; ring,
     comp'_shiftMap s u s' u' nm hnm p f]
 
+/-- **In degree zero, transport is `IsShiftBy.mapShift`.**
+
+`mapShift` is the degree-zero transport that `Pretriangulated/Basic.lean`
+already had, and `shiftMap` is the all-degree one.  They are the same map, but
+not definitionally: `shiftMap` indexes its middle composite by `n + p`, which
+at `p = 0` is `n + 0` and is only propositionally `n`.  `shiftMap_unique`
+crosses that gap, because its result index is a free variable. -/
+lemma shiftMap_zero_eq_mapShift (s : IsShiftBy A n A') (s' : IsShiftBy B n B')
+    (f : (dgHom A B).X 0) :
+    s.shiftMap s' 0 f = mapShift s s' f := by
+  refine s.shiftMap_unique s' 0 (-n) (by omega) (by omega) f _ ?_
+  rw [mapShift,
+    ← dgComp_assoc (-n) n (-n) 0 0 (-n) (by omega) (by omega) (by omega),
+    ← dgComp_assoc (-n) n 0 0 n 0 (by omega) (by omega) (by omega),
+    s.hom_inv, dgId_comp]
+
 /-- Transport across the identity shift is the identity. -/
 lemma shiftMap_self (p : ℤ) (f : (dgHom A B).X p) :
     (IsShiftBy.self A).shiftMap (IsShiftBy.self B) p f = f := by
