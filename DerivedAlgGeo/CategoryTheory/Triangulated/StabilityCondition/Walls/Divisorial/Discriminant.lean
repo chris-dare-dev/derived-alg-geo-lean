@@ -108,6 +108,57 @@ theorem pair_self_neg_of_orthogonal (h : S.HodgeIndex H) {x : D}
 
 end HodgeIndex
 
+/-- **Negative definiteness of the intersection form on `H^⊥`**, together with
+positivity of `H²`.
+
+This is what the Hodge index theorem gives for `N¹(X)_ℝ` with `H` ample: the
+form has signature `(1, ρ - 1)`, so it is negative definite on `H^⊥`.
+`HodgeIndex` records only the inequality that follows from it, and the
+inequality is strictly weaker — it permits an isotropic class in `H^⊥`, which a
+support property cannot. -/
+structure HodgeDefinite (H : D) : Prop where
+  /-- The reference class has positive square. -/
+  H_square_pos : 0 < S.pair H H
+  /-- The form is negative definite on the orthogonal complement of `H`. -/
+  neg_definite : ∀ x : D, S.pair H x = 0 → x ≠ 0 → S.pair x x < 0
+
+namespace HodgeDefinite
+
+variable {S} {H : D}
+
+/-- Definiteness on `H^⊥` implies the index inequality, by splitting a class
+into its `H`-component and an orthogonal remainder. -/
+theorem toHodgeIndex (h : S.HodgeDefinite H) : S.HodgeIndex H where
+  H_square_pos := h.H_square_pos
+  index_le x := by
+    have hH : S.pair H H ≠ 0 := ne_of_gt h.H_square_pos
+    set t : ℝ := S.pair H x / S.pair H H with ht
+    set x' : D := x - t • H with hx'
+    have horth : S.pair H x' = 0 := by
+      simp only [hx', DivisorSpace.pair, map_sub, map_smul, smul_eq_mul]
+      change S.pair H x - t * S.pair H H = 0
+      rw [ht, div_mul_cancel₀ _ hH, sub_self]
+    have hsplit : x = t • H + x' := by
+      simp only [hx']
+      abel
+    have hcomm : S.pair x' H = 0 := by rw [S.pair_comm]; exact horth
+    have hxx : S.pair x x = t ^ 2 * S.pair H H + S.pair x' x' := by
+      conv_lhs => rw [hsplit]
+      simp only [DivisorSpace.pair, map_add, map_smul, LinearMap.add_apply,
+        LinearMap.smul_apply, smul_eq_mul] at horth hcomm ⊢
+      linear_combination t * horth + t * hcomm
+    have hx'nonpos : S.pair x' x' ≤ 0 := by
+      by_cases hz : x' = 0
+      · rw [hz]
+        simp [DivisorSpace.pair]
+      · exact (h.neg_definite x' horth hz).le
+    have hts : t ^ 2 * S.pair H H * S.pair H H = S.pair H x ^ 2 := by
+      rw [ht]
+      field_simp
+    nlinarith [h.H_square_pos, hxx, hx'nonpos, hts]
+
+end HodgeDefinite
+
 end DivisorSpace
 
 /-! ### Orthogonal slices -/
