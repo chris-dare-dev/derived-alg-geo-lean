@@ -853,3 +853,21 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.squareTriangleMorphism_hom₃
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleNatTrans
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleNatTrans_app
+
+-- Independence of the chosen cones.  Two `ConeData` for one transformation are
+-- related by the identity square, so the comparison is the identity case of
+-- the naturality above; `compareIso` packages it as an isomorphism of triangle
+-- functors, which says the construction does not depend on the choices.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareCone
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareCone_self
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareCone_comp
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.id_square
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareNatTrans
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareNatTrans_app_hom₁
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareNatTrans_app_hom₂
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareNatTrans_app_hom₃
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareNatTrans_self
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareNatTrans_comp
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
