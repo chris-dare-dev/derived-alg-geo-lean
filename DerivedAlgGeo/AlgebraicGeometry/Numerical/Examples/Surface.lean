@@ -9,5 +9,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.SmoothQuadric
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.SmoothQuadricCharge
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOneRealization
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOneWalls
 
 /-! # Surface examples -/
