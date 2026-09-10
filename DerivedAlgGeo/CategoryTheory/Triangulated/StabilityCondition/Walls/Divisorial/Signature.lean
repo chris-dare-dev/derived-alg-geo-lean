@@ -55,10 +55,11 @@ the finiteness statement are exactly "the divisor space is Hodge" and "`ω` is i
 the positive cone", which is what one wants.
 
 The *region-wise* statement — finitely many walls meeting a family of planes —
-is not proved here.  `QuadraticForm/WallFiniteness.lean` records why: the
-coercivity constant degrades at the boundary of the positive-plane locus, so a
-`PlaneRegion` must carry the constant rather than derive it.  That is a separate
-change, and this file deliberately stops at the pointwise case.
+is not proved here, because it needs a uniform coercivity constant and
+`QuadraticForm/WallFiniteness.lean` records why one plane does not supply it.
+It is proved in `Divisorial/Region.lean` for a **compact** family, using the
+`PlaneRegion` of `QuadraticForm/WallRegion.lean`, whose only missing input was
+the signature this file supplies.
 
 No geometry is asserted: `D` is an arbitrary finite-dimensional real divisor
 space and the lattice is the `ℤ`-span of an `ℝ`-basis.
