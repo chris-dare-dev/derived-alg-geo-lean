@@ -234,6 +234,58 @@ theorem smul_tmulSection (M N : X.Modules) (U : X.Opensᵒᵖ)
     exact (ModuleCat.Hom.hom eta).map_smul r _
   exact (hsm.symm.trans (congrArg _ h1.symm))
 
+/-- **The pure tensor restricts termwise.**
+
+The sheafification unit is a morphism of presheaves of modules, so it commutes with restriction,
+and the presheaf tensor restricts a pure tensor termwise by definition
+(`PresheafOfModules.Monoidal.tensorObj_map_tmul`). Without this a section built by `tmulSection`
+cannot be followed to a smaller open, which every chart-by-chart argument has to do. -/
+theorem res_tmulSection (M N : X.Modules) {U V : X.Opens} (h : V ≤ U)
+    (t : Γ(M, U)) (y : Γ(N, U)) :
+    (tensorObj M N).presheaf.map (homOfLE h).op (tmulSection M N (Opposite.op U) t y)
+      = tmulSection M N (Opposite.op V) (M.presheaf.map (homOfLE h).op t)
+          (N.presheaf.map (homOfLE h).op y) := by
+  unfold tmulSection
+  exact (PresheafOfModules.naturality_apply
+    ((PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app _)
+    (homOfLE h).op _).symm
+
+/-- **The pure tensor is additive in its first factor.** -/
+theorem tmulSection_add_left (M N : X.Modules) (U : X.Opensᵒᵖ)
+    (t t' : Γ(M, U.unop)) (y : Γ(N, U.unop)) :
+    tmulSection M N U (t + t') y = tmulSection M N U t y + tmulSection M N U t' y := by
+  unfold tmulSection
+  set eta := ((PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app
+    ((toPresheafOfModules X).obj M ⊗ (toPresheafOfModules X).obj N)).app U with heta
+  have h1 : (t + t') ⊗ₜ[Γ(X, U.unop)] y = t ⊗ₜ[Γ(X, U.unop)] y + t' ⊗ₜ[Γ(X, U.unop)] y :=
+    TensorProduct.add_tmul _ _ _
+  exact (congrArg (ModuleCat.Hom.hom eta) h1).trans ((ModuleCat.Hom.hom eta).map_add _ _)
+
+/-- **A scalar moves onto the first factor** -- the companion of `smul_tmulSection`, which moves
+it onto the second. A chart-local generation argument leaves the scalar on the `F` side, where
+the generators live. -/
+theorem smul_tmulSection_left (M N : X.Modules) (U : X.Opensᵒᵖ)
+    (r : Γ(X, U.unop)) (t : Γ(M, U.unop)) (y : Γ(N, U.unop)) :
+    r • tmulSection M N U t y = tmulSection M N U (r • t) y := by
+  unfold tmulSection
+  set eta := ((PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app
+    ((toPresheafOfModules X).obj M ⊗ (toPresheafOfModules X).obj N)).app U with heta
+  have h1 : (r • t) ⊗ₜ[Γ(X, U.unop)] y = r • (t ⊗ₜ[Γ(X, U.unop)] y) :=
+    (TensorProduct.smul_tmul' _ _ _).symm
+  exact ((ModuleCat.Hom.hom eta).map_smul r _).symm.trans
+    (congrArg (ModuleCat.Hom.hom eta) h1.symm)
+
+/-- **The pure tensor of a finite sum is the finite sum of pure tensors.** -/
+theorem tmulSection_finset_sum_left (M N : X.Modules) (U : X.Opensᵒᵖ)
+    {κ : Type*} (S : Finset κ) (f : κ → Γ(M, U.unop)) (y : Γ(N, U.unop)) :
+    tmulSection M N U (∑ a ∈ S, f a) y = ∑ a ∈ S, tmulSection M N U (f a) y := by
+  unfold tmulSection
+  set eta := ((PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app
+    ((toPresheafOfModules X).obj M ⊗ (toPresheafOfModules X).obj N)).app U with heta
+  have h1 : (∑ a ∈ S, f a) ⊗ₜ[Γ(X, U.unop)] y = ∑ a ∈ S, f a ⊗ₜ[Γ(X, U.unop)] y :=
+    TensorProduct.sum_tmul _ _ _
+  exact (congrArg (ModuleCat.Hom.hom eta) h1).trans (map_sum (ModuleCat.Hom.hom eta) _ _)
+
 /-- **The sheafification unit of a presheaf of modules is locally surjective.**
 
 Its underlying map of abelian presheaves *is* `toSheafify`
