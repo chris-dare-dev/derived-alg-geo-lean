@@ -933,6 +933,19 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
 
+-- A cone functor preserves shifts AND chosen cones when its two ends do, so the
+-- twist candidate of a dg adjunction is exact as soon as the adjoints are.
+-- Both arguments are the cone splitting rather than a computation: in the
+-- coordinates of the splittings the maps are block diagonal, with one sign.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compRight_functor_map
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesShifts
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.preservesShifts
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.coneSplit_functor_map
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesChosenCones
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesChosenCones
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.preservesChosenCones
+
 -- Anno--Logvinenko's twist triangle, read as a triangle of functors on `H⁰`.
 -- The counit's chosen cones give `X ↦ (L R X ⟶ X ⟶ T X ⟶ (L R X)⟦1⟧)`, every
 -- value distinguished, with the first two maps the adjunction's own counit and

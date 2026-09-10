@@ -107,6 +107,25 @@ theorem fracSection_mul {a b a' b' : A} {k k' : ℕ} (ha : a ∈ 𝒜 k) (hb : b
       = fracSection 𝒜 (SetLike.mul_mem_graded ha ha') (SetLike.mul_mem_graded hb hb') hUU :=
   rfl
 
+/-- **`a / b` and `b / a` are inverse to each other**, over an open inside both `D₊(a)` and
+`D₊(b)`.
+
+Serre's global generation inverts the chart scalar `(f / gᵉ)ⁿ` on `D₊(g) ⊓ D₊(f)`: the extension
+lemma produces `(f / gᵉ)ⁿ • u` as a restriction of a global section, and this is what recovers
+`u` itself as a combination of the chart's generators. The product is `fracSection_mul`, and
+`(a b) / (b a) = 1 / 1` is one `Localization.r_iff_exists` with witness `1`. -/
+theorem fracSection_mul_fracSection_symm {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k) (hb : b ∈ 𝒜 k)
+    {U : Opens X} (hUb : U ≤ ProjectiveSpectrum.basicOpen 𝒜 b)
+    (hUa : U ≤ ProjectiveSpectrum.basicOpen 𝒜 a) :
+    fracSection 𝒜 ha hb hUb * fracSection 𝒜 hb ha hUa = 1 := by
+  rw [fracSection_mul 𝒜 ha hb hb ha hUb hUa (le_basicOpen_mul 𝒜 hUb hUa)]
+  refine Subtype.ext (funext fun x => ?_)
+  show frac 𝒜 _ _ _ = 1
+  apply HomogeneousLocalization.val_injective
+  rw [frac, HomogeneousLocalization.val_mk, HomogeneousLocalization.val_one]
+  rw [← Localization.mk_one, Localization.mk_eq_mk_iff, Localization.r_iff_exists]
+  exact ⟨1, by simp [mul_comm]⟩
+
 /-- **Rescaling the section `b` of `O(k)` by `a / b` gives the section `a`**, at every point of an
 open inside `D₊(b)`.
 

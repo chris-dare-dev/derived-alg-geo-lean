@@ -23,5 +23,7 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.ChartProj
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.Glue
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.GlueUniform
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.TwistGenerated
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.ChartGeneration
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.GlobalGeneration
 
 /-! # Graded modules and their sheaves on `Proj` -/
