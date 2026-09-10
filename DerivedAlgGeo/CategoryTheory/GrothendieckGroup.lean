@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Functorial
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Presentation
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 

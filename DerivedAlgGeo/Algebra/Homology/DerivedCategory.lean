@@ -8,6 +8,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.SingleTriangle
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Opposite
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.LinearDual
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Heart
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
