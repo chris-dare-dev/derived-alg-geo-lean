@@ -24,28 +24,14 @@ PeriodDomain.HasSignatureTwo -- carried as an assumption by every period-domain
 result -- becomes a consequence of the same certificate the support property
 uses. Nothing here proves that certificate for a geometric surface. -/
 
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.hasSignatureTwo_of_hodgeDefinite
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.intersectionQuadratic
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.intersectionQuadratic_apply
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.polar_intersectionQuadratic
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.sigPos_sigNeg_of_hodgeDefinite
-
-/-! ## Finitely many spherical walls through an exponential plane
-
-expPlane is the plane spanned by the real and imaginary parts of exp(B + i omega),
-and isPositivePlane_expPlane says it is a positive plane as soon as omega^2 > 0,
-with the B-field unconstrained. Feeding that and the signature into
-PeriodDomain.finite_walls_through gives Bridgeland's local finiteness at a point
-of the period domain, with hypotheses that are exactly "the divisor space is
-Hodge" and "omega is in the positive cone".
-
-The REGION-WISE statement is deliberately absent. QuadraticForm/WallFiniteness
-records why: the coercivity constant degrades at the boundary of the
-positive-plane locus, so a PlaneRegion must carry its own constant rather than
-derive it. The lattice is the Z-span of an R-basis and is not asserted to be a
-geometric lattice. -/
-
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.HodgeDefinite.of_pair_pos
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.expPlane
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.finite_sphericalOrthogonal_expPlane
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.finite_walls_through_expPlane
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.hasSignatureTwo_of_hodgeDefinite
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.intersectionQuadratic
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.intersectionQuadratic_apply
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.isPositivePlane_expPlane
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.nondegenerate_of_hodgeDefinite
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.polar_intersectionQuadratic
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.sigPos_sigNeg_of_hodgeDefinite

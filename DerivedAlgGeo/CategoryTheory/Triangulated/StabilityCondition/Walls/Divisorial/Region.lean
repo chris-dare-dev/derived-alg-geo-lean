@@ -112,6 +112,106 @@ theorem continuous_expPairMap : Continuous S.expPairMap := by
 
 variable {S} {H : D}
 
+/-! ### A uniform negative-definiteness constant on the family -/
+
+/-- The scaling step: a bound on the normalization of `x` is a bound on `x`. -/
+private theorem scale_bound {c : ℝ} {u : D} (hu : u ≠ 0)
+    (hle : c ≤ -(S.pair (‖u‖⁻¹ • u) (‖u‖⁻¹ • u))) : S.pair u u ≤ -c * ‖u‖ ^ 2 := by
+  have hnu : (0 : ℝ) < ‖u‖ := norm_pos_iff.mpr hu
+  have hval : S.pair (‖u‖⁻¹ • u) (‖u‖⁻¹ • u) = (‖u‖⁻¹) ^ 2 * S.pair u u := by
+    simp only [DivisorSpace.pair, map_smul, LinearMap.smul_apply, smul_eq_mul]
+    ring
+  rw [hval] at hle
+  have h2 := mul_le_mul_of_nonneg_right hle (sq_nonneg ‖u‖)
+  have hrw : -((‖u‖⁻¹) ^ 2 * S.pair u u) * ‖u‖ ^ 2 = -(S.pair u u) := by
+    have hne : (‖u‖ : ℝ) ≠ 0 := ne_of_gt hnu
+    field_simp
+  rw [hrw] at h2
+  linarith
+
+/-- **A compact family of polarizations has a positive lower bound for `ω²`.**
+
+The second constant `Spherical.BoundedRegion` asks for.  A continuous positive
+function on a compact set attains a positive minimum; the empty family takes
+any positive number. -/
+theorem exists_ampleLower {K : Set (D × D)} (hK : IsCompact K)
+    (hpos : ∀ p ∈ K, 0 < S.pair p.2 p.2) :
+    ∃ a : ℝ, 0 < a ∧ ∀ p ∈ K, a ≤ S.pair p.2 p.2 := by
+  rcases K.eq_empty_or_nonempty with rfl | hne
+  · exact ⟨1, one_pos, by simp⟩
+  · obtain ⟨p₀, hp₀, hmin⟩ := hK.exists_isMinOn hne
+      (S.continuous_pair.comp (continuous_snd.prodMk continuous_snd)).continuousOn
+    exact ⟨S.pair p₀.2 p₀.2, hpos p₀ hp₀, fun p hp => isMinOn_iff.mp hmin _ hp⟩
+
+/-- **A compact family of polarizations has a uniform negative-definiteness
+constant.**
+
+`HodgeDefinite.of_pair_pos` makes the form negative definite on `ω^⊥` at every
+point of the family, but with a constant that could in principle degrade across
+it.  Compactness rules that out: the pairs of the family and the unit vectors
+orthogonal to their `ω` form a compact set, on which `-q` is continuous and
+positive, so it attains a positive minimum.  Homogeneity extends the bound off
+the sphere.
+
+This is the input `Spherical.BoundedRegion` asks for and has never had. -/
+theorem exists_uniform_negDefinite (h : S.HodgeDefinite H) {K : Set (D × D)}
+    (hK : IsCompact K) (hpos : ∀ p ∈ K, 0 < S.pair p.2 p.2) :
+    ∃ c : ℝ, 0 < c ∧ ∀ p ∈ K, ∀ x : D, S.pair x p.2 = 0 → S.pair x x ≤ -c * ‖x‖ ^ 2 := by
+  have horthC : Continuous fun z : (D × D) × D => S.pair z.2 z.1.2 :=
+    S.continuous_pair.comp (continuous_snd.prodMk (continuous_snd.comp continuous_fst))
+  have hclosed : IsClosed {z : (D × D) × D | S.pair z.2 z.1.2 = 0} :=
+    isClosed_eq horthC continuous_const
+  set T : Set ((D × D) × D) :=
+    (K ×ˢ Metric.sphere (0 : D) 1) ∩ {z | S.pair z.2 z.1.2 = 0} with hTdef
+  have hTcompact : IsCompact T := (hK.prod (isCompact_sphere (0 : D) 1)).inter_right hclosed
+  have hmemT : ∀ p ∈ K, ∀ v : D, ‖v‖ = 1 → S.pair v p.2 = 0 →
+      ((p, v) : (D × D) × D) ∈ T := by
+    intro p hp v hv hvo
+    exact ⟨⟨hp, by simpa [Metric.mem_sphere, dist_eq_norm] using hv⟩, hvo⟩
+  rcases T.eq_empty_or_nonempty with hTe | hTne
+  · refine ⟨1, one_pos, fun p hp x hx => ?_⟩
+    have hx0 : x = 0 := by
+      by_contra hne
+      have hnu : (0 : ℝ) < ‖x‖ := norm_pos_iff.mpr hne
+      have hnorm : ‖‖x‖⁻¹ • x‖ = 1 := by
+        rw [norm_smul, norm_inv, norm_norm]
+        field_simp
+      have horth : S.pair (‖x‖⁻¹ • x) p.2 = 0 := by
+        simp only [DivisorSpace.pair, map_smul, LinearMap.smul_apply, smul_eq_mul]
+        simp only [DivisorSpace.pair] at hx
+        rw [hx, mul_zero]
+      have hmem := hmemT p hp _ hnorm horth
+      rw [hTe] at hmem
+      exact hmem
+    simp [hx0, DivisorSpace.pair]
+  · obtain ⟨z₀, hz₀, hmin⟩ :=
+      hTcompact.exists_isMinOn hTne
+        ((S.continuous_pair.comp (continuous_snd.prodMk continuous_snd)).neg).continuousOn
+    have hz₀K : z₀.1 ∈ K := hz₀.1.1
+    have hz₀norm : ‖z₀.2‖ = 1 := by
+      simpa [Metric.mem_sphere, dist_eq_norm] using hz₀.1.2
+    have hz₀ne : z₀.2 ≠ 0 := by
+      intro hc
+      rw [hc, norm_zero] at hz₀norm
+      exact zero_ne_one hz₀norm
+    have hz₀neg : S.pair z₀.2 z₀.2 < 0 :=
+      (h.of_pair_pos (hpos z₀.1 hz₀K)).neg_definite z₀.2
+        (by rw [S.pair_comm]; exact hz₀.2) hz₀ne
+    refine ⟨-(S.pair z₀.2 z₀.2), by linarith, fun p hp x hx => ?_⟩
+    rcases eq_or_ne x 0 with rfl | hxne
+    · simp [DivisorSpace.pair]
+    · refine scale_bound hxne ?_
+      have hnu : (0 : ℝ) < ‖x‖ := norm_pos_iff.mpr hxne
+      have hnorm : ‖‖x‖⁻¹ • x‖ = 1 := by
+        rw [norm_smul, norm_inv, norm_norm]
+        field_simp
+      have horth : S.pair (‖x‖⁻¹ • x) p.2 = 0 := by
+        simp only [DivisorSpace.pair, map_smul, LinearMap.smul_apply, smul_eq_mul]
+        simp only [DivisorSpace.pair] at hx
+        rw [hx, mul_zero]
+      exact isMinOn_iff.mp hmin _ (hmemT p hp _ hnorm horth)
+
+
 /-- **The plane region of a compact family of exponential parameters.**
 
 Both inputs of `PlaneRegion.ofCompactPairs` are discharged: the signature by the

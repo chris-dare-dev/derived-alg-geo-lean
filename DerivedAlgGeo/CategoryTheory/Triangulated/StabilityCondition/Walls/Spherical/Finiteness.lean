@@ -38,6 +38,11 @@ theorem cannot quietly assume either. Neither is proved here: exhibiting a
 region with these constants is a statement about the ample cone, and the ample
 cone does not appear in this file any more than it does in `Basic`.
 
+A caller that does produce them is
+`Walls/Spherical/DivisorialRegion.lean`: on a divisor space with a
+`DivisorSpace.HodgeDefinite` certificate, a compact family of parameters
+supplies both constants, so everything below is inhabited rather than vacuous.
+
 ## What is still not assumed
 
 No K3 surface, no Néron--Severi group, no ample cone, no Hodge index theorem.
@@ -235,5 +240,39 @@ theorem finite_wallCandidates (hq : ∀ x y : V, q x y = q y x)
     (ZSpan.setFinite_inter basis Metric.isBounded_closedBall)
 
 end BoundedRegion
+
+
+/-! ### The chamber is cut out by finitely many walls on the region -/
+
+/-- The classes the chamber of a lattice is cut out by: spherical, of positive
+integral rank, with middle coordinate in `Λ`.
+
+`wallCandidates` is this set intersected with "has a wall meeting the region",
+so the two differ only by a condition that is vacuous off the region. -/
+def latticeSpherical (Λ : Set V) : Set (Mukai.RealExtension V) :=
+  {δ | IsSpherical q δ ∧ 0 < δ.1 ∧ (∃ n : ℤ, (n : ℝ) = δ.1) ∧ δ.2.1 ∈ Λ}
+
+theorem wallCandidates_subset_latticeSpherical (R : BoundedRegion q) (Λ : Set V) :
+    wallCandidates q R Λ ⊆ latticeSpherical q Λ := by
+  rintro δ ⟨hs, hr, hn, hΛ, -⟩
+  exact ⟨hs, hr, hn, hΛ⟩
+
+/-- **On the region, the chamber of the whole lattice is the chamber of the
+finitely many candidates.**
+
+A class whose wall misses the region cannot separate two of its points, so the
+chamber restricted to the region only sees `wallCandidates` — which
+`finite_wallCandidates` shows is finite.  This is what turns local finiteness
+into a chamber decomposition. -/
+theorem chamber_inter_carrier (R : BoundedRegion q) (Λ : Set V) :
+    chamber q (latticeSpherical q Λ) ∩ R.carrier
+      = chamber q (wallCandidates q R Λ) ∩ R.carrier := by
+  ext p
+  constructor
+  · rintro ⟨hp, hcar⟩
+    exact ⟨chamber_antitone q (wallCandidates_subset_latticeSpherical q R Λ) hp, hcar⟩
+  · rintro ⟨hp, hcar⟩
+    refine ⟨fun δ hδ hw => ?_, hcar⟩
+    exact hp δ ⟨hδ.1, hδ.2.1, hδ.2.2.1, hδ.2.2.2, p, hw, hcar⟩ hw
 
 end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical

@@ -27,16 +27,21 @@ Both discharge every hypothesis.
 CHAMBERS ARE NOT PROVED, and nothing identifies the carrier with K_num(X) for a
 geometric K3. -/
 
+#print axioms AlgebraicGeometry.Numerical.Examples.boxRegion
 #print axioms AlgebraicGeometry.Numerical.Examples.isCompact_parameterBox
 #print axioms AlgebraicGeometry.Numerical.Examples.k3HasSignatureTwo
+#print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_wallCandidates_box
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_walls_integral
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_walls_meeting_box
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_walls_through_expPlane
+#print axioms AlgebraicGeometry.Numerical.Examples.k3_h2_pos
 #print axioms AlgebraicGeometry.Numerical.Examples.omega_sq_pos_on_parameterBox
 #print axioms AlgebraicGeometry.Numerical.Examples.parameterBox
 #print axioms AlgebraicGeometry.Numerical.Examples.span_surfaceMukaiBasis
 #print axioms AlgebraicGeometry.Numerical.Examples.surfaceDivisorBasis
 #print axioms AlgebraicGeometry.Numerical.Examples.surfaceHasSignatureTwo
 #print axioms AlgebraicGeometry.Numerical.Examples.surfaceMukaiBasis
+#print axioms AlgebraicGeometry.Numerical.Examples.surface_chamber_inter_box
+#print axioms AlgebraicGeometry.Numerical.Examples.surface_finite_wallCandidates_box
 #print axioms AlgebraicGeometry.Numerical.Examples.surface_finite_walls_meeting_box
 #print axioms AlgebraicGeometry.Numerical.Examples.surface_finite_walls_through_expPlane

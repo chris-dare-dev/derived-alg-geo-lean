@@ -276,6 +276,58 @@ theorem sigNeg_eq_finrank_of_negDef {Q : QuadraticForm ℝ N} (h : (-Q).PosDef) 
     refine h.anisotropic x ?_
     simp [hx]
 
+/-- **A form of full negative index is negative definite.**  The converse of
+`sigNeg_eq_finrank_of_negDef`: a negative definite subspace of full dimension is
+the whole space. -/
+theorem negDef_of_sigNeg_eq_finrank {Q : QuadraticForm ℝ N}
+    (h : sigNeg Q = Module.finrank ℝ N) : (-Q).PosDef := by
+  obtain ⟨W, hW, hpd⟩ := exists_finrank_eq_sigNeg_and_negDef Q
+  have htop : W = ⊤ := Submodule.eq_top_of_finrank_eq (by rw [hW, h])
+  intro x hx
+  have hmem : x ∈ W := htop ▸ Submodule.mem_top
+  have hne : (⟨x, hmem⟩ : W) ≠ 0 := fun hc => hx (congrArg Subtype.val hc)
+  exact hpd ⟨x, hmem⟩ hne
+
 end Definite
+
+/-! ### Restricting a nondegenerate form to an orthogonal summand -/
+
+section Restrict
+
+variable {M : Type*} [AddCommGroup M] [Module ℝ M]
+variable {Q : QuadraticForm ℝ M} {W W' : Submodule ℝ M}
+
+/-- **A summand of a nondegenerate orthogonal decomposition is nondegenerate.**
+
+This is the converse direction of `nondegenerate_of_isCompl`: a class of the
+radical of one summand is orthogonal to that summand by definition and to the
+other by hypothesis, hence to everything. -/
+theorem nondegenerate_restrict_of_isCompl (hcompl : IsCompl W W')
+    (horth : ∀ w ∈ W, ∀ w' ∈ W', polar (⇑Q) w w' = 0) (hnd : Q.Nondegenerate) :
+    (Q.restrict W').Nondegenerate := by
+  rw [nondegenerate_iff_radical_eq_bot, Submodule.eq_bot_iff]
+  rintro ⟨y, hy⟩ hrad
+  have hQy : Q y = 0 := hrad.1
+  have hperp' : ∀ z ∈ W', polar (⇑Q) y z = 0 := by
+    intro z hz
+    have := congr_arg (fun f => f (⟨z, hz⟩ : W')) hrad.2
+    simpa [polar_restrict] using this
+  have hperp : ∀ z ∈ W, polar (⇑Q) y z = 0 := by
+    intro z hz
+    rw [polar_comm]
+    exact horth z hz y hy
+  have hall : ∀ z : M, polar (⇑Q) y z = 0 := by
+    intro z
+    obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp (by
+      rw [hcompl.sup_eq_top]; trivial : z ∈ W ⊔ W')
+    rw [polar_add_right, hperp a ha, hperp' b hb, add_zero]
+  have hmem : y ∈ Q.radical := by
+    refine ⟨hQy, ?_⟩
+    ext z
+    simpa using hall z
+  rw [hnd.radical_eq_bot, Submodule.mem_bot] at hmem
+  exact Subtype.ext hmem
+
+end Restrict
 
 end QuadraticMap
