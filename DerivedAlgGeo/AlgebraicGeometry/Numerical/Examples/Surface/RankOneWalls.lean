@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOneRealization
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Signature
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Region
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.IntegralBridge
 
 /-!
@@ -39,12 +40,19 @@ vacuous.  The two-point blow-up gives signature `(2, 3)` by the same route, reco
 `BlowUpPlane.hasSignatureTwo`; its lattice is not built here, because
 `Mukai.extendBasis` wants an explicit basis of the rank-three divisor space.
 
+## Both the pointwise and the region-wise count
+
+`surface_finite_walls_through_expPlane` is the count at one plane.
+`surface_finite_walls_meeting_box` is the count over the compact parameter box
+`|B| ≤ b₀`, `t₀ ≤ ω ≤ t₁` with `t₀ > 0`, which is the form a wall-and-chamber
+argument consumes.  The second needs a uniform coercivity constant, supplied by
+`PlaneRegion.ofCompactPairs` through `Divisorial/Region.lean`.
+
 ## What is not proved
 
-The **region-wise** finiteness — finitely many walls meeting a family of planes
-— does not follow, for the reason `QuadraticForm/WallFiniteness.lean` records:
-the coercivity constant degrades at the boundary of the positive-plane locus.
-That needs a `PlaneRegion` carrying its own constant and is a separate change.
+Chambers.  Finitely many walls meeting a box does not by itself produce the
+connected components of its complement, nor constancy of the semistable objects
+on one.
 
 Nothing here identifies the carrier with `K_num(X)` for a geometric surface.
 -/
@@ -149,6 +157,65 @@ theorem k3_finite_walls_integral {d : ℕ} (hd : d ≠ 0)
               Set (Mukai.RealExtension SurfaceDivisor))}.Finite := by
   have h := k3_finite_walls_through_expPlane hd B omega homega
   rwa [span_surfaceMukaiBasis] at h
+
+/-! ### Region-wise finiteness over a compact parameter box -/
+
+/-- The compact family of parameters `|B| ≤ b₀`, `t₀ ≤ ω ≤ t₁`.  Any compact set
+on which `ω` stays away from zero would do; a box is the readable choice. -/
+def parameterBox (b₀ t₀ t₁ : ℝ) : Set (SurfaceDivisor × SurfaceDivisor) :=
+  Set.Icc (-b₀) b₀ ×ˢ Set.Icc t₀ t₁
+
+theorem isCompact_parameterBox (b₀ t₀ t₁ : ℝ) : IsCompact (parameterBox b₀ t₀ t₁) :=
+  isCompact_Icc.prod isCompact_Icc
+
+theorem omega_sq_pos_on_parameterBox {h2 : ℝ} (hh2 : 0 < h2) {b₀ t₀ t₁ : ℝ} (ht₀ : 0 < t₀) :
+    ∀ p ∈ parameterBox b₀ t₀ t₁, 0 < (surfaceDivisorSpace h2).pair p.2 p.2 := by
+  rintro ⟨B, t⟩ hp
+  have ht : t₀ ≤ t := hp.2.1
+  have htpos : 0 < t := lt_of_lt_of_le ht₀ ht
+  show 0 < h2 * t * t
+  rw [mul_assoc]
+  exact mul_pos hh2 (mul_pos htpos htpos)
+
+/-- **Only finitely many spherical classes of the integral Mukai lattice have a
+wall meeting the parameter box**, on a Picard-rank-one surface with `∫H² > 0`.
+
+This is the region-wise statement, the one a wall-and-chamber argument consumes.
+Both hypotheses of the generic theorem are discharged: the box is compact, and
+`ω² = h2 · ω² > 0` because `ω ≥ t₀ > 0`. -/
+theorem surface_finite_walls_meeting_box {h2 : ℝ} (hh2 : 0 < h2)
+    (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
+    {δ : Mukai.RealExtension SurfaceDivisor |
+        PeriodDomain.IsSphericalClass
+          (Mukai.realForm (surfaceDivisorSpace h2).intersection) δ ∧
+        (∃ p ∈ parameterBox b₀ t₀ t₁,
+          DivisorSpace.expPlane (surfaceDivisorSpace h2) p.1 p.2 ∈
+            PeriodDomain.wall (Mukai.realForm (surfaceDivisorSpace h2).intersection) δ) ∧
+        δ ∈ (Submodule.span ℤ (Set.range surfaceMukaiBasis) :
+              Set (Mukai.RealExtension SurfaceDivisor))}.Finite :=
+  DivisorSpace.finite_walls_meeting_expFamily (surfaceHodgeDefinite hh2 one_ne_zero)
+    (isCompact_parameterBox b₀ t₀ t₁) (omega_sq_pos_on_parameterBox hh2 ht₀) surfaceMukaiBasis
+
+/-- **The region-wise count on the degree-`2d` K3 model**, with the lattice named
+as the integral Mukai extension `ℤ ⊕ ℤH ⊕ ℤ`.
+
+Nothing is assumed beyond `d > 0` and `t₀ > 0`. -/
+theorem k3_finite_walls_meeting_box {d : ℕ} (hd : d ≠ 0)
+    (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
+    {δ : Mukai.RealExtension SurfaceDivisor |
+        PeriodDomain.IsSphericalClass
+          (Mukai.realForm (surfaceDivisorSpace (2 * (d : ℝ))).intersection) δ ∧
+        (∃ p ∈ parameterBox b₀ t₀ t₁,
+          DivisorSpace.expPlane (surfaceDivisorSpace (2 * (d : ℝ))) p.1 p.2 ∈
+            PeriodDomain.wall
+              (Mukai.realForm (surfaceDivisorSpace (2 * (d : ℝ))).intersection) δ) ∧
+        δ ∈ (Mukai.integralExtension (Submodule.span ℤ (Set.range surfaceDivisorBasis)) :
+              Set (Mukai.RealExtension SurfaceDivisor))}.Finite := by
+  have hh2 : (0 : ℝ) < 2 * (d : ℝ) := by
+    have hdpos : (0 : ℝ) < (d : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero hd
+    linarith
+  have hfin := surface_finite_walls_meeting_box hh2 b₀ t₀ t₁ ht₀
+  rwa [span_surfaceMukaiBasis] at hfin
 
 end
 
