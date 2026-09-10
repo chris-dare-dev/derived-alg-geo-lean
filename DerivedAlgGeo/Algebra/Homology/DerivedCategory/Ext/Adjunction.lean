@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicComparison
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.Map
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.EnoughInjectives
 import Mathlib.CategoryTheory.Preadditive.Injective.Preserves
@@ -226,75 +227,40 @@ section Bijective
 
 variable [EnoughInjectives D]
 
-/-- **The comparison is surjective in every degree.**
-
-The induction embeds `B` in an injective and compares connecting maps. Both connecting maps are
-surjective — upstairs because `Ext^{n+1}(L A, I)` vanishes, downstairs because `R I` is again
-injective — so a class in the target pulls back, lifts by the inductive hypothesis, and pushes
-forward. -/
-theorem surjective_extAdjunctionMap (n : ℕ) (A : C) (B : D) :
-    Function.Surjective (extAdjunctionMap adj (A := A) (B := B) (n := n)) := by
-  induction n generalizing A B with
-  | zero =>
-    intro y
-    obtain ⟨g, rfl⟩ := (Ext.mk₀_bijective A (R.obj B)).2 y
-    exact ⟨Ext.mk₀ ((adj.homEquiv A B).symm g), by
-      rw [extAdjunctionMap_mk₀, Equiv.apply_symm_apply]⟩
-  | succ n ih =>
-    intro y
-    let S := ShortComplex.mk _ _ (cokernel.condition (Injective.ι B))
-    have hS : S.ShortExact :=
-      { exact := ShortComplex.exact_of_g_is_cokernel _ (cokernelIsCokernel S.f) }
-    have hRS := hS.map_of_exact R
-    haveI := preservesInjectiveObjects_of_adj adj
-    haveI : Injective (S.map R).X₂ := inferInstanceAs (Injective (R.obj S.X₂))
-    have hsurj' : Function.Surjective (Ext.postcomp hRS.extClass A (rfl : n + 1 = _)) :=
-      fun y₁ ↦ Ext.covariant_sequence_exact₁ A hRS y₁ (Ext.eq_zero_of_injective _) rfl
-    obtain ⟨z, hz⟩ := hsurj' y
-    obtain ⟨x, hx⟩ := ih A S.X₃ z
-    exact ⟨x.comp hS.extClass rfl, by
-      rw [extAdjunctionMap_comp_extClass adj hS rfl x, hx]; exact hz⟩
-
-/-- **The comparison is injective in every degree.**
-
-Note the dependence: the successor case calls `surjective_extAdjunctionMap` in degree `n` to lift
-the class the exactness argument produces. Injectivity is therefore *not* provable independently
-of surjectivity, and reordering the two theorems breaks the file. -/
-theorem injective_extAdjunctionMap (n : ℕ) (A : C) (B : D) :
-    Function.Injective (extAdjunctionMap adj (A := A) (B := B) (n := n)) := by
-  induction n generalizing A B with
-  | zero =>
-    intro x y hxy
+/-- **In degree zero the comparison is bijective**: it is the adjunction hom-equivalence
+transported through `Ext.mk₀`. -/
+theorem bijective_extAdjunctionMap_zero (A : C) (B : D) :
+    Function.Bijective (extAdjunctionMap adj (A := A) (B := B) (n := 0)) := by
+  constructor
+  · intro x y hxy
     obtain ⟨f, rfl⟩ := (Ext.mk₀_bijective (L.obj A) B).2 x
     obtain ⟨g, rfl⟩ := (Ext.mk₀_bijective (L.obj A) B).2 y
     rw [extAdjunctionMap_mk₀, extAdjunctionMap_mk₀] at hxy
     exact congrArg Ext.mk₀ ((adj.homEquiv A B).injective
       ((Ext.mk₀_bijective A (R.obj B)).1 hxy))
-  | succ n ih =>
-    have key : ∀ (A : C) (B : D) (x : Ext.{w} (L.obj A) B (n + 1)),
-        extAdjunctionMap adj x = 0 → x = 0 := by
-      intro A B x hx
-      let S := ShortComplex.mk _ _ (cokernel.condition (Injective.ι B))
-      have hS : S.ShortExact :=
-        { exact := ShortComplex.exact_of_g_is_cokernel _ (cokernelIsCokernel S.f) }
-      have hRS := hS.map_of_exact R
-      haveI := preservesInjectiveObjects_of_adj adj
-      haveI : Injective (S.map R).X₂ := inferInstanceAs (Injective (R.obj S.X₂))
-      obtain ⟨x', rfl⟩ : ∃ x' : Ext.{w} (L.obj A) S.X₃ n,
-          x'.comp hS.extClass (rfl : n + 1 = _) = x :=
-        Ext.covariant_sequence_exact₁ (L.obj A) hS x (Ext.eq_zero_of_injective _) rfl
-      rw [extAdjunctionMap_comp_extClass adj hS rfl x'] at hx
-      obtain ⟨w, hw⟩ := Ext.covariant_sequence_exact₃ A hRS _ (rfl : n + 1 = _) hx
-      obtain ⟨v, rfl⟩ := surjective_extAdjunctionMap adj n A S.X₂ w
-      have hv : v.comp (Ext.mk₀ S.g) (add_zero n) = x' :=
-        ih A S.X₃ (by rw [extAdjunctionMap_comp_mk₀]; exact hw)
-      rw [← hv, Ext.comp_assoc _ _ _ (add_zero n) rfl (by lia),
-        ShortComplex.ShortExact.comp_extClass, Ext.comp_zero]
-    intro x y hxy
-    have : extAdjunctionMap adj (x - y) = 0 := by
-      rw [← extAdjunctionAddHom_apply adj, map_sub, extAdjunctionAddHom_apply,
-        extAdjunctionAddHom_apply, hxy, sub_self]
-    exact sub_eq_zero.1 (key A B _ this)
+  · intro y
+    obtain ⟨g, rfl⟩ := (Ext.mk₀_bijective A (R.obj B)).2 y
+    exact ⟨Ext.mk₀ ((adj.homEquiv A B).symm g), by
+      rw [extAdjunctionMap_mk₀, Equiv.apply_symm_apply]⟩
+
+/-- **The comparison is surjective in every degree.**
+
+This is `surjective_extComparisonMap` for `u := adj.unit.app A`: degree zero is the
+adjunction, and `R I` is injective for injective `I` (`preservesInjectiveObjects_of_adj`),
+hence acyclic. -/
+theorem surjective_extAdjunctionMap (n : ℕ) (A : C) (B : D) :
+    Function.Surjective (extAdjunctionMap adj (A := A) (B := B) (n := n)) :=
+  surjective_extComparisonMap (R := R) (P := L.obj A) (adj.unit.app A)
+    (bijective_extAdjunctionMap_zero adj A)
+    (fun _ _ _ ↦ subsingleton_ext_right_of_injective adj) n B
+
+/-- **The comparison is injective in every degree.** Likewise a special case of
+`injective_extComparisonMap`. -/
+theorem injective_extAdjunctionMap (n : ℕ) (A : C) (B : D) :
+    Function.Injective (extAdjunctionMap adj (A := A) (B := B) (n := n)) :=
+  injective_extComparisonMap (R := R) (P := L.obj A) (adj.unit.app A)
+    (bijective_extAdjunctionMap_zero adj A)
+    (fun _ _ _ ↦ subsingleton_ext_right_of_injective adj) n B
 
 /-- **Ext along an adjunction with exact left adjoint.**
 
