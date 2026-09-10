@@ -871,3 +871,26 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
+
+-- Anno--Logvinenko's twist triangle, read as a triangle of functors on `H⁰`.
+-- The counit's chosen cones give `X ↦ (L R X ⟶ X ⟶ T X ⟶ (L R X)⟦1⟧)`, every
+-- value distinguished, with the first two maps the adjunction's own counit and
+-- the canonical inclusion rather than new choices.  No sphericality, no
+-- autoequivalence, and no relation to the other three triangles is claimed.
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_obj_mem_distinguishedTriangles
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_obj_obj₁
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_obj_obj₂
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_obj_obj₃
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_obj_mor₁
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_obj_mor₂
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_map_hom₁
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_map_hom₃
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleIso
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_mem_distinguishedTriangles
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_obj₁
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_obj₂
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_obj₃
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_mor₁
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleIso
