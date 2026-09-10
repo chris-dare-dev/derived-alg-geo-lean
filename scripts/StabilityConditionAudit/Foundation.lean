@@ -70,6 +70,31 @@ several structures in this repository carried as data (`map_zero`, `map_iso`,
 #print axioms CategoryTheory.K₀Ab.lift_of
 #print axioms CategoryTheory.K₀Ab.hom_ext
 #print axioms CategoryTheory.K₀Ab.hom_ext_iff
+
+/-! ### Functoriality of `K₀Ab` (#1121)
+
+`K₀Ab` had no map `K₀Ab A →+ K₀Ab B` at all; every hom out of it in the tree landed in a fixed
+abelian group through `liftOf`. `map` supplies it from the weakest hypothesis the presentation
+allows -- a functor carrying short exact sequences to short exact ones, which is strictly weaker
+than exactness -- and `mapOfExact` is the wrapper for a functor preserving finite limits and
+colimits. `congr` upgrades an equivalence of abelian categories to an isomorphism of Grothendieck
+groups, with the round trips proved by `of_iso` on the unit and counit.
+
+This is the first half of transporting numerical data along an equivalence, which is what
+identifying `Coh X` with the heart of the standard t-structure on its derived category will need. -/
+
+#print axioms CategoryTheory.K₀Ab.map
+#print axioms CategoryTheory.K₀Ab.map_of
+#print axioms CategoryTheory.K₀Ab.map_id
+#print axioms CategoryTheory.K₀Ab.map_comp
+#print axioms CategoryTheory.K₀Ab.map_congr
+#print axioms CategoryTheory.K₀Ab.mapOfExact
+#print axioms CategoryTheory.K₀Ab.mapOfExact_of
+#print axioms CategoryTheory.K₀Ab.congr
+#print axioms CategoryTheory.K₀Ab.congr_of
+#print axioms CategoryTheory.K₀Ab.congr_symm_of
+#print axioms CategoryTheory.K₀Ab.congrHom
+#print axioms CategoryTheory.K₀Ab.congrHom_of
 #print axioms CategoryTheory.GrothendieckPresentation.map
 #print axioms CategoryTheory.GrothendieckPresentation.map_of
 #print axioms CategoryTheory.GrothendieckPresentation.IsAdditive.of_relationMap
