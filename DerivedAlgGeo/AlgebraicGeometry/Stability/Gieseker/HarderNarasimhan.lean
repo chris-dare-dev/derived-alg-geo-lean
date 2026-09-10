@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.Existence
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.MaximalDestabilizing
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.Seesaw
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.Splice
