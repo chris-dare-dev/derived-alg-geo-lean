@@ -62,12 +62,21 @@ The homotopy-coherent version is open.  With a nonzero homotopy the two
 composite lifts carry different homotopies, and identifying them needs
 uniqueness of the lift up to homotopy, which this repository does not have.
 
+## The cone choices do not matter
+
+`ConeData` is a choice of cone at every object, and `compareIso` says the
+triangle functor does not depend on it: two choices give canonically
+isomorphic functors.  The comparison is the identity case of the naturality
+above, since two `ConeData` for the same `α` are related by the identity
+square, and `compareNatTrans_self` and `compareNatTrans_comp` are what make it
+an isomorphism rather than merely a map.
+
 ## What this does not give
 
-No naturality in the cone data, and no comparison between the triangles
-produced by two different `ConeData` for the same `α`.  The objectwise cones
-are choices; `IsConeOf.compare` relates two of them at each object, but
-nothing here assembles those comparisons.
+No comparison between the triangle functors of two *different* transformations
+beyond a strict square, and no statement that `triangleFunctor` is
+triangulated or exact in any sense.  Nothing here descends to a statement
+about the twist candidate.
 -/
 
 set_option autoImplicit false
@@ -333,6 +342,134 @@ theorem triangleNatTrans_app (X : H0 C) :
   rfl
 
 end Naturality
+
+
+/-! ### Independence of the chosen cones -/
+
+section Compare
+
+/-- The comparison map between two chosen cones of the same component: the
+strict lift of the two identities. -/
+noncomputable def compareCone (L M : ConeData α) (X : C) :
+    (dgHom (L.obj X) (M.obj X)).X 0 :=
+  (L.isCone X).homogeneousLift (M.isCone X) 0 (dgId (F.obj X)) (dgId (G.obj X)) 0
+
+omit [IsPretriangulated D] in
+@[simp]
+theorem compareCone_self (L : ConeData α) (X : C) :
+    compareCone L L X = dgId (L.obj X) :=
+  (L.isCone X).homogeneousLift_id
+
+omit [IsPretriangulated D] in
+/-- The comparison maps compose.  Both sides are strict lifts, so
+`homogeneousLift_strict_comp` applies and the two identities compose to one. -/
+theorem compareCone_comp (L M N : ConeData α) (X : C) :
+    dgComp 0 0 0 (by omega) (compareCone L M X) (compareCone M N X) =
+      compareCone L N X := by
+  have hF : dgComp 0 0 (0 + 0) (by omega) (dgId (F.obj X)) (dgId (F.obj X)) =
+      dgId (F.obj X) := dgId_comp 0 (dgId (F.obj X))
+  have hG : dgComp 0 0 (0 + 0) (by omega) (dgId (G.obj X)) (dgId (G.obj X)) =
+      dgId (G.obj X) := dgId_comp 0 (dgId (G.obj X))
+  show dgComp 0 0 (0 + 0) (by omega) (compareCone L M X) (compareCone M N X) = _
+  rw [compareCone, compareCone, compareCone,
+    (L.isCone X).homogeneousLift_strict_comp (M.isCone X) (N.isCone X) 0 0,
+    hF, hG]
+  rfl
+
+omit [IsPretriangulated D] in
+/-- The identity square relating a cone situation to itself.  Both composites
+are `α`, by the two unit laws of the dg category of dg functors. -/
+theorem id_square :
+    composition F G G 0 0 0 (by omega) α (id G) =
+      composition F F G 0 0 0 (by omega) (id F) α :=
+  (dgComp_id (C := DGFunctor C D) 0 α).trans
+    (dgId_comp (C := DGFunctor C D) 0 α).symm
+
+/-- **The triangle functor does not depend on the chosen cones.**
+
+Two `ConeData` for the same transformation are related by the identity square,
+so `triangleNatTrans` applies with `u` and `v` the identities.  The
+transformation it produces is the objectwise comparison of cones. -/
+noncomputable def compareNatTrans (L M : ConeData α) :
+    L.triangleFunctor hα ⟶ M.triangleFunctor hα :=
+  triangleNatTrans L hα M hα (isClosed_id F) (isClosed_id G) id_square
+
+@[simp]
+theorem compareNatTrans_app_hom₁ (L M : ConeData α) (X : H0 C) :
+    ((compareNatTrans hα L M).app X).hom₁ =
+      𝟙 (F.h0.obj X) :=
+  rfl
+
+@[simp]
+theorem compareNatTrans_app_hom₂ (L M : ConeData α) (X : H0 C) :
+    ((compareNatTrans hα L M).app X).hom₂ =
+      𝟙 (G.h0.obj X) :=
+  rfl
+
+@[simp]
+theorem compareNatTrans_app_hom₃ (L M : ConeData α) (X : H0 C) :
+    ((compareNatTrans hα L M).app X).hom₃ =
+      H0.homMk (C := D)
+        ⟨compareCone L M (H0.of C X),
+          (L.isCone (H0.of C X)).lift_closed (M.isCone (H0.of C X)) _ _ _
+            (dgId_cocycle _) (dgId_cocycle _)
+            (squareAt (isClosed_id F) (isClosed_id G) id_square
+              (H0.of C X)).boundary⟩ :=
+  rfl
+
+/-- Comparing a cone choice with itself is the identity. -/
+@[simp]
+theorem compareNatTrans_self (L : ConeData α) :
+    compareNatTrans hα L L = 𝟙 (L.triangleFunctor hα) := by
+  apply NatTrans.ext
+  funext X
+  refine Triangle.hom_ext _ _ ?_ ?_ ?_
+  · rw [compareNatTrans_app_hom₁, NatTrans.id_app, id_hom₁]
+    rfl
+  · rw [compareNatTrans_app_hom₂, NatTrans.id_app, id_hom₂]
+    rfl
+  · rw [compareNatTrans_app_hom₃, NatTrans.id_app, id_hom₃]
+    -- The identity of `H⁰` is the class of `dgId` by definition, so `exact`
+    -- can read the target subtype off the goal; `Eq.trans` cannot.
+    exact congrArg (fun z => H0.homMk (C := D) z)
+      (Subtype.ext (compareCone_self L (H0.of C X)))
+
+/-- The comparisons compose. -/
+theorem compareNatTrans_comp (L M N : ConeData α) :
+    compareNatTrans hα L M ≫ compareNatTrans hα M N = compareNatTrans hα L N := by
+  apply NatTrans.ext
+  funext X
+  refine Triangle.hom_ext _ _ ?_ ?_ ?_
+  · rw [NatTrans.comp_app, comp_hom₁, compareNatTrans_app_hom₁,
+      compareNatTrans_app_hom₁, compareNatTrans_app_hom₁]
+    exact Category.id_comp _
+  · rw [NatTrans.comp_app, comp_hom₂, compareNatTrans_app_hom₂,
+      compareNatTrans_app_hom₂, compareNatTrans_app_hom₂]
+    exact Category.id_comp _
+  · rw [NatTrans.comp_app, comp_hom₃, compareNatTrans_app_hom₃,
+      compareNatTrans_app_hom₃, compareNatTrans_app_hom₃]
+    exact congrArg (fun z => H0.homMk (C := D) z)
+      (Subtype.ext (compareCone_comp L M N (H0.of C X)))
+
+/-- **The triangle functors of two cone choices are canonically isomorphic.** -/
+noncomputable def compareIso (L M : ConeData α) :
+    L.triangleFunctor hα ≅ M.triangleFunctor hα where
+  hom := compareNatTrans hα L M
+  inv := compareNatTrans hα M L
+  hom_inv_id := by rw [compareNatTrans_comp, compareNatTrans_self]
+  inv_hom_id := by rw [compareNatTrans_comp, compareNatTrans_self]
+
+@[simp]
+theorem compareIso_hom (L M : ConeData α) :
+    (compareIso hα L M).hom = compareNatTrans hα L M :=
+  rfl
+
+@[simp]
+theorem compareIso_inv (L M : ConeData α) :
+    (compareIso hα L M).inv = compareNatTrans hα M L :=
+  rfl
+
+end Compare
 
 end DGFunctor.HomogeneousNatTrans.ConeData
 
