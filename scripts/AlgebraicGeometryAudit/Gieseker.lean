@@ -285,6 +285,7 @@ from `Foundation/StabilityFunction/WeakSplitting.lean`. -/
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.not_isZero_chain_one
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.filtration_muPlus_ne_top_of_isPure
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muPlus_ne_top_of_isPure
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hnTrivialOfGiesekerSemistable
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_implies_hn_trivial
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_hn_trivial_n
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_hn_trivial_muPlus

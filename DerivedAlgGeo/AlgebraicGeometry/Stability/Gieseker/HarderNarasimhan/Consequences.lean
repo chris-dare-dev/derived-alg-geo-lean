@@ -106,31 +106,39 @@ theorem muPlus_ne_top_of_isPure (h : MuPositivityData P) (I : MuHNInput P h) {F 
     (hF : P.IsPure F) : muPlus h I hF.not_isZero ≠ ⊤ :=
   filtration_muPlus_ne_top_of_isPure h hF _
 
-/-- **A Gieseker-semistable sheaf has a one-step Harder–Narasimhan filtration.**
+/-- **The one-step Harder–Narasimhan filtration of a Gieseker-semistable sheaf.**
 
 Gieseker semistability implies μ-semistability, and a semistable object is its own filtration.
 This closes the loop back to the Gieseker order: the coarser numerical invariant sees no
 destabilizing subsheaf either. -/
-noncomputable def giesekerSemistable_implies_hn_trivial (h : MuPositivityData P) {F : Coh X}
+noncomputable def hnTrivialOfGiesekerSemistable (h : MuPositivityData P) {F : Coh X}
     (hF : P.IsGiesekerSemistable F) :
     AbelianWeakHNFiltration (P.weakSlopeData h).toWeakStabilityFunction F :=
   AbelianWeakHNFiltration.ofSemistable (giesekerSemistable_implies_muSemistable h hF)
 
+/-- **A Gieseker-semistable sheaf has a one-step Harder–Narasimhan filtration.** The propositional
+form of `hnTrivialOfGiesekerSemistable`, which is the name #905 asks for; the data itself carries
+a camelCase name because mathlib's naming convention forbids underscores in a `def`. -/
+theorem giesekerSemistable_implies_hn_trivial (h : MuPositivityData P) {F : Coh X}
+    (hF : P.IsGiesekerSemistable F) :
+    Nonempty (AbelianWeakHNFiltration (P.weakSlopeData h).toWeakStabilityFunction F) :=
+  ⟨hnTrivialOfGiesekerSemistable h hF⟩
+
 /-- The trivial filtration has exactly one factor. -/
 theorem giesekerSemistable_hn_trivial_n (h : MuPositivityData P) {F : Coh X}
     (hF : P.IsGiesekerSemistable F) :
-    (giesekerSemistable_implies_hn_trivial h hF).n = 1 := rfl
+    (hnTrivialOfGiesekerSemistable h hF).n = 1 := rfl
 
 /-- Both extrema of the trivial filtration are the slope of the sheaf itself. -/
 theorem giesekerSemistable_hn_trivial_muPlus (h : MuPositivityData P) {F : Coh X}
     (hF : P.IsGiesekerSemistable F) :
-    (giesekerSemistable_implies_hn_trivial h hF).μPlus =
+    (hnTrivialOfGiesekerSemistable h hF).μPlus =
       (P.weakSlopeData h).topSlope F := rfl
 
 /-- Both extrema of the trivial filtration are the slope of the sheaf itself. -/
 theorem giesekerSemistable_hn_trivial_muMinus (h : MuPositivityData P) {F : Coh X}
     (hF : P.IsGiesekerSemistable F) :
-    (giesekerSemistable_implies_hn_trivial h hF).μMinus =
+    (hnTrivialOfGiesekerSemistable h hF).μMinus =
       (P.weakSlopeData h).topSlope F := rfl
 
 /-- **The Harder–Narasimhan torsion subsheaf at a cutoff.** Every coherent sheaf has a subsheaf
