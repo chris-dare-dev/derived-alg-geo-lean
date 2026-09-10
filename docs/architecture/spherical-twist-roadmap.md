@@ -80,6 +80,10 @@ DGAdjunction
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
+├─ the twist is EXACT on H⁰ (twistH0IsTriangulated), as soon as S and R preserve
+│  shifts and chosen cones.  A cone functor preserves both when its two ends do;
+│  the cone half is the 3-by-3 lemma, whose proof is block diagonal in the four
+│  coordinates of the two splittings rather than merely triangular.
 ├─ unshifted cones underlying dual twist and cotwist
 ├─ the four triangles as functors on H⁰, every value distinguished, each first
 │  map the corresponding unit or counit.  The dual twist and the cotwist are
@@ -144,9 +148,13 @@ that comparison are instance hypotheses to be discharged by the realization.
    and the unshifted cotwist cone autoequivalences of `H⁰`.  That is the first
    categorical invertibility statement about a twist here; everything earlier
    was numerical, on `K₀`, or a construction with no invertibility attached.
-   What it is not is exactness: `DGFunctor.PreservesShifts` and
-   `PreservesChosenCones` still have no instances, so the equivalence is one of
-   ordinary categories.
+   Exactness is separate, and now supplied: `DGFunctor.PreservesShifts` and
+   `PreservesChosenCones` are instantiated for a cone functor whenever its two
+   ends carry them, so `twistH0IsTriangulated` makes `H⁰` of the twist a
+   triangulated functor.  Together with the equivalence above that is an exact
+   autoequivalence -- which is still not sphericality, since that needs all
+   four Anno--Logvinenko conditions and the Morita framework the first
+   paragraph rules out.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
    shift on a functor category, which is what `Functor.ExactFamily` should be
    built on.  That rewiring is still open, and it is not an API-only change:
