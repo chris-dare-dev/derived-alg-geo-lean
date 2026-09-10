@@ -1,6 +1,6 @@
 /-
 Gieseker slice of the AlgebraicGeometry audit: the Hilbert function of a coherent sheaf against a
-supplied polarization and the slope theory built from it (#900, #901, #902, #903, #904). Split out so
+supplied polarization and the slope theory built from it (#900, #901, #902, #903, #904, #905). Split out so
 concurrent branches append to different files; see the umbrella file for the contract and reading
 guide.
 -/
@@ -204,3 +204,91 @@ positive multiplicity and the next quotient has strictly smaller multiplicity. -
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.not_isZero_of_le
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.topSlope_lt_of_maximalDestabilizing
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_pos_of_maximalDestabilizing
+
+/-! ## Lifting a filtration through the subobject correspondence (#905 splice)
+
+Lattice-level facts, none of them about slopes, that the Harder-Narasimhan splice consumes: the
+bottom of the quotient pulls back to the subobject itself, so a spliced chain really begins
+`bot < B`; a strict inclusion has a nonzero successive quotient, and therefore pulls back to a
+strict inclusion, which is what makes the spliced chain strictly monotone; and the first
+successive quotient of a spliced chain is the subobject itself, which is how the first factor
+inherits its slope and semistability from the maximal destabilizing subobject. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.pullback_bot
+#print axioms AlgebraicGeometry.Stability.Gieseker.ofLE_bot_eq_zero
+#print axioms AlgebraicGeometry.Stability.Gieseker.cokernelOfLEBotIso
+#print axioms AlgebraicGeometry.Stability.Gieseker.cokernel_not_isZero_of_lt
+#print axioms AlgebraicGeometry.Stability.Gieseker.pullback_lt_of_lt
+
+/-! ## The spliced chain (#905 splice, continued)
+
+The chain of the spliced filtration and the facts the structure's fields need: it starts at
+bottom, its first step is the maximal destabilizing subobject, it is strictly monotone, it ends
+at the top, its first successive quotient is that subobject, and each later one is the
+corresponding quotient downstairs. Strict monotonicity reduces to adjacent steps by the `Fin`
+criterion, so only two cases arise: the opening `bot < B`, and a pullback of a strict step. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.cokernelOfLECongr
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain_zero
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain_succ
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain_strictMono
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain_top
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceFactorZeroIso
+#print axioms AlgebraicGeometry.Stability.Gieseker.spliceFactorSuccIso
+
+/-! ## The spliced filtration (#905)
+
+Prepending the maximal destabilizing subobject to a filtration of the quotient. `firstFactorIso`
+identifies a filtration's opening successive quotient with its first chain step, which is what
+turns the strict drop -- a statement about SUBOBJECTS of the quotient -- into `muZero_lt_topSlope`,
+a statement about the FACTORS of a filtration of it. `splice` then assembles all seven fields.
+Strict antitonicity is proved directly rather than through the adjacent-step criterion: that
+criterion indexes by `Fin G.n` with `G.n` opaque, which cannot be case-split. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.firstFactorIso
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muZero_lt_topSlope
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.splice
+
+/-! ## The recursion, and the weak HN property (#905)
+
+`hasHNProperty` is the payoff of the lane: the abstract engine has never before been run on a
+geometric category. Termination is NOT the chain condition of `MuHNInput`, as #905 states -- that
+condition makes the maximal destabilizing subobject exist at each step. What descends is
+multiplicity, and a single induction on it fails, because multiplicity is additive and a torsion
+maximal destabilizing subobject has multiplicity zero. That step happens at most once, since
+`isPure_cokernel` makes the quotient pure, so the recursion is staged:
+`exists_filtration_of_pure` inducts on multiplicity and `exists_filtration` splits off the single
+torsion step first. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.isSemistable_of_maximalDestabilizing_eq_top
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.not_isZero_cokernel_of_ne_top
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_cokernel
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.isPure_cokernel
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_filtration_of_pure
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_filtration
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hasHNProperty
+
+/-! ## What the HN property unlocks (#905, items 4-6)
+
+Pure application of the abstract API to the filtration above: no re-proof. `hnFiltration` picks
+one of the filtrations with choice, so `muPlus` and `muMinus` are about that choice; the one
+statement with mathematical content, `filtration_muPlus_ne_top_of_isPure`, is proved for an
+arbitrary filtration and only then specialized. The `hnTors`/`hnFree` splitting comes verbatim
+from `Foundation/StabilityFunction/WeakSplitting.lean`. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hnFiltration
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muPlus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muMinus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muMinus_le_muPlus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muPlus_eq_topSlope_chain_one
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.not_isZero_chain_one
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.filtration_muPlus_ne_top_of_isPure
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muPlus_ne_top_of_isPure
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hnTrivialOfGiesekerSemistable
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_implies_hn_trivial
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_hn_trivial_n
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_hn_trivial_muPlus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.giesekerSemistable_hn_trivial_muMinus
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_subobject_hnTors_cokernel_hnFree
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_shortExact_hnTors_hnFree
