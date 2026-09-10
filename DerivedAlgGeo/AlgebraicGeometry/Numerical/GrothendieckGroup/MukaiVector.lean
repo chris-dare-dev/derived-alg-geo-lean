@@ -43,10 +43,13 @@ sphericity, isotropy and expected dimension becomes a statement about `χ`.
 
 ## What this file does not assert
 
-* Nothing constructs an `IntegralMukaiData`, and nothing constructs an
-  `AdditiveMukaiData`.  Producing either is the geometric obligation of
-  exhibiting `NS(X)` with its intersection form; that is Layer B work, and the
-  additive version needs the lattice-valued Chern class on top.
+* Nothing constructs an `IntegralMukaiData` or an `AdditiveMukaiData` **from a
+  scheme**.  Neither is uninhabited: `Numerical/Examples/Surface/K3Mukai.lean`
+  builds `k3IntegralMukaiData` and `k3AdditiveMukaiData` on the degree-`2d`
+  rank-one model, which de-vacuates every consumer that takes one as a
+  hypothesis.  What remains open is the geometric obligation — exhibiting
+  `NS(X)` with its intersection form for an actual surface; that is Layer B
+  work, and the additive version needs the lattice-valued Chern class on top.
 * **In `IntegralMukaiData`,** `c₁` is a bare function and so is `mukaiVector`.
   No additivity is assumed there, hence none is available there, and `b_spec`
   constrains `b` only on the image of `c₁` — it does not say `b` is the full
