@@ -350,6 +350,8 @@ support property. `expCharge` is Bridgeland's `Z(β,ω)`. -/
 #print axioms Mukai.expCharge_apply
 #print axioms Mukai.expChargeHom
 #print axioms Mukai.expChargeHom_apply
+#print axioms Mukai.expChargeLinearMap
+#print axioms Mukai.expChargeLinearMap_apply
 #print axioms Mukai.expCharge_zero
 #print axioms Mukai.expCharge_add
 #print axioms Mukai.expCharge_neg

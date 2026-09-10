@@ -20,7 +20,7 @@ fight each other.
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u u' u''
+universe v u u' u'' u'''
 
 namespace CategoryTheory
 
@@ -65,6 +65,25 @@ def comp (F : DGFunctor C D) (G : DGFunctor D E) : DGFunctor C E where
   map_d p q f := by simp [F.map_d p q f, G.map_d p q (F.map p f)]
   map_id X := by simp [F.map_id X, G.map_id (F.obj X)]
   map_comp p q r h f g := by simp [F.map_comp p q r h f g, G.map_comp p q r h (F.map p f) (F.map q g)]
+
+/-! ### Strictness
+
+Composition of dg functors is strictly associative and strictly unital: all
+three laws hold by `rfl`, because `comp` composes the object maps and the
+`AddMonoidHom`s directly and the remaining fields are proofs.  Stating them is
+what lets a law about horizontally composed dg natural transformations be
+written down at all, since the two sides then have definitionally equal
+types. -/
+
+@[simp]
+theorem id_comp (F : DGFunctor C D) : (DGFunctor.id C).comp F = F := rfl
+
+@[simp]
+theorem comp_id (F : DGFunctor C D) : F.comp (DGFunctor.id D) = F := rfl
+
+theorem comp_assoc {B : Type u'''} [DGCategory.{v} B] (F : DGFunctor C D)
+    (G : DGFunctor D E) (H : DGFunctor E B) :
+    (F.comp G).comp H = F.comp (G.comp H) := rfl
 
 end DGFunctor
 
