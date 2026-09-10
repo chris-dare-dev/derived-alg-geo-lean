@@ -58,21 +58,37 @@ IsConeOf
          │  Anno--Logvinenko state SR ⟶ Id_B ⟶ T
          └─ triangleFunctor: H⁰ C ⥤ Triangle (H⁰ D), every value distinguished;
             the third square is the connecting map, carried by IsConeOf.Morphism
-            └─ triangleNatTrans: natural in a STRICT square of closed
-               degree-zero transformations; the cone lifts are natural on the
-               nose.  The homotopy-coherent case needs uniqueness of the lift
-               up to homotopy, which the repository does not have.
+            ├─ triangleNatTrans: natural in a STRICT square of closed
+            │  degree-zero transformations; the cone lifts are natural on the
+            │  nose.  The homotopy-coherent case needs uniqueness of the lift
+            │  up to homotopy, which the repository does not have.
+            └─ compareIso: two ConeData for one transformation give canonically
+               isomorphic triangle functors, so the cone choices do not matter
 
 DGAdjunction
 ├─ closed unit and counit
 ├─ dg triangle identities
 ├─ h0 : an ordinary Mathlib adjunction between the H⁰ functors
 └─ CounitConeData
-   └─ twist candidate Cone(LR ⟶ id)
+   ├─ twist candidate Cone(LR ⟶ id)
+   └─ twistTriangleFunctor: H⁰ D ⥤ Triangle (H⁰ D), every value distinguished,
+      first two maps the counit and the canonical inclusion.  This is
+      Anno--Logvinenko's twist triangle as a triangle OF FUNCTORS on H⁰.  It
+      does not say the twist is an autoequivalence, does not call the
+      adjunction spherical, and does not relate it to the other three
+      triangles; UnitConeData carries the unshifted unit side.
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
 ├─ unshifted cones underlying dual twist and cotwist
+├─ the four triangles as functors on H⁰, every value distinguished, each first
+│  map the corresponding unit or counit.  The dual twist and the cotwist are
+│  the INVERSE ROTATIONS of their unshifted cone triangles: invRotate applies
+│  the ⟦-1⟧ shift and reorders in one step, and the first vertex is the value
+│  of the dg shifted cone functor on the nose (DGFunctor.shiftedFunctor_h0_obj).
+│  The unshifted forms are kept, since TwistCotwistEquivalenceConditions is
+│  stated against the unshifted cone functors.  No sphericality, and no relation
+│  among the four.
 └─ TwistCotwistEquivalenceConditions
 
 Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
@@ -101,13 +117,19 @@ that comparison are instance hypotheses to be discharged by the realization.
    action on a degree-`p` morphism carries the sign `(-1)^(n * p)`; the
    Leibniz rule forces it (`IsShiftBy.shiftMap_d`) and no constant sign works.
 
-   What remains open here is the *comparison* data, not the shift itself.
-   Anno--Logvinenko's definition needs the shifted comparison maps between two
-   chosen shifts of the same functor, and `IsShiftBy.compare` supplies those
-   only objectwise; nothing packages them as a natural transformation of the
-   shifted functors, and no coherence between `shiftedFunctor` for `n` and for
-   `m` is proved.  So the shift exists as a field of the instance and not yet
-   as a shift *functor* with an additive structure on the degree.
+   The comparison data is now there too.  `IsShiftBy.shiftMap_compare` makes
+   the objectwise comparison of two chosen shifts natural in every degree, and
+   `IsShiftBy.comp'_shiftMap` says transport across a composite shift is the
+   two transports in turn.  On top of those, `DGFunctor.shiftedFunctorAdd` and
+   `DGFunctor.shiftedFunctorZero` are the two coherences -- shifting by `n`
+   then `m` agrees with shifting by `n + m`, and shifting by `0` changes
+   nothing -- each closed and invertible, so each is an isomorphism in the dg
+   category of dg functors rather than merely a map.
+
+   What is still missing is the *associativity* coherence between the two
+   `shiftedFunctorAdd` isomorphisms for a triple `n, m, k`, and any statement
+   assembling the family into a `HasShift`-style structure.  Neither is needed
+   by the triangles below, which is why this slice stopped here.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full

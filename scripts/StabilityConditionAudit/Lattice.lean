@@ -268,6 +268,11 @@ counting identity turns it into an equality. See the module docstring of
 #print axioms QuadraticMap.sigNeg_add_le
 #print axioms QuadraticMap.nondegenerate_of_isCompl
 #print axioms QuadraticMap.sigPos_eq_add
+#print axioms QuadraticMap.nondegenerate_of_anisotropic
+#print axioms QuadraticMap.sigPos_eq_finrank_of_posDef
+#print axioms QuadraticMap.sigNeg_eq_finrank_of_negDef
+#print axioms QuadraticMap.nondegenerate_restrict_of_isCompl
+#print axioms QuadraticMap.negDef_of_sigNeg_eq_finrank
 
 /-! ### The signature of the real Mukai extension
 

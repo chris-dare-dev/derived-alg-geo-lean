@@ -116,6 +116,12 @@ lemma shiftMap_zero (s : IsShiftBy A n A') (s' : IsShiftBy B n B') (p : ℤ) :
     s.shiftMap s' p 0 = 0 := by
   simp [shiftMap]
 
+/-- Transport commutes with the sign action. -/
+lemma shiftMap_units_smul (s : IsShiftBy A n A') (s' : IsShiftBy B n B') (p : ℤ)
+    (c : ℤˣ) (f : (dgHom A B).X p) :
+    s.shiftMap s' p (c • f) = c • s.shiftMap s' p f := by
+  simp [shiftMap, Units.smul_def, map_zsmul]
+
 /-- Transport takes the identity to the identity. -/
 lemma shiftMap_id (s : IsShiftBy A n A') :
     s.shiftMap s 0 (dgId A) = dgId A' := by
@@ -228,6 +234,118 @@ lemma comp_inv_comp_hom (s : IsShiftBy A n A') {V : C} (q p : ℤ)
     dgComp p (-n) q hq (dgComp q n p hp α s.inv) s.hom = α := by
   rw [dgComp_assoc q n (-n) p 0 q (by omega) (by omega) (by omega),
     s.inv_hom, dgComp_id]
+
+/-! ### Comparing two chosen shifts, and composing shifts
+
+Everything above fixes one shift of the source and one of the target.  A shift
+*functor* needs two more things: that the shifts of one object by `n` form a
+contractible groupoid, which `IsShiftBy.compare` already says, and that
+shifting by `n` and then by `m` agrees with shifting by `n + m`.  The lemmas
+here make both statements natural in the morphism rather than true only at
+each object. -/
+
+/-- **The characterising property of `compare`.**  Composing the first shift
+element with the comparison gives the second; this is `s.hom ≫ s.inv = 𝟙` and
+nothing else.  Every use of `compare` below reduces to it. -/
+lemma hom_comp_compare {A'' : C} (s : IsShiftBy A n A') (t : IsShiftBy A n A'') :
+    dgComp (-n) 0 (-n) (by omega) s.hom (compare s t) = t.hom := by
+  rw [compare,
+    ← dgComp_assoc (-n) n (-n) 0 0 (-n) (by omega) (by omega) (by omega),
+    s.hom_inv, dgId_comp]
+
+/-- **Transport commutes with the comparison of chosen shifts.**
+
+Both sides are the transport of `f` from `s` to `t'`, because both satisfy that
+one characterising square; `shiftMap_unique` is applied twice and the two
+results are compared.  This is what lets a shift functor be built from chosen
+witnesses without the choice mattering, in every degree and not only in degree
+zero. -/
+lemma shiftMap_compare {A'' B'' : C} (s : IsShiftBy A n A')
+    (t : IsShiftBy A n A'') (s' : IsShiftBy B n B') (t' : IsShiftBy B n B'')
+    (p : ℤ) (f : (dgHom A B).X p) :
+    dgComp p 0 p (by omega) (s.shiftMap s' p f) (compare s' t') =
+      dgComp 0 p p (by omega) (compare s t) (t.shiftMap t' p f) := by
+  have hleft : s.shiftMap t' p f =
+      dgComp p 0 p (by omega) (s.shiftMap s' p f) (compare s' t') := by
+    refine s.shiftMap_unique t' p (-n + p) (by omega) (by omega) f _ ?_
+    rw [← dgComp_assoc (-n) p 0 (-n + p) p (-n + p)
+        (by omega) (by omega) (by omega),
+      s.hom_comp_shiftMap s' p (-n + p) (by omega) (by omega) f,
+      dgComp_assoc p (-n) 0 (-n + p) (-n) (-n + p)
+        (by omega) (by omega) (by omega),
+      s'.hom_comp_compare t']
+  have hright : s.shiftMap t' p f =
+      dgComp 0 p p (by omega) (compare s t) (t.shiftMap t' p f) := by
+    refine s.shiftMap_unique t' p (-n + p) (by omega) (by omega) f _ ?_
+    rw [← dgComp_assoc (-n) 0 p (-n) p (-n + p)
+        (by omega) (by omega) (by omega),
+      s.hom_comp_compare t,
+      t.hom_comp_shiftMap t' p (-n + p) (by omega) (by omega) f]
+  rw [← hleft, ← hright]
+
+/-- **Transport across a composite shift is the two transports in turn.**
+
+`IsShiftBy.comp'` composes two shift witnesses; this says its `shiftMap` is the
+composite of the two `shiftMap`s.  Together with `shiftMap_compare` it is the
+whole content of a shift functor being additive in the degree. -/
+lemma comp'_shiftMap {E E'' : C} {m : ℤ} (s : IsShiftBy A n A')
+    (u : IsShiftBy A' m E) (s' : IsShiftBy B n B') (u' : IsShiftBy B' m E'')
+    (nm : ℤ) (hnm : n + m = nm) (p : ℤ) (f : (dgHom A B).X p) :
+    (s.comp' u nm hnm).shiftMap (s'.comp' u' nm hnm) p f =
+      u.shiftMap u' p (s.shiftMap s' p f) := by
+  refine (s.comp' u nm hnm).shiftMap_unique (s'.comp' u' nm hnm) p (-nm + p)
+    (by omega) (by omega) f _ ?_
+  rw [comp'_hom, comp'_hom,
+    dgComp_assoc (-n) (-m) p (-nm) (-m + p) (-nm + p)
+      (by omega) (by omega) (by omega),
+    u.hom_comp_shiftMap u' p (-m + p) (by omega) (by omega) (s.shiftMap s' p f),
+    ← dgComp_assoc (-n) p (-m) (-n + p) (-m + p) (-nm + p)
+      (by omega) (by omega) (by omega),
+    s.hom_comp_shiftMap s' p (-n + p) (by omega) (by omega) f,
+    dgComp_assoc p (-n) (-m) (-n + p) (-nm) (-nm + p)
+      (by omega) (by omega) (by omega)]
+
+/-- **The two transports and their two signs, merged.**
+
+This is `comp'_shiftMap` with the shift functor's Koszul signs already in
+place: shifting by `n` contributes `(-1)^(n p)` and then shifting by `m`
+contributes `(-1)^(m p)`, and the product is the `(-1)^(nm p)` of the single
+shift because `n p + m p = nm p`.  Stated here, with every object a variable,
+so that the functor-category proof can apply it instead of rewriting across
+two spellings of the same shifted object. -/
+lemma comp'_shiftMap_smul {E E'' : C} {m : ℤ} (s : IsShiftBy A n A')
+    (u : IsShiftBy A' m E) (s' : IsShiftBy B n B') (u' : IsShiftBy B' m E'')
+    (nm : ℤ) (hnm : n + m = nm) (p : ℤ) (f : (dgHom A B).X p) :
+    (m * p).negOnePow • u.shiftMap u' p ((n * p).negOnePow • s.shiftMap s' p f) =
+      (nm * p).negOnePow • (s.comp' u nm hnm).shiftMap (s'.comp' u' nm hnm) p f := by
+  rw [shiftMap_units_smul, smul_smul, ← Int.negOnePow_add,
+    show m * p + n * p = nm * p by rw [← hnm]; ring,
+    comp'_shiftMap s u s' u' nm hnm p f]
+
+/-- **In degree zero, transport is `IsShiftBy.mapShift`.**
+
+`mapShift` is the degree-zero transport that `Pretriangulated/Basic.lean`
+already had, and `shiftMap` is the all-degree one.  They are the same map, but
+not definitionally: `shiftMap` indexes its middle composite by `n + p`, which
+at `p = 0` is `n + 0` and is only propositionally `n`.  `shiftMap_unique`
+crosses that gap, because its result index is a free variable. -/
+lemma shiftMap_zero_eq_mapShift (s : IsShiftBy A n A') (s' : IsShiftBy B n B')
+    (f : (dgHom A B).X 0) :
+    s.shiftMap s' 0 f = mapShift s s' f := by
+  refine s.shiftMap_unique s' 0 (-n) (by omega) (by omega) f _ ?_
+  rw [mapShift,
+    ← dgComp_assoc (-n) n (-n) 0 0 (-n) (by omega) (by omega) (by omega),
+    ← dgComp_assoc (-n) n 0 0 n 0 (by omega) (by omega) (by omega),
+    s.hom_inv, dgId_comp]
+
+/-- Transport across the identity shift is the identity. -/
+lemma shiftMap_self (p : ℤ) (f : (dgHom A B).X p) :
+    (IsShiftBy.self A).shiftMap (IsShiftBy.self B) p f = f := by
+  refine (IsShiftBy.self A).shiftMap_unique (IsShiftBy.self B) p p
+    (by omega) (by omega) f f ?_
+  -- `self.hom` is `dgId` at degree `-0`, which is `0` definitionally but not
+  -- syntactically, so the two unit laws are applied as terms.
+  exact (dgId_comp p f).trans (dgComp_id p f).symm
 
 end IsShiftBy
 

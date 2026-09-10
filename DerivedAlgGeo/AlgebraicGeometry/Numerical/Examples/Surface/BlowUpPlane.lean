@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Core.GradedBasis
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialSupport
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Signature
 import Mathlib.Algebra.Ring.MinimalAxioms
 import Mathlib.LinearAlgebra.Basis.Fin
 
@@ -667,6 +668,17 @@ theorem hodgeDefinite_antiCanonical :
   apply hodgeDefinite
   rw [antiCanonicalPolarization, numericalRealization_polarization]
   norm_num
+
+/-- **The real Mukai extension of the two-point blow-up has signature
+`(2, 3)`.**
+
+`hodgeDefinite` is exactly the input `hasSignatureTwo_of_hodgeDefinite` wants,
+so every period-domain theorem — the negative definiteness on the orthogonal
+complement of a positive plane, the wall-finiteness statements, the orientation
+cocycle — is available here from `ω² > 0` alone. -/
+theorem hasSignatureTwo {w : Divisor} (hw : 0 < divisorSpace.pair w w) :
+    PeriodDomain.HasSignatureTwo (Mukai.realForm divisorSpace.intersection) :=
+  DivisorSpace.hasSignatureTwo_of_hodgeDefinite (hodgeDefinite hw)
 
 /-! ### The support property, needing Bogomolov--Gieseker alone -/
 

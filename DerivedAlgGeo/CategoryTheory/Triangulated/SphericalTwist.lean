@@ -6,6 +6,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.GrothendieckGrou
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Mukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Braid
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctor
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorH0
 
 /-! # The spherical twist
 

@@ -87,6 +87,9 @@ Category
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
 │  │  │  └─ h0                           closed degree zero becomes an ordinary NatTrans
 │  │  │     └─ h0Comparison              H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D); no fullness claimed
+│  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
+│  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
+│  │  │  └─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
 │  │  ├─ PreservesShifts                 composable dg capability
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
@@ -102,8 +105,10 @@ Category
 │  │        ├─ fst / snd                 cone projections, graded-natural
 │  │        ├─ isConeOf                  a cone in the dg category of dg functors
 │  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
-│  │        │  └─ triangleNatTrans       natural in a STRICT square of transformations
+│  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
+│  │        │  └─ compareIso             the cone choices do not matter, canonically
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
+│  │           └─ twistTriangleFunctor   H⁰ D ⥤ Triangle (H⁰ D), all distinguished
 │  ├─ H0 C
 │  │  └─ coneTriangleFunctor             functor to distinguished triangles
 │  └─ IsPretriangulated C
