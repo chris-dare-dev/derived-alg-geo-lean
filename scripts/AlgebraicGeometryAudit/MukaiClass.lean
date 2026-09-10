@@ -36,3 +36,68 @@ content of "sqrt td(X) = 1 + [pt]", which RiemannRoch/K3.lean states in prose. -
 #print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.sqrtToddComp_convolution
 #print axioms AlgebraicGeometry.Numerical.K3.sqrtToddComp_one
 #print axioms AlgebraicGeometry.Numerical.K3.degree_sqrtToddComp_two
+
+/-! ## The Mukai vector as a class in the intersection ring (#908)
+
+Until now the Mukai vector existed only as a FORMULA: `IntegralMukaiData` asserts the triple
+`(rank, c₁, s)` by fiat, and `RiemannRoch/K3.lean` explained in a docstring that the triple is what
+`ch(E)·√td(X)` comes to on a K3. `mukaiComp` computes that class, and the three comparison theorems
+turn the docstring into theorems.
+
+`mukaiComp` is defined for ARBITRARY dimension; the K3 statements are a section, not the
+definition, because the Fourier-Mukai and higher-dimensional lanes want `v(E)` on a threefold.
+
+`mukaiS` is deliberately NOT redefined as the degree of the top component -- `degree_mukaiComp_two`
+is the comparison theorem instead. Redefining it would ripple through the Euler pairing, the Mukai
+vector, the transfer and the realization files.
+
+The middle coordinate is compared THROUGH THE FORM `b` rather than by an equation in the lattice:
+in `IntegralMukaiData` the class `c₁` is a bare function with no additivity and no relation to the
+intersection ring, so no equation in the lattice is available to state. -/
+
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiClass
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp_mem
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp_add
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiClass_add
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp_zero
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.degree_mukaiComp_mul_mukaiComp_eq_zero
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiComp_one
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiComp_two
+#print axioms AlgebraicGeometry.Numerical.K3.degree_mukaiComp_two
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiVector_fst_eq
+#print axioms AlgebraicGeometry.Numerical.K3.b_mukaiVector_snd_eq_degree
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiVector_thd_eq_degree
+
+/-! ## The Euler pairing as an integral of Mukai classes (#909)
+
+`EulerPairing.lean` already proved the Euler pairing equals MINUS the Mukai pairing against the
+explicit formula. This proves it against the CLASS `ch(E)*sqrt(td(X))`, which is the form Mukai's
+paper uses and a Fourier-Mukai comparison needs. It is what makes the square root of the Todd class
+earn its place.
+
+THE SIGN. The headline `chi2_eq_mukaiIntegral` carries NO minus sign, and a draft of this lane got
+that wrong and propagated it. Two objects differ by a sign: the Mukai PAIRING, defined by the
+explicit formula, and the INTEGRAL OF THE DUAL PRODUCT, which is `mukaiIntegral`. They are related
+by `<v,w> = -∫ v^v · w`, so the literature identity and this file's are the same statement.
+`mukaiIntegral_eq_neg_mukaiPairing` states that relation as a theorem rather than leaving it to
+prose, and `pairing_eq_neg_mukaiIntegral` closes the loop with the abstract lattice pairing.
+
+The sign is also checked ARITHMETICALLY on the rank-one model, in
+`Examples/Surface/K3MukaiIntegral.lean`, because a sign error here would still elaborate: every
+statement in the general file is an equation between two things the reader cannot evaluate. On the
+model both sides are explicit polynomials, and the structure-sheaf diagonal comes out `+2` where a
+sign error would give `-2`. -/
+
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiDual
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiDual_add
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiIntegral
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiDual_eq
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiClass_eq
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiIntegral_eq
+#print axioms AlgebraicGeometry.Numerical.K3.chi₂_eq_mukaiIntegral
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiIntegral_comm
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiIntegral_self
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiIntegral_self_eq
+#print axioms AlgebraicGeometry.Numerical.K3.mukaiIntegral_eq_neg_mukaiPairing
+#print axioms AlgebraicGeometry.Numerical.K3.pairing_eq_neg_mukaiIntegral
