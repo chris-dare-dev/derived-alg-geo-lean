@@ -103,3 +103,22 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms DerivedCategory.Q_preservesCoproductsOfShape
 #print axioms DerivedCategory.homologyFunctor_preservesCoproductsOfShape
 #print axioms DerivedCategory.cohomologyIn_isClosedUnderColimitsOfShape_discrete
+
+/-! ## The heart of the canonical t-structure is the original category (#1121)
+
+Mathlib names this as the motivating example of `TStructure.Heart` and leaves it unproved; nothing
+in either tree identified the heart of the canonical t-structure with anything. Both halves already
+existed -- `singleFunctor C 0` is additive, full and faithful, and its objects are `≤ 0` and `≥ 0`,
+while `exists_iso_singleFunctor_obj_of_isGE_of_isLE` at `n = 0` is the converse -- so the content
+here is the assembly into Mathlib's own `Heart` interface, plus the equivalence that transports
+numerical data written on `C` onto the heart. -/
+
+#print axioms DerivedCategory.heart_singleFunctor_obj
+#print axioms DerivedCategory.essImage_singleFunctor_eq_heart
+#print axioms DerivedCategory.isHeart
+#print axioms DerivedCategory.ιHeart_eq
+#print axioms DerivedCategory.toHeart
+#print axioms DerivedCategory.toHeart_comp_ι
+#print axioms DerivedCategory.toHeart_obj_obj
+#print axioms DerivedCategory.heartEquivalence
+#print axioms DerivedCategory.heartEquivalence_functor
