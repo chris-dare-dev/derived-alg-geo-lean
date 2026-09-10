@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOneRealization
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Signature
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Region
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Spherical.DivisorialRegion
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.IntegralBridge
 
 /-!
@@ -58,6 +59,7 @@ Nothing here identifies the carrier with `K_num(X)` for a geometric surface.
 -/
 
 open QuadraticMap
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
 
 namespace AlgebraicGeometry.Numerical
@@ -216,6 +218,55 @@ theorem k3_finite_walls_meeting_box {d : ℕ} (hd : d ≠ 0)
     linarith
   have hfin := surface_finite_walls_meeting_box hh2 b₀ t₀ t₁ ht₀
   rwa [span_surfaceMukaiBasis] at hfin
+
+/-- `∫H² = 2d > 0` on the K3 model. -/
+theorem k3_h2_pos {d : ℕ} (hd : d ≠ 0) : (0 : ℝ) < 2 * (d : ℝ) := by
+  have hdpos : (0 : ℝ) < (d : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero hd
+  linarith
+
+/-! ### The chamber of the box, cut out by finitely many walls -/
+
+/-- The bounded region of the parameter box, in the `(β, ω)` chart.  This is the
+first witness for `Spherical.BoundedRegion` on a surface. -/
+def boxRegion {h2 : ℝ} (hh2 : 0 < h2) (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
+    Wall.Spherical.BoundedRegion (surfaceDivisorSpace h2).intersection :=
+  Wall.Spherical.BoundedRegion.ofDivisorSpace (surfaceHodgeDefinite hh2 one_ne_zero)
+    (isCompact_parameterBox b₀ t₀ t₁) (omega_sq_pos_on_parameterBox hh2 ht₀)
+
+/-- **Finitely many spherical classes of the lattice have a wall meeting the
+box**, in the `(β, ω)` chart of a Picard-rank-one surface. -/
+theorem surface_finite_wallCandidates_box {h2 : ℝ} (hh2 : 0 < h2)
+    (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
+    (Wall.Spherical.wallCandidates (surfaceDivisorSpace h2).intersection
+      (boxRegion hh2 b₀ t₀ t₁ ht₀)
+      ↑(Submodule.span ℤ (Set.range surfaceDivisorBasis))).Finite :=
+  Wall.Spherical.finite_wallCandidates_ofDivisorSpace _ _ _ surfaceDivisorBasis
+
+/-- **On the box, the chamber of the whole lattice is the chamber of those
+finitely many classes.**
+
+This is the chamber decomposition, on a surface, with every hypothesis
+discharged.  It says nothing about semistable objects: `chamber` is a subset of
+the parameter chart. -/
+theorem surface_chamber_inter_box {h2 : ℝ} (hh2 : 0 < h2)
+    (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
+    Wall.Spherical.chamber (surfaceDivisorSpace h2).intersection
+        (Wall.Spherical.latticeSpherical (surfaceDivisorSpace h2).intersection
+          ↑(Submodule.span ℤ (Set.range surfaceDivisorBasis)))
+        ∩ parameterBox b₀ t₀ t₁
+      = Wall.Spherical.chamber (surfaceDivisorSpace h2).intersection
+        (Wall.Spherical.wallCandidates (surfaceDivisorSpace h2).intersection
+          (boxRegion hh2 b₀ t₀ t₁ ht₀)
+          ↑(Submodule.span ℤ (Set.range surfaceDivisorBasis)))
+        ∩ parameterBox b₀ t₀ t₁ :=
+  Wall.Spherical.chamber_inter_ofDivisorSpace _ _ _ surfaceDivisorBasis
+
+/-- The same on the degree-`2d` K3 model, assuming only `d > 0` and `t₀ > 0`. -/
+theorem k3_finite_wallCandidates_box {d : ℕ} (hd : d ≠ 0) (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
+    (Wall.Spherical.wallCandidates (surfaceDivisorSpace (2 * (d : ℝ))).intersection
+      (boxRegion (k3_h2_pos hd) b₀ t₀ t₁ ht₀)
+      ↑(Submodule.span ℤ (Set.range surfaceDivisorBasis))).Finite :=
+  surface_finite_wallCandidates_box (k3_h2_pos hd) b₀ t₀ t₁ ht₀
 
 end
 

@@ -111,9 +111,9 @@ private def hPerp (S : DivisorSpace D) (H : D) : Submodule ℝ D :=
 
 private theorem mem_hPerp_iff {x : D} : x ∈ hPerp S H ↔ S.pair H x = 0 := Iff.rfl
 
-private theorem isCompl_hLine_hPerp (h : S.HodgeDefinite H) :
+private theorem isCompl_hLine_hPerp (hpos : 0 < S.pair H H) :
     IsCompl (hLine H) (hPerp S H) := by
-  have hH : S.intersection H H ≠ 0 := ne_of_gt h.H_square_pos
+  have hH : S.intersection H H ≠ 0 := ne_of_gt hpos
   constructor
   · rw [Submodule.disjoint_def]
     intro x hx hx'
@@ -144,7 +144,7 @@ private theorem orth_hLine_hPerp (S : DivisorSpace D) (H : D) :
   rw [hsmul, mem_hPerp_iff.mp hw']
   ring
 
-private theorem posDef_restrict_hLine (h : S.HodgeDefinite H) :
+private theorem posDef_restrict_hLine (hpos : 0 < S.pair H H) :
     (S.intersectionQuadratic.restrict (hLine H)).PosDef := by
   intro x hx
   obtain ⟨a, ha⟩ := Submodule.mem_span_singleton.mp x.2
@@ -160,7 +160,7 @@ private theorem posDef_restrict_hLine (h : S.HodgeDefinite H) :
     ring
   rw [restrict_apply, hval]
   have hsq : 0 < a ^ 2 := by positivity
-  exact mul_pos hsq h.H_square_pos
+  exact mul_pos hsq hpos
 
 private theorem negDef_restrict_hPerp (h : S.HodgeDefinite H) :
     (-(S.intersectionQuadratic.restrict (hPerp S H))).PosDef := by
@@ -172,11 +172,11 @@ private theorem negDef_restrict_hPerp (h : S.HodgeDefinite H) :
   rw [hval]
   linarith
 
-private theorem finrank_hLine (h : S.HodgeDefinite H) :
+private theorem finrank_hLine (hpos : 0 < S.pair H H) :
     Module.finrank ℝ (hLine H) = 1 := by
   have hHne : H ≠ 0 := by
     intro hc
-    have hsq := h.H_square_pos
+    have hsq := hpos
     rw [hc] at hsq
     simp [DivisorSpace.pair] at hsq
   rw [hLine, finrank_span_singleton hHne]
@@ -190,16 +190,70 @@ signature `(1, dim D - 1)`, and this is the translation. -/
 theorem sigPos_sigNeg_of_hodgeDefinite (h : S.HodgeDefinite H) :
     sigPos S.intersectionQuadratic = 1 ∧
       sigNeg S.intersectionQuadratic + 1 = Module.finrank ℝ D := by
-  obtain ⟨hP₁, hN₁, hnd₁⟩ := sigPos_eq_finrank_of_posDef (posDef_restrict_hLine h)
+  obtain ⟨hP₁, hN₁, hnd₁⟩ := sigPos_eq_finrank_of_posDef (posDef_restrict_hLine h.H_square_pos)
   obtain ⟨hN₂, hP₂, hnd₂⟩ := sigNeg_eq_finrank_of_negDef (negDef_restrict_hPerp h)
   obtain ⟨hsplitP, hsplitN⟩ :=
     QuadraticMap.sigPos_eq_add (Q := S.intersectionQuadratic)
-      (isCompl_hLine_hPerp h) (orth_hLine_hPerp S H) hnd₁ hnd₂
-  have hdim := Submodule.finrank_add_eq_of_isCompl (isCompl_hLine_hPerp h)
-  rw [finrank_hLine h] at hP₁ hdim
+      (isCompl_hLine_hPerp h.H_square_pos) (orth_hLine_hPerp S H) hnd₁ hnd₂
+  have hdim := Submodule.finrank_add_eq_of_isCompl (isCompl_hLine_hPerp h.H_square_pos)
+  rw [finrank_hLine h.H_square_pos] at hP₁ hdim
   refine ⟨by rw [hsplitP, hP₁, hP₂], ?_⟩
   rw [hsplitN, hN₁, hN₂]
   omega
+
+/-- **A Hodge divisor space has nondegenerate intersection form.**  Immediate
+from the index count: `1 + (dim - 1)` leaves no room for a radical. -/
+theorem nondegenerate_of_hodgeDefinite (h : S.HodgeDefinite H) :
+    S.intersectionQuadratic.Nondegenerate := by
+  obtain ⟨hP, hN⟩ := sigPos_sigNeg_of_hodgeDefinite h
+  have htot := QuadraticForm.sigPos_add_sigNeg_add_radical (Q := S.intersectionQuadratic)
+  have hrad : Module.finrank ℝ S.intersectionQuadratic.radical = 0 := by omega
+  rw [QuadraticMap.nondegenerate_iff_radical_eq_bot]
+  exact Submodule.finrank_eq_zero.mp hrad
+
+/-- **The Hodge certificate does not depend on the reference class.**
+
+If the intersection form is negative definite on `H^⊥` for one class of positive
+square, it is negative definite on `ω^⊥` for *every* class of positive square.
+The certificate is a statement about the form, and this is the proof that its
+apparent dependence on `H` is only apparent.
+
+Without this, a region of the `(β, ω)` chart would have to carry a separate
+certificate at every `ω` it contains. -/
+theorem HodgeDefinite.of_pair_pos (h : S.HodgeDefinite H) {omega : D}
+    (homega : 0 < S.pair omega omega) : S.HodgeDefinite omega := by
+  obtain ⟨hP, hN⟩ := sigPos_sigNeg_of_hodgeDefinite h
+  have hnd := nondegenerate_of_hodgeDefinite h
+  have hcompl := isCompl_hLine_hPerp (S := S) (H := omega) homega
+  have horth := orth_hLine_hPerp S omega
+  -- the line contributes exactly `1` to the positive index
+  obtain ⟨hP₁, hN₁, hnd₁⟩ :=
+    sigPos_eq_finrank_of_posDef (posDef_restrict_hLine (S := S) (H := omega) homega)
+  rw [finrank_hLine (S := S) (H := omega) homega] at hP₁
+  -- so the complement contributes none
+  have hle := QuadraticMap.sigPos_add_le (Q := S.intersectionQuadratic) hcompl horth
+  rw [hP₁, hP] at hle
+  have hPperp : sigPos (S.intersectionQuadratic.restrict (hPerp S omega)) = 0 := by omega
+  -- and it is nondegenerate, being an orthogonal summand of a nondegenerate form
+  have hnd₂ : (S.intersectionQuadratic.restrict (hPerp S omega)).Nondegenerate :=
+    QuadraticMap.nondegenerate_restrict_of_isCompl hcompl horth hnd
+  -- counting on the complement forces full negative index
+  have htot := QuadraticForm.sigPos_add_sigNeg_add_radical
+    (Q := S.intersectionQuadratic.restrict (hPerp S omega))
+  have hrad₂ : Module.finrank ℝ
+      (S.intersectionQuadratic.restrict (hPerp S omega)).radical = 0 := by
+    rw [hnd₂.radical_eq_bot]
+    simp
+  have hNperp : sigNeg (S.intersectionQuadratic.restrict (hPerp S omega))
+      = Module.finrank ℝ (hPerp S omega) := by omega
+  have hnegdef := QuadraticMap.negDef_of_sigNeg_eq_finrank hNperp
+  refine ⟨homega, fun x hx hxne => ?_⟩
+  have hmem : x ∈ hPerp S omega := hx
+  have hpos := hnegdef ⟨x, hmem⟩ (fun hc => hxne (congrArg Subtype.val hc))
+  have hval : (-(S.intersectionQuadratic.restrict (hPerp S omega))) ⟨x, hmem⟩
+      = -(S.pair x x) := rfl
+  rw [hval] at hpos
+  linarith
 
 /-- **The Hodge certificate is the signature hypothesis.**
 

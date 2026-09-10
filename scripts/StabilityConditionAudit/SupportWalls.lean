@@ -234,3 +234,29 @@ geometric theory would get from Hodge index, and the positive lower bound on
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.exists_norm_fst_le
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.wallCandidates_subset
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.finite_wallCandidates
+
+/-! ## The bounded region is inhabited, and the chamber is finitely cut
+
+BoundedRegion carried its two constants as fields precisely so that nothing
+could assume them, and until now nothing produced them either, so every
+consequence was vacuous. BoundedRegion.ofDivisorSpace is the first witness: on a
+divisor space with a HodgeDefinite certificate, a COMPACT family of parameters
+supplies both, the ample lower bound by a minimum of a continuous positive
+function and the uniform coercivity by the same compactness argument
+WallRegion uses in the other chart. HodgeDefinite.of_pair_pos is what lets one
+certificate at one reference class cover every omega of the family.
+
+latticeSpherical is the set of classes the chamber is cut out by, and
+chamber_inter_carrier says that ON THE REGION it agrees with the chamber of the
+finitely many wallCandidates. That is the chamber decomposition. It says NOTHING
+about semistable objects: chamber is a subset of the parameter chart, and no
+constancy on it is asserted, nor is a Hodge index theorem proved for any
+geometric surface. -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber_inter_carrier
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.latticeSpherical
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.wallCandidates_subset_latticeSpherical
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.ofDivisorSpace
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.ofDivisorSpace_carrier
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber_inter_ofDivisorSpace
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.finite_wallCandidates_ofDivisorSpace
