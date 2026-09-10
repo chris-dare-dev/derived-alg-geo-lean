@@ -34,7 +34,8 @@ DGFunctor.HomogeneousNatTrans
 ├─ all integer degrees and Koszul naturality
 ├─ pointwise differential and vertical composition
 ├─ whiskerLeft / whiskerRight (both sign-free) and additive-hom packaging
-│  └─ interchange: the Godement sign (-1)^(m n) is naturality of the second
+│  ├─ interchange: the Godement sign (-1)^(m n) is naturality of the second
+│  └─ hcomp: the Godement product, graded Leibniz, strictly associative
 └─ DGCategory (DGFunctor A B)
    └─ IsClosed
 
