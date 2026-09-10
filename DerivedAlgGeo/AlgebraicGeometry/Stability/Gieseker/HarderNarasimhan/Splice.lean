@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.StrictDrop
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakHarderNarasimhan
 
 /-!
 # Lifting a filtration of a quotient back to the ambient object
@@ -179,4 +180,107 @@ noncomputable def spliceFactorSuccIso {F : Coh X} (B : Subobject F) {m : ℕ}
   exact (cokernelOfLECongr hle (Functor.monotone _ hlec) h1 h2).trans
     (CategoryTheory.Abelian.cokernelPullbackIso B hlec)
 
-end AlgebraicGeometry.Stability.Gieseker
+namespace PolarizedVarietyData
+
+variable {P : PolarizedVarietyData k X}
+
+/-- **The first factor of a filtration is its first chain step.**
+
+The opening successive quotient runs out of the bottom subobject, so it is the first chain step
+itself. This is what turns a statement about the *subobjects* of a quotient into one about the
+*factors* of a filtration of it. -/
+noncomputable def firstFactorIso (h : MuPositivityData P) {Y : Coh X}
+    (G : AbelianWeakHNFiltration (P.weakSlopeData h).toWeakStabilityFunction Y) :
+    G.factor ⟨0, G.nonempty⟩ ≅
+      ((G.chain (Fin.succ ⟨0, G.nonempty⟩) : Subobject Y) : Coh X) := by
+  have hbot : G.chain (Fin.castSucc ⟨0, G.nonempty⟩) = ⊥ := G.chain_bot
+  exact (cokernelOfLECongr _ bot_le hbot rfl).trans
+    (cokernelOfLEBotIso (G.chain (Fin.succ ⟨0, G.nonempty⟩)) bot_le)
+
+/-- **The top slope of a filtration of the quotient lies strictly below the maximal slope.**
+
+The first factor is a genuine nonzero subobject of the quotient, so the strict drop applies to
+it. This is the inequality that makes the spliced slope vector strictly antitone at the splice
+point, and it is the only place the drop is needed. -/
+theorem muZero_lt_topSlope (h : MuPositivityData P) {F : Coh X} {B : Subobject F}
+    (hB : IsMaximalDestabilizing h F B)
+    (G : AbelianWeakHNFiltration (P.weakSlopeData h).toWeakStabilityFunction
+      (cokernel (B : Subobject F).arrow)) :
+    G.μ ⟨0, G.nonempty⟩ <
+      (P.weakSlopeData h).topSlope ((B : Subobject F) : Coh X) := by
+  have hiso := firstFactorIso h G
+  have hne : ¬IsZero ((G.chain (Fin.succ ⟨0, G.nonempty⟩) :
+      Subobject (cokernel B.arrow)) : Coh X) := by
+    intro hz
+    exact G.factor_not_isZero ⟨0, G.nonempty⟩ (hz.of_iso hiso)
+  have hslope : G.μ ⟨0, G.nonempty⟩ =
+      (P.weakSlopeData h).topSlope
+        ((G.chain (Fin.succ ⟨0, G.nonempty⟩) : Subobject (cokernel B.arrow)) : Coh X) := by
+    rw [← G.factor_slope ⟨0, G.nonempty⟩]
+    exact (P.weakSlopeData h).toWeakStabilityFunction.slope_eq_of_iso hiso
+  rw [hslope]
+  exact topSlope_lt_of_maximalDestabilizing h hB _ hne
+
+/-- **The spliced Harder–Narasimhan filtration.**
+
+Given the maximal destabilizing subobject `B ⊆ F` and a filtration of `F / B`, prepend `B`.
+The chain is `spliceChain`, the slope vector is the slope of `B` followed by the quotient's,
+and every field is one of the facts above:
+
+* strict monotonicity is `spliceChain_strictMono`;
+* strict antitonicity is `muZero_lt_topSlope` at the splice point and `G.μ_anti` above it. It is
+  proved directly rather than through the adjacent-step criterion, because that criterion would
+  index by `Fin G.n` with `G.n` opaque, which cannot be case-split;
+* the factors are identified by `spliceFactorZeroIso` and `spliceFactorSuccIso`, and their slopes
+  and semistability transported along those isomorphisms. -/
+noncomputable def splice (h : MuPositivityData P) {F : Coh X} {B : Subobject F}
+    (hB : IsMaximalDestabilizing h F B)
+    (G : AbelianWeakHNFiltration (P.weakSlopeData h).toWeakStabilityFunction
+      (cokernel (B : Subobject F).arrow)) :
+    AbelianWeakHNFiltration (P.weakSlopeData h).toWeakStabilityFunction F where
+  n := G.n + 1
+  nonempty := Nat.succ_pos _
+  chain := spliceChain B G.chain
+  chain_strictMono := spliceChain_strictMono hB.1 G.chain_strictMono G.chain_bot
+  chain_bot := rfl
+  chain_top := spliceChain_top B G.chain G.chain_top
+  μ := Fin.cases ((P.weakSlopeData h).topSlope ((B : Subobject F) : Coh X)) G.μ
+  μ_anti := by
+    intro a b hab
+    revert hab
+    refine Fin.cases ?_ ?_ b
+    · intro hab
+      exact absurd hab (Fin.not_lt_zero a)
+    · intro b' hab
+      revert hab
+      refine Fin.cases ?_ ?_ a
+      · intro _
+        show G.μ b' < (P.weakSlopeData h).topSlope ((B : Subobject F) : Coh X)
+        exact lt_of_le_of_lt (G.μ_anti.antitone (Fin.le_def.mpr (Nat.zero_le _)))
+          (muZero_lt_topSlope h hB G)
+      · intro a' hab
+        show G.μ b' < G.μ a'
+        exact G.μ_anti (Fin.succ_lt_succ_iff.mp hab)
+  factor_slope := by
+    intro j
+    refine Fin.cases ?_ ?_ j
+    · exact (P.weakSlopeData h).toWeakStabilityFunction.slope_eq_of_iso
+        (spliceFactorZeroIso B G.chain G.chain_bot _)
+    · intro j'
+      refine Eq.trans ((P.weakSlopeData h).toWeakStabilityFunction.slope_eq_of_iso
+        (spliceFactorSuccIso B G.chain j' _
+          (le_of_lt (G.chain_strictMono Fin.castSucc_lt_succ)))) ?_
+      exact G.factor_slope j'
+  factor_semistable := by
+    intro j
+    refine Fin.cases ?_ ?_ j
+    · exact (P.weakSlopeData h).toWeakStabilityFunction.isSemistable_of_iso
+        (spliceFactorZeroIso B G.chain G.chain_bot _).symm
+        (maximalDestabilizing_isSemistable h hB)
+    · intro j'
+      exact (P.weakSlopeData h).toWeakStabilityFunction.isSemistable_of_iso
+        (spliceFactorSuccIso B G.chain j' _
+          (le_of_lt (G.chain_strictMono Fin.castSucc_lt_succ))).symm
+        (G.factor_semistable j')
+
+end PolarizedVarietyData

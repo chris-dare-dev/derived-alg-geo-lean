@@ -236,3 +236,16 @@ criterion, so only two cases arise: the opening `bot < B`, and a pullback of a s
 #print axioms AlgebraicGeometry.Stability.Gieseker.spliceChain_top
 #print axioms AlgebraicGeometry.Stability.Gieseker.spliceFactorZeroIso
 #print axioms AlgebraicGeometry.Stability.Gieseker.spliceFactorSuccIso
+
+/-! ## The spliced filtration (#905)
+
+Prepending the maximal destabilizing subobject to a filtration of the quotient. `firstFactorIso`
+identifies a filtration's opening successive quotient with its first chain step, which is what
+turns the strict drop -- a statement about SUBOBJECTS of the quotient -- into `muZero_lt_topSlope`,
+a statement about the FACTORS of a filtration of it. `splice` then assembles all seven fields.
+Strict antitonicity is proved directly rather than through the adjacent-step criterion: that
+criterion indexes by `Fin G.n` with `G.n` opaque, which cannot be case-split. -/
+
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.firstFactorIso
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muZero_lt_topSlope
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.splice
