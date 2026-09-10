@@ -105,6 +105,7 @@ Category
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
 │  │        │  └─ compareIso             the cone choices do not matter, canonically
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
+│  │           └─ twistTriangleFunctor   H⁰ D ⥤ Triangle (H⁰ D), all distinguished
 │  ├─ H0 C
 │  │  └─ coneTriangleFunctor             functor to distinguished triangles
 │  └─ IsPretriangulated C

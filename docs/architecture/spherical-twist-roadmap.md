@@ -70,7 +70,13 @@ DGAdjunction
 ├─ dg triangle identities
 ├─ h0 : an ordinary Mathlib adjunction between the H⁰ functors
 └─ CounitConeData
-   └─ twist candidate Cone(LR ⟶ id)
+   ├─ twist candidate Cone(LR ⟶ id)
+   └─ twistTriangleFunctor: H⁰ D ⥤ Triangle (H⁰ D), every value distinguished,
+      first two maps the counit and the canonical inclusion.  This is
+      Anno--Logvinenko's twist triangle as a triangle OF FUNCTORS on H⁰.  It
+      does not say the twist is an autoequivalence, does not call the
+      adjunction spherical, and does not relate it to the other three
+      triangles; UnitConeData carries the unshifted unit side.
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
