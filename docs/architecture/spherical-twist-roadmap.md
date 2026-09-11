@@ -80,6 +80,10 @@ DGAdjunction
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
+├─ the twist is EXACT on H⁰ (twistH0IsTriangulated), as soon as S and R preserve
+│  shifts and chosen cones.  A cone functor preserves both when its two ends do;
+│  the cone half is the 3-by-3 lemma, whose proof is block diagonal in the four
+│  coordinates of the two splittings rather than merely triangular.
 ├─ unshifted cones underlying dual twist and cotwist
 ├─ the four triangles as functors on H⁰, every value distinguished, each first
 │  map the corresponding unit or counit.  The dual twist and the cotwist are
@@ -144,9 +148,13 @@ that comparison are instance hypotheses to be discharged by the realization.
    and the unshifted cotwist cone autoequivalences of `H⁰`.  That is the first
    categorical invertibility statement about a twist here; everything earlier
    was numerical, on `K₀`, or a construction with no invertibility attached.
-   What it is not is exactness: `DGFunctor.PreservesShifts` and
-   `PreservesChosenCones` still have no instances, so the equivalence is one of
-   ordinary categories.
+   Exactness is separate, and now supplied: `DGFunctor.PreservesShifts` and
+   `PreservesChosenCones` are instantiated for a cone functor whenever its two
+   ends carry them, so `twistH0IsTriangulated` makes `H⁰` of the twist a
+   triangulated functor.  Together with the equivalence above that is an exact
+   autoequivalence -- which is still not sphericality, since that needs all
+   four Anno--Logvinenko conditions and the Morita framework the first
+   paragraph rules out.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
    shift on a functor category, which is what `Functor.ExactFamily` should be
    built on.  That rewiring is still open, and it is not an API-only change:
@@ -154,10 +162,20 @@ that comparison are instance hypotheses to be discharged by the realization.
    chose, while the family needs it against that choice composed with the
    strict comparison for evaluation, so the transport needs a lemma comparing
    the two `mapTriangle`s.
-4. No generic `RHom(E,-) ⊗ E` dg functor or evaluation transformation has been
-   constructed.  The current monoidal/exact-bifunctor roots are the intended
-   lower dependency, but closed monoidal/Hom-complex representability is still
-   missing.
+4. `EvaluationData.functor` is the generic `RHom(E,-) ⊗ E` dg functor and
+   `EvaluationData.evaluation` its degree-zero transformation to the identity,
+   both in `Algebra/Homology/DGCategory/Copower.lean`.  They are built on
+   `IsCopowerOf`, which states the tensoring the way `IsShiftBy` states the
+   shift -- by its universal property, as data plus a bijectivity condition --
+   because `HomologicalComplex.HasTensor` does not synthesize for the
+   `ℤ`-indexed shape at the pin, so there is no tensor product of complexes to
+   build the object with.
+
+   What is open is *existence*.  Nothing constructs a copower, so nothing
+   produces an `EvaluationData`; a dg category with enough copowers has to
+   supply one, exactly as `IsPretriangulated` supplies cone and shift choices.
+   And no theorem relates this functor to a spherical object: that comparison
+   needs `Perf(k)` as a dg category, which the repository does not have.
 5. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
    transformed arrow is the counit.  The enhancement of the kernel category,

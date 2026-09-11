@@ -2,6 +2,7 @@
 MukaiWitness slice of the AlgebraicGeometry audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3MukaiIntegral
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3Mukai
 
 /-! ## The Mukai data of the rank-one K3 model — the first inhabitants
@@ -31,3 +32,15 @@ rather than from a hand-built lattice vector. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.mukaiPairing_k3
 #print axioms AlgebraicGeometry.Numerical.Examples.isSpherical_structureSheaf_k3
 #print axioms AlgebraicGeometry.Numerical.Examples.isIsotropic_point_k3
+
+/-! ## The integral of Mukai classes, evaluated on the model (#909 item 7)
+
+The arithmetic check on the sign discussion in `Mukai/Pairing.lean`. A sign error there would still
+elaborate, because every statement in that file is an equation between two things the reader cannot
+evaluate; on this model both sides are explicit polynomials in the coordinates. The structure-sheaf
+diagonal is the sharpest form: it comes out `+2`, where a sign error anywhere upstream would give
+`-2`. -/
+
+#print axioms AlgebraicGeometry.Numerical.Examples.mukaiIntegral_k3
+#print axioms AlgebraicGeometry.Numerical.Examples.chi₂_k3_eq_mukaiIntegral
+#print axioms AlgebraicGeometry.Numerical.Examples.mukaiIntegral_structureSheaf_k3

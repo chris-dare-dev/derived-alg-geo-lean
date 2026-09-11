@@ -105,4 +105,24 @@ theorem exists_smul_sectionOfMem_eq
   rw [LocalizedModule.mk_eq]
   exact ⟨1, by simp [Submonoid.smul_def]; ring⟩
 
+/-- **The same, as an equation of sections of `O(N)`.**
+
+`exists_smul_sectionOfMem_eq` compares the two sides at every point of `W`; sections of the
+associated sheaf are determined by their values (`section_ext`), and restriction is pointwise,
+so this is the pointwise statement read as `r • (gᴺ / 1) = w|_W`. The section type is
+ascribed at `Γ(O(N), W)` so that the scalar action is the module-sheaf one a consumer sees. -/
+theorem exists_smul_sectionOfMem_eq_res
+    {g : A} (hg : g ∈ 𝒜 1) (N : ℕ) {V : (Proj 𝒜).Opens}
+    (w : Γ(twistingSheaf 𝒜 (N : ℤ), V)) (x : Proj 𝒜) (hxV : x ∈ V)
+    (hxg : x ∈ ProjectiveSpectrum.basicOpen 𝒜 g) :
+    ∃ (W : (Proj 𝒜).Opens) (hWV : W ≤ V), x ∈ W ∧ ∃ r : Γ(Proj 𝒜, W),
+      r • (show Γ(twistingSheaf 𝒜 (N : ℤ), W) from
+          sectionOfMem 𝒜 𝒜 W N (pow_mem_deg 𝒜 hg N))
+        = (twistingSheaf 𝒜 (N : ℤ)).presheaf.map (homOfLE hWV).op w := by
+  obtain ⟨W, hWV, hxW, r, hr⟩ := exists_smul_sectionOfMem_eq 𝒜 hg N w x hxV hxg
+  refine ⟨W, hWV, hxW, r, ?_⟩
+  apply section_ext
+  funext y
+  exact hr y
+
 end AlgebraicGeometry.Proj

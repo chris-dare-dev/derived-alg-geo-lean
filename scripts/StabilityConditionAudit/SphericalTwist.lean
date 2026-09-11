@@ -121,12 +121,59 @@ does NOT imply the functorial braid relation; see the module docstring in
 -- The equivalence conditions, spent: the twist and the unshifted cotwist cone
 -- are autoequivalences of `H⁰`.  This is the first categorical invertibility
 -- statement about a twist here; everything earlier was numerical, on `K₀`, or
--- a construction with no invertibility attached.  Still no exactness and still
--- no sphericality.
+-- a construction with no invertibility attached.  Exactness is the next block;
+-- sphericality is still out of reach.
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistH0Equivalence
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConeH0Equivalence
+
+-- Exactness for the twist: it preserves shifts and chosen cones, so `H⁰` of it
+-- commutes with the shift and is a triangulated functor.  Not sphericality:
+-- that needs all four Anno--Logvinenko conditions and Morita quasi-functors.
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistPreservesShifts
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConePreservesShifts
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistH0CommShift
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistPreservesChosenCones
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConePreservesChosenCones
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistH0IsTriangulated
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctor
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.cotwist
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.twist
+
+/-! ## Spherical objects without a Serre functor (#888)
+
+`SerreFunctor/Objects.lean` already carried `SerreFunctor.IsSphericalObject`, relative to a chosen
+Serre functor and with a fourth clause `S(E) ≅ E⟦n⟧`. This predicate is deliberately WEAKER: a
+general k-linear pretriangulated category has no Serre functor, and the Euler computation needs
+none. `of_serreFunctor` projects the Serre-relative one onto this one, so the two are related
+rather than parallel; the projection is one-way and nothing here reconstructs a Serre functor.
+
+TRAP recorded in the module docstring: `chiHom_self_eq` needs `n ≠ 0`. The structure IS inhabitable
+at `n = 0`, where the support collapses to `{0}` and chi is 1 while `1 + (-1)^0` is 2 -- so without
+the hypothesis the statement is FALSE rather than vacuous. The degenerate value is recorded
+separately.
+
+TRAP, second: `vanishing` reads "every morphism is zero", never `IsZero (E ⟶ E⟦i⟧)`. That Hom is a
+bare Type and `IsZero` there is unsatisfiable, which would make the structure uninhabitable and
+every theorem vacuously true while still compiling.
+
+`finrank_shift_zero` exists because the zero shift is not syntactically the identity, so the
+endomorphism statement does not apply to `Hom(E, E⟦0⟧)` directly. -/
+
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.vanishing
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.end_one
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.top_one
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.not_isZero
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.finrank_end
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.finrank_top
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.finrank_hom_eq_zero
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.finrank_shift_zero
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.of_iso
+#print axioms CategoryTheory.Triangulated.SphericalTwist.chiHom_self_eq
+#print axioms CategoryTheory.Triangulated.SphericalTwist.chiHom_self_eq_one_of_zero
+#print axioms CategoryTheory.Triangulated.SphericalTwist.chiK₀_of_self_eq_two
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.twistK₀_involutive
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.twistK₀_bijective
+#print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.of_serreFunctor
