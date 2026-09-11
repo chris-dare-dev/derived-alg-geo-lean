@@ -214,6 +214,78 @@ def wallSlice : OrthogonalSlice divisorSpace ℝ where
   transverse := antiDiagonalMap
   orthogonal := segre_pair_antiDiagonal
 
+/-! ### The certificates of the slice
+
+`Walls/Divisorial/Slice.lean` attaches `IsHodge` and `IsGeometric` to an
+orthogonal slice, and `wallSlice` carried neither.  Both hold here, and the
+pieces were already in the file: the Segre class has positive square, the
+anti-diagonal direction has negative square, and `ampleCone` is exactly the set
+`IsGeometric` wants.
+
+On a hyperbolic form the first condition is not automatic.  `ω² = 2h₁h₂` is
+negative on half the plane and zero on the two rulings, which are isotropic, so
+`H_square_pos` genuinely selects the positive cone.  That is the difference from
+the rank-one slice, where every nonzero class has positive square, and it makes
+the quadric the first slice whose Hodge certificate is neither vacuous nor
+automatic. -/
+
+/-- `∫(f₁+f₂)² = 2`, so the Segre class has positive square. -/
+@[simp]
+theorem segre_square : divisorSpace.pair segre segre = 2 := by
+  show (1 : ℝ) * 1 + 1 * 1 = 2
+  norm_num
+
+/-- The anti-diagonal direction has square `-2u²`: negative for every nonzero
+parameter.  The ruling classes themselves are isotropic, which is why this needs
+the anti-diagonal and not an arbitrary transverse direction. -/
+@[simp]
+theorem antiDiagonal_square (u : ℝ) :
+    divisorSpace.pair (antiDiagonal u) (antiDiagonal u) = -2 * u ^ 2 := by
+  show u * (-u) + (-u) * u = -2 * u ^ 2
+  ring
+
+/-- **The quadric's wall slice is Hodge.**
+
+Not vacuous, unlike the rank-one slice: the transverse space is a line and the
+second clause has to be checked on it. -/
+theorem wallSlice_isHodge : wallSlice.IsHodge where
+  H_square_pos := by
+    show 0 < divisorSpace.pair segre segre
+    rw [segre_square]
+    norm_num
+  transverse_square_neg u hu := by
+    show divisorSpace.pair (antiDiagonal u) (antiDiagonal u) < 0
+    rw [antiDiagonal_square]
+    have : 0 < u ^ 2 := by positivity
+    linarith
+
+/-- The Segre class is ample. -/
+theorem segre_mem_ampleCone : segre ∈ ampleCone := by
+  simp [ampleCone, segre]
+
+/-- **The quadric's wall slice is geometric.**
+
+`ampleCone` and the slice were both already here; nothing had put them together,
+so `IsGeometric` had no witness on this surface. -/
+theorem wallSlice_isGeometric : wallSlice.IsGeometric ampleCone where
+  __ := wallSlice_isHodge
+  H_ample := segre_mem_ampleCone
+
+/-- **The Hodge certificate fails off the positive cone**, which is what makes
+the hyperbolic case different from the definite one.
+
+A ruling class is isotropic, so it cannot be the distinguished direction of any
+Hodge slice.  On a rank-one surface no such class exists. -/
+theorem not_isHodge_rulingOne (T : OrthogonalSlice divisorSpace ℝ)
+    (hH : T.H = rulingOne) : ¬ T.IsHodge := by
+  intro h
+  have hsq : divisorSpace.pair T.H T.H = 0 := by
+    rw [hH]
+    exact rulingOne_sq
+  have := h.H_square_pos
+  rw [hsq] at this
+  exact lt_irrefl 0 this
+
 /-- The generic wall family specialized to the smooth quadric. -/
 def wallChargeFamily :
     CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.ChargeFamily

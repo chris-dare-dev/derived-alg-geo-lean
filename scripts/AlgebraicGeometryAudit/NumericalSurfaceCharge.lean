@@ -358,4 +358,29 @@ directions. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.segre_pair_antiDiagonal
 #print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.wallChargeFamily
 #print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.wallChargeFamily_charge
+
+/-! ## The quadric slice's certificates
+
+Walls/Divisorial/Slice attaches IsHodge and IsGeometric to an orthogonal slice
+and wallSlice carried NEITHER, although the pieces were all in this file: the
+Segre class has positive square, the anti-diagonal direction has negative
+square, and ampleCone is exactly the set IsGeometric wants. Nothing had put them
+together, so IsGeometric had no witness on this surface.
+
+ON A HYPERBOLIC FORM THE FIRST CONDITION IS NOT AUTOMATIC. omega^2 = 2.h1.h2 is
+negative on half the plane and ZERO on the two rulings, which are isotropic, so
+H_square_pos genuinely selects the positive cone. not_isHodge_rulingOne records
+the consequence: a ruling class cannot be the distinguished direction of any
+Hodge slice. On a rank-one surface no such class exists, which is what makes
+this the first slice whose Hodge certificate is neither vacuous nor automatic.
+
+ampleCone is a SUPPLIED SET, as it was before this change; nothing proves it is
+the ample cone of a geometric quadric. -/
+
 #print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.wallSlice
+#print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.antiDiagonal_square
+#print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.not_isHodge_rulingOne
+#print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.segre_mem_ampleCone
+#print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.segre_square
+#print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.wallSlice_isGeometric
+#print axioms AlgebraicGeometry.Numerical.Examples.SmoothQuadric.wallSlice_isHodge
