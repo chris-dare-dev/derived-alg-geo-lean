@@ -19,10 +19,12 @@ Before this file the tree had two slices and one and a half certificates.
   `(s, t)` plane and `rankOne_isHodge` is vacuous in its second clause.
 * `SmoothQuadricCharge.wallSlice` has a one-dimensional transverse space but no
   certificate.
-* **`IsGeometric` had no witness at all**, because no model exposed its ample
-  cone as a subset of the real divisor space — the blow-up recorded one only as
-  `IsAmpleCoefficients`, a predicate on rational coefficients that nothing can
-  consume.
+* **`IsGeometric` had no witness at all.**  Not for want of an ample cone:
+  `SmoothQuadricCharge.ampleCone` is one, and carries a `DivisorialParameters`
+  over it.  What was missing was anyone proving the certificate *for a slice*.
+  The blow-up had no cone either way, recording ampleness only as
+  `IsAmpleCoefficients`, a predicate on rational coefficients that nothing
+  consumes.
 
 This file supplies a slice whose transverse space is a genuine **plane**, both
 certificates for it, and the ample cone the second needs.
@@ -169,8 +171,8 @@ theorem antiCanonicalSlice_isHodge : antiCanonicalSlice.IsHodge where
 /-- **The first `IsGeometric` witness in the repository.**
 
 `IsGeometric` adds ampleness of the distinguished direction to the Hodge data.
-Nothing inhabited it before, because no model exposed its ample cone as a subset
-of the real divisor space. -/
+Nothing inhabited it before.  `SmoothQuadricCharge.ampleCone` shows the missing
+piece was not a cone but the certificate itself: no slice in the tree had one. -/
 theorem antiCanonicalSlice_isGeometric : antiCanonicalSlice.IsGeometric ampleCone where
   __ := antiCanonicalSlice_isHodge
   H_ample := antiCanonical_mem_ampleCone

@@ -13,8 +13,9 @@ that the direction is ample. Before this the tree had two slices and one and a
 half certificates: the rank-one slice has transverse space Fin 0 -> R, so it is
 the classical (s,t) plane and rankOne_isHodge is VACUOUS in its second clause;
 SmoothQuadricCharge.wallSlice has a line but no certificate; and IsGeometric had
-NO WITNESS AT ALL, because no model exposed its ample cone as a subset of the
-real divisor space.
+NO WITNESS AT ALL. Not for want of an ample cone -- SmoothQuadricCharge.ampleCone
+is one, with a DivisorialParameters over it -- but because no slice in the tree
+carried the certificate.
 
 antiCanonicalSlice is the first slice whose transverse space is a PLANE. -K has
 square 7 and its orthogonal complement in the rank-three space is
