@@ -9,11 +9,17 @@ import Mathlib.RingTheory.Finiteness.Cardinality
 /-!
 # Free modules of finite rank in `FGModuleCat`
 
-Over a noetherian ring, the free module `Fin k → R` is projective among finitely generated
-modules, and every finitely generated module is a quotient of one. The first statement is
-projectivity in all modules transported along the forgetful functor, which preserves
-epimorphisms because it preserves finite colimits (Mathlib, for noetherian rings); the second
-is `Module.Finite.exists_fin'` read in the category.
+The free module `Fin k → R` is projective among finitely generated modules, and every
+finitely generated module is a quotient of one. The first statement is projectivity in all
+modules transported along the forgetful functor, which preserves epimorphisms because it
+preserves finite colimits; the second is `Module.Finite.exists_fin'` read in the category.
+
+Neither statement needs `R` noetherian, and this file no longer assumes it. Mathlib's
+`PreservesFiniteColimits (forget₂ (FGModuleCat k) (ModuleCat k))` holds over any ring,
+because a finite colimit of finitely generated modules is a quotient of a finite coproduct.
+Noetherian hypotheses enter `FGModuleCat` for finite *limits*, where a kernel of finitely
+generated modules need not be finitely generated. The consumers below are noetherian for
+their own reasons, not for this one.
 
 These are the "enough acyclic generators" inputs for coherent sheaves on an affine
 noetherian scheme, through `Coh.affineEquivalence`.
@@ -36,13 +42,12 @@ theorem exists_finFree_epi (M : FGModuleCat.{u} R) :
   haveI : Epi (ModuleCat.ofHom f) := (ModuleCat.epi_iff_surjective _).2 hf
   exact Functor.epi_of_epi_map (ModuleCat.isFG R).ι this
 
-/-- Free modules of finite rank are projective among finitely generated modules: the forgetful
-functor to all modules preserves epimorphisms, so a lift in all modules is a lift.
+/-- Free modules of finite rank are projective among finitely generated modules: the
+forgetful functor to all modules preserves epimorphisms, so a lift in all modules is a lift.
 
-No noetherian hypothesis. It was carried when this landed and the proof never used it — the
-argument is freeness plus epi-preservation — so the environment linter reported it as an unused
-argument and the library-wide lint went red. Dropping it strengthens the statement and cannot
-break a caller, since it is an instance argument. -/
+No noetherian hypothesis. The epimorphism preservation comes from Mathlib's
+`PreservesFiniteColimits` instance for `forget₂ (FGModuleCat R) (ModuleCat R)`, which is
+stated over any ring. -/
 theorem projective_of_finFree (k : ℕ) :
     Projective (FGModuleCat.of R (Fin k → R)) where
   factors {Y Z} g e he := by
