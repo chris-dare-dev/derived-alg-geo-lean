@@ -4,6 +4,7 @@ branches append to different files (#480). See the umbrella file for the contrac
 reading guide.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicComparison
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicGenerators
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.Adjunction
 
 /-! ## Ext along an adjunction with exact left adjoint (#572 step 3, slice 2)
@@ -53,3 +54,10 @@ degree zero and `R` sends injectives to `A`-acyclic objects. -/
 #print axioms CategoryTheory.extComparisonAddEquiv_apply
 #print axioms CategoryTheory.extComparisonMap_mk₀
 #print axioms CategoryTheory.bijective_extComparisonMap_zero_iff
+#print axioms CategoryTheory.Ext.subsingleton_of_iso_left
+#print axioms CategoryTheory.Ext.subsingleton_biproduct_left
+#print axioms CategoryTheory.Functor.bijective_mapExtAddHom_zero_iff
+#print axioms CategoryTheory.Functor.bijective_mapExtAddHom_zero
+#print axioms CategoryTheory.Functor.surjective_mapExtAddHom_of_generators
+#print axioms CategoryTheory.Functor.injective_mapExtAddHom_of_generators
+#print axioms CategoryTheory.Functor.bijective_mapExtAddHom_of_generators

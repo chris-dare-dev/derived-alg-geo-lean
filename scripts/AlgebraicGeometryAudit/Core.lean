@@ -579,6 +579,8 @@ is not closed. -/
 #print axioms AddCommGrpCat.productConeIsLimit
 #print axioms AddCommGrpCat.piIsoPi
 #print axioms AddCommGrpCat.uliftZMultiplesAddEquiv_comp
+#print axioms FGModuleCat.exists_finFree_epi
+#print axioms FGModuleCat.projective_of_finFree
 #print axioms AddCommGrpCat.piIsoPi_inv_π
 #print axioms AddCommGrpCat.piIsoPi_inv_π_apply
 #print axioms AddCommGrpCat.piIsoPi_hom_eval
@@ -1342,6 +1344,10 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Coh.affineEquivalence
 #print axioms Coh.affineEquivalence_functor
 #print axioms Coh.affineEquivalence_inverse
+#print axioms Coh.affineFree
+#print axioms Coh.projective_affineFree
+#print axioms Coh.ιAffineFreeIso
+#print axioms Coh.exists_affineFree_epi
 
 -- Layer B stage 1: kernels and cokernels. Restriction along open immersions is left exact,
 -- localization commutes with kernels, and the affine comparison transports both ambient
