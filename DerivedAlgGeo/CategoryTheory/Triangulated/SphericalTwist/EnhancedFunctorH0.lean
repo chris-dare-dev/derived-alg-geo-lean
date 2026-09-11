@@ -263,21 +263,20 @@ end Equivalences
 
 section Shifts
 
-variable (hS : DGFunctor.PreservesShifts S) (hR : DGFunctor.PreservesShifts R)
+/-- **The twist preserves shifts.**
 
-/-- **The twist preserves shifts, as soon as `S` and `R` do.**
-
-The twist is the cone of the right adjunction's counit, and a cone functor
-preserves shifts when its two ends do.  Half of exactness; the cone half is
-`twistPreservesChosenCones`. -/
+Unconditional: every dg functor preserves shifts
+(`DGFunctor.preservesShifts`), because a shift element is a closed two-sided
+invertible element.  Half of exactness, and the free half; the cone half is
+`twistPreservesChosenCones`, which does need `S` and `R` to carry it. -/
 noncomputable def twistPreservesShifts :
     DGFunctor.PreservesShifts P.twistFunctor :=
-  DGAdjunction.CounitConeData.preservesShifts P.rightAdj P.twist hS hR
+  DGAdjunction.CounitConeData.preservesShifts P.rightAdj P.twist
 
 /-- The unshifted cotwist cone preserves shifts too. -/
 noncomputable def cotwistConePreservesShifts :
     DGFunctor.PreservesShifts P.cotwistConeFunctor :=
-  DGAdjunction.UnitConeData.preservesShifts P.rightAdj P.cotwistCone hS hR
+  DGAdjunction.UnitConeData.preservesShifts P.rightAdj P.cotwistCone
 
 /-- **The twist preserves chosen cones.**  The 3-by-3 lemma for the counit's
 cone. -/
@@ -296,19 +295,21 @@ noncomputable def cotwistConePreservesChosenCones
 
 /-- **The twist is exact on `H⁰`.**
 
-Both dg-level capabilities are now available for the twist, so `H⁰` of it is a
+Both dg-level capabilities are available for the twist, so `H⁰` of it is a
 triangulated functor: it commutes with the shift and carries distinguished
 triangles to distinguished triangles.  With the equivalence supplied by the
 twist/cotwist conditions this is an exact autoequivalence, which is what the
-word "twist" is supposed to mean. -/
+word "twist" is supposed to mean.
+
+Only the cone capabilities are hypotheses; the shift ones are free. -/
 theorem twistH0IsTriangulated [IsPretriangulated B]
     (hSc : DGFunctor.PreservesChosenCones S)
     (hRc : DGFunctor.PreservesChosenCones R) :
     letI : P.twistFunctor.h0.CommShift ℤ :=
-      DGFunctor.commShift _ (P.twistPreservesShifts hS hR)
+      DGFunctor.commShift _ P.twistPreservesShifts
     P.twistFunctor.h0.IsTriangulated :=
   DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-    (P.twistPreservesShifts hS hR) (P.twistPreservesChosenCones hSc hRc)
+    P.twistPreservesShifts (P.twistPreservesChosenCones hSc hRc)
 
 /-- **The twist commutes with the shift on `H⁰`.**
 
@@ -317,7 +318,7 @@ functor.  `twistH0IsTriangulated` adds the cone half. -/
 @[reducible]
 noncomputable def twistH0CommShift [IsPretriangulated B] :
     P.twistFunctor.h0.CommShift ℤ :=
-  DGFunctor.commShift _ (P.twistPreservesShifts hS hR)
+  DGFunctor.commShift _ P.twistPreservesShifts
 
 end Shifts
 

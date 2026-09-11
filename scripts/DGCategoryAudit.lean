@@ -941,10 +941,13 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
 
--- A cone functor preserves shifts AND chosen cones when its two ends do, so the
--- twist candidate of a dg adjunction is exact as soon as the adjoints are.
--- Both arguments are the cone splitting rather than a computation: in the
--- coordinates of the splittings the maps are block diagonal, with one sign.
+-- A cone functor preserves chosen cones when its two ends do, so the twist
+-- candidate of a dg adjunction is exact as soon as the adjoints are.  That
+-- argument is the cone splitting rather than a computation: in the coordinates
+-- of the splittings the map is block diagonal, with one sign.  The shift
+-- versions below take no arguments at all -- `DGFunctor.preservesShifts` holds
+-- for every dg functor, so the cone splitting is not needed for them and the
+-- specialised proofs were removed.
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compRight_functor_map
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesShifts

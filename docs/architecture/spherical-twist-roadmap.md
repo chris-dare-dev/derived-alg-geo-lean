@@ -160,8 +160,9 @@ that comparison are instance hypotheses to be discharged by the realization.
    `PreservesChosenCones` are instantiated for a cone functor whenever its two
    ends carry them, so `twistH0IsTriangulated` makes `H⁰` of the twist a
    triangulated functor.  The shift half of that is free for every dg functor
-   (`DGFunctor.preservesShifts`), so the `PreservesShifts` arguments the
-   adjunction-side declarations still take can be filled in by any caller.  Together with the equivalence above that is an exact
+   (`DGFunctor.preservesShifts`), so `twistPreservesShifts` and
+   `cotwistConePreservesShifts` take no arguments and `twistH0IsTriangulated`
+   asks only for the two `PreservesChosenCones` witnesses.  Together with the equivalence above that is an exact
    autoequivalence -- which is still not sphericality, since that needs all
    four Anno--Logvinenko conditions and the Morita framework the first
    paragraph rules out.
