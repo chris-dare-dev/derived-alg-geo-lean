@@ -3082,6 +3082,15 @@ not the conclusion renamed. `mukaiVectorQuotient` is what it buys.
 #print axioms AlgebraicGeometry.Scheme.Modules.isGrothendieckAbelian
 #print axioms AlgebraicGeometry.Scheme.Modules.injective_sheafOfModules_of_injective
 #print axioms AlgebraicGeometry.Scheme.Modules.isFlasque_toSheaf_of_injective
+#print axioms TopCat.Sheaf.subsingleton_H_of_isFlasque
+#print axioms SheafOfModules.freeYonedaSheafHomEquiv
+#print axioms SheafOfModules.freeYonedaSheafMap
+#print axioms SheafOfModules.freeYonedaEquiv_free_map_yoneda_map_comp
+#print axioms SheafOfModules.freeYonedaSheafHomEquiv_comp
+#print axioms SheafOfModules.freeYonedaSheafMap_mono
+#print axioms SheafOfModules.isFlasque_toSheaf_of_injective
+#print axioms SheafOfModules.subsingleton_derivedH_toSheaf_of_injective
+#print axioms SheafOfModules.extUnitAddEquivDerivedH
 #print axioms AlgebraicGeometry.Scheme.Modules.unit
 #print axioms AlgebraicGeometry.Scheme.Modules.unitFromConstant
 #print axioms AlgebraicGeometry.Scheme.Modules.bijective_unitFromConstant_comp
