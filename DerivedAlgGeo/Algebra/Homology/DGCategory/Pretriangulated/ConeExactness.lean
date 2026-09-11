@@ -104,66 +104,17 @@ theorem compRight_functor_map {X Y : C} {n : ℤ} (s : IsShiftBy X n Y) (W : D)
 
 /-- **A cone functor preserves shifts.**
 
-The shift element of the image is the image of the shift element, and right
-composition with it is bijective because, through the cone splitting, it is the
-product of right composition with the two shift elements `F` and `G` supply,
-one of them scaled by a sign. -/
-noncomputable def preservesShifts (hF : PreservesShifts F)
-    (hG : PreservesShifts G) : PreservesShifts K.functor where
-  mapShift {X Y n} s :=
-    { hom := K.functor.map (-n) s.hom
-      hom_closed := by
-        rw [← K.functor.map_d (-n) (-n + 1) s.hom, s.hom_closed, map_zero]
-      bijective W p q hpn := by
-        -- Through the two splittings the map is a product of two bijections,
-        -- so `Function.Bijective.of_comp_iff'` transfers bijectivity back.
-        have hsplitX := (K.isCone X).bijective W p (p + 1) (by omega)
-        have hsplitY := (K.isCone Y).bijective W q (q + 1) (by omega)
-        have hFb := (hF.mapShift s).bijective W (p + 1) (q + 1) (by omega)
-        have hGb := (hG.mapShift s).bijective W p q (by omega)
-        rw [hF.mapShift_hom s] at hFb
-        rw [hG.mapShift_hom s] at hGb
-        have hsmul : Function.Bijective
-            (fun x : (dgHom W (F.obj Y)).X (q + 1) => (-n).negOnePow • x) :=
-          (MulAction.toPerm ((-n).negOnePow)).bijective
-        have hprod : Function.Bijective
-            (fun ab : (dgHom W (F.obj X)).X (p + 1) × (dgHom W (G.obj X)).X p =>
-              ((-n).negOnePow •
-                  dgComp (p + 1) (-n) (q + 1) (by omega) ab.1 (F.map (-n) s.hom),
-                dgComp p (-n) q (by omega) ab.2 (G.map (-n) s.hom))) :=
-          Function.Bijective.prodMap (hsmul.comp hFb) hGb
-        have hcomp : ∀ ab : (dgHom W (F.obj X)).X (p + 1) ×
-              (dgHom W (G.obj X)).X p,
-            compRight W (K.functor.map (-n) s.hom) p q hpn
-                (dgComp (p + 1) (-1) p (by omega) ab.1 (K.isCone X).inl +
-                  dgComp p 0 p (by omega) ab.2 (K.isCone X).inr) =
-              dgComp (q + 1) (-1) q (by omega)
-                  ((-n).negOnePow •
-                    dgComp (p + 1) (-n) (q + 1) (by omega) ab.1
-                      (F.map (-n) s.hom))
-                  (K.isCone Y).inl +
-                dgComp q 0 q (by omega)
-                  (dgComp p (-n) q (by omega) ab.2 (G.map (-n) s.hom))
-                  (K.isCone Y).inr :=
-          fun ab => K.compRight_functor_map s W p q hpn ab.1 ab.2
-        -- Chase the two splittings by hand.  Mathlib's `of_comp_iff` lemmas
-        -- both assume the *outer* map bijective, which is the one being
-        -- proved here, so neither applies.
-        constructor
-        · intro φ₁ φ₂ hφ
-          obtain ⟨ab₁, rfl⟩ := hsplitX.surjective φ₁
-          obtain ⟨ab₂, rfl⟩ := hsplitX.surjective φ₂
-          rw [hcomp ab₁, hcomp ab₂] at hφ
-          have hab : ab₁ = ab₂ := hprod.injective (hsplitY.injective hφ)
-          rw [hab]
-        · intro ψ
-          obtain ⟨uv, rfl⟩ := hsplitY.surjective ψ
-          obtain ⟨ab, hab⟩ := hprod.surjective uv
-          refine ⟨dgComp (p + 1) (-1) p (by omega) ab.1 (K.isCone X).inl +
-            dgComp p 0 p (by omega) ab.2 (K.isCone X).inr, ?_⟩
-          rw [← hab]
-          exact hcomp ab }
-  mapShift_hom _ := rfl
+Kept for the name and for dot notation on `ConeData`; the content is
+`DGFunctor.preservesShifts`, which holds for *every* dg functor because a shift
+element is a closed two-sided invertible element and functors preserve
+invertibility.  The cone splitting plays no part, and the two `PreservesShifts`
+arguments this used to take are gone -- there is nothing for a caller to
+supply.
+
+`preservesChosenCones` below is the one that still needs its two arguments, and
+that asymmetry is the point: a cone is not an invertible element. -/
+noncomputable def preservesShifts : PreservesShifts K.functor :=
+  DGFunctor.preservesShifts _
 
 
 /-! ### Cones
@@ -341,16 +292,14 @@ namespace DGAdjunction
 variable {C : Type u} {D : Type u'} [DGCategory.{v} C] [DGCategory.{v} D]
   {L : DGFunctor C D} {R : DGFunctor D C} (A : DGAdjunction L R)
 
-/-- **The twist candidate preserves shifts, as soon as the adjoints do.**
+/-- **The twist candidate preserves shifts.**
 
-The twist is the cone of the counit `L R ⟶ id_D`, so this is the cone-functor
-result with `F := R.comp L` and `G := id`.  It is half of exactness: the other
-half, `PreservesChosenCones`, is a 3-by-3 lemma and is not available. -/
-noncomputable def CounitConeData.preservesShifts (K : A.CounitConeData)
-    (hL : DGFunctor.PreservesShifts L) (hR : DGFunctor.PreservesShifts R) :
+Unconditional, because every dg functor does.  It is half of exactness; the
+other half, `preservesChosenCones`, is the 3-by-3 lemma and does need the
+adjoints' capabilities. -/
+noncomputable def CounitConeData.preservesShifts (K : A.CounitConeData) :
     DGFunctor.PreservesShifts K.twist :=
   DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts K
-    (DGFunctor.PreservesShifts.comp hR hL) (DGFunctor.PreservesShifts.id D)
 
 /-- **The twist candidate preserves chosen cones.**  The 3-by-3 lemma applied
 to the counit's cone: with `preservesShifts` this is full dg-level exactness
@@ -372,12 +321,10 @@ noncomputable def UnitConeData.preservesChosenCones (K : A.UnitConeData)
     (DGFunctor.PreservesChosenCones.id C)
     (DGFunctor.PreservesChosenCones.comp hL hR)
 
-/-- The unit cone preserves shifts too. -/
-noncomputable def UnitConeData.preservesShifts (K : A.UnitConeData)
-    (hL : DGFunctor.PreservesShifts L) (hR : DGFunctor.PreservesShifts R) :
+/-- The unit cone preserves shifts too, and equally unconditionally. -/
+noncomputable def UnitConeData.preservesShifts (K : A.UnitConeData) :
     DGFunctor.PreservesShifts K.unitCone :=
   DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts K
-    (DGFunctor.PreservesShifts.id C) (DGFunctor.PreservesShifts.comp hL hR)
 
 end DGAdjunction
 

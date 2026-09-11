@@ -13,3 +13,10 @@ import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CohomologyPushforward
 #print axioms CategoryTheory.sheafCohomologyPushforwardAddEquiv
 #print axioms CategoryTheory.sheafH_eq_ext
 #print axioms CategoryTheory.sheafHPushforwardAddEquiv
+
+/-! ## Naturality in the sheaf (#332 step 3)
+
+The comparison commutes with the maps induced by a morphism of sheaves: both sides are `Ext`
+composites and `extAdjunctionMap_comp_mk₀` moves the induced map across the transport. -/
+
+#print axioms CategoryTheory.sheafHPushforwardAddEquiv_naturality

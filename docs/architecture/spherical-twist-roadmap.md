@@ -78,6 +78,14 @@ DGAdjunction
       adjunction spherical, and does not relate it to the other three
       triangles; UnitConeData carries the unshifted unit side.
 
+EvaluationData E
+├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
+└─ TwistConeData: the object twist T_E = Cone(evaluation), with its triangle
+   functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished, and H⁰(T_E)
+   triangulated as soon as RHom(E,-) ⊗ E preserves chosen cones (shifts are
+   free for every dg functor).
+   No adjunction, no invertibility, no sphericality.
+
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
 ├─ the twist is EXACT on H⁰ (twistH0IsTriangulated), as soon as S and R preserve
@@ -151,7 +159,10 @@ that comparison are instance hypotheses to be discharged by the realization.
    Exactness is separate, and now supplied: `DGFunctor.PreservesShifts` and
    `PreservesChosenCones` are instantiated for a cone functor whenever its two
    ends carry them, so `twistH0IsTriangulated` makes `H⁰` of the twist a
-   triangulated functor.  Together with the equivalence above that is an exact
+   triangulated functor.  The shift half of that is free for every dg functor
+   (`DGFunctor.preservesShifts`), so `twistPreservesShifts` and
+   `cotwistConePreservesShifts` take no arguments and `twistH0IsTriangulated`
+   asks only for the two `PreservesChosenCones` witnesses.  Together with the equivalence above that is an exact
    autoequivalence -- which is still not sphericality, since that needs all
    four Anno--Logvinenko conditions and the Morita framework the first
    paragraph rules out.
@@ -171,11 +182,37 @@ that comparison are instance hypotheses to be discharged by the realization.
    `ℤ`-indexed shape at the pin, so there is no tensor product of complexes to
    build the object with.
 
+   The functor is not inert.  `evaluation_isClosed` gives the transformation
+   objectwise cones, so `EvaluationData.TwistConeData` is the Seidel--Thomas
+   twist `T_E = Cone(RHom(E,-) ⊗ E ⟶ id)` of an *object*, and its
+   `twistTriangleFunctor` is a functor `H⁰ C ⥤ Triangle (H⁰ C)` with every
+   value distinguished.  This is a second twist, not a duplicate of the
+   adjunction one: `CounitConeData.twist` is the cone of an adjunction counit,
+   this one is attached to a single object with no adjunction in sight.  The
+   two agree when `RHom(E,-)` and `- ⊗ E` are the adjoint pair of a spherical
+   functor out of `Perf(k)`, which is exactly what cannot be stated here.
+
+   `twistH0IsTriangulated` makes `H⁰(T_E)` a triangulated functor on one
+   hypothesis: that `RHom(E,-) ⊗ E` preserves chosen cones.  The shift half is
+   free.  `DGFunctor.preservesShifts` holds for *every* dg functor, because a
+   shift element is a closed two-sided invertible element (`IsShiftBy.inv`,
+   `hom_inv`, `inv_hom`) and a dg functor preserves composition and identities.
+   That retires the shift half of every exactness hypothesis in this tree, not
+   just the object twist's.
+
+   The cone half stays open, and for a structural reason worth recording:
+   `PreservesChosenCones` asks that maps *into* the cone split, while
+   `IsCopowerOf` is a *mapping-out* property -- it controls degree-`p` morphisms
+   out of `V.obj X` and says nothing about maps in.  So it does not follow from
+   the universal property the copower is given by, and a cone, unlike a shift,
+   is not an invertible element that functoriality carries over.
+
    What is open is *existence*.  Nothing constructs a copower, so nothing
    produces an `EvaluationData`; a dg category with enough copowers has to
    supply one, exactly as `IsPretriangulated` supplies cone and shift choices.
-   And no theorem relates this functor to a spherical object: that comparison
-   needs `Perf(k)` as a dg category, which the repository does not have.
+   And no theorem relates the object twist to a spherical object: that
+   comparison needs `Perf(k)` as a dg category, which the repository does not
+   have, so nothing here calls `E` spherical or claims `T_E` is invertible.
 5. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
    transformed arrow is the counit.  The enhancement of the kernel category,
