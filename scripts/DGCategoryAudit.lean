@@ -1010,3 +1010,27 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.evalHom
 #print axioms CategoryTheory.EvaluationData.univ_comp_evalHom
 #print axioms CategoryTheory.EvaluationData.evaluation
+
+-- The Seidel--Thomas twist of an *object*: the cone of `RHom(E,-) ⊗ E ⟶ id`.
+-- `evaluation_isClosed` is the whole input beyond the generic cone layer, and
+-- it is the Leibniz rule against the identity cochain.  This is not the
+-- adjunction twist: that one is the cone of an adjunction counit, this one is
+-- attached to a single object.  The two agree for a spherical functor out of
+-- `Perf(k)`, which the repository cannot state.  No invertibility and no
+-- sphericality is claimed for either.
+#print axioms CategoryTheory.EvaluationData.evaluation_isClosed
+#print axioms CategoryTheory.EvaluationData.TwistConeData
+#print axioms CategoryTheory.EvaluationData.chosenTwistConeData
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twist
+#print axioms CategoryTheory.EvaluationData.TwistConeData.inclusion
+#print axioms CategoryTheory.EvaluationData.TwistConeData.inclusion_isClosed
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_mem_distinguishedTriangles
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₁
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₂
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₃
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₁
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₂
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIso
