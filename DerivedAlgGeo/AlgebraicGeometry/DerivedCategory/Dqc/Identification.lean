@@ -42,8 +42,8 @@ injectives in `X.Modules` (Hartshorne, *Residues and Duality* II.7.18). Neither
 is available at this Mathlib pin, and the affine case is not a shortcut: see the
 2026-09-10 entry of `docs/architecture/cutover-ledger.md`.
 
-No scheme is marked as satisfying `CoherentExtComparison`; the proposition is
-consumed, never inhabited, here.
+Nothing here inhabits `CoherentExtComparison`; affine noetherian schemes satisfy it by
+`Dqc/AffineIdentification.lean`, through the `Ext` comparison from acyclic generators.
 -/
 
 attribute [local instance] HasDerivedCategory.standard

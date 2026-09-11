@@ -62,7 +62,26 @@ blocks should normally move it rather than add more declarations beside it.
      acyclicity only from Čech exactness), or `tilde` of an injective module
      to be an injective module sheaf (Hartshorne III.3.4, which needs
      Artin--Rees, absent from Mathlib). `tilde` is also not yet known to be
-     exact in the tree. Each of these is its own lane; none has been started.
+     exact in the tree. Each of these is its own lane; the first was taken, see 4.
+  4. *Affine noetherian schemes satisfy `CoherentExtComparison`* (2026-09-10,
+     same lane). `AlgebraicGeometry/DerivedCategory/Dqc/AffineIdentification.lean`
+     proves `coherentExtComparison_spec` for `Spec R`, `R` noetherian, by
+     `Functor.bijective_mapExtAddHom_of_generators`
+     (`Algebra/Homology/DerivedCategory/Ext/AcyclicGenerators.lean`: dimension
+     shifting in the first variable along a class of generators acyclic on both
+     sides, the mirror of `extComparisonAddEquiv` in `Ext/AcyclicComparison.lean`)
+     with generators `𝒪^k` (`Modules/Coherent/Affine/Free.lean`): projective in
+     `Coh (Spec R)` through `Coh.affineEquivalence`, and acyclic in `X.Modules`
+     because `Ext_{X.Modules}(𝒪_X, G) ≅ H(G)` vanishes by affine vanishing. That
+     bridge is `SheafOfModules.extUnitAddEquivH` in
+     `Algebra/Category/ModuleCat/Sheaf/Cohomology.lean`, stated for sheaves of
+     modules on a site with a terminal object under an acyclicity hypothesis on
+     injectives, discharged on a space by flasqueness
+     (`Topology/Sheaves/Flasque.lean`, `Topology/Sheaves/ModulesCohomology.lean`)
+     and reassembled for the `X.Modules` wrapper in
+     `AlgebraicGeometry/Cohomology/Derived/UnitExt.lean`. The general-scheme
+     comparison is still open; the affine proof uses that `𝒪^k` present every
+     coherent sheaf, which fails off the affine case, so it is not a shortcut.
 - Divisorial charge block (2026-09-09):
   `CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/` owns the
   central-charge arithmetic that `Walls/Numerical/` performs in three

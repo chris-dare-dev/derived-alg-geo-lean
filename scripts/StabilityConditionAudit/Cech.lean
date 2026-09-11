@@ -28,6 +28,9 @@ constructions, resolutions, comparison maps, and compact-basis arguments.
 #print axioms CategoryTheory.Sheaf.CompactOpenBasis.ofIsBasis
 #print axioms CategoryTheory.Sheaf.HPrime_subsingleton_of_isCechAcyclicOnCompactBasis
 #print axioms CategoryTheory.Sheaf.H_subsingleton_of_isCechAcyclicOnCompactBasis
+#print axioms CategoryTheory.Sheaf.derivedH
+#print axioms CategoryTheory.Sheaf.H_one_subsingleton_of_sections_epi
+#print axioms CategoryTheory.Sheaf.H_succ_subsingleton_of_shortExact
 #print axioms CategoryTheory.Sheaf.IsCechAcyclicOnCompactBasis
 #print axioms CategoryTheory.Sheaf.epi_app_of_isCechAcyclicOnCompactBasis
 #print axioms CategoryTheory.Sheaf.isCechAcyclicOnCompactBasis_of_injective
