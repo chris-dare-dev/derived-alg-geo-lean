@@ -4,6 +4,7 @@ concurrent branches append to different files (#480). See the umbrella file for 
 contract and reading guide.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Bounded
 import DerivedAlgGeo.CategoryTheory.Abelian.SerreClass.FullSubcategory
 
 /-! ## The middle of a five-term exact sequence (#721)
@@ -47,3 +48,15 @@ has not been shown to have.
 #print axioms DerivedCategory.cohomologyIn_prop_coproduct
 #print axioms CategoryTheory.ObjectProperty.serreIsClosedUnderBinaryProducts
 #print axioms CategoryTheory.ObjectProperty.serreIsClosedUnderFiniteProducts
+
+/-! ## Bounded induction relative to a class of cohomology objects (#1069--#1071)
+
+The canonical truncations of `DerivedCategory A` keep the cohomology of an object
+inside a class `P` that is closed under isomorphism and contains zero, and the
+resulting induction on amplitude is what the derived-functor dévissage runs on.
+-/
+
+#print axioms DerivedCategory.cohomologyIn_truncLT
+#print axioms DerivedCategory.cohomologyIn_truncGE
+#print axioms DerivedCategory.prop_of_cohomologyIn_singleFunctor_obj
+#print axioms DerivedCategory.bounded_induction

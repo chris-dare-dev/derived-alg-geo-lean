@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.AB
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.Sections
 
 /-!
 # Presheaves of modules

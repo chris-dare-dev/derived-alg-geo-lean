@@ -761,7 +761,10 @@ lemma isCechAcyclicOnCompactBasis_quotient
       (hF V hV U hUB hVU j hj)
   exact IsZero.mono h₁j _
 
-private noncomputable abbrev derivedH
+/-- `Sheaf.H` on a topological space with the `HasExt` instance passed explicitly, so that
+statements about it elaborate without re-synthesizing the abelian structure of the sheaf
+category (whose universe levels are `max`-expressions instance search cannot re-unify). -/
+noncomputable abbrev derivedH
     {X : TopCat.{u}} (hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u} X))
     (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) : Type (u + 1) :=
   @Sheaf.H (Opens X) _ (Opens.grothendieckTopology X) F inferInstance hExt n
@@ -798,7 +801,10 @@ private lemma derivedHMap_apply
     inferInstance hExt F G f n x
 
 set_option maxHeartbeats 200000 in
-private lemma H_one_subsingleton_of_sections_epi
+/-- If the global sections of an injective presentation `F ↪ I ↠ Q` surject onto those of
+`Q`, then `H¹ F = 0`: the connecting map from `H⁰ Q` is onto `H¹ F` and factors through
+`H⁰ I`. -/
+lemma H_one_subsingleton_of_sections_epi
     {X : TopCat.{u}} {F : TopCat.Sheaf AddCommGrpCat.{u} X}
     (ip : InjectivePresentation F)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u} X)]
@@ -832,7 +838,9 @@ private lemma H_one_subsingleton_of_sections_epi
   exact ⟨fun x y ↦ (hall x).trans (hall y).symm⟩
 
 set_option maxHeartbeats 100000 in
-private lemma H_succ_subsingleton_of_shortExact
+/-- Dimension shifting: for a short exact sequence with injective middle term, `H^(n+1)` of
+the first term vanishes as soon as `H^n` of the third does. -/
+lemma H_succ_subsingleton_of_shortExact
     {X : TopCat.{u}}
     {S : ShortComplex (TopCat.Sheaf AddCommGrpCat.{u} X)} (hS : S.ShortExact)
     [Injective S.X₂] [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u} X)]
