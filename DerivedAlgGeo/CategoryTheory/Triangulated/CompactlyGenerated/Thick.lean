@@ -191,7 +191,7 @@ instance ObjectProperty.compactObjects.isTriangulated :
     (ObjectProperty.compactObjects.{0} (C := C)).IsTriangulated := {}
 
 /-- **The triangulated envelope of compact objects is compact.** -/
-theorem ObjectProperty.triangEnvelope_le_compactObjects [IsTriangulated C]
+theorem ObjectProperty.triangEnvelope_le_compactObjects
     {P : ObjectProperty C} (hP : P ≤ ObjectProperty.compactObjects.{0}) :
     P.triangEnvelope ≤ ObjectProperty.compactObjects.{0} :=
   (ObjectProperty.triangEnvelope_le_iff P).2 hP
