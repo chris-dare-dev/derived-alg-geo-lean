@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques
 import DerivedAlgGeo.AlgebraicGeometry.Surface.K3
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Spherical
+import DerivedAlgGeo.AlgebraicGeometry.Surface.SphericalCategorical
 
 /-! # Surfaces
 
