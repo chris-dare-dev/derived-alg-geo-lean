@@ -3,11 +3,13 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Bounded
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.SingleTriangle
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Opposite
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.LinearDual
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Bounded
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Heart
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext
