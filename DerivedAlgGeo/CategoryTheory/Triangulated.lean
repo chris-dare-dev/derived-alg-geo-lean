@@ -7,6 +7,7 @@ import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Coaisle
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Polishchuk
+import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Thick
 import DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExactFunctorFamily
