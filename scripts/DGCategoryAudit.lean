@@ -428,6 +428,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesShifts
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.id
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.comp
+
+-- Every dg functor preserves shifts.  A shift element is a closed, two-sided
+-- invertible element of degree `-n` (`IsShiftBy.inv`, `hom_inv`, `inv_hom`),
+-- and a dg functor preserves composition and identities on the nose, so it
+-- carries invertible elements to invertible ones.  `PreservesShifts` therefore
+-- costs a caller nothing.  `PreservesChosenCones` is not like this and remains
+-- a genuine hypothesis: a cone is not an invertible element.
+#print axioms CategoryTheory.DGFunctor.preservesShifts
 #print axioms CategoryTheory.DGFunctor.mapHomotopySquare
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.id
@@ -933,10 +941,13 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
 
--- A cone functor preserves shifts AND chosen cones when its two ends do, so the
--- twist candidate of a dg adjunction is exact as soon as the adjoints are.
--- Both arguments are the cone splitting rather than a computation: in the
--- coordinates of the splittings the maps are block diagonal, with one sign.
+-- A cone functor preserves chosen cones when its two ends do, so the twist
+-- candidate of a dg adjunction is exact as soon as the adjoints are.  That
+-- argument is the cone splitting rather than a computation: in the coordinates
+-- of the splittings the map is block diagonal, with one sign.  The shift
+-- versions below take no arguments at all -- `DGFunctor.preservesShifts` holds
+-- for every dg functor, so the cone splitting is not needed for them and the
+-- specialised proofs were removed.
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compRight_functor_map
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesShifts
@@ -1010,3 +1021,38 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.evalHom
 #print axioms CategoryTheory.EvaluationData.univ_comp_evalHom
 #print axioms CategoryTheory.EvaluationData.evaluation
+
+-- The Seidel--Thomas twist of an *object*: the cone of `RHom(E,-) ⊗ E ⟶ id`.
+-- `evaluation_isClosed` is the whole input beyond the generic cone layer, and
+-- it is the Leibniz rule against the identity cochain.  This is not the
+-- adjunction twist: that one is the cone of an adjunction counit, this one is
+-- attached to a single object.  The two agree for a spherical functor out of
+-- `Perf(k)`, which the repository cannot state.  No invertibility and no
+-- sphericality is claimed for either.
+#print axioms CategoryTheory.EvaluationData.evaluation_isClosed
+#print axioms CategoryTheory.EvaluationData.TwistConeData
+#print axioms CategoryTheory.EvaluationData.chosenTwistConeData
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twist
+#print axioms CategoryTheory.EvaluationData.TwistConeData.inclusion
+#print axioms CategoryTheory.EvaluationData.TwistConeData.inclusion_isClosed
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_mem_distinguishedTriangles
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₁
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₂
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₃
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₁
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₂
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIso
+
+-- Exactness of the object twist.  The shift half is free -- every dg functor
+-- preserves shifts, `DGFunctor.preservesShifts` -- so only the cone half is a
+-- hypothesis, and it is `RHom(E,-) ⊗ E`'s.  That one stays open:
+-- `PreservesChosenCones` asks that maps into the cone split, while
+-- `IsCopowerOf` is a mapping-out property.  Exact is not invertible; the object
+-- twist has no invertibility statement.
+#print axioms CategoryTheory.EvaluationData.TwistConeData.preservesShifts
+#print axioms CategoryTheory.EvaluationData.TwistConeData.preservesChosenCones
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0CommShift
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0IsTriangulated

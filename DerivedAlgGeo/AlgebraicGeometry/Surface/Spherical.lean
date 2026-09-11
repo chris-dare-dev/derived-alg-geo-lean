@@ -262,7 +262,7 @@ numerical one.
 profile because `selfEuler` is only the intended invariant there. Nothing in this
 repository constructs an `EulerRealization`; producing one is the geometric
 obligation, and it is the same obligation `MukaiVector.lean` records for
-`IntegralMukaiData`. -/
+`IntegralMukaiData`. `Surface/SphericalMukai.lean` builds one from a `BilinearRiemannRochStatement`. -/
 structure EulerRealization {A : Type*} {N : Type*} [CommRing A] [Algebra ℚ A]
     [AddCommGroup N] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))]
     [IsSmoothProperVariety k X] (V : Numerical.NumericalVarietyData 2 A N) where
