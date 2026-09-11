@@ -3073,3 +3073,5 @@ not the conclusion renamed. `mukaiVectorQuotient` is what it buys.
 #print axioms AlgebraicGeometry.Scheme.Modules.ab4
 #print axioms AlgebraicGeometry.Scheme.Modules.ab5
 #print axioms AlgebraicGeometry.Scheme.Modules.isGrothendieckAbelian
+#print axioms AlgebraicGeometry.Scheme.Modules.injective_sheafOfModules_of_injective
+#print axioms AlgebraicGeometry.Scheme.Modules.isFlasque_toSheaf_of_injective
