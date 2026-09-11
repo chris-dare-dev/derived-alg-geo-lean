@@ -578,6 +578,9 @@ is not closed. -/
 #print axioms AddCommGrpCat.productCone
 #print axioms AddCommGrpCat.productConeIsLimit
 #print axioms AddCommGrpCat.piIsoPi
+#print axioms AddCommGrpCat.uliftZMultiplesAddEquiv_comp
+#print axioms FGModuleCat.exists_finFree_epi
+#print axioms FGModuleCat.projective_of_finFree
 #print axioms AddCommGrpCat.piIsoPi_inv_π
 #print axioms AddCommGrpCat.piIsoPi_inv_π_apply
 #print axioms AddCommGrpCat.piIsoPi_hom_eval
@@ -1341,6 +1344,10 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Coh.affineEquivalence
 #print axioms Coh.affineEquivalence_functor
 #print axioms Coh.affineEquivalence_inverse
+#print axioms Coh.affineFree
+#print axioms Coh.projective_affineFree
+#print axioms Coh.ιAffineFreeIso
+#print axioms Coh.exists_affineFree_epi
 
 -- Layer B stage 1: kernels and cokernels. Restriction along open immersions is left exact,
 -- localization commutes with kernels, and the affine comparison transports both ambient
@@ -3072,3 +3079,20 @@ not the conclusion renamed. `mukaiVectorQuotient` is what it buys.
 #print axioms AlgebraicGeometry.Scheme.Modules.hasExactColimitsOfShape
 #print axioms AlgebraicGeometry.Scheme.Modules.ab4
 #print axioms AlgebraicGeometry.Scheme.Modules.ab5
+#print axioms AlgebraicGeometry.Scheme.Modules.isGrothendieckAbelian
+#print axioms AlgebraicGeometry.Scheme.Modules.injective_sheafOfModules_of_injective
+#print axioms AlgebraicGeometry.Scheme.Modules.isFlasque_toSheaf_of_injective
+#print axioms TopCat.Sheaf.subsingleton_H_of_isFlasque
+#print axioms SheafOfModules.freeYonedaSheafHomEquiv
+#print axioms SheafOfModules.freeYonedaSheafMap
+#print axioms SheafOfModules.freeYonedaEquiv_free_map_yoneda_map_comp
+#print axioms SheafOfModules.freeYonedaSheafHomEquiv_comp
+#print axioms SheafOfModules.freeYonedaSheafMap_mono
+#print axioms SheafOfModules.isFlasque_toSheaf_of_injective
+#print axioms SheafOfModules.subsingleton_derivedH_toSheaf_of_injective
+#print axioms SheafOfModules.extUnitAddEquivDerivedH
+#print axioms AlgebraicGeometry.Scheme.Modules.unit
+#print axioms AlgebraicGeometry.Scheme.Modules.unitFromConstant
+#print axioms AlgebraicGeometry.Scheme.Modules.bijective_unitFromConstant_comp
+#print axioms AlgebraicGeometry.Scheme.Modules.subsingleton_derivedH_toSheaf_of_injective
+#print axioms AlgebraicGeometry.Scheme.Modules.extUnitAddEquivDerivedH
