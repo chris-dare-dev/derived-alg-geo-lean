@@ -88,14 +88,15 @@ copies of `O(-N)`**, for `𝒜` generated over `𝒜 0` by finitely many degree-
 Hartshorne II.5.17 / EGA II 2.7.9 in the form `#586` states. The surjection is
 `exists_epi_free_tensorTwist`'s `free I ↠ F ⊗ O(N)` tensored by `O(-N)`, untwisted by
 `tensorTwistNegIso`, and read on `∐ O(-N)` through `tensorLeftFreeIso`. No global-generation or
-resolution hypothesis, and no instance supplies the surjection. -/
-theorem exists_epi_coproduct_twistingSheaf (F : (Proj 𝒜).Modules)
+resolution hypothesis, and no instance supplies the surjection. The exponent can be pushed above
+any `N₀`; the dévissage on `Pⁿ` takes `N ≥ 1` so that `H⁰(O(-N)) = 0`. -/
+theorem exists_epi_coproduct_twistingSheaf_ge (F : (Proj 𝒜).Modules)
     (hF : Scheme.Modules.IsCoherent (Proj 𝒜) F)
     {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
-    (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤) :
-    ∃ (N : ℕ) (I : Type u) (_ : Finite I)
+    (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤) (N₀ : ℕ) :
+    ∃ (N : ℕ) (_ : N₀ ≤ N) (I : Type u) (_ : Finite I)
       (q : ∐ (fun _ : I => twistingSheaf 𝒜 (-(N : ℤ))) ⟶ F), Epi q := by
-  obtain ⟨N, I, hI, p, hp⟩ := exists_epi_free_tensorTwist 𝒜 F hF hg hcov
+  obtain ⟨N, hN₀, I, hI, p, hp⟩ := exists_epi_free_tensorTwist_ge 𝒜 F hF hg hcov N₀
   have hcov' : Algebra.adjoin (𝒜 0)
       (Set.range fun j => ((fun i => (⟨g i, hg i⟩ : 𝒜 1)) j : A)) = ⊤ := hcov
   haveI : SheafOfModules.IsInvertible.{u, u, u}
@@ -103,12 +104,22 @@ theorem exists_epi_coproduct_twistingSheaf (F : (Proj 𝒜).Modules)
     twistingSheaf_isInvertible 𝒜 (fun i => (⟨g i, hg i⟩ : 𝒜 1)) (-(N : ℤ)) hcov'
   haveI hp' : Epi (show (show (Proj 𝒜).Modules from SheafOfModules.free.{u} I) ⟶
       Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ)) from p) := hp
-  refine ⟨N, I, hI,
+  refine ⟨N, hN₀, I, hI,
     (Scheme.Modules.tensorLeftFreeIso (twistingSheaf 𝒜 (-(N : ℤ))) I).inv ≫
       Scheme.Modules.tensorHom (𝟙 (twistingSheaf 𝒜 (-(N : ℤ)))) p ≫
       (Scheme.Modules.tensorCommIso _ _).hom ≫
       (tensorTwistNegIso 𝒜 (fun i => (⟨g i, hg i⟩ : 𝒜 1)) hcov' F (N : ℤ)).hom, ?_⟩
   haveI := Scheme.Modules.epi_tensorHom_id_of_invertible (twistingSheaf 𝒜 (-(N : ℤ))) p
   infer_instance
+
+/-- **Serre's theorem in the `∐ O(-N) ↠ F` form**, with the exponent unconstrained. -/
+theorem exists_epi_coproduct_twistingSheaf (F : (Proj 𝒜).Modules)
+    (hF : Scheme.Modules.IsCoherent (Proj 𝒜) F)
+    {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
+    (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤) :
+    ∃ (N : ℕ) (I : Type u) (_ : Finite I)
+      (q : ∐ (fun _ : I => twistingSheaf 𝒜 (-(N : ℤ))) ⟶ F), Epi q := by
+  obtain ⟨N, -, I, hI, q, hq⟩ := exists_epi_coproduct_twistingSheaf_ge 𝒜 F hF hg hcov 0
+  exact ⟨N, I, hI, q, hq⟩
 
 end AlgebraicGeometry.Proj

@@ -314,6 +314,28 @@ noncomputable def evaluation :
         ((V.isCopower X).univ i k) (V.evalHom X) f,
       univ_comp_evalHom]⟩
 
+/-- **The evaluation transformation is closed.**
+
+Componentwise this is the Leibniz rule against the identity cochain: the
+universal family is a chain map, so differentiating `univ i k · eval` produces
+the same term twice, once from each factor, and the factor that carries
+`d eval` is what is left.
+
+Closedness is what lets `evaluation` have a cone, which is the twist. -/
+lemma evaluation_isClosed :
+    DGFunctor.HomogeneousNatTrans.IsClosed V.evaluation := by
+  ext X
+  show ((dgHom (V.obj X) X).d 0 1).hom (V.evalHom X) = 0
+  refine (V.isCopower X).lift_unique (fun i j hij k => ?_)
+  have hji : j = i + 1 := by omega
+  cases hji
+  have hleib := dgComp_leibniz (C := C) i 0 i (i + 1) (by omega) (by omega)
+    ((V.isCopower X).univ i k) (V.evalHom X)
+  rw [V.univ_comp_evalHom, ← (V.isCopower X).univ_d i (i + 1),
+    V.univ_comp_evalHom] at hleib
+  simp only [Int.negOnePow_zero, one_smul, _root_.map_zero] at hleib ⊢
+  exact add_right_cancel (hleib.symm.trans (zero_add _).symm)
+
 end EvaluationData
 
 end CategoryTheory
