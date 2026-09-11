@@ -41,13 +41,12 @@ A section of the sheafified tensor product is locally a finite sum of pure tenso
 (`exists_eq_sum_tmulSection`), so `IsLocalCombination` closes the sum, and its epimorphism
 criterion closes the theorem.
 
-## Why `F(N)` and not `⊕ O(-N) ↠ F`
+## `F(N)` here, `⊕ O(-N) ↠ F` in `TwistInverse.lean`
 
-The two forms are equivalent once `F(N)(-N) ≅ F`, and that isomorphism is not available for an
-arbitrary `F`: `TensorTwist.lean` records that the tensor associator of the tree needs invertible
-outer factors, and `#806` tracks the tensor inverse of `O(N)`. The statement proved here is the one
-Hartshorne II.5.17 states first, and the passage to `⊕ O(-N) ↠ F` is one tensor with `O(-N)`
-once that inverse lands. Nothing about the surjection changes.
+The statement proved here is the one Hartshorne II.5.17 states first. The passage to
+`⊕ O(-N) ↠ F` is one tensor with `O(-N)` and the untwisting `(F ⊗ O(N)) ⊗ O(-N) ≅ F`, which
+`TwistInverse.lean` supplies from the tensor inverse of `O(N)` (the `L = O(N)` case of `#806`);
+`exists_epi_coproduct_twistingSheaf` there is the coproduct form.
 
 ## The exponent is `1 * N`
 
