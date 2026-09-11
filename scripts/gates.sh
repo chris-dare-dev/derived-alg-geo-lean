@@ -203,6 +203,12 @@ echo "== gates ($MODE) =="
 # invisible: an invalid workflow does not produce a red check, it produces no
 # checks. In `fast` mode too, for the same reason.
 gate workflows scripts/check_workflows.sh
+# Also cheap, also in `fast` mode: every gate below prints declaration names,
+# and on the Windows runner a gate that cannot print `δ` dies with a
+# `charmap` traceback instead of its finding (#868, #869). This checks that
+# each script routes its console through scripts/_output.py, and that the
+# helper actually survives a cp1252 console.
+gate output-encoding python3 scripts/_output.py
 gate trust-guard scripts/test_trust_guard.sh
 # Next to it for the same reason: `check_local_build.py` is a PreToolUse hook,
 # and a hook that has stopped refusing is indistinguishable from a hook with

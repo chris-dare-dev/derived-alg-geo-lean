@@ -21,6 +21,10 @@ import subprocess
 import sys
 from datetime import date
 
+from _output import force_utf8_output
+
+force_utf8_output()
+
 root = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else __file__).resolve()
 if root.is_file():
     root = root.parent.parent

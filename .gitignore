@@ -40,3 +40,7 @@ ROADMAP.md
 /enum-decls.txt
 /lean-source-check.txt
 /stability-condition-audit.txt
+
+# Python bytecode from the gate scripts (scripts/_output.py is imported, so it compiles).
+__pycache__/
+*.pyc

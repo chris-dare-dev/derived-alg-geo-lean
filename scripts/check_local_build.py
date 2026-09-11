@@ -53,6 +53,8 @@ import re
 import shlex
 import sys
 
+from _output import force_utf8_output
+
 # Shell operators that separate one simple command from the next. A compound
 # such as `cd x && lake build` has to be examined segment by segment, or the
 # check is trivially evaded by prefixing anything.
@@ -193,4 +195,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     sys.exit(main())

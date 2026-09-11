@@ -42,6 +42,8 @@ import collections
 import pathlib
 import sys
 
+from _output import force_utf8_output
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASELINE = ROOT / "scripts" / "single_instantiation_baseline.txt"
 
@@ -137,4 +139,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     sys.exit(main())

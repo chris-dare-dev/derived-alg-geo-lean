@@ -549,6 +549,14 @@ jobs:
           # Style is per-file and cheap; it always runs.
           lake exe lint-style
 
+      - name: Gate console encoding
+        # Every gate prints declaration names; on this runner's cp1252 console
+        # a gate that cannot print `δ` dies with a `charmap` traceback instead
+        # of its finding (#868, #869). Checks that each script routes its
+        # console through scripts/_output.py, and reproduces the crash to prove
+        # the helper prevents it.
+        run: python3 scripts/_output.py
+
       - name: Stability source independence
         run: python3 scripts/check_source_independence.py
 
