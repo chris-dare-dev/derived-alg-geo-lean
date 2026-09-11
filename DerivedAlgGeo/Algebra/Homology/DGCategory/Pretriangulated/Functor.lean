@@ -62,6 +62,43 @@ def comp {F : DGFunctor C D} {G : DGFunctor D E}
 
 end PreservesShifts
 
+/-- **Every dg functor preserves shifts.**
+
+A shift element is a closed, two-sided invertible element of degree `-n`:
+`IsShiftBy.inv` extracts the inverse from surjectivity of right composition, and
+`hom_inv` and `inv_hom` are the two identities.  A dg functor preserves the
+graded composition and the identities on the nose, so it carries an invertible
+element to an invertible element, and right composition with the image is
+bijective with right composition with the image of the inverse.
+
+So `PreservesShifts` is not a hypothesis anybody has to discharge; it is
+supplied here for every dg functor.  The structure stays because it names the
+capability and because `mapShift` is the useful accessor, but a caller that used
+to take a `PreservesShifts` argument can now call this instead.
+
+`PreservesChosenCones` is a genuine hypothesis and stays one: a cone is not an
+invertible element, and a dg functor need not preserve the splitting of maps
+into a cone. -/
+noncomputable def preservesShifts (F : DGFunctor C D) : PreservesShifts F where
+  mapShift {X Y n} s :=
+    { hom := F.map (-n) s.hom
+      hom_closed := by
+        rw [← F.map_d (-n) (-n + 1) s.hom, s.hom_closed, map_zero]
+      bijective W p q hpn := by
+        refine Function.bijective_iff_has_inverse.2
+          ⟨fun f => dgComp q n p (by omega) f (F.map n s.inv), ?_, ?_⟩
+        · intro a
+          show dgComp q n p (by omega)
+            (dgComp p (-n) q hpn a (F.map (-n) s.hom)) (F.map n s.inv) = a
+          rw [dgComp_assoc p (-n) n q 0 p (by omega) (by omega) (by omega),
+            ← F.map_comp (-n) n 0 (by omega), s.hom_inv, F.map_id, dgComp_id]
+        · intro f
+          show dgComp p (-n) q hpn
+            (dgComp q n p (by omega) f (F.map n s.inv)) (F.map (-n) s.hom) = f
+          rw [dgComp_assoc q n (-n) p 0 q (by omega) (by omega) (by omega),
+            ← F.map_comp n (-n) 0 (by omega), s.inv_hom, F.map_id, dgComp_id] }
+  mapShift_hom _ := rfl
+
 /-- Apply a dg functor to a chosen homotopy-commutative square.  The homotopy
 itself is mapped, so this construction retains the witness needed by later
 cone maps rather than merely proving that the image square commutes in `H⁰`. -/

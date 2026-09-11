@@ -177,3 +177,45 @@ endomorphism statement does not apply to `Hom(E, E⟦0⟧)` directly. -/
 #print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.twistK₀_involutive
 #print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.twistK₀_bijective
 #print axioms CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject.of_serreFunctor
+
+/-! ## A twist-shaped autoequivalence acts on stability conditions (#890)
+
+Connects the lattice half of the lane to the stability machinery: an autoequivalence whose action
+on K0 is the twist becomes a group element acting on `WithClassMap`, and that action is transport
+along the Mukai reflection. This is the precise form of "the spherical twist acts on Stab through
+the reflection" available BEFORE the twist is constructed.
+
+NOTHING HERE CONSTRUCTS A TWIST. `TwistShaped` is supplied data and is named to say so: it asserts
+that its K0 action IS `twistK₀`. No inhabitant is produced.
+
+TWO THINGS NOT TO CONCLUDE, both recorded in the module docstring.
+
+`AutPairQuot` is NOT `Aut(D)`. It quotients by a bare natural isomorphism of underlying functors
+and leaves the CommShift datum unconstrained, so it is a priori COARSER than exact autoequivalences
+up to isomorphism of exact functors.
+
+`lam_lam` is about the LATTICE, not the functor. The reflection is an involution, so the lattice
+part of the square is the identity -- but the twist does NOT have order two in any automorphism
+group; it has infinite order. Being an involution on K0 says nothing about the functor.
+
+`map_inverse_eq` is the step the issue warned not to wave at: `K₀.map_congr` on the unit
+isomorphism upgrades a natural isomorphism to an equality of maps on K0, and involutivity of the
+twist then identifies the inverse's action. -/
+
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.Φ
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.mk.inj
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.map_eq
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.chi_self
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.map_inverse_eq
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.isSpherical_v
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.lam
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.compat
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.toAutPair
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.toAutPair_lam
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.toAutPair_Φ
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.act_eq
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.act_slicing
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.act_Z
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.lam_lam
