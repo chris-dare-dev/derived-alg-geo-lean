@@ -428,6 +428,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesShifts
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.id
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.comp
+
+-- Every dg functor preserves shifts.  A shift element is a closed, two-sided
+-- invertible element of degree `-n` (`IsShiftBy.inv`, `hom_inv`, `inv_hom`),
+-- and a dg functor preserves composition and identities on the nose, so it
+-- carries invertible elements to invertible ones.  `PreservesShifts` therefore
+-- costs a caller nothing.  `PreservesChosenCones` is not like this and remains
+-- a genuine hypothesis: a cone is not an invertible element.
+#print axioms CategoryTheory.DGFunctor.preservesShifts
 #print axioms CategoryTheory.DGFunctor.mapHomotopySquare
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.id
@@ -1034,3 +1042,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIso
+
+-- Exactness of the object twist.  The shift half is free -- every dg functor
+-- preserves shifts, `DGFunctor.preservesShifts` -- so only the cone half is a
+-- hypothesis, and it is `RHom(E,-) ⊗ E`'s.  That one stays open:
+-- `PreservesChosenCones` asks that maps into the cone split, while
+-- `IsCopowerOf` is a mapping-out property.  Exact is not invertible; the object
+-- twist has no invertibility statement.
+#print axioms CategoryTheory.EvaluationData.TwistConeData.preservesShifts
+#print axioms CategoryTheory.EvaluationData.TwistConeData.preservesChosenCones
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0CommShift
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0IsTriangulated

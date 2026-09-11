@@ -81,8 +81,10 @@ DGAdjunction
 EvaluationData E
 ├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
 └─ TwistConeData: the object twist T_E = Cone(evaluation), with its triangle
-   functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished.  No adjunction,
-   no invertibility, no sphericality.
+   functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished, and H⁰(T_E)
+   triangulated as soon as RHom(E,-) ⊗ E preserves chosen cones (shifts are
+   free for every dg functor).
+   No adjunction, no invertibility, no sphericality.
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
@@ -157,7 +159,9 @@ that comparison are instance hypotheses to be discharged by the realization.
    Exactness is separate, and now supplied: `DGFunctor.PreservesShifts` and
    `PreservesChosenCones` are instantiated for a cone functor whenever its two
    ends carry them, so `twistH0IsTriangulated` makes `H⁰` of the twist a
-   triangulated functor.  Together with the equivalence above that is an exact
+   triangulated functor.  The shift half of that is free for every dg functor
+   (`DGFunctor.preservesShifts`), so the `PreservesShifts` arguments the
+   adjunction-side declarations still take can be filled in by any caller.  Together with the equivalence above that is an exact
    autoequivalence -- which is still not sphericality, since that needs all
    four Anno--Logvinenko conditions and the Morita framework the first
    paragraph rules out.
@@ -186,6 +190,21 @@ that comparison are instance hypotheses to be discharged by the realization.
    this one is attached to a single object with no adjunction in sight.  The
    two agree when `RHom(E,-)` and `- ⊗ E` are the adjoint pair of a spherical
    functor out of `Perf(k)`, which is exactly what cannot be stated here.
+
+   `twistH0IsTriangulated` makes `H⁰(T_E)` a triangulated functor on one
+   hypothesis: that `RHom(E,-) ⊗ E` preserves chosen cones.  The shift half is
+   free.  `DGFunctor.preservesShifts` holds for *every* dg functor, because a
+   shift element is a closed two-sided invertible element (`IsShiftBy.inv`,
+   `hom_inv`, `inv_hom`) and a dg functor preserves composition and identities.
+   That retires the shift half of every exactness hypothesis in this tree, not
+   just the object twist's.
+
+   The cone half stays open, and for a structural reason worth recording:
+   `PreservesChosenCones` asks that maps *into* the cone split, while
+   `IsCopowerOf` is a *mapping-out* property -- it controls degree-`p` morphisms
+   out of `V.obj X` and says nothing about maps in.  So it does not follow from
+   the universal property the copower is given by, and a cone, unlike a shift,
+   is not an invertible element that functoriality carries over.
 
    What is open is *existence*.  Nothing constructs a copower, so nothing
    produces an `EvaluationData`; a dg category with enough copowers has to
