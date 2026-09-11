@@ -15,5 +15,9 @@ and the diagonal identity is `rfl`. -/
 #print axioms AlgebraicGeometry.K3Surface.euler
 #print axioms AlgebraicGeometry.K3Surface.selfEuler_eq_euler_self
 #print axioms AlgebraicGeometry.K3Surface.BilinearRiemannRochStatement
+#print axioms AlgebraicGeometry.K3Surface.BilinearRiemannRochStatement.cls
+#print axioms AlgebraicGeometry.K3Surface.BilinearRiemannRochStatement.chi₂_eq
+#print axioms AlgebraicGeometry.K3Surface.BilinearRiemannRochStatement.mk.inj
+#print axioms AlgebraicGeometry.K3Surface.BilinearRiemannRochStatement.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.K3Surface.BilinearRiemannRochStatement.toEulerRealization
 #print axioms AlgebraicGeometry.K3Surface.SphericalExtProfile.isSpherical_mukaiVector_of_statement
