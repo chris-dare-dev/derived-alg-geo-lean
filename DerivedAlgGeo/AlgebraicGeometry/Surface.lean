@@ -6,6 +6,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Surface.Enriques
 import DerivedAlgGeo.AlgebraicGeometry.Surface.K3
 import DerivedAlgGeo.AlgebraicGeometry.Surface.Spherical
 import DerivedAlgGeo.AlgebraicGeometry.Surface.SphericalCategorical
+import DerivedAlgGeo.AlgebraicGeometry.Surface.SphericalMukai
 
 /-! # Surfaces
 
