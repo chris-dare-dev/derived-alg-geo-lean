@@ -176,6 +176,33 @@ noncomputable instance tensorLeftFunctor_preservesFiniteLimits (L : X.Modules)
     PreservesFiniteLimits (tensorLeftFunctor L) :=
   Functor.preservesFiniteLimits_of_preservesHomology (tensorLeftFunctor L)
 
+/-- **Tensoring an epimorphism by an invertible module sheaf remains an epimorphism.**
+
+Finite colimits are preserved, so pushouts are, and a morphism is an epimorphism exactly when
+its pushout along itself is the identity square. The companion of
+`mono_tensorHom_id_of_invertible`, and the step that carries Serre's surjection `free I ↠ F(N)`
+across `O(-N)`. -/
+theorem epi_tensorHom_id_of_invertible (L : X.Modules)
+    [SheafOfModules.IsInvertible.{u, u, u}
+      (show SheafOfModules X.ringCatSheaf from L)]
+    {M N : X.Modules} (f : M ⟶ N) [Epi f] :
+    Epi (tensorHom (𝟙 L) f) :=
+  (tensorLeftFunctor L).map_epi f
+
+/-- **Tensoring a finite free sheaf by an invertible sheaf is a finite direct sum of copies of
+it.** `free I` is the coproduct of copies of the unit, tensoring by an invertible sheaf preserves
+finite coproducts, and `L ⊗ unit ≅ L` by the right unitor. -/
+noncomputable def tensorLeftFreeIso (L : X.Modules)
+    [SheafOfModules.IsInvertible.{u, u, u}
+      (show SheafOfModules X.ringCatSheaf from L)]
+    (I : Type u) [Finite I] :
+    tensorObj L (show X.Modules from SheafOfModules.free.{u} I) ≅ ∐ (fun _ : I => L) := by
+  classical
+  haveI := Fintype.ofFinite I
+  exact PreservesCoproduct.iso (tensorLeftFunctor L)
+      (fun _ : I => (SheafOfModules.unit X.ringCatSheaf : X.Modules)) ≪≫
+    Sigma.mapIso (fun _ => tensorUnitRightIso L)
+
 /-- Tensoring a short exact sequence by an invertible module sheaf remains short exact. -/
 theorem shortExact_map_tensorLeft_of_invertible (L : X.Modules)
     [SheafOfModules.IsInvertible.{u, u, u}
