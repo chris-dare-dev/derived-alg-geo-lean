@@ -9,5 +9,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Boundedness
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.LinearConnecting
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Devissage
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Projective
+import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.ProjectiveVariety
 
 /-! # Finiteness interfaces for sheaf cohomology -/

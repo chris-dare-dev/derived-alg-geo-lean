@@ -64,10 +64,12 @@ criterion is phrased about schemes.
 
 ## Main results
 
-* `cohomologyPushforwardAddEquiv` — the comparison.
+* `cohomologyPushforwardAddEquivAt` — the comparison, at a chosen `HasExt` witness.
+* `cohomologyPushforwardAddEquivAt_naturality` — it is natural in the sheaf.
+* `cohomologyPushforwardAddEquiv` — the same at the witness instance search finds.
 -/
 
-universe u
+universe w' u
 
 open CategoryTheory Limits TopologicalSpace TopCat
 open DerivedAlgGeo.Topology
@@ -85,17 +87,36 @@ syntactically equal and the abstract theorem asks about the former. -/
 lemma terminal_opens_eq_top : (⊤_ (Opens Y)) = ⊤ :=
   le_antisymm le_top (leOfHom (terminalIsTerminal.from ⊤))
 
+/-- `Opens.map f` carries the categorical terminal open of `Y` to a terminal open of `X`: it sends
+`⊤` to `⊤`. Named, because it is data that the comparison and its naturality statement have to
+share. -/
+noncomputable def isTerminalOpensMapTerminal :
+    IsTerminal ((Opens.map f).obj (⊤_ (Opens Y))) := by
+  rw [terminal_opens_eq_top, opensMap_obj_top]
+  exact isTerminalTopOpens
+
 set_option maxHeartbeats 1000000 in
-/-- **Cohomology is unchanged by pushforward along a closed embedding.**
+/-- **Cohomology is unchanged by pushforward along a closed embedding, at a chosen `HasExt`
+witness.**
 
 `#572` step 3, at a map of spaces. Every hypothesis of the abstract comparison is discharged here;
 the only one that is not an instance or an import is exactness of `f_*`, which is
-`preservesFiniteColimits_pushforward`. -/
-noncomputable def cohomologyPushforwardAddEquiv (hemb : Topology.IsInducing f)
+`preservesFiniteColimits_pushforward`.
+
+The `HasExt` witnesses are positional, as in the Čech lane: `Sheaf.H` lands in the `HasExt`
+universe, and a caller whose groups are named at `HasExt.standard` (the coherent-cohomology
+convention, `HasExt.{u + 1}`) cannot let instance search pick the Grothendieck-category
+`HasExt.{u}`, which names different groups. -/
+noncomputable def cohomologyPushforwardAddEquivAt (hemb : Topology.IsInducing f)
     (hcl : IsClosed (Set.range f))
+    (hX : HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}))
+    (hY : HasExt.{w'} (Sheaf (Opens.grothendieckTopology Y) AddCommGrpCat.{u}))
     (F : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) (n : ℕ) :
-    Sheaf.H F n ≃+ Sheaf.H (((Opens.map f).sheafPushforwardContinuous AddCommGrpCat.{u}
-        (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).obj F) n := by
+    @Sheaf.H _ _ _ F _ hX n ≃+ @Sheaf.H _ _ _ (((Opens.map f).sheafPushforwardContinuous
+        AddCommGrpCat.{u} (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).obj F)
+        _ hY n :=
+  letI := hX
+  letI := hY
   haveI hRa : ((Opens.map f).sheafPushforwardContinuous AddCommGrpCat.{u}
       (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).Additive :=
     additive_pushforward f
@@ -114,9 +135,52 @@ noncomputable def cohomologyPushforwardAddEquiv (hemb : Topology.IsInducing f)
   haveI hLadj : ((Opens.map f).sheafPullback AddCommGrpCat.{u}
       (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).IsLeftAdjoint :=
     ((Opens.map f).sheafAdjunctionContinuous AddCommGrpCat.{u} _ _).isLeftAdjoint
-  have hG : IsTerminal ((Opens.map f).obj (⊤_ (Opens Y))) := by
-    rw [terminal_opens_eq_top, opensMap_obj_top]
-    exact isTerminalTopOpens
-  exact sheafHPushforwardAddEquiv (Opens.map f) hG F n
+  sheafHPushforwardAddEquiv (Opens.map f) (isTerminalOpensMapTerminal f) F n
+
+set_option maxHeartbeats 1000000 in
+/-- **The comparison is natural in the sheaf.** The abstract naturality
+`sheafHPushforwardAddEquiv_naturality`, at the same instances and the same terminal witness. -/
+theorem cohomologyPushforwardAddEquivAt_naturality (hemb : Topology.IsInducing f)
+    (hcl : IsClosed (Set.range f))
+    (hX : HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}))
+    (hY : HasExt.{w'} (Sheaf (Opens.grothendieckTopology Y) AddCommGrpCat.{u}))
+    {F F' : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}} (φ : F ⟶ F') (n : ℕ)
+    (x : @Sheaf.H _ _ _ F _ hX n) :
+    cohomologyPushforwardAddEquivAt f hemb hcl hX hY F' n
+        (@Sheaf.H.map _ _ (Opens.grothendieckTopology X) _ hX _ _ φ n x)
+      = @Sheaf.H.map _ _ (Opens.grothendieckTopology Y) _ hY _ _
+          (((Opens.map f).sheafPushforwardContinuous AddCommGrpCat.{u}
+            (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).map φ) n
+          (cohomologyPushforwardAddEquivAt f hemb hcl hX hY F n x) := by
+  letI := hX
+  letI := hY
+  haveI hRa : ((Opens.map f).sheafPushforwardContinuous AddCommGrpCat.{u}
+      (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).Additive :=
+    additive_pushforward f
+  haveI hRc : PreservesFiniteColimits ((Opens.map f).sheafPushforwardContinuous AddCommGrpCat.{u}
+      (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)) :=
+    preservesFiniteColimits_pushforward f hemb hcl
+  haveI hRadj : ((Opens.map f).sheafPushforwardContinuous AddCommGrpCat.{u}
+      (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).IsRightAdjoint :=
+    ((Opens.map f).sheafAdjunctionContinuous AddCommGrpCat.{u} _ _).isRightAdjoint
+  haveI hLl : PreservesFiniteLimits ((Opens.map f).sheafPullback AddCommGrpCat.{u}
+      (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)) :=
+    CategoryTheory.Functor.sheafPullbackConstruction.preservesFiniteLimits _ _ _ _
+  haveI hLa : ((Opens.map f).sheafPullback AddCommGrpCat.{u}
+      (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).Additive :=
+    ((Opens.map f).sheafAdjunctionContinuous AddCommGrpCat.{u} _ _).left_adjoint_additive
+  haveI hLadj : ((Opens.map f).sheafPullback AddCommGrpCat.{u}
+      (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).IsLeftAdjoint :=
+    ((Opens.map f).sheafAdjunctionContinuous AddCommGrpCat.{u} _ _).isLeftAdjoint
+  exact sheafHPushforwardAddEquiv_naturality (Opens.map f) (isTerminalOpensMapTerminal f) φ n x
+
+/-- **Cohomology is unchanged by pushforward along a closed embedding**, at the `HasExt` witness
+instance search finds. -/
+noncomputable def cohomologyPushforwardAddEquiv (hemb : Topology.IsInducing f)
+    (hcl : IsClosed (Set.range f))
+    (F : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) (n : ℕ) :
+    Sheaf.H F n ≃+ Sheaf.H (((Opens.map f).sheafPushforwardContinuous AddCommGrpCat.{u}
+        (Opens.grothendieckTopology Y) (Opens.grothendieckTopology X)).obj F) n :=
+  cohomologyPushforwardAddEquivAt f hemb hcl inferInstance inferInstance F n
 
 end DerivedAlgGeo.Topology

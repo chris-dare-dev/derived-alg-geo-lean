@@ -31,14 +31,14 @@ unchecked definitional fact was mistaken for unbuilt mathematics; the others wer
 a coherent sheaf with that proof, as an object of `Coh Y`. **`IsLocallyNoetherian Y` is spent
 entirely there** — the cohomology comparison needs no chain condition of its own.
 
-## Two ways this is still weaker than `#572`'s wording
+## One way this is still weaker than `#572`'s wording
 
-Both inherited from the abelian-sheaf statement:
-
-* **not natural in `F`** — an isomorphism for each `F`, with naturality unproved;
-* **the `HasExt` universe is pinned**, because the instantiation lets instance search find it.
-  `CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` keeps it parametric for callers who
-  need that.
+**The `HasExt` universe is pinned**, because the instantiation lets instance search find it.
+`Topology/Sheaves/CohomologyPushforward.lean` keeps it positional
+(`cohomologyPushforwardAddEquivAt`) for callers who need another witness; the coherent-cohomology
+convention `HasExt.standard` is one such caller, in
+`Cohomology/Finiteness/ProjectiveVariety.lean`, where the comparison is also shown natural in `F`
+and `k`-linear.
 
 ## Main results
 

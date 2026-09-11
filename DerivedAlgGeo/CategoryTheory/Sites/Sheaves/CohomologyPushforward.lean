@@ -128,4 +128,18 @@ noncomputable def sheafHPushforwardAddEquiv (hG : IsTerminal (G.obj (⊤_ C)))
     Sheaf.H F n ≃+ Sheaf.H ((G.sheafPushforwardContinuous AddCommGrpCat.{w} J K).obj F) n :=
   sheafCohomologyPushforwardAddEquiv G hG F n
 
+include hLa hLl hLc hRa hRl hRc hInj in
+/-- **The comparison is natural in the sheaf.** Both sides are `Ext` composites: the induced map
+on cohomology is postcomposition with `mk₀ φ`, which `extAdjunctionMap_comp_mk₀` carries across
+the adjunction transport and associativity carries across the precomposition with the
+constant-sheaf isomorphism. -/
+theorem sheafHPushforwardAddEquiv_naturality (hG : IsTerminal (G.obj (⊤_ C)))
+    {F F' : Sheaf K AddCommGrpCat.{w}} (φ : F ⟶ F') (n : ℕ) (x : Sheaf.H F n) :
+    sheafHPushforwardAddEquiv G hG F' n (Sheaf.H.map φ n x)
+      = Sheaf.H.map ((G.sheafPushforwardContinuous AddCommGrpCat.{w} J K).map φ) n
+          (sheafHPushforwardAddEquiv G hG F n x) := by
+  change extAdjunctionMap _ ((Ext.mk₀ _).comp (x.comp (Ext.mk₀ φ) (add_zero n)) (zero_add n))
+    = (extAdjunctionMap _ ((Ext.mk₀ _).comp x (zero_add n))).comp (Ext.mk₀ _) (add_zero n)
+  rw [← Ext.comp_assoc_of_third_deg_zero, extAdjunctionMap_comp_mk₀]
+
 end CategoryTheory
