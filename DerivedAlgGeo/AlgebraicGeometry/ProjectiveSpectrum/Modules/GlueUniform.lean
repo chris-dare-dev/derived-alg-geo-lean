@@ -217,6 +217,31 @@ theorem exists_globalSection_twistBy_forall_ge (F : (Proj 𝒜).Modules)
             (le_of_eq (basicOpen_mul 𝒜 (g p.1) (g p.2)).symm)) * r)
       (fracSection_pow_mul_comm 𝒜 hf (hg p.1) (hg p.2) n k inf_le_left inf_le_right)
 
+/-- **One twist exponent for a finite family of sections, above any prescribed threshold.**
+
+The maximum of the per-section thresholds and of `N₀`; every larger exponent works for every
+section by `exists_globalSection_twistBy_forall_ge`. The threshold is what lets the dévissage on
+`Pⁿ` take `N ≥ 1`, so that `H⁰(O(-N))` vanishes. -/
+theorem exists_globalSection_twistBy_uniform_ge (F : (Proj 𝒜).Modules)
+    [SheafOfModules.IsQuasicoherent.{u, u, u}
+      (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
+    {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
+    (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤)
+    {e : ℕ} {κ : Type u} [Finite κ] {f : κ → A} (hf : ∀ a, f a ∈ 𝒜 e) (he : 0 < e)
+    (s : ∀ a, Γ(F, basicOpen 𝒜 (f a))) (N₀ : ℕ) :
+    ∃ N : ℕ, N₀ ≤ N ∧ ∀ a : κ,
+      ∃ σ : Γ(Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * N : ℕ) : ℤ)), ⊤),
+        (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * N : ℕ) : ℤ))).presheaf.map
+            (homOfLE (le_top (a := basicOpen 𝒜 (f a)))).op σ
+          = Scheme.Modules.Hom.app (twistBy 𝒜 (e * N) (pow_mem_mul 𝒜 (hf a) N) F)
+              (basicOpen 𝒜 (f a)) (s a) := by
+  classical
+  choose N₁ hN₁ using fun a =>
+    exists_globalSection_twistBy_forall_ge 𝒜 F (hf a) he hg hcov (s a)
+  obtain ⟨N, hN⟩ := (Set.finite_range N₁).bddAbove
+  exact ⟨max N N₀, le_max_right _ _, fun a =>
+    hN₁ a (max N N₀) ((hN (Set.mem_range_self a)).trans (le_max_left _ _))⟩
+
 /-- **One twist exponent for a finite family of sections.**
 
 Every `sₐ`, defined on its own degree-one chart `D₊(fₐ)`, becomes the restriction of a global
