@@ -6,6 +6,7 @@ import DerivedAlgGeo.AlgebraicTopology
 import DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech
 import DerivedAlgGeo.Topology.Sheaves.Cech
 import DerivedAlgGeo.Topology.Sheaves.Flasque
+import DerivedAlgGeo.Topology.Sheaves.ModulesCohomology
 
 /-!
 Axiom audit for generic cosimplicial exactness and site-theoretic Čech
@@ -39,6 +40,8 @@ constructions, resolutions, comparison maps, and compact-basis arguments.
 #print axioms SheafOfModules.freeYonedaSheafHomEquiv_comp
 #print axioms SheafOfModules.freeYonedaSheafMap_mono
 #print axioms SheafOfModules.isFlasque_toSheaf_of_injective
+#print axioms SheafOfModules.subsingleton_derivedH_toSheaf_of_injective
+#print axioms SheafOfModules.extUnitAddEquivDerivedH
 #print axioms CategoryTheory.Sheaf.IsCechAcyclicOnCompactBasis
 #print axioms CategoryTheory.Sheaf.epi_app_of_isCechAcyclicOnCompactBasis
 #print axioms CategoryTheory.Sheaf.isCechAcyclicOnCompactBasis_of_injective

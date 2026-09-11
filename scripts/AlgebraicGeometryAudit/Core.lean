@@ -578,6 +578,7 @@ is not closed. -/
 #print axioms AddCommGrpCat.productCone
 #print axioms AddCommGrpCat.productConeIsLimit
 #print axioms AddCommGrpCat.piIsoPi
+#print axioms AddCommGrpCat.uliftZMultiplesAddEquiv_comp
 #print axioms AddCommGrpCat.piIsoPi_inv_π
 #print axioms AddCommGrpCat.piIsoPi_inv_π_apply
 #print axioms AddCommGrpCat.piIsoPi_hom_eval
@@ -3075,3 +3076,8 @@ not the conclusion renamed. `mukaiVectorQuotient` is what it buys.
 #print axioms AlgebraicGeometry.Scheme.Modules.isGrothendieckAbelian
 #print axioms AlgebraicGeometry.Scheme.Modules.injective_sheafOfModules_of_injective
 #print axioms AlgebraicGeometry.Scheme.Modules.isFlasque_toSheaf_of_injective
+#print axioms AlgebraicGeometry.Scheme.Modules.unit
+#print axioms AlgebraicGeometry.Scheme.Modules.unitFromConstant
+#print axioms AlgebraicGeometry.Scheme.Modules.bijective_unitFromConstant_comp
+#print axioms AlgebraicGeometry.Scheme.Modules.subsingleton_derivedH_toSheaf_of_injective
+#print axioms AlgebraicGeometry.Scheme.Modules.extUnitAddEquivDerivedH

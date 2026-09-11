@@ -99,6 +99,27 @@ lemma extComparisonMap_comp_extClass {S : ShortComplex D} (hS : S.ShortExact)
   simp only [extComparisonMap, Ext.mapExactFunctor_comp, Ext.mapExactFunctor_extClass]
   exact (Ext.comp_assoc _ _ _ (zero_add n₀) hn₁ (by lia)).symm
 
+/-- In degree zero the comparison sends `mk₀ f` to `mk₀ (u ≫ R.map f)`. -/
+lemma extComparisonMap_mk₀ {B : D} (f : P ⟶ B) :
+    extComparisonMap u (Ext.mk₀ f) = Ext.mk₀ (u ≫ R.map f) := by
+  simp only [extComparisonMap, Ext.mapExactFunctor_mk₀, Ext.mk₀_comp_mk₀]
+
+/-- The degree-zero comparison is bijective iff `f ↦ u ≫ R.map f` is, under the
+identifications `Ext⁰ = Hom`. This is how the degree-zero hypothesis of
+`extComparisonAddEquiv` is checked in practice. -/
+lemma bijective_extComparisonMap_zero_iff (B : D) :
+    Function.Bijective (extComparisonMap u (B := B) (n := 0)) ↔
+      Function.Bijective (fun f : P ⟶ B ↦ u ≫ R.map f) := by
+  have : extComparisonMap u (B := B) (n := 0) =
+      Ext.mk₀ ∘ (fun f : P ⟶ B ↦ u ≫ R.map f) ∘ Ext.homEquiv₀ := by
+    funext e
+    obtain ⟨f, rfl⟩ := (Ext.mk₀_bijective P B).2 e
+    have hf : Ext.homEquiv₀ (Ext.mk₀ f) = f :=
+      (Equiv.ofBijective _ (Ext.mk₀_bijective P B)).symm_apply_apply f
+    simp only [Function.comp, extComparisonMap_mk₀, hf]
+  rw [this, (Ext.mk₀_bijective A (R.obj B)).of_comp_iff',
+    Function.Bijective.of_comp_iff _ Ext.homEquiv₀.bijective]
+
 section Bijective
 
 variable [EnoughInjectives D]

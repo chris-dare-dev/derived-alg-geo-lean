@@ -127,3 +127,11 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
 #print axioms SheafOfModules.freeYonedaSheaf_isSeparating
 #print axioms SheafOfModules.hasSeparator
 #print axioms SheafOfModules.isGrothendieckAbelian
+#print axioms PresheafOfModules.sectionsEquivOfIsTerminal
+#print axioms PresheafOfModules.sectionsEquivOfIsTerminal_apply
+#print axioms PresheafOfModules.sectionsEquivOfIsTerminal_symm_apply
+#print axioms SheafOfModules.unitFromConstant
+#print axioms SheafOfModules.homEquiv_unitFromConstant_comp
+#print axioms SheafOfModules.bijective_unitFromConstant_comp
+#print axioms SheafOfModules.bijective_extComparisonMap_unitFromConstant_zero
+#print axioms SheafOfModules.extUnitAddEquivH

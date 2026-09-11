@@ -51,3 +51,5 @@ degree zero and `R` sends injectives to `A`-acyclic objects. -/
 #print axioms CategoryTheory.injective_extComparisonMap
 #print axioms CategoryTheory.extComparisonAddEquiv
 #print axioms CategoryTheory.extComparisonAddEquiv_apply
+#print axioms CategoryTheory.extComparisonMap_mk₀
+#print axioms CategoryTheory.bijective_extComparisonMap_zero_iff
