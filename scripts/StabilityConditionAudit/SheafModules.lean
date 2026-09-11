@@ -120,3 +120,18 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
 #print axioms SheafOfModules.hasFilteredColimitsOfSize
 #print axioms SheafOfModules.ab4OfSize
 #print axioms SheafOfModules.ab5OfSize
+
+/-! ## A separator, and the Grothendieck abelian instance (#1070, affine lane, slice 3) -/
+
+#print axioms SheafOfModules.freeYonedaSheaf
+#print axioms SheafOfModules.freeYonedaSheaf_isSeparating
+#print axioms SheafOfModules.hasSeparator
+#print axioms SheafOfModules.isGrothendieckAbelian
+#print axioms PresheafOfModules.sectionsEquivOfIsTerminal
+#print axioms PresheafOfModules.sectionsEquivOfIsTerminal_apply
+#print axioms PresheafOfModules.sectionsEquivOfIsTerminal_symm_apply
+#print axioms SheafOfModules.unitFromConstant
+#print axioms SheafOfModules.homEquiv_unitFromConstant_comp
+#print axioms SheafOfModules.bijective_unitFromConstant_comp
+#print axioms SheafOfModules.bijective_extComparisonMap_unitFromConstant_zero
+#print axioms SheafOfModules.extUnitAddEquivH

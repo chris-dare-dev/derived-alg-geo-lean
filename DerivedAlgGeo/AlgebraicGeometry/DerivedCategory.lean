@@ -8,6 +8,8 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.CartierDivisor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.DivisorSequence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Comparison
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineIdentification
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Identification
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Affine
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineDerivedEquivalence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization

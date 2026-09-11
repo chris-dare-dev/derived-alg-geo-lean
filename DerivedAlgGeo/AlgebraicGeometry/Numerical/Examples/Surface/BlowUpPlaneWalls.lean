@@ -192,6 +192,70 @@ theorem chamber_inter_ampleBox {omega₀ : Divisor}
         ∩ ampleBox omega₀ b₀ t₀ t₁ :=
   Wall.Spherical.chamber_inter_ofDivisorSpace _ _ _ divisorBasis
 
+/-! ### The integral Néron--Severi lattice, and the spherical comparison -/
+
+/-- The integral Néron--Severi lattice of the two-point blow-up:
+`ℤH ⊕ ℤE₁ ⊕ ℤE₂` in coordinates. -/
+abbrev IntLattice : Type := Fin 3 → ℤ
+
+/-- The integral intersection form `diag(1, -1, -1)`.  This is the rational form
+of `BlowUpPlane.lean` read over `ℤ`, and the blow-up had no integral lattice
+before. -/
+def intForm : IntLattice →ₗ[ℤ] IntLattice →ₗ[ℤ] ℤ :=
+  LinearMap.mk₂ ℤ (fun x y => x 0 * y 0 - x 1 * y 1 - x 2 * y 2)
+    (fun _ _ _ => by simp [Pi.add_apply]; ring)
+    (fun _ _ _ => by simp [Pi.smul_apply]; ring)
+    (fun _ _ _ => by simp [Pi.add_apply]; ring)
+    (fun _ _ _ => by simp [Pi.smul_apply]; ring)
+
+@[simp]
+theorem intForm_apply (x y : IntLattice) :
+    intForm x y = x 0 * y 0 - x 1 * y 1 - x 2 * y 2 := rfl
+
+/-- The inclusion of the integral lattice into the real divisor space. -/
+def intLatticeMap : IntLattice →+ Divisor :=
+  AddMonoidHom.mk'
+    (fun x => (((x 0 : ℤ) : ℝ), ((x 1 : ℤ) : ℝ), ((x 2 : ℤ) : ℝ)))
+    (by
+      intro x y
+      ext <;> simp <;> push_cast <;> ring)
+
+@[simp]
+theorem intLatticeMap_apply (x : IntLattice) :
+    intLatticeMap x = (((x 0 : ℤ) : ℝ), ((x 1 : ℤ) : ℝ), ((x 2 : ℤ) : ℝ)) := rfl
+
+/-- **The second witness for `Spherical.IntegralComparison`**, and the one where
+the form is not definite.
+
+The obligation that structure records — "exhibiting `NS(X)` with its
+intersection form" — is discharged here by `ℤH ⊕ ℤE₁ ⊕ ℤE₂` with
+`diag(1, -1, -1)`.  Unlike the rank-one case, the lattice has isotropic vectors
+and the comparison is not a scaling of `ℤ`. -/
+def integralComparison :
+    Wall.Spherical.IntegralComparison divisorSpace.intersection intForm where
+  toFun := intLatticeMap
+  compat x y := by
+    show ((x 0 : ℤ) : ℝ) * ((y 0 : ℤ) : ℝ) - ((x 1 : ℤ) : ℝ) * ((y 1 : ℤ) : ℝ)
+        - ((x 2 : ℤ) : ℝ) * ((y 2 : ℤ) : ℝ)
+      = ((x 0 * y 0 - x 1 * y 1 - x 2 * y 2 : ℤ) : ℝ)
+    push_cast
+    ring
+
+/-- **Integral and real sphericality agree in the `(β, ω)` chart**, on the
+two-point blow-up. -/
+theorem isSpherical_map_iff (v : Mukai.MukaiLattice IntLattice) :
+    Wall.Spherical.IsSpherical divisorSpace.intersection (integralComparison.map v)
+      ↔ Mukai.IsSpherical intForm v :=
+  Wall.Spherical.isSpherical_map_iff integralComparison v
+
+/-- The realized anticanonical class is the image of the integral class
+`3H - E₁ - E₂`, so the ray the chamber statements use is an integral one. -/
+theorem intLatticeMap_antiCanonical :
+    intLatticeMap ![3, -1, -1]
+      = numericalRealization.realizePolarization antiCanonicalPolarization := by
+  rw [antiCanonicalPolarization, numericalRealization_polarization]
+  ext <;> simp [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons] <;> norm_num
+
 /-! ### The anticanonical ray -/
 
 /-- The realized anticanonical class `-K = 3H - E₁ - E₂` has square `7`, so it

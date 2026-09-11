@@ -527,6 +527,21 @@ general-scheme equivalence and compact/perfect theorem still needed by A.14.
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentRepresentativeIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.schemePerfectInDqc_iff_isCompact
 
+-- The bounded-coherent identification reduced to the coherent Ext comparison (#1070, #1071).
+-- `CoherentExtComparison` is inhabited for affine noetherian schemes (`AffineIdentification.lean`).
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.CoherentExtComparison
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentDerivedInclusion_map_bijective
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedToDqc_full
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedToDqc_faithful
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentDerivedToDqc_full_of_coherentExtComparison
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentDerivedToDqc_faithful_of_coherentExtComparison
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentDerivedToDqc_essSurj_of_coherentExtComparison
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentDqcIdentificationOfCoherentExtComparison
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.hasBoundedCoherentDqcIdentification_of_coherentExtComparison
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.subsingleton_ext_ι_affineFree
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.coherentExtComparison_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.hasBoundedCoherentDqcIdentification_spec
+
 /-! ## Geometric bounded-coherent base change
 
 This layer constructs the slicing preimage witness from the actual bounded
