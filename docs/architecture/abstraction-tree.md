@@ -92,7 +92,7 @@ Category
 │  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
 │  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
 │  │  │  └─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
-│  │  ├─ PreservesShifts                 composable dg capability
+│  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
 │  ├─ IsCopowerOf K X Z                   `Z = K ⊗ X`, by its universal property
@@ -103,7 +103,7 @@ Category
 │  │     ├─ evaluation                   its degree-zero map to the identity
 │  │     └─ TwistConeData                the object twist Cone(evaluation)
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
-│  │        └─ twistH0IsTriangulated    exact, given the evaluation functor's capabilities
+│  │        └─ twistH0IsTriangulated    exact, given only PreservesChosenCones
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
