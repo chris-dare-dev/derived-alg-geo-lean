@@ -126,3 +126,27 @@ numerical data written on `C` onto the heart. -/
 #print axioms DerivedCategory.toHeart_obj_obj
 #print axioms DerivedCategory.heartEquivalence
 #print axioms DerivedCategory.heartEquivalence_functor
+
+/-! ## The derived functor of an exact functor on bounded objects (#1070, #1071)
+
+For an exact functor that is bijective on every `Ext` group, `mapDerivedCategory`
+is fully faithful on bounded objects and essentially surjective onto the bounded
+objects with cohomology in the essential image. The hypothesis is carried
+explicitly; no instance supplies it.
+-/
+
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_iff_of_iso_left
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_iff_of_iso_right
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_shift_iff
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_shift_left
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_of_forall_shift
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_obj₃_left
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_obj₃_right
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_obj₂_left
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_obj₂_right
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_single_of_neg
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_single_iff_mapExt_bijective
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_single
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_bounded_single
+#print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_of_bounded
+#print axioms CategoryTheory.Functor.exists_bounded_iso_mapDerivedCategory_obj

@@ -5,6 +5,7 @@ Released under the MIT license.
 import Mathlib.Algebra.Category.Grp.AB
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.AB
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Generator
 
 /-!
 # Grothendieck's axioms for module sheaves on a scheme
@@ -19,6 +20,8 @@ with its own category instance, so the instance on sheaves of modules is transpo
 
 * `AlgebraicGeometry.Scheme.Modules.hasExactColimitsOfShape`: the per-shape instance.
 * `AlgebraicGeometry.Scheme.Modules.ab4`, `AlgebraicGeometry.Scheme.Modules.ab5`.
+* `AlgebraicGeometry.Scheme.Modules.isGrothendieckAbelian`: `X.Modules` is Grothendieck
+  abelian, hence has enough injectives and small `Ext` groups.
 -/
 
 open CategoryTheory Limits
@@ -42,5 +45,11 @@ instance ab4 : AB4 X.Modules := ⟨fun _ => inferInstance⟩
 
 /-- `X.Modules` satisfies AB5: filtered colimits are exact. -/
 instance ab5 : AB5 X.Modules := ⟨fun _ _ _ => inferInstance⟩
+
+/-- `X.Modules` is Grothendieck abelian: AB5 as above and the separator of
+`SheafOfModules.isGrothendieckAbelian`. Mathlib then supplies `EnoughInjectives X.Modules` and
+`HasExt.{u} X.Modules`. -/
+instance isGrothendieckAbelian : IsGrothendieckAbelian.{u} X.Modules :=
+  inferInstanceAs (IsGrothendieckAbelian.{u} (SheafOfModules.{u} X.ringCatSheaf))
 
 end AlgebraicGeometry.Scheme.Modules
