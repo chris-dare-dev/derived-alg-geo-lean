@@ -244,6 +244,18 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.stabilityPseudoEMetricSpaceOfMassTriangle
 #print axioms CategoryTheory.Triangulated.stabilityEMetricSpaceOfMassTriangle
 
+/-! ## Hausdorff separation (#922)
+
+`T0` and `T2` for the installed Section 6 topology under a surjective class map, read off the
+unconditional extended-metric package; the regression pin records that its topology is the
+installed one by `rfl`. No global metric or topology instance is introduced. -/
+
+#print axioms CategoryTheory.Triangulated.stabilityEMetricSpaceOfMassTriangle_toTopologicalSpace
+#print axioms CategoryTheory.Triangulated.t0Space_withClassMap
+#print axioms CategoryTheory.Triangulated.t2Space_withClassMap
+#print axioms CategoryTheory.Triangulated.isClosed_singleton_withClassMap
+#print axioms CategoryTheory.Triangulated.isClosed_diagonal_withClassMap
+
 /-! ## The octahedral reduction of the mass triangle inequality -/
 
 #print axioms CategoryTheory.Triangulated.stabilityMass_eq_ofReal_norm_charge
