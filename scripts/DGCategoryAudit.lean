@@ -933,6 +933,19 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
 
+-- A cone functor preserves shifts AND chosen cones when its two ends do, so the
+-- twist candidate of a dg adjunction is exact as soon as the adjoints are.
+-- Both arguments are the cone splitting rather than a computation: in the
+-- coordinates of the splittings the maps are block diagonal, with one sign.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compRight_functor_map
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesShifts
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.preservesShifts
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.coneSplit_functor_map
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesChosenCones
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesChosenCones
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.preservesChosenCones
+
 -- Anno--Logvinenko's twist triangle, read as a triangle of functors on `H⁰`.
 -- The counit's chosen cones give `X ↦ (L R X ⟶ X ⟶ T X ⟶ (L R X)⟦1⟧)`, every
 -- value distinguished, with the first two maps the adjunction's own counit and
@@ -955,3 +968,45 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_obj₃
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_mor₁
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleIso
+
+-- Tensoring a dg object by a complex, stated by its universal property the way
+-- `IsShiftBy` states the shift: `IsCopowerOf K X Z` says degree-`p` morphisms
+-- out of `Z` are degree-`p` cochains out of `K` into `dgHom X -`.  Nothing here
+-- constructs a copower, so nothing here produces an `EvaluationData`; a
+-- category with enough copowers has to supply one.
+#print axioms CategoryTheory.copowerCochain
+#print axioms CategoryTheory.copowerCochain_apply
+#print axioms CategoryTheory.IsCopowerOf
+#print axioms CategoryTheory.IsCopowerOf.univ
+#print axioms CategoryTheory.IsCopowerOf.univ_d
+#print axioms CategoryTheory.IsCopowerOf.bijective
+#print axioms CategoryTheory.IsCopowerOf.mk.inj
+#print axioms CategoryTheory.IsCopowerOf.mk.sizeOf_spec
+#print axioms CategoryTheory.IsCopowerOf.lift_unique
+#print axioms CategoryTheory.IsCopowerOf.lift
+#print axioms CategoryTheory.IsCopowerOf.univ_comp_lift
+#print axioms CategoryTheory.IsCopowerOf.compare
+#print axioms CategoryTheory.IsCopowerOf.univ_comp_compare
+#print axioms CategoryTheory.IsCopowerOf.compare_comp_compare
+#print axioms CategoryTheory.IsCopowerOf.compare_self
+
+-- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
+-- identity.  Every one of the functor's four laws is `lift_unique` applied to
+-- the cochain each side induces; only `map_d` needs more than associativity,
+-- and there it is the Leibniz rule twice, once in `C` and once in the
+-- Hom-complex out of `E`.  No relation to a spherical object is claimed.
+#print axioms CategoryTheory.EvaluationData
+#print axioms CategoryTheory.EvaluationData.obj
+#print axioms CategoryTheory.EvaluationData.isCopower
+#print axioms CategoryTheory.EvaluationData.mk.inj
+#print axioms CategoryTheory.EvaluationData.mk.sizeOf_spec
+#print axioms CategoryTheory.EvaluationData.map
+#print axioms CategoryTheory.EvaluationData.univ_comp_map
+#print axioms CategoryTheory.EvaluationData.map_zero
+#print axioms CategoryTheory.EvaluationData.map_add
+#print axioms CategoryTheory.EvaluationData.functor
+#print axioms CategoryTheory.EvaluationData.functor_obj
+#print axioms CategoryTheory.EvaluationData.functor_map
+#print axioms CategoryTheory.EvaluationData.evalHom
+#print axioms CategoryTheory.EvaluationData.univ_comp_evalHom
+#print axioms CategoryTheory.EvaluationData.evaluation
