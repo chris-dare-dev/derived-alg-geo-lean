@@ -151,12 +151,13 @@ Hartshorne II.5.17 / EGA II 2.7.9. The hypotheses are exactly the ones the chart
 coherence, and the degree-one generating family with its finiteness. No global-generation or
 resolution hypothesis enters anywhere, and no instance supplies the surjection. The index `I` is
 the disjoint union over the charts of the chart generators, and `N` is the uniform exponent of
-`exists_globalSection_twistBy_uniform`. -/
-theorem exists_epi_free_tensorTwist (F : (Proj 𝒜).Modules)
+`exists_globalSection_twistBy_uniform_ge`, pushed above any prescribed `N₀`: the dévissage on
+`Pⁿ` wants `N ≥ 1`, so that `H⁰(O(-N))` vanishes. -/
+theorem exists_epi_free_tensorTwist_ge (F : (Proj 𝒜).Modules)
     (hF : Scheme.Modules.IsCoherent (Proj 𝒜) F)
     {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
-    (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤) :
-    ∃ (N : ℕ) (I : Type u) (_ : Finite I)
+    (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤) (N₀ : ℕ) :
+    ∃ (N : ℕ) (_ : N₀ ≤ N) (I : Type u) (_ : Finite I)
       (p : SheafOfModules.free.{u} I ⟶ (show SheafOfModules (Proj 𝒜).ringCatSheaf from
         Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ)))), Epi p := by
   classical
@@ -171,10 +172,10 @@ theorem exists_epi_free_tensorTwist (F : (Proj 𝒜).Modules)
     exists_finite_generators_of_isCoherent 𝒜 F hF (hg i) (awayι_image_top 𝒜 (hg i) Nat.one_pos)
   letI : ∀ i, Fintype (κ i) := hκ
   -- one twist exponent carrying every generator of every chart to a global section
-  obtain ⟨N, hN⟩ := exists_globalSection_twistBy_uniform 𝒜 F hg hcov
-    (κ := Σ i, κ i) (f := fun a => g a.1) (fun a => hg a.1) Nat.one_pos (fun a => s a.1 a.2)
+  obtain ⟨N, hN₀, hN⟩ := exists_globalSection_twistBy_uniform_ge 𝒜 F hg hcov
+    (κ := Σ i, κ i) (f := fun a => g a.1) (fun a => hg a.1) Nat.one_pos (fun a => s a.1 a.2) N₀
   choose σ hσ using hN
-  refine ⟨1 * N, Σ i, κ i, inferInstance,
+  refine ⟨1 * N, by omega, Σ i, κ i, inferInstance,
     (show SheafOfModules (Proj 𝒜).ringCatSheaf from
       Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((1 * N : ℕ) : ℤ))).freeHomEquiv.symm
       (fun a => Scheme.Modules.sectionsOfTop _ (σ a)), ?_⟩
@@ -213,6 +214,17 @@ theorem exists_epi_free_tensorTwist (F : (Proj 𝒜).Modules)
   obtain ⟨W, hWV₁, hxW, c, hc⟩ := hsum x hxV₁
   refine ⟨W, hWV₁.trans hV₁U, hxW, c, ?_⟩
   rw [← Scheme.Modules.resSection_trans _ hV₁U hWV₁ t, hS, hc]
+
+/-- **Serre's theorem, in the global-generation form**, with the exponent unconstrained. -/
+theorem exists_epi_free_tensorTwist (F : (Proj 𝒜).Modules)
+    (hF : Scheme.Modules.IsCoherent (Proj 𝒜) F)
+    {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)
+    (hcov : Algebra.adjoin (𝒜 0) (Set.range g) = ⊤) :
+    ∃ (N : ℕ) (I : Type u) (_ : Finite I)
+      (p : SheafOfModules.free.{u} I ⟶ (show SheafOfModules (Proj 𝒜).ringCatSheaf from
+        Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (N : ℤ)))), Epi p := by
+  obtain ⟨N, -, I, hI, p, hp⟩ := exists_epi_free_tensorTwist_ge 𝒜 F hF hg hcov 0
+  exact ⟨N, I, hI, p, hp⟩
 
 /-- **Serre's theorem, phrased through `GeneratingSections`: `F(N)` has finitely many generating
 sections for `N` large.** -/
