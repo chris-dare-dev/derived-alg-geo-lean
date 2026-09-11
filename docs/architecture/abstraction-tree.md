@@ -100,7 +100,9 @@ Category
 │  │  ├─ compare                         any two copowers, canonically isomorphic
 │  │  └─ EvaluationData E                a chosen copower of `E` by `dgHom E -`
 │  │     ├─ functor                      the dg functor `RHom(E,-) ⊗ E`
-│  │     └─ evaluation                   its degree-zero map to the identity
+│  │     ├─ evaluation                   its degree-zero map to the identity
+│  │     └─ TwistConeData                the object twist Cone(evaluation)
+│  │        └─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
