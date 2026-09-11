@@ -36,10 +36,14 @@ theorem exists_finFree_epi (M : FGModuleCat.{u} R) :
   haveI : Epi (ModuleCat.ofHom f) := (ModuleCat.epi_iff_surjective _).2 hf
   exact Functor.epi_of_epi_map (ModuleCat.isFG R).ι this
 
-/-- Free modules of finite rank are projective among finitely generated modules over a
-noetherian ring: the forgetful functor to all modules preserves epimorphisms, so a lift in
-all modules is a lift. -/
-theorem projective_of_finFree [IsNoetherianRing R] (k : ℕ) :
+/-- Free modules of finite rank are projective among finitely generated modules: the forgetful
+functor to all modules preserves epimorphisms, so a lift in all modules is a lift.
+
+No noetherian hypothesis. It was carried when this landed and the proof never used it — the
+argument is freeness plus epi-preservation — so the environment linter reported it as an unused
+argument and the library-wide lint went red. Dropping it strengthens the statement and cannot
+break a caller, since it is an instance argument. -/
+theorem projective_of_finFree (k : ℕ) :
     Projective (FGModuleCat.of R (Fin k → R)) where
   factors {Y Z} g e he := by
     haveI : Epi e.hom := (forget₂ (FGModuleCat.{u} R) (ModuleCat.{u} R)).map_epi e
