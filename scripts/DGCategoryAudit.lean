@@ -1034,3 +1034,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIso
+
+-- Exactness of the object twist, reduced to one hypothesis.  A cone functor
+-- carries a capability when both ends do, and the identity end carries both for
+-- free, so the twist's exactness is exactly `RHom(E,-) ⊗ E`'s.  That hypothesis
+-- is open and stays a hypothesis: `IsCopowerOf` is a mapping-out property and
+-- both capabilities are mapping-in conditions.  Exact is not invertible; the
+-- object twist has no invertibility statement.
+#print axioms CategoryTheory.EvaluationData.TwistConeData.preservesShifts
+#print axioms CategoryTheory.EvaluationData.TwistConeData.preservesChosenCones
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0CommShift
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0IsTriangulated

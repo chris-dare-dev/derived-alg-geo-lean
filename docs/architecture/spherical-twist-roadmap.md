@@ -81,8 +81,9 @@ DGAdjunction
 EvaluationData E
 ├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
 └─ TwistConeData: the object twist T_E = Cone(evaluation), with its triangle
-   functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished.  No adjunction,
-   no invertibility, no sphericality.
+   functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished, and H⁰(T_E)
+   triangulated as soon as RHom(E,-) ⊗ E preserves shifts and chosen cones.
+   No adjunction, no invertibility, no sphericality.
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
@@ -186,6 +187,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    this one is attached to a single object with no adjunction in sight.  The
    two agree when `RHom(E,-)` and `- ⊗ E` are the adjoint pair of a spherical
    functor out of `Perf(k)`, which is exactly what cannot be stated here.
+
+   `twistH0IsTriangulated` makes `H⁰(T_E)` a triangulated functor on one
+   hypothesis: that `RHom(E,-) ⊗ E` preserves shifts and chosen cones.  The
+   identity end of the cone carries both for free, so that is the whole of it.
+   The hypothesis stays a hypothesis, and for a structural reason worth
+   recording: `IsCopowerOf` is a *mapping-out* property, while both capabilities
+   are *mapping-in* conditions -- `IsShiftBy` asks about right composition into
+   the object, `PreservesChosenCones` about maps into the cone -- so neither
+   follows from the universal property the copower is given by.  Discharging it
+   needs a copower-shift compatibility lemma nobody has written.
 
    What is open is *existence*.  Nothing constructs a copower, so nothing
    produces an `EvaluationData`; a dg category with enough copowers has to
