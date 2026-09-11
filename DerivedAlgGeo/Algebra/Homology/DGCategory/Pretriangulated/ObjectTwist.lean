@@ -41,13 +41,18 @@ and the identity, and the identity's capabilities are free, so the twist's
 exactness reduces to the evaluation functor's -- `preservesShifts` and
 `preservesChosenCones` below take exactly that one hypothesis.
 
-The hypothesis is not discharged here, and not because nobody tried.
-`IsCopowerOf` is a *mapping-out* property: it controls degree-`p` morphisms out
-of `V.obj X`.  `IsShiftBy`'s bijectivity condition is a *mapping-in* one, about
-right composition on `dgHom W (V.obj X)`, and `PreservesChosenCones` likewise
-asks about maps into the cone.  Neither follows from the universal property the
-copower is given by, so `PreservesShifts (V.functor)` needs a genuine
-copower-shift compatibility lemma that this file does not have.
+The shift half needs no hypothesis at all.  `DGFunctor.preservesShifts` says
+every dg functor preserves shifts -- a shift element is a two-sided invertible
+element, and dg functors preserve composition and identities -- so
+`preservesShifts` below is unconditional.  This has nothing to do with copowers;
+it would hold for any `F` in place of `RHom(E,-) ⊗ E`.
+
+The cone half does need one.  `PreservesChosenCones` asks that maps *into* the
+cone split, which is a mapping-in condition, while `IsCopowerOf` is a
+mapping-out property: it controls degree-`p` morphisms out of `V.obj X`, as
+cochains out of `dgHom E X`.  Nothing in the universal property the copower is
+given by says anything about maps into it, so `preservesChosenCones` takes the
+capability for `V.functor` as an argument and leaves discharging it open.
 -/
 
 set_option autoImplicit false
@@ -88,15 +93,13 @@ theorem inclusion_isClosed :
     DGFunctor.HomogeneousNatTrans.IsClosed K.inclusion :=
   K.inr_isClosed
 
-/-- **The object twist preserves shifts as soon as `RHom(E,-) ⊗ E` does.**
+/-- **The object twist preserves shifts.**
 
-Half of exactness, and the identity end contributes nothing: its capability is
-`PreservesShifts.id`.  The cone half is `preservesChosenCones`. -/
-noncomputable def preservesShifts
-    (hV : DGFunctor.PreservesShifts V.functor) :
-    DGFunctor.PreservesShifts K.twist :=
-  DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts K hV
-    (DGFunctor.PreservesShifts.id C)
+Half of exactness, and unconditional: `DGFunctor.preservesShifts` supplies the
+capability for both ends of the cone.  The cone half is
+`preservesChosenCones`, which is not free. -/
+noncomputable def preservesShifts : DGFunctor.PreservesShifts K.twist :=
+  DGFunctor.preservesShifts _
 
 /-- **The object twist preserves chosen cones as soon as `RHom(E,-) ⊗ E` does.**
 

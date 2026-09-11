@@ -36,10 +36,11 @@ the generic cone-triangle layer; the only input beyond it is that evaluation is
 closed.
 
 `twistH0IsTriangulated` adds that `H⁰(T_E)` is a triangulated functor, on the
-one hypothesis that `RHom(E,-) ⊗ E` preserves shifts and chosen cones -- the
-identity end of the cone contributes its capabilities for free.  That hypothesis
-is open: `IsCopowerOf` is a mapping-out property and both capabilities are
-mapping-in conditions, so neither follows from it.  See the discussion in
+one hypothesis that `RHom(E,-) ⊗ E` preserves chosen cones.  The shift half is
+free: `DGFunctor.preservesShifts` holds for every dg functor, because a shift
+element is a two-sided invertible element.  The cone half is not, and stays
+open: `PreservesChosenCones` asks that maps *into* the cone split, while
+`IsCopowerOf` only controls maps out.  See the discussion in
 `DGCategory/Pretriangulated/ObjectTwist.lean`.
 
 Nothing here says `T_E` is an autoequivalence, calls `E` spherical, or connects
@@ -127,10 +128,8 @@ theorem twistTriangleFunctor_map_hom₃ {X Y : H0 C} (f : X ⟶ Y) :
 `DGFunctor.commShift` spends the dg-level shift preservation on the ordinary
 functor; `twistH0IsTriangulated` adds the cone half. -/
 @[reducible]
-noncomputable def twistH0CommShift
-    (hV : DGFunctor.PreservesShifts V.functor) :
-    K.twist.h0.CommShift ℤ :=
-  DGFunctor.commShift _ (K.preservesShifts hV)
+noncomputable def twistH0CommShift : K.twist.h0.CommShift ℤ :=
+  DGFunctor.commShift _ K.preservesShifts
 
 /-- **The object twist is exact on `H⁰`.**
 
@@ -141,12 +140,11 @@ carries distinguished triangles to distinguished triangles.
 This is exactness, not invertibility: nothing here says `T_E` is an
 equivalence. -/
 theorem twistH0IsTriangulated
-    (hV : DGFunctor.PreservesShifts V.functor)
     (hVc : DGFunctor.PreservesChosenCones V.functor) :
-    letI : K.twist.h0.CommShift ℤ := DGFunctor.commShift _ (K.preservesShifts hV)
+    letI : K.twist.h0.CommShift ℤ := DGFunctor.commShift _ K.preservesShifts
     K.twist.h0.IsTriangulated :=
   DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-    (K.preservesShifts hV) (K.preservesChosenCones hVc)
+    K.preservesShifts (K.preservesChosenCones hVc)
 
 /-- **The object twist triangle does not depend on the chosen cones.** -/
 noncomputable def twistTriangleIso (K K' : V.TwistConeData) :
