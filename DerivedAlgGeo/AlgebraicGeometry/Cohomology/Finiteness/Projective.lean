@@ -36,9 +36,8 @@ sequence.
 
 ## Not here
 
-Closed subvarieties of `Pⁿ`. Step 3 of `#332` transports finiteness along a closed immersion
-through `cohCohomologyPushforwardAddEquiv`, and the `k`-linearity of that comparison is what
-`Variety.IsProjective` still needs.
+Closed subvarieties of `Pⁿ`. `ProjectiveVariety.lean` transports finiteness along the closed
+immersion of a `ProjectivePresentation`, once the comparison is shown `k`-linear.
 -/
 
 universe u
