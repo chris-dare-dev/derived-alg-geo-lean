@@ -89,6 +89,24 @@ instance locallyOfFiniteType_projectiveSpaceToSpec [Finite ι] :
     exact RingHom.FiniteType.of_surjective _ hsurj
   exact MorphismProperty.comp_mem _ _ _ inferInstance inferInstance
 
+/-- **The structure morphism of polynomial projective space is proper.**
+
+`Proj.toSpecZero` is proper because the polynomial ring is of finite type over its degree-zero
+part, and the identification of `k` with that part is an isomorphism: surjective by
+`algebraMap_polynomialGradeZero_surjective`, injective because `k` is a field. This is what
+makes `Pⁿ` Noetherian and separated through `Variety.isNoetherian_of_isProper` and
+`Variety.isSeparated_of_isProper`, which the finite-cover cohomology bound consumes. -/
+instance isProper_projectiveSpaceToSpec [Finite ι] : IsProper (projectiveSpaceToSpec ι k) := by
+  haveI : Nontrivial ↥(polynomialGrading ι k 0) :=
+    ⟨⟨0, 1, fun h => zero_ne_one (congrArg Subtype.val h)⟩⟩
+  have : IsIso (CommRingCat.ofHom (algebraMap k ↥(polynomialGrading ι k 0))) :=
+    (ConcreteCategory.isIso_iff_bijective _).2
+      ⟨(algebraMap k ↥(polynomialGrading ι k 0)).injective,
+        algebraMap_polynomialGradeZero_surjective ι k⟩
+  show IsProper (Proj.toSpecZero (polynomialGrading ι k) ≫
+    Spec.map (CommRingCat.ofHom (algebraMap k ↥(polynomialGrading ι k 0))))
+  infer_instance
+
 /-- Polynomial projective space is nonempty once there is a variable.
 
 Nonemptiness is a hypothesis of `Proj.isIntegral` rather than a consequence: `Proj` of a graded

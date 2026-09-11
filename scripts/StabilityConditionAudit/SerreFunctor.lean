@@ -169,3 +169,43 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.isShiftOf_iff
 #print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.mapIsGradedOrthogonal
 #print axioms CategoryTheory.SerreFunctor.SerreCompatibleEquivalence.isGradedOrthogonal_iff
+
+/-! ## Uniqueness of the Serre functor (#896)
+
+Any two Serre functors on the same k-linear category are naturally isomorphic, and the isomorphism
+compatible with both duality isomorphisms is unique. The argument is Yoneda.
+
+THE REPRESENTABILITY STEP IS PUBLIC API, not a private step: `isoOfLinearYonedaIso` is stated on
+`linearYoneda` alone and proved without reference to `SerreFunctorData`, because a downstream lane
+needs it on a functor that is not a Serre functor. It is `Functor.preimageIso` against Mathlib's
+`full_linearYoneda` and `faithful_linearYoneda`, so representability is not hand-rolled.
+
+TRAP, recorded in the module docstring: WHICH VARIABLE the Yoneda argument runs in. Hom is
+contravariant in the first and covariant in the second variable, and the dual flips both, so
+`Dual (A ⟶ B)` is covariant in A and contravariant in B, matching `Hom(B, S A)`. The argument runs
+in B with A fixed, which is why the functor is `linearYoneda` and NOT `linearCoyoneda` -- in this
+repository `(linearCoyoneda k C).obj (op X)` is the COVARIANT Hom(X, -), and running the argument
+there yields a statement that typechecks against the opposite functor and proves nothing about S.
+
+The two naturalities come from two different fields for two different reasons: `yonedaIso` is
+natural in B by `naturality_right`, and `uniqueIso` is natural in A by `naturality_left`. -/
+
+#print axioms CategoryTheory.SerreFunctor.isoOfLinearYonedaIso
+#print axioms CategoryTheory.SerreFunctor.map_isoOfLinearYonedaIso
+#print axioms CategoryTheory.SerreFunctor.hom_ext_of_linearYoneda
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.compareEquiv
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.compareEquiv_apply
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.compareEquiv_naturality_right
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.yonedaIso
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIsoApp
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.comp_uniqueIsoApp_hom
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIsoApp_hom_eq
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIsoApp_naturality
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_hom_app
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_compat
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_unique
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_refl
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_trans
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_symm
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.exists_uniqueIso
