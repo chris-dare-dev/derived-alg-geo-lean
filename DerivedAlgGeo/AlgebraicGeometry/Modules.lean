@@ -3,6 +3,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flasque
+import DerivedAlgGeo.AlgebraicGeometry.Modules.LocalCombination
 import DerivedAlgGeo.AlgebraicGeometry.Modules.LocallySurjective
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward

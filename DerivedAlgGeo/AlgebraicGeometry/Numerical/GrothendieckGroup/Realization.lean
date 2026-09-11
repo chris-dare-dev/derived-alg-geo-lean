@@ -79,9 +79,11 @@ does is make the distance explicit and let the categorical side be stated.
 ## What this file does not assert
 
 * Nothing constructs a geometric `K₀.Realization`, and nothing constructs a
-  `K₀.Realization.Descends` witness. Both are supplied. Nothing constructs an
-  `AdditiveMukaiData` either, so the isometry statements are conditional on a
-  lattice-valued *additive* Chern class that no file produces.
+  `K₀.Realization.Descends` witness. Both are supplied. An `AdditiveMukaiData`
+  is no longer uninhabited — `Numerical/Examples/Surface/K3Mukai.lean` builds
+  one on the rank-one model — but none comes from a scheme, so the isometry
+  statements still rest on a lattice-valued *additive* Chern class that no file
+  produces geometrically.
 * **Nothing proves a Fourier--Mukai transform preserves the Euler pairing.**
   That it does when the transform is an equivalence is a real theorem, and the
   hypothesis that carries it is full faithfulness together with `k`-linearity

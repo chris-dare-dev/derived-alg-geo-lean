@@ -39,7 +39,8 @@ does not apply to `Coh X ⊆ X.Modules` (a coherent sheaf need not map onto a
 coherent quotient of an arbitrary module sheaf), so the classical route runs
 through `D(QCoh X) ≌ D_qc(X)` (Stacks 08DB) or the injectivity of quasi-coherent
 injectives in `X.Modules` (Hartshorne, *Residues and Duality* II.7.18). Neither
-is available at this Mathlib pin. See `docs/architecture/cutover-ledger.md`.
+is available at this Mathlib pin, and the affine case is not a shortcut: see the
+2026-09-10 entry of `docs/architecture/cutover-ledger.md`.
 
 Nothing here inhabits `CoherentExtComparison`; affine noetherian schemes satisfy it by
 `Dqc/AffineIdentification.lean`, through the `Ext` comparison from acyclic generators.

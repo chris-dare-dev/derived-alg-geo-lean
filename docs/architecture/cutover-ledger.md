@@ -43,18 +43,26 @@ blocks should normally move it rather than add more declarations beside it.
      has support `U`, which is not closed; so `Hom(M~, F) = Hom(M, Γ(X, F)) = 0`
      for every quasi-coherent `M~`, and no coherent sheaf maps onto `𝒪_X`
      through `F`. The Ext comparison is therefore genuine geometric content.
-  3. *What supplies `CoherentExtComparison X` remains open.* The classical
-     proofs pass through `D(QCoh X) ≌ D_qc(X)` (Stacks 08DB, the coherator) or
-     through quasi-coherent injectives being injective in `X.Modules`
-     (Hartshorne, *Residues and Duality* II.7.18); neither is available at
-     this Mathlib pin. Mathlib's own sufficient conditions,
+  3. *What supplies `CoherentExtComparison X` remains open, and the affine
+     case is not a shortcut.* The classical proofs pass through
+     `D(QCoh X) ≌ D_qc(X)` (Stacks 08DB, the coherator) or through
+     quasi-coherent injectives being injective in `X.Modules` (Hartshorne,
+     *Residues and Duality* II.7.18); neither is available at this Mathlib
+     pin. Mathlib's own sufficient conditions,
      `Functor.mapExt_bijective_of_preservesProjectiveObjects` and
-     `…_of_preservesInjectiveObjects`, do not apply: `Coh X` has neither
-     enough projectives nor enough injectives. For an affine noetherian `X`
-     the comparison appears reachable from the affine vanishing already in
-     `AlgebraicGeometry/Cohomology/Derived/AffineVanishing.lean` together with
-     finite free resolutions and the truncation argument, and that is the
-     natural next slice; it is done, see 4.
+     `…_of_preservesInjectiveObjects`, do not apply to `Coh X`: it has neither
+     enough projectives nor enough injectives. For `X = Spec R` with `R`
+     noetherian, scoping on 2026-09-10 found that a finite-free-resolution
+     argument needs `Ext^i_{X.Modules}(𝒪_X, N~) = 0` for `i > 0`, and the
+     affine vanishing in `Cohomology/Derived/AffineVanishing.lean` is stated
+     for `Sheaf.H`, the `Ext` of *abelian* sheaves out of the constant sheaf.
+     Bridging the two needs either injective module sheaves to be flasque
+     plus flasque abelian sheaves to be `Sheaf.H`-acyclic (the Čech
+     comparison in `Sites/SheafCohomology/Cech/Comparison.lean` gives
+     acyclicity only from Čech exactness), or `tilde` of an injective module
+     to be an injective module sheaf (Hartshorne III.3.4, which needs
+     Artin--Rees, absent from Mathlib). `tilde` is also not yet known to be
+     exact in the tree. Each of these is its own lane; the first was taken, see 4.
   4. *Affine noetherian schemes satisfy `CoherentExtComparison`* (2026-09-10,
      same lane). `AlgebraicGeometry/DerivedCategory/Dqc/AffineIdentification.lean`
      proves `coherentExtComparison_spec` for `Spec R`, `R` noetherian, by
