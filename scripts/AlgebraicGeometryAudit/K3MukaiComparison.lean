@@ -30,7 +30,26 @@ t0 > 0 are assumed; no Riemann--Roch input is added here.
 
 Nothing identifies either carrier with K_num(X) for a geometric K3. -/
 
+/-! ## The spherical chart's integral comparison
+
+Walls/Spherical/Basic said of IntegralComparison that it is "supplied, never
+constructed -- producing one is the geometric obligation of exhibiting NS(X)
+with its intersection form", and NOTHING in the tree constructed one, so
+pairing_map, selfPairing_map and isSpherical_map_iff were vacuous.
+k3IntegralComparison is the first witness: on the degree-2d K3 the obligation is
+the rank-one lattice ZH, the map is the inclusion of Z into the divisor line,
+and the forms agree by k3LatticeMap_pairing.
+
+This is a DIFFERENT structure from the Mukai comparison in the same file. Its
+compat field is stated on all of Z, not on the image of a first Chern class, so
+it is a genuine comparison of forms rather than a constraint on one map.
+k3IntegralComparison_map_eq_extendMap records that the two nevertheless send an
+integral class to the same real triple. -/
+
 #print axioms AlgebraicGeometry.Numerical.Examples.extendMap_k3LatticeMap_injective
+#print axioms AlgebraicGeometry.Numerical.Examples.k3IntegralComparison
+#print axioms AlgebraicGeometry.Numerical.Examples.k3IntegralComparison_map_eq_extendMap
+#print axioms AlgebraicGeometry.Numerical.Examples.k3IntegralComparison_toFun
 #print axioms AlgebraicGeometry.Numerical.Examples.k3LatticeMap
 #print axioms AlgebraicGeometry.Numerical.Examples.k3LatticeMap_apply
 #print axioms AlgebraicGeometry.Numerical.Examples.k3LatticeMap_pairing
@@ -38,5 +57,6 @@ Nothing identifies either carrier with K_num(X) for a geometric K3. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_integral_spherical_walls
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_isSphericalClass_mukaiVector
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_isSphericalClass_of_isSpherical
+#print axioms AlgebraicGeometry.Numerical.Examples.k3_isSpherical_map_iff
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_mukaiVector_eq_extendMap
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_realPairing_extendMap
