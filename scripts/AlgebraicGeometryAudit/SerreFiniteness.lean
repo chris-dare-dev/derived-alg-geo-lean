@@ -5,13 +5,12 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Projective
 
 ## The middle of an exact pair between finite modules is finite (LinearAlgebra)
 
-`Submodule.fg_of_fg_map_of_fg_inf_ker` at `s = ⊤`: the range of the second map is a submodule
-of a finite module over a division ring, and the kernel is the range of the first map. The step
-every degree of a dévissage takes. -/
+`Function.Exact.module_finite_of_finite` is the step every degree of a dévissage takes, and it is
+audited in `StabilityConditionAudit/SerreFinitenessLinear.lean`, not here. The sweep routes a
+declaration by the module that declares it, and that one is declared under
+`DerivedAlgGeo/LinearAlgebra/`, which `EnumDecls.libraryOf` sends to `StabilityCondition`.
 
-#print axioms Function.Exact.module_finite_of_finite
-
-/-! ## The connecting map is base-field linear (Cohomology/Finiteness/LinearConnecting.lean)
+## The connecting map is base-field linear (Cohomology/Finiteness/LinearConnecting.lean)
 
 `coherentConnectingMap` is Mathlib's Ext connecting homomorphism; the scalar endomorphisms of the
 three terms of a short exact sequence form a morphism of short exact sequences, and

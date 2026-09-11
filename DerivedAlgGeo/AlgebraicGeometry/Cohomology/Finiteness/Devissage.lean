@@ -50,9 +50,14 @@ namespace AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
+omit [IsVariety k X] in
 /-- **Cohomology of a finite coproduct of coherent sheaves with finite-dimensional cohomology is
 finite-dimensional.** `linearCoherentH` is additive, so it preserves finite coproducts, and a
-finite coproduct in `ModuleCat k` is a finite product of vector spaces. -/
+finite coproduct in `ModuleCat k` is a finite product of vector spaces.
+
+Additivity of `linearCoherentH` needs no variety hypothesis, so `IsVariety` is omitted rather
+than carried: `runLinter`'s `unusedArguments` rejects a section instance a declaration does not
+use. -/
 theorem module_finite_linearCoherentH_coproduct [IsLocallyNoetherian X] {J : Type u} [Finite J]
     (G : J → Coh X) (i : ℕ) (hG : ∀ j, Module.Finite k ((linearCoherentH k X i).obj (G j))) :
     Module.Finite k ((linearCoherentH k X i).obj (∐ G)) := by
