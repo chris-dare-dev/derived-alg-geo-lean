@@ -45,6 +45,7 @@ no Riemann--Roch input is added: `mukaiVector_k3` already evaluated the integral
 vector, and this file only compares.
 -/
 
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
 open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial
 
 namespace AlgebraicGeometry.Numerical
@@ -156,6 +157,45 @@ theorem k3_extendMap_mem_integralExtension (δ : Mukai.MukaiLattice ℤ) :
   show k3LatticeMap δ.2.1 ∈ Submodule.span ℤ (Set.range surfaceDivisorBasis)
   rw [hrange, k3LatticeMap_apply]
   exact hone δ.2.1
+
+/-! ### The spherical chart's integral comparison -/
+
+/-- **The first witness for `Spherical.IntegralComparison`.**
+
+`Walls/Spherical/Basic.lean` says of that structure: "it is supplied, never
+constructed — producing one is the geometric obligation of exhibiting `NS(X)`
+with its intersection form", and nothing in the tree constructed one, so
+`pairing_map`, `selfPairing_map` and `isSpherical_map_iff` were all vacuous.
+
+On the degree-`2d` K3 the obligation is discharged by the rank-one lattice
+`ℤ·H`: the map is the inclusion of `ℤ` into the divisor line and the forms agree
+by `k3LatticeMap_pairing`.
+
+Note this is a **different** structure from the Mukai comparison above.  Its
+`compat` field is stated on all of `ℤ`, not on the image of a first Chern class,
+so it is a genuine comparison of forms rather than a constraint on one map. -/
+def k3IntegralComparison (d : ℕ) :
+    Wall.Spherical.IntegralComparison
+      (surfaceDivisorSpace (2 * (d : ℝ))).intersection (k3MukaiForm d) where
+  toFun := (k3LatticeMap : ℤ →ₗ[ℤ] SurfaceDivisor).toAddMonoidHom
+  compat := k3LatticeMap_pairing d
+
+@[simp]
+theorem k3IntegralComparison_toFun (d : ℕ) (n : ℤ) :
+    (k3IntegralComparison d).toFun n = ((n : ℤ) : ℝ) := rfl
+
+/-- **Integral and real sphericality agree in the `(β, ω)` chart**, on the K3
+model.  This is `isSpherical_map_iff` with the witness supplied. -/
+theorem k3_isSpherical_map_iff (d : ℕ) (v : Mukai.MukaiLattice ℤ) :
+    Wall.Spherical.IsSpherical (surfaceDivisorSpace (2 * (d : ℝ))).intersection
+        ((k3IntegralComparison d).map v)
+      ↔ Mukai.IsSpherical (k3MukaiForm d) v :=
+  Wall.Spherical.isSpherical_map_iff (k3IntegralComparison d) v
+
+/-- The spherical chart's comparison agrees with the period-domain one: both
+send an integral class to the same real triple. -/
+theorem k3IntegralComparison_map_eq_extendMap (d : ℕ) (v : Mukai.MukaiLattice ℤ) :
+    (k3IntegralComparison d).map v = Mukai.extendMap k3LatticeMap v := rfl
 
 /-! ### Wall finiteness, over integral classes -/
 
