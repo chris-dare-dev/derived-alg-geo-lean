@@ -7,7 +7,5 @@ These declarations are reductions with explicit geometric premises.  They do not
 Ext-finiteness or `MuHNInput` instance.
 -/
 
-#print axioms
-  AlgebraicGeometry.ProjectivePresentation.module_finite_ambientExt_of_coherent_presentations
-#print axioms
-  AlgebraicGeometry.ProjectivePresentation.module_finite_ambientExt_of_restrictedTwists
+#print axioms AlgebraicGeometry.ProjectivePresentation.module_finite_ambientExt_of_coherent_presentations
+#print axioms AlgebraicGeometry.ProjectivePresentation.module_finite_ambientExt_of_restrictedTwists
