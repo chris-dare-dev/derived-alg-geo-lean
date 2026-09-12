@@ -376,6 +376,38 @@ theorem HomogeneousNatTrans.shiftedDegreeZero_isClosed {F G : DGFunctor C D}
   rw [hα.app_d X, IsShiftBy.shiftMap_zero, smul_zero] at hd
   exact hd
 
+/-- Pointwise shifting takes the identity transformation to the identity. -/
+@[simp]
+theorem HomogeneousNatTrans.shiftedDegreeZero_id (F : DGFunctor C D) (n : ℤ) :
+    HomogeneousNatTrans.shiftedDegreeZero (HomogeneousNatTrans.id F) n =
+      HomogeneousNatTrans.id (F.shiftedFunctor n) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  rw [HomogeneousNatTrans.shiftedDegreeZero_app,
+    HomogeneousNatTrans.id_app, HomogeneousNatTrans.id_app]
+  exact IsShiftBy.shiftMap_id (F.shiftWitness n X)
+
+/-- Pointwise shifting preserves vertical composition of degree-zero
+transformations. -/
+theorem HomogeneousNatTrans.shiftedDegreeZero_comp {F G H : DGFunctor C D}
+    (α : HomogeneousNatTrans F G 0) (β : HomogeneousNatTrans G H 0) (n : ℤ) :
+    HomogeneousNatTrans.shiftedDegreeZero
+        (HomogeneousNatTrans.composition F G H 0 0 0 (by omega) α β) n =
+      HomogeneousNatTrans.composition (F.shiftedFunctor n) (G.shiftedFunctor n)
+        (H.shiftedFunctor n) 0 0 0 (by omega)
+          (HomogeneousNatTrans.shiftedDegreeZero α n)
+          (HomogeneousNatTrans.shiftedDegreeZero β n) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  rw [HomogeneousNatTrans.shiftedDegreeZero_app,
+    HomogeneousNatTrans.composition_apply_app,
+    HomogeneousNatTrans.composition_apply_app,
+    HomogeneousNatTrans.shiftedDegreeZero_app,
+    HomogeneousNatTrans.shiftedDegreeZero_app]
+  exact IsShiftBy.shiftMap_comp (F.shiftWitness n X) (G.shiftWitness n X)
+    (H.shiftWitness n X) 0 0 0 (by omega)
+      (HomogeneousNatTrans.app α X) (HomogeneousNatTrans.app β X)
+
 end ShiftTransformation
 
 /-! ### Coherence of the shift in the degree
