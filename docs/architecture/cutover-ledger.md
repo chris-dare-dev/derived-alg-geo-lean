@@ -7,6 +7,31 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Right-adjunction unit kernels and literal unit triangles (2026-09-12):
+  `FourierMukai.AdjunctionUnitKernelData` and its enhanced cone form are
+  definitional specializations of the generic kernel-transformation roots,
+  providing their second consumer without a parallel record or normalization
+  proof.  They package the supplied kernel arrow `O_Δ ⟶ P ⋆ Q`, its exact
+  transform equation, and the source-natural triangle
+  `𝟭 X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭 X)⟦1⟧`, pointwise distinguished under
+  the existing exactness hypotheses.  The third functor is the unshifted cotwist-cone
+  candidate only: inverse rotation, its `[-1]` shift, exactness,
+  autoequivalence, and sphericality remain separate seams.
+- Generic enhanced kernel-transformation cones (2026-09-12):
+  `Enhancement.liftedCocycle` and `Enhancement.conePresentation` own the
+  noncanonical lift of an ordinary morphism to a closed representative and dg
+  cone.  `FourierMukai.KernelTransformationData` packages a kernel morphism
+  whose transform is a named natural transformation in supplied endpoint
+  presentations; `KernelTransformationConeData` adds the enhanced choices and
+  forgets back one way.  Its `normalizationData` feeds the reusable
+  `Correspondence.KernelConeNormalizationData`, which owns transport to a
+  source-natural triangle with literal endpoints and first map.  The counit
+  kernel records now delegate to these generic owners without changing their
+  public contracts, with inverse adapters and simp round trips proving the two
+  presentations equivalent.  Fullness remains only a sufficient constructor,
+  choices remain noncanonical, and the normalized result is only pointwise
+  distinguished: no exactness, functor-category distinguishedness,
+  autoequivalence, or sphericality is inferred.
 - Literal Fourier--Mukai counit triangles (2026-09-12):
   `CounitKernelConeData.counitTriangleInSource` transports the raw transform
   triangle of an enhanced counit-kernel cone to a source-natural triangle with

@@ -702,6 +702,15 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₂
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₃
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_distinguished
+#print axioms CategoryTheory.Enhancement.conePresentation
+#print axioms CategoryTheory.Enhancement.conePresentation_arrow
+#print axioms CategoryTheory.Enhancement.conePresentation_source
+#print axioms CategoryTheory.Enhancement.conePresentation_target
+#print axioms CategoryTheory.Enhancement.counit_conjugate_conePresentation_arrow
+#print axioms CategoryTheory.Enhancement.counit_conjugate_liftedCocycle
+#print axioms CategoryTheory.Enhancement.homMk_conePresentation_arrow
+#print axioms CategoryTheory.Enhancement.homMk_liftedCocycle
+#print axioms CategoryTheory.Enhancement.liftedCocycle
 
 -- Closed degree-zero dg natural transformations descend to `H⁰`, and a dg
 -- adjunction is an adjunction there.  This is the adapter that makes dg data
