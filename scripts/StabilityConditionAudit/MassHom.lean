@@ -1,0 +1,27 @@
+/-
+Mass--Hom slice of the StabilityCondition audit. The predicate is abstract;
+the scheme-perfect test class is audited on the geometry side.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasGlobalMassHomBound
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.anti
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.top_iff
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.bound_congr
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.congr
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.exists_semistable_bound
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.bound_shift_one
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.bound_shift_neg_one
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.shift_one
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.shift_neg_one
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.autPair_act
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.autPair_act_iff
+#print axioms CategoryTheory.Triangulated.HNFiltration.relabelStability
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.glMassBound
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.glMassBound_pos
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.stabilityMass_smul_le
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.stabilityMass_le_smul
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.gltilde_smul
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.gltilde_smul_iff
