@@ -7,15 +7,25 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Sign-correct exactness of integral shift functors (2026-09-12):
+  `Triangulated.ShiftFunctor` now owns the explicit Koszul-signed `CommShift`
+  on `[n]`, its comparison with `Triangle.shiftFunctor`, and
+  triangulatedness for every `n : ℤ`.  The unsigned `CommShift` remains
+  available as explicit data for object-only uses, but neither package is a
+  global instance.  The stability-action `[±2]` implementation is reduced to
+  compatibility wrappers over this root.  This closes the odd-shift sign
+  seam; composing it with an already exact functor is a downstream operation,
+  not another shift-functor abstraction.
 - Exactness of the four stored dg adjunction cones (2026-09-12):
   `EnhancedAdjunctionCones` now exposes shift preservation, chosen-cone
   preservation, the induced `H⁰` `CommShift`, and triangulatedness for the
   twist, dual cotwist, and the unshifted cones underlying the dual twist and
   cotwist.  Every result reuses the generic adjunction-cone 3-by-3 theorem and
   asks only for preservation of chosen cones by the relevant adjoint pair.
-  This does not claim exactness for the two conventional `[-1]` shifted
-  functors: the sign-correct `CommShift` for an odd shift remains a separate
-  categorical seam.  No cone relation, equivalence, or sphericality follows.
+  This does not itself claim exactness for the two conventional `[-1]`
+  shifted functors; those now require composition with the separate signed
+  shift-functor interface.  No cone relation, equivalence, or sphericality
+  follows.
 - Conventional shifted dg twists on `H⁰` (2026-09-12):
   `DGFunctor.shiftedFunctor_h0_eq` and `shiftedFunctorH0Iso` package the
   objectwise and morphism computations as a functor-level comparison
