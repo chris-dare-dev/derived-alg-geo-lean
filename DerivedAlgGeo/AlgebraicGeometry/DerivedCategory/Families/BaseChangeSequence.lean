@@ -108,6 +108,26 @@ theorem shiftedPerfectGeneratorsSemiorthogonal_of_externalProducts
   simpa [Category.assoc] using
     horth hij Fi Gi Fj Gj a b (eSource.hom ≫ f ≫ eTarget.hom)
 
+/-- Shifted-generator semiorthogonality implies the concrete morphism-level
+vanishing statement. -/
+theorem perfectExternalProductsSemiorthogonal_of_shiftedGenerators
+    (horth : D.ShiftedPerfectGeneratorsSemiorthogonal A) :
+    D.PerfectExternalProductsSemiorthogonal A := by
+  intro i j hij Fi Gi Fj Gj a b f
+  exact horth hij _
+    (D.externalProduct_shift_mem_shiftedPerfectGenerators
+      (A.component j) Fj Gj b) f
+    (D.externalProduct_shift_mem_shiftedPerfectGenerators
+      (A.component i) Fi Gi a)
+
+/-- The paper-facing Hom-vanishing statement is exactly shifted-generator
+semiorthogonality. -/
+theorem perfectExternalProductsSemiorthogonal_iff_shiftedGenerators :
+    D.PerfectExternalProductsSemiorthogonal A ↔
+      D.ShiftedPerfectGeneratorsSemiorthogonal A :=
+  ⟨D.shiftedPerfectGeneratorsSemiorthogonal_of_externalProducts A,
+    D.perfectExternalProductsSemiorthogonal_of_shiftedGenerators A⟩
+
 /-- The geometric Hom-vanishing input between the perfect base-change
 envelopes. This obligation is isolated from the formal closure arguments. -/
 def PerfectComponentsSemiorthogonal : Prop :=

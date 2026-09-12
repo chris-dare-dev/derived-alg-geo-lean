@@ -223,12 +223,32 @@ def perfectGenerators (D : KFlatBaseChangeData X T)
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   perfectBaseChangeGenerators X T P (D.externalProduct P)
 
+/-- Every concrete K-flat external product belongs to the corresponding
+generator property. -/
+theorem externalProduct_mem_perfectGenerators
+    (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (F : SourcePerfectPartCategory X P) (G : CompactDqcFiber T) :
+    D.perfectGenerators P (((D.externalProduct P).obj F).obj G) :=
+  ⟨F, G, ⟨Iso.refl _⟩⟩
+
 /-- The K-flat external-product generators together with all their shifts and
 isomorphic copies. -/
 def shiftedPerfectGenerators (D : KFlatBaseChangeData X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   (D.perfectGenerators P).shiftClosure ℤ
+
+/-- Every shift of a concrete K-flat external product belongs to the shifted
+generator property. -/
+theorem externalProduct_shift_mem_shiftedPerfectGenerators
+    (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (F : SourcePerfectPartCategory X P) (G : CompactDqcFiber T) (n : ℤ) :
+    D.shiftedPerfectGenerators P
+      ((((D.externalProduct P).obj F).obj G)⟦n⟧) :=
+  ⟨((D.externalProduct P).obj F).obj G, n, Iso.refl _,
+    D.externalProduct_mem_perfectGenerators P F G⟩
 
 instance shiftedPerfectGenerators_isStableUnderShift
     (D : KFlatBaseChangeData X T)
