@@ -26,6 +26,19 @@ v1 Theorem 2.31 is v2 Theorem 2.35. Validate with:
 python scripts/check_coverage_map.py registry/coverage-2501.00710.json
 ```
 
+## The 2608.14540v1 coverage map — full support from mass--Hom
+
+`coverage-2608.14540.json` pins Yiran Cheng, *A remark on the full support
+property*, arXiv:2608.14540**v1** (14 August 2026, 12 pages).  Its three
+near-term coordinates are Theorem 2.1 with Remark 2.2, Theorem 3.2 with its
+uniform mass--Hom definition, and Theorem 4.2.  Every entry remains `target`,
+so the map asserts no theorem coverage and mints no citation key. Validate
+with:
+
+```sh
+python scripts/check_coverage_map.py registry/coverage-2608.14540.json
+```
+
 ## The 1902.08184v4 coverage map — not a mint surface
 
 `coverage-1902.08184v4.json` (issue #87) pins arXiv:1902.08184**v4**
