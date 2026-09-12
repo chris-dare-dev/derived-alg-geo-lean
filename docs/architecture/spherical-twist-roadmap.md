@@ -263,8 +263,8 @@ that comparison are instance hypotheses to be discharged by the realization.
    gives identity minus the evaluation functor on `K₀`.
    `EvaluationData.IsEulerCopower` names the explicit, choice-invariant
    realization capability that its class is `chiHom k C E X • [E]`; under
-   that input the induced object-twist map is exactly the existing numerical
-   `twistK₀`.
+   that input the object classes match the existing numerical `twistK₀`
+   formula, and together with chosen-cone preservation the induced maps match.
    None of these results is sphericality, which still needs all four
    Anno--Logvinenko conditions and the Morita framework above.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise

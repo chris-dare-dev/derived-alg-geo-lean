@@ -28,7 +28,8 @@ adjoints.  Their distinguished triangles compute the four conventional
 functors' `K₀` actions as the identity minus the corresponding adjunction
 composite.  The object-twist triangle similarly acts as identity minus its
 evaluation functor, and the explicit `IsEulerCopower` realization capability
-identifies that action with the existing numerical `twistK₀`.  It
+identifies its object classes with the existing numerical `twistK₀` formula;
+together with chosen-cone preservation it identifies the induced maps.  It
 deliberately stops short of asserting sphericality: the
 adjoint-comparison maps and the Morita/higher-cone theorem of
 Anno--Logvinenko are not yet repository primitives.  The object-specific

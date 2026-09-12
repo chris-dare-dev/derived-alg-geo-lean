@@ -8,11 +8,15 @@ blocks should normally move it rather than add more declarations beside it.
 ## Completed roots
 
 - Object-twist `K₀` action and Euler-realization boundary (2026-09-12):
-  `SphericalTwist.ObjectTwistK0` derives the class and map of the enhanced
-  object twist as identity minus its evaluation functor.  The explicit,
-  choice-invariant `EvaluationData.IsEulerCopower` capability says exactly
-  when that evaluation class is the Euler multiple of `[E]`; from it the
-  object-twist map is proved equal to the existing numerical `twistK₀`.
+  `DGEnhancement.H0.NaturalTransformationConeK0` owns the reusable theorem
+  that a functorial cone acts on `K₀` by target endpoint minus source
+  endpoint, both on generators and, under endpoint cone preservation, as a
+  homomorphism.  The object twist specializes this to identity minus its
+  evaluation functor.  `DGEnhancement.H0.ObjectTwistK0` owns the explicit,
+  choice-invariant `EvaluationData.IsEulerCopower` capability saying exactly
+  when that evaluation class is the Euler multiple of `[E]`.  Together with
+  chosen-cone preservation, the spherical consumer proves that the induced
+  object-twist map equals the existing numerical `twistK₀`.
   This capability is supplied realization input, not a consequence of the
   present additive `IsCopowerOf`, which represents ℤ-additive rather than
   `k`-linear cochains.  A scalar-linear copower layer, its homotopy invariance,

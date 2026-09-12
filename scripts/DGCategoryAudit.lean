@@ -627,6 +627,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.mk.inj
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.mk.sizeOf_spec
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.obj
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.functorK₀Of
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.functorK₀Map
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.IsClosed.app_mem_cocycles
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.chosenConeData
 
@@ -1137,6 +1139,10 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.compare_comp_evaluation
 #print axioms CategoryTheory.EvaluationData.preservesChosenConesOfCompare
 #print axioms CategoryTheory.EvaluationData.compare_evaluation_square
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Of
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Map
+#print axioms CategoryTheory.EvaluationData.IsEulerCopower
+#print axioms CategoryTheory.EvaluationData.IsEulerCopower.ofCompare
 
 -- The Seidel--Thomas twist of an *object*: the cone of `RHom(E,-) ⊗ E ⟶ id`.
 -- `evaluation_isClosed` is the whole input beyond the generic cone layer, and

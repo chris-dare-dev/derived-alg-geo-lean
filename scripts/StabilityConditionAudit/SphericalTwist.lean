@@ -174,14 +174,9 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistFunctorK₀Of
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistFunctorK₀Map
 
--- The object-twist triangle has the same categorical identity-minus-endpoint
--- formula.  Its comparison with numerical twistK₀ is conditional on the
--- explicit, choice-invariant Euler-copower realization capability; the audit
--- does not treat that capability as following from additive copowers.
-#print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Of
-#print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Map
-#print axioms CategoryTheory.EvaluationData.IsEulerCopower
-#print axioms CategoryTheory.EvaluationData.IsEulerCopower.ofCompare
+-- The generic cone subtraction and Euler-copower capability are owned and
+-- audited by the DG-enhancement root.  This consumer audits only their two
+-- comparisons with the numerical object-twist formula.
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Of_eq_twistK₀
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Map_eq_twistK₀
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist
