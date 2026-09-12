@@ -1,0 +1,109 @@
+{
+  "_readme": [
+    "Coverage map for arXiv:2608.14540v1 -- 'A remark on the full support property', Yiran Cheng. Created for GitHub #1184.",
+    "",
+    "THIS IS NOT A TRUST RECORD AND NOT A MINT SURFACE. It is a zero-claim map of the paper's four sections and three main theorem coordinates. formalization.yaml's source remains the Bridgeland 2007 record, and registry/bridgeland2007.json remains the only mint surface. Every status in this file is target.",
+    "",
+    "Validation: python scripts/check_coverage_map.py registry/coverage-2608.14540.json",
+    "",
+    "Update ownership: the owner (Chris Dare) promotes statuses. Agents may add or correct coordinates, but a promotion requires the evidence fields enforced by the validator and formalized additionally requires explicit owner acceptance.",
+    "",
+    "Provenance: metadata and submission history were checked against the arXiv abstract and OAI pages on 2026-09-12. Section titles and statement numbering were read with pdftotext -layout from the pinned v1 PDF. No corpus extraction was used."
+  ],
+  "schema": "coverage-map/1",
+  "created": "2026-09-12",
+  "issue": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/1184",
+  "source": {
+    "title": "A remark on the full support property",
+    "authors": [
+      "Yiran Cheng"
+    ],
+    "arxiv_id": "2608.14540",
+    "arxiv_version": "v1",
+    "version_submitted_utc": "2026-08-14T17:52:02Z",
+    "version_history": [
+      {
+        "version": "v1",
+        "submitted_utc": "2026-08-14T17:52:02Z",
+        "source_size": "35 KB"
+      }
+    ],
+    "latest_version_at_pin_time": "v1",
+    "doi": "10.48550/arXiv.2608.14540",
+    "primary_category": "math.AG",
+    "comments": "12 pages",
+    "pinned_from": "https://arxiv.org/abs/2608.14540v1 and the arXiv OAI record (identity and submission history), plus https://arxiv.org/pdf/2608.14540v1 (section titles and numbering), fetched 2026-09-12.",
+    "pdf_sha256": "bf1ca5947111cf2b543b39f792f9b330e8530703b4150732fea524b23b929e94",
+    "pdf_bytes": 437593,
+    "pdf_pages": 12,
+    "pdf_pin_caveat": "The hash pins the artifact as served on 2026-09-12. arXiv PDFs may be re-rendered without a content change; the durable identity is (arxiv_id, version, version_submitted_utc, doi)."
+  },
+  "corpus_note": {
+    "arxiv_version_in_corpus": "not used as evidence by this map",
+    "mint_rule": "No durable key in this repository may be derived from a corpus identifier or notebook slug. This file contains neither."
+  },
+  "status_vocabulary": {
+    "target": "Named for future work. No claim of any kind.",
+    "mapped": "Specific Lean declarations are candidate counterparts of a specific v1 statement. Still no coverage claim; complete evidence is required.",
+    "reviewed": "A candidate binding has been reviewed against the pinned v1 artifact. Complete evidence is required.",
+    "formalized": "Reviewed and explicitly accepted by the owner. The only status that counts as coverage."
+  },
+  "parts": [
+    {
+      "part": "sec-1",
+      "title": "1. Introduction",
+      "status": "target"
+    },
+    {
+      "part": "sec-2",
+      "title": "2. Absolute case",
+      "status": "target",
+      "sections": [
+        "Theorem 2.1",
+        "Remark 2.2",
+        "Corollary 2.3"
+      ]
+    },
+    {
+      "part": "sec-3",
+      "title": "3. Relative case",
+      "status": "target",
+      "sections": [
+        "Definition 3.1",
+        "Theorem 3.2",
+        "Corollary 3.5"
+      ]
+    },
+    {
+      "part": "sec-4",
+      "title": "4. The distinguished connected component",
+      "status": "target",
+      "sections": [
+        "Theorem 4.2"
+      ]
+    }
+  ],
+  "near_term_coordinates": [
+    {
+      "id": "cheng-v1-theorem-2-1-full-support",
+      "coordinate": "Section 2, Theorem 2.1 and Remark 2.2",
+      "status": "target",
+      "tracking_issue": 1184,
+      "note": "The categorical finite-Euler-probe core and the eventual proper-scheme bridge. Target status asserts no correspondence with Lean declarations."
+    },
+    {
+      "id": "cheng-v1-theorem-3-2-uniform-full-support",
+      "coordinate": "Section 3, Definition 3.1 and Theorem 3.2",
+      "status": "target",
+      "tracking_issue": 1184,
+      "note": "Uniform relative mass-Hom and support. Target only; it depends on the relative stability interface."
+    },
+    {
+      "id": "cheng-v1-theorem-4-2-canonical-component",
+      "coordinate": "Section 4, Theorem 4.2",
+      "status": "target",
+      "tracking_issue": 1184,
+      "note": "Polarization-independence of the distinguished full numerical component. Target only."
+    }
+  ]
+}
