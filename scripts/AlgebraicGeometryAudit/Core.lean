@@ -1349,6 +1349,18 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Coh.ιAffineFreeIso
 #print axioms Coh.exists_affineFree_epi
 
+-- Noetherianity from algebraic modules through the affine comparison, followed by finite-cover
+-- descent using restriction and stalkwise detection of isomorphisms.
+#print axioms ModuleCat.isNoetherianObject_of_isNoetherian
+#print axioms FGModuleCat.isNoetherianObject
+#print axioms Coh.restrict
+#print axioms Coh.restrictCompι
+#print axioms Coh.restrict_preservesMonomorphisms
+#print axioms Coh.restrict_jointlyReflectsIsomorphisms
+#print axioms Coh.isNoetherianObject_affine
+#print axioms Coh.isNoetherianObject_of_finite_openCover
+#print axioms Coh.isNoetherianObject
+
 -- Layer B stage 1: kernels and cokernels. Restriction along open immersions is left exact,
 -- localization commutes with kernels, and the affine comparison transports both ambient
 -- (co)kernels to finite modules. The final instances create (co)kernels in `Coh X`.

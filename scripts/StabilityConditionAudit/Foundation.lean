@@ -3,6 +3,7 @@ Foundation slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
 import DerivedAlgGeo.CategoryTheory.SubobjectEquivalence
+import DerivedAlgGeo.CategoryTheory.Subobject.NoetherianObject
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
@@ -1575,3 +1576,12 @@ in `WeakTruncation.lean` already does that and is reused. -/
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.congrFiltration_n
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.congrFiltration_μ
 #print axioms CategoryTheory.Triangulated.WeakSlopeData.congr_hasHNProperty
+
+/-! ### Noetherian objects detected by functors
+
+A finite dependent family of mono-preserving functors detects the ascending-chain condition when
+it jointly reflects isomorphisms. The one-functor specialization feeds the module and affine
+geometric realizations. -/
+
+#print axioms CategoryTheory.isNoetherianObject_of_finite_jointlyReflectsIsomorphisms
+#print axioms CategoryTheory.isNoetherianObject_of_reflectsIsomorphisms
