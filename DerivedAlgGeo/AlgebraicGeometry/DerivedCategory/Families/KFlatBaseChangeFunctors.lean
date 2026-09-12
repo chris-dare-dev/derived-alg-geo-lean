@@ -34,6 +34,44 @@ abbrev baseChangeMap (X : SchemeBaseChange S) {T U : SchemeBaseChange S} (f : T 
     X ⨯ T ⟶ X ⨯ U :=
   Limits.prod.map (𝟙 X) f
 
+/-- The square formed by `X ×_S f` and the second projections is a
+pullback square in the category of schemes over `S`. -/
+theorem baseChangeMap_isPullback (X : SchemeBaseChange S)
+    {T U : SchemeBaseChange S} (f : T ⟶ U) :
+    IsPullback (baseChangeSnd X T) (baseChangeMap X f) f
+      (baseChangeSnd X U) := by
+  apply IsPullback.mk'
+  · simp only [baseChangeSnd, baseChangeMap, Limits.prod.map_snd]
+  · intro Z φ φ' hfst hsnd
+    apply Limits.prod.hom_ext
+    · have h := congrArg (fun k ↦ k ≫ Limits.prod.fst) hsnd
+      simpa only [Category.assoc, baseChangeMap, Limits.prod.map_fst,
+        Category.comp_id] using h
+    · exact hfst
+  · intro Z a b h
+    refine ⟨Limits.prod.lift (b ≫ Limits.prod.fst) a, ?_, ?_⟩
+    · exact Limits.prod.lift_snd _ _
+    · apply Limits.prod.hom_ext
+      · simp only [Category.assoc, baseChangeMap, Limits.prod.map_fst,
+          Category.comp_id, Limits.prod.lift_fst]
+      · simp only [baseChangeMap]
+        rw [Category.assoc, Limits.prod.map_snd, ← Category.assoc,
+          Limits.prod.lift_snd]
+        exact h
+
+/-- Open immersions are preserved by the product base change `X ×_S -`. -/
+theorem isOpenImmersion_baseChangeMap (X : SchemeBaseChange S)
+    {T U : SchemeBaseChange S} (f : T ⟶ U) [IsOpenImmersion f.left] :
+    IsOpenImmersion (baseChangeMap X f).left := by
+  exact (@IsOpenImmersion).of_isPullback
+    ((Over.forget S).map_isPullback (baseChangeMap_isPullback X f))
+    (by change IsOpenImmersion f.left; infer_instance)
+
+instance (priority := 900) isOpenImmersionBaseChangeMap
+    (X : SchemeBaseChange S) {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsOpenImmersion f.left] : IsOpenImmersion (baseChangeMap X f).left :=
+  isOpenImmersion_baseChangeMap X f
+
 namespace DqcLeftDerivedPullback
 
 variable {V W : SchemeBaseChange S} {f : V ⟶ W}
@@ -81,6 +119,20 @@ def pullbackAlong (D : KFlatBaseChangeData X U) (f : T ⟶ U)
     DqcLeftDerivedPullback (baseChangeMap X f) :=
   kFlatDqcLeftDerivedPullback D.tensorResolution (baseChangeMap X f)
     hAcyclic hQuasicoherent
+
+/-- For an open immersion of bases, the honest ambient left-derived functor
+underlying the K-flat pullback is essentially surjective.  Open immersions are
+stable under the product base change `X ×_S -`, and the preceding geometric
+construction applies to that induced open immersion. -/
+noncomputable instance pullbackAlong_ambient_essSurj_of_isOpenImmersion
+    (D : KFlatBaseChangeData X U) (f : T ⟶ U)
+    (hAcyclic : KFlatPullbackAcyclic D.tensorResolution (baseChangeMap X f))
+    (hQuasicoherent : KFlatResolvedPullbackPreservesQuasicoherentCohomology
+      D.tensorResolution (baseChangeMap X f)) [IsOpenImmersion f.left] :
+    (D.pullbackAlong f hAcyclic hQuasicoherent).ambient.functor.EssSurj := by
+  letI : IsOpenImmersion (baseChangeMap X f).left := by infer_instance
+  dsimp [pullbackAlong, kFlatDqcLeftDerivedPullback]
+  exact LeftDerivedPullback.essSurj_of_isOpenImmersion _
 
 /-- The exact component-level statement that pullback along `f` preserves the constructed
 quasicoherent base-change component. -/

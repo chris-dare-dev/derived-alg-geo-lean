@@ -141,6 +141,10 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.openImmersionModulePullback_preservesFiniteLimits
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isExactPullback_of_isOpenImmersion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isExactPullbackOfIsOpenImmersion
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.openImmersionModulePullbackPushforwardIso
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.openImmersionComplexExtension
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.openImmersionComplexPullbackExtensionIso
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullback_essSurj_of_isOpenImmersion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullback.congr_simp
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullbackFactors
@@ -170,6 +174,7 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.LeftDerivedPullback.exactComparison
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.LeftDerivedPullback.identity
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.LeftDerivedPullback.ofExact
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.LeftDerivedPullback.essSurj_of_isOpenImmersion
 
 /-! ## Functorial pullback-acyclic resolutions -/
 
@@ -794,6 +799,7 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.pullFst
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.pullSnd
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.pullbackAlong
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.pullbackAlong_ambient_essSurj_of_isOpenImmersion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.pullback_preservesBoundedComponent
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.pushforward_preservesBoundedComponent
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.quasicoherentComponent
@@ -833,6 +839,9 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.RightDerivedPushforward.ofExact
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.RightDerivedPushforward.unit
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.baseChangeMap
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.baseChangeMap_isPullback
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isOpenImmersion_baseChangeMap
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isOpenImmersionBaseChangeMap
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.complexPushforward
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPushforward
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPushforwardFactors

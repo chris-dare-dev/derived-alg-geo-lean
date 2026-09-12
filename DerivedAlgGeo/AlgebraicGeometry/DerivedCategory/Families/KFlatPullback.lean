@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.KFlatTensor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeCategory
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FlatPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.OpenImmersionPullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.PullbackAcyclicResolution
 
 /-!

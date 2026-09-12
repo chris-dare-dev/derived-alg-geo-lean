@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FlatPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.LeftDerivedPullback
 
 /-!
 # Exact pullback along open immersions
@@ -13,6 +14,12 @@ that comparison with the stalkwise-to-global criterion from
 `Families.FlatPullback` proves that pullback along every open immersion is
 exact.  Consequently its ordinary module pullback descends to the concrete
 derived fibers without an additional exactness hypothesis.
+
+Mathlib also identifies restriction after module-sheaf pushforward with the
+identity.  Applying that counit degreewise gives every complex on the open
+subscheme an extension to the ambient scheme.  After localization this proves
+that derived pullback along an open immersion is essentially surjective; no
+exactness of pushforward is needed for this objectwise extension argument.
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -108,6 +115,66 @@ instance (priority := 900) isExactPullbackOfIsOpenImmersion
     {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsOpenImmersion f.left] : IsExactPullback f :=
   isExactPullback_of_isOpenImmersion f
+
+/-! ## Essential surjectivity -/
+
+/-- Pushforward followed by pullback along an open immersion is naturally
+isomorphic to the identity on module sheaves.  The point is that pullback is
+restriction in this case, and Mathlib's restriction--pushforward adjunction
+has invertible counit. -/
+def openImmersionModulePullbackPushforwardIso
+    {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsOpenImmersion f.left] :
+    modulePushforward f ⋙ modulePullback f ≅ 𝟭 T.left.Modules :=
+  (Functor.isoWhiskerLeft (modulePushforward f)
+      (Scheme.Modules.restrictFunctorIsoPullback f.left)).symm ≪≫
+    Scheme.Modules.restrictFunctorAdjCounitIso f.left
+
+/-- Extend a complex on an open subscheme termwise by module-sheaf
+pushforward.  Pushforward need not be exact: this functor is used only to
+choose an ambient representative whose pullback is the original complex. -/
+abbrev openImmersionComplexExtension
+    {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U) :
+    CochainComplex T.left.Modules ℤ ⥤ CochainComplex U.left.Modules ℤ :=
+  (modulePushforward f).mapHomologicalComplex (ComplexShape.up ℤ)
+
+/-- Pulling back the termwise extension of a complex from an open subscheme
+recovers that complex. -/
+def openImmersionComplexPullbackExtensionIso
+    {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsOpenImmersion f.left] :
+    openImmersionComplexExtension f ⋙ complexPullback f ≅
+      𝟭 (CochainComplex T.left.Modules ℤ) :=
+  Functor.mapHomologicalComplexCompIso
+      (openImmersionModulePullbackPushforwardIso f) (ComplexShape.up ℤ) ≪≫
+    Functor.mapHomologicalComplexIdIso T.left.Modules (ComplexShape.up ℤ)
+
+/-- Derived pullback along an open immersion is essentially surjective.
+
+For a derived object on the open subscheme, choose a complex representative,
+extend it termwise by pushforward, and use the restriction--pushforward
+counit after applying the derived localization. -/
+noncomputable instance derivedPullback_essSurj_of_isOpenImmersion
+    {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsOpenImmersion f.left] : (derivedPullback f).EssSurj where
+  mem_essImage E := by
+    let K := (SchemeDerivedCategory.Q T.left).objPreimage E
+    let extension := (openImmersionComplexExtension f).obj K
+    refine ⟨(SchemeDerivedCategory.Q U.left).obj extension, ⟨?_⟩⟩
+    exact (derivedPullbackFactors f).app extension ≪≫
+      (SchemeDerivedCategory.Q T.left).mapIso
+        ((openImmersionComplexPullbackExtensionIso f).app K) ≪≫
+      (SchemeDerivedCategory.Q T.left).objObjPreimageIso E
+
+/-- Every genuine left-derived pullback along an open immersion is
+essentially surjective.  Uniqueness of left-derived functors identifies it
+with the exact model above. -/
+noncomputable instance LeftDerivedPullback.essSurj_of_isOpenImmersion
+    {S : Scheme.{u}} {T U : SchemeBaseChange S} {f : T ⟶ U}
+    (P : LeftDerivedPullback f) [IsOpenImmersion f.left] : P.functor.EssSurj := by
+  letI : (derivedPullback f).EssSurj :=
+    derivedPullback_essSurj_of_isOpenImmersion f
+  exact Functor.essSurj_of_iso P.exactComparison.symm
 
 end SchemeBaseChange
 
