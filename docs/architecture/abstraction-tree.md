@@ -153,7 +153,8 @@ Category
 │  ├─ kernelConeTransformTriangleFunctor  pointwise image of dg cones of an enhanced kernel category
 │  └─ CounitKernelData                    ordinary kernel arrow realizing an adjunction counit
 │     └─ CounitKernelConeData             noncanonical enhanced representative and dg cone
-│        └─ kernel-presented twist candidate exact image of its dg cone
+│        ├─ kernel-presented twist candidate       exact image of its dg cone
+│        └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only

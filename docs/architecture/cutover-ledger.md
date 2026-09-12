@@ -7,6 +7,17 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Literal Fourier--Mukai counit triangles (2026-09-12):
+  `CounitKernelConeData.counitTriangleInSource` transports the raw transform
+  triangle of an enhanced counit-kernel cone to a source-natural triangle with
+  vertices `Φ_Q ⋙ Φ_P`, `𝟭 Y`, and the kernel-presented twist, and with
+  first map literally the supplied adjunction counit.  The construction reuses
+  Mathlib's `Triangle.functorMk` and `Triangle.functorIsoMk`; the natural
+  comparison exposes all three components, and exact kernel evaluation makes
+  every value of the normalized family distinguished.  This is pointwise
+  distinguishedness only: it does not assert a distinguished triangle in the
+  functor category, exactness or autoequivalence of the twist, or independence
+  from the selected enhancement representative and cone.
 - Ordinary counit-kernel data and enhanced cone selection (2026-09-12):
   `FourierMukai.CounitKernelData` separates the geometric kernel morphism and
   its exact transform equation from any enhancement or cone choice.

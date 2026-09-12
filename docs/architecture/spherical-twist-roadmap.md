@@ -131,7 +131,8 @@ Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
          │  (conv Q P represents Φ_Q ⋙ Φ_P diagrammatically; Huybrechts writes P ∘ Q)
          └─ toConeData: choose a closed representative and dg cone in any enhancement
             └─ FourierMukai.CounitKernelConeData
-               └─ exact kernel evaluation gives pointwise distinguished twist triangles
+               └─ exact kernel evaluation gives a source-natural counit triangle
+                  Φ_Q ⋙ Φ_P ⟶ 𝟭_Y ⟶ twist, pointwise distinguished
 ```
 
 The kernel category is never required to *be* an `H⁰`: the comparison
@@ -295,9 +296,17 @@ that comparison are instance hypotheses to be discharged by the realization.
    hypothesis `E.kernelTransform.Full` is one sufficient abstract constructor,
    not a theorem proved here.  Producing the ordinary arrow geometrically still
    needs convolution, the diagonal unit kernel, the adjunction trace, and proof
-   that its transform is the counit.  `CommShift` and `IsTriangulated` for the
-   enhancement comparison remain supplied where exact transform triangles are
-   consumed.
+   that its transform is the counit.  Given those supplied data,
+   `CounitKernelConeData.counitTriangleInSource` closes the normalization seam:
+   Mathlib's triangle transport identifies the raw enhanced-cone triangle with
+   a source-natural triangle whose first two vertices are literally
+   `Φ_Q ⋙ Φ_P` and `𝟭 Y`, and whose first map is literally the
+   adjunction counit.  Every value is distinguished under the existing exactness
+   hypotheses.  This is not a distinguished triangle in the functor category,
+   does not make the twist exact or an autoequivalence, and does not make the
+   selected enhancement representative or cone canonical.  `CommShift` and
+   `IsTriangulated` for the enhancement comparison remain supplied where these
+   pointwise distinguished triangles are consumed.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
