@@ -46,8 +46,11 @@ IsConeOf
    ├─ additivity, identity, composition laws for strict squares
    ├─ projection and inclusion formulas
    ├─ lift := homogeneousLift 0, HomotopySquare := degree-zero square + closedness
+   │  ├─ HomotopySquare.strict: a commuting square with zero homotopy
    │  └─ IsConeOf.Morphism with the shift-free `fst` square
    │     └─ ConePresentation category, no pretriangulated instance needed
+   ├─ isoOfStrictSquare: endpoint isomorphisms in a strict square induce a
+   │  canonical Z⁰ isomorphism of arbitrary chosen cones
    └─ HomogeneousNatTrans.ConeData
          ├─ objectwise cone choices
          ├─ assembled cone DGFunctor
@@ -56,6 +59,7 @@ IsConeOf
          ├─ isConeOf: a cone in the dg category DGFunctor C D itself, so the
          │  twist candidate is a cone OF FUNCTORS, the form in which
          │  Anno--Logvinenko state SR ⟶ Id_B ⟶ T
+         ├─ isoOfStrictSquare: the generic cone isomorphism in Z⁰(DGFunctor C D)
          └─ triangleFunctor: H⁰ C ⥤ Triangle (H⁰ D), every value distinguished;
             the third square is the connecting map, carried by IsConeOf.Morphism
             ├─ triangleNatTrans: natural in a STRICT square of closed
@@ -89,11 +93,13 @@ EvaluationData E
 ├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
 ├─ compareIso: canonical Z⁰ isomorphism between any two choices, strictly
 │  compatible with evaluation
-└─ TwistConeData: the object twist T_E = Cone(evaluation), with its triangle
-   functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished, and H⁰(T_E)
-   triangulated as soon as RHom(E,-) ⊗ E preserves chosen cones (shifts are
-   free for every dg functor).
-   No adjunction, no invertibility, no sphericality.
+└─ TwistConeData: the object twist T_E = Cone(evaluation)
+   ├─ compareIso: canonical coherent Z⁰ isomorphism across both evaluation and
+   │  cone choices, strictly compatible with id ⟶ T_E
+   ├─ triangle functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished, and
+      H⁰(T_E) triangulated as soon as RHom(E,-) ⊗ E preserves chosen cones
+      (shifts are free for every dg functor).
+   └─ no adjunction, no autoequivalence, no sphericality
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
@@ -265,13 +271,17 @@ that comparison are instance hypotheses to be discharged by the realization.
    What is open is *concrete existence*: no dg category in the repository yet
    supplies a `HasCopowers` instance.  The generic existence/choice interface
    and its independence theorem are closed, as is choice-independence of the
-   cone-preservation capability.  Comparing the resulting twist cone functors
-   is a separate remaining seam: it requires showing that cone lifts along the
-   strict evaluation square are invertible and coherent, not merely
-   transporting the exactness hypothesis.  And no theorem relates the object
-   twist to a spherical object: that comparison needs `Perf(k)` as a dg
-   category, which the repository does not have, so nothing here calls `E`
-   spherical or claims `T_E` is invertible.
+   cone-preservation capability.  The cone-comparison seam is also closed at
+   dg-functor level: `IsConeOf.isoOfStrictSquare` lifts endpoint isomorphisms in
+   a strict square, and `EvaluationData.TwistConeData.compareIso` applies it to
+   the evaluation square.  These comparisons commute strictly with the
+   inclusion `id ⟶ T_E`, are identities on one choice, and compose strictly.
+   Packaging the corresponding isomorphism of the full H⁰ triangle functors
+   across *different evaluation transformations* remains separate if a later
+   consumer needs it.  And no theorem relates the object twist to a spherical
+   object: that comparison needs `Perf(k)` as a dg category, which the
+   repository does not have, so nothing here calls `E` spherical or claims
+   `T_E` is an autoequivalence.
 5. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
    transformed arrow is the counit.  The enhancement of the kernel category,
