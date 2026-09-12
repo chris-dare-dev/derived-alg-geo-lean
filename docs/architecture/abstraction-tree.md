@@ -157,10 +157,14 @@ Category
 │  └─ KernelTransformationData            ordinary kernel arrow realizing a named transformation
 │     ├─ KernelTransformationConeData     noncanonical enhanced representative and dg cone
 │     │  └─ normalizationData             reusable literal endpoint/first-map transport
-│     └─ CounitKernelData                 equivalent adjunction-counit specialization; stable API
-│        └─ CounitKernelConeData          enhanced counit specialization
-│           ├─ kernel-presented twist candidate       exact image of its dg cone
-│           └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
+│     ├─ CounitKernelData                 equivalent adjunction-counit specialization; stable API
+│     │  └─ CounitKernelConeData          enhanced counit specialization
+│     │     ├─ kernel-presented twist candidate       exact image of its dg cone
+│     │     └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
+│     └─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
+│        └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
+│           ├─ unshifted cotwist-cone candidate       exact image of its dg cone
+│           └─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
