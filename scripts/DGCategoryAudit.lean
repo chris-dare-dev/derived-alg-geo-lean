@@ -377,6 +377,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGCategory.HomotopySquare.ext
 #print axioms CategoryTheory.DGCategory.HomotopySquare.id
 #print axioms CategoryTheory.DGCategory.HomotopySquare.comp
+#print axioms CategoryTheory.DGCategory.HomotopySquare.strict
+#print axioms CategoryTheory.DGCategory.HomotopySquare.strict_homotopy
 #print axioms CategoryTheory.IsConeOf.Morphism
 #print axioms CategoryTheory.IsConeOf.Morphism.a_closed
 #print axioms CategoryTheory.IsConeOf.Morphism.b_closed
@@ -440,6 +442,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.id
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.comp
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.ofIso
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_fst
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_snd
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_toShift
@@ -596,6 +599,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsConeOf.homogeneousLift_strict_comp
 #print axioms CategoryTheory.IsConeOf.homogeneousLift_strict_d
 #print axioms CategoryTheory.IsConeOf.homogeneousLift_strict_map_d
+#print axioms CategoryTheory.IsConeOf.isoOfStrictSquare
+#print axioms CategoryTheory.IsConeOf.isoOfStrictSquare_hom_val
+#print axioms CategoryTheory.IsConeOf.isoOfStrictSquare_inv_val
+#print axioms CategoryTheory.IsConeOf.inr_comp_isoOfStrictSquare_hom
+#print axioms CategoryTheory.IsConeOf.isoOfStrictSquare_hom_comp_fst
 #print axioms CategoryTheory.IsConeOf.homogeneous_ext
 #print axioms CategoryTheory.IsConeOf.inl_comp_homogeneousLift_strict
 #print axioms CategoryTheory.IsConeOf.inl_comp_homogeneousLift_strict_general
@@ -720,6 +728,10 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd_app
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_hom_val
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_inv_val
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inr_comp_isoOfStrictSquare_hom
 #print axioms CategoryTheory.DGFunctor.constZero
 #print axioms CategoryTheory.DGFunctor.constZero_obj
 #print axioms CategoryTheory.DGFunctor.constZero_map
@@ -1018,9 +1030,9 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 
 -- Tensoring a dg object by a complex, stated by its universal property the way
 -- `IsShiftBy` states the shift: `IsCopowerOf K X Z` says degree-`p` morphisms
--- out of `Z` are degree-`p` cochains out of `K` into `dgHom X -`.  Nothing here
--- constructs a copower, so nothing here produces an `EvaluationData`; a
--- category with enough copowers has to supply one.
+-- out of `Z` are degree-`p` cochains out of `K` into `dgHom X -`.  The
+-- `HasCopower` and `HasCopowers` classes package existence without storing a
+-- preferred object in the class, following Mathlib's `HasLimit` pattern.
 #print axioms CategoryTheory.copowerCochain
 #print axioms CategoryTheory.copowerCochain_apply
 #print axioms CategoryTheory.IsCopowerOf
@@ -1034,19 +1046,42 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsCopowerOf.univ_comp_lift
 #print axioms CategoryTheory.IsCopowerOf.compare
 #print axioms CategoryTheory.IsCopowerOf.univ_comp_compare
+#print axioms CategoryTheory.IsCopowerOf.compare_mem_cocycles
 #print axioms CategoryTheory.IsCopowerOf.compare_comp_compare
+#print axioms CategoryTheory.IsCopowerOf.compare_trans
 #print axioms CategoryTheory.IsCopowerOf.compare_self
+#print axioms CategoryTheory.CopowerData
+#print axioms CategoryTheory.CopowerData.obj
+#print axioms CategoryTheory.CopowerData.isCopower
+#print axioms CategoryTheory.CopowerData.mk.inj
+#print axioms CategoryTheory.CopowerData.mk.sizeOf_spec
+#print axioms CategoryTheory.HasCopower
+#print axioms CategoryTheory.HasCopower.exists_copower
+#print axioms CategoryTheory.HasCopower.of_isCopower
+#print axioms CategoryTheory.copowerData
+#print axioms CategoryTheory.copowerObj
+#print axioms CategoryTheory.copowerIsCopower
+#print axioms CategoryTheory.HasCopowers
+#print axioms CategoryTheory.HasCopowers.has_copower
+#print axioms CategoryTheory.hasCopowerOfHasCopowers
 
 -- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
 -- identity.  Every one of the functor's four laws is `lift_unique` applied to
 -- the cochain each side induces; only `map_d` needs more than associativity,
 -- and there it is the Leibniz rule twice, once in `C` and once in the
--- Hom-complex out of `E`.  No relation to a spherical object is claimed.
+-- Hom-complex out of `E`.  Mere existence at one object is packaged by
+-- `HasEvaluationData`; all copowers supply it.  Any two choices are canonically
+-- isomorphic in `Z⁰`, and that isomorphism commutes strictly with evaluation.
 #print axioms CategoryTheory.EvaluationData
 #print axioms CategoryTheory.EvaluationData.obj
 #print axioms CategoryTheory.EvaluationData.isCopower
 #print axioms CategoryTheory.EvaluationData.mk.inj
 #print axioms CategoryTheory.EvaluationData.mk.sizeOf_spec
+#print axioms CategoryTheory.HasEvaluationData
+#print axioms CategoryTheory.HasEvaluationData.exists_evaluationData
+#print axioms CategoryTheory.chosenEvaluationData
+#print axioms CategoryTheory.EvaluationData.ofHasCopowers
+#print axioms CategoryTheory.EvaluationData.hasEvaluationDataOfHasCopowers
 #print axioms CategoryTheory.EvaluationData.map
 #print axioms CategoryTheory.EvaluationData.univ_comp_map
 #print axioms CategoryTheory.EvaluationData.map_zero
@@ -1057,13 +1092,24 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.evalHom
 #print axioms CategoryTheory.EvaluationData.univ_comp_evalHom
 #print axioms CategoryTheory.EvaluationData.evaluation
+#print axioms CategoryTheory.EvaluationData.compare
+#print axioms CategoryTheory.EvaluationData.compare_app
+#print axioms CategoryTheory.EvaluationData.compare_isClosed
+#print axioms CategoryTheory.EvaluationData.compare_comp
+#print axioms CategoryTheory.EvaluationData.compare_self
+#print axioms CategoryTheory.EvaluationData.compareIso
+#print axioms CategoryTheory.EvaluationData.compareIso_hom_val
+#print axioms CategoryTheory.EvaluationData.compareIso_inv_val
+#print axioms CategoryTheory.EvaluationData.compare_comp_evaluation
+#print axioms CategoryTheory.EvaluationData.preservesChosenConesOfCompare
+#print axioms CategoryTheory.EvaluationData.compare_evaluation_square
 
 -- The Seidel--Thomas twist of an *object*: the cone of `RHom(E,-) ⊗ E ⟶ id`.
 -- `evaluation_isClosed` is the whole input beyond the generic cone layer, and
 -- it is the Leibniz rule against the identity cochain.  This is not the
 -- adjunction twist: that one is the cone of an adjunction counit, this one is
 -- attached to a single object.  The two agree for a spherical functor out of
--- `Perf(k)`, which the repository cannot state.  No invertibility and no
+-- `Perf(k)`, which the repository cannot state.  No autoequivalence and no
 -- sphericality is claimed for either.
 #print axioms CategoryTheory.EvaluationData.evaluation_isClosed
 #print axioms CategoryTheory.EvaluationData.TwistConeData
@@ -1071,6 +1117,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twist
 #print axioms CategoryTheory.EvaluationData.TwistConeData.inclusion
 #print axioms CategoryTheory.EvaluationData.TwistConeData.inclusion_isClosed
+#print axioms CategoryTheory.EvaluationData.TwistConeData.compareIso
+#print axioms CategoryTheory.EvaluationData.TwistConeData.compareIso_hom_val
+#print axioms CategoryTheory.EvaluationData.TwistConeData.compareIso_inv_val
+#print axioms CategoryTheory.EvaluationData.TwistConeData.inclusion_comp_compareIso_hom_val
+#print axioms CategoryTheory.EvaluationData.TwistConeData.compareIso_self_hom_val
+#print axioms CategoryTheory.EvaluationData.TwistConeData.compareIso_self
+#print axioms CategoryTheory.EvaluationData.TwistConeData.compareIso_hom_val_comp
+#print axioms CategoryTheory.EvaluationData.TwistConeData.compareIso_trans
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_mem_distinguishedTriangles
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₁
@@ -1086,8 +1140,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- preserves shifts, `DGFunctor.preservesShifts` -- so only the cone half is a
 -- hypothesis, and it is `RHom(E,-) ⊗ E`'s.  That one stays open:
 -- `PreservesChosenCones` asks that maps into the cone split, while
--- `IsCopowerOf` is a mapping-out property.  Exact is not invertible; the object
--- twist has no invertibility statement.
+-- `IsCopowerOf` is a mapping-out property.  Exact is not autoequivalence; the
+-- object twist has no autoequivalence statement.
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesShifts
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesChosenCones
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0CommShift
