@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Stable
 
 /-!
 # Mass--Hom bounds on bounded coherent derived categories
@@ -48,6 +48,31 @@ abbrev HasPerfectMassHomBound {k : Type w} [Field k]
     (σ : StabilityCondition.WithClassMap
       (SchemeBoundedCoherentDerivedCategory X) v) : Prop :=
   σ.HasMassHomBound (k := k) (boundedSchemePerfect X)
+
+/-- Remark 7.2: stable-target bounds on a classically generating collection
+give the perfect mass--Hom bound.  Classical generation is kept as the
+explicit equality `G.triangEnvelope = boundedSchemePerfect X`; this abstract
+adapter does not manufacture a geometric generating theorem. -/
+theorem hasPerfectMassHomBound_of_stable_generators
+    {k : Type w} [Field k]
+    (X : Scheme.{u}) [IsLocallyNoetherian X]
+    [Linear k (SchemeBoundedCoherentDerivedCategory X)]
+    [∀ n : ℤ,
+      (shiftFunctor (SchemeBoundedCoherentDerivedCategory X) n).Linear k]
+    [CategoryTheory.SerreFunctor.HomFinite k
+      (SchemeBoundedCoherentDerivedCategory X)]
+    {Λ : Type u'} [AddCommGroup Λ]
+    {v : K₀ (SchemeBoundedCoherentDerivedCategory X) →+ Λ}
+    (σ : StabilityCondition.WithClassMap
+      (SchemeBoundedCoherentDerivedCategory X) v)
+    (G : ObjectProperty (SchemeBoundedCoherentDerivedCategory X))
+    (hG : G.triangEnvelope = boundedSchemePerfect X)
+    (hJH : σ.slicing.HasJordanHolderFiltrations)
+    (hstable : σ.HasStableMassHomBound (k := k) G) :
+    HasPerfectMassHomBound (k := k) X σ := by
+  change σ.HasMassHomBound (k := k) (boundedSchemePerfect X)
+  rw [← hG]
+  exact hstable.triangEnvelope hJH
 
 end
 
