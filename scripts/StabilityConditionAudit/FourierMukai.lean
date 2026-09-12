@@ -919,16 +919,29 @@ stored as an extra hypothesis.
 /-! ## Fourier--Mukai lane -- adjunction-unit kernel data and cones -/
 
 -- A definitional specialization of the generic kernel-transformation root to
--- a right adjunction's unit.  The selected cone is unshifted; no conventional
--- cotwist or exactness of its transform is asserted here.
+-- a right adjunction's unit.  Its selected cone yields a choice-dependent
+-- conventional cotwist by pointwise shift, but no exactness or equivalence.
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData.ofFull
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData.toConeData
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData.transform_arrow
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.compositeToCotwistCone
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwist
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistCone
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistConeToShiftedIdentity
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_comp_π₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_comp_π₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_comp_π₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_mor₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_unit
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedCotwistTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedCotwistTriangleInSource_obj_val
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedUnitTriangleInSource
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedUnitTriangleInSource_obj_val
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.transform_arrow_unit_square

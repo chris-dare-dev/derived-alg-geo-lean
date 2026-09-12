@@ -7,6 +7,17 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Fourier--Mukai cotwist inverse rotation (2026-09-12):
+  `AdjunctionUnitKernelConeData.cotwist` is the pointwise functor-category
+  `[-1]` shift of the selected unshifted cone transform, and
+  `cotwistTriangleInSource` reuses Mathlib's `invRotate` to produce the
+  source-natural family
+  `cotwist ⟶ 𝟭 X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.  Its three projection functors
+  are identified strictly, its second map is literally the adjunction unit as
+  a natural transformation, and every value is distinguished.  The result is
+  choice-dependent and ordinary-categorical: it does not present the shifted
+  functor by a kernel, make it exact or invertible, compare it to a dg
+  adjunction cone, or assert sphericality.
 - Right-adjunction unit kernels and literal unit triangles (2026-09-12):
   `FourierMukai.AdjunctionUnitKernelData` and its enhanced cone form are
   definitional specializations of the generic kernel-transformation roots,
@@ -14,9 +25,10 @@ blocks should normally move it rather than add more declarations beside it.
   proof.  They package the supplied kernel arrow `O_Δ ⟶ P ⋆ Q`, its exact
   transform equation, and the source-natural triangle
   `𝟭 X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭 X)⟦1⟧`, pointwise distinguished under
-  the existing exactness hypotheses.  The third functor is the unshifted cotwist-cone
-  candidate only: inverse rotation, its `[-1]` shift, exactness,
-  autoequivalence, and sphericality remain separate seams.
+  the existing exactness hypotheses.  The third functor is the unshifted
+  cotwist-cone candidate; its `[-1]` shift and inverse-rotated triangle are now
+  constructed downstream, while exactness, autoequivalence, and sphericality
+  remain separate seams.
 - Generic enhanced kernel-transformation cones (2026-09-12):
   `Enhancement.liftedCocycle` and `Enhancement.conePresentation` own the
   noncanonical lift of an ordinary morphism to a closed representative and dg

@@ -164,7 +164,9 @@ Category
 │     └─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
 │        └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
 │           ├─ unshifted cotwist-cone candidate       exact image of its dg cone
-│           └─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
+│           ├─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
+│           ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
+│           └─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only

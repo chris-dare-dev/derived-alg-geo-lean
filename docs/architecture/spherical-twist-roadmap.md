@@ -141,8 +141,12 @@ Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
          └─ AdjunctionUnitKernelData: definitional right-adjunction-unit specialization
             ├─ ordinary kernel arrow O_Δ ⟶ conv P Q whose transform is the unit
             └─ AdjunctionUnitKernelConeData
-               └─ exact kernel evaluation gives the unshifted unit triangle
-                  𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧,
+               ├─ exact kernel evaluation gives the unshifted unit triangle
+               │  𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧,
+               │  pointwise distinguished
+               ├─ cotwist = cotwistCone⟦-1⟧, pointwise functor-category shift
+               └─ inverse rotation gives
+                  cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧,
                   pointwise distinguished
 ```
 
@@ -330,11 +334,14 @@ that comparison are instance hypotheses to be discharged by the realization.
    pointwise distinguished triangles are consumed.  The right-adjunction unit
    kernel is now the second generic consumer: `AdjunctionUnitKernelData`
    realizes `O_Δ ⟶ P ⋆ Q`, and its enhanced form normalizes the unshifted
-   triangle `𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧`.  The next honest seam is to
-   inverse-rotate that family to the conventional cotwist triangle, without
-   claiming that the shifted cone is exact or an autoequivalence.  Pointwise
-   distinguishedness alone cannot supply `CommShift` or `IsTriangulated` for
-   the cone transform, so that later exactness seam must remain explicit.
+   triangle `𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧`.
+   `AdjunctionUnitKernelConeData.cotwist` then uses the pointwise
+   functor-category shift and `cotwistTriangleInSource` inverse-rotates the
+   family to `cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.  This is still only a
+   choice-dependent ordinary functor and a pointwise distinguished family.
+   Pointwise distinguishedness cannot supply `CommShift` or `IsTriangulated`
+   for the cotwist, and no shifted-kernel presentation or comparison with the
+   dg-adjunction cotwist is available; those later seams remain explicit.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
