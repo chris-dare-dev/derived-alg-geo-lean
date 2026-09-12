@@ -108,10 +108,10 @@ EvaluationData E
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
-├─ the twist is EXACT on H⁰ (twistH0IsTriangulated), as soon as S and R preserve
-│  shifts and chosen cones.  A cone functor preserves both when its two ends do;
-│  the cone half is the 3-by-3 lemma, whose proof is block diagonal in the four
-│  coordinates of the two splittings rather than merely triangular.
+├─ all four STORED cone functors are exact on H⁰ as soon as their two ends
+│  preserve chosen cones (shift preservation is free).  The cone half is the
+│  3-by-3 lemma, whose proof is block diagonal in the four coordinates of the
+│  two splittings rather than merely triangular.
 ├─ unshifted cones underlying dual twist and cotwist
 ├─ dualTwistFunctor and cotwistFunctor name their conventional `[-1]` shifts;
 │  shiftedFunctorH0Iso compares their H⁰ functors with pointwise shift
@@ -231,16 +231,20 @@ that comparison are instance hypotheses to be discharged by the realization.
    quasi-equivalence or triangulatedness.  This is the first
    categorical invertibility statement about a twist here; everything earlier
    was numerical, on `K₀`, or a construction with no invertibility attached.
-   Exactness is separate, and now supplied: `DGFunctor.PreservesShifts` and
-   `PreservesChosenCones` are instantiated for a cone functor whenever its two
-   ends carry them, so `twistH0IsTriangulated` makes `H⁰` of the twist a
-   triangulated functor.  The shift half of that is free for every dg functor
-   (`DGFunctor.preservesShifts`), so `twistPreservesShifts` and
-   `cotwistConePreservesShifts` take no arguments and `twistH0IsTriangulated`
-   asks only for the two `PreservesChosenCones` witnesses.  Together with
-   `twistH0Equivalence` above, that makes the twist an exact autoequivalence --
-   which is still not sphericality, since that needs all four Anno--Logvinenko
-   conditions and the Morita framework the first paragraph rules out.
+   Exactness is separate, and now supplied for all four cone functors as they
+   are stored.  `DGFunctor.PreservesShifts` and `PreservesChosenCones` are
+   instantiated for a cone functor whenever its two ends carry them.  Thus
+   `twistH0IsTriangulated`, `dualCotwistH0IsTriangulated`, and the corresponding
+   results for the *unshifted* dual-twist and cotwist cones ask only for the
+   endpoint `PreservesChosenCones` witnesses; shift preservation is free for
+   every dg functor.  Together with `twistH0Equivalence`, this makes the twist
+   an exact autoequivalence.  The conventional dual twist and cotwist are the
+   `[-1]` shifts of two stored cones, and their exactness is deliberately not
+   inferred here: Mathlib installs no generic `CommShift` on an odd shift
+   functor because the triangulated comparison carries a sign.  That
+   sign-coherent shift-exactness interface is a separate remaining seam.
+   None of these results is sphericality, which still needs all four
+   Anno--Logvinenko conditions and the Morita framework above.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
    shift on a functor category, and `Functor.ExactFamily` is now built on that
    canonical structure: it extends Mathlib's `F.CommShift ℤ` and adds only
