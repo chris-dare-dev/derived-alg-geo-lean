@@ -182,6 +182,105 @@ instance affineLocalizationDerivedPullback_essSurj :
     ⟨(affineLocalizationDerivedRestriction (R := R) (A := A)).obj E,
       ⟨(affineLocalizationDerivedCounitIso (R := R) (A := A) M).app E⟩⟩
 
+include M in
+/-- Derived localization pullback preserves cohomologically bounded objects. -/
+theorem affineLocalizationDerivedPullback_bounded
+    (E : DerivedCategory (ModuleCat.{u} R))
+    (hE : (DerivedCategory.TStructure.t (C := ModuleCat.{u} R)).bounded E) :
+    (DerivedCategory.TStructure.t (C := ModuleCat.{u} A)).bounded
+      ((affineLocalizationDerivedPullback M).obj E) := by
+  letI := affineLocalizationExtendScalars_additive (R := R) (A := A)
+  letI := affineLocalizationExtendScalars_preservesFiniteLimits
+    (R := R) (A := A) M
+  exact mapDerivedCategory_bounded
+    (ModuleCat.extendScalars.{u, u, u} (algebraMap R A)) E hE
+
+/-- Derived restriction of scalars preserves cohomologically bounded
+objects. -/
+theorem affineLocalizationDerivedRestriction_bounded
+    (E : DerivedCategory (ModuleCat.{u} A))
+    (hE : (DerivedCategory.TStructure.t (C := ModuleCat.{u} A)).bounded E) :
+    (DerivedCategory.TStructure.t (C := ModuleCat.{u} R)).bounded
+      ((affineLocalizationDerivedRestriction (R := R) (A := A)).obj E) :=
+  mapDerivedCategory_bounded
+    (ModuleCat.restrictScalars.{u, u, u} (algebraMap R A)) E hE
+
+include M in
+/-- Exact derived localization pullback restricted to cohomologically
+bounded derived categories. -/
+def affineLocalizationBoundedDerivedPullback :
+    DerivedCategory.Bounded (ModuleCat.{u} R) ⥤
+      DerivedCategory.Bounded (ModuleCat.{u} A) :=
+  (DerivedCategory.TStructure.t (C := ModuleCat.{u} A)).bounded.lift
+    (DerivedCategory.Bounded.ι ⋙ affineLocalizationDerivedPullback M)
+    (fun E ↦ affineLocalizationDerivedPullback_bounded M E.obj E.property)
+
+/-- Exact derived restriction of scalars restricted to cohomologically
+bounded derived categories. -/
+def affineLocalizationBoundedDerivedRestriction :
+    DerivedCategory.Bounded (ModuleCat.{u} A) ⥤
+      DerivedCategory.Bounded (ModuleCat.{u} R) :=
+  (DerivedCategory.TStructure.t (C := ModuleCat.{u} R)).bounded.lift
+    (DerivedCategory.Bounded.ι ⋙
+      affineLocalizationDerivedRestriction (R := R) (A := A))
+    (fun E ↦ affineLocalizationDerivedRestriction_bounded E.obj E.property)
+
+include M in
+/-- Forgetting boundedness recovers derived localization pullback. -/
+def affineLocalizationBoundedDerivedPullbackCompInclusion :
+    affineLocalizationBoundedDerivedPullback (R := R) (A := A) M ⋙
+        DerivedCategory.Bounded.ι ≅
+      DerivedCategory.Bounded.ι ⋙ affineLocalizationDerivedPullback M :=
+  (DerivedCategory.TStructure.t (C := ModuleCat.{u} A)).bounded.liftCompιIso
+    (DerivedCategory.Bounded.ι ⋙ affineLocalizationDerivedPullback M)
+    (fun E ↦ affineLocalizationDerivedPullback_bounded M E.obj E.property)
+
+/-- Forgetting boundedness recovers derived restriction of scalars. -/
+def affineLocalizationBoundedDerivedRestrictionCompInclusion :
+    affineLocalizationBoundedDerivedRestriction (R := R) (A := A) ⋙
+        DerivedCategory.Bounded.ι ≅
+      DerivedCategory.Bounded.ι ⋙
+        affineLocalizationDerivedRestriction (R := R) (A := A) :=
+  (DerivedCategory.TStructure.t (C := ModuleCat.{u} R)).bounded.liftCompιIso
+    (DerivedCategory.Bounded.ι ⋙
+      affineLocalizationDerivedRestriction (R := R) (A := A))
+    (fun E ↦ affineLocalizationDerivedRestriction_bounded E.obj E.property)
+
+include M in
+/-- On bounded derived module categories, restriction followed by localization
+pullback is naturally isomorphic to the identity. -/
+def affineLocalizationBoundedDerivedCounitIso :
+    affineLocalizationBoundedDerivedRestriction (R := R) (A := A) ⋙
+        affineLocalizationBoundedDerivedPullback (R := R) (A := A) M ≅
+      Functor.id (DerivedCategory.Bounded (ModuleCat.{u} A)) :=
+  Functor.fullyFaithfulCancelRight DerivedCategory.Bounded.ι
+    (Functor.associator _ _ _ ≪≫
+      Functor.isoWhiskerLeft
+        (affineLocalizationBoundedDerivedRestriction (R := R) (A := A))
+        (affineLocalizationBoundedDerivedPullbackCompInclusion M) ≪≫
+      (Functor.associator _ _ _).symm ≪≫
+      Functor.isoWhiskerRight
+        (affineLocalizationBoundedDerivedRestrictionCompInclusion
+          (R := R) (A := A))
+        (affineLocalizationDerivedPullback M) ≪≫
+      Functor.associator _ _ _ ≪≫
+      Functor.isoWhiskerLeft DerivedCategory.Bounded.ι
+        (affineLocalizationDerivedCounitIso M) ≪≫
+      Functor.rightUnitor _ ≪≫
+      (Functor.leftUnitor _).symm)
+
+include M in
+/-- Derived extension of scalars along a localization is essentially
+surjective on cohomologically bounded derived categories. -/
+instance affineLocalizationBoundedDerivedPullback_essSurj :
+    (affineLocalizationBoundedDerivedPullback
+      (R := R) (A := A) M).EssSurj where
+  mem_essImage E :=
+    ⟨(affineLocalizationBoundedDerivedRestriction
+        (R := R) (A := A)).obj E,
+      ⟨(affineLocalizationBoundedDerivedCounitIso
+        (R := R) (A := A) M).app E⟩⟩
+
 /-- Transport localization pullback from derived module categories to the
 genuine derived categories of quasi-coherent sheaves on affine spectra. -/
 def affineQuasicoherentLocalizationPullback :
