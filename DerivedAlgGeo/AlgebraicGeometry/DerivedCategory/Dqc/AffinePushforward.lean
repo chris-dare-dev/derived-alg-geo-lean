@@ -137,6 +137,46 @@ def affineQuasicoherentDerivedPushforward
       AffineQuasicoherentDerivedCategory R :=
   (affineQuasicoherentSheavesPushforward f).mapDerivedCategory
 
+/-- Affine quasi-coherent derived pushforward preserves cohomologically
+bounded objects. -/
+theorem affineQuasicoherentDerivedPushforward_bounded
+    {R S : CommRingCat.{u}} (f : R ⟶ S)
+    (E : AffineQuasicoherentDerivedCategory S)
+    (hE : (DerivedCategory.TStructure.t
+      (C := AffineQuasicoherentSheaves S)).bounded E) :
+    (DerivedCategory.TStructure.t
+      (C := AffineQuasicoherentSheaves R)).bounded
+        ((affineQuasicoherentDerivedPushforward f).obj E) :=
+  mapDerivedCategory_bounded
+    (affineQuasicoherentSheavesPushforward f) E hE
+
+/-- Geometric affine derived pushforward restricted to cohomologically
+bounded quasi-coherent complexes. -/
+def affineQuasicoherentBoundedDerivedPushforward
+    {R S : CommRingCat.{u}} (f : R ⟶ S) :
+    AffineQuasicoherentBoundedDerivedCategory S ⥤
+      AffineQuasicoherentBoundedDerivedCategory R :=
+  (DerivedCategory.TStructure.t
+    (C := AffineQuasicoherentSheaves R)).bounded.lift
+      (DerivedCategory.Bounded.ι ⋙
+        affineQuasicoherentDerivedPushforward f)
+      (fun E ↦ affineQuasicoherentDerivedPushforward_bounded
+        f E.obj E.property)
+
+/-- Forgetting boundedness recovers geometric affine derived pushforward. -/
+def affineQuasicoherentBoundedDerivedPushforwardCompInclusion
+    {R S : CommRingCat.{u}} (f : R ⟶ S) :
+    affineQuasicoherentBoundedDerivedPushforward f ⋙
+        DerivedCategory.Bounded.ι ≅
+      DerivedCategory.Bounded.ι ⋙
+        affineQuasicoherentDerivedPushforward f :=
+  (DerivedCategory.TStructure.t
+    (C := AffineQuasicoherentSheaves R)).bounded.liftCompιIso
+      (DerivedCategory.Bounded.ι ⋙
+        affineQuasicoherentDerivedPushforward f)
+      (fun E ↦ affineQuasicoherentDerivedPushforward_bounded
+        f E.obj E.property)
+
 /-- On derived categories, affine global sections identify geometric
 pushforward with derived restriction of scalars. -/
 def affineQuasicoherentDerivedPushforwardGammaIso
