@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.DerivedCategory.ExactFunctor
 import Mathlib.Algebra.Homology.DerivedCategory.TStructure
+import Mathlib.CategoryTheory.Localization.Adjunction
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Retracts
 
 /-!
@@ -23,6 +24,9 @@ sheaf, or other geometric input occurs here.
   `Functor.mapDerivedCategory`, each obtained from the corresponding
   isomorphism on complexes through the universal property of the
   localization (`Localization.liftNatIso`);
+* `Adjunction.mapHomologicalComplex` and `Adjunction.mapDerivedCategory`:
+  additive adjunctions prolong degreewise to homological complexes, and exact
+  adjunctions descend to derived categories;
 * `Functor.singleFunctorIsoOfFactors`: the degree-`n` embedding commutes with any functor on
   derived categories that factors degreewise through `F`;
 * `DerivedCategory.isoOfFactors`, with `DerivedCategory.idFactors` and
@@ -42,6 +46,32 @@ open Limits Pretriangulated Triangulated
 
 variable {A B C : Type*} [Category A] [Category B] [Category C] [Abelian A] [Abelian B]
   [Abelian C]
+
+/-- An adjunction of additive functors prolongs degreewise to homological
+complexes. -/
+noncomputable def Adjunction.mapHomologicalComplex {F : A ⥤ B} {G : B ⥤ A}
+    [F.Additive] [G.Additive] (adj : F ⊣ G) {I : Type*} (c : ComplexShape I) :
+    F.mapHomologicalComplex c ⊣ G.mapHomologicalComplex c where
+  unit :=
+    { app := fun K ↦
+        { f := fun i ↦ adj.unit.app (K.X i)
+          comm' := fun i j _ ↦ (adj.unit.naturality (K.d i j)).symm }
+      naturality := fun {K L} f ↦ by
+        ext i
+        exact adj.unit.naturality (f.f i) }
+  counit :=
+    { app := fun K ↦
+        { f := fun i ↦ adj.counit.app (K.X i)
+          comm' := fun i j _ ↦ (adj.counit.naturality (K.d i j)).symm }
+      naturality := fun {K L} f ↦ by
+        ext i
+        exact adj.counit.naturality (f.f i) }
+  left_triangle_components K := by
+    ext i
+    exact adj.left_triangle_components (K.X i)
+  right_triangle_components K := by
+    ext i
+    exact adj.right_triangle_components (K.X i)
 
 /-- An additive functor sends a strictly bounded-above cochain complex to a
 strictly bounded-above cochain complex with the same bound. -/
@@ -64,6 +94,29 @@ lemma mapHomologicalComplex_isStrictlyGE (F : A ⥤ B) [F.Additive]
   exact F.map_isZero (hK i hi)
 
 variable [HasDerivedCategory A] [HasDerivedCategory B] [HasDerivedCategory C]
+
+/-- An adjunction of exact functors descends to the corresponding derived
+categories. -/
+noncomputable def Adjunction.mapDerivedCategory {F : A ⥤ B} {G : B ⥤ A}
+    [F.Additive] [PreservesFiniteLimits F] [PreservesFiniteColimits F]
+    [G.Additive] [PreservesFiniteLimits G] [PreservesFiniteColimits G]
+    (adj : F ⊣ G) : F.mapDerivedCategory ⊣ G.mapDerivedCategory := by
+  letI : CatCommSq
+      (F.mapHomologicalComplex (ComplexShape.up ℤ))
+      (DerivedCategory.Q (C := A)) (DerivedCategory.Q (C := B))
+      F.mapDerivedCategory :=
+    ⟨F.mapDerivedCategoryFactors.symm⟩
+  letI : CatCommSq
+      (G.mapHomologicalComplex (ComplexShape.up ℤ))
+      (DerivedCategory.Q (C := B)) (DerivedCategory.Q (C := A))
+      G.mapDerivedCategory :=
+    ⟨G.mapDerivedCategoryFactors.symm⟩
+  exact (adj.mapHomologicalComplex (ComplexShape.up ℤ)).localization
+    (DerivedCategory.Q (C := A))
+    (HomologicalComplex.quasiIso A (ComplexShape.up ℤ))
+    (DerivedCategory.Q (C := B))
+    (HomologicalComplex.quasiIso B (ComplexShape.up ℤ))
+    F.mapDerivedCategory G.mapDerivedCategory
 
 /-- The functor on derived categories induced by an exact functor preserves
 the canonical `≤ n` truncation bound. -/

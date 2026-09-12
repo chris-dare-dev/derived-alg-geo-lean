@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Category.ModuleCat.Descent
+import Mathlib.CategoryTheory.Adjunction.Restrict
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffinePushforward
 
@@ -71,6 +72,21 @@ def affineQuasicoherentSheavesPullbackPushforwardAdjunction
   exact transportedAdj.ofNatIsoRight
     (affineQuasicoherentSheavesPushforwardComparison f).symm
 
+/-- Affine global sections identify quasi-coherent pullback with extension
+of scalars. -/
+def affineQuasicoherentSheavesPullbackGammaIso
+    {R S : CommRingCat.{u}} (f : R ⟶ S) :
+    affineQuasicoherentSheavesPullback f ⋙
+        (affineQuasicoherentSheavesEquiv S).inverse ≅
+      (affineQuasicoherentSheavesEquiv R).inverse ⋙
+        ModuleCat.extendScalars f.hom :=
+  Functor.associator _ _ _ ≪≫
+    Functor.isoWhiskerLeft
+      ((affineQuasicoherentSheavesEquiv R).inverse ⋙
+        ModuleCat.extendScalars f.hom)
+      (affineQuasicoherentSheavesEquiv S).unitIso.symm ≪≫
+    Functor.rightUnitor _
+
 /-- Affine quasi-coherent pullback is additive. -/
 instance affineQuasicoherentSheavesPullback_additive
     {R S : CommRingCat.{u}} (f : R ⟶ S) :
@@ -108,6 +124,82 @@ def affineQuasicoherentDerivedPullback
       AffineQuasicoherentDerivedCategory S := by
   letI := affineQuasicoherentSheavesPullback_preservesFiniteLimits f hf
   exact (affineQuasicoherentSheavesPullback f).mapDerivedCategory
+
+/-- Derived extension of scalars along a flat map, with exactness packaged
+in the construction. -/
+def affineExtendScalarsDerived
+    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
+    DerivedCategory (ModuleCat R) ⥤ DerivedCategory (ModuleCat S) := by
+  letI : PreservesFiniteLimits
+      (ModuleCat.extendScalars.{u, u, u} f.hom) :=
+    ModuleCat.preservesFiniteLimits_extendScalars_of_flat hf
+  exact (ModuleCat.extendScalars f.hom).mapDerivedCategory
+
+/-- On derived categories, affine global sections identify exact pullback
+with derived extension of scalars. -/
+def affineQuasicoherentDerivedPullbackGammaIso
+    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
+    affineQuasicoherentDerivedPullback f hf ⋙
+        affineGammaDerivedFunctor S ≅
+      affineGammaDerivedFunctor R ⋙
+        affineExtendScalarsDerived f hf := by
+  letI := affineQuasicoherentSheavesPullback_preservesFiniteLimits f hf
+  letI : PreservesFiniteLimits
+      (ModuleCat.extendScalars.{u, u, u} f.hom) :=
+    ModuleCat.preservesFiniteLimits_extendScalars_of_flat hf
+  let H := (affineQuasicoherentSheavesEquiv R).inverse ⋙
+    ModuleCat.extendScalars f.hom
+  letI : H.Additive := by dsimp [H]; infer_instance
+  letI : PreservesFiniteLimits H := by
+    dsimp [H]
+    exact comp_preservesFiniteLimits _ _
+  letI : PreservesFiniteColimits H := by
+    dsimp [H]
+    exact comp_preservesFiniteColimits _ _
+  exact Functor.mapDerivedCategoryCompIso
+      (affineQuasicoherentSheavesPullbackGammaIso f) ≪≫
+    (Functor.mapDerivedCategoryCompIso (Iso.refl H)).symm
+
+/-- Exact affine derived pullback is extension of scalars transported
+through the affine derived equivalences. -/
+def affineQuasicoherentDerivedPullbackComparison
+    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
+    affineQuasicoherentDerivedPullback f hf ≅
+      equivalenceTransportFunctor
+        (affineQuasicoherentDerivedEquivalence R)
+        (affineQuasicoherentDerivedEquivalence S)
+        (affineExtendScalarsDerived f hf) := by
+  letI : PreservesFiniteLimits
+      (ModuleCat.extendScalars.{u, u, u} f.hom) :=
+    ModuleCat.preservesFiniteLimits_extendScalars_of_flat hf
+  let transported := equivalenceTransportFunctor
+    (affineQuasicoherentDerivedEquivalence R)
+    (affineQuasicoherentDerivedEquivalence S)
+    (affineExtendScalarsDerived f hf)
+  let cancel : transported ⋙ affineGammaDerivedFunctor S ≅
+      affineGammaDerivedFunctor R ⋙
+        affineExtendScalarsDerived f hf :=
+    Functor.associator _ _ _ ≪≫
+      Functor.isoWhiskerLeft
+        ((affineQuasicoherentDerivedEquivalence R).inverse ⋙
+          affineExtendScalarsDerived f hf)
+        (affineQuasicoherentDerivedEquivalence S).unitIso.symm ≪≫
+      Functor.rightUnitor _
+  letI : (affineGammaDerivedFunctor S).Full :=
+    (affineQuasicoherentDerivedEquivalence S).fullyFaithfulInverse.full
+  letI : (affineGammaDerivedFunctor S).Faithful :=
+    (affineQuasicoherentDerivedEquivalence S).fullyFaithfulInverse.faithful
+  exact Functor.fullyFaithfulCancelRight (affineGammaDerivedFunctor S)
+    (affineQuasicoherentDerivedPullbackGammaIso f hf ≪≫ cancel.symm)
+
+/-- Exact affine derived pullback is left adjoint to exact affine derived
+pushforward. -/
+def affineQuasicoherentDerivedPullbackPushforwardAdjunction
+    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
+    affineQuasicoherentDerivedPullback f hf ⊣
+      affineQuasicoherentDerivedPushforward f := by
+  letI := affineQuasicoherentSheavesPullback_preservesFiniteLimits f hf
+  exact (affineQuasicoherentSheavesPullbackPushforwardAdjunction f).mapDerivedCategory
 
 /-- Flat affine quasi-coherent derived pullback preserves cohomologically
 bounded objects. -/
@@ -150,6 +242,20 @@ def affineQuasicoherentBoundedDerivedPullbackCompInclusion
         affineQuasicoherentDerivedPullback f hf)
       (fun E ↦ affineQuasicoherentDerivedPullback_bounded
         f hf E.obj E.property)
+
+/-- The exact affine derived pullback--pushforward adjunction restricts to
+cohomologically bounded objects. -/
+def affineQuasicoherentBoundedDerivedPullbackPushforwardAdjunction
+    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
+    affineQuasicoherentBoundedDerivedPullback f hf ⊣
+      affineQuasicoherentBoundedDerivedPushforward f :=
+  (affineQuasicoherentDerivedPullbackPushforwardAdjunction f hf).restrictFullyFaithful
+    (DerivedCategory.TStructure.t
+      (C := AffineQuasicoherentSheaves R)).bounded.fullyFaithfulι
+    (DerivedCategory.TStructure.t
+      (C := AffineQuasicoherentSheaves S)).bounded.fullyFaithfulι
+    (affineQuasicoherentBoundedDerivedPullbackCompInclusion f hf).symm
+    (affineQuasicoherentBoundedDerivedPushforwardCompInclusion f).symm
 
 end
 
