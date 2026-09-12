@@ -3,7 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategory
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Functor
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Shift
+import DerivedAlgGeo.CategoryTheory.Triangulated.ShiftFunctor
 
 /-!
 # The dg shift of a functor computes the `H⁰` shift
@@ -16,8 +18,8 @@ shifts an object of `H⁰` by `n`.  Both are built from the same choice, namely
 
 The object equality is `rfl`; the morphism equality is the second computation
 lemma below.  The resulting functor equality and its natural-isomorphism
-wrapper make ordinary categorical properties such as equivalence reusable for
-shifted dg functors.
+wrapper make ordinary categorical properties such as equivalence and
+triangulatedness reusable for shifted dg functors.
 
 ## Why it is not just `rfl` on morphisms
 
@@ -36,8 +38,10 @@ dg functor rather than only about each value: the first vertex of an inversely
 rotated cone triangle is `Z⟦-1⟧` in `H⁰`, and by the object lemma below that
 is the value of the dg shifted functor.
 
-The equality and natural isomorphism are categorical interfaces; the two
-computation lemmas remain available for strict objectwise formulas.
+The equality and natural isomorphism are categorical interfaces.  The
+sign-correct `CommShift` and exactness packages below transport through that
+interface; the two computation lemmas remain available for strict objectwise
+formulas.
 -/
 
 set_option autoImplicit false
@@ -123,6 +127,60 @@ noncomputable def shiftedFunctorH0Equivalence (F : DGFunctor C D) (n : ℤ)
     (hF : F.h0.IsEquivalence) : H0 C ≌ H0 D :=
   letI := F.shiftedFunctor_h0_isEquivalence n hF
   (F.shiftedFunctor n).h0.asEquivalence
+
+section Exactness
+
+variable {A : Type u} {B : Type u'} [DGCategory.{v} A] [DGCategory.{v} B]
+  [IsPretriangulated A] [IsPretriangulated B]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The sign-correct shift comparison on `H⁰` of a shifted dg functor.
+
+It is obtained by composing the canonical comparison on `H⁰(F)` with the
+signed comparison on `[n]`, then transporting that structure across
+`shiftedFunctorH0Iso`.  The result is explicit rather than a global instance,
+so consumers control which shift comparison is in scope. -/
+@[reducible]
+noncomputable def shiftedFunctorH0CommShift (F : DGFunctor A B) (n : ℤ)
+    (hF : PreservesShifts F) : (F.shiftedFunctor n).h0.CommShift ℤ := by
+  letI : F.h0.CommShift ℤ :=
+    commShift (C := A) (D := B) F hF
+  letI : (shiftFunctor (H0 B) n).CommShift ℤ :=
+    Pretriangulated.shiftFunctorCommShift (H0 B) n
+  letI : (F.h0 ⋙ shiftFunctor (H0 B) n).CommShift ℤ := inferInstance
+  exact Functor.CommShift.ofIso (F.shiftedFunctorH0Iso n).symm ℤ
+
+set_option backward.isDefEq.respectTransparency false in
+/-- A dg functor preserving chosen cones remains exact on `H⁰` after every
+integral dg shift.
+
+The proof composes the exact functor `H⁰(F)` with the sign-correct exact
+ordinary shift `[n]`, then transports exactness across
+`shiftedFunctorH0Iso`. -/
+theorem shiftedFunctorH0IsTriangulated (F : DGFunctor A B) (n : ℤ)
+    (hShift : PreservesShifts F) (hCone : PreservesChosenCones F) :
+    letI : (F.shiftedFunctor n).h0.CommShift ℤ :=
+      shiftedFunctorH0CommShift F n hShift
+    (F.shiftedFunctor n).h0.IsTriangulated := by
+  letI : F.h0.CommShift ℤ :=
+    commShift (C := A) (D := B) F hShift
+  letI : F.h0.IsTriangulated :=
+    isTriangulated_of_preservesShifts_and_chosenCones
+      (C := A) (D := B) F hShift hCone
+  letI : (shiftFunctor (H0 B) n).CommShift ℤ :=
+    Pretriangulated.shiftFunctorCommShift (H0 B) n
+  letI : (shiftFunctor (H0 B) n).IsTriangulated :=
+    Pretriangulated.shiftFunctorIsTriangulated (H0 B) n
+  letI : (F.h0 ⋙ shiftFunctor (H0 B) n).CommShift ℤ := inferInstance
+  letI : (F.h0 ⋙ shiftFunctor (H0 B) n).IsTriangulated := inferInstance
+  let e := (F.shiftedFunctorH0Iso n).symm
+  letI : (F.shiftedFunctor n).h0.CommShift ℤ :=
+    shiftedFunctorH0CommShift F n hShift
+  haveI : NatTrans.CommShift e.hom ℤ := by
+    exact Functor.CommShift.ofIso_compatibility e ℤ
+  exact Functor.isTriangulated_of_iso e
+
+end Exactness
 
 end DGFunctor
 

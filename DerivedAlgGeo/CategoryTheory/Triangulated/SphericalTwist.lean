@@ -9,6 +9,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.StabilityAction
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Braid
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctor
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorH0
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorK0
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.ObjectTwistK0
 
 /-! # The spherical twist
 
@@ -22,7 +24,13 @@ relation `τ_A τ_B τ_A = τ_B τ_A τ_B` for an `A₂`-configuration.
 The dg-level construction now includes functorial cones of closed homogeneous
 natural transformations, counit-cone twist candidates for dg adjunctions, and
 the four enhanced cone choices attached to a functor with left and right dg
-adjoints.  It deliberately stops short of asserting sphericality: the
+adjoints.  Their distinguished triangles compute the four conventional
+functors' `K₀` actions as the identity minus the corresponding adjunction
+composite.  The object-twist triangle similarly acts as identity minus its
+evaluation functor, and the explicit `IsEulerCopower` realization capability
+identifies its object classes with the existing numerical `twistK₀` formula;
+together with chosen-cone preservation it identifies the induced maps.  It
+deliberately stops short of asserting sphericality: the
 adjoint-comparison maps and the Morita/higher-cone theorem of
 Anno--Logvinenko are not yet repository primitives.  The object-specific
 evaluation functor `RHom(E,-) ⊗ E` and its identification with a

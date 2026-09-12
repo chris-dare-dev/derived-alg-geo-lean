@@ -114,7 +114,8 @@ EnhancedAdjunctionCones
 │  two splittings rather than merely triangular.
 ├─ unshifted cones underlying dual twist and cotwist
 ├─ dualTwistFunctor and cotwistFunctor name their conventional `[-1]` shifts;
-│  shiftedFunctorH0Iso compares their H⁰ functors with pointwise shift
+│  shiftedFunctorH0Iso compares their H⁰ functors with pointwise shift, and
+│  the generic signed interface transports their exactness
 ├─ the four triangles as functors on H⁰, every value distinguished, each first
 │  map the corresponding unit or counit.  The dual twist and the cotwist are
 │  the INVERSE ROTATIONS of their unshifted cone triangles: invRotate applies
@@ -123,8 +124,11 @@ EnhancedAdjunctionCones
 │  The unshifted forms are kept, since TwistCotwistEquivalenceConditions is
 │  stated against the unshifted cone functors.  No sphericality, and no relation
 │  among the four.
+├─ K₀ action of each conventional functor is identity minus its adjunction
+│  composite, first on object classes and then as a homomorphism under exactness
 └─ TwistCotwistEquivalenceConditions
-   └─ cotwistH0Equivalence spends the unshifted condition on the actual cotwist
+   ├─ cotwistH0Equivalence spends the unshifted condition on the actual cotwist
+   └─ twist/cotwist exact equivalences use Mathlib's canonical package
 
 Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
 ├─ liftedCocycle / conePresentation: noncanonical enhanced lift of any ordinary map
@@ -228,23 +232,39 @@ that comparison are instance hypotheses to be discharged by the realization.
    `shiftedFunctorH0Equivalence` transports ordinary equivalences through that
    comparison.  Consequently `cotwistH0Equivalence` spends the recorded
    unshifted condition on the actual `[-1]` cotwist.  It does not infer a dg
-   quasi-equivalence or triangulatedness.  This is the first
+   quasi-equivalence.  This is the first
    categorical invertibility statement about a twist here; everything earlier
    was numerical, on `K₀`, or a construction with no invertibility attached.
-   Exactness is separate, and now supplied for all four cone functors as they
-   are stored.  `DGFunctor.PreservesShifts` and `PreservesChosenCones` are
+   Exactness is separate from equivalence.  `DGFunctor.PreservesShifts` and
+   `PreservesChosenCones` are
    instantiated for a cone functor whenever its two ends carry them.  Thus
    `twistH0IsTriangulated`, `dualCotwistH0IsTriangulated`, and the corresponding
-   results for the *unshifted* dual-twist and cotwist cones ask only for the
+   results for the unshifted dual-twist and cotwist cones ask only for the
    endpoint `PreservesChosenCones` witnesses; shift preservation is free for
    every dg functor.  Together with `twistH0Equivalence`, this makes the twist
    an exact autoequivalence.  The conventional dual twist and cotwist are the
    `[-1]` shifts of two stored cones.  The reusable
    `Pretriangulated.shiftFunctorCommShift` now supplies the required Koszul
    sign and `shiftFunctorIsTriangulated` proves exactness of every integral
-   shift without installing a global instance.  Transporting the two stored
-   cone exactness results through composition with this explicit signed
-   structure is the next downstream seam.
+   shift without installing a global instance.
+   `DGFunctor.shiftedFunctorH0CommShift` and
+   `shiftedFunctorH0IsTriangulated` compose that signed package with the
+   canonical comparison on `H⁰(F)` and transport across
+   `shiftedFunctorH0Iso`.  Consequently `dualTwistH0IsTriangulated` and
+   `cotwistH0IsTriangulated` close exactness for the two conventional `[-1]`
+   functors under the same endpoint chosen-cone hypotheses as their unshifted
+   cones.  Finally `twistH0EquivalenceIsTriangulated` and
+   `cotwistH0EquivalenceIsTriangulated` combine the ordinary equivalence and
+   exactness halves with Mathlib's canonical `Equivalence.IsTriangulated`
+   interface, which derives compatible inverse shift data and exactness.  The
+   four distinguished adjunction triangles now also compute their conventional
+   functors' `K₀` actions as the identity minus the corresponding adjunction
+   composite.  For an object twist, the evaluation triangle now similarly
+   gives identity minus the evaluation functor on `K₀`.
+   `EvaluationData.IsEulerCopower` names the explicit, choice-invariant
+   realization capability that its class is `chiRight k C E X • [E]`; under
+   that input the object classes match the existing numerical `twistK₀`
+   formula, and together with chosen-cone preservation the induced maps match.
    None of these results is sphericality, which still needs all four
    Anno--Logvinenko conditions and the Morita framework above.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
@@ -318,10 +338,28 @@ that comparison are instance hypotheses to be discharged by the realization.
    the universal property the copower is given by, and a cone, unlike a shift,
    is not an invertible element that functoriality carries over.
 
+   There is a second, independent boundary at scalars.  `IsCopowerOf` is
+   `AddCommGrpCat`-valued and represents all additive cochains, so it models an
+   additive copower over `ℤ`; the coefficient in `chiHom` is a dimension
+   over `k`.  The former therefore cannot imply the latter at general `k`.
+   `DGCategory.Linear` now exposes the genuinely `k`-linear Hom-complex, and
+   `DGCategory.LinearCopower` supplies the copower root over a commutative
+   ring.  Its universal family is a chain map in `ModuleCat k`; composition is
+   a linear equivalence with Mathlib's `HomComplex.Cochain`, not with all
+   additive cochains.  Thus there is no forgetful projection to
+   `IsCopowerOf`, because retaining its additive surjectivity would be
+   inconsistent with the intended tensor product.  The next lane is
+   scalar-linear evaluation data assembled from that root.  After that, the
+   Euler realization (initially over a field) still needs functoriality under
+   chain homotopies and a finite cohomology presentation as shifted finite
+   sums.  Only that realization can discharge `IsEulerCopower`.
+
    What is open is *concrete existence*: no dg category in the repository yet
-   supplies a `HasCopowers` instance.  The generic existence/choice interface
-   and its independence theorem are closed, as is choice-independence of the
-   cone-preservation capability.  The comparison seam is closed at both
+   supplies either a `HasCopowers` instance for the additive interface or a
+   `HasLinearCopowers` instance for the scalar-linear one.  The generic
+   existence/choice interfaces and their comparison coherences are closed, as
+   is choice-independence of the additive cone-preservation capability.  The
+   comparison seam is closed at both
    dg-functor and full H⁰-triangle levels.  `IsConeOf.isoOfStrictSquare` lifts
    endpoint isomorphisms in a strict square,
    `ConeData.triangleIsoOfStrictSquare` carries the result to a natural

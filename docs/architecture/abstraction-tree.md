@@ -100,22 +100,31 @@ Category
 │     └─ evaluation commutes strictly    identity comparison, both laws free
 ├─ DGCategory C
 │  ├─ DGLinear k C                       scalar refinement
+│  │  ├─ homComplex                     existing Hom-complex repackaged in ModuleCat k
+│  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
+│  │     ├─ lift / lift_unique           linear cochains are morphisms out of Z
+│  │     ├─ compare                      closed canonical comparison, strict composition
+│  │     └─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
 │  │  │  ├─ whiskerLeft / whiskerRight   both sign-free, additive, degree-preserving
 │  │  │  │  ├─ interchange               Godement, with the Koszul sign (-1)^(m n)
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
-│  │  │  └─ h0                           closed degree zero becomes an ordinary NatTrans
-│  │  │     └─ h0Comparison              H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D); no fullness claimed
-│  │  │        └─ h0Iso                    Z⁰ isomorphisms descend, coherently
+│  │  │  ├─ h0                           closed degree zero becomes an ordinary NatTrans
+│  │  │  │  └─ h0Comparison             H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D); no fullness claimed
+│  │  │  │     └─ h0Iso                 Z⁰ isomorphisms descend, coherently
+│  │  │  └─ ConeData                     functorial objectwise cones
+│  │  │     └─ K₀ action                 target endpoint minus source endpoint
 │  │  ├─ IsQuasiEquivalence               Hom-complex quasi-isos plus essential surjectivity
 │  │  │  └─ h0Equivalence                 induces an equivalence H⁰ C ≌ H⁰ D
 │  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
 │  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
 │  │  │  ├─ HasShift Z⁰(DGFunctor C D) ℤ standard Mathlib packaging, all unit/assoc laws
 │  │  │  ├─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
-│  │  │  └─ shiftedFunctorH0Iso          functor-level comparison; transports H⁰ equivalences
+│  │  │  ├─ shiftedFunctorH0Iso          functor-level comparison; transports H⁰ equivalences
+│  │  │  └─ shiftedFunctorH0CommShift / IsTriangulated
+│  │  │                                 transports exactness with the signed shift package
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
@@ -138,7 +147,9 @@ Category
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
 │  │        ├─ twistTriangleIso          original same-evaluation cone-choice comparison
 │  │        ├─ twistTriangleIsoOfEvaluation  coherent across evaluation and cone choices
-│  │        └─ twistH0IsTriangulated    exact, given only PreservesChosenCones
+│  │        ├─ twistH0IsTriangulated    exact, given only PreservesChosenCones
+│  │        ├─ K₀ action                 generic cone formula: identity minus evaluation
+│  │        └─ IsEulerCopower           choice-invariant realization input for numerical twistK₀
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
@@ -205,7 +216,9 @@ Category
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
 │  │  ├─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
-│  │  └─ stored-cone H⁰ exactness          all four, from endpoint cone preservation
+│  │  ├─ H⁰ exactness                     all four conventional functors, from endpoint cone preservation
+│  │  ├─ triangulated equivalences         canonical Mathlib package for twist and cotwist
+│  │  └─ K₀ action                        identity minus the corresponding adjunction composite
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
 │     └─ full sphericality                 pending Morita/adjoint-comparison theorem
 ├─ Derived-category extensions
