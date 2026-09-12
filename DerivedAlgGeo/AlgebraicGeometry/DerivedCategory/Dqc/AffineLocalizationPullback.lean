@@ -9,6 +9,7 @@ import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineDerivedEquivalence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineQuasicoherentIdentification
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffinePullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffinePushforward
 
@@ -362,8 +363,25 @@ def affineQuasicoherentBoundedLocalizationPullbackToDqc :
   affineQuasicoherentBoundedLocalizationPullback M ⋙
     affineQuasicoherentBoundedDerivedToDqc (CommRingCat.of A)
 
-/-- Bounded localization pullback reaches exactly all intrinsic bounded
-target `Dqc` objects covered by the current affine realization. -/
+include M in
+/-- Bounded localization pullback reaches every object of the intrinsic bounded target
+`Dqc` category. -/
+instance affineQuasicoherentBoundedLocalizationPullbackToDqc_essSurj :
+    (affineQuasicoherentBoundedLocalizationPullbackToDqc
+      (R := R) (A := A) M).EssSurj := by
+  letI : (affineQuasicoherentBoundedLocalizationPullback
+      (R := R) (A := A) M).EssSurj :=
+    affineQuasicoherentBoundedLocalizationPullback_essSurj
+      (R := R) (A := A) M
+  letI : (affineQuasicoherentBoundedDerivedToDqc
+      (CommRingCat.of A)).EssSurj :=
+    affineQuasicoherentBoundedDerivedToDqc_essSurj (CommRingCat.of A)
+  change (affineQuasicoherentBoundedLocalizationPullback M ⋙
+    affineQuasicoherentBoundedDerivedToDqc (CommRingCat.of A)).EssSurj
+  infer_instance
+
+/-- Bounded localization pullback and bounded affine realization have the same essential
+image; both now reach the entire intrinsic bounded target `Dqc` category. -/
 theorem affineQuasicoherentBoundedLocalizationPullbackToDqc_essImage :
     (affineQuasicoherentBoundedLocalizationPullbackToDqc M).essImage =
       (affineQuasicoherentBoundedDerivedToDqc
@@ -511,9 +529,29 @@ instance affineQuasicoherentBoundedDerivedPullback_essSurj_of_isLocalization :
     (affineQuasicoherentBoundedLocalizationPullbackComparison M).symm
 
 include M in
-/-- The bounded affine-localization specialization of the essential-image
-conclusion: canonical exact pullback reaches every intrinsic target object
-currently covered by affine realization. -/
+/-- The canonical exact bounded affine pullback along a localization reaches every object of
+the intrinsic bounded target `Dqc` category. -/
+instance affineQuasicoherentBoundedDerivedPullbackToDqc_essSurj_of_isLocalization :
+    (affineQuasicoherentBoundedDerivedPullbackToDqc
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M)).EssSurj := by
+  letI : (affineQuasicoherentBoundedDerivedPullback
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M)).EssSurj :=
+    affineQuasicoherentBoundedDerivedPullback_essSurj_of_isLocalization
+      (R := R) (A := A) M
+  letI : (affineQuasicoherentBoundedDerivedToDqc
+      (CommRingCat.of A)).EssSurj :=
+    affineQuasicoherentBoundedDerivedToDqc_essSurj (CommRingCat.of A)
+  change (affineQuasicoherentBoundedDerivedPullback
+    (CommRingCat.ofHom (algebraMap R A))
+    (affineLocalizationAlgebraMap_flat M) ⋙
+      affineQuasicoherentBoundedDerivedToDqc (CommRingCat.of A)).EssSurj
+  infer_instance
+
+include M in
+/-- The bounded affine-localization specialization of the essential-image conclusion; both
+sides are the entire intrinsic bounded target `Dqc` category. -/
 theorem affineQuasicoherentBoundedDerivedPullbackToDqc_essImage_of_isLocalization :
     (affineQuasicoherentBoundedDerivedPullbackToDqc
       (CommRingCat.ofHom (algebraMap R A))
