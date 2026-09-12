@@ -250,6 +250,8 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationRestriction
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationCounitIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationPullback_essSurj
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationPullbackToDqc
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationPullbackToDqc_essImage
 
 /-! ## Preserved affine bounded-above projective locus -/
 

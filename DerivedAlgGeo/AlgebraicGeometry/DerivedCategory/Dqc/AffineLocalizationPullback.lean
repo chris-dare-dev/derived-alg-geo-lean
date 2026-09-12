@@ -8,6 +8,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineDerivedEquivalence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization
 
 /-!
 # Derived pullback along an affine localization
@@ -231,6 +232,25 @@ instance affineQuasicoherentLocalizationPullback_essSurj :
         (R := R) (A := A)).obj E,
       ⟨(affineQuasicoherentLocalizationCounitIso
         (R := R) (A := A) M).app E⟩⟩
+
+/-- Affine localization pullback followed by the concrete realization into
+the target `Dqc` category. -/
+def affineQuasicoherentLocalizationPullbackToDqc :
+    AffineQuasicoherentDerivedCategory (CommRingCat.of R) ⥤
+      SchemeQuasicoherentDerivedCategory (Spec (CommRingCat.of A)) :=
+  affineQuasicoherentLocalizationPullback M ⋙
+    affineQuasicoherentDerivedToDqc (CommRingCat.of A)
+
+/-- Localization pullback reaches exactly all target `Dqc` objects covered
+by the currently available affine realization.  Upgrading this equality to
+essential surjectivity onto the full unbounded `Dqc` category is precisely
+the missing affine-realization input. -/
+theorem affineQuasicoherentLocalizationPullbackToDqc_essImage :
+    (affineQuasicoherentLocalizationPullbackToDqc M).essImage =
+      (affineQuasicoherentDerivedToDqc (CommRingCat.of A)).essImage := by
+  change (affineQuasicoherentLocalizationPullback M ⋙
+    affineQuasicoherentDerivedToDqc (CommRingCat.of A)).essImage = _
+  exact Functor.essImage_comp_of_essSurj
 
 end
 
