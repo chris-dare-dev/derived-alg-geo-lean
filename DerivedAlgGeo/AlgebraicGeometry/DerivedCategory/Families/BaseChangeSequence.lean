@@ -17,10 +17,11 @@ arXiv:1902.08184:
 * its coproduct-and-extension closure, the quasicoherent sequence;
 * the inverse-image sequence on the intrinsic bounded-coherent locus.
 
-The only new geometric input is `PerfectComponentsSemiorthogonal`, the
-Hom-vanishing between the perfect envelopes. Compactness of those envelopes
-then propagates this input to the quasicoherent components, and faithfulness
-of the bounded-coherent inclusion reflects it to the bounded components.
+The smallest geometric input is `PerfectExternalProductsSemiorthogonal`, the
+Hom-vanishing between shifts of the concrete external products. Formal
+closure extends this first to the perfect envelopes and then, using
+compactness, to the quasicoherent components. Faithfulness of the
+bounded-coherent inclusion reflects it to the bounded components.
 -/
 
 noncomputable section
@@ -68,6 +69,19 @@ theorem shiftedPerfectGenerators_triangEnvelope_eq
 
 variable (A : SemiorthogonalSequence (SourceDqc X) ι)
 
+/-- The geometric Hom-vanishing statement on the concrete K-flat external
+products. It is quantified over shifts because the perfect components are
+their triangulated envelopes. -/
+def PerfectExternalProductsSemiorthogonal : Prop :=
+  ∀ ⦃i j : ι⦄, i < j →
+    ∀ (Fi : SourcePerfectPartCategory X (A.component i))
+      (Gi : CompactDqcFiber T)
+      (Fj : SourcePerfectPartCategory X (A.component j))
+      (Gj : CompactDqcFiber T) (a b : ℤ)
+      (f : (((D.externalProduct (A.component i)).obj Fi).obj Gi)⟦a⟧ ⟶
+        (((D.externalProduct (A.component j)).obj Fj).obj Gj)⟦b⟧),
+      f = 0
+
 /-- The generator-level geometric Hom-vanishing input: every shifted
 external-product generator from a later component is right orthogonal to
 every shifted external-product generator from an earlier component. -/
@@ -75,6 +89,24 @@ def ShiftedPerfectGeneratorsSemiorthogonal : Prop :=
   ∀ ⦃i j : ι⦄, i < j →
     D.shiftedPerfectGenerators (A.component j) ≤
       (D.shiftedPerfectGenerators (A.component i)).rightOrthogonal
+
+/-- Morphism-level vanishing for the concrete external products implies
+semiorthogonality of their shift-and-isomorphism closures. -/
+theorem shiftedPerfectGeneratorsSemiorthogonal_of_externalProducts
+    (horth : D.PerfectExternalProductsSemiorthogonal A) :
+    D.ShiftedPerfectGeneratorsSemiorthogonal A := by
+  intro i j hij V hV U f hU
+  rcases hU with ⟨Ui, a, eU, Fi, Gi, ⟨eUi⟩⟩
+  rcases hV with ⟨Vj, b, eV, Fj, Gj, ⟨eVj⟩⟩
+  let eSource :
+      (((D.externalProduct (A.component i)).obj Fi).obj Gi)⟦a⟧ ≅ U :=
+    ((shiftFunctor (TargetDqc X T) a).mapIso eUi).trans eU.symm
+  let eTarget : V ≅
+      (((D.externalProduct (A.component j)).obj Fj).obj Gj)⟦b⟧ :=
+    eV.trans ((shiftFunctor (TargetDqc X T) b).mapIso eVj).symm
+  rw [← cancel_epi eSource.hom, ← cancel_mono eTarget.hom]
+  simpa [Category.assoc] using
+    horth hij Fi Gi Fj Gj a b (eSource.hom ≫ f ≫ eTarget.hom)
 
 /-- The geometric Hom-vanishing input between the perfect base-change
 envelopes. This obligation is isolated from the formal closure arguments. -/
@@ -97,6 +129,15 @@ theorem perfectComponentsSemiorthogonal_of_shiftedGenerators
     ObjectProperty.triangEnvelope_le_rightOrthogonal_triangEnvelope
       (D.shiftedPerfectGenerators (A.component i))
       (D.shiftedPerfectGenerators (A.component j)) (horth hij)
+
+/-- Concrete shifted external-product Hom-vanishing implies
+semiorthogonality of the perfect base-change envelopes. -/
+theorem perfectComponentsSemiorthogonal_of_externalProducts
+    (hA : A.HasTriangulatedComponents)
+    (horth : D.PerfectExternalProductsSemiorthogonal A) :
+    D.PerfectComponentsSemiorthogonal A :=
+  D.perfectComponentsSemiorthogonal_of_shiftedGenerators A hA
+    (D.shiftedPerfectGeneratorsSemiorthogonal_of_externalProducts A horth)
 
 /-- The sequence of perfect base-change envelopes on `Dqc(X_T)`. -/
 def perfectSequence (horth : D.PerfectComponentsSemiorthogonal A) :
