@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import Mathlib.Algebra.Category.ModuleCat.Basic
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Functor
 
 /-!
@@ -11,6 +12,11 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Functor
 exactly the complexes `CochainComplex.HomComplex` produces. Linearity over a
 commutative ring is layered on top, the way `CategoryTheory.Linear` layers over
 `Preadditive` in Mathlib.
+
+`DGLinear.homComplex` exposes those same graded groups and differentials as a
+`ModuleCat k`-valued cochain complex.  It is an abbreviation rather than a
+second Hom-complex: only the already supplied module structures and
+`DGLinear.d_smul` are added.
 
 `ADR-0011` records why this is a refinement rather than part of the definition:
 a first draft that baked `ModuleCat k` into `dgHom` collided with the
@@ -46,6 +52,44 @@ class DGLinear (k : Type w) [CommRing k] (C : Type u) [DGCategory.{v} C]
   comp_smul_right {X Y Z : C} (p q r : ℤ) (h : p + q = r) (c : k)
       (f : (dgHom X Y).X p) (g : (dgHom Y Z).X q) :
     dgComp p q r h f (c • g) = c • dgComp p q r h f g
+
+namespace DGLinear
+
+variable (k : Type w) [CommRing k]
+  {C : Type u} [DGCategory.{v} C]
+  [∀ (X Y : C) (p : ℤ), Module k ((dgHom X Y).X p)]
+  [DGLinear k C]
+
+/-- The Hom-complex of a `k`-linear dg category, regarded as a complex of
+`k`-modules.  Its underlying graded groups and differentials are unchanged. -/
+abbrev homComplex (X Y : C) : CochainComplex (ModuleCat.{v} k) ℤ where
+  X p := ModuleCat.of k ((dgHom X Y).X p)
+  d p q := ModuleCat.ofHom
+    { toFun := ((dgHom X Y).d p q).hom
+      map_add' := fun f g => map_add _ f g
+      map_smul' := fun c f => DGLinear.d_smul p q c f }
+  shape p q hpq := by
+    apply ModuleCat.hom_ext
+    ext f
+    change ((dgHom X Y).d p q).hom f = 0
+    exact ConcreteCategory.congr_hom ((dgHom X Y).shape p q hpq) f
+  d_comp_d' p q r _ _ := by
+    apply ModuleCat.hom_ext
+    ext f
+    change ((dgHom X Y).d q r).hom (((dgHom X Y).d p q).hom f) = 0
+    exact ConcreteCategory.congr_hom ((dgHom X Y).d_comp_d p q r) f
+
+@[simp]
+lemma homComplex_X (X Y : C) (p : ℤ) :
+    (homComplex k X Y).X p = ModuleCat.of k ((dgHom X Y).X p) :=
+  rfl
+
+@[simp]
+lemma homComplex_d_apply (X Y : C) (p q : ℤ) (f : (dgHom X Y).X p) :
+    ((homComplex k X Y).d p q).hom f = ((dgHom X Y).d p q).hom f :=
+  rfl
+
+end DGLinear
 
 namespace DGFunctor
 

@@ -143,6 +143,9 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGLinear.comp_smul_left
 #print axioms CategoryTheory.DGLinear.comp_smul_right
 #print axioms CategoryTheory.DGLinear.d_smul
+#print axioms CategoryTheory.DGLinear.homComplex
+#print axioms CategoryTheory.DGLinear.homComplex_X
+#print axioms CategoryTheory.DGLinear.homComplex_d_apply
 #print axioms CategoryTheory.DGFunctor.Linear
 #print axioms CategoryTheory.DGFunctor.Linear.map_smul
 #print axioms CategoryTheory.DGFunctor.compLinear
@@ -1098,6 +1101,48 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.HasCopowers
 #print axioms CategoryTheory.HasCopowers.has_copower
 #print axioms CategoryTheory.hasCopowerOfHasCopowers
+
+-- The genuinely `k`-linear counterpart is separate: `DGLinear.homComplex` reuses the
+-- existing graded pieces and differential in `ModuleCat k`, while
+-- `IsLinearCopowerOf` represents only `k`-linear cochains.  There is no
+-- forgetful projection to `IsCopowerOf`, whose universal property ranges over
+-- every additive cochain.  Choice, comparison, and existence use the same
+-- universal-property pattern without asserting an Euler-class computation.
+#print axioms CategoryTheory.linearCopowerCochain
+#print axioms CategoryTheory.linearCopowerCochain_apply
+#print axioms CategoryTheory.IsLinearCopowerOf
+#print axioms CategoryTheory.IsLinearCopowerOf.univ
+#print axioms CategoryTheory.IsLinearCopowerOf.bijective
+#print axioms CategoryTheory.IsLinearCopowerOf.mk.inj
+#print axioms CategoryTheory.IsLinearCopowerOf.mk.sizeOf_spec
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_d
+#print axioms CategoryTheory.IsLinearCopowerOf.cochainLinearEquiv
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_unique
+#print axioms CategoryTheory.IsLinearCopowerOf.lift
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_zero
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_add
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_smul
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_comp_lift
+#print axioms CategoryTheory.IsLinearCopowerOf.compare
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_comp_compare
+#print axioms CategoryTheory.IsLinearCopowerOf.compare_mem_cocycles
+#print axioms CategoryTheory.IsLinearCopowerOf.compare_comp_compare
+#print axioms CategoryTheory.IsLinearCopowerOf.compare_trans
+#print axioms CategoryTheory.IsLinearCopowerOf.compare_self
+#print axioms CategoryTheory.LinearCopowerData
+#print axioms CategoryTheory.LinearCopowerData.obj
+#print axioms CategoryTheory.LinearCopowerData.isLinearCopower
+#print axioms CategoryTheory.LinearCopowerData.mk.inj
+#print axioms CategoryTheory.LinearCopowerData.mk.sizeOf_spec
+#print axioms CategoryTheory.HasLinearCopower
+#print axioms CategoryTheory.HasLinearCopower.exists_linearCopower
+#print axioms CategoryTheory.HasLinearCopower.of_isLinearCopower
+#print axioms CategoryTheory.linearCopowerData
+#print axioms CategoryTheory.linearCopowerObj
+#print axioms CategoryTheory.linearCopowerIsLinearCopower
+#print axioms CategoryTheory.HasLinearCopowers
+#print axioms CategoryTheory.HasLinearCopowers.has_linearCopower
+#print axioms CategoryTheory.hasLinearCopowerOfHasLinearCopowers
 
 -- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
 -- identity.  Every one of the functor's four laws is `lift_unique` applied to
