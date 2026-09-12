@@ -7,6 +7,50 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Conventional shifted dg twists on `H⁰` (2026-09-12):
+  `DGFunctor.shiftedFunctor_h0_eq` and `shiftedFunctorH0Iso` package the
+  objectwise and morphism computations as a functor-level comparison
+  `H⁰(F[n]) ≅ H⁰(F) ⋙ [n]`.  Equivalence of `H⁰ F` therefore transports to
+  every shifted dg functor without asserting a dg quasi-equivalence or
+  exactness.  `EnhancedAdjunctionCones` now names the conventional
+  `dualTwistFunctor` and `cotwistFunctor`, and `cotwistH0Equivalence` applies
+  that bridge to the recorded unshifted cotwist condition.  This introduces
+  no second shift structure and proves no relation among the four adjunction
+  cones or sphericality.
+- Generic twist kernels and left-adjunction Fourier--Mukai dual cotwists
+  (2026-09-12): `CounitKernelConeData.twistKernel` now names the ordinary image
+  of the selected enhanced cone, with its definitional transform isomorphism
+  and the correspondingly narrow `IsKernelFunctor` conclusion.
+  `DualCotwistKernelData` and its enhanced form then swap the correspondences
+  through `LeftAdjointKernelData.toRightAdjointKernelData` and reuse that
+  counit/twist construction for the left-adjunction counit.  The semantic API
+  names `dualCotwist`, presents it by `dualCotwistKernel`, and exposes the
+  source-natural triangle
+  `Φ_P ⋙ Φ_Q ⟶ 𝟭 X ⟶ dualCotwist ⟶ (Φ_P ⋙ Φ_Q)⟦1⟧`, pointwise
+  distinguished under the existing exactness hypotheses.  No new cone or
+  normalization is introduced, and no exactness, invertibility, canonicity,
+  dual-kernel identity, or sphericality is asserted.
+- Left-adjunction Fourier--Mukai dual twists (2026-09-12):
+  `DualTwistKernelData` and its enhanced cone form read
+  `LeftAdjointKernelData.toRightAdjointKernelData` with the correspondences
+  swapped, so the left-adjunction unit reuses the generic unit-kernel,
+  normalization, inverse-rotation, and shifted-kernel machinery.  The semantic
+  API names the resulting functor `dualTwist`, presents it by
+  `dualTwistKernel`, and exposes the target-natural triangle
+  `dualTwist ⟶ 𝟭 Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧`, pointwise
+  distinguished under the existing exactness hypotheses.  This is not a new
+  adjunction, cone choice, or normalization construction, and it asserts no
+  exactness, invertibility, dual-kernel identity, or sphericality.
+- Shifted Fourier--Mukai cone kernels (2026-09-12):
+  `KernelConeNormalizationData` names the ordinary kernel represented by its
+  selected enhanced cone and, for every integer shift, the kernel obtained by
+  shifting that cone in the enhancement's homotopy category.  The enhancement
+  comparison and the kernel family's existing Mathlib `CommShift` component
+  give the reusable isomorphism from its transform to the pointwise-shifted
+  cone transform.  `AdjunctionUnitKernelConeData.cotwistKernel` specializes
+  this at `-1`, so the conventional cotwist is now explicitly a kernel functor.
+  No second shift structure is installed, and the statement does not make the
+  selected kernel canonical, exact, invertible, or spherical.
 - Fourier--Mukai cotwist inverse rotation (2026-09-12):
   `AdjunctionUnitKernelConeData.cotwist` is the pointwise functor-category
   `[-1]` shift of the selected unshifted cone transform, and
@@ -15,9 +59,9 @@ blocks should normally move it rather than add more declarations beside it.
   `cotwist ⟶ 𝟭 X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.  Its three projection functors
   are identified strictly, its second map is literally the adjunction unit as
   a natural transformation, and every value is distinguished.  The result is
-  choice-dependent and ordinary-categorical: it does not present the shifted
-  functor by a kernel, make it exact or invertible, compare it to a dg
-  adjunction cone, or assert sphericality.
+  choice-dependent and ordinary-categorical.  Its shifted-kernel presentation
+  is now constructed downstream; exactness, invertibility, comparison with a
+  dg adjunction cone, and sphericality remain separate seams.
 - Right-adjunction unit kernels and literal unit triangles (2026-09-12):
   `FourierMukai.AdjunctionUnitKernelData` and its enhanced cone form are
   definitional specializations of the generic kernel-transformation roots,

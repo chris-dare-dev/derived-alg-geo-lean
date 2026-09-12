@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.AdjunctionCone
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategory
 
 /-!
 # Enhanced cone data for spherical-functor constructions
@@ -17,8 +18,9 @@ autoequivalence and adjoint-comparison conditions (or a theorem deriving all
 four conditions from a sufficient pair in the Morita-enhanced setting).
 `TwistCotwistEquivalenceConditions` records the commonly used equivalence pair
 as explicit data, but no theorem here upgrades it to sphericality.  Doing so
-requires the shifted comparison maps and higher cone coherence developed in
-the literature, neither of which is yet a repository primitive.
+requires the specific adjoint-comparison transformations and higher cone
+coherence developed in the literature, neither of which is yet a repository
+primitive.
 -/
 
 set_option autoImplicit false
@@ -80,6 +82,15 @@ noncomputable abbrev dualTwistConeFunctor : DGFunctor B B :=
 /-- The unshifted cone underlying the cotwist. -/
 noncomputable abbrev cotwistConeFunctor : DGFunctor A A :=
   P.cotwistCone.unitCone
+
+/-- The conventional dg dual twist: the `[-1]` shift of its stored unit
+cone. -/
+noncomputable abbrev dualTwistFunctor [IsPretriangulated B] : DGFunctor B B :=
+  P.dualTwistConeFunctor.shiftedFunctor (-1 : ℤ)
+
+/-- The conventional dg cotwist: the `[-1]` shift of its stored unit cone. -/
+noncomputable abbrev cotwistFunctor [IsPretriangulated A] : DGFunctor A A :=
+  P.cotwistConeFunctor.shiftedFunctor (-1 : ℤ)
 
 /-- The dg dual-cotwist endofunctor `Cone(L S ⟶ id_A)`. -/
 noncomputable abbrev dualCotwistFunctor : DGFunctor A A :=
