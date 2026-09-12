@@ -74,6 +74,32 @@ def affineQuasicoherentSheavesPushforwardGammaIso
       (gammaPushforwardNatIso f) ≪≫
     (Functor.associator _ _ _).symm
 
+/-- Geometric affine quasi-coherent pushforward is restriction of scalars
+transported through the affine equivalences. -/
+def affineQuasicoherentSheavesPushforwardComparison
+    {R S : CommRingCat.{u}} (f : R ⟶ S) :
+    affineQuasicoherentSheavesPushforward f ≅
+      equivalenceTransportFunctor
+        (affineQuasicoherentSheavesEquiv S)
+        (affineQuasicoherentSheavesEquiv R)
+        (ModuleCat.restrictScalars f.hom) := by
+  let transported := equivalenceTransportFunctor
+    (affineQuasicoherentSheavesEquiv S)
+    (affineQuasicoherentSheavesEquiv R)
+    (ModuleCat.restrictScalars f.hom)
+  let cancel : transported ⋙ (affineQuasicoherentSheavesEquiv R).inverse ≅
+      (affineQuasicoherentSheavesEquiv S).inverse ⋙
+        ModuleCat.restrictScalars f.hom :=
+    Functor.associator _ _ _ ≪≫
+      Functor.isoWhiskerLeft
+        ((affineQuasicoherentSheavesEquiv S).inverse ⋙
+          ModuleCat.restrictScalars f.hom)
+        (affineQuasicoherentSheavesEquiv R).unitIso.symm ≪≫
+      Functor.rightUnitor _
+  exact Functor.fullyFaithfulCancelRight
+    (affineQuasicoherentSheavesEquiv R).inverse
+    (affineQuasicoherentSheavesPushforwardGammaIso f ≪≫ cancel.symm)
+
 /-- Affine quasi-coherent pushforward preserves finite limits. -/
 instance affineQuasicoherentSheavesPushforward_preservesFiniteLimits
     {R S : CommRingCat.{u}} (f : R ⟶ S) :
