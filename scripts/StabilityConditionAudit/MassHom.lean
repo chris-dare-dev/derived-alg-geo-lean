@@ -39,3 +39,55 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isOpen_massHomLocus
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isClosed_massHomLocus
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isClopen_massHomLocus
+
+/-! ## Full support from finite Euler probes -/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.EulerProbeFamily
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.EulerProbeFamily.realizes
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.EulerProbeFamily.separates
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.shifts
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.shifted_mem
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.euler_abs_le
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.mk.inj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.probeQuadratic
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.probeQuadratic_apply
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.chargeQuadratic
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.chargeQuadratic_apply
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.hasQuadraticSupportProperty_of_finite_probes
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.quadraticSupportData
+
+/-! ## Generator reduction -/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.retract
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.shift
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.of_isZero
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.triangle_middle
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.massHomBoundedTests
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.triangEnvelope
+
+/-! ## Stable-object reduction -/
+
+#print axioms CategoryTheory.Triangulated.Slicing.IsStableAt
+#print axioms CategoryTheory.Triangulated.Slicing.HasJordanHolderFiltrations
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasStableMassHomBoundFor
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasStableMassHomBound
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasStableMassHomBoundFor.massHom
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.stable
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.stable_iff
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasStableMassHomBound.massHom
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasStableMassHomBound.triangEnvelope
+
+/-! ## Algebraic finite-heart base case -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.tiltedImaginaryPart
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.exists_common_positive_functional
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.FiniteLength.exists_common_unit_direction
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasFiniteLengthHeart
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasFiniteStableOrbits
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.IsAlgebraic
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.IsAlgebraic.hasJordanHolder
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.IsAlgebraic.exists_classicalGenerator
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.IsAlgebraic.totalShiftedHomRank
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.IsAlgebraic.hasGlobalMassHomBound
