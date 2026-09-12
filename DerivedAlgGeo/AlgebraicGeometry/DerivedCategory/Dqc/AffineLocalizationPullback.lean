@@ -281,6 +281,61 @@ instance affineLocalizationBoundedDerivedPullback_essSurj :
       ⟨(affineLocalizationBoundedDerivedCounitIso
         (R := R) (A := A) M).app E⟩⟩
 
+/-- Transport bounded localization pullback to the genuine bounded derived
+categories of quasi-coherent sheaves on affine spectra. -/
+def affineQuasicoherentBoundedLocalizationPullback :
+    AffineQuasicoherentBoundedDerivedCategory (CommRingCat.of R) ⥤
+      AffineQuasicoherentBoundedDerivedCategory (CommRingCat.of A) :=
+  equivalenceTransportFunctor
+    (affineQuasicoherentBoundedDerivedEquivalence (CommRingCat.of R))
+    (affineQuasicoherentBoundedDerivedEquivalence (CommRingCat.of A))
+    (affineLocalizationBoundedDerivedPullback M)
+
+/-- Transport bounded restriction of scalars to the genuine bounded derived
+categories of affine quasi-coherent sheaves. -/
+def affineQuasicoherentBoundedLocalizationRestriction :
+    AffineQuasicoherentBoundedDerivedCategory (CommRingCat.of A) ⥤
+      AffineQuasicoherentBoundedDerivedCategory (CommRingCat.of R) :=
+  equivalenceTransportFunctor
+    (affineQuasicoherentBoundedDerivedEquivalence (CommRingCat.of A))
+    (affineQuasicoherentBoundedDerivedEquivalence (CommRingCat.of R))
+    (affineLocalizationBoundedDerivedRestriction (R := R) (A := A))
+
+/-- On bounded affine quasi-coherent derived categories, transported
+restriction followed by localization pullback is naturally isomorphic to the
+identity. -/
+def affineQuasicoherentBoundedLocalizationCounitIso :
+    affineQuasicoherentBoundedLocalizationRestriction
+        (R := R) (A := A) ⋙
+      affineQuasicoherentBoundedLocalizationPullback
+        (R := R) (A := A) M ≅
+      Functor.id
+        (AffineQuasicoherentBoundedDerivedCategory (CommRingCat.of A)) :=
+  equivalenceTransportCompIso
+      (affineQuasicoherentBoundedDerivedEquivalence (CommRingCat.of A))
+      (affineQuasicoherentBoundedDerivedEquivalence (CommRingCat.of R))
+      (affineQuasicoherentBoundedDerivedEquivalence (CommRingCat.of A))
+      (affineLocalizationBoundedDerivedRestriction (R := R) (A := A))
+      (affineLocalizationBoundedDerivedPullback M)
+      (Functor.id (DerivedCategory.Bounded (ModuleCat A)))
+      (affineLocalizationBoundedDerivedCounitIso M) ≪≫
+    equivalenceTransportIdIso
+      (affineQuasicoherentBoundedDerivedEquivalence (CommRingCat.of A))
+      (Functor.id (DerivedCategory.Bounded (ModuleCat A)))
+      (Functor.id (DerivedCategory.Bounded (ModuleCat A)))
+      (Iso.refl _) (Iso.refl _)
+
+/-- Localization pullback is essentially surjective on bounded affine
+quasi-coherent derived categories. -/
+instance affineQuasicoherentBoundedLocalizationPullback_essSurj :
+    (affineQuasicoherentBoundedLocalizationPullback
+      (R := R) (A := A) M).EssSurj where
+  mem_essImage E :=
+    ⟨(affineQuasicoherentBoundedLocalizationRestriction
+        (R := R) (A := A)).obj E,
+      ⟨(affineQuasicoherentBoundedLocalizationCounitIso
+        (R := R) (A := A) M).app E⟩⟩
+
 /-- Transport localization pullback from derived module categories to the
 genuine derived categories of quasi-coherent sheaves on affine spectra. -/
 def affineQuasicoherentLocalizationPullback :
