@@ -130,7 +130,10 @@ Category
 ├─ Fourier--Mukai correspondence
 │  ├─ kernelTransform                     functor from kernels to transforms
 │  ├─ kernelEvaluation                    one source object's kernel-variable functor
-│  ├─ ExactFamily / ExactBifunctor         globally shift-coherent exactness roots
+│  ├─ ExactFamily                         extends Mathlib CommShift; pointwise exactness only
+│  ├─ ExactBifunctor                      extends Mathlib CommShift₂Int; Koszul-compatible
+│  │  ├─ first/secondFamilyCommShift      explicit adapters, evaluation agreement
+│  │  └─ firstFamily / secondFamily       exact-family projections through those adapters
 │  ├─ kernelConeTransformTriangleFunctor  pointwise image of dg cones of an enhanced kernel category
 │  └─ CounitKernelConeData                kernel arrow realizing an adjunction counit, in an enhancement
 │     └─ kernel-presented twist candidate exact image of its dg cone

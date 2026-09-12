@@ -183,12 +183,26 @@ that comparison are instance hypotheses to be discharged by the realization.
    four Anno--Logvinenko conditions and the Morita framework the first
    paragraph rules out.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
-   shift on a functor category, which is what `Functor.ExactFamily` should be
-   built on.  That rewiring is still open, and it is not an API-only change:
-   `ExactBifunctor` records triangulatedness against the shift structure it
-   chose, while the family needs it against that choice composed with the
-   strict comparison for evaluation, so the transport needs a lemma comparing
-   the two `mapTriangle`s.
+   shift on a functor category, and `Functor.ExactFamily` is now built on that
+   canonical structure: it extends Mathlib's `F.CommShift ℤ` and adds only
+   pointwise triangulatedness.  The former `FamilyCommShift` record, its
+   separately stored evaluated comparisons, and its manual naturality field
+   have been removed.
+
+   The bifunctor projection is coherent at the data level, not only at the
+   level of comparison maps.  `Functor.CommShift₂.firstFamilyCommShift` and
+   `secondFamilyCommShift` assemble the two functor-valued `CommShift`
+   structures explicitly from Mathlib's `CommShift₂`; they are not global
+   instances.  After composition with the strict evaluation comparison,
+   `firstFamilyEvaluationCommShift_eq` and
+   `secondFamilyEvaluationCommShift_eq` identify them with the partial
+   structures already selected by `CommShift₂`.  Thus `ExactBifunctor`
+   still retains the Koszul compatibility between its two variables, while
+   its two `ExactFamily` projections transport triangulatedness across an
+   equality of the complete `CommShift` data.  Evaluation of
+   `ExactFamily.mapTriangle` is consequently proved against Mathlib's
+   ordinary `mapTriangle`; no parallel triangle-map interface remains.  This
+   seam is closed.
 4. `EvaluationData.functor` is the generic `RHom(E,-) ⊗ E` dg functor and
    `EvaluationData.evaluation` its degree-zero transformation to the identity,
    both in `Algebra/Homology/DGCategory/Copower.lean`.  They are built on

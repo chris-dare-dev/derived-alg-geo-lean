@@ -7,6 +7,19 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Exact functor-family shift coherence (2026-09-12):
+  `CategoryTheory/Triangulated/ExactFunctorFamily.lean` now makes
+  `Functor.ExactFamily F` extend Mathlib's `F.CommShift ℤ` for the pointwise
+  shift on the target functor category, and adds only pointwise
+  triangulatedness. The parallel `FamilyCommShift` record and its manually
+  stored evaluation naturality are removed. The generic extensionality
+  theorem for `CommShift` lives at the mirrored Mathlib definition site in
+  `CategoryTheory/Shift/CommShift.lean`; the explicit, non-instance adapters
+  from `CommShift₂` and their evaluation-agreement theorems live in
+  `CategoryTheory/Shift/FunctorCategory.lean`. Thus `ExactBifunctor` retains
+  Mathlib's two-variable Koszul contract while its two family projections use
+  the canonical one-variable interface, with complete shift-data agreement
+  rather than an isolated comparison at shift one.
 - Bounded dévissage for the derived functor of an exact functor
   (2026-09-10, #1069/#1070/#1071):
   `Algebra/Homology/DerivedCategory/CohomologyObjectProperty/Bounded.lean` owns
