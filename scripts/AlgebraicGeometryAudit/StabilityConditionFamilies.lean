@@ -337,6 +337,14 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.subsingleton_ext_affineQuasicoherentFree
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.AffineQuasicoherentExtComparison
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentExtComparison
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedDerivedInclusion_map_bijective
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedToDqc_full
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedToDqc_faithful
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedDerivedToDqc_full
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedDerivedToDqc_faithful
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedDerivedToDqc_essSurj
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedDqcEquivalence
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedDqcEquivalence_functor
 
 /-! ## Preserved affine bounded-above projective locus -/
 

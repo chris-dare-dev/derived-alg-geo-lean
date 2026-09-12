@@ -5,6 +5,7 @@ Released under the MIT license.
 import Mathlib.Algebra.Category.ModuleCat.LeftResolution
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.EnoughProjectives
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicGenerators
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Bounded
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineVanishing
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.UnitExt
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization
@@ -145,6 +146,93 @@ theorem affineQuasicoherentExtComparison (R : CommRingCat.{u}) :
     (fun X Y ↦
       (affineQuasicoherentSheavesInclusion R).bijective_mapExtAddHom_zero X Y)
     n F G
+
+/-- The bounded affine derived inclusion is bijective on each hom-set. -/
+theorem affineQuasicoherentBoundedDerivedInclusion_map_bijective
+    (R : CommRingCat.{u})
+    (E E' : AffineQuasicoherentBoundedDerivedCategory R) :
+    Function.Bijective
+      ((DerivedCategory.Bounded.ι ⋙ affineQuasicoherentDerivedInclusion R).map :
+        (E ⟶ E') → _) := by
+  have hι : Function.Bijective
+      ((DerivedCategory.Bounded.ι
+        (C := AffineQuasicoherentSheaves R)).map : (E ⟶ E') → _) :=
+    ⟨DerivedCategory.Bounded.ι.map_injective,
+      DerivedCategory.Bounded.ι.map_surjective⟩
+  exact ((affineQuasicoherentSheavesInclusion R).mapDerivedCategory_map_bijective_of_bounded
+      (affineQuasicoherentExtComparison R) E.property E'.property).comp hι
+
+/-- The bounded affine realization into `Dqc` is full before restricting the target to
+bounded objects. -/
+theorem affineQuasicoherentBoundedToDqc_full (R : CommRingCat.{u}) :
+    (DerivedCategory.Bounded.ι ⋙ affineQuasicoherentDerivedToDqc R).Full := by
+  haveI : (DerivedCategory.Bounded.ι ⋙
+      affineQuasicoherentDerivedInclusion R).Full :=
+    ⟨fun g ↦
+      (affineQuasicoherentBoundedDerivedInclusion_map_bijective R _ _).2 g⟩
+  exact Functor.Full.of_comp_faithful_iso
+    (G := SchemeQuasicoherentDerivedCategory.ι (Spec R))
+    (Functor.associator _ _ _ ≪≫ Functor.isoWhiskerLeft _
+      (affineQuasicoherentDerivedToDqcCompInclusion R))
+
+/-- The bounded affine realization into `Dqc` is faithful before restricting the target to
+bounded objects. -/
+theorem affineQuasicoherentBoundedToDqc_faithful (R : CommRingCat.{u}) :
+    (DerivedCategory.Bounded.ι ⋙ affineQuasicoherentDerivedToDqc R).Faithful := by
+  haveI : (DerivedCategory.Bounded.ι ⋙
+      affineQuasicoherentDerivedInclusion R).Faithful :=
+    ⟨fun hfg ↦
+      (affineQuasicoherentBoundedDerivedInclusion_map_bijective R _ _).1 hfg⟩
+  exact Functor.Faithful.of_comp_iso
+    (G := SchemeQuasicoherentDerivedCategory.ι (Spec R))
+    (Functor.associator _ _ _ ≪≫ Functor.isoWhiskerLeft _
+      (affineQuasicoherentDerivedToDqcCompInclusion R))
+
+/-- The concrete bounded affine realization is full. -/
+theorem affineQuasicoherentBoundedDerivedToDqc_full (R : CommRingCat.{u}) :
+    (affineQuasicoherentBoundedDerivedToDqc R).Full := by
+  haveI := affineQuasicoherentBoundedToDqc_full R
+  change ((schemeBoundedQuasicoherent (Spec R)).lift
+    (DerivedCategory.Bounded.ι ⋙ affineQuasicoherentDerivedToDqc R) _).Full
+  infer_instance
+
+/-- The concrete bounded affine realization is faithful. -/
+theorem affineQuasicoherentBoundedDerivedToDqc_faithful (R : CommRingCat.{u}) :
+    (affineQuasicoherentBoundedDerivedToDqc R).Faithful := by
+  haveI := affineQuasicoherentBoundedToDqc_faithful R
+  change ((schemeBoundedQuasicoherent (Spec R)).lift
+    (DerivedCategory.Bounded.ι ⋙ affineQuasicoherentDerivedToDqc R) _).Faithful
+  infer_instance
+
+/-- Every intrinsically bounded object of `Dqc(Spec R)` is represented by a bounded
+complex of affine quasi-coherent sheaves. -/
+theorem affineQuasicoherentBoundedDerivedToDqc_essSurj (R : CommRingCat.{u}) :
+    (affineQuasicoherentBoundedDerivedToDqc R).EssSurj where
+  mem_essImage E := by
+    obtain ⟨K, hK, ⟨e⟩⟩ :=
+      (affineQuasicoherentSheavesInclusion R).exists_bounded_iso_mapDerivedCategory_obj
+          (affineQuasicoherentExtComparison R) E.property
+          (fun n ↦ ⟨⟨_, E.obj.property n⟩, ⟨Iso.refl _⟩⟩)
+    exact ⟨⟨K, hK⟩,
+      ⟨ObjectProperty.isoMk _ (ObjectProperty.isoMk _ e)⟩⟩
+
+/-- **Bounded affine `Dqc` identification.**  The concrete realization functor is an
+equivalence between the bounded derived category of affine quasi-coherent sheaves and the
+intrinsic bounded quasi-coherent-cohomology locus. -/
+noncomputable def affineQuasicoherentBoundedDqcEquivalence (R : CommRingCat.{u}) :
+    AffineQuasicoherentBoundedDerivedCategory R ≌
+      SchemeBoundedQuasicoherentDerivedCategory (Spec R) := by
+  letI := affineQuasicoherentBoundedDerivedToDqc_full R
+  letI := affineQuasicoherentBoundedDerivedToDqc_faithful R
+  letI := affineQuasicoherentBoundedDerivedToDqc_essSurj R
+  letI : (affineQuasicoherentBoundedDerivedToDqc R).IsEquivalence := {}
+  exact (affineQuasicoherentBoundedDerivedToDqc R).asEquivalence
+
+@[simp]
+theorem affineQuasicoherentBoundedDqcEquivalence_functor (R : CommRingCat.{u}) :
+    (affineQuasicoherentBoundedDqcEquivalence R).functor =
+      affineQuasicoherentBoundedDerivedToDqc R :=
+  rfl
 
 end
 
