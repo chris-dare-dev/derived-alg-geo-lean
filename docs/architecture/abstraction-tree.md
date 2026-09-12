@@ -107,6 +107,7 @@ Category
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
 │  │  │  └─ h0                           closed degree zero becomes an ordinary NatTrans
 │  │  │     └─ h0Comparison              H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D); no fullness claimed
+│  │  │        └─ h0Iso                    Z⁰ isomorphisms descend, coherently
 │  │  ├─ IsQuasiEquivalence               Hom-complex quasi-isos plus essential surjectivity
 │  │  │  └─ h0Equivalence                 induces an equivalence H⁰ C ≌ H⁰ D
 │  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
@@ -133,6 +134,8 @@ Category
 │  │        ├─ compareIso                coherent Z⁰ iso across evaluation/cone choices
 │  │        │  └─ inclusion compatibility is strict
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
+│  │        ├─ twistTriangleIso          original same-evaluation cone-choice comparison
+│  │        ├─ twistTriangleIsoOfEvaluation  coherent across evaluation and cone choices
 │  │        └─ twistH0IsTriangulated    exact, given only PreservesChosenCones
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
@@ -151,6 +154,7 @@ Category
 │  │        ├─ preservesShifts           a cone functor preserves shifts if its ends do
 │  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
+│  │        │  ├─ triangleIsoOfStrictSquare  endpoint isos give a NatIso
 │  │        │  └─ compareIso             the cone choices do not matter, canonically
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
 │  │           └─ twistTriangleFunctor   H⁰ D ⥤ Triangle (H⁰ D), all distinguished
