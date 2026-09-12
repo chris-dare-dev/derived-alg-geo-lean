@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Bounded
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.HomVanishing
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.SingleTriangle
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Opposite

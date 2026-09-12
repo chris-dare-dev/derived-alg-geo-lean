@@ -5,6 +5,7 @@ contract and reading guide.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Bounded
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.HomVanishing
 import DerivedAlgGeo.CategoryTheory.Abelian.SerreClass.FullSubcategory
 
 /-! ## The middle of a five-term exact sequence (#721)
@@ -60,3 +61,5 @@ resulting induction on amplitude is what the derived-functor dévissage runs on.
 #print axioms DerivedCategory.cohomologyIn_truncGE
 #print axioms DerivedCategory.prop_of_cohomologyIn_singleFunctor_obj
 #print axioms DerivedCategory.bounded_induction
+#print axioms DerivedCategory.hom_singleFunctor_eq_zero_of_ext_subsingleton
+#print axioms DerivedCategory.hom_eq_zero_of_isGE_of_isLE_neg_of_cohomologyIn
