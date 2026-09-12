@@ -151,6 +151,70 @@ theorem h0Comparison_map_mk {F G : H0 (DGFunctor C D)}
       HomogeneousNatTrans.h0 a.1 (isClosed_of_mem_cocycles a.2) :=
   rfl
 
+/-- An isomorphism of dg functors in the closed degree-zero category descends
+to a natural isomorphism between their `H⁰` functors.  This is the image under
+the canonical composite `Z⁰ → H⁰ → Fun(H⁰ C, H⁰ D)`. -/
+noncomputable def h0Iso {F G : Z0 (DGFunctor C D)} (e : F ≅ G) :
+    (Z0.of (DGFunctor C D) F).h0 ≅ (Z0.of (DGFunctor C D) G).h0 :=
+  (h0Comparison C D).mapIso ((Z0.toH0 (DGFunctor C D)).mapIso e)
+
+@[simp]
+theorem h0Iso_hom {F G : Z0 (DGFunctor C D)} (e : F ≅ G) :
+    (h0Iso e).hom =
+      HomogeneousNatTrans.h0 e.hom.val
+        (isClosed_of_mem_cocycles e.hom.2) :=
+  rfl
+
+@[simp]
+theorem h0Iso_inv {F G : Z0 (DGFunctor C D)} (e : F ≅ G) :
+    (h0Iso e).inv =
+      HomogeneousNatTrans.h0 e.inv.val
+        (isClosed_of_mem_cocycles e.inv.2) :=
+  rfl
+
+@[simp]
+theorem h0Iso_hom_app {F G : Z0 (DGFunctor C D)} (e : F ≅ G) (X : H0 C) :
+    ((h0Iso e).app X).hom =
+      (HomogeneousNatTrans.h0 e.hom.val
+        (isClosed_of_mem_cocycles e.hom.2)).app X :=
+  rfl
+
+@[simp]
+theorem h0Iso_inv_app {F G : Z0 (DGFunctor C D)} (e : F ≅ G) (X : H0 C) :
+    ((h0Iso e).app X).inv =
+      (HomogeneousNatTrans.h0 e.inv.val
+        (isClosed_of_mem_cocycles e.inv.2)).app X :=
+  rfl
+
+@[simp]
+theorem h0Iso_refl (F : Z0 (DGFunctor C D)) :
+    h0Iso (Iso.refl F) = Iso.refl (Z0.of (DGFunctor C D) F).h0 := by
+  calc
+    h0Iso (Iso.refl F) =
+        (h0Comparison C D).mapIso
+          (Iso.refl ((Z0.toH0 (DGFunctor C D)).obj F)) := by
+      rw [h0Iso, Functor.mapIso_refl]
+      rfl
+    _ = Iso.refl ((h0Comparison C D).obj
+        ((Z0.toH0 (DGFunctor C D)).obj F)) :=
+      Functor.mapIso_refl _ _
+    _ = _ := rfl
+
+theorem h0Iso_trans {F G H : Z0 (DGFunctor C D)} (e : F ≅ G) (f : G ≅ H) :
+    h0Iso (e.trans f) = (h0Iso e).trans (h0Iso f) := by
+  calc
+    h0Iso (e.trans f) = (h0Comparison C D).mapIso
+        (((Z0.toH0 (DGFunctor C D)).mapIso e).trans
+          ((Z0.toH0 (DGFunctor C D)).mapIso f)) := by
+      rw [h0Iso, Functor.mapIso_trans]
+      rfl
+    _ = ((h0Comparison C D).mapIso
+          ((Z0.toH0 (DGFunctor C D)).mapIso e)).trans
+        ((h0Comparison C D).mapIso
+          ((Z0.toH0 (DGFunctor C D)).mapIso f)) :=
+      Functor.mapIso_trans _ _ _
+    _ = _ := rfl
+
 end DGFunctor
 
 end CategoryTheory
