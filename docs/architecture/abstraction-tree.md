@@ -48,6 +48,7 @@ Category
 │  └─ reflective transport using an ordinary adjunction
 ├─ Preadditive
 │  ├─ Triangulated category              Mathlib root
+│  │  ├─ signed integral-shift exactness explicit CommShift + IsTriangulated
 │  │  ├─ ObjectProperty.OnTriangle       objectwise subcategory witness
 │  │  │  └─ liftTriangle / liftTriangleMap
 │  │  │     full-subcategory lift, comparison iso, functorial laws

@@ -239,10 +239,12 @@ that comparison are instance hypotheses to be discharged by the realization.
    endpoint `PreservesChosenCones` witnesses; shift preservation is free for
    every dg functor.  Together with `twistH0Equivalence`, this makes the twist
    an exact autoequivalence.  The conventional dual twist and cotwist are the
-   `[-1]` shifts of two stored cones, and their exactness is deliberately not
-   inferred here: Mathlib installs no generic `CommShift` on an odd shift
-   functor because the triangulated comparison carries a sign.  That
-   sign-coherent shift-exactness interface is a separate remaining seam.
+   `[-1]` shifts of two stored cones.  The reusable
+   `Pretriangulated.shiftFunctorCommShift` now supplies the required Koszul
+   sign and `shiftFunctorIsTriangulated` proves exactness of every integral
+   shift without installing a global instance.  Transporting the two stored
+   cone exactness results through composition with this explicit signed
+   structure is the next downstream seam.
    None of these results is sphericality, which still needs all four
    Anno--Logvinenko conditions and the Morita framework above.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
