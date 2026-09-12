@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.SchemeDerived
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FiniteType
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeCategory
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeDecomposition
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeSequence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.KFlatPullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.KFlatBaseChange

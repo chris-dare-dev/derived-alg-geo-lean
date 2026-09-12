@@ -43,6 +43,16 @@ abbrev SourceDqc (X : SchemeBaseChange S) :=
 abbrev TargetDqc (X T : SchemeBaseChange S) :=
   Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left
 
+/-- The compact-object model for `Perf(X_T)`. -/
+abbrev TargetPerfect (X T : SchemeBaseChange S) :=
+  (ObjectProperty.compactObjects.{u} (C := TargetDqc X T)).FullSubcategory
+
+/-- The canonical inclusion of the compact-object model of `Perf(X_T)` into
+`Dqc(X_T)`. -/
+abbrev targetPerfectToDqc (X T : SchemeBaseChange S) :
+    TargetPerfect X T ⥤ TargetDqc X T :=
+  (ObjectProperty.compactObjects.{u} (C := TargetDqc X T)).ι
+
 namespace KFlatBaseChangeData
 
 variable (A : SemiorthogonalSequence (SourceDqc X) ι)
@@ -66,6 +76,29 @@ theorem perfectSequence_component
     (D.perfectSequence A horth).component i =
       D.perfectEnvelope (A.component i) :=
   rfl
+
+/-- The perfect base-change sequence on the compact-object model of
+`Perf(X_T)`, obtained by restricting the ambient perfect-envelope sequence. -/
+def perfectCategorySequence
+    (horth : D.PerfectComponentsSemiorthogonal A) :
+    SemiorthogonalSequence (TargetPerfect X T) ι :=
+  (D.perfectSequence A horth).inverseImage (targetPerfectToDqc X T)
+
+@[simp]
+theorem perfectCategorySequence_component
+    (horth : D.PerfectComponentsSemiorthogonal A) (i : ι) :
+    (D.perfectCategorySequence A horth).component i =
+      (D.perfectEnvelope (A.component i)).inverseImage
+        (targetPerfectToDqc X T) :=
+  rfl
+
+/-- The compact-object inclusion is compatible with the perfect-category and
+ambient perfect-envelope sequences. -/
+theorem perfectCategorySequence_compatible
+    (horth : D.PerfectComponentsSemiorthogonal A) :
+    (D.perfectCategorySequence A horth).CompatibleWith
+      (targetPerfectToDqc X T) (D.perfectSequence A horth) :=
+  SemiorthogonalSequence.inverseImage_compatible _ _
 
 /-- Compactness propagates perfect-envelope semiorthogonality to the
 quasicoherent base-change components. -/
