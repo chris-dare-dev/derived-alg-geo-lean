@@ -161,6 +161,7 @@ Category
 │     │  └─ normalizationData             reusable literal endpoint/first-map transport
 │     ├─ CounitKernelData                 equivalent adjunction-counit specialization; stable API
 │     │  └─ CounitKernelConeData          enhanced counit specialization
+│     │     ├─ twistKernel                           ordinary image of the selected dg cone
 │     │     ├─ kernel-presented twist candidate       exact image of its dg cone
 │     │     └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
 │     ├─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
@@ -170,10 +171,14 @@ Category
 │     │     ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
 │     │     ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
 │     │     └─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
-│     └─ DualTwistKernelData              left-adjunction semantic specialization after swapping
-│        └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
-│           ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
-│           └─ dualTwistTriangleInTarget             inverse rotation, pointwise distinguished
+│     ├─ DualTwistKernelData              left-adjunction unit specialization after swapping
+│     │  └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
+│     │     ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
+│     │     └─ dualTwistTriangleInTarget             inverse rotation, pointwise distinguished
+│     └─ DualCotwistKernelData            left-adjunction counit specialization after swapping
+│        └─ DualCotwistKernelConeData     reuses the counit/twist cone and normalization
+│           ├─ dualCotwistKernel                      selected enhanced cone presenting dual cotwist
+│           └─ dualCotwistTriangleInSource           literal counit triangle, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only

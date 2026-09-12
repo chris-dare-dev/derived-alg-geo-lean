@@ -137,6 +137,7 @@ Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
          │  │  (conv Q P represents Φ_Q ⋙ Φ_P diagrammatically; Huybrechts writes P ∘ Q)
          │  └─ toConeData: choose a closed representative and dg cone in any enhancement
          │     └─ FourierMukai.CounitKernelConeData
+         │        ├─ twistKernel presents the selected enhanced cone
          │        └─ exact kernel evaluation gives a source-natural counit triangle
          │           Φ_Q ⋙ Φ_P ⟶ 𝟭_Y ⟶ twist, pointwise distinguished
          ├─ AdjunctionUnitKernelData: definitional right-adjunction-unit specialization
@@ -150,10 +151,15 @@ Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
          │     └─ inverse rotation gives
          │        cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧,
          │        pointwise distinguished
-         └─ DualTwistKernelData: left-adjunction specialization after swapping C and C'
-            └─ DualTwistKernelConeData reuses the unit/cotwist construction
-               ├─ dualTwistKernel presents the pointwise shifted left-unit cone
-               └─ dualTwist ⟶ 𝟭_Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧,
+         ├─ DualTwistKernelData: left-adjunction unit specialization after swapping C and C'
+         │  └─ DualTwistKernelConeData reuses the unit/cotwist construction
+         │     ├─ dualTwistKernel presents the pointwise shifted left-unit cone
+         │     └─ dualTwist ⟶ 𝟭_Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧,
+         │        pointwise distinguished
+         └─ DualCotwistKernelData: left-adjunction counit specialization after swapping C and C'
+            └─ DualCotwistKernelConeData reuses the counit/twist construction
+               ├─ dualCotwistKernel presents the selected left-counit cone
+               └─ Φ_P ⋙ Φ_Q ⟶ 𝟭_X ⟶ dualCotwist ⟶ (Φ_P ⋙ Φ_Q)⟦1⟧,
                   pointwise distinguished
 ```
 
@@ -356,7 +362,12 @@ that comparison are instance hypotheses to be discharged by the realization.
    `LeftAdjointKernelData.toRightAdjointKernelData`, so its enhanced form names
    the kernel-presented dual twist and the pointwise distinguished family
    `dualTwist ⟶ 𝟭_Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧` without a second
-   cone or normalization construction.  Pointwise distinguishedness cannot
+   cone or normalization construction.  The corresponding left-adjunction
+   counit is a fourth consumer: `DualCotwistKernelData` performs the same swap
+   through the generic counit/twist interface, names the selected cone kernel,
+   and exposes
+   `Φ_P ⋙ Φ_Q ⟶ 𝟭_X ⟶ dualCotwist ⟶ (Φ_P ⋙ Φ_Q)⟦1⟧` pointwise,
+   again without new cone machinery.  Pointwise distinguishedness cannot
    supply `CommShift` or `IsTriangulated` for either shifted cone functor, and
    no comparison with the corresponding dg-adjunction cone is available;
    those later seams remain explicit.

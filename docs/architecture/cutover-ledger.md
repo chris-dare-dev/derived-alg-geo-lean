@@ -7,6 +7,19 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Generic twist kernels and left-adjunction Fourier--Mukai dual cotwists
+  (2026-09-12): `CounitKernelConeData.twistKernel` now names the ordinary image
+  of the selected enhanced cone, with its definitional transform isomorphism
+  and the correspondingly narrow `IsKernelFunctor` conclusion.
+  `DualCotwistKernelData` and its enhanced form then swap the correspondences
+  through `LeftAdjointKernelData.toRightAdjointKernelData` and reuse that
+  counit/twist construction for the left-adjunction counit.  The semantic API
+  names `dualCotwist`, presents it by `dualCotwistKernel`, and exposes the
+  source-natural triangle
+  `Φ_P ⋙ Φ_Q ⟶ 𝟭 X ⟶ dualCotwist ⟶ (Φ_P ⋙ Φ_Q)⟦1⟧`, pointwise
+  distinguished under the existing exactness hypotheses.  No new cone or
+  normalization is introduced, and no exactness, invertibility, canonicity,
+  dual-kernel identity, or sphericality is asserted.
 - Left-adjunction Fourier--Mukai dual twists (2026-09-12):
   `DualTwistKernelData` and its enhanced cone form read
   `LeftAdjointKernelData.toRightAdjointKernelData` with the correspondences
