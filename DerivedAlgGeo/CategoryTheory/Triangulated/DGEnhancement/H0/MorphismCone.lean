@@ -96,7 +96,6 @@ theorem conePresentation_arrow {K L : W} (f : K ⟶ L) :
 
 /-- The arrow in the selected cone presentation represents the inverse image
 of the original ordinary morphism. -/
-@[simp]
 theorem homMk_conePresentation_arrow {K L : W} (f : K ⟶ L) :
     H0.homMk (C := e.dgCat) (e.conePresentation f).arrow =
       e.equiv.inverse.map f :=
