@@ -57,3 +57,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.chargeQuadratic_apply
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.hasQuadraticSupportProperty_of_finite_probes
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.quadraticSupportData
+
+/-! ## Generator reduction -/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.retract
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.shift
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.of_isZero
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.triangle_middle
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.massHomBoundedTests
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.triangEnvelope
