@@ -126,8 +126,8 @@
       "sections": [7],
       "part": "I",
       "status": "target",
-      "tracking": ".claude/roadmap/projective-families.yaml#projective-families-m5",
-      "note": "Mass-Hom bounds, tilt comparisons, and supported derived categories of vector-bundle total spaces. Target only."
+      "tracking": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/1177",
+      "note": "Mass-Hom bounds (Definition 7.1, Lemma 7.4, Theorem 7.5) tracked by #1177 with deliverables #1178--#1183; consumers #1184 (Cheng, full support property) and #1185 (Theorem 8.23, good moduli); tilt comparisons (Propositions 7.6--7.7) and supported derived categories remain under .claude/roadmap/projective-families.yaml#projective-families-m5. Target only."
     },
     {
       "id": "sec-8-1-relative-perfect-moduli",
