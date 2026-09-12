@@ -1,0 +1,70 @@
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.AlgebraicWitness
+
+open CategoryTheory CategoryTheory.Triangulated
+
+namespace CategoryTheory.Triangulated.AlgebraicWitness
+
+#print axioms fgModuleCat_simple_iff_finrank_eq_one
+#print axioms DerivedFiniteVect
+#print axioms standardT
+#print axioms residueObject
+#print axioms standardT_isBounded
+#print axioms boundedQh_essImage_le_bounded
+#print axioms boundedImageToBounded
+#print axioms boundedImageToBounded_additive
+#print axioms boundedImageToBounded_linear
+#print axioms boundedImageToBounded_full
+#print axioms boundedImageToBounded_faithful
+#print axioms boundedImageToBounded_commShift
+#print axioms boundedImageToBounded_essSurj
+#print axioms homFiniteBounded_derivedFiniteVect
+#print axioms homFinite_derivedFiniteVect
+#print axioms subsingleton_residue_shiftedHom_of_ne_zero
+#print axioms chiHom_residue_eq_finrank
+#print axioms centralCharge
+#print axioms residueHomEquiv
+#print axioms finrank_residueHom_pos
+#print axioms centralCharge_of_heart
+#print axioms standardStabilityFunction
+#print axioms standardWeakStabilityFunction
+#print axioms standardWeak_slope_eq_top
+#print axioms standardWeak_isSemistable
+#print axioms standardWeak_hasHNProperty
+#print axioms standardWeak_ambientHN
+#print axioms standardSlicing
+#print axioms centralCharge_ne_zero_of_ambientPhasePredicate
+#print axioms standardPreStabilityCondition
+#print axioms standardSlicing_phase_integer
+#print axioms standardDualHeart_heart_iff
+#print axioms phaseBase_int
+#print axioms standardSlicing_mem_integer_iff
+#print axioms standardCanonicalHeart_heart_iff
+#print axioms dualHeartToStandardEquivalence
+#print axioms dualHeartEquivalence
+#print axioms canonicalHeartEquivalence
+#print axioms dualHeart_isStableAt_iff_simple
+#print axioms dualHeart_isArtinianObject
+#print axioms dualHeart_isNoetherianObject
+#print axioms standardSlicing_isLocallyFinite
+#print axioms standardStabilityCondition
+#print axioms canonicalHeart_isArtinianObject
+#print axioms canonicalHeart_isNoetherianObject
+#print axioms simpleHeartObject
+#print axioms simpleHeartObject_simple
+#print axioms canonicalHeart_simple_iso
+#print axioms standardStabilityCondition_hasFiniteLengthHeart
+#print axioms standardHeart_simple_iso_residue
+#print axioms stableRepresentative
+#print axioms stableRepresentative_isStable
+#print axioms stable_iso_residue_shift
+#print axioms phaseIndex_int_eq
+#print axioms stableRepresentative_iso_residue
+#print axioms stable_iso_representative_shift
+#print axioms standardSlicing_hasJordanHolderFiltrations
+#print axioms standardStabilityCondition_hasFiniteStableOrbits
+#print axioms standardStabilityCondition_isAlgebraic
+#print axioms standardStabilityCondition_hasGlobalMassHomBound
+#print axioms centralCharge_residue
+#print axioms centralCharge_ne_zero
+
+end CategoryTheory.Triangulated.AlgebraicWitness
