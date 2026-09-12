@@ -104,6 +104,50 @@ noncomputable def boundedPullbackPushforwardAdjunction
     (boundedPullbackCompInclusion DT DU P pull hPullDqc hPullBounded).symm
     (boundedPushforwardCompInclusion DT DU P push hPushDqc hPushBounded).symm
 
+/-- Lemma 3.18 for the constructed quasicoherent base-change component,
+reduced to the geometric inputs: a fully faithful right adjoint on `Dqc` and
+detection of component membership by pullback. -/
+theorem quasicoherentPullbackOfDetection_essSurj_of_adjunction
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    (adj : pull.functor ⊣ push.functor)
+    (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
+      DU.quasicoherentComponent P E ↔
+        DT.quasicoherentComponent P (pull.functor.obj E))
+    [push.functor.Full] [push.functor.Faithful] :
+    (quasicoherentPullbackOfDetection DT DU P pull hDetect).EssSurj := by
+  letI : pull.functor.EssSurj :=
+    pull.essSurj_of_adjunction_of_fullyFaithful push adj
+  infer_instance
+
+/-- Lemma 3.18 for the constructed bounded base-change component.  Full
+faithfulness of the `Dqc` right adjoint descends to the bounded-coherent
+restriction, whose counit supplies essential surjectivity before the final
+membership-detection restriction to `D_T`. -/
+theorem boundedPullbackOfDetection_essSurj_of_adjunction
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    (adj : pull.functor ⊣ push.functor)
+    (hPull : pull.PreservesBoundedCoherent)
+    (hPush : push.PreservesBoundedCoherent)
+    (hDetect : ∀ E : Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ U).left,
+      DU.boundedComponent P E ↔
+        DT.boundedComponent P ((pull.boundedFunctor hPull).obj E))
+    [push.functor.Full] [push.functor.Faithful] :
+    (boundedPullbackOfDetection DT DU P pull hPull hDetect).EssSurj := by
+  let boundedAdj :=
+    boundedCoherentPullbackPushforwardAdjunction pull push adj hPull hPush
+  letI : (pull.boundedFunctor hPull).EssSurj := by
+    constructor
+    intro E
+    letI : IsIso (boundedAdj.counit.app E) := inferInstance
+    exact boundedAdj.mem_essImage_of_counit_isIso E
+  infer_instance
+
 end KFlatBaseChangeData
 
 end

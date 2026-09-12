@@ -107,6 +107,22 @@ theorem boundedFunctor_obj_obj (P : DqcRightDerivedPushforward f)
     ((P.boundedFunctor h).obj E).obj = P.functor.obj E.obj :=
   rfl
 
+/-- Fullness of right-derived pushforward on `Dqc` descends to its intrinsic
+bounded-coherent restriction. -/
+noncomputable instance boundedFunctor_full (P : DqcRightDerivedPushforward f)
+    (h : P.PreservesBoundedCoherent) [P.functor.Full] :
+    (P.boundedFunctor h).Full := by
+  dsimp [boundedFunctor]
+  infer_instance
+
+/-- Faithfulness of right-derived pushforward on `Dqc` descends to its
+intrinsic bounded-coherent restriction. -/
+instance boundedFunctor_faithful (P : DqcRightDerivedPushforward f)
+    (h : P.PreservesBoundedCoherent) [P.functor.Faithful] :
+    (P.boundedFunctor h).Faithful := by
+  dsimp [boundedFunctor]
+  infer_instance
+
 end DqcRightDerivedPushforward
 
 namespace KFlatBaseChangeData
