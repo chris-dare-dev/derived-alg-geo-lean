@@ -11,6 +11,21 @@ mfc registry validate registry/bridgeland2007.json \
   --frontier-kind-labels mathlib-gap unproved-here definitional-divergence source-review-pending
 ```
 
+## The 2501.00710v2 coverage map — mass--Hom and moduli targets
+
+`coverage-2501.00710.json` pins Halpern-Leistner--Robotis,
+*The Space of augmented stability conditions*, arXiv:2501.00710**v2**
+(31 May 2026, 102 pages). The map is restricted to §2.2, “Boundedness of
+functors,” and §2.5, “Existence of moduli spaces”; every entry is `target`, so
+it asserts no theorem coverage and mints no citation key. Its numbering ledger
+records Definition 2.7, Lemma 2.8, Example 2.9, Corollary 2.14, Example 2.29,
+Theorem 2.35, Propositions 2.38 and 2.41, and Conjecture 1. In particular,
+v1 Theorem 2.31 is v2 Theorem 2.35. Validate with:
+
+```sh
+python scripts/check_coverage_map.py registry/coverage-2501.00710.json
+```
+
 ## The 1902.08184v4 coverage map — not a mint surface
 
 `coverage-1902.08184v4.json` (issue #87) pins arXiv:1902.08184**v4**
