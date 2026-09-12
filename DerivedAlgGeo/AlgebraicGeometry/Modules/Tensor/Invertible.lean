@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Equivalence
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Isomorphism
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Locality
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 import Mathlib.CategoryTheory.Abelian.ShortExact
@@ -175,6 +177,34 @@ noncomputable instance tensorLeftFunctor_preservesFiniteLimits (L : X.Modules)
       (show SheafOfModules X.ringCatSheaf from L)] :
     PreservesFiniteLimits (tensorLeftFunctor L) :=
   Functor.preservesFiniteLimits_of_preservesHomology (tensorLeftFunctor L)
+
+/-- **Tensoring a finitely presented module sheaf by an invertible one preserves finite
+presentation.**
+
+On a rank-one trivializing cover for `L`, the restriction of `L ⊗ M` is isomorphic to the
+restriction of `M`: commute the two tensor factors and use the right-factor trivialization.
+Finite presentation restricts to each cover member and descends from that cover. -/
+theorem isFinitePresentation_tensorObj_left_of_isInvertible (L M : X.Modules)
+    [SheafOfModules.IsInvertible.{u, u, u}
+      (show SheafOfModules X.ringCatSheaf from L)]
+    (hM : (show SheafOfModules X.ringCatSheaf from M).IsFinitePresentation) :
+    (show SheafOfModules X.ringCatSheaf from
+      tensorObj L M).IsFinitePresentation := by
+  obtain ⟨q, hq, hrank⟩ :=
+    SheafOfModules.IsInvertible.exists_rankOneData
+      (M := show SheafOfModules X.ringCatSheaf from L)
+  letI : q.IsLocallyFreeData := hq
+  apply SheafOfModules.IsFinitePresentation.of_coversTop
+    (show SheafOfModules X.ringCatSheaf from tensorObj L M) q.X q.coversTop
+  intro i
+  let e : (tensorObj L M).over (q.X i) ≅ M.over (q.X i) :=
+    (SheafOfModules.overFunctor X.ringCatSheaf (q.X i)).mapIso
+        (tensorCommIso L M) ≪≫
+      tensorOverIsoOfTrivializationRight M L (q.X i)
+        (q.rankOneTrivialization hrank i)
+  exact SheafOfModules.IsFinitePresentation.of_iso
+    (C := Over (q.X i)) e.symm
+    (SheafOfModules.IsFinitePresentation.over hM (q.X i))
 
 /-- **Tensoring an epimorphism by an invertible module sheaf remains an epimorphism.**
 
