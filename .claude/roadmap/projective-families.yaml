@@ -389,7 +389,7 @@ items:
     parent: projective-families-e14
     blocked_by: [1178]
     title: "Generator and stable-object reductions (HLR Lemma 2.8, Remark 7.2)"
-    status: blocked
+    status: done
     summary: "The class of A with a constant is thick (long exact Hom sequence, mass shift-invariance), so a classical generating set of T suffices; and stable F suffices via HN additivity of mass and Jordan–Hölder in the finite-length 𝒫(φ). The Jordan–Hölder input at the Mathlib pin is a named research item, proved or isolated as one hypothesis."
     priority: must
     size: L
@@ -454,7 +454,7 @@ items:
     parent: projective-families-m5
     blocked_by: [1178]
     title: "Mass-Hom bounds imply the full support property (Cheng, arXiv:2608.14540)"
-    status: blocked
+    status: done
     priority: should
     size: L
     summary: "Cheng Theorem 2.1 (proper X, Remark 2.2): a mass-Hom bound gives the support property for the full K_num(X), via finitely many perfect A_i separating K_num, the finite Ext-window on semistables (phase vanishing plus Serre duality with the dualizing complex), and the KS quadratic form C²|Z|² − ‖·‖². Also Definition 3.1 / Theorem 3.2 (uniform relative version, blocked on e10) and Theorem 4.2 (canonical component, blocked on e14-6 and PF3). Answers §1.7 of the paper for Stab†."
