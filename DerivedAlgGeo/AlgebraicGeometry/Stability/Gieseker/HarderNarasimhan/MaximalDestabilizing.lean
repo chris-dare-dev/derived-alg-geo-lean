@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Noetherian
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.MuStability
 import Mathlib.CategoryTheory.Abelian.Exact
 import Mathlib.CategoryTheory.Subobject.NoetherianObject
@@ -16,14 +17,14 @@ named inputs and nothing else.
 
 ## What is supplied, and what is proved
 
-`MuHNInput` carries exactly two facts, neither available at this pin:
+`MuHNInput` carries exactly two facts:
 
-* *subobject-chain termination*, `IsNoetherianObject F` for every coherent sheaf. `Coh X` on a
-  noetherian variety is a noetherian category; the transfer lemma a geometric proof would use is
-  `isNoetherianObject_of_fullFaithful_preservesMono` in `CategoryTheory/Abelian/QuasiAbelian.lean`,
-  applied through `Coh.ι`.
+* *subobject-chain termination*, `IsNoetherianObject F` for every coherent sheaf. This is now
+  proved for every Noetherian scheme by `Coh.isNoetherianObject`; proper varieties obtain the
+  required `IsNoetherian X` instance. `MuHNInput.ofSlopeBoundedness` installs this field from that
+  theorem.
 * *slope boundedness*, Grothendieck's lemma: the μ-slopes of nonzero subobjects of a fixed `F`
-  are bounded above.
+  are bounded above. This remains the geometric input unavailable here.
 
 Neither the maximal destabilizing subobject nor `HasHNProperty` is a field. Everything below is
 derived.
@@ -56,12 +57,12 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-/-- **The two inputs sheaf-level Harder–Narasimhan theory needs**, neither provable at this pin.
-See the module docstring for what would discharge each, and for why boundedness must be stated
-with a real bound rather than in `WithTop ℝ`. -/
+/-- **The two inputs sheaf-level Harder–Narasimhan theory needs.** The first is proved for
+Noetherian schemes; the second remains Grothendieck's boundedness lemma. See the module docstring
+for why boundedness must be stated with a real bound rather than in `WithTop ℝ`. -/
 structure MuHNInput (P : PolarizedVarietyData k X) (h : MuPositivityData P) : Prop where
-  /-- Ascending chains of subobjects terminate. `Coh X` on a noetherian variety is a noetherian
-  category; no instance exists at this pin. -/
+  /-- Ascending chains of subobjects terminate. `Coh.isNoetherianObject` supplies this on a
+  Noetherian scheme. -/
   noetherian : ∀ F : Coh X, IsNoetherianObject F
   /-- **Grothendieck's boundedness lemma**: the μ-slopes of the nonzero subobjects of positive
   multiplicity of a fixed sheaf are bounded above by a real number. Nothing in the tree supplies
@@ -69,6 +70,18 @@ structure MuHNInput (P : PolarizedVarietyData k X) (h : MuPositivityData P) : Pr
   slope_bddAbove : ∀ F : Coh X, ∃ μ₀ : ℝ, ∀ B : Subobject F, ¬IsZero (B : Coh X) →
     0 < P.multiplicity (B : Coh X) →
       (P.hilbertDegreeCoefficient (B : Coh X) : ℝ) / (P.multiplicity (B : Coh X) : ℝ) ≤ μ₀
+
+/-- On a Noetherian scheme, Grothendieck slope boundedness is the only remaining input for
+sheaf-level μ-Harder–Narasimhan theory. -/
+theorem MuHNInput.ofSlopeBoundedness {P : PolarizedVarietyData k X} {h : MuPositivityData P}
+    [IsNoetherian X]
+    (slope_bddAbove : ∀ F : Coh X, ∃ μ₀ : ℝ, ∀ B : Subobject F, ¬IsZero (B : Coh X) →
+      0 < P.multiplicity (B : Coh X) →
+        (P.hilbertDegreeCoefficient (B : Coh X) : ℝ) /
+          (P.multiplicity (B : Coh X) : ℝ) ≤ μ₀) :
+    MuHNInput P h where
+  noetherian := fun _ ↦ inferInstance
+  slope_bddAbove := slope_bddAbove
 
 namespace PolarizedVarietyData
 

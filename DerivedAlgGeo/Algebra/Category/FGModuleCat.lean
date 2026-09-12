@@ -1,9 +1,10 @@
 import DerivedAlgGeo.Algebra.Category.FGModuleCat.Projective
+import DerivedAlgGeo.Algebra.Category.FGModuleCat.Noetherian
 
 /-!
 # Finitely generated modules
 
-Extensions of Mathlib's `FGModuleCat`: free modules of finite rank are projective among
-finitely generated modules over a noetherian ring, and every finitely generated module is a
-quotient of one.
+Extensions of Mathlib's `FGModuleCat`: free modules of finite rank are projective, every finitely
+generated module is a quotient of one, and finite modules over a Noetherian ring are Noetherian
+objects.
 -/

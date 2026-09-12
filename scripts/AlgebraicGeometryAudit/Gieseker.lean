@@ -158,20 +158,31 @@ purity to rule out the multiplicity-zero subobject that would otherwise have slo
 
 /-! ## The maximal destabilizing subobject (#904)
 
-`MuHNInput` supplies the two facts sheaf-level Harder-Narasimhan theory needs and this pin
-cannot prove: termination of ascending subobject chains, and Grothendieck's boundedness lemma.
-Neither the maximal destabilizing subobject nor `HasHNProperty` is a field. The boundedness
-field takes a REAL bound rather than one in `WithTop`, because a `WithTop` bound is satisfied
-vacuously by the top element. That the bounded slope is actually attained needs no third input:
-multiplicity is additive and nonnegative, so subobject multiplicities are bounded by that of the
-ambient sheaf, every slope is a multiple of one over its factorial, and such a set bounded above
-has a greatest element. -/
+`MuHNInput` supplies the two facts sheaf-level Harder-Narasimhan theory needs. Termination of
+ascending subobject chains is now proved for coherent sheaves on a Noetherian scheme, so
+`MuHNInput.ofSlopeBoundedness` leaves only Grothendieck's boundedness lemma. Neither the maximal
+destabilizing subobject nor `HasHNProperty` is a field. The boundedness field takes a REAL bound
+rather than one in `WithTop`, because a `WithTop` bound is satisfied vacuously by the top element.
+That the bounded slope is actually attained needs no third input: multiplicity is additive and
+nonnegative, so subobject multiplicities are bounded by that of the ambient sheaf, every slope is
+a multiple of one over its factorial, and such a set bounded above has a greatest element.
+
+The remaining geometric input is also reduced exactly, not weakened:
+`slope_bddAbove_iff_quotientDegree_bddBelow` identifies it with a uniform lower bound on the
+codimension-one Hilbert coefficients of the canonical quotients. The forward implication uses
+the bounded subobject multiplicities; the reverse implication uses coefficient additivity.
+`MuHNInput.ofQuotientDegreeLowerBound` packages a proof of that obligation, but does not assert
+one. -/
 
 #print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput.ofSlopeBoundedness
 #print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput.noetherian
 #print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput.slope_bddAbove
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_le_of_mono
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_subobject_le
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertDegreeCoefficient_eq_add_cokernel
+#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.slope_bddAbove_iff_quotientDegree_bddBelow
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput.ofQuotientDegreeLowerBound
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_slopeMax
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.IsMaximalDestabilizing
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_maximalDestabilizing
