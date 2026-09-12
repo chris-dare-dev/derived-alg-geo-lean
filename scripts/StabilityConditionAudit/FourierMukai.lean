@@ -785,6 +785,7 @@ stored as an extra hypothesis.
 -- cone selection, and endpoint normalization of the resulting pointwise
 -- distinguished transform triangle.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.coneKernel
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.coneTransform
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.distinguishedNormalizedTriangle
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.distinguishedNormalizedTriangle_obj_val
@@ -814,6 +815,9 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.rawTriangleObj₂Iso
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.sourceIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.square
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.shiftedConeKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.shiftedConeKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.shiftedConeTransformIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.targetIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.KernelTransformationData
 #print axioms CategoryTheory.Triangulated.FourierMukai.KernelTransformationData.arrow
@@ -930,6 +934,9 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwist
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistCone
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistConeToShiftedIdentity
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.isKernelFunctor_cotwist
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_comp_π₁
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_comp_π₂

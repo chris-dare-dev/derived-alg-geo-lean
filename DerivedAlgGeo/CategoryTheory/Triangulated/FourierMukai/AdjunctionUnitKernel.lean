@@ -36,9 +36,11 @@ inverse rotation gives the source-natural triangle
 `cotwist ⟶ 𝟭 X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.
 
 The shift and inverse rotation reuse the functor-category `HasShift` instance
-and Mathlib's `invRotate`; no signed map is reconstructed here.  No
-representative or cone is canonical, no shifted kernel presentation is
-asserted, and no exactness, autoequivalence, or sphericality claim is made.
+and Mathlib's `invRotate`; no signed map is reconstructed here.  The existing
+shift comparison of a shift-coherent kernel family presents the cotwist by the
+cone kernel shifted inside the enhancement's homotopy category.  No
+representative or cone is canonical, and no exactness, autoequivalence, or
+sphericality claim is made.
 
 `AdjunctionUnitKernelData.ofFull` is only a sufficient abstract constructor.
 Without the explicit fullness hypothesis, producing the kernel arrow remains
@@ -129,9 +131,36 @@ variable [HasShift X ℤ]
 
 /-- The conventional, choice-dependent ordinary cotwist: the pointwise
 `[-1]` shift of the selected cotwist-cone transform.  This is a functor only;
-no exactness, equivalence, or shifted-kernel presentation is asserted. -/
+no exactness or equivalence is asserted. -/
 noncomputable abbrev cotwist : X ⥤ X :=
   (shiftFunctor (X ⥤ X) (-1 : ℤ)).obj S.cotwistCone
+
+section Kernel
+
+variable [HasShift W ℤ] [e.equiv.functor.CommShift ℤ]
+
+/-- The selected kernel presenting the conventional cotwist: shift the
+enhanced unit cone by `-1` before transporting it to the ordinary kernel
+category. -/
+noncomputable abbrev cotwistKernel : W :=
+  S.normalizationData.shiftedConeKernel (-1 : ℤ)
+
+/-- The kernel family's shift comparison identifies the transform of
+`cotwistKernel` with the pointwise shifted cotwist-cone functor. -/
+noncomputable def cotwistKernelIso
+    (hShift : E.kernelTransform.CommShift ℤ) :
+    E.transform S.cotwistKernel ≅ S.cotwist :=
+  S.normalizationData.shiftedConeTransformIso hShift (-1 : ℤ)
+
+/-- The conventional cotwist is a Fourier--Mukai kernel functor, presented by
+the explicitly named shifted cone kernel.  This asserts neither exactness nor
+invertibility of the cotwist. -/
+theorem isKernelFunctor_cotwist
+    (hShift : E.kernelTransform.CommShift ℤ) :
+    E.IsKernelFunctor S.cotwist :=
+  ⟨S.cotwistKernel, ⟨(S.cotwistKernelIso hShift).symm⟩⟩
+
+end Kernel
 
 end Shift
 

@@ -7,6 +7,16 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Shifted Fourier--Mukai cone kernels (2026-09-12):
+  `KernelConeNormalizationData` names the ordinary kernel represented by its
+  selected enhanced cone and, for every integer shift, the kernel obtained by
+  shifting that cone in the enhancement's homotopy category.  The enhancement
+  comparison and the kernel family's existing Mathlib `CommShift` component
+  give the reusable isomorphism from its transform to the pointwise-shifted
+  cone transform.  `AdjunctionUnitKernelConeData.cotwistKernel` specializes
+  this at `-1`, so the conventional cotwist is now explicitly a kernel functor.
+  No second shift structure is installed, and the statement does not make the
+  selected kernel canonical, exact, invertible, or spherical.
 - Fourier--Mukai cotwist inverse rotation (2026-09-12):
   `AdjunctionUnitKernelConeData.cotwist` is the pointwise functor-category
   `[-1]` shift of the selected unshifted cone transform, and
@@ -15,9 +25,9 @@ blocks should normally move it rather than add more declarations beside it.
   `cotwist ⟶ 𝟭 X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.  Its three projection functors
   are identified strictly, its second map is literally the adjunction unit as
   a natural transformation, and every value is distinguished.  The result is
-  choice-dependent and ordinary-categorical: it does not present the shifted
-  functor by a kernel, make it exact or invertible, compare it to a dg
-  adjunction cone, or assert sphericality.
+  choice-dependent and ordinary-categorical.  Its shifted-kernel presentation
+  is now constructed downstream; exactness, invertibility, comparison with a
+  dg adjunction cone, and sphericality remain separate seams.
 - Right-adjunction unit kernels and literal unit triangles (2026-09-12):
   `FourierMukai.AdjunctionUnitKernelData` and its enhanced cone form are
   definitional specializations of the generic kernel-transformation roots,

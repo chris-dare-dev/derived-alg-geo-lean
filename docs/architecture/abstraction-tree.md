@@ -154,6 +154,8 @@ Category
 │  │  └─ firstFamily / secondFamily       exact-family projections through those adapters
 │  ├─ kernelConeTransformTriangleFunctor  pointwise image of dg cones of an enhanced kernel category
 │  ├─ KernelConeNormalizationData         endpoint square for literal source-natural triangles
+│  │  ├─ coneKernel                      ordinary image of the selected enhanced cone
+│  │  └─ shiftedConeKernel               enhanced shift with transform/shift comparison
 │  └─ KernelTransformationData            ordinary kernel arrow realizing a named transformation
 │     ├─ KernelTransformationConeData     noncanonical enhanced representative and dg cone
 │     │  └─ normalizationData             reusable literal endpoint/first-map transport
@@ -166,6 +168,7 @@ Category
 │           ├─ unshifted cotwist-cone candidate       exact image of its dg cone
 │           ├─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
 │           ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
+│           ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
 │           └─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices

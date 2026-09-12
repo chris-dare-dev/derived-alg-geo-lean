@@ -128,6 +128,7 @@ Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
 └─ coneTriangleFunctor: dg cones read in W through the comparison equivalence
    └─ FourierMukai.KernelCone: pointwise and source-natural transform triangles
       ├─ KernelConeNormalizationData: literal endpoints and named first map
+      │  └─ shiftedConeKernel: enhanced shift whose transform is the shifted cone transform
       └─ KernelTransformationData: a kernel arrow realizes any named transformation
          ├─ KernelTransformationConeData: enhanced representative and chosen dg cone
          │  └─ normalizationData: feeds the generic endpoint transport
@@ -145,6 +146,7 @@ Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
                │  𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧,
                │  pointwise distinguished
                ├─ cotwist = cotwistCone⟦-1⟧, pointwise functor-category shift
+               ├─ cotwistKernel: shifted enhanced cone presenting cotwist
                └─ inverse rotation gives
                   cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧,
                   pointwise distinguished
@@ -339,9 +341,14 @@ that comparison are instance hypotheses to be discharged by the realization.
    functor-category shift and `cotwistTriangleInSource` inverse-rotates the
    family to `cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.  This is still only a
    choice-dependent ordinary functor and a pointwise distinguished family.
+   The generic normalization root now also transports a shifted enhanced cone
+   through the enhancement and kernel-family `CommShift` comparisons.
+   Specializing at `-1` gives `cotwistKernel`, an explicit kernel whose
+   transform is naturally isomorphic to the cotwist, and hence proves only
+   that the cotwist is a kernel functor.
    Pointwise distinguishedness cannot supply `CommShift` or `IsTriangulated`
-   for the cotwist, and no shifted-kernel presentation or comparison with the
-   dg-adjunction cotwist is available; those later seams remain explicit.
+   for the cotwist, and no comparison with the dg-adjunction cotwist is
+   available; those later seams remain explicit.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
