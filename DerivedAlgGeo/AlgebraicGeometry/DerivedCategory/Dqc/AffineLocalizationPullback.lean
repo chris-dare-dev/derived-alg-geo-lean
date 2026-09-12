@@ -694,6 +694,38 @@ def affineQuasicoherentLocalizationPullbackToDqcComparison :
     (affineQuasicoherentLocalizationPullbackComparison M)
     (affineQuasicoherentDerivedToDqc (CommRingCat.of A))
 
+include M in
+/-- If the unbounded affine `Dqc` identification is available for the target ring, then
+localization pullback reaches every object of the unbounded intrinsic target `Dqc` category. -/
+theorem affineQuasicoherentLocalizationPullbackToDqc_essSurj_of_identification
+    (I : AffineQuasicoherentDqcIdentification (CommRingCat.of A)) :
+    (affineQuasicoherentLocalizationPullbackToDqc
+      (R := R) (A := A) M).EssSurj := by
+  letI : (affineQuasicoherentLocalizationPullback
+      (R := R) (A := A) M).EssSurj :=
+    affineQuasicoherentLocalizationPullback_essSurj
+      (R := R) (A := A) M
+  letI : (affineQuasicoherentDerivedToDqc
+      (CommRingCat.of A)).EssSurj :=
+    affineQuasicoherentDerivedToDqc_essSurj_of_identification I
+  change (affineQuasicoherentLocalizationPullback M ⋙
+    affineQuasicoherentDerivedToDqc (CommRingCat.of A)).EssSurj
+  infer_instance
+
+include M in
+/-- Under the target unbounded affine identification, the canonical exact affine pullback
+along a localization reaches every object of the unbounded intrinsic target `Dqc` category. -/
+theorem affineQuasicoherentDerivedPullbackToDqc_essSurj_of_isLocalization_of_identification
+    (I : AffineQuasicoherentDqcIdentification (CommRingCat.of A)) :
+    (affineQuasicoherentDerivedPullbackToDqc
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M)).EssSurj := by
+  letI : (affineQuasicoherentLocalizationPullbackToDqc
+      (R := R) (A := A) M).EssSurj :=
+    affineQuasicoherentLocalizationPullbackToDqc_essSurj_of_identification M I
+  exact Functor.essSurj_of_iso
+    (affineQuasicoherentLocalizationPullbackToDqcComparison M).symm
+
 /-- Localization pullback reaches exactly all target `Dqc` objects covered
 by the currently available affine realization.  Upgrading this equality to
 essential surjectivity onto the full unbounded `Dqc` category is precisely

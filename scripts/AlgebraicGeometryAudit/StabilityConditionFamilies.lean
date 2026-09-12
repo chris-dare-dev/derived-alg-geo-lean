@@ -326,6 +326,8 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedPullbackToDqc_essImage_of_isLocalization
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationPullbackToDqc
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationPullbackToDqcComparison
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationPullbackToDqc_essSurj_of_identification
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedPullbackToDqc_essSurj_of_isLocalization_of_identification
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationPullbackToDqc_essImage
 
 /-! ## Bounded affine quasi-coherent identification -/
