@@ -7,6 +7,22 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
+  `DGCategory.LinearCopowerFunctor` packages the universal property as a
+  degreewise `homComplexIso`, then uses it to define the homogeneous
+  `coefficientMap`.  Differential, identity, and composition compatibility
+  assemble the selected objects into the `k`-linear dg functor
+  `linearCopowerFunctor k X : Cdg (ModuleCat k) ⟶ C`.  The standard complex
+  model's `DGLinear` instance is only a bridge to Mathlib's existing
+  pointwise module action and its `δ_smul`/cochain-composition laws.
+  Chain homotopies give coboundary differences, and homotopy equivalences give
+  isomorphic witnessed copowers in `H⁰ C`.  The selected-object wrapper is
+  owned by `HomotopyCategory.DGEnhancement.LinearCopower`, where it is
+  transported through the existing `Cdg.h0Functor` seam rather than a new
+  quotient construction.  This
+  proves neither quasi-isomorphism invariance nor a finite cohomology
+  decomposition, Euler formula, cone-preservation theorem, or concrete
+  `HasLinearCopowers` instance.
 - Scalar-linear evaluation root (2026-09-12):
   `DGCategory.LinearEvaluation` assembles the `IsLinearCopowerOf` family at an
   object `E` into `LinearEvaluationData k E`.  Fixed-source right composition
@@ -18,9 +34,10 @@ blocks should normally move it rather than add more declarations beside it.
   with evaluation.  `HasLinearEvaluationData` stores only existence and is
   supplied at low priority by `HasLinearCopowers`.
   This is parallel to, not a refinement of, additive `EvaluationData`: there
-  is no adapter between their incompatible universal properties.  No cone,
-  exactness, Euler/K₀, homotopy-invariance, finite-presentation, or concrete
-  existence result is asserted here.
+  is no adapter between their incompatible universal properties.  The
+  coefficient-complex homotopy result is owned by the copower DG-functor root;
+  this evaluation root itself asserts no cone, exactness, Euler/K₀,
+  finite-presentation, or concrete existence result.
 - Scalar-linear dg Hom and copower root (2026-09-12):
   `DGCategory.Linear` repackages the existing Hom-complex of a `DGLinear k C`
   as `DGLinear.homComplex`, a `ModuleCat k`-valued cochain complex.
@@ -31,9 +48,9 @@ blocks should normally move it rather than add more declarations beside it.
   universal-property pattern as the additive root.  There is deliberately no
   projection to `IsCopowerOf`: that interface represents all additive
   cochains, so forgetting scalar structure would strengthen rather than
-  preserve the linear contract.  Scalar-linear evaluation data now consumes
-  this root separately; no Euler-class, homotopy-invariance, or
-  finite-presentation result is asserted here.
+  preserve the linear contract.  Scalar-linear evaluation data and the
+  coefficient DG-functor/homotopy root now consume this universal property
+  separately; no Euler-class or finite-presentation result is asserted here.
 - Object-twist `K₀` action and Euler-realization boundary (2026-09-12):
   `DGEnhancement.H0.NaturalTransformationConeK0` owns the reusable theorem
   that a functorial cone acts on `K₀` by target endpoint minus source
@@ -47,9 +64,9 @@ blocks should normally move it rather than add more declarations beside it.
   This capability is supplied realization input, not a consequence of the
   present additive `IsCopowerOf`, which represents ℤ-additive rather than
   `k`-linear cochains.  The separate scalar-linear copower and evaluation
-  roots now exist; relating that parallel evaluation package to the numerical
-  consumer, proving homotopy invariance, and giving a finite cohomology
-  presentation are the next foundational roots.
+  roots now exist, and coefficient-complex homotopy invariance is closed;
+  relating that parallel evaluation package to the numerical consumer and
+  giving a finite cohomology presentation are the next foundational roots.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under

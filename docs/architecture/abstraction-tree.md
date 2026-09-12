@@ -81,11 +81,16 @@ Category
 ├─ DGCategory C
 │  ├─ DGLinear k C                       scalar refinement
 │  │  ├─ homComplex                     existing Hom-complex repackaged in ModuleCat k
-│  │  ├─ postcompCochain                fixed-source right composition, k-linear in the morphism
+│  │  ├─ postcompCochain                fixed-source right composition, linear chain-map law
+│  │  ├─ Cdg (ModuleCat k)             standard model inherits Mathlib's k-linear structure
 │  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
+│  │     ├─ homComplexIso               representing equivalence, compatible with differentials
+│  │     ├─ coefficientMap              homogeneous coefficient action, strict in composition
 │  │     ├─ lift / lift_unique           linear cochains are morphisms out of Z
 │  │     ├─ compare                      closed canonical comparison, strict composition
 │  │     ├─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
+│  │     │  └─ linearCopowerFunctor    Cdg(ModuleCat k) ⟶ C, k-linear dg functor
+│  │     │     └─ selected H⁰ invariance is a HomotopyCategory/DGEnhancement leaf
 │  │     └─ LinearEvaluationData k E     scalar-linear Hom(E,-) ⊗ E assembly
 │  │        ├─ functor                   k-linear dg functor
 │  │        ├─ evaluation                closed degree-zero map to the identity

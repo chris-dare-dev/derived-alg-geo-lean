@@ -37,6 +37,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Cdg.dgComp_eq
 #print axioms CategoryTheory.Cdg.dgHom_eq
 #print axioms CategoryTheory.Cdg.dgId_eq
+#print axioms CategoryTheory.Cdg.homModule
+#print axioms CategoryTheory.Cdg.linear
 #print axioms CategoryTheory.Cdg.enhancement
 #print axioms CategoryTheory.Cdg.h0Functor
 #print axioms CategoryTheory.Cdg.homEquivCohomologyClass
@@ -148,6 +150,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGLinear.homComplex_d_apply
 #print axioms CategoryTheory.DGLinear.postcompCochain
 #print axioms CategoryTheory.DGLinear.postcompCochain_apply
+#print axioms CategoryTheory.DGLinear.postcompCochain_d
 #print axioms CategoryTheory.DGFunctor.Linear
 #print axioms CategoryTheory.DGFunctor.Linear.map_smul
 #print axioms CategoryTheory.DGFunctor.compLinear
@@ -1145,6 +1148,40 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.HasLinearCopowers
 #print axioms CategoryTheory.HasLinearCopowers.has_linearCopower
 #print axioms CategoryTheory.hasLinearCopowerOfHasLinearCopowers
+
+-- Coefficient-complex functoriality is a single linear dg functor, not a
+-- collection of unrelated degree-zero comparisons.  Its Hom-complex
+-- isomorphism owns differential compatibility; homotopies descend to equality
+-- in `H⁰`, and the selected homotopy-equivalence comparison reuses the existing
+-- `H⁰(Cdg) ≃ HomotopyCategory` seam.  No quasi-isomorphism or Euler claim is
+-- made.
+#print axioms CategoryTheory.IsLinearCopowerOf.linearCopowerCochain_d
+#print axioms CategoryTheory.IsLinearCopowerOf.homComplexIso
+#print axioms CategoryTheory.IsLinearCopowerOf.homComplexIso_hom_f_apply
+#print axioms CategoryTheory.IsLinearCopowerOf.homComplexIso_inv_f_apply
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_d
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_comp_coefficientMap
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap_d
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap_comp
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap_id
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap_id_eq_compare
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_comp_coefficientMapOfHom
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom_mem_cocycles
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom_id_eq_compare
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom_comp
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom_sub_mem_coboundaries
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientHom
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientHom_eq_of_homotopy
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientHom_id
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientHom_comp
+#print axioms CategoryTheory.IsLinearCopowerOf.homotopyEquivIso
+#print axioms CategoryTheory.linearCopowerFunctor
+#print axioms CategoryTheory.linearCopowerFunctor_linear
+#print axioms CategoryTheory.linearCopowerFunctor_obj
+#print axioms CategoryTheory.linearCopowerFunctor_map
+#print axioms CategoryTheory.linearCopowerObjIsoOfHomotopyEquiv
 
 -- Scalar-linear evaluation data assembles the linear copowers at a fixed
 -- object into a `k`-linear dg functor and a closed evaluation transformation.

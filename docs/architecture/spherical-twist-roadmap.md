@@ -96,6 +96,19 @@ HasLinearEvaluationData k E
 ├─ chosenLinearEvaluationData: a noncomputably selected LinearEvaluationData witness
 └─ supplied automatically by HasLinearCopowers k C
 
+IsLinearCopowerOf k K X ZK
+├─ homComplexIso: the representing equivalence in every degree
+├─ coefficientMap: strict homogeneous action of coefficient cochains
+└─ homotopyEquivIso: homotopy-equivalent coefficient complexes give
+   isomorphic witnessed copowers in H⁰
+
+HasLinearCopowers k C
+└─ linearCopowerFunctor k X: C^dg(ModuleCat k) ⟶ C, a k-linear dg functor
+
+HomotopyCategory/DGEnhancement/LinearCopower
+└─ H⁰ sends homotopy-equivalent coefficient complexes to isomorphic selected
+   objects through the existing H⁰(C^dg) ≃ HomotopyCategory seam
+
 LinearEvaluationData k E
 ├─ functor = Hom(E,-) ⊗ E, a k-linear dg functor
 ├─ evaluation : functor ⟶ id, closed in degree zero
@@ -363,11 +376,18 @@ that comparison are instance hypotheses to be discharged by the realization.
    `DGCategory.LinearEvaluation` now assembles that root into
    `LinearEvaluationData k E`: a `k`-linear dg functor, a closed evaluation
    transformation, and coherent comparison isomorphisms between choices.
-   This parallel package does not discharge the existing additive
-   `EvaluationData.IsEulerCopower`; a later lane must formulate its numerical
-   consumer directly or accept explicit comparison data.  The Euler
-   realization (initially over a field) still needs functoriality under chain
-   homotopies and a finite cohomology presentation as shifted finite sums.
+   `DGCategory.LinearCopowerFunctor` now packages the homogeneous coefficient
+   action as a `k`-linear dg functor out of `C^dg(ModuleCat k)`.  Its Hom-complex
+   comparison commutes with differentials, chain-homotopic maps agree in `H⁰`,
+   and homotopy equivalences yield isomorphic witnessed copowers.  The selected
+   wrapper through the existing `Cdg.h0Functor` seam lives in
+   `HomotopyCategory.DGEnhancement.LinearCopower`.  This is not
+   quasi-isomorphism invariance.
+   The parallel linear evaluation package still does not discharge the
+   existing additive `EvaluationData.IsEulerCopower`; a later lane must
+   formulate its numerical consumer directly or accept explicit comparison
+   data.  The Euler realization (initially over a field) still needs a finite
+   cohomology presentation as shifted finite sums.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies either a `HasCopowers` instance for the additive interface or a

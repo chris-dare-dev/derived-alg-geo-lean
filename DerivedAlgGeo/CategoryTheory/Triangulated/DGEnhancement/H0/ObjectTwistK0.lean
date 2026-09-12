@@ -22,7 +22,8 @@ is independent of the chosen additive evaluation data.  The parallel
 scalar-linear copower and evaluation roots now exist, but they do not imply
 this additive property.  A later consumer must either formulate the Euler
 statement directly for `LinearEvaluationData` or accept explicit comparison
-data; homotopy invariance and a finite shifted-sum/cohomology presentation are
+data.  Coefficient-complex homotopy invariance is now available from the
+linear-copower DG functor; a finite shifted-sum/cohomology presentation is
 still required for the concrete computation.
 -/
 

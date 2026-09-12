@@ -25,11 +25,11 @@ projection is mathematically available for a general scalar extension.  The
 two interfaces coincide only after additional comparison input (for example,
 over the integers), which is not asserted here.
 
-The sibling `LinearEvaluation` module assembles these copowers into a
-scalar-linear evaluation functor and its closed evaluation transformation.
-This file itself stops at the universal-property root; neither module derives
-an Euler-class formula, which still needs homotopy invariance and a finite
-cohomology presentation.
+The sibling `LinearCopowerFunctor` module packages coefficient-complex
+functoriality and homotopy invariance, while `LinearEvaluation` assembles these
+copowers into a scalar-linear evaluation functor and its closed evaluation
+transformation.  None of these modules derives an Euler-class formula, which
+still needs a finite cohomology presentation.
 -/
 
 set_option autoImplicit false
