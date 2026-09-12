@@ -14,7 +14,10 @@ shifts an object of `H⁰` by `n`.  Both are built from the same choice, namely
 
 `H⁰ (F[n]) = H⁰ F ⋙ (-)[n]`,
 
-on objects by `rfl` and on morphisms by the two lemmas below.
+The object equality is `rfl`; the morphism equality is the second computation
+lemma below.  The resulting functor equality and its natural-isomorphism
+wrapper make ordinary categorical properties such as equivalence reusable for
+shifted dg functors.
 
 ## Why it is not just `rfl` on morphisms
 
@@ -33,11 +36,8 @@ dg functor rather than only about each value: the first vertex of an inversely
 rotated cone triangle is `Z⟦-1⟧` in `H⁰`, and by the object lemma below that
 is the value of the dg shifted functor.
 
-## What is not claimed
-
-No equality of functors.  `Functor.ext` would need the object equality
-transported across the morphism equality, and nothing here needs it; the two
-computation lemmas are what consumers rewrite with.
+The equality and natural isomorphism are categorical interfaces; the two
+computation lemmas remain available for strict objectwise formulas.
 -/
 
 set_option autoImplicit false
@@ -87,6 +87,42 @@ theorem shiftedFunctor_h0_map (F : DGFunctor C D) (n : ℤ) {X Y : H0 C}
     -- The two witnesses are the same choice: both are
     -- `(IsPretriangulated.exists_shift (F.obj X) n).choose_spec.some`.
     rfl
+
+/-- The object and morphism computations assemble into an equality of ordinary
+functors. -/
+theorem shiftedFunctor_h0_eq (F : DGFunctor C D) (n : ℤ) :
+    (F.shiftedFunctor n).h0 =
+      F.h0 ⋙ CategoryTheory.shiftFunctor (H0 D) n := by
+  exact Functor.hext (fun _ => rfl) (fun X Y f =>
+    heq_of_eq (F.shiftedFunctor_h0_map n f))
+
+/-- **The dg shift computes the pointwise shift on `H⁰`, functorially.**
+
+This categorical interface packages `shiftedFunctor_h0_eq` as a natural
+isomorphism for consumers that should transport structure through isomorphism
+rather than rewrite functors. -/
+noncomputable def shiftedFunctorH0Iso (F : DGFunctor C D) (n : ℤ) :
+    (F.shiftedFunctor n).h0 ≅
+      F.h0 ⋙ CategoryTheory.shiftFunctor (H0 D) n :=
+  eqToIso (F.shiftedFunctor_h0_eq n)
+
+/-- If `H⁰ F` is an equivalence, then so is `H⁰` of every shifted dg functor.
+
+This is only an ordinary categorical conclusion; it neither asserts that the
+shifted dg functor is a quasi-equivalence nor supplies triangulatedness. -/
+theorem shiftedFunctor_h0_isEquivalence (F : DGFunctor C D) (n : ℤ)
+    (hF : F.h0.IsEquivalence) : (F.shiftedFunctor n).h0.IsEquivalence := by
+  letI := hF
+  haveI : (F.h0 ⋙ CategoryTheory.shiftFunctor (H0 D) n).IsEquivalence :=
+    inferInstance
+  exact Functor.isEquivalence_of_iso (F.shiftedFunctorH0Iso n).symm
+
+/-- The ordinary equivalence on `H⁰` induced from an equivalence `H⁰ F` after
+shifting the dg functor. -/
+noncomputable def shiftedFunctorH0Equivalence (F : DGFunctor C D) (n : ℤ)
+    (hF : F.h0.IsEquivalence) : H0 C ≌ H0 D :=
+  letI := F.shiftedFunctor_h0_isEquivalence n hF
+  (F.shiftedFunctor n).h0.asEquivalence
 
 end DGFunctor
 

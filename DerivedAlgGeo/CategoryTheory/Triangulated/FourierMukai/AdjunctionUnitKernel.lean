@@ -2,6 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import Mathlib.CategoryTheory.Triangulated.Rotate
+import DerivedAlgGeo.CategoryTheory.Shift.FunctorCategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Autoequivalence
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Convolution
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.KernelTransformation
@@ -27,10 +29,18 @@ distinguished unshifted unit triangle
 
 `𝟭 X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭 X)⟦1⟧`.
 
-The third functor is only the unshifted cotwist-cone candidate.  The
-conventional cotwist is its `[-1]` shift and is deliberately not constructed
-here.  No representative or cone is canonical, and no exactness,
-autoequivalence, or sphericality claim is made about that third functor.
+The third functor is the unshifted cotwist-cone candidate.  Its pointwise
+`[-1]` shift is the conventional, choice-dependent ordinary cotwist, and
+inverse rotation gives the source-natural triangle
+
+`cotwist ⟶ 𝟭 X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.
+
+The shift and inverse rotation reuse the functor-category `HasShift` instance
+and Mathlib's `invRotate`; no signed map is reconstructed here.  The existing
+shift comparison of a shift-coherent kernel family presents the cotwist by the
+cone kernel shifted inside the enhancement's homotopy category.  No
+representative or cone is canonical, and no exactness, autoequivalence, or
+sphericality claim is made.
 
 `AdjunctionUnitKernelData.ofFull` is only a sufficient abstract constructor.
 Without the explicit fullness hypothesis, producing the kernel arrow remains
@@ -114,6 +124,45 @@ variable {C : Correspondence X Y W₁} {C' : Correspondence Y X W₂}
 candidate. -/
 abbrev cotwistCone : X ⥤ X :=
   (KernelTransformationConeData.normalizationData S).coneTransform
+
+section Shift
+
+variable [HasShift X ℤ]
+
+/-- The conventional, choice-dependent ordinary cotwist: the pointwise
+`[-1]` shift of the selected cotwist-cone transform.  This is a functor only;
+no exactness or equivalence is asserted. -/
+noncomputable abbrev cotwist : X ⥤ X :=
+  (shiftFunctor (X ⥤ X) (-1 : ℤ)).obj S.cotwistCone
+
+section Kernel
+
+variable [HasShift W ℤ] [e.equiv.functor.CommShift ℤ]
+
+/-- The selected kernel presenting the conventional cotwist: shift the
+enhanced unit cone by `-1` before transporting it to the ordinary kernel
+category. -/
+noncomputable abbrev cotwistKernel : W :=
+  S.normalizationData.shiftedConeKernel (-1 : ℤ)
+
+/-- The kernel family's shift comparison identifies the transform of
+`cotwistKernel` with the pointwise shifted cotwist-cone functor. -/
+noncomputable def cotwistKernelIso
+    (hShift : E.kernelTransform.CommShift ℤ) :
+    E.transform S.cotwistKernel ≅ S.cotwist :=
+  S.normalizationData.shiftedConeTransformIso hShift (-1 : ℤ)
+
+/-- The conventional cotwist is a Fourier--Mukai kernel functor, presented by
+the explicitly named shifted cone kernel.  This asserts neither exactness nor
+invertibility of the cotwist. -/
+theorem isKernelFunctor_cotwist
+    (hShift : E.kernelTransform.CommShift ℤ) :
+    E.IsKernelFunctor S.cotwist :=
+  ⟨S.cotwistKernel, ⟨(S.cotwistKernelIso hShift).symm⟩⟩
+
+end Kernel
+
+end Shift
 
 /-- The transformed enhanced arrow forms the literal adjunction-unit square. -/
 theorem transform_arrow_unit_square :
@@ -203,6 +252,85 @@ theorem distinguishedUnitTriangleInSource_obj_val
     [e.equiv.functor.IsTriangulated] (A : X) :
     ((S.distinguishedUnitTriangleInSource hE).obj A).obj =
       (S.unitTriangleInSource hE).obj A :=
+  rfl
+
+/-! ### The conventional cotwist triangle -/
+
+/-- The inverse rotation of the unshifted unit triangle:
+`cotwist ⟶ 𝟭 X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.
+
+Mathlib's inverse rotation owns the minus sign in the first map. -/
+noncomputable def cotwistTriangleInSource : X ⥤ Triangle X :=
+  S.unitTriangleInSource hE ⋙ invRotate X
+
+/-- The first projection of the rotated triangle is strictly the pointwise
+shifted cotwist-cone functor. -/
+theorem cotwistTriangleInSource_comp_π₁ :
+    S.cotwistTriangleInSource hE ⋙ Triangle.π₁ = S.cotwist :=
+  rfl
+
+/-- The second projection of the rotated triangle is strictly the identity. -/
+theorem cotwistTriangleInSource_comp_π₂ :
+    S.cotwistTriangleInSource hE ⋙ Triangle.π₂ = Functor.id X :=
+  rfl
+
+/-- The third projection of the rotated triangle is strictly the composite
+adjoint transform. -/
+theorem cotwistTriangleInSource_comp_π₃ :
+    S.cotwistTriangleInSource hE ⋙ Triangle.π₃ =
+      C.transform P ⋙ C'.transform R.adjKernel :=
+  rfl
+
+@[simp]
+theorem cotwistTriangleInSource_obj₁ (A : X) :
+    ((S.cotwistTriangleInSource hE).obj A).obj₁ = S.cotwist.obj A :=
+  rfl
+
+@[simp]
+theorem cotwistTriangleInSource_obj₂ (A : X) :
+    ((S.cotwistTriangleInSource hE).obj A).obj₂ = A :=
+  rfl
+
+@[simp]
+theorem cotwistTriangleInSource_obj₃ (A : X) :
+    ((S.cotwistTriangleInSource hE).obj A).obj₃ =
+      (C.transform P ⋙ C'.transform R.adjKernel).obj A :=
+  rfl
+
+/-- At the natural-transformation level, the second map is strictly the
+adjunction unit. -/
+theorem cotwistTriangleInSource_unit :
+    Functor.whiskerLeft (S.cotwistTriangleInSource hE)
+        Triangle.π₂Toπ₃ = R.adj.unit :=
+  rfl
+
+/-- Inverse rotation moves the adjunction unit into the second map. -/
+@[simp]
+theorem cotwistTriangleInSource_mor₂ (A : X) :
+    ((S.cotwistTriangleInSource hE).obj A).mor₂ = R.adj.unit.app A :=
+  congr_app (S.cotwistTriangleInSource_unit hE) A
+
+/-- Every value of the conventional cotwist triangle is distinguished. -/
+theorem cotwistTriangleInSource_obj_distinguished
+    [e.equiv.functor.IsTriangulated] (A : X) :
+    (S.cotwistTriangleInSource hE).obj A ∈ distTriang X :=
+  inv_rot_of_distTriang _ (S.unitTriangleInSource_obj_distinguished hE A)
+
+/-- The conventional cotwist-triangle family with codomain restricted to
+distinguished triangles. -/
+noncomputable def distinguishedCotwistTriangleInSource
+    [e.equiv.functor.IsTriangulated] :
+    X ⥤ (Correspondence.KernelEvaluationExact.pointwiseDistinguishedTriangleProperty
+      (Y := X)).FullSubcategory :=
+  (Correspondence.KernelEvaluationExact.pointwiseDistinguishedTriangleProperty
+    (Y := X)).lift (S.cotwistTriangleInSource hE)
+      (S.cotwistTriangleInSource_obj_distinguished hE)
+
+@[simp]
+theorem distinguishedCotwistTriangleInSource_obj_val
+    [e.equiv.functor.IsTriangulated] (A : X) :
+    ((S.distinguishedCotwistTriangleInSource hE).obj A).obj =
+      (S.cotwistTriangleInSource hE).obj A :=
   rfl
 
 end Exact

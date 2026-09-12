@@ -3,6 +3,7 @@ Axiom audit records for extensions of Mathlib's `CategoryTheory/Shift/`.
 Run with `lake env lean scripts/StabilityConditionAudit/Shift.lean`.
 -/
 import DerivedAlgGeo.CategoryTheory.Shift
+import DerivedAlgGeo.CategoryTheory.Triangulated.ShiftFunctor
 
 /-! ## The pointwise shift on a functor category
 
@@ -33,3 +34,19 @@ commute with it on the nose. -/
 #print axioms CategoryTheory.Functor.CommShift₂.secondFamilyCommShift_iso_hom_app_app
 #print axioms CategoryTheory.Functor.CommShift₂.secondFamilyEvaluationCommShift
 #print axioms CategoryTheory.Functor.CommShift₂.secondFamilyEvaluationCommShift_eq
+
+/-! ## Integral shifts as triangulated functors
+
+Both `CommShift` packages are explicit.  The signed package is triangulated
+for every integer; the unsigned package is triangulated only at even shifts
+and remains available for compatibility and object-only uses. -/
+
+#print axioms CategoryTheory.Pretriangulated.signedShiftFunctorCommIso
+#print axioms CategoryTheory.Pretriangulated.shiftFunctorUnsignedCommShift
+#print axioms CategoryTheory.Pretriangulated.shiftFunctorCommShift
+#print axioms CategoryTheory.Pretriangulated.shiftFunctorCommShift_commShiftIso_hom_app
+#print axioms CategoryTheory.Pretriangulated.shiftSignIso
+#print axioms CategoryTheory.Pretriangulated.shiftFunctorMapTriangleIso
+#print axioms CategoryTheory.Pretriangulated.shiftFunctorIsTriangulated
+#print axioms CategoryTheory.Pretriangulated.shiftFunctorUnsignedMapTriangleIso
+#print axioms CategoryTheory.Pretriangulated.shiftFunctorUnsignedIsTriangulated
