@@ -162,6 +162,8 @@ Category
 │  │  └─ coneTriangleFunctor             functor to distinguished triangles
 │  └─ IsPretriangulated C
 │     └─ Enhancement T                   comparison data, not a class
+│        ├─ liftedCocycle                noncanonical closed representative of an ordinary map
+│        ├─ conePresentation             representative plus a noncanonical dg cone
 │        └─ coneTriangleFunctor          dg cones read in `T` through the equivalence
 ├─ Fourier--Mukai correspondence
 │  ├─ kernelTransform                     functor from kernels to transforms
@@ -171,10 +173,18 @@ Category
 │  │  ├─ first/secondFamilyCommShift      explicit adapters, evaluation agreement
 │  │  └─ firstFamily / secondFamily       exact-family projections through those adapters
 │  ├─ kernelConeTransformTriangleFunctor  pointwise image of dg cones of an enhanced kernel category
-│  └─ CounitKernelData                    ordinary kernel arrow realizing an adjunction counit
-│     └─ CounitKernelConeData             noncanonical enhanced representative and dg cone
-│        ├─ kernel-presented twist candidate       exact image of its dg cone
-│        └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
+│  ├─ KernelConeNormalizationData         endpoint square for literal source-natural triangles
+│  └─ KernelTransformationData            ordinary kernel arrow realizing a named transformation
+│     ├─ KernelTransformationConeData     noncanonical enhanced representative and dg cone
+│     │  └─ normalizationData             reusable literal endpoint/first-map transport
+│     ├─ CounitKernelData                 equivalent adjunction-counit specialization; stable API
+│     │  └─ CounitKernelConeData          enhanced counit specialization
+│     │     ├─ kernel-presented twist candidate       exact image of its dg cone
+│     │     └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
+│     └─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
+│        └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
+│           ├─ unshifted cotwist-cone candidate       exact image of its dg cone
+│           └─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
