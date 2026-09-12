@@ -9,6 +9,7 @@ import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineDerivedEquivalence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffinePushforward
 
 /-!
 # Derived pullback along an affine localization
@@ -375,6 +376,15 @@ def affineQuasicoherentLocalizationRestriction :
     (affineQuasicoherentDerivedEquivalence (CommRingCat.of R))
     (affineLocalizationDerivedRestriction (R := R) (A := A))
 
+/-- For the affine localization morphism, geometric derived pushforward is
+the transported restriction-of-scalars functor. -/
+def affineQuasicoherentLocalizationRestrictionComparison :
+    affineQuasicoherentDerivedPushforward
+        (CommRingCat.ofHom (algebraMap R A)) ≅
+      affineQuasicoherentLocalizationRestriction (R := R) (A := A) :=
+  affineQuasicoherentDerivedPushforwardComparison
+    (CommRingCat.ofHom (algebraMap R A))
+
 /-- On affine quasi-coherent derived categories, transported restriction
 followed by localization pullback is naturally isomorphic to the identity. -/
 def affineQuasicoherentLocalizationCounitIso :
@@ -394,6 +404,20 @@ def affineQuasicoherentLocalizationCounitIso :
       (𝟭 (DerivedCategory (ModuleCat A)))
       (𝟭 (DerivedCategory (ModuleCat A)))
       (Iso.refl _) (Iso.refl _)
+
+/-- Geometric affine pushforward followed by localization pullback is the
+identity on the target affine quasi-coherent derived category. -/
+def affineQuasicoherentLocalizationGeometricCounitIso :
+    affineQuasicoherentDerivedPushforward
+        (CommRingCat.ofHom (algebraMap R A)) ⋙
+      affineQuasicoherentLocalizationPullback (R := R) (A := A) M ≅
+      Functor.id
+        (AffineQuasicoherentDerivedCategory (CommRingCat.of A)) :=
+  Functor.isoWhiskerRight
+      (affineQuasicoherentLocalizationRestrictionComparison
+        (R := R) (A := A))
+      (affineQuasicoherentLocalizationPullback M) ≪≫
+    affineQuasicoherentLocalizationCounitIso M
 
 /-- Localization pullback is essentially surjective on the genuine affine
 quasi-coherent derived categories. -/

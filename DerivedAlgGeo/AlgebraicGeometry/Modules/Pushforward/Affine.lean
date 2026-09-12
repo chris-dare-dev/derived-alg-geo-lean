@@ -18,6 +18,8 @@ along a finite morphism exact (`Modules/Coherent/Pushforward/Finite.lean`).
 
 * `Scheme.Modules.isQuasicoherent_pushforward_SpecMap`: pushforward along a morphism of affine
   spectra preserves quasi-coherent module sheaves.
+* `gammaPushforwardNatIso`: global sections identify affine pushforward with restriction of
+  scalars, naturally in the module sheaf.
 * `Scheme.Modules.pushforward_map_epi_of_isAffineHom`: for an affine morphism `f` and an
   epimorphism `u` of quasi-coherent sheaves, `f_* u` is an epimorphism.
 
@@ -44,7 +46,43 @@ comparison isomorphism appears.
 
 universe u
 
-open CategoryTheory Limits TopologicalSpace
+open CategoryTheory Limits Opposite TopologicalSpace
+
+namespace AlgebraicGeometry
+
+variable {R S : CommRingCat.{u}} (f : R ⟶ S)
+
+/-- The global sections of a pushforward along `Spec.map f`, as an `R`-module, are the global
+sections of the original with `R` acting through `f`. -/
+noncomputable def gammaPushforwardIso (M : (Spec S).Modules) :
+    moduleSpecΓFunctor.obj ((Scheme.Modules.pushforward (Spec.map f)).obj M) ≅
+      (ModuleCat.restrictScalars f.hom).obj (moduleSpecΓFunctor.obj M) :=
+  (TopCat.Sheaf.forget (ModuleCat R) (Spec R) ⋙
+      (CategoryTheory.evaluation _ _).obj (op (⊤ : (Spec R).Opens))).mapIso
+    ((pushforwardCompModulesSpecToSheafIso f).app M)
+
+/-- Global sections identify affine pushforward with restriction of scalars,
+naturally in the module sheaf. -/
+noncomputable def gammaPushforwardNatIso :
+    Scheme.Modules.pushforward (Spec.map f) ⋙
+        moduleSpecΓFunctor (R := R) ≅
+      moduleSpecΓFunctor (R := S) ⋙
+        ModuleCat.restrictScalars f.hom :=
+  NatIso.ofComponents (gammaPushforwardIso f) (fun {M N} g ↦ by
+    let H := TopCat.Sheaf.forget (ModuleCat R) (Spec R) ⋙
+      (CategoryTheory.evaluation _ _).obj (op (⊤ : (Spec R).Opens))
+    change H.map ((Scheme.Modules.pushforward (Spec.map f) ⋙
+        modulesSpecToSheaf).map g) ≫
+        H.map ((pushforwardCompModulesSpecToSheafIso f).hom.app N) =
+      H.map ((pushforwardCompModulesSpecToSheafIso f).hom.app M) ≫
+        H.map ((modulesSpecToSheaf ⋙
+          TopCat.Sheaf.pushforward (ModuleCat S) (Spec.map f).base ⋙
+          sheafCompose _ (ModuleCat.restrictScalars f.hom)).map g)
+    rw [← H.map_comp, (pushforwardCompModulesSpecToSheafIso f).hom.naturality,
+      H.map_comp]
+    rfl)
+
+end AlgebraicGeometry
 
 namespace AlgebraicGeometry.Scheme.Modules
 

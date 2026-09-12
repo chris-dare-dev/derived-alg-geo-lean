@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Basic.Isomorphism
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.Affine
 
 /-!
 # Coherence is preserved by pushforward along a finite map of affine schemes
@@ -29,8 +30,7 @@ Three facts do the work, and all three are at the pin:
 * being a tilde is preserved by pushforward along `Spec.map`
   (`AlgebraicGeometry.isIso_fromTildeΓ_pushforward`);
 * the global sections of the pushforward are the global sections of the original, with the base
-  ring acting through `φ` (`AlgebraicGeometry.pushforwardCompModulesSpecToSheafIso`, evaluated at
-  `⊤`) — this is `gammaPushforwardIso` below.
+  ring acting through `φ` (`AlgebraicGeometry.gammaPushforwardIso`).
 
 So the pushforward is the tilde of an `R`-module, and coherence reduces to that module being
 finitely generated over `R`. That is the only place the hypothesis on `φ` is used, and it is
@@ -52,19 +52,6 @@ open CategoryTheory Opposite
 namespace AlgebraicGeometry
 
 variable {R S : CommRingCat.{u}} (φ : R ⟶ S)
-
-/-- The global sections of a pushforward along `Spec.map φ`, as an `R`-module, are the global
-sections of the original with `R` acting through `φ`.
-
-This is `pushforwardCompModulesSpecToSheafIso` evaluated at the top open. Mathlib states that
-compatibility at the level of sheaves of modules; what is needed downstream is its value on
-global sections, and taking it here keeps the evaluation out of the finiteness argument. -/
-noncomputable def gammaPushforwardIso (M : (Spec S).Modules) :
-    moduleSpecΓFunctor.obj ((Scheme.Modules.pushforward (Spec.map φ)).obj M) ≅
-      (ModuleCat.restrictScalars φ.hom).obj (moduleSpecΓFunctor.obj M) :=
-  (TopCat.Sheaf.forget (ModuleCat R) (Spec R) ⋙
-      (CategoryTheory.evaluation _ _).obj (op (⊤ : (Spec R).Opens))).mapIso
-    ((AlgebraicGeometry.pushforwardCompModulesSpecToSheafIso φ).app M)
 
 /-- Global sections of a coherent sheaf stay finitely generated after restriction of scalars
 along a finite ring map: `S` is a finite `R`-module, and finiteness composes down the tower.

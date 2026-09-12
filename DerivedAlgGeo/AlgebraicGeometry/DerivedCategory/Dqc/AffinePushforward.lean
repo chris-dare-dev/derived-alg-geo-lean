@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.Affine
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
 
 /-!
 # Pushforward on affine quasi-coherent derived categories
@@ -19,6 +20,7 @@ therefore induces an exact functor on derived categories.
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
+open CategoryTheory.Pseudofunctor
 
 noncomputable section
 
@@ -54,6 +56,23 @@ def affineQuasicoherentSheavesPushforwardCompInclusion
       affineQuasicoherentSheavesInclusion S ⋙
         Scheme.Modules.pushforward (Spec.map f) :=
   (SheafOfModules.isQuasicoherent (Spec R).ringCatSheaf).liftCompιIso _ _
+
+/-- Affine global sections identify quasi-coherent pushforward with
+restriction of scalars. -/
+def affineQuasicoherentSheavesPushforwardGammaIso
+    {R S : CommRingCat.{u}} (f : R ⟶ S) :
+    affineQuasicoherentSheavesPushforward f ⋙
+        (affineQuasicoherentSheavesEquiv R).inverse ≅
+      (affineQuasicoherentSheavesEquiv S).inverse ⋙
+        ModuleCat.restrictScalars f.hom :=
+  (Functor.associator _ _ _).symm ≪≫
+    Functor.isoWhiskerRight
+      (affineQuasicoherentSheavesPushforwardCompInclusion f)
+      (moduleSpecΓFunctor (R := R)) ≪≫
+    Functor.associator _ _ _ ≪≫
+    Functor.isoWhiskerLeft (affineQuasicoherentSheavesInclusion S)
+      (gammaPushforwardNatIso f) ≪≫
+    (Functor.associator _ _ _).symm
 
 /-- Affine quasi-coherent pushforward preserves finite limits. -/
 instance affineQuasicoherentSheavesPushforward_preservesFiniteLimits
@@ -117,6 +136,56 @@ def affineQuasicoherentDerivedPushforward
     AffineQuasicoherentDerivedCategory S ⥤
       AffineQuasicoherentDerivedCategory R :=
   (affineQuasicoherentSheavesPushforward f).mapDerivedCategory
+
+/-- On derived categories, affine global sections identify geometric
+pushforward with derived restriction of scalars. -/
+def affineQuasicoherentDerivedPushforwardGammaIso
+    {R S : CommRingCat.{u}} (f : R ⟶ S) :
+    affineQuasicoherentDerivedPushforward f ⋙
+        affineGammaDerivedFunctor R ≅
+      affineGammaDerivedFunctor S ⋙
+        (ModuleCat.restrictScalars f.hom).mapDerivedCategory := by
+  let H := (affineQuasicoherentSheavesEquiv S).inverse ⋙
+    ModuleCat.restrictScalars f.hom
+  letI : H.Additive := by dsimp [H]; infer_instance
+  letI : PreservesFiniteLimits H := by
+    dsimp [H]
+    exact comp_preservesFiniteLimits _ _
+  letI : PreservesFiniteColimits H := by
+    dsimp [H]
+    exact comp_preservesFiniteColimits _ _
+  exact Functor.mapDerivedCategoryCompIso
+      (affineQuasicoherentSheavesPushforwardGammaIso f) ≪≫
+    (Functor.mapDerivedCategoryCompIso (Iso.refl H)).symm
+
+/-- Geometric affine derived pushforward is the transport of derived
+restriction of scalars through the affine derived equivalences. -/
+def affineQuasicoherentDerivedPushforwardComparison
+    {R S : CommRingCat.{u}} (f : R ⟶ S) :
+    affineQuasicoherentDerivedPushforward f ≅
+      equivalenceTransportFunctor
+        (affineQuasicoherentDerivedEquivalence S)
+        (affineQuasicoherentDerivedEquivalence R)
+        ((ModuleCat.restrictScalars f.hom).mapDerivedCategory) := by
+  let transported := equivalenceTransportFunctor
+    (affineQuasicoherentDerivedEquivalence S)
+    (affineQuasicoherentDerivedEquivalence R)
+    ((ModuleCat.restrictScalars f.hom).mapDerivedCategory)
+  let cancel : transported ⋙ affineGammaDerivedFunctor R ≅
+      affineGammaDerivedFunctor S ⋙
+        (ModuleCat.restrictScalars f.hom).mapDerivedCategory :=
+    Functor.associator _ _ _ ≪≫
+      Functor.isoWhiskerLeft
+        ((affineQuasicoherentDerivedEquivalence S).inverse ⋙
+          (ModuleCat.restrictScalars f.hom).mapDerivedCategory)
+        (affineQuasicoherentDerivedEquivalence R).unitIso.symm ≪≫
+      Functor.rightUnitor _
+  letI : (affineGammaDerivedFunctor R).Full :=
+    (affineQuasicoherentDerivedEquivalence R).fullyFaithfulInverse.full
+  letI : (affineGammaDerivedFunctor R).Faithful :=
+    (affineQuasicoherentDerivedEquivalence R).fullyFaithfulInverse.faithful
+  exact Functor.fullyFaithfulCancelRight (affineGammaDerivedFunctor R)
+    (affineQuasicoherentDerivedPushforwardGammaIso f ≪≫ cancel.symm)
 
 end
 

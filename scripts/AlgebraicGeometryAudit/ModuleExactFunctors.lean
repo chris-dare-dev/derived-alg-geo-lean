@@ -13,5 +13,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules
 
 /-! ## Pushforward along an affine morphism preserves epimorphisms of quasi-coherent sheaves -/
 
+#print axioms AlgebraicGeometry.gammaPushforwardIso
+#print axioms AlgebraicGeometry.gammaPushforwardNatIso
 #print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_pushforward_SpecMap
 #print axioms AlgebraicGeometry.Scheme.Modules.pushforward_map_epi_of_isAffineHom
