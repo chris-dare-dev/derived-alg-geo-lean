@@ -842,6 +842,10 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.baseChangeMap_isPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isOpenImmersion_baseChangeMap
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isOpenImmersionBaseChangeMap
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.quasiCompact_baseChangeMap
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.quasiCompactBaseChangeMap
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isAffineHom_baseChangeMap
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isAffineHomBaseChangeMap
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.complexPushforward
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPushforward
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPushforwardFactors

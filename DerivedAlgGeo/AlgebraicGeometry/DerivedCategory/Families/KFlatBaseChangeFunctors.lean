@@ -72,6 +72,35 @@ instance (priority := 900) isOpenImmersionBaseChangeMap
     [IsOpenImmersion f.left] : IsOpenImmersion (baseChangeMap X f).left :=
   isOpenImmersion_baseChangeMap X f
 
+/-- Quasi-compact morphisms are preserved by the product base change
+`X ×_S -`. -/
+theorem quasiCompact_baseChangeMap (X : SchemeBaseChange S)
+    {T U : SchemeBaseChange S} (f : T ⟶ U) [QuasiCompact f.left] :
+    QuasiCompact (baseChangeMap X f).left := by
+  exact MorphismProperty.of_isPullback (P := @QuasiCompact)
+    ((Over.forget S).map_isPullback (baseChangeMap_isPullback X f))
+    (by change QuasiCompact f.left; infer_instance)
+
+instance (priority := 900) quasiCompactBaseChangeMap
+    (X : SchemeBaseChange S) {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [QuasiCompact f.left] : QuasiCompact (baseChangeMap X f).left :=
+  quasiCompact_baseChangeMap X f
+
+/-- Affine morphisms are preserved by the product base change
+`X ×_S -`.  In particular, the induced morphism remains affine when the
+original morphism is an affine localization. -/
+theorem isAffineHom_baseChangeMap (X : SchemeBaseChange S)
+    {T U : SchemeBaseChange S} (f : T ⟶ U) [IsAffineHom f.left] :
+    IsAffineHom (baseChangeMap X f).left := by
+  exact MorphismProperty.of_isPullback (P := @IsAffineHom)
+    ((Over.forget S).map_isPullback (baseChangeMap_isPullback X f))
+    (by change IsAffineHom f.left; infer_instance)
+
+instance (priority := 900) isAffineHomBaseChangeMap
+    (X : SchemeBaseChange S) {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsAffineHom f.left] : IsAffineHom (baseChangeMap X f).left :=
+  isAffineHom_baseChangeMap X f
+
 namespace DqcLeftDerivedPullback
 
 variable {V W : SchemeBaseChange S} {f : V ⟶ W}
