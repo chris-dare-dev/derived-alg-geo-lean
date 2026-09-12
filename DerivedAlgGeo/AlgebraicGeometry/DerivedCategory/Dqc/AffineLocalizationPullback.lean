@@ -501,6 +501,33 @@ def affineQuasicoherentBoundedLocalizationPullbackComparison :
       (affineQuasicoherentBoundedLocalizationPullbackCompInclusion M).symm)
 
 include M in
+/-- The canonical exact bounded affine pullback is essentially surjective
+when the ring map is a localization. -/
+instance affineQuasicoherentBoundedDerivedPullback_essSurj_of_isLocalization :
+    (affineQuasicoherentBoundedDerivedPullback
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M)).EssSurj :=
+  Functor.essSurj_of_iso
+    (affineQuasicoherentBoundedLocalizationPullbackComparison M).symm
+
+include M in
+/-- The bounded affine-localization specialization of the essential-image
+conclusion: canonical exact pullback reaches every intrinsic target object
+currently covered by affine realization. -/
+theorem affineQuasicoherentBoundedDerivedPullbackToDqc_essImage_of_isLocalization :
+    (affineQuasicoherentBoundedDerivedPullbackToDqc
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M)).essImage =
+        (affineQuasicoherentBoundedDerivedToDqc
+          (CommRingCat.of A)).essImage := by
+  change (affineQuasicoherentBoundedDerivedPullback
+    (CommRingCat.ofHom (algebraMap R A))
+    (affineLocalizationAlgebraMap_flat M) ⋙
+      affineQuasicoherentBoundedDerivedToDqc
+        (CommRingCat.of A)).essImage = _
+  exact Functor.essImage_comp_of_essSurj
+
+include M in
 /-- Realizing the general bounded affine pullback along a localization agrees
 with the earlier transported localization realization. -/
 def affineQuasicoherentBoundedLocalizationPullbackToDqcComparison :
@@ -580,6 +607,33 @@ instance affineQuasicoherentLocalizationPullback_essSurj :
         (R := R) (A := A)).obj E,
       ⟨(affineQuasicoherentLocalizationCounitIso
         (R := R) (A := A) M).app E⟩⟩
+
+include M in
+/-- The canonical exact affine pullback is essentially surjective when the
+ring map is a localization. -/
+instance affineQuasicoherentDerivedPullback_essSurj_of_isLocalization :
+    (affineQuasicoherentDerivedPullback
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M)).EssSurj :=
+  Functor.essSurj_of_iso
+    (affineQuasicoherentLocalizationPullbackComparison M).symm
+
+include M in
+/-- The affine-localization specialization of the essential-image
+conclusion: canonical exact pullback reaches every intrinsic target object
+currently covered by affine realization. -/
+theorem affineQuasicoherentDerivedPullbackToDqc_essImage_of_isLocalization :
+    (affineQuasicoherentDerivedPullbackToDqc
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M)).essImage =
+        (affineQuasicoherentDerivedToDqc
+          (CommRingCat.of A)).essImage := by
+  change (affineQuasicoherentDerivedPullback
+    (CommRingCat.ofHom (algebraMap R A))
+    (affineLocalizationAlgebraMap_flat M) ⋙
+      affineQuasicoherentDerivedToDqc
+        (CommRingCat.of A)).essImage = _
+  exact Functor.essImage_comp_of_essSurj
 
 /-- Affine localization pullback followed by the concrete realization into
 the target `Dqc` category. -/
