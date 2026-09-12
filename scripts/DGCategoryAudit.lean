@@ -728,9 +728,13 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd_app
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf_fst
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf_snd
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_hom_val
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_inv_val
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_hom_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_inv_app
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inr_comp_isoOfStrictSquare_hom
 #print axioms CategoryTheory.DGFunctor.constZero
 #print axioms CategoryTheory.DGFunctor.constZero_obj
@@ -939,6 +943,13 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.h0Comparison
 #print axioms CategoryTheory.DGFunctor.h0Comparison_obj
 #print axioms CategoryTheory.DGFunctor.h0Comparison_map_mk
+#print axioms CategoryTheory.DGFunctor.h0Iso
+#print axioms CategoryTheory.DGFunctor.h0Iso_hom
+#print axioms CategoryTheory.DGFunctor.h0Iso_inv
+#print axioms CategoryTheory.DGFunctor.h0Iso_hom_app
+#print axioms CategoryTheory.DGFunctor.h0Iso_inv_app
+#print axioms CategoryTheory.DGFunctor.h0Iso_refl
+#print axioms CategoryTheory.DGFunctor.h0Iso_trans
 
 -- The objectwise cones of a closed degree-zero dg natural transformation give
 -- a functor from `H⁰ C` to triangles of `H⁰ D`, every value distinguished.
@@ -970,6 +981,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.squareTriangleMorphism_hom₃
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleNatTrans
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleNatTrans_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare_hom_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare_hom_app_hom₁
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare_hom_app_hom₂
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare_hom_app_hom₃
 
 -- Independence of the chosen cones.  Two `ConeData` for one transformation are
 -- related by the identity square, so the comparison is the identity case of
@@ -1100,6 +1116,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.compareIso
 #print axioms CategoryTheory.EvaluationData.compareIso_hom_val
 #print axioms CategoryTheory.EvaluationData.compareIso_inv_val
+#print axioms CategoryTheory.EvaluationData.compareIso_self
+#print axioms CategoryTheory.EvaluationData.compareIso_trans
 #print axioms CategoryTheory.EvaluationData.compare_comp_evaluation
 #print axioms CategoryTheory.EvaluationData.preservesChosenConesOfCompare
 #print axioms CategoryTheory.EvaluationData.compare_evaluation_square
@@ -1135,6 +1153,12 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIso
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₁
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₂
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₃
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_self
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans
 
 -- Exactness of the object twist.  The shift half is free -- every dg functor
 -- preserves shifts, `DGFunctor.preservesShifts` -- so only the cone half is a

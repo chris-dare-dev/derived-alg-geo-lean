@@ -294,6 +294,71 @@ noncomputable def isConeOf : IsConeOf (α : (dgHom F G).X 0) K.functor where
         dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega),
         ← map_add, (K.isCone X).fst_inl_add_snd_inr, dgComp_id]
 
+private lemma explicitProjections_splitId :
+    dgComp 1 (-1) 0 (by omega) K.fst K.inl +
+        dgComp 0 0 0 (by omega) K.snd K.inr =
+      dgId K.functor := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  change dgComp 1 (-1) 0 (by omega)
+        (HomogeneousNatTrans.app K.fst X) (HomogeneousNatTrans.app K.inl X) +
+      dgComp 0 0 0 (by omega)
+        (HomogeneousNatTrans.app K.snd X) (HomogeneousNatTrans.app K.inr X) =
+    dgId (K.functor.obj X)
+  rw [fst_app, inl_app, snd_app, inr_app]
+  exact (K.isCone X).fst_inl_add_snd_inr
+
+/-- The projection selected from the assembled cone in the dg-functor category
+is the explicit pointwise source projection transformation. -/
+@[simp]
+lemma isConeOf_fst : K.isConeOf.fst = K.fst := by
+  symm
+  exact (K.isConeOf.splitId_unique K.explicitProjections_splitId).1
+
+/-- The projection selected from the assembled cone in the dg-functor category
+is the explicit pointwise target projection transformation. -/
+@[simp]
+lemma isConeOf_snd : K.isConeOf.snd = K.snd := by
+  symm
+  exact (K.isConeOf.splitId_unique K.explicitProjections_splitId).2
+
+private lemma isConeOf_lift_app {F' G' : DGFunctor C D}
+    {α' : HomogeneousNatTrans F' G' 0} (K' : ConeData α')
+    (u : HomogeneousNatTrans F F' 0) (v : HomogeneousNatTrans G G' 0)
+    (X : C) :
+    HomogeneousNatTrans.app (K.isConeOf.lift K'.isConeOf u v 0) X =
+      (K.isCone X).lift (K'.isCone X)
+        (HomogeneousNatTrans.app u X) (HomogeneousNatTrans.app v X) 0 := by
+  apply (K'.isCone X).homogeneous_ext 0
+  · have h := congrArg (fun θ => HomogeneousNatTrans.app θ X)
+      (K.isConeOf.lift_comp_fst K'.isConeOf u v 0)
+    rw [K'.isConeOf_fst, K.isConeOf_fst] at h
+    change HomogeneousNatTrans.app
+        (HomogeneousNatTrans.composition K.functor K'.functor F'
+          0 1 1 (by omega) (K.isConeOf.lift K'.isConeOf u v 0) K'.fst) X =
+      HomogeneousNatTrans.app
+        (HomogeneousNatTrans.composition K.functor F F'
+          1 0 1 (by omega) K.fst u) X at h
+    rw [HomogeneousNatTrans.composition_apply_app,
+      HomogeneousNatTrans.composition_apply_app, fst_app, fst_app] at h
+    exact h.trans ((K.isCone X).lift_comp_fst
+      (K'.isCone X) (HomogeneousNatTrans.app u X)
+      (HomogeneousNatTrans.app v X) 0).symm
+  · have h := congrArg (fun θ => HomogeneousNatTrans.app θ X)
+      (K.isConeOf.homogeneousLift_comp_snd K'.isConeOf 0 u v)
+    rw [K'.isConeOf_snd, K.isConeOf_snd] at h
+    change HomogeneousNatTrans.app
+        (HomogeneousNatTrans.composition K.functor K'.functor G'
+          0 0 0 (by omega) (K.isConeOf.lift K'.isConeOf u v 0) K'.snd) X =
+      HomogeneousNatTrans.app
+        (HomogeneousNatTrans.composition K.functor G G'
+          0 0 0 (by omega) K.snd v) X at h
+    rw [HomogeneousNatTrans.composition_apply_app,
+      HomogeneousNatTrans.composition_apply_app, snd_app, snd_app] at h
+    exact h.trans ((K.isCone X).homogeneousLift_comp_snd
+      (K'.isCone X) 0 (HomogeneousNatTrans.app u X)
+      (HomogeneousNatTrans.app v X)).symm
+
 section StrictSquareIso
 
 variable {F' G' : DGFunctor C D} {α' : HomogeneousNatTrans F' G' 0}
@@ -335,6 +400,38 @@ lemma isoOfStrictSquare_inv_val
     (K.isoOfStrictSquare K' eF eG hsq).inv.val =
       K'.isConeOf.lift K.isConeOf eF.inv.val eG.inv.val 0 :=
   rfl
+
+@[simp]
+lemma isoOfStrictSquare_hom_app
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α')
+    (X : C) :
+    HomogeneousNatTrans.app (K.isoOfStrictSquare K' eF eG hsq).hom.val X =
+      (K.isCone X).lift (K'.isCone X)
+        (HomogeneousNatTrans.app eF.hom.val X)
+        (HomogeneousNatTrans.app eG.hom.val X) 0 := by
+  rw [isoOfStrictSquare_hom_val]
+  exact K.isConeOf_lift_app K' eF.hom.val eG.hom.val X
+
+@[simp]
+lemma isoOfStrictSquare_inv_app
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α')
+    (X : C) :
+    HomogeneousNatTrans.app (K.isoOfStrictSquare K' eF eG hsq).inv.val X =
+      (K'.isCone X).lift (K.isCone X)
+        (HomogeneousNatTrans.app eF.inv.val X)
+        (HomogeneousNatTrans.app eG.inv.val X) 0 := by
+  rw [isoOfStrictSquare_inv_val]
+  exact K'.isConeOf_lift_app K eF.inv.val eG.inv.val X
 
 /-- The lifted dg-functor isomorphism strictly commutes with the canonical
 target inclusions of the two cone sequences. -/
