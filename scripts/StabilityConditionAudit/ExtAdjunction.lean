@@ -33,6 +33,9 @@ every degree.
 #print axioms CategoryTheory.injective_extAdjunctionMap
 #print axioms CategoryTheory.extAdjunctionAddEquiv
 #print axioms CategoryTheory.extAdjunctionAddEquiv_apply
+#print axioms CategoryTheory.extAdjunctionLinearMap
+#print axioms CategoryTheory.extAdjunctionLinearEquiv
+#print axioms CategoryTheory.extAdjunctionLinearEquiv_apply
 #print axioms CategoryTheory.Abelian.Ext.precompAddEquiv
 #print axioms CategoryTheory.Adjunction.homLinearEquiv
 

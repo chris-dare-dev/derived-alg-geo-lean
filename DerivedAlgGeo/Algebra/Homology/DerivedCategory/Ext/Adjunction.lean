@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicComparison
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.Map
+import Mathlib.Algebra.Homology.DerivedCategory.Ext.Linear
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.EnoughInjectives
 import Mathlib.CategoryTheory.Preadditive.Injective.Preserves
 
@@ -83,12 +84,14 @@ term does not unify. `exact Ext.mk₀_comp_mk₀ _ _` does. The same shape will 
 * `preservesInjectiveObjects_of_adj` — `R` preserves injectives.
 * `bijective_extAdjunctionMap_of_injective` — positive degree on an injective.
 * `surjective_extAdjunctionMap`, `injective_extAdjunctionMap`, `extAdjunctionAddEquiv` — the
-  theorem.
+  additive theorem;
+* `extAdjunctionLinearMap`, `extAdjunctionLinearEquiv` — its linear form when the right adjoint
+  is linear.
 * `Abelian.Ext.precompAddEquiv` — transport along an isomorphism in the first variable, which a
   consumer needs whenever the comparison identifies that variable only up to isomorphism.
 -/
 
-universe w v v' u u'
+universe w v v' u u' t
 
 open CategoryTheory Category Limits Abelian
 
@@ -278,6 +281,44 @@ lemma extAdjunctionAddEquiv_apply (A : C) (B : D) (n : ℕ) (e : Ext.{w} (L.obj 
   rfl
 
 end Bijective
+
+section Linear
+
+variable {S : Type t} [CommRing S]
+  [Linear S C] [Linear S D] [R.Linear S] [EnoughInjectives D]
+
+/-- **The Ext comparison along a linear exact right adjoint is linear.**
+
+The scalar on an Ext class is postcomposition by the corresponding scalar endomorphism.  The
+exact functor `R` carries scalar multiples to scalar multiples, and Ext composition is linear in
+the second variable. -/
+@[simps]
+noncomputable def extAdjunctionLinearMap (A : C) (B : D) (n : ℕ) :
+    Ext.{w} (L.obj A) B n →ₗ[S] Ext.{w} A (R.obj B) n where
+  __ := extAdjunctionAddHom adj A B n
+  map_smul' r e := by
+    change extAdjunctionMap adj (r • e) = r • extAdjunctionMap adj e
+    dsimp only [extAdjunctionMap]
+    rw [Functor.mapExactFunctor_smul]
+    exact Abelian.Ext.comp_smul _ _ _ _
+
+/-- **Linear Ext along an adjunction with exact left adjoint.**
+
+This is `extAdjunctionAddEquiv` with its canonical scalar compatibility exposed.  Only the right
+adjoint must be linear: it is the functor applied to Ext classes in the comparison map. -/
+noncomputable def extAdjunctionLinearEquiv (A : C) (B : D) (n : ℕ) :
+    Ext.{w} (L.obj A) B n ≃ₗ[S] Ext.{w} A (R.obj B) n :=
+  LinearEquiv.ofBijective (extAdjunctionLinearMap adj A B n)
+    ⟨injective_extAdjunctionMap adj n A B,
+      surjective_extAdjunctionMap adj n A B⟩
+
+@[simp]
+lemma extAdjunctionLinearEquiv_apply (A : C) (B : D) (n : ℕ)
+    (e : Ext.{w} (L.obj A) B n) :
+    extAdjunctionLinearEquiv (S := S) adj A B n e = extAdjunctionMap adj e :=
+  rfl
+
+end Linear
 
 section Precomp
 
