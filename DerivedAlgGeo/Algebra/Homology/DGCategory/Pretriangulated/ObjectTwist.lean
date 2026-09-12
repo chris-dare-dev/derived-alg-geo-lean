@@ -159,7 +159,6 @@ lemma inclusion_comp_compareIso_hom_val {W : EvaluationData E}
 
 /-- The canonical twist comparison from a cone choice to itself is strictly
 the identity homogeneous natural transformation. -/
-@[simp]
 lemma compareIso_self_hom_val :
     (K.compareIso K).hom.val =
       DGFunctor.HomogeneousNatTrans.id K.twist := by
