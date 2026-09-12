@@ -213,6 +213,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Z0.id_val
 #print axioms CategoryTheory.Z0.of
 #print axioms CategoryTheory.Z0.toH0
+#print axioms CategoryTheory.Z0.toH0_full
 #print axioms CategoryTheory.coboundaries
 #print axioms CategoryTheory.coboundaries_le_cocycles
 #print axioms CategoryTheory.coboundary_comp_mem

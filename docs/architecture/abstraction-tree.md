@@ -171,8 +171,10 @@ Category
 │  │  ├─ first/secondFamilyCommShift      explicit adapters, evaluation agreement
 │  │  └─ firstFamily / secondFamily       exact-family projections through those adapters
 │  ├─ kernelConeTransformTriangleFunctor  pointwise image of dg cones of an enhanced kernel category
-│  └─ CounitKernelConeData                kernel arrow realizing an adjunction counit, in an enhancement
-│     └─ kernel-presented twist candidate exact image of its dg cone
+│  └─ CounitKernelData                    ordinary kernel arrow realizing an adjunction counit
+│     └─ CounitKernelConeData             noncanonical enhanced representative and dg cone
+│        ├─ kernel-presented twist candidate       exact image of its dg cone
+│        └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only

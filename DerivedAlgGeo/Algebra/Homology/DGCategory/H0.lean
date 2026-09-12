@@ -351,6 +351,13 @@ def Z0.toH0 (C : Type u) [DGCategory.{v} C] : Z0 C ⥤ H0 C where
   map_id _ := rfl
   map_comp _ _ := rfl
 
+/-- Every morphism in `H⁰ C` has a degree-zero cocycle representative. -/
+instance Z0.toH0_full (C : Type u) [DGCategory.{v} C] :
+    (Z0.toH0 C).Full where
+  map_surjective f := by
+    obtain ⟨f, rfl⟩ := Quotient.exists_rep f
+    exact ⟨f, rfl⟩
+
 namespace DGFunctor
 
 variable {C : Type u} {D : Type u'} {E : Type u''} [DGCategory.{v} C] [DGCategory.{v} D]

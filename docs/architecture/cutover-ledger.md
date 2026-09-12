@@ -7,6 +7,27 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Literal Fourier--Mukai counit triangles (2026-09-12):
+  `CounitKernelConeData.counitTriangleInSource` transports the raw transform
+  triangle of an enhanced counit-kernel cone to a source-natural triangle with
+  vertices `Φ_Q ⋙ Φ_P`, `𝟭 Y`, and the kernel-presented twist, and with
+  first map literally the supplied adjunction counit.  The construction reuses
+  Mathlib's `Triangle.functorMk` and `Triangle.functorIsoMk`; the natural
+  comparison exposes all three components, and exact kernel evaluation makes
+  every value of the normalized family distinguished.  This is pointwise
+  distinguishedness only: it does not assert a distinguished triangle in the
+  functor category, exactness or autoequivalence of the twist, or independence
+  from the selected enhancement representative and cone.
+- Ordinary counit-kernel data and enhanced cone selection (2026-09-12):
+  `FourierMukai.CounitKernelData` separates the geometric kernel morphism and
+  its exact transform equation from any enhancement or cone choice.
+  `CategoryTheory.Z0.toH0_full` records the reusable quotient-surjectivity fact,
+  so `CounitKernelData.toConeData` uses Mathlib's `Functor.preimage` to choose a
+  closed representative and pretriangulated cone in any enhancement.  The
+  forgetful map recovers the ordinary datum, but no selected representative or
+  cone is claimed canonical.  `CounitKernelData.ofFull` is only a constructor
+  under the explicit strong hypothesis `E.kernelTransform.Full`; the geometric
+  counit-trace realization remains open.
 - H⁰ cone-triangle comparison across strict isomorphism squares (2026-09-12):
   `Algebra/Homology/DGCategory/FunctorCategoryH0.lean` owns the canonical
   `DGFunctor.h0Iso`, including identity and composition coherence.
