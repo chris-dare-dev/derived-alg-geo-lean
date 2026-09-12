@@ -232,7 +232,10 @@ that comparison are instance hypotheses to be discharged by the realization.
    `compare_comp_evaluation` says that this isomorphism commutes strictly with
    their evaluation transformations.  Thus later consumers may depend on the
    existence capability without treating a selected evaluation family as
-   mathematically significant.
+   mathematically significant.  Moreover,
+   `DGFunctor.PreservesChosenCones.ofIso` transports strong cone preservation
+   across any such dg-functor isomorphism, so the cone-preservation hypothesis
+   used for exactness is independent of the selected evaluation data.
 
    The functor is not inert.  `evaluation_isClosed` gives the transformation
    objectwise cones, so `EvaluationData.TwistConeData` is the Seidel--Thomas
@@ -261,13 +264,14 @@ that comparison are instance hypotheses to be discharged by the realization.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies a `HasCopowers` instance.  The generic existence/choice interface
-   and its independence theorem are closed.  Choice-independence for the
-   resulting twist cones is the next separate transport seam: it must use
-   preservation of chosen cones under a dg natural isomorphism, not pretend
-   that the mapping-out copower property proves the mapping-in cone property.
-   And no theorem relates the object twist to a spherical object: that
-   comparison needs `Perf(k)` as a dg category, which the repository does not
-   have, so nothing here calls `E` spherical or claims `T_E` is invertible.
+   and its independence theorem are closed, as is choice-independence of the
+   cone-preservation capability.  Comparing the resulting twist cone functors
+   is a separate remaining seam: it requires showing that cone lifts along the
+   strict evaluation square are invertible and coherent, not merely
+   transporting the exactness hypothesis.  And no theorem relates the object
+   twist to a spherical object: that comparison needs `Perf(k)` as a dg
+   category, which the repository does not have, so nothing here calls `E`
+   spherical or claims `T_E` is invertible.
 5. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
    transformed arrow is the counit.  The enhancement of the kernel category,
