@@ -3,6 +3,7 @@ TStructureCore slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Thick
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.FullSubcategory
@@ -115,6 +116,27 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.IsCompactObject.map_ι_coproductComparisonIso_hom_assoc
 #print axioms CategoryTheory.IsCompactObject.exists_finite_sum
 #print axioms CategoryTheory.IsCompactObject.shift
+#print axioms CategoryTheory.directSumToHom
+#print axioms CategoryTheory.directSumToHom_of
+#print axioms CategoryTheory.directSumPrecomp
+#print axioms CategoryTheory.directSumPrecomp_apply
+#print axioms CategoryTheory.directSumPrecomp_comp
+#print axioms CategoryTheory.directSumPrecomp_id
+#print axioms CategoryTheory.directSumToHom_precomp
+#print axioms CategoryTheory.IsCompactObject.bijective_directSumToHom
+#print axioms CategoryTheory.isCompactObject_of_bijective_directSumToHom
+#print axioms CategoryTheory.isCompactObject_iff_bijective_directSumToHom
+#print axioms CategoryTheory.IsCompactObject.of_retract
+#print axioms CategoryTheory.IsCompactObject.of_isZero
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isStableUnderRetracts
+#print axioms CategoryTheory.directSumPrecomp_exact
+#print axioms CategoryTheory.IsCompactObject.of_distTriang₃
+#print axioms CategoryTheory.ObjectProperty.compactObjects.containsZero
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isStableUnderShift
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isTriangulatedClosed₃
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isTriangulatedClosed₂
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isTriangulated
+#print axioms CategoryTheory.ObjectProperty.triangEnvelope_le_compactObjects
 #print axioms CategoryTheory.ObjectProperty.compactObjects
 #print axioms CategoryTheory.ObjectProperty.isCompactObject_of_iso
 #print axioms CategoryTheory.ObjectProperty.coprodClosure

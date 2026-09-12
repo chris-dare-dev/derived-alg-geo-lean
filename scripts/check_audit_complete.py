@@ -40,6 +40,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from _output import force_utf8_output
+
 # Prefixes an audit file's `open` lines make available, per library.
 AUDITS = {
     "AlgebraicGeometry": (
@@ -224,4 +226,5 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     sys.exit(main(sys.argv[1:]))

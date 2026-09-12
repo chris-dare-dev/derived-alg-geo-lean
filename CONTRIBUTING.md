@@ -100,6 +100,15 @@ Public declarations belong in the appropriate hand-maintained axiom audit:
 The completeness ratchet rejects growth in unaudited public declarations. When
 the ratchet improves, lower its ceiling; never raise one to make a change pass.
 
+Every gate script under `scripts/` prints through `scripts/_output.py`: a new
+`scripts/check_*.py` must `from _output import force_utf8_output` and call
+`force_utf8_output()` as the first statement of its `if __name__ == "__main__":`
+block. The self-hosted Windows runner's console is cp1252, and a gate that
+prints a declaration name such as `chi₂_eq` without this dies with a `charmap`
+traceback instead of its finding (#868, #869). `python3 scripts/_output.py`
+checks every script for the call and reproduces the crash to prove the helper
+prevents it; it runs first in `scripts/gates.sh` and in CI.
+
 ## Where verification runs
 
 **Full verification runs on the self-hosted Windows runners, not on your

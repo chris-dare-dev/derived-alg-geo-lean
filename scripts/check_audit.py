@@ -64,6 +64,8 @@ import re
 import sys
 from pathlib import Path
 
+from _output import force_utf8_output
+
 ALLOWED = {"propext", "Classical.choice", "Quot.sound"}
 
 # Lazy, so a name ending in `'` still terminates correctly: the regex needs the
@@ -160,6 +162,7 @@ def main(path: str, audit_lean: str | None = None) -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     if len(sys.argv) not in (2, 3):
         print(__doc__)
         sys.exit(2)

@@ -43,6 +43,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from _output import force_utf8_output
+
 
 def git(*args: str) -> str:
     return subprocess.run(
@@ -155,4 +157,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     sys.exit(main())

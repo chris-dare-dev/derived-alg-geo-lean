@@ -29,6 +29,8 @@ import json
 import sys
 from pathlib import Path
 
+from _output import force_utf8_output
+
 DEFAULT_MAP_PATH = Path("registry/coverage-1902.08184v4.json")
 FORBIDDEN_KEYS = {"chunk_id", "chunk_ids", "chunk", "notebook_slug"}
 EVIDENCE_FIELDS = ("review_doc", "reviewer", "reviewed_at")
@@ -118,6 +120,7 @@ def main(path=None):
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     if len(sys.argv) > 2:
         print(__doc__)
         sys.exit(2)
