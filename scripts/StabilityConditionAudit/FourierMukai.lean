@@ -778,11 +778,24 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelEvaluationExact.pointwiseDistinguishedTriangleProperty
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.transformMapIso_hom
 
-/-! ## Fourier--Mukai lane -- counit kernel cones -/
+/-! ## Fourier--Mukai lane -- counit kernel data and cones -/
 
--- A supplied closed kernel arrow from the convolution kernel to the unit
--- kernel, the equation identifying its transform with the adjunction counit,
--- and the kernel-presented twist candidate its dg cone produces.
+-- An ordinary kernel arrow whose transform is the counit; its noncanonical
+-- lift to a closed arrow and cone in any enhancement; and the kernel-presented
+-- twist candidate that cone produces.
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.arrow
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.counit_conjugate_liftedArrow
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.ext
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.ext_iff
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.homMk_liftedArrow
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.liftedArrow
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.mk.inj
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.ofFull
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.toConeData
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.toConeData_toCounitKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelData.transform_arrow
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.arrow
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.cone
@@ -793,6 +806,7 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentation_cone
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentation_source
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentation_target
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.toCounitKernelData
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.transform_arrow
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.triangleInSource
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.triangleInSource_obj_distinguished

@@ -32,11 +32,12 @@ abstract functorial dg-cone construction is rooted at
 cones pointwise through a correspondence, and
 `FourierMukai.CounitKernelConeData` is the reusable specialization when the
 kernel morphism realizes an adjunction counit.  The geometric identification
-of the kernel category with an `H⁰`, the actual enhanced kernel morphism, and
-exactness of kernel evaluation remain the #853--#855 realization boundary.
-Accordingly the two extension structures are still explicitly *result data*.
-Once their adjunction fields are supplied, however, the ambient equivalence
-itself is derived through `Adjunction.toEquivalence`.
+of the kernel category with an `H⁰`, the ordinary kernel morphism with its
+exact counit-transform equation, an enhancement, and exactness of kernel
+evaluation remain the #853--#855 realization boundary.  Accordingly the two
+extension structures are still explicitly *result data*.  Once their
+adjunction fields are supplied, however, the ambient equivalence itself is
+derived through `Adjunction.toEquivalence`.
 -/
 
 open CategoryTheory

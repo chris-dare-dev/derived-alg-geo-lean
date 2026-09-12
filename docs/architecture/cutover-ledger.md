@@ -7,6 +7,16 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Ordinary counit-kernel data and enhanced cone selection (2026-09-12):
+  `FourierMukai.CounitKernelData` separates the geometric kernel morphism and
+  its exact transform equation from any enhancement or cone choice.
+  `CategoryTheory.Z0.toH0_full` records the reusable quotient-surjectivity fact,
+  so `CounitKernelData.toConeData` uses Mathlib's `Functor.preimage` to choose a
+  closed representative and pretriangulated cone in any enhancement.  The
+  forgetful map recovers the ordinary datum, but no selected representative or
+  cone is claimed canonical.  `CounitKernelData.ofFull` is only a constructor
+  under the explicit strong hypothesis `E.kernelTransform.Full`; the geometric
+  counit-trace realization remains open.
 - H⁰ cone-triangle comparison across strict isomorphism squares (2026-09-12):
   `Algebra/Homology/DGCategory/FunctorCategoryH0.lean` owns the canonical
   `DGFunctor.h0Iso`, including identity and composition coherence.
