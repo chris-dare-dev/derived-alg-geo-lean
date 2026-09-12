@@ -51,11 +51,31 @@ Category
 │  │  ├─ ObjectProperty.OnTriangle       objectwise subcategory witness
 │  │  │  └─ liftTriangle / liftTriangleMap
 │  │  │     full-subcategory lift, comparison iso, functorial laws
-│  │  └─ Semiorthogonal decomposition
-│  │     ├─ ExceptionalCollection
-│  │     ├─ OrthogonalExceptionalBlocks  positive blocks and residual
-│  │     ├─ RightProjectionData          chosen adjoint and universal Hom
-│  │     └─ mutation / projection chains objectwise cones and iteration
+│  │  ├─ Semiorthogonal decomposition
+│  │  │  ├─ ExceptionalCollection
+│  │  │  ├─ OrthogonalExceptionalBlocks  positive blocks and residual
+│  │  │  ├─ RightProjectionData          chosen adjoint and universal Hom
+│  │  │  └─ mutation / projection chains objectwise cones and iteration
+│  │  └─ Wall.ChargeFamily P N           parameterized charges; wall loci
+│  │     ├─ reindex / pullback           change of chart / of class map
+│  │     ├─ smul / phaseRotate β         wall_smul; a unit modulus fixes wallValue
+│  │     │  └─ = phaseTiltRotation       proved comparison, never a copy
+│  │     ├─ Wall.Exp.ofMoments m         one polynomial, indexed by truncation m
+│  │     │  ├─ scalar moments            compressed H-degrees of a polarised n-fold
+│  │     │  │  ├─ m = 1, m = 2           SlopeData.charge / stChargeFamily
+│  │     │  │  ├─ m = 3                  Threefold.chargeFamily
+│  │     │  │  ├─ m = 4                  free; no new polynomial
+│  │     │  │  └─ (n,m) = (3,2)          the tilt charge; Ku(cubic threefold)
+│  │     │  │     rotated by 1/i         ν is α · its unrotated chargeSlope
+│  │     │  └─ form moments              Picard rank ≥ 2; no compression
+│  │     │     ├─ centralCharge          Divisorial; proved instance of the kernel
+│  │     │     ├─ StabilityParameters    the (B,ω) chart; w = β + iα fixed here
+│  │     │     ├─ mukaiCharge / κ        κ is a pullback, never a coefficient
+│  │     │     │  SqrtTodd               the image of κ, not a truncation of it
+│  │     │     └─ quadric, ℙ², blow-up   rank-one slice reaches the scalar branch
+│  │     ├─ Wall.Exp.twist / discr       the e^{-βH} action and Δ_H, stated once
+│  │     └─ Spherical half-wall          a wall against the point class, cut by a
+│  │                                     sign; inclusion plus sign, never equality
 │  └─ Linear k C                         Mathlib root
 │     └─ SerreFunctorData                duality on Hom spaces
 │        ├─ SerreCategoryData            chosen Serre autoequivalence
@@ -194,9 +214,22 @@ LinearAlgebra
 ├─ finite free integral lattices          Mathlib: [Module.Finite ℤ Λ] [Module.Free ℤ Λ]
 │  └─ NumericalVarietyData.NumericalQuotient finite by Module.Finite.quotient; free, once
 │                                            torsion-free, by Module.free_of_finite_type_torsion_free'
-└─ weighted-basis graded pieces
-   ├─ internal direct-sum decomposition
-   └─ NumericalRingData.ofGradedBasis        geometric numerical consumer
+├─ weighted-basis graded pieces
+│  ├─ internal direct-sum decomposition
+│  └─ NumericalRingData.ofGradedBasis        geometric numerical consumer
+├─ bilinear form on a lattice
+│  └─ Lattice.pairCharge b x y v         ⟪x,v⟫ + i⟪y,v⟫; b not symmetric
+│     ├─ PeriodDomain.centralCharge      the quadratic-space presentation
+│     │  ├─ support property             ker Z is the plane's negative-definite ⊥
+│     │  ├─ signature additivity         gives HasSignatureTwo on a complement
+│     │  ├─ Mukai.expCharge              Bridgeland Z(β,ω), the exponential plane
+│     │  ├─ Ku(X) charge                 on H̃_alg; NOT a child of expCharge
+│     │  └─ Ku(X) period domain          on A₂^⊥ ⊆ H̃; a different lattice
+│     └─ Mukai.Graded.pairing n          ⟪v,w⟫ = (-1)ⁿ⟪w,v⟫; odd n alternating
+│        n = 2 is realPairing            so n = 2 owes a comparison, not a def
+└─ Mukai.pairing / selfPairing           Lattice/Mukai/Basic.lean:56,143
+   ARITY IS FIXED AT THREE               generalise over the coefficient ring only
+   root of the discriminant              pairing 3 v v = 0 identically
 
 Algebra
 ├─ ordinary ring and module theory
@@ -251,16 +284,21 @@ AlgebraicGeometry
 ├─ numerical K-theory
 │  ├─ Euler quotient
 │  │  └─ future scheme-specific relation generators consume Algebra root
-│  └─ Riemann--Roch and Mukai transfer
-│     └─ consume categorical K₀ realizations and Euler forms
+│  ├─ Riemann--Roch and Mukai transfer
+│  │  └─ consume categorical K₀ realizations and Euler forms
+│  └─ Polarised.wallChargeFamily         one transport for every (n, m, κ)
+│     ├─ n = 2, 3 exist; n = 4 free      K3, ℙ², quadric, ℙ³, quintic, ℙ⁴, sextic
+│     ├─ κ = √td is inhabited            = mukaiCharge at sqrtTodd on rankOne
+│     │  any surface                     no K3 hypothesis is needed
+│     └─ κ = 1 and κ = √td               two pullbacks; different walls, not one
 ├─ moduli
 │  ├─ fiberwise replete locus selector     not a subprestack
 │  ├─ finite-type boundedness witness      consumes selector + generic predicate
 │  ├─ affine stable subprestack            consumes pseudofunctor object property
 │  ├─ stack presentation
 │  └─ perfect-complex specialization
-└─ stability on scheme-derived categories      `DerivedCategory/Stability/`, the one
-                                               stability-consuming child
+└─ stability-consuming children                `DerivedCategory/Stability/`, `Moduli/`,
+                                               `Numerical/`, `Stability/` — four, not one
 ```
 
 The arrows implied by this tree point downwards from consumers to roots.  In
@@ -355,11 +393,69 @@ particular:
   on the nose; the enhancement of the geometric kernel category with its
   exact comparison, the actual kernel morphism, and exactness of kernel
   evaluation remain explicit realization inputs.
+- keep every central charge under one root. A charge is an additive map to `ℂ`
+  built from a complex parameter and a numerical class, and the surface, threefold
+  and slope charges are the same polynomial at three truncation degrees, not three
+  theories. Truncation degree `m` is the index, never the ambient dimension `n`:
+  the cubic-threefold tilt charge is `(n, m) = (3, 2)`, so a root indexed by `n`
+  cannot state it. A new dimension supplies a `Polarization` and inherits the
+  polynomial; if a lane finds itself writing a fourth charge polynomial, the
+  placement is wrong.
+- a correction class `κ` is a pullback, never a coefficient. `κ = 1` and `κ = √td`
+  give genuinely different walls, so they are two pullbacks of one transport and
+  must not be fused into a single family. `SqrtTodd` is the image of `κ` under a
+  numerical realization, not a truncation of it.
+- the Mukai pairing has fixed arity three. Generalise it over the coefficient
+  ring, never over dimension: a dimension-indexed self-pairing vanishes
+  identically in odd degree, so it cannot be the root of the Bogomolov
+  discriminant. The graded pairing is a separate object that declares nothing new
+  at `n = 2`, where it is `Mukai.realPairing` and owes a comparison theorem.
+- noncommutative varieties add no carrier. A Kuznetsov component reaches the tree
+  by restriction along its inclusion, so there is no `KuznetsovChargeData` and
+  must not become one. The two cases differ and the difference is forced by
+  parity, not by taste: for the cubic threefold the dimension is odd, the pairing
+  is alternating, no period domain exists, and the charge is induced from the
+  rotated tilt charge; for the cubic fourfold the charge lives on the algebraic
+  Mukai lattice while the period domain lives on the orthogonal complement of an
+  `A₂` sublattice, and those are two different lattices that must not be fused.
 
 Bicategories are the first implemented higher-categorical stage. A future
 general `n`-category or `(∞,1)`-category layer must name its formal model and
 its comparison with this spine; an empty directory does not establish an
 abstraction relationship.
+
+## Recorded negative results
+
+Clause 6 below requires a falsified generalization to be recorded rather than
+forgotten. These were each established against the tree, and each one is a
+unification that looks right in the literature and is false here.
+
+- **A dimension-indexed Mukai self-pairing is not the root of the discriminant.**
+  It vanishes identically in odd degree, so the threefold leaf cannot reach it.
+  The root is the fixed-arity pairing generalized over its coefficient ring.
+- **The multi-divisor charge does not factor through the compressed H-degrees.**
+  The compression is not injective once the Picard rank exceeds one, so the
+  intersection-form branch is a genuine sibling of the scalar branch and not a
+  specialization of it.
+- **The graded pairing declares nothing new at `n = 2`.** It is
+  `Mukai.realPairing` there, on the nose. Shipping it as a definition rather than
+  a comparison would add a second spelling of an existing form.
+- **Parity of the compressed pairing says nothing about a Kuznetsov component.**
+  The compressed form lives on a space of dimension `n + 1`; the Mukai lattice of
+  the component does not. Symmetry there is automatic for an unrelated reason, so
+  the parity argument is vacuous even on the correct space.
+- **The rotation that induces the cubic-threefold charge is not cosmetic.** It
+  leaves every wall fixed but changes phases, so a construction that drops it is
+  wrong about semistability even where it is right about walls.
+- **The tilt charge is not a chart change of the threefold charge.** Their wall
+  loci genuinely differ; the tilt family is the surface family pulled back along a
+  truncation, which is a different operation.
+- **A geometric Serre functor is not a new structure.** The categorical root
+  already exists and the geometric side owes it a bridge; a parallel structure
+  fails the adoption clause below and would add a third duplicate twist.
+- **The Fourier--Mukai convolution classes are not pseudofunctor data.** They
+  resemble compositor and unitor data without being an instance of it, so that
+  lane cannot own them and the resemblance must not be used to place them.
 
 ## Root review before a new structure
 
