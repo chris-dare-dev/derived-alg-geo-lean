@@ -48,6 +48,7 @@ Category
 │  └─ reflective transport using an ordinary adjunction
 ├─ Preadditive
 │  ├─ Triangulated category              Mathlib root
+│  │  ├─ signed integral-shift exactness explicit CommShift + IsTriangulated
 │  │  ├─ ObjectProperty.OnTriangle       objectwise subcategory witness
 │  │  │  └─ liftTriangle / liftTriangleMap
 │  │  │     full-subcategory lift, comparison iso, functorial laws
@@ -113,7 +114,8 @@ Category
 │  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
 │  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
 │  │  │  ├─ HasShift Z⁰(DGFunctor C D) ℤ standard Mathlib packaging, all unit/assoc laws
-│  │  │  └─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
+│  │  │  ├─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
+│  │  │  └─ shiftedFunctorH0Iso          functor-level comparison; transports H⁰ equivalences
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
@@ -174,21 +176,38 @@ Category
 │  │  └─ firstFamily / secondFamily       exact-family projections through those adapters
 │  ├─ kernelConeTransformTriangleFunctor  pointwise image of dg cones of an enhanced kernel category
 │  ├─ KernelConeNormalizationData         endpoint square for literal source-natural triangles
+│  │  ├─ coneKernel                      ordinary image of the selected enhanced cone
+│  │  └─ shiftedConeKernel               enhanced shift with transform/shift comparison
 │  └─ KernelTransformationData            ordinary kernel arrow realizing a named transformation
 │     ├─ KernelTransformationConeData     noncanonical enhanced representative and dg cone
 │     │  └─ normalizationData             reusable literal endpoint/first-map transport
 │     ├─ CounitKernelData                 equivalent adjunction-counit specialization; stable API
 │     │  └─ CounitKernelConeData          enhanced counit specialization
+│     │     ├─ twistKernel                           ordinary image of the selected dg cone
 │     │     ├─ kernel-presented twist candidate       exact image of its dg cone
 │     │     └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
-│     └─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
-│        └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
-│           ├─ unshifted cotwist-cone candidate       exact image of its dg cone
-│           └─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
+│     ├─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
+│     │  └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
+│     │     ├─ unshifted cotwist-cone candidate       exact image of its dg cone
+│     │     ├─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
+│     │     ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
+│     │     ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
+│     │     └─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
+│     ├─ DualTwistKernelData              left-adjunction unit specialization after swapping
+│     │  └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
+│     │     ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
+│     │     └─ dualTwistTriangleInTarget             inverse rotation, pointwise distinguished
+│     └─ DualCotwistKernelData            left-adjunction counit specialization after swapping
+│        └─ DualCotwistKernelConeData     reuses the counit/twist cone and normalization
+│           ├─ dualCotwistKernel                      selected enhanced cone presenting dual cotwist
+│           └─ dualCotwistTriangleInSource           literal counit triangle, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
+│  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
+│  │  ├─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
+│  │  └─ stored-cone H⁰ exactness          all four, from endpoint cone preservation
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
-│     └─ full sphericality                 pending Morita/shifted-comparison theorem
+│     └─ full sphericality                 pending Morita/adjoint-comparison theorem
 ├─ Derived-category extensions
 │  └─ Ext adjunction / dimension shift / resolution naturality
 ├─ filtered-complex spectral sequences

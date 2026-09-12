@@ -791,6 +791,10 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- functor" a statement about the dg functor rather than only about each value.
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_obj
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_map
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_eq
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_isEquivalence
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Equivalence
 
 -- `dg-enhancements-e10`: a quasi-equivalence of dg categories induces an
 -- equivalence on `H⁰`.  The seam between the `H⁰` Hom quotient and Mathlib's

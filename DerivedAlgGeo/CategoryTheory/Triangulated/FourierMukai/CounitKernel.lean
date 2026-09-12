@@ -27,7 +27,9 @@ cone to a source-natural family of pointwise distinguished triangles.
 `CounitKernelConeData.counitTriangleInSource` transports their first two
 vertices to the composite adjoint transform and the identity functor, with
 first map literally the adjunction counit and third vertex the Fourier--Mukai
-twist candidate.
+twist candidate.  The selected cone kernel is named `twistKernel` and
+definitionally presents that twist, so the candidate is explicitly a kernel
+functor without any exactness or invertibility conclusion.
 
 The constructor `CounitKernelData.ofFull` produces the ordinary arrow when the
 kernel transform is explicitly assumed full.  No fullness theorem is asserted
@@ -223,11 +225,24 @@ theorem presentation_target :
 theorem presentation_cone : S.presentation.cone = S.cone :=
   rfl
 
+/-- The ordinary kernel represented by the selected enhanced counit cone. -/
+abbrev twistKernel : W :=
+  e.equiv.functor.obj (show H0 e.dgCat from S.cone)
+
 /-- The Fourier--Mukai transform of the counit-cone kernel, read in the kernel
 category through the enhancement.  This is the kernel-presented twist
 candidate. -/
 abbrev twist : Y ⥤ Y :=
-  E.transform (e.equiv.functor.obj (show H0 e.dgCat from S.cone))
+  E.transform S.twistKernel
+
+/-- The named twist kernel presents the twist definitionally. -/
+def twistKernelIso : E.transform S.twistKernel ≅ S.twist :=
+  Iso.refl _
+
+/-- The twist candidate is a kernel functor, witnessed by its selected cone
+kernel.  This asserts neither exactness nor invertibility. -/
+theorem isKernelFunctor_twist : E.IsKernelFunctor S.twist :=
+  ⟨S.twistKernel, ⟨S.twistKernelIso.symm⟩⟩
 
 /-- Identify the enhanced lift of the convolution kernel first with the
 ordinary convolution kernel and then with the composite transform presenting

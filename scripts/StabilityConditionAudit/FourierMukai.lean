@@ -785,6 +785,7 @@ stored as an extra hypothesis.
 -- cone selection, and endpoint normalization of the resulting pointwise
 -- distinguished transform triangle.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.coneKernel
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.coneTransform
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.distinguishedNormalizedTriangle
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.distinguishedNormalizedTriangle_obj_val
@@ -814,6 +815,9 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.rawTriangleObj₂Iso
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.sourceIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.square
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.shiftedConeKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.shiftedConeKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.shiftedConeTransformIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.targetIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.KernelTransformationData
 #print axioms CategoryTheory.Triangulated.FourierMukai.KernelTransformationData.arrow
@@ -884,6 +888,7 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.distinguishedCounitTriangleInSource
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.distinguishedCounitTriangleInSource_obj_val
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.isCone
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.isKernelFunctor_twist
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.mk.inj
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.normalizationData
@@ -914,21 +919,39 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.triangleInSourceObj₁Iso
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.triangleInSourceObj₂Iso
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.twist
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.twistKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.twistKernelIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.twistToShiftedComposite
 
 /-! ## Fourier--Mukai lane -- adjunction-unit kernel data and cones -/
 
 -- A definitional specialization of the generic kernel-transformation root to
--- a right adjunction's unit.  The selected cone is unshifted; no conventional
--- cotwist or exactness of its transform is asserted here.
+-- a right adjunction's unit.  Its selected cone yields a choice-dependent
+-- conventional cotwist by pointwise shift, but no exactness or equivalence.
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData.ofFull
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData.toConeData
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData.transform_arrow
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.compositeToCotwistCone
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwist
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistCone
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistConeToShiftedIdentity
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.isKernelFunctor_cotwist
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_comp_π₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_comp_π₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_comp_π₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_mor₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistTriangleInSource_unit
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedCotwistTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedCotwistTriangleInSource_obj_val
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedUnitTriangleInSource
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedUnitTriangleInSource_obj_val
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.transform_arrow_unit_square
@@ -940,6 +963,76 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_obj₁
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_obj₂
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_obj₃
+
+/-! ## Fourier--Mukai lane -- left-adjunction dual-twist kernels -/
+
+-- The left-adjunction unit lane is a semantic specialization of the generic
+-- right-unit/cotwist construction after swapping correspondences.  It adds no
+-- second cone or normalization mechanism.
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelData.ofFull
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelData.toConeData
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelData.transform_arrow
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.compositeToDualTwistCone
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.distinguishedDualTwistTriangleInTarget
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.distinguishedDualTwistTriangleInTarget_obj_val
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.distinguishedUnitTriangleInTarget
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.distinguishedUnitTriangleInTarget_obj_val
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwist
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistCone
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistConeToShiftedIdentity
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget_comp_π₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget_comp_π₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget_comp_π₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget_mor₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.dualTwistTriangleInTarget_unit
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.isKernelFunctor_dualTwist
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.transform_arrow_unit_square
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.unitTriangleInTarget
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.unitTriangleInTarget_mor₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.unitTriangleInTarget_mor₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.unitTriangleInTarget_mor₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.unitTriangleInTarget_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.unitTriangleInTarget_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.unitTriangleInTarget_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualTwistKernelConeData.unitTriangleInTarget_obj₃
+
+/-! ## Fourier--Mukai lane -- left-adjunction dual-cotwist kernels -/
+
+-- The left-adjunction counit lane is a semantic specialization of the generic
+-- right-counit/twist construction after swapping correspondences.  It adds no
+-- second cone or normalization mechanism.
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelData.ofFull
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelData.toConeData
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelData.transform_arrow
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.counitToDualCotwist
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.distinguishedDualCotwistTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.distinguishedDualCotwistTriangleInSource_obj_val
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwist
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistKernelIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistToShiftedComposite
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistTriangleInSource_counit
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistTriangleInSource_mor₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistTriangleInSource_mor₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistTriangleInSource_mor₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistTriangleInSource_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistTriangleInSource_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistTriangleInSource_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.dualCotwistTriangleInSource_obj₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.isKernelFunctor_dualCotwist
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.transform_arrow_counit_square
 
 /-! ## Fourier--Mukai lane -- kernel-presented adjunctions on extension stages -/
 

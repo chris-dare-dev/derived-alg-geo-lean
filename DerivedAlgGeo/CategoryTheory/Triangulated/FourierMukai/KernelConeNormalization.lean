@@ -20,7 +20,11 @@ first map and literal first two vertices.  The construction reuses Mathlib's
 
 The result is only a family of pointwise distinguished triangles.  It does not
 give a distinguished triangle in a functor category, make the third functor
-exact, or compare different enhanced arrows or cone choices.
+exact, or compare different enhanced arrows or cone choices.  The selected
+cone nevertheless has a reusable shifted-kernel presentation: shift it first
+in the enhancement's homotopy category, compare that kernel with the ordinary
+shift through the enhancement equivalence, and then use the kernel family's
+existing `CommShift` comparison.  No parallel shift structure is introduced.
 -/
 
 set_option autoImplicit false
@@ -63,10 +67,47 @@ variable {corr : Correspondence X Y W} {e : Enhancement.{vE, uE} W}
   {A : DGCategory.ConePresentation e.dgCat} {F G : X ⥤ Y} {α : F ⟶ G}
   (N : corr.KernelConeNormalizationData e A F G α)
 
+/-- The ordinary kernel represented by the selected enhanced cone. -/
+abbrev coneKernel : W :=
+  let _ := N
+  e.equiv.functor.obj (show H0 e.dgCat from A.cone)
+
 /-- The transform of the selected cone, with no application-specific name. -/
 abbrev coneTransform : X ⥤ Y :=
   let _ := N
-  corr.transform (e.equiv.functor.obj A.cone)
+  corr.transform N.coneKernel
+
+section Shift
+
+variable [HasShift Y ℤ] [HasShift W ℤ] [e.equiv.functor.CommShift ℤ]
+
+/-- The kernel obtained by shifting the selected cone in the enhancement's
+homotopy category before transporting it to the ordinary kernel category. -/
+noncomputable abbrev shiftedConeKernel (n : ℤ) : W :=
+  let _ := N
+  e.equiv.functor.obj
+    ((shiftFunctor (H0 e.dgCat) n).obj (show H0 e.dgCat from A.cone))
+
+/-- The enhancement comparison identifies the transported shifted cone with
+the shift of its transported ordinary kernel. -/
+noncomputable def shiftedConeKernelIso (n : ℤ) :
+    N.shiftedConeKernel n ≅ (shiftFunctor W n).obj N.coneKernel :=
+  (e.equiv.functor.commShiftIso n).app
+    (show H0 e.dgCat from A.cone)
+
+/-- A shift-coherent kernel family presents the shifted cone transform by the
+shifted enhanced cone kernel.
+
+The `CommShift` structure is passed explicitly because an `ExactFamily`
+stores it as data; this avoids installing a competing global instance. -/
+noncomputable def shiftedConeTransformIso
+    (hShift : corr.kernelTransform.CommShift ℤ) (n : ℤ) :
+    corr.transform (N.shiftedConeKernel n) ≅
+      (shiftFunctor (X ⥤ Y) n).obj N.coneTransform :=
+  corr.transformMapIso (N.shiftedConeKernelIso n) ≪≫
+    (hShift.commShiftIso n).app N.coneKernel
+
+end Shift
 
 section Exact
 

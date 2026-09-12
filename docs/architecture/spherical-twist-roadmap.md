@@ -108,11 +108,13 @@ EvaluationData E
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
-├─ the twist is EXACT on H⁰ (twistH0IsTriangulated), as soon as S and R preserve
-│  shifts and chosen cones.  A cone functor preserves both when its two ends do;
-│  the cone half is the 3-by-3 lemma, whose proof is block diagonal in the four
-│  coordinates of the two splittings rather than merely triangular.
+├─ all four STORED cone functors are exact on H⁰ as soon as their two ends
+│  preserve chosen cones (shift preservation is free).  The cone half is the
+│  3-by-3 lemma, whose proof is block diagonal in the four coordinates of the
+│  two splittings rather than merely triangular.
 ├─ unshifted cones underlying dual twist and cotwist
+├─ dualTwistFunctor and cotwistFunctor name their conventional `[-1]` shifts;
+│  shiftedFunctorH0Iso compares their H⁰ functors with pointwise shift
 ├─ the four triangles as functors on H⁰, every value distinguished, each first
 │  map the corresponding unit or counit.  The dual twist and the cotwist are
 │  the INVERSE ROTATIONS of their unshifted cone triangles: invRotate applies
@@ -122,12 +124,14 @@ EnhancedAdjunctionCones
 │  stated against the unshifted cone functors.  No sphericality, and no relation
 │  among the four.
 └─ TwistCotwistEquivalenceConditions
+   └─ cotwistH0Equivalence spends the unshifted condition on the actual cotwist
 
 Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
 ├─ liftedCocycle / conePresentation: noncanonical enhanced lift of any ordinary map
 └─ coneTriangleFunctor: dg cones read in W through the comparison equivalence
    └─ FourierMukai.KernelCone: pointwise and source-natural transform triangles
       ├─ KernelConeNormalizationData: literal endpoints and named first map
+      │  └─ shiftedConeKernel: enhanced shift whose transform is the shifted cone transform
       └─ KernelTransformationData: a kernel arrow realizes any named transformation
          ├─ KernelTransformationConeData: enhanced representative and chosen dg cone
          │  └─ normalizationData: feeds the generic endpoint transport
@@ -136,13 +140,29 @@ Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
          │  │  (conv Q P represents Φ_Q ⋙ Φ_P diagrammatically; Huybrechts writes P ∘ Q)
          │  └─ toConeData: choose a closed representative and dg cone in any enhancement
          │     └─ FourierMukai.CounitKernelConeData
+         │        ├─ twistKernel presents the selected enhanced cone
          │        └─ exact kernel evaluation gives a source-natural counit triangle
          │           Φ_Q ⋙ Φ_P ⟶ 𝟭_Y ⟶ twist, pointwise distinguished
-         └─ AdjunctionUnitKernelData: definitional right-adjunction-unit specialization
-            ├─ ordinary kernel arrow O_Δ ⟶ conv P Q whose transform is the unit
-            └─ AdjunctionUnitKernelConeData
-               └─ exact kernel evaluation gives the unshifted unit triangle
-                  𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧,
+         ├─ AdjunctionUnitKernelData: definitional right-adjunction-unit specialization
+         │  ├─ ordinary kernel arrow O_Δ ⟶ conv P Q whose transform is the unit
+         │  └─ AdjunctionUnitKernelConeData
+         │     ├─ exact kernel evaluation gives the unshifted unit triangle
+         │     │  𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧,
+         │     │  pointwise distinguished
+         │     ├─ cotwist = cotwistCone⟦-1⟧, pointwise functor-category shift
+         │     ├─ cotwistKernel: shifted enhanced cone presenting cotwist
+         │     └─ inverse rotation gives
+         │        cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧,
+         │        pointwise distinguished
+         ├─ DualTwistKernelData: left-adjunction unit specialization after swapping C and C'
+         │  └─ DualTwistKernelConeData reuses the unit/cotwist construction
+         │     ├─ dualTwistKernel presents the pointwise shifted left-unit cone
+         │     └─ dualTwist ⟶ 𝟭_Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧,
+         │        pointwise distinguished
+         └─ DualCotwistKernelData: left-adjunction counit specialization after swapping C and C'
+            └─ DualCotwistKernelConeData reuses the counit/twist construction
+               ├─ dualCotwistKernel presents the selected left-counit cone
+               └─ Φ_P ⋙ Φ_Q ⟶ 𝟭_X ⟶ dualCotwist ⟶ (Φ_P ⋙ Φ_Q)⟦1⟧,
                   pointwise distinguished
 ```
 
@@ -200,19 +220,33 @@ that comparison are instance hypotheses to be discharged by the realization.
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
    `H⁰`, so `twistH0Equivalence` and `cotwistConeH0Equivalence` make the twist
-   and the unshifted cotwist cone autoequivalences of `H⁰`.  That is the first
+   and the unshifted cotwist cone autoequivalences of `H⁰`.
+   The conventional dg functors are now named `dualTwistFunctor` and
+   `cotwistFunctor`.  The functor equality
+   `DGFunctor.shiftedFunctor_h0_eq` and its natural-isomorphism wrapper compare
+   `H⁰(F[n])` with `H⁰(F) ⋙ [n]`; the reusable
+   `shiftedFunctorH0Equivalence` transports ordinary equivalences through that
+   comparison.  Consequently `cotwistH0Equivalence` spends the recorded
+   unshifted condition on the actual `[-1]` cotwist.  It does not infer a dg
+   quasi-equivalence or triangulatedness.  This is the first
    categorical invertibility statement about a twist here; everything earlier
    was numerical, on `K₀`, or a construction with no invertibility attached.
-   Exactness is separate, and now supplied: `DGFunctor.PreservesShifts` and
-   `PreservesChosenCones` are instantiated for a cone functor whenever its two
-   ends carry them, so `twistH0IsTriangulated` makes `H⁰` of the twist a
-   triangulated functor.  The shift half of that is free for every dg functor
-   (`DGFunctor.preservesShifts`), so `twistPreservesShifts` and
-   `cotwistConePreservesShifts` take no arguments and `twistH0IsTriangulated`
-   asks only for the two `PreservesChosenCones` witnesses.  Together with the equivalence above that is an exact
-   autoequivalence -- which is still not sphericality, since that needs all
-   four Anno--Logvinenko conditions and the Morita framework the first
-   paragraph rules out.
+   Exactness is separate, and now supplied for all four cone functors as they
+   are stored.  `DGFunctor.PreservesShifts` and `PreservesChosenCones` are
+   instantiated for a cone functor whenever its two ends carry them.  Thus
+   `twistH0IsTriangulated`, `dualCotwistH0IsTriangulated`, and the corresponding
+   results for the *unshifted* dual-twist and cotwist cones ask only for the
+   endpoint `PreservesChosenCones` witnesses; shift preservation is free for
+   every dg functor.  Together with `twistH0Equivalence`, this makes the twist
+   an exact autoequivalence.  The conventional dual twist and cotwist are the
+   `[-1]` shifts of two stored cones.  The reusable
+   `Pretriangulated.shiftFunctorCommShift` now supplies the required Koszul
+   sign and `shiftFunctorIsTriangulated` proves exactness of every integral
+   shift without installing a global instance.  Transporting the two stored
+   cone exactness results through composition with this explicit signed
+   structure is the next downstream seam.
+   None of these results is sphericality, which still needs all four
+   Anno--Logvinenko conditions and the Morita framework above.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
    shift on a functor category, and `Functor.ExactFamily` is now built on that
    canonical structure: it extends Mathlib's `F.CommShift ℤ` and adds only
@@ -330,11 +364,30 @@ that comparison are instance hypotheses to be discharged by the realization.
    pointwise distinguished triangles are consumed.  The right-adjunction unit
    kernel is now the second generic consumer: `AdjunctionUnitKernelData`
    realizes `O_Δ ⟶ P ⋆ Q`, and its enhanced form normalizes the unshifted
-   triangle `𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧`.  The next honest seam is to
-   inverse-rotate that family to the conventional cotwist triangle, without
-   claiming that the shifted cone is exact or an autoequivalence.  Pointwise
-   distinguishedness alone cannot supply `CommShift` or `IsTriangulated` for
-   the cone transform, so that later exactness seam must remain explicit.
+   triangle `𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧`.
+   `AdjunctionUnitKernelConeData.cotwist` then uses the pointwise
+   functor-category shift and `cotwistTriangleInSource` inverse-rotates the
+   family to `cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.  This is still only a
+   choice-dependent ordinary functor and a pointwise distinguished family.
+   The generic normalization root now also transports a shifted enhanced cone
+   through the enhancement and kernel-family `CommShift` comparisons.
+   Specializing at `-1` gives `cotwistKernel`, an explicit kernel whose
+   transform is naturally isomorphic to the cotwist, and hence proves only
+   that the cotwist is a kernel functor.
+   The left-adjunction unit is now a third consumer:
+   `DualTwistKernelData` swaps the two correspondences and reuses
+   `LeftAdjointKernelData.toRightAdjointKernelData`, so its enhanced form names
+   the kernel-presented dual twist and the pointwise distinguished family
+   `dualTwist ⟶ 𝟭_Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧` without a second
+   cone or normalization construction.  The corresponding left-adjunction
+   counit is a fourth consumer: `DualCotwistKernelData` performs the same swap
+   through the generic counit/twist interface, names the selected cone kernel,
+   and exposes
+   `Φ_P ⋙ Φ_Q ⟶ 𝟭_X ⟶ dualCotwist ⟶ (Φ_P ⋙ Φ_Q)⟦1⟧` pointwise,
+   again without new cone machinery.  Pointwise distinguishedness cannot
+   supply `CommShift` or `IsTriangulated` for either shifted cone functor, and
+   no comparison with the corresponding dg-adjunction cone is available;
+   those later seams remain explicit.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
