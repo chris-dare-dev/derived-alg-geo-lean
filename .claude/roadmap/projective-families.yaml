@@ -376,7 +376,7 @@ items:
     kind: deliverable
     parent: projective-families-e14
     title: "The mass-Hom bound predicate, its invariances, and the HLR v2 source pin"
-    status: planned
+    status: done
     summary: "HasMassHomBound σ T on PreStabilityCondition.WithClassMap with a test class T : ObjectProperty C, finrank of Hom over stabilityMass; invariance under isomorphism, shift, autoequivalence transport (Remark 1.4), and the GL̃⁺(2,ℝ) action; the semistable normal form dim Hom(A,F) ≤ C‖Z(F)‖; the arXiv:2501.00710v2 source pin, label, and a §2.2/§2.5 coverage stub (owner-gated)."
     priority: must
     size: M
@@ -402,7 +402,7 @@ items:
     parent: projective-families-e14
     blocked_by: [1178]
     title: "Finite distance and connected components (HLR Corollary 2.14(1), Remark 7.3)"
-    status: blocked
+    status: done
     summary: "stabilityDist σ τ < ⊤ transfers the bound with constant e^d (stabilityMass_toReal_lt_exp_mul_of_stabilityDist already exists); finite-distance classes are open, so the bound is a union of connected components. Corollary 2.14(2) is not in scope."
     priority: must
     size: S
