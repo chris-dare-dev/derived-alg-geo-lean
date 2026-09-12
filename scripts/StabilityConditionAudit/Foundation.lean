@@ -2,6 +2,7 @@
 Foundation slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Noetherian
 import DerivedAlgGeo.CategoryTheory.SubobjectEquivalence
 import DerivedAlgGeo.CategoryTheory.Subobject.NoetherianObject
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
@@ -1585,3 +1586,4 @@ geometric realizations. -/
 
 #print axioms CategoryTheory.isNoetherianObject_of_finite_jointlyReflectsIsomorphisms
 #print axioms CategoryTheory.isNoetherianObject_of_reflectsIsomorphisms
+#print axioms ModuleCat.isNoetherianObject_of_isNoetherian

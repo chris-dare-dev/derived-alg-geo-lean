@@ -1351,7 +1351,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 
 -- Noetherianity from algebraic modules through the affine comparison, followed by finite-cover
 -- descent using restriction and stalkwise detection of isomorphisms.
-#print axioms ModuleCat.isNoetherianObject_of_isNoetherian
 #print axioms FGModuleCat.isNoetherianObject
 #print axioms Coh.restrict
 #print axioms Coh.restrictCompι
