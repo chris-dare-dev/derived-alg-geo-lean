@@ -50,7 +50,12 @@ variable {C : Type u} [Category.{v} C] [Preadditive C] [Linear k C]
 variable {Λ : Type u'} [AddCommGroup Λ] {v : K₀ C →+ Λ}
 
 /-- A mass--Hom bound for one test object.  The positive constant is a
-propositionally existential witness, not chosen data. -/
+propositionally existential witness, not chosen data.
+
+The `HomFinite` argument is intentionally explicit even though `finrank` is
+junk-total without it; the declaration-level lint exception prevents that
+mathematical guard from being erased as a syntactically unused argument. -/
+@[nolint unusedArguments]
 def HasMassHomBoundFor [HomFinite k C]
     (σ : StabilityCondition.WithClassMap C v) (A : C) : Prop :=
   ∃ K : ℝ, 0 < K ∧ ∀ F : C,
