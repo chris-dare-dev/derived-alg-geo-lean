@@ -9,6 +9,7 @@ import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineDerivedEquivalence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffinePullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffinePushforward
 
 /-!
@@ -20,8 +21,9 @@ localizations therefore lets this counit descend to derived categories and
 exhibits derived extension of scalars as essentially surjective.
 
 This is the algebraic affine-localization input for the essential-surjectivity
-part of the base-change construction.  Identifying this functor with geometric
-pullback on affine `Dqc` is a separate comparison step.
+part of the base-change construction.  The module and quasi-coherent functors
+are compared here with the general exact affine pullback, including the
+pullback--restriction adjunction on unbounded and bounded derived categories.
 -/
 
 namespace AlgebraicGeometry.DerivedCategory.Dqc
@@ -136,12 +138,17 @@ theorem affineLocalizationExtendScalars_additive :
   affineExtendScalars_additive (CommRingCat.ofHom (algebraMap R A))
 
 include M in
+/-- The algebra map of a localization is flat. -/
+theorem affineLocalizationAlgebraMap_flat : (algebraMap R A).Flat :=
+  RingHom.flat_algebraMap_iff.mpr (IsLocalization.flat A M)
+
+include M in
 /-- Extension of scalars along a localization preserves finite limits. -/
 theorem affineLocalizationExtendScalars_preservesFiniteLimits :
     PreservesFiniteLimits
       (ModuleCat.extendScalars.{u, u, u} (algebraMap R A)) :=
   ModuleCat.preservesFiniteLimits_extendScalars_of_flat
-    (RingHom.flat_algebraMap_iff.mpr (IsLocalization.flat A M))
+    (affineLocalizationAlgebraMap_flat M)
 
 include M in
 /-- Exact derived extension of scalars along a localization. -/
@@ -153,6 +160,16 @@ def affineLocalizationDerivedPullback :
     (R := R) (A := A) M
   exact (ModuleCat.extendScalars.{u, u, u}
     (algebraMap R A)).mapDerivedCategory
+
+include M in
+/-- The localization-specific derived pullback is the general exact derived
+extension-of-scalars functor specialized to the flat localization map. -/
+def affineLocalizationDerivedPullbackComparison :
+    affineLocalizationDerivedPullback (R := R) (A := A) M ≅
+      affineExtendScalarsDerived
+        (CommRingCat.ofHom (algebraMap R A))
+        (affineLocalizationAlgebraMap_flat M) :=
+  Iso.refl _
 
 /-- Exact derived restriction of scalars.  It supplies an explicit preimage
 for essential surjectivity of localization pullback. -/
@@ -376,6 +393,23 @@ def affineQuasicoherentLocalizationRestriction :
     (affineQuasicoherentDerivedEquivalence (CommRingCat.of R))
     (affineLocalizationDerivedRestriction (R := R) (A := A))
 
+include M in
+/-- The general geometric affine pullback specializes to the previously
+constructed transported localization pullback. -/
+def affineQuasicoherentLocalizationPullbackComparison :
+    affineQuasicoherentDerivedPullback
+        (CommRingCat.ofHom (algebraMap R A))
+        (affineLocalizationAlgebraMap_flat M) ≅
+      affineQuasicoherentLocalizationPullback (R := R) (A := A) M :=
+  affineQuasicoherentDerivedPullbackComparison
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M) ≪≫
+    Functor.isoWhiskerRight
+      (Functor.isoWhiskerLeft
+        (affineQuasicoherentDerivedEquivalence (CommRingCat.of R)).inverse
+        (affineLocalizationDerivedPullbackComparison M).symm)
+      (affineQuasicoherentDerivedEquivalence (CommRingCat.of A)).functor
+
 /-- For the affine localization morphism, geometric derived pushforward is
 the transported restriction-of-scalars functor. -/
 def affineQuasicoherentLocalizationRestrictionComparison :
@@ -384,6 +418,18 @@ def affineQuasicoherentLocalizationRestrictionComparison :
       affineQuasicoherentLocalizationRestriction (R := R) (A := A) :=
   affineQuasicoherentDerivedPushforwardComparison
     (CommRingCat.ofHom (algebraMap R A))
+
+include M in
+/-- The geometric affine pullback--pushforward adjunction specializes to the
+transported localization pullback and restriction functors. -/
+def affineQuasicoherentLocalizationPullbackRestrictionAdjunction :
+    affineQuasicoherentLocalizationPullback (R := R) (A := A) M ⊣
+      affineQuasicoherentLocalizationRestriction (R := R) (A := A) :=
+  ((affineQuasicoherentDerivedPullbackPushforwardAdjunction
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M)).ofNatIsoLeft
+        (affineQuasicoherentLocalizationPullbackComparison M)).ofNatIsoRight
+    (affineQuasicoherentLocalizationRestrictionComparison (R := R) (A := A))
 
 /-- On affine quasi-coherent derived categories, transported restriction
 followed by localization pullback is naturally isomorphic to the identity. -/
@@ -437,6 +483,23 @@ def affineQuasicoherentBoundedLocalizationRestrictionCompInclusion :
         affineQuasicoherentLocalizationRestriction (R := R) (A := A) :=
   Iso.refl _
 
+include M in
+/-- The bounded general geometric affine pullback specializes to the bounded
+transported localization pullback. -/
+def affineQuasicoherentBoundedLocalizationPullbackComparison :
+    affineQuasicoherentBoundedDerivedPullback
+        (CommRingCat.ofHom (algebraMap R A))
+        (affineLocalizationAlgebraMap_flat M) ≅
+      affineQuasicoherentBoundedLocalizationPullback
+        (R := R) (A := A) M :=
+  Functor.fullyFaithfulCancelRight DerivedCategory.Bounded.ι
+    (affineQuasicoherentBoundedDerivedPullbackCompInclusion
+        (CommRingCat.ofHom (algebraMap R A))
+        (affineLocalizationAlgebraMap_flat M) ≪≫
+      Functor.isoWhiskerLeft DerivedCategory.Bounded.ι
+        (affineQuasicoherentLocalizationPullbackComparison M) ≪≫
+      (affineQuasicoherentBoundedLocalizationPullbackCompInclusion M).symm)
+
 /-- For the affine localization morphism, bounded geometric derived
 pushforward is the transported bounded restriction-of-scalars functor. -/
 def affineQuasicoherentBoundedLocalizationRestrictionComparison :
@@ -452,6 +515,21 @@ def affineQuasicoherentBoundedLocalizationRestrictionComparison :
           (R := R) (A := A)) ≪≫
       (affineQuasicoherentBoundedLocalizationRestrictionCompInclusion
         (R := R) (A := A)).symm)
+
+include M in
+/-- The bounded geometric affine pullback--pushforward adjunction specializes
+to the bounded localization pullback and restriction functors. -/
+def affineQuasicoherentBoundedLocalizationPullbackRestrictionAdjunction :
+    affineQuasicoherentBoundedLocalizationPullback
+        (R := R) (A := A) M ⊣
+      affineQuasicoherentBoundedLocalizationRestriction
+        (R := R) (A := A) :=
+  ((affineQuasicoherentBoundedDerivedPullbackPushforwardAdjunction
+      (CommRingCat.ofHom (algebraMap R A))
+      (affineLocalizationAlgebraMap_flat M)).ofNatIsoLeft
+        (affineQuasicoherentBoundedLocalizationPullbackComparison M)).ofNatIsoRight
+    (affineQuasicoherentBoundedLocalizationRestrictionComparison
+      (R := R) (A := A))
 
 /-- Bounded geometric affine pushforward followed by bounded localization
 pullback is naturally isomorphic to the identity. -/
