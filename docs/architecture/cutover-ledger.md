@@ -7,6 +7,17 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- DG copower and evaluation-data existence packaging (2026-09-12):
+  `Algebra/Homology/DGCategory/Copower.lean` owns the Mathlib-style
+  `HasCopower` and `HasCopowers` mere-existence capabilities, their
+  noncomputable `copowerData` selector returning a `CopowerData` witness, and
+  the narrower `HasEvaluationData E` capability consumed by object twists. It
+  also proves
+  that canonical copower comparisons are closed and compose strictly, then
+  assembles these into `EvaluationData.compareIso` in
+  `Z⁰ (DGFunctor C C)` with strict compatibility with evaluation. No
+  concrete dg category is asserted to have all copowers, and no cone-
+  preservation claim is derived from the mapping-out universal property.
 - Exact functor-family shift coherence (2026-09-12):
   `CategoryTheory/Triangulated/ExactFunctorFamily.lean` now makes
   `Functor.ExactFamily F` extend Mathlib's `F.CommShift ℤ` for the pointwise

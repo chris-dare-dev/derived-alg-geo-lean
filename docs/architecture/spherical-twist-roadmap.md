@@ -78,8 +78,17 @@ DGAdjunction
       adjunction spherical, and does not relate it to the other three
       triangles; UnitConeData carries the unshifted unit side.
 
+HasCopower K X / HasCopowers C
+└─ copowerData: a noncomputably selected CopowerData witness
+
+HasEvaluationData E
+├─ chosenEvaluationData: a noncomputably selected EvaluationData witness
+└─ supplied automatically by HasCopowers C
+
 EvaluationData E
 ├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
+├─ compareIso: canonical Z⁰ isomorphism between any two choices, strictly
+│  compatible with evaluation
 └─ TwistConeData: the object twist T_E = Cone(evaluation), with its triangle
    functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished, and H⁰(T_E)
    triangulated as soon as RHom(E,-) ⊗ E preserves chosen cones (shifts are
@@ -210,7 +219,20 @@ that comparison are instance hypotheses to be discharged by the realization.
    shift -- by its universal property, as data plus a bijectivity condition --
    because `HomologicalComplex.HasTensor` does not synthesize for the
    `ℤ`-indexed shape at the pin, so there is no tensor product of complexes to
-   build the object with.
+   build the object with.  `HasCopower K X` and `HasCopowers C` now package
+   mere existence in Mathlib's `HasLimit` style: the classes contain no
+   preferred object, while `copowerData` makes a noncomputable selection for
+   consumers.  The narrower `HasEvaluationData E` is exactly the capability
+   needed here, and follows automatically from `HasCopowers C`.
+
+   This choice is coherent rather than merely available.  The canonical
+   comparison between two copowers is closed and composes strictly, so any two
+   `EvaluationData E` choices determine a canonical isomorphism
+   `EvaluationData.compareIso` in `Z⁰ (DGFunctor C C)`.  The theorem
+   `compare_comp_evaluation` says that this isomorphism commutes strictly with
+   their evaluation transformations.  Thus later consumers may depend on the
+   existence capability without treating a selected evaluation family as
+   mathematically significant.
 
    The functor is not inert.  `evaluation_isClosed` gives the transformation
    objectwise cones, so `EvaluationData.TwistConeData` is the Seidel--Thomas
@@ -237,9 +259,12 @@ that comparison are instance hypotheses to be discharged by the realization.
    the universal property the copower is given by, and a cone, unlike a shift,
    is not an invertible element that functoriality carries over.
 
-   What is open is *existence*.  Nothing constructs a copower, so nothing
-   produces an `EvaluationData`; a dg category with enough copowers has to
-   supply one, exactly as `IsPretriangulated` supplies cone and shift choices.
+   What is open is *concrete existence*: no dg category in the repository yet
+   supplies a `HasCopowers` instance.  The generic existence/choice interface
+   and its independence theorem are closed.  Choice-independence for the
+   resulting twist cones is the next separate transport seam: it must use
+   preservation of chosen cones under a dg natural isomorphism, not pretend
+   that the mapping-out copower property proves the mapping-in cone property.
    And no theorem relates the object twist to a spherical object: that
    comparison needs `Perf(k)` as a dg category, which the repository does not
    have, so nothing here calls `E` spherical or claims `T_E` is invertible.

@@ -98,10 +98,16 @@ Category
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
 │  ├─ IsCopowerOf K X Z                   `Z = K ⊗ X`, by its universal property
 │  │  ├─ lift / lift_unique              cochains out of `K` are morphisms out of `Z`
-│  │  ├─ compare                         any two copowers, canonically isomorphic
-│  │  └─ EvaluationData E                a chosen copower of `E` by `dgHom E -`
+│  │  ├─ compare                         closed canonical comparison, strict composition
+│  │  ├─ HasCopower / HasCopowers        Mathlib-style mere-existence capabilities
+│  │  │  └─ copowerData                  a noncomputably selected CopowerData witness
+│  │  ├─ HasEvaluationData E             the narrower existence capability object twists need
+│  │  │  └─ chosenEvaluationData         a noncomputably selected EvaluationData E
+│  │  └─ EvaluationData E                selected directly or through HasEvaluationData
 │  │     ├─ functor                      the dg functor `RHom(E,-) ⊗ E`
 │  │     ├─ evaluation                   its degree-zero map to the identity
+│  │     ├─ compareIso                   canonical Z⁰ isomorphism between any two choices
+│  │     │  └─ compare_comp_evaluation  strict compatibility with evaluation
 │  │     └─ TwistConeData                the object twist Cone(evaluation)
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
 │  │        └─ twistH0IsTriangulated    exact, given only PreservesChosenCones

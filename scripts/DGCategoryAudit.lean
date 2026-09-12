@@ -1018,9 +1018,9 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 
 -- Tensoring a dg object by a complex, stated by its universal property the way
 -- `IsShiftBy` states the shift: `IsCopowerOf K X Z` says degree-`p` morphisms
--- out of `Z` are degree-`p` cochains out of `K` into `dgHom X -`.  Nothing here
--- constructs a copower, so nothing here produces an `EvaluationData`; a
--- category with enough copowers has to supply one.
+-- out of `Z` are degree-`p` cochains out of `K` into `dgHom X -`.  The
+-- `HasCopower` and `HasCopowers` classes package existence without storing a
+-- preferred object in the class, following Mathlib's `HasLimit` pattern.
 #print axioms CategoryTheory.copowerCochain
 #print axioms CategoryTheory.copowerCochain_apply
 #print axioms CategoryTheory.IsCopowerOf
@@ -1034,19 +1034,42 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsCopowerOf.univ_comp_lift
 #print axioms CategoryTheory.IsCopowerOf.compare
 #print axioms CategoryTheory.IsCopowerOf.univ_comp_compare
+#print axioms CategoryTheory.IsCopowerOf.compare_mem_cocycles
 #print axioms CategoryTheory.IsCopowerOf.compare_comp_compare
+#print axioms CategoryTheory.IsCopowerOf.compare_trans
 #print axioms CategoryTheory.IsCopowerOf.compare_self
+#print axioms CategoryTheory.CopowerData
+#print axioms CategoryTheory.CopowerData.obj
+#print axioms CategoryTheory.CopowerData.isCopower
+#print axioms CategoryTheory.CopowerData.mk.inj
+#print axioms CategoryTheory.CopowerData.mk.sizeOf_spec
+#print axioms CategoryTheory.HasCopower
+#print axioms CategoryTheory.HasCopower.exists_copower
+#print axioms CategoryTheory.HasCopower.of_isCopower
+#print axioms CategoryTheory.copowerData
+#print axioms CategoryTheory.copowerObj
+#print axioms CategoryTheory.copowerIsCopower
+#print axioms CategoryTheory.HasCopowers
+#print axioms CategoryTheory.HasCopowers.has_copower
+#print axioms CategoryTheory.hasCopowerOfHasCopowers
 
 -- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
 -- identity.  Every one of the functor's four laws is `lift_unique` applied to
 -- the cochain each side induces; only `map_d` needs more than associativity,
 -- and there it is the Leibniz rule twice, once in `C` and once in the
--- Hom-complex out of `E`.  No relation to a spherical object is claimed.
+-- Hom-complex out of `E`.  Mere existence at one object is packaged by
+-- `HasEvaluationData`; all copowers supply it.  Any two choices are canonically
+-- isomorphic in `Z⁰`, and that isomorphism commutes strictly with evaluation.
 #print axioms CategoryTheory.EvaluationData
 #print axioms CategoryTheory.EvaluationData.obj
 #print axioms CategoryTheory.EvaluationData.isCopower
 #print axioms CategoryTheory.EvaluationData.mk.inj
 #print axioms CategoryTheory.EvaluationData.mk.sizeOf_spec
+#print axioms CategoryTheory.HasEvaluationData
+#print axioms CategoryTheory.HasEvaluationData.exists_evaluationData
+#print axioms CategoryTheory.chosenEvaluationData
+#print axioms CategoryTheory.EvaluationData.ofHasCopowers
+#print axioms CategoryTheory.EvaluationData.hasEvaluationDataOfHasCopowers
 #print axioms CategoryTheory.EvaluationData.map
 #print axioms CategoryTheory.EvaluationData.univ_comp_map
 #print axioms CategoryTheory.EvaluationData.map_zero
@@ -1057,6 +1080,15 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.evalHom
 #print axioms CategoryTheory.EvaluationData.univ_comp_evalHom
 #print axioms CategoryTheory.EvaluationData.evaluation
+#print axioms CategoryTheory.EvaluationData.compare
+#print axioms CategoryTheory.EvaluationData.compare_app
+#print axioms CategoryTheory.EvaluationData.compare_isClosed
+#print axioms CategoryTheory.EvaluationData.compare_comp
+#print axioms CategoryTheory.EvaluationData.compare_self
+#print axioms CategoryTheory.EvaluationData.compareIso
+#print axioms CategoryTheory.EvaluationData.compareIso_hom_val
+#print axioms CategoryTheory.EvaluationData.compareIso_inv_val
+#print axioms CategoryTheory.EvaluationData.compare_comp_evaluation
 
 -- The Seidel--Thomas twist of an *object*: the cone of `RHom(E,-) ⊗ E ⟶ id`.
 -- `evaluation_isClosed` is the whole input beyond the generic cone layer, and
