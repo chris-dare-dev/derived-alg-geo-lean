@@ -31,7 +31,9 @@ for quasi-coherent `G` on an affine scheme.
 ## Main results
 
 * `Ext.subsingleton_of_iso_left`, `Ext.subsingleton_biproduct_left` — vanishing of `Ext`
-  transports along isomorphisms and finite biproducts in the first variable.
+  transports along isomorphisms and finite biproducts in the first variable;
+  `Ext.subsingleton_coproduct_left` is the corresponding arbitrary-coproduct
+  statement when the derived single functor preserves that coproduct.
 * `Functor.bijective_mapExtAddHom_zero_iff`, `Functor.bijective_mapExtAddHom_zero` — degree
   zero.
 * `Functor.surjective_mapExtAddHom_of_generators`,
@@ -77,6 +79,38 @@ lemma Ext.subsingleton_biproduct_left {J : Type} [Fintype J] (f : J → C) [HasB
           rw [← Ext.mk₀_comp_mk₀_assoc,
             @Subsingleton.elim _ (h j) ((Ext.mk₀ (biproduct.ι f j)).comp x (zero_add n)) 0,
             Ext.comp_zero]
+
+/-- `Ext` out of an arbitrary coproduct vanishes when it vanishes on every
+summand, provided the derived single functor preserves that coproduct.
+
+The preservation hypothesis is deliberately stated on `singleFunctor`
+rather than derived here from AB4.  This keeps the lemma applicable to any
+abelian category whose relevant coproduct survives into the derived
+category, while `DerivedCategory.Coproducts` supplies the instance for the
+scheme-module application. -/
+lemma Ext.subsingleton_coproduct_left {J : Type w'} (f : J → C)
+    [HasCoproduct f]
+    [HasDerivedCategory.{w'} C]
+    [PreservesColimitsOfShape (Discrete J)
+      (DerivedCategory.singleFunctor C 0)]
+    (Y : C) (n : ℕ) (h : ∀ j, Subsingleton (Ext.{w} (f j) Y n)) :
+    Subsingleton (Ext.{w} (∐ f) Y n) := by
+  let c := Cofan.mk (P := ∐ f) (Sigma.ι f)
+  let hc : IsColimit c := coproductIsCoproduct f
+  let hc' := isColimitOfPreserves (DerivedCategory.singleFunctor C 0) hc
+  apply subsingleton_of_forall_eq 0
+  intro x
+  apply Ext.ext
+  apply IsColimit.hom_ext hc'
+  intro j
+  change (DerivedCategory.singleFunctor C 0).map (Sigma.ι f j.as) ≫ x.hom = _
+  rw [Ext.singleFunctor_map_comp_hom]
+  haveI := h j.as
+  rw [Subsingleton.elim ((Ext.mk₀ (Sigma.ι f j.as)).comp x (zero_add n)) 0]
+  rw [Ext.zero_hom, Ext.zero_hom]
+  change (0 : (DerivedCategory.singleFunctor C 0).obj (f j.as) ⟶
+      ((DerivedCategory.singleFunctor C 0).obj Y)⟦(n : ℤ)⟧) = _ ≫ 0
+  rw [comp_zero]
 
 end Vanishing
 

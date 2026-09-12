@@ -56,6 +56,7 @@ degree zero and `R` sends injectives to `A`-acyclic objects. -/
 #print axioms CategoryTheory.bijective_extComparisonMap_zero_iff
 #print axioms CategoryTheory.Ext.subsingleton_of_iso_left
 #print axioms CategoryTheory.Ext.subsingleton_biproduct_left
+#print axioms CategoryTheory.Ext.subsingleton_coproduct_left
 #print axioms CategoryTheory.Functor.bijective_mapExtAddHom_zero_iff
 #print axioms CategoryTheory.Functor.bijective_mapExtAddHom_zero
 #print axioms CategoryTheory.Functor.surjective_mapExtAddHom_of_generators
