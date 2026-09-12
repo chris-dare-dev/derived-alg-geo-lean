@@ -20,3 +20,10 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall.image_stabRegular_smul
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall.StabChamber
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall.chamberOf
+
+/-! ## Topology of walls and finite regular loci -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall.continuous_chargeAt_of_mem_range
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall.continuous_chargeAt
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall.isClosed_stabWall
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall.isOpen_stabRegular
