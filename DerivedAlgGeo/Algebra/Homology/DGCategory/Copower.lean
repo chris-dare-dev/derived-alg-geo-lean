@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Basic
+import DerivedAlgGeo.Algebra.Homology.DGCategory.H0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformation
 
 /-!
@@ -35,7 +36,13 @@ Everything.  `IsShiftBy` gets its inverse, its uniqueness and its transport
 from one bijectivity assumption, and the same three follow here:
 `IsCopowerOf.lift` inverts the bijection, `lift_unique` says a morphism out of
 a copower is determined by the cochain it induces, and `compare` makes any two
-copowers of the same data canonically isomorphic.
+copowers of the same data canonically isomorphic in `Z⁰`.
+
+`HasCopower K X` and `HasCopowers C` package mere existence in the same style
+as Mathlib's `HasLimit` and `HasLimitsOfShape`: the classes store no selected
+object, and the noncomputable `copowerData` API makes a choice only when a
+consumer asks for one.  `HasEvaluationData E` is the narrower existence
+interface consumed by the object-twist construction; all copowers imply it.
 
 ## The evaluation functor
 
@@ -43,7 +50,10 @@ copowers of the same data canonically isomorphic.
 in the same shape as `ConeData`: objectwise data, assembled into a dg functor.
 Its functor is `RHom(E,-) ⊗ E` and its `evaluation` is the transformation to
 the identity, whose component at `X` is the morphism corresponding to the
-*identity* cochain of `dgHom E X`.
+*identity* cochain of `dgHom E X`.  Any two choices are connected by
+`EvaluationData.compareIso`, a canonical isomorphism in the closed
+degree-zero dg-functor category, and that comparison commutes strictly with
+evaluation.
 
 Every one of the functor's four laws is `lift_unique` applied to the cochain
 each side induces; only `map_d` needs anything beyond associativity, and there
@@ -51,11 +61,12 @@ it is the Leibniz rule twice, once in `C` and once in the Hom-complex.
 
 ## What this does not give
 
-Existence.  Nothing here builds a copower, so nothing here produces an
-`EvaluationData`; a category with enough copowers has to supply one, exactly
-as `IsPretriangulated` supplies cone and shift choices.  And nothing relates
-this functor to a spherical object: that comparison needs `Perf(k)` as a dg
-category, which the repository does not have.
+Concrete existence.  Nothing here proves that a particular dg category has
+copowers.  Once a category supplies the `HasCopowers` capability, however,
+`HasEvaluationData` and `chosenEvaluationData` produce the evaluation data
+without adding compatibility fields or a second choice mechanism.  Nothing
+here relates this functor to a spherical object: that comparison needs
+`Perf(k)` as a dg category, which the repository does not have.
 -/
 
 set_option autoImplicit false
@@ -148,6 +159,25 @@ lemma univ_comp_compare (t : IsCopowerOf K X Z) (t' : IsCopowerOf K X Z')
     dgComp i 0 i (by omega) (t.univ i x) (t.compare t') = t'.univ i x :=
   t.univ_comp_lift 0 _ i i (by omega) x
 
+/-- The canonical comparison is closed, hence is a morphism in `Z⁰ C`.
+
+Both universal families are chain maps.  Applying the Leibniz rule to the
+source universal family followed by the comparison leaves the differential of
+the comparison as the only unmatched term, and the universal property detects
+that it vanishes. -/
+lemma compare_mem_cocycles (t : IsCopowerOf K X Z) (t' : IsCopowerOf K X Z') :
+    t.compare t' ∈ cocycles Z Z' := by
+  rw [mem_cocycles_iff]
+  refine t.lift_unique (fun i j hij x => ?_)
+  have hji : j = i + 1 := by omega
+  cases hji
+  have hleib := dgComp_leibniz (C := C) i 0 i (i + 1) (by omega) (by omega)
+    (t.univ i x) (t.compare t')
+  rw [t.univ_comp_compare t', ← t'.univ_d i (i + 1),
+    ← t.univ_d i (i + 1), t.univ_comp_compare t'] at hleib
+  simp only [Int.negOnePow_zero, one_smul, _root_.map_zero] at hleib ⊢
+  exact add_right_cancel (hleib.symm.trans (zero_add _).symm)
+
 /-- **Any two copowers of the same data are canonically isomorphic.**  The two
 comparisons compose to the identity, so the object `IsCopowerOf` characterises
 is unique up to a canonical degree-zero isomorphism. -/
@@ -159,6 +189,18 @@ lemma compare_comp_compare (t : IsCopowerOf K X Z) (t' : IsCopowerOf K X Z') :
   rw [← dgComp_assoc i 0 0 i 0 i (by omega) (by omega) (by omega),
     t.univ_comp_compare t', t'.univ_comp_compare t, dgComp_id]
 
+/-- Canonical copower comparisons compose.  Together with
+`compare_comp_compare` and `compare_self`, this makes the copower choices for
+fixed `K` and `X` a contractible groupoid inside `Z⁰ C`. -/
+lemma compare_trans {Z'' : C} (t : IsCopowerOf K X Z) (t' : IsCopowerOf K X Z')
+    (t'' : IsCopowerOf K X Z'') :
+    dgComp 0 0 0 (by omega) (t.compare t') (t'.compare t'') = t.compare t'' := by
+  refine t.lift_unique (fun i j hij x => ?_)
+  have hji : j = i := by omega
+  cases hji
+  rw [← dgComp_assoc i 0 0 i 0 i (by omega) (by omega) (by omega),
+    t.univ_comp_compare t', t'.univ_comp_compare t'', t.univ_comp_compare t'']
+
 /-- Comparing a copower with itself is the identity. -/
 @[simp]
 lemma compare_self (t : IsCopowerOf K X Z) : t.compare t = dgId Z := by
@@ -168,6 +210,51 @@ lemma compare_self (t : IsCopowerOf K X Z) : t.compare t = dgId Z := by
   rw [t.univ_comp_compare t, dgComp_id]
 
 end IsCopowerOf
+
+/-- A copower object together with its universal-property witness. -/
+structure CopowerData (K : CochainComplex AddCommGrpCat.{v} ℤ) (X : C) where
+  /-- The chosen copower object. -/
+  obj : C
+  /-- The universal property witnessed by the chosen object. -/
+  isCopower : IsCopowerOf K X obj
+
+/-- Mere existence of a copower of `X` by `K`.
+
+Like Mathlib's `HasLimit`, this proposition carries no preferred choice in its
+public contract.  The choice is made only by `copowerData`. -/
+class HasCopower (K : CochainComplex AddCommGrpCat.{v} ℤ) (X : C) : Prop where
+  exists_copower : Nonempty (CopowerData K X)
+
+/-- A witnessed copower supplies the corresponding existence instance. -/
+theorem HasCopower.of_isCopower {K : CochainComplex AddCommGrpCat.{v} ℤ} {X Z : C}
+    (t : IsCopowerOf K X Z) : HasCopower K X :=
+  ⟨⟨⟨Z, t⟩⟩⟩
+
+/-- A noncomputably selected copower and its witness. -/
+noncomputable def copowerData (K : CochainComplex AddCommGrpCat.{v} ℤ) (X : C)
+    [HasCopower K X] : CopowerData K X :=
+  Classical.choice HasCopower.exists_copower
+
+/-- The copower object selected from `HasCopower K X`. -/
+noncomputable def copowerObj (K : CochainComplex AddCommGrpCat.{v} ℤ) (X : C)
+    [HasCopower K X] : C :=
+  (copowerData K X).obj
+
+/-- The universal-property witness for the selected `copowerObj K X`. -/
+noncomputable def copowerIsCopower (K : CochainComplex AddCommGrpCat.{v} ℤ) (X : C)
+    [HasCopower K X] : IsCopowerOf K X (copowerObj K X) :=
+  (copowerData K X).isCopower
+
+/-- Existence of all copowers by integer cochain complexes. -/
+class HasCopowers (C : Type u) [DGCategory.{v} C] : Prop where
+  has_copower (K : CochainComplex AddCommGrpCat.{v} ℤ) (X : C) : HasCopower K X := by
+    infer_instance
+
+/-- All copowers give each individual copower.  The low priority leaves room
+for a category to expose a more specific local construction. -/
+instance (priority := 100) hasCopowerOfHasCopowers [HasCopowers C]
+    (K : CochainComplex AddCommGrpCat.{v} ℤ) (X : C) : HasCopower K X :=
+  HasCopowers.has_copower K X
 
 /-- **A choice of `RHom(E,X) ⊗ E` for every `X`.**
 
@@ -179,7 +266,25 @@ structure EvaluationData (E : C) where
   /-- It is the copower of `E` by the Hom-complex out of `E`. -/
   isCopower (X : C) : IsCopowerOf (dgHom E X) E (obj X)
 
+/-- Mere existence of the copowers needed for evaluation at `E`. -/
+class HasEvaluationData (E : C) : Prop where
+  exists_evaluationData : Nonempty (EvaluationData E)
+
+/-- Evaluation data noncomputably selected from `HasEvaluationData E`. -/
+noncomputable def chosenEvaluationData (E : C) [HasEvaluationData E] : EvaluationData E :=
+  Classical.choice HasEvaluationData.exists_evaluationData
+
 namespace EvaluationData
+
+/-- All copowers supply the family of copowers needed for evaluation at `E`. -/
+noncomputable def ofHasCopowers [HasCopowers C] (E : C) : EvaluationData E where
+  obj Y := copowerObj (dgHom E Y) E
+  isCopower Y := copowerIsCopower (dgHom E Y) E
+
+/-- A category with all copowers has evaluation data at every object. -/
+instance (priority := 100) hasEvaluationDataOfHasCopowers [HasCopowers C]
+    (E : C) : HasEvaluationData E :=
+  ⟨⟨ofHasCopowers E⟩⟩
 
 variable {E : C} (V : EvaluationData E)
 
@@ -335,6 +440,92 @@ lemma evaluation_isClosed :
     V.univ_comp_evalHom] at hleib
   simp only [Int.negOnePow_zero, one_smul, _root_.map_zero] at hleib ⊢
   exact add_right_cancel (hleib.symm.trans (zero_add _).symm)
+
+/-- The canonical closed natural comparison between two choices of evaluation
+data.  Objectwise it is the canonical comparison between their copowers. -/
+noncomputable def compare (V W : EvaluationData E) :
+    DGFunctor.HomogeneousNatTrans V.functor W.functor 0 :=
+  ⟨fun Y => (V.isCopower Y).compare (W.isCopower Y), by
+    intro Y Y' p r hpr hrp f
+    rw [zero_mul, Int.negOnePow_zero, one_smul]
+    have hrp' : r = p := by omega
+    cases hrp'
+    change dgComp p 0 p hpr (V.map p f)
+        ((V.isCopower Y').compare (W.isCopower Y')) =
+      dgComp 0 p p hrp ((V.isCopower Y).compare (W.isCopower Y)) (W.map p f)
+    refine (V.isCopower Y).lift_unique (fun i j hij k => ?_)
+    rw [← dgComp_assoc i p 0 j p j hij hpr (by omega),
+      V.univ_comp_map, (V.isCopower Y').univ_comp_compare (W.isCopower Y'),
+      ← dgComp_assoc i 0 p i p j (by omega) hrp (by omega),
+      (V.isCopower Y).univ_comp_compare (W.isCopower Y), W.univ_comp_map]⟩
+
+@[simp]
+lemma compare_app (V W : EvaluationData E) (Y : C) :
+    DGFunctor.HomogeneousNatTrans.app (compare V W) Y =
+      (V.isCopower Y).compare (W.isCopower Y) :=
+  rfl
+
+/-- The canonical comparison is closed because its components are closed. -/
+lemma compare_isClosed (V W : EvaluationData E) :
+    DGFunctor.HomogeneousNatTrans.IsClosed (compare V W) := by
+  apply DGFunctor.HomogeneousNatTrans.ext
+  intro Y
+  exact IsCopowerOf.compare_mem_cocycles _ _
+
+/-- Canonical comparisons compose strictly. -/
+lemma compare_comp (V W U : EvaluationData E) :
+    DGFunctor.HomogeneousNatTrans.composition _ _ _ 0 0 0 (by omega)
+        (compare V W) (compare W U) = compare V U := by
+  apply DGFunctor.HomogeneousNatTrans.ext
+  intro Y
+  rw [DGFunctor.HomogeneousNatTrans.composition_apply_app,
+    compare_app, compare_app, compare_app]
+  exact (V.isCopower Y).compare_trans (W.isCopower Y) (U.isCopower Y)
+
+/-- The comparison from an evaluation choice to itself is the identity. -/
+@[simp]
+lemma compare_self (V : EvaluationData E) :
+    compare V V = DGFunctor.HomogeneousNatTrans.id V.functor := by
+  apply DGFunctor.HomogeneousNatTrans.ext
+  intro Y
+  rw [compare_app, DGFunctor.HomogeneousNatTrans.id_app]
+  exact IsCopowerOf.compare_self _
+
+/-- The canonical comparison between two evaluation choices as an isomorphism
+in the closed degree-zero dg-functor category. -/
+noncomputable def compareIso (V W : EvaluationData E) :
+    (show Z0 (DGFunctor C C) from V.functor) ≅
+      (show Z0 (DGFunctor C C) from W.functor) where
+  hom := ⟨compare V W, compare_isClosed V W⟩
+  inv := ⟨compare W V, compare_isClosed W V⟩
+  hom_inv_id := Subtype.ext ((compare_comp V W V).trans (compare_self V))
+  inv_hom_id := Subtype.ext ((compare_comp W V W).trans (compare_self W))
+
+@[simp]
+lemma compareIso_hom_val (V W : EvaluationData E) :
+    (compareIso V W).hom.val = compare V W :=
+  rfl
+
+@[simp]
+lemma compareIso_inv_val (V W : EvaluationData E) :
+    (compareIso V W).inv.val = compare W V :=
+  rfl
+
+/-- The canonical comparison commutes strictly with evaluation. -/
+lemma compare_comp_evaluation (V W : EvaluationData E) :
+    DGFunctor.HomogeneousNatTrans.composition _ _ _ 0 0 0 (by omega)
+        (compare V W) W.evaluation = V.evaluation := by
+  apply DGFunctor.HomogeneousNatTrans.ext
+  intro Y
+  rw [DGFunctor.HomogeneousNatTrans.composition_apply_app, compare_app]
+  change dgComp 0 0 0 (by omega)
+      ((V.isCopower Y).compare (W.isCopower Y)) (W.evalHom Y) = V.evalHom Y
+  refine (V.isCopower Y).lift_unique (fun i j hij k => ?_)
+  have hji : j = i := by omega
+  cases hji
+  rw [← dgComp_assoc i 0 0 i 0 i (by omega) (by omega) (by omega),
+    (V.isCopower Y).univ_comp_compare (W.isCopower Y), W.univ_comp_evalHom,
+    V.univ_comp_evalHom]
 
 end EvaluationData
 

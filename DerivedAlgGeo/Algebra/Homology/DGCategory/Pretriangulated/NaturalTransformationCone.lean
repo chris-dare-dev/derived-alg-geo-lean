@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformationH0
-import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.HomogeneousLift
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Lift
 
 /-!
 # Dg functors obtained from objectwise cones
@@ -293,6 +293,65 @@ noncomputable def isConeOf : IsConeOf (α : (dgHom F G).X 0) K.functor where
         dgComp_assoc p 1 (-1) q 0 p (by omega) (by omega) (by omega),
         dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega),
         ← map_add, (K.isCone X).fst_inl_add_snd_inr, dgComp_id]
+
+section StrictSquareIso
+
+variable {F' G' : DGFunctor C D} {α' : HomogeneousNatTrans F' G' 0}
+  (K' : ConeData α')
+
+/-- A strict isomorphism square between two dg natural transformations lifts
+to an isomorphism between their chosen cone dg functors. -/
+noncomputable def isoOfStrictSquare
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α') :
+    (show Z0 (DGFunctor C D) from K.functor) ≅
+      (show Z0 (DGFunctor C D) from K'.functor) :=
+  IsConeOf.isoOfStrictSquare K.isConeOf K'.isConeOf eF eG hsq
+
+@[simp]
+lemma isoOfStrictSquare_hom_val
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α') :
+    (K.isoOfStrictSquare K' eF eG hsq).hom.val =
+      K.isConeOf.lift K'.isConeOf eF.hom.val eG.hom.val 0 :=
+  rfl
+
+@[simp]
+lemma isoOfStrictSquare_inv_val
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α') :
+    (K.isoOfStrictSquare K' eF eG hsq).inv.val =
+      K'.isConeOf.lift K.isConeOf eF.inv.val eG.inv.val 0 :=
+  rfl
+
+/-- The lifted dg-functor isomorphism strictly commutes with the canonical
+target inclusions of the two cone sequences. -/
+lemma inr_comp_isoOfStrictSquare_hom
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α') :
+    composition G K.functor K'.functor 0 0 0 (by omega)
+        K.inr (K.isoOfStrictSquare K' eF eG hsq).hom.val =
+      composition G G' K'.functor 0 0 0 (by omega) eG.hom.val K'.inr :=
+  IsConeOf.inr_comp_isoOfStrictSquare_hom
+    K.isConeOf K'.isConeOf eF eG hsq
+
+end StrictSquareIso
 
 end ConeData
 
