@@ -25,3 +25,17 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.stabilityMass_le_smul
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.gltilde_smul
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.gltilde_smul_iff
+
+/-! ## Finite distance and connected components -/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.finiteDistanceClass
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isClopen_finiteDistanceClass
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.connectedComponent_subset_finiteDistanceClass
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.of_stabilityDist_lt
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.of_finiteDistance
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.finiteDistance_iff
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.of_mem_connectedComponent
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.massHomLocus
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isOpen_massHomLocus
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isClosed_massHomLocus
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isClopen_massHomLocus
