@@ -7,6 +7,19 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- H⁰ cone-triangle comparison across strict isomorphism squares (2026-09-12):
+  `Algebra/Homology/DGCategory/FunctorCategoryH0.lean` owns the canonical
+  `DGFunctor.h0Iso`, including identity and composition coherence.
+  `DGEnhancement/H0/NaturalTransformationCone.lean` upgrades the existing
+  strict-square natural transformation to `ConeData.triangleIsoOfStrictSquare`
+  when both endpoint maps are isomorphisms. Its third component is the `H⁰`
+  image of the canonical dg cone-functor comparison, not a second comparison
+  construction. `DGEnhancement/H0/ObjectTwist.lean` specializes this interface
+  to `TwistConeData.twistTriangleIsoOfEvaluation` across both evaluation and
+  cone choices, with component, identity, and composition laws, while retaining
+  the original `twistTriangleIso` definition for same-evaluation callers. This is
+  choice-independence of the full triangle functor; it does not assert that the
+  twist itself is an autoequivalence or that the object is spherical.
 - DG cone comparison and preservation transport (2026-09-12):
   `Algebra/Homology/DGCategory/Pretriangulated/Functor.lean` proves that
   `DGFunctor.PreservesChosenCones` transports across an isomorphism in
