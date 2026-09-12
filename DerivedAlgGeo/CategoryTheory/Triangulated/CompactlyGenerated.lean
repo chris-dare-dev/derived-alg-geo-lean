@@ -140,6 +140,22 @@ theorem coprodClosure_le_shift_of_le_shift {R : ObjectProperty C} (n : ℤ)
       exact R.ext_of_isTriangulatedClosed₂ ((Triangle.shiftFunctor C n).obj T)
         (Triangle.shift_distinguished T hT n) ih₁ ih₃
 
+/-- The coproduct-and-extension closure of a triangulated object property is
+again triangulated.
+
+The extension and isomorphism clauses are built into `coprodClosure`. Shift
+closure follows by applying `coprodClosure_le_shift_of_le_shift` to the
+shift-stability of the generators. -/
+instance coprodClosure_isTriangulated [P.IsTriangulated] :
+    P.coprodClosure.{w}.IsTriangulated where
+  toContainsZero := by
+    obtain ⟨Z, hZ, hP⟩ := P.exists_prop_of_containsZero
+    exact ⟨Z, hZ, P.le_coprodClosure Z hP⟩
+  toIsStableUnderShift :=
+    ⟨fun n ↦ ⟨P.coprodClosure_le_shift_of_le_shift n
+      (fun X hX ↦ P.le_coprodClosure _ (P.le_shift n X hX))⟩⟩
+  toIsTriangulatedClosed₂ := inferInstance
+
 variable {P}
 
 /-- A coproduct-preserving triangulated functor carries `Coprod(P)` into

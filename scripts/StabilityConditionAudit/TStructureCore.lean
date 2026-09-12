@@ -160,6 +160,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.ObjectProperty.le_coprodClosure
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_le
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_le_shift_of_le_shift
+#print axioms CategoryTheory.ObjectProperty.coprodClosure_isTriangulated
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_map_obj
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_map_obj_of_le
 #print axioms CategoryTheory.ObjectProperty.map_coprodClosure_le
