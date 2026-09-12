@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformationH0
+import DerivedAlgGeo.Algebra.Homology.DGCategory.FunctorCategoryH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.NaturalTransformationCone
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Triangle
 
@@ -58,6 +58,12 @@ single lift and the two agree because `u` and `v` are natural at degree zero.
 The cone lifts are therefore natural **on the nose**, not merely up to
 homotopy, which is `functor_map_comp_lift`.
 
+When both endpoint maps are isomorphisms in the closed degree-zero dg-functor
+category, `triangleIsoOfStrictSquare` upgrades this natural transformation to
+a natural isomorphism.  Its first two components are the `H⁰` images of the
+endpoint isomorphisms, and its third is the `H⁰` image of the canonical dg
+cone-functor isomorphism `ConeData.isoOfStrictSquare`.
+
 The homotopy-coherent version is open.  With a nonzero homotopy the two
 composite lifts carry different homotopies, and identifying them needs
 uniqueness of the lift up to homotopy, which this repository does not have.
@@ -73,10 +79,10 @@ an isomorphism rather than merely a map.
 
 ## What this does not give
 
-No comparison between the triangle functors of two *different* transformations
-beyond a strict square, and no statement that `triangleFunctor` is
-triangulated or exact in any sense.  Nothing here descends to a statement
-about the twist candidate.
+No comparison is made from a merely homotopy-commuting square, and no statement
+says that `triangleFunctor` is triangulated or exact in any sense.  The generic
+strict-square interface is specialized to object twists in `H0/ObjectTwist`;
+autoequivalence and sphericality remain separate questions.
 -/
 
 set_option autoImplicit false
@@ -342,6 +348,156 @@ theorem triangleNatTrans_app (X : H0 C) :
   rfl
 
 end Naturality
+
+
+/-! ### Isomorphisms induced by strict isomorphism squares -/
+
+section StrictSquareIso
+
+variable {F' G' : DGFunctor C D} {α' : HomogeneousNatTrans F' G' 0}
+
+private noncomputable def squareTriangleIsoOfStrictSquare
+    (K : ConeData α) (hα : IsClosed α)
+    (K' : ConeData α') (hα' : IsClosed α')
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α')
+    (X : C) :
+    K.triangleObj hα X ≅ K'.triangleObj hα' X := by
+  let m := squareTriangleMorphism K hα K' hα'
+    (DGFunctor.isClosed_of_mem_cocycles eF.hom.2)
+    (DGFunctor.isClosed_of_mem_cocycles eG.hom.2) hsq X
+  have h₁ : IsIso m.hom₁ := by
+    change IsIso ((DGFunctor.h0Iso eF).hom.app (show H0 C from X))
+    infer_instance
+  have h₂ : IsIso m.hom₂ := by
+    change IsIso ((DGFunctor.h0Iso eG).hom.app (show H0 C from X))
+    infer_instance
+  have h₃ : IsIso m.hom₃ := by
+    have heq : m.hom₃ =
+        ((DGFunctor.h0Iso (K.isoOfStrictSquare K' eF eG hsq)).app
+          (show H0 C from X)).hom := by
+      rw [show m.hom₃ =
+        H0.homMk (C := D) (K.squareConeMorphism K'
+          (DGFunctor.isClosed_of_mem_cocycles eF.hom.2)
+          (DGFunctor.isClosed_of_mem_cocycles eG.hom.2) hsq X).hom from rfl,
+        DGFunctor.h0Iso_hom_app, HomogeneousNatTrans.h0_app]
+      exact congrArg (fun z => H0.homMk (C := D) z)
+        (Subtype.ext (K.isoOfStrictSquare_hom_app K' eF eG hsq X).symm)
+    rw [heq]
+    infer_instance
+  letI : IsIso m := Triangle.isIso_of_isIsos m h₁ h₂ h₃
+  exact asIso m
+
+private lemma squareTriangleIsoOfStrictSquare_hom
+    (K : ConeData α) (hα : IsClosed α)
+    (K' : ConeData α') (hα' : IsClosed α')
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α')
+    (X : C) :
+    (squareTriangleIsoOfStrictSquare K hα K' hα' eF eG hsq X).hom =
+      squareTriangleMorphism K hα K' hα'
+        (DGFunctor.isClosed_of_mem_cocycles eF.hom.2)
+        (DGFunctor.isClosed_of_mem_cocycles eG.hom.2) hsq X := by
+  rfl
+
+/-- A strict square of closed dg natural transformations whose two endpoint
+maps are isomorphisms induces a natural isomorphism of their cone triangle
+functors.  Its third component is the `H⁰` image of the dg cone-functor
+isomorphism `ConeData.isoOfStrictSquare`. -/
+noncomputable def triangleIsoOfStrictSquare
+    (K : ConeData α) (hα : IsClosed α)
+    (K' : ConeData α') (hα' : IsClosed α')
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α') :
+    K.triangleFunctor hα ≅ K'.triangleFunctor hα' :=
+  NatIso.ofComponents
+    (fun X => squareTriangleIsoOfStrictSquare K hα K' hα' eF eG hsq
+      (H0.of C X))
+    (fun f => by
+      simpa only [squareTriangleIsoOfStrictSquare_hom,
+        triangleNatTrans_app] using
+        (triangleNatTrans K hα K' hα'
+          (DGFunctor.isClosed_of_mem_cocycles eF.hom.2)
+          (DGFunctor.isClosed_of_mem_cocycles eG.hom.2) hsq).naturality f)
+
+@[simp]
+theorem triangleIsoOfStrictSquare_hom_app
+    (K : ConeData α) (hα : IsClosed α)
+    (K' : ConeData α') (hα' : IsClosed α')
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α')
+    (X : H0 C) :
+    (triangleIsoOfStrictSquare K hα K' hα' eF eG hsq).hom.app X =
+      squareTriangleMorphism K hα K' hα'
+        (DGFunctor.isClosed_of_mem_cocycles eF.hom.2)
+        (DGFunctor.isClosed_of_mem_cocycles eG.hom.2) hsq (H0.of C X) := by
+  rfl
+
+@[simp]
+theorem triangleIsoOfStrictSquare_hom_app_hom₁
+    (K : ConeData α) (hα : IsClosed α)
+    (K' : ConeData α') (hα' : IsClosed α')
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α')
+    (X : H0 C) :
+    ((triangleIsoOfStrictSquare K hα K' hα' eF eG hsq).hom.app X).hom₁ =
+      (DGFunctor.h0Iso eF).hom.app X :=
+  rfl
+
+@[simp]
+theorem triangleIsoOfStrictSquare_hom_app_hom₂
+    (K : ConeData α) (hα : IsClosed α)
+    (K' : ConeData α') (hα' : IsClosed α')
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α')
+    (X : H0 C) :
+    ((triangleIsoOfStrictSquare K hα K' hα' eF eG hsq).hom.app X).hom₂ =
+      (DGFunctor.h0Iso eG).hom.app X :=
+  rfl
+
+theorem triangleIsoOfStrictSquare_hom_app_hom₃
+    (K : ConeData α) (hα : IsClosed α)
+    (K' : ConeData α') (hα' : IsClosed α')
+    (eF : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from F'))
+    (eG : (show Z0 (DGFunctor C D) from G) ≅
+      (show Z0 (DGFunctor C D) from G'))
+    (hsq : composition F G G' 0 0 0 (by omega) α eG.hom.val =
+      composition F F' G' 0 0 0 (by omega) eF.hom.val α')
+    (X : H0 C) :
+    ((triangleIsoOfStrictSquare K hα K' hα' eF eG hsq).hom.app X).hom₃ =
+      (DGFunctor.h0Iso (K.isoOfStrictSquare K' eF eG hsq)).hom.app X := by
+  rw [triangleIsoOfStrictSquare_hom_app, squareTriangleMorphism_hom₃,
+    DGFunctor.h0Iso_hom, HomogeneousNatTrans.h0_app]
+  exact congrArg (fun z => H0.homMk (C := D) z)
+    (Subtype.ext (K.isoOfStrictSquare_hom_app K' eF eG hsq
+      (H0.of C X)).symm)
+
+end StrictSquareIso
 
 
 /-! ### Independence of the chosen cones -/
