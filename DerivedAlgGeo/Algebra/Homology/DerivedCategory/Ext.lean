@@ -6,10 +6,11 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicComparison
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicGenerators
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.Adjunction
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.DimensionShift
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.FiniteGenerators
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNaturality
 
 /-! # Ext in derived categories
 
-Generic adjunction, dimension-shift, and injective-resolution naturality for
-`Ext` in arbitrary abelian categories.
+Generic adjunction, dimension-shift, quotient-generator finiteness, and injective-resolution
+naturality for `Ext` in arbitrary abelian categories.
 -/
