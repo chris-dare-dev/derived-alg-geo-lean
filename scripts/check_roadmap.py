@@ -52,6 +52,21 @@ repository has had, both found by hand:
     it closed would have signalled SF8.5 complete to #522, which depends on
     exactly the theorem still missing.
 
+## RM-07 is judged per-branch, and only RM-07
+
+RM-07 is the only rule here that compares a FILE IN THE BRANCH against LIVE
+tracker state, so it is the only one an unrelated merge can turn red. On a pull
+request CI passes `--scope-to-diff=origin/main`, and RM-07 then fails only on
+entries the branch actually changed since it forked; entries it inherited
+unchanged are printed as notes and left to `main`. Pushes to `main` and merge
+queue entries pass no such flag and judge all of them, so nothing escapes -- it
+moves WHERE a finding is reported, never WHETHER.
+
+The other rules are deliberately left unscoped even though RM-01, RM-02, RM-05
+and RM-06 read the same live state. They check structure, which changes far
+less often than `status` does, and none of them has yet produced the repo-wide
+red that RM-07 produced on 2026-09-12. Scope them when they do, not before.
+
 RM-01..RM-06 all check STRUCTURE -- existence, parentage, milestone, blockers,
 coverage -- and every one of them passed on both. Nothing compared what the
 roadmap says about PROGRESS against what the tracker says about it, so a
@@ -144,6 +159,85 @@ def load_items(root):
     return out, None
 
 
+def _git(root, *args):
+    """Run git in `root`; return stdout, or None if git failed."""
+    try:
+        proc = subprocess.run(("git", "-C", str(root)) + args,
+                              capture_output=True, text=True, timeout=60,
+                              encoding="utf-8")
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return proc.stdout if proc.returncode == 0 else None
+
+
+def load_items_at_rev(root, rev):
+    """`load_items`, but reading the roadmap as of a git revision.
+
+    Returns id -> entry, or None if the revision cannot be read. `_file` is
+    dropped: a file rename is not a change to what an entry CLAIMS, and
+    including it would make every renamed file look PR-authored.
+    """
+    try:
+        import yaml
+    except ImportError:
+        return None
+    listing = _git(root, "ls-tree", "--name-only", f"{rev}:.claude/roadmap")
+    if listing is None:
+        return None
+    out = {}
+    for name in listing.split():
+        if not name.endswith(".yaml"):
+            continue
+        blob = _git(root, "show", f"{rev}:.claude/roadmap/{name}")
+        if blob is None:
+            return None
+        doc = yaml.safe_load(blob)
+        if not isinstance(doc, dict):
+            continue
+        for item in doc.get("items") or []:
+            if isinstance(item, dict) and item.get("id"):
+                out[item["id"]] = item
+    return out
+
+
+def pr_authored_ids(root, items, base_ref):
+    """Entry ids this branch CHANGED relative to where it forked from base_ref.
+
+    RM-07 judges the roadmap against LIVE tracker state, so an entry nobody on
+    this branch touched can still start failing here: another pull request
+    closes the issue, `main` advances the entry, and every branch that forked
+    before that carries the old `status` through no fault of its own. At this
+    repository's merge cadence that is the normal state of an open pull
+    request, not an exceptional one -- on 2026-09-12 it turned 15 of 18 open
+    pull requests red at once, none of which had touched the roadmap.
+
+    The merge base is what separates the two. An entry whose YAML is identical
+    at HEAD and at the fork point was not authored by this branch, so a
+    disagreement there is `main`'s to fix and `main`'s own CI judges it. An
+    entry this branch added or edited is still judged in full -- which is the
+    shape both defects in this module's docstring had: #192 and #554 were each
+    a change whose OWN entry contradicted the tracker.
+
+    Returns None when the base cannot be resolved, and None means DO NOT SCOPE.
+    Narrowing is the only thing this function can do, so losing it has to fail
+    towards judging everything; a missing ref must never be a way to be judged
+    less.
+    """
+    base = _git(root, "merge-base", "HEAD", base_ref)
+    if not base or not base.strip():
+        return None
+    was = load_items_at_rev(root, base.strip())
+    if was is None:
+        return None
+    authored = set()
+    for e in items:
+        before = was.get(e["id"])
+        now = {k: v for k, v in e.items() if k != "_file"}
+        if before is None or {k: v for k, v in before.items() if k != "_file"} != now:
+            authored.add(e["id"])
+    return authored
+
+
 def fetch_issues():
     """number -> {state, parent, milestone, blocked_by} for the whole tracker."""
     try:
@@ -194,6 +288,8 @@ def fetch_open_milestones():
 
 def main(argv):
     require_api = "--require-api" in argv
+    scope_to = next((a.partition("=")[2] for a in argv
+                     if a.startswith("--scope-to-diff=")), None)
     rest = [a for a in argv if not a.startswith("--")]
     root = pathlib.Path(rest[0]).resolve() if rest else pathlib.Path(__file__).resolve().parent.parent
 
@@ -212,6 +308,12 @@ def main(argv):
         return not_run(problem, require_api)
 
     by_id = {i["id"]: i for i in items}
+    # None = judge every entry (see pr_authored_ids: narrowing fails towards
+    # judging everything, so an unresolvable base cannot buy a lighter check).
+    authored = pr_authored_ids(root, items, scope_to) if scope_to else None
+    if scope_to and authored is None:
+        print(f"note: --scope-to-diff={scope_to} could not be resolved; "
+              f"RM-07 is judging every entry")
     failures = 0
     referenced = set()
     for e in items:
@@ -319,6 +421,22 @@ def main(argv):
 
     # RM-07 -----------------------------------------------------------------
     judged = unjudged = 0
+    inherited = []
+
+    def rm07(entry_id, detail):
+        """Fail, unless this branch did not author the entry.
+
+        An inherited disagreement is still PRINTED -- this module does not have
+        a quiet mode, and a finding nobody can see is the failure state of a
+        reporting gate. It just is not this branch's exit code.
+        """
+        nonlocal failures
+        if authored is not None and entry_id not in authored:
+            inherited.append(detail)
+            return
+        fail("RM-07", detail)
+        failures += 1
+
     for e in items:
         n = e.get("gh_issue")
         if not n or n not in live:
@@ -328,19 +446,19 @@ def main(argv):
         if status in RM07_DONE_STATUSES:
             judged += 1
             if gh_state == "OPEN":
-                fail("RM-07", f"{e['id']}: roadmap says status={status} but #{n} is "
-                              f"OPEN -- either the work is not finished (THE ROADMAP "
-                              f"IS STALE) or the issue was never closed (THE TRACKER "
-                              f"IS STALE) -- {live[n]['title'][:44]}")
-                failures += 1
+                rm07(e["id"],
+                     f"{e['id']}: roadmap says status={status} but #{n} is "
+                     f"OPEN -- either the work is not finished (THE ROADMAP "
+                     f"IS STALE) or the issue was never closed (THE TRACKER "
+                     f"IS STALE) -- {live[n]['title'][:44]}")
         elif status in RM07_OPEN_STATUSES:
             judged += 1
             if gh_state == "CLOSED":
-                fail("RM-07", f"{e['id']}: #{n} is CLOSED but the roadmap says "
-                              f"status={status} -- either the closure was premature "
-                              f"(REOPEN IT) or the entry owes an update (ADVANCE THE "
-                              f"STATUS) -- {live[n]['title'][:44]}")
-                failures += 1
+                rm07(e["id"],
+                     f"{e['id']}: #{n} is CLOSED but the roadmap says "
+                     f"status={status} -- either the closure was premature "
+                     f"(REOPEN IT) or the entry owes an update (ADVANCE THE "
+                     f"STATUS) -- {live[n]['title'][:44]}")
         else:
             unjudged += 1
 
@@ -349,6 +467,16 @@ def main(argv):
     print(f"        {len(referenced)} issue(s) referenced, {len(owned)} milestone(s) owned")
     print(f"        RM-07: {judged} entr{'y' if judged == 1 else 'ies'} judged against "
           f"issue state, {unjudged} with no comparable status")
+    if authored is not None:
+        print(f"        RM-07: scoped to {len(authored)} entr"
+              f"{'y' if len(authored) == 1 else 'ies'} this branch authored "
+              f"(base {scope_to})")
+    if inherited:
+        print(f"        RM-07: {len(inherited)} inherited disagreement(s) NOT "
+              f"failed here -- they are `main`'s to fix, and `main`'s own run "
+              f"judges them. Listed in full:")
+        for detail in inherited:
+            print(f"          note  RM-07  {detail}")
     if known_hit:
         print(f"        RM-06: {len(known_hit)} known gap(s) still open "
               f"(this number must go down, never up)")

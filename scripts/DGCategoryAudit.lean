@@ -213,6 +213,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Z0.id_val
 #print axioms CategoryTheory.Z0.of
 #print axioms CategoryTheory.Z0.toH0
+#print axioms CategoryTheory.Z0.toH0_full
 #print axioms CategoryTheory.coboundaries
 #print axioms CategoryTheory.coboundaries_le_cocycles
 #print axioms CategoryTheory.coboundary_comp_mem
@@ -701,6 +702,15 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₂
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₃
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_distinguished
+#print axioms CategoryTheory.Enhancement.conePresentation
+#print axioms CategoryTheory.Enhancement.conePresentation_arrow
+#print axioms CategoryTheory.Enhancement.conePresentation_source
+#print axioms CategoryTheory.Enhancement.conePresentation_target
+#print axioms CategoryTheory.Enhancement.counit_conjugate_conePresentation_arrow
+#print axioms CategoryTheory.Enhancement.counit_conjugate_liftedCocycle
+#print axioms CategoryTheory.Enhancement.homMk_conePresentation_arrow
+#print axioms CategoryTheory.Enhancement.homMk_liftedCocycle
+#print axioms CategoryTheory.Enhancement.liftedCocycle
 
 -- Closed degree-zero dg natural transformations descend to `H⁰`, and a dg
 -- adjunction is an adjunction there.  This is the adapter that makes dg data
@@ -781,6 +791,10 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- functor" a statement about the dg functor rather than only about each value.
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_obj
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_map
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_eq
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_isEquivalence
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Equivalence
 
 -- `dg-enhancements-e10`: a quasi-equivalence of dg categories induces an
 -- equivalence on `H⁰`.  The seam between the `H⁰` Hom quotient and Mathlib's
