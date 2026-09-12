@@ -124,6 +124,8 @@ EnhancedAdjunctionCones
 │  The unshifted forms are kept, since TwistCotwistEquivalenceConditions is
 │  stated against the unshifted cone functors.  No sphericality, and no relation
 │  among the four.
+├─ K₀ action of each conventional functor is identity minus its adjunction
+│  composite, first on object classes and then as a homomorphism under exactness
 └─ TwistCotwistEquivalenceConditions
    ├─ cotwistH0Equivalence spends the unshifted condition on the actual cotwist
    └─ twist/cotwist exact equivalences use Mathlib's canonical package
@@ -254,7 +256,12 @@ that comparison are instance hypotheses to be discharged by the realization.
    cones.  Finally `twistH0EquivalenceIsTriangulated` and
    `cotwistH0EquivalenceIsTriangulated` combine the ordinary equivalence and
    exactness halves with Mathlib's canonical `Equivalence.IsTriangulated`
-   interface, which derives compatible inverse shift data and exactness.
+   interface, which derives compatible inverse shift data and exactness.  The
+   four distinguished adjunction triangles now also compute their conventional
+   functors' `K₀` actions as the identity minus the corresponding adjunction
+   composite.  For an object twist, reaching the numerical `twistK₀` formula
+   next requires the separate theorem that the evaluation copower has class
+   `chiHom k C E X • [E]`.
    None of these results is sphericality, which still needs all four
    Anno--Logvinenko conditions and the Morita framework above.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise

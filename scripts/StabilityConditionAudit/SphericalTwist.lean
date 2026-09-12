@@ -160,6 +160,19 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistH0IsTriangulated
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistH0EquivalenceIsTriangulated
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistH0EquivalenceIsTriangulated
+
+-- The four distinguished adjunction triangles determine the object classes
+-- of their conventional functors.  Under endpoint cone preservation these
+-- lift to map equalities: identity minus the appropriate adjunction composite.
+-- No Euler-pairing or numerical spherical-reflection formula is used here.
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctorK₀Of
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctorK₀Map
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualTwistFunctorK₀Of
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualTwistFunctorK₀Map
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistFunctorK₀Of
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistFunctorK₀Map
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistFunctorK₀Of
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistFunctorK₀Map
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctor
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions
