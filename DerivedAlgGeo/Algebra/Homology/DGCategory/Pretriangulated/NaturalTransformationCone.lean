@@ -401,7 +401,6 @@ lemma isoOfStrictSquare_inv_val
       K'.isConeOf.lift K.isConeOf eF.inv.val eG.inv.val 0 :=
   rfl
 
-@[simp]
 lemma isoOfStrictSquare_hom_app
     (eF : (show Z0 (DGFunctor C D) from F) ≅
       (show Z0 (DGFunctor C D) from F'))
@@ -417,7 +416,6 @@ lemma isoOfStrictSquare_hom_app
   rw [isoOfStrictSquare_hom_val]
   exact K.isConeOf_lift_app K' eF.hom.val eG.hom.val X
 
-@[simp]
 lemma isoOfStrictSquare_inv_app
     (eF : (show Z0 (DGFunctor C D) from F) ≅
       (show Z0 (DGFunctor C D) from F'))

@@ -479,7 +479,6 @@ theorem triangleIsoOfStrictSquare_hom_app_hom₂
       (DGFunctor.h0Iso eG).hom.app X :=
   rfl
 
-@[simp]
 theorem triangleIsoOfStrictSquare_hom_app_hom₃
     (K : ConeData α) (hα : IsClosed α)
     (K' : ConeData α') (hα' : IsClosed α')
