@@ -1190,6 +1190,14 @@ See `WeakTruncation.lean`'s module docstring. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_cokernel_mapMono_eq
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.slope_cokernel_ofLE_congr
 
+/-! ### HN transport across the same weak slope order (#1121) -/
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.SameSlopeOrder
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.SameSlopeOrder.le_iff
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.SameSlopeOrder.lt_iff
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.SameSlopeOrder.isSemistable_iff
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.changeSlopeOrder
+#print axioms CategoryTheory.Triangulated.WeakSlopeData.SameSlopeOrder.hasHNProperty
+
 /-! ### The extremal weak slopes and their monotonicity (`WeakExtrema.lean`) -/
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_one_eq
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_one_isSemistable

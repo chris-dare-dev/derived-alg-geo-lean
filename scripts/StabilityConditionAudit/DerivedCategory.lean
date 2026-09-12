@@ -127,6 +127,26 @@ numerical data written on `C` onto the heart. -/
 #print axioms DerivedCategory.heartEquivalence
 #print axioms DerivedCategory.heartEquivalence_functor
 
+/-! ## The standard heart of the bounded derived category (#1121) -/
+
+#print axioms DerivedCategory.boundedSingleFunctor
+#print axioms DerivedCategory.boundedSingleFunctor_additive
+#print axioms DerivedCategory.boundedSingleFunctor_full
+#print axioms DerivedCategory.boundedSingleFunctor_faithful
+#print axioms DerivedCategory.boundedSingleFunctor_obj_obj
+#print axioms DerivedCategory.boundedHeart_singleFunctor_obj
+#print axioms DerivedCategory.essImage_boundedSingleFunctor_eq_boundedHeart
+#print axioms DerivedCategory.isBoundedHeart
+#print axioms DerivedCategory.toBoundedHeart
+#print axioms DerivedCategory.toBoundedHeart_comp_ι
+#print axioms DerivedCategory.toBoundedHeart_full
+#print axioms DerivedCategory.toBoundedHeart_faithful
+#print axioms DerivedCategory.toBoundedHeart_essSurj
+#print axioms DerivedCategory.toBoundedHeart_isEquivalence
+#print axioms DerivedCategory.boundedHeartEquivalence
+#print axioms DerivedCategory.boundedHeartEquivalence_functor
+#print axioms DerivedCategory.toBoundedHeart_obj_obj_obj
+
 /-! ## The derived functor of an exact functor on bounded objects (#1070, #1071)
 
 For an exact functor that is bijective on every `Ext` group, `mapDerivedCategory`
