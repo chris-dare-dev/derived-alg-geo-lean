@@ -14,7 +14,9 @@ fibre product. Its parameters are geometric evidence about that construction—p
 quasicoherent cohomology and compact objects—rather than an arbitrary bifunctor on `Dqc`.
 
 The resulting aliases are the K-flat forms of the paper's `(Dqc)_T` and `D_T`. Constructing the
-resolution and proving the two preservation properties remains explicit in their signatures.
+resolution and proving quasicoherence and compactness for its resolved complex-level tensors
+remains explicit in their signatures; the corresponding facts for arbitrary derived objects are
+then theorems.
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -36,11 +38,12 @@ noncomputable def kFlatBaseChangeExternalProduct
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology) :
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology) :
     SourcePerfectPartCategory X P ⥤
       (CompactDqcFiber T ⥤
         Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
-  baseChangeExternalProduct X T P pullX pullT (R.derivedTensorToDqc hR)
+  baseChangeExternalProduct X T P pullX pullT
+    (R.derivedTensorToDqc (R.preservesQuasicoherentCohomology_of_resolvedTensor hR))
 
 /-- After forgetting quasicoherence witnesses, the K-flat external product is the ambient K-flat
 derived tensor of the two derived pullbacks. -/
@@ -50,7 +53,7 @@ theorem kFlatBaseChangeExternalProduct_obj_obj_obj
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology)
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology)
     (F : SourcePerfectPartCategory X P) (G : CompactDqcFiber T) :
     (((kFlatBaseChangeExternalProduct X T P pullX pullT R hR).obj F).obj G).obj =
       ((R.derivedTensor.obj (pullX.functor.obj F.obj).obj).obj
@@ -64,15 +67,16 @@ theorem kFlatBaseChangeExternalProduct_obj_isCompact
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology)
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology)
     (hpullX : pullX.PreservesCompactObjects)
     (hpullT : pullT.PreservesCompactObjects)
-    (htensor : R.PreservesCompactObjects hR)
+    (htensor : R.ResolvedTensorPreservesCompactObjects hR)
     (F : SourcePerfectPartCategory X P) (G : CompactDqcFiber T) :
     IsCompactObject.{u}
       (((kFlatBaseChangeExternalProduct X T P pullX pullT R hR).obj F).obj G) :=
   baseChangeExternalProduct_obj_isCompact X T P pullX pullT
-    (R.derivedTensorToDqc hR) hpullX hpullT htensor F G
+    (R.derivedTensorToDqc (R.preservesQuasicoherentCohomology_of_resolvedTensor hR))
+    hpullX hpullT (R.preservesCompactObjects_of_resolvedTensor hR htensor) F G
 
 /-- The external-product generators obtained from K-flat derived tensor. -/
 def kFlatPerfectBaseChangeGenerators
@@ -80,7 +84,7 @@ def kFlatPerfectBaseChangeGenerators
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology) :
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology) :
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   perfectBaseChangeGenerators X T P
     (kFlatBaseChangeExternalProduct X T P pullX pullT R hR)
@@ -91,7 +95,7 @@ def kFlatPerfectBaseChangeEnvelope
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology) :
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology) :
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   perfectBaseChangeEnvelope X T P
     (kFlatBaseChangeExternalProduct X T P pullX pullT R hR)
@@ -102,7 +106,7 @@ abbrev KFlatPerfectBaseChangeEnvelopeCategory
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology) :=
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology) :=
   (kFlatPerfectBaseChangeEnvelope X T P pullX pullT R hR).FullSubcategory
 
 /-- The quasicoherent base-change component `(Dqc)_T` constructed from K-flat derived tensor. -/
@@ -111,7 +115,7 @@ def kFlatQuasicoherentBaseChangeComponent
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology) :
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology) :
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   quasicoherentBaseChangeComponent X T P
     (kFlatBaseChangeExternalProduct X T P pullX pullT R hR)
@@ -122,7 +126,7 @@ abbrev KFlatQuasicoherentBaseChangeCategory
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology) :=
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology) :=
   (kFlatQuasicoherentBaseChangeComponent X T P pullX pullT R hR).FullSubcategory
 
 /-- The bounded base-change component `D_T` constructed from K-flat derived tensor. -/
@@ -131,7 +135,7 @@ def kFlatBoundedBaseChangeComponent
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology) :
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology) :
     ObjectProperty (Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ T).left) :=
   boundedBaseChangeComponent X T P
     (kFlatBaseChangeExternalProduct X T P pullX pullT R hR)
@@ -142,7 +146,7 @@ abbrev KFlatBoundedBaseChangeCategory
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology) :=
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology) :=
   (kFlatBoundedBaseChangeComponent X T P pullX pullT R hR).FullSubcategory
 
 /-- The whole perfect envelope built from K-flat tensor lies in the compact objects when the
@@ -152,14 +156,15 @@ theorem kFlatPerfectBaseChangeEnvelope_le_compact
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
     (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
     (R : SchemeKFlatResolution (X ⨯ T).left)
-    (hR : R.PreservesQuasicoherentCohomology)
+    (hR : R.ResolvedTensorPreservesQuasicoherentCohomology)
     (hpullX : pullX.PreservesCompactObjects)
     (hpullT : pullT.PreservesCompactObjects)
-    (htensor : R.PreservesCompactObjects hR) :
+    (htensor : R.ResolvedTensorPreservesCompactObjects hR) :
     kFlatPerfectBaseChangeEnvelope X T P pullX pullT R hR ≤
       ObjectProperty.compactObjects.{u} :=
   perfectBaseChangeEnvelope_externalProduct_le_compact X T P pullX pullT
-    (R.derivedTensorToDqc hR) hpullX hpullT htensor
+    (R.derivedTensorToDqc (R.preservesQuasicoherentCohomology_of_resolvedTensor hR))
+    hpullX hpullT (R.preservesCompactObjects_of_resolvedTensor hR htensor)
 
 end
 

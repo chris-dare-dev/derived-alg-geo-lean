@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.ObjectProperty.FullSubcategory
+import Mathlib.CategoryTheory.EssentialImage
 import Mathlib.CategoryTheory.Whiskering
 
 /-!
@@ -15,7 +16,7 @@ two-variable analogue of Mathlib's `ObjectProperty.lift`.
 
 namespace CategoryTheory.ObjectProperty
 
-universe v u
+universe v v' u u'
 
 variable {C : Type u} [Category.{v} C]
 
@@ -47,5 +48,23 @@ def lift₂CompιIso (P : ObjectProperty C) (F : C ⥤ C ⥤ C)
     P.lift₂ F hF ⋙ (Functor.whiskeringRight _ _ _).obj P.ι ≅
       P.ι ⋙ F ⋙ (Functor.whiskeringLeft _ _ _).obj P.ι :=
   Iso.refl _
+
+/-- To prove that a bifunctor preserves an isomorphism-stable object property, it suffices to
+check the claim after presenting both inputs through an essentially surjective functor. -/
+theorem maps₂_of_comp_of_essSurj {D : Type u'} [Category.{v'} D]
+    (P : ObjectProperty D) [P.IsClosedUnderIsomorphisms]
+    (L : C ⥤ D) [L.EssSurj] (F : D ⥤ D ⥤ D) (G : C ⥤ C ⥤ D)
+    (e : (((Functor.whiskeringLeft₂ D).obj L).obj L).obj F ≅ G)
+    (hG : ∀ X Y, P (L.obj X) → P (L.obj Y) → P ((G.obj X).obj Y)) :
+    ∀ X Y, P X → P Y → P ((F.obj X).obj Y) := by
+  intro X Y hX hY
+  let X' := L.objPreimage X
+  let Y' := L.objPreimage Y
+  let eX : L.obj X' ≅ X := L.objObjPreimageIso X
+  let eY : L.obj Y' ≅ Y := L.objObjPreimageIso Y
+  exact P.prop_of_iso
+    (((e.app X').app Y').symm ≪≫ (F.mapIso eX).app (L.obj Y') ≪≫
+      (F.obj X).mapIso eY)
+    (hG X' Y' (P.prop_of_iso eX.symm hX) (P.prop_of_iso eY.symm hY))
 
 end CategoryTheory.ObjectProperty
