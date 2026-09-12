@@ -183,7 +183,8 @@ Category
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
-│  │  └─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
+│  │  ├─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
+│  │  └─ stored-cone H⁰ exactness          all four, from endpoint cone preservation
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
 │     └─ full sphericality                 pending Morita/adjoint-comparison theorem
 ├─ Derived-category extensions
