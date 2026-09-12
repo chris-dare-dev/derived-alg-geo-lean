@@ -16,5 +16,4 @@ This slice audits the ambient-module-sheaf bridge
 
 /-! ## Linear line-bundle Ext comparison -/
 
-#print axioms
-  AlgebraicGeometry.Scheme.Modules.LineBundleData.extLineLinearEquivCoherentH
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.extLineLinearEquivCoherentH
