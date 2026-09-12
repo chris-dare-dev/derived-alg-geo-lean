@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.Scheme
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.LeftDerivedPullback
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
 
 /-!
@@ -34,17 +35,24 @@ will identify this construction with the paper's notation rather than change
 its carrier.
 
 No new category hierarchy is introduced: every category below is an
-abbreviation for `ObjectProperty.FullSubcategory`.  The external-product
-functor is still an explicit input.  Constructing it from derived pullback and
-tensor, proving that its triangulated envelope remains compact, constructing
-the source `Dqc` component from a strong semiorthogonal component of
-`Dᵇ(X)`, and proving pullback/pushforward functoriality are the next layers of
-Theorem 3.17.
+abbreviation for `ObjectProperty.FullSubcategory`.  A
+`DqcLeftDerivedPullback` refines the repository's existing universal-property
+object `LeftDerivedPullback` by proving that its functor preserves
+quasi-coherent cohomology.  The external product is assembled from those
+lifts along the two fibre-product projections and a supplied tensor
+bifunctor on `Dqc(X_T)`.  Constructing that derived tensor, proving that the
+triangulated envelope remains compact, constructing the source `Dqc`
+component from a strong semiorthogonal component of `Dᵇ(X)`, and proving
+pullback/pushforward functoriality are the next layers of Theorem 3.17.
 
 ## Main definitions
 
 * `SchemeBaseChange.CompactDqcFiber`: compact objects of `Dqc` on a base
   change;
+* `SchemeBaseChange.DqcLeftDerivedPullback`: an actual left-derived pullback
+  which preserves the `Dqc` locus;
+* `SchemeBaseChange.baseChangeExternalProduct`: the functor
+  `(F, G) ↦ Lφ'^*F ⊗ Lg'^*G`;
 * `SchemeBaseChange.sourcePerfectPart`: the compact part of a source
   component;
 * `SchemeBaseChange.perfectBaseChangeGenerators` and
@@ -74,6 +82,51 @@ namespace SchemeBaseChange
 
 variable {S : Scheme.{u}}
 
+/-- An actual left-derived pullback whose ambient functor preserves
+quasi-coherent cohomology.
+
+The `ambient` field is the existing universal-property object, so this
+structure cannot be inhabited by merely choosing an unrelated functor between
+the two `Dqc` categories.  The additional field is exactly what is needed to
+lift that functor to the quasi-coherent-cohomology loci. -/
+structure DqcLeftDerivedPullback {T U : SchemeBaseChange S} (f : T ⟶ U) where
+  /-- The left-derived pullback on the ambient derived categories of module
+  sheaves. -/
+  ambient : LeftDerivedPullback f
+  /-- The ambient left-derived pullback preserves quasi-coherent cohomology. -/
+  mapsQuasicoherent (E : Dqc.SchemeQuasicoherentDerivedCategory U.left) :
+    Dqc.schemeQuasicoherentCohomology T.left
+      (ambient.functor.obj E.obj)
+
+namespace DqcLeftDerivedPullback
+
+variable {T U : SchemeBaseChange S} {f : T ⟶ U}
+
+/-- The lift of an actual left-derived pullback to the honest `Dqc` loci. -/
+noncomputable def functor (P : DqcLeftDerivedPullback f) :
+    Dqc.SchemeQuasicoherentDerivedCategory U.left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory T.left :=
+  (Dqc.schemeQuasicoherentCohomology T.left).lift
+    (Dqc.SchemeQuasicoherentDerivedCategory.ι U.left ⋙ P.ambient.functor)
+    P.mapsQuasicoherent
+
+/-- Forgetting the quasi-coherence witness recovers the ambient
+left-derived pullback on the nose. -/
+noncomputable def functorCompInclusion (P : DqcLeftDerivedPullback f) :
+    P.functor ⋙ Dqc.SchemeQuasicoherentDerivedCategory.ι T.left ≅
+      Dqc.SchemeQuasicoherentDerivedCategory.ι U.left ⋙ P.ambient.functor :=
+  (Dqc.schemeQuasicoherentCohomology T.left).liftCompιIso
+    (Dqc.SchemeQuasicoherentDerivedCategory.ι U.left ⋙ P.ambient.functor)
+    P.mapsQuasicoherent
+
+@[simp]
+theorem functor_obj_obj (P : DqcLeftDerivedPullback f)
+    (E : Dqc.SchemeQuasicoherentDerivedCategory U.left) :
+    (P.functor.obj E).obj = P.ambient.functor.obj E.obj :=
+  rfl
+
+end DqcLeftDerivedPullback
+
 /-- The compact objects of `Dqc(T)`.  Under the quasi-compact affine-diagonal
 hypotheses in Section 3 these are the perfect complexes.  This formulation is
 available without assuming that `T` is locally Noetherian. -/
@@ -95,6 +148,65 @@ abbrev SourcePerfectPartCategory (X : SchemeBaseChange S)
 
 variable (X T : SchemeBaseChange S)
 
+/-- The projection `φ' : X_T ⟶ X` from the fibre product in `Over S`. -/
+abbrev baseChangeFst : X ⨯ T ⟶ X :=
+  Limits.prod.fst
+
+/-- The projection `g' : X_T ⟶ T` from the fibre product in `Over S`. -/
+abbrev baseChangeSnd : X ⨯ T ⟶ T :=
+  Limits.prod.snd
+
+/-- Pull the compact part of the source component to `Dqc(X_T)` along
+`φ' : X_T ⟶ X`. -/
+noncomputable def sourcePerfectPullback
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pullX : DqcLeftDerivedPullback (baseChangeFst X T)) :
+    SourcePerfectPartCategory X P ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left :=
+  (sourcePerfectPart X P).ι ⋙ pullX.functor
+
+/-- Pull compact objects of `Dqc(T)` to `Dqc(X_T)` along
+`g' : X_T ⟶ T`. -/
+noncomputable def compactFiberPullback
+    (pullT : DqcLeftDerivedPullback (baseChangeSnd X T)) :
+    CompactDqcFiber T ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left :=
+  (ObjectProperty.compactObjects.{u}
+    (C := Dqc.SchemeQuasicoherentDerivedCategory T.left)).ι ⋙ pullT.functor
+
+/-- The geometric external-product functor
+`(F, G) ↦ Lφ'^*F ⊗ Lg'^*G` used in Proposition 3.15.
+
+The two pullbacks are actual left-derived pullbacks which preserve `Dqc`.
+The tensor bifunctor remains explicit because the repository does not yet
+construct the unbounded derived tensor product on `Dqc`. -/
+noncomputable def baseChangeExternalProduct
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
+    (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
+    (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :
+    SourcePerfectPartCategory X P ⥤
+      (CompactDqcFiber T ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
+  sourcePerfectPullback X T P pullX ⋙ tensor ⋙
+    (Functor.whiskeringLeft _ _ _).obj (compactFiberPullback X T pullT)
+
+@[simp]
+theorem baseChangeExternalProduct_obj_obj
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
+    (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
+    (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
+    (F : SourcePerfectPartCategory X P) (G : CompactDqcFiber T) :
+    ((baseChangeExternalProduct X T P pullX pullT tensor).obj F).obj G =
+      (tensor.obj (pullX.functor.obj F.obj)).obj
+        (pullT.functor.obj G.obj) :=
+  rfl
+
 /-- The objects `φ'^* F ⊗ g'^* G` which generate the perfect base-change
 component in Proposition 3.15.  The curried functor is the geometric external
 product on the compact part of the source component and the compact objects
@@ -107,6 +219,25 @@ def perfectBaseChangeGenerators
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   fun E ↦ ∃ (F : SourcePerfectPartCategory X P),
     ∃ (G : CompactDqcFiber T), Nonempty ((externalProduct.obj F).obj G ≅ E)
+
+/-- Membership in the generator property after assembling the external
+product from the two `Dqc` pullbacks and tensor is exactly the formula in
+Proposition 3.15. -/
+theorem mem_perfectBaseChangeGenerators_externalProduct_iff
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
+    (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
+    (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
+    (E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :
+    perfectBaseChangeGenerators X T P
+        (baseChangeExternalProduct X T P pullX pullT tensor) E ↔
+      ∃ (F : SourcePerfectPartCategory X P), ∃ (G : CompactDqcFiber T),
+        Nonempty
+          ((tensor.obj (pullX.functor.obj F.obj)).obj
+            (pullT.functor.obj G.obj) ≅ E) :=
+  Iff.rfl
 
 /-- The triangulated envelope generated by the perfect external products in
 `Dqc(X_T)`.  The later compactness theorem identifies this envelope with the
