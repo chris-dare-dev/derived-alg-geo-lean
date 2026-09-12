@@ -262,7 +262,7 @@ that comparison are instance hypotheses to be discharged by the realization.
    composite.  For an object twist, the evaluation triangle now similarly
    gives identity minus the evaluation functor on `K₀`.
    `EvaluationData.IsEulerCopower` names the explicit, choice-invariant
-   realization capability that its class is `chiHom k C E X • [E]`; under
+   realization capability that its class is `chiRight k C E X • [E]`; under
    that input the object classes match the existing numerical `twistK₀`
    formula, and together with chosen-cone preservation the induced maps match.
    None of these results is sphericality, which still needs all four
@@ -342,17 +342,24 @@ that comparison are instance hypotheses to be discharged by the realization.
    `AddCommGrpCat`-valued and represents all additive cochains, so it models an
    additive copower over `ℤ`; the coefficient in `chiHom` is a dimension
    over `k`.  The former therefore cannot imply the latter at general `k`.
-   The next foundational lane is a genuinely `k`-linear copower and evaluation
-   interface (initially over a field), followed by functoriality under chain
-   homotopies and a finite cohomology presentation as shifted finite sums.
-   Only that realization can discharge `IsEulerCopower`; adding linearity to
-   the existing universal family while retaining surjectivity onto all
-   additive cochains would be inconsistent with the intended tensor product.
+   `DGCategory.Linear` now exposes the genuinely `k`-linear Hom-complex, and
+   `DGCategory.LinearCopower` supplies the copower root over a commutative
+   ring.  Its universal family is a chain map in `ModuleCat k`; composition is
+   a linear equivalence with Mathlib's `HomComplex.Cochain`, not with all
+   additive cochains.  Thus there is no forgetful projection to
+   `IsCopowerOf`, because retaining its additive surjectivity would be
+   inconsistent with the intended tensor product.  The next lane is
+   scalar-linear evaluation data assembled from that root.  After that, the
+   Euler realization (initially over a field) still needs functoriality under
+   chain homotopies and a finite cohomology presentation as shifted finite
+   sums.  Only that realization can discharge `IsEulerCopower`.
 
    What is open is *concrete existence*: no dg category in the repository yet
-   supplies a `HasCopowers` instance.  The generic existence/choice interface
-   and its independence theorem are closed, as is choice-independence of the
-   cone-preservation capability.  The comparison seam is closed at both
+   supplies either a `HasCopowers` instance for the additive interface or a
+   `HasLinearCopowers` instance for the scalar-linear one.  The generic
+   existence/choice interfaces and their comparison coherences are closed, as
+   is choice-independence of the additive cone-preservation capability.  The
+   comparison seam is closed at both
    dg-functor and full H⁰-triangle levels.  `IsConeOf.isoOfStrictSquare` lifts
    endpoint isomorphisms in a strict square,
    `ConeData.triangleIsoOfStrictSquare` carries the result to a natural

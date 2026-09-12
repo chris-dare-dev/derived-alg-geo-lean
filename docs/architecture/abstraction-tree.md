@@ -80,6 +80,11 @@ Category
 │     └─ evaluation commutes strictly    identity comparison, both laws free
 ├─ DGCategory C
 │  ├─ DGLinear k C                       scalar refinement
+│  │  ├─ homComplex                     existing Hom-complex repackaged in ModuleCat k
+│  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
+│  │     ├─ lift / lift_unique           linear cochains are morphisms out of Z
+│  │     ├─ compare                      closed canonical comparison, strict composition
+│  │     └─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
