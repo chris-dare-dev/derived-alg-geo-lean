@@ -94,6 +94,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 -- the two upstream-candidate retract-stability instances for the orthogonals.
 #print axioms CategoryTheory.ObjectProperty.rightOrthogonal_isStableUnderRetracts
 #print axioms CategoryTheory.ObjectProperty.leftOrthogonal_isStableUnderRetracts
+#print axioms CategoryTheory.ObjectProperty.triangEnvelope_le_rightOrthogonal_triangEnvelope
+#print axioms CategoryTheory.ObjectProperty.shiftClosure_triangEnvelope_eq
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.obj
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.exceptional

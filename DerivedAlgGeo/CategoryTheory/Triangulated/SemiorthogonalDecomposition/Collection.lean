@@ -81,38 +81,6 @@ exceptional collection, semiorthogonal decomposition, triangulated envelope
 
 universe w u v
 
-namespace CategoryTheory.ObjectProperty
-
-open Limits
-
-section Retracts
-
-variable {C : Type u} [Category.{v} C] [Limits.HasZeroMorphisms C]
-
-/-- The right orthogonal of any property is stable under retracts: a map from
-a `P`-object into a retract extends to the ambient object, where it vanishes.
-Upstream candidate — the pinned Mathlib has no retract-stability instance for
-either orthogonal. -/
-instance rightOrthogonal_isStableUnderRetracts (P : ObjectProperty C) :
-    P.rightOrthogonal.IsStableUnderRetracts where
-  of_retract {X Y} h hY := by
-    intro A f hA
-    rw [← Category.comp_id f, ← h.retract, ← Category.assoc,
-      hY (f ≫ h.i) hA, zero_comp]
-
-/-- The left orthogonal of any property is stable under retracts — the dual.
-Upstream candidate. -/
-instance leftOrthogonal_isStableUnderRetracts (P : ObjectProperty C) :
-    P.leftOrthogonal.IsStableUnderRetracts where
-  of_retract {X Y} h hY := by
-    intro A f hA
-    rw [← Category.id_comp f, ← h.retract, Category.assoc,
-      hY (h.r ≫ f) hA, comp_zero]
-
-end Retracts
-
-end CategoryTheory.ObjectProperty
-
 namespace CategoryTheory.Triangulated
 
 open Limits Pretriangulated

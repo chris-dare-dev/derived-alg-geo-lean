@@ -33,6 +33,36 @@ variable {C : Type u} [Category.{v} C] [Preadditive C]
   [HasZeroObject C] [HasShift C ℤ]
   [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
 
+namespace ObjectProperty
+
+/-- Semiorthogonality of two shift-stable generating properties extends to
+their triangulated envelopes. -/
+theorem triangEnvelope_le_rightOrthogonal_triangEnvelope
+    (P Q : ObjectProperty C) [P.IsStableUnderShift ℤ]
+    [Q.IsStableUnderShift ℤ] (h : Q ≤ P.rightOrthogonal) :
+    Q.triangEnvelope ≤ P.triangEnvelope.rightOrthogonal := by
+  rw [ObjectProperty.triangEnvelope_le_iff]
+  have hP : P.triangEnvelope ≤ Q.leftOrthogonal := by
+    rw [ObjectProperty.triangEnvelope_le_iff]
+    intro X hX Y f hY
+    exact h Y hY f hX
+  intro Y hY X f hX
+  exact hP X hX f hY
+
+/-- Adding all shifts before taking the triangulated envelope does not change
+the result. -/
+theorem shiftClosure_triangEnvelope_eq (P : ObjectProperty C)
+    [P.Nonempty] [IsTriangulated C] :
+    (P.shiftClosure ℤ).triangEnvelope = P.triangEnvelope := by
+  apply le_antisymm
+  · rw [ObjectProperty.triangEnvelope_le_iff]
+    rw [ObjectProperty.shiftClosure_le_iff]
+    exact P.le_triangEnvelope
+  · exact ObjectProperty.monotone_triangEnvelope
+      (ObjectProperty.le_shiftClosure P)
+
+end ObjectProperty
+
 namespace IsCompactObject
 
 variable {K : C} (hK : IsCompactObject.{w} K)
