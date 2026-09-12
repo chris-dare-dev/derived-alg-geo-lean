@@ -9,6 +9,7 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Cone
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.ConeCategory
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Functor
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategory
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategoryShift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.HomogeneousLift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.HomogeneousShift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Lift

@@ -798,6 +798,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.shiftedDegreeZero
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.shiftedDegreeZero_app
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.shiftedDegreeZero_isClosed
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.shiftedDegreeZero_id
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.shiftedDegreeZero_comp
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorAddAssocLeft
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorAddAssocRight
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorAdd_assoc
@@ -813,6 +815,32 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorAddInv_comp
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorZero_comp_inv
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorZeroInv_comp
+
+-- The closed degree-zero category of dg functors carries the pointwise dg
+-- shift as an actual Mathlib `HasShift`.  `z0ShiftMkCore` uses the inverse
+-- comparison in Mathlib's total-to-iterated direction, reuses the raw
+-- associativity theorem through categorical inverses, and supplies both unit
+-- coherences rather than introducing a parallel shift interface.
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctor
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctor_obj
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctor_map_val
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorZeroIso
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorZeroIso_hom_app_val
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorZeroIso_inv_app_val
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorAddIso'
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorAddIso'_hom_app_val
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorAddIso'_inv_app_val
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorAddIso
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorAddIso'_hom_app_zero_right
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorAddIso'_hom_app_zero_left
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorAddIso'_hom_app_congr
+#print axioms CategoryTheory.DGFunctor.z0ShiftFunctorAddIso'_assoc
+#print axioms CategoryTheory.DGFunctor.z0ShiftMkCore
+#print axioms CategoryTheory.DGFunctor.z0HasShift
+#print axioms CategoryTheory.DGFunctor.z0_shiftFunctor_eq
+#print axioms CategoryTheory.DGFunctor.z0_shiftFunctor_obj
+#print axioms CategoryTheory.DGFunctor.z0_shiftFunctorZero_eq
+#print axioms CategoryTheory.DGFunctor.z0_shiftFunctorAdd_eq
 
 -- The shift of a dg functor, and the resulting pretriangulated structure on
 -- the dg category of dg functors.  This is what makes the objectwise twist a

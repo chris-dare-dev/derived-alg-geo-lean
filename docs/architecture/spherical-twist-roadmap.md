@@ -138,14 +138,26 @@ that comparison are instance hypotheses to be discharged by the realization.
    nothing -- each closed and invertible, so each is an isomorphism in the dg
    category of dg functors rather than merely a map.
 
-   The associativity coherence is now `DGFunctor.shiftedFunctorAdd_assoc`:
-   the path that first combines `n` and `m` agrees with the path that first
-   combines `m` and `k`, already as degree-zero dg natural transformations.
-   `HomogeneousNatTrans.shiftedDegreeZero` supplies the shifted first
-   comparison and preserves closedness.  What is still missing is a statement
-   assembling the family into a `HasShift`-style structure (including whatever
-   unit coherence that target API requires).  That packaging is not needed by
-   the triangles below.
+   This family is now assembled into Mathlib's shift interface at the first
+   ordinary categorical boundary where that statement makes sense:
+   `DGFunctor.z0HasShift` is a `HasShift (Z0 (DGFunctor C D)) ℤ` instance.
+   Its functors are `DGFunctor.z0ShiftFunctor`; they act on closed degree-zero
+   transformations by `HomogeneousNatTrans.shiftedDegreeZero`, whose identity
+   and composition laws are explicit.  Its zero and addition isomorphisms are
+   `z0ShiftFunctorZeroIso` and `z0ShiftFunctorAddIso`.  The latter uses
+   `shiftedFunctorAddInv` as its `hom`, because Mathlib points from the total
+   shift to the iterated shift, and `shiftedFunctorAdd` as its `inv`.
+
+   `DGFunctor.z0ShiftMkCore` proves all three standard coherences.  Its
+   associativity law reuses `DGFunctor.shiftedFunctorAdd_assoc`: the inverse
+   paths of the two categorical composites are exactly
+   `shiftedFunctorAddAssocLeft` and `shiftedFunctorAddAssocRight`.  The two
+   unit laws identify addition by zero with, respectively, the shifted inverse
+   zero comparison and the inverse zero comparison on the shifted functor.
+   Nothing parallel is installed on `H0 (DGFunctor C D)`: that category
+   already receives the generic `H0.hasShift` from its pretriangulated dg
+   structure, so a second instance would duplicate an existing abstraction.
+   The dg-functor shift packaging seam is therefore closed.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
