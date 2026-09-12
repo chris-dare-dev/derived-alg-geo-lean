@@ -13,6 +13,7 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformationH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.H0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Instances
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Linear
+import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearCopower
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Opposite
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Product

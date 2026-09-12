@@ -173,6 +173,12 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistFunctorK₀Map
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistFunctorK₀Of
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistFunctorK₀Map
+
+-- The generic cone subtraction and Euler-copower capability are owned and
+-- audited by the DG-enhancement root.  This consumer audits only their two
+-- comparisons with the numerical object-twist formula.
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Of_eq_twistK₀
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Map_eq_twistK₀
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctor
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions

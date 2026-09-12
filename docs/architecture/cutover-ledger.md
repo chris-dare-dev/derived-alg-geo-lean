@@ -7,6 +7,34 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Scalar-linear dg Hom and copower root (2026-09-12):
+  `DGCategory.Linear` repackages the existing Hom-complex of a `DGLinear k C`
+  as `DGLinear.homComplex`, a `ModuleCat k`-valued cochain complex.
+  `DGCategory.LinearCopower` defines `IsLinearCopowerOf` by a bundled linear
+  equivalence with Mathlib's existing `HomComplex.Cochain`.  Its
+  lift, closed canonical comparison, strict comparison laws, and
+  `HasLinearCopower(s)` choice-free existence capabilities follow the same
+  universal-property pattern as the additive root.  There is deliberately no
+  projection to `IsCopowerOf`: that interface represents all additive
+  cochains, so forgetting scalar structure would strengthen rather than
+  preserve the linear contract.  Scalar-linear evaluation data is the next
+  consumer; no Euler-class, homotopy-invariance, or finite-presentation result
+  is asserted here.
+- Object-twist `K₀` action and Euler-realization boundary (2026-09-12):
+  `DGEnhancement.H0.NaturalTransformationConeK0` owns the reusable theorem
+  that a functorial cone acts on `K₀` by target endpoint minus source
+  endpoint, both on generators and, under endpoint cone preservation, as a
+  homomorphism.  The object twist specializes this to identity minus its
+  evaluation functor.  `DGEnhancement.H0.ObjectTwistK0` owns the explicit,
+  choice-invariant `EvaluationData.IsEulerCopower` capability saying exactly
+  when that evaluation class is the Euler multiple of `[E]`.  Together with
+  chosen-cone preservation, the spherical consumer proves that the induced
+  object-twist map equals the existing numerical `twistK₀`.
+  This capability is supplied realization input, not a consequence of the
+  present additive `IsCopowerOf`, which represents ℤ-additive rather than
+  `k`-linear cochains.  The separate scalar-linear copower root now exists;
+  scalar-linear evaluation data, its homotopy invariance, and a finite
+  cohomology presentation are the next foundational roots.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under
