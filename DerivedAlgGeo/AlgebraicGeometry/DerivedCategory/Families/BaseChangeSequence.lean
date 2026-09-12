@@ -55,7 +55,26 @@ abbrev targetPerfectToDqc (X T : SchemeBaseChange S) :
 
 namespace KFlatBaseChangeData
 
+/-- Closing the shifted K-flat generators under triangles and retracts gives
+the same perfect envelope as closing the unshifted generators. -/
+theorem shiftedPerfectGenerators_triangEnvelope_eq
+    (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    [P.ContainsZero] :
+    (D.shiftedPerfectGenerators P).triangEnvelope = D.perfectEnvelope P := by
+  letI : (D.perfectGenerators P).Nonempty :=
+    perfectBaseChangeGenerators_nonempty X T P (D.externalProduct P)
+  exact ObjectProperty.shiftClosure_triangEnvelope_eq (D.perfectGenerators P)
+
 variable (A : SemiorthogonalSequence (SourceDqc X) ι)
+
+/-- The generator-level geometric Hom-vanishing input: every shifted
+external-product generator from a later component is right orthogonal to
+every shifted external-product generator from an earlier component. -/
+def ShiftedPerfectGeneratorsSemiorthogonal : Prop :=
+  ∀ ⦃i j : ι⦄, i < j →
+    D.shiftedPerfectGenerators (A.component j) ≤
+      (D.shiftedPerfectGenerators (A.component i)).rightOrthogonal
 
 /-- The geometric Hom-vanishing input between the perfect base-change
 envelopes. This obligation is isolated from the formal closure arguments. -/
@@ -63,6 +82,21 @@ def PerfectComponentsSemiorthogonal : Prop :=
   ∀ ⦃i j : ι⦄, i < j →
     D.perfectEnvelope (A.component j) ≤
       (D.perfectEnvelope (A.component i)).rightOrthogonal
+
+/-- Generator-level semiorthogonality implies semiorthogonality of the
+perfect base-change envelopes. All closure under shifts, cones, and retracts
+is discharged formally. -/
+theorem perfectComponentsSemiorthogonal_of_shiftedGenerators
+    (hA : A.HasTriangulatedComponents)
+    (horth : D.ShiftedPerfectGeneratorsSemiorthogonal A) :
+    D.PerfectComponentsSemiorthogonal A := by
+  intro i j hij
+  letI : (A.component i).IsTriangulated := hA i
+  letI : (A.component j).IsTriangulated := hA j
+  simpa only [D.shiftedPerfectGenerators_triangEnvelope_eq] using
+    ObjectProperty.triangEnvelope_le_rightOrthogonal_triangEnvelope
+      (D.shiftedPerfectGenerators (A.component i))
+      (D.shiftedPerfectGenerators (A.component j)) (horth hij)
 
 /-- The sequence of perfect base-change envelopes on `Dqc(X_T)`. -/
 def perfectSequence (horth : D.PerfectComponentsSemiorthogonal A) :

@@ -216,6 +216,27 @@ noncomputable def externalProduct (D : KFlatBaseChangeData X T)
   kFlatBaseChangeExternalProduct X T P D.pullFst D.pullSnd
     D.tensorResolution D.tensorQuasicoherent
 
+/-- The external-product generators associated to the bundled K-flat
+construction. -/
+def perfectGenerators (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
+    ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
+  perfectBaseChangeGenerators X T P (D.externalProduct P)
+
+/-- The K-flat external-product generators together with all their shifts and
+isomorphic copies. -/
+def shiftedPerfectGenerators (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
+    ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
+  (D.perfectGenerators P).shiftClosure ℤ
+
+instance shiftedPerfectGenerators_isStableUnderShift
+    (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
+    (D.shiftedPerfectGenerators P).IsStableUnderShift ℤ := by
+  dsimp [shiftedPerfectGenerators]
+  infer_instance
+
 /-- The perfect base-change envelope obtained entirely from the bundled K-flat resolutions. -/
 def perfectEnvelope (D : KFlatBaseChangeData X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
