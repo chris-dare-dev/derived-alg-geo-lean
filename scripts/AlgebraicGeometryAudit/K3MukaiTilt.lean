@@ -1,0 +1,43 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTiltScheme
+
+/-!
+Audit records for the geometric Mukai tilt stability-function assembly on the
+standard heart of `Dᵇ(Coh X)` (#1121).
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeBoundedness
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.muHNInput
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.scale
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.scale_pos
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.shift
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.multiplicity_eq
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.degree_eq
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.mukaiSlopeData
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.mukaiSlopeData_rank
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.mukaiSlopeData_degree
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.hilbertSlope_eq
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.sameSlopeOrder
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.mukaiSlopeData_hasHNProperty
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.boundedStandardT
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.boundedCohHeart
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.boundedMukaiSlopeData
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.boundedMukaiSlopeData_hasHNProperty
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.coherentMukaiClass
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.coherentMukaiClass_apply
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.boundedHeartMukaiClass
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.boundedHeartMukaiClass_of
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.IsAmbientMukaiClass
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.mukaiWeakSlopeCompat
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.HasDimensionZeroMukaiClasses
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.hasDimensionZeroTorsionClasses
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.tiltStabilityFunction
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.SlopeNormalization.tiltStabilityFunction_Z
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.schemeTiltStabilityFunction
+#print axioms AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt.schemeTiltStabilityFunction_Z
