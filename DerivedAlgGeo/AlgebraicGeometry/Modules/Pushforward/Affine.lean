@@ -16,6 +16,8 @@ along a finite morphism exact (`Modules/Coherent/Pushforward/Finite.lean`).
 
 ## Main results
 
+* `Scheme.Modules.isQuasicoherent_pushforward_SpecMap`: pushforward along a morphism of affine
+  spectra preserves quasi-coherent module sheaves.
 * `Scheme.Modules.pushforward_map_epi_of_isAffineHom`: for an affine morphism `f` and an
   epimorphism `u` of quasi-coherent sheaves, `f_* u` is an epimorphism.
 
@@ -45,6 +47,17 @@ universe u
 open CategoryTheory Limits TopologicalSpace
 
 namespace AlgebraicGeometry.Scheme.Modules
+
+/-- Pushforward along a morphism of affine spectra preserves quasi-coherence.  The affine
+counit remains invertible after pushforward, and on an affine spectrum invertibility of that
+counit characterizes quasi-coherent module sheaves. -/
+theorem isQuasicoherent_pushforward_SpecMap
+    {R S : CommRingCat.{u}} (f : R ⟶ S)
+    (M : (Spec S).Modules) [M.IsQuasicoherent] :
+    ((pushforward (Spec.map f)).obj M).IsQuasicoherent := by
+  rw [isQuasicoherent_iff_isIso_fromTildeΓ]
+  letI : IsIso M.fromTildeΓ := isIso_fromTildeΓ_of_isQuasicoherent M
+  exact isIso_fromTildeΓ_pushforward f M
 
 /-- Pushforward along an affine morphism sends an epimorphism of quasi-coherent module
 sheaves to an epimorphism.  Locally on the target, a section over an affine open `W` is a
