@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Category.ModuleCat.LeftResolution
+import Mathlib.Algebra.Homology.DerivedCategory.Ext.EnoughProjectives
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicGenerators
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineVanishing
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.UnitExt
@@ -31,6 +32,19 @@ universe u
 
 attribute [local instance] HasDerivedCategory.standard
 attribute [local instance] CategoryTheory.hasExt_of_hasDerivedCategory
+attribute [local instance] affineQuasicoherentSheavesInclusion_additive
+  affineQuasicoherentSheavesInclusion_preservesFiniteLimits
+  affineQuasicoherentSheavesInclusion_preservesFiniteColimits
+
+local instance affineQuasicoherentSheavesInclusion_full
+    (R : CommRingCat.{u}) : (affineQuasicoherentSheavesInclusion R).Full :=
+  (SheafOfModules.isQuasicoherent
+    (Spec R).ringCatSheaf).fullyFaithfulι.full
+
+local instance affineQuasicoherentSheavesInclusion_faithful
+    (R : CommRingCat.{u}) : (affineQuasicoherentSheavesInclusion R).Faithful :=
+  (SheafOfModules.isQuasicoherent
+    (Spec R).ringCatSheaf).fullyFaithfulι.faithful
 
 /-- The arbitrary-rank free object in affine quasi-coherent sheaves,
 transported from the usual free module through the tilde equivalence. -/
@@ -99,6 +113,38 @@ theorem subsingleton_ext_affineQuasicoherentFree_inclusion
   haveI := Cohomology.modules_H_subsingleton_of_isQuasicoherent
     Y.obj (n + 1) (Nat.succ_pos n)
   exact (Scheme.Modules.extUnitAddEquivDerivedH Y.obj (n + 1)).toEquiv.subsingleton
+
+/-- Higher `Ext` from an arbitrary-rank free object vanishes inside affine
+quasi-coherent sheaves because that object is projective. -/
+theorem subsingleton_ext_affineQuasicoherentFree
+    (R : CommRingCat.{u}) (I : Type u) (Y : AffineQuasicoherentSheaves R) (n : ℕ) :
+    Subsingleton (Ext.{u + 1} (affineQuasicoherentFree R I) Y (n + 1)) := by
+  haveI := affineQuasicoherentFree_projective R I
+  exact subsingleton_of_forall_eq 0 fun e ↦ Ext.eq_zero_of_projective e
+
+/-- The exact affine quasi-coherent inclusion induces bijections on all `Ext` groups. -/
+def AffineQuasicoherentExtComparison (R : CommRingCat.{u}) : Prop :=
+  ∀ (F G : AffineQuasicoherentSheaves R) (n : ℕ),
+    Function.Bijective
+      ((affineQuasicoherentSheavesInclusion R).mapExtAddHom F G n)
+
+/-- **Affine quasi-coherent `Ext` comparison.**  The arbitrary-rank free objects form
+projective generators on the source and remain acyclic against quasi-coherent targets after
+inclusion into all module sheaves. -/
+theorem affineQuasicoherentExtComparison (R : CommRingCat.{u}) :
+    AffineQuasicoherentExtComparison R := fun F G n ↦
+  (affineQuasicoherentSheavesInclusion R).bijective_mapExtAddHom_of_generators
+    (affineQuasicoherentFreeObjects R)
+    (exists_affineQuasicoherentFree_epi R)
+    (fun P hP Y n ↦ by
+      obtain ⟨I, rfl⟩ := hP
+      exact subsingleton_ext_affineQuasicoherentFree R I Y n)
+    (fun P hP Y n ↦ by
+      obtain ⟨I, rfl⟩ := hP
+      exact subsingleton_ext_affineQuasicoherentFree_inclusion R I Y n)
+    (fun X Y ↦
+      (affineQuasicoherentSheavesInclusion R).bijective_mapExtAddHom_zero X Y)
+    n F G
 
 end
 
