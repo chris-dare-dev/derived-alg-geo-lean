@@ -5,6 +5,8 @@ open CategoryTheory CategoryTheory.Triangulated
 namespace CategoryTheory.Triangulated.AlgebraicWitness
 
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.fgModuleCat_simple_iff_finrank_eq_one
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.fgModuleCat_isArtinianObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.moduleCat_isArtinianObject
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.DerivedFiniteVect
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardT
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.residueObject
