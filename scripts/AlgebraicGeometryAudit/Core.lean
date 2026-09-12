@@ -1728,7 +1728,15 @@ not functions. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.coe_toPic
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.toPic_eq_of_iso
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.dual
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.tensorLeftEquivalence
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.tensorLeftHomEquiv
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.tensorLeftHomEquiv_apply
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.tensorLeftHomEquiv_symm_apply
+#print axioms AlgebraicGeometry.Scheme.Modules.unitHomTopEquiv
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.lineHomTopEquiv
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.tensor
+#print axioms AlgebraicGeometry.Proj.twistingSheafLineBundleData
+#print axioms AlgebraicGeometry.Proj.twistingSheafHomTopEquiv
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.toPic_dual
 #print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.toPic_tensor
 #print axioms AlgebraicGeometry.Scheme.Modules.DeterminantData
