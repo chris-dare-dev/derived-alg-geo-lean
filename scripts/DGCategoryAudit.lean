@@ -754,6 +754,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsShiftBy.shiftMap_compare
 #print axioms CategoryTheory.IsShiftBy.comp'_shiftMap
 #print axioms CategoryTheory.IsShiftBy.comp'_shiftMap_smul
+#print axioms CategoryTheory.IsShiftBy.shiftMap_compare_compOfDegree
+#print axioms CategoryTheory.IsShiftBy.compare_compLeftOfDegree
 #print axioms CategoryTheory.IsShiftBy.shiftMap_self
 #print axioms CategoryTheory.IsShiftBy.shiftMap_zero_eq_mapShift
 
@@ -793,6 +795,12 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorAddInv
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorAdd_app
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorAddInv_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.shiftedDegreeZero
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.shiftedDegreeZero_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.shiftedDegreeZero_isClosed
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAddAssocLeft
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAddAssocRight
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorAdd_assoc
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorZero
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorZero_app
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorZeroInv
