@@ -95,27 +95,39 @@ Category
 │  │  │  └─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
+│  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
 │  ├─ IsCopowerOf K X Z                   `Z = K ⊗ X`, by its universal property
 │  │  ├─ lift / lift_unique              cochains out of `K` are morphisms out of `Z`
-│  │  ├─ compare                         any two copowers, canonically isomorphic
-│  │  └─ EvaluationData E                a chosen copower of `E` by `dgHom E -`
+│  │  ├─ compare                         closed canonical comparison, strict composition
+│  │  ├─ HasCopower / HasCopowers        Mathlib-style mere-existence capabilities
+│  │  │  └─ copowerData                  a noncomputably selected CopowerData witness
+│  │  ├─ HasEvaluationData E             the narrower existence capability object twists need
+│  │  │  └─ chosenEvaluationData         a noncomputably selected EvaluationData E
+│  │  └─ EvaluationData E                selected directly or through HasEvaluationData
 │  │     ├─ functor                      the dg functor `RHom(E,-) ⊗ E`
 │  │     ├─ evaluation                   its degree-zero map to the identity
+│  │     ├─ compareIso                   canonical Z⁰ isomorphism between any two choices
+│  │     │  └─ compare_comp_evaluation  strict compatibility with evaluation
 │  │     └─ TwistConeData                the object twist Cone(evaluation)
+│  │        ├─ compareIso                coherent Z⁰ iso across evaluation/cone choices
+│  │        │  └─ inclusion compatibility is strict
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
 │  │        └─ twistH0IsTriangulated    exact, given only PreservesChosenCones
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps
+│  │  │  └─ strict                      a commuting square with zero homotopy
 │  │  └─ IsConeOf.homogeneousLift        all-degree cone maps, d/id/add/comp laws
 │  │     ├─ IsConeOf.lift                the degree-zero case, not a second owner
 │  │     │  └─ IsConeOf.Morphism         cone map with strict `inr` and `fst` squares
 │  │     │     └─ ConePresentation category  composes without a shift witness
+│  │     ├─ IsConeOf.isoOfStrictSquare   endpoint isos lift canonically to cone isos
 │  │     └─ HomogeneousNatTrans.ConeData objectwise cones assemble to a dg functor
 │  │        ├─ fst / snd                 cone projections, graded-natural
 │  │        ├─ isConeOf                  a cone in the dg category of dg functors
+│  │        ├─ isoOfStrictSquare         the generic lift in Z⁰(DGFunctor C D)
 │  │        ├─ preservesShifts           a cone functor preserves shifts if its ends do
 │  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations

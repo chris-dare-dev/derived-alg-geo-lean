@@ -116,6 +116,23 @@ lemma ofBoundary_homotopy (ha : ((dgHom X₁ X₂).d 0 1).hom a = 0)
     (ofBoundary ha hb k hk).homotopy = k :=
   rfl
 
+/-- A strictly commuting square of closed degree-zero morphisms, regarded as
+a homotopy square with zero homotopy. -/
+def strict (ha : ((dgHom X₁ X₂).d 0 1).hom a = 0)
+    (hb : ((dgHom Y₁ Y₂).d 0 1).hom b = 0)
+    (hsq : dgComp 0 0 0 (by omega) f₁ b =
+      dgComp 0 0 0 (by omega) a f₂) :
+    HomotopySquare f₁ f₂ a b :=
+  ofBoundary ha hb 0 (by rw [map_zero, hsq, sub_self])
+
+@[simp]
+lemma strict_homotopy (ha : ((dgHom X₁ X₂).d 0 1).hom a = 0)
+    (hb : ((dgHom Y₁ Y₂).d 0 1).hom b = 0)
+    (hsq : dgComp 0 0 0 (by omega) f₁ b =
+      dgComp 0 0 0 (by omega) a f₂) :
+    (strict ha hb hsq).homotopy = 0 :=
+  rfl
+
 /-- Two homotopy squares with the same chosen homotopy are equal.  Closedness
 and the boundary equation are propositions, so the degree-minus-one element is
 the only additional data once the four boundary morphisms are fixed. -/
@@ -442,6 +459,153 @@ def Morphism.comp
                 hc₁.fst a₁ a₂
 
 end Composition
+
+section StrictSquareIso
+
+variable {A₁ B₁ T₁ A₂ B₂ T₂ : Z0 C}
+  {f₁ : (dgHom (Z0.of C A₁) (Z0.of C B₁)).X 0}
+  {f₂ : (dgHom (Z0.of C A₂) (Z0.of C B₂)).X 0}
+  (hc₁ : IsConeOf f₁ (Z0.of C T₁))
+  (hc₂ : IsConeOf f₂ (Z0.of C T₂))
+
+private lemma iso_hom_inv_val (e : A₁ ≅ A₂) :
+    dgComp 0 0 0 (by omega) e.hom.val e.inv.val =
+      dgId (Z0.of C A₁) := by
+  have h := congrArg Subtype.val e.hom_inv_id
+  exact h
+
+private lemma iso_inv_hom_val (e : A₁ ≅ A₂) :
+    dgComp 0 0 0 (by omega) e.inv.val e.hom.val =
+      dgId (Z0.of C A₂) := by
+  have h := congrArg Subtype.val e.inv_hom_id
+  exact h
+
+private lemma inverse_square
+    (eA : A₁ ≅ A₂) (eB : B₁ ≅ B₂)
+    (hsq : dgComp 0 0 0 (by omega) f₁ eB.hom.val =
+      dgComp 0 0 0 (by omega) eA.hom.val f₂) :
+    dgComp 0 0 0 (by omega) f₂ eB.inv.val =
+      dgComp 0 0 0 (by omega) eA.inv.val f₁ := by
+  calc
+    _ = dgComp 0 0 0 (by omega) (dgId (Z0.of C A₂))
+        (dgComp 0 0 0 (by omega) f₂ eB.inv.val) := by
+      rw [dgId_comp]
+    _ = dgComp 0 0 0 (by omega)
+        (dgComp 0 0 0 (by omega) eA.inv.val eA.hom.val)
+        (dgComp 0 0 0 (by omega) f₂ eB.inv.val) := by
+      rw [iso_inv_hom_val eA]
+    _ = dgComp 0 0 0 (by omega) eA.inv.val
+        (dgComp 0 0 0 (by omega) eA.hom.val
+          (dgComp 0 0 0 (by omega) f₂ eB.inv.val)) :=
+      dgComp_assoc 0 0 0 0 0 0 (by omega) (by omega) (by omega) _ _ _
+    _ = dgComp 0 0 0 (by omega) eA.inv.val
+        (dgComp 0 0 0 (by omega)
+          (dgComp 0 0 0 (by omega) eA.hom.val f₂) eB.inv.val) := by
+      exact congrArg (fun k => dgComp 0 0 0 (by omega) eA.inv.val k)
+        (dgComp_assoc 0 0 0 0 0 0 (by omega) (by omega) (by omega)
+          eA.hom.val f₂ eB.inv.val).symm
+    _ = dgComp 0 0 0 (by omega) eA.inv.val
+        (dgComp 0 0 0 (by omega)
+          (dgComp 0 0 0 (by omega) f₁ eB.hom.val) eB.inv.val) := by
+      rw [hsq]
+    _ = dgComp 0 0 0 (by omega) eA.inv.val
+        (dgComp 0 0 0 (by omega) f₁
+          (dgComp 0 0 0 (by omega) eB.hom.val eB.inv.val)) := by
+      exact congrArg (fun k => dgComp 0 0 0 (by omega) eA.inv.val k)
+        (dgComp_assoc 0 0 0 0 0 0 (by omega) (by omega) (by omega)
+          f₁ eB.hom.val eB.inv.val)
+    _ = dgComp 0 0 0 (by omega) eA.inv.val
+        (dgComp 0 0 0 (by omega) f₁ (dgId (Z0.of C B₁))) := by
+      rw [iso_hom_inv_val eB]
+    _ = _ := by rw [dgComp_id]
+
+/-- A strict square whose two vertical maps are isomorphisms induces an
+isomorphism between any chosen cones.  The forward and inverse maps are the
+strict cone lifts of the two endpoint isomorphisms. -/
+noncomputable def isoOfStrictSquare
+    (eA : A₁ ≅ A₂) (eB : B₁ ≅ B₂)
+    (hsq : dgComp 0 0 0 (by omega) f₁ eB.hom.val =
+      dgComp 0 0 0 (by omega) eA.hom.val f₂) :
+    T₁ ≅ T₂ where
+  hom := (hc₁.liftMorphism hc₂ eA.hom.val eB.hom.val
+    (DGCategory.HomotopySquare.strict
+      (show ((dgHom (Z0.of C A₁) (Z0.of C A₂)).d 0 1).hom eA.hom.val = 0
+        from eA.hom.2)
+      (show ((dgHom (Z0.of C B₁) (Z0.of C B₂)).d 0 1).hom eB.hom.val = 0
+        from eB.hom.2)
+      hsq)).hom
+  inv := (hc₂.liftMorphism hc₁ eA.inv.val eB.inv.val
+    (DGCategory.HomotopySquare.strict
+      (show ((dgHom (Z0.of C A₂) (Z0.of C A₁)).d 0 1).hom eA.inv.val = 0
+        from eA.inv.2)
+      (show ((dgHom (Z0.of C B₂) (Z0.of C B₁)).d 0 1).hom eB.inv.val = 0
+        from eB.inv.2)
+      (inverse_square eA eB hsq))).hom
+  hom_inv_id := Subtype.ext (by
+    change dgComp 0 0 (0 + 0) (by omega)
+        (hc₁.homogeneousLift hc₂ 0 eA.hom.val eB.hom.val 0)
+        (hc₂.homogeneousLift hc₁ 0 eA.inv.val eB.inv.val 0) =
+      dgId (Z0.of C T₁)
+    rw [hc₁.homogeneousLift_strict_comp hc₂ hc₁ 0 0]
+    change hc₁.homogeneousLift hc₁ 0
+      (dgComp 0 0 0 (by omega) eA.hom.val eA.inv.val)
+      (dgComp 0 0 0 (by omega) eB.hom.val eB.inv.val) 0 =
+        dgId (Z0.of C T₁)
+    rw [iso_hom_inv_val eA, iso_hom_inv_val eB,
+      hc₁.homogeneousLift_id])
+  inv_hom_id := Subtype.ext (by
+    change dgComp 0 0 (0 + 0) (by omega)
+        (hc₂.homogeneousLift hc₁ 0 eA.inv.val eB.inv.val 0)
+        (hc₁.homogeneousLift hc₂ 0 eA.hom.val eB.hom.val 0) =
+      dgId (Z0.of C T₂)
+    rw [hc₂.homogeneousLift_strict_comp hc₁ hc₂ 0 0]
+    change hc₂.homogeneousLift hc₂ 0
+      (dgComp 0 0 0 (by omega) eA.inv.val eA.hom.val)
+      (dgComp 0 0 0 (by omega) eB.inv.val eB.hom.val) 0 =
+        dgId (Z0.of C T₂)
+    rw [iso_inv_hom_val eA, iso_inv_hom_val eB,
+      hc₂.homogeneousLift_id])
+
+@[simp]
+lemma isoOfStrictSquare_hom_val
+    (eA : A₁ ≅ A₂) (eB : B₁ ≅ B₂)
+    (hsq : dgComp 0 0 0 (by omega) f₁ eB.hom.val =
+      dgComp 0 0 0 (by omega) eA.hom.val f₂) :
+    (isoOfStrictSquare hc₁ hc₂ eA eB hsq).hom.val =
+      hc₁.lift hc₂ eA.hom.val eB.hom.val 0 :=
+  rfl
+
+@[simp]
+lemma isoOfStrictSquare_inv_val
+    (eA : A₁ ≅ A₂) (eB : B₁ ≅ B₂)
+    (hsq : dgComp 0 0 0 (by omega) f₁ eB.hom.val =
+      dgComp 0 0 0 (by omega) eA.hom.val f₂) :
+    (isoOfStrictSquare hc₁ hc₂ eA eB hsq).inv.val =
+      hc₂.lift hc₁ eA.inv.val eB.inv.val 0 :=
+  rfl
+
+/-- The cone isomorphism strictly commutes with the target inclusions. -/
+lemma inr_comp_isoOfStrictSquare_hom
+    (eA : A₁ ≅ A₂) (eB : B₁ ≅ B₂)
+    (hsq : dgComp 0 0 0 (by omega) f₁ eB.hom.val =
+      dgComp 0 0 0 (by omega) eA.hom.val f₂) :
+    dgComp 0 0 0 (by omega) hc₁.inr
+        (isoOfStrictSquare hc₁ hc₂ eA eB hsq).hom.val =
+      dgComp 0 0 0 (by omega) eB.hom.val hc₂.inr := by
+  rw [isoOfStrictSquare_hom_val]
+  exact hc₁.inr_comp_lift hc₂ eA.hom.val eB.hom.val 0
+
+/-- The cone isomorphism strictly commutes with the source projections. -/
+lemma isoOfStrictSquare_hom_comp_fst
+    (eA : A₁ ≅ A₂) (eB : B₁ ≅ B₂)
+    (hsq : dgComp 0 0 0 (by omega) f₁ eB.hom.val =
+      dgComp 0 0 0 (by omega) eA.hom.val f₂) :
+    dgComp 0 1 1 (by omega) (isoOfStrictSquare hc₁ hc₂ eA eB hsq).hom.val hc₂.fst =
+      dgComp 1 0 1 (by omega) hc₁.fst eA.hom.val := by
+  rw [isoOfStrictSquare_hom_val]
+  exact hc₁.lift_comp_fst hc₂ eA.hom.val eB.hom.val 0
+
+end StrictSquareIso
 
 end IsConeOf
 
