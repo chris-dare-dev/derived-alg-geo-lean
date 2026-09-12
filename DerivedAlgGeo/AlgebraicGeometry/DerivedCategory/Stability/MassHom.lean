@@ -3,7 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability.BoundedCoherentPullback
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Stable
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Transfer
 
 /-!
 # Mass--Hom bounds on bounded coherent derived categories
@@ -17,6 +19,8 @@ attribute [local instance] HasDerivedCategory.standard
 
 namespace AlgebraicGeometry.DerivedCategory
 
+open AlgebraicGeometry.DerivedCategory.Families
+open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 
 noncomputable section
@@ -73,6 +77,48 @@ theorem hasPerfectMassHomBound_of_stable_generators
   change σ.HasMassHomBound (k := k) (boundedSchemePerfect X)
   rw [← hG]
   exact hstable.triangEnvelope hJH
+
+/-! ## Finite pullback transfer -/
+
+/-- **The finite-morphism pullback half of Lemma 7.4, with its two unfinished
+geometric inputs explicit.**
+
+For a finite morphism, `boundedCoherentDerivedPushforward f` is the actual
+exact direct image used to construct `f^♯σ`.  Any linear left adjoint `pull`
+transfers the mass--Hom bound provided its perfect images classically generate
+the source perfect test class.
+
+The repository does not yet construct the required bounded coherent derived
+pullback for an arbitrary finite morphism: `perfectDerivedPullback` is defined
+only under the exact coherent-pullback contract and has domain `Perf`, whereas
+the adjunction here is against all of `Dᵇ(Coh)`.  Accordingly `pull`, `adj`, and
+the generation containment are parameters rather than manufactured instances.
+The future geometric discharges are tracked by #1033 and #723. -/
+theorem hasPerfectMassHomBound_finitePullback
+    {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
+    [IsFinite f.left]
+    {k : Type w} [Field k]
+    [Linear k T.BoundedCoherentDerivedFiber]
+    [Linear k U.BoundedCoherentDerivedFiber]
+    [∀ n : ℤ, (shiftFunctor T.BoundedCoherentDerivedFiber n).Linear k]
+    [CategoryTheory.SerreFunctor.HomFinite k T.BoundedCoherentDerivedFiber]
+    [CategoryTheory.SerreFunctor.HomFinite k U.BoundedCoherentDerivedFiber]
+    {Λ : Type u'} [AddCommGroup Λ]
+    {v : K₀ U.BoundedCoherentDerivedFiber →+ Λ}
+    (σ : StabilityCondition.WithClassMap U.BoundedCoherentDerivedFiber v)
+    (hσ : HasPerfectMassHomBound (k := k) U.left σ)
+    (hpre : BoundedCoherentPushforwardPreimageData f σ.slicing)
+    (pull : U.BoundedCoherentDerivedFiber ⥤ T.BoundedCoherentDerivedFiber)
+    [pull.Additive] [pull.Linear k]
+    (adj : pull ⊣ boundedCoherentDerivedPushforward f)
+    (hgen : boundedSchemePerfect T.left ≤
+      ((boundedSchemePerfect U.left).map pull).triangEnvelope) :
+    HasPerfectMassHomBound (k := k) T.left
+      (σ.boundedCoherentPullback f hpre) := by
+  change (σ.preimage (boundedCoherentDerivedPushforward f)
+    hpre.preimageData).HasMassHomBound (k := k) (boundedSchemePerfect T.left)
+  exact hσ.preimage adj hpre.preimageData hgen
 
 end
 
