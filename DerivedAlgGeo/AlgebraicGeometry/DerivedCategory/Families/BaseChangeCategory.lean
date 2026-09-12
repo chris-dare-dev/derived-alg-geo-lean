@@ -315,6 +315,16 @@ def perfectBaseChangeEnvelope
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   (perfectBaseChangeGenerators X T P externalProduct).triangEnvelope
 
+/-- Perfect base-change envelopes are replete. -/
+instance perfectBaseChangeEnvelope_isClosedUnderIsomorphisms
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (externalProduct : SourcePerfectPartCategory X P ⥤
+      (CompactDqcFiber T ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)) :
+    (perfectBaseChangeEnvelope X T P externalProduct).IsClosedUnderIsomorphisms := by
+  dsimp [perfectBaseChangeEnvelope]
+  infer_instance
+
 /-- A perfect base-change envelope generated from a source component
 containing zero is a triangulated object property. -/
 instance perfectBaseChangeEnvelope_isTriangulated

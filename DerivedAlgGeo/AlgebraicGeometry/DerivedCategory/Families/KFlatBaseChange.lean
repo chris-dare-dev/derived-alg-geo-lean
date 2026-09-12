@@ -245,8 +245,34 @@ def boundedComponent (D : KFlatBaseChangeData X T)
 /-- The full bounded base-change category `D_T` constructed from the bundled K-flat
 resolutions. -/
 abbrev BoundedCategory (D : KFlatBaseChangeData X T)
-    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :=
+  (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :=
   (D.boundedComponent P).FullSubcategory
+
+/-- A K-flat perfect envelope is closed under isomorphisms. -/
+instance perfectEnvelope_isClosedUnderIsomorphisms
+    (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
+    (D.perfectEnvelope P).IsClosedUnderIsomorphisms := by
+  dsimp [perfectEnvelope]
+  infer_instance
+
+/-- A K-flat perfect envelope is triangulated whenever its source component
+contains a zero object. -/
+instance perfectEnvelope_isTriangulated
+    (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    [P.ContainsZero] : (D.perfectEnvelope P).IsTriangulated := by
+  dsimp [perfectEnvelope]
+  infer_instance
+
+/-- A K-flat quasicoherent base-change component is triangulated whenever
+its source component contains a zero object. -/
+instance quasicoherentComponent_isTriangulated
+    (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    [P.ContainsZero] : (D.quasicoherentComponent P).IsTriangulated := by
+  dsimp [quasicoherentComponent]
+  infer_instance
 
 instance quasicoherentComponent_isClosedUnderIsomorphisms
     (D : KFlatBaseChangeData X T)

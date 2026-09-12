@@ -45,17 +45,14 @@ variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
 /-- The remaining geometric data making the perfect and quasicoherent
 base-change sequences into full strong decompositions. -/
 structure DecompositionData where
-  /-- Each perfect component is triangulated in the compact-object carrier. -/
-  perfectComponentsTriangulated :
-    (D.perfectCategorySequence A horth).HasTriangulatedComponents
+  /-- Each source component is triangulated. The corresponding perfect and
+  quasicoherent base-change components are then triangulated formally. -/
+  sourceComponentsTriangulated : A.HasTriangulatedComponents
   /-- The perfect components generate the compact-object carrier. -/
   perfectFull : (D.perfectCategorySequence A horth).IsFull
   /-- Chosen right projections onto all perfect components. -/
   perfectProjections :
     (D.perfectCategorySequence A horth).RightProjectionData
-  /-- Each quasicoherent component is triangulated. -/
-  quasicoherentComponentsTriangulated :
-    (D.quasicoherentSequence A hcompact horth).HasTriangulatedComponents
   /-- The quasicoherent components generate `Dqc(X_T)`. -/
   quasicoherentFull :
     (D.quasicoherentSequence A hcompact horth).IsFull
@@ -78,13 +75,15 @@ include B
 theorem perfectIsStrong :
     (D.perfectCategorySequence A horth).IsStrong :=
   fun i ↦ ((perfectProjections B).componentProjection i).isRightAdmissible
-    (B.perfectComponentsTriangulated i)
+    (D.perfectCategorySequence_hasTriangulatedComponents A
+      B.sourceComponentsTriangulated horth i)
 
 /-- The quasicoherent sequence is strong in the paper's sense. -/
 theorem quasicoherentIsStrong :
     (D.quasicoherentSequence A hcompact horth).IsStrong :=
   fun i ↦ ((quasicoherentProjections B).componentProjection i).isRightAdmissible
-    (B.quasicoherentComponentsTriangulated i)
+    (D.quasicoherentSequence_hasTriangulatedComponents A
+      B.sourceComponentsTriangulated hcompact horth i)
 
 /-- The bounded-coherent object property on the fibre product. -/
 abbrev boundedLocus : ObjectProperty (TargetDqc X T) :=
@@ -122,7 +121,8 @@ theorem isStrong : (D.boundedSequence A hcompact horth).IsStrong := by
   simpa [KFlatBaseChangeData.boundedSequence, boundedLocus] using
     (quasicoherentProjections B).inverseImage_isStrong
       (boundedLocus (X := X) (T := T))
-      B.quasicoherentComponentsTriangulated
+      (D.quasicoherentSequence_hasTriangulatedComponents A
+        B.sourceComponentsTriangulated hcompact horth)
       (fun i ↦ D.quasicoherentComponent_isClosedUnderIsomorphisms
         (A.component i))
       BB.projectionsPreserveBounded

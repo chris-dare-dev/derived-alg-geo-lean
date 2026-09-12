@@ -100,6 +100,18 @@ theorem perfectCategorySequence_compatible
       (targetPerfectToDqc X T) (D.perfectSequence A horth) :=
   SemiorthogonalSequence.inverseImage_compatible _ _
 
+/-- Triangulated source components give triangulated perfect base-change
+components on the compact-object carrier. -/
+theorem perfectCategorySequence_hasTriangulatedComponents
+    (hA : A.HasTriangulatedComponents)
+    (horth : D.PerfectComponentsSemiorthogonal A) :
+    (D.perfectCategorySequence A horth).HasTriangulatedComponents := by
+  intro i
+  letI : (A.component i).IsTriangulated := hA i
+  change ((D.perfectEnvelope (A.component i)).inverseImage
+    (targetPerfectToDqc X T)).IsTriangulated
+  infer_instance
+
 /-- Compactness propagates perfect-envelope semiorthogonality to the
 quasicoherent base-change components. -/
 theorem quasicoherentComponentsSemiorthogonal
@@ -128,6 +140,18 @@ theorem quasicoherentSequence_component
     (D.quasicoherentSequence A hcompact horth).component i =
       D.quasicoherentComponent (A.component i) :=
   rfl
+
+/-- Triangulated source components give triangulated quasicoherent
+base-change components. -/
+theorem quasicoherentSequence_hasTriangulatedComponents
+    (hA : A.HasTriangulatedComponents)
+    (hcompact : D.PreservesCompactObjects)
+    (horth : D.PerfectComponentsSemiorthogonal A) :
+    (D.quasicoherentSequence A hcompact horth).HasTriangulatedComponents := by
+  intro i
+  letI : (A.component i).IsTriangulated := hA i
+  change (D.quasicoherentComponent (A.component i)).IsTriangulated
+  infer_instance
 
 /-- The bounded-coherent base-change sequence `D_T`, obtained by restricting
 the quasicoherent sequence along the canonical fully faithful inclusion. -/
