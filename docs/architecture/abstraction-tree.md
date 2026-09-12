@@ -115,7 +115,9 @@ Category
 │  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
 │  │  │  ├─ HasShift Z⁰(DGFunctor C D) ℤ standard Mathlib packaging, all unit/assoc laws
 │  │  │  ├─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
-│  │  │  └─ shiftedFunctorH0Iso          functor-level comparison; transports H⁰ equivalences
+│  │  │  ├─ shiftedFunctorH0Iso          functor-level comparison; transports H⁰ equivalences
+│  │  │  └─ shiftedFunctorH0CommShift / IsTriangulated
+│  │  │                                 transports exactness with the signed shift package
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
@@ -205,7 +207,9 @@ Category
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
 │  │  ├─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
-│  │  └─ stored-cone H⁰ exactness          all four, from endpoint cone preservation
+│  │  ├─ H⁰ exactness                     all four conventional functors, from endpoint cone preservation
+│  │  ├─ triangulated equivalences         canonical Mathlib package for twist and cotwist
+│  │  └─ K₀ action                        identity minus the corresponding adjunction composite
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
 │     └─ full sphericality                 pending Morita/adjoint-comparison theorem
 ├─ Derived-category extensions
