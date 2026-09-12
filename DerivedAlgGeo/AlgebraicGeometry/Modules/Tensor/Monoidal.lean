@@ -2,7 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.Monoidal
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
+import Mathlib.CategoryTheory.Adjunction.Additive
 import Mathlib.CategoryTheory.Monoidal.Subcategory
 
 /-!
@@ -36,6 +38,17 @@ local instance : MonoidalCategory X.PresheafOfModules :=
 
 local instance : SymmetricCategory X.PresheafOfModules :=
   PresheafOfModules.symmetricCategory (R := X.presheaf)
+
+private noncomputable local instance : MonoidalPreadditive X.PresheafOfModules :=
+  PresheafOfModules.monoidalPreadditive X.presheaf
+
+private noncomputable local instance :
+    (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).Additive :=
+  (PresheafOfModules.sheafificationAdjunction
+    (𝟙 X.ringCatSheaf.obj)).left_adjoint_additive
+
+private local instance : (toPresheafOfModules X).Additive :=
+  inferInstanceAs (SheafOfModules.forget X.ringCatSheaf).Additive
 
 lemma tensorSheafificationComparisonRight_naturality {P Q : X.PresheafOfModules}
     (f : P ⟶ Q) {L M : X.Modules} (g : L ⟶ M) :
@@ -754,6 +767,33 @@ noncomputable instance modulesMonoidalCategory : MonoidalCategory X.Modules wher
   rightUnitor_naturality := tensorUnitRightIso_naturality
   pentagon := tensorAssocIso_pentagon
   triangle := tensorAssocIso_triangle
+
+set_option backward.isDefEq.respectTransparency true in
+/-- The sheafified tensor product is additive separately in both variables. -/
+noncomputable instance modulesMonoidalPreadditive : MonoidalPreadditive X.Modules := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro A B C
+    change tensorHom (𝟙 A) (0 : B ⟶ C) = 0
+    unfold tensorHom
+    simp
+    rfl
+  · intro A B C
+    change tensorHom (0 : B ⟶ C) (𝟙 A) = 0
+    unfold tensorHom
+    simp
+    rfl
+  · intro A B C f g
+    change tensorHom (𝟙 A) (f + g) =
+      tensorHom (𝟙 A) f + tensorHom (𝟙 A) g
+    unfold tensorHom
+    simp
+    rfl
+  · intro A B C f g
+    change tensorHom (f + g) (𝟙 A) =
+      tensorHom f (𝟙 A) + tensorHom g (𝟙 A)
+    unfold tensorHom
+    simp
+    rfl
 
 /-- Intrinsic invertibility is a monoidal object property of scheme-module sheaves. -/
 noncomputable instance isInvertibleIsMonoidal :
