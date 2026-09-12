@@ -162,6 +162,38 @@ noncomputable def affineQuasicoherentDerivedToDqcCompInclusion
     (affineQuasicoherentDerivedInclusion R)
     (affineQuasicoherentDerivedInclusion_mem_dqc R)
 
+/-- Affine realization carries cohomologically bounded quasi-coherent
+complexes to the intrinsic bounded locus in `Dqc`. -/
+theorem affineQuasicoherentDerivedToDqc_bounded
+    (R : CommRingCat.{u})
+    (E : AffineQuasicoherentBoundedDerivedCategory R) :
+    schemeBoundedQuasicoherent (Spec R)
+      ((affineQuasicoherentDerivedToDqc R).obj E.obj) := by
+  change (DerivedCategory.TStructure.t (C := (Spec R).Modules)).bounded
+    ((affineQuasicoherentDerivedInclusion R).obj E.obj)
+  exact mapDerivedCategory_bounded
+    (affineQuasicoherentSheavesInclusion R) E.obj E.property
+
+/-- The bounded affine quasi-coherent derived category maps concretely into
+the intrinsic bounded `Dqc` locus. -/
+noncomputable def affineQuasicoherentBoundedDerivedToDqc
+    (R : CommRingCat.{u}) :
+    AffineQuasicoherentBoundedDerivedCategory R ⥤
+      SchemeBoundedQuasicoherentDerivedCategory (Spec R) :=
+  (schemeBoundedQuasicoherent (Spec R)).lift
+    (DerivedCategory.Bounded.ι ⋙ affineQuasicoherentDerivedToDqc R)
+    (affineQuasicoherentDerivedToDqc_bounded R)
+
+/-- Forgetting boundedness recovers affine realization into `Dqc`. -/
+noncomputable def affineQuasicoherentBoundedDerivedToDqcCompInclusion
+    (R : CommRingCat.{u}) :
+    affineQuasicoherentBoundedDerivedToDqc R ⋙
+        SchemeBoundedQuasicoherentDerivedCategory.ι (Spec R) ≅
+      DerivedCategory.Bounded.ι ⋙ affineQuasicoherentDerivedToDqc R :=
+  (schemeBoundedQuasicoherent (Spec R)).liftCompιIso
+    (DerivedCategory.Bounded.ι ⋙ affineQuasicoherentDerivedToDqc R)
+    (affineQuasicoherentDerivedToDqc_bounded R)
+
 end
 
 end AlgebraicGeometry.DerivedCategory.Dqc
