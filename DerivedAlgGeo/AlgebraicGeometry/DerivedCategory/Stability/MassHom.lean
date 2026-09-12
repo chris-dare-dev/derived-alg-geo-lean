@@ -3,7 +3,10 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.CoherentPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FlatPullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability.BoundedCoherentPullback
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability.BoundedCoherentPushforward
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Stable
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Transfer
 
@@ -118,6 +121,59 @@ theorem hasPerfectMassHomBound_finitePullback
       (σ.boundedCoherentPullback f hpre) := by
   change (σ.preimage (boundedCoherentDerivedPushforward f)
     hpre.preimageData).HasMassHomBound (k := k) (boundedSchemePerfect T.left)
+  exact hσ.preimage adj hpre.preimageData hgen
+
+/-! ## Flat pushforward transfer -/
+
+/-- **The transfer core of the faithfully-flat half of Lemma 7.4, with the
+lower shriek and its generation input explicit.**
+
+Flatness is the hypothesis this statement uses: it supplies the exact bounded
+coherent pullback `f^*` that detects `f_♯σ`, through `isExactPullbackOfFlat`
+and `hasCoherentPullbackOfIsExactPullback`.  Given a linear left adjoint
+`lowerShriek ⊣ f^*`, the abstract preimage theorem transfers a perfect
+mass--Hom bound once the `lowerShriek` images of perfect tests generate the
+target perfect class.
+
+**Why surjectivity is not a hypothesis here.**  Lemma 7.4(2) assumes `f`
+faithfully flat with relative dualizing complex `ω_f^•` in `D_perf`, and those
+two extra assumptions do exactly two jobs.  The dualizing complex builds
+`f_! = f_*(- ⊗ ω_f^•)` together with its adjunction against `f^*`; surjectivity
+makes `f^*` conservative on `Dqc`, which is what the Neeman--Ravenel criterion
+turns into the statement that `f_!` carries a classical generator of `Perf T`
+to one of `Perf U`.  Both jobs are discharged into explicit parameters here --
+`lowerShriek` and `adj` for the first, `hgen` for the second -- because the
+repository owns neither construction.  A `Surjective f.left` binder would
+therefore be inert: it is the hypothesis of results this statement assumes
+rather than proves, and carrying it would claim a geometric input the proof
+never consumes.  Those two constructions are the precise remaining #1033 and
+#723 interfaces; discharging them is what earns back the faithfully flat
+hypothesis, and the name, on a downstream theorem. -/
+theorem hasPerfectMassHomBound_flatPushforward
+    {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
+    [Flat f.left]
+    {k : Type w} [Field k]
+    [Linear k T.BoundedCoherentDerivedFiber]
+    [Linear k U.BoundedCoherentDerivedFiber]
+    [∀ n : ℤ, (shiftFunctor U.BoundedCoherentDerivedFiber n).Linear k]
+    [CategoryTheory.SerreFunctor.HomFinite k T.BoundedCoherentDerivedFiber]
+    [CategoryTheory.SerreFunctor.HomFinite k U.BoundedCoherentDerivedFiber]
+    {Λ : Type u'} [AddCommGroup Λ]
+    {v : K₀ T.BoundedCoherentDerivedFiber →+ Λ}
+    (σ : StabilityCondition.WithClassMap T.BoundedCoherentDerivedFiber v)
+    (hσ : HasPerfectMassHomBound (k := k) T.left σ)
+    (hpre : BoundedCoherentPullbackPreimageData f σ.slicing)
+    (lowerShriek : T.BoundedCoherentDerivedFiber ⥤
+      U.BoundedCoherentDerivedFiber)
+    [lowerShriek.Additive] [lowerShriek.Linear k]
+    (adj : lowerShriek ⊣ boundedCoherentDerivedPullback f)
+    (hgen : boundedSchemePerfect U.left ≤
+      ((boundedSchemePerfect T.left).map lowerShriek).triangEnvelope) :
+    HasPerfectMassHomBound (k := k) U.left
+      (σ.boundedCoherentPushforward f hpre) := by
+  change (σ.preimage (boundedCoherentDerivedPullback f)
+    hpre.preimageData).HasMassHomBound (k := k) (boundedSchemePerfect U.left)
   exact hσ.preimage adj hpre.preimageData hgen
 
 end
