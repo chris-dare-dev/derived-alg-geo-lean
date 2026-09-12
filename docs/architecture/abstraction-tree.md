@@ -187,7 +187,8 @@ Category
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
 │  │  ├─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
-│  │  └─ H⁰ exactness                     all four conventional functors, from endpoint cone preservation
+│  │  ├─ H⁰ exactness                     all four conventional functors, from endpoint cone preservation
+│  │  └─ triangulated equivalences         canonical Mathlib package for twist and cotwist
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
 │     └─ full sphericality                 pending Morita/adjoint-comparison theorem
 ├─ Derived-category extensions

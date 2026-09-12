@@ -7,6 +7,14 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Exact twist and cotwist equivalences on `H⁰` (2026-09-12):
+  `twistH0EquivalenceIsTriangulated` and
+  `cotwistH0EquivalenceIsTriangulated` combine the separately proved ordinary
+  equivalences and exact forward functors using Mathlib's canonical
+  `Equivalence.CommShift` and `Equivalence.IsTriangulated` interfaces.  The
+  compatible shift structure and triangulatedness of each inverse are derived,
+  not assumed or duplicated in a repository-owned record.  This packaging
+  still proves no `K₀` action formula, cone relation, or sphericality.
 - Sign-correct exactness of shifted dg functors (2026-09-12):
   `DGFunctor.shiftedFunctorH0CommShift` composes the canonical comparison on
   `H⁰(F)` with the signed integral-shift package and transports it across

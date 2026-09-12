@@ -125,7 +125,8 @@ EnhancedAdjunctionCones
 │  stated against the unshifted cone functors.  No sphericality, and no relation
 │  among the four.
 └─ TwistCotwistEquivalenceConditions
-   └─ cotwistH0Equivalence spends the unshifted condition on the actual cotwist
+   ├─ cotwistH0Equivalence spends the unshifted condition on the actual cotwist
+   └─ twist/cotwist exact equivalences use Mathlib's canonical package
 
 Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
 ├─ liftedCocycle / conePresentation: noncanonical enhanced lift of any ordinary map
@@ -250,7 +251,10 @@ that comparison are instance hypotheses to be discharged by the realization.
    `shiftedFunctorH0Iso`.  Consequently `dualTwistH0IsTriangulated` and
    `cotwistH0IsTriangulated` close exactness for the two conventional `[-1]`
    functors under the same endpoint chosen-cone hypotheses as their unshifted
-   cones.
+   cones.  Finally `twistH0EquivalenceIsTriangulated` and
+   `cotwistH0EquivalenceIsTriangulated` combine the ordinary equivalence and
+   exactness halves with Mathlib's canonical `Equivalence.IsTriangulated`
+   interface, which derives compatible inverse shift data and exactness.
    None of these results is sphericality, which still needs all four
    Anno--Logvinenko conditions and the Morita framework above.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
