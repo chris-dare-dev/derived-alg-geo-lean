@@ -5,6 +5,8 @@ Released under the MIT license.
 import Mathlib.Algebra.Category.ModuleCat.Descent
 import Mathlib.RingTheory.Localization.BaseChange
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineDerivedEquivalence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
 
 /-!
@@ -23,6 +25,7 @@ pullback on affine `Dqc` is a separate comparison step.
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 
 open CategoryTheory CategoryTheory.Limits
+open CategoryTheory.Pseudofunctor
 open scoped ChangeOfRings
 
 noncomputable section
@@ -177,6 +180,57 @@ instance affineLocalizationDerivedPullback_essSurj :
   mem_essImage E :=
     ⟨(affineLocalizationDerivedRestriction (R := R) (A := A)).obj E,
       ⟨(affineLocalizationDerivedCounitIso (R := R) (A := A) M).app E⟩⟩
+
+/-- Transport localization pullback from derived module categories to the
+genuine derived categories of quasi-coherent sheaves on affine spectra. -/
+def affineQuasicoherentLocalizationPullback :
+    AffineQuasicoherentDerivedCategory (CommRingCat.of R) ⥤
+      AffineQuasicoherentDerivedCategory (CommRingCat.of A) :=
+  equivalenceTransportFunctor
+    (affineQuasicoherentDerivedEquivalence (CommRingCat.of R))
+    (affineQuasicoherentDerivedEquivalence (CommRingCat.of A))
+    (affineLocalizationDerivedPullback M)
+
+/-- Transport restriction of scalars to affine quasi-coherent derived
+categories. -/
+def affineQuasicoherentLocalizationRestriction :
+    AffineQuasicoherentDerivedCategory (CommRingCat.of A) ⥤
+      AffineQuasicoherentDerivedCategory (CommRingCat.of R) :=
+  equivalenceTransportFunctor
+    (affineQuasicoherentDerivedEquivalence (CommRingCat.of A))
+    (affineQuasicoherentDerivedEquivalence (CommRingCat.of R))
+    (affineLocalizationDerivedRestriction (R := R) (A := A))
+
+/-- On affine quasi-coherent derived categories, transported restriction
+followed by localization pullback is naturally isomorphic to the identity. -/
+def affineQuasicoherentLocalizationCounitIso :
+    affineQuasicoherentLocalizationRestriction (R := R) (A := A) ⋙
+        affineQuasicoherentLocalizationPullback (R := R) (A := A) M ≅
+      𝟭 (AffineQuasicoherentDerivedCategory (CommRingCat.of A)) :=
+  equivalenceTransportCompIso
+      (affineQuasicoherentDerivedEquivalence (CommRingCat.of A))
+      (affineQuasicoherentDerivedEquivalence (CommRingCat.of R))
+      (affineQuasicoherentDerivedEquivalence (CommRingCat.of A))
+      (affineLocalizationDerivedRestriction (R := R) (A := A))
+      (affineLocalizationDerivedPullback M)
+      (𝟭 (DerivedCategory (ModuleCat A)))
+      (affineLocalizationDerivedCounitIso M) ≪≫
+    equivalenceTransportIdIso
+      (affineQuasicoherentDerivedEquivalence (CommRingCat.of A))
+      (𝟭 (DerivedCategory (ModuleCat A)))
+      (𝟭 (DerivedCategory (ModuleCat A)))
+      (Iso.refl _) (Iso.refl _)
+
+/-- Localization pullback is essentially surjective on the genuine affine
+quasi-coherent derived categories. -/
+instance affineQuasicoherentLocalizationPullback_essSurj :
+    (affineQuasicoherentLocalizationPullback
+      (R := R) (A := A) M).EssSurj where
+  mem_essImage E :=
+    ⟨(affineQuasicoherentLocalizationRestriction
+        (R := R) (A := A)).obj E,
+      ⟨(affineQuasicoherentLocalizationCounitIso
+        (R := R) (A := A) M).app E⟩⟩
 
 end
 
