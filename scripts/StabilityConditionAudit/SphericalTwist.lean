@@ -132,15 +132,28 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConeH0Equivalence
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistH0Equivalence
 
--- Exactness for the twist: it preserves shifts and chosen cones, so `H⁰` of it
--- commutes with the shift and is a triangulated functor.  Not sphericality:
--- that needs all four Anno--Logvinenko conditions and Morita quasi-functors.
+-- Exactness for all four stored cone functors: shift preservation is
+-- unconditional; chosen-cone preservation and triangulatedness require the
+-- relevant endpoint witnesses.  For dual twist and cotwist these are the
+-- unshifted stored cones, not the conventional `[-1]` functors.  This is not
+-- sphericality: that needs all four Anno--Logvinenko conditions and Morita
+-- quasi-functors.
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistPreservesShifts
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConePreservesShifts
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualTwistConePreservesShifts
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistPreservesShifts
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistH0CommShift
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistPreservesChosenCones
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConePreservesChosenCones
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualTwistConePreservesChosenCones
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistPreservesChosenCones
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistH0IsTriangulated
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConeH0CommShift
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistConeH0IsTriangulated
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualTwistConeH0CommShift
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualTwistConeH0IsTriangulated
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistH0CommShift
+#print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.dualCotwistH0IsTriangulated
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctor
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions
