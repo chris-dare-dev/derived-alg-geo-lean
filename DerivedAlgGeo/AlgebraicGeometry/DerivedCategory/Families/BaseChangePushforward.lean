@@ -61,6 +61,24 @@ theorem functor_obj_obj (P : DqcRightDerivedPushforward f)
     (P.functor.obj E).obj = P.ambient.functor.obj E.obj :=
   rfl
 
+/-- Fullness of ambient right-derived pushforward descends to its `Dqc`
+restriction. -/
+noncomputable instance functor_full (P : DqcRightDerivedPushforward f)
+    [P.ambient.functor.Full] : P.functor.Full := by
+  haveI : (Dqc.SchemeQuasicoherentDerivedCategory.ι T.left ⋙
+      P.ambient.functor).Full := Functor.Full.comp _ _
+  exact Functor.Full.of_comp_faithful_iso
+    (P.functorCompInclusion)
+
+/-- Faithfulness of ambient right-derived pushforward descends to its `Dqc`
+restriction. -/
+instance functor_faithful (P : DqcRightDerivedPushforward f)
+    [P.ambient.functor.Faithful] : P.functor.Faithful := by
+  haveI : (Dqc.SchemeQuasicoherentDerivedCategory.ι T.left ⋙
+      P.ambient.functor).Faithful := Functor.Faithful.comp _ _
+  exact Functor.Faithful.of_comp_iso
+    (P.functorCompInclusion)
+
 /-- A `Dqc` right-derived pushforward preserves intrinsic bounded-coherent complexes. -/
 def PreservesBoundedCoherent (P : DqcRightDerivedPushforward f) : Prop :=
   ∀ E : Dqc.SchemeBoundedCoherentDqcCategory T.left,

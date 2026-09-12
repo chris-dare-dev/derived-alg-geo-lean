@@ -427,6 +427,8 @@ for every instance, as are the identity and composition laws.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.functorCompInclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.functor_obj_obj
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.PreservesCompactObjects
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.essSurj_of_adjunction_counit_isIso
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.essSurj_of_adjunction_of_fullyFaithful
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.CompactDqcFiber
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourcePerfectPart
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.SourcePerfectPartCategory
@@ -748,6 +750,8 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcRightDerivedPushforward.functor
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcRightDerivedPushforward.functorCompInclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcRightDerivedPushforward.functor_obj_obj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcRightDerivedPushforward.functor_full
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcRightDerivedPushforward.functor_faithful
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcRightDerivedPushforward.mapsQuasicoherent
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcRightDerivedPushforward.mk.inj
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcRightDerivedPushforward.mk.sizeOf_spec

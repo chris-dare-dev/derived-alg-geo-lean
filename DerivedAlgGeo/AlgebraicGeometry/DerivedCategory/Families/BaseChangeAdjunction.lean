@@ -24,6 +24,31 @@ universe u
 
 variable {S : Scheme.{u}} {X T U : SchemeBaseChange S} {f : T ⟶ U}
 
+namespace DqcLeftDerivedPullback
+
+/-- A `Dqc` left-derived pullback is essentially surjective when it has a
+right adjoint with invertible counit. -/
+theorem essSurj_of_adjunction_counit_isIso
+    (pull : DqcLeftDerivedPullback f) (push : DqcRightDerivedPushforward f)
+    (adj : pull.functor ⊣ push.functor)
+    (hCounit : ∀ E, IsIso (adj.counit.app E)) : pull.functor.EssSurj := by
+  constructor
+  intro E
+  letI := hCounit E
+  exact adj.mem_essImage_of_counit_isIso E
+
+/-- A `Dqc` left-derived pullback with a fully faithful right adjoint is
+essentially surjective.  For a quasi-compact open immersion, this is the
+formal categorical conclusion once derived pushforward is known to preserve
+quasicoherent cohomology and remain fully faithful. -/
+theorem essSurj_of_adjunction_of_fullyFaithful
+    (pull : DqcLeftDerivedPullback f) (push : DqcRightDerivedPushforward f)
+    (adj : pull.functor ⊣ push.functor) [push.functor.Full]
+    [push.functor.Faithful] : pull.functor.EssSurj :=
+  pull.essSurj_of_adjunction_counit_isIso push adj (fun _ ↦ inferInstance)
+
+end DqcLeftDerivedPullback
+
 namespace KFlatBaseChangeData
 
 /-- An adjunction between the ambient `Dqc` pullback and pushforward restricts to the constructed
