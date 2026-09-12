@@ -30,8 +30,8 @@ open CategoryTheory.Triangulated
 
 /-! ## Exact functor families and exact bifunctors -/
 
--- Shift-coherent functor-valued families, their global shift isomorphism,
--- pointwise exactness, and the bifunctor root built on Mathlib's `CommShift₂Int`.
+-- Functor-valued families built on Mathlib's global `CommShift`, their
+-- pointwise exactness, and the bifunctor root built on `CommShift₂Int`.
 #print axioms CategoryTheory.Functor.ExactBifunctor
 #print axioms CategoryTheory.Functor.ExactBifunctor.firstCommShift
 #print axioms CategoryTheory.Functor.ExactBifunctor.firstFamily
@@ -45,6 +45,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Functor.ExactFamily
 #print axioms CategoryTheory.Functor.ExactFamily.distinguishedTriangleProperty
 #print axioms CategoryTheory.Functor.ExactFamily.evaluationCommShift
+#print axioms CategoryTheory.Functor.ExactFamily.evaluationCommShift_iso_hom_app
 #print axioms CategoryTheory.Functor.ExactFamily.mapDistinguishedTriangle
 #print axioms CategoryTheory.Functor.ExactFamily.mapDistinguishedTriangle_obj_val
 #print axioms CategoryTheory.Functor.ExactFamily.mapTriangle
@@ -55,18 +56,8 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Functor.ExactFamily.mapTriangle_obj_obj₃
 #print axioms CategoryTheory.Functor.ExactFamily.mk.inj
 #print axioms CategoryTheory.Functor.ExactFamily.mk.sizeOf_spec
-#print axioms CategoryTheory.Functor.ExactFamily.toFamilyCommShift
+#print axioms CategoryTheory.Functor.ExactFamily.toCommShift
 #print axioms CategoryTheory.Functor.ExactFamily.triangulated
-#print axioms CategoryTheory.Functor.FamilyCommShift
-#print axioms CategoryTheory.Functor.FamilyCommShift.commShift
-#print axioms CategoryTheory.Functor.FamilyCommShift.commShift_naturality
-#print axioms CategoryTheory.Functor.FamilyCommShift.mk.inj
-#print axioms CategoryTheory.Functor.FamilyCommShift.mk.sizeOf_spec
-#print axioms CategoryTheory.Functor.FamilyCommShift.postShift
-#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIso
-#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIsoApp
-#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIso_hom_app_app
-#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIso_inv_app_app
 
 /-! ## Cohomology exactness (#146) -/
 

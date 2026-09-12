@@ -97,9 +97,9 @@ theorem Correspondence.kernelConeTransformTriangleFunctor_obj_distinguished
 comparisons globally natural in the source object.
 
 This is the Fourier--Mukai name for the generic `Functor.ExactFamily` carried
-by `kernelTransform`.  In particular, its evaluated shift structures are not
-independent choices: `FamilyCommShift.commShift_naturality` assembles them into
-one functor-valued shift isomorphism. -/
+by `kernelTransform`.  Its shift structure is Mathlib's ordinary `CommShift`
+into the pointwise-shifted functor category, so source naturality and the
+zero/addition coherences are part of that canonical interface. -/
 abbrev Correspondence.KernelEvaluationExact (corr : Correspondence X Y W) :=
   Functor.ExactFamily corr.kernelTransform
 
@@ -111,7 +111,7 @@ variable {corr : Correspondence X Y W} (h : corr.KernelEvaluationExact)
 whose kernel-variable exactness has been chosen once. -/
 noncomputable def coneTriangleFunctor (E : X) :
     DGCategory.ConePresentation e.dgCat ⥤ Triangle Y := by
-  letI : (corr.kernelEvaluation E).CommShift ℤ := h.commShift E
+  letI : (corr.kernelEvaluation E).CommShift ℤ := h.evaluationCommShift E
   exact corr.kernelConeTransformTriangleFunctor e E
 
 @[simp]
@@ -119,7 +119,7 @@ theorem coneTriangleFunctor_obj₁ (E : X)
     (A : DGCategory.ConePresentation e.dgCat) :
     ((h.coneTriangleFunctor e E).obj A).obj₁ =
       (corr.transform (e.equiv.functor.obj A.source)).obj E := by
-  letI : (corr.kernelEvaluation E).CommShift ℤ := h.commShift E
+  letI : (corr.kernelEvaluation E).CommShift ℤ := h.evaluationCommShift E
   rfl
 
 @[simp]
@@ -127,7 +127,7 @@ theorem coneTriangleFunctor_obj₂ (E : X)
     (A : DGCategory.ConePresentation e.dgCat) :
     ((h.coneTriangleFunctor e E).obj A).obj₂ =
       (corr.transform (e.equiv.functor.obj A.target)).obj E := by
-  letI : (corr.kernelEvaluation E).CommShift ℤ := h.commShift E
+  letI : (corr.kernelEvaluation E).CommShift ℤ := h.evaluationCommShift E
   rfl
 
 @[simp]
@@ -135,7 +135,7 @@ theorem coneTriangleFunctor_obj₃ (E : X)
     (A : DGCategory.ConePresentation e.dgCat) :
     ((h.coneTriangleFunctor e E).obj A).obj₃ =
       (corr.transform (e.equiv.functor.obj A.cone)).obj E := by
-  letI : (corr.kernelEvaluation E).CommShift ℤ := h.commShift E
+  letI : (corr.kernelEvaluation E).CommShift ℤ := h.evaluationCommShift E
   rfl
 
 /-- Every pointwise transform triangle supplied by kernel-variable exactness
@@ -143,7 +143,7 @@ is distinguished. -/
 theorem coneTriangleFunctor_obj_distinguished [e.equiv.functor.IsTriangulated] (E : X)
     (A : DGCategory.ConePresentation e.dgCat) :
     (h.coneTriangleFunctor e E).obj A ∈ distTriang Y := by
-  letI : (corr.kernelEvaluation E).CommShift ℤ := h.commShift E
+  letI : (corr.kernelEvaluation E).CommShift ℤ := h.evaluationCommShift E
   letI : (corr.kernelEvaluation E).IsTriangulated := h.triangulated E
   exact corr.kernelConeTransformTriangleFunctor_obj_distinguished e E A
 
@@ -183,8 +183,8 @@ constructed pointwise image of the kernel cone. -/
 theorem coneTriangleInSource_obj
     (A : DGCategory.ConePresentation e.dgCat) (E : X) :
     (h.coneTriangleInSource e A).obj E =
-      (h.coneTriangleFunctor e E).obj A :=
-  rfl
+      (h.coneTriangleFunctor e E).obj A := by
+  exact Functor.ExactFamily.mapTriangle_obj h (e.coneTriangleFunctor.obj A) E
 
 /-- Every member of the source-natural transform triangle is distinguished. -/
 theorem coneTriangleInSource_obj_distinguished [e.equiv.functor.IsTriangulated]
