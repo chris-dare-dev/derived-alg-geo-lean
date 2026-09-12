@@ -21,11 +21,9 @@ inverse as a specified quasi-inverse. Its adjunction supplies the expected equiv
 `Hom(L ⊗ M, N) ≃ Hom(M, L⁻¹ ⊗ N)`. Specializing `M` to the tensor unit identifies
 `Hom(L, N)` with the global sections of `L⁻¹ ⊗ N`.
 
-These are equivalences of types. A finite-dimensionality argument over a base field additionally
-needs their scalar-linearity. That is deliberately not asserted here: the present sheafified
-tensor API has no `MonoidalLinear` instance on `X.Modules`. Thus this file closes the categorical
-part of the line-bundle Hom comparison while leaving the exact linear compatibility obligation
-visible to the Serre/Hom-finiteness lane.
+These are equivalences of types. Their scalar-linear refinements live in
+`Modules.Tensor.LineBundleLinear`, downstream of the monoidal-linear structure on module
+sheaves. Keeping that dependency separate leaves this file as the neutral categorical root.
 -/
 
 open CategoryTheory Limits MonoidalCategory
@@ -165,9 +163,9 @@ theorem tensorLeftHomEquiv_symm_apply (L : LineBundleData X) (M N : X.Modules)
 `Hom(L, N) ≃ Γ(X, L⁻¹ ⊗ N)`.
 
 This is the reusable categorical reduction behind the usual proof that Hom spaces between
-coherent sheaves on a projective variety are finite-dimensional. The remaining input for that
-application is a scalar-linear refinement of this equivalence, together with coherence and Serre
-finiteness for `L⁻¹ ⊗ N`. -/
+coherent sheaves on a projective variety are finite-dimensional. Its scalar-linear refinement is
+`lineHomTopLinearEquivOver`; the remaining geometric input is coherence of `L⁻¹ ⊗ N`, after which
+projective Serre finiteness applies. -/
 noncomputable def lineHomTopEquiv (L : LineBundleData X) (N : X.Modules) :
     (L.line ⟶ N) ≃ Γ(tensorObj L.inverse N, ⊤) :=
   (Iso.homCongr (tensorUnitRightIso L.line).symm (Iso.refl N)).trans
