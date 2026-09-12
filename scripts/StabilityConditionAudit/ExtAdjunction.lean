@@ -34,6 +34,7 @@ every degree.
 #print axioms CategoryTheory.extAdjunctionAddEquiv
 #print axioms CategoryTheory.extAdjunctionAddEquiv_apply
 #print axioms CategoryTheory.extAdjunctionLinearMap
+#print axioms CategoryTheory.extAdjunctionLinearMap_apply
 #print axioms CategoryTheory.extAdjunctionLinearEquiv
 #print axioms CategoryTheory.extAdjunctionLinearEquiv_apply
 #print axioms CategoryTheory.Abelian.Ext.precompAddEquiv
