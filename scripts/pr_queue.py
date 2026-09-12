@@ -42,6 +42,8 @@ import subprocess
 import sys
 from collections import Counter
 
+from _output import force_utf8_output
+
 REPO = "chris-dare-dev/derived-alg-geo-lean"
 FIELDS = (
     "number,title,headRefName,isDraft,mergeable,additions,files,statusCheckRollup,"
@@ -210,4 +212,5 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     sys.exit(main(sys.argv[1:]))

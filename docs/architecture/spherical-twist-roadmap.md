@@ -46,8 +46,11 @@ IsConeOf
    ├─ additivity, identity, composition laws for strict squares
    ├─ projection and inclusion formulas
    ├─ lift := homogeneousLift 0, HomotopySquare := degree-zero square + closedness
+   │  ├─ HomotopySquare.strict: a commuting square with zero homotopy
    │  └─ IsConeOf.Morphism with the shift-free `fst` square
    │     └─ ConePresentation category, no pretriangulated instance needed
+   ├─ isoOfStrictSquare: endpoint isomorphisms in a strict square induce a
+   │  canonical Z⁰ isomorphism of arbitrary chosen cones
    └─ HomogeneousNatTrans.ConeData
          ├─ objectwise cone choices
          ├─ assembled cone DGFunctor
@@ -56,6 +59,7 @@ IsConeOf
          ├─ isConeOf: a cone in the dg category DGFunctor C D itself, so the
          │  twist candidate is a cone OF FUNCTORS, the form in which
          │  Anno--Logvinenko state SR ⟶ Id_B ⟶ T
+         ├─ isoOfStrictSquare: the generic cone isomorphism in Z⁰(DGFunctor C D)
          └─ triangleFunctor: H⁰ C ⥤ Triangle (H⁰ D), every value distinguished;
             the third square is the connecting map, carried by IsConeOf.Morphism
             ├─ triangleNatTrans: natural in a STRICT square of closed
@@ -78,13 +82,24 @@ DGAdjunction
       adjunction spherical, and does not relate it to the other three
       triangles; UnitConeData carries the unshifted unit side.
 
+HasCopower K X / HasCopowers C
+└─ copowerData: a noncomputably selected CopowerData witness
+
+HasEvaluationData E
+├─ chosenEvaluationData: a noncomputably selected EvaluationData witness
+└─ supplied automatically by HasCopowers C
+
 EvaluationData E
 ├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
-└─ TwistConeData: the object twist T_E = Cone(evaluation), with its triangle
-   functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished, and H⁰(T_E)
-   triangulated as soon as RHom(E,-) ⊗ E preserves chosen cones (shifts are
-   free for every dg functor).
-   No adjunction, no invertibility, no sphericality.
+├─ compareIso: canonical Z⁰ isomorphism between any two choices, strictly
+│  compatible with evaluation
+└─ TwistConeData: the object twist T_E = Cone(evaluation)
+   ├─ compareIso: canonical coherent Z⁰ isomorphism across both evaluation and
+   │  cone choices, strictly compatible with id ⟶ T_E
+   ├─ triangle functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished, and
+      H⁰(T_E) triangulated as soon as RHom(E,-) ⊗ E preserves chosen cones
+      (shifts are free for every dg functor).
+   └─ no adjunction, no autoequivalence, no sphericality
 
 EnhancedAdjunctionCones
 ├─ twist and dual-cotwist cones
@@ -138,10 +153,26 @@ that comparison are instance hypotheses to be discharged by the realization.
    nothing -- each closed and invertible, so each is an isomorphism in the dg
    category of dg functors rather than merely a map.
 
-   What is still missing is the *associativity* coherence between the two
-   `shiftedFunctorAdd` isomorphisms for a triple `n, m, k`, and any statement
-   assembling the family into a `HasShift`-style structure.  Neither is needed
-   by the triangles below, which is why this slice stopped here.
+   This family is now assembled into Mathlib's shift interface at the first
+   ordinary categorical boundary where that statement makes sense:
+   `DGFunctor.z0HasShift` is a `HasShift (Z0 (DGFunctor C D)) ℤ` instance.
+   Its functors are `DGFunctor.z0ShiftFunctor`; they act on closed degree-zero
+   transformations by `HomogeneousNatTrans.shiftedDegreeZero`, whose identity
+   and composition laws are explicit.  Its zero and addition isomorphisms are
+   `z0ShiftFunctorZeroIso` and `z0ShiftFunctorAddIso`.  The latter uses
+   `shiftedFunctorAddInv` as its `hom`, because Mathlib points from the total
+   shift to the iterated shift, and `shiftedFunctorAdd` as its `inv`.
+
+   `DGFunctor.z0ShiftMkCore` proves all three standard coherences.  Its
+   associativity law reuses `DGFunctor.shiftedFunctorAdd_assoc`: the inverse
+   paths of the two categorical composites are exactly
+   `shiftedFunctorAddAssocLeft` and `shiftedFunctorAddAssocRight`.  The two
+   unit laws identify addition by zero with, respectively, the shifted inverse
+   zero comparison and the inverse zero comparison on the shifted functor.
+   Nothing parallel is installed on `H0 (DGFunctor C D)`: that category
+   already receives the generic `H0.hasShift` from its pretriangulated dg
+   structure, so a second instance would duplicate an existing abstraction.
+   The dg-functor shift packaging seam is therefore closed.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
@@ -167,12 +198,26 @@ that comparison are instance hypotheses to be discharged by the realization.
    four Anno--Logvinenko conditions and the Morita framework the first
    paragraph rules out.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
-   shift on a functor category, which is what `Functor.ExactFamily` should be
-   built on.  That rewiring is still open, and it is not an API-only change:
-   `ExactBifunctor` records triangulatedness against the shift structure it
-   chose, while the family needs it against that choice composed with the
-   strict comparison for evaluation, so the transport needs a lemma comparing
-   the two `mapTriangle`s.
+   shift on a functor category, and `Functor.ExactFamily` is now built on that
+   canonical structure: it extends Mathlib's `F.CommShift ℤ` and adds only
+   pointwise triangulatedness.  The former `FamilyCommShift` record, its
+   separately stored evaluated comparisons, and its manual naturality field
+   have been removed.
+
+   The bifunctor projection is coherent at the data level, not only at the
+   level of comparison maps.  `Functor.CommShift₂.firstFamilyCommShift` and
+   `secondFamilyCommShift` assemble the two functor-valued `CommShift`
+   structures explicitly from Mathlib's `CommShift₂`; they are not global
+   instances.  After composition with the strict evaluation comparison,
+   `firstFamilyEvaluationCommShift_eq` and
+   `secondFamilyEvaluationCommShift_eq` identify them with the partial
+   structures already selected by `CommShift₂`.  Thus `ExactBifunctor`
+   still retains the Koszul compatibility between its two variables, while
+   its two `ExactFamily` projections transport triangulatedness across an
+   equality of the complete `CommShift` data.  Evaluation of
+   `ExactFamily.mapTriangle` is consequently proved against Mathlib's
+   ordinary `mapTriangle`; no parallel triangle-map interface remains.  This
+   seam is closed.
 4. `EvaluationData.functor` is the generic `RHom(E,-) ⊗ E` dg functor and
    `EvaluationData.evaluation` its degree-zero transformation to the identity,
    both in `Algebra/Homology/DGCategory/Copower.lean`.  They are built on
@@ -180,7 +225,23 @@ that comparison are instance hypotheses to be discharged by the realization.
    shift -- by its universal property, as data plus a bijectivity condition --
    because `HomologicalComplex.HasTensor` does not synthesize for the
    `ℤ`-indexed shape at the pin, so there is no tensor product of complexes to
-   build the object with.
+   build the object with.  `HasCopower K X` and `HasCopowers C` now package
+   mere existence in Mathlib's `HasLimit` style: the classes contain no
+   preferred object, while `copowerData` makes a noncomputable selection for
+   consumers.  The narrower `HasEvaluationData E` is exactly the capability
+   needed here, and follows automatically from `HasCopowers C`.
+
+   This choice is coherent rather than merely available.  The canonical
+   comparison between two copowers is closed and composes strictly, so any two
+   `EvaluationData E` choices determine a canonical isomorphism
+   `EvaluationData.compareIso` in `Z⁰ (DGFunctor C C)`.  The theorem
+   `compare_comp_evaluation` says that this isomorphism commutes strictly with
+   their evaluation transformations.  Thus later consumers may depend on the
+   existence capability without treating a selected evaluation family as
+   mathematically significant.  Moreover,
+   `DGFunctor.PreservesChosenCones.ofIso` transports strong cone preservation
+   across any such dg-functor isomorphism, so the cone-preservation hypothesis
+   used for exactness is independent of the selected evaluation data.
 
    The functor is not inert.  `evaluation_isClosed` gives the transformation
    objectwise cones, so `EvaluationData.TwistConeData` is the Seidel--Thomas
@@ -207,12 +268,20 @@ that comparison are instance hypotheses to be discharged by the realization.
    the universal property the copower is given by, and a cone, unlike a shift,
    is not an invertible element that functoriality carries over.
 
-   What is open is *existence*.  Nothing constructs a copower, so nothing
-   produces an `EvaluationData`; a dg category with enough copowers has to
-   supply one, exactly as `IsPretriangulated` supplies cone and shift choices.
-   And no theorem relates the object twist to a spherical object: that
-   comparison needs `Perf(k)` as a dg category, which the repository does not
-   have, so nothing here calls `E` spherical or claims `T_E` is invertible.
+   What is open is *concrete existence*: no dg category in the repository yet
+   supplies a `HasCopowers` instance.  The generic existence/choice interface
+   and its independence theorem are closed, as is choice-independence of the
+   cone-preservation capability.  The cone-comparison seam is also closed at
+   dg-functor level: `IsConeOf.isoOfStrictSquare` lifts endpoint isomorphisms in
+   a strict square, and `EvaluationData.TwistConeData.compareIso` applies it to
+   the evaluation square.  These comparisons commute strictly with the
+   inclusion `id ⟶ T_E`, are identities on one choice, and compose strictly.
+   Packaging the corresponding isomorphism of the full H⁰ triangle functors
+   across *different evaluation transformations* remains separate if a later
+   consumer needs it.  And no theorem relates the object twist to a spherical
+   object: that comparison needs `Perf(k)` as a dg category, which the
+   repository does not have, so nothing here calls `E` spherical or claims
+   `T_E` is an autoequivalence.
 5. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
    transformed arrow is the counit.  The enhancement of the kernel category,

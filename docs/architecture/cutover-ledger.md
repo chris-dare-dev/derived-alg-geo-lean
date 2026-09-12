@@ -7,6 +7,44 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- DG cone comparison and preservation transport (2026-09-12):
+  `Algebra/Homology/DGCategory/Pretriangulated/Functor.lean` proves that
+  `DGFunctor.PreservesChosenCones` transports across an isomorphism in
+  `Z⁰ (DGFunctor C D)`.  Consequently the exactness hypothesis for an object
+  twist is independent of the chosen evaluation data once the evaluation
+  functors are compared.  `Pretriangulated/Lift.lean` owns the reusable
+  `IsConeOf.isoOfStrictSquare`: endpoint isomorphisms in a strictly commuting
+  square lift to an isomorphism between arbitrary chosen cones.
+  `Pretriangulated/NaturalTransformationCone.lean` specializes it to cone dg
+  functors, and `Pretriangulated/ObjectTwist.lean` gives the resulting
+  `TwistConeData.compareIso`, strict compatibility with `id ⟶ T_E`, and strict
+  identity/composition coherence.  This identifies the twist dg functor
+  independently of both evaluation and cone choices; it does not assert
+  autoequivalence or sphericality.
+- DG copower and evaluation-data existence packaging (2026-09-12):
+  `Algebra/Homology/DGCategory/Copower.lean` owns the Mathlib-style
+  `HasCopower` and `HasCopowers` mere-existence capabilities, their
+  noncomputable `copowerData` selector returning a `CopowerData` witness, and
+  the narrower `HasEvaluationData E` capability consumed by object twists. It
+  also proves
+  that canonical copower comparisons are closed and compose strictly, then
+  assembles these into `EvaluationData.compareIso` in
+  `Z⁰ (DGFunctor C C)` with strict compatibility with evaluation. No
+  concrete dg category is asserted to have all copowers, and no cone-
+  preservation claim is derived from the mapping-out universal property.
+- Exact functor-family shift coherence (2026-09-12):
+  `CategoryTheory/Triangulated/ExactFunctorFamily.lean` now makes
+  `Functor.ExactFamily F` extend Mathlib's `F.CommShift ℤ` for the pointwise
+  shift on the target functor category, and adds only pointwise
+  triangulatedness. The parallel `FamilyCommShift` record and its manually
+  stored evaluation naturality are removed. The generic extensionality
+  theorem for `CommShift` lives at the mirrored Mathlib definition site in
+  `CategoryTheory/Shift/CommShift.lean`; the explicit, non-instance adapters
+  from `CommShift₂` and their evaluation-agreement theorems live in
+  `CategoryTheory/Shift/FunctorCategory.lean`. Thus `ExactBifunctor` retains
+  Mathlib's two-variable Koszul contract while its two family projections use
+  the canonical one-variable interface, with complete shift-data agreement
+  rather than an isolated comparison at shift one.
 - Bounded dévissage for the derived functor of an exact functor
   (2026-09-10, #1069/#1070/#1071):
   `Algebra/Homology/DerivedCategory/CohomologyObjectProperty/Bounded.lean` owns

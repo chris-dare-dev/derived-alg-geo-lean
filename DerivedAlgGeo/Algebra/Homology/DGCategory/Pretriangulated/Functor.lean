@@ -3,16 +3,19 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Functor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformation
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Basic
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Lift
 
 /-!
 # Preservation of pretriangulated dg structure
 
-An arbitrary dg functor need not preserve the representability witnesses that
-define shifts in a pretriangulated dg category. `DGFunctor.PreservesShifts`
-records that capability entirely at the dg level.  Transport of this data to
-the ordinary shift functors on `H⁰` belongs to the dg-enhancement layer.
+Every dg functor preserves the representability witnesses that define shifts:
+`DGFunctor.preservesShifts` supplies the dg-level capability automatically.
+Preservation of chosen cone witnesses remains genuine extra data, recorded by
+`DGFunctor.PreservesChosenCones`, but this capability transports across
+isomorphisms in `Z⁰ (DGFunctor C D)`.  Transport to the ordinary shift functors
+and cone triangles on `H⁰` belongs to the dg-enhancement layer.
 -/
 
 set_option autoImplicit false
@@ -165,6 +168,237 @@ def comp {F : DGFunctor C D} {G : DGFunctor D E}
   mapCone_inl hc := by
     rw [hG.mapCone_inl, hF.mapCone_inl]
     rfl
+
+section Iso
+
+variable {F G : Z0 (DGFunctor C D)}
+
+private lemma iso_hom_inv_app (e : F ≅ G) (X : C) :
+    dgComp 0 0 0 (by omega)
+        (HomogeneousNatTrans.app e.hom.val X)
+        (HomogeneousNatTrans.app e.inv.val X) =
+      dgId ((Z0.of (DGFunctor C D) F).obj X) := by
+  have h := congrArg Subtype.val e.hom_inv_id
+  change HomogeneousNatTrans.composition
+      (Z0.of (DGFunctor C D) F) (Z0.of (DGFunctor C D) G)
+      (Z0.of (DGFunctor C D) F) 0 0 0 (by omega)
+      e.hom.val e.inv.val =
+    HomogeneousNatTrans.id (Z0.of (DGFunctor C D) F) at h
+  have hX := congrArg (fun θ => HomogeneousNatTrans.app θ X) h
+  rw [HomogeneousNatTrans.composition_apply_app,
+    HomogeneousNatTrans.id_app] at hX
+  exact hX
+
+private lemma iso_inv_hom_app (e : F ≅ G) (X : C) :
+    dgComp 0 0 0 (by omega)
+        (HomogeneousNatTrans.app e.inv.val X)
+        (HomogeneousNatTrans.app e.hom.val X) =
+      dgId ((Z0.of (DGFunctor C D) G).obj X) := by
+  have h := congrArg Subtype.val e.inv_hom_id
+  change HomogeneousNatTrans.composition
+      (Z0.of (DGFunctor C D) G) (Z0.of (DGFunctor C D) F)
+      (Z0.of (DGFunctor C D) G) 0 0 0 (by omega)
+      e.inv.val e.hom.val =
+    HomogeneousNatTrans.id (Z0.of (DGFunctor C D) G) at h
+  have hX := congrArg (fun θ => HomogeneousNatTrans.app θ X) h
+  rw [HomogeneousNatTrans.composition_apply_app,
+    HomogeneousNatTrans.id_app] at hX
+  exact hX
+
+private lemma compRight_hom_bijective (e : F ≅ G) (W : D) (X : C) (p : ℤ) :
+    Function.Bijective (fun f : (dgHom W ((Z0.of (DGFunctor C D) F).obj X)).X p =>
+      dgComp p 0 p (by omega) f (HomogeneousNatTrans.app e.hom.val X)) := by
+  constructor
+  · intro f g hfg
+    have h := congrArg (fun k => dgComp p 0 p (by omega) k
+      (HomogeneousNatTrans.app e.inv.val X)) hfg
+    simpa only [dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega),
+      iso_hom_inv_app e X, dgComp_id] using h
+  · intro g
+    refine ⟨dgComp p 0 p (by omega) g (HomogeneousNatTrans.app e.inv.val X), ?_⟩
+    change dgComp p 0 p (by omega)
+      (dgComp p 0 p (by omega) g (HomogeneousNatTrans.app e.inv.val X))
+      (HomogeneousNatTrans.app e.hom.val X) = g
+    rw [dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega),
+      iso_inv_hom_app e X, dgComp_id]
+
+private lemma compRight_inv_bijective (e : F ≅ G) (W : D) (X : C) (p : ℤ) :
+    Function.Bijective (fun f : (dgHom W ((Z0.of (DGFunctor C D) G).obj X)).X p =>
+      dgComp p 0 p (by omega) f (HomogeneousNatTrans.app e.inv.val X)) := by
+  constructor
+  · intro f g hfg
+    have h := congrArg (fun k => dgComp p 0 p (by omega) k
+      (HomogeneousNatTrans.app e.hom.val X)) hfg
+    simpa only [dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega),
+      iso_inv_hom_app e X, dgComp_id] using h
+  · intro g
+    refine ⟨dgComp p 0 p (by omega) g (HomogeneousNatTrans.app e.hom.val X), ?_⟩
+    change dgComp p 0 p (by omega)
+      (dgComp p 0 p (by omega) g (HomogeneousNatTrans.app e.hom.val X))
+      (HomogeneousNatTrans.app e.inv.val X) = g
+    rw [dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega),
+      iso_hom_inv_app e X, dgComp_id]
+
+private def ofIsoAux (hF : PreservesChosenCones (Z0.of (DGFunctor C D) F))
+    (e : F ≅ G) : PreservesChosenCones (Z0.of (DGFunctor C D) G) where
+  mapCone {X Y Z f} hc :=
+    { inr := (Z0.of (DGFunctor C D) G).map 0 hc.inr
+      inr_closed := by
+        rw [← (Z0.of (DGFunctor C D) G).map_d 0 1 hc.inr,
+          hc.inr_closed, map_zero]
+      inl := (Z0.of (DGFunctor C D) G).map (-1) hc.inl
+      δ_inl := by
+        rw [← (Z0.of (DGFunctor C D) G).map_d (-1) 0 hc.inl,
+          hc.δ_inl, (Z0.of (DGFunctor C D) G).map_comp]
+      bijective := by
+        intro W p q hq
+        have hX := compRight_inv_bijective e W X q
+        have hY := compRight_inv_bijective e W Y p
+        have hpair : Function.Bijective (fun ab :
+            (dgHom W ((Z0.of (DGFunctor C D) G).obj X)).X q ×
+              (dgHom W ((Z0.of (DGFunctor C D) G).obj Y)).X p =>
+            (dgComp q 0 q (by omega) ab.1
+                (HomogeneousNatTrans.app e.inv.val X),
+              dgComp p 0 p (by omega) ab.2
+                (HomogeneousNatTrans.app e.inv.val Y))) := by
+          constructor
+          · intro ab ab' hab
+            apply Prod.ext
+            · exact hX.injective (congrArg (fun pair => pair.1) hab)
+            · exact hY.injective (congrArg (fun pair => pair.2) hab)
+          · intro ab
+            obtain ⟨a, ha⟩ := hX.surjective ab.1
+            obtain ⟨b, hb⟩ := hY.surjective ab.2
+            exact ⟨(a, b), Prod.ext ha hb⟩
+        have hZ := compRight_hom_bijective e W Z p
+        have hnatInl := HomogeneousNatTrans.naturality e.hom.val (-1) (-1)
+          (by omega) (by omega) hc.inl
+        rw [zero_mul, Int.negOnePow_zero, one_smul] at hnatInl
+        have hnatInr := HomogeneousNatTrans.naturality e.hom.val 0 0
+          (by omega) (by omega) hc.inr
+        rw [zero_mul, Int.negOnePow_zero, one_smul] at hnatInr
+        have htermX (a : (dgHom W ((Z0.of (DGFunctor C D) G).obj X)).X q) :
+            dgComp p 0 p (by omega)
+                (dgComp q (-1) p (by omega)
+                  (dgComp q 0 q (by omega) a (HomogeneousNatTrans.app e.inv.val X))
+                  ((Z0.of (DGFunctor C D) F).map (-1) hc.inl))
+                (HomogeneousNatTrans.app e.hom.val Z) =
+              dgComp q (-1) p (by omega) a
+                ((Z0.of (DGFunctor C D) G).map (-1) hc.inl) := by
+          calc
+            _ = dgComp q (-1) p (by omega)
+                (dgComp q 0 q (by omega) a (HomogeneousNatTrans.app e.inv.val X))
+                (dgComp (-1) 0 (-1) (by omega)
+                  ((Z0.of (DGFunctor C D) F).map (-1) hc.inl)
+                  (HomogeneousNatTrans.app e.hom.val Z)) :=
+              dgComp_assoc q (-1) 0 p (-1) p
+                (by omega) (by omega) (by omega) _ _ _
+            _ = dgComp q (-1) p (by omega)
+                (dgComp q 0 q (by omega) a (HomogeneousNatTrans.app e.inv.val X))
+                (dgComp 0 (-1) (-1) (by omega)
+                  (HomogeneousNatTrans.app e.hom.val X)
+                  ((Z0.of (DGFunctor C D) G).map (-1) hc.inl)) := by
+              rw [hnatInl]
+            _ = dgComp q (-1) p (by omega)
+                (dgComp q 0 q (by omega)
+                  (dgComp q 0 q (by omega) a (HomogeneousNatTrans.app e.inv.val X))
+                  (HomogeneousNatTrans.app e.hom.val X))
+                ((Z0.of (DGFunctor C D) G).map (-1) hc.inl) := by
+              exact (dgComp_assoc q 0 (-1) q (-1) p
+                (by omega) (by omega) (by omega) _ _ _).symm
+            _ = dgComp q (-1) p (by omega)
+                (dgComp q 0 q (by omega) a
+                  (dgComp 0 0 0 (by omega)
+                    (HomogeneousNatTrans.app e.inv.val X)
+                    (HomogeneousNatTrans.app e.hom.val X)))
+                ((Z0.of (DGFunctor C D) G).map (-1) hc.inl) := by
+              exact congrArg (fun k :
+                  (dgHom W ((Z0.of (DGFunctor C D) G).obj X)).X q =>
+                  dgComp q (-1) p (by omega) k
+                    ((Z0.of (DGFunctor C D) G).map (-1) hc.inl))
+                (dgComp_assoc q 0 0 q 0 q
+                  (by omega) (by omega) (by omega) a
+                  (HomogeneousNatTrans.app e.inv.val X)
+                  (HomogeneousNatTrans.app e.hom.val X))
+            _ = _ := by rw [iso_inv_hom_app e X, dgComp_id]
+        have htermY (b : (dgHom W ((Z0.of (DGFunctor C D) G).obj Y)).X p) :
+            dgComp p 0 p (by omega)
+                (dgComp p 0 p (by omega)
+                  (dgComp p 0 p (by omega) b (HomogeneousNatTrans.app e.inv.val Y))
+                  ((Z0.of (DGFunctor C D) F).map 0 hc.inr))
+                (HomogeneousNatTrans.app e.hom.val Z) =
+              dgComp p 0 p (by omega) b
+                ((Z0.of (DGFunctor C D) G).map 0 hc.inr) := by
+          calc
+            _ = dgComp p 0 p (by omega)
+                (dgComp p 0 p (by omega) b (HomogeneousNatTrans.app e.inv.val Y))
+                (dgComp 0 0 0 (by omega)
+                  ((Z0.of (DGFunctor C D) F).map 0 hc.inr)
+                  (HomogeneousNatTrans.app e.hom.val Z)) :=
+              dgComp_assoc p 0 0 p 0 p
+                (by omega) (by omega) (by omega) _ _ _
+            _ = dgComp p 0 p (by omega)
+                (dgComp p 0 p (by omega) b (HomogeneousNatTrans.app e.inv.val Y))
+                (dgComp 0 0 0 (by omega)
+                  (HomogeneousNatTrans.app e.hom.val Y)
+                  ((Z0.of (DGFunctor C D) G).map 0 hc.inr)) := by
+              rw [hnatInr]
+            _ = dgComp p 0 p (by omega)
+                (dgComp p 0 p (by omega)
+                  (dgComp p 0 p (by omega) b (HomogeneousNatTrans.app e.inv.val Y))
+                  (HomogeneousNatTrans.app e.hom.val Y))
+                ((Z0.of (DGFunctor C D) G).map 0 hc.inr) := by
+              exact (dgComp_assoc p 0 0 p 0 p
+                (by omega) (by omega) (by omega) _ _ _).symm
+            _ = dgComp p 0 p (by omega)
+                (dgComp p 0 p (by omega) b
+                  (dgComp 0 0 0 (by omega)
+                    (HomogeneousNatTrans.app e.inv.val Y)
+                    (HomogeneousNatTrans.app e.hom.val Y)))
+                ((Z0.of (DGFunctor C D) G).map 0 hc.inr) := by
+              exact congrArg (fun k :
+                  (dgHom W ((Z0.of (DGFunctor C D) G).obj Y)).X p =>
+                  dgComp p 0 p (by omega) k
+                    ((Z0.of (DGFunctor C D) G).map 0 hc.inr))
+                (dgComp_assoc p 0 0 p 0 p
+                  (by omega) (by omega) (by omega) b
+                  (HomogeneousNatTrans.app e.inv.val Y)
+                  (HomogeneousNatTrans.app e.hom.val Y))
+            _ = _ := by rw [iso_inv_hom_app e Y, dgComp_id]
+        have hfactor : (fun ab :
+            (dgHom W ((Z0.of (DGFunctor C D) G).obj X)).X q ×
+              (dgHom W ((Z0.of (DGFunctor C D) G).obj Y)).X p =>
+            dgComp q (-1) p (by omega) ab.1
+                ((Z0.of (DGFunctor C D) G).map (-1) hc.inl) +
+              dgComp p 0 p (by omega) ab.2
+                ((Z0.of (DGFunctor C D) G).map 0 hc.inr)) =
+            (fun z => dgComp p 0 p (by omega) z
+                (HomogeneousNatTrans.app e.hom.val Z)) ∘
+              (fun ab =>
+                dgComp q (-1) p (by omega) ab.1 (hF.mapCone hc).inl +
+                  dgComp p 0 p (by omega) ab.2 (hF.mapCone hc).inr) ∘
+              (fun ab =>
+                (dgComp q 0 q (by omega) ab.1
+                    (HomogeneousNatTrans.app e.inv.val X),
+                  dgComp p 0 p (by omega) ab.2
+                    (HomogeneousNatTrans.app e.inv.val Y))) := by
+          funext ab
+          simp only [Function.comp_apply]
+          rw [hF.mapCone_inl, hF.mapCone_inr]
+          rw [map_add, AddMonoidHom.add_apply, htermX, htermY]
+        rw [hfactor]
+        exact hZ.comp ((hF.mapCone hc).bijective W p q hq |>.comp hpair) }
+  mapCone_inr _ := rfl
+  mapCone_inl _ := rfl
+
+end Iso
+
+/-- Strong preservation of the chosen cone witnesses is invariant under an
+isomorphism of dg functors in the closed degree-zero category. -/
+def ofIso {F G : DGFunctor C D} (hF : PreservesChosenCones F)
+    (e : (show Z0 (DGFunctor C D) from F) ≅
+      (show Z0 (DGFunctor C D) from G)) : PreservesChosenCones G :=
+  ofIsoAux hF e
 
 /-- The projection from an image cone to its source is the image of the source
 cone projection.  This is forced by uniqueness of the cone splitting; it is

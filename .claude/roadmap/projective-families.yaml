@@ -99,6 +99,7 @@ generations:
   - { rev: 26, at: "2026-09-03", note: "Nineteenth slice of #1033, the categorical Theorem 2.8(3): semistability is detected by base change. The coaisle of a compactly generated t-structure is closed under coproducts (TStructure.IsCompactlyGeneratedBy.isGE_one_coproduct, CompactlyGenerated/Coaisle.lean: a map from a compact generator into a coproduct is a finite sum of maps into the summands, and right orthogonality passes to the coproduct-and-extension closure), an object is semistable of phase φ exactly when its HN phases are at least φ and below every ψ > φ (Slicing.semistable_iff_geProp_ltProp, Slicing/CoreConsequences.lean, the first file downstream of all of phiPlus/phiMinus, geProp_of_semistable and semistable_of_phiPlus_eq_phiMinus), so with the Ind-extensions, whose aisles are closed under coproducts by Lemma A.14(i), E is semistable of phase φ iff a nonempty coproduct of copies of it lies in the aisle of τ̂'_φ and the coaisles of τ̂'_ψ for ψ > φ (Slicing.IndExtensions.semistable_iff_isLE_zero_and_isGE_one_of_iso_coproduct, Phase/Transfer/BaseChange.lean, forward by closure under coproducts and backward by closure under retracts), which constrains the coproduct only as an object of D, and when the coproduct itself lies in Q the two conditions reassemble into semistability there (semistable_iff_semistable_of_iso_coproduct), hence for the preimage slicing along F on F⁻¹ Q, E is semistable iff L E is when F L E is a nonempty coproduct of copies of E (semistable_iff_preimage_of_coproduct; no adjunction is used, only the isomorphism, and semistability on the right is that of F L E by definition of the preimage slicing): the categorical Theorem 2.8(3) with F = π_*, L = π^*, π_* π^* E = E ⊗_k ℓ, for a FINITE extension. For an infinite one E ⊗_k ℓ is not coherent, so hQL cannot hold at E and both Q-level statements are vacuous; what the still-open large-target statement of rev 25 will consume is the D-level reduction together with isLE_zero_coproduct and isGE_one_coproduct, none of which mention Q. Coproducts are indexed by Type, as IsCompactObject.exists_finite_sum is. Next in §3.3: Lemma 3.10(1.a), the equivalence of (3.3) and (3.4) under base change, which combines this with Theorem 2.8(1) at Ind-extension level." }
   - { rev: 27, at: "2026-09-03", note: "Twentieth slice of #1033, the last purely categorical piece of Theorem 2.8(1) at the level of the phase-indexed t-structures: Corollary A.23 with recognition against the large target. Slicing.IndExtensions.largePhase (Phase/Transfer/IndExtensions.lean) is the phase collection of the Ind-slicing in the ambient category, the aisle of tau_phi cut against the coaisles of tau_psi for psi > phi; largePhase_iff_semistable identifies it with s.P on Q (both halves Lemma A.14(iii), reassembled by semistable_iff_geProp_ltProp of rev 26). Note the primed/unprimed distinction: Theorem 2.8(1) states its recognition on the cuts of the unprimed tau_phi, while IndExtensions carries the primed family that Corollary A.23 uses, and largePhase is the intersection of the primed cuts. Slicing.IndExtensions.InducedTStructuresLarge (Phase/Transfer/Inducing.lean) is the large-target twin of Slicing.InducedTStructures: formulas (A.8) against tau_phi with no target subcategory, so it is statable where s.geProp and s.ltProp are not, which for an arbitrary field extension is everywhere outside Q. Unlike the bounded twin it also carries Step 4 boundedness, which the bounded twin can drop because it never truncates on the source. Its hom_vanishing, stated on the pulled-back collection largePreimagePhase, is shorter than the bounded twin's because largePhase already carries coaisle membership at every psi > phi, so no target HN filtration is needed; ofIso transports it along a natural isomorphism, and toInducedTStructures / ofInducedTStructures make it interderivable with the bounded shape whenever the detecting functor factors through Q (the converse direction must be handed boundedness), so it extends rather than competes. nonempty_inducedTStructuresLarge is Corollary A.23 in that shape, on Polishchuk.induceLarge of rev 25 at every phase. Its hbdd (F sends P into the tau_phi-bounded objects) is the one hypothesis this shape adds over nonempty_inducedTStructures_of_le, which bought it from hle; for F = pi_* it is the descent to a finite subextension of Remark A.12(3), and it JOINS rather than replaces hzero, hG/htC and htrunc on the list of geometric inputs still open for pi. Assembling the output into a Slicing is the accounting of Slicing.PreimageData with one entry moved: closure under isomorphisms and zero membership are still formal, hom_vanishing is now supplied, and two are open -- the shift law, since there is no slicing on D to borrow it from and IndExtensions relates two phases only by the aisle inclusion le_zero_anti (never by the shift), so Phat(phi) shifted by one equals Phat(phi+1) needs a coprodClosure shift equality the repository does not have; and HN existence for largePreimagePhase, which cannot be got the bounded twin's way (Slicing.InducedTStructures.hn_exists lifts a TARGET HN filtration and the ambient category carries no slicing) and needs the finite phase-truncation argument run on the source. Also in this slice: rev 26's semistable_iff_isLE_zero_and_isGE_one_of_iso_coproduct is renamed semistable_iff_largePhase_of_iso_coproduct and restated through largePhase, the normal form, which did not exist when rev 26 landed; there is one name for that statement, not two. Next: the shift law and the HN half, after which Theorem 2.8(1) closes categorically; then Lemma 3.10(1.a)." }
   - { rev: 28, at: "2026-09-03", note: "Twenty-first slice of #1033, the phase shift for the Ind-slicing, and with it the slicing P_l itself modulo Harder-Narasimhan existence. ObjectProperty.coprodClosure_le_shift_of_le_shift (Triangulated/CompactlyGenerated.lean) transports the coproduct-and-extension closure into a shift of a DIFFERENT property, which is what distinguishes it from the homogeneous coprodClosure_le_shift of CompactlyGenerated/Existence.lean; the aisles it compares sit at two phases. coprodClosure_map_obj cannot do it, for a library reason rather than a mathematical one: Mathlib installs no CommShift instance on shiftFunctor C n, three rotations of a distinguished triangle returning the shift with all three morphisms negated, so only a sign-corrected commutation isomorphism makes the shift triangulated and none is registered. The signs land on the morphisms, and coprodClosure constrains only the OBJECTS of the triangle in its extension constructor, so Pretriangulated.Triangle.shift_distinguished suffices and the induction goes through. With Slicing.geProp_shift and closure of Q under the shift that gives boundedAisle_shift, hence isLE_zero_shift: the aisles of the Ind-extensions shift with the phase. Definition A.22 asserts nothing relating two phases (rev 27 recorded le_zero_anti, the aisle inclusion, as the only relation), so this is a theorem and not an axiom, resting on clause (i) of Lemma A.14 pinning each aisle to Coprod(P(>= phi)). isGE_one_shift follows without a second argument, the coaisle being the right orthogonal of the aisle (isGE_iff_orthogonal) and the shift fully faithful. largePhase_shift and largePhase_shift_iff are the phase shift Phat(phi) shifted by one equals Phat(phi+1); with largePhase_isClosedUnderIsomorphisms and largePhase_of_isZero these are the three formal Slicing axioms for largePhase. Slicing.IndExtensions.largePreimage (Phase/Transfer/Inducing.lean) then assembles the slicing: five of Slicing's six fields are discharged -- the three formal ones, the shift law transported through F.commShiftIso, and hom_vanishing from rev 27 -- and only hn_exists remains, as a hypothesis. This is Corollary A.23's output in the shape Theorem 2.8(1) needs; identifying it with P_l still wants the primed/unprimed cut comparison (2.8(1) pins P_l by the cuts Phat(> phi) and Phat(<= phi+1) of the UNPRIMED family, while largePhase is the intersection of the primed cuts), and the geometric inputs hzero, hG/htC, htrunc and hbdd remain open for pi. Categorically only hn_exists is left, and it cannot be got the bounded twin's way: Slicing.InducedTStructures.hn_exists lifts a TARGET HN filtration and the ambient category carries no slicing, so it needs the finite phase-truncation argument run on the source, which is what rev 27's Step 4 boundedness field was kept for. Next: that argument, after which Theorem 2.8(1) closes categorically; then Lemma 3.10(1.a)." }
+  - { rev: 29, at: "2026-09-12", note: "PF5 materialized as milestone #48 for the mass-Hom lane. e14 rewritten as the bound itself (#1177) with six deliverables #1178--#1183 in dependency order: root predicate and HLR v2 pin, Lemma 2.8 reductions, Corollary 2.14(1)/Remark 7.3 from the existing stabilityDist mass comparison, Lemma 7.4 transfer on e7's preimage carrier, Example 2.9 base case, Theorem 7.5. Two consumer epics filed on the same milestone: e19 (#1184, Cheng arXiv:2608.14540: mass-Hom bound implies the full support property) and e20 (#1185, Theorem 8.23 = HLR v2 Theorem 2.35, with inequality (8.4) as the ownable slice and the HLR/BLMNPS chain as named hypotheses on e10). Tilt comparisons split off as e21, unfiled. Source facts pinned: the bound is HLR arXiv:2501.00710v2 Definition 2.7 (v1 Theorem 2.31 is v2 Theorem 2.35; v2 moved its appendix to arXiv:2606.00396, which does not use the bound); the paper cites v2 numbering." }
 items:
   - id: projective-families-m1
     gh_milestone: 33
@@ -327,11 +328,11 @@ items:
     labels: [area:families, area:geometry, blocked, source:2607.28411]
 
   - id: projective-families-m5
-    gh_milestone: null
+    gh_milestone: 48
     kind: milestone
     title: "PF5 — Moduli consequences and complementary branches"
-    status: planned
-    lane: later
+    status: in_progress
+    lane: now
     acceptance:
       - "Mass-Hom bounds, tilt comparisons, supported total-space categories, and Bondal--Orlov reconstruction are separate consumers of the main spine."
       - "Proper good moduli is proved only with the exact characteristic-zero and valuative hypotheses."
@@ -352,18 +353,140 @@ items:
     links:
       issues: [522, 524, 525]
 
+  # ----- Mass-Hom bounds (§7.1, §8.5; HLR arXiv:2501.00710v2 §2.2/§2.5) -----
+  # e14 is the bound itself; e19 and e20 are its two literature consumers and
+  # are separate epics so that PF4-blocked moduli work never holds e14 open.
+  # Propositions 7.6--7.7 (tilt comparisons) moved to e21, unfiled.
   - id: projective-families-e14
+    gh_issue: 1177
+    gh_sub_issues: [1178, 1179, 1180, 1181, 1182, 1183]
+    kind: epic
+    parent: projective-families-m5
+    title: "Mass-Hom bounds: HLR Definition 2.7, the categorical calculus, and Theorem 7.5"
+    status: planned
+    priority: must
+    size: XL
+    summary: "Definition 7.1 (= HLR v2 Definition 2.7) as one predicate on a k-linear triangulated category with a test class (⊤ for HLR, schemePerfect for the paper), its invariances, the generator and stable-object reductions (Lemma 2.8 / Remark 7.2), invariance on a connected component (Corollary 2.14(1) / Remark 7.3, from the existing stabilityDist mass comparison), transfer along pullback and pushforward (Lemma 7.4, on the Phase/Transfer preimage carrier), the algebraic base case (Example 2.9), and Theorem 7.5 with Remark 1.4 on top of PF3's distinguished component. Evidence for HLR's Boundedness Conjecture; the augmented-compactification half of HLR is out of scope."
+    tags: [mass-hom, boundedness-conjecture]
+    labels: [area:stability, area:lean, type:feature, source:2607.28411, source:2501.00710]
+
+  - id: projective-families-e14-1
+    gh_issue: 1178
+    gh_sub_issues: []
+    kind: deliverable
+    parent: projective-families-e14
+    title: "The mass-Hom bound predicate, its invariances, and the HLR v2 source pin"
+    status: done
+    summary: "HasMassHomBound σ T on PreStabilityCondition.WithClassMap with a test class T : ObjectProperty C, finrank of Hom over stabilityMass; invariance under isomorphism, shift, autoequivalence transport (Remark 1.4), and the GL̃⁺(2,ℝ) action; the semistable normal form dim Hom(A,F) ≤ C‖Z(F)‖; the arXiv:2501.00710v2 source pin, label, and a §2.2/§2.5 coverage stub (owner-gated)."
+    priority: must
+    size: M
+    tags: [mass-hom, root, source-pin]
+
+  - id: projective-families-e14-2
+    gh_issue: 1179
+    gh_sub_issues: []
+    kind: deliverable
+    parent: projective-families-e14
+    blocked_by: [1178]
+    title: "Generator and stable-object reductions (HLR Lemma 2.8, Remark 7.2)"
+    status: blocked
+    summary: "The class of A with a constant is thick (long exact Hom sequence, mass shift-invariance), so a classical generating set of T suffices; and stable F suffices via HN additivity of mass and Jordan–Hölder in the finite-length 𝒫(φ). The Jordan–Hölder input at the Mathlib pin is a named research item, proved or isolated as one hypothesis."
+    priority: must
+    size: L
+    tags: [mass-hom, generators, jordan-holder]
+
+  - id: projective-families-e14-3
+    gh_issue: 1180
+    gh_sub_issues: []
+    kind: deliverable
+    parent: projective-families-e14
+    blocked_by: [1178]
+    title: "Finite distance and connected components (HLR Corollary 2.14(1), Remark 7.3)"
+    status: done
+    summary: "stabilityDist σ τ < ⊤ transfers the bound with constant e^d (stabilityMass_toReal_lt_exp_mul_of_stabilityDist already exists); finite-distance classes are open, so the bound is a union of connected components. Corollary 2.14(2) is not in scope."
+    priority: must
+    size: S
+    tags: [mass-hom, distance, components]
+
+  - id: projective-families-e14-4
+    gh_issue: 1181
+    gh_sub_issues: []
+    kind: deliverable
+    parent: projective-families-e14
+    blocked_by: [1178, 1179]
+    title: "Transfer of mass-Hom bounds along pullback and pushforward (Lemma 7.4)"
+    status: blocked
+    summary: "One categorical theorem on the preimage-slicing carrier of e7 (L ⊣ G, G conservative, stabilityMass_preimage), with generation transported by L as a named hypothesis; geometric instances f^♯ along finite morphisms (HasCoherentPushforward, perfectDerivedPullback) and f_♯ along faithfully flat morphisms with perfect dualizing complex (blocked on the Dqc adjunction in #1033). Neeman–Ravenel and classical generators of Perf link to #723."
+    priority: must
+    size: L
+    tags: [mass-hom, transfer, generators]
+
+  - id: projective-families-e14-5
+    gh_issue: 1182
+    gh_sub_issues: []
+    kind: deliverable
+    parent: projective-families-e14
+    blocked_by: [1178, 1179]
+    title: "Algebraic stability conditions have mass-Hom bounds (HLR Example 2.9)"
+    status: blocked
+    summary: "Finite-length heart with finitely many simples: Hom from a simple is bounded by length, and finitely many charges in ℍ ∪ ℝ_{<0} admit a common direction, so length ≤ |Z(F)|/c. Abstract theorem plus one compiled witness (finite-heart lane or Dᵇ(FGModuleCat k) per #543)."
+    priority: must
+    size: M
+    tags: [mass-hom, algebraic, finite-heart]
+
+  - id: projective-families-e14-6
+    gh_issue: 1183
+    gh_sub_issues: []
+    kind: deliverable
+    parent: projective-families-e14
+    blocked_by: [1180, 1181, 1182]
+    title: "Theorem 7.5 and Remark 1.4 on the distinguished component"
+    status: blocked
+    summary: "Remark 7.3 plus the two transfers plus the base case, with PF3's distinguished-component inhabitant (Definition 6.4, Theorems 5.4/5.6/6.2) as the one named hypothesis until e8/e9 land; Remark 1.4 from autoequivalence transport; §7 coverage promotion proposed to the owner."
+    priority: must
+    size: M
+    tags: [mass-hom, theorem-7-5]
+
+  - id: projective-families-e19
+    gh_issue: 1184
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m5
+    blocked_by: [1178]
+    title: "Mass-Hom bounds imply the full support property (Cheng, arXiv:2608.14540)"
+    status: blocked
+    priority: should
+    size: L
+    summary: "Cheng Theorem 2.1 (proper X, Remark 2.2): a mass-Hom bound gives the support property for the full K_num(X), via finitely many perfect A_i separating K_num, the finite Ext-window on semistables (phase vanishing plus Serre duality with the dualizing complex), and the KS quadratic form C²|Z|² − ‖·‖². Also Definition 3.1 / Theorem 3.2 (uniform relative version, blocked on e10) and Theorem 4.2 (canonical component, blocked on e14-6 and PF3). Answers §1.7 of the paper for Stab†."
+    tags: [mass-hom, support-property, consumer]
+    labels: [area:stability, area:lean, type:feature, source:2608.14540, source:2607.28411]
+
+  - id: projective-families-e20
+    gh_issue: 1185
+    gh_sub_issues: []
+    kind: epic
+    parent: projective-families-m5
+    blocked_by: [1033, 1178]
+    title: "Theorem 8.23: the mass-Hom bound as the input to HLR's good-moduli theorem"
+    status: blocked
+    priority: should
+    size: L
+    summary: "Theorem 8.23 (HLR v2 Theorem 2.35 = v1 Theorem 2.31): on smooth projective X a mass-Hom bound makes σ a stability condition over k, hence proper good moduli in characteristic 0. Ownable now: inequality (8.4), the bound uniform over finite-type field extensions (Zariski's lemma, adjunction, π_* preserves HN filtrations from e7's Theorem 2.8 lane). The HLR/BLMNPS chain (Theorem 2.35(1)⇒(2), Propositions 2.38/2.41, Lemma 8.22, [7, 21.24]) is recorded as named hypotheses on e10's Definition 8.17 interface, never as conclusion fields. Selvaggi arXiv:2603.29053 Theorem 2.42 is the relative literature pointer."
+    tags: [mass-hom, good-moduli, consumer]
+    labels: [area:stability, area:moduli, area:lean, type:feature, source:2501.00710, source:2607.28411]
+
+  - id: projective-families-e21
     gh_issue: null
     gh_sub_issues: []
     kind: epic
     parent: projective-families-m5
-    title: "Mass-Hom bounds and tilt-stability comparisons"
+    title: "Tilt-stability comparisons (Propositions 7.6--7.7)"
     status: planned
-    priority: should
-    size: XL
-    summary: "Formalize Definition 7.1 and Theorem 7.5 on the mass root, then Propositions 7.6--7.7 as geometric leaf comparisons."
-    tags: [mass-hom, tilt-stability]
-    labels: [area:stability, source:2607.28411]
+    priority: could
+    size: L
+    summary: "Surfaces over ℂ: Stab†_num(Dᵇ(X)) contains all geometric stability conditions, hence all have mass-Hom bounds (Proposition 7.6); threefolds satisfying the BMT conjecture and the lattice condition (i): the tilt-constructed open set 𝔓̃ lies in Stab†_{H_X} (Proposition 7.7). Consumers of e14-6; not filed."
+    tags: [tilt-stability, mass-hom]
+    labels: [area:stability, area:geometry, source:2607.28411]
 
   - id: projective-families-e15
     gh_issue: null

@@ -130,6 +130,26 @@ numerical data written on `C` onto the heart. -/
 #print axioms DerivedCategory.heartEquivalence
 #print axioms DerivedCategory.heartEquivalence_functor
 
+/-! ## The standard heart of the bounded derived category (#1121) -/
+
+#print axioms DerivedCategory.boundedSingleFunctor
+#print axioms DerivedCategory.boundedSingleFunctor_additive
+#print axioms DerivedCategory.boundedSingleFunctor_full
+#print axioms DerivedCategory.boundedSingleFunctor_faithful
+#print axioms DerivedCategory.boundedSingleFunctor_obj_obj
+#print axioms DerivedCategory.boundedHeart_singleFunctor_obj
+#print axioms DerivedCategory.essImage_boundedSingleFunctor_eq_boundedHeart
+#print axioms DerivedCategory.isBoundedHeart
+#print axioms DerivedCategory.toBoundedHeart
+#print axioms DerivedCategory.toBoundedHeart_comp_ι
+#print axioms DerivedCategory.toBoundedHeart_full
+#print axioms DerivedCategory.toBoundedHeart_faithful
+#print axioms DerivedCategory.toBoundedHeart_essSurj
+#print axioms DerivedCategory.toBoundedHeart_isEquivalence
+#print axioms DerivedCategory.boundedHeartEquivalence
+#print axioms DerivedCategory.boundedHeartEquivalence_functor
+#print axioms DerivedCategory.toBoundedHeart_obj_obj_obj
+
 /-! ## The derived functor of an exact functor on bounded objects (#1070, #1071)
 
 For an exact functor that is bijective on every `Ext` group, `mapDerivedCategory`
@@ -153,3 +173,27 @@ explicitly; no instance supplies it.
 #print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_bounded_single
 #print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_of_bounded
 #print axioms CategoryTheory.Functor.exists_bounded_iso_mapDerivedCategory_obj
+
+/-! ## Bounded derived Hom-finiteness from heart Ext-finiteness (#1121)
+
+`ExtFiniteBounded` is the explicit heart-level input. Its ordinary-Ext
+constructor proves negative shifted Homs vanish from the canonical t-structure;
+the two-variable dévissage then propagates finite-dimensionality and finite
+support to all bounded derived objects. Nothing here supplies coherent-sheaf
+Ext finiteness or a geometric vanishing bound.
+-/
+
+#print axioms Module.Finite.of_exact_middle
+#print axioms DerivedCategory.ExtFiniteBounded
+#print axioms DerivedCategory.ExtFiniteBounded.finite
+#print axioms DerivedCategory.ExtFiniteBounded.support_finite
+#print axioms DerivedCategory.ExtFiniteBounded.of_ext
+#print axioms DerivedCategory.HomFiniteBoundedPair
+#print axioms DerivedCategory.HomFiniteBoundedPair.finite
+#print axioms DerivedCategory.HomFiniteBoundedPair.support_finite
+#print axioms DerivedCategory.HomFiniteBoundedPair.of_iso
+#print axioms DerivedCategory.HomFiniteBoundedPair.shift
+#print axioms DerivedCategory.HomFiniteBoundedPair.obj₂_right
+#print axioms DerivedCategory.HomFiniteBoundedPair.obj₂_left
+#print axioms DerivedCategory.homFiniteBoundedPair_of_bounded
+#print axioms DerivedCategory.homFiniteBounded_boundedDerived

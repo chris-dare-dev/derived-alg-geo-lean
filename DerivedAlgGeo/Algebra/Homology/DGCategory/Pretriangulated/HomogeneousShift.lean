@@ -322,6 +322,52 @@ lemma comp'_shiftMap_smul {E E'' : C} {m : ℤ} (s : IsShiftBy A n A')
     show m * p + n * p = nm * p by rw [← hnm]; ring,
     comp'_shiftMap s u s' u' nm hnm p f]
 
+/-! ### Coherence for three composed shifts
+
+The binary comparison for shifted dg functors is canonical only if its two
+threefold composites agree.  The two lemmas below isolate the remaining
+pointwise content of that coherence.  They are stated for arbitrary shift
+witnesses so the functor-category proof does not have to unfold the chosen
+shifted objects.
+-/
+
+/-- The degree-zero transport of a comparison is the comparison of the
+composite witnesses.
+
+The total degree `nm` is explicit because the associativity proof compares
+the propositionally equal indices `(n + m) + k` and `n + (m + k)`.  The proof
+uses the characterising square of `shiftMap`; this is the all-degree
+counterpart of `mapShift_compare_comp'`. -/
+lemma shiftMap_compare_compOfDegree {A'' E'' : C} {m nm : ℤ}
+    (s : IsShiftBy A n A') (t : IsShiftBy A n A'')
+    (u : IsShiftBy A' m E) (v : IsShiftBy A'' m E'')
+    (hnm : n + m = nm) :
+    u.shiftMap v 0 (compare s t) =
+      compare (s.comp' u nm hnm) (t.comp' v nm hnm) := by
+  symm
+  refine (s.comp' u nm hnm).compare_unique (t.comp' v nm hnm) _ ?_
+  rw [comp'_hom, comp'_hom,
+    dgComp_assoc (-n) (-m) 0 (-nm) (-m) (-nm)
+      (by omega) (by omega) (by omega),
+    u.hom_comp_shiftMap v 0 (-m) (by omega) (by omega) (compare s t),
+    ← dgComp_assoc (-n) 0 (-m) (-n) (-m) (-nm)
+      (by omega) (by omega) (by omega),
+    s.hom_comp_compare t]
+
+/-- Prefixing two witnesses by the same shift does not change their
+comparison: the common shift element and its inverse cancel.  The explicit
+total degree keeps the statement usable under either bracketing of three
+integer shifts. -/
+lemma compare_compLeftOfDegree {Z Z' : C} {m nm : ℤ}
+    (s : IsShiftBy A n A') (u : IsShiftBy A' m Z)
+    (v : IsShiftBy A' m Z') (hnm : n + m = nm) :
+    compare (s.comp' u nm hnm) (s.comp' v nm hnm) = compare u v := by
+  refine (s.comp' u nm hnm).compare_unique (s.comp' v nm hnm) _ ?_
+  rw [comp'_hom, comp'_hom,
+    dgComp_assoc (-n) (-m) 0 (-nm) (-m) (-nm)
+      (by omega) (by omega) (by omega),
+    u.hom_comp_compare v]
+
 /-- **In degree zero, transport is `IsShiftBy.mapShift`.**
 
 `mapShift` is the degree-zero transport that `Pretriangulated/Basic.lean`

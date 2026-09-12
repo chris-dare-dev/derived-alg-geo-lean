@@ -1,0 +1,159 @@
+{
+  "_readme": [
+    "Coverage map for arXiv:2501.00710v2 -- 'The Space of augmented stability conditions', Daniel Halpern-Leistner and Antonios-Alexandros Robotis. Created for GitHub #1178.",
+    "",
+    "THIS IS NOT A TRUST RECORD AND NOT A MINT SURFACE. It is a zero-claim map restricted to the two source sections used by the mass--Hom and moduli lanes: section 2.2 and section 2.5. formalization.yaml's source remains the Bridgeland 2007 record, and registry/bridgeland2007.json remains the only mint surface. Every status in this file is target.",
+    "",
+    "Validation: python scripts/check_coverage_map.py registry/coverage-2501.00710.json",
+    "",
+    "Update ownership: the owner (Chris Dare) promotes statuses. Agents may add or correct coordinates, but a promotion requires the evidence fields enforced by the validator and formalized additionally requires explicit owner acceptance.",
+    "",
+    "Provenance: metadata and submission history were checked against the arXiv abstract page on 2026-09-12. Section titles and statement numbering were read with pdftotext -layout from the pinned v2 PDF. No corpus extraction was used.",
+    "",
+    "Numbering caution: v1 and v2 differ. In particular, v1 Theorem 2.31 is v2 Theorem 2.35. Coordinates in this file always mean v2."
+  ],
+  "schema": "coverage-map/1",
+  "created": "2026-09-12",
+  "issue": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/1178",
+  "source": {
+    "title": "The Space of augmented stability conditions",
+    "authors": [
+      "Daniel Halpern-Leistner",
+      "Antonios-Alexandros Robotis"
+    ],
+    "arxiv_id": "2501.00710",
+    "arxiv_version": "v2",
+    "version_submitted_utc": "2026-05-31T11:20:53Z",
+    "version_history": [
+      {
+        "version": "v1",
+        "submitted_utc": "2025-01-01T03:13:31Z"
+      },
+      {
+        "version": "v2",
+        "submitted_utc": "2026-05-31T11:20:53Z"
+      }
+    ],
+    "latest_version_at_pin_time": "v2",
+    "doi": "10.48550/arXiv.2501.00710",
+    "primary_category": "math.AG",
+    "comments": "102 pages, 8 figures; v2 removes the appendix to a separate concomitant work and makes minor changes and improvements.",
+    "pinned_from": "https://arxiv.org/abs/2501.00710v2 (identity and submission history) and https://arxiv.org/pdf/2501.00710v2 (section titles and numbering), fetched 2026-09-12.",
+    "pdf_sha256": "86443bb6d22d7b3fc2d097520de10102d39803c4ff9fe8b2a97f99b731c97abb",
+    "pdf_bytes": 6408999,
+    "pdf_pages": 102,
+    "pdf_pin_caveat": "The hash pins the artifact as served on 2026-09-12. arXiv PDFs may be re-rendered without a content change; the durable identity is (arxiv_id, version, version_submitted_utc, doi)."
+  },
+  "corpus_note": {
+    "arxiv_version_in_corpus": "not used as evidence by this map",
+    "mint_rule": "No durable key in this repository may be derived from a corpus identifier or notebook slug. This file contains neither."
+  },
+  "status_vocabulary": {
+    "target": "Named for future work. No claim of any kind.",
+    "mapped": "Specific Lean declarations are candidate counterparts of a specific v2 statement. Still no coverage claim; complete evidence is required.",
+    "reviewed": "A candidate binding has been reviewed against the pinned v2 artifact. Complete evidence is required.",
+    "formalized": "Reviewed and explicitly accepted by the owner. The only status that counts as coverage."
+  },
+  "parts": [
+    {
+      "part": "sec-2-2",
+      "title": "2.2. Boundedness of functors",
+      "status": "target",
+      "sections": [
+        "Definition 2.7",
+        "Lemma 2.8",
+        "Example 2.9",
+        "Conjecture 1",
+        "Corollary 2.14"
+      ]
+    },
+    {
+      "part": "sec-2-5",
+      "title": "2.5. Existence of moduli spaces",
+      "status": "target",
+      "sections": [
+        "Theorem 2.35",
+        "Proposition 2.38",
+        "Proposition 2.41"
+      ]
+    }
+  ],
+  "numbering_ledger": [
+    {
+      "statement": "Definition 2.7",
+      "title": "mass-Hom bound",
+      "source_section": "2.2"
+    },
+    {
+      "statement": "Lemma 2.8",
+      "source_section": "2.2"
+    },
+    {
+      "statement": "Example 2.9",
+      "title": "Algebraic stability conditions",
+      "source_section": "2.2"
+    },
+    {
+      "statement": "Conjecture 1",
+      "title": "Boundedness conjecture",
+      "source_section": "2.2"
+    },
+    {
+      "statement": "Corollary 2.14",
+      "source_section": "2.2"
+    },
+    {
+      "statement": "Example 2.29",
+      "source_section": "2.4",
+      "note": "Recorded only as the v2 numbering prerequisite cited by section 2.5; section 2.4 is not otherwise mapped here."
+    },
+    {
+      "statement": "Theorem 2.35",
+      "source_section": "2.5",
+      "version_note": "This is Theorem 2.31 in v1."
+    },
+    {
+      "statement": "Proposition 2.38",
+      "source_section": "2.5"
+    },
+    {
+      "statement": "Proposition 2.41",
+      "source_section": "2.5"
+    }
+  ],
+  "near_term_coordinates": [
+    {
+      "id": "hlr-v2-def-2-7-mass-hom",
+      "coordinate": "Section 2.2, Definition 2.7 and Lemma 2.8",
+      "status": "target",
+      "tracking_issue": 1178,
+      "note": "Predicate and its two reductions. Target status names the coordinate and asserts no correspondence with Lean declarations."
+    },
+    {
+      "id": "hlr-v2-example-2-9-algebraic",
+      "coordinate": "Section 2.2, Example 2.9",
+      "status": "target",
+      "tracking_issue": 1182,
+      "note": "Algebraic stability conditions and the finite-heart base case."
+    },
+    {
+      "id": "hlr-v2-cor-2-14-finite-distance",
+      "coordinate": "Section 2.2, Corollary 2.14",
+      "status": "target",
+      "tracking_issue": 1180,
+      "note": "Finite-distance invariance; only part (1) is in the current roadmap lane."
+    },
+    {
+      "id": "hlr-v2-conjecture-1-boundedness",
+      "coordinate": "Section 2.2, Conjecture 1",
+      "status": "target",
+      "note": "The smooth-proper boundedness conjecture is recorded, not asserted or assumed."
+    },
+    {
+      "id": "hlr-v2-theorem-2-35-moduli",
+      "coordinate": "Section 2.5, Theorem 2.35, Propositions 2.38 and 2.41",
+      "status": "target",
+      "note": "The v2 moduli-space coordinate. It is Theorem 2.31 in v1; no v1 number is used as a v2 identifier."
+    }
+  ]
+}

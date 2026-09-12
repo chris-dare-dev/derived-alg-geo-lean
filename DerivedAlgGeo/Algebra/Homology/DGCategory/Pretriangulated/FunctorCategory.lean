@@ -305,6 +305,111 @@ theorem exists_shift_dgFunctor (F : DGFunctor C D) (n : ℤ) :
 
 end Shift
 
+/-! ### Shifting a degree-zero dg natural transformation
+
+The associativity coherence below has to shift the comparison
+`F[n][m] ⟶ F[n + m]` once more.  This is transport across the chosen shifts,
+pointwise.  It is stated for every degree-zero homogeneous transformation;
+closed transformations remain closed, as recorded below. -/
+
+section ShiftTransformation
+
+variable [IsPretriangulated D]
+
+/-- Shift a degree-zero homogeneous dg natural transformation pointwise.
+
+Naturality is `IsShiftBy.shiftMap_comp`: both sides are the transport of the
+original naturality square, with the common Koszul sign from the shifted
+functors. -/
+noncomputable def HomogeneousNatTrans.shiftedDegreeZero {F G : DGFunctor C D}
+    (α : HomogeneousNatTrans F G 0) (n : ℤ) :
+    HomogeneousNatTrans (F.shiftedFunctor n) (G.shiftedFunctor n) 0 :=
+  ⟨fun X => (F.shiftWitness n X).shiftMap (G.shiftWitness n X) 0
+      (HomogeneousNatTrans.app α X), by
+    intro X Y p q hpq hqp f
+    have hq : q = p := by omega
+    cases hq
+    rw [zero_mul, Int.negOnePow_zero, one_smul]
+    show dgComp p 0 p hpq
+        ((n * p).negOnePow •
+          (F.shiftWitness n X).shiftMap (F.shiftWitness n Y) p (F.map p f))
+        ((F.shiftWitness n Y).shiftMap (G.shiftWitness n Y) 0
+          (HomogeneousNatTrans.app α Y)) =
+      dgComp 0 p p hqp
+        ((F.shiftWitness n X).shiftMap (G.shiftWitness n X) 0
+          (HomogeneousNatTrans.app α X))
+        ((n * p).negOnePow •
+          (G.shiftWitness n X).shiftMap (G.shiftWitness n Y) p (G.map p f))
+    have hα := HomogeneousNatTrans.naturality α p p (by omega) (by omega) f
+    simp only [zero_mul, Int.negOnePow_zero, one_smul] at hα
+    rw [dgComp_units_smul_left, dgComp_units_smul_right,
+      ← IsShiftBy.shiftMap_comp (F.shiftWitness n X) (F.shiftWitness n Y)
+        (G.shiftWitness n Y) p 0 p hpq (F.map p f)
+          (HomogeneousNatTrans.app α Y),
+      ← IsShiftBy.shiftMap_comp (F.shiftWitness n X) (G.shiftWitness n X)
+        (G.shiftWitness n Y) 0 p p hqp (HomogeneousNatTrans.app α X)
+          (G.map p f),
+      hα]⟩
+
+/-- The component of a pointwise shifted degree-zero transformation. -/
+@[simp]
+theorem HomogeneousNatTrans.shiftedDegreeZero_app {F G : DGFunctor C D}
+    (α : HomogeneousNatTrans F G 0) (n : ℤ) (X : C) :
+    HomogeneousNatTrans.app (HomogeneousNatTrans.shiftedDegreeZero α n) X =
+      (F.shiftWitness n X).shiftMap (G.shiftWitness n X) 0
+        (HomogeneousNatTrans.app α X) :=
+  rfl
+
+/-- Pointwise shifting preserves closed degree-zero transformations. -/
+theorem HomogeneousNatTrans.shiftedDegreeZero_isClosed {F G : DGFunctor C D}
+    {α : HomogeneousNatTrans F G 0} (hα : HomogeneousNatTrans.IsClosed α) (n : ℤ) :
+    HomogeneousNatTrans.IsClosed (HomogeneousNatTrans.shiftedDegreeZero α n) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  rw [HomogeneousNatTrans.differential_app,
+    HomogeneousNatTrans.shiftedDegreeZero_app]
+  show ((dgHom (F.shiftObj n X) (G.shiftObj n X)).d 0 (0 + 1)).hom
+      ((F.shiftWitness n X).shiftMap (G.shiftWitness n X) 0
+        (HomogeneousNatTrans.app α X)) = 0
+  have hd := IsShiftBy.shiftMap_d (F.shiftWitness n X) (G.shiftWitness n X) 0
+    (HomogeneousNatTrans.app α X)
+  rw [hα.app_d X, IsShiftBy.shiftMap_zero, smul_zero] at hd
+  exact hd
+
+/-- Pointwise shifting takes the identity transformation to the identity. -/
+@[simp]
+theorem HomogeneousNatTrans.shiftedDegreeZero_id (F : DGFunctor C D) (n : ℤ) :
+    HomogeneousNatTrans.shiftedDegreeZero (HomogeneousNatTrans.id F) n =
+      HomogeneousNatTrans.id (F.shiftedFunctor n) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  rw [HomogeneousNatTrans.shiftedDegreeZero_app,
+    HomogeneousNatTrans.id_app, HomogeneousNatTrans.id_app]
+  exact IsShiftBy.shiftMap_id (F.shiftWitness n X)
+
+/-- Pointwise shifting preserves vertical composition of degree-zero
+transformations. -/
+theorem HomogeneousNatTrans.shiftedDegreeZero_comp {F G H : DGFunctor C D}
+    (α : HomogeneousNatTrans F G 0) (β : HomogeneousNatTrans G H 0) (n : ℤ) :
+    HomogeneousNatTrans.shiftedDegreeZero
+        (HomogeneousNatTrans.composition F G H 0 0 0 (by omega) α β) n =
+      HomogeneousNatTrans.composition (F.shiftedFunctor n) (G.shiftedFunctor n)
+        (H.shiftedFunctor n) 0 0 0 (by omega)
+          (HomogeneousNatTrans.shiftedDegreeZero α n)
+          (HomogeneousNatTrans.shiftedDegreeZero β n) := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  rw [HomogeneousNatTrans.shiftedDegreeZero_app,
+    HomogeneousNatTrans.composition_apply_app,
+    HomogeneousNatTrans.composition_apply_app,
+    HomogeneousNatTrans.shiftedDegreeZero_app,
+    HomogeneousNatTrans.shiftedDegreeZero_app]
+  exact IsShiftBy.shiftMap_comp (F.shiftWitness n X) (G.shiftWitness n X)
+    (H.shiftWitness n X) 0 0 0 (by omega)
+      (HomogeneousNatTrans.app α X) (HomogeneousNatTrans.app β X)
+
+end ShiftTransformation
+
 /-! ### Coherence of the shift in the degree
 
 `shiftedFunctor` shifts by one integer.  A shift *functor* also needs the two
@@ -318,7 +423,12 @@ be proved is that the objectwise comparison is *natural*, and that is
 `IsShiftBy.shiftMap_compare` together with `IsShiftBy.comp'_shiftMap`.  The
 signs take care of themselves: the two composed shifts contribute
 `(-1)^(m p)` and `(-1)^(n p)`, whose product is the `(-1)^(r p)` of the single
-shift because `n p + m p = r p`. -/
+shift because `n p + m p = r p`.
+
+The additive comparison is associative as well.  For three shifts,
+`shiftedFunctorAdd_assoc` identifies the path that first combines `n` and `m`
+with the path that first combines `m` and `k`, as degree-zero dg natural
+transformations rather than only after passing to `H⁰`. -/
 
 section Coherence
 
@@ -435,6 +545,91 @@ theorem shiftedFunctorAddInv_app (n m r : ℤ) (h : n + m = r) (X : C) :
     HomogeneousNatTrans.app (F.shiftedFunctorAddInv n m r h) X =
       IsShiftBy.compare (F.shiftWitness r X) (F.shiftWitnessComp n m r h X) :=
   rfl
+
+/-! ### Associativity of the additive comparison
+
+For three shifts there are two composites of `shiftedFunctorAdd`.  The left
+bracketing shifts the comparison `F[n][m] ⟶ F[n + m]` by `k`; the right
+bracketing first compares the last two shifts of `F[n]`.  The theorem below
+says those two degree-zero dg natural transformations are equal, before
+passing to `Z⁰` or `H⁰`.
+-/
+
+/-- The left-associated composite from `F[n][m][k]` to `F[r]`. -/
+noncomputable def shiftedFunctorAddAssocLeft (n m k nm r : ℤ)
+    (hnm : n + m = nm) (hleft : nm + k = r) :
+    HomogeneousNatTrans (((F.shiftedFunctor n).shiftedFunctor m).shiftedFunctor k)
+      (F.shiftedFunctor r) 0 :=
+  HomogeneousNatTrans.composition _ _ _ 0 0 0 (by omega)
+    (HomogeneousNatTrans.shiftedDegreeZero (F.shiftedFunctorAdd n m nm hnm) k)
+    (F.shiftedFunctorAdd nm k r hleft)
+
+/-- The right-associated composite from `F[n][m][k]` to `F[r]`. -/
+noncomputable def shiftedFunctorAddAssocRight (n m k mk r : ℤ)
+    (hmk : m + k = mk) (hright : n + mk = r) :
+    HomogeneousNatTrans (((F.shiftedFunctor n).shiftedFunctor m).shiftedFunctor k)
+      (F.shiftedFunctor r) 0 :=
+  HomogeneousNatTrans.composition _ _ _ 0 0 0 (by omega)
+    ((F.shiftedFunctor n).shiftedFunctorAdd m k mk hmk)
+    (F.shiftedFunctorAdd n mk r hright)
+
+/-- **Associativity coherence for the shift of a dg functor.**
+
+The two composites of the canonical comparisons from `F[n][m][k]` to the
+chosen `F[r]` agree.  Pointwise, both composites collapse by
+`IsShiftBy.compare_trans`; the only remaining equality is associativity of
+the three shift elements, `IsShiftBy.comp'_assoc_hom`. -/
+theorem shiftedFunctorAdd_assoc (n m k nm mk r : ℤ)
+    (hnm : n + m = nm) (hmk : m + k = mk)
+    (hleft : nm + k = r) (hright : n + mk = r) :
+    F.shiftedFunctorAddAssocLeft n m k nm r hnm hleft =
+      F.shiftedFunctorAddAssocRight n m k mk r hmk hright := by
+  apply HomogeneousNatTrans.ext
+  intro X
+  simp only [shiftedFunctorAddAssocLeft, shiftedFunctorAddAssocRight]
+  let s := F.shiftWitness n X
+  let u := (F.shiftedFunctor n).shiftWitness m X
+  let v := ((F.shiftedFunctor n).shiftedFunctor m).shiftWitness k X
+  let b := F.shiftWitness nm X
+  let z := (F.shiftedFunctor nm).shiftWitness k X
+  let w := (F.shiftedFunctor n).shiftWitness mk X
+  let c := F.shiftWitness r X
+  change dgComp 0 0 0 (by omega)
+      (v.shiftMap z 0 (IsShiftBy.compare (s.comp' u nm hnm) b))
+      (IsShiftBy.compare (b.comp' z r hleft) c) =
+    dgComp 0 0 0 (by omega)
+      (IsShiftBy.compare (u.comp' v mk hmk) w)
+      (IsShiftBy.compare (s.comp' w r hright) c)
+  have hassoc : ((s.comp' u nm hnm).comp' v r hleft).hom =
+      (s.comp' (u.comp' v mk hmk) r hright).hom := by
+    simpa using IsShiftBy.comp'_assoc_hom s u v nm mk r hnm hmk hleft
+  calc
+    dgComp 0 0 0 (by omega)
+        (v.shiftMap z 0 (IsShiftBy.compare (s.comp' u nm hnm) b))
+        (IsShiftBy.compare (b.comp' z r hleft) c) =
+      dgComp 0 0 0 (by omega)
+        (IsShiftBy.compare ((s.comp' u nm hnm).comp' v r hleft)
+          (b.comp' z r hleft))
+        (IsShiftBy.compare (b.comp' z r hleft) c) := by
+      exact congrArg (fun q => dgComp 0 0 0 (by omega) q
+        (IsShiftBy.compare (b.comp' z r hleft) c))
+        (IsShiftBy.shiftMap_compare_compOfDegree (nm := r)
+          (s.comp' u nm hnm) b v z hleft)
+    _ = IsShiftBy.compare ((s.comp' u nm hnm).comp' v r hleft) c := by
+      rw [IsShiftBy.compare_trans]
+    _ = IsShiftBy.compare (s.comp' (u.comp' v mk hmk) r hright) c :=
+      IsShiftBy.compare_congr_left _ _ _ hassoc
+    _ = dgComp 0 0 0 (by omega)
+        (IsShiftBy.compare (s.comp' (u.comp' v mk hmk) r hright)
+          (s.comp' w r hright))
+        (IsShiftBy.compare (s.comp' w r hright) c) := by
+      rw [IsShiftBy.compare_trans]
+    _ = dgComp 0 0 0 (by omega)
+        (IsShiftBy.compare (u.comp' v mk hmk) w)
+        (IsShiftBy.compare (s.comp' w r hright) c) := by
+      exact congrArg (fun q => dgComp 0 0 0 (by omega) q
+        (IsShiftBy.compare (s.comp' w r hright) c))
+        (IsShiftBy.compare_compLeftOfDegree s (u.comp' v mk hmk) w hright)
 
 /-- **Shifting by zero changes nothing, up to the canonical comparison.** -/
 noncomputable def shiftedFunctorZero :

@@ -7,6 +7,7 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.Monoidal
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Bifunctor
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
+import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Thick
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.FullSubcategory
@@ -33,8 +34,8 @@ open CategoryTheory.Triangulated
 
 /-! ## Exact functor families and exact bifunctors -/
 
--- Shift-coherent functor-valued families, their global shift isomorphism,
--- pointwise exactness, and the bifunctor root built on Mathlib's `CommShift₂Int`.
+-- Functor-valued families built on Mathlib's global `CommShift`, their
+-- pointwise exactness, and the bifunctor root built on `CommShift₂Int`.
 #print axioms CategoryTheory.Functor.ExactBifunctor
 #print axioms CategoryTheory.Functor.ExactBifunctor.firstCommShift
 #print axioms CategoryTheory.Functor.ExactBifunctor.firstFamily
@@ -48,6 +49,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Functor.ExactFamily
 #print axioms CategoryTheory.Functor.ExactFamily.distinguishedTriangleProperty
 #print axioms CategoryTheory.Functor.ExactFamily.evaluationCommShift
+#print axioms CategoryTheory.Functor.ExactFamily.evaluationCommShift_iso_hom_app
 #print axioms CategoryTheory.Functor.ExactFamily.mapDistinguishedTriangle
 #print axioms CategoryTheory.Functor.ExactFamily.mapDistinguishedTriangle_obj_val
 #print axioms CategoryTheory.Functor.ExactFamily.mapTriangle
@@ -58,18 +60,8 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Functor.ExactFamily.mapTriangle_obj_obj₃
 #print axioms CategoryTheory.Functor.ExactFamily.mk.inj
 #print axioms CategoryTheory.Functor.ExactFamily.mk.sizeOf_spec
-#print axioms CategoryTheory.Functor.ExactFamily.toFamilyCommShift
+#print axioms CategoryTheory.Functor.ExactFamily.toCommShift
 #print axioms CategoryTheory.Functor.ExactFamily.triangulated
-#print axioms CategoryTheory.Functor.FamilyCommShift
-#print axioms CategoryTheory.Functor.FamilyCommShift.commShift
-#print axioms CategoryTheory.Functor.FamilyCommShift.commShift_naturality
-#print axioms CategoryTheory.Functor.FamilyCommShift.mk.inj
-#print axioms CategoryTheory.Functor.FamilyCommShift.mk.sizeOf_spec
-#print axioms CategoryTheory.Functor.FamilyCommShift.postShift
-#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIso
-#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIsoApp
-#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIso_hom_app_app
-#print axioms CategoryTheory.Functor.FamilyCommShift.shiftIso_inv_app_app
 
 /-! ## Cohomology exactness (#146) -/
 
@@ -123,7 +115,28 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.IsCompactObject.shift
 #print axioms CategoryTheory.IsCompactObject.zero
 #print axioms CategoryTheory.IsCompactObject.extension
+#print axioms CategoryTheory.IsCompactObject.of_retract_of_size
+#print axioms CategoryTheory.directSumToHom
+#print axioms CategoryTheory.directSumToHom_of
+#print axioms CategoryTheory.directSumPrecomp
+#print axioms CategoryTheory.directSumPrecomp_apply
+#print axioms CategoryTheory.directSumPrecomp_comp
+#print axioms CategoryTheory.directSumPrecomp_id
+#print axioms CategoryTheory.directSumToHom_precomp
+#print axioms CategoryTheory.IsCompactObject.bijective_directSumToHom
+#print axioms CategoryTheory.isCompactObject_of_bijective_directSumToHom
+#print axioms CategoryTheory.isCompactObject_iff_bijective_directSumToHom
 #print axioms CategoryTheory.IsCompactObject.of_retract
+#print axioms CategoryTheory.IsCompactObject.of_isZero
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isStableUnderRetracts
+#print axioms CategoryTheory.directSumPrecomp_exact
+#print axioms CategoryTheory.IsCompactObject.of_distTriang₃
+#print axioms CategoryTheory.ObjectProperty.compactObjects.containsZero
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isStableUnderShift
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isTriangulatedClosed₃
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isTriangulatedClosed₂
+#print axioms CategoryTheory.ObjectProperty.compactObjects.isTriangulated
+#print axioms CategoryTheory.ObjectProperty.triangEnvelope_le_compactObjects
 #print axioms CategoryTheory.ObjectProperty.compactObjects
 #print axioms CategoryTheory.ObjectProperty.isCompactObject_of_iso
 #print axioms CategoryTheory.ObjectProperty.compactObjects_isStableUnderRetracts

@@ -306,7 +306,7 @@ theorem zero : IsCompactObject.{w} (0 : C) := by
 
 omit [HasZeroObject C] in
 /-- A retract of a compact object is compact. -/
-theorem of_retract {X Y : C} (r : Retract X Y)
+theorem of_retract_of_size {X Y : C} (r : Retract X Y)
     (hY : IsCompactObject.{w} Y) : IsCompactObject.{w} X := by
   intro ι
   refine ⟨fun {D} => ?_⟩
@@ -358,7 +358,7 @@ variable [HasCoproducts.{w} AddCommGrpCat.{v}]
 
 instance compactObjects_isStableUnderRetracts :
     (compactObjects.{w} (C := C)).IsStableUnderRetracts where
-  of_retract r hY := IsCompactObject.of_retract r hY
+  of_retract r hY := IsCompactObject.of_retract_of_size r hY
 
 end Retracts
 

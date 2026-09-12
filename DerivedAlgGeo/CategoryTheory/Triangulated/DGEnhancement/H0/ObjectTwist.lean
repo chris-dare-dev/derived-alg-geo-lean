@@ -44,10 +44,11 @@ open: `PreservesChosenCones` asks that maps *into* the cone split, while
 `DGCategory/Pretriangulated/ObjectTwist.lean`.
 
 Nothing here says `T_E` is an autoequivalence, calls `E` spherical, or connects
-it to `SerreFunctor.IsSphericalObject`.  Nothing here even produces an
-`EvaluationData`: a dg category with enough copowers has to supply one.  Being
-exact is not being invertible, and the object twist has no invertibility
-statement at all -- the adjunction twist gets one from
+it to `SerreFunctor.IsSphericalObject`.  The generic `HasCopowers` capability
+does produce `HasEvaluationData` and a noncomputably selected
+`chosenEvaluationData`; what remains open is a concrete dg category carrying
+that capability.  Being exact is not being invertible, and the object twist
+has no invertibility statement at all -- the adjunction twist gets one from
 `TwistCotwistEquivalenceConditions`, which has no object-level counterpart.
 
 ## Where the first two maps come from

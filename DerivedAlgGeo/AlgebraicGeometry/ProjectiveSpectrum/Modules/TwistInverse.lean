@@ -6,6 +6,7 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.TwistCompariso
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.TwistInvertible
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.GlobalGeneration
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Invertible
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
 
 /-!
 # `O(-N)` is the tensor inverse of `O(N)`, and Serre's surjection `⊕ O(-N) ↠ F`
@@ -37,10 +38,11 @@ finite direct sum of copies of one `O(-N)`.
 
 ## What is not here
 
-The general `IsInvertible L → ∃ L', L ⊗ L' ≅ unit` and the hom-equivalence
-`Hom(L ⊗ M, N) ≅ Hom(M, L' ⊗ N)` with identified composites, which `#806` also asks for. The
-first needs the per-chart trivializations glued; the second needs the associator natural in all
-three arguments. Neither is needed for the surjection, and `#806` stays open for them.
+The general `IsInvertible L → ∃ L', L ⊗ L' ≅ unit`, which still needs the per-chart
+trivializations glued. For an explicit `LineBundleData`, the formerly blocked hom-equivalence
+`Hom(L ⊗ M, N) ≃ Hom(M, L⁻¹ ⊗ N)` now lives at `LineBundleData.tensorLeftHomEquiv`:
+associator naturality is available from the monoidal structure. Its scalar-linear refinement
+lives downstream at `LineBundleData.tensorLeftHomLinearEquiv`.
 -/
 
 noncomputable section
@@ -67,6 +69,26 @@ def twistingSheafTensorNegIso (N : ℤ) :
   twistingSheafTensorAddIso 𝒜 g N (-N) hg ≪≫
     eqToIso (congrArg (twistingSheaf 𝒜) (add_neg_cancel N)) ≪≫
     twistingSheafZeroIso 𝒜 ≪≫ associatedSheafSelfIso 𝒜
+
+/-- The twisting sheaf with its opposite twist as a chosen tensor inverse. -/
+def twistingSheafLineBundleData (N : ℤ) :
+    Scheme.Modules.LineBundleData (Proj 𝒜) where
+  line := twistingSheaf 𝒜 N
+  inverse := twistingSheaf 𝒜 (-N)
+  lineIsInvertible := twistingSheaf_isInvertible 𝒜 g N hg
+  inverseIsInvertible := twistingSheaf_isInvertible 𝒜 g (-N) hg
+  tensorInverseIso := twistingSheafTensorNegIso 𝒜 g hg N
+
+/-- The projective twisting-sheaf specialization of the line-bundle Hom/sections comparison:
+`Hom(O(N), F) ≃ Γ(O(-N) ⊗ F)`.
+
+This file records the categorical equivalence at the neutral line-bundle layer. The generic
+scalar-linear refinement is `LineBundleData.lineHomTopLinearEquivOver`, and the projective
+Hom-finiteness reduction using it lives in `Cohomology.Finiteness.Hom`. -/
+def twistingSheafHomTopEquiv (N : ℤ) (F : (Proj 𝒜).Modules) :
+    (twistingSheaf 𝒜 N ⟶ F) ≃
+      Γ(Scheme.Modules.tensorObj (twistingSheaf 𝒜 (-N)) F, ⊤) :=
+  (twistingSheafLineBundleData 𝒜 g hg N).lineHomTopEquiv F
 
 /-- **Untwisting: `(F ⊗ O(N)) ⊗ O(-N) ≅ F`**, for an arbitrary module sheaf `F`.
 

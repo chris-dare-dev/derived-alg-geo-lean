@@ -7,6 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.Exist
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.HeartTransport
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.MaximalDestabilizing
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.Seesaw
+import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.SlopeBoundedness
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.Splice
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan.StrictDrop
 
