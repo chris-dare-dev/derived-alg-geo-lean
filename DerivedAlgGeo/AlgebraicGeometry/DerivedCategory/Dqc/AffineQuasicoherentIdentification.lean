@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Category.ModuleCat.LeftResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicGenerators
+import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineVanishing
+import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.UnitExt
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization
 
 /-!
@@ -81,6 +83,22 @@ noncomputable def affineQuasicoherentFreeInclusionIso
         (affineQuasicoherentFree R I) ≅
       SheafOfModules.free.{u} I :=
   tildeFinsupp I
+
+/-- Higher `Ext` from an arbitrary-rank affine quasi-coherent free sheaf vanishes after
+forgetting to all module sheaves.  The free sheaf is a coproduct of copies of the structure
+sheaf, whose `Ext` computes affine quasi-coherent cohomology. -/
+theorem subsingleton_ext_affineQuasicoherentFree_inclusion
+    (R : CommRingCat.{u}) (I : Type u) (Y : AffineQuasicoherentSheaves R) (n : ℕ) :
+    Subsingleton (Ext.{u + 1}
+      ((affineQuasicoherentSheavesInclusion R).obj (affineQuasicoherentFree R I))
+      ((affineQuasicoherentSheavesInclusion R).obj Y) (n + 1)) := by
+  apply Ext.subsingleton_of_iso_left
+    (affineQuasicoherentFreeInclusionIso R I) (n + 1)
+  apply Ext.subsingleton_coproduct_left
+  intro i
+  haveI := Cohomology.modules_H_subsingleton_of_isQuasicoherent
+    Y.obj (n + 1) (Nat.succ_pos n)
+  exact (Scheme.Modules.extUnitAddEquivDerivedH Y.obj (n + 1)).toEquiv.subsingleton
 
 end
 

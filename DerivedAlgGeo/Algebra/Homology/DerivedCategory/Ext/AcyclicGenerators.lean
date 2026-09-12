@@ -41,7 +41,7 @@ for quasi-coherent `G` on an affine scheme.
   `Functor.bijective_mapExtAddHom_of_generators` — the theorem.
 -/
 
-universe w w' v v' u u'
+universe w w' w'' v v' u u'
 
 open CategoryTheory Category Limits Abelian
 
@@ -90,7 +90,7 @@ category, while `DerivedCategory.Coproducts` supplies the instance for the
 scheme-module application. -/
 lemma Ext.subsingleton_coproduct_left {J : Type w'} (f : J → C)
     [HasCoproduct f]
-    [HasDerivedCategory.{w'} C]
+    [HasDerivedCategory.{w''} C]
     [PreservesColimitsOfShape (Discrete J)
       (DerivedCategory.singleFunctor C 0)]
     (Y : C) (n : ℕ) (h : ∀ j, Subsingleton (Ext.{w} (f j) Y n)) :

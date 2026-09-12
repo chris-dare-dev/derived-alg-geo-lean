@@ -103,6 +103,7 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms DerivedCategory.hasCoproductsOfShape
 #print axioms DerivedCategory.Qh_preservesCoproductsOfShape
 #print axioms DerivedCategory.Q_preservesCoproductsOfShape
+#print axioms DerivedCategory.singleFunctor_preservesCoproductsOfShape
 #print axioms DerivedCategory.homologyFunctor_preservesCoproductsOfShape
 #print axioms DerivedCategory.cohomologyIn_isClosedUnderColimitsOfShape_discrete
 
