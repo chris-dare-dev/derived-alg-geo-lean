@@ -500,6 +500,19 @@ def affineQuasicoherentBoundedLocalizationPullbackComparison :
         (affineQuasicoherentLocalizationPullbackComparison M) ≪≫
       (affineQuasicoherentBoundedLocalizationPullbackCompInclusion M).symm)
 
+include M in
+/-- Realizing the general bounded affine pullback along a localization agrees
+with the earlier transported localization realization. -/
+def affineQuasicoherentBoundedLocalizationPullbackToDqcComparison :
+    affineQuasicoherentBoundedDerivedPullbackToDqc
+        (CommRingCat.ofHom (algebraMap R A))
+        (affineLocalizationAlgebraMap_flat M) ≅
+      affineQuasicoherentBoundedLocalizationPullbackToDqc
+        (R := R) (A := A) M :=
+  Functor.isoWhiskerRight
+    (affineQuasicoherentBoundedLocalizationPullbackComparison M)
+    (affineQuasicoherentBoundedDerivedToDqc (CommRingCat.of A))
+
 /-- For the affine localization morphism, bounded geometric derived
 pushforward is the transported bounded restriction-of-scalars functor. -/
 def affineQuasicoherentBoundedLocalizationRestrictionComparison :
@@ -575,6 +588,19 @@ def affineQuasicoherentLocalizationPullbackToDqc :
       SchemeQuasicoherentDerivedCategory (Spec (CommRingCat.of A)) :=
   affineQuasicoherentLocalizationPullback M ⋙
     affineQuasicoherentDerivedToDqc (CommRingCat.of A)
+
+include M in
+/-- Realizing the general affine pullback along a localization agrees with
+the earlier transported localization realization. -/
+def affineQuasicoherentLocalizationPullbackToDqcComparison :
+    affineQuasicoherentDerivedPullbackToDqc
+        (CommRingCat.ofHom (algebraMap R A))
+        (affineLocalizationAlgebraMap_flat M) ≅
+      affineQuasicoherentLocalizationPullbackToDqc
+        (R := R) (A := A) M :=
+  Functor.isoWhiskerRight
+    (affineQuasicoherentLocalizationPullbackComparison M)
+    (affineQuasicoherentDerivedToDqc (CommRingCat.of A))
 
 /-- Localization pullback reaches exactly all target `Dqc` objects covered
 by the currently available affine realization.  Upgrading this equality to

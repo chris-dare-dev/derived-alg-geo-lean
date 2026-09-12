@@ -201,6 +201,27 @@ def affineQuasicoherentDerivedPullbackPushforwardAdjunction
   letI := affineQuasicoherentSheavesPullback_preservesFiniteLimits f hf
   exact (affineQuasicoherentSheavesPullbackPushforwardAdjunction f).mapDerivedCategory
 
+/-- Exact affine pullback followed by the concrete realization into the
+target scheme's intrinsic `Dqc` category. -/
+def affineQuasicoherentDerivedPullbackToDqc
+    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
+    AffineQuasicoherentDerivedCategory R ⥤
+      SchemeQuasicoherentDerivedCategory (Spec S) :=
+  affineQuasicoherentDerivedPullback f hf ⋙
+    affineQuasicoherentDerivedToDqc S
+
+/-- Forgetting the target `Dqc` witness identifies realized affine pullback
+with pullback followed by the exact inclusion into all module sheaves. -/
+def affineQuasicoherentDerivedPullbackToDqcCompInclusion
+    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
+    affineQuasicoherentDerivedPullbackToDqc f hf ⋙
+        SchemeQuasicoherentDerivedCategory.ι (Spec S) ≅
+      affineQuasicoherentDerivedPullback f hf ⋙
+        affineQuasicoherentDerivedInclusion S :=
+  Functor.associator _ _ _ ≪≫
+    Functor.isoWhiskerLeft (affineQuasicoherentDerivedPullback f hf)
+      (affineQuasicoherentDerivedToDqcCompInclusion S)
+
 /-- Flat affine quasi-coherent derived pullback preserves cohomologically
 bounded objects. -/
 theorem affineQuasicoherentDerivedPullback_bounded
@@ -256,6 +277,33 @@ def affineQuasicoherentBoundedDerivedPullbackPushforwardAdjunction
       (C := AffineQuasicoherentSheaves S)).bounded.fullyFaithfulι
     (affineQuasicoherentBoundedDerivedPullbackCompInclusion f hf).symm
     (affineQuasicoherentBoundedDerivedPushforwardCompInclusion f).symm
+
+/-- Bounded exact affine pullback followed by the concrete realization into
+the target scheme's intrinsic bounded `Dqc` category. -/
+def affineQuasicoherentBoundedDerivedPullbackToDqc
+    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
+    AffineQuasicoherentBoundedDerivedCategory R ⥤
+      SchemeBoundedQuasicoherentDerivedCategory (Spec S) :=
+  affineQuasicoherentBoundedDerivedPullback f hf ⋙
+    affineQuasicoherentBoundedDerivedToDqc S
+
+/-- Forgetting intrinsic boundedness recovers realized unbounded affine
+pullback on the bounded source. -/
+def affineQuasicoherentBoundedDerivedPullbackToDqcCompInclusion
+    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
+    affineQuasicoherentBoundedDerivedPullbackToDqc f hf ⋙
+        SchemeBoundedQuasicoherentDerivedCategory.ι (Spec S) ≅
+      DerivedCategory.Bounded.ι ⋙
+        affineQuasicoherentDerivedPullbackToDqc f hf :=
+  Functor.associator _ _ _ ≪≫
+    Functor.isoWhiskerLeft
+      (affineQuasicoherentBoundedDerivedPullback f hf)
+      (affineQuasicoherentBoundedDerivedToDqcCompInclusion S) ≪≫
+    (Functor.associator _ _ _).symm ≪≫
+    Functor.isoWhiskerRight
+      (affineQuasicoherentBoundedDerivedPullbackCompInclusion f hf)
+      (affineQuasicoherentDerivedToDqc S) ≪≫
+    Functor.associator _ _ _
 
 end
 
