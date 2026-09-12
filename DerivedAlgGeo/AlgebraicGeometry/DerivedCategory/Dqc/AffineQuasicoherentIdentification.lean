@@ -234,6 +234,59 @@ theorem affineQuasicoherentBoundedDqcEquivalence_functor (R : CommRingCat.{u}) :
       affineQuasicoherentBoundedDerivedToDqc R :=
   rfl
 
+/-- The explicit unbounded affine `Dqc` identification interface.  Its comparison field
+ensures that an abstract equivalence is the concrete derived realization constructed in
+`AffineRealization.lean`.  This file does not construct an inhabitant. -/
+structure AffineQuasicoherentDqcIdentification (R : CommRingCat.{u}) where
+  equivalence : AffineQuasicoherentDerivedCategory R ≌
+    SchemeQuasicoherentDerivedCategory (Spec R)
+  comparison : equivalence.functor ≅ affineQuasicoherentDerivedToDqc R
+
+/-- The proposition that the explicit unbounded affine `Dqc` identification is available. -/
+def HasAffineQuasicoherentDqcIdentification (R : CommRingCat.{u}) : Prop :=
+  Nonempty (AffineQuasicoherentDqcIdentification R)
+
+/-- An unbounded affine identification makes the concrete realization full. -/
+theorem affineQuasicoherentDerivedToDqc_full_of_identification
+    {R : CommRingCat.{u}} (I : AffineQuasicoherentDqcIdentification R) :
+    (affineQuasicoherentDerivedToDqc R).Full := by
+  letI : I.equivalence.functor.Full := inferInstance
+  exact Functor.Full.of_iso I.comparison
+
+/-- An unbounded affine identification makes the concrete realization faithful. -/
+theorem affineQuasicoherentDerivedToDqc_faithful_of_identification
+    {R : CommRingCat.{u}} (I : AffineQuasicoherentDqcIdentification R) :
+    (affineQuasicoherentDerivedToDqc R).Faithful := by
+  letI : I.equivalence.functor.Faithful := inferInstance
+  exact Functor.Faithful.of_iso I.comparison
+
+/-- An unbounded affine identification makes the concrete realization essentially
+surjective. -/
+theorem affineQuasicoherentDerivedToDqc_essSurj_of_identification
+    {R : CommRingCat.{u}} (I : AffineQuasicoherentDqcIdentification R) :
+    (affineQuasicoherentDerivedToDqc R).EssSurj := by
+  letI : I.equivalence.functor.EssSurj := inferInstance
+  exact Functor.essSurj_of_iso I.comparison
+
+/-- Repackage an unbounded identification as an equivalence whose forward functor is
+definitionally the concrete affine realization. -/
+noncomputable def affineQuasicoherentDqcEquivalenceOfIdentification
+    {R : CommRingCat.{u}} (I : AffineQuasicoherentDqcIdentification R) :
+    AffineQuasicoherentDerivedCategory R ≌
+      SchemeQuasicoherentDerivedCategory (Spec R) := by
+  letI := affineQuasicoherentDerivedToDqc_full_of_identification I
+  letI := affineQuasicoherentDerivedToDqc_faithful_of_identification I
+  letI := affineQuasicoherentDerivedToDqc_essSurj_of_identification I
+  letI : (affineQuasicoherentDerivedToDqc R).IsEquivalence := {}
+  exact (affineQuasicoherentDerivedToDqc R).asEquivalence
+
+@[simp]
+theorem affineQuasicoherentDqcEquivalenceOfIdentification_functor
+    {R : CommRingCat.{u}} (I : AffineQuasicoherentDqcIdentification R) :
+    (affineQuasicoherentDqcEquivalenceOfIdentification I).functor =
+      affineQuasicoherentDerivedToDqc R :=
+  rfl
+
 end
 
 end AlgebraicGeometry.DerivedCategory.Dqc

@@ -347,6 +347,13 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedDerivedToDqc_essSurj
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedDqcEquivalence
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentBoundedDqcEquivalence_functor
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.AffineQuasicoherentDqcIdentification
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.HasAffineQuasicoherentDqcIdentification
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedToDqc_full_of_identification
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedToDqc_faithful_of_identification
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedToDqc_essSurj_of_identification
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDqcEquivalenceOfIdentification
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDqcEquivalenceOfIdentification_functor
 
 /-! ## Preserved affine bounded-above projective locus -/
 
