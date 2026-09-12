@@ -17,11 +17,13 @@ arXiv:1902.08184:
 * its coproduct-and-extension closure, the quasicoherent sequence;
 * the inverse-image sequence on the intrinsic bounded-coherent locus.
 
-The smallest geometric input is `PerfectExternalProductsSemiorthogonal`, the
-Hom-vanishing between shifts of the concrete external products. Formal
-closure extends this first to the perfect envelopes and then, using
-compactness, to the quasicoherent components. Faithfulness of the
-bounded-coherent inclusion reflects it to the bounded components.
+The geometric semiorthogonality input is split into an additive Hom reduction
+(`ExternalProductHomReduction`) and the statement that its source-side
+objects remain in the later component (`PreservesSourceComponents`). Source
+semiorthogonality then proves Hom-vanishing between shifts of the concrete
+external products. Formal closure extends this first to the perfect envelopes
+and then, using compactness, to the quasicoherent components. Faithfulness of
+the bounded-coherent inclusion reflects it to the bounded components.
 -/
 
 noncomputable section
@@ -81,6 +83,69 @@ def PerfectExternalProductsSemiorthogonal : Prop :=
       (f : (((D.externalProduct (A.component i)).obj Fi).obj Gi)⟦a⟧ ⟶
         (((D.externalProduct (A.component j)).obj Fj).obj Gj)⟦b⟧),
       f = 0
+
+/-- A tensor-duality/adjunction reduction for morphisms between K-flat
+external products.
+
+The reduced object is deliberately separate from any component-membership
+claim. In a geometric construction, `homEquiv` is the composite of tensor
+duality and pullback-pushforward adjunction; preservation of components is
+the additional `S`-linearity/projection-formula input below. -/
+structure ExternalProductHomReduction where
+  /-- The source-side object representing morphisms out of the earlier
+  external-product factor. -/
+  reductionObject :
+    ∀ ⦃j : ι⦄, SourcePerfectPartCategory X (A.component j) →
+      CompactDqcFiber T → CompactDqcFiber T → ℤ → ℤ → SourceDqc X
+  /-- The additive Hom equivalence obtained from duality and adjunction. -/
+  homEquiv :
+    ∀ ⦃i j : ι⦄ (Fi : SourcePerfectPartCategory X (A.component i))
+      (Gi : CompactDqcFiber T)
+      (Fj : SourcePerfectPartCategory X (A.component j))
+      (Gj : CompactDqcFiber T) (a b : ℤ),
+      ((((D.externalProduct (A.component i)).obj Fi).obj Gi)⟦a⟧ ⟶
+          (((D.externalProduct (A.component j)).obj Fj).obj Gj)⟦b⟧) ≃+
+        (Fi.obj ⟶ reductionObject Fj Gi Gj a b)
+
+namespace ExternalProductHomReduction
+
+/-- The source-side reductions stay in the component of their later
+external-product factor. This is the `S`-linearity/projection-formula half of
+the geometric argument. -/
+def PreservesSourceComponents
+    (R : D.ExternalProductHomReduction A) : Prop :=
+  ∀ ⦃j : ι⦄ (Fj : SourcePerfectPartCategory X (A.component j))
+    (Gi Gj : CompactDqcFiber T) (a b : ℤ),
+    A.component j (R.reductionObject Fj Gi Gj a b)
+
+/-- Source semiorthogonality kills every target morphism after an additive
+Hom reduction whose reduced objects remain in the later component. -/
+theorem hom_eq_zero (R : D.ExternalProductHomReduction A)
+    (hR : R.PreservesSourceComponents) ⦃i j : ι⦄ (hij : i < j)
+    (Fi : SourcePerfectPartCategory X (A.component i))
+    (Gi : CompactDqcFiber T)
+    (Fj : SourcePerfectPartCategory X (A.component j))
+    (Gj : CompactDqcFiber T) (a b : ℤ)
+    (f : (((D.externalProduct (A.component i)).obj Fi).obj Gi)⟦a⟧ ⟶
+      (((D.externalProduct (A.component j)).obj Fj).obj Gj)⟦b⟧) :
+    f = 0 := by
+  apply (R.homEquiv Fi Gi Fj Gj a b).injective
+  rw [map_zero]
+  exact A.hom_eq_zero hij Fi.property.1
+    (hR Fj Gi Gj a b) ((R.homEquiv Fi Gi Fj Gj a b) f)
+
+end ExternalProductHomReduction
+
+/-- Tensor-duality/adjunction Hom reduction plus source-component
+preservation proves the concrete external-product semiorthogonality
+obligation. -/
+theorem perfectExternalProductsSemiorthogonal_of_homReduction
+    (R : D.ExternalProductHomReduction A)
+    (hR : R.PreservesSourceComponents) :
+    D.PerfectExternalProductsSemiorthogonal A := by
+  intro i j hij Fi Gi Fj Gj a b f
+  exact ExternalProductHomReduction.hom_eq_zero
+    (D := D) (A := A) R hR hij Fi Gi Fj Gj a b f
 
 /-- The generator-level geometric Hom-vanishing input: every shifted
 external-product generator from a later component is right orthogonal to
@@ -158,6 +223,17 @@ theorem perfectComponentsSemiorthogonal_of_externalProducts
     D.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_shiftedGenerators A hA
     (D.shiftedPerfectGeneratorsSemiorthogonal_of_externalProducts A horth)
+
+/-- A tensor-duality/adjunction Hom reduction whose reduced objects stay in
+the later source component implies semiorthogonality of the perfect
+base-change envelopes. -/
+theorem perfectComponentsSemiorthogonal_of_homReduction
+    (hA : A.HasTriangulatedComponents)
+    (R : D.ExternalProductHomReduction A)
+    (hR : R.PreservesSourceComponents) :
+    D.PerfectComponentsSemiorthogonal A :=
+  D.perfectComponentsSemiorthogonal_of_externalProducts A hA
+    (D.perfectExternalProductsSemiorthogonal_of_homReduction A R hR)
 
 /-- The sequence of perfect base-change envelopes on `Dqc(X_T)`. -/
 def perfectSequence (horth : D.PerfectComponentsSemiorthogonal A) :
