@@ -916,6 +916,31 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.twist
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.twistToShiftedComposite
 
+/-! ## Fourier--Mukai lane -- adjunction-unit kernel data and cones -/
+
+-- A definitional specialization of the generic kernel-transformation root to
+-- a right adjunction's unit.  The selected cone is unshifted; no conventional
+-- cotwist or exactness of its transform is asserted here.
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData.ofFull
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData.toConeData
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelData.transform_arrow
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.compositeToCotwistCone
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistCone
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.cotwistConeToShiftedIdentity
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedUnitTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.distinguishedUnitTriangleInSource_obj_val
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.transform_arrow_unit_square
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_mor₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_mor₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_mor₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_obj_distinguished
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_obj₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_obj₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_obj₃
+
 /-! ## Fourier--Mukai lane -- kernel-presented adjunctions on extension stages -/
 
 -- The transform of a supplied kernel map, the restricted equivalence and

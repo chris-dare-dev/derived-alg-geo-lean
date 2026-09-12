@@ -131,13 +131,19 @@ Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
       └─ KernelTransformationData: a kernel arrow realizes any named transformation
          ├─ KernelTransformationConeData: enhanced representative and chosen dg cone
          │  └─ normalizationData: feeds the generic endpoint transport
-         └─ FourierMukai.CounitKernelData: adjunction-counit specialization
-            ├─ ordinary kernel arrow conv Q P ⟶ O_Δ whose transform is the counit
-            │  (conv Q P represents Φ_Q ⋙ Φ_P diagrammatically; Huybrechts writes P ∘ Q)
-            └─ toConeData: choose a closed representative and dg cone in any enhancement
-               └─ FourierMukai.CounitKernelConeData
-                  └─ exact kernel evaluation gives a source-natural counit triangle
-                     Φ_Q ⋙ Φ_P ⟶ 𝟭_Y ⟶ twist, pointwise distinguished
+         ├─ FourierMukai.CounitKernelData: adjunction-counit specialization
+         │  ├─ ordinary kernel arrow conv Q P ⟶ O_Δ whose transform is the counit
+         │  │  (conv Q P represents Φ_Q ⋙ Φ_P diagrammatically; Huybrechts writes P ∘ Q)
+         │  └─ toConeData: choose a closed representative and dg cone in any enhancement
+         │     └─ FourierMukai.CounitKernelConeData
+         │        └─ exact kernel evaluation gives a source-natural counit triangle
+         │           Φ_Q ⋙ Φ_P ⟶ 𝟭_Y ⟶ twist, pointwise distinguished
+         └─ AdjunctionUnitKernelData: definitional right-adjunction-unit specialization
+            ├─ ordinary kernel arrow O_Δ ⟶ conv P Q whose transform is the unit
+            └─ AdjunctionUnitKernelConeData
+               └─ exact kernel evaluation gives the unshifted unit triangle
+                  𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧,
+                  pointwise distinguished
 ```
 
 The kernel category is never required to *be* an `H⁰`: the comparison
@@ -321,12 +327,14 @@ that comparison are instance hypotheses to be discharged by the realization.
    does not make the twist exact or an autoequivalence, and does not make the
    selected enhancement representative or cone canonical.  `CommShift` and
    `IsTriangulated` for the enhancement comparison remain supplied where these
-   pointwise distinguished triangles are consumed.  The next honest consumer
-   is the right-adjunction unit kernel `O_Δ ⟶ P ⋆ Q`: first realize and
-   normalize the unshifted unit cone, then inverse-rotate it for the
-   conventional cotwist.  Pointwise distinguishedness alone cannot supply
-   `CommShift` or `IsTriangulated` for the cone transform, so that later
-   exactness seam must remain explicit.
+   pointwise distinguished triangles are consumed.  The right-adjunction unit
+   kernel is now the second generic consumer: `AdjunctionUnitKernelData`
+   realizes `O_Δ ⟶ P ⋆ Q`, and its enhanced form normalizes the unshifted
+   triangle `𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧`.  The next honest seam is to
+   inverse-rotate that family to the conventional cotwist triangle, without
+   claiming that the shifted cone is exact or an autoequivalence.  Pointwise
+   distinguishedness alone cannot supply `CommShift` or `IsTriangulated` for
+   the cone transform, so that later exactness seam must remain explicit.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
