@@ -326,6 +326,14 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationPullbackToDqcComparison
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentLocalizationPullbackToDqc_essImage
 
+/-! ## Bounded affine quasi-coherent identification -/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentFree
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentFree_projective
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentFreeObjects
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.exists_affineQuasicoherentFree_epi
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentFreeInclusionIso
+
 /-! ## Preserved affine bounded-above projective locus -/
 
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineExtendScalars_preservesProjectiveObjects
