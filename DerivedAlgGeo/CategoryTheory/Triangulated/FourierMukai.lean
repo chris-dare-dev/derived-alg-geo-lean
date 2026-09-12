@@ -12,6 +12,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.ExceptionalExtensi
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.ExceptionalInduction
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.KernelCone
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.KernelConeNormalization
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.KernelTransformation
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Witness
 
 /-! # Fourier--Mukai transforms
