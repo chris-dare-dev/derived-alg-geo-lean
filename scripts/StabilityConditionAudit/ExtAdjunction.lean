@@ -6,6 +6,7 @@ reading guide.
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicComparison
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.AcyclicGenerators
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.Adjunction
+import DerivedAlgGeo.CategoryTheory.Linear.Adjunction
 
 /-! ## Ext along an adjunction with exact left adjoint (#572 step 3, slice 2)
 
@@ -33,6 +34,7 @@ every degree.
 #print axioms CategoryTheory.extAdjunctionAddEquiv
 #print axioms CategoryTheory.extAdjunctionAddEquiv_apply
 #print axioms CategoryTheory.Abelian.Ext.precompAddEquiv
+#print axioms CategoryTheory.Adjunction.homLinearEquiv
 
 /-! ## Ext comparison from acyclicity of images of injectives (#1070, affine lane, slice 2)
 
