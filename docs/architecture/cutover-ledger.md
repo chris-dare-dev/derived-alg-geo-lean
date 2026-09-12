@@ -7,6 +7,14 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- `K₀` actions of enhanced adjunction cones (2026-09-12):
+  `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
+  directly from the distinguished adjunction triangles and lifts them, under
+  the existing endpoint chosen-cone hypotheses, to equalities of `K₀`
+  homomorphisms.  Each conventional twist or cotwist acts as the identity
+  minus its corresponding adjunction composite.  This does not identify an
+  object-twist evaluation composite with an Euler multiple of the object;
+  that copower computation remains the next seam toward `twistK₀`.
 - Exact twist and cotwist equivalences on `H⁰` (2026-09-12):
   `twistH0EquivalenceIsTriangulated` and
   `cotwistH0EquivalenceIsTriangulated` combine the separately proved ordinary
