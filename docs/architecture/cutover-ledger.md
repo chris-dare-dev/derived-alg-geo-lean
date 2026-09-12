@@ -7,6 +7,16 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Conventional shifted dg twists on `H⁰` (2026-09-12):
+  `DGFunctor.shiftedFunctor_h0_eq` and `shiftedFunctorH0Iso` package the
+  objectwise and morphism computations as a functor-level comparison
+  `H⁰(F[n]) ≅ H⁰(F) ⋙ [n]`.  Equivalence of `H⁰ F` therefore transports to
+  every shifted dg functor without asserting a dg quasi-equivalence or
+  exactness.  `EnhancedAdjunctionCones` now names the conventional
+  `dualTwistFunctor` and `cotwistFunctor`, and `cotwistH0Equivalence` applies
+  that bridge to the recorded unshifted cotwist condition.  This introduces
+  no second shift structure and proves no relation among the four adjunction
+  cones or sphericality.
 - Generic twist kernels and left-adjunction Fourier--Mukai dual cotwists
   (2026-09-12): `CounitKernelConeData.twistKernel` now names the ordinary image
   of the selected enhanced cone, with its definitional transform isomorphism
