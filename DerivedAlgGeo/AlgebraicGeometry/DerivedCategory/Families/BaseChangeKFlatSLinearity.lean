@@ -12,8 +12,9 @@ perfect-component semiorthogonality. A `KFlatBasePullbackData X` constructs
 the derived pullback `Dqc(S) ⥤ Dqc(X)` from a K-flat resolution on `S`, its
 pullback-acyclicity along `X → S`, and resolved quasicoherence preservation.
 
-The resulting aliases and end-to-end theorem state the base-coefficient and
-`S`-linearity inputs entirely in terms of this constructed pullback.
+The resulting aliases and end-to-end theorems state both compact and
+quasicoherent base-coefficient/`S`-linearity inputs entirely in terms of this
+constructed pullback.
 -/
 
 noncomputable section
@@ -69,6 +70,14 @@ def KFlatSLinearComponents
     (A : SemiorthogonalSequence (SourceDqc X) ι) : Prop :=
   SLinearComponents (D := D) Q B.pullback A
 
+/-- `Dqc(S)`-linearity using the base action constructed from K-flat
+pullback data. -/
+def KFlatDqcSLinearComponents
+    (Q : D.SourceTensorData)
+    (B : KFlatBasePullbackData X)
+    (A : SemiorthogonalSequence (SourceDqc X) ι) : Prop :=
+  DqcSLinearComponents (D := D) Q B.pullback A
+
 end SourceTensorData
 
 namespace CompactFiberProjectionFormula
@@ -82,6 +91,16 @@ abbrev KFlatBaseCoefficientData
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (B : KFlatBasePullbackData X) :=
   BaseCoefficientData (D := D) P B.pullback
+
+/-- Quasicoherent base coefficients represented through the
+K-flat-constructed pullback `Dqc(S) ⥤ Dqc(X)`. -/
+abbrev KFlatDqcBaseCoefficientData
+    {H : D.CompactFiberTensorDuality}
+    {Q : D.SourceTensorData}
+    {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
+    (P : D.CompactFiberProjectionFormula H Q pushFst)
+    (B : KFlatBasePullbackData X) :=
+  DqcBaseCoefficientData (D := D) P B.pullback
 
 end CompactFiberProjectionFormula
 
@@ -105,6 +124,27 @@ theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_sLinear
       (D := D) Q B A) :
     D.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula_of_sLinear
+    A hA hIso H Q B.pullback pushFst adj P C hS
+
+/-- The fully K-flat route from quasicoherent base coefficients and
+`Dqc(S)`-linearity to perfect-component semiorthogonality. -/
+theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_dqcSLinear
+    (A : SemiorthogonalSequence (SourceDqc X) ι)
+    (hA : A.HasTriangulatedComponents)
+    (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
+    (H : D.CompactFiberTensorDuality)
+    (Q : D.SourceTensorData)
+    (B : KFlatBasePullbackData X)
+    (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
+    (adj : D.pullFst.functor ⊣ pushFst.functor)
+    [D.pullFst.functor.Additive]
+    (P : D.CompactFiberProjectionFormula H Q pushFst)
+    (C : CompactFiberProjectionFormula.KFlatDqcBaseCoefficientData
+      (D := D) P B)
+    (hS : SourceTensorData.KFlatDqcSLinearComponents
+      (D := D) Q B A) :
+    D.PerfectComponentsSemiorthogonal A :=
+  D.perfectComponentsSemiorthogonal_of_projectionFormula_of_dqcSLinear
     A hA hIso H Q B.pullback pushFst adj P C hS
 
 end KFlatBaseChangeData
