@@ -7,6 +7,17 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Left-adjunction Fourier--Mukai dual twists (2026-09-12):
+  `DualTwistKernelData` and its enhanced cone form read
+  `LeftAdjointKernelData.toRightAdjointKernelData` with the correspondences
+  swapped, so the left-adjunction unit reuses the generic unit-kernel,
+  normalization, inverse-rotation, and shifted-kernel machinery.  The semantic
+  API names the resulting functor `dualTwist`, presents it by
+  `dualTwistKernel`, and exposes the target-natural triangle
+  `dualTwist ⟶ 𝟭 Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧`, pointwise
+  distinguished under the existing exactness hypotheses.  This is not a new
+  adjunction, cone choice, or normalization construction, and it asserts no
+  exactness, invertibility, dual-kernel identity, or sphericality.
 - Shifted Fourier--Mukai cone kernels (2026-09-12):
   `KernelConeNormalizationData` names the ordinary kernel represented by its
   selected enhanced cone and, for every integer shift, the kernel obtained by
