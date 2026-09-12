@@ -41,10 +41,12 @@ The unshifted triangles are kept under their `Cone` names, since the
 `TwistCotwistEquivalenceConditions` are stated against the unshifted cone
 functors.
 
-That the first vertex really is the shift of the dg cone functor, and not
-merely some object isomorphic to it, is
-`DGFunctor.shiftedFunctor_h0_obj`: the dg shifted functor and the `H⁰` shift
-make the same choice, so the two agree on the nose.
+The conventional shifted dg functors are named `dualTwistFunctor` and
+`cotwistFunctor`.  Their `H⁰` functors are naturally isomorphic to the
+corresponding unshifted cone functor followed by the ordinary `[-1]` shift.
+Thus the first vertices below are values of the named dg functors on the nose,
+while ordinary categorical properties can be transported through a reusable
+comparison.
 
 ## What is not claimed
 
@@ -116,8 +118,9 @@ so its first vertex is `C X⟦-1⟧`, the dual twist:
 
 `C X⟦-1⟧ ⟶ X ⟶ S L X ⟶ C X`.
 
-Inverse rotation applies the shift and reorders in one step, which is why this
-needs no separate shifted cone functor. -/
+Inverse rotation applies the shift and reorders in one step, so the triangle
+construction itself need not be rebuilt from the separately named shifted
+cone functor. -/
 noncomputable def dualTwistTriangleFunctor : H0 B ⥤ Triangle (H0 B) :=
   P.dualTwistConeTriangleFunctor ⋙ invRotate (H0 B)
 
@@ -130,8 +133,14 @@ theorem dualTwistTriangleFunctor_obj_mem_distinguishedTriangles (X : H0 B) :
 the dg cone functor, shifted by `-1`. -/
 theorem dualTwistTriangleFunctor_obj_obj₁ (X : H0 B) :
     ((P.dualTwistTriangleFunctor).obj X).obj₁ =
-      (P.dualTwistConeFunctor.shiftedFunctor (-1 : ℤ)).h0.obj X :=
+      P.dualTwistFunctor.h0.obj X :=
   rfl
+
+/-- The `H⁰` dual twist is naturally the unshifted cone followed by `[-1]`. -/
+noncomputable def dualTwistFunctorH0Iso :
+    P.dualTwistFunctor.h0 ≅
+      P.dualTwistConeFunctor.h0 ⋙ shiftFunctor (H0 B) (-1 : ℤ) :=
+  DGFunctor.shiftedFunctorH0Iso P.dualTwistConeFunctor (-1 : ℤ)
 
 @[simp]
 theorem dualTwistTriangleFunctor_obj_obj₂ (X : H0 B) :
@@ -190,8 +199,14 @@ theorem cotwistTriangleFunctor_obj_mem_distinguishedTriangles (X : H0 A) :
 dg cone functor, shifted by `-1`. -/
 theorem cotwistTriangleFunctor_obj_obj₁ (X : H0 A) :
     ((P.cotwistTriangleFunctor).obj X).obj₁ =
-      (P.cotwistConeFunctor.shiftedFunctor (-1 : ℤ)).h0.obj X :=
+      P.cotwistFunctor.h0.obj X :=
   rfl
+
+/-- The `H⁰` cotwist is naturally the unshifted cone followed by `[-1]`. -/
+noncomputable def cotwistFunctorH0Iso :
+    P.cotwistFunctor.h0 ≅
+      P.cotwistConeFunctor.h0 ⋙ shiftFunctor (H0 A) (-1 : ℤ) :=
+  DGFunctor.shiftedFunctorH0Iso P.cotwistConeFunctor (-1 : ℤ)
 
 @[simp]
 theorem cotwistTriangleFunctor_obj_obj₂ (X : H0 A) :
@@ -256,6 +271,18 @@ condition. -/
 noncomputable def cotwistConeH0Equivalence
     (h : TwistCotwistEquivalenceConditions P) : H0 A ≌ H0 A :=
   P.cotwistConeFunctor.h0Equivalence h.cotwist
+
+/-- **The conventional cotwist is an autoequivalence of `H⁰ A`.**
+
+The recorded condition is stated for the unshifted cone.  The reusable
+shifted-functor comparison transports its induced `H⁰` equivalence across the
+conventional `[-1]` shift.  This remains an equivalence of ordinary categories;
+no sphericality or exactness is inferred here. -/
+noncomputable def cotwistH0Equivalence
+    [IsPretriangulated A]
+    (h : TwistCotwistEquivalenceConditions P) : H0 A ≌ H0 A :=
+  DGFunctor.shiftedFunctorH0Equivalence P.cotwistConeFunctor (-1 : ℤ)
+    (P.cotwistConeFunctor.isEquivalence_h0 h.cotwist)
 
 end Equivalences
 
