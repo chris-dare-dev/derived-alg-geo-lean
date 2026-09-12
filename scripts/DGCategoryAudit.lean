@@ -440,6 +440,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.id
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.comp
+#print axioms CategoryTheory.DGFunctor.PreservesChosenCones.ofIso
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_fst
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_snd
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_toShift

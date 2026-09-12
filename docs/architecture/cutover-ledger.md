@@ -7,6 +7,14 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- DG cone-preservation transport (2026-09-12):
+  `Algebra/Homology/DGCategory/Pretriangulated/Functor.lean` proves that
+  `DGFunctor.PreservesChosenCones` transports across an isomorphism in
+  `Z⁰ (DGFunctor C D)`.  Consequently the exactness hypothesis for an object
+  twist is independent of the chosen evaluation data once the evaluation
+  functors are compared.  This does not yet identify the resulting twist cone
+  functors; that requires an invertible, coherent lift of the strict
+  evaluation square.
 - DG copower and evaluation-data existence packaging (2026-09-12):
   `Algebra/Homology/DGCategory/Copower.lean` owns the Mathlib-style
   `HasCopower` and `HasCopowers` mere-existence capabilities, their

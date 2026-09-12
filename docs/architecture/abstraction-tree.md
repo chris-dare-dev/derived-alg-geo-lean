@@ -95,6 +95,7 @@ Category
 │  │  │  └─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
+│  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
 │  │     └─ H0 exactness                 derived weak cone-triangle certificate
 │  ├─ IsCopowerOf K X Z                   `Z = K ⊗ X`, by its universal property
 │  │  ├─ lift / lift_unique              cochains out of `K` are morphisms out of `Z`
