@@ -260,6 +260,18 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.combinedEffectiveOrbitHomeomorph
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.combinedEffectiveOrbitHomeomorph_mk
 
+/-! ## Proper discontinuity as explicit external data -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData.properlyDiscontinuous
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData.surjective
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData.locallyCompact
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData.finite_stabilizer
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData.exists_nhds_image_smul_eq_self
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData.exists_nhds_disjoint_image
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData.t2Space_autPairOrbitSpace
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData.isCoveringMapOn_autPairOrbitMap
+
 /-! ## AutIsometry — the action preserves the foundational library's phase distance -/
 
 #print axioms CategoryTheory.Triangulated.Slicing.phiPlus_congr
