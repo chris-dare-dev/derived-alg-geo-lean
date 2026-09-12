@@ -43,8 +43,17 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
 /-! ## Full support from finite Euler probes -/
 
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.EulerProbeFamily
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.EulerProbeFamily.realizes
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.EulerProbeFamily.separates
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.shifts
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.shifted_mem
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.euler_abs_le
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.mk.inj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.probeQuadratic
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.probeQuadratic_apply
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.chargeQuadratic
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.chargeQuadratic_apply
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.hasQuadraticSupportProperty_of_finite_probes
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.quadraticSupportData
