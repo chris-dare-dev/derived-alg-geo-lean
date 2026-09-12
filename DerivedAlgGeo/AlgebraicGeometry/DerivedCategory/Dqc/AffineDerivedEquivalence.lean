@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Localization.Equivalence
+import Mathlib.CategoryTheory.ObjectProperty.Equivalence
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Affine
 
 /-!
@@ -125,6 +127,44 @@ theorem affineQuasicoherentDerivedEquivalence_inverse
     (affineQuasicoherentDerivedEquivalence R).inverse =
       affineGammaDerivedFunctor R :=
   rfl
+
+/-- The cohomologically bounded derived category of genuine quasi-coherent
+sheaves on an affine spectrum. -/
+abbrev AffineQuasicoherentBoundedDerivedCategory (R : CommRingCat.{u}) :=
+  DerivedCategory.Bounded (AffineQuasicoherentSheaves R)
+
+/-- The affine derived tilde equivalence detects cohomological boundedness.
+Both directions follow from exactness of the abelian tilde equivalence. -/
+theorem affineQuasicoherentDerivedEquivalence_bounded_inverseImage
+    (R : CommRingCat.{u}) :
+    (DerivedCategory.TStructure.t
+        (C := AffineQuasicoherentSheaves R)).bounded.inverseImage
+        (affineQuasicoherentDerivedEquivalence R).functor =
+      (DerivedCategory.TStructure.t (C := ModuleCat R)).bounded := by
+  ext E
+  constructor
+  · intro hE
+    change (DerivedCategory.TStructure.t
+      (C := AffineQuasicoherentSheaves R)).bounded
+        (((affineQuasicoherentSheavesEquiv R).functor.mapDerivedCategory).obj E) at hE
+    have hE' := mapDerivedCategory_bounded
+      (affineQuasicoherentSheavesEquiv R).inverse _ hE
+    exact (DerivedCategory.TStructure.t (C := ModuleCat R)).bounded.prop_of_iso
+      ((affineQuasicoherentDerivedEquivalence R).unitIso.app E).symm hE'
+  · intro hE
+    change (DerivedCategory.TStructure.t
+      (C := AffineQuasicoherentSheaves R)).bounded
+        (((affineQuasicoherentSheavesEquiv R).functor.mapDerivedCategory).obj E)
+    exact mapDerivedCategory_bounded
+      (affineQuasicoherentSheavesEquiv R).functor E hE
+
+/-- The affine quasi-coherent derived equivalence restricted to
+cohomologically bounded objects. -/
+def affineQuasicoherentBoundedDerivedEquivalence (R : CommRingCat.{u}) :
+    DerivedCategory.Bounded (ModuleCat R) ≌
+      AffineQuasicoherentBoundedDerivedCategory R :=
+  (affineQuasicoherentDerivedEquivalence R).congrFullSubcategory
+    (affineQuasicoherentDerivedEquivalence_bounded_inverseImage R)
 
 end
 
