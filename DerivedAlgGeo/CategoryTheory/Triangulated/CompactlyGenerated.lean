@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Preadditive.CompactObject
+import DerivedAlgGeo.CategoryTheory.Triangulated.CompactObject
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
 import Mathlib.CategoryTheory.Adjunction.Additive
 import Mathlib.CategoryTheory.Adjunction.Limits
@@ -19,9 +19,9 @@ a compact object or the coproduct-and-extension closure `Coprod(G)`.
 
 The definitions here follow A.9--A.11 literally:
 
-* `Functor.PreservesSmallCoproducts` and `IsCompactObject` (A.9, A.10) are the
-  preadditive vocabulary of `CategoryTheory/Preadditive/CompactObject.lean`, which this
-  file imports;
+* `Functor.PreservesSmallCoproducts` and `IsCompactObject` (A.9, A.10) begin in the
+  preadditive compact-object layer, while their thick-subcategory structure lives in
+  `CategoryTheory/Triangulated/CompactObject.lean`, which this file imports;
 * `ObjectProperty.coprodClosure` is the smallest isomorphism-, coproduct-, and
   extension-closed object property containing its generators;
 * `ObjectProperty.coprodClosure_le_shift_of_le_shift` transports that closure

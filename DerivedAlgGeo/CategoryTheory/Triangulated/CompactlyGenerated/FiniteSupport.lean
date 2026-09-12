@@ -133,14 +133,4 @@ theorem exists_finite_sum {ι : Type} (X : ι → C)
   simp only [totalIso_hom_comp_ι, g]
   exact (DirectSum.sum_support_of (β := fun i => H i) y).symm
 
-variable [HasShift C ℤ] [∀ n : ℤ, (shiftFunctor C n).Additive]
-
-/-- A shift of a compact object is compact in the same indexing universe. -/
-theorem shift (n : ℤ) : IsCompactObject.{0} (K⟦n⟧) := by
-  let adj : shiftFunctor C n ⊣ shiftFunctor C (-n) :=
-    (shiftEquiv C n).toAdjunction
-  have hpres : (shiftFunctor C (-n)).PreservesSmallCoproducts.{0} :=
-    fun _ => inferInstance
-  exact adj.isCompactObject_leftAdjoint_obj hpres hK
-
 end CategoryTheory.IsCompactObject

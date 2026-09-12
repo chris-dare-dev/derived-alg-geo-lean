@@ -108,6 +108,8 @@ open CategoryTheory.Triangulated
 /-! ## SF7.2 compact generation, Ind-extension, and A.17 core (#477) -/
 
 #print axioms CategoryTheory.Functor.PreservesSmallCoproducts
+#print axioms CategoryTheory.AddCommGrpCat.hasCoproductsSucc
+#print axioms CategoryTheory.AddCommGrpCat.ab4OfSizeSucc
 #print axioms CategoryTheory.IsCompactObject
 #print axioms CategoryTheory.IsCompactObject.coproductComparisonIso
 #print axioms CategoryTheory.IsCompactObject.coproductComparisonIso.congr_simp
@@ -115,8 +117,16 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.IsCompactObject.map_ι_coproductComparisonIso_hom_assoc
 #print axioms CategoryTheory.IsCompactObject.exists_finite_sum
 #print axioms CategoryTheory.IsCompactObject.shift
+#print axioms CategoryTheory.IsCompactObject.zero
+#print axioms CategoryTheory.IsCompactObject.extension
+#print axioms CategoryTheory.IsCompactObject.of_retract
 #print axioms CategoryTheory.ObjectProperty.compactObjects
 #print axioms CategoryTheory.ObjectProperty.isCompactObject_of_iso
+#print axioms CategoryTheory.ObjectProperty.compactObjects_isStableUnderRetracts
+#print axioms CategoryTheory.ObjectProperty.compactObjects_containsZero
+#print axioms CategoryTheory.ObjectProperty.compactObjects_isStableUnderShift
+#print axioms CategoryTheory.ObjectProperty.compactObjects_isTriangulatedClosed₂
+#print axioms CategoryTheory.ObjectProperty.compactObjects_isTriangulated
 #print axioms CategoryTheory.ObjectProperty.coprodClosure
 #print axioms CategoryTheory.ObjectProperty.coprodClosure.below.of_coproduct
 #print axioms CategoryTheory.ObjectProperty.coprodClosure.below.of_extension

@@ -25,6 +25,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement
 import DerivedAlgGeo.CategoryTheory.Triangulated.Families
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
+import DerivedAlgGeo.CategoryTheory.Triangulated.CompactObject
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
 import DerivedAlgGeo.CategoryTheory.Triangulated.Opposite
 

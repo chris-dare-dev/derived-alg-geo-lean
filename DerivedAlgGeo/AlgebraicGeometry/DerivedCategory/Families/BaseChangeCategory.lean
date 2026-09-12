@@ -404,13 +404,8 @@ theorem perfectBaseChangeEnvelope_le
     (P := perfectBaseChangeGenerators X T P externalProduct) (Q := Q)).2 h
 
 /-- Compactness half of the perfect-envelope construction in Proposition
-3.15.  Once compact objects of the ambient `Dqc(X_T)` are available as a thick
-triangulated property, compact-preserving pullback and tensor put the whole
-external-product envelope inside them.
-
-The two typeclass hypotheses are deliberately explicit: their general proof
-for the repository's coproduct-based `IsCompactObject` API has not yet been
-formalized and is independent of the scheme-theoretic tensor construction. -/
+3.15.  Compact objects form a thick triangulated property, so compact-preserving
+pullback and tensor put the whole external-product envelope inside them. -/
 theorem perfectBaseChangeEnvelope_externalProduct_le_compact
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
@@ -418,12 +413,6 @@ theorem perfectBaseChangeEnvelope_externalProduct_le_compact
     (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
       Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
         Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
-    [ObjectProperty.IsStableUnderRetracts
-      (ObjectProperty.compactObjects.{u}
-        (C := Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left))]
-    [ObjectProperty.IsTriangulated
-      (ObjectProperty.compactObjects.{u}
-        (C := Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left))]
     (hpullX : pullX.PreservesCompactObjects)
     (hpullT : pullT.PreservesCompactObjects)
     (htensor : TensorPreservesCompactObjects X T tensor) :
