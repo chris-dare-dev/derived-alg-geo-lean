@@ -7,6 +7,17 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Sign-correct exactness of shifted dg functors (2026-09-12):
+  `DGFunctor.shiftedFunctorH0CommShift` composes the canonical comparison on
+  `H⁰(F)` with the signed integral-shift package and transports it across
+  `shiftedFunctorH0Iso`; `shiftedFunctorH0IsTriangulated` transports exactness
+  by the same route.  Both are explicit interfaces, not global instances.
+  The underlying `H⁰` capability transport now also keeps independent source
+  and target object universes, matching the shifted-functor comparison API.
+  The conventional `[-1]` dual twist and cotwist now reuse this root, so their
+  exactness asks only for the same endpoint chosen-cone preservation as their
+  unshifted cones.  This proves no dg quasi-equivalence, cone relation, or
+  sphericality.
 - Sign-correct exactness of integral shift functors (2026-09-12):
   `Triangulated.ShiftFunctor` now owns the explicit Koszul-signed `CommShift`
   on `[n]`, its comparison with `Triangle.shiftFunctor`, and
@@ -22,10 +33,9 @@ blocks should normally move it rather than add more declarations beside it.
   twist, dual cotwist, and the unshifted cones underlying the dual twist and
   cotwist.  Every result reuses the generic adjunction-cone 3-by-3 theorem and
   asks only for preservation of chosen cones by the relevant adjoint pair.
-  This does not itself claim exactness for the two conventional `[-1]`
-  shifted functors; those now require composition with the separate signed
-  shift-functor interface.  No cone relation, equivalence, or sphericality
-  follows.
+  Exactness for the two conventional `[-1]` shifted functors is obtained in
+  the separate shifted-dg-functor root above.  No cone relation, equivalence,
+  or sphericality follows.
 - Conventional shifted dg twists on `H⁰` (2026-09-12):
   `DGFunctor.shiftedFunctor_h0_eq` and `shiftedFunctorH0Iso` package the
   objectwise and morphism computations as a functor-level comparison
