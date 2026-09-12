@@ -47,7 +47,7 @@ close the loop.
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u
+universe v u u'
 
 namespace CategoryTheory
 
@@ -55,7 +55,7 @@ open DGCategoryStruct DGCategory Limits Pretriangulated
 
 namespace DGFunctor
 
-variable {C D : Type u} [DGCategory.{v} C] [DGCategory.{v} D]
+variable {C : Type u} {D : Type u'} [DGCategory.{v} C] [DGCategory.{v} D]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The shift comparison induced on `H⁰` by dg-level shift preservation. -/

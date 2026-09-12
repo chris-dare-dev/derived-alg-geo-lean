@@ -7,6 +7,33 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- `K₀` actions of enhanced adjunction cones (2026-09-12):
+  `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
+  directly from the distinguished adjunction triangles and lifts them, under
+  the existing endpoint chosen-cone hypotheses, to equalities of `K₀`
+  homomorphisms.  Each conventional twist or cotwist acts as the identity
+  minus its corresponding adjunction composite.  This does not identify an
+  object-twist evaluation composite with an Euler multiple of the object;
+  that copower computation remains the next seam toward `twistK₀`.
+- Exact twist and cotwist equivalences on `H⁰` (2026-09-12):
+  `twistH0EquivalenceIsTriangulated` and
+  `cotwistH0EquivalenceIsTriangulated` combine the separately proved ordinary
+  equivalences and exact forward functors using Mathlib's canonical
+  `Equivalence.CommShift` and `Equivalence.IsTriangulated` interfaces.  The
+  compatible shift structure and triangulatedness of each inverse are derived,
+  not assumed or duplicated in a repository-owned record.  This packaging
+  still proves no `K₀` action formula, cone relation, or sphericality.
+- Sign-correct exactness of shifted dg functors (2026-09-12):
+  `DGFunctor.shiftedFunctorH0CommShift` composes the canonical comparison on
+  `H⁰(F)` with the signed integral-shift package and transports it across
+  `shiftedFunctorH0Iso`; `shiftedFunctorH0IsTriangulated` transports exactness
+  by the same route.  Both are explicit interfaces, not global instances.
+  The underlying `H⁰` capability transport now also keeps independent source
+  and target object universes, matching the shifted-functor comparison API.
+  The conventional `[-1]` dual twist and cotwist now reuse this root, so their
+  exactness asks only for the same endpoint chosen-cone preservation as their
+  unshifted cones.  This proves no dg quasi-equivalence, cone relation, or
+  sphericality.
 - Sign-correct exactness of integral shift functors (2026-09-12):
   `Triangulated.ShiftFunctor` now owns the explicit Koszul-signed `CommShift`
   on `[n]`, its comparison with `Triangle.shiftFunctor`, and
@@ -22,10 +49,9 @@ blocks should normally move it rather than add more declarations beside it.
   twist, dual cotwist, and the unshifted cones underlying the dual twist and
   cotwist.  Every result reuses the generic adjunction-cone 3-by-3 theorem and
   asks only for preservation of chosen cones by the relevant adjoint pair.
-  This does not itself claim exactness for the two conventional `[-1]`
-  shifted functors; those now require composition with the separate signed
-  shift-functor interface.  No cone relation, equivalence, or sphericality
-  follows.
+  Exactness for the two conventional `[-1]` shifted functors is obtained in
+  the separate shifted-dg-functor root above.  No cone relation, equivalence,
+  or sphericality follows.
 - Conventional shifted dg twists on `H⁰` (2026-09-12):
   `DGFunctor.shiftedFunctor_h0_eq` and `shiftedFunctorH0Iso` package the
   objectwise and morphism computations as a functor-level comparison
