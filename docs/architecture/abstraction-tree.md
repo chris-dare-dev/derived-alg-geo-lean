@@ -91,6 +91,7 @@ Category
 │  │  │  └─ h0Equivalence                 induces an equivalence H⁰ C ≌ H⁰ D
 │  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
 │  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
+│  │  │  ├─ HasShift Z⁰(DGFunctor C D) ℤ standard Mathlib packaging, all unit/assoc laws
 │  │  │  └─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
