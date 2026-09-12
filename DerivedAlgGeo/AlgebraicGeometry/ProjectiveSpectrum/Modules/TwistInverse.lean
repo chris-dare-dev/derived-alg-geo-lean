@@ -41,8 +41,8 @@ finite direct sum of copies of one `O(-N)`.
 The general `IsInvertible L → ∃ L', L ⊗ L' ≅ unit`, which still needs the per-chart
 trivializations glued. For an explicit `LineBundleData`, the formerly blocked hom-equivalence
 `Hom(L ⊗ M, N) ≃ Hom(M, L⁻¹ ⊗ N)` now lives at `LineBundleData.tensorLeftHomEquiv`:
-associator naturality is available from the monoidal structure. Its scalar-linear refinement is
-still separate, since `X.Modules` does not yet carry a `MonoidalLinear` instance.
+associator naturality is available from the monoidal structure. Its scalar-linear refinement
+lives downstream at `LineBundleData.tensorLeftHomLinearEquiv`.
 -/
 
 noncomputable section
@@ -82,8 +82,9 @@ def twistingSheafLineBundleData (N : ℤ) :
 /-- The projective twisting-sheaf specialization of the line-bundle Hom/sections comparison:
 `Hom(O(N), F) ≃ Γ(O(-N) ⊗ F)`.
 
-The equivalence is categorical. Its scalar-linearity is the remaining interface needed to combine
-this comparison with projective Serre finiteness. -/
+This file records the categorical equivalence at the neutral line-bundle layer. The generic
+scalar-linear refinement is `LineBundleData.lineHomTopLinearEquivOver`, and the projective
+Hom-finiteness reduction using it lives in `Cohomology.Finiteness.Hom`. -/
 def twistingSheafHomTopEquiv (N : ℤ) (F : (Proj 𝒜).Modules) :
     (twistingSheaf 𝒜 N ⟶ F) ≃
       Γ(Scheme.Modules.tensorObj (twistingSheaf 𝒜 (-N)) F, ⊤) :=
