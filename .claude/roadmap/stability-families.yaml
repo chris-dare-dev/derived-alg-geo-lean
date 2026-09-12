@@ -639,7 +639,7 @@ items:
   - id: stability-families-m11
     kind: milestone
     title: "SF11 — Base change of t-structures (§§3–6)"
-    status: planned
+    status: in_progress
     lane: next
     acceptance:
       - "Base change categories D_T exist as a construction, with their two functors as theorems about it."
@@ -654,7 +654,7 @@ items:
     kind: epic
     parent: stability-families-m11
     title: "Base change categories D_T for a morphism T to S (§3)"
-    status: planned
+    status: in_progress
     summary: "Every result in the chain from Theorem 12.17 down is stated relative to the base change category D_T of an S-linear strong semiorthogonal component along T to S, together with its quasi-coherent companion (Dqc)_T and the two base change functors between them. The repository has no such construction: a grep for BaseChangeCategory returns nothing. This is the infrastructure item and the real cost of the milestone. Includes Lemmas 3.17 and 3.18, which Step 4 of Theorem 5.7 and Step 2 of Theorem 12.17 both consume."
     priority: must
     size: XL
