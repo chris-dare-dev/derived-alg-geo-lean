@@ -24,6 +24,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from _output import force_utf8_output
+
 NOLINTS = Path("scripts/nolints.json")
 BASELINE_REF = "origin/main"
 
@@ -127,4 +129,5 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     sys.exit(main(sys.argv[1:]))

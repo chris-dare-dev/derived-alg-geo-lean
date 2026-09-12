@@ -37,6 +37,8 @@ import re
 import sys
 from pathlib import Path
 
+from _output import force_utf8_output
+
 MAX_LINE = 100
 
 # Only owner-authored library source. Vendored Apache source keeps upstream
@@ -394,4 +396,5 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     sys.exit(main(sys.argv[1:]))

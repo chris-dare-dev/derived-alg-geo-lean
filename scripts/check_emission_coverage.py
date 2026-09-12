@@ -36,6 +36,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from _output import force_utf8_output
+
 DEFAULT_EMISSION = Path("attest/lean-emission.json")
 
 # Paths whose `.lean` files are not library modules of the swept environment.
@@ -126,4 +128,5 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     sys.exit(main(sys.argv))

@@ -14,6 +14,8 @@ import pathlib
 import re
 import sys
 
+from _output import force_utf8_output
+
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LIBRARY = ROOT / "DerivedAlgGeo"
@@ -100,4 +102,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    force_utf8_output()
     sys.exit(main())
