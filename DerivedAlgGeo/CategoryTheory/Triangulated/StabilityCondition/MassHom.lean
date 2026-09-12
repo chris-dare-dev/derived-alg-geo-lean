@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.FiniteDistance
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.FullSupport
 
 /-!
 # Mass--Hom bounds

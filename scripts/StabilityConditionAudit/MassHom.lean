@@ -39,3 +39,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isOpen_massHomLocus
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isClosed_massHomLocus
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.isClopen_massHomLocus
+
+/-! ## Full support from finite Euler probes -/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.EulerProbeFamily
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.probeQuadratic
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.chargeQuadratic
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FullSupport.hasQuadraticSupportProperty_of_finite_probes
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.quadraticSupportData
