@@ -6,6 +6,8 @@ autoequivalence invariance statement of Remark 1.4.
 -/
 
 #print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant
+#print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant.base
 #print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant.base_hasPerfectMassHomBound
 #print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant.target_mem_connectedComponent
