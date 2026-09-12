@@ -38,6 +38,7 @@ every degree.
 #print axioms CategoryTheory.extAdjunctionLinearEquiv
 #print axioms CategoryTheory.extAdjunctionLinearEquiv_apply
 #print axioms CategoryTheory.Abelian.Ext.precompAddEquiv
+#print axioms CategoryTheory.Abelian.Ext.precompLinearEquiv
 #print axioms CategoryTheory.Adjunction.homLinearEquiv
 
 /-! ## Ext comparison from acyclicity of images of injectives (#1070, affine lane, slice 2)

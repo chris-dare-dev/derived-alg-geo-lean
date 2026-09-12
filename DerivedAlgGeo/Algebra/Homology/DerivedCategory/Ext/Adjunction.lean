@@ -87,8 +87,9 @@ term does not unify. `exact Ext.mk₀_comp_mk₀ _ _` does. The same shape will 
   additive theorem;
 * `extAdjunctionLinearMap`, `extAdjunctionLinearEquiv` — its linear form when the right adjoint
   is linear.
-* `Abelian.Ext.precompAddEquiv` — transport along an isomorphism in the first variable, which a
-  consumer needs whenever the comparison identifies that variable only up to isomorphism.
+* `Abelian.Ext.precompAddEquiv`, `Abelian.Ext.precompLinearEquiv` — transport along an
+  isomorphism in the first variable, which a consumer needs whenever the comparison identifies
+  that variable only up to isomorphism.
 -/
 
 universe w v v' u u' t
@@ -342,6 +343,18 @@ noncomputable def Abelian.Ext.precompAddEquiv {X X' : C} (e : X ≅ X') (B : C) 
     rw [← Ext.comp_assoc _ _ _ (zero_add 0) (zero_add n) (by lia), Ext.mk₀_comp_mk₀,
       e.hom_inv_id, Ext.mk₀_id_comp]
   map_add' x y := Ext.comp_add _ _ _ _
+
+variable {S : Type t} [CommRing S] [Linear S C]
+
+/-- **Linear transport in the first variable of `Ext` along an isomorphism.**
+
+This is the scalar-compatible refinement of `precompAddEquiv`. The scalar action on Ext is
+linear in either argument of the Yoneda product, so precomposition with the degree-zero class of
+an isomorphism is linear. -/
+noncomputable def Abelian.Ext.precompLinearEquiv {X X' : C} (e : X ≅ X') (B : C) (n : ℕ) :
+    Ext.{w} X' B n ≃ₗ[S] Ext.{w} X B n where
+  __ := Ext.precompAddEquiv e B n
+  map_smul' r _ := Ext.comp_smul _ _ (zero_add n) r
 
 end Precomp
 
