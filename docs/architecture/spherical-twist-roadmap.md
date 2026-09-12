@@ -34,6 +34,7 @@ DGFunctor.HomogeneousNatTrans
 ├─ all integer degrees and Koszul naturality
 ├─ pointwise differential and vertical composition
 ├─ h0Comparison: H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D), no fullness or faithfulness
+│  └─ h0Iso: a Z⁰ dg-functor isomorphism descends canonically, with unit/composition laws
 ├─ whiskerLeft / whiskerRight (both sign-free) and additive-hom packaging
 │  ├─ interchange: the Godement sign (-1)^(m n) is naturality of the second
 │  └─ hcomp: the Godement product, graded Leibniz, strictly associative
@@ -66,6 +67,8 @@ IsConeOf
             │  degree-zero transformations; the cone lifts are natural on the
             │  nose.  The homotopy-coherent case needs uniqueness of the lift
             │  up to homotopy, which the repository does not have.
+            ├─ triangleIsoOfStrictSquare: endpoint isomorphisms upgrade the
+            │  comparison to a natural isomorphism of triangle functors
             └─ compareIso: two ConeData for one transformation give canonically
                isomorphic triangle functors, so the cone choices do not matter
 
@@ -96,9 +99,11 @@ EvaluationData E
 └─ TwistConeData: the object twist T_E = Cone(evaluation)
    ├─ compareIso: canonical coherent Z⁰ isomorphism across both evaluation and
    │  cone choices, strictly compatible with id ⟶ T_E
-   ├─ triangle functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished, and
-      H⁰(T_E) triangulated as soon as RHom(E,-) ⊗ E preserves chosen cones
-      (shifts are free for every dg functor).
+   ├─ twistTriangleIsoOfEvaluation: coherent natural isomorphism of the full triangles
+   │  across both evaluation and cone choices
+   ├─ triangle functor H⁰ C ⥤ Triangle (H⁰ C), every value distinguished
+   ├─ H⁰(T_E) triangulated as soon as RHom(E,-) ⊗ E preserves chosen cones
+   │  (shifts are free for every dg functor)
    └─ no adjunction, no autoequivalence, no sphericality
 
 EnhancedAdjunctionCones
@@ -271,17 +276,19 @@ that comparison are instance hypotheses to be discharged by the realization.
    What is open is *concrete existence*: no dg category in the repository yet
    supplies a `HasCopowers` instance.  The generic existence/choice interface
    and its independence theorem are closed, as is choice-independence of the
-   cone-preservation capability.  The cone-comparison seam is also closed at
-   dg-functor level: `IsConeOf.isoOfStrictSquare` lifts endpoint isomorphisms in
-   a strict square, and `EvaluationData.TwistConeData.compareIso` applies it to
-   the evaluation square.  These comparisons commute strictly with the
-   inclusion `id ⟶ T_E`, are identities on one choice, and compose strictly.
-   Packaging the corresponding isomorphism of the full H⁰ triangle functors
-   across *different evaluation transformations* remains separate if a later
-   consumer needs it.  And no theorem relates the object twist to a spherical
-   object: that comparison needs `Perf(k)` as a dg category, which the
-   repository does not have, so nothing here calls `E` spherical or claims
-   `T_E` is an autoequivalence.
+   cone-preservation capability.  The comparison seam is closed at both
+   dg-functor and full H⁰-triangle levels.  `IsConeOf.isoOfStrictSquare` lifts
+   endpoint isomorphisms in a strict square,
+   `ConeData.triangleIsoOfStrictSquare` carries the result to a natural
+   isomorphism of triangle functors, and
+   `EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation` applies it to
+   the evaluation square while preserving the original same-evaluation
+   `twistTriangleIso` wrapper.  These comparisons commute with all three
+   triangle components, are
+   identities on one choice, and compose coherently.  No theorem relates the
+   object twist to a spherical object: that comparison needs `Perf(k)` as a dg
+   category, which the repository does not have, so nothing here calls `E`
+   spherical or claims `T_E` is an autoequivalence.
 5. `CounitKernelConeData.arrow` is supplied.  Producing it geometrically needs
    convolution, the diagonal unit kernel, adjunction trace, and proof that the
    transformed arrow is the counit.  The enhancement of the kernel category,
