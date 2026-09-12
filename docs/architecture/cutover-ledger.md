@@ -7,6 +7,16 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Object-twist `K₀` action and Euler-realization boundary (2026-09-12):
+  `SphericalTwist.ObjectTwistK0` derives the class and map of the enhanced
+  object twist as identity minus its evaluation functor.  The explicit,
+  choice-invariant `EvaluationData.IsEulerCopower` capability says exactly
+  when that evaluation class is the Euler multiple of `[E]`; from it the
+  object-twist map is proved equal to the existing numerical `twistK₀`.
+  This capability is supplied realization input, not a consequence of the
+  present additive `IsCopowerOf`, which represents ℤ-additive rather than
+  `k`-linear cochains.  A scalar-linear copower layer, its homotopy invariance,
+  and a finite cohomology presentation are the next foundational roots.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under

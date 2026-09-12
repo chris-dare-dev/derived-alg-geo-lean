@@ -259,9 +259,12 @@ that comparison are instance hypotheses to be discharged by the realization.
    interface, which derives compatible inverse shift data and exactness.  The
    four distinguished adjunction triangles now also compute their conventional
    functors' `K₀` actions as the identity minus the corresponding adjunction
-   composite.  For an object twist, reaching the numerical `twistK₀` formula
-   next requires the separate theorem that the evaluation copower has class
-   `chiHom k C E X • [E]`.
+   composite.  For an object twist, the evaluation triangle now similarly
+   gives identity minus the evaluation functor on `K₀`.
+   `EvaluationData.IsEulerCopower` names the explicit, choice-invariant
+   realization capability that its class is `chiHom k C E X • [E]`; under
+   that input the induced object-twist map is exactly the existing numerical
+   `twistK₀`.
    None of these results is sphericality, which still needs all four
    Anno--Logvinenko conditions and the Morita framework above.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
@@ -334,6 +337,17 @@ that comparison are instance hypotheses to be discharged by the realization.
    out of `V.obj X` and says nothing about maps in.  So it does not follow from
    the universal property the copower is given by, and a cone, unlike a shift,
    is not an invertible element that functoriality carries over.
+
+   There is a second, independent boundary at scalars.  `IsCopowerOf` is
+   `AddCommGrpCat`-valued and represents all additive cochains, so it models an
+   additive copower over `ℤ`; the coefficient in `chiHom` is a dimension
+   over `k`.  The former therefore cannot imply the latter at general `k`.
+   The next foundational lane is a genuinely `k`-linear copower and evaluation
+   interface (initially over a field), followed by functoriality under chain
+   homotopies and a finite cohomology presentation as shifted finite sums.
+   Only that realization can discharge `IsEulerCopower`; adding linearity to
+   the existing universal family while retaining surjectivity onto all
+   additive cochains would be inconsistent with the intended tensor product.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies a `HasCopowers` instance.  The generic existence/choice interface

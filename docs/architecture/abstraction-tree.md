@@ -120,7 +120,9 @@ Category
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
 │  │        ├─ twistTriangleIso          original same-evaluation cone-choice comparison
 │  │        ├─ twistTriangleIsoOfEvaluation  coherent across evaluation and cone choices
-│  │        └─ twistH0IsTriangulated    exact, given only PreservesChosenCones
+│  │        ├─ twistH0IsTriangulated    exact, given only PreservesChosenCones
+│  │        ├─ K₀ action                 identity minus the evaluation functor
+│  │        └─ IsEulerCopower           explicit realization input identifying it with twistK₀
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
