@@ -113,6 +113,8 @@ EnhancedAdjunctionCones
 │  the cone half is the 3-by-3 lemma, whose proof is block diagonal in the four
 │  coordinates of the two splittings rather than merely triangular.
 ├─ unshifted cones underlying dual twist and cotwist
+├─ dualTwistFunctor and cotwistFunctor name their conventional `[-1]` shifts;
+│  shiftedFunctorH0Iso compares their H⁰ functors with pointwise shift
 ├─ the four triangles as functors on H⁰, every value distinguished, each first
 │  map the corresponding unit or counit.  The dual twist and the cotwist are
 │  the INVERSE ROTATIONS of their unshifted cone triangles: invRotate applies
@@ -122,6 +124,7 @@ EnhancedAdjunctionCones
 │  stated against the unshifted cone functors.  No sphericality, and no relation
 │  among the four.
 └─ TwistCotwistEquivalenceConditions
+   └─ cotwistH0Equivalence spends the unshifted condition on the actual cotwist
 
 Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
 ├─ liftedCocycle / conePresentation: noncanonical enhanced lift of any ordinary map
@@ -217,7 +220,15 @@ that comparison are instance hypotheses to be discharged by the realization.
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
    `H⁰`, so `twistH0Equivalence` and `cotwistConeH0Equivalence` make the twist
-   and the unshifted cotwist cone autoequivalences of `H⁰`.  That is the first
+   and the unshifted cotwist cone autoequivalences of `H⁰`.
+   The conventional dg functors are now named `dualTwistFunctor` and
+   `cotwistFunctor`.  The functor equality
+   `DGFunctor.shiftedFunctor_h0_eq` and its natural-isomorphism wrapper compare
+   `H⁰(F[n])` with `H⁰(F) ⋙ [n]`; the reusable
+   `shiftedFunctorH0Equivalence` transports ordinary equivalences through that
+   comparison.  Consequently `cotwistH0Equivalence` spends the recorded
+   unshifted condition on the actual `[-1]` cotwist.  It does not infer a dg
+   quasi-equivalence or triangulatedness.  This is the first
    categorical invertibility statement about a twist here; everything earlier
    was numerical, on `K₀`, or a construction with no invertibility attached.
    Exactness is separate, and now supplied: `DGFunctor.PreservesShifts` and
@@ -226,10 +237,10 @@ that comparison are instance hypotheses to be discharged by the realization.
    triangulated functor.  The shift half of that is free for every dg functor
    (`DGFunctor.preservesShifts`), so `twistPreservesShifts` and
    `cotwistConePreservesShifts` take no arguments and `twistH0IsTriangulated`
-   asks only for the two `PreservesChosenCones` witnesses.  Together with the equivalence above that is an exact
-   autoequivalence -- which is still not sphericality, since that needs all
-   four Anno--Logvinenko conditions and the Morita framework the first
-   paragraph rules out.
+   asks only for the two `PreservesChosenCones` witnesses.  Together with
+   `twistH0Equivalence` above, that makes the twist an exact autoequivalence --
+   which is still not sphericality, since that needs all four Anno--Logvinenko
+   conditions and the Morita framework the first paragraph rules out.
 3. `CategoryTheory/Shift/FunctorCategory.lean` now supplies the pointwise
    shift on a functor category, and `Functor.ExactFamily` is now built on that
    canonical structure: it extends Mathlib's `F.CommShift ℤ` and adds only

@@ -93,7 +93,8 @@ Category
 │  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
 │  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
 │  │  │  ├─ HasShift Z⁰(DGFunctor C D) ℤ standard Mathlib packaging, all unit/assoc laws
-│  │  │  └─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
+│  │  │  ├─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
+│  │  │  └─ shiftedFunctorH0Iso          functor-level comparison; transports H⁰ equivalences
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
 │  │  └─ PreservesChosenCones            strong witness-preserving capability
 │  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
@@ -181,8 +182,10 @@ Category
 │           └─ dualCotwistTriangleInSource           literal counit triangle, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
+│  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
+│  │  └─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
-│     └─ full sphericality                 pending Morita/shifted-comparison theorem
+│     └─ full sphericality                 pending Morita/adjoint-comparison theorem
 ├─ Derived-category extensions
 │  └─ Ext adjunction / dimension shift / resolution naturality
 ├─ filtered-complex spectral sequences
