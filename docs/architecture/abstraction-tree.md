@@ -163,13 +163,17 @@ Category
 │     │  └─ CounitKernelConeData          enhanced counit specialization
 │     │     ├─ kernel-presented twist candidate       exact image of its dg cone
 │     │     └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
-│     └─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
-│        └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
-│           ├─ unshifted cotwist-cone candidate       exact image of its dg cone
-│           ├─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
-│           ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
-│           ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
-│           └─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
+│     ├─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
+│     │  └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
+│     │     ├─ unshifted cotwist-cone candidate       exact image of its dg cone
+│     │     ├─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
+│     │     ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
+│     │     ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
+│     │     └─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
+│     └─ DualTwistKernelData              left-adjunction semantic specialization after swapping
+│        └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
+│           ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
+│           └─ dualTwistTriangleInTarget             inverse rotation, pointwise distinguished
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only

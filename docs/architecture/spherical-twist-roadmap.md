@@ -139,16 +139,21 @@ Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
          │     └─ FourierMukai.CounitKernelConeData
          │        └─ exact kernel evaluation gives a source-natural counit triangle
          │           Φ_Q ⋙ Φ_P ⟶ 𝟭_Y ⟶ twist, pointwise distinguished
-         └─ AdjunctionUnitKernelData: definitional right-adjunction-unit specialization
-            ├─ ordinary kernel arrow O_Δ ⟶ conv P Q whose transform is the unit
-            └─ AdjunctionUnitKernelConeData
-               ├─ exact kernel evaluation gives the unshifted unit triangle
-               │  𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧,
-               │  pointwise distinguished
-               ├─ cotwist = cotwistCone⟦-1⟧, pointwise functor-category shift
-               ├─ cotwistKernel: shifted enhanced cone presenting cotwist
-               └─ inverse rotation gives
-                  cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧,
+         ├─ AdjunctionUnitKernelData: definitional right-adjunction-unit specialization
+         │  ├─ ordinary kernel arrow O_Δ ⟶ conv P Q whose transform is the unit
+         │  └─ AdjunctionUnitKernelConeData
+         │     ├─ exact kernel evaluation gives the unshifted unit triangle
+         │     │  𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwistCone ⟶ (𝟭_X)⟦1⟧,
+         │     │  pointwise distinguished
+         │     ├─ cotwist = cotwistCone⟦-1⟧, pointwise functor-category shift
+         │     ├─ cotwistKernel: shifted enhanced cone presenting cotwist
+         │     └─ inverse rotation gives
+         │        cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧,
+         │        pointwise distinguished
+         └─ DualTwistKernelData: left-adjunction specialization after swapping C and C'
+            └─ DualTwistKernelConeData reuses the unit/cotwist construction
+               ├─ dualTwistKernel presents the pointwise shifted left-unit cone
+               └─ dualTwist ⟶ 𝟭_Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧,
                   pointwise distinguished
 ```
 
@@ -346,9 +351,15 @@ that comparison are instance hypotheses to be discharged by the realization.
    Specializing at `-1` gives `cotwistKernel`, an explicit kernel whose
    transform is naturally isomorphic to the cotwist, and hence proves only
    that the cotwist is a kernel functor.
-   Pointwise distinguishedness cannot supply `CommShift` or `IsTriangulated`
-   for the cotwist, and no comparison with the dg-adjunction cotwist is
-   available; those later seams remain explicit.
+   The left-adjunction unit is now a third consumer:
+   `DualTwistKernelData` swaps the two correspondences and reuses
+   `LeftAdjointKernelData.toRightAdjointKernelData`, so its enhanced form names
+   the kernel-presented dual twist and the pointwise distinguished family
+   `dualTwist ⟶ 𝟭_Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧` without a second
+   cone or normalization construction.  Pointwise distinguishedness cannot
+   supply `CommShift` or `IsTriangulated` for either shifted cone functor, and
+   no comparison with the corresponding dg-adjunction cone is available;
+   those later seams remain explicit.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
