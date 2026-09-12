@@ -150,3 +150,27 @@ explicitly; no instance supplies it.
 #print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_bounded_single
 #print axioms CategoryTheory.Functor.mapDerivedCategory_map_bijective_of_bounded
 #print axioms CategoryTheory.Functor.exists_bounded_iso_mapDerivedCategory_obj
+
+/-! ## Bounded derived Hom-finiteness from heart Ext-finiteness (#1121)
+
+`ExtFiniteBounded` is the explicit heart-level input. Its ordinary-Ext
+constructor proves negative shifted Homs vanish from the canonical t-structure;
+the two-variable dévissage then propagates finite-dimensionality and finite
+support to all bounded derived objects. Nothing here supplies coherent-sheaf
+Ext finiteness or a geometric vanishing bound.
+-/
+
+#print axioms Module.Finite.of_exact_middle
+#print axioms DerivedCategory.ExtFiniteBounded
+#print axioms DerivedCategory.ExtFiniteBounded.finite
+#print axioms DerivedCategory.ExtFiniteBounded.support_finite
+#print axioms DerivedCategory.ExtFiniteBounded.of_ext
+#print axioms DerivedCategory.HomFiniteBoundedPair
+#print axioms DerivedCategory.HomFiniteBoundedPair.finite
+#print axioms DerivedCategory.HomFiniteBoundedPair.support_finite
+#print axioms DerivedCategory.HomFiniteBoundedPair.of_iso
+#print axioms DerivedCategory.HomFiniteBoundedPair.shift
+#print axioms DerivedCategory.HomFiniteBoundedPair.obj₂_right
+#print axioms DerivedCategory.HomFiniteBoundedPair.obj₂_left
+#print axioms DerivedCategory.homFiniteBoundedPair_of_bounded
+#print axioms DerivedCategory.homFiniteBounded_boundedDerived
