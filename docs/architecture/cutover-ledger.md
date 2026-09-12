@@ -7,14 +7,20 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
-- DG cone-preservation transport (2026-09-12):
+- DG cone comparison and preservation transport (2026-09-12):
   `Algebra/Homology/DGCategory/Pretriangulated/Functor.lean` proves that
   `DGFunctor.PreservesChosenCones` transports across an isomorphism in
   `Z⁰ (DGFunctor C D)`.  Consequently the exactness hypothesis for an object
   twist is independent of the chosen evaluation data once the evaluation
-  functors are compared.  This does not yet identify the resulting twist cone
-  functors; that requires an invertible, coherent lift of the strict
-  evaluation square.
+  functors are compared.  `Pretriangulated/Lift.lean` owns the reusable
+  `IsConeOf.isoOfStrictSquare`: endpoint isomorphisms in a strictly commuting
+  square lift to an isomorphism between arbitrary chosen cones.
+  `Pretriangulated/NaturalTransformationCone.lean` specializes it to cone dg
+  functors, and `Pretriangulated/ObjectTwist.lean` gives the resulting
+  `TwistConeData.compareIso`, strict compatibility with `id ⟶ T_E`, and strict
+  identity/composition coherence.  This identifies the twist dg functor
+  independently of both evaluation and cone choices; it does not assert
+  autoequivalence or sphericality.
 - DG copower and evaluation-data existence packaging (2026-09-12):
   `Algebra/Homology/DGCategory/Copower.lean` owns the Mathlib-style
   `HasCopower` and `HasCopowers` mere-existence capabilities, their

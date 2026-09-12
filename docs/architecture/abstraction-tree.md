@@ -110,19 +110,24 @@ Category
 │  │     ├─ compareIso                   canonical Z⁰ isomorphism between any two choices
 │  │     │  └─ compare_comp_evaluation  strict compatibility with evaluation
 │  │     └─ TwistConeData                the object twist Cone(evaluation)
+│  │        ├─ compareIso                coherent Z⁰ iso across evaluation/cone choices
+│  │        │  └─ inclusion compatibility is strict
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
 │  │        └─ twistH0IsTriangulated    exact, given only PreservesChosenCones
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps
+│  │  │  └─ strict                      a commuting square with zero homotopy
 │  │  └─ IsConeOf.homogeneousLift        all-degree cone maps, d/id/add/comp laws
 │  │     ├─ IsConeOf.lift                the degree-zero case, not a second owner
 │  │     │  └─ IsConeOf.Morphism         cone map with strict `inr` and `fst` squares
 │  │     │     └─ ConePresentation category  composes without a shift witness
+│  │     ├─ IsConeOf.isoOfStrictSquare   endpoint isos lift canonically to cone isos
 │  │     └─ HomogeneousNatTrans.ConeData objectwise cones assemble to a dg functor
 │  │        ├─ fst / snd                 cone projections, graded-natural
 │  │        ├─ isConeOf                  a cone in the dg category of dg functors
+│  │        ├─ isoOfStrictSquare         the generic lift in Z⁰(DGFunctor C D)
 │  │        ├─ preservesShifts           a cone functor preserves shifts if its ends do
 │  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
