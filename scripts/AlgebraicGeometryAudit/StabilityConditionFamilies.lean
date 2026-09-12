@@ -953,6 +953,7 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.quasicoherentSequence_hasTriangulatedComponents
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedSequence
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedSequence_component
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedSequence_hasTriangulatedComponents
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedSequence_compatible
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.mk.inj

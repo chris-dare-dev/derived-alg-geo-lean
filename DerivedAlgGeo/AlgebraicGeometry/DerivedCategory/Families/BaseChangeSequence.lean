@@ -246,6 +246,28 @@ theorem boundedSequence_component
       D.boundedComponent (A.component i) :=
   rfl
 
+/-- If bounded coherent cohomology is triangulated on the fibre product,
+then triangulated source components give triangulated bounded base-change
+components. -/
+theorem boundedSequence_hasTriangulatedComponents
+    (hA : A.HasTriangulatedComponents)
+    (hcompact : D.PreservesCompactObjects)
+    (horth : D.PerfectComponentsSemiorthogonal A)
+    [(Dqc.schemeBoundedCoherentCohomology
+      (X ⨯ T).left).IsTriangulated] :
+    (D.boundedSequence A hcompact horth).HasTriangulatedComponents := by
+  intro i
+  letI : (A.component i).IsTriangulated := hA i
+  letI : (D.quasicoherentComponent
+      (A.component i)).IsTriangulated := inferInstance
+  letI : (D.quasicoherentComponent
+      (A.component i)).IsClosedUnderIsomorphisms := inferInstance
+  letI : (boundedCoherentFiberToDqc X T).CommShift ℤ := inferInstance
+  letI : (boundedCoherentFiberToDqc X T).IsTriangulated := inferInstance
+  change ((D.quasicoherentComponent (A.component i)).inverseImage
+    (boundedCoherentFiberToDqc X T)).IsTriangulated
+  infer_instance
+
 /-- The bounded-coherent inclusion is compatible with the bounded and
 quasicoherent base-change sequences. -/
 theorem boundedSequence_compatible

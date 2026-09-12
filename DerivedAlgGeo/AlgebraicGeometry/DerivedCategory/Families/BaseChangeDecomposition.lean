@@ -117,15 +117,10 @@ def projections :
 
 /-- The bounded sequence is strong once the quasicoherent projectors preserve
 bounded coherent cohomology. -/
-theorem isStrong : (D.boundedSequence A hcompact horth).IsStrong := by
-  simpa [KFlatBaseChangeData.boundedSequence, boundedLocus] using
-    (quasicoherentProjections B).inverseImage_isStrong
-      (boundedLocus (X := X) (T := T))
-      (D.quasicoherentSequence_hasTriangulatedComponents A
-        B.sourceComponentsTriangulated hcompact horth)
-      (fun i ↦ D.quasicoherentComponent_isClosedUnderIsomorphisms
-        (A.component i))
-      BB.projectionsPreserveBounded
+theorem isStrong : (D.boundedSequence A hcompact horth).IsStrong :=
+  fun i ↦ ((projections B BB).componentProjection i).isRightAdmissible
+    (D.boundedSequence_hasTriangulatedComponents A
+      B.sourceComponentsTriangulated hcompact horth i)
 
 end BoundedData
 
