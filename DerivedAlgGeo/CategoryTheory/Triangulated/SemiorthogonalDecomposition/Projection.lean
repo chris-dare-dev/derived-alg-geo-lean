@@ -42,6 +42,16 @@ namespace RightProjectionData
 
 variable {P} (Q : RightProjectionData P)
 
+/-- Extract a chosen right projection from proposition-valued right
+admissibility. This is noncomputable because admissibility only asserts that
+the adjoint exists. -/
+noncomputable def ofIsRightAdmissible
+    [Limits.HasZeroObject C] [HasShift C ℤ] [Preadditive C]
+    [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+    (hP : P.IsRightAdmissible) : RightProjectionData P where
+  projection := hP.2.choose
+  adjunction := hP.2.choose_spec.some
+
 /-- The projected object, as an object of the full subcategory. -/
 abbrev project (X : C) : P.FullSubcategory :=
   Q.projection.obj X
@@ -49,6 +59,10 @@ abbrev project (X : C) : P.FullSubcategory :=
 /-- The underlying ambient object of a projection. -/
 abbrev projectObj (X : C) : C :=
   P.ι.obj (Q.project X)
+
+/-- The ambient endofunctor underlying a right projection. -/
+abbrev ambientProjection : C ⥤ C :=
+  Q.projection ⋙ P.ι
 
 /-- The counit map from the projected ambient object to its source. -/
 abbrev counitApp (X : C) : Q.projectObj X ⟶ X :=
