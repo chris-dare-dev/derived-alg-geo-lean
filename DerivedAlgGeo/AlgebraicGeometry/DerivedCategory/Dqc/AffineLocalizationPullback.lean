@@ -336,6 +336,25 @@ instance affineQuasicoherentBoundedLocalizationPullback_essSurj :
       ⟨(affineQuasicoherentBoundedLocalizationCounitIso
         (R := R) (A := A) M).app E⟩⟩
 
+/-- Bounded affine localization pullback followed by realization into the
+intrinsic bounded target `Dqc` category. -/
+def affineQuasicoherentBoundedLocalizationPullbackToDqc :
+    AffineQuasicoherentBoundedDerivedCategory (CommRingCat.of R) ⥤
+      SchemeBoundedQuasicoherentDerivedCategory (Spec (CommRingCat.of A)) :=
+  affineQuasicoherentBoundedLocalizationPullback M ⋙
+    affineQuasicoherentBoundedDerivedToDqc (CommRingCat.of A)
+
+/-- Bounded localization pullback reaches exactly all intrinsic bounded
+target `Dqc` objects covered by the current affine realization. -/
+theorem affineQuasicoherentBoundedLocalizationPullbackToDqc_essImage :
+    (affineQuasicoherentBoundedLocalizationPullbackToDqc M).essImage =
+      (affineQuasicoherentBoundedDerivedToDqc
+        (CommRingCat.of A)).essImage := by
+  change (affineQuasicoherentBoundedLocalizationPullback M ⋙
+    affineQuasicoherentBoundedDerivedToDqc
+      (CommRingCat.of A)).essImage = _
+  exact Functor.essImage_comp_of_essSurj
+
 /-- Transport localization pullback from derived module categories to the
 genuine derived categories of quasi-coherent sheaves on affine spectra. -/
 def affineQuasicoherentLocalizationPullback :
