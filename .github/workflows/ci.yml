@@ -1116,10 +1116,37 @@ jobs:
   # same commit makes the correctness claim.
   ci:
     needs: [build]
-    # `always()` so this job still runs when an upstream job failed -- without
-    # it, a failed `build` would leave `ci` skipped, and a skipped required
-    # check does not block a merge. This is the whole mechanism.
-    if: always()
+    # This job must still run when `build` FAILED -- without that, a failed
+    # build would leave `ci` skipped, and a skipped required check does not
+    # block a merge. That is the whole mechanism, and it is why the obvious
+    # default (no `if:` at all, which skips on any upstream failure) is wrong.
+    #
+    # But it must NOT run when the whole RUN was cancelled, which is what
+    # `always()` did here until 2026-09-12. The concurrency block above sets
+    # `cancel-in-progress` on branch lanes, so pushing twice in a minute --
+    # the normal agent-lane cadence -- cancels the first run. Under `always()`
+    # that dead run still executed this job, saw `RESULTS: cancelled`, and
+    # posted a FAILING `ci` check. Because that failure lands LATER than the
+    # superseding run's success, it is the newest check with this name, and
+    # branch protection reads the newest: a green build sat behind a red `ci`
+    # belonging to a run that had been killed on purpose. PRs #1242 and #1243
+    # were both stuck this way.
+    #
+    # `!cancelled()` keeps the mechanism and drops the artifact: a FAILED
+    # upstream is not a cancelled run, so this still runs and still fails on
+    # it; an individually cancelled `build` inside a live run also still
+    # reaches the enumeration below and fails there.
+    #
+    # THE TRADE-OFF, stated rather than hidden: when a run is cancelled this
+    # job is SKIPPED, and a skipped required check does not block. That is
+    # correct for the concurrency case, because a superseding run is by
+    # definition already posting its own `ci`. It is a real if small loss for
+    # a run cancelled BY HAND with nothing following it -- that leaves `ci`
+    # skipped rather than red. Do not "fix" that by letting this job run and
+    # PASS on a cancelled run: a green `ci` over a build that never finished
+    # is the vacuous pass this repository keeps finding in new places, and it
+    # is strictly worse than a skip.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - name: Every required job succeeded
