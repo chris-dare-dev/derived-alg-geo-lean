@@ -135,6 +135,31 @@ def PushforwardPreservesQuasicoherentComponent
   DT.quasicoherentComponent P ≤
     (DU.quasicoherentComponent P).inverseImage push.functor
 
+/-- The smaller generator-level condition that pushforward sends the source
+perfect envelope into the target quasicoherent component. -/
+def PushforwardMapsPerfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f)) : Prop :=
+  (DT.perfectEnvelope P).map push.functor ≤
+    DU.quasicoherentComponent P
+
+/-- A coproduct-preserving triangulated pushforward preserves the whole
+quasicoherent component once it maps the perfect envelope into the target
+component. -/
+theorem pushforward_preservesQuasicoherentComponent_of_perfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
+    (hCoproducts : push.functor.PreservesSmallCoproducts.{u})
+    (hEnvelope : PushforwardMapsPerfectEnvelope DT DU P push) :
+    PushforwardPreservesQuasicoherentComponent DT DU P push := by
+  change (DT.perfectEnvelope P).coprodClosure.{u} ≤
+    (DU.perfectEnvelope P).coprodClosure.{u}.inverseImage push.functor
+  exact ObjectProperty.coprodClosure_le_inverseImage
+    push.functor hCoproducts (DU.perfectEnvelope P) hEnvelope
+
 /-- Right-derived pushforward between the constructed quasicoherent base-change categories. -/
 noncomputable def quasicoherentPushforward
     (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
@@ -143,6 +168,20 @@ noncomputable def quasicoherentPushforward
     (h : PushforwardPreservesQuasicoherentComponent DT DU P push) :
     DT.QuasicoherentCategory P ⥤ DU.QuasicoherentCategory P :=
   ObjectProperty.liftOfLE push.functor h
+
+/-- Pushforward between quasicoherent base-change components, constructed
+from the smaller perfect-envelope preservation condition. -/
+noncomputable def quasicoherentPushforwardOfPerfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
+    (hCoproducts : push.functor.PreservesSmallCoproducts.{u})
+    (hEnvelope : PushforwardMapsPerfectEnvelope DT DU P push) :
+    DT.QuasicoherentCategory P ⥤ DU.QuasicoherentCategory P :=
+  quasicoherentPushforward DT DU P push
+    (pushforward_preservesQuasicoherentComponent_of_perfectEnvelope
+      DT DU P push hCoproducts hEnvelope)
 
 /-- Forgetting component witnesses recovers right-derived pushforward on `Dqc`. -/
 noncomputable def quasicoherentPushforwardCompInclusion
@@ -179,6 +218,22 @@ noncomputable def boundedPushforward
     DT.BoundedCategory P ⥤ DU.BoundedCategory P :=
   ObjectProperty.liftOfLE (push.boundedFunctor hBounded)
     (pushforward_preservesBoundedComponent DT DU P push hDqc hBounded)
+
+/-- Bounded pushforward constructed from perfect-envelope preservation and
+preservation of intrinsic bounded-coherent objects. -/
+noncomputable def boundedPushforwardOfPerfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
+    (hCoproducts : push.functor.PreservesSmallCoproducts.{u})
+    (hEnvelope : PushforwardMapsPerfectEnvelope DT DU P push)
+    (hBounded : push.PreservesBoundedCoherent) :
+    DT.BoundedCategory P ⥤ DU.BoundedCategory P :=
+  boundedPushforward DT DU P push
+    (pushforward_preservesQuasicoherentComponent_of_perfectEnvelope
+      DT DU P push hCoproducts hEnvelope)
+    hBounded
 
 /-- Forgetting component witnesses recovers pushforward on intrinsic bounded-coherent loci. -/
 noncomputable def boundedPushforwardCompInclusion

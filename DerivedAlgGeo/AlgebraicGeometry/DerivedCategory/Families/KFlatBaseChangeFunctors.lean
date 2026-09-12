@@ -172,6 +172,31 @@ def PullbackPreservesQuasicoherentComponent
   DU.quasicoherentComponent P ≤
     (DT.quasicoherentComponent P).inverseImage pull.functor
 
+/-- The smaller generator-level condition that pullback sends the source
+perfect envelope into the target quasicoherent component. -/
+def PullbackMapsPerfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f)) : Prop :=
+  (DU.perfectEnvelope P).map pull.functor ≤
+    DT.quasicoherentComponent P
+
+/-- A coproduct-preserving triangulated pullback preserves the whole
+quasicoherent component once it maps the perfect envelope into the target
+component. -/
+theorem pullback_preservesQuasicoherentComponent_of_perfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    [pull.functor.CommShift ℤ] [pull.functor.IsTriangulated]
+    (hCoproducts : pull.functor.PreservesSmallCoproducts.{u})
+    (hEnvelope : PullbackMapsPerfectEnvelope DT DU P pull) :
+    PullbackPreservesQuasicoherentComponent DT DU P pull := by
+  change (DU.perfectEnvelope P).coprodClosure.{u} ≤
+    (DT.perfectEnvelope P).coprodClosure.{u}.inverseImage pull.functor
+  exact ObjectProperty.coprodClosure_le_inverseImage
+    pull.functor hCoproducts (DT.perfectEnvelope P) hEnvelope
+
 /-- Pullback between the constructed quasicoherent base-change categories. -/
 noncomputable def quasicoherentPullback
     (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
@@ -180,6 +205,20 @@ noncomputable def quasicoherentPullback
     (h : PullbackPreservesQuasicoherentComponent DT DU P pull) :
     DU.QuasicoherentCategory P ⥤ DT.QuasicoherentCategory P :=
   ObjectProperty.liftOfLE pull.functor h
+
+/-- Pullback between quasicoherent base-change components, constructed from
+the smaller perfect-envelope preservation condition. -/
+noncomputable def quasicoherentPullbackOfPerfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    [pull.functor.CommShift ℤ] [pull.functor.IsTriangulated]
+    (hCoproducts : pull.functor.PreservesSmallCoproducts.{u})
+    (hEnvelope : PullbackMapsPerfectEnvelope DT DU P pull) :
+    DU.QuasicoherentCategory P ⥤ DT.QuasicoherentCategory P :=
+  quasicoherentPullback DT DU P pull
+    (pullback_preservesQuasicoherentComponent_of_perfectEnvelope
+      DT DU P pull hCoproducts hEnvelope)
 
 /-- Forgetting component witnesses recovers the ambient `Dqc` pullback. -/
 noncomputable def quasicoherentPullbackCompInclusion
@@ -216,6 +255,22 @@ noncomputable def boundedPullback
     DU.BoundedCategory P ⥤ DT.BoundedCategory P :=
   ObjectProperty.liftOfLE (pull.boundedFunctor hBounded)
     (pullback_preservesBoundedComponent DT DU P pull hDqc hBounded)
+
+/-- Bounded pullback constructed from perfect-envelope preservation and
+preservation of intrinsic bounded-coherent objects. -/
+noncomputable def boundedPullbackOfPerfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    [pull.functor.CommShift ℤ] [pull.functor.IsTriangulated]
+    (hCoproducts : pull.functor.PreservesSmallCoproducts.{u})
+    (hEnvelope : PullbackMapsPerfectEnvelope DT DU P pull)
+    (hBounded : pull.PreservesBoundedCoherent) :
+    DU.BoundedCategory P ⥤ DT.BoundedCategory P :=
+  boundedPullback DT DU P pull
+    (pullback_preservesQuasicoherentComponent_of_perfectEnvelope
+      DT DU P pull hCoproducts hEnvelope)
+    hBounded
 
 /-- Forgetting component witnesses recovers pullback on the intrinsic bounded-coherent loci. -/
 noncomputable def boundedPullbackCompInclusion
