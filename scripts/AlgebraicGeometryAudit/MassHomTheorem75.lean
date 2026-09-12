@@ -1,0 +1,14 @@
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability.MassHomTheorem75
+
+/-!
+Audit records for the conditional Theorem 7.5 assembly and the
+autoequivalence invariance statement of Remark 1.4.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant
+#print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant.base
+#print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant.base_hasPerfectMassHomBound
+#print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant.target_mem_connectedComponent
+#print axioms AlgebraicGeometry.DerivedCategory.DistinguishedComponentInhabitant.ofAlgebraicTransferChain
+#print axioms AlgebraicGeometry.DerivedCategory.theorem75
+#print axioms AlgebraicGeometry.DerivedCategory.remark14_autoequivalence_iff
