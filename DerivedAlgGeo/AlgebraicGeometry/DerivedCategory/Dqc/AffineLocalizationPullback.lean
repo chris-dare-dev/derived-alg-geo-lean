@@ -419,6 +419,66 @@ def affineQuasicoherentLocalizationGeometricCounitIso :
       (affineQuasicoherentLocalizationPullback M) ≪≫
     affineQuasicoherentLocalizationCounitIso M
 
+/-- Forgetting boundedness recovers transported affine localization
+pullback. -/
+def affineQuasicoherentBoundedLocalizationPullbackCompInclusion :
+    affineQuasicoherentBoundedLocalizationPullback
+        (R := R) (A := A) M ⋙ DerivedCategory.Bounded.ι ≅
+      DerivedCategory.Bounded.ι ⋙
+        affineQuasicoherentLocalizationPullback (R := R) (A := A) M :=
+  Iso.refl _
+
+/-- Forgetting boundedness recovers transported affine restriction of
+scalars. -/
+def affineQuasicoherentBoundedLocalizationRestrictionCompInclusion :
+    affineQuasicoherentBoundedLocalizationRestriction
+        (R := R) (A := A) ⋙ DerivedCategory.Bounded.ι ≅
+      DerivedCategory.Bounded.ι ⋙
+        affineQuasicoherentLocalizationRestriction (R := R) (A := A) :=
+  Iso.refl _
+
+/-- For the affine localization morphism, bounded geometric derived
+pushforward is the transported bounded restriction-of-scalars functor. -/
+def affineQuasicoherentBoundedLocalizationRestrictionComparison :
+    affineQuasicoherentBoundedDerivedPushforward
+        (CommRingCat.ofHom (algebraMap R A)) ≅
+      affineQuasicoherentBoundedLocalizationRestriction
+        (R := R) (A := A) :=
+  Functor.fullyFaithfulCancelRight DerivedCategory.Bounded.ι
+    (affineQuasicoherentBoundedDerivedPushforwardCompInclusion
+        (CommRingCat.ofHom (algebraMap R A)) ≪≫
+      Functor.isoWhiskerLeft DerivedCategory.Bounded.ι
+        (affineQuasicoherentLocalizationRestrictionComparison
+          (R := R) (A := A)) ≪≫
+      (affineQuasicoherentBoundedLocalizationRestrictionCompInclusion
+        (R := R) (A := A)).symm)
+
+/-- Bounded geometric affine pushforward followed by bounded localization
+pullback is naturally isomorphic to the identity. -/
+def affineQuasicoherentBoundedLocalizationGeometricCounitIso :
+    affineQuasicoherentBoundedDerivedPushforward
+        (CommRingCat.ofHom (algebraMap R A)) ⋙
+      affineQuasicoherentBoundedLocalizationPullback
+        (R := R) (A := A) M ≅
+      Functor.id
+        (AffineQuasicoherentBoundedDerivedCategory (CommRingCat.of A)) :=
+  Functor.fullyFaithfulCancelRight DerivedCategory.Bounded.ι
+    (Functor.associator _ _ _ ≪≫
+      Functor.isoWhiskerLeft
+        (affineQuasicoherentBoundedDerivedPushforward
+          (CommRingCat.ofHom (algebraMap R A)))
+        (affineQuasicoherentBoundedLocalizationPullbackCompInclusion M) ≪≫
+      (Functor.associator _ _ _).symm ≪≫
+      Functor.isoWhiskerRight
+        (affineQuasicoherentBoundedDerivedPushforwardCompInclusion
+          (CommRingCat.ofHom (algebraMap R A)))
+        (affineQuasicoherentLocalizationPullback M) ≪≫
+      Functor.associator _ _ _ ≪≫
+      Functor.isoWhiskerLeft DerivedCategory.Bounded.ι
+        (affineQuasicoherentLocalizationGeometricCounitIso M) ≪≫
+      Functor.rightUnitor _ ≪≫
+      (Functor.leftUnitor _).symm)
+
 /-- Localization pullback is essentially surjective on the genuine affine
 quasi-coherent derived categories. -/
 instance affineQuasicoherentLocalizationPullback_essSurj :
