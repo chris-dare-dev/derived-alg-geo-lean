@@ -67,6 +67,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.massHomBoundedTests
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.triangEnvelope
 
+/-! ## Transfer along a detecting functor -/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.preimage_obj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.preimage_map
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.preimage
+
 /-! ## Stable-object reduction -/
 
 #print axioms CategoryTheory.Triangulated.Slicing.IsStableAt
