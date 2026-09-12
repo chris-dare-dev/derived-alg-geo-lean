@@ -117,7 +117,7 @@ items:
     kind: epic
     parent: charge-abstraction-m1
     title: "The exponential charge kernel, indexed by truncation degree"
-    status: planned
+    status: done
     summary: "`Walls/Exp/Kernel.lean`: `ofMoments m μ = -∑_{j≤m} (-1)^j/j! · μ j`, `HDeg`, `moments`, `charge`, `chargeFamily`, the two charts, and four comparison theorems proving `stCharge` (`Walls/Numerical/ChargeFamily.lean:28`) and `Threefold.charge` (`Walls/Threefold/Basic.lean:148`) are this kernel at m = 2 and m = 3. Imports only `Walls/ChargeFamily.lean` and Mathlib, so the root imports no leaf, and lands with two inhabitants. The `Fin (m+1)` indexing stands: the audit's claim that the root had to be ℕ-indexed to keep `degH` definitional was falsified on both halves."
     priority: must
     size: M
