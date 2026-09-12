@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.ProjectiveVariety
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Invertible
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundleLinear
 
 /-!
@@ -13,20 +14,16 @@ a line-bundle source. The linear comparison
 
 `Hom(L, N) ≃ₗ[k] Γ(X, L⁻¹ ⊗ N)`
 
-transports finite-dimensionality from coherent `H⁰` once `L⁻¹ ⊗ N` is known to be coherent.
-
-The current scheme-module API does not yet provide the general theorem that tensoring a coherent
-module sheaf with an invertible sheaf preserves coherence. Accordingly, the projective theorem
-below takes exactly that proposition as `hTensor`; it does not postulate a global instance or
-weaken the coherence contract. Discharging `hTensor` is the remaining geometric obligation for
-applying this reduction to an arbitrary coherent target.
+transports finite-dimensionality from coherent `H⁰`. Tensoring by the invertible sheaf `L⁻¹`
+preserves finite presentation, so a coherent target `N` supplies the required coherent tensor
+without an extra geometric premise.
 
 ## Main results
 
 * `LineBundleData.module_finite_hom_of_finiteHZero` isolates the formal transport from finite
   coherent `H⁰` to finite Hom;
-* `ProjectivePresentation.module_finite_lineBundleHom` supplies the `H⁰` input by projective
-  Serre finiteness, retaining only the explicit tensor-coherence hypothesis.
+* `ProjectivePresentation.module_finite_lineBundleHom` supplies tensor coherence and the `H⁰`
+  input from a coherent target and projective Serre finiteness.
 -/
 
 open CategoryTheory
@@ -62,14 +59,17 @@ namespace AlgebraicGeometry.ProjectivePresentation
 variable {k : Type u} [Field k] {X : Scheme.{u}}
   [X.Over (Spec (CommRingCat.of k))]
 
-/-- Hom from a line bundle to `N` on a projectively presented variety is finite-dimensional once
-the tensor `L⁻¹ ⊗ N` is known to be coherent. -/
+/-- Hom from a line bundle to a coherent module sheaf on a projectively presented variety is
+finite-dimensional. -/
 theorem module_finite_lineBundleHom (P : ProjectivePresentation k X)
     [Nontrivial P.index] (L : Scheme.Modules.LineBundleData X) (N : X.Modules)
-    (hTensor : Scheme.Modules.IsCoherent X
-      (Scheme.Modules.tensorObj L.inverse N)) :
-    Module.Finite k (L.line ⟶ N) :=
-  L.module_finite_hom_of_finiteHZero X N hTensor
+    (hN : Scheme.Modules.IsCoherent X N) :
+    Module.Finite k (L.line ⟶ N) := by
+  have hTensor : Scheme.Modules.IsCoherent X
+      (Scheme.Modules.tensorObj L.inverse N) :=
+    Scheme.Modules.isFinitePresentation_tensorObj_left_of_isInvertible
+      L.inverse N hN
+  exact L.module_finite_hom_of_finiteHZero X N hTensor
     (P.module_finite_linearCoherentH 0
       ⟨Scheme.Modules.tensorObj L.inverse N, hTensor⟩)
 
