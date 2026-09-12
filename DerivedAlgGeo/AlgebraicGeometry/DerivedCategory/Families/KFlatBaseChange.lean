@@ -248,6 +248,21 @@ abbrev BoundedCategory (D : KFlatBaseChangeData X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :=
   (D.boundedComponent P).FullSubcategory
 
+instance quasicoherentComponent_isClosedUnderIsomorphisms
+    (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
+    (D.quasicoherentComponent P).IsClosedUnderIsomorphisms := by
+  dsimp [quasicoherentComponent, quasicoherentBaseChangeComponent]
+  infer_instance
+
+instance boundedComponent_isClosedUnderIsomorphisms
+    (D : KFlatBaseChangeData X T)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
+    (D.boundedComponent P).IsClosedUnderIsomorphisms where
+  of_iso e hE :=
+    (D.quasicoherentComponent P).prop_of_iso
+      ((boundedCoherentFiberToDqc X T).mapIso e) hE
+
 /-- Representative-level compactness conditions for the three K-flat operations bundled in
 `KFlatBaseChangeData`. -/
 structure PreservesCompactObjects (D : KFlatBaseChangeData X T) : Prop where

@@ -180,6 +180,60 @@ noncomputable def kFlatBoundedPullback
   boundedPullback DT DU P (DU.pullbackAlong f hAcyclic hQuasicoherent)
     hComponent hBounded
 
+/-- Pullback on `(Dqc)` when membership in the source component is detected after ambient
+pullback. This is the form in which essential surjectivity descends from the ambient category. -/
+noncomputable def quasicoherentPullbackOfDetection
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
+      DU.quasicoherentComponent P E ↔
+        DT.quasicoherentComponent P (pull.functor.obj E)) :
+    DU.QuasicoherentCategory P ⥤ DT.QuasicoherentCategory P :=
+  ObjectProperty.preimageLift pull.functor hDetect
+
+/-- Lemma 3.18's essential-surjectivity argument for the quasicoherent component: ambient
+essential surjectivity and detection of component membership imply essential surjectivity of the
+restricted pullback. -/
+noncomputable instance quasicoherentPullbackOfDetection_essSurj
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
+      DU.quasicoherentComponent P E ↔
+        DT.quasicoherentComponent P (pull.functor.obj E))
+    [pull.functor.EssSurj] :
+    (quasicoherentPullbackOfDetection DT DU P pull hDetect).EssSurj := by
+  dsimp [quasicoherentPullbackOfDetection]
+  exact ObjectProperty.instEssSurjPreimageLift hDetect
+
+/-- Pullback on `D` when bounded-component membership is detected after ambient bounded
+pullback. -/
+noncomputable def boundedPullbackOfDetection
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hBounded : pull.PreservesBoundedCoherent)
+    (hDetect : ∀ E : Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ U).left,
+      DU.boundedComponent P E ↔
+        DT.boundedComponent P ((pull.boundedFunctor hBounded).obj E)) :
+    DU.BoundedCategory P ⥤ DT.BoundedCategory P :=
+  ObjectProperty.preimageLift (pull.boundedFunctor hBounded) hDetect
+
+/-- Lemma 3.18's essential-surjectivity argument for the bounded component. -/
+noncomputable instance boundedPullbackOfDetection_essSurj
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hBounded : pull.PreservesBoundedCoherent)
+    (hDetect : ∀ E : Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ U).left,
+      DU.boundedComponent P E ↔
+        DT.boundedComponent P ((pull.boundedFunctor hBounded).obj E))
+    [(pull.boundedFunctor hBounded).EssSurj] :
+    (boundedPullbackOfDetection DT DU P pull hBounded hDetect).EssSurj := by
+  dsimp [boundedPullbackOfDetection]
+  exact ObjectProperty.instEssSurjPreimageLift hDetect
+
 end KFlatBaseChangeData
 
 end
