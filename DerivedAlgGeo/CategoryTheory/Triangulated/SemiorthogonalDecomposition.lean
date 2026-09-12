@@ -13,6 +13,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Exc
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Mutation
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Orientation
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Projection
+import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Restriction
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Strong
 
 /-!
