@@ -31,9 +31,12 @@ triangles coexist and neither is derived from the other.
 ## What is claimed, and what is not
 
 That the triangle is functorial, that every value is distinguished, and that it
-does not depend on the chosen cones (`twistTriangleIso`).  All three come from
-the generic cone-triangle layer; the only input beyond it is that evaluation is
-closed.
+does not depend on either the chosen evaluation data or the chosen cones
+(`twistTriangleIsoOfEvaluation`).  The comparison is a natural isomorphism of
+full triangle functors, with coherent identity and composition laws.  The
+original `twistTriangleIso` remains the definitional wrapper for changing only
+the cone choices.  All three facts come from the generic strict-square
+cone-triangle layer; the only input beyond it is that evaluation is closed.
 
 `twistH0IsTriangulated` adds that `H⁰(T_E)` is a triangulated functor, on the
 one hypothesis that `RHom(E,-) ⊗ E` preserves chosen cones.  The shift half is
@@ -47,8 +50,9 @@ Nothing here says `T_E` is an autoequivalence, calls `E` spherical, or connects
 it to `SerreFunctor.IsSphericalObject`.  The generic `HasCopowers` capability
 does produce `HasEvaluationData` and a noncomputably selected
 `chosenEvaluationData`; what remains open is a concrete dg category carrying
-that capability.  Being exact is not being invertible, and the object twist
-has no invertibility statement at all -- the adjunction twist gets one from
+that capability.  Being exact is not being an autoequivalence.  The comparison
+maps between different choices are invertible, but the object twist functor
+itself has no autoequivalence statement -- the adjunction twist gets one from
 `TwistCotwistEquivalenceConditions`, which has no object-level counterpart.
 
 ## Where the first two maps come from
@@ -151,6 +155,106 @@ theorem twistH0IsTriangulated
 noncomputable def twistTriangleIso (K K' : V.TwistConeData) :
     twistTriangleFunctor K ≅ twistTriangleFunctor K' :=
   DGFunctor.HomogeneousNatTrans.ConeData.compareIso V.evaluation_isClosed K K'
+
+/-- **The object twist triangle does not depend on the evaluation or cone
+choices.**
+
+The separately named definition preserves the original `twistTriangleIso`
+contract, which remains the direct generic cone-choice comparison. -/
+noncomputable def twistTriangleIsoOfEvaluation {W : EvaluationData E}
+    (L : W.TwistConeData) :
+    twistTriangleFunctor K ≅ twistTriangleFunctor L :=
+  DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare
+    K V.evaluation_isClosed L W.evaluation_isClosed
+    (EvaluationData.compareIso V W)
+    (Iso.refl (show Z0 (DGFunctor C C) from DGFunctor.id C))
+    (V.compare_evaluation_square W)
+
+@[simp]
+theorem twistTriangleIsoOfEvaluation_hom_app_hom₁ {W : EvaluationData E}
+    (L : W.TwistConeData) (X : H0 C) :
+    ((K.twistTriangleIsoOfEvaluation L).hom.app X).hom₁ =
+      (DGFunctor.h0Iso (EvaluationData.compareIso V W)).hom.app X :=
+  rfl
+
+@[simp]
+theorem twistTriangleIsoOfEvaluation_hom_app_hom₂ {W : EvaluationData E}
+    (L : W.TwistConeData) (X : H0 C) :
+    ((K.twistTriangleIsoOfEvaluation L).hom.app X).hom₂ = 𝟙 X := by
+  change (DGFunctor.h0Iso
+    (Iso.refl (show Z0 (DGFunctor C C) from DGFunctor.id C))).hom.app X = 𝟙 X
+  rw [DGFunctor.h0Iso_refl]
+  rfl
+
+@[simp]
+theorem twistTriangleIsoOfEvaluation_hom_app_hom₃ {W : EvaluationData E}
+    (L : W.TwistConeData) (X : H0 C) :
+    ((K.twistTriangleIsoOfEvaluation L).hom.app X).hom₃ =
+      (DGFunctor.h0Iso (K.compareIso L)).hom.app X :=
+  DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare_hom_app_hom₃
+    K V.evaluation_isClosed L W.evaluation_isClosed
+    (EvaluationData.compareIso V W)
+    (Iso.refl (show Z0 (DGFunctor C C) from DGFunctor.id C))
+    (V.compare_evaluation_square W) X
+
+@[simp]
+theorem twistTriangleIsoOfEvaluation_self :
+    K.twistTriangleIsoOfEvaluation K = Iso.refl _ := by
+  apply Iso.ext
+  apply NatTrans.ext
+  funext X
+  refine Triangle.hom_ext _ _ ?_ ?_ ?_
+  · change (DGFunctor.h0Iso (V.compareIso V)).hom.app X =
+      𝟙 (V.functor.h0.obj X)
+    rw [EvaluationData.compareIso_self,
+      DGFunctor.h0Iso_refl (C := C) (D := C)
+        (show Z0 (DGFunctor C C) from V.functor)]
+    rfl
+  · change 𝟙 X = 𝟙 X
+    rfl
+  · rw [twistTriangleIsoOfEvaluation_hom_app_hom₃]
+    change (DGFunctor.h0Iso (K.compareIso K)).hom.app X =
+      𝟙 (K.twist.h0.obj X)
+    rw [K.compareIso_self,
+      DGFunctor.h0Iso_refl (C := C) (D := C)
+        (show Z0 (DGFunctor C C) from K.twist)]
+    rfl
+
+theorem twistTriangleIsoOfEvaluation_trans {W X : EvaluationData E}
+    (L : W.TwistConeData) (M : X.TwistConeData) :
+    (K.twistTriangleIsoOfEvaluation L).trans
+        (L.twistTriangleIsoOfEvaluation M) =
+      K.twistTriangleIsoOfEvaluation M := by
+  apply Iso.ext
+  apply NatTrans.ext
+  funext Y
+  refine Triangle.hom_ext _ _ ?_ ?_ ?_
+  · change
+      ((K.twistTriangleIsoOfEvaluation L).hom.app Y).hom₁ ≫
+          ((L.twistTriangleIsoOfEvaluation M).hom.app Y).hom₁ =
+        ((K.twistTriangleIsoOfEvaluation M).hom.app Y).hom₁
+    rw [twistTriangleIsoOfEvaluation_hom_app_hom₁,
+      twistTriangleIsoOfEvaluation_hom_app_hom₁,
+      twistTriangleIsoOfEvaluation_hom_app_hom₁,
+      ← EvaluationData.compareIso_trans V W X, DGFunctor.h0Iso_trans]
+    rfl
+  · change
+      ((K.twistTriangleIsoOfEvaluation L).hom.app Y).hom₂ ≫
+          ((L.twistTriangleIsoOfEvaluation M).hom.app Y).hom₂ =
+        ((K.twistTriangleIsoOfEvaluation M).hom.app Y).hom₂
+    rw [twistTriangleIsoOfEvaluation_hom_app_hom₂,
+      twistTriangleIsoOfEvaluation_hom_app_hom₂,
+      twistTriangleIsoOfEvaluation_hom_app_hom₂]
+    exact Category.id_comp (X := Y) (Y := Y) (𝟙 Y)
+  · change
+      ((K.twistTriangleIsoOfEvaluation L).hom.app Y).hom₃ ≫
+          ((L.twistTriangleIsoOfEvaluation M).hom.app Y).hom₃ =
+        ((K.twistTriangleIsoOfEvaluation M).hom.app Y).hom₃
+    rw [twistTriangleIsoOfEvaluation_hom_app_hom₃,
+      twistTriangleIsoOfEvaluation_hom_app_hom₃,
+      twistTriangleIsoOfEvaluation_hom_app_hom₃,
+      ← K.compareIso_trans L M, DGFunctor.h0Iso_trans]
+    rfl
 
 end TwistConeData
 

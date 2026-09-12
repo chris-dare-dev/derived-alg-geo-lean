@@ -511,6 +511,22 @@ lemma compareIso_inv_val (V W : EvaluationData E) :
     (compareIso V W).inv.val = compare W V :=
   rfl
 
+/-- The canonical evaluation-data comparison from a choice to itself is the
+identity isomorphism. -/
+@[simp]
+lemma compareIso_self (V : EvaluationData E) :
+    compareIso V V = Iso.refl _ := by
+  apply Iso.ext
+  apply Subtype.ext
+  exact compare_self V
+
+/-- Canonical evaluation-data comparison isomorphisms are transitive. -/
+lemma compareIso_trans (V W U : EvaluationData E) :
+    (compareIso V W).trans (compareIso W U) = compareIso V U := by
+  apply Iso.ext
+  apply Subtype.ext
+  exact compare_comp V W U
+
 /-- The canonical comparison commutes strictly with evaluation. -/
 lemma compare_comp_evaluation (V W : EvaluationData E) :
     DGFunctor.HomogeneousNatTrans.composition _ _ _ 0 0 0 (by omega)
