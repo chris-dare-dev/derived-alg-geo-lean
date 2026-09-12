@@ -123,23 +123,36 @@ theorem hasPerfectMassHomBound_finitePullback
     hpre.preimageData).HasMassHomBound (k := k) (boundedSchemePerfect T.left)
   exact hσ.preimage adj hpre.preimageData hgen
 
-/-! ## Faithfully-flat pushforward transfer -/
+/-! ## Flat pushforward transfer -/
 
-/-- **The faithfully-flat pushforward half of Lemma 7.4, with `fₗ` explicit.**
+/-- **The transfer core of the faithfully-flat half of Lemma 7.4, with the
+lower shriek and its generation input explicit.**
 
-Flatness supplies the exact bounded coherent pullback that detects
-`f_♯σ`.  If this pullback has a linear left adjoint `lowerShriek`, then the
-abstract preimage theorem transfers a perfect mass--Hom bound once the
-`lowerShriek` images of perfect tests generate the target perfect class.
+Flatness is the hypothesis this statement uses: it supplies the exact bounded
+coherent pullback `f^*` that detects `f_♯σ`, through `isExactPullbackOfFlat`
+and `hasCoherentPullbackOfIsExactPullback`.  Given a linear left adjoint
+`lowerShriek ⊣ f^*`, the abstract preimage theorem transfers a perfect
+mass--Hom bound once the `lowerShriek` images of perfect tests generate the
+target perfect class.
 
-Classically the left adjoint is constructed from a perfect relative dualizing
-complex.  The repository does not yet own that construction or its adjunction
-on `Dᵇ(Coh)`, so neither is inferred here.  The explicit `lowerShriek`, `adj`,
-and `hgen` arguments are the precise remaining #1033 and #723 interfaces. -/
-theorem hasPerfectMassHomBound_faithfullyFlatPushforward
+**Why surjectivity is not a hypothesis here.**  Lemma 7.4(2) assumes `f`
+faithfully flat with relative dualizing complex `ω_f^•` in `D_perf`, and those
+two extra assumptions do exactly two jobs.  The dualizing complex builds
+`f_! = f_*(- ⊗ ω_f^•)` together with its adjunction against `f^*`; surjectivity
+makes `f^*` conservative on `Dqc`, which is what the Neeman--Ravenel criterion
+turns into the statement that `f_!` carries a classical generator of `Perf T`
+to one of `Perf U`.  Both jobs are discharged into explicit parameters here --
+`lowerShriek` and `adj` for the first, `hgen` for the second -- because the
+repository owns neither construction.  A `Surjective f.left` binder would
+therefore be inert: it is the hypothesis of results this statement assumes
+rather than proves, and carrying it would claim a geometric input the proof
+never consumes.  Those two constructions are the precise remaining #1033 and
+#723 interfaces; discharging them is what earns back the faithfully flat
+hypothesis, and the name, on a downstream theorem. -/
+theorem hasPerfectMassHomBound_flatPushforward
     {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [Flat f.left] [Surjective f.left]
+    [Flat f.left]
     {k : Type w} [Field k]
     [Linear k T.BoundedCoherentDerivedFiber]
     [Linear k U.BoundedCoherentDerivedFiber]
