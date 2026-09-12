@@ -12,6 +12,7 @@ import DerivedAlgGeo.CategoryTheory.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.ModuleCat
 import DerivedAlgGeo.CategoryTheory.Shift
 import DerivedAlgGeo.CategoryTheory.Sites
+import DerivedAlgGeo.CategoryTheory.Subobject
 import DerivedAlgGeo.CategoryTheory.SubobjectCorrespondence
 import DerivedAlgGeo.CategoryTheory.SubobjectEquivalence
 import DerivedAlgGeo.CategoryTheory.Triangulated

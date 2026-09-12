@@ -168,6 +168,7 @@ ambient sheaf, every slope is a multiple of one over its factorial, and such a s
 has a greatest element. -/
 
 #print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput
+#print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput.ofSlopeBoundedness
 #print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput.noetherian
 #print axioms AlgebraicGeometry.Stability.Gieseker.MuHNInput.slope_bddAbove
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.multiplicity_le_of_mono

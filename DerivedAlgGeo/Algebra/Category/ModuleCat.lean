@@ -6,6 +6,7 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
 import DerivedAlgGeo.Algebra.Category.ModuleCat.LinearDual
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Limits
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Noetherian
 
 /-!
 # Categories of modules
