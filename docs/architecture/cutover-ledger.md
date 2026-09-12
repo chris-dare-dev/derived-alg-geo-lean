@@ -7,6 +7,15 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Bounded-derived cohomological Euler classes (2026-09-12):
+  `K₀Ab.of_exact` expresses the middle term of an exact pair through its two
+  image classes, and `K₀Ab.eulerClass_add_of_exact` telescopes those identities
+  over a finitely supported integer-indexed long exact sequence. For every
+  abelian category `A`, `DerivedCategory.boundedEulerClassHom` then gives the
+  canonical map `K₀(Dᵇ(A)) →+ K₀Ab(A)` by alternating bounded cohomology.
+  This constructs only the cohomological direction. Identifying it as the
+  inverse of the standard-heart `K₀Ab.toAmbient` map remains the next
+  dévissage step; no Grothendieck-group equivalence is assumed here.
 - Degreewise ambient coherent Ext-finiteness on projective varieties
   (2026-09-12):
   `ProjectivePresentation.module_finite_ambientExt` combines unconditional
