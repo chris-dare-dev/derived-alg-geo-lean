@@ -81,10 +81,15 @@ Category
 ├─ DGCategory C
 │  ├─ DGLinear k C                       scalar refinement
 │  │  ├─ homComplex                     existing Hom-complex repackaged in ModuleCat k
+│  │  ├─ postcompCochain                fixed-source right composition, k-linear in the morphism
 │  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
 │  │     ├─ lift / lift_unique           linear cochains are morphisms out of Z
 │  │     ├─ compare                      closed canonical comparison, strict composition
-│  │     └─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
+│  │     ├─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
+│  │     └─ LinearEvaluationData k E     scalar-linear Hom(E,-) ⊗ E assembly
+│  │        ├─ functor                   k-linear dg functor
+│  │        ├─ evaluation                closed degree-zero map to the identity
+│  │        └─ compareIso                coherent choice independence, strict over evaluation
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations

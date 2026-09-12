@@ -7,6 +7,20 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Scalar-linear evaluation root (2026-09-12):
+  `DGCategory.LinearEvaluation` assembles the `IsLinearCopowerOf` family at an
+  object `E` into `LinearEvaluationData k E`.  Fixed-source right composition
+  is exposed once as `DGLinear.postcompCochain`; the evaluation action is its
+  composite with the target universal chain map, followed by the source
+  copower's linear representing inverse.  The result is a `k`-linear dg
+  functor, a closed evaluation transformation to the identity, and a coherent
+  canonical `Z⁰` isomorphism between any two choices which commutes strictly
+  with evaluation.  `HasLinearEvaluationData` stores only existence and is
+  supplied at low priority by `HasLinearCopowers`.
+  This is parallel to, not a refinement of, additive `EvaluationData`: there
+  is no adapter between their incompatible universal properties.  No cone,
+  exactness, Euler/K₀, homotopy-invariance, finite-presentation, or concrete
+  existence result is asserted here.
 - Scalar-linear dg Hom and copower root (2026-09-12):
   `DGCategory.Linear` repackages the existing Hom-complex of a `DGLinear k C`
   as `DGLinear.homComplex`, a `ModuleCat k`-valued cochain complex.
@@ -17,9 +31,9 @@ blocks should normally move it rather than add more declarations beside it.
   universal-property pattern as the additive root.  There is deliberately no
   projection to `IsCopowerOf`: that interface represents all additive
   cochains, so forgetting scalar structure would strengthen rather than
-  preserve the linear contract.  Scalar-linear evaluation data is the next
-  consumer; no Euler-class, homotopy-invariance, or finite-presentation result
-  is asserted here.
+  preserve the linear contract.  Scalar-linear evaluation data now consumes
+  this root separately; no Euler-class, homotopy-invariance, or
+  finite-presentation result is asserted here.
 - Object-twist `K₀` action and Euler-realization boundary (2026-09-12):
   `DGEnhancement.H0.NaturalTransformationConeK0` owns the reusable theorem
   that a functorial cone acts on `K₀` by target endpoint minus source
@@ -32,9 +46,10 @@ blocks should normally move it rather than add more declarations beside it.
   object-twist map equals the existing numerical `twistK₀`.
   This capability is supplied realization input, not a consequence of the
   present additive `IsCopowerOf`, which represents ℤ-additive rather than
-  `k`-linear cochains.  The separate scalar-linear copower root now exists;
-  scalar-linear evaluation data, its homotopy invariance, and a finite
-  cohomology presentation are the next foundational roots.
+  `k`-linear cochains.  The separate scalar-linear copower and evaluation
+  roots now exist; relating that parallel evaluation package to the numerical
+  consumer, proving homotopy invariance, and giving a finite cohomology
+  presentation are the next foundational roots.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under
