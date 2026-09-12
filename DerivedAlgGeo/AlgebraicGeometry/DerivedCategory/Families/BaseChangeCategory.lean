@@ -40,10 +40,13 @@ abbreviation for `ObjectProperty.FullSubcategory`.  A
 object `LeftDerivedPullback` by proving that its functor preserves
 quasi-coherent cohomology.  The external product is assembled from those
 lifts along the two fibre-product projections and a supplied tensor
-bifunctor on `Dqc(X_T)`.  Constructing that derived tensor, proving that the
-triangulated envelope remains compact, constructing the source `Dqc`
-component from a strong semiorthogonal component of `Dᵇ(X)`, and proving
-pullback/pushforward functoriality are the next layers of Theorem 3.17.
+bifunctor on `Dqc(X_T)`.  The compactness layer below isolates the exact
+preservation statements needed to put the resulting generators, and hence
+their thick envelope, inside the compact objects of `Dqc(X_T)`.  Constructing
+the unbounded derived tensor and proving those preservation statements,
+constructing the source `Dqc` component from a strong semiorthogonal component
+of `Dᵇ(X)`, and proving pullback/pushforward functoriality are the next layers
+of Theorem 3.17.
 
 ## Main definitions
 
@@ -53,6 +56,9 @@ pullback/pushforward functoriality are the next layers of Theorem 3.17.
   which preserves the `Dqc` locus;
 * `SchemeBaseChange.baseChangeExternalProduct`: the functor
   `(F, G) ↦ Lφ'^*F ⊗ Lg'^*G`;
+* `SchemeBaseChange.DqcLeftDerivedPullback.PreservesCompactObjects` and
+  `SchemeBaseChange.TensorPreservesCompactObjects`: the exact compactness
+  obligations on the supplied geometric operations;
 * `SchemeBaseChange.sourcePerfectPart`: the compact part of a source
   component;
 * `SchemeBaseChange.perfectBaseChangeGenerators` and
@@ -125,6 +131,15 @@ theorem functor_obj_obj (P : DqcLeftDerivedPullback f)
     (P.functor.obj E).obj = P.ambient.functor.obj E.obj :=
   rfl
 
+/-- The exact compactness obligation on a `Dqc` left-derived pullback.
+
+This is kept as a property of the already constructed universal-property
+object rather than as a second pullback structure.  In geometric applications
+it is discharged by the perfect-pullback theorem. -/
+def PreservesCompactObjects (P : DqcLeftDerivedPullback f) : Prop :=
+  ∀ E : Dqc.SchemeQuasicoherentDerivedCategory U.left,
+    IsCompactObject.{u} E → IsCompactObject.{u} (P.functor.obj E)
+
 end DqcLeftDerivedPullback
 
 /-- The compact objects of `Dqc(T)`.  Under the quasi-compact affine-diagonal
@@ -193,6 +208,16 @@ noncomputable def baseChangeExternalProduct
   sourcePerfectPullback X T P pullX ⋙ tensor ⋙
     (Functor.whiskeringLeft _ _ _).obj (compactFiberPullback X T pullT)
 
+/-- The exact compactness obligation on the supplied tensor bifunctor: the
+tensor product of two compact objects is compact. -/
+def TensorPreservesCompactObjects
+    (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) : Prop :=
+  ∀ E F : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left,
+    IsCompactObject.{u} E → IsCompactObject.{u} F →
+      IsCompactObject.{u} ((tensor.obj E).obj F)
+
 @[simp]
 theorem baseChangeExternalProduct_obj_obj
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
@@ -206,6 +231,24 @@ theorem baseChangeExternalProduct_obj_obj
       (tensor.obj (pullX.functor.obj F.obj)).obj
         (pullT.functor.obj G.obj) :=
   rfl
+
+/-- Every geometric external product is compact when both derived pullbacks
+preserve compact objects and tensor preserves compactness in two compact
+arguments. -/
+theorem baseChangeExternalProduct_obj_isCompact
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
+    (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
+    (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
+    (hpullX : pullX.PreservesCompactObjects)
+    (hpullT : pullT.PreservesCompactObjects)
+    (htensor : TensorPreservesCompactObjects X T tensor)
+    (F : SourcePerfectPartCategory X P) (G : CompactDqcFiber T) :
+    IsCompactObject.{u}
+      (((baseChangeExternalProduct X T P pullX pullT tensor).obj F).obj G) :=
+  htensor _ _ (hpullX F.obj F.property.2) (hpullT G.obj G.property)
 
 /-- The objects `φ'^* F ⊗ g'^* G` which generate the perfect base-change
 component in Proposition 3.15.  The curried functor is the geometric external
@@ -326,6 +369,26 @@ theorem perfectBaseChangeGenerators_le_envelope
       perfectBaseChangeEnvelope X T P externalProduct :=
   ObjectProperty.le_triangEnvelope _
 
+/-- Under compact-preserving pullback and tensor, every geometric generator
+of Proposition 3.15 is a compact object of `Dqc(X_T)`. -/
+theorem perfectBaseChangeGenerators_externalProduct_le_compact
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
+    (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
+    (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
+    (hpullX : pullX.PreservesCompactObjects)
+    (hpullT : pullT.PreservesCompactObjects)
+    (htensor : TensorPreservesCompactObjects X T tensor) :
+    perfectBaseChangeGenerators X T P
+        (baseChangeExternalProduct X T P pullX pullT tensor) ≤
+      ObjectProperty.compactObjects.{u} := by
+  rintro E ⟨F, G, ⟨e⟩⟩
+  exact ObjectProperty.isCompactObject_of_iso e
+    (baseChangeExternalProduct_obj_isCompact X T P pullX pullT tensor
+      hpullX hpullT htensor F G)
+
 /-- Universal property of the perfect envelope: any thick triangulated
 property containing the external-product generators contains the envelope. -/
 theorem perfectBaseChangeEnvelope_le
@@ -339,6 +402,38 @@ theorem perfectBaseChangeEnvelope_le
     perfectBaseChangeEnvelope X T P externalProduct ≤ Q :=
   (ObjectProperty.triangEnvelope_le_iff
     (P := perfectBaseChangeGenerators X T P externalProduct) (Q := Q)).2 h
+
+/-- Compactness half of the perfect-envelope construction in Proposition
+3.15.  Once compact objects of the ambient `Dqc(X_T)` are available as a thick
+triangulated property, compact-preserving pullback and tensor put the whole
+external-product envelope inside them.
+
+The two typeclass hypotheses are deliberately explicit: their general proof
+for the repository's coproduct-based `IsCompactObject` API has not yet been
+formalized and is independent of the scheme-theoretic tensor construction. -/
+theorem perfectBaseChangeEnvelope_externalProduct_le_compact
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pullX : DqcLeftDerivedPullback (baseChangeFst X T))
+    (pullT : DqcLeftDerivedPullback (baseChangeSnd X T))
+    (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
+    [ObjectProperty.IsStableUnderRetracts
+      (ObjectProperty.compactObjects.{u}
+        (C := Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left))]
+    [ObjectProperty.IsTriangulated
+      (ObjectProperty.compactObjects.{u}
+        (C := Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left))]
+    (hpullX : pullX.PreservesCompactObjects)
+    (hpullT : pullT.PreservesCompactObjects)
+    (htensor : TensorPreservesCompactObjects X T tensor) :
+    perfectBaseChangeEnvelope X T P
+        (baseChangeExternalProduct X T P pullX pullT tensor) ≤
+      ObjectProperty.compactObjects.{u} :=
+  perfectBaseChangeEnvelope_le X T P
+    (baseChangeExternalProduct X T P pullX pullT tensor)
+    (perfectBaseChangeGenerators_externalProduct_le_compact X T P pullX pullT
+      tensor hpullX hpullT htensor)
 
 /-- Universal property of the quasi-coherent construction: any property
 closed under isomorphisms, `Type u`-indexed coproducts, and extensions which

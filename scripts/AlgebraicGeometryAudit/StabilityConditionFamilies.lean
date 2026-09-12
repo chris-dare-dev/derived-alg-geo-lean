@@ -420,6 +420,7 @@ for every instance, as are the identity and composition laws.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.functor
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.functorCompInclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.functor_obj_obj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.PreservesCompactObjects
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.CompactDqcFiber
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourcePerfectPart
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.SourcePerfectPartCategory
@@ -428,7 +429,9 @@ for every instance, as are the identity and composition laws.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourcePerfectPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.compactFiberPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.baseChangeExternalProduct
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TensorPreservesCompactObjects
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.baseChangeExternalProduct_obj_obj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.baseChangeExternalProduct_obj_isCompact
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectBaseChangeGenerators
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.mem_perfectBaseChangeGenerators_externalProduct_iff
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectBaseChangeEnvelope
@@ -441,7 +444,9 @@ for every instance, as are the identity and composition laws.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourcePerfectPart_le
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourcePerfectPart_le_compact
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectBaseChangeGenerators_le_envelope
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectBaseChangeGenerators_externalProduct_le_compact
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectBaseChangeEnvelope_le
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectBaseChangeEnvelope_externalProduct_le_compact
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.quasicoherentBaseChangeComponent_le
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.perfectBaseChangeEnvelope_le_quasicoherent
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.mem_boundedBaseChangeComponent_iff
