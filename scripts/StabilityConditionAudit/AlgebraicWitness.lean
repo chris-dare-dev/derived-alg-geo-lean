@@ -26,7 +26,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Alge
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_linear
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_full
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_faithful
-#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_commShift
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBoundedCommShift
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_essSurj
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.homFiniteBounded_derivedFiniteVect
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.homFinite_derivedFiniteVect

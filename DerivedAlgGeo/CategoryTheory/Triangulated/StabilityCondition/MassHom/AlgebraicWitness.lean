@@ -171,7 +171,7 @@ noncomputable instance boundedImageToBounded_faithful :
   dsimp [boundedImageToBounded]
   infer_instance
 
-noncomputable instance boundedImageToBounded_commShift :
+noncomputable instance boundedImageToBoundedCommShift :
     (boundedImageToBounded k).CommShift ℤ := by
   dsimp [boundedImageToBounded]
   infer_instance
