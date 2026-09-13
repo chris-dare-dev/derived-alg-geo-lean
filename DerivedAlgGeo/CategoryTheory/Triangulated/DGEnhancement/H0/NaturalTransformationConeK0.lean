@@ -15,9 +15,9 @@ objectwise cones gives a functorial distinguished triangle
 
 `H⁰ F X ⟶ H⁰ G X ⟶ H⁰(Cone α) X ⟶ H⁰ F X⟦1⟧`.
 
-Consequently its cone functor has class `[G X] - [F X]`.  When both endpoints
-preserve chosen dg cones, all three functors are exact on `H⁰`, and the same
-formula holds as an equality of homomorphisms on `K₀`.
+Consequently its cone functor has class `[G X] - [F X]`.  Automatic
+dg-functor exactness upgrades the formula to an equality of homomorphisms on
+`K₀`.
 
 This generic leaf is the owner of the subtraction formula.  Adjunction cones,
 object twists, and any later kernel-cone construction should specialize it
@@ -56,44 +56,27 @@ theorem functorK₀Of (hα : IsClosed α) (X : H0 C) :
 variable [IsPretriangulated C]
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The functorial cone acts on `K₀` by target endpoint minus source endpoint.
-The endpoint cone arguments are retained for source compatibility and are
-redundant. -/
-theorem functorK₀Map
-    (hα : IsClosed α)
-    (hFc : DGFunctor.PreservesChosenCones F)
-    (hGc : DGFunctor.PreservesChosenCones G) :
+/-- The functorial cone acts on `K₀` by target endpoint minus source endpoint. -/
+theorem functorK₀Map (hα : IsClosed α) :
     letI : K.functor.h0.CommShift ℤ :=
-      DGFunctor.commShift _ K.preservesShifts
-    letI : K.functor.h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        K.preservesShifts (K.preservesChosenCones hFc hGc)
+      DGFunctor.h0CommShift K.functor
+    letI : K.functor.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.functor
     letI : F.h0.CommShift ℤ :=
-      DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-    letI : F.h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        (DGFunctor.preservesShifts _) hFc
+      DGFunctor.h0CommShift F
+    letI : F.h0.IsTriangulated := DGFunctor.h0IsTriangulated F
     letI : G.h0.CommShift ℤ :=
-      DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-    letI : G.h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        (DGFunctor.preservesShifts _) hGc
+      DGFunctor.h0CommShift G
+    letI : G.h0.IsTriangulated := DGFunctor.h0IsTriangulated G
     K₀.map K.functor.h0 = K₀.map G.h0 - K₀.map F.h0 := by
   letI : K.functor.h0.CommShift ℤ :=
-    DGFunctor.commShift _ K.preservesShifts
-  letI : K.functor.h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      K.preservesShifts (K.preservesChosenCones hFc hGc)
+    DGFunctor.h0CommShift K.functor
+  letI : K.functor.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.functor
   letI : F.h0.CommShift ℤ :=
-    DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-  letI : F.h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      (DGFunctor.preservesShifts _) hFc
+    DGFunctor.h0CommShift F
+  letI : F.h0.IsTriangulated := DGFunctor.h0IsTriangulated F
   letI : G.h0.CommShift ℤ :=
-    DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-  letI : G.h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      (DGFunctor.preservesShifts _) hGc
+    DGFunctor.h0CommShift G
+  letI : G.h0.IsTriangulated := DGFunctor.h0IsTriangulated G
   apply K₀.hom_ext
   intro X
   change K₀.of (H0 D) (K.functor.h0.obj X) =
