@@ -110,7 +110,9 @@ CochainComplex.homologyModel (any abelian category)
    no finite support, finite dimension, naturality, or quasi-isomorphism claim
 
 HasLinearCopowers k C
-└─ linearCopowerFunctor k X: C^dg(ModuleCat k) ⟶ C, a k-linear dg functor
+├─ linearCopowerFunctor k X: C^dg(ModuleCat k) ⟶ C, a k-linear dg functor
+└─ C = Cdg(ModuleCat k), same universe: Mathlib's total tensor product
+   supplies the chosen object, tensor--Hom cochain equivalence, and instance
 
 HomotopyCategory/DGEnhancement/LinearCopower
 └─ H⁰ sends homotopy-equivalent coefficient complexes to isomorphic selected
@@ -126,7 +128,8 @@ LinearEvaluationData k E
 ├─ TwistConeData: thin specialization of the generic evaluation cone
 │  ├─ K₀ action = identity minus evaluation
 │  └─ numerical twistK₀ via IsEulerCopower; dg exactness is automatic
-└─ no additive EvaluationData adapter, autoequivalence, or concrete instance
+└─ no additive EvaluationData adapter or autoequivalence; the standard
+   module-complex dg category now has a concrete same-universe instance
 
 EvaluationData E
 ├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
@@ -485,12 +488,19 @@ that comparison are instance hypotheses to be discharged by the realization.
    `twistK₀`, without an additive-evaluation adapter.  Exactness is automatic
    for its dg functor, but this proves no autoequivalence.
 
-   What is open is *concrete existence*: no dg category in the repository yet
-   supplies either a `HasCopowers` instance for the additive interface or a
-   `HasLinearCopowers` instance for the scalar-linear one.  The generic
-   existence/choice interfaces, including linear evaluation, and their
-   comparison coherences are closed, as is choice-independence of the additive
-   cone-preservation capability.  The
+   Concrete scalar-linear existence is now closed for the standard dg category
+   `Cdg (ModuleCat k)` in the same universe.  `DGCategory.Model.LinearCopower`
+   uses Mathlib's total tensor product, coproduct eliminator, and module tensor
+   universal property to construct the degreewise tensor--Hom linear
+   equivalence; the Koszul formula for the total differential proves that the
+   curried identity is the universal chain map.  This supplies
+   `HasLinearCopowers k (Cdg (ModuleCat k))` without a parallel tensor
+   construction.  The same-universe restriction is Mathlib's current monoidal
+   `ModuleCat` restriction, not an abstract requirement.  Concrete additive
+   `HasCopowers` remains open, as do scalar-linear instances for other dg
+   categories.  The generic existence/choice interfaces, including linear
+   evaluation, and their comparison coherences are closed, as is
+   choice-independence of the additive cone-preservation capability.  The
    comparison seam is closed at both
    dg-functor and full H⁰-triangle levels.  `IsConeOf.isoOfStrictSquare` lifts
    endpoint isomorphisms in a strict square,

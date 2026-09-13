@@ -114,7 +114,8 @@ blocks should normally move it rather than add more declarations beside it.
   or shift interface is introduced.  This root still assumes the actual
   `HomotopyEquiv`; it proves no automatic formality, quasi-isomorphism
   invariance, Hom-cohomology comparison, Euler/K₀ formula, cone preservation,
-  basis independence, or concrete `HasLinearCopowers` instance.
+  or basis independence.  The concrete standard-model copower instance is
+  supplied separately by `DGCategory.Model.LinearCopower`.
 - Supplied-presentation scalar-copower `K₀` class (2026-09-12):
   `DGEnhancement.FiniteCohomologyCopowerK0` owns the numerical leaf
   `FiniteCohomologyPresentation.linearCopowerK₀Of`.  For an explicitly
@@ -178,8 +179,24 @@ blocks should normally move it rather than add more declarations beside it.
   transported through the existing `Cdg.h0Functor` seam rather than a new
   quotient construction.  This
   proves neither quasi-isomorphism invariance nor a finite cohomology
-  decomposition, Euler formula, cone-preservation theorem, or concrete
-  `HasLinearCopowers` instance.
+  decomposition, Euler formula, or cone-preservation theorem.  Concrete
+  existence for the standard module-complex model is a separate model-layer
+  instance.
+- Concrete scalar-linear copowers for module complexes (2026-09-13):
+  `DGCategory.Model.LinearCopower` identifies the scalar-linear copower of a
+  standard dg module complex `X` by a coefficient complex `K` with Mathlib's
+  total tensor product `K ⊗ X`.  The forward map is tensor currying in every
+  homogeneous degree; its inverse combines Mathlib's total-complex coproduct
+  eliminator with `TensorProduct.lift`.  Currying the identity gives the
+  universal family, and Mathlib's `D₁`/`D₂` formulas reduce its chain-map
+  law to cancellation of the two vertical Koszul signs.  The resulting
+  `IsLinearCopowerOf` witness supplies
+  `HasLinearCopowers k (Cdg (ModuleCat k))`.  No parallel monoidal, coproduct,
+  Hom-complex, or copower abstraction is introduced.  The instance is
+  intentionally same-universe because Mathlib's present monoidal `ModuleCat`
+  instance has that restriction; it does not assert concrete additive
+  copowers, quasi-isomorphism invariance, or a copower instance for another dg
+  model.
 - Scalar-linear evaluation root (2026-09-12):
   `DGCategory.LinearEvaluation` assembles the `IsLinearCopowerOf` family at an
   object `E` into `LinearEvaluationData k E`.  Fixed-source right composition
@@ -194,7 +211,8 @@ blocks should normally move it rather than add more declarations beside it.
   is no adapter between their incompatible universal properties.  The
   coefficient-complex homotopy result is owned by the copower DG-functor root;
   this evaluation root itself asserts no cone, exactness, Euler/K₀,
-  finite-presentation, or concrete existence result.
+  or finite-presentation result.  Its standard module-complex inputs now obtain
+  concrete existence from the separate model-layer tensor instance.
 - Scalar-linear dg Hom and copower root (2026-09-12):
   `DGCategory.Linear` repackages the existing Hom-complex of a `DGLinear k C`
   as `DGLinear.homComplex`, a `ModuleCat k`-valued cochain complex.

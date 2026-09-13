@@ -1173,6 +1173,28 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.HasLinearCopowers.has_linearCopower
 #print axioms CategoryTheory.hasLinearCopowerOfHasLinearCopowers
 
+-- In the standard same-universe dg category of module complexes, Mathlib's
+-- total tensor product realizes the scalar-linear copower.  The degreewise
+-- tensor--Hom equivalence uses the existing total coproduct and module tensor
+-- universal properties, while the universal chain-map law is the standard
+-- cancellation of the two vertical Koszul signs.  This supplies a concrete
+-- scalar-linear instance, not an additive copower or a new tensor abstraction.
+#print axioms CategoryTheory.Cdg.linearTensorObj
+#print axioms CategoryTheory.Cdg.linearTensorιOfEq
+#print axioms CategoryTheory.Cdg.linearTensorι
+#print axioms CategoryTheory.Cdg.tensorCurryCochain
+#print axioms CategoryTheory.Cdg.tensorCochainLinearEquiv
+#print axioms CategoryTheory.Cdg.linearTensorUnivCochain
+#print axioms CategoryTheory.Cdg.linearTensorUnivCochain_apply
+#print axioms CategoryTheory.Cdg.linearTensorι_d_apply
+#print axioms CategoryTheory.Cdg.linearTensorUnivCochain_mem
+#print axioms CategoryTheory.Cdg.linearTensorUnivCocycle
+#print axioms CategoryTheory.Cdg.linearTensorUniv
+#print axioms CategoryTheory.Cdg.cochain_ofHom_linearTensorUniv
+#print axioms CategoryTheory.Cdg.linearCopowerCochain_linearTensorUniv
+#print axioms CategoryTheory.Cdg.isLinearCopowerOfLinearTensor
+#print axioms CategoryTheory.Cdg.hasLinearCopowers
+
 -- The literal degree-zero single on the scalar ring represents `X` itself.
 -- Its universal map sends the scalar unit to the dg identity, and the selected
 -- object comparison descends from the strict `Z⁰` comparison above.  This
