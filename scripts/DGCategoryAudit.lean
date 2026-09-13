@@ -686,8 +686,18 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.inclusion
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.inclusion_isClosed
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.twist
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparison
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparison_app
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparison_isClosed
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparisonH0
 #print axioms CategoryTheory.DGAdjunction.UnitConeData
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitCone
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparison
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparison_app
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparison_isClosed
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparisonH0
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparisonShiftedH0
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparisonShiftedH0_eq
 #print axioms CategoryTheory.DGAdjunction.chosenCounitConeData
 #print axioms CategoryTheory.DGAdjunction.chosenUnitConeData
 #print axioms CategoryTheory.DGAdjunction.counit
@@ -864,6 +874,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_hom_app
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_inv_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorCompIsoIdH0
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_commShift
 #print axioms CategoryTheory.DGFunctor.transportedShiftedFunctorH0Iso
 #print axioms CategoryTheory.DGFunctor.transportedShiftedFunctorH0Iso_commShift

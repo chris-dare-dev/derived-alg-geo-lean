@@ -191,6 +191,13 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.cotwist
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.twist
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AdjointComparisonConditions
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AdjointComparisonConditions.cotwist
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AdjointComparisonConditions.twist
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AdjointComparisonConditions.cotwistIso
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AdjointComparisonConditions.cotwistShiftedIso
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AdjointComparisonConditions.cotwistShiftedIso_hom
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AdjointComparisonConditions.twistIso
 
 /-! ## Spherical objects without a Serre functor (#888)
 

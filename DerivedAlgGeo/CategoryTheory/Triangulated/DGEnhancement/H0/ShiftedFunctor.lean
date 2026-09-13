@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategory
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategoryShift
+import DerivedAlgGeo.Algebra.Homology.DGCategory.FunctorCategoryH0
 import DerivedAlgGeo.CategoryTheory.Shift.CommShift
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Functor
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.FunctorTransport
@@ -46,6 +48,12 @@ interface.  The direct `CommShift` package obtained from the shifted dg
 functor is proved to agree with that transport, and the compatibility survives
 ordinary endpoint equivalences; the two computation lemmas remain available
 for strict objectwise formulas.
+
+Opposite successive shifts are normalized by
+`shiftedFunctorCompIsoIdH0`.  It applies Mathlib's
+`shiftFunctorCompIsoId` to the `HasShift` structure on closed dg functors and
+descends that isomorphism to `H⁰`, so the cancellation reuses the same unit and
+associativity laws.
 -/
 
 set_option autoImplicit false
@@ -113,6 +121,19 @@ noncomputable def shiftedFunctorH0Iso (F : DGFunctor C D) (n : ℤ) :
     (F.shiftedFunctor n).h0 ≅
       F.h0 ⋙ CategoryTheory.shiftFunctor (H0 D) n :=
   eqToIso (F.shiftedFunctor_h0_eq n)
+
+/-- **Opposite dg-functor shifts cancel canonically on `H⁰`.**
+
+This is Mathlib's `shiftFunctorCompIsoId` for the `HasShift` structure on
+closed dg functors, descended through `DGFunctor.h0Iso`.  In particular, its
+coherence is inherited from the packaged zero and addition comparisons rather
+than reproved objectwise. -/
+noncomputable def shiftedFunctorCompIsoIdH0 (F : DGFunctor C D)
+    (n m : ℤ) (h : n + m = 0) :
+    ((F.shiftedFunctor n).shiftedFunctor m).h0 ≅ F.h0 :=
+  DGFunctor.h0Iso
+    ((shiftFunctorCompIsoId (Z0 (DGFunctor C D)) n m h).app
+      (Z0.of (DGFunctor C D) F))
 
 /-- The comparison `H⁰(F[n]) ≅ H⁰(F)[n]` is the identity on each
 object; only its functorial typing records the morphism computation. -/
