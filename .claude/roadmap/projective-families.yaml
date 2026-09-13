@@ -415,7 +415,7 @@ items:
     parent: projective-families-e14
     blocked_by: [1178, 1179]
     title: "Transfer of mass-Hom bounds along pullback and pushforward (Lemma 7.4)"
-    status: blocked
+    status: done
     summary: "One categorical theorem on the preimage-slicing carrier of e7 (L ⊣ G, G conservative, stabilityMass_preimage), with generation transported by L as a named hypothesis; geometric instances f^♯ along finite morphisms (HasCoherentPushforward, perfectDerivedPullback) and f_♯ along faithfully flat morphisms with perfect dualizing complex (blocked on the Dqc adjunction in #1033). Neeman–Ravenel and classical generators of Perf link to #723."
     priority: must
     size: L
