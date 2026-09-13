@@ -148,7 +148,7 @@ Category
 │  │        │  └─ automatic realization from HomFiniteBounded
 │  │        └─ TwistConeData             direct cone of scalar-linear evaluation
 │  │           ├─ compareIso / exactness  delegated to generic strict-square and cone APIs
-│  │           └─ K₀ action             identity minus evaluation; numerical twist via IsEulerCopower
+│  │           └─ K₀ action             identity minus evaluation; HomFiniteBounded numerical twist
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations

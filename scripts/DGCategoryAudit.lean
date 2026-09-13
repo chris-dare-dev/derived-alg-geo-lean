@@ -1295,8 +1295,9 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- generic cone package.  Choice comparison and exactness reuse the existing
 -- strict-square and cone-preservation interfaces; exactness of evaluation
 -- remains explicit input.  Its generic K₀ formulas give identity minus
--- evaluation; the numerical spherical-twist specialization is audited by the
--- spherical-twist slice.
+-- evaluation.  The numerical spherical-twist specialization is audited by
+-- the spherical-twist slice, while the HomFiniteBounded realization below
+-- supplies its Euler witness automatically.
 #print axioms CategoryTheory.LinearEvaluationData.preservesChosenConesOfCompare
 #print axioms CategoryTheory.LinearEvaluationData.compare_evaluation_square
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData
@@ -1313,6 +1314,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesChosenCones
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of_eq_twistK₀_ofHomFiniteBounded
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map_eq_twistK₀_ofHomFiniteBounded
 
 -- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
 -- identity.  Every one of the functor's four laws is `lift_unique` applied to

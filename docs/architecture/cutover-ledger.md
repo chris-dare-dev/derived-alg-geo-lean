@@ -130,9 +130,12 @@ blocks should normally move it rather than add more declarations beside it.
   identity minus scalar-linear evaluation, and
   `SphericalTwist.LinearObjectTwistK0` combines it with the shared
   `IsEulerCopower` predicate to recover the existing numerical `twistK₀`
-  formula.  This path does not pass through additive `EvaluationData`.
+  formula.  The homotopy-category DG-enhancement leaf
+  `DGEnhancement.LinearObjectTwistK0` discharges that predicate automatically
+  from `HomFiniteBounded` and all linear copowers.  This path does not pass
+  through additive `EvaluationData`.
   Evaluation exactness remains an explicit hypothesis, and no autoequivalence,
-  sphericality, automatic formality, or comparison of the two copower
+  sphericality, naturality of formality, or comparison of the two copower
   universal properties is claimed.
 - Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
   `DGCategory.LinearCopowerFunctor` packages the universal property as a
