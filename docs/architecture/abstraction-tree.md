@@ -218,6 +218,7 @@ Category
 │  │        ├─ presentedCotwistTriangle    Mathlib inverse rotation of the presented unit triangle
 │  │        │  ├─ transportedCotwist      pointwise `[-1]` shift of the transported unit cone
 │  │        │  └─ transportedCotwistH0Iso transport of the actual shifted dg cone agrees up to iso
+│  │        │     ├─ CommShift compatibility canonical sign-correct packages agree across the iso
 │  │        │     └─ exact equivalence     exact for every cone under supplied triangulated transport;
 │  │        │                                equivalence from explicit H⁰ input
 │  │        └─ Fourier--Mukai adapters     existing left/right adjoint-kernel data

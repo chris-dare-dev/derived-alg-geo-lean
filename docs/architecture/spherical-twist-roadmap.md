@@ -311,7 +311,9 @@ that comparison are instance hypotheses to be discharged by the realization.
    `DGFunctor.transportedShiftedFunctorH0Iso` and its specialization
    `transportedCotwistH0Iso` compare that first vertex with the transport of
    `H⁰` of the actual shifted dg unit cone; equality after transport is not
-   claimed.  `DGFunctor.transportedH0` now packages the shift and exactness
+   claimed.  `transportedCotwistH0Iso_commShift` also specializes the canonical
+   sign-correct compatibility of this comparison.  `DGFunctor.transportedH0`
+   now packages the shift and exactness
    capabilities of an arbitrary `H⁰` dg functor after ordinary equivalence
    transport.  Its cotwist specialization proves exactness from the supplied
    triangulated source equivalence and packages an ordinary exact
@@ -337,7 +339,9 @@ that comparison are instance hypotheses to be discharged by the realization.
    that data is supplied.  Their nested `ShiftCompatibility` refinements can
    additionally select Fourier--Mukai twist/cotwist `CommShift` structures and
    require Mathlib compatibility of the projected natural isomorphisms; this
-   transfers `IsTriangulated` from the dg presentations.  Neither the bare
+   transfers `IsTriangulated` from the dg presentations.  On the cotwist side,
+   the comparison from the actual shifted dg cone is then compatible by
+   composition, with no additional field.  Neither the bare
    comparison data nor the refinements are constructed here, and they imply no
    dg quasi-equivalence, choice independence, equivalence transfer, target
    shift-structure uniqueness, or sphericality.  The dg notion is still
@@ -673,7 +677,9 @@ that comparison are instance hypotheses to be discharged by the realization.
    not constructed here.  Its `ShiftCompatibility` refinement records
    compatibility of the conventional cotwist isomorphism with a selected
    Fourier--Mukai `CommShift` and transfers triangulatedness.  Compatibility
-   of the intermediate actual shifted dg cotwist is still open.
+   of the intermediate actual shifted dg cotwist follows from the canonical
+   transported comparison and is exposed by
+   `transportedDGCotwistIso_commShift`.
    The left-adjunction unit is now a third consumer:
    `DualTwistKernelData` swaps the two correspondences and reuses
    `LeftAdjointKernelData.toRightAdjointKernelData`, so its enhanced form names

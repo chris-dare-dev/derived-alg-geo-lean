@@ -1051,6 +1051,7 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.ShiftCompatibility.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.ShiftCompatibility.cotwistCommShift
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.ShiftCompatibility.transportedCotwistIso_commShift
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.ShiftCompatibility.transportedDGCotwistIso_commShift
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.ShiftCompatibility.cotwistIsTriangulated
 
 /-! ## Fourier--Mukai lane -- left-adjunction dual-twist kernels -/

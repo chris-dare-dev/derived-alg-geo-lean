@@ -31,7 +31,8 @@ equivalence, kernel-presentation, or sphericality.  A further
 `ShiftCompatibility` refinement can select a Fourier--Mukai `CommShift`
 structure compatible with the conventional cotwist comparison; exactness
 then transfers through Mathlib's existing `Functor.isTriangulated_of_iso`
-theorem.
+theorem.  Compatibility of the composite comparison from the actual shifted
+dg cone is derived from that refinement rather than stored separately.
 -/
 
 set_option autoImplicit false
@@ -253,8 +254,7 @@ Fourier--Mukai cotwist.
 
 The source uses the canonical sign-correct shift structure on the conventional
 pointwise `[-1]` cotwist.  Compatibility of the intermediate comparison from
-the actual shifted dg cone is a separate coherence question and is not stored
-here. -/
+the actual shifted dg cone is derived canonically and is not stored here. -/
 structure ShiftCompatibility where
   /-- The selected shift structure on the Fourier--Mukai cotwist. -/
   cotwistCommShift : S.cotwist.CommShift ℤ
@@ -269,6 +269,29 @@ structure ShiftCompatibility where
 namespace ShiftCompatibility
 
 variable (h : N.ShiftCompatibility)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The composite comparison from the actual shifted dg cotwist to the
+Fourier--Mukai cotwist respects the canonical source shift package and the
+selected Fourier--Mukai shift package. -/
+theorem transportedDGCotwistIso_commShift [eA.functor.Additive] :
+    letI : (K.transportedDGCotwist eA).CommShift ℤ :=
+      (K.unitCone.shiftedFunctor (-1 : ℤ)).transportedH0CommShift
+    letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
+    NatTrans.CommShift N.transportedDGCotwistIso.hom ℤ := by
+  letI : (K.transportedDGCotwist eA).CommShift ℤ :=
+    (K.unitCone.shiftedFunctor (-1 : ℤ)).transportedH0CommShift
+  letI : (K.transportedCotwist eA).CommShift ℤ :=
+    K.transportedCotwistCommShift (eC := eA)
+  letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
+  letI : NatTrans.CommShift (K.transportedCotwistH0Iso (eC := eA)).hom ℤ :=
+    K.transportedCotwistH0Iso_commShift (eC := eA)
+  letI : NatTrans.CommShift N.transportedCotwistIso.hom ℤ :=
+    h.transportedCotwistIso_commShift
+  change NatTrans.CommShift
+    ((K.transportedCotwistH0Iso (eC := eA)).hom ≫
+      N.transportedCotwistIso.hom) ℤ
+  infer_instance
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The Fourier--Mukai cotwist is triangulated relative to the selected target
