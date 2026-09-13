@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeDecomposition
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeFiberCoefficient
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeGeneration
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeProjection
 
 /-!
 # Proposition 3.15 assembly for scheme base change
@@ -19,10 +20,13 @@ second adds external-product generation and propagation from perfect objects
 to `Dqc`. Thus it produces semiorthogonality and fullness for both the perfect
 and quasicoherent sequences.
 
-Chosen component projections and cocontinuity are deliberately the next
-boundary. `Proposition315ProjectionData` states exactly those remaining
-obligations and converts the core package to `DecompositionData` without
-hiding any geometric theorem.
+The projection layer constructs the `Dqc` projectors from componentwise
+compact-generator approximations and obtains the perfect projectors by
+restriction to compact objects. `Proposition315ProjectionConstructionData`
+records the remaining geometric inputs: cocontinuity of the corresponding
+truncations, preservation of compact objects, and the compact-intersection
+identification. It produces `Proposition315ProjectionData`, which in turn
+converts the core package to `DecompositionData`.
 -/
 
 noncomputable section
@@ -167,6 +171,52 @@ structure Proposition315ProjectionData
   quasicoherentProjectionCocontinuous :
     ∀ i, (quasicoherentProjections.ambientProjection i).PreservesSmallCoproducts.{u}
 
+/-- Geometric inputs from which all chosen projections in Proposition 3.15
+are constructed. -/
+structure Proposition315ProjectionConstructionData
+    {A : SemiorthogonalSequence (SourceDqc X) ι}
+    {Q : D.SourceTensorData}
+    {B : KFlatBasePullbackData X}
+    {hcompact : D.PreservesCompactObjects}
+    (C : D.Proposition315CoreData A Q B hcompact) : Prop where
+  /-- Compact-generator approximations for the perfect envelopes. -/
+  approximation : D.QuasicoherentProjectionApproximationData A
+  /-- The zero truncation attached to each approximation preserves
+  coproducts in the scheme universe. -/
+  truncationCocontinuous (i : ι) :
+    Functor.PreservesSmallCoproducts.{u}
+      ((approximation.componentApproximation i).tStructure.truncLE 0)
+  /-- The quasicoherent projectors preserve compact objects, and compact
+  intersection identifies their restrictions with the perfect components. -/
+  compactRestriction :
+    D.PerfectProjectionRestrictionData A hcompact
+      C.semiorthogonality.perfectSemiorthogonal
+      (approximation.quasicoherentProjections hcompact
+        C.semiorthogonality.perfectSemiorthogonal)
+
+namespace Proposition315ProjectionConstructionData
+
+variable {D : KFlatBaseChangeData X T}
+  {A : SemiorthogonalSequence (SourceDqc X) ι}
+  {Q : D.SourceTensorData}
+  {B : KFlatBasePullbackData X}
+  {hcompact : D.PreservesCompactObjects}
+  {C : D.Proposition315CoreData A Q B hcompact}
+  (P : D.Proposition315ProjectionConstructionData C)
+
+/-- Construct all perfect and quasicoherent projection data required by the
+Proposition 3.15 core. -/
+noncomputable def toProjectionData : D.Proposition315ProjectionData C where
+  perfectProjections := P.compactRestriction.perfectProjections
+  quasicoherentProjections :=
+    P.approximation.quasicoherentProjections hcompact
+      C.semiorthogonality.perfectSemiorthogonal
+  quasicoherentProjectionCocontinuous :=
+    P.approximation.quasicoherentProjectionCocontinuous hcompact
+      C.semiorthogonality.perfectSemiorthogonal P.truncationCocontinuous
+
+end Proposition315ProjectionConstructionData
+
 namespace Proposition315CoreData
 
 variable {D : KFlatBaseChangeData X T}
@@ -190,6 +240,14 @@ def toDecompositionData
   quasicoherentProjections := P.quasicoherentProjections
   quasicoherentProjectionCocontinuous :=
     P.quasicoherentProjectionCocontinuous
+
+/-- Construct the projectors from compact-generator approximations and pass
+directly to the paper-strength decomposition package. -/
+noncomputable def toDecompositionDataOfProjectionConstruction
+    (P : D.Proposition315ProjectionConstructionData C) :
+    D.DecompositionData A hcompact
+      C.semiorthogonality.perfectSemiorthogonal :=
+  C.toDecompositionData P.toProjectionData
 
 end Proposition315CoreData
 
