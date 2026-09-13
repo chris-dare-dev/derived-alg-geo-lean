@@ -297,10 +297,17 @@ that comparison are instance hypotheses to be discharged by the realization.
    triangle with literal vertices `𝟭 X`, `F ⋙ G`, and the transported
    unshifted unit cone, with first map `(P.toAdjunction A).unit`; it names the
    remaining maps and raw comparison and uses only the source equivalence's
-   triangulatedness for pointwise distinguishedness.  It does not inverse
-   rotate this family or identify the third vertex with the conventional
-   `[-1]` cotwist.  Both generic ordinary adjunction-cone presentation seams
-   are therefore closed.  The dg notion is still
+   triangulatedness for pointwise distinguishedness.  Its inverse rotation is
+   now the generic `presentedCotwistTriangle`, whose first vertex is the
+   pointwise `[-1]` shift `transportedCotwist` and whose second map is literally
+   the presented adjunction unit.  The reusable
+   `DGFunctor.transportedShiftedFunctorH0Iso` and its specialization
+   `transportedCotwistH0Iso` compare that first vertex with the transport of
+   `H⁰` of the actual shifted dg unit cone; equality after transport is not
+   claimed.  Thus the generic ordinary adjunction-cone presentation and
+   conventional cotwist-rotation seams are closed.  No comparison with an
+   independently chosen Fourier--Mukai cone, exactness, equivalence, or
+   sphericality follows.  The dg notion is still
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
    and no comparison with those exists.
 

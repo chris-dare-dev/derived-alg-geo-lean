@@ -843,6 +843,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_map
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_eq
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso
+#print axioms CategoryTheory.DGFunctor.transportedShiftedFunctorH0Iso
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_isEquivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Equivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0CommShift
@@ -1162,6 +1163,25 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented_hom_app_hom₂
 #print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented_hom_app_hom₃
 #print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_obj_distinguished
+
+-- Inverse rotation presents the conventional pointwise `[-1]` cotwist, while
+-- a generic transport/shift comparison identifies it with the H⁰ transport of
+-- the actual shifted dg unit cone.  This block asserts only a functor
+-- isomorphism and pointwise distinguishedness: no exactness, equivalence,
+-- Fourier--Mukai comparison, or sphericality.
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedDGCotwist
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwist
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistH0Iso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_comp_π₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_comp_π₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_comp_π₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_obj₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_obj₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_obj₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_mor₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_unit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_obj_distinguished
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_mem_distinguishedTriangles
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_obj₁
