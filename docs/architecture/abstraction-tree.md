@@ -179,6 +179,7 @@ Category
 │  │  │  ├─ HasShift Z⁰(DGFunctor C D) ℤ standard Mathlib packaging, all unit/assoc laws
 │  │  │  ├─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
 │  │  │  ├─ shiftedFunctorH0Iso          functor-level comparison; direct/transported CommShift-compatible
+│  │  │  ├─ shiftedFunctorCompIsoIdH0    Mathlib opposite-shift cancellation descended to H⁰
 │  │  │  └─ shiftedFunctorH0CommShift / IsTriangulated
 │  │  │                                 transports exactness with the signed shift package
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
@@ -213,7 +214,9 @@ Category
 │  │  ├─ CounitConeData                  counit-cone twist candidate
 │  │  │  └─ twistAdjointComparison      canonical closed `L T[-1] ⟶ R`, and its H⁰ map
 │  │  ├─ UnitConeData                    unshifted unit-cone cotwist candidate
-│  │  │  └─ cotwistAdjointComparison    canonical closed `R ⟶ C L`, and its H⁰ map
+│  │  │  ├─ cotwistAdjointComparison    canonical closed `R ⟶ C L`, and its H⁰ map
+│  │  │  └─ cotwistAdjointComparisonShiftedH0
+│  │  │                                  canonical `R ⟶ (C[-1] L)[1]` normalization
 │  │  └─ DGAdjunction.h0                 an ordinary adjunction between the H⁰ functors
 │  │     └─ H0Presentation                supplied endpoint isos after equivalence transport
 │  │        ├─ presentedCounitTriangle     generic normalization of the transported dg counit cone
@@ -309,6 +312,7 @@ Category
 │  │  ├─ triangulated equivalences         canonical Mathlib package for twist and cotwist
 │  │  └─ K₀ action                        identity minus the corresponding adjunction composite
 │  ├─ AdjointComparisonConditions         IsIso on the two canonical H⁰ comparison maps
+│  │  └─ cotwistShiftedIso                conventional `R ≅ (F L)[1]` accessor
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
 │     ├─ FM twist/cotwist adapters         conditional KernelAutoequivalence, no new record
 │     └─ full sphericality                 pending Morita/two-of-four theorem

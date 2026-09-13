@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.AdjunctionComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctor
 
 /-!
@@ -72,6 +72,33 @@ noncomputable def cotwistIso :
   letI := h.cotwist
   exact asIso (DGAdjunction.UnitConeData.cotwistAdjointComparisonH0
     (rightAdj := P.rightAdj) P.leftAdj P.cotwistCone)
+
+section ShiftedCotwist
+
+variable [IsPretriangulated A]
+
+/-- The cotwist comparison in Anno--Logvinenko's conventional shifted form
+`R ≅ (F L)[1]`, where `F = C[-1]`.
+
+The final isomorphism is Mathlib's opposite-shift cancellation for the
+`HasShift` structure on closed dg functors. -/
+noncomputable def cotwistShiftedIso :
+    R.h0 ≅
+      ((L.comp P.cotwistFunctor).shiftedFunctor 1).h0 :=
+  h.cotwistIso ≪≫
+    (DGFunctor.shiftedFunctorCompIsoIdH0
+      (L.comp P.cotwistConeFunctor) (-1 : ℤ) 1 (by omega)).symm
+
+/-- The hom of `cotwistShiftedIso` is the canonical shifted-target comparison,
+not an independently chosen natural isomorphism. -/
+@[simp]
+theorem cotwistShiftedIso_hom :
+    h.cotwistShiftedIso.hom =
+      DGAdjunction.UnitConeData.cotwistAdjointComparisonShiftedH0
+        (rightAdj := P.rightAdj) P.leftAdj P.cotwistCone :=
+  rfl
+
+end ShiftedCotwist
 
 end AdjointComparisonConditions
 
