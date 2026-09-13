@@ -13,8 +13,7 @@ The generic functorial-cone formula specializes to scalar-linear evaluation:
 `[T_E X] = [X] - [DGLinear.homComplex k E X ⊗ₖ E]`.
 
 Automatic dg-functor exactness upgrades the same identity to induced
-endomorphisms of `K₀`; the current theorem retains a redundant witness
-argument.  No Euler-characteristic identification is
+endomorphisms of `K₀`.  No Euler-characteristic identification is
 used here; that numerical specialization belongs to `SphericalTwist`.
 -/
 
@@ -50,31 +49,22 @@ theorem twistK₀Of (X : H0 C) :
       rfl
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The scalar-linear object twist acts on `K₀` by identity minus evaluation.
-The cone argument is retained for source compatibility and is redundant. -/
-theorem twistK₀Map (hVc : DGFunctor.PreservesChosenCones V.functor) :
+/-- The scalar-linear object twist acts on `K₀` by identity minus evaluation. -/
+theorem twistK₀Map :
     letI : K.twist.h0.CommShift ℤ :=
-      DGFunctor.commShift _ K.preservesShifts
-    letI : K.twist.h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        K.preservesShifts (K.preservesChosenCones hVc)
+      DGFunctor.h0CommShift K.twist
+    letI : K.twist.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.twist
     letI : V.functor.h0.CommShift ℤ :=
-      DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-    letI : V.functor.h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        (DGFunctor.preservesShifts _) hVc
+      DGFunctor.h0CommShift V.functor
+    letI : V.functor.h0.IsTriangulated := DGFunctor.h0IsTriangulated V.functor
     K₀.map K.twist.h0 =
       AddMonoidHom.id (K₀ (H0 C)) - K₀.map V.functor.h0 := by
   letI : K.twist.h0.CommShift ℤ :=
-    DGFunctor.commShift _ K.preservesShifts
-  letI : K.twist.h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      K.preservesShifts (K.preservesChosenCones hVc)
+    DGFunctor.h0CommShift K.twist
+  letI : K.twist.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.twist
   letI : V.functor.h0.CommShift ℤ :=
-    DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-  letI : V.functor.h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      (DGFunctor.preservesShifts _) hVc
+    DGFunctor.h0CommShift V.functor
+  letI : V.functor.h0.IsTriangulated := DGFunctor.h0IsTriangulated V.functor
   apply K₀.hom_ext
   intro X
   change K₀.of (H0 C) (K.twist.h0.obj X) =
