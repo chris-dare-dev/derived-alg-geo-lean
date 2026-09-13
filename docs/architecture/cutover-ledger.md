@@ -106,10 +106,22 @@ blocks should normally move it rather than add more declarations beside it.
   base ring and infers neither a presentation nor formality from bare
   finiteness.  It introduces no
   parallel Euler-characteristic definition and supplies no comparison between
-  scalar-linear `LinearEvaluationData` and additive `EvaluationData`.  The
-  next numerical seam is a shared endofunctor-level Euler interface consumed
-  directly by the linear evaluation package, followed only then by an
-  explicit bridge to the existing additive object-twist interface.
+  scalar-linear `LinearEvaluationData` and additive `EvaluationData`.
+- Rank-one `K₀` interface and scalar-linear Euler evaluation (2026-09-12):
+  `Triangulated/GrothendieckGroup/RankOne` owns the reusable factorization
+  `K₀ C →+ ℤ →+ K₀ D` and the objectwise `K₀.IsRankOne` predicate.
+  Natural isomorphisms preserve that predicate without exactness; only the
+  separate `map_eq_rankOne` theorem assumes the existing hypotheses needed to
+  form `K₀.map`.  Both additive `EvaluationData.IsEulerCopower` and the new
+  generic-H⁰ scalar-linear specialization reuse this root.  The H⁰
+  Hom-cohomology Euler bridge identifies Mathlib's homological Euler
+  characteristic with `chiHom` without a boundedness hypothesis.
+  `HomotopyCategory/DGEnhancement/LinearEvaluationK0` owns the realization:
+  with `HomFiniteBounded`, all linear copowers, and a supplied finite
+  cohomology presentation for every `DGLinear.homComplex k E X`, it derives
+  the required finite/free homology witnesses and proves the rank-one formula.
+  It does not infer presentations or formality, make the evaluation functor
+  exact, or compare the additive and scalar-linear universal properties.
 - Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
   `DGCategory.LinearCopowerFunctor` packages the universal property as a
   degreewise `homComplexIso`, then uses it to define the homogeneous
@@ -187,12 +199,12 @@ blocks should normally move it rather than add more declarations beside it.
   roots now exist, coefficient-complex homotopy invariance is closed, and
   supplied finite cohomology presentations now transport to shifted finite
   biproducts and finite-free homology expands these into `finrank` copies.
-  The scalar-linear Hom-cohomology comparison is now closed, and generic
-  triangulated `K₀` now computes finite biproduct classes, and the supplied
+  The scalar-linear Hom-cohomology comparison is now closed, generic
+  triangulated `K₀` computes finite biproduct classes, and the supplied
   finite-presentation scalar-copower class is Mathlib's homological Euler
-  characteristic times the object class.  The next numerical root is a
-  shared endofunctor-level Euler interface for linear evaluation, with any
-  passage to additive `EvaluationData` remaining explicit; automatic
+  characteristic times the object class.  The shared `K₀.IsRankOne`
+  interface and its direct linear-evaluation consumer are now closed as well.
+  Any passage to additive `EvaluationData` remains explicit, and automatic
   formality remains a separate later lane.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities

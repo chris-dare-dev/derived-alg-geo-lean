@@ -114,7 +114,9 @@ LinearEvaluationData k E
 ├─ evaluation : functor ⟶ id, closed in degree zero
 ├─ compareIso: canonical Z⁰ isomorphism between choices, strictly compatible
 │  with evaluation
-└─ no additive EvaluationData adapter, cone, Euler formula, or concrete instance
+├─ IsEulerCopower: shared rank-one K₀ formula, obtained from supplied finite
+│  cohomology presentations when all linear copowers exist
+└─ no additive EvaluationData adapter, cone, exactness, or concrete instance
 
 EvaluationData E
 ├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
@@ -425,13 +427,21 @@ that comparison are instance hypotheses to be discharged by the realization.
    compute the selected copower class as Mathlib's
    `HomologicalComplex.homologyEulerChar` times `[X]`.  Its explicit finite
    presentation and finite-free hypotheses are data, not inferred formality.
-   The parallel linear evaluation package still does not discharge the
-   existing additive `EvaluationData.IsEulerCopower`; a later lane must
-   formulate its numerical consumer directly or accept explicit comparison
-   data.  The next seam is the shared endofunctor-level Euler interface for
-   `LinearEvaluationData`, followed by an explicit bridge to additive
-   evaluation.  Automatic formality remains open and is not to be inferred
-   from Hom-finiteness.
+   The shared endofunctor-level numerical seam is now closed.
+   `K₀.IsRankOne` records the objectwise formula before exactness is known,
+   is invariant under natural isomorphism, and determines `K₀.map` only when
+   the usual additive, shift-compatible, triangulated hypotheses are supplied.
+   `H0.homComplex_homologyEulerChar_eq_chiHom` identifies the two existing
+   junk-total Euler sums, and
+   `LinearEvaluationData.IsEulerCopower.ofFiniteCohomologyPresentations`
+   is owned by the homotopy-category DG-enhancement layer, where it consumes a
+   supplied presentation family to prove the direct scalar-linear evaluation
+   formula.  The generic H⁰ umbrella exports only the predicate and its
+   choice-independence theorem.  The existing additive
+   `EvaluationData.IsEulerCopower` is a second specialization of the same
+   interface, not a consequence of the linear one.  Any passage between the
+   two evaluation packages remains explicit.  Automatic formality remains
+   open and is not to be inferred from Hom-finiteness.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies either a `HasCopowers` instance for the additive interface or a

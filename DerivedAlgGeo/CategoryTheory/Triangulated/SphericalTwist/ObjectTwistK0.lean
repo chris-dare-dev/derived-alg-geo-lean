@@ -15,19 +15,21 @@ twist as
 
 To identify this categorical formula with the numerical endomorphism `twistK₀`,
 one further input is genuinely needed: the chosen copower must have class
-`χ(E,X) • [E]`.  `EvaluationData.IsEulerCopower` names exactly that
-capability, using the fixed-source descended character `chiRight` so that the
-generic statement retains Hom-finiteness and finite Ext-amplitude without
-requiring every shift functor to be linear.  It is invariant under the
-canonical comparison between evaluation-data choices.  The full
+`χ(E,X) • [E]`.  `EvaluationData.IsEulerCopower` specializes the shared
+objectwise rank-one `K₀` capability, using the fixed-source descended character
+`chiRight` so that the generic statement retains Hom-finiteness and finite
+Ext-amplitude without requiring every shift functor to be linear.  It is
+invariant under the canonical comparison between evaluation-data choices.  The full
 shift-linearity needed by the two-variable numerical endomorphism remains
 local to this spherical-twist consumer.
 
 The capability and the categorical subtraction formula live in the generic
 DG-enhancement layer.  This spherical-twist consumer contains only their two
 comparisons with the pre-existing numerical formula.  It does not manufacture
-the capability from additive `IsCopowerOf`; constructing the scalar-linear
-realization layer remains a separate seam.
+the capability from additive `IsCopowerOf`.  The scalar-linear realization now
+proves the parallel predicate from explicitly supplied finite cohomology
+presentations, but no adapter identifies its evaluation data with this additive
+package; any such passage remains explicit.
 -/
 
 set_option autoImplicit false

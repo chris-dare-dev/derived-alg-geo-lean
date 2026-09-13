@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.NaturalTransformationConeK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ObjectTwist
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
+import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.RankOne
 
 /-!
 # Euler-class realization for object-twist evaluation data
@@ -14,17 +15,13 @@ The existing `EvaluationData` gives additive copowers and the functor
 extra realization content: the current `IsCopowerOf` represents additive
 cochains over `ℤ`, not `k`-linear cochains.
 
-`EvaluationData.IsEulerCopower` names exactly the required `K₀` formula,
+`EvaluationData.IsEulerCopower` specializes the shared rank-one `K₀` formula,
 using the fixed-source descended character `chiRight`; this retains
 Hom-finiteness and finite Ext-amplitude without imposing the stronger
 shift-linearity needed to descend in the first variable as well.  The property
-is independent of the chosen additive evaluation data.  The parallel
-scalar-linear copower and evaluation roots now exist, but they do not imply
-this additive property.  A later consumer must either formulate the Euler
-statement directly for `LinearEvaluationData` or accept explicit comparison
-data.  Coefficient-complex homotopy invariance is now available from the
-linear-copower DG functor; a finite shifted-sum/cohomology presentation is
-still required for the concrete computation.
+is independent of the chosen additive evaluation data.  The parallel direct
+linear evaluation consumer uses the same numerical interface, but that common
+formula supplies no map between additive and scalar-linear evaluation data.
 -/
 
 set_option autoImplicit false
@@ -95,17 +92,14 @@ variable (k : Type w) [DivisionRing k] [Linear k (H0 C)]
 This is explicit realization input, not a consequence of the present
 additive `IsCopowerOf` universal property. -/
 def IsEulerCopower (V : EvaluationData E) : Prop :=
-  ∀ X : H0 C,
-    K₀.of (H0 C) (V.functor.h0.obj X) =
-      chiRight k (H0 C) (show H0 C from E) (K₀.of (H0 C) X) •
-        K₀.of (H0 C) (show H0 C from E)
+  K₀.IsRankOne V.functor.h0
+    (chiRight k (H0 C) (show H0 C from E))
+    (K₀.of (H0 C) (show H0 C from E))
 
 /-- The Euler copower formula is independent of the chosen evaluation data. -/
 theorem IsEulerCopower.ofCompare {V W : EvaluationData E}
     (hV : V.IsEulerCopower k) : W.IsEulerCopower k := by
-  intro X
-  rw [← hV X]
-  exact (K₀.of_iso (H0 C) ((DGFunctor.h0Iso (V.compareIso W)).app X)).symm
+  exact K₀.IsRankOne.ofIso hV (DGFunctor.h0Iso (V.compareIso W))
 
 end EvaluationData
 
