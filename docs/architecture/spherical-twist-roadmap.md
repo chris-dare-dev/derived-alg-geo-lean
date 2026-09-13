@@ -111,6 +111,10 @@ CochainComplex.homologyModel (any abelian category)
 
 HasLinearCopowers k C
 ├─ linearCopowerFunctor k X: C^dg(ModuleCat k) ⟶ C, a k-linear dg functor
+├─ DGLinear.homFunctor k E: C ⟶ C^dg(ModuleCat k), a k-linear dg functor
+├─ linearCopowerAdjunction k E: (- ⊗ E) ⊣ Hom(E,-)
+│  ├─ unit: the selected universal copower chain map
+│  └─ counit: exactly the selected scalar-linear evaluation transformation
 └─ C = Cdg(ModuleCat k), same universe: Mathlib's total tensor product
    supplies the chosen object, tensor--Hom cochain equivalence, and instance
 
@@ -392,6 +396,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    `DGCategory.LinearEvaluation` now assembles that root into
    `LinearEvaluationData k E`: a `k`-linear dg functor, a closed evaluation
    transformation, and coherent comparison isomorphisms between choices.
+   `DGLinear.homFunctor` now assembles fixed-source right composition into the
+   `k`-linear dg functor `Hom(E,-)`, and `linearCopowerAdjunction` packages the
+   selected copower functor as its strict dg left adjoint.  The unit is the
+   universal copower chain map, the counit is definitionally the selected
+   scalar-linear evaluation transformation, and both triangle identities are
+   the existing representing equations.  Thus scalar-linear evaluation is no
+   longer merely adjunction-shaped.  The source is the dg category of all
+   module complexes, not `Perf(k)`; this supplies no additive evaluation
+   adapter, adjoint on the other side, quasi-equivalence, or sphericality
+   statement.
    `DGCategory.LinearCopowerFunctor` now packages the homogeneous coefficient
    action as a `k`-linear dg functor out of `C^dg(ModuleCat k)`.  Its Hom-complex
    comparison commutes with differentials, chain-homotopic maps agree in `H⁰`,
