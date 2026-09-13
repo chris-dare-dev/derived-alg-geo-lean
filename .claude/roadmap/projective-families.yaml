@@ -428,7 +428,7 @@ items:
     parent: projective-families-e14
     blocked_by: [1178, 1179]
     title: "Algebraic stability conditions have mass-Hom bounds (HLR Example 2.9)"
-    status: blocked
+    status: done
     summary: "Finite-length heart with finitely many simples: Hom from a simple is bounded by length, and finitely many charges in ℍ ∪ ℝ_{<0} admit a common direction, so length ≤ |Z(F)|/c. Abstract theorem plus one compiled witness (finite-heart lane or Dᵇ(FGModuleCat k) per #543)."
     priority: must
     size: M

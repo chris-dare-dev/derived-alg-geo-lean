@@ -849,6 +849,16 @@ jobs:
           # to pass it unconditionally: on `main` and in the merge queue the
           # merge base is the thing being judged, so scoping there would judge
           # nothing and pass vacuously.
+          #
+          # `--pr` is passed on the same event and for the opposite reason.
+          # Scoping stops OTHER people's staleness reddening this branch; RM-08
+          # stops THIS branch creating staleness for everyone else, by refusing
+          # a pull request that closes an issue without advancing its entry.
+          # RM-07 cannot do that job: while the pull request is open the issue
+          # it closes is still open, so RM-07 agrees with the tracker right up
+          # until the merge makes it disagree. There is no pull request to ask
+          # about on `main` or in the merge queue, so the flag is absent there
+          # and RM-07 remains the backstop it always was.
           if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
             # merge-base needs the base branch present. The checkout above is
             # fetch-depth: 0, which fetches all history, but not necessarily a
@@ -857,7 +867,8 @@ jobs:
             # is the safe direction.
             git fetch --no-tags --depth=0 origin main >/dev/null 2>&1 || true
             "$VENV_PY" scripts/check_roadmap.py --require-api \
-              --scope-to-diff=origin/main
+              --scope-to-diff=origin/main \
+              --pr="${{ github.event.pull_request.number }}"
           else
             "$VENV_PY" scripts/check_roadmap.py --require-api
           fi

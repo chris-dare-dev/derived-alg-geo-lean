@@ -36,6 +36,8 @@ default is a degraded report rather than a failure, so a contributor without
   RM-06  no LIVE issue on a roadmap-owned milestone goes unreferenced
          (live = the issue is open, or its milestone is)
   RM-07  an entry's `status` agrees with its issue being open or closed
+  RM-08  a pull request that CLOSES an issue advances that issue's entry
+         in the same pull request (pull_request events only)
 
 RM-05 is scoped to open items on purpose. A closed item's blockers are history:
 #618 was closed as a decision while still marked blocked by #134 and #178, and
@@ -286,10 +288,35 @@ def fetch_open_milestones():
     return open_ms, None
 
 
+def fetch_closing_issues(pr):
+    """Issue numbers this pull request will close when it merges.
+
+    GitHub resolves the closing keywords in the body and the commits for us and
+    exposes the result as `closingIssuesReferences`, so this does not re-parse
+    prose and cannot disagree with what the merge will actually do.
+    """
+    try:
+        proc = subprocess.run(
+            ["gh", "pr", "view", str(pr), "--repo", REPO,
+             "--json", "closingIssuesReferences",
+             "--jq", "[.closingIssuesReferences[].number] | @json"],
+            capture_output=True, text=True, timeout=120, encoding="utf-8")
+    except (OSError, subprocess.SubprocessError) as exc:
+        return None, f"could not run gh: {exc}"
+    if proc.returncode != 0:
+        return None, f"gh pr view exited {proc.returncode}: {proc.stderr.strip()[:200]}"
+    try:
+        return set(json.loads(proc.stdout.strip() or "[]")), None
+    except json.JSONDecodeError as exc:
+        return None, f"could not decode closingIssuesReferences: {exc}"
+
+
 def main(argv):
     require_api = "--require-api" in argv
     scope_to = next((a.partition("=")[2] for a in argv
                      if a.startswith("--scope-to-diff=")), None)
+    pr_number = next((a.partition("=")[2] for a in argv
+                      if a.startswith("--pr=")), None)
     rest = [a for a in argv if not a.startswith("--")]
     root = pathlib.Path(rest[0]).resolve() if rest else pathlib.Path(__file__).resolve().parent.parent
 
@@ -462,11 +489,53 @@ def main(argv):
         else:
             unjudged += 1
 
+    # RM-08 -----------------------------------------------------------------
+    #
+    # RM-07 cannot see this one coming. It compares the roadmap against LIVE
+    # tracker state, and while a pull request is open the issue it will close
+    # is still OPEN -- so `status: blocked` agrees with the tracker, the check
+    # passes, the merge closes the issue, and `main` goes red one second later.
+    # Three times on 2026-09-12 (#1179 and #1184 by #1204, #1182 by #1250), and
+    # each occurrence reddens every open pull request until a human notices.
+    #
+    # The fix has to run where the author still is, so this asks the question
+    # RM-07 structurally cannot: does this pull request close an issue whose
+    # entry it does not advance? GitHub resolves the closing keywords itself,
+    # so the answer matches what the merge will really do.
+    #
+    # `pull_request` only. There is no pull request to ask about on `main`, and
+    # in the merge queue the closure has effectively already happened -- RM-07
+    # judges both of those, as it did before.
+    rm08_checked = 0
+    if pr_number:
+        closing, problem = fetch_closing_issues(pr_number)
+        if closing is None:
+            print(f"note: RM-08 could not read closing issues for "
+                  f"#{pr_number} ({problem}); RM-07 remains the backstop")
+        else:
+            by_issue = {e["gh_issue"]: e for e in items if e.get("gh_issue")}
+            for n in sorted(closing):
+                e = by_issue.get(n)
+                if e is None:
+                    continue  # no roadmap entry; RM-06 owns that gap
+                rm08_checked += 1
+                status = e.get("status")
+                if status not in RM07_DONE_STATUSES:
+                    fail("RM-08",
+                         f"{e['id']}: this pull request closes #{n} but leaves "
+                         f"its entry at status={status} -- ADVANCE IT IN THIS "
+                         f"PULL REQUEST, or `main` goes red the moment this "
+                         f"merges and stays red for every open branch")
+                    failures += 1
+
     files = sorted({e["_file"] for e in items})
     print(f"checked {len(items)} entries across {len(files)} file(s): {', '.join(files)}")
     print(f"        {len(referenced)} issue(s) referenced, {len(owned)} milestone(s) owned")
     print(f"        RM-07: {judged} entr{'y' if judged == 1 else 'ies'} judged against "
           f"issue state, {unjudged} with no comparable status")
+    if pr_number:
+        print(f"        RM-08: {rm08_checked} closing reference(s) checked "
+              f"for pull request #{pr_number}")
     if authored is not None:
         print(f"        RM-07: scoped to {len(authored)} entr"
               f"{'y' if len(authored) == 1 else 'ies'} this branch authored "
