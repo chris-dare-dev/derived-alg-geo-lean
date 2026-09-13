@@ -8,3 +8,5 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability.MassHom
 #print axioms AlgebraicGeometry.DerivedCategory.boundedSchemePerfect_iff
 #print axioms AlgebraicGeometry.DerivedCategory.HasPerfectMassHomBound
 #print axioms AlgebraicGeometry.DerivedCategory.hasPerfectMassHomBound_of_stable_generators
+#print axioms AlgebraicGeometry.DerivedCategory.hasPerfectMassHomBound_finitePullback
+#print axioms AlgebraicGeometry.DerivedCategory.hasPerfectMassHomBound_flatPushforward

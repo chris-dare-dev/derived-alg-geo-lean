@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.FiniteGenerators
-import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.RestrictedTwistPresentation
+import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.RestrictedTwistExt
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Linear
 
 /-!
@@ -14,20 +14,21 @@ dévissage for Ext.  It gives two honest reductions:
 
 1. coherent presentations whose middle terms have finite ambient Ext imply degreewise finite
    ambient Ext between arbitrary coherent sheaves;
-2. the restricted-twist presentations constructed by a `ProjectivePresentation` reduce that
-   hypothesis to finite ambient Ext from negative restricted twists, provided the
-   closed-immersion pullback/pushforward counit is epi.
+2. the restricted-twist presentations constructed by a `ProjectivePresentation`, together with
+   restricted-twist Ext-finiteness, reduce that hypothesis to the closed-immersion
+   pullback/pushforward counit being epi.
+
+That counit premise is now discharged in `RestrictedTwistPresentation` through faithfulness of
+closed-immersion pushforward. The reductions here remain useful independently; the unconditional
+ambient Ext-finiteness specialization is the next assembly layer.
 
 ## Remaining geometric boundary
 
-Neither premise in the second reduction is fabricated here.  At the current Mathlib pin:
+The restricted-twist premise is discharged by `module_finite_restrictedTwistExt`, and the counit
+epimorphism follows without the unavailable stronger comparison `ι^* ι_* F ≅ F`. Two later
+geometric obligations remain:
 
-* the standard closed-immersion comparison `ι^* ι_* F ≅ F` for module sheaves is unavailable,
-  so the counit epimorphism cannot yet be discharged;
-* a restricted twist is intrinsically invertible, but the pullback functor does not have the
-  monoidal API needed to package a chosen `Scheme.Modules.LineBundleData`.  Consequently the
-  line-bundle Ext-finiteness theorem cannot yet be applied to it;
-* these theorems concern Ext in `X.Modules`.  Passing to Ext internal to `Coh X` still requires
+* these theorems concern Ext in `X.Modules`. Passing to Ext internal to `Coh X` still requires
   the non-affine `CoherentExtComparison X`;
 * degreewise finiteness alone does not give the finite degree support required by
   `DerivedCategory.ExtFiniteBounded.of_ext`.  A geometric regularity/global-dimension bound
@@ -106,5 +107,22 @@ theorem module_finite_ambientExt_of_restrictedTwists
     @Ext.module_finite_coproduct_left k _ X.Modules _ _ _ hExtStandard I inferInstance
       A ((Coh.ι X).obj T) j (fun _ ↦ htwist N hN T j)
   exact Module.Finite.equiv (Ext.precompLinearEquiv (S := k) eMiddle ((Coh.ι X).obj T) j)
+
+/-- **Projective coherent ambient Ext-finiteness assembled from the closed-immersion counit.**
+
+Restricted twists have finite ambient Ext by `module_finite_restrictedTwistExt`, so the only
+explicit premise of this reduction is that the pullback/pushforward counit of the chosen
+projective closed immersion is epi on coherent sheaves. That premise is discharged by
+`Scheme.Modules.pullbackPushforwardAdjunction_counit_epi_of_isClosedImmersion`; an unconditional
+wrapper belongs to the next assembly layer. -/
+theorem module_finite_ambientExt_of_counit_epi
+    (P : AlgebraicGeometry.ProjectivePresentation k X) [Nontrivial P.index]
+    (hcounit : ∀ F : Coh X, Epi
+      ((Scheme.Modules.pullbackPushforwardAdjunction P.embedding).counit.app
+        ((Coh.ι X).obj F)))
+    (F G : Coh X) (n : ℕ) :
+    Module.Finite k (Ext.{u + 1} ((Coh.ι X).obj F) ((Coh.ι X).obj G) n) :=
+  P.module_finite_ambientExt_of_restrictedTwists hcounit
+    (fun N _hN T j ↦ P.module_finite_restrictedTwistExt (-(N : ℤ)) T j) F G n
 
 end AlgebraicGeometry.ProjectivePresentation

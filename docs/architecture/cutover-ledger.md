@@ -7,6 +7,26 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Closed-immersion counit epimorphism and restricted-twist presentations
+  (2026-09-12): `Scheme.Modules.pushforward_faithful_of_isInducing` detects
+  equality of module-sheaf morphisms on the canonical target open attached to
+  each source open. Closed immersions therefore have faithful pushforward, so
+  the general adjunction theorem makes every component of
+  `pullbackPushforwardAdjunction` counit epic. The projective-presentation lane
+  now gives unconditional finite restricted-negative-twist quotients of
+  coherent sheaves. This does not assert the stronger counit isomorphism or
+  exactness of closed-immersion pullback; neither is needed for the quotient.
+- Scheme-module stalk and pullback comparison (2026-09-12):
+  `AlgebraicGeometry/Modules/Pullback/Stalk.lean` now owns the local-ring-valued
+  module-stalk functors, their finite-limit and joint-reflection theorems, the
+  private module-skyscraper construction, and the canonical presheaf and sheaf
+  pullback-to-stalk isomorphisms. These declarations previously lived in
+  `DerivedCategory/Families/FlatPullback.lean` despite mentioning neither
+  derived categories, families, nor flatness. The families file now contains
+  only the flat local-ring calculation and its exact-pullback consequence;
+  open-immersion and relative-perfect consumers use the canonical neutral API.
+  The transitional comparison records are removed rather than retained as a
+  compatibility shim.
 - Finite cohomology presentation and scalar-linear copower transport
   (2026-09-12):
   `Homotopy.FiniteCohomologyPresentation` owns the coefficient-side data of an

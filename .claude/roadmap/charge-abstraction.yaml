@@ -1,0 +1,335 @@
+schema: roadmap/1
+slug: charge-abstraction
+project: derived-alg-geo-lean
+title: "One charge, indexed by truncation degree — and the leaves that reach it"
+status: active
+phase: sequenced          # init -> refined -> decomposed -> sequenced -> complete
+brief: |
+  This track exists because an adversarial abstraction audit on 2026-09-12 found
+  the same defect in the charge lane that `numerical-k-theory` found in the
+  Grothendieck-group lane: one mathematical object written several times because
+  the literature spells it differently per example.
+
+  The surface charge on three real coordinates
+  (`Walls/Numerical/ChargeFamily.lean:28`) and the Bayer--Macrì--Toda threefold
+  charge on four (`Walls/Threefold/Basic.lean:148`) are the same generating
+  formula truncated at two codimensions. The threefold file's own docstring says
+  so. They are nevertheless two unrelated roots with no shared parent, a fourfold
+  charge does not exist, and the divisorial charge
+  (`Walls/Divisorial/Charge.lean:333`) — the one that works in arbitrary Picard
+  rank — sits beside both.
+
+  THE INDEX IS THE POINT, and it is where `numerical-k-theory` stopped. That
+  track's fourth assumption reads "the fourfold numerical formulas admit the same
+  uniform shape as the surface and threefold ones, so one indexed type covers all
+  three", and it is marked FALSIFIED 2026-08-27, parking `numerical-k-theory-e5`.
+  That falsification is correct and this track does not overturn it. What the
+  audit adds is the reason: dimension was the wrong index. The uniform object is
+  indexed by TRUNCATION DEGREE `m`, and the geometric transport carries the
+  dimension `n` separately. The proof that these must be separate indices is that
+  the cubic-threefold Kuznetsov charge is `(n, m) = (3, 2)`: a family indexed by
+  dimension alone cannot state it at all. So this track unparks e5 by changing
+  its index rather than by re-opening its assumption.
+
+  What makes this track unusual is that its own first design was wrong in ways
+  its own review caught. A completeness critic found that the design left the
+  correction slot uninhabited, shipped a second Mukai pairing with no bridge to
+  the existing one, justified the cubic-fourfold node with a statement about the
+  wrong lattice, and dropped a rotation that a verifier had flagged. A
+  remediation pass then proved five repairs in Lean, refuted three claims of the
+  design by counterexample, and two adversarial checkers caught seven further
+  proposals that would themselves have shipped a second spelling of an existing
+  declaration. Every one of those is a recorded negative result rather than a
+  deletion, and the epics below carry them.
+
+  What this is NOT: new stability mathematics. No epic here proves a new theorem
+  about a variety. Each one either removes a copy in favour of an existing
+  definition, or replaces an enumeration by a parameter, or records why an
+  apparent unification is false.
+goal:
+  hmw: "How might we make the charge lane carry one polynomial indexed by truncation degree, so that a new dimension or a noncommutative example supplies data and inherits the charge, without restating a line of its mathematics?"
+  objective: "Collapse every exponential central-charge definition in the repository onto one kernel indexed by truncation degree, give the geometric transport one owner for every (n, m, κ), and leave the discriminant, the twist and the Mukai pairing with exactly one root apiece."
+  key_results:
+    - "Exactly one exponential charge polynomial exists; a grep for a second returns nothing. The surface, threefold and slope charges are theorems about it at m = 2, 3, 1."
+    - "The divisorial charge in arbitrary Picard rank is a proved instance of the same kernel, not a sibling of it. If only the rank-one slice reaches the root, the unification is cosmetic and has failed."
+    - "A fourfold wall family exists and costs one `Polarization` and zero new polynomials."
+    - "The Bogomolov--Mukai discriminant has one owner, reached by all seven of its current spellings."
+    - "The (3,2) tilt charge is the existing surface family pulled back along a truncation, carries its rotation, and exactly one spelling of it survives."
+    - "No declaration added by this track duplicates an existing one without a proved comparison theorem landing in the same pull request."
+  assumptions:
+    - tier: must
+      text: "The surface and threefold charges are the same generating formula at two truncation degrees."
+      validation: "CONFIRMED 2026-09-12 in Lean: `stCharge` and `Threefold.charge` are both proved equal to `Exp.ofMoments` at m = 2 and m = 3, and both family-level comparisons elaborate."
+    - tier: must
+      text: "Truncation degree and ambient dimension must be separate indices."
+      validation: "CONFIRMED: the cubic-threefold Kuznetsov charge is (n, m) = (3, 2). A dimension-indexed family cannot state it. This is also why `numerical-k-theory-e5` was parked."
+    - tier: must
+      text: "The multi-divisor divisorial charge is a child of the kernel, not a sibling."
+      validation: "CONFIRMED at the triple level: `expCharge_eq_ofMoments` is proved on a bare `Mukai.RealExtension D`. Two of three independent design angles asserted the opposite and were wrong; the keystone must be stated on the triple, not on `ChernCharacter`, or it cannot reach `mukaiCharge`."
+    - tier: must
+      text: "The correction class κ is a pullback, not a coefficient, and κ = 1 and κ = √td are two pullbacks."
+      validation: "CONFIRMED: they give genuinely different walls. The transport at √td is proved equal to the existing Mukai charge on the rank-one slice for any surface, no K3 hypothesis."
+    - tier: should
+      text: "One dimension-indexed self-pairing can parent every discriminant in the tree."
+      validation: "FALSIFIED 2026-09-12. A dimension-indexed Mukai self-pairing vanishes identically in odd degree, so the threefold leaf cannot reach it. The root is the fixed-arity pairing generalised over its COEFFICIENT RING; the arity stays three. Recorded in `docs/architecture/abstraction-tree.md`."
+    - tier: should
+      text: "A new graded pairing is needed to state the parity theorem."
+      validation: "FALSIFIED at n = 2: the new form is literally `Mukai.realPairing (LinearMap.mul ℝ ℝ)` — same carrier, no weight, no transport. It survives only for n ≠ 2, and only because two further unifications are refuted. n = 2 must land as a comparison theorem, never as a definition."
+    - tier: should
+      text: "Parity of the compressed pairing decides the cubic-fourfold Kuznetsov node."
+      validation: "FALSIFIED. The compressed form lives on `Fin (n+1) → ℝ`, dimension 5 at n = 4; the Mukai lattice of the component has rank 24 and signature (4,20). Symmetry there is automatic for an unrelated reason, so the parity argument is vacuous even on the correct space. The node needs a signature-additivity transfer, which is proved, plus geometry the tree does not have."
+  wont:
+    - "No new stability mathematics. No epic proves a new theorem about a variety."
+    - "No `KuznetsovChargeData` carrier. A noncommutative example reaches the tree by restriction along its inclusion; a dedicated carrier is forbidden and the rule is recorded in the spine."
+    - "No dimension-indexed generalisation of the Mukai pairing. The arity is fixed at three and only the coefficient ring generalises."
+    - "No fusion of the cubic fourfold's charge lattice with its period-domain lattice. They are orthogonal complements for a very general X, so no comparison theorem between them can exist."
+    - "No `sorry`, including as a refactoring convenience while a copy is being removed."
+generated_by: { agent: claude-opus-5, at: "2026-09-12" }
+generations:
+  - at: "2026-09-12"
+    note: |
+      Decomposed from the 2026-09-12 abstraction audit, its completeness critic,
+      and the remediation pass that repaired the audit's own design. The three
+      documents are in `docs/reviews/`; the scope that produced this file is
+      `docs/reviews/2026-09-12-charge-abstraction-track-scope.md`.
+
+      CA4 (noncommutative varieties) is deliberately NOT filed as GitHub issues.
+      All three of its epics are blocked on obligations outside the tree, and an
+      open unblockable issue trains people to ignore the tracker. The entries
+      carry `gh_issue: null` until their blockers are discharged.
+items:
+  - id: charge-abstraction-m1
+    gh_milestone: 49
+    kind: milestone
+    title: "CA1 — One charge, indexed by truncation degree"
+    status: planned
+    lane: now
+    acceptance:
+      - "`Wall.Exp.ofMoments` exists once, and the surface, threefold and slope charges are proved equal to it at m = 2, 3 and 1."
+      - "The divisorial charge is a proved instance of the same kernel at the intersection-form moments, stated on the triple so that it reaches `mukaiCharge`."
+      - "The κ slot has a real inhabitant: the transport at √td is proved equal to the existing Mukai charge on the rank-one slice, for any surface and with no K3 hypothesis."
+      - "The Bogomolov--Mukai discriminant has exactly one owner; a grep for a second definition on H-degrees returns nothing."
+      - "No declaration added by this milestone duplicates an existing one without a proved comparison theorem in the same pull request."
+      - "Zero sorries; all gates green, including `check_roadmap.py --require-api`."
+  - id: charge-abstraction-e1
+    gh_issue: 1219
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m1
+    title: "The exponential charge kernel, indexed by truncation degree"
+    status: done
+    summary: "`Walls/Exp/Kernel.lean`: `ofMoments m μ = -∑_{j≤m} (-1)^j/j! · μ j`, `HDeg`, `moments`, `charge`, `chargeFamily`, the two charts, and four comparison theorems proving `stCharge` (`Walls/Numerical/ChargeFamily.lean:28`) and `Threefold.charge` (`Walls/Threefold/Basic.lean:148`) are this kernel at m = 2 and m = 3. Imports only `Walls/ChargeFamily.lean` and Mathlib, so the root imports no leaf, and lands with two inhabitants. The `Fin (m+1)` indexing stands: the audit's claim that the root had to be ℕ-indexed to keep `degH` definitional was falsified on both halves."
+    priority: must
+    size: M
+    tags: [lean, charges, root]
+    labels: [area:lean, area:stability, type:feature, sev:high]
+  - id: charge-abstraction-e2
+    gh_issue: 1220
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m1
+    title: "The divisorial keystone reaches the charge kernel"
+    status: planned
+    summary: "`Walls/Exp/Divisorial.lean`: the intersection-form moments and `expCharge_eq_ofMoments`, stated on a bare `Mukai.RealExtension D` rather than on `ChernCharacter`. The triple level is load-bearing — `mukaiCharge` (`Walls/Divisorial/Mukai.lean:173`) is the same `expChargeHom` on a different triple, so a `ChernCharacter`-level statement cannot reach it and the κ epic depends on that reach. This is the slice to review hardest: two of three independent design angles declared the multi-divisor charge a non-child and were wrong."
+    priority: must
+    size: M
+    tags: [lean, charges, keystone]
+    labels: [area:lean, area:stability, type:feature, sev:high]
+    blocked_by: [1219]
+  - id: charge-abstraction-e3
+    gh_issue: 1221
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m1
+    title: "The polarised transport: one map for every (n, m, kappa)"
+    status: planned
+    summary: "`AlgebraicGeometry/Numerical/Stability/PolarisedWallTransport.lean`: `corrComp`, `hDegrees`, `hDegreesHom`, `wallChargeFamily`, and the two dimension comparisons `surface_toNumClass_eq` and `threefold_toNumClass_eq`, both proved with zero sorries. The n = 3 twin did not exist in any form before remediation; it was a code comment. `corrComp` must land with `corrComp_sqrtToddComp` and `corrComp_unitCorr` or it is a third spelling of an existing convolution. Two open obligations ride along: the name collision with `Surface.wallChargeFamily` (`WallTransport.lean:156`) and the tilt-spelling comparison, the latter owned by e10."
+    priority: must
+    size: L
+    tags: [lean, charges, transport]
+    labels: [area:lean, area:geometry, type:feature, sev:high]
+    blocked_by: [1219]
+  - id: charge-abstraction-e4
+    gh_issue: 1222
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m1
+    title: "Inhabit the correction slot at sqrt(td)"
+    status: planned
+    summary: "`wallChargeFamily_sqrtToddComp_eq_mukaiCharge`, proved for any surface realization with no K3 hypothesis, plus the K3 corollary through `mukaiCharge_of_isK3` (`DivisorialMukai.lean:124`). Without it the κ slot has zero inhabitants and the spine's `κ = √td` line is unbacked. Must use `R.realizePolarization` (`DivisorialChargeNumerical.lean:106`); the remediation scratch file's local `polDiv` duplicates it. The audit's claim that the repository holds two unrelated √td data is half wrong — the bridge exists at `DivisorialMukai.lean:69` and the design cited neither; what is genuinely wrong is the audit's `√td = (1,0,1)`, which as an H-degree vector is `(∫H², 0, 1)`."
+    priority: must
+    size: S
+    tags: [lean, charges, mukai]
+    labels: [area:lean, area:geometry, type:feature, sev:medium]
+    blocked_by: [1221]
+  - id: charge-abstraction-e5
+    gh_issue: 1223
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m1
+    title: "One discriminant owner, and the inert beta dropped"
+    status: planned
+    summary: "Generalise `Mukai.pairing` (`Lattice/Mukai/Basic.lean:56`) over its coefficient ring IN PLACE, with `Mukai.realPairing` an abbrev at R = ℝ; move `DivisorSpace.realDiscriminant` up to `RealForm.lean`, whose current home imports two of the leaves it would parent; land the eight leaf projections and five bridges; drop the inert β from `Threefold.discrHBeta` (`BMT.lean:103`). No new declaration name. The audit shipped two rival parents for these same seven leaves and adjudicated neither; the loser — a dimension-indexed Δ_H — is recorded as a negative result because a dimension-indexed self-pairing vanishes identically in odd degree."
+    priority: must
+    size: M
+    tags: [lean, discriminant, refactor]
+    labels: [area:lean, type:refactor, sev:high]
+  - id: charge-abstraction-e6
+    gh_issue: 1224
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m1
+    title: "The e^-betaH twist on the kernel, and its two real gaps"
+    status: planned
+    summary: "`Walls/Exp/Twist.lean`: `twist`, `twist_twist`, `charge_twist` and the two leaf comparisons, retiring three of the four existing twist spellings. THE ONLY EPIC IN CA1 CONTAINING UNPROVED MATHEMATICS: `twist_twist` is an ℝ-side binomial/Vandermonde identity and `charge_twist` a Cauchy product with a double-sum reindex, both classed REAL rather than routine. `twist_add_beta` (`TwistedChern.lean:110`) is not reusable — it is ℚ-parameterised while every wall child takes β : ℝ. Sequence last within the milestone; it blocks nothing."
+    priority: should
+    size: M
+    tags: [lean, charges, open-proof]
+    labels: [area:lean, type:feature, research, sev:medium]
+    blocked_by: [1219]
+  - id: charge-abstraction-e7
+    gh_issue: 1225
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m1
+    title: "The fourfold wall layer, at zero polynomial cost"
+    status: planned
+    summary: "`Examples/Fourfold/ProjectiveSpaceWalls.lean` and `CalabiYauWalls.lean`. The fourfold numerical models already exist with proved HRR; no fourfold charge or wall family exists anywhere in the tree. The entire content of this epic is one `Polarization` per model, and it is the slice to point at when asked what the root bought. One gap to record rather than hide: the n = 4 graded pairing has no repository counterpart, no comparison and no consumer."
+    priority: should
+    size: S
+    tags: [lean, charges, examples]
+    labels: [area:lean, area:geometry, type:feature, sev:medium]
+    blocked_by: [1221]
+  - id: charge-abstraction-m2
+    gh_milestone: 50
+    kind: milestone
+    title: "CA2 — The tilt node, and the rotation that was missing"
+    status: planned
+    lane: next
+    acceptance:
+      - "`threefoldTruncate` exists and the (3,2) tilt family is the existing surface family pulled back along it, with no new polynomial."
+      - "The rotation is proved to be the existing `phaseTiltRotation` rather than a copy; walls are proved invariant under it and phases are proved not to be."
+      - "Exactly one of the three candidate spellings of the tilt charge survives, with comparisons proved to the others or the others deleted."
+      - "`Threefold.nu` is tied to the charge slope, and the `Threefold.nu` versus `BMT.nu` question is settled in writing."
+      - "Zero sorries; all gates green, including `check_roadmap.py --require-api`."
+  - id: charge-abstraction-e8
+    gh_issue: 1226
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m2
+    title: "The charge-family rotation, as the existing tilt rotation"
+    status: planned
+    summary: "`Walls/Rotation.lean`: `ChargeFamily.phaseRotate β := smul (exp(-πβi))`, with the two bridges that stop it duplicating what exists — it IS `phaseTiltRotation` (`TiltGeometry.lean:42`, not `:43` as the audit cited) and it agrees with `phaseTiltCharge` (`:53`) on the constant family. Must NOT be merged into `Walls/ChargeFamily.lean`, which imports only Mathlib today and must stay stability-neutral. The rotation was flagged by a verifier during the audit and never reached the audit's deliverable; it is free on walls and provably not free on phases."
+    priority: must
+    size: S
+    tags: [lean, charges, rotation]
+    labels: [area:lean, area:stability, type:feature, sev:medium]
+  - id: charge-abstraction-e9
+    gh_issue: 1227
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m2
+    title: "The tilt family by truncation, and its slope"
+    status: planned
+    summary: "`Walls/Threefold/Tilt.lean`: `threefoldTruncate : Threefold.NumClass →+ NumClass` (which does not exist today, and without which the nested-semicircle theorems cannot apply to ν-walls at all), `tiltFamily := (stChargeFamily.reindex Prod.swap).pullback threefoldTruncate`, `rotatedTiltFamily`, and `ν = α · chargeSlope` tying it to `Threefold.nu` (`Threefold/Basic.lean:208`). THE STRONGEST RESULT OF THE REMEDIATION: the (3,2) charge needs no new polynomial and no kernel, so this epic no longer depends on e1--e6 as originally scoped. Two negative results land with it: the tilt family is not a chart change of `Threefold.chargeFamily` (their wall loci differ, with a computed witness) and the rotation is not cosmetic."
+    priority: must
+    size: M
+    tags: [lean, charges, tilt]
+    labels: [area:lean, area:stability, type:feature, sev:high]
+    blocked_by: [1226]
+  - id: charge-abstraction-e10
+    gh_issue: 1228
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m2
+    title: "Adjudicate the three tilt spellings and the two nu"
+    status: planned
+    summary: "Two duplications the charge work would otherwise ship, owned by no earlier epic. Three spellings of one tilt charge — `tiltWallChargeFamily` at the transport level, `Exp.tiltChargeFamily` at the kernel level, `Tilt.tiltFamily` from the rotation work — with no comparison between any pair. And two slopes, `Threefold.nu` (`Threefold/Basic.lean:208`) against `BMT.nu` (`BMT.lean:111`), unconfirmed against the tree. This exists as its own epic because the obligation is shared: attached as a footnote to two other issues, it gets dropped by both. A comparison theorem or a deletion; a docstring noting the similarity is not a discharge."
+    priority: must
+    size: S
+    tags: [lean, charges, adjudication]
+    labels: [area:lean, type:refactor, sev:high]
+    blocked_by: [1221, 1227]
+  - id: charge-abstraction-m3
+    gh_milestone: 51
+    kind: milestone
+    title: "CA3 — The lattice root and the pairing bridge"
+    status: planned
+    lane: later
+    acceptance:
+      - "`Lattice.pairCharge` exists and both the period-domain and exponential charges are proved to be it, or the root is withdrawn and the bridge theorems are the whole delivery."
+      - "`Mukai.Graded.pairing` at n = 2 is a comparison theorem, never a second definition."
+      - "The Mukai pairing is generalised over its coefficient ring in place; no new name is introduced."
+      - "The two-consumer obligation for any new structure is answered in writing in the pull request, because `check_single_instantiation.py` does not scan these paths."
+      - "Zero sorries; all gates green, including `check_roadmap.py --require-api`."
+  - id: charge-abstraction-e11
+    gh_issue: 1229
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m3
+    title: "The pairing bridge, as theorems about the existing root"
+    status: planned
+    summary: "The n = 2 comparison, the weighted rank-one bridge and the `realForm` factor-of-two lemma, landed beside `Mukai.realPairing` in `RealForm.lean` as theorems about the root that already exists. Remediation proved what the audit had not checked: at n = 2 the proposed new graded form is literally `Mukai.realPairing (LinearMap.mul ℝ ℝ)` — same carrier, no weight, no transport — so shipping it as a definition would have added a second spelling of an existing pairing. Three refuted unifications go in the docstring; they are what justify any separate graded form existing at all. Deliberately sequenced BEFORE e12, inverting the audit's order."
+    priority: must
+    size: S
+    tags: [lean, lattice, bridge]
+    labels: [area:lean, type:feature, sev:medium]
+  - id: charge-abstraction-e12
+    gh_issue: 1230
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m3
+    title: "The lattice charge root"
+    status: planned
+    summary: "`Lattice.pairCharge b x y v = ⟪x,v⟫ + i⟪y,v⟫` with b NOT assumed symmetric, which is what admits odd dimension, plus proofs that `PeriodDomain.centralCharge` (`QuadraticForm/CentralCharge.lean:61`) and `Mukai.expCharge` (`Lattice/Mukai/CentralCharge.lean:36`) are one root with two presentations. BLOCKED ON A ROOT-REVIEW OBLIGATION, not on mathematics: `abstraction-tree.md` requires two independent consumers named before implementation, and the graded pairing's only named n ≠ 2 consumers are a negative result about itself and a fourfold layer that does not exist. `check_single_instantiation.py` does not scan these paths, so CI will not catch it. e11 either supplies the second consumer or shows this root is unnecessary."
+    priority: should
+    size: M
+    tags: [lean, lattice, root, blocked]
+    labels: [area:lean, type:feature, blocked, sev:medium]
+    blocked_by: [1229]
+  - id: charge-abstraction-m4
+    gh_milestone: null
+    kind: milestone
+    title: "CA4 — Noncommutative varieties"
+    status: planned
+    lane: parked
+    acceptance:
+      - "Each external blocker is either discharged or recorded as a dependency with the exact statement it needs."
+      - "No `KuznetsovChargeData` carrier exists; each component reaches the tree by restriction along its inclusion."
+      - "The cubic fourfold's charge lattice and its period-domain lattice remain two nodes; no comparison theorem between them is attempted."
+  - id: charge-abstraction-e13
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m4
+    title: "Cubic threefold Ku(X), by the rotated tilt charge"
+    status: planned
+    summary: "NOT FILED: blocked on an obligation outside this track. Bayer--Lahoz--Macrì--Stellari induce stability on Ku(X) from the (n,m) = (3,2) tilt charge rotated by 1/i, not from the BMT ch₃ charge. The wall-level half is e9. What is missing is the statement that the rotated charge is a stability function on the tilted heart, which no repair proved and which is not a wall-level fact: it needs `phaseTiltCharge_im_pos_of_phaseTors` (`TiltGeometry.lean:278`) and the `WeakUpperClosed` machinery (`:68`). Do not land a thin `ChargeFamily.restrict` alias first."
+    priority: should
+    size: L
+    tags: [lean, noncommutative, blocked]
+    labels: [area:lean, area:stability, type:feature, blocked]
+  - id: charge-abstraction-e14
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m4
+    title: "Cubic fourfold Ku(X): the charge on the algebraic lattice"
+    status: planned
+    summary: "NOT FILED: blocked on the geometry frontier. Plain `pairCharge` on the algebraic Mukai lattice of the component, signature (2,ρ), which for a very general cubic fourfold IS the A₂ lattice. No restriction is involved. Needs the Mukai lattice of Ku(X) and its signature, neither of which exists in the tree; `grep -rni kuznetsov DerivedAlgGeo` returns two disclaimers and no construction."
+    priority: should
+    size: L
+    tags: [lean, noncommutative, blocked]
+    labels: [area:lean, type:feature, blocked]
+  - id: charge-abstraction-e15
+    gh_issue: null
+    gh_sub_issues: []
+    kind: epic
+    parent: charge-abstraction-m4
+    title: "Cubic fourfold Ku(X): the period domain on the A2 complement"
+    status: planned
+    summary: "NOT FILED: blocked on the geometry frontier. `pairCharge.restrict` along the inclusion of A₂^⊥, signature (2,20), with the `HasSignatureTwo` witness PROVED from sig H̃ = (4,20) plus A₂ positive definite of rank 2, via `QuadraticMap.sigPos_eq_add` (`SignatureAdditive.lean:202`). Separate from e14 and must stay separate: the two live on lattices that are orthogonal complements for a very general X, so no comparison theorem between them can exist, and filing them together would invite exactly the fusion the audit refuted. Landing it requires de-privatising `QuadraticMap.polar_restrict` (`SignatureAdditive.lean:62`) rather than copying it."
+    priority: should
+    size: L
+    tags: [lean, noncommutative, blocked]
+    labels: [area:lean, type:feature, blocked]
