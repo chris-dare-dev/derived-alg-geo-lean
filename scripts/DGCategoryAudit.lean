@@ -146,6 +146,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGLinear.homComplex
 #print axioms CategoryTheory.DGLinear.homComplex_X
 #print axioms CategoryTheory.DGLinear.homComplex_d_apply
+#print axioms CategoryTheory.DGLinear.postcompCochain
+#print axioms CategoryTheory.DGLinear.postcompCochain_apply
 #print axioms CategoryTheory.DGFunctor.Linear
 #print axioms CategoryTheory.DGFunctor.Linear.map_smul
 #print axioms CategoryTheory.DGFunctor.compLinear
@@ -1143,6 +1145,43 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.HasLinearCopowers
 #print axioms CategoryTheory.HasLinearCopowers.has_linearCopower
 #print axioms CategoryTheory.hasLinearCopowerOfHasLinearCopowers
+
+-- Scalar-linear evaluation data assembles the linear copowers at a fixed
+-- object into a `k`-linear dg functor and a closed evaluation transformation.
+-- Its existence selector is choice-independent up to a coherent canonical
+-- `Z⁰` isomorphism which commutes strictly with evaluation.  This remains
+-- separate from additive `EvaluationData` and asserts no Euler computation.
+#print axioms CategoryTheory.LinearEvaluationData
+#print axioms CategoryTheory.LinearEvaluationData.obj
+#print axioms CategoryTheory.LinearEvaluationData.isLinearCopower
+#print axioms CategoryTheory.LinearEvaluationData.mk.inj
+#print axioms CategoryTheory.LinearEvaluationData.mk.sizeOf_spec
+#print axioms CategoryTheory.HasLinearEvaluationData
+#print axioms CategoryTheory.HasLinearEvaluationData.exists_linearEvaluationData
+#print axioms CategoryTheory.chosenLinearEvaluationData
+#print axioms CategoryTheory.LinearEvaluationData.ofHasLinearCopowers
+#print axioms CategoryTheory.LinearEvaluationData.hasLinearEvaluationDataOfHasLinearCopowers
+#print axioms CategoryTheory.LinearEvaluationData.map
+#print axioms CategoryTheory.LinearEvaluationData.univ_comp_map
+#print axioms CategoryTheory.LinearEvaluationData.functor
+#print axioms CategoryTheory.LinearEvaluationData.functor_obj
+#print axioms CategoryTheory.LinearEvaluationData.functor_map
+#print axioms CategoryTheory.LinearEvaluationData.functorLinear
+#print axioms CategoryTheory.LinearEvaluationData.evalHom
+#print axioms CategoryTheory.LinearEvaluationData.univ_comp_evalHom
+#print axioms CategoryTheory.LinearEvaluationData.evaluation
+#print axioms CategoryTheory.LinearEvaluationData.evaluation_isClosed
+#print axioms CategoryTheory.LinearEvaluationData.compare
+#print axioms CategoryTheory.LinearEvaluationData.compare_app
+#print axioms CategoryTheory.LinearEvaluationData.compare_isClosed
+#print axioms CategoryTheory.LinearEvaluationData.compare_comp
+#print axioms CategoryTheory.LinearEvaluationData.compare_self
+#print axioms CategoryTheory.LinearEvaluationData.compareIso
+#print axioms CategoryTheory.LinearEvaluationData.compareIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.compareIso_inv_val
+#print axioms CategoryTheory.LinearEvaluationData.compareIso_self
+#print axioms CategoryTheory.LinearEvaluationData.compareIso_trans
+#print axioms CategoryTheory.LinearEvaluationData.compare_comp_evaluation
 
 -- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
 -- identity.  Every one of the functor's four laws is `lift_unique` applied to

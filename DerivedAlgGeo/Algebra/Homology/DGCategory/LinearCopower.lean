@@ -25,9 +25,11 @@ projection is mathematically available for a general scalar extension.  The
 two interfaces coincide only after additional comparison input (for example,
 over the integers), which is not asserted here.
 
-This file stops before constructing scalar-linear evaluation data or deriving
-an Euler-class formula.  Those require functorial assembly and, later,
-homotopy invariance and a finite cohomology presentation.
+The sibling `LinearEvaluation` module assembles these copowers into a
+scalar-linear evaluation functor and its closed evaluation transformation.
+This file itself stops at the universal-property root; neither module derives
+an Euler-class formula, which still needs homotopy invariance and a finite
+cohomology presentation.
 -/
 
 set_option autoImplicit false
@@ -50,32 +52,13 @@ def linearCopowerCochain {K : CochainComplex (ModuleCat.{v} k) ℤ} {X Z : C}
     (univ : K ⟶ DGLinear.homComplex k X Z) {W : C} (p : ℤ) :
     (DGLinear.homComplex k Z W).X p →ₗ[k]
       CochainComplex.HomComplex.Cochain K (DGLinear.homComplex k X W) p where
-  toFun g := CochainComplex.HomComplex.Cochain.mk (fun i j h => ModuleCat.ofHom
-    { toFun := fun x => dgComp i p j h (univ.f i x) g
-      map_add' := fun x y => by
-        rw [map_add, map_add, AddMonoidHom.add_apply]
-      map_smul' := fun c x => by
-        rw [map_smul, DGLinear.comp_smul_left]
-        rfl })
+  toFun g := (CochainComplex.HomComplex.Cochain.ofHom univ).comp
+    (DGLinear.postcompCochain k X p g) (zero_add p)
   map_add' g g' := by
-    apply CochainComplex.HomComplex.Cochain.ext
-    intro i j hij
-    apply ModuleCat.hom_ext
-    apply LinearMap.ext
-    intro x
-    change dgComp i p j hij (univ.f i x) (g + g') =
-      dgComp i p j hij (univ.f i x) g +
-        dgComp i p j hij (univ.f i x) g'
-    rw [map_add]
+    rw [map_add, CochainComplex.HomComplex.Cochain.comp_add]
   map_smul' c g := by
-    apply CochainComplex.HomComplex.Cochain.ext
-    intro i j hij
-    apply ModuleCat.hom_ext
-    apply LinearMap.ext
-    intro x
-    change dgComp i p j hij (univ.f i x) (c • g) =
-      c • dgComp i p j hij (univ.f i x) g
-    rw [DGLinear.comp_smul_right]
+    rw [map_smul, CochainComplex.HomComplex.Cochain.comp_smul]
+    rfl
 
 @[simp]
 lemma linearCopowerCochain_apply
@@ -83,7 +66,11 @@ lemma linearCopowerCochain_apply
     (univ : K ⟶ DGLinear.homComplex k X Z) {W : C} (p : ℤ)
     (g : (dgHom Z W).X p) (i j : ℤ) (h : i + p = j) (x : K.X i) :
     ((linearCopowerCochain k univ p g).v i j h).hom x =
-      dgComp i p j h (univ.f i x) g :=
+      dgComp i p j h (univ.f i x) g := by
+  change ((((CochainComplex.HomComplex.Cochain.ofHom univ).comp
+      (DGLinear.postcompCochain k X p g) (zero_add p)).v i j h).hom x) = _
+  rw [CochainComplex.HomComplex.Cochain.zero_cochain_comp_v,
+    CochainComplex.HomComplex.Cochain.ofHom_v]
   rfl
 
 /-- **`Z` is the `k`-linear tensoring of `X` by the complex `K`.**
@@ -135,7 +122,11 @@ lemma lift_unique (t : IsLinearCopowerOf k K X Z) {W : C} {p : ℤ}
   apply CochainComplex.HomComplex.Cochain.ext
   intro i j hij
   apply ModuleCat.hom_ext
-  exact LinearMap.ext fun x => h i j hij x
+  apply LinearMap.ext
+  intro x
+  rw [linearCopowerCochain_apply k t.univ p g i j hij x,
+    linearCopowerCochain_apply k t.univ p g' i j hij x]
+  exact h i j hij x
 
 /-- Every linear cochain out of `K` is induced by a morphism out of the linear
 copower. -/
@@ -172,7 +163,10 @@ lemma univ_comp_lift (t : IsLinearCopowerOf k K X Z) {W : C} (p : ℤ)
     dgComp i p j hij (t.univ.f i x) (t.lift p c) =
       (c.v i j hij).hom x := by
   have h := (t.cochainLinearEquiv W p).apply_symm_apply c
-  exact congrArg (fun z => (z.v i j hij).hom x) h
+  change linearCopowerCochain k t.univ p (t.lift p c) = c at h
+  have h' := congrArg (fun z => (z.v i j hij).hom x) h
+  rw [linearCopowerCochain_apply k t.univ p (t.lift p c) i j hij x] at h'
+  exact h'
 
 /-- The canonical comparison between two linear copowers of the same data. -/
 noncomputable def compare
