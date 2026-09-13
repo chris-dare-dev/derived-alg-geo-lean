@@ -7,6 +7,20 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Conditional dg/Fourier--Mukai kernel autoequivalences (2026-09-13):
+  a supplied `PresentedCounitComparisonData` or `PresentedUnitComparisonData`
+  transports an explicit `H⁰` equivalence hypothesis from the dg twist or
+  unshifted unit cone to the selected Fourier--Mukai twist or conventional
+  cotwist.  `twistKernelAutoequivalence` and
+  `cotwistKernelAutoequivalence` package the already named cone kernels with
+  the repository's `KernelAutoequivalence` interface; the cotwist uses the
+  existing exact-family shift comparison for its `[-1]` kernel.  The natural
+  comparisons also expose the transported dg functors as kernel functors.
+  Together with the supplied triangulated endpoint equivalence, the existing
+  `ShiftCompatibility` gives the two equivalences Mathlib's canonical
+  triangulated-equivalence package.  No comparison data,
+  equivalence hypothesis, inverse kernel, dg quasi-equivalence, adjoint
+  comparison, or sphericality is constructed.
 - Shift-compatible dg/Fourier--Mukai twist and cotwist comparison
   (2026-09-13): the nested `ShiftCompatibility` records refine supplied
   `PresentedCounitComparisonData` and `PresentedUnitComparisonData` with an
@@ -20,9 +34,9 @@ blocks should normally move it rather than add more declarations beside it.
   actual shifted dg cone, and
   `ShiftCompatibility.transportedDGCotwistIso_commShift` composes it with the
   supplied Fourier--Mukai comparison.  Neither compatibility is stored as new
-  record data.  No target shift structure is manufactured, no global instance
-  is installed, and no uniqueness, equivalence, kernel-identification, or
-  sphericality statement is asserted.
+  record data.  The shift-compatibility layer manufactures no target shift
+  structure and installs no global instance; it asserts no uniqueness or
+  sphericality.
 - Supplied natural comparison of dg and Fourier--Mukai adjunction cones
   (2026-09-13): `Triangle.FirstMapNormalizationData.ComparisonData` records the
   remaining data for an endpoint-strict comparison of two normalizations with
@@ -34,9 +48,10 @@ blocks should normally move it rather than add more declarations beside it.
   this contract to the independently chosen dg and kernel cones; they derive
   natural unit/counit and twist/cotwist comparisons, including the actual
   shifted dg cotwist.  The records are supplied and are not inferred from the
-  earlier pointwise choices.  The bare records assert no canonicity,
-  `CommShift` compatibility, exactness/equivalence transfer, dg kernel
-  identification, or sphericality.
+  earlier pointwise choices.  By themselves the bare records assert no
+  canonicity, `CommShift` compatibility, equivalence of either functor, or
+  sphericality; the conditional consumers above require the separate
+  equivalence and shift inputs explicitly.
 - Objectwise dg/Fourier--Mukai twist comparison (2026-09-13):
   `CounitKernelConeData.presentedCounitTriangleObjIso` applies Mathlib's
   triangle-isomorphism completion theorem to the presented dg and independently
