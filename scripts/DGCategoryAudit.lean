@@ -486,6 +486,17 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones
 #print axioms CategoryTheory.DGFunctor.h0IsTriangulated
 
+-- Ordinary equivalence transport of `H⁰ F`, with shift, exactness, and
+-- equivalence supplied by Mathlib's existing composition and mate packages.
+-- These declarations infer neither dg quasi-equivalence nor triangulatedness
+-- of a plain category equivalence.
+#print axioms CategoryTheory.DGFunctor.transportedH0
+#print axioms CategoryTheory.DGFunctor.transportedH0_isEquivalence
+#print axioms CategoryTheory.DGFunctor.transportedH0Equivalence
+#print axioms CategoryTheory.DGFunctor.transportedH0CommShift
+#print axioms CategoryTheory.DGFunctor.transportedH0IsTriangulated
+#print axioms CategoryTheory.DGFunctor.transportedH0EquivalenceIsTriangulated
+
 -- The instance itself (dg-enhancements-e6, #377): the completion axiom for
 -- arbitrary distinguished triangles, the five axioms H⁰ proves, and the
 -- `Pretriangulated (H0 C)` they assemble into.
@@ -1166,12 +1177,18 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 
 -- Inverse rotation presents the conventional pointwise `[-1]` cotwist, while
 -- a generic transport/shift comparison identifies it with the H⁰ transport of
--- the actual shifted dg unit cone.  This block asserts only a functor
--- isomorphism and pointwise distinguishedness: no exactness, equivalence,
--- Fourier--Mukai comparison, or sphericality.
+-- the actual shifted dg unit cone.  Exactness reuses the canonical pointwise
+-- shift package, and autoequivalence requires an explicit equivalence
+-- hypothesis on the unshifted cone.  No dg quasi-equivalence, Fourier--Mukai
+-- comparison, choice independence, or sphericality is inferred.
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedDGCotwist
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwist
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistH0Iso
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistCommShift
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwist_isEquivalence
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistEquivalence
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistIsTriangulated
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistEquivalenceIsTriangulated
 #print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle
 #print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_comp_π₁
 #print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_comp_π₂

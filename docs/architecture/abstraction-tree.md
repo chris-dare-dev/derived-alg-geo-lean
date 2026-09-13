@@ -184,6 +184,9 @@ Category
 │  │  └─ PreservesChosenCones            free: mapped fst/snd split every image cone
 │  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
 │  │     └─ h0CommShift / h0IsTriangulated automatic non-instance H⁰ exactness
+│  │        └─ transportedH0             ordinary equivalence conjugate
+│  │           ├─ CommShift / IsTriangulated  composed from canonical packages
+│  │           └─ Equivalence            under explicit equivalence of H⁰ F
 │  ├─ IsCopowerOf K X Z                   `Z = K ⊗ X`, by its universal property
 │  │  ├─ lift / lift_unique              cochains out of `K` are morphisms out of `Z`
 │  │  ├─ compare                         closed canonical comparison, strict composition
@@ -215,6 +218,8 @@ Category
 │  │        ├─ presentedCotwistTriangle    Mathlib inverse rotation of the presented unit triangle
 │  │        │  ├─ transportedCotwist      pointwise `[-1]` shift of the transported unit cone
 │  │        │  └─ transportedCotwistH0Iso transport of the actual shifted dg cone agrees up to iso
+│  │        │     └─ exact equivalence     exact for every cone under supplied triangulated transport;
+│  │        │                                equivalence from explicit H⁰ input
 │  │        └─ Fourier--Mukai adapters     existing left/right adjoint-kernel data
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps
