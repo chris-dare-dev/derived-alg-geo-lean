@@ -31,7 +31,9 @@ splits one such adjoint into the three constituent adjunctions plus a
 projection-formula identification; and the induced maps on the triangulated
 Grothendieck group.  Presented dg unit/counit and cotwist/twist triangles can
 be compared objectwise, noncanonically, with independently chosen
-Fourier--Mukai cone triangles.  No geometry, and no theorem asserting that a
-functor is of this form or that it has an adjoint.
+Fourier--Mukai cone triangles; separately supplied comparison data produce
+natural triangle and functor isomorphisms between the same families.  No
+geometry, and no theorem asserting that a functor is of this form or that it
+has an adjoint.
 
 -/

@@ -952,6 +952,19 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentedCounitTriangleObjIso_hom_hom₂
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.transportedTwistObjIso
 
+/-! ## Fourier--Mukai lane -- supplied natural dg-twist comparison -/
+
+-- This separate endpoint-strict contract records a natural third-component
+-- isomorphism and the two remaining triangle squares; it is not inferred from
+-- the pointwise choices above.
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.PresentedCounitComparisonData
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.PresentedCounitComparisonData.ofTwistIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.PresentedCounitComparisonData.presentedCounitTriangleIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.PresentedCounitComparisonData.presentedCounitTriangleIso_hom_app_hom₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.PresentedCounitComparisonData.presentedCounitTriangleIso_hom_app_hom₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.PresentedCounitComparisonData.presentedCounitTriangleIso_hom_app_hom₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.PresentedCounitComparisonData.transportedTwistIso
+
 /-! ## Fourier--Mukai lane -- adjunction-unit kernel data and cones -/
 
 -- A definitional specialization of the generic kernel-transformation root to
@@ -1008,6 +1021,24 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.presentedCotwistTriangleObjIso_hom_hom₃
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.transportedCotwistObjIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.transportedDGCotwistObjIso
+
+/-! ## Fourier--Mukai lane -- supplied natural dg-cotwist comparison -/
+
+-- This separate endpoint-strict contract records a natural cone isomorphism
+-- and the two remaining triangle squares; it is not inferred from the
+-- pointwise choices above.
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.ofConeIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.presentedUnitTriangleIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.presentedUnitTriangleIso_hom_app_hom₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.presentedUnitTriangleIso_hom_app_hom₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.presentedUnitTriangleIso_hom_app_hom₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.transportedUnitConeIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.presentedCotwistTriangleIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.presentedCotwistTriangleIso_hom_app_hom₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.presentedCotwistTriangleIso_hom_app_hom₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.transportedCotwistIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.transportedDGCotwistIso
 
 /-! ## Fourier--Mukai lane -- left-adjunction dual-twist kernels -/
 

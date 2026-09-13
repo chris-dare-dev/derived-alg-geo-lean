@@ -23,6 +23,12 @@ This is an ordinary categorical interface.  It does not assert that the
 triangles are distinguished, make any vertex functor exact, or make the
 normalization canonical.  If the values of `T` are distinguished, the final
 theorem transports that pointwise fact to the normalized family.
+
+For two normalizations with the same named first two vertices and first map,
+`FirstMapNormalizationData.ComparisonData` stores only a natural isomorphism
+of their third vertices and compatibility with the remaining two maps.  It
+then delegates the full triangle-family isomorphism to Mathlib's
+`Triangle.functorIsoMk'`.
 -/
 
 set_option autoImplicit false
@@ -151,6 +157,63 @@ theorem rawIsoNormalized_hom_app_hom₂ (A : J) :
 theorem rawIsoNormalized_hom_app_hom₃ (A : J) :
     ((N.rawIsoNormalized).hom.app A).hom₃ = 𝟙 _ :=
   rfl
+
+/-! ### Comparing two normalizations with the same first map -/
+
+/-- The remaining data needed for an endpoint-strict comparison of two
+first-map-normalized triangle families with the same named first two vertices
+and first map.
+
+The interface fixes the first two comparison components to be identities.
+Thus only a natural isomorphism of the third vertices and compatibility with
+the second and third maps are stored. -/
+structure ComparisonData
+    {T₁ T₂ : J ⥤ Triangle C} {F G : J ⥤ C} {α : F ⟶ G}
+    (N₁ : FirstMapNormalizationData T₁ F G α)
+    (N₂ : FirstMapNormalizationData T₂ F G α) where
+  /-- Natural comparison of the third vertices. -/
+  thirdIso : N₁.third ≅ N₂.third
+  /-- Compatibility with the maps from the common second vertex. -/
+  second : N₁.normalizedSecond ≫ thirdIso.hom = N₂.normalizedSecond
+  /-- Compatibility with the connecting maps to the shifted common first
+  vertex. -/
+  third : N₁.normalizedThird = thirdIso.hom ≫ N₂.normalizedThird
+
+namespace ComparisonData
+
+variable {T₁ T₂ : J ⥤ Triangle C} {F G : J ⥤ C} {α : F ⟶ G}
+  {N₁ : FirstMapNormalizationData T₁ F G α}
+  {N₂ : FirstMapNormalizationData T₂ F G α}
+  (D : ComparisonData N₁ N₂)
+
+/-- The natural isomorphism of normalized triangle families determined by the
+third-vertex comparison.  Mathlib's triangle-functor constructor supplies the
+identity components on the common first two vertices. -/
+noncomputable def normalizedTriangleIso :
+    N₁.normalizedTriangle ≅ N₂.normalizedTriangle :=
+  Triangle.functorIsoMk' (Iso.refl F) (Iso.refl G) D.thirdIso
+    (by simp) (by simpa using D.second) (by simpa using D.third)
+
+/-- The first component of the normalized comparison is the identity. -/
+@[simp]
+theorem normalizedTriangleIso_hom_app_hom₁ (A : J) :
+    (D.normalizedTriangleIso.hom.app A).hom₁ = 𝟙 _ :=
+  rfl
+
+/-- The second component of the normalized comparison is the identity. -/
+@[simp]
+theorem normalizedTriangleIso_hom_app_hom₂ (A : J) :
+    (D.normalizedTriangleIso.hom.app A).hom₂ = 𝟙 _ :=
+  rfl
+
+/-- The third component of the normalized comparison is the supplied natural
+isomorphism. -/
+@[simp]
+theorem normalizedTriangleIso_hom_app_hom₃ (A : J) :
+    (D.normalizedTriangleIso.hom.app A).hom₃ = D.thirdIso.hom.app A :=
+  rfl
+
+end ComparisonData
 
 section Distinguished
 
