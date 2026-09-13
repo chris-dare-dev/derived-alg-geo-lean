@@ -456,9 +456,12 @@ that comparison are instance hypotheses to be discharged by the realization.
    homotopy equivalence from every unbounded `ModuleCat k`-valued cochain
    complex to its zero-differential homology model.  This uses projective
    splittings and imposes no finite-dimensionality or support hypothesis.
-   What remains open here is the finite-support comparison from that full
-   homology model to `finiteCohomologyModel`, after which the existing finite
-   presentation Euler consumer can be instantiated automatically.  No
+   The finite-support comparison is now closed:
+   `CochainComplex.homologyModelIsoFiniteCohomologyModel` identifies the full
+   model with `finiteCohomologyModel` under an explicit vanishing witness, and
+   `FiniteCohomologyPresentation.ofFiniteSupport` composes it with formality.
+   The next seam is the automatic H⁰ Euler consumer obtained by feeding this
+   presentation into the existing finite-presentation interface.  No
    naturality or quasi-isomorphism invariance is inferred from formality.
    The direct scalar-linear cone consumer is now closed as well.
    `LinearEvaluationData.TwistConeData` is a thin name for the generic cone of

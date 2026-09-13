@@ -6,6 +6,7 @@ import DerivedAlgGeo.Algebra.Homology.Homotopy.Sigma
 import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
+import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentationOfSupport
 
 /-!
 # Homotopies

@@ -7,6 +7,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
+import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentationOfSupport
 import DerivedAlgGeo.Algebra.Homology.Localization
 import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNaturality
@@ -54,6 +55,11 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.FiniteCohomologyPresentation.homologyIso
 #print axioms CochainComplex.FiniteCohomologyPresentation.isZero_homology_of_not_mem
 #print axioms CochainComplex.FiniteCohomologyPresentation.shiftedHomotopyEquiv
+#print axioms CochainComplex.isZero_finiteCohomologyModel_X_of_not_mem
+#print axioms CochainComplex.finiteCohomologyModel_d
+#print axioms CochainComplex.homologyModelIsoFiniteCohomologyModel
+#print axioms CochainComplex.FiniteCohomologyPresentation.ofFiniteSupport
+#print axioms CochainComplex.FiniteCohomologyPresentation.ofFiniteSupport_degrees
 #print axioms HomotopyCategory.cofanDesc
 #print axioms HomotopyCategory.cofanDesc_fac
 #print axioms HomotopyCategory.cofanDesc_uniq

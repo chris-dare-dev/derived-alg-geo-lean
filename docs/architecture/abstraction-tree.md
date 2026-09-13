@@ -95,6 +95,9 @@ Category
 │  ├─ CochainComplex.FiniteCohomologyPresentation
 │  │  ├─ pullback                        transport along an explicit HomotopyEquiv
 │  │  ├─ isZero_homology_of_not_mem      finite homology support consequence
+│  │  ├─ homologyModelIsoFiniteCohomologyModel
+│  │  │                                   generic finite-support comparison
+│  │  ├─ ofFiniteSupport                 ModuleCat/division-ring constructor
 │  │  └─ shiftedHomotopyEquiv            presentation in the shifted normal form
 │  ├─ weak-Serre exactness               repository generic extension
 │  └─ DerivedCategory C                  generic construction

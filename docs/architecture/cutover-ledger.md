@@ -7,6 +7,16 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Finite-support comparison for formal complexes (2026-09-13):
+  `Homotopy.FiniteCohomologyPresentation` owns the categorical comparison from
+  the full zero-differential homology model to the existing finite-biproduct
+  model under an explicit vanishing witness.  The specialized
+  `Homotopy.FiniteCohomologyPresentationOfSupport` module owns only the
+  division-ring constructor which composes that comparison with the
+  noncanonical unbounded formality theorem.  This introduces no second
+  presentation type, does not require the selected degree set to be minimal,
+  and infers neither finite support from boundedness nor naturality from the
+  chosen splittings.
 - Homology model and unbounded formality over a division ring (2026-09-13):
   `Homotopy.HomologyModel` owns the generic zero-differential complex of
   homology objects in any abelian category.  It makes no formality claim.
@@ -17,9 +27,8 @@ blocks should normally move it rather than add more declarations beside it.
   spaces, and explicit splittings of cycles and boundaries.  It is unbounded
   and requires neither finite-dimensionality nor finite support.  The choices
   are deliberately not packaged as natural data, and the theorem asserts no
-  quasi-isomorphism invariance.  Turning a finite-support hypothesis into the
-  existing `FiniteCohomologyPresentation` is a downstream comparison with its
-  finite-biproduct model, not a second formality theorem.
+  quasi-isomorphism invariance.  The downstream finite-support comparison is
+  recorded separately and reuses the existing `FiniteCohomologyPresentation`.
 - Degreewise ambient coherent Ext-finiteness on projective varieties
   (2026-09-12):
   `ProjectivePresentation.module_finite_ambientExt` combines unconditional
