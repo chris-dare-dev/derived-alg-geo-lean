@@ -7,6 +7,16 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Objectwise dg/Fourier--Mukai twist comparison (2026-09-13):
+  `CounitKernelConeData.presentedCounitTriangleObjIso` applies Mathlib's
+  triangle-isomorphism completion theorem to the presented dg and independently
+  selected Fourier--Mukai counit triangles at each target object.  Its first
+  two components are identities because both triangles use the same presented
+  adjunction counit, and its third component gives
+  `transportedTwistObjIso` from the actual transported dg twist object to the
+  kernel twist object.  This choice is not proved natural in the target object,
+  so no functor isomorphism, choice independence, exactness/equivalence
+  transfer, kernel presentation of the dg twist, or sphericality is inferred.
 - Objectwise dg/Fourier--Mukai cotwist comparison (2026-09-13):
   `AdjunctionUnitKernelConeData.presentedUnitTriangleObjIso` applies Mathlib's
   triangle-isomorphism completion theorem to the presented dg and independently

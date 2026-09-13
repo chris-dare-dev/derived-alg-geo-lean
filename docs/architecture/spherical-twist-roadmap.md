@@ -318,7 +318,11 @@ that comparison are instance hypotheses to be discharged by the realization.
    independently chosen Fourier--Mukai unit cone.  Inverse rotation gives the
    corresponding objectwise cotwist comparison, including the transport of
    the actual shifted dg cone.  The chosen third component is not proved
-   natural in the source object, so no functor isomorphism, dg
+   natural in the source object.  On the counit side,
+   `presentedCounitTriangleObjIso` directly compares the presented dg twist
+   triangle with the independently chosen Fourier--Mukai counit cone at every
+   target object, again with no naturality for the chosen third component.
+   Thus no functor isomorphism, dg
    quasi-equivalence, choice independence, exactness/equivalence transfer, or
    sphericality follows.  The dg notion is still
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
@@ -655,10 +659,12 @@ that comparison are instance hypotheses to be discharged by the realization.
    `Φ_P ⋙ Φ_Q ⟶ 𝟭_X ⟶ dualCotwist ⟶ (Φ_P ⋙ Φ_Q)⟦1⟧` pointwise,
    again without new cone machinery.  Pointwise distinguishedness cannot
    supply `CommShift` or `IsTriangulated` for either shifted cone functor.
-   The corresponding dg-adjunction counit triangle now has an ordinary
-   presentation through `DGAdjunction.H0Presentation`, but no comparison
-   identifies its transported dg cone with an independently selected
-   Fourier--Mukai cone; that later seam remains explicit.
+   The corresponding dg-adjunction counit triangle has an ordinary presentation
+   through `DGAdjunction.H0Presentation`; it is now noncanonically isomorphic
+   at every target object to the independently selected Fourier--Mukai counit
+   triangle, so the transported dg twist and kernel twist are objectwise
+   isomorphic.  A natural comparison of the two twist functors still requires
+   additional realization data compatible with the remaining triangle maps.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.

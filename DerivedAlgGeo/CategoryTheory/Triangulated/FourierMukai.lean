@@ -11,6 +11,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Convolution
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.CounitKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionCotwistComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionPresentation
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionTwistComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DualCotwistKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DualTwistKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.ExceptionalExtension
@@ -28,9 +29,9 @@ correspondence; the convolution of kernels as supplied data; kernel-presented
 adjoints of a transform, also as supplied data, together with the ledger that
 splits one such adjoint into the three constituent adjunctions plus a
 projection-formula identification; and the induced maps on the triangulated
-Grothendieck group.  Presented dg unit and cotwist triangles can be compared
-objectwise, noncanonically, with independently chosen Fourier--Mukai cone
-triangles.  No geometry, and no theorem asserting that a functor is of this
-form or that it has an adjoint.
+Grothendieck group.  Presented dg unit/counit and cotwist/twist triangles can
+be compared objectwise, noncanonically, with independently chosen
+Fourier--Mukai cone triangles.  No geometry, and no theorem asserting that a
+functor is of this form or that it has an adjoint.
 
 -/
