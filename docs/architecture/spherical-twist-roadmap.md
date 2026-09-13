@@ -102,6 +102,13 @@ IsLinearCopowerOf k K X ZK
 └─ homotopyEquivIso: homotopy-equivalent coefficient complexes give
    isomorphic witnessed copowers in H⁰
 
+CochainComplex.homologyModel (any abelian category)
+├─ generic zero-differential model, with no formality assertion
+└─ ModuleCat/division-ring homotopyEquivHomologyModel:
+   every unbounded coefficient complex is noncanonically homotopy equivalent
+   to its zero-differential homology model;
+   no finite support, finite dimension, naturality, or quasi-isomorphism claim
+
 HasLinearCopowers k C
 └─ linearCopowerFunctor k X: C^dg(ModuleCat k) ⟶ C, a k-linear dg functor
 
@@ -443,8 +450,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    choice-independence theorem.  The existing additive
    `EvaluationData.IsEulerCopower` is a second specialization of the same
    interface, not a consequence of the linear one.  Any passage between the
-   two evaluation packages remains explicit.  Automatic formality remains
-   open and is not to be inferred from Hom-finiteness.
+   two evaluation packages remains explicit.  The coefficient-side formality
+   foundation is now closed over a division ring:
+   `CochainComplex.homotopyEquivHomologyModel` constructs a noncanonical
+   homotopy equivalence from every unbounded `ModuleCat k`-valued cochain
+   complex to its zero-differential homology model.  This uses projective
+   splittings and imposes no finite-dimensionality or support hypothesis.
+   What remains open here is the finite-support comparison from that full
+   homology model to `finiteCohomologyModel`, after which the existing finite
+   presentation Euler consumer can be instantiated automatically.  No
+   naturality or quasi-isomorphism invariance is inferred from formality.
    The direct scalar-linear cone consumer is now closed as well.
    `LinearEvaluationData.TwistConeData` is a thin name for the generic cone of
    scalar-linear evaluation; its choice comparison and conditional exactness

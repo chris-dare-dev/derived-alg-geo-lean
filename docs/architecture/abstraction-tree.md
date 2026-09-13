@@ -86,6 +86,9 @@ Category
 │        ├─ Ext profiles / transport     Serre-compatible equivalences
 │        └─ classification data          supplied paper conclusions
 ├─ Abelian                               Mathlib typeclass
+│  ├─ CochainComplex.homologyModel       generic zero-differential model
+│  │  └─ ModuleCat/division-ring formality
+│  │     noncanonical and unbounded; no finiteness/naturality
 │  ├─ CochainComplex.finiteCohomologyModel
 │  │  ├─ finiteCohomologyModelHomologyIso  homology preserves the finite biproduct
 │  │  └─ finiteCohomologyModelIsoShifted degree i becomes degree zero shifted by -i
