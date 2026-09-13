@@ -155,6 +155,10 @@ Category
 │  │        │  └─ automatic realization from HomFiniteBounded
 │  │        └─ TwistConeData             direct cone of scalar-linear evaluation
 │  │           ├─ compareIso / exactness  delegated to generic strict-square and cone APIs
+│  │           ├─ twistTriangleFunctor    H⁰ C ⥤ Triangle (H⁰ C), all distinguished
+│  │           ├─ adjunctionTwistIso      canonical Z⁰ identification with the copower--Hom counit cone
+│  │           ├─ adjunctionTwistTriangleIso
+│  │           │                           coherent identification of the full H⁰ triangle functors
 │  │           └─ K₀ action             identity minus evaluation; HomFiniteBounded numerical twist
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category

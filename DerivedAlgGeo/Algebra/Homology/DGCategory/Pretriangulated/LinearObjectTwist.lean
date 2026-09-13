@@ -113,6 +113,20 @@ lemma compareIso_inv_val {W : LinearEvaluationData k E}
         (DGFunctor.HomogeneousNatTrans.id (DGFunctor.id C)) 0 :=
   rfl
 
+/-- The canonical scalar-linear twist comparison strictly commutes with the
+inclusions from the identity functor. -/
+lemma inclusion_comp_compareIso_hom_val {W : LinearEvaluationData k E}
+    (L : W.TwistConeData k) :
+    DGFunctor.HomogeneousNatTrans.composition (DGFunctor.id C) K.twist L.twist
+        0 0 0 (by omega) K.inr (K.compareIso L).hom.val =
+      L.inr := by
+  rw [compareIso]
+  refine (DGFunctor.HomogeneousNatTrans.ConeData.inr_comp_isoOfStrictSquare_hom
+    K L (LinearEvaluationData.compareIso V W)
+      (Iso.refl (show Z0 (DGFunctor C C) from DGFunctor.id C))
+      (V.compare_evaluation_square k W)).trans ?_
+  exact dgId_comp (C := DGFunctor C C) 0 L.inr
+
 /-- The scalar-linear twist comparison from a cone choice to itself is
 strictly the identity homogeneous natural transformation. -/
 lemma compareIso_self_hom_val :
