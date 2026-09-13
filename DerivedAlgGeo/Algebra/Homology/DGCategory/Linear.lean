@@ -30,7 +30,7 @@ universe v u u' u'' w
 
 namespace CategoryTheory
 
-open DGCategoryStruct
+open DGCategoryStruct DGCategory
 
 /-- A `k`-linear structure on a dg category: given `k`-module structures on the
 graded pieces of the Hom-complexes, both the differential and the composition
@@ -125,6 +125,37 @@ lemma postcompCochain_apply (X : C) {Y Z : C} (p : ℤ)
     (g : (dgHom X Y).X i) :
     ((postcompCochain k X p f).v i j h).hom g = dgComp i p j h g f :=
   rfl
+
+/-- Right composition intertwines the Hom-complex differential with the dg
+differential.  The two Koszul terms cancel because Mathlib's Hom differential
+uses the successor sign. -/
+lemma postcompCochain_d (X : C) {Y Z : C} (p q : ℤ)
+    (f : (dgHom Y Z).X p) :
+    CochainComplex.HomComplex.δ p q (postcompCochain k X p f) =
+      postcompCochain k X q (((dgHom Y Z).d p q).hom f) := by
+  by_cases hpq : p + 1 = q
+  · subst q
+    apply CochainComplex.HomComplex.Cochain.ext
+    intro i j hij
+    apply ModuleCat.hom_ext
+    apply LinearMap.ext
+    intro g
+    rw [CochainComplex.HomComplex.δ_v p (p + 1) rfl
+      (postcompCochain k X p f) i j hij (i + p) (i + 1) (by omega) rfl]
+    change ((dgHom X Z).d (i + p) j).hom
+          (dgComp i p (i + p) rfl g f) +
+        (p + 1).negOnePow •
+          dgComp (i + 1) p j (by omega)
+            (((dgHom X Y).d i (i + 1)).hom g) f =
+      dgComp i (p + 1) j hij g (((dgHom Y Z).d p (p + 1)).hom f)
+    have hleib := dgComp_leibniz (C := C) i p (i + p) j (by omega) (by omega) g f
+    rw [hleib, Int.negOnePow_succ, Units.neg_smul]
+    abel
+  · have hshape : ¬(ComplexShape.up ℤ).Rel p q := by
+      simpa [ComplexShape.up, ComplexShape.up'] using hpq
+    have hd : ((dgHom Y Z).d p q).hom f = 0 :=
+      ConcreteCategory.congr_hom ((dgHom Y Z).shape p q hshape) f
+    rw [CochainComplex.HomComplex.δ_shape p q hpq, hd, map_zero]
 
 end DGLinear
 

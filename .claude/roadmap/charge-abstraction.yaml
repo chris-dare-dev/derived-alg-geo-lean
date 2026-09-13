@@ -129,7 +129,7 @@ items:
     kind: epic
     parent: charge-abstraction-m1
     title: "The divisorial keystone reaches the charge kernel"
-    status: planned
+    status: done
     summary: "`Walls/Exp/Divisorial.lean`: the intersection-form moments and `expCharge_eq_ofMoments`, stated on a bare `Mukai.RealExtension D` rather than on `ChernCharacter`. The triple level is load-bearing — `mukaiCharge` (`Walls/Divisorial/Mukai.lean:173`) is the same `expChargeHom` on a different triple, so a `ChernCharacter`-level statement cannot reach it and the κ epic depends on that reach. This is the slice to review hardest: two of three independent design angles declared the multi-divisor charge a non-child and were wrong."
     priority: must
     size: M

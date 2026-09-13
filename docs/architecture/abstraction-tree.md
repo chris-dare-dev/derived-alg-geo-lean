@@ -86,6 +86,13 @@ Category
 │        ├─ Ext profiles / transport     Serre-compatible equivalences
 │        └─ classification data          supplied paper conclusions
 ├─ Abelian                               Mathlib typeclass
+│  ├─ CochainComplex.finiteCohomologyModel
+│  │  ├─ finiteCohomologyModelHomologyIso  homology preserves the finite biproduct
+│  │  └─ finiteCohomologyModelIsoShifted degree i becomes degree zero shifted by -i
+│  ├─ CochainComplex.FiniteCohomologyPresentation
+│  │  ├─ pullback                        transport along an explicit HomotopyEquiv
+│  │  ├─ isZero_homology_of_not_mem      finite homology support consequence
+│  │  └─ shiftedHomotopyEquiv            presentation in the shifted normal form
 │  ├─ weak-Serre exactness               repository generic extension
 │  └─ DerivedCategory C                  generic construction
 │     ├─ ShortExact.singleTriangle       Mathlib triangle construction
@@ -101,11 +108,23 @@ Category
 ├─ DGCategory C
 │  ├─ DGLinear k C                       scalar refinement
 │  │  ├─ homComplex                     existing Hom-complex repackaged in ModuleCat k
-│  │  ├─ postcompCochain                fixed-source right composition, k-linear in the morphism
+│  │  ├─ postcompCochain                fixed-source right composition, linear chain-map law
+│  │  ├─ Cdg (ModuleCat k)             standard model inherits Mathlib's k-linear structure
 │  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
+│  │     ├─ homComplexIso               representing equivalence, compatible with differentials
+│  │     ├─ coefficientMap              homogeneous coefficient action, strict in composition
 │  │     ├─ lift / lift_unique           linear cochains are morphisms out of Z
-│  │     ├─ compare                      closed canonical comparison, strict composition
+│  │     ├─ compare / compareIso         strict comparison, packaged as a Z⁰ isomorphism
+│  │     ├─ scalar-unit witness         single⁰(k) ⊗ X represents X itself
 │  │     ├─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
+│  │     │  └─ linearCopowerFunctor    Cdg(ModuleCat k) ⟶ C, k-linear dg functor
+│  │     │     ├─ selected H⁰ invariance is a HomotopyCategory/DGEnhancement leaf
+│  │     │     │  └─ LinearCopowerFiniteFree
+│  │     │     │     ├─ basis expansion of a degree-zero copower
+│  │     │     │     └─ finite-free finrank specialization
+│  │     │     └─ finite presentation transport
+│  │     │        ├─ finite biproduct of shifted degree-zero copowers in H⁰ C
+│  │     │        └─ nested finite biproduct of shifts of X with finrank multiplicity
 │  │     └─ LinearEvaluationData k E     scalar-linear Hom(E,-) ⊗ E assembly
 │  │        ├─ functor                   k-linear dg functor
 │  │        ├─ evaluation                closed degree-zero map to the identity

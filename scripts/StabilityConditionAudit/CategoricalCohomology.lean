@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
+import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
 import DerivedAlgGeo.Algebra.Homology.Localization
 import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNaturality
@@ -34,6 +35,19 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.shortComplexFunctor_preservesColimitsOfShape
 #print axioms HomologicalComplex.homologyFunctor_preservesColimitsOfShape
 #print axioms Homotopy.sigma
+#print axioms CochainComplex.finiteCohomologyModel
+#print axioms CochainComplex.finiteCohomologyModelHomologyIso
+#print axioms CochainComplex.FiniteCohomologyPresentation
+#print axioms CochainComplex.FiniteCohomologyPresentation.degrees
+#print axioms CochainComplex.FiniteCohomologyPresentation.homotopyEquiv
+#print axioms CochainComplex.FiniteCohomologyPresentation.mk.inj
+#print axioms CochainComplex.FiniteCohomologyPresentation.mk.sizeOf_spec
+#print axioms CochainComplex.finiteCohomologyModelIsoShifted
+#print axioms CochainComplex.FiniteCohomologyPresentation.pullback
+#print axioms CochainComplex.FiniteCohomologyPresentation.pullback_degrees
+#print axioms CochainComplex.FiniteCohomologyPresentation.homologyIso
+#print axioms CochainComplex.FiniteCohomologyPresentation.isZero_homology_of_not_mem
+#print axioms CochainComplex.FiniteCohomologyPresentation.shiftedHomotopyEquiv
 #print axioms HomotopyCategory.cofanDesc
 #print axioms HomotopyCategory.cofanDesc_fac
 #print axioms HomotopyCategory.cofanDesc_uniq
