@@ -7,6 +7,32 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Bounded-derived `K₀` comparison and geometric class-map transport
+  (2026-09-12): `DerivedCategory.boundedHeartToAmbient` is the direct
+  standard-heart map `K₀Ab(A) →+ K₀(Dᵇ(A))`, and bounded cohomological
+  dévissage proves that it is inverse to `boundedEulerClassHom`.  The proof
+  handles shifted single objects with the parity formula for `K₀`, lifts the
+  truncation triangles into the bounded full subcategory, and uses triangle
+  additivity; it does not assume the comparison.  Consequently
+  `boundedDerivedClassMap` canonically transports any supplied additive class
+  map on `K₀Ab(A)` to `K₀(Dᵇ(A))`.  For coherent sheaves,
+  `K3MukaiTilt.derivedMukaiClass` applies this construction to the existing
+  numerical-realization Mukai class and proves the former ambient restriction
+  obligation automatically.  The canonical tilt constructor therefore no
+  longer asks for an arbitrary ambient map or compatibility proof.  It still
+  exposes exactly the geometric inputs not proved here: Grothendieck slope
+  boundedness (the remaining `MuHNInput` field on a Noetherian scheme), the
+  Hilbert/numerical normalization, dimension-zero Mukai-class classification,
+  Hodge positivity, and the boundary Mukai decomposition.
+- Bounded-derived cohomological Euler classes (2026-09-12):
+  `K₀Ab.of_exact` expresses the middle term of an exact pair through its two
+  image classes, and `K₀Ab.eulerClass_add_of_exact` telescopes those identities
+  over a finitely supported integer-indexed long exact sequence. For every
+  abelian category `A`, `DerivedCategory.boundedEulerClassHom` then gives the
+  canonical map `K₀(Dᵇ(A)) →+ K₀Ab(A)` by alternating bounded cohomology.
+  This file constructs only the cohomological direction; the separate
+  comparison entry above supplies the inverse by dévissage rather than
+  assuming a Grothendieck-group equivalence.
 - Degreewise ambient coherent Ext-finiteness on projective varieties
   (2026-09-12):
   `ProjectivePresentation.module_finite_ambientExt` combines unconditional
