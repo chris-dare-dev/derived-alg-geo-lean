@@ -12,8 +12,9 @@ The generic functorial-cone formula specializes to scalar-linear evaluation:
 
 `[T_E X] = [X] - [DGLinear.homComplex k E X ⊗ₖ E]`.
 
-If the evaluation functor preserves chosen cones, the same identity holds for
-the induced endomorphisms of `K₀`.  No Euler-characteristic identification is
+Automatic dg-functor exactness upgrades the same identity to induced
+endomorphisms of `K₀`; the current theorem retains a redundant witness
+argument.  No Euler-characteristic identification is
 used here; that numerical specialization belongs to `SphericalTwist`.
 -/
 
@@ -49,8 +50,8 @@ theorem twistK₀Of (X : H0 C) :
       rfl
 
 set_option backward.isDefEq.respectTransparency false in
-/-- If scalar-linear evaluation preserves chosen cones, the object twist acts
-on `K₀` by the identity minus evaluation. -/
+/-- The scalar-linear object twist acts on `K₀` by identity minus evaluation.
+The cone argument is retained for source compatibility and is redundant. -/
 theorem twistK₀Map (hVc : DGFunctor.PreservesChosenCones V.functor) :
     letI : K.twist.h0.CommShift ℤ :=
       DGFunctor.commShift _ K.preservesShifts

@@ -56,8 +56,8 @@ theorem twistK₀Of (X : H0 C) :
       rfl
 
 set_option backward.isDefEq.respectTransparency false in
-/-- If the evaluation functor preserves chosen cones, the object twist acts on
-`K₀` by the identity minus the evaluation functor. -/
+/-- The object twist acts on `K₀` by identity minus evaluation.  The cone
+argument is retained for source compatibility and is redundant. -/
 theorem twistK₀Map (hVc : DGFunctor.PreservesChosenCones V.functor) :
     letI : K.twist.h0.CommShift ℤ := K.twistH0CommShift
     letI : K.twist.h0.IsTriangulated := K.twistH0IsTriangulated hVc

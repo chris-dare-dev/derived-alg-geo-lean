@@ -10,9 +10,10 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Triangle
 
 `DGFunctor.PreservesShifts` and `DGFunctor.PreservesChosenCones` are dg-level
 capabilities, owned by `Algebra/Homology/DGCategory/Pretriangulated/Functor.lean`.
-This file spends them on the ordinary functor `H⁰(F)`: the chosen shift
-witnesses assemble into a `CommShift`, and cone-generator preservation makes
-that functor triangulated.
+Every dg functor has both capabilities.  This file spends them on the ordinary
+functor `H⁰(F)`: `h0CommShift` packages the chosen shift witnesses into a
+`CommShift`, and `h0IsTriangulated` proves that every dg functor between
+pretriangulated dg categories induces a triangulated functor.
 
 `H0/Triangle.lean` owns the distinguished triangles of `H⁰` and the
 pretriangulated instance; everything here consumes them, which is why the
@@ -322,12 +323,24 @@ noncomputable def commShift (F : DGFunctor C D)
     rw [Functor.CommShift.isoAdd_hom_app, H0.shiftFunctorAdd_eq]
     exact shiftCommIso_add_hom_app F hF a b X
 
+/-- The canonical coherent shift package on `H⁰(F)` for an arbitrary dg
+functor between pretriangulated dg categories.
+
+This is an explicit definition rather than a global instance so that callers
+can control which comparison is used when several naturally isomorphic
+functor presentations are in scope. -/
+@[reducible]
+noncomputable def h0CommShift (F : DGFunctor C D)
+    [IsPretriangulated C] [IsPretriangulated D] : F.h0.CommShift ℤ :=
+  commShift F (preservesShifts F)
+
 /-- Preservation data for the cone generators of `H⁰`.
 
 This is the reusable exactness seam for a dg functor: it asks that the image of
 each chosen dg cone triangle be isomorphic to a cone triangle in the target.
-It does not assert that an arbitrary dg functor has this property, nor does it
-duplicate `Functor.IsTriangulated` as a field. -/
+The record itself is only the weak generator condition; the theorem below
+constructs it for every dg functor from the strong split-cone witness.  It does
+not duplicate `Functor.IsTriangulated` as a field. -/
 structure PreservesConeTriangles (F : DGFunctor C D)
     [IsPretriangulated C] [IsPretriangulated D] [F.h0.CommShift ℤ] : Prop where
   /-- The image of a dg cone triangle is a target cone triangle up to triangle
@@ -457,6 +470,19 @@ theorem isTriangulated_of_preservesShifts_and_chosenCones
   letI : F.h0.CommShift ℤ := commShift F hShift
   exact isTriangulated_of_preservesConeTriangles F
     (preservesConeTriangles_of_preservesChosenCones F hShift hCone)
+
+/-- **Every dg functor between pretriangulated dg categories induces a
+triangulated functor on `H⁰`.**
+
+The shift and cone packages are selected explicitly rather than installed as
+global instances. -/
+theorem h0IsTriangulated
+    (F : DGFunctor C D) [IsPretriangulated C] [IsPretriangulated D] :
+    letI : F.h0.CommShift ℤ := h0CommShift F
+    F.h0.IsTriangulated := by
+  letI : F.h0.CommShift ℤ := h0CommShift F
+  exact isTriangulated_of_preservesShifts_and_chosenCones F
+    (preservesShifts F) (preservesChosenCones F)
 
 end DGFunctor
 

@@ -456,12 +456,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.id
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.comp
 
--- Every dg functor preserves shifts.  A shift element is a closed, two-sided
--- invertible element of degree `-n` (`IsShiftBy.inv`, `hom_inv`, `inv_hom`),
--- and a dg functor preserves composition and identities on the nose, so it
--- carries invertible elements to invertible ones.  `PreservesShifts` therefore
--- costs a caller nothing.  `PreservesChosenCones` is not like this and remains
--- a genuine hypothesis: a cone is not an invertible element.
+-- Every dg functor preserves shifts and the repository's strong split cone
+-- witnesses.  For cones, the mapped `fst` and `snd` projections are an
+-- explicit inverse to the mapped splitting map; the five matrix identities
+-- survive because dg functors preserve addition, composition, zero, and
+-- identities.  Neither capability costs a caller an additional hypothesis.
 #print axioms CategoryTheory.DGFunctor.preservesShifts
 #print axioms CategoryTheory.DGFunctor.mapHomotopySquare
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones
@@ -471,6 +470,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_fst
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_snd
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_toShift
+#print axioms CategoryTheory.DGFunctor.preservesChosenCones
 #print axioms CategoryTheory.DGFunctor.mapShift_inv_eq
 #print axioms CategoryTheory.DGFunctor.map_mapShift
 #print axioms CategoryTheory.DGFunctor.map_compare
@@ -478,11 +478,13 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftCommIso_zero_hom_app
 #print axioms CategoryTheory.DGFunctor.shiftCommIso_add_hom_app
 #print axioms CategoryTheory.DGFunctor.commShift
+#print axioms CategoryTheory.DGFunctor.h0CommShift
 #print axioms CategoryTheory.DGFunctor.PreservesConeTriangles
 #print axioms CategoryTheory.DGFunctor.preservesConeTriangles_of_preservesChosenCones
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesConeTriangles
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesShifts_and_coneTriangles
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones
+#print axioms CategoryTheory.DGFunctor.h0IsTriangulated
 
 -- The instance itself (dg-enhancements-e6, #377): the completion axiom for
 -- arbitrary distinguished triangles, the five axioms H⁰ proves, and the
@@ -1048,13 +1050,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
 
--- A cone functor preserves chosen cones when its two ends do, so the twist
--- candidate of a dg adjunction is exact as soon as the adjoints are.  That
--- argument is the cone splitting rather than a computation: in the coordinates
--- of the splittings the map is block diagonal, with one sign.  The shift
--- versions below take no arguments at all -- `DGFunctor.preservesShifts` holds
--- for every dg functor, so the cone splitting is not needed for them and the
--- specialised proofs were removed.
+-- The structured cone-functor constructor computes chosen-cone preservation
+-- from its endpoints.  Its block-diagonal proof remains useful even though
+-- `DGFunctor.preservesChosenCones` makes the endpoint arguments redundant for
+-- exactness consumers.  The shift versions likewise retain useful names over
+-- the unconditional generic capability.
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compRight_functor_map
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesShifts
@@ -1292,9 +1292,9 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.LinearEvaluationData.compare_comp_evaluation
 
 -- The direct scalar-linear object twist is a thin specialization of the
--- generic cone package.  Choice comparison and exactness reuse the existing
--- strict-square and cone-preservation interfaces; exactness of evaluation
--- remains explicit input.  Its generic K₀ formulas give identity minus
+-- generic cone package.  Choice comparison reuses the existing strict-square
+-- interface, while exactness follows automatically for every dg functor.
+-- The legacy leaf still accepts a redundant cone witness.  Its generic K₀ formulas give identity minus
 -- evaluation.  The numerical spherical-twist specialization is audited by
 -- the spherical-twist slice, while the HomFiniteBounded realization below
 -- supplies its Euler witness automatically.
@@ -1400,12 +1400,10 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_self
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans
 
--- Exactness of the object twist.  The shift half is free -- every dg functor
--- preserves shifts, `DGFunctor.preservesShifts` -- so only the cone half is a
--- hypothesis, and it is `RHom(E,-) ⊗ E`'s.  That one stays open:
--- `PreservesChosenCones` asks that maps into the cone split, while
--- `IsCopowerOf` is a mapping-out property.  Exact is not autoequivalence; the
--- object twist has no autoequivalence statement.
+-- Exactness of the object twist is automatic: every dg functor preserves both
+-- shifts and the repository's strong split cones.  The object-specific
+-- wrappers below retain redundant witness arguments for source compatibility.
+-- Exact is not autoequivalence; the object twist has no autoequivalence statement.
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesShifts
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesChosenCones
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0CommShift

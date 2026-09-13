@@ -7,6 +7,17 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Automatic dg-functor cone preservation and H⁰ exactness (2026-09-13):
+  `DGFunctor.preservesChosenCones` maps a supplied strong split cone witness
+  through an arbitrary dg functor.  The images of `IsConeOf.fst` and `.snd`
+  give an explicit inverse to the target splitting map, so fullness,
+  pretriangulated existence, copowers, and endpoint hypotheses are unnecessary.
+  Together with the existing automatic shift preservation,
+  `DGFunctor.h0CommShift` and `h0IsTriangulated` package the canonical
+  non-instance conclusion that every dg functor between pretriangulated dg
+  categories induces a triangulated functor on `H⁰`.  The capability
+  structures and their `id`/`comp`/`ofIso` constructors remain as useful named
+  data; no global `CommShift` or `IsTriangulated` instance is installed.
 - Finite-support comparison for formal complexes (2026-09-13):
   `Homotopy.FiniteCohomologyPresentation` owns the categorical comparison from
   the full zero-differential homology model to the existing finite-biproduct
@@ -119,8 +130,9 @@ blocks should normally move it rather than add more declarations beside it.
   `HomotopyCategory/DGEnhancement/LinearEvaluationK0` owns the realization:
   the supplied-presentation theorem remains reusable, while
   `IsEulerCopower.ofHomFiniteBounded` constructs that family automatically
-  when all linear copowers exist.  It does not make the evaluation functor
-  exact or compare the additive and scalar-linear universal properties.
+  when all linear copowers exist.  Exactness is supplied independently by the
+  generic dg-functor theorem; this result does not compare the additive and
+  scalar-linear universal properties.
 - Direct scalar-linear object twist on `K₀` (2026-09-12):
   `DGCategory.Pretriangulated.LinearObjectTwist` packages the cone of the
   scalar-linear evaluation transformation as
@@ -134,9 +146,10 @@ blocks should normally move it rather than add more declarations beside it.
   `DGEnhancement.LinearObjectTwistK0` discharges that predicate automatically
   from `HomFiniteBounded` and all linear copowers.  This path does not pass
   through additive `EvaluationData`.
-  Evaluation exactness remains an explicit hypothesis, and no autoequivalence,
-  sphericality, naturality of formality, or comparison of the two copower
-  universal properties is claimed.
+  Exactness is automatic for the underlying dg functors; the current leaf
+  still accepts a redundant witness pending the immediate consumer cutover.
+  No autoequivalence, sphericality, naturality of formality, or comparison of
+  the two copower universal properties is claimed.
 - Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
   `DGCategory.LinearCopowerFunctor` packages the universal property as a
   degreewise `homComplexIso`, then uses it to define the homogeneous
@@ -201,12 +214,12 @@ blocks should normally move it rather than add more declarations beside it.
 - Object-twist `K₀` action and Euler-realization boundary (2026-09-12):
   `DGEnhancement.H0.NaturalTransformationConeK0` owns the reusable theorem
   that a functorial cone acts on `K₀` by target endpoint minus source
-  endpoint, both on generators and, under endpoint cone preservation, as a
+  endpoint, both on generators and, via automatic dg-functor exactness, as a
   homomorphism.  The object twist specializes this to identity minus its
   evaluation functor.  `DGEnhancement.H0.ObjectTwistK0` owns the explicit,
   choice-invariant `EvaluationData.IsEulerCopower` capability saying exactly
   when that evaluation class is the Euler multiple of `[E]`.  Together with
-  chosen-cone preservation, the spherical consumer proves that the induced
+  that exactness, the spherical consumer proves that the induced
   object-twist map equals the existing numerical `twistK₀`.
   This capability is supplied realization input, not a consequence of the
   present additive `IsCopowerOf`, which represents ℤ-additive rather than
@@ -223,8 +236,8 @@ blocks should normally move it rather than add more declarations beside it.
   formality remains a separate later lane.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
-  directly from the distinguished adjunction triangles and lifts them, under
-  the existing endpoint chosen-cone hypotheses, to equalities of `K₀`
+  directly from the distinguished adjunction triangles and lifts them, via
+  automatic dg-functor exactness, to equalities of `K₀`
   homomorphisms.  Each conventional twist or cotwist acts as the identity
   minus its corresponding adjunction composite.  This does not identify an
   object-twist evaluation composite with an Euler multiple of the object;
@@ -244,10 +257,10 @@ blocks should normally move it rather than add more declarations beside it.
   by the same route.  Both are explicit interfaces, not global instances.
   The underlying `H⁰` capability transport now also keeps independent source
   and target object universes, matching the shifted-functor comparison API.
-  The conventional `[-1]` dual twist and cotwist now reuse this root, so their
-  exactness asks only for the same endpoint chosen-cone preservation as their
-  unshifted cones.  This proves no dg quasi-equivalence, cone relation, or
-  sphericality.
+  The conventional `[-1]` dual twist and cotwist now reuse this root.  Their
+  specialized wrappers still accept redundant endpoint witnesses, but
+  exactness itself is automatic.  This proves no dg quasi-equivalence, cone
+  relation, or sphericality.
 - Sign-correct exactness of integral shift functors (2026-09-12):
   `Triangulated.ShiftFunctor` now owns the explicit Koszul-signed `CommShift`
   on `[n]`, its comparison with `Triangle.shiftFunctor`, and
@@ -261,8 +274,8 @@ blocks should normally move it rather than add more declarations beside it.
   `EnhancedAdjunctionCones` now exposes shift preservation, chosen-cone
   preservation, the induced `H⁰` `CommShift`, and triangulatedness for the
   twist, dual cotwist, and the unshifted cones underlying the dual twist and
-  cotwist.  Every result reuses the generic adjunction-cone 3-by-3 theorem and
-  asks only for preservation of chosen cones by the relevant adjoint pair.
+  cotwist.  The retained wrappers reuse the generic adjunction-cone 3-by-3
+  theorem and still accept now-redundant endpoint witnesses.
   Exactness for the two conventional `[-1]` shifted functors is obtained in
   the separate shifted-dg-functor root above.  No cone relation, equivalence,
   or sphericality follows.
@@ -384,9 +397,9 @@ blocks should normally move it rather than add more declarations beside it.
 - DG cone comparison and preservation transport (2026-09-12):
   `Algebra/Homology/DGCategory/Pretriangulated/Functor.lean` proves that
   `DGFunctor.PreservesChosenCones` transports across an isomorphism in
-  `Z⁰ (DGFunctor C D)`.  Consequently the exactness hypothesis for an object
-  twist is independent of the chosen evaluation data once the evaluation
-  functors are compared.  `Pretriangulated/Lift.lean` owns the reusable
+  `Z⁰ (DGFunctor C D)`.  This remains useful compatibility data even though
+  every dg functor now supplies the capability directly.
+  `Pretriangulated/Lift.lean` owns the reusable
   `IsConeOf.isoOfStrictSquare`: endpoint isomorphisms in a strictly commuting
   square lift to an isomorphism between arbitrary chosen cones.
   `Pretriangulated/NaturalTransformationCone.lean` specializes it to cone dg
@@ -404,8 +417,9 @@ blocks should normally move it rather than add more declarations beside it.
   that canonical copower comparisons are closed and compose strictly, then
   assembles these into `EvaluationData.compareIso` in
   `Z⁰ (DGFunctor C C)` with strict compatibility with evaluation. No
-  concrete dg category is asserted to have all copowers, and no cone-
-  preservation claim is derived from the mapping-out universal property.
+  concrete dg category is asserted to have all copowers.  Generic cone
+  preservation is derived from the cone's split matrix identities, not from
+  this mapping-out universal property.
 - Exact functor-family shift coherence (2026-09-12):
   `CategoryTheory/Triangulated/ExactFunctorFamily.lean` now makes
   `Functor.ExactFamily F` extend Mathlib's `F.CommShift ℤ` for the pointwise

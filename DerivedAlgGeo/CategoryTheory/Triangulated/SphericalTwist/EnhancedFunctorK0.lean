@@ -9,9 +9,9 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorH
 # Grothendieck-group actions of enhanced adjunction cones
 
 The four distinguished adjunction triangles determine the `K₀` class of
-each conventional twist or cotwist value.  Under chosen-cone preservation for
-the two endpoints, exactness upgrades those generator formulas to equalities
-of homomorphisms on `K₀`.
+each conventional twist or cotwist value.  Automatic dg-functor exactness
+upgrades those generator formulas to equalities of homomorphisms on `K₀`;
+the current specialized wrappers retain redundant endpoint arguments.
 
 These formulas stop at the adjunction composites.  Identifying an
 object-twist evaluation composite with
@@ -50,8 +50,8 @@ theorem twistFunctorK₀Of (X : H0 B) :
   abel
 
 set_option backward.isDefEq.respectTransparency false in
-/-- When `S` and `R` preserve chosen cones, the twist acts on `K₀` by the
-identity minus the adjunction composite. -/
+/-- The twist acts on `K₀` by identity minus the adjunction composite.  The
+endpoint arguments are retained for compatibility and are redundant. -/
 theorem twistFunctorK₀Map
     (hSc : DGFunctor.PreservesChosenCones S)
     (hRc : DGFunctor.PreservesChosenCones R) :
@@ -95,8 +95,9 @@ theorem dualTwistFunctorK₀Of (X : H0 B) :
   abel
 
 set_option backward.isDefEq.respectTransparency false in
-/-- When `L` and `S` preserve chosen cones, the dual twist acts on `K₀` by
-the identity minus the left-adjunction composite. -/
+/-- The dual twist acts on `K₀` by identity minus the left-adjunction
+composite.  The endpoint arguments are retained for compatibility and are
+redundant. -/
 theorem dualTwistFunctorK₀Map
     (hLc : DGFunctor.PreservesChosenCones L)
     (hSc : DGFunctor.PreservesChosenCones S) :
@@ -145,8 +146,8 @@ theorem cotwistFunctorK₀Of (X : H0 A) :
   abel
 
 set_option backward.isDefEq.respectTransparency false in
-/-- When `S` and `R` preserve chosen cones, the cotwist acts on `K₀` by the
-identity minus the right-adjunction composite. -/
+/-- The cotwist acts on `K₀` by identity minus the right-adjunction composite.
+The endpoint arguments are retained for compatibility and are redundant. -/
 theorem cotwistFunctorK₀Map
     (hSc : DGFunctor.PreservesChosenCones S)
     (hRc : DGFunctor.PreservesChosenCones R) :
@@ -190,8 +191,9 @@ theorem dualCotwistFunctorK₀Of (X : H0 A) :
   abel
 
 set_option backward.isDefEq.respectTransparency false in
-/-- When `L` and `S` preserve chosen cones, the dual cotwist acts on `K₀` by
-the identity minus the left-adjunction composite. -/
+/-- The dual cotwist acts on `K₀` by identity minus the left-adjunction
+composite.  The endpoint arguments are retained for compatibility and are
+redundant. -/
 theorem dualCotwistFunctorK₀Map
     (hLc : DGFunctor.PreservesChosenCones L)
     (hSc : DGFunctor.PreservesChosenCones S) :

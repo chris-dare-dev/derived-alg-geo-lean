@@ -133,9 +133,9 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistH0Equivalence
 
 -- Exactness for all four stored cone functors and for the conventional
--- `[-1]` dual twist and cotwist: shift preservation is unconditional;
--- chosen-cone preservation and triangulatedness require the relevant endpoint
--- witnesses.  The two conventional functors use the generic sign-correct
+-- `[-1]` dual twist and cotwist is unconditional at the dg-functor level.
+-- The current specialized wrappers retain redundant endpoint witnesses, and
+-- the two conventional functors use the generic sign-correct
 -- shifted-dg-functor interface.  This is not sphericality: that needs all four
 -- Anno--Logvinenko conditions and Morita quasi-functors.
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistPreservesShifts
@@ -162,8 +162,8 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.cotwistH0EquivalenceIsTriangulated
 
 -- The four distinguished adjunction triangles determine the object classes
--- of their conventional functors.  Under endpoint cone preservation these
--- lift to map equalities: identity minus the appropriate adjunction composite.
+-- of their conventional functors.  Automatic dg-functor exactness lifts these
+-- to map equalities: identity minus the appropriate adjunction composite.
 -- No Euler-pairing or numerical spherical-reflection formula is used here.
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctorK₀Of
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctorK₀Map
@@ -181,8 +181,8 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Map_eq_twistK₀
 
 -- Scalar-linear evaluation reaches the same numerical formula directly,
--- without an adapter to the additive evaluation package.  Cone preservation
--- remains explicit input to the endomorphism-level statement.
+-- without an adapter to the additive evaluation package.  The current
+-- endomorphism wrapper retains a redundant cone-preservation argument.
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of_eq_twistK₀
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map_eq_twistK₀
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist

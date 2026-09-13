@@ -30,8 +30,8 @@ functors' `K₀` actions as the identity minus the corresponding adjunction
 composite.  The additive and scalar-linear object-twist cones similarly act
 as identity minus their evaluation functors.  Their parallel explicit
 `IsEulerCopower` capabilities identify object classes with the existing
-numerical `twistK₀` formula; together with chosen-cone preservation they
-identify the induced maps.  The scalar-linear path requires no adapter to the
+numerical `twistK₀` formula; automatic dg-functor exactness identifies the
+induced maps.  The scalar-linear path requires no adapter to the
 incompatible additive universal property.  It
 deliberately stops short of asserting sphericality: the
 adjoint-comparison maps and the Morita/higher-cone theorem of
