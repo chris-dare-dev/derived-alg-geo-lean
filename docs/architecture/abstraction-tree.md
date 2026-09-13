@@ -208,6 +208,7 @@ Category
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
 │  │     └─ H0Presentation                supplied endpoint isos after equivalence transport
+│  │        └─ Fourier--Mukai adapters     existing left/right adjoint-kernel data
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps
 │  │  │  └─ strict                      a commuting square with zero homotopy
