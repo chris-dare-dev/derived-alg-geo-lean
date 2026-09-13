@@ -360,6 +360,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    adjunction counit.  It introduces neither a second comparison map nor an
    invertibility or sphericality conclusion.
 
+   The formally dual law `DGAdjunction.h0_whiskerRight_unit` identifies the
+   descended right-whiskered dg unit with ordinary right whiskering of
+   `h0Unit`, through the left unitor, associator, and canonical compositors.
+   `UnitConeData.cotwistAdjointComparisonH0_eq_h0Unit_comp_inrH0` combines
+   it with the generic descent law for the left-whiskered cone inclusion,
+   factoring the unshifted comparison `R ⟶ C L` through the ordinary unit
+   and descended `inr`.  The conventional cotwist remains `F = C[-1]`; its
+   existing `[-1][1]` cancellation stays a separate shift-coherence step, so
+   this factorization claims no new shifted comparison.
+
    `DGAdjunction.h0` now compares a dg adjunction with an
    ordinary one on `H⁰`.  `DGAdjunction.H0Presentation` further conjugates
    that adjunction through supplied equivalences from the two homotopy

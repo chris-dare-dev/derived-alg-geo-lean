@@ -28,9 +28,10 @@ changes no component, so the two triangle identities below reduce to
 representative, with no homotopy and no sign.
 
 The same comparison coherence normalizes a descended left-whiskered dg
-counit to ordinary left whiskering of `h0Counit`, including the canonical
-functor associator and right unitor.  This is kept at the generic adjunction
-root so cone and twist consumers do not repeat the component calculation.
+counit and a descended right-whiskered dg unit to ordinary whiskering of
+`h0Counit` and `h0Unit`, including the canonical functor associators and
+unitors.  These laws are kept at the generic adjunction root so cone and twist
+consumers do not repeat the calculation.
 
 ## What this does not say
 
@@ -168,6 +169,112 @@ theorem h0_whiskerLeft_counit {E : Type u''} [DGCategory.{v} E]
         _ = _ := by
           convert h₂ using 1
           all_goals simp only [DGFunctor.comp_id]
+
+/-- Descending a right-whiskered dg unit is ordinary right whiskering of the
+`H⁰` unit, after the canonical unitor, associator, and compositor
+comparisons.  The trailing compositor presents the target as
+`L.h0 ⋙ (R.comp P).h0`. -/
+theorem h0_whiskerRight_unit {E : Type u''} [DGCategory.{v} E]
+    (A : DGAdjunction L R) (P : DGFunctor C E) :
+    DGFunctor.HomogeneousNatTrans.h0
+          (DGFunctor.HomogeneousNatTrans.whiskerRight A.unit P)
+          (A.unit_isClosed.whiskerRight P) ≫
+        (DGFunctor.h0CompIso L (R.comp P)).hom =
+      (Functor.leftUnitor P.h0).inv ≫
+        Functor.whiskerRight A.h0Unit P.h0 ≫
+            (Functor.associator L.h0 R.h0 P.h0).hom ≫
+            Functor.whiskerLeft L.h0 (DGFunctor.h0CompIso R P).inv := by
+  let cAssoc : ((L.comp R).comp P).h0 ≅ L.h0 ⋙ (R.comp P).h0 :=
+    DGFunctor.h0CompIso L (R.comp P)
+  change DGFunctor.HomogeneousNatTrans.h0
+      (DGFunctor.HomogeneousNatTrans.whiskerRight A.unit P)
+      (A.unit_isClosed.whiskerRight P) ≫ cAssoc.hom = _
+  have hwhisk := DGFunctor.HomogeneousNatTrans.h0_whiskerRight
+    A.unit A.unit_isClosed P
+  calc
+    _ = ((DGFunctor.h0CompIso (DGFunctor.id C) P).hom ≫
+          Functor.whiskerRight
+            (DGFunctor.HomogeneousNatTrans.h0 A.unit A.unit_isClosed) P.h0 ≫
+          (DGFunctor.h0CompIso (L.comp R) P).inv) ≫
+        cAssoc.hom :=
+      congrArg
+        (fun τ => τ ≫ cAssoc.hom) hwhisk
+    _ = _ := by
+      have hunit :
+          DGFunctor.HomogeneousNatTrans.h0 A.unit A.unit_isClosed =
+            (DGFunctor.h0IdIso (C := C)).hom ≫ A.h0Unit ≫
+              (DGFunctor.h0CompIso L R).inv := by
+        unfold h0Unit
+        simp
+      rw [hunit, Functor.whiskerRight_comp, Functor.whiskerRight_comp]
+      have hleftUnit :
+          (DGFunctor.h0CompIso (DGFunctor.id C) P).hom ≫
+              Functor.whiskerRight (DGFunctor.h0IdIso (C := C)).hom P.h0 =
+            (Functor.leftUnitor P.h0).inv := by
+        have h := congrArg Iso.hom (DGFunctor.h0CompIso_id_comp P)
+        rw [← cancel_mono (Functor.leftUnitor P.h0).hom]
+        simp only [Iso.trans_hom, Functor.isoWhiskerRight_hom,
+          Iso.refl_hom] at h
+        convert h using 1
+        all_goals simp
+      have hassocInv :
+          (Functor.associator L.h0 R.h0 P.h0).inv ≫
+              Functor.whiskerRight (DGFunctor.h0CompIso L R).inv P.h0 ≫
+                (DGFunctor.h0CompIso (L.comp R) P).inv =
+            Functor.whiskerLeft L.h0 (DGFunctor.h0CompIso R P).inv ≫
+              cAssoc.inv := by
+        have h := congrArg Iso.inv (DGFunctor.h0CompIso_assoc L R P)
+        simp only [Iso.trans_inv, Functor.isoWhiskerRight_inv,
+          Functor.isoWhiskerLeft_inv, Category.assoc] at h
+        convert h using 1
+        all_goals rfl
+      have hassoc' :
+          Functor.whiskerRight (DGFunctor.h0CompIso L R).inv P.h0 ≫
+              (DGFunctor.h0CompIso (L.comp R) P).inv ≫
+                cAssoc.hom =
+            (Functor.associator L.h0 R.h0 P.h0).hom ≫
+              Functor.whiskerLeft L.h0 (DGFunctor.h0CompIso R P).inv := by
+        ext X
+        simp only [NatTrans.comp_app]
+        have hX := congrArg (fun τ => τ.app X) hassocInv
+        simp only [NatTrans.comp_app] at hX
+        calc
+          _ = (Functor.associator L.h0 R.h0 P.h0).hom.app X ≫
+                ((Functor.associator L.h0 R.h0 P.h0).inv.app X ≫
+                  (Functor.whiskerRight
+                    (DGFunctor.h0CompIso L R).inv P.h0).app X ≫
+                  (DGFunctor.h0CompIso (L.comp R) P).inv.app X) ≫
+                cAssoc.hom.app X := by
+            symm
+            rw [Category.assoc, Iso.hom_inv_id_app_assoc]
+            exact Category.assoc _ _ _
+          _ = (Functor.associator L.h0 R.h0 P.h0).hom.app X ≫
+                ((Functor.whiskerLeft L.h0
+                    (DGFunctor.h0CompIso R P).inv).app X ≫
+                  cAssoc.inv.app X) ≫
+                cAssoc.hom.app X :=
+            congrArg
+              (fun f => (Functor.associator L.h0 R.h0 P.h0).hom.app X ≫
+                f ≫ cAssoc.hom.app X) hX
+          _ = _ := by
+            simp only [Category.assoc, Iso.inv_hom_id_app,
+              Category.comp_id]
+      have h₁ := congrArg
+        (fun τ => τ ≫ Functor.whiskerRight A.h0Unit P.h0 ≫
+          Functor.whiskerRight (DGFunctor.h0CompIso L R).inv P.h0 ≫
+            (DGFunctor.h0CompIso (L.comp R) P).inv ≫
+              cAssoc.hom) hleftUnit
+      have h₂ := congrArg
+        (fun τ => (Functor.leftUnitor P.h0).inv ≫
+          Functor.whiskerRight A.h0Unit P.h0 ≫ τ) hassoc'
+      calc
+        _ = (Functor.leftUnitor P.h0).inv ≫
+              Functor.whiskerRight A.h0Unit P.h0 ≫
+                Functor.whiskerRight (DGFunctor.h0CompIso L R).inv P.h0 ≫
+                  (DGFunctor.h0CompIso (L.comp R) P).inv ≫
+                    cAssoc.hom := by
+          simpa only [DGFunctor.id_comp, Category.assoc] using h₁
+        _ = _ := h₂
 
 /-- **A dg adjunction induces an adjunction on `H⁰`.**
 
