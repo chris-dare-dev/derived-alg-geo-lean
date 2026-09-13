@@ -70,6 +70,12 @@ abbrev projectObj (X : C) : C :=
 abbrev ambientProjection : C ⥤ C :=
   Q.projection ⋙ P.ι
 
+/-- Equality transport does not change the underlying ambient projection. -/
+def ofEqAmbientIso {P' : ObjectProperty C} (h : P = P') :
+    (Q.ofEq h).ambientProjection ≅ Q.ambientProjection := by
+  subst h
+  exact Iso.refl _
+
 /-- The counit map from the projected ambient object to its source. -/
 abbrev counitApp (X : C) : Q.projectObj X ⟶ X :=
   Q.adjunction.counit.app X
