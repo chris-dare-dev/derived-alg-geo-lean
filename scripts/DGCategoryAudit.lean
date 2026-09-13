@@ -1239,6 +1239,16 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- comparison.
 #print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerK₀Of
 
+-- Hom-complex cohomology and selected shifts have the same junk-total Euler
+-- characteristic.  Supplied finite cohomology presentations then compute the
+-- object classes of scalar-linear evaluation through the shared rank-one K₀
+-- interface.  This adds neither formality nor exactness of the evaluation
+-- functor and supplies no adapter to additive evaluation data.
+#print axioms CategoryTheory.H0.homComplex_homologyEulerChar_eq_chiHom
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofCompare
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofFiniteCohomologyPresentations
+
 -- Scalar-linear evaluation data assembles the linear copowers at a fixed
 -- object into a `k`-linear dg functor and a closed evaluation transformation.
 -- Its existence selector is choice-independent up to a coherent canonical
@@ -1275,6 +1285,29 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.LinearEvaluationData.compareIso_self
 #print axioms CategoryTheory.LinearEvaluationData.compareIso_trans
 #print axioms CategoryTheory.LinearEvaluationData.compare_comp_evaluation
+
+-- The direct scalar-linear object twist is a thin specialization of the
+-- generic cone package.  Choice comparison and exactness reuse the existing
+-- strict-square and cone-preservation interfaces; exactness of evaluation
+-- remains explicit input.  Its generic K₀ formulas give identity minus
+-- evaluation; the numerical spherical-twist specialization is audited by the
+-- spherical-twist slice.
+#print axioms CategoryTheory.LinearEvaluationData.preservesChosenConesOfCompare
+#print axioms CategoryTheory.LinearEvaluationData.compare_evaluation_square
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData
+#print axioms CategoryTheory.LinearEvaluationData.chosenTwistConeData
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twist
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_inv_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val_comp
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesShifts
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesChosenCones
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map
 
 -- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
 -- identity.  Every one of the functor's four laws is `lift_unique` applied to

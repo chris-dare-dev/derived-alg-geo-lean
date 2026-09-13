@@ -11,6 +11,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctor
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorH0
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.ObjectTwistK0
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.LinearObjectTwistK0
 
 /-! # The spherical twist
 
@@ -26,10 +27,12 @@ natural transformations, counit-cone twist candidates for dg adjunctions, and
 the four enhanced cone choices attached to a functor with left and right dg
 adjoints.  Their distinguished triangles compute the four conventional
 functors' `K₀` actions as the identity minus the corresponding adjunction
-composite.  The object-twist triangle similarly acts as identity minus its
-evaluation functor, and the explicit `IsEulerCopower` realization capability
-identifies its object classes with the existing numerical `twistK₀` formula;
-together with chosen-cone preservation it identifies the induced maps.  It
+composite.  The additive and scalar-linear object-twist cones similarly act
+as identity minus their evaluation functors.  Their parallel explicit
+`IsEulerCopower` capabilities identify object classes with the existing
+numerical `twistK₀` formula; together with chosen-cone preservation they
+identify the induced maps.  The scalar-linear path requires no adapter to the
+incompatible additive universal property.  It
 deliberately stops short of asserting sphericality: the
 adjoint-comparison maps and the Morita/higher-cone theorem of
 Anno--Logvinenko are not yet repository primitives.  The object-specific
