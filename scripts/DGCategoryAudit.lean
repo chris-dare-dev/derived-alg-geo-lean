@@ -1346,12 +1346,55 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_inv_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.inclusion_comp_compareIso_hom_val
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self_hom_val
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val_comp
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesShifts
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesChosenCones
+
+-- Under all scalar-linear copowers, selected object-twist cone data is
+-- definitionally the copower--Hom adjunction's counit-cone data.  Arbitrary
+-- choices compare canonically in Z⁰, strictly over the identity inclusion and
+-- coherently under changes of evaluation data.  The scalar-linear H⁰ triangle
+-- package and its adjunction comparison are the generic strict-square cone
+-- comparison at the full triangle-functor level.  These statements concern
+-- all module complexes and assert neither Perf(k), sphericality, nor
+-- autoequivalence.
+#print axioms CategoryTheory.linearCopowerAdjunction_counitConeData_eq
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_eq_compareIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.inclusion_comp_adjunctionTwistIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twist_eq_adjunctionTwist
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans_adjunctionTwistIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mem_distinguishedTriangles
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistH0CommShift
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistH0IsTriangulated
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_eq_adjunctionTwistTriangleFunctor
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans_adjunctionTwistTriangleIso
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of_eq_twistK₀_ofHomFiniteBounded

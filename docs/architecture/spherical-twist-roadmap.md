@@ -114,7 +114,8 @@ HasLinearCopowers k C
 ├─ DGLinear.homFunctor k E: C ⟶ C^dg(ModuleCat k), a k-linear dg functor
 ├─ linearCopowerAdjunction k E: (- ⊗ E) ⊣ Hom(E,-)
 │  ├─ unit: the selected universal copower chain map
-│  └─ counit: exactly the selected scalar-linear evaluation transformation
+│  ├─ counit: exactly the selected scalar-linear evaluation transformation
+│  └─ counit cone = selected scalar-linear object-twist cone definitionally
 └─ C = Cdg(ModuleCat k), same universe: Mathlib's total tensor product
    supplies the chosen object, tensor--Hom cochain equivalence, and instance
 
@@ -130,6 +131,10 @@ LinearEvaluationData k E
 ├─ IsEulerCopower: shared rank-one K₀ formula, obtained from supplied finite
 │  cohomology presentations when all linear copowers exist
 ├─ TwistConeData: thin specialization of the generic evaluation cone
+│  ├─ twistTriangleFunctor: H⁰ C ⥤ Triangle (H⁰ C), all values distinguished
+│  ├─ coherent comparison across evaluation and cone choices
+│  ├─ adjunctionTwistIso / adjunctionTwistTriangleIso:
+│  │  canonical DG and full-triangle identifications with the copower--Hom counit twist
 │  ├─ K₀ action = identity minus evaluation
 │  └─ numerical twistK₀ via IsEulerCopower; dg exactness is automatic
 └─ no additive EvaluationData adapter or autoequivalence; the standard
@@ -402,10 +407,13 @@ that comparison are instance hypotheses to be discharged by the realization.
    universal copower chain map, the counit is definitionally the selected
    scalar-linear evaluation transformation, and both triangle identities are
    the existing representing equations.  Thus scalar-linear evaluation is no
-   longer merely adjunction-shaped.  The source is the dg category of all
-   module complexes, not `Perf(k)`; this supplies no additive evaluation
-   adapter, adjoint on the other side, quasi-equivalence, or sphericality
-   statement.
+   longer merely adjunction-shaped.  Its selected evaluation cones are
+   definitionally the adjunction's counit cones.  Arbitrary evaluation choices
+   compare canonically at the dg-functor and full `H⁰` triangle-functor levels,
+   strictly over the identity inclusion and coherently under further changes
+   of choice.  The source is the dg category of all module complexes, not
+   `Perf(k)`; this supplies no additive evaluation adapter, adjoint on the
+   other side, quasi-equivalence, or sphericality statement.
    `DGCategory.LinearCopowerFunctor` now packages the homogeneous coefficient
    action as a `k`-linear dg functor out of `C^dg(ModuleCat k)`.  Its Hom-complex
    comparison commutes with differentials, chain-homotopic maps agree in `H⁰`,
@@ -493,9 +501,13 @@ that comparison are instance hypotheses to be discharged by the realization.
    inferred from formality.
    The direct scalar-linear cone consumer is now closed as well.
    `LinearEvaluationData.TwistConeData` is a thin name for the generic cone of
-   scalar-linear evaluation; its choice comparison and retained structured
-   cone-preservation constructor delegate to the existing strict-square and
-   3-by-3 interfaces, while exactness uses the automatic dg-functor package.
+   scalar-linear evaluation; its choice comparison, full `H⁰` triangle
+   comparison, and retained structured cone-preservation constructor delegate
+   to the existing strict-square, cone-triangle, and 3-by-3 interfaces, while
+   exactness uses the automatic dg-functor package.  For the selected copowers
+   this cone is definitionally the counit cone of
+   `linearCopowerAdjunction`; arbitrary choices are canonically identified
+   with that presentation in `Z⁰` and as full triangle functors.
    The generic H⁰ leaf computes its `K₀` action as identity minus evaluation,
    and `SphericalTwist.LinearObjectTwistK0` combines that formula with
    `LinearEvaluationData.IsEulerCopower` to obtain the existing numerical
