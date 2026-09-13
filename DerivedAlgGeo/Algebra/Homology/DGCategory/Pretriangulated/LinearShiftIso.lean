@@ -56,7 +56,10 @@ noncomputable def linearHomMap {X Y : C} {n : ℤ}
 lemma linearHomMap_f_apply {X Y : C} {n : ℤ}
     (h : IsShiftBy X n Y) (W : C) (p : ℤ)
     (f : (dgHom W X).X p) :
-    ((h.linearHomMap (k := k) W).f p).hom f =
+    (@ModuleCat.Hom.hom k _
+      (ModuleCat.of k ((dgHom W X).X p))
+      (ModuleCat.of k ((dgHom W Y).X (p + -n)))
+      ((h.linearHomMap (k := k) W).f p)) f =
       dgComp p (-n) (p + -n) rfl f h.hom :=
   rfl
 
@@ -82,7 +85,10 @@ noncomputable def linearHomIso {X Y : C} {n : ℤ}
 lemma linearHomIso_hom_f_apply {X Y : C} {n : ℤ}
     (h : IsShiftBy X n Y) (W : C) (p : ℤ)
     (f : (dgHom W X).X p) :
-    ((h.linearHomIso (k := k) W).hom.f p).hom f =
+    (@ModuleCat.Hom.hom k _
+      (ModuleCat.of k ((dgHom W X).X p))
+      (ModuleCat.of k ((dgHom W Y).X (p + -n)))
+      ((h.linearHomIso (k := k) W).hom.f p)) f =
       dgComp p (-n) (p + -n) rfl f h.hom :=
   rfl
 

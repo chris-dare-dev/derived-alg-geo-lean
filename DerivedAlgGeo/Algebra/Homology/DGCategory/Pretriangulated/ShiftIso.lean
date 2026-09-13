@@ -95,7 +95,10 @@ noncomputable def IsShiftBy.homIso {X Y : C} {n : ℤ}
 lemma IsShiftBy.homIso_hom_f_apply {X Y : C} {n : ℤ}
     (h : IsShiftBy X n Y) (W : C) (p : ℤ)
     (f : (dgHom W X).X p) :
-    ((h.homIso W).hom.f p).hom f =
+    (@AddCommGrpCat.Hom.hom
+      (AddCommGrpCat.of ((dgHom W X).X p))
+      (AddCommGrpCat.of ((dgHom W Y).X (p + -n)))
+      ((h.homIso W).hom.f p)) f =
       dgComp p (-n) (p + -n) rfl f h.hom :=
   rfl
 
