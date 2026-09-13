@@ -65,7 +65,7 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits
 
-universe u v
+universe u v u' v'
 
 namespace CategoryTheory.Triangulated
 
@@ -613,7 +613,7 @@ end
 section
 
 variable {A : Type u} [Category.{v} A]
-  {D : Type u} [Category.{v} D]
+  {D : Type u'} [Category.{v'} D]
 
 /-- The map on subobjects induced by a full faithful functor preserving
 monomorphisms. -/
