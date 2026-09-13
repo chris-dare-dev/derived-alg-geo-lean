@@ -89,6 +89,43 @@ lemma homComplex_d_apply (X Y : C) (p q : ℤ) (f : (dgHom X Y).X p) :
     ((homComplex k X Y).d p q).hom f = ((dgHom X Y).d p q).hom f :=
   rfl
 
+/-- Right composition by a degree-`p` dg morphism, as a degree-`p` linear
+cochain between Hom-complexes with a fixed source. -/
+def postcompCochain (X : C) {Y Z : C} (p : ℤ) :
+    (homComplex k Y Z).X p →ₗ[k]
+      CochainComplex.HomComplex.Cochain
+        (homComplex k X Y) (homComplex k X Z) p where
+  toFun f := CochainComplex.HomComplex.Cochain.mk (fun i j h => ModuleCat.ofHom
+    { toFun := fun g => dgComp i p j h g f
+      map_add' := fun g g' => by
+        rw [← AddMonoidHom.add_apply]
+        exact congrArg (fun q => q f) (map_add (dgComp i p j h) g g')
+      map_smul' := fun c g => DGLinear.comp_smul_left i p j h c g f })
+  map_add' f f' := by
+    apply CochainComplex.HomComplex.Cochain.ext
+    intro i j hij
+    apply ModuleCat.hom_ext
+    apply LinearMap.ext
+    intro g
+    change dgComp i p j hij g (f + f') =
+      dgComp i p j hij g f + dgComp i p j hij g f'
+    rw [map_add]
+  map_smul' c f := by
+    apply CochainComplex.HomComplex.Cochain.ext
+    intro i j hij
+    apply ModuleCat.hom_ext
+    apply LinearMap.ext
+    intro g
+    change dgComp i p j hij g (c • f) = c • dgComp i p j hij g f
+    rw [DGLinear.comp_smul_right]
+
+@[simp]
+lemma postcompCochain_apply (X : C) {Y Z : C} (p : ℤ)
+    (f : (dgHom Y Z).X p) (i j : ℤ) (h : i + p = j)
+    (g : (dgHom X Y).X i) :
+    ((postcompCochain k X p f).v i j h).hom g = dgComp i p j h g f :=
+  rfl
+
 end DGLinear
 
 namespace DGFunctor
