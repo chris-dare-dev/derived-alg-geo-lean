@@ -122,6 +122,7 @@ Category
 │  │  ├─ homComplexFiniteCohomologyPresentation
 │  │  │                                   HomFiniteBounded support + field formality
 │  │  ├─ postcompCochain                fixed-source right composition, linear chain-map law
+│  │  ├─ homFunctor k E                 Hom(E,-) as a k-linear dg functor to Cdg(ModuleCat k)
 │  │  ├─ Cdg (ModuleCat k)             standard model inherits Mathlib's k-linear structure
 │  │  │  └─ linearTensorObj K X       Mathlib total tensor product, same universe
 │  │  │     ├─ tensorCochainLinearEquiv   degreewise tensor--Hom adjunction
@@ -134,6 +135,9 @@ Category
 │  │     ├─ scalar-unit witness         single⁰(k) ⊗ X represents X itself
 │  │     ├─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
 │  │     │  └─ linearCopowerFunctor    Cdg(ModuleCat k) ⟶ C, k-linear dg functor
+│  │     │     ├─ linearCopowerAdjunction  (- ⊗ E) ⊣ Hom(E,-), strict at the dg level
+│  │     │     │  ├─ unit                 selected universal copower chain map
+│  │     │     │  └─ counit               exactly selected scalar-linear evaluation
 │  │     │     ├─ selected H⁰ invariance is a HomotopyCategory/DGEnhancement leaf
 │  │     │     │  └─ LinearCopowerFiniteFree
 │  │     │     │     ├─ basis expansion of a degree-zero copower
@@ -151,6 +155,10 @@ Category
 │  │        │  └─ automatic realization from HomFiniteBounded
 │  │        └─ TwistConeData             direct cone of scalar-linear evaluation
 │  │           ├─ compareIso / exactness  delegated to generic strict-square and cone APIs
+│  │           ├─ twistTriangleFunctor    H⁰ C ⥤ Triangle (H⁰ C), all distinguished
+│  │           ├─ adjunctionTwistIso      canonical Z⁰ identification with the copower--Hom counit cone
+│  │           ├─ adjunctionTwistTriangleIso
+│  │           │                           coherent identification of the full H⁰ triangle functors
 │  │           └─ K₀ action             identity minus evaluation; HomFiniteBounded numerical twist
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
@@ -199,6 +207,8 @@ Category
 │  │        └─ IsEulerCopower           choice-invariant realization input for numerical twistK₀
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
+│  │     └─ H0Presentation                supplied endpoint isos after equivalence transport
+│  │        └─ Fourier--Mukai adapters     existing left/right adjoint-kernel data
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps
 │  │  │  └─ strict                      a commuting square with zero homotopy

@@ -756,6 +756,27 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.h0_unit
 #print axioms CategoryTheory.DGAdjunction.h0_counit
 
+-- A strict dg adjunction transports through arbitrary equivalences out of its
+-- two homotopy categories and may then be presented by named ordinary
+-- functors.  The construction delegates composition and natural-isomorphism
+-- transport to Mathlib and retains explicit unit/counit formulas; it assumes
+-- the presentation isomorphisms and produces no dg lift or kernel.
+#print axioms CategoryTheory.DGAdjunction.transportedH0Left
+#print axioms CategoryTheory.DGAdjunction.transportedH0Right
+#print axioms CategoryTheory.DGAdjunction.transportedH0
+#print axioms CategoryTheory.DGAdjunction.transportedH0_unit_app
+#print axioms CategoryTheory.DGAdjunction.transportedH0_counit_app
+#print axioms CategoryTheory.DGAdjunction.H0Presentation
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.leftIso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rightIso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.mk.inj
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.mk.sizeOf_spec
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_unit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_counit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_unit_app
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_counit_app
+
 -- The cone projections are graded-natural, so the objectwise cones of a closed
 -- degree-zero dg natural transformation assemble into a cone in the dg category
 -- of dg functors.  With the zero object and the shift below, that is all three
@@ -1239,6 +1260,21 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.linearCopowerFunctor_map
 #print axioms CategoryTheory.linearCopowerObjIsoOfHomotopyEquiv
 
+-- Fixed-source right composition is the k-linear dg Hom functor.  With all
+-- scalar-linear copowers, its selected left adjoint is the copower functor:
+-- the unit is the universal copower map and the counit is exactly the existing
+-- selected evaluation transformation.  The triangle identities are strict.
+-- This constructs neither Perf(k) nor a spherical or additive adjunction.
+#print axioms CategoryTheory.DGLinear.homFunctor
+#print axioms CategoryTheory.DGLinear.homFunctor_obj
+#print axioms CategoryTheory.DGLinear.homFunctor_map
+#print axioms CategoryTheory.DGLinear.homFunctor_linear
+#print axioms CategoryTheory.LinearEvaluationData.ofHasLinearCopowers_functor_eq
+#print axioms CategoryTheory.linearCopowerAdjunction
+#print axioms CategoryTheory.linearCopowerAdjunction_unit_app
+#print axioms CategoryTheory.linearCopowerAdjunction_counit
+#print axioms CategoryTheory.linearCopowerAdjunction_counit_app
+
 -- The generic `H⁰` finite-free leaf packages shifted single copowers.  A
 -- supplied basis expands a degree-zero copower, with arbitrary finite index
 -- universes handled by categorical reindexing, and finite free modules have
@@ -1331,12 +1367,55 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_inv_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.inclusion_comp_compareIso_hom_val
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self_hom_val
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val_comp
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesShifts
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesChosenCones
+
+-- Under all scalar-linear copowers, selected object-twist cone data is
+-- definitionally the copower--Hom adjunction's counit-cone data.  Arbitrary
+-- choices compare canonically in Z⁰, strictly over the identity inclusion and
+-- coherently under changes of evaluation data.  The scalar-linear H⁰ triangle
+-- package and its adjunction comparison are the generic strict-square cone
+-- comparison at the full triangle-functor level.  These statements concern
+-- all module complexes and assert neither Perf(k), sphericality, nor
+-- autoequivalence.
+#print axioms CategoryTheory.linearCopowerAdjunction_counitConeData_eq
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_eq_compareIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.inclusion_comp_adjunctionTwistIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twist_eq_adjunctionTwist
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans_adjunctionTwistIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mem_distinguishedTriangles
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistH0CommShift
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistH0IsTriangulated
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_eq_adjunctionTwistTriangleFunctor
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans_adjunctionTwistTriangleIso
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of_eq_twistK₀_ofHomFiniteBounded

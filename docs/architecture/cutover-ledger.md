@@ -7,6 +7,39 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Fourier--Mukai presentations of strict dg adjunctions (2026-09-13):
+  `RightAdjointKernelData.ofH0Presentation` and its left-adjoint mirror spend
+  the generic equivalence-transported `DGAdjunction.H0Presentation` on the
+  existing Fourier--Mukai adjoint-kernel structures.  The two orientations
+  agree definitionally with the existing correspondence-swap adapters, so no
+  dg-specific copy of kernel-adjunction data is introduced.  Kernels,
+  endpoint comparisons, and any kernel arrow realizing the unit or counit
+  remain supplied; no comparison of dg and kernel cones is inferred.
+- Ordinary presentations of strict dg adjunctions (2026-09-13):
+  `DGAdjunction.H0Presentation` transports `DGAdjunction.h0` through supplied
+  source and target category equivalences and identifies the resulting two
+  functors with named ordinary functors.  Its ordinary adjunction is assembled
+  exclusively from Mathlib's adjunction composition and natural-isomorphism
+  transport, and its public unit/counit formulas retain both category
+  equivalences and endpoint comparisons.  This is the generic bridge needed
+  to present strict dg adjunctions by geometric or Fourier--Mukai functors;
+  the comparisons are supplied, and no dg lift, kernel realization, or
+  compatibility with a separately chosen ordinary adjunction is inferred.
+- Scalar-linear object twist as copower--Hom counit twist (2026-09-13):
+  The selected `LinearEvaluationData` cone type and
+  `linearCopowerAdjunction.CounitConeData` are definitionally equal, so the
+  selected object-twist and adjunction-twist functors and their full `H⁰`
+  triangle functors need no transport or second cone construction.  For an
+  arbitrary scalar-linear evaluation choice,
+  `LinearEvaluationData.TwistConeData.adjunctionTwistIso` reuses the existing
+  strict-square cone comparison, preserves the canonical inclusion strictly,
+  and composes coherently with changes of evaluation data.  The H⁰ layer now
+  exposes the scalar-linear twist triangle, its distinguishedness and
+  automatic exactness, coherent choice-independence, and the corresponding
+  natural isomorphism to the adjunction counit triangle.  This concerns the
+  adjunction from all module complexes; it does not construct or restrict to
+  `Perf(k)`, provide the other adjoint, or assert sphericality or
+  autoequivalence.
 - Automatic dg exactness consumer cutover (2026-09-13):
   Public H⁰ exactness and `K₀.map` theorems for homogeneous-transformation
   cones, additive and scalar-linear object twists, and all four enhanced
@@ -197,6 +230,20 @@ blocks should normally move it rather than add more declarations beside it.
   instance has that restriction; it does not assert concrete additive
   copowers, quasi-isomorphism invariance, or a copower instance for another dg
   model.
+- Scalar-linear tensor--Hom dg adjunction (2026-09-13):
+  `DGCategory.LinearHomFunctor` packages fixed-source right composition as the
+  `k`-linear dg functor `DGLinear.homFunctor k E` from an arbitrary
+  `k`-linear dg category to the standard dg category of module complexes.
+  Under `HasLinearCopowers`, `DGCategory.LinearCopowerAdjunction` proves that
+  `linearCopowerFunctor k E` is its strict dg left adjoint.  The unit is the
+  selected universal copower chain map, the counit is exactly
+  `LinearEvaluationData.ofHasLinearCopowers.evaluation`, and the two triangle
+  identities reuse `univ_comp_coefficientMap` and `univ_comp_evalHom`.
+  No second adjunction interface, tensor construction, or evaluation map is
+  introduced.  The result concerns all coefficient complexes; it does not
+  construct `Perf(k)`, compare linear and additive evaluation, produce an
+  adjoint on the other side, or imply quasi-equivalence, sphericality, or
+  autoequivalence.
 - Scalar-linear evaluation root (2026-09-12):
   `DGCategory.LinearEvaluation` assembles the `IsLinearCopowerOf` family at an
   object `E` into `LinearEvaluationData k E`.  Fixed-source right composition
