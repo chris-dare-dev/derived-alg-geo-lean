@@ -983,6 +983,22 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_obj₂
 #print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.unitTriangleInSource_obj₃
 
+/-! ## Fourier--Mukai lane -- pointwise dg-cotwist comparison -/
+
+-- The two independently chosen cone triangles are comparable at each source
+-- object because their identity/composite vertices and adjunction unit agree.
+-- Mathlib chooses the remaining component separately at each object, so these
+-- declarations assert neither naturality nor cone-choice independence.
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.presentedUnitTriangleObjIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.presentedUnitTriangleObjIso_hom_hom₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.presentedUnitTriangleObjIso_hom_hom₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.transportedUnitConeObjIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.presentedCotwistTriangleObjIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.presentedCotwistTriangleObjIso_hom_hom₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.presentedCotwistTriangleObjIso_hom_hom₃
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.transportedCotwistObjIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.transportedDGCotwistObjIso
+
 /-! ## Fourier--Mukai lane -- left-adjunction dual-twist kernels -/
 
 -- The left-adjunction unit lane is a semantic specialization of the generic

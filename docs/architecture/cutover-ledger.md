@@ -7,6 +7,18 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Objectwise dg/Fourier--Mukai cotwist comparison (2026-09-13):
+  `AdjunctionUnitKernelConeData.presentedUnitTriangleObjIso` applies Mathlib's
+  triangle-isomorphism completion theorem to the presented dg and independently
+  selected Fourier--Mukai unit triangles at each source object.  Their first two
+  components are identities because both triangles use the same presented
+  adjunction unit.  Inverse rotation yields
+  `presentedCotwistTriangleObjIso`; its first component compares the
+  transported dg cotwist object with the Fourier--Mukai cotwist object, and a
+  final composite reaches the transport of the actual shifted dg cone.  The
+  chosen cone comparison is not proved natural in the source object, so no
+  functor isomorphism, choice independence, exactness/equivalence transfer,
+  kernel presentation of the dg cotwist, or sphericality is inferred.
 - Exactness and equivalence after ordinary `H⁰` transport (2026-09-13):
   `DGFunctor.transportedH0` names equivalence conjugation of `H⁰ F`, while
   `transportedH0CommShift`, `transportedH0IsTriangulated`, and the equivalence
@@ -15,8 +27,8 @@ blocks should normally move it rather than add more declarations beside it.
   specializes these interfaces and the canonical exact `[-1]` shift.  Its
   exactness is unconditional in the chosen cone; its autoequivalence requires
   the explicit hypothesis that the unshifted cone is an equivalence on `H⁰`.
-  No dg quasi-equivalence, choice independence, Fourier--Mukai comparison, or
-  sphericality is inferred.
+  No dg quasi-equivalence, choice independence, natural Fourier--Mukai
+  comparison, or sphericality is inferred.
 - Conventional cotwist triangles from presented dg adjunctions (2026-09-13):
   `DGAdjunction.H0Presentation.presentedCotwistTriangle` reuses Mathlib's
   `invRotate` on the normalized unit-triangle family.  Its first vertex is the
@@ -27,8 +39,8 @@ blocks should normally move it rather than add more declarations beside it.
   the rotated second map and every value is distinguished under the existing
   source-side hypotheses.  Exactness and equivalence are separate capability
   accessors with their own hypotheses; this presentation infers no
-  Fourier--Mukai comparison, distinguished functor-category triangle, or
-  sphericality.
+  natural Fourier--Mukai comparison, distinguished functor-category triangle,
+  or sphericality.
 - Ordinary presentations of dg-adjunction unit triangles (2026-09-13):
   `DGAdjunction.H0Presentation.unitFirstMapNormalizationData` is the
   source-side mirror of the counit presentation and reuses the same generic

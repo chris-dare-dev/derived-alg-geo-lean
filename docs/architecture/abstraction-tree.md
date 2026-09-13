@@ -277,7 +277,8 @@ Category
 │     │     ├─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
 │     │     ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
 │     │     ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
-│     │     └─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
+│     │     ├─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
+│     │     └─ presented dg comparison               noncanonical objectwise triangle/cotwist isos
 │     ├─ DualTwistKernelData              left-adjunction unit specialization after swapping
 │     │  └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
 │     │     ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
