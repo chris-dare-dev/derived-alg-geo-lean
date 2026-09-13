@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Basic
 import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.Algebra.Homology.QuasiIso
+import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Functor
 
 /-!
@@ -317,6 +318,14 @@ def h0 (F : DGFunctor C D) : H0 C ⥤ H0 D where
     | _ f =>
       induction g using Quotient.ind with
       | _ g => exact congrArg _ (Subtype.ext (F.map_comp 0 0 0 (by omega) f.1 g.1))
+
+/-- The functor on `H⁰` induced by a dg functor is additive. -/
+instance h0_additive (F : DGFunctor C D) : F.h0.Additive where
+  map_add {X Y} f g := by
+    induction f using Quotient.ind with
+    | _ f =>
+      induction g using Quotient.ind with
+      | _ g => exact congrArg _ (Subtype.ext (map_add (F.map 0) f.1 g.1))
 
 
 /-- A dg functor's action on a single Hom-complex, packaged as a morphism of

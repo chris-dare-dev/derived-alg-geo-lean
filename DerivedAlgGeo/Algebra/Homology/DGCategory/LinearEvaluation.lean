@@ -21,8 +21,9 @@ cochain interface.
 
 This is deliberately parallel to, not a refinement of, additive
 `EvaluationData`.  Its copowers represent only `k`-linear cochains, so there is
-no general map from `LinearEvaluationData` to `EvaluationData`.  This file
-stops before cones, exactness, Euler-class formulas, homotopy invariance, finite
+no general map from `LinearEvaluationData` to `EvaluationData`.  Coefficient-
+complex homotopy invariance is supplied separately by `LinearCopowerFunctor`;
+this file stops before cones, exactness, Euler-class formulas, finite
 presentations, or concrete existence.
 -/
 

@@ -25,11 +25,11 @@ projection is mathematically available for a general scalar extension.  The
 two interfaces coincide only after additional comparison input (for example,
 over the integers), which is not asserted here.
 
-The sibling `LinearEvaluation` module assembles these copowers into a
-scalar-linear evaluation functor and its closed evaluation transformation.
-This file itself stops at the universal-property root; neither module derives
-an Euler-class formula, which still needs homotopy invariance and a finite
-cohomology presentation.
+The sibling `LinearCopowerFunctor` module packages coefficient-complex
+functoriality and homotopy invariance, while `LinearEvaluation` assembles these
+copowers into a scalar-linear evaluation functor and its closed evaluation
+transformation.  None of these modules derives an Euler-class formula, which
+still needs a finite cohomology presentation.
 -/
 
 set_option autoImplicit false
@@ -233,6 +233,46 @@ lemma compare_self (t : IsLinearCopowerOf k K X Z) :
   have hji : j = i := by omega
   cases hji
   rw [t.univ_comp_compare t, dgComp_id]
+
+/-- The canonical comparison between two linear-copower witnesses as an
+isomorphism in the closed degree-zero category. -/
+noncomputable def compareIso
+    (t : IsLinearCopowerOf k K X Z) (t' : IsLinearCopowerOf k K X Z') :
+    (show Z0 C from Z) ≅ (show Z0 C from Z') where
+  hom := ⟨t.compare t', t.compare_mem_cocycles t'⟩
+  inv := ⟨t'.compare t, t'.compare_mem_cocycles t⟩
+  hom_inv_id := Subtype.ext (t.compare_comp_compare t')
+  inv_hom_id := Subtype.ext (t'.compare_comp_compare t)
+
+@[simp]
+lemma compareIso_hom_val
+    (t : IsLinearCopowerOf k K X Z) (t' : IsLinearCopowerOf k K X Z') :
+    (t.compareIso t').hom.val = t.compare t' :=
+  rfl
+
+@[simp]
+lemma compareIso_inv_val
+    (t : IsLinearCopowerOf k K X Z) (t' : IsLinearCopowerOf k K X Z') :
+    (t.compareIso t').inv.val = t'.compare t :=
+  rfl
+
+/-- The canonical comparison of a linear-copower witness with itself is the
+identity isomorphism. -/
+@[simp]
+lemma compareIso_self (t : IsLinearCopowerOf k K X Z) :
+    t.compareIso t = Iso.refl _ := by
+  apply Iso.ext
+  apply Subtype.ext
+  exact t.compare_self
+
+/-- Canonical linear-copower comparison isomorphisms are transitive. -/
+lemma compareIso_trans {Z'' : C}
+    (t : IsLinearCopowerOf k K X Z) (t' : IsLinearCopowerOf k K X Z')
+    (t'' : IsLinearCopowerOf k K X Z'') :
+    (t.compareIso t').trans (t'.compareIso t'') = t.compareIso t'' := by
+  apply Iso.ext
+  apply Subtype.ext
+  exact t.compare_trans t' t''
 
 end IsLinearCopowerOf
 
