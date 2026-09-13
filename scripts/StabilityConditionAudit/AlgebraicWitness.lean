@@ -1,12 +1,21 @@
+/-
+Algebraic-witness slice of the StabilityCondition audit. The witness is a
+concrete nondegenerate algebraic stability condition on the bounded derived
+category of finite-dimensional vector spaces.
+
+Records are written fully qualified, as in every other slice of this audit.
+`scripts/check_audit_complete.py` resolves a record by trying the bare name
+and then a fixed prefix list, which for this library is
+`CategoryTheory.Triangulated.` and `CategoryTheory.Triangulated.StabilityCondition.`;
+neither reaches this module's `AlgebraicWitness` namespace, so an unqualified
+record here resolves to nothing and leaves every declaration counted as
+unaudited.
+-/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.AlgebraicWitness
 
-open CategoryTheory CategoryTheory.Triangulated
-
-namespace CategoryTheory.Triangulated.AlgebraicWitness
-
-#print axioms CategoryTheory.Triangulated.AlgebraicWitness.fgModuleCat_simple_iff_finrank_eq_one
-#print axioms CategoryTheory.Triangulated.AlgebraicWitness.fgModuleCat_isArtinianObject
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.moduleCat_isArtinianObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.fgModuleCat_isArtinianObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.fgModuleCat_simple_iff_finrank_eq_one
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.DerivedFiniteVect
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardT
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.residueObject
@@ -68,5 +77,3 @@ namespace CategoryTheory.Triangulated.AlgebraicWitness
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardStabilityCondition_hasGlobalMassHomBound
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.centralCharge_residue
 #print axioms CategoryTheory.Triangulated.AlgebraicWitness.centralCharge_ne_zero
-
-end CategoryTheory.Triangulated.AlgebraicWitness

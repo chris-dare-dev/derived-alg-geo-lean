@@ -1,0 +1,25 @@
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
+
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkRingCocone
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkRingIsColimit
+#print axioms AlgebraicGeometry.Scheme.Modules.neighborhoodModuleStalkFunctor
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModuleStalkFunctor
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModuleStalkToSheafificationApp
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModuleStalkToSheafificationApp_isIso
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModuleStalkSheafificationIso
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkForgetIso
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesFiniteLimits
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctors_jointlyReflectIsomorphisms
+#print axioms AlgebraicGeometry.Scheme.Modules.preservesFiniteLimits_of_stalkwise
+#print axioms AlgebraicGeometry.Scheme.Modules.neighborhoodRingHom
+#print axioms AlgebraicGeometry.Scheme.Modules.neighborhoodModulePullback
+#print axioms AlgebraicGeometry.Scheme.Modules.neighborhoodRingHom_comp_stalkCocone
+#print axioms AlgebraicGeometry.Scheme.Modules.constNeighborhoodPushforwardIsoApp
+#print axioms AlgebraicGeometry.Scheme.Modules.constNeighborhoodPushforwardIso
+#print axioms AlgebraicGeometry.Scheme.Modules.neighborhoodModulePullbackStalkIso
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkPresheafIso
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkIso
+#print axioms ModuleCat.isoMk.congr_simp
+#print axioms ModuleCat.restrictScalarsCongr.congr_simp

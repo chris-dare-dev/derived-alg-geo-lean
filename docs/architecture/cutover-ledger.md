@@ -7,6 +7,17 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Scheme-module stalk and pullback comparison (2026-09-12):
+  `AlgebraicGeometry/Modules/Pullback/Stalk.lean` now owns the local-ring-valued
+  module-stalk functors, their finite-limit and joint-reflection theorems, the
+  private module-skyscraper construction, and the canonical presheaf and sheaf
+  pullback-to-stalk isomorphisms. These declarations previously lived in
+  `DerivedCategory/Families/FlatPullback.lean` despite mentioning neither
+  derived categories, families, nor flatness. The families file now contains
+  only the flat local-ring calculation and its exact-pullback consequence;
+  open-immersion and relative-perfect consumers use the canonical neutral API.
+  The transitional comparison records are removed rather than retained as a
+  compatibility shim.
 - Scalar-linear dg Hom and copower root (2026-09-12):
   `DGCategory.Linear` repackages the existing Hom-complex of a `DGLinear k C`
   as `DGLinear.homComplex`, a `ModuleCat k`-valued cochain complex.
