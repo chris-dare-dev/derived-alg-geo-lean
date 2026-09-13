@@ -3,7 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategory
+import DerivedAlgGeo.CategoryTheory.Shift.CommShift
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Functor
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.FunctorTransport
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Shift
 import DerivedAlgGeo.CategoryTheory.Triangulated.ShiftFunctor
 
@@ -40,8 +42,10 @@ is the value of the dg shifted functor.
 
 The equality and natural isomorphism are categorical interfaces.  The
 sign-correct `CommShift` and exactness packages below transport through that
-interface; the two computation lemmas remain available for strict objectwise
-formulas.
+interface.  The direct `CommShift` package obtained from the shifted dg
+functor is proved to agree with that transport, and the compatibility survives
+ordinary endpoint equivalences; the two computation lemmas remain available
+for strict objectwise formulas.
 -/
 
 set_option autoImplicit false
@@ -110,6 +114,139 @@ noncomputable def shiftedFunctorH0Iso (F : DGFunctor C D) (n : ℤ) :
       F.h0 ⋙ CategoryTheory.shiftFunctor (H0 D) n :=
   eqToIso (F.shiftedFunctor_h0_eq n)
 
+/-- The comparison `H⁰(F[n]) ≅ H⁰(F)[n]` is the identity on each
+object; only its functorial typing records the morphism computation. -/
+@[simp]
+theorem shiftedFunctorH0Iso_hom_app (F : DGFunctor C D) (n : ℤ) (X : H0 C) :
+    (F.shiftedFunctorH0Iso n).hom.app X = 𝟙 _ := by
+  rw [shiftedFunctorH0Iso, eqToIso.hom, eqToHom_app]
+  have hp : Functor.congr_obj (F.shiftedFunctor_h0_eq n) X =
+      F.shiftedFunctor_h0_obj n X := Subsingleton.elim _ _
+  rw [hp]
+  exact eqToHom_refl _ _
+
+/-- The inverse comparison is likewise the identity on each object. -/
+@[simp]
+theorem shiftedFunctorH0Iso_inv_app (F : DGFunctor C D) (n : ℤ) (X : H0 C) :
+    (F.shiftedFunctorH0Iso n).inv.app X = 𝟙 _ := by
+  rw [shiftedFunctorH0Iso, eqToIso.inv, eqToHom_app]
+  have hp : Functor.congr_obj (F.shiftedFunctor_h0_eq n).symm X =
+      (F.shiftedFunctor_h0_obj n X).symm := Subsingleton.elim _ _
+  rw [hp]
+  exact eqToHom_refl _ _
+
+section CommShift
+
+variable [IsPretriangulated C]
+
+set_option backward.isDefEq.respectTransparency false in
+private lemma shiftedFunctor_h0CommShift_eq_ofIso
+    (F : DGFunctor C D) (n : ℤ) :
+    (F.shiftedFunctor n).h0CommShift = by
+      letI : F.h0.CommShift ℤ := F.h0CommShift
+      letI : (shiftFunctor (H0 D) n).CommShift ℤ :=
+        Pretriangulated.shiftFunctorCommShift (H0 D) n
+      letI : (F.h0 ⋙ shiftFunctor (H0 D) n).CommShift ℤ := inferInstance
+      exact Functor.CommShift.ofIso (F.shiftedFunctorH0Iso n).symm ℤ := by
+  letI : F.h0.CommShift ℤ := F.h0CommShift
+  letI : (shiftFunctor (H0 D) n).CommShift ℤ :=
+    Pretriangulated.shiftFunctorCommShift (H0 D) n
+  letI : (F.h0 ⋙ shiftFunctor (H0 D) n).CommShift ℤ := inferInstance
+  apply Functor.CommShift.ext
+  intro a
+  ext X
+  simp only [Functor.CommShift.ofIso_commShiftIso_hom_app,
+    Iso.symm_hom, Iso.symm_inv, shiftedFunctorH0Iso_hom_app,
+    shiftedFunctorH0Iso_inv_app, Functor.map_id, Category.comp_id,
+    Category.id_comp, Functor.commShiftIso_comp_hom_app,
+    Pretriangulated.shiftFunctorCommShift_commShiftIso_hom_app]
+  change (shiftCommIso (F.shiftedFunctor n)
+      (preservesShifts (F.shiftedFunctor n)) a).hom.app X = _
+  change H0.homMk (C := D) _ = _
+  change H0.homMk (C := D) _ =
+    (shiftFunctor (H0 D) n).map
+        ((shiftCommIso F (preservesShifts F) a).hom.app X) ≫ _
+  change H0.homMk (C := D) _ =
+    (H0.shiftFunctor D n).map
+        (H0.homMk (C := D) ⟨IsShiftBy.compare
+          ((preservesShifts F).mapShift
+            (IsPretriangulated.shiftWitness C (H0.of C X) a))
+          (IsPretriangulated.shiftWitness D (F.obj (H0.of C X)) a), _⟩) ≫ _
+  unfold H0.homMk
+  rw [H0.shiftFunctor_map_mk]
+  rw [H0.shiftFunctorComm_hom_app]
+  change H0.homMk (C := D) _ = H0.homMk (C := D) _ ≫
+    ((n * a).negOnePow • H0.homMk (C := D) _)
+  rw [Units.smul_def, Preadditive.comp_zsmul, H0.homMk_comp]
+  change H0.homMk (C := D) _ = H0.homMk (C := D) _
+  let x := H0.of C X
+  let sC := IsPretriangulated.shiftWitness C x a
+  let A := (preservesShifts (F.shiftedFunctor n)).mapShift sC
+  let B := IsPretriangulated.shiftWitness D ((F.shiftedFunctor n).obj x) a
+  let p := (preservesShifts F).mapShift sC
+  let q := IsPretriangulated.shiftWitness D (F.obj x) a
+  let sn := F.shiftWitness n x
+  let u := F.shiftWitness n (IsPretriangulated.shiftObj C x a)
+  let v := IsPretriangulated.shiftWitness D
+    (IsPretriangulated.shiftObj D (F.obj x) a) n
+  refine congrArg _ (Subtype.ext ?_)
+  change IsShiftBy.compare A B = (n * a).negOnePow •
+    dgComp (C := D) 0 0 0 (by omega)
+      (IsShiftBy.mapShift u v (IsShiftBy.compare p q))
+      (IsShiftBy.compare (q.comp' v (a + n) rfl)
+        (sn.comp' B (a + n) (by omega)))
+  rw [IsShiftBy.mapShift_compare_comp', IsShiftBy.compare_trans]
+  change IsShiftBy.compare A B = (n * a).negOnePow •
+    IsShiftBy.compare (p.comp' u (a + n) rfl)
+      (sn.comp' B (a + n) (by omega))
+  have hA :
+      (sn.comp' A (a + n) (by omega)).hom =
+        (n * a).negOnePow • (p.comp' u (a + n) rfl).hom := by
+    simp only [IsShiftBy.comp'_hom]
+    rw [(preservesShifts (F.shiftedFunctor n)).mapShift_hom,
+      F.shiftedFunctor_map]
+    rw [dgComp_units_smul_right]
+    rw [show n * -a = -(n * a) by ring, Int.negOnePow_neg]
+    rw [← (preservesShifts F).mapShift_hom sC]
+    apply congrArg (fun z => (n * a).negOnePow • z)
+    exact sn.hom_comp_shiftMap u (-a) (-(a + n)) (by omega) (by omega) p.hom
+  rw [← IsShiftBy.compare_compLeftOfDegree (m := a) (nm := a + n)
+    sn A B (by omega)]
+  apply IsShiftBy.compare_unique
+  rw [hA, dgComp_units_smul_left, dgComp_units_smul_right,
+    smul_smul, Int.units_mul_self, one_smul,
+    IsShiftBy.hom_comp_compare]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The canonical comparison `H⁰(F[n]) ≅ H⁰(F)[n]` is compatible with
+the direct shift package on `H⁰(F[n])`, the canonical package on `H⁰(F)`,
+and the Koszul-signed package on `[n]`.
+
+The source package is the one constructed directly from the shifted dg
+functor, rather than a package manufactured by transporting across this
+isomorphism. -/
+theorem shiftedFunctorH0Iso_commShift (F : DGFunctor C D) (n : ℤ) :
+    letI : (F.shiftedFunctor n).h0.CommShift ℤ :=
+      (F.shiftedFunctor n).h0CommShift
+    letI : F.h0.CommShift ℤ := F.h0CommShift
+    letI : (shiftFunctor (H0 D) n).CommShift ℤ :=
+      Pretriangulated.shiftFunctorCommShift (H0 D) n
+    letI : (F.h0 ⋙ shiftFunctor (H0 D) n).CommShift ℤ := inferInstance
+    NatTrans.CommShift (F.shiftedFunctorH0Iso n).hom ℤ := by
+  letI : F.h0.CommShift ℤ := F.h0CommShift
+  letI : (shiftFunctor (H0 D) n).CommShift ℤ :=
+    Pretriangulated.shiftFunctorCommShift (H0 D) n
+  letI : (F.h0 ⋙ shiftFunctor (H0 D) n).CommShift ℤ := inferInstance
+  let e := (F.shiftedFunctorH0Iso n).symm
+  rw [shiftedFunctor_h0CommShift_eq_ofIso F n]
+  letI : (F.shiftedFunctor n).h0.CommShift ℤ :=
+    Functor.CommShift.ofIso e ℤ
+  haveI : NatTrans.CommShift e.hom ℤ :=
+    Functor.CommShift.ofIso_compatibility e ℤ
+  exact NatTrans.CommShift.of_iso_inv e ℤ
+
+end CommShift
+
 section Transport
 
 variable {X : Type uX} {Y : Type uY}
@@ -139,6 +276,93 @@ noncomputable def transportedShiftedFunctorH0Iso (F : DGFunctor C D) (n : ℤ)
       (eD.functor.commShiftIso n) ≪≫
     (Functor.associator (eC.inverse ⋙ F.h0) eD.functor
       (shiftFunctor Y n)).symm
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The transported comparison `H⁰(F[n]) ≅ H⁰(F)[n]` respects the
+canonical shift packages at both endpoints and the Koszul-signed package on
+the final shift functor.
+
+Additivity of the forward target equivalence is exactly what lets its shift
+comparison commute with the Koszul sign. -/
+theorem transportedShiftedFunctorH0Iso_commShift
+    (F : DGFunctor C D) (n : ℤ) (eC : H0 C ≌ X) (eD : H0 D ≌ Y)
+    [IsPretriangulated C]
+    [HasShift X ℤ] [HasShift Y ℤ]
+    [eC.functor.CommShift ℤ] [eD.functor.CommShift ℤ]
+    [Preadditive Y] [∀ k : ℤ, (shiftFunctor Y k).Additive]
+    [eD.functor.Additive] :
+    letI : ((F.shiftedFunctor n).transportedH0 eC eD).CommShift ℤ :=
+      (F.shiftedFunctor n).transportedH0CommShift
+    letI : (F.transportedH0 eC eD).CommShift ℤ :=
+      F.transportedH0CommShift
+    letI : (shiftFunctor Y n).CommShift ℤ :=
+      Pretriangulated.shiftFunctorCommShift Y n
+    letI : (F.transportedH0 eC eD ⋙ shiftFunctor Y n).CommShift ℤ :=
+      inferInstance
+    NatTrans.CommShift (F.transportedShiftedFunctorH0Iso n eC eD).hom ℤ := by
+  letI : eC.inverse.CommShift ℤ := eC.commShiftInverse ℤ
+  letI : F.h0.CommShift ℤ := F.h0CommShift
+  letI : (F.shiftedFunctor n).h0.CommShift ℤ :=
+    (F.shiftedFunctor n).h0CommShift
+  letI : (shiftFunctor (H0 D) n).CommShift ℤ :=
+    Pretriangulated.shiftFunctorCommShift (H0 D) n
+  letI : (shiftFunctor Y n).CommShift ℤ :=
+    Pretriangulated.shiftFunctorCommShift Y n
+  letI : (F.h0 ⋙ shiftFunctor (H0 D) n).CommShift ℤ := inferInstance
+  haveI : NatTrans.CommShift (F.shiftedFunctorH0Iso n).hom ℤ :=
+    F.shiftedFunctorH0Iso_commShift n
+  haveI : NatTrans.CommShift (eD.functor.commShiftIso n).hom ℤ :=
+    Pretriangulated.commShiftIso_commShift (H0 D) eD.functor n
+  haveI : NatTrans.CommShift
+      (Functor.isoWhiskerRight
+        (Functor.isoWhiskerLeft eC.inverse (F.shiftedFunctorH0Iso n))
+        eD.functor).hom ℤ := by
+    change NatTrans.CommShift
+      (Functor.whiskerRight
+        (Functor.whiskerLeft eC.inverse (F.shiftedFunctorH0Iso n).hom)
+        eD.functor) ℤ
+    infer_instance
+  haveI : NatTrans.CommShift
+      (Functor.associator eC.inverse
+        (F.h0 ⋙ shiftFunctor (H0 D) n) eD.functor).hom ℤ := by
+    infer_instance
+  haveI : NatTrans.CommShift
+      (Functor.isoWhiskerLeft eC.inverse
+        (Functor.associator F.h0 (shiftFunctor (H0 D) n) eD.functor)).hom ℤ := by
+    change NatTrans.CommShift
+      (Functor.whiskerLeft eC.inverse
+        (Functor.associator F.h0 (shiftFunctor (H0 D) n) eD.functor).hom) ℤ
+    infer_instance
+  haveI : NatTrans.CommShift
+      (Functor.associator eC.inverse F.h0
+        (shiftFunctor (H0 D) n ⋙ eD.functor)).symm.hom ℤ := by
+    infer_instance
+  haveI : NatTrans.CommShift
+      (Functor.isoWhiskerLeft (eC.inverse ⋙ F.h0)
+        (eD.functor.commShiftIso n)).hom ℤ := by
+    change NatTrans.CommShift
+      (Functor.whiskerLeft (eC.inverse ⋙ F.h0)
+        (eD.functor.commShiftIso n).hom) ℤ
+    infer_instance
+  haveI : NatTrans.CommShift
+      (Functor.associator (eC.inverse ⋙ F.h0) eD.functor
+        (shiftFunctor Y n)).symm.hom ℤ := by
+    infer_instance
+  change NatTrans.CommShift
+    ((Functor.isoWhiskerRight
+        (Functor.isoWhiskerLeft eC.inverse (F.shiftedFunctorH0Iso n))
+        eD.functor).hom ≫
+      (Functor.associator eC.inverse
+        (F.h0 ⋙ shiftFunctor (H0 D) n) eD.functor).hom ≫
+      (Functor.isoWhiskerLeft eC.inverse
+        (Functor.associator F.h0 (shiftFunctor (H0 D) n) eD.functor)).hom ≫
+      (Functor.associator eC.inverse F.h0
+        (shiftFunctor (H0 D) n ⋙ eD.functor)).symm.hom ≫
+      (Functor.isoWhiskerLeft (eC.inverse ⋙ F.h0)
+        (eD.functor.commShiftIso n)).hom ≫
+      (Functor.associator (eC.inverse ⋙ F.h0) eD.functor
+        (shiftFunctor Y n)).symm.hom) ℤ
+  infer_instance
 
 end Transport
 

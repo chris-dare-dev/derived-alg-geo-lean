@@ -210,6 +210,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsShiftBy.inv
 #print axioms CategoryTheory.IsShiftBy.inv_closed
 #print axioms CategoryTheory.IsShiftBy.inv_hom
+#print axioms CategoryTheory.IsShiftBy.precompEquiv
+#print axioms CategoryTheory.IsShiftBy.precompEquiv_apply
+#print axioms CategoryTheory.IsShiftBy.precompEquiv_symm_apply
+#print axioms CategoryTheory.IsShiftBy.precompEquiv_d
+#print axioms CategoryTheory.IsShiftBy.precompEquiv_d_eq_zero_iff
 #print axioms CategoryTheory.IsShiftBy.mapShift
 #print axioms CategoryTheory.IsShiftBy.mapShift_comp
 #print axioms CategoryTheory.IsShiftBy.mapShift_id
@@ -522,6 +527,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- The ambient shift on H⁰ is the one `H0Shift.lean` built (dg-enhancements-e7).
 #print axioms CategoryTheory.H0.shiftFunctorZero_eq
 #print axioms CategoryTheory.H0.shiftFunctorAdd_eq
+#print axioms CategoryTheory.H0.shiftFunctorAdd'_eq_shiftFunctorAddIso'
+#print axioms CategoryTheory.H0.shiftFunctorComm_hom_app
 
 -- The model shift is Mathlib's shift (dg-enhancements-e7). Stated first on plain
 -- cochain complexes, where no `Cdg`/`CochainComplex` synonym has to be crossed
@@ -796,6 +803,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsConeOf.homogeneousLift_comp_snd_general
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst_isClosed
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd_app
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf
@@ -854,7 +862,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_map
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_eq
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_hom_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_inv_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_commShift
 #print axioms CategoryTheory.DGFunctor.transportedShiftedFunctorH0Iso
+#print axioms CategoryTheory.DGFunctor.transportedShiftedFunctorH0Iso_commShift
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_isEquivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Equivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0CommShift
@@ -952,6 +964,17 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorWitness
 #print axioms CategoryTheory.DGFunctor.exists_shift_dgFunctor
 #print axioms CategoryTheory.DGFunctor.isPretriangulated_dgFunctor
+
+-- Precomposition by the inverse of a selected shift regrades a homogeneous
+-- transformation by shifting its source.  The additive equivalence preserves
+-- and reflects closedness, so degree-one cone projections can become the
+-- degree-zero maps out of a `[-1]` shift used by inverse-rotated triangles.
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorWitness_inv_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.sourceShiftEquiv
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.sourceShiftEquiv_apply_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.sourceShiftEquiv_symm_apply_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.differential_sourceShiftEquiv
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.sourceShiftEquiv_isClosed_iff
 
 -- Whiskering a homogeneous dg natural transformation by a dg functor on either
 -- side.  Neither operation carries a sign, because a dg functor preserves the
@@ -1185,6 +1208,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwist
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistH0Iso
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistCommShift
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistH0Iso_commShift
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwist_isEquivalence
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistEquivalence
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistIsTriangulated

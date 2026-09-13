@@ -265,6 +265,25 @@ that comparison are instance hypotheses to be discharged by the realization.
    already receives the generic `H0.hasShift` from its pretriangulated dg
    structure, so a second instance would duplicate an existing abstraction.
    The dg-functor shift packaging seam is therefore closed.
+
+   Source regrading is now packaged at the same root rather than rebuilt by
+   cone consumers.  `IsShiftBy.precompEquiv` says that precomposition with a
+   selected shift inverse identifies `Hom^p(X,W)` with
+   `Hom^(n+p)(X[n],W)`, and
+   `HomogeneousNatTrans.sourceShiftEquiv` applies it in the dg category of dg
+   functors.  It preserves and reflects closedness.  Thus a closed degree-one
+   cone projection can be read canonically as a closed degree-zero map out of
+   the selected `[-1]` functor shift; no new shift instance or sign convention
+   is introduced.
+
+   At the `H⁰`
+   boundary, `shiftedFunctorH0Iso_commShift` additionally proves that the
+   package constructed directly from `F[n]` agrees with the composite package
+   on `H⁰(F) ⋙ [n]`; the proof reduces the two shift orders with the
+   associativity comparison and cancels the two Koszul signs.  The transported
+   form composes this with endpoint equivalences, using the generic
+   `Pretriangulated.commShiftIso_commShift` rather than another isolated
+   comparison formula.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
@@ -304,7 +323,9 @@ that comparison are instance hypotheses to be discharged by the realization.
    `DGFunctor.transportedShiftedFunctorH0Iso` and its specialization
    `transportedCotwistH0Iso` compare that first vertex with the transport of
    `H⁰` of the actual shifted dg unit cone; equality after transport is not
-   claimed.  `DGFunctor.transportedH0` now packages the shift and exactness
+   claimed.  `transportedCotwistH0Iso_commShift` also specializes the canonical
+   sign-correct compatibility of this comparison.  `DGFunctor.transportedH0`
+   now packages the shift and exactness
    capabilities of an arbitrary `H⁰` dg functor after ordinary equivalence
    transport.  Its cotwist specialization proves exactness from the supplied
    triangulated source equivalence and packages an ordinary exact
@@ -327,11 +348,53 @@ that comparison are instance hypotheses to be discharged by the realization.
    natural third-vertex isomorphism and two remaining triangle squares.
    `PresentedUnitComparisonData` and `PresentedCounitComparisonData` specialize
    it and derive natural twist/cotwist and triangle-family isomorphisms when
-   that data is supplied.  They do not construct the comparison data or imply
-   dg quasi-equivalence, choice independence, `CommShift` compatibility,
-   exactness/equivalence transfer, or sphericality.  The dg notion is still
+   that data is supplied.  Their nested `ShiftCompatibility` refinements can
+   additionally select Fourier--Mukai twist/cotwist `CommShift` structures and
+   require Mathlib compatibility of the projected natural isomorphisms; this
+   transfers `IsTriangulated` from the dg presentations.  On the cotwist side,
+   the comparison from the actual shifted dg cone is then compatible by
+   composition, with no additional field.  Neither the bare
+   comparison data nor the refinements are constructed here.  Given the
+   separate explicit `H⁰` equivalence hypotheses on the dg twist and unshifted
+   unit cone, however, the natural comparisons now package the selected twist
+   and cotwist kernels as `KernelAutoequivalence`s; `ShiftCompatibility`
+   together with the supplied triangulated endpoint equivalence makes those
+   ordinary equivalences exact.  This still implies no dg
+   quasi-equivalence, choice independence, target shift-structure uniqueness,
+   inverse-kernel formula, or sphericality.  The dg notion is still
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
    and no comparison with those exists.
+
+   The left-adjunction dual twist now reaches this same interface without a
+   parallel abstraction.  `DGAdjunctionDualTwistComparison` swaps the endpoint
+   categories and correspondences and reuses `PresentedUnitComparisonData`
+   through the definitional conversion from the presented left-adjoint kernel
+   to the corresponding right-adjoint datum.  Its semantic
+   `PresentedDualTwistComparisonData` alias exposes the objectwise and supplied
+   natural comparisons, conventional and actual-dg shift compatibility,
+   exactness, and conditional `KernelAutoequivalence` packaging.  The
+   conventional dual twist receives exactly the existing `[-1]` shift; the
+   facade does not construct comparison data, infer equivalence, or add a
+   second `CommShift` structure.  Symmetrically,
+   `DGAdjunctionDualCotwistComparison` reuses the counit/twist comparison for
+   the left-adjunction counit.  Its dual cotwist is the unshifted dg counit
+   cone, so this facade adds no inverse rotation or `[-1]` shift.  It exposes
+   the same objectwise, supplied-natural, shift-compatible, exact, and
+   conditional kernel-autoequivalence layers under dual-cotwist names.  Thus
+   both left-adjunction facades are closed over the two existing comparison
+   roots; neither creates new comparison or shift data.
+
+   The canonical `TwistCotwistEquivalenceConditions` now also feeds the two
+   right-adjunction Fourier--Mukai kernel packages directly.  Its twist and
+   unshifted-cotwist-cone quasi-equivalences imply exactly the two `H⁰`
+   equivalence witnesses required by the existing comparison constructors;
+   the cotwist constructor remains solely responsible for the conventional
+   `[-1]` shift.  The adapters package the selected twist and cotwist kernels
+   independently, since their endocorrespondences and enhancement categories
+   need not agree.  Their exactness still requires the separately supplied
+   comparison `ShiftCompatibility` and triangulated endpoint equivalence.
+   These conditions provide no equivalence for either left-adjunction dual
+   cone, no relation between the two selected kernels, and no sphericality.
 
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
@@ -366,7 +429,13 @@ that comparison are instance hypotheses to be discharged by the realization.
    `shiftedFunctorH0IsTriangulated` compose that signed package with the
    canonical comparison on `H⁰(F)` and transport across
    `shiftedFunctorH0Iso`; the latter derives cone preservation automatically
-   while retaining the shift witness that selects its comparison.
+   while retaining the shift witness that selects its comparison.  The new
+   `shiftedFunctorH0Iso_commShift` identifies that transported package with the
+   direct package on `H⁰(F[n])`, and
+   `transportedShiftedFunctorH0Iso_commShift` preserves the identification
+   after ordinary endpoint transport.  Thus downstream cotwist consumers can
+   compose compatibility proofs without manufacturing a source `CommShift`
+   with `Functor.CommShift.ofIso`.
    Consequently `dualTwistH0IsTriangulated` and
    `cotwistH0IsTriangulated` close exactness for the two conventional `[-1]`
    functors without endpoint cone-preservation arguments.  Finally
@@ -653,7 +722,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    identify the two cotwist functors naturally.  The additional realization
    data and remaining triangle-map squares are now explicitly packaged by
    `PresentedUnitComparisonData`, which derives the natural comparison but is
-   not constructed here.
+   not constructed here.  Its `ShiftCompatibility` refinement records
+   compatibility of the conventional cotwist isomorphism with a selected
+   Fourier--Mukai `CommShift` and transfers triangulatedness.  Compatibility
+   of the intermediate actual shifted dg cotwist follows from the canonical
+   transported comparison and is exposed by
+   `transportedDGCotwistIso_commShift`.  The same supplied natural comparison
+   transports kernel-functor status to both versions of the dg cotwist and,
+   under the explicit equivalence hypothesis on the unshifted dg unit cone,
+   packages `cotwistKernelAutoequivalence`; the existing shift refinement and
+   supplied triangulated source equivalence make that equivalence exact.
    The left-adjunction unit is now a third consumer:
    `DualTwistKernelData` swaps the two correspondences and reuses
    `LeftAdjointKernelData.toRightAdjointKernelData`, so its enhanced form names
@@ -672,7 +750,13 @@ that comparison are instance hypotheses to be discharged by the realization.
    triangle, so the transported dg twist and kernel twist are objectwise
    isomorphic.  `PresentedCounitComparisonData` now packages the additional
    natural twist isomorphism and remaining triangle-map squares and derives the
-   natural triangle comparison, but no geometric constructor supplies it.
+   natural triangle comparison, while its `ShiftCompatibility` refinement
+   transfers triangulatedness to a selected compatible Fourier--Mukai shift
+   structure.  Under an explicit equivalence hypothesis on `H⁰` of the dg
+   twist it also packages the selected cone kernel as
+   `twistKernelAutoequivalence`, with exactness supplied jointly by that
+   refinement and the triangulated target equivalence.  No geometric constructor
+   supplies either record or either equivalence hypothesis.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.

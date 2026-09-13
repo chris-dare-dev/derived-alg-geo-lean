@@ -10,8 +10,11 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Convolution
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.CounitKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionCotwistComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionDualCotwistComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionDualTwistComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionPresentation
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionTwistComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionTwistCotwistAutoequivalence
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DualCotwistKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DualTwistKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.ExceptionalExtension
@@ -32,8 +35,14 @@ projection-formula identification; and the induced maps on the triangulated
 Grothendieck group.  Presented dg unit/counit and cotwist/twist triangles can
 be compared objectwise, noncanonically, with independently chosen
 Fourier--Mukai cone triangles; separately supplied comparison data produce
-natural triangle and functor isomorphisms between the same families.  No
-geometry, and no theorem asserting that a functor is of this form or that it
-has an adjoint.
+natural triangle and functor isomorphisms between the same families.
+Shift-compatible refinements transfer triangulatedness to the selected
+Fourier--Mukai twist and cotwist shift structures.  The left-adjunction dual
+twist and dual cotwist expose the same comparison and conditional
+kernel-autoequivalence APIs through the definitional correspondence swaps.
+The canonical enhanced twist/cotwist equivalence conditions discharge the
+ordinary equivalence inputs for the right-adjunction pair without supplying
+their comparison or shift data.  No geometry, and no
+theorem asserting that a functor is of this form or that it has an adjoint.
 
 -/

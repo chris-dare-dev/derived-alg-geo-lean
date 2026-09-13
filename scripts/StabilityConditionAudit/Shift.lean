@@ -45,6 +45,7 @@ and remains available for compatibility and object-only uses. -/
 #print axioms CategoryTheory.Pretriangulated.shiftFunctorUnsignedCommShift
 #print axioms CategoryTheory.Pretriangulated.shiftFunctorCommShift
 #print axioms CategoryTheory.Pretriangulated.shiftFunctorCommShift_commShiftIso_hom_app
+#print axioms CategoryTheory.Pretriangulated.commShiftIso_commShift
 #print axioms CategoryTheory.Pretriangulated.shiftSignIso
 #print axioms CategoryTheory.Pretriangulated.shiftFunctorMapTriangleIso
 #print axioms CategoryTheory.Pretriangulated.shiftFunctorIsTriangulated

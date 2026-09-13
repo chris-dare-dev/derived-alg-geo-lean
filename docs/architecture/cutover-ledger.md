@@ -7,6 +7,36 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Conditional dg/Fourier--Mukai kernel autoequivalences (2026-09-13):
+  a supplied `PresentedCounitComparisonData` or `PresentedUnitComparisonData`
+  transports an explicit `H⁰` equivalence hypothesis from the dg twist or
+  unshifted unit cone to the selected Fourier--Mukai twist or conventional
+  cotwist.  `twistKernelAutoequivalence` and
+  `cotwistKernelAutoequivalence` package the already named cone kernels with
+  the repository's `KernelAutoequivalence` interface; the cotwist uses the
+  existing exact-family shift comparison for its `[-1]` kernel.  The natural
+  comparisons also expose the transported dg functors as kernel functors.
+  Together with the supplied triangulated endpoint equivalence, the existing
+  `ShiftCompatibility` gives the two equivalences Mathlib's canonical
+  triangulated-equivalence package.  No comparison data,
+  equivalence hypothesis, inverse kernel, dg quasi-equivalence, adjoint
+  comparison, or sphericality is constructed.
+- Shift-compatible dg/Fourier--Mukai twist and cotwist comparison
+  (2026-09-13): the nested `ShiftCompatibility` records refine supplied
+  `PresentedCounitComparisonData` and `PresentedUnitComparisonData` with an
+  independently selected `CommShift` on the Fourier--Mukai twist or cotwist
+  and Mathlib's `NatTrans.CommShift` condition for the corresponding natural
+  isomorphism.  `twistIsTriangulated` and `cotwistIsTriangulated` then delegate
+  exactness transfer to Mathlib's `Functor.isTriangulated_of_iso`.  The
+  cotwist side compares the conventional pointwise `[-1]` functor, whose
+  sign-correct shift structure is already packaged.
+  `transportedCotwistH0Iso_commShift` derives compatibility of the intermediate
+  actual shifted dg cone, and
+  `ShiftCompatibility.transportedDGCotwistIso_commShift` composes it with the
+  supplied Fourier--Mukai comparison.  Neither compatibility is stored as new
+  record data.  The shift-compatibility layer manufactures no target shift
+  structure and installs no global instance; it asserts no uniqueness or
+  sphericality.
 - Supplied natural comparison of dg and Fourier--Mukai adjunction cones
   (2026-09-13): `Triangle.FirstMapNormalizationData.ComparisonData` records the
   remaining data for an endpoint-strict comparison of two normalizations with
@@ -18,9 +48,10 @@ blocks should normally move it rather than add more declarations beside it.
   this contract to the independently chosen dg and kernel cones; they derive
   natural unit/counit and twist/cotwist comparisons, including the actual
   shifted dg cotwist.  The records are supplied and are not inferred from the
-  earlier pointwise choices.  No canonicity, `CommShift` compatibility,
-  exactness/equivalence transfer, dg kernel identification, or sphericality is
-  asserted.
+  earlier pointwise choices.  By themselves the bare records assert no
+  canonicity, `CommShift` compatibility, equivalence of either functor, or
+  sphericality; the conditional consumers above require the separate
+  equivalence and shift inputs explicitly.
 - Objectwise dg/Fourier--Mukai twist comparison (2026-09-13):
   `CounitKernelConeData.presentedCounitTriangleObjIso` applies Mathlib's
   triangle-isomorphism completion theorem to the presented dg and independently
@@ -59,10 +90,12 @@ blocks should normally move it rather than add more declarations beside it.
   pointwise `[-1]` shift `UnitConeData.transportedCotwist`, and
   `transportedCotwistH0Iso` specializes the reusable
   `DGFunctor.transportedShiftedFunctorH0Iso` to compare it with the transported
-  `H⁰` of the actual shifted dg unit cone.  The adjunction unit is literally
-  the rotated second map and every value is distinguished under the existing
-  source-side hypotheses.  Exactness and equivalence are separate capability
-  accessors with their own hypotheses; this presentation infers no
+  `H⁰` of the actual shifted dg unit cone;
+  `transportedCotwistH0Iso_commShift` specializes the corresponding canonical
+  shift-compatibility theorem.  The adjunction unit is literally the rotated
+  second map and every value is distinguished under the existing source-side
+  hypotheses.  Exactness and equivalence are separate capability accessors
+  with their own hypotheses; this presentation infers no
   natural Fourier--Mukai comparison, distinguished functor-category triangle,
   or sphericality.
 - Ordinary presentations of dg-adjunction unit triangles (2026-09-13):
@@ -440,7 +473,15 @@ blocks should normally move it rather than add more declarations beside it.
   `DGFunctor.shiftedFunctorH0CommShift` composes the canonical comparison on
   `H⁰(F)` with the signed integral-shift package and transports it across
   `shiftedFunctorH0Iso`; `shiftedFunctorH0IsTriangulated` transports exactness
-  by the same route.  Both are explicit interfaces, not global instances.
+  by the same route.  `shiftedFunctorH0Iso_commShift` now proves that this
+  transported package agrees with the package constructed directly from the
+  shifted dg functor, including the Koszul sign, while
+  `transportedShiftedFunctorH0Iso_commShift` carries the comparison through
+  endpoint equivalences.  Beyond the endpoint shift and additivity packages
+  needed to state compatibility, the only extra functor hypothesis there is
+  additivity of the forward target equivalence, used by the reusable
+  `Pretriangulated.commShiftIso_commShift`.  These are explicit interfaces,
+  not global instances.
   The underlying `H⁰` capability transport now also keeps independent source
   and target object universes, matching the shifted-functor comparison API.
   The conventional `[-1]` dual twist and cotwist now reuse this root, and their
@@ -499,6 +540,39 @@ blocks should normally move it rather than add more declarations beside it.
   distinguished under the existing exactness hypotheses.  This is not a new
   adjunction, cone choice, or normalization construction, and it asserts no
   exactness, invertibility, dual-kernel identity, or sphericality.
+- Presented dg/Fourier--Mukai dual-twist comparison (2026-09-13):
+  `DGAdjunctionDualTwistComparison` is a semantic facade over the existing
+  right-unit/cotwist comparison after swapping the endpoint categories and
+  correspondences.  `PresentedDualTwistComparisonData` is an abbreviation of
+  the canonical `PresentedUnitComparisonData`, so objectwise and supplied
+  natural triangle comparisons, the conventional and actual-dg shift laws,
+  exactness, and conditional `KernelAutoequivalence` packaging introduce no
+  second comparison or shift structure.  The equivalence of `H⁰` of the
+  unshifted unit cone, the natural comparison data, endpoint exactness, and
+  the target `CommShift` remain explicit inputs.  No dg quasi-equivalence,
+  inverse-kernel formula, comparison canonicity, or sphericality is asserted.
+- Presented dg/Fourier--Mukai dual-cotwist comparison (2026-09-13):
+  `DGAdjunctionDualCotwistComparison` swaps the endpoints and correspondences
+  and exposes the existing right-counit/twist comparison through
+  dual-cotwist names.  `PresentedDualCotwistComparisonData` and its
+  `ShiftCompatibility` are aliases of the canonical comparison roots; the
+  semantic constructors merely populate those existing records.  The dual
+  cotwist is the unshifted counit cone, so no inverse rotation or `[-1]` shift
+  is introduced.  Natural comparison data, the `H⁰` equivalence hypothesis,
+  endpoint exactness, and the target `CommShift` remain explicit.  No dg
+  quasi-equivalence, inverse-kernel formula, canonicity, or sphericality is
+  asserted.
+- Enhanced twist/cotwist conditions to Fourier--Mukai kernels (2026-09-13):
+  `DGAdjunctionTwistCotwistAutoequivalence` is an FM-owned consumer of the
+  canonical `SphericalTwist.TwistCotwistEquivalenceConditions`.  Its two
+  quasi-equivalence fields supply the existing twist and unshifted cotwist
+  `H⁰` equivalence hypotheses through `DGFunctor.isEquivalence_h0`; the
+  existing comparison constructors then package the selected kernels as
+  independent `KernelAutoequivalence`s.  No paired or spherical record is
+  introduced.  Exactness still consumes the existing per-side
+  `ShiftCompatibility` and endpoint triangulated equivalence, and the dual
+  twist/cotwist, inverse kernels, comparison canonicity, and full sphericality
+  remain outside the conclusion.
 - Shifted Fourier--Mukai cone kernels (2026-09-12):
   `KernelConeNormalizationData` names the ordinary kernel represented by its
   selected enhanced cone and, for every integer shift, the kernel obtained by

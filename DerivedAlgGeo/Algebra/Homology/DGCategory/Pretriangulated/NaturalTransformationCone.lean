@@ -193,6 +193,12 @@ noncomputable def fst : HomogeneousNatTrans K.functor F 1 :=
 theorem fst_app (X : C) : app K.fst X = (K.isCone X).fst :=
   rfl
 
+/-- The degree-one projection from a functorial cone to its source is closed
+in the dg functor category. -/
+theorem fst_isClosed : IsClosed K.fst := by
+  ext X
+  exact (K.isCone X).delta_fst
+
 /-- The cone projections to the target form a closed degree-zero homogeneous
 dg natural transformation `Cone(α) ⟶ G`. -/
 noncomputable def snd : HomogeneousNatTrans K.functor G 0 :=

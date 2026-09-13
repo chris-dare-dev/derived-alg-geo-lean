@@ -26,8 +26,15 @@ separately at each object and therefore supplies no naturality.  A separate
 `PresentedUnitComparisonData` interface records a genuinely supplied natural
 cone isomorphism and its two remaining triangle squares; from that input the
 file constructs natural unit- and cotwist-triangle isomorphisms.  It does not
-construct this input, prove independence of either cone choice, or transfer
-exactness, equivalence, kernel-presentation, or sphericality.
+construct this input or prove independence of either cone choice.  Under an
+explicit `H⁰` equivalence hypothesis on the unshifted dg unit cone, the
+comparison packages the selected shifted kernel as a `KernelAutoequivalence`;
+it does not prove that hypothesis or sphericality.  A further `ShiftCompatibility`
+refinement can select a Fourier--Mukai `CommShift`
+structure compatible with the conventional cotwist comparison; exactness
+then transfers through Mathlib's existing `Functor.isTriangulated_of_iso`
+theorem.  Compatibility of the composite comparison from the actual shifted
+dg cone is derived from that refinement rather than stored separately.
 -/
 
 set_option autoImplicit false
@@ -157,6 +164,8 @@ abbrev PresentedUnitComparisonData :=
 
 namespace PresentedUnitComparisonData
 
+section Comparison
+
 variable (N : S.PresentedUnitComparisonData adj H K hE)
 
 /-- Supply a natural comparison of the transported dg and Fourier--Mukai unit
@@ -240,6 +249,138 @@ to the Fourier--Mukai cotwist. -/
 noncomputable def transportedDGCotwistIso :
     K.transportedDGCotwist eA ≅ S.cotwist :=
   K.transportedCotwistH0Iso (eC := eA) ≪≫ N.transportedCotwistIso
+
+end Comparison
+
+/-- The conventional transported dg cotwist is a kernel functor once a
+natural comparison with the selected Fourier--Mukai cotwist has been
+supplied. -/
+theorem transportedCotwist_isKernelFunctor
+    (N : S.PresentedUnitComparisonData adj H K hE) :
+    E.IsKernelFunctor (K.transportedCotwist eA) :=
+  (S.isKernelFunctor_cotwist hE.toCommShift).of_natIso
+    N.transportedCotwistIso.symm
+
+/-- The transport of the actual shifted dg unit cone is a kernel functor
+through the composite natural comparison. -/
+theorem transportedDGCotwist_isKernelFunctor
+    (N : S.PresentedUnitComparisonData adj H K hE) :
+    E.IsKernelFunctor (K.transportedDGCotwist eA) :=
+  (S.isKernelFunctor_cotwist hE.toCommShift).of_natIso
+    N.transportedDGCotwistIso.symm
+
+/-- An explicit equivalence hypothesis on `H⁰` of the unshifted dg unit cone
+transfers to the selected conventional Fourier--Mukai cotwist. -/
+theorem cotwist_isEquivalence
+    (N : S.PresentedUnitComparisonData adj H K hE)
+    (hK : K.unitCone.h0.IsEquivalence) :
+    S.cotwist.IsEquivalence := by
+  letI : (K.transportedCotwist eA).IsEquivalence :=
+    K.transportedCotwist_isEquivalence hK
+  exact Functor.isEquivalence_of_iso N.transportedCotwistIso
+
+/-- The selected shifted cotwist kernel, packaged as a kernel autoequivalence
+under the explicit equivalence hypothesis on `H⁰` of the unshifted dg unit
+cone. -/
+@[reducible]
+noncomputable def cotwistKernelAutoequivalence
+    (N : S.PresentedUnitComparisonData adj H K hE)
+    (hK : K.unitCone.h0.IsEquivalence) : KernelAutoequivalence X W := by
+  letI : (K.transportedCotwist eA).IsEquivalence :=
+    K.transportedCotwist_isEquivalence hK
+  letI : S.cotwist.IsEquivalence :=
+    Functor.isEquivalence_of_iso N.transportedCotwistIso
+  exact
+    { corr := E
+      kernel := S.cotwistKernel
+      equiv := S.cotwist.asEquivalence
+      iso := (S.cotwistKernelIso hE.toCommShift).symm }
+
+/-! ### Compatibility with selected shift structures -/
+
+variable (N : S.PresentedUnitComparisonData adj H K hE)
+
+/-- Compatibility of the supplied conventional dg/Fourier--Mukai cotwist
+comparison with an independently selected shift structure on the
+Fourier--Mukai cotwist.
+
+The source uses the canonical sign-correct shift structure on the conventional
+pointwise `[-1]` cotwist.  Compatibility of the intermediate comparison from
+the actual shifted dg cone is derived canonically and is not stored here. -/
+structure ShiftCompatibility where
+  /-- The selected shift structure on the Fourier--Mukai cotwist. -/
+  cotwistCommShift : S.cotwist.CommShift ℤ
+  /-- The conventional cotwist comparison respects the source and target
+  shift structures. -/
+  transportedCotwistIso_commShift :
+    letI : (K.transportedCotwist eA).CommShift ℤ :=
+      K.transportedCotwistCommShift (eC := eA)
+    letI : S.cotwist.CommShift ℤ := cotwistCommShift
+    NatTrans.CommShift N.transportedCotwistIso.hom ℤ
+
+namespace ShiftCompatibility
+
+variable (h : N.ShiftCompatibility)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The composite comparison from the actual shifted dg cotwist to the
+Fourier--Mukai cotwist respects the canonical source shift package and the
+selected Fourier--Mukai shift package. -/
+theorem transportedDGCotwistIso_commShift [eA.functor.Additive] :
+    letI : (K.transportedDGCotwist eA).CommShift ℤ :=
+      (K.unitCone.shiftedFunctor (-1 : ℤ)).transportedH0CommShift
+    letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
+    NatTrans.CommShift N.transportedDGCotwistIso.hom ℤ := by
+  letI : (K.transportedDGCotwist eA).CommShift ℤ :=
+    (K.unitCone.shiftedFunctor (-1 : ℤ)).transportedH0CommShift
+  letI : (K.transportedCotwist eA).CommShift ℤ :=
+    K.transportedCotwistCommShift (eC := eA)
+  letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
+  letI : NatTrans.CommShift (K.transportedCotwistH0Iso (eC := eA)).hom ℤ :=
+    K.transportedCotwistH0Iso_commShift (eC := eA)
+  letI : NatTrans.CommShift N.transportedCotwistIso.hom ℤ :=
+    h.transportedCotwistIso_commShift
+  change NatTrans.CommShift
+    ((K.transportedCotwistH0Iso (eC := eA)).hom ≫
+      N.transportedCotwistIso.hom) ℤ
+  infer_instance
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The Fourier--Mukai cotwist is triangulated relative to the selected target
+shift structure when the conventional cotwist comparison respects shifts. -/
+theorem cotwistIsTriangulated [eA.functor.IsTriangulated] :
+    letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
+    S.cotwist.IsTriangulated := by
+  letI : (K.transportedCotwist eA).CommShift ℤ :=
+    K.transportedCotwistCommShift (eC := eA)
+  letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
+  letI : NatTrans.CommShift N.transportedCotwistIso.hom ℤ :=
+    h.transportedCotwistIso_commShift
+  letI : (K.transportedCotwist eA).IsTriangulated :=
+    K.transportedCotwistIsTriangulated (eC := eA)
+  exact Functor.isTriangulated_of_iso N.transportedCotwistIso
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The kernel autoequivalence of the selected Fourier--Mukai cotwist is an
+exact equivalence relative to the selected target shift package. -/
+theorem cotwistKernelAutoequivalenceIsTriangulated
+    [eA.functor.IsTriangulated] (hK : K.unitCone.h0.IsEquivalence) :
+    letI : (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.functor.CommShift ℤ :=
+      h.cotwistCommShift
+    letI : (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.inverse.CommShift ℤ :=
+      (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.commShiftInverse ℤ
+    letI : (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.CommShift ℤ :=
+      (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.commShift_of_functor ℤ
+    (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.IsTriangulated := by
+  letI : (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.functor.CommShift ℤ :=
+    h.cotwistCommShift
+  letI : (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.inverse.CommShift ℤ :=
+    (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.commShiftInverse ℤ
+  letI : (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.CommShift ℤ :=
+    (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.commShift_of_functor ℤ
+  exact Equivalence.IsTriangulated.mk' _ h.cotwistIsTriangulated
+
+end ShiftCompatibility
 
 end PresentedUnitComparisonData
 
