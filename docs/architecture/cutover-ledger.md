@@ -94,6 +94,22 @@ blocks should normally move it rather than add more declarations beside it.
   `HomotopyEquiv`; it proves no automatic formality, quasi-isomorphism
   invariance, Hom-cohomology comparison, Euler/K₀ formula, cone preservation,
   basis independence, or concrete `HasLinearCopowers` instance.
+- Supplied-presentation scalar-copower `K₀` class (2026-09-12):
+  `DGEnhancement.FiniteCohomologyCopowerK0` owns the numerical leaf
+  `FiniteCohomologyPresentation.linearCopowerK₀Of`.  For an explicitly
+  supplied finite cohomology presentation whose displayed homology modules
+  are finite free, it combines `linearCopowerFinrankIso`, the generic finite
+  biproduct law in triangulated `K₀`, and `K₀.of_shift_int` to identify the
+  selected scalar-linear copower class with Mathlib's
+  `HomologicalComplex.homologyEulerChar` times `[X]`.  The support reduction
+  comes only from the supplied presentation; the theorem assumes a nontrivial
+  base ring and infers neither a presentation nor formality from bare
+  finiteness.  It introduces no
+  parallel Euler-characteristic definition and supplies no comparison between
+  scalar-linear `LinearEvaluationData` and additive `EvaluationData`.  The
+  next numerical seam is a shared endofunctor-level Euler interface consumed
+  directly by the linear evaluation package, followed only then by an
+  explicit bridge to the existing additive object-twist interface.
 - Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
   `DGCategory.LinearCopowerFunctor` packages the universal property as a
   degreewise `homComplexIso`, then uses it to define the homogeneous
@@ -172,9 +188,12 @@ blocks should normally move it rather than add more declarations beside it.
   supplied finite cohomology presentations now transport to shifted finite
   biproducts and finite-free homology expands these into `finrank` copies.
   The scalar-linear Hom-cohomology comparison is now closed, and generic
-  triangulated `K₀` now computes finite biproduct classes.  The next
-  numerical root is the supplied-presentation scalar-copower class formula;
-  automatic formality remains a separate later lane.
+  triangulated `K₀` now computes finite biproduct classes, and the supplied
+  finite-presentation scalar-copower class is Mathlib's homological Euler
+  characteristic times the object class.  The next numerical root is a
+  shared endofunctor-level Euler interface for linear evaluation, with any
+  passage to additive `EvaluationData` remaining explicit; automatic
+  formality remains a separate later lane.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under

@@ -130,6 +130,7 @@ Category
 │  │     │     └─ finite presentation transport
 │  │     │        ├─ finite biproduct of shifted degree-zero copowers in H⁰ C
 │  │     │        └─ nested finite biproduct of shifts of X with finrank multiplicity
+│  │     │           └─ K₀ class = homologyEulerChar • [X] for supplied finite-free data
 │  │     └─ LinearEvaluationData k E     scalar-linear Hom(E,-) ⊗ E assembly
 │  │        ├─ functor                   k-linear dg functor
 │  │        ├─ evaluation                closed degree-zero map to the identity
