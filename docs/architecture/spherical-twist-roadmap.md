@@ -418,15 +418,20 @@ that comparison are instance hypotheses to be discharged by the realization.
    `K₀.of_biproduct` computes the class of any finite biproduct as the sum
    of the classes of its factors, with a constant-family multiplicity
    corollary.  This lives at the triangulated Grothendieck-group root and is
-   intentionally independent of copowers.  The immediate downstream seam is
-   to combine it with `linearCopowerFinrankIso` and `K₀.of_shift_int` for a
-   supplied finite cohomology presentation.
+   intentionally independent of copowers.  The supplied-presentation
+   scalar-copower Euler class is now closed as well:
+   `FiniteCohomologyPresentation.linearCopowerK₀Of` combines
+   `linearCopowerFinrankIso`, `K₀.of_biproduct`, and `K₀.of_shift_int` to
+   compute the selected copower class as Mathlib's
+   `HomologicalComplex.homologyEulerChar` times `[X]`.  Its explicit finite
+   presentation and finite-free hypotheses are data, not inferred formality.
    The parallel linear evaluation package still does not discharge the
    existing additive `EvaluationData.IsEulerCopower`; a later lane must
    formulate its numerical consumer directly or accept explicit comparison
-   data.  The scalar-copower Euler class, the shared endofunctor-level Euler
-   interface, and automatic formality remain open; automatic formality is not
-   to be inferred from Hom-finiteness.
+   data.  The next seam is the shared endofunctor-level Euler interface for
+   `LinearEvaluationData`, followed by an explicit bridge to additive
+   evaluation.  Automatic formality remains open and is not to be inferred
+   from Hom-finiteness.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies either a `HasCopowers` instance for the additive interface or a

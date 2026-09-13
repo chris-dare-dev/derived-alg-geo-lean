@@ -1231,6 +1231,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerIso
 #print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerFinrankIso
 
+-- The supplied-presentation numerical leaf combines the finite-free normal
+-- form with generic finite-biproduct and integral-shift calculus in
+-- triangulated `K₀`.  It uses Mathlib's homological Euler characteristic and
+-- gets its support bound only from the supplied presentation; it does not
+-- infer formality, a presentation from bare finiteness, or an evaluation-data
+-- comparison.
+#print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerK₀Of
+
 -- Scalar-linear evaluation data assembles the linear copowers at a fixed
 -- object into a `k`-linear dg functor and a closed evaluation transformation.
 -- Its existence selector is choice-independent up to a coherent canonical
