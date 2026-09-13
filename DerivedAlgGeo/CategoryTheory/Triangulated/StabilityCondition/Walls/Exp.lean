@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp.Comparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp.Divisorial
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp.Kernel
 
 /-!
@@ -10,5 +11,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp.Ke
 
 `Kernel.lean` states the charge once, indexed by truncation degree;
 `Comparison.lean` proves the surface and threefold families are that kernel at
-`m = 2` and `m = 3`.
+`m = 2` and `m = 3`; `Divisorial.lean` proves the arbitrary-Picard-rank charge
+is the same kernel with the intersection form in place of the degree
+functional.
 -/
