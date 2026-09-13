@@ -21,6 +21,7 @@ namespace AlgebraicGeometry.DerivedCategory.Families
 
 open CategoryTheory CategoryTheory.Limits Opposite
 open AlgebraicGeometry
+open AlgebraicGeometry.Scheme.Modules
 
 noncomputable section
 
