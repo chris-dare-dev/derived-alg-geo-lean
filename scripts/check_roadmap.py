@@ -456,6 +456,14 @@ def main(argv):
     # RM-07 -----------------------------------------------------------------
     judged = unjudged = 0
     inherited = []
+    # Every entry the closing-set rewrite below lets through is RECORDED here
+    # and printed with the summary. The rewrite is invisible otherwise: the
+    # entry simply stops being judged, and an entry passing `done` against an
+    # issue that is still OPEN leaves no trace of why. This module has no quiet
+    # mode -- RM-07 already prints its inherited findings for the same reason.
+    # RM-08 still judges these entries; the note says which ones RM-07 handed
+    # over, so the two rules are legible together.
+    exempt = []
 
     def rm07(entry_id, detail):
         """Fail, unless this branch did not author the entry.
@@ -485,11 +493,16 @@ def main(argv):
         # request that closes an issue can be green either way. That is a
         # repository-wide block, and it shipped in #1252 -- the rules were
         # written apart and never run against each other.
-        if closing and n in closing:
+        closes_here = bool(closing) and n in closing and gh_state == "OPEN"
+        if closes_here:
             gh_state = "CLOSED"
         if status in RM07_DONE_STATUSES:
             judged += 1
-            if gh_state == "OPEN":
+            if closes_here:
+                # RM-08's required end state, not a disagreement: the merge
+                # closes #n and this entry already says so.
+                exempt.append(f"{e['id']}: status={status}, #{n} closes on merge")
+            elif gh_state == "OPEN":
                 rm07(e["id"],
                      f"{e['id']}: roadmap says status={status} but #{n} is "
                      f"OPEN -- either the work is not finished (THE ROADMAP "
@@ -556,6 +569,12 @@ def main(argv):
         print(f"        RM-07: scoped to {len(authored)} entr"
               f"{'y' if len(authored) == 1 else 'ies'} this branch authored "
               f"(base {scope_to})")
+    if exempt:
+        print(f"        RM-07: {len(exempt)} entr"
+              f"{'y' if len(exempt) == 1 else 'ies'} not judged because this "
+              f"pull request closes the issue on merge (RM-08 judges those):")
+        for detail in exempt:
+            print(f"          note  RM-07  {detail}")
     if inherited:
         print(f"        RM-07: {len(inherited)} inherited disagreement(s) NOT "
               f"failed here -- they are `main`'s to fix, and `main`'s own run "
