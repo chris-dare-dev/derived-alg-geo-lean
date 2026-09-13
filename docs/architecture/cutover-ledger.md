@@ -514,6 +514,17 @@ blocks should normally move it rather than add more declarations beside it.
   distinguished under the existing exactness hypotheses.  This is not a new
   adjunction, cone choice, or normalization construction, and it asserts no
   exactness, invertibility, dual-kernel identity, or sphericality.
+- Presented dg/Fourier--Mukai dual-twist comparison (2026-09-13):
+  `DGAdjunctionDualTwistComparison` is a semantic facade over the existing
+  right-unit/cotwist comparison after swapping the endpoint categories and
+  correspondences.  `PresentedDualTwistComparisonData` is an abbreviation of
+  the canonical `PresentedUnitComparisonData`, so objectwise and supplied
+  natural triangle comparisons, the conventional and actual-dg shift laws,
+  exactness, and conditional `KernelAutoequivalence` packaging introduce no
+  second comparison or shift structure.  The equivalence of `H⁰` of the
+  unshifted unit cone, the natural comparison data, endpoint exactness, and
+  the target `CommShift` remain explicit inputs.  No dg quasi-equivalence,
+  inverse-kernel formula, comparison canonicity, or sphericality is asserted.
 - Shifted Fourier--Mukai cone kernels (2026-09-12):
   `KernelConeNormalizationData` names the ordinary kernel represented by its
   selected enhanced cone and, for every integer shift, the kernel obtained by
