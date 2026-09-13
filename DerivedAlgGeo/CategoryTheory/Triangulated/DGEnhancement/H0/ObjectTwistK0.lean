@@ -18,10 +18,12 @@ cochains over `ℤ`, not `k`-linear cochains.
 using the fixed-source descended character `chiRight`; this retains
 Hom-finiteness and finite Ext-amplitude without imposing the stronger
 shift-linearity needed to descend in the first variable as well.  The property
-is independent of the chosen evaluation data.  The scalar-linear copower root
-now exists separately; scalar-linear evaluation data, homotopy invariance, and
-a finite shifted-sum/cohomology presentation are still required to construct
-this property in a concrete dg model.
+is independent of the chosen additive evaluation data.  The parallel
+scalar-linear copower and evaluation roots now exist, but they do not imply
+this additive property.  A later consumer must either formulate the Euler
+statement directly for `LinearEvaluationData` or accept explicit comparison
+data; homotopy invariance and a finite shifted-sum/cohomology presentation are
+still required for the concrete computation.
 -/
 
 set_option autoImplicit false

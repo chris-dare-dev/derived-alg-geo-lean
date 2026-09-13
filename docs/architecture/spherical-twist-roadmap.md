@@ -92,6 +92,17 @@ HasEvaluationData E
 ├─ chosenEvaluationData: a noncomputably selected EvaluationData witness
 └─ supplied automatically by HasCopowers C
 
+HasLinearEvaluationData k E
+├─ chosenLinearEvaluationData: a noncomputably selected LinearEvaluationData witness
+└─ supplied automatically by HasLinearCopowers k C
+
+LinearEvaluationData k E
+├─ functor = Hom(E,-) ⊗ E, a k-linear dg functor
+├─ evaluation : functor ⟶ id, closed in degree zero
+├─ compareIso: canonical Z⁰ isomorphism between choices, strictly compatible
+│  with evaluation
+└─ no additive EvaluationData adapter, cone, Euler formula, or concrete instance
+
 EvaluationData E
 ├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
 ├─ compareIso: canonical Z⁰ isomorphism between any two choices, strictly
@@ -340,7 +351,7 @@ that comparison are instance hypotheses to be discharged by the realization.
 
    There is a second, independent boundary at scalars.  `IsCopowerOf` is
    `AddCommGrpCat`-valued and represents all additive cochains, so it models an
-   additive copower over `ℤ`; the coefficient in `chiHom` is a dimension
+   additive copower over `ℤ`; the coefficient in `chiRight` is a dimension
    over `k`.  The former therefore cannot imply the latter at general `k`.
    `DGCategory.Linear` now exposes the genuinely `k`-linear Hom-complex, and
    `DGCategory.LinearCopower` supplies the copower root over a commutative
@@ -348,17 +359,22 @@ that comparison are instance hypotheses to be discharged by the realization.
    a linear equivalence with Mathlib's `HomComplex.Cochain`, not with all
    additive cochains.  Thus there is no forgetful projection to
    `IsCopowerOf`, because retaining its additive surjectivity would be
-   inconsistent with the intended tensor product.  The next lane is
-   scalar-linear evaluation data assembled from that root.  After that, the
-   Euler realization (initially over a field) still needs functoriality under
-   chain homotopies and a finite cohomology presentation as shifted finite
-   sums.  Only that realization can discharge `IsEulerCopower`.
+   inconsistent with the intended tensor product.
+   `DGCategory.LinearEvaluation` now assembles that root into
+   `LinearEvaluationData k E`: a `k`-linear dg functor, a closed evaluation
+   transformation, and coherent comparison isomorphisms between choices.
+   This parallel package does not discharge the existing additive
+   `EvaluationData.IsEulerCopower`; a later lane must formulate its numerical
+   consumer directly or accept explicit comparison data.  The Euler
+   realization (initially over a field) still needs functoriality under chain
+   homotopies and a finite cohomology presentation as shifted finite sums.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies either a `HasCopowers` instance for the additive interface or a
    `HasLinearCopowers` instance for the scalar-linear one.  The generic
-   existence/choice interfaces and their comparison coherences are closed, as
-   is choice-independence of the additive cone-preservation capability.  The
+   existence/choice interfaces, including linear evaluation, and their
+   comparison coherences are closed, as is choice-independence of the additive
+   cone-preservation capability.  The
    comparison seam is closed at both
    dg-functor and full H⁰-triangle levels.  `IsConeOf.isoOfStrictSquare` lifts
    endpoint isomorphisms in a strict square,
