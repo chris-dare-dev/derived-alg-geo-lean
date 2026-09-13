@@ -42,6 +42,12 @@ namespace RightProjectionData
 
 variable {P} (Q : RightProjectionData P)
 
+/-- Transport chosen right-projection data across an equality of object
+properties. -/
+def ofEq {P' : ObjectProperty C} (h : P = P') : RightProjectionData P' := by
+  subst h
+  exact Q
+
 /-- Extract a chosen right projection from proposition-valued right
 admissibility. This is noncomputable because admissibility only asserts that
 the adjoint exists. -/
