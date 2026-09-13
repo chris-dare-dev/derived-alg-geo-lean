@@ -287,7 +287,9 @@ Category
 │     ├─ DualTwistKernelData              left-adjunction unit specialization after swapping
 │     │  └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
 │     │     ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
-│     │     └─ dualTwistTriangleInTarget             inverse rotation, pointwise distinguished
+│     │     ├─ dualTwistTriangleInTarget             inverse rotation, pointwise distinguished
+│     │     ├─ presented dg comparison               cotwist comparison reused after swapping
+│     │     └─ conditional KernelAutoequivalence     explicit H⁰ equivalence + natural comparison
 │     └─ DualCotwistKernelData            left-adjunction counit specialization after swapping
 │        └─ DualCotwistKernelConeData     reuses the counit/twist cone and normalization
 │           ├─ dualCotwistKernel                      selected enhanced cone presenting dual cotwist
