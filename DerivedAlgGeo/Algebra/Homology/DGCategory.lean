@@ -18,6 +18,7 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearCopowerFunctor
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearCopowerUnit
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearEvaluation
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearH0
+import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearH0Homology
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Opposite
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Product
 import DerivedAlgGeo.Algebra.Homology.DGCategory.QuasiEquivalence

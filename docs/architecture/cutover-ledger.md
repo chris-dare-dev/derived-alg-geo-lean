@@ -103,6 +103,23 @@ blocks should normally move it rather than add more declarations beside it.
   preserve the linear contract.  Scalar-linear evaluation data and the
   coefficient DG-functor/homotopy root now consume this universal property
   separately; no Euler-class or finite-presentation result is asserted here.
+- Scalar-linear dg Hom-cohomology comparison (2026-09-12):
+  `DGCategory.Pretriangulated.ShiftIso` now packages the degreewise
+  bijectivity in `IsShiftBy` as an actual isomorphism of Hom-complexes, and
+  `LinearShiftIso` supplies its `ModuleCat k` refinement through the existing
+  `DGLinear.postcompCochain` and Mathlib cocycle-to-shift equivalence.
+  `DGCategory.LinearH0Homology` owns the intrinsic degree-zero quotient
+  comparison, and `Pretriangulated.LinearShiftHomology` combines it with
+  Mathlib's shifted-homology isomorphism for an explicit `IsShiftBy` witness.
+  `DGEnhancement.H0.HomCohomology` only selects the existing `HasShift` object,
+  giving
+  `Hⁿ(DGLinear.homComplex k X Y) ≃ₗ[k] Hom_{H⁰ C}(X, Y⟦n⟧)`, both for an
+  explicit shift witness and for the selected `HasShift` object.  Public
+  representative laws identify the maps with `H0.homMk` and right composition
+  by the shift element.  The `+n` target convention follows from the `-n`
+  shift of Hom-complexes.  This is a pointwise linear comparison only: no
+  naturality package, finite-dimensional transfer, formality, Euler
+  characteristic, `K₀`, or sphericality statement is inferred.
 - Object-twist `K₀` action and Euler-realization boundary (2026-09-12):
   `DGEnhancement.H0.NaturalTransformationConeK0` owns the reusable theorem
   that a functorial cone acts on `K₀` by target endpoint minus source
@@ -119,8 +136,9 @@ blocks should normally move it rather than add more declarations beside it.
   roots now exist, coefficient-complex homotopy invariance is closed, and
   supplied finite cohomology presentations now transport to shifted finite
   biproducts and finite-free homology expands these into `finrank` copies.
-  Automatic formality, the scalar-linear Hom-cohomology comparison, and the
-  numerical Euler consumer remain the next foundational roots.
+  The scalar-linear Hom-cohomology comparison is now closed.  Automatic
+  formality and the numerical Euler consumer remain the next foundational
+  roots.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under

@@ -77,4 +77,26 @@ lemma IsShiftBy.bijective_homMap {X Y : C} {n : ℤ} (h : IsShiftBy X n Y) (W : 
     Function.Bijective ((h.homMap W).f p).hom :=
   h.bijective W p (p + -n) rfl
 
+/-- The Hom-complex comparison represented by a chosen dg shift.
+
+This is the categorical form of the degreewise bijectivity stored in
+`IsShiftBy`: `homMap` already supplies compatibility with the differentials,
+and its components are isomorphisms by `bijective_homMap`. -/
+noncomputable def IsShiftBy.homIso {X Y : C} {n : ℤ}
+    (h : IsShiftBy X n Y) (W : C) :
+    dgHom W X ≅ (dgHom W Y)⟦-n⟧ := by
+  letI (p : ℤ) : IsIso ((h.homMap W).f p) :=
+    (ConcreteCategory.isIso_iff_bijective ((h.homMap W).f p)).2
+      (h.bijective_homMap W p)
+  exact HomologicalComplex.Hom.isoOfComponents
+    (fun p ↦ asIso ((h.homMap W).f p)) (fun p q _ ↦ (h.homMap W).comm p q)
+
+@[simp]
+lemma IsShiftBy.homIso_hom_f_apply {X Y : C} {n : ℤ}
+    (h : IsShiftBy X n Y) (W : C) (p : ℤ)
+    (f : (dgHom W X).X p) :
+    ((h.homIso W).hom.f p).hom f =
+      dgComp p (-n) (p + -n) rfl f h.hom :=
+  rfl
+
 end CategoryTheory
