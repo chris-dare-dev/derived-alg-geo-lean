@@ -135,7 +135,7 @@ CategoryTheory/Triangulated
   │                                           kernels vary through `kernelTransform`,
   │                                           enhanced cones map pointwise to transform triangles;
   │                                           consumes presented dg adjunction triangles through
-  │                                           objectwise comparison and supplied natural contracts
+  │                                           objectwise, supplied-natural, and shift-compatible layers
   ├─→ Families                                pseudofunctorial fiber categories
   ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation,
   │                                           functorial distinguished cone triangles and

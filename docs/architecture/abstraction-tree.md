@@ -272,7 +272,7 @@ Category
 │     │     ├─ twistKernel                           ordinary image of the selected dg cone
 │     │     ├─ kernel-presented twist candidate       exact image of its dg cone
 │     │     ├─ counitTriangleInSource                literal counit triangle, pointwise distinguished
-│     │     └─ presented dg comparison               objectwise choice or supplied natural contract
+│     │     └─ presented dg comparison               pointwise/natural/shift-compatible layers
 │     ├─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
 │     │  └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
 │     │     ├─ unshifted cotwist-cone candidate       exact image of its dg cone
@@ -280,7 +280,7 @@ Category
 │     │     ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
 │     │     ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
 │     │     ├─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
-│     │     └─ presented dg comparison               objectwise choice or supplied natural contract
+│     │     └─ presented dg comparison               pointwise/natural/shift-compatible layers
 │     ├─ DualTwistKernelData              left-adjunction unit specialization after swapping
 │     │  └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
 │     │     ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
