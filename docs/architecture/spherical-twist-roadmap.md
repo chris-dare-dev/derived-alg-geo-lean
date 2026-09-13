@@ -85,7 +85,9 @@ DGAdjunction
 └─ a compatible left/right adjunction pair canonically supplies
    ├─ twistAdjointComparison: L T[-1] ⟶ R
    └─ cotwistAdjointComparison: R ⟶ C L
-      └─ EnhancedAdjunctionComparison records IsIso on their H⁰ maps
+      ├─ cotwistAdjointComparisonShifted_h0: R ⟶ (C[-1] L)[1]
+      └─ EnhancedAdjunctionComparison records IsIso on their H⁰ maps and
+         exposes the conventional shifted-target cotwist isomorphism
 
 The cone constructions and comparison maps do not say that either cone is an
 autoequivalence, do not call the adjunction spherical, and do not derive the
@@ -306,10 +308,18 @@ that comparison are instance hypotheses to be discharged by the realization.
    `UnitConeData.cotwistAdjointComparison` pastes the left unit with the
    cotwist-cone inclusion to obtain `R ⟶ C L`.  Both are closed degree-zero
    transformations with explicit component formulas and named `H⁰` maps.
+   The conventional target in Anno--Logvinenko's notation is `(F L)[1]` for
+   `F = C[-1]`.  `DGFunctor.shiftedFunctorCompIsoIdH0` descends Mathlib's
+   `shiftFunctorCompIsoId` from the `HasShift` category of closed dg functors,
+   and `cotwistAdjointComparisonShifted_h0` composes its inverse with the raw
+   map to obtain `R ⟶ (C[-1] L)[1]`.  Thus the cancellation uses the packaged
+   add, zero, unit, and associativity laws instead of a paper-specific shift
+   comparison.
    `AdjointComparisonConditions` records Mathlib `IsIso` witnesses for these
-   canonical maps and exposes their `asIso`s; it does not accept unrelated
-   natural isomorphisms.  No `IsIso` conclusion follows from construction or
-   from `TwistCotwistEquivalenceConditions`.
+   canonical maps and exposes their `asIso`s; `cotwistShiftedIso` is the
+   conventional shifted-target form of the same cotwist condition.  It does
+   not accept unrelated natural isomorphisms.  No `IsIso` conclusion follows
+   from construction or from `TwistCotwistEquivalenceConditions`.
 
    `DGAdjunction.h0` now compares a dg adjunction with an
    ordinary one on `H⁰`.  `DGAdjunction.H0Presentation` further conjugates
