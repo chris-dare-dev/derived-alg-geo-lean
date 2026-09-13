@@ -525,6 +525,17 @@ blocks should normally move it rather than add more declarations beside it.
   unshifted unit cone, the natural comparison data, endpoint exactness, and
   the target `CommShift` remain explicit inputs.  No dg quasi-equivalence,
   inverse-kernel formula, comparison canonicity, or sphericality is asserted.
+- Presented dg/Fourier--Mukai dual-cotwist comparison (2026-09-13):
+  `DGAdjunctionDualCotwistComparison` swaps the endpoints and correspondences
+  and exposes the existing right-counit/twist comparison through
+  dual-cotwist names.  `PresentedDualCotwistComparisonData` and its
+  `ShiftCompatibility` are aliases of the canonical comparison roots; the
+  semantic constructors merely populate those existing records.  The dual
+  cotwist is the unshifted counit cone, so no inverse rotation or `[-1]` shift
+  is introduced.  Natural comparison data, the `H⁰` equivalence hypothesis,
+  endpoint exactness, and the target `CommShift` remain explicit.  No dg
+  quasi-equivalence, inverse-kernel formula, canonicity, or sphericality is
+  asserted.
 - Shifted Fourier--Mukai cone kernels (2026-09-12):
   `KernelConeNormalizationData` names the ordinary kernel represented by its
   selected enhanced cone and, for every integer shift, the kernel obtained by

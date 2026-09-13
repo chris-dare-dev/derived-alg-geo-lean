@@ -293,7 +293,9 @@ Category
 │     └─ DualCotwistKernelData            left-adjunction counit specialization after swapping
 │        └─ DualCotwistKernelConeData     reuses the counit/twist cone and normalization
 │           ├─ dualCotwistKernel                      selected enhanced cone presenting dual cotwist
-│           └─ dualCotwistTriangleInSource           literal counit triangle, pointwise distinguished
+│           ├─ dualCotwistTriangleInSource           literal counit triangle, pointwise distinguished
+│           ├─ presented dg comparison               twist comparison reused after swapping
+│           └─ conditional KernelAutoequivalence     explicit H⁰ equivalence + natural comparison
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
