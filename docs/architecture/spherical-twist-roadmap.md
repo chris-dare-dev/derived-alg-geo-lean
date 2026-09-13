@@ -341,12 +341,17 @@ that comparison are instance hypotheses to be discharged by the realization.
    not accept unrelated natural isomorphisms.  No `IsIso` conclusion follows
    from construction or from `TwistCotwistEquivalenceConditions`.
 
-   The next comparison seam is to express `twistAdjointComparison_h0` as the
-   left-counit composite of the generic inverse-rotated first map.  Doing that
-   without object-level coercion bookkeeping needs reusable component and
-   naturality laws for `DGFunctor.h0CompIso` and for descent through dg
-   whiskering; those laws belong at the `H⁰` functoriality root before the
-   adjunction specialization.
+   That comparison seam is now closed at the reusable `H⁰` functoriality
+   root.  The identity components of `DGFunctor.h0IdIso` and
+   `DGFunctor.h0CompIso` have named computation lemmas; strict dg vertical
+   composition and both dg whiskerings descend to ordinary natural
+   transformations, with whiskering passing through the canonical
+   `h0CompIso` compositors.  The adjunction consumer
+   `twistAdjointComparison_h0_eq_inverseRotateFirstH0` therefore factors the
+   twist comparison through the generic `shiftedFstH0_eq`, ordinary right
+   whiskering by `L.h0`, and the descended left-counit whisker.  It introduces
+   neither a second comparison map nor an ordinary-counit normalization, and
+   it proves no invertibility or sphericality.
 
    `DGAdjunction.h0` now compares a dg adjunction with an
    ordinary one on `H⁰`.  `DGAdjunction.H0Presentation` further conjugates
