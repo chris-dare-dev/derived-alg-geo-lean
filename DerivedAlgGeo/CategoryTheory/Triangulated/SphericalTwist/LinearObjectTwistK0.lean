@@ -14,8 +14,7 @@ Seidel--Thomas formula without passing through additive `EvaluationData`.
 `LinearEvaluationData.IsEulerCopower` identifies the evaluation term in the
 generic cone subtraction formula with `χ(E,X) • [E]`.
 
-Exactness is automatic for every dg functor.  The endomorphism-level theorem
-still accepts a redundant cone-preservation argument for compatibility.  Nothing here compares
+Exactness is automatic for every dg functor.  Nothing here compares
 the additive and scalar-linear universal properties or asserts that the twist
 is an autoequivalence.
 -/
@@ -48,23 +47,17 @@ theorem twistK₀Of_eq_twistK₀ (hV : V.IsEulerCopower k) (X : H0 C) :
 
 set_option backward.isDefEq.respectTransparency false in
 /-- If scalar-linear evaluation realizes the Euler copower formula, its cone
-induces the numerical twist endomorphism on `K₀`.  The cone argument is
-retained for compatibility and is redundant. -/
+induces the numerical twist endomorphism on `K₀`. -/
 theorem twistK₀Map_eq_twistK₀
-    (hVc : DGFunctor.PreservesChosenCones V.functor)
     (hV : V.IsEulerCopower k) :
     letI : K.twist.h0.CommShift ℤ :=
-      DGFunctor.commShift _ K.preservesShifts
-    letI : K.twist.h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        K.preservesShifts (K.preservesChosenCones hVc)
+      DGFunctor.h0CommShift K.twist
+    letI : K.twist.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.twist
     K₀.map K.twist.h0 =
       SphericalTwist.twistK₀ k (H0 C) (show H0 C from E) := by
   letI : K.twist.h0.CommShift ℤ :=
-    DGFunctor.commShift _ K.preservesShifts
-  letI : K.twist.h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      K.preservesShifts (K.preservesChosenCones hVc)
+    DGFunctor.h0CommShift K.twist
+  letI : K.twist.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.twist
   apply K₀.hom_ext
   intro X
   rw [K₀.map_of]

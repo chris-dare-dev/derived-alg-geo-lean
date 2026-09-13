@@ -825,6 +825,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_isEquivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Equivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0CommShift
+-- The shift witness selects the sign-correct comparison; cone preservation is
+-- supplied by the unconditional dg-functor theorem.
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0IsTriangulated
 
 -- `dg-enhancements-e10`: a quasi-equivalence of dg categories induces an
@@ -1294,8 +1296,9 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- The direct scalar-linear object twist is a thin specialization of the
 -- generic cone package.  Choice comparison reuses the existing strict-square
 -- interface, while exactness follows automatically for every dg functor.
--- The legacy leaf still accepts a redundant cone witness.  Its generic K₀ formulas give identity minus
--- evaluation.  The numerical spherical-twist specialization is audited by
+-- Its H⁰ and K₀ leaves therefore take no cone witness; the lower structured
+-- 3-by-3 constructor remains available.  Its generic K₀ formulas give
+-- identity minus evaluation.  The numerical spherical-twist specialization is audited by
 -- the spherical-twist slice, while the HomFiniteBounded realization below
 -- supplies its Euler witness automatically.
 #print axioms CategoryTheory.LinearEvaluationData.preservesChosenConesOfCompare
@@ -1401,8 +1404,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans
 
 -- Exactness of the object twist is automatic: every dg functor preserves both
--- shifts and the repository's strong split cones.  The object-specific
--- wrappers below retain redundant witness arguments for source compatibility.
+-- shifts and the repository's strong split cones.  The public H⁰ and K₀
+-- consumers take no witness; the structured 3-by-3 constructor remains below.
 -- Exact is not autoequivalence; the object twist has no autoequivalence statement.
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesShifts
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesChosenCones

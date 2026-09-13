@@ -358,18 +358,14 @@ noncomputable def dualCotwistPreservesChosenCones
 @[reducible]
 noncomputable def cotwistConeH0CommShift [IsPretriangulated A] :
     P.cotwistConeFunctor.h0.CommShift ℤ :=
-  DGFunctor.commShift _ P.cotwistConePreservesShifts
+  DGFunctor.h0CommShift P.cotwistConeFunctor
 
-/-- The unshifted cotwist cone is exact on `H⁰`.  The endpoint arguments are
-retained for compatibility and are redundant. -/
-theorem cotwistConeH0IsTriangulated [IsPretriangulated A]
-    (hSc : DGFunctor.PreservesChosenCones S)
-    (hRc : DGFunctor.PreservesChosenCones R) :
+/-- The unshifted cotwist cone is exact on `H⁰`. -/
+theorem cotwistConeH0IsTriangulated [IsPretriangulated A] :
     letI : P.cotwistConeFunctor.h0.CommShift ℤ :=
       P.cotwistConeH0CommShift
     P.cotwistConeFunctor.h0.IsTriangulated :=
-  DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-    P.cotwistConePreservesShifts (P.cotwistConePreservesChosenCones hSc hRc)
+  DGFunctor.h0IsTriangulated P.cotwistConeFunctor
 
 /-- The sign-correct shift comparison on the conventional cotwist. -/
 @[reducible]
@@ -378,33 +374,25 @@ noncomputable def cotwistH0CommShift [IsPretriangulated A] :
   DGFunctor.shiftedFunctorH0CommShift P.cotwistConeFunctor (-1 : ℤ)
     P.cotwistConePreservesShifts
 
-/-- The conventional cotwist is exact on `H⁰`.  The endpoint arguments are
-retained for compatibility and are redundant. -/
-theorem cotwistH0IsTriangulated [IsPretriangulated A]
-    (hSc : DGFunctor.PreservesChosenCones S)
-    (hRc : DGFunctor.PreservesChosenCones R) :
+/-- The conventional cotwist is exact on `H⁰`. -/
+theorem cotwistH0IsTriangulated [IsPretriangulated A] :
     letI : P.cotwistFunctor.h0.CommShift ℤ := P.cotwistH0CommShift
     P.cotwistFunctor.h0.IsTriangulated :=
   DGFunctor.shiftedFunctorH0IsTriangulated P.cotwistConeFunctor (-1 : ℤ)
-    P.cotwistConePreservesShifts (P.cotwistConePreservesChosenCones hSc hRc)
+    P.cotwistConePreservesShifts
 
 /-- The shift comparison on `H⁰` of the unshifted dual-twist cone. -/
 @[reducible]
 noncomputable def dualTwistConeH0CommShift [IsPretriangulated B] :
     P.dualTwistConeFunctor.h0.CommShift ℤ :=
-  DGFunctor.commShift _ P.dualTwistConePreservesShifts
+  DGFunctor.h0CommShift P.dualTwistConeFunctor
 
-/-- The unshifted dual-twist cone is exact on `H⁰`.  The endpoint arguments
-are retained for compatibility and are redundant. -/
-theorem dualTwistConeH0IsTriangulated [IsPretriangulated B]
-    (hLc : DGFunctor.PreservesChosenCones L)
-    (hSc : DGFunctor.PreservesChosenCones S) :
+/-- The unshifted dual-twist cone is exact on `H⁰`. -/
+theorem dualTwistConeH0IsTriangulated [IsPretriangulated B] :
     letI : P.dualTwistConeFunctor.h0.CommShift ℤ :=
       P.dualTwistConeH0CommShift
     P.dualTwistConeFunctor.h0.IsTriangulated :=
-  DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-    P.dualTwistConePreservesShifts
-      (P.dualTwistConePreservesChosenCones hLc hSc)
+  DGFunctor.h0IsTriangulated P.dualTwistConeFunctor
 
 /-- The sign-correct shift comparison on the conventional dual twist. -/
 @[reducible]
@@ -413,32 +401,24 @@ noncomputable def dualTwistH0CommShift [IsPretriangulated B] :
   DGFunctor.shiftedFunctorH0CommShift P.dualTwistConeFunctor (-1 : ℤ)
     P.dualTwistConePreservesShifts
 
-/-- The conventional dual twist is exact on `H⁰`.  The endpoint arguments are
-retained for compatibility and are redundant. -/
-theorem dualTwistH0IsTriangulated [IsPretriangulated B]
-    (hLc : DGFunctor.PreservesChosenCones L)
-    (hSc : DGFunctor.PreservesChosenCones S) :
+/-- The conventional dual twist is exact on `H⁰`. -/
+theorem dualTwistH0IsTriangulated [IsPretriangulated B] :
     letI : P.dualTwistFunctor.h0.CommShift ℤ := P.dualTwistH0CommShift
     P.dualTwistFunctor.h0.IsTriangulated :=
   DGFunctor.shiftedFunctorH0IsTriangulated P.dualTwistConeFunctor (-1 : ℤ)
     P.dualTwistConePreservesShifts
-      (P.dualTwistConePreservesChosenCones hLc hSc)
 
 /-- The shift comparison on `H⁰` of the dual cotwist. -/
 @[reducible]
 noncomputable def dualCotwistH0CommShift [IsPretriangulated A] :
     P.dualCotwistFunctor.h0.CommShift ℤ :=
-  DGFunctor.commShift _ P.dualCotwistPreservesShifts
+  DGFunctor.h0CommShift P.dualCotwistFunctor
 
-/-- The dual cotwist is exact on `H⁰`.  The endpoint arguments are retained
-for compatibility and are redundant. -/
-theorem dualCotwistH0IsTriangulated [IsPretriangulated A]
-    (hLc : DGFunctor.PreservesChosenCones L)
-    (hSc : DGFunctor.PreservesChosenCones S) :
+/-- The dual cotwist is exact on `H⁰`. -/
+theorem dualCotwistH0IsTriangulated [IsPretriangulated A] :
     letI : P.dualCotwistFunctor.h0.CommShift ℤ := P.dualCotwistH0CommShift
     P.dualCotwistFunctor.h0.IsTriangulated :=
-  DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-    P.dualCotwistPreservesShifts (P.dualCotwistPreservesChosenCones hLc hSc)
+  DGFunctor.h0IsTriangulated P.dualCotwistFunctor
 
 /-- **The twist is exact on `H⁰`.**
 
@@ -448,24 +428,20 @@ triangles to distinguished triangles.  With the equivalence supplied by the
 twist/cotwist conditions this is an exact autoequivalence, which is what the
 word "twist" is supposed to mean.
 
-The endpoint arguments are retained for compatibility and are redundant. -/
-theorem twistH0IsTriangulated [IsPretriangulated B]
-    (hSc : DGFunctor.PreservesChosenCones S)
-    (hRc : DGFunctor.PreservesChosenCones R) :
+No endpoint hypotheses are required. -/
+theorem twistH0IsTriangulated [IsPretriangulated B] :
     letI : P.twistFunctor.h0.CommShift ℤ :=
-      DGFunctor.commShift _ P.twistPreservesShifts
+      DGFunctor.h0CommShift P.twistFunctor
     P.twistFunctor.h0.IsTriangulated :=
-  DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-    P.twistPreservesShifts (P.twistPreservesChosenCones hSc hRc)
+  DGFunctor.h0IsTriangulated P.twistFunctor
 
 /-- **The twist commutes with the shift on `H⁰`.**
 
-`DGFunctor.commShift` spends the dg-level shift preservation on the ordinary
-functor; cone preservation is automatic as well. -/
+This is the twist-specific name for the canonical dg-functor package. -/
 @[reducible]
 noncomputable def twistH0CommShift [IsPretriangulated B] :
     P.twistFunctor.h0.CommShift ℤ :=
-  DGFunctor.commShift _ P.twistPreservesShifts
+  DGFunctor.h0CommShift P.twistFunctor
 
 end Shifts
 
@@ -475,15 +451,12 @@ section ExactEquivalences
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Under the recorded equivalence condition, the twist is a triangulated
-equivalence of `H⁰ B`.  The endpoint arguments are retained for compatibility
-and are redundant.
+equivalence of `H⁰ B`.
 
 The inverse shift comparison and its triangulatedness are the canonical ones
 transported by Mathlib from the exact forward functor. -/
 theorem twistH0EquivalenceIsTriangulated [IsPretriangulated B]
-    (h : TwistCotwistEquivalenceConditions P)
-    (hSc : DGFunctor.PreservesChosenCones S)
-    (hRc : DGFunctor.PreservesChosenCones R) :
+    (h : TwistCotwistEquivalenceConditions P) :
     letI : (P.twistH0Equivalence h).functor.CommShift ℤ := P.twistH0CommShift
     letI : (P.twistH0Equivalence h).inverse.CommShift ℤ :=
       (P.twistH0Equivalence h).commShiftInverse ℤ
@@ -495,19 +468,16 @@ theorem twistH0EquivalenceIsTriangulated [IsPretriangulated B]
     (P.twistH0Equivalence h).commShiftInverse ℤ
   letI : (P.twistH0Equivalence h).CommShift ℤ :=
     (P.twistH0Equivalence h).commShift_of_functor ℤ
-  exact Equivalence.IsTriangulated.mk' _ (P.twistH0IsTriangulated hSc hRc)
+  exact Equivalence.IsTriangulated.mk' _ P.twistH0IsTriangulated
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Under the recorded equivalence condition, the conventional cotwist is a
-triangulated equivalence of `H⁰ A`.  The endpoint arguments are retained for
-compatibility and are redundant.
+triangulated equivalence of `H⁰ A`.
 
 Its forward exactness uses the sign-correct `[-1]` package; Mathlib then
 transports the compatible shift structure and exactness to the inverse. -/
 theorem cotwistH0EquivalenceIsTriangulated [IsPretriangulated A]
-    (h : TwistCotwistEquivalenceConditions P)
-    (hSc : DGFunctor.PreservesChosenCones S)
-    (hRc : DGFunctor.PreservesChosenCones R) :
+    (h : TwistCotwistEquivalenceConditions P) :
     letI : (P.cotwistH0Equivalence h).functor.CommShift ℤ := P.cotwistH0CommShift
     letI : (P.cotwistH0Equivalence h).inverse.CommShift ℤ :=
       (P.cotwistH0Equivalence h).commShiftInverse ℤ
@@ -519,7 +489,7 @@ theorem cotwistH0EquivalenceIsTriangulated [IsPretriangulated A]
     (P.cotwistH0Equivalence h).commShiftInverse ℤ
   letI : (P.cotwistH0Equivalence h).CommShift ℤ :=
     (P.cotwistH0Equivalence h).commShift_of_functor ℤ
-  exact Equivalence.IsTriangulated.mk' _ (P.cotwistH0IsTriangulated hSc hRc)
+  exact Equivalence.IsTriangulated.mk' _ P.cotwistH0IsTriangulated
 
 end ExactEquivalences
 

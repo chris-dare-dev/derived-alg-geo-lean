@@ -287,10 +287,11 @@ that comparison are instance hypotheses to be discharged by the realization.
    `DGFunctor.shiftedFunctorH0CommShift` and
    `shiftedFunctorH0IsTriangulated` compose that signed package with the
    canonical comparison on `H⁰(F)` and transport across
-   `shiftedFunctorH0Iso`.  Consequently `dualTwistH0IsTriangulated` and
+   `shiftedFunctorH0Iso`; the latter derives cone preservation automatically
+   while retaining the shift witness that selects its comparison.
+   Consequently `dualTwistH0IsTriangulated` and
    `cotwistH0IsTriangulated` close exactness for the two conventional `[-1]`
-   functors; their remaining endpoint witness arguments are now redundant
-   consumer signatures rather than an open exactness seam.  Finally
+   functors without endpoint cone-preservation arguments.  Finally
    `twistH0EquivalenceIsTriangulated` and
    `cotwistH0EquivalenceIsTriangulated` combine the ordinary equivalence and
    exactness halves with Mathlib's canonical `Equivalence.IsTriangulated`
@@ -468,14 +469,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    numerical twist corollaries are now closed too:
    `twistK₀Of_eq_twistK₀_ofHomFiniteBounded` and
    `twistK₀Map_eq_twistK₀_ofHomFiniteBounded` no longer ask callers to pass the
-   automatic `IsEulerCopower` witness.  Its remaining chosen-cone argument is
-   now redundant in light of the generic dg-functor theorem and is the next
-   consumer cutover, not an open mathematical hypothesis.  No naturality or
-   quasi-isomorphism invariance is inferred from formality.
+   automatic `IsEulerCopower` witness or a chosen-cone witness.  The generic,
+   additive object-twist, scalar-linear object-twist, and enhanced-adjunction
+   exactness and `K₀` consumers now all use automatic dg-functor cone
+   preservation internally.  No naturality or quasi-isomorphism invariance is
+   inferred from formality.
    The direct scalar-linear cone consumer is now closed as well.
    `LinearEvaluationData.TwistConeData` is a thin name for the generic cone of
-   scalar-linear evaluation; its choice comparison and compatibility exactness wrapper
-   delegate to the existing strict-square and cone-preservation interfaces.
+   scalar-linear evaluation; its choice comparison and retained structured
+   cone-preservation constructor delegate to the existing strict-square and
+   3-by-3 interfaces, while exactness uses the automatic dg-functor package.
    The generic H⁰ leaf computes its `K₀` action as identity minus evaluation,
    and `SphericalTwist.LinearObjectTwistK0` combines that formula with
    `LinearEvaluationData.IsEulerCopower` to obtain the existing numerical

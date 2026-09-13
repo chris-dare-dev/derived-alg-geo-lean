@@ -64,17 +64,15 @@ theorem twistK₀Of_eq_twistK₀ (hV : V.IsEulerCopower k) (X : H0 C) :
 
 set_option backward.isDefEq.respectTransparency false in
 /-- If evaluation realizes the Euler copower formula, the induced object-twist
-map is the existing numerical endomorphism `twistK₀`.  The cone argument is
-retained for compatibility and is redundant. -/
+map is the existing numerical endomorphism `twistK₀`. -/
 theorem twistK₀Map_eq_twistK₀
-    (hVc : DGFunctor.PreservesChosenCones V.functor)
     (hV : V.IsEulerCopower k) :
     letI : K.twist.h0.CommShift ℤ := K.twistH0CommShift
-    letI : K.twist.h0.IsTriangulated := K.twistH0IsTriangulated hVc
+    letI : K.twist.h0.IsTriangulated := K.twistH0IsTriangulated
     K₀.map K.twist.h0 =
       SphericalTwist.twistK₀ k (H0 C) (show H0 C from E) := by
   letI : K.twist.h0.CommShift ℤ := K.twistH0CommShift
-  letI : K.twist.h0.IsTriangulated := K.twistH0IsTriangulated hVc
+  letI : K.twist.h0.IsTriangulated := K.twistH0IsTriangulated
   apply K₀.hom_ext
   intro X
   rw [K₀.map_of]

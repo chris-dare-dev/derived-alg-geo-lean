@@ -191,7 +191,7 @@ Category
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
 │  │        ├─ twistTriangleIso          original same-evaluation cone-choice comparison
 │  │        ├─ twistTriangleIsoOfEvaluation  coherent across evaluation and cone choices
-│  │        ├─ twistH0IsTriangulated    exact; legacy wrapper still accepts redundant witness
+│  │        ├─ twistH0IsTriangulated    automatic exactness; no caller-supplied cone witness
 │  │        ├─ K₀ action                 generic cone formula: identity minus evaluation
 │  │        └─ IsEulerCopower           choice-invariant realization input for numerical twistK₀
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
@@ -208,7 +208,8 @@ Category
 │  │        ├─ fst / snd                 cone projections, graded-natural
 │  │        ├─ isConeOf                  a cone in the dg category of dg functors
 │  │        ├─ isoOfStrictSquare         the generic lift in Z⁰(DGFunctor C D)
-│  │        ├─ preservesShifts           a cone functor preserves shifts if its ends do
+│  │        ├─ preservesShifts           automatic for the assembled dg functor
+│  │        ├─ preservesChosenCones      retained endpoint-based 3-by-3 witness; existence automatic
 │  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
 │  │        │  ├─ triangleIsoOfStrictSquare  endpoint isos give a NatIso

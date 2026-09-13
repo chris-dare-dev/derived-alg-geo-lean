@@ -134,8 +134,9 @@ does NOT imply the functorial braid relation; see the module docstring in
 
 -- Exactness for all four stored cone functors and for the conventional
 -- `[-1]` dual twist and cotwist is unconditional at the dg-functor level.
--- The current specialized wrappers retain redundant endpoint witnesses, and
--- the two conventional functors use the generic sign-correct
+-- The exactness and K₀ consumers require no endpoint witnesses; only the
+-- explicitly structured 3-by-3 constructors retain them.  The two
+-- conventional functors use the generic sign-correct
 -- shifted-dg-functor interface.  This is not sphericality: that needs all four
 -- Anno--Logvinenko conditions and Morita quasi-functors.
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistPreservesShifts
@@ -181,8 +182,8 @@ does NOT imply the functorial braid relation; see the module docstring in
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Map_eq_twistK₀
 
 -- Scalar-linear evaluation reaches the same numerical formula directly,
--- without an adapter to the additive evaluation package.  The current
--- endomorphism wrapper retains a redundant cone-preservation argument.
+-- without an adapter to the additive evaluation package.  Its endomorphism
+-- wrapper obtains cone preservation automatically.
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of_eq_twistK₀
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map_eq_twistK₀
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist

@@ -7,6 +7,20 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Automatic dg exactness consumer cutover (2026-09-13):
+  Public H⁰ exactness and `K₀.map` theorems for homogeneous-transformation
+  cones, additive and scalar-linear object twists, and all four enhanced
+  adjunction twists/cotwists now construct cone preservation from the dg
+  functor itself.  Their redundant endpoint witness arguments have been
+  removed.  The lower structured 3-by-3 constructors deliberately remain:
+  they expose how cone preservation is assembled from chosen endpoint
+  witnesses, but no specialized H⁰ or `K₀` leaf in this cutover requires
+  callers to provide them.  The lower capability-parametric adapters remain
+  available.  Sign-correct `CommShift` data for the conventional `[-1]`
+  functors is unchanged.  The reusable `shiftedFunctorH0IsTriangulated`
+  interface likewise retains only the shift witness selecting that comparison
+  and derives cone preservation internally.  No global exactness instance is
+  installed.
 - Automatic dg-functor cone preservation and H⁰ exactness (2026-09-13):
   `DGFunctor.preservesChosenCones` maps a supplied strong split cone witness
   through an arbitrary dg functor.  The images of `IsConeOf.fst` and `.snd`
@@ -146,8 +160,8 @@ blocks should normally move it rather than add more declarations beside it.
   `DGEnhancement.LinearObjectTwistK0` discharges that predicate automatically
   from `HomFiniteBounded` and all linear copowers.  This path does not pass
   through additive `EvaluationData`.
-  Exactness is automatic for the underlying dg functors; the current leaf
-  still accepts a redundant witness pending the immediate consumer cutover.
+  Exactness is automatic for the underlying dg functors, and the H⁰ and `K₀`
+  leaves no longer accept a cone-preservation witness.
   No autoequivalence, sphericality, naturality of formality, or comparison of
   the two copower universal properties is claimed.
 - Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
@@ -257,10 +271,9 @@ blocks should normally move it rather than add more declarations beside it.
   by the same route.  Both are explicit interfaces, not global instances.
   The underlying `H⁰` capability transport now also keeps independent source
   and target object universes, matching the shifted-functor comparison API.
-  The conventional `[-1]` dual twist and cotwist now reuse this root.  Their
-  specialized wrappers still accept redundant endpoint witnesses, but
-  exactness itself is automatic.  This proves no dg quasi-equivalence, cone
-  relation, or sphericality.
+  The conventional `[-1]` dual twist and cotwist now reuse this root, and their
+  exactness wrappers require no endpoint witnesses.  This proves no dg
+  quasi-equivalence, cone relation, or sphericality.
 - Sign-correct exactness of integral shift functors (2026-09-12):
   `Triangulated.ShiftFunctor` now owns the explicit Koszul-signed `CommShift`
   on `[n]`, its comparison with `Triangle.shiftFunctor`, and
@@ -274,8 +287,9 @@ blocks should normally move it rather than add more declarations beside it.
   `EnhancedAdjunctionCones` now exposes shift preservation, chosen-cone
   preservation, the induced `H⁰` `CommShift`, and triangulatedness for the
   twist, dual cotwist, and the unshifted cones underlying the dual twist and
-  cotwist.  The retained wrappers reuse the generic adjunction-cone 3-by-3
-  theorem and still accept now-redundant endpoint witnesses.
+  cotwist.  The retained structured cone-preservation constructors reuse the
+  generic adjunction-cone 3-by-3 theorem and accept endpoint witnesses to
+  expose that computation; the exactness wrappers require none.
   Exactness for the two conventional `[-1]` shifted functors is obtained in
   the separate shifted-dg-functor root above.  No cone relation, equivalence,
   or sphericality follows.

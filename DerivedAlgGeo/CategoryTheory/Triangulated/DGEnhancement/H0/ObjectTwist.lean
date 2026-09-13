@@ -39,10 +39,7 @@ the cone choices.  All three facts come from the generic strict-square
 cone-triangle layer; the only input beyond it is that evaluation is closed.
 
 `H⁰(T_E)` is triangulated automatically: every dg functor preserves both
-shift witnesses and the strong split cone witnesses.  The existing
-`twistH0IsTriangulated` wrapper temporarily retains its now-redundant endpoint
-argument for source compatibility; `DGFunctor.h0IsTriangulated K.twist` is the
-unconditional generic interface.
+shift witnesses and the strong split cone witnesses.
 
 Nothing here says `T_E` is an autoequivalence, calls `E` spherical, or connects
 it to `SerreFunctor.IsSphericalObject`.  The generic `HasCopowers` capability
@@ -128,27 +125,23 @@ theorem twistTriangleFunctor_map_hom₃ {X Y : H0 C} (f : X ⟶ Y) :
 
 /-- **`H⁰(T_E)` commutes with the shift.**
 
-`DGFunctor.commShift` spends the dg-level shift preservation on the ordinary
-functor; cone preservation is automatic as well. -/
+This is the object-twist name for the canonical dg-functor package. -/
 @[reducible]
 noncomputable def twistH0CommShift : K.twist.h0.CommShift ℤ :=
-  DGFunctor.commShift _ K.preservesShifts
+  DGFunctor.h0CommShift K.twist
 
 /-- **The object twist is exact on `H⁰`.**
 
 Both dg-level capabilities are available for every dg functor, so `H⁰` of the
 twist commutes with the shift and carries distinguished triangles to
-distinguished triangles.  The argument below is retained for compatibility but
-is redundant as a hypothesis.
+distinguished triangles.
 
 This is exactness, not invertibility: nothing here says `T_E` is an
 equivalence. -/
-theorem twistH0IsTriangulated
-    (hVc : DGFunctor.PreservesChosenCones V.functor) :
-    letI : K.twist.h0.CommShift ℤ := DGFunctor.commShift _ K.preservesShifts
+theorem twistH0IsTriangulated :
+    letI : K.twist.h0.CommShift ℤ := K.twistH0CommShift
     K.twist.h0.IsTriangulated :=
-  DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-    K.preservesShifts (K.preservesChosenCones hVc)
+  DGFunctor.h0IsTriangulated K.twist
 
 /-- **The object twist triangle does not depend on the chosen cones.** -/
 noncomputable def twistTriangleIso (K K' : V.TwistConeData) :
