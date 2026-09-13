@@ -536,6 +536,17 @@ blocks should normally move it rather than add more declarations beside it.
   endpoint exactness, and the target `CommShift` remain explicit.  No dg
   quasi-equivalence, inverse-kernel formula, canonicity, or sphericality is
   asserted.
+- Enhanced twist/cotwist conditions to Fourier--Mukai kernels (2026-09-13):
+  `DGAdjunctionTwistCotwistAutoequivalence` is an FM-owned consumer of the
+  canonical `SphericalTwist.TwistCotwistEquivalenceConditions`.  Its two
+  quasi-equivalence fields supply the existing twist and unshifted cotwist
+  `H⁰` equivalence hypotheses through `DGFunctor.isEquivalence_h0`; the
+  existing comparison constructors then package the selected kernels as
+  independent `KernelAutoequivalence`s.  No paired or spherical record is
+  introduced.  Exactness still consumes the existing per-side
+  `ShiftCompatibility` and endpoint triangulated equivalence, and the dual
+  twist/cotwist, inverse kernels, comparison canonicity, and full sphericality
+  remain outside the conclusion.
 - Shifted Fourier--Mukai cone kernels (2026-09-12):
   `KernelConeNormalizationData` names the ordinary kernel represented by its
   selected enhanced cone and, for every integer shift, the kernel obtained by

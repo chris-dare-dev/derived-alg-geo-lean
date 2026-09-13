@@ -304,6 +304,7 @@ Category
 │  │  ├─ triangulated equivalences         canonical Mathlib package for twist and cotwist
 │  │  └─ K₀ action                        identity minus the corresponding adjunction composite
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
+│     ├─ FM twist/cotwist adapters         conditional KernelAutoequivalence, no new record
 │     └─ full sphericality                 pending Morita/adjoint-comparison theorem
 ├─ Derived-category extensions
 │  └─ Ext adjunction / dimension shift / resolution naturality
