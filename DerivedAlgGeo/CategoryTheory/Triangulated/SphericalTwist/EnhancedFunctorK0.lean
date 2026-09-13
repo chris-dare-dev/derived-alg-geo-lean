@@ -9,9 +9,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorH
 # Grothendieck-group actions of enhanced adjunction cones
 
 The four distinguished adjunction triangles determine the `K₀` class of
-each conventional twist or cotwist value.  Under chosen-cone preservation for
-the two endpoints, exactness upgrades those generator formulas to equalities
-of homomorphisms on `K₀`.
+each conventional twist or cotwist value.  Automatic dg-functor exactness
+upgrades those generator formulas to equalities of homomorphisms on `K₀`.
 
 These formulas stop at the adjunction composites.  Identifying an
 object-twist evaluation composite with
@@ -50,31 +49,23 @@ theorem twistFunctorK₀Of (X : H0 B) :
   abel
 
 set_option backward.isDefEq.respectTransparency false in
-/-- When `S` and `R` preserve chosen cones, the twist acts on `K₀` by the
-identity minus the adjunction composite. -/
-theorem twistFunctorK₀Map
-    (hSc : DGFunctor.PreservesChosenCones S)
-    (hRc : DGFunctor.PreservesChosenCones R) :
+/-- The twist acts on `K₀` by identity minus the adjunction composite.  The
+exact structures used here are canonical for dg functors. -/
+theorem twistFunctorK₀Map :
     letI : P.twistFunctor.h0.CommShift ℤ := P.twistH0CommShift
     letI : P.twistFunctor.h0.IsTriangulated :=
-      P.twistH0IsTriangulated hSc hRc
+      P.twistH0IsTriangulated
     letI : (R.comp S).h0.CommShift ℤ :=
-      DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-    letI : (R.comp S).h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        (DGFunctor.preservesShifts _)
-        (DGFunctor.PreservesChosenCones.comp hRc hSc)
+      DGFunctor.h0CommShift (R.comp S)
+    letI : (R.comp S).h0.IsTriangulated := DGFunctor.h0IsTriangulated (R.comp S)
     K₀.map P.twistFunctor.h0 =
       AddMonoidHom.id (K₀ (H0 B)) - K₀.map (R.comp S).h0 := by
   letI : P.twistFunctor.h0.CommShift ℤ := P.twistH0CommShift
   letI : P.twistFunctor.h0.IsTriangulated :=
-    P.twistH0IsTriangulated hSc hRc
+    P.twistH0IsTriangulated
   letI : (R.comp S).h0.CommShift ℤ :=
-    DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-  letI : (R.comp S).h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      (DGFunctor.preservesShifts _)
-      (DGFunctor.PreservesChosenCones.comp hRc hSc)
+    DGFunctor.h0CommShift (R.comp S)
+  letI : (R.comp S).h0.IsTriangulated := DGFunctor.h0IsTriangulated (R.comp S)
   apply K₀.hom_ext
   intro X
   change K₀.of (H0 B) (P.twistFunctor.h0.obj X) =
@@ -95,31 +86,23 @@ theorem dualTwistFunctorK₀Of (X : H0 B) :
   abel
 
 set_option backward.isDefEq.respectTransparency false in
-/-- When `L` and `S` preserve chosen cones, the dual twist acts on `K₀` by
-the identity minus the left-adjunction composite. -/
-theorem dualTwistFunctorK₀Map
-    (hLc : DGFunctor.PreservesChosenCones L)
-    (hSc : DGFunctor.PreservesChosenCones S) :
+/-- The dual twist acts on `K₀` by identity minus the left-adjunction
+composite.  The exact structures used here are canonical for dg functors. -/
+theorem dualTwistFunctorK₀Map :
     letI : P.dualTwistFunctor.h0.CommShift ℤ := P.dualTwistH0CommShift
     letI : P.dualTwistFunctor.h0.IsTriangulated :=
-      P.dualTwistH0IsTriangulated hLc hSc
+      P.dualTwistH0IsTriangulated
     letI : (L.comp S).h0.CommShift ℤ :=
-      DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-    letI : (L.comp S).h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        (DGFunctor.preservesShifts _)
-        (DGFunctor.PreservesChosenCones.comp hLc hSc)
+      DGFunctor.h0CommShift (L.comp S)
+    letI : (L.comp S).h0.IsTriangulated := DGFunctor.h0IsTriangulated (L.comp S)
     K₀.map P.dualTwistFunctor.h0 =
       AddMonoidHom.id (K₀ (H0 B)) - K₀.map (L.comp S).h0 := by
   letI : P.dualTwistFunctor.h0.CommShift ℤ := P.dualTwistH0CommShift
   letI : P.dualTwistFunctor.h0.IsTriangulated :=
-    P.dualTwistH0IsTriangulated hLc hSc
+    P.dualTwistH0IsTriangulated
   letI : (L.comp S).h0.CommShift ℤ :=
-    DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-  letI : (L.comp S).h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      (DGFunctor.preservesShifts _)
-      (DGFunctor.PreservesChosenCones.comp hLc hSc)
+    DGFunctor.h0CommShift (L.comp S)
+  letI : (L.comp S).h0.IsTriangulated := DGFunctor.h0IsTriangulated (L.comp S)
   apply K₀.hom_ext
   intro X
   change K₀.of (H0 B) (P.dualTwistFunctor.h0.obj X) =
@@ -145,31 +128,23 @@ theorem cotwistFunctorK₀Of (X : H0 A) :
   abel
 
 set_option backward.isDefEq.respectTransparency false in
-/-- When `S` and `R` preserve chosen cones, the cotwist acts on `K₀` by the
-identity minus the right-adjunction composite. -/
-theorem cotwistFunctorK₀Map
-    (hSc : DGFunctor.PreservesChosenCones S)
-    (hRc : DGFunctor.PreservesChosenCones R) :
+/-- The cotwist acts on `K₀` by identity minus the right-adjunction composite.
+The exact structures used here are canonical for dg functors. -/
+theorem cotwistFunctorK₀Map :
     letI : P.cotwistFunctor.h0.CommShift ℤ := P.cotwistH0CommShift
     letI : P.cotwistFunctor.h0.IsTriangulated :=
-      P.cotwistH0IsTriangulated hSc hRc
+      P.cotwistH0IsTriangulated
     letI : (S.comp R).h0.CommShift ℤ :=
-      DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-    letI : (S.comp R).h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        (DGFunctor.preservesShifts _)
-        (DGFunctor.PreservesChosenCones.comp hSc hRc)
+      DGFunctor.h0CommShift (S.comp R)
+    letI : (S.comp R).h0.IsTriangulated := DGFunctor.h0IsTriangulated (S.comp R)
     K₀.map P.cotwistFunctor.h0 =
       AddMonoidHom.id (K₀ (H0 A)) - K₀.map (S.comp R).h0 := by
   letI : P.cotwistFunctor.h0.CommShift ℤ := P.cotwistH0CommShift
   letI : P.cotwistFunctor.h0.IsTriangulated :=
-    P.cotwistH0IsTriangulated hSc hRc
+    P.cotwistH0IsTriangulated
   letI : (S.comp R).h0.CommShift ℤ :=
-    DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-  letI : (S.comp R).h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      (DGFunctor.preservesShifts _)
-      (DGFunctor.PreservesChosenCones.comp hSc hRc)
+    DGFunctor.h0CommShift (S.comp R)
+  letI : (S.comp R).h0.IsTriangulated := DGFunctor.h0IsTriangulated (S.comp R)
   apply K₀.hom_ext
   intro X
   change K₀.of (H0 A) (P.cotwistFunctor.h0.obj X) =
@@ -190,31 +165,23 @@ theorem dualCotwistFunctorK₀Of (X : H0 A) :
   abel
 
 set_option backward.isDefEq.respectTransparency false in
-/-- When `L` and `S` preserve chosen cones, the dual cotwist acts on `K₀` by
-the identity minus the left-adjunction composite. -/
-theorem dualCotwistFunctorK₀Map
-    (hLc : DGFunctor.PreservesChosenCones L)
-    (hSc : DGFunctor.PreservesChosenCones S) :
+/-- The dual cotwist acts on `K₀` by identity minus the left-adjunction
+composite.  The exact structures used here are canonical for dg functors. -/
+theorem dualCotwistFunctorK₀Map :
     letI : P.dualCotwistFunctor.h0.CommShift ℤ := P.dualCotwistH0CommShift
     letI : P.dualCotwistFunctor.h0.IsTriangulated :=
-      P.dualCotwistH0IsTriangulated hLc hSc
+      P.dualCotwistH0IsTriangulated
     letI : (S.comp L).h0.CommShift ℤ :=
-      DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-    letI : (S.comp L).h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        (DGFunctor.preservesShifts _)
-        (DGFunctor.PreservesChosenCones.comp hSc hLc)
+      DGFunctor.h0CommShift (S.comp L)
+    letI : (S.comp L).h0.IsTriangulated := DGFunctor.h0IsTriangulated (S.comp L)
     K₀.map P.dualCotwistFunctor.h0 =
       AddMonoidHom.id (K₀ (H0 A)) - K₀.map (S.comp L).h0 := by
   letI : P.dualCotwistFunctor.h0.CommShift ℤ := P.dualCotwistH0CommShift
   letI : P.dualCotwistFunctor.h0.IsTriangulated :=
-    P.dualCotwistH0IsTriangulated hLc hSc
+    P.dualCotwistH0IsTriangulated
   letI : (S.comp L).h0.CommShift ℤ :=
-    DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-  letI : (S.comp L).h0.IsTriangulated :=
-    DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-      (DGFunctor.preservesShifts _)
-      (DGFunctor.PreservesChosenCones.comp hSc hLc)
+    DGFunctor.h0CommShift (S.comp L)
+  letI : (S.comp L).h0.IsTriangulated := DGFunctor.h0IsTriangulated (S.comp L)
   apply K₀.hom_ext
   intro X
   change K₀.of (H0 A) (P.dualCotwistFunctor.h0.obj X) =

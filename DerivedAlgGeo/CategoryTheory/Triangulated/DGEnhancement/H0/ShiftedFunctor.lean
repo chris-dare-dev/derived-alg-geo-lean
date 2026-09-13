@@ -151,14 +151,15 @@ noncomputable def shiftedFunctorH0CommShift (F : DGFunctor A B) (n : ℤ)
   exact Functor.CommShift.ofIso (F.shiftedFunctorH0Iso n).symm ℤ
 
 set_option backward.isDefEq.respectTransparency false in
-/-- A dg functor preserving chosen cones remains exact on `H⁰` after every
-integral dg shift.
+/-- A dg functor remains exact on `H⁰` after every integral dg shift.  The
+shift argument selects the comparison used by `shiftedFunctorH0CommShift`;
+cone preservation is automatic for every dg functor.
 
 The proof composes the exact functor `H⁰(F)` with the sign-correct exact
 ordinary shift `[n]`, then transports exactness across
 `shiftedFunctorH0Iso`. -/
 theorem shiftedFunctorH0IsTriangulated (F : DGFunctor A B) (n : ℤ)
-    (hShift : PreservesShifts F) (hCone : PreservesChosenCones F) :
+    (hShift : PreservesShifts F) :
     letI : (F.shiftedFunctor n).h0.CommShift ℤ :=
       shiftedFunctorH0CommShift F n hShift
     (F.shiftedFunctor n).h0.IsTriangulated := by
@@ -166,7 +167,7 @@ theorem shiftedFunctorH0IsTriangulated (F : DGFunctor A B) (n : ℤ)
     commShift (C := A) (D := B) F hShift
   letI : F.h0.IsTriangulated :=
     isTriangulated_of_preservesShifts_and_chosenCones
-      (C := A) (D := B) F hShift hCone
+      (C := A) (D := B) F hShift (preservesChosenCones F)
   letI : (shiftFunctor (H0 B) n).CommShift ℤ :=
     Pretriangulated.shiftFunctorCommShift (H0 B) n
   letI : (shiftFunctor (H0 B) n).IsTriangulated :=

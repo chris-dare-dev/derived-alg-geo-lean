@@ -86,12 +86,18 @@ Category
 │        ├─ Ext profiles / transport     Serre-compatible equivalences
 │        └─ classification data          supplied paper conclusions
 ├─ Abelian                               Mathlib typeclass
+│  ├─ CochainComplex.homologyModel       generic zero-differential model
+│  │  └─ ModuleCat/division-ring formality
+│  │     noncanonical and unbounded; no finiteness/naturality
 │  ├─ CochainComplex.finiteCohomologyModel
 │  │  ├─ finiteCohomologyModelHomologyIso  homology preserves the finite biproduct
 │  │  └─ finiteCohomologyModelIsoShifted degree i becomes degree zero shifted by -i
 │  ├─ CochainComplex.FiniteCohomologyPresentation
 │  │  ├─ pullback                        transport along an explicit HomotopyEquiv
 │  │  ├─ isZero_homology_of_not_mem      finite homology support consequence
+│  │  ├─ homologyModelIsoFiniteCohomologyModel
+│  │  │                                   generic finite-support comparison
+│  │  ├─ ofFiniteSupport                 ModuleCat/division-ring constructor
 │  │  └─ shiftedHomotopyEquiv            presentation in the shifted normal form
 │  ├─ weak-Serre exactness               repository generic extension
 │  └─ DerivedCategory C                  generic construction
@@ -113,8 +119,14 @@ Category
 │  │  ├─ IsShiftBy.linearHomIso          target shift as a shifted Hom-complex iso
 │  │  │  ├─ H⁰ homComplex ≃ₗ Hom in H⁰  intrinsic quotient comparison
 │  │  │  └─ Hⁿ homComplex ≃ₗ Hom in H⁰  target is the selected same-sign shift Y⟦n⟧
+│  │  ├─ homComplexFiniteCohomologyPresentation
+│  │  │                                   HomFiniteBounded support + field formality
 │  │  ├─ postcompCochain                fixed-source right composition, linear chain-map law
+│  │  ├─ homFunctor k E                 Hom(E,-) as a k-linear dg functor to Cdg(ModuleCat k)
 │  │  ├─ Cdg (ModuleCat k)             standard model inherits Mathlib's k-linear structure
+│  │  │  └─ linearTensorObj K X       Mathlib total tensor product, same universe
+│  │  │     ├─ tensorCochainLinearEquiv   degreewise tensor--Hom adjunction
+│  │  │     └─ HasLinearCopowers       concrete scalar-linear copower instance
 │  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
 │  │     ├─ homComplexIso               representing equivalence, compatible with differentials
 │  │     ├─ coefficientMap              homogeneous coefficient action, strict in composition
@@ -123,6 +135,9 @@ Category
 │  │     ├─ scalar-unit witness         single⁰(k) ⊗ X represents X itself
 │  │     ├─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
 │  │     │  └─ linearCopowerFunctor    Cdg(ModuleCat k) ⟶ C, k-linear dg functor
+│  │     │     ├─ linearCopowerAdjunction  (- ⊗ E) ⊣ Hom(E,-), strict at the dg level
+│  │     │     │  ├─ unit                 selected universal copower chain map
+│  │     │     │  └─ counit               exactly selected scalar-linear evaluation
 │  │     │     ├─ selected H⁰ invariance is a HomotopyCategory/DGEnhancement leaf
 │  │     │     │  └─ LinearCopowerFiniteFree
 │  │     │     │     ├─ basis expansion of a degree-zero copower
@@ -136,10 +151,15 @@ Category
 │  │        ├─ evaluation                closed degree-zero map to the identity
 │  │        ├─ compareIso                coherent choice independence, strict over evaluation
 │  │        ├─ IsEulerCopower            generic H⁰ rank-one K₀ predicate
-│  │        │  └─ HomotopyCategory realization from supplied finite presentations
+│  │        │  ├─ realization from supplied finite presentations
+│  │        │  └─ automatic realization from HomFiniteBounded
 │  │        └─ TwistConeData             direct cone of scalar-linear evaluation
 │  │           ├─ compareIso / exactness  delegated to generic strict-square and cone APIs
-│  │           └─ K₀ action             identity minus evaluation; numerical twist via IsEulerCopower
+│  │           ├─ twistTriangleFunctor    H⁰ C ⥤ Triangle (H⁰ C), all distinguished
+│  │           ├─ adjunctionTwistIso      canonical Z⁰ identification with the copower--Hom counit cone
+│  │           ├─ adjunctionTwistTriangleIso
+│  │           │                           coherent identification of the full H⁰ triangle functors
+│  │           └─ K₀ action             identity minus evaluation; HomFiniteBounded numerical twist
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
@@ -161,9 +181,9 @@ Category
 │  │  │  └─ shiftedFunctorH0CommShift / IsTriangulated
 │  │  │                                 transports exactness with the signed shift package
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
-│  │  └─ PreservesChosenCones            strong witness-preserving capability
+│  │  └─ PreservesChosenCones            free: mapped fst/snd split every image cone
 │  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
-│  │     └─ H0 exactness                 derived weak cone-triangle certificate
+│  │     └─ h0CommShift / h0IsTriangulated automatic non-instance H⁰ exactness
 │  ├─ IsCopowerOf K X Z                   `Z = K ⊗ X`, by its universal property
 │  │  ├─ lift / lift_unique              cochains out of `K` are morphisms out of `Z`
 │  │  ├─ compare                         closed canonical comparison, strict composition
@@ -182,11 +202,13 @@ Category
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
 │  │        ├─ twistTriangleIso          original same-evaluation cone-choice comparison
 │  │        ├─ twistTriangleIsoOfEvaluation  coherent across evaluation and cone choices
-│  │        ├─ twistH0IsTriangulated    exact, given only PreservesChosenCones
+│  │        ├─ twistH0IsTriangulated    automatic exactness; no caller-supplied cone witness
 │  │        ├─ K₀ action                 generic cone formula: identity minus evaluation
 │  │        └─ IsEulerCopower           choice-invariant realization input for numerical twistK₀
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
+│  │     └─ H0Presentation                supplied endpoint isos after equivalence transport
+│  │        └─ Fourier--Mukai adapters     existing left/right adjoint-kernel data
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps
 │  │  │  └─ strict                      a commuting square with zero homotopy
@@ -199,7 +221,8 @@ Category
 │  │        ├─ fst / snd                 cone projections, graded-natural
 │  │        ├─ isConeOf                  a cone in the dg category of dg functors
 │  │        ├─ isoOfStrictSquare         the generic lift in Z⁰(DGFunctor C D)
-│  │        ├─ preservesShifts           a cone functor preserves shifts if its ends do
+│  │        ├─ preservesShifts           automatic for the assembled dg functor
+│  │        ├─ preservesChosenCones      retained endpoint-based 3-by-3 witness; existence automatic
 │  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
 │  │        │  ├─ triangleIsoOfStrictSquare  endpoint isos give a NatIso
@@ -251,7 +274,7 @@ Category
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
 │  │  ├─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
-│  │  ├─ H⁰ exactness                     all four conventional functors, from endpoint cone preservation
+│  │  ├─ H⁰ exactness                     automatic for every dg functor; no endpoint cone hypotheses
 │  │  ├─ triangulated equivalences         canonical Mathlib package for twist and cotwist
 │  │  └─ K₀ action                        identity minus the corresponding adjunction composite
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only

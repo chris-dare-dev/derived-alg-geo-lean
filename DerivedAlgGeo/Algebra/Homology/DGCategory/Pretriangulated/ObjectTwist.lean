@@ -39,26 +39,16 @@ coherence.  Nothing here says the twist is an autoequivalence, calls `E`
 spherical, or connects it to `SerreFunctor.IsSphericalObject`; those are the
 seams the roadmap records.
 
-## Exactness, and what it reduces to
+## Exactness
 
-`ConeData.preservesShifts` and `preservesChosenCones` say a cone functor carries
-a capability as soon as both of its ends do.  Here the ends are `RHom(E,-) ⊗ E`
-and the identity, and the identity's capabilities are free, so the twist's
-exactness reduces to the evaluation functor's -- `preservesShifts` and
-`preservesChosenCones` below take exactly that one hypothesis.
-
-The shift half needs no hypothesis at all.  `DGFunctor.preservesShifts` says
-every dg functor preserves shifts -- a shift element is a two-sided invertible
-element, and dg functors preserve composition and identities -- so
-`preservesShifts` below is unconditional.  This has nothing to do with copowers;
-it would hold for any `F` in place of `RHom(E,-) ⊗ E`.
-
-The cone half does need one.  `PreservesChosenCones` asks that maps *into* the
-cone split, which is a mapping-in condition, while `IsCopowerOf` is a
-mapping-out property: it controls degree-`p` morphisms out of `V.obj X`, as
-cochains out of `dgHom E X`.  Nothing in the universal property the copower is
-given by says anything about maps into it, so `preservesChosenCones` takes the
-capability for `V.functor` as an argument and leaves discharging it open.
+Every dg functor preserves both shifts and the strong split cone witnesses used
+here.  For shifts this follows by mapping the invertible homogeneous element;
+for cones the mapped `fst` and `snd` projections explicitly invert the mapped
+splitting.  Thus the twist is exact on `H⁰` without an evaluation-specific
+hypothesis.  The structured `preservesChosenCones` constructor below retains
+its endpoint argument for compatibility and to expose the cone functor's
+3-by-3 proof, but callers may always use
+`DGFunctor.preservesChosenCones K.twist` directly.
 -/
 
 set_option autoImplicit false
@@ -74,9 +64,9 @@ namespace EvaluationData
 
 variable {C : Type u} [DGCategory.{v} C] {E : C} (V : EvaluationData E)
 
-/-- Cone preservation for the evaluation functor is independent of the
-selected evaluation data.  This is deliberately not an instance: the
-capability remains explicit input to object-twist exactness. -/
+/-- Cone preservation for the evaluation functor transports across a change of
+evaluation data.  This structured compatibility theorem remains useful even
+though every dg functor now supplies cone preservation directly. -/
 noncomputable def preservesChosenConesOfCompare (W : EvaluationData E)
     (hV : DGFunctor.PreservesChosenCones V.functor) :
     DGFunctor.PreservesChosenCones W.functor :=
@@ -234,15 +224,14 @@ lemma compareIso_trans {W X : EvaluationData E}
 
 /-- **The object twist preserves shifts.**
 
-Half of exactness, and unconditional: `DGFunctor.preservesShifts` supplies the
-capability for both ends of the cone.  The cone half is
-`preservesChosenCones`, which is not free. -/
+Kept as the object-twist accessor for the unconditional generic capability. -/
 noncomputable def preservesShifts : DGFunctor.PreservesShifts K.twist :=
   DGFunctor.preservesShifts _
 
-/-- **The object twist preserves chosen cones as soon as `RHom(E,-) ⊗ E` does.**
+/-- **The structured 3-by-3 cone-preservation witness for the object twist.**
 
-The 3-by-3 lemma with the identity as one of the two ends. -/
+The endpoint argument is now redundant as a hypothesis, but retaining this
+constructor records how the cone-functor witness is assembled. -/
 noncomputable def preservesChosenCones
     (hV : DGFunctor.PreservesChosenCones V.functor) :
     DGFunctor.PreservesChosenCones K.twist :=
