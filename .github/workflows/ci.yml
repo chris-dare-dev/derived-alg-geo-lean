@@ -23,24 +23,41 @@ concurrency:
   # github.event.pull_request.head.ref is `agent/x` while github.ref is
   # `refs/heads/agent/x`; it would take github.head_ref || github.ref_name.)
   #
-  # `main` and the merge queue are EXEMPT from cancellation, and that exemption
-  # is what keeps the README's CI badge honest. The badge renders the newest
-  # run of this workflow on `main`; with a blanket `cancel-in-progress: true`
-  # every merge cancelled the run the previous merge had just started, so at
-  # this repository's cadence -- 51 of the last 60 `main` runs were cancelled,
-  # against 5 successes -- the newest completed run was almost always
-  # `cancelled`, which the badge draws as a failure. Nothing was broken; the
-  # badge was reporting the concurrency rule, not the build.
+  # `main` and the merge queue are EXEMPT from cancellation, AND `main` is keyed
+  # per commit, because cancellation is only half of what evicts a run.
   #
-  # This does NOT queue one run per merge. GitHub keeps at most one PENDING run
-  # per concurrency group: a third arrival cancels the second while it is still
-  # waiting, so the exemption costs one extra in-flight run on `owner-win`, not
-  # a backlog. The run that survives is always the newest, which is the one the
-  # badge reads.
+  # The badge renders the newest run of this workflow on `main`, and it draws a
+  # `cancelled` run as a failure. `cancel-in-progress: false` protects a run
+  # that has already STARTED. It does nothing for a run that is still QUEUED:
+  # GitHub keeps at most one PENDING run per concurrency group, so the next
+  # merge evicts the waiting one no matter what this flag says.
+  #
+  # That is not theoretical. On 2026-09-13, with two busy `owner-win` runners
+  # and a ~13 minute build, main runs were arriving faster than they could
+  # start: runs 34727342451 (a2dae262) and 34728317209 (ffdb7796) were both
+  # cancelled with `jobs: 0`, having never been assigned a runner, and the last
+  # 30 `main` runs of this workflow were 26 cancelled, 2 failure, 0 success.
+  # The badge read `failing` for hours while every gate actually passed.
+  #
+  # An earlier version of this comment claimed the exemption "keeps the
+  # README's CI badge honest" and that it "does NOT queue one run per merge",
+  # on the reasoning that "the run that survives is always the newest, which is
+  # the one the badge reads". That holds only if no newer merge arrives before
+  # the pending run starts. At this repository's cadence one always does, so
+  # the surviving run was perpetually the newest QUEUED one and never a
+  # completed one.
+  #
+  # Keying `main` by `github.sha` gives every commit its own group, so main runs
+  # never evict each other and each merge is actually verified. This DOES cost
+  # one full build per merge on `owner-win` -- the thing the old comment was
+  # trying to avoid -- which is the deliberate trade: a badge that reports the
+  # build is worth more than runner time spent cancelling the evidence for it.
+  # If that cost bites, reduce the merge rate or add a runner; do not restore
+  # the shared key and expect the badge to mean anything.
   #
   # Branch lanes keep the old behaviour deliberately -- an agent branch that is
   # pushed five times in a minute has no reason to build the first four.
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}${{ github.ref == 'refs/heads/main' && format('-{0}', github.sha) || '' }}
   cancel-in-progress: >-
     ${{ github.ref != 'refs/heads/main' && github.event_name != 'merge_group' }}
 
