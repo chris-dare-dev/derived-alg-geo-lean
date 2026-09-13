@@ -1133,6 +1133,35 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedTwistTriangleIsoPresented_hom_app_hom₂
 #print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedTwistTriangleIsoPresented_hom_app_hom₃
 #print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCounitTriangle_obj_distinguished
+
+-- The source-side mirror presents the transported dg unit triangle with
+-- literal identity and adjunction-composite vertices and literal unit first
+-- map.  Its third vertex remains the unshifted unit cone: this block audits no
+-- inverse rotation, conventional cotwist, Fourier--Mukai comparison,
+-- exactness, equivalence, or sphericality claim.
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedUnitCone
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangle
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangle_obj_obj₃
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangle_obj_mor₁
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangleObj₁Iso
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangleObj₁Iso_hom_app
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangle_obj_distinguished
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.unitTriangleObj₂Iso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.unitFirstMapNormalizationData
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.compositeToTransportedUnitCone
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.transportedUnitConeToShiftedIdentity
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_obj₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_obj₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_obj₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_mor₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_mor₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_mor₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented_hom_app_hom₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented_hom_app_hom₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented_hom_app_hom₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_obj_distinguished
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_mem_distinguishedTriangles
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_obj₁

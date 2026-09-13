@@ -7,7 +7,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionCone
 import DerivedAlgGeo.CategoryTheory.Triangulated.TriangleFunctorNormalization
 
 /-!
-# Presenting a dg-adjunction counit triangle on an ordinary category
+# Presenting dg-adjunction cone triangles on ordinary categories
 
 A strict dg adjunction and a choice of cones for its counit give a natural
 family of distinguished triangles on the target homotopy category.  A
@@ -20,11 +20,18 @@ and feeds its endpoint comparisons to
 map `(P.toAdjunction A).counit : G ⋙ F ⟶ 𝟭 Y`, literal first two vertices, and
 the transported dg twist as its unchanged third vertex.
 
-The target equivalence's `CommShift` and triangulatedness are supplied where
-needed; a plain category equivalence does not provide either.  No shift data is
-required on the source equivalence.  The construction does not identify the
+For the counit side, the target equivalence's `CommShift` and triangulatedness
+are supplied where needed; for the unit side, the corresponding data are
+supplied on the source equivalence.  A plain category equivalence provides
+neither.  The construction does not identify the
 transported dg twist with an independently chosen ordinary or
 Fourier--Mukai twist, make it exact, or assert sphericality.
+
+The unit-side mirror transports the raw dg unit-cone triangle through the
+source equivalence and normalizes it to have literal first map
+`(P.toAdjunction A).unit : 𝟭 X ⟶ F ⋙ G`.  Its third vertex is the
+transported *unshifted* unit cone.  No inverse rotation or identification with
+the conventional `[-1]` cotwist is performed here.
 -/
 
 set_option autoImplicit false
@@ -159,6 +166,78 @@ theorem rawTransportedTwistTriangle_obj_distinguished (Z : Y) :
 end Distinguished
 
 end CounitConeData
+
+namespace UnitConeData
+
+variable [IsPretriangulated C] (K : A.UnitConeData)
+
+/-- The dg unit-cone functor transported from `H⁰ C` to the ordinary source
+category.  This is the unshifted cone; no cotwist shift or exactness is
+asserted. -/
+noncomputable abbrev transportedUnitCone (eC : H0 C ≌ X) : X ⥤ X :=
+  eC.inverse ⋙ K.unitCone.h0 ⋙ eC.functor
+
+variable [HasShift X ℤ] [eC.functor.CommShift ℤ]
+
+/-- The raw dg unit triangle, reindexed along the source equivalence and
+mapped to the ordinary source category. -/
+noncomputable def rawTransportedUnitTriangle : X ⥤ Triangle X :=
+  (eC.inverse ⋙ K.unitTriangleFunctor A) ⋙ eC.functor.mapTriangle
+
+@[simp]
+theorem rawTransportedUnitTriangle_obj_obj₃ (Z : X) :
+    ((K.rawTransportedUnitTriangle (eC := eC)).obj Z).obj₃ =
+      (K.transportedUnitCone eC).obj Z :=
+  rfl
+
+@[simp]
+theorem rawTransportedUnitTriangle_obj_mor₁ (Z : X) :
+    ((K.rawTransportedUnitTriangle (eC := eC)).obj Z).mor₁ =
+      eC.functor.map (A.h0Unit.app (eC.inverse.obj Z)) := by
+  change eC.functor.map
+    (((K.unitTriangleFunctor A).obj (eC.inverse.obj Z)).mor₁) = _
+  rw [K.unitTriangleFunctor_obj_mor₁ A]
+  rfl
+
+/-- The first projection of the raw transported dg unit triangle, identified
+with the identity functor of the ordinary source category. -/
+noncomputable def rawTransportedUnitTriangleObj₁Iso :
+    K.rawTransportedUnitTriangle (eC := eC) ⋙ Triangle.π₁ ≅ 𝟭 X := by
+  exact
+    Functor.isoWhiskerRight
+        (Functor.isoWhiskerLeft eC.inverse (DGFunctor.h0IdIso (C := C)))
+        eC.functor ≪≫
+      Functor.isoWhiskerRight (Functor.rightUnitor eC.inverse) eC.functor ≪≫
+      eC.counitIso
+
+@[simp]
+theorem rawTransportedUnitTriangleObj₁Iso_hom_app (Z : X) :
+    (K.rawTransportedUnitTriangleObj₁Iso (eC := eC)).hom.app Z =
+      eC.counit.app Z := by
+  simp only [rawTransportedUnitTriangleObj₁Iso, Iso.trans_hom,
+    NatTrans.comp_app]
+  rw [whiskeredH0IdIso_hom_app (eD := eC),
+    whiskeredRightUnitor_hom_app (eD := eC)]
+  change 𝟙 (eC.functor.obj (eC.inverse.obj Z)) ≫ 𝟙 _ ≫
+    eC.counit.app Z = eC.counit.app Z
+  simp
+
+section Distinguished
+
+variable [Limits.HasZeroObject X] [Preadditive X]
+  [∀ n : ℤ, (shiftFunctor X n).Additive] [Pretriangulated X]
+  [eC.functor.IsTriangulated]
+
+/-- Every value of the transported raw dg unit triangle is distinguished
+when the source equivalence is triangulated. -/
+theorem rawTransportedUnitTriangle_obj_distinguished (Z : X) :
+    (K.rawTransportedUnitTriangle (eC := eC)).obj Z ∈ distTriang X := by
+  exact eC.functor.map_distinguished _
+    (K.unitTriangleFunctor_obj_mem_distinguishedTriangles A (eC.inverse.obj Z))
+
+end Distinguished
+
+end UnitConeData
 
 namespace H0Presentation
 
@@ -401,6 +480,244 @@ theorem presentedCounitTriangle_obj_distinguished (Z : Y) :
     (P.presentedCounitTriangle K).obj Z ∈ distTriang Y :=
   (P.counitFirstMapNormalizationData K).normalizedTriangle_obj_distinguished
     (K.rawTransportedTwistTriangle_obj_distinguished (eD := eD)) Z
+
+end Distinguished
+
+end H0Presentation
+
+namespace H0Presentation
+
+variable [IsPretriangulated C] [HasShift X ℤ]
+  [eC.functor.CommShift ℤ]
+  (P : H0Presentation (L := L) (R := R) eC eD F G)
+  (K : A.UnitConeData)
+
+/-- The second projection of the raw transported dg unit triangle, identified
+with the composite of the named presented left and right adjoints. -/
+noncomputable def unitTriangleObj₂Iso :
+    K.rawTransportedUnitTriangle (eC := eC) ⋙ Triangle.π₂ ≅ F ⋙ G := by
+  let right₀ := transportedH0Right (R := R) eC eD
+  exact
+    Functor.isoWhiskerRight
+        (Functor.isoWhiskerLeft eC.inverse (DGFunctor.h0CompIso L R))
+        eC.functor ≪≫
+      Functor.associator eC.inverse (L.h0 ⋙ R.h0) eC.functor ≪≫
+      Functor.isoWhiskerLeft eC.inverse
+        (Functor.associator L.h0 R.h0 eC.functor) ≪≫
+      (Functor.associator eC.inverse L.h0
+        (R.h0 ⋙ eC.functor)).symm ≪≫
+      Functor.isoWhiskerLeft (eC.inverse ⋙ L.h0)
+        (eD.funInvIdAssoc (R.h0 ⋙ eC.functor)).symm ≪≫
+      (Functor.associator (eC.inverse ⋙ L.h0) eD.functor
+        (eD.inverse ⋙ (R.h0 ⋙ eC.functor))).symm ≪≫
+      Functor.isoWhiskerRight P.leftIso right₀ ≪≫
+      Functor.isoWhiskerLeft F P.rightIso
+
+private noncomputable def unitTargetUnitApp (Z : X) :
+    (K.rawTransportedUnitTriangle (eC := eC) ⋙ Triangle.π₂).obj Z ⟶
+      (transportedH0Right (R := R) eC eD).obj
+        ((transportedH0Left (L := L) eC eD).obj Z) :=
+  eC.functor.map
+    (R.h0.map (eD.unit.app (L.h0.obj (eC.inverse.obj Z))))
+
+private noncomputable def presentedUnitTailApp (Z : X) :
+    (transportedH0Right (R := R) eC eD).obj
+        ((transportedH0Left (L := L) eC eD).obj Z) ⟶
+      (F ⋙ G).obj Z :=
+  (transportedH0Right (R := R) eC eD).map (P.leftIso.hom.app Z) ≫
+    P.rightIso.hom.app (F.obj Z)
+
+private noncomputable def presentedObj₂IsoHomApp (Z : X) :
+    (K.rawTransportedUnitTriangle (eC := eC) ⋙ Triangle.π₂).obj Z ⟶
+      (F ⋙ G).obj Z :=
+  unitTargetUnitApp (L := L) (R := R) (eC := eC) (eD := eD) K Z ≫
+    presentedUnitTailApp (L := L) (R := R) (eC := eC) (eD := eD) P Z
+
+private theorem unitTriangleObj₂Iso_hom_app (Z : X) :
+    (P.unitTriangleObj₂Iso K).hom.app Z =
+      presentedObj₂IsoHomApp (L := L) (R := R) (eC := eC) (eD := eD)
+        P K Z := by
+  simp only [unitTriangleObj₂Iso, Iso.trans_hom, NatTrans.comp_app]
+  rw [whiskeredH0CompIso_hom_app (L := R) (R := L) (eD := eC)]
+  simp
+  erw [Category.id_comp]
+  erw [Category.id_comp]
+  erw [Category.id_comp]
+  erw [Category.id_comp]
+  erw [Category.id_comp]
+  rfl
+
+private noncomputable def transportedUnitApp (Z : X) :
+    (K.rawTransportedUnitTriangle (eC := eC) ⋙ Triangle.π₁).obj Z ⟶
+      (transportedH0Right (R := R) eC eD).obj
+        ((transportedH0Left (L := L) eC eD).obj Z) :=
+  ((K.rawTransportedUnitTriangle (eC := eC)).obj Z).mor₁ ≫
+    unitTargetUnitApp (L := L) (R := R) (eC := eC) (eD := eD) K Z
+
+private noncomputable def presentedTransportedUnitApp (Z : X) :
+    (K.rawTransportedUnitTriangle (eC := eC) ⋙ Triangle.π₁).obj Z ⟶
+      (F ⋙ G).obj Z :=
+  transportedUnitApp (L := L) (R := R) (A := A) (eC := eC) (eD := eD)
+      K Z ≫
+    presentedUnitTailApp (L := L) (R := R) (eC := eC) (eD := eD) P Z
+
+private theorem rawTransportedUnitTriangle_mor₁_comp_obj₂Iso_hom_app
+    (Z : X) :
+    (Functor.whiskerLeft (K.rawTransportedUnitTriangle (eC := eC))
+          Triangle.π₁Toπ₂).app Z ≫
+        (P.unitTriangleObj₂Iso K).hom.app Z =
+      presentedTransportedUnitApp
+        (L := L) (R := R) (eC := eC) (eD := eD) P K Z := by
+  change ((K.rawTransportedUnitTriangle (eC := eC)).obj Z).mor₁ ≫
+      (P.unitTriangleObj₂Iso K).hom.app Z = _
+  rw [P.unitTriangleObj₂Iso_hom_app]
+  unfold presentedObj₂IsoHomApp presentedTransportedUnitApp transportedUnitApp
+  exact (Category.assoc _ _ _).symm
+
+private noncomputable def presentedUnitApp (Z : X) :
+    (𝟭 X).obj Z ⟶ (F ⋙ G).obj Z :=
+  (A.transportedH0 eC eD).unit.app Z ≫
+    presentedUnitTailApp (L := L) (R := R) (eC := eC) (eD := eD) P Z
+
+omit [IsPretriangulated C] [HasShift X ℤ] [eC.functor.CommShift ℤ] in
+private theorem toAdjunction_unit_app_eq_presentedUnitApp (Z : X) :
+    (P.toAdjunction A).unit.app Z =
+      presentedUnitApp (A := A) (eC := eC) (eD := eD) P Z := by
+  rw [P.toAdjunction_unit_app A]
+  unfold presentedUnitApp presentedUnitTailApp
+  rfl
+
+@[reassoc]
+private theorem obj₁Iso_hom_comp_transportedH0_unit (Z : X) :
+    (K.rawTransportedUnitTriangleObj₁Iso (eC := eC)).hom.app Z ≫
+        (A.transportedH0 eC eD).unit.app Z =
+      transportedUnitApp (L := L) (R := R) (A := A) (eC := eC) (eD := eD)
+        K Z := by
+  rw [K.rawTransportedUnitTriangleObj₁Iso_hom_app]
+  unfold transportedUnitApp unitTargetUnitApp
+  rw [A.transportedH0_unit_app eC eD]
+  simp only [Equivalence.symm_unit, Equivalence.toAdjunction_unit,
+    Category.assoc]
+  let i := eC.counitIso.app Z
+  change i.hom ≫ i.inv ≫
+      eC.functor.map (A.h0Unit.app (eC.inverse.obj Z)) ≫
+        eC.functor.map
+          (R.h0.map (eD.unit.app (L.h0.obj (eC.inverse.obj Z)))) = _
+  rw [Iso.hom_inv_id_assoc]
+  rw [K.rawTransportedUnitTriangle_obj_mor₁]
+  rfl
+
+private theorem obj₁Iso_hom_comp_presentedUnit (Z : X) :
+    (K.rawTransportedUnitTriangleObj₁Iso (eC := eC)).hom.app Z ≫
+        (P.toAdjunction A).unit.app Z =
+      presentedTransportedUnitApp
+        (L := L) (R := R) (eC := eC) (eD := eD) P K Z := by
+  rw [P.toAdjunction_unit_app_eq_presentedUnitApp]
+  unfold presentedUnitApp presentedTransportedUnitApp
+  exact obj₁Iso_hom_comp_transportedH0_unit_assoc (K := K) (Z := Z)
+    (presentedUnitTailApp (L := L) (R := R) (eC := eC) (eD := eD) P Z)
+
+/-- The generic first-map normalization data for the transported dg unit
+triangle.  Its named first map is exactly the unit of the ordinary adjunction
+constructed by `P`. -/
+noncomputable def unitFirstMapNormalizationData :
+    Triangle.FirstMapNormalizationData
+      (K.rawTransportedUnitTriangle (eC := eC)) (𝟭 X) (F ⋙ G)
+        (P.toAdjunction A).unit where
+  obj₁Iso := K.rawTransportedUnitTriangleObj₁Iso (eC := eC)
+  obj₂Iso := P.unitTriangleObj₂Iso K
+  square := by
+    ext Z
+    simp only [NatTrans.comp_app]
+    rw [P.rawTransportedUnitTriangle_mor₁_comp_obj₂Iso_hom_app K,
+      P.obj₁Iso_hom_comp_presentedUnit K]
+
+/-- The second map of the presented unit triangle, from the adjunction
+composite to the transported unshifted unit cone. -/
+noncomputable def compositeToTransportedUnitCone :
+    F ⋙ G ⟶ K.transportedUnitCone eC :=
+  (P.unitFirstMapNormalizationData K).normalizedSecond
+
+/-- The connecting map of the presented unit triangle, from the transported
+unshifted unit cone to the shift of the identity. -/
+noncomputable def transportedUnitConeToShiftedIdentity :
+    K.transportedUnitCone eC ⟶
+      𝟭 X ⋙ CategoryTheory.shiftFunctor X (1 : ℤ) :=
+  (P.unitFirstMapNormalizationData K).normalizedThird
+
+/-- The presented ordinary unit triangle
+`𝟭 X ⟶ F G ⟶ transportedUnitCone ⟶ (𝟭 X)⟦1⟧`. -/
+noncomputable def presentedUnitTriangle : X ⥤ Triangle X :=
+  (P.unitFirstMapNormalizationData K).normalizedTriangle
+
+@[simp]
+theorem presentedUnitTriangle_obj₁ (Z : X) :
+    ((P.presentedUnitTriangle K).obj Z).obj₁ = Z :=
+  rfl
+
+@[simp]
+theorem presentedUnitTriangle_obj₂ (Z : X) :
+    ((P.presentedUnitTriangle K).obj Z).obj₂ = (F ⋙ G).obj Z :=
+  rfl
+
+@[simp]
+theorem presentedUnitTriangle_obj₃ (Z : X) :
+    ((P.presentedUnitTriangle K).obj Z).obj₃ =
+      (K.transportedUnitCone eC).obj Z :=
+  rfl
+
+@[simp]
+theorem presentedUnitTriangle_mor₁ (Z : X) :
+    ((P.presentedUnitTriangle K).obj Z).mor₁ =
+      (P.toAdjunction A).unit.app Z :=
+  rfl
+
+@[simp]
+theorem presentedUnitTriangle_mor₂ (Z : X) :
+    ((P.presentedUnitTriangle K).obj Z).mor₂ =
+      (P.compositeToTransportedUnitCone K).app Z :=
+  rfl
+
+@[simp]
+theorem presentedUnitTriangle_mor₃ (Z : X) :
+    ((P.presentedUnitTriangle K).obj Z).mor₃ =
+      (P.transportedUnitConeToShiftedIdentity K).app Z :=
+  rfl
+
+/-- The raw transported dg unit triangle and its presented form are naturally
+isomorphic. -/
+noncomputable def rawTransportedUnitTriangleIsoPresented :
+    K.rawTransportedUnitTriangle (eC := eC) ≅ P.presentedUnitTriangle K :=
+  (P.unitFirstMapNormalizationData K).rawIsoNormalized
+
+@[simp]
+theorem rawTransportedUnitTriangleIsoPresented_hom_app_hom₁ (Z : X) :
+    ((P.rawTransportedUnitTriangleIsoPresented K).hom.app Z).hom₁ =
+      (K.rawTransportedUnitTriangleObj₁Iso (eC := eC)).hom.app Z :=
+  rfl
+
+@[simp]
+theorem rawTransportedUnitTriangleIsoPresented_hom_app_hom₂ (Z : X) :
+    ((P.rawTransportedUnitTriangleIsoPresented K).hom.app Z).hom₂ =
+      (P.unitTriangleObj₂Iso K).hom.app Z :=
+  rfl
+
+@[simp]
+theorem rawTransportedUnitTriangleIsoPresented_hom_app_hom₃ (Z : X) :
+    ((P.rawTransportedUnitTriangleIsoPresented K).hom.app Z).hom₃ = 𝟙 _ :=
+  rfl
+
+section Distinguished
+
+variable [Limits.HasZeroObject X] [Preadditive X]
+  [∀ n : ℤ, (shiftFunctor X n).Additive] [Pretriangulated X]
+  [eC.functor.IsTriangulated]
+
+/-- Every value of the presented ordinary unit triangle is distinguished. -/
+theorem presentedUnitTriangle_obj_distinguished (Z : X) :
+    (P.presentedUnitTriangle K).obj Z ∈ distTriang X :=
+  (P.unitFirstMapNormalizationData K).normalizedTriangle_obj_distinguished
+    (K.rawTransportedUnitTriangle_obj_distinguished (eC := eC)) Z
 
 end Distinguished
 

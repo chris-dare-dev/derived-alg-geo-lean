@@ -210,6 +210,8 @@ Category
 │  │     └─ H0Presentation                supplied endpoint isos after equivalence transport
 │  │        ├─ presentedCounitTriangle     generic normalization of the transported dg counit cone
 │  │        │  └─ transportedTwist        unchanged third vertex; pointwise distinguished
+│  │        ├─ presentedUnitTriangle       generic normalization of the transported dg unit cone
+│  │        │  └─ transportedUnitCone     unshifted third vertex; pointwise distinguished
 │  │        └─ Fourier--Mukai adapters     existing left/right adjoint-kernel data
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps

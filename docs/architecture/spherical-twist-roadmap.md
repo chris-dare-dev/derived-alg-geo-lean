@@ -292,7 +292,15 @@ that comparison are instance hypotheses to be discharged by the realization.
    target equivalence's triangulatedness.  Thus the generic ordinary
    dg-counit-cone bridge is closed.  It does not identify this transported dg
    twist with an independently chosen Fourier--Mukai cone, make the twist
-   exact, or assert autoequivalence or sphericality.  The dg notion is still
+   exact, or assert autoequivalence or sphericality.  The source-side mirror
+   `unitFirstMapNormalizationData` likewise presents the transported dg unit
+   triangle with literal vertices `𝟭 X`, `F ⋙ G`, and the transported
+   unshifted unit cone, with first map `(P.toAdjunction A).unit`; it names the
+   remaining maps and raw comparison and uses only the source equivalence's
+   triangulatedness for pointwise distinguishedness.  It does not inverse
+   rotate this family or identify the third vertex with the conventional
+   `[-1]` cotwist.  Both generic ordinary adjunction-cone presentation seams
+   are therefore closed.  The dg notion is still
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
    and no comparison with those exists.
 
