@@ -14,6 +14,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.FiniteCohom
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.FiniteCohomologyCopowerK0
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.HomComplexFiniteCohomologyPresentation
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearEvaluationK0
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearObjectTwistK0
 
 /-!
 # The dg enhancement of the homotopy category
