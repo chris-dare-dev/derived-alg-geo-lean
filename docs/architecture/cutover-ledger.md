@@ -7,6 +7,21 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Scalar-linear object twist as copower--Hom counit twist (2026-09-13):
+  The selected `LinearEvaluationData` cone type and
+  `linearCopowerAdjunction.CounitConeData` are definitionally equal, so the
+  selected object-twist and adjunction-twist functors and their full `H⁰`
+  triangle functors need no transport or second cone construction.  For an
+  arbitrary scalar-linear evaluation choice,
+  `LinearEvaluationData.TwistConeData.adjunctionTwistIso` reuses the existing
+  strict-square cone comparison, preserves the canonical inclusion strictly,
+  and composes coherently with changes of evaluation data.  The H⁰ layer now
+  exposes the scalar-linear twist triangle, its distinguishedness and
+  automatic exactness, coherent choice-independence, and the corresponding
+  natural isomorphism to the adjunction counit triangle.  This concerns the
+  adjunction from all module complexes; it does not construct or restrict to
+  `Perf(k)`, provide the other adjoint, or assert sphericality or
+  autoequivalence.
 - Automatic dg exactness consumer cutover (2026-09-13):
   Public H⁰ exactness and `K₀.map` theorems for homogeneous-transformation
   cones, additive and scalar-linear object twists, and all four enhanced
