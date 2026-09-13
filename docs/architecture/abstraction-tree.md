@@ -220,10 +220,12 @@ Category
 │  │  │                                 generic shiftedFstH0, right whiskering, and ordinary h0Counit
 │  │  ├─ UnitConeData                    unshifted unit-cone cotwist candidate
 │  │  │  ├─ cotwistAdjointComparison    canonical closed `R ⟶ C L`, and its H⁰ map
+│  │  │  │  └─ H⁰ unit/inclusion factorization generic h0Unit, right whiskering, and descended inr
 │  │  │  └─ cotwistAdjointComparisonShiftedH0
 │  │  │                                  canonical `R ⟶ (C[-1] L)[1]` normalization
 │  │  └─ DGAdjunction.h0                 an ordinary adjunction between the H⁰ functors
-│  │     ├─ h0_whiskerLeft_counit       generic compositor/associator/unitor normalization
+│  │     ├─ h0_whiskerLeft_counit       generic left-whiskered counit normalization
+│  │     ├─ h0_whiskerRight_unit        generic right-whiskered unit normalization
 │  │     └─ H0Presentation                supplied endpoint isos after equivalence transport
 │  │        ├─ presentedCounitTriangle     generic normalization of the transported dg counit cone
 │  │        │  └─ transportedTwist        unchanged third vertex; pointwise distinguished
