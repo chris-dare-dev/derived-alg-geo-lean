@@ -264,7 +264,19 @@ that comparison are instance hypotheses to be discharged by the realization.
    Nothing parallel is installed on `H0 (DGFunctor C D)`: that category
    already receives the generic `H0.hasShift` from its pretriangulated dg
    structure, so a second instance would duplicate an existing abstraction.
-   The dg-functor shift packaging seam is therefore closed.  At the `H⁰`
+   The dg-functor shift packaging seam is therefore closed.
+
+   Source regrading is now packaged at the same root rather than rebuilt by
+   cone consumers.  `IsShiftBy.precompEquiv` says that precomposition with a
+   selected shift inverse identifies `Hom^p(X,W)` with
+   `Hom^(n+p)(X[n],W)`, and
+   `HomogeneousNatTrans.sourceShiftEquiv` applies it in the dg category of dg
+   functors.  It preserves and reflects closedness.  Thus a closed degree-one
+   cone projection can be read canonically as a closed degree-zero map out of
+   the selected `[-1]` functor shift; no new shift instance or sign convention
+   is introduced.
+
+   At the `H⁰`
    boundary, `shiftedFunctorH0Iso_commShift` additionally proves that the
    package constructed directly from `F[n]` agrees with the composite package
    on `H⁰(F) ⋙ [n]`; the proof reduces the two shift orders with the
@@ -371,6 +383,18 @@ that comparison are instance hypotheses to be discharged by the realization.
    conditional kernel-autoequivalence layers under dual-cotwist names.  Thus
    both left-adjunction facades are closed over the two existing comparison
    roots; neither creates new comparison or shift data.
+
+   The canonical `TwistCotwistEquivalenceConditions` now also feeds the two
+   right-adjunction Fourier--Mukai kernel packages directly.  Its twist and
+   unshifted-cotwist-cone quasi-equivalences imply exactly the two `H⁰`
+   equivalence witnesses required by the existing comparison constructors;
+   the cotwist constructor remains solely responsible for the conventional
+   `[-1]` shift.  The adapters package the selected twist and cotwist kernels
+   independently, since their endocorrespondences and enhancement categories
+   need not agree.  Their exactness still requires the separately supplied
+   comparison `ShiftCompatibility` and triangulated endpoint equivalence.
+   These conditions provide no equivalence for either left-adjunction dual
+   cone, no relation between the two selected kernels, and no sphericality.
 
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on

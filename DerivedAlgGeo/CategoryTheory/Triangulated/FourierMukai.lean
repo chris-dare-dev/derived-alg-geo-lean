@@ -14,6 +14,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionDualCo
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionDualTwistComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionPresentation
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionTwistComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionTwistCotwistAutoequivalence
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DualCotwistKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DualTwistKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.ExceptionalExtension
@@ -38,7 +39,10 @@ natural triangle and functor isomorphisms between the same families.
 Shift-compatible refinements transfer triangulatedness to the selected
 Fourier--Mukai twist and cotwist shift structures.  The left-adjunction dual
 twist and dual cotwist expose the same comparison and conditional
-kernel-autoequivalence APIs through the definitional correspondence swaps.  No geometry, and no
+kernel-autoequivalence APIs through the definitional correspondence swaps.
+The canonical enhanced twist/cotwist equivalence conditions discharge the
+ordinary equivalence inputs for the right-adjunction pair without supplying
+their comparison or shift data.  No geometry, and no
 theorem asserting that a functor is of this form or that it has an adjoint.
 
 -/

@@ -1183,6 +1183,17 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.ShiftCompatibility.dualCotwistIsTriangulated
 #print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.ShiftCompatibility.dualCotwistKernelAutoequivalenceIsTriangulated
 
+/-! ## Fourier--Mukai lane -- enhanced twist/cotwist equivalence adapters -/
+
+-- The canonical spherical-functor candidate conditions discharge only the
+-- two explicit H⁰ equivalence hypotheses for the right-adjunction FM pair.
+-- Comparison and shift compatibility remain supplied, and no sphericality or
+-- assertion about the two dual cones follows.
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.twistKernelAutoequivalence
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.twistKernelAutoequivalenceIsTriangulated
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.cotwistKernelAutoequivalence
+#print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions.cotwistKernelAutoequivalenceIsTriangulated
+
 /-! ## Fourier--Mukai lane -- kernel-presented adjunctions on extension stages -/
 
 -- The transform of a supplied kernel map, the restricted equivalence and

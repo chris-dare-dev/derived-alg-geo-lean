@@ -163,6 +163,7 @@ Category
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
+│  │  │  ├─ sourceShiftEquiv              additive regrading through IsShiftBy.precompEquiv
 │  │  │  ├─ whiskerLeft / whiskerRight   both sign-free, additive, degree-preserving
 │  │  │  │  ├─ interchange               Godement, with the Koszul sign (-1)^(m n)
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
@@ -304,6 +305,7 @@ Category
 │  │  ├─ triangulated equivalences         canonical Mathlib package for twist and cotwist
 │  │  └─ K₀ action                        identity minus the corresponding adjunction composite
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
+│     ├─ FM twist/cotwist adapters         conditional KernelAutoequivalence, no new record
 │     └─ full sphericality                 pending Morita/adjoint-comparison theorem
 ├─ Derived-category extensions
 │  └─ Ext adjunction / dimension shift / resolution naturality
