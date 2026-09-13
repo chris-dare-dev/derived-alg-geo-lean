@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Functorial
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Presentation
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
+import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.ExactSequence
 
 /-!
 # Grothendieck groups by presentation
