@@ -269,7 +269,11 @@ that comparison are instance hypotheses to be discharged by the realization.
    reuses Mathlib's adjunction composition and natural-isomorphism transport,
    and exposes the resulting unit and counit formulas for later cone and
    Fourier--Mukai consumers.  It constructs neither the endpoint comparisons
-   nor a kernel realization.  The dg notion is still the strict one:
+   nor a kernel realization.  When the named endpoints are transforms,
+   `RightAdjointKernelData.ofH0Presentation` and its left-adjoint mirror feed
+   the resulting adjunction into the existing kernel-adjunction interfaces;
+   their correspondence-swap comparisons are definitional.  They still
+   construct no kernel or kernel arrow.  The dg notion is still the strict one:
    Anno--Logvinenko work with homotopy adjunctions of bimodules, and no
    comparison with those exists.
 
