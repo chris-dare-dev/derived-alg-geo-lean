@@ -45,11 +45,11 @@ structure AdjointComparisonConditions
     (P : EnhancedAdjunctionCones S L R) [IsPretriangulated B] : Prop where
   /-- The canonical comparison `L T[-1] ⟶ R` is invertible on `H⁰`. -/
   twist : IsIso
-    (DGAdjunction.CounitConeData.twistAdjointComparison_h0
+    (DGAdjunction.CounitConeData.twistAdjointComparisonH0
       (rightAdj := P.rightAdj) P.leftAdj P.twist)
   /-- The canonical comparison `R ⟶ C L` is invertible on `H⁰`. -/
   cotwist : IsIso
-    (DGAdjunction.UnitConeData.cotwistAdjointComparison_h0
+    (DGAdjunction.UnitConeData.cotwistAdjointComparisonH0
       (rightAdj := P.rightAdj) P.leftAdj P.cotwistCone)
 
 namespace AdjointComparisonConditions
@@ -62,7 +62,7 @@ isomorphism. -/
 noncomputable def twistIso :
     ((P.twistFunctor.shiftedFunctor (-1 : ℤ)).comp L).h0 ≅ R.h0 := by
   letI := h.twist
-  exact asIso (DGAdjunction.CounitConeData.twistAdjointComparison_h0
+  exact asIso (DGAdjunction.CounitConeData.twistAdjointComparisonH0
     (rightAdj := P.rightAdj) P.leftAdj P.twist)
 
 /-- The canonical cotwist-side comparison, packaged as Mathlib's selected
@@ -70,7 +70,7 @@ isomorphism. -/
 noncomputable def cotwistIso :
     R.h0 ≅ (L.comp P.cotwistConeFunctor).h0 := by
   letI := h.cotwist
-  exact asIso (DGAdjunction.UnitConeData.cotwistAdjointComparison_h0
+  exact asIso (DGAdjunction.UnitConeData.cotwistAdjointComparisonH0
     (rightAdj := P.rightAdj) P.leftAdj P.cotwistCone)
 
 section ShiftedCotwist
@@ -94,7 +94,7 @@ not an independently chosen natural isomorphism. -/
 @[simp]
 theorem cotwistShiftedIso_hom :
     h.cotwistShiftedIso.hom =
-      DGAdjunction.UnitConeData.cotwistAdjointComparisonShifted_h0
+      DGAdjunction.UnitConeData.cotwistAdjointComparisonShiftedH0
         (rightAdj := P.rightAdj) P.leftAdj P.cotwistCone :=
   rfl
 
