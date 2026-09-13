@@ -363,7 +363,7 @@ items:
     kind: epic
     parent: projective-families-m5
     title: "Mass-Hom bounds: HLR Definition 2.7, the categorical calculus, and Theorem 7.5"
-    status: planned
+    status: done
     priority: must
     size: XL
     summary: "Definition 7.1 (= HLR v2 Definition 2.7) as one predicate on a k-linear triangulated category with a test class (⊤ for HLR, schemePerfect for the paper), its invariances, the generator and stable-object reductions (Lemma 2.8 / Remark 7.2), invariance on a connected component (Corollary 2.14(1) / Remark 7.3, from the existing stabilityDist mass comparison), transfer along pullback and pushforward (Lemma 7.4, on the Phase/Transfer preimage carrier), the algebraic base case (Example 2.9), and Theorem 7.5 with Remark 1.4 on top of PF3's distinguished component. Evidence for HLR's Boundedness Conjecture; the augmented-compactification half of HLR is out of scope."
@@ -441,7 +441,7 @@ items:
     parent: projective-families-e14
     blocked_by: [1180, 1181, 1182]
     title: "Theorem 7.5 and Remark 1.4 on the distinguished component"
-    status: blocked
+    status: done
     summary: "Remark 7.3 plus the two transfers plus the base case, with PF3's distinguished-component inhabitant (Definition 6.4, Theorems 5.4/5.6/6.2) as the one named hypothesis until e8/e9 land; Remark 1.4 from autoequivalence transport; §7 coverage promotion proposed to the owner."
     priority: must
     size: M

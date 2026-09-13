@@ -446,6 +446,13 @@ def main(argv):
                       f"issue on an owned milestone -- remove it from the list")
         failures += 1
 
+    # The set of issues THIS pull request closes is needed by two rules, so it
+    # is fetched once, here, above both of them. RM-08 uses it directly; RM-07
+    # uses it to avoid punishing the very thing RM-08 demands (see below).
+    closing, closing_problem = (None, None)
+    if pr_number:
+        closing, closing_problem = fetch_closing_issues(pr_number)
+
     # RM-07 -----------------------------------------------------------------
     judged = unjudged = 0
     inherited = []
@@ -470,6 +477,16 @@ def main(argv):
             continue  # RM-01 owns a missing issue
         status = e.get("status")
         gh_state = live[n]["state"]
+        # An issue this pull request CLOSES is judged as the merge will leave
+        # it, not as it stands mid-review. Without this RM-07 and RM-08
+        # contradict each other outright: RM-08 demands the entry be advanced
+        # in the closing pull request, RM-07 then sees `done` against an issue
+        # that is still OPEN (it closes on merge, not before), and no pull
+        # request that closes an issue can be green either way. That is a
+        # repository-wide block, and it shipped in #1252 -- the rules were
+        # written apart and never run against each other.
+        if closing and n in closing:
+            gh_state = "CLOSED"
         if status in RM07_DONE_STATUSES:
             judged += 1
             if gh_state == "OPEN":
@@ -508,10 +525,9 @@ def main(argv):
     # judges both of those, as it did before.
     rm08_checked = 0
     if pr_number:
-        closing, problem = fetch_closing_issues(pr_number)
         if closing is None:
             print(f"note: RM-08 could not read closing issues for "
-                  f"#{pr_number} ({problem}); RM-07 remains the backstop")
+                  f"#{pr_number} ({closing_problem}); RM-07 remains the backstop")
         else:
             by_issue = {e["gh_issue"]: e for e in items if e.get("gh_issue")}
             for n in sorted(closing):
