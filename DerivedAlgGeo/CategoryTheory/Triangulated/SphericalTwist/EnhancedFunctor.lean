@@ -19,8 +19,9 @@ four conditions from a sufficient pair in the Morita-enhanced setting).
 `TwistCotwistEquivalenceConditions` records the commonly used equivalence pair
 as explicit data, but no theorem here upgrades it to sphericality.  Doing so
 requires the specific adjoint-comparison transformations and higher cone
-coherence developed in the literature, neither of which is yet a repository
-primitive.
+coherence developed in the literature.  The former are constructed at the
+generic dg-cone root and packaged for this data in
+`EnhancedAdjunctionComparison`; the latter is not yet a repository primitive.
 -/
 
 set_option autoImplicit false

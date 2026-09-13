@@ -76,14 +76,20 @@ DGAdjunction
 ├─ closed unit and counit
 ├─ dg triangle identities
 ├─ h0 : an ordinary Mathlib adjunction between the H⁰ functors
-└─ CounitConeData
-   ├─ twist candidate Cone(LR ⟶ id)
-   └─ twistTriangleFunctor: H⁰ D ⥤ Triangle (H⁰ D), every value distinguished,
-      first two maps the counit and the canonical inclusion.  This is
-      Anno--Logvinenko's twist triangle as a triangle OF FUNCTORS on H⁰.  It
-      does not say the twist is an autoequivalence, does not call the
-      adjunction spherical, and does not relate it to the other three
-      triangles; UnitConeData carries the unshifted unit side.
+├─ CounitConeData
+│  ├─ twist candidate Cone(LR ⟶ id)
+│  └─ twistTriangleFunctor: H⁰ D ⥤ Triangle (H⁰ D), every value distinguished,
+│     first two maps the counit and the canonical inclusion
+├─ UnitConeData
+│  └─ unshifted unit-cone candidate Cone(id ⟶ RL)
+└─ a compatible left/right adjunction pair canonically supplies
+   ├─ twistAdjointComparison: L T[-1] ⟶ R
+   └─ cotwistAdjointComparison: R ⟶ C L
+      └─ EnhancedAdjunctionComparison records IsIso on their H⁰ maps
+
+The cone constructions and comparison maps do not say that either cone is an
+autoequivalence, do not call the adjunction spherical, and do not derive the
+comparison conditions from the equivalence conditions.
 
 HasCopower K X / HasCopowers C
 └─ copowerData: a noncomputably selected CopowerData witness
@@ -172,6 +178,12 @@ EnhancedAdjunctionCones
 │  among the four.
 ├─ K₀ action of each conventional functor is identity minus its adjunction
 │  composite, first on object classes and then as a homomorphism under exactness
+├─ canonical closed dg adjunction comparisons
+│  ├─ `L T[-1] ⟶ R`, from the regraded twist-cone projection and left counit
+│  └─ `R ⟶ C L`, from the left unit and cotwist-cone inclusion
+│     └─ both descend to named H⁰ maps
+├─ AdjointComparisonConditions
+│  └─ Mathlib IsIso on those canonical H⁰ maps, with asIso accessors
 └─ TwistCotwistEquivalenceConditions
    ├─ cotwistH0Equivalence spends the unshifted condition on the actual cotwist
    └─ twist/cotwist exact equivalences use Mathlib's canonical package
@@ -287,7 +299,19 @@ that comparison are instance hypotheses to be discharged by the realization.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
-   sphericality.  `DGAdjunction.h0` now compares a dg adjunction with an
+   sphericality.  The two strict adjunction comparisons themselves are now
+   present at the generic dg-cone root.
+   `CounitConeData.twistAdjointComparison` pastes the regraded closed
+   projection `T[-1] ⟶ S R` with the left counit to obtain `L T[-1] ⟶ R`;
+   `UnitConeData.cotwistAdjointComparison` pastes the left unit with the
+   cotwist-cone inclusion to obtain `R ⟶ C L`.  Both are closed degree-zero
+   transformations with explicit component formulas and named `H⁰` maps.
+   `AdjointComparisonConditions` records Mathlib `IsIso` witnesses for these
+   canonical maps and exposes their `asIso`s; it does not accept unrelated
+   natural isomorphisms.  No `IsIso` conclusion follows from construction or
+   from `TwistCotwistEquivalenceConditions`.
+
+   `DGAdjunction.h0` now compares a dg adjunction with an
    ordinary one on `H⁰`.  `DGAdjunction.H0Presentation` further conjugates
    that adjunction through supplied equivalences from the two homotopy
    categories and identifies its endpoints with named ordinary functors.  It
