@@ -363,8 +363,14 @@ that comparison are instance hypotheses to be discharged by the realization.
    exactness, and conditional `KernelAutoequivalence` packaging.  The
    conventional dual twist receives exactly the existing `[-1]` shift; the
    facade does not construct comparison data, infer equivalence, or add a
-   second `CommShift` structure.  The left-adjunction dual-cotwist comparison
-   remains the next symmetric facade over the counit/twist root.
+   second `CommShift` structure.  Symmetrically,
+   `DGAdjunctionDualCotwistComparison` reuses the counit/twist comparison for
+   the left-adjunction counit.  Its dual cotwist is the unshifted dg counit
+   cone, so this facade adds no inverse rotation or `[-1]` shift.  It exposes
+   the same objectwise, supplied-natural, shift-compatible, exact, and
+   conditional kernel-autoequivalence layers under dual-cotwist names.  Thus
+   both left-adjunction facades are closed over the two existing comparison
+   roots; neither creates new comparison or shift data.
 
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on

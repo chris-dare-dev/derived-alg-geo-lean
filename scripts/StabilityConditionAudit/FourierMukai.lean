@@ -1162,6 +1162,27 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.isKernelFunctor_dualCotwist
 #print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.transform_arrow_counit_square
 
+/-! ## Fourier--Mukai lane -- presented dg dual-cotwist comparison -/
+
+-- This left-adjunction facade is definitionally the existing counit/twist
+-- comparison after swapping endpoints and correspondences.  Its comparison
+-- and shift packages are aliases, not new structures.
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.presentedLeftCounitTriangleObjIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.transportedDualCotwistObjIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.ofDualCotwistIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.presentedLeftCounitTriangleIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.transportedDualCotwistIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.transportedDualCotwist_isKernelFunctor
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.dualCotwist_isEquivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.dualCotwistKernelAutoequivalence
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.ShiftCompatibility
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.ShiftCompatibility.ofCommShift
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.ShiftCompatibility.dualCotwistCommShift
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.ShiftCompatibility.transportedDualCotwistIso_commShift
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.ShiftCompatibility.dualCotwistIsTriangulated
+#print axioms CategoryTheory.Triangulated.FourierMukai.DualCotwistKernelConeData.PresentedDualCotwistComparisonData.ShiftCompatibility.dualCotwistKernelAutoequivalenceIsTriangulated
+
 /-! ## Fourier--Mukai lane -- kernel-presented adjunctions on extension stages -/
 
 -- The transform of a supplied kernel map, the restricted equivalence and
