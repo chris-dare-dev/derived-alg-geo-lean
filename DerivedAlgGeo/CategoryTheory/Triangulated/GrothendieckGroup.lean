@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Biproduct
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Functorial
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HeartComparison

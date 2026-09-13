@@ -402,12 +402,31 @@ that comparison are instance hypotheses to be discharged by the realization.
    free homology therefore yields a nested finite biproduct of shifts of `X`,
    with multiplicity the corresponding `finrank`.  These isomorphisms are
    noncanonical and make no basis-independence claim.
+   The scalar-linear Hom-cohomology seam is now closed as well.
+   `IsShiftBy.linearHomIso` upgrades the defining degreewise bijections of a
+   chosen shift to an isomorphism of `ModuleCat k`-valued Hom-complexes, and
+   `H0.homologyShiftLinearEquiv` combines it with Mathlib's homology and shift
+   APIs to identify `Hⁿ(DGLinear.homComplex k X Y)` linearly with
+   `Hom_{H⁰ C}(X, Y⟦n⟧)`.  The same-sign `+n` shift on the target is intentional:
+   right composition with the degree-`-n` shift element lands in the
+   `(-n)`-shifted Hom-complex, whose degree `n` homology is degree zero.  This
+   comparison has representative laws computing the degree-zero map as
+   `H0.homMk` and the explicit-shift map as right composition by the shift
+   element.  It is pointwise and non-numerical; it does not assert finiteness,
+   formality, or a dimension formula.
+   The first generic `K₀` prerequisite is also closed:
+   `K₀.of_biproduct` computes the class of any finite biproduct as the sum
+   of the classes of its factors, with a constant-family multiplicity
+   corollary.  This lives at the triangulated Grothendieck-group root and is
+   intentionally independent of copowers.  The immediate downstream seam is
+   to combine it with `linearCopowerFinrankIso` and `K₀.of_shift_int` for a
+   supplied finite cohomology presentation.
    The parallel linear evaluation package still does not discharge the
    existing additive `EvaluationData.IsEulerCopower`; a later lane must
    formulate its numerical consumer directly or accept explicit comparison
-   data.  Automatic formality, the scalar-linear comparison between Hom-complex
-   cohomology and shifted `H⁰` morphisms, and the Euler/K₀ realization all
-   remain open.
+   data.  The scalar-copower Euler class, the shared endofunctor-level Euler
+   interface, and automatic formality remain open; automatic formality is not
+   to be inferred from Hom-finiteness.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies either a `HasCopowers` instance for the additive interface or a
