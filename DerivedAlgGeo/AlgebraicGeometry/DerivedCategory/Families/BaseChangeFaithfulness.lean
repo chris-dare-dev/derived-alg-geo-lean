@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeKFlatSLinearity
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FlatPullback
 
 /-!
 # Faithful base change for external-product coefficients
@@ -48,6 +49,83 @@ structure DqcFaithfulBaseChange
   from `X_T` forward to `X`. -/
   iso : pushBase.functor ⋙ pullBase.functor ≅
     D.pullSnd.functor ⋙ pushFst.functor
+
+/-- The missing geometric flat-base-change theorem, stated once with the two
+flatness alternatives used in Proposition 3.15.
+
+This is deliberately stronger than accepting an unrelated isomorphism at
+each call site: an implementation must produce faithful base change uniformly
+from flatness of either the source morphism `X → S` or the base-change
+morphism `T → S`. -/
+structure DqcFlatBaseChangeTheorem
+    (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
+    (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
+    (pushFst : DqcRightDerivedPushforward (baseChangeFst X T)) where
+  /-- Flatness of `X → S` gives derived base change. -/
+  of_source_flat [Flat X.hom] :
+    D.DqcFaithfulBaseChange pullBase pushBase pushFst
+  /-- Flatness of `T → S` gives derived base change. -/
+  of_base_flat [Flat T.hom] :
+    D.DqcFaithfulBaseChange pullBase pushBase pushFst
+
+/-- The two projections from `X ×_S T` form the defining pullback square
+over the identity object of `Over S`. -/
+theorem baseChangeProjections_isPullback :
+    IsPullback (baseChangeSnd X T) (baseChangeFst X T)
+      (toIdentityBaseChange T) (toIdentityBaseChange X) := by
+  apply IsPullback.mk'
+  · apply Over.OverMorphism.ext
+    exact (Over.w (baseChangeSnd X T)).trans
+      (Over.w (baseChangeFst X T)).symm
+  · intro Z f g hSnd hFst
+    apply Limits.prod.hom_ext
+    · exact hFst
+    · exact hSnd
+  · intro Z f g h
+    exact ⟨Limits.prod.lift g f, Limits.prod.lift_snd _ _,
+      Limits.prod.lift_fst _ _⟩
+
+namespace DqcFlatBaseChangeTheorem
+
+/-- Under flatness of `X → S`, its pullback projection
+`X_T → T` is flat. -/
+theorem baseChangeSnd_flat
+    [Flat X.hom] : Flat (baseChangeSnd X T).left := by
+  exact MorphismProperty.of_isPullback (P := @Flat)
+    ((Over.forget S).map_isPullback
+      (baseChangeProjections_isPullback (X := X) (T := T)).flip)
+    (by change Flat X.hom; infer_instance)
+
+/-- Under flatness of `T → S`, its pullback projection
+`X_T → X` is flat. -/
+theorem baseChangeFst_flat
+    [Flat T.hom] : Flat (baseChangeFst X T).left := by
+  exact MorphismProperty.of_isPullback (P := @Flat)
+    ((Over.forget S).map_isPullback
+      (baseChangeProjections_isPullback (X := X) (T := T)))
+    (by change Flat T.hom; infer_instance)
+
+/-- Specialize the flat-base-change theorem using flatness of `X → S`. -/
+def faithfulOfSourceFlat
+    {pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X)}
+    {pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T)}
+    {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
+    (H : D.DqcFlatBaseChangeTheorem pullBase pushBase pushFst)
+    [Flat X.hom] :
+    D.DqcFaithfulBaseChange pullBase pushBase pushFst :=
+  H.of_source_flat
+
+/-- Specialize the flat-base-change theorem using flatness of `T → S`. -/
+def faithfulOfBaseFlat
+    {pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X)}
+    {pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T)}
+    {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
+    (H : D.DqcFlatBaseChangeTheorem pullBase pushBase pushFst)
+    [Flat T.hom] :
+    D.DqcFaithfulBaseChange pullBase pushBase pushFst :=
+  H.of_base_flat
+
+end DqcFlatBaseChangeTheorem
 
 namespace CompactFiberProjectionFormula
 
@@ -142,6 +220,58 @@ theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBas
     D.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula_of_faithfulBaseChange
     A hA hIso H Q B.pullback pushBase pushFst adj P faithful C hS
+
+/-- The K-flat coefficient route under the paper's first flatness
+alternative, flatness of `X → S`. -/
+theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_sourceFlat
+    (A : SemiorthogonalSequence (SourceDqc X) ι)
+    (hA : A.HasTriangulatedComponents)
+    (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
+    (H : D.CompactFiberTensorDuality)
+    (Q : D.SourceTensorData)
+    (B : KFlatBasePullbackData X)
+    (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
+    (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
+    (adj : D.pullFst.functor ⊣ pushFst.functor)
+    [D.pullFst.functor.Additive]
+    [Flat X.hom]
+    (P : D.CompactFiberProjectionFormula H Q pushFst)
+    (flatBaseChange : D.DqcFlatBaseChangeTheorem
+      B.pullback pushBase pushFst)
+    (C : CompactFiberProjectionFormula.FiberCoefficientData
+      (D := D) P)
+    (hS : SourceTensorData.KFlatDqcSLinearComponents
+      (D := D) Q B A) :
+    D.PerfectComponentsSemiorthogonal A :=
+  D.perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBaseChange
+    A hA hIso H Q B pushBase pushFst adj P
+      flatBaseChange.faithfulOfSourceFlat C hS
+
+/-- The K-flat coefficient route under the paper's second flatness
+alternative, flatness of `T → S`. -/
+theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_baseFlat
+    (A : SemiorthogonalSequence (SourceDqc X) ι)
+    (hA : A.HasTriangulatedComponents)
+    (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
+    (H : D.CompactFiberTensorDuality)
+    (Q : D.SourceTensorData)
+    (B : KFlatBasePullbackData X)
+    (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
+    (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
+    (adj : D.pullFst.functor ⊣ pushFst.functor)
+    [D.pullFst.functor.Additive]
+    [Flat T.hom]
+    (P : D.CompactFiberProjectionFormula H Q pushFst)
+    (flatBaseChange : D.DqcFlatBaseChangeTheorem
+      B.pullback pushBase pushFst)
+    (C : CompactFiberProjectionFormula.FiberCoefficientData
+      (D := D) P)
+    (hS : SourceTensorData.KFlatDqcSLinearComponents
+      (D := D) Q B A) :
+    D.PerfectComponentsSemiorthogonal A :=
+  D.perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBaseChange
+    A hA hIso H Q B pushBase pushFst adj P
+      flatBaseChange.faithfulOfBaseFlat C hS
 
 end KFlatBaseChangeData
 
