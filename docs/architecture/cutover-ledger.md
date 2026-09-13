@@ -16,11 +16,20 @@ blocks should normally move it rather than add more declarations beside it.
   `DGEnhancement.FiniteCohomologyCopower` transports this presentation through
   `linearCopowerFunctor`: generic additivity of `DGFunctor.h0` and `Cdg.toH0`
   lets Mathlib supply finite-biproduct preservation, and
-  `SingleFunctors.postcomp` supplies the coherent shifted family.  No new
-  direct-sum or shift interface is introduced.  This root assumes the actual
+  `SingleFunctors.postcomp` supplies the coherent shifted family.
+  `DGCategory.LinearCopowerUnit` proves directly from the representing
+  property that the scalar unit copower is `X`, using the strict canonical
+  `IsLinearCopowerOf.compareIso`.
+  `DGEnhancement.LinearCopowerFiniteFree` owns the generic `H⁰` leaf: a
+  supplied finite basis expands a degree-zero copower as a finite biproduct of
+  copies of `X`, with arbitrary finite index universe handled by Mathlib's
+  categorical biproduct reindexing.  `Module.finBasis` gives the finite-free
+  `finrank` specialization.  The finite-presentation consumer composes these
+  interfaces into its nested finite-biproduct normal form.  No new direct-sum
+  or shift interface is introduced.  This root still assumes the actual
   `HomotopyEquiv`; it proves no automatic formality, quasi-isomorphism
-  invariance, basis/finrank expansion, Hom-cohomology comparison, Euler/K₀
-  formula, cone preservation, or concrete `HasLinearCopowers` instance.
+  invariance, Hom-cohomology comparison, Euler/K₀ formula, cone preservation,
+  basis independence, or concrete `HasLinearCopowers` instance.
 - Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
   `DGCategory.LinearCopowerFunctor` packages the universal property as a
   degreewise `homComplexIso`, then uses it to define the homogeneous
@@ -80,9 +89,9 @@ blocks should normally move it rather than add more declarations beside it.
   `k`-linear cochains.  The separate scalar-linear copower and evaluation
   roots now exist, coefficient-complex homotopy invariance is closed, and
   supplied finite cohomology presentations now transport to shifted finite
-  biproducts. Automatic formality and finite-dimensional basis data, the
-  scalar-linear Hom-cohomology comparison, and the numerical Euler consumer
-  remain the next foundational roots.
+  biproducts and finite-free homology expands these into `finrank` copies.
+  Automatic formality, the scalar-linear Hom-cohomology comparison, and the
+  numerical Euler consumer remain the next foundational roots.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under

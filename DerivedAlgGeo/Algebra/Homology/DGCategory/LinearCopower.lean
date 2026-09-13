@@ -234,6 +234,46 @@ lemma compare_self (t : IsLinearCopowerOf k K X Z) :
   cases hji
   rw [t.univ_comp_compare t, dgComp_id]
 
+/-- The canonical comparison between two linear-copower witnesses as an
+isomorphism in the closed degree-zero category. -/
+noncomputable def compareIso
+    (t : IsLinearCopowerOf k K X Z) (t' : IsLinearCopowerOf k K X Z') :
+    (show Z0 C from Z) ≅ (show Z0 C from Z') where
+  hom := ⟨t.compare t', t.compare_mem_cocycles t'⟩
+  inv := ⟨t'.compare t, t'.compare_mem_cocycles t⟩
+  hom_inv_id := Subtype.ext (t.compare_comp_compare t')
+  inv_hom_id := Subtype.ext (t'.compare_comp_compare t)
+
+@[simp]
+lemma compareIso_hom_val
+    (t : IsLinearCopowerOf k K X Z) (t' : IsLinearCopowerOf k K X Z') :
+    (t.compareIso t').hom.val = t.compare t' :=
+  rfl
+
+@[simp]
+lemma compareIso_inv_val
+    (t : IsLinearCopowerOf k K X Z) (t' : IsLinearCopowerOf k K X Z') :
+    (t.compareIso t').inv.val = t'.compare t :=
+  rfl
+
+/-- The canonical comparison of a linear-copower witness with itself is the
+identity isomorphism. -/
+@[simp]
+lemma compareIso_self (t : IsLinearCopowerOf k K X Z) :
+    t.compareIso t = Iso.refl _ := by
+  apply Iso.ext
+  apply Subtype.ext
+  exact t.compare_self
+
+/-- Canonical linear-copower comparison isomorphisms are transitive. -/
+lemma compareIso_trans {Z'' : C}
+    (t : IsLinearCopowerOf k K X Z) (t' : IsLinearCopowerOf k K X Z')
+    (t'' : IsLinearCopowerOf k K X Z'') :
+    (t.compareIso t').trans (t'.compareIso t'') = t.compareIso t'' := by
+  apply Iso.ext
+  apply Subtype.ext
+  exact t.compare_trans t' t''
+
 end IsLinearCopowerOf
 
 variable {k : Type w} [CommRing k]

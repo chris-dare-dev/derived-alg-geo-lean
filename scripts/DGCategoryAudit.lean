@@ -1136,6 +1136,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsLinearCopowerOf.compare_comp_compare
 #print axioms CategoryTheory.IsLinearCopowerOf.compare_trans
 #print axioms CategoryTheory.IsLinearCopowerOf.compare_self
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso_hom_val
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso_inv_val
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso_self
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso_trans
 #print axioms CategoryTheory.LinearCopowerData
 #print axioms CategoryTheory.LinearCopowerData.obj
 #print axioms CategoryTheory.LinearCopowerData.isLinearCopower
@@ -1150,6 +1155,16 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.HasLinearCopowers
 #print axioms CategoryTheory.HasLinearCopowers.has_linearCopower
 #print axioms CategoryTheory.hasLinearCopowerOfHasLinearCopowers
+
+-- The literal degree-zero single on the scalar ring represents `X` itself.
+-- Its universal map sends the scalar unit to the dg identity, and the selected
+-- object comparison descends from the strict `Z⁰` comparison above.  This
+-- supplies no global copower instance.
+#print axioms CategoryTheory.linearCopowerUnitCocycle
+#print axioms CategoryTheory.linearCopowerUnitUniv
+#print axioms CategoryTheory.cochain_ofHom_linearCopowerUnitUniv
+#print axioms CategoryTheory.isLinearCopowerOfUnit
+#print axioms CategoryTheory.linearCopowerUnitIso
 
 -- Coefficient-complex functoriality is a single linear dg functor, not a
 -- collection of unrelated degree-zero comparisons.  Its Hom-complex
@@ -1185,13 +1200,21 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.linearCopowerFunctor_map
 #print axioms CategoryTheory.linearCopowerObjIsoOfHomotopyEquiv
 
--- Supplied finite cohomology presentations transport through the linear
--- copower functor to finite biproducts of shifted degree-zero copowers.  The
--- biproduct and shift interfaces are Mathlib's; this makes no formality,
--- basis, finrank, or Euler claim.
+-- The generic `H⁰` finite-free leaf packages shifted single copowers.  A
+-- supplied basis expands a degree-zero copower, with arbitrary finite index
+-- universes handled by categorical reindexing, and finite free modules have
+-- the noncanonical finrank specialization.  This makes no formality,
+-- basis-independence, or Euler claim.
 #print axioms CategoryTheory.linearCopowerSingleFunctors
 #print axioms CategoryTheory.linearCopowerSingleFunctors_obj
+#print axioms CategoryTheory.linearCopowerSingleZeroIsoOfBasis
+#print axioms CategoryTheory.linearCopowerSingleZeroFinrankIso
+
+-- Supplied finite cohomology presentations transport through the linear
+-- copower functor to finite biproducts of shifted degree-zero copowers, then
+-- consume the generic finrank expansion when their homology is finite free.
 #print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerIso
+#print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerFinrankIso
 
 -- Scalar-linear evaluation data assembles the linear copowers at a fixed
 -- object into a `k`-linear dg functor and a closed evaluation transformation.

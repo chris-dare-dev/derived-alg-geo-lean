@@ -391,12 +391,23 @@ that comparison are instance hypotheses to be discharged by the realization.
    through `linearCopowerFunctor`, using ordinary additivity to preserve the
    finite biproduct and the established coherent shift comparison.  Thus the
    shifted finite-sum presentation seam is closed for supplied formality data.
+   The scalar unit is now computed directly from the linear representing
+   property, and its strict comparison is packaged as an isomorphism in
+   `Z⁰ C` before descending to `H⁰ C`.
+   `DGEnhancement.LinearCopowerFiniteFree` owns the reusable next leaf: a
+   chosen finite basis expands a degree-zero coefficient copower into copies
+   of the original object, using categorical reindexing for an arbitrary
+   finite index universe; `Module.finBasis` supplies the finite-free `finrank`
+   specialization.  A supplied finite cohomology presentation with finite
+   free homology therefore yields a nested finite biproduct of shifts of `X`,
+   with multiplicity the corresponding `finrank`.  These isomorphisms are
+   noncanonical and make no basis-independence claim.
    The parallel linear evaluation package still does not discharge the
    existing additive `EvaluationData.IsEulerCopower`; a later lane must
    formulate its numerical consumer directly or accept explicit comparison
-   data.  Automatic formality, finite-dimensional basis expansion, the
-   scalar-linear comparison between Hom-complex cohomology and shifted `H⁰`
-   morphisms, and the Euler/K₀ realization all remain open.
+   data.  Automatic formality, the scalar-linear comparison between Hom-complex
+   cohomology and shifted `H⁰` morphisms, and the Euler/K₀ realization all
+   remain open.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies either a `HasCopowers` instance for the additive interface or a
