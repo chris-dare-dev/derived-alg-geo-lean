@@ -292,7 +292,35 @@ that comparison are instance hypotheses to be discharged by the realization.
    target equivalence's triangulatedness.  Thus the generic ordinary
    dg-counit-cone bridge is closed.  It does not identify this transported dg
    twist with an independently chosen Fourier--Mukai cone, make the twist
-   exact, or assert autoequivalence or sphericality.  The dg notion is still
+   exact, or assert autoequivalence or sphericality.  The source-side mirror
+   `unitFirstMapNormalizationData` likewise presents the transported dg unit
+   triangle with literal vertices `𝟭 X`, `F ⋙ G`, and the transported
+   unshifted unit cone, with first map `(P.toAdjunction A).unit`; it names the
+   remaining maps and raw comparison and uses only the source equivalence's
+   triangulatedness for pointwise distinguishedness.  Its inverse rotation is
+   now the generic `presentedCotwistTriangle`, whose first vertex is the
+   pointwise `[-1]` shift `transportedCotwist` and whose second map is literally
+   the presented adjunction unit.  The reusable
+   `DGFunctor.transportedShiftedFunctorH0Iso` and its specialization
+   `transportedCotwistH0Iso` compare that first vertex with the transport of
+   `H⁰` of the actual shifted dg unit cone; equality after transport is not
+   claimed.  `DGFunctor.transportedH0` now packages the shift and exactness
+   capabilities of an arbitrary `H⁰` dg functor after ordinary equivalence
+   transport.  Its cotwist specialization proves exactness from the supplied
+   triangulated source equivalence and packages an ordinary exact
+   autoequivalence only under an explicit equivalence hypothesis on the
+   unshifted cone.  Thus the generic ordinary adjunction-cone presentation,
+   conventional cotwist rotation, and transported-capability seams are closed.
+   When the named functors are Fourier--Mukai transforms and the kernel unit
+   is presented by `RightAdjointKernelData.ofH0Presentation`,
+   `presentedUnitTriangleObjIso` now uses Mathlib's triangle-isomorphism
+   completion theorem at each source object to compare this triangle with an
+   independently chosen Fourier--Mukai unit cone.  Inverse rotation gives the
+   corresponding objectwise cotwist comparison, including the transport of
+   the actual shifted dg cone.  The chosen third component is not proved
+   natural in the source object, so no functor isomorphism, dg
+   quasi-equivalence, choice independence, exactness/equivalence transfer, or
+   sphericality follows.  The dg notion is still
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
    and no comparison with those exists.
 
@@ -610,6 +638,11 @@ that comparison are instance hypotheses to be discharged by the realization.
    Specializing at `-1` gives `cotwistKernel`, an explicit kernel whose
    transform is naturally isomorphic to the cotwist, and hence proves only
    that the cotwist is a kernel functor.
+   For the right-adjunction unit, the independently chosen dg and kernel cone
+   triangles are now noncanonically isomorphic at every source object, and so
+   are their conventional cotwist objects.  This pointwise comparison does not
+   identify the two cotwist functors naturally; that requires additional
+   realization data compatible with the remaining triangle maps.
    The left-adjunction unit is now a third consumer:
    `DualTwistKernelData` swaps the two correspondences and reuses
    `LeftAdjointKernelData.toRightAdjointKernelData`, so its enhanced form names
