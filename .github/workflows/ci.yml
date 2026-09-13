@@ -830,7 +830,7 @@ jobs:
           echo "using venv interpreter $VENV_PY"
 
           "$VENV_BIN/pip" install --quiet \
-            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@b90d0d97fa73f90ebdf25b6faf480956d94ea49e#subdirectory=contract"
+            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@ed71fbba2ef4261ae6ae7153ffc21cfe3d1bab25#subdirectory=contract"
           MFC="$VENV_BIN/mfc"
 
           # Assert the installed schema is the one the emitter writes against.
