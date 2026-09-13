@@ -8,7 +8,7 @@ import Mathlib.Algebra.Category.Grp.Limits
 import Mathlib.Algebra.Category.Grp.Ulift
 import Mathlib.CategoryTheory.Adjunction.Additive
 import Mathlib.CategoryTheory.Limits.Shapes.ConcreteCategory
-import Mathlib.CategoryTheory.Sites.CoversTop
+import Mathlib.CategoryTheory.Sites.CoversTop.Basic
 import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
 import Mathlib.CategoryTheory.Sites.SheafCohomology.Cech
 import Mathlib.GroupTheory.FreeAbelianGroup
@@ -328,7 +328,7 @@ cohomology represented by a terminal object agrees with global sheaf cohomology.
 noncomputable def HPrimeNatIsoH {T : C} (hT : IsTerminal T) (n : ℕ) :
     cohomologyPresheafFunctor J n ⋙
       (evaluation Cᵒᵖ AddCommGrpCat.{h}).obj (Opposite.op T) ≅
-        cohomologyFunctor J n := by
+        functorH J n := by
   change (Abelian.extFunctor n).obj
       (Opposite.op (freeAbelianYonedaSheaf J T)) ≅
     (Abelian.extFunctor n).obj (Opposite.op

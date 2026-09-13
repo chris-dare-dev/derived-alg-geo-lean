@@ -39,6 +39,7 @@ ROADMAP.md
 /dg-audit.txt
 /enum-decls.txt
 /lean-source-check.txt
+/lean-warnings.log
 /stability-condition-audit.txt
 
 # Python bytecode from the gate scripts (scripts/_output.py is imported, so it compiles).
