@@ -112,12 +112,15 @@ blocks should normally move it rather than add more declarations beside it.
   generic-H⁰ scalar-linear specialization reuse this root.  The H⁰
   Hom-cohomology Euler bridge identifies Mathlib's homological Euler
   characteristic with `chiHom` without a boundedness hypothesis.
+  `DGEnhancement.HomComplexFiniteCohomologyPresentation` turns the finite
+  support already carried by `HomFiniteBounded` into an explicit presentation
+  of each `DGLinear.homComplex`, using the coefficient-side division-ring
+  formality theorem and the H⁰ homology/shift linear equivalence.
   `HomotopyCategory/DGEnhancement/LinearEvaluationK0` owns the realization:
-  with `HomFiniteBounded`, all linear copowers, and a supplied finite
-  cohomology presentation for every `DGLinear.homComplex k E X`, it derives
-  the required finite/free homology witnesses and proves the rank-one formula.
-  It does not infer presentations or formality, make the evaluation functor
-  exact, or compare the additive and scalar-linear universal properties.
+  the supplied-presentation theorem remains reusable, while
+  `IsEulerCopower.ofHomFiniteBounded` constructs that family automatically
+  when all linear copowers exist.  It does not make the evaluation functor
+  exact or compare the additive and scalar-linear universal properties.
 - Direct scalar-linear object twist on `K₀` (2026-09-12):
   `DGCategory.Pretriangulated.LinearObjectTwist` packages the cone of the
   scalar-linear evaluation transformation as

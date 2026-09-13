@@ -460,9 +460,14 @@ that comparison are instance hypotheses to be discharged by the realization.
    `CochainComplex.homologyModelIsoFiniteCohomologyModel` identifies the full
    model with `finiteCohomologyModel` under an explicit vanishing witness, and
    `FiniteCohomologyPresentation.ofFiniteSupport` composes it with formality.
-   The next seam is the automatic H⁰ Euler consumer obtained by feeding this
-   presentation into the existing finite-presentation interface.  No
-   naturality or quasi-isomorphism invariance is inferred from formality.
+   The automatic H⁰ Euler consumer is now closed as well.
+   `H0.homComplexFiniteCohomologyPresentation` selects the finite support from
+   `HomFiniteBounded`, and
+   `LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded` feeds those
+   presentations into the existing finite-presentation interface.  The next
+   seam is to expose direct numerical twist corollaries which no longer ask
+   callers to pass the now-automatic `IsEulerCopower` witness.  No naturality
+   or quasi-isomorphism invariance is inferred from formality.
    The direct scalar-linear cone consumer is now closed as well.
    `LinearEvaluationData.TwistConeData` is a thin name for the generic cone of
    scalar-linear evaluation; its choice comparison and conditional exactness
