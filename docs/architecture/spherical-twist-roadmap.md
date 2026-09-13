@@ -176,11 +176,17 @@ EnhancedAdjunctionCones
    ├─ cotwistH0Equivalence spends the unshifted condition on the actual cotwist
    └─ twist/cotwist exact equivalences use Mathlib's canonical package
 
+Triangle.FirstMapNormalizationData (T : J ⥤ Triangle C)
+├─ supplied raw-to-named isomorphisms on the first two projections
+├─ supplied square identifying the transported first map with a named map
+└─ normalized triangle family naturally isomorphic to T, preserving
+   pointwise distinguishedness and leaving the third projection unchanged
+
 Enhancement W (kernel category W ≃ H⁰ of a pretriangulated dg category)
 ├─ liftedCocycle / conePresentation: noncanonical enhanced lift of any ordinary map
 └─ coneTriangleFunctor: dg cones read in W through the comparison equivalence
    └─ FourierMukai.KernelCone: pointwise and source-natural transform triangles
-      ├─ KernelConeNormalizationData: literal endpoints and named first map
+      ├─ KernelConeNormalizationData: FM adapter to Triangle.FirstMapNormalizationData
       │  └─ shiftedConeKernel: enhanced shift whose transform is the shifted cone transform
       └─ KernelTransformationData: a kernel arrow realizes any named transformation
          ├─ KernelTransformationConeData: enhanced representative and chosen dg cone
@@ -273,9 +279,14 @@ that comparison are instance hypotheses to be discharged by the realization.
    `RightAdjointKernelData.ofH0Presentation` and its left-adjoint mirror feed
    the resulting adjunction into the existing kernel-adjunction interfaces;
    their correspondence-swap comparisons are definitional.  They still
-   construct no kernel or kernel arrow.  The dg notion is still the strict one:
-   Anno--Logvinenko work with homotopy adjunctions of bimodules, and no
-   comparison with those exists.
+   construct no kernel or kernel arrow.  The endpoint-normalization operation
+   needed by the next cone bridge is now the generic
+   `Triangle.FirstMapNormalizationData`: it replaces the first two projections
+   of any triangle-valued functor and makes a compatible first map literal.
+   The remaining bridge must construct that data for the transported dg
+   counit triangle; no new normalization proof belongs there.  The dg notion
+   is still the strict one: Anno--Logvinenko work with homotopy adjunctions of
+   bimodules, and no comparison with those exists.
 
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
@@ -554,8 +565,9 @@ that comparison are instance hypotheses to be discharged by the realization.
    kernel arrow realizes a named natural transformation between functors in
    supplied endpoint presentations.  `KernelTransformationConeData` owns its
    noncanonical enhanced representative and cone, while
-   `KernelConeNormalizationData` owns transport to literal endpoints and first
-   map.  `CounitKernelData` and `CounitKernelConeData` retain their public
+   `KernelConeNormalizationData` feeds its raw transform family to the generic
+   `Triangle.FirstMapNormalizationData` endpoint/first-map transport.
+   `CounitKernelData` and `CounitKernelConeData` retain their public
    contracts as equivalent adjunction-counit presentations, with inverse
    adapters and simp round trips to those interfaces.
    In particular, `CounitKernelData.arrow` and its exact transform equation are
@@ -585,7 +597,7 @@ that comparison are instance hypotheses to be discharged by the realization.
    functor-category shift and `cotwistTriangleInSource` inverse-rotates the
    family to `cotwist ⟶ 𝟭_X ⟶ Φ_P ⋙ Φ_Q ⟶ cotwist⟦1⟧`.  This is still only a
    choice-dependent ordinary functor and a pointwise distinguished family.
-   The generic normalization root now also transports a shifted enhanced cone
+   The Fourier--Mukai normalization root also transports a shifted enhanced cone
    through the enhancement and kernel-family `CommShift` comparisons.
    Specializing at `-1` gives `cotwistKernel`, an explicit kernel whose
    transform is naturally isomorphic to the cotwist, and hence proves only

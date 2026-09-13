@@ -236,6 +236,9 @@ Category
 │        ├─ liftedCocycle                noncanonical closed representative of an ordinary map
 │        ├─ conePresentation             representative plus a noncanonical dg cone
 │        └─ coneTriangleFunctor          dg cones read in `T` through the equivalence
+├─ Triangle.FirstMapNormalizationData     raw endpoint isos plus a named first-map square
+│  ├─ normalizedTriangle                 literal first two vertices and literal first map
+│  └─ rawIsoNormalized                   natural triangle comparison; third component identity
 ├─ Fourier--Mukai correspondence
 │  ├─ kernelTransform                     functor from kernels to transforms
 │  ├─ kernelEvaluation                    one source object's kernel-variable functor
@@ -244,7 +247,8 @@ Category
 │  │  ├─ first/secondFamilyCommShift      explicit adapters, evaluation agreement
 │  │  └─ firstFamily / secondFamily       exact-family projections through those adapters
 │  ├─ kernelConeTransformTriangleFunctor  pointwise image of dg cones of an enhanced kernel category
-│  ├─ KernelConeNormalizationData         endpoint square for literal source-natural triangles
+│  ├─ KernelConeNormalizationData         FM cone/shift data plus generic-normalization adapter
+│  │  ├─ firstMapNormalizationData       categorical endpoint/first-map normalization
 │  │  ├─ coneKernel                      ordinary image of the selected enhanced cone
 │  │  └─ shiftedConeKernel               enhanced shift with transform/shift comparison
 │  └─ KernelTransformationData            ordinary kernel arrow realizing a named transformation

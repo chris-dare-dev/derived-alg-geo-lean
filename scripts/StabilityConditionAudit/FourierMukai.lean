@@ -807,6 +807,7 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.coneTransform
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.distinguishedNormalizedTriangle
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.distinguishedNormalizedTriangle_obj_val
+#print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.firstMapNormalizationData
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.mk.inj
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.FourierMukai.Correspondence.KernelConeNormalizationData.normalizedSecond
