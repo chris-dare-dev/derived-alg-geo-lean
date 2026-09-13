@@ -97,6 +97,7 @@ Algebra/Homology
   │     ├─→ Functor, Opposite, Product, Linear, Shift, H0, LinearH0
   │     ├─→ NaturalTransformationH0            closed degree-zero transformations on H⁰
   │     ├─→ AdjunctionH0                       a dg adjunction as a Mathlib adjunction
+  │     │     └─→ AdjunctionH0Presentation           transport through equivalences to named functors
   │     ├─→ Pretriangulated                   cones, shifts, rotation, chosen homotopy squares
   │     │     ├─→ ConeCategory                chosen cones and homotopy-coherent maps
   │     │     └─→ Functor                     composable shift/cone preservation capabilities
