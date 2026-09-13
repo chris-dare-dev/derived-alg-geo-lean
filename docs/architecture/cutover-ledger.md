@@ -13,7 +13,7 @@ blocks should normally move it rather than add more declarations beside it.
   canonical comparison from strict dg composition to ordinary functor
   composition.  `DGAdjunction.h0_whiskerLeft_counit` then packages the
   descended left-whiskered counit as ordinary whiskering of `h0Counit`, and
-  `CounitConeData.twistAdjointComparison_h0_eq_inverseRotateFirstH0_comp_h0Counit`
+  `CounitConeData.twistAdjointComparisonH0_eq_inverseRotateFirstH0_comp_h0Counit`
   is the corresponding twist consumer.  Mathlib's `Pseudofunctor` remains the
   conceptual owner, but no instance is installed because the repository does
   not yet have a bundled universe-controlled bicategory of dg categories and
@@ -512,7 +512,7 @@ blocks should normally move it rather than add more declarations beside it.
   `DGFunctor.h0CompIso` and `h0IdIso` now expose their identity components,
   while `HomogeneousNatTrans.h0_comp'`, `h0_whiskerLeft`, and
   `h0_whiskerRight` package descent of strict composition and whiskering.
-  `CounitConeData.twistAdjointComparison_h0_eq_inverseRotateFirstH0` consumes
+  `CounitConeData.twistAdjointComparisonH0_eq_inverseRotateFirstH0` consumes
   those generic laws to factor the twist comparison through the
   inverse-rotated first map and the descended left counit.  No adjunction,
   exactness, invertibility, or sphericality is inferred from the cone-generic

@@ -98,7 +98,7 @@ theorem twistAdjointComparison_isClosed :
 
 /-- The twist adjunction comparison as an ordinary natural transformation on
 `H⁰`. -/
-noncomputable def twistAdjointComparison_h0 :
+noncomputable def twistAdjointComparisonH0 :
     ((K.twist.shiftedFunctor (-1 : ℤ)).comp L).h0 ⟶ R.h0 :=
   DGFunctor.HomogeneousNatTrans.h0
     (twistAdjointComparison (rightAdj := rightAdj) leftAdj K)
@@ -148,7 +148,7 @@ theorem cotwistAdjointComparison_isClosed :
 
 /-- The cotwist adjunction comparison as an ordinary natural transformation
 on `H⁰`. -/
-noncomputable def cotwistAdjointComparison_h0 :
+noncomputable def cotwistAdjointComparisonH0 :
     R.h0 ⟶ (L.comp K.unitCone).h0 :=
   DGFunctor.HomogeneousNatTrans.h0
     (cotwistAdjointComparison (rightAdj := rightAdj) leftAdj K)

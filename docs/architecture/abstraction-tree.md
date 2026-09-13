@@ -220,7 +220,7 @@ Category
 │  │  │                                 generic shiftedFstH0, right whiskering, and ordinary h0Counit
 │  │  ├─ UnitConeData                    unshifted unit-cone cotwist candidate
 │  │  │  ├─ cotwistAdjointComparison    canonical closed `R ⟶ C L`, and its H⁰ map
-│  │  │  └─ cotwistAdjointComparisonShifted_h0
+│  │  │  └─ cotwistAdjointComparisonShiftedH0
 │  │  │                                  canonical `R ⟶ (C[-1] L)[1]` normalization
 │  │  └─ DGAdjunction.h0                 an ordinary adjunction between the H⁰ functors
 │  │     ├─ h0_whiskerLeft_counit       generic compositor/associator/unitor normalization

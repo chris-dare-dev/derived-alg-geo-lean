@@ -57,8 +57,8 @@ The descended dg comparison is the first map of the inverse-rotated twist
 triangle, postcomposed with `L`, followed by the descended left-counit whisker.
 The two `h0CompIso` terms are the canonical compositor needed to pass between
 `H⁰` of a dg composite and the composite of its `H⁰` functors. -/
-theorem twistAdjointComparison_h0_eq_inverseRotateFirstH0 :
-    twistAdjointComparison_h0 (rightAdj := rightAdj) leftAdj K =
+theorem twistAdjointComparisonH0_eq_inverseRotateFirstH0 :
+    twistAdjointComparisonH0 (rightAdj := rightAdj) leftAdj K =
       (DGFunctor.h0CompIso (K.twist.shiftedFunctor (-1 : ℤ)) L).hom ≫
         Functor.whiskerRight
           ((K.twist.shiftedFunctorH0Iso (-1)).hom ≫
@@ -91,12 +91,12 @@ theorem twistAdjointComparison_h0_eq_inverseRotateFirstH0 :
 counit.**
 
 This is the fully normalized form of
-`twistAdjointComparison_h0_eq_inverseRotateFirstH0`: the terminal descended
+`twistAdjointComparisonH0_eq_inverseRotateFirstH0`: the terminal descended
 dg whisker has been replaced by ordinary left whiskering of `leftAdj.h0Counit`.
 The remaining compositor, associator, and unitor are precisely the canonical
 comparison from strict dg composition to ordinary functor composition. -/
-theorem twistAdjointComparison_h0_eq_inverseRotateFirstH0_comp_h0Counit :
-    twistAdjointComparison_h0 (rightAdj := rightAdj) leftAdj K =
+theorem twistAdjointComparisonH0_eq_inverseRotateFirstH0_comp_h0Counit :
+    twistAdjointComparisonH0 (rightAdj := rightAdj) leftAdj K =
       (DGFunctor.h0CompIso (K.twist.shiftedFunctor (-1 : ℤ)) L).hom ≫
         Functor.whiskerRight
           ((K.twist.shiftedFunctorH0Iso (-1)).hom ≫
@@ -105,7 +105,7 @@ theorem twistAdjointComparison_h0_eq_inverseRotateFirstH0_comp_h0Counit :
         (Functor.associator R.h0 S.h0 L.h0).hom ≫
         Functor.whiskerLeft R.h0 leftAdj.h0Counit ≫
         (Functor.rightUnitor R.h0).hom := by
-  rw [twistAdjointComparison_h0_eq_inverseRotateFirstH0]
+  rw [twistAdjointComparisonH0_eq_inverseRotateFirstH0]
   exact congrArg
     (fun τ =>
       (DGFunctor.h0CompIso (K.twist.shiftedFunctor (-1 : ℤ)) L).hom ≫
@@ -129,18 +129,18 @@ variable {A : Type u} {B : Type u'}
 
 It is the shift-free map `R ⟶ C L`, followed by the inverse of the canonical
 cancellation `(C L)[-1][1] ≅ C L`. -/
-noncomputable def cotwistAdjointComparisonShifted_h0 :
+noncomputable def cotwistAdjointComparisonShiftedH0 :
     R.h0 ⟶
       ((L.comp (K.unitCone.shiftedFunctor (-1 : ℤ))).shiftedFunctor 1).h0 :=
-  cotwistAdjointComparison_h0 (rightAdj := rightAdj) leftAdj K ≫
+  cotwistAdjointComparisonH0 (rightAdj := rightAdj) leftAdj K ≫
     (DGFunctor.shiftedFunctorCompIsoIdH0 (L.comp K.unitCone)
       (-1 : ℤ) 1 (by omega)).inv
 
 /-- The conventional cotwist comparison is the shift-free comparison followed
 by the canonical opposite-shift cancellation. -/
-theorem cotwistAdjointComparisonShifted_h0_eq :
-    cotwistAdjointComparisonShifted_h0 (rightAdj := rightAdj) leftAdj K =
-      cotwistAdjointComparison_h0 (rightAdj := rightAdj) leftAdj K ≫
+theorem cotwistAdjointComparisonShiftedH0_eq :
+    cotwistAdjointComparisonShiftedH0 (rightAdj := rightAdj) leftAdj K =
+      cotwistAdjointComparisonH0 (rightAdj := rightAdj) leftAdj K ≫
         (DGFunctor.shiftedFunctorCompIsoIdH0 (L.comp K.unitCone)
           (-1 : ℤ) 1 (by omega)).inv :=
   rfl
