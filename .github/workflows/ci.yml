@@ -187,20 +187,34 @@ jobs:
     #
     # Concurrency cannot fix this, because it bounds how many runs exist, not
     # which one gets a runner. Label partitioning is the only lever GitHub
-    # gives: `owner-win-main` is carried by exactly one runner, which does NOT
-    # carry `owner-win`, so branch pushes cannot occupy it and `main` waits at
-    # most one build.
+    # gives, so `main` asks for `owner-win-main` and branch pushes cannot.
     #
-    # THE COST IS REAL AND IS THE POINT. Branch capacity drops from two runners
-    # to one, so branch queues roughly double. That is the trade: `main`'s
-    # verdict gates merges, branch protection and the badge, and a `main` that
-    # never runs is worth less than a branch queue that is slower.
+    # CAPACITY WAS ADDED RATHER THAN DIVIDED, and that was a deliberate choice
+    # between two shapes. Taking `owner-win` off one of the two existing
+    # runners would have reserved it for `main` at no hardware cost, but branch
+    # capacity would have halved across roughly sixty active lanes. Instead a
+    # THIRD runner is registered on the same Windows box carrying only
+    # `owner-win-main`, so branches keep both of the runners they had.
     #
-    # ORDERING, IF THIS IS EVER REDONE. The label must exist on a runner BEFORE
-    # this file names it, or every `main` push queues forever against a label
-    # nothing carries. Add `owner-win-main` to the runner first, merge this,
-    # and only then remove `owner-win` from it. Doing it in that order leaves
-    # no window in which either lane is unserved.
+    # `owner-win-main` is deliberately ALSO left on runner 24. That is not an
+    # oversight. It gives `main` two eligible runners of which one is
+    # exclusive, so `main` cannot starve however long a branch burst runs, and
+    # it makes this file safe to merge whether or not the third runner is up
+    # yet -- the failure this avoids is naming a label nothing carries, which
+    # queues every `main` push forever.
+    #
+    # THE COST IS CONTENTION, NOT QUEUEING. Three concurrent Lean builds now
+    # share one workstation that the owner also builds on locally. That is the
+    # same condition behind the 2026-08-07 truncated-audit incident recorded in
+    # scripts/check_audit.py's docstring, and it is now likelier, not less. If
+    # audits start truncating or builds start dying for memory, this is the
+    # first thing to look at, and the answer is to stop building locally during
+    # a merge burst -- or to drop back to two runners and accept the split.
+    #
+    # LABELS ARE ROUTING, NOT PLACEMENT. Every runner named here is a process
+    # on the owner's own Windows machine; a label decides which jobs a runner
+    # accepts, never which hardware it runs on. The `owner-mac` prohibition
+    # above is about a DIFFERENT machine and is untouched by any of this.
     #
     # THE ROUTING INVARIANT IS PRESERVED: this is a third self-hosted lane and
     # it keys on `push` / `workflow_dispatch` and nothing else, exactly as the
