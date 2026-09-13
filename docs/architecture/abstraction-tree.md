@@ -123,6 +123,9 @@ Category
 │  │  │                                   HomFiniteBounded support + field formality
 │  │  ├─ postcompCochain                fixed-source right composition, linear chain-map law
 │  │  ├─ Cdg (ModuleCat k)             standard model inherits Mathlib's k-linear structure
+│  │  │  └─ linearTensorObj K X       Mathlib total tensor product, same universe
+│  │  │     ├─ tensorCochainLinearEquiv   degreewise tensor--Hom adjunction
+│  │  │     └─ HasLinearCopowers       concrete scalar-linear copower instance
 │  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
 │  │     ├─ homComplexIso               representing equivalence, compatible with differentials
 │  │     ├─ coefficientMap              homogeneous coefficient action, strict in composition
