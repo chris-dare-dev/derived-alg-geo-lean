@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.KernelCone
+import DerivedAlgGeo.CategoryTheory.Triangulated.TriangleFunctorNormalization
 
 /-!
 # Normalizing transformed kernel cones
@@ -15,8 +16,9 @@ identify the first map with a named natural transformation.
 `Correspondence.KernelConeNormalizationData` packages exactly that endpoint
 comparison square.  Together with exactness in the kernel variable, it
 transports the raw cone triangle to a source-natural triangle with literal
-first map and literal first two vertices.  The construction reuses Mathlib's
-`Triangle.functorMk` and `Triangle.functorIsoMk`.
+first map and literal first two vertices.  The categorical transport is
+delegated to `Triangle.FirstMapNormalizationData`; this file retains the
+kernel-specific cone, enhancement, and shift comparisons.
 
 The result is only a family of pointwise distinguished triangles.  It does not
 give a distinguished triangle in a functor category, make the third functor
@@ -168,24 +170,29 @@ theorem rawTriangle_square :
       (N.rawTriangleObj₁Iso h).hom ≫ α := by
   exact N.square
 
+/-- Forget the kernel origin and retain exactly the categorical data needed
+to normalize the first map of the raw triangle family. -/
+noncomputable def firstMapNormalizationData :
+    Triangle.FirstMapNormalizationData (N.rawTriangle h) F G α where
+  obj₁Iso := N.rawTriangleObj₁Iso h
+  obj₂Iso := N.rawTriangleObj₂Iso h
+  square := N.rawTriangle_square h
+
 /-- The transported second map from the literal target functor to the cone
 transform. -/
 noncomputable def normalizedSecond : G ⟶ N.coneTransform :=
-  (N.rawTriangleObj₂Iso h).inv ≫
-    Functor.whiskerLeft (N.rawTriangle h) Triangle.π₂Toπ₃
+  (N.firstMapNormalizationData h).normalizedSecond
 
 /-- The transported connecting map from the cone transform to the shifted
 literal source functor. -/
 noncomputable def normalizedThird :
     N.coneTransform ⟶ F ⋙ shiftFunctor Y (1 : ℤ) :=
-  Functor.whiskerLeft (N.rawTriangle h) Triangle.π₃Toπ₁ ≫
-    Functor.whiskerRight (N.rawTriangleObj₁Iso h).hom
-      (shiftFunctor Y (1 : ℤ))
+  (N.firstMapNormalizationData h).normalizedThird
 
 /-- The normalized source-natural triangle with literal first map and literal
 first two vertices. -/
 noncomputable def normalizedTriangle : X ⥤ Triangle Y :=
-  Triangle.functorMk α (N.normalizedSecond h) (N.normalizedThird h)
+  (N.firstMapNormalizationData h).normalizedTriangle
 
 @[simp]
 theorem normalizedTriangle_obj₁ (E : X) :
@@ -223,28 +230,7 @@ theorem normalizedTriangle_mor₃ (E : X) :
 isomorphic. -/
 noncomputable def rawTriangleIsoNormalized :
     N.rawTriangle h ≅ N.normalizedTriangle h :=
-  Triangle.functorIsoMk _ _ (N.rawTriangleObj₁Iso h)
-    (N.rawTriangleObj₂Iso h) (Iso.refl _)
-    (N.rawTriangle_square h)
-    (by
-      ext E
-      change ((N.rawTriangle h).obj E).mor₂ ≫ 𝟙 _ =
-        (N.rawTriangleObj₂Iso h).hom.app E ≫
-          ((N.rawTriangleObj₂Iso h).inv.app E ≫
-            ((N.rawTriangle h).obj E).mor₂)
-      rw [Category.comp_id]
-      exact (Iso.hom_inv_id_assoc
-        ((N.rawTriangleObj₂Iso h).app E)
-        ((N.rawTriangle h).obj E).mor₂).symm)
-    (by
-      ext E
-      change ((N.rawTriangle h).obj E).mor₃ ≫
-          (shiftFunctor Y (1 : ℤ)).map
-            ((N.rawTriangleObj₁Iso h).hom.app E) =
-        𝟙 _ ≫ (((N.rawTriangle h).obj E).mor₃ ≫
-          (shiftFunctor Y (1 : ℤ)).map
-            ((N.rawTriangleObj₁Iso h).hom.app E))
-      simp)
+  (N.firstMapNormalizationData h).rawIsoNormalized
 
 @[simp]
 theorem rawTriangleIsoNormalized_hom_app_hom₁ (E : X) :
@@ -267,8 +253,8 @@ theorem rawTriangleIsoNormalized_hom_app_hom₃ (E : X) :
 theorem normalizedTriangle_obj_distinguished
     [e.equiv.functor.IsTriangulated] (E : X) :
     (N.normalizedTriangle h).obj E ∈ distTriang Y :=
-  (distinguished_iff_of_iso ((N.rawTriangleIsoNormalized h).app E)).mp
-    (h.coneTriangleInSource_obj_distinguished e A E)
+  (N.firstMapNormalizationData h).normalizedTriangle_obj_distinguished
+    (h.coneTriangleInSource_obj_distinguished e A) E
 
 /-- The normalized family with codomain restricted to distinguished
 triangles. -/

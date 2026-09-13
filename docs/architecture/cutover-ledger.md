@@ -424,27 +424,35 @@ blocks should normally move it rather than add more declarations beside it.
   cotwist-cone candidate; its `[-1]` shift and inverse-rotated triangle are now
   constructed downstream, while exactness, autoequivalence, and sphericality
   remain separate seams.
+- First-map normalization for triangle-valued functors (2026-09-13):
+  `Triangle.FirstMapNormalizationData` is the generic owner for replacing the
+  first two projections of `T : J ⥤ Triangle C` by named isomorphic functors
+  and making a compatible named first map literal.  It reuses Mathlib's
+  triangle-functor constructors, leaves the third projection unchanged, and
+  transports pointwise distinguishedness.  It supplies no canonicity,
+  exactness, or distinguished triangle in a functor category.
 - Generic enhanced kernel-transformation cones (2026-09-12):
   `Enhancement.liftedCocycle` and `Enhancement.conePresentation` own the
   noncanonical lift of an ordinary morphism to a closed representative and dg
   cone.  `FourierMukai.KernelTransformationData` packages a kernel morphism
   whose transform is a named natural transformation in supplied endpoint
   presentations; `KernelTransformationConeData` adds the enhanced choices and
-  forgets back one way.  Its `normalizationData` feeds the reusable
-  `Correspondence.KernelConeNormalizationData`, which owns transport to a
-  source-natural triangle with literal endpoints and first map.  The counit
-  kernel records now delegate to these generic owners without changing their
-  public contracts, with inverse adapters and simp round trips proving the two
-  presentations equivalent.  Fullness remains only a sufficient constructor,
-  choices remain noncanonical, and the normalized result is only pointwise
-  distinguished: no exactness, functor-category distinguishedness,
+  forgets back one way.  Its `normalizationData` feeds
+  `Correspondence.KernelConeNormalizationData`, whose adapter delegates the
+  endpoint/first-map transport to `Triangle.FirstMapNormalizationData`.  The
+  counit kernel records now delegate to these generic owners without changing
+  their public contracts, with inverse adapters and simp round trips proving
+  the two presentations equivalent.  Fullness remains only a sufficient
+  constructor, choices remain noncanonical, and the normalized result is only
+  pointwise distinguished: no exactness, functor-category distinguishedness,
   autoequivalence, or sphericality is inferred.
 - Literal Fourier--Mukai counit triangles (2026-09-12):
   `CounitKernelConeData.counitTriangleInSource` transports the raw transform
   triangle of an enhanced counit-kernel cone to a source-natural triangle with
   vertices `Φ_Q ⋙ Φ_P`, `𝟭 Y`, and the kernel-presented twist, and with
-  first map literally the supplied adjunction counit.  The construction reuses
-  Mathlib's `Triangle.functorMk` and `Triangle.functorIsoMk`; the natural
+  first map literally the supplied adjunction counit.  The construction uses
+  the generic `Triangle.FirstMapNormalizationData` wrapper around Mathlib's
+  `Triangle.functorMk` and `Triangle.functorIsoMk`; the natural
   comparison exposes all three components, and exact kernel evaluation makes
   every value of the normalized family distinguished.  This is pointwise
   distinguishedness only: it does not assert a distinguished triangle in the

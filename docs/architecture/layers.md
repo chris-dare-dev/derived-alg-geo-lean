@@ -127,6 +127,7 @@ CategoryTheory/Shift
 
 CategoryTheory/Triangulated
   ├─→ PretriangulatedAxioms, TStructure, PostnikovTower, ExtensionClosure, QuasiAbelian
+  ├─→ TriangleFunctorNormalization             first-map transport for triangle-valued functors
   ├─→ FullSubcategory                         objectwise triangle and map lifts
   ├─→ GrothendieckGroup                        K₀, realizations, Euler forms
   ├─→ CompactlyGenerated, SemiorthogonalDecomposition, SphericalTwist
