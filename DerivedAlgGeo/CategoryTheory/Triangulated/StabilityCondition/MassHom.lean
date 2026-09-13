@@ -6,6 +6,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Alge
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.AlgebraicWitness
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.FiniteDistance
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.FieldExtension
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.FullSupport
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Generator
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.JordanHolder

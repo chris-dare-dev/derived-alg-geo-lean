@@ -26,6 +26,15 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.gltilde_smul
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.gltilde_smul_iff
 
+/-! ## Finite-type field-extension cancellation -/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.UniformMassHomBound
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.UniformMassHomBound.of_scaled
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.finiteDimensional_of_finiteType_field
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FieldExtensionAdjunctionDimensionFormula
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FieldExtensionHNMassFormula
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.inequality84
+
 /-! ## Finite distance and connected components -/
 
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.finiteDistanceClass
