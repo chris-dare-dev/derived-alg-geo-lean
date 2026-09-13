@@ -14,9 +14,8 @@ H⁰ Hom-spaces and the existence of scalar-linear copowers now construct that
 witness automatically, so the numerical Seidel--Thomas formula needs no
 additional presentation data.
 
-The endomorphism-level result still assumes that scalar-linear evaluation
-preserves the chosen cones.  No exactness, sphericality, or autoequivalence is
-inferred from Hom-finiteness or formality.
+Exactness comes from the generic dg-functor theorem, not from Hom-finiteness or
+formality; no sphericality or autoequivalence is inferred.
 -/
 
 set_option autoImplicit false
@@ -49,19 +48,15 @@ theorem twistK₀Of_eq_twistK₀_ofHomFiniteBounded (X : H0 C) :
     (LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded k V) X
 
 set_option backward.isDefEq.respectTransparency false in
-/-- If scalar-linear evaluation also preserves chosen cones, the induced
-endomorphism is the numerical twist without a separately supplied Euler
-copower witness. -/
-theorem twistK₀Map_eq_twistK₀_ofHomFiniteBounded
-    (hVc : DGFunctor.PreservesChosenCones V.functor) :
+/-- The induced endomorphism is the numerical twist without a separately
+supplied Euler copower witness. -/
+theorem twistK₀Map_eq_twistK₀_ofHomFiniteBounded :
     letI : K.twist.h0.CommShift ℤ :=
-      DGFunctor.commShift _ K.preservesShifts
-    letI : K.twist.h0.IsTriangulated :=
-      DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones _
-        K.preservesShifts (K.preservesChosenCones hVc)
+      DGFunctor.h0CommShift K.twist
+    letI : K.twist.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.twist
     K₀.map K.twist.h0 =
       SphericalTwist.twistK₀ k (H0 C) (show H0 C from E) :=
-  K.twistK₀Map_eq_twistK₀ k hVc
+  K.twistK₀Map_eq_twistK₀ k
     (LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded k V)
 
 end LinearEvaluationData.TwistConeData

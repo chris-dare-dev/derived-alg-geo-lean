@@ -11,15 +11,16 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.NaturalTransfor
 # A cone functor preserves shifts
 
 `DGFunctor.PreservesShifts` and `PreservesChosenCones` are the two dg-level
-capabilities from which `H⁰ F` is triangulated.  Until now the only functors
-carrying either were the identity and composites of functors that already had
-them: nothing interesting was known to be exact.
+capabilities from which `H⁰ F` is triangulated.  Both are now available for
+every dg functor.  This file retains the more structured cone-functor proofs:
+they compute the witnesses from the two endpoints and expose the block-matrix
+argument used by adjunction-cone consumers.
 
-This file proves the first half for cone functors.  If `α : F ⟶ G` is a closed
-degree-zero dg natural transformation and both `F` and `G` preserve shifts, then
-so does `Cone(α)`.  Since the twist candidate of a dg adjunction *is* a cone
-functor, that gives the twist a `PreservesShifts` witness as soon as the
-adjoints have one, and with it a `CommShift` on `H⁰`.
+The retained coordinate calculation for cone functors shows directly how
+`Cone(α)` acts on a supplied shift when `α : F ⟶ G` is closed of degree
+zero.  The public preservation witness itself delegates to the generic
+`DGFunctor.preservesShifts` theorem; the calculation remains useful for its
+explicit coordinates.
 
 ## The proof is the splitting, not a computation
 
@@ -111,8 +112,9 @@ invertibility.  The cone splitting plays no part, and the two `PreservesShifts`
 arguments this used to take are gone -- there is nothing for a caller to
 supply.
 
-`preservesChosenCones` below is the one that still needs its two arguments, and
-that asymmetry is the point: a cone is not an invertible element. -/
+`preservesChosenCones` below retains its two endpoint arguments as a structured
+constructor, although `DGFunctor.preservesChosenCones K.functor` supplies the
+same capability without them. -/
 noncomputable def preservesShifts : PreservesShifts K.functor :=
   DGFunctor.preservesShifts _
 
@@ -294,9 +296,10 @@ variable {C : Type u} {D : Type u'} [DGCategory.{v} C] [DGCategory.{v} D]
 
 /-- **The twist candidate preserves shifts.**
 
-Unconditional, because every dg functor does.  It is half of exactness; the
-other half, `preservesChosenCones`, is the 3-by-3 lemma and does need the
-adjoints' capabilities. -/
+Unconditional, because every dg functor does.  The adjacent 3-by-3 constructor
+retains the endpoint witnesses in order to expose how the cone functor acts in
+split coordinates; the generic dg-functor constructor makes them optional to
+later exactness consumers. -/
 noncomputable def CounitConeData.preservesShifts (K : A.CounitConeData) :
     DGFunctor.PreservesShifts K.twist :=
   DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts K

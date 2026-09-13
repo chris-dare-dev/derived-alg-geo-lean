@@ -456,12 +456,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.id
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.comp
 
--- Every dg functor preserves shifts.  A shift element is a closed, two-sided
--- invertible element of degree `-n` (`IsShiftBy.inv`, `hom_inv`, `inv_hom`),
--- and a dg functor preserves composition and identities on the nose, so it
--- carries invertible elements to invertible ones.  `PreservesShifts` therefore
--- costs a caller nothing.  `PreservesChosenCones` is not like this and remains
--- a genuine hypothesis: a cone is not an invertible element.
+-- Every dg functor preserves shifts and the repository's strong split cone
+-- witnesses.  For cones, the mapped `fst` and `snd` projections are an
+-- explicit inverse to the mapped splitting map; the five matrix identities
+-- survive because dg functors preserve addition, composition, zero, and
+-- identities.  Neither capability costs a caller an additional hypothesis.
 #print axioms CategoryTheory.DGFunctor.preservesShifts
 #print axioms CategoryTheory.DGFunctor.mapHomotopySquare
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones
@@ -471,6 +470,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_fst
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_snd
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_toShift
+#print axioms CategoryTheory.DGFunctor.preservesChosenCones
 #print axioms CategoryTheory.DGFunctor.mapShift_inv_eq
 #print axioms CategoryTheory.DGFunctor.map_mapShift
 #print axioms CategoryTheory.DGFunctor.map_compare
@@ -478,11 +478,13 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftCommIso_zero_hom_app
 #print axioms CategoryTheory.DGFunctor.shiftCommIso_add_hom_app
 #print axioms CategoryTheory.DGFunctor.commShift
+#print axioms CategoryTheory.DGFunctor.h0CommShift
 #print axioms CategoryTheory.DGFunctor.PreservesConeTriangles
 #print axioms CategoryTheory.DGFunctor.preservesConeTriangles_of_preservesChosenCones
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesConeTriangles
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesShifts_and_coneTriangles
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones
+#print axioms CategoryTheory.DGFunctor.h0IsTriangulated
 
 -- The instance itself (dg-enhancements-e6, #377): the completion axiom for
 -- arbitrary distinguished triangles, the five axioms H⁰ proves, and the
@@ -754,6 +756,27 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.h0_unit
 #print axioms CategoryTheory.DGAdjunction.h0_counit
 
+-- A strict dg adjunction transports through arbitrary equivalences out of its
+-- two homotopy categories and may then be presented by named ordinary
+-- functors.  The construction delegates composition and natural-isomorphism
+-- transport to Mathlib and retains explicit unit/counit formulas; it assumes
+-- the presentation isomorphisms and produces no dg lift or kernel.
+#print axioms CategoryTheory.DGAdjunction.transportedH0Left
+#print axioms CategoryTheory.DGAdjunction.transportedH0Right
+#print axioms CategoryTheory.DGAdjunction.transportedH0
+#print axioms CategoryTheory.DGAdjunction.transportedH0_unit_app
+#print axioms CategoryTheory.DGAdjunction.transportedH0_counit_app
+#print axioms CategoryTheory.DGAdjunction.H0Presentation
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.leftIso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rightIso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.mk.inj
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.mk.sizeOf_spec
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_unit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_counit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_unit_app
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_counit_app
+
 -- The cone projections are graded-natural, so the objectwise cones of a closed
 -- degree-zero dg natural transformation assemble into a cone in the dg category
 -- of dg functors.  With the zero object and the shift below, that is all three
@@ -823,6 +846,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_isEquivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Equivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0CommShift
+-- The shift witness selects the sign-correct comparison; cone preservation is
+-- supplied by the unconditional dg-functor theorem.
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0IsTriangulated
 
 -- `dg-enhancements-e10`: a quasi-equivalence of dg categories induces an
@@ -1048,13 +1073,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
 
--- A cone functor preserves chosen cones when its two ends do, so the twist
--- candidate of a dg adjunction is exact as soon as the adjoints are.  That
--- argument is the cone splitting rather than a computation: in the coordinates
--- of the splittings the map is block diagonal, with one sign.  The shift
--- versions below take no arguments at all -- `DGFunctor.preservesShifts` holds
--- for every dg functor, so the cone splitting is not needed for them and the
--- specialised proofs were removed.
+-- The structured cone-functor constructor computes chosen-cone preservation
+-- from its endpoints.  Its block-diagonal proof remains useful even though
+-- `DGFunctor.preservesChosenCones` makes the endpoint arguments redundant for
+-- exactness consumers.  The shift versions likewise retain useful names over
+-- the unconditional generic capability.
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compRight_functor_map
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesShifts
@@ -1171,6 +1194,28 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.HasLinearCopowers.has_linearCopower
 #print axioms CategoryTheory.hasLinearCopowerOfHasLinearCopowers
 
+-- In the standard same-universe dg category of module complexes, Mathlib's
+-- total tensor product realizes the scalar-linear copower.  The degreewise
+-- tensor--Hom equivalence uses the existing total coproduct and module tensor
+-- universal properties, while the universal chain-map law is the standard
+-- cancellation of the two vertical Koszul signs.  This supplies a concrete
+-- scalar-linear instance, not an additive copower or a new tensor abstraction.
+#print axioms CategoryTheory.Cdg.linearTensorObj
+#print axioms CategoryTheory.Cdg.linearTensorιOfEq
+#print axioms CategoryTheory.Cdg.linearTensorι
+#print axioms CategoryTheory.Cdg.tensorCurryCochain
+#print axioms CategoryTheory.Cdg.tensorCochainLinearEquiv
+#print axioms CategoryTheory.Cdg.linearTensorUnivCochain
+#print axioms CategoryTheory.Cdg.linearTensorUnivCochain_apply
+#print axioms CategoryTheory.Cdg.linearTensorι_d_apply
+#print axioms CategoryTheory.Cdg.linearTensorUnivCochain_mem
+#print axioms CategoryTheory.Cdg.linearTensorUnivCocycle
+#print axioms CategoryTheory.Cdg.linearTensorUniv
+#print axioms CategoryTheory.Cdg.cochain_ofHom_linearTensorUniv
+#print axioms CategoryTheory.Cdg.linearCopowerCochain_linearTensorUniv
+#print axioms CategoryTheory.Cdg.isLinearCopowerOfLinearTensor
+#print axioms CategoryTheory.Cdg.hasLinearCopowers
+
 -- The literal degree-zero single on the scalar ring represents `X` itself.
 -- Its universal map sends the scalar unit to the dg identity, and the selected
 -- object comparison descends from the strict `Z⁰` comparison above.  This
@@ -1214,6 +1259,21 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.linearCopowerFunctor_obj
 #print axioms CategoryTheory.linearCopowerFunctor_map
 #print axioms CategoryTheory.linearCopowerObjIsoOfHomotopyEquiv
+
+-- Fixed-source right composition is the k-linear dg Hom functor.  With all
+-- scalar-linear copowers, its selected left adjoint is the copower functor:
+-- the unit is the universal copower map and the counit is exactly the existing
+-- selected evaluation transformation.  The triangle identities are strict.
+-- This constructs neither Perf(k) nor a spherical or additive adjunction.
+#print axioms CategoryTheory.DGLinear.homFunctor
+#print axioms CategoryTheory.DGLinear.homFunctor_obj
+#print axioms CategoryTheory.DGLinear.homFunctor_map
+#print axioms CategoryTheory.DGLinear.homFunctor_linear
+#print axioms CategoryTheory.LinearEvaluationData.ofHasLinearCopowers_functor_eq
+#print axioms CategoryTheory.linearCopowerAdjunction
+#print axioms CategoryTheory.linearCopowerAdjunction_unit_app
+#print axioms CategoryTheory.linearCopowerAdjunction_counit
+#print axioms CategoryTheory.linearCopowerAdjunction_counit_app
 
 -- The generic `H⁰` finite-free leaf packages shifted single copowers.  A
 -- supplied basis expands a degree-zero copower, with arbitrary finite index
@@ -1292,10 +1352,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.LinearEvaluationData.compare_comp_evaluation
 
 -- The direct scalar-linear object twist is a thin specialization of the
--- generic cone package.  Choice comparison and exactness reuse the existing
--- strict-square and cone-preservation interfaces; exactness of evaluation
--- remains explicit input.  Its generic K₀ formulas give identity minus
--- evaluation.  The numerical spherical-twist specialization is audited by
+-- generic cone package.  Choice comparison reuses the existing strict-square
+-- interface, while exactness follows automatically for every dg functor.
+-- Its H⁰ and K₀ leaves therefore take no cone witness; the lower structured
+-- 3-by-3 constructor remains available.  Its generic K₀ formulas give
+-- identity minus evaluation.  The numerical spherical-twist specialization is audited by
 -- the spherical-twist slice, while the HomFiniteBounded realization below
 -- supplies its Euler witness automatically.
 #print axioms CategoryTheory.LinearEvaluationData.preservesChosenConesOfCompare
@@ -1306,12 +1367,55 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_inv_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.inclusion_comp_compareIso_hom_val
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self_hom_val
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val_comp
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesShifts
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesChosenCones
+
+-- Under all scalar-linear copowers, selected object-twist cone data is
+-- definitionally the copower--Hom adjunction's counit-cone data.  Arbitrary
+-- choices compare canonically in Z⁰, strictly over the identity inclusion and
+-- coherently under changes of evaluation data.  The scalar-linear H⁰ triangle
+-- package and its adjunction comparison are the generic strict-square cone
+-- comparison at the full triangle-functor level.  These statements concern
+-- all module complexes and assert neither Perf(k), sphericality, nor
+-- autoequivalence.
+#print axioms CategoryTheory.linearCopowerAdjunction_counitConeData_eq
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_eq_compareIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.inclusion_comp_adjunctionTwistIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twist_eq_adjunctionTwist
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans_adjunctionTwistIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mem_distinguishedTriangles
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistH0CommShift
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistH0IsTriangulated
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_eq_adjunctionTwistTriangleFunctor
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans_adjunctionTwistTriangleIso
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of_eq_twistK₀_ofHomFiniteBounded
@@ -1400,12 +1504,10 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_self
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans
 
--- Exactness of the object twist.  The shift half is free -- every dg functor
--- preserves shifts, `DGFunctor.preservesShifts` -- so only the cone half is a
--- hypothesis, and it is `RHom(E,-) ⊗ E`'s.  That one stays open:
--- `PreservesChosenCones` asks that maps into the cone split, while
--- `IsCopowerOf` is a mapping-out property.  Exact is not autoequivalence; the
--- object twist has no autoequivalence statement.
+-- Exactness of the object twist is automatic: every dg functor preserves both
+-- shifts and the repository's strong split cones.  The public H⁰ and K₀
+-- consumers take no witness; the structured 3-by-3 constructor remains below.
+-- Exact is not autoequivalence; the object twist has no autoequivalence statement.
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesShifts
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesChosenCones
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0CommShift

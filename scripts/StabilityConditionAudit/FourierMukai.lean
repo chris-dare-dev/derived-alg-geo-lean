@@ -457,6 +457,24 @@ Orlov uniqueness, which this repository does not state.
 #print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.toLeftAdjointKernelData_adjKernel
 #print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.transformIso
 
+/-! ## Strict dg adjunctions presented by Fourier--Mukai transforms
+
+The generic `DGAdjunction.H0Presentation` bridge may name its two transported
+functors by transforms.  These constructors spend that presentation on the
+existing left/right adjoint-kernel structures and agree definitionally with
+their correspondence-swap conversions.  The kernel and endpoint isomorphisms
+remain inputs, and no kernel arrow or cone is produced.
+-/
+
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.ofH0Presentation
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.ofH0Presentation_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.ofH0Presentation_adj
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.ofH0Presentation
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.ofH0Presentation_adjKernel
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.ofH0Presentation_adj
+#print axioms CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData.ofH0Presentation_toLeftAdjointKernelData
+#print axioms CategoryTheory.Triangulated.FourierMukai.LeftAdjointKernelData.ofH0Presentation_toRightAdjointKernelData
+
 /-! ## Dual kernels derived from adjunction data (#559)
 
 The consumer of the adjoint-kernel layer, and the first constructor of a
