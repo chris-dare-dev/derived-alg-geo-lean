@@ -129,7 +129,7 @@ items:
     kind: epic
     parent: charge-abstraction-m1
     title: "The divisorial keystone reaches the charge kernel"
-    status: planned
+    status: done
     summary: "`Walls/Exp/Divisorial.lean`: the intersection-form moments and `expCharge_eq_ofMoments`, stated on a bare `Mukai.RealExtension D` rather than on `ChernCharacter`. The triple level is load-bearing — `mukaiCharge` (`Walls/Divisorial/Mukai.lean:173`) is the same `expChargeHom` on a different triple, so a `ChernCharacter`-level statement cannot reach it and the κ epic depends on that reach. This is the slice to review hardest: two of three independent design angles declared the multi-divisor charge a non-child and were wrong."
     priority: must
     size: M
@@ -142,7 +142,7 @@ items:
     kind: epic
     parent: charge-abstraction-m1
     title: "The polarised transport: one map for every (n, m, kappa)"
-    status: planned
+    status: done
     summary: "`AlgebraicGeometry/Numerical/Stability/PolarisedWallTransport.lean`: `corrComp`, `hDegrees`, `hDegreesHom`, `wallChargeFamily`, and the two dimension comparisons `surface_toNumClass_eq` and `threefold_toNumClass_eq`, both proved with zero sorries. The n = 3 twin did not exist in any form before remediation; it was a code comment. `corrComp` must land with `corrComp_sqrtToddComp` and `corrComp_unitCorr` or it is a third spelling of an existing convolution. Two open obligations ride along: the name collision with `Surface.wallChargeFamily` (`WallTransport.lean:156`) and the tilt-spelling comparison, the latter owned by e10."
     priority: must
     size: L
