@@ -264,7 +264,14 @@ that comparison are instance hypotheses to be discharged by the realization.
    Nothing parallel is installed on `H0 (DGFunctor C D)`: that category
    already receives the generic `H0.hasShift` from its pretriangulated dg
    structure, so a second instance would duplicate an existing abstraction.
-   The dg-functor shift packaging seam is therefore closed.
+   The dg-functor shift packaging seam is therefore closed.  At the `H⁰`
+   boundary, `shiftedFunctorH0Iso_commShift` additionally proves that the
+   package constructed directly from `F[n]` agrees with the composite package
+   on `H⁰(F) ⋙ [n]`; the proof reduces the two shift orders with the
+   associativity comparison and cancels the two Koszul signs.  The transported
+   form composes this with endpoint equivalences, using the generic
+   `Pretriangulated.commShiftIso_commShift` rather than another isolated
+   comparison formula.
 2. The repository has strict dg functors, not the Morita quasi-functor and
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
@@ -370,7 +377,13 @@ that comparison are instance hypotheses to be discharged by the realization.
    `shiftedFunctorH0IsTriangulated` compose that signed package with the
    canonical comparison on `H⁰(F)` and transport across
    `shiftedFunctorH0Iso`; the latter derives cone preservation automatically
-   while retaining the shift witness that selects its comparison.
+   while retaining the shift witness that selects its comparison.  The new
+   `shiftedFunctorH0Iso_commShift` identifies that transported package with the
+   direct package on `H⁰(F[n])`, and
+   `transportedShiftedFunctorH0Iso_commShift` preserves the identification
+   after ordinary endpoint transport.  Thus downstream cotwist consumers can
+   compose compatibility proofs without manufacturing a source `CommShift`
+   with `Functor.CommShift.ofIso`.
    Consequently `dualTwistH0IsTriangulated` and
    `cotwistH0IsTriangulated` close exactness for the two conventional `[-1]`
    functors without endpoint cone-preservation arguments.  Finally

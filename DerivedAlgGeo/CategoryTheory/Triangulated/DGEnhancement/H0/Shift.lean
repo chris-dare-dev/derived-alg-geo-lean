@@ -49,6 +49,11 @@ general form: `shiftFunctorAddIso'_hom_app_zero_right`, `..._zero_left`, and
 to a threefold composite, and the two threefold composites have equal `hom`
 fields by `comp'_assoc_hom`.
 
+The later computation lemmas identify Mathlib's additive and commutative
+shift comparisons with these same `IsShiftBy.compare` witnesses.  They are the
+bridge used by compatibility proofs without replacing the existing
+`HasShift` instance.
+
 So `HasShift (H0 C) ℤ` is an instance, not an aspiration: `hasShift` at the
 foot of this file. What `dg-enhancements-e6` still owes after it is the
 transport theorem itself, `IsPretriangulated C → Pretriangulated (H0 C)`, whose
@@ -336,6 +341,37 @@ lemma shiftFunctorZero_eq :
 lemma shiftFunctorAdd_eq (a b : ℤ) :
     CategoryTheory.shiftFunctorAdd (H0 C) a b = shiftFunctorAddIso C a b := by
   rw [ShiftMkCore.shiftFunctorAdd_eq]; rfl
+
+/-- The ambient additive-shift comparison at a propositionally equal target
+degree is the free-degree comparison constructed from dg shift witnesses. -/
+lemma shiftFunctorAdd'_eq_shiftFunctorAddIso' (a b ab : ℤ) (h : a + b = ab) :
+    CategoryTheory.shiftFunctorAdd' (H0 C) a b ab h =
+      shiftFunctorAddIso' C a b ab h := by
+  subst ab
+  rw [CategoryTheory.shiftFunctorAdd'_eq_shiftFunctorAdd,
+    shiftFunctorAdd_eq]
+  rfl
+
+/-- On `H⁰`, the interchange of two shifts is the canonical comparison
+between the two composite dg shift witnesses. -/
+@[simp]
+lemma shiftFunctorComm_hom_app (a b : ℤ) (X : H0 C) :
+    (CategoryTheory.shiftFunctorComm (H0 C) a b).hom.app X =
+      H0.homMk (C := C) ⟨IsShiftBy.compare
+        (shiftCompWitness' C (H0.of C X) a b (a + b) rfl)
+        (shiftCompWitness' C (H0.of C X) b a (a + b) (by omega)),
+        IsShiftBy.compare_mem_cocycles _ _⟩ := by
+  rw [CategoryTheory.shiftFunctorComm_eq (H0 C) a b (a + b) rfl,
+    shiftFunctorAdd'_eq_shiftFunctorAddIso',
+    shiftFunctorAdd'_eq_shiftFunctorAddIso']
+  change H0.homMk (C := C) ⟨IsShiftBy.compare
+      (shiftCompWitness' C (H0.of C X) a b (a + b) rfl)
+      (shiftWitness C (H0.of C X) (a + b)), _⟩ ≫
+    H0.homMk (C := C) ⟨IsShiftBy.compare
+      (shiftWitness C (H0.of C X) (a + b))
+      (shiftCompWitness' C (H0.of C X) b a (a + b) (by omega)), _⟩ = _
+  rw [H0.homMk_comp]
+  exact congrArg _ (Subtype.ext (IsShiftBy.compare_trans _ _ _))
 
 
 end H0

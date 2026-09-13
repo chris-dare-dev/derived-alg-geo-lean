@@ -427,7 +427,15 @@ blocks should normally move it rather than add more declarations beside it.
   `DGFunctor.shiftedFunctorH0CommShift` composes the canonical comparison on
   `H⁰(F)` with the signed integral-shift package and transports it across
   `shiftedFunctorH0Iso`; `shiftedFunctorH0IsTriangulated` transports exactness
-  by the same route.  Both are explicit interfaces, not global instances.
+  by the same route.  `shiftedFunctorH0Iso_commShift` now proves that this
+  transported package agrees with the package constructed directly from the
+  shifted dg functor, including the Koszul sign, while
+  `transportedShiftedFunctorH0Iso_commShift` carries the comparison through
+  endpoint equivalences.  Beyond the endpoint shift and additivity packages
+  needed to state compatibility, the only extra functor hypothesis there is
+  additivity of the forward target equivalence, used by the reusable
+  `Pretriangulated.commShiftIso_commShift`.  These are explicit interfaces,
+  not global instances.
   The underlying `H⁰` capability transport now also keeps independent source
   and target object universes, matching the shifted-functor comparison API.
   The conventional `[-1]` dual twist and cotwist now reuse this root, and their

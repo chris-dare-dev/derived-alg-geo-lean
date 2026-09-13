@@ -16,7 +16,9 @@ integral shift is triangulated with respect to it.
 
 The structures are explicit definitions rather than global instances.  This
 avoids an instance diamond with the unsigned comparison, which remains useful
-for even shifts and object-only arguments.
+for even shifts and object-only arguments.  For an additive shift-compatible
+functor, its selected comparison with `[n]` is itself compatible with these
+signed packages; that reusable theorem is what transported DG consumers use.
 -/
 
 noncomputable section
@@ -25,7 +27,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 
 namespace CategoryTheory.Pretriangulated
 
-universe v u
+universe v v' u u'
 
 variable (C : Type u) [Category.{v} C] [Preadditive C] [HasShift C ℤ]
 
@@ -124,6 +126,45 @@ lemma shiftFunctorCommShift_commShiftIso_hom_app (n a : ℤ) (X : C) :
     ((shiftFunctor C n).commShiftIso a).hom.app X =
       (n * a).negOnePow • (shiftFunctorComm C a n).hom.app X := by
   rfl
+
+section Functor
+
+variable {D : Type u'} [Category.{v'} D] [Preadditive D] [HasShift D ℤ]
+  [∀ n : ℤ, (shiftFunctor D n).Additive]
+  (F : C ⥤ D) [F.Additive] [F.CommShift ℤ]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The selected comparison of an additive functor with the shift by `n` is
+itself compatible with all integral shifts when the two shift functors carry
+the sign-correct `CommShift` structures.
+
+The additivity hypothesis is essential: moving the Koszul sign through
+`F.map` is part of the compatibility equation. -/
+theorem commShiftIso_commShift (n : ℤ) :
+    letI : (shiftFunctor C n).CommShift ℤ := shiftFunctorCommShift C n
+    letI : (shiftFunctor D n).CommShift ℤ := shiftFunctorCommShift D n
+    NatTrans.CommShift (F.commShiftIso n).hom ℤ := by
+  letI : (shiftFunctor C n).CommShift ℤ := shiftFunctorCommShift C n
+  letI : (shiftFunctor D n).CommShift ℤ := shiftFunctorCommShift D n
+  refine ⟨fun a => ?_⟩
+  ext X
+  dsimp
+  simp only [shiftFunctorCommShift_commShiftIso_hom_app,
+    Functor.commShiftIso_comp_hom_app, Category.assoc, Functor.comp_obj,
+    Functor.map_units_smul]
+  rw [F.map_shiftFunctorComm_hom_app X a n]
+  simp only [Linear.units_smul_comp,
+    Linear.comp_units_smul, Category.assoc, Iso.inv_hom_id_app_assoc]
+  have h :
+      (shiftFunctor D a).map ((F.commShiftIso n).inv.app X) ≫
+          (shiftFunctor D a).map ((F.commShiftIso n).hom.app X) = 𝟙 _ := by
+    rw [← Functor.map_comp, Iso.inv_hom_id_app, Functor.map_id]
+  rw [h]
+  simp only [Functor.comp_obj]
+  simp only [← Category.assoc]
+  rw [← Linear.units_smul_comp, Category.comp_id]
+
+end Functor
 
 variable [HasZeroObject C] [Pretriangulated C]
 
