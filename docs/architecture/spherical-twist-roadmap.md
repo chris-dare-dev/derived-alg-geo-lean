@@ -372,6 +372,18 @@ that comparison are instance hypotheses to be discharged by the realization.
    both left-adjunction facades are closed over the two existing comparison
    roots; neither creates new comparison or shift data.
 
+   The canonical `TwistCotwistEquivalenceConditions` now also feeds the two
+   right-adjunction Fourier--Mukai kernel packages directly.  Its twist and
+   unshifted-cotwist-cone quasi-equivalences imply exactly the two `H⁰`
+   equivalence witnesses required by the existing comparison constructors;
+   the cotwist constructor remains solely responsible for the conventional
+   `[-1]` shift.  The adapters package the selected twist and cotwist kernels
+   independently, since their endocorrespondences and enhancement categories
+   need not agree.  Their exactness still requires the separately supplied
+   comparison `ShiftCompatibility` and triangulated endpoint equivalence.
+   These conditions provide no equivalence for either left-adjunction dual
+   cone, no relation between the two selected kernels, and no sphericality.
+
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
    `H⁰`, so `twistH0Equivalence` and `cotwistConeH0Equivalence` make the twist
