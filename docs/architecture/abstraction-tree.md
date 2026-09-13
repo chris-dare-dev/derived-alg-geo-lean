@@ -177,7 +177,7 @@ Category
 │  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
 │  │  │  ├─ HasShift Z⁰(DGFunctor C D) ℤ standard Mathlib packaging, all unit/assoc laws
 │  │  │  ├─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
-│  │  │  ├─ shiftedFunctorH0Iso          functor-level comparison; transports H⁰ equivalences
+│  │  │  ├─ shiftedFunctorH0Iso          functor-level comparison; direct/transported CommShift-compatible
 │  │  │  └─ shiftedFunctorH0CommShift / IsTriangulated
 │  │  │                                 transports exactness with the signed shift package
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts

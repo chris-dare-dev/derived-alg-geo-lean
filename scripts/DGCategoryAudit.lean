@@ -522,6 +522,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- The ambient shift on H⁰ is the one `H0Shift.lean` built (dg-enhancements-e7).
 #print axioms CategoryTheory.H0.shiftFunctorZero_eq
 #print axioms CategoryTheory.H0.shiftFunctorAdd_eq
+#print axioms CategoryTheory.H0.shiftFunctorAdd'_eq_shiftFunctorAddIso'
+#print axioms CategoryTheory.H0.shiftFunctorComm_hom_app
 
 -- The model shift is Mathlib's shift (dg-enhancements-e7). Stated first on plain
 -- cochain complexes, where no `Cdg`/`CochainComplex` synonym has to be crossed
@@ -854,7 +856,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_map
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_eq
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_hom_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_inv_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_commShift
 #print axioms CategoryTheory.DGFunctor.transportedShiftedFunctorH0Iso
+#print axioms CategoryTheory.DGFunctor.transportedShiftedFunctorH0Iso_commShift
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_isEquivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Equivalence
 #print axioms CategoryTheory.DGFunctor.shiftedFunctorH0CommShift
