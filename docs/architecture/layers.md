@@ -139,8 +139,10 @@ CategoryTheory/Triangulated
   │                                           functorial distinguished cone triangles and
   │                                           presented dg-adjunction cone triangles and their
   │                                           conventional cotwist inverse rotation;
-  │                                           H0/Triangle owns the triangles, H0/Functor
-  │                                           the transport of dg-functor capabilities
+  │                                           H0/Triangle owns the triangles;
+  │                                           H0/{Functor,FunctorTransport} own transport of
+  │                                           dg-functor capabilities through H⁰ and ordinary
+  │                                           equivalences
   └─→ StabilityCondition                      Bridgeland stability (canonical concept)
         ├─→ Weak                              weak stability: the dependency parent
         │     └─→ Foundation, Families, HarderNarasimhan, Support, Tilting

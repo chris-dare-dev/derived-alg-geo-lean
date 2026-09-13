@@ -304,10 +304,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    `DGFunctor.transportedShiftedFunctorH0Iso` and its specialization
    `transportedCotwistH0Iso` compare that first vertex with the transport of
    `H⁰` of the actual shifted dg unit cone; equality after transport is not
-   claimed.  Thus the generic ordinary adjunction-cone presentation and
-   conventional cotwist-rotation seams are closed.  No comparison with an
-   independently chosen Fourier--Mukai cone, exactness, equivalence, or
-   sphericality follows.  The dg notion is still
+   claimed.  `DGFunctor.transportedH0` now packages the shift and exactness
+   capabilities of an arbitrary `H⁰` dg functor after ordinary equivalence
+   transport.  Its cotwist specialization proves exactness from the supplied
+   triangulated source equivalence and packages an ordinary exact
+   autoequivalence only under an explicit equivalence hypothesis on the
+   unshifted cone.  Thus the generic ordinary adjunction-cone presentation,
+   conventional cotwist rotation, and transported-capability seams are closed.
+   No comparison with an independently chosen Fourier--Mukai cone, dg
+   quasi-equivalence of the shifted cone, choice independence, or sphericality
+   follows.  The dg notion is still
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
    and no comparison with those exists.
 
