@@ -14,14 +14,15 @@ The cone of the scalar-linear evaluation map
 
 is the direct scalar-linear version of the Seidel--Thomas object twist.  This
 file only packages the existing generic cone interface under
-`LinearEvaluationData.TwistConeData`.  In particular, the cone construction,
-choice comparison, shift preservation, and chosen-cone preservation all remain
-owned by the generic `HomogeneousNatTrans.ConeData` layer.
+`LinearEvaluationData.TwistConeData`.  Cone construction and structured
+cone-functor comparisons remain owned by `HomogeneousNatTrans.ConeData`;
+automatic shift and chosen-cone preservation are owned by the generic
+pretriangulated dg-functor layer.
 
 No comparison with additive `EvaluationData` is asserted: the two evaluation
-packages represent different universal properties.  Nor does this file claim
-that the evaluation functor preserves chosen cones or that the resulting twist
-is an autoequivalence.
+packages represent different universal properties.  Cone preservation is
+automatic for every dg functor by the generic split-cone theorem; this file
+still makes no autoequivalence claim for the resulting twist.
 -/
 
 set_option autoImplicit false
@@ -41,8 +42,9 @@ variable (k : Type w) [CommRing k]
   [DGLinear k C]
   {E : C} (V : LinearEvaluationData k E)
 
-/-- Cone preservation for scalar-linear evaluation is independent of the
-selected evaluation data.  This remains explicit rather than an instance. -/
+/-- Cone preservation for scalar-linear evaluation transports across a change
+of selected evaluation data.  This remains useful compatibility data even
+though the capability is automatic for every dg functor. -/
 noncomputable def preservesChosenConesOfCompare (W : LinearEvaluationData k E)
     (hV : DGFunctor.PreservesChosenCones V.functor) :
     DGFunctor.PreservesChosenCones W.functor :=
@@ -110,6 +112,20 @@ lemma compareIso_inv_val {W : LinearEvaluationData k E}
       L.isConeOf.lift K.isConeOf (LinearEvaluationData.compare W V)
         (DGFunctor.HomogeneousNatTrans.id (DGFunctor.id C)) 0 :=
   rfl
+
+/-- The canonical scalar-linear twist comparison strictly commutes with the
+inclusions from the identity functor. -/
+lemma inclusion_comp_compareIso_hom_val {W : LinearEvaluationData k E}
+    (L : W.TwistConeData k) :
+    DGFunctor.HomogeneousNatTrans.composition (DGFunctor.id C) K.twist L.twist
+        0 0 0 (by omega) K.inr (K.compareIso L).hom.val =
+      L.inr := by
+  rw [compareIso]
+  refine (DGFunctor.HomogeneousNatTrans.ConeData.inr_comp_isoOfStrictSquare_hom
+    K L (LinearEvaluationData.compareIso V W)
+      (Iso.refl (show Z0 (DGFunctor C C) from DGFunctor.id C))
+      (V.compare_evaluation_square k W)).trans ?_
+  exact dgId_comp (C := DGFunctor C C) 0 L.inr
 
 /-- The scalar-linear twist comparison from a cone choice to itself is
 strictly the identity homogeneous natural transformation. -/
@@ -191,8 +207,9 @@ lemma compareIso_trans {W X : LinearEvaluationData k E}
 noncomputable def preservesShifts : DGFunctor.PreservesShifts K.twist :=
   DGFunctor.preservesShifts _
 
-/-- The scalar-linear object twist preserves chosen cones as soon as its
-evaluation endpoint does. -/
+/-- The structured 3-by-3 cone-preservation witness for the scalar-linear
+object twist.  Its endpoint argument is redundant but records the generic cone
+functor construction explicitly. -/
 noncomputable def preservesChosenCones
     (hV : DGFunctor.PreservesChosenCones V.functor) :
     DGFunctor.PreservesChosenCones K.twist :=
