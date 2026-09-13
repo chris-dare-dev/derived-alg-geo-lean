@@ -99,4 +99,52 @@ theorem schemeTiltStabilityFunction_Z
       hzero hboundary).Z =
       MukaiChargeData.ambientChargeHom m RR.divisorSpace.intersection β ω := rfl
 
+/-- The scheme-derived K3 tilt stability function using the canonical
+cohomological extension of the coherent Mukai class.  This removes the
+separate ambient class map and restriction proof from the geometric input. -/
+def canonicalSchemeTiltStabilityFunction
+    (T : ToddData.Data Q K) (Rg : ReconstructionSystem (X := X) (P := Q))
+    (RR : Numerical.Surface.NumericalRealization
+      (RiemannRoch.Surface.Assembly.toNumericalVariety T Rg).ring (D := W))
+    {β ω : W}
+    (G : PolarizedVarietyData k X)
+    (N : SlopeNormalization (V := RiemannRoch.Surface.Assembly.toNumericalVariety T Rg)
+      G RR ω)
+    (hμ : MuPositivityData G) (hbounded : SlopeBoundedness G)
+    (hchi : Q.intersection.eulerPic 1 = 2)
+    (hHodge : RR.divisorSpace.HodgeDefinite ω)
+    (hω : 2 < RR.divisorSpace.pair ω ω)
+    (hzero : HasDimensionZeroMukaiClasses RR ω)
+    (hboundary : MukaiTilt.HasBoundaryMukaiDecomposition (derivedMukaiClass RR)
+      RR.divisorSpace.intersection β ω (N.boundedMukaiSlopeData hμ)) :
+    WeakStabilityCondition.StabilityFunction
+      ((N.boundedMukaiSlopeData hμ).toWeakStabilityFunction.hnTilt
+        (((RR.divisorSpace.intersection β ω : ℝ)) : WithTop ℝ)
+        (N.boundedMukaiSlopeData_hasHNProperty hμ (muHNInput hbounded))) :=
+  N.canonicalTiltStabilityFunction hμ hbounded
+    (RiemannRoch.Surface.Assembly.toIsK3 T Rg
+      hK3Surface.canonicalClass_eq_one hchi)
+    hHodge hω hzero hboundary
+
+@[simp]
+theorem canonicalSchemeTiltStabilityFunction_Z
+    (T : ToddData.Data Q K) (Rg : ReconstructionSystem (X := X) (P := Q))
+    (RR : Numerical.Surface.NumericalRealization
+      (RiemannRoch.Surface.Assembly.toNumericalVariety T Rg).ring (D := W))
+    {β ω : W}
+    (G : PolarizedVarietyData k X)
+    (N : SlopeNormalization (V := RiemannRoch.Surface.Assembly.toNumericalVariety T Rg)
+      G RR ω)
+    (hμ : MuPositivityData G) (hbounded : SlopeBoundedness G)
+    (hchi : Q.intersection.eulerPic 1 = 2)
+    (hHodge : RR.divisorSpace.HodgeDefinite ω)
+    (hω : 2 < RR.divisorSpace.pair ω ω)
+    (hzero : HasDimensionZeroMukaiClasses RR ω)
+    (hboundary : MukaiTilt.HasBoundaryMukaiDecomposition (derivedMukaiClass RR)
+      RR.divisorSpace.intersection β ω (N.boundedMukaiSlopeData hμ)) :
+    (canonicalSchemeTiltStabilityFunction T Rg RR G N hμ hbounded hchi hHodge hω
+      hzero hboundary).Z =
+      MukaiChargeData.ambientChargeHom (derivedMukaiClass RR)
+        RR.divisorSpace.intersection β ω := rfl
+
 end AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt
