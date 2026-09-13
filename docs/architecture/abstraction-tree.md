@@ -219,7 +219,7 @@ Category
 │  │  │                                 generic shiftedFstH0, right whiskering, and left counit
 │  │  ├─ UnitConeData                    unshifted unit-cone cotwist candidate
 │  │  │  ├─ cotwistAdjointComparison    canonical closed `R ⟶ C L`, and its H⁰ map
-│  │  │  └─ cotwistAdjointComparisonShifted_h0
+│  │  │  └─ cotwistAdjointComparisonShiftedH0
 │  │  │                                  canonical `R ⟶ (C[-1] L)[1]` normalization
 │  │  └─ DGAdjunction.h0                 an ordinary adjunction between the H⁰ functors
 │  │     └─ H0Presentation                supplied endpoint isos after equivalence transport

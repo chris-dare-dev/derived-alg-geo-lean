@@ -499,7 +499,7 @@ blocks should normally move it rather than add more declarations beside it.
   `DGFunctor.h0CompIso` and `h0IdIso` now expose their identity components,
   while `HomogeneousNatTrans.h0_comp'`, `h0_whiskerLeft`, and
   `h0_whiskerRight` package descent of strict composition and whiskering.
-  `CounitConeData.twistAdjointComparison_h0_eq_inverseRotateFirstH0` consumes
+  `CounitConeData.twistAdjointComparisonH0_eq_inverseRotateFirstH0` consumes
   those generic laws to factor the twist comparison through the
   inverse-rotated first map and the descended left counit.  No adjunction,
   exactness, invertibility, or sphericality is inferred from the cone-generic

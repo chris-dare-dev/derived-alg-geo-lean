@@ -90,7 +90,7 @@ DGAdjunction
 └─ a compatible left/right adjunction pair canonically supplies
    ├─ twistAdjointComparison: L T[-1] ⟶ R
    └─ cotwistAdjointComparison: R ⟶ C L
-      ├─ cotwistAdjointComparisonShifted_h0: R ⟶ (C[-1] L)[1]
+      ├─ cotwistAdjointComparisonShiftedH0: R ⟶ (C[-1] L)[1]
       └─ EnhancedAdjunctionComparison records IsIso on their H⁰ maps and
          exposes the conventional shifted-target cotwist isomorphism
 
@@ -331,7 +331,7 @@ that comparison are instance hypotheses to be discharged by the realization.
    The conventional target in Anno--Logvinenko's notation is `(F L)[1]` for
    `F = C[-1]`.  `DGFunctor.shiftedFunctorCompIsoIdH0` descends Mathlib's
    `shiftFunctorCompIsoId` from the `HasShift` category of closed dg functors,
-   and `cotwistAdjointComparisonShifted_h0` composes its inverse with the raw
+   and `cotwistAdjointComparisonShiftedH0` composes its inverse with the raw
    map to obtain `R ⟶ (C[-1] L)[1]`.  Thus the cancellation uses the packaged
    add, zero, unit, and associativity laws instead of a paper-specific shift
    comparison.
@@ -347,7 +347,7 @@ that comparison are instance hypotheses to be discharged by the realization.
    composition and both dg whiskerings descend to ordinary natural
    transformations, with whiskering passing through the canonical
    `h0CompIso` compositors.  The adjunction consumer
-   `twistAdjointComparison_h0_eq_inverseRotateFirstH0` therefore factors the
+   `twistAdjointComparisonH0_eq_inverseRotateFirstH0` therefore factors the
    twist comparison through the generic `shiftedFstH0_eq`, ordinary right
    whiskering by `L.h0`, and the descended left-counit whisker.  It introduces
    neither a second comparison map nor an ordinary-counit normalization, and
