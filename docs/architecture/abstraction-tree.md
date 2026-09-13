@@ -177,7 +177,7 @@ Category
 │  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
 │  │  │  ├─ HasShift Z⁰(DGFunctor C D) ℤ standard Mathlib packaging, all unit/assoc laws
 │  │  │  ├─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
-│  │  │  ├─ shiftedFunctorH0Iso          functor-level comparison; transports H⁰ equivalences
+│  │  │  ├─ shiftedFunctorH0Iso          functor-level comparison; direct/transported CommShift-compatible
 │  │  │  └─ shiftedFunctorH0CommShift / IsTriangulated
 │  │  │                                 transports exactness with the signed shift package
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
@@ -218,6 +218,7 @@ Category
 │  │        ├─ presentedCotwistTriangle    Mathlib inverse rotation of the presented unit triangle
 │  │        │  ├─ transportedCotwist      pointwise `[-1]` shift of the transported unit cone
 │  │        │  └─ transportedCotwistH0Iso transport of the actual shifted dg cone agrees up to iso
+│  │        │     ├─ CommShift compatibility canonical sign-correct packages agree across the iso
 │  │        │     └─ exact equivalence     exact for every cone under supplied triangulated transport;
 │  │        │                                equivalence from explicit H⁰ input
 │  │        └─ Fourier--Mukai adapters     existing left/right adjoint-kernel data

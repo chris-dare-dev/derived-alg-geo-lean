@@ -15,11 +15,14 @@ blocks should normally move it rather than add more declarations beside it.
   isomorphism.  `twistIsTriangulated` and `cotwistIsTriangulated` then delegate
   exactness transfer to Mathlib's `Functor.isTriangulated_of_iso`.  The
   cotwist side compares the conventional pointwise `[-1]` functor, whose
-  sign-correct shift structure is already packaged; compatibility of the
-  intermediate actual shifted dg cone remains separate.  No target shift
-  structure is manufactured, no global instance is installed, and no
-  uniqueness, equivalence, kernel-identification, or sphericality statement
-  is asserted.
+  sign-correct shift structure is already packaged.
+  `transportedCotwistH0Iso_commShift` derives compatibility of the intermediate
+  actual shifted dg cone, and
+  `ShiftCompatibility.transportedDGCotwistIso_commShift` composes it with the
+  supplied Fourier--Mukai comparison.  Neither compatibility is stored as new
+  record data.  No target shift structure is manufactured, no global instance
+  is installed, and no uniqueness, equivalence, kernel-identification, or
+  sphericality statement is asserted.
 - Supplied natural comparison of dg and Fourier--Mukai adjunction cones
   (2026-09-13): `Triangle.FirstMapNormalizationData.ComparisonData` records the
   remaining data for an endpoint-strict comparison of two normalizations with
@@ -72,10 +75,12 @@ blocks should normally move it rather than add more declarations beside it.
   pointwise `[-1]` shift `UnitConeData.transportedCotwist`, and
   `transportedCotwistH0Iso` specializes the reusable
   `DGFunctor.transportedShiftedFunctorH0Iso` to compare it with the transported
-  `H⁰` of the actual shifted dg unit cone.  The adjunction unit is literally
-  the rotated second map and every value is distinguished under the existing
-  source-side hypotheses.  Exactness and equivalence are separate capability
-  accessors with their own hypotheses; this presentation infers no
+  `H⁰` of the actual shifted dg unit cone;
+  `transportedCotwistH0Iso_commShift` specializes the corresponding canonical
+  shift-compatibility theorem.  The adjunction unit is literally the rotated
+  second map and every value is distinguished under the existing source-side
+  hypotheses.  Exactness and equivalence are separate capability accessors
+  with their own hypotheses; this presentation infers no
   natural Fourier--Mukai comparison, distinguished functor-category triangle,
   or sphericality.
 - Ordinary presentations of dg-adjunction unit triangles (2026-09-13):
@@ -427,7 +432,15 @@ blocks should normally move it rather than add more declarations beside it.
   `DGFunctor.shiftedFunctorH0CommShift` composes the canonical comparison on
   `H⁰(F)` with the signed integral-shift package and transports it across
   `shiftedFunctorH0Iso`; `shiftedFunctorH0IsTriangulated` transports exactness
-  by the same route.  Both are explicit interfaces, not global instances.
+  by the same route.  `shiftedFunctorH0Iso_commShift` now proves that this
+  transported package agrees with the package constructed directly from the
+  shifted dg functor, including the Koszul sign, while
+  `transportedShiftedFunctorH0Iso_commShift` carries the comparison through
+  endpoint equivalences.  Beyond the endpoint shift and additivity packages
+  needed to state compatibility, the only extra functor hypothesis there is
+  additivity of the forward target equivalence, used by the reusable
+  `Pretriangulated.commShiftIso_commShift`.  These are explicit interfaces,
+  not global instances.
   The underlying `H⁰` capability transport now also keeps independent source
   and target object universes, matching the shifted-functor comparison API.
   The conventional `[-1]` dual twist and cotwist now reuse this root, and their
