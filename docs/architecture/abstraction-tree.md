@@ -134,7 +134,9 @@ Category
 │  │     └─ LinearEvaluationData k E     scalar-linear Hom(E,-) ⊗ E assembly
 │  │        ├─ functor                   k-linear dg functor
 │  │        ├─ evaluation                closed degree-zero map to the identity
-│  │        └─ compareIso                coherent choice independence, strict over evaluation
+│  │        ├─ compareIso                coherent choice independence, strict over evaluation
+│  │        └─ IsEulerCopower            generic H⁰ rank-one K₀ predicate
+│  │           └─ HomotopyCategory realization from supplied finite presentations
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
@@ -260,6 +262,7 @@ Category
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
 │  │  ├─ finite biproduct calculus         [⨁ Xᵢ] = Σ [Xᵢ], constant family = n·[X]
+│  │  ├─ rankOne / IsRankOne                factorization through ℤ; objectwise before exactness
 │  │  ├─ Realization := K₀ C →+ A        additive target
 │  │  │  └─ Descends                    commuting realization square
 │  │  └─ EulerForm := K₀ C →+ K₀ C →+ ℤ

@@ -1239,6 +1239,16 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- comparison.
 #print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerK₀Of
 
+-- Hom-complex cohomology and selected shifts have the same junk-total Euler
+-- characteristic.  Supplied finite cohomology presentations then compute the
+-- object classes of scalar-linear evaluation through the shared rank-one K₀
+-- interface.  This adds neither formality nor exactness of the evaluation
+-- functor and supplies no adapter to additive evaluation data.
+#print axioms CategoryTheory.H0.homComplex_homologyEulerChar_eq_chiHom
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofCompare
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofFiniteCohomologyPresentations
+
 -- Scalar-linear evaluation data assembles the linear copowers at a fixed
 -- object into a `k`-linear dg functor and a closed evaluation transformation.
 -- Its existence selector is choice-independent up to a coherent canonical
