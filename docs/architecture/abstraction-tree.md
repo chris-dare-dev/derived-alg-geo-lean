@@ -135,8 +135,11 @@ Category
 │  │        ├─ functor                   k-linear dg functor
 │  │        ├─ evaluation                closed degree-zero map to the identity
 │  │        ├─ compareIso                coherent choice independence, strict over evaluation
-│  │        └─ IsEulerCopower            generic H⁰ rank-one K₀ predicate
-│  │           └─ HomotopyCategory realization from supplied finite presentations
+│  │        ├─ IsEulerCopower            generic H⁰ rank-one K₀ predicate
+│  │        │  └─ HomotopyCategory realization from supplied finite presentations
+│  │        └─ TwistConeData             direct cone of scalar-linear evaluation
+│  │           ├─ compareIso / exactness  delegated to generic strict-square and cone APIs
+│  │           └─ K₀ action             identity minus evaluation; numerical twist via IsEulerCopower
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations

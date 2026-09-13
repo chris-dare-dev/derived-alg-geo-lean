@@ -122,6 +122,19 @@ blocks should normally move it rather than add more declarations beside it.
   the required finite/free homology witnesses and proves the rank-one formula.
   It does not infer presentations or formality, make the evaluation functor
   exact, or compare the additive and scalar-linear universal properties.
+- Direct scalar-linear object twist on `K₀` (2026-09-12):
+  `DGCategory.Pretriangulated.LinearObjectTwist` packages the cone of the
+  scalar-linear evaluation transformation as
+  `LinearEvaluationData.TwistConeData`, delegating cone construction,
+  strict-square comparison, shift preservation, and chosen-cone preservation
+  to the existing generic interfaces.  The generic H⁰ `K₀` leaf computes
+  identity minus scalar-linear evaluation, and
+  `SphericalTwist.LinearObjectTwistK0` combines it with the shared
+  `IsEulerCopower` predicate to recover the existing numerical `twistK₀`
+  formula.  This path does not pass through additive `EvaluationData`.
+  Evaluation exactness remains an explicit hypothesis, and no autoequivalence,
+  sphericality, automatic formality, or comparison of the two copower
+  universal properties is claimed.
 - Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
   `DGCategory.LinearCopowerFunctor` packages the universal property as a
   degreewise `homComplexIso`, then uses it to define the homogeneous

@@ -1286,6 +1286,29 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.LinearEvaluationData.compareIso_trans
 #print axioms CategoryTheory.LinearEvaluationData.compare_comp_evaluation
 
+-- The direct scalar-linear object twist is a thin specialization of the
+-- generic cone package.  Choice comparison and exactness reuse the existing
+-- strict-square and cone-preservation interfaces; exactness of evaluation
+-- remains explicit input.  Its generic K₀ formulas give identity minus
+-- evaluation; the numerical spherical-twist specialization is audited by the
+-- spherical-twist slice.
+#print axioms CategoryTheory.LinearEvaluationData.preservesChosenConesOfCompare
+#print axioms CategoryTheory.LinearEvaluationData.compare_evaluation_square
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData
+#print axioms CategoryTheory.LinearEvaluationData.chosenTwistConeData
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twist
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_inv_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val_comp
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesShifts
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesChosenCones
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map
+
 -- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
 -- identity.  Every one of the functor's four laws is `lift_unique` applied to
 -- the cochain each side induces; only `map_d` needs more than associativity,
