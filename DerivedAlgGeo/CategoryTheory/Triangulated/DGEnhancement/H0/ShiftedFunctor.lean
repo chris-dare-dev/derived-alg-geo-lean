@@ -47,7 +47,7 @@ formulas.
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u u'
+universe v vX vY u u' uX uY
 
 namespace CategoryTheory
 
@@ -109,6 +109,38 @@ noncomputable def shiftedFunctorH0Iso (F : DGFunctor C D) (n : ℤ) :
     (F.shiftedFunctor n).h0 ≅
       F.h0 ⋙ CategoryTheory.shiftFunctor (H0 D) n :=
   eqToIso (F.shiftedFunctor_h0_eq n)
+
+section Transport
+
+variable {X : Type uX} {Y : Type uY}
+  [Category.{vX} X] [Category.{vY} Y]
+
+/-- Transporting `H⁰` of a shifted dg functor through ordinary equivalences
+agrees with transporting `H⁰` first and then shifting in the target.
+
+Only the forward target equivalence needs a shift comparison: the shift occurs
+after `H⁰ F`, so no `CommShift` structure is required on the source
+equivalence. -/
+noncomputable def transportedShiftedFunctorH0Iso (F : DGFunctor C D) (n : ℤ)
+    (eC : H0 C ≌ X) (eD : H0 D ≌ Y) [HasShift Y ℤ]
+    [eD.functor.CommShift ℤ] :
+    (eC.inverse ⋙ (F.shiftedFunctor n).h0) ⋙ eD.functor ≅
+      ((eC.inverse ⋙ F.h0) ⋙ eD.functor) ⋙ shiftFunctor Y n :=
+  Functor.isoWhiskerRight
+      (Functor.isoWhiskerLeft eC.inverse (F.shiftedFunctorH0Iso n))
+      eD.functor ≪≫
+    Functor.associator eC.inverse
+      (F.h0 ⋙ shiftFunctor (H0 D) n) eD.functor ≪≫
+    Functor.isoWhiskerLeft eC.inverse
+      (Functor.associator F.h0 (shiftFunctor (H0 D) n) eD.functor) ≪≫
+    (Functor.associator eC.inverse F.h0
+      (shiftFunctor (H0 D) n ⋙ eD.functor)).symm ≪≫
+    Functor.isoWhiskerLeft (eC.inverse ⋙ F.h0)
+      (eD.functor.commShiftIso n) ≪≫
+    (Functor.associator (eC.inverse ⋙ F.h0) eD.functor
+      (shiftFunctor Y n)).symm
+
+end Transport
 
 /-- If `H⁰ F` is an equivalence, then so is `H⁰` of every shifted dg functor.
 

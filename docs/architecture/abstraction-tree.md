@@ -212,6 +212,9 @@ Category
 │  │        │  └─ transportedTwist        unchanged third vertex; pointwise distinguished
 │  │        ├─ presentedUnitTriangle       generic normalization of the transported dg unit cone
 │  │        │  └─ transportedUnitCone     unshifted third vertex; pointwise distinguished
+│  │        ├─ presentedCotwistTriangle    Mathlib inverse rotation of the presented unit triangle
+│  │        │  ├─ transportedCotwist      pointwise `[-1]` shift of the transported unit cone
+│  │        │  └─ transportedCotwistH0Iso transport of the actual shifted dg cone agrees up to iso
 │  │        └─ Fourier--Mukai adapters     existing left/right adjoint-kernel data
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps
