@@ -7,6 +7,17 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Ordinary presentations of dg-adjunction unit triangles (2026-09-13):
+  `DGAdjunction.H0Presentation.unitFirstMapNormalizationData` is the
+  source-side mirror of the counit presentation and reuses the same generic
+  `Triangle.FirstMapNormalizationData` root.  Its `presentedUnitTriangle` has
+  literal first two vertices `𝟭 X` and `F ⋙ G`, literal first map equal to
+  the presented adjunction unit, and the transported unshifted dg unit cone
+  as third vertex; the other two maps and the raw comparison are named.
+  Pointwise distinguishedness requires only that the source equivalence be
+  triangulated.  No inverse rotation, conventional `[-1]` cotwist,
+  Fourier--Mukai comparison, exactness, equivalence, or sphericality is
+  inferred.
 - Ordinary presentations of dg-adjunction counit triangles (2026-09-13):
   `DGAdjunction.H0Presentation.counitFirstMapNormalizationData` feeds the raw
   counit-cone family transported through the target equivalence into the
