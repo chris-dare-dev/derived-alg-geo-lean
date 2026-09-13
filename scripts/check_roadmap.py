@@ -446,9 +446,38 @@ def main(argv):
                       f"issue on an owned milestone -- remove it from the list")
         failures += 1
 
+    # The closing set, read once and used by BOTH rules below ----------------
+    #
+    # RM-08 needs it to ask its question. RM-07 needs it to NOT ask its own:
+    # an issue this pull request closes is still OPEN precisely BECAUSE the
+    # pull request has not merged, so `status: done` disagreeing with an OPEN
+    # issue is the state RM-08 demands, not a defect.
+    #
+    # Without this the two rules are mutually unsatisfiable on any pull request
+    # targeting the default branch that carries a closing keyword: leave the
+    # entry alone and RM-08 fails it, advance the entry and RM-07 fails the
+    # same entry. Both were observed on #1251 on 2026-09-12, the day RM-08
+    # landed. Only the default branch is affected, because GitHub resolves
+    # closing keywords into `closingIssuesReferences` only there -- which is
+    # why the stacked pull requests open at the same time stayed green and the
+    # contradiction did not show up until a main-targeting one ran.
+    closing = None
+    closing_problem = None
+    if pr_number:
+        closing, closing_problem = fetch_closing_issues(pr_number)
+        if closing is None:
+            print(f"note: RM-08 could not read closing issues for "
+                  f"#{pr_number} ({closing_problem}); RM-07 remains the backstop")
+    #: Issues this pull request will close on merge. Empty when there is no
+    #: pull request, or when the lookup failed -- in which case RM-07 judges
+    #: everything exactly as it did before RM-08 existed, which is the safe
+    #: direction: losing the exemption can only make this stricter.
+    closes_on_merge = frozenset(closing or ())
+
     # RM-07 -----------------------------------------------------------------
     judged = unjudged = 0
     inherited = []
+    exempt = []
 
     def rm07(entry_id, detail):
         """Fail, unless this branch did not author the entry.
@@ -472,7 +501,11 @@ def main(argv):
         gh_state = live[n]["state"]
         if status in RM07_DONE_STATUSES:
             judged += 1
-            if gh_state == "OPEN":
+            if gh_state == "OPEN" and n in closes_on_merge:
+                # RM-08's required end state, not a disagreement. The merge
+                # closes #n, and this entry already says so.
+                exempt.append(f"{e['id']}: status={status}, #{n} closes on merge")
+            elif gh_state == "OPEN":
                 rm07(e["id"],
                      f"{e['id']}: roadmap says status={status} but #{n} is "
                      f"OPEN -- either the work is not finished (THE ROADMAP "
@@ -508,11 +541,7 @@ def main(argv):
     # judges both of those, as it did before.
     rm08_checked = 0
     if pr_number:
-        closing, problem = fetch_closing_issues(pr_number)
-        if closing is None:
-            print(f"note: RM-08 could not read closing issues for "
-                  f"#{pr_number} ({problem}); RM-07 remains the backstop")
-        else:
+        if closing is not None:
             by_issue = {e["gh_issue"]: e for e in items if e.get("gh_issue")}
             for n in sorted(closing):
                 e = by_issue.get(n)
@@ -540,6 +569,12 @@ def main(argv):
         print(f"        RM-07: scoped to {len(authored)} entr"
               f"{'y' if len(authored) == 1 else 'ies'} this branch authored "
               f"(base {scope_to})")
+    if exempt:
+        print(f"        RM-07: {len(exempt)} entr"
+              f"{'y' if len(exempt) == 1 else 'ies'} not judged because this "
+              f"pull request closes the issue on merge (RM-08 judges those):")
+        for detail in exempt:
+            print(f"          note  RM-07  {detail}")
     if inherited:
         print(f"        RM-07: {len(inherited)} inherited disagreement(s) NOT "
               f"failed here -- they are `main`'s to fix, and `main`'s own run "
