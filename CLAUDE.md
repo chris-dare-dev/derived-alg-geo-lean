@@ -210,6 +210,57 @@ gate, and CI paths together.
 Read `CONTRIBUTING.md` before creating a new directory or publishing a
 change; it owns the human-facing placement and contribution rules.
 
+## Reading the diff of a stale pull request
+
+**Merge the base branch in before reviewing a diff.** A branch that is behind
+renders every record the base has added since the fork as a DELETION the pull
+request never made. This is an artifact of the two-dot diff GitHub shows, not a
+change anyone wrote.
+
+Observed twice on 2026-09-12. #1268 and #1272 each appeared to delete ~84 lines
+across five `scripts/*Audit*/*.lean` files; after merging their base, each was a
+single file with insertions only and no deletions anywhere. One of the
+"deleted" files, `scripts/StabilityConditionAudit/ExpDivisorial.lean`, existed
+on neither the branch nor its merge base -- the base created it after the fork.
+
+This matters most for the audit record slices, because deleting a record is a
+real defect and the artifact is indistinguishable from it by eye. Those slices
+are NOT trust surface -- `trust-guard.yml` excludes
+`scripts/AlgebraicGeometryAudit/` and `scripts/StabilityConditionAudit/`
+deliberately, since guarding append-only record lists would fire the gate on
+almost every pull request. They are protected instead by `check_audit.py` and
+`check_audit_complete.py`, which run in `ci` and judge the merged tree, where
+the artifact does not exist. So a phantom deletion cannot reach `main`; the cost
+is a reviewer's time and a wrongly rejected pull request.
+
+## The `trust-reviewed` label
+
+`trust-guard.yml` fails any pull request touching `.github/`, `scripts/`
+(minus the two audit-record directories above), `exe/`, `registry/`,
+`DerivedAlgGeoSweep.lean`, `lakefile.toml`, `lake-manifest.json`,
+`lean-toolchain`, `pins.json` or `LICENSE.md`, until a human adds the
+`trust-reviewed` label.
+
+The label asserts that a person read that diff. Never apply it to your own
+change, and never apply it for someone else unless they have said they read it.
+Adding it re-runs the check; `gh run rerun` does NOT, because the job reads the
+label set from the event payload and a rerun replays the original, empty one --
+and its `concurrency` group cancels the real `labeled` run. To re-fire the
+check, remove the label and add it again.
+
+After resolving a merge on a branch that already carries the label, check
+whether the label still covers the diff -- over the guarded paths only, or the
+phantom deletions above will make an unchanged diff look rewritten:
+
+```bash
+diff <(git diff <base> <old-head> -- <guarded paths>) \
+     <(git diff <base> <new-head> -- <guarded paths>)
+```
+
+Identical or smaller means the reviewer approved a superset and the label
+holds. Anything added means it no longer covers the diff: remove it and ask for
+a fresh review.
+
 ## Required verification
 
 **Full verification runs on the self-hosted Windows runners, not on your machine.**
