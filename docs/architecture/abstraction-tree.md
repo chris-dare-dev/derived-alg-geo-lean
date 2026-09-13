@@ -258,6 +258,7 @@ Category
 ├─ GrothendieckPresentation
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
+│  │  ├─ finite biproduct calculus         [⨁ Xᵢ] = Σ [Xᵢ], constant family = n·[X]
 │  │  ├─ Realization := K₀ C →+ A        additive target
 │  │  │  └─ Descends                    commuting realization square
 │  │  └─ EulerForm := K₀ C →+ K₀ C →+ ℤ

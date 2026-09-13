@@ -62,6 +62,15 @@ blocks should normally move it rather than add more declarations beside it.
   open-immersion and relative-perfect consumers use the canonical neutral API.
   The transitional comparison records are removed rather than retained as a
   compatibility shim.
+- Finite-biproduct calculus in triangulated `K₀` (2026-09-12):
+  `Triangulated/GrothendieckGroup/Biproduct.lean` owns the reusable identities
+  `[X ⊞ Y] = [X] + [Y]` and `[⨁ i, X i] = ∑ i, [X i]`, together with
+  the constant-family `nsmul` specialization.  The binary law is exactly
+  Mathlib's distinguished split triangle; the finite law uses Mathlib's
+  finite-type induction and biproduct comparison maps.  This is generic
+  triangulated `K₀` infrastructure, not a copower- or twist-specific
+  formula.  It makes no Euler-characteristic, formality, or scalar-evaluation
+  assertion; those remain downstream consumers.
 - Finite cohomology presentation and scalar-linear copower transport
   (2026-09-12):
   `Homotopy.FiniteCohomologyPresentation` owns the coefficient-side data of an
@@ -162,9 +171,10 @@ blocks should normally move it rather than add more declarations beside it.
   roots now exist, coefficient-complex homotopy invariance is closed, and
   supplied finite cohomology presentations now transport to shifted finite
   biproducts and finite-free homology expands these into `finrank` copies.
-  The scalar-linear Hom-cohomology comparison is now closed.  Automatic
-  formality and the numerical Euler consumer remain the next foundational
-  roots.
+  The scalar-linear Hom-cohomology comparison is now closed, and generic
+  triangulated `K₀` now computes finite biproduct classes.  The next
+  numerical root is the supplied-presentation scalar-copower class formula;
+  automatic formality remains a separate later lane.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under
