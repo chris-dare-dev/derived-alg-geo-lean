@@ -353,6 +353,25 @@ that comparison are instance hypotheses to be discharged by the realization.
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
    and no comparison with those exists.
 
+   The left-adjunction dual twist now reaches this same interface without a
+   parallel abstraction.  `DGAdjunctionDualTwistComparison` swaps the endpoint
+   categories and correspondences and reuses `PresentedUnitComparisonData`
+   through the definitional conversion from the presented left-adjoint kernel
+   to the corresponding right-adjoint datum.  Its semantic
+   `PresentedDualTwistComparisonData` alias exposes the objectwise and supplied
+   natural comparisons, conventional and actual-dg shift compatibility,
+   exactness, and conditional `KernelAutoequivalence` packaging.  The
+   conventional dual twist receives exactly the existing `[-1]` shift; the
+   facade does not construct comparison data, infer equivalence, or add a
+   second `CommShift` structure.  Symmetrically,
+   `DGAdjunctionDualCotwistComparison` reuses the counit/twist comparison for
+   the left-adjunction counit.  Its dual cotwist is the unshifted dg counit
+   cone, so this facade adds no inverse rotation or `[-1]` shift.  It exposes
+   the same objectwise, supplied-natural, shift-compatible, exact, and
+   conditional kernel-autoequivalence layers under dual-cotwist names.  Thus
+   both left-adjunction facades are closed over the two existing comparison
+   roots; neither creates new comparison or shift data.
+
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
    `H⁰`, so `twistH0Equivalence` and `cotwistConeH0Equivalence` make the twist
