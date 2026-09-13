@@ -21,12 +21,13 @@ cotwist triangles, with Mathlib retaining ownership of the sign and shift
 cancellation.  The first component compares the transported dg cotwist object
 with the Fourier--Mukai cotwist object.
 
-The completion chosen by `isoTriangleOfIso₁₂` is made separately at each
-object.  Nothing here proves that these comparisons are natural in the source
-object, independent of either cone choice, exact, or compatible with the
-chosen `CommShift` structures.  In particular, this file constructs no
-functor isomorphism and transfers no equivalence, kernel-presentation, or
-sphericality statement.
+The unconditional completion chosen by `isoTriangleOfIso₁₂` is made
+separately at each object and therefore supplies no naturality.  A separate
+`PresentedUnitComparisonData` interface records a genuinely supplied natural
+cone isomorphism and its two remaining triangle squares; from that input the
+file constructs natural unit- and cotwist-triangle isomorphisms.  It does not
+construct this input, prove independence of either cone choice, or transfer
+exactness, equivalence, kernel-presentation, or sphericality.
 -/
 
 set_option autoImplicit false
@@ -55,10 +56,10 @@ namespace AdjunctionUnitKernelConeData
 variable [IsPretriangulated A]
   [Limits.HasZeroObject X] [HasShift X ℤ] [Preadditive X]
   [∀ n : ℤ, (shiftFunctor X n).Additive] [Pretriangulated X]
-  [eA.functor.CommShift ℤ] [eA.functor.IsTriangulated]
+  [eA.functor.CommShift ℤ]
   [Limits.HasZeroObject W] [HasShift W ℤ] [Preadditive W]
   [∀ n : ℤ, (shiftFunctor W n).Additive] [Pretriangulated W]
-  [e.equiv.functor.CommShift ℤ] [e.equiv.functor.IsTriangulated]
+  [e.equiv.functor.CommShift ℤ]
   (adj : DGAdjunction L R)
   (H : DGAdjunction.H0Presentation (L := L) (R := R) eA eB
     (C.transform P) (C'.transform Q))
@@ -66,6 +67,10 @@ variable [IsPretriangulated A]
   (S : AdjunctionUnitKernelConeData C C' E e P
     (RightAdjointKernelData.ofH0Presentation H adj) D U)
   (hE : E.KernelEvaluationExact)
+
+section Pointwise
+
+variable [eA.functor.IsTriangulated] [e.equiv.functor.IsTriangulated]
 
 /-- At each object, the presented dg unit triangle is noncanonically
 isomorphic to the independently chosen Fourier--Mukai unit triangle.
@@ -133,6 +138,110 @@ noncomputable def transportedDGCotwistObjIso (Z : X) :
     (K.transportedDGCotwist eA).obj Z ≅ S.cotwist.obj Z :=
   (K.transportedCotwistH0Iso (eC := eA)).app Z ≪≫
     S.transportedCotwistObjIso adj H K hE Z
+
+end Pointwise
+
+/-! ### Supplied natural comparison data -/
+
+/-- The genuinely additional data required to supply a separate natural
+unit-cone comparison of the same triangle families considered objectwise
+above.
+
+This is a semantic abbreviation of the generic comparison between two
+first-map normalizations.  It stores a natural isomorphism of the unit-cone
+functors and compatibility with the two remaining triangle maps. -/
+abbrev PresentedUnitComparisonData :=
+  Triangle.FirstMapNormalizationData.ComparisonData
+    (H.unitFirstMapNormalizationData K)
+    (S.normalizationData.firstMapNormalizationData hE)
+
+namespace PresentedUnitComparisonData
+
+variable (N : S.PresentedUnitComparisonData adj H K hE)
+
+/-- Supply a natural comparison of the transported dg and Fourier--Mukai unit
+cones, together with exactly the two triangle-map squares not fixed by the
+common adjunction unit. -/
+def ofConeIso
+    (iso : K.transportedUnitCone eA ≅ S.cotwistCone)
+    (second : H.compositeToTransportedUnitCone K ≫ iso.hom =
+      S.compositeToCotwistCone hE)
+    (third : H.transportedUnitConeToShiftedIdentity K =
+      iso.hom ≫ S.cotwistConeToShiftedIdentity hE) :
+    S.PresentedUnitComparisonData adj H K hE where
+  thirdIso := iso
+  second := second
+  third := third
+
+/-- The supplied comparison data determine a natural isomorphism between the
+presented dg and Fourier--Mukai unit-triangle families. -/
+noncomputable def presentedUnitTriangleIso :
+    H.presentedUnitTriangle K ≅ S.unitTriangleInSource hE :=
+  N.normalizedTriangleIso
+
+/-- The natural unit-triangle comparison is the identity on the identity
+vertex. -/
+@[simp]
+theorem presentedUnitTriangleIso_hom_app_hom₁ (Z : X) :
+    (N.presentedUnitTriangleIso.hom.app Z).hom₁ = 𝟙 Z :=
+  rfl
+
+/-- The natural unit-triangle comparison is the identity on the adjunction
+composite vertex. -/
+@[simp]
+theorem presentedUnitTriangleIso_hom_app_hom₂ (Z : X) :
+    (N.presentedUnitTriangleIso.hom.app Z).hom₂ =
+      𝟙 ((C.transform P ⋙ C'.transform Q).obj Z) :=
+  rfl
+
+/-- The third component of the natural unit-triangle comparison is the
+supplied unit-cone isomorphism. -/
+@[simp]
+theorem presentedUnitTriangleIso_hom_app_hom₃ (Z : X) :
+    (N.presentedUnitTriangleIso.hom.app Z).hom₃ =
+      N.thirdIso.hom.app Z :=
+  rfl
+
+/-- The supplied natural isomorphism between the two unshifted unit-cone
+functors. -/
+noncomputable def transportedUnitConeIso :
+    K.transportedUnitCone eA ≅ S.cotwistCone :=
+  N.thirdIso
+
+/-- Inverse rotation upgrades the natural unit-triangle comparison to a
+natural comparison of the conventional cotwist triangles. -/
+noncomputable def presentedCotwistTriangleIso :
+    H.presentedCotwistTriangle K ≅ S.cotwistTriangleInSource hE :=
+  Functor.isoWhiskerRight N.presentedUnitTriangleIso (invRotate X)
+
+/-- The natural cotwist-triangle comparison is the identity on its identity
+vertex. -/
+@[simp]
+theorem presentedCotwistTriangleIso_hom_app_hom₂ (Z : X) :
+    (N.presentedCotwistTriangleIso.hom.app Z).hom₂ = 𝟙 Z :=
+  rfl
+
+/-- The natural cotwist-triangle comparison is the identity on its adjunction
+composite vertex. -/
+@[simp]
+theorem presentedCotwistTriangleIso_hom_app_hom₃ (Z : X) :
+    (N.presentedCotwistTriangleIso.hom.app Z).hom₃ =
+      𝟙 ((C.transform P ⋙ C'.transform Q).obj Z) :=
+  rfl
+
+/-- The induced natural isomorphism from the conventional transported dg
+cotwist to the Fourier--Mukai cotwist. -/
+noncomputable def transportedCotwistIso :
+    K.transportedCotwist eA ≅ S.cotwist :=
+  Functor.isoWhiskerRight N.presentedCotwistTriangleIso Triangle.π₁
+
+/-- The transport of the actual shifted dg unit cone is naturally isomorphic
+to the Fourier--Mukai cotwist. -/
+noncomputable def transportedDGCotwistIso :
+    K.transportedDGCotwist eA ≅ S.cotwist :=
+  K.transportedCotwistH0Iso (eC := eA) ≪≫ N.transportedCotwistIso
+
+end PresentedUnitComparisonData
 
 end AdjunctionUnitKernelConeData
 

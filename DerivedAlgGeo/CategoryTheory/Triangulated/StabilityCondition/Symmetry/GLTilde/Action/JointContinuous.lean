@@ -165,7 +165,7 @@ theorem norm_actC_sub_div_le (T : Matrix.GLPos (Fin 2) ℝ) (z w : ℂ) (hw : w 
   let D := L - ContinuousLinearMap.id ℝ ℂ
   have hw0 : 0 < ‖w‖ := norm_pos_iff.mpr hw
   have hdecomp : actC T (z + w) - w = L z + D w := by
-    simp only [L, D, actCCLM_apply, map_add, ContinuousLinearMap.sub_apply,
+    simp only [L, D, actCCLM_apply, map_add, sub_apply,
       ContinuousLinearMap.id_apply]
     abel
   rw [hdecomp]
