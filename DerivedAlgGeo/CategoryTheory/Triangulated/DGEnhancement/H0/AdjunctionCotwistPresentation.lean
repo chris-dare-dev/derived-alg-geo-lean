@@ -5,6 +5,7 @@ Released under the MIT license.
 import Mathlib.CategoryTheory.Triangulated.Rotate
 import DerivedAlgGeo.CategoryTheory.Shift.FunctorCategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionConePresentation
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.FunctorTransport
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
 
 /-!
@@ -25,9 +26,13 @@ unit cone.  It also compares this ordinary functor with the transport of the
 actual shifted dg cone.  The comparison reuses `DGFunctor.shiftedFunctorH0Iso`
 and the source equivalence's `CommShift` structure.
 
-No exactness, equivalence, Fourier--Mukai comparison, or sphericality is
-asserted.  Distinguishedness remains pointwise; this is not a distinguished
-triangle in the functor category.
+The canonical pointwise shift and the generic transported-`H⁰` package also
+give an explicit `CommShift` and exactness result.  An ordinary
+autoequivalence is packaged only under the supplied hypothesis that the
+unshifted cone is an equivalence on `H⁰`.  No dg quasi-equivalence,
+Fourier--Mukai comparison, choice independence, or sphericality is inferred.
+Distinguishedness remains pointwise; this is not a distinguished triangle in
+the functor category.
 -/
 
 set_option autoImplicit false
@@ -73,6 +78,90 @@ noncomputable def transportedCotwistH0Iso :
     K.transportedDGCotwist eC ≅ K.transportedCotwist eC :=
   DGFunctor.transportedShiftedFunctorH0Iso
     K.unitCone (-1 : ℤ) eC eC
+
+/-- The coherent shift comparison on the pointwise transported cotwist.
+
+This is the composite of the generic transported-`H⁰` comparison and the
+canonical comparison on the ordinary shift functor. -/
+@[reducible]
+noncomputable def transportedCotwistCommShift [Preadditive X]
+    [∀ n : ℤ, (shiftFunctor X n).Additive] :
+    (K.transportedCotwist eC).CommShift ℤ := by
+  letI : (K.unitCone.transportedH0 eC eC).CommShift ℤ :=
+    K.unitCone.transportedH0CommShift
+  letI : (shiftFunctor X (-1 : ℤ)).CommShift ℤ :=
+    Pretriangulated.shiftFunctorCommShift X (-1 : ℤ)
+  change (K.unitCone.transportedH0 eC eC ⋙
+    shiftFunctor X (-1 : ℤ)).CommShift ℤ
+  infer_instance
+
+omit [IsPretriangulated C] [eC.functor.CommShift ℤ] in
+/-- Equivalence of the unshifted unit cone on `H⁰` makes the conventional
+transported cotwist an ordinary autoequivalence. -/
+theorem transportedCotwist_isEquivalence
+    (hK : K.unitCone.h0.IsEquivalence) :
+    (K.transportedCotwist eC).IsEquivalence := by
+  letI : (K.unitCone.transportedH0 eC eC).IsEquivalence :=
+    K.unitCone.transportedH0_isEquivalence eC eC hK
+  change (K.unitCone.transportedH0 eC eC ⋙
+    shiftFunctor X (-1 : ℤ)).IsEquivalence
+  infer_instance
+
+/-- The ordinary autoequivalence presented by the conventional transported
+cotwist, under an explicit equivalence hypothesis on the unshifted cone. -/
+noncomputable def transportedCotwistEquivalence
+    (hK : K.unitCone.h0.IsEquivalence) : X ≌ X :=
+  (K.unitCone.transportedH0Equivalence eC eC hK).trans
+    (shiftEquiv X (-1 : ℤ))
+
+section Exact
+
+variable [Limits.HasZeroObject X] [Preadditive X]
+  [∀ n : ℤ, (shiftFunctor X n).Additive] [Pretriangulated X]
+  [eC.functor.IsTriangulated]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The conventional transported cotwist is triangulated.  Exactness of the
+shifted cone is unconditional in the cone choice; the ordinary comparison
+equivalence must be supplied as triangulated. -/
+theorem transportedCotwistIsTriangulated :
+    letI : (K.transportedCotwist eC).CommShift ℤ :=
+      K.transportedCotwistCommShift (eC := eC)
+    (K.transportedCotwist eC).IsTriangulated := by
+  letI : (K.unitCone.transportedH0 eC eC).CommShift ℤ :=
+    K.unitCone.transportedH0CommShift
+  letI : (K.unitCone.transportedH0 eC eC).IsTriangulated :=
+    K.unitCone.transportedH0IsTriangulated
+  letI : (shiftFunctor X (-1 : ℤ)).CommShift ℤ :=
+    Pretriangulated.shiftFunctorCommShift X (-1 : ℤ)
+  letI : (shiftFunctor X (-1 : ℤ)).IsTriangulated :=
+    Pretriangulated.shiftFunctorIsTriangulated X (-1 : ℤ)
+  change (K.unitCone.transportedH0 eC eC ⋙
+    shiftFunctor X (-1 : ℤ)).IsTriangulated
+  infer_instance
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Under the explicit equivalence hypothesis, the transported cotwist
+equivalence carries Mathlib's canonical triangulated-equivalence package. -/
+theorem transportedCotwistEquivalenceIsTriangulated
+    (hK : K.unitCone.h0.IsEquivalence) :
+    letI : (K.transportedCotwistEquivalence (eC := eC) hK).functor.CommShift ℤ :=
+      K.transportedCotwistCommShift (eC := eC)
+    letI : (K.transportedCotwistEquivalence (eC := eC) hK).inverse.CommShift ℤ :=
+      (K.transportedCotwistEquivalence (eC := eC) hK).commShiftInverse ℤ
+    letI : (K.transportedCotwistEquivalence (eC := eC) hK).CommShift ℤ :=
+      (K.transportedCotwistEquivalence (eC := eC) hK).commShift_of_functor ℤ
+    (K.transportedCotwistEquivalence (eC := eC) hK).IsTriangulated := by
+  letI : (K.transportedCotwistEquivalence (eC := eC) hK).functor.CommShift ℤ :=
+    K.transportedCotwistCommShift (eC := eC)
+  letI : (K.transportedCotwistEquivalence (eC := eC) hK).inverse.CommShift ℤ :=
+    (K.transportedCotwistEquivalence (eC := eC) hK).commShiftInverse ℤ
+  letI : (K.transportedCotwistEquivalence (eC := eC) hK).CommShift ℤ :=
+    (K.transportedCotwistEquivalence (eC := eC) hK).commShift_of_functor ℤ
+  exact Equivalence.IsTriangulated.mk' _
+    (K.transportedCotwistIsTriangulated (eC := eC))
+
+end Exact
 
 end UnitConeData
 

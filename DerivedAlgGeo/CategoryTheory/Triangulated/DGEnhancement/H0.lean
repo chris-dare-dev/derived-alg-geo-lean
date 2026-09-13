@@ -9,6 +9,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.LinearEvaluati
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.LinearObjectTwist
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.LinearObjectTwistAdjunction
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.LinearObjectTwistK0
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.FunctorTransport
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionCone
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionConePresentation
@@ -28,5 +29,6 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.MorphismCone
 Shifts and distinguished triangles on `H⁰` induced by pretriangulated dg
 structure, the functorial dg cone diagrams they carry, presentation of dg
 adjunction counit, unit, and conventional cotwist triangles on equivalent
-ordinary categories, and the transport of dg-functor capabilities to `H⁰`.
+ordinary categories, and the transport of dg-functor capabilities through
+`H⁰` and ordinary equivalences.
 -/
