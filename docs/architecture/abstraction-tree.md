@@ -248,6 +248,10 @@ Category
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
 │  │        │  ├─ triangleIsoOfStrictSquare  endpoint isos give a NatIso
 │  │        │  └─ compareIso             the cone choices do not matter, canonically
+│  │        ├─ inverseRotateFirstH0     first maps of inverse-rotated cone triangles
+│  │        ├─ shiftedFstH0            H⁰ of the source-regraded degree-one projection
+│  │        ├─ shiftedFstH0_eq         equality through shiftedFunctorH0Iso and packaged
+│  │        │                           `[1][-1]` cancellation
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
 │  │           └─ twistTriangleFunctor   H⁰ D ⥤ Triangle (H⁰ D), all distinguished
 │  ├─ H0 C

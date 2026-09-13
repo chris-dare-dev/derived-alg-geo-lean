@@ -528,6 +528,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.H0.shiftFunctorZero_eq
 #print axioms CategoryTheory.H0.shiftFunctorAdd_eq
 #print axioms CategoryTheory.H0.shiftFunctorAdd'_eq_shiftFunctorAddIso'
+#print axioms CategoryTheory.H0.shiftFunctorCompIsoId_hom_app
 #print axioms CategoryTheory.H0.shiftFunctorComm_hom_app
 
 -- The model shift is Mathlib's shift (dg-enhancements-e7). Stated first on plain
@@ -1080,6 +1081,15 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleFunctor_map_hom₂
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleFunctor_map_hom₃
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleFunctor_obj_mem_distinguishedTriangles
+
+-- Inverse rotation of a dg cone triangle reads its first map through the
+-- source-regraded degree-one cone projection.  The two conventional minus
+-- signs cancel, and Mathlib's packaged `[1][-1]` comparison is computed by
+-- the H⁰ shift witness rather than by a second cone-specific normalization.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inverseRotateFirstH0
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.shiftedFstH0
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inverseRotateFirstH0_app_eq_shiftedFstH0
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.shiftedFstH0_eq
 
 -- Naturality of that functor in the transformation.  A strictly commuting
 -- square of closed degree-zero dg natural transformations gives a natural

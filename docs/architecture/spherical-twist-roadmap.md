@@ -61,7 +61,7 @@ IsConeOf
          │  twist candidate is a cone OF FUNCTORS, the form in which
          │  Anno--Logvinenko state SR ⟶ Id_B ⟶ T
          ├─ isoOfStrictSquare: the generic cone isomorphism in Z⁰(DGFunctor C D)
-         └─ triangleFunctor: H⁰ C ⥤ Triangle (H⁰ D), every value distinguished;
+         ├─ triangleFunctor: H⁰ C ⥤ Triangle (H⁰ D), every value distinguished;
             the third square is the connecting map, carried by IsConeOf.Morphism
             ├─ triangleNatTrans: natural in a STRICT square of closed
             │  degree-zero transformations; the cone lifts are natural on the
@@ -71,6 +71,11 @@ IsConeOf
             │  comparison to a natural isomorphism of triangle functors
             └─ compareIso: two ConeData for one transformation give canonically
                isomorphic triangle functors, so the cone choices do not matter
+         └─ inverse-rotation/source-regrading coherence
+            ├─ inverseRotateFirstH0: the inverse-rotated first maps as a NatTrans
+            ├─ shiftedFstH0: H⁰ of the regraded closed degree-one projection
+            └─ shiftedFstH0_eq: equality through shiftedFunctorH0Iso and the
+               packaged `[1][-1]` cancellation
 
 DGAdjunction
 ├─ closed unit and counit
@@ -184,6 +189,11 @@ EnhancedAdjunctionCones
 │  ├─ `L T[-1] ⟶ R`, from the regraded twist-cone projection and left counit
 │  └─ `R ⟶ C L`, from the left unit and cotwist-cone inclusion
 │     └─ both descend to named H⁰ maps
+├─ generic inverse-rotation/source-regrading coherence
+│  ├─ `inverseRotateFirstH0`: first maps of inverse-rotated cone triangles
+│  ├─ `shiftedFstH0`: H⁰ of the regraded closed degree-one projection
+│  └─ equality through `shiftedFunctorH0Iso`, using packaged `[1][-1]`
+│     cancellation and no new cone-specific sign choice
 ├─ AdjointComparisonConditions
 │  └─ Mathlib IsIso on those canonical H⁰ maps, with asIso accessors
 └─ TwistCotwistEquivalenceConditions
@@ -290,6 +300,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    the selected `[-1]` functor shift; no new shift instance or sign convention
    is introduced.
 
+   Inverse rotation now consumes that interface generically.
+   `H0.shiftFunctorCompIsoId_hom_app` exposes the dg-witness representative of
+   Mathlib's packaged cancellation, and
+   `ConeData.inverseRotateFirstH0_app_eq_shiftedFstH0` proves that the first map
+   of the inverse-rotated cone triangle is the source-regraded projection.  The
+   minus sign in `coneTriangle.mor₃` cancels the minus sign in `invRotate`, and
+   `ConeData.shiftedFstH0_eq` states the result as an equality of natural
+   transformations through `shiftedFunctorH0Iso`.  This is a cone-generic
+   coherence theorem, not another adjunction comparison.
+
    At the `H⁰`
    boundary, `shiftedFunctorH0Iso_commShift` additionally proves that the
    package constructed directly from `F[n]` agrees with the composite package
@@ -320,6 +340,13 @@ that comparison are instance hypotheses to be discharged by the realization.
    conventional shifted-target form of the same cotwist condition.  It does
    not accept unrelated natural isomorphisms.  No `IsIso` conclusion follows
    from construction or from `TwistCotwistEquivalenceConditions`.
+
+   The next comparison seam is to express `twistAdjointComparison_h0` as the
+   left-counit composite of the generic inverse-rotated first map.  Doing that
+   without object-level coercion bookkeeping needs reusable component and
+   naturality laws for `DGFunctor.h0CompIso` and for descent through dg
+   whiskering; those laws belong at the `H⁰` functoriality root before the
+   adjunction specialization.
 
    `DGAdjunction.h0` now compares a dg adjunction with an
    ordinary one on `H⁰`.  `DGAdjunction.H0Presentation` further conjugates

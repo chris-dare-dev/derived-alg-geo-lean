@@ -487,6 +487,18 @@ blocks should normally move it rather than add more declarations beside it.
   The conventional `[-1]` dual twist and cotwist now reuse this root, and their
   exactness wrappers require no endpoint witnesses.  This proves no dg
   quasi-equivalence, cone relation, or sphericality.
+- Inverse-rotated dg cone projection coherence (2026-09-13):
+  `H0.shiftFunctorCompIsoId_hom_app` computes Mathlib's packaged cancellation
+  of an integral shift pair using the composite dg shift witness.
+  `ConeData.inverseRotateFirstH0` assembles the first maps of the objectwise
+  inverse-rotated cone triangles into a natural transformation, while
+  `ConeData.shiftedFstH0` descends the source-regraded closed degree-one cone
+  projection.  Their equality through `shiftedFunctorH0Iso` proves that the
+  cone-triangle and inverse-rotation minus signs cancel and that the remaining
+  `[1][-1]` cancellation is exactly the existing `HasShift` comparison.  No
+  adjunction, exactness, invertibility, or sphericality is inferred.  The
+  adjunction specialization remains downstream of reusable `h0CompIso` and
+  dg-whiskering descent laws.
 - Sign-correct exactness of integral shift functors (2026-09-12):
   `Triangulated.ShiftFunctor` now owns the explicit Koszul-signed `CommShift`
   on `[n]`, its comparison with `Triangle.shiftFunctor`, and
