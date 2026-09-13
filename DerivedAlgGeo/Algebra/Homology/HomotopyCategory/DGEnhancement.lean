@@ -9,6 +9,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.CommShift
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.Enhancement
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.Agreement
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearCopower
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.FiniteCohomologyCopower
 
 /-!
 # The dg enhancement of the homotopy category

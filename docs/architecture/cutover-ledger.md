@@ -27,6 +27,20 @@ blocks should normally move it rather than add more declarations beside it.
   open-immersion and relative-perfect consumers use the canonical neutral API.
   The transitional comparison records are removed rather than retained as a
   compatibility shim.
+- Finite cohomology presentation and scalar-linear copower transport
+  (2026-09-12):
+  `Homotopy.FiniteCohomologyPresentation` owns the coefficient-side data of an
+  explicit homotopy equivalence to a finite biproduct of single homology
+  objects.  Its shifted normal form reuses Mathlib's `singleFunctors.shiftIso`,
+  with a degree-`i` single identified as a degree-zero single shifted by `-i`.
+  `DGEnhancement.FiniteCohomologyCopower` transports this presentation through
+  `linearCopowerFunctor`: generic additivity of `DGFunctor.h0` and `Cdg.toH0`
+  lets Mathlib supply finite-biproduct preservation, and
+  `SingleFunctors.postcomp` supplies the coherent shifted family.  No new
+  direct-sum or shift interface is introduced.  This root assumes the actual
+  `HomotopyEquiv`; it proves no automatic formality, quasi-isomorphism
+  invariance, basis/finrank expansion, Hom-cohomology comparison, Euler/K₀
+  formula, cone preservation, or concrete `HasLinearCopowers` instance.
 - Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
   `DGCategory.LinearCopowerFunctor` packages the universal property as a
   degreewise `homComplexIso`, then uses it to define the homogeneous
@@ -84,9 +98,11 @@ blocks should normally move it rather than add more declarations beside it.
   This capability is supplied realization input, not a consequence of the
   present additive `IsCopowerOf`, which represents ℤ-additive rather than
   `k`-linear cochains.  The separate scalar-linear copower and evaluation
-  roots now exist, and coefficient-complex homotopy invariance is closed;
-  relating that parallel evaluation package to the numerical consumer and
-  giving a finite cohomology presentation are the next foundational roots.
+  roots now exist, coefficient-complex homotopy invariance is closed, and
+  supplied finite cohomology presentations now transport to shifted finite
+  biproducts. Automatic formality and finite-dimensional basis data, the
+  scalar-linear Hom-cohomology comparison, and the numerical Euler consumer
+  remain the next foundational roots.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under

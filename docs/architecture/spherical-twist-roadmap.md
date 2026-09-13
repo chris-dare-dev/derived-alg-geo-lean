@@ -383,11 +383,20 @@ that comparison are instance hypotheses to be discharged by the realization.
    wrapper through the existing `Cdg.h0Functor` seam lives in
    `HomotopyCategory.DGEnhancement.LinearCopower`.  This is not
    quasi-isomorphism invariance.
+   `CochainComplex.FiniteCohomologyPresentation` now records an explicit
+   homotopy equivalence to a finite biproduct of single homology objects, and
+   normalizes that model to degree-zero singles shifted by `-i` using
+   Mathlib's `SingleFunctors.shiftIso`.  The DG-facing
+   `FiniteCohomologyPresentation.linearCopowerIso` transports this data
+   through `linearCopowerFunctor`, using ordinary additivity to preserve the
+   finite biproduct and the established coherent shift comparison.  Thus the
+   shifted finite-sum presentation seam is closed for supplied formality data.
    The parallel linear evaluation package still does not discharge the
    existing additive `EvaluationData.IsEulerCopower`; a later lane must
    formulate its numerical consumer directly or accept explicit comparison
-   data.  The Euler realization (initially over a field) still needs a finite
-   cohomology presentation as shifted finite sums.
+   data.  Automatic formality, finite-dimensional basis expansion, the
+   scalar-linear comparison between Hom-complex cohomology and shifted `H⁰`
+   morphisms, and the Euler/K₀ realization all remain open.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies either a `HasCopowers` instance for the additive interface or a
