@@ -134,8 +134,8 @@ CategoryTheory/Triangulated
   ├─→ FourierMukai                            generic kernel autoequivalences;
   │                                           kernels vary through `kernelTransform`,
   │                                           enhanced cones map pointwise to transform triangles;
-  │                                           consumes presented dg adjunction triangles only
-  │                                           through explicit objectwise comparison
+  │                                           consumes presented dg adjunction triangles through
+  │                                           objectwise comparison and supplied natural contracts
   ├─→ Families                                pseudofunctorial fiber categories
   ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation,
   │                                           functorial distinguished cone triangles and

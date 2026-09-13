@@ -19,11 +19,13 @@ Mathlib's `isoTriangleOfIso₁₂` supplies a noncanonical isomorphism between
 the two triangles at each target object.  Its third component compares the
 ordinary transport of the actual dg twist with the Fourier--Mukai twist.
 
-The completion is chosen separately at each object.  Nothing here proves that
-these comparisons are natural in the target object, independent of either
-cone choice, exact, or compatible with chosen `CommShift` structures.  In
-particular, this file constructs no functor isomorphism and transfers no
-equivalence, kernel-presentation, or sphericality statement.
+The unconditional completion is chosen separately at each object and
+therefore supplies no naturality.  A separate `PresentedCounitComparisonData`
+interface records a genuinely supplied natural twist isomorphism and its two
+remaining triangle squares; from that input the file constructs the natural
+counit-triangle isomorphism.  It does not construct this input, prove
+independence of either cone choice, or transfer exactness, equivalence,
+kernel-presentation, or sphericality.
 -/
 
 set_option autoImplicit false
@@ -52,10 +54,10 @@ namespace CounitKernelConeData
 variable [IsPretriangulated B]
   [Limits.HasZeroObject Y] [HasShift Y ℤ] [Preadditive Y]
   [∀ n : ℤ, (shiftFunctor Y n).Additive] [Pretriangulated Y]
-  [eB.functor.CommShift ℤ] [eB.functor.IsTriangulated]
+  [eB.functor.CommShift ℤ]
   [Limits.HasZeroObject W] [HasShift W ℤ] [Preadditive W]
   [∀ n : ℤ, (shiftFunctor W n).Additive] [Pretriangulated W]
-  [e.equiv.functor.CommShift ℤ] [e.equiv.functor.IsTriangulated]
+  [e.equiv.functor.CommShift ℤ]
   (adj : DGAdjunction L R)
   (H : DGAdjunction.H0Presentation (L := L) (R := R) eA eB
     (C.transform P) (C'.transform Q))
@@ -63,6 +65,10 @@ variable [IsPretriangulated B]
   (S : CounitKernelConeData C C' E e P
     (RightAdjointKernelData.ofH0Presentation H adj) D U)
   (hE : E.KernelEvaluationExact)
+
+section Pointwise
+
+variable [eB.functor.IsTriangulated] [e.equiv.functor.IsTriangulated]
 
 /-- At each target object, the presented dg counit triangle is noncanonically
 isomorphic to the independently chosen Fourier--Mukai counit triangle.
@@ -97,6 +103,77 @@ actual dg twist and the Fourier--Mukai twist. -/
 noncomputable def transportedTwistObjIso (Z : Y) :
     (K.transportedTwist eB).obj Z ≅ S.twist.obj Z :=
   Triangle.π₃.mapIso (S.presentedCounitTriangleObjIso adj H K hE Z)
+
+end Pointwise
+
+/-! ### Supplied natural comparison data -/
+
+/-- The genuinely additional data required to supply a separate natural
+counit-cone comparison of the same triangle families considered objectwise
+above.
+
+This is a semantic abbreviation of the generic comparison between two
+first-map normalizations.  It stores a natural isomorphism of the twist
+functors and compatibility with the two remaining triangle maps. -/
+abbrev PresentedCounitComparisonData :=
+  Triangle.FirstMapNormalizationData.ComparisonData
+    (H.counitFirstMapNormalizationData K)
+    (S.normalizationData.firstMapNormalizationData hE)
+
+namespace PresentedCounitComparisonData
+
+variable (N : S.PresentedCounitComparisonData adj H K hE)
+
+/-- Supply a natural comparison of the transported dg and Fourier--Mukai
+twists, together with exactly the two triangle-map squares not fixed by the
+common adjunction counit. -/
+def ofTwistIso
+    (iso : K.transportedTwist eB ≅ S.twist)
+    (second : H.counitToTransportedTwist K ≫ iso.hom =
+      S.counitToTwist hE)
+    (third : H.transportedTwistToShiftedComposite K =
+      iso.hom ≫ S.twistToShiftedComposite hE) :
+    S.PresentedCounitComparisonData adj H K hE where
+  thirdIso := iso
+  second := second
+  third := third
+
+/-- The supplied comparison data determine a natural isomorphism between the
+presented dg and Fourier--Mukai counit-triangle families. -/
+noncomputable def presentedCounitTriangleIso :
+    H.presentedCounitTriangle K ≅ S.counitTriangleInSource hE :=
+  N.normalizedTriangleIso
+
+/-- The natural counit-triangle comparison is the identity on the adjunction
+composite vertex. -/
+@[simp]
+theorem presentedCounitTriangleIso_hom_app_hom₁ (Z : Y) :
+    (N.presentedCounitTriangleIso.hom.app Z).hom₁ =
+      𝟙 ((C'.transform Q ⋙ C.transform P).obj Z) :=
+  rfl
+
+/-- The natural counit-triangle comparison is the identity on the identity
+vertex. -/
+@[simp]
+theorem presentedCounitTriangleIso_hom_app_hom₂ (Z : Y) :
+    (N.presentedCounitTriangleIso.hom.app Z).hom₂ = 𝟙 Z :=
+  rfl
+
+/-- The third component of the natural counit-triangle comparison is the
+supplied twist isomorphism. -/
+@[simp]
+theorem presentedCounitTriangleIso_hom_app_hom₃ (Z : Y) :
+    (N.presentedCounitTriangleIso.hom.app Z).hom₃ =
+      N.thirdIso.hom.app Z :=
+  rfl
+
+/-- The induced natural isomorphism from the transported actual dg twist to
+the Fourier--Mukai twist. -/
+noncomputable def transportedTwistIso :
+    K.transportedTwist eB ≅ S.twist :=
+  Functor.isoWhiskerRight N.presentedCounitTriangleIso Triangle.π₃
+
+end PresentedCounitComparisonData
 
 end CounitKernelConeData
 

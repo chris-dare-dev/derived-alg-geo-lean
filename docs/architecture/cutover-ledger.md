@@ -7,6 +7,20 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Supplied natural comparison of dg and Fourier--Mukai adjunction cones
+  (2026-09-13): `Triangle.FirstMapNormalizationData.ComparisonData` records the
+  remaining data for an endpoint-strict comparison of two normalizations with
+  the same first two vertices and first map: a natural third-vertex isomorphism
+  and the two remaining map squares.  It fixes the endpoint components to
+  identities and delegates the resulting triangle-family isomorphism to
+  Mathlib's `Triangle.functorIsoMk'`.  The Fourier--Mukai aliases
+  `PresentedUnitComparisonData` and `PresentedCounitComparisonData` specialize
+  this contract to the independently chosen dg and kernel cones; they derive
+  natural unit/counit and twist/cotwist comparisons, including the actual
+  shifted dg cotwist.  The records are supplied and are not inferred from the
+  earlier pointwise choices.  No canonicity, `CommShift` compatibility,
+  exactness/equivalence transfer, dg kernel identification, or sphericality is
+  asserted.
 - Objectwise dg/Fourier--Mukai twist comparison (2026-09-13):
   `CounitKernelConeData.presentedCounitTriangleObjIso` applies Mathlib's
   triangle-isomorphism completion theorem to the presented dg and independently

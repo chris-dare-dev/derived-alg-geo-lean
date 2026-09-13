@@ -250,7 +250,8 @@ Category
 │        └─ coneTriangleFunctor          dg cones read in `T` through the equivalence
 ├─ Triangle.FirstMapNormalizationData     raw endpoint isos plus a named first-map square
 │  ├─ normalizedTriangle                 literal first two vertices and literal first map
-│  └─ rawIsoNormalized                   natural triangle comparison; third component identity
+│  ├─ rawIsoNormalized                   natural triangle comparison; third component identity
+│  └─ ComparisonData                     third-vertex iso + remaining squares over identity endpoints
 ├─ Fourier--Mukai correspondence
 │  ├─ kernelTransform                     functor from kernels to transforms
 │  ├─ kernelEvaluation                    one source object's kernel-variable functor
@@ -271,7 +272,7 @@ Category
 │     │     ├─ twistKernel                           ordinary image of the selected dg cone
 │     │     ├─ kernel-presented twist candidate       exact image of its dg cone
 │     │     ├─ counitTriangleInSource                literal counit triangle, pointwise distinguished
-│     │     └─ presented dg comparison               noncanonical objectwise triangle/twist isos
+│     │     └─ presented dg comparison               objectwise choice or supplied natural contract
 │     ├─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
 │     │  └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
 │     │     ├─ unshifted cotwist-cone candidate       exact image of its dg cone
@@ -279,7 +280,7 @@ Category
 │     │     ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
 │     │     ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
 │     │     ├─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
-│     │     └─ presented dg comparison               noncanonical objectwise triangle/cotwist isos
+│     │     └─ presented dg comparison               objectwise choice or supplied natural contract
 │     ├─ DualTwistKernelData              left-adjunction unit specialization after swapping
 │     │  └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
 │     │     ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
