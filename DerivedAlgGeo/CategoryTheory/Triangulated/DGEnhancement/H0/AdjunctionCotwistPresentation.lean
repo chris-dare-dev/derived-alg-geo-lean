@@ -27,7 +27,8 @@ actual shifted dg cone.  The comparison reuses `DGFunctor.shiftedFunctorH0Iso`
 and the source equivalence's `CommShift` structure.
 
 The canonical pointwise shift and the generic transported-`H⁰` package also
-give an explicit `CommShift` and exactness result.  An ordinary
+give an explicit `CommShift` and exactness result.  Their comparison with the
+actual shifted dg cone respects these canonical shift packages.  An ordinary
 autoequivalence is packaged only under the supplied hypothesis that the
 unshifted cone is an equivalence on `H⁰`.  No dg quasi-equivalence,
 Fourier--Mukai comparison, choice independence, or sphericality is inferred.
@@ -94,6 +95,19 @@ noncomputable def transportedCotwistCommShift [Preadditive X]
   change (K.unitCone.transportedH0 eC eC ⋙
     shiftFunctor X (-1 : ℤ)).CommShift ℤ
   infer_instance
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The comparison from the actual shifted dg unit cone to the conventional
+pointwise cotwist respects their canonical sign-correct shift packages. -/
+theorem transportedCotwistH0Iso_commShift [Preadditive X]
+    [∀ n : ℤ, (shiftFunctor X n).Additive] [eC.functor.Additive] :
+    letI : (K.transportedDGCotwist eC).CommShift ℤ :=
+      (K.unitCone.shiftedFunctor (-1 : ℤ)).transportedH0CommShift
+    letI : (K.transportedCotwist eC).CommShift ℤ :=
+      K.transportedCotwistCommShift (eC := eC)
+    NatTrans.CommShift (K.transportedCotwistH0Iso (eC := eC)).hom ℤ := by
+  exact DGFunctor.transportedShiftedFunctorH0Iso_commShift
+    K.unitCone (-1 : ℤ) eC eC
 
 omit [IsPretriangulated C] [eC.functor.CommShift ℤ] in
 /-- Equivalence of the unshifted unit cone on `H⁰` makes the conventional
