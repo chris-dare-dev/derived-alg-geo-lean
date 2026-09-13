@@ -280,13 +280,21 @@ that comparison are instance hypotheses to be discharged by the realization.
    the resulting adjunction into the existing kernel-adjunction interfaces;
    their correspondence-swap comparisons are definitional.  They still
    construct no kernel or kernel arrow.  The endpoint-normalization operation
-   needed by the next cone bridge is now the generic
+   is the generic
    `Triangle.FirstMapNormalizationData`: it replaces the first two projections
    of any triangle-valued functor and makes a compatible first map literal.
-   The remaining bridge must construct that data for the transported dg
-   counit triangle; no new normalization proof belongs there.  The dg notion
-   is still the strict one: Anno--Logvinenko work with homotopy adjunctions of
-   bimodules, and no comparison with those exists.
+   `DGAdjunction.H0Presentation.counitFirstMapNormalizationData` now supplies
+   that interface for the transported dg counit triangle.  Its normalized
+   family has literal vertices `G ⋙ F`, `𝟭 Y`, and the transported dg
+   twist, with literal first map `(P.toAdjunction A).counit`; the remaining two
+   maps are named natural transformations, and the raw and presented families
+   are naturally isomorphic.  Pointwise distinguishedness uses only the
+   target equivalence's triangulatedness.  Thus the generic ordinary
+   dg-counit-cone bridge is closed.  It does not identify this transported dg
+   twist with an independently chosen Fourier--Mukai cone, make the twist
+   exact, or assert autoequivalence or sphericality.  The dg notion is still
+   the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
+   and no comparison with those exists.
 
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
@@ -613,9 +621,11 @@ that comparison are instance hypotheses to be discharged by the realization.
    and exposes
    `Φ_P ⋙ Φ_Q ⟶ 𝟭_X ⟶ dualCotwist ⟶ (Φ_P ⋙ Φ_Q)⟦1⟧` pointwise,
    again without new cone machinery.  Pointwise distinguishedness cannot
-   supply `CommShift` or `IsTriangulated` for either shifted cone functor, and
-   no comparison with the corresponding dg-adjunction cone is available;
-   those later seams remain explicit.
+   supply `CommShift` or `IsTriangulated` for either shifted cone functor.
+   The corresponding dg-adjunction counit triangle now has an ordinary
+   presentation through `DGAdjunction.H0Presentation`, but no comparison
+   identifies its transported dg cone with an independently selected
+   Fourier--Mukai cone; that later seam remains explicit.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.

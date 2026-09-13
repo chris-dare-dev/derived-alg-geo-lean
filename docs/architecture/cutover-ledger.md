@@ -7,6 +7,18 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Ordinary presentations of dg-adjunction counit triangles (2026-09-13):
+  `DGAdjunction.H0Presentation.counitFirstMapNormalizationData` feeds the raw
+  counit-cone family transported through the target equivalence into the
+  generic `Triangle.FirstMapNormalizationData` root.  The resulting
+  `presentedCounitTriangle` has literal first two vertices `G ⋙ F` and
+  `𝟭 Y`, literal first map equal to the presented adjunction counit, and the
+  transported dg twist as its unchanged third vertex; the second and
+  connecting maps have semantic natural-transformation names.  A natural
+  triangle isomorphism compares the raw and normalized families, and
+  pointwise distinguishedness requires only that the target equivalence be
+  triangulated.  No unit-side mirror, comparison with an independently chosen
+  Fourier--Mukai cone, exactness, autoequivalence, or sphericality is inferred.
 - Fourier--Mukai presentations of strict dg adjunctions (2026-09-13):
   `RightAdjointKernelData.ofH0Presentation` and its left-adjoint mirror spend
   the generic equivalence-transported `DGAdjunction.H0Presentation` on the
