@@ -58,6 +58,23 @@ namespace KFlatBaseChangeData
 
 namespace SourceTensorData
 
+/-- For a fixed source object, the base-variable action functor: pull back
+from `S` to `X`, then tensor on the right. -/
+noncomputable def dqcBaseActionInBase
+    (Q : D.SourceTensorData)
+    (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
+    (F : SourceDqc X) : BaseDqc S ⥤ SourceDqc X :=
+  pullBase.functor ⋙ Q.derivedTensor.obj F
+
+@[simp]
+theorem dqcBaseActionInBase_obj
+    (Q : D.SourceTensorData)
+    (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
+    (F : SourceDqc X) (B : BaseDqc S) :
+    (dqcBaseActionInBase (D := D) Q pullBase F).obj B =
+      (Q.derivedTensor.obj F).obj (pullBase.functor.obj B) :=
+  rfl
+
 /-- The action of an arbitrary quasicoherent base object on `Dqc(X)`: pull
 it back along `X → S`, then tensor by it on the right. -/
 noncomputable def dqcBaseAction
@@ -112,6 +129,69 @@ def DqcSLinearComponents
   ∀ ⦃j : ι⦄ (F : SourceDqc X), A.component j F →
     ∀ B : BaseDqc S,
       A.component j ((dqcBaseAction (D := D) Q pullBase B).obj F)
+
+/-- Presentability data needed to extend the compact base action to all of
+`Dqc(S)`.
+
+The base is generated from compact objects by coproducts and extensions, and
+for each fixed source object the action in the base variable is exact and
+preserves the relevant small coproducts. -/
+structure PresentableBaseActionData
+    (Q : D.SourceTensorData)
+    (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X)) where
+  /-- Compact objects generate `Dqc(S)` under coproducts and extensions. -/
+  baseGenerated :
+    (ObjectProperty.compactObjects.{u} (C := BaseDqc S)).coprodClosure.{u} = ⊤
+  /-- The action in the base variable commutes with shifts. -/
+  actionCommShift (F : SourceDqc X) :
+    (dqcBaseActionInBase (D := D) Q pullBase F).CommShift ℤ
+  /-- The action in the base variable is triangulated. -/
+  actionTriangulated (F : SourceDqc X) :
+    (dqcBaseActionInBase (D := D) Q pullBase F).IsTriangulated
+  /-- The action in the base variable preserves scheme-universe coproducts. -/
+  actionCocontinuous (F : SourceDqc X) :
+    (dqcBaseActionInBase (D := D) Q pullBase F).PreservesSmallCoproducts.{u}
+
+namespace PresentableBaseActionData
+
+/-- Perf(S)-linearity extends to Dqc(S)-linearity when compact objects
+generate the base and the base action preserves triangles and coproducts. -/
+theorem dqcSLinearComponents
+    (Q : D.SourceTensorData)
+    (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
+    (G : PresentableBaseActionData (D := D) Q pullBase)
+    (A : SemiorthogonalSequence (SourceDqc X) ι)
+    (hA : A.HasTriangulatedComponents)
+    (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
+    (hCoprod : ∀ j (κ : Type u),
+      (A.component j).IsClosedUnderColimitsOfShape (Discrete κ))
+    (hS : SLinearComponents (D := D) Q pullBase A) :
+    DqcSLinearComponents (D := D) Q pullBase A := by
+  intro j F hF B
+  let action := dqcBaseActionInBase (D := D) Q pullBase F
+  letI : action.CommShift ℤ := G.actionCommShift F
+  letI : action.IsTriangulated := G.actionTriangulated F
+  letI : (A.component j).IsTriangulated := hA j
+  letI : (A.component j).IsClosedUnderIsomorphisms := hIso j
+  letI (κ : Type u) :
+      (A.component j).IsClosedUnderColimitsOfShape (Discrete κ) :=
+    hCoprod j κ
+  have hB :
+      (ObjectProperty.compactObjects.{u} (C := BaseDqc S)).coprodClosure.{u} B := by
+    rw [G.baseGenerated]
+    trivial
+  have hMap :=
+    (ObjectProperty.compactObjects.{u} (C := BaseDqc S)).coprodClosure_map_obj
+      action (G.actionCocontinuous F) hB
+  change A.component j (action.obj B)
+  exact ((ObjectProperty.compactObjects.{u} (C := BaseDqc S)).map action).coprodClosure_le
+    (Q := A.component j) (fun E hE ↦ by
+      rcases hE with ⟨C, hC, ⟨e⟩⟩
+      exact (A.component j).prop_of_iso e
+        (by simpa [action, dqcBaseActionInBase, dqcBaseAction] using
+          hS F hF (⟨C, hC⟩ : CompactBaseDqc S))) _ hMap
+
+end PresentableBaseActionData
 
 end SourceTensorData
 
