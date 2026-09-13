@@ -179,6 +179,12 @@ does NOT imply the functorial braid relation; see the module docstring in
 -- comparisons with the numerical object-twist formula.
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Of_eq_twistK₀
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Map_eq_twistK₀
+
+-- Scalar-linear evaluation reaches the same numerical formula directly,
+-- without an adapter to the additive evaluation package.  Cone preservation
+-- remains explicit input to the endomorphism-level statement.
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of_eq_twistK₀
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map_eq_twistK₀
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twist
 #print axioms CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones.twistFunctor
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions
