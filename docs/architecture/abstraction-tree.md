@@ -168,6 +168,8 @@ Category
 │  │  │  │  ├─ interchange               Godement, with the Koszul sign (-1)^(m n)
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
 │  │  │  ├─ h0                           closed degree zero becomes an ordinary NatTrans
+│  │  │  │  ├─ composition              strict dg composition descends to ordinary composition
+│  │  │  │  ├─ whiskering               descends through the canonical h0CompIso compositors
 │  │  │  │  └─ h0Comparison             H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D); no fullness claimed
 │  │  │  │     └─ h0Iso                 Z⁰ isomorphisms descend, coherently
 │  │  │  └─ ConeData                     functorial objectwise cones
@@ -213,6 +215,8 @@ Category
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
 │  │  ├─ CounitConeData                  counit-cone twist candidate
 │  │  │  └─ twistAdjointComparison      canonical closed `L T[-1] ⟶ R`, and its H⁰ map
+│  │  │     └─ H⁰ inverse-rotation factorization
+│  │  │                                 generic shiftedFstH0, right whiskering, and left counit
 │  │  ├─ UnitConeData                    unshifted unit-cone cotwist candidate
 │  │  │  ├─ cotwistAdjointComparison    canonical closed `R ⟶ C L`, and its H⁰ map
 │  │  │  └─ cotwistAdjointComparisonShiftedH0
@@ -248,6 +252,10 @@ Category
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
 │  │        │  ├─ triangleIsoOfStrictSquare  endpoint isos give a NatIso
 │  │        │  └─ compareIso             the cone choices do not matter, canonically
+│  │        ├─ inverseRotateFirstH0     first maps of inverse-rotated cone triangles
+│  │        ├─ shiftedFstH0            H⁰ of the source-regraded degree-one projection
+│  │        ├─ shiftedFstH0_eq         equality through shiftedFunctorH0Iso and packaged
+│  │        │                           `[1][-1]` cancellation
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
 │  │           └─ twistTriangleFunctor   H⁰ D ⥤ Triangle (H⁰ D), all distinguished
 │  ├─ H0 C

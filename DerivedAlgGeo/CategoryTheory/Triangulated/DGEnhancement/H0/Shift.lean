@@ -352,6 +352,30 @@ lemma shiftFunctorAdd'_eq_shiftFunctorAddIso' (a b ab : ℤ) (h : a + b = ab) :
     shiftFunctorAdd_eq]
   rfl
 
+/-- The cancellation comparison for two opposite shifts is the direct
+comparison from their composite dg shift witness to the unshifted object.
+
+This exposes the representative used by Mathlib's `shiftFunctorCompIsoId` for
+the `HasShift` structure constructed above.  It is the component-level bridge
+needed when a rotated triangle cancels an explicit pair of shifts. -/
+lemma shiftFunctorCompIsoId_hom_app (n m : ℤ) (h : n + m = 0) (X : H0 C) :
+    (CategoryTheory.shiftFunctorCompIsoId (H0 C) n m h).hom.app X =
+      H0.homMk (C := C) ⟨IsShiftBy.compare
+        (shiftCompWitness' C (H0.of C X) n m 0 h)
+        (IsShiftBy.self (H0.of C X)),
+        IsShiftBy.compare_mem_cocycles _ _⟩ := by
+  rw [CategoryTheory.shiftFunctorCompIsoId, Iso.trans_hom,
+    NatTrans.comp_app, shiftFunctorAdd'_eq_shiftFunctorAddIso',
+    shiftFunctorZero_eq]
+  change H0.homMk (C := C) ⟨IsShiftBy.compare
+      (shiftCompWitness' C (H0.of C X) n m 0 h)
+      (shiftWitness C (H0.of C X) 0), _⟩ ≫
+    H0.homMk (C := C) ⟨IsShiftBy.compare
+      (shiftWitness C (H0.of C X) 0)
+      (IsShiftBy.self (H0.of C X)), _⟩ = _
+  rw [H0.homMk_comp]
+  exact congrArg _ (Subtype.ext (IsShiftBy.compare_trans _ _ _))
+
 /-- On `H⁰`, the interchange of two shifts is the canonical comparison
 between the two composite dg shift witnesses. -/
 @[simp]
