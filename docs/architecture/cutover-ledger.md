@@ -7,6 +7,19 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Homology model and unbounded formality over a division ring (2026-09-13):
+  `Homotopy.HomologyModel` owns the generic zero-differential complex of
+  homology objects in any abelian category.  It makes no formality claim.
+  `Homotopy.ModuleCatFormality` owns the coefficient-side theorem that every
+  `ModuleCat k`-valued cochain complex is noncanonically homotopy equivalent
+  to its zero-differential homology model when `k` is a division ring.  The
+  proof uses Mathlib's homology quotient, categorical projectivity of vector
+  spaces, and explicit splittings of cycles and boundaries.  It is unbounded
+  and requires neither finite-dimensionality nor finite support.  The choices
+  are deliberately not packaged as natural data, and the theorem asserts no
+  quasi-isomorphism invariance.  Turning a finite-support hypothesis into the
+  existing `FiniteCohomologyPresentation` is a downstream comparison with its
+  finite-biproduct model, not a second formality theorem.
 - Degreewise ambient coherent Ext-finiteness on projective varieties
   (2026-09-12):
   `ProjectivePresentation.module_finite_ambientExt` combines unconditional

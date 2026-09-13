@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
+import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
+import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
 import DerivedAlgGeo.Algebra.Homology.Localization
 import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
@@ -35,6 +37,10 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.shortComplexFunctor_preservesColimitsOfShape
 #print axioms HomologicalComplex.homologyFunctor_preservesColimitsOfShape
 #print axioms Homotopy.sigma
+#print axioms CochainComplex.homologyModel
+#print axioms CochainComplex.homologyModel_X
+#print axioms CochainComplex.homologyModel_d
+#print axioms CochainComplex.homotopyEquivHomologyModel
 #print axioms CochainComplex.finiteCohomologyModel
 #print axioms CochainComplex.finiteCohomologyModelHomologyIso
 #print axioms CochainComplex.FiniteCohomologyPresentation
