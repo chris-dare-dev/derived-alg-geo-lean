@@ -3,9 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
-import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.CommShift
-import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearCopower
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Functor
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearCopowerFiniteFree
 
 /-!
 # Finite cohomology presentations of scalar-linear copowers
@@ -22,42 +20,15 @@ The construction reuses three existing categorical interfaces:
   `H⁰` of a dg functor.
 
 Thus this file introduces no copower-specific direct-sum preservation record
-and no new shift comparison. It does not choose bases for the homology
-objects, compute a Grothendieck class, or assert an Euler formula.
+and no new shift comparison. Its finite-free specialization consumes the
+generic sibling interface, makes no basis-independence claim, computes no
+Grothendieck class, and asserts no Euler formula.
 -/
 
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
 universe w v u
-
-namespace CategoryTheory
-
-open DGCategoryStruct DGCategory Limits
-
-variable {k : Type w} [CommRing k]
-  {C : Type u} [DGCategory.{v} C]
-  [∀ (X Y : C) (p : ℤ), Module k ((dgHom X Y).X p)]
-  [DGLinear k C] [HasLinearCopowers k C]
-
-/-- Degreewise scalar-linear copowers of single coefficient modules, with
-their coherent shift comparison inherited by postcomposition. -/
-noncomputable def linearCopowerSingleFunctors [IsPretriangulated C] (X : C) :
-    SingleFunctors (ModuleCat.{v} k) (H0 C) ℤ := by
-  letI : (linearCopowerFunctor k X).h0.CommShift ℤ :=
-    DGFunctor.commShift _ (DGFunctor.preservesShifts _)
-  exact (CochainComplex.singleFunctors (ModuleCat.{v} k)).postcomp
-    (Cdg.toH0 (ModuleCat.{v} k) ⋙ (linearCopowerFunctor k X).h0)
-
-@[simp]
-lemma linearCopowerSingleFunctors_obj [IsPretriangulated C]
-    (X : C) (i : ℤ) (V : ModuleCat.{v} k) :
-    ((linearCopowerSingleFunctors (k := k) X).functor i).obj V =
-      (show H0 C from linearCopowerObj (C := C)
-        ((CochainComplex.singleFunctor (ModuleCat.{v} k) i).obj V) X) :=
-  rfl
-
-end CategoryTheory
 
 namespace CochainComplex.FiniteCohomologyPresentation
 
@@ -95,5 +66,45 @@ noncomputable def linearCopowerIso [IsPretriangulated C]
     biproduct.mapIso fun i =>
       (((linearCopowerSingleFunctors (k := k) X).shiftIso
         (-i.1) i.1 0 (by omega)).app (K.homology i.1)).symm
+
+end CochainComplex.FiniteCohomologyPresentation
+
+namespace CochainComplex.FiniteCohomologyPresentation
+
+open CategoryTheory CategoryTheory.DGCategoryStruct CategoryTheory.DGCategory
+  CategoryTheory.Limits
+
+attribute [local instance] CategoryTheory.Abelian.hasFiniteBiproducts
+
+variable {k : Type v} [CommRing k] [StrongRankCondition k]
+  {C : Type u} [DGCategory.{v} C]
+  [∀ (X Y : C) (p : ℤ), Module k ((dgHom X Y).X p)]
+  [DGLinear k C] [HasLinearCopowers k C]
+  {K : CochainComplex (ModuleCat.{v} k) ℤ}
+
+/-- If the homology modules in a supplied finite presentation are finite free,
+the selected scalar-linear copower is a finite biproduct of shifts of the
+original object, with multiplicities given by their `finrank`s.
+
+The nested biproduct records the cohomological degree and its multiplicity
+separately. The isomorphism is noncanonical: each inner expansion uses
+Mathlib's noncomputably selected finite basis. -/
+noncomputable def linearCopowerFinrankIso [IsPretriangulated C]
+    (P : CochainComplex.FiniteCohomologyPresentation K)
+    [∀ i : {i // i ∈ P.degrees}, Module.Free k (K.homology i.1)]
+    [∀ i : {i // i ∈ P.degrees}, Module.Finite k (K.homology i.1)]
+    (X : C) :
+    (show H0 C from linearCopowerObj (C := C) K X) ≅
+      ⨁ fun i : {i // i ∈ P.degrees} =>
+        ⨁ fun _ : Fin (Module.finrank k (K.homology i.1)) =>
+          (show H0 C from X)⟦-i.1⟧ :=
+  P.linearCopowerIso X ≪≫
+    biproduct.mapIso (fun i =>
+      (CategoryTheory.shiftFunctor (H0 C) (-i.1)).mapIso
+        (CategoryTheory.linearCopowerSingleZeroFinrankIso
+          (k := k) (V := K.homology i.1) X) ≪≫
+      (CategoryTheory.shiftFunctor (H0 C) (-i.1)).mapBiproduct
+        (fun _ : Fin (Module.finrank k (K.homology i.1)) =>
+          (show H0 C from X)))
 
 end CochainComplex.FiniteCohomologyPresentation
