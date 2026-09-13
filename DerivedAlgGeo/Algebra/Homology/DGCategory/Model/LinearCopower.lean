@@ -253,7 +253,6 @@ noncomputable def linearTensorUnivCochain
 
 /-- Pointwise evaluation of the universal cochain is the corresponding total
 tensor summand inclusion. -/
-@[simp]
 theorem linearTensorUnivCochain_apply
     (K : CochainComplex (ModuleCat.{v} k) ℤ)
     (X : Cdg (ModuleCat.{v} k)) (i j q : ℤ) (hjq : j + i = q)
