@@ -127,17 +127,24 @@ CategoryTheory/Shift
 
 CategoryTheory/Triangulated
   ├─→ PretriangulatedAxioms, TStructure, PostnikovTower, ExtensionClosure, QuasiAbelian
+  ├─→ TriangleFunctorNormalization             first-map transport for triangle-valued functors
   ├─→ FullSubcategory                         objectwise triangle and map lifts
   ├─→ GrothendieckGroup                        K₀, realizations, Euler forms
   ├─→ CompactlyGenerated, SemiorthogonalDecomposition, SphericalTwist
   ├─→ FourierMukai                            generic kernel autoequivalences;
   │                                           kernels vary through `kernelTransform`,
-  │                                           enhanced cones map pointwise to transform triangles
+  │                                           enhanced cones map pointwise to transform triangles;
+  │                                           consumes presented dg adjunction triangles only
+  │                                           through explicit objectwise comparison
   ├─→ Families                                pseudofunctorial fiber categories
   ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation,
-  │                                           functorial distinguished cone triangles;
-  │                                           H0/Triangle owns the triangles, H0/Functor
-  │                                           the transport of dg-functor capabilities
+  │                                           functorial distinguished cone triangles and
+  │                                           presented dg-adjunction cone triangles and their
+  │                                           conventional cotwist inverse rotation;
+  │                                           H0/Triangle owns the triangles;
+  │                                           H0/{Functor,FunctorTransport} own transport of
+  │                                           dg-functor capabilities through H⁰ and ordinary
+  │                                           equivalences
   └─→ StabilityCondition                      Bridgeland stability (canonical concept)
         ├─→ Weak                              weak stability: the dependency parent
         │     └─→ Foundation, Families, HarderNarasimhan, Support, Tilting

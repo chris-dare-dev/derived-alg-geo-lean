@@ -1,0 +1,30 @@
+/-
+TriangleFunctorNormalization slice of the StabilityCondition audit.  This
+records the generic first-map normalization interface independently of its
+Fourier--Mukai consumers.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.TriangleFunctorNormalization
+
+/-! ## First-map normalization of triangle-valued functors -/
+
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.mk.inj
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.mk.sizeOf_spec
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedSecond
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedThird
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedTriangle
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedTriangle_mor₁
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedTriangle_mor₂
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedTriangle_mor₃
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedTriangle_obj_distinguished
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedTriangle_obj₁
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedTriangle_obj₂
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.normalizedTriangle_obj₃
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.obj₁Iso
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.obj₂Iso
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.rawIsoNormalized
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.rawIsoNormalized_hom_app_hom₁
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.rawIsoNormalized_hom_app_hom₂
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.rawIsoNormalized_hom_app_hom₃
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.square
+#print axioms CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.third

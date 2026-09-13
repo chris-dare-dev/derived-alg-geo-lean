@@ -7,6 +7,63 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Objectwise dg/Fourier--Mukai cotwist comparison (2026-09-13):
+  `AdjunctionUnitKernelConeData.presentedUnitTriangleObjIso` applies Mathlib's
+  triangle-isomorphism completion theorem to the presented dg and independently
+  selected Fourier--Mukai unit triangles at each source object.  Their first two
+  components are identities because both triangles use the same presented
+  adjunction unit.  Inverse rotation yields
+  `presentedCotwistTriangleObjIso`; its first component compares the
+  transported dg cotwist object with the Fourier--Mukai cotwist object, and a
+  final composite reaches the transport of the actual shifted dg cone.  The
+  chosen cone comparison is not proved natural in the source object, so no
+  functor isomorphism, choice independence, exactness/equivalence transfer,
+  kernel presentation of the dg cotwist, or sphericality is inferred.
+- Exactness and equivalence after ordinary `H⁰` transport (2026-09-13):
+  `DGFunctor.transportedH0` names equivalence conjugation of `H⁰ F`, while
+  `transportedH0CommShift`, `transportedH0IsTriangulated`, and the equivalence
+  accessors compose Mathlib's canonical inverse-mate, functor-composition, and
+  triangulated-equivalence packages.  `UnitConeData.transportedCotwist`
+  specializes these interfaces and the canonical exact `[-1]` shift.  Its
+  exactness is unconditional in the chosen cone; its autoequivalence requires
+  the explicit hypothesis that the unshifted cone is an equivalence on `H⁰`.
+  No dg quasi-equivalence, choice independence, natural Fourier--Mukai
+  comparison, or sphericality is inferred.
+- Conventional cotwist triangles from presented dg adjunctions (2026-09-13):
+  `DGAdjunction.H0Presentation.presentedCotwistTriangle` reuses Mathlib's
+  `invRotate` on the normalized unit-triangle family.  Its first vertex is the
+  pointwise `[-1]` shift `UnitConeData.transportedCotwist`, and
+  `transportedCotwistH0Iso` specializes the reusable
+  `DGFunctor.transportedShiftedFunctorH0Iso` to compare it with the transported
+  `H⁰` of the actual shifted dg unit cone.  The adjunction unit is literally
+  the rotated second map and every value is distinguished under the existing
+  source-side hypotheses.  Exactness and equivalence are separate capability
+  accessors with their own hypotheses; this presentation infers no
+  natural Fourier--Mukai comparison, distinguished functor-category triangle,
+  or sphericality.
+- Ordinary presentations of dg-adjunction unit triangles (2026-09-13):
+  `DGAdjunction.H0Presentation.unitFirstMapNormalizationData` is the
+  source-side mirror of the counit presentation and reuses the same generic
+  `Triangle.FirstMapNormalizationData` root.  Its `presentedUnitTriangle` has
+  literal first two vertices `𝟭 X` and `F ⋙ G`, literal first map equal to
+  the presented adjunction unit, and the transported unshifted dg unit cone
+  as third vertex; the other two maps and the raw comparison are named.
+  Pointwise distinguishedness requires only that the source equivalence be
+  triangulated.  The separate cotwist-presentation root owns inverse rotation;
+  this normalization root itself infers no Fourier--Mukai comparison,
+  exactness, equivalence, or sphericality.
+- Ordinary presentations of dg-adjunction counit triangles (2026-09-13):
+  `DGAdjunction.H0Presentation.counitFirstMapNormalizationData` feeds the raw
+  counit-cone family transported through the target equivalence into the
+  generic `Triangle.FirstMapNormalizationData` root.  The resulting
+  `presentedCounitTriangle` has literal first two vertices `G ⋙ F` and
+  `𝟭 Y`, literal first map equal to the presented adjunction counit, and the
+  transported dg twist as its unchanged third vertex; the second and
+  connecting maps have semantic natural-transformation names.  A natural
+  triangle isomorphism compares the raw and normalized families, and
+  pointwise distinguishedness requires only that the target equivalence be
+  triangulated.  No unit-side mirror, comparison with an independently chosen
+  Fourier--Mukai cone, exactness, autoequivalence, or sphericality is inferred.
 - Fourier--Mukai presentations of strict dg adjunctions (2026-09-13):
   `RightAdjointKernelData.ofH0Presentation` and its left-adjoint mirror spend
   the generic equivalence-transported `DGAdjunction.H0Presentation` on the
@@ -450,27 +507,35 @@ blocks should normally move it rather than add more declarations beside it.
   cotwist-cone candidate; its `[-1]` shift and inverse-rotated triangle are now
   constructed downstream, while exactness, autoequivalence, and sphericality
   remain separate seams.
+- First-map normalization for triangle-valued functors (2026-09-13):
+  `Triangle.FirstMapNormalizationData` is the generic owner for replacing the
+  first two projections of `T : J ⥤ Triangle C` by named isomorphic functors
+  and making a compatible named first map literal.  It reuses Mathlib's
+  triangle-functor constructors, leaves the third projection unchanged, and
+  transports pointwise distinguishedness.  It supplies no canonicity,
+  exactness, or distinguished triangle in a functor category.
 - Generic enhanced kernel-transformation cones (2026-09-12):
   `Enhancement.liftedCocycle` and `Enhancement.conePresentation` own the
   noncanonical lift of an ordinary morphism to a closed representative and dg
   cone.  `FourierMukai.KernelTransformationData` packages a kernel morphism
   whose transform is a named natural transformation in supplied endpoint
   presentations; `KernelTransformationConeData` adds the enhanced choices and
-  forgets back one way.  Its `normalizationData` feeds the reusable
-  `Correspondence.KernelConeNormalizationData`, which owns transport to a
-  source-natural triangle with literal endpoints and first map.  The counit
-  kernel records now delegate to these generic owners without changing their
-  public contracts, with inverse adapters and simp round trips proving the two
-  presentations equivalent.  Fullness remains only a sufficient constructor,
-  choices remain noncanonical, and the normalized result is only pointwise
-  distinguished: no exactness, functor-category distinguishedness,
+  forgets back one way.  Its `normalizationData` feeds
+  `Correspondence.KernelConeNormalizationData`, whose adapter delegates the
+  endpoint/first-map transport to `Triangle.FirstMapNormalizationData`.  The
+  counit kernel records now delegate to these generic owners without changing
+  their public contracts, with inverse adapters and simp round trips proving
+  the two presentations equivalent.  Fullness remains only a sufficient
+  constructor, choices remain noncanonical, and the normalized result is only
+  pointwise distinguished: no exactness, functor-category distinguishedness,
   autoequivalence, or sphericality is inferred.
 - Literal Fourier--Mukai counit triangles (2026-09-12):
   `CounitKernelConeData.counitTriangleInSource` transports the raw transform
   triangle of an enhanced counit-kernel cone to a source-natural triangle with
   vertices `Φ_Q ⋙ Φ_P`, `𝟭 Y`, and the kernel-presented twist, and with
-  first map literally the supplied adjunction counit.  The construction reuses
-  Mathlib's `Triangle.functorMk` and `Triangle.functorIsoMk`; the natural
+  first map literally the supplied adjunction counit.  The construction uses
+  the generic `Triangle.FirstMapNormalizationData` wrapper around Mathlib's
+  `Triangle.functorMk` and `Triangle.functorIsoMk`; the natural
   comparison exposes all three components, and exact kernel evaluation makes
   every value of the normalized family distinguished.  This is pointwise
   distinguishedness only: it does not assert a distinguished triangle in the

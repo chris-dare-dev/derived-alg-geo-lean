@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.PretriangulatedAxioms
 import DerivedAlgGeo.CategoryTheory.Triangulated.ShiftFunctor
+import DerivedAlgGeo.CategoryTheory.Triangulated.TriangleFunctorNormalization
 import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Coaisle
@@ -35,7 +36,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.Opposite
 The compatibility interface for monoidal tensor products, the
 pretriangulated axioms with rotation only forward, sign-correct exactness of
 integral shift functors, t-structures, objectwise
-triangle lifts to full triangulated subcategories, compact generation,
+triangle lifts to full triangulated subcategories, first-map normalization of
+triangle-valued functors, compact generation,
 Postnikov towers, strict morphisms, semiorthogonal sequences,
 extension closures, generation time, the Grothendieck group, the spherical twist on `K₀`,
 Fourier--Mukai kernel functors, dg enhancements, and stability conditions on
