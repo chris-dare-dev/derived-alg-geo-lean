@@ -124,6 +124,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.comp_map
 #print axioms CategoryTheory.DGFunctor.comp_obj
 #print axioms CategoryTheory.DGFunctor.h0
+#print axioms CategoryTheory.DGFunctor.h0_additive
 #print axioms CategoryTheory.DGFunctor.h0CompIso
 #print axioms CategoryTheory.DGFunctor.h0IdIso
 #print axioms CategoryTheory.DGFunctor.h0_map_mk
@@ -509,6 +510,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- both telescope into a single `IsShiftBy.compare`.
 #print axioms CategoryTheory.Cdg.toH0
 #print axioms CategoryTheory.Cdg.toH0_map
+#print axioms CategoryTheory.Cdg.toH0_additive
 #print axioms CategoryTheory.Cdg.instFullCochainComplexIntH0ToH0
 #print axioms CategoryTheory.Cdg.h0Functor_map_toH0_map
 #print axioms CategoryTheory.Cdg.toH0ShiftIso
@@ -1182,6 +1184,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.linearCopowerFunctor_obj
 #print axioms CategoryTheory.linearCopowerFunctor_map
 #print axioms CategoryTheory.linearCopowerObjIsoOfHomotopyEquiv
+
+-- Supplied finite cohomology presentations transport through the linear
+-- copower functor to finite biproducts of shifted degree-zero copowers.  The
+-- biproduct and shift interfaces are Mathlib's; this makes no formality,
+-- basis, finrank, or Euler claim.
+#print axioms CategoryTheory.linearCopowerSingleFunctors
+#print axioms CategoryTheory.linearCopowerSingleFunctors_obj
+#print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerIso
 
 -- Scalar-linear evaluation data assembles the linear copowers at a fixed
 -- object into a `k`-linear dg functor and a closed evaluation transformation.
