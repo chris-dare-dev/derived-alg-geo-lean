@@ -18,9 +18,9 @@ dévissage for Ext.  It gives two honest reductions:
    restricted-twist Ext-finiteness, reduce that hypothesis to the closed-immersion
    pullback/pushforward counit being epi.
 
-That counit premise is now discharged in `RestrictedTwistPresentation` through faithfulness of
-closed-immersion pushforward. The reductions here remain useful independently; the unconditional
-ambient Ext-finiteness specialization is the next assembly layer.
+That counit premise is discharged in `RestrictedTwistPresentation` through faithfulness of
+closed-immersion pushforward. The reductions here remain useful independently, while
+`module_finite_ambientExt` gives their unconditional projective-variety specialization.
 
 ## Remaining geometric boundary
 
@@ -113,8 +113,8 @@ theorem module_finite_ambientExt_of_restrictedTwists
 Restricted twists have finite ambient Ext by `module_finite_restrictedTwistExt`, so the only
 explicit premise of this reduction is that the pullback/pushforward counit of the chosen
 projective closed immersion is epi on coherent sheaves. That premise is discharged by
-`Scheme.Modules.pullbackPushforwardAdjunction_counit_epi_of_isClosedImmersion`; an unconditional
-wrapper belongs to the next assembly layer. -/
+`Scheme.Modules.pullbackPushforwardAdjunction_counit_epi_of_isClosedImmersion`; the theorem below
+packages the unconditional specialization. -/
 theorem module_finite_ambientExt_of_counit_epi
     (P : AlgebraicGeometry.ProjectivePresentation k X) [Nontrivial P.index]
     (hcounit : ∀ F : Coh X, Epi
@@ -124,5 +124,20 @@ theorem module_finite_ambientExt_of_counit_epi
     Module.Finite k (Ext.{u + 1} ((Coh.ι X).obj F) ((Coh.ι X).obj G) n) :=
   P.module_finite_ambientExt_of_restrictedTwists hcounit
     (fun N _hN T j ↦ P.module_finite_restrictedTwistExt (-(N : ℤ)) T j) F G n
+
+/-- **Ambient Ext between coherent sheaves on a projective variety is finite-dimensional in
+every degree.**
+
+The restricted-twist generator calculation supplies finite Ext for each presentation term, and
+faithfulness of pushforward along the chosen projective closed immersion makes the adjunction
+counit epic. This is degreewise finiteness only: no finite cohomological-amplitude claim is made. -/
+theorem module_finite_ambientExt
+    (P : AlgebraicGeometry.ProjectivePresentation k X) [Nontrivial P.index]
+    (F G : Coh X) (n : ℕ) :
+    Module.Finite k (Ext.{u + 1} ((Coh.ι X).obj F) ((Coh.ι X).obj G) n) :=
+  P.module_finite_ambientExt_of_counit_epi
+    (fun E ↦
+      Scheme.Modules.pullbackPushforwardAdjunction_counit_epi_of_isClosedImmersion
+        P.embedding ((Coh.ι X).obj E)) F G n
 
 end AlgebraicGeometry.ProjectivePresentation

@@ -7,6 +7,15 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Degreewise ambient coherent Ext-finiteness on projective varieties
+  (2026-09-12):
+  `ProjectivePresentation.module_finite_ambientExt` combines unconditional
+  restricted-twist presentations, finite Ext from restricted twists, and the
+  long exact Ext sequence to prove `Module.Finite k` for every
+  `Ext^n_{X.Modules}(F, G)`. The result deliberately asserts no uniform or
+  pairwise degree bound: finite support still requires a genuine regularity or
+  finite-global-dimension theorem, and internal Ext in `Coh X` still requires
+  `Dqc.CoherentExtComparison X`.
 - Closed-immersion counit epimorphism and restricted-twist presentations
   (2026-09-12): `Scheme.Modules.pushforward_faithful_of_isInducing` detects
   equality of module-sheaf morphisms on the canonical target open attached to
