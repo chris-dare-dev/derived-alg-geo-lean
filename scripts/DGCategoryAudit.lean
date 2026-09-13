@@ -126,7 +126,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.h0
 #print axioms CategoryTheory.DGFunctor.h0_additive
 #print axioms CategoryTheory.DGFunctor.h0CompIso
+#print axioms CategoryTheory.DGFunctor.h0CompIso_hom_app
+#print axioms CategoryTheory.DGFunctor.h0CompIso_inv_app
 #print axioms CategoryTheory.DGFunctor.h0IdIso
+#print axioms CategoryTheory.DGFunctor.h0IdIso_hom_app
+#print axioms CategoryTheory.DGFunctor.h0IdIso_inv_app
 #print axioms CategoryTheory.DGFunctor.h0_map_mk
 #print axioms CategoryTheory.DGFunctor.h0_obj
 #print axioms CategoryTheory.DGFunctor.id
@@ -691,6 +695,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparison_app
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparison_isClosed
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparisonH0
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparisonH0_eq_inverseRotateFirstH0
 #print axioms CategoryTheory.DGAdjunction.UnitConeData
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitCone
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparison
@@ -1055,6 +1060,9 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.isClosed_of_mem_cocycles
 #print axioms CategoryTheory.DGFunctor.mem_cocycles_of_isClosed
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_comp
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_comp'
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_whiskerLeft
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_whiskerRight
 #print axioms CategoryTheory.DGFunctor.h0Comparison
 #print axioms CategoryTheory.DGFunctor.h0Comparison_obj
 #print axioms CategoryTheory.DGFunctor.h0Comparison_map_mk

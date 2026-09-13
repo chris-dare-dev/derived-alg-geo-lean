@@ -3,10 +3,17 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.AdjunctionComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.NaturalTransformationConeShift
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
 
 /-!
-# Conventional shifted targets for dg-adjunction comparisons
+# H⁰ coherence and conventional shifted targets for dg-adjunction comparisons
+
+For the twist comparison, this file identifies the descended dg composite
+with the inverse-rotated first map, right-whiskered by the left adjoint and
+followed by the descended left counit.  The factorization uses the generic
+descent laws for dg composition and whiskering together with `h0CompIso`; it
+does not introduce an adjunction-specific comparison map.
 
 The strict dg cone construction gives the cotwist comparison in the
 shift-free form
@@ -33,6 +40,52 @@ universe v u u'
 namespace CategoryTheory
 
 open DGCategoryStruct DGCategory
+
+namespace DGAdjunction.CounitConeData
+
+variable {A : Type u} {B : Type u'}
+  [DGCategory.{v} A] [DGCategory.{v} B]
+  {S : DGFunctor A B} {L R : DGFunctor B A}
+  (leftAdj : DGAdjunction L S) (rightAdj : DGAdjunction S R)
+  (K : rightAdj.CounitConeData) [IsPretriangulated B]
+
+/-- **The twist adjunction comparison factors through inverse rotation.**
+
+The descended dg comparison is the first map of the inverse-rotated twist
+triangle, postcomposed with `L`, followed by the descended left-counit whisker.
+The two `h0CompIso` terms are the canonical compositor needed to pass between
+`H⁰` of a dg composite and the composite of its `H⁰` functors. -/
+theorem twistAdjointComparisonH0_eq_inverseRotateFirstH0 :
+    twistAdjointComparisonH0 (rightAdj := rightAdj) leftAdj K =
+      (DGFunctor.h0CompIso (K.twist.shiftedFunctor (-1 : ℤ)) L).hom ≫
+        Functor.whiskerRight
+          ((K.twist.shiftedFunctorH0Iso (-1)).hom ≫
+            K.inverseRotateFirstH0 rightAdj.counit_isClosed) L.h0 ≫
+        (DGFunctor.h0CompIso (R.comp S) L).inv ≫
+        DGFunctor.HomogeneousNatTrans.h0
+          (DGFunctor.HomogeneousNatTrans.whiskerLeft R leftAdj.counit)
+          (leftAdj.counit_isClosed.whiskerLeft R) := by
+  let η := DGFunctor.HomogeneousNatTrans.sourceShiftEquiv K.twist (R.comp S)
+    (-1 : ℤ) 1 0 (by omega) K.fst
+  have hη : DGFunctor.HomogeneousNatTrans.IsClosed η :=
+    (DGFunctor.HomogeneousNatTrans.sourceShiftEquiv_isClosed_iff K.twist
+      (R.comp S) (-1 : ℤ) 1 0 (by omega) K.fst).2 K.fst_isClosed
+  have hηL := hη.whiskerRight L
+  have hεR := leftAdj.counit_isClosed.whiskerLeft R
+  change DGFunctor.HomogeneousNatTrans.h0
+      (DGFunctor.HomogeneousNatTrans.comp
+        (DGFunctor.HomogeneousNatTrans.whiskerRight η L)
+        (DGFunctor.HomogeneousNatTrans.whiskerLeft R leftAdj.counit)) _ = _
+  rw [DGFunctor.HomogeneousNatTrans.h0_comp'
+    (DGFunctor.HomogeneousNatTrans.whiskerRight η L)
+    (DGFunctor.HomogeneousNatTrans.whiskerLeft R leftAdj.counit) hηL hεR]
+  rw [DGFunctor.HomogeneousNatTrans.h0_whiskerRight η hη L]
+  have hηh0 : DGFunctor.HomogeneousNatTrans.h0 η hη = K.shiftedFstH0 := rfl
+  rw [hηh0, K.shiftedFstH0_eq rightAdj.counit_isClosed,
+    Functor.whiskerRight_comp]
+  simp only [Category.assoc]
+
+end DGAdjunction.CounitConeData
 
 namespace DGAdjunction.UnitConeData
 

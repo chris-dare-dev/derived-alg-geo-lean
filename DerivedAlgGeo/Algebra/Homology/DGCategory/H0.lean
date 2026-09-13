@@ -394,6 +394,22 @@ def h0IdIso : (DGFunctor.id C).h0 ≅ 𝟭 (H0 C) :=
       simp [DGFunctor.id, H0.of_self]
       rfl)
 
+/-! The identity comparison has literal identity components in both directions. -/
+
+/-- The forward component of `h0IdIso` is the identity.  This exposes the
+computation without requiring consumers to unfold `NatIso.ofComponents`. -/
+@[simp]
+theorem h0IdIso_hom_app (X : H0 C) :
+    (h0IdIso (C := C)).hom.app X = 𝟙 _ :=
+  rfl
+
+/-- The inverse component of `h0IdIso` is the identity.  This exposes the
+computation without requiring consumers to unfold `NatIso.ofComponents`. -/
+@[simp]
+theorem h0IdIso_inv_app (X : H0 C) :
+    (h0IdIso (C := C)).inv.app X = 𝟙 _ :=
+  rfl
+
 /-- `H⁰` takes composition of dg functors to composition of functors. -/
 def h0CompIso (F : DGFunctor C D) (G : DGFunctor D E) :
     (F.comp G).h0 ≅ F.h0 ⋙ G.h0 :=
@@ -404,6 +420,20 @@ def h0CompIso (F : DGFunctor C D) (G : DGFunctor D E) :
       show _ ≫ 𝟙 _ = 𝟙 _ ≫ _
       rw [Category.comp_id, Category.id_comp]
       rfl)
+
+/-- The forward component of `h0CompIso` is the identity.  This is the
+component computation used when descending dg whiskering to `H⁰`. -/
+@[simp]
+theorem h0CompIso_hom_app (F : DGFunctor C D) (G : DGFunctor D E) (X : H0 C) :
+    (h0CompIso F G).hom.app X = 𝟙 _ :=
+  rfl
+
+/-- The inverse component of `h0CompIso` is the identity.  This is the
+component computation used when descending dg whiskering to `H⁰`. -/
+@[simp]
+theorem h0CompIso_inv_app (F : DGFunctor C D) (G : DGFunctor D E) (X : H0 C) :
+    (h0CompIso F G).inv.app X = 𝟙 _ :=
+  rfl
 
 
 end DGFunctor
