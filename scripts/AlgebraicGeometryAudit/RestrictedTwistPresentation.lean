@@ -3,10 +3,12 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.RestrictedTwistPres
 /-!
 # Restricted-twist presentation audit
 
-The presentation theorem is a reduction, not a fabricated geometric instance: it keeps the
-closed-immersion pullback/pushforward counit epimorphism as an explicit premise.
+The conditional theorem records the exact categorical reduction. The unconditional theorem
+discharges its counit premise through faithfulness of closed-immersion pushforward, without
+assuming the stronger counit isomorphism or exactness of pullback.
 -/
 
 #print axioms AlgebraicGeometry.ProjectivePresentation.restrictedTwist
 #print axioms AlgebraicGeometry.ProjectivePresentation.restrictedTwist_isInvertible
 #print axioms AlgebraicGeometry.ProjectivePresentation.exists_shortExact_coproduct_restrictedTwist_of_counit_epi
+#print axioms AlgebraicGeometry.ProjectivePresentation.exists_shortExact_coproduct_restrictedTwist
