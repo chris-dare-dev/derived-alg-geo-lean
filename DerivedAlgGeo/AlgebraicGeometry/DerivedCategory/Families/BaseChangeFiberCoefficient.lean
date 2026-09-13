@@ -170,6 +170,38 @@ def toFiberCoefficientData
 
 end KFlatTensorCoefficientData
 
+namespace KFlatTensorCoefficientComparison
+
+/-- Compose the projection/duality comparison with monoidality of fibre
+pullback to obtain the coefficient comparison used by faithful base change. -/
+def toKFlatTensorCoefficientData
+    {H : D.CompactFiberTensorDuality}
+    {Q : D.SourceTensorData}
+    {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
+    {P : D.CompactFiberProjectionFormula H Q pushFst}
+    {K : KFlatFiberTensorData T}
+    {V : KFlatCompactFiberDualityData K}
+    (C : KFlatTensorCoefficientComparison (D := D) P K V) :
+    KFlatTensorCoefficientData (D := D) P K V where
+  coefficientIso Gi Gj a b :=
+    C.projectionIso Gi Gj a b ≪≫
+      pushFst.functor.mapIso (C.pullbackTensorIso Gi Gj a b)
+
+/-- The atomic K-flat comparisons also supply the fibre-coefficient datum
+consumed by the faithful-base-change argument. -/
+def toFiberCoefficientData
+    {H : D.CompactFiberTensorDuality}
+    {Q : D.SourceTensorData}
+    {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
+    {P : D.CompactFiberProjectionFormula H Q pushFst}
+    {K : KFlatFiberTensorData T}
+    {V : KFlatCompactFiberDualityData K}
+    (C : KFlatTensorCoefficientComparison (D := D) P K V) :
+    FiberCoefficientData (D := D) P :=
+  C.toKFlatTensorCoefficientData.toFiberCoefficientData
+
+end KFlatTensorCoefficientComparison
+
 end CompactFiberProjectionFormula
 
 /-- The end-to-end semiorthogonality theorem with all three tensor operations
@@ -198,6 +230,32 @@ theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficients
   D.perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBaseChange
     A hA hIso H Q B pushBase pushFst adj P faithful
       C.toFiberCoefficientData hS
+
+/-- The end-to-end semiorthogonality theorem stated using the two atomic
+coherence comparisons rather than a bundled coefficient isomorphism. -/
+theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficientComparison
+    (A : SemiorthogonalSequence (SourceDqc X) ι)
+    (hA : A.HasTriangulatedComponents)
+    (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
+    (H : D.CompactFiberTensorDuality)
+    (Q : D.SourceTensorData)
+    (B : KFlatBasePullbackData X)
+    (K : KFlatFiberTensorData T)
+    (V : KFlatCompactFiberDualityData K)
+    (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
+    (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
+    (adj : D.pullFst.functor ⊣ pushFst.functor)
+    [D.pullFst.functor.Additive]
+    (P : D.CompactFiberProjectionFormula H Q pushFst)
+    (faithful : D.DqcFaithfulBaseChange B.pullback pushBase pushFst)
+    (C : CompactFiberProjectionFormula.KFlatTensorCoefficientComparison
+      (D := D) P K V)
+    (hS : SourceTensorData.KFlatDqcSLinearComponents
+      (D := D) Q B A) :
+    D.PerfectComponentsSemiorthogonal A :=
+  D.perfectComponentsSemiorthogonal_of_kFlatTensorCoefficients
+    A hA hIso H Q B K V pushBase pushFst adj P faithful
+      C.toKFlatTensorCoefficientData hS
 
 end KFlatBaseChangeData
 
