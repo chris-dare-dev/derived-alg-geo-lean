@@ -210,6 +210,70 @@ lemma inv_closed (s : IsShiftBy X n Y) :
     dgComp (n + 1) (-n) 1 _ 0 s.hom
   rw [key2, map_zero, AddMonoidHom.zero_apply]
 
+/-! ### Precomposition by a shift
+
+The defining bijectivity of `IsShiftBy` concerns postcomposition with the
+shift element.  Its inverse also makes precomposition an equivalence in the
+other Hom-variable.  Recording that derived operation once avoids rebuilding
+the same associativity argument whenever a homogeneous map is regraded by
+shifting its source. -/
+
+/-- Precomposition with the inverse of a chosen shift is an additive
+equivalence
+
+`Hom^p(X, W) ≃ Hom^(n+p)(Y, W)`.
+
+The inverse precomposes with the shift element itself. -/
+noncomputable def precompEquiv (s : IsShiftBy X n Y) (W : C)
+    (p q : ℤ) (h : n + p = q) :
+    (dgHom X W).X p ≃+ (dgHom Y W).X q where
+  toFun f := dgComp n p q h s.inv f
+  invFun g := dgComp (-n) q p (by omega) s.hom g
+  left_inv f := by
+    change dgComp (-n) q p (by omega) s.hom
+      (dgComp n p q h s.inv f) = f
+    rw [← dgComp_assoc (-n) n p 0 q p (by omega) h (by omega),
+      s.hom_inv, dgId_comp]
+  right_inv g := by
+    change dgComp n p q h s.inv
+      (dgComp (-n) q p (by omega) s.hom g) = g
+    rw [← dgComp_assoc n (-n) q 0 p q (by omega) (by omega) (by omega),
+      s.inv_hom, dgId_comp]
+  map_add' f g := map_add (dgComp n p q h s.inv) f g
+
+/-- Forward source regrading is left composition with the shift inverse. -/
+lemma precompEquiv_apply (s : IsShiftBy X n Y) (W : C)
+    (p q : ℤ) (h : n + p = q) (f : (dgHom X W).X p) :
+    s.precompEquiv W p q h f = dgComp n p q h s.inv f :=
+  rfl
+
+/-- Inverse source regrading is left composition with the shift element. -/
+lemma precompEquiv_symm_apply (s : IsShiftBy X n Y) (W : C)
+    (p q : ℤ) (h : n + p = q) (g : (dgHom Y W).X q) :
+    (s.precompEquiv W p q h).symm g =
+      dgComp (-n) q p (by omega) s.hom g :=
+  rfl
+
+/-- Precomposition by a shift inverse commutes with the differential. -/
+lemma precompEquiv_d (s : IsShiftBy X n Y) (W : C)
+    (p q : ℤ) (h : n + p = q) (f : (dgHom X W).X p) :
+    ((dgHom Y W).d q (q + 1)).hom (s.precompEquiv W p q h f) =
+      s.precompEquiv W (p + 1) (q + 1) (by omega)
+        (((dgHom X W).d p (p + 1)).hom f) := by
+  rw [precompEquiv_apply, precompEquiv_apply,
+    dgComp_leibniz n p q (q + 1) h (by omega) s.inv f,
+    s.inv_closed]
+  simp
+
+/-- A homogeneous map is closed if and only if its regrading by a source
+shift is closed. -/
+lemma precompEquiv_d_eq_zero_iff (s : IsShiftBy X n Y) (W : C)
+    (p q : ℤ) (h : n + p = q) (f : (dgHom X W).X p) :
+    ((dgHom Y W).d q (q + 1)).hom (s.precompEquiv W p q h f) = 0 ↔
+      ((dgHom X W).d p (p + 1)).hom f = 0 := by
+  rw [s.precompEquiv_d W p q h f]
+  exact (s.precompEquiv W (p + 1) (q + 1) (by omega)).map_eq_zero_iff
+
 end Inverse
 
 section Uniqueness

@@ -163,6 +163,7 @@ Category
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
+│  │  │  ├─ sourceShiftEquiv              additive regrading through IsShiftBy.precompEquiv
 │  │  │  ├─ whiskerLeft / whiskerRight   both sign-free, additive, degree-preserving
 │  │  │  │  ├─ interchange               Godement, with the Koszul sign (-1)^(m n)
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
@@ -273,7 +274,8 @@ Category
 │     │     ├─ twistKernel                           ordinary image of the selected dg cone
 │     │     ├─ kernel-presented twist candidate       exact image of its dg cone
 │     │     ├─ counitTriangleInSource                literal counit triangle, pointwise distinguished
-│     │     └─ presented dg comparison               pointwise/natural/shift-compatible layers
+│     │     ├─ presented dg comparison               pointwise/natural/shift-compatible layers
+│     │     └─ conditional KernelAutoequivalence     from explicit H⁰ equivalence + natural comparison
 │     ├─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
 │     │  └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
 │     │     ├─ unshifted cotwist-cone candidate       exact image of its dg cone
@@ -281,15 +283,20 @@ Category
 │     │     ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
 │     │     ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
 │     │     ├─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
-│     │     └─ presented dg comparison               pointwise/natural/shift-compatible layers
+│     │     ├─ presented dg comparison               pointwise/natural/shift-compatible layers
+│     │     └─ conditional KernelAutoequivalence     from explicit H⁰ equivalence + natural comparison
 │     ├─ DualTwistKernelData              left-adjunction unit specialization after swapping
 │     │  └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
 │     │     ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
-│     │     └─ dualTwistTriangleInTarget             inverse rotation, pointwise distinguished
+│     │     ├─ dualTwistTriangleInTarget             inverse rotation, pointwise distinguished
+│     │     ├─ presented dg comparison               cotwist comparison reused after swapping
+│     │     └─ conditional KernelAutoequivalence     explicit H⁰ equivalence + natural comparison
 │     └─ DualCotwistKernelData            left-adjunction counit specialization after swapping
 │        └─ DualCotwistKernelConeData     reuses the counit/twist cone and normalization
 │           ├─ dualCotwistKernel                      selected enhanced cone presenting dual cotwist
-│           └─ dualCotwistTriangleInSource           literal counit triangle, pointwise distinguished
+│           ├─ dualCotwistTriangleInSource           literal counit triangle, pointwise distinguished
+│           ├─ presented dg comparison               twist comparison reused after swapping
+│           └─ conditional KernelAutoequivalence     explicit H⁰ equivalence + natural comparison
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
@@ -298,6 +305,7 @@ Category
 │  │  ├─ triangulated equivalences         canonical Mathlib package for twist and cotwist
 │  │  └─ K₀ action                        identity minus the corresponding adjunction composite
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
+│     ├─ FM twist/cotwist adapters         conditional KernelAutoequivalence, no new record
 │     └─ full sphericality                 pending Morita/adjoint-comparison theorem
 ├─ Derived-category extensions
 │  └─ Ext adjunction / dimension shift / resolution naturality
