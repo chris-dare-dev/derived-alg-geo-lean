@@ -604,6 +604,25 @@ jobs:
           # Style is per-file and cheap; it always runs.
           lake exe lint-style
 
+      - name: Compiler warning ratchet
+        run: |
+          set -euo pipefail
+          # The warnings Lean emits while elaborating were never gated, so they
+          # only grew: 93 by the time this was wired, in which a Mathlib
+          # deprecation with a real deadline looked exactly like a `simpa` nag.
+          # scripts/check_warnings.py holds deprecations at zero in code we own
+          # and lets the rest shrink but never grow, the same ratchet shape as
+          # scripts/nolints.json above.
+          #
+          # The library is already built by now, so this re-invocation compiles
+          # nothing: Lake replays the cached modules and reprints their
+          # warnings, which is the whole reason the raw count in a full log is
+          # several times the real one. If that ever stops being true the
+          # capture comes back empty, and the script fails rather than passing
+          # vacuously on a silent log.
+          lake build DerivedAlgGeo 2>&1 | tee lean-warnings.log
+          python3 scripts/check_warnings.py lean-warnings.log
+
       - name: Gate console encoding
         # Every gate prints declaration names; on this runner's cp1252 console
         # a gate that cannot print `δ` dies with a `charmap` traceback instead
@@ -811,7 +830,7 @@ jobs:
           echo "using venv interpreter $VENV_PY"
 
           "$VENV_BIN/pip" install --quiet \
-            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@b90d0d97fa73f90ebdf25b6faf480956d94ea49e#subdirectory=contract"
+            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@ed71fbba2ef4261ae6ae7153ffc21cfe3d1bab25#subdirectory=contract"
           MFC="$VENV_BIN/mfc"
 
           # Assert the installed schema is the one the emitter writes against.
