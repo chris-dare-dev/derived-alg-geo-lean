@@ -14,9 +14,10 @@ H⁰ Hom-spaces and the existence of scalar-linear copowers now construct that
 witness automatically, so the numerical Seidel--Thomas formula needs no
 additional presentation data.
 
-The endomorphism-level result still assumes that scalar-linear evaluation
-preserves the chosen cones.  No exactness, sphericality, or autoequivalence is
-inferred from Hom-finiteness or formality.
+The endomorphism-level result still accepts a redundant cone witness pending
+the consumer cutover.  Exactness comes from the generic dg-functor theorem,
+not from Hom-finiteness or formality; no sphericality or autoequivalence is
+inferred.
 -/
 
 set_option autoImplicit false
@@ -49,9 +50,9 @@ theorem twistK₀Of_eq_twistK₀_ofHomFiniteBounded (X : H0 C) :
     (LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded k V) X
 
 set_option backward.isDefEq.respectTransparency false in
-/-- If scalar-linear evaluation also preserves chosen cones, the induced
-endomorphism is the numerical twist without a separately supplied Euler
-copower witness. -/
+/-- The induced endomorphism is the numerical twist without a separately
+supplied Euler copower witness.  The cone argument is retained for compatibility
+and is redundant. -/
 theorem twistK₀Map_eq_twistK₀_ofHomFiniteBounded
     (hVc : DGFunctor.PreservesChosenCones V.functor) :
     letI : K.twist.h0.CommShift ℤ :=

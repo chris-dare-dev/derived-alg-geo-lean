@@ -151,8 +151,9 @@ noncomputable def shiftedFunctorH0CommShift (F : DGFunctor A B) (n : ℤ)
   exact Functor.CommShift.ofIso (F.shiftedFunctorH0Iso n).symm ℤ
 
 set_option backward.isDefEq.respectTransparency false in
-/-- A dg functor preserving chosen cones remains exact on `H⁰` after every
-integral dg shift.
+/-- A dg functor remains exact on `H⁰` after every integral dg shift.  The
+shift and cone arguments are retained for compatibility and are automatic for
+every dg functor.
 
 The proof composes the exact functor `H⁰(F)` with the sign-correct exact
 ordinary shift `[n]`, then transports exactness across

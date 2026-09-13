@@ -10,12 +10,13 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Lift
 /-!
 # Preservation of pretriangulated dg structure
 
-Every dg functor preserves the representability witnesses that define shifts:
-`DGFunctor.preservesShifts` supplies the dg-level capability automatically.
-Preservation of chosen cone witnesses remains genuine extra data, recorded by
-`DGFunctor.PreservesChosenCones`, but this capability transports across
-isomorphisms in `Z⁰ (DGFunctor C D)`.  Transport to the ordinary shift functors
-and cone triangles on `H⁰` belongs to the dg-enhancement layer.
+Every dg functor preserves the representability witnesses that define shifts
+and cones.  `DGFunctor.preservesShifts` and
+`DGFunctor.preservesChosenCones` supply the two dg-level capabilities
+automatically.  For cones, the inverse to the image splitting map is built
+from the images of the two projections extracted from the source cone.
+Transport to the ordinary shift functors and cone triangles on `H⁰` belongs
+to the dg-enhancement layer.
 -/
 
 set_option autoImplicit false
@@ -77,11 +78,7 @@ bijective with right composition with the image of the inverse.
 So `PreservesShifts` is not a hypothesis anybody has to discharge; it is
 supplied here for every dg functor.  The structure stays because it names the
 capability and because `mapShift` is the useful accessor, but a caller that used
-to take a `PreservesShifts` argument can now call this instead.
-
-`PreservesChosenCones` is a genuine hypothesis and stays one: a cone is not an
-invertible element, and a dg functor need not preserve the splitting of maps
-into a cone. -/
+to take a `PreservesShifts` argument can now call this instead. -/
 noncomputable def preservesShifts (F : DGFunctor C D) : PreservesShifts F where
   mapShift {X Y n} s :=
     { hom := F.map (-n) s.hom
@@ -438,6 +435,58 @@ lemma mapCone_toShift (hCone : PreservesChosenCones F)
     hCone.mapCone_fst, hShift.mapShift_hom]
 
 end PreservesChosenCones
+
+/-- **Every dg functor preserves the chosen cone witnesses.**
+
+The cone universal property is a split representability statement.  A source
+cone supplies projections `fst` and `snd` satisfying the usual five matrix
+identities with `inl` and `inr`.  After applying a dg functor, those identities
+still hold.  For an arbitrary target object `W`, they exhibit
+
+`c ↦ (c ≫ F(fst), c ≫ F(snd))`
+
+as the inverse to the image cone's splitting map.  Thus neither fullness nor a
+pretriangulated existence assumption is needed.  The structure remains useful
+as a named package consumed by the `H⁰` exactness adapters. -/
+noncomputable def preservesChosenCones (F : DGFunctor C D) :
+    PreservesChosenCones F where
+  mapCone {X Y Z f} hc :=
+    { inr := F.map 0 hc.inr
+      inr_closed := by
+        rw [← F.map_d 0 1 hc.inr, hc.inr_closed, map_zero]
+      inl := F.map (-1) hc.inl
+      δ_inl := by
+        rw [← F.map_d (-1) 0 hc.inl, hc.δ_inl, F.map_comp]
+      bijective W p q hq := by
+        let inverse := fun c : (dgHom W (F.obj Z)).X p =>
+          (dgComp p 1 q hq c (F.map 1 hc.fst),
+            dgComp p 0 p (by omega) c (F.map 0 hc.snd))
+        refine Function.bijective_iff_has_inverse.2 ⟨inverse, ?_, ?_⟩
+        · intro ab
+          apply Prod.ext
+          · dsimp [inverse]
+            rw [map_add, AddMonoidHom.add_apply,
+              dgComp_assoc q (-1) 1 p 0 q (by omega) (by omega) (by omega),
+              dgComp_assoc p 0 1 p 1 q (by omega) (by omega) (by omega),
+              ← F.map_comp, ← F.map_comp,
+              hc.inl_comp_fst, hc.inr_comp_fst, F.map_id, map_zero]
+            simp [dgComp_id]
+          · dsimp [inverse]
+            rw [map_add, AddMonoidHom.add_apply,
+              dgComp_assoc q (-1) 0 p (-1) p (by omega) (by omega) (by omega),
+              dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega),
+              ← F.map_comp, ← F.map_comp,
+              hc.inl_comp_snd, hc.inr_comp_snd, map_zero, F.map_id]
+            simp [dgComp_id]
+        · intro c
+          dsimp [inverse]
+          rw [dgComp_assoc p 1 (-1) q 0 p (by omega) (by omega) (by omega),
+            dgComp_assoc p 0 0 p 0 p (by omega) (by omega) (by omega),
+            ← F.map_comp, ← F.map_comp, ← map_add,
+            ← (F.map 0).map_add,
+            hc.fst_inl_add_snd_inr, F.map_id, dgComp_id] }
+  mapCone_inr _ := rfl
+  mapCone_inl _ := rfl
 
 variable {F : DGFunctor C D}
 

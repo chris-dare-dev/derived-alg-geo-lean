@@ -170,9 +170,9 @@ Category
 │  │  │  └─ shiftedFunctorH0CommShift / IsTriangulated
 │  │  │                                 transports exactness with the signed shift package
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
-│  │  └─ PreservesChosenCones            strong witness-preserving capability
+│  │  └─ PreservesChosenCones            free: mapped fst/snd split every image cone
 │  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
-│  │     └─ H0 exactness                 derived weak cone-triangle certificate
+│  │     └─ h0CommShift / h0IsTriangulated automatic non-instance H⁰ exactness
 │  ├─ IsCopowerOf K X Z                   `Z = K ⊗ X`, by its universal property
 │  │  ├─ lift / lift_unique              cochains out of `K` are morphisms out of `Z`
 │  │  ├─ compare                         closed canonical comparison, strict composition
@@ -191,7 +191,7 @@ Category
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
 │  │        ├─ twistTriangleIso          original same-evaluation cone-choice comparison
 │  │        ├─ twistTriangleIsoOfEvaluation  coherent across evaluation and cone choices
-│  │        ├─ twistH0IsTriangulated    exact, given only PreservesChosenCones
+│  │        ├─ twistH0IsTriangulated    exact; legacy wrapper still accepts redundant witness
 │  │        ├─ K₀ action                 generic cone formula: identity minus evaluation
 │  │        └─ IsEulerCopower           choice-invariant realization input for numerical twistK₀
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
@@ -260,7 +260,7 @@ Category
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
 │  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
 │  │  ├─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
-│  │  ├─ H⁰ exactness                     all four conventional functors, from endpoint cone preservation
+│  │  ├─ H⁰ exactness                     automatic for every dg functor; no endpoint cone hypotheses
 │  │  ├─ triangulated equivalences         canonical Mathlib package for twist and cotwist
 │  │  └─ K₀ action                        identity minus the corresponding adjunction composite
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only

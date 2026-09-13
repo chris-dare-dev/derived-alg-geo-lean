@@ -63,9 +63,9 @@ theorem twistK₀Of_eq_twistK₀ (hV : V.IsEulerCopower k) (X : H0 C) :
     K.twistK₀Of, hV X, chiRight_of]
 
 set_option backward.isDefEq.respectTransparency false in
-/-- If the evaluation functor is exact and realizes the Euler copower formula,
-the induced map of the object twist is exactly the existing numerical
-endomorphism `twistK₀`. -/
+/-- If evaluation realizes the Euler copower formula, the induced object-twist
+map is the existing numerical endomorphism `twistK₀`.  The cone argument is
+retained for compatibility and is redundant. -/
 theorem twistK₀Map_eq_twistK₀
     (hVc : DGFunctor.PreservesChosenCones V.functor)
     (hV : V.IsEulerCopower k) :

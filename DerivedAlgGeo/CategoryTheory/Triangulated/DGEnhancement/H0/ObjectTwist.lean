@@ -38,13 +38,11 @@ original `twistTriangleIso` remains the definitional wrapper for changing only
 the cone choices.  All three facts come from the generic strict-square
 cone-triangle layer; the only input beyond it is that evaluation is closed.
 
-`twistH0IsTriangulated` adds that `H⁰(T_E)` is a triangulated functor, on the
-one hypothesis that `RHom(E,-) ⊗ E` preserves chosen cones.  The shift half is
-free: `DGFunctor.preservesShifts` holds for every dg functor, because a shift
-element is a two-sided invertible element.  The cone half is not, and stays
-open: `PreservesChosenCones` asks that maps *into* the cone split, while
-`IsCopowerOf` only controls maps out.  See the discussion in
-`DGCategory/Pretriangulated/ObjectTwist.lean`.
+`H⁰(T_E)` is triangulated automatically: every dg functor preserves both
+shift witnesses and the strong split cone witnesses.  The existing
+`twistH0IsTriangulated` wrapper temporarily retains its now-redundant endpoint
+argument for source compatibility; `DGFunctor.h0IsTriangulated K.twist` is the
+unconditional generic interface.
 
 Nothing here says `T_E` is an autoequivalence, calls `E` spherical, or connects
 it to `SerreFunctor.IsSphericalObject`.  The generic `HasCopowers` capability
@@ -131,16 +129,17 @@ theorem twistTriangleFunctor_map_hom₃ {X Y : H0 C} (f : X ⟶ Y) :
 /-- **`H⁰(T_E)` commutes with the shift.**
 
 `DGFunctor.commShift` spends the dg-level shift preservation on the ordinary
-functor; `twistH0IsTriangulated` adds the cone half. -/
+functor; cone preservation is automatic as well. -/
 @[reducible]
 noncomputable def twistH0CommShift : K.twist.h0.CommShift ℤ :=
   DGFunctor.commShift _ K.preservesShifts
 
 /-- **The object twist is exact on `H⁰`.**
 
-Both dg-level capabilities are available for the twist as soon as they are
-available for `RHom(E,-) ⊗ E`, so `H⁰` of the twist commutes with the shift and
-carries distinguished triangles to distinguished triangles.
+Both dg-level capabilities are available for every dg functor, so `H⁰` of the
+twist commutes with the shift and carries distinguished triangles to
+distinguished triangles.  The argument below is retained for compatibility but
+is redundant as a hypothesis.
 
 This is exactness, not invertibility: nothing here says `T_E` is an
 equivalence. -/

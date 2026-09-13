@@ -14,8 +14,8 @@ Seidel--Thomas formula without passing through additive `EvaluationData`.
 `LinearEvaluationData.IsEulerCopower` identifies the evaluation term in the
 generic cone subtraction formula with `χ(E,X) • [E]`.
 
-Exactness remains explicit: the endomorphism-level theorem additionally assumes
-that scalar-linear evaluation preserves chosen cones.  Nothing here compares
+Exactness is automatic for every dg functor.  The endomorphism-level theorem
+still accepts a redundant cone-preservation argument for compatibility.  Nothing here compares
 the additive and scalar-linear universal properties or asserts that the twist
 is an autoequivalence.
 -/
@@ -47,8 +47,9 @@ theorem twistK₀Of_eq_twistK₀ (hV : V.IsEulerCopower k) (X : H0 C) :
   rw [SphericalTwist.twistK₀_of, K.twistK₀Of, hV X, chiRight_of]
 
 set_option backward.isDefEq.respectTransparency false in
-/-- If scalar-linear evaluation is exact and realizes the Euler copower
-formula, its cone induces the numerical twist endomorphism on `K₀`. -/
+/-- If scalar-linear evaluation realizes the Euler copower formula, its cone
+induces the numerical twist endomorphism on `K₀`.  The cone argument is
+retained for compatibility and is redundant. -/
 theorem twistK₀Map_eq_twistK₀
     (hVc : DGFunctor.PreservesChosenCones V.functor)
     (hV : V.IsEulerCopower k) :

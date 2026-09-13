@@ -56,8 +56,9 @@ theorem functorK₀Of (hα : IsClosed α) (X : H0 C) :
 variable [IsPretriangulated C]
 
 set_option backward.isDefEq.respectTransparency false in
-/-- If both endpoints preserve chosen cones, the functorial cone acts on `K₀`
-by the target endpoint minus the source endpoint. -/
+/-- The functorial cone acts on `K₀` by target endpoint minus source endpoint.
+The endpoint cone arguments are retained for source compatibility and are
+redundant. -/
 theorem functorK₀Map
     (hα : IsClosed α)
     (hFc : DGFunctor.PreservesChosenCones F)
