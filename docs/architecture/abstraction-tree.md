@@ -163,6 +163,7 @@ Category
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
+│  │  │  ├─ sourceShiftEquiv              additive regrading through IsShiftBy.precompEquiv
 │  │  │  ├─ whiskerLeft / whiskerRight   both sign-free, additive, degree-preserving
 │  │  │  │  ├─ interchange               Godement, with the Koszul sign (-1)^(m n)
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
