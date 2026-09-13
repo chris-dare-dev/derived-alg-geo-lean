@@ -7,6 +7,14 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Fourier--Mukai presentations of strict dg adjunctions (2026-09-13):
+  `RightAdjointKernelData.ofH0Presentation` and its left-adjoint mirror spend
+  the generic equivalence-transported `DGAdjunction.H0Presentation` on the
+  existing Fourier--Mukai adjoint-kernel structures.  The two orientations
+  agree definitionally with the existing correspondence-swap adapters, so no
+  dg-specific copy of kernel-adjunction data is introduced.  Kernels,
+  endpoint comparisons, and any kernel arrow realizing the unit or counit
+  remain supplied; no comparison of dg and kernel cones is inferred.
 - Ordinary presentations of strict dg adjunctions (2026-09-13):
   `DGAdjunction.H0Presentation` transports `DGAdjunction.h0` through supplied
   source and target category equivalences and identifies the resulting two
