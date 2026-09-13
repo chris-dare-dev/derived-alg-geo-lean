@@ -133,7 +133,9 @@ CategoryTheory/Triangulated
   ├─→ CompactlyGenerated, SemiorthogonalDecomposition, SphericalTwist
   ├─→ FourierMukai                            generic kernel autoequivalences;
   │                                           kernels vary through `kernelTransform`,
-  │                                           enhanced cones map pointwise to transform triangles
+  │                                           enhanced cones map pointwise to transform triangles;
+  │                                           consumes presented dg adjunction triangles only
+  │                                           through explicit objectwise comparison
   ├─→ Families                                pseudofunctorial fiber categories
   ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation,
   │                                           functorial distinguished cone triangles and
