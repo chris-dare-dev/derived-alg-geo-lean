@@ -27,7 +27,11 @@ separately at each object and therefore supplies no naturality.  A separate
 cone isomorphism and its two remaining triangle squares; from that input the
 file constructs natural unit- and cotwist-triangle isomorphisms.  It does not
 construct this input, prove independence of either cone choice, or transfer
-exactness, equivalence, kernel-presentation, or sphericality.
+equivalence, kernel-presentation, or sphericality.  A further
+`ShiftCompatibility` refinement can select a Fourier--Mukai `CommShift`
+structure compatible with the conventional cotwist comparison; exactness
+then transfers through Mathlib's existing `Functor.isTriangulated_of_iso`
+theorem.
 -/
 
 set_option autoImplicit false
@@ -240,6 +244,48 @@ to the Fourier--Mukai cotwist. -/
 noncomputable def transportedDGCotwistIso :
     K.transportedDGCotwist eA ≅ S.cotwist :=
   K.transportedCotwistH0Iso (eC := eA) ≪≫ N.transportedCotwistIso
+
+/-! ### Compatibility with selected shift structures -/
+
+/-- Compatibility of the supplied conventional dg/Fourier--Mukai cotwist
+comparison with an independently selected shift structure on the
+Fourier--Mukai cotwist.
+
+The source uses the canonical sign-correct shift structure on the conventional
+pointwise `[-1]` cotwist.  Compatibility of the intermediate comparison from
+the actual shifted dg cone is a separate coherence question and is not stored
+here. -/
+structure ShiftCompatibility where
+  /-- The selected shift structure on the Fourier--Mukai cotwist. -/
+  cotwistCommShift : S.cotwist.CommShift ℤ
+  /-- The conventional cotwist comparison respects the source and target
+  shift structures. -/
+  transportedCotwistIso_commShift :
+    letI : (K.transportedCotwist eA).CommShift ℤ :=
+      K.transportedCotwistCommShift (eC := eA)
+    letI : S.cotwist.CommShift ℤ := cotwistCommShift
+    NatTrans.CommShift N.transportedCotwistIso.hom ℤ
+
+namespace ShiftCompatibility
+
+variable (h : N.ShiftCompatibility)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The Fourier--Mukai cotwist is triangulated relative to the selected target
+shift structure when the conventional cotwist comparison respects shifts. -/
+theorem cotwistIsTriangulated [eA.functor.IsTriangulated] :
+    letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
+    S.cotwist.IsTriangulated := by
+  letI : (K.transportedCotwist eA).CommShift ℤ :=
+    K.transportedCotwistCommShift (eC := eA)
+  letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
+  letI : NatTrans.CommShift N.transportedCotwistIso.hom ℤ :=
+    h.transportedCotwistIso_commShift
+  letI : (K.transportedCotwist eA).IsTriangulated :=
+    K.transportedCotwistIsTriangulated (eC := eA)
+  exact Functor.isTriangulated_of_iso N.transportedCotwistIso
+
+end ShiftCompatibility
 
 end PresentedUnitComparisonData
 

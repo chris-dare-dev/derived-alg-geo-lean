@@ -7,6 +7,19 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- Shift-compatible dg/Fourier--Mukai twist and cotwist comparison
+  (2026-09-13): the nested `ShiftCompatibility` records refine supplied
+  `PresentedCounitComparisonData` and `PresentedUnitComparisonData` with an
+  independently selected `CommShift` on the Fourier--Mukai twist or cotwist
+  and Mathlib's `NatTrans.CommShift` condition for the corresponding natural
+  isomorphism.  `twistIsTriangulated` and `cotwistIsTriangulated` then delegate
+  exactness transfer to Mathlib's `Functor.isTriangulated_of_iso`.  The
+  cotwist side compares the conventional pointwise `[-1]` functor, whose
+  sign-correct shift structure is already packaged; compatibility of the
+  intermediate actual shifted dg cone remains separate.  No target shift
+  structure is manufactured, no global instance is installed, and no
+  uniqueness, equivalence, kernel-identification, or sphericality statement
+  is asserted.
 - Supplied natural comparison of dg and Fourier--Mukai adjunction cones
   (2026-09-13): `Triangle.FirstMapNormalizationData.ComparisonData` records the
   remaining data for an endpoint-strict comparison of two normalizations with
@@ -18,9 +31,9 @@ blocks should normally move it rather than add more declarations beside it.
   this contract to the independently chosen dg and kernel cones; they derive
   natural unit/counit and twist/cotwist comparisons, including the actual
   shifted dg cotwist.  The records are supplied and are not inferred from the
-  earlier pointwise choices.  No canonicity, `CommShift` compatibility,
-  exactness/equivalence transfer, dg kernel identification, or sphericality is
-  asserted.
+  earlier pointwise choices.  The bare records assert no canonicity,
+  `CommShift` compatibility, exactness/equivalence transfer, dg kernel
+  identification, or sphericality.
 - Objectwise dg/Fourier--Mukai twist comparison (2026-09-13):
   `CounitKernelConeData.presentedCounitTriangleObjIso` applies Mathlib's
   triangle-isomorphism completion theorem to the presented dg and independently

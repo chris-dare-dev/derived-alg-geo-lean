@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionConePresentation
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.FunctorTransport
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.CounitKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionPresentation
 
@@ -24,8 +25,11 @@ therefore supplies no naturality.  A separate `PresentedCounitComparisonData`
 interface records a genuinely supplied natural twist isomorphism and its two
 remaining triangle squares; from that input the file constructs the natural
 counit-triangle isomorphism.  It does not construct this input, prove
-independence of either cone choice, or transfer exactness, equivalence,
-kernel-presentation, or sphericality.
+independence of either cone choice, or transfer equivalence,
+kernel-presentation, or sphericality.  A further `ShiftCompatibility`
+refinement can select a Fourier--Mukai `CommShift` structure compatible with
+the comparison; exactness then transfers through Mathlib's existing
+`Functor.isTriangulated_of_iso` theorem.
 -/
 
 set_option autoImplicit false
@@ -172,6 +176,53 @@ the Fourier--Mukai twist. -/
 noncomputable def transportedTwistIso :
     K.transportedTwist eB ≅ S.twist :=
   Functor.isoWhiskerRight N.presentedCounitTriangleIso Triangle.π₃
+
+/-- The projected twist isomorphism is the third-vertex isomorphism supplied
+by the endpoint-strict comparison data. -/
+@[simp]
+theorem transportedTwistIso_hom :
+    N.transportedTwistIso.hom = N.thirdIso.hom :=
+  rfl
+
+/-! ### Compatibility with selected shift structures -/
+
+/-- Compatibility of the supplied dg/Fourier--Mukai twist comparison with an
+independently selected shift structure on the Fourier--Mukai twist.
+
+The source uses the canonical shift structure on the transported `H⁰` dg
+twist.  This record does not manufacture a target structure with
+`Functor.CommShift.ofIso`; it records compatibility with the structure chosen
+by the realization. -/
+structure ShiftCompatibility where
+  /-- The selected shift structure on the Fourier--Mukai twist. -/
+  twistCommShift : S.twist.CommShift ℤ
+  /-- The twist comparison respects the source and target shift structures. -/
+  transportedTwistIso_commShift :
+    letI : (K.transportedTwist eB).CommShift ℤ :=
+      K.twist.transportedH0CommShift
+    letI : S.twist.CommShift ℤ := twistCommShift
+    NatTrans.CommShift N.transportedTwistIso.hom ℤ
+
+namespace ShiftCompatibility
+
+variable (h : N.ShiftCompatibility)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The Fourier--Mukai twist is triangulated relative to the selected target
+shift structure when the supplied comparison respects shifts. -/
+theorem twistIsTriangulated [eB.functor.IsTriangulated] :
+    letI : S.twist.CommShift ℤ := h.twistCommShift
+    S.twist.IsTriangulated := by
+  letI : (K.transportedTwist eB).CommShift ℤ :=
+    K.twist.transportedH0CommShift
+  letI : S.twist.CommShift ℤ := h.twistCommShift
+  letI : NatTrans.CommShift N.transportedTwistIso.hom ℤ :=
+    h.transportedTwistIso_commShift
+  letI : (K.transportedTwist eB).IsTriangulated :=
+    K.twist.transportedH0IsTriangulated
+  exact Functor.isTriangulated_of_iso N.transportedTwistIso
+
+end ShiftCompatibility
 
 end PresentedCounitComparisonData
 

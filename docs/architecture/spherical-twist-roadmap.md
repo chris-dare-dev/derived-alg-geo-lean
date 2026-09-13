@@ -327,9 +327,13 @@ that comparison are instance hypotheses to be discharged by the realization.
    natural third-vertex isomorphism and two remaining triangle squares.
    `PresentedUnitComparisonData` and `PresentedCounitComparisonData` specialize
    it and derive natural twist/cotwist and triangle-family isomorphisms when
-   that data is supplied.  They do not construct the comparison data or imply
-   dg quasi-equivalence, choice independence, `CommShift` compatibility,
-   exactness/equivalence transfer, or sphericality.  The dg notion is still
+   that data is supplied.  Their nested `ShiftCompatibility` refinements can
+   additionally select Fourier--Mukai twist/cotwist `CommShift` structures and
+   require Mathlib compatibility of the projected natural isomorphisms; this
+   transfers `IsTriangulated` from the dg presentations.  Neither the bare
+   comparison data nor the refinements are constructed here, and they imply no
+   dg quasi-equivalence, choice independence, equivalence transfer, target
+   shift-structure uniqueness, or sphericality.  The dg notion is still
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
    and no comparison with those exists.
 
@@ -653,7 +657,10 @@ that comparison are instance hypotheses to be discharged by the realization.
    identify the two cotwist functors naturally.  The additional realization
    data and remaining triangle-map squares are now explicitly packaged by
    `PresentedUnitComparisonData`, which derives the natural comparison but is
-   not constructed here.
+   not constructed here.  Its `ShiftCompatibility` refinement records
+   compatibility of the conventional cotwist isomorphism with a selected
+   Fourier--Mukai `CommShift` and transfers triangulatedness.  Compatibility
+   of the intermediate actual shifted dg cotwist is still open.
    The left-adjunction unit is now a third consumer:
    `DualTwistKernelData` swaps the two correspondences and reuses
    `LeftAdjointKernelData.toRightAdjointKernelData`, so its enhanced form names
@@ -672,7 +679,9 @@ that comparison are instance hypotheses to be discharged by the realization.
    triangle, so the transported dg twist and kernel twist are objectwise
    isomorphic.  `PresentedCounitComparisonData` now packages the additional
    natural twist isomorphism and remaining triangle-map squares and derives the
-   natural triangle comparison, but no geometric constructor supplies it.
+   natural triangle comparison, while its `ShiftCompatibility` refinement
+   transfers triangulatedness to a selected compatible Fourier--Mukai shift
+   structure.  No geometric constructor supplies either record.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
