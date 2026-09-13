@@ -119,6 +119,8 @@ Category
 │  │  ├─ IsShiftBy.linearHomIso          target shift as a shifted Hom-complex iso
 │  │  │  ├─ H⁰ homComplex ≃ₗ Hom in H⁰  intrinsic quotient comparison
 │  │  │  └─ Hⁿ homComplex ≃ₗ Hom in H⁰  target is the selected same-sign shift Y⟦n⟧
+│  │  ├─ homComplexFiniteCohomologyPresentation
+│  │  │                                   HomFiniteBounded support + field formality
 │  │  ├─ postcompCochain                fixed-source right composition, linear chain-map law
 │  │  ├─ Cdg (ModuleCat k)             standard model inherits Mathlib's k-linear structure
 │  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
@@ -142,7 +144,8 @@ Category
 │  │        ├─ evaluation                closed degree-zero map to the identity
 │  │        ├─ compareIso                coherent choice independence, strict over evaluation
 │  │        ├─ IsEulerCopower            generic H⁰ rank-one K₀ predicate
-│  │        │  └─ HomotopyCategory realization from supplied finite presentations
+│  │        │  ├─ realization from supplied finite presentations
+│  │        │  └─ automatic realization from HomFiniteBounded
 │  │        └─ TwistConeData             direct cone of scalar-linear evaluation
 │  │           ├─ compareIso / exactness  delegated to generic strict-square and cone APIs
 │  │           └─ K₀ action             identity minus evaluation; numerical twist via IsEulerCopower

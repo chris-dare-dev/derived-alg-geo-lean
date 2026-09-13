@@ -12,6 +12,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearCopow
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearCopowerFiniteFree
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.FiniteCohomologyCopower
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.FiniteCohomologyCopowerK0
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.HomComplexFiniteCohomologyPresentation
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearEvaluationK0
 
 /-!
