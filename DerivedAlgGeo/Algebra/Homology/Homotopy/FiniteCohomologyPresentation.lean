@@ -5,6 +5,7 @@ Released under the MIT license.
 import Mathlib.Algebra.Homology.HomotopyCategory.SingleFunctors
 import Mathlib.Algebra.Homology.HomologicalComplexAbelian
 import Mathlib.Algebra.Homology.SingleHomology
+import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 
 /-!
 # Finite cohomology presentations
@@ -26,6 +27,11 @@ dimensionality alone is not silently converted into a homotopy equivalence,
 and quasi-isomorphisms are not treated as homotopy equivalences. This file
 also does not mention dg copowers, Euler characteristics, or Grothendieck
 groups.
+
+When homology vanishes away from the selected degrees,
+`homologyModelIsoFiniteCohomologyModel` identifies the full zero-differential
+homology model with this finite model.  This is a categorical comparison, not
+a formality theorem for the original complex.
 -/
 
 set_option autoImplicit false
@@ -64,6 +70,104 @@ noncomputable def finiteCohomologyModelHomologyIso
   change F.obj (⨁ fun j : {j // j ∈ degrees} =>
     (singleFunctor A j.1).obj (K.homology j.1)) ≅ _
   exact F.mapBiproduct _
+
+/-- Away from the selected finite set, every degree of the finite cohomology
+model is a biproduct of zero objects. -/
+lemma isZero_finiteCohomologyModel_X_of_not_mem
+    (K : CochainComplex A ℤ) (degrees : Finset ℤ) (i : ℤ)
+    (hi : i ∉ degrees) :
+    IsZero ((finiteCohomologyModel K degrees).X i) := by
+  let F := HomologicalComplex.eval A (ComplexShape.up ℤ) i
+  apply ((F.mapBiproduct fun j : {j // j ∈ degrees} =>
+    (singleFunctor A j.1).obj (K.homology j.1))).isZero_iff.mpr
+  apply (biproduct.isLimit _).isZero_pt
+  exact Functor.isZero _ fun j =>
+    HomologicalComplex.isZero_single_obj_X
+      (ComplexShape.up ℤ) j.as.1 (K.homology j.as.1) i (by
+        intro h
+        apply hi
+        rw [h]
+        exact j.as.2)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The finite cohomology model has zero differential. -/
+@[simp]
+lemma finiteCohomologyModel_d
+    (K : CochainComplex A ℤ) (degrees : Finset ℤ) (i j : ℤ) :
+    (finiteCohomologyModel K degrees).d i j = 0 := by
+  change (⨁ fun n : {n // n ∈ degrees} =>
+    (singleFunctor A n.1).obj (K.homology n.1)).d i j = 0
+  apply (cancel_mono (((HomologicalComplex.eval A (ComplexShape.up ℤ) j).mapBiproduct
+    fun n : {n // n ∈ degrees} =>
+      (singleFunctor A n.1).obj (K.homology n.1))).hom).1
+  apply biproduct.hom_ext
+  intro n
+  dsimp only [Function.comp_def]
+  simp only [Category.assoc, Functor.mapBiproduct_hom,
+    biproduct.lift_π, HomologicalComplex.eval_map]
+  rw [zero_comp]
+  simpa only [CochainComplex.singleFunctor_obj_d, comp_zero, zero_comp] using
+    ((biproduct.π (fun n : {n // n ∈ degrees} =>
+      (singleFunctor A n.1).obj (K.homology n.1)) n).comm i j).symm
+
+/-- A biproduct whose summands other than `i` are zero is isomorphic to its
+`i`-th summand. -/
+private noncomputable def biproductIsoOfIsZeroCompl
+    {J : Type*} [Fintype J] (f : J → A) (i : J)
+    (h : ∀ j, j ≠ i → IsZero (f j)) :
+    (⨁ f) ≅ f i where
+  hom := biproduct.π f i
+  inv := biproduct.ι f i
+  hom_inv_id := by
+    apply biproduct.hom_ext
+    intro j
+    by_cases hj : j = i
+    · subst j
+      simp
+    · exact (h j hj).eq_of_tgt _ _
+  inv_hom_id := by simp
+
+/-- In a retained degree, evaluation of the finite cohomology model is the
+corresponding homology object. -/
+private noncomputable def finiteCohomologyModelXIsoOfMem
+    (K : CochainComplex A ℤ) (degrees : Finset ℤ) (i : ℤ)
+    (hi : i ∈ degrees) :
+    (finiteCohomologyModel K degrees).X i ≅ K.homology i :=
+  let F := HomologicalComplex.eval A (ComplexShape.up ℤ) i
+  F.mapBiproduct (fun j : {j // j ∈ degrees} =>
+      (singleFunctor A j.1).obj (K.homology j.1)) ≪≫
+    biproductIsoOfIsZeroCompl
+      (fun j : {j // j ∈ degrees} =>
+        ((singleFunctor A j.1).obj (K.homology j.1)).X i)
+      ⟨i, hi⟩ (fun j hj =>
+        HomologicalComplex.isZero_single_obj_X
+          (ComplexShape.up ℤ) j.1 (K.homology j.1) i (by
+            intro h
+            apply hj
+            apply Subtype.ext
+            exact h.symm)) ≪≫
+    HomologicalComplex.singleObjXSelf
+      (ComplexShape.up ℤ) i (K.homology i)
+
+/-- If the homology of `K` vanishes away from `degrees`, its full
+zero-differential homology model is isomorphic to the existing finite
+cohomology model on `degrees`.
+
+This comparison is categorical and does not assert that `K` itself is formal.
+-/
+noncomputable def homologyModelIsoFiniteCohomologyModel
+    (K : CochainComplex A ℤ) (degrees : Finset ℤ)
+    (hSupport : ∀ i, i ∉ degrees → IsZero (K.homology i)) :
+    homologyModel K ≅ finiteCohomologyModel K degrees :=
+  HomologicalComplex.Hom.isoOfComponents
+    (fun i => if hi : i ∈ degrees then
+      (finiteCohomologyModelXIsoOfMem K degrees i hi).symm
+    else
+      IsZero.iso (hSupport i hi)
+        (isZero_finiteCohomologyModel_X_of_not_mem K degrees i hi))
+    (fun i j _ => by
+      simp only [homologyModel_d, finiteCohomologyModel_d,
+        zero_comp, comp_zero])
 
 /-- A chosen homotopy presentation of a complex by finitely many of its
 homology objects. -/
