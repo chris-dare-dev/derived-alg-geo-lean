@@ -24,9 +24,11 @@ The unconditional completion is chosen separately at each object and
 therefore supplies no naturality.  A separate `PresentedCounitComparisonData`
 interface records a genuinely supplied natural twist isomorphism and its two
 remaining triangle squares; from that input the file constructs the natural
-counit-triangle isomorphism.  It does not construct this input, prove
-independence of either cone choice, or transfer equivalence,
-kernel-presentation, or sphericality.  A further `ShiftCompatibility`
+counit-triangle isomorphism.  It does not construct this input or prove
+independence of either cone choice.  Under an explicit equivalence hypothesis
+on the dg twist at `H⁰`, the comparison packages the selected kernel as a
+`KernelAutoequivalence`; it does not prove that hypothesis or sphericality.  A
+further `ShiftCompatibility`
 refinement can select a Fourier--Mukai `CommShift` structure compatible with
 the comparison; exactness then transfers through Mathlib's existing
 `Functor.isTriangulated_of_iso` theorem.
@@ -126,6 +128,8 @@ abbrev PresentedCounitComparisonData :=
 
 namespace PresentedCounitComparisonData
 
+section Comparison
+
 variable (N : S.PresentedCounitComparisonData adj H K hE)
 
 /-- Supply a natural comparison of the transported dg and Fourier--Mukai
@@ -184,7 +188,44 @@ theorem transportedTwistIso_hom :
     N.transportedTwistIso.hom = N.thirdIso.hom :=
   rfl
 
+end Comparison
+
+/-- The transported actual dg twist is a kernel functor once a natural
+comparison with the selected Fourier--Mukai twist has been supplied. -/
+theorem transportedTwist_isKernelFunctor
+    (N : S.PresentedCounitComparisonData adj H K hE) :
+    E.IsKernelFunctor (K.transportedTwist eB) :=
+  (S.isKernelFunctor_twist).of_natIso N.transportedTwistIso.symm
+
+/-- An explicit equivalence hypothesis on `H⁰` of the dg twist transfers to the
+selected Fourier--Mukai twist through the supplied natural comparison. -/
+theorem twist_isEquivalence
+    (N : S.PresentedCounitComparisonData adj H K hE)
+    (hK : K.twist.h0.IsEquivalence) :
+    S.twist.IsEquivalence := by
+  letI : (K.transportedTwist eB).IsEquivalence :=
+    K.twist.transportedH0_isEquivalence eB eB hK
+  exact Functor.isEquivalence_of_iso N.transportedTwistIso
+
+/-- The selected twist kernel, packaged as a kernel autoequivalence under the
+explicit equivalence hypothesis on `H⁰` of the dg twist. -/
+@[reducible]
+noncomputable def twistKernelAutoequivalence
+    (N : S.PresentedCounitComparisonData adj H K hE)
+    (hK : K.twist.h0.IsEquivalence) : KernelAutoequivalence Y W := by
+  letI : (K.transportedTwist eB).IsEquivalence :=
+    K.twist.transportedH0_isEquivalence eB eB hK
+  letI : S.twist.IsEquivalence :=
+    Functor.isEquivalence_of_iso N.transportedTwistIso
+  exact
+    { corr := E
+      kernel := S.twistKernel
+      equiv := S.twist.asEquivalence
+      iso := S.twistKernelIso.symm }
+
 /-! ### Compatibility with selected shift structures -/
+
+variable (N : S.PresentedCounitComparisonData adj H K hE)
 
 /-- Compatibility of the supplied dg/Fourier--Mukai twist comparison with an
 independently selected shift structure on the Fourier--Mukai twist.
@@ -221,6 +262,26 @@ theorem twistIsTriangulated [eB.functor.IsTriangulated] :
   letI : (K.transportedTwist eB).IsTriangulated :=
     K.twist.transportedH0IsTriangulated
   exact Functor.isTriangulated_of_iso N.transportedTwistIso
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The kernel autoequivalence of the selected Fourier--Mukai twist is an
+exact equivalence relative to the selected target shift package. -/
+theorem twistKernelAutoequivalenceIsTriangulated
+    [eB.functor.IsTriangulated] (hK : K.twist.h0.IsEquivalence) :
+    letI : (twistKernelAutoequivalence adj H K S hE N hK).equiv.functor.CommShift ℤ :=
+      h.twistCommShift
+    letI : (twistKernelAutoequivalence adj H K S hE N hK).equiv.inverse.CommShift ℤ :=
+      (twistKernelAutoequivalence adj H K S hE N hK).equiv.commShiftInverse ℤ
+    letI : (twistKernelAutoequivalence adj H K S hE N hK).equiv.CommShift ℤ :=
+      (twistKernelAutoequivalence adj H K S hE N hK).equiv.commShift_of_functor ℤ
+    (twistKernelAutoequivalence adj H K S hE N hK).equiv.IsTriangulated := by
+  letI : (twistKernelAutoequivalence adj H K S hE N hK).equiv.functor.CommShift ℤ :=
+    h.twistCommShift
+  letI : (twistKernelAutoequivalence adj H K S hE N hK).equiv.inverse.CommShift ℤ :=
+    (twistKernelAutoequivalence adj H K S hE N hK).equiv.commShiftInverse ℤ
+  letI : (twistKernelAutoequivalence adj H K S hE N hK).equiv.CommShift ℤ :=
+    (twistKernelAutoequivalence adj H K S hE N hK).equiv.commShift_of_functor ℤ
+  exact Equivalence.IsTriangulated.mk' _ h.twistIsTriangulated
 
 end ShiftCompatibility
 

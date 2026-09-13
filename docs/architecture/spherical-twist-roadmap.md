@@ -342,9 +342,14 @@ that comparison are instance hypotheses to be discharged by the realization.
    transfers `IsTriangulated` from the dg presentations.  On the cotwist side,
    the comparison from the actual shifted dg cone is then compatible by
    composition, with no additional field.  Neither the bare
-   comparison data nor the refinements are constructed here, and they imply no
-   dg quasi-equivalence, choice independence, equivalence transfer, target
-   shift-structure uniqueness, or sphericality.  The dg notion is still
+   comparison data nor the refinements are constructed here.  Given the
+   separate explicit `H⁰` equivalence hypotheses on the dg twist and unshifted
+   unit cone, however, the natural comparisons now package the selected twist
+   and cotwist kernels as `KernelAutoequivalence`s; `ShiftCompatibility`
+   together with the supplied triangulated endpoint equivalence makes those
+   ordinary equivalences exact.  This still implies no dg
+   quasi-equivalence, choice independence, target shift-structure uniqueness,
+   inverse-kernel formula, or sphericality.  The dg notion is still
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
    and no comparison with those exists.
 
@@ -679,7 +684,11 @@ that comparison are instance hypotheses to be discharged by the realization.
    Fourier--Mukai `CommShift` and transfers triangulatedness.  Compatibility
    of the intermediate actual shifted dg cotwist follows from the canonical
    transported comparison and is exposed by
-   `transportedDGCotwistIso_commShift`.
+   `transportedDGCotwistIso_commShift`.  The same supplied natural comparison
+   transports kernel-functor status to both versions of the dg cotwist and,
+   under the explicit equivalence hypothesis on the unshifted dg unit cone,
+   packages `cotwistKernelAutoequivalence`; the existing shift refinement and
+   supplied triangulated source equivalence make that equivalence exact.
    The left-adjunction unit is now a third consumer:
    `DualTwistKernelData` swaps the two correspondences and reuses
    `LeftAdjointKernelData.toRightAdjointKernelData`, so its enhanced form names
@@ -700,7 +709,11 @@ that comparison are instance hypotheses to be discharged by the realization.
    natural twist isomorphism and remaining triangle-map squares and derives the
    natural triangle comparison, while its `ShiftCompatibility` refinement
    transfers triangulatedness to a selected compatible Fourier--Mukai shift
-   structure.  No geometric constructor supplies either record.
+   structure.  Under an explicit equivalence hypothesis on `H⁰` of the dg
+   twist it also packages the selected cone kernel as
+   `twistKernelAutoequivalence`, with exactness supplied jointly by that
+   refinement and the triangulated target equivalence.  No geometric constructor
+   supplies either record or either equivalence hypothesis.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
