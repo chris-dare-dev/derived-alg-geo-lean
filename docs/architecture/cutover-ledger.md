@@ -62,6 +62,15 @@ blocks should normally move it rather than add more declarations beside it.
   open-immersion and relative-perfect consumers use the canonical neutral API.
   The transitional comparison records are removed rather than retained as a
   compatibility shim.
+- Finite-biproduct calculus in triangulated `K₀` (2026-09-12):
+  `Triangulated/GrothendieckGroup/Biproduct.lean` owns the reusable identities
+  `[X ⊞ Y] = [X] + [Y]` and `[⨁ i, X i] = ∑ i, [X i]`, together with
+  the constant-family `nsmul` specialization.  The binary law is exactly
+  Mathlib's distinguished split triangle; the finite law uses Mathlib's
+  finite-type induction and biproduct comparison maps.  This is generic
+  triangulated `K₀` infrastructure, not a copower- or twist-specific
+  formula.  It makes no Euler-characteristic, formality, or scalar-evaluation
+  assertion; those remain downstream consumers.
 - Finite cohomology presentation and scalar-linear copower transport
   (2026-09-12):
   `Homotopy.FiniteCohomologyPresentation` owns the coefficient-side data of an
@@ -85,6 +94,22 @@ blocks should normally move it rather than add more declarations beside it.
   `HomotopyEquiv`; it proves no automatic formality, quasi-isomorphism
   invariance, Hom-cohomology comparison, Euler/K₀ formula, cone preservation,
   basis independence, or concrete `HasLinearCopowers` instance.
+- Supplied-presentation scalar-copower `K₀` class (2026-09-12):
+  `DGEnhancement.FiniteCohomologyCopowerK0` owns the numerical leaf
+  `FiniteCohomologyPresentation.linearCopowerK₀Of`.  For an explicitly
+  supplied finite cohomology presentation whose displayed homology modules
+  are finite free, it combines `linearCopowerFinrankIso`, the generic finite
+  biproduct law in triangulated `K₀`, and `K₀.of_shift_int` to identify the
+  selected scalar-linear copower class with Mathlib's
+  `HomologicalComplex.homologyEulerChar` times `[X]`.  The support reduction
+  comes only from the supplied presentation; the theorem assumes a nontrivial
+  base ring and infers neither a presentation nor formality from bare
+  finiteness.  It introduces no
+  parallel Euler-characteristic definition and supplies no comparison between
+  scalar-linear `LinearEvaluationData` and additive `EvaluationData`.  The
+  next numerical seam is a shared endofunctor-level Euler interface consumed
+  directly by the linear evaluation package, followed only then by an
+  explicit bridge to the existing additive object-twist interface.
 - Scalar-linear copower DG functor and homotopy invariance (2026-09-12):
   `DGCategory.LinearCopowerFunctor` packages the universal property as a
   degreewise `homComplexIso`, then uses it to define the homogeneous
@@ -129,6 +154,23 @@ blocks should normally move it rather than add more declarations beside it.
   preserve the linear contract.  Scalar-linear evaluation data and the
   coefficient DG-functor/homotopy root now consume this universal property
   separately; no Euler-class or finite-presentation result is asserted here.
+- Scalar-linear dg Hom-cohomology comparison (2026-09-12):
+  `DGCategory.Pretriangulated.ShiftIso` now packages the degreewise
+  bijectivity in `IsShiftBy` as an actual isomorphism of Hom-complexes, and
+  `LinearShiftIso` supplies its `ModuleCat k` refinement through the existing
+  `DGLinear.postcompCochain` and Mathlib cocycle-to-shift equivalence.
+  `DGCategory.LinearH0Homology` owns the intrinsic degree-zero quotient
+  comparison, and `Pretriangulated.LinearShiftHomology` combines it with
+  Mathlib's shifted-homology isomorphism for an explicit `IsShiftBy` witness.
+  `DGEnhancement.H0.HomCohomology` only selects the existing `HasShift` object,
+  giving
+  `Hⁿ(DGLinear.homComplex k X Y) ≃ₗ[k] Hom_{H⁰ C}(X, Y⟦n⟧)`, both for an
+  explicit shift witness and for the selected `HasShift` object.  Public
+  representative laws identify the maps with `H0.homMk` and right composition
+  by the shift element.  The `+n` target convention follows from the `-n`
+  shift of Hom-complexes.  This is a pointwise linear comparison only: no
+  naturality package, finite-dimensional transfer, formality, Euler
+  characteristic, `K₀`, or sphericality statement is inferred.
 - Object-twist `K₀` action and Euler-realization boundary (2026-09-12):
   `DGEnhancement.H0.NaturalTransformationConeK0` owns the reusable theorem
   that a functorial cone acts on `K₀` by target endpoint minus source
@@ -145,8 +187,13 @@ blocks should normally move it rather than add more declarations beside it.
   roots now exist, coefficient-complex homotopy invariance is closed, and
   supplied finite cohomology presentations now transport to shifted finite
   biproducts and finite-free homology expands these into `finrank` copies.
-  Automatic formality, the scalar-linear Hom-cohomology comparison, and the
-  numerical Euler consumer remain the next foundational roots.
+  The scalar-linear Hom-cohomology comparison is now closed, and generic
+  triangulated `K₀` now computes finite biproduct classes, and the supplied
+  finite-presentation scalar-copower class is Mathlib's homological Euler
+  characteristic times the object class.  The next numerical root is a
+  shared endofunctor-level Euler interface for linear evaluation, with any
+  passage to additive `EvaluationData` remaining explicit; automatic
+  formality remains a separate later lane.
 - `K₀` actions of enhanced adjunction cones (2026-09-12):
   `SphericalTwist.EnhancedFunctorK0` derives the four generator identities
   directly from the distinguished adjunction triangles and lifts them, under
