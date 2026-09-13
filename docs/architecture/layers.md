@@ -136,7 +136,8 @@ CategoryTheory/Triangulated
   │                                           enhanced cones map pointwise to transform triangles
   ├─→ Families                                pseudofunctorial fiber categories
   ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation,
-  │                                           functorial distinguished cone triangles;
+  │                                           functorial distinguished cone triangles and
+  │                                           presented dg-adjunction counit triangles;
   │                                           H0/Triangle owns the triangles, H0/Functor
   │                                           the transport of dg-functor capabilities
   └─→ StabilityCondition                      Bridgeland stability (canonical concept)
