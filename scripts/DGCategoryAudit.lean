@@ -1240,14 +1240,19 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerK₀Of
 
 -- Hom-complex cohomology and selected shifts have the same junk-total Euler
--- characteristic.  Supplied finite cohomology presentations then compute the
--- object classes of scalar-linear evaluation through the shared rank-one K₀
--- interface.  This adds neither formality nor exactness of the evaluation
+-- characteristic.  `HomFiniteBounded` selects a finite support, coefficient-
+-- side formality constructs the corresponding presentation, and the existing
+-- finite-presentation consumer computes scalar-linear evaluation through the
+-- shared rank-one K₀ interface.  This adds no exactness of the evaluation
 -- functor and supplies no adapter to additive evaluation data.
 #print axioms CategoryTheory.H0.homComplex_homologyEulerChar_eq_chiHom
+#print axioms CategoryTheory.H0.homComplexCohomologyDegrees
+#print axioms CategoryTheory.H0.isZero_homComplex_homology_of_not_mem
+#print axioms CategoryTheory.H0.homComplexFiniteCohomologyPresentation
 #print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower
 #print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofCompare
 #print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofFiniteCohomologyPresentations
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded
 
 -- Scalar-linear evaluation data assembles the linear copowers at a fixed
 -- object into a `k`-linear dg functor and a closed evaluation transformation.
@@ -1290,8 +1295,9 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- generic cone package.  Choice comparison and exactness reuse the existing
 -- strict-square and cone-preservation interfaces; exactness of evaluation
 -- remains explicit input.  Its generic K₀ formulas give identity minus
--- evaluation; the numerical spherical-twist specialization is audited by the
--- spherical-twist slice.
+-- evaluation.  The numerical spherical-twist specialization is audited by
+-- the spherical-twist slice, while the HomFiniteBounded realization below
+-- supplies its Euler witness automatically.
 #print axioms CategoryTheory.LinearEvaluationData.preservesChosenConesOfCompare
 #print axioms CategoryTheory.LinearEvaluationData.compare_evaluation_square
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData
@@ -1308,6 +1314,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesChosenCones
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of_eq_twistK₀_ofHomFiniteBounded
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map_eq_twistK₀_ofHomFiniteBounded
 
 -- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
 -- identity.  Every one of the functor's four laws is `lift_unique` applied to

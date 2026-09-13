@@ -3,21 +3,22 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.FiniteCohomologyCopowerK0
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.HomComplexFiniteCohomologyPresentation
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.HomCohomologyEuler
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.LinearEvaluationK0
 
 /-!
 # Finite-presentation realization for scalar-linear evaluation
 
-A supplied finite cohomology presentation for every dg Hom-complex proves the
-shared rank-one `K₀` formula for scalar-linear evaluation when all scalar-linear
-copowers exist.
+A finite cohomology presentation for every dg Hom-complex proves the shared
+rank-one `K₀` formula for scalar-linear evaluation when all scalar-linear
+copowers exist.  Such presentations may be supplied explicitly, or constructed
+automatically from `HomFiniteBounded` using coefficient-side formality.
 
-The presentation family remains explicit: finite-dimensional bounded Hom in
-`H⁰` does not provide formality.  The result also makes no exactness claim for
-the evaluation functor and supplies no comparison with additive evaluation
-data.  The scalar-universe restriction belongs to the finite-free copower
-realization consumed here, not to the generic numerical predicate.
+The result makes no exactness claim for the evaluation functor and supplies no
+comparison with additive evaluation data.  The scalar-universe restriction
+belongs to the finite-free copower realization consumed here, not to the
+generic numerical predicate.
 -/
 
 set_option autoImplicit false
@@ -56,6 +57,15 @@ theorem IsEulerCopower.ofFiniteCohomologyPresentations
       K₀.of (H0 C) (show H0 C from E)
   rw [P_X.linearCopowerK₀Of E,
     H0.homComplex_homologyEulerChar_eq_chiHom, chiRight_of]
+
+/-- Over a field, `HomFiniteBounded` and coefficient-side formality construct
+the finite presentation family needed for the scalar-linear Euler copower
+formula. -/
+theorem IsEulerCopower.ofHomFiniteBounded
+    [HasLinearCopowers k C] (V : LinearEvaluationData k E) :
+    V.IsEulerCopower k :=
+  IsEulerCopower.ofFiniteCohomologyPresentations k V fun X =>
+    H0.homComplexFiniteCohomologyPresentation k E X
 
 end LinearEvaluationData
 
