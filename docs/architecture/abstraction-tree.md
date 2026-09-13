@@ -174,6 +174,7 @@ Category
 │  │  │  │     └─ h0Iso                 Z⁰ isomorphisms descend, coherently
 │  │  │  └─ ConeData                     functorial objectwise cones
 │  │  │     └─ K₀ action                 target endpoint minus source endpoint
+│  │  ├─ h0 / h0IdIso / h0CompIso       functor descent with compositor associativity and unit laws
 │  │  ├─ IsQuasiEquivalence               Hom-complex quasi-isos plus essential surjectivity
 │  │  │  └─ h0Equivalence                 induces an equivalence H⁰ C ≌ H⁰ D
 │  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
@@ -216,12 +217,15 @@ Category
 │  │  ├─ CounitConeData                  counit-cone twist candidate
 │  │  │  └─ twistAdjointComparison      canonical closed `L T[-1] ⟶ R`, and its H⁰ map
 │  │  │     └─ H⁰ inverse-rotation factorization
-│  │  │                                 generic shiftedFstH0, right whiskering, and left counit
+│  │  │                                 generic shiftedFstH0, right whiskering, and ordinary h0Counit
 │  │  ├─ UnitConeData                    unshifted unit-cone cotwist candidate
 │  │  │  ├─ cotwistAdjointComparison    canonical closed `R ⟶ C L`, and its H⁰ map
+│  │  │  │  └─ H⁰ unit/inclusion factorization generic h0Unit, right whiskering, and descended inr
 │  │  │  └─ cotwistAdjointComparisonShiftedH0
 │  │  │                                  canonical `R ⟶ (C[-1] L)[1]` normalization
 │  │  └─ DGAdjunction.h0                 an ordinary adjunction between the H⁰ functors
+│  │     ├─ h0_whiskerLeft_counit       generic left-whiskered counit normalization
+│  │     ├─ h0_whiskerRight_unit        generic right-whiskered unit normalization
 │  │     └─ H0Presentation                supplied endpoint isos after equivalence transport
 │  │        ├─ presentedCounitTriangle     generic normalization of the transported dg counit cone
 │  │        │  └─ transportedTwist        unchanged third vertex; pointwise distinguished

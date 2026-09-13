@@ -346,12 +346,29 @@ that comparison are instance hypotheses to be discharged by the realization.
    `DGFunctor.h0CompIso` have named computation lemmas; strict dg vertical
    composition and both dg whiskerings descend to ordinary natural
    transformations, with whiskering passing through the canonical
-   `h0CompIso` compositors.  The adjunction consumer
-   `twistAdjointComparisonH0_eq_inverseRotateFirstH0` therefore factors the
-   twist comparison through the generic `shiftedFstH0_eq`, ordinary right
-   whiskering by `L.h0`, and the descended left-counit whisker.  It introduces
-   neither a second comparison map nor an ordinary-counit normalization, and
-   it proves no invertibility or sphericality.
+   `h0CompIso` compositors.  Those compositors now satisfy the explicit
+   associativity and two unit equations expected of Mathlib's pseudofunctor
+   interface.  They remain equations rather than a `Pseudofunctor` instance:
+   the repository has not bundled its universe-polymorphic dg categories and
+   quotient two-cells into the bicategory that such an instance requires.
+
+   `DGAdjunction.h0_whiskerLeft_counit` uses this boundary to identify the
+   descended left-counit whisker with ordinary left whiskering of `h0Counit`,
+   through the canonical compositor, associator, and right unitor.  Thus
+   `twistAdjointComparisonH0_eq_inverseRotateFirstH0_comp_h0Counit` advances
+   the existing inverse-rotation factorization all the way to the ordinary
+   adjunction counit.  It introduces neither a second comparison map nor an
+   invertibility or sphericality conclusion.
+
+   The formally dual law `DGAdjunction.h0_whiskerRight_unit` identifies the
+   descended right-whiskered dg unit with ordinary right whiskering of
+   `h0Unit`, through the left unitor, associator, and canonical compositors.
+   `UnitConeData.cotwistAdjointComparisonH0_eq_h0Unit_comp_inrH0` combines
+   it with the generic descent law for the left-whiskered cone inclusion,
+   factoring the unshifted comparison `R ⟶ C L` through the ordinary unit
+   and descended `inr`.  The conventional cotwist remains `F = C[-1]`; its
+   existing `[-1][1]` cancellation stays a separate shift-coherence step, so
+   this factorization claims no new shifted comparison.
 
    `DGAdjunction.h0` now compares a dg adjunction with an
    ordinary one on `H⁰`.  `DGAdjunction.H0Presentation` further conjugates

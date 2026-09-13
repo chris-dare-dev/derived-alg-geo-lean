@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.Algebra.Homology.DGCategory.FunctorCategoryH0
+import DerivedAlgGeo.Algebra.Homology.DGCategory.AdjunctionH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.AdjunctionCone
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.NaturalTransformationShift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Whiskering
@@ -18,6 +18,11 @@ standard comparison maps
 
 where `T = Cone(S R ⟶ 𝟭)` and `C = Cone(𝟭 ⟶ R S)`.  This file constructs
 their closed degree-zero dg representatives and their images in `H⁰`.
+
+The `H⁰` cotwist comparison is also factored through the ordinary adjunction
+unit and the descended cone inclusion.  Its compositor, unitor, and associator
+terms come from the generic dg-adjunction descent interface; no second
+comparison map is introduced.
 
 The first construction is why source-shift regrading is the right primitive:
 the closed degree-one projection `T ⟶ S R` becomes `T[-1] ⟶ S R` in degree
@@ -153,6 +158,68 @@ noncomputable def cotwistAdjointComparisonH0 :
   DGFunctor.HomogeneousNatTrans.h0
     (cotwistAdjointComparison (rightAdj := rightAdj) leftAdj K)
     (cotwistAdjointComparison_isClosed (rightAdj := rightAdj) leftAdj K)
+
+/-- **The cotwist adjunction comparison factors through the ordinary `H⁰`
+unit and the cone inclusion.**
+
+This is the unshifted comparison `R ⟶ C L`.  The left unitor and associator
+put ordinary functor composition in the required order, and the two inverse
+compositors return to the strict dg composites before and after the descended
+cone inclusion. -/
+theorem cotwistAdjointComparisonH0_eq_h0Unit_comp_inrH0 :
+    cotwistAdjointComparisonH0 (rightAdj := rightAdj) leftAdj K =
+      (Functor.leftUnitor R.h0).inv ≫
+        Functor.whiskerRight leftAdj.h0Unit R.h0 ≫
+          (Functor.associator L.h0 S.h0 R.h0).hom ≫
+            Functor.whiskerLeft L.h0 (DGFunctor.h0CompIso S R).inv ≫
+              Functor.whiskerLeft L.h0
+                (DGFunctor.HomogeneousNatTrans.h0 K.inr K.inr_isClosed) ≫
+                (DGFunctor.h0CompIso L K.unitCone).inv := by
+  have hη := leftAdj.unit_isClosed.whiskerRight R
+  have hι := K.inr_isClosed.whiskerLeft L
+  change DGFunctor.HomogeneousNatTrans.h0
+      (DGFunctor.HomogeneousNatTrans.comp
+        (DGFunctor.HomogeneousNatTrans.whiskerRight leftAdj.unit R)
+        (DGFunctor.HomogeneousNatTrans.whiskerLeft L K.inr)) _ = _
+  rw [DGFunctor.HomogeneousNatTrans.h0_comp'
+    (DGFunctor.HomogeneousNatTrans.whiskerRight leftAdj.unit R)
+    (DGFunctor.HomogeneousNatTrans.whiskerLeft L K.inr) hη hι]
+  let unitWhiskerH0 : R.h0 ⟶ ((L.comp S).comp R).h0 :=
+    DGFunctor.HomogeneousNatTrans.h0
+      (DGFunctor.HomogeneousNatTrans.whiskerRight leftAdj.unit R) hη
+  let inrWhiskerH0 : ((L.comp S).comp R).h0 ⟶
+      (L.comp K.unitCone).h0 :=
+    DGFunctor.HomogeneousNatTrans.h0
+      (DGFunctor.HomogeneousNatTrans.whiskerLeft L K.inr) hι
+  let cAssoc : ((L.comp S).comp R).h0 ≅ L.h0 ⋙ (S.comp R).h0 :=
+    DGFunctor.h0CompIso L (S.comp R)
+  change unitWhiskerH0 ≫ inrWhiskerH0 = _
+  have hinr := DGFunctor.HomogeneousNatTrans.h0_whiskerLeft
+    L K.inr K.inr_isClosed
+  change inrWhiskerH0 = cAssoc.hom ≫
+      Functor.whiskerLeft L.h0
+        (DGFunctor.HomogeneousNatTrans.h0 K.inr K.inr_isClosed) ≫
+      (DGFunctor.h0CompIso L K.unitCone).inv at hinr
+  have hunit := leftAdj.h0_whiskerRight_unit R
+  change unitWhiskerH0 ≫ cAssoc.hom =
+      (Functor.leftUnitor R.h0).inv ≫
+        Functor.whiskerRight leftAdj.h0Unit R.h0 ≫
+          (Functor.associator L.h0 S.h0 R.h0).hom ≫
+            Functor.whiskerLeft L.h0 (DGFunctor.h0CompIso S R).inv at hunit
+  calc
+    _ = unitWhiskerH0 ≫
+        (cAssoc.hom ≫
+          Functor.whiskerLeft L.h0
+            (DGFunctor.HomogeneousNatTrans.h0 K.inr K.inr_isClosed) ≫
+          (DGFunctor.h0CompIso L K.unitCone).inv) :=
+      congrArg (fun τ => unitWhiskerH0 ≫ τ) hinr
+    _ = _ := by
+      have h := congrArg
+        (fun τ => τ ≫
+          Functor.whiskerLeft L.h0
+            (DGFunctor.HomogeneousNatTrans.h0 K.inr K.inr_isClosed) ≫
+          (DGFunctor.h0CompIso L K.unitCone).inv) hunit
+      simpa only [Category.assoc] using h
 
 end UnitConeData
 
