@@ -13,6 +13,8 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategory
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.HomogeneousLift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.HomogeneousShift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Lift
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.LinearShiftIso
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.LinearShiftHomology
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.NaturalTransformationCone
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.ObjectTwist
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Rotate

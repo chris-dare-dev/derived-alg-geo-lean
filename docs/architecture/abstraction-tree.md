@@ -106,8 +106,13 @@ Category
 │  └─ HasShift (X ⥤ Y) A                 pointwise, from the target's shift
 │     └─ evaluation commutes strictly    identity comparison, both laws free
 ├─ DGCategory C
+│  ├─ IsShiftBy X n Y                    representable dg shift witness
+│  │  └─ homIso                         dgHom W X ≅ (dgHom W Y)⟦-n⟧
 │  ├─ DGLinear k C                       scalar refinement
 │  │  ├─ homComplex                     existing Hom-complex repackaged in ModuleCat k
+│  │  ├─ IsShiftBy.linearHomIso          target shift as a shifted Hom-complex iso
+│  │  │  ├─ H⁰ homComplex ≃ₗ Hom in H⁰  intrinsic quotient comparison
+│  │  │  └─ Hⁿ homComplex ≃ₗ Hom in H⁰  target is the selected same-sign shift Y⟦n⟧
 │  │  ├─ postcompCochain                fixed-source right composition, linear chain-map law
 │  │  ├─ Cdg (ModuleCat k)             standard model inherits Mathlib's k-linear structure
 │  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
@@ -125,6 +130,7 @@ Category
 │  │     │     └─ finite presentation transport
 │  │     │        ├─ finite biproduct of shifted degree-zero copowers in H⁰ C
 │  │     │        └─ nested finite biproduct of shifts of X with finrank multiplicity
+│  │     │           └─ K₀ class = homologyEulerChar • [X] for supplied finite-free data
 │  │     └─ LinearEvaluationData k E     scalar-linear Hom(E,-) ⊗ E assembly
 │  │        ├─ functor                   k-linear dg functor
 │  │        ├─ evaluation                closed degree-zero map to the identity
@@ -253,6 +259,7 @@ Category
 ├─ GrothendieckPresentation
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
+│  │  ├─ finite biproduct calculus         [⨁ Xᵢ] = Σ [Xᵢ], constant family = n·[X]
 │  │  ├─ Realization := K₀ C →+ A        additive target
 │  │  │  └─ Descends                    commuting realization square
 │  │  └─ EulerForm := K₀ C →+ K₀ C →+ ℤ

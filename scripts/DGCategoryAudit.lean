@@ -202,6 +202,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsShiftBy.compare_eq_mapShift
 #print axioms CategoryTheory.IsShiftBy.compare_mem_cocycles
 #print axioms CategoryTheory.IsShiftBy.hom
+#print axioms CategoryTheory.IsShiftBy.homIso
+#print axioms CategoryTheory.IsShiftBy.homIso_hom_f_apply
 #print axioms CategoryTheory.IsShiftBy.homMap
 #print axioms CategoryTheory.IsShiftBy.hom_closed
 #print axioms CategoryTheory.IsShiftBy.hom_inv
@@ -212,6 +214,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsShiftBy.mapShift_comp
 #print axioms CategoryTheory.IsShiftBy.mapShift_id
 #print axioms CategoryTheory.IsShiftBy.mapShift_mem_cocycles
+#print axioms CategoryTheory.IsShiftBy.linearHomIso
+#print axioms CategoryTheory.IsShiftBy.linearHomIso_hom_f_apply
+#print axioms CategoryTheory.IsShiftBy.linearHomMap
+#print axioms CategoryTheory.IsShiftBy.linearHomMap_f_apply
+#print axioms CategoryTheory.IsShiftBy.bijective_linearHomMap
 #print axioms CategoryTheory.IsShiftBy.mk.inj
 #print axioms CategoryTheory.IsShiftBy.mk.sizeOf_spec
 #print axioms CategoryTheory.IsShiftBy.self
@@ -245,6 +252,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.prodComplex_X_coe
 #print axioms CategoryTheory.prodComplex_d
 #print axioms CategoryTheory.prodD
+
+-- Scalar-linear cohomology of a dg Hom-complex, first in degree zero and then
+-- as morphisms into an explicit or selected same-sign shift in H⁰.
+#print axioms CategoryTheory.H0.homologyZeroLinearEquiv
+#print axioms CategoryTheory.H0.homologyZeroLinearEquiv_homologyπ_cyclesMk
+#print axioms CategoryTheory.IsShiftBy.homologyLinearEquiv
+#print axioms CategoryTheory.IsShiftBy.homologyLinearEquiv_homologyπ_cyclesMk
+#print axioms CategoryTheory.H0.homologyShiftLinearEquiv
 
 -- dg-enhancements-e6: the shift functor on H0, its zero and add comparison
 -- isomorphisms, all three ShiftMkCore coherence identities, and the resulting
@@ -1215,6 +1230,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- consume the generic finrank expansion when their homology is finite free.
 #print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerIso
 #print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerFinrankIso
+
+-- The supplied-presentation numerical leaf combines the finite-free normal
+-- form with generic finite-biproduct and integral-shift calculus in
+-- triangulated `K₀`.  It uses Mathlib's homological Euler characteristic and
+-- gets its support bound only from the supplied presentation; it does not
+-- infer formality, a presentation from bare finiteness, or an evaluation-data
+-- comparison.
+#print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerK₀Of
 
 -- Scalar-linear evaluation data assembles the linear copowers at a fixed
 -- object into a `k`-linear dg functor and a closed evaluation transformation.
