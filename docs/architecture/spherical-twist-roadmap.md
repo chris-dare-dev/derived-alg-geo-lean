@@ -322,9 +322,14 @@ that comparison are instance hypotheses to be discharged by the realization.
    `presentedCounitTriangleObjIso` directly compares the presented dg twist
    triangle with the independently chosen Fourier--Mukai counit cone at every
    target object, again with no naturality for the chosen third component.
-   Thus no functor isomorphism, dg
-   quasi-equivalence, choice independence, exactness/equivalence transfer, or
-   sphericality follows.  The dg notion is still
+   These automatic comparisons alone yield no functor isomorphism.
+   `Triangle.FirstMapNormalizationData.ComparisonData` now packages the extra
+   natural third-vertex isomorphism and two remaining triangle squares.
+   `PresentedUnitComparisonData` and `PresentedCounitComparisonData` specialize
+   it and derive natural twist/cotwist and triangle-family isomorphisms when
+   that data is supplied.  They do not construct the comparison data or imply
+   dg quasi-equivalence, choice independence, `CommShift` compatibility,
+   exactness/equivalence transfer, or sphericality.  The dg notion is still
    the strict one: Anno--Logvinenko work with homotopy adjunctions of bimodules,
    and no comparison with those exists.
 
@@ -645,8 +650,10 @@ that comparison are instance hypotheses to be discharged by the realization.
    For the right-adjunction unit, the independently chosen dg and kernel cone
    triangles are now noncanonically isomorphic at every source object, and so
    are their conventional cotwist objects.  This pointwise comparison does not
-   identify the two cotwist functors naturally; that requires additional
-   realization data compatible with the remaining triangle maps.
+   identify the two cotwist functors naturally.  The additional realization
+   data and remaining triangle-map squares are now explicitly packaged by
+   `PresentedUnitComparisonData`, which derives the natural comparison but is
+   not constructed here.
    The left-adjunction unit is now a third consumer:
    `DualTwistKernelData` swaps the two correspondences and reuses
    `LeftAdjointKernelData.toRightAdjointKernelData`, so its enhanced form names
@@ -663,8 +670,9 @@ that comparison are instance hypotheses to be discharged by the realization.
    through `DGAdjunction.H0Presentation`; it is now noncanonically isomorphic
    at every target object to the independently selected Fourier--Mukai counit
    triangle, so the transported dg twist and kernel twist are objectwise
-   isomorphic.  A natural comparison of the two twist functors still requires
-   additional realization data compatible with the remaining triangle maps.
+   isomorphic.  `PresentedCounitComparisonData` now packages the additional
+   natural twist isomorphism and remaining triangle-map squares and derives the
+   natural triangle comparison, but no geometric constructor supplies it.
 6. No theorem currently identifies a categorical spherical object with a
    spherical functor from `Perf(k)`, or derives the Seidel--Thomas
    autoequivalence from `SerreFunctor.IsSphericalObject`.
