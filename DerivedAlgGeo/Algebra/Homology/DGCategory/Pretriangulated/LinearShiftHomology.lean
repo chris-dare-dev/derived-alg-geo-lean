@@ -116,9 +116,13 @@ lemma homologyLinearEquiv_homologyπ_cyclesMk {Y Yn : C} {n : ℤ}
     rw [hzQi, hzLi]
     dsimp only [ψ, gQ, g, φ, Q, L]
     rw [CochainComplex.shiftShortComplexFunctorIso_hom_app_τ₂]
-    rw [linearHomMap_f_apply (k := k) s X n f]
-    convert htransport 0 (by omega) using 1
-    all_goals rfl
+    change
+      (show ((DGLinear.homComplex k X Yn).sc 0).X₂ from
+        ((DGLinear.homComplex k X Yn).XIsoOfEq (by omega)).hom.hom
+          (dgComp n (-n) (n + -n) rfl f s.hom)) =
+        (show ((DGLinear.homComplex k X Yn).sc 0).X₂ from
+          dgComp n (-n) 0 (by omega) f s.hom)
+    exact htransport 0 (by omega)
   have hshift :
       ((CochainComplex.ShiftSequence.shiftIso (ModuleCat.{v} k)
         (-n) n 0 (by omega)).hom.app L).hom ((Q.homologyπ n).hom zQ) =
