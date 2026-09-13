@@ -1,0 +1,297 @@
+[
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Pretriangulated/Rotate.lean",
+  "This simp argument is unused:",
+  2
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/HomotopyCategory/DGEnhancement/Agreement.lean",
+  "`ext` did not consume the patterns `q` and `hpq`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/HomotopyCategory/HomComplexPostcomp.lean",
+  "This simp argument is unused:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/SpectralSequence/FilteredTotalComplexAdjacent.lean",
+  "Definition `adjacentColumnTotalShortExact` is a proposition; use `theorem` instead of `def`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/SpectralSequence/FilteredTotalComplexAdjacent.lean",
+  "This simp argument is unused:",
+  4
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/Subcomplex.lean",
+  "Variable name `i` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Divisors/AssociatedSheaf/Construction.lean",
+  "automatically included section variable(s) unused in theorem `_private.DerivedAlgGeo.AlgebraicGeometry.Divisors.AssociatedSheaf.Construction.0.AlgebraicGeometry.Scheme.CartierDivisor.unitHomEquiv_symm_comp'`:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Duality/Canonical/Descent.lean",
+  "automatically included section variable(s) unused in theorem `_private.DerivedAlgGeo.AlgebraicGeometry.Duality.Canonical.Descent.0.AlgebraicGeometry.Variety.chartBasisHom_app_basicOpen_isIso`:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Duality/Canonical/Descent.lean",
+  "try 'simp' instead of 'simpa'",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Surface/BlowUpPlaneWalls.lean",
+  "'norm_num' tactic does nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Surface/BlowUpPlaneWalls.lean",
+  "'push_cast' tactic does nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Surface/BlowUpPlaneWalls.lean",
+  "'ring' tactic does nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Surface/BlowUpPlaneWalls.lean",
+  "This simp argument is unused:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Surface/BlowUpPlaneWalls.lean",
+  "this tactic is never executed",
+  3
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ProjectiveSpace.lean",
+  "try 'simp' instead of 'simpa'",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean",
+  "Variable name `x` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Sites/SheafCohomology/Cech/ComplexNaturality.lean",
+  "This simp argument is unused:",
+  9
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/GrothendieckGroup/Basic.lean",
+  "try 'simp' instead of 'simpa'",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/ConnectedComponent.lean",
+  "'change τ ∈ connectedComponent σ' tactic does nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/DeformedSlicing.lean",
+  "Variable name `A` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/DeformedSlicing.lean",
+  "Variable name `B` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/DeformedSlicing.lean",
+  "Variable name `X` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/DeformedSlicing.lean",
+  "Variable name `ψ` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/DeformedSlicing.lean",
+  "Variable name `ψ₁` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/DeformedSlicing.lean",
+  "Variable name `ψ₂` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/FirstStrictSES.lean",
+  "Variable name `A` is not explicitly referenced.",
+  2
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/GlobalHN.lean",
+  "'change 0 ≤ j.val' tactic does nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/GlobalHN.lean",
+  "'change j.val ≤ F.n - 1' tactic does nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/PhiPlusHN.lean",
+  "Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/PhiPlusSplit.lean",
+  "Try `simp at hcontra` instead of `simpa using hcontra`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/PullbackCokernel.lean",
+  "Variable name `hiB` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/Theorem.lean",
+  "Variable name `ψ` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Mass/Subadditivity/Triangle/HeartShortExact.lean",
+  "Try `simp at h` instead of `simpa using h`",
+  2
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase/Transfer/Basic.lean",
+  "Definition `Slicing.PreimageData.ofFaithful` is a proposition; use `theorem` instead of `def`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase/Transfer/Basic.lean",
+  "Definition `Slicing.PreimageData.phaseShift` is a proposition; use `theorem` instead of `def`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase/Transfer/Phase.lean",
+  "Definition `Slicing.preimageOrderData` is a proposition; use `theorem` instead of `def`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Region.lean",
+  "automatically included section variable(s) unused in theorem `_private.DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Region.0.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.scale_bound`:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/StabilityFunction/HNPolygon.lean",
+  "'change Z.phase (C₁ : A) = G.phase i₀' tactic does nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/StabilityFunction/Slope.lean",
+  "This simp argument is unused:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/HarderNarasimhan/Heart.lean",
+  "try 'simp' instead of 'simpa'",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Heart/Equivalence.lean",
+  "'change (σ.Z.comp v) (CategoryTheory.Triangulated.K₀.of C E) = ∑ i, f i' tactic does nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Heart/Equivalence.lean",
+  "'change σ.Z (v (CategoryTheory.Triangulated.K₀.of C E)) = ∑ i, f i' tactic does nothing",
+  2
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Heart/EquivalenceReverse.lean",
+  "Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice",
+  2
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/Cohomology/Homological.lean",
+  "Definition `originalHeartCohFunctor_zero_isHomological` is a proposition; use `theorem` instead of `def`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/Cohomology/Homological.lean",
+  "Definition `shiftFunctorCompOriginalHeartH0IsHomological` is a proposition; use `theorem` instead of `def`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/Cohomology/Homological.lean",
+  "try 'simp' instead of 'simpa'",
+  14
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/HeartBridge.lean",
+  "try 'simp' instead of 'simpa'",
+  1
+ ],
+ [
+  "DerivedAlgGeo/LinearAlgebra/ExteriorPower/Top.lean",
+  "try 'simp' instead of 'simpa'",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/Cech/GlobalComparison.lean",
+  "automatically included section variable(s) unused in theorem `CategoryTheory.Sheaf.globalSectionsToCechZeroInt_comp_d`:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/Cech/GlobalComparison.lean",
+  "automatically included section variable(s) unused in theorem `CategoryTheory.Sheaf.globalSectionsToCechZero_exact`:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/Cech/GlobalComparison.lean",
+  "automatically included section variable(s) unused in theorem `CategoryTheory.Sheaf.globalSectionsToCechZero_mono`:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/Cech/GlobalComparison.lean",
+  "automatically included section variable(s) unused in theorem `CategoryTheory.Sheaf.globalSectionsToCechZero_naturality`:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "Variable name `hLa` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "Variable name `hLadj` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "Variable name `hLl` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "Variable name `hRa` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "Variable name `hRadj` is not explicitly referenced.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "Variable name `hRc` is not explicitly referenced.",
+  1
+ ],
+ [
+  "MathFormalContract/Emit.lean",
+  "`String.trim` has been deprecated: Use `String.trimAscii` instead",
+  1
+ ]
+]
