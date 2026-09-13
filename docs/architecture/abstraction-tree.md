@@ -270,7 +270,8 @@ Category
 │     │  └─ CounitKernelConeData          enhanced counit specialization
 │     │     ├─ twistKernel                           ordinary image of the selected dg cone
 │     │     ├─ kernel-presented twist candidate       exact image of its dg cone
-│     │     └─ counitTriangleInSource                literal counit triangle, pointwise distinguished
+│     │     ├─ counitTriangleInSource                literal counit triangle, pointwise distinguished
+│     │     └─ presented dg comparison               noncanonical objectwise triangle/twist isos
 │     ├─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
 │     │  └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
 │     │     ├─ unshifted cotwist-cone candidate       exact image of its dg cone

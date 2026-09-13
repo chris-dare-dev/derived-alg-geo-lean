@@ -942,6 +942,16 @@ stored as an extra hypothesis.
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.twistKernelIso
 #print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.twistToShiftedComposite
 
+/-! ## Fourier--Mukai lane -- pointwise dg-twist comparison -/
+
+-- The presented dg and independently chosen kernel counit triangles have the
+-- same first two vertices and counit map.  Mathlib chooses the third component
+-- separately at each target object, so no natural twist comparison follows.
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentedCounitTriangleObjIso
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentedCounitTriangleObjIso_hom_hom₁
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.presentedCounitTriangleObjIso_hom_hom₂
+#print axioms CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.transportedTwistObjIso
+
 /-! ## Fourier--Mukai lane -- adjunction-unit kernel data and cones -/
 
 -- A definitional specialization of the generic kernel-transformation root to
