@@ -117,6 +117,18 @@ dg_audit() {
   python3 scripts/check_audit.py "$GATE_TMP"/dg-audit.txt scripts/DGCategoryAudit.lean
 }
 
+warning_ratchet() {
+  # The `build` gate above already compiled the library, so this recompiles
+  # nothing: Lake replays the cached modules and reprints their warnings. The
+  # capture has to be its own command anyway, because `build` streams straight
+  # to the console and there is nothing to grep afterwards.
+  lake build DerivedAlgGeo > "$GATE_TMP"/lean-warnings.txt 2>&1 || {
+    tail -20 "$GATE_TMP"/lean-warnings.txt
+    return 1
+  }
+  python3 scripts/check_warnings.py "$GATE_TMP"/lean-warnings.txt
+}
+
 single_instantiation() {
   # The disease detector. `EnumInhabitants.lean` needs the same prerequisite
   # build as the sweep above, and CI reuses whatever `audit_complete` already
@@ -227,6 +239,7 @@ if [ "$MODE" != "fast" ]; then
   gate runLinter lake exe runLinter DerivedAlgGeo
   gate nolints-ratchet python3 scripts/check_nolints.py
   gate lint-style lake exe lint-style
+  gate warning-ratchet warning_ratchet
   gate pin python3 scripts/check_pin.py
   gate source-independence python3 scripts/check_source_independence.py
   gate subject-layering python3 scripts/check_layering.py
