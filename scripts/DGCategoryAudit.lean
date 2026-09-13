@@ -756,6 +756,27 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.h0_unit
 #print axioms CategoryTheory.DGAdjunction.h0_counit
 
+-- A strict dg adjunction transports through arbitrary equivalences out of its
+-- two homotopy categories and may then be presented by named ordinary
+-- functors.  The construction delegates composition and natural-isomorphism
+-- transport to Mathlib and retains explicit unit/counit formulas; it assumes
+-- the presentation isomorphisms and produces no dg lift or kernel.
+#print axioms CategoryTheory.DGAdjunction.transportedH0Left
+#print axioms CategoryTheory.DGAdjunction.transportedH0Right
+#print axioms CategoryTheory.DGAdjunction.transportedH0
+#print axioms CategoryTheory.DGAdjunction.transportedH0_unit_app
+#print axioms CategoryTheory.DGAdjunction.transportedH0_counit_app
+#print axioms CategoryTheory.DGAdjunction.H0Presentation
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.leftIso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rightIso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.mk.inj
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.mk.sizeOf_spec
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_unit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_counit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_unit_app
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_counit_app
+
 -- The cone projections are graded-natural, so the objectwise cones of a closed
 -- degree-zero dg natural transformation assemble into a cone in the dg category
 -- of dg functors.  With the zero object and the shift below, that is all three

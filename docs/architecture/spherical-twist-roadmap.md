@@ -263,9 +263,15 @@ that comparison are instance hypotheses to be discharged by the realization.
    bimodule framework used by the spherical-functor theorem.  Consequently it
    does not claim that the two recorded equivalence conditions imply full
    sphericality.  `DGAdjunction.h0` now compares a dg adjunction with an
-   ordinary one on `H⁰`, but the dg notion is the strict one: Anno--Logvinenko
-   work with homotopy adjunctions of bimodules, and no comparison with those
-   exists.
+   ordinary one on `H⁰`.  `DGAdjunction.H0Presentation` further conjugates
+   that adjunction through supplied equivalences from the two homotopy
+   categories and identifies its endpoints with named ordinary functors.  It
+   reuses Mathlib's adjunction composition and natural-isomorphism transport,
+   and exposes the resulting unit and counit formulas for later cone and
+   Fourier--Mukai consumers.  It constructs neither the endpoint comparisons
+   nor a kernel realization.  The dg notion is still the strict one:
+   Anno--Logvinenko work with homotopy adjunctions of bimodules, and no
+   comparison with those exists.
 
    The conditions are no longer inert, though.  `DGFunctor.h0Equivalence`
    (`dg-enhancements-e10`) turns a quasi-equivalence into an equivalence on
