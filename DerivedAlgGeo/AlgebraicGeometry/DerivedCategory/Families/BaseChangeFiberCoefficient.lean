@@ -97,7 +97,44 @@ end KFlatCompactFiberDualityData
 
 namespace KFlatBaseChangeData
 
+/-- The target-side tensor coefficient obtained by pulling back the two
+compact fibre factors separately, tensoring them with the target K-flat
+tensor, and applying the shift left by compact duality.
+
+This is the intermediate object at which the projection-formula comparison
+and the monoidality of fibre pullback meet. -/
+noncomputable def pulledBackTensorCoefficient
+    (K : KFlatFiberTensorData T)
+    (V : KFlatCompactFiberDualityData K)
+    (Gi Gj : CompactDqcFiber T) (a b : ℤ) : TargetDqc X T :=
+  ((D.derivedTensor.obj (D.pullSnd.functor.obj Gj.obj)).obj
+    (D.pullSnd.functor.obj (V.dual Gi).obj))⟦b - a⟧
+
 namespace CompactFiberProjectionFormula
+
+/-- Atomic comparisons underlying the explicit K-flat fibre coefficient.
+
+The first isomorphism is the projection-formula/duality calculation on
+`X_T`. The second isomorphism is the tensor compatibility of pullback from
+`T`. Keeping them separate prevents either geometric theorem from being
+hidden in the final coefficient comparison. -/
+structure KFlatTensorCoefficientComparison
+    {H : D.CompactFiberTensorDuality}
+    {Q : D.SourceTensorData}
+    {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
+    (P : D.CompactFiberProjectionFormula H Q pushFst)
+    (K : KFlatFiberTensorData T)
+    (V : KFlatCompactFiberDualityData K) where
+  /-- Projection formula and compact duality identify the source coefficient
+  with the pushforward of the separately pulled-back tensor coefficient. -/
+  projectionIso (Gi Gj : CompactDqcFiber T) (a b : ℤ) :
+    P.coefficient Gi Gj a b ≅
+      pushFst.functor.obj
+        (D.pulledBackTensorCoefficient K V Gi Gj a b)
+  /-- Pullback from the fibre commutes with its K-flat tensor coefficient. -/
+  pullbackTensorIso (Gi Gj : CompactDqcFiber T) (a b : ℤ) :
+    D.pulledBackTensorCoefficient K V Gi Gj a b ≅
+      D.pullSnd.functor.obj (V.coefficient Gi Gj a b)
 
 /-- The first-projection coefficient is represented by the explicit K-flat
 fibre tensor of the later factor with the dual of the earlier factor. -/
