@@ -26,6 +26,13 @@ Leibniz rule is an axiom of `DGCategory` rather than a lemma about a special
 case, and the `Const` example in `DerivedAlgGeo.Algebra.Homology.DGCategory/Instances.lean` — whose
 differential is zero — tests none of them.
 
+The induced functor on `H⁰` also carries canonical identity and composition
+comparisons.  Their associativity and two unit laws are recorded here as the
+ordinary pseudofunctor coherence equations.  They are exposed directly because
+the repository has no bundled bicategory of dg categories on which to install
+Mathlib's `Pseudofunctor`; introducing a partial replacement would duplicate
+that abstraction.
+
 ## A wrinkle in the degrees
 
 `dgComp_leibniz` states the shifted degrees as `p + 1`, and those are dependent
@@ -38,7 +45,7 @@ rather than rewriting the goal.
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u u' u''
+universe v u u' u'' u'''
 
 namespace CategoryTheory
 
@@ -434,6 +441,59 @@ component computation used when descending dg whiskering to `H⁰`. -/
 theorem h0CompIso_inv_app (F : DGFunctor C D) (G : DGFunctor D E) (X : H0 C) :
     (h0CompIso F G).inv.app X = 𝟙 _ :=
   rfl
+
+/-- The `H⁰` composition comparison satisfies the pseudofunctor
+associativity law.  The ordinary functor associator is retained explicitly
+even though dg-functor composition is strict. -/
+theorem h0CompIso_assoc {B : Type u'''} [DGCategory.{v} B]
+    (F : DGFunctor C D) (G : DGFunctor D E) (H : DGFunctor E B) :
+    h0CompIso (F.comp G) H ≪≫
+        Functor.isoWhiskerRight (h0CompIso F G) H.h0 ≪≫
+          Functor.associator F.h0 G.h0 H.h0 =
+      h0CompIso F (G.comp H) ≪≫
+        Functor.isoWhiskerLeft F.h0 (h0CompIso G H) := by
+  ext X
+  have hmap : H.h0.map (𝟙 ((F.comp G).h0.obj X)) = 𝟙 _ :=
+    H.h0.map_id _
+  simp only [Iso.trans_hom, NatTrans.comp_app,
+    Functor.isoWhiskerRight_hom, Functor.whiskerRight_app,
+    h0CompIso_hom_app, Functor.associator_hom_app,
+    Functor.isoWhiskerLeft_hom, Functor.whiskerLeft_app]
+  erw [hmap]
+  change 𝟙 _ ≫ 𝟙 _ ≫ 𝟙 _ = 𝟙 _ ≫ 𝟙 _
+  simp
+
+/-- The `H⁰` composition comparison is coherent with right composition by
+the identity dg functor and the ordinary right unitor. -/
+theorem h0CompIso_comp_id (F : DGFunctor C D) :
+    h0CompIso F (DGFunctor.id D) ≪≫
+        Functor.isoWhiskerLeft F.h0 (h0IdIso (C := D)) ≪≫
+          Functor.rightUnitor F.h0 =
+      Iso.refl F.h0 := by
+  ext X
+  simp only [Iso.trans_hom, NatTrans.comp_app,
+    Functor.isoWhiskerLeft_hom, Functor.whiskerLeft_app,
+    h0CompIso_hom_app, h0IdIso_hom_app,
+    Functor.rightUnitor_hom_app, Iso.refl_hom, NatTrans.id_app]
+  change 𝟙 (F.h0.obj X) ≫ 𝟙 _ ≫ 𝟙 _ = 𝟙 _
+  simp
+
+/-- The `H⁰` composition comparison is coherent with left composition by
+the identity dg functor and the ordinary left unitor. -/
+theorem h0CompIso_id_comp (F : DGFunctor C D) :
+    h0CompIso (DGFunctor.id C) F ≪≫
+        Functor.isoWhiskerRight (h0IdIso (C := C)) F.h0 ≪≫
+          Functor.leftUnitor F.h0 =
+      Iso.refl F.h0 := by
+  ext X
+  have hmap : F.h0.map (𝟙 X) = 𝟙 _ := F.h0.map_id X
+  simp only [Iso.trans_hom, NatTrans.comp_app,
+    Functor.isoWhiskerRight_hom, Functor.whiskerRight_app,
+    h0CompIso_hom_app, h0IdIso_hom_app,
+    Functor.leftUnitor_hom_app, Iso.refl_hom, NatTrans.id_app]
+  erw [hmap]
+  change 𝟙 _ ≫ 𝟙 _ ≫ 𝟙 _ = 𝟙 _
+  simp
 
 
 end DGFunctor

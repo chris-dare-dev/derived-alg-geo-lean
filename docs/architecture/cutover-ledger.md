@@ -7,6 +7,19 @@ blocks should normally move it rather than add more declarations beside it.
 
 ## Completed roots
 
+- `H⁰` dg-functor compositor coherence and counit normalization
+  (2026-09-13): `DGFunctor.h0CompIso_assoc`, `h0CompIso_comp_id`, and
+  `h0CompIso_id_comp` record the associativity and two unit equations for the
+  canonical comparison from strict dg composition to ordinary functor
+  composition.  `DGAdjunction.h0_whiskerLeft_counit` then packages the
+  descended left-whiskered counit as ordinary whiskering of `h0Counit`, and
+  `CounitConeData.twistAdjointComparison_h0_eq_inverseRotateFirstH0_comp_h0Counit`
+  is the corresponding twist consumer.  Mathlib's `Pseudofunctor` remains the
+  conceptual owner, but no instance is installed because the repository does
+  not yet have a bundled universe-controlled bicategory of dg categories and
+  quotient two-cells.  This adds no `IsIso`, exactness, Morita, or sphericality
+  conclusion.
+
 - Conditional dg/Fourier--Mukai kernel autoequivalences (2026-09-13):
   a supplied `PresentedCounitComparisonData` or `PresentedUnitComparisonData`
   transports an explicit `H⁰` equivalence hypothesis from the dg twist or

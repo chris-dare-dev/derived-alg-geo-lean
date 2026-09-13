@@ -3,17 +3,19 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.AdjunctionComparison
+import DerivedAlgGeo.Algebra.Homology.DGCategory.AdjunctionH0
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.NaturalTransformationConeShift
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
 
 /-!
 # H⁰ coherence and conventional shifted targets for dg-adjunction comparisons
 
-For the twist comparison, this file identifies the descended dg composite
-with the inverse-rotated first map, right-whiskered by the left adjoint and
-followed by the descended left counit.  The factorization uses the generic
-descent laws for dg composition and whiskering together with `h0CompIso`; it
-does not introduce an adjunction-specific comparison map.
+For the twist comparison, this file first identifies the descended dg
+composite with the inverse-rotated first map, right-whiskered by the left
+adjoint and followed by the descended left counit.  It then normalizes that
+last raw dg whisker to ordinary left whiskering of the `H⁰` counit, with the
+canonical compositor, associator, and unitor.  Both factorizations use generic
+descent coherence rather than an adjunction-specific comparison map.
 
 The strict dg cone construction gives the cotwist comparison in the
 shift-free form
@@ -84,6 +86,33 @@ theorem twistAdjointComparison_h0_eq_inverseRotateFirstH0 :
   rw [hηh0, K.shiftedFstH0_eq rightAdj.counit_isClosed,
     Functor.whiskerRight_comp]
   simp only [Category.assoc]
+
+/-- **The twist adjunction comparison factors through the ordinary `H⁰`
+counit.**
+
+This is the fully normalized form of
+`twistAdjointComparison_h0_eq_inverseRotateFirstH0`: the terminal descended
+dg whisker has been replaced by ordinary left whiskering of `leftAdj.h0Counit`.
+The remaining compositor, associator, and unitor are precisely the canonical
+comparison from strict dg composition to ordinary functor composition. -/
+theorem twistAdjointComparison_h0_eq_inverseRotateFirstH0_comp_h0Counit :
+    twistAdjointComparison_h0 (rightAdj := rightAdj) leftAdj K =
+      (DGFunctor.h0CompIso (K.twist.shiftedFunctor (-1 : ℤ)) L).hom ≫
+        Functor.whiskerRight
+          ((K.twist.shiftedFunctorH0Iso (-1)).hom ≫
+            K.inverseRotateFirstH0 rightAdj.counit_isClosed) L.h0 ≫
+        Functor.whiskerRight (DGFunctor.h0CompIso R S).hom L.h0 ≫
+        (Functor.associator R.h0 S.h0 L.h0).hom ≫
+        Functor.whiskerLeft R.h0 leftAdj.h0Counit ≫
+        (Functor.rightUnitor R.h0).hom := by
+  rw [twistAdjointComparison_h0_eq_inverseRotateFirstH0]
+  exact congrArg
+    (fun τ =>
+      (DGFunctor.h0CompIso (K.twist.shiftedFunctor (-1 : ℤ)) L).hom ≫
+        Functor.whiskerRight
+          ((K.twist.shiftedFunctorH0Iso (-1)).hom ≫
+            K.inverseRotateFirstH0 rightAdj.counit_isClosed) L.h0 ≫ τ)
+    (leftAdj.h0_whiskerLeft_counit R)
 
 end DGAdjunction.CounitConeData
 
