@@ -116,7 +116,10 @@ LinearEvaluationData k E
 │  with evaluation
 ├─ IsEulerCopower: shared rank-one K₀ formula, obtained from supplied finite
 │  cohomology presentations when all linear copowers exist
-└─ no additive EvaluationData adapter, cone, exactness, or concrete instance
+├─ TwistConeData: thin specialization of the generic evaluation cone
+│  ├─ K₀ action = identity minus evaluation
+│  └─ numerical twistK₀ via IsEulerCopower; exactness remains explicit
+└─ no additive EvaluationData adapter, autoequivalence, or concrete instance
 
 EvaluationData E
 ├─ functor = RHom(E,-) ⊗ E, evaluation : functor ⟶ id, closed in degree zero
@@ -442,6 +445,16 @@ that comparison are instance hypotheses to be discharged by the realization.
    interface, not a consequence of the linear one.  Any passage between the
    two evaluation packages remains explicit.  Automatic formality remains
    open and is not to be inferred from Hom-finiteness.
+   The direct scalar-linear cone consumer is now closed as well.
+   `LinearEvaluationData.TwistConeData` is a thin name for the generic cone of
+   scalar-linear evaluation; its choice comparison and conditional exactness
+   delegate to the existing strict-square and cone-preservation interfaces.
+   The generic H⁰ leaf computes its `K₀` action as identity minus evaluation,
+   and `SphericalTwist.LinearObjectTwistK0` combines that formula with
+   `LinearEvaluationData.IsEulerCopower` to obtain the existing numerical
+   `twistK₀`, without an additive-evaluation adapter.  Cone preservation is
+   still explicit input, so this proves neither automatic exactness nor an
+   autoequivalence.
 
    What is open is *concrete existence*: no dg category in the repository yet
    supplies either a `HasCopowers` instance for the additive interface or a
