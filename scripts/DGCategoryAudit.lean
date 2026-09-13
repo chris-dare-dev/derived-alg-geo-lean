@@ -1239,6 +1239,21 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.linearCopowerFunctor_map
 #print axioms CategoryTheory.linearCopowerObjIsoOfHomotopyEquiv
 
+-- Fixed-source right composition is the k-linear dg Hom functor.  With all
+-- scalar-linear copowers, its selected left adjoint is the copower functor:
+-- the unit is the universal copower map and the counit is exactly the existing
+-- selected evaluation transformation.  The triangle identities are strict.
+-- This constructs neither Perf(k) nor a spherical or additive adjunction.
+#print axioms CategoryTheory.DGLinear.homFunctor
+#print axioms CategoryTheory.DGLinear.homFunctor_obj
+#print axioms CategoryTheory.DGLinear.homFunctor_map
+#print axioms CategoryTheory.DGLinear.homFunctor_linear
+#print axioms CategoryTheory.LinearEvaluationData.ofHasLinearCopowers_functor_eq
+#print axioms CategoryTheory.linearCopowerAdjunction
+#print axioms CategoryTheory.linearCopowerAdjunction_unit_app
+#print axioms CategoryTheory.linearCopowerAdjunction_counit
+#print axioms CategoryTheory.linearCopowerAdjunction_counit_app
+
 -- The generic `H⁰` finite-free leaf packages shifted single copowers.  A
 -- supplied basis expands a degree-zero copower, with arbitrary finite index
 -- universes handled by categorical reindexing, and finite free modules have

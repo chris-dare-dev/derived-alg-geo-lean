@@ -122,6 +122,7 @@ Category
 │  │  ├─ homComplexFiniteCohomologyPresentation
 │  │  │                                   HomFiniteBounded support + field formality
 │  │  ├─ postcompCochain                fixed-source right composition, linear chain-map law
+│  │  ├─ homFunctor k E                 Hom(E,-) as a k-linear dg functor to Cdg(ModuleCat k)
 │  │  ├─ Cdg (ModuleCat k)             standard model inherits Mathlib's k-linear structure
 │  │  │  └─ linearTensorObj K X       Mathlib total tensor product, same universe
 │  │  │     ├─ tensorCochainLinearEquiv   degreewise tensor--Hom adjunction
@@ -134,6 +135,9 @@ Category
 │  │     ├─ scalar-unit witness         single⁰(k) ⊗ X represents X itself
 │  │     ├─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
 │  │     │  └─ linearCopowerFunctor    Cdg(ModuleCat k) ⟶ C, k-linear dg functor
+│  │     │     ├─ linearCopowerAdjunction  (- ⊗ E) ⊣ Hom(E,-), strict at the dg level
+│  │     │     │  ├─ unit                 selected universal copower chain map
+│  │     │     │  └─ counit               exactly selected scalar-linear evaluation
 │  │     │     ├─ selected H⁰ invariance is a HomotopyCategory/DGEnhancement leaf
 │  │     │     │  └─ LinearCopowerFiniteFree
 │  │     │     │     ├─ basis expansion of a degree-zero copower

@@ -13,8 +13,10 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformationH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.H0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Instances
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Linear
+import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearHomFunctor
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearCopower
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearCopowerFunctor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearCopowerAdjunction
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearCopowerUnit
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearEvaluation
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearH0

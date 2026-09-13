@@ -197,6 +197,20 @@ blocks should normally move it rather than add more declarations beside it.
   instance has that restriction; it does not assert concrete additive
   copowers, quasi-isomorphism invariance, or a copower instance for another dg
   model.
+- Scalar-linear tensor--Hom dg adjunction (2026-09-13):
+  `DGCategory.LinearHomFunctor` packages fixed-source right composition as the
+  `k`-linear dg functor `DGLinear.homFunctor k E` from an arbitrary
+  `k`-linear dg category to the standard dg category of module complexes.
+  Under `HasLinearCopowers`, `DGCategory.LinearCopowerAdjunction` proves that
+  `linearCopowerFunctor k E` is its strict dg left adjoint.  The unit is the
+  selected universal copower chain map, the counit is exactly
+  `LinearEvaluationData.ofHasLinearCopowers.evaluation`, and the two triangle
+  identities reuse `univ_comp_coefficientMap` and `univ_comp_evalHom`.
+  No second adjunction interface, tensor construction, or evaluation map is
+  introduced.  The result concerns all coefficient complexes; it does not
+  construct `Perf(k)`, compare linear and additive evaluation, produce an
+  adjoint on the other side, or imply quasi-equivalence, sphericality, or
+  autoequivalence.
 - Scalar-linear evaluation root (2026-09-12):
   `DGCategory.LinearEvaluation` assembles the `IsLinearCopowerOf` family at an
   object `E` into `LinearEvaluationData k E`.  Fixed-source right composition
