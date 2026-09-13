@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedHeart
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialMukai
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Assembly
@@ -16,8 +16,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Diviso
 This file is the geometric adapter from coherent-sheaf data to the abstract
 Mukai tilt assembly.  It constructs the correctly normalized numerical slope,
 transfers its HN property from the Hilbert-coefficient slope, transports it to
-the standard heart of `Dᵇ(Coh X)`, and compares the resulting slope with the
-scheme-derived Mukai class.
+the standard heart of `Dᵇ(Coh X)`, and extends the coherent Mukai class
+canonically to `K₀(Dᵇ(Coh X))` through the cohomological Euler equivalence.
 
 Two genuinely geometric seams remain explicit: the dimension-zero sheaf
 classification and the boundary Jordan--Hölder/Mukai-square decomposition.
@@ -267,11 +267,32 @@ theorem boundedHeartMukaiClass_of (E : boundedCohHeart (X := X)) :
 
 /-- An ambient Mukai class on `K₀(Dᵇ(Coh X))` realizes the geometric class
 when its restriction to the standard heart is the transported coherent-sheaf
-class.  The equality stays explicit because only the forward heart-to-ambient
-Grothendieck map is currently available. -/
+class.  This predicate remains useful for arbitrary ambient class maps; the
+canonical cohomological extension below satisfies it automatically. -/
 def IsAmbientMukaiClass
     (m : K₀ (_root_.DerivedCategory.Bounded (Coh X)) →+ Mukai.RealExtension W) : Prop :=
   m.comp (K₀Ab.toAmbient (boundedStandardT (X := X))) = boundedHeartMukaiClass R
+
+/-- The coherent Mukai class extended canonically to the bounded derived
+category by its cohomological Euler class. -/
+def derivedMukaiClass :
+    K₀ (_root_.DerivedCategory.Bounded (Coh X)) →+ Mukai.RealExtension W :=
+  _root_.DerivedCategory.boundedDerivedClassMap (Coh X) (coherentMukaiClass R)
+
+@[simp]
+theorem derivedMukaiClass_apply
+    (x : K₀ (_root_.DerivedCategory.Bounded (Coh X))) :
+    derivedMukaiClass R x =
+      coherentMukaiClass R
+        (_root_.DerivedCategory.boundedEulerClassHom (Coh X) x) := rfl
+
+/-- The canonical derived Mukai class restricts to the supplied coherent
+Mukai class on the standard bounded heart. -/
+theorem derivedMukaiClass_isAmbient :
+    IsAmbientMukaiClass R (derivedMukaiClass R) := by
+  rw [IsAmbientMukaiClass, derivedMukaiClass,
+    _root_.DerivedCategory.boundedDerivedClassMap_comp_toAmbient]
+  rfl
 
 namespace SlopeNormalization
 
@@ -308,6 +329,18 @@ theorem mukaiWeakSlopeCompat
       (N.mukaiSlopeData hμ)
       (_root_.DerivedCategory.boundedHeartEquivalence (Coh X)) E).symm
 
+/-- The canonical derived Mukai class computes the bounded-heart normalized
+slope data; no separate ambient realization hypothesis is needed. -/
+theorem derivedMukaiWeakSlopeCompat
+    (N : SlopeNormalization P R ω) (hμ : MuPositivityData P)
+    (hK3 : Numerical.K3.IsK3 V) :
+    MukaiWeakSlopeCompat
+      (MukaiChargeData.ofAmbient (boundedStandardT (X := X))
+        (derivedMukaiClass R))
+      (N.boundedMukaiSlopeData hμ) R.divisorSpace.intersection ω :=
+  N.mukaiWeakSlopeCompat hμ hK3 (derivedMukaiClass R)
+    (derivedMukaiClass_isAmbient R)
+
 end SlopeNormalization
 
 /-! ## The remaining sheaf-level geometric classification -/
@@ -327,7 +360,7 @@ namespace SlopeNormalization
 
 variable {P : PolarizedVarietyData k X}
 variable {R : Numerical.Surface.NumericalRealization V.ring (D := W)}
-variable {ω : W}
+variable {β ω : W}
 
 /-- A coherent-sheaf dimension-zero classification supplies exactly the
 abstract torsion-boundary input required by the Mukai tilt argument. -/
@@ -357,6 +390,16 @@ theorem hasDimensionZeroTorsionClasses
   change (m.comp (K₀Ab.toAmbient (boundedStandardT (X := X)))) (K₀Ab.of T₀) = _
   rw [hm, boundedHeartMukaiClass_of]
   exact hclass
+
+/-- A coherent-sheaf dimension-zero classification supplies the torsion
+boundary statement for the canonical derived Mukai class. -/
+theorem hasDimensionZeroTorsionClasses_derived
+    (N : SlopeNormalization P R ω) (hμ : MuPositivityData P)
+    (hzero : HasDimensionZeroMukaiClasses R ω) :
+    MukaiTilt.HasDimensionZeroTorsionClasses (derivedMukaiClass R)
+      R.divisorSpace.intersection β ω (N.boundedMukaiSlopeData hμ) :=
+  N.hasDimensionZeroTorsionClasses hμ (derivedMukaiClass R)
+    (derivedMukaiClass_isAmbient R) hzero β
 
 end SlopeNormalization
 
@@ -414,6 +457,41 @@ theorem tiltStabilityFunction_Z
       R.divisorSpace.intersection β ω (N.boundedMukaiSlopeData hμ)) :
     (N.tiltStabilityFunction hμ hbounded hK3 m hm hHodge hω hzero hboundary).Z =
       MukaiChargeData.ambientChargeHom m R.divisorSpace.intersection β ω := rfl
+
+/-- The K3 tilt stability function using the canonical cohomological
+extension of the coherent Mukai class.  The genuine geometric boundedness,
+dimension-zero, Hodge, and boundary-decomposition obligations remain
+explicit. -/
+def canonicalTiltStabilityFunction
+    (N : SlopeNormalization P R ω) (hμ : MuPositivityData P)
+    (hbounded : SlopeBoundedness P) (hK3 : Numerical.K3.IsK3 V)
+    (hHodge : R.divisorSpace.HodgeDefinite ω)
+    (hω : 2 < R.divisorSpace.pair ω ω)
+    (hzero : HasDimensionZeroMukaiClasses R ω)
+    (hboundary : MukaiTilt.HasBoundaryMukaiDecomposition
+      (derivedMukaiClass R) R.divisorSpace.intersection β ω
+      (N.boundedMukaiSlopeData hμ)) :
+    WeakStabilityCondition.StabilityFunction
+      ((N.boundedMukaiSlopeData hμ).toWeakStabilityFunction.hnTilt
+        (((R.divisorSpace.intersection β ω : ℝ)) : WithTop ℝ)
+        (N.boundedMukaiSlopeData_hasHNProperty hμ (muHNInput hbounded))) :=
+  N.tiltStabilityFunction hμ hbounded hK3
+    (derivedMukaiClass R) (derivedMukaiClass_isAmbient R)
+    hHodge hω hzero hboundary
+
+@[simp]
+theorem canonicalTiltStabilityFunction_Z
+    (N : SlopeNormalization P R ω) (hμ : MuPositivityData P)
+    (hbounded : SlopeBoundedness P) (hK3 : Numerical.K3.IsK3 V)
+    (hHodge : R.divisorSpace.HodgeDefinite ω)
+    (hω : 2 < R.divisorSpace.pair ω ω)
+    (hzero : HasDimensionZeroMukaiClasses R ω)
+    (hboundary : MukaiTilt.HasBoundaryMukaiDecomposition
+      (derivedMukaiClass R) R.divisorSpace.intersection β ω
+      (N.boundedMukaiSlopeData hμ)) :
+    (N.canonicalTiltStabilityFunction hμ hbounded hK3 hHodge hω hzero hboundary).Z =
+      MukaiChargeData.ambientChargeHom (derivedMukaiClass R)
+        R.divisorSpace.intersection β ω := rfl
 
 end SlopeNormalization
 

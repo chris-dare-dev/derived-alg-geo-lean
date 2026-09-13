@@ -19,9 +19,9 @@ descends to a canonical homomorphism
 
 `K₀(Dᵇ(A)) →+ K₀Ab(A)`.
 
-This file constructs that direction only.  Identifying it as the inverse of
-the standard-heart comparison requires a separate dévissage theorem; no
-equivalence of Grothendieck groups is assumed here.
+This file constructs that direction only.  Its identification as the inverse
+of the standard-heart comparison is proved separately, by dévissage, in
+`GrothendieckGroup.Comparison`.
 -/
 
 noncomputable section

@@ -15,6 +15,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Bounded
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Heart
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedHeart
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup.Comparison
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
