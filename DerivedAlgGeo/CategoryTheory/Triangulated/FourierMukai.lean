@@ -10,6 +10,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Convolution
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.CounitKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionCotwistComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionDualCotwistComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionDualTwistComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionPresentation
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionTwistComparison
@@ -36,8 +37,8 @@ Fourier--Mukai cone triangles; separately supplied comparison data produce
 natural triangle and functor isomorphisms between the same families.
 Shift-compatible refinements transfer triangulatedness to the selected
 Fourier--Mukai twist and cotwist shift structures.  The left-adjunction dual
-twist exposes the same comparison and conditional kernel-autoequivalence API
-through the definitional correspondence swap.  No geometry, and no
+twist and dual cotwist expose the same comparison and conditional
+kernel-autoequivalence APIs through the definitional correspondence swaps.  No geometry, and no
 theorem asserting that a functor is of this form or that it has an adjoint.
 
 -/
