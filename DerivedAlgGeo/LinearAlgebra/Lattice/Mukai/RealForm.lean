@@ -55,6 +55,37 @@ so **as soon as `ω` has positive square the pair spans a positive plane**
 `QuadraticForm/PositiveFrame.lean` says is needed to name Bridgeland's component
 rather than an arbitrary half: take `(expRe, expIm)` as the reference pair.
 
+## The graded pairing is this pairing, and the `∫H²` weight is real
+
+An abstraction audit proposed a graded form `-∑_k (-1)^k v_k w_{n-k}` on
+`Fin (n + 1) → ℝ`, together with a parity theorem about it. At `n = 2` that form
+is the one already here: both it and `b c c' - r s' - r' s` expand to
+`v₁w₁ - v₀w₂ - v₂w₀`, with no weight, no transport and no hypothesis.
+`realPairing_mul_eq_alternatingSum` records that, so the graded form is never
+declared a second owner of the even case. Nothing new is defined here; these are
+theorems about `realPairing`, `realForm` and `selfPairing`.
+
+The compression `v ↦ (∫H²·rk, ∫H·c₁, ch₂)` relates the two on the rank-one
+slice `c = x • H`, and `realPairing_compression_rankOne` carries the weight
+`∫H² = b H H` explicitly rather than absorbing it.
+
+### Three unifications that are refuted, and why a graded form still earns `n ≠ 2`
+
+* **Odd degree is alternating, and no `realPairing` is.** At odd `n` the graded
+  form has `⟪v, v⟫ = 0` for every `v`, because the sum pairs slot `k` with slot
+  `n - k` under opposite signs. No `realPairing b` can do that: `(1, 0, 1)` has
+  `realPairing b (1,0,1) (1,0,1) = -2` for every `b`. So the odd case is not
+  this pairing under any choice of `b`, and a separate graded form is what odd
+  degree needs.
+* **The `H`-compression is not injective once the Picard rank exceeds one.** It
+  collapses any two classes whose `c₁` differ by something `H`-orthogonal, so a
+  multi-divisor pairing does not factor through `Fin 3 → ℝ`. That is why the
+  bridge below is stated on the rank-one slice `c = x • H` and not in general.
+* **The weight is not removable.** `realPairing_compression_rankOne` carries
+  `b H H` to the first power, and it is `1` exactly when `∫H² = 1`. Rescaling
+  `H` rescales the weight rather than clearing it, so the two forms agree on the
+  nose only under that normalisation.
+
 ## What is not here
 
 * **The integral comparison.** Relating this to `Mukai.pairing` on
@@ -289,5 +320,56 @@ theorem mem_positiveFramesPlus_exp (hb : ∀ x y : V, b x y = b y x) (hω : 0 < 
   positivity
 
 end Exponential
+
+/-! ## The graded pairing, as theorems about this root
+
+See the module docstring. No new declaration: the graded form is written out
+where it is used, so that it never becomes a second name for `realPairing`. -/
+
+/-- **The graded `n = 2` pairing is `realPairing` on the scalar line.**
+
+The right-hand side is the audit's graded form `-∑_k (-1)^k d_k e_{2-k}` written
+out. There is no weight, no hypothesis and no transport: at `n = 2` the two are
+one equation, so the graded form must not be declared a second owner of the even
+case. Odd degree is a different matter; see the module docstring. -/
+theorem realPairing_mul_eq_alternatingSum (d e : Fin 3 → ℝ) :
+    realPairing (LinearMap.mul ℝ ℝ) (d 0, d 1, d 2) (e 0, e 1, e 2)
+      = -∑ k : Fin 3, (-1 : ℝ) ^ (k : ℕ) * d k * e k.rev := by
+  have r0 : (0 : Fin 3).rev = 2 := rfl
+  have r1 : (1 : Fin 3).rev = 1 := rfl
+  have r2 : (2 : Fin 3).rev = 0 := rfl
+  rw [realPairing_apply, Fin.sum_univ_three, r0, r1, r2]
+  norm_num
+  ring
+
+/-- **The weighted rank-one bridge.** On the slice `c = x • H` the graded
+pairing of the `H`-degree compressions `(∫H²·rk, ∫H·c₁, ch₂)` is `∫H²` times
+this pairing.
+
+The left-hand side is that graded pairing written out. The weight `b H H` is
+first power and is not removable: it is `1` exactly when `∫H² = 1`. The
+rank-one hypothesis is not decoration either, since the compression stops being
+injective as soon as the Picard rank exceeds one. -/
+theorem realPairing_compression_rankOne (H : V) (r x s r' x' s' : ℝ) :
+    b H (x • H) * b H (x' • H) - b H H * r * s' - s * (b H H * r')
+      = b H H * realPairing b (r, x • H, s) (r', x' • H, s') := by
+  have h1 : b H (x • H) = x * b H H := by rw [map_smul, smul_eq_mul]
+  have h2 : b H (x' • H) = x' * b H H := by rw [map_smul, smul_eq_mul]
+  have h3 : b (x • H) (x' • H) = x * x' * b H H := by
+    simp only [map_smul, LinearMap.smul_apply, smul_eq_mul]; ring
+  rw [realPairing_apply, h1, h2, h3]
+  ring
+
+/-- **The factor of two is the `realForm` halving and nothing else.**
+
+Specialising the bridge to `v = w` puts a `2` in front, and it is exactly the
+`realForm = realPairing / 2` convention this file's module docstring calls a
+factor-of-two trap — not a second discrepancy stacked on the `∫H²` weight. -/
+theorem realForm_compression_rankOne (H : V) (r x s : ℝ) :
+    b H (x • H) * b H (x • H) - b H H * r * s - s * (b H H * r)
+      = 2 * b H H * realForm b (r, x • H, s) := by
+  rw [realPairing_compression_rankOne b H r x s r x s, realForm_apply]
+  ring
+
 
 end Mukai
