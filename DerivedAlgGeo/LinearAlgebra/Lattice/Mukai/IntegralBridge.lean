@@ -136,7 +136,7 @@ integral Mukai pairing is the real one, cast. -/
 theorem realPairing_extendMap (bZ : N →ₗ[ℤ] N →ₗ[ℤ] ℤ) (bR : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
     (f : N →ₗ[ℤ] V) (hf : ∀ x y : N, bR (f x) (f y) = (bZ x y : ℝ))
     (u w : MukaiLattice N) :
-    realPairing bR (extendMap f u) (extendMap f w) = (pairing bZ u w : ℝ) := by
+    realPairing bR (extendMap f u) (extendMap f w) = ((pairing bZ u w : ℤ) : ℝ) := by
   simp only [realPairing, extendMap, pairing, hf]
   push_cast
   ring

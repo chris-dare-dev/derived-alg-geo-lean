@@ -183,11 +183,11 @@ noncomputable def pairingIm (β ω : V) (δ : Mukai.RealExtension V) : ℝ :=
 
 theorem pairingRe_eq (β ω : V) (δ : Mukai.RealExtension V) :
     pairingRe q β ω δ = q β δ.2.1 - δ.2.2 - δ.1 * ((q β β - q ω ω) / 2) := by
-  simp only [pairingRe, pairing, Mukai.realPairing, chartRe_eq, one_mul]
+  simp only [pairingRe, pairing, Mukai.realPairing, Mukai.pairing, chartRe_eq, one_mul]
 
 theorem pairingIm_eq (β ω : V) (δ : Mukai.RealExtension V) :
     pairingIm q β ω δ = q ω δ.2.1 - δ.1 * q β ω := by
-  simp only [pairingIm, pairing, Mukai.realPairing, chartIm_eq, zero_mul, sub_zero]
+  simp only [pairingIm, pairing, Mukai.realPairing, Mukai.pairing, chartIm_eq, zero_mul, sub_zero]
 
 /-! ### The two identities
 
@@ -216,7 +216,7 @@ theorem two_mul_rk_mul_pairingRe (hq : ∀ x y : V, q x y = q y x) (β ω : V)
     2 * δ.1 * pairingRe q β ω δ
       = selfPairing q δ + δ.1 ^ 2 * q ω ω
         - q (δ.2.1 - δ.1 • β) (δ.2.1 - δ.1 • β) := by
-  rw [pairingRe_eq, selfPairing_eq_pairing, pairing, Mukai.realPairing]
+  rw [pairingRe_eq, selfPairing_eq_pairing, pairing, Mukai.realPairing, Mukai.pairing]
   simp only [map_sub, map_smul, LinearMap.sub_apply, LinearMap.smul_apply,
     smul_eq_mul]
   rw [hq δ.2.1 β]
@@ -385,13 +385,13 @@ theorem IntegralComparison.map_fst (c : IntegralComparison q b)
 /-- The comparison is an isometry onto its image: the real pairing of two
 mapped classes is the integral pairing, cast. -/
 theorem pairing_map (c : IntegralComparison q b) (v w : Mukai.MukaiLattice N) :
-    pairing q (c.map v) (c.map w) = (Mukai.pairing b v w : ℝ) := by
+    pairing q (c.map v) (c.map w) = ((Mukai.pairing b v w : ℤ) : ℝ) := by
   simp only [pairing, Mukai.realPairing, IntegralComparison.map, Mukai.pairing, c.compat]
   push_cast
   ring
 
 theorem selfPairing_map (c : IntegralComparison q b) (v : Mukai.MukaiLattice N) :
-    selfPairing q (c.map v) = (Mukai.selfPairing b v : ℝ) := by
+    selfPairing q (c.map v) = ((Mukai.selfPairing b v : ℤ) : ℝ) := by
   rw [selfPairing_eq_pairing, pairing_map, Mukai.selfPairing_eq_pairing]
 
 /-- **The two sphericity conditions agree.** -/

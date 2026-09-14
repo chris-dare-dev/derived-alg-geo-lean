@@ -2,6 +2,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.AB
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower
+import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower.Restriction
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flasque
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
 import DerivedAlgGeo.AlgebraicGeometry.Modules.LocalCombination

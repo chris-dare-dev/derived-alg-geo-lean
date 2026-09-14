@@ -229,6 +229,16 @@ RETIRED_PATHS = (
     # to AlgebraicGeometry/DerivedCategory/Perfect/, and stalkwise flatness of
     # a module sheaf moved to AlgebraicGeometry/Modules/Flat.lean.
     "AlgebraicGeometry/Moduli/PerfectComplex/Relative.lean",
+    # 2026-09-13 MO1.14: four paths that disagreed with the API each file
+    # extends. Linear duality on ModuleCat is one subject at ModuleCat's own
+    # Mathlib path; the exterior-power file under Sheaf/ constructs presheaf
+    # exterior powers; quasicoherent extension closure is about the modules,
+    # not the cohomology its proof uses; exterior-power restriction is about
+    # module sheaves, not divisors.
+    "CategoryTheory/ModuleCat",
+    "Algebra/Category/ModuleCat/Sheaf/ExteriorPower.lean",
+    "AlgebraicGeometry/Cohomology/Quasicoherent",
+    "AlgebraicGeometry/Divisors/ExteriorPower.lean",
 )
 
 

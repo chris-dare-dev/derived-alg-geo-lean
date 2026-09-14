@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.ModuleCat.LinearDual
+import DerivedAlgGeo.Algebra.Category.ModuleCat.LinearDual.Basic
 import Mathlib.CategoryTheory.Linear.Yoneda
 import Mathlib.LinearAlgebra.Dual.Lemmas
 
