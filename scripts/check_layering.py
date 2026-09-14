@@ -321,6 +321,19 @@ CHARGE_FAMILY_ROOT = (
 CHARGE_ZERO_ROOT = (
     "CategoryTheory/Triangulated/StabilityCondition/Chambers/Basic.lean"
 )
+# Rule 11. MO1.05 keeps numerical foundations upstream of their named and
+# dimension-specific consumers.
+SQRT_TODD_ROOT = f"{GEOMETRY}.Numerical.Mukai.SqrtTodd"
+SLOPE_ROOT = f"{GEOMETRY}.Numerical.Stability.Slope"
+POLARISED_TRANSPORT_ROOT = (
+    f"{GEOMETRY}.Numerical.Stability.PolarisedWallTransport"
+)
+NUMERICAL_SPECIALIZATIONS = (
+    f"{GEOMETRY}.Numerical.RiemannRoch.K3",
+    f"{GEOMETRY}.Numerical.Examples",
+    f"{GEOMETRY}.Numerical.Stability.WallTransport",
+    f"{GEOMETRY}.Numerical.Stability.ThreefoldWallTransport",
+)
 MO1_03_OWNERS = {
     POSITIVE_PLANE_ROOT: ("IsPositivePlane", "positivePlanes"),
     POSITIVE_FRAME_ROOT: (
@@ -588,6 +601,16 @@ def owner_boundary_failures(
             return [
                 f"{label}: reaches {forbidden[0]}; central-charge construction "
                 "must remain upstream of walls and geometry"
+            ]
+    if module in (SQRT_TODD_ROOT, SLOPE_ROOT, POLARISED_TRANSPORT_ROOT):
+        forbidden = sorted(
+            dep for dep in reached
+            if any(in_tree(dep, root) for root in NUMERICAL_SPECIALIZATIONS)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; generic numerical roots "
+                "must not import K3, surface, or dimension-specific consumers"
             ]
     return []
 
@@ -926,7 +949,9 @@ def main() -> int:
         "and signed-ray owners are distinct, with no common codimension-one "
         "parent; the "
         f"{len(LINEAR_YONEDA_BLOCK)}-declaration linear Yoneda block needs "
-        "Mathlib alone and the linear Serre root reaches no triangulated module"
+        "Mathlib alone and the linear Serre root reaches no triangulated module; "
+        "generic square-root, slope, and polarised-transport roots reach no "
+        "K3, surface, or dimension-specific consumers"
     )
     return 0
 

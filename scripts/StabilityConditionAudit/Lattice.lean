@@ -263,6 +263,9 @@ it does in the source; see the module docstring of `Mukai/RealForm.lean`. -/
 #print axioms Mukai.isPositiveFrame_exp
 #print axioms Mukai.pairingDet_exp_self
 #print axioms Mukai.mem_positiveFramesPlus_exp
+#print axioms Mukai.realPairing_mul_eq_alternatingSum
+#print axioms Mukai.realPairing_compression_rankOne
+#print axioms Mukai.realForm_compression_rankOne
 
 /-! ### Additivity of the signature over an orthogonal decomposition
 

@@ -192,6 +192,23 @@ therefore rational rather than integral. -/
 /-- A class is recorded by the three rational coefficients of `ch = a + b·H + c·H²`. -/
 abbrev SurfaceNum : Type := Fin 3 → ℤ
 
+/-- Shared Chern-character coordinates for the rank-one surface models: the
+class `(r, c, s)` has `ch = r + c·H + s·H²`.
+
+The historical name is retained even though the construction is not K3-specific. -/
+noncomputable def k3ChCoeff (E : SurfaceNum) : ℕ → ℚ
+  | 0 => (E 0 : ℚ)
+  | 1 => (E 1 : ℚ)
+  | 2 => (E 2 : ℚ)
+  | _ + 3 => 0
+
+theorem k3ChCoeff_add (E F : SurfaceNum) (i : ℕ) :
+    k3ChCoeff (E + F) i = k3ChCoeff E i + k3ChCoeff F i := by
+  match i with
+  | 0 | 1 => simp only [k3ChCoeff, Pi.add_apply, Int.cast_add]
+  | 2 => simp only [k3ChCoeff, Pi.add_apply, Int.cast_add]
+  | _ + 3 => simp only [k3ChCoeff, add_zero]
+
 /-- The Chern character of `E`, given its coefficient functions. `chCoeff E i` is the
 coefficient of `Hⁱ`; keeping it abstract lets `ℙ²` use half-integers. -/
 noncomputable def surfaceCh (chCoeff : SurfaceNum → ℕ → ℚ) (E : SurfaceNum) : ℕ → SurfaceRing

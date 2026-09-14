@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialMukai
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallTransport
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.PolarisedWallTransport
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.PolarisedWallTransportComparison
 
 /-!
 # The correction slot at `√td`: the transport there is the Mukai charge

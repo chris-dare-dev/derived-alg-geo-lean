@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.K3
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.General
 import Mathlib.Tactic.LinearCombination
 
 /-!
@@ -50,9 +50,7 @@ to relate them, which is why the obvious `simp; ring` does not work here.
 * `sqrtComp_convolution` — the identity that earns the name.
 * `sqrtComp_mem` — the square root respects the grading.
 * `NumericalVarietyData.sqrtToddComp` and its three companions.
-* `K3.sqrtToddComp_one` and `K3.degree_sqrtToddComp_two` — together, the formal
-  content of the claim `√td(X) = 1 + [pt]` that
-  `Numerical/RiemannRoch/K3.lean` currently makes in prose only.
+K3-specific simplifications live downstream in `Mukai/SqrtToddK3.lean`.
 -/
 
 open Finset
@@ -195,28 +193,5 @@ theorem sqrtToddComp_convolution (V : NumericalVarietyData n A N) {i : ℕ} (hi 
   sqrtComp_convolution V.toddComp V.toddComp_zero hi
 
 end NumericalVarietyData
-
-namespace K3
-
-variable {V : NumericalVarietyData 2 A N}
-
-/-- On a K3 the linear term of `√td` vanishes, because `td₁ = 0`. -/
-theorem sqrtToddComp_one (hK3 : IsK3 V) : V.sqrtToddComp 1 = 0 := by
-  rw [NumericalVarietyData.sqrtToddComp, sqrtComp_one, hK3.toddComp_one, mul_zero]
-
-/-- `∫_X √td₂ = 1`: with `td₁ = 0` the quadratic term is `td₂/2`, and
-`∫td₂ = χ(O_X) = 2`.
-
-Together with `sqrtToddComp_one` and `sqrtToddComp_zero` this is the formal
-content of `√td(X) = 1 + [pt]`, which `RiemannRoch/K3.lean` states in prose. -/
-theorem degree_sqrtToddComp_two (hK3 : IsK3 V) :
-    V.ring.degree (V.sqrtToddComp 2) = 1 := by
-  show V.ring.degree (algebraMap ℚ A (1 / 2) * V.toddComp 2
-    - algebraMap ℚ A (1 / 8) * (V.toddComp 1 * V.toddComp 1)) = 1
-  rw [hK3.toddComp_one, mul_zero, mul_zero, sub_zero,
-    NumericalRingData.degree_algebraMap_mul, hK3.degree_toddComp_two]
-  norm_num
-
-end K3
 
 end AlgebraicGeometry.Numerical

@@ -165,6 +165,12 @@ realizations remain under `AlgebraicGeometry/Numerical/`. Rule 8 of
 boundaries. Preserve the existing roots and comparisons instead of creating
 another charge carrier or retired-path shim.
 
+The numerical specialization cutover is complete (#1316). Generic
+`Mukai/SqrtTodd.lean`, `Mukai/VectorClass.lean`, `Stability/Slope.lean`, and
+`Stability/PolarisedWallTransport.lean` import no K3, named-surface, or
+dimension-specific transport consumer. K3 consequences and cross-model or
+surface/threefold comparisons live in explicit downstream modules.
+
 Orthogonal exceptional blocks and a chosen right adjoint to a residual
 full-subcategory inclusion are structures on abstract (pre)triangulated
 categories, so their canonical owner is

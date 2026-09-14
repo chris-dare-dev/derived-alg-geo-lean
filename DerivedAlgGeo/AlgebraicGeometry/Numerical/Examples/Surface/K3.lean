@@ -34,20 +34,6 @@ namespace AlgebraicGeometry.Numerical
 
 namespace Examples
 
-/-- Chern-character coefficients: the class `(r, c, s)` has `ch = r + c·H + s·H²`. -/
-noncomputable def k3ChCoeff (E : SurfaceNum) : ℕ → ℚ
-  | 0 => (E 0 : ℚ)
-  | 1 => (E 1 : ℚ)
-  | 2 => (E 2 : ℚ)
-  | _ + 3 => 0
-
-theorem k3ChCoeff_add (E F : SurfaceNum) (i : ℕ) :
-    k3ChCoeff (E + F) i = k3ChCoeff E i + k3ChCoeff F i := by
-  match i with
-  | 0 | 1 => simp only [k3ChCoeff, Pi.add_apply, Int.cast_add]
-  | 2 => simp only [k3ChCoeff, Pi.add_apply, Int.cast_add]
-  | _ + 3 => simp only [k3ChCoeff, add_zero]
-
 /-- The Todd class of a K3: `td₁ = 0`, and `td₂` normalised so that `∫_X td₂ = 2`. -/
 noncomputable def k3Todd (d : ℚ) : ℕ → SurfaceRing
   | 0 => 1
