@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.LinearAlgebra.BilinearForm.Basic
+import Mathlib.Data.Real.Basic
 
 /-!
 # Supplied surface Todd-correction data

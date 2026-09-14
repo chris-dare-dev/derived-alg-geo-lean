@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Analysis.Calculus.FDeriv.Bilinear
+import Mathlib.LinearAlgebra.QuadraticForm.Basic
 import Mathlib.Tactic
 
 /-!
