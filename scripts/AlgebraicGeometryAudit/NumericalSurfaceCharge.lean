@@ -171,7 +171,7 @@ imZ on one side, ChernCharacter.centralCharge on the other). -/
 #print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.rankOneParameters_omega
 #print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.wallChargeFamily_charge_eq_centralCharge
 #print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.wallChargeFamily_eq_rankOne_reindex
-#print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.wallChargeFamily_wall_eq
+#print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.wallChargeFamily_alignmentLocus_eq
 
 /-! ## The projective plane as a rank-one child
 

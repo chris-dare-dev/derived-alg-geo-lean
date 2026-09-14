@@ -384,9 +384,9 @@ of them at once. This answers the question #700 left open. -/
 #print axioms PeriodDomain.isPositiveFrame_iff
 #print axioms PeriodDomain.isOpen_setOf_isPositiveFrame
 #print axioms PeriodDomain.exists_isPositiveFrame
-#print axioms PeriodDomain.orthogonalityLocusPairs
+#print axioms PeriodDomain.orthogonalityPairs
 #print axioms PeriodDomain.mem_orthogonalityPairs_iff
-#print axioms PeriodDomain.orthogonalityLocusPairs_ne_top
+#print axioms PeriodDomain.orthogonalityPairs_ne_top
 #print axioms PeriodDomain.dense_compl_orthogonalityPairs
 #print axioms PeriodDomain.nonempty_positivePlanesAway
 
