@@ -2,7 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.Monoidal
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
+import Mathlib.CategoryTheory.Adjunction.Additive
 import Mathlib.CategoryTheory.Monoidal.Subcategory
 
 /-!
@@ -36,6 +38,17 @@ local instance : MonoidalCategory X.PresheafOfModules :=
 
 local instance : SymmetricCategory X.PresheafOfModules :=
   PresheafOfModules.symmetricCategory (R := X.presheaf)
+
+private noncomputable local instance : MonoidalPreadditive X.PresheafOfModules :=
+  PresheafOfModules.monoidalPreadditive X.presheaf
+
+private noncomputable local instance :
+    (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).Additive :=
+  (PresheafOfModules.sheafificationAdjunction
+    (𝟙 X.ringCatSheaf.obj)).left_adjoint_additive
+
+private local instance : (toPresheafOfModules X).Additive :=
+  inferInstanceAs (SheafOfModules.forget X.ringCatSheaf).Additive
 
 lemma tensorSheafificationComparisonRight_naturality {P Q : X.PresheafOfModules}
     (f : P ⟶ Q) {L M : X.Modules} (g : L ⟶ M) :

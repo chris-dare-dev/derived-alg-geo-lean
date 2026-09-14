@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Preadditive.CompactObject
+import DerivedAlgGeo.CategoryTheory.Triangulated.CompactObject
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
 import Mathlib.CategoryTheory.Adjunction.Additive
 import Mathlib.CategoryTheory.Adjunction.Limits
@@ -19,9 +19,9 @@ a compact object or the coproduct-and-extension closure `Coprod(G)`.
 
 The definitions here follow A.9--A.11 literally:
 
-* `Functor.PreservesSmallCoproducts` and `IsCompactObject` (A.9, A.10) are the
-  preadditive vocabulary of `CategoryTheory/Preadditive/CompactObject.lean`, which this
-  file imports;
+* `Functor.PreservesSmallCoproducts` and `IsCompactObject` (A.9, A.10) begin in the
+  preadditive compact-object layer, while their thick-subcategory structure lives in
+  `CategoryTheory/Triangulated/CompactObject.lean`, which this file imports;
 * `ObjectProperty.coprodClosure` is the smallest isomorphism-, coproduct-, and
   extension-closed object property containing its generators;
 * `ObjectProperty.coprodClosure_le_shift_of_le_shift` transports that closure
@@ -140,6 +140,22 @@ theorem coprodClosure_le_shift_of_le_shift {R : ObjectProperty C} (n : ℤ)
       exact R.ext_of_isTriangulatedClosed₂ ((Triangle.shiftFunctor C n).obj T)
         (Triangle.shift_distinguished T hT n) ih₁ ih₃
 
+/-- The coproduct-and-extension closure of a triangulated object property is
+again triangulated.
+
+The extension and isomorphism clauses are built into `coprodClosure`. Shift
+closure follows by applying `coprodClosure_le_shift_of_le_shift` to the
+shift-stability of the generators. -/
+instance coprodClosure_isTriangulated [P.IsTriangulated] :
+    P.coprodClosure.{w}.IsTriangulated where
+  toContainsZero := by
+    obtain ⟨Z, hZ, hP⟩ := P.exists_prop_of_containsZero
+    exact ⟨Z, hZ, P.le_coprodClosure Z hP⟩
+  toIsStableUnderShift :=
+    ⟨fun n ↦ ⟨P.coprodClosure_le_shift_of_le_shift n
+      (fun X hX ↦ P.le_coprodClosure _ (P.le_shift n X hX))⟩⟩
+  toIsTriangulatedClosed₂ := inferInstance
+
 variable {P}
 
 /-- A coproduct-preserving triangulated functor carries `Coprod(P)` into
@@ -162,6 +178,47 @@ theorem coprodClosure_map_obj
       exact .of_coproduct (F.mapCocone c) (isColimitOfPreserves F hc) ih
   | of_extension T hT _ _ ih₁ ih₃ =>
       exact .of_extension (F.mapTriangle.obj T) (F.map_distinguished T hT) ih₁ ih₃
+
+/-- A coproduct-preserving triangulated functor carries `Coprod(P)` into
+`Coprod(Q)` as soon as the images of the generators `P` lie in
+`Coprod(Q)`. -/
+theorem coprodClosure_map_obj_of_le
+    {D : Type u₂} [Category.{v} D] [HasZeroObject D] [HasShift D ℤ]
+    [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive]
+    [Pretriangulated D]
+    (F : Functor C D) [F.CommShift ℤ] [F.IsTriangulated]
+    (hF : F.PreservesSmallCoproducts.{w})
+    (Q : ObjectProperty D) (hPQ : P.map F ≤ Q.coprodClosure.{w})
+    {X : C} (hX : P.coprodClosure.{w} X) :
+    Q.coprodClosure.{w} (F.obj X) :=
+  (P.map F).coprodClosure_le hPQ _
+    (P.coprodClosure_map_obj F hF hX)
+
+/-- Property-level form of `coprodClosure_map_obj_of_le`. -/
+theorem map_coprodClosure_le
+    {D : Type u₂} [Category.{v} D] [HasZeroObject D] [HasShift D ℤ]
+    [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive]
+    [Pretriangulated D]
+    (F : Functor C D) [F.CommShift ℤ] [F.IsTriangulated]
+    (hF : F.PreservesSmallCoproducts.{w})
+    (Q : ObjectProperty D) (hPQ : P.map F ≤ Q.coprodClosure.{w}) :
+    P.coprodClosure.{w}.map F ≤ Q.coprodClosure.{w} := by
+  rintro Y ⟨X, hX, ⟨e⟩⟩
+  exact Q.coprodClosure.prop_of_iso e
+    (P.coprodClosure_map_obj_of_le F hF Q hPQ hX)
+
+/-- Inverse-image form of `coprodClosure_map_obj_of_le`, matching the
+object-property inequality used to restrict a functor to full
+subcategories. -/
+theorem coprodClosure_le_inverseImage
+    {D : Type u₂} [Category.{v} D] [HasZeroObject D] [HasShift D ℤ]
+    [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive]
+    [Pretriangulated D]
+    (F : Functor C D) [F.CommShift ℤ] [F.IsTriangulated]
+    (hF : F.PreservesSmallCoproducts.{w})
+    (Q : ObjectProperty D) (hPQ : P.map F ≤ Q.coprodClosure.{w}) :
+    P.coprodClosure.{w} ≤ Q.coprodClosure.{w}.inverseImage F :=
+  fun _ hX ↦ P.coprodClosure_map_obj_of_le F hF Q hPQ hX
 
 end ObjectProperty
 

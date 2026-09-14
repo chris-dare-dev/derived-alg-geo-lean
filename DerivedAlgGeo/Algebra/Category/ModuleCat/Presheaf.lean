@@ -4,12 +4,14 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.AB
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.ExteriorPower
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.Monoidal
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.Sections
 
 /-!
 # Presheaves of modules
 
 Extensions of Mathlib's `PresheafOfModules`, at Mathlib's path
-`Algebra/Category/ModuleCat/Presheaf/`: exactness of colimits, and objectwise
-exterior powers built from semilinear exterior powers of the restriction maps.
+`Algebra/Category/ModuleCat/Presheaf/`: exactness of colimits, additivity of the
+pointwise tensor product, and objectwise exterior powers built from semilinear
+exterior powers of the restriction maps.
 -/

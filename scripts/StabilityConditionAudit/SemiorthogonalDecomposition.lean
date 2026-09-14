@@ -94,6 +94,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 -- the two upstream-candidate retract-stability instances for the orthogonals.
 #print axioms CategoryTheory.ObjectProperty.rightOrthogonal_isStableUnderRetracts
 #print axioms CategoryTheory.ObjectProperty.leftOrthogonal_isStableUnderRetracts
+#print axioms CategoryTheory.ObjectProperty.triangEnvelope_le_rightOrthogonal_triangEnvelope
+#print axioms CategoryTheory.ObjectProperty.shiftClosure_triangEnvelope_eq
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.obj
 #print axioms CategoryTheory.Triangulated.ExceptionalCollection.exceptional
@@ -200,12 +202,40 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.mk.sizeOf_spec
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.project
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.projectObj
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.ambientProjection
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.counitApp
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.homEquiv
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.homEquivFromProject
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.homEquivFromProject_id
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.isRightAdmissible
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.project_isZero_iff
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude
+#print axioms CategoryTheory.Functor.hasCohomologicalAmplitude_zero
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.weaken
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsStrong
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsStrong.hasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.CompatibleWith
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.compatibleWith_id
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.CompatibleWith.comp
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.componentProjection
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.ambientProjection
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasCohomologicalAmplitude
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.IsStrong.rightProjectionData
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.inverseImage
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.inverseImage_component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.inverseImage_compatible
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.inverseImageInclusion
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.inverseImageInclusionFullyFaithful
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.restrictedProjection
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.restrict
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.Preserves
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.restrict
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.inverseImage_isStrong
+#print axioms CategoryTheory.IsCompactObject.singletonRightOrthogonalIsClosedUnderColimitsOfShape
+#print axioms CategoryTheory.IsCompactObject.leftOrthogonal_coprodClosure
+#print axioms CategoryTheory.ObjectProperty.coprodClosure_le_leftOrthogonal_coprodClosure
+#print axioms CategoryTheory.ObjectProperty.coprodClosure_le_rightOrthogonal_coprodClosure
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ResidualProjectionData
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.projectedObject
 #print axioms CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.projectedObjectHomEquiv
@@ -251,3 +281,40 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.isExceptional_residueObject
 #print axioms CategoryTheory.Triangulated.residueObjectExceptionalCollection
 #print axioms CategoryTheory.Triangulated.residueObjectExceptionalCollection_component
+
+/-! ## Finite cohomological amplitude and the bounded restriction (SF11 tranche H)
+
+A functor of finite cohomological amplitude carries the t-bounded locus into
+itself, so chosen projections of finite amplitude preserve that locus, restrict
+along its inclusion, and leave the restricted sequence strong. Amplitude itself
+is never asserted here: these records certify the passage from an amplitude
+bound to the restriction, not the existence of any bound.
+-/
+
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.mk.inj
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.Preserves.inf
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.Preserves.of_iff
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.bounded_le
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.comp
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.hasFinite
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.isGE
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.isLE
+#print axioms CategoryTheory.Functor.HasFiniteCohomologicalAmplitude
+#print axioms CategoryTheory.Functor.HasFiniteCohomologicalAmplitude.bounded_le
+#print axioms CategoryTheory.Functor.HasFiniteCohomologicalAmplitude.comp
+#print axioms CategoryTheory.Functor.hasFiniteCohomologicalAmplitude_of_isTExact
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasCohomologicalAmplitude.hasFinite
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasFiniteCohomologicalAmplitude
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasFiniteCohomologicalAmplitude.boundedProjections
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasFiniteCohomologicalAmplitude.inverseImage_bounded_isStrong
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasFiniteCohomologicalAmplitude.preserves_bounded
+
+/-! ## Transport of chosen projections along an equality of properties (SF11)
+
+Introduced with the projection layer; recorded here with the rest of the
+chosen-projection API.
+-/
+
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.ofEq
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.ofEqAmbientIso
