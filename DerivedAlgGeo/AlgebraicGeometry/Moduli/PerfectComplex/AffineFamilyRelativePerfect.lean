@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Bicategory.Functor.Cat.ObjectProperty
 import Mathlib.CategoryTheory.ObjectProperty.ClosedUnderIsomorphisms
-import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Relative
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Perfect.Relative
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineFamilyPseudofunctor
 
 /-!

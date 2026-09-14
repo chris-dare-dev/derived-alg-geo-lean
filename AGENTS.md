@@ -19,7 +19,9 @@ root, extending a known mixed module, or moving declarations.
 - Keep charge construction upstream of walls, general quadratic/lattice
   algebra separate from geometric Mukai interpretation, and numerical models
   separate from their geometric realizations. Preserve n, m and κ as distinct
-  parameters and preserve the arbitrary-divisor-rank branch.
+  parameters and preserve the arbitrary-divisor-rank branch. The canonical
+  stability-facing root is `StabilityCondition/CentralCharge/`; `Walls/`
+  imports it for loci, while full support predicates live under `Support/`.
 - Extract independent linear Serre/Yoneda, abelian stability, dg H⁰, derived
   operations, perfectness, GL-cover and planar-geometry foundations from their
   applications. Preserve hypotheses; a move proves no missing comparison.
@@ -146,7 +148,7 @@ until their implementing cutovers add the corresponding checks.
 - **Stability-neutral geometry.** Geometry reaches the stability tree only from
   the subcomponents that exist to consume it: `DerivedCategory/Stability/`,
   `Moduli/{HarderNarasimhan,Semistability}/`, `Numerical/Stability/`,
-  `Numerical/Examples/{Surface,Threefold}/`,
+  `Numerical/Examples/{Surface,Threefold,Fourfold}/`,
   `Numerical/GrothendieckGroup/CategoricalCharge/` and `Stability/Gieseker/`.
   Everything else below `AlgebraicGeometry/` is stability-neutral, transitively
   included. A same-named umbrella over one of those subcomponents is exempt as

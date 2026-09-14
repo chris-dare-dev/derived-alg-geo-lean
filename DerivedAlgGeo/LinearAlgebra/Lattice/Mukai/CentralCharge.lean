@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.RealForm
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.CentralCharge
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.ComplexPairingSignature
 
 /-!
 # `Z(β,ω)` on the Mukai extension
@@ -17,10 +17,10 @@ Z (r, c, s) = (b β c - s - r * (b β β - b ω ω) / 2) + i * (b ω c - r * b �
 which is Bridgeland's `Z(β,ω)` — his `⟪exp(β + iω), v⟫`, with the pairing read
 on the real and imaginary parts rather than on a complexified space.
 
-The support property comes with it: the classes of vanishing charge are exactly
-the orthogonal complement of the plane, where the form is negative definite. On
-the Mukai extension that is the statement that the walls are cut out by the
-vanishing of `Z`.
+The classes of vanishing charge are exactly the orthogonal complement of the
+exponential plane, where the form is negative definite under the signature
+hypothesis.  Interpreting that fact as one half of a support condition, or as a
+wall statement, belongs to downstream stability modules.
 
 `V` is an arbitrary real bilinear space; no geometry is asserted, and `v(E)` for
 an object `E` is not defined here.
@@ -57,9 +57,8 @@ theorem expChargeHom_apply (v : RealExtension V) :
 /-- **`Z(β,ω)` as an `ℝ`-linear map.**
 
 The additive homomorphism above is enough for the wall arithmetic, but the
-support property of
-`Triangulated/StabilityCondition/Weak/Support/Predicate/Quadratic.lean` is
-stated for an `ℝ`-linear charge, because its quadratic form is.  Real
+    quadratic compatibility predicates downstream are
+    stated for an `ℝ`-linear charge.  Real
 homogeneity comes from `PeriodDomain.centralCharge_smul`; nothing new is
 computed. -/
 noncomputable def expChargeLinearMap : RealExtension V →ₗ[ℝ] ℂ where
@@ -87,41 +86,20 @@ section FiniteDimensional
 
 variable [FiniteDimensional ℝ V]
 
-/-- **The support property for `Z(β,ω)`**: a nonzero class of vanishing charge has
-negative square. -/
+/-- A nonzero class of vanishing charge has negative square. This is the kernel
+half of a quadratic support criterion, not the full support property. -/
 theorem neg_of_expCharge_eq_zero
     (hsig : PeriodDomain.HasSignatureTwo (realForm b)) (hb : ∀ x y : V, b x y = b y x)
     (hω : 0 < b ω ω) {v : RealExtension V} (hv : expCharge b β ω v = 0) (hv0 : v ≠ 0) :
     realForm b v < 0 :=
   PeriodDomain.neg_of_centralCharge_eq_zero hsig (isPositivePair_exp b β ω hb hω) hv hv0
 
-/-- **No class of nonnegative square is killed by `Z(β,ω)`** — there are no walls
-in the positive cone. -/
+/-- No nonzero class of nonnegative square is killed by `Z(β,ω)`. -/
 theorem expCharge_ne_zero_of_nonneg
     (hsig : PeriodDomain.HasSignatureTwo (realForm b)) (hb : ∀ x y : V, b x y = b y x)
     (hω : 0 < b ω ω) {v : RealExtension V} (hv : 0 ≤ realForm b v) (hv0 : v ≠ 0) :
     expCharge b β ω v ≠ 0 :=
   PeriodDomain.centralCharge_ne_zero_of_nonneg hsig (isPositivePair_exp b β ω hb hω) hv hv0
-
-omit [FiniteDimensional ℝ V] in
-/-- **A spherical wall is a vanishing charge.** -/
-theorem mem_wall_iff_expCharge_eq_zero (hb : ∀ x y : V, b x y = b y x) (hω : 0 < b ω ω)
-    {δ : RealExtension V} :
-    PeriodDomain.pairSpan (expRe b β ω) (expIm b β ω) ∈ PeriodDomain.wall (realForm b) δ ↔
-      expCharge b β ω δ = 0 :=
-  PeriodDomain.mem_wall_iff_centralCharge_eq_zero (isPositivePair_exp b β ω hb hω)
-
-omit [FiniteDimensional ℝ V] in
-/-- **`P₀` for the exponential pair is where `Z(β,ω)` kills nothing in `Δ`.**
-With `Δ` the spherical classes of the Mukai lattice this is Bridgeland's cut
-period domain. -/
-theorem mem_periodDomain₀_iff_expCharge_ne_zero (hb : ∀ x y : V, b x y = b y x)
-    (hω : 0 < b ω ω) (Δ : Set (RealExtension V)) :
-    PeriodDomain.pairSpan (expRe b β ω) (expIm b β ω) ∈
-        PeriodDomain.periodDomain₀ (realForm b) Δ ↔
-      ∀ δ ∈ Δ, expCharge b β ω δ ≠ 0 :=
-  PeriodDomain.mem_periodDomain₀_iff_centralCharge_ne_zero
-    (isPositivePair_exp b β ω hb hω) Δ
 
 end FiniteDimensional
 

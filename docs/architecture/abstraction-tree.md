@@ -384,16 +384,15 @@ LinearAlgebra
 ├─ weighted-basis graded pieces
 │  ├─ internal direct-sum decomposition
 │  └─ NumericalRingData.ofGradedBasis        geometric numerical consumer
-├─ bilinear form on a lattice
-│  └─ Lattice.pairCharge b x y v         ⟪x,v⟫ + i⟪y,v⟫; b not symmetric
-│     ├─ PeriodDomain.centralCharge      the quadratic-space presentation
-│     │  ├─ support property             ker Z is the plane's negative-definite ⊥
-│     │  ├─ signature additivity         gives HasSignatureTwo on a complement
-│     │  ├─ Mukai.expCharge              Bridgeland Z(β,ω), the exponential plane
-│     │  ├─ Ku(X) charge                 on H̃_alg; NOT a child of expCharge
-│     │  └─ Ku(X) period domain          on A₂^⊥ ⊆ H̃; a different lattice
-│     └─ Mukai.Graded.pairing n          ⟪v,w⟫ = (-1)ⁿ⟪w,v⟫; odd n alternating
-│        n = 2 is realPairing            so n = 2 owes a comparison, not a def
+├─ paired complex functional
+│  └─ PeriodDomain.centralCharge         ComplexPairing.lean; ker Z = plane ⊥
+│     ├─ stability wall adapter          CentralCharge/Quadratic.lean
+│     ├─ kernel negativity               one half of quadratic support
+│     └─ Mukai.expCharge                 existing exponential presentation
+├─ conditional lattice root (#1230)      not landed: second consumer unresolved
+│  └─ Lattice.pairCharge                 retain existing functional/bridges meanwhile
+├─ conditional graded pairing (#1230)    separate two-consumer decision
+│  └─ n = 2 must compare to realPairing  never a second definition
 └─ Mukai.pairing / selfPairing           Lattice/Mukai/Basic.lean:56,143
    ARITY IS FIXED AT THREE               generalise over the coefficient ring only
    root of the discriminant              pairing 3 v v = 0 identically
@@ -444,8 +443,9 @@ AlgebraicGeometry
 │  └─ absolute perfect locus                   thick envelope in `D(Coh X)`
 │     └─ essential image in Dqc
 │        └─ compact objects                    only with explicit evidence
-├─ relative-perfect locus over `p : X ⟶ S`     `Moduli/PerfectComplex/Relative`
-│  └─ pseudo-coherent + finite Tor amplitude   not absolute perfection by definition
+├─ relative-perfect locus over `p : X ⟶ S`     `DerivedCategory/Perfect/Relative`
+│  ├─ pseudo-coherent + finite Tor amplitude   not absolute perfection by definition
+│  └─ stalkwise flat module sheaf over `p`     `Modules/Flat`, needs no derived category
 ├─ two-term determinant presentation           explicit finite-locally-free resolution
 │  └─ absolute perfect degree-zero object       proved comparison adapter
 ├─ numerical K-theory

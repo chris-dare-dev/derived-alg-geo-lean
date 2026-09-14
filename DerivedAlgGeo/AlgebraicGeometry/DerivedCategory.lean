@@ -28,6 +28,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineGeometricPseudo
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineGeometricCorePseudofunctor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineFamilyPseudofunctor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Perfect
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai
 
 /-!

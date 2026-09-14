@@ -10,7 +10,7 @@ and audited in the AlgebraicGeometry lane. There is no scheme, sheaf, heart,
 slicing, or stability condition here, and nothing below claims the charge is
 one.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.Divisorial
 open CategoryTheory.Triangulated
 
 /-! ## The strict Hodge certificate

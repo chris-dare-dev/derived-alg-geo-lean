@@ -91,7 +91,7 @@ theorem k3_realPairing_extendMap (d : ℕ) (u w : Mukai.MukaiLattice ℤ) :
 
 /-- **The real Mukai vector is the integral one, extended.**
 
-The left side is `Walls/Divisorial/Mukai.lean` read through the realization of
+The left side is `CentralCharge/Divisorial/Mukai.lean` read through the realization of
 `RankOneRealization.lean`; the right side is `GrothendieckGroup/MukaiVector.lean`
 read through `k3IntegralMukaiData`.  They are the same triple. -/
 theorem k3_mukaiVector_eq_extendMap (d : ℕ) (hd : d ≠ 0) (E : SurfaceNum) :

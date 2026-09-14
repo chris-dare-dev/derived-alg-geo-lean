@@ -3,12 +3,12 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialDiscriminant
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Support
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.Divisorial
 
 /-!
 # Bogomolov--Gieseker gives the support property on a realized surface
 
-`Walls/Divisorial/Support.lean` proves that the `C`-discriminant, bundled as a
+`Support/Divisorial.lean` proves that the `C`-discriminant, bundled as a
 `QuadraticForm ℝ` on the real Mukai extension, is negative on every nonzero
 class of vanishing charge, provided the intersection form is negative definite
 on `ω^⊥`.  What it leaves open is the other half of
@@ -102,7 +102,7 @@ The quadratic form is the `C`-discriminant of Macrì--Schmidt Definition 6.12,
 bundled on the real Mukai extension.  Its nonnegativity on the locus is
 Bogomolov--Gieseker, supplied by `BogomolovGiesekerData`; its negativity on the
 kernel of the charge is proved from `HodgeDefinite` in
-`Walls/Divisorial/Support.lean`.
+`Support/Divisorial.lean`.
 
 This is the Kontsevich--Soibelman support property in the form
 `Weak/Support/Predicate/Quadratic.lean` states it, for the charge of an

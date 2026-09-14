@@ -2,14 +2,15 @@
 ChargeFamily slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Numerical.SurfaceFamily
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Numerical.ChargeFamily
 open CategoryTheory.Triangulated
 
-/-! ## The dimension- and geometry-independent wall root
+/-! ## The dimension- and geometry-independent charge-family root
 
 ChargeFamily P N is a family of additive complex charges on an additive group
 N, indexed by an arbitrary type P: no heart, slicing, support property,
-half-plane, or topology. wallValue is the determinant
+half-plane, or topology. The downstream wall adapter defines `wallValue` as the determinant
 Re Z(v) Im Z(w) - Im Z(v) Re Z(w), equal to minus the imaginary part of
 Z(v) conj Z(w), and wall is its zero locus: the NUMERICAL wall, which is the
 whole parameter space when w is an integral multiple of v or Z(v) = 0.

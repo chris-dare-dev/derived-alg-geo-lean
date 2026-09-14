@@ -153,25 +153,17 @@ at those declaration boundaries. Record hypotheses separately from subject
 ownership. Use the [decision record](mathematical-ownership.md#record-the-decision-in-the-issue-or-pr)
 to make the owner, imports and Lean specialization map reviewable.
 
-The divisorial charge currently mixes neutral intersection-form arithmetic,
-charge construction and wall applications under
-`CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/`.
-That current path is not the target owner for all three. General paired
-functionals belong with linear algebra; charge constructors and families
-belong upstream of `Walls`; geometric Chern/Todd realizations belong under
-`AlgebraicGeometry/`. The exact file split is tracked by MO1.01–MO1.02
-(#1312–#1313). Preserve the existing roots and comparisons instead of creating
-another divisorial charge. Update the gate's hard-coded owner in the source
-cutover; a policy edit alone does not change that check.
-
-That placement is under revision. Review finding 04 observes that charge
-construction is upstream of the wall question, so `Walls/` should import the
-charge root rather than own it. The cutover ledger records the agreed
-destination; MO1.02 (#1313) implements it. Because rule 8 of
-`scripts/check_layering.py` currently *requires* the six divisorial structures
-to be declared in the `Walls/` subtree, that move must update
-`DIVISORIAL_ROOT_DIR`, this paragraph and the source in one change -- otherwise
-the gate rejects the destination the policy just agreed to.
+The charge ownership cutover is complete (#1313). General paired functionals,
+quadratic continuity and coercivity, and abstract Hodge-signature input live
+under `LinearAlgebra/`. Additive charge families and exponential, numerical and
+divisorial constructors live under
+`CategoryTheory/Triangulated/StabilityCondition/CentralCharge/`. Wall equations
+import those constructors from `StabilityCondition/Walls/`; full support
+predicates live under `StabilityCondition/Support/`; geometric Chern/Todd
+realizations remain under `AlgebraicGeometry/Numerical/`. Rule 8 of
+`scripts/check_layering.py` pins the owners and checks their transitive import
+boundaries. Preserve the existing roots and comparisons instead of creating
+another charge carrier or retired-path shim.
 
 Orthogonal exceptional blocks and a chosen right adjoint to a residual
 full-subcategory inclusion are structures on abstract (pre)triangulated
@@ -236,7 +228,7 @@ The ambient categories and formal relationships are:
 | Notion | Ambient object | Meaning and owner | Valid comparison |
 | --- | --- | --- | --- |
 | `schemePerfect X` | `D(Coh X)` | Thick envelope of degree-zero finite locally free coherent sheaves; `AlgebraicGeometry/DerivedCategory/Coherent.lean` | `perfectDerivedToDqc_obj_mem_schemePerfectInDqc` maps it into the defining perfect essential image in `Dqc(X)` |
-| `schemeRelativePerfect p` | `Dqc(X)` for `p : X ⟶ S` | Pseudo-coherence plus local finite Tor amplitude over the chosen base; `Moduli/PerfectComplex/Relative.lean` | It implies `schemePseudoCoherent`; it is not identified with absolute perfection without an additional geometric theorem |
+| `schemeRelativePerfect p` | `Dqc(X)` for `p : X ⟶ S` | Pseudo-coherence plus local finite Tor amplitude over the chosen base; `DerivedCategory/Perfect/Relative.lean` | It implies `schemePseudoCoherent`; it is not identified with absolute perfection without an additional geometric theorem |
 | `Coh.TwoTermPerfectDeterminantData F` | a coherent sheaf `F` plus presentation data | An explicit two-term finite locally free resolution used by determinant and Chern-class consumers; `Divisors/Determinant.lean` | `Moduli/PerfectComplex/Comparison.lean` forgets it to an absolute perfect degree-zero object and then to `schemePerfectInDqc` |
 
 `schemePerfectInDqc X` is the bridge, not a fourth competing definition: it
@@ -270,10 +262,15 @@ it. Do not introduce a parallel `Subprestack` carrier in algebraic geometry. An
 indexed collection of isomorphism-closed fiber predicates is not yet a
 subprestack until restriction stability is supplied.
 
-Concrete finite-type witnesses, atlases, scheme presentations, relative-perfect
-objects, semistable loci, and Harder--Narasimhan filtrations remain under
-`AlgebraicGeometry/Moduli/` because their signatures intrinsically mention
-geometry.
+Concrete finite-type witnesses, atlases, scheme presentations, semistable loci,
+and Harder--Narasimhan filtrations remain under `AlgebraicGeometry/Moduli/`
+because their signatures intrinsically mention geometry. The relative-perfect
+*predicates* do not: pseudo-coherence, local finite Tor amplitude and relative
+perfection are properties of one complex over one morphism, needed by base
+change and derived operations before a moduli functor exists, so their owner is
+`AlgebraicGeometry/DerivedCategory/Perfect/` and the moduli problem consumes
+them. Stalkwise flatness of a module sheaf over a morphism is a further step
+down, at `AlgebraicGeometry/Modules/Flat.lean`.
 
 `AlgebraicGeometry.RelativePerfectModuliSelector` is the canonical name for
 the weaker geometric input used by finite-type boundedness: it stores the

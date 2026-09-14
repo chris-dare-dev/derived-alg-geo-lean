@@ -5,12 +5,12 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.VectorClass
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.ThreefoldWallTransport
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.WallTransport
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential
 
 /-!
 # The polarised wall transport, for every dimension and correction class
 
-`Walls/Exp/` states the exponential charge once. This is the geometric side:
+`CentralCharge/Exponential/` states the exponential charge once. This is the geometric side:
 the map that turns a numerical class on a polarised variety into the compressed
 `H`-degrees that the charge consumes, written once for every dimension `n`,
 truncation degree `m` and correction class `κ`.
@@ -128,6 +128,14 @@ from here rather than from a charge of its own. -/
 def wallChargeFamily (V : NumericalVarietyData n A N) (P : Polarization V.ring)
     (κ : ℕ → A) (m : ℕ) : ChargeFamily ℂ N :=
   (Exp.chargeFamily m).pullback (hDegreesHom V P κ m)
+
+/-- The root family evaluates as the kernel on the transported degrees. The
+accessor the surface leaf has had since `WallTransport.lean:161`; a consumer
+that unfolds `pullback` by hand is reaching past this definition. -/
+@[simp]
+theorem wallChargeFamily_charge (V : NumericalVarietyData n A N)
+    (P : Polarization V.ring) (κ : ℕ → A) (m : ℕ) (w : ℂ) (E : N) :
+    (wallChargeFamily V P κ m).charge w E = Exp.charge m w (hDegrees V P κ m E) := rfl
 
 /-- **PROVED.**  Slot 0 is `∫Hⁿ · rank E`. -/
 theorem hDegrees_zero (V : NumericalVarietyData n A N) (P : Polarization V.ring)

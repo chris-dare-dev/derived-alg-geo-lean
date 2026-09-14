@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Data.Complex.Basic
+import Mathlib.Tactic
 
 /-!
 # Additive central charges in compressed coordinates

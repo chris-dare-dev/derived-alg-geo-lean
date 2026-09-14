@@ -3,4 +3,4 @@
 # Numerical/Mukai/, Numerical/RiemannRoch/ and Numerical/Specializations/ do
 # not, and are no longer exempted by a blanket Numerical/ entry.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Core
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.ChargeFamily
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Family

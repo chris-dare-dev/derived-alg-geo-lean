@@ -7,7 +7,7 @@ slicing, or stability condition. It proves neither a Bogomolov inequality nor a
 Hodge index theorem; DivisorSpace.HodgeDefinite is a proposition-valued
 certificate supplied by the caller.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Signature
 open CategoryTheory.Triangulated
 
 /-! ## The Hodge certificate is the signature hypothesis

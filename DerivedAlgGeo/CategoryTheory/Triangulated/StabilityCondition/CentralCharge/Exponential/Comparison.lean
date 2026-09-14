@@ -2,28 +2,28 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp.Kernel
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Numerical.ChargeFamily
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Threefold.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential.Kernel
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Numerical.SurfaceFamily
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Numerical.Threefold
 
 /-!
 # The surface and threefold charges are one kernel
 
-`Walls/Exp/Kernel.lean` states the exponential charge once, indexed by
+`CentralCharge/Exponential/Kernel.lean` states the exponential charge once, indexed by
 truncation degree. This file proves that the two charges already in the tree
 are that kernel at `m = 2` and `m = 3`, so neither is a root any more.
 
-The separation is the point. The kernel imports `Walls/ChargeFamily.lean` and
+The separation is the point. The kernel imports `CentralCharge/Family.lean` and
 Mathlib and nothing else, so it imports no leaf; this file may import both
 leaves because it is the comparison and not the root. Putting the comparisons
 in the kernel would have made the root depend on the things it parents.
 
 ## What is proved
 
-* `stCharge_eq_exp` — the surface charge (`Walls/Numerical/ChargeFamily.lean`)
+* `stCharge_eq_exp` — the surface charge (`CentralCharge/Numerical/SurfaceFamily.lean`)
   is the kernel at `m = 2`, `w = s + tI`.
 * `threefold_charge_eq_exp` — the Bayer--Macrì--Toda charge
-  (`Walls/Threefold/Basic.lean`) is the same kernel at `m = 3`, `w = β + αI`.
+  (`CentralCharge/Numerical/Threefold.lean`) is the same kernel at `m = 3`, `w = β + αI`.
 * the two family-level statements, which is the form a consumer needs: each
   existing `ChargeFamily` is a `reindex` of `Exp.chargeFamily` along its chart,
   pulled back along the coordinate identification.

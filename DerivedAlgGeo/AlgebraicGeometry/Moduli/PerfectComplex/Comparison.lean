@@ -5,7 +5,7 @@ Released under the MIT license.
 import Mathlib.Algebra.Homology.DerivedCategory.SingleTriangle
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Determinant
-import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Relative
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Perfect.Relative
 
 /-!
 # Comparing the repository's perfect-complex notions
