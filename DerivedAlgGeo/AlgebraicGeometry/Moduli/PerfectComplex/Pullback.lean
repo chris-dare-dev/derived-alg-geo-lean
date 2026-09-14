@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Relative
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Perfect.Relative
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPullbackCoherence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.LeftDerivedPullback
 
