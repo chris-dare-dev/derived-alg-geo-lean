@@ -645,6 +645,7 @@ items:
     tags: [lean, geometry, fourier-mukai, ledger, inhabitance]
 
   - id: stability-families-m11
+    gh_milestone: 53
     kind: milestone
     title: "SF11 — Base change of t-structures (§§3–6)"
     status: in_progress
