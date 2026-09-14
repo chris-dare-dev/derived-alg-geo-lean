@@ -1,8 +1,10 @@
 # Dependency direction
 
-This document records the dependency contract between the subjects of
-`DerivedAlgGeo/`. It is short because the contract is short: the tree mirrors
-Mathlib's, and Mathlib's subjects are not layered.
+This document records the implemented broad dependency checks and the current
+import map for `DerivedAlgGeo/`. Mathlib's subjects are not a total hierarchy.
+The finer foundation/application policy is in
+[mathematical-ownership.md](mathematical-ownership.md); its pending source
+cutovers are tracked in [the ledger](cutover-ledger.md).
 
 ## Subjects are not a tower
 
@@ -22,9 +24,9 @@ classify.
 
 ## The policy edges
 
-These are the edges the layout promises and nothing else checks. Each is a
-rule in `scripts/check_layering.py`, and each has a known-answer fixture under
-`scripts/fixtures/layering/`.
+These broad rules are implemented in `scripts/check_layering.py`, with
+known-answer fixtures under `scripts/fixtures/layering/`. They are not the
+complete mathematical ownership policy.
 
 1. **Geometry firewall.** Only modules below `AlgebraicGeometry/` and
    `Development/` import `DerivedAlgGeo.AlgebraicGeometry` or
@@ -47,6 +49,20 @@ rule in `scripts/check_layering.py`, and each has a known-answer fixture under
 6. **A new top-level subject is deliberate.** A directory directly below the
    source root must be one of the Mathlib subjects the repository uses, named
    in the gate's `KNOWN_SUBJECTS`.
+
+## Component boundaries and coverage limits
+
+New generic roots must not import their specializations or downstream
+comparisons, including transitively through umbrellas. The broad `Numerical`
+stability exemption does not authorize such imports: neutral numerical/Todd
+algebra must be separate from charge and geometric comparison consumers.
+Similarly, the gate's current hard-coded divisorial root is a source location
+to migrate in #1313, not a rule that charge construction must remain in Walls.
+
+MO1 cutovers add focused component checks and regression fixtures with the
+source move. Preserve the broad firewalls and umbrella coverage while doing
+so. A documentation update neither installs these checks nor means all
+existing reverse imports have been repaired.
 
 ## AlgebraicGeometry sublayers
 
@@ -77,7 +93,12 @@ base-change and Fourier--Mukai actions on stability data in
 namespace of the categorical structure it extends so that dot notation
 resolves; the file's path records what it is about.
 
-## Where each theory lives
+## Where each theory currently lives
+
+This map describes existing modules. The ownership policy and cutover ledger
+identify mixed roots still to split, including dg H⁰ under DGEnhancement,
+derived operations under FourierMukai and perfectness under Moduli. Their
+appearance here is not permission to extend a misplaced foundation in place.
 
 Arrows point from a refinement or consumer to the root it builds on.
 
@@ -221,8 +242,9 @@ AlgebraicGeometry
 | Stability on scheme-derived categories | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability` |
 | Semistable loci, probes, finite-type openness, relative HN | `DerivedAlgGeo.AlgebraicGeometry.Moduli` |
 
-Lanes still moving toward these paths are listed in
-`docs/architecture/cutover-ledger.md`; the import guide names the target.
+Consult `docs/architecture/cutover-ledger.md` for pending cutovers and confirm
+the chosen import exists in the current checkout. A proposed target is not
+an implemented import or an additional canonical root.
 
 ## Retired conventions
 
@@ -230,8 +252,8 @@ Lanes still moving toward these paths are listed in
   umbrellas, the `GeometryInstances` virtual layer, and the reverse-edge
   allowlist. A geometric realization lives with the geometric object.
 - The subject rank order and subject-level cycle check.
-- The weakest-vocabulary signature test as the primary placement rule; it is
-  now the Tier 2 tie-breaker in `placement.md`.
+- The weakest-vocabulary ranking of subjects. Sufficient hypotheses help
+  split foundations from applications; they do not determine subject order.
 - `AlgebraicGeometry/StabilityCondition/`, `Compatibility/`, and the
   import-only shims listed in the gate's `RETIRED_PATHS`.
 - The `CohLean`, `DGLean`, and `BridgelandStabLean` roots.

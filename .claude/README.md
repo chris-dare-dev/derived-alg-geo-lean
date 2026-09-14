@@ -35,6 +35,12 @@ second agent instructed to default to REFUTED when it could not confirm.
 
 ### Reading order for an agent picking this up cold
 
+For public API ownership and structural moves, `CLAUDE.md` points to the
+versioned [mathematical ownership policy](../docs/architecture/mathematical-ownership.md)
+and [placement procedure](../docs/architecture/placement.md). Read those before
+using a dated note or issue path as a placement rule. The cutover ledger
+distinguishes existing source from proposed destinations.
+
 1. `CLAUDE.md` (the working rules — they are load-bearing and override defaults)
 2. `decisions/` in numeric order (~10 min, and it is the whole design)
 3. `notes/2026-08-04-contract-red-team.md` (what is wrong with the design)

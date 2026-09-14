@@ -8,7 +8,8 @@ live and how do the specializations relate to it?
 
 ## The rule
 
-Every reusable concept has one canonical root in the lowest natural owner.
+Every reusable concept has one canonical root in its natural mathematical
+owner, identified by [the placement procedure](placement.md).
 Specialized geometry supplies instances, refinements, subobjects, quotients,
 or equivalences at the leaves.  A leaf must not copy the carrier or fields of
 its root.
@@ -31,9 +32,33 @@ similar.
 ## Canonical spine
 
 This is the ownership target. Existing reverse edges are tracked defects to
-burn down, not exceptions that authorize more leaf-to-root imports.
+burn down, not exceptions that authorize roots importing their consumers.
+The diagram records construction and comparison relationships, not a chain
+of Lean `extends` declarations or a list of completed implementations.
+Current-versus-target paths are tracked in the cutover ledger.
 
 ```text
+ChargeFamily P N                       existing Wall namespace; no category required
+├─ reindex / pullback           change of chart / of class map
+├─ smul / phaseRotate β         wall_smul; a unit modulus fixes wallValue
+│  └─ = phaseTiltRotation       proved comparison, never a copy
+├─ Wall.Exp.ofMoments m         one polynomial, indexed by truncation m
+│  ├─ scalar moments            compressed H-degrees of a polarised n-fold
+│  │  ├─ m = 1, m = 2           SlopeData.charge / stChargeFamily
+│  │  ├─ m = 3                  Threefold.chargeFamily
+│  │  ├─ m = 4                  free; no new polynomial
+│  │  └─ (n,m) = (3,2)          the tilt charge; Ku(cubic threefold)
+│  │     rotated by 1/i         ν is α · its unrotated chargeSlope
+│  └─ form moments              arbitrary divisor rank; no scalar compression
+│     ├─ centralCharge          Divisorial; proved instance of the kernel
+│     ├─ StabilityParameters    the (B,ω) chart; w = β + iα fixed here
+│     ├─ mukaiCharge / κ        κ is a pullback, never a coefficient
+│     │  SqrtTodd               the image of κ, not a truncation of it
+│     └─ quadric, ℙ², blow-up   rank-one slice reaches the scalar branch
+├─ Wall.Exp.twist / discr       the e^{-βH} action and Δ_H, stated once
+└─ Spherical half-wall          a wall against the point class, cut by a
+                                sign; inclusion plus sign, never equality
+
 Bicategory                              Mathlib higher-categorical root
 ├─ Adjunction of 1-morphisms
 │  ├─ adjoint equivalences and mates
@@ -57,26 +82,7 @@ Category
 │  │  │  ├─ OrthogonalExceptionalBlocks  positive blocks and residual
 │  │  │  ├─ RightProjectionData          chosen adjoint and universal Hom
 │  │  │  └─ mutation / projection chains objectwise cones and iteration
-│  │  └─ Wall.ChargeFamily P N           parameterized charges; wall loci
-│  │     ├─ reindex / pullback           change of chart / of class map
-│  │     ├─ smul / phaseRotate β         wall_smul; a unit modulus fixes wallValue
-│  │     │  └─ = phaseTiltRotation       proved comparison, never a copy
-│  │     ├─ Wall.Exp.ofMoments m         one polynomial, indexed by truncation m
-│  │     │  ├─ scalar moments            compressed H-degrees of a polarised n-fold
-│  │     │  │  ├─ m = 1, m = 2           SlopeData.charge / stChargeFamily
-│  │     │  │  ├─ m = 3                  Threefold.chargeFamily
-│  │     │  │  ├─ m = 4                  free; no new polynomial
-│  │     │  │  └─ (n,m) = (3,2)          the tilt charge; Ku(cubic threefold)
-│  │     │  │     rotated by 1/i         ν is α · its unrotated chargeSlope
-│  │     │  └─ form moments              Picard rank ≥ 2; no compression
-│  │     │     ├─ centralCharge          Divisorial; proved instance of the kernel
-│  │     │     ├─ StabilityParameters    the (B,ω) chart; w = β + iα fixed here
-│  │     │     ├─ mukaiCharge / κ        κ is a pullback, never a coefficient
-│  │     │     │  SqrtTodd               the image of κ, not a truncation of it
-│  │     │     └─ quadric, ℙ², blow-up   rank-one slice reaches the scalar branch
-│  │     ├─ Wall.Exp.twist / discr       the e^{-βH} action and Δ_H, stated once
-│  │     └─ Spherical half-wall          a wall against the point class, cut by a
-│  │                                     sign; inclusion plus sign, never equality
+│  │  └─ Stability conditions           consume the independent charge core above
 │  └─ Linear k C                         Mathlib root
 │     └─ SerreFunctorData                duality on Hom spaces
 │        ├─ SerreCategoryData            chosen Serre autoequivalence
@@ -550,10 +556,12 @@ particular:
   on the nose; the enhancement of the geometric kernel category with its
   exact comparison, the actual kernel morphism, and exactness of kernel
   evaluation remain explicit realization inputs.
-- keep every central charge under one root. A charge is an additive map to `ℂ`
-  built from a complex parameter and a numerical class, and the surface, threefold
-  and slope charges are the same polynomial at three truncation degrees, not three
-  theories. Truncation degree `m` is the index, never the ambient dimension `n`:
+- keep abstract charges and their geometric constructors distinct. An abstract
+  charge is an additive map `Λ →+ ℂ`; a complex parameter, Chern character and
+  Todd correction are inputs to particular constructors, not fields required
+  of every charge. Reuse the existing exponential kernel for the supported
+  surface, threefold and slope families at their respective truncation degrees.
+  Truncation degree `m` is the index, never the ambient dimension `n`:
   the cubic-threefold tilt charge is `(n, m) = (3, 2)`, so a root indexed by `n`
   cannot state it. A new dimension supplies a `Polarization` and inherits the
   polynomial; if a lane finds itself writing a fourth charge polynomial, the
@@ -566,15 +574,20 @@ particular:
   ring, never over dimension: a dimension-indexed self-pairing vanishes
   identically in odd degree, so it cannot be the root of the Bogomolov
   discriminant. The graded pairing is a separate object that declares nothing new
-  at `n = 2`, where it is `Mukai.realPairing` and owes a comparison theorem.
-- noncommutative varieties add no carrier. A Kuznetsov component reaches the tree
-  by restriction along its inclusion, so there is no `KuznetsovChargeData` and
-  must not become one. The two cases differ and the difference is forced by
-  parity, not by taste: for the cubic threefold the dimension is odd, the pairing
-  is alternating, no period domain exists, and the charge is induced from the
-  rotated tilt charge; for the cubic fourfold the charge lives on the algebraic
-  Mukai lattice while the period domain lives on the orthogonal complement of an
-  `A₂` sublattice, and those are two different lattices that must not be fused.
+  at `n = 2`, where it must compare with `Mukai.realPairing`, using the actual
+  coordinate equivalence and normalization. Fin-indexed functions and nested
+  products must not be assumed definitionally equal.
+- do not add a `KuznetsovChargeData` carrier. Reuse the abstract charge or
+  pairing root. An ambiently induced charge reaches the component by
+  restriction along its inclusion; a charge constructed on its own numerical
+  lattice must name that realization instead. For the cubic threefold the
+  charge is induced from the rotated tilt charge. Its odd-degree compressed
+  pairing is alternating and
+  cannot supply a positive-plane quadratic domain; this says nothing about
+  other period-domain constructions for the variety or component. For the
+  cubic fourfold the charge lives on the algebraic Mukai lattice while the
+  period domain lives on the orthogonal complement of an `A₂` sublattice,
+  and those are two different lattices that must not be fused.
 
 Bicategories are the first implemented higher-categorical stage. A future
 general `n`-category or `(∞,1)`-category layer must name its formal model and
@@ -594,9 +607,10 @@ unification that looks right in the literature and is false here.
   The compression is not injective once the Picard rank exceeds one, so the
   intersection-form branch is a genuine sibling of the scalar branch and not a
   specialization of it.
-- **The graded pairing declares nothing new at `n = 2`.** It is
-  `Mukai.realPairing` there, on the nose. Shipping it as a definition rather than
-  a comparison would add a second spelling of an existing form.
+- **The graded pairing needs no second root at `n = 2`.** Its comparison
+  with `Mukai.realPairing` must exhibit the actual coordinate identification
+  and normalization. A function space and a product carrier are not thereby
+  definitionally equal. Prove the bridge rather than add a duplicate form.
 - **Parity of the compressed pairing says nothing about a Kuznetsov component.**
   The compressed form lives on a space of dimension `n + 1`; the Mukai lattice of
   the component does not. Symmetry there is automatic for an unrelated reason, so
@@ -628,15 +642,20 @@ quotient carrier, or category must answer these questions before implementation.
    `abbrev`, or a theorem—not prose.
 4. **Diamond.** If both the root and leaf synthesize inherited instances, add a
    compile-time or equality test showing that the paths agree.
-5. **Dependency direction.** Confirm that the root imports no leaf or
-   paper-specific module.
+5. **Dependency direction.** Confirm that the root imports no specialization,
+   realization or paper-specific consumer, including through umbrellas. Keep
+   agreement theorems downstream of both presentations. State the inspected
+   import closure, not just the absence of one direct import.
 6. **Negative result.** If the apparent generalization is false, record the
    counterexample and keep the leaves separate.  A falsified unification is a
    successful architecture result.
 
-Moving declarations is not complete until imports, umbrellas, audit records,
-registry bindings, and compatibility reexports are updated together, as
-required by `CONTRIBUTING.md`.
+Use the [ownership decision record](mathematical-ownership.md#record-the-decision-in-the-issue-or-pr)
+to connect these answers to the issue or PR. Moving declarations is not
+complete until imports, umbrellas, audit routing, registry/source-owner
+bindings, documentation and relevant checks are updated together. Preserve
+required historical names through the existing executable-only mechanism;
+retired-path import shims are forbidden. See `CONTRIBUTING.md`.
 
 ## Agreement is part of the feature
 
@@ -654,12 +673,14 @@ The policy is partly mechanical and partly a review obligation:
 - `scripts/check_layering.py` enforces the policy edges in `layers.md`;
 - `scripts/check_umbrella_coverage.py` keeps every specialization in the public
   tree;
-- `scripts/check_single_instantiation.py` rejects new thin abstractions in the
-  generic subjects;
+- `scripts/check_single_instantiation.py` checks its configured paths for
+  thin abstractions; the two-consumer obligation still applies outside its scan;
 - `scripts/check_roadmap.py` keeps materialized lanes synchronized with their
   tracker issues;
-- the pull-request template records the non-mechanical root, projection, and
-  agreement decisions.
+- the pull-request template and the ownership decision record capture the
+  non-mechanical root, projection and agreement decisions. Component import
+  boundaries not yet encoded by a gate remain review obligations, with checks
+  added in their source cutovers.
 
 The projective-families roadmap carries the first finer-grained burn-down:
 generic stack roots move out of scheme geometry, moduli-to-stability reverse

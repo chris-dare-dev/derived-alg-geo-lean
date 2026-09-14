@@ -1,3 +1,6 @@
+# Structural companion: mathematical-ownership.yaml (MO1, milestone 52).
+# CA1–CA3 keep mathematical ownership; MO1 owns placement and extraction.
+# See docs/reviews/2026-09-13-mathematical-ownership-plan.md for exact issue links.
 schema: roadmap/1
 slug: charge-abstraction
 project: derived-alg-geo-lean
