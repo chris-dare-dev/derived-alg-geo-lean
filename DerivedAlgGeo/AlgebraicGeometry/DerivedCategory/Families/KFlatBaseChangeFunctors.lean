@@ -370,6 +370,90 @@ noncomputable instance boundedPullbackOfDetection_essSurj
   dsimp [boundedPullbackOfDetection]
   exact ObjectProperty.instEssSurjPreimageLift hDetect
 
+/-! ## Lemma 3.18: base change restricts an equivalence to the components
+
+Essential surjectivity of the restricted pullback is above. Full faithfulness
+needs nothing about base change at all -- it restricts along a full-subcategory
+inclusion for free -- so once the ambient pullback is an equivalence, detection
+of component membership makes the restriction one too. The hypothesis is
+deliberately on the *ambient* functor: nothing here proves that any base-change
+pullback is an equivalence. -/
+
+instance quasicoherentPullbackOfDetection_faithful
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
+      DU.quasicoherentComponent P E ↔
+        DT.quasicoherentComponent P (pull.functor.obj E))
+    [pull.functor.Faithful] :
+    (quasicoherentPullbackOfDetection DT DU P pull hDetect).Faithful :=
+  inferInstanceAs (ObjectProperty.preimageLift pull.functor hDetect).Faithful
+
+instance quasicoherentPullbackOfDetection_full
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
+      DU.quasicoherentComponent P E ↔
+        DT.quasicoherentComponent P (pull.functor.obj E))
+    [pull.functor.Full] :
+    (quasicoherentPullbackOfDetection DT DU P pull hDetect).Full :=
+  inferInstanceAs (ObjectProperty.preimageLift pull.functor hDetect).Full
+
+/-- Lemma 3.18 for the quasicoherent base-change component: an ambient `Dqc`
+pullback that is an equivalence restricts to an equivalence `(Dqc)_U ≌ (Dqc)_T`
+along the detection of component membership. -/
+noncomputable def quasicoherentPullbackOfDetectionEquivalence
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
+      DU.quasicoherentComponent P E ↔
+        DT.quasicoherentComponent P (pull.functor.obj E))
+    [pull.functor.IsEquivalence] :
+    DU.QuasicoherentCategory P ≌ DT.QuasicoherentCategory P :=
+  ObjectProperty.preimageLiftEquivalence pull.functor hDetect
+
+instance boundedPullbackOfDetection_faithful
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hBounded : pull.PreservesBoundedCoherent)
+    (hDetect : ∀ E : Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ U).left,
+      DU.boundedComponent P E ↔
+        DT.boundedComponent P ((pull.boundedFunctor hBounded).obj E))
+    [(pull.boundedFunctor hBounded).Faithful] :
+    (boundedPullbackOfDetection DT DU P pull hBounded hDetect).Faithful :=
+  inferInstanceAs
+    (ObjectProperty.preimageLift (pull.boundedFunctor hBounded) hDetect).Faithful
+
+instance boundedPullbackOfDetection_full
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hBounded : pull.PreservesBoundedCoherent)
+    (hDetect : ∀ E : Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ U).left,
+      DU.boundedComponent P E ↔
+        DT.boundedComponent P ((pull.boundedFunctor hBounded).obj E))
+    [(pull.boundedFunctor hBounded).Full] :
+    (boundedPullbackOfDetection DT DU P pull hBounded hDetect).Full :=
+  inferInstanceAs
+    (ObjectProperty.preimageLift (pull.boundedFunctor hBounded) hDetect).Full
+
+/-- Lemma 3.18 for the bounded base-change component `D_U ≌ D_T`. -/
+noncomputable def boundedPullbackOfDetectionEquivalence
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (pull : DqcLeftDerivedPullback (baseChangeMap X f))
+    (hBounded : pull.PreservesBoundedCoherent)
+    (hDetect : ∀ E : Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ U).left,
+      DU.boundedComponent P E ↔
+        DT.boundedComponent P ((pull.boundedFunctor hBounded).obj E))
+    [(pull.boundedFunctor hBounded).IsEquivalence] :
+    DU.BoundedCategory P ≌ DT.BoundedCategory P :=
+  ObjectProperty.preimageLiftEquivalence (pull.boundedFunctor hBounded) hDetect
+
 end KFlatBaseChangeData
 
 end
