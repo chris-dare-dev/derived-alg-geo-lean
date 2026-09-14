@@ -211,7 +211,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.04 — Separate hyperbolic-extension algebra from geometric Mukai realizations
-  status: blocked
+  status: in_progress
   summary: 'Extract reusable extension, reflection and Gram-form algebra from Lattice/Mukai while retaining
     geometric Mukai terminology for the realization and its geometric consequences. Native prerequisites
     #1223 and #1229 avoid moving the shared root while its canonical form and bridges are still being
@@ -230,7 +230,7 @@ items:
   - area:algebraic-geometry
   - type:refactor
   - sev:high
-  - blocked
+  - ready
   acceptance:
   - Identify the existing Z × N × Z carrier and its real extension as hyperbolic-extension algebra. Place
     general reflections and Gram theory at their neutral lattice/form owners with explicitly sufficient
