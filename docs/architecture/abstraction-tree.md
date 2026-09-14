@@ -607,6 +607,13 @@ unification that looks right in the literature and is false here.
 - **A dimension-indexed Mukai self-pairing is not the root of the discriminant.**
   It vanishes identically in odd degree, so the threefold leaf cannot reach it.
   The root is the fixed-arity pairing generalized over its coefficient ring.
+  The winner landed with `#1223`: `Mukai.pairing` was generalized in place over
+  `[CommRing R] [Module R M]`, keeping arity three and its public name, and all
+  seven discriminants — two on wall classes, two divisorial, one `A`-valued on a
+  numerical variety, and the surface and threefold `H`-compressions — reach it
+  by a `*_eq_selfPairing` projection. Three of those seven are `ℚ`- or
+  `A`-valued, which is the whole reason the ring had to move and the dimension
+  did not.
 - **The multi-divisor charge does not factor through the compressed H-degrees.**
   The compression is not injective once the Picard rank exceeds one, so the
   intersection-form branch is a genuine sibling of the scalar branch and not a

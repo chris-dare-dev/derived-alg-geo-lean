@@ -165,7 +165,7 @@ Composing `pairing_mukaiVector`, which lands on the explicit formula, with
 `mukaiIntegral_eq_neg_mukaiPairing`. This is the one place the sign is visible from both sides at
 once. -/
 theorem pairing_eq_neg_mukaiIntegral (hHRR : V.SatisfiesHRR) (hK3 : IsK3 V) (E F : N) :
-    (Mukai.pairing D.b (D.mukaiVector E) (D.mukaiVector F) : ℚ) = -mukaiIntegral V E F := by
+    ((Mukai.pairing D.b (D.mukaiVector E) (D.mukaiVector F) : ℤ) : ℚ) = -mukaiIntegral V E F := by
   rw [D.pairing_mukaiVector hHRR hK3, mukaiIntegral_eq_neg_mukaiPairing hK3, neg_neg]
 
 end Lattice

@@ -70,6 +70,7 @@ generates no mk.inj and no mk.sizeOf_spec. -/
 #print axioms AlgebraicGeometry.Numerical.HodgeIndexStatement.index_le
 #print axioms AlgebraicGeometry.Numerical.Surface.nonneg_degree_discriminant
 #print axioms AlgebraicGeometry.Numerical.Surface.discrH_nonneg
+#print axioms AlgebraicGeometry.Numerical.Surface.discrH_eq_selfPairing
 #print axioms AlgebraicGeometry.Numerical.K3.chi₂_self_le
 #print axioms AlgebraicGeometry.Numerical.K3.mukaiSelfPairing_ge
 #print axioms AlgebraicGeometry.Numerical.K3.neg_two_le_mukaiSelfPairing_of_rank_le_one
@@ -116,6 +117,10 @@ of an object of a TILTED HEART, and this layer has neither hearts nor objects. -
 #print axioms AlgebraicGeometry.Numerical.Threefold.degH2Beta_zero_beta
 #print axioms AlgebraicGeometry.Numerical.Threefold.deg3Beta_zero_beta
 #print axioms AlgebraicGeometry.Numerical.Threefold.discrHBeta_zero_beta
+#print axioms AlgebraicGeometry.Numerical.Threefold.discrHBeta_eq_selfPairing
+#print axioms AlgebraicGeometry.Numerical.Threefold.degH1Beta_eq_sub
+#print axioms AlgebraicGeometry.Numerical.Threefold.degH2Beta_eq_sub
+#print axioms AlgebraicGeometry.Numerical.Threefold.discrHBeta_beta_inert
 #print axioms AlgebraicGeometry.Numerical.Threefold.Q_zero_beta
 #print axioms AlgebraicGeometry.Numerical.Threefold.nu_zero_alpha
 #print axioms AlgebraicGeometry.Numerical.Threefold.Q_zero_alpha

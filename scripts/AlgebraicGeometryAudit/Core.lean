@@ -983,6 +983,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms NumericalVarietyData.degree_ch_mul_todd
 #print axioms NumericalVarietyData.chi_eq_sum
 #print axioms NumericalVarietyData.discriminant_mem_piece_two
+#print axioms AlgebraicGeometry.Numerical.NumericalVarietyData.discriminant_eq_selfPairing
 #print axioms NumericalVarietyData.degree_discriminant
 #print axioms NumericalVarietyData.chComp_eq_zero_of_lt
 #print axioms NumericalVarietyData.toddComp_eq_zero_of_lt

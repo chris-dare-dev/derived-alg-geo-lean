@@ -145,7 +145,7 @@ theorem orthogonal_hyperbolic_middle (hb : ∀ x y : V, b x y = b y x) :
   intro w hw w' hw'
   rw [mem_hyperbolic_iff] at hw
   rw [mem_middle_iff] at hw'
-  rw [polar_realForm b hb, realPairing, hw, hw'.1, hw'.2]
+  rw [polar_realForm b hb, realPairing, pairing, hw, hw'.1, hw'.2]
   simp
 
 /-- The form the plane carries: `(r, s) ↦ -r * s`. -/

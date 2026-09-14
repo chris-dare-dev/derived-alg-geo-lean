@@ -156,8 +156,8 @@ theorem pairing_mukaiVector_eq_of_preservesEuler (D : IntegralMukaiData V Λ)
     (hφ : PreservesEuler V V' φ) (E F : N) :
     Mukai.pairing D'.b (D'.mukaiVector (φ E)) (D'.mukaiVector (φ F))
       = Mukai.pairing D.b (D.mukaiVector E) (D.mukaiVector F) := by
-  have hq : (Mukai.pairing D'.b (D'.mukaiVector (φ E)) (D'.mukaiVector (φ F)) : ℚ)
-      = (Mukai.pairing D.b (D.mukaiVector E) (D.mukaiVector F) : ℚ) := by
+  have hq : ((Mukai.pairing D'.b (D'.mukaiVector (φ E)) (D'.mukaiVector (φ F)) : ℤ) : ℚ)
+      = ((Mukai.pairing D.b (D.mukaiVector E) (D.mukaiVector F) : ℤ) : ℚ) := by
     have h1 := D'.chi₂_eq_neg_pairing hHRR' hK3' (φ E) (φ F)
     have h2 := D.chi₂_eq_neg_pairing hHRR hK3 E F
     have h3 := hφ E F

@@ -171,7 +171,7 @@ items:
     kind: epic
     parent: charge-abstraction-m1
     title: "One discriminant owner, and the inert beta dropped"
-    status: planned
+    status: done
     summary: "Generalise `Mukai.pairing` (`Lattice/Mukai/Basic.lean:56`) over its coefficient ring IN PLACE, with `Mukai.realPairing` an abbrev at R = ℝ; move `DivisorSpace.realDiscriminant` up to `RealForm.lean`, whose current home imports two of the leaves it would parent; land the eight leaf projections and five bridges; drop the inert β from `Threefold.discrHBeta` (`BMT.lean:103`). No new declaration name. The audit shipped two rival parents for these same seven leaves and adjudicated neither; the loser — a dimension-indexed Δ_H — is recorded as a negative result because a dimension-indexed self-pairing vanishes identically in odd degree."
     priority: must
     size: M

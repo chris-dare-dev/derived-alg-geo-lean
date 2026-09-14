@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Orientation
 
 /-!
@@ -83,29 +84,61 @@ abbrev RealExtension (V : Type*) : Type _ := ℝ × V × ℝ
 
 variable (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
 
-/-- The Mukai pairing of the real extension. -/
-def realPairing (v w : RealExtension V) : ℝ :=
-  b v.2.1 w.2.1 - v.1 * w.2.2 - w.1 * v.2.2
+/-- **The Mukai pairing of the real extension is `Mukai.pairing` at `R = ℝ`.**
 
-@[simp]
+An `abbrev`, not a second definition: `RealExtension V` is `ℝ × V × ℝ` and
+`Basic.lean`'s `pairing` is stated over an arbitrary coefficient ring, so this
+is the same function under a name the real lane reads better. Every lemma below
+is therefore a statement about the one root. -/
+abbrev realPairing (v w : RealExtension V) : ℝ := pairing b v w
+
+/-- Not a `simp` lemma: `pairing_mk` is already `simp` and `realPairing` is
+reducible, so the two would be the same rewrite registered twice and the
+normal-form linter rejects the duplicate. Kept as a named statement because the
+real lane rewrites by it. -/
 theorem realPairing_apply (r : ℝ) (c : V) (s : ℝ) (r' : ℝ) (c' : V) (s' : ℝ) :
     realPairing b (r, c, s) (r', c', s') = b c c' - r * s' - r' * s := rfl
 
 theorem realPairing_comm (hb : ∀ x y : V, b x y = b y x) (v w : RealExtension V) :
-    realPairing b v w = realPairing b w v := by
-  simp only [realPairing, hb v.2.1 w.2.1]
-  ring
+    realPairing b v w = realPairing b w v :=
+  pairing_comm b hb v w
 
 /-- The pairing, bundled. -/
 def realBilin : LinearMap.BilinForm ℝ (RealExtension V) :=
   LinearMap.mk₂ ℝ (realPairing b)
-    (fun v₁ v₂ w => by simp [realPairing]; ring)
-    (fun a v w => by simp [realPairing]; ring)
-    (fun v w₁ w₂ => by simp [realPairing]; ring)
-    (fun a v w => by simp [realPairing]; ring)
+    (fun v₁ v₂ w => by simp [realPairing, pairing]; ring)
+    (fun a v w => by simp [realPairing, pairing]; ring)
+    (fun v w₁ w₂ => by simp [realPairing, pairing]; ring)
+    (fun a v w => by simp [realPairing, pairing]; ring)
 
 @[simp]
 theorem realBilin_apply (v w : RealExtension V) : realBilin b v w = realPairing b v w := rfl
+
+/-- **The discriminant of the real Mukai extension**, `Δ(r, c, s) = b c c - 2rs`.
+
+This is the self-pairing as a bundled `QuadraticForm`, **without** the halving
+of `realForm`: the discriminant convention of Macrì--Schmidt is the unhalved
+one, and `realDiscriminant_eq_selfPairing` is what pins the choice.
+
+It lives here rather than beside a divisor space because it parents the
+divisorial discriminant leaves, and its former home imported two of them. `V`
+is an arbitrary real bilinear space; the `DivisorSpace` spelling in
+`Walls/Divisorial/Support.lean` is this form at `b = S.intersection`. -/
+def realDiscriminant : QuadraticForm ℝ (RealExtension V) :=
+  (realBilin b).toQuadraticMap
+
+/-- **The bundled discriminant is the Mukai self-pairing.** The unhalved
+convention is exactly what makes this an equality rather than a factor of two. -/
+theorem realDiscriminant_eq_selfPairing (v : RealExtension V) :
+    realDiscriminant b v = selfPairing b v := by
+  rw [realDiscriminant, LinearMap.BilinMap.toQuadraticMap_apply, realBilin_apply]
+  rfl
+
+@[simp]
+theorem realDiscriminant_mk (r : ℝ) (c : V) (s : ℝ) :
+    realDiscriminant b (r, c, s) = b c c - 2 * r * s := by
+  rw [realDiscriminant_eq_selfPairing, selfPairing_mk]
+  ring
 
 /-- **The quadratic form of the real Mukai extension: half the self-pairing.**
 The halving is what makes `polar (realForm b) = realPairing b`; see the module

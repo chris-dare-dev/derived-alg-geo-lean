@@ -328,6 +328,9 @@ integral classes rather than about an abstract `ZSpan`. -/
 #print axioms Mukai.span_range_extendBasis
 #print axioms Mukai.extendMap
 #print axioms Mukai.realPairing_extendMap
+#print axioms Mukai.realDiscriminant
+#print axioms Mukai.realDiscriminant_eq_selfPairing
+#print axioms Mukai.realDiscriminant_mk
 #print axioms Mukai.isSphericalClass_extendMap
 #print axioms Mukai.finite_sphericalOrthogonal_integralExtension
 #print axioms Mukai.finite_wallClasses_integralExtension

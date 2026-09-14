@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.TwistedChern
+import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 
 /-!
 # The tilt slope and the Bayer–Macrì–Toda quantity on a threefold
@@ -100,9 +101,26 @@ noncomputable def deg3Beta (β : ℚ) (E : N) : ℚ :=
 
 `ch₀` carries no `β`: the twist sums over `j ≤ 0` in degree zero, so
 `ch₀^β = ch₀ = rank`. -/
-noncomputable def discrHBeta (β : ℚ) (E : N) : ℚ :=
-  (degH1Beta V P β E) ^ 2
-    - 2 * (V.ring.degree (P.cls ^ 3) * (V.rank E : ℚ)) * (degH2Beta V P β E)
+noncomputable def discrHBeta (E : N) : ℚ :=
+  (degH1Beta V P 0 E) ^ 2
+    - 2 * (V.ring.degree (P.cls ^ 3) * (V.rank E : ℚ)) * (degH2Beta V P 0 E)
+
+/-- **The threefold tilt discriminant is the Mukai self-pairing**, at
+coefficient ring `ℚ` with the multiplication of `ℚ` as the bilinear form.
+
+The rank slot carries `∫H³`, the codimension-three analogue of the `∫H²` in
+`Surface.discrH_eq_selfPairing`.  The triple is the three twisted degrees at
+`β`, and `discrHBeta_beta_inert` below says the value does not depend on which
+`β` that is. -/
+theorem discrHBeta_eq_selfPairing (E : N) :
+    discrHBeta V P E
+      = Mukai.selfPairing (LinearMap.mul ℚ ℚ)
+          (V.ring.degree (P.cls ^ 3) * (V.rank E : ℚ), degH1Beta V P 0 E,
+            degH2Beta V P 0 E) := by
+  rw [Mukai.selfPairing_mk, discrHBeta]
+  show _ = degH1Beta V P 0 E * degH1Beta V P 0 E
+    - 2 * (V.ring.degree (P.cls ^ 3) * (V.rank E : ℚ) * degH2Beta V P 0 E)
+  ring
 
 /-- **The tilt slope** `ν_{α,β}(E) = (H·ch₂^β − (α²/2)·H³·ch₀) / (H²·ch₁^β)`.
 
@@ -118,7 +136,7 @@ noncomputable def nu (α β : ℚ) (E : N) : ℚ :=
 Defining it is all this does. Whether it is nonnegative is `BMTData`, and see
 the module docstring before assuming so. -/
 noncomputable def Q (α β : ℚ) (E : N) : ℚ :=
-  α ^ 2 * discrHBeta V P β E + 4 * (degH2Beta V P β E) ^ 2
+  α ^ 2 * discrHBeta V P E + 4 * (degH2Beta V P β E) ^ 2
     - 6 * (degH1Beta V P β E) * (deg3Beta V P β E)
 
 /-! ### The `β = 0` and `α = 0` specialisations -/
@@ -138,8 +156,61 @@ theorem deg3Beta_zero_beta (E : N) :
     deg3Beta V P 0 E = V.ring.degree (V.chComp E 3) := by
   rw [deg3Beta, chBetaComp_zero_beta]
 
+/-! ### `β` is inert in the discriminant
+
+The two twisted degrees each move with `β`, and the discriminant is the one
+combination of them that does not. `degH1Beta_eq_sub` and `degH2Beta_eq_sub`
+are the two expansions; `discrHBeta_beta_inert` is the cancellation. -/
+
+/-- `∫H²·ch₁^β = ∫H²·ch₁ − β·∫H³·ch₀`. -/
+theorem degH1Beta_eq_sub (β : ℚ) (E : N) :
+    degH1Beta V P β E
+      = degH1Beta V P 0 E - β * (V.ring.degree (P.cls ^ 3) * (V.rank E : ℚ)) := by
+  have key : chBetaComp V P β E 1 * P.cls ^ 2
+      = algebraMap ℚ A (-(β * (V.rank E : ℚ))) * P.cls ^ 3
+        + V.chComp E 1 * P.cls ^ 2 := by
+    rw [chBetaComp_eq, Finset.sum_range_succ, Finset.sum_range_one, V.chComp_zero]
+    norm_num [twistCoeff, Nat.factorial, map_neg, map_mul]
+    ring
+  rw [degH1Beta, key, map_add, NumericalRingData.degree_algebraMap_mul,
+    degH1Beta_zero_beta]
+  ring
+
+/-- `∫H·ch₂^β = ∫H·ch₂ − β·∫H²·ch₁ + (β²/2)·∫H³·ch₀`. -/
+theorem degH2Beta_eq_sub (β : ℚ) (E : N) :
+    degH2Beta V P β E
+      = degH2Beta V P 0 E - β * degH1Beta V P 0 E
+        + β ^ 2 / 2 * (V.ring.degree (P.cls ^ 3) * (V.rank E : ℚ)) := by
+  have key : chBetaComp V P β E 2 * P.cls
+      = algebraMap ℚ A (β ^ 2 / 2 * (V.rank E : ℚ)) * P.cls ^ 3
+        + algebraMap ℚ A (-β) * (V.chComp E 1 * P.cls ^ 2)
+        + V.chComp E 2 * P.cls := by
+    rw [chBetaComp_eq, Finset.sum_range_succ, Finset.sum_range_succ,
+      Finset.sum_range_one, V.chComp_zero]
+    norm_num [twistCoeff, Nat.factorial, map_neg, map_mul]
+    ring
+  rw [degH2Beta, key, map_add, map_add, NumericalRingData.degree_algebraMap_mul,
+    NumericalRingData.degree_algebraMap_mul, degH2Beta_zero_beta, degH1Beta_zero_beta]
+  ring
+
+/-- **`β` is inert in the tilt discriminant.**
+
+Each twisted degree moves with `β` — see the two expansions above — and the
+combination `(∫H²ch₁^β)² − 2(∫H³ch₀)(∫H·ch₂^β)` is the one in which every `β`
+term cancels: the linear terms cancel against each other and the quadratic ones
+against the `β²/2` in `ch₂^β`.
+
+This is the threefold instance of the `B`-twist invariance
+`ChernCharacter.discriminant_twist` already records on the divisorial side. -/
+theorem discrHBeta_beta_inert (β : ℚ) (E : N) :
+    (degH1Beta V P β E) ^ 2
+        - 2 * (V.ring.degree (P.cls ^ 3) * (V.rank E : ℚ)) * (degH2Beta V P β E)
+      = discrHBeta V P E := by
+  rw [discrHBeta, degH1Beta_eq_sub V P β E, degH2Beta_eq_sub V P β E]
+  ring
+
 theorem discrHBeta_zero_beta (E : N) :
-    discrHBeta V P 0 E
+    discrHBeta V P E
       = (V.ring.degree (V.chComp E 1 * P.cls ^ 2)) ^ 2
         - 2 * (V.ring.degree (P.cls ^ 3) * (V.rank E : ℚ))
           * V.ring.degree (V.chComp E 2 * P.cls) := by

@@ -199,7 +199,7 @@ theorem mukaiVector_snd_snd (E : N) :
 identification the abstract lattice file declined to make, discharged from the
 supplied integral data. -/
 theorem pairing_mukaiVector (hHRR : V.SatisfiesHRR) (hK3 : IsK3 V) (E F : N) :
-    (Mukai.pairing D.b (D.mukaiVector E) (D.mukaiVector F) : ℚ)
+    ((Mukai.pairing D.b (D.mukaiVector E) (D.mukaiVector F) : ℤ) : ℚ)
       = mukaiPairing V E F := by
   rw [mukaiVector, mukaiVector, Mukai.pairing_mk, mukaiPairing]
   push_cast
@@ -208,7 +208,7 @@ theorem pairing_mukaiVector (hHRR : V.SatisfiesHRR) (hK3 : IsK3 V) (E F : N) :
 /-- Specializing `pairing_mukaiVector` to the diagonal identifies the lattice norm used by
 sphericity and expected-dimension results with the numerical self-pairing. -/
 theorem selfPairing_mukaiVector (hHRR : V.SatisfiesHRR) (hK3 : IsK3 V) (E : N) :
-    (Mukai.selfPairing D.b (D.mukaiVector E) : ℚ)
+    ((Mukai.selfPairing D.b (D.mukaiVector E) : ℤ) : ℚ)
       = mukaiSelfPairing V E := by
   rw [Mukai.selfPairing_eq_pairing, D.pairing_mukaiVector hHRR hK3,
     mukaiPairing_self V]
@@ -221,13 +221,13 @@ expected-dimension vocabulary of `LinearAlgebra/Lattice/Mukai` applicable to
 the Euler form. -/
 theorem chi₂_eq_neg_pairing (hHRR : V.SatisfiesHRR) (hK3 : IsK3 V) (E F : N) :
     V.chi₂ E F
-      = -(Mukai.pairing D.b (D.mukaiVector E) (D.mukaiVector F) : ℚ) := by
+      = -((Mukai.pairing D.b (D.mukaiVector E) (D.mukaiVector F) : ℤ) : ℚ) := by
   rw [D.pairing_mukaiVector hHRR hK3, chi₂_eq_neg_mukaiPairing V hK3]
 
 /-- The self-pairing of `v(E)`, cast to `ℚ`, is `−χ(E,E)`. -/
 theorem selfPairing_mukaiVector_eq_neg_chi₂
     (hHRR : V.SatisfiesHRR) (hK3 : IsK3 V) (E : N) :
-    (Mukai.selfPairing D.b (D.mukaiVector E) : ℚ) = -V.chi₂ E E := by
+    ((Mukai.selfPairing D.b (D.mukaiVector E) : ℤ) : ℚ) = -V.chi₂ E E := by
   rw [Mukai.selfPairing_eq_pairing, D.chi₂_eq_neg_pairing hHRR hK3]
   ring
 
