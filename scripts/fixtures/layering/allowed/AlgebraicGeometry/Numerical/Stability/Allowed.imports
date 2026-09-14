@@ -1,0 +1,6 @@
+# The numerical stability subcomponent carries charge and wall calculations, so
+# it reaches the stability tree by subject. Its siblings Numerical/Core/,
+# Numerical/Mukai/, Numerical/RiemannRoch/ and Numerical/Specializations/ do
+# not, and are no longer exempted by a blanket Numerical/ entry.
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Core
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.ChargeFamily

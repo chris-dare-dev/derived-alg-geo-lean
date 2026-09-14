@@ -1,0 +1,6 @@
+# Relative perfection is a property of a complex over a morphism, not a
+# stability notion; Moduli/PerfectComplex/ is stability-neutral today and the
+# gate now holds it there. Reached transitively, as the real regression would
+# be.
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
+import DerivedAlgGeo.AlgebraicGeometry.Moduli.Semistability.Locus

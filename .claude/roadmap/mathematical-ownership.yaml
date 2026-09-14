@@ -59,11 +59,14 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.01 — Agree canonical owners and a coordinated cutover map
-  status: partial
-  progress: 'Policy codification is authored in PR #1327: CLAUDE.md, AGENTS.md and the architecture
+  status: done
+  progress: 'Two parts. PR #1327 codified the policy: CLAUDE.md, AGENTS.md and the architecture
     documents distinguish ownership, imports and specialization, with subject-specific boundaries.
-    The complete declaration-level cutover map, finer gate changes and per-issue path reconciliation
-    remain open. Documentation is not completion of the source repairs.'
+    PR #1328 supplied the three things that left open — the declaration-level cutover map for all
+    fifteen findings in docs/architecture/cutover-ledger.md, the finer gate change (rule 3 named by
+    subcomponent instead of by blanket subtree, with regression fixtures, taking the guarded
+    stability-neutral count from 258 to 302 of 381), and the per-issue path reconciliation. Neither
+    part moves a Lean declaration; the source repairs are MO1.02–MO1.14.'
   summary: Record the definition owner, neutral core, application adapter and comparison owner for each
     confirmed finding before moving source. Amend the placement policy where it currently conflates a
     new subject with an extension of an existing Mathlib API. Coordinates CA1–CA3 (#1222–#1230), SRF1,

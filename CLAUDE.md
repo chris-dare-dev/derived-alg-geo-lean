@@ -144,13 +144,20 @@ until their implementing cutovers add the corresponding checks.
   `Mathlib.AlgebraicGeometry`, and only they declare into the
   `AlgebraicGeometry` namespace. Everything else is usable without schemes.
 - **`Development/` is a leaf.** No stable module imports it.
-- **Stability-neutral geometry.** Modules below `AlgebraicGeometry/` outside
-  `Moduli/`, `Numerical/`, and `DerivedCategory/Stability/` never reach the
-  stability tree, even transitively. The `AlgebraicGeometry/DerivedCategory`
-  umbrella therefore omits its `Stability` child; the top-level
-  `AlgebraicGeometry` umbrella imports it. This is what keeps `Dᵇ(Coh X)`,
-  `Dqc`, coherent sheaves, and cohomology importable without Bridgeland
-  stability.
+- **Stability-neutral geometry.** Geometry reaches the stability tree only from
+  the subcomponents that exist to consume it: `DerivedCategory/Stability/`,
+  `Moduli/{HarderNarasimhan,Semistability}/`, `Numerical/Stability/`,
+  `Numerical/Examples/{Surface,Threefold}/`,
+  `Numerical/GrothendieckGroup/CategoricalCharge/` and `Stability/Gieseker/`.
+  Everything else below `AlgebraicGeometry/` is stability-neutral, transitively
+  included. A same-named umbrella over one of those subcomponents is exempt as
+  an umbrella, and its other children are not. The
+  `AlgebraicGeometry/DerivedCategory` umbrella is the one that omits a child
+  outright -- it drops `Stability`, and the top-level `AlgebraicGeometry`
+  umbrella imports it. This is what keeps `Dᵇ(Coh X)`, `Dqc`, coherent sheaves,
+  and cohomology importable without Bridgeland stability. The list was narrowed
+  from the four blanket subtrees on 2026-09-13 (MO1.01, #1312); see
+  `docs/architecture/cutover-ledger.md`.
 - **Weak stability is independent of Bridgeland stability**, and
   `PreStabilityCondition` structurally extends `WeakPreStabilityCondition`.
 - **Retired paths stay retired.** The gate carries the list.

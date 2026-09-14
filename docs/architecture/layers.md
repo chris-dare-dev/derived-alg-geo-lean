@@ -36,10 +36,18 @@ complete mathematical ownership policy.
    `DerivedAlgGeoSweep.lean` import everything and own nothing.
 2. **`Development/` is a leaf.** No stable module imports it.
 3. **Stability-neutral geometry.** A module below `AlgebraicGeometry/` that is
-   not below `Moduli/`, `Numerical/`, or `DerivedCategory/Stability/` never
-   reaches the stability tree, even transitively. This keeps `Dᵇ(Coh X)`,
-   `Dqc`, coherent sheaves, and cohomology importable without Bridgeland
-   stability.
+   not below one of the eight subcomponents that exist to consume stability
+   never reaches the stability tree, even transitively. The eight are
+   `DerivedCategory/Stability/`, `Moduli/HarderNarasimhan/`,
+   `Moduli/Semistability/`, `Numerical/Stability/`,
+   `Numerical/Examples/Surface/`, `Numerical/Examples/Threefold/`,
+   `Numerical/GrothendieckGroup/CategoricalCharge/` and `Stability/Gieseker/`.
+   A same-named umbrella over one of them re-exports it and is exempt as an
+   umbrella only; its other children are not. This keeps `Dᵇ(Coh X)`, `Dqc`,
+   coherent sheaves, and cohomology importable without Bridgeland stability.
+   Before 2026-09-13 the exemption named the whole `Moduli/`, `Numerical/`,
+   `Stability/` and `DerivedCategory/Stability/` subtrees, which exempted 122
+   modules to excuse the 60 that use the tree; MO1.01 (#1312) narrowed it.
 4. **Weak stability is independent of Bridgeland stability.** No module of the
    weak theory imports the Bridgeland theory, and
    `PreStabilityCondition` structurally `extends toWeak :
@@ -53,11 +61,16 @@ complete mathematical ownership policy.
 ## Component boundaries and coverage limits
 
 New generic roots must not import their specializations or downstream
-comparisons, including transitively through umbrellas. The broad `Numerical`
-stability exemption does not authorize such imports: neutral numerical/Todd
-algebra must be separate from charge and geometric comparison consumers.
-Similarly, the gate's current hard-coded divisorial root is a source location
-to migrate in #1313, not a rule that charge construction must remain in Walls.
+comparisons, including transitively through umbrellas. The stability exemption
+does not authorize such imports. Since 2026-09-13 it is also no longer broad:
+rule 3 names eight subcomponents, so `Numerical/Core/`, `Numerical/Mukai/`,
+`Numerical/RiemannRoch/` and `Numerical/Specializations/` are mechanically
+held to being separate from the charge and geometric comparison consumers
+rather than only asked to be. What the gate still cannot see is a parent
+importing its own specialization *inside* an exempt subcomponent; that stays a
+review obligation until #1316 and #1317 split those subtrees.
+The gate's hard-coded divisorial root is a source location to migrate in
+#1313, not a rule that charge construction must remain in Walls.
 
 MO1 cutovers add focused component checks and regression fixtures with the
 source move. Preserve the broad firewalls and umbrella coverage while doing
@@ -80,8 +93,20 @@ DerivedCategory
                                                         omitted by the DerivedCategory
                                                         umbrella, imported by the
                                                         AlgebraicGeometry umbrella
-Moduli, Numerical                                       may import the stability tree
+Moduli
+  ├─ HarderNarasimhan, Semistability                  may import the stability tree
+  └─ PerfectComplex, Quot                             stability-neutral
+Numerical
+  ├─ Stability                                        may import the stability tree
+  ├─ Examples/Surface, Examples/Threefold             may import the stability tree
+  ├─ GrothendieckGroup/CategoricalCharge              may import the stability tree
+  └─ Core, Mukai, RiemannRoch, Specializations        stability-neutral
+Stability
+  └─ Gieseker                                         may import the stability tree
 ```
+
+Each same-named umbrella above a "may import" row re-exports it and is exempt
+as an umbrella; the exemption does not reach the umbrella's other children.
 
 A geometric realization of a categorical interface sits with the geometric
 object it is about: the `IsCompatibleWithTriangulation` instance for

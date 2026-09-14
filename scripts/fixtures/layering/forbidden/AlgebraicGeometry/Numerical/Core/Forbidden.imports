@@ -1,0 +1,5 @@
+# The named component edge "numerical core -> no stability constructions"
+# (review finding 14). The blanket Numerical/ exemption accepted this; the
+# subcomponent list rejects it, which is the whole point of MO1.01's narrowing.
+import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.Surface.Number
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.ChargeFamily

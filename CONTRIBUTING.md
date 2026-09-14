@@ -63,12 +63,17 @@ route for that application. Check transitive imports through umbrellas.
 
 The dependency contract is `docs/architecture/layers.md`: only
 `AlgebraicGeometry/` and `Development/` import geometry, `Development/` is a
-leaf, geometry outside `Moduli/`, `Numerical/`, and
-`DerivedCategory/Stability/` never reaches the stability tree, weak stability
-never imports Bridgeland stability, and retired paths stay retired. Subjects
-are otherwise free to import one another as they do in Mathlib. These are the
-current broad mechanical checks. The finer root/consumer boundaries in the
-ownership policy remain review obligations until their source cutovers add
+leaf, geometry outside the eight subcomponents that exist to consume stability
+never reaches the stability tree, weak stability never imports Bridgeland
+stability, and retired paths stay retired. Subjects are otherwise free to
+import one another as they do in Mathlib. The stability exemption is named by
+subcomponent, not by top-level subtree: `Moduli/PerfectComplex/`,
+`Moduli/Quot/`, `Numerical/Core/`, `Numerical/Mukai/`,
+`Numerical/RiemannRoch/` and `Numerical/Specializations/` are held neutral even
+though their parents are not. A same-named umbrella over an exempt
+subcomponent is exempt as an umbrella; its other children are not. Those are
+still broad mechanical checks. The finer root/consumer boundaries in the
+ownership policy remain review obligations until their own source cutovers add
 focused checks; a green gate does not certify every placement decision.
 
 Derived-category theory is built once: Mathlib constructs `DerivedCategory C`,
@@ -228,6 +233,15 @@ the proposed destination. Update affected issue path contracts and keep
 GitHub milestone membership, native dependencies and roadmap entries in
 agreement. A source-implementation issue stays open when only its policy or
 plan has been documented.
+
+The ledger's "agreed owners and cutover map" section settles the destination of
+every confirmed 2026-09-13 ownership finding at declaration granularity. If you
+are moving code that appears there, the destination is already agreed and the
+pull request implements it; if you are moving code that does not, add the row
+rather than inventing a destination in the pull request description. Two rules
+in that section bind every structural change: paths move while fully qualified
+declaration names stay, and a proposed new carrier needs a consumer outside the
+module it was extracted from or it is replaced by a theorem or an `abbrev`.
 
 Repository documents are the canonical record of these practices. GitHub
 Discussions can propose changes or explain a decision; link the versioned
