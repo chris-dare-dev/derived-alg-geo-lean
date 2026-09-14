@@ -55,7 +55,7 @@ theorem isPositiveFrame_iff (x y : M) :
       have := combination_ne_zero h (a := 1) (b := 0) (Or.inl one_ne_zero)
       simp [hx0] at this
     have hQx : 0 < Q x := by
-      have := h.posDef ⟨x, hx⟩ (by simpa using hxne)
+      have := h.posDef ⟨x, hx⟩ (fun h0 => hxne (by simpa [Subtype.ext_iff] using h0))
       rwa [restrict_apply] at this
     refine ⟨hQx, ?_⟩
     -- the quadratic `t ↦ Q (t • x + y)` is positive, so its discriminant is negative
@@ -104,16 +104,16 @@ theorem isPositiveFrame_iff (x y : M) :
         ext z
         simp
         tauto
-      rw [pairSpan, hrange]
+      rw [framePlane_mk, pairSpan, hrange]
       simpa using finrank_span_eq_card hindep
     · rintro ⟨v, hv⟩ hv0
-      rw [pairSpan, Submodule.mem_span_pair] at hv
+      rw [framePlane_mk, pairSpan, Submodule.mem_span_pair] at hv
       obtain ⟨a, b, rfl⟩ := hv
       rw [restrict_apply]
       refine hvals a b ?_
       by_contra hcon
       push Not at hcon
-      exact hv0 (by simp [hcon.1, hcon.2])
+      exact hv0 (Subtype.ext (by simp [hcon.1, hcon.2]))
 
 section Topology
 

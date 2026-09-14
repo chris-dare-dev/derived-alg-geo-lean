@@ -62,6 +62,13 @@ variable (Q)
 /-- Forget the ordered basis of a frame and retain only the plane it spans. -/
 def framePlane (p : M × M) : Submodule ℝ M := pairSpan p.1 p.2
 
+/-- `framePlane` on an explicit pair is the span of its two entries. The
+frame-to-plane map is a genuine definition, so consumers that reason about the
+spanning set need this to reach `pairSpan`. It is deliberately not `@[simp]`:
+rewriting the carrier of a frame's subtype blocks `Submodule.mk_eq_zero` on
+elements of that subtype. -/
+theorem framePlane_mk (x y : M) : framePlane (x, y) = pairSpan x y := rfl
+
 /-- An **ordered positive frame**: an ordered pair spanning a positive plane. -/
 def IsPositiveFrame (x y : M) : Prop := IsPositivePlane Q (framePlane (x, y))
 

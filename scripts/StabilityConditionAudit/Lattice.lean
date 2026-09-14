@@ -214,6 +214,7 @@ sign, not proved to be one; see the module docstring of
 
 #print axioms PeriodDomain.pairSpan
 #print axioms PeriodDomain.framePlane
+#print axioms PeriodDomain.framePlane_mk
 #print axioms PeriodDomain.IsPositiveFrame
 #print axioms PeriodDomain.positiveFrames
 #print axioms PeriodDomain.pairingDet

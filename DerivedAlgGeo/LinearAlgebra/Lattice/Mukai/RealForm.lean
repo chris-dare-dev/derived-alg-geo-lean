@@ -246,16 +246,16 @@ theorem isPositiveFrame_exp (hb : ∀ x y : V, b x y = b y x) (hω : 0 < b ω ω
       ext z
       simp
       tauto
-    rw [PeriodDomain.pairSpan, hrange]
+    rw [PeriodDomain.framePlane_mk, PeriodDomain.pairSpan, hrange]
     simpa using finrank_span_eq_card hindep
   · rintro ⟨v, hv⟩ hv0
-    rw [PeriodDomain.pairSpan, Submodule.mem_span_pair] at hv
+    rw [PeriodDomain.framePlane_mk, PeriodDomain.pairSpan, Submodule.mem_span_pair] at hv
     obtain ⟨s, t, rfl⟩ := hv
     rw [restrict_apply, realForm_smul_add_smul b β ω hb]
     have hst : s ≠ 0 ∨ t ≠ 0 := by
       by_contra hcon
       push Not at hcon
-      exact hv0 (by simp [hcon.1, hcon.2])
+      exact hv0 (Subtype.ext (by simp [hcon.1, hcon.2]))
     rcases hst with hs | ht
     · have : 0 < s ^ 2 := by positivity
       have h2 : 0 ≤ t ^ 2 := sq_nonneg t
