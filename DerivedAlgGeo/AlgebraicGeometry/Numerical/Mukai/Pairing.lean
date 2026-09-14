@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.VectorClass
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.VectorClassK3
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.EulerPairing
 
 /-!

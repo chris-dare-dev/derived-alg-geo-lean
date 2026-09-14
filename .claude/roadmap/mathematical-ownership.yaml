@@ -258,7 +258,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.05 — Remove numerical parent-to-specialization import inversions
-  status: blocked
+  status: done
   summary: 'Split generic numerical/Todd/transport foundations from K3, dimension-specific and cross-surface
     comparison files. Structural continuation of closed #1221, coordinated with open #1222 and #1225.
     Those issues retain the correction/fourfold constructions; this one removes backwards imports.'
@@ -276,7 +276,7 @@ items:
   - area:stability
   - type:refactor
   - sev:high
-  - blocked
+  - ready
   acceptance:
   - Split Numerical/Mukai/SqrtTodd so generic correction algebra does not import K3 Riemann–Roch. Put
     K3 identification downstream, preserving the explicit codimension-at-most-four scope of sqrtComp.

@@ -1,4 +1,5 @@
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.Abelian
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.BlowUpPlane
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.BlowUpPlaneWalls
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.BlowUpPlaneSlice

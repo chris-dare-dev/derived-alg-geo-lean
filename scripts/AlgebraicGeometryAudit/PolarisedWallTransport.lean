@@ -3,7 +3,7 @@ Polarised-transport slice of the AlgebraicGeometry audit. One H-degree map for
 every dimension, truncation degree and correction class; the two existing
 per-dimension transports are proved to be it.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.PolarisedWallTransport
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.PolarisedWallTransportComparison
 
 #print axioms AlgebraicGeometry.Numerical.Polarised.unitCorr
 #print axioms AlgebraicGeometry.Numerical.Polarised.corrComp
