@@ -158,7 +158,7 @@ items:
     kind: epic
     parent: charge-abstraction-m1
     title: "Inhabit the correction slot at sqrt(td)"
-    status: planned
+    status: done
     summary: "`wallChargeFamily_sqrtToddComp_eq_mukaiCharge`, proved for any surface realization with no K3 hypothesis, plus the K3 corollary through `mukaiCharge_of_isK3` (`DivisorialMukai.lean:124`). Without it the κ slot has zero inhabitants and the spine's `κ = √td` line is unbacked. Must use `R.realizePolarization` (`DivisorialChargeNumerical.lean:106`); the remediation scratch file's local `polDiv` duplicates it. The audit's claim that the repository holds two unrelated √td data is half wrong — the bridge exists at `DivisorialMukai.lean:69` and the design cited neither; what is genuinely wrong is the audit's `√td = (1,0,1)`, which as an H-degree vector is `(∫H², 0, 1)`."
     priority: must
     size: S

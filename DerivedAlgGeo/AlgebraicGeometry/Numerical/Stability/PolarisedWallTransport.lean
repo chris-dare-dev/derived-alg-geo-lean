@@ -129,6 +129,14 @@ def wallChargeFamily (V : NumericalVarietyData n A N) (P : Polarization V.ring)
     (κ : ℕ → A) (m : ℕ) : ChargeFamily ℂ N :=
   (Exp.chargeFamily m).pullback (hDegreesHom V P κ m)
 
+/-- The root family evaluates as the kernel on the transported degrees. The
+accessor the surface leaf has had since `WallTransport.lean:161`; a consumer
+that unfolds `pullback` by hand is reaching past this definition. -/
+@[simp]
+theorem wallChargeFamily_charge (V : NumericalVarietyData n A N)
+    (P : Polarization V.ring) (κ : ℕ → A) (m : ℕ) (w : ℂ) (E : N) :
+    (wallChargeFamily V P κ m).charge w E = Exp.charge m w (hDegrees V P κ m E) := rfl
+
 /-- **PROVED.**  Slot 0 is `∫Hⁿ · rank E`. -/
 theorem hDegrees_zero (V : NumericalVarietyData n A N) (P : Polarization V.ring)
     (E : N) :
