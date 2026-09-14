@@ -9,7 +9,6 @@ import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Limits
 import DerivedAlgGeo.CategoryTheory.Monoidal
 import DerivedAlgGeo.CategoryTheory.ObjectProperty
-import DerivedAlgGeo.CategoryTheory.ModuleCat
 import DerivedAlgGeo.CategoryTheory.Shift
 import DerivedAlgGeo.CategoryTheory.Sites
 import DerivedAlgGeo.CategoryTheory.Subobject

@@ -197,12 +197,14 @@ and kernel packages with Fourier--Mukai theory.
 
 Comparison data of type `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` extends
 Mathlib's derived category, so its owner is
-`Algebra/Homology/DerivedCategory/Opposite.lean`. The bare algebraic-dual
-functor on `ModuleCat` currently lives at `CategoryTheory/ModuleCat/LinearDual.lean`;
-its target owner is `Algebra/Category/ModuleCat/LinearDual.lean`, with its
-exactness API (pending #1325). The exactness and derived lift currently live in
-`Algebra/Category/ModuleCat/LinearDual.lean` and
-`Algebra/Homology/DerivedCategory/LinearDual.lean`. A Serre-duality statement that mentions a scheme
+`Algebra/Homology/DerivedCategory/Opposite.lean`. Algebraic linear duality on
+`ModuleCat` is one subject at `ModuleCat`'s own Mathlib path:
+`Algebra/Category/ModuleCat/LinearDual/Basic.lean` bundles the contravariant
+additive functor and `LinearDual/Exact.lean` proves it exact over a field.
+Being category-theoretic is not a placement reason -- `ModuleCat` is defined in
+`Mathlib/Algebra/Category/ModuleCat/`, and Tier 1 follows the definition site.
+The derived lift stays at `Algebra/Homology/DerivedCategory/LinearDual.lean`,
+because it extends the derived category rather than `ModuleCat`. A Serre-duality statement that mentions a scheme
 imports those roots and the canonical coherent-derived specialization; its
 geometric motivation does not move the generic functors into duality.
 
