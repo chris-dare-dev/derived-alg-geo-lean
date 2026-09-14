@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.Enriques
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface
 
 /-!
 # A numerical Enriques surface of Picard rank one
