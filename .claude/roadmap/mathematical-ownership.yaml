@@ -370,7 +370,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.08 — Separate abelian stability foundations and make slope theory independent of Gieseker
-  status: blocked
+  status: planned
   summary: 'Extract abelian stability functions/HN foundations from the triangulated weak-stability application
     and organize geometric slope and Gieseker theories as siblings. SF1 #192/#208 owns weak stability
     and HRS tilting; CA2 #1226–#1228 owns the tilt-charge comparisons. Neither set of mathematical deliverables
@@ -389,7 +389,7 @@ items:
   - area:algebraic-geometry
   - type:refactor
   - sev:high
-  - blocked
+  - ready
   acceptance:
   - Move the independently abelian StabilityFunction/HN declarations from Weak/Foundation/StabilityFunction
     to the agreed CategoryTheory/Abelian stability owner; triangulated weak stability consumes them.
@@ -408,7 +408,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.09 — Own H⁰ constructions with DGCategory and make enhancement exactness explicit
-  status: blocked
+  status: planned
   summary: 'Separate DGCategory’s intrinsic H⁰/shift/triangle/functor theory from the data comparing it
     with a chosen triangulated category. DG3 #854/#855 owns seam and exactness proofs. MO1 owns module
     placement and truthful comparison packaging; later DG4/DG5 consumers must see the distinction.'
@@ -426,7 +426,7 @@ items:
   - area:derived
   - type:refactor
   - sev:high
-  - blocked
+  - ready
   acceptance:
   - Move generic H⁰ shift, triangle and pretriangulated compatibility results from Triangulated/DGEnhancement/H0
     to Algebra/Homology/DGCategory/H0 or Pretriangulated as the declaration owner requires.
@@ -447,7 +447,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.10 — Extract derived tensor and pushforward capabilities from Fourier–Mukai
-  status: blocked
+  status: planned
   summary: 'Give general derived operations their own geometry-level owners, leaving Fourier–Mukai files
     to assemble kernels, convolution and transforms. DT1 remains owner of tensor inhabitation; #795/#796
     remain owners of transform equivalence/adjoint obligations; SF8 #554 owns arbitrary pullback. This
@@ -466,7 +466,7 @@ items:
   - area:algebraic-geometry
   - type:refactor
   - sev:high
-  - blocked
+  - ready
   acceptance:
   - Extract HasDerivedTensor, HasDerivedPushforward and the general coherent derived-tensor compatibility
     from KernelCorrespondence/DerivedTensorCoherence to agreed DerivedCategory/Tensor and pushforward
@@ -526,7 +526,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.12 — Separate the GL⁺(2,ℝ) cover from its stability action
-  status: blocked
+  status: planned
   summary: 'Extract the standalone covering-group/topological construction currently owned by stability
     symmetry. Related AUT1 #927 concerns an autoequivalence action and supplied proper discontinuity;
     it is not the owner of this independent GL-cover construction and is not discharged here.'
@@ -543,7 +543,7 @@ items:
   - area:stability
   - type:refactor
   - sev:medium
-  - blocked
+  - ready
   acceptance:
   - Classify GLTilde declarations into group/cover theory and phase/slicing/action adapters. Place the
     former by the pinned general-linear/covering API under the approved map.
@@ -560,7 +560,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.13 — Make mass a sibling of metric and extract planar convex geometry
-  status: blocked
+  status: planned
   summary: 'Give mass its own stability-theoretic owner and move neutral planar perimeter/convexity lemmas
     out of a mass-subadditivity proof directory. Relates to the mass-Hom consumer #1185, whose theorem
     and moduli input remain outside this structural issue.'
@@ -577,7 +577,7 @@ items:
   - area:stability
   - type:refactor
   - sev:medium
-  - blocked
+  - ready
   acceptance:
   - Place mass definitions and intrinsic mass results under StabilityCondition/Mass, with Metric importing
     the mass API it uses.
