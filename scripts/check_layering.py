@@ -212,6 +212,11 @@ RETIRED_PATHS = (
     # need no shift, so they moved to CategoryTheory/Linear/SerreFunctor/.
     "CategoryTheory/Triangulated/SerreFunctor/Basic.lean",
     "CategoryTheory/Triangulated/SerreFunctor/Uniqueness.lean",
+    # 2026-09-13 MO1.11: pseudo-coherence, Tor amplitude and relative
+    # perfection are properties of one complex over one morphism, so they moved
+    # to AlgebraicGeometry/DerivedCategory/Perfect/, and stalkwise flatness of
+    # a module sheaf moved to AlgebraicGeometry/Modules/Flat.lean.
+    "AlgebraicGeometry/Moduli/PerfectComplex/Relative.lean",
 )
 
 
