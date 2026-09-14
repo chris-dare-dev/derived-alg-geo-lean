@@ -183,7 +183,10 @@ theorem pairingDet_ne_zero (hsig : HasSignatureTwo Q) {x₀ y₀ x y : M}
     · rw [hv, polar_add_right, polar_smul_right, polar_smul_right, smul_eq_mul, smul_eq_mul]
       linarith [hc]
   have hpos : 0 < Q v := by
-    have := h.posDef ⟨v, hmemW⟩ (by simpa using hv0)
+    have hvFrame : (⟨v, hmemW⟩ : framePlane (x, y)) ≠ 0 := by
+      intro hvz
+      exact hv0 (congrArg Subtype.val hvz)
+    have := h.posDef ⟨v, hmemW⟩ hvFrame
     rwa [restrict_apply] at this
   have hneg : Q v < 0 := neg_of_mem_orthogonal hsig h₀ hperp hv0
   linarith

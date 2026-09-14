@@ -89,7 +89,7 @@ theorem zeroLocus_subset_alignmentLocus_left (v w : N) :
   have hz := (mem_zeroLocus Z p v).mp hp
   have hre := congrArg Complex.re hz
   have him := congrArg Complex.im hz
-  simp only [map_zero, Complex.zero_re, Complex.zero_im] at hre him
+  simp only [Complex.zero_re, Complex.zero_im] at hre him
   simp only [re, im]
   rw [hre, him]
   ring
@@ -102,7 +102,7 @@ theorem zeroLocus_subset_alignmentLocus_right (v w : N) :
   have hz := (mem_zeroLocus Z p w).mp hp
   have hre := congrArg Complex.re hz
   have him := congrArg Complex.im hz
-  simp only [map_zero, Complex.zero_re, Complex.zero_im] at hre him
+  simp only [Complex.zero_re, Complex.zero_im] at hre him
   simp only [re, im]
   rw [hre, him]
   ring
