@@ -2,13 +2,16 @@
 
 ## Place code by mathematics
 
-All stable Lean code lives below `DerivedAlgGeo/`, whose layout mirrors
-Mathlib's subject hierarchy directory for directory. Do not add new top-level
+All stable Lean code lives below `DerivedAlgGeo/`, whose layout follows
+Mathlib's broad subjects and the APIs it directly extends. Do not add new top-level
 libraries or restore retired repository roots; a new top-level subject must be
 a Mathlib subject and is added to `scripts/check_layering.py` by name.
 
 The placement rule has two tiers, stated in full in
-`docs/architecture/placement.md` and `CLAUDE.md`.
+[placement.md](docs/architecture/placement.md). The subject/application
+boundaries and compact issue/PR decision record are maintained in
+[mathematical-ownership.md](docs/architecture/mathematical-ownership.md).
+`CLAUDE.md` and `AGENTS.md` summarize the same rules for coding agents.
 
 1. **An extension of a Mathlib API lives at that API's Mathlib path**, under
    `DerivedAlgGeo/`, in that API's namespace. Derived categories, `Ext`, and
@@ -29,8 +32,10 @@ The placement rule has two tiers, stated in full in
    `Monoidal/Preadditive.lean`; a geometric realization of a categorical
    interface lives with the geometric object under `AlgebraicGeometry/`, as
    `Algebra/Category/ModuleCat/Abelian.lean` lives with `ModuleCat`. Within
-   this tier, the weakest vocabulary sufficient for the full public type is
-   the tie-breaker.
+   this tier, identify the independently useful mathematical subject and use
+   sufficient hypotheses to separate foundations from applications. Merely
+   using a Mathlib carrier does not make a new concept a direct extension of
+   its elementary API. Do not order subjects by their weakest vocabulary.
 
 `AlgebraicGeometry/` is organized by geometric object and never mirrors
 `CategoryTheory/`. Inside an object directory, files are named by the
@@ -52,14 +57,19 @@ Use Mathlib's established namespace when extending a Mathlib concept. A
 declaration in a geometric file may keep the namespace of the categorical
 structure it extends so that dot notation resolves. Add a same-named umbrella
 for a new non-leaf directory and export stable leaves through their nearest
-existing umbrellas.
+existing umbrellas. A neutral core may omit an application only with a
+documented exact exception in the coverage gate and another stable export/build
+route for that application. Check transitive imports through umbrellas.
 
 The dependency contract is `docs/architecture/layers.md`: only
 `AlgebraicGeometry/` and `Development/` import geometry, `Development/` is a
 leaf, geometry outside `Moduli/`, `Numerical/`, and
 `DerivedCategory/Stability/` never reaches the stability tree, weak stability
 never imports Bridgeland stability, and retired paths stay retired. Subjects
-are otherwise free to import one another as they do in Mathlib.
+are otherwise free to import one another as they do in Mathlib. These are the
+current broad mechanical checks. The finer root/consumer boundaries in the
+ownership policy remain review obligations until their source cutovers add
+focused checks; a green gate does not certify every placement decision.
 
 Derived-category theory is built once: Mathlib constructs `DerivedCategory C`,
 this repository extends it under `Algebra/Homology/DerivedCategory/`, geometry
@@ -75,6 +85,14 @@ Read [the canonical-root policy](docs/architecture/abstraction-tree.md) before
 adding a public structure, class, quotient carrier, category, or parallel
 presentation of an existing object.  The pull request must name the canonical
 root and explain how the specialization projects or compares to it.
+
+Keep three answers separate: which subject owns the declaration, which
+modules it imports, and which Lean map connects its specialization to the
+root. Comparisons import both presentations downstream; generic foundations
+must not import their special cases to state their agreement. Charge
+construction precedes walls, and general derived operations and perfectness
+precede their Fourier–Mukai and moduli consumers. The ownership policy gives
+the remaining subject examples and the hypotheses that a move must preserve.
 
 Do not create a paper-specific or geometry-specific sibling of an existing
 generic object.  In particular, use Mathlib's `Preadditive`/`Linear` hierarchy,
@@ -203,3 +221,14 @@ permitted here nor sufficient.
 Mark completed and newly confirmed ownership defects in
 `docs/architecture/cutover-ledger.md`. Do not use the ledger as an exception:
 new declarations must go directly to their canonical owner.
+
+Identify each path as current, confirmed target or proposed split. Use the
+existing root until its coordinated cutover; do not add a competing root at
+the proposed destination. Update affected issue path contracts and keep
+GitHub milestone membership, native dependencies and roadmap entries in
+agreement. A source-implementation issue stays open when only its policy or
+plan has been documented.
+
+Repository documents are the canonical record of these practices. GitHub
+Discussions can propose changes or explain a decision; link the versioned
+policy there rather than maintaining a second, divergent rulebook.

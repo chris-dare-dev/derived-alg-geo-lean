@@ -10,9 +10,13 @@ blocks should normally move it rather than add more declarations beside it.
 The [MO1 execution plan](../reviews/2026-09-13-mathematical-ownership-plan.md)
 tracks the [fifteen review findings](../reviews/2026-09-13-mathematical-ownership-review.md)
 in [milestone 52](https://github.com/chris-dare-dev/derived-alg-geo-lean/milestone/52).
-These are pending ownership repairs, not completed roots or policy exemptions.
+The standing [ownership policy](mathematical-ownership.md) and matching
+`CLAUDE.md`/`AGENTS.md` checklist codify the foundation/application boundary.
+These are pending source repairs, not completed roots or policy exemptions.
 [#1312](https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/1312)
-settles the declaration-level destinations and policy amendments before cutover.
+still settles the full declaration-level destinations and reconciles each
+affected issue's path contract before cutover. Codifying the policy does not
+complete that map, install the finer gates, or move a Lean declaration.
 
 - Charge roots, wall/period terminology and hyperbolic-extension/Mukai separation: #1313–#1315.
 - Generic numerical/Todd/transport separation and model ownership: #1316–#1317.

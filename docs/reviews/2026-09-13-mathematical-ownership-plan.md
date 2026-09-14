@@ -8,6 +8,13 @@ This plan creates a structural companion to CA1–CA3. The charge track already 
 
 ## Integration with the existing milestones
 
+The standing [ownership policy](../architecture/mathematical-ownership.md)
+codifies the review's general rules, with matching `CLAUDE.md`/`AGENTS.md`
+instructions and reconciled placement, abstraction and dependency guidance.
+This is partial progress on MO1.01. The complete declaration-level cutover map
+and affected issue path contracts still need reconciliation; no source move
+or new import gate is completed by codifying the policy.
+
 - [CA1, milestone 49](https://github.com/chris-dare-dev/derived-alg-geo-lean/milestone/49) retains the exponential kernel, correction inhabitant, discriminant, twist and fourfold constructions. Closed #1219–#1221 are reused. MO1 extracts charge roots, removes parent-to-specialization imports and organizes numerical models. #1223 is a native prerequisite of the lattice move.
 - [CA2, milestone 50](https://github.com/chris-dare-dev/derived-alg-geo-lean/milestone/50) retains rotation, the (3,2) tilt node and adjudication of tilt/nu spellings (#1226–#1228). MO1 gives charge families an owner upstream of walls and separates the wall notions. The tilt-dependent rotation comparison stays downstream of the neutral core.
 - [CA3, milestone 51](https://github.com/chris-dare-dev/derived-alg-geo-lean/milestone/51) retains bridge-first #1229 and conditional root review #1230. The lattice move waits for #1229 and #1223, preserves the public Mukai.pairing root and the weighted/factor-of-two comparisons, and creates no competing graded root. Fin-indexed and product coordinates require the actual equivalence, not an assumed definitional equality.
