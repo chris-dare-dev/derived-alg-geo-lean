@@ -8,6 +8,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Bifunctor
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Thick
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Local
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Projection
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
@@ -481,3 +482,25 @@ is audited under AlgebraicGeometry.
 #print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.coprodClosure_isRightAdmissible
 #print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.rightProjectionData
 #print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.rightProjectionData_preservesSmallCoproducts
+
+/-! ## A t-structure is determined by its aisle, and restrictions along a functor (SF11.2)
+
+`ext_le` is the engine behind the uniqueness in Remark 4.6(1) of
+arXiv:1902.08184: the connective half is the right orthogonal of the
+coconnective one, so pinning the aisle pins the t-structure. `Restriction`
+is one clause of `S`-locality at one functor; the quantifier over the
+quasi-compact opens of a base is geometric and is not taken here.
+-/
+
+#print axioms CategoryTheory.Triangulated.TStructure.ext
+#print axioms CategoryTheory.Triangulated.TStructure.ge_eq_of_le_eq
+#print axioms CategoryTheory.Triangulated.TStructure.ext_le
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.tStructure
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.isTExact
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.mk.inj
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.TStructure.RestrictsAlong
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.restrictsAlong
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.tStructure_eq_of_le_eq
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.id
