@@ -17,6 +17,10 @@ The second half restricts a chosen right projection along the inclusion of an
 object property, provided the ambient projection preserves that property.
 This is the precise categorical obligation needed when passing a strong
 semiorthogonal decomposition to a bounded subcategory.
+
+`Preserves` is stated for one property at a time and is closed under
+conjunction, so a restriction whose defining property is a conjunction -- a
+bounded *and* coherent locus, say -- splits into one obligation per conjunct.
 -/
 
 noncomputable section
@@ -115,6 +119,20 @@ variable {C : Type u₁} [Category.{v₁} C] [Preadditive C] [HasZeroObject C]
 /-- All component projections preserve an object property `P`. -/
 def Preserves (P : ObjectProperty C) : Prop :=
   ∀ i, P ≤ P.inverseImage (Q.ambientProjection i)
+
+omit [HasZeroObject C] [HasShift C ℤ] [∀ (n : ℤ), (shiftFunctor C n).Additive]
+  [Pretriangulated C] in
+/-- Preservation only depends on the objects a property holds of. -/
+theorem Preserves.of_iff {Q : S.RightProjectionData} {P₁ P₂ : ObjectProperty C}
+    (h : ∀ X, P₁ X ↔ P₂ X) (hP : Q.Preserves P₁) : Q.Preserves P₂ :=
+  fun i X hX ↦ (h _).1 (hP i X ((h X).2 hX))
+
+omit [HasZeroObject C] [HasShift C ℤ] [∀ (n : ℤ), (shiftFunctor C n).Additive]
+  [Pretriangulated C] in
+/-- Two preserved properties are preserved together. -/
+theorem Preserves.inf {Q : S.RightProjectionData} {P₁ P₂ : ObjectProperty C}
+    (hP₁ : Q.Preserves P₁) (hP₂ : Q.Preserves P₂) : Q.Preserves (P₁ ⊓ P₂) :=
+  fun i X hX ↦ ⟨hP₁ i X hX.1, hP₂ i X hX.2⟩
 
 /-- Restrict all chosen component projections to a full subcategory. -/
 def restrict (hP : Q.Preserves P) :
