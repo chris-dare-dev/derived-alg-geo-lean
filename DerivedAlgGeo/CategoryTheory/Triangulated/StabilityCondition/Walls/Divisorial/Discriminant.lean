@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Slice
+import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 
 /-!
 # Discriminants and the Hodge index on a real divisor space
@@ -227,6 +228,22 @@ the intersection form of the divisor space. -/
 def discriminant (E : N) : ℝ :=
   S.pair (ch.chOne E) (ch.chOne E) - 2 * ch.rank E * ch.chTwo E
 
+/-- **The divisorial discriminant is the Mukai self-pairing** of the
+Chern-character triple, at coefficient ring `ℝ` and the divisor space's own
+intersection form.
+
+This is the leaf that fixes the arity: the middle summand here is `D`, an
+arbitrary real divisor space, not a copy of `ℝ`. The root generalises over the
+coefficient ring for the sake of the `ℚ`- and `A`-valued leaves, never over the
+number of slots. -/
+theorem discriminant_eq_selfPairing (E : N) :
+    ch.discriminant S E
+      = Mukai.selfPairing S.intersection (ch.rank E, ch.chOne E, ch.chTwo E) := by
+  rw [Mukai.selfPairing_mk, discriminant]
+  show _ - 2 * ch.rank E * ch.chTwo E = _ - 2 * (ch.rank E * ch.chTwo E)
+  rw [DivisorSpace.pair]
+  ring
+
 /-- The discriminant is invariant under every `B`-twist: `Δ(ch^B) = Δ(ch)`. -/
 theorem discriminant_twist (B : D) (E : N) :
     (ch.twist S B).discriminant S E = ch.discriminant S E := by
@@ -287,6 +304,59 @@ coordinates: the shape consumed by the wall-plane
 `Wall.NumClass.discr`, with the rank slot weighted by `∫H²`. -/
 def discr (E : N) : ℝ :=
   Dc.degree E ^ 2 - 2 * Dc.hyperplaneSquare * Dc.rank E * Dc.chTwo E
+
+/-- **The compressed discriminant is the Mukai self-pairing** with the rank slot
+carrying the polarisation square.
+
+The triple is `(∫H²·rk, ∫H·ch₁, ∫ch₂)`, **not** `(rk, ∫H·ch₁, ∫ch₂)`. The `∫H²`
+weight is what makes this the same quantity as the uncompressed
+`ChernCharacter.discriminant` on the rank-one slice, and dropping it is the
+error the surface transport's docstring already warns about. -/
+theorem discr_eq_selfPairing (E : N) :
+    Dc.discr E
+      = Mukai.selfPairing (LinearMap.mul ℝ ℝ)
+          (Dc.hyperplaneSquare * Dc.rank E, Dc.degree E, Dc.chTwo E) := by
+  rw [Mukai.selfPairing_mk, discr]
+  show _ = Dc.degree E * Dc.degree E - 2 * (Dc.hyperplaneSquare * Dc.rank E * Dc.chTwo E)
+  ring
+
+end ChargeCoordinates
+
+namespace ChernCharacter
+
+variable (ch : ChernCharacter N D) (S : DivisorSpace D)
+
+/-- **The integral bridge: on the rank-one slice the compressed discriminant is
+`∫H²` times the uncompressed one.**
+
+`Δ_H(E) = (∫H²) · Δ(E)` whenever `c₁(E)` is a multiple of `H`, which is exactly
+the hypothesis `hc`. Both sides are `Mukai.selfPairing` of the same root — the
+left at the compressed triple, the right at the divisorial one — so the whole
+content is where the weight goes.
+
+**The weight cannot be normalised away.** The two agree on the nose only when
+`∫H² = 1`; at any other polarisation degree they differ by that factor, and
+reading the compressed discriminant as the uncompressed one is the error
+`Numerical/Stability/WallTransport.lean` records having made once. The
+statement is confined to the rank-one slice by necessity: off it, `c₁` has
+components orthogonal to `H` that the compression discards, so no factor
+relates the two.
+
+The companion statement on the pairings rather than the discriminants belongs
+to the bridge epic beside `Mukai.realPairing`; this is the discriminant-level
+form, and that one should be stated against it rather than re-derived. -/
+theorem coordinatesAt_discr_eq (H : D) {x : ℝ} (E : N) (hc : ch.chOne E = x • H) :
+    (ch.coordinatesAt S H).discr E = S.pair H H * ch.discriminant S E := by
+  rw [ChargeCoordinates.discr, discriminant, coordinatesAt_degree,
+    coordinatesAt_rank, coordinatesAt_chTwo, coordinatesAt_hyperplaneSquare, hc]
+  simp only [DivisorSpace.pair, map_smul, LinearMap.smul_apply, smul_eq_mul]
+  ring
+
+end ChernCharacter
+
+namespace ChargeCoordinates
+
+variable (Dc : ChargeCoordinates N)
 
 end ChargeCoordinates
 

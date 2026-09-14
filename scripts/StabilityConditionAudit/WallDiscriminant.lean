@@ -30,6 +30,7 @@ strictly in the negative regime, so `wall_eq_of_meet_needs_charge` and
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.NumClass.scale_deg
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.NumClass.scale_ch2
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.NumClass.discr_scale
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.NumClass.discr_eq_selfPairing
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.discr_eq_neg_of_charge_eq_zero
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.charge_ne_zero_of_discr_nonneg
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.wall_eq_of_meet_of_discr_nonneg

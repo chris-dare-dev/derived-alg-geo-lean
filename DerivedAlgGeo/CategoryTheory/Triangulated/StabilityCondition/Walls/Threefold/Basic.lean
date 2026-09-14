@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.ChargeFamily
+import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 
 /-!
 # The threefold charge in the `(α, β)` half plane
@@ -202,6 +203,20 @@ theorem wallValue_div_alpha (α β : ℝ) (v w : NumClass) :
 /-- The `H`-discriminant of a compressed threefold class,
 `Δ_H = (∫H²ch₁)² − 2(∫H³ch₀)(∫H·ch₂)`. -/
 def discr (v : NumClass) : ℝ := v.deg1 ^ 2 - 2 * v.deg0 * v.deg2
+
+/-- **The threefold discriminant is the Mukai self-pairing** of the first three
+slots, at coefficient ring `ℝ` with the multiplication of `ℝ` as the form.
+
+The fourth slot `∫ch₃` is not in the triple and is not meant to be: the arity of
+the root is fixed at three. Generalising the root over the DIMENSION instead
+would make this leaf unreachable — a dimension-indexed self-pairing vanishes
+identically in odd degree — which is recorded as a negative result in
+`docs/architecture/abstraction-tree.md`. -/
+theorem discr_eq_selfPairing (v : NumClass) :
+    discr v = Mukai.selfPairing (LinearMap.mul ℝ ℝ) (v.deg0, v.deg1, v.deg2) := by
+  rw [Mukai.selfPairing_mk]
+  show v.deg1 ^ 2 - 2 * v.deg0 * v.deg2 = v.deg1 * v.deg1 - 2 * (v.deg0 * v.deg2)
+  ring
 
 /-- **The tilt slope** `ν_{α,β}`, junk where the denominator vanishes — the same
 convention the surface slope uses at rank zero. -/

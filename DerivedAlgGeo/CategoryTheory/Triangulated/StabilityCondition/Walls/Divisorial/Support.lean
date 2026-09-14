@@ -86,19 +86,18 @@ variable (S : DivisorSpace D)
 /-- **The discriminant as a genuine quadratic form** on the real extension:
 `Δ(r, c, s) = c² - 2rs`.
 
-This is the self-pairing of the Mukai form *without* the halving of
-`Mukai.realForm`; the discriminant convention of Macrì--Schmidt is the unhalved
-one, and `realDiscriminant_toRealExtension` is what pins the choice. -/
+This is `Mukai.realDiscriminant` at `b = S.intersection`, and nothing more.
+The form itself lives in `Lattice/Mukai/RealForm.lean` beside the pairing it is
+built from: this file imports two of the discriminant leaves the form parents,
+so the parent could not live here. `realDiscriminant_toRealExtension` below is
+what pins the unhalved convention against `ChernCharacter.discriminant`. -/
 def realDiscriminant : QuadraticForm ℝ (Mukai.RealExtension D) :=
-  (Mukai.realBilin S.intersection).toQuadraticMap
+  Mukai.realDiscriminant S.intersection
 
 @[simp]
 theorem realDiscriminant_apply (r : ℝ) (c : D) (s : ℝ) :
     S.realDiscriminant (r, c, s) = S.pair c c - 2 * r * s := by
-  rw [realDiscriminant, LinearMap.BilinMap.toQuadraticMap_apply, Mukai.realBilin_apply,
-    Mukai.realPairing_apply]
-  simp only [DivisorSpace.pair]
-  ring
+  rw [realDiscriminant, Mukai.realDiscriminant_mk, DivisorSpace.pair]
 
 /-- **The twisted `ω`-degree** `v ↦ ω · (c - r B)`, as a linear functional on the
 real extension.  It is the linear form whose square `Δ^C` adds to `Δ`. -/

@@ -68,7 +68,7 @@ theorem pairingDet_exp (hb : ∀ x y : V, b x y = b y x) (β ω β' ω' : V) :
         - (b β ω' - b β' ω') * (b ω β' - b β ω) := by
   rw [PeriodDomain.pairingDet, polar_realForm b hb, polar_realForm b hb, polar_realForm b hb,
     polar_realForm b hb]
-  simp only [realPairing, expRe, expIm]
+  simp only [realPairing, pairing, expRe, expIm]
   ring
 
 section Path

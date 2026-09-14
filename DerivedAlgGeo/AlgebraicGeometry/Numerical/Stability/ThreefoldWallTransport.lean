@@ -206,8 +206,8 @@ theorem betaTwist_toNumClass (β : ℚ) (E : N) :
 /-- The compressed discriminant is the `H`-twisted discriminant of `BMT.lean`. -/
 theorem discr_betaTwist_toNumClass (β : ℚ) (E : N) :
     Wall.Threefold.discr (Wall.Threefold.betaTwist (β : ℝ) (toNumClass V P E)) =
-      ((discrHBeta V P β E : ℚ) : ℝ) := by
-  rw [betaTwist_toNumClass, discrHBeta]
+      ((discrHBeta V P E : ℚ) : ℝ) := by
+  rw [betaTwist_toNumClass, ← discrHBeta_beta_inert V P β E, degH1Beta, degH2Beta]
   simp only [Wall.Threefold.discr, Wall.Threefold.NumClass.deg0,
     Wall.Threefold.NumClass.deg1, Wall.Threefold.NumClass.deg2]
   push_cast
@@ -218,7 +218,7 @@ defines.**  There is one `Q` in the library, not two. -/
 theorem Q_toNumClass (α β : ℚ) (E : N) :
     Wall.Threefold.Q (α : ℝ) (β : ℝ) (toNumClass V P E) = ((Q V P α β E : ℚ) : ℝ) := by
   rw [Wall.Threefold.Q, discr_betaTwist_toNumClass, betaTwist_toNumClass,
-    Threefold.Q, discrHBeta]
+    Threefold.Q, ← discrHBeta_beta_inert V P β E, degH1Beta, degH2Beta]
   simp only [Wall.Threefold.NumClass.deg1, Wall.Threefold.NumClass.deg2,
     Wall.Threefold.NumClass.deg3]
   push_cast

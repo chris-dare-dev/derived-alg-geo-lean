@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Numerical.Basic
+import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 
 /-!
 # The Bogomolov discriminant of a numerical class
@@ -71,6 +72,23 @@ def discr (v : NumClass) : ℝ := v.deg ^ 2 - 2 * v.rk * v.ch2
 
 /-- `discr` unfolded, for rewriting. -/
 theorem discr_eq (v : NumClass) : v.discr = v.deg ^ 2 - 2 * v.rk * v.ch2 := rfl
+
+/-- **This discriminant is the Mukai self-pairing**, at coefficient ring `ℝ`
+and middle summand `ℝ` with its multiplication as the bilinear form.
+
+`NumClass` is `ℝ × ℝ × ℝ` and `Mukai.RealExtension ℝ` is the same type, so
+there is no transport here: the two sides are the same expression once
+`selfPairing_mk` is unfolded. The triple is read `(r, c, s) = (rk, deg, ch2)`,
+which is why the degree lands in the middle slot and the rank pairs with `ch₂`.
+
+`Mukai.pairing` is generalised over its coefficient ring precisely so that this
+projection and the six others can all name it; see
+`LinearAlgebra/Lattice/Mukai/Basic.lean`. -/
+theorem discr_eq_selfPairing (v : NumClass) :
+    v.discr = Mukai.selfPairing (LinearMap.mul ℝ ℝ) v := by
+  rw [discr_eq, Mukai.selfPairing_mk]
+  show _ = v.deg * v.deg - 2 * (v.rk * v.ch2)
+  ring
 
 /-- At rank zero the discriminant is the square of the degree. -/
 theorem discr_of_rk_eq_zero {v : NumClass} (h : v.rk = 0) : v.discr = v.deg ^ 2 := by

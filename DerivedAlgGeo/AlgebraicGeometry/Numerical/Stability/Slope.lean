@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Discriminant
+import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3
 
 /-!
@@ -178,6 +179,23 @@ noncomputable def discrH (E : N) : ℚ :=
 theorem discrH_eq (E : N) :
     discrH V P E = degH V P E ^ 2
       - 2 * V.ring.degree (P.cls ^ 2) * (V.rank E : ℚ) * V.ring.degree (V.chComp E 2) := rfl
+
+/-- **The tilt discriminant is the Mukai self-pairing**, at coefficient ring
+`ℚ` with the multiplication of `ℚ` as the bilinear form.
+
+The rank slot carries `∫H²`, exactly as it does in the `(s,t)` wall plane. That
+weighting is why `discrH` is the quantity `Wall.NumClass.discr` computes on a
+transported class and `∫Δ(E)` is not; see `WallTransport.lean`, which records
+the mistake of reading it the other way. -/
+theorem discrH_eq_selfPairing (E : N) :
+    discrH V P E
+      = Mukai.selfPairing (LinearMap.mul ℚ ℚ)
+          (V.ring.degree (P.cls ^ 2) * (V.rank E : ℚ), degH V P E,
+            V.ring.degree (V.chComp E 2)) := by
+  rw [Mukai.selfPairing_mk, discrH_eq]
+  show _ = degH V P E * degH V P E
+    - 2 * (V.ring.degree (P.cls ^ 2) * (V.rank E : ℚ) * V.ring.degree (V.chComp E 2))
+  ring
 
 end Surface
 
