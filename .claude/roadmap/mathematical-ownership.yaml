@@ -165,7 +165,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.03 — Separate positive frames, positive planes and the different wall loci
-  status: blocked
+  status: planned
   summary: 'Give the current period-domain and wall APIs names and owners matching what they actually
     define, with explicit maps between frame, plane, numerical-locus and stability interpretations. Consumes
     the ownership split in MO1.02. Relates to CA2 wall invariance, but does not duplicate #1226 or assert
@@ -198,8 +198,6 @@ items:
     carries its regularity/transversality hypotheses; equal-phase adapters carry nonzero/sign conditions.
   - Keep existing wall/local-finiteness results with explicit comparison theorems after relabeling; actual
     destabilization requires categorical existence data. No theorem is strengthened by terminology alone.
-  blocked_by:
-  - 1313
 - id: mathematical-ownership-t4
   gh_issue: 1315
   kind: task
