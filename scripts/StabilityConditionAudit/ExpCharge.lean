@@ -3,7 +3,7 @@ Exponential-charge slice of the StabilityCondition audit. The kernel is pure
 arithmetic on compressed degrees; the comparisons are the two existing charge
 families proved to be it.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential
 
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.coeff
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.coeff_zero

@@ -76,6 +76,14 @@ still broad mechanical checks. The finer root/consumer boundaries in the
 ownership policy remain review obligations until their own source cutovers add
 focused checks; a green gate does not certify every placement decision.
 
+Charge construction is one focused enforced boundary: paired-functional,
+quadratic bounds and Hodge input live under `LinearAlgebra/`; additive charge
+families and exponential/numerical/divisorial constructors live under
+`CategoryTheory/Triangulated/StabilityCondition/CentralCharge/`; `Walls/`
+contains the downstream loci, `Support/` the support predicates, and
+`AlgebraicGeometry/Numerical/` the geometric realizations. The layering gate
+checks these import closures and retired owner paths.
+
 Derived-category theory is built once: Mathlib constructs `DerivedCategory C`,
 this repository extends it under `Algebra/Homology/DerivedCategory/`, geometry
 proves `Abelian (Coh X)` and defines `Dᵇ(Coh X)` as an abbreviation under

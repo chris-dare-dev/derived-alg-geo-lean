@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Numerical.Surface
 import Mathlib.Tactic
 
 /-!
@@ -97,35 +97,7 @@ what a future binding is checked against.
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall
 
-/-- A numerical class `(r, c, d)`.
-
-A triple of reals. It is **not** `ch(E)` for a sheaf `E`; see the module
-docstring. -/
-abbrev NumClass : Type := ℝ × ℝ × ℝ
-
-namespace NumClass
-
-/-- The rank coordinate. -/
-def rk (v : NumClass) : ℝ := v.1
-
-/-- The degree coordinate, standing for `ch₁ · H`. -/
-def deg (v : NumClass) : ℝ := v.2.1
-
-/-- The second coordinate, standing for `ch₂`. -/
-def ch2 (v : NumClass) : ℝ := v.2.2
-
-end NumClass
-
 open NumClass
-
-/-! ### The twisted charge -/
-
-/-- The real part of the twisted charge at `(s, t)`. -/
-noncomputable def reZ (s t : ℝ) (v : NumClass) : ℝ :=
-  -v.ch2 + s * v.deg - (s ^ 2 / 2) * v.rk + (t ^ 2 / 2) * v.rk
-
-/-- The imaginary part of the twisted charge at `(s, t)`. -/
-def imZ (s t : ℝ) (v : NumClass) : ℝ := t * (v.deg - s * v.rk)
 
 /-! ### The three minors
 

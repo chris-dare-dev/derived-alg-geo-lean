@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Orientation
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.WallFiniteness
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Continuous
 
 /-!
 # A Sylvester criterion for a positive pair, and openness

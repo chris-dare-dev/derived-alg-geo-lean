@@ -1,0 +1,2 @@
+# The neutral paired-functional root may not acquire stability dependencies.
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Family

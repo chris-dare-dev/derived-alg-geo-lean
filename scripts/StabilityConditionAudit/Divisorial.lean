@@ -2,7 +2,7 @@
 Divisorial slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 
-This subtree is the uncompressed counterpart of Walls/Numerical/: the same
+The central-charge owner is the uncompressed counterpart of the numerical model: the same
 central-charge arithmetic, carried out on a real divisor space with a symmetric
 intersection form instead of on three compressed real coordinates. It contains
 NO scheme, sheaf, numerical intersection ring, heart, slicing, or stability
@@ -11,7 +11,8 @@ theorem; both of those are proposition-valued certificates supplied by the
 caller. Its geometric adapters live under AlgebraicGeometry/Numerical/Stability/
 and are audited in the AlgebraicGeometry lane.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial
 open CategoryTheory.Triangulated
 
 /-! ## Compressed charge coordinates

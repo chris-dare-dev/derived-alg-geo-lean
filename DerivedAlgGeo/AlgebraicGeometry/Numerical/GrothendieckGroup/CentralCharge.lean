@@ -26,8 +26,6 @@ statements about classes rather than about a quadratic space:
   numerical terms**: a class killed by the charge has negative Mukai square.
 * `numericalCharge_ne_zero_of_nonneg` — a class of nonnegative Mukai square is
   never killed.
-* `mem_wall_iff_numericalCharge_eq_zero` — a wall is a vanishing charge, for the
-  class of an object rather than for a raw lattice vector.
 
 ## What is still not here
 
@@ -135,14 +133,6 @@ theorem numericalCharge_ne_zero_of_nonneg [FiniteDimensional ℝ W]
   rw [realForm_extendMap_mukaiVector hf E]
   have : (0 : ℝ) ≤ ((D.mukaiForm E E : ℤ) : ℝ) := by exact_mod_cast hsq
   linarith
-
-/-- **A wall is a vanishing charge**, for the class of an object. -/
-theorem mem_wall_iff_numericalCharge_eq_zero (hb : ∀ x y : W, bR x y = bR y x)
-    (hω : 0 < bR ω ω) (E : N) :
-    PeriodDomain.pairSpan (Mukai.expRe bR β ω) (Mukai.expIm bR β ω) ∈
-        PeriodDomain.wall (Mukai.realForm bR) (Mukai.extendMap f (D.mukaiVectorHom E)) ↔
-      D.numericalCharge bR f β ω E = 0 :=
-  Mukai.mem_wall_iff_expCharge_eq_zero bR β ω hb hω
 
 end AdditiveMukaiData
 
