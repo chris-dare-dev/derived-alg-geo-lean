@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Charge
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential.Kernel
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential.Twist
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.CentralCharge
 
 /-!
@@ -69,6 +69,33 @@ namespace Divisorial
 
 variable {D : Type*} [AddCommGroup D] [Module ℝ D]
 variable {N : Type*} [AddCommGroup N]
+
+/-- Scalar twisting commutes with the weighted surface degree presentation. -/
+theorem ChargeCoordinates.twistByScalar_eq_exp (D : ChargeCoordinates N) (β : ℝ) (E : N) :
+    ![(D.twistByScalar β).hyperplaneSquare * (D.twistByScalar β).rank E,
+      (D.twistByScalar β).degree E, (D.twistByScalar β).chTwo E] =
+      Exp.twist 2 β ![D.hyperplaneSquare * D.rank E, D.degree E, D.chTwo E] := by
+  funext i
+  fin_cases i <;>
+    norm_num [Exp.twist_apply, Fin.sum_univ_succ, Nat.factorial,
+      ChargeCoordinates.twistByScalar] <;> ring
+
+/-- Along `B = βH`, twisting in the full divisor space commutes with compression.
+For an arbitrary `B`, the compressed degrees do not determine the twist. -/
+theorem ChernCharacter.twist_rankOne_eq_exp (ch : ChernCharacter N D)
+    (S : DivisorSpace D) (H : D) (β : ℝ) (E : N) :
+    ![S.pair H H * (ch.twist S (β • H)).rank E,
+      S.pair H ((ch.twist S (β • H)).chOne E), (ch.twist S (β • H)).chTwo E] =
+      Exp.twist 2 β ![S.pair H H * ch.rank E, S.pair H (ch.chOne E), ch.chTwo E] := by
+  have h := ChargeCoordinates.twistByScalar_eq_exp (ch.coordinatesAt S H) β E
+  simp only [ChernCharacter.coordinatesAt_hyperplaneSquare, ChernCharacter.coordinatesAt_rank,
+    ChernCharacter.coordinatesAt_degree, ChernCharacter.coordinatesAt_chTwo] at h
+  rw [← h]
+  funext i
+  fin_cases i <;>
+    simp [ChargeCoordinates.twistByScalar, ChernCharacter.coordinatesAt,
+      DivisorSpace.pair, map_sub, map_smul, smul_eq_mul] <;> ring_nf
+  simp
 
 /-- `<w, x>` for `w = B + i*omega`, as a complex number. -/
 def cPair (S : DivisorSpace D) (P : StabilityParameters D) (x : D) : ℂ :=
