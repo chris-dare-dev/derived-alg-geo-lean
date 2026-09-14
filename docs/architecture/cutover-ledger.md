@@ -305,6 +305,9 @@ and no numerical model is identified with a scheme.
 | `AlgebraicGeometry/Cohomology/Quasicoherent/Extensions.lean` | `AlgebraicGeometry/Modules/Quasicoherent/Extensions.lean` |
 | `AlgebraicGeometry/Divisors/ExteriorPower.lean` | `AlgebraicGeometry/Modules/ExteriorPower/Restriction.lean` |
 
+**Landed 2026-09-13** in #1325; see "Four Mathlib owners repaired" under
+Completed roots.
+
 Divisor-specific determinant and Cartier applications stay under `Divisors/`.
 A cohomological *proof* does not make cohomology the theorem's subject, which
 is the whole content of the third row. **Check the import graph while splitting
@@ -448,6 +451,28 @@ tree with modules that do not.
   instance relates `schemePerfect`, `schemeRelativePerfect` and
   `TwoTermPerfectDeterminantData`; SF8 (#517/#554/#723) keeps its
   construction, preservation and compact-perfect obligations.
+- Four Mathlib owners repaired (2026-09-13, finding 13): each path now agrees
+  with the API the file extends.
+  `Algebra/Category/ModuleCat/LinearDual/` is one subject in two files,
+  `Basic.lean` for the contravariant additive functor and `Exact.lean` for its
+  exactness over a field; the split across `CategoryTheory/ModuleCat/` and
+  `Algebra/Category/ModuleCat/` had filed the functor by its abstraction level
+  rather than by where `ModuleCat` is defined, and `CategoryTheory/ModuleCat/`
+  is retired.  `Algebra/Category/ModuleCat/Presheaf/ExteriorPower.lean` is
+  where the file always belonged: every declaration in it is in the
+  `PresheafOfModules` namespace, and nothing in it was sheaf-specific.
+  `AlgebraicGeometry/Modules/Quasicoherent/Extensions.lean` owns closure of
+  quasi-coherence under extensions -- a theorem about module sheaves whose
+  proof happens to go through affine cohomology, which is why it had been filed
+  under `Cohomology/`.  `AlgebraicGeometry/Modules/ExteriorPower/Restriction.lean`
+  owns the restriction comparison for module-sheaf exterior powers; the
+  divisor-specific determinant and Cartier consumers stay under `Divisors/`.
+  The cycle the review warned about does not occur: the two cohomological
+  imports of the extensions file reach nothing under `Modules/Quasicoherent/`
+  or the `Modules` umbrella, measured before the move, so no helper needed
+  splitting out.  Every fully qualified declaration name is unchanged; the one
+  audit record that moved slice is `ModuleCat.linearDualFunctor`, rejoining its
+  own siblings.  All four vacated paths are retired with no shims.
 
 - `H⁰` dg-functor compositor coherence and adjunction normalization
   (2026-09-13): `DGFunctor.h0CompIso_assoc`, `h0CompIso_comp_id`, and
@@ -1430,9 +1455,9 @@ tree with modules that do not.
 - Derived opposites and exact linear duality:
   `Algebra/Homology/DerivedCategory/Opposite.lean` owns the generic
   `DerivedCategory.OppositeComparison`;
-  `CategoryTheory/ModuleCat/LinearDual.lean` owns the bare contravariant
-  ModuleCat linear-dual functor,
-  `Algebra/Category/ModuleCat/LinearDual.lean` proves its exactness, and
+  `Algebra/Category/ModuleCat/LinearDual/Basic.lean` owns the bare
+  contravariant ModuleCat linear-dual functor,
+  `LinearDual/Exact.lean` beside it proves its exactness, and
   `Algebra/Homology/DerivedCategory/LinearDual.lean` owns the derived lift.
   Canonical and Serre duality consume those roots together with
   `AlgebraicGeometry/DerivedCategory/Coherent.lean`; the former geometric
@@ -1457,8 +1482,10 @@ tree with modules that do not.
 - Ordinary semilinear and top exterior-power algebra:
   `LinearAlgebra/ExteriorPower/`.
 - Exterior powers of presheaves of modules over an arbitrary ring presheaf:
-  `Algebra/Category/ModuleCat/Sheaf/ExteriorPower.lean`; scheme
-  sheafification and restriction comparisons remain geometric consumers.
+  `Algebra/Category/ModuleCat/Presheaf/ExteriorPower.lean`; scheme
+  sheafification remains a geometric consumer in
+  `Modules/ExteriorPower.lean`, and restriction comparison is
+  `Modules/ExteriorPower/Restriction.lean`.
 - Higher-categorical adjunctions: Mathlib's
   `CategoryTheory.Bicategory.Adjunction`, extended under
   `CategoryTheory/Bicategory/Adjunction/`; ordinary adjoint functors are the

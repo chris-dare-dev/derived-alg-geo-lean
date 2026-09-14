@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Abelian.Basic
-import DerivedAlgGeo.AlgebraicGeometry.Divisors.ExteriorPower
+import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower.Restriction
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.PicardGroup
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible

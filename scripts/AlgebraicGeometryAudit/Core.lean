@@ -3047,6 +3047,10 @@ about a quadratic space. -/
 #print axioms AlgebraicGeometry.fromTildeΓShortComplexHom_τ₁
 #print axioms AlgebraicGeometry.fromTildeΓShortComplexHom_τ₂
 #print axioms AlgebraicGeometry.fromTildeΓShortComplexHom_τ₃
+-- Closure of quasi-coherence under extensions. The theorem is about module
+-- sheaves; its proof goes through affine cohomology, which is why it used to
+-- live under Cohomology/. Owner since 2026-09-13 (MO1.14, #1325):
+-- AlgebraicGeometry/Modules/Quasicoherent/Extensions.lean.
 #print axioms AlgebraicGeometry.isQuasicoherent_middle_affine
 #print axioms AlgebraicGeometry.isQuasicoherent_middle
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderExtensions
