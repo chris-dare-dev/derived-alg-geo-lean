@@ -228,8 +228,11 @@ theorem isPositiveFrame_interp (hsig : HasSignatureTwo Q) {x₀ y₀ x y : M}
       (Submodule.smul_mem _ _ (proj_mem_pairSpan Q x₀ y₀ x))
       (Submodule.smul_mem _ _ (proj_mem_pairSpan Q x₀ y₀ y))
   have hpolar : polar (⇑Q) u w = 0 := (mem_orthogonal_iff.1 hwmem) u humem
-  have hQw : Q w ≤ 0 :=
-    nonpos_of_mem_orthogonal hsig (isPositivePlane_framePlane h₀) hwmem
+  -- pin the frame explicitly: leaving `p` to unification asks Lean to solve
+  -- `?p.1 =?= x₀` through `framePlane`, which does not terminate in budget
+  have h₀plane : IsPositivePlane Q (pairSpan x₀ y₀) :=
+    isPositivePlane_framePlane (p := (x₀, y₀)) h₀
+  have hQw : Q w ≤ 0 := nonpos_of_mem_orthogonal hsig h₀plane hwmem
   have hsum : Q u + Q w = Q (a • x + b • y) := by
     have huw : u + w = a • x + b • y := by rw [hu, hw]; module
     have := polar (⇑Q) u w

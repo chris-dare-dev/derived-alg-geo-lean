@@ -27,9 +27,10 @@ variable {M : Type*} [AddCommGroup M] [Module ℝ M] {Q : QuadraticForm ℝ M}
 
 /-- A class is orthogonal to the plane underlying a positive frame exactly when its paired complex
 functional vanishes. -/
-theorem mem_orthogonalityLocus_iff_centralCharge_eq_zero {x y : M} (hxy : IsPositiveFrame Q x y) {δ : M} :
+theorem mem_orthogonalityLocus_iff_centralCharge_eq_zero {x y : M}
+    (hxy : IsPositiveFrame Q x y) {δ : M} :
     framePlane (x, y) ∈ orthogonalityLocus Q δ ↔ centralCharge Q x y δ = 0 := by
-  rw [mem_orthogonalityLocus_iff_mem_orthogonal hxy, centralCharge_eq_zero_iff]
+  rw [mem_orthogonalityLocus_iff_mem_orthogonal hxy, framePlane_mk, centralCharge_eq_zero_iff]
 
 /-- A positive frame maps into the deleted-locus complement exactly when its paired complex
 functional kills no member of the cutting set. -/
@@ -40,7 +41,8 @@ theorem mem_positivePlanesAway_iff_centralCharge_ne_zero {x y : M} (hxy : IsPosi
   · rintro ⟨-, hcut⟩ δ hδ hz
     exact hcut δ hδ ((mem_orthogonalityLocus_iff_centralCharge_eq_zero hxy).mpr hz)
   · intro h
-    exact ⟨hxy, fun δ hδ hw => h δ hδ ((mem_orthogonalityLocus_iff_centralCharge_eq_zero hxy).mp hw)⟩
+    exact ⟨hxy, fun δ hδ hw =>
+      h δ hδ ((mem_orthogonalityLocus_iff_centralCharge_eq_zero hxy).mp hw)⟩
 
 end PeriodDomain
 
@@ -51,7 +53,8 @@ variable (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V)
 
 /-- A spherical orthogonality locus for the exponential pair is the vanishing
 locus of its additive exponential charge. -/
-theorem mem_orthogonalityLocus_iff_expCharge_eq_zero (hb : ∀ x y : V, b x y = b y x) (hω : 0 < b ω ω)
+theorem mem_orthogonalityLocus_iff_expCharge_eq_zero (hb : ∀ x y : V, b x y = b y x)
+    (hω : 0 < b ω ω)
     {δ : RealExtension V} :
     PeriodDomain.framePlane (expRe b β ω, expIm b β ω) ∈
       PeriodDomain.orthogonalityLocus (realForm b) δ ↔

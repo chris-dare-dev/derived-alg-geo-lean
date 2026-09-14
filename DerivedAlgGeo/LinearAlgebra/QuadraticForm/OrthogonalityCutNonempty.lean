@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositiveFrameOpen
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.OrthogonalityLocus
+import Mathlib.Topology.Baire.CompleteMetrizable
 
 /-!
 # Positive planes avoiding countably many orthogonality loci exist
