@@ -476,7 +476,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.11 — Move flatness and relative-perfect predicates out of the moduli consumer
-  status: blocked
+  status: done
   summary: 'Make geometric flatness, pseudo-coherence and Tor-amplitude predicates usable independently
     of the relative-perfect moduli problem. SF8 #517/#554 and #723 retain construction, preservation and
     compact-perfect obligations. The issue is foundational ownership, with the existing trust boundary
@@ -495,7 +495,6 @@ items:
   - area:derived
   - type:refactor
   - sev:high
-  - blocked
   acceptance:
   - Extract module flatness over a scheme morphism from Moduli/PerfectComplex/Relative to Modules/Flat
     (or the actual module owner agreed in MO1.01).

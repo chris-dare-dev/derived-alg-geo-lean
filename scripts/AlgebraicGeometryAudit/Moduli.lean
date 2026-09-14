@@ -28,62 +28,16 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms AlgebraicGeometry.affineFamilyUniversallyStableRelativePerfect_le_fullLocus
 #print axioms AlgebraicGeometry.affineFamilyUniversallyStableRelativePerfect_eq_fullLocus
 
-/-! ## Relative-perfect and universally-gluable scheme objects (#521) -/
+/-! ## Relative-perfect comparison (#521)
 
-#print axioms AlgebraicGeometry.Scheme.Modules.IsFlatOver
-#print axioms AlgebraicGeometry.schemePseudoCoherent
-#print axioms AlgebraicGeometry.schemePseudoCoherent_isClosedUnderIsomorphisms
-#print axioms AlgebraicGeometry.relativeOpenBaseChange
-#print axioms AlgebraicGeometry.relativeOpenTo
-#print axioms AlgebraicGeometry.relativeOpenTo_left
-#print axioms AlgebraicGeometry.relativeOpenTo_isOpenImmersion
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.flatOverBase
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.lower
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.lower_le_upper
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.mem_openSubset
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.mk.inj
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.model
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.openSubset
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.represents
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.strictlyGE
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.strictlyLE
-#print axioms AlgebraicGeometry.LocalFiniteTorAmplitudeChart.upper
-#print axioms AlgebraicGeometry.schemeLocallyFiniteTorAmplitudeOver
-#print axioms AlgebraicGeometry.schemeLocallyFiniteTorAmplitudeOver_isClosedUnderIsomorphisms
-#print axioms AlgebraicGeometry.schemeRelativePerfect
-#print axioms AlgebraicGeometry.schemeRelativePerfect_isClosedUnderIsomorphisms
+The relative-perfect predicates themselves moved to
+`AlgebraicGeometry/DerivedCategory/Perfect/Relative.lean` on 2026-09-13
+(MO1.11, #1322) and are audited in `SchemeDerived.lean`; stalkwise
+flatness moved to `Modules/Flat.lean` and is audited in
+`ModuleFlat.lean`. What remains here is the comparison this subtree
+owns, in `Moduli/PerfectComplex/Comparison.lean`. -/
+
 #print axioms AlgebraicGeometry.schemeRelativePerfect_le_schemePseudoCoherent
-#print axioms AlgebraicGeometry.SchemeRelativePerfectCategory
-#print axioms AlgebraicGeometry.SchemeRelativePerfectCategory.exists_boundedCoherentRepresentative
-#print axioms AlgebraicGeometry.SchemeRelativePerfectCategory.perfect_iff_compact
-#print axioms AlgebraicGeometry.GeometricFiberModel
-#print axioms AlgebraicGeometry.GeometricFiberModel.fiberComplex
-#print axioms AlgebraicGeometry.GeometricFiberModel.fiberObject
-#print axioms AlgebraicGeometry.GeometricFiberModel.flatOverBase
-#print axioms AlgebraicGeometry.GeometricFiberModel.mk.inj
-#print axioms AlgebraicGeometry.GeometricFiberModel.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.GeometricFiberModel.represents
-#print axioms AlgebraicGeometry.GeometricFiberModel.totalModel
-#print axioms AlgebraicGeometry.UniversallyGluableData
-#print axioms AlgebraicGeometry.UniversallyGluableData.fiberModel
-#print axioms AlgebraicGeometry.UniversallyGluableData.mk.inj
-#print axioms AlgebraicGeometry.UniversallyGluableData.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.UniversallyGluableData.negativeExtVanishes
-#print axioms AlgebraicGeometry.schemeUniversallyGluableRelativePerfect
-#print axioms AlgebraicGeometry.UniversallyGluableData.ofIso
-#print axioms AlgebraicGeometry.schemeUniversallyGluableRelativePerfect_isClosedUnderIsomorphisms
-#print axioms AlgebraicGeometry.SchemeUniversallyGluableCategory
-#print axioms AlgebraicGeometry.zeroModuleComplex
-#print axioms AlgebraicGeometry.zeroModuleComplex_isZero
-#print axioms AlgebraicGeometry.schemePseudoCoherent_zero
-#print axioms AlgebraicGeometry.zeroLocalFiniteTorAmplitudeChart
-#print axioms AlgebraicGeometry.schemeLocallyFiniteTorAmplitudeOver_zero
-#print axioms AlgebraicGeometry.schemeRelativePerfect_zero
-#print axioms AlgebraicGeometry.zeroGeometricFiberModel
-#print axioms AlgebraicGeometry.universallyGluableDataZero
-#print axioms AlgebraicGeometry.schemeUniversallyGluableRelativePerfect_zero
 
 /-! ## Perfect-notion comparisons -/
 

@@ -270,6 +270,9 @@ categorical rename is optional and may be declined with that reason recorded.
 | Application adapter | presheaves, restriction stability, boundedness, openness, atlases and algebraicity stay under `Moduli/PerfectComplex/` |
 | Comparison owner | `Moduli/PerfectComplex/Comparison.lean` keeps the one-way adapters; the three-notion ledger in `docs/architecture/placement.md` stands unchanged |
 
+**Landed 2026-09-13** in #1322; see "Relative perfection before moduli" under
+Completed roots.
+
 The source's own warning survives the move verbatim: the bounded-above
 finitely-presented-cohomology predicate is the **Noetherian** criterion and is
 not standard pseudo-coherence on an arbitrary scheme. The move must not promote
@@ -418,6 +421,33 @@ tree with modules that do not.
   was added to the linear core. SRF1 (#897--#899) keeps its full-faithfulness,
   transport and geometric-duality obligations; this cutover proves none of
   them.
+- Relative perfection before moduli (2026-09-13, finding 11):
+  `AlgebraicGeometry/DerivedCategory/Perfect/Relative.lean` now owns
+  `schemePseudoCoherent`, `LocalFiniteTorAmplitudeChart`,
+  `schemeLocallyFiniteTorAmplitudeOver`, `schemeRelativePerfect`,
+  `SchemeRelativePerfectCategory` with its bounded-coherent representative and
+  compact/perfect theorems, `GeometricFiberModel`, `UniversallyGluableData`,
+  `schemeUniversallyGluableRelativePerfect` and the zero models that inhabit
+  them.  `AlgebraicGeometry/Modules/Flat.lean` owns
+  `Scheme.Modules.IsFlatOver`, which mentions one module sheaf and one
+  morphism and no derived category at all.  Both were declared inside
+  `Moduli/PerfectComplex/Relative.lean`, whose only remaining role was to be
+  their first consumer; that path is retired with no shim.
+  `Moduli/PerfectComplex/` keeps the presheaf, restriction-stability,
+  boundedness, openness, atlas and algebraicity layer, and
+  `Comparison.lean` keeps the one-way adapters between the three uses of
+  "perfect".
+  Measured, not asserted: the transitive repository closure of
+  `DerivedCategory/Perfect` is 117 modules with **no** `Moduli/` dependency and
+  **no** stability dependency, and `Modules/Flat` closes over a single module.
+  Every fully qualified declaration name is unchanged.
+  The scope note survives verbatim: `schemePseudoCoherent` is the locally
+  Noetherian cohomological criterion, on a general scheme it diverges from
+  standard pseudo-coherence in both directions, and any theorem quantifying
+  over non-Noetherian bases is about that predicate.  No global equivalence
+  instance relates `schemePerfect`, `schemeRelativePerfect` and
+  `TwoTermPerfectDeterminantData`; SF8 (#517/#554/#723) keeps its
+  construction, preservation and compact-perfect obligations.
 
 - `H⁰` dg-functor compositor coherence and adjunction normalization
   (2026-09-13): `DGFunctor.h0CompIso_assoc`, `h0CompIso_comp_id`, and
