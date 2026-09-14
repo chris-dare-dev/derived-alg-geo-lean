@@ -198,8 +198,6 @@ items:
     carries its regularity/transversality hypotheses; equal-phase adapters carry nonzero/sign conditions.
   - Keep existing wall/local-finiteness results with explicit comparison theorems after relabeling; actual
     destabilization requires categorical existence data. No theorem is strengthened by terminology alone.
-  blocked_by:
-  - 1313
 - id: mathematical-ownership-t4
   gh_issue: 1315
   kind: task
