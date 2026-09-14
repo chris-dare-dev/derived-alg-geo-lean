@@ -14,6 +14,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.PolarisedWallTranspor
 #print axioms AlgebraicGeometry.Numerical.Polarised.hDegrees_add
 #print axioms AlgebraicGeometry.Numerical.Polarised.hDegreesHom
 #print axioms AlgebraicGeometry.Numerical.Polarised.wallChargeFamily
+#print axioms AlgebraicGeometry.Numerical.Polarised.wallChargeFamily_charge
 #print axioms AlgebraicGeometry.Numerical.Polarised.hDegrees_zero
 #print axioms AlgebraicGeometry.Numerical.Polarised.hDegrees_one
 #print axioms AlgebraicGeometry.Numerical.Polarised.surface_toNumClass_eq
