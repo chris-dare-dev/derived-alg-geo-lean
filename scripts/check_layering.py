@@ -134,10 +134,16 @@ STABILITY_CONSUMING_GEOMETRY = (
     # is now held to that.
     f"{GEOMETRY}.Moduli.HarderNarasimhan",
     f"{GEOMETRY}.Moduli.Semistability",
-    # Numerical models that carry charge and wall calculations. Dimension-zero,
-    # fourfold and rank-one examples do not, and are now held to that.
+    # Numerical models that carry charge and wall calculations. Dimension-zero
+    # and rank-one examples do not, and are held to that.
+    #
+    # The fourfold leaves were in that neutral group when #1328 narrowed this
+    # list, and they left it the same day: #1225 gave `ℙ⁴` and the sextic their
+    # wall families, so the directory now carries charge like its two siblings.
+    # The entry is the fact that changed, not an exemption bought to pass a gate.
     f"{GEOMETRY}.Numerical.Examples.Surface",
     f"{GEOMETRY}.Numerical.Examples.Threefold",
+    f"{GEOMETRY}.Numerical.Examples.Fourfold",
     # The single K-theoretic charge adapter; the lattice, Euler-pairing,
     # discriminant and Mukai-vector modules beside it are neutral.
     f"{GEOMETRY}.Numerical.GrothendieckGroup.CategoricalCharge",
