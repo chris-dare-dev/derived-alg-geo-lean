@@ -1316,3 +1316,28 @@ proves that any base-change pullback is an equivalence.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedPullbackOfDetection_faithful
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedPullbackOfDetection_full
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedPullbackOfDetectionEquivalence
+
+/-! ## `S`-local t-structures and the opens that index them (SF11.2)
+
+An open of the base is already an object of `Over S`, so `opensBaseChange` names
+it and nothing is constructed. `OpenRestrictionFamily` is the base-change data
+`S`-locality quantifies over, `IsSLocal` is the quantifier, and `SLocalData` is
+its chosen form. Uniqueness at each open is `TStructure.ext_le`; what pins the
+aisle is a generation theorem about base change and is not proved here.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Families.opensBaseChange
+#print axioms AlgebraicGeometry.DerivedCategory.Families.opensBaseChange_left
+#print axioms AlgebraicGeometry.DerivedCategory.Families.opensBaseChange_hom
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.data
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.restriction
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.IsSLocal
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData.restriction
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData.isSLocal
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData.tStructure_eq_of_le_eq
