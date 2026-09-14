@@ -6,11 +6,11 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Chambers.Bas
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.StabilityTopology
 
 /-!
-# Topology of charge-vanishing walls
+# Topology of charge-zero loci
 
 For a lattice class in `Set.range v`, evaluation of the central charge is
 continuous on `StabilityCondition.WithClassMap C v`.  Consequently, when `v`
-is surjective, each `stabWall` is closed and a regular locus indexed by a
+is surjective, each `chargeZeroLocus` is closed and a regular locus indexed by a
 finite set of classes is open.
 
 ## Why the range hypothesis is necessary
@@ -33,8 +33,8 @@ representative exists.
 
 The estimates are pointwise in the center stability condition.  No uniform
 continuity or Lipschitz bound is asserted.  Openness is proved only for finite
-wall sets; the corresponding result for an infinite family would require a
-local-finiteness input not present here.
+sets of charge-zero loci; the corresponding result for an infinite family
+would require a local-finiteness input not present here.
 -/
 
 open CategoryTheory.Triangulated
@@ -42,7 +42,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open Set
 open scoped Topology
 
-namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.ChargeZero
 
 noncomputable section
 
@@ -143,23 +143,23 @@ theorem continuous_chargeAt (hv : Function.Surjective v) (δ : Λ) :
     Continuous (fun σ : StabilityCondition.WithClassMap C v => σ.Z δ) :=
   continuous_chargeAt_of_mem_range (Set.mem_range.mpr (hv δ))
 
-/-- For a surjective class map, the charge-vanishing wall of each lattice
+/-- For a surjective class map, the charge-zero locus of each lattice
 class is closed. -/
-theorem isClosed_stabWall (hv : Function.Surjective v) (δ : Λ) :
-    IsClosed (stabWall (C := C) (v := v) δ) := by
-  rw [show stabWall (C := C) (v := v) δ =
+theorem isClosed_chargeZeroLocus (hv : Function.Surjective v) (δ : Λ) :
+    IsClosed (chargeZeroLocus (C := C) (v := v) δ) := by
+  rw [show chargeZeroLocus (C := C) (v := v) δ =
       (fun σ : StabilityCondition.WithClassMap C v => σ.Z δ) ⁻¹' {0} by
     ext σ
-    simp [stabWall]]
+    simp [chargeZeroLocus]]
   exact isClosed_singleton.preimage (continuous_chargeAt (C := C) hv δ)
 
 /-- For a surjective class map, the regular locus associated to finitely many
 lattice classes is open. -/
-theorem isOpen_stabRegular (hv : Function.Surjective v) {Δ : Set Λ}
-    (hΔ : Δ.Finite) : IsOpen (stabRegular (C := C) (v := v) Δ) := by
-  rw [stabRegular_eq_compl_iUnion]
-  exact (hΔ.isClosed_biUnion fun δ _ => isClosed_stabWall (C := C) hv δ).isOpen_compl
+theorem isOpen_chargeRegularLocus (hv : Function.Surjective v) {Δ : Set Λ}
+    (hΔ : Δ.Finite) : IsOpen (chargeRegularLocus (C := C) (v := v) Δ) := by
+  rw [chargeRegularLocus_eq_compl_iUnion]
+  exact (hΔ.isClosed_biUnion fun δ _ => isClosed_chargeZeroLocus (C := C) hv δ).isOpen_compl
 
 end
 
-end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.ChargeZero

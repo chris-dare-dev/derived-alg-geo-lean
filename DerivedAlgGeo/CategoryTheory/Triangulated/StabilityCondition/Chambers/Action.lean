@@ -12,7 +12,7 @@ A set of lattice classes is `IsAutStable` when every compatible
 autoequivalence preserves membership through its descended lattice
 automorphism. For such a set, the combined `GLTilde × AutPairQuot v` action
 restricts to the regular-locus subtype and hence, through the existing generic
-connected-component machinery, acts on `StabChamber`.
+connected-component machinery, acts on `ChargeChamber`.
 
 The full kernel of the action on the stability space acts trivially on chamber
 labels. Consequently the chamber action descends to
@@ -29,7 +29,7 @@ open CategoryTheory.Triangulated
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open Set
 
-namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall
+namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.ChargeZero
 
 noncomputable section
 
@@ -76,7 +76,7 @@ theorem IsAutStable.image_lam {Δ : Set Λ}
 
 end
 
-end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.StabWall
+end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.ChargeZero
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
 
@@ -90,17 +90,17 @@ variable {C : Type u} [Category.{w} C] [HasZeroObject C] [HasShift C ℤ]
 variable {Λ : Type u'} [AddCommGroup Λ] {v : K₀ C →+ Λ}
 variable {Δ : Set Λ}
 
-open StabWall
+open ChargeZero
 open scoped GroupAction
 
 /-! ## The regular-locus action -/
 
 /-- The combined symmetry action restricts to the regular locus of an
 autoequivalence-stable class set. -/
-noncomputable abbrev stabRegularMulAction
-    (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ) :
-    MulAction (GLTilde × AutPairQuot v) (stabRegular (C := C) (v := v) Δ) where
-  smul p σ := ⟨p • σ.1, (combined_smul_mem_stabRegular_iff p
+noncomputable abbrev chargeRegularLocusMulAction
+    (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ) :
+    MulAction (GLTilde × AutPairQuot v) (chargeRegularLocus (C := C) (v := v) Δ) where
+  smul p σ := ⟨p • σ.1, (combined_smul_mem_chargeRegularLocus_iff p
     (hΔ.image_lam p.2) σ.1).2 σ.2⟩
   one_smul σ := by
     apply Subtype.ext
@@ -111,12 +111,12 @@ noncomputable abbrev stabRegularMulAction
 
 /-- The restricted action is continuous in the regular-locus variable for
 each fixed combined symmetry. -/
-noncomputable abbrev stabRegularContinuousConstSMul
-    (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ) :
-    letI := stabRegularMulAction hΔ
+noncomputable abbrev chargeRegularLocusContinuousConstSMul
+    (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ) :
+    letI := chargeRegularLocusMulAction hΔ
     ContinuousConstSMul (GLTilde × AutPairQuot v)
-      (stabRegular (C := C) (v := v) Δ) := by
-  letI := stabRegularMulAction hΔ
+      (chargeRegularLocus (C := C) (v := v) Δ) := by
+  letI := chargeRegularLocusMulAction hΔ
   exact
     { continuous_const_smul := fun p ↦
         ((continuous_const_smul p : Continuous fun σ :
@@ -126,34 +126,34 @@ noncomputable abbrev stabRegularContinuousConstSMul
 /-! ## Chamber transport -/
 
 /-- The named specialization of `componentSmul` to regular-locus chambers. -/
-def chamberSmul (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ)
+def chamberSmul (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ)
     (p : GLTilde × AutPairQuot v)
-    (cc : StabChamber (C := C) (v := v) Δ) :
-    StabChamber (C := C) (v := v) Δ :=
-  letI := stabRegularMulAction hΔ
-  letI := stabRegularContinuousConstSMul hΔ
+    (cc : ChargeChamber (C := C) (v := v) Δ) :
+    ChargeChamber (C := C) (v := v) Δ :=
+  letI := chargeRegularLocusMulAction hΔ
+  letI := chargeRegularLocusContinuousConstSMul hΔ
   componentSmul p cc
 
 /-- The named specialization of `componentHomeomorph` between chambers of
 the regular locus. -/
 def chamberHomeomorph
-    (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ)
+    (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ)
     (p : GLTilde × AutPairQuot v)
-    (cc : StabChamber (C := C) (v := v) Δ) :
-    {σ : stabRegular (C := C) (v := v) Δ // chamberOf σ = cc} ≃ₜ
-      {σ : stabRegular (C := C) (v := v) Δ //
-        chamberOf σ = chamberSmul hΔ p cc} :=
-  letI := stabRegularMulAction hΔ
-  letI := stabRegularContinuousConstSMul hΔ
+    (cc : ChargeChamber (C := C) (v := v) Δ) :
+    {σ : chargeRegularLocus (C := C) (v := v) Δ // chargeChamberOf σ = cc} ≃ₜ
+      {σ : chargeRegularLocus (C := C) (v := v) Δ //
+        chargeChamberOf σ = chamberSmul hΔ p cc} :=
+  letI := chargeRegularLocusMulAction hΔ
+  letI := chargeRegularLocusContinuousConstSMul hΔ
   componentHomeomorph p cc
 
 /-- The subgroup of combined symmetries preserving a chamber label. -/
 abbrev chamberStabilizer
-    (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ)
-    (cc : StabChamber (C := C) (v := v) Δ) :
+    (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ)
+    (cc : ChargeChamber (C := C) (v := v) Δ) :
     Subgroup (GLTilde × AutPairQuot v) :=
-  letI := stabRegularMulAction hΔ
-  letI := stabRegularContinuousConstSMul hΔ
+  letI := chargeRegularLocusMulAction hΔ
+  letI := chargeRegularLocusContinuousConstSMul hΔ
   componentStabilizer cc
 
 /-! ## Descent to the effective quotient -/
@@ -161,23 +161,23 @@ abbrev chamberStabilizer
 /-- The permutation representation of the combined symmetry group on chamber
 labels. -/
 noncomputable def chamberActionHom
-    (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ) :
+    (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ) :
     (GLTilde × AutPairQuot v) →*
-      Equiv.Perm (StabChamber (C := C) (v := v) Δ) :=
-  letI := stabRegularMulAction hΔ
-  letI := stabRegularContinuousConstSMul hΔ
+      Equiv.Perm (ChargeChamber (C := C) (v := v) Δ) :=
+  letI := chargeRegularLocusMulAction hΔ
+  letI := chargeRegularLocusContinuousConstSMul hΔ
   letI : MulAction (GLTilde × AutPairQuot v)
-      (StabChamber (C := C) (v := v) Δ) := componentMulAction
+      (ChargeChamber (C := C) (v := v) Δ) := componentMulAction
   MulAction.toPermHom _ _
 
 /-- Every symmetry acting trivially on the full stability space also acts
 trivially on chamber labels. -/
 theorem combinedActionKernel_le_chamberActionHom_ker
-    (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ) :
+    (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ) :
     combinedActionKernel v ≤
       (chamberActionHom (C := C) (v := v) hΔ).ker := by
-  letI := stabRegularMulAction hΔ
-  letI := stabRegularContinuousConstSMul hΔ
+  letI := chargeRegularLocusMulAction hΔ
+  letI := chargeRegularLocusContinuousConstSMul hΔ
   intro p hp
   rw [MonoidHom.mem_ker] at hp ⊢
   apply Equiv.ext
@@ -194,9 +194,9 @@ theorem combinedActionKernel_le_chamberActionHom_ker
 /-- The chamber permutation representation descended through the full kernel
 of the action on the stability space. -/
 noncomputable def effectiveChamberActionHom
-    (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ) :
+    (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ) :
     EffectiveCombinedSymmetry v →*
-      Equiv.Perm (StabChamber (C := C) (v := v) Δ) :=
+      Equiv.Perm (ChargeChamber (C := C) (v := v) Δ) :=
   QuotientGroup.lift (combinedActionKernel v)
     (chamberActionHom (C := C) (v := v) hΔ)
     (combinedActionKernel_le_chamberActionHom_ker hΔ)
@@ -204,9 +204,9 @@ noncomputable def effectiveChamberActionHom
 /-- The effective combined symmetry group acts on chamber labels. This action
 is deliberately not asserted faithful; see the module docstring. -/
 noncomputable abbrev effectiveCombinedChamberMulAction
-    (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ) :
+    (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ) :
     MulAction (EffectiveCombinedSymmetry v)
-      (StabChamber (C := C) (v := v) Δ) :=
+      (ChargeChamber (C := C) (v := v) Δ) :=
   MulAction.compHom _
     (effectiveChamberActionHom (C := C) (v := v) hΔ)
 
@@ -214,9 +214,9 @@ noncomputable abbrev effectiveCombinedChamberMulAction
 the original combined action on chamber labels. -/
 @[simp]
 theorem effectiveCombinedChamber_smul_coe
-    (hΔ : StabWall.IsAutStable (C := C) (v := v) Δ)
+    (hΔ : ChargeZero.IsAutStable (C := C) (v := v) Δ)
     (p : GLTilde × AutPairQuot v)
-    (cc : StabChamber (C := C) (v := v) Δ) :
+    (cc : ChargeChamber (C := C) (v := v) Δ) :
     letI := effectiveCombinedChamberMulAction hΔ
     (p : EffectiveCombinedSymmetry v) • cc = chamberSmul hΔ p cc :=
   rfl

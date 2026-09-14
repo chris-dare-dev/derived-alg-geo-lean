@@ -14,7 +14,7 @@ open CategoryTheory.Triangulated
 Divisorial/Signature counts the walls through ONE plane. That is not enough for
 a wall-and-chamber structure, which needs finiteness across a neighbourhood.
 
-QuadraticForm/WallRegion records that the coercivity constant of -Q on W-perp
+QuadraticForm/OrthogonalityRegion records that the coercivity constant of -Q on W-perp
 degrades to 0 at the boundary of the positive-plane locus, so a family inherits
 no constant from its members and PlaneRegion carries it as a field. Its
 criterion ofCompactPairs supplies that field for a COMPACT family -- but only
@@ -44,5 +44,5 @@ not asserted to be a geometric lattice. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.expPlaneRegion
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.expPlaneRegion_carrier
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.expPlane_eq_span
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.finite_wallClasses_expPlaneRegion
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.finite_orthogonalClasses_expPlaneRegion
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.finite_walls_meeting_expFamily

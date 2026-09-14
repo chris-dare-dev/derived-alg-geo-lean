@@ -8,7 +8,7 @@ import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Continuous
 /-!
 # `P⁺` does not depend on which class in the positive cone names it
 
-`Orientation.lean` defines the two halves against a **fixed** reference pair, and
+`PositiveFrame.lean` defines the two halves against a **fixed** reference frame, and
 says plainly that reference-independence is a further statement — the
 projection-sign cocycle, whose usual proof runs through connectedness of the
 Grassmannian of positive planes.
@@ -24,7 +24,7 @@ inside it.
 
 The segment from `ω` to `ω'` stays in the positive cone — that is one line of
 bilinear algebra once `0 < b ω ω'` says the two are in the *same* component —
-so the whole family `exp(β_t + iω_t)` consists of positive pairs, and the
+so the whole family `exp(β_t + iω_t)` consists of positive frames, and the
 pairing determinant against the reference is a continuous function of `t` that
 never vanishes (`pairingDet_ne_zero`). It is positive at `t = 0`, so the
 intermediate value theorem makes it positive at `t = 1`.
@@ -36,7 +36,7 @@ its own issue, and nothing here should be read as settling it.
 ## Scope
 
 `β` is carried along the path and is otherwise unconstrained; the positivity
-condition is on `ω` alone, exactly as in `isPositivePair_exp`.
+condition is on `ω` alone, exactly as in `isPositiveFrame_exp`.
 -/
 
 open QuadraticMap Set
@@ -161,17 +161,17 @@ positive, so the intermediate value theorem keeps it positive at the far end.
 
 `hsig` is not a new assumption: route (A) supplies it from the Hodge index
 signature of `V` (`hasSignatureTwo_realForm`). -/
-theorem mem_periodDomainPlus_exp_of_sameCone
+theorem mem_positiveFramesPlus_exp_of_sameCone
     (hsig : PeriodDomain.HasSignatureTwo (realForm b)) (hb : ∀ x y : V, b x y = b y x)
     (hω : 0 < b ω ω) (hω' : 0 < b ω' ω') (hcone : 0 < b ω ω') :
     (expRe b β' ω', expIm b β' ω') ∈
-      PeriodDomain.periodDomainPlus (realForm b) (expRe b β ω) (expIm b β ω) := by
-  have hpair : ∀ t ∈ Icc (0 : ℝ) 1, PeriodDomain.IsPositivePair (realForm b)
+      PeriodDomain.positiveFramesPlus (realForm b) (expRe b β ω) (expIm b β ω) := by
+  have hpair : ∀ t ∈ Icc (0 : ℝ) 1, PeriodDomain.IsPositiveFrame (realForm b)
       (expRe b (segment β ω β' ω' t).1 (segment β ω β' ω' t).2)
       (expIm b (segment β ω β' ω' t).1 (segment β ω β' ω' t).2) := fun t ht =>
-    isPositivePair_exp b _ _ hb (pos_segment b β ω β' ω' hb hω hω' hcone ht)
+    isPositiveFrame_exp b _ _ hb (pos_segment b β ω β' ω' hb hω hω' hcone ht)
   have hne : ∀ t ∈ Icc (0 : ℝ) 1, pathDet b β ω β' ω' t ≠ 0 := fun t ht =>
-    PeriodDomain.pairingDet_ne_zero hsig (isPositivePair_exp b β ω hb hω) (hpair t ht)
+    PeriodDomain.pairingDet_ne_zero hsig (isPositiveFrame_exp b β ω hb hω) (hpair t ht)
   have h0 : 0 < pathDet b β ω β' ω' 0 := by
     rw [pathDet_zero b β ω β' ω' hb]
     positivity
@@ -184,7 +184,7 @@ theorem mem_periodDomainPlus_exp_of_sameCone
       exact hne c hc hc0
     · exact absurd heq (hne 1 ⟨zero_le_one, le_refl 1⟩)
     · exact hgt
-  refine ⟨isPositivePair_exp b β' ω' hb hω', ?_⟩
+  refine ⟨isPositiveFrame_exp b β' ω' hb hω', ?_⟩
   rwa [← pathDet_one b β ω β' ω']
 
 /-- **The same statement resting on the Hodge index hypotheses alone.**
@@ -192,13 +192,13 @@ theorem mem_periodDomainPlus_exp_of_sameCone
 `hasSignatureTwo_realForm` discharges the signature hypothesis, so with
 `V = NS(X) ⊗ ℝ` the inputs are: the Hodge index signature of `V`, and two classes
 in the same component of its positive cone. -/
-theorem mem_periodDomainPlus_exp_of_sameCone_of_sigPos (hb : ∀ x y : V, b x y = b y x)
+theorem mem_positiveFramesPlus_exp_of_sameCone_of_sigPos (hb : ∀ x y : V, b x y = b y x)
     (hsigPos : sigPos (LinearMap.BilinMap.toQuadraticMap b) = 1)
     (hsigNeg : sigNeg (LinearMap.BilinMap.toQuadraticMap b) + 1 = Module.finrank ℝ V)
     (hω : 0 < b ω ω) (hω' : 0 < b ω' ω') (hcone : 0 < b ω ω') :
     (expRe b β' ω', expIm b β' ω') ∈
-      PeriodDomain.periodDomainPlus (realForm b) (expRe b β ω) (expIm b β ω) :=
-  mem_periodDomainPlus_exp_of_sameCone b β ω β' ω'
+      PeriodDomain.positiveFramesPlus (realForm b) (expRe b β ω) (expIm b β ω) :=
+  mem_positiveFramesPlus_exp_of_sameCone b β ω β' ω'
     (hasSignatureTwo_realForm b hb hsigPos hsigNeg) hb hω hω' hcone
 
 end Path

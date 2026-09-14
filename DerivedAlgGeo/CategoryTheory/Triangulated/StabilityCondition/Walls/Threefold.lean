@@ -8,7 +8,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Threef
 # Threefold walls
 
 The four-coordinate compressed model of a polarised threefold and its
-Bayer--Macrì--Toda charge, as a child of `Walls/ChargeFamily.lean`.  This is the
+Bayer--Macrì--Toda charge, as a child of `Walls/Alignment.lean`.  This is the
 threefold counterpart of `Walls/Numerical/`, which does the same for surfaces in
 three coordinates.
 

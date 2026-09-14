@@ -44,10 +44,10 @@ an integral class. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.ampleBox
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.antiCanonical_sq_pos
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.boxRegion
-#print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.chamber_inter_ampleBox
+#print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.signedRayRegularLocus_inter_ampleBox
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.divisorBasis
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.divisorCoordEquiv
-#print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.finite_wallCandidates_ampleBox
+#print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.finite_rayCandidates_ampleBox
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.finite_walls_meeting_ampleBox
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.finite_walls_meeting_antiCanonicalBox
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.finite_walls_through_expPlane

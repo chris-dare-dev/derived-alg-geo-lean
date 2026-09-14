@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PeriodDomain
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositivePlane
 
 /-!
 # The signature is additive over an orthogonal decomposition

@@ -50,4 +50,4 @@ plane's worth. No scheme and no ample line bundle appear. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.transverseMap
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.transverseMap_apply
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.transverseMap_injective
-#print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.wall_ofST_iff_circle
+#print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.alignmentLocus_ofST_iff_circle

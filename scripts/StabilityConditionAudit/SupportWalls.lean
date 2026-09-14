@@ -191,13 +191,13 @@ docstrings in
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.isSpherical_of_mem_sphericalPlus
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.rk_pos_of_mem_sphericalPlus
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.corank_eq_of_isSpherical
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.wall
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_wall_iff
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_chamber_iff
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber_antitone
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber_eq_compl_iUnion
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_wall_iff_of_isSpherical
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.nonpositiveRayLocus
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_nonpositiveRayLocus_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.signedRayRegularLocus
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_signedRayRegularLocus_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.signedRayRegularLocus_antitone
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.signedRayRegularLocus_eq_compl_iUnion
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_nonpositiveRayLocus_iff_of_isSpherical
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison.toFun
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison.compat
@@ -232,10 +232,10 @@ geometric theory would get from Hodge index, and the positive lower bound on
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.rk_sq_le
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.normSq_sub_smul_le
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.reconstruct
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.wallCandidates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.rayCandidates
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.exists_norm_fst_le
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.wallCandidates_subset
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.finite_wallCandidates
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.rayCandidates_subset
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.finite_rayCandidates
 
 /-! ## The bounded region is inhabited, and the chamber is finitely cut
 
@@ -245,23 +245,23 @@ consequence was vacuous. BoundedRegion.ofDivisorSpace is the first witness: on a
 divisor space with a HodgeDefinite certificate, a COMPACT family of parameters
 supplies both, the ample lower bound by a minimum of a continuous positive
 function and the uniform coercivity by the same compactness argument
-WallRegion uses in the other chart. HodgeDefinite.of_pair_pos is what lets one
+OrthogonalityRegion uses in the other chart. HodgeDefinite.of_pair_pos is what lets one
 certificate at one reference class cover every omega of the family.
 
 latticeSpherical is the set of classes the chamber is cut out by, and
-chamber_inter_carrier says that ON THE REGION it agrees with the chamber of the
-finitely many wallCandidates. That is the chamber decomposition. It says NOTHING
+signedRayRegularLocus_inter_carrier says that ON THE REGION it agrees with the chamber of the
+finitely many rayCandidates. That is the chamber decomposition. It says NOTHING
 about semistable objects: chamber is a subset of the parameter chart, and no
 constancy on it is asserted, nor is a Hodge index theorem proved for any
 geometric surface. -/
 
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber_inter_carrier
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.signedRayRegularLocus_inter_carrier
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.latticeSpherical
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.wallCandidates_subset_latticeSpherical
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.rayCandidates_subset_latticeSpherical
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.ofDivisorSpace
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion.ofDivisorSpace_carrier
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chamber_inter_ofDivisorSpace
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.finite_wallCandidates_ofDivisorSpace
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.signedRayRegularLocus_inter_ofDivisorSpace
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.finite_rayCandidates_ofDivisorSpace
 
 /-! ## The two wall notions, compared
 
@@ -274,7 +274,7 @@ imported them; chartRe and chartIm are abbreviations now, so the charts are one
 object and chartRe_eq / chartIm_eq are the normal forms.
 
 The loci are NOT equal, and that is the content. Orthogonality to the plane is
-the vanishing of BOTH pairings, so mem_periodDomainWall_iff_mem_wall says the
+the vanishing of BOTH pairings, so mem_orthogonalityLocus_iff_mem_nonpositiveRayLocus says the
 period-domain wall is the sub-locus of the spherical half-wall where the real
 pairing also vanishes; the inclusion goes ONE WAY only, and is strict wherever
 the real pairing is negative. That is also why the two finiteness theorems are
@@ -284,10 +284,13 @@ expPlane_eq_chartPlane records that the divisorial exponential plane is the
 same submodule. No stability condition, heart, or semistable object appears. -/
 
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartPlane
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartFrame
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartPlane_eq_framePlane
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.chartPlane_eq_span
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.isPositiveFrame_chartFrame
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.isPositivePlane_chartPlane
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_periodDomainWall_iff
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_periodDomainWall_iff_mem_wall
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_wall_of_mem_periodDomainWall
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.not_mem_periodDomainWall_of_mem_chamber
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_chartPlane_orthogonalityLocus_iff
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_orthogonalityLocus_iff_mem_nonpositiveRayLocus
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.mem_nonpositiveRayLocus_of_mem_orthogonalityLocus
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.not_mem_orthogonalityLocus_of_mem_signedRayRegularLocus
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.expPlane_eq_chartPlane

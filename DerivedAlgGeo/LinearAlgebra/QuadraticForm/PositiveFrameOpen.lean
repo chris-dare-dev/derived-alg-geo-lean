@@ -2,24 +2,24 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Orientation
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositiveFrame
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Continuous
 
 /-!
-# A Sylvester criterion for a positive pair, and openness
+# A Sylvester criterion for a positive frame, and openness
 
-`IsPositivePair` is stated as a condition on the plane a pair spans. This file
+`IsPositiveFrame` is stated as a condition on the plane a pair spans. This file
 gives the equivalent condition on the pair itself,
 
 ```
-IsPositivePair Q x y ↔ 0 < Q x ∧ 0 < 4 * Q x * Q y - (polar Q x y) ^ 2,
+IsPositiveFrame Q x y ↔ 0 < Q x ∧ 0 < 4 * Q x * Q y - (polar Q x y) ^ 2,
 ```
 
 which is Sylvester's criterion for the `2 × 2` Gram matrix, and which subsumes
 independence: a pair satisfying it spans a plane rather than a line, so the
 `finrank = 2` clause comes free.
 
-Both sides of the criterion are continuous, so **the positive pairs form an open
+Both sides of the criterion are continuous, so **the positive frames form an open
 set** — the fact a genericity argument needs, and the reason this file exists.
 -/
 
@@ -43,8 +43,8 @@ theorem apply_smul_add_smul (x y : M) (a b : ℝ) :
 /-- **Sylvester's criterion for a pair.** The `2 × 2` Gram matrix of `(x, y)` is
 positive definite exactly when `Q x` and the discriminant are positive, and that
 is exactly the condition that the pair spans a positive plane. -/
-theorem isPositivePair_iff (x y : M) :
-    IsPositivePair Q x y ↔
+theorem isPositiveFrame_iff (x y : M) :
+    IsPositiveFrame Q x y ↔
       0 < Q x ∧ 0 < 4 * Q x * Q y - (polar (⇑Q) x y) ^ 2 := by
   constructor
   · intro h
@@ -55,7 +55,7 @@ theorem isPositivePair_iff (x y : M) :
       have := combination_ne_zero h (a := 1) (b := 0) (Or.inl one_ne_zero)
       simp [hx0] at this
     have hQx : 0 < Q x := by
-      have := h.posDef ⟨x, hx⟩ (by simpa using hxne)
+      have := h.posDef ⟨x, hx⟩ (fun h0 => hxne (by simpa [Subtype.ext_iff] using h0))
       rwa [restrict_apply] at this
     refine ⟨hQx, ?_⟩
     -- the quadratic `t ↦ Q (t • x + y)` is positive, so its discriminant is negative
@@ -104,33 +104,33 @@ theorem isPositivePair_iff (x y : M) :
         ext z
         simp
         tauto
-      rw [pairSpan, hrange]
+      rw [framePlane_mk, pairSpan, hrange]
       simpa using finrank_span_eq_card hindep
     · rintro ⟨v, hv⟩ hv0
-      rw [pairSpan, Submodule.mem_span_pair] at hv
+      rw [framePlane_mk, pairSpan, Submodule.mem_span_pair] at hv
       obtain ⟨a, b, rfl⟩ := hv
       rw [restrict_apply]
       refine hvals a b ?_
       by_contra hcon
       push Not at hcon
-      exact hv0 (by simp [hcon.1, hcon.2])
+      exact hv0 (Subtype.ext (by simp [hcon.1, hcon.2]))
 
 section Topology
 
 variable {N : Type*} [NormedAddCommGroup N] [NormedSpace ℝ N] [FiniteDimensional ℝ N]
 variable (Q : QuadraticForm ℝ N)
 
-/-- **The positive pairs form an open set.** Both halves of the Sylvester
+/-- **The positive frames form an open set.** Both halves of the Sylvester
 criterion are continuous. -/
-theorem isOpen_setOf_isPositivePair :
-    IsOpen {p : N × N | IsPositivePair Q p.1 p.2} := by
+theorem isOpen_setOf_isPositiveFrame :
+    IsOpen {p : N × N | IsPositiveFrame Q p.1 p.2} := by
   have hQ := continuous_of_finiteDimensional Q
   have hpolar := continuous_polar Q
-  have hset : {p : N × N | IsPositivePair Q p.1 p.2}
+  have hset : {p : N × N | IsPositiveFrame Q p.1 p.2}
       = {p : N × N | 0 < Q p.1} ∩
         {p : N × N | 0 < 4 * Q p.1 * Q p.2 - (polar (⇑Q) p.1 p.2) ^ 2} := by
     ext p
-    exact isPositivePair_iff p.1 p.2
+    exact isPositiveFrame_iff p.1 p.2
   rw [hset]
   refine IsOpen.inter ?_ ?_
   · exact isOpen_lt continuous_const (hQ.comp continuous_fst)

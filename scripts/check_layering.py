@@ -38,6 +38,11 @@ nothing else checks.
    and complex-pairing roots reach neither stability conditions nor geometry;
    the central-charge subtree reaches neither wall-locus modules nor geometry;
    and the moved owner structures are declared exactly once.
+10. **Positive frames, positive planes, and wall loci stay distinct.** The
+   frame-to-plane map, orthogonality arrangement, determinant-alignment locus,
+   signed-ray locus, and stability-space charge-zero locus have separate
+   owners. Retired compressed paths stay absent, and positive frames do not
+   import orthogonality finiteness.
 9. **The linear Serre root is shift-free.** ``CategoryTheory/Linear/Yoneda.lean``
    needs Mathlib alone, nothing below ``CategoryTheory/Linear/SerreFunctor/``
    reaches ``CategoryTheory/Triangulated`` even transitively, and the three
@@ -220,6 +225,18 @@ RETIRED_PATHS = (
     "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Discriminant.lean",
     "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Mukai.lean",
     "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Support.lean",
+    # 2026-09-14 MO1.03: neutral frames and planes, orthogonality
+    # arrangements, determinant alignment, and charge-zero loci received
+    # separate owners. Historical declaration spellings live only in the
+    # executable restatement bridge.
+    "LinearAlgebra/QuadraticForm/PeriodDomain.lean",
+    "LinearAlgebra/QuadraticForm/Orientation.lean",
+    "LinearAlgebra/QuadraticForm/PositivePairOpen.lean",
+    "LinearAlgebra/QuadraticForm/OrientationCocycle.lean",
+    "LinearAlgebra/QuadraticForm/WallFiniteness.lean",
+    "LinearAlgebra/QuadraticForm/WallRegion.lean",
+    "LinearAlgebra/QuadraticForm/CutNonempty.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/Walls/ChargeFamily.lean",
     # 2026-09-13 MO1.07: the k-linear Serre duality data and its uniqueness
     # need no shift, so they moved to CategoryTheory/Linear/SerreFunctor/.
     "CategoryTheory/Triangulated/SerreFunctor/Basic.lean",
@@ -283,11 +300,51 @@ NEUTRAL_CHARGE_ROOTS = (
 )
 PAIRING_CORE_MODULE = f"{LIBRARY}.LinearAlgebra.QuadraticForm.ComplexPairing"
 PAIRING_DOWNSTREAM_TREES = (
-    f"{LIBRARY}.LinearAlgebra.QuadraticForm.PeriodDomain",
-    f"{LIBRARY}.LinearAlgebra.QuadraticForm.WallFiniteness",
-    f"{LIBRARY}.LinearAlgebra.QuadraticForm.WallRegion",
-    f"{LIBRARY}.LinearAlgebra.QuadraticForm.Orientation",
+    f"{LIBRARY}.LinearAlgebra.QuadraticForm.PositivePlane",
+    f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityLocus",
+    f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityFiniteness",
+    f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityRegion",
+    f"{LIBRARY}.LinearAlgebra.QuadraticForm.PositiveFrame",
 )
+# Rule 10. MO1.03 gives the distinct carriers and loci owners that match
+# their actual equations. These are declaration names rather than a common
+# superclass because their codimensions and categorical content differ.
+POSITIVE_PLANE_ROOT = "LinearAlgebra/QuadraticForm/PositivePlane.lean"
+POSITIVE_FRAME_ROOT = "LinearAlgebra/QuadraticForm/PositiveFrame.lean"
+ORTHOGONALITY_LOCUS_ROOT = "LinearAlgebra/QuadraticForm/OrthogonalityLocus.lean"
+ALIGNMENT_LOCUS_ROOT = (
+    "CategoryTheory/Triangulated/StabilityCondition/Walls/Alignment.lean"
+)
+CHARGE_FAMILY_ROOT = (
+    "CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Family.lean"
+)
+CHARGE_ZERO_ROOT = (
+    "CategoryTheory/Triangulated/StabilityCondition/Chambers/Basic.lean"
+)
+MO1_03_OWNERS = {
+    POSITIVE_PLANE_ROOT: ("IsPositivePlane", "positivePlanes"),
+    POSITIVE_FRAME_ROOT: (
+        "framePlane",
+        "IsPositiveFrame",
+        "positiveFrames",
+        "forgetPositiveFrame",
+    ),
+    ORTHOGONALITY_LOCUS_ROOT: (
+        "orthogonalityLocus",
+        "positivePlanesAway",
+    ),
+    CHARGE_FAMILY_ROOT: ("zeroLocus",),
+    ALIGNMENT_LOCUS_ROOT: (
+        "alignmentValue",
+        "alignmentLocus",
+        "positiveRayLocus",
+    ),
+    CHARGE_ZERO_ROOT: (
+        "stabilityChargeFamily",
+        "chargeZeroLocus",
+        "chargeRegularLocus",
+    ),
+}
 # Rule 9. The k-linear Serre duality data and the linear Yoneda representability
 # helpers moved out of Triangulated/ on 2026-09-13 (MO1.07, #1318) because they
 # mention no shift and no distinguished triangle -- the previous owner's own
@@ -729,6 +786,49 @@ def main() -> int:
         if not path.is_file():
             failures.append(f"missing neutral charge root {path.relative_to(ROOT)}")
 
+    # Rule 10, declaration owners and the one import edge that matters to the
+    # frame/plane split. The executable-only historical aliases are outside
+    # SOURCE_ROOT and therefore cannot satisfy these checks.
+    for entry, names in MO1_03_OWNERS.items():
+        path = SOURCE_ROOT / entry
+        if not path.is_file():
+            failures.append(f"missing MO1.03 owner {path.relative_to(ROOT)}")
+            continue
+        declared = declared_names(path.read_text(encoding="utf-8")) | structure_names(
+            path.read_text(encoding="utf-8")
+        )
+        for name in names:
+            if name not in declared:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: no longer declares {name}; "
+                    "the frame/plane/locus split requires this canonical owner"
+                )
+
+    positive_frame_module = module_of(SOURCE_ROOT / POSITIVE_FRAME_ROOT)
+    forbidden_frame_dependencies = (
+        f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityFiniteness",
+        f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityRegion",
+    )
+    if positive_frame_module in modules:
+        reached = closure.of(positive_frame_module)
+        for dependency in forbidden_frame_dependencies:
+            if dependency in reached:
+                failures.append(
+                    f"{positive_frame_module}: reaches {dependency}; positive "
+                    "frames forget to positive planes and do not depend on an "
+                    "orthogonality arrangement or its finiteness theorem"
+                )
+
+    all_library_text = "\n".join(
+        path.read_text(encoding="utf-8") for path, _, _ in modules.values()
+    )
+    if "RealCodimensionOneSubmanifold" in all_library_text:
+        failures.append(
+            "RealCodimensionOneSubmanifold appears in the library; MO1.03 "
+            "forbids a common codimension-one parent for charge-zero, "
+            "alignment, and signed-ray loci"
+        )
+
     # Rule 9.
     yoneda_root = SOURCE_ROOT / LINEAR_YONEDA_ROOT
     if not yoneda_root.is_file():
@@ -821,7 +921,10 @@ def main() -> int:
         f"{len(DIVISORIAL_BLOCK)}-structure divisorial charge block and "
         f"{len(HODGE_INDEX_BLOCK)}-structure neutral Hodge block are declared once; "
         "central-charge roots reach neither walls nor geometry and the paired "
-        "functional reaches no wall arrangement; the "
+        "functional reaches no wall arrangement; the positive-plane, "
+        "positive-frame, orthogonality, charge-zero, determinant-alignment, "
+        "and signed-ray owners are distinct, with no common codimension-one "
+        "parent; the "
         f"{len(LINEAR_YONEDA_BLOCK)}-declaration linear Yoneda block needs "
         "Mathlib alone and the linear Serre root reaches no triangulated module"
     )

@@ -125,11 +125,11 @@ theorem wallChargeFamily_eq_rankOne_reindex :
 
 /-- The `(s,t)` wall of two classes is the rank-one slice of their divisorial
 wall. -/
-theorem wallChargeFamily_wall_eq (v w : N) :
-    (wallChargeFamily V P).wall v w =
+theorem wallChargeFamily_alignmentLocus_eq (v w : N) :
+    (wallChargeFamily V P).alignmentLocus v w =
       R.rankOneParameters P ⁻¹'
-        (R.chernCharacter.fullChargeFamily R.divisorSpace).wall v w := by
-  rw [R.wallChargeFamily_eq_rankOne_reindex P, Wall.ChargeFamily.reindex_wall]
+        (R.chernCharacter.fullChargeFamily R.divisorSpace).alignmentLocus v w := by
+  rw [R.wallChargeFamily_eq_rankOne_reindex P, Wall.ChargeFamily.reindex_alignmentLocus]
 
 end NumericalRealization
 

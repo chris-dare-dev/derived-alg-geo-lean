@@ -136,7 +136,7 @@ of any derived category is constructed or asserted. -/
 Pure signature theory of a real quadratic space, in the discipline of the Mukai
 lane above: nothing here is a statement about a K3 surface, its numerical
 Grothendieck group or its period domain. See the module docstring of
-`DerivedAlgGeo/LinearAlgebra/QuadraticForm/PeriodDomain.lean`. -/
+`DerivedAlgGeo/LinearAlgebra/QuadraticForm/PositivePlane.lean`. -/
 
 #print axioms PeriodDomain.IsPositivePlane
 #print axioms PeriodDomain.IsPositivePlane.finrank_eq
@@ -146,15 +146,15 @@ Grothendieck group or its period domain. See the module docstring of
 #print axioms PeriodDomain.HasSignatureTwo.sigNeg_add_two
 #print axioms PeriodDomain.IsSphericalClass
 #print axioms PeriodDomain.orthogonal
-#print axioms PeriodDomain.wall
-#print axioms PeriodDomain.periodDomain
+#print axioms PeriodDomain.orthogonalityLocus
+#print axioms PeriodDomain.positivePlanes
 #print axioms PeriodDomain.sphericalClasses
-#print axioms PeriodDomain.periodDomain₀
-#print axioms PeriodDomain.periodDomain₀_sphericalClasses_univ_eq_empty
+#print axioms PeriodDomain.positivePlanesAway
+#print axioms PeriodDomain.positivePlanesAway_sphericalClasses_univ_eq_empty
 #print axioms PeriodDomain.polarBilin_isRefl
 #print axioms PeriodDomain.mem_orthogonal_iff
 #print axioms PeriodDomain.isSphericalClass_iff_apply
-#print axioms PeriodDomain.mem_wall_iff_mem_orthogonal
+#print axioms PeriodDomain.mem_orthogonalityLocus_iff_mem_orthogonal
 #print axioms PeriodDomain.notMem_of_isSphericalClass
 #print axioms PeriodDomain.restrict_nondegenerate_of_isPositivePlane
 #print axioms PeriodDomain.nondegenerate
@@ -164,7 +164,7 @@ Grothendieck group or its period domain. See the module docstring of
 #print axioms PeriodDomain.negDef_orthogonal
 #print axioms PeriodDomain.finrank_orthogonal
 #print axioms PeriodDomain.exists_isPositivePlane
-#print axioms PeriodDomain.periodDomain_nonempty
+#print axioms PeriodDomain.positivePlanes_nonempty
 #print axioms PeriodDomain.stdForm
 #print axioms PeriodDomain.stdForm_hasSignatureTwo
 
@@ -181,7 +181,7 @@ the pointwise wall count. Neither says anything about a K3 surface. -/
 #print axioms PeriodDomain.sphericalOrthogonal
 #print axioms PeriodDomain.isBounded_sphericalOrthogonal
 #print axioms PeriodDomain.finite_sphericalOrthogonal_inter
-#print axioms PeriodDomain.finite_walls_through
+#print axioms PeriodDomain.finite_orthogonalityLoci_through
 
 /-! ### Regions of positive planes — the uniform constant and the wall count
 
@@ -199,22 +199,28 @@ inhabits the field, and `empty` is the degenerate witness kept for contrast. -/
 #print axioms PeriodDomain.PlaneRegion.coercivity
 #print axioms PeriodDomain.PlaneRegion.coercivity_pos
 #print axioms PeriodDomain.PlaneRegion.uniform
-#print axioms PeriodDomain.PlaneRegion.wallClasses
-#print axioms PeriodDomain.PlaneRegion.isBounded_wallClasses
-#print axioms PeriodDomain.PlaneRegion.finite_wallClasses_inter
+#print axioms PeriodDomain.PlaneRegion.orthogonalClasses
+#print axioms PeriodDomain.PlaneRegion.isBounded_orthogonalClasses
+#print axioms PeriodDomain.PlaneRegion.finite_orthogonalClasses_inter
 #print axioms PeriodDomain.PlaneRegion.ofCompactPairs
 #print axioms PeriodDomain.PlaneRegion.empty
 
-/-! ### Oriented positive pairs — the sign invariant that models `P⁺`
+/-! ### Ordered positive frames — the sign invariant that models `P⁺`
 
-The ordered form of the period domain and the two halves the pairing determinant
-cuts it into. "Component" is modeled by the sign, not proved to be one; see the
-module docstring of `QuadraticForm/Orientation.lean`. -/
+An ordered positive frame forgets to its positive spanning plane. The two
+halves are cut out by the pairing determinant. "Component" is modeled by the
+sign, not proved to be one; see the module docstring of
+`QuadraticForm/PositiveFrame.lean`. -/
 
 #print axioms PeriodDomain.pairSpan
-#print axioms PeriodDomain.IsPositivePair
+#print axioms PeriodDomain.framePlane
+#print axioms PeriodDomain.framePlane_mk
+#print axioms PeriodDomain.IsPositiveFrame
+#print axioms PeriodDomain.positiveFrames
 #print axioms PeriodDomain.pairingDet
-#print axioms PeriodDomain.isPositivePlane_pairSpan
+#print axioms PeriodDomain.isPositivePlane_framePlane
+#print axioms PeriodDomain.forgetPositiveFrame
+#print axioms PeriodDomain.forgetPositiveFrame_coe
 #print axioms PeriodDomain.combination_ne_zero
 #print axioms PeriodDomain.pairingDet_ne_zero
 #print axioms PeriodDomain.pairingDet_swap
@@ -223,11 +229,11 @@ module docstring of `QuadraticForm/Orientation.lean`. -/
 #print axioms PeriodDomain.sameOrientation_refl
 #print axioms PeriodDomain.sameOrientation_symm
 #print axioms PeriodDomain.sameOrientation_trans
-#print axioms PeriodDomain.periodDomainPlus
-#print axioms PeriodDomain.periodDomainMinus
-#print axioms PeriodDomain.disjoint_periodDomainPlus_minus
-#print axioms PeriodDomain.union_periodDomainPlus_minus
-#print axioms PeriodDomain.swap_mem_of_mem_periodDomainPlus
+#print axioms PeriodDomain.positiveFramesPlus
+#print axioms PeriodDomain.positiveFramesMinus
+#print axioms PeriodDomain.disjoint_positiveFramesPlus_minus
+#print axioms PeriodDomain.union_positiveFramesPlus_minus
+#print axioms PeriodDomain.swap_mem_of_mem_positiveFramesPlus
 
 /-! ### The real Mukai extension, bundled — and the exponential chart
 
@@ -254,9 +260,9 @@ it does in the source; see the module docstring of `Mukai/RealForm.lean`. -/
 #print axioms Mukai.realPairing_expIm_expRe
 #print axioms Mukai.realForm_smul_add_smul
 #print axioms Mukai.expRe_ne_zero
-#print axioms Mukai.isPositivePair_exp
+#print axioms Mukai.isPositiveFrame_exp
 #print axioms Mukai.pairingDet_exp_self
-#print axioms Mukai.mem_periodDomainPlus_exp
+#print axioms Mukai.mem_positiveFramesPlus_exp
 
 /-! ### Additivity of the signature over an orthogonal decomposition
 
@@ -314,8 +320,8 @@ along the segment rather than by the cocycle itself. See the module docstring of
 #print axioms Mukai.continuous_pathDet
 #print axioms Mukai.pathDet_zero
 #print axioms Mukai.pathDet_one
-#print axioms Mukai.mem_periodDomainPlus_exp_of_sameCone
-#print axioms Mukai.mem_periodDomainPlus_exp_of_sameCone_of_sigPos
+#print axioms Mukai.mem_positiveFramesPlus_exp_of_sameCone
+#print axioms Mukai.mem_positiveFramesPlus_exp_of_sameCone_of_sigPos
 
 /-! ### The integral Mukai lattice inside the real extension
 
@@ -333,9 +339,9 @@ integral classes rather than about an abstract `ZSpan`. -/
 #print axioms Mukai.realDiscriminant_mk
 #print axioms Mukai.isSphericalClass_extendMap
 #print axioms Mukai.finite_sphericalOrthogonal_integralExtension
-#print axioms Mukai.finite_wallClasses_integralExtension
+#print axioms Mukai.finite_orthogonalClasses_integralExtension
 
-/-! ### The central charge of a positive pair
+/-! ### The central charge of a positive frame
 
 Route (A) re-read in the language stability conditions are stated in: the kernel
 of `Z` is the orthogonal complement, and negative definiteness there is the
@@ -351,9 +357,9 @@ support property. `expCharge` is Bridgeland's `Z(β,ω)`. -/
 #print axioms PeriodDomain.ker_centralCharge_eq
 #print axioms PeriodDomain.neg_of_centralCharge_eq_zero
 #print axioms PeriodDomain.centralCharge_ne_zero_of_nonneg
-#print axioms PeriodDomain.mem_wall_iff_centralCharge_eq_zero
+#print axioms PeriodDomain.mem_orthogonalityLocus_iff_centralCharge_eq_zero
 #print axioms PeriodDomain.isCompl_ker_centralCharge
-#print axioms PeriodDomain.mem_periodDomain₀_iff_centralCharge_ne_zero
+#print axioms PeriodDomain.mem_positivePlanesAway_iff_centralCharge_ne_zero
 #print axioms Mukai.expCharge
 #print axioms Mukai.expCharge_apply
 #print axioms Mukai.expChargeHom
@@ -365,31 +371,31 @@ support property. `expCharge` is Bridgeland's `Z(β,ω)`. -/
 #print axioms Mukai.expCharge_neg
 #print axioms Mukai.neg_of_expCharge_eq_zero
 #print axioms Mukai.expCharge_ne_zero_of_nonneg
-#print axioms Mukai.mem_wall_iff_expCharge_eq_zero
-#print axioms Mukai.mem_periodDomain₀_iff_expCharge_ne_zero
+#print axioms Mukai.mem_orthogonalityLocus_iff_expCharge_eq_zero
+#print axioms Mukai.mem_positivePlanesAway_iff_expCharge_ne_zero
 
-/-! ### The cut period domain is nonempty
+/-! ### Positive planes avoiding selected orthogonality loci are nonempty
 
-A Sylvester criterion makes the positive pairs an open set; each wall of a
+A Sylvester criterion makes the positive frames an open set; each orthogonality locus of a
 nonzero class is a proper closed subspace of `M × M`; Baire avoids countably many
 of them at once. This answers the question #700 left open. -/
 
 #print axioms PeriodDomain.apply_smul_add_smul
-#print axioms PeriodDomain.isPositivePair_iff
-#print axioms PeriodDomain.isOpen_setOf_isPositivePair
-#print axioms PeriodDomain.exists_isPositivePair
-#print axioms PeriodDomain.wallPairs
-#print axioms PeriodDomain.mem_wallPairs_iff
-#print axioms PeriodDomain.wallPairs_ne_top
-#print axioms PeriodDomain.dense_compl_wallPairs
-#print axioms PeriodDomain.nonempty_periodDomain₀
+#print axioms PeriodDomain.isPositiveFrame_iff
+#print axioms PeriodDomain.isOpen_setOf_isPositiveFrame
+#print axioms PeriodDomain.exists_isPositiveFrame
+#print axioms PeriodDomain.orthogonalityPairs
+#print axioms PeriodDomain.mem_orthogonalityPairs_iff
+#print axioms PeriodDomain.orthogonalityPairs_ne_top
+#print axioms PeriodDomain.dense_compl_orthogonalityPairs
+#print axioms PeriodDomain.nonempty_positivePlanesAway
 
 #print axioms Mukai.extendMap_add
 
 /-! ## The projection-sign cocycle
 
-The orientation partition of `Orientation.lean` does not depend on its
-reference pair. The proof interpolates a positive pair into the reference plane
+The orientation partition of `PositiveFrame.lean` does not depend on its
+reference frame. The proof interpolates a positive frame into the reference plane
 along a segment that stays positive, so the only analytic input is the
 intermediate value theorem on a quadratic polynomial — connectedness of the
 Grassmannian of positive planes is not used. -/
@@ -398,7 +404,7 @@ Grassmannian of positive planes is not used. -/
 #print axioms PeriodDomain.pairingDet_ref_comb
 #print axioms PeriodDomain.pairingDet_self
 #print axioms PeriodDomain.pairingDet_self_pos
-#print axioms PeriodDomain.isPositivePair_iff_forall_combination
+#print axioms PeriodDomain.isPositiveFrame_iff_forall_combination
 #print axioms PeriodDomain.projCoeffFst
 #print axioms PeriodDomain.projCoeffSnd
 #print axioms PeriodDomain.proj
@@ -408,7 +414,7 @@ Grassmannian of positive planes is not used. -/
 #print axioms PeriodDomain.sub_proj_mem_orthogonal
 #print axioms PeriodDomain.pairingDet_proj
 #print axioms PeriodDomain.pos_mul_endpoints_of_ne_zero
-#print axioms PeriodDomain.isPositivePair_interp
+#print axioms PeriodDomain.isPositiveFrame_interp
 #print axioms PeriodDomain.pairingDet_proj_mul_pos
 #print axioms PeriodDomain.pairingDet_cocycle
 #print axioms PeriodDomain.sameOrientation_iff_of_reference

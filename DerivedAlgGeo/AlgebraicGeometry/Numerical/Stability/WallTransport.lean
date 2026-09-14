@@ -164,8 +164,8 @@ theorem wallChargeFamily_charge (p : ℝ × ℝ) (E : N) :
 /-- Surface walls are inherited pullbacks of the generic determinant, whose
 specialized value is the established `(s,t)` polynomial. -/
 @[simp]
-theorem wallChargeFamily_wallValue (p : ℝ × ℝ) (E F : N) :
-    (wallChargeFamily V P).wallValue p E F =
+theorem wallChargeFamily_alignmentValue (p : ℝ × ℝ) (E F : N) :
+    (wallChargeFamily V P).alignmentValue p E F =
       Wall.wallExpr p.1 p.2 (toNumClass V P E) (toNumClass V P F) := by
   simp [wallChargeFamily]
 

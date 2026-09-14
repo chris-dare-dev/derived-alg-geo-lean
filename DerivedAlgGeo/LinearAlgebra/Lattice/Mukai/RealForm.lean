@@ -3,13 +3,13 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Orientation
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositiveFrame
 
 /-!
 # The real Mukai extension as a bundled quadratic form, and the exponential chart
 
 `Lattice/Mukai/Basic.lean` builds the Mukai extension of a symmetric bilinear
-`ℤ`-lattice as a bare pairing. `QuadraticForm/PeriodDomain.lean` and its
+`ℤ`-lattice as a bare pairing. `QuadraticForm/PositivePlane.lean` and its
 successors work with a bundled `QuadraticForm ℝ M`, because Mathlib's signature
 theory is quadratic-form-native. This file is the bridge: the real Mukai
 extension `ℝ × V × ℝ` of a real bilinear space, bundled, together with the
@@ -50,9 +50,9 @@ arithmetic:
 ```
 
 so **as soon as `ω` has positive square the pair spans a positive plane**
-(`isPositivePair_exp`) — the exponential chart lands in the period domain, and
+(`isPositiveFrame_exp`) — the exponential chart lands in the period domain, and
 `β` is unconstrained. This is the distinguished family
-`QuadraticForm/Orientation.lean` says is needed to name Bridgeland's component
+`QuadraticForm/PositiveFrame.lean` says is needed to name Bridgeland's component
 rather than an arbitrary half: take `(expRe, expIm)` as the reference pair.
 
 ## What is not here
@@ -63,7 +63,7 @@ rather than an arbitrary half: take `(expRe, expIm)` as the reference pair.
 * **The signature.** `HasSignatureTwo (realForm b)` when `b` has signature
   `(1, n - 1)` — the Hodge-index input — needs additivity of the signature over
   an orthogonal direct sum, which the pinned Mathlib does not have. Stated
-  nowhere below; `isPositivePair_exp` deliberately needs only `0 < b ω ω`.
+  nowhere below; `isPositiveFrame_exp` deliberately needs only `0 < b ω ω`.
 * **Any geometry.** `V` is an arbitrary real bilinear space, not `NS(X) ⊗ ℝ`.
 -/
 
@@ -225,8 +225,8 @@ Only `0 < b ω ω` is needed; `β` is unconstrained, and no signature hypothesis
 used. The two vectors are orthogonal with equal positive square, so every
 nonzero combination has positive square, and they are independent because their
 rank coordinates are `1` and `0`. -/
-theorem isPositivePair_exp (hb : ∀ x y : V, b x y = b y x) (hω : 0 < b ω ω) :
-    PeriodDomain.IsPositivePair (realForm b) (expRe b β ω) (expIm b β ω) := by
+theorem isPositiveFrame_exp (hb : ∀ x y : V, b x y = b y x) (hω : 0 < b ω ω) :
+    PeriodDomain.IsPositiveFrame (realForm b) (expRe b β ω) (expIm b β ω) := by
   have hindep : LinearIndependent ℝ ![expRe b β ω, expIm b β ω] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
@@ -246,16 +246,16 @@ theorem isPositivePair_exp (hb : ∀ x y : V, b x y = b y x) (hω : 0 < b ω ω)
       ext z
       simp
       tauto
-    rw [PeriodDomain.pairSpan, hrange]
+    rw [PeriodDomain.framePlane_mk, PeriodDomain.pairSpan, hrange]
     simpa using finrank_span_eq_card hindep
   · rintro ⟨v, hv⟩ hv0
-    rw [PeriodDomain.pairSpan, Submodule.mem_span_pair] at hv
+    rw [PeriodDomain.framePlane_mk, PeriodDomain.pairSpan, Submodule.mem_span_pair] at hv
     obtain ⟨s, t, rfl⟩ := hv
     rw [restrict_apply, realForm_smul_add_smul b β ω hb]
     have hst : s ≠ 0 ∨ t ≠ 0 := by
       by_contra hcon
       push Not at hcon
-      exact hv0 (by simp [hcon.1, hcon.2])
+      exact hv0 (Subtype.ext (by simp [hcon.1, hcon.2]))
     rcases hst with hs | ht
     · have : 0 < s ^ 2 := by positivity
       have h2 : 0 ≤ t ^ 2 := sq_nonneg t
@@ -281,10 +281,10 @@ Taking `(expRe, expIm)` as the reference is therefore not an arbitrary choice
 dressed up: the half it names is the one containing `exp(β + iω)`, which is how
 Bridgeland specifies `P⁺`. Whether that half is independent of `ω` is the
 cocycle question, and is not settled here. -/
-theorem mem_periodDomainPlus_exp (hb : ∀ x y : V, b x y = b y x) (hω : 0 < b ω ω) :
+theorem mem_positiveFramesPlus_exp (hb : ∀ x y : V, b x y = b y x) (hω : 0 < b ω ω) :
     (expRe b β ω, expIm b β ω) ∈
-      PeriodDomain.periodDomainPlus (realForm b) (expRe b β ω) (expIm b β ω) := by
-  refine ⟨isPositivePair_exp b β ω hb hω, ?_⟩
+      PeriodDomain.positiveFramesPlus (realForm b) (expRe b β ω) (expIm b β ω) := by
+  refine ⟨isPositiveFrame_exp b β ω hb hω, ?_⟩
   rw [pairingDet_exp_self b β ω hb]
   positivity
 

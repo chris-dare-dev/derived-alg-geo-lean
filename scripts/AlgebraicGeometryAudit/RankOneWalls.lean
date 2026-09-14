@@ -30,7 +30,7 @@ geometric K3. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.boxRegion
 #print axioms AlgebraicGeometry.Numerical.Examples.isCompact_parameterBox
 #print axioms AlgebraicGeometry.Numerical.Examples.k3HasSignatureTwo
-#print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_wallCandidates_box
+#print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_rayCandidates_box
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_walls_integral
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_walls_meeting_box
 #print axioms AlgebraicGeometry.Numerical.Examples.k3_finite_walls_through_expPlane
@@ -41,7 +41,7 @@ geometric K3. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.surfaceDivisorBasis
 #print axioms AlgebraicGeometry.Numerical.Examples.surfaceHasSignatureTwo
 #print axioms AlgebraicGeometry.Numerical.Examples.surfaceMukaiBasis
-#print axioms AlgebraicGeometry.Numerical.Examples.surface_chamber_inter_box
-#print axioms AlgebraicGeometry.Numerical.Examples.surface_finite_wallCandidates_box
+#print axioms AlgebraicGeometry.Numerical.Examples.surface_signedRayRegularLocus_inter_box
+#print axioms AlgebraicGeometry.Numerical.Examples.surface_finite_rayCandidates_box
 #print axioms AlgebraicGeometry.Numerical.Examples.surface_finite_walls_meeting_box
 #print axioms AlgebraicGeometry.Numerical.Examples.surface_finite_walls_through_expPlane

@@ -144,7 +144,7 @@ to any concrete realization. No basis and no Picard-rank hypothesis appear. -/
 
 toNumClassHom bundles the degree-weighted transport additively and
 wallChargeFamily pulls the generic (s,t) family back along it;
-wallChargeFamily_wallValue is the established wallExpr. This is the H-slice:
+wallChargeFamily_alignmentValue is the established wallExpr. This is the H-slice:
 c_1 is compressed to its H-degree. k3WallChargeFamily is the rank-one K3 model
 in ORDINARY Chern coordinates, not the Mukai charge. -/
 
@@ -154,7 +154,7 @@ in ORDINARY Chern coordinates, not the Mukai charge. -/
 #print axioms AlgebraicGeometry.Numerical.Surface.toNumClassHom_apply
 #print axioms AlgebraicGeometry.Numerical.Surface.wallChargeFamily
 #print axioms AlgebraicGeometry.Numerical.Surface.wallChargeFamily_charge
-#print axioms AlgebraicGeometry.Numerical.Surface.wallChargeFamily_wallValue
+#print axioms AlgebraicGeometry.Numerical.Surface.wallChargeFamily_alignmentValue
 
 /-! ## The two branches of the wall hierarchy agree
 
@@ -171,7 +171,7 @@ imZ on one side, ChernCharacter.centralCharge on the other). -/
 #print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.rankOneParameters_omega
 #print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.wallChargeFamily_charge_eq_centralCharge
 #print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.wallChargeFamily_eq_rankOne_reindex
-#print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.wallChargeFamily_wall_eq
+#print axioms AlgebraicGeometry.Numerical.Surface.NumericalRealization.wallChargeFamily_alignmentLocus_eq
 
 /-! ## The projective plane as a rank-one child
 

@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.BilinearForm.HodgeIndex
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.WallFiniteness
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.OrthogonalityFiniteness
 
 /-!
 # Spherical-wall finiteness for exponential planes
@@ -43,7 +43,7 @@ unconstrained. -/
 theorem isPositivePlane_expPlane (S : DivisorSpace D) (B omega : D)
     (homega : 0 < S.pair omega omega) :
     PeriodDomain.IsPositivePlane (Mukai.realForm S.intersection) (expPlane S B omega) :=
-  Mukai.isPositivePair_exp S.intersection B omega (fun x y => S.pair_comm x y) homega
+  Mukai.isPositiveFrame_exp S.intersection B omega (fun x y => S.pair_comm x y) homega
 
 variable [FiniteDimensional ℝ D]
 
@@ -54,9 +54,9 @@ theorem finite_walls_through_expPlane (h : S.HodgeDefinite H) (B omega : D)
     {ι : Type*} [Finite ι] (b : Module.Basis ι ℝ (Mukai.RealExtension D)) :
     {δ : Mukai.RealExtension D |
         PeriodDomain.IsSphericalClass (Mukai.realForm S.intersection) δ ∧
-        expPlane S B omega ∈ PeriodDomain.wall (Mukai.realForm S.intersection) δ ∧
+        expPlane S B omega ∈ PeriodDomain.orthogonalityLocus (Mukai.realForm S.intersection) δ ∧
         δ ∈ (Submodule.span ℤ (Set.range b) : Set (Mukai.RealExtension D))}.Finite :=
-  PeriodDomain.finite_walls_through (hasSignatureTwo_of_hodgeDefinite h)
+  PeriodDomain.finite_orthogonalityLoci_through (hasSignatureTwo_of_hodgeDefinite h)
     (isPositivePlane_expPlane S B omega homega) b
 
 /-- The same finiteness, stated as a bounded set of spherical classes

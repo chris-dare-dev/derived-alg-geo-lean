@@ -10,7 +10,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Diviso
 # A bounded region from a Hodge divisor space
 
 `Spherical/Finiteness.lean` proves that finitely many spherical walls meet a
-`BoundedRegion` of the `(β, ω)` chart, and defines the chamber they cut out.
+`BoundedRegion` of the `(β, ω)` chart, and defines the signedRayRegularLocus they cut out.
 Its own module docstring records that nothing inhabits that structure:
 
 > exhibiting a region with these constants is a statement about the ample cone,
@@ -42,9 +42,9 @@ certificate per point.
 
 ## What this does and does not settle
 
-It makes `finite_walls_meeting` and `chamber` non-vacuous on any Hodge divisor
+It makes `finite_walls_meeting` and `signedRayRegularLocus` non-vacuous on any Hodge divisor
 space.  It does not prove a Hodge index theorem for a geometric surface, and it
-says nothing about semistable objects: `chamber` is a subset of the parameter
+says nothing about semistable objects: `signedRayRegularLocus` is a subset of the parameter
 chart, and constancy of anything on it is not asserted.
 -/
 
@@ -103,34 +103,34 @@ theorem expPlane_eq_chartPlane (S : Divisorial.DivisorSpace D) (B omega : D) :
 
 /-! ### The consequences, now non-vacuous -/
 
-/-- **Finitely many spherical classes of a lattice have a wall meeting a compact
+/-- **Finitely many spherical classes of a lattice have a nonpositiveRayLocus meeting a compact
 family of parameters on a Hodge divisor space.**
 
-This is `BoundedRegion.finite_wallCandidates` with the region supplied.  Every
+This is `BoundedRegion.finite_rayCandidates` with the region supplied.  Every
 hypothesis is discharged except the Hodge certificate itself. -/
-theorem finite_wallCandidates_ofDivisorSpace (h : S.HodgeDefinite H) {K : Set (D × D)}
+theorem finite_rayCandidates_ofDivisorSpace (h : S.HodgeDefinite H) {K : Set (D × D)}
     (hK : IsCompact K) (hpos : ∀ p ∈ K, 0 < S.pair p.2 p.2)
     {ι : Type*} [Finite ι] (basis : Module.Basis ι ℝ D) :
-    (wallCandidates S.intersection (BoundedRegion.ofDivisorSpace h hK hpos)
+    (rayCandidates S.intersection (BoundedRegion.ofDivisorSpace h hK hpos)
       ↑(Submodule.span ℤ (Set.range basis))).Finite :=
-  BoundedRegion.finite_wallCandidates _ (fun x y => S.pair_comm x y) basis
+  BoundedRegion.finite_rayCandidates _ (fun x y => S.pair_comm x y) basis
 
-/-- **On a compact family over a Hodge divisor space, the chamber is cut out by
+/-- **On a compact family over a Hodge divisor space, the signedRayRegularLocus is cut out by
 finitely many walls.**
 
-`chamber_inter_carrier` says the chamber of the whole lattice agrees, on the
-region, with the chamber of the wall candidates, and
-`finite_wallCandidates_ofDivisorSpace` says those are finite.  Together they are
-the chamber decomposition the missing witness has been blocking. -/
-theorem chamber_inter_ofDivisorSpace (h : S.HodgeDefinite H) {K : Set (D × D)}
+`signedRayRegularLocus_inter_carrier` says the signedRayRegularLocus of the whole lattice agrees, on the
+region, with the signedRayRegularLocus of the nonpositiveRayLocus candidates, and
+`finite_rayCandidates_ofDivisorSpace` says those are finite.  Together they are
+the signedRayRegularLocus decomposition the missing witness has been blocking. -/
+theorem signedRayRegularLocus_inter_ofDivisorSpace (h : S.HodgeDefinite H) {K : Set (D × D)}
     (hK : IsCompact K) (hpos : ∀ p ∈ K, 0 < S.pair p.2 p.2)
     {ι : Type*} (basis : Module.Basis ι ℝ D) :
-    chamber S.intersection
+    signedRayRegularLocus S.intersection
         (latticeSpherical S.intersection ↑(Submodule.span ℤ (Set.range basis))) ∩ K
-      = chamber S.intersection
-        (wallCandidates S.intersection (BoundedRegion.ofDivisorSpace h hK hpos)
+      = signedRayRegularLocus S.intersection
+        (rayCandidates S.intersection (BoundedRegion.ofDivisorSpace h hK hpos)
           ↑(Submodule.span ℤ (Set.range basis))) ∩ K :=
-  chamber_inter_carrier S.intersection (BoundedRegion.ofDivisorSpace h hK hpos)
+  signedRayRegularLocus_inter_carrier S.intersection (BoundedRegion.ofDivisorSpace h hK hpos)
     ↑(Submodule.span ℤ (Set.range basis))
 
 end

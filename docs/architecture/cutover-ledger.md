@@ -100,8 +100,8 @@ otherwise; issue numbers are the implementing task.
 | Relationship | Owner |
 | --- | --- |
 | Definition owner | `LinearAlgebra/QuadraticForm/ComplexPairing.lean` keeps the paired functional, its additivity, real linearity and kernel description |
-| Neutral core | `QuadraticForm/Continuous.lean` owns continuity; `QuadraticForm/Bounds.lean` owns positive-definite coercivity and bounded level sets; `WallFiniteness.lean` consumes them |
-| Application adapter | `StabilityCondition/CentralCharge/Quadratic.lean` owns the wall and period-domain readings; `Support/Divisorial.lean` owns the full support-property adapter |
+| Neutral core | `QuadraticForm/Continuous.lean` owns continuity; `QuadraticForm/Bounds.lean` owns positive-definite coercivity and bounded level sets; `OrthogonalityFiniteness.lean` consumes them |
+| Application adapter | `StabilityCondition/CentralCharge/Quadratic.lean` owns the orthogonality-locus and positive-plane readings; `Support/Divisorial.lean` owns the full support-property adapter |
 | Comparison owner | unchanged: `Weak/Support/Predicate/Quadratic.lean` already records that negative definiteness on `ker Z` is one part of the quadratic support criterion and that nonnegativity on the relevant semistable classes is a further requirement |
 
 Independent consumer for the extracted neutral modules: the wall-finiteness
@@ -114,10 +114,10 @@ definition mentions no category, heart, Chern character or scheme.
 
 | Relationship | Owner |
 | --- | --- |
-| Definition owner | the set-of-two-dimensional-submodules carrier and the ordered-pair carrier stay distinct declarations with distinct names; neither is renamed into the other |
-| Neutral core | positive-subspace and positive-frame theory, and the deleted-locus/arrangement finiteness results, stated independently of stability |
-| Application adapter | under stability, the numerical alignment locus, the signed ray locus and the charge-zero locus are named apart; `PeriodDomain.wall` (orthogonality to a class) and `ChargeFamily.wall` (real linear dependence of two charges) are not merged |
-| Comparison owner | the existing wall-comparison module keeps the frame/plane and locus comparison maps; the K3 identification with the framed domain belongs to its geometric realization |
+| Definition owner | `QuadraticForm/PositivePlane.lean` owns `IsPositivePlane` and `positivePlanes`; `PositiveFrame.lean` owns `IsPositiveFrame`, `positiveFrames`, `framePlane` and `forgetPositiveFrame` |
+| Neutral core | `OrthogonalityLocus.lean` owns `orthogonalityLocus` and `positivePlanesAway`; `OrthogonalityFiniteness.lean`, `OrthogonalityRegion.lean` and `OrthogonalityCutNonempty.lean` retain the arrangement results independently of stability |
+| Application adapter | `CentralCharge/Family.lean` owns `zeroLocus`; `Walls/Alignment.lean` owns `alignmentValue`, `alignmentLocus` and the nonzero, positive-sign `positiveRayLocus`; `Walls/Spherical/Basic.lean` owns `nonpositiveRayLocus`; `Chambers/Basic.lean` owns the stability-space `chargeZeroLocus` |
+| Comparison owner | `Spherical/WallComparison.lean` makes `chartFrame → chartPlane` explicit and compares orthogonality with the signed-ray locus; `Chambers/Basic.lean` compares stability-space vanishing with `ChargeFamily.zeroLocus`; a K3 identification with a framed geometric domain remains with its realization |
 
 No `RealCodimensionOneSubmanifold` parent is created: `Z(δ) = 0` is generically
 two real equations and phase alignment is generically one, still requiring
@@ -411,6 +411,17 @@ tree with modules that do not.
 
 ## Completed roots
 
+- Positive planes, positive frames and numerical loci (2026-09-14, finding 02):
+  `QuadraticForm/PositivePlane.lean` and `PositiveFrame.lean` own distinct
+  carriers connected by `framePlane` and `forgetPositiveFrame`.
+  `OrthogonalityLocus.lean` and the `Orthogonality*` consumers retain the
+  neutral arrangement and finiteness theory. `CentralCharge/Family.lean`,
+  `Walls/Alignment.lean`, `Walls/Spherical/Basic.lean` and `Chambers/Basic.lean`
+  separately own charge-zero, determinant-alignment, positive-ray,
+  nonpositive-ray and stability-space loci. The comparison modules state only
+  the maps and inclusions their hypotheses support; no shared codimension-one
+  superclass or actual destabilization object was introduced.
+
 - Charge construction upstream of walls (2026-09-13, findings 01 and 04):
   `StabilityCondition/CentralCharge/Family.lean` now owns the unchanged
   additive `ChargeFamily`; `CentralCharge/Exponential/` owns the unchanged
@@ -428,7 +439,7 @@ tree with modules that do not.
   interpretations are downstream in `CentralCharge/Quadratic.lean`.
   `QuadraticForm/Continuous.lean` and `Bounds.lean` extract the arbitrary
   continuity, coercivity and level-set results formerly mixed into
-  `WallFiniteness.lean`. `LinearAlgebra/BilinearForm/HodgeIndex.lean` owns the
+  `OrthogonalityFiniteness.lean`. `LinearAlgebra/BilinearForm/HodgeIndex.lean` owns the
   abstract symmetric divisor space and its Hodge signature theory. Geometric
   Chern and Todd realizations remain under `AlgebraicGeometry/Numerical/`.
 

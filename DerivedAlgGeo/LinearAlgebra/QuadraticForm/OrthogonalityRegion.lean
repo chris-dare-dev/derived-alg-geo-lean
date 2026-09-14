@@ -2,12 +2,13 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.WallFiniteness
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.OrthogonalityFiniteness
 
 /-!
-# Regions of positive planes, and the walls that meet them
+# Regions of positive planes, and the orthogonality loci that meet them
 
-`WallFiniteness.lean` counts the spherical walls through **one** positive plane.
+`OrthogonalityFiniteness.lean` counts the spherical orthogonality loci through
+**one** positive plane.
 This file does it for a family, which is what a local-finiteness statement about
 the period domain needs.
 
@@ -38,13 +39,13 @@ which keeps everything inside the linear algebra already in the tree.
 
 * `exists_uniform_coercivity` — a compact family of positive planes has a
   uniform coercivity constant. Its closedness input, `mem_orthogonal_span_pair_iff`,
-  is pure algebra and lives in `PeriodDomain.lean`.
-* `PlaneRegion.finite_wallClasses_inter` — **finitely many spherical classes of a
-  lattice have a wall meeting the region.**
+  is pure algebra and lives in `PositivePlane.lean`.
+* `PlaneRegion.finite_orthogonalClasses_inter` — **finitely many spherical classes of a
+  lattice have an orthogonality locus meeting the region.**
 * `PlaneRegion.ofCompactPairs` — the criterion, packaged; and `PlaneRegion.empty`
   for contrast, a witness that proves only non-vacuity of the structure.
 
-As in `PeriodDomain.lean`, everything is about an arbitrary real quadratic space
+As in `PositivePlane.lean`, everything is about an arbitrary real quadratic space
 and its lattices, and no geometry is asserted.
 -/
 
@@ -151,19 +152,19 @@ namespace PlaneRegion
 
 variable (R : PlaneRegion Q)
 
-/-- The spherical classes with a wall meeting the region. -/
-def wallClasses : Set M :=
-  {δ | IsSphericalClass Q δ ∧ ∃ W ∈ R.carrier, W ∈ wall Q δ}
+/-- The spherical classes with a orthogonalityLocus meeting the region. -/
+def orthogonalClasses : Set M :=
+  {δ | IsSphericalClass Q δ ∧ ∃ W ∈ R.carrier, W ∈ orthogonalityLocus Q δ}
 
 omit [FiniteDimensional ℝ M] in
-/-- **The wall classes of a region are bounded**, by the one constant the region
+/-- **The orthogonalityLocus classes of a region are bounded**, by the one constant the region
 carries. -/
-theorem isBounded_wallClasses : IsBounded R.wallClasses := by
+theorem isBounded_orthogonalClasses : IsBounded R.orthogonalClasses := by
   rw [isBounded_iff_forall_norm_le]
   refine ⟨Real.sqrt (1 / R.coercivity), ?_⟩
   rintro δ ⟨hsph, W, hW, hwall⟩
   have hmem : δ ∈ orthogonal Q W :=
-    (mem_wall_iff_mem_orthogonal (R.isPositivePlane W hW)).mp hwall
+    (mem_orthogonalityLocus_iff_mem_orthogonal (R.isPositivePlane W hW)).mp hwall
   have h := R.uniform W hW δ hmem
   rw [isSphericalClass_iff_apply.mp hsph] at h
   have hsq : ‖δ‖ ^ 2 ≤ 1 / R.coercivity := by
@@ -171,12 +172,12 @@ theorem isBounded_wallClasses : IsBounded R.wallClasses := by
     linarith
   exact (Real.le_sqrt (norm_nonneg δ) (div_nonneg zero_le_one R.coercivity_pos.le)).mpr hsq
 
-/-- **Only finitely many spherical classes of a lattice have a wall meeting the
+/-- **Only finitely many spherical classes of a lattice have a orthogonalityLocus meeting the
 region.** Bridgeland's local finiteness in the period-domain chart, with the
 uniform constant explicit. -/
-theorem finite_wallClasses_inter {ι : Type*} [Finite ι] (b : Module.Basis ι ℝ M) :
-    (R.wallClasses ∩ (Submodule.span ℤ (Set.range b) : Set M)).Finite :=
-  ZSpan.setFinite_inter b R.isBounded_wallClasses
+theorem finite_orthogonalClasses_inter {ι : Type*} [Finite ι] (b : Module.Basis ι ℝ M) :
+    (R.orthogonalClasses ∩ (Submodule.span ℤ (Set.range b) : Set M)).Finite :=
+  ZSpan.setFinite_inter b R.isBounded_orthogonalClasses
 
 end PlaneRegion
 
