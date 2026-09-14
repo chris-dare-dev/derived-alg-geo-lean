@@ -147,7 +147,7 @@ until their implementing cutovers add the corresponding checks.
 - **Stability-neutral geometry.** Geometry reaches the stability tree only from
   the subcomponents that exist to consume it: `DerivedCategory/Stability/`,
   `Moduli/{HarderNarasimhan,Semistability}/`, `Numerical/Stability/`,
-  `Numerical/Examples/{Surface,Threefold}/`,
+  `Numerical/Examples/{Surface,Threefold,Fourfold}/`,
   `Numerical/GrothendieckGroup/CategoricalCharge/` and `Stability/Gieseker/`.
   Everything else below `AlgebraicGeometry/` is stability-neutral, transitively
   included. A same-named umbrella over one of those subcomponents is exempt as

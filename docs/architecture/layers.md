@@ -36,11 +36,12 @@ complete mathematical ownership policy.
    `DerivedAlgGeoSweep.lean` import everything and own nothing.
 2. **`Development/` is a leaf.** No stable module imports it.
 3. **Stability-neutral geometry.** A module below `AlgebraicGeometry/` that is
-   not below one of the eight subcomponents that exist to consume stability
-   never reaches the stability tree, even transitively. The eight are
+   not below one of the nine subcomponents that exist to consume stability
+   never reaches the stability tree, even transitively. The nine are
    `DerivedCategory/Stability/`, `Moduli/HarderNarasimhan/`,
    `Moduli/Semistability/`, `Numerical/Stability/`,
    `Numerical/Examples/Surface/`, `Numerical/Examples/Threefold/`,
+   `Numerical/Examples/Fourfold/`,
    `Numerical/GrothendieckGroup/CategoricalCharge/` and `Stability/Gieseker/`.
    A same-named umbrella over one of them re-exports it and is exempt as an
    umbrella only; its other children are not. This keeps `Dᵇ(Coh X)`, `Dqc`,
@@ -48,6 +49,8 @@ complete mathematical ownership policy.
    Before 2026-09-13 the exemption named the whole `Moduli/`, `Numerical/`,
    `Stability/` and `DerivedCategory/Stability/` subtrees, which exempted 122
    modules to excuse the 60 that use the tree; MO1.01 (#1312) narrowed it.
+   `Numerical/Examples/Fourfold/` was neutral at that moment and stopped being
+   so the same day, when #1225 gave the fourfold models their wall families.
 4. **Weak stability is independent of Bridgeland stability.** No module of the
    weak theory imports the Bridgeland theory, and
    `PreStabilityCondition` structurally `extends toWeak :
