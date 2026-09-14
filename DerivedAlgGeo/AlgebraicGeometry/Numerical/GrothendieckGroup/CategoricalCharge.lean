@@ -98,9 +98,9 @@ numerical charge remains independent of wall loci. -/
 theorem mem_wall_iff_numericalCharge_eq_zero (hb : ∀ x y : W, bR x y = bR y x)
     (hω : 0 < bR ω ω) (E : N) :
     PeriodDomain.pairSpan (Mukai.expRe bR β ω) (Mukai.expIm bR β ω) ∈
-        PeriodDomain.wall (Mukai.realForm bR) (Mukai.extendMap f (D.mukaiVectorHom E)) ↔
+        PeriodDomain.orthogonalityLocus (Mukai.realForm bR) (Mukai.extendMap f (D.mukaiVectorHom E)) ↔
       D.numericalCharge bR f β ω E = 0 :=
-  Mukai.mem_wall_iff_expCharge_eq_zero bR β ω hb hω
+  Mukai.mem_orthogonalityLocus_iff_expCharge_eq_zero bR β ω hb hω
 
 end AdditiveMukaiData
 

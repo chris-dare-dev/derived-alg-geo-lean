@@ -16,8 +16,8 @@ statement.
 
 ## Two hypotheses the printed proof leaves implicit
 
-The argument is: a wall through `(β, ω)` forces `Δ − rβ ∈ ω^⊥`, negative
-definiteness there bounds `q(Δ − rβ, Δ − rβ) ≤ 0`, sphericity turns the wall
+The argument is: a nonpositiveRayLocus through `(β, ω)` forces `Δ − rβ ∈ ω^⊥`, negative
+definiteness there bounds `q(Δ − rβ, Δ − rβ) ≤ 0`, sphericity turns the nonpositiveRayLocus
 inequality into `r²·q(ω,ω) ≤ 2 + q(Δ − rβ, Δ − rβ) ≤ 2`, and then "only finitely
 many `r`, hence only finitely many `Δ`". Writing that down forces two
 quantifiers the source does not state.
@@ -53,7 +53,7 @@ not `NS(X)`.
 ## Main results
 
 * `BoundedRegion` — a region together with the two constants above.
-* `rk_sq_le` — `r² ≤ 2 / ampleLower` for a spherical class whose wall meets the
+* `rk_sq_le` — `r² ≤ 2 / ampleLower` for a spherical class whose nonpositiveRayLocus meets the
   region. This is where positivity of the lower bound on `q(ω,ω)` is spent.
 * `normSq_sub_smul_le` — `‖Δ − rβ‖² ≤ 2 / coercivity`, from the same
   inequality read the other way.
@@ -96,16 +96,16 @@ namespace BoundedRegion
 
 variable {q} (R : BoundedRegion q)
 
-/-- The two facts a wall through the region gives about the class, before any
-finiteness reasoning: the offset `Δ − rβ` is `q`-negative, and the wall
+/-- The two facts a nonpositiveRayLocus through the region gives about the class, before any
+finiteness reasoning: the offset `Δ − rβ` is `q`-negative, and the nonpositiveRayLocus
 inequality holds. -/
 theorem key (hq : ∀ x y : V, q x y = q y x) {δ : Mukai.RealExtension V}
     (hs : IsSpherical q δ) (hr : 0 < δ.1) {p : V × V} (hp : p ∈ R.carrier)
-    (hw : p ∈ wall q δ) :
+    (hw : p ∈ nonpositiveRayLocus q δ) :
     q (δ.2.1 - δ.1 • p.1) (δ.2.1 - δ.1 • p.1) ≤ -R.coercivity * ‖δ.2.1 - δ.1 • p.1‖ ^ 2 ∧
       δ.1 ^ 2 * q p.2 p.2
         ≤ 2 + q (δ.2.1 - δ.1 • p.1) (δ.2.1 - δ.1 • p.1) := by
-  rw [mem_wall_iff_of_isSpherical q hq hs hr] at hw
+  rw [mem_nonpositiveRayLocus_iff_of_isSpherical q hq hs hr] at hw
   exact ⟨R.neg_definite p hp _ hw.1, hw.2⟩
 
 /-- **The rank is bounded.** `r² ≤ 2 / ampleLower`.
@@ -114,7 +114,7 @@ This is the step that needs `ampleLower > 0`, and the step the printed argument
 performs by saying "`ω` is constrained to lie in a bounded region". -/
 theorem rk_sq_le (hq : ∀ x y : V, q x y = q y x) {δ : Mukai.RealExtension V}
     (hs : IsSpherical q δ) (hr : 0 < δ.1) {p : V × V} (hp : p ∈ R.carrier)
-    (hw : p ∈ wall q δ) :
+    (hw : p ∈ nonpositiveRayLocus q δ) :
     δ.1 ^ 2 ≤ 2 / R.ampleLower := by
   obtain ⟨hneg, hle⟩ := R.key hq hs hr hp hw
   have hnn : -R.coercivity * ‖δ.2.1 - δ.1 • p.1‖ ^ 2 ≤ 0 := by
@@ -131,7 +131,7 @@ The same inequality as `rk_sq_le`, read for the other term: `r²·q(ω,ω) ≥ 0
 absorbs the rank contribution and what is left bounds the offset. -/
 theorem normSq_sub_smul_le (hq : ∀ x y : V, q x y = q y x) {δ : Mukai.RealExtension V}
     (hs : IsSpherical q δ) (hr : 0 < δ.1) {p : V × V} (hp : p ∈ R.carrier)
-    (hw : p ∈ wall q δ) :
+    (hw : p ∈ nonpositiveRayLocus q δ) :
     ‖δ.2.1 - δ.1 • p.1‖ ^ 2 ≤ 2 / R.coercivity := by
   obtain ⟨hneg, hle⟩ := R.key hq hs hr hp hw
   have hω : R.ampleLower ≤ q p.2 p.2 := R.ample_le p hp
@@ -163,10 +163,10 @@ noncomputable def reconstruct (nΔ : ℤ × V) : Mukai.RealExtension V :=
   ((nΔ.1 : ℝ), nΔ.2, (q nΔ.2 nΔ.2 + 2) / (2 * (nΔ.1 : ℝ)))
 
 /-- The spherical classes of positive integral rank, with middle coordinate in
-`Λ`, whose wall meets the region. -/
-def wallCandidates (R : BoundedRegion q) (Λ : Set V) : Set (Mukai.RealExtension V) :=
+`Λ`, whose nonpositiveRayLocus meets the region. -/
+def rayCandidates (R : BoundedRegion q) (Λ : Set V) : Set (Mukai.RealExtension V) :=
   {δ | IsSpherical q δ ∧ 0 < δ.1 ∧ (∃ n : ℤ, (n : ℝ) = δ.1) ∧ δ.2.1 ∈ Λ ∧
-    (wall q δ ∩ R.carrier).Nonempty}
+    (nonpositiveRayLocus q δ ∩ R.carrier).Nonempty}
 
 namespace BoundedRegion
 
@@ -181,9 +181,9 @@ theorem exists_norm_fst_le : ∃ M : ℝ, 0 ≤ M ∧ ∀ p ∈ R.carrier, ‖p.
 /-- **Every candidate is reconstructed from a bounded integer and a bounded
 lattice point.** This is the whole content of the finiteness argument; the
 finiteness itself is then two standard facts. -/
-theorem wallCandidates_subset (hq : ∀ x y : V, q x y = q y x) (Λ : Set V)
+theorem rayCandidates_subset (hq : ∀ x y : V, q x y = q y x) (Λ : Set V)
     {M : ℝ} (hM : ∀ p ∈ R.carrier, ‖p.1‖ ≤ M) :
-    wallCandidates q R Λ ⊆
+    rayCandidates q R Λ ⊆
       reconstruct q ''
         (Set.Icc (1 : ℤ) ⌈2 / R.ampleLower⌉ ×ˢ
           (Metric.closedBall (0 : V)
@@ -230,47 +230,47 @@ theorem wallCandidates_subset (hq : ∀ x y : V, q x y = q y x) (Λ : Set V)
 Bridgeland's Proposition 11.2, with the two uniform constants of
 `BoundedRegion` made explicit and the rank required to be an integer. `Λ` is the
 `ℤ`-span of an `ℝ`-basis; it is not asserted to be `NS(X)`. -/
-theorem finite_wallCandidates (hq : ∀ x y : V, q x y = q y x)
+theorem finite_rayCandidates (hq : ∀ x y : V, q x y = q y x)
     [FiniteDimensional ℝ V] {ι : Type*} [Finite ι] (basis : Module.Basis ι ℝ V) :
-    (wallCandidates q R ↑(Submodule.span ℤ (Set.range basis))).Finite := by
+    (rayCandidates q R ↑(Submodule.span ℤ (Set.range basis))).Finite := by
   obtain ⟨M, _, hM⟩ := R.exists_norm_fst_le
   refine Set.Finite.subset (Set.Finite.image _ ?_)
-    (R.wallCandidates_subset hq _ hM)
+    (R.rayCandidates_subset hq _ hM)
   exact (Set.finite_Icc _ _).prod
     (ZSpan.setFinite_inter basis Metric.isBounded_closedBall)
 
 end BoundedRegion
 
 
-/-! ### The chamber is cut out by finitely many walls on the region -/
+/-! ### The signedRayRegularLocus is cut out by finitely many walls on the region -/
 
-/-- The classes the chamber of a lattice is cut out by: spherical, of positive
+/-- The classes the signedRayRegularLocus of a lattice is cut out by: spherical, of positive
 integral rank, with middle coordinate in `Λ`.
 
-`wallCandidates` is this set intersected with "has a wall meeting the region",
+`rayCandidates` is this set intersected with "has a nonpositiveRayLocus meeting the region",
 so the two differ only by a condition that is vacuous off the region. -/
 def latticeSpherical (Λ : Set V) : Set (Mukai.RealExtension V) :=
   {δ | IsSpherical q δ ∧ 0 < δ.1 ∧ (∃ n : ℤ, (n : ℝ) = δ.1) ∧ δ.2.1 ∈ Λ}
 
-theorem wallCandidates_subset_latticeSpherical (R : BoundedRegion q) (Λ : Set V) :
-    wallCandidates q R Λ ⊆ latticeSpherical q Λ := by
+theorem rayCandidates_subset_latticeSpherical (R : BoundedRegion q) (Λ : Set V) :
+    rayCandidates q R Λ ⊆ latticeSpherical q Λ := by
   rintro δ ⟨hs, hr, hn, hΛ, -⟩
   exact ⟨hs, hr, hn, hΛ⟩
 
-/-- **On the region, the chamber of the whole lattice is the chamber of the
+/-- **On the region, the signedRayRegularLocus of the whole lattice is the signedRayRegularLocus of the
 finitely many candidates.**
 
-A class whose wall misses the region cannot separate two of its points, so the
-chamber restricted to the region only sees `wallCandidates` — which
-`finite_wallCandidates` shows is finite.  This is what turns local finiteness
-into a chamber decomposition. -/
-theorem chamber_inter_carrier (R : BoundedRegion q) (Λ : Set V) :
-    chamber q (latticeSpherical q Λ) ∩ R.carrier
-      = chamber q (wallCandidates q R Λ) ∩ R.carrier := by
+A class whose nonpositiveRayLocus misses the region cannot separate two of its points, so the
+signedRayRegularLocus restricted to the region only sees `rayCandidates` — which
+`finite_rayCandidates` shows is finite.  This is what turns local finiteness
+into a signedRayRegularLocus decomposition. -/
+theorem signedRayRegularLocus_inter_carrier (R : BoundedRegion q) (Λ : Set V) :
+    signedRayRegularLocus q (latticeSpherical q Λ) ∩ R.carrier
+      = signedRayRegularLocus q (rayCandidates q R Λ) ∩ R.carrier := by
   ext p
   constructor
   · rintro ⟨hp, hcar⟩
-    exact ⟨chamber_antitone q (wallCandidates_subset_latticeSpherical q R Λ) hp, hcar⟩
+    exact ⟨signedRayRegularLocus_antitone q (rayCandidates_subset_latticeSpherical q R Λ) hp, hcar⟩
   · rintro ⟨hp, hcar⟩
     refine ⟨fun δ hδ hw => ?_, hcar⟩
     exact hp δ ⟨hδ.1, hδ.2.1, hδ.2.2.1, hδ.2.2.2, p, hw, hcar⟩ hw

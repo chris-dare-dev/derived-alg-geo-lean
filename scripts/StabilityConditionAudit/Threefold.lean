@@ -20,8 +20,8 @@ coordinate, and betaTwist_betaTwist is the group law
 e^{-(b1+b2)H} = e^{-b1 H} e^{-b2 H} on the four degrees. betaTwist fixes deg0,
 because the twist sums over j <= 0 in codimension zero.
 
-chargeFamily is another child of Walls/ChargeFamily.lean; positivity alpha > 0
-is NOT built into the parameter type. wallValue_div_alpha records that dropping
+chargeFamily is another child of Walls/Alignment.lean; positivity alpha > 0
+is NOT built into the parameter type. alignmentValue_div_alpha records that dropping
 the outer alpha from the imaginary part -- the other normalisation found in the
 literature -- rescales every wall expression by alpha and so moves no wall off
 alpha = 0.
@@ -51,7 +51,7 @@ assuming the conjecture. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.charge
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.chargeFamily
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.chargeFamily_charge
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.chargeFamily_wallValue
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.chargeFamily_alignmentValue
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.charge_im
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.charge_re
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.discr
@@ -62,4 +62,4 @@ assuming the conjecture. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.nu_zero_alpha
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.reZ
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.reZ_eq_betaTwist
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.wallValue_div_alpha
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.alignmentValue_div_alpha

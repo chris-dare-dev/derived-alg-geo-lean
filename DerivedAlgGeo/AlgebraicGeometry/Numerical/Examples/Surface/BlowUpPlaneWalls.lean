@@ -33,7 +33,7 @@ This file supplies the basis and instantiates the chain.
   against.
 * `finite_walls_through_expPlane` — the pointwise count.
 * `finite_walls_meeting_ampleBox` — the region-wise count over a compact family.
-* `boxRegion`, `chamber_inter_ampleBox` — the chamber, cut out by finitely many
+* `boxRegion`, `signedRayRegularLocus_inter_ampleBox` — the chamber, cut out by finitely many
   walls on the family.
 
 Every hypothesis is discharged.  Because `hodgeDefinite` needs only `ω² > 0` on
@@ -110,7 +110,7 @@ theorem finite_walls_through_expPlane (B omega : Divisor)
     {δ : Mukai.RealExtension Divisor |
         PeriodDomain.IsSphericalClass (Mukai.realForm divisorSpace.intersection) δ ∧
         DivisorSpace.expPlane divisorSpace B omega ∈
-          PeriodDomain.wall (Mukai.realForm divisorSpace.intersection) δ ∧
+          PeriodDomain.orthogonalityLocus (Mukai.realForm divisorSpace.intersection) δ ∧
         δ ∈ (Submodule.span ℤ (Set.range mukaiBasis) :
               Set (Mukai.RealExtension Divisor))}.Finite :=
   DivisorSpace.finite_walls_through_expPlane (hodgeDefinite homega) B omega homega mukaiBasis
@@ -151,7 +151,7 @@ theorem finite_walls_meeting_ampleBox {omega₀ : Divisor}
         PeriodDomain.IsSphericalClass (Mukai.realForm divisorSpace.intersection) δ ∧
         (∃ p ∈ ampleBox omega₀ b₀ t₀ t₁,
           DivisorSpace.expPlane divisorSpace p.1 p.2 ∈
-            PeriodDomain.wall (Mukai.realForm divisorSpace.intersection) δ) ∧
+            PeriodDomain.orthogonalityLocus (Mukai.realForm divisorSpace.intersection) δ) ∧
         δ ∈ (Submodule.span ℤ (Set.range mukaiBasis) :
               Set (Mukai.RealExtension Divisor))}.Finite :=
   DivisorSpace.finite_walls_meeting_expFamily (hodgeDefinite h₀)
@@ -167,30 +167,30 @@ def boxRegion {omega₀ : Divisor} (h₀ : 0 < divisorSpace.pair omega₀ omega�
 
 /-- **Finitely many spherical classes have a wall meeting the family**, in the
 `(β, ω)` chart. -/
-theorem finite_wallCandidates_ampleBox {omega₀ : Divisor}
+theorem finite_rayCandidates_ampleBox {omega₀ : Divisor}
     (h₀ : 0 < divisorSpace.pair omega₀ omega₀) (b₀ : ℝ) {t₀ : ℝ} (t₁ : ℝ) (ht₀ : 0 < t₀) :
-    (Wall.Spherical.wallCandidates divisorSpace.intersection
+    (Wall.Spherical.rayCandidates divisorSpace.intersection
       (boxRegion h₀ b₀ t₁ ht₀)
       ↑(Submodule.span ℤ (Set.range divisorBasis))).Finite :=
-  Wall.Spherical.finite_wallCandidates_ofDivisorSpace _ _ _ divisorBasis
+  Wall.Spherical.finite_rayCandidates_ofDivisorSpace _ _ _ divisorBasis
 
 /-- **On the family, the chamber of the whole lattice is the chamber of those
 finitely many classes.**
 
 This is the chamber decomposition on the model where the Hodge input is not
 vacuous.  It says nothing about semistable objects. -/
-theorem chamber_inter_ampleBox {omega₀ : Divisor}
+theorem signedRayRegularLocus_inter_ampleBox {omega₀ : Divisor}
     (h₀ : 0 < divisorSpace.pair omega₀ omega₀) (b₀ : ℝ) {t₀ : ℝ} (t₁ : ℝ) (ht₀ : 0 < t₀) :
-    Wall.Spherical.chamber divisorSpace.intersection
+    Wall.Spherical.signedRayRegularLocus divisorSpace.intersection
         (Wall.Spherical.latticeSpherical divisorSpace.intersection
           ↑(Submodule.span ℤ (Set.range divisorBasis)))
         ∩ ampleBox omega₀ b₀ t₀ t₁
-      = Wall.Spherical.chamber divisorSpace.intersection
-        (Wall.Spherical.wallCandidates divisorSpace.intersection
+      = Wall.Spherical.signedRayRegularLocus divisorSpace.intersection
+        (Wall.Spherical.rayCandidates divisorSpace.intersection
           (boxRegion h₀ b₀ t₁ ht₀)
           ↑(Submodule.span ℤ (Set.range divisorBasis)))
         ∩ ampleBox omega₀ b₀ t₀ t₁ :=
-  Wall.Spherical.chamber_inter_ofDivisorSpace _ _ _ divisorBasis
+  Wall.Spherical.signedRayRegularLocus_inter_ofDivisorSpace _ _ _ divisorBasis
 
 /-! ### The integral Néron--Severi lattice, and the spherical comparison -/
 
@@ -274,7 +274,7 @@ theorem finite_walls_meeting_antiCanonicalBox (b₀ : ℝ) {t₀ : ℝ} (t₁ : 
         (∃ p ∈ ampleBox
             (numericalRealization.realizePolarization antiCanonicalPolarization) b₀ t₀ t₁,
           DivisorSpace.expPlane divisorSpace p.1 p.2 ∈
-            PeriodDomain.wall (Mukai.realForm divisorSpace.intersection) δ) ∧
+            PeriodDomain.orthogonalityLocus (Mukai.realForm divisorSpace.intersection) δ) ∧
         δ ∈ (Submodule.span ℤ (Set.range mukaiBasis) :
               Set (Mukai.RealExtension Divisor))}.Finite :=
   finite_walls_meeting_ampleBox antiCanonical_sq_pos b₀ t₁ ht₀

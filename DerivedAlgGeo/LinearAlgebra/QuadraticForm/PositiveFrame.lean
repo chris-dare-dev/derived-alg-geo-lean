@@ -2,20 +2,22 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.WallRegion
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositivePlane
 
 /-!
-# Oriented positive pairs, and the sign that models `P⁺`
+# Positive frames, their underlying planes, and the sign that models `P⁺`
 
 Bridgeland's period domain is not `P` but one connected component of it, `P⁺` —
 the one containing `exp(iω)` for an ample class. A component is picked out by an
-**orientation** of the positive plane, and `PeriodDomain.periodDomain` is a set of
+**orientation** of the positive plane, and `PeriodDomain.positivePlanes` is a set of
 submodules, which carries none: `Re Ω` and `Im Ω` are an ordered pair and the
 plane forgets the order.
 
-This file keeps the order. A positive pair is an ordered pair spanning a positive
-plane, and the invariant separating the two halves is the sign of a `2 × 2`
-determinant of pairings against a reference pair.
+This file keeps the order. A positive frame is an ordered pair spanning a positive
+plane. The map `framePlane` forgets its ordered basis, and
+`forgetPositiveFrame` is the corresponding map between the two locus subtypes.
+The invariant separating the two oriented halves is the sign of a `2 × 2`
+determinant of pairings against a reference frame.
 
 ## Why the determinant cannot vanish, and where that comes from
 
@@ -33,17 +35,17 @@ would be wrong:
 
 * **That there are exactly two connected components.** That needs connectedness
   of the Grassmannian of positive planes — topology, not lattice theory. What is
-  proved is that the sign invariant splits the positive pairs into two nonempty
+proved is that the sign invariant splits the positive frames into two nonempty
   disjoint halves; whether each half is connected is not addressed.
 * **That the positive half is Bridgeland's.** Selecting the component containing
   `exp(iω) = (1, iω, -ω²/2)` needs the Mukai extension's own vectors and an ample
   class, so it needs the bridge from `Mukai.MukaiLattice` to a bundled form that
   is out of scope here as it was in the period-domain file. Relative to a
-  reference pair, "positive half" means only what its definition says.
+  reference frame, "positive half" means only what its definition says.
 
 Reference-independence of the *partition* — that changing the reference either
 preserves every sign or flips every sign — is not proved *here*, but it is
-proved: it is the cocycle of `QuadraticForm/OrientationCocycle.lean`, which
+proved: it is the cocycle of `QuadraticForm/PositiveFrameOrientation.lean`, which
 imports this file.
 -/
 
@@ -57,9 +59,15 @@ section Defs
 
 variable (Q)
 
-/-- An **ordered** pair spanning a positive plane. Everything already proved
-about the plane applies through `pairSpan`. -/
-def IsPositivePair (x y : M) : Prop := IsPositivePlane Q (pairSpan x y)
+/-- Forget the ordered basis of a frame and retain only the plane it spans. -/
+def framePlane (p : M × M) : Submodule ℝ M := pairSpan p.1 p.2
+
+/-- An **ordered positive frame**: an ordered pair spanning a positive plane. -/
+def IsPositiveFrame (x y : M) : Prop := IsPositivePlane Q (framePlane (x, y))
+
+/-- The locus of ordered positive frames. It is not the positive-plane locus:
+different ordered bases can have the same image under `framePlane`. -/
+def positiveFrames : Set (M × M) := {p | IsPositiveFrame Q p.1 p.2}
 
 /-- The `2 × 2` determinant of pairings of `(x, y)` against a reference pair
 `(x₀, y₀)`. Up to the positive factor `det` of the reference Gram matrix this is
@@ -70,12 +78,22 @@ def pairingDet (x₀ y₀ x y : M) : ℝ :=
 
 end Defs
 
-theorem isPositivePlane_pairSpan {x y : M} (h : IsPositivePair Q x y) :
-    IsPositivePlane Q (pairSpan x y) := h
+/-- A positive frame forgets to a positive plane. -/
+theorem isPositivePlane_framePlane {p : M × M} (h : p ∈ positiveFrames Q) :
+    framePlane p ∈ positivePlanes Q := h
 
-/-- A nontrivial combination of a positive pair is nonzero: the pair spans a
+/-- The explicit forgetful map from ordered positive frames to unoriented
+positive planes. No inverse is chosen: a plane has many ordered bases. -/
+def forgetPositiveFrame (p : positiveFrames Q) : positivePlanes Q :=
+  ⟨framePlane p, isPositivePlane_framePlane p.property⟩
+
+@[simp]
+theorem forgetPositiveFrame_coe (p : positiveFrames Q) :
+    ((forgetPositiveFrame p : positivePlanes Q) : Submodule ℝ M) = framePlane p := rfl
+
+/-- A nontrivial combination of a positive frame is nonzero: the frame spans a
 plane, so it is independent. -/
-theorem combination_ne_zero {x y : M} (h : IsPositivePair Q x y) {a b : ℝ}
+theorem combination_ne_zero {x y : M} (h : IsPositiveFrame Q x y) {a b : ℝ}
     (hab : a ≠ 0 ∨ b ≠ 0) : a • x + b • y ≠ 0 := by
   intro hzero
   -- the plane is two-dimensional, so a dependence collapses it to a line
@@ -131,7 +149,7 @@ reference vectors, hence in the reference plane's orthogonal complement, where
 `Q` is negative definite — while it lies in a plane where `Q` is positive
 definite. This is `neg_of_mem_orthogonal` in coordinates. -/
 theorem pairingDet_ne_zero (hsig : HasSignatureTwo Q) {x₀ y₀ x y : M}
-    (h₀ : IsPositivePair Q x₀ y₀) (h : IsPositivePair Q x y) :
+    (h₀ : IsPositiveFrame Q x₀ y₀) (h : IsPositiveFrame Q x y) :
     pairingDet Q x₀ y₀ x y ≠ 0 := by
   intro hdet
   rw [pairingDet] at hdet
@@ -170,21 +188,21 @@ theorem pairingDet_ne_zero (hsig : HasSignatureTwo Q) {x₀ y₀ x y : M}
   have hneg : Q v < 0 := neg_of_mem_orthogonal hsig h₀ hperp hv0
   linarith
 
-/-- Two positive pairs are **similarly oriented** when their determinants against
+/-- Two positive frames are **similarly oriented** when their determinants against
 the reference agree in sign.
 
 The relation is stated against a fixed reference on purpose. That changing the
 reference either preserves every sign or flips every one — so that the
 *partition* is reference-free — is a genuine further statement: it is the cocycle
 identity for the projection signs. It is proved downstream, in
-`QuadraticForm/OrientationCocycle.lean`, as `sameOrientation_iff_of_reference`;
-the proof there interpolates through positive pairs rather than importing
+`QuadraticForm/PositiveFrameOrientation.lean`, as `sameOrientation_iff_of_reference`;
+the proof there interpolates through positive frames rather than importing
 connectedness of the Grassmannian. -/
 def SameOrientation (Q : QuadraticForm ℝ M) (x₀ y₀ : M) (p q : M × M) : Prop :=
   0 < pairingDet Q x₀ y₀ p.1 p.2 * pairingDet Q x₀ y₀ q.1 q.2
 
 theorem sameOrientation_refl (hsig : HasSignatureTwo Q) {x₀ y₀ : M}
-    (h₀ : IsPositivePair Q x₀ y₀) {p : M × M} (hp : IsPositivePair Q p.1 p.2) :
+    (h₀ : IsPositiveFrame Q x₀ y₀) {p : M × M} (hp : IsPositiveFrame Q p.1 p.2) :
     SameOrientation Q x₀ y₀ p p :=
   mul_self_pos.mpr (pairingDet_ne_zero hsig h₀ hp)
 
@@ -195,7 +213,7 @@ theorem sameOrientation_symm {x₀ y₀ : M} {p q : M × M}
   exact h
 
 theorem sameOrientation_trans (hsig : HasSignatureTwo Q) {x₀ y₀ : M}
-    (h₀ : IsPositivePair Q x₀ y₀) {p q r : M × M} (hq : IsPositivePair Q q.1 q.2)
+    (h₀ : IsPositiveFrame Q x₀ y₀) {p q r : M × M} (hq : IsPositiveFrame Q q.1 q.2)
     (hpq : SameOrientation Q x₀ y₀ p q) (hqr : SameOrientation Q x₀ y₀ q r) :
     SameOrientation Q x₀ y₀ p r := by
   have hq0 := pairingDet_ne_zero hsig h₀ hq
@@ -225,28 +243,28 @@ variable (Q) [FiniteDimensional ℝ M]
 
 /-- The **positive half** relative to a reference pair: `P⁺` as far as this file
 can honestly define it. -/
-def periodDomainPlus (x₀ y₀ : M) : Set (M × M) :=
-  {p | IsPositivePair Q p.1 p.2 ∧ 0 < pairingDet Q x₀ y₀ p.1 p.2}
+def positiveFramesPlus (x₀ y₀ : M) : Set (M × M) :=
+  {p | IsPositiveFrame Q p.1 p.2 ∧ 0 < pairingDet Q x₀ y₀ p.1 p.2}
 
 /-- The other half. -/
-def periodDomainMinus (x₀ y₀ : M) : Set (M × M) :=
-  {p | IsPositivePair Q p.1 p.2 ∧ pairingDet Q x₀ y₀ p.1 p.2 < 0}
+def positiveFramesMinus (x₀ y₀ : M) : Set (M × M) :=
+  {p | IsPositiveFrame Q p.1 p.2 ∧ pairingDet Q x₀ y₀ p.1 p.2 < 0}
 
 variable {Q}
 
 omit [FiniteDimensional ℝ M] in
-theorem disjoint_periodDomainPlus_minus (x₀ y₀ : M) :
-    Disjoint (periodDomainPlus Q x₀ y₀) (periodDomainMinus Q x₀ y₀) := by
+theorem disjoint_positiveFramesPlus_minus (x₀ y₀ : M) :
+    Disjoint (positiveFramesPlus Q x₀ y₀) (positiveFramesMinus Q x₀ y₀) := by
   rw [Set.disjoint_left]
   rintro p ⟨-, hplus⟩ ⟨-, hminus⟩
   linarith
 
-/-- **The two halves exhaust the positive pairs.** Nonvanishing of the
+/-- **The two halves exhaust the positive frames.** Nonvanishing of the
 determinant is what leaves no third case. -/
-theorem union_periodDomainPlus_minus (hsig : HasSignatureTwo Q) {x₀ y₀ : M}
-    (h₀ : IsPositivePair Q x₀ y₀) :
-    {p : M × M | IsPositivePair Q p.1 p.2} =
-      periodDomainPlus Q x₀ y₀ ∪ periodDomainMinus Q x₀ y₀ := by
+theorem union_positiveFramesPlus_minus (hsig : HasSignatureTwo Q) {x₀ y₀ : M}
+    (h₀ : IsPositiveFrame Q x₀ y₀) :
+    positiveFrames Q =
+      positiveFramesPlus Q x₀ y₀ ∪ positiveFramesMinus Q x₀ y₀ := by
   ext p
   constructor
   · intro hp
@@ -257,13 +275,13 @@ theorem union_periodDomainPlus_minus (hsig : HasSignatureTwo Q) {x₀ y₀ : M}
 
 omit [FiniteDimensional ℝ M] in
 /-- **Swapping a pair moves it to the other half.** So neither half is vacuous
-once one positive pair exists, and the split is a genuine two-way split. -/
-theorem swap_mem_of_mem_periodDomainPlus {x₀ y₀ : M} {p : M × M}
-    (hp : p ∈ periodDomainPlus Q x₀ y₀) :
-    (p.2, p.1) ∈ periodDomainMinus Q x₀ y₀ := by
+once one positive frame exists, and the split is a genuine two-way split. -/
+theorem swap_mem_of_mem_positiveFramesPlus {x₀ y₀ : M} {p : M × M}
+    (hp : p ∈ positiveFramesPlus Q x₀ y₀) :
+    (p.2, p.1) ∈ positiveFramesMinus Q x₀ y₀ := by
   obtain ⟨hpair, hdet⟩ := hp
   refine ⟨?_, ?_⟩
-  · rw [IsPositivePair, pairSpan, Set.pair_comm]
+  · rw [IsPositiveFrame, framePlane, pairSpan, Set.pair_comm]
     exact hpair
   · rw [pairingDet_swap]
     linarith

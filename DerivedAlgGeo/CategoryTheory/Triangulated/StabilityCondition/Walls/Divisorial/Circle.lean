@@ -8,9 +8,9 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Numeri
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Numerical.Discriminant
 
 /-!
-# Every fixed-`u` slice of a divisorial wall family is an `(s, t)` half plane
+# Every fixed-`u` slice of a divisorial alignmentLocus family is an `(s, t)` half plane
 
-`Walls/Numerical/Basic.lean` proves that a numerical wall in the `(s, t)` plane
+`Walls/Numerical/Basic.lean` proves that a numerical alignmentLocus in the `(s, t)` plane
 is a circle centred on the `s`-axis or a vertical line, that two walls of a
 fixed class are disjoint, and that they are nested.  Those are theorems about
 the three-coordinate polynomial and, until this file, were available only to
@@ -28,7 +28,7 @@ degree-weighted triple of the `G(u)`-twisted character:
 ```
 
 Consequently the circle, line, disjointness, and nesting results hold on every
-`u`-slice of a surface of arbitrary Picard rank.  This is the wall picture used
+`u`-slice of a surface of arbitrary Picard rank.  This is the alignmentLocus picture used
 by Maciocia (arXiv:1202.4587, Prop. 2.6 and Thm 3.1), Arcara--Miles
 (arXiv:1401.6149, §4) and Mizuno--Yoshida (arXiv:2502.18894, Thm 2.1), and it is
 the reason those papers fix a transverse direction before drawing circles.
@@ -67,7 +67,7 @@ variable {N : Type v} {D : Type w}
 variable [AddCommGroup N]
 variable [AddCommGroup D] [Module ℝ D]
 
-/-! ### Compressed coordinates as a point of the `(s, t)` wall plane -/
+/-! ### Compressed coordinates as a point of the `(s, t)` alignmentLocus plane -/
 
 namespace ChargeCoordinates
 
@@ -99,7 +99,7 @@ def toNumClassHom : N →+ Wall.NumClass :=
 @[simp]
 theorem toNumClassHom_apply (E : N) : Dc.toNumClassHom E = Dc.toNumClass E := rfl
 
-/-- The wall-plane discriminant of the transported triple is the compressed
+/-- The alignmentLocus-plane discriminant of the transported triple is the compressed
 discriminant. -/
 @[simp]
 theorem discr_toNumClass (E : N) :
@@ -122,7 +122,7 @@ theorem stCharge_toNumClass (b a : ℝ) (E : N) :
     simp only [Wall.imZ, toNumClass_rk, toNumClass_deg, twistByScalar_degree]
     ring
 
-/-- The `(s,t)` wall family of compressed coordinates: the generic `(s,t)` child
+/-- The `(s,t)` alignmentLocus family of compressed coordinates: the generic `(s,t)` child
 pulled back along the degree-weighted triple. -/
 def stWallFamily : Wall.ChargeFamily (ℝ × ℝ) N :=
   Wall.stChargeFamily.pullback Dc.toNumClassHom
@@ -132,8 +132,8 @@ theorem stWallFamily_charge (p : ℝ × ℝ) (E : N) :
     Dc.stWallFamily.charge p E = Wall.stCharge p.1 p.2 (Dc.toNumClass E) := rfl
 
 @[simp]
-theorem stWallFamily_wallValue (p : ℝ × ℝ) (E F : N) :
-    Dc.stWallFamily.wallValue p E F =
+theorem stWallFamily_alignmentValue (p : ℝ × ℝ) (E F : N) :
+    Dc.stWallFamily.alignmentValue p E F =
       Wall.wallExpr p.1 p.2 (Dc.toNumClass E) (Dc.toNumClass F) := by
   simp [stWallFamily]
 
@@ -214,7 +214,7 @@ theorem parameters_ofST (uu : U) (p : ℝ × ℝ) :
     T.parameters (Point.ofST uu p) =
       ⟨p.1 • T.H + T.transverse uu, p.2 • T.H⟩ := rfl
 
-/-- **The fixed-`u` slice of a divisorial wall family is the `(s,t)` model.**
+/-- **The fixed-`u` slice of a divisorial alignmentLocus family is the `(s,t)` model.**
 
 Reindexing the divisorial family to a fixed transverse parameter gives exactly
 the generic `(s,t)` charge family, pulled back along the degree-weighted triple
@@ -233,39 +233,39 @@ theorem chargeFamily_reindex_ofST (ch : ChernCharacter N D) (uu : U) :
     ChernCharacter.centralCharge_twist]
   rfl
 
-/-- The wall of two classes on a fixed `u`-slice is the `(s,t)` wall of their
+/-- The alignmentLocus of two classes on a fixed `u`-slice is the `(s,t)` alignmentLocus of their
 transported triples. -/
-theorem wallValue_ofST (ch : ChernCharacter N D) (uu : U) (p : ℝ × ℝ) (v w : N) :
-    (T.chargeFamily ch).wallValue (Point.ofST uu p) v w =
+theorem alignmentValue_ofST (ch : ChernCharacter N D) (uu : U) (p : ℝ × ℝ) (v w : N) :
+    (T.chargeFamily ch).alignmentValue (Point.ofST uu p) v w =
       Wall.wallExpr p.1 p.2 ((T.sliceCoordinates ch uu).toNumClass v)
         ((T.sliceCoordinates ch uu).toNumClass w) := by
-  rw [show (T.chargeFamily ch).wallValue (Point.ofST uu p) v w
-        = ((T.chargeFamily ch).reindex (Point.ofST uu)).wallValue p v w from rfl,
-    T.chargeFamily_reindex_ofST ch uu, ChargeCoordinates.stWallFamily_wallValue]
+  rw [show (T.chargeFamily ch).alignmentValue (Point.ofST uu p) v w
+        = ((T.chargeFamily ch).reindex (Point.ofST uu)).alignmentValue p v w from rfl,
+    T.chargeFamily_reindex_ofST ch uu, ChargeCoordinates.stWallFamily_alignmentValue]
 
 /-! ### The circle, on every slice -/
 
-/-- **A numerical wall on a fixed `u`-slice is cut out by a circle equation.**
+/-- **A numerical alignmentLocus on a fixed `u`-slice is cut out by a circle equation.**
 Maciocia Prop. 2.6; Mizuno--Yoshida Thm 2.1(1). -/
-theorem wall_ofST_iff_circle (ch : ChernCharacter N D) (uu : U) {p : ℝ × ℝ}
+theorem alignmentLocus_ofST_iff_circle (ch : ChernCharacter N D) (uu : U) {p : ℝ × ℝ}
     (ht : p.2 ≠ 0) (v w : N) :
-    Point.ofST uu p ∈ T.wall ch v w ↔
+    Point.ofST uu p ∈ T.alignmentLocus ch v w ↔
       Wall.minA ((T.sliceCoordinates ch uu).toNumClass v)
             ((T.sliceCoordinates ch uu).toNumClass w) * (p.1 ^ 2 + p.2 ^ 2)
           + 2 * Wall.minB ((T.sliceCoordinates ch uu).toNumClass v)
             ((T.sliceCoordinates ch uu).toNumClass w) * p.1
           + 2 * Wall.minC ((T.sliceCoordinates ch uu).toNumClass v)
             ((T.sliceCoordinates ch uu).toNumClass w) = 0 := by
-  rw [OrthogonalSlice.wall, Wall.ChargeFamily.mem_wall, T.wallValue_ofST]
+  rw [OrthogonalSlice.alignmentLocus, Wall.ChargeFamily.mem_alignmentLocus, T.alignmentValue_ofST]
   exact Wall.wall_iff_circle ht _ _
 
 /-- Centre `(-minB/minA, 0)` and radius squared `(minB² - 2 minA minC)/minA²`,
 on a fixed `u`-slice, in cleared form. -/
-theorem wall_ofST_circle_eq (ch : ChernCharacter N D) (uu : U) {p : ℝ × ℝ}
+theorem alignmentLocus_ofST_circle_eq (ch : ChernCharacter N D) (uu : U) {p : ℝ × ℝ}
     (ht : p.2 ≠ 0) {v w : N}
     (hA : Wall.minA ((T.sliceCoordinates ch uu).toNumClass v)
       ((T.sliceCoordinates ch uu).toNumClass w) ≠ 0) :
-    Point.ofST uu p ∈ T.wall ch v w ↔
+    Point.ofST uu p ∈ T.alignmentLocus ch v w ↔
       (Wall.minA ((T.sliceCoordinates ch uu).toNumClass v)
               ((T.sliceCoordinates ch uu).toNumClass w) * p.1
             + Wall.minB ((T.sliceCoordinates ch uu).toNumClass v)
@@ -278,22 +278,22 @@ theorem wall_ofST_circle_eq (ch : ChernCharacter N D) (uu : U) {p : ℝ × ℝ}
               ((T.sliceCoordinates ch uu).toNumClass w)
             * Wall.minC ((T.sliceCoordinates ch uu).toNumClass v)
               ((T.sliceCoordinates ch uu).toNumClass w) := by
-  rw [OrthogonalSlice.wall, Wall.ChargeFamily.mem_wall, T.wallValue_ofST]
+  rw [OrthogonalSlice.alignmentLocus, Wall.ChargeFamily.mem_alignmentLocus, T.alignmentValue_ofST]
   exact Wall.wall_circle_eq ht hA
 
 /-- The vertical-line case, on a fixed `u`-slice. -/
-theorem wall_ofST_line_eq (ch : ChernCharacter N D) (uu : U) {p : ℝ × ℝ}
+theorem alignmentLocus_ofST_line_eq (ch : ChernCharacter N D) (uu : U) {p : ℝ × ℝ}
     (ht : p.2 ≠ 0) {v w : N}
     (hA : Wall.minA ((T.sliceCoordinates ch uu).toNumClass v)
       ((T.sliceCoordinates ch uu).toNumClass w) = 0)
     (hB : Wall.minB ((T.sliceCoordinates ch uu).toNumClass v)
       ((T.sliceCoordinates ch uu).toNumClass w) ≠ 0) :
-    Point.ofST uu p ∈ T.wall ch v w ↔
+    Point.ofST uu p ∈ T.alignmentLocus ch v w ↔
       p.1 = -(Wall.minC ((T.sliceCoordinates ch uu).toNumClass v)
           ((T.sliceCoordinates ch uu).toNumClass w))
         / Wall.minB ((T.sliceCoordinates ch uu).toNumClass v)
           ((T.sliceCoordinates ch uu).toNumClass w) := by
-  rw [OrthogonalSlice.wall, Wall.ChargeFamily.mem_wall, T.wallValue_ofST]
+  rw [OrthogonalSlice.alignmentLocus, Wall.ChargeFamily.mem_alignmentLocus, T.alignmentValue_ofST]
   exact Wall.wall_line_eq ht hA hB
 
 /-! ### The discriminant on a slice -/
@@ -345,7 +345,7 @@ theorem discr_sliceCoordinates_nonneg (ch : ChernCharacter N D) (p : Point U)
   rw [mul_zero]
   exact hbar
 
-/-- The same, against the wall-plane discriminant the `(s,t)` theorems consume. -/
+/-- The same, against the alignmentLocus-plane discriminant the `(s,t)` theorems consume. -/
 theorem discr_toNumClass_sliceCoordinates_nonneg (ch : ChernCharacter N D)
     (p : Point U) (ht : p.t ≠ 0) (h : S.HodgeIndex (T.parameters p).omega) {E : N}
     (hΔ : 0 ≤ ch.discriminant S E) :

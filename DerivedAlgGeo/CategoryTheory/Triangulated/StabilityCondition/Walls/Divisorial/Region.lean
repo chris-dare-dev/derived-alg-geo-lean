@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Signature
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.WallRegion
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.OrthogonalityRegion
 import Mathlib.Topology.Algebra.Module.FiniteDimensionBilinear
 
 /-!
@@ -17,7 +17,7 @@ compact set on which `ω²` is positive.
 
 ## Why this is now available
 
-`QuadraticForm/WallRegion.lean` records that the coercivity constant of `-Q` on
+`QuadraticForm/OrthogonalityRegion.lean` records that the coercivity constant of `-Q` on
 `Wᗮ` degrades to `0` at the boundary of the positive-plane locus, so a family of
 planes inherits no constant from its members; `PlaneRegion` therefore carries
 the constant as a field.  Its criterion `ofCompactPairs` supplies that field for
@@ -34,7 +34,7 @@ the divisorial layer: `DivisorSpace.HodgeDefinite`.
 `(Re exp(B + iω), Im exp(B + iω))`.  It is continuous because the intersection
 form is a bilinear map on a finite-dimensional space, so a compact set of
 parameters gives a compact set of pairs; and each plane is positive by
-`Mukai.isPositivePair_exp` as soon as `ω² > 0`, with `B` unconstrained.  Those
+`Mukai.isPositiveFrame_exp` as soon as `ω² > 0`, with `B` unconstrained.  Those
 are exactly the two hypotheses of `ofCompactPairs`.
 
 ## Main results
@@ -216,7 +216,7 @@ theorem exists_uniform_negDefinite (h : S.HodgeDefinite H) {K : Set (D × D)}
 /-- **The plane region of a compact family of exponential parameters.**
 
 Both inputs of `PlaneRegion.ofCompactPairs` are discharged: the signature by the
-Hodge certificate, and positivity of each plane by `Mukai.isPositivePair_exp`,
+Hodge certificate, and positivity of each plane by `Mukai.isPositiveFrame_exp`,
 which needs only `ω² > 0`. -/
 def expPlaneRegion (h : S.HodgeDefinite H) {K : Set (D × D)} (hK : IsCompact K)
     (hpos : ∀ p ∈ K, 0 < S.pair p.2 p.2) :
@@ -225,7 +225,7 @@ def expPlaneRegion (h : S.HodgeDefinite H) {K : Set (D × D)} (hK : IsCompact K)
     (hK.image S.continuous_expPairMap)
     (by
       rintro q ⟨p, hp, rfl⟩
-      exact Mukai.isPositivePair_exp S.intersection p.1 p.2
+      exact Mukai.isPositiveFrame_exp S.intersection p.1 p.2
         (fun x y => S.pair_comm x y) (hpos p hp))
 
 @[simp]
@@ -239,14 +239,14 @@ theorem expPlaneRegion_carrier (h : S.HodgeDefinite H) {K : Set (D × D)} (hK : 
 /-! ### The count -/
 
 /-- **Finitely many spherical classes of a lattice have a wall meeting the
-region.**  This is `PlaneRegion.finite_wallClasses_inter` with the region
+region.**  This is `PlaneRegion.finite_orthogonalClasses_inter` with the region
 supplied. -/
-theorem finite_wallClasses_expPlaneRegion (h : S.HodgeDefinite H) {K : Set (D × D)}
+theorem finite_orthogonalClasses_expPlaneRegion (h : S.HodgeDefinite H) {K : Set (D × D)}
     (hK : IsCompact K) (hpos : ∀ p ∈ K, 0 < S.pair p.2 p.2)
     {ι : Type*} [Finite ι] (b : Module.Basis ι ℝ (Mukai.RealExtension D)) :
-    ((expPlaneRegion h hK hpos).wallClasses
+    ((expPlaneRegion h hK hpos).orthogonalClasses
       ∩ (Submodule.span ℤ (Set.range b) : Set (Mukai.RealExtension D))).Finite :=
-  PeriodDomain.PlaneRegion.finite_wallClasses_inter _ b
+  PeriodDomain.PlaneRegion.finite_orthogonalClasses_inter _ b
 
 /-- **Bridgeland's local finiteness, region-wise, on a divisor space.**
 
@@ -263,10 +263,10 @@ theorem finite_walls_meeting_expFamily (h : S.HodgeDefinite H) {K : Set (D × D)
     {δ : Mukai.RealExtension D |
         PeriodDomain.IsSphericalClass (Mukai.realForm S.intersection) δ ∧
         (∃ p ∈ K, S.expPlane p.1 p.2 ∈
-          PeriodDomain.wall (Mukai.realForm S.intersection) δ) ∧
+          PeriodDomain.orthogonalityLocus (Mukai.realForm S.intersection) δ) ∧
         δ ∈ (Submodule.span ℤ (Set.range b) :
               Set (Mukai.RealExtension D))}.Finite := by
-  refine Set.Finite.subset (finite_wallClasses_expPlaneRegion h hK hpos b) ?_
+  refine Set.Finite.subset (finite_orthogonalClasses_expPlaneRegion h hK hpos b) ?_
   rintro δ ⟨hsph, ⟨p, hp, hwall⟩, hlat⟩
   refine ⟨⟨hsph, ?_⟩, hlat⟩
   exact ⟨S.expPlane p.1 p.2, ⟨S.expPairMap p, ⟨p, hp, rfl⟩, rfl⟩, hwall⟩

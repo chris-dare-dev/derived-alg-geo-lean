@@ -40,7 +40,8 @@ Current-versus-target paths are tracked in the cutover ledger.
 ```text
 ChargeFamily P N                       existing Wall namespace; no category required
 ├─ reindex / pullback           change of chart / of class map
-├─ smul / phaseRotate β         wall_smul; a unit modulus fixes wallValue
+├─ zeroLocus δ                  charge vanishing; generally two real equations
+├─ smul / phaseRotate β         alignmentLocus_smul; a unit modulus fixes alignmentValue
 │  └─ = phaseTiltRotation       proved comparison, never a copy
 ├─ Wall.Exp.ofMoments m         one polynomial, indexed by truncation m
 │  ├─ scalar moments            compressed H-degrees of a polarised n-fold
@@ -56,8 +57,19 @@ ChargeFamily P N                       existing Wall namespace; no category requ
 │     │  SqrtTodd               the image of κ, not a truncation of it
 │     └─ quadric, ℙ², blow-up   rank-one slice reaches the scalar branch
 ├─ Wall.Exp.twist / discr       the e^{-βH} action and Δ_H, stated once
-└─ Spherical half-wall          a wall against the point class, cut by a
-                                sign; inclusion plus sign, never equality
+├─ alignmentLocus v w           determinant zero; no nonzero or sign claim
+│  └─ positiveRayLocus v w      nonzero charges plus a positive real scalar
+└─ Spherical.nonpositiveRayLocus
+                                a one-class signed-ray condition; never an
+                                actual destabilization wall by terminology
+
+positiveFrames Q                       ordered bases of positive planes
+└─ forgetPositiveFrame          explicit map to positivePlanes Q
+   └─ orthogonalityLocus δ      planes orthogonal to δ; arrangement and
+                                finiteness stay in neutral linear algebra
+
+StabilityCondition.ChargeZero
+└─ stabilityChargeFamily        explicit comparison to ChargeFamily.zeroLocus
 
 Bicategory                              Mathlib higher-categorical root
 ├─ Adjunction of 1-morphisms

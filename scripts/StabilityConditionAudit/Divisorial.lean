@@ -178,8 +178,8 @@ charge family or its walls. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.rankOne
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.reFormula
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.transverse
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.wall
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.wallValue_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.alignmentLocus
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.alignmentValue_eq
 
 /-! ## Discriminants and the Hodge index certificate
 
@@ -232,7 +232,7 @@ walls genuinely move with u, and barDiscriminant_parameters discharges the
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates.stCharge_toNumClass
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates.stWallFamily
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates.stWallFamily_charge
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates.stWallFamily_wallValue
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates.stWallFamily_alignmentValue
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates.toNumClass
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates.toNumClassHom
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates.toNumClassHom_apply
@@ -252,10 +252,10 @@ walls genuinely move with u, and barDiscriminant_parameters discharges the
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.sliceCoordinates_degree
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.sliceCoordinates_hyperplaneSquare
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.sliceCoordinates_rank
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.wallValue_ofST
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.wall_ofST_circle_eq
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.wall_ofST_iff_circle
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.wall_ofST_line_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.alignmentValue_ofST
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.alignmentLocus_ofST_circle_eq
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.alignmentLocus_ofST_iff_circle
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.OrthogonalSlice.alignmentLocus_ofST_line_eq
 
 /-! ## The Mukai presentation, as a second child
 

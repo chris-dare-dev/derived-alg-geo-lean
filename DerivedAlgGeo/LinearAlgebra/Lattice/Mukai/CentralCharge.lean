@@ -92,14 +92,14 @@ theorem neg_of_expCharge_eq_zero
     (hsig : PeriodDomain.HasSignatureTwo (realForm b)) (hb : ∀ x y : V, b x y = b y x)
     (hω : 0 < b ω ω) {v : RealExtension V} (hv : expCharge b β ω v = 0) (hv0 : v ≠ 0) :
     realForm b v < 0 :=
-  PeriodDomain.neg_of_centralCharge_eq_zero hsig (isPositivePair_exp b β ω hb hω) hv hv0
+  PeriodDomain.neg_of_centralCharge_eq_zero hsig (isPositiveFrame_exp b β ω hb hω) hv hv0
 
 /-- No nonzero class of nonnegative square is killed by `Z(β,ω)`. -/
 theorem expCharge_ne_zero_of_nonneg
     (hsig : PeriodDomain.HasSignatureTwo (realForm b)) (hb : ∀ x y : V, b x y = b y x)
     (hω : 0 < b ω ω) {v : RealExtension V} (hv : 0 ≤ realForm b v) (hv0 : v ≠ 0) :
     expCharge b β ω v ≠ 0 :=
-  PeriodDomain.centralCharge_ne_zero_of_nonneg hsig (isPositivePair_exp b β ω hb hω) hv hv0
+  PeriodDomain.centralCharge_ne_zero_of_nonneg hsig (isPositiveFrame_exp b β ω hb hω) hv hv0
 
 end FiniteDimensional
 

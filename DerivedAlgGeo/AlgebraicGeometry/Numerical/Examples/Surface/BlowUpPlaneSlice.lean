@@ -195,12 +195,12 @@ theorem sliceChargeFamily_charge (p : OrthogonalSlice.Point (ℝ × ℝ))
 /-- **The circle description of walls fires on this slice.**
 
 For each fixed transverse parameter the wall of two classes in the `(s, t)`
-half-plane is a circle or a line, by `wall_ofST_iff_circle`.  On the rank-one
+half-plane is a circle or a line, by `alignmentLocus_ofST_iff_circle`.  On the rank-one
 slice that statement has one such half-plane; here it has a plane's worth. -/
-theorem wall_ofST_iff_circle (uu : ℝ × ℝ) {p : ℝ × ℝ} (ht : p.2 ≠ 0)
+theorem alignmentLocus_ofST_iff_circle (uu : ℝ × ℝ) {p : ℝ × ℝ} (ht : p.2 ≠ 0)
     (v w : NumericalClass) :
     OrthogonalSlice.Point.ofST uu p ∈
-        antiCanonicalSlice.wall numericalRealization.chernCharacter v w ↔
+        antiCanonicalSlice.alignmentLocus numericalRealization.chernCharacter v w ↔
       Wall.minA
             ((antiCanonicalSlice.sliceCoordinates
               numericalRealization.chernCharacter uu).toNumClass v)
@@ -217,7 +217,7 @@ theorem wall_ofST_iff_circle (uu : ℝ × ℝ) {p : ℝ × ℝ} (ht : p.2 ≠ 0)
               numericalRealization.chernCharacter uu).toNumClass v)
             ((antiCanonicalSlice.sliceCoordinates
               numericalRealization.chernCharacter uu).toNumClass w) = 0 :=
-  OrthogonalSlice.wall_ofST_iff_circle antiCanonicalSlice
+  OrthogonalSlice.alignmentLocus_ofST_iff_circle antiCanonicalSlice
     numericalRealization.chernCharacter uu ht v w
 
 end

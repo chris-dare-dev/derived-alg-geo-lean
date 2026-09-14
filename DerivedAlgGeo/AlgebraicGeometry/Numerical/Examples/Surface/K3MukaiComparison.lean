@@ -224,7 +224,7 @@ theorem k3_finite_integral_spherical_walls (d : ℕ) (hd : d ≠ 0)
         Mukai.IsSpherical (k3MukaiForm d) δ ∧
         ∃ p ∈ parameterBox b₀ t₀ t₁,
           DivisorSpace.expPlane (surfaceDivisorSpace (2 * (d : ℝ))) p.1 p.2 ∈
-            PeriodDomain.wall
+            PeriodDomain.orthogonalityLocus
               (Mukai.realForm (surfaceDivisorSpace (2 * (d : ℝ))).intersection)
               (Mukai.extendMap k3LatticeMap δ)}.Finite := by
   refine Set.Finite.of_finite_image ?_

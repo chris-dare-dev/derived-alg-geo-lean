@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Slice
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.ChargeFamily
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Alignment
 
 /-!
 # Wall equations on orthogonal divisorial charge slices
@@ -26,18 +26,18 @@ variable {S : DivisorSpace D} (T : OrthogonalSlice S U)
 
 namespace OrthogonalSlice
 
-/-- The numerical determinant-alignment wall of two classes in an orthogonal
+/-- The numerical determinant-alignment alignmentLocus of two classes in an orthogonal
 divisor slice. -/
-def wall (ch : ChernCharacter N D) (v w : N) : Set (Point U) :=
-  (T.chargeFamily ch).wall v w
+def alignmentLocus (ch : ChernCharacter N D) (v w : N) : Set (Point U) :=
+  (T.chargeFamily ch).alignmentLocus v w
 
 /-- The universal determinant equation evaluated using the two divisorial
 slice formulas. -/
-theorem wallValue_eq (ch : ChernCharacter N D) (p : Point U) (v w : N) :
-    (T.chargeFamily ch).wallValue p v w =
+theorem alignmentValue_eq (ch : ChernCharacter N D) (p : Point U) (v w : N) :
+    (T.chargeFamily ch).alignmentValue p v w =
       T.reFormula ch p v * T.imFormula ch p w -
         T.imFormula ch p v * T.reFormula ch p w := by
-  simp only [Wall.ChargeFamily.wallValue, Wall.ChargeFamily.re,
+  simp only [Wall.ChargeFamily.alignmentValue, Wall.ChargeFamily.re,
     Wall.ChargeFamily.im, T.charge_re, T.charge_im]
 
 end OrthogonalSlice

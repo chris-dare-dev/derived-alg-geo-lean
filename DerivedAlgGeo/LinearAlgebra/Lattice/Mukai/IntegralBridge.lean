@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.RealForm
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.WallRegion
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.OrthogonalityRegion
 
 /-!
 # The integral Mukai lattice inside the real extension
@@ -173,12 +173,12 @@ theorem finite_sphericalOrthogonal_integralExtension
   exact PeriodDomain.finite_sphericalOrthogonal_inter hsig hW (extendBasis v)
 
 /-- The region-wise form of the same statement. -/
-theorem finite_wallClasses_integralExtension (R : PeriodDomain.PlaneRegion (realForm b))
+theorem finite_orthogonalClasses_integralExtension (R : PeriodDomain.PlaneRegion (realForm b))
     (v : Module.Basis ι ℝ V) :
-    (R.wallClasses ∩
+    (R.orthogonalClasses ∩
       (integralExtension (Submodule.span ℤ (Set.range v)) : Set (RealExtension V))).Finite := by
   rw [← span_range_extendBasis v]
-  exact R.finite_wallClasses_inter (extendBasis v)
+  exact R.finite_orthogonalClasses_inter (extendBasis v)
 
 end Finiteness
 

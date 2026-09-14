@@ -2,12 +2,12 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PeriodDomain
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.OrthogonalityLocus
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Bounds
 import Mathlib.Algebra.Module.ZLattice.Basic
 
 /-!
-# Finitely many spherical walls pass through a point of the period domain
+# Finitely many spherical orthogonality loci pass through a positive plane
 
 `PeriodDomain.neg_of_mem_orthogonal` makes `Q` negative definite on `Wᗮ` for
 every positive plane `W` of a space of signature `(2, n - 2)`.  The reusable
@@ -18,8 +18,8 @@ continuity and coercivity results now live in `Continuous.lean` and
 
 * `PeriodDomain.finite_sphericalOrthogonal_inter` — **for a lattice `Λ`, only
   finitely many spherical classes of `Λ` are orthogonal to a given positive
-  plane**, i.e. `finite_walls_through`: finitely many spherical walls pass
-  through a point of the period domain.
+  plane**, i.e. `finite_orthogonalityLoci_through`: finitely many spherical
+  orthogonality loci contain a given positive plane.
 
 ## What is *not* proved here, and why it is not an oversight
 
@@ -45,8 +45,8 @@ namespace PeriodDomain
 variable {M : Type*} [NormedAddCommGroup M] [NormedSpace ℝ M] [FiniteDimensional ℝ M]
 variable {Q : QuadraticForm ℝ M} {W : Submodule ℝ M}
 
-/-- The spherical classes orthogonal to `W`. By `mem_wall_iff_mem_orthogonal`
-these are exactly the classes whose wall passes through `W`. -/
+/-- The spherical classes orthogonal to `W`. By `mem_orthogonalityLocus_iff_mem_orthogonal`
+these are exactly the classes whose orthogonalityLocus passes through `W`. -/
 def sphericalOrthogonal (Q : QuadraticForm ℝ M) (W : Submodule ℝ M) : Set M :=
   {δ | IsSphericalClass Q δ ∧ δ ∈ orthogonal Q W}
 
@@ -83,17 +83,17 @@ theorem finite_sphericalOrthogonal_inter (hsig : HasSignatureTwo Q)
     (sphericalOrthogonal Q W ∩ (Submodule.span ℤ (Set.range b) : Set M)).Finite :=
   ZSpan.setFinite_inter b (isBounded_sphericalOrthogonal hsig hW)
 
-/-- **Finitely many spherical walls pass through a point of the period domain.**
+/-- **Finitely many spherical orthogonality loci contain a positive plane.**
 
 The same statement as `finite_sphericalOrthogonal_inter`, said in walls: this is
 what a local-finiteness argument for route (A) starts from, and the pointwise
 case is unconditional where the region-wise case is not. -/
-theorem finite_walls_through (hsig : HasSignatureTwo Q) (hW : IsPositivePlane Q W)
+theorem finite_orthogonalityLoci_through (hsig : HasSignatureTwo Q) (hW : IsPositivePlane Q W)
     {ι : Type*} [Finite ι] (b : Module.Basis ι ℝ M) :
-    {δ : M | IsSphericalClass Q δ ∧ W ∈ wall Q δ ∧
+    {δ : M | IsSphericalClass Q δ ∧ W ∈ orthogonalityLocus Q δ ∧
       δ ∈ (Submodule.span ℤ (Set.range b) : Set M)}.Finite := by
   refine Set.Finite.subset (finite_sphericalOrthogonal_inter hsig hW b) ?_
   rintro δ ⟨hsph, hwall, hlat⟩
-  exact ⟨⟨hsph, (mem_wall_iff_mem_orthogonal hW).mp hwall⟩, hlat⟩
+  exact ⟨⟨hsph, (mem_orthogonalityLocus_iff_mem_orthogonal hW).mp hwall⟩, hlat⟩
 
 end PeriodDomain

@@ -9,7 +9,7 @@ import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 
 /-!
-# Spherical walls in the `exp(β + iω)` chart
+# Spherical signed-ray loci in the `exp(β + iω)` chart
 
 For a real vector space `V` with a symmetric bilinear form `q` — standing for
 `NS(X) ⊗ ℝ` with the intersection form — the vector
@@ -34,7 +34,7 @@ Everything here is arithmetic in a real vector space carrying a symmetric
 bilinear form. There is **no** K3 surface: no Néron–Severi group, no ample
 cone, no Hodge index theorem, no Mukai vector of an object, no stability
 condition and no `Stab(X)`. `Mukai.RealExtension V` is a triple, not `N(X) ⊗ ℝ`, and
-`chamber` is not claimed to be the image of anything under a map from a space
+`signedRayRegularLocus` is not claimed to be the image of anything under a map from a space
 of stability conditions.
 
 In particular the Hodge index theorem is **not** used and not assumed. Where
@@ -50,15 +50,15 @@ This is the same discipline `Walls/Numerical/Basic.lean` applies to tilt walls
 and `LinearAlgebra/Lattice/Mukai/Basic.lean` applies to the integral Mukai
 extension.
 
-## Not the same walls as `Walls/Numerical`
+## Not the same loci as `Walls/Numerical`
 
 `Walls/Numerical/Basic.lean` is the **tilt-stability** wall structure: a
 numerical class is a triple of reals `(ch₀, ch₁·H, ch₂)`, the parameter space
 is the `(s, t)` half plane, and the walls are nested conics. This file is a
-different structure with the same name attached: the parameter space is a pair
-`(β, ω)` of vectors, the index set is the spherical classes, and a wall is a
-real half-space rather than a circle. The two files share no declaration and
-neither imports the other. Do not merge them.
+different numerical locus: the parameter space is a pair `(β, ω)` of vectors,
+the index set is the spherical classes, and `nonpositiveRayLocus` is a real
+half-space rather than a circle. The two files share no declaration and neither
+imports the other. Do not merge them.
 
 ## The real extension is a twin of `Mukai.pairing`, not a generalisation
 
@@ -81,9 +81,9 @@ the geometric obligation of exhibiting `NS(X)` with its intersection form, and
   `⟪δ,δ⟫ + r²·q(ω,ω) − q(Δ − rβ, Δ − rβ)`, with no side condition. Bridgeland's
   formula `(⋆)` is this divided by `2r`, and is therefore conditional on
   `r ≠ 0` in a way the undivided form is not.
-* `pairingIm_eq_of_symm` — `Im(℧,δ) = q(Δ − rβ, ω)`. This is the statement that a wall
+* `pairingIm_eq_of_symm` — `Im(℧,δ) = q(Δ − rβ, ω)`. This is the statement that a signed-ray locus
   meets the real axis exactly on `ω^⊥`.
-* `mem_wall_iff_of_isSpherical` — membership of `H(δ)` for spherical `δ` of
+* `mem_nonpositiveRayLocus_iff_of_isSpherical` — membership of `H(δ)` for spherical `δ` of
   positive rank, in the form
   `q(Δ − rβ, ω) = 0 ∧ r²·q(ω,ω) ≤ 2 + q(Δ − rβ, Δ − rβ)`.
   This is the shape the local-finiteness argument consumes.
@@ -110,7 +110,7 @@ This file used to declare the type and this pairing a second time, as
 `q c c' - r*s' - r'*s`, the same `[AddCommGroup V] [Module ℝ V]` and the same
 bilinear form as `Mukai.RealExtension` and `Mukai.realPairing`. The two
 docstrings named each other instead of one importing the other. They are now
-one, and what is local to this file is the wall arithmetic below.
+one, and what is local to this file is the signed-ray-locus arithmetic below.
 
 Note `Mukai.realForm` is *half* the self-pairing, so sphericality below reads
 `selfPairing q δ = -2` rather than `realForm q δ = -2`. -/
@@ -146,7 +146,7 @@ computed componentwise because the Mukai form is extended `ℂ`-bilinearly. -/
 **This is `Mukai.expRe`, not a second definition of it.**  This file used to
 declare the exponential chart a second time, exactly as it used to declare the
 pairing a second time — the same `(1, β, (q β β - q ω ω)/2)`, in a file that
-already imports `Mukai/RealForm.lean`.  The names are kept because the wall
+already imports `Mukai/RealForm.lean`.  The names are kept because the nonpositiveRayLocus
 statements below read better with them, but they are abbreviations now, so the
 `(β, ω)` chart of this subtree and the exponential chart of the period-domain
 subtree are one object rather than two. -/
@@ -291,52 +291,52 @@ theorem corank_eq_of_isSpherical {δ : Mukai.RealExtension V} (hs : IsSpherical 
   rw [eq_div_iff (mul_ne_zero two_ne_zero hr)]
   linarith [h2]
 
-/-! ### The walls, and the chamber they cut out -/
+/-! ### The signed-ray loci, and the regular locus they cut out -/
 
 /-- `H(δ)` in the `(β, ω)` chart: the locus where `(℧, δ)` is real and
 non-positive.
 
 Defined for every `δ`, not only for spherical ones of positive rank — the
 sphericity and rank hypotheses belong to the theorems, not to the definition. -/
-def wall (δ : Mukai.RealExtension V) : Set (V × V) :=
+def nonpositiveRayLocus (δ : Mukai.RealExtension V) : Set (V × V) :=
   {p | pairingIm q p.1 p.2 δ = 0 ∧ pairingRe q p.1 p.2 δ ≤ 0}
 
-theorem mem_wall_iff (δ : Mukai.RealExtension V) (p : V × V) :
-    p ∈ wall q δ ↔ pairingIm q p.1 p.2 δ = 0 ∧ pairingRe q p.1 p.2 δ ≤ 0 :=
+theorem mem_nonpositiveRayLocus_iff (δ : Mukai.RealExtension V) (p : V × V) :
+    p ∈ nonpositiveRayLocus q δ ↔ pairingIm q p.1 p.2 δ = 0 ∧ pairingRe q p.1 p.2 δ ≤ 0 :=
   Iff.rfl
 
-/-- The chamber cut out by a set `S` of classes: the points of the chart on no
-wall of `S`. Bridgeland's `L(X)` is `chamber q (sphericalPlus q)`. -/
-def chamber (S : Set (Mukai.RealExtension V)) : Set (V × V) :=
-  {p | ∀ δ ∈ S, p ∉ wall q δ}
+/-- The signedRayRegularLocus cut out by a set `S` of classes: the points of the chart on no
+nonpositiveRayLocus of `S`. Bridgeland's `L(X)` is `signedRayRegularLocus q (sphericalPlus q)`. -/
+def signedRayRegularLocus (S : Set (Mukai.RealExtension V)) : Set (V × V) :=
+  {p | ∀ δ ∈ S, p ∉ nonpositiveRayLocus q δ}
 
-theorem mem_chamber_iff (S : Set (Mukai.RealExtension V)) (p : V × V) :
-    p ∈ chamber q S ↔ ∀ δ ∈ S, p ∉ wall q δ :=
+theorem mem_signedRayRegularLocus_iff (S : Set (Mukai.RealExtension V)) (p : V × V) :
+    p ∈ signedRayRegularLocus q S ↔ ∀ δ ∈ S, p ∉ nonpositiveRayLocus q δ :=
   Iff.rfl
 
-theorem chamber_antitone {S T : Set (Mukai.RealExtension V)} (h : S ⊆ T) :
-    chamber q T ⊆ chamber q S :=
+theorem signedRayRegularLocus_antitone {S T : Set (Mukai.RealExtension V)} (h : S ⊆ T) :
+    signedRayRegularLocus q T ⊆ signedRayRegularLocus q S :=
   fun _ hp δ hδ => hp δ (h hδ)
 
-theorem chamber_eq_compl_iUnion (S : Set (Mukai.RealExtension V)) :
-    chamber q S = (⋃ δ ∈ S, wall q δ)ᶜ := by
+theorem signedRayRegularLocus_eq_compl_iUnion (S : Set (Mukai.RealExtension V)) :
+    signedRayRegularLocus q S = (⋃ δ ∈ S, nonpositiveRayLocus q δ)ᶜ := by
   ext p
-  simp [chamber, Set.mem_compl_iff]
+  simp [signedRayRegularLocus, Set.mem_compl_iff]
 
-/-- **Membership of a spherical wall, in the form the finiteness argument
+/-- **Membership of a spherical signed-ray locus, in the form the finiteness argument
 consumes.**
 
 The first conjunct puts `Δ − rβ` in `ω^⊥`; the second is the inequality that,
 together with negative-definiteness of `q` on `ω^⊥` and a positive lower bound
 on `q(ω,ω)`, bounds `r` and then `Δ`. Neither of those two extra hypotheses
 appears here, because neither is needed for the equivalence itself. -/
-theorem mem_wall_iff_of_isSpherical (hq : ∀ x y : V, q x y = q y x)
+theorem mem_nonpositiveRayLocus_iff_of_isSpherical (hq : ∀ x y : V, q x y = q y x)
     {δ : Mukai.RealExtension V} (hs : IsSpherical q δ) (hr : 0 < δ.1) (p : V × V) :
-    p ∈ wall q δ ↔
+    p ∈ nonpositiveRayLocus q δ ↔
       q (δ.2.1 - δ.1 • p.1) p.2 = 0 ∧
         δ.1 ^ 2 * q p.2 p.2
           ≤ 2 + q (δ.2.1 - δ.1 • p.1) (δ.2.1 - δ.1 • p.1) := by
-  rw [mem_wall_iff, pairingIm_eq_of_symm q hq]
+  rw [mem_nonpositiveRayLocus_iff, pairingIm_eq_of_symm q hq]
   refine and_congr_right fun _ => ?_
   have key := two_mul_rk_mul_pairingRe q hq p.1 p.2 δ
   rw [(isSpherical_iff q δ).1 hs] at key

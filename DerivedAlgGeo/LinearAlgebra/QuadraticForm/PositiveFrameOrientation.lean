@@ -2,14 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositivePairOpen
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositiveFrameOpen
 
 /-!
 # The projection-sign cocycle
 
-`Orientation.lean` splits the positive pairs in two by the sign of `pairingDet`
+`PositiveFrame.lean` splits the positive frames in two by the sign of `pairingDet`
 against a fixed reference pair, and says plainly that the split might depend on
-the reference. It does not. For any three positive pairs
+the reference. It does not. For any three positive frames
 
 ```
 0 < pairingDet r p * pairingDet p q * pairingDet q r
@@ -17,21 +17,21 @@ the reference. It does not. For any three positive pairs
 
 (`pairingDet_cocycle`), so the sign against one reference is the product of the
 signs through any other; `sameOrientation_iff_of_reference` turns that into
-independence of the partition, which is what makes `periodDomainPlus` *the*
+independence of the partition, which is what makes `positiveFramesPlus` *the*
 half rather than *a* half.
 
 ## The proof, and what it does not use
 
 The textbook argument runs through connectedness of the Grassmannian of
 positive planes. That is not used here and not assumed. What replaces it is
-that a positive pair can be pushed into the reference plane along an explicit
-straight line that never leaves the positive pairs:
+that a positive frame can be pushed into the reference plane along an explicit
+straight line that never leaves the positive frames:
 
 * `proj` is orthogonal projection onto the reference plane, written by Cramer's
   rule out of the reference's own Gram determinant — invertible exactly because
   the reference is positive. No orthogonal-complement theory is needed.
-* `isPositivePair_interp`: the whole segment `t ↦ (πx + t x', πy + t y')`,
-  `t ∈ [0, 1]`, consists of positive pairs. The residual lies where `Q` is
+* `isPositiveFrame_interp`: the whole segment `t ↦ (πx + t x', πy + t y')`,
+  `t ∈ [0, 1]`, consists of positive frames. The residual lies where `Q` is
   nonpositive, so shrinking it only increases `Q` on every combination.
 * `pairingDet_proj`: the determinant against the reference does not move along
   that segment at all. It only ever sees the projection.
@@ -83,19 +83,19 @@ theorem pairingDet_self (x y : M) :
   rw [pairingDet, polar_self, polar_self, polar_comm (⇑Q) y x]
   ring
 
-/-- A positive pair has positive Gram determinant. -/
-theorem pairingDet_self_pos {x y : M} (h : IsPositivePair Q x y) :
+/-- A positive frame has positive Gram determinant. -/
+theorem pairingDet_self_pos {x y : M} (h : IsPositiveFrame Q x y) :
     0 < pairingDet Q x y x y := by
   rw [pairingDet_self]
-  exact ((isPositivePair_iff x y).1 h).2
+  exact ((isPositiveFrame_iff x y).1 h).2
 
 /-- **A pair is positive exactly when `Q` is positive on every nontrivial
 combination.** Sylvester's criterion in the form the interpolation argument
 wants. -/
-theorem isPositivePair_iff_forall_combination (x y : M) :
-    IsPositivePair Q x y ↔
+theorem isPositiveFrame_iff_forall_combination (x y : M) :
+    IsPositiveFrame Q x y ↔
       ∀ a b : ℝ, (a ≠ 0 ∨ b ≠ 0) → 0 < Q (a • x + b • y) := by
-  rw [isPositivePair_iff]
+  rw [isPositiveFrame_iff]
   constructor
   · rintro ⟨hx, hdisc⟩ a b hab
     rw [apply_smul_add_smul]
@@ -127,16 +127,16 @@ def projCoeffSnd (x₀ y₀ v : M) : ℝ :=
   (polar (⇑Q) x₀ x₀ * polar (⇑Q) y₀ v - polar (⇑Q) x₀ y₀ * polar (⇑Q) x₀ v) /
     pairingDet Q x₀ y₀ x₀ y₀
 
-/-- **Orthogonal projection onto the plane of a positive pair**, written out in
+/-- **Orthogonal projection onto the plane of a positive frame**, written out in
 the pair's own coordinates.  No general orthogonal-complement theory is needed:
-the Gram determinant of a positive pair is invertible, so Cramer's rule gives
+the Gram determinant of a positive frame is invertible, so Cramer's rule gives
 the projection directly. -/
 def proj (x₀ y₀ v : M) : M :=
   projCoeffFst Q x₀ y₀ v • x₀ + projCoeffSnd Q x₀ y₀ v • y₀
 
 variable {Q}
 
-theorem polar_proj_fst {x₀ y₀ : M} (h₀ : IsPositivePair Q x₀ y₀) (v : M) :
+theorem polar_proj_fst {x₀ y₀ : M} (h₀ : IsPositiveFrame Q x₀ y₀) (v : M) :
     polar (⇑Q) x₀ (proj Q x₀ y₀ v) = polar (⇑Q) x₀ v := by
   have hg : pairingDet Q x₀ y₀ x₀ y₀ ≠ 0 := ne_of_gt (pairingDet_self_pos h₀)
   simp only [proj, polar_add_right, polar_smul_right, smul_eq_mul, projCoeffFst,
@@ -145,7 +145,7 @@ theorem polar_proj_fst {x₀ y₀ : M} (h₀ : IsPositivePair Q x₀ y₀) (v : 
   simp only [pairingDet, polar_comm (⇑Q) y₀ x₀]
   ring
 
-theorem polar_proj_snd {x₀ y₀ : M} (h₀ : IsPositivePair Q x₀ y₀) (v : M) :
+theorem polar_proj_snd {x₀ y₀ : M} (h₀ : IsPositiveFrame Q x₀ y₀) (v : M) :
     polar (⇑Q) y₀ (proj Q x₀ y₀ v) = polar (⇑Q) y₀ v := by
   have hg : pairingDet Q x₀ y₀ x₀ y₀ ≠ 0 := ne_of_gt (pairingDet_self_pos h₀)
   simp only [proj, polar_add_right, polar_smul_right, smul_eq_mul, projCoeffFst,
@@ -160,7 +160,7 @@ theorem proj_mem_pairSpan (Q) (x₀ y₀ v : M) : proj Q x₀ y₀ v ∈ pairSpa
 
 /-- What the projection is for: the residual is orthogonal to the reference
 plane, so `Q` is nonpositive on it. -/
-theorem sub_proj_mem_orthogonal {x₀ y₀ : M} (h₀ : IsPositivePair Q x₀ y₀) (v : M) :
+theorem sub_proj_mem_orthogonal {x₀ y₀ : M} (h₀ : IsPositiveFrame Q x₀ y₀) (v : M) :
     v - proj Q x₀ y₀ v ∈ orthogonal Q (pairSpan x₀ y₀) := by
   rw [pairSpan, mem_orthogonal_span_pair_iff]
   constructor
@@ -169,7 +169,7 @@ theorem sub_proj_mem_orthogonal {x₀ y₀ : M} (h₀ : IsPositivePair Q x₀ y�
 
 /-- **The determinant only sees the projection.**  Both entries of each column
 are pairings against the reference, and those are unchanged by projecting. -/
-theorem pairingDet_proj {x₀ y₀ : M} (h₀ : IsPositivePair Q x₀ y₀) (x y : M) :
+theorem pairingDet_proj {x₀ y₀ : M} (h₀ : IsPositiveFrame Q x₀ y₀) (x y : M) :
     pairingDet Q x₀ y₀ (proj Q x₀ y₀ x) (proj Q x₀ y₀ y) = pairingDet Q x₀ y₀ x y := by
   rw [pairingDet, pairingDet, polar_proj_fst h₀, polar_proj_fst h₀,
     polar_proj_snd h₀, polar_proj_snd h₀]
@@ -206,14 +206,14 @@ variable [FiniteDimensional ℝ M]
 /-- **Shrinking the orthogonal component keeps a pair positive.**  The residual
 lies where `Q` is nonpositive, so scaling it down by `t ≤ 1` only increases
 `Q` on every combination. -/
-theorem isPositivePair_interp (hsig : HasSignatureTwo Q) {x₀ y₀ x y : M}
-    (h₀ : IsPositivePair Q x₀ y₀) (h : IsPositivePair Q x y) {t : ℝ}
+theorem isPositiveFrame_interp (hsig : HasSignatureTwo Q) {x₀ y₀ x y : M}
+    (h₀ : IsPositiveFrame Q x₀ y₀) (h : IsPositiveFrame Q x y) {t : ℝ}
     (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
-    IsPositivePair Q (proj Q x₀ y₀ x + t • (x - proj Q x₀ y₀ x))
+    IsPositiveFrame Q (proj Q x₀ y₀ x + t • (x - proj Q x₀ y₀ x))
       (proj Q x₀ y₀ y + t • (y - proj Q x₀ y₀ y)) := by
   set px := proj Q x₀ y₀ x with hpx
   set py := proj Q x₀ y₀ y with hpy
-  rw [isPositivePair_iff_forall_combination]
+  rw [isPositiveFrame_iff_forall_combination]
   intro a b hab
   set u : M := a • px + b • py with hu
   set w : M := a • (x - px) + b • (y - py) with hw
@@ -229,7 +229,7 @@ theorem isPositivePair_interp (hsig : HasSignatureTwo Q) {x₀ y₀ x y : M}
       (Submodule.smul_mem _ _ (proj_mem_pairSpan Q x₀ y₀ y))
   have hpolar : polar (⇑Q) u w = 0 := (mem_orthogonal_iff.1 hwmem) u humem
   have hQw : Q w ≤ 0 :=
-    nonpos_of_mem_orthogonal hsig (isPositivePlane_pairSpan h₀) hwmem
+    nonpos_of_mem_orthogonal hsig (isPositivePlane_framePlane h₀) hwmem
   have hsum : Q u + Q w = Q (a • x + b • y) := by
     have huw : u + w = a • x + b • y := by rw [hu, hw]; module
     have := polar (⇑Q) u w
@@ -238,7 +238,7 @@ theorem isPositivePair_interp (hsig : HasSignatureTwo Q) {x₀ y₀ x y : M}
     rw [huw, hpolar, add_zero] at hexp
     exact hexp.symm
   have hxy : 0 < Q (a • x + b • y) :=
-    (isPositivePair_iff_forall_combination x y).1 h a b hab
+    (isPositiveFrame_iff_forall_combination x y).1 h a b hab
   have hexp : Q (u + t • w) = Q u + t * t * Q w := by
     have h1 : Q (u + t • w) = Q u + Q (t • w) + polar (⇑Q) u (t • w) := by
       rw [polar]; ring
@@ -252,12 +252,12 @@ theorem isPositivePair_interp (hsig : HasSignatureTwo Q) {x₀ y₀ x y : M}
   linarith
 
 /-- **The sign against a second reference survives the projection.**  The two
-pairs are the ends of an interpolation through positive pairs, and the
+frames are the ends of an interpolation through positive frames, and the
 determinant against `(u, v)` is a quadratic polynomial along it that never
 vanishes. -/
 theorem pairingDet_proj_mul_pos (hsig : HasSignatureTwo Q) {x₀ y₀ u v x y : M}
-    (h₀ : IsPositivePair Q x₀ y₀) (huv : IsPositivePair Q u v)
-    (h : IsPositivePair Q x y) :
+    (h₀ : IsPositiveFrame Q x₀ y₀) (huv : IsPositiveFrame Q u v)
+    (h : IsPositiveFrame Q x y) :
     0 < pairingDet Q u v (proj Q x₀ y₀ x) (proj Q x₀ y₀ y) *
       pairingDet Q u v x y := by
   set px := proj Q x₀ y₀ x with hpxdef
@@ -280,7 +280,7 @@ theorem pairingDet_proj_mul_pos (hsig : HasSignatureTwo Q) {x₀ y₀ u v x y : 
       pairingDet Q u v (px + t • (x - px)) (py + t • (y - py)) ≠ 0 := by
     intro t ht
     exact pairingDet_ne_zero hsig huv
-      (isPositivePair_interp hsig h₀ h ht.1 ht.2)
+      (isPositiveFrame_interp hsig h₀ h ht.1 ht.2)
   have key := pos_mul_endpoints_of_ne_zero hcont hne
   have e0x : px + (0 : ℝ) • (x - px) = px := by module
   have e0y : py + (0 : ℝ) • (y - py) = py := by module
@@ -288,12 +288,12 @@ theorem pairingDet_proj_mul_pos (hsig : HasSignatureTwo Q) {x₀ y₀ u v x y : 
   have e1y : py + (1 : ℝ) • (y - py) = y := by module
   simpa only [e0x, e0y, e1x, e1y] using key
 
-/-- **The projection-sign cocycle.**  For any three positive pairs the three
+/-- **The projection-sign cocycle.**  For any three positive frames the three
 pairing determinants taken cyclically have positive product, so the sign
 against one reference is the product of the signs through any other. -/
 theorem pairingDet_cocycle (hsig : HasSignatureTwo Q) {x₀ y₀ u v x y : M}
-    (h₀ : IsPositivePair Q x₀ y₀) (huv : IsPositivePair Q u v)
-    (h : IsPositivePair Q x y) :
+    (h₀ : IsPositiveFrame Q x₀ y₀) (huv : IsPositiveFrame Q u v)
+    (h : IsPositiveFrame Q x y) :
     0 < pairingDet Q x₀ y₀ x y * pairingDet Q x y u v *
       pairingDet Q u v x₀ y₀ := by
   set px := proj Q x₀ y₀ x with hpxdef
@@ -326,12 +326,12 @@ theorem pairingDet_cocycle (hsig : HasSignatureTwo Q) {x₀ y₀ u v x y : M}
 
 /-- **The orientation partition does not depend on the reference.**  Changing
 the reference pair either preserves every sign or flips every sign, so
-`SameOrientation` against one positive pair is `SameOrientation` against any
+`SameOrientation` against one positive frame is `SameOrientation` against any
 other. -/
 theorem sameOrientation_iff_of_reference (hsig : HasSignatureTwo Q)
-    {x₀ y₀ u v : M} (h₀ : IsPositivePair Q x₀ y₀) (huv : IsPositivePair Q u v)
-    {p q : M × M} (hp : IsPositivePair Q p.1 p.2)
-    (hq : IsPositivePair Q q.1 q.2) :
+    {x₀ y₀ u v : M} (h₀ : IsPositiveFrame Q x₀ y₀) (huv : IsPositiveFrame Q u v)
+    {p q : M × M} (hp : IsPositiveFrame Q p.1 p.2)
+    (hq : IsPositiveFrame Q q.1 q.2) :
     SameOrientation Q x₀ y₀ p q ↔ SameOrientation Q u v p q := by
   set sp := pairingDet Q x₀ y₀ p.1 p.2 with hsp
   set sq := pairingDet Q x₀ y₀ q.1 q.2 with hsq

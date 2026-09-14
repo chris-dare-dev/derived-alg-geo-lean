@@ -6,18 +6,18 @@ import DerivedAlgGeo.LinearAlgebra.QuadraticForm.ComplexPairing
 import Mathlib.LinearAlgebra.QuadraticForm.Signature
 
 /-!
-# The period domain of a real quadratic space of signature `(2, n - 2)`
+# Positive planes in a real quadratic space of signature `(2, n - 2)`
 
 A quadratic space `(M, Q)` over `ℝ` whose signature is `(2, n - 2)` carries a
 distinguished family of two-dimensional subspaces: the **positive planes**, the
-planes on which `Q` is positive definite. The set of them is the **period
-domain**, and deleting from it the planes orthogonal to a class of square `-2`
-leaves the **cut period domain**.
+planes on which `Q` is positive definite. This file owns that neutral carrier;
+`OrthogonalityLocus.lean` separately owns the loci cut out inside it.
 
-The names come from the K3 case, where `M = N(X) ⊗ ℝ` for the numerical
-Grothendieck group of a K3 surface with its Mukai pairing, the signature is
-`(2, ρ(X))`, and the cut domain is Bridgeland's `P₀⁺(X)` — the target of the
-covering map of *Stability conditions on K3 surfaces*, Theorem 1.1.
+In the K3 application, `M = N(X) ⊗ ℝ` and a complex vector determines an
+ordered frame `(Re Ω, Im Ω)`, which then forgets to the plane it spans. Those
+three presentations are not interchangeable. `PositiveFrame.lean` supplies
+the explicit frame-to-plane map; a geometric period-domain identification must
+be stated with its geometric realization.
 
 **No geometry is asserted here.** Every statement below is a statement about an
 arbitrary real quadratic space of signature `(2, n - 2)` and is true whether or
@@ -31,47 +31,33 @@ states for the integral lattice, applied to its real span.
 Bridgeland writes the pairing bilinearly: a spherical class has `(δ, δ) = -2`.
 Mathlib's signature API is quadratic-form-native (`sigPos`, `sigNeg`), and the
 bilinear form belonging to a `QuadraticForm` is its polar form, which satisfies
-`polar Q δ δ = 2 * Q δ`. Both readings are kept: `Q` carries the Sylvester
-theory, `Q.polarBilin` **is** the pairing, `IsSphericalClass` is stated as
-`polar Q δ δ = -2` so it can be compared with the paper unchanged, and
-`isSphericalClass_iff_apply` records that this is `Q δ = -1`.
+`polar Q δ δ = 2 * Q δ`. `Q` carries the Sylvester theory and
+`Q.polarBilin` **is** the pairing; spherical-class and orthogonality-locus
+terminology starts in `OrthogonalityLocus.lean`.
 
 ## Main results
 
 * `Nondegenerate` of the form, from the signature hypothesis alone.
 * `isCompl_orthogonal` — `M = W ⊕ Wᗮ` for a positive plane `W`.
 * `neg_of_mem_orthogonal` and `negDef_orthogonal` — **the engine**: `Q` is
-  negative definite on `Wᗮ`. Every finiteness statement about the walls
-  eventually rests on this, since it is what makes the pairing definite on the
-  space where the wall classes live.
-* `notMem_of_isSphericalClass` — a spherical class lies in no positive plane.
-* `mem_orthogonal_span_pair_iff` — orthogonality to a plane spanned by two
-  vectors is orthogonality to both, which is what makes it a closed condition
-  downstream.
-* `mem_wall_iff_mem_orthogonal` — a positive plane lies on the wall of `δ`
-  exactly when `δ` is orthogonal to it, which is how the previous item is used.
-  A wall does **not** meet its plane in a proper subspace: `W ⊆ δ^⊥` is exactly
-  the wall condition, and it is compatible with `δ ∉ W` because `δ` lies in
-  `Wᗮ`.
-* `periodDomain₀_sphericalClasses_univ_eq_empty` — the cut must be taken by a
-  *set* of classes: cutting by every real class of square `-2` empties the
-  domain. Bridgeland cuts by the lattice `Δ(X)`, which is discrete.
+  negative definite on `Wᗮ`. Downstream orthogonality-finiteness statements
+  rest on this, since it makes the pairing definite on the orthogonal space.
 * `exists_isPositivePlane` and `stdForm_hasSignatureTwo` — the hypothesis is
-  inhabited and its period domain is nonempty, so nothing above is vacuous.
+  inhabited and its positive-plane locus is nonempty, so nothing above is vacuous.
   `sigPos Q = 2` carries its own positive plane; `stdForm` is `x₀² + x₁² - x₂²`
   on `ℝ³`, the smallest space the hypothesis holds for.
 
 ## What is deliberately absent
 
-* **Finiteness of the wall family.** That needs a lattice inside `M` and its
+* **Finiteness of orthogonality loci.** That needs a lattice inside `M` and its
   discreteness on top of `negDef_orthogonal`; it is not a statement about the
   real quadratic space alone.
 * **The component `P⁺` of `P`.** Choosing the connected component containing
   `exp(iω)` is orientation data on the positive plane. Nothing below needs it.
-* **The complex form.** Bridgeland's domain sits in `M ⊗ ℝ ℂ` and is cut out by
-  a condition on `Re Ω` and `Im Ω`. The plane they span carries exactly that
-  condition, so the two-plane presentation is the same set without paying for
-  complexification.
+* **A complex-vector or geometric period domain.** Bridgeland's domain sits in
+  `M ⊗ ℝ ℂ`, while `positivePlanes Q` is a set of submodules. Passing through
+  `(Re Ω, Im Ω)` forgets an ordered basis and then its orientation; it is a map,
+  not a rename or a literal identification of carriers.
 -/
 
 open QuadraticMap
@@ -102,34 +88,8 @@ structure HasSignatureTwo : Prop where
   /-- The negative index of inertia takes up everything else. -/
   sigNeg_add_two : sigNeg Q + 2 = Module.finrank ℝ M
 
-/-- A **spherical class**: `(δ, δ) = -2` for the pairing, which is the polar
-form of `Q`. Stated bilinearly so that it reads as in the source; see
-`isSphericalClass_iff_apply` for the quadratic form of the same condition. -/
-def IsSphericalClass (δ : M) : Prop := polar Q δ δ = -2
-
-/-- The **wall** of a class `δ`: the positive planes orthogonal to `δ`. For a
-K3 surface this is the hyperplane `δ^⊥` of Bridgeland's period domain, read on
-the plane rather than on a complex vector spanning it. -/
-def wall (δ : M) : Set (Submodule ℝ M) :=
-  {W | IsPositivePlane Q W ∧ ∀ w ∈ W, polar Q δ w = 0}
-
-/-- The **period domain**: all positive planes. -/
-def periodDomain : Set (Submodule ℝ M) := {W | IsPositivePlane Q W}
-
-/-- The spherical classes of a set of classes — Bridgeland's `Δ(X)` when the
-set is the Mukai lattice. -/
-def sphericalClasses (Λ : Set M) : Set M := {δ ∈ Λ | IsSphericalClass Q δ}
-
-/-- The **cut period domain**, `P₀`: the positive planes lying on no wall of a
-class in `Δ`.
-
-`Δ` is a parameter, and it must be: cutting by *every* real class of square `-2`
-deletes the whole domain, since the negative definite `Wᗮ` of any positive plane
-contains such a class. That is `periodDomain₀_sphericalClasses_univ_eq_empty`
-below, and it is why Bridgeland cuts by the lattice `Δ(X)`, which is discrete.
-The intended argument is `sphericalClasses Q Λ` for a lattice `Λ`. -/
-def periodDomain₀ (Δ : Set M) : Set (Submodule ℝ M) :=
-  {W ∈ periodDomain Q | ∀ δ ∈ Δ, W ∉ wall Q δ}
+/-- The locus of all positive planes. -/
+def positivePlanes : Set (Submodule ℝ M) := {W | IsPositivePlane Q W}
 
 end Defs
 
@@ -139,35 +99,6 @@ variable {Q : QuadraticForm ℝ M}
 theorem polarBilin_isRefl : Q.polarBilin.IsRefl := fun x y h => by
   rw [polarBilin_apply_apply] at h ⊢
   exact (polar_comm (⇑Q) y x).trans h
-
-/-- A spherical class is one with `Q δ = -1`; the factor two is the difference
-between the pairing and its quadratic form. -/
-theorem isSphericalClass_iff_apply {δ : M} : IsSphericalClass Q δ ↔ Q δ = -1 := by
-  rw [IsSphericalClass, polar_self, two_nsmul]
-  constructor <;> intro h <;> linarith
-
-/-- A positive plane lies on the wall of `δ` exactly when `δ` is orthogonal to
-it. This is the form in which the wall condition meets `negDef_orthogonal`. -/
-theorem mem_wall_iff_mem_orthogonal {W : Submodule ℝ M} {δ : M}
-    (hW : IsPositivePlane Q W) : W ∈ wall Q δ ↔ δ ∈ orthogonal Q W := by
-  rw [wall, Set.mem_setOf_eq, mem_orthogonal_iff]
-  refine ⟨fun h w hw => ?_, fun h => ⟨hW, fun w hw => ?_⟩⟩
-  · exact (polar_comm (⇑Q) w δ).trans (h.2 w hw)
-  · exact (polar_comm (⇑Q) δ w).trans (h w hw)
-
-/-- A spherical class lies in no positive plane: it has negative square and the
-form is positive definite on the plane. This is why a wall meets its plane in
-the orthogonal complement of the plane rather than inside it. -/
-theorem notMem_of_isSphericalClass {W : Submodule ℝ M} {δ : M}
-    (hW : IsPositivePlane Q W) (hδ : IsSphericalClass Q δ) : δ ∉ W := by
-  intro hmem
-  have hδ0 : δ ≠ 0 := by
-    intro h
-    rw [isSphericalClass_iff_apply, h, map_zero] at hδ
-    norm_num at hδ
-  have hpos : 0 < (Q.restrict W) ⟨δ, hmem⟩ := hW.posDef _ (by simpa using hδ0)
-  rw [restrict_apply, isSphericalClass_iff_apply.mp hδ] at hpos
-  norm_num at hpos
 
 /-- The pairing is nondegenerate on a positive plane: a vector of the plane
 orthogonal to the whole plane is orthogonal to itself, so its square vanishes
@@ -337,46 +268,7 @@ theorem finrank_orthogonal {W : Submodule ℝ M} (hW : IsPositivePlane Q W) :
   omega
 
 
-/-- **Cutting by every real class of square `-2` deletes the whole domain.**
-
-The orthogonal complement of a positive plane is negative definite and, once the
-space has dimension at least three, nonzero; scaling any vector of it to square
-`-1` produces a real spherical class orthogonal to the plane. So every positive
-plane lies on such a wall.
-
-This is why `periodDomain₀` takes the class set as a parameter, and why
-Bridgeland cuts by the discrete `Δ(X)` rather than by all of `{δ | ⟪δ,δ⟫ = -2}`.
--/
-theorem periodDomain₀_sphericalClasses_univ_eq_empty (hsig : HasSignatureTwo Q)
-    (hdim : 3 ≤ Module.finrank ℝ M) :
-    periodDomain₀ Q (sphericalClasses Q Set.univ) = ∅ := by
-  rw [Set.eq_empty_iff_forall_notMem]
-  rintro W ⟨hW, hcut⟩
-  have hWpos : IsPositivePlane Q W := hW
-  -- the complement is nonzero
-  have hrank : Module.finrank ℝ (orthogonal Q W) + 2 = Module.finrank ℝ M :=
-    finrank_orthogonal hWpos
-  have hpos : 0 < Module.finrank ℝ (orthogonal Q W) := by omega
-  have hnt : Nontrivial (orthogonal Q W) := (Module.finrank_pos_iff).mp hpos
-  obtain ⟨u, hu0⟩ := exists_ne (0 : orthogonal Q W)
-  have humem : (u : M) ∈ orthogonal Q W := u.2
-  have hune : (u : M) ≠ 0 := by simpa using hu0
-  have hQu : Q (u : M) < 0 := neg_of_mem_orthogonal hsig hWpos humem hune
-  -- scale it to square `-1`, i.e. to a spherical class
-  have hQne : Q (u : M) ≠ 0 := ne_of_lt hQu
-  have hfrac : 0 < -1 / Q (u : M) := div_pos_of_neg_of_neg (by norm_num) hQu
-  set c : ℝ := Real.sqrt (-1 / Q (u : M)) with hc
-  have hcsq : c * c = -1 / Q (u : M) := Real.mul_self_sqrt hfrac.le
-  set δ : M := c • (u : M) with hδ
-  have hQδ : Q δ = -1 := by
-    rw [hδ, QuadraticMap.map_smul, smul_eq_mul, hcsq]
-    field_simp
-  have hsph : IsSphericalClass Q δ := by
-    rw [isSphericalClass_iff_apply, hQδ]
-  have hmem : δ ∈ orthogonal Q W := Submodule.smul_mem _ _ humem
-  exact hcut δ ⟨Set.mem_univ δ, hsph⟩ ((mem_wall_iff_mem_orthogonal hWpos).mpr hmem)
-
-/-- **The period domain of a signature `(2, n - 2)` space is nonempty.**
+/-- **The positive-plane locus of a signature `(2, n - 2)` space is nonempty.**
 
 `sigPos Q = 2` is exactly the assertion that a two-dimensional positive definite
 subspace is available, so the hypothesis carries its own witness and nothing
@@ -386,7 +278,7 @@ theorem exists_isPositivePlane (hsig : HasSignatureTwo Q) :
   obtain ⟨W, hrank, hposDef⟩ := exists_finrank_eq_sigPos_and_posDef Q
   exact ⟨W, ⟨hrank.trans hsig.sigPos_eq, hposDef⟩⟩
 
-theorem periodDomain_nonempty (hsig : HasSignatureTwo Q) : (periodDomain Q).Nonempty :=
+theorem positivePlanes_nonempty (hsig : HasSignatureTwo Q) : (positivePlanes Q).Nonempty :=
   exists_isPositivePlane hsig
 
 end FiniteDimensional

@@ -87,9 +87,9 @@ def reZ (α β : ℝ) (v : NumClass) : ℝ :=
 /-- The imaginary part of the threefold charge at `(α, β)`.
 
 The outer factor of `α` is the one the expansion of `-∫exp(-(β+iα)H)ch`
-produces.  Some presentations divide it out; `wallValue` is unchanged by that,
+produces.  Some presentations divide it out; `alignmentValue` is unchanged by that,
 because dropping it rescales the imaginary part by `α > 0` and
-`wallValue_div_alpha` records the resulting proportionality. -/
+`alignmentValue_div_alpha` records the resulting proportionality. -/
 def imZ (α β : ℝ) (v : NumClass) : ℝ :=
   α * (v.deg2 - β * v.deg1 + (3 * β ^ 2 - α ^ 2) / 6 * v.deg0)
 

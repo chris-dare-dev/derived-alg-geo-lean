@@ -14,12 +14,13 @@ arbitrary parameter type `P`.  It contains no heart, slicing, support property,
 wall locus, Chern character, or scheme.
 
 `reindex` changes parameters and `pullback` changes the additive class
-presentation.  Real-linear postcomposition and complex rescaling also belong
-here because they act on charges before any wall or phase is considered.
+presentation. `zeroLocus` names charge vanishing without calling it a wall.
+Real-linear postcomposition and complex rescaling also belong here because they
+act on charges before any wall or phase is considered.
 
 The declarations keep their established `...Wall` namespace so the source
 cutover preserves public names.  The path records the mathematical owner; wall
-equations are downstream in `StabilityCondition/Walls/ChargeFamily.lean`.
+equations are downstream in `StabilityCondition/Walls/Alignment.lean`.
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall
@@ -43,6 +44,14 @@ structure ChargeFamily (P : Type u) (N : Type v) [AddCommGroup N] where
 namespace ChargeFamily
 
 variable (Z : ChargeFamily P N)
+
+/-- The parameters where the charge of one class vanishes. This is generally
+two real equations, not a codimension-one numerical alignment wall. -/
+def zeroLocus (v : N) : Set P := {p | Z.charge p v = 0}
+
+@[simp]
+theorem mem_zeroLocus (p : P) (v : N) :
+    p ∈ Z.zeroLocus v ↔ Z.charge p v = 0 := Iff.rfl
 
 @[ext]
 theorem ext {Z W : ChargeFamily P N}
@@ -74,6 +83,14 @@ theorem pullback_charge (f : M →+ N) (p : P) (v : M) :
 composition in the two independent inputs. -/
 theorem reindex_pullback_charge (f : Q → P) (g : M →+ N) (q : Q) (v : M) :
     ((Z.reindex f).pullback g).charge q v = Z.charge (f q) (g v) := rfl
+
+/-- Reindexing pulls a charge-zero locus back along the parameter map. -/
+theorem reindex_zeroLocus (f : Q → P) (v : N) :
+    (Z.reindex f).zeroLocus v = f ⁻¹' Z.zeroLocus v := rfl
+
+/-- Pullback of classes compares the corresponding charge-zero loci. -/
+theorem pullback_zeroLocus (f : M →+ N) (v : M) :
+    (Z.pullback f).zeroLocus v = Z.zeroLocus (f v) := rfl
 
 @[simp]
 theorem reindex_id : Z.reindex id = Z := rfl

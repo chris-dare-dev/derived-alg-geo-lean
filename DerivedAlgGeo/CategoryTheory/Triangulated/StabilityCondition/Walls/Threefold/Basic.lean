@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Numerical.Threefold
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.ChargeFamily
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Alignment
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 
 /-!
@@ -25,16 +25,16 @@ namespace Threefold
 
 /-- The universal determinant of the threefold family, written out in the two
 polynomials. -/
-theorem chargeFamily_wallValue (p : ℝ × ℝ) (v w : NumClass) :
-    chargeFamily.wallValue p v w =
+theorem chargeFamily_alignmentValue (p : ℝ × ℝ) (v w : NumClass) :
+    chargeFamily.alignmentValue p v w =
       reZ p.1 p.2 v * imZ p.1 p.2 w - imZ p.1 p.2 v * reZ p.1 p.2 w := by
-  simp [ChargeFamily.wallValue, ChargeFamily.re, ChargeFamily.im]
+  simp [ChargeFamily.alignmentValue, ChargeFamily.re, ChargeFamily.im]
 
 /-- Dropping the outer `α` from the imaginary part rescales every wall
 expression by `α`, so it moves no wall off `α = 0`.  This is why the two
 normalisations of the threefold charge found in the literature agree about
 walls. -/
-theorem wallValue_div_alpha (α β : ℝ) (v w : NumClass) :
+theorem alignmentValue_div_alpha (α β : ℝ) (v w : NumClass) :
     reZ α β v * imZ α β w - imZ α β v * reZ α β w =
       α * (reZ α β v * (imZ α β w / α) - (imZ α β v / α) * reZ α β w) ∨ α = 0 := by
   by_cases hα : α = 0

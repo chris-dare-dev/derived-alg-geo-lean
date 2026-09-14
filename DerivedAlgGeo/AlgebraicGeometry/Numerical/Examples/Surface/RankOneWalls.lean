@@ -121,7 +121,7 @@ theorem surface_finite_walls_through_expPlane {h2 : ℝ} (hh2 : 0 < h2)
         PeriodDomain.IsSphericalClass
           (Mukai.realForm (surfaceDivisorSpace h2).intersection) δ ∧
         DivisorSpace.expPlane (surfaceDivisorSpace h2) B omega ∈
-          PeriodDomain.wall (Mukai.realForm (surfaceDivisorSpace h2).intersection) δ ∧
+          PeriodDomain.orthogonalityLocus (Mukai.realForm (surfaceDivisorSpace h2).intersection) δ ∧
         δ ∈ (Submodule.span ℤ (Set.range surfaceMukaiBasis) :
               Set (Mukai.RealExtension SurfaceDivisor))}.Finite := by
   refine DivisorSpace.finite_walls_through_expPlane
@@ -137,7 +137,7 @@ theorem k3_finite_walls_through_expPlane {d : ℕ} (hd : d ≠ 0)
         PeriodDomain.IsSphericalClass
           (Mukai.realForm (surfaceDivisorSpace (2 * (d : ℝ))).intersection) δ ∧
         DivisorSpace.expPlane (surfaceDivisorSpace (2 * (d : ℝ))) B omega ∈
-          PeriodDomain.wall
+          PeriodDomain.orthogonalityLocus
             (Mukai.realForm (surfaceDivisorSpace (2 * (d : ℝ))).intersection) δ ∧
         δ ∈ (Submodule.span ℤ (Set.range surfaceMukaiBasis) :
               Set (Mukai.RealExtension SurfaceDivisor))}.Finite := by
@@ -153,7 +153,7 @@ theorem k3_finite_walls_integral {d : ℕ} (hd : d ≠ 0)
         PeriodDomain.IsSphericalClass
           (Mukai.realForm (surfaceDivisorSpace (2 * (d : ℝ))).intersection) δ ∧
         DivisorSpace.expPlane (surfaceDivisorSpace (2 * (d : ℝ))) B omega ∈
-          PeriodDomain.wall
+          PeriodDomain.orthogonalityLocus
             (Mukai.realForm (surfaceDivisorSpace (2 * (d : ℝ))).intersection) δ ∧
         δ ∈ (Mukai.integralExtension (Submodule.span ℤ (Set.range surfaceDivisorBasis)) :
               Set (Mukai.RealExtension SurfaceDivisor))}.Finite := by
@@ -192,7 +192,7 @@ theorem surface_finite_walls_meeting_box {h2 : ℝ} (hh2 : 0 < h2)
           (Mukai.realForm (surfaceDivisorSpace h2).intersection) δ ∧
         (∃ p ∈ parameterBox b₀ t₀ t₁,
           DivisorSpace.expPlane (surfaceDivisorSpace h2) p.1 p.2 ∈
-            PeriodDomain.wall (Mukai.realForm (surfaceDivisorSpace h2).intersection) δ) ∧
+            PeriodDomain.orthogonalityLocus (Mukai.realForm (surfaceDivisorSpace h2).intersection) δ) ∧
         δ ∈ (Submodule.span ℤ (Set.range surfaceMukaiBasis) :
               Set (Mukai.RealExtension SurfaceDivisor))}.Finite :=
   DivisorSpace.finite_walls_meeting_expFamily (surfaceHodgeDefinite hh2 one_ne_zero)
@@ -209,7 +209,7 @@ theorem k3_finite_walls_meeting_box {d : ℕ} (hd : d ≠ 0)
           (Mukai.realForm (surfaceDivisorSpace (2 * (d : ℝ))).intersection) δ ∧
         (∃ p ∈ parameterBox b₀ t₀ t₁,
           DivisorSpace.expPlane (surfaceDivisorSpace (2 * (d : ℝ))) p.1 p.2 ∈
-            PeriodDomain.wall
+            PeriodDomain.orthogonalityLocus
               (Mukai.realForm (surfaceDivisorSpace (2 * (d : ℝ))).intersection) δ) ∧
         δ ∈ (Mukai.integralExtension (Submodule.span ℤ (Set.range surfaceDivisorBasis)) :
               Set (Mukai.RealExtension SurfaceDivisor))}.Finite := by
@@ -235,12 +235,12 @@ def boxRegion {h2 : ℝ} (hh2 : 0 < h2) (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀
 
 /-- **Finitely many spherical classes of the lattice have a wall meeting the
 box**, in the `(β, ω)` chart of a Picard-rank-one surface. -/
-theorem surface_finite_wallCandidates_box {h2 : ℝ} (hh2 : 0 < h2)
+theorem surface_finite_rayCandidates_box {h2 : ℝ} (hh2 : 0 < h2)
     (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
-    (Wall.Spherical.wallCandidates (surfaceDivisorSpace h2).intersection
+    (Wall.Spherical.rayCandidates (surfaceDivisorSpace h2).intersection
       (boxRegion hh2 b₀ t₀ t₁ ht₀)
       ↑(Submodule.span ℤ (Set.range surfaceDivisorBasis))).Finite :=
-  Wall.Spherical.finite_wallCandidates_ofDivisorSpace _ _ _ surfaceDivisorBasis
+  Wall.Spherical.finite_rayCandidates_ofDivisorSpace _ _ _ surfaceDivisorBasis
 
 /-- **On the box, the chamber of the whole lattice is the chamber of those
 finitely many classes.**
@@ -248,25 +248,25 @@ finitely many classes.**
 This is the chamber decomposition, on a surface, with every hypothesis
 discharged.  It says nothing about semistable objects: `chamber` is a subset of
 the parameter chart. -/
-theorem surface_chamber_inter_box {h2 : ℝ} (hh2 : 0 < h2)
+theorem surface_signedRayRegularLocus_inter_box {h2 : ℝ} (hh2 : 0 < h2)
     (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
-    Wall.Spherical.chamber (surfaceDivisorSpace h2).intersection
+    Wall.Spherical.signedRayRegularLocus (surfaceDivisorSpace h2).intersection
         (Wall.Spherical.latticeSpherical (surfaceDivisorSpace h2).intersection
           ↑(Submodule.span ℤ (Set.range surfaceDivisorBasis)))
         ∩ parameterBox b₀ t₀ t₁
-      = Wall.Spherical.chamber (surfaceDivisorSpace h2).intersection
-        (Wall.Spherical.wallCandidates (surfaceDivisorSpace h2).intersection
+      = Wall.Spherical.signedRayRegularLocus (surfaceDivisorSpace h2).intersection
+        (Wall.Spherical.rayCandidates (surfaceDivisorSpace h2).intersection
           (boxRegion hh2 b₀ t₀ t₁ ht₀)
           ↑(Submodule.span ℤ (Set.range surfaceDivisorBasis)))
         ∩ parameterBox b₀ t₀ t₁ :=
-  Wall.Spherical.chamber_inter_ofDivisorSpace _ _ _ surfaceDivisorBasis
+  Wall.Spherical.signedRayRegularLocus_inter_ofDivisorSpace _ _ _ surfaceDivisorBasis
 
 /-- The same on the degree-`2d` K3 model, assuming only `d > 0` and `t₀ > 0`. -/
-theorem k3_finite_wallCandidates_box {d : ℕ} (hd : d ≠ 0) (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
-    (Wall.Spherical.wallCandidates (surfaceDivisorSpace (2 * (d : ℝ))).intersection
+theorem k3_finite_rayCandidates_box {d : ℕ} (hd : d ≠ 0) (b₀ t₀ t₁ : ℝ) (ht₀ : 0 < t₀) :
+    (Wall.Spherical.rayCandidates (surfaceDivisorSpace (2 * (d : ℝ))).intersection
       (boxRegion (k3_h2_pos hd) b₀ t₀ t₁ ht₀)
       ↑(Submodule.span ℤ (Set.range surfaceDivisorBasis))).Finite :=
-  surface_finite_wallCandidates_box (k3_h2_pos hd) b₀ t₀ t₁ ht₀
+  surface_finite_rayCandidates_box (k3_h2_pos hd) b₀ t₀ t₁ ht₀
 
 end
 

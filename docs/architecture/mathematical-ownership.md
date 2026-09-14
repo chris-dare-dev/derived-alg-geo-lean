@@ -102,7 +102,9 @@ categorical destabilization.
 
 **Frames, planes and support are separate.** An ordered positive frame and
 the unoriented positive plane it spans are different objects, related by a
-forgetful map. General positive-plane/signature theory belongs in linear
+forgetful map. The canonical neutral owners are `QuadraticForm/PositiveFrame.lean`
+and `PositivePlane.lean`; orthogonality arrangements live in the separate
+`Orthogonality*.lean` modules. General positive-plane/signature theory belongs in linear
 algebra; a geometric period-domain identification belongs with its
 realization. Negative definiteness on `ker Z` alone is not the full quadratic
 support condition: nonnegativity on relevant semistable classes is also needed.
