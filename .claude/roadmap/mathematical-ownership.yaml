@@ -323,7 +323,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.07 — Move linear Serre duality and Yoneda helpers to their independent owners
-  status: blocked
+  status: done
   summary: 'Make the basic Serre-functor and linear representability theory importable without triangulated
     categories. SRF1 #897–#899 remains responsible for new full-faithfulness, transport and geometric-duality
     theorems. This issue relocates/repackages the owner; it does not duplicate those proofs.'
@@ -340,7 +340,6 @@ items:
   - area:derived
   - type:refactor
   - sev:high
-  - blocked
   acceptance:
   - Move SerreFunctor/Basic and linear uniqueness/equivalence material to CategoryTheory/Linear/SerreFunctor
     under the agreed map; retain shift/Ext/triangulated results in downstream adapters.

@@ -178,9 +178,15 @@ full-subcategory inclusion are structures on abstract (pre)triangulated
 categories, so their canonical owner is
 `CategoryTheory/Triangulated/SemiorthogonalDecomposition/`.  Constructors
 for objectwise mutation triangles and the same-projection theorem also live
-there; neither requires scheme vocabulary.  Ext profiles, transport of
-spherical and pseudoprojective objects, and classification-induced matching
-live beside the generic Serre API.  Adjacent Ext shift rigidity and ordered
+there; neither requires scheme vocabulary.  The `k`-linear Serre duality data,
+its Hom-finiteness hypothesis, the Serre pairing and trace, and uniqueness of
+the Serre functor mention no shift and no triangulation, so their owner is
+`CategoryTheory/Linear/SerreFunctor/`, with the three representability helpers
+that need no Serre datum at all in `CategoryTheory/Linear/Yoneda.lean`.  Ext
+profiles, transport of spherical and pseudoprojective objects, and
+classification-induced matching are shift-dependent and stay in
+`CategoryTheory/Triangulated/SerreFunctor/`, which imports the linear root.
+Adjacent Ext shift rigidity and ordered
 block-length comparison belong with the semiorthogonal root.  One-step and
 dependent finite kernel extension, including generation from right
 admissibility, live beside the generic Fourier--Mukai API.  Only the comparison

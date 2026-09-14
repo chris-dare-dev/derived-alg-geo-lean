@@ -120,7 +120,11 @@ powers of the polarization. Reusable models belong to their subject, with
 - **Linear Serre theory and Yoneda:** basic Hom-duality and linear
   representability need no triangulated category. Shift, Ext and exactness
   results are downstream. Full faithfulness needs its finiteness hypothesis;
-  essential surjectivity is an additional obligation.
+  essential surjectivity is an additional obligation. **Done** (#1318):
+  `CategoryTheory/Linear/SerreFunctor/` owns the duality data and its
+  uniqueness, `CategoryTheory/Linear/Yoneda.lean` owns the three
+  representability helpers and needs Mathlib alone, and layering rule 9 keeps
+  both of those true.
 - **Abelian stability and slope:** abelian stability functions and HN theory
   precede their triangulated applications. Geometric slope and Gieseker
   stability have independent owners and downstream comparisons. Retain
