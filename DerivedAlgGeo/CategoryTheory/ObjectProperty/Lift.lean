@@ -105,6 +105,20 @@ instance instIsTriangulatedPreimageLift [P.IsTriangulated] [Q.IsTriangulated] [F
     (preimageLift F hmem).IsTriangulated :=
   inferInstanceAs (liftOfLE F (fun X ↦ (hmem X).1)).IsTriangulated
 
+/-- Restricting an essentially surjective functor along a property detected by that functor is
+still essentially surjective. Every target object has an ambient preimage; invariance under
+isomorphism puts that preimage in the source property, and the ambient isomorphism lifts to the
+two full subcategories. -/
+noncomputable instance instEssSurjPreimageLift [F.EssSurj] [Q.IsClosedUnderIsomorphisms]
+    (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
+    (preimageLift F hmem).EssSurj where
+  mem_essImage Y := by
+    let X := F.objPreimage Y.obj
+    let e : F.obj X ≅ Y.obj := F.objObjPreimageIso Y.obj
+    have hFX : Q (F.obj X) := Q.prop_of_iso e.symm Y.property
+    let XP : P.FullSubcategory := ⟨X, (hmem X).2 hFX⟩
+    exact ⟨XP, ⟨Q.isoMk e⟩⟩
+
 /-- The restriction of `F` to the objects whose image lies in `Q`, landing
 in `Q`.  This is the functor between the selected subcategories under
 hypothesis (iv) of Theorem A.17 of arXiv:2607.28411v1, `P = F⁻¹ Q`, the

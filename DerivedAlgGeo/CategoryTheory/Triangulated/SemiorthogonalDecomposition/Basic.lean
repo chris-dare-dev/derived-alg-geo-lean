@@ -23,6 +23,32 @@ open CategoryTheory
 
 universe v u w
 
+namespace CategoryTheory.ObjectProperty
+
+open Limits
+
+variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C]
+
+/-- The right orthogonal of any property is stable under retracts: a map from
+a `P`-object into a retract extends to the ambient object, where it
+vanishes. -/
+instance rightOrthogonal_isStableUnderRetracts (P : ObjectProperty C) :
+    P.rightOrthogonal.IsStableUnderRetracts where
+  of_retract {X Y} h hY := by
+    intro A f hA
+    rw [← Category.comp_id f, ← h.retract, ← Category.assoc,
+      hY (f ≫ h.i) hA, zero_comp]
+
+/-- The left orthogonal of any property is stable under retracts. -/
+instance leftOrthogonal_isStableUnderRetracts (P : ObjectProperty C) :
+    P.leftOrthogonal.IsStableUnderRetracts where
+  of_retract {X Y} h hY := by
+    intro A f hA
+    rw [← Category.id_comp f, ← h.retract, Category.assoc,
+      hY (h.r ≫ f) hA, comp_zero]
+
+end CategoryTheory.ObjectProperty
+
 namespace CategoryTheory.Triangulated
 
 variable {C : Type u} [Category.{v} C] [Limits.HasZeroMorphisms C]

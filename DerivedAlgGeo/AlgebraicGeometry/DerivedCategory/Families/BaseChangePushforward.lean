@@ -1,0 +1,257 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.KFlatBaseChangeFunctors
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.RightDerivedPushforward
+
+/-!
+# Pushforward between constructed base-change categories
+
+This file lifts a genuine `RightDerivedPushforward` to `Dqc`, restricts it to intrinsic
+bounded-coherent complexes, and then restricts both functors to the K-flat base-change components.
+The ambient right-derived universal property remains part of the data throughout.
+
+For a morphism `f : T ⟶ U`, the induced morphism of fibre products is
+`X ×_S T ⟶ X ×_S U`; pushforward therefore runs from the component over `T` to the
+component over `U`.
+-/
+
+attribute [local instance] HasDerivedCategory.standard
+
+namespace AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
+
+open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
+
+noncomputable section
+
+universe u
+
+variable {S : Scheme.{u}} {X T U : SchemeBaseChange S} {f : T ⟶ U}
+
+/-- A genuine right-derived pushforward which preserves quasicoherent cohomology. -/
+structure DqcRightDerivedPushforward (f : T ⟶ U) where
+  /-- The right-derived pushforward on ambient derived categories. -/
+  ambient : RightDerivedPushforward f
+  /-- Ambient right-derived pushforward preserves quasicoherent cohomology. -/
+  mapsQuasicoherent (E : Dqc.SchemeQuasicoherentDerivedCategory T.left) :
+    Dqc.schemeQuasicoherentCohomology U.left (ambient.functor.obj E.obj)
+
+namespace DqcRightDerivedPushforward
+
+/-- Lift a genuine right-derived pushforward to the `Dqc` loci. -/
+noncomputable def functor (P : DqcRightDerivedPushforward f) :
+    Dqc.SchemeQuasicoherentDerivedCategory T.left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory U.left :=
+  (Dqc.schemeQuasicoherentCohomology U.left).lift
+    (Dqc.SchemeQuasicoherentDerivedCategory.ι T.left ⋙ P.ambient.functor)
+    P.mapsQuasicoherent
+
+/-- Forgetting quasicoherence witnesses recovers the ambient right-derived pushforward. -/
+noncomputable def functorCompInclusion (P : DqcRightDerivedPushforward f) :
+    P.functor ⋙ Dqc.SchemeQuasicoherentDerivedCategory.ι U.left ≅
+      Dqc.SchemeQuasicoherentDerivedCategory.ι T.left ⋙ P.ambient.functor :=
+  (Dqc.schemeQuasicoherentCohomology U.left).liftCompιIso
+    (Dqc.SchemeQuasicoherentDerivedCategory.ι T.left ⋙ P.ambient.functor)
+    P.mapsQuasicoherent
+
+@[simp]
+theorem functor_obj_obj (P : DqcRightDerivedPushforward f)
+    (E : Dqc.SchemeQuasicoherentDerivedCategory T.left) :
+    (P.functor.obj E).obj = P.ambient.functor.obj E.obj :=
+  rfl
+
+/-- Fullness of ambient right-derived pushforward descends to its `Dqc`
+restriction. -/
+noncomputable instance functor_full (P : DqcRightDerivedPushforward f)
+    [P.ambient.functor.Full] : P.functor.Full := by
+  haveI : (Dqc.SchemeQuasicoherentDerivedCategory.ι T.left ⋙
+      P.ambient.functor).Full := Functor.Full.comp _ _
+  exact Functor.Full.of_comp_faithful_iso
+    (P.functorCompInclusion)
+
+/-- Faithfulness of ambient right-derived pushforward descends to its `Dqc`
+restriction. -/
+instance functor_faithful (P : DqcRightDerivedPushforward f)
+    [P.ambient.functor.Faithful] : P.functor.Faithful := by
+  haveI : (Dqc.SchemeQuasicoherentDerivedCategory.ι T.left ⋙
+      P.ambient.functor).Faithful := Functor.Faithful.comp _ _
+  exact Functor.Faithful.of_comp_iso
+    (P.functorCompInclusion)
+
+/-- A `Dqc` right-derived pushforward preserves intrinsic bounded-coherent complexes. -/
+def PreservesBoundedCoherent (P : DqcRightDerivedPushforward f) : Prop :=
+  ∀ E : Dqc.SchemeBoundedCoherentDqcCategory T.left,
+    Dqc.schemeBoundedCoherentCohomology U.left (P.functor.obj E.obj)
+
+/-- Restrict right-derived pushforward to intrinsic bounded-coherent complexes. -/
+noncomputable def boundedFunctor (P : DqcRightDerivedPushforward f)
+    (h : P.PreservesBoundedCoherent) :
+    Dqc.SchemeBoundedCoherentDqcCategory T.left ⥤
+      Dqc.SchemeBoundedCoherentDqcCategory U.left :=
+  (Dqc.schemeBoundedCoherentCohomology U.left).lift
+    (Dqc.SchemeBoundedCoherentDqcCategory.ι T.left ⋙ P.functor) h
+
+/-- Forgetting bounded-coherent witnesses recovers right-derived pushforward on `Dqc`. -/
+noncomputable def boundedFunctorCompInclusion (P : DqcRightDerivedPushforward f)
+    (h : P.PreservesBoundedCoherent) :
+    P.boundedFunctor h ⋙ Dqc.SchemeBoundedCoherentDqcCategory.ι U.left ≅
+      Dqc.SchemeBoundedCoherentDqcCategory.ι T.left ⋙ P.functor :=
+  (Dqc.schemeBoundedCoherentCohomology U.left).liftCompιIso
+    (Dqc.SchemeBoundedCoherentDqcCategory.ι T.left ⋙ P.functor) h
+
+@[simp]
+theorem boundedFunctor_obj_obj (P : DqcRightDerivedPushforward f)
+    (h : P.PreservesBoundedCoherent)
+    (E : Dqc.SchemeBoundedCoherentDqcCategory T.left) :
+    ((P.boundedFunctor h).obj E).obj = P.functor.obj E.obj :=
+  rfl
+
+/-- Fullness of right-derived pushforward on `Dqc` descends to its intrinsic
+bounded-coherent restriction. -/
+noncomputable instance boundedFunctor_full (P : DqcRightDerivedPushforward f)
+    (h : P.PreservesBoundedCoherent) [P.functor.Full] :
+    (P.boundedFunctor h).Full := by
+  dsimp [boundedFunctor]
+  infer_instance
+
+/-- Faithfulness of right-derived pushforward on `Dqc` descends to its
+intrinsic bounded-coherent restriction. -/
+instance boundedFunctor_faithful (P : DqcRightDerivedPushforward f)
+    (h : P.PreservesBoundedCoherent) [P.functor.Faithful] :
+    (P.boundedFunctor h).Faithful := by
+  dsimp [boundedFunctor]
+  infer_instance
+
+end DqcRightDerivedPushforward
+
+namespace KFlatBaseChangeData
+
+/-- The component-level condition that right-derived pushforward preserves `(Dqc)`. -/
+def PushforwardPreservesQuasicoherentComponent
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f)) : Prop :=
+  DT.quasicoherentComponent P ≤
+    (DU.quasicoherentComponent P).inverseImage push.functor
+
+/-- The smaller generator-level condition that pushforward sends the source
+perfect envelope into the target quasicoherent component. -/
+def PushforwardMapsPerfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f)) : Prop :=
+  (DT.perfectEnvelope P).map push.functor ≤
+    DU.quasicoherentComponent P
+
+/-- A coproduct-preserving triangulated pushforward preserves the whole
+quasicoherent component once it maps the perfect envelope into the target
+component. -/
+theorem pushforward_preservesQuasicoherentComponent_of_perfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
+    (hCoproducts : push.functor.PreservesSmallCoproducts.{u})
+    (hEnvelope : PushforwardMapsPerfectEnvelope DT DU P push) :
+    PushforwardPreservesQuasicoherentComponent DT DU P push := by
+  change (DT.perfectEnvelope P).coprodClosure.{u} ≤
+    (DU.perfectEnvelope P).coprodClosure.{u}.inverseImage push.functor
+  exact ObjectProperty.coprodClosure_le_inverseImage
+    push.functor hCoproducts (DU.perfectEnvelope P) hEnvelope
+
+/-- Right-derived pushforward between the constructed quasicoherent base-change categories. -/
+noncomputable def quasicoherentPushforward
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    (h : PushforwardPreservesQuasicoherentComponent DT DU P push) :
+    DT.QuasicoherentCategory P ⥤ DU.QuasicoherentCategory P :=
+  ObjectProperty.liftOfLE push.functor h
+
+/-- Pushforward between quasicoherent base-change components, constructed
+from the smaller perfect-envelope preservation condition. -/
+noncomputable def quasicoherentPushforwardOfPerfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
+    (hCoproducts : push.functor.PreservesSmallCoproducts.{u})
+    (hEnvelope : PushforwardMapsPerfectEnvelope DT DU P push) :
+    DT.QuasicoherentCategory P ⥤ DU.QuasicoherentCategory P :=
+  quasicoherentPushforward DT DU P push
+    (pushforward_preservesQuasicoherentComponent_of_perfectEnvelope
+      DT DU P push hCoproducts hEnvelope)
+
+/-- Forgetting component witnesses recovers right-derived pushforward on `Dqc`. -/
+noncomputable def quasicoherentPushforwardCompInclusion
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    (h : PushforwardPreservesQuasicoherentComponent DT DU P push) :
+    quasicoherentPushforward DT DU P push h ⋙ (DU.quasicoherentComponent P).ι ≅
+      (DT.quasicoherentComponent P).ι ⋙ push.functor :=
+  (DU.quasicoherentComponent P).liftCompιIso
+    ((DT.quasicoherentComponent P).ι ⋙ push.functor)
+    (fun E ↦ h E.obj E.property)
+
+/-- Preservation of the bounded base-change component follows formally from preservation of its
+quasicoherent companion and of intrinsic bounded-coherent complexes. -/
+theorem pushforward_preservesBoundedComponent
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    (hDqc : PushforwardPreservesQuasicoherentComponent DT DU P push)
+    (hBounded : push.PreservesBoundedCoherent) :
+    DT.boundedComponent P ≤
+      (DU.boundedComponent P).inverseImage (push.boundedFunctor hBounded) := by
+  intro E hE
+  exact hDqc E.obj hE
+
+/-- Right-derived pushforward between the constructed bounded base-change categories. -/
+noncomputable def boundedPushforward
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    (hDqc : PushforwardPreservesQuasicoherentComponent DT DU P push)
+    (hBounded : push.PreservesBoundedCoherent) :
+    DT.BoundedCategory P ⥤ DU.BoundedCategory P :=
+  ObjectProperty.liftOfLE (push.boundedFunctor hBounded)
+    (pushforward_preservesBoundedComponent DT DU P push hDqc hBounded)
+
+/-- Bounded pushforward constructed from perfect-envelope preservation and
+preservation of intrinsic bounded-coherent objects. -/
+noncomputable def boundedPushforwardOfPerfectEnvelope
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
+    (hCoproducts : push.functor.PreservesSmallCoproducts.{u})
+    (hEnvelope : PushforwardMapsPerfectEnvelope DT DU P push)
+    (hBounded : push.PreservesBoundedCoherent) :
+    DT.BoundedCategory P ⥤ DU.BoundedCategory P :=
+  boundedPushforward DT DU P push
+    (pushforward_preservesQuasicoherentComponent_of_perfectEnvelope
+      DT DU P push hCoproducts hEnvelope)
+    hBounded
+
+/-- Forgetting component witnesses recovers pushforward on intrinsic bounded-coherent loci. -/
+noncomputable def boundedPushforwardCompInclusion
+    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
+    (push : DqcRightDerivedPushforward (baseChangeMap X f))
+    (hDqc : PushforwardPreservesQuasicoherentComponent DT DU P push)
+    (hBounded : push.PreservesBoundedCoherent) :
+    boundedPushforward DT DU P push hDqc hBounded ⋙ (DU.boundedComponent P).ι ≅
+      (DT.boundedComponent P).ι ⋙ push.boundedFunctor hBounded :=
+  (DU.boundedComponent P).liftCompιIso
+    ((DT.boundedComponent P).ι ⋙ push.boundedFunctor hBounded)
+    (fun E ↦ pushforward_preservesBoundedComponent DT DU P push hDqc hBounded
+      E.obj E.property)
+
+end KFlatBaseChangeData
+
+end
+
+
+end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

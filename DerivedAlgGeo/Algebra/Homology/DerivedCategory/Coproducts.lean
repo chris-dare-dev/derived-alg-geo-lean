@@ -24,7 +24,8 @@ fractions, stable under coproducts, has them and is preserved by the localizatio
 ## Main results
 
 * `DerivedCategory.hasCoproductsOfShape`, `Qh_preservesCoproductsOfShape`,
-  `Q_preservesCoproductsOfShape`, `homologyFunctor_preservesCoproductsOfShape`: the instances.
+  `Q_preservesCoproductsOfShape`, `singleFunctor_preservesCoproductsOfShape`,
+  `homologyFunctor_preservesCoproductsOfShape`: the instances.
 
 ## References
 
@@ -73,6 +74,19 @@ by `Qh`, and both preserve them. -/
 instance Q_preservesCoproductsOfShape :
     PreservesColimitsOfShape (Discrete κ) (Q : CochainComplex C ℤ ⥤ DerivedCategory C) :=
   preservesColimitsOfShape_of_natIso (quotientCompQhIso C)
+
+/-- The single-object functor into the derived category preserves coproducts of shape `κ`:
+the complex single-object functor preserves them termwise and `Q` preserves them. -/
+instance singleFunctor_preservesCoproductsOfShape (n : ℤ) :
+    PreservesColimitsOfShape (Discrete κ) (singleFunctor C n) := by
+  letI : PreservesColimitsOfShape (Discrete κ)
+      (CochainComplex.singleFunctor C n) := by
+    change PreservesColimitsOfShape (Discrete κ)
+      (HomologicalComplex.single C (ComplexShape.up ℤ) n)
+    infer_instance
+  change PreservesColimitsOfShape (Discrete κ)
+    (CochainComplex.singleFunctor C n ⋙ Q)
+  infer_instance
 
 /-- Homology on the derived category preserves coproducts of shape `κ`: it factors through the
 essentially surjective `Q`, which preserves them, as homology of complexes, which commutes

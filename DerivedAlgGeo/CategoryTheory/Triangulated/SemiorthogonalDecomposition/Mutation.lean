@@ -40,14 +40,6 @@ variable {P : ObjectProperty C}
 
 namespace RightProjectionData
 
-/-- Extract a chosen right projection from proposition-valued right
-admissibility.  This is noncomputable because admissibility only asserts that
-the adjoint exists. -/
-noncomputable def ofIsRightAdmissible (hP : P.IsRightAdmissible) :
-    RightProjectionData P where
-  projection := hP.2.choose
-  adjunction := hP.2.choose_spec.some
-
 variable (Q : RightProjectionData P)
 
 /-- The objectwise counit triangle of a chosen right projection.

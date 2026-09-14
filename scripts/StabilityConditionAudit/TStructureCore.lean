@@ -3,7 +3,12 @@ TStructureCore slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.Monoidal
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
+import DerivedAlgGeo.CategoryTheory.ObjectProperty.Bifunctor
+import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Thick
+import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Projection
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.FullSubcategory
@@ -100,6 +105,8 @@ open CategoryTheory.Triangulated
 /-! ## SF7.2 compact generation, Ind-extension, and A.17 core (#477) -/
 
 #print axioms CategoryTheory.Functor.PreservesSmallCoproducts
+#print axioms CategoryTheory.AddCommGrpCat.hasCoproductsSucc
+#print axioms CategoryTheory.AddCommGrpCat.ab4OfSizeSucc
 #print axioms CategoryTheory.IsCompactObject
 #print axioms CategoryTheory.IsCompactObject.coproductComparisonIso
 #print axioms CategoryTheory.IsCompactObject.coproductComparisonIso.congr_simp
@@ -107,6 +114,9 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.IsCompactObject.map_ι_coproductComparisonIso_hom_assoc
 #print axioms CategoryTheory.IsCompactObject.exists_finite_sum
 #print axioms CategoryTheory.IsCompactObject.shift
+#print axioms CategoryTheory.IsCompactObject.zero
+#print axioms CategoryTheory.IsCompactObject.extension
+#print axioms CategoryTheory.IsCompactObject.of_retract_of_size
 #print axioms CategoryTheory.directSumToHom
 #print axioms CategoryTheory.directSumToHom_of
 #print axioms CategoryTheory.directSumPrecomp
@@ -130,6 +140,11 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.ObjectProperty.triangEnvelope_le_compactObjects
 #print axioms CategoryTheory.ObjectProperty.compactObjects
 #print axioms CategoryTheory.ObjectProperty.isCompactObject_of_iso
+#print axioms CategoryTheory.ObjectProperty.compactObjects_isStableUnderRetracts
+#print axioms CategoryTheory.ObjectProperty.compactObjects_containsZero
+#print axioms CategoryTheory.ObjectProperty.compactObjects_isStableUnderShift
+#print axioms CategoryTheory.ObjectProperty.compactObjects_isTriangulatedClosed₂
+#print axioms CategoryTheory.ObjectProperty.compactObjects_isTriangulated
 #print axioms CategoryTheory.ObjectProperty.coprodClosure
 #print axioms CategoryTheory.ObjectProperty.coprodClosure.below.of_coproduct
 #print axioms CategoryTheory.ObjectProperty.coprodClosure.below.of_extension
@@ -146,7 +161,11 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.ObjectProperty.le_coprodClosure
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_le
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_le_shift_of_le_shift
+#print axioms CategoryTheory.ObjectProperty.coprodClosure_isTriangulated
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_map_obj
+#print axioms CategoryTheory.ObjectProperty.coprodClosure_map_obj_of_le
+#print axioms CategoryTheory.ObjectProperty.map_coprodClosure_le
+#print axioms CategoryTheory.ObjectProperty.coprodClosure_le_inverseImage
 #print axioms CategoryTheory.Adjunction.isCompactObject_leftAdjoint_obj
 #print axioms CategoryTheory.Adjunction.compactObjects_map_leftAdjoint
 #print axioms CategoryTheory.Triangulated.TStructure.IsCompactlyGeneratedBy
@@ -406,3 +425,59 @@ the `HomFiniteBounded` model built on it is audited with the Euler form. -/
 #print axioms HomotopyCategory.Bounded
 #print axioms HomotopyCategory.Bounded.ι
 #print axioms HomotopyCategory.Bounded.fullyFaithfulι
+
+/-! ## K-flat resolutions and object-property lifting (#1060) -/
+
+#print axioms CategoryTheory.CochainComplex.IsKFlat
+#print axioms CategoryTheory.CochainComplex.IsKFlat.tensorLeft_inverts
+#print axioms CategoryTheory.CochainComplex.IsKFlat.tensorRight_inverts
+#print axioms CategoryTheory.KFlatResolution
+#print axioms CategoryTheory.KFlatResolution.comparison
+#print axioms CategoryTheory.KFlatResolution.comparisonApp
+#print axioms CategoryTheory.KFlatResolution.comparisonApp_naturality
+#print axioms CategoryTheory.KFlatResolution.comparisonApp_naturality_assoc
+#print axioms CategoryTheory.KFlatResolution.comparison_quasiIso
+#print axioms CategoryTheory.KFlatResolution.derivedTensor
+#print axioms CategoryTheory.KFlatResolution.derivedTensorCounit
+#print axioms CategoryTheory.KFlatResolution.derivedTensorFactors
+#print axioms CategoryTheory.KFlatResolution.isKFlat
+#print axioms CategoryTheory.KFlatResolution.map_quasiIso
+#print axioms CategoryTheory.KFlatResolution.mk.inj
+#print axioms CategoryTheory.KFlatResolution.mk.sizeOf_spec
+#print axioms CategoryTheory.KFlatResolution.resolution
+#print axioms CategoryTheory.KFlatResolution.resolvedTensor
+#print axioms CategoryTheory.KFlatResolution.resolvedTensorComparison
+#print axioms CategoryTheory.KFlatResolution.resolvedTensor_inverts
+#print axioms CategoryTheory.KFlatResolution.resolvedTensor_obj_obj
+#print axioms CategoryTheory.ObjectProperty.instEssSurjPreimageLift
+#print axioms CategoryTheory.ObjectProperty.lift₂
+#print axioms CategoryTheory.ObjectProperty.lift₂CompιIso
+#print axioms CategoryTheory.ObjectProperty.lift₂_map_app
+#print axioms CategoryTheory.ObjectProperty.lift₂_obj
+#print axioms CategoryTheory.ObjectProperty.maps₂_of_comp_of_essSurj
+#print axioms PresheafOfModules.monoidalPreadditive
+
+/-! ## Canonical aisle projections and compact-generator projections (SF11 tranche G)
+
+Every aisle of a t-structure is right admissible with a canonical chosen
+projection, and a compact-generator approximation projects onto the coproduct
+closure of its generator with cocontinuity transferred from zero truncation.
+Generic triangulated category theory; the base-change consumer is geometric and
+is audited under AlgebraicGeometry.
+-/
+
+#print axioms CategoryTheory.Triangulated.TStructure.aisleInclusionIsLE
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjection
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjectionAdjunction
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjectionHomEquiv
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjectionHomEquiv_apply
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjectionHomEquiv_symm_apply
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjection_map_hom
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjection_obj_obj
+#print axioms CategoryTheory.Triangulated.TStructure.aisleRightProjectionData
+#print axioms CategoryTheory.Triangulated.TStructure.aisleRightProjectionDataAmbientIso
+#print axioms CategoryTheory.Triangulated.TStructure.aisleRightProjectionData_preservesSmallCoproducts
+#print axioms CategoryTheory.Triangulated.TStructure.le_isRightAdmissible
+#print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.coprodClosure_isRightAdmissible
+#print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.rightProjectionData
+#print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.rightProjectionData_preservesSmallCoproducts

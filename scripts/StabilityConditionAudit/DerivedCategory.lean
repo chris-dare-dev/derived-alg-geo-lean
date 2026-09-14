@@ -50,6 +50,8 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CategoryTheory.instIsStableUnderRetractsBounded_derivedAlgGeo
 #print axioms CategoryTheory.mapHomologicalComplex_isStrictlyLE
 #print axioms CategoryTheory.mapHomologicalComplex_isStrictlyGE
+#print axioms CategoryTheory.Adjunction.mapHomologicalComplex
+#print axioms CategoryTheory.Adjunction.mapDerivedCategory
 #print axioms CategoryTheory.mapDerivedCategory_isLE
 #print axioms CategoryTheory.mapDerivedCategory_isGE
 #print axioms CategoryTheory.mapDerivedCategory_bounded
@@ -102,6 +104,7 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms DerivedCategory.hasCoproductsOfShape
 #print axioms DerivedCategory.Qh_preservesCoproductsOfShape
 #print axioms DerivedCategory.Q_preservesCoproductsOfShape
+#print axioms DerivedCategory.singleFunctor_preservesCoproductsOfShape
 #print axioms DerivedCategory.homologyFunctor_preservesCoproductsOfShape
 #print axioms DerivedCategory.cohomologyIn_isClosedUnderColimitsOfShape_discrete
 
