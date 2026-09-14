@@ -636,7 +636,11 @@ quotient carrier, or category must answer these questions before implementation.
 1. **Canonical owner.** What existing root is closest?  Give its declaration
    and module.  If none exists, name the proposed neutral module.
 2. **Adoption.** Name two independent consumers, or say explicitly that this is
-   statement-layer data whose purpose is to compare multiple inhabitants.
+   statement-layer data whose purpose is to compare multiple inhabitants. When
+   the structure is being *extracted* from an existing module, that module does
+   not count as one of the two: an extraction that only its own former home
+   consumes is a rename, and belongs in that home as a theorem or an `abbrev`.
+   This is what keeps an ownership repair from producing an empty hierarchy.
 3. **Projection.** How does a specialization forget to, refine, or compare with
    the root?  The answer must be an existing instance, a projection, an
    `abbrev`, or a theorem—not prose.
@@ -656,6 +660,12 @@ complete until imports, umbrellas, audit routing, registry/source-owner
 bindings, documentation and relevant checks are updated together. Preserve
 required historical names through the existing executable-only mechanism;
 retired-path import shims are forbidden. See `CONTRIBUTING.md`.
+
+For the 2026-09-13 ownership review the answers to questions 1, 3 and 5 are
+already recorded per finding in the owner map in
+`docs/architecture/cutover-ledger.md`; a pull request implementing one of those
+rows cites the row instead of re-deriving it, and answers question 2 there or
+drops the proposed carrier.
 
 ## Agreement is part of the feature
 

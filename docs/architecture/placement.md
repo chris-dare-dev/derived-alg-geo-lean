@@ -52,6 +52,51 @@ in the lattice of opens of a prime spectrum, but `basicOpen` is defined in
 `TopCat`, germs, and stalk functors, which Mathlib defines in
 `Topology/Sheaves/`, so they live there.
 
+## Tier 1 is about extension, not use
+
+Tier 1 decides where an *extension of an existing Mathlib API* lives. It does
+not follow that everything built with a Mathlib API belongs at that API's path.
+A new mathematical object that merely uses `Module.Dual`, a bilinear form, or
+`HomComplex` is placed by its own subject and at an appropriately general root,
+by Tier 2. Reading Tier 1 as a universal carrier rule is how a new subject ends
+up filed under whichever upstream definition its implementation happened to
+reach for, and how the *same* policy simultaneously recognized conceptual
+ownership for weak charges while filing the analogous numerical constructions
+under a consumer directory.
+
+Two consequences, both load-bearing:
+
+- **A directory is an index; it is not the import graph and not the
+  specialization graph.** The three must agree where they overlap and cannot be
+  identical. A comparison theorem between two constructions does not license
+  the generic one to import the special one, and a shared directory does not
+  make two constructions instances of each other.
+- **A narrowly imported module is not a full subject umbrella.** Keep them
+  distinct in prose and in the layering gate: an umbrella re-exports its
+  children by construction, so a rule that holds for a leaf may fail for the
+  umbrella above it for reasons that have nothing to do with the leaf's
+  subject.
+
+Proposed destinations in an architecture review are local recommendations, not
+promises that Mathlib will accept a module of that name.
+
+## The agreed owner map
+
+`docs/architecture/cutover-ledger.md` carries the declaration-level owner map
+agreed in MO1.01 (#1312) for the 2026-09-13 ownership review: for each
+confirmed finding, the definition owner, the neutral core, the application
+adapter and the comparison owner, together with the independent-consumer
+justification for every proposed new carrier. Two of its standing decisions
+apply to every structural change in the repository, not only to MO1:
+
+1. paths move and fully qualified declaration names do not, so a relocation
+   never invalidates a historical review payload; and
+2. a proposed new carrier needs a consumer outside the module it was extracted
+   from, or it is replaced by a theorem or an `abbrev` -- an extraction is not
+   its own second consumer.
+
+Read that map before proposing a destination for code it already covers.
+
 ## Tier 2: a subject Mathlib lacks is placed by the nearest precedent
 
 | Situation | Mathlib precedent | Repository placement |
@@ -118,6 +163,15 @@ belong upstream of `Walls`; geometric Chern/Todd realizations belong under
 (#1312–#1313). Preserve the existing roots and comparisons instead of creating
 another divisorial charge. Update the gate's hard-coded owner in the source
 cutover; a policy edit alone does not change that check.
+
+That placement is under revision. Review finding 04 observes that charge
+construction is upstream of the wall question, so `Walls/` should import the
+charge root rather than own it. The cutover ledger records the agreed
+destination; MO1.02 (#1313) implements it. Because rule 8 of
+`scripts/check_layering.py` currently *requires* the six divisorial structures
+to be declared in the `Walls/` subtree, that move must update
+`DIVISORIAL_ROOT_DIR`, this paragraph and the source in one change -- otherwise
+the gate rejects the destination the policy just agreed to.
 
 Orthogonal exceptional blocks and a chosen right adjoint to a residual
 full-subcategory inclusion are structures on abstract (pre)triangulated

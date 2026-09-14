@@ -183,11 +183,14 @@ If it omits a child, document the exact umbrella/child exception, update the
 coverage gate in that PR, and retain a stable export/build route for the child.
 Never weaken coverage globally to allow a single move.
 
-The current scripts enforce only their named rules. The broad `Numerical`
-stability exemption and the hard-coded divisorial owner do not certify that
-every numerical root is independent or well placed. New component boundaries
-are review obligations until their source cutover adds the focused checks and
-regression fixtures. `check_single_instantiation.py` has a scoped search;
+The current scripts enforce only their named rules. The stability exemption is
+named by subcomponent rather than by top-level subtree since 2026-09-13, with
+regression fixtures for the first named component edge; even so, neither it nor
+the hard-coded divisorial owner certifies that every numerical root is
+independent or well placed, because four of the eight exempt subcomponents
+still mix modules that reach the stability tree with modules that do not. The
+remaining component boundaries are review obligations until their source
+cutover adds the focused checks and regression fixtures. `check_single_instantiation.py` has a scoped search;
 absence of a finding is not the two-consumer justification.
 
 Run the relevant focused checks, then the prescribed runner CI for source

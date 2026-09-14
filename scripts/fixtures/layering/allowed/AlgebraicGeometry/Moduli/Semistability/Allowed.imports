@@ -1,0 +1,6 @@
+# Geometry may import category theory and its own siblings, and the
+# semistability subcomponent of Moduli/ is one of the eight places geometry may
+# reach the stability tree. Its sibling Moduli/PerfectComplex/ may not.
+import DerivedAlgGeo.CategoryTheory.Sites
+import DerivedAlgGeo.AlgebraicGeometry.Stacks.Representable
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak

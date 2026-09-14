@@ -19,10 +19,14 @@ nothing else checks.
    lives in ``Algebra/Category/ModuleCat/Abelian.lean``; there are no
    ``Instances/AlgebraicGeometry`` leaves below a generic subject.
 2. **Development is a leaf.** No stable module imports it.
-3. **Stability-neutral geometry.** Geometry outside the subtrees that exist to
-   consume stability conditions must not reach the stability tree, even
-   transitively. This is what lets ``Dᵇ(Coh X)``, ``Dqc``, coherent sheaves,
-   and cohomology be imported without Bridgeland stability.
+3. **Stability-neutral geometry.** Geometry outside the *subcomponents* that
+   exist to consume stability conditions must not reach the stability tree,
+   even transitively. This is what lets ``Dᵇ(Coh X)``, ``Dqc``, coherent
+   sheaves, and cohomology be imported without Bridgeland stability. The
+   exemption is named by subcomponent rather than by top-level subtree
+   (MO1.01, #1312), with one exception: a same-named umbrella over an exempt
+   subcomponent reaches the tree by re-exporting it, and is exempt as an
+   umbrella only -- its other children are not.
 4. **Weak stability is independent of Bridgeland stability**, and the
    Bridgeland pre-stability structure extends the weak one instead of copying
    its fields.
@@ -94,17 +98,48 @@ STRONG_PRESTABILITY_EXTENDS = re.compile(
     r"extends\s+toWeak\s*:\s*WeakStabilityCondition\.WeakPreStabilityCondition"
 )
 
-# Geometry that exists to consume stability conditions. Every other module
-# below AlgebraicGeometry/ must be importable without the stability tree.
+# Geometry that exists to consume stability conditions, named by SUBCOMPONENT
+# rather than by top-level subtree (MO1.01, #1312; review finding 14).
+#
+# The four blanket roots this list replaced -- `Moduli`, `Numerical`,
+# `Stability` and `DerivedCategory.Stability` -- exempted 122 modules to excuse
+# the 60 that actually reach the stability tree. The other 62 were unguarded,
+# which is why the gate could pass on a snapshot in which numerical parents
+# import their own specializations. A subcomponent that does not reach
+# stability today is not exempt, so a new edge into the stability tree from
+# `Numerical/Core/`, `Numerical/Mukai/`, `Numerical/RiemannRoch/`,
+# `Numerical/Specializations/`, `Moduli/PerfectComplex/`, `Moduli/Quot/` or the
+# non-charge `Numerical/GrothendieckGroup/` modules is now rejected here.
+#
+# This is a narrowing, not a subject order: it says nothing about which subject
+# may import which, only which geometry subcomponents are allowed to reach the
+# one tree the layout promises the rest of geometry is free of.
+#
+# Narrowing further is MO1.05, MO1.06 and MO1.13 work, not a free edit: each
+# entry below still contains modules that do NOT reach stability, and the
+# remaining queue is recorded in docs/architecture/cutover-ledger.md.
 STABILITY_CONSUMING_GEOMETRY = (
-    f"{GEOMETRY}.Moduli",
-    f"{GEOMETRY}.Numerical",
+    # The Dqc/families lane: base change of pre-stability data and the
+    # geometric Fourier--Mukai action.
     f"{GEOMETRY}.DerivedCategory.Stability",
+    # The two moduli subcomponents whose subject is a stability notion. The
+    # rest of Moduli/ -- perfect complexes and Quot -- is stability-neutral and
+    # is now held to that.
+    f"{GEOMETRY}.Moduli.HarderNarasimhan",
+    f"{GEOMETRY}.Moduli.Semistability",
+    # Numerical models that carry charge and wall calculations. Dimension-zero,
+    # fourfold and rank-one examples do not, and are now held to that.
+    f"{GEOMETRY}.Numerical.Examples.Surface",
+    f"{GEOMETRY}.Numerical.Examples.Threefold",
+    # The single K-theoretic charge adapter; the lattice, Euler-pairing,
+    # discriminant and Mukai-vector modules beside it are neutral.
+    f"{GEOMETRY}.Numerical.GrothendieckGroup.CategoricalCharge",
+    f"{GEOMETRY}.Numerical.Stability",
     # Stability of sheaves: slope and Gieseker theory on `Coh X`, whose whole
     # purpose is to instantiate the abstract slope theory, so it necessarily
     # reaches the stability tree. Distinct from `DerivedCategory.Stability`,
     # which is the Dqc/families lane.
-    f"{GEOMETRY}.Stability",
+    f"{GEOMETRY}.Stability.Gieseker",
 )
 
 # Paths removed by a structural cutover, relative to the source root. An entry
@@ -251,6 +286,36 @@ def may_import_geometry(module: str) -> bool:
     )
 
 
+def is_umbrella(module: str) -> bool:
+    """Whether `module` is the same-named umbrella of a source directory.
+
+    `DerivedAlgGeo/AlgebraicGeometry/Numerical.lean` beside
+    `DerivedAlgGeo/AlgebraicGeometry/Numerical/` is an umbrella;
+    `Numerical/Core/Basic.lean` is not. A fixture module names no directory, so
+    fixtures are never umbrellas and the exception below cannot launder one.
+    """
+    return (ROOT / pathlib.Path(*module.split("."))).is_dir()
+
+
+def may_consume_stability(module: str) -> bool:
+    """Rule 3's exemption, subcomponent-scoped with one umbrella exception.
+
+    A same-named umbrella re-exports its direct children, so an umbrella over a
+    subcomponent that legitimately consumes stability reaches the tree by
+    construction, and holding it neutral would mean dropping a child from an
+    umbrella -- breaking the layout's own promise that every non-leaf directory
+    has a complete one. The exception is therefore granted to the umbrella *as
+    an umbrella*, and is not inherited by the umbrella's other children. That
+    is the distinction between a narrowly imported module and a full subject
+    umbrella that review finding 14 asks the policy to keep.
+    """
+    if any(in_tree(module, root) for root in STABILITY_CONSUMING_GEOMETRY):
+        return True
+    return is_umbrella(module) and any(
+        in_tree(root, module) for root in STABILITY_CONSUMING_GEOMETRY
+    )
+
+
 def parse(path: pathlib.Path) -> tuple[list[str], list[str]]:
     imports: list[str] = []
     namespaces: list[str] = []
@@ -334,7 +399,7 @@ def neutral_geometry_failures(
     """Rule 3 for one geometry module."""
     if not in_tree(module, GEOMETRY) or module == GEOMETRY:
         return []
-    if any(in_tree(module, root) for root in STABILITY_CONSUMING_GEOMETRY):
+    if may_consume_stability(module):
         return []
     for imp in imports:
         if in_tree(imp, STABILITY_ROOT) or any(
@@ -346,8 +411,8 @@ def neutral_geometry_failures(
                     root.removeprefix(LIBRARY + ".").replace(".", "/") + "/"
                     for root in STABILITY_CONSUMING_GEOMETRY
                 )
-                + " may, so that the rest of geometry is importable without "
-                "stability conditions"
+                + " and the umbrellas above them may, so that the rest of "
+                "geometry is importable without stability conditions"
             ]
     return []
 
@@ -526,12 +591,13 @@ def main() -> int:
         for m in modules
         if in_tree(m, GEOMETRY)
         and m != GEOMETRY
-        and not any(in_tree(m, r) for r in STABILITY_CONSUMING_GEOMETRY)
+        and not may_consume_stability(m)
     )
     print(
         f"ok: {len(modules)} modules; only AlgebraicGeometry/ and Development/ "
         f"import geometry; {neutral} of {geometry} geometry modules are "
-        "stability-neutral; weak stability is independent of, and structurally "
+        f"stability-neutral against {len(STABILITY_CONSUMING_GEOMETRY)} exempt "
+        "subcomponents; weak stability is independent of, and structurally "
         f"parented by, Bridgeland stability; {len(RETIRED_PATHS)} retired paths "
         f"absent; the {len(OBJECT_PROPERTY_BLOCK)}-declaration ObjectProperty "
         "lift block is generic and declared once; the "
