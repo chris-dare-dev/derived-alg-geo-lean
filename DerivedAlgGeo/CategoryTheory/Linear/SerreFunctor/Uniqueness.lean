@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Basic
-import Mathlib.CategoryTheory.Linear.Yoneda
+import DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor.Basic
+import DerivedAlgGeo.CategoryTheory.Linear.Yoneda
 
 /-!
 # A Serre functor is unique up to natural isomorphism
@@ -13,27 +13,31 @@ isomorphism compatible with both duality isomorphisms is unique. The argument is
 represents `B ↦ Dual (A ⟶ B)`, representing objects are unique up to unique isomorphism, and
 naturality in `A` promotes the pointwise isomorphisms to a natural isomorphism of functors.
 
-## The representability step is public API, not a private step
+## The representability step has its own owner
 
-`isoOfLinearYonedaIso` is stated on `linearYoneda` alone and proved **without reference to
-`SerreFunctorData`**, because a downstream lane needs it on a functor that is not a Serre functor.
-It is `Functor.preimageIso` against Mathlib's `full_linearYoneda` and `faithful_linearYoneda`, so
-nothing about representability is hand-rolled here.
+`isoOfLinearYonedaIso`, its `mapIso` computation and `hom_ext_of_linearYoneda` are stated on
+`linearYoneda` alone and proved **without reference to `SerreFunctorData`**, because a downstream
+lane needs them on a functor that is not a Serre functor. They now live in
+`CategoryTheory/Linear/Yoneda.lean`, which this file imports; see that module for why the argument
+runs on `linearYoneda` rather than `linearCoyoneda`.
 
 ## Trap: which variable the Yoneda argument runs in
 
 `Hom(A,B)` is contravariant in `A` and covariant in `B`, and the dual flips both — so
 `Dual (A ⟶ B)` is **covariant in `A`** and **contravariant in `B`**, matching `Hom(B, S A)`.
 
-The Yoneda argument therefore runs in the `B` variable with `A` fixed, which is why the right
-functor is `linearYoneda` and not `linearCoyoneda`. In this repository
-`(linearCoyoneda k C).obj (op X)` is the *covariant* `Hom(X, −)`, so running the argument there
-produces a statement that typechecks against the opposite functor and proves nothing about `S`.
-Naturality in `A` is a separate step, and it is what promotes the pointwise isomorphisms to a
-natural transformation.
+The Yoneda argument therefore runs in the `B` variable with `A` fixed. Naturality in `A` is a
+separate step, and it is what promotes the pointwise isomorphisms to a natural transformation.
 
 Concretely: `yonedaIso` below is natural in `B` by `naturality_right`, and `uniqueIso` is natural
 in `A` by `naturality_left`. Two different fields of `SerreFunctorData`, for two different reasons.
+
+## No shift, no triangulation
+
+Neither this file nor `Basic` mentions a shift or a distinguished triangle, which is why both live
+under `CategoryTheory/Linear/`. Ext profiles, shift relations, the Enriques refinement and every
+triangulated compatibility stay in `CategoryTheory/Triangulated/SerreFunctor/`, which imports this
+root.
 -/
 
 universe w v u
@@ -43,35 +47,6 @@ open CategoryTheory CategoryTheory.Limits
 namespace CategoryTheory.SerreFunctor
 
 variable {k : Type w} [Field k] {C : Type u} [Category.{v} C] [Preadditive C] [Linear k C]
-
-/-! ### Representability, independent of any Serre functor -/
-
-section Representability
-
-variable (k C)
-
-/-- **Representing objects are unique.** A natural isomorphism of the linear Yoneda presheaves
-gives an isomorphism of the representing objects.
-
-Public and `SerreFunctorData`-free on purpose; see the module docstring. This is
-`Functor.preimageIso` against Mathlib's `full_linearYoneda` and `faithful_linearYoneda`. -/
-noncomputable def isoOfLinearYonedaIso {X Y : C}
-    (e : (linearYoneda k C).obj X ≅ (linearYoneda k C).obj Y) : X ≅ Y :=
-  (linearYoneda k C).preimageIso e
-
-@[simp]
-theorem map_isoOfLinearYonedaIso {X Y : C}
-    (e : (linearYoneda k C).obj X ≅ (linearYoneda k C).obj Y) :
-    (linearYoneda k C).mapIso (isoOfLinearYonedaIso k C e) = e := by
-  ext : 1
-  exact (linearYoneda k C).map_preimage e.hom
-
-/-- Two morphisms agreeing after the linear Yoneda embedding are equal. -/
-theorem hom_ext_of_linearYoneda {X Y : C} {f g : X ⟶ Y}
-    (h : (linearYoneda k C).map f = (linearYoneda k C).map g) : f = g :=
-  (linearYoneda k C).map_injective h
-
-end Representability
 
 /-! ### Uniqueness of the Serre functor -/
 

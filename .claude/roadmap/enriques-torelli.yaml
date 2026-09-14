@@ -80,7 +80,7 @@ architecture_contract:
     surface_definition: "SmoothProperVariety + CanonicalSheafData, following the K3 pattern in AlgebraicGeometry/Surface/K3.lean"
     derived_category: "AlgebraicGeometry/DerivedCategory/Coherent.lean; the generic construction is Mathlib's DerivedCategory"
     semiorthogonal: "CategoryTheory/Triangulated/SemiorthogonalDecomposition/: exceptional collections, orthogonal blocks, residual right orthogonals, and chosen right projections"
-    serre: "CategoryTheory/Triangulated/SerreFunctor/: SerreFunctorData, SerreCategoryData, EnriquesCategoryData, generic object-classification roots, and their residual-projection constructors"
+    serre: "CategoryTheory/Linear/SerreFunctor/: SerreFunctorData, SerreCategoryData and uniqueness, which need no shift; CategoryTheory/Triangulated/SerreFunctor/: EnriquesCategoryData, generic object-classification roots, and their residual-projection constructors. Declaration names are unchanged by the 2026-09-13 split (#1318)"
     lattice: "LinearAlgebra/Lattice/, IntegralLattice namespace, bilinear maps into ℤ"
     line_bundles: "Scheme.Modules.LineBundleData; Pic X for torsion statements"
   prohibited:

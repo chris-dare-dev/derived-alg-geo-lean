@@ -5,7 +5,419 @@ signature test in `placement.md`. It is a migration queue, not an allowlist:
 new code must use the canonical owner immediately, and touching one of these
 blocks should normally move it rather than add more declarations beside it.
 
+## Mathematical ownership review: agreed owners and cutover map (2026-09-13)
+
+The [MO1 execution plan](../reviews/2026-09-13-mathematical-ownership-plan.md)
+tracks the [fifteen review findings](../reviews/2026-09-13-mathematical-ownership-review.md)
+in [milestone 52](https://github.com/chris-dare-dev/derived-alg-geo-lean/milestone/52).
+The standing [ownership policy](mathematical-ownership.md) and matching
+`CLAUDE.md`/`AGENTS.md` checklist codify the foundation/application boundary.
+This section is the other half MO1.01
+([#1312](https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/1312))
+owes: the agreed destination for each confirmed finding, at declaration
+granularity, settled **before** any source moves. The policy decides how to
+choose an owner; the map below records the decision already taken for each of
+the fifteen findings, so an implementing pull request cites a row instead of
+re-deriving it. Codifying the policy moved no Lean declaration, and neither
+does this map.
+
+It is a queue of pending cutovers, not a record of completed roots and not a
+policy exemption. A path named here is the target even before the move lands,
+as the "Confirmed next lanes" convention already says; but nothing here is
+built, and none of it discharges a mathematical obligation. CA1--CA3 retain
+their charge, pairing and tilt mathematics; SRF1, DG3, DT1 and SF8 retain their
+theorem obligations. A new name or directory does not supply a geometric
+realization, a support condition, exactness, bounded tensor closure, or
+standard pseudo-coherence on an arbitrary base.
+
+### Five standing decisions, applying to every row below
+
+1. **Paths move; namespaces do not.** Every row relocates files and leaves
+   fully qualified declaration names untouched. `CLAUDE.md` already blesses the
+   divergence -- Mathlib's `MetricSpace/Pseudo/` has namespace and path differ
+   too -- and a namespace cutover would invalidate the immutable review
+   payloads that `exe/RestateHistoricalNames.lean` exists to protect. Where a
+   row's destination makes the retained namespace read oddly
+   (`CategoryTheory.SerreFunctor` declarations in a linear Yoneda file is the
+   sharpest case), the oddity is accepted and recorded here rather than
+   repaired by a rename. A namespace cutover is a separate, separately
+   justified change, and MO1 does not authorize one.
+2. **A new carrier needs a named independent consumer.** Per
+   `docs/architecture/abstraction-tree.md`, a proposed new root is justified
+   only by a consumer that is not the module it was extracted from. Rows that
+   cannot name one say so, and resolve to a theorem, an `abbrev`, or a move
+   into an existing owner instead of a new hierarchy. No row below authorizes
+   an empty speculative directory or a mass rename.
+3. **Three graphs, not one.** A directory is an index; the Lean import graph is
+   the dependency DAG; specialization and comparison maps form a third graph.
+   They must be consistent and cannot be identical. Each row therefore names
+   the *definition owner*, the *neutral core*, the *application adapter* and
+   the *comparison owner* separately, because collapsing them is the defect the
+   review found.
+4. **No retired-path shims.** A move updates imports, umbrellas, audits and
+   declaration-sweep routing in the same pull request; the vacated path is
+   added to `RETIRED_PATHS` in `scripts/check_layering.py`. Nothing is left
+   behind re-exporting its new owner.
+5. **Hypotheses travel with the declaration.** Relocation never strengthens or
+   silently discharges a hypothesis. Named cases: Hom-finiteness for Serre full
+   faithfulness; the codimension-four bound on `sqrtComp`; the Noetherian
+   caveat on the bounded-above finitely-presented-cohomology predicate; the
+   `(n, m) = (3, 2)` distinction between variety dimension and truncation
+   degree; `Dᵇ(Coh X)` not being closed under arbitrary derived tensor on a
+   singular scheme.
+
+### The shared CA path contract
+
+Settled here so MO1.02--MO1.06 and CA1--CA3 cannot drift apart:
+
+- **Neutral paired complex functionals live in linear algebra.** The complex
+  functional built from two polar pairings, its additivity, its real linearity
+  and the description of its kernel are bilinear algebra and stay under
+  `LinearAlgebra/`. The *interpretation* of that kernel theorem as a support
+  property is a stability adapter and does not.
+- **Stability charge families live upstream of `Walls/`.** `ChargeFamily`,
+  `Exp.ofMoments` and the divisorial constructors are inputs to a wall
+  question, not consequences of one, so `Walls/` imports them and not the
+  reverse. They stay inside the stability subject; they do not move into
+  `AlgebraicGeometry/`.
+- **Geometric Chern/Todd realizations live under `AlgebraicGeometry/`.** The
+  scheme-level characteristic-class realizations and their numerical models
+  belong to geometry and import the neutral charge root.
+- **Single roots are preserved.** `#1223` and `#1230` keep the single charge
+  kernel, the public `Mukai.pairing` root and the weighted/factor-of-two
+  comparisons. No row creates a second charge carrier, a second pairing root,
+  or a competing graded root; the optional graded root remains CA3's decision
+  and may still conclude that none is justified.
+
+### The owner map
+
+Columns are the four relationships of decision 3. "--" means the row has no
+declaration of that kind. Paths are below `DerivedAlgGeo/` unless marked
+otherwise; issue numbers are the implementing task.
+
+#### 01 -- Complex linear functionals vs. central-charge applications (#1313)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | `LinearAlgebra/QuadraticForm/CentralCharge.lean` keeps the functional, its additivity, real linearity and kernel description, renamed by what it owns rather than by its first consumer |
+| Neutral core | continuity of a quadratic form, coercivity of a positive-definite form and boundedness of level sets leave `QuadraticForm/WallFiniteness.lean` for neutral `QuadraticForm/` modules |
+| Application adapter | the central-charge reading, and the support-property adapter, move to the stability subject beside the existing `Weak/Support/Predicate/Quadratic.lean` |
+| Comparison owner | unchanged: `Weak/Support/Predicate/Quadratic.lean` already records that negative definiteness on `ker Z` is one part of the quadratic support criterion and that nonnegativity on the relevant semistable classes is a further requirement |
+
+Independent consumer for the extracted neutral modules: the wall-finiteness
+argument and the support predicate are two different consumers of the same
+coercivity statement, which is what justifies extracting it rather than
+inlining it. This is a split, not a move into algebraic geometry: the present
+definition mentions no category, heart, Chern character or scheme.
+
+#### 02 -- Positive planes, positive frames and the wall loci (#1314)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | the set-of-two-dimensional-submodules carrier and the ordered-pair carrier stay distinct declarations with distinct names; neither is renamed into the other |
+| Neutral core | positive-subspace and positive-frame theory, and the deleted-locus/arrangement finiteness results, stated independently of stability |
+| Application adapter | under stability, the numerical alignment locus, the signed ray locus and the charge-zero locus are named apart; `PeriodDomain.wall` (orthogonality to a class) and `ChargeFamily.wall` (real linear dependence of two charges) are not merged |
+| Comparison owner | the existing wall-comparison module keeps the frame/plane and locus comparison maps; the K3 identification with the framed domain belongs to its geometric realization |
+
+No `RealCodimensionOneSubmanifold` parent is created: `Z(δ) = 0` is generically
+two real equations and phase alignment is generically one, still requiring
+nonvanishing, a sign and destabilizing objects to describe an actual wall. No
+`Walls/Actual/` directory is created until there is destabilization content to
+put in it -- an empty speculative hierarchy is exactly what decision 2
+forbids. Nothing moves into `Geometry/Manifold`; the plane API supplies no
+manifold theorem.
+
+#### 03 -- Hyperbolic extension algebra vs. geometric Mukai (#1315)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | the `ℤ × N × ℤ` carrier with pairing `b(c,c') - rs' - r's` is an abstract hyperbolic extension and gets a neutral owner beside the bilinear-form API it is built from |
+| Neutral core | norm-minus-two reflections and rank-two Gram-determinant identities, restated over an arbitrary ambient lattice rather than this one extension |
+| Application adapter | the Mukai vector, integral structure and the actual surface realization stay in `AlgebraicGeometry/Numerical/Mukai/` and the surface modules; the exponential chart goes with numerical central-charge construction, not with the quadratic extension |
+| Comparison owner | the Euler-pairing comparison stays where it is and is not absorbed into either side |
+
+`IsSpherical` and `expectedDim = square + 2` are application vocabulary sitting
+on a neutral carrier: the neutral statement is a root or square condition, and
+spherical-object terminology plus expected moduli dimension stay with the
+application. "Lattice" must not silently imply finite free or nondegenerate;
+an arbitrary additive group with a form is neither. Native prerequisites
+`#1223` and `#1229` are load-bearing here, not procedural.
+
+#### 04 -- Charge construction upstream of walls (#1313)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | a lightweight central-charge owner inside the stability subject, holding the family, exponential and quadratic constructors that `Walls/` currently owns |
+| Neutral core | Hodge-signature linear algebra moves to a neutral form module |
+| Application adapter | geometric Chern/Todd realizations under `Numerical/`; semistable support statements under `Support/` |
+| Comparison owner | the existing specialization maps out of `ChargeFamily` and `Exp.ofMoments` are preserved as they stand |
+
+Independent consumer: the surface, threefold, slope and divisorial charge
+constructions each consume the family root without asking a wall question,
+which is the justification for the root existing upstream of `Walls/`. **This
+row requires a deliberate policy update, not just a file move**: rule 8 of
+`scripts/check_layering.py` currently *requires* six divisorial structures --
+`ChargeCoordinates`, `ChernCharacter`, `DivisorSpace`, `DivisorialParameters`,
+`OrthogonalSlice`, `StabilityParameters` -- to be declared in the `Walls/`
+subtree, and `docs/architecture/placement.md` states that requirement in prose.
+MO1.02 must move `DIVISORIAL_ROOT_DIR` and the placement paragraph in the same
+change, or the gate will reject its own agreed destination. No second common
+central-charge record is introduced merely to improve names.
+
+#### 05 -- Linear Serre duality and Yoneda helpers (#1318)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | `CategoryTheory/Linear/SerreFunctor/Basic.lean` for the `k`-linear duality data, its Hom-finiteness class, the pairing, the trace and the finrank identity; `CategoryTheory/Linear/SerreFunctor/Uniqueness.lean` for the comparison and its coherence |
+| Neutral core | `CategoryTheory/Linear/Yoneda.lean` for the three representability helpers, which are proved without reference to any Serre datum |
+| Application adapter | `CategoryTheory/Triangulated/SerreFunctor/` keeps `Objects`, `Enriques`, `Classification`, `Transport`, `ProjectionObjects` and `Matching`, which add shift, Ext profiles and semiorthogonal structure |
+| Comparison owner | unchanged; SRF1 `#897`--`#899` keeps full faithfulness, equivalence/shift transport and the geometric Serre-duality obligations |
+
+**Landed 2026-09-13** in #1318; see "Linear Serre duality and representability"
+under Completed roots.
+
+Independent consumer for `CategoryTheory/Linear/Yoneda.lean`: a downstream lane
+already needs the representability step on a functor that is *not* a Serre
+functor, which is why those declarations were made public in the first place.
+Per decision 1 the three helpers keep the `CategoryTheory.SerreFunctor`
+namespace even in the linear Yoneda file. Hom-finiteness is not added to the
+linear core, and essential surjectivity is still not inferred from full
+faithfulness: `HasRightSerreFunctor` remains the Reiten--Van den Bergh notion
+and `SerreCategoryData` remains the Bondal--Kapranov one.
+
+#### 06 -- Abelian stability foundations and slope vs. Gieseker (#1319)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | abelian stability functions and their Harder--Narasimhan theory under `CategoryTheory/Abelian/`, with weak variants as children |
+| Neutral core | the class datum and additive charge, which need an abelian category and nothing triangulated |
+| Application adapter | restriction to hearts and reconstruction of triangulated stability stay in `Triangulated/StabilityCondition/`; under `AlgebraicGeometry/Stability/`, slope and Gieseker become siblings with shared Hilbert-polynomial data |
+| Comparison owner | a `Comparison.lean` joining the two geometric theories |
+
+`Weak/` below `StabilityCondition/` is not itself a defect and does not move:
+directory nesting names a variant even when the stronger theory imports the
+weaker. The defect is the independent abelian subject, and the μ-Harder--
+Narasimhan existence theorem, being owned by later consumers. The current
+μ-HN theorem must not be relabelled a proof of Gieseker HN existence by virtue
+of its new directory.
+
+#### 07 -- Numerical parent-to-specialization inversions (#1316)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | square-root algebra, Todd construction and K3 simplification become three owners instead of one file that imports its own specialization |
+| Neutral core | generic polarised transport imports only its numerical data, correction and charge kernel |
+| Application adapter | K3, abelian and Enriques surface models are built from a shared surface-model constructor rather than from each other |
+| Comparison owner | old/new agreement theorems move to a downstream comparison module; the K3/abelian/Enriques comparison witnesses move to a downstream `Models/Surface/Comparison.lean` |
+
+The present comparisons are good mathematics and all of them survive; what
+changes is which module owns them. The explicit codimension-four bound on
+`sqrtComp` survives relocation unchanged -- it is not an arbitrary-degree
+square-root construction and must not be presented as one.
+
+#### 08 -- The GL⁺(2,ℝ) cover vs. its stability action (#1323)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | the group construction, deck transformations, covering map, simple connectedness and topological-group laws move beside the general-linear-group API, with general covering lemmas near the topology owner |
+| Neutral core | the order automorphism of `ℝ` commuting with unit translation, which mentions no category |
+| Application adapter | phase conventions and the action on slicings, charges and stability conditions stay under `Symmetry/GLTilde/Action/` |
+| Comparison owner | the existing compatible-pair construction is retained; a complex-coordinate linear-map adapter moves near the complex linear-algebra owner only once its public type is independent of the cover |
+
+The π-normalization is a convention to expose through adapters, not a reason
+for covering-space theory to live inside triangulated categories. The proposed
+destination is a local extension, not an existing Mathlib module.
+
+#### 09 -- Mass as a sibling of metric; planar convex geometry (#1324)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | `StabilityCondition/Mass/` becomes a sibling of `Metric/`, since Harder--Narasimhan mass is an invariant of an object and a stability condition |
+| Neutral core | the polygonal-path carrier, the real continuous linear functionals on `ℂ` and the Euclidean perimeter comparison leave the mass-subadditivity proof directory |
+| Application adapter | the metric construction stays downstream of mass; the HN-polygon and mass adapters stay in stability |
+| Comparison owner | unchanged |
+
+Mass has consumers besides the metric -- mass--Hom estimates and dynamical
+constructions -- and that is the independent-consumer justification. **Scope
+warning:** the neutral destination for the planar lemmas is a subject this
+repository does not yet have. Introducing `Analysis/` or `Geometry/` means
+adding a name to `KNOWN_SUBJECTS` in `scripts/check_layering.py`, which rule 6
+deliberately makes a conscious act. MO1.13 must first check what Mathlib
+already provides and prefer reusing it; a new top-level subject is authorized
+only if that check comes back empty, and is recorded here when it happens.
+
+#### 10 -- Derived tensor and pushforward vs. Fourier--Mukai (#1321)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | the derived-tensor and derived-pushforward capabilities move to geometry-level owners under `AlgebraicGeometry/DerivedCategory/`; the coherent derived-tensor capability follows them out of the Fourier--Mukai subtree |
+| Neutral core | the purely functorial correspondence -- three ordinary categories, a pull functor, a bifunctor and a push functor -- may get a categorical owner; this is explicitly the *less* urgent half |
+| Application adapter | Fourier--Mukai keeps correspondences, kernels, convolution, units, adjoints and theorems about transforms |
+| Comparison owner | unchanged |
+
+These records are **supplied capabilities, not constructed operations in full
+generality**, and the move must not read as construction: `Dᵇ(Coh X)` is not
+automatically closed under arbitrary derived tensor on a singular scheme.
+"Abstract Fourier--Mukai formalism" is a defensible subject name, so the
+categorical rename is optional and may be declined with that reason recorded.
+
+#### 11 -- Flatness and relative perfection out of the moduli consumer (#1322)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | flatness of a module sheaf over a morphism moves to the relative-module owner under `AlgebraicGeometry/Modules/` |
+| Neutral core | the derived-object predicates -- pseudo-coherence and local finite Tor amplitude -- and their local models move to a relative-perfect owner under `AlgebraicGeometry/DerivedCategory/` |
+| Application adapter | presheaves, restriction stability, boundedness, openness, atlases and algebraicity stay under `Moduli/PerfectComplex/` |
+| Comparison owner | `Moduli/PerfectComplex/Comparison.lean` keeps the one-way adapters; the three-notion ledger in `docs/architecture/placement.md` stands unchanged |
+
+The source's own warning survives the move verbatim: the bounded-above
+finitely-presented-cohomology predicate is the **Noetherian** criterion and is
+not standard pseudo-coherence on an arbitrary scheme. The move must not promote
+it to an unrestricted canonical definition, and must not identify the
+repository's three "perfect" notions without their comparison theorems.
+
+#### 12 -- Numerical models, named surface cases and realizations (#1317)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | explicit algebraic models get a `Numerical/Models/` owner; reusable constructors move out of the example leaves |
+| Neutral core | the shared surface-model constructor from row 07 |
+| Application adapter | K3-only charge adapters move into visibly K3-specific modules; dimension specializations get explicit homes inside the numerical subject |
+| Comparison owner | actual scheme realizations stay with `Surface/K3/` and `Surface/Enriques/`, **or** consistently under object-specific children of `DerivedCategory/Stability/` -- MO1.06 picks one convention and records it here |
+
+Two naming defects are fixed as part of the move rather than carried forward:
+the Enriques example models a polarization slice of a rank-ten numerical
+divisor lattice, so "Picard rank one" is the wrong title; and in higher
+dimensions Picard rank one alone does not imply that the numerical intersection
+ring is `ℚ[H]/(H^(n+1))` -- the rank-one file's stronger generated-by-`H`
+assumption is the load-bearing one. No K3 files are collapsed into one folder,
+and no numerical model is identified with a scheme.
+
+#### 13 -- Direct Mathlib-owner mismatches (#1325)
+
+| Old path | New owner |
+| --- | --- |
+| `CategoryTheory/ModuleCat/LinearDual.lean` | consolidated with the rest of module-category linear duality under `Algebra/Category/ModuleCat/LinearDual/` |
+| `Algebra/Category/ModuleCat/Sheaf/ExteriorPower.lean` | `Algebra/Category/ModuleCat/Presheaf/ExteriorPower.lean`, because it constructs exterior powers of a presheaf of modules |
+| `AlgebraicGeometry/Cohomology/Quasicoherent/Extensions.lean` | `AlgebraicGeometry/Modules/Quasicoherent/Extensions.lean` |
+| `AlgebraicGeometry/Divisors/ExteriorPower.lean` | `AlgebraicGeometry/Modules/ExteriorPower/Restriction.lean` |
+
+Divisor-specific determinant and Cartier applications stay under `Divisors/`.
+A cohomological *proof* does not make cohomology the theorem's subject, which
+is the whole content of the third row. **Check the import graph while splitting
+the quasicoherent file**: its affine and cohomological helper declarations may
+need separate owners to avoid a cycle, and that check is part of MO1.14 rather
+than a follow-up.
+
+Note that `placement.md` already assigns the bare algebraic-dual functor to
+`CategoryTheory/ModuleCat/LinearDual.lean` and its exactness to
+`Algebra/Category/ModuleCat/LinearDual.lean`. That paragraph is the thing this
+row changes; MO1.14 updates it in the same pull request as the move.
+
+#### 14 -- The placement policy itself (#1312, this section)
+
+Implemented here rather than queued. See "What MO1.01 changed" below.
+
+#### 15 -- H⁰ with `DGCategory`; enhancement vs. presentation (#1320)
+
+| Relationship | Owner |
+| --- | --- |
+| Definition owner | the dg encoding root stays **provisionally** at `Algebra/Homology/DGCategory/`, and the generic H⁰ constructions -- shift, cone triangles, functor exactness -- move below that owner |
+| Neutral core | pretriangulated H⁰ results about a dg category, stated before any external category is chosen |
+| Application adapter | `Triangulated/DGEnhancement/` is reserved for exact comparisons with a *specified* triangulated category, and their transport |
+| Comparison owner | the Mathlib homotopy-category realization stays at `Algebra/Homology/HomotopyCategory/DGEnhancement/`; the existing proved agreement for the complexes model is preserved |
+
+The weaker package -- an equivalence with an ordinary category -- is named as an
+underlying **H⁰ presentation**, and an exact enhancement becomes a refinement
+carrying the compatibility data. Exactness is necessary to match the standard
+enhancement notion; it does **not** imply a general uniqueness-of-enhancements
+theorem, and no row here asserts one. "Provisionally" is the existing ADR-0010
+/ ADR-0011 position and is unchanged: if the enriched encoding (Option A′) ever
+lands, the subtree moves under `CategoryTheory/Enriched/` in that same change.
+This is not a request to re-encode the library as enriched categories.
+
+### Component-specific forbidden import edges
+
+Named per review finding 14, replacing the impulse to impose a total order on
+top-level subjects. Three are named; one is enforced today and two become
+enforceable only after their own cutover lands.
+
+| Edge | Status |
+| --- | --- |
+| numerical core → no stability constructions | **Enforced.** `scripts/check_layering.py` rule 3 now names exempt subcomponents rather than the whole `Numerical/`, `Moduli/` and `Stability/` subtrees, with a forbidden fixture at `scripts/fixtures/layering/forbidden/AlgebraicGeometry/Numerical/Core/` |
+| charge construction → no wall classification | Pending MO1.02. Not enforceable while the charge constructors live *inside* `Walls/`; the gate rule is written in the same pull request that moves them |
+| geometric derived operations → no Fourier--Mukai or moduli consumers | Pending MO1.10 and MO1.11. Same reason: the operations are currently declared inside the consumers |
+
+### Legitimate core-umbrella exceptions
+
+The layout promises every non-leaf directory a complete same-named umbrella,
+and an umbrella over a stability-consuming child reaches the stability tree by
+re-exporting it. Five umbrellas are therefore exempt from rule 3 **as
+umbrellas**, and the exemption is not inherited by their other children:
+
+- `AlgebraicGeometry/Moduli.lean` (over `Moduli/HarderNarasimhan/`, `Moduli/Semistability/`)
+- `AlgebraicGeometry/Numerical.lean` (over `Numerical/Stability/`, and transitively `Numerical/Examples/`)
+- `AlgebraicGeometry/Numerical/Examples.lean` (over `Examples/Surface/`, `Examples/Threefold/`)
+- `AlgebraicGeometry/Numerical/GrothendieckGroup.lean` (over `GrothendieckGroup/CategoricalCharge/`)
+- `AlgebraicGeometry/Stability.lean` (over `Stability/Gieseker/`)
+
+The gate derives this list rather than hard-coding it: a module is an umbrella
+when a same-named source directory exists, and it is exempt when an exempt
+subcomponent lies below it. A fixture names no directory, so no fixture can
+acquire the exception.
+
+### What MO1.01 changed, and what it left alone
+
+Changed: this section; the subcomponent-scoped rule 3 and the umbrella
+exception in `scripts/check_layering.py`; five layering fixtures; and the
+placement, contribution, layering and agent documents where they stated the
+blanket exemption or the over-broad Tier 1 rule.
+
+Left alone deliberately: one `DerivedAlgGeo` library; the geometry firewall;
+`Development/` as a leaf; generic derived categories beside Mathlib's
+`DerivedCategory`; `DGCategory` beside the `HomComplex` it is built on; and
+every declaration name in the repository. No Lean source moved in MO1.01.
+
+Measured effect of the narrowing: 302 of 381 geometry modules are now checked
+as stability-neutral, against 258 on the review snapshot. The 44-module
+difference is code the blanket exemption was not guarding -- `Numerical/Core/`,
+`Numerical/Mukai/`, `Numerical/RiemannRoch/`, `Numerical/Specializations/`, the
+non-charge `Numerical/GrothendieckGroup/` modules, `Numerical/Examples/`'s
+dimension-zero, fourfold and rank-one leaves, `Moduli/PerfectComplex/` and
+`Moduli/Quot/`. Narrowing the remaining eight entries further is MO1.05,
+MO1.06 and MO1.13 work, since each still mixes modules that reach the stability
+tree with modules that do not.
+
 ## Completed roots
+
+- Linear Serre duality and representability (2026-09-13, finding 05):
+  `CategoryTheory/Linear/SerreFunctor/` now owns `SerreFunctorData`, the
+  `HomFinite` hypothesis, `SerreCategoryData`, the Serre pairing, trace and
+  `finrank` identity, and the whole uniqueness development --
+  `compareEquiv`, `yonedaIso`, `uniqueIsoApp`, `uniqueIso`, `uniqueIso_unique`
+  and the reflexivity, transitivity and symmetry coherence lemmas.
+  `CategoryTheory/Linear/Yoneda.lean` owns `isoOfLinearYonedaIso`,
+  `map_isoOfLinearYonedaIso` and `hom_ext_of_linearYoneda`, which mention no
+  Serre datum and are `Functor.preimageIso`, `Functor.map_preimage` and
+  `Functor.map_injective` against Mathlib's `full_linearYoneda` and
+  `faithful_linearYoneda`. Neither file mentions a shift or a distinguished
+  triangle, and the source said so before the move: the previous owner's own
+  docstring recorded that no shift or triangulation is needed.
+  `CategoryTheory/Triangulated/SerreFunctor/` keeps exactly the
+  shift-dependent half -- `Objects`, `Enriques`, `Classification`, `Matching`,
+  `ProjectionObjects`, `Transport` -- and imports the linear root. Its umbrella
+  no longer re-exports the moved modules, so the audit slice imports both roots
+  by name.
+  Every fully qualified declaration name survived unchanged, including the
+  three helpers that keep the `CategoryTheory.SerreFunctor` namespace inside a
+  linear Yoneda file; that divergence is decision 1 of the owner map, not an
+  oversight. No hypothesis moved: full faithfulness still spends
+  Hom-finiteness, `HasRightSerreFunctor` is still the Reiten--Van den Bergh
+  right Serre functor with essential surjectivity supplied separately by
+  `SerreCategoryData.serreIsEquivalence`, and no shift or exactness assumption
+  was added to the linear core. SRF1 (#897--#899) keeps its full-faithfulness,
+  transport and geometric-duality obligations; this cutover proves none of
+  them.
 
 - `H⁰` dg-functor compositor coherence and adjunction normalization
   (2026-09-13): `DGFunctor.h0CompIso_assoc`, `h0CompIso_comp_id`, and
@@ -931,7 +1343,8 @@ blocks should normally move it rather than add more declarations beside it.
   inclusion and its universal Hom equivalence; `Mutation.lean` constructs the
   objectwise counit triangle and proves the generic projection-chain theorem.
   Ext profiles, their bidirectional transport, and classification-induced
-  candidate matching remain generic in `SerreFunctor/`; adjacent Ext shift
+  candidate matching remain generic in `Triangulated/SerreFunctor/`, which
+  since 2026-09-13 imports the linear duality root rather than owning it; adjacent Ext shift
   rigidity and bidirectional ordered block-length comparison live in
   `SemiorthogonalDecomposition/AdjacentExt.lean`.  The one-step criterion and
   result interface live in `FourierMukai/ExceptionalExtension.lean`, while
