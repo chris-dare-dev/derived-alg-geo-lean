@@ -20,7 +20,10 @@ import DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor
 import DerivedAlgGeo.CategoryTheory.Linear.Yoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 
-#print axioms ModuleCat.linearDualFunctor
+-- `ModuleCat.linearDualFunctor` is audited with its own siblings in
+-- DerivedCategory.lean since 2026-09-13 (MO1.14, #1325), when linear duality
+-- was consolidated at Algebra/Category/ModuleCat/LinearDual/.
+
 #print axioms CategoryTheory.SerreFunctor.HomFinite
 #print axioms CategoryTheory.SerreFunctor.HomFinite.finite
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData

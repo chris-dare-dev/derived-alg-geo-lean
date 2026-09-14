@@ -590,7 +590,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.14 — Repair direct Mathlib-owner mismatches in module and sheaf APIs
-  status: blocked
+  status: done
   summary: Perform the small, independently reviewable owner corrections where the current path disagrees
     with the API being extended. These are direct owner corrections, not a wholesale reorganization of
     the broadly sound sheaf/site/scheme hierarchy.
@@ -608,7 +608,6 @@ items:
   - area:algebraic-geometry
   - type:refactor
   - sev:medium
-  - blocked
   acceptance:
   - Move CategoryTheory/ModuleCat/LinearDual to Algebra/Category/ModuleCat beside the existing exactness
     API.
