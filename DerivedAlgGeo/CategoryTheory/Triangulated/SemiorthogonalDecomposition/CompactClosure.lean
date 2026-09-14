@@ -18,6 +18,13 @@ and extensions on both sides.
 The indexing universe is kept explicit. This is the closure step needed for
 the perfect-to-quasicoherent passage in Proposition 3.15 of
 arXiv:1902.08184.
+
+The last section lifts that step from a pair of properties to a whole
+semiorthogonal sequence: closing every component of a sequence of compact
+objects under coproducts and extensions leaves it semiorthogonal, and the
+closure's components are triangulated, replete, and coproduct-closed for free.
+Those three are exactly the hypotheses the base-change layer otherwise has to
+assume about its source sequence.
 -/
 
 noncomputable section
@@ -25,7 +32,7 @@ noncomputable section
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open Opposite
 
-universe w v u
+universe w v u u₁
 
 namespace CategoryTheory
 
@@ -150,5 +157,60 @@ theorem coprodClosure_le_rightOrthogonal_coprodClosure
   exact hclosure X hX f hY
 
 end ObjectProperty
+
+namespace Triangulated.SemiorthogonalSequence
+
+variable {ι : Type u₁} [Preorder ι] (S : SemiorthogonalSequence C ι)
+  (hcompact : ∀ i, S.component i ≤ ObjectProperty.compactObjects.{w})
+
+/-- Close every component of a semiorthogonal sequence under coproducts and
+extensions.
+
+Semiorthogonality survives because compactness carries Hom-vanishing across a
+coproduct. Only the *earlier* component's compactness is used at each pair; the
+hypothesis is stated uniformly because that is how a compact-generator sequence
+arrives. -/
+def coprodClosure : SemiorthogonalSequence C ι where
+  component i := (S.component i).coprodClosure.{w}
+  semiorthogonal _ _ hij :=
+    ObjectProperty.coprodClosure_le_rightOrthogonal_coprodClosure
+      (hcompact _) (S.semiorthogonal hij)
+
+@[simp]
+theorem coprodClosure_component (i : ι) :
+    (S.coprodClosure hcompact).component i = (S.component i).coprodClosure.{w} :=
+  rfl
+
+/-- Every component sits inside its own closure. This is Definition 3.3
+compatibility for the identity functor, stated without the vocabulary so that
+this file keeps its narrow import. -/
+theorem le_coprodClosure_component (i : ι) :
+    S.component i ≤ (S.coprodClosure hcompact).component i :=
+  ObjectProperty.le_coprodClosure _
+
+/-- Closure preserves triangulatedness of the components. -/
+theorem coprodClosure_hasTriangulatedComponents
+    (hS : S.HasTriangulatedComponents) :
+    (S.coprodClosure hcompact).HasTriangulatedComponents := by
+  intro i
+  letI : (S.component i).IsTriangulated := hS i
+  exact ObjectProperty.coprodClosure_isTriangulated _
+
+/-- The closed components are closed under isomorphisms, with no hypothesis on
+the sequence. -/
+theorem coprodClosure_isClosedUnderIsomorphisms (i : ι) :
+    ((S.coprodClosure hcompact).component i).IsClosedUnderIsomorphisms :=
+  inferInstanceAs ((S.component i).coprodClosure.{w}).IsClosedUnderIsomorphisms
+
+/-- The closed components are closed under coproducts in the closure universe,
+with no hypothesis on the sequence. -/
+theorem coprodClosure_isClosedUnderColimitsOfShape (i : ι) (κ : Type w) :
+    ((S.coprodClosure hcompact).component i).IsClosedUnderColimitsOfShape
+      (Discrete κ) :=
+  inferInstanceAs
+    ((((S.component i).coprodClosure.{w}).IsClosedUnderColimitsOfShape
+      (Discrete κ)))
+
+end Triangulated.SemiorthogonalSequence
 
 end CategoryTheory
