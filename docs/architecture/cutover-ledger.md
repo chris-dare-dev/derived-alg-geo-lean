@@ -99,9 +99,9 @@ otherwise; issue numbers are the implementing task.
 
 | Relationship | Owner |
 | --- | --- |
-| Definition owner | `LinearAlgebra/QuadraticForm/CentralCharge.lean` keeps the functional, its additivity, real linearity and kernel description, renamed by what it owns rather than by its first consumer |
-| Neutral core | continuity of a quadratic form, coercivity of a positive-definite form and boundedness of level sets leave `QuadraticForm/WallFiniteness.lean` for neutral `QuadraticForm/` modules |
-| Application adapter | the central-charge reading, and the support-property adapter, move to the stability subject beside the existing `Weak/Support/Predicate/Quadratic.lean` |
+| Definition owner | `LinearAlgebra/QuadraticForm/ComplexPairing.lean` keeps the paired functional, its additivity, real linearity and kernel description |
+| Neutral core | `QuadraticForm/Continuous.lean` owns continuity; `QuadraticForm/Bounds.lean` owns positive-definite coercivity and bounded level sets; `WallFiniteness.lean` consumes them |
+| Application adapter | `StabilityCondition/CentralCharge/Quadratic.lean` owns the wall and period-domain readings; `Support/Divisorial.lean` owns the full support-property adapter |
 | Comparison owner | unchanged: `Weak/Support/Predicate/Quadratic.lean` already records that negative definiteness on `ker Z` is one part of the quadratic support criterion and that nonnegativity on the relevant semistable classes is a further requirement |
 
 Independent consumer for the extracted neutral modules: the wall-finiteness
@@ -147,22 +147,25 @@ an arbitrary additive group with a form is neither. Native prerequisites
 
 | Relationship | Owner |
 | --- | --- |
-| Definition owner | a lightweight central-charge owner inside the stability subject, holding the family, exponential and quadratic constructors that `Walls/` currently owns |
-| Neutral core | Hodge-signature linear algebra moves to a neutral form module |
-| Application adapter | geometric Chern/Todd realizations under `Numerical/`; semistable support statements under `Support/` |
+| Definition owner | `StabilityCondition/CentralCharge/` holds the family, exponential, numerical, divisorial and quadratic charge constructors formerly owned by `Walls/` |
+| Neutral core | Hodge-signature linear algebra lives in `LinearAlgebra/BilinearForm/HodgeIndex.lean` |
+| Application adapter | geometric Chern/Todd realizations stay under `AlgebraicGeometry/Numerical/`; semistable support statements live under `StabilityCondition/Support/` |
 | Comparison owner | the existing specialization maps out of `ChargeFamily` and `Exp.ofMoments` are preserved as they stand |
 
 Independent consumer: the surface, threefold, slope and divisorial charge
 constructions each consume the family root without asking a wall question,
-which is the justification for the root existing upstream of `Walls/`. **This
-row requires a deliberate policy update, not just a file move**: rule 8 of
-`scripts/check_layering.py` currently *requires* six divisorial structures --
-`ChargeCoordinates`, `ChernCharacter`, `DivisorSpace`, `DivisorialParameters`,
-`OrthogonalSlice`, `StabilityParameters` -- to be declared in the `Walls/`
-subtree, and `docs/architecture/placement.md` states that requirement in prose.
-MO1.02 must move `DIVISORIAL_ROOT_DIR` and the placement paragraph in the same
-change, or the gate will reject its own agreed destination. No second common
-central-charge record is introduced merely to improve names.
+which is the justification for the root existing upstream of `Walls/`. Rule 8
+pins six divisorial charge structures to `CentralCharge/Divisorial/`, three
+Hodge structures to their neutral owner, and checks the transitive closures of
+the neutral owners and
+the entire `CentralCharge/` subtree. No second common central-charge record is
+introduced merely to improve names.
+
+**Landed 2026-09-13** in #1313; see "Charge construction upstream of walls"
+under Completed roots. Issue #1230 remains open and blocked on its independent
+two-consumer obligation, so this cutover retains `PeriodDomain.centralCharge`
+and `Mukai.expCharge` with their existing bridges instead of inventing
+`Lattice.pairCharge` or a graded pairing.
 
 #### 05 -- Linear Serre duality and Yoneda helpers (#1318)
 
@@ -351,7 +354,7 @@ enforceable only after their own cutover lands.
 | Edge | Status |
 | --- | --- |
 | numerical core → no stability constructions | **Enforced.** `scripts/check_layering.py` rule 3 now names exempt subcomponents rather than the whole `Numerical/`, `Moduli/` and `Stability/` subtrees, with a forbidden fixture at `scripts/fixtures/layering/forbidden/AlgebraicGeometry/Numerical/Core/` |
-| charge construction → no wall classification | Pending MO1.02. Not enforceable while the charge constructors live *inside* `Walls/`; the gate rule is written in the same pull request that moves them |
+| charge construction → no wall classification | **Enforced.** Rule 8 checks every module below `StabilityCondition/CentralCharge/` transitively against `Walls/` and geometry, and checks the neutral paired-functional, continuity, bounds and Hodge roots against stability and geometry; two forbidden fixtures prove both boundaries fire |
 | geometric derived operations → no Fourier--Mukai or moduli consumers | Pending MO1.10 and MO1.11. Same reason: the operations are currently declared inside the consumers |
 
 ### Legitimate core-umbrella exceptions
@@ -395,6 +398,35 @@ MO1.06 and MO1.13 work, since each still mixes modules that reach the stability
 tree with modules that do not.
 
 ## Completed roots
+
+- Charge construction upstream of walls (2026-09-13, findings 01 and 04):
+  `StabilityCondition/CentralCharge/Family.lean` now owns the unchanged
+  additive `ChargeFamily`; `CentralCharge/Exponential/` owns the unchanged
+  `Exp.ofMoments` kernel and its surface, threefold and arbitrary-divisor-rank
+  comparisons; and `CentralCharge/Divisorial/` owns Chern coordinates, charge
+  parameters, slice construction, discriminants and supplied Todd data.
+  `CentralCharge/Numerical/` owns the surface and threefold charge
+  constructions, while `Walls/` keeps only determinant-alignment loci and
+  their circle, nesting and finiteness results. `Support/Divisorial.lean`
+  states the support predicates, including both semistable-locus
+  nonnegativity and strict kernel negativity.
+
+  The paired complex functional and kernel algebra moved without declaration
+  renames to `LinearAlgebra/QuadraticForm/ComplexPairing.lean`; wall and period
+  interpretations are downstream in `CentralCharge/Quadratic.lean`.
+  `QuadraticForm/Continuous.lean` and `Bounds.lean` extract the arbitrary
+  continuity, coercivity and level-set results formerly mixed into
+  `WallFiniteness.lean`. `LinearAlgebra/BilinearForm/HodgeIndex.lean` owns the
+  abstract symmetric divisor space and its Hodge signature theory. Geometric
+  Chern and Todd realizations remain under `AlgebraicGeometry/Numerical/`.
+
+  Rule 8 pins these structure owners, rejects transitive wall or geometry
+  imports from the central-charge tree, and rejects all stability or geometry
+  imports from the neutral roots. The old motivational paths are retired, not
+  shimmed. Issue #1230 has not introduced `Lattice.pairCharge`: it remains open
+  on a separate two-consumer review obligation, so this delivery deliberately
+  retains the existing functional and bridge theorems. Tilt-dependent
+  rotation remains downstream and does not enter `CentralCharge/Family.lean`.
 
 - Linear Serre duality and representability (2026-09-13, finding 05):
   `CategoryTheory/Linear/SerreFunctor/` now owns `SerreFunctorData`, the
@@ -1278,21 +1310,16 @@ tree with modules that do not.
      `AlgebraicGeometry/Cohomology/Derived/UnitExt.lean`. The general-scheme
      comparison is still open; the affine proof uses that `𝒪^k` present every
      coherent sheaf, which fails off the affine case, so it is not a shortcut.
-- Divisorial charge block (2026-09-09):
-  `CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/` owns the
-  central-charge arithmetic that `Walls/Numerical/` performs in three
-  compressed real coordinates, carried out instead on an uncompressed real
-  divisor space. `Coordinates.lean` owns `ChargeCoordinates` and the charge
-  polynomial, `Charge.lean` owns `DivisorSpace`, `ChernCharacter`,
-  `StabilityParameters` and the intrinsic charge, `Slice.lean` owns
-  `fullChargeFamily` and `OrthogonalSlice`, `Discriminant.lean` owns the
-  Macri--Schmidt quadratic forms and the `DivisorSpace.HodgeIndex` certificate,
-  and `Circle.lean` owns the identification of a fixed-`u` slice with the
-  `(s,t)` model. None of the five needs a scheme, a sheaf, or a numerical
-  intersection ring. The precedent for the placement is
-  `Walls/Numerical/Basic.lean`, which is the same kind of pure arithmetic, and
-  `Walls/Spherical/Basic.lean`, which already consumes `LinearAlgebra/` from
-  this subtree rather than living in it.
+- Divisorial charge block (2026-09-09; owner corrected by #1313 on 2026-09-13):
+  `CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Divisorial/`
+  owns the central-charge arithmetic on an uncompressed real divisor space.
+  `Coordinates.lean` owns `ChargeCoordinates`; `Charge.lean` owns
+  `ChernCharacter`, `StabilityParameters` and the intrinsic charge;
+  `Slice.lean` owns `fullChargeFamily` and `OrthogonalSlice`; and
+  `Discriminant.lean` owns the Macri--Schmidt quadratic forms. The abstract
+  `DivisorSpace` and Hodge certificates now live at the neutral
+  `LinearAlgebra/BilinearForm/HodgeIndex.lean` owner. `Walls/Divisorial/`
+  retains the fixed-slice wall equation, circle geometry and finiteness.
 
   The geometric adapters stay under `AlgebraicGeometry/Numerical/Stability/`:
   `SurfaceChargeNumerical.lean`, `DivisorialChargeNumerical.lean`,
@@ -1305,8 +1332,9 @@ tree with modules that do not.
   still under `AlgebraicGeometry/`, so its records stay in the
   algebraic-geometry audit lane, while the 177 moved declarations are audited
   in `scripts/StabilityConditionAudit/Divisorial.lean`. Rule 8 of
-  `scripts/check_layering.py` pins the six structures to the Walls subtree and
-  fails if a geometric module declares them again.
+  `scripts/check_layering.py` pins the six charge structures to the
+  `CentralCharge/Divisorial/` subtree, the three Hodge structures to their
+  neutral owner, and fails if a geometric module declares them again.
 
   **The candidate entry for this lane overstated its payoff.** It said the move
   would let `Wall.stChargeFamily` be defined as a reindexing of

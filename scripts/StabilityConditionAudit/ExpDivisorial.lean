@@ -3,7 +3,7 @@ Divisorial slice of the exponential-charge audit. The keystone: the
 arbitrary-Picard-rank charge is the same kernel as the compressed families,
 with the intersection form in place of the degree functional.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp.Divisorial
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential.Divisorial
 
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.cPair
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.cSelf

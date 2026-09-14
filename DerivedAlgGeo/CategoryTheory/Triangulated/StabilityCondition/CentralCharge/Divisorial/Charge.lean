@@ -2,7 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Coordinates
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Coordinates
+import DerivedAlgGeo.LinearAlgebra.BilinearForm.HodgeIndex
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.RealForm
 
 /-!
@@ -13,8 +14,8 @@ two independent real divisor classes: a `B`-field and an ample class `omega`.
 They are not, in general, scalar multiples of one chosen generator.  This file
 therefore keeps the following data in separate, composable layers:
 
-* `DivisorSpace` supplies the real divisor space and its symmetric intersection
-  form;
+* `DivisorSpace`, from the neutral Hodge-index module, supplies the real vector
+  space and its symmetric pairing;
 * `ChernCharacter` supplies additive maps `rank`, `chOne`, and `chTwo`;
 * `StabilityParameters` supplies independent classes `B` and `omega`;
 * `DivisorialParameters` optionally records membership of `omega` in a
@@ -51,40 +52,6 @@ universe u v
 
 variable {D : Type u} [AddCommGroup D] [Module ℝ D]
 variable {N : Type v} [AddCommGroup N]
-
-/-- A real numerical divisor space with its symmetric intersection form.
-
-For a smooth projective surface the intended model is `N^1(X)_R`, with the
-usual intersection product.  No basis and no Picard-rank assumption is part of
-the structure. -/
-structure DivisorSpace (D : Type u) [AddCommGroup D] [Module ℝ D] where
-  /-- The real intersection pairing. -/
-  intersection : LinearMap.BilinForm ℝ D
-  /-- Intersection of divisors on a surface is symmetric. -/
-  intersection_symm : intersection.IsSymm
-
-namespace DivisorSpace
-
-variable (S : DivisorSpace D)
-
-/-- Dot notation for the intersection pairing. -/
-def pair (x y : D) : ℝ := S.intersection x y
-
-theorem pair_apply (x y : D) : S.pair x y = S.intersection x y := rfl
-
-/-- Symmetry of the numerical intersection product. -/
-theorem pair_comm (x y : D) : S.pair x y = S.pair y x :=
-  S.intersection_symm.eq x y
-
-@[simp]
-theorem pair_zero_left (x : D) : S.pair 0 x = 0 := by
-  simp [pair]
-
-@[simp]
-theorem pair_zero_right (x : D) : S.pair x 0 = 0 := by
-  simp [pair]
-
-end DivisorSpace
 
 /-- Additive Chern-character coordinates with an uncompressed first Chern
 class in the full real divisor space. -/

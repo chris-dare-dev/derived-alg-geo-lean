@@ -7,7 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability
 /-! ## Bogomolov--Gieseker as the nonnegativity half of a support property
 
 The support property needs two halves. Negativity on the kernel of the charge
-is proved in Walls/Divisorial/Support.lean from a supplied HodgeDefinite.
+is proved in Support/Divisorial.lean from a supplied HodgeDefinite.
 Nonnegativity on the locus is Bogomolov--Gieseker, which this repository does
 NOT prove: BogomolovGiesekerData is the supplied datum, and
 discriminantC_nonneg_of_semistable only upgrades it through

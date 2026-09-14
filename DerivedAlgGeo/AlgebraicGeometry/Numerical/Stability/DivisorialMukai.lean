@@ -5,12 +5,12 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.MukaiVector
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.SqrtTodd
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialChargeNumerical
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Mukai
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Mukai
 
 /-!
 # `√td_X` read off a numerical realization, and Bridgeland's K3 charge
 
-`Walls/Divisorial/Mukai.lean` owns the Mukai vector and the Mukai charge on an
+`CentralCharge/Divisorial/Mukai.lean` owns the Mukai vector and the Mukai charge on an
 abstract real divisor space, parameterized by a supplied `SqrtTodd`: the
 codimension-one class `√td₁` and the number `∫√td₂`.  This file supplies that
 datum from geometry rather than by hand, using the `sqrtToddComp` of

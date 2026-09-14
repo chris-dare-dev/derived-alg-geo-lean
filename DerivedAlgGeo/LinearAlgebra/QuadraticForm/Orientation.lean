@@ -57,9 +57,6 @@ section Defs
 
 variable (Q)
 
-/-- The plane spanned by an ordered pair. -/
-def pairSpan (x y : M) : Submodule ℝ M := Submodule.span ℝ ({x, y} : Set M)
-
 /-- An **ordered** pair spanning a positive plane. Everything already proved
 about the plane applies through `pairSpan`. -/
 def IsPositivePair (x y : M) : Prop := IsPositivePlane Q (pairSpan x y)

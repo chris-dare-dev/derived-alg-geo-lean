@@ -83,6 +83,14 @@ may be neutral; their comparison with a tilted heart belongs downstream.
 Preserve the existing canonical declarations required by CA1–CA3, including
 the option to withdraw an unjustified new graded root.
 
+**Implemented by #1313.** The canonical stability-facing owner is
+`StabilityCondition/CentralCharge/`; determinant-alignment loci remain below
+`Walls/`, and full quadratic support statements remain below `Support/`.
+Neutral paired-functional, continuity, coercivity and Hodge-index owners are
+below `LinearAlgebra/`. Issue #1230 has not supplied its conditional
+`Lattice.pairCharge`, so the established paired functional and its existing
+bridges remain the root for this cutover.
+
 **Name the locus that was defined.** Distinguish `Z(δ) = 0`, determinant
 alignment, a signed ray condition, and an actual destabilization wall.
 Charge-zero loci are generically real codimension two; alignment loci are
