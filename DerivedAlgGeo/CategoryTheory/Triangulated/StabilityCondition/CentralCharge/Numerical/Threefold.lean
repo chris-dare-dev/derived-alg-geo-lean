@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Family
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential.Twist
 
 /-!
 # The threefold central charge in the `(α, β)` half plane
@@ -41,6 +41,19 @@ def deg3 (v : NumClass) : ℝ := v.2.2.2
 
 end NumClass
 
+end Threefold
+
+/-- The threefold tuple and the kernel's compressed degrees hold the same four
+reals. Slot `0` is the weighted rank `∫H³·ch₀` on both sides. -/
+def threefoldVec : Threefold.NumClass ≃+ Exp.HDeg 3 where
+  toFun v := ![v.1, v.2.1, v.2.2.1, v.2.2.2]
+  invFun d := (d 0, d 1, d 2, d 3)
+  left_inv := by intro v; simp
+  right_inv := by intro d; funext k; fin_cases k <;> simp
+  map_add' := by intro v w; funext k; fin_cases k <;> simp [Prod.fst_add, Prod.snd_add]
+
+namespace Threefold
+
 open NumClass
 
 /-! ### The `β`-twist on compressed coordinates -/
@@ -69,13 +82,21 @@ def betaTwist (β : ℝ) (v : NumClass) : NumClass :=
   simp only [betaTwist, deg0, deg1, deg2, deg3]
   norm_num
 
+/-- The four-coordinate twist is the exponential kernel's action at degree three. -/
+theorem betaTwist_eq_exp (β : ℝ) (v : NumClass) :
+    threefoldVec (betaTwist β v) = Exp.twist 3 β (threefoldVec v) := by
+  funext i
+  fin_cases i <;>
+    norm_num [Exp.twist_apply, Fin.sum_univ_succ, Nat.factorial,
+      threefoldVec, betaTwist, deg0, deg1, deg2, deg3] <;> ring
+
 /-- **The group law**: twisting by `β₁ + β₂` is twisting by `β₂` and then by
 `β₁`.  This is `e^{-(β₁+β₂)H} = e^{-β₁H}e^{-β₂H}` on the four degrees, and it is
 what makes the name `betaTwist` honest. -/
 theorem betaTwist_betaTwist (β₁ β₂ : ℝ) (v : NumClass) :
     betaTwist β₁ (betaTwist β₂ v) = betaTwist (β₁ + β₂) v := by
-  simp only [betaTwist, deg0, deg1, deg2, deg3, Prod.mk.injEq]
-  exact ⟨trivial, by ring, by ring, by ring⟩
+  apply threefoldVec.injective
+  rw [betaTwist_eq_exp, betaTwist_eq_exp, Exp.twist_twist, betaTwist_eq_exp]
 
 /-! ### The charge -/
 

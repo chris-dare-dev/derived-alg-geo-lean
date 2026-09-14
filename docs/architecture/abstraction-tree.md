@@ -630,6 +630,12 @@ unification that looks right in the literature and is false here.
   The compression is not injective once the Picard rank exceeds one, so the
   intersection-form branch is a genuine sibling of the scalar branch and not a
   specialization of it.
+  The same obstruction applies to twisting by an arbitrary divisor `B`: on the
+  plane with form `diag(1,-1)`, take `H=(1,0)` and `B=(0,1)`. The triples
+  `(0,(0,0),0)` and `(0,(0,1),0)` have identical compressed `H`-degrees, but
+  their `B`-twisted top coordinates are respectively `0` and `1`.
+  `ChernCharacter.twist_rankOne_eq_exp` compares the valid `B=βH` slice;
+  `ChargeCoordinates.twistByScalar_eq_exp` includes the weight `H²` on rank.
 - **The graded pairing needs no second root at `n = 2`.** Its comparison
   with `Mukai.realPairing` must exhibit the actual coordinate identification
   and normalization. A function space and a product carrier are not thereby

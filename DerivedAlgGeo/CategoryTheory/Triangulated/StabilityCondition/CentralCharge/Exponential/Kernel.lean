@@ -48,10 +48,10 @@ which two of the three independent designs of this tree wrongly concluded.
 
 ## What is not here
 
-No twist, no discriminant, no truncation, and no wall theory. This module
-imports `Walls/Alignment.lean` and Mathlib and nothing else, so the root
-imports no leaf; the comparisons with the existing families live beside it in
-`Comparison.lean`, which may import both.
+The exponential action and charge translation identity are in `Twist.lean`.
+This primitive kernel imports `CentralCharge/Family.lean` and Mathlib, so it
+imports no leaf; comparisons with the existing families live downstream in
+`Comparison.lean` and `Divisorial.lean`.
 -/
 
 open Complex Finset

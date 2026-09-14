@@ -183,11 +183,11 @@ items:
     kind: epic
     parent: charge-abstraction-m1
     title: "The e^-betaH twist on the kernel, and its two real gaps"
-    status: planned
-    summary: "`CentralCharge/Exponential/Twist.lean`: `twist`, `twist_twist`, `charge_twist` and the two leaf comparisons, retiring three of the four existing twist spellings. THE ONLY EPIC IN CA1 CONTAINING UNPROVED MATHEMATICS: `twist_twist` is an ℝ-side binomial/Vandermonde identity and `charge_twist` a Cauchy product with a double-sum reindex, both classed REAL rather than routine. `twist_add_beta` (`TwistedChern.lean:110`) is not reusable — it is ℚ-parameterised while every wall child takes β : ℝ. Sequence last within the milestone; it blocks nothing."
+    status: in_progress
+    summary: "Implemented for review: `CentralCharge/Exponential/Twist.lean` proves the real group law and complex charge translation identity for arbitrary truncation degree using one finite exponential convolution. The threefold group law now inherits the root; weighted surface and B=βH divisorial comparisons are proved. `Numerical/Stability/ExponentialTwist.lean` compares the retained rational twist after weighted degrees for m ≤ n. Arbitrary B does not descend to H-compression; the counterexample is recorded in the canonical-root policy. Review and merge remain; this epic blocks nothing."
     priority: should
     size: M
-    tags: [lean, charges, open-proof]
+    tags: [lean, charges, twist]
     labels: [area:lean, type:feature, research, sev:medium]
     blocked_by: [1219]
   - id: charge-abstraction-e7

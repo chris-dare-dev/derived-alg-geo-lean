@@ -22,6 +22,17 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharg
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.stChart
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.alphaBetaChart
 
+/-! ## The real exponential action and its specializations -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.twist
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.twist_apply
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.twist_twist
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.twist_zero
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.charge_twist
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Threefold.betaTwist_eq_exp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates.twistByScalar_eq_exp
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChernCharacter.twist_rankOne_eq_exp
+
 /-! ## The two existing families, proved to be the kernel -/
 
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.surfaceVec

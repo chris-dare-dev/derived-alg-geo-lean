@@ -167,6 +167,18 @@ two-consumer obligation, so this cutover retains `PeriodDomain.centralCharge`
 and `Mukai.expCharge` with their existing bridges instead of inventing
 `Lattice.pairCharge` or a graded pairing.
 
+The exponential-twist extension (#1224) uses this implemented owner:
+`CentralCharge/Exponential/Twist.lean` adds `Exp.twist`, its real group law and
+the complex charge-translation identity to the existing `HDeg` kernel. The
+threefold coordinate equivalence `threefoldVec` now lives with `NumClass` in
+`CentralCharge/Numerical/Threefold.lean`, with its name preserved; that consumer
+uses `betaTwist_eq_exp` to inherit the root group law. Surface scalar and
+`B=βH` full-character comparisons are downstream in `Exponential/Divisorial`.
+`Numerical/Stability/ExponentialTwist.lean` compares weighted degrees of the
+retained rational twist with the real action for `m ≤ n`. No carrier or
+instance is introduced. Arbitrary `B` does not descend to compressed degrees;
+the explicit counterexample is recorded in the canonical-root policy.
+
 #### 05 -- Linear Serre duality and Yoneda helpers (#1318)
 
 | Relationship | Owner |
