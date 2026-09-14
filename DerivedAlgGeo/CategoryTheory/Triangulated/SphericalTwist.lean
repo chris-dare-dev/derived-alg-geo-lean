@@ -7,8 +7,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.GrothendieckGrou
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Mukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.StabilityAction
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Braid
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctor
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorH0
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorK0
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.ObjectTwistK0
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.LinearObjectTwistK0
 
 /-! # The spherical twist
 
@@ -22,9 +26,18 @@ relation `τ_A τ_B τ_A = τ_B τ_A τ_B` for an `A₂`-configuration.
 The dg-level construction now includes functorial cones of closed homogeneous
 natural transformations, counit-cone twist candidates for dg adjunctions, and
 the four enhanced cone choices attached to a functor with left and right dg
-adjoints.  It deliberately stops short of asserting sphericality: the
-adjoint-comparison maps and the Morita/higher-cone theorem of
-Anno--Logvinenko are not yet repository primitives.  The object-specific
+adjoints.  Their distinguished triangles compute the four conventional
+functors' `K₀` actions as the identity minus the corresponding adjunction
+composite.  The additive and scalar-linear object-twist cones similarly act
+as identity minus their evaluation functors.  Their parallel explicit
+`IsEulerCopower` capabilities identify object classes with the existing
+numerical `twistK₀` formula; automatic dg-functor exactness identifies the
+induced maps.  The scalar-linear path requires no adapter to the
+incompatible additive universal property.  It
+deliberately stops short of asserting sphericality: the canonical
+adjoint-comparison maps and their `H⁰` invertibility conditions are now named,
+but the Morita/higher-cone theorem of Anno--Logvinenko is not a repository
+primitive.  The object-specific
 evaluation functor `RHom(E,-) ⊗ E` and its identification with a
 Fourier--Mukai kernel remain geometric realization obligations.
 -/

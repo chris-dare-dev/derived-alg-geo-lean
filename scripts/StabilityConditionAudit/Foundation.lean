@@ -9,6 +9,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
+import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Biproduct
+import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.RankOne
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HeartComparison
@@ -110,8 +112,16 @@ identifying `Coh X` with the heart of the standard t-structure on its derived ca
 #print axioms CategoryTheory.Triangulated.K₀.of_zero
 #print axioms CategoryTheory.Triangulated.K₀.of_iso
 #print axioms CategoryTheory.Triangulated.K₀.of_isZero
+#print axioms CategoryTheory.Triangulated.K₀.of_biprod
+#print axioms CategoryTheory.Triangulated.K₀.of_biproduct
+#print axioms CategoryTheory.Triangulated.K₀.of_biproduct_const
 #print axioms CategoryTheory.Triangulated.K₀.of_shift_one
 #print axioms CategoryTheory.Triangulated.K₀.of_shift_neg_one
+#print axioms CategoryTheory.Triangulated.K₀.rankOne
+#print axioms CategoryTheory.Triangulated.K₀.rankOne_apply
+#print axioms CategoryTheory.Triangulated.K₀.IsRankOne
+#print axioms CategoryTheory.Triangulated.K₀.IsRankOne.ofIso
+#print axioms CategoryTheory.Triangulated.K₀.IsRankOne.map_eq_rankOne
 #print axioms CategoryTheory.Triangulated.IsTriangleAdditive
 #print axioms CategoryTheory.Triangulated.instIsAdditiveSubtypeTriangleMemSetDistinguishedTrianglesTriangulatedPresentationOfIsTriangleAdditive
 #print axioms CategoryTheory.Triangulated.K₀.lift

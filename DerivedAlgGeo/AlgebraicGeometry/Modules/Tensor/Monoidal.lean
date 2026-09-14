@@ -768,33 +768,6 @@ noncomputable instance modulesMonoidalCategory : MonoidalCategory X.Modules wher
   pentagon := tensorAssocIso_pentagon
   triangle := tensorAssocIso_triangle
 
-set_option backward.isDefEq.respectTransparency true in
-/-- The sheafified tensor product is additive separately in both variables. -/
-noncomputable instance modulesMonoidalPreadditive : MonoidalPreadditive X.Modules := by
-  refine ⟨?_, ?_, ?_, ?_⟩
-  · intro A B C
-    change tensorHom (𝟙 A) (0 : B ⟶ C) = 0
-    unfold tensorHom
-    simp
-    rfl
-  · intro A B C
-    change tensorHom (0 : B ⟶ C) (𝟙 A) = 0
-    unfold tensorHom
-    simp
-    rfl
-  · intro A B C f g
-    change tensorHom (𝟙 A) (f + g) =
-      tensorHom (𝟙 A) f + tensorHom (𝟙 A) g
-    unfold tensorHom
-    simp
-    rfl
-  · intro A B C f g
-    change tensorHom (f + g) (𝟙 A) =
-      tensorHom f (𝟙 A) + tensorHom g (𝟙 A)
-    unfold tensorHom
-    simp
-    rfl
-
 /-- Intrinsic invertibility is a monoidal object property of scheme-module sheaves. -/
 noncomputable instance isInvertibleIsMonoidal :
     (isInvertible X).IsMonoidal where

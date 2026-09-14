@@ -2,13 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Linear
 import Mathlib.Algebra.Homology.Monoidal
 
 /-!
 # Total tensor products of complexes of scheme-module sheaves
 
-The sheafified tensor product is additive in both variables and `X.Modules` has all coproducts.
+The sheafified tensor product is additive in both variables -- `Tensor/Linear.lean` owns that
+instance -- and `X.Modules` has all coproducts.
 Mathlib's total-complex construction therefore promotes it to a bifunctor on unbounded cochain
 complexes. This is the underived complex-level input for K-flat localization.
 -/

@@ -1,0 +1,79 @@
+/-
+Algebraic-witness slice of the StabilityCondition audit. The witness is a
+concrete nondegenerate algebraic stability condition on the bounded derived
+category of finite-dimensional vector spaces.
+
+Records are written fully qualified, as in every other slice of this audit.
+`scripts/check_audit_complete.py` resolves a record by trying the bare name
+and then a fixed prefix list, which for this library is
+`CategoryTheory.Triangulated.` and `CategoryTheory.Triangulated.StabilityCondition.`;
+neither reaches this module's `AlgebraicWitness` namespace, so an unqualified
+record here resolves to nothing and leaves every declaration counted as
+unaudited.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.AlgebraicWitness
+
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.moduleCat_isArtinianObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.fgModuleCat_isArtinianObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.fgModuleCat_simple_iff_finrank_eq_one
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.DerivedFiniteVect
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardT
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.residueObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardT_isBounded
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedQh_essImage_le_bounded
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_additive
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_linear
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_full
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_faithful
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBoundedCommShift
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.boundedImageToBounded_essSurj
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.homFiniteBounded_derivedFiniteVect
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.homFinite_derivedFiniteVect
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.subsingleton_residue_shiftedHom_of_ne_zero
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.chiHom_residue_eq_finrank
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.centralCharge
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.residueHomEquiv
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.finrank_residueHom_pos
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.centralCharge_of_heart
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardStabilityFunction
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardWeakStabilityFunction
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardWeak_slope_eq_top
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardWeak_isSemistable
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardWeak_hasHNProperty
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardWeak_ambientHN
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardSlicing
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.centralCharge_ne_zero_of_ambientPhasePredicate
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardPreStabilityCondition
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardSlicing_phase_integer
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardDualHeart_heart_iff
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.phaseBase_int
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardSlicing_mem_integer_iff
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardCanonicalHeart_heart_iff
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.dualHeartToStandardEquivalence
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.dualHeartEquivalence
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.canonicalHeartEquivalence
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.dualHeart_isStableAt_iff_simple
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.dualHeart_isArtinianObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.dualHeart_isNoetherianObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardSlicing_isLocallyFinite
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardStabilityCondition
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.canonicalHeart_isArtinianObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.canonicalHeart_isNoetherianObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.simpleHeartObject
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.simpleHeartObject_simple
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.canonicalHeart_simple_iso
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardStabilityCondition_hasFiniteLengthHeart
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardHeart_simple_iso_residue
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.stableRepresentative
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.stableRepresentative_isStable
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.stable_iso_residue_shift
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.phaseIndex_int_eq
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.stableRepresentative_iso_residue
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.stable_iso_representative_shift
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardSlicing_hasJordanHolderFiltrations
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardStabilityCondition_hasFiniteStableOrbits
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardStabilityCondition_isAlgebraic
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.standardStabilityCondition_hasGlobalMassHomBound
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.centralCharge_residue
+#print axioms CategoryTheory.Triangulated.AlgebraicWitness.centralCharge_ne_zero

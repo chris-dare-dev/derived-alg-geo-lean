@@ -35,10 +35,11 @@ the abstract dg cone and its pointwise transform triangle are now functorial,
 with `DGFunctor.HomogeneousNatTrans.ConeData` as the construction root and
 `FourierMukai.CounitKernelConeData` as the adjunction-counit specialization.
 Constructing the paper's extended Fourier--Mukai kernel still waits on the
-geometric `H⁰` model, the paper's enhanced kernel morphism, and exactness of
-kernel evaluation (#853--#855); it is not silently identified with the counit
-specialization.  Its categorical consequences continue to use the existing
-kernel/adjunction roots immediately.
+geometric `H⁰` model, the paper's ordinary kernel morphism with its exact
+counit-transform equation, an enhancement, and exactness of kernel evaluation
+(#853--#855); it is not silently identified with the counit specialization.
+Its categorical consequences continue to use the existing kernel/adjunction
+roots immediately.
 -/
 
 universe u t

@@ -8,7 +8,8 @@ live and how do the specializations relate to it?
 
 ## The rule
 
-Every reusable concept has one canonical root in the lowest natural owner.
+Every reusable concept has one canonical root in its natural mathematical
+owner, identified by [the placement procedure](placement.md).
 Specialized geometry supplies instances, refinements, subobjects, quotients,
 or equivalences at the leaves.  A leaf must not copy the carrier or fields of
 its root.
@@ -31,9 +32,33 @@ similar.
 ## Canonical spine
 
 This is the ownership target. Existing reverse edges are tracked defects to
-burn down, not exceptions that authorize more leaf-to-root imports.
+burn down, not exceptions that authorize roots importing their consumers.
+The diagram records construction and comparison relationships, not a chain
+of Lean `extends` declarations or a list of completed implementations.
+Current-versus-target paths are tracked in the cutover ledger.
 
 ```text
+ChargeFamily P N                       existing Wall namespace; no category required
+├─ reindex / pullback           change of chart / of class map
+├─ smul / phaseRotate β         wall_smul; a unit modulus fixes wallValue
+│  └─ = phaseTiltRotation       proved comparison, never a copy
+├─ Wall.Exp.ofMoments m         one polynomial, indexed by truncation m
+│  ├─ scalar moments            compressed H-degrees of a polarised n-fold
+│  │  ├─ m = 1, m = 2           SlopeData.charge / stChargeFamily
+│  │  ├─ m = 3                  Threefold.chargeFamily
+│  │  ├─ m = 4                  free; no new polynomial
+│  │  └─ (n,m) = (3,2)          the tilt charge; Ku(cubic threefold)
+│  │     rotated by 1/i         ν is α · its unrotated chargeSlope
+│  └─ form moments              arbitrary divisor rank; no scalar compression
+│     ├─ centralCharge          Divisorial; proved instance of the kernel
+│     ├─ StabilityParameters    the (B,ω) chart; w = β + iα fixed here
+│     ├─ mukaiCharge / κ        κ is a pullback, never a coefficient
+│     │  SqrtTodd               the image of κ, not a truncation of it
+│     └─ quadric, ℙ², blow-up   rank-one slice reaches the scalar branch
+├─ Wall.Exp.twist / discr       the e^{-βH} action and Δ_H, stated once
+└─ Spherical half-wall          a wall against the point class, cut by a
+                                sign; inclusion plus sign, never equality
+
 Bicategory                              Mathlib higher-categorical root
 ├─ Adjunction of 1-morphisms
 │  ├─ adjoint equivalences and mates
@@ -48,16 +73,22 @@ Category
 │  └─ reflective transport using an ordinary adjunction
 ├─ Preadditive
 │  ├─ Triangulated category              Mathlib root
+│  │  ├─ signed integral-shift exactness explicit CommShift + IsTriangulated
 │  │  ├─ ObjectProperty.OnTriangle       objectwise subcategory witness
 │  │  │  └─ liftTriangle / liftTriangleMap
 │  │  │     full-subcategory lift, comparison iso, functorial laws
-│  │  └─ Semiorthogonal decomposition
-│  │     ├─ ExceptionalCollection
-│  │     ├─ OrthogonalExceptionalBlocks  positive blocks and residual
-│  │     ├─ RightProjectionData          chosen adjoint and universal Hom
-│  │     └─ mutation / projection chains objectwise cones and iteration
+│  │  ├─ Semiorthogonal decomposition
+│  │  │  ├─ ExceptionalCollection
+│  │  │  ├─ OrthogonalExceptionalBlocks  positive blocks and residual
+│  │  │  ├─ RightProjectionData          chosen adjoint and universal Hom
+│  │  │  └─ mutation / projection chains objectwise cones and iteration
+│  │  └─ Stability conditions           consume the independent charge core above
 │  └─ Linear k C                         Mathlib root
+│     ├─ linear Yoneda representability  preimageIso / map_injective, no Serre datum
 │     └─ SerreFunctorData                duality on Hom spaces
+│        ·                               CategoryTheory/Linear/SerreFunctor/; the
+│        ·                               five entries below it are the shift-dependent
+│        ·                               refinements, under Triangulated/SerreFunctor/
 │        ├─ SerreCategoryData            chosen Serre autoequivalence
 │        │  └─ EnriquesCategoryData      square-to-shift refinement
 │        ├─ IsSphericalObject            two-degree self-Hom profile
@@ -65,6 +96,19 @@ Category
 │        ├─ Ext profiles / transport     Serre-compatible equivalences
 │        └─ classification data          supplied paper conclusions
 ├─ Abelian                               Mathlib typeclass
+│  ├─ CochainComplex.homologyModel       generic zero-differential model
+│  │  └─ ModuleCat/division-ring formality
+│  │     noncanonical and unbounded; no finiteness/naturality
+│  ├─ CochainComplex.finiteCohomologyModel
+│  │  ├─ finiteCohomologyModelHomologyIso  homology preserves the finite biproduct
+│  │  └─ finiteCohomologyModelIsoShifted degree i becomes degree zero shifted by -i
+│  ├─ CochainComplex.FiniteCohomologyPresentation
+│  │  ├─ pullback                        transport along an explicit HomotopyEquiv
+│  │  ├─ isZero_homology_of_not_mem      finite homology support consequence
+│  │  ├─ homologyModelIsoFiniteCohomologyModel
+│  │  │                                   generic finite-support comparison
+│  │  ├─ ofFiniteSupport                 ModuleCat/division-ring constructor
+│  │  └─ shiftedHomotopyEquiv            presentation in the shifted normal form
 │  ├─ weak-Serre exactness               repository generic extension
 │  └─ DerivedCategory C                  generic construction
 │     ├─ ShortExact.singleTriangle       Mathlib triangle construction
@@ -78,25 +122,86 @@ Category
 │  └─ HasShift (X ⥤ Y) A                 pointwise, from the target's shift
 │     └─ evaluation commutes strictly    identity comparison, both laws free
 ├─ DGCategory C
+│  ├─ IsShiftBy X n Y                    representable dg shift witness
+│  │  └─ homIso                         dgHom W X ≅ (dgHom W Y)⟦-n⟧
 │  ├─ DGLinear k C                       scalar refinement
+│  │  ├─ homComplex                     existing Hom-complex repackaged in ModuleCat k
+│  │  ├─ IsShiftBy.linearHomIso          target shift as a shifted Hom-complex iso
+│  │  │  ├─ H⁰ homComplex ≃ₗ Hom in H⁰  intrinsic quotient comparison
+│  │  │  └─ Hⁿ homComplex ≃ₗ Hom in H⁰  target is the selected same-sign shift Y⟦n⟧
+│  │  ├─ homComplexFiniteCohomologyPresentation
+│  │  │                                   HomFiniteBounded support + field formality
+│  │  ├─ postcompCochain                fixed-source right composition, linear chain-map law
+│  │  ├─ homFunctor k E                 Hom(E,-) as a k-linear dg functor to Cdg(ModuleCat k)
+│  │  ├─ Cdg (ModuleCat k)             standard model inherits Mathlib's k-linear structure
+│  │  │  └─ linearTensorObj K X       Mathlib total tensor product, same universe
+│  │  │     ├─ tensorCochainLinearEquiv   degreewise tensor--Hom adjunction
+│  │  │     └─ HasLinearCopowers       concrete scalar-linear copower instance
+│  │  └─ IsLinearCopowerOf k K X Z      represents k-linear cochains only
+│  │     ├─ homComplexIso               representing equivalence, compatible with differentials
+│  │     ├─ coefficientMap              homogeneous coefficient action, strict in composition
+│  │     ├─ lift / lift_unique           linear cochains are morphisms out of Z
+│  │     ├─ compare / compareIso         strict comparison, packaged as a Z⁰ isomorphism
+│  │     ├─ scalar-unit witness         single⁰(k) ⊗ X represents X itself
+│  │     ├─ HasLinearCopower(s)          Mathlib-style mere-existence capabilities
+│  │     │  └─ linearCopowerFunctor    Cdg(ModuleCat k) ⟶ C, k-linear dg functor
+│  │     │     ├─ linearCopowerAdjunction  (- ⊗ E) ⊣ Hom(E,-), strict at the dg level
+│  │     │     │  ├─ unit                 selected universal copower chain map
+│  │     │     │  └─ counit               exactly selected scalar-linear evaluation
+│  │     │     ├─ selected H⁰ invariance is a HomotopyCategory/DGEnhancement leaf
+│  │     │     │  └─ LinearCopowerFiniteFree
+│  │     │     │     ├─ basis expansion of a degree-zero copower
+│  │     │     │     └─ finite-free finrank specialization
+│  │     │     └─ finite presentation transport
+│  │     │        ├─ finite biproduct of shifted degree-zero copowers in H⁰ C
+│  │     │        └─ nested finite biproduct of shifts of X with finrank multiplicity
+│  │     │           └─ K₀ class = homologyEulerChar • [X] for supplied finite-free data
+│  │     └─ LinearEvaluationData k E     scalar-linear Hom(E,-) ⊗ E assembly
+│  │        ├─ functor                   k-linear dg functor
+│  │        ├─ evaluation                closed degree-zero map to the identity
+│  │        ├─ compareIso                coherent choice independence, strict over evaluation
+│  │        ├─ IsEulerCopower            generic H⁰ rank-one K₀ predicate
+│  │        │  ├─ realization from supplied finite presentations
+│  │        │  └─ automatic realization from HomFiniteBounded
+│  │        └─ TwistConeData             direct cone of scalar-linear evaluation
+│  │           ├─ compareIso / exactness  delegated to generic strict-square and cone APIs
+│  │           ├─ twistTriangleFunctor    H⁰ C ⥤ Triangle (H⁰ C), all distinguished
+│  │           ├─ adjunctionTwistIso      canonical Z⁰ identification with the copower--Hom counit cone
+│  │           ├─ adjunctionTwistTriangleIso
+│  │           │                           coherent identification of the full H⁰ triangle functors
+│  │           └─ K₀ action             identity minus evaluation; HomFiniteBounded numerical twist
 │  ├─ DGFunctor C D
 │  │  ├─ HomogeneousNatTrans             all degrees, differential, dg-functor category
 │  │  │  ├─ IsClosed                     shared cocycle predicate for transformations
+│  │  │  ├─ sourceShiftEquiv              additive regrading through IsShiftBy.precompEquiv
 │  │  │  ├─ whiskerLeft / whiskerRight   both sign-free, additive, degree-preserving
 │  │  │  │  ├─ interchange               Godement, with the Koszul sign (-1)^(m n)
 │  │  │  │  └─ hcomp                     the product itself; graded Leibniz, strict assoc
-│  │  │  └─ h0                           closed degree zero becomes an ordinary NatTrans
-│  │  │     └─ h0Comparison              H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D); no fullness claimed
+│  │  │  ├─ h0                           closed degree zero becomes an ordinary NatTrans
+│  │  │  │  ├─ composition              strict dg composition descends to ordinary composition
+│  │  │  │  ├─ whiskering               descends through the canonical h0CompIso compositors
+│  │  │  │  └─ h0Comparison             H⁰(DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D); no fullness claimed
+│  │  │  │     └─ h0Iso                 Z⁰ isomorphisms descend, coherently
+│  │  │  └─ ConeData                     functorial objectwise cones
+│  │  │     └─ K₀ action                 target endpoint minus source endpoint
+│  │  ├─ h0 / h0IdIso / h0CompIso       functor descent with compositor associativity and unit laws
 │  │  ├─ IsQuasiEquivalence               Hom-complex quasi-isos plus essential surjectivity
 │  │  │  └─ h0Equivalence                 induces an equivalence H⁰ C ≌ H⁰ D
 │  │  ├─ shiftedFunctor n                objectwise shift with the sign (-1)^(n p)
 │  │  │  ├─ shiftedFunctorAdd / Zero     degree coherence, closed and invertible
 │  │  │  ├─ HasShift Z⁰(DGFunctor C D) ℤ standard Mathlib packaging, all unit/assoc laws
-│  │  │  └─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
+│  │  │  ├─ shiftedFunctor_h0_obj/_map   the dg shift computes the H⁰ shift
+│  │  │  ├─ shiftedFunctorH0Iso          functor-level comparison; direct/transported CommShift-compatible
+│  │  │  ├─ shiftedFunctorCompIsoIdH0    Mathlib opposite-shift cancellation descended to H⁰
+│  │  │  └─ shiftedFunctorH0CommShift / IsTriangulated
+│  │  │                                 transports exactness with the signed shift package
 │  │  ├─ PreservesShifts                 free: every dg functor preserves shifts
-│  │  └─ PreservesChosenCones            strong witness-preserving capability
+│  │  └─ PreservesChosenCones            free: mapped fst/snd split every image cone
 │  │     ├─ ofIso                        invariant under Z⁰ dg-functor isomorphism
-│  │     └─ H0 exactness                 derived weak cone-triangle certificate
+│  │     └─ h0CommShift / h0IsTriangulated automatic non-instance H⁰ exactness
+│  │        └─ transportedH0             ordinary equivalence conjugate
+│  │           ├─ CommShift / IsTriangulated  composed from canonical packages
+│  │           └─ Equivalence            under explicit equivalence of H⁰ F
 │  ├─ IsCopowerOf K X Z                   `Z = K ⊗ X`, by its universal property
 │  │  ├─ lift / lift_unique              cochains out of `K` are morphisms out of `Z`
 │  │  ├─ compare                         closed canonical comparison, strict composition
@@ -113,9 +218,36 @@ Category
 │  │        ├─ compareIso                coherent Z⁰ iso across evaluation/cone choices
 │  │        │  └─ inclusion compatibility is strict
 │  │        ├─ twistTriangleFunctor      H⁰ C ⥤ Triangle (H⁰ C), all distinguished
-│  │        └─ twistH0IsTriangulated    exact, given only PreservesChosenCones
+│  │        ├─ twistTriangleIso          original same-evaluation cone-choice comparison
+│  │        ├─ twistTriangleIsoOfEvaluation  coherent across evaluation and cone choices
+│  │        ├─ twistH0IsTriangulated    automatic exactness; no caller-supplied cone witness
+│  │        ├─ K₀ action                 generic cone formula: identity minus evaluation
+│  │        └─ IsEulerCopower           choice-invariant realization input for numerical twistK₀
 │  ├─ DGAdjunction L R                    closed unit/counit plus triangle identities
-│  │  └─ DGAdjunction.h0                  an ordinary adjunction between the H⁰ functors
+│  │  ├─ CounitConeData                  counit-cone twist candidate
+│  │  │  └─ twistAdjointComparison      canonical closed `L T[-1] ⟶ R`, and its H⁰ map
+│  │  │     └─ H⁰ inverse-rotation factorization
+│  │  │                                 generic shiftedFstH0, right whiskering, and ordinary h0Counit
+│  │  ├─ UnitConeData                    unshifted unit-cone cotwist candidate
+│  │  │  ├─ cotwistAdjointComparison    canonical closed `R ⟶ C L`, and its H⁰ map
+│  │  │  │  └─ H⁰ unit/inclusion factorization generic h0Unit, right whiskering, and descended inr
+│  │  │  └─ cotwistAdjointComparisonShiftedH0
+│  │  │                                  canonical `R ⟶ (C[-1] L)[1]` normalization
+│  │  └─ DGAdjunction.h0                 an ordinary adjunction between the H⁰ functors
+│  │     ├─ h0_whiskerLeft_counit       generic left-whiskered counit normalization
+│  │     ├─ h0_whiskerRight_unit        generic right-whiskered unit normalization
+│  │     └─ H0Presentation                supplied endpoint isos after equivalence transport
+│  │        ├─ presentedCounitTriangle     generic normalization of the transported dg counit cone
+│  │        │  └─ transportedTwist        unchanged third vertex; pointwise distinguished
+│  │        ├─ presentedUnitTriangle       generic normalization of the transported dg unit cone
+│  │        │  └─ transportedUnitCone     unshifted third vertex; pointwise distinguished
+│  │        ├─ presentedCotwistTriangle    Mathlib inverse rotation of the presented unit triangle
+│  │        │  ├─ transportedCotwist      pointwise `[-1]` shift of the transported unit cone
+│  │        │  └─ transportedCotwistH0Iso transport of the actual shifted dg cone agrees up to iso
+│  │        │     ├─ CommShift compatibility canonical sign-correct packages agree across the iso
+│  │        │     └─ exact equivalence     exact for every cone under supplied triangulated transport;
+│  │        │                                equivalence from explicit H⁰ input
+│  │        └─ Fourier--Mukai adapters     existing left/right adjoint-kernel data
 │  ├─ HomogeneousSquare                  arbitrary-degree vertical maps and homotopy
 │  │  ├─ HomotopySquare                  degree zero with closed vertical maps
 │  │  │  └─ strict                      a commuting square with zero homotopy
@@ -128,17 +260,29 @@ Category
 │  │        ├─ fst / snd                 cone projections, graded-natural
 │  │        ├─ isConeOf                  a cone in the dg category of dg functors
 │  │        ├─ isoOfStrictSquare         the generic lift in Z⁰(DGFunctor C D)
-│  │        ├─ preservesShifts           a cone functor preserves shifts if its ends do
+│  │        ├─ preservesShifts           automatic for the assembled dg functor
+│  │        ├─ preservesChosenCones      retained endpoint-based 3-by-3 witness; existence automatic
 │  │        ├─ triangleFunctor           H⁰ C ⥤ Triangle (H⁰ D), values distinguished
 │  │        │  ├─ triangleNatTrans       natural in a STRICT square of transformations
+│  │        │  ├─ triangleIsoOfStrictSquare  endpoint isos give a NatIso
 │  │        │  └─ compareIso             the cone choices do not matter, canonically
+│  │        ├─ inverseRotateFirstH0     first maps of inverse-rotated cone triangles
+│  │        ├─ shiftedFstH0            H⁰ of the source-regraded degree-one projection
+│  │        ├─ shiftedFstH0_eq         equality through shiftedFunctorH0Iso and packaged
+│  │        │                           `[1][-1]` cancellation
 │  │        └─ DGAdjunction.CounitConeData  counit-cone twist candidate
 │  │           └─ twistTriangleFunctor   H⁰ D ⥤ Triangle (H⁰ D), all distinguished
 │  ├─ H0 C
 │  │  └─ coneTriangleFunctor             functor to distinguished triangles
 │  └─ IsPretriangulated C
 │     └─ Enhancement T                   comparison data, not a class
+│        ├─ liftedCocycle                noncanonical closed representative of an ordinary map
+│        ├─ conePresentation             representative plus a noncanonical dg cone
 │        └─ coneTriangleFunctor          dg cones read in `T` through the equivalence
+├─ Triangle.FirstMapNormalizationData     raw endpoint isos plus a named first-map square
+│  ├─ normalizedTriangle                 literal first two vertices and literal first map
+│  ├─ rawIsoNormalized                   natural triangle comparison; third component identity
+│  └─ ComparisonData                     third-vertex iso + remaining squares over identity endpoints
 ├─ Fourier--Mukai correspondence
 │  ├─ kernelTransform                     functor from kernels to transforms
 │  ├─ kernelEvaluation                    one source object's kernel-variable functor
@@ -147,12 +291,53 @@ Category
 │  │  ├─ first/secondFamilyCommShift      explicit adapters, evaluation agreement
 │  │  └─ firstFamily / secondFamily       exact-family projections through those adapters
 │  ├─ kernelConeTransformTriangleFunctor  pointwise image of dg cones of an enhanced kernel category
-│  └─ CounitKernelConeData                kernel arrow realizing an adjunction counit, in an enhancement
-│     └─ kernel-presented twist candidate exact image of its dg cone
+│  ├─ KernelConeNormalizationData         FM cone/shift data plus generic-normalization adapter
+│  │  ├─ firstMapNormalizationData       categorical endpoint/first-map normalization
+│  │  ├─ coneKernel                      ordinary image of the selected enhanced cone
+│  │  └─ shiftedConeKernel               enhanced shift with transform/shift comparison
+│  └─ KernelTransformationData            ordinary kernel arrow realizing a named transformation
+│     ├─ KernelTransformationConeData     noncanonical enhanced representative and dg cone
+│     │  └─ normalizationData             reusable literal endpoint/first-map transport
+│     ├─ CounitKernelData                 equivalent adjunction-counit specialization; stable API
+│     │  └─ CounitKernelConeData          enhanced counit specialization
+│     │     ├─ twistKernel                           ordinary image of the selected dg cone
+│     │     ├─ kernel-presented twist candidate       exact image of its dg cone
+│     │     ├─ counitTriangleInSource                literal counit triangle, pointwise distinguished
+│     │     ├─ presented dg comparison               pointwise/natural/shift-compatible layers
+│     │     └─ conditional KernelAutoequivalence     from explicit H⁰ equivalence + natural comparison
+│     ├─ AdjunctionUnitKernelData         definitional right-adjunction-unit specialization
+│     │  └─ AdjunctionUnitKernelConeData  selected enhanced unit arrow and dg cone
+│     │     ├─ unshifted cotwist-cone candidate       exact image of its dg cone
+│     │     ├─ unitTriangleInSource                  literal unit triangle, pointwise distinguished
+│     │     ├─ cotwist = cotwistCone⟦-1⟧             pointwise functor-category shift
+│     │     ├─ cotwistKernel                         shifted enhanced cone presenting cotwist
+│     │     ├─ cotwistTriangleInSource               inverse rotation, pointwise distinguished
+│     │     ├─ presented dg comparison               pointwise/natural/shift-compatible layers
+│     │     └─ conditional KernelAutoequivalence     from explicit H⁰ equivalence + natural comparison
+│     ├─ DualTwistKernelData              left-adjunction unit specialization after swapping
+│     │  └─ DualTwistKernelConeData       reuses the unit/cotwist cone and normalization
+│     │     ├─ dualTwistKernel                        shifted enhanced cone presenting dual twist
+│     │     ├─ dualTwistTriangleInTarget             inverse rotation, pointwise distinguished
+│     │     ├─ presented dg comparison               cotwist comparison reused after swapping
+│     │     └─ conditional KernelAutoequivalence     explicit H⁰ equivalence + natural comparison
+│     └─ DualCotwistKernelData            left-adjunction counit specialization after swapping
+│        └─ DualCotwistKernelConeData     reuses the counit/twist cone and normalization
+│           ├─ dualCotwistKernel                      selected enhanced cone presenting dual cotwist
+│           ├─ dualCotwistTriangleInSource           literal counit triangle, pointwise distinguished
+│           ├─ presented dg comparison               twist comparison reused after swapping
+│           └─ conditional KernelAutoequivalence     explicit H⁰ equivalence + natural comparison
 ├─ Enhanced spherical-functor lane
 │  ├─ EnhancedAdjunctionCones             four adjunction-map cone choices
+│  │  ├─ dualTwistFunctor / cotwistFunctor conventional shifted cone functors
+│  │  ├─ cotwistH0Equivalence             spends the unshifted condition after `[-1]`
+│  │  ├─ H⁰ exactness                     automatic for every dg functor; no endpoint cone hypotheses
+│  │  ├─ triangulated equivalences         canonical Mathlib package for twist and cotwist
+│  │  └─ K₀ action                        identity minus the corresponding adjunction composite
+│  ├─ AdjointComparisonConditions         IsIso on the two canonical H⁰ comparison maps
+│  │  └─ cotwistShiftedIso                conventional `R ≅ (F L)[1]` accessor
 │  └─ TwistCotwistEquivalenceConditions   explicit sufficient-condition input only
-│     └─ full sphericality                 pending Morita/shifted-comparison theorem
+│     ├─ FM twist/cotwist adapters         conditional KernelAutoequivalence, no new record
+│     └─ full sphericality                 pending Morita/two-of-four theorem
 ├─ Derived-category extensions
 │  └─ Ext adjunction / dimension shift / resolution naturality
 ├─ filtered-complex spectral sequences
@@ -161,6 +346,8 @@ Category
 ├─ GrothendieckPresentation
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
+│  │  ├─ finite biproduct calculus         [⨁ Xᵢ] = Σ [Xᵢ], constant family = n·[X]
+│  │  ├─ rankOne / IsRankOne                factorization through ℤ; objectwise before exactness
 │  │  ├─ Realization := K₀ C →+ A        additive target
 │  │  │  └─ Descends                    commuting realization square
 │  │  └─ EulerForm := K₀ C →+ K₀ C →+ ℤ
@@ -194,9 +381,22 @@ LinearAlgebra
 ├─ finite free integral lattices          Mathlib: [Module.Finite ℤ Λ] [Module.Free ℤ Λ]
 │  └─ NumericalVarietyData.NumericalQuotient finite by Module.Finite.quotient; free, once
 │                                            torsion-free, by Module.free_of_finite_type_torsion_free'
-└─ weighted-basis graded pieces
-   ├─ internal direct-sum decomposition
-   └─ NumericalRingData.ofGradedBasis        geometric numerical consumer
+├─ weighted-basis graded pieces
+│  ├─ internal direct-sum decomposition
+│  └─ NumericalRingData.ofGradedBasis        geometric numerical consumer
+├─ bilinear form on a lattice
+│  └─ Lattice.pairCharge b x y v         ⟪x,v⟫ + i⟪y,v⟫; b not symmetric
+│     ├─ PeriodDomain.centralCharge      the quadratic-space presentation
+│     │  ├─ support property             ker Z is the plane's negative-definite ⊥
+│     │  ├─ signature additivity         gives HasSignatureTwo on a complement
+│     │  ├─ Mukai.expCharge              Bridgeland Z(β,ω), the exponential plane
+│     │  ├─ Ku(X) charge                 on H̃_alg; NOT a child of expCharge
+│     │  └─ Ku(X) period domain          on A₂^⊥ ⊆ H̃; a different lattice
+│     └─ Mukai.Graded.pairing n          ⟪v,w⟫ = (-1)ⁿ⟪w,v⟫; odd n alternating
+│        n = 2 is realPairing            so n = 2 owes a comparison, not a def
+└─ Mukai.pairing / selfPairing           Lattice/Mukai/Basic.lean:56,143
+   ARITY IS FIXED AT THREE               generalise over the coefficient ring only
+   root of the discriminant              pairing 3 v v = 0 identically
 
 Algebra
 ├─ ordinary ring and module theory
@@ -251,16 +451,21 @@ AlgebraicGeometry
 ├─ numerical K-theory
 │  ├─ Euler quotient
 │  │  └─ future scheme-specific relation generators consume Algebra root
-│  └─ Riemann--Roch and Mukai transfer
-│     └─ consume categorical K₀ realizations and Euler forms
+│  ├─ Riemann--Roch and Mukai transfer
+│  │  └─ consume categorical K₀ realizations and Euler forms
+│  └─ Polarised.wallChargeFamily         one transport for every (n, m, κ)
+│     ├─ n = 2, 3 exist; n = 4 free      K3, ℙ², quadric, ℙ³, quintic, ℙ⁴, sextic
+│     ├─ κ = √td is inhabited            = mukaiCharge at sqrtTodd on rankOne
+│     │  any surface                     no K3 hypothesis is needed
+│     └─ κ = 1 and κ = √td               two pullbacks; different walls, not one
 ├─ moduli
 │  ├─ fiberwise replete locus selector     not a subprestack
 │  ├─ finite-type boundedness witness      consumes selector + generic predicate
 │  ├─ affine stable subprestack            consumes pseudofunctor object property
 │  ├─ stack presentation
 │  └─ perfect-complex specialization
-└─ stability on scheme-derived categories      `DerivedCategory/Stability/`, the one
-                                               stability-consuming child
+└─ stability-consuming children                `DerivedCategory/Stability/`, `Moduli/`,
+                                               `Numerical/`, `Stability/` — four, not one
 ```
 
 The arrows implied by this tree point downwards from consumers to roots.  In
@@ -355,11 +560,77 @@ particular:
   on the nose; the enhancement of the geometric kernel category with its
   exact comparison, the actual kernel morphism, and exactness of kernel
   evaluation remain explicit realization inputs.
+- keep abstract charges and their geometric constructors distinct. An abstract
+  charge is an additive map `Λ →+ ℂ`; a complex parameter, Chern character and
+  Todd correction are inputs to particular constructors, not fields required
+  of every charge. Reuse the existing exponential kernel for the supported
+  surface, threefold and slope families at their respective truncation degrees.
+  Truncation degree `m` is the index, never the ambient dimension `n`:
+  the cubic-threefold tilt charge is `(n, m) = (3, 2)`, so a root indexed by `n`
+  cannot state it. A new dimension supplies a `Polarization` and inherits the
+  polynomial; if a lane finds itself writing a fourth charge polynomial, the
+  placement is wrong.
+- a correction class `κ` is a pullback, never a coefficient. `κ = 1` and `κ = √td`
+  give genuinely different walls, so they are two pullbacks of one transport and
+  must not be fused into a single family. `SqrtTodd` is the image of `κ` under a
+  numerical realization, not a truncation of it.
+- the Mukai pairing has fixed arity three. Generalise it over the coefficient
+  ring, never over dimension: a dimension-indexed self-pairing vanishes
+  identically in odd degree, so it cannot be the root of the Bogomolov
+  discriminant. The graded pairing is a separate object that declares nothing new
+  at `n = 2`, where it must compare with `Mukai.realPairing`, using the actual
+  coordinate equivalence and normalization. Fin-indexed functions and nested
+  products must not be assumed definitionally equal.
+- do not add a `KuznetsovChargeData` carrier. Reuse the abstract charge or
+  pairing root. An ambiently induced charge reaches the component by
+  restriction along its inclusion; a charge constructed on its own numerical
+  lattice must name that realization instead. For the cubic threefold the
+  charge is induced from the rotated tilt charge. Its odd-degree compressed
+  pairing is alternating and
+  cannot supply a positive-plane quadratic domain; this says nothing about
+  other period-domain constructions for the variety or component. For the
+  cubic fourfold the charge lives on the algebraic Mukai lattice while the
+  period domain lives on the orthogonal complement of an `A₂` sublattice,
+  and those are two different lattices that must not be fused.
 
 Bicategories are the first implemented higher-categorical stage. A future
 general `n`-category or `(∞,1)`-category layer must name its formal model and
 its comparison with this spine; an empty directory does not establish an
 abstraction relationship.
+
+## Recorded negative results
+
+Clause 6 below requires a falsified generalization to be recorded rather than
+forgotten. These were each established against the tree, and each one is a
+unification that looks right in the literature and is false here.
+
+- **A dimension-indexed Mukai self-pairing is not the root of the discriminant.**
+  It vanishes identically in odd degree, so the threefold leaf cannot reach it.
+  The root is the fixed-arity pairing generalized over its coefficient ring.
+- **The multi-divisor charge does not factor through the compressed H-degrees.**
+  The compression is not injective once the Picard rank exceeds one, so the
+  intersection-form branch is a genuine sibling of the scalar branch and not a
+  specialization of it.
+- **The graded pairing needs no second root at `n = 2`.** Its comparison
+  with `Mukai.realPairing` must exhibit the actual coordinate identification
+  and normalization. A function space and a product carrier are not thereby
+  definitionally equal. Prove the bridge rather than add a duplicate form.
+- **Parity of the compressed pairing says nothing about a Kuznetsov component.**
+  The compressed form lives on a space of dimension `n + 1`; the Mukai lattice of
+  the component does not. Symmetry there is automatic for an unrelated reason, so
+  the parity argument is vacuous even on the correct space.
+- **The rotation that induces the cubic-threefold charge is not cosmetic.** It
+  leaves every wall fixed but changes phases, so a construction that drops it is
+  wrong about semistability even where it is right about walls.
+- **The tilt charge is not a chart change of the threefold charge.** Their wall
+  loci genuinely differ; the tilt family is the surface family pulled back along a
+  truncation, which is a different operation.
+- **A geometric Serre functor is not a new structure.** The categorical root
+  already exists and the geometric side owes it a bridge; a parallel structure
+  fails the adoption clause below and would add a third duplicate twist.
+- **The Fourier--Mukai convolution classes are not pseudofunctor data.** They
+  resemble compositor and unitor data without being an instance of it, so that
+  lane cannot own them and the resemblance must not be used to place them.
 
 ## Root review before a new structure
 
@@ -369,21 +640,36 @@ quotient carrier, or category must answer these questions before implementation.
 1. **Canonical owner.** What existing root is closest?  Give its declaration
    and module.  If none exists, name the proposed neutral module.
 2. **Adoption.** Name two independent consumers, or say explicitly that this is
-   statement-layer data whose purpose is to compare multiple inhabitants.
+   statement-layer data whose purpose is to compare multiple inhabitants. When
+   the structure is being *extracted* from an existing module, that module does
+   not count as one of the two: an extraction that only its own former home
+   consumes is a rename, and belongs in that home as a theorem or an `abbrev`.
+   This is what keeps an ownership repair from producing an empty hierarchy.
 3. **Projection.** How does a specialization forget to, refine, or compare with
    the root?  The answer must be an existing instance, a projection, an
    `abbrev`, or a theorem—not prose.
 4. **Diamond.** If both the root and leaf synthesize inherited instances, add a
    compile-time or equality test showing that the paths agree.
-5. **Dependency direction.** Confirm that the root imports no leaf or
-   paper-specific module.
+5. **Dependency direction.** Confirm that the root imports no specialization,
+   realization or paper-specific consumer, including through umbrellas. Keep
+   agreement theorems downstream of both presentations. State the inspected
+   import closure, not just the absence of one direct import.
 6. **Negative result.** If the apparent generalization is false, record the
    counterexample and keep the leaves separate.  A falsified unification is a
    successful architecture result.
 
-Moving declarations is not complete until imports, umbrellas, audit records,
-registry bindings, and compatibility reexports are updated together, as
-required by `CONTRIBUTING.md`.
+Use the [ownership decision record](mathematical-ownership.md#record-the-decision-in-the-issue-or-pr)
+to connect these answers to the issue or PR. Moving declarations is not
+complete until imports, umbrellas, audit routing, registry/source-owner
+bindings, documentation and relevant checks are updated together. Preserve
+required historical names through the existing executable-only mechanism;
+retired-path import shims are forbidden. See `CONTRIBUTING.md`.
+
+For the 2026-09-13 ownership review the answers to questions 1, 3 and 5 are
+already recorded per finding in the owner map in
+`docs/architecture/cutover-ledger.md`; a pull request implementing one of those
+rows cites the row instead of re-deriving it, and answers question 2 there or
+drops the proposed carrier.
 
 ## Agreement is part of the feature
 
@@ -401,12 +687,14 @@ The policy is partly mechanical and partly a review obligation:
 - `scripts/check_layering.py` enforces the policy edges in `layers.md`;
 - `scripts/check_umbrella_coverage.py` keeps every specialization in the public
   tree;
-- `scripts/check_single_instantiation.py` rejects new thin abstractions in the
-  generic subjects;
+- `scripts/check_single_instantiation.py` checks its configured paths for
+  thin abstractions; the two-consumer obligation still applies outside its scan;
 - `scripts/check_roadmap.py` keeps materialized lanes synchronized with their
   tracker issues;
-- the pull-request template records the non-mechanical root, projection, and
-  agreement decisions.
+- the pull-request template and the ownership decision record capture the
+  non-mechanical root, projection and agreement decisions. Component import
+  boundaries not yet encoded by a gate remain review obligations, with checks
+  added in their source cutovers.
 
 The projective-families roadmap carries the first finer-grained burn-down:
 generic stack roots move out of scheme geometry, moduli-to-stability reverse

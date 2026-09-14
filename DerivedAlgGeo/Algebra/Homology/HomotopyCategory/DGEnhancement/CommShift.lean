@@ -77,6 +77,12 @@ lemma toH0_map {K L : CochainComplex A ℤ} (φ : K ⟶ L) :
     (toH0 A).map φ = H0.homMk (C := Cdg A) (X := (K : Cdg A)) (Y := (L : Cdg A))
       ⟨Cochain.ofHom φ, δ_ofHom φ⟩ := rfl
 
+/-- The tautological functor from cochain complexes to `H⁰(C^dg A)` is
+additive. -/
+instance toH0_additive : (toH0 A).Additive where
+  map_add {_ _} f g :=
+    congrArg _ (Subtype.ext (Cochain.ofHom_add f g))
+
 instance : (toH0 A).Full where
   map_surjective {K L} f := by
     induction f using Quotient.ind with

@@ -37,6 +37,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Cdg.dgComp_eq
 #print axioms CategoryTheory.Cdg.dgHom_eq
 #print axioms CategoryTheory.Cdg.dgId_eq
+#print axioms CategoryTheory.Cdg.homModule
+#print axioms CategoryTheory.Cdg.linear
 #print axioms CategoryTheory.Cdg.enhancement
 #print axioms CategoryTheory.Cdg.h0Functor
 #print axioms CategoryTheory.Cdg.homEquivCohomologyClass
@@ -122,8 +124,16 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.comp_map
 #print axioms CategoryTheory.DGFunctor.comp_obj
 #print axioms CategoryTheory.DGFunctor.h0
+#print axioms CategoryTheory.DGFunctor.h0_additive
 #print axioms CategoryTheory.DGFunctor.h0CompIso
+#print axioms CategoryTheory.DGFunctor.h0CompIso_hom_app
+#print axioms CategoryTheory.DGFunctor.h0CompIso_inv_app
+#print axioms CategoryTheory.DGFunctor.h0CompIso_assoc
+#print axioms CategoryTheory.DGFunctor.h0CompIso_comp_id
+#print axioms CategoryTheory.DGFunctor.h0CompIso_id_comp
 #print axioms CategoryTheory.DGFunctor.h0IdIso
+#print axioms CategoryTheory.DGFunctor.h0IdIso_hom_app
+#print axioms CategoryTheory.DGFunctor.h0IdIso_inv_app
 #print axioms CategoryTheory.DGFunctor.h0_map_mk
 #print axioms CategoryTheory.DGFunctor.h0_obj
 #print axioms CategoryTheory.DGFunctor.id
@@ -143,6 +153,12 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGLinear.comp_smul_left
 #print axioms CategoryTheory.DGLinear.comp_smul_right
 #print axioms CategoryTheory.DGLinear.d_smul
+#print axioms CategoryTheory.DGLinear.homComplex
+#print axioms CategoryTheory.DGLinear.homComplex_X
+#print axioms CategoryTheory.DGLinear.homComplex_d_apply
+#print axioms CategoryTheory.DGLinear.postcompCochain
+#print axioms CategoryTheory.DGLinear.postcompCochain_apply
+#print axioms CategoryTheory.DGLinear.postcompCochain_d
 #print axioms CategoryTheory.DGFunctor.Linear
 #print axioms CategoryTheory.DGFunctor.Linear.map_smul
 #print axioms CategoryTheory.DGFunctor.compLinear
@@ -193,16 +209,28 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsShiftBy.compare_eq_mapShift
 #print axioms CategoryTheory.IsShiftBy.compare_mem_cocycles
 #print axioms CategoryTheory.IsShiftBy.hom
+#print axioms CategoryTheory.IsShiftBy.homIso
+#print axioms CategoryTheory.IsShiftBy.homIso_hom_f_apply
 #print axioms CategoryTheory.IsShiftBy.homMap
 #print axioms CategoryTheory.IsShiftBy.hom_closed
 #print axioms CategoryTheory.IsShiftBy.hom_inv
 #print axioms CategoryTheory.IsShiftBy.inv
 #print axioms CategoryTheory.IsShiftBy.inv_closed
 #print axioms CategoryTheory.IsShiftBy.inv_hom
+#print axioms CategoryTheory.IsShiftBy.precompEquiv
+#print axioms CategoryTheory.IsShiftBy.precompEquiv_apply
+#print axioms CategoryTheory.IsShiftBy.precompEquiv_symm_apply
+#print axioms CategoryTheory.IsShiftBy.precompEquiv_d
+#print axioms CategoryTheory.IsShiftBy.precompEquiv_d_eq_zero_iff
 #print axioms CategoryTheory.IsShiftBy.mapShift
 #print axioms CategoryTheory.IsShiftBy.mapShift_comp
 #print axioms CategoryTheory.IsShiftBy.mapShift_id
 #print axioms CategoryTheory.IsShiftBy.mapShift_mem_cocycles
+#print axioms CategoryTheory.IsShiftBy.linearHomIso
+#print axioms CategoryTheory.IsShiftBy.linearHomIso_hom_f_apply
+#print axioms CategoryTheory.IsShiftBy.linearHomMap
+#print axioms CategoryTheory.IsShiftBy.linearHomMap_f_apply
+#print axioms CategoryTheory.IsShiftBy.bijective_linearHomMap
 #print axioms CategoryTheory.IsShiftBy.mk.inj
 #print axioms CategoryTheory.IsShiftBy.mk.sizeOf_spec
 #print axioms CategoryTheory.IsShiftBy.self
@@ -213,6 +241,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Z0.id_val
 #print axioms CategoryTheory.Z0.of
 #print axioms CategoryTheory.Z0.toH0
+#print axioms CategoryTheory.Z0.toH0_full
 #print axioms CategoryTheory.coboundaries
 #print axioms CategoryTheory.coboundaries_le_cocycles
 #print axioms CategoryTheory.coboundary_comp_mem
@@ -235,6 +264,14 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.prodComplex_X_coe
 #print axioms CategoryTheory.prodComplex_d
 #print axioms CategoryTheory.prodD
+
+-- Scalar-linear cohomology of a dg Hom-complex, first in degree zero and then
+-- as morphisms into an explicit or selected same-sign shift in H⁰.
+#print axioms CategoryTheory.H0.homologyZeroLinearEquiv
+#print axioms CategoryTheory.H0.homologyZeroLinearEquiv_homologyπ_cyclesMk
+#print axioms CategoryTheory.IsShiftBy.homologyLinearEquiv
+#print axioms CategoryTheory.IsShiftBy.homologyLinearEquiv_homologyπ_cyclesMk
+#print axioms CategoryTheory.H0.homologyShiftLinearEquiv
 
 -- dg-enhancements-e6: the shift functor on H0, its zero and add comparison
 -- isomorphisms, all three ShiftMkCore coherence identities, and the resulting
@@ -431,12 +468,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.id
 #print axioms CategoryTheory.DGFunctor.PreservesShifts.comp
 
--- Every dg functor preserves shifts.  A shift element is a closed, two-sided
--- invertible element of degree `-n` (`IsShiftBy.inv`, `hom_inv`, `inv_hom`),
--- and a dg functor preserves composition and identities on the nose, so it
--- carries invertible elements to invertible ones.  `PreservesShifts` therefore
--- costs a caller nothing.  `PreservesChosenCones` is not like this and remains
--- a genuine hypothesis: a cone is not an invertible element.
+-- Every dg functor preserves shifts and the repository's strong split cone
+-- witnesses.  For cones, the mapped `fst` and `snd` projections are an
+-- explicit inverse to the mapped splitting map; the five matrix identities
+-- survive because dg functors preserve addition, composition, zero, and
+-- identities.  Neither capability costs a caller an additional hypothesis.
 #print axioms CategoryTheory.DGFunctor.preservesShifts
 #print axioms CategoryTheory.DGFunctor.mapHomotopySquare
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones
@@ -446,6 +482,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_fst
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_snd
 #print axioms CategoryTheory.DGFunctor.PreservesChosenCones.mapCone_toShift
+#print axioms CategoryTheory.DGFunctor.preservesChosenCones
 #print axioms CategoryTheory.DGFunctor.mapShift_inv_eq
 #print axioms CategoryTheory.DGFunctor.map_mapShift
 #print axioms CategoryTheory.DGFunctor.map_compare
@@ -453,11 +490,24 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.shiftCommIso_zero_hom_app
 #print axioms CategoryTheory.DGFunctor.shiftCommIso_add_hom_app
 #print axioms CategoryTheory.DGFunctor.commShift
+#print axioms CategoryTheory.DGFunctor.h0CommShift
 #print axioms CategoryTheory.DGFunctor.PreservesConeTriangles
 #print axioms CategoryTheory.DGFunctor.preservesConeTriangles_of_preservesChosenCones
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesConeTriangles
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesShifts_and_coneTriangles
 #print axioms CategoryTheory.DGFunctor.isTriangulated_of_preservesShifts_and_chosenCones
+#print axioms CategoryTheory.DGFunctor.h0IsTriangulated
+
+-- Ordinary equivalence transport of `H⁰ F`, with shift, exactness, and
+-- equivalence supplied by Mathlib's existing composition and mate packages.
+-- These declarations infer neither dg quasi-equivalence nor triangulatedness
+-- of a plain category equivalence.
+#print axioms CategoryTheory.DGFunctor.transportedH0
+#print axioms CategoryTheory.DGFunctor.transportedH0_isEquivalence
+#print axioms CategoryTheory.DGFunctor.transportedH0Equivalence
+#print axioms CategoryTheory.DGFunctor.transportedH0CommShift
+#print axioms CategoryTheory.DGFunctor.transportedH0IsTriangulated
+#print axioms CategoryTheory.DGFunctor.transportedH0EquivalenceIsTriangulated
 
 -- The instance itself (dg-enhancements-e6, #377): the completion axiom for
 -- arbitrary distinguished triangles, the five axioms H⁰ proves, and the
@@ -484,6 +534,9 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- The ambient shift on H⁰ is the one `H0Shift.lean` built (dg-enhancements-e7).
 #print axioms CategoryTheory.H0.shiftFunctorZero_eq
 #print axioms CategoryTheory.H0.shiftFunctorAdd_eq
+#print axioms CategoryTheory.H0.shiftFunctorAdd'_eq_shiftFunctorAddIso'
+#print axioms CategoryTheory.H0.shiftFunctorCompIsoId_hom_app
+#print axioms CategoryTheory.H0.shiftFunctorComm_hom_app
 
 -- The model shift is Mathlib's shift (dg-enhancements-e7). Stated first on plain
 -- cochain complexes, where no `Cdg`/`CochainComplex` synonym has to be crossed
@@ -500,6 +553,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- both telescope into a single `IsShiftBy.compare`.
 #print axioms CategoryTheory.Cdg.toH0
 #print axioms CategoryTheory.Cdg.toH0_map
+#print axioms CategoryTheory.Cdg.toH0_additive
 #print axioms CategoryTheory.Cdg.instFullCochainComplexIntH0ToH0
 #print axioms CategoryTheory.Cdg.h0Functor_map_toH0_map
 #print axioms CategoryTheory.Cdg.toH0ShiftIso
@@ -626,6 +680,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.mk.inj
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.mk.sizeOf_spec
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.obj
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.functorK₀Of
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.functorK₀Map
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.IsClosed.app_mem_cocycles
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.chosenConeData
 
@@ -638,8 +694,21 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.inclusion
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.inclusion_isClosed
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.twist
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparison
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparison_app
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparison_isClosed
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparisonH0
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparisonH0_eq_inverseRotateFirstH0
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.twistAdjointComparisonH0_eq_inverseRotateFirstH0_comp_h0Counit
 #print axioms CategoryTheory.DGAdjunction.UnitConeData
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitCone
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparison
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparison_app
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparison_isClosed
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparisonH0
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparisonH0_eq_h0Unit_comp_inrH0
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparisonShiftedH0
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.cotwistAdjointComparisonShiftedH0_eq
 #print axioms CategoryTheory.DGAdjunction.chosenCounitConeData
 #print axioms CategoryTheory.DGAdjunction.chosenUnitConeData
 #print axioms CategoryTheory.DGAdjunction.counit
@@ -701,6 +770,15 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₂
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_obj₃
 #print axioms CategoryTheory.Enhancement.coneTriangleFunctor_obj_distinguished
+#print axioms CategoryTheory.Enhancement.conePresentation
+#print axioms CategoryTheory.Enhancement.conePresentation_arrow
+#print axioms CategoryTheory.Enhancement.conePresentation_source
+#print axioms CategoryTheory.Enhancement.conePresentation_target
+#print axioms CategoryTheory.Enhancement.counit_conjugate_conePresentation_arrow
+#print axioms CategoryTheory.Enhancement.counit_conjugate_liftedCocycle
+#print axioms CategoryTheory.Enhancement.homMk_conePresentation_arrow
+#print axioms CategoryTheory.Enhancement.homMk_liftedCocycle
+#print axioms CategoryTheory.Enhancement.liftedCocycle
 
 -- Closed degree-zero dg natural transformations descend to `H⁰`, and a dg
 -- adjunction is an adjunction there.  This is the adapter that makes dg data
@@ -713,9 +791,32 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.h0Counit
 #print axioms CategoryTheory.DGAdjunction.h0Unit_app
 #print axioms CategoryTheory.DGAdjunction.h0Counit_app
+#print axioms CategoryTheory.DGAdjunction.h0_whiskerLeft_counit
+#print axioms CategoryTheory.DGAdjunction.h0_whiskerRight_unit
 #print axioms CategoryTheory.DGAdjunction.h0
 #print axioms CategoryTheory.DGAdjunction.h0_unit
 #print axioms CategoryTheory.DGAdjunction.h0_counit
+
+-- A strict dg adjunction transports through arbitrary equivalences out of its
+-- two homotopy categories and may then be presented by named ordinary
+-- functors.  The construction delegates composition and natural-isomorphism
+-- transport to Mathlib and retains explicit unit/counit formulas; it assumes
+-- the presentation isomorphisms and produces no dg lift or kernel.
+#print axioms CategoryTheory.DGAdjunction.transportedH0Left
+#print axioms CategoryTheory.DGAdjunction.transportedH0Right
+#print axioms CategoryTheory.DGAdjunction.transportedH0
+#print axioms CategoryTheory.DGAdjunction.transportedH0_unit_app
+#print axioms CategoryTheory.DGAdjunction.transportedH0_counit_app
+#print axioms CategoryTheory.DGAdjunction.H0Presentation
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.leftIso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rightIso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.mk.inj
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.mk.sizeOf_spec
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_unit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_counit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_unit_app
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.toAdjunction_counit_app
 
 -- The cone projections are graded-natural, so the objectwise cones of a closed
 -- degree-zero dg natural transformation assemble into a cone in the dg category
@@ -725,12 +826,17 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsConeOf.homogeneousLift_comp_snd_general
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.fst_isClosed
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.snd_app
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf_fst
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isConeOf_snd
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_hom_val
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_inv_val
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_hom_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.isoOfStrictSquare_inv_app
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inr_comp_isoOfStrictSquare_hom
 #print axioms CategoryTheory.DGFunctor.constZero
 #print axioms CategoryTheory.DGFunctor.constZero_obj
@@ -777,6 +883,20 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 -- functor" a statement about the dg functor rather than only about each value.
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_obj
 #print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_map
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_eq
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_hom_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_inv_app
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorCompIsoIdH0
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Iso_commShift
+#print axioms CategoryTheory.DGFunctor.transportedShiftedFunctorH0Iso
+#print axioms CategoryTheory.DGFunctor.transportedShiftedFunctorH0Iso_commShift
+#print axioms CategoryTheory.DGFunctor.shiftedFunctor_h0_isEquivalence
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0Equivalence
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0CommShift
+-- The shift witness selects the sign-correct comparison; cone preservation is
+-- supplied by the unconditional dg-functor theorem.
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorH0IsTriangulated
 
 -- `dg-enhancements-e10`: a quasi-equivalence of dg categories induces an
 -- equivalence on `H⁰`.  The seam between the `H⁰` Hom quotient and Mathlib's
@@ -869,6 +989,17 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.exists_shift_dgFunctor
 #print axioms CategoryTheory.DGFunctor.isPretriangulated_dgFunctor
 
+-- Precomposition by the inverse of a selected shift regrades a homogeneous
+-- transformation by shifting its source.  The additive equivalence preserves
+-- and reflects closedness, so degree-one cone projections can become the
+-- degree-zero maps out of a `[-1]` shift used by inverse-rotated triangles.
+#print axioms CategoryTheory.DGFunctor.shiftedFunctorWitness_inv_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.sourceShiftEquiv
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.sourceShiftEquiv_apply_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.sourceShiftEquiv_symm_apply_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.differential_sourceShiftEquiv
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.sourceShiftEquiv_isClosed_iff
+
 -- Whiskering a homogeneous dg natural transformation by a dg functor on either
 -- side.  Neither operation carries a sign, because a dg functor preserves the
 -- graded composition on the nose; the Koszul sign of the horizontal composite
@@ -936,9 +1067,19 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.isClosed_of_mem_cocycles
 #print axioms CategoryTheory.DGFunctor.mem_cocycles_of_isClosed
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_comp
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_comp'
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_whiskerLeft
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.h0_whiskerRight
 #print axioms CategoryTheory.DGFunctor.h0Comparison
 #print axioms CategoryTheory.DGFunctor.h0Comparison_obj
 #print axioms CategoryTheory.DGFunctor.h0Comparison_map_mk
+#print axioms CategoryTheory.DGFunctor.h0Iso
+#print axioms CategoryTheory.DGFunctor.h0Iso_hom
+#print axioms CategoryTheory.DGFunctor.h0Iso_inv
+#print axioms CategoryTheory.DGFunctor.h0Iso_hom_app
+#print axioms CategoryTheory.DGFunctor.h0Iso_inv_app
+#print axioms CategoryTheory.DGFunctor.h0Iso_refl
+#print axioms CategoryTheory.DGFunctor.h0Iso_trans
 
 -- The objectwise cones of a closed degree-zero dg natural transformation give
 -- a functor from `H⁰ C` to triangles of `H⁰ D`, every value distinguished.
@@ -956,6 +1097,15 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleFunctor_map_hom₃
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleFunctor_obj_mem_distinguishedTriangles
 
+-- Inverse rotation of a dg cone triangle reads its first map through the
+-- source-regraded degree-one cone projection.  The two conventional minus
+-- signs cancel, and Mathlib's packaged `[1][-1]` comparison is computed by
+-- the H⁰ shift witness rather than by a second cone-specific normalization.
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inverseRotateFirstH0
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.shiftedFstH0
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.inverseRotateFirstH0_app_eq_shiftedFstH0
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.shiftedFstH0_eq
+
 -- Naturality of that functor in the transformation.  A strictly commuting
 -- square of closed degree-zero dg natural transformations gives a natural
 -- transformation of triangle functors, and the cone lifts are natural on the
@@ -970,6 +1120,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.squareTriangleMorphism_hom₃
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleNatTrans
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleNatTrans_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare_hom_app
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare_hom_app_hom₁
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare_hom_app_hom₂
+#print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.triangleIsoOfStrictSquare_hom_app_hom₃
 
 -- Independence of the chosen cones.  Two `ConeData` for one transformation are
 -- related by the identity square, so the comparison is the identity case of
@@ -989,13 +1144,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_hom
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compareIso_inv
 
--- A cone functor preserves chosen cones when its two ends do, so the twist
--- candidate of a dg adjunction is exact as soon as the adjoints are.  That
--- argument is the cone splitting rather than a computation: in the coordinates
--- of the splittings the map is block diagonal, with one sign.  The shift
--- versions below take no arguments at all -- `DGFunctor.preservesShifts` holds
--- for every dg functor, so the cone splitting is not needed for them and the
--- specialised proofs were removed.
+-- The structured cone-functor constructor computes chosen-cone preservation
+-- from its endpoints.  Its block-diagonal proof remains useful even though
+-- `DGFunctor.preservesChosenCones` makes the endpoint arguments redundant for
+-- exactness consumers.  The shift versions likewise retain useful names over
+-- the unconditional generic capability.
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.compRight_functor_map
 #print axioms CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData.preservesShifts
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.preservesShifts
@@ -1020,6 +1173,92 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_map_hom₁
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleFunctor_map_hom₃
 #print axioms CategoryTheory.DGAdjunction.CounitConeData.twistTriangleIso
+
+-- A supplied presentation of the two H⁰ functors transports the raw dg
+-- counit triangle to an ordinary family whose first two vertices and first map
+-- are literal.  The generic triangle normalizer owns the transport; this
+-- adapter names the transported twist and the other two maps and proves only
+-- pointwise distinguishedness under the target equivalence's triangulatedness.
+-- It constructs no ordinary or Fourier--Mukai twist comparison and asserts no
+-- exactness, autoequivalence, or sphericality.
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.transportedTwist
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.rawTransportedTwistTriangle
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.rawTransportedTwistTriangle_obj_obj₃
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.rawTransportedTwistTriangle_obj_mor₁
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.rawTransportedTwistTriangleObj₂Iso
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.rawTransportedTwistTriangleObj₂Iso_hom_app
+#print axioms CategoryTheory.DGAdjunction.CounitConeData.rawTransportedTwistTriangle_obj_distinguished
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.counitTriangleObj₁Iso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.counitFirstMapNormalizationData
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.counitToTransportedTwist
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.transportedTwistToShiftedComposite
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCounitTriangle
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCounitTriangle_obj₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCounitTriangle_obj₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCounitTriangle_obj₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCounitTriangle_mor₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCounitTriangle_mor₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCounitTriangle_mor₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedTwistTriangleIsoPresented
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedTwistTriangleIsoPresented_hom_app_hom₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedTwistTriangleIsoPresented_hom_app_hom₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedTwistTriangleIsoPresented_hom_app_hom₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCounitTriangle_obj_distinguished
+
+-- The source-side mirror presents the transported dg unit triangle with
+-- literal identity and adjunction-composite vertices and literal unit first
+-- map.  Its third vertex remains the unshifted unit cone: this block audits no
+-- inverse rotation, conventional cotwist, Fourier--Mukai comparison,
+-- exactness, equivalence, or sphericality claim.
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedUnitCone
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangle
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangle_obj_obj₃
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangle_obj_mor₁
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangleObj₁Iso
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangleObj₁Iso_hom_app
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.rawTransportedUnitTriangle_obj_distinguished
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.unitTriangleObj₂Iso
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.unitFirstMapNormalizationData
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.compositeToTransportedUnitCone
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.transportedUnitConeToShiftedIdentity
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_obj₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_obj₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_obj₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_mor₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_mor₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_mor₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented_hom_app_hom₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented_hom_app_hom₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.rawTransportedUnitTriangleIsoPresented_hom_app_hom₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedUnitTriangle_obj_distinguished
+
+-- Inverse rotation presents the conventional pointwise `[-1]` cotwist, while
+-- a generic transport/shift comparison identifies it with the H⁰ transport of
+-- the actual shifted dg unit cone.  Exactness reuses the canonical pointwise
+-- shift package, and autoequivalence requires an explicit equivalence
+-- hypothesis on the unshifted cone.  No dg quasi-equivalence, Fourier--Mukai
+-- comparison, choice independence, or sphericality is inferred.
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedDGCotwist
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwist
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistH0Iso
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistCommShift
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistH0Iso_commShift
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwist_isEquivalence
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistEquivalence
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistIsTriangulated
+#print axioms CategoryTheory.DGAdjunction.UnitConeData.transportedCotwistEquivalenceIsTriangulated
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_comp_π₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_comp_π₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_comp_π₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_obj₁
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_obj₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_obj₃
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_mor₂
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_unit
+#print axioms CategoryTheory.DGAdjunction.H0Presentation.presentedCotwistTriangle_obj_distinguished
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_mem_distinguishedTriangles
 #print axioms CategoryTheory.DGAdjunction.UnitConeData.unitTriangleFunctor_obj_obj₁
@@ -1065,6 +1304,280 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.HasCopowers.has_copower
 #print axioms CategoryTheory.hasCopowerOfHasCopowers
 
+-- The genuinely `k`-linear counterpart is separate: `DGLinear.homComplex` reuses the
+-- existing graded pieces and differential in `ModuleCat k`, while
+-- `IsLinearCopowerOf` represents only `k`-linear cochains.  There is no
+-- forgetful projection to `IsCopowerOf`, whose universal property ranges over
+-- every additive cochain.  Choice, comparison, and existence use the same
+-- universal-property pattern without asserting an Euler-class computation.
+#print axioms CategoryTheory.linearCopowerCochain
+#print axioms CategoryTheory.linearCopowerCochain_apply
+#print axioms CategoryTheory.IsLinearCopowerOf
+#print axioms CategoryTheory.IsLinearCopowerOf.univ
+#print axioms CategoryTheory.IsLinearCopowerOf.bijective
+#print axioms CategoryTheory.IsLinearCopowerOf.mk.inj
+#print axioms CategoryTheory.IsLinearCopowerOf.mk.sizeOf_spec
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_d
+#print axioms CategoryTheory.IsLinearCopowerOf.cochainLinearEquiv
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_unique
+#print axioms CategoryTheory.IsLinearCopowerOf.lift
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_zero
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_add
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_smul
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_comp_lift
+#print axioms CategoryTheory.IsLinearCopowerOf.compare
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_comp_compare
+#print axioms CategoryTheory.IsLinearCopowerOf.compare_mem_cocycles
+#print axioms CategoryTheory.IsLinearCopowerOf.compare_comp_compare
+#print axioms CategoryTheory.IsLinearCopowerOf.compare_trans
+#print axioms CategoryTheory.IsLinearCopowerOf.compare_self
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso_hom_val
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso_inv_val
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso_self
+#print axioms CategoryTheory.IsLinearCopowerOf.compareIso_trans
+#print axioms CategoryTheory.LinearCopowerData
+#print axioms CategoryTheory.LinearCopowerData.obj
+#print axioms CategoryTheory.LinearCopowerData.isLinearCopower
+#print axioms CategoryTheory.LinearCopowerData.mk.inj
+#print axioms CategoryTheory.LinearCopowerData.mk.sizeOf_spec
+#print axioms CategoryTheory.HasLinearCopower
+#print axioms CategoryTheory.HasLinearCopower.exists_linearCopower
+#print axioms CategoryTheory.HasLinearCopower.of_isLinearCopower
+#print axioms CategoryTheory.linearCopowerData
+#print axioms CategoryTheory.linearCopowerObj
+#print axioms CategoryTheory.linearCopowerIsLinearCopower
+#print axioms CategoryTheory.HasLinearCopowers
+#print axioms CategoryTheory.HasLinearCopowers.has_linearCopower
+#print axioms CategoryTheory.hasLinearCopowerOfHasLinearCopowers
+
+-- In the standard same-universe dg category of module complexes, Mathlib's
+-- total tensor product realizes the scalar-linear copower.  The degreewise
+-- tensor--Hom equivalence uses the existing total coproduct and module tensor
+-- universal properties, while the universal chain-map law is the standard
+-- cancellation of the two vertical Koszul signs.  This supplies a concrete
+-- scalar-linear instance, not an additive copower or a new tensor abstraction.
+#print axioms CategoryTheory.Cdg.linearTensorObj
+#print axioms CategoryTheory.Cdg.linearTensorιOfEq
+#print axioms CategoryTheory.Cdg.linearTensorι
+#print axioms CategoryTheory.Cdg.tensorCurryCochain
+#print axioms CategoryTheory.Cdg.tensorCochainLinearEquiv
+#print axioms CategoryTheory.Cdg.linearTensorUnivCochain
+#print axioms CategoryTheory.Cdg.linearTensorUnivCochain_apply
+#print axioms CategoryTheory.Cdg.linearTensorι_d_apply
+#print axioms CategoryTheory.Cdg.linearTensorUnivCochain_mem
+#print axioms CategoryTheory.Cdg.linearTensorUnivCocycle
+#print axioms CategoryTheory.Cdg.linearTensorUniv
+#print axioms CategoryTheory.Cdg.cochain_ofHom_linearTensorUniv
+#print axioms CategoryTheory.Cdg.linearCopowerCochain_linearTensorUniv
+#print axioms CategoryTheory.Cdg.isLinearCopowerOfLinearTensor
+#print axioms CategoryTheory.Cdg.hasLinearCopowers
+
+-- The literal degree-zero single on the scalar ring represents `X` itself.
+-- Its universal map sends the scalar unit to the dg identity, and the selected
+-- object comparison descends from the strict `Z⁰` comparison above.  This
+-- supplies no global copower instance.
+#print axioms CategoryTheory.linearCopowerUnitCocycle
+#print axioms CategoryTheory.linearCopowerUnitUniv
+#print axioms CategoryTheory.cochain_ofHom_linearCopowerUnitUniv
+#print axioms CategoryTheory.isLinearCopowerOfUnit
+#print axioms CategoryTheory.linearCopowerUnitIso
+
+-- Coefficient-complex functoriality is a single linear dg functor, not a
+-- collection of unrelated degree-zero comparisons.  Its Hom-complex
+-- isomorphism owns differential compatibility; homotopies descend to equality
+-- in `H⁰`, and the selected homotopy-equivalence comparison reuses the existing
+-- `H⁰(Cdg) ≃ HomotopyCategory` seam.  No quasi-isomorphism or Euler claim is
+-- made.
+#print axioms CategoryTheory.IsLinearCopowerOf.linearCopowerCochain_d
+#print axioms CategoryTheory.IsLinearCopowerOf.homComplexIso
+#print axioms CategoryTheory.IsLinearCopowerOf.homComplexIso_hom_f_apply
+#print axioms CategoryTheory.IsLinearCopowerOf.homComplexIso_inv_f_apply
+#print axioms CategoryTheory.IsLinearCopowerOf.lift_d
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_comp_coefficientMap
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap_d
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap_comp
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap_id
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMap_id_eq_compare
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom
+#print axioms CategoryTheory.IsLinearCopowerOf.univ_comp_coefficientMapOfHom
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom_mem_cocycles
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom_id_eq_compare
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom_comp
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientMapOfHom_sub_mem_coboundaries
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientHom
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientHom_eq_of_homotopy
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientHom_id
+#print axioms CategoryTheory.IsLinearCopowerOf.coefficientHom_comp
+#print axioms CategoryTheory.IsLinearCopowerOf.homotopyEquivIso
+#print axioms CategoryTheory.linearCopowerFunctor
+#print axioms CategoryTheory.linearCopowerFunctor_linear
+#print axioms CategoryTheory.linearCopowerFunctor_obj
+#print axioms CategoryTheory.linearCopowerFunctor_map
+#print axioms CategoryTheory.linearCopowerObjIsoOfHomotopyEquiv
+
+-- Fixed-source right composition is the k-linear dg Hom functor.  With all
+-- scalar-linear copowers, its selected left adjoint is the copower functor:
+-- the unit is the universal copower map and the counit is exactly the existing
+-- selected evaluation transformation.  The triangle identities are strict.
+-- This constructs neither Perf(k) nor a spherical or additive adjunction.
+#print axioms CategoryTheory.DGLinear.homFunctor
+#print axioms CategoryTheory.DGLinear.homFunctor_obj
+#print axioms CategoryTheory.DGLinear.homFunctor_map
+#print axioms CategoryTheory.DGLinear.homFunctor_linear
+#print axioms CategoryTheory.LinearEvaluationData.ofHasLinearCopowers_functor_eq
+#print axioms CategoryTheory.linearCopowerAdjunction
+#print axioms CategoryTheory.linearCopowerAdjunction_unit_app
+#print axioms CategoryTheory.linearCopowerAdjunction_counit
+#print axioms CategoryTheory.linearCopowerAdjunction_counit_app
+
+-- The generic `H⁰` finite-free leaf packages shifted single copowers.  A
+-- supplied basis expands a degree-zero copower, with arbitrary finite index
+-- universes handled by categorical reindexing, and finite free modules have
+-- the noncanonical finrank specialization.  This makes no formality,
+-- basis-independence, or Euler claim.
+#print axioms CategoryTheory.linearCopowerSingleFunctors
+#print axioms CategoryTheory.linearCopowerSingleFunctors_obj
+#print axioms CategoryTheory.linearCopowerSingleZeroIsoOfBasis
+#print axioms CategoryTheory.linearCopowerSingleZeroFinrankIso
+
+-- Supplied finite cohomology presentations transport through the linear
+-- copower functor to finite biproducts of shifted degree-zero copowers, then
+-- consume the generic finrank expansion when their homology is finite free.
+#print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerIso
+#print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerFinrankIso
+
+-- The supplied-presentation numerical leaf combines the finite-free normal
+-- form with generic finite-biproduct and integral-shift calculus in
+-- triangulated `K₀`.  It uses Mathlib's homological Euler characteristic and
+-- gets its support bound only from the supplied presentation; it does not
+-- infer formality, a presentation from bare finiteness, or an evaluation-data
+-- comparison.
+#print axioms CochainComplex.FiniteCohomologyPresentation.linearCopowerK₀Of
+
+-- Hom-complex cohomology and selected shifts have the same junk-total Euler
+-- characteristic.  `HomFiniteBounded` selects a finite support, coefficient-
+-- side formality constructs the corresponding presentation, and the existing
+-- finite-presentation consumer computes scalar-linear evaluation through the
+-- shared rank-one K₀ interface.  This adds no exactness of the evaluation
+-- functor and supplies no adapter to additive evaluation data.
+#print axioms CategoryTheory.H0.homComplex_homologyEulerChar_eq_chiHom
+#print axioms CategoryTheory.H0.homComplexCohomologyDegrees
+#print axioms CategoryTheory.H0.isZero_homComplex_homology_of_not_mem
+#print axioms CategoryTheory.H0.homComplexFiniteCohomologyPresentation
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofCompare
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofFiniteCohomologyPresentations
+#print axioms CategoryTheory.LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded
+
+-- Scalar-linear evaluation data assembles the linear copowers at a fixed
+-- object into a `k`-linear dg functor and a closed evaluation transformation.
+-- Its existence selector is choice-independent up to a coherent canonical
+-- `Z⁰` isomorphism which commutes strictly with evaluation.  This remains
+-- separate from additive `EvaluationData` and asserts no Euler computation.
+#print axioms CategoryTheory.LinearEvaluationData
+#print axioms CategoryTheory.LinearEvaluationData.obj
+#print axioms CategoryTheory.LinearEvaluationData.isLinearCopower
+#print axioms CategoryTheory.LinearEvaluationData.mk.inj
+#print axioms CategoryTheory.LinearEvaluationData.mk.sizeOf_spec
+#print axioms CategoryTheory.HasLinearEvaluationData
+#print axioms CategoryTheory.HasLinearEvaluationData.exists_linearEvaluationData
+#print axioms CategoryTheory.chosenLinearEvaluationData
+#print axioms CategoryTheory.LinearEvaluationData.ofHasLinearCopowers
+#print axioms CategoryTheory.LinearEvaluationData.hasLinearEvaluationDataOfHasLinearCopowers
+#print axioms CategoryTheory.LinearEvaluationData.map
+#print axioms CategoryTheory.LinearEvaluationData.univ_comp_map
+#print axioms CategoryTheory.LinearEvaluationData.functor
+#print axioms CategoryTheory.LinearEvaluationData.functor_obj
+#print axioms CategoryTheory.LinearEvaluationData.functor_map
+#print axioms CategoryTheory.LinearEvaluationData.functorLinear
+#print axioms CategoryTheory.LinearEvaluationData.evalHom
+#print axioms CategoryTheory.LinearEvaluationData.univ_comp_evalHom
+#print axioms CategoryTheory.LinearEvaluationData.evaluation
+#print axioms CategoryTheory.LinearEvaluationData.evaluation_isClosed
+#print axioms CategoryTheory.LinearEvaluationData.compare
+#print axioms CategoryTheory.LinearEvaluationData.compare_app
+#print axioms CategoryTheory.LinearEvaluationData.compare_isClosed
+#print axioms CategoryTheory.LinearEvaluationData.compare_comp
+#print axioms CategoryTheory.LinearEvaluationData.compare_self
+#print axioms CategoryTheory.LinearEvaluationData.compareIso
+#print axioms CategoryTheory.LinearEvaluationData.compareIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.compareIso_inv_val
+#print axioms CategoryTheory.LinearEvaluationData.compareIso_self
+#print axioms CategoryTheory.LinearEvaluationData.compareIso_trans
+#print axioms CategoryTheory.LinearEvaluationData.compare_comp_evaluation
+
+-- The direct scalar-linear object twist is a thin specialization of the
+-- generic cone package.  Choice comparison reuses the existing strict-square
+-- interface, while exactness follows automatically for every dg functor.
+-- Its H⁰ and K₀ leaves therefore take no cone witness; the lower structured
+-- 3-by-3 constructor remains available.  Its generic K₀ formulas give
+-- identity minus evaluation.  The numerical spherical-twist specialization is audited by
+-- the spherical-twist slice, while the HomFiniteBounded realization below
+-- supplies its Euler witness automatically.
+#print axioms CategoryTheory.LinearEvaluationData.preservesChosenConesOfCompare
+#print axioms CategoryTheory.LinearEvaluationData.compare_evaluation_square
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData
+#print axioms CategoryTheory.LinearEvaluationData.chosenTwistConeData
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twist
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_inv_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.inclusion_comp_compareIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_hom_val_comp
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesShifts
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.preservesChosenCones
+
+-- Under all scalar-linear copowers, selected object-twist cone data is
+-- definitionally the copower--Hom adjunction's counit-cone data.  Arbitrary
+-- choices compare canonically in Z⁰, strictly over the identity inclusion and
+-- coherently under changes of evaluation data.  The scalar-linear H⁰ triangle
+-- package and its adjunction comparison are the generic strict-square cone
+-- comparison at the full triangle-functor level.  These statements concern
+-- all module complexes and assert neither Perf(k), sphericality, nor
+-- autoequivalence.
+#print axioms CategoryTheory.linearCopowerAdjunction_counitConeData_eq
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_eq_compareIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.inclusion_comp_adjunctionTwistIso_hom_val
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twist_eq_adjunctionTwist
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.compareIso_trans_adjunctionTwistIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mem_distinguishedTriangles
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_obj₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_obj_mor₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistH0CommShift
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistH0IsTriangulated
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_eq_adjunctionTwistTriangleFunctor
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₁
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_hom_app_hom₃
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.adjunctionTwistTriangleIso_self
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans_adjunctionTwistTriangleIso
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Of_eq_twistK₀_ofHomFiniteBounded
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistK₀Map_eq_twistK₀_ofHomFiniteBounded
+
 -- The evaluation functor `RHom(E,-) ⊗ E` and its transformation to the
 -- identity.  Every one of the functor's four laws is `lift_unique` applied to
 -- the cochain each side induces; only `map_d` needs more than associativity,
@@ -1100,9 +1613,15 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.compareIso
 #print axioms CategoryTheory.EvaluationData.compareIso_hom_val
 #print axioms CategoryTheory.EvaluationData.compareIso_inv_val
+#print axioms CategoryTheory.EvaluationData.compareIso_self
+#print axioms CategoryTheory.EvaluationData.compareIso_trans
 #print axioms CategoryTheory.EvaluationData.compare_comp_evaluation
 #print axioms CategoryTheory.EvaluationData.preservesChosenConesOfCompare
 #print axioms CategoryTheory.EvaluationData.compare_evaluation_square
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Of
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistK₀Map
+#print axioms CategoryTheory.EvaluationData.IsEulerCopower
+#print axioms CategoryTheory.EvaluationData.IsEulerCopower.ofCompare
 
 -- The Seidel--Thomas twist of an *object*: the cone of `RHom(E,-) ⊗ E ⟶ id`.
 -- `evaluation_isClosed` is the whole input beyond the generic cone layer, and
@@ -1135,13 +1654,17 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₃
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIso
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₁
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₂
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_hom_app_hom₃
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_self
+#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleIsoOfEvaluation_trans
 
--- Exactness of the object twist.  The shift half is free -- every dg functor
--- preserves shifts, `DGFunctor.preservesShifts` -- so only the cone half is a
--- hypothesis, and it is `RHom(E,-) ⊗ E`'s.  That one stays open:
--- `PreservesChosenCones` asks that maps into the cone split, while
--- `IsCopowerOf` is a mapping-out property.  Exact is not autoequivalence; the
--- object twist has no autoequivalence statement.
+-- Exactness of the object twist is automatic: every dg functor preserves both
+-- shifts and the repository's strong split cones.  The public H⁰ and K₀
+-- consumers take no witness; the structured 3-by-3 constructor remains below.
+-- Exact is not autoequivalence; the object twist has no autoequivalence statement.
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesShifts
 #print axioms CategoryTheory.EvaluationData.TwistConeData.preservesChosenCones
 #print axioms CategoryTheory.EvaluationData.TwistConeData.twistH0CommShift

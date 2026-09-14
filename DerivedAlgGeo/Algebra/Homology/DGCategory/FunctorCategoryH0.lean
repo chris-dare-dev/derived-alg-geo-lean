@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformationH0
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Whiskering
 
 /-!
 # `H⁰` of the dg category of dg functors, compared with ordinary functors
@@ -14,6 +15,12 @@ dg natural transformations up to homotopy.  Separately, every dg functor has an
 says those two facts assemble into a functor
 
 `H⁰ (DGFunctor C D) ⥤ (H⁰ C ⥤ H⁰ D)`.
+
+It also records the pseudofunctorial bookkeeping needed by consumers:
+strict vertical composition descends to ordinary composition, and dg left or
+right whiskering descends through the canonical `h0CompIso` compositors.
+These are equalities of natural transformations, so later cone and adjunction
+arguments do not need to repeat componentwise quotient calculations.
 
 ## What the functor is, and what it is not
 
@@ -42,7 +49,7 @@ the dg functor category is the pointwise one, so the two components agree in
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u u'
+universe v u u' u''
 
 namespace CategoryTheory
 
@@ -81,6 +88,56 @@ theorem HomogeneousNatTrans.h0_comp {F G H : DGFunctor C D}
   rw [H0.homMk_comp]
   exact congrArg _ (Subtype.ext
     (HomogeneousNatTrans.composition_apply_app η θ 0 (by omega) (H0.of C X)))
+
+/-- Descending the strict vertical composite of homogeneous transformations
+is composition of their descents.  This primed form targets the direct
+`HomogeneousNatTrans.comp` API; `h0_comp` targets its additive
+arbitrary-result-degree `composition` wrapper. -/
+theorem HomogeneousNatTrans.h0_comp' {F G H : DGFunctor C D}
+    (η : HomogeneousNatTrans F G 0) (θ : HomogeneousNatTrans G H 0)
+    (hη : HomogeneousNatTrans.IsClosed η)
+    (hθ : HomogeneousNatTrans.IsClosed θ)
+    (hηθ : HomogeneousNatTrans.IsClosed (HomogeneousNatTrans.comp η θ)) :
+    HomogeneousNatTrans.h0 _ hηθ =
+      HomogeneousNatTrans.h0 η hη ≫ HomogeneousNatTrans.h0 θ hθ := by
+  change HomogeneousNatTrans.h0
+      (HomogeneousNatTrans.composition F G H 0 0 0 (by omega) η θ) _ = _
+  exact HomogeneousNatTrans.h0_comp η θ hη hθ hηθ
+
+/-- Descent to `H⁰` commutes with dg left whiskering, through the canonical
+comparisons between `H⁰` of a composite and the composite of `H⁰` functors. -/
+theorem HomogeneousNatTrans.h0_whiskerLeft {E : Type u''} [DGCategory.{v} E]
+    (P : DGFunctor C D) {F G : DGFunctor D E}
+    (η : HomogeneousNatTrans F G 0) (hη : HomogeneousNatTrans.IsClosed η) :
+    HomogeneousNatTrans.h0 (HomogeneousNatTrans.whiskerLeft P η)
+        (hη.whiskerLeft P) =
+      (h0CompIso P F).hom ≫
+        Functor.whiskerLeft P.h0 (HomogeneousNatTrans.h0 η hη) ≫
+          (h0CompIso P G).inv := by
+  ext X
+  change H0.homMk (C := E)
+        ⟨HomogeneousNatTrans.app η (P.obj (H0.of C X)), _⟩ =
+      𝟙 _ ≫ H0.homMk (C := E)
+        ⟨HomogeneousNatTrans.app η (P.obj (H0.of C X)), _⟩ ≫ 𝟙 _
+  simp
+
+/-- Descent to `H⁰` commutes with dg right whiskering, through the canonical
+comparisons between `H⁰` of a composite and the composite of `H⁰` functors. -/
+theorem HomogeneousNatTrans.h0_whiskerRight {E : Type u''} [DGCategory.{v} E]
+    {F G : DGFunctor C D} (η : HomogeneousNatTrans F G 0)
+    (hη : HomogeneousNatTrans.IsClosed η) (P : DGFunctor D E) :
+    HomogeneousNatTrans.h0 (HomogeneousNatTrans.whiskerRight η P)
+        (hη.whiskerRight P) =
+      (h0CompIso F P).hom ≫
+        Functor.whiskerRight (HomogeneousNatTrans.h0 η hη) P.h0 ≫
+          (h0CompIso G P).inv := by
+  ext X
+  change H0.homMk (C := E)
+        ⟨P.map 0 (HomogeneousNatTrans.app η (H0.of C X)), _⟩ =
+      𝟙 _ ≫ P.h0.map
+        (H0.homMk (C := D) ⟨HomogeneousNatTrans.app η (H0.of C X), _⟩) ≫ 𝟙 _
+  rw [Category.id_comp, Category.comp_id]
+  rfl
 
 variable (C D) in
 /-- **The comparison functor.**
@@ -150,6 +207,70 @@ theorem h0Comparison_map_mk {F G : H0 (DGFunctor C D)}
     (h0Comparison C D).map (QuotientAddGroup.mk a) =
       HomogeneousNatTrans.h0 a.1 (isClosed_of_mem_cocycles a.2) :=
   rfl
+
+/-- An isomorphism of dg functors in the closed degree-zero category descends
+to a natural isomorphism between their `H⁰` functors.  This is the image under
+the canonical composite `Z⁰ → H⁰ → Fun(H⁰ C, H⁰ D)`. -/
+noncomputable def h0Iso {F G : Z0 (DGFunctor C D)} (e : F ≅ G) :
+    (Z0.of (DGFunctor C D) F).h0 ≅ (Z0.of (DGFunctor C D) G).h0 :=
+  (h0Comparison C D).mapIso ((Z0.toH0 (DGFunctor C D)).mapIso e)
+
+@[simp]
+theorem h0Iso_hom {F G : Z0 (DGFunctor C D)} (e : F ≅ G) :
+    (h0Iso e).hom =
+      HomogeneousNatTrans.h0 e.hom.val
+        (isClosed_of_mem_cocycles e.hom.2) :=
+  rfl
+
+@[simp]
+theorem h0Iso_inv {F G : Z0 (DGFunctor C D)} (e : F ≅ G) :
+    (h0Iso e).inv =
+      HomogeneousNatTrans.h0 e.inv.val
+        (isClosed_of_mem_cocycles e.inv.2) :=
+  rfl
+
+@[simp]
+theorem h0Iso_hom_app {F G : Z0 (DGFunctor C D)} (e : F ≅ G) (X : H0 C) :
+    ((h0Iso e).app X).hom =
+      (HomogeneousNatTrans.h0 e.hom.val
+        (isClosed_of_mem_cocycles e.hom.2)).app X :=
+  rfl
+
+@[simp]
+theorem h0Iso_inv_app {F G : Z0 (DGFunctor C D)} (e : F ≅ G) (X : H0 C) :
+    ((h0Iso e).app X).inv =
+      (HomogeneousNatTrans.h0 e.inv.val
+        (isClosed_of_mem_cocycles e.inv.2)).app X :=
+  rfl
+
+@[simp]
+theorem h0Iso_refl (F : Z0 (DGFunctor C D)) :
+    h0Iso (Iso.refl F) = Iso.refl (Z0.of (DGFunctor C D) F).h0 := by
+  calc
+    h0Iso (Iso.refl F) =
+        (h0Comparison C D).mapIso
+          (Iso.refl ((Z0.toH0 (DGFunctor C D)).obj F)) := by
+      rw [h0Iso, Functor.mapIso_refl]
+      rfl
+    _ = Iso.refl ((h0Comparison C D).obj
+        ((Z0.toH0 (DGFunctor C D)).obj F)) :=
+      Functor.mapIso_refl _ _
+    _ = _ := rfl
+
+theorem h0Iso_trans {F G H : Z0 (DGFunctor C D)} (e : F ≅ G) (f : G ≅ H) :
+    h0Iso (e.trans f) = (h0Iso e).trans (h0Iso f) := by
+  calc
+    h0Iso (e.trans f) = (h0Comparison C D).mapIso
+        (((Z0.toH0 (DGFunctor C D)).mapIso e).trans
+          ((Z0.toH0 (DGFunctor C D)).mapIso f)) := by
+      rw [h0Iso, Functor.mapIso_trans]
+      rfl
+    _ = ((h0Comparison C D).mapIso
+          ((Z0.toH0 (DGFunctor C D)).mapIso e)).trans
+        ((h0Comparison C D).mapIso
+          ((Z0.toH0 (DGFunctor C D)).mapIso f)) :=
+      Functor.mapIso_trans _ _ _
+    _ = _ := rfl
 
 end DGFunctor
 

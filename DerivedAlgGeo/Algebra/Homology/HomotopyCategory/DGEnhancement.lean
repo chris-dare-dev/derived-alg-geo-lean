@@ -8,6 +8,13 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.ShiftCompar
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.CommShift
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.Enhancement
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.Agreement
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearCopower
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearCopowerFiniteFree
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.FiniteCohomologyCopower
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.FiniteCohomologyCopowerK0
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.HomComplexFiniteCohomologyPresentation
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearEvaluationK0
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearObjectTwistK0
 
 /-!
 # The dg enhancement of the homotopy category

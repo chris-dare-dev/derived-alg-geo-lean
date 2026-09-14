@@ -23,24 +23,41 @@ concurrency:
   # github.event.pull_request.head.ref is `agent/x` while github.ref is
   # `refs/heads/agent/x`; it would take github.head_ref || github.ref_name.)
   #
-  # `main` and the merge queue are EXEMPT from cancellation, and that exemption
-  # is what keeps the README's CI badge honest. The badge renders the newest
-  # run of this workflow on `main`; with a blanket `cancel-in-progress: true`
-  # every merge cancelled the run the previous merge had just started, so at
-  # this repository's cadence -- 51 of the last 60 `main` runs were cancelled,
-  # against 5 successes -- the newest completed run was almost always
-  # `cancelled`, which the badge draws as a failure. Nothing was broken; the
-  # badge was reporting the concurrency rule, not the build.
+  # `main` and the merge queue are EXEMPT from cancellation, AND `main` is keyed
+  # per commit, because cancellation is only half of what evicts a run.
   #
-  # This does NOT queue one run per merge. GitHub keeps at most one PENDING run
-  # per concurrency group: a third arrival cancels the second while it is still
-  # waiting, so the exemption costs one extra in-flight run on `owner-win`, not
-  # a backlog. The run that survives is always the newest, which is the one the
-  # badge reads.
+  # The badge renders the newest run of this workflow on `main`, and it draws a
+  # `cancelled` run as a failure. `cancel-in-progress: false` protects a run
+  # that has already STARTED. It does nothing for a run that is still QUEUED:
+  # GitHub keeps at most one PENDING run per concurrency group, so the next
+  # merge evicts the waiting one no matter what this flag says.
+  #
+  # That is not theoretical. On 2026-09-13, with two busy `owner-win` runners
+  # and a ~13 minute build, main runs were arriving faster than they could
+  # start: runs 34727342451 (a2dae262) and 34728317209 (ffdb7796) were both
+  # cancelled with `jobs: 0`, having never been assigned a runner, and the last
+  # 30 `main` runs of this workflow were 26 cancelled, 2 failure, 0 success.
+  # The badge read `failing` for hours while every gate actually passed.
+  #
+  # An earlier version of this comment claimed the exemption "keeps the
+  # README's CI badge honest" and that it "does NOT queue one run per merge",
+  # on the reasoning that "the run that survives is always the newest, which is
+  # the one the badge reads". That holds only if no newer merge arrives before
+  # the pending run starts. At this repository's cadence one always does, so
+  # the surviving run was perpetually the newest QUEUED one and never a
+  # completed one.
+  #
+  # Keying `main` by `github.sha` gives every commit its own group, so main runs
+  # never evict each other and each merge is actually verified. This DOES cost
+  # one full build per merge on `owner-win` -- the thing the old comment was
+  # trying to avoid -- which is the deliberate trade: a badge that reports the
+  # build is worth more than runner time spent cancelling the evidence for it.
+  # If that cost bites, reduce the merge rate or add a runner; do not restore
+  # the shared key and expect the badge to mean anything.
   #
   # Branch lanes keep the old behaviour deliberately -- an agent branch that is
   # pushed five times in a minute has no reason to build the first four.
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}${{ github.ref == 'refs/heads/main' && format('-{0}', github.sha) || '' }}
   cancel-in-progress: >-
     ${{ github.ref != 'refs/heads/main' && github.event_name != 'merge_group' }}
 
@@ -152,9 +169,61 @@ jobs:
     # NOTE the indentation: in a `>-` scalar, a line indented DEEPER than the
     # first is folded literally and keeps its newline. These three lines are
     # deliberately flush with each other so this folds to one line.
+    #
+    # MAIN HAS ITS OWN LABEL, AND THE REASON IS STARVATION, NOT PREFERENCE.
+    # On 2026-09-13 `main` had EIGHT consecutive `ci` runs sitting at `queued`,
+    # the oldest 11 hours old, none of which was ever allocated a runner. Every
+    # one carried a real `build` job asking for `self-hosted, owner-win`; both
+    # runners were `online` and `busy`; and the work occupying them was agent
+    # branches pushed minutes earlier. GitHub does not prioritise, so with
+    # continuous branch pushes against two runners the `main` job never reaches
+    # the front, and a queued job is dropped unrun at 24 hours.
+    #
+    # This is the SECOND shape of this defect. The first was eviction -- main
+    # runs cancelling each other -- which #1258 fixed by keying main's
+    # concurrency group per commit. That stopped the cancelling and turned it
+    # into a backlog, which is why the badge still does not reflect the tree:
+    # `main` has never produced a verdict either way.
+    #
+    # Concurrency cannot fix this, because it bounds how many runs exist, not
+    # which one gets a runner. Label partitioning is the only lever GitHub
+    # gives, so `main` asks for `owner-win-main` and branch pushes cannot.
+    #
+    # CAPACITY WAS ADDED RATHER THAN DIVIDED, and that was a deliberate choice
+    # between two shapes. Taking `owner-win` off one of the two existing
+    # runners would have reserved it for `main` at no hardware cost, but branch
+    # capacity would have halved across roughly sixty active lanes. Instead a
+    # THIRD runner is registered on the same Windows box carrying only
+    # `owner-win-main`, so branches keep both of the runners they had.
+    #
+    # `owner-win-main` is deliberately ALSO left on runner 24. That is not an
+    # oversight. It gives `main` two eligible runners of which one is
+    # exclusive, so `main` cannot starve however long a branch burst runs, and
+    # it keeps this file correct whether or not the third runner is up -- the
+    # failure that avoids is naming a label nothing carries, which queues every
+    # `main` push forever.
+    #
+    # THE COST IS CONTENTION, NOT QUEUEING. Three concurrent Lean builds now
+    # share one workstation that the owner also builds on locally. That is the
+    # same condition behind the 2026-08-07 truncated-audit incident recorded in
+    # scripts/check_audit.py's docstring, and it is now likelier, not less. If
+    # audits start truncating or builds start dying for memory, this is the
+    # first thing to look at, and the answer is to stop building locally during
+    # a merge burst -- or to drop back to two runners and accept the split.
+    #
+    # LABELS ARE ROUTING, NOT PLACEMENT. Every runner named here is a process
+    # on the owner's own Windows machine; a label decides which jobs a runner
+    # accepts, never which hardware it runs on. The `owner-mac` prohibition
+    # above concerns a DIFFERENT machine and is untouched by any of this.
+    #
+    # THE ROUTING INVARIANT IS PRESERVED: this is a third self-hosted lane and
+    # it keys on `push` / `workflow_dispatch` and nothing else, exactly as the
+    # rule above requires. `pull_request` and `merge_group` still fall through
+    # to `ubuntu-latest`.
     runs-on: >-
       ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-      && fromJSON('["self-hosted", "owner-win"]')
+      && ((github.ref == 'refs/heads/main' && fromJSON('["self-hosted", "owner-win-main"]'))
+      || fromJSON('["self-hosted", "owner-win"]'))
       || 'ubuntu-latest' }}
     timeout-minutes: 90
 
@@ -549,6 +618,25 @@ jobs:
           # Style is per-file and cheap; it always runs.
           lake exe lint-style
 
+      - name: Compiler warning ratchet
+        run: |
+          set -euo pipefail
+          # The warnings Lean emits while elaborating were never gated, so they
+          # only grew: 93 by the time this was wired, in which a Mathlib
+          # deprecation with a real deadline looked exactly like a `simpa` nag.
+          # scripts/check_warnings.py holds deprecations at zero in code we own
+          # and lets the rest shrink but never grow, the same ratchet shape as
+          # scripts/nolints.json above.
+          #
+          # The library is already built by now, so this re-invocation compiles
+          # nothing: Lake replays the cached modules and reprints their
+          # warnings, which is the whole reason the raw count in a full log is
+          # several times the real one. If that ever stops being true the
+          # capture comes back empty, and the script fails rather than passing
+          # vacuously on a silent log.
+          lake build DerivedAlgGeo 2>&1 | tee lean-warnings.log
+          python3 scripts/check_warnings.py lean-warnings.log
+
       - name: Gate console encoding
         # Every gate prints declaration names; on this runner's cp1252 console
         # a gate that cannot print `δ` dies with a `charmap` traceback instead
@@ -756,7 +844,7 @@ jobs:
           echo "using venv interpreter $VENV_PY"
 
           "$VENV_BIN/pip" install --quiet \
-            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@b5a63cbab0cc2625cdfeacadfa9cb4b64a419598#subdirectory=contract"
+            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@ed71fbba2ef4261ae6ae7153ffc21cfe3d1bab25#subdirectory=contract"
           MFC="$VENV_BIN/mfc"
 
           # Assert the installed schema is the one the emitter writes against.
@@ -833,7 +921,45 @@ jobs:
           # from running the offline gates -- but CI is the one environment
           # guaranteed to have the API, and a check that silently skips there
           # is the vacuous pass this repository keeps finding in new places.
-          "$VENV_PY" scripts/check_roadmap.py --require-api
+          # RM-07 is the one rule here that judges a file in the branch
+          # against LIVE tracker state, so any merge that closes an issue and
+          # advances its entry on `main` turns every branch that forked earlier
+          # red -- on an entry that branch never touched. On 2026-09-12 that
+          # was 15 of 18 open pull requests at once.
+          #
+          # On a pull request, scope RM-07 to the entries the branch actually
+          # changed since it forked. Inherited disagreements still PRINT, as
+          # notes; they are `main`'s to fix and the line below judges them in
+          # full on every push to `main` and every merge queue entry. This
+          # moves where a finding is reported, not whether it is.
+          #
+          # The flag is passed ONLY for `pull_request`. Do not "simplify" this
+          # to pass it unconditionally: on `main` and in the merge queue the
+          # merge base is the thing being judged, so scoping there would judge
+          # nothing and pass vacuously.
+          #
+          # `--pr` is passed on the same event and for the opposite reason.
+          # Scoping stops OTHER people's staleness reddening this branch; RM-08
+          # stops THIS branch creating staleness for everyone else, by refusing
+          # a pull request that closes an issue without advancing its entry.
+          # RM-07 cannot do that job: while the pull request is open the issue
+          # it closes is still open, so RM-07 agrees with the tracker right up
+          # until the merge makes it disagree. There is no pull request to ask
+          # about on `main` or in the merge queue, so the flag is absent there
+          # and RM-07 remains the backstop it always was.
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
+            # merge-base needs the base branch present. The checkout above is
+            # fetch-depth: 0, which fetches all history, but not necessarily a
+            # remote-tracking ref for `main` -- fetch it by name. If this
+            # fails, the script resolves no base and judges everything, which
+            # is the safe direction.
+            git fetch --no-tags --depth=0 origin main >/dev/null 2>&1 || true
+            "$VENV_PY" scripts/check_roadmap.py --require-api \
+              --scope-to-diff=origin/main \
+              --pr="${{ github.event.pull_request.number }}"
+          else
+            "$VENV_PY" scripts/check_roadmap.py --require-api
+          fi
 
           # ------------------------------------------------------------------
           # build.json, and the honest size of what it measured.
@@ -1089,10 +1215,37 @@ jobs:
   # same commit makes the correctness claim.
   ci:
     needs: [build]
-    # `always()` so this job still runs when an upstream job failed -- without
-    # it, a failed `build` would leave `ci` skipped, and a skipped required
-    # check does not block a merge. This is the whole mechanism.
-    if: always()
+    # This job must still run when `build` FAILED -- without that, a failed
+    # build would leave `ci` skipped, and a skipped required check does not
+    # block a merge. That is the whole mechanism, and it is why the obvious
+    # default (no `if:` at all, which skips on any upstream failure) is wrong.
+    #
+    # But it must NOT run when the whole RUN was cancelled, which is what
+    # `always()` did here until 2026-09-12. The concurrency block above sets
+    # `cancel-in-progress` on branch lanes, so pushing twice in a minute --
+    # the normal agent-lane cadence -- cancels the first run. Under `always()`
+    # that dead run still executed this job, saw `RESULTS: cancelled`, and
+    # posted a FAILING `ci` check. Because that failure lands LATER than the
+    # superseding run's success, it is the newest check with this name, and
+    # branch protection reads the newest: a green build sat behind a red `ci`
+    # belonging to a run that had been killed on purpose. PRs #1242 and #1243
+    # were both stuck this way.
+    #
+    # `!cancelled()` keeps the mechanism and drops the artifact: a FAILED
+    # upstream is not a cancelled run, so this still runs and still fails on
+    # it; an individually cancelled `build` inside a live run also still
+    # reaches the enumeration below and fails there.
+    #
+    # THE TRADE-OFF, stated rather than hidden: when a run is cancelled this
+    # job is SKIPPED, and a skipped required check does not block. That is
+    # correct for the concurrency case, because a superseding run is by
+    # definition already posting its own `ci`. It is a real if small loss for
+    # a run cancelled BY HAND with nothing following it -- that leaves `ci`
+    # skipped rather than red. Do not "fix" that by letting this job run and
+    # PASS on a cancelled run: a green `ci` over a build that never finished
+    # is the vacuous pass this repository keeps finding in new places, and it
+    # is strictly worse than a skip.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - name: Every required job succeeded

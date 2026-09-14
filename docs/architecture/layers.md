@@ -1,8 +1,10 @@
 # Dependency direction
 
-This document records the dependency contract between the subjects of
-`DerivedAlgGeo/`. It is short because the contract is short: the tree mirrors
-Mathlib's, and Mathlib's subjects are not layered.
+This document records the implemented broad dependency checks and the current
+import map for `DerivedAlgGeo/`. Mathlib's subjects are not a total hierarchy.
+The finer foundation/application policy is in
+[mathematical-ownership.md](mathematical-ownership.md); its pending source
+cutovers are tracked in [the ledger](cutover-ledger.md).
 
 ## Subjects are not a tower
 
@@ -22,9 +24,9 @@ classify.
 
 ## The policy edges
 
-These are the edges the layout promises and nothing else checks. Each is a
-rule in `scripts/check_layering.py`, and each has a known-answer fixture under
-`scripts/fixtures/layering/`.
+These broad rules are implemented in `scripts/check_layering.py`, with
+known-answer fixtures under `scripts/fixtures/layering/`. They are not the
+complete mathematical ownership policy.
 
 1. **Geometry firewall.** Only modules below `AlgebraicGeometry/` and
    `Development/` import `DerivedAlgGeo.AlgebraicGeometry` or
@@ -34,10 +36,18 @@ rule in `scripts/check_layering.py`, and each has a known-answer fixture under
    `DerivedAlgGeoSweep.lean` import everything and own nothing.
 2. **`Development/` is a leaf.** No stable module imports it.
 3. **Stability-neutral geometry.** A module below `AlgebraicGeometry/` that is
-   not below `Moduli/`, `Numerical/`, or `DerivedCategory/Stability/` never
-   reaches the stability tree, even transitively. This keeps `Dᵇ(Coh X)`,
-   `Dqc`, coherent sheaves, and cohomology importable without Bridgeland
-   stability.
+   not below one of the eight subcomponents that exist to consume stability
+   never reaches the stability tree, even transitively. The eight are
+   `DerivedCategory/Stability/`, `Moduli/HarderNarasimhan/`,
+   `Moduli/Semistability/`, `Numerical/Stability/`,
+   `Numerical/Examples/Surface/`, `Numerical/Examples/Threefold/`,
+   `Numerical/GrothendieckGroup/CategoricalCharge/` and `Stability/Gieseker/`.
+   A same-named umbrella over one of them re-exports it and is exempt as an
+   umbrella only; its other children are not. This keeps `Dᵇ(Coh X)`, `Dqc`,
+   coherent sheaves, and cohomology importable without Bridgeland stability.
+   Before 2026-09-13 the exemption named the whole `Moduli/`, `Numerical/`,
+   `Stability/` and `DerivedCategory/Stability/` subtrees, which exempted 122
+   modules to excuse the 60 that use the tree; MO1.01 (#1312) narrowed it.
 4. **Weak stability is independent of Bridgeland stability.** No module of the
    weak theory imports the Bridgeland theory, and
    `PreStabilityCondition` structurally `extends toWeak :
@@ -47,6 +57,25 @@ rule in `scripts/check_layering.py`, and each has a known-answer fixture under
 6. **A new top-level subject is deliberate.** A directory directly below the
    source root must be one of the Mathlib subjects the repository uses, named
    in the gate's `KNOWN_SUBJECTS`.
+
+## Component boundaries and coverage limits
+
+New generic roots must not import their specializations or downstream
+comparisons, including transitively through umbrellas. The stability exemption
+does not authorize such imports. Since 2026-09-13 it is also no longer broad:
+rule 3 names eight subcomponents, so `Numerical/Core/`, `Numerical/Mukai/`,
+`Numerical/RiemannRoch/` and `Numerical/Specializations/` are mechanically
+held to being separate from the charge and geometric comparison consumers
+rather than only asked to be. What the gate still cannot see is a parent
+importing its own specialization *inside* an exempt subcomponent; that stays a
+review obligation until #1316 and #1317 split those subtrees.
+The gate's hard-coded divisorial root is a source location to migrate in
+#1313, not a rule that charge construction must remain in Walls.
+
+MO1 cutovers add focused component checks and regression fixtures with the
+source move. Preserve the broad firewalls and umbrella coverage while doing
+so. A documentation update neither installs these checks nor means all
+existing reverse imports have been repaired.
 
 ## AlgebraicGeometry sublayers
 
@@ -64,8 +93,20 @@ DerivedCategory
                                                         omitted by the DerivedCategory
                                                         umbrella, imported by the
                                                         AlgebraicGeometry umbrella
-Moduli, Numerical                                       may import the stability tree
+Moduli
+  ├─ HarderNarasimhan, Semistability                  may import the stability tree
+  └─ PerfectComplex, Quot                             stability-neutral
+Numerical
+  ├─ Stability                                        may import the stability tree
+  ├─ Examples/Surface, Examples/Threefold             may import the stability tree
+  ├─ GrothendieckGroup/CategoricalCharge              may import the stability tree
+  └─ Core, Mukai, RiemannRoch, Specializations        stability-neutral
+Stability
+  └─ Gieseker                                         may import the stability tree
 ```
+
+Each same-named umbrella above a "may import" row re-exports it and is exempt
+as an umbrella; the exemption does not reach the umbrella's other children.
 
 A geometric realization of a categorical interface sits with the geometric
 object it is about: the `IsCompatibleWithTriangulation` instance for
@@ -77,7 +118,12 @@ base-change and Fourier--Mukai actions on stability data in
 namespace of the categorical structure it extends so that dot notation
 resolves; the file's path records what it is about.
 
-## Where each theory lives
+## Where each theory currently lives
+
+This map describes existing modules. The ownership policy and cutover ledger
+identify mixed roots still to split, including dg H⁰ under DGEnhancement,
+derived operations under FourierMukai and perfectness under Moduli. Their
+appearance here is not permission to extend a misplaced foundation in place.
 
 Arrows point from a refinement or consumer to the root it builds on.
 
@@ -97,6 +143,7 @@ Algebra/Homology
   │     ├─→ Functor, Opposite, Product, Linear, Shift, H0, LinearH0
   │     ├─→ NaturalTransformationH0            closed degree-zero transformations on H⁰
   │     ├─→ AdjunctionH0                       a dg adjunction as a Mathlib adjunction
+  │     │     └─→ AdjunctionH0Presentation           transport through equivalences to named functors
   │     ├─→ Pretriangulated                   cones, shifts, rotation, chosen homotopy squares
   │     │     ├─→ ConeCategory                chosen cones and homotopy-coherent maps
   │     │     └─→ Functor                     composable shift/cone preservation capabilities
@@ -126,17 +173,24 @@ CategoryTheory/Shift
 
 CategoryTheory/Triangulated
   ├─→ PretriangulatedAxioms, TStructure, PostnikovTower, ExtensionClosure, QuasiAbelian
+  ├─→ TriangleFunctorNormalization             first-map transport for triangle-valued functors
   ├─→ FullSubcategory                         objectwise triangle and map lifts
   ├─→ GrothendieckGroup                        K₀, realizations, Euler forms
   ├─→ CompactlyGenerated, SemiorthogonalDecomposition, SphericalTwist
   ├─→ FourierMukai                            generic kernel autoequivalences;
   │                                           kernels vary through `kernelTransform`,
-  │                                           enhanced cones map pointwise to transform triangles
+  │                                           enhanced cones map pointwise to transform triangles;
+  │                                           consumes presented dg adjunction triangles through
+  │                                           objectwise, supplied-natural, and shift-compatible layers
   ├─→ Families                                pseudofunctorial fiber categories
   ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation,
-  │                                           functorial distinguished cone triangles;
-  │                                           H0/Triangle owns the triangles, H0/Functor
-  │                                           the transport of dg-functor capabilities
+  │                                           functorial distinguished cone triangles and
+  │                                           presented dg-adjunction cone triangles and their
+  │                                           conventional cotwist inverse rotation;
+  │                                           H0/Triangle owns the triangles;
+  │                                           H0/{Functor,FunctorTransport} own transport of
+  │                                           dg-functor capabilities through H⁰ and ordinary
+  │                                           equivalences
   └─→ StabilityCondition                      Bridgeland stability (canonical concept)
         ├─→ Weak                              weak stability: the dependency parent
         │     └─→ Foundation, Families, HarderNarasimhan, Support, Tilting
@@ -213,8 +267,9 @@ AlgebraicGeometry
 | Stability on scheme-derived categories | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability` |
 | Semistable loci, probes, finite-type openness, relative HN | `DerivedAlgGeo.AlgebraicGeometry.Moduli` |
 
-Lanes still moving toward these paths are listed in
-`docs/architecture/cutover-ledger.md`; the import guide names the target.
+Consult `docs/architecture/cutover-ledger.md` for pending cutovers and confirm
+the chosen import exists in the current checkout. A proposed target is not
+an implemented import or an additional canonical root.
 
 ## Retired conventions
 
@@ -222,8 +277,8 @@ Lanes still moving toward these paths are listed in
   umbrellas, the `GeometryInstances` virtual layer, and the reverse-edge
   allowlist. A geometric realization lives with the geometric object.
 - The subject rank order and subject-level cycle check.
-- The weakest-vocabulary signature test as the primary placement rule; it is
-  now the Tier 2 tie-breaker in `placement.md`.
+- The weakest-vocabulary ranking of subjects. Sufficient hypotheses help
+  split foundations from applications; they do not determine subject order.
 - `AlgebraicGeometry/StabilityCondition/`, `Compatibility/`, and the
   import-only shims listed in the gate's `RETIRED_PATHS`.
 - The `CohLean`, `DGLean`, and `BridgelandStabLean` roots.

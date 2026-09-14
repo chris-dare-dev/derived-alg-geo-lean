@@ -6,6 +6,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Projective
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pullback
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Finite
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Invertible
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.ClosedImmersion
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Projective
 
 /-!
@@ -16,18 +17,21 @@ twists surjecting onto `ι_* F`. Coherent pullback is right exact, so pulling th
 an epimorphism. Composing with the adjunction counit `ι^* ι_* F ⟶ F` produces the desired
 restricted-twist quotient as soon as that counit is known to be epi.
 
-The current sheaf-of-modules API does not prove the closed-immersion counit epi (or its stronger,
-standard isomorphism form). The theorem below therefore isolates precisely that one morphism as
-an explicit premise. It does not assume flat pullback: after obtaining the quotient, its kernel
-is formed afresh in `Coh X`.
+Pushforward along the closed immersion is faithful because its underlying continuous map is
+inducing. The general adjunction theorem therefore makes the counit epic, which discharges that
+premise without assuming the stronger standard isomorphism `ι^* ι_* F ≅ F`. The kernel of the
+resulting quotient is formed afresh in `Coh X`, so no exactness of closed-immersion pullback is
+asserted or used.
 
 ## Main results
 
 * `ProjectivePresentation.restrictedTwist` is the pullback of the ambient projective twist;
 * `ProjectivePresentation.restrictedTwist_isInvertible` proves its underlying module sheaf is
   intrinsically invertible;
-* `ProjectivePresentation.exists_shortExact_coproduct_restrictedTwist_of_counit_epi` constructs
-  a coherent restricted-twist presentation from the single missing counit premise.
+* `ProjectivePresentation.exists_shortExact_coproduct_restrictedTwist_of_counit_epi` records the
+  exact categorical reduction through the counit;
+* `ProjectivePresentation.exists_shortExact_coproduct_restrictedTwist` gives the unconditional
+  coherent restricted-twist presentation.
 -/
 
 universe u
@@ -122,5 +126,18 @@ theorem exists_shortExact_coproduct_restrictedTwist_of_counit_epi
     { exact := ShortComplex.exact_of_f_is_kernel _ (kernelIsKernel qX)
       mono_f := inferInstance
       epi_g := inferInstance }
+
+/-- **Every coherent sheaf on a projective variety is a quotient of finitely many restricted
+negative twists.**
+
+The closed-immersion pullback/pushforward counit is epic because module-sheaf pushforward along
+an inducing map is faithful. This conclusion does not require pullback to be exact, nor does it
+claim the stronger counit isomorphism. -/
+theorem exists_shortExact_coproduct_restrictedTwist
+    (P : AlgebraicGeometry.ProjectivePresentation k X) [Nontrivial P.index] (F : Coh X) :
+    ∃ (S : ShortComplex (Coh X)) (_ : S.ShortExact) (_ : S.X₃ ≅ F)
+      (N : ℕ) (_ : 1 ≤ N) (I : Type u) (_ : Finite I),
+      S.X₂ = ∐ (fun _ : I ↦ P.restrictedTwist (-(N : ℤ))) :=
+  P.exists_shortExact_coproduct_restrictedTwist_of_counit_epi F inferInstance
 
 end AlgebraicGeometry.ProjectivePresentation

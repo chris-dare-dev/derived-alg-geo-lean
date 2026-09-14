@@ -1,12 +1,46 @@
 # Working in DerivedAlgGeo
 
+## Mathematical ownership: required before public API work
+
+Read [the ownership policy](docs/architecture/mathematical-ownership.md) and
+[placement procedure](docs/architecture/placement.md) before adding a public
+root, extending a known mixed module, or moving declarations.
+
+- Distinguish a direct Mathlib API extension from a new concept that merely
+  uses its types. Follow the pinned API owner for the former; choose the
+  mathematical subject for the latter. There is no total subject hierarchy.
+- Record ownership, imports and specialization maps separately. Consumers
+  import roots; comparisons import both presentations downstream. Check
+  transitive imports through umbrellas, not just the file's import lines.
+- Reuse the existing canonical declaration. A new directory is not a reason
+  to copy its carrier, fields, polynomial or pairing. Name the actual Lean
+  projection, abbreviation, instance or comparison; follow the root-review
+  adoption and instance-agreement requirements.
+- Keep charge construction upstream of walls, general quadratic/lattice
+  algebra separate from geometric Mukai interpretation, and numerical models
+  separate from their geometric realizations. Preserve n, m and κ as distinct
+  parameters and preserve the arbitrary-divisor-rank branch.
+- Extract independent linear Serre/Yoneda, abelian stability, dg H⁰, derived
+  operations, perfectness, GL-cover and planar-geometry foundations from their
+  applications. Preserve hypotheses; a move proves no missing comparison.
+- Distinguish charge-zero/alignment/destabilization loci, frames/planes,
+  kernel negativity/full support, and ordinary H⁰ presentations/exact
+  enhancements. Use the precise boundaries in the ownership policy.
+- Use its compact decision record in the issue or PR. Update imports,
+  umbrellas, audits, registry/source-owner paths, documentation and relevant
+  gates in the source cutover; preserve historical names through the existing
+  executable-only mechanism, without retired-path import shims.
+- Consult the cutover ledger for current and target owners. Pending MO1 moves
+  are not implemented paths, and a passing current gate does not certify the
+  new component boundaries. Add focused checks with each implementing move.
+
 ## Repository shape
 
 This repository contains one public Lean library, `DerivedAlgGeo`. Its source
 root is `DerivedAlgGeo/` and its all-library umbrella is `DerivedAlgGeo.lean`.
-The layout mirrors Mathlib's subject hierarchy, directory for directory, so
-that a file extending a Mathlib API sits where that API sits in Mathlib and an
-upstream pull request is a copy, not a relocation.
+The layout follows Mathlib's broad subjects and the pinned definition sites
+of APIs it directly extends. New subjects follow mathematical ownership;
+using a Mathlib type alone does not determine their directory.
 
 | Directory | Mathlib counterpart | What lives here |
 | --- | --- | --- |
@@ -22,14 +56,16 @@ upstream pull request is a copy, not a relocation.
 Never add imports or namespaces rooted at `CohLean`, `DGLean`, or
 `BridgelandStabLean`; those migration artifacts are retired. Lanes still in
 flight toward this layout are listed under "Confirmed next lanes" in
-`docs/architecture/cutover-ledger.md`; a path named there is the target even
-before the move lands.
+`docs/architecture/cutover-ledger.md`. Distinguish a current module from a
+confirmed target or a proposal awaiting a declaration-level split. Do not
+import an unimplemented target or duplicate the existing root there.
 
 ## The placement rule
 
-Mathlib does not organize by abstraction level. It organizes by *definition
-site*: a file lives where the carrier it is about is defined, and extensions
-follow the definition. Two tiers.
+Direct Mathlib extensions follow their API's definition site. New concepts
+are placed by mathematical subject and the nearest applicable precedent.
+The mere appearance of a carrier in a public type does not decide which
+case applies. Two tiers.
 
 **Tier 1. An extension of a Mathlib API lives at that API's Mathlib path,
 under `DerivedAlgGeo/`, in that API's namespace.** Nothing else decides it:
@@ -88,29 +124,39 @@ Three consequences follow, and each retires a former convention.
   namespace cutover would invalidate the immutable review payloads the
   `exe/RestateHistoricalNames.lean` bridge exists to protect.
 
-The weakest-vocabulary signature test in `docs/architecture/placement.md` is
-the tie-breaker within Tier 2, not the primary rule; it must not move an
-extension of a Mathlib API away from that API's path.
+Within Tier 2, use sufficient hypotheses to separate independent mathematics
+from its application. Do not rank subjects by their weakest vocabulary or
+move a direct Mathlib extension away from its API owner. The examples and
+boundaries are in `docs/architecture/mathematical-ownership.md`.
 
 ## Dependency direction
 
 Mathlib's subjects interleave: `Algebra/Homology` imports `CategoryTheory`,
 and `CategoryTheory/Linear` imports `Algebra`. There is therefore no rank
 order between subjects, and `scripts/check_layering.py` does not enforce one.
-Lean enforces module acyclicity. The policy edges are exactly these.
+Lean enforces module acyclicity. The currently enforced broad policy edges
+are below; finer ownership boundaries remain explicit review obligations
+until their implementing cutovers add the corresponding checks.
 
 - **Geometry firewall.** Only modules below `AlgebraicGeometry/` and
   `Development/` import `DerivedAlgGeo.AlgebraicGeometry` or
   `Mathlib.AlgebraicGeometry`, and only they declare into the
   `AlgebraicGeometry` namespace. Everything else is usable without schemes.
 - **`Development/` is a leaf.** No stable module imports it.
-- **Stability-neutral geometry.** Modules below `AlgebraicGeometry/` outside
-  `Moduli/`, `Numerical/`, and `DerivedCategory/Stability/` never reach the
-  stability tree, even transitively. The `AlgebraicGeometry/DerivedCategory`
-  umbrella therefore omits its `Stability` child; the top-level
-  `AlgebraicGeometry` umbrella imports it. This is what keeps `Dᵇ(Coh X)`,
-  `Dqc`, coherent sheaves, and cohomology importable without Bridgeland
-  stability.
+- **Stability-neutral geometry.** Geometry reaches the stability tree only from
+  the subcomponents that exist to consume it: `DerivedCategory/Stability/`,
+  `Moduli/{HarderNarasimhan,Semistability}/`, `Numerical/Stability/`,
+  `Numerical/Examples/{Surface,Threefold}/`,
+  `Numerical/GrothendieckGroup/CategoricalCharge/` and `Stability/Gieseker/`.
+  Everything else below `AlgebraicGeometry/` is stability-neutral, transitively
+  included. A same-named umbrella over one of those subcomponents is exempt as
+  an umbrella, and its other children are not. The
+  `AlgebraicGeometry/DerivedCategory` umbrella is the one that omits a child
+  outright -- it drops `Stability`, and the top-level `AlgebraicGeometry`
+  umbrella imports it. This is what keeps `Dᵇ(Coh X)`, `Dqc`, coherent sheaves,
+  and cohomology importable without Bridgeland stability. The list was narrowed
+  from the four blanket subtrees on 2026-09-13 (MO1.01, #1312); see
+  `docs/architecture/cutover-ledger.md`.
 - **Weak stability is independent of Bridgeland stability**, and
   `PreStabilityCondition` structurally extends `WeakPreStabilityCondition`.
 - **Retired paths stay retired.** The gate carries the list.
@@ -177,14 +223,14 @@ three uses of "perfect" (`schemePerfect`, `schemeRelativePerfect`,
 
 ## Umbrellas
 
-Every non-leaf directory has a same-named umbrella that re-exports its direct
-children. Two umbrellas deliberately omit a child, and
-`scripts/check_umbrella_coverage.py` knows both: the weak stability umbrella
-omits the Bridgeland child, and `AlgebraicGeometry/DerivedCategory.lean` omits
-`Stability`. A module that shares a name with a directory of its consequences
-is not an umbrella and is left alone. A structural move updates imports,
-umbrellas, audits, declaration-sweep routing, documentation, the layering
-gate, and CI paths together.
+Every non-leaf directory normally has a same-named umbrella re-exporting its
+direct children. A neutral core must not import applications through that
+umbrella. Document each exact umbrella/child exception and register it in
+`scripts/check_umbrella_coverage.py` in the source cutover, preserving another
+stable export/build route for the omitted child. A module that defines the
+object studied by its same-named directory is not necessarily an umbrella.
+Update imports, audits, declaration routing, documentation and affected
+gates/CI paths together; do not silently omit a child or relax coverage globally.
 
 ## Editing rules
 
@@ -196,10 +242,10 @@ gate, and CI paths together.
   category, follow `docs/architecture/abstraction-tree.md`: reuse one
   canonical root and make specializations reach it by an instance,
   projection, abbreviation, or proved comparison.
-- If a file contains a generic block followed by its geometric use, split at
-  the first declaration whose signature no longer needs the geometry. If the
-  block is not moved in the current slice, record it in
-  `docs/architecture/cutover-ledger.md` and do not extend it in place.
+- If a file mixes a foundation, its application and their comparison, split
+  at those declaration boundaries. Put the comparison downstream of both
+  presentations. If the split is deferred, record it in the cutover ledger
+  and do not extend the misplaced block in place or create a competing root.
 - Preserve explicit trust boundaries; do not use `sorry`, `admit`, or a
   hidden axiom to cross an unfinished mathematical seam.
 - Add every new public declaration to the relevant audit.

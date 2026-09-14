@@ -26,6 +26,15 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.gltilde_smul
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.gltilde_smul_iff
 
+/-! ## Finite-type field-extension cancellation -/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.UniformMassHomBound
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.UniformMassHomBound.of_scaled
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.finiteDimensional_of_finiteType_field
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FieldExtensionAdjunctionDimensionFormula
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.FieldExtensionHNMassFormula
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.inequality84
+
 /-! ## Finite distance and connected components -/
 
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.finiteDistanceClass
@@ -66,6 +75,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.triangle_middle
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.massHomBoundedTests
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.triangEnvelope
+
+/-! ## Transfer along a detecting functor -/
+
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBoundFor.preimage_obj
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.preimage_map
+#print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.HasMassHomBound.preimage
 
 /-! ## Stable-object reduction -/
 

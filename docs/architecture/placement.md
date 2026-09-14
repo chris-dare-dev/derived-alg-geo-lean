@@ -1,14 +1,18 @@
 # Declaration placement
 
 This is the operational placement test for new declarations and structural
-moves. It has two tiers, and the first one is mechanical.
+moves. Apply it with the subject/application boundaries in
+[mathematical-ownership.md](mathematical-ownership.md). Tier 1 follows an
+identified Mathlib API owner; deciding whether a declaration extends that API
+or introduces a new subject still requires mathematical review.
 
 ## Tier 1: an extension of a Mathlib API lives at that API's Mathlib path
 
-Mathlib organizes by definition site, not by abstraction level. A file that
-extends a Mathlib API goes at the path Mathlib uses for that API, under
-`DerivedAlgGeo/`, in that API's namespace. That is also where an upstream pull
-request would put it, so the move to Mathlib is a copy.
+A direct extension of a Mathlib API follows that API's definition site at the
+repository's pinned revision, under `DerivedAlgGeo/`, in that API's namespace.
+Using a Mathlib type does not by itself make a new concept an extension of its
+elementary API. Follow Tier 2 for a new subject. This alignment aids navigation
+and future upstream work; matching directories is not required to import Mathlib.
 
 | Concept the declaration extends | Mathlib path | Repository path |
 | --- | --- | --- |
@@ -39,13 +43,59 @@ request would put it, so the move to Mathlib is a copy.
 | Alternating sums along finite exact sequences | `Algebra/Exact/Sequence.lean` | `Algebra/Exact/Sequence.lean` |
 | Schemes, `X.Modules`, `Proj`, morphism properties | `AlgebraicGeometry/` | `AlgebraicGeometry/`, with `ProjectiveSpectrum/` under Mathlib's name |
 
-If two rows seem to apply, the definition site of the *carrier* in the
-declaration's public type wins. `PrimeSpectrum.basicOpen_prod_eq_pi` is stated
+If two rows seem to apply, identify the API actually being extended, rather
+than choosing the weakest type appearing in the statement.
+`PrimeSpectrum.basicOpen_prod_eq_pi` is stated
 in the lattice of opens of a prime spectrum, but `basicOpen` is defined in
 `RingTheory/Spectrum/Prime/Topology.lean`, so it lives there and not in
 `Topology/` or `Algebra/`. Stalks of module presheaves are stated with
 `TopCat`, germs, and stalk functors, which Mathlib defines in
 `Topology/Sheaves/`, so they live there.
+
+## Tier 1 is about extension, not use
+
+Tier 1 decides where an *extension of an existing Mathlib API* lives. It does
+not follow that everything built with a Mathlib API belongs at that API's path.
+A new mathematical object that merely uses `Module.Dual`, a bilinear form, or
+`HomComplex` is placed by its own subject and at an appropriately general root,
+by Tier 2. Reading Tier 1 as a universal carrier rule is how a new subject ends
+up filed under whichever upstream definition its implementation happened to
+reach for, and how the *same* policy simultaneously recognized conceptual
+ownership for weak charges while filing the analogous numerical constructions
+under a consumer directory.
+
+Two consequences, both load-bearing:
+
+- **A directory is an index; it is not the import graph and not the
+  specialization graph.** The three must agree where they overlap and cannot be
+  identical. A comparison theorem between two constructions does not license
+  the generic one to import the special one, and a shared directory does not
+  make two constructions instances of each other.
+- **A narrowly imported module is not a full subject umbrella.** Keep them
+  distinct in prose and in the layering gate: an umbrella re-exports its
+  children by construction, so a rule that holds for a leaf may fail for the
+  umbrella above it for reasons that have nothing to do with the leaf's
+  subject.
+
+Proposed destinations in an architecture review are local recommendations, not
+promises that Mathlib will accept a module of that name.
+
+## The agreed owner map
+
+`docs/architecture/cutover-ledger.md` carries the declaration-level owner map
+agreed in MO1.01 (#1312) for the 2026-09-13 ownership review: for each
+confirmed finding, the definition owner, the neutral core, the application
+adapter and the comparison owner, together with the independent-consumer
+justification for every proposed new carrier. Two of its standing decisions
+apply to every structural change in the repository, not only to MO1:
+
+1. paths move and fully qualified declaration names do not, so a relocation
+   never invalidates a historical review payload; and
+2. a proposed new carrier needs a consumer outside the module it was extracted
+   from, or it is replaced by a theorem or an `abbrev` -- an extraction is not
+   its own second consumer.
+
+Read that map before proposing a destination for code it already covers.
 
 ## Tier 2: a subject Mathlib lacks is placed by the nearest precedent
 
@@ -60,10 +110,13 @@ in the lattice of opens of a prime spectrum, but `basicOpen` is defined in
 | A neutral predicate on pseudofunctors used by both geometry and stability | `CategoryTheory/Bicategory/Functor/Cat/` | `CategoryTheory/Moduli/` until Mathlib has a home for it |
 | A theorem whose public type mentions a scheme, variety, `Coh X`, `Dqc X`, or a geometric morphism property | `AlgebraicGeometry/` | `AlgebraicGeometry/`, organized by geometric object |
 
-Within Tier 2, when the precedent does not decide, use the weakest vocabulary
-sufficient for the full public type as the tie-breaker: rings before linear
-algebra before categories before sites before topological spaces before
-schemes. That tie-breaker never overrides Tier 1.
+Within Tier 2, identify the mathematical object and its independently useful
+theory. Use the weakest sufficient hypotheses to separate a reusable block
+from its application, not to rank all subjects or file every construction
+under its most elementary carrier. A stability function has a stability
+owner even though its charge is an additive map. A general bilinear identity
+has a linear-algebra owner even when first used by stability. This subject
+decision never relocates a direct Mathlib extension away from its API owner.
 
 ## What does not decide placement
 
@@ -87,38 +140,53 @@ Before adding or moving a public declaration:
 2. Name the canonical root module and the concrete consumer module.
 3. State the Lean relationship between them: direct reuse, `extends`, an
    instance, an `abbrev`, or a proved comparison.
-4. Verify that the root imports no consumer, paper-specific file, or
-   geometric realization.
+4. Verify that the root imports no specialization, consumer, paper-specific
+   file, or geometric realization, including through umbrellas. Put comparison
+   modules downstream of both presentations.
 5. Import the root directly from the consumer. Do not add a compatibility shim
    merely to preserve the old motivational path.
 6. Update the nearest umbrella, axiom audit, declaration baseline, layering
    gate, and this documentation in the same change.
 
-If a file contains both a generic block and its geometric use, split the block
-at the first declaration whose signature no longer needs the consumer's
-vocabulary.
+If a file mixes a generic block, its application and their comparison, split
+at those declaration boundaries. Record hypotheses separately from subject
+ownership. Use the [decision record](mathematical-ownership.md#record-the-decision-in-the-issue-or-pr)
+to make the owner, imports and Lean specialization map reviewable.
 
-The divisorial central charge -- a real vector space with a symmetric
-intersection form, an additive Chern-character triple valued in it, two
-independent divisor parameters, and the resulting complex charge -- is
-arithmetic in the vocabulary of bilinear forms, so it does not belong under
-`AlgebraicGeometry/`.  Its canonical owner is
-`CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/`, beside the
-compressed three-coordinate model of `Walls/Numerical/` and the spherical wall
-lane, both of which are the same kind of pure arithmetic.  Adapters from a
-rational `NumericalRingData`, the scalar extension to `N¹(X)_ℝ`, and the
-projective-plane, smooth-quadric and K3 models are its consumers and live under
-`AlgebraicGeometry/Numerical/Stability/`; a consumer may declare lemmas into the
-block's own namespace when dot notation needs it.
+The divisorial charge currently mixes neutral intersection-form arithmetic,
+charge construction and wall applications under
+`CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/`.
+That current path is not the target owner for all three. General paired
+functionals belong with linear algebra; charge constructors and families
+belong upstream of `Walls`; geometric Chern/Todd realizations belong under
+`AlgebraicGeometry/`. The exact file split is tracked by MO1.01–MO1.02
+(#1312–#1313). Preserve the existing roots and comparisons instead of creating
+another divisorial charge. Update the gate's hard-coded owner in the source
+cutover; a policy edit alone does not change that check.
+
+That placement is under revision. Review finding 04 observes that charge
+construction is upstream of the wall question, so `Walls/` should import the
+charge root rather than own it. The cutover ledger records the agreed
+destination; MO1.02 (#1313) implements it. Because rule 8 of
+`scripts/check_layering.py` currently *requires* the six divisorial structures
+to be declared in the `Walls/` subtree, that move must update
+`DIVISORIAL_ROOT_DIR`, this paragraph and the source in one change -- otherwise
+the gate rejects the destination the policy just agreed to.
 
 Orthogonal exceptional blocks and a chosen right adjoint to a residual
 full-subcategory inclusion are structures on abstract (pre)triangulated
 categories, so their canonical owner is
 `CategoryTheory/Triangulated/SemiorthogonalDecomposition/`.  Constructors
 for objectwise mutation triangles and the same-projection theorem also live
-there; neither requires scheme vocabulary.  Ext profiles, transport of
-spherical and pseudoprojective objects, and classification-induced matching
-live beside the generic Serre API.  Adjacent Ext shift rigidity and ordered
+there; neither requires scheme vocabulary.  The `k`-linear Serre duality data,
+its Hom-finiteness hypothesis, the Serre pairing and trace, and uniqueness of
+the Serre functor mention no shift and no triangulation, so their owner is
+`CategoryTheory/Linear/SerreFunctor/`, with the three representability helpers
+that need no Serre datum at all in `CategoryTheory/Linear/Yoneda.lean`.  Ext
+profiles, transport of spherical and pseudoprojective objects, and
+classification-induced matching are shift-dependent and stay in
+`CategoryTheory/Triangulated/SerreFunctor/`, which imports the linear root.
+Adjacent Ext shift rigidity and ordered
 block-length comparison belong with the semiorthogonal root.  One-step and
 dependent finite kernel extension, including generation from right
 admissibility, live beside the generic Fourier--Mukai API.  Only the comparison
@@ -138,8 +206,9 @@ and kernel packages with Fourier--Mukai theory.
 Comparison data of type `(DerivedCategory C)ᵒᵖ ≃ DerivedCategory Cᵒᵖ` extends
 Mathlib's derived category, so its owner is
 `Algebra/Homology/DerivedCategory/Opposite.lean`. The bare algebraic-dual
-functor on `ModuleCat` lives at `CategoryTheory/ModuleCat/LinearDual.lean`;
-its exactness and derived lift are respectively the specializations in
+functor on `ModuleCat` currently lives at `CategoryTheory/ModuleCat/LinearDual.lean`;
+its target owner is `Algebra/Category/ModuleCat/LinearDual.lean`, with its
+exactness API (pending #1325). The exactness and derived lift currently live in
 `Algebra/Category/ModuleCat/LinearDual.lean` and
 `Algebra/Homology/DerivedCategory/LinearDual.lean`. A Serre-duality statement that mentions a scheme
 imports those roots and the canonical coherent-derived specialization; its
@@ -156,8 +225,13 @@ becoming the owner of either comparison.
 
 ## Perfect-complex notion ledger
 
-The word "perfect" currently appears in three non-interchangeable APIs. Their
-ambient categories and formal relationships are:
+The word "perfect" currently appears in three non-interchangeable APIs. The
+paths below describe the present implementation. Moving foundational relative
+perfectness out of the moduli consumer is tracked in #1322; it does not change
+these mathematical comparisons. In particular, the current cohomological
+`schemePseudoCoherent` criterion is not automatically standard pseudo-coherence
+on arbitrary non-Noetherian bases; preserve the scope warning in #554.
+The ambient categories and formal relationships are:
 
 | Notion | Ambient object | Meaning and owner | Valid comparison |
 | --- | --- | --- | --- |

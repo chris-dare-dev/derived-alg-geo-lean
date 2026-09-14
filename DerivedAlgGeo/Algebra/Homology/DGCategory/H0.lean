@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Basic
 import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.Algebra.Homology.QuasiIso
+import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Functor
 
 /-!
@@ -25,6 +26,13 @@ Leibniz rule is an axiom of `DGCategory` rather than a lemma about a special
 case, and the `Const` example in `DerivedAlgGeo.Algebra.Homology.DGCategory/Instances.lean` — whose
 differential is zero — tests none of them.
 
+The induced functor on `H⁰` also carries canonical identity and composition
+comparisons.  Their associativity and two unit laws are recorded here as the
+ordinary pseudofunctor coherence equations.  They are exposed directly because
+the repository has no bundled bicategory of dg categories on which to install
+Mathlib's `Pseudofunctor`; introducing a partial replacement would duplicate
+that abstraction.
+
 ## A wrinkle in the degrees
 
 `dgComp_leibniz` states the shifted degrees as `p + 1`, and those are dependent
@@ -37,7 +45,7 @@ rather than rewriting the goal.
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u u' u''
+universe v u u' u'' u'''
 
 namespace CategoryTheory
 
@@ -318,6 +326,14 @@ def h0 (F : DGFunctor C D) : H0 C ⥤ H0 D where
       induction g using Quotient.ind with
       | _ g => exact congrArg _ (Subtype.ext (F.map_comp 0 0 0 (by omega) f.1 g.1))
 
+/-- The functor on `H⁰` induced by a dg functor is additive. -/
+instance h0_additive (F : DGFunctor C D) : F.h0.Additive where
+  map_add {X Y} f g := by
+    induction f using Quotient.ind with
+    | _ f =>
+      induction g using Quotient.ind with
+      | _ g => exact congrArg _ (Subtype.ext (map_add (F.map 0) f.1 g.1))
+
 
 /-- A dg functor's action on a single Hom-complex, packaged as a morphism of
 cochain complexes. `map_d` is exactly the commutation square. -/
@@ -351,6 +367,13 @@ def Z0.toH0 (C : Type u) [DGCategory.{v} C] : Z0 C ⥤ H0 C where
   map_id _ := rfl
   map_comp _ _ := rfl
 
+/-- Every morphism in `H⁰ C` has a degree-zero cocycle representative. -/
+instance Z0.toH0_full (C : Type u) [DGCategory.{v} C] :
+    (Z0.toH0 C).Full where
+  map_surjective f := by
+    obtain ⟨f, rfl⟩ := Quotient.exists_rep f
+    exact ⟨f, rfl⟩
+
 namespace DGFunctor
 
 variable {C : Type u} {D : Type u'} {E : Type u''} [DGCategory.{v} C] [DGCategory.{v} D]
@@ -378,6 +401,22 @@ def h0IdIso : (DGFunctor.id C).h0 ≅ 𝟭 (H0 C) :=
       simp [DGFunctor.id, H0.of_self]
       rfl)
 
+/-! The identity comparison has literal identity components in both directions. -/
+
+/-- The forward component of `h0IdIso` is the identity.  This exposes the
+computation without requiring consumers to unfold `NatIso.ofComponents`. -/
+@[simp]
+theorem h0IdIso_hom_app (X : H0 C) :
+    (h0IdIso (C := C)).hom.app X = 𝟙 _ :=
+  rfl
+
+/-- The inverse component of `h0IdIso` is the identity.  This exposes the
+computation without requiring consumers to unfold `NatIso.ofComponents`. -/
+@[simp]
+theorem h0IdIso_inv_app (X : H0 C) :
+    (h0IdIso (C := C)).inv.app X = 𝟙 _ :=
+  rfl
+
 /-- `H⁰` takes composition of dg functors to composition of functors. -/
 def h0CompIso (F : DGFunctor C D) (G : DGFunctor D E) :
     (F.comp G).h0 ≅ F.h0 ⋙ G.h0 :=
@@ -388,6 +427,73 @@ def h0CompIso (F : DGFunctor C D) (G : DGFunctor D E) :
       show _ ≫ 𝟙 _ = 𝟙 _ ≫ _
       rw [Category.comp_id, Category.id_comp]
       rfl)
+
+/-- The forward component of `h0CompIso` is the identity.  This is the
+component computation used when descending dg whiskering to `H⁰`. -/
+@[simp]
+theorem h0CompIso_hom_app (F : DGFunctor C D) (G : DGFunctor D E) (X : H0 C) :
+    (h0CompIso F G).hom.app X = 𝟙 _ :=
+  rfl
+
+/-- The inverse component of `h0CompIso` is the identity.  This is the
+component computation used when descending dg whiskering to `H⁰`. -/
+@[simp]
+theorem h0CompIso_inv_app (F : DGFunctor C D) (G : DGFunctor D E) (X : H0 C) :
+    (h0CompIso F G).inv.app X = 𝟙 _ :=
+  rfl
+
+/-- The `H⁰` composition comparison satisfies the pseudofunctor
+associativity law.  The ordinary functor associator is retained explicitly
+even though dg-functor composition is strict. -/
+theorem h0CompIso_assoc {B : Type u'''} [DGCategory.{v} B]
+    (F : DGFunctor C D) (G : DGFunctor D E) (H : DGFunctor E B) :
+    h0CompIso (F.comp G) H ≪≫
+        Functor.isoWhiskerRight (h0CompIso F G) H.h0 ≪≫
+          Functor.associator F.h0 G.h0 H.h0 =
+      h0CompIso F (G.comp H) ≪≫
+        Functor.isoWhiskerLeft F.h0 (h0CompIso G H) := by
+  ext X
+  have hmap : H.h0.map (𝟙 ((F.comp G).h0.obj X)) = 𝟙 _ :=
+    H.h0.map_id _
+  simp only [Iso.trans_hom, NatTrans.comp_app,
+    Functor.isoWhiskerRight_hom, Functor.whiskerRight_app,
+    h0CompIso_hom_app, Functor.associator_hom_app,
+    Functor.isoWhiskerLeft_hom, Functor.whiskerLeft_app]
+  erw [hmap]
+  change 𝟙 _ ≫ 𝟙 _ ≫ 𝟙 _ = 𝟙 _ ≫ 𝟙 _
+  simp
+
+/-- The `H⁰` composition comparison is coherent with right composition by
+the identity dg functor and the ordinary right unitor. -/
+theorem h0CompIso_comp_id (F : DGFunctor C D) :
+    h0CompIso F (DGFunctor.id D) ≪≫
+        Functor.isoWhiskerLeft F.h0 (h0IdIso (C := D)) ≪≫
+          Functor.rightUnitor F.h0 =
+      Iso.refl F.h0 := by
+  ext X
+  simp only [Iso.trans_hom, NatTrans.comp_app,
+    Functor.isoWhiskerLeft_hom, Functor.whiskerLeft_app,
+    h0CompIso_hom_app, h0IdIso_hom_app,
+    Functor.rightUnitor_hom_app, Iso.refl_hom, NatTrans.id_app]
+  change 𝟙 (F.h0.obj X) ≫ 𝟙 _ ≫ 𝟙 _ = 𝟙 _
+  simp
+
+/-- The `H⁰` composition comparison is coherent with left composition by
+the identity dg functor and the ordinary left unitor. -/
+theorem h0CompIso_id_comp (F : DGFunctor C D) :
+    h0CompIso (DGFunctor.id C) F ≪≫
+        Functor.isoWhiskerRight (h0IdIso (C := C)) F.h0 ≪≫
+          Functor.leftUnitor F.h0 =
+      Iso.refl F.h0 := by
+  ext X
+  have hmap : F.h0.map (𝟙 X) = 𝟙 _ := F.h0.map_id X
+  simp only [Iso.trans_hom, NatTrans.comp_app,
+    Functor.isoWhiskerRight_hom, Functor.whiskerRight_app,
+    h0CompIso_hom_app, h0IdIso_hom_app,
+    Functor.leftUnitor_hom_app, Iso.refl_hom, NatTrans.id_app]
+  erw [hmap]
+  change 𝟙 _ ≫ 𝟙 _ ≫ 𝟙 _ = 𝟙 _
+  simp
 
 
 end DGFunctor

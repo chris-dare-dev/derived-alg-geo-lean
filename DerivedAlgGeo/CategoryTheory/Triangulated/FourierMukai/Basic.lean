@@ -178,6 +178,11 @@ theorem transformMapIso_hom (C : Correspondence 𝒳 𝒴 𝒵) {K L : 𝒵} (e 
   rfl
 
 @[simp]
+theorem transformMapIso_inv (C : Correspondence 𝒳 𝒴 𝒵) {K L : 𝒵} (e : K ≅ L) :
+    (C.transformMapIso e).inv = C.transformMap e.inv := by
+  rfl
+
+@[simp]
 theorem transformMapIso_refl (C : Correspondence 𝒳 𝒴 𝒵) (K : 𝒵) :
     C.transformMapIso (Iso.refl K) = Iso.refl (C.transform K) := by
   simp [transformMapIso]

@@ -57,7 +57,7 @@ def Modules.IsFlatOver {X S : Scheme.{u}} (p : X ⟶ S)
     (M : X.Modules) : Prop :=
   ∀ x : X, Module.Flat (S.presheaf.stalk (p x))
     ((ModuleCat.restrictScalars (p.stalkMap x).hom).obj
-      ((SchemeBaseChange.moduleStalkFunctor X x).obj M))
+      ((Scheme.Modules.moduleStalkFunctor X x).obj M))
 
 end Scheme
 
@@ -351,16 +351,16 @@ def zeroLocalFiniteTorAmplitudeChart {X S : Scheme.{u}}
     exact isZero_zero _
   flatOverBase i y := by
     letI : PreservesFiniteLimits
-        (SchemeBaseChange.moduleStalkFunctor ((⊤ : X.Opens).toScheme) y) :=
-      SchemeBaseChange.moduleStalkFunctor_preservesFiniteLimits
+        (Scheme.Modules.moduleStalkFunctor ((⊤ : X.Opens).toScheme) y) :=
+      Scheme.Modules.moduleStalkFunctor_preservesFiniteLimits
         ((⊤ : X.Opens).toScheme) y
     let Z :=
       (ModuleCat.restrictScalars (((⊤ : X.Opens).ι ≫ p).stalkMap y).hom).obj
-        ((SchemeBaseChange.moduleStalkFunctor ((⊤ : X.Opens).toScheme) y).obj
+        ((Scheme.Modules.moduleStalkFunctor ((⊤ : X.Opens).toScheme) y).obj
           ((zeroModuleComplex ((⊤ : X.Opens).toScheme)).X i))
     have hZ : IsZero Z :=
       (ModuleCat.restrictScalars (((⊤ : X.Opens).ι ≫ p).stalkMap y).hom).map_isZero
-        ((SchemeBaseChange.moduleStalkFunctor ((⊤ : X.Opens).toScheme) y).map_isZero
+        ((Scheme.Modules.moduleStalkFunctor ((⊤ : X.Opens).toScheme) y).map_isZero
           (by dsimp [zeroModuleComplex]; exact isZero_zero _))
     letI : Subsingleton Z := ModuleCat.isZero_iff_subsingleton.mp hZ
     exact Module.Flat.of_free
@@ -393,14 +393,14 @@ def zeroGeometricFiberModel {X S : Scheme.{u}} (p : X ⟶ S) (s : S) :
     ((SchemeDerivedCategory.Q X).map_isZero (zeroModuleComplex_isZero X))
     (SchemeQuasicoherentDerivedCategory.zero_obj_isZero X)
   flatOverBase i x := by
-    letI : PreservesFiniteLimits (SchemeBaseChange.moduleStalkFunctor X x) :=
-      SchemeBaseChange.moduleStalkFunctor_preservesFiniteLimits X x
+    letI : PreservesFiniteLimits (Scheme.Modules.moduleStalkFunctor X x) :=
+      Scheme.Modules.moduleStalkFunctor_preservesFiniteLimits X x
     let Z := (ModuleCat.restrictScalars (p.stalkMap x).hom).obj
-      ((SchemeBaseChange.moduleStalkFunctor X x).obj
+      ((Scheme.Modules.moduleStalkFunctor X x).obj
         ((zeroModuleComplex X).X i))
     have hZ : IsZero Z :=
       (ModuleCat.restrictScalars (p.stalkMap x).hom).map_isZero
-        ((SchemeBaseChange.moduleStalkFunctor X x).map_isZero
+        ((Scheme.Modules.moduleStalkFunctor X x).map_isZero
           (by dsimp [zeroModuleComplex]; exact isZero_zero _))
     letI : Subsingleton Z := ModuleCat.isZero_iff_subsingleton.mp hZ
     exact Module.Flat.of_free

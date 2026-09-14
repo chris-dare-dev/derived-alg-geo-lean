@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Combined.PeriodMap
+import DerivedAlgGeo.CategoryTheory.Triangulated.ShiftFunctor
 import Mathlib.GroupTheory.QuotientGroup.Basic
 
 set_option backward.defeqAttrib.useBackward true
@@ -26,10 +27,9 @@ axiom, records the overlap in the kernel of the combined action, and defines
 the effective symmetry group to be the quotient by the full action kernel.
 The induced action of that quotient is faithful by construction.
 
-The preliminary `shiftFunctorCommShift` instance is useful independently: a
-shift functor commutes coherently with all shifts.  For the even shifts `2`
-and `-2`, the sign in the triangle shift is `+1`, which makes both functors
-triangulated.
+The shift-functor coherence used here comes from the reusable sign-correct
+interface in `Triangulated.ShiftFunctor`.  The local names below remain thin
+compatibility wrappers for the stability-action API.
 -/
 
 open CategoryTheory.Triangulated
@@ -50,90 +50,33 @@ variable {C : Type u} [Category.{w} C] [HasZeroObject C] [HasShift C ℤ]
 set_option backward.isDefEq.respectTransparency false in
 /-- A shift functor coherently commutes with every other shift.
 
-**`scoped`, deliberately.** This is a global, unconditional `CommShift` datum
-for *every* `n`, on a functor Mathlib also equips elsewhere. For ODD `n` this is
-NOT the structure under which `shiftFunctor C n` is triangulated -- the
-triangulated one carries the sign `(-1)^n` on the connecting map -- so a global
-instance here would silently win instance search at sites that wanted the
-triangulated structure. Scoping keeps it inside
-`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`, where the only consumer is the
-DOUBLE shift
-and the sign is `+1`. -/
+**`scoped`, deliberately.** The underlying reusable structure is explicit so
+that it cannot silently compete with another `CommShift` choice.  This wrapper
+keeps the historical stability-action instance local to this namespace. -/
 noncomputable scoped instance shiftFunctorCommShift (n : ℤ) :
-    (shiftFunctor C n).CommShift ℤ where
-  commShiftIso a := shiftFunctorComm C a n
-  commShiftIso_zero := by
-    change shiftFunctorComm C 0 n = _
-    rw [← shiftFunctorComm_symm]
-    ext X
-    simp only [Iso.symm_hom, Functor.CommShift.isoZero_hom_app]
-    rw [← cancel_epi ((shiftFunctorComm C n 0).hom.app X)]
-    rw [Iso.hom_inv_id_app]
-    symm
-    rw [← Category.assoc, ← shiftFunctorZero_hom_app_shift]
-    simp
-  commShiftIso_add a b := by
-    change shiftFunctorComm C (a + b) n = _
-    rw [← shiftFunctorComm_symm]
-    ext X
-    simp only [Iso.symm_hom, Functor.CommShift.isoAdd_hom_app]
-    rw [← cancel_epi ((shiftFunctorComm C n (a + b)).hom.app X)]
-    simp only [Iso.hom_inv_id_app]
-    rw [shiftFunctorComm_hom_app_comp_shift_shiftFunctorAdd_hom_app_assoc]
-    rw [show shiftFunctorComm C b n = (shiftFunctorComm C n b).symm by
-      rw [shiftFunctorComm_symm]]
-    rw [show shiftFunctorComm C a n = (shiftFunctorComm C n a).symm by
-      rw [shiftFunctorComm_symm]]
-    simp only [Iso.symm_hom, Iso.hom_inv_id_app_assoc]
-    rw [← Functor.map_comp_assoc, Iso.hom_inv_id_app]
-    dsimp only [Functor.comp_obj]
-    rw [(shiftFunctor C b).map_id, Category.id_comp, Iso.hom_inv_id_app]
+    (shiftFunctor C n).CommShift ℤ :=
+  Pretriangulated.shiftFunctorUnsignedCommShift C n
 
 set_option backward.isDefEq.respectTransparency false in
 /-- For the even shift `[2]`, mapping a triangle agrees with shifting that
 triangle: the usual `(-1)^n` sign is `+1`. -/
 noncomputable def shiftTwoMapTriangleIso :
     (shiftFunctor C (2 : ℤ)).mapTriangle ≅ Triangle.shiftFunctor C (2 : ℤ) :=
-  NatIso.ofComponents
-    (fun T => Triangle.isoMk _ _ (Iso.refl _) (Iso.refl _) (Iso.refl _)
-      (by dsimp; rw [Int.negOnePow_even 2 (by norm_num)]; simp)
-      (by dsimp; rw [Int.negOnePow_even 2 (by norm_num)]; simp)
-      (by
-        dsimp
-        rw [(shiftFunctor C 1).map_id, Category.comp_id, Category.id_comp]
-        change (shiftFunctor C 2).map T.mor₃ ≫ (shiftFunctorComm C 1 2).hom.app T.obj₁ = _
-        rw [Int.negOnePow_even 2 (by norm_num)]
-        simp))
-    (by cat_disch)
+  Pretriangulated.shiftFunctorUnsignedMapTriangleIso C 2 (by norm_num)
 
 noncomputable instance shiftTwoIsTriangulated :
-    (shiftFunctor C (2 : ℤ)).IsTriangulated where
-  map_distinguished T hT :=
-    isomorphic_distinguished _ (Triangle.shift_distinguished T hT 2) _
-      ((shiftTwoMapTriangleIso (C := C)).app T)
+    (shiftFunctor C (2 : ℤ)).IsTriangulated :=
+  Pretriangulated.shiftFunctorUnsignedIsTriangulated C 2 (by norm_num)
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The inverse even shift has the same sign-free triangle comparison. -/
 noncomputable def shiftNegTwoMapTriangleIso :
     (shiftFunctor C (-2 : ℤ)).mapTriangle ≅ Triangle.shiftFunctor C (-2 : ℤ) :=
-  NatIso.ofComponents
-    (fun T => Triangle.isoMk _ _ (Iso.refl _) (Iso.refl _) (Iso.refl _)
-      (by dsimp; rw [Int.negOnePow_even (-2) (by norm_num)]; simp)
-      (by dsimp; rw [Int.negOnePow_even (-2) (by norm_num)]; simp)
-      (by
-        dsimp
-        rw [(shiftFunctor C 1).map_id, Category.comp_id, Category.id_comp]
-        change (shiftFunctor C (-2)).map T.mor₃ ≫
-          (shiftFunctorComm C 1 (-2)).hom.app T.obj₁ = _
-        rw [Int.negOnePow_even (-2) (by norm_num)]
-        simp))
-    (by cat_disch)
+  Pretriangulated.shiftFunctorUnsignedMapTriangleIso C (-2) (by norm_num)
 
 noncomputable instance shiftNegTwoIsTriangulated :
-    (shiftFunctor C (-2 : ℤ)).IsTriangulated where
-  map_distinguished T hT :=
-    isomorphic_distinguished _ (Triangle.shift_distinguished T hT (-2)) _
-      ((shiftNegTwoMapTriangleIso (C := C)).app T)
+    (shiftFunctor C (-2 : ℤ)).IsTriangulated :=
+  Pretriangulated.shiftFunctorUnsignedIsTriangulated C (-2) (by norm_num)
 
 /-- The categorical double shift as a bundled triangulated autoequivalence. -/
 noncomputable def shiftTwoTriEquiv : TriEquiv C where
