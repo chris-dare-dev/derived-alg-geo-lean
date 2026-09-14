@@ -228,7 +228,7 @@ The ambient categories and formal relationships are:
 | Notion | Ambient object | Meaning and owner | Valid comparison |
 | --- | --- | --- | --- |
 | `schemePerfect X` | `D(Coh X)` | Thick envelope of degree-zero finite locally free coherent sheaves; `AlgebraicGeometry/DerivedCategory/Coherent.lean` | `perfectDerivedToDqc_obj_mem_schemePerfectInDqc` maps it into the defining perfect essential image in `Dqc(X)` |
-| `schemeRelativePerfect p` | `Dqc(X)` for `p : X ⟶ S` | Pseudo-coherence plus local finite Tor amplitude over the chosen base; `Moduli/PerfectComplex/Relative.lean` | It implies `schemePseudoCoherent`; it is not identified with absolute perfection without an additional geometric theorem |
+| `schemeRelativePerfect p` | `Dqc(X)` for `p : X ⟶ S` | Pseudo-coherence plus local finite Tor amplitude over the chosen base; `DerivedCategory/Perfect/Relative.lean` | It implies `schemePseudoCoherent`; it is not identified with absolute perfection without an additional geometric theorem |
 | `Coh.TwoTermPerfectDeterminantData F` | a coherent sheaf `F` plus presentation data | An explicit two-term finite locally free resolution used by determinant and Chern-class consumers; `Divisors/Determinant.lean` | `Moduli/PerfectComplex/Comparison.lean` forgets it to an absolute perfect degree-zero object and then to `schemePerfectInDqc` |
 
 `schemePerfectInDqc X` is the bridge, not a fourth competing definition: it
@@ -262,10 +262,15 @@ it. Do not introduce a parallel `Subprestack` carrier in algebraic geometry. An
 indexed collection of isomorphism-closed fiber predicates is not yet a
 subprestack until restriction stability is supplied.
 
-Concrete finite-type witnesses, atlases, scheme presentations, relative-perfect
-objects, semistable loci, and Harder--Narasimhan filtrations remain under
-`AlgebraicGeometry/Moduli/` because their signatures intrinsically mention
-geometry.
+Concrete finite-type witnesses, atlases, scheme presentations, semistable loci,
+and Harder--Narasimhan filtrations remain under `AlgebraicGeometry/Moduli/`
+because their signatures intrinsically mention geometry. The relative-perfect
+*predicates* do not: pseudo-coherence, local finite Tor amplitude and relative
+perfection are properties of one complex over one morphism, needed by base
+change and derived operations before a moduli functor exists, so their owner is
+`AlgebraicGeometry/DerivedCategory/Perfect/` and the moduli problem consumes
+them. Stalkwise flatness of a module sheaf over a morphism is a further step
+down, at `AlgebraicGeometry/Modules/Flat.lean`.
 
 `AlgebraicGeometry.RelativePerfectModuliSelector` is the canonical name for
 the weaker geometric input used by finite-type boundedness: it stores the

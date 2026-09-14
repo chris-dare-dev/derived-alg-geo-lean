@@ -4,17 +4,29 @@ Released under the MIT license.
 -/
 import Mathlib.AlgebraicGeometry.Fiber
 import Mathlib.AlgebraicGeometry.Morphisms.FinitePresentation
-import Mathlib.RingTheory.Flat.Basic
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.OpenImmersionPullback
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
 
 /-!
 # Relative-perfect and universally-gluable complexes
 
-This file starts the scheme-object layer of the moduli problem of relative
-perfect complexes.  Its objects live in the honest quasi-coherent-cohomology
-locus `SchemeQuasicoherentDerivedCategory X`, not in the derived category of
-all module sheaves under a different name.
+Pseudo-coherence, local finite Tor amplitude over a base, relative perfection
+and the universally-gluable refinement.  These are properties of *one complex*
+over *one morphism*.  Their objects live in the honest
+quasi-coherent-cohomology locus `SchemeQuasicoherentDerivedCategory X`, not in
+the derived category of all module sheaves under a different name.
+
+They are needed before a moduli functor exists -- base change and derived
+operations ask for them -- so they are owned here, beside the derived category
+they are predicates on, and the moduli problem in `Moduli/PerfectComplex/`
+consumes them.  That subtree keeps the presheaf, restriction stability,
+boundedness, openness, atlas and algebraicity layer, none of which is
+mentioned here.  This file was `Moduli/PerfectComplex/Relative.lean` until
+2026-09-13; see `docs/architecture/cutover-ledger.md`, finding 11.
+
+Stalkwise flatness of a module sheaf over a morphism is a further step down
+and lives with the module sheaves, in `Modules/Flat.lean`.
 
 At the current Mathlib pin there is no general derived tensor product for
 module sheaves.  Finite Tor amplitude is therefore expressed by the standard
@@ -47,19 +59,6 @@ noncomputable section
 universe u
 
 attribute [local instance] HasDerivedCategory.standard
-
-namespace Scheme
-
-/-- A module sheaf on `X` is flat over `S` when every stalk, restricted along
-the local-ring map induced by `p`, is a flat module over the corresponding
-stalk of `S`. -/
-def Modules.IsFlatOver {X S : Scheme.{u}} (p : X ⟶ S)
-    (M : X.Modules) : Prop :=
-  ∀ x : X, Module.Flat (S.presheaf.stalk (p x))
-    ((ModuleCat.restrictScalars (p.stalkMap x).hom).obj
-      ((Scheme.Modules.moduleStalkFunctor X x).obj M))
-
-end Scheme
 
 /-- The locally Noetherian cohomological criterion for pseudo-coherence:
 bounded above with finitely presented cohomology in every degree.

@@ -443,8 +443,9 @@ AlgebraicGeometry
 │  └─ absolute perfect locus                   thick envelope in `D(Coh X)`
 │     └─ essential image in Dqc
 │        └─ compact objects                    only with explicit evidence
-├─ relative-perfect locus over `p : X ⟶ S`     `Moduli/PerfectComplex/Relative`
-│  └─ pseudo-coherent + finite Tor amplitude   not absolute perfection by definition
+├─ relative-perfect locus over `p : X ⟶ S`     `DerivedCategory/Perfect/Relative`
+│  ├─ pseudo-coherent + finite Tor amplitude   not absolute perfection by definition
+│  └─ stalkwise flat module sheaf over `p`     `Modules/Flat`, needs no derived category
 ├─ two-term determinant presentation           explicit finite-locally-free resolution
 │  └─ absolute perfect degree-zero object       proved comparison adapter
 ├─ numerical K-theory
