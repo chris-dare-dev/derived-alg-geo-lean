@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.ExteriorPower
+import DerivedAlgGeo.LinearAlgebra.BilinearForm
 import DerivedAlgGeo.LinearAlgebra.GradedBasis
 import DerivedAlgGeo.LinearAlgebra.Lattice
 import DerivedAlgGeo.LinearAlgebra.Matrix.PolarDecomposition

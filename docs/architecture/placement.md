@@ -153,25 +153,17 @@ at those declaration boundaries. Record hypotheses separately from subject
 ownership. Use the [decision record](mathematical-ownership.md#record-the-decision-in-the-issue-or-pr)
 to make the owner, imports and Lean specialization map reviewable.
 
-The divisorial charge currently mixes neutral intersection-form arithmetic,
-charge construction and wall applications under
-`CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/`.
-That current path is not the target owner for all three. General paired
-functionals belong with linear algebra; charge constructors and families
-belong upstream of `Walls`; geometric Chern/Todd realizations belong under
-`AlgebraicGeometry/`. The exact file split is tracked by MO1.01–MO1.02
-(#1312–#1313). Preserve the existing roots and comparisons instead of creating
-another divisorial charge. Update the gate's hard-coded owner in the source
-cutover; a policy edit alone does not change that check.
-
-That placement is under revision. Review finding 04 observes that charge
-construction is upstream of the wall question, so `Walls/` should import the
-charge root rather than own it. The cutover ledger records the agreed
-destination; MO1.02 (#1313) implements it. Because rule 8 of
-`scripts/check_layering.py` currently *requires* the six divisorial structures
-to be declared in the `Walls/` subtree, that move must update
-`DIVISORIAL_ROOT_DIR`, this paragraph and the source in one change -- otherwise
-the gate rejects the destination the policy just agreed to.
+The charge ownership cutover is complete (#1313). General paired functionals,
+quadratic continuity and coercivity, and abstract Hodge-signature input live
+under `LinearAlgebra/`. Additive charge families and exponential, numerical and
+divisorial constructors live under
+`CategoryTheory/Triangulated/StabilityCondition/CentralCharge/`. Wall equations
+import those constructors from `StabilityCondition/Walls/`; full support
+predicates live under `StabilityCondition/Support/`; geometric Chern/Todd
+realizations remain under `AlgebraicGeometry/Numerical/`. Rule 8 of
+`scripts/check_layering.py` pins the owners and checks their transitive import
+boundaries. Preserve the existing roots and comparisons instead of creating
+another charge carrier or retired-path shim.
 
 Orthogonal exceptional blocks and a chosen right adjoint to a residual
 full-subcategory inclusion are structures on abstract (pre)triangulated

@@ -2,7 +2,8 @@
 Threefold slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Numerical.Threefold
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Threefold.Basic
 open CategoryTheory.Triangulated
 
 /-! ## The (alpha, beta) charge of a compressed threefold class

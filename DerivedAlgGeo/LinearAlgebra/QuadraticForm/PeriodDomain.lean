@@ -2,9 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.ComplexPairing
 import Mathlib.LinearAlgebra.QuadraticForm.Signature
-import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
-import Mathlib.LinearAlgebra.QuadraticForm.Real
 
 /-!
 # The period domain of a real quadratic space of signature `(2, n - 2)`
@@ -108,10 +107,6 @@ form of `Q`. Stated bilinearly so that it reads as in the source; see
 `isSphericalClass_iff_apply` for the quadratic form of the same condition. -/
 def IsSphericalClass (δ : M) : Prop := polar Q δ δ = -2
 
-/-- The orthogonal complement with respect to the pairing. -/
-abbrev orthogonal (W : Submodule ℝ M) : Submodule ℝ M :=
-  LinearMap.BilinForm.orthogonal Q.polarBilin W
-
 /-- The **wall** of a class `δ`: the positive planes orthogonal to `δ`. For a
 K3 surface this is the hyperplane `δ^⊥` of Bridgeland's period domain, read on
 the plane rather than on a complex vector spanning it. -/
@@ -144,25 +139,6 @@ variable {Q : QuadraticForm ℝ M}
 theorem polarBilin_isRefl : Q.polarBilin.IsRefl := fun x y h => by
   rw [polarBilin_apply_apply] at h ⊢
   exact (polar_comm (⇑Q) y x).trans h
-
-theorem mem_orthogonal_iff {W : Submodule ℝ M} {u : M} :
-    u ∈ orthogonal Q W ↔ ∀ w ∈ W, polar (⇑Q) w u = 0 := by
-  simp [orthogonal, LinearMap.BilinForm.mem_orthogonal_iff]
-
-/-- Orthogonality to a plane spanned by two vectors is orthogonality to both,
-which is what makes it a closed condition. -/
-theorem mem_orthogonal_span_pair_iff {x y u : M} :
-    u ∈ orthogonal Q (Submodule.span ℝ ({x, y} : Set M)) ↔
-      polar (⇑Q) x u = 0 ∧ polar (⇑Q) y u = 0 := by
-  rw [mem_orthogonal_iff]
-  constructor
-  · intro h
-    exact ⟨h x (Submodule.subset_span (by simp)), h y (Submodule.subset_span (by simp))⟩
-  · rintro ⟨hx, hy⟩ w hw
-    have hle : Submodule.span ℝ ({x, y} : Set M) ≤ LinearMap.ker (Q.polarBilin.flip u) := by
-      rw [Submodule.span_le]
-      rintro z (rfl | rfl) <;> simp [LinearMap.mem_ker, hx, hy]
-    simpa [LinearMap.mem_ker] using hle hw
 
 /-- A spherical class is one with `Q δ = -1`; the factor two is the difference
 between the pairing and its quadratic form. -/

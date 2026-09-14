@@ -110,7 +110,14 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.02 — Make charge construction upstream of walls and separate neutral pairing lemmas
-  status: blocked
+  status: done
+  progress: 'Moved the unchanged ChargeFamily and Exp.ofMoments roots to StabilityCondition/CentralCharge,
+    split surface and threefold construction from their wall equations, moved divisorial charge data and
+    supplied Todd corrections upstream, extracted neutral paired-functional, continuity, bounds and Hodge
+    owners under LinearAlgebra, and moved full divisorial support under Support. Rule 8 pins the owners and
+    transitive import boundaries with forbidden fixtures. Issue #1230 remains open on its two-consumer
+    obligation, so this cutover retains PeriodDomain.centralCharge and Mukai.expCharge with their existing
+    bridges; no pairCharge or graded root was invented.'
   summary: Split the linear-algebra functional/kernel/bounds API from its stability interpretation, and
     move the existing ChargeFamily and exponential/divisorial constructors to their agreed owners upstream
     of Walls. CA1 owns formulas and corrections (#1222–#1225); CA2 owns rotation/tilt (#1226–#1228); CA3
@@ -131,7 +138,6 @@ items:
   - area:algebra
   - type:refactor
   - sev:high
-  - blocked
   acceptance:
   - 'Reuse ChargeFamily and Exp.ofMoments from #1219–#1221; all existing surface, threefold, slope and
     divisorial comparisons remain available. No second charge carrier or polynomial is introduced.'

@@ -6,7 +6,7 @@ This subtree contains NO scheme, sheaf, numerical intersection ring, heart,
 slicing, or stability condition. DivisorSpace.HodgeDefinite is a
 proposition-valued certificate supplied by the caller and is never proved here.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Region
 open CategoryTheory.Triangulated
 
 /-! ## Region-wise local finiteness of spherical walls

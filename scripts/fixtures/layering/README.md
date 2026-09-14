@@ -19,6 +19,8 @@ caught here rather than by the next regression.
 | `forbidden/AlgebraicGeometry/Numerical/Core` | the numerical core reaching a charge construction |
 | `forbidden/AlgebraicGeometry/Moduli/PerfectComplex` | relative perfection reaching the stability tree transitively |
 | `forbidden/CategoryTheory/Triangulated/StabilityCondition/Weak/Families` | weak stability importing the Bridgeland theory |
+| `forbidden/CategoryTheory/Triangulated/StabilityCondition/CentralCharge` | central-charge construction importing downstream wall loci |
+| `forbidden/LinearAlgebra/QuadraticForm/ComplexPairing` | neutral paired-functional code importing stability conditions or wall arrangements |
 
 The three fixtures below a *subcomponent* -- `Moduli/Semistability`,
 `Stability/Gieseker`, `Numerical/Stability` -- sit where they do because rule

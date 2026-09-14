@@ -2,7 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Slice
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Slice
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Todd
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.CentralCharge
 
 /-!
@@ -54,8 +55,9 @@ class but is **not** a scalar multiple of the charge, so `wall_smul` does not
 apply and the two families have different walls in general.  That is the point
 of keeping them apart, and `mukaiCharge_k3` makes the difference explicit.
 
-Nothing here is a stability condition, a heart, or a K3 surface; `SqrtTodd` is
-supplied data, and no theorem below claims it comes from a geometric `√td`.
+Nothing here is a stability condition, wall, heart, or K3 surface; `SqrtTodd`
+is supplied by `Todd.lean`, and no theorem below claims it comes from a
+geometric `√td`.
 -/
 
 open QuadraticMap
@@ -68,37 +70,6 @@ noncomputable section
 
 variable {N : Type v} {D : Type w}
 variable [AddCommGroup N] [AddCommGroup D] [Module ℝ D]
-
-/-- The part of `√td_X` a surface Mukai vector can see: its codimension-one
-class and its integrated codimension-two number.
-
-This is supplied data.  Nothing in this file asserts that it is the square root
-of a Todd class; the geometric constructor lives with the numerical adapters. -/
-structure SqrtTodd (D : Type w) [AddCommGroup D] [Module ℝ D] where
-  /-- The codimension-one component `√td₁`. -/
-  divisor : D
-  /-- The integrated codimension-two component `∫√td₂`. -/
-  number : ℝ
-
-namespace SqrtTodd
-
-/-- The trivial square root, at which the Mukai vector is the ordinary
-Chern-character triple. -/
-def trivial : SqrtTodd D := ⟨0, 0⟩
-
-/-- The K3 square root `√td = 1 + [pt]`: no codimension-one part, and
-`∫√td₂ = 1`. -/
-def k3 : SqrtTodd D := ⟨0, 1⟩
-
-@[simp] theorem trivial_divisor : (trivial : SqrtTodd D).divisor = 0 := rfl
-
-@[simp] theorem trivial_number : (trivial : SqrtTodd D).number = 0 := rfl
-
-@[simp] theorem k3_divisor : (k3 : SqrtTodd D).divisor = 0 := rfl
-
-@[simp] theorem k3_number : (k3 : SqrtTodd D).number = 1 := rfl
-
-end SqrtTodd
 
 namespace ChernCharacter
 

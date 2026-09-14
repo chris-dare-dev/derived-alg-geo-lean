@@ -34,6 +34,10 @@ nothing else checks.
    back.
 6. **New top-level subjects are deliberate.** A directory directly below the
    source root must be one of the Mathlib subjects this repository uses.
+8. **Charge construction is upstream of walls.** Neutral continuity, Hodge,
+   and complex-pairing roots reach neither stability conditions nor geometry;
+   the central-charge subtree reaches neither wall-locus modules nor geometry;
+   and the moved owner structures are declared exactly once.
 9. **The linear Serre root is shift-free.** ``CategoryTheory/Linear/Yoneda.lean``
    needs Mathlib alone, nothing below ``CategoryTheory/Linear/SerreFunctor/``
    reaches ``CategoryTheory/Triangulated`` even transitively, and the three
@@ -208,6 +212,14 @@ RETIRED_PATHS = (
     "Symmetry/Autoequivalence/Instances",
     "CategoryTheory/Triangulated/StabilityCondition/"
     "WeakCompatibility",
+    # 2026-09-13 MO1.02: charge construction moved upstream of wall loci.
+    "LinearAlgebra/QuadraticForm/CentralCharge.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/Walls/Exp",
+    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Charge.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Coordinates.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Discriminant.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Mukai.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Support.lean",
     # 2026-09-13 MO1.07: the k-linear Serre duality data and its uniqueness
     # need no shift, so they moved to CategoryTheory/Linear/SerreFunctor/.
     "CategoryTheory/Triangulated/SerreFunctor/Basic.lean",
@@ -229,24 +241,37 @@ OBJECT_PROPERTY_BLOCK = (
     "restrictInverseImageLeft",
     "restrictInverseImageRight",
 )
-# Rule 8. The divisorial charge layer moved out of AlgebraicGeometry/ on
-# 2026-09-09 (cutover-ledger.md). Its carriers are a real vector space with a
-# symmetric bilinear form, an additive coordinate triple valued in it, and two
-# divisor parameters; nothing in the block needs a scheme, a sheaf, or a
-# numerical intersection ring, and its geometric adapters now import it rather
-# than owning it. The guard is the one the ledger asks for: the block's
-# structures stay declared in the Walls subtree, and no module below
-# AlgebraicGeometry/ declares them again. A geometric file may still add
-# lemmas INTO these namespaces for dot notation -- that is what the placement
-# rule permits -- so only the structure declarations are pinned here.
-DIVISORIAL_ROOT_DIR = "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial"
+# Rule 8. MO1.02 moved charge construction upstream of wall loci. The Hodge
+# carrier is neutral linear algebra, while Chern coordinates and charge
+# parameters live below CentralCharge/. Geometric files may still add lemmas
+# into these namespaces for dot notation, so only structures are pinned.
+DIVISORIAL_ROOT_DIR = (
+    "CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Divisorial"
+)
 DIVISORIAL_BLOCK = (
     "ChargeCoordinates",
     "ChernCharacter",
-    "DivisorSpace",
     "DivisorialParameters",
     "OrthogonalSlice",
+    "SqrtTodd",
     "StabilityParameters",
+)
+HODGE_INDEX_ROOT = "LinearAlgebra/BilinearForm/HodgeIndex.lean"
+HODGE_INDEX_BLOCK = ("DivisorSpace", "HodgeIndex", "HodgeDefinite")
+CENTRAL_CHARGE_TREE = f"{STABILITY_ROOT}.CentralCharge"
+WALL_TREE = f"{STABILITY_ROOT}.Walls"
+NEUTRAL_CHARGE_ROOTS = (
+    "LinearAlgebra/QuadraticForm/ComplexPairing.lean",
+    "LinearAlgebra/QuadraticForm/Continuous.lean",
+    "LinearAlgebra/QuadraticForm/Bounds.lean",
+    HODGE_INDEX_ROOT,
+)
+PAIRING_CORE_MODULE = f"{LIBRARY}.LinearAlgebra.QuadraticForm.ComplexPairing"
+PAIRING_DOWNSTREAM_TREES = (
+    f"{LIBRARY}.LinearAlgebra.QuadraticForm.PeriodDomain",
+    f"{LIBRARY}.LinearAlgebra.QuadraticForm.WallFiniteness",
+    f"{LIBRARY}.LinearAlgebra.QuadraticForm.WallRegion",
+    f"{LIBRARY}.LinearAlgebra.QuadraticForm.Orientation",
 )
 # Rule 9. The k-linear Serre duality data and the linear Yoneda representability
 # helpers moved out of Triangulated/ on 2026-09-13 (MO1.07, #1318) because they
@@ -449,6 +474,52 @@ def neutral_geometry_failures(
     return []
 
 
+def owner_boundary_failures(
+    module: str, imports: list[str], closure: Closure, label: str
+) -> list[str]:
+    """Rule 8 import boundaries for actual modules and known-answer fixtures."""
+    reached: set[str] = set(imports)
+    for imp in imports:
+        reached |= closure.of(imp)
+    neutral_modules = tuple(
+        retired_module(entry) for entry in NEUTRAL_CHARGE_ROOTS
+    )
+    if any(in_tree(module, root) for root in neutral_modules):
+        forbidden = sorted(
+            dep
+            for dep in reached
+            if in_tree(dep, STABILITY_ROOT) or in_tree(dep, GEOMETRY)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; neutral charge roots may "
+                "depend on neither stability conditions nor geometry"
+            ]
+    if in_tree(module, PAIRING_CORE_MODULE):
+        forbidden = sorted(
+            dep
+            for dep in reached
+            if any(in_tree(dep, root) for root in PAIRING_DOWNSTREAM_TREES)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; the paired-functional core "
+                "must remain independent of period-domain and wall-arrangement consumers"
+            ]
+    if in_tree(module, CENTRAL_CHARGE_TREE):
+        forbidden = sorted(
+            dep
+            for dep in reached
+            if in_tree(dep, WALL_TREE) or in_tree(dep, GEOMETRY)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; central-charge construction "
+                "must remain upstream of walls and geometry"
+            ]
+    return []
+
+
 def check_fixtures(closure: Closure) -> list[str]:
     failures: list[str] = []
     for verdict in ("allowed", "forbidden"):
@@ -465,6 +536,7 @@ def check_fixtures(closure: Closure) -> list[str]:
             label = str(fixture.relative_to(ROOT))
             found = direction_failures(module, imports, namespaces, label)
             found += neutral_geometry_failures(module, imports, closure, label)
+            found += owner_boundary_failures(module, imports, closure, label)
             if verdict == "allowed" and found:
                 failures.append(
                     "allowed layering fixture was rejected: " + "; ".join(found)
@@ -523,6 +595,7 @@ def main() -> int:
         label = str(path.relative_to(ROOT))
         failures += direction_failures(module, imports, namespaces, label)
         failures += neutral_geometry_failures(module, imports, closure, label)
+        failures += owner_boundary_failures(module, imports, closure, label)
         for imp in imports:
             if imp in retired_modules or any(
                 in_tree(imp, retired) for retired in retired_modules
@@ -578,7 +651,7 @@ def main() -> int:
                     f"the ObjectProperty lift block; import {op_module} instead"
                 )
 
-    # Rule 8.
+    # Rule 8, canonical structure owners.
     div_dir = SOURCE_ROOT / DIVISORIAL_ROOT_DIR
     if not div_dir.is_dir():
         failures.append(
@@ -593,21 +666,53 @@ def main() -> int:
             if name not in div_declared:
                 failures.append(
                     f"{div_dir.relative_to(ROOT)}: no longer declares {name}; "
-                    "the divisorial charge block's canonical owner is this "
-                    "subtree"
+                    "the divisorial charge block's canonical owner is this subtree"
                 )
         for module, (path, _, _) in modules.items():
             if not may_import_geometry(module):
                 continue
-            stray = structure_names(path.read_text(encoding="utf-8")) & set(
-                DIVISORIAL_BLOCK
+            stray = structure_names(path.read_text(encoding="utf-8")) & (
+                set(DIVISORIAL_BLOCK) | set(HODGE_INDEX_BLOCK)
             )
             if stray:
                 failures.append(
                     f"{path.relative_to(ROOT)}: redeclares {sorted(stray)} from "
                     "the divisorial charge block; import "
-                    f"{module_of(next(div_dir.glob('Charge.lean')))} instead"
+                    f"{module_of(next(div_dir.glob('Charge.lean')))} or the neutral "
+                    "Hodge-index owner instead"
                 )
+
+    hodge_root = SOURCE_ROOT / HODGE_INDEX_ROOT
+    if not hodge_root.is_file():
+        failures.append(
+            f"missing {hodge_root.relative_to(ROOT)}: it owns the neutral "
+            "Hodge-index block"
+        )
+    else:
+        hodge_declared = structure_names(hodge_root.read_text(encoding="utf-8"))
+        for name in HODGE_INDEX_BLOCK:
+            if name not in hodge_declared:
+                failures.append(
+                    f"{hodge_root.relative_to(ROOT)}: no longer declares {name}; "
+                    "the neutral Hodge-index block's canonical owner is this file"
+                )
+
+    family_root = SOURCE_ROOT / (
+        "CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Family.lean"
+    )
+    if not family_root.is_file() or "ChargeFamily" not in structure_names(
+        family_root.read_text(encoding="utf-8") if family_root.is_file() else ""
+    ):
+        failures.append(
+            "CentralCharge/Family.lean must own the ChargeFamily structure"
+        )
+
+    # Rule 8, owner existence. Import boundaries were checked uniformly above
+    # so the known-answer fixtures exercise the same predicate as the tree.
+    for entry in NEUTRAL_CHARGE_ROOTS:
+        path = SOURCE_ROOT / entry
+        if not path.is_file():
+            failures.append(f"missing neutral charge root {path.relative_to(ROOT)}")
 
     # Rule 9.
     yoneda_root = SOURCE_ROOT / LINEAR_YONEDA_ROOT
@@ -698,8 +803,10 @@ def main() -> int:
         f"parented by, Bridgeland stability; {len(RETIRED_PATHS)} retired paths "
         f"absent; the {len(OBJECT_PROPERTY_BLOCK)}-declaration ObjectProperty "
         "lift block is generic and declared once; the "
-        f"{len(DIVISORIAL_BLOCK)}-structure divisorial charge block lives in "
-        "the Walls subtree and is declared once; the "
+        f"{len(DIVISORIAL_BLOCK)}-structure divisorial charge block and "
+        f"{len(HODGE_INDEX_BLOCK)}-structure neutral Hodge block are declared once; "
+        "central-charge roots reach neither walls nor geometry and the paired "
+        "functional reaches no wall arrangement; the "
         f"{len(LINEAR_YONEDA_BLOCK)}-declaration linear Yoneda block needs "
         "Mathlib alone and the linear Serre root reaches no triangulated module"
     )

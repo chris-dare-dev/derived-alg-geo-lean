@@ -3,12 +3,12 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialWallTransport
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Discriminant
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Discriminant
 
 /-!
 # Discriminants of a realized numerical surface
 
-`Walls/Divisorial/Discriminant.lean` owns the Macrì--Schmidt quadratic forms
+`CentralCharge/Divisorial/Discriminant.lean` owns the Macrì--Schmidt quadratic forms
 (arXiv:1607.01262v3, Definition 6.12) on an abstract real divisor space, and
 the `DivisorSpace.HodgeIndex` certificate.  This file is their geometric
 adapter: it reads those forms off a `NumericalRealization` of a rational

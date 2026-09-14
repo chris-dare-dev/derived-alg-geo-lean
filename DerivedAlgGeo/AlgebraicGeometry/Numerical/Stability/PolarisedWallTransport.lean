@@ -5,12 +5,12 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.VectorClass
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.ThreefoldWallTransport
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.WallTransport
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential
 
 /-!
 # The polarised wall transport, for every dimension and correction class
 
-`Walls/Exp/` states the exponential charge once. This is the geometric side:
+`CentralCharge/Exponential/` states the exponential charge once. This is the geometric side:
 the map that turns a numerical class on a polarised variety into the compressed
 `H`-degrees that the charge consumes, written once for every dimension `n`,
 truncation degree `m` and correction class `κ`.

@@ -2,12 +2,17 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Discriminant
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Mukai
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Discriminant
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Mukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Support.Predicate.Quadratic
 
 /-!
 # The divisorial discriminant is a support form
+
+The charge constructors are upstream under `CentralCharge/Divisorial/`; this
+module adds the support interpretation.  Every full quadratic-support theorem
+below supplies both nonnegativity on the selected locus and strict negativity
+on the kernel of the same charge.
 
 `Discriminant.lean` defines `Δ`, `\bar Δ^B_ω` and `Δ^C_{ω,B}` as *functions* of a
 class `E : N`, because `N` is only an additive group and a `QuadraticForm ℝ N`

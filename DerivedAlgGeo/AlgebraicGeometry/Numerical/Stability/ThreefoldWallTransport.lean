@@ -8,7 +8,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Threef
 /-!
 # Transporting a polarised threefold class to the `(α, β)` plane
 
-`Walls/Threefold/Basic.lean` does its charge arithmetic on `NumClass`, a
+`CentralCharge/Numerical/Threefold.lean` does its charge arithmetic on `NumClass`, a
 quadruple of reals, and says of it: "It is **not** `ch(E)` for a sheaf `E`."
 This file supplies the map that makes it one, exactly as `WallTransport.lean`
 does in the surface case, and on the same side of the geometry boundary.
