@@ -318,3 +318,18 @@ chosen-projection API.
 
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.ofEq
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.ofEqAmbientIso
+
+/-! ## The coproduct closure of a compact semiorthogonal sequence (SF11 tranche I)
+
+Closing every component of a semiorthogonal sequence of compact objects under
+coproducts and extensions leaves it semiorthogonal, and its components
+triangulated, replete, and coproduct-closed. These are the three standing
+hypotheses the base-change layer otherwise assumes about its source sequence.
+-/
+
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.coprodClosure
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.coprodClosure_component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.le_coprodClosure_component
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.coprodClosure_hasTriangulatedComponents
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.coprodClosure_isClosedUnderIsomorphisms
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.coprodClosure_isClosedUnderColimitsOfShape
