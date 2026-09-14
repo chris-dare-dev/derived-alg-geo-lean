@@ -33,6 +33,7 @@ Mathlib alone, and nothing from `DerivedAlgGeo`.
 * `ObjectProperty.liftOfLE`: the restriction of `F` to a subcategory `P ≤ F⁻¹ Q`, landing in `Q`,
   with the `Additive`, `CommShift ℤ`, and `IsTriangulated` instances a triangulated consumer needs.
 * `ObjectProperty.preimageLift`: its case of a two-way detection `P X ↔ Q (F.obj X)`.
+* `ObjectProperty.preimageLiftEquivalence`: that restriction of an equivalence is an equivalence.
 * `ObjectProperty.inverseImageLift`: its `P = F⁻¹ Q` case.
 * `ObjectProperty.liftToInverseImage`: the restriction of a functor in the other direction whose
   composite with `F` preserves `Q`.
@@ -85,6 +86,14 @@ instance instIsTriangulatedLiftOfLE [P.IsTriangulated] [Q.IsTriangulated] [F.Com
     (liftOfLE F hle).IsTriangulated :=
   inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).IsTriangulated
 
+instance instFaithfulLiftOfLE [F.Faithful] (hle : P ≤ Q.inverseImage F) :
+    (liftOfLE F hle).Faithful :=
+  inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).Faithful
+
+instance instFullLiftOfLE [F.Full] (hle : P ≤ Q.inverseImage F) :
+    (liftOfLE F hle).Full :=
+  inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).Full
+
 /-- The functor between the two full subcategories selected by a detection
 equivalence: `liftOfLE` along its forward direction, by definition. -/
 def preimageLift (F : Functor C D) (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
@@ -118,6 +127,31 @@ noncomputable instance instEssSurjPreimageLift [F.EssSurj] [Q.IsClosedUnderIsomo
     have hFX : Q (F.obj X) := Q.prop_of_iso e.symm Y.property
     let XP : P.FullSubcategory := ⟨X, (hmem X).2 hFX⟩
     exact ⟨XP, ⟨Q.isoMk e⟩⟩
+
+instance instFaithfulPreimageLift [F.Faithful] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
+    (preimageLift F hmem).Faithful :=
+  inferInstanceAs (liftOfLE F (fun X ↦ (hmem X).1)).Faithful
+
+instance instFullPreimageLift [F.Full] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
+    (preimageLift F hmem).Full :=
+  inferInstanceAs (liftOfLE F (fun X ↦ (hmem X).1)).Full
+
+/-- A functor that is an equivalence restricts to an equivalence between the two
+full subcategories a detection cuts out.
+
+Full faithfulness restricts for free, by Mathlib's instances on `lift` and the
+full faithfulness of a full-subcategory inclusion. Essential surjectivity is the
+half that uses the detection: an ambient preimage is carried into `P` by the
+backward direction of `hmem`, and repleteness of `Q` lifts the ambient
+isomorphism. -/
+noncomputable def preimageLiftEquivalence (F : Functor C D) [F.IsEquivalence]
+    [Q.IsClosedUnderIsomorphisms] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
+    P.FullSubcategory ≌ Q.FullSubcategory :=
+  letI : F.Faithful := Functor.IsEquivalence.faithful (F := F)
+  letI : F.Full := Functor.IsEquivalence.full (F := F)
+  letI : F.EssSurj := Functor.IsEquivalence.essSurj (F := F)
+  letI : (preimageLift F hmem).IsEquivalence := { }
+  (preimageLift F hmem).asEquivalence
 
 /-- The restriction of `F` to the objects whose image lies in `Q`, landing
 in `Q`.  This is the functor between the selected subcategories under

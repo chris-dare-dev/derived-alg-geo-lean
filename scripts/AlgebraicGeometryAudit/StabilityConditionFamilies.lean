@@ -1301,3 +1301,18 @@ compact generation and stays an input.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourceQuasicoherentSequence_isClosedUnderIsomorphisms
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourceQuasicoherentSequence_isClosedUnderColimitsOfShape
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.le_sourcePerfectPart_sourceQuasicoherentSequence
+
+/-! ## Lemma 3.18 as an equivalence of base-change components (SF11 tranche J)
+
+The restricted pullbacks inherit full faithfulness from the ambient pullback,
+so an ambient equivalence restricts to an equivalence of the quasicoherent and
+bounded components. The hypothesis stays on the ambient functor: nothing here
+proves that any base-change pullback is an equivalence.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.quasicoherentPullbackOfDetection_faithful
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.quasicoherentPullbackOfDetection_full
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.quasicoherentPullbackOfDetectionEquivalence
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedPullbackOfDetection_faithful
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedPullbackOfDetection_full
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.boundedPullbackOfDetectionEquivalence
