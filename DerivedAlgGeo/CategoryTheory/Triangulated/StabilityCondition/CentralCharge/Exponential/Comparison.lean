@@ -59,15 +59,6 @@ def surfaceVec : NumClass ≃+ Exp.HDeg 2 where
   right_inv := by intro d; funext k; fin_cases k <;> simp
   map_add' := by intro v w; funext k; fin_cases k <;> simp [Prod.fst_add, Prod.snd_add]
 
-/-- The threefold lane's tuple carrier and the kernel's compressed degrees hold
-the same four reals, in the same order. Slot `0` is `∫H³·ch₀` on both sides. -/
-def threefoldVec : Threefold.NumClass ≃+ Exp.HDeg 3 where
-  toFun v := ![v.1, v.2.1, v.2.2.1, v.2.2.2]
-  invFun d := (d 0, d 1, d 2, d 3)
-  left_inv := by intro v; simp
-  right_inv := by intro d; funext k; fin_cases k <;> simp
-  map_add' := by intro v w; funext k; fin_cases k <;> simp [Prod.fst_add, Prod.snd_add]
-
 /-- The surface charge is the kernel at `m = 2`, `w = s + tI`. -/
 theorem stCharge_eq_exp (s t : ℝ) (v : NumClass) :
     stCharge s t v = Exp.charge 2 (Exp.stChart (s, t)) ![v.rk, v.deg, v.ch2] := by

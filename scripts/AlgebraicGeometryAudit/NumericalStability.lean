@@ -4,6 +4,8 @@ branches append to different files (#480). See the umbrella file for the contrac
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability
 
+#print axioms AlgebraicGeometry.Numerical.twist_degree_eq_exp
+
 /-! ## Polarised numerical data — definitions only
 
 A polarisation is explicit data hanging off `NumericalRingData`, never an
