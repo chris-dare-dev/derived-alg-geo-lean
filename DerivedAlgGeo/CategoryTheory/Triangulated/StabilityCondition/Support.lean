@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.Semistable
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.Transfer
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Support.Divisorial
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Support.Predicate
 
 /-! # Support properties -/

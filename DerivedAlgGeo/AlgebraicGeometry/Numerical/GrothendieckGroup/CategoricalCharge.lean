@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.CentralCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Quadratic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Charge
 
 /-!
@@ -88,6 +89,18 @@ theorem charge_toMukaiChargeData (E : C) :
     (D.toMukaiChargeData f cl).charge bR β ω E
       = D.numericalCharge bR f β ω (cl (K₀Ab.of E)) :=
   rfl
+
+variable {D bR f β ω}
+
+/-- **A wall is a vanishing charge**, for the class of an object.  This
+interpretation lives in the categorical stability adapter so the underlying
+numerical charge remains independent of wall loci. -/
+theorem mem_wall_iff_numericalCharge_eq_zero (hb : ∀ x y : W, bR x y = bR y x)
+    (hω : 0 < bR ω ω) (E : N) :
+    PeriodDomain.pairSpan (Mukai.expRe bR β ω) (Mukai.expIm bR β ω) ∈
+        PeriodDomain.wall (Mukai.realForm bR) (Mukai.extendMap f (D.mukaiVectorHom E)) ↔
+      D.numericalCharge bR f β ω E = 0 :=
+  Mukai.mem_wall_iff_expCharge_eq_zero bR β ω hb hω
 
 end AdditiveMukaiData
 

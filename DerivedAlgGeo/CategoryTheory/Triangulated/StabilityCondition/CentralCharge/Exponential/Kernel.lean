@@ -2,18 +2,18 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.ChargeFamily
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Family
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 
 /-!
 # The exponential charge, indexed by truncation degree
 
-One polynomial. `Walls/Numerical/` carries the surface charge on three real
-coordinates and `Walls/Threefold/` the Bayer--Macrì--Toda charge on four, and
+One polynomial. `CentralCharge/Numerical/` carries the surface charge on three
+real coordinates and the Bayer--Macrì--Toda charge on four, and
 the threefold file's own docstring records that they are the same expansion of
 `-∫exp(-(β + iα)H)ch` at two codimensions. They are nevertheless two unrelated
 roots, and no fourfold charge exists. This file is the shared parent, and
-`Walls/Exp/Comparison.lean` proves both existing families are instances of it.
+`CentralCharge/Exponential/Comparison.lean` proves both existing families are instances of it.
 
 ## The index is the truncation degree, never the dimension
 

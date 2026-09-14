@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Signature
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.WallRegion
+import Mathlib.Topology.Algebra.Module.FiniteDimensionBilinear
 
 /-!
 # Finitely many spherical walls meet a compact family of exponential planes

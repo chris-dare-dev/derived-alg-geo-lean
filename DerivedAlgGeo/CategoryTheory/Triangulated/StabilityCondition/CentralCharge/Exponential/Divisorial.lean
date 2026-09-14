@@ -2,18 +2,18 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Charge
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Exp.Kernel
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Charge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential.Kernel
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.CentralCharge
 
 /-!
 # The divisorial charge is the exponential kernel
 
-`Walls/Exp/Kernel.lean` states the exponential charge once, indexed by
-truncation degree, and `Walls/Exp/Comparison.lean` proves the two compressed
-`H`-degree families are it. Those families are Picard rank one. This file does
+`CentralCharge/Exponential/Kernel.lean` states the exponential charge once,
+indexed by truncation degree, and `CentralCharge/Exponential/Comparison.lean`
+proves the two compressed `H`-degree families are it. Those families are Picard rank one. This file does
 the case that actually decides whether the kernel is worth having: the
-divisorial charge of `Walls/Divisorial/Charge.lean`, which takes two
+divisorial charge of `CentralCharge/Divisorial/Charge.lean`, which takes two
 independent classes `B` and `omega` in the full real divisor space.
 
 ## Why this is the keystone
@@ -44,7 +44,7 @@ proof.
 
 The keystone is proved on a bare `Mukai.RealExtension D`, not on a
 `ChernCharacter`. That is load-bearing rather than stylistic: `mukaiCharge`
-(`Walls/Divisorial/Mukai.lean`) is the same `expCharge` on a *different* triple,
+(`CentralCharge/Divisorial/Mukai.lean`) is the same `expCharge` on a *different* triple,
 so a `ChernCharacter`-level statement could not reach it, and the correction
 class the next slice inhabits is exactly that difference. The
 `ChernCharacter` forms below follow by `toRealExtension`.

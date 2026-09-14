@@ -2,25 +2,17 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Charge
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Circle
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Coordinates
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Discriminant
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Mukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Region
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Signature
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Slice
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Support
 
 /-!
-# Divisorial central charges and their walls
+# Divisorial wall loci
 
-The charge attached to a real divisor space with a symmetric intersection form,
-an additive Chern-character triple valued in it, and two independent divisor
-parameters `B` and `omega`.  Nothing in this subtree mentions a scheme, a
-sheaf, a numerical intersection ring, or a stability condition: it is the
-arithmetic that `Walls/Numerical/` performs in three compressed real
-coordinates, done instead in the uncompressed divisor space.
+The divisorial charges and discriminants live upstream under
+`CentralCharge/Divisorial/`; support theorems live under `Support/Divisorial`.
+This subtree owns only their wall loci, circle geometry, and finiteness.
 
 Declarations use the strong-child namespace
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial`.

@@ -1,0 +1,2 @@
+# Central-charge construction is upstream of wall loci, including transitively.
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Numerical
