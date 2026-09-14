@@ -1,0 +1,666 @@
+schema: roadmap/1
+slug: mathematical-ownership
+project: derived-alg-geo-lean
+title: Mathematical ownership and abstraction boundaries
+status: active
+phase: sequenced
+brief: 'Structural companion to charge-abstraction CA1–CA3 (milestones 49–51), based on the 2026-09-13
+  repository-wide ownership review at 9edfb9d6. It preserves the existing single charge kernel, separates
+  foundations from comparisons/applications, and repairs the non-charge owners without duplicating SRF1,
+  DG3, DT1 or SF8 theorem work. Source review: docs/reviews/2026-09-13-mathematical-ownership-review.md.
+  Execution plan: docs/reviews/2026-09-13-mathematical-ownership-plan.md.'
+goal:
+  objective: Place independently reusable mathematics at its proper owner, retain canonical roots and
+    explicit specialization/realization maps, and prevent foundations importing their applications.
+  key_results:
+  - All fifteen review findings have an implemented or explicitly reasoned disposition, linked to source
+    and implementing PRs.
+  - Charge construction precedes walls; neutral quadratic/lattice algebra and geometric Mukai interpretation
+    have distinct owners.
+  - Linear Serre/Yoneda, abelian stability, dg H0, derived operations, perfectness, GL cover and planar
+    geometry have independently importable foundations.
+  - CA1–CA3 retain their mathematical ownership and conditional root decisions; no formula, pairing or
+    carrier is duplicated by moving a file.
+  - Tracker, roadmap, imports, umbrellas, audits, source-owner checks and prescribed runner CI agree.
+  wont:
+  - No source refactor is implemented by the planning PR; proposed destinations are settled in MO1.01
+    before cutover.
+  - No global rank ordering of Mathlib subjects, no repository/library split, and no empty speculative
+    abstraction carriers.
+  - No automatic equivalence of numerical models with geometric realizations, kernel negativity with full
+    support, ordinary H0 presentation with exact enhancement, or arbitrary loci with codimension-one manifolds.
+  - No hidden strengthening of finite-Tor, Noetherian, HN, integrality, signature or exactness hypotheses.
+  - No completion claim for unrelated mathematics in CA, SRF1, DG3, DT1 or SF8.
+generated_by:
+  agent: Codex
+  at: '2026-09-13'
+generations:
+- at: '2026-09-13'
+  note: Created at the user’s request as a companion milestone with milestone-direct tasks. New native
+    blockers are only on MO1 tasks; existing CA membership, status and native blockers are preserved.
+    The new milestone is first claimed by this roadmap file, avoiding new unreferenced issues on existing
+    roadmap-owned milestones before the planning PR merges.
+items:
+- id: mathematical-ownership-m1
+  gh_milestone: 52
+  kind: milestone
+  title: MO1 — Mathematical ownership and abstraction boundaries
+  status: planned
+  lane: now
+  acceptance:
+  - MO1.01 records canonical owners and reconciles pending path contracts; no new carrier bypasses the
+    root-review rule.
+  - MO1.02–MO1.14 implement or explicitly adjudicate findings 01–15 with their existing mathematical boundaries
+    intact.
+  - MO1.15 records focused import evidence, comparison preservation and required runner verification;
+    all tracker/roadmap references agree.
+- id: mathematical-ownership-t1
+  gh_issue: 1312
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.01 — Agree canonical owners and a coordinated cutover map
+  status: planned
+  summary: Record the definition owner, neutral core, application adapter and comparison owner for each
+    confirmed finding before moving source. Amend the placement policy where it currently conflates a
+    new subject with an extension of an existing Mathlib API. Coordinates CA1–CA3 (#1222–#1230), SRF1,
+    DG3, DT1 and SF8. It establishes a shared placement contract; it does not block existing mathematical
+    proofs on completion of the entire MO1 milestone.
+  priority: must
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-14
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:governance
+  - type:docs
+  - sev:medium
+  - ready
+  acceptance:
+  - Publish a declaration-level old-to-new owner map in docs/architecture/cutover-ledger.md. Consult the
+    pinned Mathlib definition site first; candidate paths in the review are proposals, not existing upstream
+    APIs.
+  - Document separately subject ownership, imports and specialization maps. Retain one DerivedAlgGeo library,
+    the geometry firewall, Development as a leaf, and generic derived categories and DGCategory beside
+    their actual Mathlib carriers.
+  - 'Settle the shared CA path contract: neutral paired complex functionals in linear algebra; stability
+    charge families upstream of Walls; geometric Chern/Todd realizations under AlgebraicGeometry. Preserve
+    the single roots and names required by #1223 and #1230.'
+  - Name component-specific forbidden import edges and legitimate core-umbrella exceptions; narrow the
+    blanket Numerical stability exemption by subcomponent instead of imposing a total order on Mathlib
+    subjects.
+  - Update AGENTS.md, CONTRIBUTING.md, placement.md, abstraction-tree.md and the cutover ledger consistently
+    where affected. Reconcile the path-specific clauses of linked open issues with this map without changing
+    their mathematical acceptance.
+  - Every proposed new carrier has the required independent-consumer justification or is replaced by a
+    theorem/abbreviation. No empty speculative hierarchy or mass rename is authorized by this decision
+    alone.
+- id: mathematical-ownership-t2
+  gh_issue: 1313
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.02 — Make charge construction upstream of walls and separate neutral pairing lemmas
+  status: blocked
+  summary: Split the linear-algebra functional/kernel/bounds API from its stability interpretation, and
+    move the existing ChargeFamily and exponential/divisorial constructors to their agreed owners upstream
+    of Walls. CA1 owns formulas and corrections (#1222–#1225); CA2 owns rotation/tilt (#1226–#1228); CA3
+    owns the pairing bridge and conditional root (#1229–#1230). This issue owns extraction and import
+    direction only.
+  priority: must
+  size: L
+  tags:
+  - ownership
+  - architecture
+  - review-01
+  - review-04
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:stability
+  - area:algebra
+  - type:refactor
+  - sev:high
+  - blocked
+  acceptance:
+  - 'Reuse ChargeFamily and Exp.ofMoments from #1219–#1221; all existing surface, threefold, slope and
+    divisorial comparisons remain available. No second charge carrier or polynomial is introduced.'
+  - Extract arbitrary quadratic continuity/coercivity/level-set bounds from WallFiniteness; retain genuinely
+    quadratic statements under QuadraticForm. General paired complex-functional algebra is independent
+    of stability, schemes and wall arrangements.
+  - Place stability-facing families and support adapters under the agreed CentralCharge/Support owners.
+    Split divisorial charge data, Chern coordinates, Hodge input and Todd corrections by actual subject;
+    wall equations import the constructors.
+  - Keep the primitive abstract charge additive (a map to ℂ); Chern character and κ are geometric constructors,
+    not mandatory fields of every charge. State both semistable-class nonnegativity and kernel negativity
+    when claiming quadratic support.
+  - Update the divisorial-root assertions in the layering/single-owner gates with the move. Demonstrate
+    imports of neutral pairing, charge-family core and Exp kernel do not reach their wall or geometric
+    consumers.
+  - 'If #1230 introduces pairCharge, use that root; if its review withdraws it, retain the existing functional
+    plus its bridges. Settle that branch explicitly without making the placement split wait for an unjustified
+    graded structure.'
+  - 'Keep the existing tilt-dependent rotation comparison downstream of the neutral ChargeFamily core;
+    accommodate #1226–#1228 without importing tilting into it.'
+  blocked_by:
+  - 1312
+- id: mathematical-ownership-t3
+  gh_issue: 1314
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.03 — Separate positive frames, positive planes and the different wall loci
+  status: blocked
+  summary: 'Give the current period-domain and wall APIs names and owners matching what they actually
+    define, with explicit maps between frame, plane, numerical-locus and stability interpretations. Consumes
+    the ownership split in MO1.02. Relates to CA2 wall invariance, but does not duplicate #1226 or assert
+    phase invariance.'
+  priority: must
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-02
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:stability
+  - area:algebra
+  - type:refactor
+  - sev:high
+  - blocked
+  acceptance:
+  - Distinguish the current unoriented positive two-plane carrier from ordered positive frames. Provide
+    the required forgetful/comparison maps; do not identify a complex-vector domain with a submodule carrier
+    by a rename.
+  - Retain general positivity, signature, orthogonality arrangements and their finiteness lemmas in neutral
+    linear algebra. Place actual geometric period-domain identifications with the geometric realization.
+  - Document and separate Z(δ)=0, determinant/alignment loci, signed ray loci and actual destabilization
+    walls. Charge-zero is generically real codimension two; alignment is generically codimension one only
+    with appropriate nondegeneracy.
+  - Do not introduce a common codimension-one-submanifold superclass. Any smoothness/codimension theorem
+    carries its regularity/transversality hypotheses; equal-phase adapters carry nonzero/sign conditions.
+  - Keep existing wall/local-finiteness results with explicit comparison theorems after relabeling; actual
+    destabilization requires categorical existence data. No theorem is strengthened by terminology alone.
+  blocked_by:
+  - 1313
+- id: mathematical-ownership-t4
+  gh_issue: 1315
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.04 — Separate hyperbolic-extension algebra from geometric Mukai realizations
+  status: blocked
+  summary: 'Extract reusable extension, reflection and Gram-form algebra from Lattice/Mukai while retaining
+    geometric Mukai terminology for the realization and its geometric consequences. Native prerequisites
+    #1223 and #1229 avoid moving the shared root while its canonical form and bridges are still being
+    established. CA3 remains the sole owner of those mathematical deliverables.'
+  priority: must
+  size: L
+  tags:
+  - ownership
+  - architecture
+  - review-03
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:algebra
+  - area:algebraic-geometry
+  - type:refactor
+  - sev:high
+  - blocked
+  acceptance:
+  - Identify the existing Z × N × Z carrier and its real extension as hyperbolic-extension algebra. Place
+    general reflections and Gram theory at their neutral lattice/form owners with explicitly sufficient
+    hypotheses.
+  - Move or adapt IsSpherical, expectedDim, Mukai-vector/Euler interpretations and geometric period identifications
+    at the application boundary; preserve the distinctions between a numerical model and an integral surface
+    Mukai lattice.
+  - 'Consume #1223’s coefficient-ring generalization of the EXISTING Mukai.pairing, keeping fixed arity
+    three and its required public name. Do not create a second generalized pairing because the directory
+    changes.'
+  - 'Preserve #1229’s n=2, weighted rank-one and factor-of-two bridges. Check the actual carriers: HDeg
+    2 is a Fin-indexed function type and RealExtension is a product; supply the explicit coordinate equivalence
+    when needed rather than assuming definitional equality.'
+  - Preserve the odd-degree alternating obstruction, the polarization weight and the loss of information
+    at higher divisor rank. Integrality and Euler-pairing identifications are proved or supplied geometric
+    inputs.
+  - 'Treat #1230’s pairCharge and any graded pairing as separate decisions. Honor its two-consumer review/withdrawal
+    alternative; no speculative graded parent is needed for this extraction.'
+  blocked_by:
+  - 1312
+  - 1223
+  - 1229
+- id: mathematical-ownership-t5
+  gh_issue: 1316
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.05 — Remove numerical parent-to-specialization import inversions
+  status: blocked
+  summary: 'Split generic numerical/Todd/transport foundations from K3, dimension-specific and cross-surface
+    comparison files. Structural continuation of closed #1221, coordinated with open #1222 and #1225.
+    Those issues retain the correction/fourfold constructions; this one removes backwards imports.'
+  priority: must
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-07
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:algebraic-geometry
+  - area:stability
+  - type:refactor
+  - sev:high
+  - blocked
+  acceptance:
+  - Split Numerical/Mukai/SqrtTodd so generic correction algebra does not import K3 Riemann–Roch. Put
+    K3 identification downstream, preserving the explicit codimension-at-most-four scope of sqrtComp.
+  - 'Split generic PolarisedWallTransport from surface/threefold comparisons: the generic (n,m,κ) root
+    imports no specialized transport, and each comparison imports both sides.'
+  - Separate Abelian/K3 and Enriques/Abelian numerical comparison material so each model imports the common
+    foundation rather than a sibling merely to reuse a comparison.
+  - 'Preserve #1221’s transport, #1222’s arbitrary-surface rank-one pointwise √td comparison and all parameter
+    reindexing obligations. n and m remain separate; κ=1 and κ=√td are distinct choices.'
+  - Add focused transitive-import checks for each extracted root and verify at least the existing surface
+    and threefold consumers use it. Do not replace missing geometry with an unrestricted instance.
+  blocked_by:
+  - 1313
+- id: mathematical-ownership-t6
+  gh_issue: 1317
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.06 — Distinguish numerical models, named surface cases and geometric realizations
+  status: blocked
+  summary: 'Organize reusable Numerical/Examples material as mathematical models and put variety-specific
+    realizations beneath the common numerical construction. Follows MO1.05’s comparison split; coordinates
+    CA1 #1225. The classification includes naming, import owners and realization maps, not a new numerical
+    K-theory.'
+  priority: should
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-12
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:algebraic-geometry
+  - type:refactor
+  - sev:medium
+  - blocked
+  acceptance:
+  - Classify each current Examples file as a reusable model, a comparison or an actual worked example;
+    move the first two to subject owners, leaving Examples for demonstrations.
+  - Choose a coherent surface/dimension model hierarchy and make K3, Enriques and abelian surface models
+    siblings. Move the K3-only central-charge material out of the vaguely generic Numerical/GrothendieckGroup
+    owner.
+  - Keep actual schemes/surfaces and their realization maps distinct from formal rank-degree-coordinate
+    models; record the map that makes each advertised specialization reach the common root.
+  - Label the Enriques rank-one model as a polarization slice, not the full numerical lattice. Do not
+    infer higher-dimensional numerical-ring generation by H from Picard rank one.
+  - Preserve arbitrary-divisor-rank charges as a separate input branch of the shared exponential kernel,
+    not as a child of lossy scalar H-degree compression.
+  - 'Document where the reusable fourfold models of #1225 belong, without reproducing their charge formula
+    or claiming a geometric existence theorem.'
+  blocked_by:
+  - 1316
+- id: mathematical-ownership-t7
+  gh_issue: 1318
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.07 — Move linear Serre duality and Yoneda helpers to their independent owners
+  status: blocked
+  summary: 'Make the basic Serre-functor and linear representability theory importable without triangulated
+    categories. SRF1 #897–#899 remains responsible for new full-faithfulness, transport and geometric-duality
+    theorems. This issue relocates/repackages the owner; it does not duplicate those proofs.'
+  priority: must
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-05
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:derived
+  - type:refactor
+  - sev:high
+  - blocked
+  acceptance:
+  - Move SerreFunctor/Basic and linear uniqueness/equivalence material to CategoryTheory/Linear/SerreFunctor
+    under the agreed map; retain shift/Ext/triangulated results in downstream adapters.
+  - Extract isoOfLinearYonedaIso and the independent hom_ext helper to a linear Yoneda owner; the Serre
+    API consumes it.
+  - Preserve public declaration names and assumptions; full faithfulness still needs Hom-finiteness and
+    essential surjectivity is not inferred from full faithfulness.
+  - 'In #898 separate ordinary linear conjugation transport from shift coherence, exactness and TriEquiv
+    packaging if they land together. No shift/exactness assumption is added to the linear core.'
+  - Coordinate the open SRF1 path contracts and audit routing with the move. Show a minimal linear-core
+    import has no path to Triangulated or stability.
+  blocked_by:
+  - 1312
+- id: mathematical-ownership-t8
+  gh_issue: 1319
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.08 — Separate abelian stability foundations and make slope theory independent of Gieseker
+  status: blocked
+  summary: 'Extract abelian stability functions/HN foundations from the triangulated weak-stability application
+    and organize geometric slope and Gieseker theories as siblings. SF1 #192/#208 owns weak stability
+    and HRS tilting; CA2 #1226–#1228 owns the tilt-charge comparisons. Neither set of mathematical deliverables
+    is refiled here.'
+  priority: must
+  size: L
+  tags:
+  - ownership
+  - architecture
+  - review-06
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:stability
+  - area:algebraic-geometry
+  - type:refactor
+  - sev:high
+  - blocked
+  acceptance:
+  - Move the independently abelian StabilityFunction/HN declarations from Weak/Foundation/StabilityFunction
+    to the agreed CategoryTheory/Abelian stability owner; triangulated weak stability consumes them.
+  - Retain Weak as a legitimate child of StabilityCondition. The task is the misplaced abelian root, not
+    reversing every weakened-concept directory.
+  - Separate μ-stability and μ-HN from the Gieseker owner, using sibling Slope and Gieseker modules with
+    downstream comparison files.
+  - Preserve weak versus ordinary stability, the zero-charge subcategory, chain/HN hypotheses and geometry
+    firewall; do not identify slope and Gieseker stability.
+  - Demonstrate independent abelian and slope imports and preserve current tilting and geometric consumers.
+    Coordinate audit routing with SF1 rather than introducing a parallel stability-function carrier.
+  blocked_by:
+  - 1312
+- id: mathematical-ownership-t9
+  gh_issue: 1320
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.09 — Own H⁰ constructions with DGCategory and make enhancement exactness explicit
+  status: blocked
+  summary: 'Separate DGCategory’s intrinsic H⁰/shift/triangle/functor theory from the data comparing it
+    with a chosen triangulated category. DG3 #854/#855 owns seam and exactness proofs. MO1 owns module
+    placement and truthful comparison packaging; later DG4/DG5 consumers must see the distinction.'
+  priority: must
+  size: L
+  tags:
+  - ownership
+  - architecture
+  - review-15
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:dg
+  - area:derived
+  - type:refactor
+  - sev:high
+  - blocked
+  acceptance:
+  - Move generic H⁰ shift, triangle and pretriangulated compatibility results from Triangulated/DGEnhancement/H0
+    to Algebra/Homology/DGCategory/H0 or Pretriangulated as the declaration owner requires.
+  - Keep the present DGCategory on HomComplex; no enriched-category reencoding is part of this issue.
+    Preserve identity/composition and the existing DGFunctor.h0 construction.
+  - Distinguish an ordinary equivalence H⁰(C) ≌ D from an exact enhancement of triangulated D. If retaining
+    the current weaker carrier, label it as an underlying presentation and add the exact comparison/refinement
+    explicitly.
+  - 'Use #855 for linear/exact H⁰ and #854 for the classical seam; do not replace their missing theorem
+    with a supplied Boolean or exactness field that is advertised as proved.'
+  - Keep object-specific homotopy-category realizations with HomotopyCategory. Intrinsic dg H⁰ imports
+    no enhancement consumer, scheme realization or stability.
+  - Preserve supplied-vs-proved boundaries and avoid any general uniqueness-of-enhancements assertion.
+  blocked_by:
+  - 1312
+- id: mathematical-ownership-t10
+  gh_issue: 1321
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.10 — Extract derived tensor and pushforward capabilities from Fourier–Mukai
+  status: blocked
+  summary: 'Give general derived operations their own geometry-level owners, leaving Fourier–Mukai files
+    to assemble kernels, convolution and transforms. DT1 remains owner of tensor inhabitation; #795/#796
+    remain owners of transform equivalence/adjoint obligations; SF8 #554 owns arbitrary pullback. This
+    is a placement split, not discharge of those trust boundaries.'
+  priority: must
+  size: L
+  tags:
+  - ownership
+  - architecture
+  - review-10
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:derived
+  - area:algebraic-geometry
+  - type:refactor
+  - sev:high
+  - blocked
+  acceptance:
+  - Extract HasDerivedTensor, HasDerivedPushforward and the general coherent derived-tensor compatibility
+    from KernelCorrespondence/DerivedTensorCoherence to agreed DerivedCategory/Tensor and pushforward
+    owners; separate unbounded, bounded-coherent and relative inputs.
+  - Retain kernel-specific projection formula, convolution and compositor/adjunction data with FourierMukai;
+    avoid mechanically moving every class mentioned by a transform.
+  - 'Review ordinary-category Correspondence separately: move it to a neutral KernelTransform owner only
+    if the actual declarations require no triangulated structure. No speculative common carrier.'
+  - 'Coordinate DT1 #892/#928–#931 constructors and path contracts with the extracted existing roots.
+    Do not recreate their bifunctor, resolution interface or coherence.'
+  - Preserve finite-Tor/boundedness and exactness hypotheses. Derived tensor on bounded coherent objects
+    is conditional; singular schemes do not acquire it through relocation.
+  - Demonstrate a general tensor/pushforward import without FourierMukai or stability, and rebuild the
+    transform/relative-family consumers against the same capabilities.
+  blocked_by:
+  - 1312
+- id: mathematical-ownership-t11
+  gh_issue: 1322
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.11 — Move flatness and relative-perfect predicates out of the moduli consumer
+  status: blocked
+  summary: 'Make geometric flatness, pseudo-coherence and Tor-amplitude predicates usable independently
+    of the relative-perfect moduli problem. SF8 #517/#554 and #723 retain construction, preservation and
+    compact-perfect obligations. The issue is foundational ownership, with the existing trust boundary
+    unchanged.'
+  priority: must
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-11
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:moduli
+  - area:derived
+  - type:refactor
+  - sev:high
+  - blocked
+  acceptance:
+  - Extract module flatness over a scheme morphism from Moduli/PerfectComplex/Relative to Modules/Flat
+    (or the actual module owner agreed in MO1.01).
+  - Place pseudo-coherence, Tor amplitude and intrinsic/relative perfect-complex predicates with DerivedCategory/Perfect;
+    the moduli groupoid and descent consume those owners.
+  - 'Keep the current schemePseudoCoherent criterion explicitly restricted/interpreted as in #554: on
+    arbitrary non-Noetherian bases it is not automatically standard pseudo-coherence. A move must neither
+    erase this warning nor pretend to prove the missing preservation theorem.'
+  - Preserve the distinction and one-way comparisons among schemePerfect, schemeRelativePerfect and TwoTermPerfectDeterminantData;
+    add no global equivalence instance.
+  - Rebuild existing relative-perfect, determinant and moduli consumers, and show the foundational predicates
+    have no transitive Moduli/stability dependency.
+  blocked_by:
+  - 1312
+- id: mathematical-ownership-t12
+  gh_issue: 1323
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.12 — Separate the GL⁺(2,ℝ) cover from its stability action
+  status: blocked
+  summary: 'Extract the standalone covering-group/topological construction currently owned by stability
+    symmetry. Related AUT1 #927 concerns an autoequivalence action and supplied proper discontinuity;
+    it is not the owner of this independent GL-cover construction and is not discharged here.'
+  priority: should
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-08
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:stability
+  - type:refactor
+  - sev:medium
+  - blocked
+  acceptance:
+  - Classify GLTilde declarations into group/cover theory and phase/slicing/action adapters. Place the
+    former by the pinned general-linear/covering API under the approved map.
+  - Retain stability-specific phase lifts and action compatibility downstream; do not infer a covering
+    theorem from the name GLTilde if it is only supplied in the current formalization.
+  - Preserve public names and the current action laws; prove or retain the explicit projection/comparison
+    consumed by stability.
+  - Show the cover-core import reaches neither StabilityCondition nor AlgebraicGeometry, and verify the
+    existing symmetry consumer still elaborates.
+  blocked_by:
+  - 1312
+- id: mathematical-ownership-t13
+  gh_issue: 1324
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.13 — Make mass a sibling of metric and extract planar convex geometry
+  status: blocked
+  summary: 'Give mass its own stability-theoretic owner and move neutral planar perimeter/convexity lemmas
+    out of a mass-subadditivity proof directory. Relates to the mass-Hom consumer #1185, whose theorem
+    and moduli input remain outside this structural issue.'
+  priority: should
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-09
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:stability
+  - type:refactor
+  - sev:medium
+  - blocked
+  acceptance:
+  - Place mass definitions and intrinsic mass results under StabilityCondition/Mass, with Metric importing
+    the mass API it uses.
+  - Extract Euclidean polygon/perimeter/convex geometry from Metric/Mass/Subadditivity to the nearest
+    appropriate neutral analysis/convexity owner, checking actual Mathlib definitions first.
+  - Keep HN-polygon and semistability interpretations in stability adapters; show the planar core imports
+    no categories or stability.
+  - Retain mass triangle/subadditivity and metric consumers with the same hypotheses and normalizations;
+    do not reconstruct mass under a second name.
+  - Give proof-shaped or paper-number files in this touched subtree a descriptive subject owner while
+    retaining citation/source bindings.
+  blocked_by:
+  - 1312
+- id: mathematical-ownership-t14
+  gh_issue: 1325
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.14 — Repair direct Mathlib-owner mismatches in module and sheaf APIs
+  status: blocked
+  summary: Perform the small, independently reviewable owner corrections where the current path disagrees
+    with the API being extended. These are direct owner corrections, not a wholesale reorganization of
+    the broadly sound sheaf/site/scheme hierarchy.
+  priority: should
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-13
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:algebra
+  - area:algebraic-geometry
+  - type:refactor
+  - sev:medium
+  - blocked
+  acceptance:
+  - Move CategoryTheory/ModuleCat/LinearDual to Algebra/Category/ModuleCat beside the existing exactness
+    API.
+  - Split/move the presheaf exterior-power content currently under ModuleCat/Sheaf to the actual PresheafOfModules
+    owner; retain genuinely sheaf-specific declarations with sheaves.
+  - Place the quasicoherent extension-closure theorem in Modules/Quasicoherent; isolate any affine/cohomological
+    helpers to avoid a cycle rather than retaining a proof-technique owner for the theorem.
+  - Place the scheme-module exterior-power restriction API currently under Divisors/ExteriorPower with
+    Modules/ExteriorPower/Restriction, leaving divisor-specific consequences downstream.
+  - Use separate small PRs if import closures differ. Preserve names, audits and source bindings, and
+    verify each destination against the pinned Mathlib API rather than a guessed upstream path.
+  blocked_by:
+  - 1312
+- id: mathematical-ownership-t15
+  gh_issue: 1326
+  kind: task
+  parent: mathematical-ownership-m1
+  title: MO1.15 — Verify the completed ownership graph and close the migration ledger
+  status: blocked
+  summary: Close MO1 on evidence that the extracted foundations are reusable and every review finding
+    has a completed or explicitly adjudicated disposition. This is the integration acceptance task for
+    the companion milestone, not another theorem-development track.
+  priority: must
+  size: M
+  tags:
+  - ownership
+  - architecture
+  - review-14
+  labels:
+  - initiative:architecture-hardening
+  - arch:layering
+  - area:lean
+  - area:governance
+  - type:task
+  - sev:medium
+  - blocked
+  acceptance:
+  - Record a disposition for findings 01–15 with the implementing PR, old/new owner and canonical specialization/realization
+    map. No finding is dropped because a path merely looks cleaner.
+  - Run focused transitive-import checks for neutral pairing/charge cores, generic numerical transport,
+    linear Serre/Yoneda, abelian stability, dg H⁰, derived operations, perfectness, GL cover and planar
+    geometry. Add regression fixtures for genuine policy edges, not a total subject ranking.
+  - Ensure umbrellas expose neutral cores without reimporting specializations; update coverage exceptions,
+    single-owner checks, audit routing, registry/source-owner paths, historical-name executable support
+    and CI paths together with each move.
+  - Verify CA1–CA3 retain their canonical roots, comparison obligations and independent state. New paths
+    must not reopen completed kernel work, duplicate pending discriminant/tilt proofs or convert the conditional
+    graded-root proposal into a mandatory structure.
+  - Run check_roadmap.py --require-api and all relevant architecture checks, then obtain the prescribed
+    full runner CI on the final implementation commit. No local full-library build, hidden axiom or sorry
+    is a refactoring shortcut.
+  - The milestone closes only after all accepted placement work has landed; any rejected proposal needs
+    a documented mathematical/import-graph reason and tracker/roadmap agreement. Completion does not assert
+    that unrelated SRF1, DG3, DT1, SF8 or all CA mathematics is finished.
+  blocked_by:
+  - 1314
+  - 1315
+  - 1317
+  - 1318
+  - 1319
+  - 1320
+  - 1321
+  - 1322
+  - 1323
+  - 1324
+  - 1325

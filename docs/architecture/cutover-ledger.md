@@ -5,6 +5,28 @@ signature test in `placement.md`. It is a migration queue, not an allowlist:
 new code must use the canonical owner immediately, and touching one of these
 blocks should normally move it rather than add more declarations beside it.
 
+## Mathematical ownership review: pending cutovers (2026-09-13)
+
+The [MO1 execution plan](../reviews/2026-09-13-mathematical-ownership-plan.md)
+tracks the [fifteen review findings](../reviews/2026-09-13-mathematical-ownership-review.md)
+in [milestone 52](https://github.com/chris-dare-dev/derived-alg-geo-lean/milestone/52).
+These are pending ownership repairs, not completed roots or policy exemptions.
+[#1312](https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/1312)
+settles the declaration-level destinations and policy amendments before cutover.
+
+- Charge roots, wall/period terminology and hyperbolic-extension/Mukai separation: #1313–#1315.
+- Generic numerical/Todd/transport separation and model ownership: #1316–#1317.
+- Linear Serre/Yoneda, abelian stability/slope and intrinsic dg H⁰: #1318–#1320.
+- Derived tensor/pushforward and flatness/relative-perfect foundations: #1321–#1322.
+- GL cover, mass/planar geometry and direct Mathlib-owner repairs: #1323–#1325.
+- Import-boundary, canonical-root, audit and runner verification: #1326.
+
+CA1–CA3 retain their charge/pairing/tilt mathematics. A new name or directory
+does not discharge a geometric realization, a support condition, exactness,
+bounded tensor closure or standard pseudo-coherence on arbitrary bases.
+Each implementing PR records its completed cutover here and advances its
+roadmap entry; existing completed roots below are unaffected by this queue.
+
 ## Completed roots
 
 - `H⁰` dg-functor compositor coherence and adjunction normalization
