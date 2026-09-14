@@ -2,8 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.Abelian
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.Enriques
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface
 
 /-!
 # A numerical Enriques surface of Picard rank one
@@ -45,7 +46,6 @@ the abelian one.
 
 * `enriquesNumericalVariety` — the model.
 * `standardEnriquesNumericalVariety` — a named degree-one witness.
-* `k3EnriquesAbelianPresentations` — the three presentations on one carrier.
 
 ## Main results
 
@@ -55,8 +55,6 @@ the abelian one.
 * `enriquesChiStructureSheaf` — `∫_Y td₂ = χ(O_Y) = 1`.
 * `enriquesToddComp_one` — `td₁ = 0`: the canonical class is numerically
   trivial, though not trivial in `Pic`.
-* the pairwise `χ(O)` distinctions `2 ≠ 1 ≠ 0` between the three rank-one
-  models.
 
 ## References
 
@@ -177,39 +175,6 @@ theorem standardEnriquesNumericalVariety_isEnriques :
     Enriques.IsEnriques standardEnriquesNumericalVariety := by
   simpa [standardEnriquesNumericalVariety] using
     enriques_isEnriques 1 (by norm_num)
-
-/-- Three numerical presentations on the same carriers coexist as ordinary
-data, extending `k3AndAbelianPresentations`. This is a regression test against
-making any presentation a global instance. -/
-noncomputable def k3EnriquesAbelianPresentations (d : ℕ) :
-    NumericalVarietyData 2 SurfaceRing SurfaceNum ×
-      NumericalVarietyData 2 SurfaceRing SurfaceNum ×
-        NumericalVarietyData 2 SurfaceRing SurfaceNum :=
-  (k3NumericalVariety d, enriquesNumericalVariety d, abelianNumericalVariety d)
-
-/-- The Enriques and K3 models are provably different data: `1 ≠ 2`. -/
-theorem chiStructureSheaf_enriques_ne_k3 (d : ℕ) (hd : d ≠ 0) :
-    Surface.chiStructureSheaf (enriquesNumericalVariety d) ≠
-      Surface.chiStructureSheaf (k3NumericalVariety d) := by
-  rw [enriquesChiStructureSheaf d hd, k3ChiStructureSheaf d hd]
-  norm_num
-
-/-- The Enriques and abelian models are provably different data: `1 ≠ 0`.
-This is the pair the `td₁ = 0` equation cannot separate, so `∫td₂` is the
-*only* numerical invariant doing so. -/
-theorem chiStructureSheaf_enriques_ne_abelian (d : ℕ) (hd : d ≠ 0) :
-    Surface.chiStructureSheaf (enriquesNumericalVariety d) ≠
-      Surface.chiStructureSheaf (abelianNumericalVariety d) := by
-  rw [enriquesChiStructureSheaf d hd, abelianChiStructureSheaf d]
-  norm_num
-
-/-- The K3 and abelian models are provably different data: `2 ≠ 0`. Completes
-the pairwise distinction of the three rank-one surface models. -/
-theorem chiStructureSheaf_k3_ne_abelian (d : ℕ) (hd : d ≠ 0) :
-    Surface.chiStructureSheaf (k3NumericalVariety d) ≠
-      Surface.chiStructureSheaf (abelianNumericalVariety d) := by
-  rw [k3ChiStructureSheaf d hd, abelianChiStructureSheaf d]
-  norm_num
 
 end Examples
 

@@ -4,7 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Discriminant
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3
 
 /-!
 # A polarisation, the Mumford slope, and the two `H`-discriminants
@@ -68,7 +67,6 @@ field, supplied by whoever builds the polarisation.
 * `slopeH` — the Mumford slope, junk at rank zero.
 * `discDegH`, `discDegH_mul_mem` and `Surface.discDegH_eq`.
 * `Surface.discrH` — the tilt discriminant, and **not** `∫Δ(E)`.
-* `Examples.k3Polarization` and `Examples.degH_k3` — a worked instance.
 -/
 
 universe u v
@@ -198,39 +196,5 @@ theorem discrH_eq_selfPairing (E : N) :
   ring
 
 end Surface
-
-/-! ### A worked instance on the rank-one K3 model -/
-
-namespace Examples
-
-open AlgebraicGeometry.Numerical.Examples
-
-/-- The hyperplane class as a polarisation of the K3 numerical ring.
-
-`hd : d ≠ 0` is what makes `∫H² = 2d` positive, matching the convention of
-`k3NumericalVariety_satisfiesHRR` and `k3_isK3`. -/
-noncomputable def k3Polarization (d : ℕ) (hd : d ≠ 0) :
-    Polarization (surfaceNumericalRing (2 * (d : ℚ))) where
-  cls := H
-  cls_mem := H_mem_piece_one
-  degree_pow_pos := by
-    have : (surfaceNumericalRing (2 * (d : ℚ))).degree (H ^ 2) = 2 * (d : ℚ) :=
-      surfaceDegree_Hsq _
-    rw [this]
-    have : (0 : ℚ) < (d : ℚ) := by
-      exact_mod_cast Nat.pos_of_ne_zero hd
-    linarith
-
-/-- The `H`-degree on the K3 model is `2d` times the `ch₁` coefficient. -/
-theorem degH_k3 (d : ℕ) (hd : d ≠ 0) (E : SurfaceNum) :
-    degH (k3NumericalVariety d) (k3Polarization d hd) E = 2 * (d : ℚ) * (E 1 : ℚ) := by
-  show (surfaceNumericalRing (2 * (d : ℚ))).degree
-      (algebraMap ℚ SurfaceRing (k3ChCoeff E 1) * H * H ^ 1) = _
-  rw [pow_one, mul_assoc, ← pow_two,
-    NumericalRingData.degree_algebraMap_mul, surfaceDegree_Hsq]
-  show (E 1 : ℚ) * (2 * (d : ℚ)) = _
-  ring
-
-end Examples
 
 end AlgebraicGeometry.Numerical

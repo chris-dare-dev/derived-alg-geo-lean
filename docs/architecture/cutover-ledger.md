@@ -225,6 +225,20 @@ of its new directory.
 | Application adapter | K3, abelian and Enriques surface models are built from a shared surface-model constructor rather than from each other |
 | Comparison owner | old/new agreement theorems move to a downstream comparison module; the K3/abelian/Enriques comparison witnesses move to a downstream `Models/Surface/Comparison.lean` |
 
+**Landed 2026-09-14** in #1316. `Mukai/SqrtTodd.lean` and
+`Mukai/VectorClass.lean` now contain only dimension-general constructions;
+their K3 consequences live in `SqrtToddK3.lean` and `VectorClassK3.lean`.
+`Stability/Slope.lean` is independent of the K3 worked example, which moved to
+`SlopeK3.lean`. `PolarisedWallTransport.lean` owns the generic `(n,m,κ)` root,
+while `PolarisedWallTransportComparison.lean` imports the surface and
+threefold leaves. Shared rank-one Chern coordinates live in `RankOne.lean`,
+and cross-model witnesses live in `Examples/Surface/Comparison.lean`.
+
+The layering gate checks the transitive closures of the square-root, slope and
+polarised-transport roots against K3, named-surface and dimension-specific
+consumers. Fully qualified declaration names and the codimension-four bound on
+`sqrtComp_convolution` are unchanged.
+
 The present comparisons are good mathematics and all of them survive; what
 changes is which module owns them. The explicit codimension-four bound on
 `sqrtComp` survives relocation unchanged -- it is not an arbitrary-degree
@@ -410,6 +424,13 @@ MO1.06 and MO1.13 work, since each still mixes modules that reach the stability
 tree with modules that do not.
 
 ## Completed roots
+
+- Numerical foundations upstream of specializations (2026-09-14, finding 07):
+  generic square-root Todd, Mukai-class, slope, and polarised-transport roots
+  no longer import K3 or dimension-specific consumers. K3 simplifications,
+  surface/threefold transport comparisons, and K3/abelian/Enriques model
+  comparisons are downstream modules. The three surface models share the
+  rank-one coordinate constructor rather than importing sibling models.
 
 - Positive planes, positive frames and numerical loci (2026-09-14, finding 02):
   `QuadraticForm/PositivePlane.lean` and `PositiveFrame.lean` own distinct

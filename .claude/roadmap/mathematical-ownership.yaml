@@ -258,7 +258,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.05 — Remove numerical parent-to-specialization import inversions
-  status: in_progress
+  status: done
   summary: 'Split generic numerical/Todd/transport foundations from K3, dimension-specific and cross-surface
     comparison files. Structural continuation of closed #1221, coordinated with open #1222 and #1225.
     Those issues retain the correction/fourfold constructions; this one removes backwards imports.'

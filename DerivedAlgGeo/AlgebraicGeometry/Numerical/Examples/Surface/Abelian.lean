@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface
 
 /-!
@@ -106,13 +106,6 @@ theorem abelianNumericalVariety_satisfiesHRR (d : ℕ) :
   show _ = 2 * (d : ℚ) * ((E 0 : ℚ) * 0 + (E 1 : ℚ) * 0 + (E 2 : ℚ))
   push_cast
   ring
-
-/-- Two numerical presentations on the same carriers coexist as ordinary data. This is a
-regression test against making either presentation a global instance. -/
-noncomputable def k3AndAbelianPresentations (d : ℕ) :
-    NumericalVarietyData 2 SurfaceRing SurfaceNum ×
-      NumericalVarietyData 2 SurfaceRing SurfaceNum :=
-  (k3NumericalVariety d, abelianNumericalVariety d)
 
 /-- `td₁ = 0`: the canonical class of an abelian surface is trivial. -/
 theorem abelianToddComp_one (d : ℕ) :

@@ -3,8 +3,6 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.SqrtTodd
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Discriminant
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.MukaiVector
 
 /-!
 # The Mukai vector as a class in the intersection ring
@@ -92,72 +90,5 @@ theorem degree_mukaiComp_mul_mukaiComp_eq_zero (E F : N) {i j : ℕ} (hij : i + 
     (V.ring.mul_mem_piece (V.mukaiComp_mem E i) (V.mukaiComp_mem F j))
 
 end NumericalVarietyData
-
-namespace K3
-
-open NumericalVarietyData
-
-variable {V : NumericalVarietyData 2 A N}
-
-/-- On a K3 the linear component of the Mukai vector is `c₁`: the cross term dies because
-`√td₁ = 0`. -/
-theorem mukaiComp_one (hK3 : IsK3 V) (E : N) : V.mukaiComp E 1 = V.chComp E 1 := by
-  rw [mukaiComp, Finset.sum_range_succ, Finset.sum_range_one]
-  simp [K3.sqrtToddComp_one hK3]
-
-/-- On a K3 the top component is `ch₂(E) + rank(E)·√td₂`: the middle summand
-`ch₁(E)·√td₁` vanishes. -/
-theorem mukaiComp_two (hK3 : IsK3 V) (E : N) :
-    V.mukaiComp E 2 =
-      V.chComp E 2 + algebraMap ℚ A (V.rank E : ℚ) * V.sqrtToddComp 2 := by
-  simp [mukaiComp, Finset.sum_range_succ, K3.sqrtToddComp_one hK3, V.chComp_zero]
-  ring
-
-/-- **The deliverable the lane hangs on.** `∫_X v₂(E) = mukaiS V E`.
-
-`mukaiS` was defined as `rank E + ∫ ch₂(E)`, which is what `ch(E)·√td(X)` comes to in top
-codimension on a K3 — but only because `∫√td₂ = 1`. That is now used rather than asserted. Note
-the hypothesis: `IsK3` alone, with no Riemann–Roch input. -/
-theorem degree_mukaiComp_two (hK3 : IsK3 V) (E : N) :
-    V.ring.degree (V.mukaiComp E 2) = mukaiS V E := by
-  rw [mukaiComp_two hK3, map_add, NumericalRingData.degree_algebraMap_mul,
-    K3.degree_sqrtToddComp_two hK3, mukaiS]
-  ring
-
-/-! ### The asserted triple is the computed class
-
-`IntegralMukaiData.mukaiVector` asserts the triple `(rank, c₁, s)` by formula. These three
-statements say it is `ch(E)·√td(X)`.
-
-The middle coordinate is compared **through the form** `b`, never by an equation in `Λ`. That is
-deliberate and is the strongest available statement: in `IntegralMukaiData` the class `c₁` is a
-bare function with no additivity and no relation to `A`, so there is no map to compare against.
-`MukaiVector.lean`'s own `b_c₁_add` docstring explains why. -/
-
-section Comparison
-
-variable {Λ : Type*} [AddCommGroup Λ] (D : IntegralMukaiData V Λ)
-
-/-- The rank coordinate needs no comparison; it holds by definition. -/
-theorem mukaiVector_fst_eq (E : N) : (D.mukaiVector E).1 = V.rank E := rfl
-
-/-- **The `c₁` coordinate is the linear component of `ch(E)·√td(X)`**, read through the form. -/
-theorem b_mukaiVector_snd_eq_degree (hK3 : IsK3 V) (E F : N) :
-    ((D.b (D.mukaiVector E).2.1 (D.c₁ F) : ℤ) : ℚ) =
-      V.ring.degree (V.mukaiComp E 1 * V.chComp F 1) := by
-  rw [mukaiComp_one hK3]
-  exact D.b_spec E F
-
-/-- **The `s` coordinate is the degree of the top component of `ch(E)·√td(X)`.**
-
-This is the coordinate that was previously justified only in prose. -/
-theorem mukaiVector_thd_eq_degree (hHRR : V.SatisfiesHRR) (hK3 : IsK3 V) (E : N) :
-    (((D.mukaiVector E).2.2 : ℤ) : ℚ) = V.ring.degree (V.mukaiComp E 2) := by
-  rw [degree_mukaiComp_two hK3]
-  exact mukaiSInt_spec V hHRR hK3 E
-
-end Comparison
-
-end K3
 
 end AlgebraicGeometry.Numerical

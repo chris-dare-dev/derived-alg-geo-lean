@@ -3,8 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.VectorClass
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.ThreefoldWallTransport
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.WallTransport
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.Slope
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Exponential
 
 /-!
@@ -147,73 +146,6 @@ theorem hDegrees_zero (V : NumericalVarietyData n A N) (P : Polarization V.ring)
   rw [hc, Nat.sub_zero, NumericalRingData.degree_algebraMap_mul]
 
 /-! ###########################################################################
-    (1) THE n = 2 COMPARISON — `WallTransport.lean:112`.
-    ########################################################################### -/
-
-/-- **The surface transport is `(n, m, κ) = (2, 2, 1)` of the root.**
-`Surface.toNumClass` (WallTransport.lean:112) is exactly the root's H-degree
-vector; in particular its slot 0 weighting by `∫H²` is the `k = 0` case of
-`hDegrees_zero`, not a per-dimension convention. -/
-theorem surface_toNumClass_eq (V : NumericalVarietyData 2 A N)
-    (P : Polarization V.ring) (E : N) :
-    Surface.toNumClass V P E
-      = (hDegrees V P (unitCorr A) 2 E 0,
-         hDegrees V P (unitCorr A) 2 E 1,
-         hDegrees V P (unitCorr A) 2 E 2) := by
-  have h0 : hDegrees V P (unitCorr A) 2 E 0
-      = ((V.ring.degree (P.cls ^ 2) * (V.rank E : ℚ) : ℚ) : ℝ) := by
-    show ((V.ring.degree (corrComp V (unitCorr A) E 0 * P.cls ^ (2 - 0)) : ℚ) : ℝ) = _
-    rw [hDegrees_zero V P E, mul_comm]
-  have h1 : hDegrees V P (unitCorr A) 2 E 1 = ((degH V P E : ℚ) : ℝ) := by
-    show ((V.ring.degree (corrComp V (unitCorr A) E 1 * P.cls ^ (2 - 1)) : ℚ) : ℝ) = _
-    rw [corrComp_unitCorr]
-    rfl
-  have h2 : hDegrees V P (unitCorr A) 2 E 2
-      = ((V.ring.degree (V.chComp E 2) : ℚ) : ℝ) := by
-    show ((V.ring.degree (corrComp V (unitCorr A) E 2 * P.cls ^ (2 - 2)) : ℚ) : ℝ) = _
-    rw [corrComp_unitCorr]
-    norm_num
-  rw [h0, h1, h2]
-  rfl
-
-/-! ###########################################################################
-    (2) THE n = 3 TWIN — `ThreefoldWallTransport.lean:146`.
-    The critic's finding: this was a code comment, never a declaration.
-    ########################################################################### -/
-
-/-- **The threefold transport is `(n, m, κ) = (3, 3, 1)` of the root.**
-`Threefold.toNumClass` (ThreefoldWallTransport.lean:146) is the root's H-degree
-vector at `n = 3`: slot 0 is `∫H³ · rank E` by `hDegrees_zero`, and slots 1–3
-are `∫ H^(3-k) · ch_k(E)`. -/
-theorem threefold_toNumClass_eq (V : NumericalVarietyData 3 A N)
-    (P : Polarization V.ring) (E : N) :
-    Threefold.toNumClass V P E
-      = (hDegrees V P (unitCorr A) 3 E 0,
-         hDegrees V P (unitCorr A) 3 E 1,
-         hDegrees V P (unitCorr A) 3 E 2,
-         hDegrees V P (unitCorr A) 3 E 3) := by
-  have h0 : hDegrees V P (unitCorr A) 3 E 0
-      = ((V.ring.degree (P.cls ^ 3) * (V.rank E : ℚ) : ℚ) : ℝ) := by
-    show ((V.ring.degree (corrComp V (unitCorr A) E 0 * P.cls ^ (3 - 0)) : ℚ) : ℝ) = _
-    rw [hDegrees_zero V P E, mul_comm]
-  have h1 : hDegrees V P (unitCorr A) 3 E 1
-      = ((V.ring.degree (V.chComp E 1 * P.cls ^ 2) : ℚ) : ℝ) := by
-    show ((V.ring.degree (corrComp V (unitCorr A) E 1 * P.cls ^ (3 - 1)) : ℚ) : ℝ) = _
-    rw [corrComp_unitCorr]
-  have h2 : hDegrees V P (unitCorr A) 3 E 2
-      = ((V.ring.degree (V.chComp E 2 * P.cls) : ℚ) : ℝ) := by
-    show ((V.ring.degree (corrComp V (unitCorr A) E 2 * P.cls ^ (3 - 2)) : ℚ) : ℝ) = _
-    rw [corrComp_unitCorr]
-    norm_num
-  have h3 : hDegrees V P (unitCorr A) 3 E 3
-      = ((V.ring.degree (V.chComp E 3) : ℚ) : ℝ) := by
-    show ((V.ring.degree (corrComp V (unitCorr A) E 3 * P.cls ^ (3 - 3)) : ℚ) : ℝ) = _
-    rw [corrComp_unitCorr]
-    norm_num
-  rw [h0, h1, h2, h3]
-  rfl
-
-/-! ###########################################################################
     (3) N4 — the honest relation between `slopeH` and the root's slots.
     `slopeH` (Slope.lean:133) is `degH / rank`, while slot 0 is `rank · ∫Hⁿ`.
     So the ratio `d₁ / d₀` is NOT the slope: it is the slope divided by `∫Hⁿ`.
@@ -282,32 +214,4 @@ theorem slopeH_ne_ratio_of_degree_ne_one (V : NumericalVarietyData n A N)
   exact hdeg (by exact_mod_cast hone)
 
 
-/-! ### The family-level comparison -/
-
-/-- The surface transport's H-degree vector IS the surface lane's coordinate
-identification of `Surface.toNumClass`. -/
-theorem surfaceVec_toNumClass (V : NumericalVarietyData 2 A N)
-    (P : Polarization V.ring) (E : N) :
-    surfaceVec (Surface.toNumClass V P E) = hDegrees V P (unitCorr A) 2 E := by
-  funext k
-  rw [surface_toNumClass_eq V P E]
-  fin_cases k <;> simp [surfaceVec]
-
-/-- **The existing surface wall family is the root's, reindexed by the chart.**
-This is the family-level statement; the class-level one is
-`surface_toNumClass_eq`. -/
-theorem surface_wallChargeFamily_eq (V : NumericalVarietyData 2 A N)
-    (P : Polarization V.ring) :
-    Surface.wallChargeFamily V P
-      = (wallChargeFamily V P (unitCorr A) 2).reindex Exp.stChart := by
-  apply ChargeFamily.ext
-  intro p
-  ext E
-  rw [Surface.wallChargeFamily_charge, stCharge_eq_exp]
-  show _ = Exp.charge 2 (Exp.stChart p) (hDegrees V P (unitCorr A) 2 E)
-  rw [← surfaceVec_toNumClass V P E]
-  rfl
-
 end AlgebraicGeometry.Numerical.Polarised
-
-#print axioms AlgebraicGeometry.Numerical.Polarised.surface_wallChargeFamily_eq
