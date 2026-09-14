@@ -84,7 +84,11 @@ Category
 │  │  │  └─ mutation / projection chains objectwise cones and iteration
 │  │  └─ Stability conditions           consume the independent charge core above
 │  └─ Linear k C                         Mathlib root
+│     ├─ linear Yoneda representability  preimageIso / map_injective, no Serre datum
 │     └─ SerreFunctorData                duality on Hom spaces
+│        ·                               CategoryTheory/Linear/SerreFunctor/; the
+│        ·                               five entries below it are the shift-dependent
+│        ·                               refinements, under Triangulated/SerreFunctor/
 │        ├─ SerreCategoryData            chosen Serre autoequivalence
 │        │  └─ EnriquesCategoryData      square-to-shift refinement
 │        ├─ IsSphericalObject            two-degree self-Hom profile

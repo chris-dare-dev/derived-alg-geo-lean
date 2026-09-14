@@ -3,12 +3,21 @@ Serre-functor and paper-object slice of the StabilityCondition audit.  These
 are generic linear/triangulated category interfaces; the Enriques geometric
 specialization is audited separately in AlgebraicGeometryAudit/Core.lean.
 
+TWO ROOTS, TWO IMPORTS.  The k-linear duality data, its uniqueness and the
+linear Yoneda helpers are owned by CategoryTheory/Linear/, which needs no
+shift; the shift-dependent refinements are owned by
+CategoryTheory/Triangulated/SerreFunctor/.  The triangulated umbrella no
+longer re-exports the linear root, so both are imported by name.  Every
+declaration below kept its fully qualified name across that move.
+
 The classification structures are SUPPLIED DATA.  Ext-profile constructors
 and their bidirectional transport under a Serre-compatible equivalence are
 proved here.  A clean axiom list says that their formal consequences use no
 hidden axioms; it does not construct the geometric Ext calculations assumed
 by the two papers.
 -/
+import DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor
+import DerivedAlgGeo.CategoryTheory.Linear.Yoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 
 #print axioms ModuleCat.linearDualFunctor
@@ -175,10 +184,12 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 Any two Serre functors on the same k-linear category are naturally isomorphic, and the isomorphism
 compatible with both duality isomorphisms is unique. The argument is Yoneda.
 
-THE REPRESENTABILITY STEP IS PUBLIC API, not a private step: `isoOfLinearYonedaIso` is stated on
+THE REPRESENTABILITY STEP HAS ITS OWN OWNER: `isoOfLinearYonedaIso`, `map_isoOfLinearYonedaIso`
+and `hom_ext_of_linearYoneda` live in CategoryTheory/Linear/Yoneda.lean. They are stated on
 `linearYoneda` alone and proved without reference to `SerreFunctorData`, because a downstream lane
-needs it on a functor that is not a Serre functor. It is `Functor.preimageIso` against Mathlib's
-`full_linearYoneda` and `faithful_linearYoneda`, so representability is not hand-rolled.
+needs them on a functor that is not a Serre functor. They are `Functor.preimageIso`,
+`Functor.map_preimage` and `Functor.map_injective` against Mathlib's `full_linearYoneda` and
+`faithful_linearYoneda`, so representability is not hand-rolled.
 
 TRAP, recorded in the module docstring: WHICH VARIABLE the Yoneda argument runs in. Hom is
 contravariant in the first and covariant in the second variable, and the dual flips both, so

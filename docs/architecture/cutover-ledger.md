@@ -173,6 +173,9 @@ central-charge record is introduced merely to improve names.
 | Application adapter | `CategoryTheory/Triangulated/SerreFunctor/` keeps `Objects`, `Enriques`, `Classification`, `Transport`, `ProjectionObjects` and `Matching`, which add shift, Ext profiles and semiorthogonal structure |
 | Comparison owner | unchanged; SRF1 `#897`--`#899` keeps full faithfulness, equivalence/shift transport and the geometric Serre-duality obligations |
 
+**Landed 2026-09-13** in #1318; see "Linear Serre duality and representability"
+under Completed roots.
+
 Independent consumer for `CategoryTheory/Linear/Yoneda.lean`: a downstream lane
 already needs the representability step on a functor that is *not* a Serre
 functor, which is why those declarations were made public in the first place.
@@ -386,6 +389,35 @@ MO1.06 and MO1.13 work, since each still mixes modules that reach the stability
 tree with modules that do not.
 
 ## Completed roots
+
+- Linear Serre duality and representability (2026-09-13, finding 05):
+  `CategoryTheory/Linear/SerreFunctor/` now owns `SerreFunctorData`, the
+  `HomFinite` hypothesis, `SerreCategoryData`, the Serre pairing, trace and
+  `finrank` identity, and the whole uniqueness development --
+  `compareEquiv`, `yonedaIso`, `uniqueIsoApp`, `uniqueIso`, `uniqueIso_unique`
+  and the reflexivity, transitivity and symmetry coherence lemmas.
+  `CategoryTheory/Linear/Yoneda.lean` owns `isoOfLinearYonedaIso`,
+  `map_isoOfLinearYonedaIso` and `hom_ext_of_linearYoneda`, which mention no
+  Serre datum and are `Functor.preimageIso`, `Functor.map_preimage` and
+  `Functor.map_injective` against Mathlib's `full_linearYoneda` and
+  `faithful_linearYoneda`. Neither file mentions a shift or a distinguished
+  triangle, and the source said so before the move: the previous owner's own
+  docstring recorded that no shift or triangulation is needed.
+  `CategoryTheory/Triangulated/SerreFunctor/` keeps exactly the
+  shift-dependent half -- `Objects`, `Enriques`, `Classification`, `Matching`,
+  `ProjectionObjects`, `Transport` -- and imports the linear root. Its umbrella
+  no longer re-exports the moved modules, so the audit slice imports both roots
+  by name.
+  Every fully qualified declaration name survived unchanged, including the
+  three helpers that keep the `CategoryTheory.SerreFunctor` namespace inside a
+  linear Yoneda file; that divergence is decision 1 of the owner map, not an
+  oversight. No hypothesis moved: full faithfulness still spends
+  Hom-finiteness, `HasRightSerreFunctor` is still the Reiten--Van den Bergh
+  right Serre functor with essential surjectivity supplied separately by
+  `SerreCategoryData.serreIsEquivalence`, and no shift or exactness assumption
+  was added to the linear core. SRF1 (#897--#899) keeps its full-faithfulness,
+  transport and geometric-duality obligations; this cutover proves none of
+  them.
 
 - `H⁰` dg-functor compositor coherence and adjunction normalization
   (2026-09-13): `DGFunctor.h0CompIso_assoc`, `h0CompIso_comp_id`, and
@@ -1311,7 +1343,8 @@ tree with modules that do not.
   inclusion and its universal Hom equivalence; `Mutation.lean` constructs the
   objectwise counit triangle and proves the generic projection-chain theorem.
   Ext profiles, their bidirectional transport, and classification-induced
-  candidate matching remain generic in `SerreFunctor/`; adjacent Ext shift
+  candidate matching remain generic in `Triangulated/SerreFunctor/`, which
+  since 2026-09-13 imports the linear duality root rather than owning it; adjacent Ext shift
   rigidity and bidirectional ordered block-length comparison live in
   `SemiorthogonalDecomposition/AdjacentExt.lean`.  The one-step criterion and
   result interface live in `FourierMukai/ExceptionalExtension.lean`, while

@@ -34,6 +34,13 @@ nothing else checks.
    back.
 6. **New top-level subjects are deliberate.** A directory directly below the
    source root must be one of the Mathlib subjects this repository uses.
+9. **The linear Serre root is shift-free.** ``CategoryTheory/Linear/Yoneda.lean``
+   needs Mathlib alone, nothing below ``CategoryTheory/Linear/SerreFunctor/``
+   reaches ``CategoryTheory/Triangulated`` even transitively, and the three
+   linear-Yoneda representability helpers are declared exactly once. This is
+   the claim MO1.07 (#1318) moved those files to make true, and it is the kind
+   of claim that decays silently: one convenience import from a triangulated
+   consumer and the root is no longer importable without a shift.
 7. **The ``ObjectProperty`` lift block stays at its carrier's path.**
    ``CategoryTheory/ObjectProperty/Lift.lean`` declares all six of
    it and imports nothing from ``DerivedAlgGeo``; no other module redeclares
@@ -195,6 +202,10 @@ RETIRED_PATHS = (
     "Symmetry/Autoequivalence/Instances",
     "CategoryTheory/Triangulated/StabilityCondition/"
     "WeakCompatibility",
+    # 2026-09-13 MO1.07: the k-linear Serre duality data and its uniqueness
+    # need no shift, so they moved to CategoryTheory/Linear/SerreFunctor/.
+    "CategoryTheory/Triangulated/SerreFunctor/Basic.lean",
+    "CategoryTheory/Triangulated/SerreFunctor/Uniqueness.lean",
 )
 
 
@@ -231,6 +242,21 @@ DIVISORIAL_BLOCK = (
     "OrthogonalSlice",
     "StabilityParameters",
 )
+# Rule 9. The k-linear Serre duality data and the linear Yoneda representability
+# helpers moved out of Triangulated/ on 2026-09-13 (MO1.07, #1318) because they
+# mention no shift and no distinguished triangle -- the previous owner's own
+# module docstring said as much. Pinned in both directions: the Yoneda file
+# needs Mathlib alone, the Serre root reaches no triangulated module, and the
+# three helpers are declared once so a consumer cannot quietly re-derive them.
+LINEAR_YONEDA_ROOT = "CategoryTheory/Linear/Yoneda.lean"
+LINEAR_YONEDA_BLOCK = (
+    "isoOfLinearYonedaIso",
+    "map_isoOfLinearYonedaIso",
+    "hom_ext_of_linearYoneda",
+)
+LINEAR_SERRE_ROOT_DIR = "CategoryTheory/Linear/SerreFunctor"
+TRIANGULATED_TREE = f"{LIBRARY}.CategoryTheory.Triangulated"
+
 STRUCTURE_DECLARES = re.compile(
     r"^\s*(?:private\s+|protected\s+|noncomputable\s+)*structure\s+(\S+)"
 )
@@ -577,6 +603,71 @@ def main() -> int:
                     f"{module_of(next(div_dir.glob('Charge.lean')))} instead"
                 )
 
+    # Rule 9.
+    yoneda_root = SOURCE_ROOT / LINEAR_YONEDA_ROOT
+    if not yoneda_root.is_file():
+        failures.append(
+            f"missing {yoneda_root.relative_to(ROOT)}: it owns the linear "
+            "Yoneda representability block; see "
+            "docs/architecture/cutover-ledger.md"
+        )
+    else:
+        yoneda_module = module_of(yoneda_root)
+        yoneda_imports, _ = parse(yoneda_root)
+        for imp in yoneda_imports:
+            if in_tree(imp, LIBRARY):
+                failures.append(
+                    f"{yoneda_root.relative_to(ROOT)}: imports {imp}; these "
+                    "three helpers are Mathlib's full and faithful "
+                    "`linearYoneda` and nothing else"
+                )
+        yoneda_declared = declared_names(yoneda_root.read_text(encoding="utf-8"))
+        for name in LINEAR_YONEDA_BLOCK:
+            if name not in yoneda_declared:
+                failures.append(
+                    f"{yoneda_root.relative_to(ROOT)}: no longer declares "
+                    f"{name}; the linear Yoneda block's canonical owner is "
+                    "this file"
+                )
+        for module, (path, _, _) in modules.items():
+            if module == yoneda_module:
+                continue
+            stray = declared_names(path.read_text(encoding="utf-8")) & set(
+                LINEAR_YONEDA_BLOCK
+            )
+            if stray:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)} "
+                    f"from the linear Yoneda block; import {yoneda_module} "
+                    "instead"
+                )
+    serre_root_dir = SOURCE_ROOT / LINEAR_SERRE_ROOT_DIR
+    if not serre_root_dir.is_dir():
+        failures.append(
+            f"missing {serre_root_dir.relative_to(ROOT)}: it owns the k-linear "
+            "Serre duality data; see docs/architecture/cutover-ledger.md"
+        )
+    else:
+        serre_root_module = module_of(serre_root_dir.with_suffix(".lean"))
+        for module in modules:
+            if not (
+                module == serre_root_module
+                or in_tree(module, serre_root_module)
+                or module == module_of(SOURCE_ROOT / LINEAR_YONEDA_ROOT)
+            ):
+                continue
+            reached = sorted(
+                dep
+                for dep in closure.of(module)
+                if in_tree(dep, TRIANGULATED_TREE)
+            )
+            if reached:
+                failures.append(
+                    f"{module}: reaches {reached[0]}; the linear Serre root "
+                    "exists to be importable without a shift or a "
+                    "triangulation (MO1.07)"
+                )
+
     failures += check_fixtures(closure)
 
     if failures:
@@ -602,7 +693,9 @@ def main() -> int:
         f"absent; the {len(OBJECT_PROPERTY_BLOCK)}-declaration ObjectProperty "
         "lift block is generic and declared once; the "
         f"{len(DIVISORIAL_BLOCK)}-structure divisorial charge block lives in "
-        "the Walls subtree and is declared once"
+        "the Walls subtree and is declared once; the "
+        f"{len(LINEAR_YONEDA_BLOCK)}-declaration linear Yoneda block needs "
+        "Mathlib alone and the linear Serre root reaches no triangulated module"
     )
     return 0
 
