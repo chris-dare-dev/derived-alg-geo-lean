@@ -38,8 +38,8 @@ namespace ObjectProperty
 /-- Semiorthogonality of two shift-stable generating properties extends to
 their triangulated envelopes. -/
 theorem triangEnvelope_le_rightOrthogonal_triangEnvelope
-    (P Q : ObjectProperty C) [P.IsStableUnderShift ℤ]
-    [Q.IsStableUnderShift ℤ] (h : Q ≤ P.rightOrthogonal) :
+    (P Q : ObjectProperty C) [Q.IsStableUnderShift ℤ]
+    (h : Q ≤ P.rightOrthogonal) :
     Q.triangEnvelope ≤ P.triangEnvelope.rightOrthogonal := by
   rw [ObjectProperty.triangEnvelope_le_iff]
   have hP : P.triangEnvelope ≤ Q.leftOrthogonal := by

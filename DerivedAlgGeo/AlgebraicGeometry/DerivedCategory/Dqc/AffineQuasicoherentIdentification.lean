@@ -238,8 +238,11 @@ theorem affineQuasicoherentBoundedDqcEquivalence_functor (R : CommRingCat.{u}) :
 ensures that an abstract equivalence is the concrete derived realization constructed in
 `AffineRealization.lean`.  This file does not construct an inhabitant. -/
 structure AffineQuasicoherentDqcIdentification (R : CommRingCat.{u}) where
+  /-- The abstract equivalence with the quasi-coherent locus on `Spec R`. -/
   equivalence : AffineQuasicoherentDerivedCategory R ≌
     SchemeQuasicoherentDerivedCategory (Spec R)
+  /-- The equivalence is the concrete derived realization, not merely some
+  equivalence of the two categories. -/
   comparison : equivalence.functor ≅ affineQuasicoherentDerivedToDqc R
 
 /-- The proposition that the explicit unbounded affine `Dqc` identification is available. -/

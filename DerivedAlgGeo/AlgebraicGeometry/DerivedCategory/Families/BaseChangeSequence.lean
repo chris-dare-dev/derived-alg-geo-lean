@@ -40,9 +40,11 @@ variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
   (D : KFlatBaseChangeData X T)
   {ι : Type w} [Preorder ι]
 
+/-- `Dqc(X)` for a scheme over the base, the source side of base change. -/
 abbrev SourceDqc (X : SchemeBaseChange S) :=
   Dqc.SchemeQuasicoherentDerivedCategory X.left
 
+/-- `Dqc(X_T)` on the fibre product, the target side of base change. -/
 abbrev TargetDqc (X T : SchemeBaseChange S) :=
   Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left
 

@@ -60,8 +60,10 @@ theorem shiftedFiberTensor_obj (G : CompactDqcFiber T) (a : ℤ)
   rfl
 
 /-- On a pulled-back source object, `shiftedFiberTensor` is definitionally the
-shifted K-flat external product used to generate the base-change component. -/
-@[simp]
+shifted K-flat external product used to generate the base-change component.
+
+Not a `simp` lemma: `shiftedFiberTensor_obj` already rewrites this left-hand
+side, so it could never fire. It stays as the named definitional bridge. -/
 theorem shiftedFiberTensor_obj_pullFst
     (P : ObjectProperty (SourceDqc X))
     (F : SourcePerfectPartCategory X P) (G : CompactDqcFiber T) (a : ℤ) :

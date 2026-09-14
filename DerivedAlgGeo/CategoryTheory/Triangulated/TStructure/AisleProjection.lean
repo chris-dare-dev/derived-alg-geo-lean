@@ -73,7 +73,10 @@ def aisleProjectionHomEquiv (n : ℤ)
     apply t.to_truncLE_obj_ext
     exact t.liftTruncLE_ι (f.hom ≫ (t.truncLEι n).app Y) n
 
-@[simp]
+/-- Not a `simp` lemma: `ObjectProperty.ι_obj` rewrites the source type of `f`,
+so simp's normal form for this left-hand side is one this statement does not
+have and the rewrite could never fire. `aisleProjectionAdjunction` uses it
+through `rw`, where that does not matter. -/
 theorem aisleProjectionHomEquiv_apply (n : ℤ)
     (X : (t.le n).FullSubcategory) (Y : C) (f : (t.le n).ι.obj X ⟶ Y) :
     t.aisleProjectionHomEquiv n X Y f =
@@ -81,7 +84,7 @@ theorem aisleProjectionHomEquiv_apply (n : ℤ)
   letI : t.IsLE ((t.le n).ι.obj X) n := ⟨X.property⟩
   rfl
 
-@[simp]
+/-- Not a `simp` lemma, for the reason given on `aisleProjectionHomEquiv_apply`. -/
 theorem aisleProjectionHomEquiv_symm_apply (n : ℤ)
     (X : (t.le n).FullSubcategory) (Y : C)
     (f : X ⟶ (t.aisleProjection n).obj Y) :

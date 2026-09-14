@@ -62,10 +62,10 @@ structure DqcFlatBaseChangeTheorem
     (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T)) where
   /-- Flatness of `X → S` gives derived base change. -/
-  of_source_flat [Flat X.hom] :
+  ofSourceFlat [Flat X.hom] :
     D.DqcFaithfulBaseChange pullBase pushBase pushFst
   /-- Flatness of `T → S` gives derived base change. -/
-  of_base_flat [Flat T.hom] :
+  ofBaseFlat [Flat T.hom] :
     D.DqcFaithfulBaseChange pullBase pushBase pushFst
 
 /-- The two projections from `X ×_S T` form the defining pullback square
@@ -113,7 +113,7 @@ def faithfulOfSourceFlat
     (H : D.DqcFlatBaseChangeTheorem pullBase pushBase pushFst)
     [Flat X.hom] :
     D.DqcFaithfulBaseChange pullBase pushBase pushFst :=
-  H.of_source_flat
+  H.ofSourceFlat
 
 /-- Specialize the flat-base-change theorem using flatness of `T → S`. -/
 def faithfulOfBaseFlat
@@ -123,7 +123,7 @@ def faithfulOfBaseFlat
     (H : D.DqcFlatBaseChangeTheorem pullBase pushBase pushFst)
     [Flat T.hom] :
     D.DqcFaithfulBaseChange pullBase pushBase pushFst :=
-  H.of_base_flat
+  H.ofBaseFlat
 
 end DqcFlatBaseChangeTheorem
 
