@@ -165,7 +165,15 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.03 — Separate positive frames, positive planes and the different wall loci
-  status: in_progress
+  status: done
+  progress: 'Separated the neutral positive-plane and ordered-positive-frame carriers and added
+    explicit framePlane and forgetPositiveFrame maps. Orthogonality arrangements and finiteness remain
+    in neutral QuadraticForm modules; generic charge-zero, determinant-alignment, positive-ray,
+    spherical nonpositive-ray and stability-space charge-zero loci now have distinct names and owners,
+    with comparison theorems carrying the required nonzero and sign data. Rule 10 pins those owners,
+    forbids a common codimension-one parent and retires the compressed source paths. Existing historical
+    spellings remain executable-only for immutable review restatement; no actual destabilization theorem
+    or geometric period-domain identification was invented.'
   summary: 'Give the current period-domain and wall APIs names and owners matching what they actually
     define, with explicit maps between frame, plane, numerical-locus and stability interpretations. Consumes
     the ownership split in MO1.02. Relates to CA2 wall invariance, but does not duplicate #1226 or assert

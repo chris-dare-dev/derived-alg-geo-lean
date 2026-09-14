@@ -399,6 +399,17 @@ tree with modules that do not.
 
 ## Completed roots
 
+- Positive planes, positive frames and numerical loci (2026-09-14, finding 02):
+  `QuadraticForm/PositivePlane.lean` and `PositiveFrame.lean` own distinct
+  carriers connected by `framePlane` and `forgetPositiveFrame`.
+  `OrthogonalityLocus.lean` and the `Orthogonality*` consumers retain the
+  neutral arrangement and finiteness theory. `CentralCharge/Family.lean`,
+  `Walls/Alignment.lean`, `Walls/Spherical/Basic.lean` and `Chambers/Basic.lean`
+  separately own charge-zero, determinant-alignment, positive-ray,
+  nonpositive-ray and stability-space loci. The comparison modules state only
+  the maps and inclusions their hypotheses support; no shared codimension-one
+  superclass or actual destabilization object was introduced.
+
 - Charge construction upstream of walls (2026-09-13, findings 01 and 04):
   `StabilityCondition/CentralCharge/Family.lean` now owns the unchanged
   additive `ChargeFamily`; `CentralCharge/Exponential/` owns the unchanged
