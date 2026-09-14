@@ -271,7 +271,8 @@ items:
     kind: epic
     parent: charge-abstraction-m3
     title: "The pairing bridge, as theorems about the existing root"
-    status: planned
+    status: done
+    progress: "Landed as three theorems beside `Mukai.realPairing` in `RealForm.lean`, with no new declaration: `realPairing_mul_eq_alternatingSum` (the n = 2 comparison, graded form written out rather than named), `realPairing_compression_rankOne` (the weighted bridge, `b H H` explicit and first power) and `realForm_compression_rankOne` (the factor of two is the `realForm` halving). The three refuted unifications are in the module docstring. One correction to the issue: `Exp.HDeg 2` is `Fin 3 -> R`, not definitionally `R x R x R`, so the comparison is stated on `Fin 3 -> R` coordinates with the repackaging explicit, as the issue's own MO1 note asks. All three depend only on propext, Classical.choice and Quot.sound."
     summary: "The n = 2 comparison, the weighted rank-one bridge and the `realForm` factor-of-two lemma, landed beside `Mukai.realPairing` in `RealForm.lean` as theorems about the root that already exists. Remediation proved what the audit had not checked: at n = 2 the proposed new graded form is literally `Mukai.realPairing (LinearMap.mul ℝ ℝ)` — same carrier, no weight, no transport — so shipping it as a definition would have added a second spelling of an existing pairing. Three refuted unifications go in the docstring; they are what justify any separate graded form existing at all. Deliberately sequenced BEFORE e12, inverting the audit's order."
     priority: must
     size: S
