@@ -42,11 +42,17 @@ quasi-coherent cohomology.  The external product is assembled from those
 lifts along the two fibre-product projections and a supplied tensor
 bifunctor on `Dqc(X_T)`.  The compactness layer below isolates the exact
 preservation statements needed to put the resulting generators, and hence
-their thick envelope, inside the compact objects of `Dqc(X_T)`.  Constructing
-the unbounded derived tensor and proving those preservation statements,
-constructing the source `Dqc` component from a strong semiorthogonal component
-of `Dᵇ(X)`, and proving pullback/pushforward functoriality are the next layers
-of Theorem 3.17.
+their thick envelope, inside the compact objects of `Dqc(X_T)`.
+
+The three layers of Theorem 3.17 this paragraph used to name as next are now
+built.  The unbounded derived tensor is the K-flat construction in
+`KFlatBaseChange.lean`; the source `Dqc` component is the coproduct-and-extension
+closure of a compact source sequence in `BaseChangeSourceSequence.lean`; and
+pullback/pushforward functoriality is lifted to whole sequences in
+`BaseChangeSequenceFunctoriality.lean`.  What remains of 3.17 is not
+construction but inhabitation: the compactness preservation statements isolated
+below, and compact generation on the source, are still supplied rather than
+proved.
 
 ## Main definitions
 

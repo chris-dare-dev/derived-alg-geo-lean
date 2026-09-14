@@ -30,3 +30,16 @@ import DerivedAlgGeo.CategoryTheory.ObjectProperty
 /-! ## Left orthogonals are closed under colimits -/
 
 #print axioms CategoryTheory.ObjectProperty.instIsClosedUnderColimitsOfShapeLeftOrthogonal
+
+/-! ## Full faithfulness of the restricted lift, and the restricted equivalence (SF11 tranche J)
+
+Full faithfulness restricts along a full-subcategory inclusion for free, so
+`preimageLift` of an equivalence is an equivalence once the detection supplies
+essential surjectivity. This is the categorical half of Lemma 3.18.
+-/
+
+#print axioms CategoryTheory.ObjectProperty.instFaithfulLiftOfLE
+#print axioms CategoryTheory.ObjectProperty.instFullLiftOfLE
+#print axioms CategoryTheory.ObjectProperty.instFaithfulPreimageLift
+#print axioms CategoryTheory.ObjectProperty.instFullPreimageLift
+#print axioms CategoryTheory.ObjectProperty.preimageLiftEquivalence
