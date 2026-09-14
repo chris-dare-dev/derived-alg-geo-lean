@@ -8,6 +8,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Bifunctor
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Thick
+import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Projection
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.FullSubcategory
@@ -455,3 +456,28 @@ the `HomFiniteBounded` model built on it is audited with the Euler form. -/
 #print axioms CategoryTheory.ObjectProperty.lift₂_obj
 #print axioms CategoryTheory.ObjectProperty.maps₂_of_comp_of_essSurj
 #print axioms PresheafOfModules.monoidalPreadditive
+
+/-! ## Canonical aisle projections and compact-generator projections (SF11 tranche G)
+
+Every aisle of a t-structure is right admissible with a canonical chosen
+projection, and a compact-generator approximation projects onto the coproduct
+closure of its generator with cocontinuity transferred from zero truncation.
+Generic triangulated category theory; the base-change consumer is geometric and
+is audited under AlgebraicGeometry.
+-/
+
+#print axioms CategoryTheory.Triangulated.TStructure.aisleInclusionIsLE
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjection
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjectionAdjunction
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjectionHomEquiv
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjectionHomEquiv_apply
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjectionHomEquiv_symm_apply
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjection_map_hom
+#print axioms CategoryTheory.Triangulated.TStructure.aisleProjection_obj_obj
+#print axioms CategoryTheory.Triangulated.TStructure.aisleRightProjectionData
+#print axioms CategoryTheory.Triangulated.TStructure.aisleRightProjectionDataAmbientIso
+#print axioms CategoryTheory.Triangulated.TStructure.aisleRightProjectionData_preservesSmallCoproducts
+#print axioms CategoryTheory.Triangulated.TStructure.le_isRightAdmissible
+#print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.coprodClosure_isRightAdmissible
+#print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.rightProjectionData
+#print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.rightProjectionData_preservesSmallCoproducts

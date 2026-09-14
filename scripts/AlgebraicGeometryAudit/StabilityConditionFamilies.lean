@@ -1038,13 +1038,6 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.quasicoherentSequence
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.quasicoherentSequence_component
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.quasicoherentSequence_hasTriangulatedComponents
-#print axioms CategoryTheory.Triangulated.TStructure.aisleProjection
-#print axioms CategoryTheory.Triangulated.TStructure.aisleProjectionAdjunction
-#print axioms CategoryTheory.Triangulated.TStructure.aisleRightProjectionData
-#print axioms CategoryTheory.Triangulated.TStructure.aisleRightProjectionData_preservesSmallCoproducts
-#print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.rightProjectionData
-#print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.coprodClosure_isRightAdmissible
-#print axioms CategoryTheory.Triangulated.TStructure.CompactGeneratorApproximation.rightProjectionData_preservesSmallCoproducts
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.QuasicoherentProjectionApproximationData
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.QuasicoherentProjectionApproximationData.componentApproximation
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.QuasicoherentProjectionApproximationData.quasicoherentProjections
@@ -1100,8 +1093,6 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.quasicoherentIsStrong
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.boundedLocus
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.BoundedData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.BoundedData.mk.inj
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.BoundedData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.BoundedData.projectionsPreserveBounded
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.BoundedData.full
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.BoundedData.projections
@@ -1216,3 +1207,82 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.Scheme.Modules.modulesMonoidalPreadditive
 #print axioms AlgebraicGeometry.Scheme.Modules.totalTensor
 #print axioms AlgebraicGeometry.Scheme.Modules.totalTensor_obj_obj
+
+/-! ## Bounded-coherent restriction after base change (SF11 tranche H)
+
+The intrinsic bounded-coherent locus of Dqc(X) splits into ambient boundedness
+and finite presentation of every cohomology sheaf. Finite cohomological
+amplitude of the chosen quasicoherent projectors, measured against a supplied
+t-structure presenting the ambient bounded locus, discharges the first conjunct;
+the second stays an explicit geometric input, as does generation of the
+restricted locus.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.Proposition315CoreData.semiorthogonality
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.Proposition315ProjectionData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.Proposition315ProjectionData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.instIsClosedUnderIsomorphismsSchemeQuasicoherentDerivedCategorySchemeFinitePresentationCohomology
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.schemeBoundedCoherentCohomology_eq_inf
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.schemeBoundedCoherentCohomology_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.schemeBoundedCoherentCohomology_le_finitePresentationCohomology
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.schemeFinitePresentationCohomology
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.HasFiniteAmplitude
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.PreservesCoherentCohomology
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.boundedSequence_isStrong
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.preservesBoundedQuasicoherent
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.projectionsPreserveBounded
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DecompositionData.toBoundedData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.Proposition315CoreData.boundedSequence_isStrong
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.Proposition315CoreData.toBoundedData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetBoundedTStructure
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetBoundedTStructure.bounded_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetBoundedTStructure.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetBoundedTStructure.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetBoundedTStructure.tStructure
+
+/-! ## Base-change data carriers missed by earlier tranches (SF11 A-G)
+
+Generated structure-equality and size lemmas, plus the four category
+abbreviations the base-change layer is stated over. They belong to the tranches
+that introduced the carriers; they are recorded here because the ratchet, not
+the source, is what reveals them.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.AffineQuasicoherentDqcIdentification.comparison
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.AffineQuasicoherentDqcIdentification.equivalence
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.AffineQuasicoherentDqcIdentification.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.AffineQuasicoherentDqcIdentification.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.BaseCoefficientData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.BaseCoefficientData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.DqcBaseCoefficientData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.DqcBaseCoefficientData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.FiberCoefficientData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.FiberCoefficientData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.KFlatTensorCoefficientComparison.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.KFlatTensorCoefficientComparison.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.KFlatTensorCoefficientData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.KFlatTensorCoefficientData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberProjectionFormula.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberTensorDuality.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.CompactFiberTensorDuality.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DqcFaithfulBaseChange.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DqcFaithfulBaseChange.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DqcFlatBaseChangeTheorem.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.DqcFlatBaseChangeTheorem.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.ExternalProductHomReduction.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.ExternalProductHomReduction.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.ExternalProductTensorDuality.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.ExternalProductTensorDuality.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.SourceTensorData.PresentableBaseActionData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBaseChangeData.SourceTensorData.PresentableBaseActionData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBasePullbackData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatBasePullbackData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatCompactFiberDualityData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatCompactFiberDualityData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatFiberTensorData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatFiberTensorData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.SourceDqc
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetDqc
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetPerfect
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.targetPerfectToDqc

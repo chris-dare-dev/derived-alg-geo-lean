@@ -281,3 +281,40 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.Triangulated.isExceptional_residueObject
 #print axioms CategoryTheory.Triangulated.residueObjectExceptionalCollection
 #print axioms CategoryTheory.Triangulated.residueObjectExceptionalCollection_component
+
+/-! ## Finite cohomological amplitude and the bounded restriction (SF11 tranche H)
+
+A functor of finite cohomological amplitude carries the t-bounded locus into
+itself, so chosen projections of finite amplitude preserve that locus, restrict
+along its inclusion, and leave the restricted sequence strong. Amplitude itself
+is never asserted here: these records certify the passage from an amplitude
+bound to the restriction, not the existence of any bound.
+-/
+
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.mk.inj
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.Preserves.inf
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.Preserves.of_iff
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.bounded_le
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.comp
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.hasFinite
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.isGE
+#print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.isLE
+#print axioms CategoryTheory.Functor.HasFiniteCohomologicalAmplitude
+#print axioms CategoryTheory.Functor.HasFiniteCohomologicalAmplitude.bounded_le
+#print axioms CategoryTheory.Functor.HasFiniteCohomologicalAmplitude.comp
+#print axioms CategoryTheory.Functor.hasFiniteCohomologicalAmplitude_of_isTExact
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasCohomologicalAmplitude.hasFinite
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasFiniteCohomologicalAmplitude
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasFiniteCohomologicalAmplitude.boundedProjections
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasFiniteCohomologicalAmplitude.inverseImage_bounded_isStrong
+#print axioms CategoryTheory.Triangulated.SemiorthogonalSequence.RightProjectionData.HasFiniteCohomologicalAmplitude.preserves_bounded
+
+/-! ## Transport of chosen projections along an equality of properties (SF11)
+
+Introduced with the projection layer; recorded here with the rest of the
+chosen-projection API.
+-/
+
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.ofEq
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.ofEqAmbientIso
