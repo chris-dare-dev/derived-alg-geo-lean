@@ -1286,3 +1286,18 @@ the source, is what reveals them.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetDqc
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetPerfect
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.targetPerfectToDqc
+
+/-! ## The source quasicoherent sequence of Theorem 3.17 (SF11 tranche I)
+
+The compact source components generate the quasicoherent source sequence the
+base-change layer consumes, and the three hypotheses it used to assume about
+that sequence are now theorems. Recovering the compact part of the closure is
+compact generation and stays an input.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourceQuasicoherentSequence
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourceQuasicoherentSequence_component
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourceQuasicoherentSequence_hasTriangulatedComponents
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourceQuasicoherentSequence_isClosedUnderIsomorphisms
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.sourceQuasicoherentSequence_isClosedUnderColimitsOfShape
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.le_sourcePerfectPart_sourceQuasicoherentSequence
