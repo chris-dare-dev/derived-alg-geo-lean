@@ -193,7 +193,7 @@ items:
     kind: epic
     parent: charge-abstraction-m1
     title: "The fourfold wall layer, at zero polynomial cost"
-    status: planned
+    status: done
     summary: "`Examples/Fourfold/ProjectiveSpaceWalls.lean` and `CalabiYauWalls.lean`. The fourfold numerical models already exist with proved HRR; no fourfold charge or wall family exists anywhere in the tree. The entire content of this epic is one `Polarization` per model, and it is the slice to point at when asked what the root bought. One gap to record rather than hide: the n = 4 graded pairing has no repository counterpart, no comparison and no consumer."
     priority: should
     size: S
