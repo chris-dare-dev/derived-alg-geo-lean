@@ -152,13 +152,25 @@ invalidate the immutable review payloads `exe/RestateHistoricalNames.lean`
 exists to protect. `HodgeIndex.lean` is the precedent for a neutral path
 keeping its consumer's namespace.
 
-The other three rows are still owed: the neutral core (norm-minus-two
-reflections and rank-two Gram identities restated over an arbitrary ambient
-lattice, rather than this one extension) is a generalisation and not a move;
-the exponential chart still sits in `Mukai/RealForm.lean` rather than with the
-numerical central-charge construction; and `IsSpherical` and
-`expectedDim = square + 2` remain application vocabulary on the neutral
-carrier. #1315 stays open until they land.
+**Reflections landed 2026-09-15.** `BilinearForm/Reflection.lean` states the
+norm-minus-two reflection over an arbitrary `(R, M, B)`, and
+`Lattice/Mukai/Reflection.lean` specialises it at `pairingBilin b`, keeping
+every public name its four `SphericalTwist` consumers spell. `-2` is the
+hypothesis rather than an `IsSpherical`-shaped predicate: spherical-class
+vocabulary is application vocabulary and stays with the application, which is
+also what lets the neutral file be importable without the Mukai extension.
+
+Restating it over an arbitrary form made the hypothesis split visible, and it
+is not the expected one: additivity needs neither symmetry nor `B s s = -2`,
+involutivity needs `B s s = -2` alone, and only the isometry needs symmetry.
+
+Still owed: rank-two Gram-determinant identities, the other half of the neutral
+core; the exponential chart, which still sits in `Mukai/RealForm.lean` rather
+than with the numerical central-charge construction; and `IsSpherical` and
+`expectedDim = square + 2`, which remain application vocabulary on the neutral
+carrier. The tracker closed #1315 early -- a commit message in #1345 that said
+it did *not* close the issue was read by GitHub as a closing keyword -- so the
+issue state is not evidence that these landed.
 
 #### 04 -- Charge construction upstream of walls (#1313)
 

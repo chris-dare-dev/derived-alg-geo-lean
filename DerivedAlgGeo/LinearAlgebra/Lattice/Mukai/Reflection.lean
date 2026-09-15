@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.LinearAlgebra.BilinearForm.Reflection
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
-import Mathlib.LinearAlgebra.BilinearForm.Isometry
 
 /-!
 # Reflection in a spherical class
@@ -30,15 +30,15 @@ about **an arbitrary symmetric bilinear `ℤ`-lattice**, true whether or not any
 surface exists — the same discipline `Mukai/Basic.lean` states in its own
 docstring.
 
-Note which hypotheses do what, because the split is not the expected one:
+Every argument below is bilinearity, symmetry, or the single hypothesis
+`⟪s,s⟫ = -2`, and none of it is about this carrier. It is therefore proved
+once, over an arbitrary form, in `BilinearForm/Reflection.lean`, and this file
+specialises it at `pairingBilin b`. There is one reflection, not two, and the
+record of which hypothesis does what lives with the general statement.
 
-* **additivity** of `ρ_s` needs neither symmetry of `b` nor `⟪s,s⟫ = -2`. It is
-  bilinearity of the pairing alone, so `reflectHom` is a `ℤ`-linear map for
-  *every* `s`;
-* **involutivity** needs `⟪s,s⟫ = -2` and nothing else;
-* **isometry** needs symmetry of `b` as well, and fails without it — the two
-  cross terms `⟪v,s⟫⟪s,w⟫` and `⟪w,s⟫⟪v,s⟫` only cancel against
-  `⟪v,s⟫⟪w,s⟫⟪s,s⟫` once they are equal.
+What stays here is the part that is genuinely about the Mukai extension:
+`IsSpherical` as the name for `⟪s,s⟫ = -2`, and the preservation of the
+distinguished classes `Mukai/Basic.lean` defines.
 
 ## Main results
 
@@ -58,20 +58,16 @@ namespace Mukai
 
 variable {N : Type*} [AddCommGroup N] (b : N →ₗ[ℤ] N →ₗ[ℤ] ℤ)
 
-/-! ### The map, and its linearity
+/-! ### The map
 
-Stated for an arbitrary `s`. Sphericity enters only from `reflect_reflect`
-onwards, so everything in this section holds for every `s` and is not a
-statement about spherical classes at all. -/
+`Mukai.reflect` is `BilinearForm.reflect` at `pairingBilin b`. The name is kept
+because four `SphericalTwist` modules spell it, and because "reflection in a
+spherical class" is the application's word for it. -/
 
-/-- Reflection in `s`: `ρ_s(v) = v + ⟪v, s⟫ • s`.
-
-For spherical `s` this is the lattice reflection in `s^⊥`; for other `s` it is
-still a well-defined additive map, but is neither an involution nor an
-isometry. The definition deliberately takes no sphericity hypothesis so that
-`reflectHom` below is available unconditionally. -/
+/-- Reflection in `s`: `ρ_s(v) = v + ⟪v, s⟫ • s`, specialising
+`BilinearForm.reflect` to the Mukai pairing. -/
 def reflect (s v : MukaiLattice N) : MukaiLattice N :=
-  v + pairing b v s • s
+  BilinearForm.reflect (pairingBilin b) s v
 
 /-- Not `@[simp]`: unfolding `reflect` everywhere would put `reflect_zero`,
 `reflect_self` and `reflect_neg_left` out of simp-normal form. Rewrite with it
@@ -81,30 +77,26 @@ theorem reflect_apply (s v : MukaiLattice N) :
   rfl
 
 @[simp]
-theorem reflect_zero (s : MukaiLattice N) : reflect b s 0 = 0 := by
-  simp [reflect]
+theorem reflect_zero (s : MukaiLattice N) : reflect b s 0 = 0 :=
+  BilinearForm.reflect_zero _ s
 
 theorem reflect_add (s v w : MukaiLattice N) :
-    reflect b s (v + w) = reflect b s v + reflect b s w := by
-  simp only [reflect, pairing_add_left, add_smul]
-  abel
+    reflect b s (v + w) = reflect b s v + reflect b s w :=
+  BilinearForm.reflect_add _ s v w
 
 theorem reflect_smul (a : ℤ) (s v : MukaiLattice N) :
-    reflect b s (a • v) = a • reflect b s v := by
-  simp only [reflect, pairing_smul_left, smul_add, mul_smul]
+    reflect b s (a • v) = a • reflect b s v :=
+  BilinearForm.reflect_smul _ a s v
 
 theorem reflect_neg (s v : MukaiLattice N) :
-    reflect b s (-v) = -reflect b s v := by
-  simp only [reflect, pairing_neg_left, neg_smul, neg_add_rev]
-  abel
+    reflect b s (-v) = -reflect b s v :=
+  BilinearForm.reflect_neg _ s v
 
 /-- `ρ_s` as a `ℤ`-linear endomorphism of the Mukai extension.
 
 No hypothesis on `s`: additivity is bilinearity of `pairing`, nothing more. -/
-def reflectHom (s : MukaiLattice N) : MukaiLattice N →ₗ[ℤ] MukaiLattice N where
-  toFun := reflect b s
-  map_add' := reflect_add b s
-  map_smul' := by intro a v; simpa using reflect_smul b a s v
+def reflectHom (s : MukaiLattice N) : MukaiLattice N →ₗ[ℤ] MukaiLattice N :=
+  BilinearForm.reflectHom (pairingBilin b) s
 
 @[simp]
 theorem reflectHom_apply (s v : MukaiLattice N) :
@@ -113,27 +105,24 @@ theorem reflectHom_apply (s v : MukaiLattice N) :
 
 /-! ### The pairing against `s`
 
-One computation, isolated because both the involution and the isometry proof
-consume it. -/
+`IsSpherical b s` is by definition `selfPairing b s = -2`, and
+`pairingBilin b s s` reduces to `selfPairing b s`, so a sphericity hypothesis is
+accepted directly wherever the general theory asks for `B s s = -2`. -/
 
 /-- Reflecting reverses the pairing against `s` itself. This is where
 `⟪s, s⟫ = -2` is spent. -/
 theorem pairing_reflect_right (s : MukaiLattice N) (hs : IsSpherical b s)
     (v : MukaiLattice N) :
-    pairing b (reflect b s v) s = -pairing b v s := by
-  rw [reflect, pairing_add_left, pairing_smul_left, ← selfPairing_eq_pairing,
-    (isSpherical_iff b s).1 hs]
-  ring
+    pairing b (reflect b s v) s = -pairing b v s :=
+  BilinearForm.apply_reflect_right (pairingBilin b) s hs v
 
 /-! ### Involutivity -/
 
 /-- **`ρ_s` is an involution** when `s` is spherical. -/
 theorem reflect_reflect (s : MukaiLattice N) (hs : IsSpherical b s)
     (v : MukaiLattice N) :
-    reflect b s (reflect b s v) = v := by
-  conv_lhs => rw [reflect, pairing_reflect_right b s hs, reflect]
-  rw [neg_smul]
-  abel
+    reflect b s (reflect b s v) = v :=
+  BilinearForm.reflect_reflect (pairingBilin b) s hs v
 
 theorem reflect_involutive (s : MukaiLattice N) (hs : IsSpherical b s) :
     Function.Involutive (reflect b s) :=
@@ -146,10 +135,7 @@ theorem reflect_bijective (s : MukaiLattice N) (hs : IsSpherical b s) :
 /-- `ρ_s` as a `ℤ`-linear automorphism, with itself as inverse. -/
 def reflectEquiv (s : MukaiLattice N) (hs : IsSpherical b s) :
     MukaiLattice N ≃ₗ[ℤ] MukaiLattice N :=
-  { reflectHom b s with
-    invFun := reflect b s
-    left_inv := reflect_reflect b s hs
-    right_inv := reflect_reflect b s hs }
+  BilinearForm.reflectEquiv (pairingBilin b) s hs
 
 @[simp]
 theorem reflectEquiv_apply (s : MukaiLattice N) (hs : IsSpherical b s)
@@ -172,21 +158,20 @@ spanned by `s` and the `+1` eigenspace contains `s^⊥`. -/
 /-- `ρ_s s = -s`. Needs sphericity but not symmetry. -/
 @[simp]
 theorem reflect_self (s : MukaiLattice N) (hs : IsSpherical b s) :
-    reflect b s s = -s := by
-  rw [reflect, ← selfPairing_eq_pairing, (isSpherical_iff b s).1 hs]
-  module
+    reflect b s s = -s :=
+  BilinearForm.reflect_self (pairingBilin b) s hs
 
 /-- `ρ_s` fixes `s^⊥` pointwise. No hypothesis on `s` at all. -/
 theorem reflect_of_pairing_eq_zero {s v : MukaiLattice N}
     (h : pairing b v s = 0) :
-    reflect b s v = v := by
-  rw [reflect, h, zero_smul, add_zero]
+    reflect b s v = v :=
+  BilinearForm.reflect_of_apply_eq_zero (pairingBilin b) h
 
 /-- The reflected vector lies in `s^⊥` exactly when the original one does. -/
 theorem pairing_reflect_eq_zero_iff (s : MukaiLattice N) (hs : IsSpherical b s)
     (v : MukaiLattice N) :
-    pairing b (reflect b s v) s = 0 ↔ pairing b v s = 0 := by
-  rw [pairing_reflect_right b s hs, neg_eq_zero]
+    pairing b (reflect b s v) s = 0 ↔ pairing b v s = 0 :=
+  BilinearForm.apply_reflect_eq_zero_iff (pairingBilin b) s hs v
 
 /-! ### Isometry
 
@@ -195,12 +180,9 @@ The first statements in this file to need symmetry of `b`. -/
 /-- **`ρ_s` preserves the Mukai pairing.** -/
 theorem pairing_reflect_reflect (hb : ∀ x y : N, b x y = b y x)
     (s : MukaiLattice N) (hs : IsSpherical b s) (v w : MukaiLattice N) :
-    pairing b (reflect b s v) (reflect b s w) = pairing b v w := by
-  have hss : pairing b s s = -2 := (isSpherical_iff b s).1 hs
-  have hsw : pairing b s w = pairing b w s := pairing_comm b hb s w
-  simp only [reflect, pairing_add_left, pairing_add_right, pairing_smul_left,
-    pairing_smul_right, hss, hsw]
-  ring
+    pairing b (reflect b s v) (reflect b s w) = pairing b v w :=
+  BilinearForm.apply_reflect_reflect (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) s hs v w
 
 /-- `ρ_s` preserves `⟪v, v⟫`. -/
 theorem selfPairing_reflect (hb : ∀ x y : N, b x y = b y x)
@@ -212,9 +194,9 @@ theorem selfPairing_reflect (hb : ∀ x y : N, b x y = b y x)
 /-- `ρ_s` as an isometry of the bundled Mukai form. -/
 def reflectIsometry (hb : ∀ x y : N, b x y = b y x)
     (s : MukaiLattice N) (hs : IsSpherical b s) :
-    pairingBilin b →bᵢ pairingBilin b where
-  toLinearMap := reflectHom b s
-  map_app' v w := pairing_reflect_reflect b hb s hs v w
+    pairingBilin b →bᵢ pairingBilin b :=
+  BilinearForm.reflectIsometry (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) s hs
 
 @[simp]
 theorem reflectIsometry_apply (hb : ∀ x y : N, b x y = b y x)
@@ -224,9 +206,9 @@ theorem reflectIsometry_apply (hb : ∀ x y : N, b x y = b y x)
 
 /-! ### The distinguished classes are preserved
 
-Corollaries of `selfPairing_reflect`, recorded separately because
-`Mukai/Basic.lean` names these conditions and downstream code will rewrite with
-them rather than unfolding to `selfPairing`. -/
+This is the part that is genuinely about the Mukai extension rather than about
+an arbitrary form: `Mukai/Basic.lean` names these conditions and downstream
+code rewrites with them rather than unfolding to `selfPairing`. -/
 
 theorem IsSpherical.reflect (hb : ∀ x y : N, b x y = b y x)
     {s : MukaiLattice N} (hs : IsSpherical b s) {v : MukaiLattice N}
@@ -254,7 +236,7 @@ exist; they are the same map, because the sign enters the formula twice. -/
 
 @[simp]
 theorem reflect_neg_left (s v : MukaiLattice N) :
-    reflect b (-s) v = reflect b s v := by
-  simp only [reflect, pairing_neg_right, neg_smul, smul_neg, neg_neg]
+    reflect b (-s) v = reflect b s v :=
+  BilinearForm.reflect_neg_left (pairingBilin b) s v
 
 end Mukai
