@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.K3
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.RankOne
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface
 
 /-!
@@ -15,7 +15,7 @@ The first model of `NumericalVarietyData` in dimension two. Before it, every sta
 `NumericalVarietyData 2 A N` existing at all — only the dimension-zero point had been exhibited.
 
 The surface is a K3 `X` with `Pic X = ℤ·H` and `H² = 2d`. The ring, grading and degree map
-come from `Numerical/Examples/Surface/RankOne.lean`; all this file supplies is the Todd class
+come from `Numerical/Models/Surface/RankOne.lean`; all this file supplies is the Todd class
 
 `td(X) = 1 + 0 + (1/d)·H²`,
 

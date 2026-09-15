@@ -44,7 +44,7 @@ sphericity, isotropy and expected dimension becomes a statement about `χ`.
 ## What this file does not assert
 
 * Nothing constructs an `IntegralMukaiData` or an `AdditiveMukaiData` **from a
-  scheme**.  Neither is uninhabited: `Numerical/Examples/Surface/K3Mukai.lean`
+  scheme**.  Neither is uninhabited: `Numerical/Models/Surface/K3Mukai.lean`
   builds `k3IntegralMukaiData` and `k3AdditiveMukaiData` on the degree-`2d`
   rank-one model, which de-vacuates every consumer that takes one as a
   hypothesis.  What remains open is the geometric obligation — exhibiting

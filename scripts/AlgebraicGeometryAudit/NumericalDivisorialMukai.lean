@@ -17,7 +17,7 @@ HRR is supplied; those two are what stop the library carrying two unrelated
 notions of Mukai vector. mukaiCharge_of_isK3 is Bridgeland's charge as the
 ordinary divisorial charge minus the rank.
 
-NOT here: a numerical realization for the K3 model of Examples/Surface/K3.lean,
+NOT here: a numerical realization for the K3 model of Models/Surface/K3.lean,
 and any comparison between the real Mukai extension used here and the integral
 Mukai.MukaiLattice of GrothendieckGroup/MukaiVector.lean. The latter needs a
 realization of the integral lattice inside the real divisor space. -/

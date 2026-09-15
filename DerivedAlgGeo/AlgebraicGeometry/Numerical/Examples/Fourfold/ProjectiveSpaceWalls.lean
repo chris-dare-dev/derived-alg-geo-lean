@@ -2,13 +2,13 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Fourfold.ProjectiveSpace
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Fourfold.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.PolarisedWallTransport
 
 /-!
 # The wall layer of `ℙ⁴`, at zero polynomial cost
 
-`Examples/Fourfold/ProjectiveSpace.lean` builds the `ℙ⁴` numerical model with
+`Models/Fourfold/ProjectiveSpace.lean` builds the `ℙ⁴` numerical model with
 proved Riemann--Roch, and until this file nothing connected it to a charge: no
 fourfold charge or wall family existed anywhere in the tree, because every
 charge in the tree was written per dimension and nobody had written the

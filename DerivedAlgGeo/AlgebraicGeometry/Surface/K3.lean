@@ -49,7 +49,7 @@ goes in the field.
 ## What this file does not do
 
 * **It exhibits no K3 surface.** Nothing here constructs an `X`, a
-  `CanonicalSheafData k X 2`, or an `IsK3Surface`. `Numerical/Examples/Surface/K3.lean`
+  `CanonicalSheafData k X 2`, or an `IsK3Surface`. `Numerical/Models/Surface/K3.lean`
   exhibits a *numerical* model — a `NumericalVarietyData 2` satisfying
   `Numerical.K3.IsK3` — and that is a model of the Todd-class axioms, not of
   anything below. Every statement here is conditional on data nobody has yet

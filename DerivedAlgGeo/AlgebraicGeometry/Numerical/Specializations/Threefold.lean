@@ -30,7 +30,7 @@ substitution needs `K_X` and `c₂`, which are Layer B objects, so it is not ass
 `Numerical/Examples/Threefold/` carries two: `ℙ³`, whose Todd class has no vanishing
 component and so exercises every term of `chi_eq`, and the quintic hypersurface in `ℙ⁴`,
 which discharges `CalabiYauThreefold.IsCalabiYau`. Both are built from the dimension-general
-ring `ℚ[t]/(t⁴)` of `Numerical/Examples/RankOne.lean`.
+ring `ℚ[t]/(t⁴)` of `Numerical/Models/MonogenicRing.lean`.
 -/
 
 universe u v

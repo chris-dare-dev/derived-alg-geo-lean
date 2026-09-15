@@ -2,8 +2,8 @@
 MukaiWitness slice of the AlgebraicGeometry audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3MukaiIntegral
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3Mukai
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.K3MukaiIntegral
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.K3Mukai
 
 /-! ## The Mukai data of the rank-one K3 model — the first inhabitants
 

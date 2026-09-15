@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.RankOne
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface
 
 /-!
@@ -31,13 +31,13 @@ does *not* contain, so the model cannot evaluate it.
 
 These are the same as the K3's — a class `(r, c, s)` has `ch = r + c·H + s·H²` in the basis
 `1, H, H²` — so `k3ChCoeff` is reused rather than copied. That is the design
-`Examples/Surface/RankOne.lean` states outright: within Picard rank one, a new model costs a
+`Models/Surface/RankOne.lean` states outright: within Picard rank one, a new model costs a
 Todd class and nothing else.
 
 `s` ranging over `ℤ` makes `N` the sublattice of classes whose `ch₂` is an integer multiple
 of `H²`, which is a genuine restriction — `O(mH)` has `ch₂ = (m²/2)H²` and so lies in it
 only for even `m`. The K3 model carries the same restriction and for the same reason; where
-a model needs the full lattice it must reparametrise, as `Examples/Surface/ProjectivePlane.lean`
+a model needs the full lattice it must reparametrise, as `Models/Surface/ProjectivePlane.lean`
 does.
 
 ## Main definitions

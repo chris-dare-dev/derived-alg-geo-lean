@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.K3
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.MukaiVector
 
 /-!
@@ -21,7 +21,7 @@ degree-`2d` rank-one model `k3NumericalVariety d`, with
 
 Every consumer of `IntegralMukaiData` on `main` takes one as a hypothesis, so
 each is a statement about a structure nothing was known to satisfy. Supplying
-one de-vacuates all of them at once: `GrothendieckGroup/CentralCharge.lean`,
+one de-vacuates all of them at once: `GrothendieckGroup/CentralChargeK3.lean`,
 `CategoricalCharge.lean`, `RadicalKernel.lean`, `Realization.lean` (the
 `preservesEuler` family and the two isometry constructions), `EulerTransfer.lean`
 and `Walls/Spherical/Basic.lean`.
