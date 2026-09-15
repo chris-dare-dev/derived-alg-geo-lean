@@ -46,6 +46,7 @@ section Algebraic
 variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
 variable (B : M →ₗ[R] M →ₗ[R] R)
 
+/-- The Gram determinant of the pair `(v, w)`: `B v v * B w w - (B v w)^2`. -/
 def gram (v w : M) : R := B v v * B w w - B v w ^ 2
 
 theorem gram_comm (hb : ∀ x y : M, B x y = B y x) (v w : M) :
@@ -72,6 +73,8 @@ theorem gram_lincomb (hb : ∀ x y : M, B x y = B y x) (a₁ a₂ a₃ a₄ : R)
       = (a₁ * a₄ - a₂ * a₃) ^ 2 * gram B v w := by
   simp only [gram, self_lincomb B hb, apply_lincomb B hb]; ring
 
+/-- `B v w • v - B v v • w`, the projection of `w` off `v` cleared of
+denominators. Orthogonal to `v` with no symmetry hypothesis. -/
 def orthWitness (v w : M) : M := B v w • v - B v v • w
 
 theorem apply_orthWitness (v w : M) : B v (orthWitness B v w) = 0 := by
@@ -83,6 +86,7 @@ theorem self_orthWitness (hb : ∀ x y : M, B x y = B y x) (v w : M) :
     LinearMap.smul_apply, smul_eq_mul, hb w v]
   ring
 
+/-- The set of `R`-combinations of `v` and `w`. -/
 def pairSpan (v w : M) : Set M := {x | ∃ a₁ a₂ : R, x = a₁ • v + a₂ • w}
 
 theorem mem_pairSpan_left (v w : M) : v ∈ pairSpan (R := R) v w := ⟨1, 0, by simp⟩
@@ -98,6 +102,11 @@ section Ordered
 variable {R M : Type*} [CommRing R] [LinearOrder R] [IsStrictOrderedRing R]
 variable [AddCommGroup M] [Module R M] (B : M →ₗ[R] M →ₗ[R] R)
 
+/-- Negative Gram determinant: the rank-two form spanned by `v` and `w` is
+indefinite. For a rank-two lattice this is signature `(1, 1)`.
+
+A numerical condition on two vectors, and **not** a claim that a wall exists in
+any space of stability conditions. -/
 def IsHyperbolicPair (v w : M) : Prop := gram B v w < 0
 
 theorem isHyperbolicPair_iff (v w : M) :
