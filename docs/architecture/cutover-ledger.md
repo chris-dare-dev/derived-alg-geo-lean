@@ -143,6 +143,23 @@ application. "Lattice" must not silently imply finite free or nondegenerate;
 an arbitrary additive group with a form is neither. Native prerequisites
 `#1223` and `#1229` are load-bearing here, not procedural.
 
+**Definition owner landed 2026-09-14.** The ring-general carrier and pairing
+moved to `LinearAlgebra/BilinearForm/Hyperbolic.lean`, beside the
+`LinearMap.BilinMap` API they are built from, and `Lattice/Mukai/Basic.lean`
+now imports them. Declaration names and the `Mukai` namespace are unchanged:
+this is a change of owner, not of vocabulary, and a namespace cutover would
+invalidate the immutable review payloads `exe/RestateHistoricalNames.lean`
+exists to protect. `HodgeIndex.lean` is the precedent for a neutral path
+keeping its consumer's namespace.
+
+The other three rows are still owed: the neutral core (norm-minus-two
+reflections and rank-two Gram identities restated over an arbitrary ambient
+lattice, rather than this one extension) is a generalisation and not a move;
+the exponential chart still sits in `Mukai/RealForm.lean` rather than with the
+numerical central-charge construction; and `IsSpherical` and
+`expectedDim = square + 2` remain application vocabulary on the neutral
+carrier. #1315 stays open until they land.
+
 #### 04 -- Charge construction upstream of walls (#1313)
 
 | Relationship | Owner |
