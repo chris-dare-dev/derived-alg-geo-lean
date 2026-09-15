@@ -98,6 +98,36 @@ in `DerivedAlgGeo/LinearAlgebra/Lattice/Mukai/`. -/
 #print axioms Mukai.exists_neg_selfPairing_of_isHyperbolicPair
 
 
+/-! ## Neutral lane — reflection in a vector of norm minus two
+
+The argument is bilinearity, symmetry and the single hypothesis `B s s = -2`,
+so it is stated over an arbitrary form in `BilinearForm/Reflection.lean` and the
+Mukai lane below specialises it. One reflection, recorded on both sides. -/
+
+#print axioms BilinearForm.reflect
+#print axioms BilinearForm.reflect_apply
+#print axioms BilinearForm.reflect_zero
+#print axioms BilinearForm.reflect_add
+#print axioms BilinearForm.reflect_smul
+#print axioms BilinearForm.reflect_neg
+#print axioms BilinearForm.reflectHom
+#print axioms BilinearForm.reflectHom_apply
+#print axioms BilinearForm.apply_reflect_right
+#print axioms BilinearForm.reflect_reflect
+#print axioms BilinearForm.reflect_involutive
+#print axioms BilinearForm.reflect_bijective
+#print axioms BilinearForm.reflectEquiv
+#print axioms BilinearForm.reflectEquiv_apply
+#print axioms BilinearForm.reflectEquiv_symm_apply
+#print axioms BilinearForm.reflect_self
+#print axioms BilinearForm.reflect_of_apply_eq_zero
+#print axioms BilinearForm.apply_reflect_eq_zero_iff
+#print axioms BilinearForm.apply_reflect_reflect
+#print axioms BilinearForm.self_reflect
+#print axioms BilinearForm.reflectIsometry
+#print axioms BilinearForm.reflectIsometry_apply
+#print axioms BilinearForm.reflect_neg_left
+
 /-! ## Mukai lane — reflection in a spherical class
 
 Still pure lattice arithmetic. `reflect` is a map of the abstract Mukai
