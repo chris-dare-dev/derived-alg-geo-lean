@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.LinearAlgebra.BilinearForm.Hyperbolic
 import DerivedAlgGeo.LinearAlgebra.Lattice.Arithmetic.TorsionFree
 import Mathlib.LinearAlgebra.BilinearMap
 
@@ -50,63 +51,6 @@ The name is suggestive of the K3 case; the module docstring records that the
 identification with any geometric lattice is **not** made here. -/
 abbrev MukaiLattice (N : Type*) : Type _ := ℤ × N × ℤ
 
-/-! ### The pairing, over an arbitrary coefficient ring
-
-**The generalisation is over the coefficient ring, never over the dimension.**
-The arity is fixed at three. A dimension-indexed self-pairing vanishes
-identically in odd degree, so the threefold discriminant could not reach it;
-that is recorded as a negative result in
-`docs/architecture/abstraction-tree.md`.
-
-`MukaiLattice N` is the `R = ℤ` carrier and is unchanged, as is every `ℤ`-only
-theorem below it. `Mukai/RealForm.lean`'s `RealExtension V` is the `R = ℝ`
-carrier and `realPairing` is an `abbrev` for this definition there. The reason
-the ring has to move at all is that three of the seven discriminant leaves this
-parents are `ℚ`- or `A`-valued rather than `ℝ`-valued; that is the only thing a
-`ℤ`-only root lacked, and no new declaration name is introduced to supply it.
--/
-
-section CoefficientRing
-
-variable {R : Type*} {M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-variable (b : M →ₗ[R] M →ₗ[R] R)
-
-/-- The Mukai pairing built from a bilinear form `b` on the middle summand. -/
-def pairing (v w : R × M × R) : R :=
-  b v.2.1 w.2.1 - v.1 * w.2.2 - w.1 * v.2.2
-
-@[simp]
-theorem pairing_mk (r : R) (c : M) (s : R) (r' : R) (c' : M) (s' : R) :
-    pairing b (r, c, s) (r', c', s') = b c c' - r * s' - r' * s :=
-  rfl
-
-/-- Symmetry of the extension, from symmetry of `b`. -/
-theorem pairing_comm (hb : ∀ x y : M, b x y = b y x) (v w : R × M × R) :
-    pairing b v w = pairing b w v := by
-  simp only [pairing]
-  rw [hb v.2.1 w.2.1]
-  ring
-
-/-! #### The quadratic refinement -/
-
-/-- `⟪v, v⟫`. -/
-def selfPairing (v : R × M × R) : R := pairing b v v
-
-theorem selfPairing_eq_pairing (v : R × M × R) :
-    selfPairing b v = pairing b v v :=
-  rfl
-
-/-- **The discriminant, once.**  `Δ(r, c, s) = b c c - 2 r s` is what every
-discriminant in the repository projects to; the leaves differ only in which
-ring `R` is, which bilinear form `b` is, and which three quantities are fed in.
--/
-@[simp]
-theorem selfPairing_mk (r : R) (c : M) (s : R) :
-    selfPairing b (r, c, s) = b c c - 2 * (r * s) := by
-  simp only [selfPairing, pairing_mk]
-  ring
-
-end CoefficientRing
 
 variable {N : Type*} [AddCommGroup N] (b : N →ₗ[ℤ] N →ₗ[ℤ] ℤ)
 
