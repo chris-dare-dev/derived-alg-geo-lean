@@ -31,22 +31,6 @@ variable {S : Scheme.{u}} {X T U : SchemeBaseChange S} {f : T ⟶ U}
 
 namespace KFlatBaseChangeData
 
-/-- The K-flat derived tensor on the fibre product underlying a base-change datum. -/
-noncomputable def derivedTensor (D : KFlatBaseChangeData X T) :
-    Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
-      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
-        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left :=
-  D.tensorResolution.derivedTensorToDqc
-    (D.tensorResolution.preservesQuasicoherentCohomology_of_resolvedTensor
-      D.tensorQuasicoherent)
-
-@[simp]
-theorem derivedTensor_obj_obj_obj (D : KFlatBaseChangeData X T)
-    (E F : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :
-    (((D.derivedTensor.obj E).obj F).obj) =
-      ((D.tensorResolution.derivedTensor.obj E.obj).obj F.obj) :=
-  rfl
-
 /-- Linearity of derived pullback with respect to the constructed K-flat tensors. For each twist
 `B`, this is the natural isomorphism
 `(B ⊗ -) ⋙ Lf^* ≅ Lf^* ⋙ (Lf^* B ⊗ -)`. -/
