@@ -183,8 +183,8 @@ items:
     kind: epic
     parent: charge-abstraction-m1
     title: "The e^-betaH twist on the kernel, and its two real gaps"
-    status: in_progress
-    summary: "Implemented for review: `CentralCharge/Exponential/Twist.lean` proves the real group law and complex charge translation identity for arbitrary truncation degree using one finite exponential convolution. The threefold group law now inherits the root; weighted surface and B=βH divisorial comparisons are proved. `Numerical/Stability/ExponentialTwist.lean` compares the retained rational twist after weighted degrees for m ≤ n. Arbitrary B does not descend to H-compression; the counterexample is recorded in the canonical-root policy. Review and merge remain; this epic blocks nothing."
+    status: done
+    summary: "`CentralCharge/Exponential/Twist.lean`: `Exp.twist`, `twist_twist` for arbitrary real parameters, and `charge_twist` at every truncation degree — twisting the degrees by β moves the charge parameter from `w` to `w + β`. Both rest on one finite exponential convolution, proved by the binomial theorem and a triangular reindex; `twist_add_beta` was not reusable, as the epic predicted. All four prior spellings reach the root: the threefold group law inherits it through `betaTwist_eq_exp`, `ChargeCoordinates.twistByScalar_eq_exp` and `ChernCharacter.twist_rankOne_eq_exp` cover the surface scalar and the `B = βH` full character, and `Numerical/Stability/ExponentialTwist.lean` compares the retained rational `TwistedChern.twist` after weighted degrees for `m ≤ n`. One recorded negative result: an arbitrary divisor `B` does not descend to compressed `H`-degrees, and the rank-two counterexample is in the canonical-root policy. Landed in #1337 with no `sorry`; the nine new declarations passed the focused axiom audit on `propext`, `Classical.choice` and `Quot.sound` only."
     priority: should
     size: M
     tags: [lean, charges, twist]
