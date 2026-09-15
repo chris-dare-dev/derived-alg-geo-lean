@@ -55,6 +55,12 @@ namespace BilinearForm
 variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
 variable (B : M →ₗ[R] M →ₗ[R] R)
 
+/-- Reflection in `s`: `ρ_s(v) = v + B v s • s`.
+
+For `B s s = -2` this is the reflection in `s^⊥`; for other `s` it is still a
+well-defined additive map, but is neither an involution nor an isometry. The
+definition deliberately takes no hypothesis so that `reflectHom` below is
+available unconditionally. -/
 def reflect (s v : M) : M := v + B v s • s
 
 theorem reflect_apply (s v : M) : reflect B s v = v + B v s • s := rfl
@@ -75,6 +81,9 @@ theorem reflect_neg (s v : M) : reflect B s (-v) = -reflect B s v := by
   simp only [reflect, map_neg, LinearMap.neg_apply, neg_smul, neg_add_rev]
   abel
 
+/-- `ρ_s` as a linear endomorphism.
+
+No hypothesis on `s`: additivity is bilinearity of `B`, nothing more. -/
 def reflectHom (s : M) : M →ₗ[R] M where
   toFun := reflect B s
   map_add' := reflect_add B s
@@ -100,6 +109,8 @@ theorem reflect_involutive (s : M) (hs : B s s = -2) :
 theorem reflect_bijective (s : M) (hs : B s s = -2) :
     Function.Bijective (reflect B s) := (reflect_involutive B s hs).bijective
 
+/-- `ρ_s` as a linear automorphism, with itself as inverse. Needs
+`B s s = -2`, which is what makes it an involution. -/
 def reflectEquiv (s : M) (hs : B s s = -2) : M ≃ₗ[R] M :=
   { reflectHom B s with
     invFun := reflect B s
@@ -135,6 +146,8 @@ theorem self_reflect (hb : ∀ x y : M, B x y = B y x) (s : M) (hs : B s s = -2)
     (v : M) : B (reflect B s v) (reflect B s v) = B v v :=
   apply_reflect_reflect B hb s hs v v
 
+/-- `ρ_s` as an isometry of `B`. This is the first statement to need symmetry
+of `B` as well as `B s s = -2`. -/
 def reflectIsometry (hb : ∀ x y : M, B x y = B y x) (s : M) (hs : B s s = -2) :
     B →bᵢ B where
   toLinearMap := reflectHom B s
