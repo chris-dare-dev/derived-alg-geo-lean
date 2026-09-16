@@ -16,6 +16,7 @@ Usage:
     python3 scripts/check_mathlib_style.py FILE [FILE ...]
     python3 scripts/check_mathlib_style.py --hook              # hook JSON on stdin
     python3 scripts/check_mathlib_style.py --diff-only REF F.. # only changed lines
+    python3 scripts/check_mathlib_style.py --self-test         # known-answer fixtures
 
 `--diff-only` exists because a branch gate and an edit hook are answering
 different questions. The hook judges the line you just wrote, so it is strict.
@@ -41,6 +42,9 @@ from _output import force_utf8_output
 
 MAX_LINE = 100
 
+ROOT = Path(__file__).resolve().parent.parent
+FIXTURES = ROOT / "scripts" / "fixtures" / "mathlib-style"
+
 # Only owner-authored library source. Vendored Apache source keeps upstream
 # style, audit scripts are not library modules, and `.claude/` holds review
 # fixtures that were deliberately frozen.
@@ -56,6 +60,18 @@ DECL_RE = re.compile(
 # Declaration kinds Mathlib requires a docstring on, no exceptions.
 DOC_REQUIRED = {"def", "abbrev", "structure", "class", "inductive"}
 NAME_RE = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_.'₁-₉]*)")
+
+# Git writes `<<<<<<< `, `=======`, `>>>>>>> `, and -- under
+# `merge.conflictStyle = diff3` -- `||||||| `, each at the very start of a line.
+# Seven `<` or seven `>` there are unambiguous: no Lean token and no prose this
+# repository writes opens a line that way, so those two are the anchors.
+# `=======` is *not* unambiguous -- it is a legal Markdown setext heading
+# underline, and the module docstrings here are Markdown -- and seven pipes are
+# a marker only in diff3 output. Both are therefore reported only when an anchor
+# appears elsewhere in the same file, which is exactly the condition git
+# guarantees whenever it writes either of them.
+CONFLICT_ANCHOR_RE = re.compile(r"^(?:<{7}|>{7})(?: |$)")
+CONFLICT_INNER_RE = re.compile(r"^(?:={7}$|\|{7}(?: |$))")
 
 
 class Finding:
@@ -112,9 +128,56 @@ def code_only(lines: list[str]) -> list[str]:
     return out
 
 
+def conflict_markers(raw: str, lines: list[str]) -> list[Finding]:
+    """Findings for git merge-conflict markers committed into the file.
+
+    Nothing else in `scripts/` catches these. Every structural gate --
+    `check_layering.py`, `check_umbrella_coverage.py`,
+    `check_source_independence.py`, `check_root_reachability.py` -- reads
+    `import` lines and ignores the rest, so a file full of `<<<<<<< HEAD`
+    passes all four. On 2026-09-16 a rebase left markers in two files, `git
+    add -A` staged them, and the defect surfaced ~13 minutes into CI as
+    `unexpected token '<<<'; expected command` (#1359, issue #1315).
+
+    Raw lines, not `code_only`: a conflict inside a docstring is still a
+    conflict, and a conflicted file's block-comment nesting is unbalanced
+    anyway, so the blanking pass cannot be trusted here.
+    """
+    # One C-level scan of the whole file keeps the common case -- a file with
+    # no conflict in it -- off the per-line path entirely.
+    if "<<<<<<<" not in raw and ">>>>>>>" not in raw:
+        return []
+    text = [ln[:-1] if ln.endswith("\r") else ln for ln in lines]
+    hits = {i for i, ln in enumerate(text, start=1) if CONFLICT_ANCHOR_RE.match(ln)}
+    if not hits:
+        return []
+    hits.update(i for i, ln in enumerate(text, start=1) if CONFLICT_INNER_RE.match(ln))
+    return [
+        Finding(
+            "ERROR",
+            i,
+            "CONFLICT",
+            f"Unresolved merge-conflict marker `{elide(text[i - 1])}`; finish the merge.",
+        )
+        for i in sorted(hits)
+    ]
+
+
+def elide(line: str, limit: int = 48) -> str:
+    """Shorten a quoted source line; a rebase marker carries a whole commit subject."""
+    return line if len(line) <= limit else line[:limit] + "..."
+
+
 def check_text(raw: str, path: Path) -> list[Finding]:
-    out: list[Finding] = []
     lines = raw.split("\n")
+
+    # A file with conflict markers is not Lean source yet, so every check below
+    # would be judging text that does not survive the resolution. Report the
+    # markers alone: the only useful next action is to finish the merge.
+    if conflicts := conflict_markers(raw, lines):
+        return conflicts
+
+    out: list[Finding] = []
     code = code_only(lines)
 
     # An import-only re-export file needs neither a copyright header nor a full
@@ -328,6 +391,58 @@ def changed_lines(ref: str, path: Path) -> set[int] | None:
     return lines
 
 
+def self_test() -> int:
+    """Run the known-answer fixtures under `scripts/fixtures/mathlib-style/`.
+
+    The layout is `<code>/allowed/*.leansrc` and `<code>/forbidden/*.leansrc`,
+    where `<code>` is the lowercased finding code under test: every `allowed`
+    fixture must produce no finding with that code and every `forbidden`
+    fixture must produce at least one, so an edit that silently stops
+    rejecting something is caught here instead of by the next regression.
+
+    Only the named code is asserted on, which lets a fixture be about exactly
+    one question rather than a fully Mathlib-clean file.
+
+    A fixture is Lean source text but deliberately not a `.lean` file: it must
+    reach neither `lake`, `lake exe lint-style`, the declaration sweep, nor
+    this checker's own `in_scope`. `scripts/fixtures/layering` keeps its
+    hypothetical modules out of the build the same way.
+    """
+    failures: list[str] = []
+    groups = sorted(p for p in FIXTURES.iterdir() if p.is_dir()) if FIXTURES.is_dir() else []
+    if not groups:
+        print(f"no mathlib-style fixtures found under {FIXTURES}", file=sys.stderr)
+        return 1
+
+    checked = 0
+    for group in groups:
+        code = group.name.upper()
+        for verdict in ("allowed", "forbidden"):
+            base = group / verdict
+            fixtures = sorted(base.glob("*.leansrc")) if base.is_dir() else []
+            if not fixtures:
+                failures.append(f"no {verdict} fixtures for [{code}] under {base}")
+                continue
+            for fixture in fixtures:
+                checked += 1
+                found = [
+                    f
+                    for f in check_text(fixture.read_text(encoding="utf-8"), fixture)
+                    if f.code == code
+                ]
+                label = fixture.relative_to(ROOT).as_posix()
+                if verdict == "forbidden" and not found:
+                    failures.append(f"forbidden fixture {label} produced no [{code}] finding")
+                if verdict == "allowed" and found:
+                    where = ", ".join(f"line {f.line}" for f in found)
+                    failures.append(f"allowed fixture {label} was rejected: [{code}] at {where}")
+
+    for failure in failures:
+        print(f"mathlib-style fixture: {failure}", file=sys.stderr)
+    print(f"mathlib-style fixtures: {checked} checked, {len(failures)} failed")
+    return 1 if failures else 0
+
+
 def report(path: Path, findings: list[Finding]) -> int:
     errors = [f for f in findings if f.severity == "ERROR"]
     warns = [f for f in findings if f.severity == "WARN"]
@@ -337,6 +452,9 @@ def report(path: Path, findings: list[Finding]) -> int:
 
 
 def main(argv: list[str]) -> int:
+    if "--self-test" in argv:
+        return self_test()
+
     paths: list[Path]
     hook_mode = "--hook" in argv
     diff_ref: str | None = None
