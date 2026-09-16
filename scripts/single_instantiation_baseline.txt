@@ -84,7 +84,6 @@ CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondi
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData	external input, per its docstring: proper discontinuity plus the two hypotheses its Hausdorff-local consequences need
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut	recorded before the reason column existed; reason not yet written
 LinearAlgebra	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.HodgeIndex	`HodgeDefinite.toHodgeIndex` weakens the definite form to the index inequality, which is the reusable consequence
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorialParameters	an ample-cone side condition on `StabilityParameters`; the smooth quadric is the one geometric model so far [adoption pending, tracked in the single-instantiation follow-up]
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.SubobjectChain	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Support.IsCompatible	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Support.IsHomogTwo	recorded before the reason column existed; reason not yet written
