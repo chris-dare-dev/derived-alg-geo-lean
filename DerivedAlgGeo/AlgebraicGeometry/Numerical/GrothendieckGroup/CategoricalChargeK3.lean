@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.CentralCharge
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.CentralChargeK3
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Quadratic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Charge
 

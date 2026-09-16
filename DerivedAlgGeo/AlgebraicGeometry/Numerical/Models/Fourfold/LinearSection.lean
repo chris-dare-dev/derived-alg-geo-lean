@@ -2,12 +2,12 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.RankOne
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.MonogenicRing
 
 /-!
 # Linear-section coordinates on a Picard-rank-one fourfold
 
-The dimension-four counterpart of `Examples/Threefold/LinearSection.lean`, with the same
+The dimension-four counterpart of `Models/Threefold/LinearSection.lean`, with the same
 justification: a class is recorded by its multiplicities against
 
 `[O_X], [O_{X∩H}], [O_{X∩H²}], [O_{X∩H³}], [O_pt]`,

@@ -84,7 +84,7 @@ by `<v,w> = -∫ v^v · w`, so the literature identity and this file's are the s
 prose, and `pairing_eq_neg_mukaiIntegral` closes the loop with the abstract lattice pairing.
 
 The sign is also checked ARITHMETICALLY on the rank-one model, in
-`Examples/Surface/K3MukaiIntegral.lean`, because a sign error here would still elaborate: every
+`Models/Surface/K3MukaiIntegral.lean`, because a sign error here would still elaborate: every
 statement in the general file is an equation between two things the reader cannot evaluate. On the
 model both sides are explicit polynomials, and the structure-sheaf diagonal comes out `+2` where a
 sign error would give `-2`. -/

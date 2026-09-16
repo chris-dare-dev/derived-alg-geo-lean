@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Fourfold.LinearSection
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Fourfold.LinearSection
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Fourfold
 
 /-!
@@ -30,7 +30,7 @@ from `c₁ = 5H` and `c₂ = 10H²`: `td₁ = c₁/2`, `td₂ = (c₁² + c₂)/
   `χ(O(m)) = (m+1)(m+2)(m+3)(m+4)/24`.
 * `p4ChCoeff_lineBundle_four` — the class used there really is `O(m)`: its Chern character is
   `e^{mH}` in codimension four, which is the only check on the `7/12` and `−3/2` of
-  `Examples/Fourfold/LinearSection.lean`.
+  `Models/Fourfold/LinearSection.lean`.
 -/
 
 namespace AlgebraicGeometry.Numerical
@@ -100,7 +100,7 @@ theorem p4Chi_lineBundle (m c e f : ℤ) (hc : 2 * c = m * (m + 1))
 
 /-- The class of `p4Chi_lineBundle` really has `ch₄ = m⁴/24`, the top Chern-character
 component of `e^{mH}`. This is the coefficient the `7/12` and `−3/2` of
-`Examples/Fourfold/LinearSection.lean` feed into, so it is where a transcription error in
+`Models/Fourfold/LinearSection.lean` feed into, so it is where a transcription error in
 those numbers would surface. -/
 theorem p4ChCoeff_lineBundle_four (m c e f : ℤ) (hc : 2 * c = m * (m + 1))
     (he : 6 * e = m * (m + 1) * (m + 2))

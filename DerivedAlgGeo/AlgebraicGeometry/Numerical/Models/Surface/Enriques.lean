@@ -2,14 +2,22 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.RankOne
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.Enriques
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface
 
 /-!
-# A numerical Enriques surface of Picard rank one
+# A polarisation slice of the Enriques numerical lattice
 
-The fourth surface model: the Todd class
+**This model is a slice, not the Enriques numerical lattice.** `Num(Y)` of a
+genuine Enriques surface is `U ⊕ E₈(−1)`, of rank ten; what is built here is the
+rank-one sublattice `ℤ·H` spanned by one polarisation class with `H² = 2d`, which
+is a legitimate slice because the Enriques lattice is even. Nothing below has
+Picard rank one as a hypothesis or as a conclusion, and no isotropic sequence,
+no rank-ten form and no lattice-theoretic Enriques invariant is visible from
+here. The rank-ten lattice is a separate lane.
+
+What the slice carries is the Todd class
 
 `td(Y) = 1 + 0 + (1/(2d))·H²`,
 
@@ -27,14 +35,11 @@ abelian surface: `td₁` cannot detect the torsion —
 `enriquesToddComp_one` and `abelianToddComp_one` are the same equation. What
 separates the two models is `∫td₂ = 1` versus `0`, not anything `ω_Y`-shaped.
 
-The carrier is the shared Picard-rank-one lattice of
-`Examples/Surface/RankOne.lean` — "a new model costs a Todd class and nothing
-else." A genuine Enriques surface has `Num(Y) = U ⊕ E₈(−1)` of rank ten; this
-file is the rank-one slice spanned by a single polarisation class `H` with
-`H² = 2d`, which is consistent because the Enriques lattice is even. The rank
-ten lattice and its isotropic sequences are a separate lane. As
-`AlgebraicGeometry/Surface/K3.lean` records for its own model in "What this
-file does not do", the numerical-to-geometric bridge is
+The carrier is the shared rank-one surface ring of
+`Models/Surface/RankOne.lean` — "a new model costs a Todd class and nothing
+else" — which the K3, abelian and projective-plane models use as siblings of
+this one. As `AlgebraicGeometry/Surface/K3.lean` records for its own model in
+"What this file does not do", the numerical-to-geometric bridge is
 Hirzebruch–Riemann–Roch and does not exist at the pin.
 
 The rank coefficient is `∫td₂ = 1` rather than the K3's `2` or the abelian
@@ -94,8 +99,9 @@ theorem enriquesTodd_sum (d : ℚ) :
     Finset.sum_range_zero, zero_add]
   simp [enriquesTodd]
 
-/-- **The model.** A numerical Enriques surface with polarisation degree
-`H² = 2d`, `d > 0`. -/
+/-- **The model.** The polarisation slice `ℤ·H ⊆ Num(Y)` of an Enriques surface,
+with `H² = 2d`, `d > 0`, carrying the Enriques Todd class. Not the rank-ten
+numerical lattice. -/
 @[reducible]
 noncomputable def enriquesNumericalVariety (d : ℕ) :
     NumericalVarietyData 2 SurfaceRing SurfaceNum where
@@ -159,7 +165,7 @@ theorem enriques_isEnriques (d : ℕ) (hd : d ≠ 0) :
     Enriques.IsEnriques (enriquesNumericalVariety d) :=
   ⟨enriquesToddComp_one d, enriquesChiStructureSheaf d hd⟩
 
-/-- A named degree-one numerical Enriques model. The degree-one choice is the
+/-- A named degree-one Enriques polarisation slice. The degree-one choice is the
 smallest nonzero polarization parameter on the rank-one carrier. -/
 @[reducible]
 noncomputable def standardEnriquesNumericalVariety :

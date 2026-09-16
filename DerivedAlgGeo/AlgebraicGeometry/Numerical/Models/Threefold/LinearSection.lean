@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.RankOne
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.MonogenicRing
 
 /-!
 # Linear-section coordinates on a Picard-rank-one threefold
@@ -29,7 +29,7 @@ parametrised by `d` rather than fixed.
 The alternative — recording `(r, c₁, ch₂, ch₃)` directly — cannot be a lattice: `ch₂` is a
 half-integer and `ch₃` a sixth-integer, so `χ` would not land in `ℤ`. Exactly the same
 problem forced the `(r, c, v)` coordinates in
-`Examples/Surface/ProjectivePlane.lean`. Linear sections solve it structurally instead of by
+`Models/Surface/ProjectivePlane.lean`. Linear sections solve it structurally instead of by
 a substitution chosen to work: every generator is an actual coherent sheaf, so its `χ` is an
 integer by construction, and the integrality of `χ` on the whole lattice is then automatic
 rather than something the model has to arrange.

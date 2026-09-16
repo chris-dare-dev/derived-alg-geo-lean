@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3Mukai
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.K3Mukai
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOneWalls
 
 /-!

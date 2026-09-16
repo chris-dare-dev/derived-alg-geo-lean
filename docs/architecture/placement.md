@@ -171,6 +171,25 @@ The numerical specialization cutover is complete (#1316). Generic
 dimension-specific transport consumer. K3 consequences and cross-model or
 surface/threefold comparisons live in explicit downstream modules.
 
+The numerical model cutover is complete (#1317). A formal
+rank-degree-coordinate model -- an intersection ring, its grading, a degree
+map, Chern and Todd coefficients, Riemann--Roch -- belongs under
+`AlgebraicGeometry/Numerical/Models/`, with the named surface models as
+siblings over `Models/Surface/RankOne.lean` and the dimension-general ring at
+`Models/MonogenicRing.lean`. A realization map into a real divisor space, a
+charge, a wall, a slice or a region built on such a model is a *demonstration*
+and belongs under `AlgebraicGeometry/Numerical/Examples/`, which imports
+`Models/` and is never imported by it. A K3-only adapter carries a `K3`
+suffix. Name a polarization slice as a slice, and do not name a construction
+after Picard rank one when what it uses is generation of the whole
+intersection ring by one class. None of these models is a scheme: the
+scheme-level object stays with its geometric owner, and a scheme-level
+specialization of a stability construction stays under
+`DerivedCategory/Stability/` with a `Scheme` suffix. Rule 12 of
+`scripts/check_layering.py` pins the owners, the sibling structure, and the
+separation of the arbitrary-divisor-rank charge branch from the scalar
+`H`-degree compression.
+
 Orthogonal exceptional blocks and a chosen right adjoint to a residual
 full-subcategory inclusion are structures on abstract (pre)triangulated
 categories, so their canonical owner is

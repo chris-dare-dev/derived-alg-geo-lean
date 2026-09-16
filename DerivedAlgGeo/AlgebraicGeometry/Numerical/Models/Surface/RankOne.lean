@@ -17,14 +17,14 @@ So the ring, its grading, the Chern character in the basis `1, H, H²`, and the 
 the normal form are all shared. What distinguishes one surface from another is only the
 **Todd class**, and that is what the individual model files supply:
 
-* `Examples/Surface/K3.lean` — `td = 1 + 0 + (1/d)H²` on a K3 of degree `H² = 2d`;
-* `Examples/Surface/ProjectivePlane.lean` — `td = 1 + (3/2)H + H²` on `ℙ²`, where `H² = 1`;
-* `Examples/Surface/Abelian.lean` — `td = 1 + 0 + 0` on an abelian surface.
+* `Models/Surface/K3.lean` — `td = 1 + 0 + (1/d)H²` on a K3 of degree `H² = 2d`;
+* `Models/Surface/ProjectivePlane.lean` — `td = 1 + (3/2)H + H²` on `ℙ²`, where `H² = 1`;
+* `Models/Surface/Abelian.lean` — `td = 1 + 0 + 0` on an abelian surface.
 
 The degree is parametrised by `h2 = ∫_X H²` rather than by a surface, so a new
 Picard-rank-one model costs a Todd class and nothing else.
 
-`Examples/RankOne.lean` performs this same construction in arbitrary dimension, and the
+`Models/MonogenicRing.lean` performs this same construction in arbitrary dimension, and the
 threefold and fourfold models are built on it. This file is not rebuilt on top of that one:
 see the implementation notes there for why.
 -/
@@ -186,7 +186,7 @@ noncomputable def surfaceNumericalRing (h2 : ℚ) : NumericalRingData 2 SurfaceR
 
 All three models use the same `N`. `K3.lean` and `Abelian.lean` share `k3ChCoeff`;
 `ProjectivePlane.lean` reparametrises with its own `p2ChCoeff`, because `ch₂` is a
-half-integer on `ℙ²` — see `Examples/Surface/ProjectivePlane.lean`. Coefficients are
+half-integer on `ℙ²` — see `Models/Surface/ProjectivePlane.lean`. Coefficients are
 therefore rational rather than integral. -/
 
 /-- A class is recorded by the three rational coefficients of `ch = a + b·H + c·H²`. -/
