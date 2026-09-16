@@ -432,6 +432,7 @@ the `HomFiniteBounded` model built on it is audited with the Euler form. -/
 #print axioms CategoryTheory.CochainComplex.IsKFlat
 #print axioms CategoryTheory.CochainComplex.IsKFlat.tensorLeft_inverts
 #print axioms CategoryTheory.CochainComplex.IsKFlat.tensorRight_inverts
+#print axioms CategoryTheory.CochainComplex.quasiIso_map_of_comparison
 #print axioms CategoryTheory.KFlatResolution
 #print axioms CategoryTheory.KFlatResolution.comparison
 #print axioms CategoryTheory.KFlatResolution.comparisonApp

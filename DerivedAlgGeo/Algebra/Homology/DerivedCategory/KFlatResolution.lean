@@ -69,6 +69,30 @@ lemma tensorRight_inverts :
 
 end IsKFlat
 
+/-- A functorial replacement of cochain complexes equipped with a
+componentwise quasi-isomorphic comparison to the identity functor preserves
+quasi-isomorphisms.
+
+Only the comparison is used.  No K-flatness, K-projectivity, or exactness
+hypothesis enters, so every functorial resolution interface in this library
+can reuse the statement rather than reproving it. -/
+lemma quasiIso_map_of_comparison
+    {Res : CochainComplex C ℤ ⥤ CochainComplex C ℤ}
+    (comparison : Res ⟶ 𝟭 (CochainComplex C ℤ))
+    (hcomparison : ∀ K : CochainComplex C ℤ,
+      HomologicalComplex.quasiIso C (ComplexShape.up ℤ) (comparison.app K))
+    {K L : CochainComplex C ℤ} (f : K ⟶ L)
+    (hf : HomologicalComplex.quasiIso C (ComplexShape.up ℤ) f) :
+    HomologicalComplex.quasiIso C (ComplexShape.up ℤ) (Res.map f) := by
+  have hf' : W ((𝟭 (CochainComplex C ℤ)).map f) := by
+    simpa only [Functor.id_obj, Functor.id_map] using hf
+  have hcomp : W (comparison.app K ≫ (𝟭 (CochainComplex C ℤ)).map f) :=
+    W.comp_mem _ _ (hcomparison K) hf'
+  have hcomp' : W (Res.map f ≫ comparison.app L) := by
+    rw [comparison.naturality]
+    exact hcomp
+  exact W.of_postcomp _ _ (hcomparison L) hcomp'
+
 end CochainComplex
 
 /-- A functorial two-sided K-flat replacement for a complex-level tensor bifunctor. -/
@@ -106,16 +130,8 @@ lemma comparisonApp_naturality (R : KFlatResolution C tensor)
 
 /-- A K-flat replacement functor preserves quasi-isomorphisms. -/
 lemma map_quasiIso (R : KFlatResolution C tensor) {K L : CochainComplex C ℤ}
-    (f : K ⟶ L) (hf : W f) : W (R.resolution.map f) := by
-  have hf' : W ((𝟭 (CochainComplex C ℤ)).map f) := by
-    simpa only [Functor.id_obj, Functor.id_map] using hf
-  have hcomp : W
-      (R.comparison.app K ≫ (𝟭 (CochainComplex C ℤ)).map f) :=
-    W.comp_mem _ _ (R.comparison_quasiIso K) hf'
-  have hcomp' : W (R.resolution.map f ≫ R.comparison.app L) := by
-    rw [R.comparison.naturality]
-    exact hcomp
-  exact W.of_postcomp _ _ (R.comparison_quasiIso L) hcomp'
+    (f : K ⟶ L) (hf : W f) : W (R.resolution.map f) :=
+  CochainComplex.quasiIso_map_of_comparison R.comparison R.comparison_quasiIso f hf
 
 /-- Apply `tensor` after K-flat replacement in both inputs and then localize. -/
 def resolvedTensor (R : KFlatResolution C tensor) :
