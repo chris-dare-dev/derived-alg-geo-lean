@@ -477,6 +477,33 @@ LINEAR_YONEDA_BLOCK = (
 LINEAR_SERRE_ROOT_DIR = "CategoryTheory/Linear/SerreFunctor"
 TRIANGULATED_TREE = f"{LIBRARY}.CategoryTheory.Triangulated"
 
+# Rule 13. MO1.10 (#1321) moved the derived-tensor and derived-pushforward
+# capabilities out of the Fourier--Mukai subtree, because a transform needs a
+# tensor and a tensor is not about transforms. The whole point of that move is
+# the import direction, so it is pinned here rather than left to review: each
+# owner below, and the twisted-pushforward consumer that demonstrates them,
+# must reach NEITHER the Fourier--Mukai subtree NOR the stability tree.
+#
+# Import lines alone would not catch the regression this guards against. The
+# capabilities were reachable without a kernel before only by accident of which
+# file they sat in; a single new import anywhere in the 187-module closure of
+# `Tensor/` would quietly restore the coupling with every other gate still
+# green. The check is therefore transitive.
+#
+# `TwistedPushforward` is listed as an owner rather than a consumer on purpose:
+# it is the named independent consumer that rule 2 of the cutover ledger
+# requires for the `Tensor/` root, so a version of it that reached FourierMukai
+# would leave the root unjustified.
+DERIVED_OPERATION_OWNERS = (
+    "AlgebraicGeometry/DerivedCategory/Tensor",
+    "AlgebraicGeometry/DerivedCategory/Families/DerivedPushforward.lean",
+    "AlgebraicGeometry/DerivedCategory/TwistedPushforward.lean",
+)
+GEOMETRIC_FOURIER_MUKAI_TREE = (
+    f"{LIBRARY}.AlgebraicGeometry.DerivedCategory.FourierMukai"
+)
+ABSTRACT_FOURIER_MUKAI_TREE = f"{TRIANGULATED_TREE}.FourierMukai"
+
 STRUCTURE_DECLARES = re.compile(
     r"^\s*(?:private\s+|protected\s+|noncomputable\s+)*structure\s+(\S+)"
 )
@@ -1144,6 +1171,38 @@ def main() -> int:
                     "triangulation (MO1.07)"
                 )
 
+    # Rule 13, derived-operation owners are reachable without a kernel.
+    for entry in DERIVED_OPERATION_OWNERS:
+        path = SOURCE_ROOT / entry
+        if not (path.is_file() or path.is_dir()):
+            failures.append(
+                f"missing {entry}: it owns a general derived operation "
+                "extracted from Fourier--Mukai; see "
+                "docs/architecture/cutover-ledger.md row 10"
+            )
+            continue
+        owner_module = module_of(
+            path if path.is_file() else path.with_suffix(".lean")
+        )
+        for module in modules:
+            if not (module == owner_module or in_tree(module, owner_module)):
+                continue
+            for tree, why in (
+                (GEOMETRIC_FOURIER_MUKAI_TREE, "the geometric kernel subtree"),
+                (ABSTRACT_FOURIER_MUKAI_TREE, "the abstract kernel subtree"),
+                (STABILITY_ROOT, "the stability tree"),
+            ):
+                reached = sorted(
+                    dep for dep in closure.of(module) if in_tree(dep, tree)
+                )
+                if reached:
+                    failures.append(
+                        f"{module}: reaches {reached[0]} in {why}; the derived "
+                        "tensor and pushforward capabilities exist to be "
+                        "importable without a kernel, a correspondence or a "
+                        "stability condition (MO1.10)"
+                    )
+
     failures += check_fixtures(closure)
 
     if failures:
@@ -1183,7 +1242,9 @@ def main() -> int:
         "a demonstration, the "
         f"{len(SURFACE_MODEL_SIBLINGS)} named surface models share one carrier "
         "and no sibling, and the arbitrary-divisor-rank charge reaches the "
-        "exponential kernel without a degree vector"
+        "exponential kernel without a degree vector; the "
+        f"{len(DERIVED_OPERATION_OWNERS)} derived-operation owners reach "
+        "neither Fourier--Mukai subtree nor the stability tree"
     )
     return 0
 
