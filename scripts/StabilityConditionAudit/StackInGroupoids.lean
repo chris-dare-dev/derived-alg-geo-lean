@@ -57,3 +57,10 @@ The module, declarations, and audit ownership are neutral category theory.
 #print axioms CategoryTheory.discretePseudofunctor_obj_isDiscrete
 #print axioms CategoryTheory.discretePseudofunctor_obj_isGroupoid
 #print axioms CategoryTheory.stackInGroupoidsOfSheaf
+#print axioms CategoryTheory.Pseudofunctor.IsStack.of_le
+#print axioms CategoryTheory.StackInGroupoids.ofLE
+#print axioms CategoryTheory.StackInGroupoids.ofLE_presheaf
+#print axioms CategoryTheory.StackInGroupoids.Cover.ofLE
+#print axioms CategoryTheory.StackInGroupoids.Cover.ofLE_index
+#print axioms CategoryTheory.StackInGroupoids.Cover.ofLE_obj
+#print axioms CategoryTheory.StackInGroupoids.Cover.ofLE_hom

@@ -44,8 +44,10 @@ def main() -> int:
                 "the weak parent Foundation.Slicing or "
                 "Foundation.IntervalCategory, the strong child "
                 "Foundation.PreStabilityCondition or "
-                "Foundation.StabilityCondition, or a narrow "
-                "Foundation.StabilityFunction leaf)"
+                "Foundation.StabilityCondition, the heart adapter "
+                "Foundation.HeartDatum, or -- for the abelian stability "
+                "functions MO1.08 moved out of this tree -- a narrow "
+                "CategoryTheory.Abelian.Stability leaf)"
             )
 
     if failures:

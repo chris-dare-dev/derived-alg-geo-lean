@@ -72,6 +72,44 @@ def affineKProjectivePullbackObjIso {R A : CommRingCat.{u}} (f : R ⟶ A)
           (ComplexShape.up ℤ)).obj K) :=
   kProjectiveDerivedFunctorObjIso (ModuleCat.extendScalars f.hom) K d
 
+/-- Extension of scalars along an arbitrary morphism of commutative rings
+carries a quasi-isomorphism between K-projective complexes to a
+quasi-isomorphism.
+
+The ring map carries no flatness hypothesis: a quasi-isomorphism between
+K-projective complexes is a homotopy equivalence, and extension of scalars is
+additive. -/
+theorem quasiIso_extendScalars_map_of_isKProjective
+    {R A : CommRingCat.{u}} (f : R ⟶ A)
+    {K L : _root_.CochainComplex (ModuleCat R) ℤ}
+    [_root_.CochainComplex.IsKProjective K]
+    [_root_.CochainComplex.IsKProjective L]
+    {g : K ⟶ L}
+    (hg : HomologicalComplex.quasiIso (ModuleCat R) (ComplexShape.up ℤ) g) :
+    HomologicalComplex.quasiIso (ModuleCat A) (ComplexShape.up ℤ)
+      (((ModuleCat.extendScalars f.hom).mapHomologicalComplex
+        (ComplexShape.up ℤ)).map g) :=
+  _root_.CochainComplex.IsKProjective.quasiIso_map
+    (ModuleCat.extendScalars f.hom) hg
+
+/-- The inhabited form of `quasiIso_extendScalars_map_of_isKProjective`.
+
+Bounded-above complexes of projective modules are K-projective and exist in
+abundance over any ring, so this is the statement an affine consumer of
+arbitrary derived pullback can actually apply. -/
+theorem quasiIso_extendScalars_map_of_projective
+    {R A : CommRingCat.{u}} (f : R ⟶ A)
+    {K L : _root_.CochainComplex (ModuleCat R) ℤ} (dK dL : ℤ)
+    [K.IsStrictlyLE dK] [L.IsStrictlyLE dL]
+    [∀ n : ℤ, Projective (K.X n)] [∀ n : ℤ, Projective (L.X n)]
+    {g : K ⟶ L}
+    (hg : HomologicalComplex.quasiIso (ModuleCat R) (ComplexShape.up ℤ) g) :
+    HomologicalComplex.quasiIso (ModuleCat A) (ComplexShape.up ℤ)
+      (((ModuleCat.extendScalars f.hom).mapHomologicalComplex
+        (ComplexShape.up ℤ)).map g) :=
+  _root_.CochainComplex.IsKProjective.quasiIso_map_of_projective
+    (ModuleCat.extendScalars f.hom) dK dL hg
+
 end
 
 end AlgebraicGeometry.DerivedCategory.Dqc

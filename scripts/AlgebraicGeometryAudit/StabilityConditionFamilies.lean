@@ -242,6 +242,8 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineKProjectiveDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineKProjectiveDerivedPullbackComparison
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineKProjectivePullbackObjIso
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.quasiIso_extendScalars_map_of_isKProjective
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.quasiIso_extendScalars_map_of_projective
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineLocalizationExtendRestrictCounitApp_isIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineLocalizationExtendRestrictCounitIso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineLocalizationExtendScalars_additive
@@ -780,6 +782,7 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.sigma_mem
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.isClosedUnderColimitsOfShape_discrete
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.ι_preservesCoproductsOfShape
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.ι_reflectsCoproductsOfShape
 
 /-! ## Pushforward of stability conditions along bounded coherent pullback -/
 
@@ -1182,6 +1185,13 @@ absent from Mathlib at this pin and is asserted nowhere.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclicResolution
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclic_ofExact
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclic_ofFlat
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclic_of_isKProjective
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatLeftDerivedPullbackOfKProjective
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.quasiIso_complexPullback_map_of_isKProjective
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.isIso_complexPullback_map_of_isKProjective
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.PullbackAcyclicResolution.ofKProjective
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kProjectiveLeftDerivedPullback
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kProjectiveExactComparison
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatQuasicoherentBaseChangeComponent
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatResolvedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.modulePushforward_preservesFiniteLimits

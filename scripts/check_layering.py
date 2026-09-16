@@ -58,6 +58,32 @@ nothing else checks.
    siblings over one shared carrier, and the arbitrary-divisor-rank charge
    demonstrations reach the shared exponential kernel without passing through
    the scalar ``H``-degree compression. This is MO1.06 (#1317).
+13. **Abelian stability, slope stability and Gieseker stability are three
+   subjects, not one nest.** ``CategoryTheory/Abelian/Stability/`` reaches no
+   ``CategoryTheory/Triangulated`` module, so stability functions and their
+   Harder--Narasimhan theory are importable without a shift, a t-structure or a
+   heart. Below ``AlgebraicGeometry/Stability/``, ``Slope/`` and ``Gieseker/``
+   reach neither each other nor the stability tree; ``Comparison.lean`` reaches
+   both and is reached by neither; and ``Purity.lean`` declares ``IsPure``
+   exactly once, because it is the one notion the two geometric theories share.
+   This is MO1.08 (#1319), and the sheaf-stability exemption rule 3 used to
+   grant is gone with it.
+14. **The neutral planar core is category-free and stability-free.** Nothing
+   below ``Analysis/`` reaches ``CategoryTheory/``, ``AlgebraicGeometry/`` or
+   the stability tree, and nothing below it imports ``Mathlib.CategoryTheory``
+   either. That is the whole reason MO1.13 (#1324) gave the Euclidean
+   perimeter comparison a subject of its own instead of leaving it inside a
+   mass-subadditivity proof directory, and it is exactly the kind of claim one
+   convenience import erases.
+15. **A derived tensor is not about transforms.** The derived-tensor and
+   derived-pushforward capabilities left the Fourier--Mukai subtree, so
+   ``DerivedCategory/Tensor/``, ``Families/DerivedPushforward.lean`` and the
+   twisted-pushforward consumer that demonstrates them reach neither
+   Fourier--Mukai subtree nor the stability tree, even transitively. The
+   capabilities were importable without a kernel before only by accident of
+   which file they sat in; this is MO1.10 (#1321), and the check is transitive
+   because a single new import anywhere in the ``Tensor/`` closure would
+   restore the coupling with every other gate still green.
 7. **The ``ObjectProperty`` lift block stays at its carrier's path.**
    ``CategoryTheory/ObjectProperty/Lift.lean`` declares all six of
    it and imports nothing from ``DerivedAlgGeo``; no other module redeclares
@@ -93,6 +119,13 @@ KNOWN_SUBJECTS = {
     "Algebra",
     "AlgebraicGeometry",
     "AlgebraicTopology",
+    # Added by MO1.13 (#1324), deliberately and after the check rule 6 asks
+    # for: the pinned Mathlib has no polygonal-chain length and no perimeter
+    # of any kind, so the Euclidean comparison under mass subadditivity had no
+    # Mathlib owner to reuse. `Analysis` rather than `Geometry` because the
+    # convexity API it consumes, `convexHull`, is owned at the pinned revision
+    # by `Mathlib/Analysis/Convex/Hull.lean`. Recorded in the cutover ledger.
+    "Analysis",
     "CategoryTheory",
     "Development",
     "LinearAlgebra",
@@ -169,16 +202,26 @@ STABILITY_CONSUMING_GEOMETRY = (
     # discriminant and Mukai-vector modules beside it are neutral.
     f"{GEOMETRY}.Numerical.GrothendieckGroup.CategoricalChargeK3",
     f"{GEOMETRY}.Numerical.Stability",
-    # Stability of sheaves: slope and Gieseker theory on `Coh X`, whose whole
-    # purpose is to instantiate the abstract slope theory, so it necessarily
-    # reaches the stability tree. Distinct from `DerivedCategory.Stability`,
-    # which is the Dqc/families lane.
-    f"{GEOMETRY}.Stability.Gieseker",
+    # `AlgebraicGeometry/Stability/` was the third entry here until MO1.08
+    # (#1319). It instantiates a slope theory, but that theory is abelian and
+    # now lives at `CategoryTheory/Abelian/Stability/`, so sheaves, Hilbert
+    # polynomials and slopes reach no triangulated stability condition at all.
+    # The exemption was removed rather than renamed, and rule 13 below pins the
+    # claim that made removing it possible.
 )
 
 # Paths removed by a structural cutover, relative to the source root. An entry
 # without a suffix names a directory and also forbids its same-named umbrella.
 RETIRED_PATHS = (
+    # 2026-09-15 MO1.13 (#1324): mass became a sibling of metric, and the
+    # Euclidean planar core left the mass-subadditivity proof directory.
+    # The finite-sum half-plane bounds went one step further than MO1.08 sent
+    # them: that file mentions no category at all, so it owns
+    # Analysis/Complex/PhaseFiniteSums.lean rather than a path below
+    # CategoryTheory/. MO1.08's own parent entry covers where it used to live.
+    "CategoryTheory/Triangulated/StabilityCondition/Metric/Mass",
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Metric",
+    "CategoryTheory/Abelian/Stability/FiniteSums.lean",
     # 2026-09-02 Euler-characteristic lane: restated on Mathlib's GradedObject.eulerChar.
     "LinearAlgebra/AlternatingFinsum.lean",
     "LinearAlgebra/AlternatingSum.lean",
@@ -290,6 +333,22 @@ RETIRED_PATHS = (
     "AlgebraicGeometry/Numerical/Examples/Fourfold/ProjectiveSpace.lean",
     "AlgebraicGeometry/Numerical/GrothendieckGroup/CentralCharge.lean",
     "AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalCharge.lean",
+    # 2026-09-15 MO1.08: abelian stability functions and their
+    # Harder-Narasimhan theory moved to CategoryTheory/Abelian/Stability/, with
+    # the weak variants as its children and the class datum as its neutral
+    # core. Only the heart adapter stayed behind, at
+    # Weak/Foundation/HeartDatum.lean.
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/"
+    "StabilityFunction",
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Charge.lean",
+    # 2026-09-15 MO1.08: the mu-slope datum and the mu-Harder-Narasimhan
+    # existence theorem are not Gieseker theory and stopped being filed under
+    # it; the shared Hilbert-polynomial data moved up to the common parent, and
+    # the statements that mention both theories moved to Comparison.lean.
+    "AlgebraicGeometry/Stability/Gieseker/MuStability.lean",
+    "AlgebraicGeometry/Stability/Gieseker/HilbertPolynomial.lean",
+    "AlgebraicGeometry/Stability/Gieseker/Coefficients.lean",
+    "AlgebraicGeometry/Stability/Gieseker/HarderNarasimhan",
     # 2026-09-15 MO1.10: the derived-tensor and derived-pushforward
     # capabilities are about a derived category, not about transforms, so they
     # left the Fourier--Mukai subtree. `HasDerivedTensor` and the coherent
@@ -438,6 +497,26 @@ SCALAR_DEGREE_COMPRESSION = (
     f"{GEOMETRY}.Numerical.Models.Surface.RankOne",
     f"{GEOMETRY}.Numerical.Stability.PolarisedWallTransport",
 )
+# Rule 13. MO1.08 (#1319) unnested three subjects. The abelian stability
+# functions were a foundation directory inside the triangulated theory they are
+# a foundation for; the mu-slope datum and the mu-Harder-Narasimhan existence
+# theorem were children of the Gieseker directory although neither mentions the
+# Gieseker order. Each claim below is one a single convenience import would
+# silently undo, which is why all three are pinned rather than documented.
+ABELIAN_STABILITY_TREE = f"{LIBRARY}.CategoryTheory.Abelian.Stability"
+ABELIAN_STABILITY_UMBRELLA = "CategoryTheory/Abelian/Stability.lean"
+ABELIAN_STABILITY_WEAK_UMBRELLA = "CategoryTheory/Abelian/Stability/Weak.lean"
+HEART_DATUM_ADAPTER = (
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/"
+    "HeartDatum.lean"
+)
+SHEAF_STABILITY_TREE = f"{GEOMETRY}.Stability"
+SHEAF_SLOPE_TREE = f"{SHEAF_STABILITY_TREE}.Slope"
+SHEAF_GIESEKER_TREE = f"{SHEAF_STABILITY_TREE}.Gieseker"
+SHEAF_COMPARISON_MODULE = f"{SHEAF_STABILITY_TREE}.Comparison"
+SHEAF_PURITY_ROOT = "AlgebraicGeometry/Stability/Purity.lean"
+SHEAF_PURITY_BLOCK = ("IsPure",)
+
 MO1_03_OWNERS = {
     POSITIVE_PLANE_ROOT: ("IsPositivePlane", "positivePlanes"),
     POSITIVE_FRAME_ROOT: (
@@ -475,9 +554,24 @@ LINEAR_YONEDA_BLOCK = (
     "hom_ext_of_linearYoneda",
 )
 LINEAR_SERRE_ROOT_DIR = "CategoryTheory/Linear/SerreFunctor"
+
+# Rule 14. `Analysis/` is the neutral planar subject MO1.13 (#1324) added:
+# the polygonal-path carrier, the real continuous linear functionals on `C`
+# and the Euclidean perimeter comparison, none of which mentions an object,
+# a filtration or a stability function. The point of the move is that it can
+# be imported with no category theory and no stability, so that is checked
+# rather than asserted in a docstring.
+ANALYSIS_ROOT = f"{LIBRARY}.Analysis"
+ANALYSIS_FORBIDDEN_PREFIXES = (
+    f"{LIBRARY}.CategoryTheory",
+    f"{LIBRARY}.AlgebraicGeometry",
+    f"{LIBRARY}.Development",
+    "Mathlib.CategoryTheory",
+    "Mathlib.AlgebraicGeometry",
+)
 TRIANGULATED_TREE = f"{LIBRARY}.CategoryTheory.Triangulated"
 
-# Rule 13. MO1.10 (#1321) moved the derived-tensor and derived-pushforward
+# Rule 15. MO1.10 (#1321) moved the derived-tensor and derived-pushforward
 # capabilities out of the Fourier--Mukai subtree, because a transform needs a
 # tensor and a tensor is not about transforms. The whole point of that move is
 # the import direction, so it is pinned here rather than left to review: each
@@ -732,6 +826,38 @@ def owner_boundary_failures(
             return [
                 f"{label}: reaches {forbidden[0]}; central-charge construction "
                 "must remain upstream of walls and geometry"
+            ]
+    if in_tree(module, ABELIAN_STABILITY_TREE):
+        forbidden = sorted(
+            dep for dep in reached if in_tree(dep, TRIANGULATED_TREE)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; abelian stability functions "
+                "and their Harder-Narasimhan theory are importable without a "
+                "shift, a t-structure or a heart (MO1.08)"
+            ]
+    if in_tree(module, SHEAF_SLOPE_TREE):
+        forbidden = sorted(
+            dep for dep in reached if in_tree(dep, SHEAF_GIESEKER_TREE)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; mu-slope stability and its "
+                "Harder-Narasimhan theory are a sibling of Gieseker stability "
+                "over the shared Hilbert-polynomial data, not a child of it. "
+                "Statements mentioning both belong in "
+                f"{SHEAF_COMPARISON_MODULE}"
+            ]
+    if in_tree(module, SHEAF_GIESEKER_TREE):
+        forbidden = sorted(
+            dep for dep in reached if in_tree(dep, SHEAF_SLOPE_TREE)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; the Gieseker order is "
+                "defined without a slope, and the comparison between the two "
+                f"theories belongs in {SHEAF_COMPARISON_MODULE}"
             ]
     if module in (SQRT_TODD_ROOT, SLOPE_ROOT, POLARISED_TRANSPORT_ROOT):
         forbidden = sorted(
@@ -1081,6 +1207,83 @@ def main() -> int:
                 "specializing the lossy scalar H-degree compression"
             )
 
+    # Rule 13, MO1.08. The closure claims are checked uniformly in
+    # `owner_boundary_failures` above, so the fixtures exercise the same
+    # predicate; what is left here is the existence of the owners, the one
+    # claim about the comparison module, and the single declaration of IsPure.
+    for entry in (
+        ABELIAN_STABILITY_UMBRELLA,
+        ABELIAN_STABILITY_WEAK_UMBRELLA,
+        HEART_DATUM_ADAPTER,
+        SHEAF_PURITY_ROOT,
+    ):
+        if not (SOURCE_ROOT / entry).is_file():
+            failures.append(
+                f"missing MO1.08 owner {entry}; see "
+                "docs/architecture/cutover-ledger.md"
+            )
+
+    # No module below AlgebraicGeometry/Stability/ may buy back the rule 3
+    # exemption MO1.08 removed. The same guard rule 12 puts on numerical models.
+    for root in STABILITY_CONSUMING_GEOMETRY:
+        if in_tree(root, SHEAF_STABILITY_TREE):
+            failures.append(
+                f"{root}: stability of sheaves may not be exempted from rule "
+                "3; it instantiates the abelian slope theory at "
+                f"{ABELIAN_STABILITY_TREE} and needs no stability condition"
+            )
+
+    # The comparison owner joins the two geometric theories and is joined by
+    # neither. An empty Comparison.lean with the statements left in a sibling
+    # would pass the two closure checks above and defeat the point of the row.
+    if SHEAF_COMPARISON_MODULE not in modules:
+        failures.append(
+            f"missing {SHEAF_COMPARISON_MODULE}; the slope/Gieseker comparison "
+            "needs an owner that is not either theory"
+        )
+    else:
+        reached = closure.of(SHEAF_COMPARISON_MODULE)
+        for tree in (SHEAF_SLOPE_TREE, SHEAF_GIESEKER_TREE):
+            if not any(in_tree(dep, tree) for dep in reached):
+                failures.append(
+                    f"{SHEAF_COMPARISON_MODULE}: does not reach {tree}; the "
+                    "comparison owner is the module that sees both theories"
+                )
+        for module in sorted(modules):
+            if not (
+                in_tree(module, SHEAF_SLOPE_TREE)
+                or in_tree(module, SHEAF_GIESEKER_TREE)
+            ):
+                continue
+            if SHEAF_COMPARISON_MODULE in closure.of(module):
+                failures.append(
+                    f"{module}: reaches {SHEAF_COMPARISON_MODULE}; a theory "
+                    "does not import its own comparison with another one"
+                )
+
+    purity_root = SOURCE_ROOT / SHEAF_PURITY_ROOT
+    if purity_root.is_file():
+        purity_module = module_of(purity_root)
+        purity_declared = declared_names(purity_root.read_text(encoding="utf-8"))
+        for name in SHEAF_PURITY_BLOCK:
+            if name not in purity_declared:
+                failures.append(
+                    f"{purity_root.relative_to(ROOT)}: no longer declares "
+                    f"{name}; purity is what the slope and Gieseker theories "
+                    "share, and it has one owner"
+                )
+        for module, (path, _, _) in modules.items():
+            if module == purity_module:
+                continue
+            stray = declared_names(path.read_text(encoding="utf-8")) & set(
+                SHEAF_PURITY_BLOCK
+            )
+            if stray:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)} "
+                    f"from the purity block; import {purity_module} instead"
+                )
+
     positive_frame_module = module_of(SOURCE_ROOT / POSITIVE_FRAME_ROOT)
     forbidden_frame_dependencies = (
         f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityFiniteness",
@@ -1171,7 +1374,35 @@ def main() -> int:
                     "triangulation (MO1.07)"
                 )
 
-    # Rule 13, derived-operation owners are reachable without a kernel.
+    # Rule 14.
+    analysis_modules = [
+        m for m in modules if m == ANALYSIS_ROOT or in_tree(m, ANALYSIS_ROOT)
+    ]
+    if not analysis_modules:
+        failures.append(
+            f"missing {ANALYSIS_ROOT}: it owns the neutral planar core -- the "
+            "polygonal-path carrier, the real continuous linear functionals on "
+            "the complex plane, and the Euclidean perimeter comparison; see "
+            "docs/architecture/cutover-ledger.md"
+        )
+    for module in analysis_modules:
+        reached = sorted(
+            dep
+            for dep in closure.of(module)
+            if dep != module
+            and any(
+                dep == prefix or dep.startswith(prefix + ".")
+                for prefix in ANALYSIS_FORBIDDEN_PREFIXES
+            )
+        )
+        if reached:
+            failures.append(
+                f"{module}: reaches {reached[0]}; the neutral planar core "
+                "exists to be importable with no category theory and no "
+                "stability (MO1.13)"
+            )
+
+    # Rule 15, derived-operation owners are reachable without a kernel.
     for entry in DERIVED_OPERATION_OWNERS:
         path = SOURCE_ROOT / entry
         if not (path.is_file() or path.is_dir()):
@@ -1242,7 +1473,11 @@ def main() -> int:
         "a demonstration, the "
         f"{len(SURFACE_MODEL_SIBLINGS)} named surface models share one carrier "
         "and no sibling, and the arbitrary-divisor-rank charge reaches the "
-        "exponential kernel without a degree vector; the "
+        "exponential kernel without a degree vector; abelian stability reaches "
+        "no triangulated module, sheaf slope and Gieseker stability reach "
+        "neither each other nor the stability tree, and IsPure is declared once; "
+        f"the {len(analysis_modules)} neutral planar modules below Analysis/ "
+        "reach no category, no scheme and no stability condition; the "
         f"{len(DERIVED_OPERATION_OWNERS)} derived-operation owners reach "
         "neither Fourier--Mukai subtree nor the stability tree"
     )

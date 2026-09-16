@@ -149,6 +149,13 @@ that true.
   precede their triangulated applications. Geometric slope and Gieseker
   stability have independent owners and downstream comparisons. Retain
   `StabilityCondition/Weak` as the legitimate weakened-concept nesting.
+  **Done** (#1319): `CategoryTheory/Abelian/Stability/` owns the stability
+  functions, their Harder--Narasimhan theory and the `Weak/` variants below
+  them, and reaches no triangulated module; `AlgebraicGeometry/Stability/`
+  carries `Slope/` and `Gieseker/` as siblings over shared Hilbert-polynomial
+  data with a `Comparison.lean` above them; and layering rule 13 keeps all of
+  that true. The μ-Harder--Narasimhan existence theorem moved directory and
+  kept its statement: it is not a Gieseker HN theorem.
 - **dg H⁰:** intrinsic H⁰, shift, cone and functor theory belongs with the
   implemented `DGCategory` on `HomComplex`. Comparison with a chosen
   triangulated target belongs to enhancement theory. An ordinary equivalence
@@ -223,9 +230,12 @@ regression fixtures for the first named component edge; even so, neither it nor
 the hard-coded divisorial owner certifies that every numerical root is
 independent or well placed. Five of the nine exempt subcomponents mixed
 modules that reach the stability tree with modules that do not; after MO1.05
-and MO1.06 two still do -- `Numerical/Stability/` and `Stability/Gieseker/`.
-Those two component boundaries are review obligations until their source
-cutover adds the focused checks and regression fixtures. `check_single_instantiation.py` has a scoped search;
+and MO1.06 two still did, and MO1.08 (#1319) resolved one of those two by
+removing `Stability/Gieseker/` from the list rather than narrowing it -- the
+sheaf-stability subtree instantiates an abelian slope theory and reaches no
+stability condition. `Numerical/Stability/` is the remaining mixed entry, and
+that component boundary is a review obligation until its source cutover adds
+the focused checks and regression fixtures. `check_single_instantiation.py` has a scoped search;
 absence of a finding is not the two-consumer justification.
 
 Run the relevant focused checks, then the prescribed runner CI for source
