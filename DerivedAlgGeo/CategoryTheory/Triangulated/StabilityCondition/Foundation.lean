@@ -23,7 +23,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundat
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.PhaseTruncation
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Slicing
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction
+import DerivedAlgGeo.CategoryTheory.Abelian.Stability
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.ImageFactorisation
 
 /-!

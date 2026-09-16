@@ -36,14 +36,13 @@ complete mathematical ownership policy.
    `DerivedAlgGeoSweep.lean` import everything and own nothing.
 2. **`Development/` is a leaf.** No stable module imports it.
 3. **Stability-neutral geometry.** A module below `AlgebraicGeometry/` that is
-   not below one of the nine subcomponents that exist to consume stability
-   never reaches the stability tree, even transitively. The nine are
+   not below one of the eight subcomponents that exist to consume stability
+   never reaches the stability tree, even transitively. The eight are
    `DerivedCategory/Stability/`, `Moduli/HarderNarasimhan/`,
    `Moduli/Semistability/`, `Numerical/Stability/`,
    `Numerical/Examples/Surface/`, `Numerical/Examples/Threefold/`,
-   `Numerical/Examples/Fourfold/`,
-   `Numerical/GrothendieckGroup/CategoricalChargeK3.lean` and
-   `Stability/Gieseker/`.
+   `Numerical/Examples/Fourfold/` and
+   `Numerical/GrothendieckGroup/CategoricalChargeK3.lean`.
    A same-named umbrella over one of them re-exports it and is exempt as an
    umbrella only; its other children are not. This keeps `Dᵇ(Coh X)`, `Dqc`,
    coherent sheaves, and cohomology importable without Bridgeland stability.
@@ -53,7 +52,11 @@ complete mathematical ownership policy.
    `Numerical/Examples/Fourfold/` was neutral at that moment and stopped being
    so the same day, when #1225 gave the fourfold models their wall families.
    MO1.06 (#1317) made the three `Numerical/Examples/` entries exact by moving
-   the formal models to `Numerical/Models/`, which is held neutral.
+   the formal models to `Numerical/Models/`, which is held neutral. MO1.08
+   (#1319) removed the ninth entry, `Stability/Gieseker/`: the slope theory
+   sheaf stability instantiates is abelian, it moved to
+   `CategoryTheory/Abelian/Stability/`, and the whole `Stability/` subtree is
+   now held neutral by this rule rather than exempted from it.
 4. **Weak stability is independent of Bridgeland stability.** No module of the
    weak theory imports the Bridgeland theory, and
    `PreStabilityCondition` structurally `extends toWeak :
@@ -71,6 +74,15 @@ complete mathematical ownership policy.
    no sibling, and the arbitrary-divisor-rank charge reaches the exponential
    kernel without passing through the scalar `H`-degree compression. MO1.06
    (#1317).
+8. **Abelian stability, slope stability and Gieseker stability are three
+   subjects.** `CategoryTheory/Abelian/Stability/` -- stability functions, their
+   Harder--Narasimhan theory, and the `Weak/` variants below it -- reaches no
+   `CategoryTheory/Triangulated` module, so it is importable without a shift, a
+   t-structure or a heart. Below `AlgebraicGeometry/Stability/`, `Slope/` and
+   `Gieseker/` are siblings over the shared `HilbertPolynomial.lean`,
+   `Coefficients.lean` and `Purity.lean`: neither reaches the other,
+   `Comparison.lean` reaches both and is reached by neither, and `IsPure` is
+   declared exactly once. MO1.08 (#1319).
 
 ## Component boundaries and coverage limits
 
@@ -82,9 +94,11 @@ rule 3 names nine subcomponents, so `Numerical/Core/`, `Numerical/Mukai/`,
 are mechanically held to being separate from the charge and geometric
 comparison consumers rather than only asked to be. #1316 and #1317 split the
 numerical subtrees, so seven of those nine entries are now exact: every module
-below them reaches the stability tree. A parent importing its own
-specialization *inside* `Numerical/Stability/` or `Stability/Gieseker/`, the
-two that still mix, stays a review obligation.
+below them reaches the stability tree. `Stability/Gieseker/` was the eighth;
+MO1.08 (#1319) removed it from the list altogether, because the subtree no
+longer reaches the stability tree at all. A parent importing its own
+specialization *inside* `Numerical/Stability/`, the one entry that still mixes,
+stays a review obligation.
 The gate's hard-coded divisorial root is a source location to migrate in
 #1313, not a rule that charge construction must remain in Walls.
 
@@ -124,7 +138,14 @@ Numerical
                                                         upstream of Examples
   └─ Core, Mukai, RiemannRoch, Specializations        stability-neutral
 Stability
-  └─ Gieseker                                         may import the stability tree
+  ├─ HilbertPolynomial, Coefficients, Purity          shared polarization data
+  ├─ Slope, Gieseker                                  siblings; neither imports the
+  │                                                     other, and both are
+  │                                                     stability-neutral -- the slope
+  │                                                     theory they instantiate is
+  │                                                     CategoryTheory/Abelian/Stability
+  └─ Comparison                                       imports both siblings; imported
+                                                        by neither
 ```
 
 Each same-named umbrella above a "may import" row re-exports it and is exempt
@@ -189,6 +210,14 @@ CategoryTheory/Bicategory
   ├─→ Adjunction                              adjunctions of 1-morphisms; Cat specialization
   └─→ Functor/Cat                             pseudofunctor transport; ObjectProperty/UniversallyStable
 
+CategoryTheory/Abelian
+  ├─→ SerreClass, QuasiAbelian
+  └─→ Stability                               stability functions on an abelian category,
+        │                                     their HN theory, and the neutral ClassDatum;
+        │                                     needs no shift, t-structure or heart
+        └─→ Weak                              the variant whose charge may vanish; the
+                                              stronger theory one level up imports it
+
 CategoryTheory/Shift
   └─→ FunctorCategory                         pointwise shift on `X ⥤ Y`; strict
                                               commutation of the evaluations
@@ -216,6 +245,8 @@ CategoryTheory/Triangulated
   └─→ StabilityCondition                      Bridgeland stability (canonical concept)
         ├─→ Weak                              weak stability: the dependency parent
         │     └─→ Foundation, Families, HarderNarasimhan, Support, Tilting
+        │           Foundation owns slicings, interval categories and the heart
+        │           class datum, and consumes CategoryTheory/Abelian/Stability
         ├─→ Foundation (Deformation), Phase, Metric, Symmetry, Support, Walls
         └─→ Families                          abstract categorical families
 
@@ -286,6 +317,8 @@ AlgebraicGeometry
 | Fiber categories and pullbacks | `DerivedAlgGeo.CategoryTheory.Triangulated.Families` |
 | Bridgeland stability | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition` |
 | Weak stability only | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak` |
+| Stability functions and HN theory on an abelian category | `DerivedAlgGeo.CategoryTheory.Abelian.Stability` |
+| Slope and Gieseker stability of coherent sheaves | `DerivedAlgGeo.AlgebraicGeometry.Stability` |
 | Basiswise isomorphism detection for topological sheaves | `DerivedAlgGeo.Topology.Sheaves.Basis` |
 | Finite products of prime-spectrum basic opens | `DerivedAlgGeo.RingTheory.Spectrum.Prime.BasicOpen` |
 | Coherent sheaves | `DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent` |

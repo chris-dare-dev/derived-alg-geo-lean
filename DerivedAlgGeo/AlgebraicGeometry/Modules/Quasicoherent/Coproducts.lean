@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import Mathlib.CategoryTheory.Limits.FullSubcategory
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Kernels
 
 /-!
@@ -32,6 +33,15 @@ so is one of the two inputs `Dqc(X)`'s coproduct structure needs (#721).
 `DerivedCategory X.Modules` *has* the coproducts and that every `Hⁿ` preserves
 them — is absent from Mathlib at this pin and is not supplied here. Nothing in
 this file asserts anything about the derived category.
+
+The closure also gives the full subcategory of quasi-coherent sheaves its own
+`ι`-indexed coproducts, with the inclusion into `X.Modules` **creating** them, so
+a coproduct formed among quasi-coherent sheaves is the ambient one. That is the
+compatibility a realization functor needs downstream, and it holds on an arbitrary
+scheme. It says nothing about exactness of those coproducts: the subcategory is
+not abelian on a general scheme, so AB4 for it is not even a statement here, and
+where it is available (the affine case, through the tilde equivalence) it is
+supplied by its own owner.
 -/
 
 universe u
@@ -101,6 +111,66 @@ instance quasicoherent_isClosedUnderCoproducts (X : Scheme.{u}) (ι : Type u) :
     refine (SheafOfModules.isQuasicoherent X.ringCatSheaf).prop_of_iso
       ((HasColimit.isoOfNatIso (Discrete.natIsoFunctor (F := F))).symm) ?_
     exact Scheme.Modules.isQuasicoherent_sigma _ (fun i ↦ hF ⟨i⟩))
+
+/-- **The category of quasi-coherent sheaves has `ι`-indexed coproducts**, on an
+arbitrary scheme.
+
+Closure above plus the ambient coproducts is exactly what Mathlib's
+`hasColimitsOfShape_of_closedUnderColimits` consumes. Nothing is transported and
+no equivalence is used, so this holds with no hypothesis on `X`; in particular it
+does not need quasi-coherent sheaves to be an abelian subcategory, which they are
+not on a general scheme.
+
+The instance is supplied by name rather than by `inferInstance` for the reason
+recorded on `Dqc.SchemeQuasicoherentDerivedCategory.sigma_mem`: unifying the
+ambient category with `X.Modules` routes it through `Scheme.Modules.instCategory`,
+and search does not then match the instance's own head. Naming it is not a
+workaround for an unproved fact -- it is the same instance, named. -/
+instance quasicoherentSheaves_hasCoproductsOfShape (X : Scheme.{u}) (ι : Type u) :
+    HasColimitsOfShape (Discrete ι)
+      (SheafOfModules.isQuasicoherent X.ringCatSheaf).FullSubcategory :=
+  @Limits.hasColimitsOfShape_of_closedUnderColimits (Discrete ι) _ X.Modules _
+    (SheafOfModules.isQuasicoherent X.ringCatSheaf)
+    (quasicoherent_isClosedUnderCoproducts X ι) inferInstance
+
+/-- **The inclusion of quasi-coherent sheaves preserves `ι`-indexed coproducts**,
+on an arbitrary scheme.
+
+This is the compatibility statement downstream consumers actually need: a
+coproduct formed among quasi-coherent sheaves has the ambient coproduct as its
+image, so a realization functor may compute either way.
+
+The route is that closure makes the inclusion **create** those colimits
+(Mathlib's `createsColimitsOfShapeFullSubcategoryInclusion`), which is strictly
+stronger. Creation carries data rather than being a proposition, so it is used
+here as a local term rather than exported as a second named declaration; a
+consumer that needs it can rebuild it from
+`quasicoherent_isClosedUnderCoproducts` in one line, as this proof does. -/
+theorem quasicoherentSheavesInclusion_preservesCoproductsOfShape
+    (X : Scheme.{u}) (ι : Type u) :
+    PreservesColimitsOfShape (Discrete ι)
+      (SheafOfModules.isQuasicoherent X.ringCatSheaf).ι := by
+  haveI : CreatesColimitsOfShape (Discrete ι)
+      (SheafOfModules.isQuasicoherent X.ringCatSheaf).ι :=
+    @Limits.createsColimitsOfShapeFullSubcategoryInclusion (Discrete ι) _ X.Modules _
+      (SheafOfModules.isQuasicoherent X.ringCatSheaf)
+      (quasicoherent_isClosedUnderCoproducts X ι) inferInstance
+  infer_instance
+
+/-- **The inclusion of quasi-coherent sheaves reflects `ι`-indexed coproducts**,
+on an arbitrary scheme: a family in the subcategory whose ambient coproduct
+cocone is a colimit was already a colimit there.  Creation again, in the form a
+functor landing in the subcategory consumes. -/
+theorem quasicoherentSheavesInclusion_reflectsCoproductsOfShape
+    (X : Scheme.{u}) (ι : Type u) :
+    ReflectsColimitsOfShape (Discrete ι)
+      (SheafOfModules.isQuasicoherent X.ringCatSheaf).ι := by
+  haveI : CreatesColimitsOfShape (Discrete ι)
+      (SheafOfModules.isQuasicoherent X.ringCatSheaf).ι :=
+    @Limits.createsColimitsOfShapeFullSubcategoryInclusion (Discrete ι) _ X.Modules _
+      (SheafOfModules.isQuasicoherent X.ringCatSheaf)
+      (quasicoherent_isClosedUnderCoproducts X ι) inferInstance
+  infer_instance
 
 end
 

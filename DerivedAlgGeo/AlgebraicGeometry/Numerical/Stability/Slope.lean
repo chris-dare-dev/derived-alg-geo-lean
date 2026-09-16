@@ -127,7 +127,7 @@ theorem degHHom_apply (E : N) : degHHom V P E = degH V P E := rfl
 /-- **The Mumford slope** `μ_H(E) = deg_H(E) / rk(E)`.
 
 Junk at rank zero, exactly as `SlopeData.slope` in
-`CategoryTheory/…/StabilityFunction/Slope.lean` is, so the two agree where they
+`CategoryTheory/Abelian/Stability/Slope.lean` is, so the two agree where they
 meet. -/
 noncomputable def slopeH (E : N) : ℚ := degH V P E / (V.rank E : ℚ)
 
