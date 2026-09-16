@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.CoreConsequences
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing.PhaseTruncation
-import DerivedAlgGeo.CategoryTheory.Abelian.Stability.FiniteSums
+import DerivedAlgGeo.Analysis.Complex.PhaseFiniteSums
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Basic.Definitions
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HeartBridge
 

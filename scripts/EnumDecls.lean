@@ -102,6 +102,11 @@ private def libraryOf (m : Name) : Option String :=
   let ringTheory := `DerivedAlgGeo.RingTheory
   let categoryTheory := `DerivedAlgGeo.CategoryTheory
   let linearAlgebra := `DerivedAlgGeo.LinearAlgebra
+  -- `Analysis/` is the neutral planar owner MO1.13 (#1324) split out of
+  -- the stability tree. Routing follows the lane that holds the records,
+  -- and these declarations kept their names and their records in
+  -- `scripts/StabilityConditionAudit/`.
+  let analysis := `DerivedAlgGeo.Analysis
   let algebraicGeometry := `DerivedAlgGeo.AlgebraicGeometry
   let algebra := `DerivedAlgGeo.Algebra
   let topology := `DerivedAlgGeo.Topology
@@ -116,7 +121,8 @@ private def libraryOf (m : Name) : Option String :=
       m == moduleCat || moduleCat.isPrefixOf m ||
       m == algebraicTopology || algebraicTopology.isPrefixOf m ||
       m == topologicalCech || topologicalCech.isPrefixOf m ||
-      m == linearAlgebra || linearAlgebra.isPrefixOf m then
+      m == linearAlgebra || linearAlgebra.isPrefixOf m ||
+      m == analysis || analysis.isPrefixOf m then
     some "StabilityCondition"
   else if m == algebraicGeometry || algebraicGeometry.isPrefixOf m ||
       m == algebra || algebra.isPrefixOf m || m == topology || topology.isPrefixOf m ||

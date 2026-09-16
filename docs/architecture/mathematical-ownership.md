@@ -185,7 +185,7 @@ that true.
   `Topology/Covering/Basic.lean`, and the cover-independent complex-coordinate
   adapter at `LinearAlgebra/Complex/Coordinates.lean`. The phase conventions
   and the action on slicings, charges and stability conditions stay at
-  `StabilityCondition/Symmetry/GLTilde/Action/`, and layering rule 14 keeps
+  `StabilityCondition/Symmetry/GLTilde/Action/`, and layering rule 15 keeps
   that boundary. A relocated covering theorem is still a theorem, not a
   consequence of the name `GLTilde`; the planar and mass halves remain #1324.
 - **Direct Mathlib extensions:** distinguish `ModuleCat` from arbitrary linear
