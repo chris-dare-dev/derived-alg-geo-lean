@@ -6,6 +6,7 @@ import Mathlib.Algebra.Homology.HomotopyCategory.Triangulated
 import Mathlib.CategoryTheory.Triangulated.Adjunction
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.CommShift
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.Enhancement
+import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.Exact
 
 /-!
 # The transported triangulated structure is Mathlib's
@@ -203,6 +204,24 @@ theorem seam_distinguishedTriangles_eq :
         (seam (A := A)).inverse.mapTriangle.obj T ∈ H0.distinguishedTriangles (Cdg A)} =
       HomotopyCategory.Pretriangulated.distinguishedTriangles A :=
   Set.ext fun T => (seam (A := A)).inverse.map_distinguished_iff T
+
+/-- **`C^dg A` is an *exact* enhancement of the homotopy category**, not merely
+an H⁰ presentation of it.
+
+`Enhancement.Exact` is supplied data everywhere else in the library; this is the
+one place it is discharged, and both fields come from theorems rather than from
+a hypothesis. `commShift` is `Cdg.h0FunctorCommShift`, built in
+`HomotopyCategory/CommShift.lean` from the seam's shift comparison;
+`isTriangulated` is `Cdg.h0FunctorIsTriangulated` above, which is the agreement
+theorem `seam_distinguishedTriangles_eq` in functor form.
+
+Neither this nor anything downstream says that an exact enhancement of
+`HomotopyCategory A` is unique. `dg-enhancements-e15` remains open, and the
+statement it will need quantifies over this structure rather than over
+`Enhancement`. -/
+noncomputable def enhancementExact : (enhancement A).Exact where
+  commShift := inferInstanceAs ((h0Functor (A := A)).CommShift ℤ)
+  isTriangulated := inferInstanceAs ((h0Functor (A := A)).IsTriangulated)
 
 end Agreement
 end Cdg

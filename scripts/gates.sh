@@ -3,22 +3,53 @@
 #
 # An unattended formalization loop needs a single exit code to branch on, and it
 # needs the gates in cheapest-first order so a failure is reported in two minutes
-# rather than forty. Every gate below also runs in `.github/workflows/ci.yml`,
-# with ONE deliberate exception: `workflows`. That one cannot be a CI gate,
-# because a workflow file too invalid to parse is also too invalid to run the
-# job that would have checked it -- GitHub just fails a run named after the file
-# and reports no checks at all. It has to fire before the file reaches GitHub,
-# which means here. See scripts/check_workflows.sh.
+# rather than forty.
 #
 #   scripts/gates.sh fast   build + style + axiom audits          (~minutes)
-#   scripts/gates.sh        everything CI runs, in CI's order
+#   scripts/gates.sh        the full list below, in CI's order
+#   scripts/precheck.sh     the subset with no Lean build         (~seconds)
 #
-# The containment runs ONE WAY ONLY, and saying so is the point of this
-# paragraph. Every gate here runs in CI; CI is NOT every gate here. CI's
-# `Contract gates` step additionally runs the `mfc` contract tooling --
-# validate / env / bundle / lint / check-ilean-coverage against the pinned
-# registry -- from a venv it builds per run, and none of that is reproduced
-# below. A green `scripts/gates.sh` therefore does not imply a green CI.
+# DO NOT RUN THIS SCRIPT ON THE DEVELOPER'S MACHINE. `scripts/check_local_build.py`
+# is a PreToolUse hook and refuses it in any mode, because the `build` gate below
+# is the whole-library build that cost a developer three hours on 2026-08-27.
+# Full verification runs on the self-hosted Windows runners: push the branch, or
+# `gh workflow run ci.yml --ref <branch>`. This file remains the readable list of
+# what is checked, and reading it is allowed -- `cat`, `grep` and `git ls-tree`
+# pass the hook. `scripts/precheck.sh` is what you actually run locally.
+#
+# NEITHER LIST CONTAINS THE OTHER, and saying so precisely is the point of this
+# paragraph, because the imprecise version caused a real regression.
+#
+# What CI has and this file does not: the `Contract gates` step runs the `mfc`
+# contract tooling -- validate / env / bundle / lint / check-ilean-coverage
+# against the pinned registry -- from a venv it builds per run, and none of it is
+# reproduced below. A green `scripts/gates.sh` does not imply a green CI.
+#
+# What this file has and `.github/workflows/` does not, verified against ci.yml,
+# cache-warm.yml, docs.yml and trust-guard.yml on 2026-09-16:
+#
+#   workflows        cannot be a CI gate. A workflow file too invalid to parse is
+#                    also too invalid to run the job that would have checked it;
+#                    GitHub fails a run named after the file and reports no
+#                    checks at all. It has to fire before the file reaches
+#                    GitHub. See scripts/check_workflows.sh.
+#   trust-guard      tests the logic of trust-guard.yml. A pull request cannot be
+#                    trusted to run the check that decides whether it is trusted.
+#   local-build      tests a PreToolUse hook, which exists only on a developer's
+#                    machine.
+#   mathlib-style    is the PostToolUse edit hook's checker, run over the branch
+#                    diff. It is a pre-push linter by design.
+#   emit-build       runs in cache-warm.yml rather than ci.yml -- linking is
+#                    expensive on a cold tree, and exe/Emit.lean cannot link on
+#                    Windows at all. Deliberate; see the gate's own comment.
+#   single-instantiation  was NOT deliberate. Until PR #1355 it appeared in no
+#                    workflow at all, so for anyone who could not run this script
+#                    -- which, since the hook, is every agent -- it ran nowhere.
+#                    It drifted in silence: `bb8a1278` records 24 generic
+#                    abstractions that reached at most one inhabitant with
+#                    nothing going red. The first four entries above are local by
+#                    construction; this one was local by omission, and the header
+#                    that claimed "ONE deliberate exception" is what hid it.
 #
 # `roadmap` is the one piece of that step cheap enough to run here, and it was
 # added on 2026-08-27 after the gap bit: RM-07 went red on main and on every
@@ -198,6 +229,10 @@ changed_lean_files() {
 
 mathlib_style() {
   local files
+  # Known-answer fixtures first: they do not depend on the diff, and a branch
+  # that changes the checker can break what it rejects without changing a
+  # single .lean file.
+  python3 scripts/check_mathlib_style.py --self-test || return 1
   files="$(changed_lean_files | sort -u)"
   [ -z "$files" ] && return 0
   # --diff-only: judge the lines this branch wrote, not the pre-existing debt in

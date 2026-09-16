@@ -1,0 +1,15 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+Portions adapted from mattrobball/BridgelandStability, revision 9e48f23
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.Basic
+
+/-!
+# A header with a line the old allowlist did not know
+
+The header skip used to match `Copyright`, `Released under` and `Authors` by
+prefix, so this fourth line fell through and was reported as the first command.
+-/
+
+theorem also_trivially_true : True := trivial

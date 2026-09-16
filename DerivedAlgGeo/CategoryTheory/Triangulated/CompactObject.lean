@@ -217,13 +217,13 @@ theorem extension (T : Triangle C) (hT : T ∈ distTriang C)
     exact L'.ab_exact_iff_function_exact.mp hL'
   have hc₁ : i₁ ≫ g₁ = f₁ ≫ i₂ := by
     convert colimitPost_naturality D
-      (preadditiveYoneda.flip.map T.mor₃.op) using 1 ; rfl
+      (preadditiveYoneda.flip.map T.mor₃.op) using 1; rfl
   have hc₂ : i₂ ≫ g₂ = f₂ ≫ i₃ := by
     convert colimitPost_naturality D
-      (preadditiveYoneda.flip.map T.mor₂.op) using 1 ; rfl
+      (preadditiveYoneda.flip.map T.mor₂.op) using 1; rfl
   have hc₃ : i₃ ≫ g₃ = f₃ ≫ i₄ := by
     convert colimitPost_naturality D
-      (preadditiveYoneda.flip.map T.mor₁.op) using 1 ; rfl
+      (preadditiveYoneda.flip.map T.mor₁.op) using 1; rfl
   have hc₄ : i₄ ≫ g₄ = f₄ ≫ i₅ := by
     convert colimitPost_naturality D
       (preadditiveYoneda.flip.map T.invRotate.mor₁.op) using 1 <;> rfl

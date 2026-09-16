@@ -4,8 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearEvaluation
 import DerivedAlgGeo.Algebra.Homology.DGCategory.FunctorCategoryH0
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.HomCohomology
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Triangle
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.HomCohomology
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Triangle
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.RankOne
 

@@ -11,6 +11,7 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.ConeCategory
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Functor
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategory
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategoryShift
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.HomogeneousLift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.HomogeneousShift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Lift
@@ -27,7 +28,13 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.ShiftIso
 /-!
 # Pretriangulated dg categories
 
-The internal dg data of zero objects, shifts, and cones. Its triangulated
-realization on `H⁰` is owned by
-`DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement`.
+The internal dg data of zero objects, shifts, and cones, together with the
+intrinsic triangulated theory of `H⁰` it induces (`Pretriangulated/H0/`).
+
+Comparison with a *specified* triangulated category -- an equivalence, and the
+shift and exactness compatibilities that make it an enhancement -- is owned by
+`DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement`, and the homotopy-
+category realization by
+`DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement`. Both import
+this root; neither is imported by it.
 -/

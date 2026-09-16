@@ -99,6 +99,37 @@ cli_case allow  'lake exe runLinter DerivedAlgGeo' lake exe runLinter DerivedAlg
 cli_case refuse 'scripts/gates.sh'                scripts/gates.sh
 cli_case refuse 'scripts/gates.sh fast'           scripts/gates.sh fast
 cli_case refuse 'bash scripts/gates.sh'           bash scripts/gates.sh
+cli_case refuse './scripts/gates.sh'              ./scripts/gates.sh
+cli_case refuse 'env assignment before gates.sh'  FOO=1 ./scripts/gates.sh
+cli_case refuse 'env FOO=1 scripts/gates.sh'      env FOO=1 scripts/gates.sh
+# An unrecognised command word that names the file is still refused: the reader
+# list below is an allow-list, so the default direction stays "refuse".
+cli_case refuse 'xargs bash scripts/gates.sh'     xargs bash scripts/gates.sh
+# `git` is a reader for `show` and friends, NOT in general. `git bisect run` is
+# the worst version of what this gate refuses: the whole-library build once per
+# revision. The other executing subcommands go with it.
+cli_case refuse 'git bisect run scripts/gates.sh' git bisect run scripts/gates.sh
+cli_case refuse 'git rebase -x scripts/gates.sh'  git rebase -x scripts/gates.sh main
+cli_case refuse 'git submodule foreach gates.sh'  git submodule foreach scripts/gates.sh
+
+# READING the file is not running it, and until 2026-09-16 the check refused
+# both. `git ls-tree` is the tooling probe in .claude/skills/land-pr; the rest
+# are how anyone follows CONTRIBUTING.md's instruction to read gates.sh to know
+# what CI will check.
+cli_case allow  'cat scripts/gates.sh'            cat scripts/gates.sh
+cli_case allow  'grep in scripts/gates.sh'        grep -n single_instantiation scripts/gates.sh
+cli_case allow  'git ls-tree scripts/gates.sh'    git ls-tree origin/main --name-only scripts/gates.sh
+cli_case allow  'git -C dir show gates.sh'        git -C .. show origin/main:scripts/gates.sh
+cli_case allow  'git --no-pager log gates.sh'     git --no-pager log --oneline -- scripts/gates.sh
+cli_case allow  'env -u VAR grep gates.sh'        env -u DAG_ALLOW_LOCAL_BUILD grep -c gate scripts/gates.sh
+hook_case allow 'hook passes reading gates.sh'    'grep -rn "gates.sh" scripts/'
+
+# The replacement the refusal points at. `precheck.sh` runs the no-build subset
+# and a targeted build; refusing it would leave the skills with no pre-flight at
+# all, which is the state this test lane was written to end.
+cli_case allow  'scripts/precheck.sh'             scripts/precheck.sh
+cli_case allow  'bash scripts/precheck.sh'        bash scripts/precheck.sh
+cli_case allow  'scripts/precheck.sh --no-build'  scripts/precheck.sh --no-build
 
 # Compound commands are examined segment by segment, or the gate is one `cd`
 # away from being evaded.

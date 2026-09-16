@@ -1,0 +1,17 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.Basic
+
+set_option backward.defeqAttrib.useBackward true
+
+/-!
+# A file that sets an option before its docstring
+
+Mathlib writes a file-level `set_option` between the imports and the module
+docstring, so the docstring is still the first thing that is not setup. 25 of
+the 30 MODDOC findings were exactly this shape.
+-/
+
+theorem trivially_true : True := trivial

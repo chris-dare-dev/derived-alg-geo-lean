@@ -161,6 +161,15 @@ that true.
   triangulated target belongs to enhancement theory. An ordinary equivalence
   with H⁰ is not an exact enhancement without shift/triangle compatibility.
   A placement correction does not change the dg encoding or prove uniqueness.
+  **Done** (#1320): `Algebra/Homology/DGCategory/Pretriangulated/H0/` owns the
+  intrinsic theory and reaches no enhancement consumer, scheme realization or
+  stability module; `CategoryTheory/Triangulated/DGEnhancement/` keeps the
+  comparisons and names two carriers -- `Enhancement`, the underlying H⁰
+  presentation, and `Enhancement.Exact`, the refinement carrying `CommShift` and
+  `Functor.IsTriangulated` as supplied data with `Cdg.enhancementExact` as its
+  one inhabitant. The dg encoding is unchanged (ADR-0010 / ADR-0011), the seam
+  and exactness obligations remain #854's and #855's, and layering rule 13 keeps
+  the import claim true.
 - **Derived operations:** general tensor and pushforward capabilities belong
   with the relevant derived-category object; Fourier–Mukai consumes them to
   construct transforms and convolution. Preserve the distinction between
@@ -185,7 +194,7 @@ that true.
   `Topology/Covering/Basic.lean`, and the cover-independent complex-coordinate
   adapter at `LinearAlgebra/Complex/Coordinates.lean`. The phase conventions
   and the action on slicings, charges and stability conditions stay at
-  `StabilityCondition/Symmetry/GLTilde/Action/`, and layering rule 15 keeps
+  `StabilityCondition/Symmetry/GLTilde/Action/`, and layering rule 16 keeps
   that boundary. A relocated covering theorem is still a theorem, not a
   consequence of the name `GLTilde`; the planar and mass halves remain #1324.
 - **Direct Mathlib extensions:** distinguish `ModuleCat` from arbitrary linear

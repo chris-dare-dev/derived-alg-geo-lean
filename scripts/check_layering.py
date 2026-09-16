@@ -340,6 +340,27 @@ RETIRED_PATHS = (
     "AlgebraicGeometry/Stability/Gieseker/HilbertPolynomial.lean",
     "AlgebraicGeometry/Stability/Gieseker/Coefficients.lean",
     "AlgebraicGeometry/Stability/Gieseker/HarderNarasimhan",
+    # 2026-09-15 MO1.09: the intrinsic H0 theory of a pretriangulated dg
+    # category -- shift, distinguished triangles, cone diagrams, functor and
+    # natural-transformation exactness -- mentions no other category, so it
+    # moved to its definition owner at
+    # Algebra/Homology/DGCategory/Pretriangulated/H0/. What stays below
+    # DGEnhancement/H0/ needs a chosen category or the Grothendieck group.
+    "CategoryTheory/Triangulated/DGEnhancement/H0/Shift.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/Triangle.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/Functor.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/FunctorTransport.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/ShiftedFunctor.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/HomCohomology.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/NaturalTransformationCone.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/NaturalTransformationConeShift.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionCone.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionComparison.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionConePresentation.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionCotwistPresentation.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/ObjectTwist.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/LinearObjectTwist.lean",
+    "CategoryTheory/Triangulated/DGEnhancement/H0/LinearObjectTwistAdjunction.lean",
     # 2026-09-15 MO1.12: the universal cover of GL+(2,R) moved beside the
     # general-linear-group API, the +1-equivariant order automorphisms of R
     # moved to order algebra, the general product-of-coverings lemma moved to
@@ -563,7 +584,33 @@ ANALYSIS_FORBIDDEN_PREFIXES = (
 )
 TRIANGULATED_TREE = f"{LIBRARY}.CategoryTheory.Triangulated"
 
-# Rule 15. MO1.12 (#1323) separates the universal cover of GL+(2,R) from the
+# Rule 15. MO1.09 gives the intrinsic H0 theory of a pretriangulated dg category
+# its definition owner below the dg encoding root, and keeps `DGEnhancement/`
+# for comparison with a *chosen* category. The dg root is the thing that has to
+# stay importable on its own: an enhancement consumer, a scheme realization or a
+# stability module reached from it would mean the split had been undone.
+DG_ROOT = f"{LIBRARY}.Algebra.Homology.DGCategory"
+DG_H0_ROOT = f"{DG_ROOT}.Pretriangulated.H0"
+DG_H0_UMBRELLA = "Algebra/Homology/DGCategory/Pretriangulated/H0.lean"
+DG_ENHANCEMENT_TREE = f"{TRIANGULATED_TREE}.DGEnhancement"
+HOMOTOPY_ENHANCEMENT_TREE = (
+    f"{LIBRARY}.Algebra.Homology.HomotopyCategory.DGEnhancement"
+)
+# The two carriers the row separates, each at its own named owner. `Enhancement`
+# is the underlying H0 presentation; `Enhancement.Exact` is the refinement that
+# carries the shift and exactness compatibilities as data.
+MO1_09_OWNERS = {
+    "Algebra/Homology/DGCategory/Pretriangulated/H0/Basic.lean": (
+        "hasZeroObject",
+        "isZero_of_dgId_eq_zero",
+    ),
+    "Algebra/Homology/DGCategory/Pretriangulated/H0/Triangle.lean": (
+        "pretriangulated",
+    ),
+    "CategoryTheory/Triangulated/DGEnhancement/Basic.lean": ("Enhancement",),
+    "CategoryTheory/Triangulated/DGEnhancement/Exact.lean": ("Exact",),
+}
+# Rule 16. MO1.12 (#1323) separates the universal cover of GL+(2,R) from the
 # action it was built for. The cover is a group of compatible pairs, a Z deck
 # group, a global chart, a covering map and a topological group: none of that
 # mentions a category, a slicing, a heart or a central charge, so it lives
@@ -1415,6 +1462,50 @@ def main() -> int:
                     "triangulation (MO1.07)"
                 )
 
+    # Rule 15, MO1.09. Owners first, then the one import claim that matters.
+    for entry, names in MO1_09_OWNERS.items():
+        path = SOURCE_ROOT / entry
+        if not path.is_file():
+            failures.append(f"missing MO1.09 owner {path.relative_to(ROOT)}")
+            continue
+        text = path.read_text(encoding="utf-8")
+        declared = declared_names(text) | structure_names(text)
+        for name in names:
+            if name not in declared:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: no longer declares {name}; the "
+                    "presentation/enhancement split requires this canonical owner"
+                )
+    if not (SOURCE_ROOT / DG_H0_UMBRELLA).is_file():
+        failures.append(
+            f"missing {DG_H0_UMBRELLA}: the intrinsic H0 theory of a dg "
+            "category needs an umbrella of its own, separate from the "
+            "enhancement comparisons"
+        )
+    # The dg encoding root, H0 subtree included, reaches no consumer that has
+    # already chosen a category to compare with, and no geometry or stability.
+    forbidden_dg_consumers = (
+        DG_ENHANCEMENT_TREE,
+        HOMOTOPY_ENHANCEMENT_TREE,
+        GEOMETRY,
+        STABILITY_ROOT,
+    )
+    for module in sorted(modules):
+        if not (module == DG_ROOT or in_tree(module, DG_ROOT)):
+            continue
+        reached = sorted(
+            dep
+            for dep in closure.of(module)
+            if any(in_tree(dep, root) for root in forbidden_dg_consumers)
+        )
+        if reached:
+            failures.append(
+                f"{module}: reaches {reached[0]}; intrinsic dg H0 theory is "
+                "stated before any external category is chosen, so it imports "
+                "no enhancement consumer, scheme realization or stability "
+                "module (MO1.09)"
+            )
+
     # Rule 14.
     analysis_modules = [
         m for m in modules if m == ANALYSIS_ROOT or in_tree(m, ANALYSIS_ROOT)
@@ -1443,7 +1534,7 @@ def main() -> int:
                 "stability (MO1.13)"
             )
 
-    # Rule 15, MO1.12. Owners first, then the three claims the split makes.
+    # Rule 16, MO1.12. Owners first, then the three claims the split makes.
     gl_cover_dir = SOURCE_ROOT / GL_COVER_ROOT_DIR
     shift_dir = SOURCE_ROOT / NORMALIZED_SHIFT_ROOT_DIR
     for owner, what in (
@@ -1569,7 +1660,10 @@ def main() -> int:
         "no triangulated module, sheaf slope and Gieseker stability reach "
         "neither each other nor the stability tree, and IsPure is declared once; "
         f"the {len(analysis_modules)} neutral planar modules below Analysis/ "
-        "reach no category, no scheme and no stability condition"
+        "reach no category, no scheme and no stability condition; the "
+        f"{len(MO1_09_OWNERS)} presentation/enhancement owners exist and the dg "
+        "encoding root reaches no enhancement consumer, scheme realization or "
+        "stability module"
     )
     return 0
 

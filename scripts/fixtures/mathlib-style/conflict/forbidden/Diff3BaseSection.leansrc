@@ -1,0 +1,11 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+<<<<<<< ours
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Mukai
+||||||| base
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Basic
+=======
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Pairing
+>>>>>>> theirs

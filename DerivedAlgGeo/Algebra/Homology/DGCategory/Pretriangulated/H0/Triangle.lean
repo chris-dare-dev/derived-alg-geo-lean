@@ -8,8 +8,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.PretriangulatedAxioms
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Cone
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Lift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Rotate
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.Basic
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Shift
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Basic
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Shift
 
 /-!
 # The distinguished triangles of `H⁰`
