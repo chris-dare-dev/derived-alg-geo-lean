@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.BlowUpPlane
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Spherical.DivisorialRegion
-import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.IntegralBridge
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.Integral
 
 /-!
 # Walls and chambers on the two-point blow-up

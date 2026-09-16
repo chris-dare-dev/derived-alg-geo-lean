@@ -235,7 +235,7 @@ theorem selfPairing_mukaiVector_eq_neg_chi₂
 
 Lemma 5.1 is `v(E)² ≥ −2` for a `μ`-stable sheaf on a K3, and it is the hypothesis that
 `Mukai.re_expCharge_pos_of_neg_one` takes as `−1 ≤ realForm b v` — the last thing standing
-between `ChargePositivity.lean` and case 4 of Lemma 6.2.
+between `CentralCharge/Mukai/Positivity.lean` and case 4 of Lemma 6.2.
 
 This theorem **proves none of it**. It is a rewrite of `selfPairing_mukaiVector_eq_neg_chi₂`,
 and its only content is to state the remaining gap in its sharpest form: **Lemma 5.1 is exactly

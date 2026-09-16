@@ -24,6 +24,11 @@ caught here rather than by the next regression.
 | `forbidden/AlgebraicGeometry/Stability/Gieseker` | sheaf stability reaching the triangulated stability tree, an exemption MO1.08 removed |
 | `forbidden/AlgebraicGeometry/Stability/Slope` | a slope module reaching its Gieseker sibling instead of the comparison owner |
 | `forbidden/CategoryTheory/Abelian/Stability` | abelian stability reaching the triangulated heart adapter it is upstream of |
+| `allowed/LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover` | the GL+(2,R) cover importing its four neutral inputs |
+| `forbidden/LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover` | the cover importing the stability action it was extracted from |
+| `forbidden/Algebra/Order/NormalizedShift` | the neutral order-automorphism core reaching the stability tree |
+| `forbidden/LinearAlgebra/Complex` | the complex-coordinate adapter importing the cover its public type is independent of |
+| `forbidden/Topology/Covering` | a general covering lemma acquiring a DerivedAlgGeo dependency |
 
 The two fixtures below a *subcomponent* -- `Moduli/Semistability` and
 `Numerical/Stability` -- sit where they do because rule 3's exemption is named
@@ -39,6 +44,10 @@ moved the abstract slope theory it instantiates to
 subtree reaches no stability condition and the exemption was removed; the same
 path is now a *forbidden* fixture, and the `allowed` one beside it imports the
 abelian owner instead.
+
+The five MO1.12 (#1323) fixtures pin ledger row 08 in both directions: the
+cover and its neutral inputs are importable without stability conditions, and
+the action adapter they were separated from stays where the ledger put it.
 
 Add a fixture whenever a rule is added or a boundary moves; a rule with no
 forbidden fixture is a rule nobody has seen fire.

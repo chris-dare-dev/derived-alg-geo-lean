@@ -1466,13 +1466,6 @@ component left free. `ofSlopeData` is the same at the curve hypothesis class, th
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.ofWeakSlopeData
 #print axioms CategoryTheory.Triangulated.MukaiWeakSlopeCompat.ofSlopeData
 
-/-! ## `extendMap`, bundled
-
-The Mukai-lattice leg of the charge chain was additive and unbundled like the numerical leg.
--/
-
-#print axioms Mukai.extendMapHom
-
 /-! ## The surface slope, honestly valued
 
 `WeakSlope.lean`'s slope is `degree / rank`, junk at rank zero where the classical slope is

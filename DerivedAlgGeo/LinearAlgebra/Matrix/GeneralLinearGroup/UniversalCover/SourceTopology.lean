@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Covering.Surjectivity
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.Surjectivity
 import Mathlib.AlgebraicTopology.FundamentalGroupoid.SimplyConnected
 import Mathlib.Analysis.Convex.Contractible
 import Mathlib.Topology.Algebra.Group.Matrix
@@ -11,7 +11,7 @@ import Mathlib.Topology.Algebra.Group.Matrix
 # Source topology and simple connectedness of the lifted group
 
 This file begins the topological half of the universal-cover theorem.  The
-group-theoretic half is in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Fibre.lean` and `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Surjectivity.lean`.
+group-theoretic half is in `UniversalCover/Fibre.lean` and `UniversalCover/Surjectivity.lean`.
 
 The useful coordinates do not require a computation of `π₁(S¹)`.  If
 `x = (T, f) : GLTilde`, rotate the first column of `T` backwards through the
@@ -33,9 +33,9 @@ which are contractible.  We transport the product topology through this
 coordinate equivalence and obtain `ContractibleSpace GLTilde`, hence
 `SimplyConnectedSpace GLTilde`.
 
-`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean` continues from these coordinates, gives global circle
+`UniversalCover/Map.lean` continues from these coordinates, gives global circle
 coordinates on `GL⁺(2, ℝ)`, and proves that the matrix projection is a
-covering map. `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Topology/Group.lean` then proves that multiplication
+covering map. `UniversalCover/TopologicalGroup.lean` then proves that multiplication
 and inversion are continuous for the transported topology.
 -/
 
@@ -426,7 +426,7 @@ noncomputable instance GLTilde.contractibleSpace : ContractibleSpace GLTilde := 
 connected.**
 
 This proves the formerly missing simple-connectedness fact.  The covering-map
-theorem is proved separately in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`. -/
+theorem is proved separately in `UniversalCover/Map.lean`. -/
 noncomputable instance GLTilde.simplyConnectedSpace : SimplyConnectedSpace GLTilde :=
   SimplyConnectedSpace.ofContractible GLTilde
 

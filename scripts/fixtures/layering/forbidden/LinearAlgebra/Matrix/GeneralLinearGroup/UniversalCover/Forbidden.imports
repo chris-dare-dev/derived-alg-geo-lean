@@ -1,0 +1,5 @@
+# The GL+(2,R) cover may not import the action it was built for. MO1.12 exists
+# because the group construction, the deck transformations, the covering map and
+# the topological-group laws were owned by stability symmetry; an import back
+# into the stability tree would restore that.
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Action.Slicing

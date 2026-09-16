@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.RealFormSignature
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.Continuous
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Chart
 
 /-!
 # `P⁺` does not depend on which class in the positive cone names it
@@ -37,6 +38,21 @@ its own issue, and nothing here should be read as settling it.
 
 `β` is carried along the path and is otherwise unconstrained; the positivity
 condition is on `ω` alone, exactly as in `isPositiveFrame_exp`.
+
+## Why this path, and one declaration that does not belong to it
+
+The subject is a comparison between two charts: the half named by
+`exp(β + iω)` against the half named by `exp(β' + iω')`. That is chart
+vocabulary, so it followed the chart out of `LinearAlgebra/Lattice/Mukai/`.
+
+`continuous_bilin` is the exception and is recorded rather than moved. It says a
+bilinear form on a finite-dimensional real normed space is jointly continuous;
+it mentions no Mukai extension, no chart and no charge, and its neutral owner is
+`QuadraticForm/Continuous.lean`. Re-homing it there is a separate change:
+`Continuous.lean` is one of the neutral charge roots rule 8 pins, whose
+transitive closure may contain neither stability conditions nor geometry, and
+moving a declaration into a pinned root deserves its own justification rather
+than a ride on a path cutover.
 -/
 
 open QuadraticMap Set

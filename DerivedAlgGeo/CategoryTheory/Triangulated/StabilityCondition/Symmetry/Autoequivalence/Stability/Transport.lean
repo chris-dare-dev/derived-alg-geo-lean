@@ -223,7 +223,7 @@ theorem mapEquiv_isLocallyFinite (s : Slicing C) (hs : s.IsLocallyFinite C) :
 
 section ClassMap
 
--- `Λ` gets its own universe, as in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean`: nothing here
+-- `Λ` gets its own universe, as in `CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean`: nothing here
 -- relates the class lattice to the category's universe, and tying them
 -- together would make this track strictly less general than the `GL⁺` one.
 variable {Λ : Type u'} [AddCommGroup Λ] (v : K₀ C →+ Λ)

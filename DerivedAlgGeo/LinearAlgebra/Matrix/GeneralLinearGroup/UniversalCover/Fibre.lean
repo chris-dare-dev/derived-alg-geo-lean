@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Basic
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.Basic
 
 /-!
 # The integer fibre of the lifted matrix projection
@@ -16,11 +16,11 @@ identity matrix is one of these, and distinct `n` give distinct elements.
 **Proved in the companion files:**
 
 * **Surjectivity of `toMatHom`.** Not proved *here* — landed separately in
-  `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Surjectivity.lean`, which writes the lift down in closed form rather than
+  `UniversalCover/Surjectivity.lean`, which writes the lift down in closed form rather than
   invoking covering-space machinery.
-* **Simple connectedness.** Landed separately in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/SourceTopology.lean`, using
+* **Simple connectedness.** Landed separately in `UniversalCover/SourceTopology.lean`, using
   global contractible coordinates rather than a computation of `π₁(S¹)`.
-* **Covering-map property.** Landed in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`, by conjugating the
+* **Covering-map property.** Landed in `UniversalCover/Map.lean`, by conjugating the
   projection in global coordinates to the standard exponential cover
   `ℝ → S¹` times an identity map.
 

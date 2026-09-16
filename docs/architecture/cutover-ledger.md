@@ -180,21 +180,67 @@ else, so the general theory is importable with no Mukai extension in scope, and
 the `-2` and `0` conditions appear in the neutral statements as hypotheses
 rather than as named predicates.
 
-**The exponential chart row is blocked, and not by effort.** The ledger asks
-for the chart to go with the numerical central-charge construction. It cannot
-move alone: `Lattice/Mukai/CentralCharge.lean` consumes `expRe`/`expIm`, and
-`StabilityCondition/CentralCharge/Quadratic.lean` already imports
-`Lattice/Mukai/CentralCharge.lean`, so relocating the chart into the
-central-charge tree closes an import cycle. The layering gate does not catch
-this -- it passes on a `LinearAlgebra` to `StabilityCondition` edge -- Lean's
-module acyclicity does. Discharging the row means moving the whole real-Mukai
-to charge bridge (`Mukai/CentralCharge.lean`, `ExponentialOrientation.lean`,
-`IntegralBridge.lean`) out of `LinearAlgebra/Lattice/`, which is coupled to
-MO1.02's central-charge ownership and is a lane of its own.
+**The exponential chart landed 2026-09-15**, discharging the row and with it
+the whole of MO1.04. `CentralCharge/Mukai/Chart.lean` owns `expRe`, `expIm`
+and `isPositiveFrame_exp`; `Charge.lean`, `Positivity.lean` and
+`Orientation.lean` beside it own `expCharge`, its boundary positivity and the
+reference-independence of `P⁺`; and the integral comparison went to
+`AlgebraicGeometry/Numerical/Mukai/Integral.lean`. Namespaces are unchanged, so
+`Mukai.expRe` is still `Mukai.expRe` and the immutable payloads in
+`exe/RestateHistoricalNames.lean` keep resolving.
+
+Measuring the graph before moving anything corrected the blockage recorded here,
+in four ways worth keeping.
+
+The chart was in none of the three files this ledger named. `expRe`, `expIm`
+and `isPositiveFrame_exp` were declared in `Lattice/Mukai/RealForm.lean`, inside
+a self-contained `section Exponential`; the three named files consumed them.
+Moving those three would not have moved the chart.
+
+The hard blocker was rule 8, not the cycle. `RealForm.lean` could not follow the
+chart, because it is upstream of the neutral charge root
+`BilinearForm/HodgeIndex.lean` through `RealFormSignature.lean`, and that root's
+transitive closure may contain neither stability conditions nor geometry. The
+chart had to be severed from its carrier. That the section boundary already
+existed is why the split cost a `sed` range rather than a redesign.
+
+The cycle was real and narrower than recorded. It is the 2-cycle
+`Lattice/Mukai/CentralCharge -> CentralCharge/Quadratic -> Lattice/Mukai/CentralCharge`,
+and it materialises only if the chart lands in one of the six modules that
+transitively import `Lattice.Mukai.CentralCharge` -- `Quadratic`,
+`Divisorial/Mukai`, `Exponential/Divisorial` and the three umbrellas above them.
+Every other module in the tree was a legal destination, and the three named
+files move with no cycle at all. The obstruction was one edge, not a tangle.
+
+A fourth file had to move, and one of the three moved for another reason.
+`ChargePositivity.lean` is 278 lines of `expCharge` theory and is not named
+above; left behind it would have made `LinearAlgebra/` import
+`StabilityCondition/`. `IntegralBridge.lean`, by contrast, never mentions
+`expCharge` or `expRe` and has no `StabilityCondition` consumer at all: it is
+the integral/real comparison, and it moved to the destination the
+application-adapter cell already gives the integral structure, not because of
+the cycle.
+
+Splitting the charge out of linear algebra also made an existing dependency
+visible. `AlgebraicGeometry/Numerical/GrothendieckGroup/CentralChargeK3.lean`
+defines `numericalCharge` as `Mukai.expCharge` precomposed with `extendMap` and
+the Mukai vector, so it was always a K-theoretic charge adapter; it read as
+stability-neutral only because the charge sat in `LinearAlgebra/`. It joins
+`CategoricalChargeK3` in `STABILITY_CONSUMING_GEOMETRY`. That entry is a fact
+that changed, on the standard the fourfold entry beside it already sets.
+
+One neutral remainder is recorded rather than moved. `Mukai.continuous_bilin`
+-- joint continuity of a bilinear form on a finite-dimensional real normed
+space -- mentions no extension, no chart and no charge, and its neutral owner is
+`QuadraticForm/Continuous.lean`. It travelled with `Orientation.lean` and says
+so in that file's docstring. Re-homing a declaration into a rule-8 pinned
+neutral root is a separate, separately justified change, and this row does not
+authorize one.
 
 The tracker closed #1315 early -- a commit message in #1345 that said it did
 *not* close the issue was read by GitHub as a closing keyword -- so the issue
-state is not evidence about any of these rows.
+state was never evidence about any of these rows. The issue was reopened when
+this row landed, so that its closure records the work rather than a parser.
 
 #### 04 -- Charge construction upstream of walls (#1313)
 
@@ -340,16 +386,45 @@ square-root construction and must not be presented as one.
 
 #### 08 -- The GL⁺(2,ℝ) cover vs. its stability action (#1323)
 
+**Implemented by #1323 (MO1.12), 2026-09-15.** Paths below are the owners now
+in the tree; every fully qualified declaration name is unchanged.
+
 | Relationship | Owner |
 | --- | --- |
-| Definition owner | the group construction, deck transformations, covering map, simple connectedness and topological-group laws move beside the general-linear-group API, with general covering lemmas near the topology owner |
-| Neutral core | the order automorphism of `ℝ` commuting with unit translation, which mentions no category |
-| Application adapter | phase conventions and the action on slicings, charges and stability conditions stay under `Symmetry/GLTilde/Action/` |
-| Comparison owner | the existing compatible-pair construction is retained; a complex-coordinate linear-map adapter moves near the complex linear-algebra owner only once its public type is independent of the cover |
+| Definition owner | `LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/` owns the group construction (`Basic.lean`), the deck transformations and `ℤ` fibre (`Fibre.lean`), surjectivity of the projection (`Surjectivity.lean`), the global chart, contractibility and simple connectedness (`SourceTopology.lean`), the covering map (`Map.lean`) and the topological-group laws (`TopologicalGroup.lean`); `LinearAlgebra/Matrix/GeneralLinearGroup/Positive.lean` owns the `GL⁺` matrix coercion beneath all of them; `Topology/Covering/Basic.lean` owns the general product-of-a-covering-with-an-identity lemma |
+| Neutral core | `Algebra/Order/NormalizedShift/` owns the order automorphism of `ℝ` commuting with unit translation -- `Basic.lean` for the group, `UniformContinuity.lean` for the uniform modulus that `+1`-equivariance forces -- and mentions no category |
+| Application adapter | phase conventions and the action on slicings, charges and stability conditions stay under `Symmetry/GLTilde/Action/`; the `Symmetry/GLTilde.lean` umbrella now names only that action |
+| Comparison owner | the existing compatible-pair construction is retained unchanged; `LinearAlgebra/Complex/Coordinates.lean` takes `cplxCoord`, `cplxCoord_apply`, `actC` and the two action laws, whose public types mention `ℂ` and `Matrix.GLPos (Fin 2) ℝ` and not the cover; `UniversalCover/ComplexRepresentation.lean` keeps `cplxCoord_exp`, `compat_exp` and `actC_exp`, which mention `rayVec`, `Compatible` and `NormalizedShift` and so did not meet the condition |
 
 The π-normalization is a convention to expose through adapters, not a reason
-for covering-space theory to live inside triangulated categories. The proposed
+for covering-space theory to live inside triangulated categories. The
 destination is a local extension, not an existing Mathlib module.
+
+`rayVec`, `OnRay` and `Compatible` stay with the definition owner, because the
+group is *defined* by the phase-circle condition they express; what the ledger
+means by exposing the convention through adapters is `cplxCoord_exp` and
+`actC_exp`, which restate it in the `exp (i π ·)` vocabulary the stability
+foundation uses.
+
+**What the identifier does not prove.** `GLTilde` is a name. The covering
+statement is `GLTilde.universalCoverData` -- `IsCoveringMap GLTilde.mat`,
+`Function.Surjective GLTilde.mat`, `SimplyConnectedSpace GLTilde` -- together
+with `exact_deckHom_toMatHom` for the `ℤ` deck group. Both are proved and
+sorry-free, and `registry/bridgeland2007.json` records a named reviewer's
+2026-08-07 judgement that their conjunction is what Lemma 8.2's phrase means,
+Mathlib having no bundled universal-cover predicate at the pin. This cutover
+moved files; it did not supply, strengthen or discharge any of that, and the
+`@[discharges "gltilde-universal-cover"]` binding travels with the theorem.
+
+**Not discharged here.** AUT1 (#927) concerns an autoequivalence action and a
+supplied proper discontinuity. It is a different obligation about a different
+group, it remains open, and no part of it is closed by this row.
+
+Layering rule 16 and five fixtures under `scripts/fixtures/layering/` pin the
+result: the cover tree, the order-automorphism core, the complex-coordinate
+adapter and the general covering lemma reach neither `StabilityCondition` nor
+`AlgebraicGeometry`, and `Symmetry/GLTilde/Action/` still reaches the cover, so
+the projection stability consumes is an import edge rather than a restatement.
 
 #### 09 -- Mass as a sibling of metric; planar convex geometry (#1324)
 
