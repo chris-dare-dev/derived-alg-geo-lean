@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import Mathlib.Analysis.SpecialFunctions.Complex.Arg
+import DerivedAlgGeo.Analysis.Complex.HalfPlane
 import Mathlib.Algebra.Group.Hom.Defs
 
 /-!
@@ -31,12 +31,16 @@ tie-breaker. It sat at the root of `CategoryTheory/` from #760 until 2026-09-02;
 the review of the Mathlib-mesh restructure observed that this promoted
 stability-specific support to a subject root it does not own.
 
-The four upper-half-plane facts (`semiClosedUpperHalfPlane`,
-`closedUpperHalfPlane`, and their two lemmas) are an upstream candidate for
-`Mathlib/Analysis/Complex/UpperHalfPlane/` under the `Complex` namespace. They
-stay here for now because the namespace change would rename declarations, and
-declaration names are kept stable across moves so that the immutable review
-payloads the `exe/RestateHistoricalNames.lean` bridge protects keep resolving.
+The five upper-half-plane facts (`semiClosedUpperHalfPlane`,
+`closedUpperHalfPlane`, and their three lemmas) left this file in MO1.13
+(#1324) and now live at `DerivedAlgGeo/Analysis/Complex/HalfPlane.lean`, which
+this file imports. They had to move: the Euclidean core of the
+mass-subadditivity proof states half-plane memberships, and that core is
+required to be importable with no category theory and no stability. Their
+declaration names and their `CategoryTheory` namespace are unchanged, because a
+namespace change would rename declarations and the immutable review payloads
+the `exe/RestateHistoricalNames.lean` bridge protects must keep resolving. They
+remain an upstream candidate for `Mathlib/Analysis/Complex/UpperHalfPlane/`.
 -/
 
 noncomputable section
@@ -46,37 +50,6 @@ universe u v
 open Complex Real
 
 namespace CategoryTheory
-
-/-- The semi-closed upper half-plane used for central charges: positive
-imaginary part together with the negative real axis. -/
-def semiClosedUpperHalfPlane : Set ℂ :=
-  {z : ℂ | 0 < z.im} ∪ {z : ℂ | z.im = 0 ∧ z.re < 0}
-
-theorem semiClosedUpperHalfPlane_ne_zero {z : ℂ}
-    (hz : z ∈ semiClosedUpperHalfPlane) : z ≠ 0 := by
-  rcases hz with him | ⟨him, hre⟩
-  · exact ne_of_apply_ne im him.ne'
-  · exact ne_of_apply_ne re hre.ne
-
-/-- The **closed** upper half-plane: the weak condition, which unlike
-`semiClosedUpperHalfPlane` contains `0`.  That single difference is the whole of
-the weak/strict distinction, and it is why μ-slope stability on a surface is weak
-— a skyscraper has zero rank and zero degree, so its μ-charge is `0`. -/
-def closedUpperHalfPlane : Set ℂ :=
-  {z : ℂ | 0 < z.im} ∪ {z : ℂ | z.im = 0 ∧ z.re ≤ 0}
-
-theorem semiClosedUpperHalfPlane_subset_closed :
-    semiClosedUpperHalfPlane ⊆ closedUpperHalfPlane :=
-  fun _ hz ↦ hz.imp id (fun h ↦ ⟨h.1, h.2.le⟩)
-
-theorem arg_pos_of_mem_semiClosedUpperHalfPlane {z : ℂ}
-    (hz : z ∈ semiClosedUpperHalfPlane) : 0 < arg z := by
-  rcases hz with him | ⟨him, hre⟩
-  · refine lt_of_le_of_ne (arg_nonneg_iff.mpr him.le) ?_
-    exact fun h => him.ne' (arg_eq_zero_iff.mp h.symm).2
-  · have hz : z = (z.re : ℂ) := Complex.ext rfl (by simpa using him)
-    rw [hz, arg_ofReal_of_neg hre]
-    exact Real.pi_pos
 
 /-- **What a positivity condition needs to know about a category.**
 

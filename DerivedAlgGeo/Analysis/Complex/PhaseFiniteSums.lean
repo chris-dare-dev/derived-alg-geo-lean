@@ -2,13 +2,21 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.PhaseGeometry
+import DerivedAlgGeo.Analysis.Complex.PhaseGeometry
+import Mathlib.Data.Finset.Lattice.Fold
 
 /-!
 # Finite sums in the semi-closed upper half-plane
 
-This file extends the owner phase-geometry API from binary sums to nonempty
-finite sums and records determinant formulations used by HN-polygon proofs.
+This file extends the neutral phase-geometry API in
+`Analysis/Complex/PhaseGeometry.lean` from binary sums to nonempty finite sums,
+and records the determinant formulations the HN-polygon proofs use.
+
+Nothing here is categorical or stability-theoretic. It sat under
+`StabilityCondition/Weak/Foundation/StabilityFunction/` until MO1.13 (#1324),
+which moved it so that the Euclidean core of the mass-subadditivity proof could
+reach these bounds without reaching stability. Declaration names and the
+`CategoryTheory.Triangulated` namespace are unchanged.
 -/
 
 noncomputable section

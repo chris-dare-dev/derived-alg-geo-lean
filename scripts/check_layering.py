@@ -58,6 +58,13 @@ nothing else checks.
    siblings over one shared carrier, and the arbitrary-divisor-rank charge
    demonstrations reach the shared exponential kernel without passing through
    the scalar ``H``-degree compression. This is MO1.06 (#1317).
+13. **The neutral planar core is category-free and stability-free.** Nothing
+   below ``Analysis/`` reaches ``CategoryTheory/``, ``AlgebraicGeometry/`` or
+   the stability tree, and nothing below it imports ``Mathlib.CategoryTheory``
+   either. That is the whole reason MO1.13 (#1324) gave the Euclidean
+   perimeter comparison a subject of its own instead of leaving it inside a
+   mass-subadditivity proof directory, and it is exactly the kind of claim one
+   convenience import erases.
 7. **The ``ObjectProperty`` lift block stays at its carrier's path.**
    ``CategoryTheory/ObjectProperty/Lift.lean`` declares all six of
    it and imports nothing from ``DerivedAlgGeo``; no other module redeclares
@@ -93,6 +100,13 @@ KNOWN_SUBJECTS = {
     "Algebra",
     "AlgebraicGeometry",
     "AlgebraicTopology",
+    # Added by MO1.13 (#1324), deliberately and after the check rule 6 asks
+    # for: the pinned Mathlib has no polygonal-chain length and no perimeter
+    # of any kind, so the Euclidean comparison under mass subadditivity had no
+    # Mathlib owner to reuse. `Analysis` rather than `Geometry` because the
+    # convexity API it consumes, `convexHull`, is owned at the pinned revision
+    # by `Mathlib/Analysis/Convex/Hull.lean`. Recorded in the cutover ledger.
+    "Analysis",
     "CategoryTheory",
     "Development",
     "LinearAlgebra",
@@ -179,6 +193,12 @@ STABILITY_CONSUMING_GEOMETRY = (
 # Paths removed by a structural cutover, relative to the source root. An entry
 # without a suffix names a directory and also forbids its same-named umbrella.
 RETIRED_PATHS = (
+    # 2026-09-15 MO1.13 (#1324): mass became a sibling of metric, and the
+    # Euclidean planar core left the mass-subadditivity proof directory.
+    "CategoryTheory/Triangulated/StabilityCondition/Metric/Mass",
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Metric",
+    "CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/"
+    "StabilityFunction/FiniteSums.lean",
     # 2026-09-02 Euler-characteristic lane: restated on Mathlib's GradedObject.eulerChar.
     "LinearAlgebra/AlternatingFinsum.lean",
     "LinearAlgebra/AlternatingSum.lean",
@@ -463,6 +483,21 @@ LINEAR_YONEDA_BLOCK = (
     "hom_ext_of_linearYoneda",
 )
 LINEAR_SERRE_ROOT_DIR = "CategoryTheory/Linear/SerreFunctor"
+
+# Rule 13. `Analysis/` is the neutral planar subject MO1.13 (#1324) added:
+# the polygonal-path carrier, the real continuous linear functionals on `C`
+# and the Euclidean perimeter comparison, none of which mentions an object,
+# a filtration or a stability function. The point of the move is that it can
+# be imported with no category theory and no stability, so that is checked
+# rather than asserted in a docstring.
+ANALYSIS_ROOT = f"{LIBRARY}.Analysis"
+ANALYSIS_FORBIDDEN_PREFIXES = (
+    f"{LIBRARY}.CategoryTheory",
+    f"{LIBRARY}.AlgebraicGeometry",
+    f"{LIBRARY}.Development",
+    "Mathlib.CategoryTheory",
+    "Mathlib.AlgebraicGeometry",
+)
 TRIANGULATED_TREE = f"{LIBRARY}.CategoryTheory.Triangulated"
 
 STRUCTURE_DECLARES = re.compile(
@@ -1132,6 +1167,34 @@ def main() -> int:
                     "triangulation (MO1.07)"
                 )
 
+    # Rule 13.
+    analysis_modules = [
+        m for m in modules if m == ANALYSIS_ROOT or in_tree(m, ANALYSIS_ROOT)
+    ]
+    if not analysis_modules:
+        failures.append(
+            f"missing {ANALYSIS_ROOT}: it owns the neutral planar core -- the "
+            "polygonal-path carrier, the real continuous linear functionals on "
+            "the complex plane, and the Euclidean perimeter comparison; see "
+            "docs/architecture/cutover-ledger.md"
+        )
+    for module in analysis_modules:
+        reached = sorted(
+            dep
+            for dep in closure.of(module)
+            if dep != module
+            and any(
+                dep == prefix or dep.startswith(prefix + ".")
+                for prefix in ANALYSIS_FORBIDDEN_PREFIXES
+            )
+        )
+        if reached:
+            failures.append(
+                f"{module}: reaches {reached[0]}; the neutral planar core "
+                "exists to be importable with no category theory and no "
+                "stability (MO1.13)"
+            )
+
     failures += check_fixtures(closure)
 
     if failures:
@@ -1171,7 +1234,9 @@ def main() -> int:
         "a demonstration, the "
         f"{len(SURFACE_MODEL_SIBLINGS)} named surface models share one carrier "
         "and no sibling, and the arbitrary-divisor-rank charge reaches the "
-        "exponential kernel without a degree vector"
+        "exponential kernel without a degree vector; the "
+        f"{len(analysis_modules)} neutral planar modules below Analysis/ reach "
+        "no category, no scheme and no stability condition"
     )
     return 0
 

@@ -2,7 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.HNPolygon
+import DerivedAlgGeo.Analysis.Convex.ComplexPolygonalPath.Basic
+import Mathlib.Analysis.Convex.Hull
+import Mathlib.Analysis.Convex.Jensen
 import Mathlib.Data.List.Dedup
 import Mathlib.Data.List.Destutter
 import Mathlib.Data.List.FinRange
@@ -16,10 +18,39 @@ set_option backward.isDefEq.respectTransparency false
 /-!
 # Convex-polygon perimeter comparison
 
-This file isolates the Euclidean (`t = 0`) polygon comparison used in
-Ikeda's Lemma 3.7.  The proof is finite-dimensional: supporting functionals
-select a monotone subsequence of the outer boundary, and discrete integration
-by parts reduces the perimeter comparison to the triangle inequality.
+The Euclidean (`t = 0`) polygon comparison: if one nonempty upper-half-plane
+path turns with strictly decreasing edge arguments and its closed vertex hull
+sits inside another path's vertex hull, the first path is no longer than the
+second. The proof is finite-dimensional -- supporting functionals select a
+monotone subsequence of the outer boundary, and discrete integration by parts
+reduces the perimeter comparison to the triangle inequality.
+
+## Main declarations
+
+* `chainLength` and `closedLength`, the open and closed perimeters, with
+  `closedLength_eq_sum_turning`: a closed perimeter is its discrete support sum.
+* `closedLength_le_of_monotone_support`, the finite support-fan comparison.
+* `length_le_of_convexHull_subset`, the comparison itself.
+
+## Source
+
+This is the `t = 0` case of Ikeda, *A phase limit formula and the space of
+stability conditions*, Lemma 3.7, slightly strengthened: no decreasing-turn
+hypothesis is needed for the outer path, because the proof only selects a
+monotone subsequence of its support-maximizing vertices and any remaining turns
+can only increase the outer length. The Harder--Narasimhan reading of the
+comparison, and Ikeda's Lemma 3.8 built on it, are the stability adapter
+`StabilityCondition/Mass/Subadditivity/HNPolygonComparison.lean`.
+
+## Placement
+
+Neutral planar geometry: this file imports no category theory and no stability,
+and every statement quantifies over vertices in `ℂ`. It was the first
+two-thirds of
+`StabilityCondition/Metric/Mass/Subadditivity/PolygonPerimeter.lean` -- a
+Euclidean perimeter argument living inside a mass-subadditivity proof directory
+-- until MO1.13 (#1324). See `ComplexPolygonalPath/Basic.lean` for why
+`Analysis/` is the subject and why the namespace did not move with the path.
 -/
 
 open CategoryTheory.Triangulated
@@ -731,224 +762,3 @@ theorem length_le_of_convexHull_subset {n m : ℕ} (hn : 0 < n)
 end
 
 end CategoryTheory.Triangulated.ComplexPolygonalPath
-
-namespace CategoryTheory.Triangulated
-
-noncomputable section
-
-open CategoryTheory CategoryTheory.Limits
-
-universe v u
-
-variable {A : Type u} [Category.{v} A] [Abelian A]
-
-namespace AbelianHNFiltration
-
-variable {Z : StabilityFunction A} {E E' : A}
-
-/-- HN-path specialization of the finite perimeter comparison for
-applications which already have containment of the two closed finite vertex
-polygons.  The monomorphism comparison below uses the more precise ambient
-support theorem instead of trying to derive this hypothesis from full ambient
-HN-polygon containment. -/
-theorem polygonLength_le_of_vertexHull_subset
-    (F : AbelianHNFiltration Z E) (G : AbelianHNFiltration Z E')
-    (hcharge : Z.charge E = Z.charge E')
-    (hcontain : convexHull ℝ (Set.range F.polygonVertex) ⊆
-      convexHull ℝ (Set.range G.polygonVertex)) :
-    F.polygonLength ≤ G.polygonLength := by
-  apply ComplexPolygonalPath.length_le_of_convexHull_subset F.nonempty
-  · rw [F.polygonVertex_zero, G.polygonVertex_zero]
-  · calc
-      F.polygonVertex (Fin.last F.n) = Z.charge E := F.polygonVertex_last
-      _ = Z.charge E' := hcharge
-      _ = G.polygonVertex (Fin.last G.n) := G.polygonVertex_last.symm
-  · exact fun i ↦ F.polygonEdge_mem_semiClosedUpperHalfPlane i
-  · exact fun i ↦ G.polygonEdge_mem_semiClosedUpperHalfPlane i
-  · exact F.polygonEdge_arg_strictAnti
-  · exact hcontain
-
-/-- **Boundary-cut HN polygon comparison.** If `E ⟶ E'` is monic, the HN
-path of `E` is no longer than the HN path of `E'` followed by the single edge
-from `Z(E')` back to `Z(E)`.
-
-This is the `t = 0` comparison used in Ikeda's Lemma 3.8, strengthened at that
-parameter by not requiring the cokernel to have phase one.  (That phase
-hypothesis controls the exponential weight for general `t`; it disappears
-when `t = 0`.)  The final edge is allowed to lie on the positive real boundary
-when the cokernel does have phase one.  No false claim that the full ambient HN
-polygon is the closed HN vertex hull is used.  Instead, positive-angle support
-maxima of the ambient polygon are supplied by `HNPolygon` and the finite
-support-fan perimeter theorem closes the argument. -/
-theorem polygonLength_le_add_norm_charge_sub_of_mono
-    (F : AbelianHNFiltration Z E) (G : AbelianHNFiltration Z E')
-    (hHN : Z.HasHNProperty) (f : E ⟶ E') [Mono f] :
-    F.polygonLength ≤ G.polygonLength + ‖Z.charge E - Z.charge E'‖ := by
-  let w : Fin (G.n + 2) → ℂ := Fin.snoc G.polygonVertex (Z.charge E)
-  let q : Fin (F.n + 1) → Fin (G.n + 2) := fun k ↦
-    if hk₀ : k = 0 then 0
-    else if hkl : k = Fin.last F.n then Fin.last (G.n + 1)
-    else (ComplexPolygonalPath.crossMaxIndex G.polygonVertex
-      (ComplexPolygonalPath.interiorBisector F.polygonVertex k
-        (Fin.pos_iff_ne_zero.mpr hk₀)
-        (lt_of_le_of_ne (Fin.le_last k) hkl))).castSucc
-  have hq₀ : q 0 = 0 := by simp [q]
-  have hq_last : q (Fin.last F.n) = Fin.last (G.n + 1) := by
-    have hne : (Fin.last F.n : Fin (F.n + 1)) ≠ 0 := by
-      intro h
-      have := congrArg Fin.val h
-      simp only [Fin.val_last, Fin.val_zero] at this
-      have := F.nonempty
-      omega
-    unfold q
-    rw [dif_neg hne, dif_pos rfl]
-  have hq : Monotone q := by
-    intro a b hab
-    rcases hab.eq_or_lt with rfl | hab
-    · exact le_rfl
-    · by_cases ha₀ : a = 0
-      · simp [q, ha₀]
-      · by_cases hbl : b = Fin.last F.n
-        · rw [hbl, hq_last]
-          exact Fin.le_last _
-        · have hal : a ≠ Fin.last F.n := by
-            intro h
-            subst a
-            exact (not_lt_of_ge (Fin.le_last b)) hab
-          have hb₀ : b ≠ 0 := by
-            intro h
-            subst b
-            exact Fin.not_lt_zero a hab
-          have ha_pos : 0 < a := Fin.pos_iff_ne_zero.mpr ha₀
-          have hb_pos : 0 < b := Fin.pos_iff_ne_zero.mpr hb₀
-          have ha_last : a < Fin.last F.n :=
-            lt_of_le_of_ne (Fin.le_last a) hal
-          have hb_last : b < Fin.last F.n :=
-            lt_of_le_of_ne (Fin.le_last b) hbl
-          simp only [q, dif_neg ha₀, dif_neg hal, dif_neg hb₀, dif_neg hbl,
-            Fin.castSucc_le_castSucc_iff]
-          exact ComplexPolygonalPath.crossMaxIndex_mono_of_angle_gt
-            G.polygonVertex (fun i ↦ G.polygonEdge_mem_semiClosedUpperHalfPlane i)
-            (ComplexPolygonalPath.interiorBisector_mem_Ioo F.polygonVertex
-              (fun i ↦ F.polygonEdge_mem_semiClosedUpperHalfPlane i)
-              F.polygonEdge_arg_strictAnti a ha_pos ha_last)
-            (ComplexPolygonalPath.interiorBisector_mem_Ioo F.polygonVertex
-              (fun i ↦ F.polygonEdge_mem_semiClosedUpperHalfPlane i)
-              F.polygonEdge_arg_strictAnti b hb_pos hb_last)
-            (ComplexPolygonalPath.interiorBisector_strictAnti F.polygonVertex
-              F.polygonEdge_arg_strictAnti ha_pos ha_last hb_pos hb_last hab)
-  have hsupport : ∀ k, ComplexPolygonalPath.turningFunctional
-      F.polygonVertex k (F.polygonVertex k) ≤
-        ComplexPolygonalPath.turningFunctional
-          F.polygonVertex k (w (q k)) := by
-    intro k
-    by_cases hk₀ : k = 0
-    · subst k
-      rw [hq₀]
-      simp [w, F.polygonVertex_zero, G.polygonVertex_zero]
-    by_cases hkl : k = Fin.last F.n
-    · subst k
-      rw [hq_last]
-      have hw : w (Fin.last (G.n + 1)) =
-          F.polygonVertex (Fin.last F.n) := by
-        rw [show w (Fin.last (G.n + 1)) = Z.charge E by simp [w]]
-        exact F.polygonVertex_last.symm
-      rw [hw]
-    have hk_pos : 0 < k := Fin.pos_iff_ne_zero.mpr hk₀
-    have hk_last : k < Fin.last F.n :=
-      lt_of_le_of_ne (Fin.le_last k) hkl
-    let θ := ComplexPolygonalPath.interiorBisector
-      F.polygonVertex k hk_pos hk_last
-    let j := ComplexPolygonalPath.crossMaxIndex G.polygonVertex θ
-    have hθ : θ ∈ Set.Ioo 0 Real.pi :=
-      ComplexPolygonalPath.interiorBisector_mem_Ioo F.polygonVertex
-        (fun i ↦ F.polygonEdge_mem_semiClosedUpperHalfPlane i)
-        F.polygonEdge_arg_strictAnti k hk_pos hk_last
-    have hzB : F.polygonVertex k ∈ Z.hnPolygon E' :=
-      Z.hnPolygon_mono f (F.polygonVertex_mem_hnPolygon k)
-    have hcross : ComplexPolygonalPath.crossFunctional
-        (ComplexPolygonalPath.unitRay θ) (F.polygonVertex k) ≤
-      ComplexPolygonalPath.crossFunctional
-        (ComplexPolygonalPath.unitRay θ) (G.polygonVertex j) :=
-      G.hnPolygon_le_of_polygonVertex_isMax hHN hθ j
-        (fun i ↦ ComplexPolygonalPath.crossMaxIndex_max
-          G.polygonVertex θ i) hzB
-    have hqk : q k = j.castSucc := by
-      simp [q, hk₀, hkl, θ, j]
-    rw [ComplexPolygonalPath.turningFunctional_interior_eq_cross
-        F.polygonVertex (fun i ↦ F.polygonEdge_mem_semiClosedUpperHalfPlane i)
-        k hk_pos hk_last,
-      ComplexPolygonalPath.turningFunctional_interior_eq_cross
-        F.polygonVertex (fun i ↦ F.polygonEdge_mem_semiClosedUpperHalfPlane i)
-        k hk_pos hk_last, hqk]
-    simp only [w, Fin.snoc_castSucc]
-    exact mul_le_mul_of_nonneg_left hcross
-      (le_of_lt (ComplexPolygonalPath.interiorTurnScale_pos F.polygonVertex
-        (fun i ↦ F.polygonEdge_mem_semiClosedUpperHalfPlane i)
-        F.polygonEdge_arg_strictAnti k hk_pos hk_last))
-  have hclosed := ComplexPolygonalPath.closedLength_le_of_monotone_support
-    F.polygonVertex w q hq hq₀ hq_last hsupport
-  rw [ComplexPolygonalPath.closedLength_eq_length_add_chord,
-    ComplexPolygonalPath.closedLength_eq_length_add_chord] at hclosed
-  have hw₀ : w 0 = F.polygonVertex 0 := by
-    simp [w, F.polygonVertex_zero, G.polygonVertex_zero]
-  have hwlast : w (Fin.last (G.n + 1)) = F.polygonVertex (Fin.last F.n) := by
-    rw [show w (Fin.last (G.n + 1)) = Z.charge E by simp [w]]
-    exact F.polygonVertex_last.symm
-  rw [hw₀, hwlast] at hclosed
-  have hopen : F.polygonLength ≤ ComplexPolygonalPath.length w := by
-    exact le_of_add_le_add_right hclosed
-  rw [ComplexPolygonalPath.length_snoc] at hopen
-  have hGlast : G.polygonVertex (Fin.last G.n) = Z.charge E' :=
-    G.polygonVertex_last
-  rw [hGlast] at hopen
-  simpa [w, polygonLength] using hopen
-
-/-- Mass form of the boundary-cut comparison.  The closing-edge charge is
-the negative of the cokernel charge, by additivity of the stability
-function. -/
-theorem mass_le_add_norm_cokernel_of_mono
-    (F : AbelianHNFiltration Z E) (G : AbelianHNFiltration Z E')
-    (hHN : Z.HasHNProperty) (f : E ⟶ E') [Mono f] :
-    F.mass ≤ G.mass + ‖Z.charge (Limits.cokernel f)‖ := by
-  have hse : (ShortComplex.mk f (Limits.cokernel.π f)
-      (Limits.cokernel.condition f)).ShortExact :=
-    StabilityFunction.shortExact_of_mono f
-  have hadd := Z.additive _ hse
-  have hsub : Z.charge E - Z.charge E' = -Z.charge (Limits.cokernel f) := by
-    linear_combination -hadd
-  rw [← F.polygonLength_eq_mass, ← G.polygonLength_eq_mass, ← norm_neg,
-    ← hsub]
-  exact F.polygonLength_le_add_norm_charge_sub_of_mono G hHN f
-
-/-- Short-exact-sequence form of the boundary-cut comparison. -/
-theorem mass_le_add_norm_of_shortExact (S : ShortComplex A)
-    (hS : S.ShortExact) (F : AbelianHNFiltration Z S.X₁)
-    (G : AbelianHNFiltration Z S.X₂) (hHN : Z.HasHNProperty) :
-    F.mass ≤ G.mass + ‖Z.charge S.X₃‖ := by
-  letI := hS.mono_f
-  have hmass := F.mass_le_add_norm_cokernel_of_mono G hHN S.f
-  let e : Limits.cokernel S.f ≅ S.X₃ :=
-    Limits.IsColimit.coconePointUniqueUpToIso (Limits.cokernelIsCokernel S.f)
-      hS.gIsCokernel
-  have hcharge : Z.charge (Limits.cokernel S.f) = Z.charge S.X₃ :=
-    Z.charge_eq_of_iso e
-  rwa [hcharge] at hmass
-
-/-- The mass of an abelian HN filtration is independent of the chosen
-filtration.  This is the identity-monomorphism specialization of the
-boundary-cut comparison. -/
-theorem mass_eq_mass (F G : AbelianHNFiltration Z E)
-    (hHN : Z.HasHNProperty) :
-    F.mass = G.mass := by
-  apply le_antisymm
-  · rw [← F.polygonLength_eq_mass, ← G.polygonLength_eq_mass]
-    simpa using F.polygonLength_le_add_norm_charge_sub_of_mono G hHN (𝟙 E)
-  · rw [← F.polygonLength_eq_mass, ← G.polygonLength_eq_mass]
-    simpa using G.polygonLength_le_add_norm_charge_sub_of_mono F hHN (𝟙 E)
-
-end AbelianHNFiltration
-
-end
-
-end CategoryTheory.Triangulated

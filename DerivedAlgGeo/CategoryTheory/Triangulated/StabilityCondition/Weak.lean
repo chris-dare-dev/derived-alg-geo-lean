@@ -7,7 +7,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Families
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Heart
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.HarderNarasimhan
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Metric
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Mass
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Support
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Charge

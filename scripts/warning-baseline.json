@@ -160,7 +160,7 @@
   1
  ],
  [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Mass/Subadditivity/Triangle/HeartShortExact.lean",
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mass/Subadditivity/Triangle/HeartShortExact.lean",
   "Try `simp at h` instead of `simpa using h`",
   2
  ],
