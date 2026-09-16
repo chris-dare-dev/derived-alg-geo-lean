@@ -18,13 +18,15 @@ Refused:
     passed, and on 2026-08-27 it ran for over an hour in a worktree that DID
     have the hook;
   * `scripts/gates.sh`, in any mode, because its `build` gate is that same
-    whole-library build.
+    whole-library build;
+  * `lake build <Target>` without `LEAN_NUM_THREADS`, or with it above
+    `MAX_LOCAL_THREADS` -- see "Width, not just size" below.
 
 Allowed, deliberately:
 
   * `lake build <Target>` for any target below an umbrella, including the three
     audits and `DerivedAlgGeo.Development` (which `gates.sh` and `ci.yml` both
-    build by name);
+    build by name), as long as it declares its concurrency;
   * `lake env lean <file>` -- the seconds-long probe that interactive proof work
     depends on. Routing those through CI would make each attempt a ~12 minute
     round trip and stop anyone from writing a proof at all;
@@ -34,6 +36,20 @@ The distinction is cost, not principle. A targeted build on a warm cache is
 seconds; the whole library from cold is hours, and on 2026-08-27 an agent spent
 three of them rebuilding a cache that a machine-wide cleanup had deleted --
 work the Windows runner would have done off the developer's machine entirely.
+
+## Width, not just size
+
+Refusing big builds is only half of a resource rule. A permitted `lake build
+DerivedAlgGeo.Foo` still takes one `lean` process per core unless
+`LEAN_NUM_THREADS` says otherwise, and on this 16-core host, shared by dozens of
+agent worktrees and four self-hosted runners, that is how the machine runs out
+of COMMIT rather than CPU. See `MAX_LOCAL_THREADS` for what that cost on
+2026-09-15.
+
+So a targeted build must declare its concurrency, and the ceiling is enforced
+rather than documented. `DAG_ALLOW_LOCAL_BUILD=1` overrides this rule too,
+because it overrides the whole gate -- but it is the wrong tool here: the right
+answer to "I need more threads" is a smaller number, not a bypass.
 
 ## Override
 
@@ -69,6 +85,91 @@ SEPARATORS = re.compile(r"\|\||&&|[;|&\n()]")
 # precisely the targeted build this gate exists to permit: both `gates.sh` and
 # `ci.yml` build it by name before the audits.
 UMBRELLAS = {"DerivedAlgGeo", "DerivedAlgGeoSweep"}
+
+# Lake's concurrency, and the ceiling a targeted build may use on this host.
+#
+# WHY A TARGETED BUILD IS ALSO A RESOURCE DECISION. The rest of this gate is
+# about the SIZE of a build; this is about its WIDTH. Without `LEAN_NUM_THREADS`
+# Lake takes one `lean` process per core, and each one can hold several GB. On
+# the 16-core host this repository is developed on that is up to 16 heavyweight
+# processes from a single `lake build DerivedAlgGeo.Foo` -- which the size rule
+# above deliberately permits.
+#
+# That is not hypothetical. On 2026-09-15 the host ran ~60 concurrent `lean`
+# processes across agent worktrees and self-hosted runners, the commit limit
+# collapsed to 2.9 GB free, and the consequences were: CI `build` jobs dying
+# with zero step records ("the self-hosted runner lost communication") on five
+# branches; `lean` dying mid-build with `std::bad_alloc` / exit code 3221226505;
+# and `elan` failing to relink `lake.exe` behind a crashed job's processes.
+#
+# `CLAUDE.md` has required `LEAN_NUM_THREADS=2` for local builds for some time,
+# and `~/.claude/settings.json` sets it per agent session. Both are advice: the
+# variable is absent in any shell that does not inherit that file, which
+# `CLAUDE.md` says in as many words ("set it explicitly if you are building from
+# a shell that does not inherit that"). Advice is what failed on 2026-08-27 for
+# the size rule, and the fix there was to enforce it. This is the same fix for
+# the width rule.
+#
+# The ceiling is 4 rather than the documented 2 so that someone who has thought
+# about it has room; it is not 16, because 16 is the failure.
+LEAN_THREADS_VAR = "LEAN_NUM_THREADS"
+MAX_LOCAL_THREADS = 4
+
+
+def inline_assignment(tokens: list[str], name: str) -> str | None:
+    """The value of `name=...` written as a prefix assignment on this command.
+
+    `LEAN_NUM_THREADS=2 lake build X` and `env LEAN_NUM_THREADS=2 lake build X`
+    both set the variable for that one command without exporting it, so neither
+    reaches `os.environ` here. Scanning stops at the command word: a `name=...`
+    AFTER it is an argument, not an assignment.
+    """
+    for tok in tokens:
+        if os.path.basename(tok) == "lake":
+            return None
+        if tok.startswith(name + "="):
+            return tok.split("=", 1)[1]
+    return None
+
+
+def threads_offence(value: str | None) -> str | None:
+    """Return why this `LEAN_NUM_THREADS` value is refused, or None.
+
+    Unset is refused rather than defaulted. A gate that silently substituted a
+    safe value would leave the caller's command meaning something other than
+    what it says, and the next person to copy that command out of a transcript
+    would run it uncapped.
+    """
+    advice = (
+        f"Prefix the command: `{LEAN_THREADS_VAR}=2 lake build <Target>`, or "
+        f"export {LEAN_THREADS_VAR} in the shell."
+    )
+    if value is None or not value.strip():
+        return (
+            f"`lake build` without {LEAN_THREADS_VAR} lets Lake take one `lean` "
+            f"process per core, and each can hold several GB. {advice}"
+        )
+    try:
+        n = int(value.strip())
+    except ValueError:
+        return (
+            f"{LEAN_THREADS_VAR}={value!r} is not a number, so Lake's "
+            f"concurrency is whatever it defaults to. {advice}"
+        )
+    if n < 1:
+        # `LEAN_NUM_THREADS=0` is not "no threads": it is Lean's spelling of
+        # "decide for me", which on this host means one per core.
+        return (
+            f"{LEAN_THREADS_VAR}={n} means one `lean` process per core, not "
+            f"none. {advice}"
+        )
+    if n > MAX_LOCAL_THREADS:
+        return (
+            f"{LEAN_THREADS_VAR}={n} exceeds the local ceiling of "
+            f"{MAX_LOCAL_THREADS} on this host, which several worktrees and the "
+            f"self-hosted runners share. {advice}"
+        )
+    return None
 
 
 def target_name(token: str) -> str:
@@ -138,6 +239,15 @@ def offence(tokens: list[str]) -> str | None:
                 "the module you changed (`lake build DerivedAlgGeo.Foo`) or "
                 "push the branch and let the runner do it."
             )
+        # The build is an allowed SIZE. It still has to declare its WIDTH.
+        # An inline assignment beats the ambient environment, because that is
+        # the precedence the shell itself gives it.
+        reason = threads_offence(
+            inline_assignment(tokens, LEAN_THREADS_VAR)
+            or os.environ.get(LEAN_THREADS_VAR)
+        )
+        if reason is not None:
+            return reason
     return None
 
 
@@ -184,8 +294,9 @@ def main() -> int:
         "(`ci.yml` routes `push` and `workflow_dispatch` to "
         "[\"self-hosted\", \"owner-win\"]).\n"
         "\n"
-        "Still allowed locally: `lake build <Target>`, `lake env lean <file>`,\n"
-        "`lake exe runLinter`, `lake exe lint-style`, the python checkers.\n"
+        "Still allowed locally: `LEAN_NUM_THREADS=2 lake build <Target>`,\n"
+        "`lake env lean <file>`, `lake exe runLinter`, `lake exe lint-style`,\n"
+        "the python checkers.\n"
         "\n"
         "If the runner is genuinely unavailable, set DAG_ALLOW_LOCAL_BUILD=1 for\n"
         "the command -- and say so in your report.",
