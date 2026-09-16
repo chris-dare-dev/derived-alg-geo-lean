@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Basic
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.Triangle.Consequences
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.Triangle.Consequences
 
 /-!
 # Mass--Hom bounds at finite stability distance

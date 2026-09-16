@@ -114,7 +114,8 @@ stability conditions. The finer direction below `AlgebraicGeometry/` is:
 
 ```text
 Modules, ProjectiveSpectrum, Cohomology, Divisors, Duality,
-IntersectionTheory, RiemannRoch, Stacks, Surface, Variety, Spec, Morphisms
+IntersectionTheory, RiemannRoch, Sites, Stacks, Surface, Variety, Spec,
+Morphisms
         stability-neutral: never reach the stability tree
 
 DerivedCategory
@@ -285,7 +286,14 @@ AlgebraicGeometry
   │     ├─→ PerfectComplex, Quot
   │     ├─→ Semistability                     loci, scheme probes, locus probes, finite-type openness
   │     └─→ HarderNarasimhan                  relative filtrations, the Dedekind HN problem
-  ├─→ Stacks                                  big-Zariski representables
+  ├─→ Sites                                   direct extensions of Mathlib's big Zariski,
+  │                                           étale, fppf and fpqc topologies on schemes
+  ├─→ Stacks
+  │     ├─→ Representable                     big-Zariski representables
+  │     ├─→ Descent                           fppf and étale descent for those representables,
+  │     │                                     and covering families from Mathlib covers
+  │     └─→ Algebraic                         provisional big-Zariski presentation data:
+  │                                           scheme fibers, scheme diagonals, atlases
   └─→ Variety, Surface
 ```
 
@@ -302,6 +310,8 @@ AlgebraicGeometry
 | Module sheaves on an arbitrary ringed site | `DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf` |
 | Generic site-theoretic Čech machinery | `DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech` |
 | Generic stacks and representable fibers | `DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids` |
+| Étale/fppf/fpqc topology comparisons on schemes | `DerivedAlgGeo.AlgebraicGeometry.Sites.Comparison` |
+| Fppf and étale descent for representable stacks | `DerivedAlgGeo.AlgebraicGeometry.Stacks.Descent` |
 | Pseudofunctor transport, loci, and subprestacks | `DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat` |
 | Neutral moduli boundedness | `DerivedAlgGeo.CategoryTheory.Moduli` |
 | Fiber categories and pullbacks | `DerivedAlgGeo.CategoryTheory.Triangulated.Families` |

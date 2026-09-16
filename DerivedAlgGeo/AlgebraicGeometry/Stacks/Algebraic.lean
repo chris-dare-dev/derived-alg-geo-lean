@@ -24,6 +24,12 @@ standard definition of an algebraic stack: no fppf or étale descent theorem is
 proved here, and the diagonal is represented by schemes rather than algebraic
 spaces.  No Artin representability theorem or opaque algebraicity proposition
 is introduced.
+
+The fppf and étale descent level lives in
+`DerivedAlgGeo.AlgebraicGeometry.Stacks.Descent`, which also shows that a
+smooth surjection is an fppf covering family.  That module does not change
+anything here: the diagonal below is still represented by schemes, and the
+presentations below are still big-Zariski presentations.
 -/
 
 namespace AlgebraicGeometry
