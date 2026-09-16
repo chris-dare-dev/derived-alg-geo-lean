@@ -26,7 +26,9 @@ The canonical modules are:
 | Postnikov towers and HN filtrations | `DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower`, `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing` |
 | Slicings and phase truncation | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing` |
 | Grothendieck group and class maps | `DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup`, `DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Presentation` |
-| Stability functions and abelian HN theory | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction` |
+| Stability functions and abelian HN theory | `DerivedAlgGeo.CategoryTheory.Abelian.Stability` (`.Weak` for the weak variants) |
+| Class datum and additive charge | `DerivedAlgGeo.CategoryTheory.Abelian.Stability.Charge` |
+| Class datum of a t-structure heart | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.HeartDatum` |
 | Stability conditions and topology | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.StabilityCondition`, `.Deformation.StabilityTopology` |
 | Deformation theorem | `DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.Theorem` |
 | Local comparison and injectivity | `.Deformation.LocalComparison`, `.Deformation.LocalInjectivity` |

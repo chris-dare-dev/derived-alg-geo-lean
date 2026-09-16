@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.HNPolygon
+import DerivedAlgGeo.CategoryTheory.Abelian.Stability.HNPolygon
 import Mathlib.Data.List.Dedup
 import Mathlib.Data.List.Destutter
 import Mathlib.Data.List.FinRange

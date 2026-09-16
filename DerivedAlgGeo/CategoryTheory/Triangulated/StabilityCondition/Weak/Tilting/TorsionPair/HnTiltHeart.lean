@@ -29,7 +29,7 @@ buy is that the tilted heart can be described in the phase language of
 `Cutoff.lean` rather than in terms of two abstract `ObjectProperty`s, which is
 the form §6 states it in.
 
-`Foundation/StabilityFunction/SlopeCutoff.lean` is the companion on the other
+`Abelian/Stability/SlopeCutoff.lean` is the companion on the other
 side: it says which objects are in `T β` to begin with, namely every nonzero
 object of rank zero, at every `β < 1`.
 -/

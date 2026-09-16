@@ -370,7 +370,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.08 — Separate abelian stability foundations and make slope theory independent of Gieseker
-  status: planned
+  status: done
   summary: 'Extract abelian stability functions/HN foundations from the triangulated weak-stability application
     and organize geometric slope and Gieseker theories as siblings. SF1 #192/#208 owns weak stability
     and HRS tilting; CA2 #1226–#1228 owns the tilt-charge comparisons. Neither set of mathematical deliverables

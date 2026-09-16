@@ -149,10 +149,11 @@ until their implementing cutovers add the corresponding checks.
   the subcomponents that exist to consume it: `DerivedCategory/Stability/`,
   `Moduli/{HarderNarasimhan,Semistability}/`, `Numerical/Stability/`,
   `Numerical/Examples/{Surface,Threefold,Fourfold}/`,
-  `Numerical/GrothendieckGroup/CategoricalChargeK3.lean` and
-  `Stability/Gieseker/`.
+  and `Numerical/GrothendieckGroup/CategoricalChargeK3.lean`.
   Everything else below `AlgebraicGeometry/` is stability-neutral, transitively
-  included. A same-named umbrella over one of those subcomponents is exempt as
+  included -- `Stability/` among it since MO1.08 (#1319), which moved the
+  abstract slope theory it instantiates to `CategoryTheory/Abelian/Stability/`
+  and removed the exemption rather than renaming it. A same-named umbrella over one of those subcomponents is exempt as
   an umbrella, and its other children are not. The
   `AlgebraicGeometry/DerivedCategory` umbrella is the one that omits a child
   outright -- it drops `Stability`, and the top-level `AlgebraicGeometry`

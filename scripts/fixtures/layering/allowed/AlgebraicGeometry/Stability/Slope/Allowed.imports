@@ -1,0 +1,5 @@
+# Sheaf slope stability instantiates the ABELIAN slope theory, and that is the
+# whole of what it needs: no shift, no t-structure, no stability condition.
+# MO1.08 removed the rule 3 exemption this subtree used to hold.
+import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.Surface.Number
+import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.SlopeGeometry

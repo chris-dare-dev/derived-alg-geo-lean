@@ -80,6 +80,16 @@
   1
  ],
  [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/HNPolygon.lean",
+  "'change Z.phase (C₁ : A) = G.phase i₀' tactic does nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Slope.lean",
+  "This simp argument is unused:",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Sites/SheafCohomology/Cech/ComplexNaturality.lean",
   "This simp argument is unused:",
   9
@@ -182,16 +192,6 @@
  [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Region.lean",
   "automatically included section variable(s) unused in theorem `_private.DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Region.0.CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.scale_bound`:",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/StabilityFunction/HNPolygon.lean",
-  "'change Z.phase (C₁ : A) = G.phase i₀' tactic does nothing",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/StabilityFunction/Slope.lean",
-  "This simp argument is unused:",
   1
  ],
  [
