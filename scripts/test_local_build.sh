@@ -24,6 +24,12 @@ cd "$(dirname "$0")/.."
 CHECK="scripts/check_local_build.py"
 fails=0
 
+# The gate reads LEAN_NUM_THREADS from the ambient environment, so the suite has
+# to pin it rather than inherit whatever the runner happens to export. Every
+# case below is explicit about which side of the width rule it is testing: this
+# default keeps the SIZE cases testing size, and the width cases override it.
+export LEAN_NUM_THREADS=2
+
 # refuse|allow <name> -- <argv for the checker, CLI mode>
 cli_case () {
   local expect="$1" name="$2"; shift 2
@@ -103,6 +109,66 @@ cli_case allow  'cd x && lake build a leaf'        cd x '&&' lake build DerivedA
 hook_case refuse 'hook blocks the umbrella'  'lake build DerivedAlgGeo'
 hook_case refuse 'hook blocks the bare build' 'lake build'
 hook_case allow  'hook passes a leaf module' 'lake build DerivedAlgGeo.Foo'
+
+# == width ==
+#
+# A targeted build is an allowed SIZE; these pin its WIDTH. The failure being
+# prevented is not a slow build, it is the host running out of commit: see
+# MAX_LOCAL_THREADS in the checker for the 2026-09-15 incident.
+
+# Cases that run the checker with LEAN_NUM_THREADS removed from the environment,
+# to exercise the "unset" branch that the export at the top of this file hides.
+nothreads_case () {
+  local expect="$1" name="$2"; shift 2
+  local out rc want
+  out="$(env -u DAG_ALLOW_LOCAL_BUILD -u LEAN_NUM_THREADS \
+    python3 "$CHECK" "$@" 2>&1)"
+  rc=$?
+  [ "$expect" = refuse ] && want=1 || want=0
+  if [ "$rc" -eq "$want" ]; then
+    printf 'PASS  %-46s (%s)\n' "$name" "$expect"
+    return 0
+  fi
+  printf 'FAIL  %-46s expected %s (rc=%s), got rc=%s\n' "$name" "$expect" "$want" "$rc"
+  printf '%s\n' "$out" | sed 's/^/        /'
+  fails=$((fails + 1))
+}
+
+nothreads_case refuse 'targeted build, no LEAN_NUM_THREADS' lake build DerivedAlgGeo.Foo
+nothreads_case allow  'inline assignment supplies it'       LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.Foo
+nothreads_case allow  'env prefix supplies it'              env LEAN_NUM_THREADS=4 lake build DerivedAlgGeo.Foo
+
+# The ambient variable is enough on its own: this is the common path, since
+# `~/.claude/settings.json` exports it for every agent session.
+cli_case allow  'ambient LEAN_NUM_THREADS=2'      lake build DerivedAlgGeo.Foo
+
+# The ceiling. 16 is what the host has cores of, and is the failure mode.
+LEAN_NUM_THREADS=4  cli_case allow  'threads at the ceiling'  lake build DerivedAlgGeo.Foo
+LEAN_NUM_THREADS=5  cli_case refuse 'threads above the ceiling' lake build DerivedAlgGeo.Foo
+LEAN_NUM_THREADS=16 cli_case refuse 'threads = core count'    lake build DerivedAlgGeo.Foo
+
+# `0` is Lean's spelling of "decide for me", which is one per core -- the exact
+# thing being refused. A naive `int(v) > MAX` test would let it through.
+LEAN_NUM_THREADS=0   cli_case refuse 'threads = 0 means auto'  lake build DerivedAlgGeo.Foo
+LEAN_NUM_THREADS=''  cli_case refuse 'threads set but empty'   lake build DerivedAlgGeo.Foo
+LEAN_NUM_THREADS=all cli_case refuse 'threads not a number'    lake build DerivedAlgGeo.Foo
+
+# An inline assignment overrides the ambient value, as the shell would.
+LEAN_NUM_THREADS=2 cli_case refuse 'inline overrides ambient (up)' \
+  LEAN_NUM_THREADS=16 lake build DerivedAlgGeo.Foo
+
+# The width rule must not reach commands that are not `lake build`. `lake env
+# lean` is the seconds-long probe proof work depends on, and gating it would
+# make every lemma attempt a CI round trip.
+nothreads_case allow 'lake env lean is not gated on width' lake env lean scratch.lean
+nothreads_case allow 'lake exe is not gated on width'      lake exe lint-style
+
+# A size refusal still wins when both rules would fire, so the message names the
+# problem that actually matters.
+nothreads_case refuse 'umbrella refused on size, not width' lake build DerivedAlgGeo
+
+# Hook mode carries the width rule too, or the enforcement is CLI-only.
+hook_case allow  'hook passes a declared build' 'LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.Foo'
 
 # The documented escape hatch still works, and still has to be set explicitly.
 out="$(DAG_ALLOW_LOCAL_BUILD=1 python3 "$CHECK" lake build DerivedAlgGeo 2>&1)"
