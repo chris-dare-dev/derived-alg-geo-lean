@@ -167,7 +167,15 @@ The push started the gate run on the Windows runners. Find it and wait on it:
 gh run list --branch "agent/<slug>" --workflow ci.yml --limit 1 \
   --json databaseId,url --jq '.[0]'
 gh run watch <databaseId> -R chris-dare-dev/derived-alg-geo-lean --exit-status
+gh run view <databaseId> -R chris-dare-dev/derived-alg-geo-lean \
+  --json status,conclusion --jq '"\(.status)/\(.conclusion)"'
 ```
+
+**Read the conclusion, not the exit code.** `gh run watch --exit-status` exits
+**0 on a cancelled run**, and `ci.yml`'s concurrency group cancels the in-flight
+run on the next push to the same ref — so any follow-up push kills the run you
+were waiting on. Observed 2026-09-16 on run 35158669480: the watcher returned 0
+and the conclusion was `cancelled`. Only `completed/success` is green.
 
 **Bound the wait.** One build job serialises the queue. If the run has not
 *started* within about ten minutes, stop waiting: say so in the PR body with

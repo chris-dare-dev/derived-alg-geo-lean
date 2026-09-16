@@ -203,7 +203,16 @@ Then wait on it:
 
 ```bash
 gh run watch <databaseId> -R chris-dare-dev/derived-alg-geo-lean --exit-status
+gh run view <databaseId> -R chris-dare-dev/derived-alg-geo-lean \
+  --json status,conclusion --jq '"\(.status)/\(.conclusion)"'
 ```
+
+**Read the conclusion, not the exit code.** `gh run watch --exit-status` exits
+**0 on a cancelled run**, and cancellation is the normal outcome here: `ci.yml`'s
+concurrency group cancels the in-flight run on the next push to the same ref, so
+every `--force-with-lease` in step 5 kills the run before it. Observed
+2026-09-16 on run 35158669480 — the watcher returned 0 and the run's conclusion
+was `cancelled`. Only `completed/success` is green.
 
 **Bound the wait.** One build job serialises the whole queue, so a run can sit
 queued for longer than this iteration is worth. If the run has not *started*
