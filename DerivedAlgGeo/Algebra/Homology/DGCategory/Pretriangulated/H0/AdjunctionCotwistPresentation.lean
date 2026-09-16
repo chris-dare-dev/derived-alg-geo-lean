@@ -4,9 +4,9 @@ Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Triangulated.Rotate
 import DerivedAlgGeo.CategoryTheory.Shift.FunctorCategory
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionConePresentation
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.FunctorTransport
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.AdjunctionConePresentation
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.FunctorTransport
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.ShiftedFunctor
 
 /-!
 # Presenting dg-adjunction cotwist triangles on ordinary categories

@@ -6,9 +6,9 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategory
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.FunctorCategoryShift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.FunctorCategoryH0
 import DerivedAlgGeo.CategoryTheory.Shift.CommShift
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Functor
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.FunctorTransport
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Shift
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Functor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.FunctorTransport
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Shift
 import DerivedAlgGeo.CategoryTheory.Triangulated.ShiftFunctor
 
 /-!

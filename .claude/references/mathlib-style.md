@@ -24,6 +24,7 @@ Run by `.github/workflows/ci.yml` and by `CLAUDE.md`'s pre-push list.
 | `lake exe runLinter <Lib>` | missing docstrings on public defs, unused arguments, `simp` lemmas that don't apply, non-terminal `simp`-normal-form problems, deprecated-decl use, `dupNamespace` |
 | the three subsystem audits and `check_audit.py` | `sorryAx` and unexpected axioms reaching the audit surface |
 | `scripts/check_source_independence.py` | retired or external source roots re-entering the library |
+| `scripts/check_mathlib_style.py` (edit hook, `gates.sh`) | unresolved merge-conflict markers left in a file by a rebase — the structural gates all parse `import` lines only, so a conflicted file passed every one of them until #1359 |
 
 `lake exe runLinter DerivedAlgGeo` covers the complete stable library. The
 development probes remain covered by the emitter and style checks.

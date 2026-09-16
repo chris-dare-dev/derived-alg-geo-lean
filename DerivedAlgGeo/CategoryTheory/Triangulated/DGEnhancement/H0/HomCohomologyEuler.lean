@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.HomCohomology
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.HomCohomology
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import Mathlib.Algebra.Homology.EulerCharacteristic
 

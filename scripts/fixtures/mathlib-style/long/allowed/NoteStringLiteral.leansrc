@@ -1,0 +1,14 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.Basic
+
+/-!
+# A review record kept on one line
+-/
+
+theorem recorded : True := by
+  have := (fun _ => trivial :
+    (note := "A deliberate review record. The code on this line is short; it is long only because the limit lands inside this string, and reflowing it means a string gap that edits the payload's whitespace for no readability gain.") → True)
+  trivial

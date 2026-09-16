@@ -1,0 +1,11 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.Basic
+
+/-!
+# A definition with no docstring at all
+-/
+
+def undocumented (sigma : Sigma) : ENNReal := 0

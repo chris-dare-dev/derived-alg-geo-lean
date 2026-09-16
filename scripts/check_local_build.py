@@ -18,19 +18,26 @@ Refused:
     passed, and on 2026-08-27 it ran for over an hour in a worktree that DID
     have the hook;
   * `scripts/gates.sh`, in any mode, because its `build` gate is that same
-    whole-library build;
+    whole-library build. RUNNING it, that is -- see READERS below;
   * `lake build <Target>` without `LEAN_NUM_THREADS`, or with it above
     `MAX_LOCAL_THREADS` -- see "Width, not just size" below.
 
 Allowed, deliberately:
 
+  * `scripts/precheck.sh` -- the subset of `gates.sh` that needs no Lean build
+    at all, plus a targeted build of the modules the branch changed. It exists
+    because refusing `gates.sh` without offering anything in its place left
+    every agent skill with no local pre-flight whatsoever;
   * `lake build <Target>` for any target below an umbrella, including the three
     audits and `DerivedAlgGeo.Development` (which `gates.sh` and `ci.yml` both
     build by name), as long as it declares its concurrency;
   * `lake env lean <file>` -- the seconds-long probe that interactive proof work
     depends on. Routing those through CI would make each attempt a ~12 minute
     round trip and stop anyone from writing a proof at all;
-  * `lake exe runLinter`, `lake exe lint-style`, and the python checkers.
+  * `lake exe runLinter`, `lake exe lint-style`, and the python checkers;
+  * READING `scripts/gates.sh` -- `cat`, `grep`, `git ls-tree`, `diff`. The cost
+    this gate exists to refuse is running the file, not looking at it, and
+    CONTRIBUTING.md tells contributors to read it to know what CI will check.
 
 The distinction is cost, not principle. A targeted build on a warm cache is
 seconds; the whole library from cold is hours, and on 2026-08-27 an agent spent
@@ -50,6 +57,18 @@ So a targeted build must declare its concurrency, and the ceiling is enforced
 rather than documented. `DAG_ALLOW_LOCAL_BUILD=1` overrides this rule too,
 because it overrides the whole gate -- but it is the wrong tool here: the right
 answer to "I need more threads" is a smaller number, not a bypass.
+
+## What this gate does NOT say
+
+It does not say that CI is a superset of `gates.sh`. It is not, and the text
+here used to claim otherwise ("CI runs every gate in it, and more"). Five gates
+in `scripts/gates.sh` have no counterpart in any workflow: `workflows`,
+`trust-guard`, `local-build`, `mathlib-style`, and `single-instantiation`. The
+first four are local by construction -- they test hooks, or a pre-push linter
+that cannot run after the file reaches GitHub. `single-instantiation` was not,
+and the cost of the false claim is on the record: it ran nowhere for agents,
+and 24 names drifted past its baseline unseen until `bb8a1278` recorded them.
+PR #1355 wires it into `ci.yml`.
 
 ## Override
 
@@ -172,6 +191,99 @@ def threads_offence(value: str | None) -> str | None:
     return None
 
 
+# Commands that can only READ a file named on their command line.
+#
+# Until 2026-09-16 this check scanned every token of every segment, so any
+# command that so much as MENTIONED `gates.sh` was refused -- `cat`, `grep`,
+# `diff`, and `git ls-tree origin/main --name-only scripts/gates.sh`, which is
+# the tooling probe `.claude/skills/land-pr` runs in its own first step. A gate
+# whose purpose is "do not spend three hours of the developer's machine" has no
+# business refusing a read, and CONTRIBUTING.md §"Local workflow" tells you to
+# read that file to know what CI will check.
+#
+# The list is an allow-list rather than a deny-list on purpose: an unrecognised
+# command word that mentions `gates.sh` is still refused, which is the safe
+# direction for a check whose job is refusing things.
+READERS = {
+    "awk", "bat", "cat", "cut", "diff", "egrep", "fgrep", "file",
+    "grep", "head", "less", "ls", "md5sum", "more", "nl", "rg", "sed",
+    "sha256sum", "shellcheck", "sort", "stat", "tail", "uniq", "wc",
+}
+
+# `git` is a reader only for these subcommands. It is NOT one in general:
+# `git bisect run scripts/gates.sh` runs the script once per revision, which is
+# the worst version of the thing this gate refuses, and `git rebase --exec`,
+# `git submodule foreach` and `git filter-branch` all execute too. An allow-list
+# of subcommands keeps the probe in .claude/skills/land-pr working without
+# opening that door.
+GIT_READ_SUBCOMMANDS = {
+    "blame", "cat-file", "diff", "grep", "log", "ls-files", "ls-tree",
+    "rev-parse", "show", "status",
+}
+
+# A leading `VAR=value` is an environment assignment, not the command.
+ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+
+# `env` flags that swallow the following token. Without these, `env -u FOO grep
+# ... gates.sh` reports its command word as `FOO`, which is in no allow-list, so
+# a read would be refused -- and `env -u DAG_ALLOW_LOCAL_BUILD` is exactly how
+# scripts/test_local_build.sh invokes this checker.
+ENV_FLAGS_WITH_ARG = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
+
+
+def reads_only(tokens: list[str]) -> bool:
+    """Does this simple command only READ the files it names?
+
+    An allow-list, so an unrecognised command word means "refuse". `git` is
+    resolved one level deeper, to its subcommand.
+    """
+    word = command_word(tokens)
+    if word is None:
+        return False
+    base = os.path.basename(word)
+    if base in READERS:
+        return True
+    if base != "git":
+        return False
+    rest = tokens[tokens.index(word) + 1 :]
+    skip_next = False
+    for tok in rest:
+        if skip_next:
+            skip_next = False
+            continue
+        if tok.startswith("-"):
+            # `git --no-pager log`, and the two global flags that take a
+            # separate argument: `git -C dir show`, `git -c k=v log`.
+            skip_next = tok in {"-C", "-c"}
+            continue
+        return tok in GIT_READ_SUBCOMMANDS
+    return False
+
+
+def command_word(tokens: list[str]) -> str | None:
+    """The executable a simple command actually runs.
+
+    Skips leading environment assignments and a leading `env` with its flags, so
+    that `env -u FOO grep x scripts/gates.sh` reports `grep`.
+    """
+    skip_next = False
+    saw_env = False
+    for tok in tokens:
+        if skip_next:
+            skip_next = False
+            continue
+        if ASSIGNMENT.match(tok):
+            continue
+        if saw_env and tok.startswith("-"):
+            skip_next = tok in ENV_FLAGS_WITH_ARG
+            continue
+        if os.path.basename(tok) == "env":
+            saw_env = True
+            continue
+        return tok
+    return None
+
+
 def target_name(token: str) -> str:
     """The library or module a Lake target token names, bare.
 
@@ -210,9 +322,12 @@ def offence(tokens: list[str]) -> str | None:
     for tok in tokens:
         # Matches `scripts/gates.sh`, `./scripts/gates.sh`, `bash scripts/gates.sh`.
         if tok.endswith("gates.sh"):
+            if reads_only(tokens):
+                break  # reading the file, not running it
             return (
-                "scripts/gates.sh runs the whole-library build gate. Push the "
-                "branch instead: CI runs every gate in it, and more."
+                "scripts/gates.sh runs the whole-library build gate. Run "
+                "`scripts/precheck.sh` for the local subset that needs no Lean "
+                "build, and take the verdict from the runners."
             )
 
     # `lake build` with no explicit target builds the default targets, i.e. the
@@ -294,9 +409,18 @@ def main() -> int:
         "(`ci.yml` routes `push` and `workflow_dispatch` to "
         "[\"self-hosted\", \"owner-win\"]).\n"
         "\n"
-        "Still allowed locally: `LEAN_NUM_THREADS=2 lake build <Target>`,\n"
-        "`lake env lean <file>`, `lake exe runLinter`, `lake exe lint-style`,\n"
-        "the python checkers.\n"
+        "For a verdict, push the branch, or without pushing:\n"
+        "    gh workflow run ci.yml --ref <branch>\n"
+        "\n"
+        "Still allowed locally: `scripts/precheck.sh` (every gate that needs no\n"
+        "Lean build, plus a targeted build of what the branch changed),\n"
+        "`LEAN_NUM_THREADS=2 lake build <Target>`, `lake env lean <file>`,\n"
+        "`lake exe runLinter`, `lake exe lint-style`, the python checkers,\n"
+        "and READING gates.sh.\n"
+        "\n"
+        "CI is NOT a superset of gates.sh: `workflows`, `trust-guard`,\n"
+        "`local-build`, `mathlib-style` and `single-instantiation` have no\n"
+        "ci.yml counterpart. `precheck.sh` runs the first four.\n"
         "\n"
         "If the runner is genuinely unavailable, set DAG_ALLOW_LOCAL_BUILD=1 for\n"
         "the command -- and say so in your report.",

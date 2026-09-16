@@ -4,8 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.AdjunctionComparison
 import DerivedAlgGeo.Algebra.Homology.DGCategory.AdjunctionH0
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.NaturalTransformationConeShift
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.NaturalTransformationConeShift
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.ShiftedFunctor
 
 /-!
 # H⁰ coherence and conventional shifted targets for dg-adjunction comparisons

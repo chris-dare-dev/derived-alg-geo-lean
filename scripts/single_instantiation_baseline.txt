@@ -7,6 +7,7 @@ CategoryTheory	CategoryTheory.DGFunctor.PreservesConeTriangles	the weak exactnes
 Algebra	CategoryTheory.DGLinear	recorded before the reason column existed; reason not yet written
 Algebra	CategoryTheory.DerivedCategory.OppositeComparison	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Enhancement	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Enhancement.Exact	supplied data: constructing one means building a `CommShift` structure and proving `Functor.IsTriangulated`, and nothing in the repository produces one for a general `E`, as its docstring states
 Algebra	CategoryTheory.HasCopowers	a Mathlib-style mere-existence capability (abstraction-tree.md:220), discharged by a consumer's dg category rather than instantiated here; the `AddCommGrp` tower it heads serves object twists, distinct from the `ModuleCat k` tower under `HasLinearCopowers`
 Algebra	CategoryTheory.HasEvaluationData	`hasEvaluationDataOfHasCopowers` is the derivation from the stronger capability; abstraction-tree.md calls it the narrower capability object twists need
 Algebra	CategoryTheory.HasLinearCopowers	`Cdg (ModuleCat k)` is the one concrete dg category model so far; a second model would supply a second [adoption pending, tracked in the single-instantiation follow-up]
