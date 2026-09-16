@@ -526,7 +526,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.12 — Separate the GL⁺(2,ℝ) cover from its stability action
-  status: in_progress
+  status: done
   summary: 'Extract the standalone covering-group/topological construction currently owned by stability
     symmetry. Related AUT1 #927 concerns an autoequivalence action and supplied proper discontinuity;
     it is not the owner of this independent GL-cover construction and is not discharged here.'
