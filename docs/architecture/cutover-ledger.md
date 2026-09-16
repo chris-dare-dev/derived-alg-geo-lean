@@ -269,6 +269,46 @@ Narasimhan existence theorem, being owned by later consumers. The current
 μ-HN theorem must not be relabelled a proof of Gieseker HN existence by virtue
 of its new directory.
 
+**Landed 2026-09-15** in #1319. `Weak/Foundation/StabilityFunction/` is now
+`CategoryTheory/Abelian/Stability/`, with the fourteen `Weak*` leaves as its
+`Weak/` children -- so `Weak/` keeps naming a variant in the new home too, and
+`Stability/Slope.lean` still imports `Stability/Weak/Slope.lean` rather than the
+reverse. `Weak/Charge.lean` became `Abelian/Stability/Charge.lean`: `ClassDatum`
+and the additive charge are the neutral core, and they have two independent
+consumers, `abelianDatum` and the heart. Only `HeartDatum.lean` stayed in the
+triangulated tree, at `Weak/Foundation/HeartDatum.lean`, because it is the
+adapter and the one module of the old directory that mentions a t-structure.
+`Weak/Foundation.lean` re-exports the abelian owner, so the triangulated weak
+theory offers the same names it did before. The four upper-half-plane facts
+moved with `Charge.lean` and remain the upstream candidate the 2026-09-02 entry
+below records.
+
+Under `AlgebraicGeometry/Stability/`, `HilbertPolynomial.lean`,
+`Coefficients.lean` and a new `Purity.lean` are the shared data; `Slope/` and
+`Gieseker/` are siblings over them, reaching neither each other nor the
+stability tree; and `Comparison.lean` owns the four statements that mention
+both, together with the one-step filtration of a Gieseker-semistable sheaf.
+`Purity.lean` exists because `IsPure` mentions only the multiplicity and has two
+unrelated consumers -- it is the Gieseker predicate's conjunct, and it is what
+gives the μ-HN recursion a finite maximal slope -- so the μ-lane no longer
+imports the Gieseker order to reach it.
+
+The μ-HN existence theorem is `Slope/HarderNarasimhan/Existence.lean` and is
+still a theorem about the μ-slope: it was not relabelled, its `MuHNInput`
+hypotheses are unchanged, and Grothendieck's boundedness lemma is still
+supplied rather than proved. The audit slice named `Gieseker.lean` was split
+for the same reason, into `SheafStability.lean`, `Gieseker.lean`,
+`SheafSlope.lean` and `SheafStabilityComparison.lean`, with all 171 records
+preserved.
+
+The layering gate gained rule 13 for the three claims this row makes, and
+*lost* the `Stability/Gieseker/` entry in rule 3's exemption list: the
+sheaf-stability subtree now reaches no stability condition at all, so the
+exemption was removed rather than renamed. Fully qualified declaration names
+are unchanged throughout, which leaves the abelian files declaring into
+`CategoryTheory.Triangulated` -- the oddity decision 1 accepts rather than
+repairs.
+
 #### 07 -- Numerical parent-to-specialization inversions (#1316)
 
 | Relationship | Owner |

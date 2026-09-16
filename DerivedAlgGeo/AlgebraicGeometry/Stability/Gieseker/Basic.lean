@@ -2,16 +2,16 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.Coefficients
+import DerivedAlgGeo.AlgebraicGeometry.Stability.Purity
 
 /-!
-# Purity, the Gieseker order, and Gieseker (semi)stability
+# The Gieseker order and Gieseker (semi)stability
 
 A coherent sheaf is Gieseker-semistable when no nonzero subsheaf has a larger reduced Hilbert
-function for large `n`. This file defines purity, that order, the two stability predicates, and
-proves the structural facts: the order is reflexive and transitive, it is decided by the
-normalized coefficient vector read lexicographically from the top, and it is total on sheaves of
-positive multiplicity.
+function for large `n`. This file defines that order, the two stability predicates, and proves
+the structural facts: the order is reflexive and transitive, it is decided by the normalized
+coefficient vector read lexicographically from the top, and it is total on sheaves of positive
+multiplicity.
 
 ## Which classical definition this is
 
@@ -20,15 +20,18 @@ for a pure sheaf of dimension `P.dim`, with purity expressed through Hilbert mul
 than through dimension of support. The geometric equivalence of the two forms of purity is *not*
 claimed: no dimension-of-support theory exists at this pin. The subsheaf quantifier is over
 monomorphisms `G ⟶ F` throughout; the translation to `Subobject F` is made where it is needed,
-in `MuStability.lean`, and is not mixed into the definitions here.
+in `Comparison.lean`, and is not mixed into the definitions here.
 
 ## Why purity is a conjunct and not an afterthought
 
 `reducedHilbert P G` divides by `multiplicity P G` and takes Lean's junk value `0` when that is
 zero. Without purity, every nonzero subsheaf of multiplicity zero would satisfy the order
 relation vacuously, the predicate would fail to exclude exactly the subsheaves it exists to
-exclude, and the comparison theorem of `MuStability.lean` would be false. Purity is definable
-from `multiplicity` alone and needs no new geometry, so it belongs here.
+exclude, and the comparison theorem of `Comparison.lean` would be false.
+
+`IsPure` itself is not declared here. It mentions only the multiplicity, and the μ-slope lane
+needs it for a reason that has nothing to do with the Gieseker order, so MO1.08 (#1319) gave it
+the shared owner `Purity.lean` one level up. This file imports it like any other consumer.
 
 ## Why this is not a `StabilityFunctionOn`
 
@@ -37,7 +40,9 @@ Gieseker stability is ordered by a *polynomial*, compared at infinity; the repos
 There is no charge whose argument reproduces this order, and encoding a polynomial in a complex
 number to force the two together would be a false unification of the kind
 `docs/architecture/abstraction-tree.md` forbids. The comparison between the two theories happens
-one level down, between *slopes*, and is proved in `MuStability.lean`.
+one level down, between *slopes*, and is proved in `Comparison.lean` — which is a comparison and
+not an identification: neither theory is defined in terms of the other, and only one direction
+of one implication is delivered.
 
 ## The numerical core
 
@@ -224,33 +229,6 @@ variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 namespace PolarizedVarietyData
 
 variable (P : PolarizedVarietyData k X)
-
-/-! ### Purity -/
-
-/-- **Hilbert purity.** Every nonzero subsheaf has positive multiplicity, that is, full
-`P.dim`-dimensional support in the Hilbert sense.
-
-This is a definition, not a supplied `…Data` field. The geometric characterisation — no subsheaf
-whose support has dimension below `P.dim` — is not proved here, because no dimension-of-support
-theory exists at this pin. -/
-def IsPure (F : Coh X) : Prop :=
-  ¬IsZero F ∧ ∀ (G : Coh X) (i : G ⟶ F), Mono i → ¬IsZero G → 0 < P.multiplicity G
-
-variable {P}
-
-/-- A pure sheaf has positive multiplicity, by testing purity against its own identity. -/
-theorem IsPure.multiplicity_pos {F : Coh X} (h : P.IsPure F) : 0 < P.multiplicity F :=
-  h.2 F (𝟙 F) inferInstance h.1
-
-theorem IsPure.not_isZero {F : Coh X} (h : P.IsPure F) : ¬IsZero F := h.1
-
-/-- Purity is invariant under isomorphism. -/
-theorem IsPure.of_iso {F G : Coh X} (h : P.IsPure F) (e : F ≅ G) : P.IsPure G := by
-  refine ⟨fun hG ↦ h.1 (hG.of_iso e), fun H i hi hH ↦ ?_⟩
-  haveI := hi
-  exact h.2 H (i ≫ e.inv) (mono_comp i e.inv) hH
-
-variable (P)
 
 /-! ### The Gieseker order -/
 
