@@ -221,8 +221,8 @@ items:
     kind: epic
     parent: charge-abstraction-m2
     title: "The charge-family rotation, as the existing tilt rotation"
-    status: planned
-    summary: "`Walls/Rotation.lean`: `ChargeFamily.phaseRotate β := smul (exp(-πβi))`, with the two bridges that stop it duplicating what exists — it IS `phaseTiltRotation` (`TiltGeometry.lean:42`, not `:43` as the audit cited) and it agrees with `phaseTiltCharge` (`:53`) on the constant family. Must NOT be merged into `Walls/ChargeFamily.lean`, which imports only Mathlib today and must stay stability-neutral. The rotation was flagged by a verifier during the audit and never reached the audit's deliverable; it is free on walls and provably not free on phases."
+    status: done
+    summary: "`Walls/Rotation.lean`: `ChargeFamily.phaseRotate β := smul (exp(-πβi))`, with the two bridges that stop it duplicating what exists — it IS `phaseTiltRotation` (`TiltGeometry.lean:42`, not `:43` as the audit cited) and it agrees with `phaseTiltCharge` (`:53`) on the constant family. Must NOT be merged into `Walls/ChargeFamily.lean`, which imports only Mathlib today and must stay stability-neutral. The rotation was flagged by a verifier during the audit and never reached the audit's deliverable; it is free on walls and provably not free on phases. LANDED: the charge-family root is `CentralCharge/Family.lean` and the wall lemmas are `Walls/Alignment.lean` since MO1.02/MO1.03, so `Walls/Rotation.lean` imports those two plus `TiltGeometry.lean`; `wall`/`wallValue` are `alignmentLocus`/`alignmentValue`. Phase non-invariance is recorded as `exists_chargeSlope_phaseRotate_ne`."
     priority: must
     size: S
     tags: [lean, charges, rotation]
