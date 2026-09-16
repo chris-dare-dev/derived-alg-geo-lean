@@ -1,0 +1,15 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.Basic
+
+/-!
+# A docstring separated from its declaration by a multi-line attribute
+-/
+
+/-- The three-coordinate, `ℝ≥0∞`-valued stability distance. -/
+@[cites "stmt:a520a8d4f877:bridgeland2007.prop-8.1" (relation := no_claim)
+        (note := "The record sits on its own line, so the attribute spans two. Skipping only lines that start with `@[` stopped here and reported the declaration above as undocumented.")]
+def stabilityDist (sigma tau : Sigma) : ENNReal :=
+  ⨆ (E : C) (hE : ¬IsZero E), stabilityDistTerm sigma tau E hE

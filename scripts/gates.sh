@@ -229,6 +229,10 @@ changed_lean_files() {
 
 mathlib_style() {
   local files
+  # Known-answer fixtures first: they do not depend on the diff, and a branch
+  # that changes the checker can break what it rejects without changing a
+  # single .lean file.
+  python3 scripts/check_mathlib_style.py --self-test || return 1
   files="$(changed_lean_files | sort -u)"
   [ -z "$files" ] && return 0
   # --diff-only: judge the lines this branch wrote, not the pre-existing debt in

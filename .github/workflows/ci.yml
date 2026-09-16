@@ -260,6 +260,85 @@ jobs:
       run:
         shell: bash
     steps:
+      # LAKE'S CONCURRENCY IS CAPPED HERE, AND IT IS A MEMORY FIX RATHER THAN A
+      # TUNING KNOB. `LEAN_NUM_THREADS` sizes the Lean task pool that Lake's own
+      # build scheduler runs on, so it bounds how many `lean.exe` PROCESSES Lake
+      # spawns at once and not merely the threads inside each of them. Measured
+      # on this toolchain (v4.32.1) with a 24-module package whose every module
+      # is a 6-second `IO.sleep`, on the 16-core box these runners share:
+      #
+      #   LEAN_NUM_THREADS   wall clock   implied concurrent `lean.exe`
+      #   unset                 22s         16  (one per logical core)
+      #   8                     36s          8
+      #   4                     54s          4
+      #   2                    104s          2
+      #
+      # Uncapped that is one `lean.exe` per core PER JOB, and this box carries
+      # FOUR self-hosted runners: chris-win-main-runner (`owner-win-main`),
+      # chris-win-owner-runner (`owner-win`), and chris-win-owner-runner-2 and
+      # -3 (both labels). Four concurrent `build` jobs therefore asked for ~60
+      # Lean processes on 16 cores, each holding multiple GB of commit charge,
+      # and the pagefile is system-managed -- it grows REACTIVELY and so cannot
+      # absorb a step change. On 2026-09-15 the commit limit collapsed to ~74 GB
+      # against 2.9 GB free and the lane failed three separate ways in one
+      # evening:
+      #
+      #   * `build` jobs dying at ~10 minutes with ZERO step records and no log
+      #     at all -- the runner "lost communication with the server" -- on
+      #     agent/sf8-e14-0-dqc-coproducts, agent/sf9-e15-2-fppf-etale-stack-descent,
+      #     agent/mo1-12-gltilde-cover-split, agent/mo1-08-abelian-stability-slope
+      #     and agent/mo1-13-mass-planar-convex;
+      #   * `lean.exe` dying mid-build on `libc++abi: terminating due to uncaught
+      #     exception of type std::bad_alloc`, surfacing as `Lean exited with
+      #     code 3221226505` (0xC0000409) -- e.g. at module 5701 of 5850,
+      #     DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeCategory;
+      #   * elan failing at toolchain setup with `could not create link from
+      #     '...\.elan\bin\elan.exe' to '...\.elan\bin\lake.exe'`, because a
+      #     crashed job's processes had not been reaped yet.
+      #
+      # 4 threads x 4 runners = 16, exactly one `lean.exe` per logical core.
+      # CLAUDE.md already pins the owner's LOCAL builds to `LEAN_NUM_THREADS=2`
+      # for precisely this reason, so a local build during a merge burst adds
+      # two processes rather than sixteen; CI on the same machine had no
+      # equivalent cap, and that inconsistency is what this closes. Re-derive
+      # the number if a fifth runner is registered, if the machine's core count
+      # changes, or if the pagefile is given a fixed size large enough to make
+      # the uncapped shape survivable.
+      #
+      # WHY A STEP KEYED ON `runner.environment`, AND NOT A JOB-LEVEL `env:`.
+      # The obvious shape is a conditional job env keyed on the same expression
+      # `runs-on` uses, and it is a trap twice over. It copies the routing
+      # invariant into a second place that has to be kept in sync by hand, and
+      # -- measured, not assumed -- its `|| ''` branch does NOT unset the
+      # variable on ubuntu-latest: an EMPTY `LEAN_NUM_THREADS` is read as a
+      # request for a SINGLE thread. The same 24-module probe took 191s with
+      # `LEAN_NUM_THREADS=""` against 22s with it unset, i.e. fully serial. That
+      # would have made every `pull_request` run the slowest configuration
+      # available while reading in the diff as a no-op for the hosted lane.
+      #
+      # The branch is logged rather than written as a step-level `if:` because a
+      # silently-false `if:` is unfalsifiable from the run page -- the step just
+      # says "skipped", which is also what it would say if `runner.environment`
+      # were empty on some future runner version. Printing the decision makes
+      # the cap something a reader can confirm actually applied.
+      #
+      # `$GITHUB_ENV` publishes to SUBSEQUENT steps only (the same property
+      # recorded against the mfc venv further down), so this has to stay ahead
+      # of `lean-action`; being the first step is the cheapest way to keep it
+      # there.
+      - name: Cap Lake's concurrency on the self-hosted lane
+        env:
+          LANE: ${{ runner.environment }}
+        run: |
+          set -euo pipefail
+          echo "runner.environment=${LANE:-<empty>}"
+          if [ "${LANE:-}" = "self-hosted" ]; then
+            echo "LEAN_NUM_THREADS=4" >> "$GITHUB_ENV"
+            echo "capped Lake at 4 concurrent lean processes for the rest of this job"
+          else
+            echo "hosted runner: leaving LEAN_NUM_THREADS at its default"
+          fi
+
       - uses: actions/checkout@v4
         id: checkout
         with:
@@ -644,6 +723,14 @@ jobs:
         # console through scripts/_output.py, and reproduces the crash to prove
         # the helper prevents it.
         run: python3 scripts/_output.py
+
+      - name: Mathlib-style known-answer fixtures
+        # scripts/check_mathlib_style.py itself runs from the edit hook and from
+        # scripts/gates.sh, never here -- it judges a branch's own lines, which
+        # CI has no use for. Its fixtures are a different question: they are what
+        # says the checker still rejects what it is meant to reject, and a check
+        # that quietly stops firing is how #1359 reached the Lean parser.
+        run: python3 scripts/check_mathlib_style.py --self-test
 
       - name: Stability source independence
         run: python3 scripts/check_source_independence.py
