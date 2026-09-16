@@ -369,6 +369,104 @@ deliberately makes a conscious act. MO1.13 must first check what Mathlib
 already provides and prefer reusing it; a new top-level subject is authorized
 only if that check comes back empty, and is recorded here when it happens.
 
+**Implemented in #1356.**
+
+##### The Mathlib check, and the subject it authorized
+
+The check the scope warning demanded was run against the pinned revision
+(`520045ab14e2`) before any code moved. What Mathlib has, and what was reused:
+
+- `Mathlib.Geometry.Polygon.Basic` supplies `Polygon P n` -- a one-field
+  wrapper over `vertices : Fin n → P` in an affine space -- with `edgePath`,
+  `edgeSet`, `boundary` and two nondegeneracy predicates. It carries **no
+  metric content whatsoever**, so rebasing the carrier on it would import a
+  synonym for `Fin (n + 1) → ℂ` and supply none of the theory.
+- `InnerProductSpace ℝ ℂ`, `Complex.reCLM` and `Complex.imCLM` exist and are
+  already what `dotFunctional` and `crossFunctional` are built from.
+- `convexHull` and `convexHull_mono` exist and are already used.
+
+What Mathlib does not have, and what therefore has no owner to reuse: a
+polygonal-chain length or a perimeter of any kind -- `grep -ri perimeter`
+over all of `Mathlib/` returns zero files -- no `Path.length` and no
+arclength, only `eVariationOn`, which is the variation of a function and not
+the length of a chain; the perimeter comparison under containment of vertex
+hulls; and the support-fan turning-functional discrete integration by parts
+the proof runs on.
+
+The check therefore came back empty for the substantive content, and a new
+top-level subject is authorized. **The name is `Analysis`, not `Geometry`.**
+Mathlib is mid-migration on convexity: at the pinned revision
+`Mathlib/Geometry/Convex/Hull.lean` defines a *different* `Convexity.convexHull`
+over `ConvexSpace`, while the root-namespace `convexHull` this repository
+consumes is owned by `Mathlib/Analysis/Convex/Hull.lean`. Ownership follows the
+API actually being extended. The half-plane facts land beside it at
+`Analysis/Complex/`, mirroring `Mathlib/Analysis/Complex/UpperHalfPlane/`, so
+one subject covers both halves rather than two.
+
+`Analysis` is in `KNOWN_SUBJECTS` with the reason recorded at the constant.
+
+##### What moved, beyond the row's own scope
+
+Two files the owner map does not name had to move, because the acceptance
+criterion "the planar core imports no categories and no stability" cannot hold
+while the core's own hypotheses are stated with declarations that live inside
+the stability tree:
+
+- `semiClosedUpperHalfPlane` and `closedUpperHalfPlane` with their three
+  lemmas, out of the file MO1.08 has since renamed
+  `CategoryTheory/Abelian/Stability/Charge.lean`, to
+  `Analysis/Complex/HalfPlane.lean`. That file's own docstring had already
+  recorded this as the intended destination and named the only thing holding
+  it back -- a namespace change -- which standing decision 1 settles: the
+  namespace does not move.
+- The neutral first half of `PhaseGeometry.lean` (`phaseCross` and the
+  argument see-saw bounds) and all of `FiniteSums.lean`, to
+  `Analysis/Complex/PhaseGeometry.lean` and
+  `Analysis/Complex/PhaseFiniteSums.lean`. The `StabilityFunction` half of
+  `PhaseGeometry.lean`, which genuinely needs an abelian category, stayed and
+  now imports the neutral owner.
+
+  These two rows cross MO1.08 (#1319), which landed first and moved that whole
+  directory to `CategoryTheory/Abelian/Stability/`. The two moves agree rather
+  than compete: MO1.08's claim is that abelian stability needs no shift and no
+  t-structure, and rule 13 checks it; MO1.13's is that these particular
+  declarations need no *category*, which is a strictly stronger statement about
+  a strictly smaller set of files, and rule 14 checks that. The files MO1.13
+  takes are the ones for which the stronger claim holds; everything else stayed
+  where MO1.08 put it.
+
+`ComplexPolygonalPath.crossFunctional` and `phaseCross` are the same oriented
+determinant under two presentations, one bundled as a `ℂ →L[ℝ] ℝ` and one not.
+Putting them in one subject makes that visible; unifying them would rename a
+declaration and is not authorized here.
+
+##### The claim, and the gate that keeps it
+
+`scripts/check_layering.py` gained **rule 13**: no module below `Analysis/`
+reaches `DerivedAlgGeo.CategoryTheory`, `DerivedAlgGeo.AlgebraicGeometry`,
+`DerivedAlgGeo.Development`, `Mathlib.CategoryTheory` or
+`Mathlib.AlgebraicGeometry`, transitively. Without it the separation is a
+docstring, and one convenience import from a stability consumer erases it with
+every other gate still green -- the failure mode rule 9 exists for.
+
+The vacated paths are in `RETIRED_PATHS`:
+`StabilityCondition/Metric/Mass`, `StabilityCondition/Weak/Metric` (which held
+nothing but mass, so it was not kept as a one-child parent), and
+`CategoryTheory/Abelian/Stability/FiniteSums.lean` — the path MO1.08 had just
+created for it, vacated one step further because that file mentions no category
+at all. MO1.08's own parent entry covers where it lived before. No shims.
+
+`Metric/Mass/Subadditivity/PolygonPerimeter.lean` was named for the shape of
+its proof. Its Euclidean half is now
+`Analysis/Convex/ComplexPolygonalPath/Perimeter.lean` and its stability half is
+`Mass/Subadditivity/HNPolygonComparison.lean`, named for its subject. The
+Ikeda Lemma 3.7 and 3.8 citations travel with both halves, and the `t = 0`
+strengthenings each file records are restated verbatim where they apply.
+
+Scope guard honoured: the mass--Hom consumer #1185 keeps its theorem and its
+moduli input, and `StabilityCondition/MassHom/` is untouched except for the
+three import lines that follow mass to its new path.
+
 #### 10 -- Derived tensor and pushforward vs. Fourier--Mukai (#1321)
 
 | Relationship | Owner |

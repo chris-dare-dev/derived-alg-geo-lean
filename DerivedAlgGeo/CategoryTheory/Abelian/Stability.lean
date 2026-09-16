@@ -5,7 +5,6 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Basic
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Charge
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Cutoff
-import DerivedAlgGeo.CategoryTheory.Abelian.Stability.FiniteSums
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.HNPolygon
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.HarderNarasimhan
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.PhaseGeometry

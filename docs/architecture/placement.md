@@ -39,6 +39,7 @@ and future upstream work; matching directories is not required to import Mathlib
 | `HomogeneousLocalization` and graded algebras | `RingTheory/GradedAlgebra/` | `RingTheory/GradedAlgebra/` |
 | Modules, localization, graded modules, polynomials | `Algebra/Module/`, `Algebra/MvPolynomial/` | the same |
 | Lattices, bilinear forms, exterior powers, finite-dimensional lemmas | `LinearAlgebra/` | `LinearAlgebra/` |
+| Upper half-planes of `ℂ`, argument bounds, polygonal-path length and perimeter | `Analysis/Complex/`, `Analysis/Convex/` (no Mathlib owner: the pinned revision has no chain length and no perimeter) | `Analysis/Complex/`, `Analysis/Convex/ComplexPolygonalPath/` |
 | Euler characteristics of graded objects | `Algebra/Homology/EulerCharacteristic.lean` | `Algebra/Homology/EulerCharacteristic.lean` |
 | Alternating sums along finite exact sequences | `Algebra/Exact/Sequence.lean` | `Algebra/Exact/Sequence.lean` |
 | Schemes, `X.Modules`, `Proj`, morphism properties | `AlgebraicGeometry/` | `AlgebraicGeometry/`, with `ProjectiveSpectrum/` under Mathlib's name |

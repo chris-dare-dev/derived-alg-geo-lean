@@ -2,9 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.Triangle.MassAdditivity
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.Triangle.HeartShortExact
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.CohomologyExactness
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.Triangle.MassAdditivity
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.Triangle.HeartShortExact
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.CohomologyExactness
 
 /-!
 # The phase-one left endpoint through the six-term cohomology sequence

@@ -2,12 +2,12 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.Triangle.HeartObservable
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.Triangle.MassTransport
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.Triangle.MassAdditivity
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.Triangle.HeartShortExact
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.Triangle.PhaseOne
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.Triangle.Consequences
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.Triangle.HeartObservable
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.Triangle.MassTransport
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.Triangle.MassAdditivity
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.Triangle.HeartShortExact
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.Triangle.PhaseOne
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.Triangle.Consequences
 
 /-!
 # The Harder--Narasimhan mass-triangle chain
