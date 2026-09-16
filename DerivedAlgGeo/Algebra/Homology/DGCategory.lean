@@ -44,7 +44,14 @@ By definition site it therefore lives here, beside the homotopy category it
 enhances, and not under `CategoryTheory/Enriched/`. If the enriched encoding
 (ADR-0010 Option A′) lands, the subtree moves there in the same change.
 
-The triangulated category carried by `H⁰` of a pretriangulated dg category and
-the notion of a dg enhancement are exported separately from
-`DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement`.
+The triangulated category carried by `H⁰` of a pretriangulated dg category is
+owned here, under `DGCategory/Pretriangulated/H0/`: the shift, the distinguished
+triangles built from dg cones, the functorial cone diagrams, and the exactness
+of the functors `DGFunctor.h0` produces are intrinsic to the dg category and
+mention no other category.
+
+Comparing that structure with a *specified* ordinary or triangulated category is
+`DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement`, which owns both the
+underlying H⁰ presentation and its exact refinement. Nothing in this tree
+imports it.
 -/

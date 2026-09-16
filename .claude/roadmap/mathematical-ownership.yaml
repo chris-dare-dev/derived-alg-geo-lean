@@ -408,7 +408,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.09 — Own H⁰ constructions with DGCategory and make enhancement exactness explicit
-  status: planned
+  status: in_progress
   summary: 'Separate DGCategory’s intrinsic H⁰/shift/triangle/functor theory from the data comparing it
     with a chosen triangulated category. DG3 #854/#855 owns seam and exactness proofs. MO1 owns module
     placement and truthful comparison packaging; later DG4/DG5 consumers must see the distinction.'

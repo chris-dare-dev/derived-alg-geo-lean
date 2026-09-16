@@ -218,10 +218,24 @@ three uses of "perfect" (`schemePerfect`, `schemeRelativePerfect`,
   `extends` that is not there. If the enriched encoding (ADR-0010 Option A′)
   ever lands, the subtree moves under `CategoryTheory/Enriched/` in the same
   change.
-- A dg enhancement is a structure on an abstract triangulated category and
-  lives in `CategoryTheory/Triangulated/DGEnhancement/`. Its realization for
-  Mathlib's homotopy category lives with that object, in
-  `Algebra/Homology/HomotopyCategory/DGEnhancement/`.
+- The intrinsic `H⁰` theory of a pretriangulated dg category -- the zero
+  object, the shift, the distinguished triangles built from dg cones, the
+  functorial cone diagrams and the exactness of what `DGFunctor.h0` produces --
+  mentions no other category, so it lives with the dg encoding, in
+  `Algebra/Homology/DGCategory/Pretriangulated/H0/`. It imports no enhancement
+  consumer, scheme realization or stability module, and layering rule 13 keeps
+  that true (#1320).
+- Comparison with a *chosen* category lives in
+  `CategoryTheory/Triangulated/DGEnhancement/`. Two strengths are distinguished
+  and must not be conflated: `Enhancement` is the underlying **H⁰
+  presentation** -- a plain equivalence `H⁰ A ≌ T` with `T` an arbitrary
+  category -- and `Enhancement.Exact` is the refinement carrying the `CommShift`
+  and `Functor.IsTriangulated` compatibilities as data. The refinement is
+  supplied, not proved; `Cdg.enhancementExact` is its one inhabitant. No
+  declaration asserts uniqueness of enhancements in either strength.
+- The realization for Mathlib's homotopy category, and the proved agreement of
+  the two triangulated structures for the complexes model, live with that
+  object, in `Algebra/Homology/HomotopyCategory/DGEnhancement/`.
 - Monoidal and triangulated structures are independent; their compatibility
   class is `CategoryTheory/Monoidal/Triangulated.lean`, and geometric exact
   tensors instantiate it from geometry.
