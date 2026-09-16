@@ -50,6 +50,11 @@ than assumes, and injectivity of `transverse` is what turns `u ≠ 0` into
 coordinates; `mem_ampleCone_of_isAmpleCoefficients` is the bridge, so the file
 does not introduce a second unrelated notion of ampleness.
 
+`divisorialParameters` then bundles that cone into the core
+`DivisorialParameters`, which until now had a single inhabitant, at the smooth
+quadric.  A structure written to accept any geometry-specific ample cone had
+been carrying one geometry; the blow-up is the second.
+
 ## What is not claimed
 
 No scheme and no ample line bundle appear.  `ampleCone` is a subset of `ℝ³`
@@ -176,6 +181,24 @@ piece was not a cone but the certificate itself: no slice in the tree had one. -
 theorem antiCanonicalSlice_isGeometric : antiCanonicalSlice.IsGeometric ampleCone where
   __ := antiCanonicalSlice_isHodge
   H_ample := antiCanonical_mem_ampleCone
+
+/-! ### Charge parameters over the cone -/
+
+/-- **The second `DivisorialParameters` in the repository**, over the blow-up's
+own ample cone.
+
+`SmoothQuadricCharge.divisorialParameters` was the only one, so the structure
+that was written to carry *any* geometry-specific ample cone was carrying
+exactly one.  Nothing mathematical was missing here: `ampleCone` and
+`antiCanonical_mem_ampleCone` are already above, and the bundling is what the
+core API asks a geometric consumer to do.  `omega` is the anticanonical
+direction of `antiCanonicalSlice`, so these parameters and the slice describe
+the same polarization; the `B`-field stays arbitrary, because ampleness
+constrains `omega` alone. -/
+def divisorialParameters (b : Divisor) : DivisorialParameters ampleCone where
+  B := b
+  omega := numericalRealization.realizePolarization antiCanonicalPolarization
+  omega_ample := antiCanonical_mem_ampleCone
 
 /-! ### The wall family of the slice -/
 
