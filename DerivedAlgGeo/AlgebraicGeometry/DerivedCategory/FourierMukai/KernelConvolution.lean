@@ -2,7 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.DerivedTensorCoherence
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Coherent
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Relative
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelCorrespondence
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Convolution
 
 /-!

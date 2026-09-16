@@ -333,16 +333,70 @@ only if that check comes back empty, and is recorded here when it happens.
 
 | Relationship | Owner |
 | --- | --- |
-| Definition owner | the derived-tensor and derived-pushforward capabilities move to geometry-level owners under `AlgebraicGeometry/DerivedCategory/`; the coherent derived-tensor capability follows them out of the Fourier--Mukai subtree |
-| Neutral core | the purely functorial correspondence -- three ordinary categories, a pull functor, a bifunctor and a push functor -- may get a categorical owner; this is explicitly the *less* urgent half |
+| Definition owner | the derived-tensor capability owns `AlgebraicGeometry/DerivedCategory/Tensor/`, in three tiers; the derived-pushforward capability moved into the existing owner of derived direct images, `Families/DerivedPushforward.lean`; the coherent derived-tensor capability followed them out of the Fourier--Mukai subtree |
+| Neutral core | **declined, with the reason recorded below**: the ordinary-category `Correspondence` has no consumer outside the Fourier--Mukai subtree, so rule 2 resolves it to staying where it is |
 | Application adapter | Fourier--Mukai keeps correspondences, kernels, convolution, units, adjoints and theorems about transforms |
 | Comparison owner | unchanged |
+
+**Landed 2026-09-15** in #1321.
 
 These records are **supplied capabilities, not constructed operations in full
 generality**, and the move must not read as construction: `Dᵇ(Coh X)` is not
 automatically closed under arbitrary derived tensor on a singular scheme.
-"Abstract Fourier--Mukai formalism" is a defensible subject name, so the
-categorical rename is optional and may be declined with that reason recorded.
+
+##### What moved, and the three tiers
+
+| Tier | Module | Capability |
+| --- | --- | --- |
+| Unbounded | `DerivedCategory/Tensor/Unbounded.lean` | the K-flat tensor bifunctor on complexes of module sheaves, **constructed** from a supplied resolution; formerly `DerivedCategory/KFlatTensor.lean` |
+| Bounded coherent | `DerivedCategory/Tensor/BoundedCoherent.lean` | `HasDerivedTensor`, with two-slot exactness |
+| Bounded coherent, monoidal | `DerivedCategory/Tensor/Coherent.lean` | `HasCoherentDerivedTensor`, mapping one way into the tier above |
+| Relative | `DerivedCategory/Tensor/Relative.lean` | `HasMonoidalDerivedPullback` |
+| Pushforward | `DerivedCategory/Families/DerivedPushforward.lean` | `HasDerivedPushforward` |
+
+The tiers are separate because they are not each other's restrictions. The
+unbounded bifunctor does **not** restrict to `Dᵇ(Coh Z)` -- that is the missing
+theorem, not the definition -- so the bounded coherent tiers stayed contracts.
+The same reason kept `HasDerivedPushforward` unconnected to the exact
+`HasCoherentPushforward` beside it, which finite morphisms do inhabit: deriving
+one from the other is mathematics, and rule 5 forbids a relocation that
+discharges a hypothesis. Nothing in this row constructs a derived tensor or a
+derived pushforward, and no scheme acquired either.
+
+Kernel-specific material stayed: the projection formula, flat base change,
+convolution, the compositor and adjunction data, the unit kernel and the
+dualizing twist are theorems *about transforms*. `geometricCorrespondence`
+stayed too, now purely an assembly of three inputs it no longer owns.
+
+DT1 (#892, #928--#931) keeps ownership of tensor inhabitation; its constructors
+and resolution interface were not recreated, only re-homed with their
+declaration names unchanged. #795/#796 keep transform equivalence and the
+adjoint obligations, and SF8 #554 keeps arbitrary pullback.
+
+##### The independent consumer
+
+`DerivedCategory/TwistedPushforward.lean` builds `Rf_*(K ⊗^L -)` from the tensor
+and pushforward capabilities and nothing else. Its two imports reach neither
+`FourierMukai` nor the stability tree, which is the rule-2 justification for the
+`Tensor/` root and the demonstration the acceptance asked for. The audit slice
+`scripts/AlgebraicGeometryAudit/DerivedOperations.lean` has the same property:
+the capability records now elaborate in a file that cannot see a kernel.
+
+##### Why the categorical rename was declined
+
+Rule 2 needs a named independent consumer for a new carrier. The ordinary-category
+`Correspondence` qualifies on the mathematics -- every declaration in
+`CategoryTheory/Triangulated/FourierMukai/Basic.lean` outside its closing `Exact`
+section needs three plain categories and no triangulated structure at all -- but
+it fails on the consumer: the only modules importing that file are the abstract
+and geometric Fourier--Mukai subtrees themselves. A neutral `KernelTransform`
+owner would be the speculative common carrier the row forbids.
+
+"Abstract Fourier--Mukai formalism" is a defensible subject name, and this row
+already allowed the rename to be declined for that reason. It is declined. If a
+consumer outside the lane appears, the split is a later, separately justified
+change; the mathematical finding that the structure needs no triangulation is
+recorded here so it does not have to be rediscovered.
 
 #### 11 -- Flatness and relative perfection out of the moduli consumer (#1322)
 

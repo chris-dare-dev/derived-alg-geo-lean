@@ -290,6 +290,18 @@ RETIRED_PATHS = (
     "AlgebraicGeometry/Numerical/Examples/Fourfold/ProjectiveSpace.lean",
     "AlgebraicGeometry/Numerical/GrothendieckGroup/CentralCharge.lean",
     "AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalCharge.lean",
+    # 2026-09-15 MO1.10: the derived-tensor and derived-pushforward
+    # capabilities are about a derived category, not about transforms, so they
+    # left the Fourier--Mukai subtree. `HasDerivedTensor` and the coherent
+    # monoidal root moved to AlgebraicGeometry/DerivedCategory/Tensor/, which
+    # the unbounded K-flat tensor joined so the three tiers sit under one
+    # owner; `HasDerivedPushforward` moved to
+    # AlgebraicGeometry/DerivedCategory/Families/DerivedPushforward.lean,
+    # beside the exact coherent pushforward it is the weaker sibling of.
+    # FourierMukai keeps correspondences, kernels, convolution, units and
+    # adjoints.
+    "AlgebraicGeometry/DerivedCategory/KFlatTensor.lean",
+    "AlgebraicGeometry/DerivedCategory/FourierMukai/DerivedTensorCoherence.lean",
 )
 
 

@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Bifunctor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.KFlatTensor
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Unbounded
 
 /-!
 # K-flat derived tensor on `Dqc`

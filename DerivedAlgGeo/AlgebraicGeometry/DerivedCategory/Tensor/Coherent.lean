@@ -4,31 +4,50 @@ Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Monoidal.Functor
 import DerivedAlgGeo.CategoryTheory.Monoidal.Triangulated
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelCorrespondence
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedCoherent
 
 /-!
 # Coherent derived tensor products
 
-`HasDerivedTensor` is the Fourier--Mukai input for a bifunctor exact in both
-variables.  Kernel composition needs additional monoidal coherence.
-In particular, independently choosing an associator and two unitors does not
-say that different routes through a fourfold tensor product agree.
+`HasDerivedTensor` is the bare capability of `Tensor/BoundedCoherent.lean`: a bifunctor
+exact in both variables.  Consumers that rebracket or unitalize need more.  In
+particular, independently choosing an associator and two unitors does not say that
+different routes through a fourfold tensor product agree.
 
-`HasCoherentDerivedTensor` is the stable root for consumers that rebracket or
-unitalize derived tensor products.  It packages the tensor as a Mathlib
-`MonoidalCategory`, so naturality, the pentagon, and the triangle are fields of
-one structure rather than unrelated theorem-specific capabilities.  Its
-`ExactBifunctor` field retains the complete two-slot exactness and Koszul shift
-coherence used by Fourier--Mukai transforms and kernel variation.
+`HasCoherentDerivedTensor` is the stable root for those consumers.  It packages the
+tensor as a Mathlib `MonoidalCategory`, so naturality, the pentagon, and the triangle are
+fields of one structure rather than unrelated theorem-specific capabilities.  Its
+`ExactBifunctor` field retains the complete two-slot exactness and Koszul shift coherence
+used by Fourier--Mukai transforms and kernel variation.
 
 The instance below is the one-way migration adapter
 
 `HasCoherentDerivedTensor -> HasDerivedTensor`.
 
-There is intentionally no adapter in the other direction: a raw bifunctor is
-not promoted to coherent data.  Raw instances remain useful for intermediate
-realizations that only construct a single transform, but public convolution,
-associativity, and unit APIs require this coherent root.
+There is intentionally no adapter in the other direction: a raw bifunctor is not promoted
+to coherent data.  Raw instances remain useful for intermediate realizations that only
+construct a single transform, but public convolution, associativity, and unit APIs
+require this coherent root.
+
+## Still a supplied capability
+
+Coherence is *more* to supply, not less.  Nothing here inhabits either class, and
+extending `MonoidalCategory` does not make `Dᵇ(Coh Z)` closed under derived tensor; on a
+singular `Z` it is not.  A caller instantiating `HasCoherentDerivedTensor` asserts the
+closure and the coherence together.
+
+## Placement
+
+MO1.10 (#1321) extracted this file's contents from
+`DerivedCategory/FourierMukai/DerivedTensorCoherence.lean`, splitting the relative tier --
+strong monoidality of derived pullback along a morphism -- into `Tensor/Relative.lean`.
+Per the cutover ledger's standing decision that paths move and namespaces do not, the
+declarations keep the `AlgebraicGeometry.DerivedCategory.FourierMukai` namespace they
+were introduced with.
+
+## References
+
+* `docs/architecture/cutover-ledger.md`, row 10.
 -/
 
 universe u
@@ -149,56 +168,6 @@ theorem coherentDerivedTensor_triangle (Z : SchemeBaseChange S)
         X ◁ (λ_ Y).hom =
       (ρ_ X).hom ▷ Y :=
   MonoidalCategory.triangle X Y
-
-/-- Derived pullback as a strong monoidal functor.
-
-Mathlib's `Functor.Monoidal` root includes the tensorator and unit comparison,
-their naturality, associativity and unitality laws, and proofs that the lax and
-oplax maps are inverse. Thus tensor and unit compatibility cannot be selected
-independently at each theorem site. -/
-class HasMonoidalDerivedPullback {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [HasCoherentPullback f] [HasCoherentDerivedTensor T]
-    [HasCoherentDerivedTensor U]
-    extends (boundedCoherentDerivedPullback f).Monoidal
-
-/-- Strong monoidality in the orientation consumed by the kernel ledgers:
-`f*(K ⊗ -) ≅ f*K ⊗ f*(-)`. -/
-def monoidalDerivedPullbackTensorIso {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [HasCoherentPullback f] [HasCoherentDerivedTensor T]
-    [HasCoherentDerivedTensor U] [HasMonoidalDerivedPullback f]
-    (K : SchemeBoundedCoherentDerivedCategory U.left) :
-    (derivedTensor U).obj K ⋙ boundedCoherentDerivedPullback f ≅
-      boundedCoherentDerivedPullback f ⋙
-        (derivedTensor T).obj ((boundedCoherentDerivedPullback f).obj K) :=
-  (Functor.Monoidal.commTensorLeft (boundedCoherentDerivedPullback f) K).symm
-
-/-- The pullback of the source unit acts as a left unit, derived from the
-strong monoidal unit comparison and the target left unitor. -/
-def monoidalDerivedPullbackLeftUnitor {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [HasCoherentPullback f] [HasCoherentDerivedTensor T]
-    [HasCoherentDerivedTensor U] [HasMonoidalDerivedPullback f] :
-    (derivedTensor T).obj
-        ((boundedCoherentDerivedPullback f).obj (coherentDerivedTensorUnit U)) ≅
-      𝟭 (SchemeBoundedCoherentDerivedCategory T.left) :=
-  (derivedTensor T).mapIso
-      (Functor.Monoidal.εIso (boundedCoherentDerivedPullback f)).symm ≪≫
-    coherentDerivedTensorLeftUnitor T
-
-/-- The pullback of the source unit acts as a right unit, derived from the
-strong monoidal unit comparison and the target right unitor. -/
-def monoidalDerivedPullbackRightUnitor {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [HasCoherentPullback f] [HasCoherentDerivedTensor T]
-    [HasCoherentDerivedTensor U] [HasMonoidalDerivedPullback f] :
-    (derivedTensor T).flip.obj
-        ((boundedCoherentDerivedPullback f).obj (coherentDerivedTensorUnit U)) ≅
-      𝟭 (SchemeBoundedCoherentDerivedCategory T.left) :=
-  (derivedTensor T).flip.mapIso
-      (Functor.Monoidal.εIso (boundedCoherentDerivedPullback f)).symm ≪≫
-    coherentDerivedTensorRightUnitor T
 
 /-- A coherent geometric derived tensor realizes the generic compatibility
 interface between monoidal and triangulated structure from

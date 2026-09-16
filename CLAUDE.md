@@ -101,7 +101,7 @@ Three consequences follow, and each retires a former convention.
 
 - **There are no `Instances/` directories below a generic subject.** Mathlib
   has none. The instance of `IsCompatibleWithTriangulation` for `Dᵇ(Coh X)`
-  sits in `AlgebraicGeometry/DerivedCategory/FourierMukai/DerivedTensorCoherence.lean`
+  sits in `AlgebraicGeometry/DerivedCategory/Tensor/Coherent.lean`
   beside the class it registers; the scheme realizations of the stability
   family interfaces sit under `AlgebraicGeometry/Moduli/` and
   `AlgebraicGeometry/DerivedCategory/Stability/`. The former
@@ -113,7 +113,7 @@ Three consequences follow, and each retires a former convention.
   family, and carries stability conditions. Inside an object directory, files
   are named by the structure they add, as Mathlib's `ModuleCat/` has
   `Abelian.lean`, `Monoidal/`, and `Limits.lean`. So
-  `AlgebraicGeometry/DerivedCategory/{Coherent,Dqc,Families,FourierMukai,Stability}`,
+  `AlgebraicGeometry/DerivedCategory/{Coherent,Dqc,Families,Tensor,FourierMukai,Stability}`,
   never `AlgebraicGeometry/Triangulated/DerivedCategory/`.
 - **Directory nesting records names, not dependency direction.** Mathlib's
   `MetricSpace/Defs.lean` imports its own child `MetricSpace/Pseudo/Defs.lean`.
@@ -196,8 +196,10 @@ names the derived categories of module sheaves, with the standard
 `D(Coh X)`, `Dᵇ(Coh X)`, and `Perf(X)` without importing families, pullback,
 or moduli; `Dqc.lean` owns the quasicoherent-cohomology locus and its
 canonical zero for every scheme; `Families/` owns scheme base change and
-pullback; `FourierMukai/` owns neutral kernels and convolution; `Stability/`
-owns the three consumers that need stability conditions.
+pullback and the supplied derived pushforward; `Tensor/` owns the derived
+tensor product in its unbounded, bounded-coherent and relative tiers;
+`FourierMukai/` owns neutral kernels and convolution and consumes all of those;
+`Stability/` owns the three consumers that need stability conditions.
 
 The identifications `Dᵇ(Coh X) ≃ Dᵇ_coh(Dqc X)` and `Perf(X) = Dqc(X)^c`
 remain explicit propositions. `Dqc/Comparison.lean` consumes supplied

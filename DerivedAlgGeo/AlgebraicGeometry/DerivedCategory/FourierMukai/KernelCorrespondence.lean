@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
-import DerivedAlgGeo.CategoryTheory.Triangulated.ExactFunctorFamily
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedCoherent
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPushforward
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Basic
 
 /-!
@@ -22,28 +22,37 @@ named class with a docstring, nothing is constructed, and the payoff is that
 `geometricCorrespondence` assembles a genuine `Correspondence` from exactly
 those inputs and no others. The gap becomes enumerated instead of implicit.
 
+## Where the inputs live
+
+Since MO1.10 (#1321) this file **assembles** the correspondence and **owns none of its
+three inputs**. Each is a general derived-category capability with its own owner, usable
+with no kernel, no product and no transform in scope:
+
+* **Derived pullback**, as a contract rather than a construction:
+  `HasCoherentPullback f` supplies the coherent-sheaf pullback together with
+  exactness and the derived lift, and `boundedCoherentDerivedPullback` is the
+  functor on `Dᵇ(Coh)` obtained from it
+  (`Families/BoundedGeometry.lean`, `Families/CoherentPullback.lean`).
+* **Derived tensor**: `HasDerivedTensor Z`, at
+  `DerivedCategory/Tensor/BoundedCoherent.lean`. Its monoidal refinement is
+  `Tensor/Coherent.lean` and its relative pullback compatibility is
+  `Tensor/Relative.lean`; the unbounded K-flat tensor is `Tensor/Unbounded.lean` and does
+  not restrict to the bounded coherent one.
+* **Derived pushforward**: `HasDerivedPushforward f`, at
+  `Families/DerivedPushforward.lean`, beside the exact coherent pushforward it is the
+  weaker sibling of. This is where *properness* enters: pushforward preserves coherence
+  only under a properness hypothesis.
+
+`DerivedCategory/TwistedPushforward.lean` is the demonstration that the tensor and
+pushforward capabilities stand on their own: it builds `Rf_*(K ⊗^L -)` importing neither
+this file nor anything else in the Fourier--Mukai subtree.
+
 ## What already exists
 
 * `SchemeBoundedCoherentDerivedCategory X = Dᵇ(Coh X)` for locally Noetherian
   `X`, with `Perf(X)` inside it (`BoundedGeometry`).
-* **Derived pullback**, as a contract rather than a construction:
-  `HasCoherentPullback f` supplies the coherent-sheaf pullback together with
-  exactness and the derived lift, and `boundedCoherentDerivedPullback` is the
-  functor on `Dᵇ(Coh)` obtained from it. So the `pull` slot is *already*
-  reducible to an existing named obligation.
 * Base-change witnesses and relative Harder--Narasimhan machinery
   (`GeometricBaseChange`, `FiniteTypeGeometry`), none of which this file needs.
-
-## What does not exist, and is named here
-
-* **Derived pushforward.** Nothing in the repository defines `Rq_*` on derived
-  categories; a search for one finds only a docstring in
-  `TStructure/Exactness.lean` describing its t-exactness. This is where
-  *properness* enters: pushforward preserves coherence only under a properness
-  hypothesis, and `HasDerivedPushforward` is where a caller discharges it.
-* **Derived tensor product.** Likewise absent. `Modules/Tensor/Basic.lean` tensors
-  invertible sheaves and `Modules/` tensors module sheaves; neither is `⊗^L` on
-  `Dᵇ(Coh)`.
 
 ## What this ledger deliberately does *not* require
 
@@ -90,198 +99,6 @@ open AlgebraicGeometry
 open SchemeBaseChange
 
 variable {S : Scheme.{u}}
-
-section Pushforward
-
-/-- **Derived pushforward along `f`, supplied.**
-
-The `Rq_*` slot of a Fourier--Mukai correspondence, and the one where
-*properness* lives: pushforward preserves coherence only for a proper morphism,
-so a caller discharging this class is asserting exactly that much geometry.
-
-Deliberately stated directly on `Dᵇ(Coh)` rather than, as `HasCoherentPullback`
-does, on `Coh` with a derived lift. The reason is asymmetry in the mathematics,
-not convenience: pullback of a coherent sheaf is coherent, so the sheaf-level
-functor exists and the derived one is induced; pushforward of a coherent sheaf
-is *not* coherent in general, and there is no sheaf-level functor to induce
-from. The derived functor is the primitive object here. -/
-class HasDerivedPushforward {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left] where
-  /-- The derived pushforward on bounded coherent derived categories. -/
-  derivedPushforward :
-    SchemeBoundedCoherentDerivedCategory T.left ⥤
-      SchemeBoundedCoherentDerivedCategory U.left
-  /-- It is additive. -/
-  additive : derivedPushforward.Additive
-  /-- It commutes with the shift. -/
-  commShift : derivedPushforward.CommShift ℤ
-  /-- It is triangulated.  Together with `commShift` this is the exactness the
-  Fourier--Mukai transform needs of its `push` constituent. -/
-  isTriangulated : derivedPushforward.IsTriangulated
-
-/-- The derived pushforward functor, named. -/
-def derivedPushforward {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [HasDerivedPushforward f] :
-    SchemeBoundedCoherentDerivedCategory T.left ⥤
-      SchemeBoundedCoherentDerivedCategory U.left :=
-  HasDerivedPushforward.derivedPushforward f
-
-instance derivedPushforward_additive {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [HasDerivedPushforward f] : (derivedPushforward f).Additive := by
-  dsimp [derivedPushforward]
-  exact HasDerivedPushforward.additive
-
-instance derivedPushforwardCommShift {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [HasDerivedPushforward f] : (derivedPushforward f).CommShift ℤ := by
-  dsimp [derivedPushforward]
-  exact HasDerivedPushforward.commShift
-
-instance derivedPushforward_isTriangulated {T U : SchemeBaseChange S} (f : T ⟶ U)
-    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
-    [HasDerivedPushforward f] : (derivedPushforward f).IsTriangulated := by
-  dsimp [derivedPushforward]
-  exact HasDerivedPushforward.isTriangulated
-
-end Pushforward
-
-section Tensor
-
-/-- **Derived tensor product on `Dᵇ(Coh Z)`, supplied.**
-
-The `⊗^L` slot.  Stated as a bifunctor, matching `Correspondence.tensor`, so
-that `tensor.obj K` is "twist by the kernel `K`".  Its exactness is packaged
-once as an `ExactBifunctor`: both partial tensor functors are exact, the shift
-comparisons are natural in the fixed variable, and the two shift directions
-satisfy Mathlib's Koszul compatibility law.
-
-This two-slot contract is what kernel variation actually needs.  A fixed
-Fourier--Mukai transform consumes exactness in the second tensor variable,
-whereas varying the kernel and taking its cone consumes exactness in the first.
-Independent one-slot witnesses would not supply the required global
-naturality.
-
-No monoidal structure is asked for: not associativity, not symmetry, not a
-unit.  `Correspondence` uses none of them, and `FourierMukai/Basic.lean`'s own
-docstring is explicit that it assumes none. -/
-class HasDerivedTensor (Z : SchemeBaseChange S) [IsLocallyNoetherian Z.left] where
-  /-- The derived tensor bifunctor. -/
-  derivedTensor :
-    SchemeBoundedCoherentDerivedCategory Z.left ⥤
-      SchemeBoundedCoherentDerivedCategory Z.left ⥤
-        SchemeBoundedCoherentDerivedCategory Z.left
-  /-- Exactness and coherent shift behavior in both tensor variables. -/
-  exact : Functor.ExactBifunctor derivedTensor
-
-namespace HasDerivedTensor
-
-variable {Z : SchemeBaseChange S} [IsLocallyNoetherian Z.left]
-  [HasDerivedTensor Z]
-
-/-- The exact-bifunctor witness selected by the derived tensor contract. -/
-def exactBifunctor : Functor.ExactBifunctor (HasDerivedTensor.derivedTensor (Z := Z)) :=
-  HasDerivedTensor.exact
-
-/-- Exactness of the family obtained by varying the first (kernel) input. -/
-noncomputable def firstFamily :
-    Functor.ExactFamily (HasDerivedTensor.derivedTensor (Z := Z)) :=
-  exactBifunctor |>.firstFamily
-
-/-- Exactness of the family obtained by varying the second input. -/
-noncomputable def secondFamily :
-    Functor.ExactFamily (HasDerivedTensor.derivedTensor (Z := Z)).flip :=
-  exactBifunctor |>.secondFamily
-
-/-- A fixed first input gives a shift-coherent partial tensor functor. -/
-@[reducible] noncomputable def commShift
-    (K : SchemeBoundedCoherentDerivedCategory Z.left) :
-    ((HasDerivedTensor.derivedTensor (Z := Z)).obj K).CommShift ℤ :=
-  exactBifunctor |>.secondCommShift K
-
-/-- A fixed first input gives a triangulated partial tensor functor. -/
-theorem isTriangulated (K : SchemeBoundedCoherentDerivedCategory Z.left) :
-    letI := commShift K
-    ((HasDerivedTensor.derivedTensor (Z := Z)).obj K).IsTriangulated :=
-  exactBifunctor |>.secondTriangulated K
-
-/-- A fixed first input gives an additive partial tensor functor. -/
-theorem additive (K : SchemeBoundedCoherentDerivedCategory Z.left) :
-    ((HasDerivedTensor.derivedTensor (Z := Z)).obj K).Additive := by
-  letI := commShift K
-  letI := isTriangulated K
-  infer_instance
-
-/-- A fixed second input gives a shift-coherent partial tensor functor. -/
-@[reducible] noncomputable def flipCommShift
-    (E : SchemeBoundedCoherentDerivedCategory Z.left) :
-    ((HasDerivedTensor.derivedTensor (Z := Z)).flip.obj E).CommShift ℤ :=
-  exactBifunctor |>.firstCommShift E
-
-/-- A fixed second input gives a triangulated partial tensor functor. -/
-theorem flipIsTriangulated (E : SchemeBoundedCoherentDerivedCategory Z.left) :
-    letI := flipCommShift E
-    ((HasDerivedTensor.derivedTensor (Z := Z)).flip.obj E).IsTriangulated :=
-  exactBifunctor |>.firstTriangulated E
-
-/-- A fixed second input gives an additive partial tensor functor. -/
-theorem flipAdditive (E : SchemeBoundedCoherentDerivedCategory Z.left) :
-    ((HasDerivedTensor.derivedTensor (Z := Z)).flip.obj E).Additive := by
-  letI := flipCommShift E
-  letI := flipIsTriangulated E
-  infer_instance
-
-end HasDerivedTensor
-
-/-- The derived tensor bifunctor, named. -/
-def derivedTensor (Z : SchemeBaseChange S) [IsLocallyNoetherian Z.left]
-    [HasDerivedTensor Z] :
-    SchemeBoundedCoherentDerivedCategory Z.left ⥤
-      SchemeBoundedCoherentDerivedCategory Z.left ⥤
-        SchemeBoundedCoherentDerivedCategory Z.left :=
-  HasDerivedTensor.derivedTensor
-
-instance derivedTensor_additive (Z : SchemeBaseChange S) [IsLocallyNoetherian Z.left]
-    [HasDerivedTensor Z] (K : SchemeBoundedCoherentDerivedCategory Z.left) :
-    ((derivedTensor Z).obj K).Additive := by
-  dsimp [derivedTensor]
-  exact HasDerivedTensor.additive K
-
-noncomputable instance derivedTensorCommShift (Z : SchemeBaseChange S)
-    [IsLocallyNoetherian Z.left]
-    [HasDerivedTensor Z] (K : SchemeBoundedCoherentDerivedCategory Z.left) :
-    ((derivedTensor Z).obj K).CommShift ℤ := by
-  dsimp [derivedTensor]
-  exact HasDerivedTensor.commShift K
-
-instance derivedTensor_isTriangulated (Z : SchemeBaseChange S) [IsLocallyNoetherian Z.left]
-    [HasDerivedTensor Z] (K : SchemeBoundedCoherentDerivedCategory Z.left) :
-    ((derivedTensor Z).obj K).IsTriangulated := by
-  dsimp [derivedTensor]
-  exact HasDerivedTensor.isTriangulated K
-
-noncomputable instance derivedTensorFlipCommShift (Z : SchemeBaseChange S)
-    [IsLocallyNoetherian Z.left] [HasDerivedTensor Z]
-    (E : SchemeBoundedCoherentDerivedCategory Z.left) :
-    ((derivedTensor Z).flip.obj E).CommShift ℤ := by
-  dsimp [derivedTensor]
-  exact HasDerivedTensor.flipCommShift E
-
-instance derivedTensorFlip_isTriangulated (Z : SchemeBaseChange S)
-    [IsLocallyNoetherian Z.left] [HasDerivedTensor Z]
-    (E : SchemeBoundedCoherentDerivedCategory Z.left) :
-    ((derivedTensor Z).flip.obj E).IsTriangulated := by
-  dsimp [derivedTensor]
-  exact HasDerivedTensor.flipIsTriangulated E
-
-/-- The derived tensor bifunctor with its exactness in both variables exposed. -/
-noncomputable def derivedTensorExactBifunctor (Z : SchemeBaseChange S)
-    [IsLocallyNoetherian Z.left] [HasDerivedTensor Z] :
-    Functor.ExactBifunctor (derivedTensor Z) :=
-  HasDerivedTensor.exactBifunctor
-
-end Tensor
 
 section Assembly
 
@@ -362,8 +179,8 @@ variable (X Y Z : SchemeBaseChange S)
 /-- **The geometric transform is triangulated.**
 
 `FourierMukai.transform_isTriangulated` at the geometric correspondence — the
-first statement that the assembled transform is exact, and the thing the six
-instances above exist to make statable. -/
+first statement that the assembled transform is exact, and the thing the
+exactness instances of the three capability owners exist to make statable. -/
 theorem geometricTransform_isTriangulated
     (K : SchemeBoundedCoherentDerivedCategory Z.left) :
     ((geometricCorrespondence X Y Z p q).transform K).IsTriangulated :=
@@ -401,6 +218,11 @@ ledger would have to name:
 None of those is stated here.  Similarly, a `UnitKernelData` would need `𝒪_Δ`
 along the diagonal, and a `DualKernel` the derived dual `P^∨ ⊗ p^*ω[dim]` —
 both geometric, both absent.
+
+Those are kernel-specific, and MO1.10 deliberately left them here rather than moving them
+to the general owners: the projection formula, convolution, and the compositor and
+adjunction data are theorems *about transforms*, not capabilities a general derived
+tensor or pushforward consumer would ask for.
 -/
 
 end AlgebraicGeometry.DerivedCategory.FourierMukai
