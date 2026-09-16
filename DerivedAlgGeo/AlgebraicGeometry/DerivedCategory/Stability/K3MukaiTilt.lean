@@ -4,10 +4,10 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialMukai
-import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan
+import DerivedAlgGeo.AlgebraicGeometry.Stability.Slope.HarderNarasimhan
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Assembly
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakHNTransport
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakSlopeOrder
+import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.HNTransport
+import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.SlopeOrder
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Signature
 
 /-!

@@ -83,6 +83,23 @@ open CategoryTheory.Triangulated
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineTildeDerivedFunctor
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineTildeDerivedHomologyIso
 
+/-! ## Coproducts in the affine quasi-coherent realization (#528)
+
+The abelian coproducts are the ambient ones, created by the inclusion into
+`(Spec R).Modules`; their exactness is transported across the tilde equivalence and
+is affine-only. Nothing here claims unbounded essential surjectivity, compact
+generation, or `S`-linearity. -/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentSheavesHasExactCoproducts
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentSheavesInclusion_preservesCoproductsOfShape
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedCategory_hasCoproductsOfShape
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentQ_preservesCoproductsOfShape
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentHomologyFunctor_preservesCoproductsOfShape
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineTildeDerivedFunctor_preservesCoproductsOfShape
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineGammaDerivedFunctor_preservesCoproductsOfShape
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedInclusion_preservesCoproductsOfShape
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedToDqc_preservesCoproductsOfShape
+
 /-! ## Relative-perfect and universally-gluable scheme objects (#521)
 
 Pseudo-coherence, local finite Tor amplitude over a base, relative

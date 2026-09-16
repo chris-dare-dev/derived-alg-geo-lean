@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Analysis.Convex.ComplexPolygonalPath.Perimeter
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.HNPolygon
+import DerivedAlgGeo.CategoryTheory.Abelian.Stability.HNPolygon
 
 /-!
 # Perimeter comparison for Harder--Narasimhan polygons

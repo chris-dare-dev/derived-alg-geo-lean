@@ -19,9 +19,9 @@ quantifies over complex numbers.
 
 ## Placement
 
-These declarations were the first half of
-`StabilityCondition/Weak/Foundation/StabilityFunction/PhaseGeometry.lean`,
-whose second half -- the `StabilityFunction` see-saw for a short exact sequence
+These declarations were the first half of what MO1.08 (#1319) has since
+renamed `CategoryTheory/Abelian/Stability/PhaseGeometry.lean`, whose second
+half -- the `StabilityFunction` see-saw for a short exact sequence
 -- needs an abelian category and stayed there, importing this file. MO1.13
 (#1324) made the split because the Euclidean core of the mass-subadditivity
 proof rests on these bounds and is required to be importable with no category

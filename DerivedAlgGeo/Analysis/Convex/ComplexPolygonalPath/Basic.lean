@@ -28,9 +28,10 @@ against, and the supporting-hyperplane form of strict clockwise convexity.
 ## Placement
 
 This is neutral planar geometry and imports no category theory and no
-stability. It was the `ComplexPolygonalPath` block of
-`StabilityCondition/Weak/Foundation/StabilityFunction/HNPolygon.lean` until
-MO1.13 (#1324); nothing in it mentions an object, a filtration or a stability
+stability -- which is why it is not under `CategoryTheory/Abelian/Stability/`,
+where MO1.08 (#1319) placed the rest of that directory. It was the
+`ComplexPolygonalPath` block of what is now
+`CategoryTheory/Abelian/Stability/HNPolygon.lean` until MO1.13 (#1324); nothing in it mentions an object, a filtration or a stability
 function, and the Harder--Narasimhan *reading* of these statements -- that the
 vertices are subobject charges and the edges are semistable-factor charges --
 is the adapter that stayed behind in `HNPolygon.lean`.

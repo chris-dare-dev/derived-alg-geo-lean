@@ -12,7 +12,9 @@ This file extends the neutral phase-geometry API in
 `Analysis/Complex/PhaseGeometry.lean` from binary sums to nonempty finite sums,
 and records the determinant formulations the HN-polygon proofs use.
 
-Nothing here is categorical or stability-theoretic. It sat under
+Nothing here is categorical or stability-theoretic -- which is exactly why it
+is not under `CategoryTheory/Abelian/Stability/`, where MO1.08 (#1319) placed
+the rest of that directory. It sat under
 `StabilityCondition/Weak/Foundation/StabilityFunction/` until MO1.13 (#1324),
 which moved it so that the Euclidean core of the mass-subadditivity proof could
 reach these bounds without reaching stability. Declaration names and the

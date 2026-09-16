@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.AlgebraicGeometry.Modules.Tilde
+import Mathlib.Algebra.Category.ModuleCat.AB
 import Mathlib.CategoryTheory.Abelian.Transfer
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc
 
@@ -45,6 +46,25 @@ the proved tilde equivalence with modules over the coordinate ring. -/
 noncomputable instance affineQuasicoherentSheavesAbelian
     (R : CommRingCat.{u}) : Abelian (AffineQuasicoherentSheaves R) :=
   abelianOfEquivalence (tildeEquiv (R := R)).inverse
+
+/-- **Affine quasi-coherent sheaves satisfy AB4 at each indexing type**:
+`ι`-indexed coproducts are exact.
+
+The coproducts themselves are not transported — they are the ambient ones,
+created by the inclusion into `(Spec R).Modules`
+(`quasicoherentSheavesInclusion_createsCoproductsOfShape`, arbitrary scheme,
+no hypotheses).  Exactness is what the tilde equivalence supplies, from
+`AB4 (ModuleCat R)`, and it is affine-only: on a general scheme the
+quasi-coherent subcategory is not abelian, so there is no AB4 statement there
+to prove or to assume.
+
+This is the missing abelian-side input to coproducts in the affine
+quasi-coherent derived category: `DerivedCategory.hasCoproductsOfShape` asks
+for `HasExactColimitsOfShape (Discrete ι)`, not merely for the coproducts. -/
+noncomputable instance affineQuasicoherentSheavesHasExactCoproducts
+    (R : CommRingCat.{u}) (ι : Type u) :
+    HasExactColimitsOfShape (Discrete ι) (AffineQuasicoherentSheaves R) :=
+  HasExactColimitsOfShape.of_codomain_equivalence (Discrete ι) (tildeEquiv (R := R))
 
 attribute [local instance] HasDerivedCategory.standard
 
