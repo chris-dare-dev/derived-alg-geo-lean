@@ -1,6 +1,6 @@
 ---
 name: land-pr
-description: Run one unattended landing iteration — take the base of the open PR stack, rebase it, gate it locally, review it, push fixes, mark it ready, then stop. Never merges. Pair with /loop.
+description: Run one unattended landing iteration — take the base of the open PR stack, rebase it, pre-flight it with scripts/precheck.sh, review it, push for the CI gate verdict, mark it ready, then stop. Never merges. Pair with /loop.
 ---
 
 # One landing iteration
@@ -19,24 +19,34 @@ along one chain. Two consequences drive everything below:
   unreviewable commit. Merging the base makes the next PR's diff collapse to its
   own slice.
 - **The queue is CI-bound, not review-bound.** One 90-minute build job serialises
-  28 PRs. Local gates answer the same question in minutes, so never wait on
-  GitHub CI — gate locally and let CI confirm afterwards.
+  28 PRs, and there is no way around that: the verdict comes from the
+  self-hosted Windows runners and nowhere else. What you *can* do locally is
+  fail fast — `scripts/precheck.sh` answers the cheap half in seconds, so a
+  typo never costs a 90-minute round trip. It is not a verdict. See step 3.
+
+  This section used to say "never wait on GitHub CI — gate locally and let CI
+  confirm afterwards", and steps 3 and 4 below told you to run
+  `scripts/gates.sh`. The `PreToolUse` hook in `.claude/settings.json` refuses
+  that command in every mode, so the instruction could not be followed: every
+  iteration hit a blocked hook at the step this skill calls its definition of
+  done, and no iteration ever produced a gate verdict at all.
 
 ## 0a. This skill needs its own tooling on `main`
 
 `gh pr checkout` puts you on a branch cut before this tooling existed, so
-`scripts/gates.sh`, `scripts/check_mathlib_style.py`, and the edit hook are all
-absent there until the tooling commit is on `main` and the PR has been rebased.
+`scripts/precheck.sh`, `scripts/check_mathlib_style.py`, and the edit hook are
+all absent there until the tooling commit is on `main` and the PR has been
+rebased.
 
 Check first:
 
 ```bash
-git ls-tree origin/main --name-only scripts/gates.sh
+git ls-tree origin/main --name-only scripts/precheck.sh scripts/check_mathlib_style.py
 ```
 
-Empty output? Stop: land the tooling PR before running this loop. Running the
-gates from another branch's copy works for a one-off dry run but leaves the
-branch's own edits ungated, which is the opposite of the point.
+Fewer than two lines? Stop: land the tooling PR before running this loop.
+Running the checks from another branch's copy works for a one-off dry run but
+leaves the branch's own edits ungated, which is the opposite of the point.
 
 ## 0. Refuse to start if the tree is dirty
 
@@ -132,21 +142,41 @@ If the rebase cannot be resolved without guessing at mathematical intent, abort
 it (`git rebase --abort`), comment on the PR with the exact conflicting hunks,
 and halt. Do not guess.
 
-## 3. Gate locally
+## 3. Pre-flight locally — this is not the verdict
 
 ```bash
-scripts/gates.sh fast   # build, style, both axiom audits — minutes
-scripts/gates.sh        # everything CI runs, once fast is green
+scripts/precheck.sh
 ```
 
-A failing gate is the iteration's work, not a reason to weaken the gate. The
-usual failures on this queue, in order of frequency:
+Seconds, not minutes. It runs every gate that needs no Lean build — workflows,
+style on this branch's own lines, source-independence, layering, umbrella
+coverage, root reachability, coherent families, coverage map, pin, nolints,
+roadmap, and the two hook tests — then a **targeted** `lake build` of the
+modules the branch changed.
+
+**Do not run `scripts/gates.sh`.** The `PreToolUse` hook refuses it in any
+mode, because its `build` gate is the whole-library build that cost a developer
+three hours on 2026-08-27. `DAG_ALLOW_LOCAL_BUILD=1` exists for a genuinely
+unavailable runner and nothing else; using it is a reportable event, so say so
+in the verdict comment if you do.
+
+**What `precheck.sh` cannot tell you**, and what therefore has to come from the
+runners in step 5: the library build, all three axiom audits, the
+audit-completeness ratchet, `runLinter`/`lint-style`, the warning ratchet, the
+emitter and its coverage check, the `exe` sorry sweep, and the `mfc` contract
+tooling. A clean precheck is a *cheap* green, not a green.
+
+A failing check is the iteration's work, not a reason to weaken it. The usual
+failures on this queue, in order of frequency:
 
 - a new public theorem missing from `scripts/StabilityConditionAudit.lean`,
-  `scripts/AlgebraicGeometryAudit.lean`, or `scripts/DGCategoryAudit.lean`;
-- `check_source_independence.py` rejecting a retired or external source root;
+  `scripts/AlgebraicGeometryAudit.lean`, or `scripts/DGCategoryAudit.lean`
+  — **CI only**, so read the branch diff for new `theorem`/`def` lines and add
+  the records before you push rather than learning it 90 minutes later;
+- `check_source_independence.py` rejecting a retired or external source root
+  — precheck catches this;
 - convention errors the edit hook would have caught had the branch been written
-  with it installed. Fix them; they are one-line fixes.
+  with it installed — precheck catches these. Fix them; they are one-line fixes.
 
 Never introduce a `sorry` to get a gate green. If the branch already contains
 one, that is a `NEEDS REWORK` verdict, not something to work around.
@@ -158,22 +188,60 @@ Run the `mathlib-reviewer` agent over `git diff origin/main...HEAD`. Apply its
 that does not transcribe its statement, a docstring that restates the signature.
 Leave anything requiring mathematical judgement for the PR comment.
 
-## 5. Push and report
+## 5. Push, and take the verdict from the runners
+
+The push **is** the gate run: `ci.yml` triggers on `push` to `main` and
+`agent/**`, and routes it to `["self-hosted", "owner-win"]`.
 
 ```bash
 git push --force-with-lease
+gh run list --branch "$(git branch --show-current)" --workflow ci.yml \
+  --limit 1 --json databaseId,url --jq '.[0]'
+```
+
+Then wait on it:
+
+```bash
+gh run watch <databaseId> -R chris-dare-dev/derived-alg-geo-lean --exit-status
+```
+
+**Bound the wait.** One build job serialises the whole queue, so a run can sit
+queued for longer than this iteration is worth. If the run has not *started*
+within about ten minutes, stop waiting: post the verdict comment with the run
+URL and the precheck result, leave the PR as it is, and halt. The next
+iteration re-reads the queue and will find the finished run.
+
+To re-run the gate without pushing again — after a label change, or when a run
+was cancelled by the concurrency group:
+
+```bash
+gh workflow run ci.yml --ref "$(git branch --show-current)"
+```
+
+Then report:
+
+```bash
 gh pr comment <N> -R chris-dare-dev/derived-alg-geo-lean --body "<verdict>"
 ```
 
-The verdict comment states, in this order: which gates passed locally and at
-what commit, what you fixed, what you left for a human and why, and the
-reviewer's verdict with finding counts by severity.
+The verdict comment states, in this order: the head commit it was written
+against; that `scripts/precheck.sh` was clean locally (naming it, not
+"the gates"); the CI run URL and its conclusion, or that the run was still
+queued when the iteration halted; what you fixed; what you left for a human and
+why; and the reviewer's verdict with finding counts by severity. If you used
+`DAG_ALLOW_LOCAL_BUILD=1` for anything, say so here.
 
-If the PR is a draft and every gate passed and the reviewer said `MERGE`:
+Never write "gates pass" on the strength of a local run. Precheck is fifteen of
+the thirty-odd gates and none of the expensive ones.
+
+If the PR is a draft, **the CI run concluded green**, and the reviewer said
+`MERGE`:
 
 ```bash
 gh pr ready <N> -R chris-dare-dev/derived-alg-geo-lean
 ```
+
+A queued or failed run is not a green run. Leave the PR in draft and say why.
 
 ## 6. Halt
 

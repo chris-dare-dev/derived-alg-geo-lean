@@ -138,7 +138,8 @@ block. The self-hosted Windows runner's console is cp1252, and a gate that
 prints a declaration name such as `chi₂_eq` without this dies with a `charmap`
 traceback instead of its finding (#868, #869). `python3 scripts/_output.py`
 checks every script for the call and reproduces the crash to prove the helper
-prevents it; it runs first in `scripts/gates.sh` and in CI.
+prevents it; it runs near the front of `scripts/gates.sh`, of
+`scripts/precheck.sh`, and in CI.
 
 ## Where verification runs
 
@@ -156,6 +157,20 @@ This is enforced rather than advised. A `PreToolUse` hook in the tracked
 `scripts/gates.sh` in any mode and refuses `lake build` with no target.
 `DAG_ALLOW_LOCAL_BUILD=1` overrides it for one command; say so in the pull
 request when you use it.
+
+For a local pre-flight that the hook allows, run:
+
+```bash
+scripts/precheck.sh
+```
+
+It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
+`--diff-only` style on your own lines, source-independence, layering, umbrella
+coverage, root reachability, coherent families, coverage map, pin, nolints,
+roadmap, and the two hook tests — then a targeted `lake build` of the modules
+you changed. Seconds, not minutes. It is a cheap green, not a green: the
+library build, the audits, the ratchets, the linters and the emitter all need
+the library elaborated and run on the runners.
 
 This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate
@@ -177,8 +192,10 @@ lake env lean scratch.lean
 seconds-long probe interactive proof work depends on, and a push per attempt
 would make writing a lemma impractical.
 
-`scripts/gates.sh` remains the definition of what CI runs — read it to know what
-will be checked — but let the runners run it.
+`scripts/gates.sh` remains the readable list of what is checked — read it, with
+the caveat in the next section that it is neither a subset nor a superset of CI
+— but let the runners run it. Reading it is allowed: the hook refuses running
+the file, not `cat`, `grep`, `diff` or `git ls-tree` over it.
 
 The full gate includes:
 
@@ -188,18 +205,39 @@ The full gate includes:
 - roadmap/tracker agreement, when `gh` is available;
 - repository-wide emission and `sorryAx` coverage checks.
 
-**A green `scripts/gates.sh` is not a green CI.** The containment runs one way:
-every gate in the script also runs in CI, but CI runs more than the script does.
-CI's `Contract gates` step additionally runs the `mfc` contract tooling —
-`validate`, `env`, `bundle`, `lint`, and `check-ilean-coverage` against the
-pinned registry — from a virtualenv it builds per run, and the script does not
-reproduce any of it. Expect to learn about those failures from CI.
+**Neither list contains the other.** This file used to say the containment ran
+one way — "every gate in the script also runs in CI" — and that was false in
+both directions.
 
-This file previously called the script "the complete CI-equivalent gate". It was
-not, and the difference is not academic: a roadmap entry left at `planned` after
-its issue closed reddened CI on `main` and on every open pull request while
-`scripts/gates.sh` stayed green on all of them. The `roadmap` gate above closes
-that particular hole; the `mfc` steps remain CI-only.
+CI has what the script does not: the `Contract gates` step runs the `mfc`
+contract tooling — `validate`, `env`, `bundle`, `lint`, and
+`check-ilean-coverage` against the pinned registry — from a virtualenv it builds
+per run, and the script reproduces none of it. Expect to learn about those
+failures from CI. A green `scripts/gates.sh` is not a green CI.
+
+The script has what no workflow does. Verified against `ci.yml`,
+`cache-warm.yml`, `docs.yml` and `trust-guard.yml` on 2026-09-16:
+
+| Gate | Why it is not in CI |
+| --- | --- |
+| `workflows` | a workflow too invalid to parse is too invalid to run the job that would check it |
+| `trust-guard` | a pull request cannot be trusted to run the check that decides whether it is trusted |
+| `local-build` | tests a `PreToolUse` hook, which exists only on a developer's machine |
+| `mathlib-style` | is the edit hook's checker over the branch diff — a pre-push linter by design |
+| `emit-build` | runs in `cache-warm.yml` instead; linking is expensive cold and cannot happen on Windows at all |
+| `single-instantiation` | **omission, not design.** Fixed by PR #1355 |
+
+The first five are local by construction and `scripts/precheck.sh` runs four of
+them. `single-instantiation` was local by accident, and the cost of the wrong
+sentence above is on the record: once the hook made `scripts/gates.sh`
+unrunnable, that gate ran nowhere for anyone, and `bb8a1278` records 24 generic
+abstractions that drifted to at most one inhabitant with nothing going red.
+
+The same failure shape has now happened twice. A roadmap entry left at `planned`
+after its issue closed reddened CI on `main` and on every open pull request
+while `scripts/gates.sh` stayed green on all of them; the `roadmap` gate closed
+that hole. Both times the gap was invisible because a summary sentence claimed
+coverage the files did not have. Verify the list before citing it.
 
 For a focused audit run:
 
