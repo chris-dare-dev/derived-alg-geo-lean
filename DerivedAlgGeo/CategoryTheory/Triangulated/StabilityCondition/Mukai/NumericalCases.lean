@@ -2,14 +2,20 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+<<<<<<< HEAD
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Charge
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.PhaseGeometry
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
+=======
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Charge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.PhaseGeometry
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Positivity
+>>>>>>> 0addb0f9 (refactor(charge): move the real-Mukai charge bridge out of the quadratic extension (#1315))
 
 /-!
 # The four cases of Lemma 6.2, at the level of the charge
 
-`ChargePositivity.lean` proves the two analytic facts Bridgeland's Lemma 6.2
+`CentralCharge/Mukai/Positivity.lean` proves the two analytic facts Bridgeland's Lemma 6.2
 (`math/0307164`, §6) needs: `im_expCharge_pos` for the cases that stay off the
 real axis, and `re_expCharge_pos_of_nonneg` / `re_expCharge_pos_of_neg_one` for
 the boundary. Neither says anything about `semiClosedUpperHalfPlane`, which is
@@ -25,7 +31,7 @@ tilted heart. In the boundary case `E` is torsion-free with `μ_ω(E) = β·ω`,
 `E ∈ F(β)` and the object of `𝒜(β,ω)` is **`E⟦1⟧`**, whose class is `-v(E)` and
 whose charge is `-Z(E)`.
 
-So `ChargePositivity` concluding `Re Z(E) > 0` is exactly what puts the *heart
+So `CentralCharge/Mukai/Positivity` concluding `Re Z(E) > 0` is exactly what puts the *heart
 object* on the negative real axis, which is the `{z | z.im = 0 ∧ z.re < 0}` half
 of `semiClosedUpperHalfPlane`. The two apparent reversals cancel. Getting this
 backwards yields a false statement that compiles, which is why the shifted cases

@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.RealForm
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.ComplexPairingSignature
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Chart
 
 /-!
 # `Z(β,ω)` on the Mukai extension
@@ -24,6 +25,19 @@ wall statement, belongs to downstream stability modules.
 
 `V` is an arbitrary real bilinear space; no geometry is asserted, and `v(E)` for
 an object `E` is not defined here.
+
+## Why this path
+
+This file used to sit in `LinearAlgebra/Lattice/Mukai/`, which put a central
+charge inside the quadratic extension it is computed on and let geometry consume
+a stability construction without declaring the edge. `expCharge` is
+`PeriodDomain.centralCharge` -- the neutral paired functional of
+`QuadraticForm/ComplexPairing.lean`, unchanged -- specialised at `realForm` and
+at the exponential frame, so it is an application adapter and belongs with the
+numerical central-charge construction. `neg_of_expCharge_eq_zero` and
+`expCharge_ne_zero_of_nonneg` are the comparison half: the charge kernel against
+the sign of `realForm`. They remain the kernel statement only;
+`Weak/Support/Predicate/Quadratic.lean` still owns the full support criterion.
 -/
 
 open QuadraticMap

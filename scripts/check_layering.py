@@ -189,9 +189,19 @@ STABILITY_CONSUMING_GEOMETRY = (
     f"{GEOMETRY}.Numerical.Examples.Surface",
     f"{GEOMETRY}.Numerical.Examples.Threefold",
     f"{GEOMETRY}.Numerical.Examples.Fourfold",
-    # The single K-theoretic charge adapter; the lattice, Euler-pairing,
-    # discriminant and Mukai-vector modules beside it are neutral.
+    # The two K-theoretic charge adapters; the lattice, Euler-pairing,
+    # discriminant and Mukai-vector modules beside them are neutral.
+    #
+    # `CentralChargeK3` joined this list on 2026-09-15 with MO1.04's chart row
+    # (#1315), and it is a fact that changed rather than an exemption bought to
+    # pass a gate. `numericalCharge` is `Mukai.expCharge` precomposed with
+    # `extendMap` and the Mukai vector: it was always a charge adapter. It only
+    # read as neutral because `Mukai.expCharge` was sitting in
+    # `LinearAlgebra/Lattice/Mukai/`, which let geometry consume a stability
+    # construction without declaring the edge. Moving the charge to its owner
+    # under `CentralCharge/` is what made the existing dependency visible.
     f"{GEOMETRY}.Numerical.GrothendieckGroup.CategoricalChargeK3",
+    f"{GEOMETRY}.Numerical.GrothendieckGroup.CentralChargeK3",
     f"{GEOMETRY}.Numerical.Stability",
     # `AlgebraicGeometry/Stability/` was the third entry here until MO1.08
     # (#1319). It instantiates a slope theory, but that theory is abelian and
@@ -340,6 +350,17 @@ RETIRED_PATHS = (
     "AlgebraicGeometry/Stability/Gieseker/HilbertPolynomial.lean",
     "AlgebraicGeometry/Stability/Gieseker/Coefficients.lean",
     "AlgebraicGeometry/Stability/Gieseker/HarderNarasimhan",
+    # 2026-09-15 MO1.04: the real-Mukai-to-charge bridge left the quadratic
+    # extension. The exponential chart, the charge built on it and its boundary
+    # positivity are central-charge construction and moved to
+    # `CentralCharge/Mukai/`; the integral comparison moved to
+    # `AlgebraicGeometry/Numerical/Mukai/Integral.lean`. `RealForm.lean` stays:
+    # it is upstream of the neutral charge root `BilinearForm/HodgeIndex.lean`
+    # and could not follow the chart.
+    "LinearAlgebra/Lattice/Mukai/CentralCharge.lean",
+    "LinearAlgebra/Lattice/Mukai/ChargePositivity.lean",
+    "LinearAlgebra/Lattice/Mukai/ExponentialOrientation.lean",
+    "LinearAlgebra/Lattice/Mukai/IntegralBridge.lean",
 )
 
 
