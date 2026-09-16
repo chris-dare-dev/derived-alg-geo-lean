@@ -148,7 +148,8 @@ until their implementing cutovers add the corresponding checks.
   the subcomponents that exist to consume it: `DerivedCategory/Stability/`,
   `Moduli/{HarderNarasimhan,Semistability}/`, `Numerical/Stability/`,
   `Numerical/Examples/{Surface,Threefold,Fourfold}/`,
-  `Numerical/GrothendieckGroup/CategoricalCharge/` and `Stability/Gieseker/`.
+  `Numerical/GrothendieckGroup/CategoricalChargeK3.lean` and
+  `Stability/Gieseker/`.
   Everything else below `AlgebraicGeometry/` is stability-neutral, transitively
   included. A same-named umbrella over one of those subcomponents is exempt as
   an umbrella, and its other children are not. The
@@ -158,6 +159,14 @@ until their implementing cutovers add the corresponding checks.
   and cohomology importable without Bridgeland stability. The list was narrowed
   from the four blanket subtrees on 2026-09-13 (MO1.01, #1312); see
   `docs/architecture/cutover-ledger.md`.
+- **A numerical model is not a demonstration.** `Numerical/Models/` owns the
+  formal rank-degree-coordinate models -- ring, grading, degree map, Chern and
+  Todd coefficients. `Numerical/Examples/` owns the realization maps, charges
+  and walls demonstrated on them and imports `Models/`, never the reverse. The
+  named surface models share `Models/Surface/RankOne.lean` and import no
+  sibling; the arbitrary-divisor-rank charge is a sibling input of the
+  exponential kernel, not a child of the scalar `H`-degree compression
+  (MO1.06, #1317).
 - **Weak stability is independent of Bridgeland stability**, and
   `PreStabilityCondition` structurally extends `WeakPreStabilityCondition`.
 - **Retired paths stay retired.** The gate carries the list.

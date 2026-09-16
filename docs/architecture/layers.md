@@ -42,7 +42,8 @@ complete mathematical ownership policy.
    `Moduli/Semistability/`, `Numerical/Stability/`,
    `Numerical/Examples/Surface/`, `Numerical/Examples/Threefold/`,
    `Numerical/Examples/Fourfold/`,
-   `Numerical/GrothendieckGroup/CategoricalCharge/` and `Stability/Gieseker/`.
+   `Numerical/GrothendieckGroup/CategoricalChargeK3.lean` and
+   `Stability/Gieseker/`.
    A same-named umbrella over one of them re-exports it and is exempt as an
    umbrella only; its other children are not. This keeps `Dᵇ(Coh X)`, `Dqc`,
    coherent sheaves, and cohomology importable without Bridgeland stability.
@@ -51,6 +52,8 @@ complete mathematical ownership policy.
    modules to excuse the 60 that use the tree; MO1.01 (#1312) narrowed it.
    `Numerical/Examples/Fourfold/` was neutral at that moment and stopped being
    so the same day, when #1225 gave the fourfold models their wall families.
+   MO1.06 (#1317) made the three `Numerical/Examples/` entries exact by moving
+   the formal models to `Numerical/Models/`, which is held neutral.
 4. **Weak stability is independent of Bridgeland stability.** No module of the
    weak theory imports the Bridgeland theory, and
    `PreStabilityCondition` structurally `extends toWeak :
@@ -60,18 +63,28 @@ complete mathematical ownership policy.
 6. **A new top-level subject is deliberate.** A directory directly below the
    source root must be one of the Mathlib subjects the repository uses, named
    in the gate's `KNOWN_SUBJECTS`.
+7. **A numerical model is not a demonstration.** `Numerical/Models/` holds
+   formal rank--degree--coordinate models -- a ring, a grading, a degree map,
+   Chern and Todd coefficients -- and reaches neither the stability tree nor
+   `Numerical/Examples/`, which owns the realization maps, charges and walls
+   built on them. The four named surface models share one carrier and import
+   no sibling, and the arbitrary-divisor-rank charge reaches the exponential
+   kernel without passing through the scalar `H`-degree compression. MO1.06
+   (#1317).
 
 ## Component boundaries and coverage limits
 
 New generic roots must not import their specializations or downstream
 comparisons, including transitively through umbrellas. The stability exemption
 does not authorize such imports. Since 2026-09-13 it is also no longer broad:
-rule 3 names eight subcomponents, so `Numerical/Core/`, `Numerical/Mukai/`,
-`Numerical/RiemannRoch/` and `Numerical/Specializations/` are mechanically
-held to being separate from the charge and geometric comparison consumers
-rather than only asked to be. What the gate still cannot see is a parent
-importing its own specialization *inside* an exempt subcomponent; that stays a
-review obligation until #1316 and #1317 split those subtrees.
+rule 3 names nine subcomponents, so `Numerical/Core/`, `Numerical/Mukai/`,
+`Numerical/RiemannRoch/`, `Numerical/Specializations/` and `Numerical/Models/`
+are mechanically held to being separate from the charge and geometric
+comparison consumers rather than only asked to be. #1316 and #1317 split the
+numerical subtrees, so seven of those nine entries are now exact: every module
+below them reaches the stability tree. A parent importing its own
+specialization *inside* `Numerical/Stability/` or `Stability/Gieseker/`, the
+two that still mix, stays a review obligation.
 The gate's hard-coded divisorial root is a source location to migrate in
 #1313, not a rule that charge construction must remain in Walls.
 
@@ -101,8 +114,13 @@ Moduli
   └─ PerfectComplex, Quot                             stability-neutral
 Numerical
   ├─ Stability                                        may import the stability tree
-  ├─ Examples/Surface, Examples/Threefold             may import the stability tree
-  ├─ GrothendieckGroup/CategoricalCharge              may import the stability tree
+  ├─ Examples/{Surface,Threefold,Fourfold}            realizations, charges and walls
+                                                        demonstrated on a model; every
+                                                        module here imports the tree
+  ├─ GrothendieckGroup/CategoricalChargeK3            may import the stability tree
+  ├─ Models                                           formal rank-degree-coordinate
+                                                        models; stability-neutral, and
+                                                        upstream of Examples
   └─ Core, Mukai, RiemannRoch, Specializations        stability-neutral
 Stability
   └─ Gieseker                                         may import the stability tree

@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.Slope
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.K3
 
 /-! # The slope API on the rank-one K3 model -/
 

@@ -46,7 +46,7 @@ statement carry it even when unused.
   that duality as `DerivedStatement` realization data rather than as a
   theorem, so neither geometric consequence is available at the pin. A
   separate numerical shadow now exists in
-  `Numerical/Examples/Surface/Enriques.lean`, including a degree-one witness
+  `Numerical/Models/Surface/Enriques.lean`, including a degree-one witness
   of `td₁ = 0` and `∫td₂ = 1`; no bridge from that numerical model to a
   geometric `Scheme` or to `IsEnriquesSurface` is claimed.
 * **It does not construct the K3 double cover.** The 2-torsion class

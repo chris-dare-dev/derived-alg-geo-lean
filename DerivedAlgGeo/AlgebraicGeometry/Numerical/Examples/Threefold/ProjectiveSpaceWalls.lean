@@ -2,14 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Threefold.ProjectiveSpace
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Threefold.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.ThreefoldWallTransport
 
 /-!
 # The threefold wall transport, on `ℙ³`
 
 `Stability/ThreefoldWallTransport.lean` carries a polarised threefold class into
-the four-coordinate `(α, β)` charge plane, and `Examples/Threefold/ProjectiveSpace.lean`
+the four-coordinate `(α, β)` charge plane, and `Models/Threefold/ProjectiveSpace.lean`
 builds the `ℙ³` model.  Nothing connected them: the model was referenced only
 inside its own file, and no polarization was defined for it at all.  So the
 threefold charge arithmetic had no worked example, exactly as the surface

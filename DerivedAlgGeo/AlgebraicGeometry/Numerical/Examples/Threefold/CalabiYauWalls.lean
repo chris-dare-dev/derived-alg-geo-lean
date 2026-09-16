@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Threefold.CalabiYau
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Threefold.CalabiYau
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.ThreefoldWallTransport
 
 /-!

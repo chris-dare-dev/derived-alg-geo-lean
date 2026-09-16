@@ -295,7 +295,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.06 — Distinguish numerical models, named surface cases and geometric realizations
-  status: blocked
+  status: done
   summary: 'Organize reusable Numerical/Examples material as mathematical models and put variety-specific
     realizations beneath the common numerical construction. Follows MO1.05’s comparison split; coordinates
     CA1 #1225. The classification includes naming, import owners and realization maps, not a new numerical
@@ -313,7 +313,7 @@ items:
   - area:algebraic-geometry
   - type:refactor
   - sev:medium
-  - blocked
+  - ready
   acceptance:
   - Classify each current Examples file as a reusable model, a comparison or an actual worked example;
     move the first two to subject owners, leaving Examples for demonstrations.

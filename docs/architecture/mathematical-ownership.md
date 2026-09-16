@@ -125,6 +125,16 @@ higher dimension does not by itself identify the entire numerical ring with
 powers of the polarization. Reusable models belong to their subject, with
 `Examples` reserved for demonstrations and realizations stated explicitly.
 
+**Implemented by #1317.** `Numerical/Models/` owns the formal
+rank-degree-coordinate models; `Numerical/Examples/` owns the realization maps,
+charges and walls demonstrated on them, and every module there reaches the
+stability tree. The four named surface models share `Models/Surface/RankOne.lean`
+and import no sibling. The Enriques model is titled as the polarisation slice
+it is, and the dimension-general ring is `Models/MonogenicRing.lean`, named for
+the generated-by-`H` hypothesis it actually uses rather than for Picard rank
+one. K3-only charge adapters carry a `K3` suffix. Layering rule 12 keeps all of
+that true.
+
 ## Independent foundations in the other subjects
 
 - **Linear Serre theory and Yoneda:** basic Hom-duality and linear
@@ -201,9 +211,10 @@ The current scripts enforce only their named rules. The stability exemption is
 named by subcomponent rather than by top-level subtree since 2026-09-13, with
 regression fixtures for the first named component edge; even so, neither it nor
 the hard-coded divisorial owner certifies that every numerical root is
-independent or well placed, because four of the eight exempt subcomponents
-still mix modules that reach the stability tree with modules that do not. The
-remaining component boundaries are review obligations until their source
+independent or well placed. Five of the nine exempt subcomponents mixed
+modules that reach the stability tree with modules that do not; after MO1.05
+and MO1.06 two still do -- `Numerical/Stability/` and `Stability/Gieseker/`.
+Those two component boundaries are review obligations until their source
 cutover adds the focused checks and regression fixtures. `check_single_instantiation.py` has a scoped search;
 absence of a finding is not the two-consumer justification.
 

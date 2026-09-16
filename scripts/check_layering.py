@@ -50,6 +50,14 @@ nothing else checks.
    the claim MO1.07 (#1318) moved those files to make true, and it is the kind
    of claim that decays silently: one convenience import from a triangulated
    consumer and the root is no longer importable without a shift.
+12. **A numerical model is not a demonstration, and not a scheme.**
+   ``Numerical/Models/`` holds formal rank-degree-coordinate models: a ring, a
+   grading, a degree map, Chern and Todd coefficients. It reaches neither the
+   stability tree nor ``Numerical/Examples/``, which owns the realization maps,
+   charges and walls built on those models. The named surface models are
+   siblings over one shared carrier, and the arbitrary-divisor-rank charge
+   demonstrations reach the shared exponential kernel without passing through
+   the scalar ``H``-degree compression. This is MO1.06 (#1317).
 7. **The ``ObjectProperty`` lift block stays at its carrier's path.**
    ``CategoryTheory/ObjectProperty/Lift.lean`` declares all six of
    it and imports nothing from ``DerivedAlgGeo``; no other module redeclares
@@ -143,8 +151,12 @@ STABILITY_CONSUMING_GEOMETRY = (
     # is now held to that.
     f"{GEOMETRY}.Moduli.HarderNarasimhan",
     f"{GEOMETRY}.Moduli.Semistability",
-    # Numerical models that carry charge and wall calculations. Dimension-zero
-    # and rank-one examples do not, and are held to that.
+    # The numerical demonstrations: realization maps, charges, walls, slices
+    # and regions instantiated on a model. Every module below these three
+    # entries reaches the stability tree, and MO1.06 (#1317) is what made that
+    # true -- the formal rank-degree-coordinate models they are built on moved
+    # to `Numerical/Models/`, which is deliberately absent from this list and
+    # is therefore held stability-neutral by rule 3.
     #
     # The fourfold leaves were in that neutral group when #1328 narrowed this
     # list, and they left it the same day: #1225 gave `ℙ⁴` and the sextic their
@@ -155,7 +167,7 @@ STABILITY_CONSUMING_GEOMETRY = (
     f"{GEOMETRY}.Numerical.Examples.Fourfold",
     # The single K-theoretic charge adapter; the lattice, Euler-pairing,
     # discriminant and Mukai-vector modules beside it are neutral.
-    f"{GEOMETRY}.Numerical.GrothendieckGroup.CategoricalCharge",
+    f"{GEOMETRY}.Numerical.GrothendieckGroup.CategoricalChargeK3",
     f"{GEOMETRY}.Numerical.Stability",
     # Stability of sheaves: slope and Gieseker theory on `Coh X`, whose whole
     # purpose is to instantiate the abstract slope theory, so it necessarily
@@ -256,6 +268,28 @@ RETIRED_PATHS = (
     "Algebra/Category/ModuleCat/Sheaf/ExteriorPower.lean",
     "AlgebraicGeometry/Cohomology/Quasicoherent",
     "AlgebraicGeometry/Divisors/ExteriorPower.lean",
+    # 2026-09-15 MO1.06: formal rank-degree-coordinate models moved out of the
+    # example leaves into AlgebraicGeometry/Numerical/Models/, and the two
+    # K3-only charge adapters took a visibly K3 filename. Examples/ keeps the
+    # realizations, charges and walls built on those models.
+    "AlgebraicGeometry/Numerical/Examples/RankOne.lean",
+    "AlgebraicGeometry/Numerical/Examples/DimensionZero",
+    "AlgebraicGeometry/Numerical/Examples/Surface/RankOne.lean",
+    "AlgebraicGeometry/Numerical/Examples/Surface/K3.lean",
+    "AlgebraicGeometry/Numerical/Examples/Surface/K3Mukai.lean",
+    "AlgebraicGeometry/Numerical/Examples/Surface/K3MukaiIntegral.lean",
+    "AlgebraicGeometry/Numerical/Examples/Surface/Abelian.lean",
+    "AlgebraicGeometry/Numerical/Examples/Surface/Enriques.lean",
+    "AlgebraicGeometry/Numerical/Examples/Surface/ProjectivePlane.lean",
+    "AlgebraicGeometry/Numerical/Examples/Surface/Comparison.lean",
+    "AlgebraicGeometry/Numerical/Examples/Threefold/CalabiYau.lean",
+    "AlgebraicGeometry/Numerical/Examples/Threefold/LinearSection.lean",
+    "AlgebraicGeometry/Numerical/Examples/Threefold/ProjectiveSpace.lean",
+    "AlgebraicGeometry/Numerical/Examples/Fourfold/CalabiYau.lean",
+    "AlgebraicGeometry/Numerical/Examples/Fourfold/LinearSection.lean",
+    "AlgebraicGeometry/Numerical/Examples/Fourfold/ProjectiveSpace.lean",
+    "AlgebraicGeometry/Numerical/GrothendieckGroup/CentralCharge.lean",
+    "AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalCharge.lean",
 )
 
 
@@ -331,8 +365,66 @@ POLARISED_TRANSPORT_ROOT = (
 NUMERICAL_SPECIALIZATIONS = (
     f"{GEOMETRY}.Numerical.RiemannRoch.K3",
     f"{GEOMETRY}.Numerical.Examples",
+    # MO1.06 moved the named and dimension-specific models here; rule 11 has to
+    # follow them or a generic root could import `ℙ²` again without failing.
+    f"{GEOMETRY}.Numerical.Models",
     f"{GEOMETRY}.Numerical.Stability.WallTransport",
     f"{GEOMETRY}.Numerical.Stability.ThreefoldWallTransport",
+)
+# Rule 12. MO1.06 separates the formal numerical models from the
+# demonstrations built on them, and keeps the multi-divisor charge a sibling
+# input of the exponential kernel rather than a child of the compressed
+# `H`-degree families.
+NUMERICAL_MODELS_TREE = f"{GEOMETRY}.Numerical.Models"
+NUMERICAL_DEMONSTRATIONS_TREE = f"{GEOMETRY}.Numerical.Examples"
+NUMERICAL_MODELS_UMBRELLA = "AlgebraicGeometry/Numerical/Models.lean"
+MO1_06_OWNERS = {
+    "AlgebraicGeometry/Numerical/Models/MonogenicRing.lean": (
+        "rankOneNumericalRing",
+        "rankOneNumericalVariety",
+    ),
+    "AlgebraicGeometry/Numerical/Models/Surface/RankOne.lean": (
+        "surfaceNumericalRing",
+        "surfaceCh",
+    ),
+    "AlgebraicGeometry/Numerical/GrothendieckGroup/CentralChargeK3.lean": (
+        "numericalCharge",
+        "numericalChargeHom",
+    ),
+}
+# Each named surface model reaches the shared carrier and no sibling model.
+SURFACE_MODEL_CARRIER = f"{GEOMETRY}.Numerical.Models.Surface.RankOne"
+SURFACE_MODEL_SIBLINGS = (
+    f"{GEOMETRY}.Numerical.Models.Surface.K3",
+    f"{GEOMETRY}.Numerical.Models.Surface.Abelian",
+    f"{GEOMETRY}.Numerical.Models.Surface.Enriques",
+    f"{GEOMETRY}.Numerical.Models.Surface.ProjectivePlane",
+)
+# The arbitrary-divisor-rank branch: two independent classes in the full real
+# divisor space, with no degree vector to hand the kernel. `Exp.ofMoments`
+# takes a moment sequence precisely so that this branch and the compressed
+# families are siblings under it.
+ARBITRARY_RANK_CHARGE_DEMONSTRATIONS = (
+    f"{GEOMETRY}.Numerical.Examples.Surface.SmoothQuadric",
+    f"{GEOMETRY}.Numerical.Examples.Surface.SmoothQuadricCharge",
+    f"{GEOMETRY}.Numerical.Examples.Surface.BlowUpPlane",
+    f"{GEOMETRY}.Numerical.Examples.Surface.BlowUpPlaneWalls",
+    f"{GEOMETRY}.Numerical.Examples.Surface.BlowUpPlaneSlice",
+)
+EXPONENTIAL_KERNEL_ROOT = f"{STABILITY_ROOT}.CentralCharge.Exponential.Kernel"
+ARBITRARY_RANK_CHARGE_BRANCH = (
+    f"{STABILITY_ROOT}.CentralCharge.Exponential.Divisorial"
+)
+COMPRESSED_DEGREE_BRANCH = (
+    f"{STABILITY_ROOT}.CentralCharge.Exponential.Comparison"
+)
+# The compressed branch: a vector of `H`-degrees, which is not injective once
+# the Picard rank exceeds one.
+SCALAR_DEGREE_COMPRESSION = (
+    f"{STABILITY_ROOT}.CentralCharge.Numerical",
+    f"{GEOMETRY}.Numerical.Models.MonogenicRing",
+    f"{GEOMETRY}.Numerical.Models.Surface.RankOne",
+    f"{GEOMETRY}.Numerical.Stability.PolarisedWallTransport",
 )
 MO1_03_OWNERS = {
     POSITIVE_PLANE_ROOT: ("IsPositivePlane", "positivePlanes"),
@@ -827,6 +919,129 @@ def main() -> int:
                     "the frame/plane/locus split requires this canonical owner"
                 )
 
+    # Rule 12, MO1.06. Owners first, then the four claims the split makes.
+    for entry, names in MO1_06_OWNERS.items():
+        path = SOURCE_ROOT / entry
+        if not path.is_file():
+            failures.append(f"missing MO1.06 owner {path.relative_to(ROOT)}")
+            continue
+        text = path.read_text(encoding="utf-8")
+        declared = declared_names(text) | structure_names(text)
+        for name in names:
+            if name not in declared:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: no longer declares {name}; "
+                    "the model/demonstration split requires this canonical owner"
+                )
+    if not (SOURCE_ROOT / NUMERICAL_MODELS_UMBRELLA).is_file():
+        failures.append(
+            f"missing {NUMERICAL_MODELS_UMBRELLA}: the formal numerical models "
+            "need an umbrella of their own, separate from the demonstrations"
+        )
+
+    # (a) No model may buy a stability exemption. Rule 3 already holds the tree
+    # neutral; this keeps a future edit from adding `Numerical.Models` to the
+    # exempt list instead of fixing the import that made it necessary.
+    for root in STABILITY_CONSUMING_GEOMETRY:
+        if in_tree(root, NUMERICAL_MODELS_TREE):
+            failures.append(
+                f"{root}: a formal numerical model may not be exempted from "
+                "rule 3; move the charge or wall material to "
+                "Numerical/Examples/ instead"
+            )
+
+    # (b) Models are upstream of the demonstrations built on them.
+    for module in sorted(modules):
+        if not in_tree(module, NUMERICAL_MODELS_TREE):
+            continue
+        reached = sorted(
+            dep
+            for dep in closure.of(module)
+            if in_tree(dep, NUMERICAL_DEMONSTRATIONS_TREE)
+        )
+        if reached:
+            failures.append(
+                f"{module}: reaches {reached[0]}; a numerical model is "
+                "upstream of the realizations, charges and walls demonstrated "
+                "on it"
+            )
+
+    # (c) The named surface models are siblings over one shared carrier.
+    for sibling in SURFACE_MODEL_SIBLINGS:
+        if sibling not in modules:
+            failures.append(
+                f"missing named surface model {sibling}; K3, abelian, Enriques "
+                "and the projective plane are siblings over "
+                f"{SURFACE_MODEL_CARRIER}"
+            )
+            continue
+        reached = closure.of(sibling)
+        if SURFACE_MODEL_CARRIER not in reached:
+            failures.append(
+                f"{sibling}: does not reach {SURFACE_MODEL_CARRIER}; a named "
+                "surface model specializes the shared rank-one carrier"
+            )
+        for other in SURFACE_MODEL_SIBLINGS:
+            if other != sibling and other in reached:
+                failures.append(
+                    f"{sibling}: reaches sibling model {other}; named surface "
+                    "models share a carrier, not each other"
+                )
+
+    # (d) The arbitrary-divisor-rank charge is a sibling input of the shared
+    # exponential kernel, not a child of the compressed `H`-degree families.
+    # Both branches must reach the kernel; only the compressed one may reach a
+    # degree vector.
+    for branch in (ARBITRARY_RANK_CHARGE_BRANCH, COMPRESSED_DEGREE_BRANCH):
+        if branch not in modules:
+            failures.append(
+                f"missing {branch}; the exponential kernel needs both of its "
+                "input branches to stay a shared root"
+            )
+        elif EXPONENTIAL_KERNEL_ROOT not in closure.of(branch):
+            failures.append(
+                f"{branch}: no longer reaches {EXPONENTIAL_KERNEL_ROOT}; the "
+                "two charge branches are siblings under one kernel"
+            )
+    if ARBITRARY_RANK_CHARGE_BRANCH in modules:
+        reached = closure.of(ARBITRARY_RANK_CHARGE_BRANCH)
+        forbidden = sorted(
+            dep
+            for dep in reached
+            if dep == COMPRESSED_DEGREE_BRANCH
+            or any(in_tree(dep, root) for root in SCALAR_DEGREE_COMPRESSION)
+        )
+        if forbidden:
+            failures.append(
+                f"{ARBITRARY_RANK_CHARGE_BRANCH}: reaches {forbidden[0]}; the "
+                "multi-divisor charge takes two classes in the full real "
+                "divisor space, has no degree vector to hand the kernel, and "
+                "is therefore a sibling of the compressed families rather "
+                "than a child of them"
+            )
+    # The geometry demonstrations of that branch keep the same discipline: a
+    # rank-two or rank-three divisor model does not import the rank-one
+    # carrier or the scalar polarised transport to obtain its charge.
+    for module in ARBITRARY_RANK_CHARGE_DEMONSTRATIONS:
+        if module not in modules:
+            failures.append(
+                f"missing arbitrary-divisor-rank demonstration {module}; the "
+                "multi-divisor charge branch has no other witness"
+            )
+            continue
+        direct = set(modules[module][1])
+        forbidden = sorted(
+            dep
+            for dep in direct
+            if any(in_tree(dep, root) for root in SCALAR_DEGREE_COMPRESSION)
+        )
+        if forbidden:
+            failures.append(
+                f"{module}: imports {forbidden[0]}; an arbitrary-rank divisor "
+                "model builds its charge from the intersection form, not by "
+                "specializing the lossy scalar H-degree compression"
+            )
+
     positive_frame_module = module_of(SOURCE_ROOT / POSITIVE_FRAME_ROOT)
     forbidden_frame_dependencies = (
         f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityFiniteness",
@@ -951,7 +1166,12 @@ def main() -> int:
         f"{len(LINEAR_YONEDA_BLOCK)}-declaration linear Yoneda block needs "
         "Mathlib alone and the linear Serre root reaches no triangulated module; "
         "generic square-root, slope, and polarised-transport roots reach no "
-        "K3, surface, or dimension-specific consumers"
+        "K3, surface, or dimension-specific consumers; the "
+        f"{len(MO1_06_OWNERS)} numerical-model owners exist, no model reaches "
+        "a demonstration, the "
+        f"{len(SURFACE_MODEL_SIBLINGS)} named surface models share one carrier "
+        "and no sibling, and the arbitrary-divisor-rank charge reaches the "
+        "exponential kernel without a degree vector"
     )
     return 0
 

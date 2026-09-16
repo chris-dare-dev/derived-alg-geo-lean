@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Threefold.LinearSection
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Threefold.LinearSection
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Threefold
 
 /-!
@@ -24,7 +24,7 @@ turns that into the coefficient `50/(12·5) = 5/6`. The top coefficient is zero 
 
 ## The lattice, and why its Euler characteristics are the check
 
-Linear-section coordinates (see `Examples/Threefold/LinearSection.lean`) make `χ` an integer
+Linear-section coordinates (see `Models/Threefold/LinearSection.lean`) make `χ` an integer
 by construction, and here they also make it *verifiable*, because each generator is a
 classical variety with a classical Euler characteristic:
 

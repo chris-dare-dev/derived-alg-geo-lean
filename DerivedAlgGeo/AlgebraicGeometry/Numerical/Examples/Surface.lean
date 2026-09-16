@@ -1,19 +1,11 @@
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.Abelian
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.BlowUpPlane
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.BlowUpPlaneWalls
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.BlowUpPlaneSlice
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.Enriques
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3Mukai
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.BlowUpPlaneWalls
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3MukaiComparison
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3MukaiIntegral
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.ProjectivePlane
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.ProjectivePlaneCharge
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.SmoothQuadric
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.SmoothQuadricCharge
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOneRealization
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOneWalls
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.SmoothQuadric
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.SmoothQuadricCharge
 
-/-! # Surface examples -/
+/-! # Surface realizations, charges and walls -/
