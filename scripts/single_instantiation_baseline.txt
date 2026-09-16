@@ -1,81 +1,102 @@
-Algebra	CategoryTheory.DGFunctor.IsQuasiEquivalence
-Algebra	CategoryTheory.DGLinear
-Algebra	CategoryTheory.DerivedCategory.OppositeComparison
-CategoryTheory	CategoryTheory.Enhancement
-CategoryTheory	CategoryTheory.Enhancement.Exact
-Algebra	CategoryTheory.IsConeOf
-Algebra	CategoryTheory.IsPretriangulated
-CategoryTheory	CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation
-CategoryTheory	CategoryTheory.ObjectProperty.RightProjectionData
-CategoryTheory	CategoryTheory.Pretriangulated.Axioms
-CategoryTheory	CategoryTheory.SerreFunctor.EnriquesCategoryData
-CategoryTheory	CategoryTheory.SerreFunctor.HomFinite
-CategoryTheory	CategoryTheory.SerreFunctor.MixedClassificationData
-CategoryTheory	CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile
-CategoryTheory	CategoryTheory.SerreFunctor.SerreCategoryData
-CategoryTheory	CategoryTheory.SerreFunctor.SerreCompatibleEquivalence
-CategoryTheory	CategoryTheory.SerreFunctor.SerreFunctorData
-CategoryTheory	CategoryTheory.SerreFunctor.SphericalClassificationData
-CategoryTheory	CategoryTheory.SerreFunctor.SphericalExtProfile
-CategoryTheory	CategoryTheory.StackEquivalence
-CategoryTheory	CategoryTheory.StackInGroupoids.Cover
-CategoryTheory	CategoryTheory.Triangulated.AdjacentExtProfile
-CategoryTheory	CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData
-CategoryTheory	CategoryTheory.Triangulated.CofiltrationData
-CategoryTheory	CategoryTheory.Triangulated.ComponentTopologicalLinearLocalModel
-CategoryTheory	CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.CompatibleClassMaps
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.CoherentConvolutionData
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence
-CategoryTheory	CategoryTheory.Triangulated.MemberwiseBlockShiftData
-CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks
-CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData
-CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData
-CategoryTheory	CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge
-CategoryTheory	CategoryTheory.Triangulated.PrefixBlockEmbeddingData
-CategoryTheory	CategoryTheory.Triangulated.QuasiAbelian
-CategoryTheory	CategoryTheory.Triangulated.SlicingOrderPreimageData
-CategoryTheory	CategoryTheory.Triangulated.SlopeData
-CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.MukaiRealization
-CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.SphericalPairData
-CategoryTheory	CategoryTheory.Triangulated.StabilityFunctionOn
-CategoryTheory	CategoryTheory.Triangulated.TStructure.ApproximationMap
-CategoryTheory	CategoryTheory.Triangulated.TStructure.CompactGeneratorBrown.StepData
-CategoryTheory	CategoryTheory.Triangulated.TStructure.GeneratorApproximationMap
-CategoryTheory	CategoryTheory.Triangulated.TStructure.IsNondegenerate
-CategoryTheory	CategoryTheory.Triangulated.WeakSlopeData
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.DedekindHNProblem
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.OrdinaryDefinition20_5Conditions
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakChargeProbe
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDedekindHNProblem
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDefinition20_5ClauseZero
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDefinition20_5Conditions
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakQuotientQuadraticSupportData
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakSemistabilityProbe
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakStabilityInFamiliesData
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.CategoricalOrdinaryFiberStabilityInFamiliesData
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.OrdinaryFiberStabilityInFamiliesData
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.OrdinaryStabilityInFamiliesData
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.BoundedRegion
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical.IntegralComparison
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.SubobjectChain
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Support.IsCompatible
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Support.IsHomogTwo
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakAbelianHNFiltration
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ExtremalHNData
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.SourceTiltConclusion
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.TiltingProperty
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.HNQuotientStep
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.QuadraticSupportData
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.QuotientUniformQuadraticSupportData
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.ReverseSlicingObligations
-Algebra	DerivedAlgGeo.Algebra.RelativeNumerical.FamilyRelationSystem
-Algebra	GradedModule.GradedLinearMap
-Algebra	GradedModule.NumDenSameDeg
-LinearAlgebra	PeriodDomain.IsPositivePlane
+Algebra	CategoryTheory.CopowerData	bundled object plus universal property; `copowerData` is the sole choice selector from `HasCopower`, the HasLimit/LimitCone shape, so a second producer would be a second unrelated choice
+Algebra	CategoryTheory.DGAdjunction	the definition of a dg adjunction; `linearCopowerAdjunction` is the single construction under a 25-file tower that takes an arbitrary `DGAdjunction` as a parameter [adoption pending, tracked in the single-instantiation follow-up]
+Algebra	CategoryTheory.DGAdjunction.H0Presentation	a parameter of nine downstream comparison files; its docstring says the same presentation is supplied to `toAdjunction` per adjunction
+Algebra	CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData	`chosenConeData` selects objectwise cones from `IsPretriangulated`; the choice is the only producer
+Algebra	CategoryTheory.DGFunctor.IsQuasiEquivalence	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.DGFunctor.PreservesConeTriangles	the weak exactness seam; `preservesConeTriangles_of_preservesChosenCones` derives it from the strong split-cone witness, as its docstring states
+Algebra	CategoryTheory.DGLinear	recorded before the reason column existed; reason not yet written
+Algebra	CategoryTheory.DerivedCategory.OppositeComparison	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Enhancement	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Enhancement.Exact	supplied data: constructing one means building a `CommShift` structure and proving `Functor.IsTriangulated`, and nothing in the repository produces one for a general `E`, as its docstring states
+Algebra	CategoryTheory.HasCopowers	a Mathlib-style mere-existence capability (abstraction-tree.md:220), discharged by a consumer's dg category rather than instantiated here; the `AddCommGrp` tower it heads serves object twists, distinct from the `ModuleCat k` tower under `HasLinearCopowers`
+Algebra	CategoryTheory.HasEvaluationData	`hasEvaluationDataOfHasCopowers` is the derivation from the stronger capability; abstraction-tree.md calls it the narrower capability object twists need
+Algebra	CategoryTheory.HasLinearCopowers	`Cdg (ModuleCat k)` is the one concrete dg category model so far; a second model would supply a second [adoption pending, tracked in the single-instantiation follow-up]
+Algebra	CategoryTheory.HasLinearEvaluationData	the k-linear counterpart, derived by `hasLinearEvaluationDataOfHasLinearCopowers`
+Algebra	CategoryTheory.IsCopowerOf	characterises the copower rather than building it; `copowerIsCopower` is the selector's witness
+Algebra	CategoryTheory.KFlatResolution	the K-flat model #1348 deliberately separated from derived base change; supplied at schemes as the `SchemeKFlatResolution` abbrev
+Algebra	CategoryTheory.LinearCopowerData	the k-linear enrichment of `CopowerData` over `ModuleCat k` cochains, per abstraction-tree.md; `linearCopowerData` is its selector
+CategoryTheory	CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.ObjectProperty.OnTriangle	a three-field spelling of `P` on all three vertices; built inline at `liftTriangle` call sites, and named at one geometric site so far [adoption pending, tracked in the single-instantiation follow-up]
+CategoryTheory	CategoryTheory.Pretriangulated.Axioms	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.ComparisonData	the uniqueness comparison between two normalizations, built where two are actually compared
+CategoryTheory	CategoryTheory.SerreFunctor.EnriquesCategoryData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.SerreFunctor.HomFinite	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.SerreFunctor.MixedClassificationData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.SerreFunctor.SerreCategoryData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.SerreFunctor.SerreCompatibleEquivalence	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.SerreFunctor.SerreFunctorData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.SerreFunctor.SphericalClassificationData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.SerreFunctor.SphericalExtProfile	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.StackEquivalence	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.StackInGroupoids.Cover	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.AdjacentExtProfile	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.CofiltrationData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.ComponentTopologicalLinearLocalModel	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.CompatibleClassMaps	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.ShiftCompatibility	records compatibility with the shift structure the realization chose; the docstring is explicit that it does not manufacture one
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.CoherentConvolutionData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.PresentedCounitComparisonData.ShiftCompatibility	twist counterpart of the cotwist `ShiftCompatibility`; same externally chosen structure
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData	the ambient adjunction and the target-to-source preservation are genuine geometric inputs, per its docstring
+CategoryTheory	CategoryTheory.Triangulated.MemberwiseBlockShiftData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.PrefixBlockEmbeddingData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.QuasiAbelian	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.SlicingOrderPreimageData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.SlopeData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.AdjointComparisonConditions	asserts H0-invertibility of the canonical comparisons; a hypothesis on supplied cone data, not a construction
+CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones	`.chosen` selects the five cones; consumers take an arbitrary one as a parameter
+CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.MukaiRealization	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.SphericalPairData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.TwistCotwistEquivalenceConditions	deliberately not named `IsSpherical`: the Anno-Logvinenko implication needs Morita quasi-functors and higher cone coherence not yet formalized here
+CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.TwistShaped	supplied, not constructed: the K0 action is asserted to be `twistK0`, per its docstring
+CategoryTheory	CategoryTheory.Triangulated.StabilityCondition.WithClassMap.EulerProbeFamily	the extension and separation are input; this file does not infer either from a presentation of the numerical Grothendieck group
+CategoryTheory	CategoryTheory.Triangulated.StabilityCondition.WithClassMap.SemistableExtWindow	the Euler bound stays an explicit input until phase vanishing and Serre duality exist as geometric bridges
+CategoryTheory	CategoryTheory.Triangulated.StabilityFunctionOn	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.TStructure.ApproximationMap	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.TStructure.CompactGeneratorBrown.StepData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.TStructure.GeneratorApproximationMap	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.TStructure.IsNondegenerate	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.TStructure.Restriction	one clause of S-locality at one functor; `SLocalData` holds the real per-open witnesses as fields, so the only named inhabitant is the trivial `Restriction.id` [adoption pending, tracked in the single-instantiation follow-up]
+CategoryTheory	CategoryTheory.Triangulated.WeakSlopeData.SameSlopeOrder	a relation between two slope data, proved so far only at the K3 tilt slope normalization [adoption pending, tracked in the single-instantiation follow-up]
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.DedekindHNProblem	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.OrdinaryDefinition20_5Conditions	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakChargeProbe	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDedekindHNProblem	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDefinition20_5ClauseZero	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDefinition20_5Conditions	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakQuotientQuadraticSupportData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakSemistabilityProbe	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakStabilityInFamiliesData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.CategoricalOrdinaryFiberStabilityInFamiliesData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.OrdinaryFiberStabilityInFamiliesData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.OrdinaryStabilityInFamiliesData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData	external input, per its docstring: proper discontinuity plus the two hypotheses its Hausdorff-local consequences need
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut	recorded before the reason column existed; reason not yet written
+LinearAlgebra	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.HodgeIndex	`HodgeDefinite.toHodgeIndex` weakens the definite form to the index inequality, which is the reusable consequence
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.SubobjectChain	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Support.IsCompatible	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Support.IsHomogTwo	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakAbelianHNFiltration	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.ExtremalHNData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.SourceTiltConclusion	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakPreStabilityCondition.TiltingProperty	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.HNQuotientStep	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.QuadraticSupportData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.QuotientUniformQuadraticSupportData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.WeakStabilityFunction.ReverseSlicingObligations	recorded before the reason column existed; reason not yet written
+Algebra	DerivedAlgGeo.Algebra.RelativeNumerical.FamilyRelationSystem	recorded before the reason column existed; reason not yet written
+Algebra	DerivedCategory.ExtFiniteBounded	`of_ext` is the documented constructor from the nonnegative `Abelian.Ext` groups; the class is a hypothesis a consumer discharges
+Algebra	GradedModule.GradedLinearMap	recorded before the reason column existed; reason not yet written
+Algebra	GradedModule.NumDenSameDeg	recorded before the reason column existed; reason not yet written

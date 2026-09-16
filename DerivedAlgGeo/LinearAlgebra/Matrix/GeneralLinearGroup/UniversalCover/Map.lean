@@ -2,11 +2,10 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Covering.SourceTopology
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.SourceTopology
+import DerivedAlgGeo.Topology.Covering.Basic
 import MathFormalContract
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
-import Mathlib.Topology.Covering.Basic
-import Mathlib.Topology.Homeomorph.Lemmas
 
 set_option backward.defeqAttrib.useBackward true
 set_option backward.isDefEq.respectTransparency false
@@ -33,8 +32,13 @@ with the identity on the remaining three coordinates.  The first map is the
 standard exponential covering; the product and coordinate homeomorphisms
 therefore give the required covering map.
 
-`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Topology/Group.lean` supplies the final compatibility layer by
-proving that the transported topology makes `GLTilde` a topological group.
+`UniversalCover/TopologicalGroup.lean`
+supplies the final compatibility layer by proving that the transported topology
+makes `GLTilde` a topological group.
+
+The product-of-a-covering-with-an-identity step is the general lemma
+`isCoveringMap_prodMap_id`, which quantifies over arbitrary spaces and lives
+with the topology owner in `Topology/Covering/Basic.lean` (MO1.12, #1323).
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
@@ -363,42 +367,6 @@ noncomputable def glPosCoordinateHomeomorph :
   right_inv := glPosCoordinates_ofCoordinates
   continuous_toFun := continuous_glPosCoordinates
   continuous_invFun := continuous_glPosOfCoordinates
-
-/-! ## Products of covering maps -/
-
-/-- A covering map remains a covering map after taking its product with an
-identity map. -/
-theorem isCoveringMap_prodMap_id {E X Y : Type*} [TopologicalSpace E]
-    [TopologicalSpace X] [TopologicalSpace Y] {f : E → X} (hf : IsCoveringMap f) :
-    IsCoveringMap (Prod.map f (id : Y → Y)) := by
-  intro xy
-  obtain ⟨hdisc, U, hxU, hU, hfU, H, hH⟩ := hf xy.1
-  let I := f ⁻¹' ({xy.1} : Set X)
-  apply IsEvenlyCovered.to_isEvenlyCovered_preimage (I := I)
-  have hpre : Prod.map f (id : Y → Y) ⁻¹' (U ×ˢ Set.univ) =
-      (f ⁻¹' U) ×ˢ Set.univ := by
-    ext p
-    simp [Prod.map]
-  let reassoc : ((U × I) × Y) ≃ₜ ((U × Y) × I) :=
-    (Homeomorph.prodAssoc U I Y).trans <|
-      ((Homeomorph.refl U).prodCongr (Homeomorph.prodComm I Y)).trans <|
-        (Homeomorph.prodAssoc U Y I).symm
-  let base : (U ×ˢ (Set.univ : Set Y)) ≃ₜ U × Y :=
-    (Homeomorph.Set.prod U Set.univ).trans <|
-      (Homeomorph.refl U).prodCongr (Homeomorph.Set.univ Y)
-  let K : (Prod.map f (id : Y → Y) ⁻¹' (U ×ˢ Set.univ)) ≃ₜ
-      (U ×ˢ Set.univ) × I :=
-    (Homeomorph.setCongr hpre).trans <|
-      (Homeomorph.Set.prod (f ⁻¹' U) Set.univ).trans <|
-        (H.prodCongr (Homeomorph.Set.univ Y)).trans <|
-          reassoc.trans (base.symm.prodCongr (Homeomorph.refl I))
-  refine ⟨hdisc, U ×ˢ Set.univ, ⟨hxU, Set.mem_univ _⟩, hU.prod isOpen_univ,
-    hpre ▸ hfU.prod isOpen_univ, K, ?_⟩
-  intro e
-  change (K e).1.1 = Prod.map f id e
-  apply Prod.ext
-  · exact hH ⟨e.1.1, e.2.1⟩
-  · rfl
 
 /-! ## The standard phase covering -/
 

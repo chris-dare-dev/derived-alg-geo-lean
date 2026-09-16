@@ -24,7 +24,18 @@ failing on all of them fires on 45% of the tree and stops being read.
 So this follows `audit_missing_baseline.txt`: the known ones are named, and only
 a NEW name fails. That converts the failure mode from invisible drift into a
 deliberate, reviewable act -- the author either instantiates it twice in the same
-change, or adds the name and says why in the pull request.
+change, or adds the name and says why in the third column of the baseline.
+
+The reason used to live in the pull request instead, and that did not hold. A
+pull request is not readable from the tree, and `--relax` rewrites the file from
+scratch, so a regenerated baseline was indistinguishable from a reviewed one.
+Between 2026-09-08 and 2026-09-14, 29 names drifted in that way -- against 80
+recorded -- while this gate ran only in `scripts/gates.sh` and never in CI. The
+reason now lives in the file, `--relax` preserves the reasons already there and
+returns nonzero for any name it had to write a `TODO` for, and a `TODO` that
+reaches a commit fails the gate. `--relax` can record a name; it cannot bless
+one. The 80 entries that predate the column carry a visible legacy marker rather
+than a silent pass, so the back-fill stays countable.
 
 ## What counts as an inhabitant
 
@@ -64,6 +75,32 @@ def subject_of(module: str) -> str:
     return parts[1] if len(parts) > 1 else ""
 
 
+# A third, optional tab-separated column carrying the reason one inhabitant
+# is right. Optional only in the parsing: `--relax` writes `TODO` for a name
+# that has none and returns nonzero, and the gate rejects a `TODO` that
+# reaches a commit. Before this column the reason lived only in the pull
+# request, so the next `--relax` erased every one of them and a regenerated
+# file could not be told from a reviewed one -- which is how 29 names drifted
+# in unnoticed while the gate itself ran only locally.
+TODO = "TODO: say why one inhabitant is right"
+
+
+def read_baseline() -> tuple[set[str], dict[str, str]]:
+    """Parse the baseline into its names and their recorded reasons."""
+    names: set[str] = set()
+    reasons: dict[str, str] = {}
+    if not BASELINE.exists():
+        return names, reasons
+    for line in BASELINE.read_text(encoding="utf-8").splitlines():
+        parts = line.split("\t")
+        if len(parts) < 2:
+            continue
+        names.add(parts[1])
+        if len(parts) > 2 and parts[2].strip():
+            reasons[parts[1]] = parts[2].strip()
+    return names, reasons
+
+
 def main() -> int:
     relax = "--relax" in sys.argv
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
@@ -91,21 +128,39 @@ def main() -> int:
     )
 
     if relax:
+        _, reasons = read_baseline()
+        missing = [n for n in thin if not reasons.get(n)]
         BASELINE.write_text(
-            "".join(f"{subject_of(modules[n])}\t{n}\n" for n in thin), encoding="utf-8"
+            "".join(
+                f"{subject_of(modules[n])}\t{n}\t{reasons.get(n) or TODO}\n"
+                for n in thin
+            ),
+            encoding="utf-8",
         )
         print(f"wrote {BASELINE.relative_to(ROOT)} ({len(thin)} entries)")
+        if missing:
+            print()
+            print(f"{len(missing)} of them have no reason, written as `{TODO}`:")
+            for name in missing:
+                print(
+                    f"  - {name} ({modules[name]}) has "
+                    f"{counts[name]} inhabitant(s)"
+                )
+            print()
+            print(
+                "Replace each placeholder with the reason one inhabitant is "
+                "right, in the third tab-separated column. Until then this "
+                "gate stays red: `--relax` can record a name but it cannot "
+                "bless one, which is the whole point of the file."
+            )
+            return 1
         return 0
 
     if not BASELINE.exists():
         print(f"::error::{BASELINE.relative_to(ROOT)} is missing; regenerate it with --relax")
         return 1
 
-    baseline = {
-        line.split("\t")[1]
-        for line in BASELINE.read_text(encoding="utf-8").splitlines()
-        if "\t" in line
-    }
+    baseline, reasons = read_baseline()
     new = [n for n in thin if n not in baseline]
 
     if new:
@@ -122,6 +177,22 @@ def main() -> int:
             "second time in this change, or add it to "
             f"{BASELINE.relative_to(ROOT)} with --relax and say in the pull "
             "request why one is right."
+        )
+        return 1
+
+    unexplained = sorted(
+        n for n in thin if n in baseline and reasons.get(n, TODO) == TODO
+    )
+    if unexplained:
+        print("single-instantiation gate failed:")
+        for name in unexplained:
+            print(f"  - {name} ({modules[name]}) is recorded with no reason")
+        print()
+        print(
+            "A baseline entry still reading the placeholder is a name "
+            "recorded without anyone saying why one inhabitant is right. "
+            "That is the drift this file exists to make visible, so it "
+            "fails here rather than passing quietly."
         )
         return 1
 

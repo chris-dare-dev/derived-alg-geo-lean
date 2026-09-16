@@ -31,6 +31,15 @@ the model already carried, so the file does not introduce a second unrelated
 notion of ampleness. Nothing proves it IS the ample cone of a geometric surface;
 IsGeometric asks only that the direction lie in the supplied set.
 
+divisorialParameters is the SECOND DivisorialParameters in the repository.
+SmoothQuadricCharge.divisorialParameters was the only one, so a structure
+parameterized by an arbitrary geometry-specific ample cone had exactly one
+geometry in it. Nothing mathematical was added here: ampleCone and
+antiCanonical_mem_ampleCone were already present, and the bundling is what the
+core API asks a geometric consumer to do. omega is antiCanonicalSlice.H, so the
+parameters and the slice describe the same polarization; b is unconstrained,
+because ampleness is a condition on omega alone.
+
 wall_ofST_iff_circle records that the circle description of walls fires on this
 slice: for each fixed transverse parameter the wall is a circle or a line in the
 (s,t) half-plane. On the rank-one slice that is one half-plane; here it is a
@@ -42,6 +51,7 @@ plane's worth. No scheme and no ample line bundle appear. -/
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.antiCanonicalSlice_isGeometric
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.antiCanonicalSlice_isHodge
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.antiCanonical_mem_ampleCone
+#print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.divisorialParameters
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.mem_ampleCone_iff
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.mem_ampleCone_of_isAmpleCoefficients
 #print axioms AlgebraicGeometry.Numerical.Examples.BlowUpPlane.pair_antiCanonical_transverse

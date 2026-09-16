@@ -195,6 +195,18 @@ that true.
   construction precedes its stability action. Neutral planar perimeter lemmas
   precede HN-polygon applications. Mass is a stability invariant consumed by
   the metric, rather than a definition owned by its metric proof.
+  **GL-cover half done** (#1323): the compatible-pair group, its `ℤ` deck
+  group, its global chart, simple connectedness, the covering map and the
+  topological-group laws are at
+  `LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/`, the
+  `+1`-equivariant order automorphisms of `ℝ` at
+  `Algebra/Order/NormalizedShift/`, the general product-of-coverings lemma at
+  `Topology/Covering/Basic.lean`, and the cover-independent complex-coordinate
+  adapter at `LinearAlgebra/Complex/Coordinates.lean`. The phase conventions
+  and the action on slicings, charges and stability conditions stay at
+  `StabilityCondition/Symmetry/GLTilde/Action/`, and layering rule 16 keeps
+  that boundary. A relocated covering theorem is still a theorem, not a
+  consequence of the name `GLTilde`; the planar and mass halves remain #1324.
 - **Direct Mathlib extensions:** distinguish `ModuleCat` from arbitrary linear
   categories, presheaf modules from sheaf modules, and scheme-module exterior
   powers from their divisor applications. Use the actual API owner at the pin.

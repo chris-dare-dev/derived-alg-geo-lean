@@ -75,7 +75,7 @@ nothing else checks.
    perimeter comparison a subject of its own instead of leaving it inside a
    mass-subadditivity proof directory, and it is exactly the kind of claim one
    convenience import erases.
-16. **A derived tensor is not about transforms.** The derived-tensor and
+17. **A derived tensor is not about transforms.** The derived-tensor and
    derived-pushforward capabilities left the Fourier--Mukai subtree, so
    ``DerivedCategory/Tensor/``, ``Families/DerivedPushforward.lean`` and the
    twisted-pushforward consumer that demonstrates them reach neither
@@ -391,6 +391,19 @@ RETIRED_PATHS = (
     "LinearAlgebra/Lattice/Mukai/ChargePositivity.lean",
     "LinearAlgebra/Lattice/Mukai/ExponentialOrientation.lean",
     "LinearAlgebra/Lattice/Mukai/IntegralBridge.lean",
+    # 2026-09-15 MO1.12: the universal cover of GL+(2,R) moved beside the
+    # general-linear-group API, the +1-equivariant order automorphisms of R
+    # moved to order algebra, the general product-of-coverings lemma moved to
+    # the topology owner, and the cover-independent complex-coordinate adapter
+    # moved to complex linear algebra. `Symmetry/GLTilde/Action/` keeps the
+    # phase conventions and the action, and is deliberately NOT retired.
+    "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Basic.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/"
+    "Symmetry/GLTilde/ComplexRepresentation.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Covering",
+    "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Topology",
+    "CategoryTheory/Triangulated/StabilityCondition/Phase/NormalizedShift.lean",
+    "CategoryTheory/Triangulated/StabilityCondition/Phase/UniformContinuity.lean",
     # 2026-09-15 MO1.10: the derived-tensor and derived-pushforward
     # capabilities are about a derived category, not about transforms, so they
     # left the Fourier--Mukai subtree. `HasDerivedTensor` and the coherent
@@ -639,8 +652,49 @@ MO1_09_OWNERS = {
     "CategoryTheory/Triangulated/DGEnhancement/Basic.lean": ("Enhancement",),
     "CategoryTheory/Triangulated/DGEnhancement/Exact.lean": ("Exact",),
 }
+# Rule 16. MO1.12 (#1323) separates the universal cover of GL+(2,R) from the
+# action it was built for. The cover is a group of compatible pairs, a Z deck
+# group, a global chart, a covering map and a topological group: none of that
+# mentions a category, a slicing, a heart or a central charge, so it lives
+# beside the general-linear-group API it covers. The +1-equivariant order
+# automorphisms of R it is built from are neutral in the same way and live with
+# order algebra; the product-of-a-covering-with-an-identity lemma is general and
+# lives with the topology owner.
+#
+# Pinned in three directions. The two neutral roots reach neither the stability
+# tree nor geometry (checked in `owner_boundary_failures`, so the layering
+# fixtures exercise it). The general covering lemma is declared once, at the
+# topology owner. And the action adapter stays where the ledger put it: the
+# phase conventions, the slicing/charge/stability action and its continuity are
+# genuinely about stability conditions and do NOT follow the group out.
+#
+# What this rule does not assert: that `GLTilde` is a universal cover because of
+# its name. That is `GLTilde.universalCoverData` and `exact_deckHom_toMatHom`,
+# two proved theorems, and the registry records a named reviewer's judgement
+# that their conjunction is what the paper's phrase means.
+GL_COVER_TREE = f"{LIBRARY}.LinearAlgebra.Matrix.GeneralLinearGroup"
+GL_COVER_ROOT_DIR = "LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover"
+GL_COVER_POSITIVE_ROOT = "LinearAlgebra/Matrix/GeneralLinearGroup/Positive.lean"
+NORMALIZED_SHIFT_TREE = f"{LIBRARY}.Algebra.Order.NormalizedShift"
+NORMALIZED_SHIFT_ROOT_DIR = "Algebra/Order/NormalizedShift"
+COMPLEX_COORDINATES_TREE = f"{LIBRARY}.LinearAlgebra.Complex"
+COMPLEX_COORDINATES_ROOT = "LinearAlgebra/Complex/Coordinates.lean"
+COMPLEX_COORDINATES_BLOCK = ("cplxCoord", "cplxCoord_apply", "actC")
+GENERAL_COVERING_TREE = f"{LIBRARY}.Topology.Covering"
+GENERAL_COVERING_ROOT = "Topology/Covering/Basic.lean"
+GENERAL_COVERING_BLOCK = ("isCoveringMap_prodMap_id",)
+GL_COVER_ACTION_TREE = f"{STABILITY_ROOT}.Symmetry.GLTilde"
+GL_COVER_ACTION_ROOT_DIR = (
+    "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action"
+)
+GL_COVER_ACTION_BLOCK = (
+    "actPre",
+    "actStab",
+    "relabel",
+    "actCCLM",
+)
 
-# Rule 16. MO1.10 (#1321) moved the derived-tensor and derived-pushforward
+# Rule 17. MO1.10 (#1321) moved the derived-tensor and derived-pushforward
 # capabilities out of the Fourier--Mukai subtree, because a transform needs a
 # tensor and a tensor is not about transforms. The whole point of that move is
 # the import direction, so it is pinned here rather than left to review: each
@@ -927,6 +981,40 @@ def owner_boundary_failures(
                 f"{label}: reaches {forbidden[0]}; the Gieseker order is "
                 "defined without a slope, and the comparison between the two "
                 f"theories belongs in {SHEAF_COMPARISON_MODULE}"
+            ]
+    if in_tree(module, GL_COVER_TREE) or in_tree(module, NORMALIZED_SHIFT_TREE):
+        forbidden = sorted(
+            dep
+            for dep in reached
+            if in_tree(dep, STABILITY_ROOT) or in_tree(dep, GEOMETRY)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; the GL+(2,R) cover and the "
+                "+1-equivariant order automorphisms it is built from are "
+                "independent of the action on stability conditions, which "
+                "stays under Symmetry/GLTilde/Action/"
+            ]
+    if in_tree(module, COMPLEX_COORDINATES_TREE):
+        forbidden = sorted(
+            dep
+            for dep in reached
+            if in_tree(dep, STABILITY_ROOT)
+            or in_tree(dep, GEOMETRY)
+            or in_tree(dep, module_of(SOURCE_ROOT / GL_COVER_ROOT_DIR))
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; the complex-coordinate "
+                "adapter moved here because its public type is independent of "
+                "the cover, and an import of the cover would undo that"
+            ]
+    if in_tree(module, GENERAL_COVERING_TREE):
+        forbidden = sorted(dep for dep in reached if in_tree(dep, LIBRARY))
+        if forbidden:
+            return [
+                f"{label}: imports {forbidden[0]}; the general covering lemmas "
+                "are about arbitrary topological spaces and need Mathlib alone"
             ]
     if module in (SQRT_TODD_ROOT, SLOPE_ROOT, POLARISED_TRANSPORT_ROOT):
         forbidden = sorted(
@@ -1515,7 +1603,87 @@ def main() -> int:
                 "stability (MO1.13)"
             )
 
-    # Rule 16, derived-operation owners are reachable without a kernel.
+    # Rule 16, MO1.12. Owners first, then the three claims the split makes.
+    gl_cover_dir = SOURCE_ROOT / GL_COVER_ROOT_DIR
+    shift_dir = SOURCE_ROOT / NORMALIZED_SHIFT_ROOT_DIR
+    for owner, what in (
+        (gl_cover_dir, "the universal cover of GL+(2,R)"),
+        (shift_dir, "the +1-equivariant order automorphisms of R"),
+        (SOURCE_ROOT / GL_COVER_POSITIVE_ROOT, "the GL+(2,R) matrix coercion"),
+        (
+            SOURCE_ROOT / COMPLEX_COORDINATES_ROOT,
+            "the cover-independent complex-coordinate adapter",
+        ),
+        (SOURCE_ROOT / GENERAL_COVERING_ROOT, "the general covering lemmas"),
+        (
+            SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR,
+            "the action on slicings, charges and stability conditions",
+        ),
+    ):
+        if not (owner.is_dir() or owner.is_file()):
+            failures.append(
+                f"missing {owner.relative_to(ROOT)}: it owns {what}; see "
+                "docs/architecture/cutover-ledger.md row 08"
+            )
+
+    # (a) The action adapter did NOT follow the group out. Its block names the
+    # four action constructions the ledger keeps under stability; a move of any
+    # of them into the neutral cover would be the defect MO1.12 repaired,
+    # inverted.
+    if (SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR).is_dir():
+        action_declared: set[str] = set()
+        for path in (SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR).rglob("*.lean"):
+            action_declared |= declared_names(path.read_text(encoding="utf-8"))
+        for name in GL_COVER_ACTION_BLOCK:
+            if name not in action_declared:
+                failures.append(
+                    f"{GL_COVER_ACTION_ROOT_DIR}: no longer declares {name}; "
+                    "the phase conventions and the action on slicings, charges "
+                    "and stability conditions stay with stability (MO1.12)"
+                )
+
+    # (b) The two extracted neutral blocks are declared once, at their owner.
+    for root, block in (
+        (COMPLEX_COORDINATES_ROOT, COMPLEX_COORDINATES_BLOCK),
+        (GENERAL_COVERING_ROOT, GENERAL_COVERING_BLOCK),
+    ):
+        owner_path = SOURCE_ROOT / root
+        if not owner_path.is_file():
+            continue
+        owner_module = module_of(owner_path)
+        owner_declared = declared_names(owner_path.read_text(encoding="utf-8"))
+        for name in block:
+            if name not in owner_declared:
+                failures.append(
+                    f"{root}: no longer declares {name}; MO1.12 made this file "
+                    "its canonical owner"
+                )
+        for module, (path, _, _) in modules.items():
+            if module == owner_module:
+                continue
+            stray = declared_names(path.read_text(encoding="utf-8")) & set(block)
+            if stray:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)}; "
+                    f"import {owner_module} instead"
+                )
+
+    # (c) The stability action still reaches the group it acts by. A split that
+    # left the adapter unable to name the cover would be a different defect.
+    action_module = module_of(
+        (SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR).with_suffix(".lean")
+    )
+    if action_module in modules:
+        cover_module = module_of(gl_cover_dir.with_suffix(".lean"))
+        reached = closure.of(action_module) | {action_module}
+        if not any(in_tree(dep, cover_module) for dep in reached):
+            failures.append(
+                f"{action_module}: no longer reaches {cover_module}; the "
+                "projection and comparison that stability consumes must stay "
+                "an import edge, not a restatement"
+            )
+
+    # Rule 17, derived-operation owners are reachable without a kernel.
     for entry in DERIVED_OPERATION_OWNERS:
         path = SOURCE_ROOT / entry
         if not (path.is_file() or path.is_dir()):
@@ -1573,6 +1741,9 @@ def main() -> int:
         "lift block is generic and declared once; the "
         f"{len(DIVISORIAL_BLOCK)}-structure divisorial charge block and "
         f"{len(HODGE_INDEX_BLOCK)}-structure neutral Hodge block are declared once; "
+        "the GL+(2,R) cover and its order-automorphism core reach neither "
+        "stability nor geometry while the action adapter still reaches the "
+        "cover; "
         "central-charge roots reach neither walls nor geometry and the paired "
         "functional reaches no wall arrangement; the positive-plane, "
         "positive-frame, orthogonality, charge-zero, determinant-alignment, "

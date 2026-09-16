@@ -9,7 +9,7 @@ import Mathlib.Topology.Compactness.Compact
 # Joint continuity of the lifted linear action
 
 This file strengthens the fixed-element continuity proved in
-`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/Continuous.lean`.  The key estimates are local at the identity:
+`CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Continuous.lean`.  The key estimates are local at the identity:
 
 * `x.shift φ - φ` is uniformly small in `φ` when `x` is close to `1`;
   integer equivariance reduces this to the compact interval `[0, 1]`;

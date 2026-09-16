@@ -169,6 +169,19 @@ until their implementing cutovers add the corresponding checks.
   sibling; the arbitrary-divisor-rank charge is a sibling input of the
   exponential kernel, not a child of the scalar `H`-degree compression
   (MO1.06, #1317).
+- **A covering group is not its action.** The universal cover of
+  `GL⁺(2, ℝ)` -- the compatible-pair group, its `ℤ` deck group, the global
+  chart, simple connectedness, the covering map and the topological-group laws
+  -- is at `LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/`, with the
+  `+1`-equivariant order automorphisms of `ℝ` at
+  `Algebra/Order/NormalizedShift/`, the general product-of-coverings lemma at
+  `Topology/Covering/`, and the cover-independent complex-coordinate adapter at
+  `LinearAlgebra/Complex/`. None of them reaches the stability tree or
+  geometry. The phase conventions and the action on slicings, charges and
+  stability conditions stay at `StabilityCondition/Symmetry/GLTilde/Action/`,
+  which still imports the cover. `GLTilde` being a universal cover is
+  `GLTilde.universalCoverData` and `exact_deckHom_toMatHom`, two proved
+  theorems, not an inference from the identifier (MO1.12, #1323).
 - **Weak stability is independent of Bridgeland stability**, and
   `PreStabilityCondition` structurally extends `WeakPreStabilityCondition`.
 - **Retired paths stay retired.** The gate carries the list.

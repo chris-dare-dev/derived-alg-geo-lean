@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Action.PreStability
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Foundations.FiniteLength
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.UniformContinuity
+import DerivedAlgGeo.Algebra.Order.NormalizedShift.UniformContinuity
 import MathFormalContract
 
 /-!
@@ -19,9 +19,9 @@ a normalized shift distorts windows.
 
 Three ingredients close it:
 
-1. `NormalizedShift.exists_radius` (`WeakStabilityCondition/StabilityCondition/Phase/UniformContinuity.lean`) — uniform continuity,
+1. `NormalizedShift.exists_radius` (`Algebra/Order/NormalizedShift/UniformContinuity.lean`) — uniform continuity,
    giving one radius `η'` whose every window maps to width `< 2η`.
-2. `relabel_intervalProp` (`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/Slicing.lean`) — interval subcategories are
+2. `relabel_intervalProp` (`CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Slicing.lean`) — interval subcategories are
    reindexed exactly, so the relabelled window at `(t-η', t+η')` *is* the
    original at `(f⁻¹(t-η'), f⁻¹(t+η'))`.
 3. `interval_thinFiniteLength_of_inclusion_strict`

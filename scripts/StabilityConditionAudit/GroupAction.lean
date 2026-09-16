@@ -10,25 +10,6 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
 
-/-! ## GroupAction lane — NormalizedShift (step 1) -/
-
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.toOrderIso_injective
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.ext'
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.symm_map_add_one
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.group
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.mul_apply
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.one_apply
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.inv_apply
-
-/-! ## GroupAction lane — ShiftAnalysis (step 3c groundwork) -/
-
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.map_add_nat
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.map_sub_nat
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.map_add_int
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.uniformContinuous
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.NormalizedShift.exists_radius
-
 /-! ## GroupAction lane — GLTilde (step 2) -/
 
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.rayVec
@@ -337,7 +318,6 @@ this against the file by eye. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glPosOfCoordinates_coordinates
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.continuous_toMatGLPos
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.glPosCoordinateHomeomorph
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.isCoveringMap_prodMap_id
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.phaseCircle
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.phaseCircle_isCoveringMap
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.coordinateProjection
