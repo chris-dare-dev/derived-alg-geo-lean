@@ -2,11 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-<<<<<<< HEAD
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Slope
-=======
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Charge
->>>>>>> 0addb0f9 (refactor(charge): move the real-Mukai charge bridge out of the quadratic extension (#1315))
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 
 /-!
