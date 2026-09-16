@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Transfer.LocallyFinite
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Distance.Basic
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Uniqueness
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Uniqueness
 
 /-!
 # Mass and the stability metric under transfer
