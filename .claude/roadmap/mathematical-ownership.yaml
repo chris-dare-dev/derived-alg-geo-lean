@@ -560,7 +560,7 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.13 — Make mass a sibling of metric and extract planar convex geometry
-  status: planned
+  status: done
   summary: 'Give mass its own stability-theoretic owner and move neutral planar perimeter/convexity lemmas
     out of a mass-subadditivity proof directory. Relates to the mass-Hom consumer #1185, whose theorem
     and moduli input remain outside this structural issue.'
