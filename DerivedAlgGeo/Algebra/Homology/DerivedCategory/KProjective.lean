@@ -142,3 +142,58 @@ def kProjectiveDerivedFunctorObjIso
 end
 
 end CategoryTheory
+
+namespace CochainComplex.IsKProjective
+
+open CategoryTheory HomologicalComplex
+
+universe v v' u u'
+
+variable {C : Type u} [Category.{v} C] [Abelian C]
+  {D : Type u'} [Category.{v'} D] [Abelian D]
+
+/-- An additive functor carries a quasi-isomorphism between K-projective
+cochain complexes to a homotopy equivalence.
+
+This is the mechanism behind every unconditional preservation statement for
+K-projective representatives: a quasi-isomorphism between K-projective
+complexes is already an isomorphism in the homotopy category, and every
+additive functor preserves homotopies.  No exactness, flatness or
+limit-preservation hypothesis on `F` is used, and none is available. -/
+lemma homotopyEquivalences_map (F : C ⥤ D) [F.Additive]
+    {K L : CochainComplex C ℤ} [K.IsKProjective] [L.IsKProjective]
+    {g : K ⟶ L} (hg : quasiIso C (ComplexShape.up ℤ) g) :
+    homotopyEquivalences D (ComplexShape.up ℤ)
+      ((F.mapHomologicalComplex (ComplexShape.up ℤ)).map g) := by
+  rw [mem_quasiIso_iff] at hg
+  obtain ⟨e, rfl⟩ := (CochainComplex.IsKProjective.quasiIso_iff g).1 hg
+  exact ⟨F.mapHomotopyEquiv e, rfl⟩
+
+/-- An additive functor carries a quasi-isomorphism between K-projective
+cochain complexes to a quasi-isomorphism. -/
+lemma quasiIso_map (F : C ⥤ D) [F.Additive]
+    {K L : CochainComplex C ℤ} [K.IsKProjective] [L.IsKProjective]
+    {g : K ⟶ L} (hg : quasiIso C (ComplexShape.up ℤ) g) :
+    quasiIso D (ComplexShape.up ℤ)
+      ((F.mapHomologicalComplex (ComplexShape.up ℤ)).map g) :=
+  homotopyEquivalences_le_quasiIso D (ComplexShape.up ℤ) _
+    (homotopyEquivalences_map F hg)
+
+/-- The bounded-above degreewise-projective case of `quasiIso_map`.
+
+This is the form in which the hypothesis is actually inhabited: every
+bounded-above complex of projective objects is K-projective, and in a module
+category such complexes are abundant.  It records that an additive functor
+needs no exactness to be correct on bounded-above projective representatives. -/
+lemma quasiIso_map_of_projective (F : C ⥤ D) [F.Additive]
+    {K L : CochainComplex C ℤ} (dK dL : ℤ)
+    [K.IsStrictlyLE dK] [L.IsStrictlyLE dL]
+    [∀ n : ℤ, Projective (K.X n)] [∀ n : ℤ, Projective (L.X n)]
+    {g : K ⟶ L} (hg : quasiIso C (ComplexShape.up ℤ) g) :
+    quasiIso D (ComplexShape.up ℤ)
+      ((F.mapHomologicalComplex (ComplexShape.up ℤ)).map g) := by
+  letI := CochainComplex.isKProjective_of_projective K dK
+  letI := CochainComplex.isKProjective_of_projective L dL
+  exact quasiIso_map F hg
+
+end CochainComplex.IsKProjective

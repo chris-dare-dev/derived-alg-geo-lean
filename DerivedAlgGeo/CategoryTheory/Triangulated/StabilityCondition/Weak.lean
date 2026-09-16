@@ -7,10 +7,9 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Families
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Heart
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.HarderNarasimhan
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Metric
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Mass
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Support
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Charge
 
 /-!
 # Weak stability conditions
@@ -23,4 +22,12 @@ weakened variant by its adjective, while the dependency runs the other way.
 Nothing below `Weak/` imports the Bridgeland theory, and this umbrella is
 importable without it. Declaration namespaces remain
 `CategoryTheory.Triangulated.WeakStabilityCondition`.
+
+The abelian half of the theory is not here. Stability functions on an abelian
+category, their Harder--Narasimhan filtrations, and the `ClassDatum` the charge
+condition is stated over are owned by `CategoryTheory/Abelian/Stability/` since
+MO1.08 (#1319); `Weak/Foundation.lean` consumes that owner and re-exports it, so
+this umbrella still offers the same names. What remains below `Weak/` is the
+triangulated theory: slicings, the heart adapter, support, tilting and the
+families.
 -/

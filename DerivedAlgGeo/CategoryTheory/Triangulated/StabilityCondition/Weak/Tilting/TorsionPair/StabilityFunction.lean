@@ -2,15 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.Splitting
+import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Splitting
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting.TorsionPair.Basic
 
 /-!
 # The torsion pair of an abelian stability function at a phase cutoff
 
 For a stability function `Z` on an abelian category with the Harder–Narasimhan
-property, and a number `β`, the two classes of `Foundation/StabilityFunction/
-Cutoff.lean`
+property, and a number `β`, the two classes of `Abelian/Stability/Cutoff.lean`
 
 ```
 T β = {E | every HN phase of E exceeds β}      F β = {E | every HN phase is at most β}

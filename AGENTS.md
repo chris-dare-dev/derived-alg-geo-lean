@@ -149,10 +149,11 @@ until their implementing cutovers add the corresponding checks.
   the subcomponents that exist to consume it: `DerivedCategory/Stability/`,
   `Moduli/{HarderNarasimhan,Semistability}/`, `Numerical/Stability/`,
   `Numerical/Examples/{Surface,Threefold,Fourfold}/`,
-  `Numerical/GrothendieckGroup/CategoricalChargeK3.lean` and
-  `Stability/Gieseker/`.
+  and `Numerical/GrothendieckGroup/CategoricalChargeK3.lean`.
   Everything else below `AlgebraicGeometry/` is stability-neutral, transitively
-  included. A same-named umbrella over one of those subcomponents is exempt as
+  included -- `Stability/` among it since MO1.08 (#1319), which moved the
+  abstract slope theory it instantiates to `CategoryTheory/Abelian/Stability/`
+  and removed the exemption rather than renaming it. A same-named umbrella over one of those subcomponents is exempt as
   an umbrella, and its other children are not. The
   `AlgebraicGeometry/DerivedCategory` umbrella is the one that omits a child
   outright -- it drops `Stability`, and the top-level `AlgebraicGeometry`
@@ -305,10 +306,51 @@ Build locally by **naming a target**, which the hook allows:
 LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
 ```
 
-`LEAN_NUM_THREADS=2` limits Lake to two concurrent `lean` processes; without it
-Lake takes one per core. It is set for every agent session in
-`~/.claude/settings.json`, so a plain `lake build <Target>` is already capped —
-set it explicitly if you are building from a shell that does not inherit that.
+`LEAN_NUM_THREADS` is **required and enforced**, not advice: the same hook
+refuses a `lake build` that does not set it, or that sets it above 4. Naming a
+target bounds how much a build does; this bounds how wide it does it. Without
+the variable Lake takes one `lean` process per core, which on this 16-core host
+is up to 16 processes holding several GB each — from a build the size rule
+deliberately permits.
+
+It used to be advice, and on 2026-09-15 that failed exactly as the size rule had
+in #837. The host reached ~60 concurrent `lean` processes across worktrees and
+the four self-hosted runners; the commit limit collapsed to 2.9 GB free; CI
+`build` jobs on five branches died with **no log and no step records** ("the
+self-hosted runner lost communication"), `lean` died mid-build with
+`std::bad_alloc` (exit code 3221226505), and `elan` failed to relink `lake.exe`
+behind a crashed job's leftovers. None of those failures names memory in its
+message, which is what made it expensive to diagnose.
+
+`~/.claude/settings.json` exports the variable for every agent session, so a
+plain `lake build <Target>` is normally already capped. The enforcement exists
+for the shells that do not inherit it — which this file previously just warned
+about. `scripts/test_local_build.sh` pins both edges.
+
+### Seeding a new worktree's cache
+
+A fresh worktree builds all ~5850 modules from cold before it reaches the file
+you changed. It does not have to:
+
+```bash
+scripts/seed_worktree_cache.sh --dry-run   # pick a donor, say what it would do
+scripts/seed_worktree_cache.sh             # copy it in
+```
+
+This copies `.lake/build` from the most-built worktree of this clone and links
+`.lake/packages` to the shared dependency set, which a fresh worktree otherwise
+lacks and nothing documents. Lake verifies every trace against the source it
+finds, so anything your branch changes is still rebuilt and nothing stale is
+trusted. Measured on 2026-09-15: 1556 modules seeded, after which a targeted
+build completed 2069 jobs in 43 seconds.
+
+It **copies rather than hardlinks**, and the script's header says why -- Lean
+writes an `.olean` at its final path, so a hardlink would let a rebuild in one
+worktree write through into another's cache. It therefore spends disk to save
+commit, which is the right trade on this host and not a universal one.
+
+The script only ever writes to the worktree you run it in, and refuses a target
+that already has a build cache unless you pass `--force`.
 
 `lake env lean scratch.lean` is **not** restricted and is not meant to be. It is
 the seconds-long probe interactive proof work depends on; routing each attempt at

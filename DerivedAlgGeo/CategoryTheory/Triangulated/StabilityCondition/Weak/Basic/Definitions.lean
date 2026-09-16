@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.HeartDatum
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.HeartDatum
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing
 import Mathlib.CategoryTheory.Triangulated.TStructure.Heart
 import Mathlib.Tactic

@@ -230,7 +230,7 @@ of all six terms and unconditional exactness plus endpoint mono/epi. -/
 
 /-! ## The abelian torsion pair of a stability function
 
-`T β` and `F β` of `Foundation/StabilityFunction/Cutoff.lean` satisfy both
+`T β` and `F β` of `Abelian/Stability/Cutoff.lean` satisfy both
 torsion-pair axioms: Hom-vanishing from `PhaseMonotone.lean`, and the splitting
 from `Splitting.lean`. This is the abelian counterpart of the slicing pair in
 `TorsionPair/Slope.lean`, and the form Bridgeland's §6 uses on `Coh X`. -/
