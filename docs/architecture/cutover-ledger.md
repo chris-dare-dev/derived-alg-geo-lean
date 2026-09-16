@@ -712,6 +712,50 @@ theorem, and no row here asserts one. "Provisionally" is the existing ADR-0010
 lands, the subtree moves under `CategoryTheory/Enriched/` in that same change.
 This is not a request to re-encode the library as enriched categories.
 
+**Landed 2026-09-15** in #1320. Sixteen modules of intrinsic `H⁰` theory --
+the zero object, the chosen shift, the distinguished triangles built from dg
+cones, the functorial cone diagrams, and the exactness of the functors and
+natural transformations `DGFunctor.h0` produces -- moved from
+`CategoryTheory/Triangulated/DGEnhancement/H0/` to
+`Algebra/Homology/DGCategory/Pretriangulated/H0/`. Every one of them is stated
+for a pretriangulated dg category `C` alone: no ordinary category has been
+chosen and no comparison equivalence appears. `H0.hasZeroObject` and
+`H0.isZero_of_dgId_eq_zero` moved out of `DGEnhancement/Basic.lean` for the same
+reason, which is what lets the dg root stop importing the enhancement file.
+`H0/ConeFunctor.lean` was split: the `H0` cone functors are intrinsic and moved,
+the `Enhancement` transport of them stayed.
+
+What stayed below `DGEnhancement/H0/` needs something the dg category does not
+supply. `ConeFunctor` and `MorphismCone` transport cones across a chosen
+comparison and carry its shift and exactness compatibilities as hypotheses. The
+four `*K0` modules read triangles and twists in the Grothendieck group and
+consume `CategoryTheory/Triangulated/GrothendieckGroup/`; they are downstream of
+the intrinsic root rather than part of it, and keeping them here is what stops
+the dg tree importing that root.
+
+`Enhancement` is retained and is now labelled in its own docstring as the
+underlying **H⁰ presentation**. The refinement is the new structure
+`Enhancement.Exact` in `DGEnhancement/Exact.lean`, carrying two fields: a
+`Functor.CommShift ℤ` on the comparison and a `Functor.IsTriangulated`. Both are
+the ordinary Mathlib classes, so supplying the refinement means supplying a
+`CommShift` and discharging a proof obligation -- it is not a Boolean, and it is
+not advertised as proved. No instance is produced for a general presentation.
+Its one inhabitant is `Cdg.enhancementExact`, in
+`HomotopyCategory/DGEnhancement/Agreement.lean`, where both fields come from the
+existing proved agreement for the complexes model
+(`Cdg.h0FunctorCommShift` and `Cdg.h0FunctorIsTriangulated`); that agreement, and
+`Cdg.seam_distinguishedTriangles_eq`, are unchanged. The seam and exactness
+obligations remain #854's and #855's; this row packaged the comparison and
+discharged nothing on their behalf. No declaration added here asserts uniqueness
+of enhancements, in either strength.
+
+Consumers that need only the shift comparison still take
+`[e.equiv.functor.CommShift ℤ]` alone rather than the bundle, because relocation
+may not strengthen a hypothesis. Layering rule 13 checks the four owners and the
+one import claim: the dg encoding root and its `H0` subtree reach no enhancement
+consumer, scheme realization or stability module. Fully qualified declaration
+names are unchanged throughout.
+
 ### Component-specific forbidden import edges
 
 Named per review finding 14, replacing the impulse to impose a total order on
@@ -772,6 +816,18 @@ stability tree, and `Numerical/Models` is held neutral. `Numerical/Stability`,
 and `Stability/Gieseker` remain as they were.
 
 ## Completed roots
+
+- Intrinsic dg H⁰ owned by `DGCategory`, presentation separated from exact
+  enhancement (2026-09-15, finding 15): sixteen modules of shift, triangle,
+  cone-diagram and functor-exactness theory are now below
+  `Algebra/Homology/DGCategory/Pretriangulated/H0/`, and that root imports no
+  enhancement consumer, scheme realization or stability module.
+  `CategoryTheory/Triangulated/DGEnhancement/` keeps only what needs a chosen
+  category or the Grothendieck group, and now names two carriers rather than
+  one: `Enhancement`, the underlying H⁰ presentation, and `Enhancement.Exact`,
+  the refinement carrying the shift and exactness compatibilities as supplied
+  data. `Cdg.enhancementExact` is its one inhabitant, built from the existing
+  proved agreement for the complexes model.
 
 - Derived base change separated from its K-flat model (2026-09-14): the
   base-change layer of `AlgebraicGeometry/DerivedCategory/Families/` was stated

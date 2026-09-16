@@ -16,6 +16,7 @@ Usage:
     python3 scripts/check_mathlib_style.py FILE [FILE ...]
     python3 scripts/check_mathlib_style.py --hook              # hook JSON on stdin
     python3 scripts/check_mathlib_style.py --diff-only REF F.. # only changed lines
+    python3 scripts/check_mathlib_style.py --self-test         # known-answer fixtures
 
 `--diff-only` exists because a branch gate and an edit hook are answering
 different questions. The hook judges the line you just wrote, so it is strict.
@@ -41,6 +42,9 @@ from _output import force_utf8_output
 
 MAX_LINE = 100
 
+ROOT = Path(__file__).resolve().parent.parent
+FIXTURES = ROOT / "scripts" / "fixtures" / "mathlib-style"
+
 # Only owner-authored library source. Vendored Apache source keeps upstream
 # style, audit scripts are not library modules, and `.claude/` holds review
 # fixtures that were deliberately frozen.
@@ -56,6 +60,31 @@ DECL_RE = re.compile(
 # Declaration kinds Mathlib requires a docstring on, no exceptions.
 DOC_REQUIRED = {"def", "abbrev", "structure", "class", "inductive"}
 NAME_RE = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_.'₁-₉]*)")
+STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
+
+# Primed names Mathlib itself fixes: the field obligations a bundled subobject
+# or bundled hom has to discharge, where the prime is part of the required name
+# and the unprimed form is the `simp` lemma Mathlib derives from it. The author
+# does not choose these, so "say what differs from the unprimed form" is not a
+# docstring anyone can write.
+MATHLIB_PRIMED = {
+    "zero_mem'", "one_mem'", "add_mem'", "mul_mem'", "neg_mem'", "inv_mem'",
+    "sub_mem'", "div_mem'", "smul_mem'", "algebraMap_mem'", "mem_carrier'",
+    "map_zero'", "map_one'", "map_add'", "map_mul'", "map_smul'", "map_rel'",
+    "commutes'", "ext'", "coe_injective'", "toFun_eq_coe'", "nonempty'",
+}
+
+# Git writes `<<<<<<< `, `=======`, `>>>>>>> `, and -- under
+# `merge.conflictStyle = diff3` -- `||||||| `, each at the very start of a line.
+# Seven `<` or seven `>` there are unambiguous: no Lean token and no prose this
+# repository writes opens a line that way, so those two are the anchors.
+# `=======` is *not* unambiguous -- it is a legal Markdown setext heading
+# underline, and the module docstrings here are Markdown -- and seven pipes are
+# a marker only in diff3 output. Both are therefore reported only when an anchor
+# appears elsewhere in the same file, which is exactly the condition git
+# guarantees whenever it writes either of them.
+CONFLICT_ANCHOR_RE = re.compile(r"^(?:<{7}|>{7})(?: |$)")
+CONFLICT_INNER_RE = re.compile(r"^(?:={7}$|\|{7}(?: |$))")
 
 
 class Finding:
@@ -67,18 +96,44 @@ class Finding:
 
 
 def in_scope(path: Path) -> bool:
+    """Is `path` owner-authored `DerivedAlgGeo` library source?
+
+    Both halves of this test are answered *relative to the repository root*,
+    and each half used to be answered against the path as given. That is two
+    separate ways for the checker to fall silent, and both were live:
+
+    * An agent session runs in a worktree under `.claude/worktrees/<name>/`,
+      and the `PostToolUse` hook is handed an absolute path. So `.claude`
+      appeared in `parts`, `EXCLUDED_PARTS` matched it, and every library file
+      edited in a worktree was skipped -- on every platform.
+    * `INCLUDED_PREFIXES` is written with `/`, but on Windows
+      `str(Path("DerivedAlgGeo/Foo.lean"))` is `DerivedAlgGeo\\Foo.lean`, so
+      the substring test never matched at all.
+
+    Either one alone makes the hook a no-op, which is the other half of why
+    nothing local caught #1359. A path outside the repository keeps the old
+    as-given reading.
+    """
     if path.suffix != ".lean":
         return False
-    parts = path.parts
-    if any(p in EXCLUDED_PARTS for p in parts):
+    try:
+        rel = path.resolve().relative_to(ROOT)
+    except (ValueError, OSError):
+        rel = path
+    if any(p in EXCLUDED_PARTS for p in rel.parts):
         return False
-    text = str(path)
-    return path.name in INCLUDED_FILES or any(p in text for p in INCLUDED_PREFIXES)
+    text = rel.as_posix()
+    return rel.name in INCLUDED_FILES or any(p in text for p in INCLUDED_PREFIXES)
 
 
 def strip_string_literals(line: str) -> str:
     """Blank out double-quoted spans so token checks do not fire inside strings."""
-    return re.sub(r'"(?:[^"\\]|\\.)*"', lambda m: '"' + " " * (len(m.group(0)) - 2) + '"', line)
+    return STRING_RE.sub(lambda m: '"' + " " * (len(m.group(0)) - 2) + '"', line)
+
+
+def column_in_string(line: str, column: int) -> bool:
+    """Does `column` (0-based) fall inside a double-quoted literal on `line`?"""
+    return any(m.start() <= column < m.end() for m in STRING_RE.finditer(line))
 
 
 def code_only(lines: list[str]) -> list[str]:
@@ -112,9 +167,56 @@ def code_only(lines: list[str]) -> list[str]:
     return out
 
 
+def conflict_markers(raw: str, lines: list[str]) -> list[Finding]:
+    """Findings for git merge-conflict markers committed into the file.
+
+    Nothing else in `scripts/` catches these. Every structural gate --
+    `check_layering.py`, `check_umbrella_coverage.py`,
+    `check_source_independence.py`, `check_root_reachability.py` -- reads
+    `import` lines and ignores the rest, so a file full of `<<<<<<< HEAD`
+    passes all four. On 2026-09-16 a rebase left markers in two files, `git
+    add -A` staged them, and the defect surfaced ~13 minutes into CI as
+    `unexpected token '<<<'; expected command` (#1359, issue #1315).
+
+    Raw lines, not `code_only`: a conflict inside a docstring is still a
+    conflict, and a conflicted file's block-comment nesting is unbalanced
+    anyway, so the blanking pass cannot be trusted here.
+    """
+    # One C-level scan of the whole file keeps the common case -- a file with
+    # no conflict in it -- off the per-line path entirely.
+    if "<<<<<<<" not in raw and ">>>>>>>" not in raw:
+        return []
+    text = [ln[:-1] if ln.endswith("\r") else ln for ln in lines]
+    hits = {i for i, ln in enumerate(text, start=1) if CONFLICT_ANCHOR_RE.match(ln)}
+    if not hits:
+        return []
+    hits.update(i for i, ln in enumerate(text, start=1) if CONFLICT_INNER_RE.match(ln))
+    return [
+        Finding(
+            "ERROR",
+            i,
+            "CONFLICT",
+            f"Unresolved merge-conflict marker `{elide(text[i - 1])}`; finish the merge.",
+        )
+        for i in sorted(hits)
+    ]
+
+
+def elide(line: str, limit: int = 48) -> str:
+    """Shorten a quoted source line; a rebase marker carries a whole commit subject."""
+    return line if len(line) <= limit else line[:limit] + "..."
+
+
 def check_text(raw: str, path: Path) -> list[Finding]:
-    out: list[Finding] = []
     lines = raw.split("\n")
+
+    # A file with conflict markers is not Lean source yet, so every check below
+    # would be judging text that does not survive the resolution. Report the
+    # markers alone: the only useful next action is to finish the merge.
+    if conflicts := conflict_markers(raw, lines):
+        return conflicts
+
+    out: list[Finding] = []
     code = code_only(lines)
 
     # An import-only re-export file needs neither a copyright header nor a full
@@ -127,15 +229,33 @@ def check_text(raw: str, path: Path) -> list[Finding]:
 
     # The module docstring must be the first command after the imports.
     first_cmd = None
+    in_header = False
     for i, line in enumerate(lines):
         s = line.strip()
+        if in_header:
+            # The copyright block is skipped to its close. It used to be skipped
+            # by an allowlist of its prose -- `Copyright`, `Released under`,
+            # `Authors` -- so any fourth line fell through and was reported as
+            # the first command. `Portions adapted from mattrobball/...` in the
+            # vendored attributions did exactly that, five times.
+            if s.endswith("-/"):
+                in_header = False
+            continue
         if not s or s.startswith("--"):
             continue
         if s.startswith("/-") and not s.startswith("/-!"):
-            continue  # header block; skipped crudely, good enough for position
-        if s.startswith(("import ", "public import ", "meta import ", "module")) or s in {"-/", "module"}:
+            if s == "/-" or not s.endswith("-/"):
+                in_header = True
             continue
-        if s.startswith("Copyright") or s.startswith("Released under") or s.startswith("Authors"):
+        if s == "-/":
+            continue
+        if s.startswith(("import ", "public import ", "meta import ")) or s == "module":
+            continue
+        # A file-level `set_option` is a command, but it is one Mathlib writes
+        # *before* the module docstring, so it does not answer "is the docstring
+        # first". 25 of the 30 MODDOC findings were files that open with
+        # `set_option backward.defeqAttrib.useBackward true`.
+        if s.startswith("set_option "):
             continue
         first_cmd = (i + 1, s)
         break
@@ -162,7 +282,14 @@ def check_text(raw: str, path: Path) -> list[Finding]:
         # hierarchy such as `CategoryTheory.Triangulated.StabilityCondition`
         # needs the same exception.
         is_import = re.match(r"^\s*(?:(?:public|meta)\s+)?import\s+", c) is not None
-        if len(line) > MAX_LINE and not is_import:
+        # A line that is only long because the limit lands inside a string
+        # literal is not the problem this rule is about. Those are the
+        # `(note := "...")` review records, up to 691 characters of deliberate
+        # prose; reflowing one means a string gap, which is legal Lean but
+        # edits the payload's whitespace for no readability gain. The code on
+        # such a line is short. 12 of the 145 LONG findings were these.
+        in_string = column_in_string(line, MAX_LINE)
+        if len(line) > MAX_LINE and not is_import and not in_string:
             out.append(Finding("ERROR", idx, "LONG", f"Line is {len(line)} chars; Mathlib's limit is {MAX_LINE}."))
 
         if " ;" in c:
@@ -188,6 +315,9 @@ def check_text(raw: str, path: Path) -> list[Finding]:
         name = nm.group(1) if nm else "<anonymous>"
 
         doc = preceding_docstring(lines, idx - 1)
+        # `zero_mem'`, `ext'` and friends: Mathlib fixes the name, so neither
+        # the ERROR nor the WARN below has anything the author could write.
+        explainable_prime = name.endswith("'") and name.split(".")[-1] not in MATHLIB_PRIMED
 
         if doc is None:
             if kw in DOC_REQUIRED:
@@ -198,7 +328,7 @@ def check_text(raw: str, path: Path) -> list[Finding]:
                 out.append(
                     Finding("WARN", idx, "DOC", f"`{kw} {name}` has no docstring. Add one if it has mathematical content.")
                 )
-            if name.endswith("'"):
+            if explainable_prime:
                 out.append(
                     Finding(
                         "ERROR",
@@ -208,7 +338,7 @@ def check_text(raw: str, path: Path) -> list[Finding]:
                     )
                 )
         else:
-            if name.endswith("'") and "'" not in doc and "prime" not in doc.lower():
+            if explainable_prime and "'" not in doc and "prime" not in doc.lower():
                 out.append(
                     Finding(
                         "WARN",
@@ -237,12 +367,35 @@ def check_text(raw: str, path: Path) -> list[Finding]:
 
 
 def preceding_docstring(lines: list[str], decl_index: int) -> str | None:
-    """Return the `/-- ... -/` docstring immediately above `lines[decl_index]`, if any."""
+    """Return the `/-- ... -/` docstring immediately above `lines[decl_index]`, if any.
+
+    Attributes may sit between the docstring and the declaration; a blank line
+    detaches the docstring, so it is not skipped.
+
+    An attribute can span several lines. This repository's `@[cites ...]`
+    carries its `(note := "...")` record on a line of its own, and skipping only
+    lines that *start* with `@[` stopped at that continuation, so a documented
+    declaration was reported as undocumented -- `def stabilityDist` in
+    `.../Metric/Distance/Basic.lean` was the whole of the `DOC` ERROR count.
+    A continuation is recognised by its closing `]` and walked back to its
+    opener, never across a blank line, so an ordinary `variable [Foo]` above a
+    declaration cannot be mistaken for one.
+    """
     i = decl_index - 1
-    # Attributes may sit between the docstring and the declaration; a blank line
-    # detaches the docstring, so it is not skipped.
-    while i >= 0 and lines[i].strip().startswith("@["):
-        i -= 1
+    while i >= 0:
+        s = lines[i].strip()
+        if s.startswith("@["):
+            i -= 1
+            continue
+        if s.endswith("]") and not s.endswith("-/"):
+            j = i
+            while j >= 0 and lines[j].strip() and not lines[j].strip().startswith("@["):
+                j -= 1
+            if j < 0 or not lines[j].strip().startswith("@["):
+                break
+            i = j - 1
+            continue
+        break
     if i < 0 or not lines[i].strip().endswith("-/"):
         return None
     end = i
@@ -328,6 +481,58 @@ def changed_lines(ref: str, path: Path) -> set[int] | None:
     return lines
 
 
+def self_test() -> int:
+    """Run the known-answer fixtures under `scripts/fixtures/mathlib-style/`.
+
+    The layout is `<code>/allowed/*.leansrc` and `<code>/forbidden/*.leansrc`,
+    where `<code>` is the lowercased finding code under test: every `allowed`
+    fixture must produce no finding with that code and every `forbidden`
+    fixture must produce at least one, so an edit that silently stops
+    rejecting something is caught here instead of by the next regression.
+
+    Only the named code is asserted on, which lets a fixture be about exactly
+    one question rather than a fully Mathlib-clean file.
+
+    A fixture is Lean source text but deliberately not a `.lean` file: it must
+    reach neither `lake`, `lake exe lint-style`, the declaration sweep, nor
+    this checker's own `in_scope`. `scripts/fixtures/layering` keeps its
+    hypothetical modules out of the build the same way.
+    """
+    failures: list[str] = []
+    groups = sorted(p for p in FIXTURES.iterdir() if p.is_dir()) if FIXTURES.is_dir() else []
+    if not groups:
+        print(f"no mathlib-style fixtures found under {FIXTURES}", file=sys.stderr)
+        return 1
+
+    checked = 0
+    for group in groups:
+        code = group.name.upper()
+        for verdict in ("allowed", "forbidden"):
+            base = group / verdict
+            fixtures = sorted(base.glob("*.leansrc")) if base.is_dir() else []
+            if not fixtures:
+                failures.append(f"no {verdict} fixtures for [{code}] under {base}")
+                continue
+            for fixture in fixtures:
+                checked += 1
+                found = [
+                    f
+                    for f in check_text(fixture.read_text(encoding="utf-8"), fixture)
+                    if f.code == code
+                ]
+                label = fixture.relative_to(ROOT).as_posix()
+                if verdict == "forbidden" and not found:
+                    failures.append(f"forbidden fixture {label} produced no [{code}] finding")
+                if verdict == "allowed" and found:
+                    where = ", ".join(f"line {f.line}" for f in found)
+                    failures.append(f"allowed fixture {label} was rejected: [{code}] at {where}")
+
+    for failure in failures:
+        print(f"mathlib-style fixture: {failure}", file=sys.stderr)
+    print(f"mathlib-style fixtures: {checked} checked, {len(failures)} failed")
+    return 1 if failures else 0
+
+
 def report(path: Path, findings: list[Finding]) -> int:
     errors = [f for f in findings if f.severity == "ERROR"]
     warns = [f for f in findings if f.severity == "WARN"]
@@ -337,6 +542,9 @@ def report(path: Path, findings: list[Finding]) -> int:
 
 
 def main(argv: list[str]) -> int:
+    if "--self-test" in argv:
+        return self_test()
+
     paths: list[Path]
     hook_mode = "--hook" in argv
     diff_ref: str | None = None

@@ -45,7 +45,15 @@ LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
 **Full verification runs on the self-hosted Windows runners, not on your
 machine.** Pushing an `agent/**` branch runs the whole gate there; a bare
 `lake build` and `scripts/gates.sh` are refused locally by a `PreToolUse` hook.
-See `CONTRIBUTING.md` §"Where verification runs".
+For the local pre-flight the hook allows — every gate that needs no Lean build,
+plus a targeted build of what you changed, in seconds — run:
+
+```bash
+scripts/precheck.sh
+```
+
+See `CONTRIBUTING.md` §"Where verification runs". Note that `scripts/gates.sh`
+is neither a subset nor a superset of CI; that section has the verified table.
 
 ## Layout
 

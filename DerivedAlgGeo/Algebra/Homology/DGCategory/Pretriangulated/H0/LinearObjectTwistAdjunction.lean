@@ -3,8 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.LinearObjectTwistAdjunction
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionCone
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.LinearObjectTwist
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.AdjunctionCone
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.LinearObjectTwist
 
 /-!
 # Scalar-linear object-twist triangles as adjunction twist triangles

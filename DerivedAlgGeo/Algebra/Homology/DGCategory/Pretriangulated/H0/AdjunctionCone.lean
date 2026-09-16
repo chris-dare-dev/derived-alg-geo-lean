@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.AdjunctionH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.AdjunctionCone
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.NaturalTransformationCone
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.NaturalTransformationCone
 
 /-!
 # The twist triangle of a dg adjunction

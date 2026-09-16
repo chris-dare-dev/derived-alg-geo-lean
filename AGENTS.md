@@ -219,10 +219,24 @@ three uses of "perfect" (`schemePerfect`, `schemeRelativePerfect`,
   `extends` that is not there. If the enriched encoding (ADR-0010 Option A′)
   ever lands, the subtree moves under `CategoryTheory/Enriched/` in the same
   change.
-- A dg enhancement is a structure on an abstract triangulated category and
-  lives in `CategoryTheory/Triangulated/DGEnhancement/`. Its realization for
-  Mathlib's homotopy category lives with that object, in
-  `Algebra/Homology/HomotopyCategory/DGEnhancement/`.
+- The intrinsic `H⁰` theory of a pretriangulated dg category -- the zero
+  object, the shift, the distinguished triangles built from dg cones, the
+  functorial cone diagrams and the exactness of what `DGFunctor.h0` produces --
+  mentions no other category, so it lives with the dg encoding, in
+  `Algebra/Homology/DGCategory/Pretriangulated/H0/`. It imports no enhancement
+  consumer, scheme realization or stability module, and layering rule 13 keeps
+  that true (#1320).
+- Comparison with a *chosen* category lives in
+  `CategoryTheory/Triangulated/DGEnhancement/`. Two strengths are distinguished
+  and must not be conflated: `Enhancement` is the underlying **H⁰
+  presentation** -- a plain equivalence `H⁰ A ≌ T` with `T` an arbitrary
+  category -- and `Enhancement.Exact` is the refinement carrying the `CommShift`
+  and `Functor.IsTriangulated` compatibilities as data. The refinement is
+  supplied, not proved; `Cdg.enhancementExact` is its one inhabitant. No
+  declaration asserts uniqueness of enhancements in either strength.
+- The realization for Mathlib's homotopy category, and the proved agreement of
+  the two triangulated structures for the complexes model, live with that
+  object, in `Algebra/Homology/HomotopyCategory/DGEnhancement/`.
 - Monoidal and triangulated structures are independent; their compatibility
   class is `CategoryTheory/Monoidal/Triangulated.lean`, and geometric exact
   tensors instantiate it from geometry.
@@ -280,10 +294,17 @@ gh workflow run ci.yml --ref <branch>
 
 **This is enforced, not advised.** A `PreToolUse` hook on `Bash`, wired in the
 tracked `.claude/settings.json` so it reaches every worktree, runs
-`scripts/check_local_build.py` and refuses two commands:
+`scripts/check_local_build.py` and refuses three things:
 
 * `scripts/gates.sh`, in any mode;
-* `lake build` with **no target**.
+* `lake build` with **no target**;
+* `lake build <Target>` that does not declare `LEAN_NUM_THREADS`, or sets it
+  above 4 — see below.
+
+It refuses RUNNING that file, not reading it: `cat`, `grep`, `diff` and
+`git ls-tree` over `scripts/gates.sh` all pass, so you can still read the gate
+list. Until 2026-09-16 they did not, which is why the `land-pr` skill's own
+tooling probe was blocked by the hook it was probing around.
 
 Advice was what this section used to give, and advice is what failed: on
 2026-08-27 an agent read "the normal build stays local", ran a whole-library
@@ -295,10 +316,21 @@ agent lanes share one Mac, Lake takes one core per job by default, and four
 concurrent full gates oversubscribe a 14-core machine five times over — that is
 how a ten-minute gate becomes an hour.
 
-Neither the local script nor the runner lane is CI-equivalent on its own, and the
-difference has bitten: every gate in `gates.sh` runs in CI, but CI also runs the
-`mfc` contract tooling, which the script does not reproduce. Say "N gates pass",
-not "CI is green". See `CONTRIBUTING.md`.
+Neither the local script nor the runner lane is CI-equivalent on its own, and
+**neither list contains the other**. CI runs the `mfc` contract tooling, which
+the script does not reproduce. The script runs `workflows`, `trust-guard`,
+`local-build`, `mathlib-style` and — until PR #1355 — `single-instantiation`,
+none of which appear in any workflow. Say "N gates pass", naming them; never say
+"CI is green" for a local run. See `CONTRIBUTING.md` for the verified table.
+
+This paragraph used to read "every gate in `gates.sh` runs in CI", and that
+sentence is why `single-instantiation` ran nowhere for months: the hook made the
+script unrunnable, the summary said CI had it covered, and `bb8a1278` records the
+24 abstractions that drifted past its baseline with nothing going red.
+
+**For a local pre-flight the hook allows**, run `scripts/precheck.sh`: every gate
+that needs no Lean build, plus a targeted build of the modules you changed, in
+seconds. It is a cheap green, not a green.
 
 Build locally by **naming a target**, which the hook allows:
 
@@ -306,10 +338,51 @@ Build locally by **naming a target**, which the hook allows:
 LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
 ```
 
-`LEAN_NUM_THREADS=2` limits Lake to two concurrent `lean` processes; without it
-Lake takes one per core. It is set for every agent session in
-`~/.claude/settings.json`, so a plain `lake build <Target>` is already capped —
-set it explicitly if you are building from a shell that does not inherit that.
+`LEAN_NUM_THREADS` is **required and enforced**, not advice: the same hook
+refuses a `lake build` that does not set it, or that sets it above 4. Naming a
+target bounds how much a build does; this bounds how wide it does it. Without
+the variable Lake takes one `lean` process per core, which on this 16-core host
+is up to 16 processes holding several GB each — from a build the size rule
+deliberately permits.
+
+It used to be advice, and on 2026-09-15 that failed exactly as the size rule had
+in #837. The host reached ~60 concurrent `lean` processes across worktrees and
+the four self-hosted runners; the commit limit collapsed to 2.9 GB free; CI
+`build` jobs on five branches died with **no log and no step records** ("the
+self-hosted runner lost communication"), `lean` died mid-build with
+`std::bad_alloc` (exit code 3221226505), and `elan` failed to relink `lake.exe`
+behind a crashed job's leftovers. None of those failures names memory in its
+message, which is what made it expensive to diagnose.
+
+`~/.claude/settings.json` exports the variable for every agent session, so a
+plain `lake build <Target>` is normally already capped. The enforcement exists
+for the shells that do not inherit it — which this file previously just warned
+about. `scripts/test_local_build.sh` pins both edges.
+
+### Seeding a new worktree's cache
+
+A fresh worktree builds all ~5850 modules from cold before it reaches the file
+you changed. It does not have to:
+
+```bash
+scripts/seed_worktree_cache.sh --dry-run   # pick a donor, say what it would do
+scripts/seed_worktree_cache.sh             # copy it in
+```
+
+This copies `.lake/build` from the most-built worktree of this clone and links
+`.lake/packages` to the shared dependency set, which a fresh worktree otherwise
+lacks and nothing documents. Lake verifies every trace against the source it
+finds, so anything your branch changes is still rebuilt and nothing stale is
+trusted. Measured on 2026-09-15: 1556 modules seeded, after which a targeted
+build completed 2069 jobs in 43 seconds.
+
+It **copies rather than hardlinks**, and the script's header says why -- Lean
+writes an `.olean` at its final path, so a hardlink would let a rebuild in one
+worktree write through into another's cache. It therefore spends disk to save
+commit, which is the right trade on this host and not a universal one.
+
+The script only ever writes to the worktree you run it in, and refuses a target
+that already has a build cache unless you pass `--force`.
 
 `lake env lean scratch.lean` is **not** restricted and is not meant to be. It is
 the seconds-long probe interactive proof work depends on; routing each attempt at
@@ -337,6 +410,7 @@ precisely what this rule exists to keep off the developer's machine.
 Useful focused commands are:
 
 ```bash
+scripts/precheck.sh     # every gate needing no Lean build, plus a targeted build
 lake build AlgebraicGeometryAudit StabilityConditionAudit DGCategoryAudit
 lake exe runLinter DerivedAlgGeo
 lake exe lint-style
