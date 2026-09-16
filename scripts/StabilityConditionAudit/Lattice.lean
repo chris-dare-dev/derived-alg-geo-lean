@@ -8,7 +8,6 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.LinearAlgebra
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Chart
 open CategoryTheory.Triangulated
 
 /-! ## Lattice lane -/
@@ -392,23 +391,17 @@ along the segment rather than by the cocycle itself. See the module docstring of
 #print axioms Mukai.mem_positiveFramesPlus_exp_of_sameCone
 #print axioms Mukai.mem_positiveFramesPlus_exp_of_sameCone_of_sigPos
 
-/-! ### The integral Mukai lattice inside the real extension
+/-! ### The bundled discriminant of the real extension
 
-The `ℤ`-span of the extended basis is the integral Mukai extension, and the two
-pairings agree under a map of middles — so wall finiteness is a statement about
-integral classes rather than about an abstract `ZSpan`. -/
+The integral-lattice records that stood here moved to
+`AlgebraicGeometryAudit/NumericalMukaiIntegral.lean` with MO1.04's chart row
+(#1315): `Mukai/IntegralBridge.lean` became
+`AlgebraicGeometry/Numerical/Mukai/Integral.lean`, and the declaration sweep
+routes by module path. The discriminant stays here because `RealForm.lean` did. -/
 
-#print axioms Mukai.extendBasis
-#print axioms Mukai.integralExtension
-#print axioms Mukai.span_range_extendBasis
-#print axioms Mukai.extendMap
-#print axioms Mukai.realPairing_extendMap
 #print axioms Mukai.realDiscriminant
 #print axioms Mukai.realDiscriminant_eq_selfPairing
 #print axioms Mukai.realDiscriminant_mk
-#print axioms Mukai.isSphericalClass_extendMap
-#print axioms Mukai.finite_sphericalOrthogonal_integralExtension
-#print axioms Mukai.finite_orthogonalClasses_integralExtension
 
 /-! ### The central charge of a positive frame
 
@@ -459,7 +452,6 @@ of them at once. This answers the question #700 left open. -/
 #print axioms PeriodDomain.dense_compl_orthogonalityPairs
 #print axioms PeriodDomain.nonempty_positivePlanesAway
 
-#print axioms Mukai.extendMap_add
 
 /-! ## The projection-sign cocycle
 
