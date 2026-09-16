@@ -4,8 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.HeartComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Distance.Topology
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.PolygonPerimeter
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Mass.Subadditivity.CohomologyExactness
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.HNPolygonComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subadditivity.CohomologyExactness
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Covering.SourceTopology
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Action.Stability
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Heart.Equivalence
