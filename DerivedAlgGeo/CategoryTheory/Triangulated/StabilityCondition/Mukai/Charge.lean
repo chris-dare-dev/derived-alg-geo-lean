@@ -3,14 +3,14 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Slope
-import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.CentralCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Charge
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 
 /-!
 # The exponential charge `Z(β,ω)` carried by a Mukai class map
 
 Bridgeland's Lemma 6.2 (`math/0307164`, §6) says that `Z(β,ω)` is a stability
-function on the tilted heart `𝒜(β,ω)`.  `ChargePositivity.lean` (#742) proved
+function on the tilted heart `𝒜(β,ω)`.  `CentralCharge/Mukai/Positivity.lean` (#742) proved
 the numerical core of the one hard case, with no category in sight.  This file
 is the bridge: it carries a Mukai class map from an abelian category into the
 real Mukai extension, so that `Z(β,ω)` becomes a charge on objects.
@@ -39,7 +39,7 @@ exists because `SlopeData`'s geometric fields genuinely discharge
 Bridgeland's §6 states every sign for the **sheaf**, not for the object of the
 heart.  In the boundary case `E` is torsion-free with `μ_ω(E) = β·ω`, so
 `E ∈ F(β)` and the object of the tilted heart is `E⟦1⟧`, with
-`Z(E⟦1⟧) = -Z(E)`.  `ChargePositivity.lean` concludes `Re Z(E) > 0` for the
+`Z(E⟦1⟧) = -Z(E)`.  `CentralCharge/Mukai/Positivity.lean` concludes `Re Z(E) > 0` for the
 sheaf; the heart object therefore has `Im = 0` and `Re < 0`, which is the
 `{z | z.im = 0 ∧ z.re < 0}` half of `semiClosedUpperHalfPlane`.  The two
 apparent sign reversals cancel, and getting this backwards yields a false

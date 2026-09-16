@@ -7,6 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.SqrtToddK3
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.Pairing
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.VectorClass
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.VectorClassK3
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.Integral
 
 /-! # The Mukai class
 

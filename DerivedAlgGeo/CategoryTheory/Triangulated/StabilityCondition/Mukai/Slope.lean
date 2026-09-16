@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Charge
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.CutoffSlope
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.SlopeCutoff
-import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Positivity
 
 /-!
 # `Z(β,ω)` read against the weak slope cutoff
@@ -54,7 +54,7 @@ the skyscraper, and on a K3 the skyscrapers are the subject.
 It is still not Lemma 6.2. This file relates `Im Z(β,ω)` to the cutoff classes of
 the **untilted** heart; Lemma 6.2 is the statement that `Z(β,ω)` is a stability
 function on the **tilted** heart `𝒜(β,ω)`, which additionally needs `hnTilt` and
-the real-part analysis of `ChargePositivity.lean` for the boundary case. The four
+the real-part analysis of `CentralCharge/Mukai/Positivity.lean` for the boundary case. The four
 cases remain open, and nothing here calls them closed.
 -/
 

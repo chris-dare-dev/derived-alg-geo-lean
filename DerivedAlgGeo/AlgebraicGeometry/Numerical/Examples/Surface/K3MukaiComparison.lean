@@ -20,7 +20,7 @@ with each other.
   `Divisorial/Signature.lean` and `Divisorial/Region.lean` lives.  Sphericality
   there is `PeriodDomain.IsSphericalClass`.
 
-`Mukai/IntegralBridge.lean` has carried the general comparison for some time —
+`Numerical/Mukai/Integral.lean` has carried the general comparison for some time —
 `extendMap`, `realPairing_extendMap`, `isSphericalClass_extendMap` — waiting on
 a lattice map that respects both forms.  On this model that map is the inclusion
 `ℤ → ℝ`, and the forms agree on the nose.
@@ -72,7 +72,7 @@ def k3LatticeMap : ℤ →ₗ[ℤ] SurfaceDivisor where
 theorem k3LatticeMap_apply (n : ℤ) : k3LatticeMap n = (n : ℝ) := rfl
 
 /-- **The two forms agree.**  This is the hypothesis every theorem of
-`Mukai/IntegralBridge.lean` waits on, and on this model it is a cast. -/
+`Numerical/Mukai/Integral.lean` waits on, and on this model it is a cast. -/
 theorem k3LatticeMap_pairing (d : ℕ) (x y : ℤ) :
     (surfaceDivisorSpace (2 * (d : ℝ))).intersection (k3LatticeMap x) (k3LatticeMap y)
       = ((k3MukaiForm d x y : ℤ) : ℝ) := by

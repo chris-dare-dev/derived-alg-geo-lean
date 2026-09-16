@@ -6,7 +6,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOneRealiza
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Signature
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Divisorial.Region
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Spherical.DivisorialRegion
-import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.IntegralBridge
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.Integral
 
 /-!
 # Finitely many spherical walls on a Picard-rank-one surface
