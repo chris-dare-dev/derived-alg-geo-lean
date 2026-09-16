@@ -42,7 +42,7 @@ realization of the K3 model of `Models/Surface/K3.lean`, and
 `Examples/Surface/K3MukaiComparison.lean` compares the real Mukai extension used
 here with the integral `Mukai.MukaiLattice` of
 `GrothendieckGroup/MukaiVector.lean`, through the lattice map that
-`Mukai/IntegralBridge.lean` asks for.  Both remain outside this file, which
+`Numerical/Mukai/Integral.lean` asks for.  Both remain outside this file, which
 stays free of any particular model.
 -/
 

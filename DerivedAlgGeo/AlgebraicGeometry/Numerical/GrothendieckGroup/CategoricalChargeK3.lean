@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.CentralChargeK3
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Quadratic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Charge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Chart
 
 /-!
 # The categorical Mukai charge is the numerical charge of the object's class
