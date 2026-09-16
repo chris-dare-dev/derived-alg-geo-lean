@@ -367,12 +367,35 @@ def check_text(raw: str, path: Path) -> list[Finding]:
 
 
 def preceding_docstring(lines: list[str], decl_index: int) -> str | None:
-    """Return the `/-- ... -/` docstring immediately above `lines[decl_index]`, if any."""
+    """Return the `/-- ... -/` docstring immediately above `lines[decl_index]`, if any.
+
+    Attributes may sit between the docstring and the declaration; a blank line
+    detaches the docstring, so it is not skipped.
+
+    An attribute can span several lines. This repository's `@[cites ...]`
+    carries its `(note := "...")` record on a line of its own, and skipping only
+    lines that *start* with `@[` stopped at that continuation, so a documented
+    declaration was reported as undocumented -- `def stabilityDist` in
+    `.../Metric/Distance/Basic.lean` was the whole of the `DOC` ERROR count.
+    A continuation is recognised by its closing `]` and walked back to its
+    opener, never across a blank line, so an ordinary `variable [Foo]` above a
+    declaration cannot be mistaken for one.
+    """
     i = decl_index - 1
-    # Attributes may sit between the docstring and the declaration; a blank line
-    # detaches the docstring, so it is not skipped.
-    while i >= 0 and lines[i].strip().startswith("@["):
-        i -= 1
+    while i >= 0:
+        s = lines[i].strip()
+        if s.startswith("@["):
+            i -= 1
+            continue
+        if s.endswith("]") and not s.endswith("-/"):
+            j = i
+            while j >= 0 and lines[j].strip() and not lines[j].strip().startswith("@["):
+                j -= 1
+            if j < 0 or not lines[j].strip().startswith("@["):
+                break
+            i = j - 1
+            continue
+        break
     if i < 0 or not lines[i].strip().endswith("-/"):
         return None
     end = i

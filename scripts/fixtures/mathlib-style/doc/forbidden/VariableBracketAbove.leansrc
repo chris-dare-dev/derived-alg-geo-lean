@@ -1,0 +1,21 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.Basic
+
+/-!
+# A `]` above a declaration that is not an attribute continuation
+
+The walk back from a closing `]` must stop at a blank line. Without that, this
+file's `variable` line would be taken for a continuation of the `@[simp]`
+further up, and the docstring above *that* would be credited to the
+undocumented declaration at the bottom.
+-/
+
+/-- A documented theorem, whose docstring must not be borrowed below. -/
+@[simp]
+theorem documented : True := trivial
+
+variable [IsTriangulated C]
+def stillUndocumented (sigma : Sigma) : ENNReal := 0

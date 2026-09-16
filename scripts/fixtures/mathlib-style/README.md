@@ -65,3 +65,11 @@ module docstring.
 | --- | --- |
 | `allowed/MathlibFieldObligations` | `zero_mem'` and `ext'`: Mathlib fixes the name, so there is no "differs from the unprimed form" to write |
 | `forbidden/UndocumentedPrime` | a primed name the author chose, with no docstring |
+
+## `doc` — a definition needs a docstring
+
+| Fixture | What it pins |
+| --- | --- |
+| `allowed/MultiLineAttribute` | a docstring separated from its `def` by an `@[cites ...]` that spans two lines; skipping only lines starting with `@[` stopped at the continuation and called the declaration undocumented |
+| `forbidden/UndocumentedDef` | a `def` with no docstring, which is what the check is for |
+| `forbidden/VariableBracketAbove` | a `variable [...]` line directly above a `def`: the walk back from a closing `]` stops at a blank line, so it cannot borrow the docstring of an earlier `@[simp]` declaration |
