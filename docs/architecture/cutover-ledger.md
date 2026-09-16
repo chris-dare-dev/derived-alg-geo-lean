@@ -300,16 +300,45 @@ square-root construction and must not be presented as one.
 
 #### 08 -- The GL⁺(2,ℝ) cover vs. its stability action (#1323)
 
+**Implemented by #1323 (MO1.12), 2026-09-15.** Paths below are the owners now
+in the tree; every fully qualified declaration name is unchanged.
+
 | Relationship | Owner |
 | --- | --- |
-| Definition owner | the group construction, deck transformations, covering map, simple connectedness and topological-group laws move beside the general-linear-group API, with general covering lemmas near the topology owner |
-| Neutral core | the order automorphism of `ℝ` commuting with unit translation, which mentions no category |
-| Application adapter | phase conventions and the action on slicings, charges and stability conditions stay under `Symmetry/GLTilde/Action/` |
-| Comparison owner | the existing compatible-pair construction is retained; a complex-coordinate linear-map adapter moves near the complex linear-algebra owner only once its public type is independent of the cover |
+| Definition owner | `LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/` owns the group construction (`Basic.lean`), the deck transformations and `ℤ` fibre (`Fibre.lean`), surjectivity of the projection (`Surjectivity.lean`), the global chart, contractibility and simple connectedness (`SourceTopology.lean`), the covering map (`Map.lean`) and the topological-group laws (`TopologicalGroup.lean`); `LinearAlgebra/Matrix/GeneralLinearGroup/Positive.lean` owns the `GL⁺` matrix coercion beneath all of them; `Topology/Covering/Basic.lean` owns the general product-of-a-covering-with-an-identity lemma |
+| Neutral core | `Algebra/Order/NormalizedShift/` owns the order automorphism of `ℝ` commuting with unit translation -- `Basic.lean` for the group, `UniformContinuity.lean` for the uniform modulus that `+1`-equivariance forces -- and mentions no category |
+| Application adapter | phase conventions and the action on slicings, charges and stability conditions stay under `Symmetry/GLTilde/Action/`; the `Symmetry/GLTilde.lean` umbrella now names only that action |
+| Comparison owner | the existing compatible-pair construction is retained unchanged; `LinearAlgebra/Complex/Coordinates.lean` takes `cplxCoord`, `cplxCoord_apply`, `actC` and the two action laws, whose public types mention `ℂ` and `Matrix.GLPos (Fin 2) ℝ` and not the cover; `UniversalCover/ComplexRepresentation.lean` keeps `cplxCoord_exp`, `compat_exp` and `actC_exp`, which mention `rayVec`, `Compatible` and `NormalizedShift` and so did not meet the condition |
 
 The π-normalization is a convention to expose through adapters, not a reason
-for covering-space theory to live inside triangulated categories. The proposed
+for covering-space theory to live inside triangulated categories. The
 destination is a local extension, not an existing Mathlib module.
+
+`rayVec`, `OnRay` and `Compatible` stay with the definition owner, because the
+group is *defined* by the phase-circle condition they express; what the ledger
+means by exposing the convention through adapters is `cplxCoord_exp` and
+`actC_exp`, which restate it in the `exp (i π ·)` vocabulary the stability
+foundation uses.
+
+**What the identifier does not prove.** `GLTilde` is a name. The covering
+statement is `GLTilde.universalCoverData` -- `IsCoveringMap GLTilde.mat`,
+`Function.Surjective GLTilde.mat`, `SimplyConnectedSpace GLTilde` -- together
+with `exact_deckHom_toMatHom` for the `ℤ` deck group. Both are proved and
+sorry-free, and `registry/bridgeland2007.json` records a named reviewer's
+2026-08-07 judgement that their conjunction is what Lemma 8.2's phrase means,
+Mathlib having no bundled universal-cover predicate at the pin. This cutover
+moved files; it did not supply, strengthen or discharge any of that, and the
+`@[discharges "gltilde-universal-cover"]` binding travels with the theorem.
+
+**Not discharged here.** AUT1 (#927) concerns an autoequivalence action and a
+supplied proper discontinuity. It is a different obligation about a different
+group, it remains open, and no part of it is closed by this row.
+
+Layering rule 13 and five fixtures under `scripts/fixtures/layering/` pin the
+result: the cover tree, the order-automorphism core, the complex-coordinate
+adapter and the general covering lemma reach neither `StabilityCondition` nor
+`AlgebraicGeometry`, and `Symmetry/GLTilde/Action/` still reaches the cover, so
+the projection stability consumes is an import edge rather than a restatement.
 
 #### 09 -- Mass as a sibling of metric; planar convex geometry (#1324)
 

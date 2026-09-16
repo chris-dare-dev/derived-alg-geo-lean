@@ -2334,8 +2334,10 @@ fidelity:
     CLAUDE.md section 4. Do not cite this lane as "the Bayer-Macri wall
     classification is formalized".
 
-    WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Basic.lean defines GLTilde as Bridgeland's pair presentation
-    of GL+(2,R)-tilde. The group, surjective projection, Z fibre, explicit
+    LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/Basic.lean -- moved
+    there from StabilityCondition/Symmetry/GLTilde/ by MO1.12 (#1323), with
+    every declaration name unchanged -- defines GLTilde as Bridgeland's pair
+    presentation of GL+(2,R)-tilde. The group, surjective projection, Z fibre, explicit
     section, global topology, continuity of the projection, contractibility,
     simple connectedness, covering-map property, and topological-group
     compatibility are now proved.

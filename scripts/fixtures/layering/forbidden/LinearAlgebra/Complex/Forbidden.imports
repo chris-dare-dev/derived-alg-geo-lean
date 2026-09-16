@@ -1,0 +1,5 @@
+# The complex-coordinate adapter moved to complex linear algebra because its
+# public type is independent of the cover. Importing the cover would make that
+# false again, so the ledger's comparison-owner condition is checked as an
+# import edge and not only as a type.
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.Basic

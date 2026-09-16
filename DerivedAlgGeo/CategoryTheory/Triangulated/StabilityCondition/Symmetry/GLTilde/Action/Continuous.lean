@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Combined.Topology
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Topology.Group
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.TopologicalGroup
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.LinearAlgebra.Complex.FiniteDimensional
 
@@ -22,7 +22,7 @@ the definition of `basisNhd`:
 
 The resulting instance is `ContinuousConstSMul`: continuity in the stability
 condition for every fixed group element.  The separate, stronger joint
-statement is proved in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/JointContinuous.lean`.
+statement is proved in `CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/JointContinuous.lean`.
 -/
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated

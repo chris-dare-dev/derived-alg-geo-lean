@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.NormalizedShift
-import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+import DerivedAlgGeo.Algebra.Order.NormalizedShift.Basic
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.Positive
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Tactic
 
@@ -30,24 +30,27 @@ This file proves that the compatible pairs form a group under componentwise
 multiplication, and that the type is nonempty (`compat_one` is the witness).
 The companion files prove the covering-space properties:
 
-* **Fibre `ℤ`** — **proved**, in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Fibre.lean`. The kernel of the
-  projection is exactly the deck transformations `φ ↦ φ + 2n`.
-* **Surjectivity of the projection** — **proved**, in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Surjectivity.lean`. Every
-  `T` of positive determinant carries a compatible phase relabelling.
-* **Simple connectedness** — **proved**, in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/SourceTopology.lean`, by global
-  coordinates `ℝ × (0,∞) × ℝ × (0,∞)` and contractibility.
-* **Covering-map property** — **proved**, in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`. Global base
-  coordinates identify the projection with the standard exponential cover
-  `ℝ → S¹` times an identity map.
+* **Fibre `ℤ`** — **proved**, in `UniversalCover/Fibre.lean`. The kernel of
+  the projection is exactly the deck transformations `φ ↦ φ + 2n`.
+* **Surjectivity of the projection** — **proved**, in
+  `UniversalCover/Surjectivity.lean`. Every `T` of positive determinant
+  carries a compatible phase relabelling.
+* **Simple connectedness** — **proved**, in
+  `UniversalCover/SourceTopology.lean`, by global coordinates
+  `ℝ × (0,∞) × ℝ × (0,∞)` and contractibility.
+* **Covering-map property** — **proved**, in `UniversalCover/Map.lean`.
+  Global base coordinates identify the projection with the standard
+  exponential cover `ℝ → S¹` times an identity map.
 
 Thus `GLTilde.universalCoverData` packages the surjective covering-map and
 simple-connectedness properties, while `exact_deckHom_toMatHom` packages the
-extension with fibre `ℤ`. `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Topology/Group.lean` proves continuity of
-multiplication and inversion and installs `IsTopologicalGroup GLTilde`.
+extension with fibre `ℤ`. `UniversalCover/TopologicalGroup.lean` proves
+continuity of multiplication and inversion and installs
+`IsTopologicalGroup GLTilde`.
 
-The `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/PreStability.lean` and
-`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean` files use this
-group to define and prove the action on stability conditions.
+The action on stability conditions is downstream and stays with stability:
+`StabilityCondition/Symmetry/GLTilde/Action/PreStability.lean` and
+`.../Action/Stability.lean` use this group to define and prove it.
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction
@@ -105,17 +108,6 @@ theorem trans {u v w : Fin 2 → ℝ} (h₁ : OnRay u v) (h₂ : OnRay v w) :
 end OnRay
 
 /-! ## Compatible pairs -/
-
-/-- The matrix underlying an element of `GL⁺(2, ℝ)`. -/
-def toMat (T : Matrix.GLPos (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
-  ((T : GL (Fin 2) ℝ) : Matrix (Fin 2) (Fin 2) ℝ)
-
-@[simp]
-theorem toMat_mul (T U : Matrix.GLPos (Fin 2) ℝ) :
-    toMat (T * U) = toMat T * toMat U := rfl
-
-@[simp]
-theorem toMat_one : toMat 1 = 1 := rfl
 
 /-- `T` and `f` induce the same map on the circle of phases: `T` carries the
 ray at phase `φ` to the ray at phase `f φ`. -/

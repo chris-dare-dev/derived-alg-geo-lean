@@ -71,6 +71,17 @@ complete mathematical ownership policy.
    no sibling, and the arbitrary-divisor-rank charge reaches the exponential
    kernel without passing through the scalar `H`-degree compression. MO1.06
    (#1317).
+8. **A covering group is not its action.** The universal cover of
+   `GL⁺(2, ℝ)` is at `LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/`,
+   the `+1`-equivariant order automorphisms of `ℝ` it pairs matrices with are
+   at `Algebra/Order/NormalizedShift/`, the general product-of-coverings lemma
+   is at `Topology/Covering/`, and the cover-independent complex-coordinate
+   adapter is at `LinearAlgebra/Complex/`. None of those reaches the stability
+   tree or geometry. The phase conventions and the action on slicings, charges
+   and stability conditions stay at
+   `StabilityCondition/Symmetry/GLTilde/Action/`, which still reaches the
+   cover, so the projection stability consumes is an import edge. MO1.12
+   (#1323).
 
 ## Component boundaries and coverage limits
 
@@ -216,6 +227,7 @@ CategoryTheory/Triangulated
         ├─→ Weak                              weak stability: the dependency parent
         │     └─→ Foundation, Families, HarderNarasimhan, Support, Tilting
         ├─→ Foundation (Deformation), Phase, Metric, Symmetry, Support, Walls
+        │     Symmetry/GLTilde is the ACTION only; the group is under LinearAlgebra
         └─→ Families                          abstract categorical families
 
 CategoryTheory/Monoidal
@@ -225,8 +237,19 @@ RingTheory/Spectrum/Prime
   └─→ BasicOpen                               finite products of basic opens
 
 Topology
+  ├─→ Covering                                product of a covering map with an identity
   ├─→ Sheaves                                 Basis, ModuleTensor (StalkTensor)
   └─→ Category/TopCat/Opens                   limits and CoversTop in the category of opens
+
+LinearAlgebra
+  ├─→ Complex/Coordinates                     ℂ as a real plane; a GL⁺(2,ℝ) matrix acting on it
+  └─→ Matrix/GeneralLinearGroup
+        ├─→ Positive                           the underlying matrix of an element of GL⁺(2,ℝ)
+        └─→ UniversalCover                     G̃L⁺(2,ℝ): compatible pairs, ℤ deck group,
+                                                global chart, covering map, topological group
+
+Algebra/Order
+  └─→ NormalizedShift                        order automorphisms of ℝ commuting with φ ↦ φ + 1
 
 AlgebraicGeometry
   ├─→ Modules                                 X.Modules: affine, presentation, pullback, pushforward, restriction, tensor

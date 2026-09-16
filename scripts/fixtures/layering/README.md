@@ -21,6 +21,11 @@ caught here rather than by the next regression.
 | `forbidden/CategoryTheory/Triangulated/StabilityCondition/Weak/Families` | weak stability importing the Bridgeland theory |
 | `forbidden/CategoryTheory/Triangulated/StabilityCondition/CentralCharge` | central-charge construction importing downstream wall loci |
 | `forbidden/LinearAlgebra/QuadraticForm/ComplexPairing` | neutral paired-functional code importing stability conditions or wall arrangements |
+| `allowed/LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover` | the GL+(2,R) cover importing its four neutral inputs |
+| `forbidden/LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover` | the cover importing the stability action it was extracted from |
+| `forbidden/Algebra/Order/NormalizedShift` | the neutral order-automorphism core reaching the stability tree |
+| `forbidden/LinearAlgebra/Complex` | the complex-coordinate adapter importing the cover its public type is independent of |
+| `forbidden/Topology/Covering` | a general covering lemma acquiring a DerivedAlgGeo dependency |
 
 The three fixtures below a *subcomponent* -- `Moduli/Semistability`,
 `Stability/Gieseker`, `Numerical/Stability` -- sit where they do because rule
@@ -29,6 +34,10 @@ The three fixtures below a *subcomponent* -- `Moduli/Semistability`,
 blanket `Moduli/`, `Numerical/` and `Stability/` entries used to exempt and no
 longer do. Moving one of these `allowed` fixtures back up a directory is enough
 to make the gate reject it, which is the boundary being pinned.
+
+The five MO1.12 (#1323) fixtures pin ledger row 08 in both directions: the
+cover and its neutral inputs are importable without stability conditions, and
+the action adapter they were separated from stays where the ledger put it.
 
 Add a fixture whenever a rule is added or a boundary moves; a rule with no
 forbidden fixture is a rule nobody has seen fire.
