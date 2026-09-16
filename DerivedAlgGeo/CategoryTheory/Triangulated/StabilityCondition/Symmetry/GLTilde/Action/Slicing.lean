@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.IntervalCategory
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Basic
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.Basic
 import MathFormalContract
 
 /-!

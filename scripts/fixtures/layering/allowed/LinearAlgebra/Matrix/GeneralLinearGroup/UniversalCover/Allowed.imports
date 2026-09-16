@@ -1,0 +1,8 @@
+# The cover may import its neutral inputs: the order automorphisms of R it
+# pairs matrices with, the general-linear-group matrix coercion, the
+# complex-coordinate adapter, and the general covering lemma. None of them
+# reaches the stability tree or geometry.
+import DerivedAlgGeo.Algebra.Order.NormalizedShift.Basic
+import DerivedAlgGeo.LinearAlgebra.Complex.Coordinates
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.Positive
+import DerivedAlgGeo.Topology.Covering.Basic

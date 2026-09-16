@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.ComplexRepresentation
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Covering.Fibre
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.ComplexRepresentation
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.Fibre
 
 /-!
 # Surjectivity of the lifted matrix projection
@@ -11,9 +11,9 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLT
 Every `T ∈ GL⁺(2, ℝ)` admits a compatible phase relabelling, so `toMatHom`
 is onto.
 
-Together with `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Fibre.lean` this closes the algebraic exact sequence.
-`WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/SourceTopology.lean` now supplies a topology, continuity of the projection,
-and simple connectedness; `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean` proves the covering-map property.
+Together with `UniversalCover/Fibre.lean` this closes the algebraic exact sequence.
+`UniversalCover/SourceTopology.lean` now supplies a topology, continuity of the projection,
+and simple connectedness; `UniversalCover/Map.lean` proves the covering-map property.
 
 ## The construction, and why it needs no branch cut
 
@@ -83,11 +83,6 @@ theorem cexpI_add (x y : ℝ) : cexpI (x + y) = cexpI x * cexpI y := by
 
 theorem cexpI_ne_zero (x : ℝ) : cexpI x ≠ 0 := by
   intro h; have := norm_cexpI x; rw [h] at this; simp at this
-
-/-- Coordinates of a complex number in the `1, I` basis. -/
-theorem cplxCoord_apply (z : ℂ) : cplxCoord z = ![z.re, z.im] := by
-  show ⇑(Complex.basisOneI.repr z) = _
-  rw [Complex.coe_basisOneI_repr]
 
 theorem cplxCoord_cexpI (φ : ℝ) : cplxCoord (cexpI (π * φ)) = rayVec φ := by
   rw [cplxCoord_apply]; ext i; fin_cases i <;> simp [rayVec]
@@ -463,7 +458,7 @@ range is exactly the kernel of the projection, and the projection is onto.
 
 This theorem packages the extension, not the topology.  The covering-map and
 simple-connectedness properties are packaged separately by
-`GLTilde.universalCoverData` in `WeakStabilityCondition/StabilityCondition/Symmetry/GLTilde/Covering/Map.lean`. -/
+`GLTilde.universalCoverData` in `UniversalCover/Map.lean`. -/
 theorem exact_deckHom_toMatHom :
     Function.Injective deckHom
       ∧ deckHom.range = GLTilde.toMatHom.ker

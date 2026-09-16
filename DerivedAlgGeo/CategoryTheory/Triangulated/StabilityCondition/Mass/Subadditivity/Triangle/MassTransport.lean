@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Uniqueness
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Covering.SourceTopology
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.SourceTopology
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Action.Stability
 
 /-!

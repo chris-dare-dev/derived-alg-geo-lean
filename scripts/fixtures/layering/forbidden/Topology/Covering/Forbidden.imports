@@ -1,0 +1,4 @@
+# isCoveringMap_prodMap_id quantifies over three arbitrary topological spaces.
+# It needs Mathlib alone; any DerivedAlgGeo import here means a general covering
+# lemma has acquired a consumer's dependency.
+import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.Positive
