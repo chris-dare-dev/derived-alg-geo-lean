@@ -79,6 +79,9 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CategoryTheory.kProjectiveLocusDerivedFunctor
 #print axioms CategoryTheory.kProjectiveLocusDerivedComparison
 #print axioms CategoryTheory.kProjectiveDerivedFunctorObjIso
+#print axioms CochainComplex.IsKProjective.homotopyEquivalences_map
+#print axioms CochainComplex.IsKProjective.quasiIso_map
+#print axioms CochainComplex.IsKProjective.quasiIso_map_of_projective
 
 /-! ## Bounded-above projective locus -/
 
@@ -107,6 +110,7 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms DerivedCategory.singleFunctor_preservesCoproductsOfShape
 #print axioms DerivedCategory.homologyFunctor_preservesCoproductsOfShape
 #print axioms DerivedCategory.cohomologyIn_isClosedUnderColimitsOfShape_discrete
+#print axioms CategoryTheory.Functor.mapDerivedCategory_preservesCoproductsOfShape
 
 /-! ## The heart of the canonical t-structure is the original category (#1121)
 

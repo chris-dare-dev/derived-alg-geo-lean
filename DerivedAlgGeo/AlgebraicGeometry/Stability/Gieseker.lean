@@ -3,17 +3,15 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.Basic
-import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.Coefficients
-import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HarderNarasimhan
-import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.HilbertPolynomial
-import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.MuStability
 
 /-! # Gieseker stability of coherent sheaves
 
-The Hilbert function of a coherent sheaf against a supplied polarization, its Newton
-coefficients, the purity and Gieseker stability notions built from them, and the weak slope
-datum through which `Coh X` becomes an inhabitant of the abstract slope theory.
+The Gieseker order on coherent sheaves — the reduced Hilbert function compared for large `n` —
+the lexicographic criterion that decides it, and the two stability predicates built from it.
 
-Harder–Narasimhan filtrations for the resulting slope, and the maximal destabilizing subobject
-they are built from, are not here.
+The shared Hilbert-polynomial data this rests on is one directory up:
+`HilbertPolynomial.lean` owns `PolarizedVarietyData` and the Hilbert function,
+`Coefficients.lean` owns the Newton coefficients, and `Purity.lean` owns `IsPure`, which the
+μ-slope lane needs for reasons of its own. Harder–Narasimhan filtrations are not here: the
+repository's HN theorem on `Coh X` is for the μ-slope, and lives with it in `Slope/`.
 -/

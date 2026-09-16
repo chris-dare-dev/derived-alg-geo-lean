@@ -50,7 +50,11 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_stabilityMass
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_stabilityMass_functor_obj
 
-/-! ## HNPolygon — abelian HN paths and positive-angle support -/
+/-! ## Polygonal paths in `ℂ`, and the abelian HN reading of them
+
+The neutral carrier owns `Analysis/Convex/ComplexPolygonalPath/Basic.lean`; the
+HN paths and positive-angle support are the stability adapter `HNPolygon`.
+MO1.13 (#1324). -/
 
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.factorObj
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.hnPolygon_le_of_polygonVertex_isMax
@@ -102,7 +106,12 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.StabilityFunction.hnPolygon_mono
 #print axioms CategoryTheory.Triangulated.StabilityFunction.subobjectCharge_mem_hnPolygon
 
-/-! ## ConvexPolygonPerimeter — finite perimeter and short-exact mass bounds -/
+/-! ## Finite perimeter, and the short-exact mass bounds read off it
+
+The perimeter comparison owns
+`Analysis/Convex/ComplexPolygonalPath/Perimeter.lean`; the mass forms are the
+stability adapter `Mass/Subadditivity/HNPolygonComparison.lean`.
+MO1.13 (#1324). -/
 
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.mass_eq_mass
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.mass_le_add_norm_cokernel_of_mono
