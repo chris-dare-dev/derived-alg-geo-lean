@@ -311,6 +311,31 @@ Lake takes one per core. It is set for every agent session in
 `~/.claude/settings.json`, so a plain `lake build <Target>` is already capped —
 set it explicitly if you are building from a shell that does not inherit that.
 
+### Seeding a new worktree's cache
+
+A fresh worktree builds all ~5850 modules from cold before it reaches the file
+you changed. It does not have to:
+
+```bash
+scripts/seed_worktree_cache.sh --dry-run   # pick a donor, say what it would do
+scripts/seed_worktree_cache.sh             # copy it in
+```
+
+This copies `.lake/build` from the most-built worktree of this clone and links
+`.lake/packages` to the shared dependency set, which a fresh worktree otherwise
+lacks and nothing documents. Lake verifies every trace against the source it
+finds, so anything your branch changes is still rebuilt and nothing stale is
+trusted. Measured on 2026-09-15: 1556 modules seeded, after which a targeted
+build completed 2069 jobs in 43 seconds.
+
+It **copies rather than hardlinks**, and the script's header says why -- Lean
+writes an `.olean` at its final path, so a hardlink would let a rebuild in one
+worktree write through into another's cache. It therefore spends disk to save
+commit, which is the right trade on this host and not a universal one.
+
+The script only ever writes to the worktree you run it in, and refuses a target
+that already has a build cache unless you pass `--force`.
+
 `lake env lean scratch.lean` is **not** restricted and is not meant to be. It is
 the seconds-long probe interactive proof work depends on; routing each attempt at
 a lemma through CI would be a ~12 minute round trip and would stop anyone writing
