@@ -164,13 +164,37 @@ Restating it over an arbitrary form made the hypothesis split visible, and it
 is not the expected one: additivity needs neither symmetry nor `B s s = -2`,
 involutivity needs `B s s = -2` alone, and only the isometry needs symmetry.
 
-Still owed: rank-two Gram-determinant identities, the other half of the neutral
-core; the exponential chart, which still sits in `Mukai/RealForm.lean` rather
-than with the numerical central-charge construction; and `IsSpherical` and
-`expectedDim = square + 2`, which remain application vocabulary on the neutral
-carrier. The tracker closed #1315 early -- a commit message in #1345 that said
-it did *not* close the issue was read by GitHub as a closing keyword -- so the
-issue state is not evidence that these landed.
+**Rank-two Gram landed 2026-09-15**, completing the neutral core.
+`BilinearForm/RankTwo.lean` states the Gram determinant, the change-of-basis
+identity, `orthWitness` and the hyperbolic-pair predicate over an arbitrary
+`(R, M, B)`, and `Lattice/Mukai/RankTwo.lean` specialises them. The file splits
+where order is needed: `gram`, `gram_lincomb` and `orthWitness` need only a
+commutative ring, and `apply_orthWitness` needs no symmetry either, while
+`IsHyperbolicPair` and everything reading a sign need a linear order and a
+strict ordered ring.
+
+`HasSphericalClass` and `HasIsotropicClass` stayed with the Mukai lane, and so
+did `IsSpherical` and `expectedDim = square + 2`. That is the application
+vocabulary row discharged: all three neutral owners import Mathlib and nothing
+else, so the general theory is importable with no Mukai extension in scope, and
+the `-2` and `0` conditions appear in the neutral statements as hypotheses
+rather than as named predicates.
+
+**The exponential chart row is blocked, and not by effort.** The ledger asks
+for the chart to go with the numerical central-charge construction. It cannot
+move alone: `Lattice/Mukai/CentralCharge.lean` consumes `expRe`/`expIm`, and
+`StabilityCondition/CentralCharge/Quadratic.lean` already imports
+`Lattice/Mukai/CentralCharge.lean`, so relocating the chart into the
+central-charge tree closes an import cycle. The layering gate does not catch
+this -- it passes on a `LinearAlgebra` to `StabilityCondition` edge -- Lean's
+module acyclicity does. Discharging the row means moving the whole real-Mukai
+to charge bridge (`Mukai/CentralCharge.lean`, `ExponentialOrientation.lean`,
+`IntegralBridge.lean`) out of `LinearAlgebra/Lattice/`, which is coupled to
+MO1.02's central-charge ownership and is a lane of its own.
+
+The tracker closed #1315 early -- a commit message in #1345 that said it did
+*not* close the issue was read by GitHub as a closing keyword -- so the issue
+state is not evidence about any of these rows.
 
 #### 04 -- Charge construction upstream of walls (#1313)
 

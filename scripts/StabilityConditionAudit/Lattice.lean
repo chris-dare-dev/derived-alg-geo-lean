@@ -67,9 +67,43 @@ in `DerivedAlgGeo/LinearAlgebra/Lattice/Mukai/`. -/
 #print axioms Mukai.pairingBilin
 #print axioms Mukai.pairingBilin_apply
 
+/-! ## Neutral lane — rank-two Gram determinants
+
+Arithmetic of two vectors under a bilinear form, stated over an arbitrary
+`(R, M, B)` in `BilinearForm/RankTwo.lean`; the Mukai lane below specialises it.
+The file splits where order is needed, which is also where the hypotheses stop
+being purely algebraic. -/
+
+#print axioms BilinearForm.gram
+#print axioms BilinearForm.gram_comm
+#print axioms BilinearForm.gram_zero_left
+#print axioms BilinearForm.gram_zero_right
+#print axioms BilinearForm.apply_lincomb
+#print axioms BilinearForm.self_lincomb
+#print axioms BilinearForm.gram_lincomb
+#print axioms BilinearForm.orthWitness
+#print axioms BilinearForm.apply_orthWitness
+#print axioms BilinearForm.self_orthWitness
+#print axioms BilinearForm.pairSpan
+#print axioms BilinearForm.mem_pairSpan_left
+#print axioms BilinearForm.mem_pairSpan_right
+#print axioms BilinearForm.orthWitness_mem_pairSpan
+#print axioms BilinearForm.IsHyperbolicPair
+#print axioms BilinearForm.isHyperbolicPair_iff
+#print axioms BilinearForm.discr_pos_of_isHyperbolicPair
+#print axioms BilinearForm.gram_ne_zero_of_isHyperbolicPair
+#print axioms BilinearForm.ne_zero_left_of_isHyperbolicPair
+#print axioms BilinearForm.ne_zero_right_of_isHyperbolicPair
+#print axioms BilinearForm.isHyperbolicPair_comm
+#print axioms BilinearForm.isHyperbolicPair_lincomb
+#print axioms BilinearForm.self_orthWitness_neg
+#print axioms BilinearForm.orthWitness_ne_zero
+#print axioms BilinearForm.exists_neg_self_of_isHyperbolicPair
+
 /-! ## Mukai lane — rank-two subpairs -/
 
 #print axioms Mukai.gram
+#print axioms Mukai.gram_apply
 #print axioms Mukai.gram_comm
 #print axioms Mukai.gram_zero_left
 #print axioms Mukai.gram_zero_right
@@ -85,6 +119,7 @@ in `DerivedAlgGeo/LinearAlgebra/Lattice/Mukai/`. -/
 #print axioms Mukai.isHyperbolicPair_comm
 #print axioms Mukai.isHyperbolicPair_lincomb
 #print axioms Mukai.orthWitness
+#print axioms Mukai.orthWitness_apply
 #print axioms Mukai.pairing_orthWitness
 #print axioms Mukai.selfPairing_orthWitness
 #print axioms Mukai.selfPairing_orthWitness_neg
