@@ -83,13 +83,34 @@ class Finding:
 
 
 def in_scope(path: Path) -> bool:
+    """Is `path` owner-authored `DerivedAlgGeo` library source?
+
+    Both halves of this test are answered *relative to the repository root*,
+    and each half used to be answered against the path as given. That is two
+    separate ways for the checker to fall silent, and both were live:
+
+    * An agent session runs in a worktree under `.claude/worktrees/<name>/`,
+      and the `PostToolUse` hook is handed an absolute path. So `.claude`
+      appeared in `parts`, `EXCLUDED_PARTS` matched it, and every library file
+      edited in a worktree was skipped -- on every platform.
+    * `INCLUDED_PREFIXES` is written with `/`, but on Windows
+      `str(Path("DerivedAlgGeo/Foo.lean"))` is `DerivedAlgGeo\\Foo.lean`, so
+      the substring test never matched at all.
+
+    Either one alone makes the hook a no-op, which is the other half of why
+    nothing local caught #1359. A path outside the repository keeps the old
+    as-given reading.
+    """
     if path.suffix != ".lean":
         return False
-    parts = path.parts
-    if any(p in EXCLUDED_PARTS for p in parts):
+    try:
+        rel = path.resolve().relative_to(ROOT)
+    except (ValueError, OSError):
+        rel = path
+    if any(p in EXCLUDED_PARTS for p in rel.parts):
         return False
-    text = str(path)
-    return path.name in INCLUDED_FILES or any(p in text for p in INCLUDED_PREFIXES)
+    text = rel.as_posix()
+    return rel.name in INCLUDED_FILES or any(p in text for p in INCLUDED_PREFIXES)
 
 
 def strip_string_literals(line: str) -> str:
