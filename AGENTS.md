@@ -308,10 +308,26 @@ Build locally by **naming a target**, which the hook allows:
 LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
 ```
 
-`LEAN_NUM_THREADS=2` limits Lake to two concurrent `lean` processes; without it
-Lake takes one per core. It is set for every agent session in
-`~/.claude/settings.json`, so a plain `lake build <Target>` is already capped —
-set it explicitly if you are building from a shell that does not inherit that.
+`LEAN_NUM_THREADS` is **required and enforced**, not advice: the same hook
+refuses a `lake build` that does not set it, or that sets it above 4. Naming a
+target bounds how much a build does; this bounds how wide it does it. Without
+the variable Lake takes one `lean` process per core, which on this 16-core host
+is up to 16 processes holding several GB each — from a build the size rule
+deliberately permits.
+
+It used to be advice, and on 2026-09-15 that failed exactly as the size rule had
+in #837. The host reached ~60 concurrent `lean` processes across worktrees and
+the four self-hosted runners; the commit limit collapsed to 2.9 GB free; CI
+`build` jobs on five branches died with **no log and no step records** ("the
+self-hosted runner lost communication"), `lean` died mid-build with
+`std::bad_alloc` (exit code 3221226505), and `elan` failed to relink `lake.exe`
+behind a crashed job's leftovers. None of those failures names memory in its
+message, which is what made it expensive to diagnose.
+
+`~/.claude/settings.json` exports the variable for every agent session, so a
+plain `lake build <Target>` is normally already capped. The enforcement exists
+for the shells that do not inherit it — which this file previously just warned
+about. `scripts/test_local_build.sh` pins both edges.
 
 ### Seeding a new worktree's cache
 
