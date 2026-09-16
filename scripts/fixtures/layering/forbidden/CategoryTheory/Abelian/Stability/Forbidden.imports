@@ -1,0 +1,4 @@
+# Abelian stability functions are importable without a shift, a t-structure or
+# a heart. Reaching the heart adapter from inside the abelian owner would
+# invert the direction MO1.08 established.
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.HeartDatum

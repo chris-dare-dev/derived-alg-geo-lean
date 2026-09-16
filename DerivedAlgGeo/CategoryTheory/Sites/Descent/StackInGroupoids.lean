@@ -99,6 +99,55 @@ theorem essSurjToCechDescent (F : StackInGroupoids C J) {S : C}
 
 end StackInGroupoids
 
+/-! ## Refining the Grothendieck topology
+
+Effective descent is antitone in the topology, and only in that direction.
+Every `J₁`-covering sieve is a `J₂`-covering sieve when `J₁ ≤ J₂`, so a stack
+for the finer topology is a stack for the coarser one.  The converse is false
+and nothing below asserts it: descent for a coarse topology says nothing about
+the covers the finer topology adds.  A consumer that needs the finer level has
+to prove it there. -/
+
+/-- Effective descent for a finer topology gives effective descent for every
+coarser topology.  This is the only implication between the two conditions;
+there is no reverse transport. -/
+theorem Pseudofunctor.IsStack.of_le {C : Type u} [Category.{v} C]
+    {F : Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{w, w}}
+    {J₁ J₂ : GrothendieckTopology C} (h : J₁ ≤ J₂) [F.IsStack J₂] :
+    F.IsStack J₁ :=
+  Pseudofunctor.IsStack.of_isStackFor fun _ R hR ↦ F.isStackFor' R (h _ hR)
+
+namespace StackInGroupoids
+
+variable {C : Type u} [Category.{v} C] {J₁ J₂ : GrothendieckTopology C}
+
+/-- Restrict a stack in groupoids along `J₁ ≤ J₂` to the coarser topology.
+The pseudofunctor and its fibers are untouched; only the descent condition is
+weakened, so this loses information and cannot be inverted. -/
+def ofLE (h : J₁ ≤ J₂) (F : StackInGroupoids C J₂) : StackInGroupoids C J₁ where
+  presheaf := F.presheaf
+  fiberIsGroupoid := F.fiberIsGroupoid
+  isStack :=
+    letI := F.isStack
+    Pseudofunctor.IsStack.of_le h
+
+@[simp]
+theorem ofLE_presheaf (h : J₁ ≤ J₂) (F : StackInGroupoids C J₂) :
+    (F.ofLE h).presheaf = F.presheaf :=
+  rfl
+
+/-- A covering family for a coarser topology is a covering family for a finer
+one, with the same index type and the same arrows. -/
+@[simps index obj hom]
+def Cover.ofLE (h : J₁ ≤ J₂) {S : C} (U : Cover.{t} (J := J₁) S) :
+    Cover.{t} (J := J₂) S where
+  index := U.index
+  obj := U.obj
+  hom := U.hom
+  mem := h _ U.mem
+
+end StackInGroupoids
+
 /-! ## Transport of the stack condition -/
 
 /-- Descent-compatible equivalence data between two pseudofunctors.

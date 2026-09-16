@@ -1,0 +1,4 @@
+# The exemption MO1.08 removed: sheaf stability reaching the triangulated
+# stability tree, here through the weak foundation umbrella.
+import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.Surface.Number
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation
