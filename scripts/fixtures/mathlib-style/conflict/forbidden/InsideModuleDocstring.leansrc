@@ -1,0 +1,18 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Basic
+
+/-!
+# The Mukai charge
+
+<<<<<<< HEAD
+Prose from one side of the merge.
+=======
+Prose from the other side of the merge.
+>>>>>>> agent/mo1.04-exponential-chart
+
+Markers inside a docstring are blanked by `code_only`, so this fixture pins that
+the check reads raw lines instead.
+-/

@@ -724,6 +724,14 @@ jobs:
         # the helper prevents it.
         run: python3 scripts/_output.py
 
+      - name: Mathlib-style known-answer fixtures
+        # scripts/check_mathlib_style.py itself runs from the edit hook and from
+        # scripts/gates.sh, never here -- it judges a branch's own lines, which
+        # CI has no use for. Its fixtures are a different question: they are what
+        # says the checker still rejects what it is meant to reject, and a check
+        # that quietly stops firing is how #1359 reached the Lean parser.
+        run: python3 scripts/check_mathlib_style.py --self-test
+
       - name: Stability source independence
         run: python3 scripts/check_source_independence.py
 
