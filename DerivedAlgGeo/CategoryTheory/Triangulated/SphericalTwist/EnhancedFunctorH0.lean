@@ -4,9 +4,9 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.ConeExactness
 import DerivedAlgGeo.Algebra.Homology.DGCategory.QuasiEquivalence
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.AdjunctionCone
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Functor
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.AdjunctionCone
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Functor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.ShiftedFunctor
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctor
 import Mathlib.CategoryTheory.Triangulated.Adjunction
 

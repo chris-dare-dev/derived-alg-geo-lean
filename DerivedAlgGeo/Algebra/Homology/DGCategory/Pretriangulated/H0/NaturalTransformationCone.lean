@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.FunctorCategoryH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.NaturalTransformationCone
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Triangle
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Triangle
 
 /-!
 # The triangle of `H⁰` attached to a closed dg natural transformation

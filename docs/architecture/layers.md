@@ -165,10 +165,10 @@ resolves; the file's path records what it is about.
 ## Where each theory currently lives
 
 This map describes existing modules. The ownership policy and cutover ledger
-identify mixed roots still to split, including dg H⁰ under DGEnhancement.
-Their appearance here is not permission to extend a misplaced foundation in
-place. Derived operations (#1321) and perfectness (#1322) are no longer among
-them.
+identify mixed roots still to split; their appearance here is not
+permission to extend a misplaced foundation in place. Derived operations
+(#1321), relative perfection (#1322) and dg H⁰ under DGEnhancement
+(#1320) are no longer among them.
 
 Arrows point from a refinement or consumer to the root it builds on.
 
@@ -191,7 +191,15 @@ Algebra/Homology
   │     │     └─→ AdjunctionH0Presentation           transport through equivalences to named functors
   │     ├─→ Pretriangulated                   cones, shifts, rotation, chosen homotopy squares
   │     │     ├─→ ConeCategory                chosen cones and homotopy-coherent maps
-  │     │     └─→ Functor                     composable shift/cone preservation capabilities
+  │     │     ├─→ Functor                     composable shift/cone preservation capabilities
+  │     │     └─→ H0                          the intrinsic triangulated theory of H⁰:
+  │     │           ├─→ Basic, Shift, Triangle   zero object, chosen shift, dg cone triangles
+  │     │           ├─→ ConeFunctor              functorial dg cone diagrams
+  │     │           ├─→ Functor, FunctorTransport, ShiftedFunctor,
+  │     │           │     NaturalTransformationCone(Shift)
+  │     │           │                            exactness of what DGFunctor.h0 produces
+  │     │           └─→ Adjunction*, (Linear)ObjectTwist*
+  │     │                                        presented dg adjunction and twist triangles
   │     └─→ Model/Complexes                   C^dg(A)
   └─→ SpectralSequence                        filtered and total complexes
 
@@ -236,14 +244,15 @@ CategoryTheory/Triangulated
   │                                           consumes presented dg adjunction triangles through
   │                                           objectwise, supplied-natural, and shift-compatible layers
   ├─→ Families                                pseudofunctorial fiber categories
-  ├─→ DGEnhancement                           enhancement interface, H⁰ triangulation,
-  │                                           functorial distinguished cone triangles and
-  │                                           presented dg-adjunction cone triangles and their
-  │                                           conventional cotwist inverse rotation;
-  │                                           H0/Triangle owns the triangles;
-  │                                           H0/{Functor,FunctorTransport} own transport of
-  │                                           dg-functor capabilities through H⁰ and ordinary
-  │                                           equivalences
+  ├─→ DGEnhancement                           comparison with a *chosen* category only:
+  │                                           Basic owns the underlying H⁰ presentation and
+  │                                           Exact the refinement carrying the shift and
+  │                                           exactness compatibilities as data;
+  │                                           H0/{ConeFunctor,MorphismCone} transport dg cones
+  │                                           across a comparison, H0/*K0 read triangles and
+  │                                           twists in the Grothendieck group.
+  │                                           The intrinsic H⁰ theory is not here: it is
+  │                                           Algebra/Homology/DGCategory/Pretriangulated/H0/
   └─→ StabilityCondition                      Bridgeland stability (canonical concept)
         ├─→ Weak                              weak stability: the dependency parent
         │     └─→ Foundation, Families, HarderNarasimhan, Support, Tilting
@@ -310,6 +319,7 @@ AlgebraicGeometry
 | Derived/opposite comparison and exact linear duality | `DerivedAlgGeo.Algebra.Homology.DerivedCategory.Opposite`, `…LinearDual` |
 | Generic spectral sequences | `DerivedAlgGeo.Algebra.Homology.SpectralSequence` |
 | dg categories | `DerivedAlgGeo.Algebra.Homology.DGCategory` |
+| the intrinsic triangulated theory of `H⁰` of a dg category | `DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0` |
 | dg enhancements of an abstract triangulated category | `DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement` |
 | The dg enhancement of the homotopy category | `DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement` |
 | Module sheaves on an arbitrary ringed site | `DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf` |

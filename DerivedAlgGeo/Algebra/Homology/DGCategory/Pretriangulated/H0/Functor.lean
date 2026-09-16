@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Functor
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Triangle
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Triangle
 
 /-!
 # Transporting dg-functor capabilities to `H⁰`

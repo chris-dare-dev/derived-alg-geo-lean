@@ -74,6 +74,8 @@ def already_landed(pr: dict) -> bool:
 # stack and the wrong rule here, so bootstrap is a separate axis, not a state.
 BOOTSTRAP_PATHS = {
     "scripts/gates.sh",
+    "scripts/precheck.sh",
+    "scripts/check_local_build.py",
     "scripts/check_mathlib_style.py",
     "scripts/pr_queue.py",
     ".claude/settings.json",

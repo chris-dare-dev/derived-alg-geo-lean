@@ -40,6 +40,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Cdg.homModule
 #print axioms CategoryTheory.Cdg.linear
 #print axioms CategoryTheory.Cdg.enhancement
+#print axioms CategoryTheory.Cdg.enhancementExact
 #print axioms CategoryTheory.Cdg.h0Functor
 #print axioms CategoryTheory.Cdg.homEquivCohomologyClass
 #print axioms CategoryTheory.Cdg.homOf_comp
@@ -178,6 +179,15 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Enhancement.isPretriangulated
 #print axioms CategoryTheory.Enhancement.mk.inj
 #print axioms CategoryTheory.Enhancement.mk.sizeOf_spec
+#print axioms CategoryTheory.Enhancement.Exact
+#print axioms CategoryTheory.Enhancement.Exact.coneTriangle_mem_distTriang
+#print axioms CategoryTheory.Enhancement.Exact.commShift
+#print axioms CategoryTheory.Enhancement.Exact.isTriangulated
+#print axioms CategoryTheory.Enhancement.Exact.mapTriangle
+#print axioms CategoryTheory.Enhancement.Exact.mapTriangle_obj_mem_distTriang
+#print axioms CategoryTheory.Enhancement.Exact.mapTriangle_obj_mem_distTriang_iff
+#print axioms CategoryTheory.Enhancement.Exact.mk.inj
+#print axioms CategoryTheory.Enhancement.Exact.mk.sizeOf_spec
 #print axioms CategoryTheory.H0
 #print axioms CategoryTheory.H0.category
 #print axioms CategoryTheory.H0.coboundariesIn

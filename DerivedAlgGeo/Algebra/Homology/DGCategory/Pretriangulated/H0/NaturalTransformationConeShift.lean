@@ -3,8 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.NaturalTransformationShift
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.NaturalTransformationCone
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ShiftedFunctor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.NaturalTransformationCone
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.ShiftedFunctor
 
 /-!
 # The inverse-rotated first map of a dg cone triangle

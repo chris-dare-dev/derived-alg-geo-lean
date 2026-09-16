@@ -1,6 +1,6 @@
 ---
 name: formalize-issue
-description: Run one unattended formalization iteration — claim a ready GitHub issue, formalize it on a branch, run the gates, open a PR, then stop. Use for hands-off sessions; pair with /loop for repeats.
+description: Run one unattended formalization iteration — claim a ready GitHub issue, formalize it on a branch, pre-flight it with scripts/precheck.sh, open a PR and take the gate verdict from CI, then stop. Use for hands-off sessions; pair with /loop for repeats.
 ---
 
 # One formalization iteration
@@ -102,19 +102,40 @@ of work, or you are on the third distinct proof strategy, go to step 5 and
 report the obstruction. A well-written obstruction report is a successful
 iteration. Grinding is not.
 
-## 4. Gates
+## 4. Pre-flight locally — this is not the verdict
 
 ```bash
-scripts/gates.sh fast
+scripts/precheck.sh
 ```
 
-Then, only once `fast` is green:
+Seconds, not minutes. It runs every gate that needs no Lean build — workflows,
+style on this branch's own lines, source-independence, layering, umbrella
+coverage, root reachability, coherent families, coverage map, pin, nolints,
+roadmap, and the two hook tests — then a **targeted** `lake build` of the
+modules this branch changed, which is where a proof that does not compile shows
+up.
 
-```bash
-scripts/gates.sh
-```
+**Do not run `scripts/gates.sh`.** The `PreToolUse` hook in
+`.claude/settings.json` refuses it in any mode: its `build` gate is the
+whole-library build that cost a developer three hours on 2026-08-27. This step
+used to say `scripts/gates.sh fast` and then `scripts/gates.sh`, which meant
+every unattended iteration stopped dead at a blocked hook here — at the step
+the skill calls its definition of done — and no iteration ever got a verdict.
+`DAG_ALLOW_LOCAL_BUILD=1` is for a genuinely unavailable runner and nothing
+else; using it is a reportable event, so say so in the PR body.
 
-Every gate must pass. A failing gate is not a reason to weaken the gate.
+Before pushing, do the one thing precheck cannot do for you: **add every new
+public declaration to its audit** (`scripts/AlgebraicGeometryAudit.lean`,
+`scripts/StabilityConditionAudit.lean`, `scripts/DGCategoryAudit.lean`). The
+audits and the completeness ratchet need the library elaborated, so they run on
+the runner only, and a missing record is the most common way an otherwise
+finished iteration comes back red.
+
+A failing check is the iteration's work, not a reason to weaken it.
+
+**The verdict comes from the self-hosted Windows runners**, after the push in
+step 6. `ci.yml` triggers on `push` to `agent/**`, so the push is the gate run;
+for a verdict without pushing, `gh workflow run ci.yml --ref agent/<slug>`.
 
 ## 5. If it did not close
 
@@ -140,10 +161,35 @@ git push -u origin agent/<slug>
 gh pr create -R chris-dare-dev/derived-alg-geo-lean --fill
 ```
 
+The push started the gate run on the Windows runners. Find it and wait on it:
+
+```bash
+gh run list --branch "agent/<slug>" --workflow ci.yml --limit 1 \
+  --json databaseId,url --jq '.[0]'
+gh run watch <databaseId> -R chris-dare-dev/derived-alg-geo-lean --exit-status
+gh run view <databaseId> -R chris-dare-dev/derived-alg-geo-lean \
+  --json status,conclusion --jq '"\(.status)/\(.conclusion)"'
+```
+
+**Read the conclusion, not the exit code.** `gh run watch --exit-status` exits
+**0 on a cancelled run**, and `ci.yml`'s concurrency group cancels the in-flight
+run on the next push to the same ref — so any follow-up push kills the run you
+were waiting on. Observed 2026-09-16 on run 35158669480: the watcher returned 0
+and the conclusion was `cancelled`. Only `completed/success` is green.
+
+**Bound the wait.** One build job serialises the queue. If the run has not
+*started* within about ten minutes, stop waiting: say so in the PR body with
+the run URL and halt. Do not claim a gate verdict you did not see.
+
 Then run the `mathlib-reviewer` agent on the branch diff and post its findings
-as a PR comment. If it returns `NEEDS REWORK`, fix the findings and re-run the
-gates before halting — the point of a hands-off run is that the PR is reviewable
-when the human returns, not that it exists.
+as a PR comment. If it returns `NEEDS REWORK`, fix the findings, re-run
+`scripts/precheck.sh`, and push again before halting — the point of a hands-off
+run is that the PR is reviewable when the human returns, not that it exists.
+
+State the CI conclusion honestly in the PR body: green, red with the failing
+step named, or still queued. A clean `scripts/precheck.sh` is fifteen of the
+thirty-odd gates and none of the expensive ones; never write it up as "gates
+pass".
 
 Finally, if step 3 turned up unrelated work worth doing, file it as its own
 issue now.
