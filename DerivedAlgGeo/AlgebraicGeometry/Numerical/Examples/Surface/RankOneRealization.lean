@@ -2,14 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.K3
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.K3
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialMukai
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.DivisorialSupport
 
 /-!
 # The real divisor realization of a Picard-rank-one surface, and the K3 model
 
-`Examples/Surface/RankOne.lean` builds the rational intersection ring
+`Models/Surface/RankOne.lean` builds the rational intersection ring
 `ℚ[H]/(H³)` with `∫_X H² = h2`, and `K3.lean`, `ProjectivePlane.lean` and
 `Abelian.lean` are three variety presentations over it.  What none of them had
 was a `Surface.NumericalRealization`: a map of the rational codimension-one

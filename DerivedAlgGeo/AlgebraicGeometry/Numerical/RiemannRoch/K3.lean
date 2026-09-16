@@ -30,7 +30,7 @@ object: `v² ≥ −2` (the condition for a moduli space to be nonempty) and `�
 
 That the axioms have a K3 *model*: a concrete `NumericalVarietyData 2 A N` with
 `A = ℚ[t]/(t³)`, `∫t² = 2d`, satisfying `IsK3`. Only the dimension-zero witness in
-`Numerical/Examples/DimensionZero/Point.lean` exists so far, so the statements below are
+`Numerical/Models/DimensionZero/Point.lean` exists so far, so the statements below are
 conditional on a
 `NumericalVarietyData 2 A N` existing at all. Building that model is the next task; it needs the
 internality of the grading, i.e. linear independence of `1, t, t²`.

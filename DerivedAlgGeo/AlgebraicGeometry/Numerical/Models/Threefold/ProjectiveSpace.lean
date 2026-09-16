@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Threefold.LinearSection
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Threefold.LinearSection
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Threefold
 
 /-!
@@ -12,7 +12,7 @@ The first model of `NumericalVarietyData` in dimension three. Before it, every s
 `DerivedAlgGeo/AlgebraicGeometry/Numerical/Specializations/Threefold.lean` was conditional on
 a `NumericalVarietyData 3 A N` existing at all.
 
-`ℙ³` is the threefold analogue of `Examples/Surface/ProjectivePlane.lean`, and it is here for
+`ℙ³` is the threefold analogue of `Models/Surface/ProjectivePlane.lean`, and it is here for
 the same reason: **every** Todd coefficient is nonzero, so it is the model that can detect a
 sign or index error anywhere in `Threefold.chi_eq`. A Calabi–Yau model cannot — two of the
 four terms are multiplied by zero there.

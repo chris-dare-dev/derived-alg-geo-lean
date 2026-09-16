@@ -26,7 +26,7 @@ Three things are proved.
   `K3.mukaiS`, the repository's existing `s = rank + ∫ch₂`, and hence
   `K3.mukaiSInt = χ − rank` once Hirzebruch--Riemann--Roch is supplied.  This is
   what ties the new adapter to `GrothendieckGroup/MukaiVector.lean` and the K3
-  model of `Examples/Surface/K3Mukai.lean` instead of leaving two unrelated
+  model of `Models/Surface/K3Mukai.lean` instead of leaving two unrelated
   notions of "Mukai vector" in the library.
 * `mukaiCharge_of_isK3`: Bridgeland's charge is the ordinary divisorial charge
   minus the rank.
@@ -38,7 +38,7 @@ satisfying `IsK3`; this file constructs none.
 
 Two gaps this section used to record are now closed, in the examples rather than
 here.  `Examples/Surface/RankOneRealization.lean` constructs the numerical
-realization of the K3 model of `Examples/Surface/K3.lean`, and
+realization of the K3 model of `Models/Surface/K3.lean`, and
 `Examples/Surface/K3MukaiComparison.lean` compares the real Mukai extension used
 here with the integral `Mukai.MukaiLattice` of
 `GrothendieckGroup/MukaiVector.lean`, through the lattice map that

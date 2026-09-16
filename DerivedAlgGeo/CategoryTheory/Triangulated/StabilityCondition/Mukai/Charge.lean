@@ -96,7 +96,7 @@ remains, and the three formal properties come from `AddMonoidHom` and
 This generic carrier deliberately accepts any such hom.  Concrete geometric
 consumers must construct it from their numerical class map; the K3 numerical
 lane does so in
-`AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalCharge.lean`, where
+`AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalChargeK3.lean`, where
 the resulting charge is proved definitionally equal to `numericalCharge`. -/
 structure MukaiChargeData (A : Type u) [Category.{v} A] [Abelian A]
     (V : Type*) [AddCommGroup V] [Module ℝ V] where

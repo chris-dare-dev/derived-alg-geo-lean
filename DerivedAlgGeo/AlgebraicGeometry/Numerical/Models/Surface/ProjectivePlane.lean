@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Surface.RankOne
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Surface.RankOne
 
 /-!
 # The projective-plane numerical model

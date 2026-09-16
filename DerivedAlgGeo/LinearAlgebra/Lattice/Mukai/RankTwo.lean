@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.LinearAlgebra.BilinearForm.RankTwo
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 
 /-!
@@ -22,6 +23,13 @@ used.** In particular:
 * `IsHyperbolicPair` is a numerical condition on two lattice vectors, not a
   claim that a wall exists.
 
+Every identity below is arithmetic of two vectors under a bilinear form and
+none of it is about this carrier, so it is proved once over an arbitrary
+`(R, M, B)` in `BilinearForm/RankTwo.lean` and specialised here at
+`pairingBilin b`. What stays is the part that is about the Mukai extension:
+`HasSphericalClass` and `HasIsotropicClass`, which are phrased in the
+application's vocabulary for `-2` and `0`.
+
 ## Main results
 
 * `gram_lincomb` — the Gram determinant transforms by the square of the
@@ -40,21 +48,22 @@ namespace Mukai
 variable {N : Type*} [AddCommGroup N] (b : N →ₗ[ℤ] N →ₗ[ℤ] ℤ)
 
 /-- The Gram determinant of the pair `(v, w)`. -/
-def gram (v w : MukaiLattice N) : ℤ :=
-  selfPairing b v * selfPairing b w - pairing b v w ^ 2
+def gram (v w : MukaiLattice N) : ℤ := BilinearForm.gram (pairingBilin b) v w
+
+theorem gram_apply (v w : MukaiLattice N) :
+    gram b v w = selfPairing b v * selfPairing b w - pairing b v w ^ 2 := rfl
 
 theorem gram_comm (hb : ∀ x y : N, b x y = b y x) (v w : MukaiLattice N) :
-    gram b v w = gram b w v := by
-  simp only [gram, pairing_comm b hb w v]
-  ring
+    gram b v w = gram b w v :=
+  BilinearForm.gram_comm (pairingBilin b) (fun x y => pairing_comm b hb x y) v w
 
 @[simp]
-theorem gram_zero_left (w : MukaiLattice N) : gram b (0 : MukaiLattice N) w = 0 := by
-  simp [gram]
+theorem gram_zero_left (w : MukaiLattice N) : gram b (0 : MukaiLattice N) w = 0 :=
+  BilinearForm.gram_zero_left (pairingBilin b) w
 
 @[simp]
-theorem gram_zero_right (v : MukaiLattice N) : gram b v (0 : MukaiLattice N) = 0 := by
-  simp [gram]
+theorem gram_zero_right (v : MukaiLattice N) : gram b v (0 : MukaiLattice N) = 0 :=
+  BilinearForm.gram_zero_right (pairingBilin b) v
 
 /-! ### Expansion along a pair -/
 
@@ -63,10 +72,9 @@ theorem pairing_lincomb (hb : ∀ x y : N, b x y = b y x) (a₁ a₂ a₃ a₄ :
     (v w : MukaiLattice N) :
     pairing b (a₁ • v + a₂ • w) (a₃ • v + a₄ • w)
       = a₁ * a₃ * selfPairing b v + (a₁ * a₄ + a₂ * a₃) * pairing b v w
-        + a₂ * a₄ * selfPairing b w := by
-  simp only [selfPairing_eq_pairing, pairing_add_left, pairing_add_right,
-    pairing_smul_left, pairing_smul_right, pairing_comm b hb w v]
-  ring
+        + a₂ * a₄ * selfPairing b w :=
+  BilinearForm.apply_lincomb (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) a₁ a₂ a₃ a₄ v w
 
 /-- The self-pairing of an integer combination: the binary quadratic form
 attached to the pair `(v, w)`. -/
@@ -74,9 +82,9 @@ theorem selfPairing_lincomb (hb : ∀ x y : N, b x y = b y x) (a₁ a₂ : ℤ)
     (v w : MukaiLattice N) :
     selfPairing b (a₁ • v + a₂ • w)
       = a₁ ^ 2 * selfPairing b v + 2 * (a₁ * a₂) * pairing b v w
-        + a₂ ^ 2 * selfPairing b w := by
-  rw [selfPairing_eq_pairing, pairing_lincomb b hb a₁ a₂ a₁ a₂ v w]
-  ring
+        + a₂ ^ 2 * selfPairing b w :=
+  BilinearForm.self_lincomb (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) a₁ a₂ v w
 
 /-- **Change of basis multiplies the Gram determinant by the square of the
 determinant.**
@@ -86,9 +94,9 @@ degenerate substitutions as well as unimodular ones. -/
 theorem gram_lincomb (hb : ∀ x y : N, b x y = b y x) (a₁ a₂ a₃ a₄ : ℤ)
     (v w : MukaiLattice N) :
     gram b (a₁ • v + a₂ • w) (a₃ • v + a₄ • w)
-      = (a₁ * a₄ - a₂ * a₃) ^ 2 * gram b v w := by
-  simp only [gram, selfPairing_lincomb b hb, pairing_lincomb b hb]
-  ring
+      = (a₁ * a₄ - a₂ * a₃) ^ 2 * gram b v w :=
+  BilinearForm.gram_lincomb (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) a₁ a₂ a₃ a₄ v w
 
 /-! ### Hyperbolic pairs -/
 
@@ -97,50 +105,46 @@ indefinite. For a rank-two lattice this is signature `(1, 1)`.
 
 A numerical condition on two vectors. It is **not** a claim that a wall exists
 in any space of stability conditions. -/
-def IsHyperbolicPair (v w : MukaiLattice N) : Prop := gram b v w < 0
+def IsHyperbolicPair (v w : MukaiLattice N) : Prop :=
+  BilinearForm.IsHyperbolicPair (pairingBilin b) v w
 
 theorem isHyperbolicPair_iff (v w : MukaiLattice N) :
-    IsHyperbolicPair b v w ↔ selfPairing b v * selfPairing b w < pairing b v w ^ 2 := by
-  rw [IsHyperbolicPair, gram]
-  constructor <;> intro h <;> linarith
+    IsHyperbolicPair b v w ↔ selfPairing b v * selfPairing b w < pairing b v w ^ 2 :=
+  BilinearForm.isHyperbolicPair_iff (pairingBilin b) v w
 
 /-- The binary quadratic form attached to a hyperbolic pair has positive
 discriminant, i.e. it is indefinite. -/
 theorem discr_pos_of_isHyperbolicPair {v w : MukaiLattice N}
     (h : IsHyperbolicPair b v w) :
-    0 < 4 * (pairing b v w ^ 2 - selfPairing b v * selfPairing b w) := by
-  rw [IsHyperbolicPair, gram] at h
-  linarith
+    0 < 4 * (pairing b v w ^ 2 - selfPairing b v * selfPairing b w) :=
+  BilinearForm.discr_pos_of_isHyperbolicPair (pairingBilin b) h
 
 theorem gram_ne_zero_of_isHyperbolicPair {v w : MukaiLattice N}
     (h : IsHyperbolicPair b v w) : gram b v w ≠ 0 :=
-  ne_of_lt h
+  BilinearForm.gram_ne_zero_of_isHyperbolicPair (pairingBilin b) h
 
 /-- A hyperbolic pair has nonzero first entry. -/
 theorem ne_zero_left_of_isHyperbolicPair {v w : MukaiLattice N}
-    (h : IsHyperbolicPair b v w) : v ≠ 0 := by
-  rintro rfl
-  rw [IsHyperbolicPair, gram_zero_left] at h
-  exact absurd h (lt_irrefl 0)
+    (h : IsHyperbolicPair b v w) : v ≠ 0 :=
+  BilinearForm.ne_zero_left_of_isHyperbolicPair (pairingBilin b) h
 
 /-- A hyperbolic pair has nonzero second entry. -/
 theorem ne_zero_right_of_isHyperbolicPair {v w : MukaiLattice N}
-    (h : IsHyperbolicPair b v w) : w ≠ 0 := by
-  rintro rfl
-  rw [IsHyperbolicPair, gram_zero_right] at h
-  exact absurd h (lt_irrefl 0)
+    (h : IsHyperbolicPair b v w) : w ≠ 0 :=
+  BilinearForm.ne_zero_right_of_isHyperbolicPair (pairingBilin b) h
 
 theorem isHyperbolicPair_comm (hb : ∀ x y : N, b x y = b y x) (v w : MukaiLattice N) :
-    IsHyperbolicPair b v w ↔ IsHyperbolicPair b w v := by
-  rw [IsHyperbolicPair, IsHyperbolicPair, gram_comm b hb]
+    IsHyperbolicPair b v w ↔ IsHyperbolicPair b w v :=
+  BilinearForm.isHyperbolicPair_comm (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) v w
 
 /-- Being hyperbolic survives any change of basis of determinant `±1`. -/
 theorem isHyperbolicPair_lincomb (hb : ∀ x y : N, b x y = b y x) {a₁ a₂ a₃ a₄ : ℤ}
     (hd : (a₁ * a₄ - a₂ * a₃) ^ 2 = 1) {v w : MukaiLattice N}
     (h : IsHyperbolicPair b v w) :
-    IsHyperbolicPair b (a₁ • v + a₂ • w) (a₃ • v + a₄ • w) := by
-  rw [IsHyperbolicPair, gram_lincomb b hb, hd, one_mul]
-  exact h
+    IsHyperbolicPair b (a₁ • v + a₂ • w) (a₃ • v + a₄ • w) :=
+  BilinearForm.isHyperbolicPair_lincomb (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) hd h
 
 /-! ### The orthogonal negative direction
 
@@ -152,19 +156,20 @@ diagonalisation, no appeal to Sylvester's law. -/
 /-- `⟪v, w⟫ • v - ⟪v, v⟫ • w`, the projection of `w` off `v` cleared of
 denominators. -/
 def orthWitness (v w : MukaiLattice N) : MukaiLattice N :=
-  pairing b v w • v - selfPairing b v • w
+  BilinearForm.orthWitness (pairingBilin b) v w
+
+theorem orthWitness_apply (v w : MukaiLattice N) :
+    orthWitness b v w = pairing b v w • v - selfPairing b v • w := rfl
 
 /-- The witness is orthogonal to `v`. Needs no symmetry hypothesis. -/
 theorem pairing_orthWitness (v w : MukaiLattice N) :
-    pairing b v (orthWitness b v w) = 0 := by
-  simp only [orthWitness, pairing_sub_right, pairing_smul_right, selfPairing_eq_pairing]
-  ring
+    pairing b v (orthWitness b v w) = 0 :=
+  BilinearForm.apply_orthWitness (pairingBilin b) v w
 
 theorem selfPairing_orthWitness (hb : ∀ x y : N, b x y = b y x) (v w : MukaiLattice N) :
-    selfPairing b (orthWitness b v w) = selfPairing b v * gram b v w := by
-  simp only [orthWitness, gram, selfPairing_eq_pairing, pairing_sub_left,
-    pairing_sub_right, pairing_smul_left, pairing_smul_right, pairing_comm b hb w v]
-  ring
+    selfPairing b (orthWitness b v w) = selfPairing b v * gram b v w :=
+  BilinearForm.self_orthWitness (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) v w
 
 /-- **The signature witness.** If the pair is hyperbolic and `v` has positive
 square, the explicit class `orthWitness b v w` is orthogonal to `v` and has
@@ -172,40 +177,42 @@ strictly negative square. -/
 theorem selfPairing_orthWitness_neg (hb : ∀ x y : N, b x y = b y x)
     {v w : MukaiLattice N} (hv : 0 < selfPairing b v)
     (h : IsHyperbolicPair b v w) :
-    selfPairing b (orthWitness b v w) < 0 := by
-  rw [selfPairing_orthWitness b hb]
-  exact mul_neg_of_pos_of_neg hv h
+    selfPairing b (orthWitness b v w) < 0 :=
+  BilinearForm.self_orthWitness_neg (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) hv h
 
 /-- The witness is nonzero whenever it has nonzero square. -/
 theorem orthWitness_ne_zero (hb : ∀ x y : N, b x y = b y x)
     {v w : MukaiLattice N} (hv : 0 < selfPairing b v)
     (h : IsHyperbolicPair b v w) :
-    orthWitness b v w ≠ 0 := by
-  intro hzero
-  have := selfPairing_orthWitness_neg b hb hv h
-  rw [hzero, selfPairing_zero] at this
-  exact absurd this (lt_irrefl 0)
+    orthWitness b v w ≠ 0 :=
+  BilinearForm.orthWitness_ne_zero (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) hv h
 
 /-! ### Numerical wall data
 
 The predicates the Bayer–Macrì classification is phrased in terms of, as
 conditions on the rank-two datum alone. Which geometric wall type each
 corresponds to is Theorem 5.7 of that paper and is **not** formalised: it needs
-moduli of stable objects. -/
+moduli of stable objects.
+
+`HasSphericalClass` and `HasIsotropicClass` stay here rather than moving to the
+neutral owner: they are phrased in `IsSpherical` and `IsIsotropic`, which are
+this application's vocabulary for `-2` and `0`. -/
 
 /-- The set of integer combinations of `v` and `w`. -/
 def pairSpan (v w : MukaiLattice N) : Set (MukaiLattice N) :=
-  {x | ∃ a₁ a₂ : ℤ, x = a₁ • v + a₂ • w}
+  BilinearForm.pairSpan (R := ℤ) v w
 
 theorem mem_pairSpan_left (v w : MukaiLattice N) : v ∈ pairSpan v w :=
-  ⟨1, 0, by simp⟩
+  BilinearForm.mem_pairSpan_left (R := ℤ) v w
 
 theorem mem_pairSpan_right (v w : MukaiLattice N) : w ∈ pairSpan v w :=
-  ⟨0, 1, by simp⟩
+  BilinearForm.mem_pairSpan_right (R := ℤ) v w
 
 theorem orthWitness_mem_pairSpan (v w : MukaiLattice N) :
     orthWitness b v w ∈ pairSpan v w :=
-  ⟨pairing b v w, -selfPairing b v, by simp [orthWitness, sub_eq_add_neg]⟩
+  BilinearForm.orthWitness_mem_pairSpan (pairingBilin b) v w
 
 /-- The rank-two datum carries a spherical class. -/
 def HasSphericalClass (v w : MukaiLattice N) : Prop :=
@@ -221,7 +228,7 @@ theorem exists_neg_selfPairing_of_isHyperbolicPair (hb : ∀ x y : N, b x y = b 
     {v w : MukaiLattice N} (hv : 0 < selfPairing b v)
     (h : IsHyperbolicPair b v w) :
     ∃ x ∈ pairSpan v w, x ≠ 0 ∧ selfPairing b x < 0 :=
-  ⟨orthWitness b v w, orthWitness_mem_pairSpan b v w,
-    orthWitness_ne_zero b hb hv h, selfPairing_orthWitness_neg b hb hv h⟩
+  BilinearForm.exists_neg_self_of_isHyperbolicPair (pairingBilin b)
+    (fun x y => pairing_comm b hb x y) hv h
 
 end Mukai

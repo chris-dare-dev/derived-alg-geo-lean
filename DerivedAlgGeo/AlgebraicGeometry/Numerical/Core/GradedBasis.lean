@@ -64,7 +64,7 @@ noncomputable def NumericalRingData.ofGradedBasis (n : ℕ)
 
 This exercises every hypothesis of `ofGradedBasis` on the dimension-zero
 intersection ring `ℚ` of a point. The exported point presentation is built
-independently in `Numerical/Examples/DimensionZero/Point.lean`. -/
+independently in `Numerical/Models/DimensionZero/Point.lean`. -/
 
 section SmokeTest
 

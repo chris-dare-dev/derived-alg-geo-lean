@@ -80,7 +80,7 @@ does is make the distance explicit and let the categorical side be stated.
 
 * Nothing constructs a geometric `K₀.Realization`, and nothing constructs a
   `K₀.Realization.Descends` witness. Both are supplied. An `AdditiveMukaiData`
-  is no longer uninhabited — `Numerical/Examples/Surface/K3Mukai.lean` builds
+  is no longer uninhabited — `Numerical/Models/Surface/K3Mukai.lean` builds
   one on the rank-one model — but none comes from a scheme, so the isometry
   statements still rest on a lattice-valued *additive* Chern class that no file
   produces geometrically.

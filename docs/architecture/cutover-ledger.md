@@ -164,13 +164,37 @@ Restating it over an arbitrary form made the hypothesis split visible, and it
 is not the expected one: additivity needs neither symmetry nor `B s s = -2`,
 involutivity needs `B s s = -2` alone, and only the isometry needs symmetry.
 
-Still owed: rank-two Gram-determinant identities, the other half of the neutral
-core; the exponential chart, which still sits in `Mukai/RealForm.lean` rather
-than with the numerical central-charge construction; and `IsSpherical` and
-`expectedDim = square + 2`, which remain application vocabulary on the neutral
-carrier. The tracker closed #1315 early -- a commit message in #1345 that said
-it did *not* close the issue was read by GitHub as a closing keyword -- so the
-issue state is not evidence that these landed.
+**Rank-two Gram landed 2026-09-15**, completing the neutral core.
+`BilinearForm/RankTwo.lean` states the Gram determinant, the change-of-basis
+identity, `orthWitness` and the hyperbolic-pair predicate over an arbitrary
+`(R, M, B)`, and `Lattice/Mukai/RankTwo.lean` specialises them. The file splits
+where order is needed: `gram`, `gram_lincomb` and `orthWitness` need only a
+commutative ring, and `apply_orthWitness` needs no symmetry either, while
+`IsHyperbolicPair` and everything reading a sign need a linear order and a
+strict ordered ring.
+
+`HasSphericalClass` and `HasIsotropicClass` stayed with the Mukai lane, and so
+did `IsSpherical` and `expectedDim = square + 2`. That is the application
+vocabulary row discharged: all three neutral owners import Mathlib and nothing
+else, so the general theory is importable with no Mukai extension in scope, and
+the `-2` and `0` conditions appear in the neutral statements as hypotheses
+rather than as named predicates.
+
+**The exponential chart row is blocked, and not by effort.** The ledger asks
+for the chart to go with the numerical central-charge construction. It cannot
+move alone: `Lattice/Mukai/CentralCharge.lean` consumes `expRe`/`expIm`, and
+`StabilityCondition/CentralCharge/Quadratic.lean` already imports
+`Lattice/Mukai/CentralCharge.lean`, so relocating the chart into the
+central-charge tree closes an import cycle. The layering gate does not catch
+this -- it passes on a `LinearAlgebra` to `StabilityCondition` edge -- Lean's
+module acyclicity does. Discharging the row means moving the whole real-Mukai
+to charge bridge (`Mukai/CentralCharge.lean`, `ExponentialOrientation.lean`,
+`IntegralBridge.lean`) out of `LinearAlgebra/Lattice/`, which is coupled to
+MO1.02's central-charge ownership and is a lane of its own.
+
+The tracker closed #1315 early -- a commit message in #1345 that said it did
+*not* close the issue was read by GitHub as a closing keyword -- so the issue
+state is not evidence about any of these rows.
 
 #### 04 -- Charge construction upstream of walls (#1313)
 
@@ -261,7 +285,8 @@ their K3 consequences live in `SqrtToddK3.lean` and `VectorClassK3.lean`.
 `SlopeK3.lean`. `PolarisedWallTransport.lean` owns the generic `(n,m,κ)` root,
 while `PolarisedWallTransportComparison.lean` imports the surface and
 threefold leaves. Shared rank-one Chern coordinates live in `RankOne.lean`,
-and cross-model witnesses live in `Examples/Surface/Comparison.lean`.
+and cross-model witnesses live in `Models/Surface/Comparison.lean`, which
+MO1.06 moved there from `Examples/Surface/` the next day.
 
 The layering gate checks the transitive closures of the square-root, slope and
 polarised-transport roots against K3, named-surface and dimension-specific
@@ -341,18 +366,121 @@ repository's three "perfect" notions without their comparison theorems.
 
 | Relationship | Owner |
 | --- | --- |
-| Definition owner | explicit algebraic models get a `Numerical/Models/` owner; reusable constructors move out of the example leaves |
-| Neutral core | the shared surface-model constructor from row 07 |
-| Application adapter | K3-only charge adapters move into visibly K3-specific modules; dimension specializations get explicit homes inside the numerical subject |
-| Comparison owner | actual scheme realizations stay with `Surface/K3/` and `Surface/Enriques/`, **or** consistently under object-specific children of `DerivedCategory/Stability/` -- MO1.06 picks one convention and records it here |
+| Definition owner | explicit algebraic models own `Numerical/Models/`; the reusable constructors moved out of the example leaves |
+| Neutral core | the shared surface-model constructor from row 07, now `Models/Surface/RankOne.lean` |
+| Application adapter | the two K3-only charge adapters took a visibly K3 filename; dimension specializations have explicit homes at `Models/Threefold/` and `Models/Fourfold/` |
+| Comparison owner | an actual scheme and its scheme-level realization stay with the geometric object -- `AlgebraicGeometry/Surface/K3.lean`, `AlgebraicGeometry/Surface/Enriques/` -- and a scheme-level specialization of a *stability* construction stays under `DerivedCategory/Stability/` with a `Scheme` suffix, because its subject is the stability function. That is the convention this row picks; both halves already existed and neither moved |
 
-Two naming defects are fixed as part of the move rather than carried forward:
-the Enriques example models a polarization slice of a rank-ten numerical
-divisor lattice, so "Picard rank one" is the wrong title; and in higher
-dimensions Picard rank one alone does not imply that the numerical intersection
-ring is `ℚ[H]/(H^(n+1))` -- the rank-one file's stronger generated-by-`H`
-assumption is the load-bearing one. No K3 files are collapsed into one folder,
-and no numerical model is identified with a scheme.
+**Landed 2026-09-15** in #1317.
+
+##### The line that was drawn
+
+`Numerical/Models/` holds formal rank--degree--coordinate models: an
+intersection ring, its grading, a degree map, Chern and Todd coefficients, and
+Riemann--Roch. `Numerical/Examples/` holds the demonstrations built on them:
+the realization map into a real divisor space, the charges, the walls, the
+slices and the regions.
+
+The line is not a matter of taste, and it is checked. Every module under
+`Numerical/Models/` is stability-neutral and every module under
+`Numerical/Examples/` reaches the stability tree, so the rule-3 exemption that
+names `Numerical/Examples/{Surface,Threefold,Fourfold}` is now tight. Narrowing
+it was named as MO1.06 work by the comment on `STABILITY_CONSUMING_GEOMETRY`
+itself; `Numerical.Models` is deliberately absent from that list, and rule 12
+rejects any later attempt to add it. Rule 11's specialization list gained
+`Numerical.Models` in the same change, so a generic root still cannot import a
+named model.
+
+| Classification | Modules | Home |
+| --- | --- | --- |
+| Reusable model | `MonogenicRing`, `Surface/RankOne`, `Threefold/LinearSection`, `Fourfold/LinearSection` | `Numerical/Models/` |
+| Named model | `Surface/{K3,Abelian,Enriques,ProjectivePlane}`, `Surface/K3Mukai`, `{Threefold,Fourfold}/{CalabiYau,ProjectiveSpace}`, `DimensionZero/Point` | `Numerical/Models/` |
+| Comparison | `Surface/Comparison`, `Surface/K3MukaiIntegral` | `Numerical/Models/` |
+| Demonstration | `Surface/{RankOneRealization,RankOneWalls,K3MukaiComparison,ProjectivePlaneCharge,SmoothQuadric,SmoothQuadricCharge,BlowUpPlane,BlowUpPlaneWalls,BlowUpPlaneSlice}`, `{Threefold,Fourfold}/{CalabiYauWalls,ProjectiveSpaceWalls}` | `Numerical/Examples/` |
+
+`SmoothQuadric.lean` and `BlowUpPlane.lean` construct rings and stay with the
+demonstrations because each also carries its divisor realization and its
+wall-theoretic certificates in the same module; they are not formal models
+alone. Splitting them is not required by this row and is not done here.
+
+##### The maps that reach the common root
+
+An advertised specialization is a declaration, not a directory name. These are
+the maps, each one an import away from its root:
+
+| Leaf | Root | Map |
+| --- | --- | --- |
+| `Models/Surface/{K3,Abelian,Enriques,ProjectivePlane}` | `Models/Surface/RankOne` | `surfaceNumericalRing`, `surfaceCh`, `surfaceCh_mem` -- each model supplies only a Todd class |
+| `Models/{Threefold,Fourfold}/{CalabiYau,ProjectiveSpace}` | `Models/MonogenicRing` | `rankOneNumericalVariety` and `rankOneNumericalVariety_satisfiesHRR`, through the dimension's `LinearSection` coordinates |
+| `Models/Surface/K3Mukai` | `GrothendieckGroup/MukaiVector` | `k3IntegralMukaiData`, `k3AdditiveMukaiData` |
+| `Examples/Surface/RankOneRealization` | `Models/Surface/RankOne` | `Surface.NumericalRealization` from the rational codimension-one piece into a real divisor space |
+| `Examples/Surface/K3MukaiComparison` | both presentations | the integral and the real Mukai structure of the same model, imported downstream of each |
+| `DerivedCategory/Stability/K3MukaiTiltScheme` | `DerivedCategory/Stability/K3MukaiTilt` | the scheme specialization, which takes an actual `Scheme` and geometric Riemann--Roch |
+
+No map runs from a numerical model to a scheme. `AlgebraicGeometry/Surface/K3.lean`
+still records in "What this file does not do" that the bridge
+`IsK3Surface k X C -> NumericalVarietyData 2 A N` is Hirzebruch--Riemann--Roch
+and does not exist at the pin; nothing in this row supplies it.
+
+##### The two naming defects
+
+Both are fixed rather than carried forward.
+
+`Models/Surface/Enriques.lean` is titled "A polarisation slice of the Enriques
+numerical lattice". `Num(Y)` of a genuine Enriques surface is `U + E8(-1)` of
+rank ten; the file builds the rank-one sublattice spanned by one polarisation
+class with `H^2 = 2d`, which is legitimate because the Enriques lattice is even.
+Picard rank one is neither a hypothesis nor a conclusion there.
+
+`Examples/RankOne.lean` became `Models/MonogenicRing.lean`, titled "The
+numerical intersection ring generated by one ample class, in every dimension",
+because that is the hypothesis every construction in it uses. In dimension two
+the two conditions agree, since a surface has `A^0 = A^2 = Q` and `A^1 = Q.H`.
+For `n >= 3` the rank of `N^1(X)` says nothing about `N^2(X)`, so Picard rank
+one alone does not give `Q[H]/(H^(n+1))`. The `rankOne` prefix on the
+declarations is preserved and is historical; the module docstring says so.
+
+No K3 files were collapsed into one folder, and no numerical model is
+identified with a scheme.
+
+##### The K3-only charge adapters
+
+`GrothendieckGroup/CentralCharge.lean` and `GrothendieckGroup/CategoricalCharge.lean`
+were entirely in namespace `Numerical.K3` behind dimension-general filenames.
+They are now `CentralChargeK3.lean` and `CategoricalChargeK3.lean`, matching the
+`SqrtToddK3`/`VectorClassK3`/`SlopeK3` convention row 07 established, and the
+rule-3 exemption entry moved with the file. `MukaiVector.lean` and
+`RadicalKernel.lean` beside them are also `Numerical.K3` but are not charge
+adapters, and this row does not rename them.
+
+##### The arbitrary-divisor-rank branch
+
+`Exp.ofMoments` takes a moment sequence, not a vector of `H`-degrees, precisely
+so that the multi-divisor charge and the compressed families are **siblings**
+under one kernel. `H`-compression is not injective once the Picard rank exceeds
+one, so the divisorial charge has no degree vector to hand the kernel and is not
+a child of the compressed branch. Rule 12 pins that: both
+`CentralCharge/Exponential/Divisorial.lean` and
+`CentralCharge/Exponential/Comparison.lean` must reach
+`CentralCharge/Exponential/Kernel.lean`, only the second may reach a degree
+vector, and the rank-two and rank-three geometry demonstrations
+(`SmoothQuadric*`, `BlowUpPlane*`) must not import the rank-one carrier or the
+scalar polarised transport to obtain a charge.
+
+##### Where the #1225 fourfold models belong
+
+`Models/Fourfold/LinearSection.lean` owns the reusable Koszul linear-section
+coordinates in dimension four, and `Models/Fourfold/CalabiYau.lean` and
+`Models/Fourfold/ProjectiveSpace.lean` own the two models over it. The wall
+families #1225 added to them are demonstrations and stay at
+`Examples/Fourfold/CalabiYauWalls.lean` and
+`Examples/Fourfold/ProjectiveSpaceWalls.lean`, which is why the fourfold entry
+in the rule-3 exemption list survives the move unchanged.
+
+No charge formula is reproduced here. Inhabiting `Numerical.CalabiYauFourfold`
+is a statement about the numerical axioms; it is not a claim that a smooth
+sextic fourfold exists as a scheme in this repository, and nothing constructs
+one.
 
 #### 13 -- Direct Mathlib-owner mismatches (#1325)
 
@@ -448,9 +576,16 @@ difference is code the blanket exemption was not guarding -- `Numerical/Core/`,
 `Numerical/Mukai/`, `Numerical/RiemannRoch/`, `Numerical/Specializations/`, the
 non-charge `Numerical/GrothendieckGroup/` modules, `Numerical/Examples/`'s
 dimension-zero, fourfold and rank-one leaves, `Moduli/PerfectComplex/` and
-`Moduli/Quot/`. Narrowing the remaining eight entries further is MO1.05,
-MO1.06 and MO1.13 work, since each still mixes modules that reach the stability
+`Moduli/Quot/`. Narrowing the remaining eight entries further was MO1.05,
+MO1.06 and MO1.13 work, since each still mixed modules that reach the stability
 tree with modules that do not.
+
+MO1.06 (#1317) closed the three `Numerical/Examples/` entries on 2026-09-15 by
+moving the formal models to `Numerical/Models/` rather than by editing the
+list: every module still named by those three entries now genuinely reaches the
+stability tree, and `Numerical/Models` is held neutral. `Numerical/Stability`,
+`DerivedCategory/Stability`, `Moduli/HarderNarasimhan`, `Moduli/Semistability`
+and `Stability/Gieseker` remain as they were.
 
 ## Completed roots
 

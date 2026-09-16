@@ -2,14 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Numerical.Examples.Fourfold.CalabiYau
+import DerivedAlgGeo.AlgebraicGeometry.Numerical.Models.Fourfold.CalabiYau
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.PolarisedWallTransport
 
 /-!
 # The wall layer of the sextic Calabi--Yau fourfold
 
 The second half of the fourfold slice, and the half that makes the weighting
-visible.  `Examples/Fourfold/CalabiYau.lean` builds the smooth sextic
+visible.  `Models/Fourfold/CalabiYau.lean` builds the smooth sextic
 `X ⊂ ℙ⁵` with `∫_X H⁴ = 6`; `ProjectiveSpaceWalls.lean` does the same job at
 `∫H⁴ = 1`, where the polarisation degree is invisible because it is one.
 
