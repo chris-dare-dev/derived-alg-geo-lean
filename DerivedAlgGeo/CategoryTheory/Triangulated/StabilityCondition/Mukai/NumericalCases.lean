@@ -5,10 +5,7 @@ Released under the MIT license.
 <<<<<<< HEAD
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Charge
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.PhaseGeometry
-import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
 =======
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Charge
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.PhaseGeometry
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Positivity
 >>>>>>> 0addb0f9 (refactor(charge): move the real-Mukai charge bridge out of the quadratic extension (#1315))
 

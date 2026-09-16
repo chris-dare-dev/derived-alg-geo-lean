@@ -4,9 +4,7 @@ Released under the MIT license.
 -/
 <<<<<<< HEAD
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Slope
-import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.CentralCharge
 =======
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.Slope
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Charge
 >>>>>>> 0addb0f9 (refactor(charge): move the real-Mukai charge bridge out of the quadratic extension (#1315))
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
