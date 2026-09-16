@@ -329,6 +329,8 @@ deliberately makes a conscious act. MO1.13 must first check what Mathlib
 already provides and prefer reusing it; a new top-level subject is authorized
 only if that check comes back empty, and is recorded here when it happens.
 
+**Implemented in #1356.**
+
 ##### The Mathlib check, and the subject it authorized
 
 The check the scope warning demanded was run against the pinned revision
