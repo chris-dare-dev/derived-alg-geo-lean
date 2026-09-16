@@ -39,3 +39,29 @@ what keeps that guard honest.
 
 Add a fixture whenever a check is added or a boundary moves; a check with no
 forbidden fixture is a check nobody has seen fire.
+
+## `moddoc` — the module docstring must be the first command
+
+Added with the fix for #1371. All 30 `MODDOC` findings the hook reported on
+first being switched on were defects in this scan, and none was a real missing
+module docstring.
+
+| Fixture | What it pins |
+| --- | --- |
+| `allowed/SetOptionBeforeDocstring` | a file-level `set_option` between the imports and the docstring — Mathlib's own shape, and 25 of the 30 findings |
+| `allowed/LongCopyrightHeader` | a header line outside the old `Copyright`/`Released under`/`Authors` allowlist; the block is now skipped to its `-/` |
+| `forbidden/DeclBeforeDocstring` | a declaration reached before any `/-! ... -/`, which is the thing the check is for |
+
+## `long` — the 100-character limit
+
+| Fixture | What it pins |
+| --- | --- |
+| `allowed/NoteStringLiteral` | the limit landing inside a string literal; the code on the line is short and reflowing means a string gap that edits the payload |
+| `forbidden/BreakableTerm` | an ordinary overlong term, which is what the rule is for |
+
+## `prime` — a trailing `'` wants an explanation
+
+| Fixture | What it pins |
+| --- | --- |
+| `allowed/MathlibFieldObligations` | `zero_mem'` and `ext'`: Mathlib fixes the name, so there is no "differs from the unprimed form" to write |
+| `forbidden/UndocumentedPrime` | a primed name the author chose, with no docstring |

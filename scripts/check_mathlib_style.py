@@ -60,6 +60,19 @@ DECL_RE = re.compile(
 # Declaration kinds Mathlib requires a docstring on, no exceptions.
 DOC_REQUIRED = {"def", "abbrev", "structure", "class", "inductive"}
 NAME_RE = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_.'₁-₉]*)")
+STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
+
+# Primed names Mathlib itself fixes: the field obligations a bundled subobject
+# or bundled hom has to discharge, where the prime is part of the required name
+# and the unprimed form is the `simp` lemma Mathlib derives from it. The author
+# does not choose these, so "say what differs from the unprimed form" is not a
+# docstring anyone can write.
+MATHLIB_PRIMED = {
+    "zero_mem'", "one_mem'", "add_mem'", "mul_mem'", "neg_mem'", "inv_mem'",
+    "sub_mem'", "div_mem'", "smul_mem'", "algebraMap_mem'", "mem_carrier'",
+    "map_zero'", "map_one'", "map_add'", "map_mul'", "map_smul'", "map_rel'",
+    "commutes'", "ext'", "coe_injective'", "toFun_eq_coe'", "nonempty'",
+}
 
 # Git writes `<<<<<<< `, `=======`, `>>>>>>> `, and -- under
 # `merge.conflictStyle = diff3` -- `||||||| `, each at the very start of a line.
@@ -115,7 +128,12 @@ def in_scope(path: Path) -> bool:
 
 def strip_string_literals(line: str) -> str:
     """Blank out double-quoted spans so token checks do not fire inside strings."""
-    return re.sub(r'"(?:[^"\\]|\\.)*"', lambda m: '"' + " " * (len(m.group(0)) - 2) + '"', line)
+    return STRING_RE.sub(lambda m: '"' + " " * (len(m.group(0)) - 2) + '"', line)
+
+
+def column_in_string(line: str, column: int) -> bool:
+    """Does `column` (0-based) fall inside a double-quoted literal on `line`?"""
+    return any(m.start() <= column < m.end() for m in STRING_RE.finditer(line))
 
 
 def code_only(lines: list[str]) -> list[str]:
@@ -211,15 +229,33 @@ def check_text(raw: str, path: Path) -> list[Finding]:
 
     # The module docstring must be the first command after the imports.
     first_cmd = None
+    in_header = False
     for i, line in enumerate(lines):
         s = line.strip()
+        if in_header:
+            # The copyright block is skipped to its close. It used to be skipped
+            # by an allowlist of its prose -- `Copyright`, `Released under`,
+            # `Authors` -- so any fourth line fell through and was reported as
+            # the first command. `Portions adapted from mattrobball/...` in the
+            # vendored attributions did exactly that, five times.
+            if s.endswith("-/"):
+                in_header = False
+            continue
         if not s or s.startswith("--"):
             continue
         if s.startswith("/-") and not s.startswith("/-!"):
-            continue  # header block; skipped crudely, good enough for position
-        if s.startswith(("import ", "public import ", "meta import ", "module")) or s in {"-/", "module"}:
+            if s == "/-" or not s.endswith("-/"):
+                in_header = True
             continue
-        if s.startswith("Copyright") or s.startswith("Released under") or s.startswith("Authors"):
+        if s == "-/":
+            continue
+        if s.startswith(("import ", "public import ", "meta import ")) or s == "module":
+            continue
+        # A file-level `set_option` is a command, but it is one Mathlib writes
+        # *before* the module docstring, so it does not answer "is the docstring
+        # first". 25 of the 30 MODDOC findings were files that open with
+        # `set_option backward.defeqAttrib.useBackward true`.
+        if s.startswith("set_option "):
             continue
         first_cmd = (i + 1, s)
         break
@@ -246,7 +282,14 @@ def check_text(raw: str, path: Path) -> list[Finding]:
         # hierarchy such as `CategoryTheory.Triangulated.StabilityCondition`
         # needs the same exception.
         is_import = re.match(r"^\s*(?:(?:public|meta)\s+)?import\s+", c) is not None
-        if len(line) > MAX_LINE and not is_import:
+        # A line that is only long because the limit lands inside a string
+        # literal is not the problem this rule is about. Those are the
+        # `(note := "...")` review records, up to 691 characters of deliberate
+        # prose; reflowing one means a string gap, which is legal Lean but
+        # edits the payload's whitespace for no readability gain. The code on
+        # such a line is short. 12 of the 145 LONG findings were these.
+        in_string = column_in_string(line, MAX_LINE)
+        if len(line) > MAX_LINE and not is_import and not in_string:
             out.append(Finding("ERROR", idx, "LONG", f"Line is {len(line)} chars; Mathlib's limit is {MAX_LINE}."))
 
         if " ;" in c:
@@ -272,6 +315,9 @@ def check_text(raw: str, path: Path) -> list[Finding]:
         name = nm.group(1) if nm else "<anonymous>"
 
         doc = preceding_docstring(lines, idx - 1)
+        # `zero_mem'`, `ext'` and friends: Mathlib fixes the name, so neither
+        # the ERROR nor the WARN below has anything the author could write.
+        explainable_prime = name.endswith("'") and name.split(".")[-1] not in MATHLIB_PRIMED
 
         if doc is None:
             if kw in DOC_REQUIRED:
@@ -282,7 +328,7 @@ def check_text(raw: str, path: Path) -> list[Finding]:
                 out.append(
                     Finding("WARN", idx, "DOC", f"`{kw} {name}` has no docstring. Add one if it has mathematical content.")
                 )
-            if name.endswith("'"):
+            if explainable_prime:
                 out.append(
                     Finding(
                         "ERROR",
@@ -292,7 +338,7 @@ def check_text(raw: str, path: Path) -> list[Finding]:
                     )
                 )
         else:
-            if name.endswith("'") and "'" not in doc and "prime" not in doc.lower():
+            if explainable_prime and "'" not in doc and "prime" not in doc.lower():
                 out.append(
                     Finding(
                         "WARN",
