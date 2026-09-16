@@ -1,0 +1,4 @@
+# Slope and Gieseker stability are siblings. A slope module reaching the
+# Gieseker order is the nesting MO1.08 undid, and the comparison between the
+# two belongs in AlgebraicGeometry/Stability/Comparison.lean.
+import DerivedAlgGeo.AlgebraicGeometry.Stability.Gieseker.Basic

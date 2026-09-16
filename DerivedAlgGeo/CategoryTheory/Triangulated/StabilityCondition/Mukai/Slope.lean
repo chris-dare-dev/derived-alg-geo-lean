@@ -3,8 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Charge
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakCutoffSlope
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.StabilityFunction.WeakSlopeCutoff
+import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.CutoffSlope
+import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.SlopeCutoff
 import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.ChargePositivity
 
 /-!
