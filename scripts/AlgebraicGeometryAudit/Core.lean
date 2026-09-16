@@ -3059,6 +3059,9 @@ about a quadratic space. -/
 #print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma_affine
 #print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma
 #print axioms AlgebraicGeometry.quasicoherent_isClosedUnderCoproducts
+#print axioms AlgebraicGeometry.quasicoherentSheaves_hasCoproductsOfShape
+#print axioms AlgebraicGeometry.quasicoherentSheavesInclusion_preservesCoproductsOfShape
+#print axioms AlgebraicGeometry.quasicoherentSheavesInclusion_reflectsCoproductsOfShape
 
 /-! ## The numerical charge, bundled, and its bridge to the categorical side
 
