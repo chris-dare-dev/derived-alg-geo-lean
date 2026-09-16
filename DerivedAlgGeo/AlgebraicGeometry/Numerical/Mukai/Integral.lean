@@ -35,6 +35,21 @@ everything below with no tensor-product plumbing, and the geometric input — th
 `N(X)` is free of finite rank and spans `N(X) ⊗ ℝ` — is exactly what a basis is.
 
 `V` remains an arbitrary real bilinear space; no geometry is asserted.
+
+## Why this path
+
+The cutover ledger's row 03 puts the Mukai vector, the integral structure and
+the surface realization under `AlgebraicGeometry/Numerical/Mukai/`, and this is
+the integral structure. The directory is numerical Mukai theory, not
+scheme-level geometry -- `Pairing.lean` and `VectorClass.lean` beside it mention
+no scheme either -- so a file that asserts no geometry is at home here.
+
+Every consumer is already in this subtree: the two surface wall examples and
+`GrothendieckGroup/CentralChargeK3.lean`. Nothing under `StabilityCondition/`
+reaches it, which is the evidence that it is not part of the charge bridge it
+travelled with; it is the comparison between the integral Mukai lattice and its
+real extension, plus the two finiteness statements that comparison exists to
+supply.
 -/
 
 open QuadraticMap

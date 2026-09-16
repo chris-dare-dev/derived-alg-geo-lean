@@ -180,21 +180,67 @@ else, so the general theory is importable with no Mukai extension in scope, and
 the `-2` and `0` conditions appear in the neutral statements as hypotheses
 rather than as named predicates.
 
-**The exponential chart row is blocked, and not by effort.** The ledger asks
-for the chart to go with the numerical central-charge construction. It cannot
-move alone: `Lattice/Mukai/CentralCharge.lean` consumes `expRe`/`expIm`, and
-`StabilityCondition/CentralCharge/Quadratic.lean` already imports
-`Lattice/Mukai/CentralCharge.lean`, so relocating the chart into the
-central-charge tree closes an import cycle. The layering gate does not catch
-this -- it passes on a `LinearAlgebra` to `StabilityCondition` edge -- Lean's
-module acyclicity does. Discharging the row means moving the whole real-Mukai
-to charge bridge (`Mukai/CentralCharge.lean`, `ExponentialOrientation.lean`,
-`IntegralBridge.lean`) out of `LinearAlgebra/Lattice/`, which is coupled to
-MO1.02's central-charge ownership and is a lane of its own.
+**The exponential chart landed 2026-09-15**, discharging the row and with it
+the whole of MO1.04. `CentralCharge/Mukai/Chart.lean` owns `expRe`, `expIm`
+and `isPositiveFrame_exp`; `Charge.lean`, `Positivity.lean` and
+`Orientation.lean` beside it own `expCharge`, its boundary positivity and the
+reference-independence of `P⁺`; and the integral comparison went to
+`AlgebraicGeometry/Numerical/Mukai/Integral.lean`. Namespaces are unchanged, so
+`Mukai.expRe` is still `Mukai.expRe` and the immutable payloads in
+`exe/RestateHistoricalNames.lean` keep resolving.
+
+Measuring the graph before moving anything corrected the blockage recorded here,
+in four ways worth keeping.
+
+The chart was in none of the three files this ledger named. `expRe`, `expIm`
+and `isPositiveFrame_exp` were declared in `Lattice/Mukai/RealForm.lean`, inside
+a self-contained `section Exponential`; the three named files consumed them.
+Moving those three would not have moved the chart.
+
+The hard blocker was rule 8, not the cycle. `RealForm.lean` could not follow the
+chart, because it is upstream of the neutral charge root
+`BilinearForm/HodgeIndex.lean` through `RealFormSignature.lean`, and that root's
+transitive closure may contain neither stability conditions nor geometry. The
+chart had to be severed from its carrier. That the section boundary already
+existed is why the split cost a `sed` range rather than a redesign.
+
+The cycle was real and narrower than recorded. It is the 2-cycle
+`Lattice/Mukai/CentralCharge -> CentralCharge/Quadratic -> Lattice/Mukai/CentralCharge`,
+and it materialises only if the chart lands in one of the six modules that
+transitively import `Lattice.Mukai.CentralCharge` -- `Quadratic`,
+`Divisorial/Mukai`, `Exponential/Divisorial` and the three umbrellas above them.
+Every other module in the tree was a legal destination, and the three named
+files move with no cycle at all. The obstruction was one edge, not a tangle.
+
+A fourth file had to move, and one of the three moved for another reason.
+`ChargePositivity.lean` is 278 lines of `expCharge` theory and is not named
+above; left behind it would have made `LinearAlgebra/` import
+`StabilityCondition/`. `IntegralBridge.lean`, by contrast, never mentions
+`expCharge` or `expRe` and has no `StabilityCondition` consumer at all: it is
+the integral/real comparison, and it moved to the destination the
+application-adapter cell already gives the integral structure, not because of
+the cycle.
+
+Splitting the charge out of linear algebra also made an existing dependency
+visible. `AlgebraicGeometry/Numerical/GrothendieckGroup/CentralChargeK3.lean`
+defines `numericalCharge` as `Mukai.expCharge` precomposed with `extendMap` and
+the Mukai vector, so it was always a K-theoretic charge adapter; it read as
+stability-neutral only because the charge sat in `LinearAlgebra/`. It joins
+`CategoricalChargeK3` in `STABILITY_CONSUMING_GEOMETRY`. That entry is a fact
+that changed, on the standard the fourfold entry beside it already sets.
+
+One neutral remainder is recorded rather than moved. `Mukai.continuous_bilin`
+-- joint continuity of a bilinear form on a finite-dimensional real normed
+space -- mentions no extension, no chart and no charge, and its neutral owner is
+`QuadraticForm/Continuous.lean`. It travelled with `Orientation.lean` and says
+so in that file's docstring. Re-homing a declaration into a rule-8 pinned
+neutral root is a separate, separately justified change, and this row does not
+authorize one.
 
 The tracker closed #1315 early -- a commit message in #1345 that said it did
 *not* close the issue was read by GitHub as a closing keyword -- so the issue
-state is not evidence about any of these rows.
+state was never evidence about any of these rows. The issue was reopened when
+this row landed, so that its closure records the work rather than a parser.
 
 #### 04 -- Charge construction upstream of walls (#1313)
 

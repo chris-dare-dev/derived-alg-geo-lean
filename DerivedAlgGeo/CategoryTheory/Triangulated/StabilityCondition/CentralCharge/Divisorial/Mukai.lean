@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Slice
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Divisorial.Todd
-import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.CentralCharge
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharge.Mukai.Charge
 
 /-!
 # The Mukai charge, as a second child rather than an overload
@@ -41,7 +41,7 @@ ordinary charge minus the rank.
 
 ## The charge is the existing exponential charge
 
-`LinearAlgebra/Lattice/Mukai/CentralCharge.lean` already owns
+`CentralCharge/Mukai/Charge.lean` already owns
 `Mukai.expChargeHom`, the additive `Z(β,ω)` on a real Mukai extension.  Nothing
 is rebuilt here: `mukaiCharge` is that homomorphism composed with the Mukai
 class map, and `centralCharge_eq_expChargeHom` records that the ordinary
