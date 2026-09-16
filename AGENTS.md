@@ -294,10 +294,17 @@ gh workflow run ci.yml --ref <branch>
 
 **This is enforced, not advised.** A `PreToolUse` hook on `Bash`, wired in the
 tracked `.claude/settings.json` so it reaches every worktree, runs
-`scripts/check_local_build.py` and refuses two commands:
+`scripts/check_local_build.py` and refuses three things:
 
 * `scripts/gates.sh`, in any mode;
-* `lake build` with **no target**.
+* `lake build` with **no target**;
+* `lake build <Target>` that does not declare `LEAN_NUM_THREADS`, or sets it
+  above 4 — see below.
+
+It refuses RUNNING that file, not reading it: `cat`, `grep`, `diff` and
+`git ls-tree` over `scripts/gates.sh` all pass, so you can still read the gate
+list. Until 2026-09-16 they did not, which is why the `land-pr` skill's own
+tooling probe was blocked by the hook it was probing around.
 
 Advice was what this section used to give, and advice is what failed: on
 2026-08-27 an agent read "the normal build stays local", ran a whole-library
@@ -309,10 +316,21 @@ agent lanes share one Mac, Lake takes one core per job by default, and four
 concurrent full gates oversubscribe a 14-core machine five times over — that is
 how a ten-minute gate becomes an hour.
 
-Neither the local script nor the runner lane is CI-equivalent on its own, and the
-difference has bitten: every gate in `gates.sh` runs in CI, but CI also runs the
-`mfc` contract tooling, which the script does not reproduce. Say "N gates pass",
-not "CI is green". See `CONTRIBUTING.md`.
+Neither the local script nor the runner lane is CI-equivalent on its own, and
+**neither list contains the other**. CI runs the `mfc` contract tooling, which
+the script does not reproduce. The script runs `workflows`, `trust-guard`,
+`local-build`, `mathlib-style` and — until PR #1355 — `single-instantiation`,
+none of which appear in any workflow. Say "N gates pass", naming them; never say
+"CI is green" for a local run. See `CONTRIBUTING.md` for the verified table.
+
+This paragraph used to read "every gate in `gates.sh` runs in CI", and that
+sentence is why `single-instantiation` ran nowhere for months: the hook made the
+script unrunnable, the summary said CI had it covered, and `bb8a1278` records the
+24 abstractions that drifted past its baseline with nothing going red.
+
+**For a local pre-flight the hook allows**, run `scripts/precheck.sh`: every gate
+that needs no Lean build, plus a targeted build of the modules you changed, in
+seconds. It is a cheap green, not a green.
 
 Build locally by **naming a target**, which the hook allows:
 
@@ -392,6 +410,7 @@ precisely what this rule exists to keep off the developer's machine.
 Useful focused commands are:
 
 ```bash
+scripts/precheck.sh     # every gate needing no Lean build, plus a targeted build
 lake build AlgebraicGeometryAudit StabilityConditionAudit DGCategoryAudit
 lake exe runLinter DerivedAlgGeo
 lake exe lint-style
