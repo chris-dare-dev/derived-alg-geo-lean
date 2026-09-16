@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Homology.DGCategory.LinearCopowerUnit
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.CommShift
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearCopower
-import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.Functor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Functor
 import Mathlib.Algebra.Category.ModuleCat.Biproducts
 import Mathlib.LinearAlgebra.Dimension.Free
 

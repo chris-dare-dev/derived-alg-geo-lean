@@ -2,6 +2,7 @@ Algebra	CategoryTheory.DGFunctor.IsQuasiEquivalence
 Algebra	CategoryTheory.DGLinear
 Algebra	CategoryTheory.DerivedCategory.OppositeComparison
 CategoryTheory	CategoryTheory.Enhancement
+CategoryTheory	CategoryTheory.Enhancement.Exact
 Algebra	CategoryTheory.IsConeOf
 Algebra	CategoryTheory.IsPretriangulated
 CategoryTheory	CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation

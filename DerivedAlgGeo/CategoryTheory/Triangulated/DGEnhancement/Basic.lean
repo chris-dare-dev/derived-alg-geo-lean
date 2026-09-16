@@ -2,55 +2,50 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Basic
+import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Basic
 
 /-!
-# Dg enhancements
+# Dg enhancements: the underlying H⁰ presentation
 
-`dg-enhancements-e6`. An *enhancement* of an ordinary category `T` is a
-pretriangulated dg category together with an equivalence `H⁰ A ≌ T`. The point
-of the notion is that structure carried on `A` can be pushed across the
-equivalence and read off on `T`; this file starts that transport with the zero
-object, and defines the structure that later transports are stated against.
+`dg-enhancements-e6`. `Enhancement` is a pretriangulated dg category together
+with an equivalence `H⁰ A ≌ T` for an ordinary category `T`. Structure carried
+on `A` can be pushed across that equivalence and read off on `T`; this file
+starts that transport with the zero object.
 
-## How this differs from the literature's enhancement, and why
+## `Enhancement` is an H⁰ presentation, not the literature's enhancement
 
-Bondal--Kapranov and Lunts--Orlov take `T` to be *triangulated* and require the
-comparison to be an *exact* equivalence. Neither is a field here: `T` is an
-arbitrary `Category`, and `equiv` is a plain equivalence with no `CommShift` and
-no preservation of distinguished triangles. The dg side is correspondingly
-narrower — `IsPretriangulated` is the strong notion, see its module docstring.
+Read the name as *underlying H⁰ presentation*: `T` is presented as the `H⁰` of a
+dg category, and nothing more is claimed. Bondal--Kapranov and Lunts--Orlov take
+`T` to be *triangulated* and require the comparison to be an *exact* equivalence.
+Neither is a field here -- `T` is an arbitrary `Category`, and `equiv` is a plain
+equivalence with no `CommShift` and no preservation of distinguished triangles.
 
-That is the repository's usual split, not an oversight: the structure carries
-the minimum, and the agreement with an existing triangulated structure is a
-separately named theorem where there is one to agree with. For the only
-inhabitant, `Cdg.enhancement`, exactness *is* proved — as an equality of the two
-`Set (Triangle _)` (`Cdg.seam_distinguishedTriangles_eq`) together with a
-`Functor.CommShift ℤ` on the seam (`Cdg.h0FunctorCommShift`), in
-`Algebra/Homology/HomotopyCategory/DGEnhancement/`.
+The exact notion is the separate refinement `Enhancement.Exact` in
+`DGEnhancement/Exact.lean`, which carries the two compatibilities as data. It is
+data, not a theorem: nothing here or there proves that a presentation admits one.
+For the only inhabitant, `Cdg.enhancement`, exactness *is* proved -- as an
+equality of the two `Set (Triangle _)` (`Cdg.seam_distinguishedTriangles_eq`)
+together with a `Functor.CommShift ℤ` on the seam (`Cdg.h0FunctorCommShift`), in
+`Algebra/Homology/HomotopyCategory/DGEnhancement/`, and `Cdg.enhancementExact`
+packages the two.
 
 **The consequence to keep in view.** Nothing proved from this structure today is
-in doubt; `hasZeroObject` below is the only consumer. But a statement that
-quantifies over enhancements is not the literature's statement when read here.
-Uniqueness of enhancements (`dg-enhancements-e15`) is the case that matters: over
-a bare equivalence of underlying categories it is false, since two dg categories
-can have equivalent `H⁰` as plain categories without being quasi-equivalent. When
-that lane is written, the statement must quantify over exact comparisons — either
-by strengthening this structure or by carrying the clause at the statement.
+in doubt. But a statement that quantifies over `Enhancement` is not the
+literature's statement when read here. Uniqueness of enhancements
+(`dg-enhancements-e15`) is the case that matters: over a bare equivalence of
+underlying categories it is false, since two dg categories can have equivalent
+`H⁰` as plain categories without being quasi-equivalent. When that lane is
+written, the statement must quantify over `Enhancement.Exact`. No declaration in
+this repository asserts uniqueness of enhancements in either form, and this file
+does not authorize one.
 
 ## What is transported here, and what is not
 
-`H⁰` of a pretriangulated dg category has a zero object: `IsPretriangulated`
-asks for an object with `dgId Z = 0`, and in a preadditive category that is
-exactly `IsZero Z`. So `HasZeroObject (H0 C)` is immediate, and it is the first
-clause of a `Pretriangulated` structure.
-
-The shift is not here. `IsPretriangulated.exists_shift` gives, for each `X` and
-`n`, *some* `Y` with *some* witness — an existential, not a choice — and
-`HasShift (H0 C) ℤ` needs a functor together with `shiftFunctorZero` and
-`shiftFunctorAdd` coherence. Getting from one to the other is a construction
-with real content, not a repackaging, and it is tracked separately rather than
-smuggled in behind a `Nonempty.some`.
+`HasZeroObject (H0 C)` is intrinsic to the dg category and belongs to the
+definition owner: it is `H0.hasZeroObject` in
+`Algebra/Homology/DGCategory/Pretriangulated/H0/Basic.lean`. What is here is the
+half that needs `T` and the equivalence -- `Enhancement.hasZeroObject` -- which
+is the shape of every transport in this subtree.
 -/
 
 set_option autoImplicit false
@@ -62,40 +57,20 @@ namespace CategoryTheory
 
 open DGCategoryStruct DGCategory Limits
 
-section Transport
-
-variable {C : Type u} [DGCategory.{v} C]
-
-/-- An object with zero dg identity is a zero object of `H⁰`. The ascription is
-written `show H0 C from Z` rather than `(Z : H0 C)`: the latter reads the
-category off `Z`'s own type and looks for `Category C`, which does not exist. -/
-lemma H0.isZero_of_dgId_eq_zero {Z : C} (hZ : dgId Z = 0) :
-    IsZero (show H0 C from Z) := by
-  rw [IsZero.iff_id_eq_zero]
-  show (QuotientAddGroup.mk (⟨dgId Z, dgId_cocycle Z⟩ : cocycles Z Z)) = 0
-  rw [show (⟨dgId Z, dgId_cocycle Z⟩ : cocycles Z Z) = 0 from Subtype.ext hZ]
-  exact QuotientAddGroup.mk_zero _
-
-/-- `H⁰` of a pretriangulated dg category has a zero object. The first clause of
-a `Pretriangulated` structure, and the only one this file transports. -/
-instance H0.hasZeroObject [IsPretriangulated C] : HasZeroObject (H0 C) := by
-  obtain ⟨Z, hZ⟩ := IsPretriangulated.exists_zero (C := C)
-  exact (H0.isZero_of_dgId_eq_zero hZ).hasZeroObject
-
-end Transport
-
 set_option linter.checkUnivs false in
 /-- A dg enhancement of an ordinary category `T`: a pretriangulated dg category
 whose `H⁰` is equivalent to `T`.
 
-`equiv` is a plain equivalence and `T` is a plain category; the literature asks
-for a triangulated `T` and an exact comparison. See the module docstring for why
-the clause is carried outside the structure and what it costs.
+`equiv` is a plain equivalence and `T` is a plain category, so this is the
+*underlying H⁰ presentation* of `T`; the literature asks for a triangulated `T`
+and an exact comparison, which is the refinement `Enhancement.Exact`. See the
+module docstring for why the clause is carried outside the structure and what it
+costs.
 
 The dg category is bundled rather than a parameter because the interesting
-statements quantify over enhancements of a fixed `T` — uniqueness of
+statements quantify over enhancements of a fixed `T` -- uniqueness of
 enhancements, in `dg-enhancements-e15`, is a statement about two inhabitants of
-this type.
+this type, and is not proved anywhere in this repository.
 
 `u` and `v` occur only together because `DGCategory.{v}` fixes the universe of
 the Hom-complexes' abelian groups while `u` fixes the objects, and the
