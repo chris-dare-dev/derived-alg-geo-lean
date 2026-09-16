@@ -680,6 +680,25 @@ jobs:
           }
           python3 scripts/check_audit_complete.py enum-decls.txt
 
+      - name: Single instantiation
+        run: |
+          set -euo pipefail
+          # The disease detector: a generic abstraction written for N cases,
+          # instantiated once, and never adopted. It reuses the build the step
+          # above already did.
+          #
+          # This ran only in scripts/gates.sh until now, which is precisely why
+          # it drifted: between 2026-09-08 and 2026-09-14, 29 names arrived at
+          # or below one inhabitant against 80 recorded, and nothing anywhere
+          # went red. A gate whose whole purpose is to make invisible drift
+          # visible cannot itself be invisible.
+          lake env lean scripts/EnumInhabitants.lean > enum-inhabitants.txt 2>&1 || {
+            echo "::error::scripts/EnumInhabitants.lean failed to elaborate"
+            cat enum-inhabitants.txt
+            exit 1
+          }
+          python3 scripts/check_single_instantiation.py enum-inhabitants.txt
+
       - name: Environment linters
         run: |
           set -euo pipefail
