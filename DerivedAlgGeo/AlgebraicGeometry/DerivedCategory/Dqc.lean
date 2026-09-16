@@ -190,6 +190,20 @@ theorem ι_preservesCoproductsOfShape (ι : Type u) :
     PreservesColimitsOfShape (Discrete ι) (SchemeQuasicoherentDerivedCategory.ι X) :=
   inferInstance
 
+/-- **The inclusion `Dqc(X) ⥤ D(X.Modules)` reflects coproducts**, which is what a realization
+functor *into* the locus needs and which preservation alone does not give.
+
+Preservation says the image of a coproduct is a coproduct, and that is the statement a consumer
+of `Dqc(X)` wants. A functor landing in `Dqc(X)` needs the converse direction: knowing that its
+composite with `ι` preserves coproducts, conclude that it does. Reflection is exactly that step,
+and it holds here because the closure above makes `ι` **create** these colimits — the coproduct
+of a family in `Dqc(X)` is their coproduct in the all-sheaf derived category, carrying its
+membership proof. Creation carries data rather than being a proposition, so it stays a local
+term inside this proof; reflection is the proposition it implies. -/
+theorem ι_reflectsCoproductsOfShape (ι : Type u) :
+    ReflectsColimitsOfShape (Discrete ι) (SchemeQuasicoherentDerivedCategory.ι X) :=
+  inferInstance
+
 /-- Membership in `Dqc(X)` is exactly quasi-coherence of every cohomology
 sheaf. -/
 theorem mem_iff (E : SchemeDerivedCategory X) :
