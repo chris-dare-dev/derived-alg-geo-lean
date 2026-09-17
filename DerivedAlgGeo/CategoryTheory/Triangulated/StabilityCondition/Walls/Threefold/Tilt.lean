@@ -76,14 +76,11 @@ records exactly what it forgets. -/
 def threefoldTruncate : Threefold.NumClass →+ NumClass :=
   AddMonoidHom.mk' (fun v => (v.1, v.2.1, v.2.2.1)) (by intro v w; rfl)
 
--- NOT `@[simp]`. `threefoldTruncate_apply` rewrites `threefoldTruncate v` to a
--- raw tuple, which is upstream of the three projection lemmas below: with both
--- simp, `rk (threefoldTruncate v)` reduces to `NumClass.rk (v.deg0, v.deg1,
--- v.deg2)` and their left-hand sides can never be in simp normal form, which is
--- what `runLinter`'s simpNF check reports. The projections are the normal form
--- worth having -- a bundled hom simplifies through its projections, not by
--- being torn open -- so the attribute comes off this one. Both proofs in this
--- file that want the tuple already name it in their own `simp only` list.
+/-- Not a `simp` lemma. The three coordinate projections below are the normal
+form worth having, and marking the tuple form `simp` too would rewrite their
+left-hand sides out from under them -- which the environment linter reports as
+`rk_threefoldTruncate` simplifying to `NumClass.rk (v.deg0, v.deg1, v.deg2)`
+rather than to `v.deg0`. -/
 theorem threefoldTruncate_apply (v : Threefold.NumClass) :
     threefoldTruncate v =
       (Threefold.NumClass.deg0 v, Threefold.NumClass.deg1 v,
