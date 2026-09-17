@@ -268,7 +268,7 @@ items:
     parent: contract-v1-e9
     blocked_by: [175]
     title: "Dated coverage census on the formal index resource"
-    status: blocked
+    status: done
     summary: "Ten records against a 15,280-chunk corpus read as a covered corpus unless the denominator ships in the same response as the numerator, dated. #177's arithmetic put the served hit rate near 0.07%, and an agent that queries three times, gets nothing and stops is behaving rationally -- which reproduces one level up the failure this whole track exists to fix. arXMCP CLAUDE.md 4.9 already mandates the shape (novelty claims are dated censuses), so it is policy-compliant rather than new. The lane partition this issue asked for is GONE: it was conditional on the sketch lane, and #177 closed as deferred with one reopen trigger -- a second topic repository minting against the registry -- which has not happened. Shape is the flat {entries, papers_covered, corpus_chunks, generated_at}."
     priority: must
     size: S

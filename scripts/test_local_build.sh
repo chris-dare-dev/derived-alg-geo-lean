@@ -30,6 +30,16 @@ fails=0
 # default keeps the SIZE cases testing size, and the width cases override it.
 export LEAN_NUM_THREADS=2
 
+# The gate also resolves a bare `lake` against PATH, and on the development host
+# the self-hosted runners' shim directories sit at the FRONT of it -- CI puts
+# them there on every job (see "Whose lake" in check_local_build.py). Left
+# alone, every bare-`lake` case below would be testing the interpreter rule
+# instead of the rule it names, and the suite would read red on the one machine
+# that matters. Pin PATH to the shape a clean checkout has.
+PATH="$(printf '%s' "$PATH" | tr ':' '
+' | grep -v actions-runner | paste -sd: -)"
+export PATH
+
 # refuse|allow <name> -- <argv for the checker, CLI mode>
 cli_case () {
   local expect="$1" name="$2"; shift 2
@@ -96,6 +106,25 @@ cli_case allow  'lake exe lint-style'             lake exe lint-style
 cli_case allow  'lake exe runLinter DerivedAlgGeo' lake exe runLinter DerivedAlgGeo
 
 # gates.sh, in any spelling, because its `build` gate is the bare build.
+# Whose lake -- the interpreter, not the target. Every case here names a target
+# the size rule allows and a width the width rule allows, so the only thing left
+# that can refuse them is the interpreter.
+cli_case refuse 'runner shim, absolute path'      /c/actions-runner/derived-alg-geo-lean-3/.elan/bin/lake build DerivedAlgGeo.Foo
+cli_case refuse 'runner shim, relative path'      ../actions-runner/r/.elan/bin/lake build DerivedAlgGeo.Foo
+cli_case allow  'own elan, absolute path'         "$HOME/.elan/bin/lake" build DerivedAlgGeo.Foo
+cli_case allow  'own elan, tilde spelling'        '~/.elan/bin/lake' build DerivedAlgGeo.Foo
+
+# A BARE `lake` CANNOT be pinned from this suite, and the reason is worth
+# writing down rather than rediscovering. The gate resolves it with
+# `shutil.which`, which is Windows path resolution, but everything here runs
+# under Git Bash and hands python a POSIX-style PATH that Windows resolution
+# cannot read. So a bare `lake` is always UNRESOLVABLE here and always passes --
+# which is the documented behaviour of `lake_interpreter_offence`, not a hole in
+# it. In production the hook is spawned by the agent harness with the Windows
+# environment, `shutil.which` works, and the bare-`lake` case that took `main`
+# red on 2026-09-16 is refused. The path cases above pin the part that a POSIX
+# shell CAN observe: the pattern, in both spellings.
+
 cli_case refuse 'scripts/gates.sh'                scripts/gates.sh
 cli_case refuse 'scripts/gates.sh fast'           scripts/gates.sh fast
 cli_case refuse 'bash scripts/gates.sh'           bash scripts/gates.sh
