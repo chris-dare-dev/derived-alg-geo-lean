@@ -1212,6 +1212,7 @@ See `WeakTruncation.lean`'s module docstring. -/
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_one_eq
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_one_isSemistable
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.chain_one_ne_bot
+#print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.eq_bot_of_semistable_μ_gt_μPlus
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.exists_epi_to_semistable_μ_μMinus
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.hom_eq_zero_to_factor
 #print axioms CategoryTheory.Triangulated.AbelianWeakHNFiltration.hom_eq_zero_to_semistable_of_μ_lt_μMinus

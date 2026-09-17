@@ -199,7 +199,8 @@ the file, not `cat`, `grep`, `diff` or `git ls-tree` over it.
 
 The full gate includes:
 
-- Mathlib-style and environment linting for `DerivedAlgGeo`;
+- Mathlib-style and environment linting for `DerivedAlgGeo`, including the
+  `scripts/style-baseline.json` ratchet;
 - all three axiom audits and the audit-completeness ratchet;
 - source-independence, pin, paper-coverage, and no-lint checks;
 - roadmap/tracker agreement, when `gh` is available;
@@ -223,7 +224,7 @@ The script has what no workflow does. Verified against `ci.yml`,
 | `workflows` | a workflow too invalid to parse is too invalid to run the job that would check it |
 | `trust-guard` | a pull request cannot be trusted to run the check that decides whether it is trusted |
 | `local-build` | tests a `PreToolUse` hook, which exists only on a developer's machine |
-| `mathlib-style` | is the edit hook's checker over the branch diff — a pre-push linter by design |
+| `mathlib-style` | **only partly.** Its `--self-test` fixtures and, since #1371, its `--check-baseline` ratchet both run in `ci.yml`; what stays local is the `--diff-only` pass over the branch diff, which is a pre-push linter by design |
 | `emit-build` | runs in `cache-warm.yml` instead; linking is expensive cold and cannot happen on Windows at all |
 | `single-instantiation` | **omission, not design.** Fixed by PR #1355 |
 

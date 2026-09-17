@@ -222,200 +222,251 @@ STABILITY_CONSUMING_GEOMETRY = (
 
 # Paths removed by a structural cutover, relative to the source root. An entry
 # without a suffix names a directory and also forbids its same-named umbrella.
-RETIRED_PATHS = (
-    # 2026-09-15 MO1.13 (#1324): mass became a sibling of metric, and the
-    # Euclidean planar core left the mass-subadditivity proof directory.
-    # The finite-sum half-plane bounds went one step further than MO1.08 sent
-    # them: that file mentions no category at all, so it owns
-    # Analysis/Complex/PhaseFiniteSums.lean rather than a path below
-    # CategoryTheory/. MO1.08's own parent entry covers where it used to live.
-    "CategoryTheory/Triangulated/StabilityCondition/Metric/Mass",
-    "CategoryTheory/Triangulated/StabilityCondition/Weak/Metric",
-    "CategoryTheory/Abelian/Stability/FiniteSums.lean",
-    # 2026-09-02 Euler-characteristic lane: restated on Mathlib's GradedObject.eulerChar.
-    "LinearAlgebra/AlternatingFinsum.lean",
-    "LinearAlgebra/AlternatingSum.lean",
-    # 2026-09-02 placement follow-ups to the Mathlib-mesh restructure.
-    "Algebra/Homology/DerivedCategory/TStructure.lean",
-    "CategoryTheory/Triangulated/QuasiAbelian.lean",
-    "CategoryTheory/Triangulated/LinearOpposite.lean",
-    "CategoryTheory/StabilityCharge.lean",
-    "Compatibility",
-    "AlgebraicGeometry/StabilityCondition",
-    "AlgebraicGeometry/Duality/Serre/LinearDual.lean",
-    "AlgebraicGeometry/Modules/Affine/Exactness.lean",
-    "AlgebraicGeometry/Modules/Presentation.lean",
-    "AlgebraicGeometry/Modules/Presentation/Finite.lean",
-    "AlgebraicGeometry/Modules/Presentation/Transport.lean",
-    "AlgebraicGeometry/Divisors/Tensor.lean",
-    "AlgebraicGeometry/Divisors/Picard.lean",
-    "AlgebraicGeometry/Divisors/Monoidal.lean",
-    "AlgebraicGeometry/Stacks/Basic.lean",
-    "AlgebraicGeometry/IntersectionTheory/NumericalPolynomial",
-    "AlgebraicGeometry/Numerical/GrothendieckGroup/Relative.lean",
-    "AlgebraicGeometry/Numerical/GrothendieckGroup/RelativeOverlattice.lean",
-    "AlgebraicGeometry/ProjectiveSpectrum/HomogeneousLocalizationDomain.lean",
-    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentBasis.lean",
-    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentProjection.lean",
-    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentBlock.lean",
-    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentHomotopy.lean",
-    "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentFinite.lean",
-    "AlgebraicGeometry/ProjectiveSpectrum/Modules/CechHomotopy.lean",
-    "AlgebraicGeometry/ProjectiveSpectrum/Modules/CechPrimitive.lean",
-    "AlgebraicGeometry/ProjectiveSpectrum/Modules/CechFinite.lean",
-    "Algebra/Category/ModuleCat/StalkTensor.lean",
-    "CategoryTheory/Adjunction",
-    "CategoryTheory/ConstantSheafPullback.lean",
-    "CategoryTheory/EquivalenceTransport.lean",
-    "CategoryTheory/PseudofunctorObjectProperty.lean",
-    "CategoryTheory/SheafCohomologyPushforward.lean",
-    "CategoryTheory/Sites/CohomologyShortExact.lean",
-    "CategoryTheory/TopologicalSheafCohomologyPushforward.lean",
-    "CategoryTheory/WeakSerreExact.lean",
-    "CategoryTheory/Monoidal/Triangulated/Instances",
-    "CategoryTheory/Triangulated/Families/Boundedness.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/Weak/Foundations",
-    "CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Instances",
-    "CategoryTheory/Triangulated/StabilityCondition/"
-    "Families/Instances",
-    "CategoryTheory/Triangulated/StabilityCondition/"
-    "Symmetry/Autoequivalence/Instances",
-    "CategoryTheory/Triangulated/StabilityCondition/"
-    "WeakCompatibility",
-    # 2026-09-13 MO1.02: charge construction moved upstream of wall loci.
-    "LinearAlgebra/QuadraticForm/CentralCharge.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/Walls/Exp",
-    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Charge.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Coordinates.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Discriminant.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Mukai.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Support.lean",
-    # 2026-09-14 MO1.03: neutral frames and planes, orthogonality
-    # arrangements, determinant alignment, and charge-zero loci received
-    # separate owners. Historical declaration spellings live only in the
-    # executable restatement bridge.
-    "LinearAlgebra/QuadraticForm/PeriodDomain.lean",
-    "LinearAlgebra/QuadraticForm/Orientation.lean",
-    "LinearAlgebra/QuadraticForm/PositivePairOpen.lean",
-    "LinearAlgebra/QuadraticForm/OrientationCocycle.lean",
-    "LinearAlgebra/QuadraticForm/WallFiniteness.lean",
-    "LinearAlgebra/QuadraticForm/WallRegion.lean",
-    "LinearAlgebra/QuadraticForm/CutNonempty.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/Walls/ChargeFamily.lean",
-    # 2026-09-13 MO1.07: the k-linear Serre duality data and its uniqueness
-    # need no shift, so they moved to CategoryTheory/Linear/SerreFunctor/.
-    "CategoryTheory/Triangulated/SerreFunctor/Basic.lean",
-    "CategoryTheory/Triangulated/SerreFunctor/Uniqueness.lean",
-    # 2026-09-13 MO1.11: pseudo-coherence, Tor amplitude and relative
-    # perfection are properties of one complex over one morphism, so they moved
-    # to AlgebraicGeometry/DerivedCategory/Perfect/, and stalkwise flatness of
-    # a module sheaf moved to AlgebraicGeometry/Modules/Flat.lean.
-    "AlgebraicGeometry/Moduli/PerfectComplex/Relative.lean",
-    # 2026-09-13 MO1.14: four paths that disagreed with the API each file
-    # extends. Linear duality on ModuleCat is one subject at ModuleCat's own
-    # Mathlib path; the exterior-power file under Sheaf/ constructs presheaf
-    # exterior powers; quasicoherent extension closure is about the modules,
-    # not the cohomology its proof uses; exterior-power restriction is about
-    # module sheaves, not divisors.
-    "CategoryTheory/ModuleCat",
-    "Algebra/Category/ModuleCat/Sheaf/ExteriorPower.lean",
-    "AlgebraicGeometry/Cohomology/Quasicoherent",
-    "AlgebraicGeometry/Divisors/ExteriorPower.lean",
-    # 2026-09-15 MO1.06: formal rank-degree-coordinate models moved out of the
-    # example leaves into AlgebraicGeometry/Numerical/Models/, and the two
-    # K3-only charge adapters took a visibly K3 filename. Examples/ keeps the
-    # realizations, charges and walls built on those models.
-    "AlgebraicGeometry/Numerical/Examples/RankOne.lean",
-    "AlgebraicGeometry/Numerical/Examples/DimensionZero",
-    "AlgebraicGeometry/Numerical/Examples/Surface/RankOne.lean",
-    "AlgebraicGeometry/Numerical/Examples/Surface/K3.lean",
-    "AlgebraicGeometry/Numerical/Examples/Surface/K3Mukai.lean",
-    "AlgebraicGeometry/Numerical/Examples/Surface/K3MukaiIntegral.lean",
-    "AlgebraicGeometry/Numerical/Examples/Surface/Abelian.lean",
-    "AlgebraicGeometry/Numerical/Examples/Surface/Enriques.lean",
-    "AlgebraicGeometry/Numerical/Examples/Surface/ProjectivePlane.lean",
-    "AlgebraicGeometry/Numerical/Examples/Surface/Comparison.lean",
-    "AlgebraicGeometry/Numerical/Examples/Threefold/CalabiYau.lean",
-    "AlgebraicGeometry/Numerical/Examples/Threefold/LinearSection.lean",
-    "AlgebraicGeometry/Numerical/Examples/Threefold/ProjectiveSpace.lean",
-    "AlgebraicGeometry/Numerical/Examples/Fourfold/CalabiYau.lean",
-    "AlgebraicGeometry/Numerical/Examples/Fourfold/LinearSection.lean",
-    "AlgebraicGeometry/Numerical/Examples/Fourfold/ProjectiveSpace.lean",
-    "AlgebraicGeometry/Numerical/GrothendieckGroup/CentralCharge.lean",
-    "AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalCharge.lean",
-    # 2026-09-15 MO1.08: abelian stability functions and their
-    # Harder-Narasimhan theory moved to CategoryTheory/Abelian/Stability/, with
-    # the weak variants as its children and the class datum as its neutral
-    # core. Only the heart adapter stayed behind, at
-    # Weak/Foundation/HeartDatum.lean.
-    "CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/"
-    "StabilityFunction",
-    "CategoryTheory/Triangulated/StabilityCondition/Weak/Charge.lean",
-    # 2026-09-15 MO1.08: the mu-slope datum and the mu-Harder-Narasimhan
-    # existence theorem are not Gieseker theory and stopped being filed under
-    # it; the shared Hilbert-polynomial data moved up to the common parent, and
-    # the statements that mention both theories moved to Comparison.lean.
-    "AlgebraicGeometry/Stability/Gieseker/MuStability.lean",
-    "AlgebraicGeometry/Stability/Gieseker/HilbertPolynomial.lean",
-    "AlgebraicGeometry/Stability/Gieseker/Coefficients.lean",
-    "AlgebraicGeometry/Stability/Gieseker/HarderNarasimhan",
-    # 2026-09-15 MO1.09: the intrinsic H0 theory of a pretriangulated dg
-    # category -- shift, distinguished triangles, cone diagrams, functor and
-    # natural-transformation exactness -- mentions no other category, so it
-    # moved to its definition owner at
-    # Algebra/Homology/DGCategory/Pretriangulated/H0/. What stays below
-    # DGEnhancement/H0/ needs a chosen category or the Grothendieck group.
-    "CategoryTheory/Triangulated/DGEnhancement/H0/Shift.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/Triangle.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/Functor.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/FunctorTransport.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/ShiftedFunctor.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/HomCohomology.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/NaturalTransformationCone.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/NaturalTransformationConeShift.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionCone.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionComparison.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionConePresentation.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionCotwistPresentation.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/ObjectTwist.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/LinearObjectTwist.lean",
-    "CategoryTheory/Triangulated/DGEnhancement/H0/LinearObjectTwistAdjunction.lean",
-    # 2026-09-15 MO1.04: the real-Mukai-to-charge bridge left the quadratic
-    # extension. The exponential chart, the charge built on it and its boundary
-    # positivity are central-charge construction and moved to
-    # `CentralCharge/Mukai/`; the integral comparison moved to
-    # `AlgebraicGeometry/Numerical/Mukai/Integral.lean`. `RealForm.lean` stays:
-    # it is upstream of the neutral charge root `BilinearForm/HodgeIndex.lean`
-    # and could not follow the chart.
-    "LinearAlgebra/Lattice/Mukai/CentralCharge.lean",
-    "LinearAlgebra/Lattice/Mukai/ChargePositivity.lean",
-    "LinearAlgebra/Lattice/Mukai/ExponentialOrientation.lean",
-    "LinearAlgebra/Lattice/Mukai/IntegralBridge.lean",
-    # 2026-09-15 MO1.12: the universal cover of GL+(2,R) moved beside the
-    # general-linear-group API, the +1-equivariant order automorphisms of R
-    # moved to order algebra, the general product-of-coverings lemma moved to
-    # the topology owner, and the cover-independent complex-coordinate adapter
-    # moved to complex linear algebra. `Symmetry/GLTilde/Action/` keeps the
-    # phase conventions and the action, and is deliberately NOT retired.
-    "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Basic.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/"
-    "Symmetry/GLTilde/ComplexRepresentation.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Covering",
-    "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Topology",
-    "CategoryTheory/Triangulated/StabilityCondition/Phase/NormalizedShift.lean",
-    "CategoryTheory/Triangulated/StabilityCondition/Phase/UniformContinuity.lean",
-    # 2026-09-15 MO1.10: the derived-tensor and derived-pushforward
-    # capabilities are about a derived category, not about transforms, so they
-    # left the Fourier--Mukai subtree. `HasDerivedTensor` and the coherent
-    # monoidal root moved to AlgebraicGeometry/DerivedCategory/Tensor/, which
-    # the unbounded K-flat tensor joined so the three tiers sit under one
-    # owner; `HasDerivedPushforward` moved to
-    # AlgebraicGeometry/DerivedCategory/Families/DerivedPushforward.lean,
-    # beside the exact coherent pushforward it is the weaker sibling of.
-    # FourierMukai keeps correspondences, kernels, convolution, units and
-    # adjoints.
-    "AlgebraicGeometry/DerivedCategory/KFlatTensor.lean",
-    "AlgebraicGeometry/DerivedCategory/FourierMukai/DerivedTensorCoherence.lean",
+# Paths removed by a structural cutover, grouped by the cutover that removed
+# them and keyed by its milestone. An entry without a suffix names a directory
+# and also forbids its same-named umbrella.
+#
+# The keys are kept sorted, and that is a merge property rather than a semantic
+# one: the gate only asks whether a path appears here and how many there are,
+# so `RETIRED_PATHS` below flattens the groups back into the flat tuple the
+# checks consume. What the order buys is that a new cutover inserts at its own
+# key instead of at the tail. Every milestone used to append, which put all of
+# them on the same closing parenthesis and made any two landing in the same
+# week a guaranteed textual conflict -- MO1.04, MO1.09, MO1.10 and MO1.12 all
+# retired paths on 2026-09-15 and each pair of them collided. Keyed, MO1.04 and
+# MO1.12 sit eight slots apart and git merges them without help.
+#
+# `check_retired_group_keys` pins the sortedness, because a key appended out of
+# order restores the old behaviour silently and the next two milestones pay for
+# it rather than the one that caused it.
+RETIRED_BY_CUTOVER: dict[str, tuple[str, ...]] = {
+    "2026-09-02 euler-characteristic": (
+        # 2026-09-02 Euler-characteristic lane: restated on Mathlib's GradedObject.eulerChar.
+        "LinearAlgebra/AlternatingFinsum.lean",
+        "LinearAlgebra/AlternatingSum.lean",
+    ),
+    "2026-09-02 mathlib-mesh-placement": (
+        # 2026-09-02 placement follow-ups to the Mathlib-mesh restructure.
+        "Algebra/Homology/DerivedCategory/TStructure.lean",
+        "CategoryTheory/Triangulated/QuasiAbelian.lean",
+        "CategoryTheory/Triangulated/LinearOpposite.lean",
+        "CategoryTheory/StabilityCharge.lean",
+        "Compatibility",
+        "AlgebraicGeometry/StabilityCondition",
+        "AlgebraicGeometry/Duality/Serre/LinearDual.lean",
+        "AlgebraicGeometry/Modules/Affine/Exactness.lean",
+        "AlgebraicGeometry/Modules/Presentation.lean",
+        "AlgebraicGeometry/Modules/Presentation/Finite.lean",
+        "AlgebraicGeometry/Modules/Presentation/Transport.lean",
+        "AlgebraicGeometry/Divisors/Tensor.lean",
+        "AlgebraicGeometry/Divisors/Picard.lean",
+        "AlgebraicGeometry/Divisors/Monoidal.lean",
+        "AlgebraicGeometry/Stacks/Basic.lean",
+        "AlgebraicGeometry/IntersectionTheory/NumericalPolynomial",
+        "AlgebraicGeometry/Numerical/GrothendieckGroup/Relative.lean",
+        "AlgebraicGeometry/Numerical/GrothendieckGroup/RelativeOverlattice.lean",
+        "AlgebraicGeometry/ProjectiveSpectrum/HomogeneousLocalizationDomain.lean",
+        "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentBasis.lean",
+        "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentProjection.lean",
+        "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentBlock.lean",
+        "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentHomotopy.lean",
+        "AlgebraicGeometry/ProjectiveSpectrum/Modules/LaurentFinite.lean",
+        "AlgebraicGeometry/ProjectiveSpectrum/Modules/CechHomotopy.lean",
+        "AlgebraicGeometry/ProjectiveSpectrum/Modules/CechPrimitive.lean",
+        "AlgebraicGeometry/ProjectiveSpectrum/Modules/CechFinite.lean",
+        "Algebra/Category/ModuleCat/StalkTensor.lean",
+        "CategoryTheory/Adjunction",
+        "CategoryTheory/ConstantSheafPullback.lean",
+        "CategoryTheory/EquivalenceTransport.lean",
+        "CategoryTheory/PseudofunctorObjectProperty.lean",
+        "CategoryTheory/SheafCohomologyPushforward.lean",
+        "CategoryTheory/Sites/CohomologyShortExact.lean",
+        "CategoryTheory/TopologicalSheafCohomologyPushforward.lean",
+        "CategoryTheory/WeakSerreExact.lean",
+        "CategoryTheory/Monoidal/Triangulated/Instances",
+        "CategoryTheory/Triangulated/Families/Boundedness.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/Weak/Foundations",
+        "CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Instances",
+        "CategoryTheory/Triangulated/StabilityCondition/"
+        "Families/Instances",
+        "CategoryTheory/Triangulated/StabilityCondition/"
+        "Symmetry/Autoequivalence/Instances",
+        "CategoryTheory/Triangulated/StabilityCondition/"
+        "WeakCompatibility",
+    ),
+    "MO1.02": (
+        # 2026-09-13 MO1.02: charge construction moved upstream of wall loci.
+        "LinearAlgebra/QuadraticForm/CentralCharge.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/Walls/Exp",
+        "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Charge.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Coordinates.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Discriminant.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Mukai.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/Walls/Divisorial/Support.lean",
+    ),
+    "MO1.03": (
+        # 2026-09-14 MO1.03: neutral frames and planes, orthogonality
+        # arrangements, determinant alignment, and charge-zero loci received
+        # separate owners. Historical declaration spellings live only in the
+        # executable restatement bridge.
+        "LinearAlgebra/QuadraticForm/PeriodDomain.lean",
+        "LinearAlgebra/QuadraticForm/Orientation.lean",
+        "LinearAlgebra/QuadraticForm/PositivePairOpen.lean",
+        "LinearAlgebra/QuadraticForm/OrientationCocycle.lean",
+        "LinearAlgebra/QuadraticForm/WallFiniteness.lean",
+        "LinearAlgebra/QuadraticForm/WallRegion.lean",
+        "LinearAlgebra/QuadraticForm/CutNonempty.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/Walls/ChargeFamily.lean",
+    ),
+    "MO1.04": (
+        # 2026-09-15 MO1.04: the real-Mukai-to-charge bridge left the quadratic
+        # extension. The exponential chart, the charge built on it and its boundary
+        # positivity are central-charge construction and moved to
+        # `CentralCharge/Mukai/`; the integral comparison moved to
+        # `AlgebraicGeometry/Numerical/Mukai/Integral.lean`. `RealForm.lean` stays:
+        # it is upstream of the neutral charge root `BilinearForm/HodgeIndex.lean`
+        # and could not follow the chart.
+        "LinearAlgebra/Lattice/Mukai/CentralCharge.lean",
+        "LinearAlgebra/Lattice/Mukai/ChargePositivity.lean",
+        "LinearAlgebra/Lattice/Mukai/ExponentialOrientation.lean",
+        "LinearAlgebra/Lattice/Mukai/IntegralBridge.lean",
+    ),
+    "MO1.06": (
+        # 2026-09-15 MO1.06: formal rank-degree-coordinate models moved out of the
+        # example leaves into AlgebraicGeometry/Numerical/Models/, and the two
+        # K3-only charge adapters took a visibly K3 filename. Examples/ keeps the
+        # realizations, charges and walls built on those models.
+        "AlgebraicGeometry/Numerical/Examples/RankOne.lean",
+        "AlgebraicGeometry/Numerical/Examples/DimensionZero",
+        "AlgebraicGeometry/Numerical/Examples/Surface/RankOne.lean",
+        "AlgebraicGeometry/Numerical/Examples/Surface/K3.lean",
+        "AlgebraicGeometry/Numerical/Examples/Surface/K3Mukai.lean",
+        "AlgebraicGeometry/Numerical/Examples/Surface/K3MukaiIntegral.lean",
+        "AlgebraicGeometry/Numerical/Examples/Surface/Abelian.lean",
+        "AlgebraicGeometry/Numerical/Examples/Surface/Enriques.lean",
+        "AlgebraicGeometry/Numerical/Examples/Surface/ProjectivePlane.lean",
+        "AlgebraicGeometry/Numerical/Examples/Surface/Comparison.lean",
+        "AlgebraicGeometry/Numerical/Examples/Threefold/CalabiYau.lean",
+        "AlgebraicGeometry/Numerical/Examples/Threefold/LinearSection.lean",
+        "AlgebraicGeometry/Numerical/Examples/Threefold/ProjectiveSpace.lean",
+        "AlgebraicGeometry/Numerical/Examples/Fourfold/CalabiYau.lean",
+        "AlgebraicGeometry/Numerical/Examples/Fourfold/LinearSection.lean",
+        "AlgebraicGeometry/Numerical/Examples/Fourfold/ProjectiveSpace.lean",
+        "AlgebraicGeometry/Numerical/GrothendieckGroup/CentralCharge.lean",
+        "AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalCharge.lean",
+    ),
+    "MO1.07": (
+        # 2026-09-13 MO1.07: the k-linear Serre duality data and its uniqueness
+        # need no shift, so they moved to CategoryTheory/Linear/SerreFunctor/.
+        "CategoryTheory/Triangulated/SerreFunctor/Basic.lean",
+        "CategoryTheory/Triangulated/SerreFunctor/Uniqueness.lean",
+    ),
+    "MO1.08 abelian-foundations": (
+        # 2026-09-15 MO1.08: abelian stability functions and their
+        # Harder-Narasimhan theory moved to CategoryTheory/Abelian/Stability/, with
+        # the weak variants as its children and the class datum as its neutral
+        # core. Only the heart adapter stayed behind, at
+        # Weak/Foundation/HeartDatum.lean.
+        "CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/"
+        "StabilityFunction",
+        "CategoryTheory/Triangulated/StabilityCondition/Weak/Charge.lean",
+    ),
+    "MO1.08 slope-vs-gieseker": (
+        # 2026-09-15 MO1.08: the mu-slope datum and the mu-Harder-Narasimhan
+        # existence theorem are not Gieseker theory and stopped being filed under
+        # it; the shared Hilbert-polynomial data moved up to the common parent, and
+        # the statements that mention both theories moved to Comparison.lean.
+        "AlgebraicGeometry/Stability/Gieseker/MuStability.lean",
+        "AlgebraicGeometry/Stability/Gieseker/HilbertPolynomial.lean",
+        "AlgebraicGeometry/Stability/Gieseker/Coefficients.lean",
+        "AlgebraicGeometry/Stability/Gieseker/HarderNarasimhan",
+    ),
+    "MO1.09": (
+        # 2026-09-15 MO1.09: the intrinsic H0 theory of a pretriangulated dg
+        # category -- shift, distinguished triangles, cone diagrams, functor and
+        # natural-transformation exactness -- mentions no other category, so it
+        # moved to its definition owner at
+        # Algebra/Homology/DGCategory/Pretriangulated/H0/. What stays below
+        # DGEnhancement/H0/ needs a chosen category or the Grothendieck group.
+        "CategoryTheory/Triangulated/DGEnhancement/H0/Shift.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/Triangle.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/Functor.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/FunctorTransport.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/ShiftedFunctor.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/HomCohomology.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/NaturalTransformationCone.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/NaturalTransformationConeShift.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionCone.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionComparison.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionConePresentation.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/AdjunctionCotwistPresentation.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/ObjectTwist.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/LinearObjectTwist.lean",
+        "CategoryTheory/Triangulated/DGEnhancement/H0/LinearObjectTwistAdjunction.lean",
+    ),
+    "MO1.10": (
+        # 2026-09-15 MO1.10: the derived-tensor and derived-pushforward
+        # capabilities are about a derived category, not about transforms, so they
+        # left the Fourier--Mukai subtree. `HasDerivedTensor` and the coherent
+        # monoidal root moved to AlgebraicGeometry/DerivedCategory/Tensor/, which
+        # the unbounded K-flat tensor joined so the three tiers sit under one
+        # owner; `HasDerivedPushforward` moved to
+        # AlgebraicGeometry/DerivedCategory/Families/DerivedPushforward.lean,
+        # beside the exact coherent pushforward it is the weaker sibling of.
+        # FourierMukai keeps correspondences, kernels, convolution, units and
+        # adjoints.
+        "AlgebraicGeometry/DerivedCategory/KFlatTensor.lean",
+        "AlgebraicGeometry/DerivedCategory/FourierMukai/DerivedTensorCoherence.lean",
+    ),
+    "MO1.11": (
+        # 2026-09-13 MO1.11: pseudo-coherence, Tor amplitude and relative
+        # perfection are properties of one complex over one morphism, so they moved
+        # to AlgebraicGeometry/DerivedCategory/Perfect/, and stalkwise flatness of
+        # a module sheaf moved to AlgebraicGeometry/Modules/Flat.lean.
+        "AlgebraicGeometry/Moduli/PerfectComplex/Relative.lean",
+    ),
+    "MO1.12": (
+        # 2026-09-15 MO1.12: the universal cover of GL+(2,R) moved beside the
+        # general-linear-group API, the +1-equivariant order automorphisms of R
+        # moved to order algebra, the general product-of-coverings lemma moved to
+        # the topology owner, and the cover-independent complex-coordinate adapter
+        # moved to complex linear algebra. `Symmetry/GLTilde/Action/` keeps the
+        # phase conventions and the action, and is deliberately NOT retired.
+        "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Basic.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/"
+        "Symmetry/GLTilde/ComplexRepresentation.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Covering",
+        "CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Topology",
+        "CategoryTheory/Triangulated/StabilityCondition/Phase/NormalizedShift.lean",
+        "CategoryTheory/Triangulated/StabilityCondition/Phase/UniformContinuity.lean",
+    ),
+    "MO1.13": (
+        # 2026-09-15 MO1.13 (#1324): mass became a sibling of metric, and the
+        # Euclidean planar core left the mass-subadditivity proof directory.
+        # The finite-sum half-plane bounds went one step further than MO1.08 sent
+        # them: that file mentions no category at all, so it owns
+        # Analysis/Complex/PhaseFiniteSums.lean rather than a path below
+        # CategoryTheory/. MO1.08's own parent entry covers where it used to live.
+        "CategoryTheory/Triangulated/StabilityCondition/Metric/Mass",
+        "CategoryTheory/Triangulated/StabilityCondition/Weak/Metric",
+        "CategoryTheory/Abelian/Stability/FiniteSums.lean",
+    ),
+    "MO1.14": (
+        # 2026-09-13 MO1.14: four paths that disagreed with the API each file
+        # extends. Linear duality on ModuleCat is one subject at ModuleCat's own
+        # Mathlib path; the exterior-power file under Sheaf/ constructs presheaf
+        # exterior powers; quasicoherent extension closure is about the modules,
+        # not the cohomology its proof uses; exterior-power restriction is about
+        # module sheaves, not divisors.
+        "CategoryTheory/ModuleCat",
+        "Algebra/Category/ModuleCat/Sheaf/ExteriorPower.lean",
+        "AlgebraicGeometry/Cohomology/Quasicoherent",
+        "AlgebraicGeometry/Divisors/ExteriorPower.lean",
+    ),
+}
+
+RETIRED_PATHS = tuple(
+    path for group in RETIRED_BY_CUTOVER.values() for path in group
 )
 
 
@@ -721,6 +772,40 @@ GEOMETRIC_FOURIER_MUKAI_TREE = (
 )
 ABSTRACT_FOURIER_MUKAI_TREE = f"{TRIANGULATED_TREE}.FourierMukai"
 
+# Rule 18. MO1.11 (#1322) moved stalkwise flatness, pseudo-coherence, Tor
+# amplitude and relative perfection out of the relative-perfect moduli problem,
+# because each is a property of one complex over one morphism and a moduli
+# problem is not among their hypotheses. As in rule 17, the whole point of the
+# move is the import direction, so it is pinned here rather than left to
+# review.
+#
+# MO1.15 is why this rule exists at all. Of the nine cores its acceptance names
+# -- neutral pairing/charge, generic numerical transport, linear Serre/Yoneda,
+# abelian stability, dg H0, derived operations, perfectness, the GL cover and
+# planar geometry -- eight had a numbered rule pinning their owners and one did
+# not. Perfectness was named only in RETIRED_PATHS, which asserts that the OLD
+# path is gone and says nothing about where the predicates went or what they
+# may import. A regression that reintroduced the coupling under the new path
+# would have left every gate green.
+#
+# The check is transitive for the same reason rule 17's is: the predicates were
+# importable without the moduli problem before only by accident of which file
+# they sat in, and a single new import anywhere in the owners' closure would
+# quietly restore the coupling.
+#
+# This pins placement only. SF8 #517/#554 and #723 still owe construction,
+# preservation and compact-perfect obligations against these predicates, and
+# nothing here discharges them.
+PERFECTNESS_OWNERS = (
+    "AlgebraicGeometry/DerivedCategory/Perfect",
+    "AlgebraicGeometry/Modules/Flat.lean",
+)
+# The converse edge. A moduli consumer that restated the predicates instead of
+# importing them would satisfy the forbidden half of this rule while defeating
+# its purpose, so the edge it is supposed to keep is checked too.
+PERFECTNESS_CONSUMER = "AlgebraicGeometry/Moduli/PerfectComplex"
+MODULI_TREE = f"{GEOMETRY}.Moduli"
+
 STRUCTURE_DECLARES = re.compile(
     r"^\s*(?:private\s+|protected\s+|noncomputable\s+)*structure\s+(\S+)"
 )
@@ -1016,6 +1101,22 @@ def owner_boundary_failures(
                 f"{label}: imports {forbidden[0]}; the general covering lemmas "
                 "are about arbitrary topological spaces and need Mathlib alone"
             ]
+    perfectness_trees = tuple(
+        retired_module(entry) for entry in PERFECTNESS_OWNERS
+    )
+    if any(in_tree(module, root) for root in perfectness_trees):
+        forbidden = sorted(
+            dep
+            for dep in reached
+            if in_tree(dep, MODULI_TREE) or in_tree(dep, STABILITY_ROOT)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; flatness, pseudo-coherence, "
+                "Tor amplitude and relative perfection are properties of one "
+                "complex over one morphism, and exist to be importable without "
+                "the relative-perfect moduli problem (MO1.11)"
+            ]
     if module in (SQRT_TODD_ROOT, SLOPE_ROOT, POLARISED_TRANSPORT_ROOT):
         forbidden = sorted(
             dep for dep in reached
@@ -1027,6 +1128,40 @@ def owner_boundary_failures(
                 "must not import K3, surface, or dimension-specific consumers"
             ]
     return []
+
+
+def check_retired_group_keys() -> list[str]:
+    """Pin the key order of `RETIRED_BY_CUTOVER`, and the absence of duplicates.
+
+    Neither claim is about layering. Both are about what happens to the next
+    two milestones that retire a path in the same week: keys in sorted order
+    put their blocks at different offsets and git merges them, a key appended
+    at the tail puts them back on the same lines. The failure is silent at the
+    time it is introduced and is paid by whoever merges next, so it is checked
+    here rather than left to review.
+    """
+    failures = []
+    keys = list(RETIRED_BY_CUTOVER)
+    if keys != sorted(keys):
+        out_of_place = [
+            key for key, want in zip(keys, sorted(keys)) if key != want
+        ]
+        failures.append(
+            f"RETIRED_BY_CUTOVER keys are not sorted (first out of place: "
+            f"{out_of_place[0]}); a cutover appended at the tail rather than "
+            "inserted at its key puts the next two milestones back on the same "
+            "lines"
+        )
+    seen: dict[str, str] = {}
+    for key, group in RETIRED_BY_CUTOVER.items():
+        for entry in group:
+            if entry in seen:
+                failures.append(
+                    f"{entry}: retired by both {seen[entry]} and {key}; a path "
+                    "is retired once, by the cutover that moved it"
+                )
+            seen[entry] = key
+    return failures
 
 
 def check_fixtures(closure: Closure) -> list[str]:
@@ -1715,6 +1850,37 @@ def main() -> int:
                         "stability condition (MO1.10)"
                     )
 
+    # Rule 18, perfectness owners are reachable without the moduli problem.
+    for entry in PERFECTNESS_OWNERS:
+        path = SOURCE_ROOT / entry
+        if not (path.is_file() or path.is_dir()):
+            failures.append(
+                f"missing {entry}: it owns a flatness or relative-perfection "
+                "predicate extracted from the moduli consumer; see "
+                "docs/architecture/cutover-ledger.md row 11"
+            )
+            continue
+        # The forbidden import edges themselves are checked in
+        # owner_boundary_failures, which runs over both real modules and the
+        # known-answer fixtures, so the rule cannot pass vacuously.
+
+    # Rule 18, and the moduli consumer still reaches what it consumes.
+    perfect_consumer = module_of(
+        (SOURCE_ROOT / PERFECTNESS_CONSUMER).with_suffix(".lean")
+    )
+    if perfect_consumer in modules:
+        perfect_owner = module_of(
+            (SOURCE_ROOT / PERFECTNESS_OWNERS[0]).with_suffix(".lean")
+        )
+        reached = closure.of(perfect_consumer) | {perfect_consumer}
+        if not any(in_tree(dep, perfect_owner) for dep in reached):
+            failures.append(
+                f"{perfect_consumer}: no longer reaches {perfect_owner}; the "
+                "relative-perfect moduli problem must consume the extracted "
+                "predicates as an import edge, not restate them"
+            )
+
+    failures += check_retired_group_keys()
     failures += check_fixtures(closure)
 
     if failures:
@@ -1766,7 +1932,10 @@ def main() -> int:
         "encoding root reaches no enhancement consumer, scheme realization or "
         "stability module; the "
         f"{len(DERIVED_OPERATION_OWNERS)} derived-operation owners reach "
-        "neither Fourier--Mukai subtree nor the stability tree"
+        "neither Fourier--Mukai subtree nor the stability tree; the "
+        f"{len(PERFECTNESS_OWNERS)} perfectness owners reach neither the "
+        "moduli tree nor the stability tree while the relative-perfect moduli "
+        "problem still reaches them"
     )
     return 0
 

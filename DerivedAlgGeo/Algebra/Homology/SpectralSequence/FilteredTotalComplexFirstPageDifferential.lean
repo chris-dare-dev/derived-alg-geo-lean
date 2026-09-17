@@ -19,7 +19,6 @@ open CategoryTheory Category Limits
 
 namespace HomologicalComplex₂
 
-set_option maxHeartbeats 4000000
 set_option backward.defeqAttrib.useBackward true
 set_option backward.isDefEq.respectTransparency false
 

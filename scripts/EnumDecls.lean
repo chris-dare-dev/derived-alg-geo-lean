@@ -54,8 +54,62 @@ private def isAuthored (n : Name) : Bool := Id.run do
   if (s.splitOn "match_").length > 1 then return false
   -- Equation lemmas: `prodD.eq_1`, `foo.eq_2`, … Missing these was what made a
   -- complete dg-category audit look like it was one declaration short.
-  if (s.splitOn ".eq_").length > 1 then return false
+  --
+  -- Only the NUMBERED form is generated. Dropping every name containing
+  -- `.eq_` also dropped authored declarations whose final component begins
+  -- `eq_`, and `eq_zero_of_…` is Mathlib's canonical conclusion-first shape,
+  -- so the filter penalised correct naming. Such a declaration left the sweep
+  -- entirely, which broke `check_audit_complete.py` in both directions at
+  -- once: its audit record read as unresolved, and an UNaudited one was
+  -- invisible to the ratchet rather than counted against it. Found on
+  -- 2026-08-31, when
+  -- `IntegralLattice.IsIsotropicSequence.eq_zero_of_pairing_smul_sum_eq_zero`
+  -- was renamed to dodge the filter rather than bend shared tooling mid-slice
+  -- (#998). `.eq_def` stays in `autoSuffixes` above.
+  let eqParts := s.splitOn ".eq_"
+  if eqParts.length > 1 then
+    let numbered := eqParts.getLast!
+    if !numbered.isEmpty && numbered.all Char.isDigit then return false
   return true
+
+/-- Known answers for `isAuthored`, checked when this file elaborates.
+
+What made #998 expensive is that nothing could notice it. A filter that drops
+too much removes declarations from the sweep, and a declaration outside the
+sweep is outside `check_audit_complete.py` in BOTH directions: its audit record
+reads as unresolved, and an unaudited one is invisible to the ratchet rather
+than counted against it. Seventeen records and two declarations sat that way
+for as long as the filter was wrong.
+
+This needs no wiring of its own. `ci.yml` and `scripts/gates.sh` both fail when
+this file does not elaborate, so a `throwError` here is already gated. It
+prints nothing when it passes, because this file's stdout is
+`check_audit_complete.py`'s input. -/
+private def authoredKnownAnswers : List (Name × Bool) :=
+  -- Generated: numbered equation lemmas at any depth, plus one of each other
+  -- rule, so a rewrite of one cannot quietly take another with it.
+  [ (`prodD.eq_1, false)
+  , (`foo.eq_42, false)
+  , (`Foo.bar.eq_2, false)
+  , (`Foo.eq_zero.eq_1, false)
+  , (`Foo.eq_def, false)
+  , (`Foo._proof_1, false)
+  , (`Foo.match_1, false)
+  , (`Foo.injEq, false)
+  -- Authored, and every one of these was dropped before #998: the first is a
+  -- record the issue predicted was silently uncounted, the second is the name
+  -- that slice was renamed away from to dodge the filter.
+  , (`IntegralLattice.eq_zero_of_zsmul_eq_zero, true)
+  , (`IntegralLattice.IsIsotropicSequence.eq_zero_of_pairing_smul_sum_eq_zero, true)
+  , (`Matrix.eq_polarFactor_of_mul, true)
+  , (`Foo.eq_zero_of_bar, true)
+  , (`Foo.eq_1_of_bar, true)
+  , (`Foo.bar, true) ]
+
+run_cmd do
+  for (n, want) in authoredKnownAnswers do
+    if isAuthored n != want then
+      throwError "EnumDecls.isAuthored {n}: expected {want}. The sweep is only as complete as this filter (#998)."
 
 /-- The mathematical subsystem owning a module under the unified source root.
 
