@@ -33,7 +33,7 @@ numerical lattice `Fin 2 → ℤ`, not an ambient carrier.
 
 * `IsIsotropicSequence.linearIndependent` — for `n ≥ 2` an isotropic sequence
   is linearly independent over `ℤ`, through the separation statement
-  `coeffs_eq_zero_of_pairing_smul_sum_eq_zero` (the Gram argument in elementary
+  `eq_zero_of_pairing_smul_sum_eq_zero` (the Gram argument in elementary
   form).
 * `IsIsotropicSequence.pairing_sum_left`, `pairing_sum_right`,
   `pairing_sum_sum` — the sum-vector identities `⟨s, v j⟩ = ⟨v j, s⟩ = n - 1`
@@ -169,7 +169,7 @@ comes from geometry rather than from a linear relation.
 By `pairing_smul_sum_left`, the hypothesis says every coefficient equals the
 common sum `S`; summing again gives `S = nS`, and `n ≥ 2` forces `S = 0` in
 `ℤ`. -/
-theorem coeffs_eq_zero_of_pairing_smul_sum_eq_zero (hn : 2 ≤ n) (g : Fin n → ℤ)
+theorem eq_zero_of_pairing_smul_sum_eq_zero (hn : 2 ≤ n) (g : Fin n → ℤ)
     (hg : ∀ j, b (∑ i, g i • v i) (v j) = 0) : ∀ i, g i = 0 := by
   have key : ∀ j, (∑ i, g i) - g j = 0 := fun j => by
     have := hg j
@@ -195,7 +195,7 @@ statement is vacuous). -/
 theorem linearIndependent (hn : 2 ≤ n) : LinearIndependent ℤ v := by
   rw [Fintype.linearIndependent_iff]
   intro g hg
-  exact h.coeffs_eq_zero_of_pairing_smul_sum_eq_zero hn g fun j => by rw [hg]; simp
+  exact h.eq_zero_of_pairing_smul_sum_eq_zero hn g fun j => by rw [hg]; simp
 
 end IsIsotropicSequence
 

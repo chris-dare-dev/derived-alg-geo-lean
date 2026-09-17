@@ -142,3 +142,28 @@ Conditional on both capabilities, so still inhabited by nothing. -/
 #print axioms AlgebraicGeometry.DerivedCategory.twistedPushforward_additive
 #print axioms AlgebraicGeometry.DerivedCategory.twistedPushforwardMap
 #print axioms AlgebraicGeometry.DerivedCategory.twistedPushforwardMap_app
+
+/-! ## Restricting a monoidal structure to the bounded coherent tier
+
+`DerivedCategory/Tensor/BoundedMonoidal.lean` (#892). `Dᵇ(Coh X)` is an `abbrev` for
+`t.bounded.FullSubcategory`, so Mathlib's `fullMonoidalSubcategory` applies to it on the
+nose; `schemeBoundedCoherentDerivedCategory_eq` records that identification as `rfl`
+rather than leaving it to a comment.
+
+The input is `ObjectProperty.IsMonoidal t.bounded` -- finite Tor-dimension, supplied and
+not proved, because on a singular scheme `⊗^L` leaves `Dᵇ(Coh)`. What this buys is that
+the `MonoidalCategory` parent of `HasCoherentDerivedTensor` becomes something a named
+constructor produces rather than something a caller supplies from nothing.
+
+Everything here is a `def`. Mathlib already has a global `fullMonoidalSubcategory`
+instance on the same `abbrev`, so a repo-level instance would be a third synthesis route
+across the 68 `HasCoherentDerivedTensor` binder sites, not a second.
+
+Still inhabited by nothing: no scheme in this repository is shown to satisfy the
+`IsMonoidal` hypothesis. -/
+
+#print axioms AlgebraicGeometry.DerivedCategory.boundedProperty
+#print axioms AlgebraicGeometry.DerivedCategory.schemeBoundedCoherentDerivedCategory_eq
+#print axioms AlgebraicGeometry.DerivedCategory.boundedMonoidalCategory
+#print axioms AlgebraicGeometry.DerivedCategory.boundedTensorι
+#print axioms AlgebraicGeometry.DerivedCategory.boundedTensorιMonoidal

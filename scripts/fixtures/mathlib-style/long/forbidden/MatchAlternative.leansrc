@@ -1,0 +1,17 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.Basic
+
+/-!
+# A match alternative is not a table row
+
+It opens with `|` in CODE, and unlike a Markdown row it breaks perfectly well,
+so the docstring-table exemption must not reach it.
+-/
+
+/-- Whether a natural number is small, written across a match that runs long. -/
+def isSmall : Nat → Bool
+  | 0 => true
+  | Nat.succ Nat.zero => true | Nat.succ (Nat.succ _) => false -- a deliberately over-wide alternative line here

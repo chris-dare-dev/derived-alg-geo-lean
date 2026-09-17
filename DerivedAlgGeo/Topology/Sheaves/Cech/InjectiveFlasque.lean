@@ -26,8 +26,6 @@ open TopCat TopologicalSpace
 
 namespace CategoryTheory.Sheaf
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 4000000
 
 private lemma freeAbelianYonedaPresheafHomAddEquiv_precomp
     {C : Type u} [Category.{u} C] {X Y : C} (f : X ⟶ Y)

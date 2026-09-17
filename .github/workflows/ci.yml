@@ -339,6 +339,97 @@ jobs:
             echo "hosted runner: leaving LEAN_NUM_THREADS at its default"
           fi
 
+      # WHY A SECOND SELF-HOSTED-LANE GUARD, IMMEDIATELY BELOW THE FIRST.
+      #
+      # `lean-action`'s first action is `scripts/install_elan.sh`, and that
+      # script has no "already installed" branch:
+      #
+      #   curl .../elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+      #
+      # On `ubuntu-latest` that is correct -- the VM is fresh and has no elan.
+      # On this lane the runner is persistent and elan has been installed since
+      # 2026-08-25, so the installer runs anyway and re-creates the seven shims
+      # in `.elan/bin`. Those shims are HARDLINKS to one inode:
+      #
+      #   elan.exe lake.exe lean.exe leanc.exe leanchecker.exe leanmake.exe
+      #   leanpkg.exe            -- seven names, one file, link count 7
+      #
+      # elan creates each with CreateHardLink and does NOT unlink an existing
+      # name first. So the moment one of those names stops being a link into
+      # the set -- replaced by a plain copy by a killed install, a crashed
+      # `lean.exe`, an antivirus restore, anything -- the name still exists, as
+      # a DIFFERENT file, and the call fails on that runner forever after:
+      #
+      #   error: could not create link from '<runner>/.elan/bin/elan.exe'
+      #                                  to '<runner>/.elan/bin/lake.exe'
+      #
+      # Measured on chris-win-owner-runner-3 on 2026-09-17, against its three
+      # healthy siblings, which were byte-identical and same-dated:
+      #
+      #                       elan.exe   lake.exe   lake.exe file id
+      #   runner-2 (healthy)  7 links    7 links    same as elan.exe
+      #   runner-3 (wedged)   6 links    1 link     DIFFERENT
+      #
+      # `lake.exe` had fallen out of the set. Nothing was wrong with the
+      # repository, the commit, or the other three runners.
+      #
+      # WHY ONE WEDGED RUNNER REDDENED EVERY BRANCH.
+      # The job dies inside the installer 21 seconds in, before checkout is
+      # even relevant -- so the wedged runner is always the first one FREE, and
+      # takes the next queued job, and fails that one too. Four consecutive
+      # pushes to `main` on 2026-09-17 -- MO1.09, MO1.04's final slice, the
+      # GL-cover split and the single-instantiation record -- all failed this
+      # way, and all four landed on runner-3. A fast failure is not a cheap
+      # failure: it monopolises the queue.
+      #
+      # THE REPAIR, AND WHY IT IS SAFE. A severed shim is by definition not
+      # reachable from elan, so deleting it discards nothing: `install_elan.sh`
+      # recreates the whole set on the very next line. That makes this a no-op
+      # on a healthy runner -- the common case, checked and reported, not
+      # assumed -- and a self-heal on a wedged one, carrying no state between
+      # runs. It deliberately does NOT clear `.elan/bin` unconditionally: that
+      # would work too, and would also destroy a working toolchain on every
+      # run to repair a fault that is rare.
+      #
+      # Git bash's `stat` returns the real NTFS file id for `%i` and the real
+      # link count for `%h` -- verified against both a healthy runner and the
+      # wedged one before this was written -- so this needs no cmd and no
+      # PowerShell, and stays in the same shell as every other step here.
+      - name: Repair a severed elan shim on the self-hosted lane
+        env:
+          LANE: ${{ runner.environment }}
+        run: |
+          set -euo pipefail
+          if [ "${LANE:-}" != "self-hosted" ]; then
+            echo "hosted runner: elan is installed into a fresh VM, nothing to repair"
+            exit 0
+          fi
+          bin="$HOME/.elan/bin"
+          if [ ! -e "$bin/elan.exe" ]; then
+            echo "no elan at $bin yet; install_elan.sh will create the whole set"
+            exit 0
+          fi
+          ref="$(stat -c %i "$bin/elan.exe")"
+          severed=0
+          for shim in "$bin"/*.exe; do
+            name="$(basename "$shim")"
+            # Not `[ ... ] && continue`: under `set -e` a false test makes the
+            # compound return non-zero and kills the step on the FIRST shim.
+            if [ "$name" = "elan.exe" ]; then
+              continue
+            fi
+            if [ "$(stat -c %i "$shim")" != "$ref" ]; then
+              echo "severed: $name is a separate file (id $(stat -c %i "$shim"), links $(stat -c %h "$shim")), not a link to elan.exe; removing so elan-init can relink it"
+              rm -f "$shim"
+              severed=$((severed + 1))
+            fi
+          done
+          if [ "$severed" -eq 0 ]; then
+            echo "elan shim set is consistent: $(stat -c %h "$bin/elan.exe") names on one inode"
+          else
+            echo "removed $severed severed shim(s); install_elan.sh recreates them next"
+          fi
+
       - uses: actions/checkout@v4
         id: checkout
         with:
@@ -750,6 +841,14 @@ jobs:
         # says the checker still rejects what it is meant to reject, and a check
         # that quietly stops firing is how #1359 reached the Lean parser.
         run: python3 scripts/check_mathlib_style.py --self-test
+
+      - name: Mathlib-style baseline ratchet
+        # The other half of the same checker. `--self-test` says it still
+        # rejects what it is meant to reject; this says the library has not
+        # grown a new ERROR outside scripts/style-baseline.json. The edit hook
+        # is the primary enforcement and cannot be relied on alone -- it only
+        # sees files an agent edits, and a human commit never passes through it.
+        run: python3 scripts/check_mathlib_style.py --check-baseline
 
       - name: Stability source independence
         run: python3 scripts/check_source_independence.py

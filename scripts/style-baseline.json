@@ -1,0 +1,692 @@
+[
+ [
+  "DerivedAlgGeo/Algebra/Category/ModuleCat.lean",
+  "LONG",
+  "`SheafOfModules` on an arbitrary ringed site. Scheme-indexed module sheaves, quasicoherent and coherent",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Category/ModuleCat/Sheaf/Cohomology.lean",
+  "LONG",
+  "variable [hExtM : HasExt.{w} (SheafOfModules.{u} R)] [hExtA : HasExt.{w} (Sheaf J AddCommGrpCat.{u})]",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Functor.lean",
+  "LONG",
+  "  map_comp p q r h f g := by simp [F.map_comp p q r h f g, G.map_comp p q r h (F.map p f) (F.map q g)]",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Pretriangulated/H0/Shift.lean",
+  "LONG",
+  "            (compare (shiftWitness C (H0.of C X) nm) (shiftCompWitness' C (H0.of C X) n m nm hnm)) z)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DerivedCategory/ExactFunctor/Bounded.lean",
+  "LONG",
+  "      (shiftFunctor (DerivedCategory B) (n : ℤ)).mapIso ((F.mapDerivedCategorySingleFunctor 0).app Y)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DerivedCategory/HomFinite.lean",
+  "LONG",
+  "              ((DerivedCategory.Bounded.ι : DerivedCategory.Bounded A ⥤ DerivedCategory A).obj E')⟦i⟧) : ℤ) := by",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DerivedCategory/HomFinite.lean",
+  "LONG",
+  "          ((DerivedCategory.Bounded.ι : DerivedCategory.Bounded A ⥤ DerivedCategory A).obj E')⟦i⟧) :=",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Module/GradedModule/Localization.lean",
+  "LONG",
+  "    ((a • x : DegreeZeroLocalization 𝒜 𝓜 S) : LocalizedModule S M) = a • (x : LocalizedModule S M) :=",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentProjection.lean",
+  "LONG",
+  "  exact IsPolynomialTwist.mul_mem_of_isHomogeneous h𝓜 h1 (by simp only [smul_eq_mul]; ring) r.num_mem",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentProjection.lean",
+  "LONG",
+  "The projective Čech contracting homotopy consumes a **sign projection**: given a monomial denominator",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Derived/AffineHomVanishing.lean",
+  "LONG",
+  "    (f : (DerivedCategory.singleFunctor (Spec R).Modules 0).obj (Scheme.Modules.unit (Spec R)) ⟶ M) :",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/EulerCharacteristic/Basic.lean",
+  "LONG",
+  "structure FiniteCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends FiniteDimensionalCohomology k X where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/Devissage.lean",
+  "LONG",
+  "bound of a finite affine cover every group vanishes (`coherent_H_subsingleton_of_cohomologicalBound`),",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/FiniteDimensional.lean",
+  "LONG",
+  "noncomputable def canonicalLinearCohomology (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] [IsVariety k Y] :",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/FiniteDimensional.lean",
+  "LONG",
+  "noncomputable def linearCoherentHComparison (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ) :",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/FiniteDimensional.lean",
+  "LONG",
+  "structure FiniteDimensionalCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends LinearCohomology k X where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/LinearCech.lean",
+  "LONG",
+  "noncomputable def cechCohomologyModule (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (M : Y.Modules)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/LinearCech.lean",
+  "LONG",
+  "noncomputable def cechComparisonLinearEquiv (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (F : Coh Y)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/LinearCech.lean",
+  "LONG",
+  "noncomputable def cechScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (M : Y.Modules)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/LinearCech.lean",
+  "LONG",
+  "theorem cechComparisonAddEquiv_coherentSmul (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (F : Coh Y)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/LinearCech.lean",
+  "LONG",
+  "theorem cechComparisonAddEquiv_smul (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (M : Y.Modules)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/LinearCech.lean",
+  "LONG",
+  "theorem module_finite_linearCoherentH_of_cech (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (F : Coh Y)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/LinearConnecting.lean",
+  "LONG",
+  "    Function.Exact (linearCoherentConnectingMap S hS i) ((linearCoherentH k X (i + 1)).map S.f) := by",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc.lean",
+  "LONG",
+  "is recorded here because it is what `Dqc(X)` has to have for \"compact object in `Dqc(X)`\" to be a statement one",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/Identification.lean",
+  "LONG",
+  "* `boundedCoherentDerivedToDqc_full_of_coherentExtComparison`, `boundedCoherentDerivedToDqc_faithful_of_coherentExtComparison`:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/Identification.lean",
+  "LONG",
+  "theorem boundedCoherentDerivedToDqc_faithful_of_coherentExtComparison (h : CoherentExtComparison X) :",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Divisors/Symmetric.lean",
+  "LONG",
+  "noncomputable instance invertibleSheafSymmetricCategory : SymmetricCategory (InvertibleSheaf X) where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Duality/Canonical/Basic.lean",
+  "LONG",
+  "variable {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Duality/Canonical/Derived.lean",
+  "LONG",
+  "noncomputable def finiteCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Duality/Canonical/Descent.lean",
+  "LONG",
+  "variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Duality/Canonical/Differentials.lean",
+  "LONG",
+  "variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/IntersectionTheory/ChernCharacter/Surface.lean",
+  "LONG",
+  "structure SurfaceChernCharacter (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Comparison.lean",
+  "LONG",
+  "* `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` — restriction of global sections to `D(f)`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Basic/Definitions.lean",
+  "LONG",
+  "specialization is installed by `DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Abelian.Extensions`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Restriction/Sections.lean",
+  "LONG",
+  "`show`-ascription residue, so each composition has to be available as a term. `presheaf_map_square_eq`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Surface/BlowUpPlane.lean",
+  "LONG",
+  "      Ring.algebraMap_e₁Coeff, Ring.algebraMap_e₂Coeff, Ring.algebraMap_ptCoeff, Ring.add_const, Ring.add_hCoeff, Ring.add_e₁Coeff, Ring.add_e₂Coeff,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Surface/RankOneRealization.lean",
+  "LONG",
+  "theorem surfaceW_preimage_one : surfaceW ⁻¹' ({1} : Set ℕ) = ({idx1} : Set (Fin surfacePB.dim)) := by",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Surface/RankOneWalls.lean",
+  "LONG",
+  "            PeriodDomain.orthogonalityLocus (Mukai.realForm (surfaceDivisorSpace h2).intersection) δ) ∧",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Threefold/ProjectiveSpaceWalls.lean",
+  "LONG",
+  "`p3_toNumClass_deg*` lemmas are that computation, and everything else in the file is a consequence of it together",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalChargeK3.lean",
+  "LONG",
+  "        PeriodDomain.orthogonalityLocus (Mukai.realForm bR) (Mukai.extendMap f (D.mukaiVectorHom E)) ↔",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Stability/SurfaceChargeNumerical.lean",
+  "LONG",
+  "end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Stability/SurfaceChargeNumerical.lean",
+  "LONG",
+  "namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "LONG",
+  "              (twistingSheaf 𝒜 ((e * (2 * m + n) : ℕ) : ℤ)), basicOpen 𝒜 (g i) ⊓ basicOpen 𝒜 (g j)) =>",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "LONG",
+  "            fracSection 𝒜 (pow_mem_deg 𝒜 (hg p.2) (e * n)) (pow_mem_deg 𝒜 (hg p.1) (e * n)) (hgn p)) •",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "LONG",
+  "    ((Scheme.Modules.resSection_trans (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * (2 * m + n) : ℕ) : ℤ)))",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "LONG",
+  "    (Scheme.Modules.resSection_trans (Scheme.Modules.tensorObj F (twistingSheaf 𝒜 ((e * (2 * m + n) : ℕ) : ℤ)))",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "LONG",
+  "    have hratio := resΓ_fracSection 𝒜 (pow_mem_deg 𝒜 (hg p.2) (e * n)) (pow_mem_deg 𝒜 (hg p.1) (e * n))",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "LONG",
+  "    {e : ℕ} {f : A} (hf : f ∈ 𝒜 e) (he : 0 < e) {ι : Type u} [Finite ι] {g : ι → A} (hg : ∀ i, g i ∈ 𝒜 1)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TensorTwist.lean",
+  "LONG",
+  "* `tensorTwist F d` — the definition. `Modules/Tensor/Basic.lean`'s machinery is stated for a locally",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistCoherence.lean",
+  "LONG",
+  "`DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.Finiteness` by trivializing the twist on the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/Enriques/Basic.lean",
+  "LONG",
+  "class IsEnriquesSurface (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/Enriques/Basic.lean",
+  "LONG",
+  "variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/K3.lean",
+  "LONG",
+  "class IsK3Surface (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] (C : SmoothProperVariety.CanonicalSheafData k X 2) :",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/K3.lean",
+  "LONG",
+  "variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/Spherical.lean",
+  "LONG",
+  "`IntegralMukaiData`. `Surface/SphericalMukai.lean` builds one from a `BilinearRiemannRochStatement`. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Variety/Numerical.lean",
+  "LONG",
+  "noncomputable def toNumericalVariety (D : NumericalData k X n A N) : NumericalVarietyData n A N where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Variety/Numerical.lean",
+  "LONG",
+  "structure NumericalData (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] (n : ℕ) (A : Type u) (N : Type v)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Variety/Numerical.lean",
+  "LONG",
+  "the numerical half. Its source is a genuine a variety over `k` and coherent sheaves on its underlying",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Variety/Numerical.lean",
+  "LONG",
+  "variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] {n : ℕ} {A : Type u} {N : Type v}",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Convex/ComplexPolygonalPath/Basic.lean",
+  "LONG",
+  "`CategoryTheory/Abelian/Stability/HNPolygon.lean` until MO1.13 (#1324); nothing in it mentions an object, a filtration or a stability",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Convex/ComplexPolygonalPath/Perimeter.lean",
+  "LONG",
+  "      (l.toLinearMap.convexOn (convex_univ : Convex ℝ (Set.univ : Set ℂ))).exists_ge_of_mem_convexHull",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Linear/SerreFunctor/Uniqueness.lean",
+  "LONG",
+  "  exact (D.uniqueIso_unique D (𝟙 D.S) (fun A B phi ↦ by rw [NatTrans.id_app, Category.comp_id])).symm",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Sites/SheafCohomology/Cech/Bicomplex.lean",
+  "LONG",
+  "`DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech.SmallSiteResolution` discharges the resolution",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Sites/SheafCohomology/Cech/Comparison.lean",
+  "LONG",
+  "`DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech.SmallSiteResolution` restates this interface",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Exponential/Divisorial.lean",
+  "LONG",
+  "proves the two compressed `H`-degree families are it. Those families are Picard rank one. This file does",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mass/Basic.lean",
+  "LONG",
+  "`WeakStabilityCondition/StabilityCondition/Metric/Mass/Uniqueness.lean` subsequently proves that every term in this supremum",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mass/Basic.lean",
+  "LONG",
+  "variable (a : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair v)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "              CategoryTheory.Triangulated.Slicing.IntervalCat.exists_distinguished_of_strictShortExact",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "              CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.strictShortExact_pullback_left",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "            CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.cokernelPullbackIso",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "            CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.cokernel_not_isZero_of_ne_top",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "            CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.lt_pullbackCokernel_of_ne_bot",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "            CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.pullbackArrow_strictMono",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "            CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.pullbackCokernel_ne_top",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "        CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.liftSub",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "        CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.liftSub_arrow_strictMono",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "        CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.liftSub_lt",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "        CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.strictShortExact_cokernel",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "      ((CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.subobject_isZero_iff_eq_bot",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "      (CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.subobject_isZero_iff_eq_bot",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "      CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.subobject_arrow_strictMono",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "    CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.isStrictFiniteLength_of_isFiniteLength",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/JordanHolder.lean",
+  "LONG",
+  "    ⟨⊥, CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Deformation.Slicing.IntervalCat.bot_arrow_strictMono C⟩",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Distance/Basic.lean",
+  "LONG",
+  "`WeakStabilityCondition/StabilityCondition/Metric/Mass/Uniqueness.lean` proves that the choice-free definition of",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Isometry/Full.lean",
+  "LONG",
+  "    (g : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot v)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Isometry/Full.lean",
+  "LONG",
+  "The phase coordinates were handled in `WeakStabilityCondition/StabilityCondition/Metric/Isometry/Phase.lean`.  The new input is",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Isometry/Full.lean",
+  "LONG",
+  "variable (a : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair v)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Isometry/Phase.lean",
+  "LONG",
+  "    (g : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot v)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mukai/Tilting.lean",
+  "LONG",
+  "*define* the heart datum by composing with `K₀Ab.toAmbient` (`GrothendieckGroup/HeartComparison.lean`).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Foundations/FiniteLength.lean",
+  "LONG",
+  "`WeakStabilityCondition/StabilityCondition/Foundation/Slicing/IntervalStrictness.lean`). Callers whose",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Slicing/Strict.lean",
+  "LONG",
+  "Everything hard is already in `WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean` — `PostnikovTower.mapF`,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean",
+  "LONG",
+  "Dual to `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.relabel`, which moves phases",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/ClassMap.lean",
+  "LONG",
+  "This is the statement `WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean` could not make. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/ClassMap.lean",
+  "LONG",
+  "`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean` produced `actStabAut`: a well-defined *map* on",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean",
+  "LONG",
+  "* **Slicing** — `Slicing.mapEquiv` (`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean`), dual to `relabel`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean",
+  "LONG",
+  "-- `Λ` gets its own universe, as in `CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean`: nothing here",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean",
+  "LONG",
+  "`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Stability/ClassMap.lean` bundles the pair and supplies the `MulAction`. **Nothing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Continuous.lean",
+  "LONG",
+  "statement is proved in `CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/JointContinuous.lean`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/JointContinuous.lean",
+  "LONG",
+  "`CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Continuous.lean`.  The key estimates are local at the identity:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean",
+  "LONG",
+  "   (`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Foundations/FiniteLength.lean`)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean",
+  "LONG",
+  "1. `NormalizedShift.exists_radius` (`Algebra/Order/NormalizedShift/UniformContinuity.lean`) — uniform continuity,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean",
+  "LONG",
+  "2. `relabel_intervalProp` (`CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Slicing.lean`) — interval subcategories are",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Spherical/DivisorialRegion.lean",
+  "LONG",
+  "`signedRayRegularLocus_inter_carrier` says the signedRayRegularLocus of the whole lattice agrees, on the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Spherical/Finiteness.lean",
+  "LONG",
+  "/-- **On the region, the signedRayRegularLocus of the whole lattice is the signedRayRegularLocus of the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Spherical/WallComparison.lean",
+  "LONG",
+  "chartPlane β ω ∈ PeriodDomain.orthogonalityLocus δ  ↔  (β, ω) ∈ nonpositiveRayLocus q δ ∧ Re(℧, δ) = 0,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/Slicing/PhaseTruncation.lean",
+  "LONG",
+  "theorem Slicing.toTStructure_heart_iff (s : Slicing C) (E : C) : (s.toTStructure C).heart E ↔ s.gtProp C 0 E ∧ s.leProp C 1 E := by",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Support/Quadratic.lean",
+  "LONG",
+  "    CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasUniformQuadraticSupportProperty Zlin",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Support/Quadratic.lean",
+  "LONG",
+  "    CategoryTheory.Triangulated.WeakStabilityCondition.Support.HasUniformQuadraticSupportPropertyModulo",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Heart.lean",
+  "LONG",
+  "    obtain ⟨k, hk⟩ := Triangle.yoneda_exact₃ _ hdist (𝟙 Y) (by show p ≫ 𝟙 Y = 0; simpa using h Y hY p)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Heart.lean",
+  "LONG",
+  "thing as a short exact sequence there. `WeakStabilityCondition/Tilting/TorsionPair/Basic.lean` is the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/Exactness.lean",
+  "LONG",
+  "theorem isNondegenerate_of_isBounded (h : TStructure.IsBounded t) : TStructure.IsNondegenerate t where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "LONG",
+  "The project milestones target smooth projective varieties over a field, while this strategy was written",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "LONG",
+  "example {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] := FiniteDimensionalCohomology k X",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "LONG",
+  "noncomputable example {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] :=",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "LONG",
+  "`CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` proves the comparison abstractly, for a continuous",
+  1
+ ]
+]
