@@ -34,8 +34,6 @@ open TopCat
 
 namespace CategoryTheory.Sheaf
 
-set_option maxHeartbeats 4000000
-set_option synthInstance.maxHeartbeats 800000
 set_option maxRecDepth 10000
 set_option backward.defeqAttrib.useBackward true
 set_option backward.isDefEq.respectTransparency false
@@ -769,6 +767,7 @@ noncomputable abbrev derivedH
     (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) : Type (u + 1) :=
   @Sheaf.H (Opens X) _ (Opens.grothendieckTopology X) F inferInstance hExt n
 
+set_option maxHeartbeats 4000000 in
 private noncomputable abbrev derivedH₀Equiv
     {X : TopCat.{u}} (hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u} X))
     (F : TopCat.Sheaf AddCommGrpCat.{u} X) :
@@ -776,6 +775,7 @@ private noncomputable abbrev derivedH₀Equiv
   @Sheaf.H.equiv₀ (Opens X) _ (Opens.grothendieckTopology X) inferInstance hExt
     F (⊤ : Opens X) Limits.isTerminalTop
 
+set_option maxHeartbeats 4000000 in
 private noncomputable abbrev derivedHMap
     {X : TopCat.{u}} (hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u} X))
     {F G : TopCat.Sheaf AddCommGrpCat.{u} X} (f : F ⟶ G) (n : ℕ) :

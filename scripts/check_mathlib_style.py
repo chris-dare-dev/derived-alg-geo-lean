@@ -17,6 +17,8 @@ Usage:
     python3 scripts/check_mathlib_style.py --hook              # hook JSON on stdin
     python3 scripts/check_mathlib_style.py --diff-only REF F.. # only changed lines
     python3 scripts/check_mathlib_style.py --self-test         # known-answer fixtures
+    python3 scripts/check_mathlib_style.py --check-baseline    # ratchet over the library
+    python3 scripts/check_mathlib_style.py --relax             # re-record the baseline
 
 `--diff-only` exists because a branch gate and an edit hook are answering
 different questions. The hook judges the line you just wrote, so it is strict.
@@ -26,6 +28,21 @@ of it -- which `CONTRIBUTING.md` explicitly does not want ("avoid unrelated
 refactors in a feature change"), and which stalls an unattended run on debt
 that is not its business. Findings are therefore filtered to lines the diff
 actually adds or changes.
+
+`scripts/style-baseline.json` answers the same question for the *hook*, which
+has no diff to filter by. Switching this checker back on (#1370) exposed 131
+pre-existing ERRORs across 76 files, and because the hook judges the whole file
+it was handed, every one of those 76 files became un-editable by an agent until
+someone refactored it. The baseline enumerates that debt so the hook blocks on
+what an edit *adds* and stays quiet about what it inherited -- the
+`scripts/nolints.json` and `scripts/warning-baseline.json` pattern, applied here
+(#1371).
+
+It records the offending source line rather than its line number, which churns
+under every unrelated edit above it -- the reason `check_warnings.py` gives for
+keying on the message instead. Unlike that gate it records the text and not only
+a count, because a per-edit hook has to name the line to fix, and a count can
+only say the file has one too many.
 
 Conventions enforced here are documented in `.claude/references/mathlib-style.md`.
 """
@@ -44,6 +61,10 @@ MAX_LINE = 100
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURES = ROOT / "scripts" / "fixtures" / "mathlib-style"
+# Anchored at the repository root, not the working directory: the PostToolUse
+# hook runs from wherever the agent's shell happens to be, and a baseline the
+# hook cannot find is a hook that blocks on all of it again.
+STYLE_BASELINE = ROOT / "scripts" / "style-baseline.json"
 
 # Only owner-authored library source. Vendored Apache source keeps upstream
 # style, audit scripts are not library modules, and `.claude/` holds review
@@ -289,7 +310,23 @@ def check_text(raw: str, path: Path) -> list[Finding]:
         # edits the payload's whitespace for no readability gain. The code on
         # such a line is short. 12 of the 145 LONG findings were these.
         in_string = column_in_string(line, MAX_LINE)
-        if len(line) > MAX_LINE and not is_import and not in_string:
+        # A Markdown table row cannot be continued either, and for the same
+        # reason `import` cannot: the row IS the line, and splitting it makes
+        # two malformed rows rather than one wrapped one. The module docstrings
+        # here are Markdown, and #1363 landed a four-row tier table between 121
+        # and 170 characters wide, which is the shape this is about.
+        #
+        # Restricted to lines that are wholly comment or docstring, so a `| cons
+        # x xs => ...` match alternative -- perfectly breakable -- is untouched,
+        # and it wants both delimiters and two cells before it believes a row.
+        stripped = line.strip()
+        is_table_row = (
+            not c.strip()
+            and stripped.startswith("|")
+            and stripped.endswith("|")
+            and stripped.count("|") >= 3
+        )
+        if len(line) > MAX_LINE and not is_import and not in_string and not is_table_row:
             out.append(Finding("ERROR", idx, "LONG", f"Line is {len(line)} chars; Mathlib's limit is {MAX_LINE}."))
 
         if " ;" in c:
@@ -481,6 +518,156 @@ def changed_lines(ref: str, path: Path) -> set[int] | None:
     return lines
 
 
+def rel_key(path: Path) -> str:
+    """The baseline's key for `path`: repository-relative, forward slashes.
+
+    `in_scope` already resolves against `ROOT` for exactly this reason -- the
+    hook is handed an absolute path inside `.claude/worktrees/<name>/`, and a
+    key recorded from that path would match in one worktree and nowhere else.
+    """
+    try:
+        return path.resolve().relative_to(ROOT).as_posix()
+    except (ValueError, OSError):
+        return path.as_posix()
+
+
+def fingerprint(lines: list[str], finding: Finding) -> str:
+    """The source line a finding is about, as the baseline records it."""
+    if 1 <= finding.line <= len(lines):
+        return lines[finding.line - 1].rstrip()
+    return ""
+
+
+@functools.lru_cache(maxsize=1)
+def load_style_baseline() -> dict[tuple[str, str, str], int]:
+    """`(path, code, source line) -> how many of them this repository carries`."""
+    if not STYLE_BASELINE.exists():
+        return {}
+    try:
+        entries = json.loads(STYLE_BASELINE.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, ValueError, OSError):
+        return {}
+    counts: dict[tuple[str, str, str], int] = {}
+    for path, code, text, n in entries:
+        counts[(path, code, text)] = counts.get((path, code, text), 0) + n
+    return counts
+
+
+def write_style_baseline(counts: dict[tuple[str, str, str], int]) -> None:
+    entries = sorted([path, code, text, n] for (path, code, text), n in counts.items())
+    STYLE_BASELINE.write_text(
+        json.dumps(entries, indent=1, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
+def split_baselined(
+    path: Path, lines: list[str], findings: list[Finding]
+) -> tuple[list[Finding], int]:
+    """Partition `findings` into what still blocks and how many the baseline covers.
+
+    Only ERRORs are ever suppressed. A WARN does not block anything, so hiding
+    one would cost information and buy nothing.
+    """
+    baseline = load_style_baseline()
+    if not baseline:
+        return findings, 0
+    key = rel_key(path)
+    budget = {k: n for k, n in baseline.items() if k[0] == key}
+    if not budget:
+        return findings, 0
+    kept: list[Finding] = []
+    covered = 0
+    for f in findings:
+        entry = (key, f.code, fingerprint(lines, f))
+        if f.severity == "ERROR" and budget.get(entry, 0) > 0:
+            budget[entry] -= 1
+            covered += 1
+            continue
+        kept.append(f)
+    return kept, covered
+
+
+def library_files() -> list[Path]:
+    """Every in-scope library file, as the whole-library modes read them."""
+    files = sorted(ROOT.joinpath("DerivedAlgGeo").rglob("*.lean"))
+    files.append(ROOT / "DerivedAlgGeo.lean")
+    return [p for p in files if p.exists() and in_scope(p)]
+
+
+def survey_library() -> dict[tuple[str, str, str], int]:
+    """Count every ERROR in the library, keyed as the baseline keys them."""
+    counts: dict[tuple[str, str, str], int] = {}
+    for p in library_files():
+        text = p.read_text(encoding="utf-8")
+        lines = text.split("\n")
+        for f in check_text(text, p):
+            if f.severity != "ERROR":
+                continue
+            entry = (rel_key(p), f.code, fingerprint(lines, f))
+            counts[entry] = counts.get(entry, 0) + 1
+    return counts
+
+
+def check_baseline(relax: bool) -> int:
+    """The ratchet: nothing new outside the baseline, and report what it outgrew.
+
+    `--relax` rewrites the file. It only ever *lowers* it: an addition is the
+    thing this gate exists to stop, and regenerating past one would be the gate
+    marking its own homework.
+    """
+    current = survey_library()
+
+    if relax and not STYLE_BASELINE.exists():
+        # First adoption, and the only time this file is written from a state
+        # it does not already dominate. Every later `--relax` may lower it and
+        # never raise it, for the reason `check_audit_complete.py` gives about
+        # its ceilings: a change that leaves more debt than it found is the
+        # thing the ratchet exists to stop.
+        write_style_baseline(current)
+        print(f"--relax: recorded {sum(current.values())} pre-existing ERROR(s) "
+              f"across {len({k[0] for k in current})} file(s) in "
+              f"{rel_key(STYLE_BASELINE)}.")
+        return 0
+
+    baseline = load_style_baseline()
+
+    if not current and not baseline:
+        print("style baseline: nothing recorded and nothing found")
+        return 0
+
+    added = {k: n - baseline.get(k, 0) for k, n in current.items()
+             if n > baseline.get(k, 0)}
+    if added:
+        total = sum(added.values())
+        print(f"::error::{total} style ERROR(s) are not in {rel_key(STYLE_BASELINE)}. "
+              "Fix them; do not regenerate the baseline to make this pass.")
+        for (path, code, text), n in sorted(added.items()):
+            print(f"  {path} (+{n}) [{code}] {elide(text, 72)}")
+        return 1
+
+    removed = {k: baseline[k] - current.get(k, 0) for k in baseline
+               if baseline[k] > current.get(k, 0)}
+    total_fixed = sum(removed.values())
+    print(f"style baseline: {sum(current.values())} ERROR(s) across "
+          f"{len({k[0] for k in current})} file(s), all recorded "
+          f"(baseline {sum(baseline.values())})")
+
+    if total_fixed and relax:
+        write_style_baseline(current)
+        print(f"--relax: baseline lowered by {total_fixed}; commit "
+              f"{rel_key(STYLE_BASELINE)} with the fix.")
+    elif total_fixed:
+        print(f"::notice::{total_fixed} baseline finding(s) are gone. Run "
+              "`python3 scripts/check_mathlib_style.py --relax` and commit "
+              f"{rel_key(STYLE_BASELINE)} so the gate keeps the ground you won.")
+    elif relax:
+        write_style_baseline(current)
+        print(f"--relax: rewrote {rel_key(STYLE_BASELINE)}.")
+    return 0
+
+
 def self_test() -> int:
     """Run the known-answer fixtures under `scripts/fixtures/mathlib-style/`.
 
@@ -544,6 +731,8 @@ def report(path: Path, findings: list[Finding]) -> int:
 def main(argv: list[str]) -> int:
     if "--self-test" in argv:
         return self_test()
+    if "--check-baseline" in argv or "--relax" in argv:
+        return check_baseline(relax="--relax" in argv)
 
     paths: list[Path]
     hook_mode = "--hook" in argv
@@ -573,10 +762,17 @@ def main(argv: list[str]) -> int:
 
     bad = 0
     total_warns = 0
+    total_covered = 0
     for p in paths:
         if not in_scope(p) or not p.exists():
             continue
-        findings = check_text(p.read_text(encoding="utf-8"), p)
+        text = p.read_text(encoding="utf-8")
+        findings = check_text(text, p)
+        # Before the diff filter, so a branch that merely moves a recorded line
+        # is not asked to refactor it. The baseline is what this repository has
+        # agreed to carry, in every mode that reads a file.
+        findings, covered = split_baselined(p, text.split("\n"), findings)
+        total_covered += covered
         if diff_ref is not None:
             touched = changed_lines(diff_ref, p)
             if touched is not None:
@@ -595,6 +791,13 @@ def main(argv: list[str]) -> int:
             "See .claude/references/mathlib-style.md.",
             file=sys.stderr,
         )
+        if total_covered:
+            print(
+                f"({total_covered} further finding(s) in these files are recorded "
+                f"in {rel_key(STYLE_BASELINE)} and are not yours to fix. Never add "
+                "to it.)",
+                file=sys.stderr,
+            )
         # Exit 2 is the PostToolUse blocking code: stderr is fed back to the agent.
         return 2 if hook_mode else 1
     if total_warns and hook_mode:
