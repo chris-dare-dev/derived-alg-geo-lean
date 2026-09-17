@@ -76,7 +76,12 @@ records exactly what it forgets. -/
 def threefoldTruncate : Threefold.NumClass →+ NumClass :=
   AddMonoidHom.mk' (fun v => (v.1, v.2.1, v.2.2.1)) (by intro v w; rfl)
 
-@[simp]
+-- Deliberately NOT `@[simp]`. It rewrites `threefoldTruncate v` to a raw
+-- tuple, which takes the three projection lemmas below out of simp-normal form:
+-- simp reaches `NumClass.rk (v.deg0, v.deg1, v.deg2)` and they can never fire.
+-- The projections are the useful normal form, so they keep the attribute and
+-- this does not. The two `simp only` calls below that want the tuple name this
+-- lemma explicitly, so they are unaffected.
 theorem threefoldTruncate_apply (v : Threefold.NumClass) :
     threefoldTruncate v =
       (Threefold.NumClass.deg0 v, Threefold.NumClass.deg1 v,
