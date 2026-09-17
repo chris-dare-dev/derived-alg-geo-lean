@@ -463,7 +463,7 @@ theorem phaseTilt_semistableQuotient_of_saturatedExtension
     (sigma.phaseTiltWeakStabilityFunction_zeroCharge_iff
       beta hbeta0 hbeta1 Vprime.obj).mp hVprime
   have hTypeTwo : sigma.IsPhaseTiltTypeTwo beta hbeta0 hbeta1 B := by
-    refine ⟨U, Vprime.obj, hUfree, hUss, hVprimeOld,
+    refine ⟨U, Vprime.obj, hUss, hVprimeOld,
       f'.hom, g'.hom, d', ?_, ?_⟩
     · simpa [UH, BH] using hd'
     · intro _ A0 hA0 z
@@ -651,7 +651,7 @@ theorem phaseTilt_semistableQuotient_of_extension
     exact Triangle.isoMk _ _ eI (Iso.refl _) (Iso.refl _)
       (by simp [fB]) (by simp) (by simp [dB, ← Functor.map_comp])
   have hTypeTwo : sigma.IsPhaseTiltTypeTwo beta hbeta0 hbeta1 B := by
-    refine ⟨Utilde, Vprime.obj, hUtildefree, hUtildess, hVprimeOld,
+    refine ⟨Utilde, Vprime.obj, hUtildess, hVprimeOld,
       fB, gB.hom, dB, hBtri, ?_⟩
     intro _ A0 hA0 z
     exact hB.2 A0
