@@ -1,0 +1,19 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import DerivedAlgGeo.CategoryTheory.Triangulated.Basic
+
+/-!
+# A tier table kept in the module docstring
+
+A Markdown table row is the line; splitting it makes two malformed rows, so it
+is unbreakable in the same way an `import` is.
+
+| Tier | Module | What it supplies |
+| --- | --- | --- |
+| Unbounded | `Tensor/Unbounded.lean` | the K-flat tensor bifunctor on complexes of module sheaves, **constructed** from a supplied resolution |
+| Relative | `Tensor/Relative.lean` | `HasMonoidalDerivedPullback`, compatibility with derived pullback along a morphism of schemes |
+-/
+
+theorem tiered : True := trivial

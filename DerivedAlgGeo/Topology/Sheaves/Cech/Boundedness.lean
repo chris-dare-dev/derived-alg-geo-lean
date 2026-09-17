@@ -23,8 +23,6 @@ namespace CategoryTheory.Sheaf
 
 variable {X : TopCat.{u}}
 
-set_option synthInstance.maxHeartbeats 800000
-set_option maxHeartbeats 4000000
 set_option maxRecDepth 10000
 
 /-- The union of a finite list of opens. -/

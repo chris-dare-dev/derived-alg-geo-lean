@@ -632,7 +632,19 @@ items:
   kind: task
   parent: mathematical-ownership-m1
   title: MO1.15 — Verify the completed ownership graph and close the migration ledger
-  status: blocked
+  status: done
+  progress: 'Recorded a disposition for all fifteen findings in
+    docs/architecture/cutover-ledger.md, each with its implementing pull request, its
+    agreed owners and the gate that now holds them. Every row is implemented; none was
+    closed by adjudication alone. The closure found one real gap: of the nine cores this
+    task names, eight carried a numbered layering rule and perfectness (row 11, MO1.11)
+    carried only a RETIRED_PATHS entry, which asserts the old path is gone and nothing
+    about what the new owners may import. Rule 18 pins both edges transitively -- the
+    owners reach neither the moduli nor the stability tree, and Moduli/PerfectComplex
+    still reaches them -- with allowed and forbidden known-answer fixtures. Rows 03 and
+    13 keep retired-path coverage deliberately; neither is among the nine, and the
+    acceptance asks for fixtures on genuine policy edges rather than a subject ranking.
+    No CA, SRF1, DG3, DT1 or SF8 obligation is discharged.'
   summary: Close MO1 on evidence that the extracted foundations are reusable and every review finding
     has a completed or explicitly adjudicated disposition. This is the integration acceptance task for
     the companion milestone, not another theorem-development track.
@@ -649,7 +661,7 @@ items:
   - area:governance
   - type:task
   - sev:medium
-  - blocked
+  - ready
   acceptance:
   - Record a disposition for findings 01–15 with the implementing PR, old/new owner and canonical specialization/realization
     map. No finding is dropped because a path merely looks cleaner.
