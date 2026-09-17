@@ -280,7 +280,7 @@ items:
     kind: epic
     parent: dg-enhancements-m3
     title: "D^dg(A) on the h-injective model"
-    status: planned
+    status: done
     summary: "The derived enhancement as the full dg subcategory of h-injective (dually h-projective) complexes, built on Mathlib's KInjective/KProjective so the resolution theory is consumed rather than rebuilt."
     priority: must
     size: XL
