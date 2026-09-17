@@ -721,6 +721,40 @@ GEOMETRIC_FOURIER_MUKAI_TREE = (
 )
 ABSTRACT_FOURIER_MUKAI_TREE = f"{TRIANGULATED_TREE}.FourierMukai"
 
+# Rule 18. MO1.11 (#1322) moved stalkwise flatness, pseudo-coherence, Tor
+# amplitude and relative perfection out of the relative-perfect moduli problem,
+# because each is a property of one complex over one morphism and a moduli
+# problem is not among their hypotheses. As in rule 17, the whole point of the
+# move is the import direction, so it is pinned here rather than left to
+# review.
+#
+# MO1.15 is why this rule exists at all. Of the nine cores its acceptance names
+# -- neutral pairing/charge, generic numerical transport, linear Serre/Yoneda,
+# abelian stability, dg H0, derived operations, perfectness, the GL cover and
+# planar geometry -- eight had a numbered rule pinning their owners and one did
+# not. Perfectness was named only in RETIRED_PATHS, which asserts that the OLD
+# path is gone and says nothing about where the predicates went or what they
+# may import. A regression that reintroduced the coupling under the new path
+# would have left every gate green.
+#
+# The check is transitive for the same reason rule 17's is: the predicates were
+# importable without the moduli problem before only by accident of which file
+# they sat in, and a single new import anywhere in the owners' closure would
+# quietly restore the coupling.
+#
+# This pins placement only. SF8 #517/#554 and #723 still owe construction,
+# preservation and compact-perfect obligations against these predicates, and
+# nothing here discharges them.
+PERFECTNESS_OWNERS = (
+    "AlgebraicGeometry/DerivedCategory/Perfect",
+    "AlgebraicGeometry/Modules/Flat.lean",
+)
+# The converse edge. A moduli consumer that restated the predicates instead of
+# importing them would satisfy the forbidden half of this rule while defeating
+# its purpose, so the edge it is supposed to keep is checked too.
+PERFECTNESS_CONSUMER = "AlgebraicGeometry/Moduli/PerfectComplex"
+MODULI_TREE = f"{GEOMETRY}.Moduli"
+
 STRUCTURE_DECLARES = re.compile(
     r"^\s*(?:private\s+|protected\s+|noncomputable\s+)*structure\s+(\S+)"
 )
@@ -1015,6 +1049,22 @@ def owner_boundary_failures(
             return [
                 f"{label}: imports {forbidden[0]}; the general covering lemmas "
                 "are about arbitrary topological spaces and need Mathlib alone"
+            ]
+    perfectness_trees = tuple(
+        retired_module(entry) for entry in PERFECTNESS_OWNERS
+    )
+    if any(in_tree(module, root) for root in perfectness_trees):
+        forbidden = sorted(
+            dep
+            for dep in reached
+            if in_tree(dep, MODULI_TREE) or in_tree(dep, STABILITY_ROOT)
+        )
+        if forbidden:
+            return [
+                f"{label}: reaches {forbidden[0]}; flatness, pseudo-coherence, "
+                "Tor amplitude and relative perfection are properties of one "
+                "complex over one morphism, and exist to be importable without "
+                "the relative-perfect moduli problem (MO1.11)"
             ]
     if module in (SQRT_TODD_ROOT, SLOPE_ROOT, POLARISED_TRANSPORT_ROOT):
         forbidden = sorted(
@@ -1715,6 +1765,36 @@ def main() -> int:
                         "stability condition (MO1.10)"
                     )
 
+    # Rule 18, perfectness owners are reachable without the moduli problem.
+    for entry in PERFECTNESS_OWNERS:
+        path = SOURCE_ROOT / entry
+        if not (path.is_file() or path.is_dir()):
+            failures.append(
+                f"missing {entry}: it owns a flatness or relative-perfection "
+                "predicate extracted from the moduli consumer; see "
+                "docs/architecture/cutover-ledger.md row 11"
+            )
+            continue
+        # The forbidden import edges themselves are checked in
+        # owner_boundary_failures, which runs over both real modules and the
+        # known-answer fixtures, so the rule cannot pass vacuously.
+
+    # Rule 18, and the moduli consumer still reaches what it consumes.
+    perfect_consumer = module_of(
+        (SOURCE_ROOT / PERFECTNESS_CONSUMER).with_suffix(".lean")
+    )
+    if perfect_consumer in modules:
+        perfect_owner = module_of(
+            (SOURCE_ROOT / PERFECTNESS_OWNERS[0]).with_suffix(".lean")
+        )
+        reached = closure.of(perfect_consumer) | {perfect_consumer}
+        if not any(in_tree(dep, perfect_owner) for dep in reached):
+            failures.append(
+                f"{perfect_consumer}: no longer reaches {perfect_owner}; the "
+                "relative-perfect moduli problem must consume the extracted "
+                "predicates as an import edge, not restate them"
+            )
+
     failures += check_fixtures(closure)
 
     if failures:
@@ -1766,7 +1846,10 @@ def main() -> int:
         "encoding root reaches no enhancement consumer, scheme realization or "
         "stability module; the "
         f"{len(DERIVED_OPERATION_OWNERS)} derived-operation owners reach "
-        "neither Fourier--Mukai subtree nor the stability tree"
+        "neither Fourier--Mukai subtree nor the stability tree; the "
+        f"{len(PERFECTNESS_OWNERS)} perfectness owners reach neither the "
+        "moduli tree nor the stability tree while the relative-perfect moduli "
+        "problem still reaches them"
     )
     return 0
 
