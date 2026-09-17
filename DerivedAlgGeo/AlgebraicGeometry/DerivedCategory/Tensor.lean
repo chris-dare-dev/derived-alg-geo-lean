@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Unbounded
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedCoherent
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedMonoidal
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Relative
 

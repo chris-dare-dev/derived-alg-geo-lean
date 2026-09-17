@@ -504,7 +504,7 @@ Grassmannian of positive planes is not used. -/
 #print axioms IntegralLattice.IsIsotropicSequence.pairing_sum_left
 #print axioms IntegralLattice.IsIsotropicSequence.pairing_sum_right
 #print axioms IntegralLattice.IsIsotropicSequence.pairing_sum_sum
-#print axioms IntegralLattice.IsIsotropicSequence.coeffs_eq_zero_of_pairing_smul_sum_eq_zero
+#print axioms IntegralLattice.IsIsotropicSequence.eq_zero_of_pairing_smul_sum_eq_zero
 #print axioms IntegralLattice.IsIsotropicSequence.linearIndependent
 #print axioms IntegralLattice.hyperbolicPairing
 #print axioms IntegralLattice.hyperbolicPairing_apply

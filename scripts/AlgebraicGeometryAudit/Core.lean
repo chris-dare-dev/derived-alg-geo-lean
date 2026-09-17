@@ -971,6 +971,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms NumericalRingData
 #print axioms NumericalRingData.piece
 #print axioms NumericalRingData.degree
+#print axioms NumericalRingData.eq_zero_of_mem_piece_of_lt
 #print axioms NumericalVarietyData
 #print axioms NumericalVarietyData.ring
 #print axioms NumericalVarietyData.chi
