@@ -1,0 +1,6 @@
+# The predicates are properties of one complex over one morphism: derived
+# categories of quasi-coherent sheaves, module sheaves and their flatness are
+# all they need, and none of it reaches a moduli problem or a stability
+# condition.
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Comparison
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat

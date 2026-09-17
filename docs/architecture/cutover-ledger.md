@@ -902,6 +902,80 @@ stability tree, and `Numerical/Models` is held neutral. `Numerical/Stability`,
 `DerivedCategory/Stability`, `Moduli/HarderNarasimhan`, `Moduli/Semistability`
 and `Stability/Gieseker` remain as they were.
 
+### Dispositions, findings 01--15 (MO1.15, #1326)
+
+The owner map above records what each row was *agreed* to become. This section
+records what each row *did*, with the pull request that did it and the gate that
+now holds it there. It is the closure evidence for MO1 and nothing more: it
+asserts placement and import direction, and it asserts no mathematics.
+
+Every row's disposition is **implemented**. No finding was dropped, and none was
+closed by adjudication alone.
+
+| # | Finding | Task | Implementing PR | Guarded by |
+| --- | --- | --- | --- | --- |
+| 01 | Complex linear functionals vs. central-charge applications | #1313 | #1333 | rule 8, `PAIRING_CORE_MODULE` boundary |
+| 02 | Positive planes, positive frames and the wall loci | #1314 | #1338 | rule 10 |
+| 03 | Hyperbolic extension algebra vs. geometric Mukai | #1315 | #1350, #1351, #1359 | `RETIRED_PATHS`; `CentralChargeK3` chart-row entry |
+| 04 | Charge construction upstream of walls | #1313 | #1333 | rule 8, `CENTRAL_CHARGE_TREE` boundary |
+| 05 | Linear Serre duality and Yoneda helpers | #1318 | #1329 | rule 9 |
+| 06 | Abelian stability foundations; slope vs. Gieseker | #1319 | #1358 | rule 13 |
+| 07 | Numerical parent-to-specialization inversions | #1316 | #1341 | rule 11 |
+| 08 | The GL⁺(2,ℝ) cover vs. its stability action | #1323 | #1360 | rule 16 |
+| 09 | Mass as a sibling of metric; planar convex geometry | #1324 | #1356 | rule 14 |
+| 10 | Derived tensor and pushforward vs. Fourier--Mukai | #1321 | #1363 | rule 17 |
+| 11 | Flatness and relative perfection out of the moduli consumer | #1322 | #1331 | **rule 18, added by this closure** |
+| 12 | Numerical models, named surface cases and realizations | #1317 | #1352 | rule 12 |
+| 13 | Direct Mathlib-owner mismatches | #1325 | #1332 | `RETIRED_PATHS` |
+| 14 | The placement policy itself | #1312 | #1327, #1328 | rule 3, narrowed by subcomponent, with fixtures |
+| 15 | H⁰ with `DGCategory`; enhancement vs. presentation | #1320 | #1367 | rule 15 |
+
+#### What the closure found
+
+MO1.15's acceptance names nine extracted cores that must carry focused
+transitive-import checks: neutral pairing/charge, generic numerical transport,
+linear Serre/Yoneda, abelian stability, dg H⁰, derived operations, perfectness,
+the GL cover and planar geometry. Eight of the nine had a numbered rule pinning
+their owners and their forbidden edges. **Perfectness did not.**
+
+Row 11's only trace in the gate was an entry in `RETIRED_PATHS` naming
+`Moduli/PerfectComplex/Relative.lean`. That asserts the old path is gone. It
+asserts nothing about where the predicates went, and nothing about what the new
+owners may import — so a regression that reintroduced the coupling under
+`DerivedCategory/Perfect/` would have left every gate green. Rule 18 closes
+that: the owners must reach neither the moduli tree nor the stability tree,
+transitively, and `Moduli/PerfectComplex` must still reach them, because a
+consumer that restated the predicates instead of importing them would satisfy
+the forbidden half of the rule while defeating its purpose. Both edges have
+known-answer fixtures.
+
+Rows 03 and 13 keep `RETIRED_PATHS` coverage and no numbered rule, deliberately.
+Neither is among the nine cores, and the acceptance asks for fixtures on genuine
+policy edges rather than a total ordering of subjects. Row 03's live constraint
+is the chart row already recorded in the stability-consuming geometry list; row
+13 is four path corrections against Mathlib's own APIs, which the absent old
+paths express completely.
+
+#### What this closure does not assert
+
+MO1 is a placement milestone. Closing it does not assert that CA, SRF1, DG3, DT1
+or SF8 mathematics is finished, and none of the trust boundaries those lanes
+carry is discharged here:
+
+- CA1--CA3 retain their canonical roots and their independent state. #1230's
+  `pairCharge` remains a conditional proposal under its two-consumer review
+  obligation, and the CA path contract above is unchanged by this section.
+- SRF1 #897--#899 keeps full faithfulness, equivalence/shift transport and the
+  geometric Serre-duality obligations (row 05).
+- DT1 #892, #928--#931 keeps tensor inhabitation; #795/#796 keep transform
+  equivalence and adjointness (row 10).
+- SF8 #517/#554 and #723 keep construction, preservation and compact-perfect
+  obligations against the extracted predicates (row 11).
+
+No formula, pairing or carrier was duplicated by moving a file, and no
+hypothesis on finite-Tor, Noetherianness, HN filtrations, integrality, signature
+or exactness was strengthened by relocation.
+
 ## Completed roots
 
 - Intrinsic dg H⁰ owned by `DGCategory`, presentation separated from exact

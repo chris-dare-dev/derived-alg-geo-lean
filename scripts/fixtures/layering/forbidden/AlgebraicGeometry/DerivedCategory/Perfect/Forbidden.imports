@@ -1,0 +1,6 @@
+# MO1.11 moved relative perfection out of the moduli consumer. An owner that
+# imported the moduli problem back would undo the move while every other gate
+# stayed green, so the edge is a known-answer fixture. Reached transitively,
+# as the real regression would be.
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Comparison
+import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Pullback
