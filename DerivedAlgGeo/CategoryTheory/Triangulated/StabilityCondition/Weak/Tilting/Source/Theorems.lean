@@ -148,6 +148,7 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 imaginary charge. -/
 theorem sourceTilt_typeTwo_im_neg
     (sigma : WeakPreStabilityCondition v) (b : ℝ) {E : C}
+    (hEtilt : ((sigma.slopeTorsionPair b).tilt).heart E)
     (hcharge : (sigma.sourceTiltWeakStabilityFunction b).charge E ≠ 0)
     (hE : sigma.IsPhaseTiltTypeTwo (slopeCutPhase b)
       (slopeCutPhase_mem_Ioo b).1.le (slopeCutPhase_mem_Ioo b).2 E) :
@@ -156,7 +157,10 @@ theorem sourceTilt_typeTwo_im_neg
   let Ws := sigma.sourceTiltWeakStabilityFunction b
   let W0 := sigma.weakStabilityFunctionOnHeart
   have htheta := slopeCutPhase_mem_Ioo b
-  obtain ⟨U, V0, hUfree, hUss, hVzero, f, g, d, hdist, -⟩ := hE
+  obtain ⟨U, V0, hUss, hVzero, f, g, d, hdist, -⟩ := hE
+  have hUfree : phaseFree sigma.slicing theta U :=
+    sigma.phaseFree_of_tiltHeart_triangle htheta.1.le htheta.2
+      (by simpa [slopeTorsionPair, theta] using hEtilt) hUss.1 hVzero.1 hdist
   have hVsource : Ws.charge V0 = 0 := by
     rw [sourceTiltWeakStabilityFunction_charge, hVzero.2, zero_div]
   have hsumSource : Ws.charge E = Ws.charge (U⟦(1 : ℤ)⟧) + Ws.charge V0 :=
@@ -188,12 +192,18 @@ theorem sourceTilt_typeTwo_im_neg
   simpa using neg_lt_zero.mpr hUim
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
-/-- **Lemma 14.17 (source-coordinate candidate).**  The two cases are
-separated by the sign of the imaginary part of the original charge.  The
-second branch retains the phase-free and positive-imaginary Hom fields used
-by the constructive phase-language classification; the adversarial review
-must determine whether those fields are automatic from the printed v4
-hypotheses before any coverage promotion. -/
+/-- **Lemma 14.17 (source coordinates).**  The two cases are separated by the
+sign of the imaginary part of the original charge.
+
+The phase-free field the second branch used to carry is no longer a
+hypothesis: `phaseFree_of_tiltHeart_triangle` derives it from the standing
+hypotheses of the printed lemma.  The branch still carries the
+positive-imaginary Hom implication, which is the positive-imaginary half of
+the printed `moreover` clause and is load-bearing: a split `U⟦1⟧ ⊕ V` with `V`
+a nonzero zero-charge object meets every other clause of case (2) and is not
+semistable, because Definition 14.2 gives a zero-charge subobject the slope
+`+∞`.  Promotion of the coverage coordinate remains owner-gated on accepting
+that reading of the source. -/
 theorem sourceTiltWeakStabilityFunction_isSemistable_iff_classification
     (sigma : WeakPreStabilityCondition v) (b : ℝ) {E : C}
     (hEtilt : ((sigma.slopeTorsionPair b).tilt).heart E)
@@ -209,7 +219,7 @@ theorem sourceTiltWeakStabilityFunction_isSemistable_iff_classification
   constructor
   · rintro (hE | hE)
     · exact Or.inl ⟨sigma.sourceTilt_typeOne_im_nonneg b hcharge hE, hE⟩
-    · exact Or.inr ⟨sigma.sourceTilt_typeTwo_im_neg b hcharge hE, hE⟩
+    · exact Or.inr ⟨sigma.sourceTilt_typeTwo_im_neg b hEtilt hcharge hE, hE⟩
   · rintro (⟨-, hE⟩ | ⟨-, hE⟩)
     · exact Or.inl hE
     · exact Or.inr hE
