@@ -62,6 +62,14 @@ standard pseudo-coherence on an arbitrary base.
    key is what keeps two rows landing in the same week from editing the same
    lines, and the gate fails if the keys stop being sorted. Nothing is left
    behind re-exporting its new owner.
+
+   A row that also pins a claim registers it the same way: one function in
+   `MILESTONE_RULES`, written beside its key-neighbours, returning its own
+   failures and the one clause it adds to the gate's `ok:` line, plus one dict
+   entry in sorted position. Do not number it. The numbered rules in that
+   file's docstring are historical -- the number was a counter two milestones
+   incremented at once, which is why MO1.10 was renumbered three times -- and
+   the milestone key is the identifier everything else already uses.
 5. **Hypotheses travel with the declaration.** Relocation never strengthens or
    silently discharges a hypothesis. Named cases: Hom-finiteness for Serre full
    faithfulness; the codimension-four bound on `sqrtComp`; the Noetherian

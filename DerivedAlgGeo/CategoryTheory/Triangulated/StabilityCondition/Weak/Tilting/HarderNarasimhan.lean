@@ -427,7 +427,7 @@ theorem phaseTilt_existsHNWithLastSource_of_freeShift_zeroCharge_extension
             (sigma.phaseTiltWeakStabilityFunction_zeroCharge_iff
               beta hbeta0 hbeta1 Q).mp hQ
           have hTypeTwo : sigma.IsPhaseTiltTypeTwo beta hbeta0 hbeta1 Z := by
-            refine ⟨X, Q, hXfree, hXss, hQOld, j, q, delta, hXZQ, ?_⟩
+            refine ⟨X, Q, hXss, hQOld, j, q, delta, hXZQ, ?_⟩
             intro hpos
             exact (not_lt_of_ge (le_of_not_gt himZ) hpos).elim
           have hZss : W.IsSemistable Z :=

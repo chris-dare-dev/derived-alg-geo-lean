@@ -42,15 +42,20 @@ def IsPhaseTiltTypeOne
     ∀ A0 : C, sigma.zeroCharge A0 → ∀ f : A0 ⟶ E, f = 0
 
 /-- The second class in the phase-language form of Lemma 14.17: an extension
-of a zero-charge object by the shift of a semistable torsion-free object.
+of a zero-charge object by the shift of a semistable object of the original
+heart.  These are exactly the hypotheses the printed case (2) records: the
+free-class membership of `U` is not carried here, because it is automatic by
+`phaseFree_of_tiltHeart_triangle`.
+
 The final implication is the positive-imaginary part of the lemma's
-`moreover` clause; it is exactly what excludes zero-charge subobjects away
-from the boundary ray. -/
+`moreover` clause.  It is retained because it is load-bearing rather than
+decorative: without it a split extension `U⟦1⟧ ⊕ V` with `V` a nonzero
+zero-charge object satisfies every other clause while failing semistability,
+since Definition 14.2 gives a zero-charge subobject the slope `+∞`. -/
 def IsPhaseTiltTypeTwo
     (sigma : WeakPreStabilityCondition v) (beta : ℝ)
     (hbeta0 : 0 ≤ beta) (hbeta1 : beta < 1) (E : C) : Prop :=
-  ∃ (U V : C), phaseFree sigma.slicing beta U ∧
-    sigma.weakStabilityFunctionOnHeart.IsSemistable U ∧
+  ∃ (U V : C), sigma.weakStabilityFunctionOnHeart.IsSemistable U ∧
     sigma.zeroCharge V ∧
     ∃ (f : U⟦(1 : ℤ)⟧ ⟶ E) (g : E ⟶ V)
       (d : V ⟶ U⟦(1 : ℤ)⟧⟦(1 : ℤ)⟧),
@@ -133,7 +138,10 @@ theorem isSemistable_of_isPhaseTiltTypeTwo
     (hE : sigma.IsPhaseTiltTypeTwo beta hbeta0 hbeta1 E) :
     (sigma.phaseTiltWeakStabilityFunction beta hbeta0 hbeta1).IsSemistable E := by
   let W := sigma.phaseTiltWeakStabilityFunction beta hbeta0 hbeta1
-  obtain ⟨U, V, hUfree, hUss, hVzero, f, g, d, hdist, hHom⟩ := hE
+  obtain ⟨U, V, hUss, hVzero, f, g, d, hdist, hHom⟩ := hE
+  have hUfree : phaseFree sigma.slicing beta U :=
+    sigma.phaseFree_of_tiltHeart_triangle hbeta0 hbeta1 hEtilt hUss.1 hVzero.1
+      hdist
   have hVtiltZero : W.zeroCharge V :=
     (sigma.phaseTiltWeakStabilityFunction_zeroCharge_iff beta hbeta0 hbeta1 V).mpr
       hVzero
@@ -320,7 +328,7 @@ theorem phaseTiltClassification_of_isSemistable
     have hUold : W0.IsSemistable U :=
       sigma.weakStabilityFunctionOnHeart_isSemistable_of_phaseFree_shiftSemistable
         beta hbeta0.le hbeta1 hUfree hUshiftSemistable hUcharge
-    refine Or.inr ⟨U, V, hUfree, hUold, hVzero, ?_, ?_, ?_, ?_, ?_⟩
+    refine Or.inr ⟨U, V, hUold, hVzero, ?_, ?_, ?_, ?_, ?_⟩
     · simpa [T, t, U, P, originalCohomologyTriangle,
         HeartTorsionPair.originalHMinusOne] using T.mor₁
     · simpa [T, t, V, P, originalCohomologyTriangle,

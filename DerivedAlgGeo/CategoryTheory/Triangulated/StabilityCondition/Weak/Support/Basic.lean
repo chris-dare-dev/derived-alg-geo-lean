@@ -148,7 +148,7 @@ theorem phaseTilt_hasSupportProperty
         ‖v (K₀.of C E)‖ ≤ K * ‖Zlin (v (K₀.of C E))‖ := hb
         _ = K * ‖phaseTiltLinearCharge beta Zlin (v (K₀.of C E))‖ := by
           rw [norm_phaseTiltLinearCharge]
-    · obtain ⟨U, V0, hUfree, hUss, hVzero, f, g, d, hdist, -⟩ := htypeTwo
+    · obtain ⟨U, V0, hUss, hVzero, f, g, d, hdist, -⟩ := htypeTwo
       have hVclass : v (K₀.of C V0) = 0 :=
         W0.class_eq_zero_of_zeroCharge Zlin hcompat0 hsupport' hVzero
       have hclass : v (CategoryTheory.Triangulated.K₀.of C E) =

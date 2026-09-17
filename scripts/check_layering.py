@@ -89,6 +89,17 @@ nothing else checks.
    it and imports nothing from ``DerivedAlgGeo``; no other module redeclares
    any of the six.
 
+The numbering above is historical and stops here. It was a counter that every
+milestone incremented by hand, so two in flight always picked the same number:
+MO1.10 (#1363) was renumbered 13 -> 15 -> 16 -> 17 across four merges of main,
+none of which was about its own subject. A milestone rule now registers itself
+in ``MILESTONE_RULES`` under its own milestone key -- which is what the failure
+messages, the cutover ledger and this file already used to identify it -- and
+carries the one ``ok:`` clause it is responsible for. To add one: write the
+function beside its key-neighbours and add one dict entry in sorted position.
+There is no shared closing line to edit and no number to claim, and the gate
+fails if either order slips.
+
 Fixtures under ``scripts/fixtures/layering`` are known-answer tests: every
 ``allowed`` fixture must pass rules 1-4 and every ``forbidden`` fixture must
 fail at least one of them, so an edit that silently stops rejecting anything
@@ -100,6 +111,7 @@ from __future__ import annotations
 import pathlib
 import re
 import sys
+from typing import Callable
 
 from _output import force_utf8_output
 
@@ -902,7 +914,12 @@ def parse(path: pathlib.Path) -> tuple[list[str], list[str]]:
     return imports, namespaces
 
 
-def load_modules() -> dict[str, tuple[pathlib.Path, list[str], list[str]]]:
+# What `load_modules` returns, named so the rule signatures below stay
+# readable.
+Modules = dict[str, tuple[pathlib.Path, list[str], list[str]]]
+
+
+def load_modules() -> Modules:
     modules: dict[str, tuple[pathlib.Path, list[str], list[str]]] = {}
     sources = [*SOURCE_ROOT.rglob("*.lean")]
     for root in AGGREGATION_ROOTS:
@@ -934,6 +951,13 @@ class Closure:
         result = frozenset(acc)
         self.memo[module] = result
         return result
+
+
+# A registered rule answers with its own failures AND the one clause it
+# contributes to the `ok:` line, so no rule has to reach into a shared
+# string to describe itself. That pairing is the point: the clause and the
+# check it summarises cannot drift apart, and neither is appended anywhere.
+MilestoneRule = Callable[[Modules, Closure], tuple[list[str], str]]
 
 
 def direction_failures(
@@ -1128,6 +1152,695 @@ def owner_boundary_failures(
                 "must not import K3, surface, or dimension-specific consumers"
             ]
     return []
+
+
+def _rule_mo1_03(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """MO1.03. Returns its failures and the clause it contributes."""
+    failures: list[str] = []
+    # Rule 10, declaration owners and the one import edge that matters to the
+    # frame/plane split. The executable-only historical aliases are outside
+    # SOURCE_ROOT and therefore cannot satisfy these checks.
+    for entry, names in MO1_03_OWNERS.items():
+        path = SOURCE_ROOT / entry
+        if not path.is_file():
+            failures.append(f"missing MO1.03 owner {path.relative_to(ROOT)}")
+            continue
+        declared = declared_names(path.read_text(encoding="utf-8")) | structure_names(
+            path.read_text(encoding="utf-8")
+        )
+        for name in names:
+            if name not in declared:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: no longer declares {name}; "
+                    "the frame/plane/locus split requires this canonical owner"
+                )
+    return failures, (
+        "the positive-plane, positive-frame, orthogonality, charge-zero, "
+        "determinant-alignment, and signed-ray owners are distinct, with no "
+        "common codimension-one parent"
+    )
+
+
+def _rule_mo1_06(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """MO1.06. Returns its failures and the clause it contributes."""
+    failures: list[str] = []
+    # Rule 12, MO1.06. Owners first, then the four claims the split makes.
+    for entry, names in MO1_06_OWNERS.items():
+        path = SOURCE_ROOT / entry
+        if not path.is_file():
+            failures.append(f"missing MO1.06 owner {path.relative_to(ROOT)}")
+            continue
+        text = path.read_text(encoding="utf-8")
+        declared = declared_names(text) | structure_names(text)
+        for name in names:
+            if name not in declared:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: no longer declares {name}; "
+                    "the model/demonstration split requires this canonical owner"
+                )
+    if not (SOURCE_ROOT / NUMERICAL_MODELS_UMBRELLA).is_file():
+        failures.append(
+            f"missing {NUMERICAL_MODELS_UMBRELLA}: the formal numerical models "
+            "need an umbrella of their own, separate from the demonstrations"
+        )
+
+    # (a) No model may buy a stability exemption. Rule 3 already holds the tree
+    # neutral; this keeps a future edit from adding `Numerical.Models` to the
+    # exempt list instead of fixing the import that made it necessary.
+    for root in STABILITY_CONSUMING_GEOMETRY:
+        if in_tree(root, NUMERICAL_MODELS_TREE):
+            failures.append(
+                f"{root}: a formal numerical model may not be exempted from "
+                "rule 3; move the charge or wall material to "
+                "Numerical/Examples/ instead"
+            )
+
+    # (b) Models are upstream of the demonstrations built on them.
+    for module in sorted(modules):
+        if not in_tree(module, NUMERICAL_MODELS_TREE):
+            continue
+        reached = sorted(
+            dep
+            for dep in closure.of(module)
+            if in_tree(dep, NUMERICAL_DEMONSTRATIONS_TREE)
+        )
+        if reached:
+            failures.append(
+                f"{module}: reaches {reached[0]}; a numerical model is "
+                "upstream of the realizations, charges and walls demonstrated "
+                "on it"
+            )
+
+    # (c) The named surface models are siblings over one shared carrier.
+    for sibling in SURFACE_MODEL_SIBLINGS:
+        if sibling not in modules:
+            failures.append(
+                f"missing named surface model {sibling}; K3, abelian, Enriques "
+                "and the projective plane are siblings over "
+                f"{SURFACE_MODEL_CARRIER}"
+            )
+            continue
+        reached = closure.of(sibling)
+        if SURFACE_MODEL_CARRIER not in reached:
+            failures.append(
+                f"{sibling}: does not reach {SURFACE_MODEL_CARRIER}; a named "
+                "surface model specializes the shared rank-one carrier"
+            )
+        for other in SURFACE_MODEL_SIBLINGS:
+            if other != sibling and other in reached:
+                failures.append(
+                    f"{sibling}: reaches sibling model {other}; named surface "
+                    "models share a carrier, not each other"
+                )
+
+    # (d) The arbitrary-divisor-rank charge is a sibling input of the shared
+    # exponential kernel, not a child of the compressed `H`-degree families.
+    # Both branches must reach the kernel; only the compressed one may reach a
+    # degree vector.
+    for branch in (ARBITRARY_RANK_CHARGE_BRANCH, COMPRESSED_DEGREE_BRANCH):
+        if branch not in modules:
+            failures.append(
+                f"missing {branch}; the exponential kernel needs both of its "
+                "input branches to stay a shared root"
+            )
+        elif EXPONENTIAL_KERNEL_ROOT not in closure.of(branch):
+            failures.append(
+                f"{branch}: no longer reaches {EXPONENTIAL_KERNEL_ROOT}; the "
+                "two charge branches are siblings under one kernel"
+            )
+    if ARBITRARY_RANK_CHARGE_BRANCH in modules:
+        reached = closure.of(ARBITRARY_RANK_CHARGE_BRANCH)
+        forbidden = sorted(
+            dep
+            for dep in reached
+            if dep == COMPRESSED_DEGREE_BRANCH
+            or any(in_tree(dep, root) for root in SCALAR_DEGREE_COMPRESSION)
+        )
+        if forbidden:
+            failures.append(
+                f"{ARBITRARY_RANK_CHARGE_BRANCH}: reaches {forbidden[0]}; the "
+                "multi-divisor charge takes two classes in the full real "
+                "divisor space, has no degree vector to hand the kernel, and "
+                "is therefore a sibling of the compressed families rather "
+                "than a child of them"
+            )
+    # The geometry demonstrations of that branch keep the same discipline: a
+    # rank-two or rank-three divisor model does not import the rank-one
+    # carrier or the scalar polarised transport to obtain its charge.
+    for module in ARBITRARY_RANK_CHARGE_DEMONSTRATIONS:
+        if module not in modules:
+            failures.append(
+                f"missing arbitrary-divisor-rank demonstration {module}; the "
+                "multi-divisor charge branch has no other witness"
+            )
+            continue
+        direct = set(modules[module][1])
+        forbidden = sorted(
+            dep
+            for dep in direct
+            if any(in_tree(dep, root) for root in SCALAR_DEGREE_COMPRESSION)
+        )
+        if forbidden:
+            failures.append(
+                f"{module}: imports {forbidden[0]}; an arbitrary-rank divisor "
+                "model builds its charge from the intersection form, not by "
+                "specializing the lossy scalar H-degree compression"
+            )
+    return failures, (
+        f"the {len(MO1_06_OWNERS)} numerical-model owners exist, no model "
+        f"reaches a demonstration, the {len(SURFACE_MODEL_SIBLINGS)} named "
+        "surface models share one carrier and no sibling, and the "
+        "arbitrary-divisor-rank charge reaches the exponential kernel without "
+        "a degree vector"
+    )
+
+
+def _rule_mo1_07(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """MO1.07. Returns its failures and the clause it contributes."""
+    failures: list[str] = []
+    # Rule 9.
+    yoneda_root = SOURCE_ROOT / LINEAR_YONEDA_ROOT
+    if not yoneda_root.is_file():
+        failures.append(
+            f"missing {yoneda_root.relative_to(ROOT)}: it owns the linear "
+            "Yoneda representability block; see "
+            "docs/architecture/cutover-ledger.md"
+        )
+    else:
+        yoneda_module = module_of(yoneda_root)
+        yoneda_imports, _ = parse(yoneda_root)
+        for imp in yoneda_imports:
+            if in_tree(imp, LIBRARY):
+                failures.append(
+                    f"{yoneda_root.relative_to(ROOT)}: imports {imp}; these "
+                    "three helpers are Mathlib's full and faithful "
+                    "`linearYoneda` and nothing else"
+                )
+        yoneda_declared = declared_names(yoneda_root.read_text(encoding="utf-8"))
+        for name in LINEAR_YONEDA_BLOCK:
+            if name not in yoneda_declared:
+                failures.append(
+                    f"{yoneda_root.relative_to(ROOT)}: no longer declares "
+                    f"{name}; the linear Yoneda block's canonical owner is "
+                    "this file"
+                )
+        for module, (path, _, _) in modules.items():
+            if module == yoneda_module:
+                continue
+            stray = declared_names(path.read_text(encoding="utf-8")) & set(
+                LINEAR_YONEDA_BLOCK
+            )
+            if stray:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)} "
+                    f"from the linear Yoneda block; import {yoneda_module} "
+                    "instead"
+                )
+    serre_root_dir = SOURCE_ROOT / LINEAR_SERRE_ROOT_DIR
+    if not serre_root_dir.is_dir():
+        failures.append(
+            f"missing {serre_root_dir.relative_to(ROOT)}: it owns the k-linear "
+            "Serre duality data; see docs/architecture/cutover-ledger.md"
+        )
+    else:
+        serre_root_module = module_of(serre_root_dir.with_suffix(".lean"))
+        for module in modules:
+            if not (
+                module == serre_root_module
+                or in_tree(module, serre_root_module)
+                or module == module_of(SOURCE_ROOT / LINEAR_YONEDA_ROOT)
+            ):
+                continue
+            reached = sorted(
+                dep
+                for dep in closure.of(module)
+                if in_tree(dep, TRIANGULATED_TREE)
+            )
+            if reached:
+                failures.append(
+                    f"{module}: reaches {reached[0]}; the linear Serre root "
+                    "exists to be importable without a shift or a "
+                    "triangulation (MO1.07)"
+                )
+    return failures, (
+        f"the {len(LINEAR_YONEDA_BLOCK)}-declaration linear Yoneda block needs "
+        "Mathlib alone and the linear Serre root reaches no triangulated module"
+    )
+
+
+def _rule_mo1_08(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """MO1.08. Returns its failures and the clause it contributes."""
+    failures: list[str] = []
+    # Rule 13, MO1.08. The closure claims are checked uniformly in
+    # `owner_boundary_failures` above, so the fixtures exercise the same
+    # predicate; what is left here is the existence of the owners, the one
+    # claim about the comparison module, and the single declaration of IsPure.
+    for entry in (
+        ABELIAN_STABILITY_UMBRELLA,
+        ABELIAN_STABILITY_WEAK_UMBRELLA,
+        HEART_DATUM_ADAPTER,
+        SHEAF_PURITY_ROOT,
+    ):
+        if not (SOURCE_ROOT / entry).is_file():
+            failures.append(
+                f"missing MO1.08 owner {entry}; see "
+                "docs/architecture/cutover-ledger.md"
+            )
+
+    # No module below AlgebraicGeometry/Stability/ may buy back the rule 3
+    # exemption MO1.08 removed. The same guard rule 12 puts on numerical models.
+    for root in STABILITY_CONSUMING_GEOMETRY:
+        if in_tree(root, SHEAF_STABILITY_TREE):
+            failures.append(
+                f"{root}: stability of sheaves may not be exempted from rule "
+                "3; it instantiates the abelian slope theory at "
+                f"{ABELIAN_STABILITY_TREE} and needs no stability condition"
+            )
+
+    # The comparison owner joins the two geometric theories and is joined by
+    # neither. An empty Comparison.lean with the statements left in a sibling
+    # would pass the two closure checks above and defeat the point of the row.
+    if SHEAF_COMPARISON_MODULE not in modules:
+        failures.append(
+            f"missing {SHEAF_COMPARISON_MODULE}; the slope/Gieseker comparison "
+            "needs an owner that is not either theory"
+        )
+    else:
+        reached = closure.of(SHEAF_COMPARISON_MODULE)
+        for tree in (SHEAF_SLOPE_TREE, SHEAF_GIESEKER_TREE):
+            if not any(in_tree(dep, tree) for dep in reached):
+                failures.append(
+                    f"{SHEAF_COMPARISON_MODULE}: does not reach {tree}; the "
+                    "comparison owner is the module that sees both theories"
+                )
+        for module in sorted(modules):
+            if not (
+                in_tree(module, SHEAF_SLOPE_TREE)
+                or in_tree(module, SHEAF_GIESEKER_TREE)
+            ):
+                continue
+            if SHEAF_COMPARISON_MODULE in closure.of(module):
+                failures.append(
+                    f"{module}: reaches {SHEAF_COMPARISON_MODULE}; a theory "
+                    "does not import its own comparison with another one"
+                )
+
+    purity_root = SOURCE_ROOT / SHEAF_PURITY_ROOT
+    if purity_root.is_file():
+        purity_module = module_of(purity_root)
+        purity_declared = declared_names(purity_root.read_text(encoding="utf-8"))
+        for name in SHEAF_PURITY_BLOCK:
+            if name not in purity_declared:
+                failures.append(
+                    f"{purity_root.relative_to(ROOT)}: no longer declares "
+                    f"{name}; purity is what the slope and Gieseker theories "
+                    "share, and it has one owner"
+                )
+        for module, (path, _, _) in modules.items():
+            if module == purity_module:
+                continue
+            stray = declared_names(path.read_text(encoding="utf-8")) & set(
+                SHEAF_PURITY_BLOCK
+            )
+            if stray:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)} "
+                    f"from the purity block; import {purity_module} instead"
+                )
+
+    positive_frame_module = module_of(SOURCE_ROOT / POSITIVE_FRAME_ROOT)
+    forbidden_frame_dependencies = (
+        f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityFiniteness",
+        f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityRegion",
+    )
+    if positive_frame_module in modules:
+        reached = closure.of(positive_frame_module)
+        for dependency in forbidden_frame_dependencies:
+            if dependency in reached:
+                failures.append(
+                    f"{positive_frame_module}: reaches {dependency}; positive "
+                    "frames forget to positive planes and do not depend on an "
+                    "orthogonality arrangement or its finiteness theorem"
+                )
+
+    all_library_text = "\n".join(
+        path.read_text(encoding="utf-8") for path, _, _ in modules.values()
+    )
+    if "RealCodimensionOneSubmanifold" in all_library_text:
+        failures.append(
+            "RealCodimensionOneSubmanifold appears in the library; MO1.03 "
+            "forbids a common codimension-one parent for charge-zero, "
+            "alignment, and signed-ray loci"
+        )
+    return failures, (
+        "abelian stability reaches no triangulated module, sheaf slope and "
+        "Gieseker stability reach neither each other nor the stability tree, "
+        "and IsPure is declared once"
+    )
+
+
+def _rule_mo1_09(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """MO1.09. Returns its failures and the clause it contributes."""
+    failures: list[str] = []
+    # Rule 15, MO1.09. Owners first, then the one import claim that matters.
+    for entry, names in MO1_09_OWNERS.items():
+        path = SOURCE_ROOT / entry
+        if not path.is_file():
+            failures.append(f"missing MO1.09 owner {path.relative_to(ROOT)}")
+            continue
+        text = path.read_text(encoding="utf-8")
+        declared = declared_names(text) | structure_names(text)
+        for name in names:
+            if name not in declared:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: no longer declares {name}; the "
+                    "presentation/enhancement split requires this canonical owner"
+                )
+    if not (SOURCE_ROOT / DG_H0_UMBRELLA).is_file():
+        failures.append(
+            f"missing {DG_H0_UMBRELLA}: the intrinsic H0 theory of a dg "
+            "category needs an umbrella of its own, separate from the "
+            "enhancement comparisons"
+        )
+    # The dg encoding root, H0 subtree included, reaches no consumer that has
+    # already chosen a category to compare with, and no geometry or stability.
+    forbidden_dg_consumers = (
+        DG_ENHANCEMENT_TREE,
+        HOMOTOPY_ENHANCEMENT_TREE,
+        GEOMETRY,
+        STABILITY_ROOT,
+    )
+    for module in sorted(modules):
+        if not (module == DG_ROOT or in_tree(module, DG_ROOT)):
+            continue
+        reached = sorted(
+            dep
+            for dep in closure.of(module)
+            if any(in_tree(dep, root) for root in forbidden_dg_consumers)
+        )
+        if reached:
+            failures.append(
+                f"{module}: reaches {reached[0]}; intrinsic dg H0 theory is "
+                "stated before any external category is chosen, so it imports "
+                "no enhancement consumer, scheme realization or stability "
+                "module (MO1.09)"
+            )
+    return failures, (
+        f"the {len(MO1_09_OWNERS)} presentation/enhancement owners exist and "
+        "the dg encoding root reaches no enhancement consumer, scheme "
+        "realization or stability module"
+    )
+
+
+def _rule_mo1_10(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """MO1.10. Returns its failures and the clause it contributes."""
+    failures: list[str] = []
+    # Rule 17, derived-operation owners are reachable without a kernel.
+    for entry in DERIVED_OPERATION_OWNERS:
+        path = SOURCE_ROOT / entry
+        if not (path.is_file() or path.is_dir()):
+            failures.append(
+                f"missing {entry}: it owns a general derived operation "
+                "extracted from Fourier--Mukai; see "
+                "docs/architecture/cutover-ledger.md row 10"
+            )
+            continue
+        owner_module = module_of(
+            path if path.is_file() else path.with_suffix(".lean")
+        )
+        for module in modules:
+            if not (module == owner_module or in_tree(module, owner_module)):
+                continue
+            for tree, why in (
+                (GEOMETRIC_FOURIER_MUKAI_TREE, "the geometric kernel subtree"),
+                (ABSTRACT_FOURIER_MUKAI_TREE, "the abstract kernel subtree"),
+                (STABILITY_ROOT, "the stability tree"),
+            ):
+                reached = sorted(
+                    dep for dep in closure.of(module) if in_tree(dep, tree)
+                )
+                if reached:
+                    failures.append(
+                        f"{module}: reaches {reached[0]} in {why}; the derived "
+                        "tensor and pushforward capabilities exist to be "
+                        "importable without a kernel, a correspondence or a "
+                        "stability condition (MO1.10)"
+                    )
+    return failures, (
+        f"the {len(DERIVED_OPERATION_OWNERS)} derived-operation owners reach "
+        "neither Fourier--Mukai subtree nor the stability tree"
+    )
+
+
+def _rule_mo1_11(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """MO1.11. Returns its failures and the clause it contributes."""
+    failures: list[str] = []
+    for entry in PERFECTNESS_OWNERS:
+        path = SOURCE_ROOT / entry
+        if not (path.is_file() or path.is_dir()):
+            failures.append(
+                f"missing {entry}: it owns a flatness or relative-perfection "
+                "predicate extracted from the moduli consumer; see "
+                "docs/architecture/cutover-ledger.md row 11"
+            )
+            continue
+        # The forbidden import edges themselves are checked in
+        # owner_boundary_failures, which runs over both real modules and the
+        # known-answer fixtures, so the rule cannot pass vacuously.
+
+    # And the moduli consumer still reaches what it consumes.
+    perfect_consumer = module_of(
+        (SOURCE_ROOT / PERFECTNESS_CONSUMER).with_suffix(".lean")
+    )
+    if perfect_consumer in modules:
+        perfect_owner = module_of(
+            (SOURCE_ROOT / PERFECTNESS_OWNERS[0]).with_suffix(".lean")
+        )
+        reached = closure.of(perfect_consumer) | {perfect_consumer}
+        if not any(in_tree(dep, perfect_owner) for dep in reached):
+            failures.append(
+                f"{perfect_consumer}: no longer reaches {perfect_owner}; the "
+                "relative-perfect moduli problem must consume the extracted "
+                "predicates as an import edge, not restate them"
+            )
+    return failures, (
+        f"the {len(PERFECTNESS_OWNERS)} perfectness owners reach neither "
+        "the moduli tree nor the stability tree while the relative-perfect "
+        "moduli problem still reaches them"
+    )
+
+
+def _rule_mo1_12(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """MO1.12. Returns its failures and the clause it contributes."""
+    failures: list[str] = []
+    # Rule 16, MO1.12. Owners first, then the three claims the split makes.
+    gl_cover_dir = SOURCE_ROOT / GL_COVER_ROOT_DIR
+    shift_dir = SOURCE_ROOT / NORMALIZED_SHIFT_ROOT_DIR
+    for owner, what in (
+        (gl_cover_dir, "the universal cover of GL+(2,R)"),
+        (shift_dir, "the +1-equivariant order automorphisms of R"),
+        (SOURCE_ROOT / GL_COVER_POSITIVE_ROOT, "the GL+(2,R) matrix coercion"),
+        (
+            SOURCE_ROOT / COMPLEX_COORDINATES_ROOT,
+            "the cover-independent complex-coordinate adapter",
+        ),
+        (SOURCE_ROOT / GENERAL_COVERING_ROOT, "the general covering lemmas"),
+        (
+            SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR,
+            "the action on slicings, charges and stability conditions",
+        ),
+    ):
+        if not (owner.is_dir() or owner.is_file()):
+            failures.append(
+                f"missing {owner.relative_to(ROOT)}: it owns {what}; see "
+                "docs/architecture/cutover-ledger.md row 08"
+            )
+
+    # (a) The action adapter did NOT follow the group out. Its block names the
+    # four action constructions the ledger keeps under stability; a move of any
+    # of them into the neutral cover would be the defect MO1.12 repaired,
+    # inverted.
+    if (SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR).is_dir():
+        action_declared: set[str] = set()
+        for path in (SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR).rglob("*.lean"):
+            action_declared |= declared_names(path.read_text(encoding="utf-8"))
+        for name in GL_COVER_ACTION_BLOCK:
+            if name not in action_declared:
+                failures.append(
+                    f"{GL_COVER_ACTION_ROOT_DIR}: no longer declares {name}; "
+                    "the phase conventions and the action on slicings, charges "
+                    "and stability conditions stay with stability (MO1.12)"
+                )
+
+    # (b) The two extracted neutral blocks are declared once, at their owner.
+    for root, block in (
+        (COMPLEX_COORDINATES_ROOT, COMPLEX_COORDINATES_BLOCK),
+        (GENERAL_COVERING_ROOT, GENERAL_COVERING_BLOCK),
+    ):
+        owner_path = SOURCE_ROOT / root
+        if not owner_path.is_file():
+            continue
+        owner_module = module_of(owner_path)
+        owner_declared = declared_names(owner_path.read_text(encoding="utf-8"))
+        for name in block:
+            if name not in owner_declared:
+                failures.append(
+                    f"{root}: no longer declares {name}; MO1.12 made this file "
+                    "its canonical owner"
+                )
+        for module, (path, _, _) in modules.items():
+            if module == owner_module:
+                continue
+            stray = declared_names(path.read_text(encoding="utf-8")) & set(block)
+            if stray:
+                failures.append(
+                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)}; "
+                    f"import {owner_module} instead"
+                )
+
+    # (c) The stability action still reaches the group it acts by. A split that
+    # left the adapter unable to name the cover would be a different defect.
+    action_module = module_of(
+        (SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR).with_suffix(".lean")
+    )
+    if action_module in modules:
+        cover_module = module_of(gl_cover_dir.with_suffix(".lean"))
+        reached = closure.of(action_module) | {action_module}
+        if not any(in_tree(dep, cover_module) for dep in reached):
+            failures.append(
+                f"{action_module}: no longer reaches {cover_module}; the "
+                "projection and comparison that stability consumes must stay "
+                "an import edge, not a restatement"
+            )
+    return failures, (
+        "the GL+(2,R) cover and its order-automorphism core reach neither "
+        "stability nor geometry while the action adapter still reaches the "
+        "cover"
+    )
+
+
+def _rule_mo1_13(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """MO1.13. Returns its failures and the clause it contributes."""
+    failures: list[str] = []
+    # Rule 14.
+    analysis_modules = [
+        m for m in modules if m == ANALYSIS_ROOT or in_tree(m, ANALYSIS_ROOT)
+    ]
+    if not analysis_modules:
+        failures.append(
+            f"missing {ANALYSIS_ROOT}: it owns the neutral planar core -- the "
+            "polygonal-path carrier, the real continuous linear functionals on "
+            "the complex plane, and the Euclidean perimeter comparison; see "
+            "docs/architecture/cutover-ledger.md"
+        )
+    for module in analysis_modules:
+        reached = sorted(
+            dep
+            for dep in closure.of(module)
+            if dep != module
+            and any(
+                dep == prefix or dep.startswith(prefix + ".")
+                for prefix in ANALYSIS_FORBIDDEN_PREFIXES
+            )
+        )
+        if reached:
+            failures.append(
+                f"{module}: reaches {reached[0]}; the neutral planar core "
+                "exists to be importable with no category theory and no "
+                "stability (MO1.13)"
+            )
+    return failures, (
+        f"the {len(analysis_modules)} neutral planar modules below Analysis/ "
+        "reach no category, no scheme and no stability condition"
+    )
+
+
+# Every milestone that pins a claim used to append TWICE: a block at the end
+# of main() and a clause at the end of the `ok:` string. Both are the same
+# shape of edit -- insert before a fixed closing line -- so two milestones in
+# flight always conflicted there, exactly as they did in RETIRED_BY_CUTOVER.
+# MO1.10 (#1363) hit all three sites and was renumbered 13 -> 15 -> 16 -> 17
+# over four merges of main, none of which was about its own subject.
+#
+# A rule now registers itself under its milestone key, in sorted position,
+# and carries its own clause home. A new milestone adds ONE dict entry and
+# ONE function next to its constants; it touches no shared closing line and
+# claims no number. `check_milestone_rule_keys` pins the sortedness, for the
+# same reason it is pinned on the cutover groups: an entry appended at the
+# tail restores the old behaviour silently, and the next two milestones pay.
+#
+# The key is the milestone, not a rule number, because the number was never
+# load-bearing -- failure messages already cite `(MO1.08)`, the cutover
+# ledger cites rows, and the docstring's own list is neither contiguous nor
+# ordered. Numbering was a counter two writers incremented at once.
+MILESTONE_RULES: dict[str, MilestoneRule] = {
+    "MO1.03": _rule_mo1_03,
+    "MO1.06": _rule_mo1_06,
+    "MO1.07": _rule_mo1_07,
+    "MO1.08": _rule_mo1_08,
+    "MO1.09": _rule_mo1_09,
+    "MO1.10": _rule_mo1_10,
+    "MO1.11": _rule_mo1_11,
+    "MO1.12": _rule_mo1_12,
+    "MO1.13": _rule_mo1_13,
+}
+
+
+def check_milestone_rule_keys() -> list[str]:
+    """Pin the key order of `MILESTONE_RULES`.
+
+    Not a layering claim: a claim about the next two milestones. Sorted keys put
+    their entries at different offsets and git merges them; a key appended at the
+    tail puts them back on one line.
+    """
+    failures = []
+    keys = list(MILESTONE_RULES)
+    if keys != sorted(keys):
+        out_of_place = [k for k, want in zip(keys, sorted(keys)) if k != want]
+        failures.append(
+            f"MILESTONE_RULES keys are not sorted (first out of place: "
+            f"{out_of_place[0]}); a milestone appended at the tail rather than "
+            "inserted at its key puts the next two back on the same lines"
+        )
+
+    # The DEFINITIONS have to be in that order too, and this is not pedantry:
+    # a sorted dict whose functions are all appended at one anchor moves the
+    # collision from the dict to the anchor rather than removing it. Measured
+    # while writing this -- two simulated milestones merged cleanly in the dict
+    # and conflicted over their function bodies. Ordering by key puts those
+    # bodies at different offsets too.
+    defined = [
+        (k, fn.__code__.co_firstlineno)
+        for k, fn in MILESTONE_RULES.items()
+    ]
+    by_line = [k for k, _ in sorted(defined, key=lambda kv: kv[1])]
+    if by_line != sorted(by_line):
+        stray = [k for k, want in zip(by_line, sorted(by_line)) if k != want]
+        failures.append(
+            f"MILESTONE_RULES functions are not defined in key order (first "
+            f"out of place: {stray[0]}); define a new rule beside its "
+            "key-neighbours, not at the end of the run, or the next two "
+            "milestones conflict over the same anchor"
+        )
+    return failures
 
 
 def check_retired_group_keys() -> list[str]:
@@ -1358,528 +2071,15 @@ def main() -> int:
         if not path.is_file():
             failures.append(f"missing neutral charge root {path.relative_to(ROOT)}")
 
-    # Rule 10, declaration owners and the one import edge that matters to the
-    # frame/plane split. The executable-only historical aliases are outside
-    # SOURCE_ROOT and therefore cannot satisfy these checks.
-    for entry, names in MO1_03_OWNERS.items():
-        path = SOURCE_ROOT / entry
-        if not path.is_file():
-            failures.append(f"missing MO1.03 owner {path.relative_to(ROOT)}")
-            continue
-        declared = declared_names(path.read_text(encoding="utf-8")) | structure_names(
-            path.read_text(encoding="utf-8")
-        )
-        for name in names:
-            if name not in declared:
-                failures.append(
-                    f"{path.relative_to(ROOT)}: no longer declares {name}; "
-                    "the frame/plane/locus split requires this canonical owner"
-                )
+    # Every milestone rule, in sorted key order, each returning its own
+    # failures and its own clause of the `ok:` line.
+    milestone_clauses: list[str] = []
+    for _key, _rule in MILESTONE_RULES.items():
+        _rule_failures, _clause = _rule(modules, closure)
+        failures += _rule_failures
+        milestone_clauses.append(_clause)
 
-    # Rule 12, MO1.06. Owners first, then the four claims the split makes.
-    for entry, names in MO1_06_OWNERS.items():
-        path = SOURCE_ROOT / entry
-        if not path.is_file():
-            failures.append(f"missing MO1.06 owner {path.relative_to(ROOT)}")
-            continue
-        text = path.read_text(encoding="utf-8")
-        declared = declared_names(text) | structure_names(text)
-        for name in names:
-            if name not in declared:
-                failures.append(
-                    f"{path.relative_to(ROOT)}: no longer declares {name}; "
-                    "the model/demonstration split requires this canonical owner"
-                )
-    if not (SOURCE_ROOT / NUMERICAL_MODELS_UMBRELLA).is_file():
-        failures.append(
-            f"missing {NUMERICAL_MODELS_UMBRELLA}: the formal numerical models "
-            "need an umbrella of their own, separate from the demonstrations"
-        )
-
-    # (a) No model may buy a stability exemption. Rule 3 already holds the tree
-    # neutral; this keeps a future edit from adding `Numerical.Models` to the
-    # exempt list instead of fixing the import that made it necessary.
-    for root in STABILITY_CONSUMING_GEOMETRY:
-        if in_tree(root, NUMERICAL_MODELS_TREE):
-            failures.append(
-                f"{root}: a formal numerical model may not be exempted from "
-                "rule 3; move the charge or wall material to "
-                "Numerical/Examples/ instead"
-            )
-
-    # (b) Models are upstream of the demonstrations built on them.
-    for module in sorted(modules):
-        if not in_tree(module, NUMERICAL_MODELS_TREE):
-            continue
-        reached = sorted(
-            dep
-            for dep in closure.of(module)
-            if in_tree(dep, NUMERICAL_DEMONSTRATIONS_TREE)
-        )
-        if reached:
-            failures.append(
-                f"{module}: reaches {reached[0]}; a numerical model is "
-                "upstream of the realizations, charges and walls demonstrated "
-                "on it"
-            )
-
-    # (c) The named surface models are siblings over one shared carrier.
-    for sibling in SURFACE_MODEL_SIBLINGS:
-        if sibling not in modules:
-            failures.append(
-                f"missing named surface model {sibling}; K3, abelian, Enriques "
-                "and the projective plane are siblings over "
-                f"{SURFACE_MODEL_CARRIER}"
-            )
-            continue
-        reached = closure.of(sibling)
-        if SURFACE_MODEL_CARRIER not in reached:
-            failures.append(
-                f"{sibling}: does not reach {SURFACE_MODEL_CARRIER}; a named "
-                "surface model specializes the shared rank-one carrier"
-            )
-        for other in SURFACE_MODEL_SIBLINGS:
-            if other != sibling and other in reached:
-                failures.append(
-                    f"{sibling}: reaches sibling model {other}; named surface "
-                    "models share a carrier, not each other"
-                )
-
-    # (d) The arbitrary-divisor-rank charge is a sibling input of the shared
-    # exponential kernel, not a child of the compressed `H`-degree families.
-    # Both branches must reach the kernel; only the compressed one may reach a
-    # degree vector.
-    for branch in (ARBITRARY_RANK_CHARGE_BRANCH, COMPRESSED_DEGREE_BRANCH):
-        if branch not in modules:
-            failures.append(
-                f"missing {branch}; the exponential kernel needs both of its "
-                "input branches to stay a shared root"
-            )
-        elif EXPONENTIAL_KERNEL_ROOT not in closure.of(branch):
-            failures.append(
-                f"{branch}: no longer reaches {EXPONENTIAL_KERNEL_ROOT}; the "
-                "two charge branches are siblings under one kernel"
-            )
-    if ARBITRARY_RANK_CHARGE_BRANCH in modules:
-        reached = closure.of(ARBITRARY_RANK_CHARGE_BRANCH)
-        forbidden = sorted(
-            dep
-            for dep in reached
-            if dep == COMPRESSED_DEGREE_BRANCH
-            or any(in_tree(dep, root) for root in SCALAR_DEGREE_COMPRESSION)
-        )
-        if forbidden:
-            failures.append(
-                f"{ARBITRARY_RANK_CHARGE_BRANCH}: reaches {forbidden[0]}; the "
-                "multi-divisor charge takes two classes in the full real "
-                "divisor space, has no degree vector to hand the kernel, and "
-                "is therefore a sibling of the compressed families rather "
-                "than a child of them"
-            )
-    # The geometry demonstrations of that branch keep the same discipline: a
-    # rank-two or rank-three divisor model does not import the rank-one
-    # carrier or the scalar polarised transport to obtain its charge.
-    for module in ARBITRARY_RANK_CHARGE_DEMONSTRATIONS:
-        if module not in modules:
-            failures.append(
-                f"missing arbitrary-divisor-rank demonstration {module}; the "
-                "multi-divisor charge branch has no other witness"
-            )
-            continue
-        direct = set(modules[module][1])
-        forbidden = sorted(
-            dep
-            for dep in direct
-            if any(in_tree(dep, root) for root in SCALAR_DEGREE_COMPRESSION)
-        )
-        if forbidden:
-            failures.append(
-                f"{module}: imports {forbidden[0]}; an arbitrary-rank divisor "
-                "model builds its charge from the intersection form, not by "
-                "specializing the lossy scalar H-degree compression"
-            )
-
-    # Rule 13, MO1.08. The closure claims are checked uniformly in
-    # `owner_boundary_failures` above, so the fixtures exercise the same
-    # predicate; what is left here is the existence of the owners, the one
-    # claim about the comparison module, and the single declaration of IsPure.
-    for entry in (
-        ABELIAN_STABILITY_UMBRELLA,
-        ABELIAN_STABILITY_WEAK_UMBRELLA,
-        HEART_DATUM_ADAPTER,
-        SHEAF_PURITY_ROOT,
-    ):
-        if not (SOURCE_ROOT / entry).is_file():
-            failures.append(
-                f"missing MO1.08 owner {entry}; see "
-                "docs/architecture/cutover-ledger.md"
-            )
-
-    # No module below AlgebraicGeometry/Stability/ may buy back the rule 3
-    # exemption MO1.08 removed. The same guard rule 12 puts on numerical models.
-    for root in STABILITY_CONSUMING_GEOMETRY:
-        if in_tree(root, SHEAF_STABILITY_TREE):
-            failures.append(
-                f"{root}: stability of sheaves may not be exempted from rule "
-                "3; it instantiates the abelian slope theory at "
-                f"{ABELIAN_STABILITY_TREE} and needs no stability condition"
-            )
-
-    # The comparison owner joins the two geometric theories and is joined by
-    # neither. An empty Comparison.lean with the statements left in a sibling
-    # would pass the two closure checks above and defeat the point of the row.
-    if SHEAF_COMPARISON_MODULE not in modules:
-        failures.append(
-            f"missing {SHEAF_COMPARISON_MODULE}; the slope/Gieseker comparison "
-            "needs an owner that is not either theory"
-        )
-    else:
-        reached = closure.of(SHEAF_COMPARISON_MODULE)
-        for tree in (SHEAF_SLOPE_TREE, SHEAF_GIESEKER_TREE):
-            if not any(in_tree(dep, tree) for dep in reached):
-                failures.append(
-                    f"{SHEAF_COMPARISON_MODULE}: does not reach {tree}; the "
-                    "comparison owner is the module that sees both theories"
-                )
-        for module in sorted(modules):
-            if not (
-                in_tree(module, SHEAF_SLOPE_TREE)
-                or in_tree(module, SHEAF_GIESEKER_TREE)
-            ):
-                continue
-            if SHEAF_COMPARISON_MODULE in closure.of(module):
-                failures.append(
-                    f"{module}: reaches {SHEAF_COMPARISON_MODULE}; a theory "
-                    "does not import its own comparison with another one"
-                )
-
-    purity_root = SOURCE_ROOT / SHEAF_PURITY_ROOT
-    if purity_root.is_file():
-        purity_module = module_of(purity_root)
-        purity_declared = declared_names(purity_root.read_text(encoding="utf-8"))
-        for name in SHEAF_PURITY_BLOCK:
-            if name not in purity_declared:
-                failures.append(
-                    f"{purity_root.relative_to(ROOT)}: no longer declares "
-                    f"{name}; purity is what the slope and Gieseker theories "
-                    "share, and it has one owner"
-                )
-        for module, (path, _, _) in modules.items():
-            if module == purity_module:
-                continue
-            stray = declared_names(path.read_text(encoding="utf-8")) & set(
-                SHEAF_PURITY_BLOCK
-            )
-            if stray:
-                failures.append(
-                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)} "
-                    f"from the purity block; import {purity_module} instead"
-                )
-
-    positive_frame_module = module_of(SOURCE_ROOT / POSITIVE_FRAME_ROOT)
-    forbidden_frame_dependencies = (
-        f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityFiniteness",
-        f"{LIBRARY}.LinearAlgebra.QuadraticForm.OrthogonalityRegion",
-    )
-    if positive_frame_module in modules:
-        reached = closure.of(positive_frame_module)
-        for dependency in forbidden_frame_dependencies:
-            if dependency in reached:
-                failures.append(
-                    f"{positive_frame_module}: reaches {dependency}; positive "
-                    "frames forget to positive planes and do not depend on an "
-                    "orthogonality arrangement or its finiteness theorem"
-                )
-
-    all_library_text = "\n".join(
-        path.read_text(encoding="utf-8") for path, _, _ in modules.values()
-    )
-    if "RealCodimensionOneSubmanifold" in all_library_text:
-        failures.append(
-            "RealCodimensionOneSubmanifold appears in the library; MO1.03 "
-            "forbids a common codimension-one parent for charge-zero, "
-            "alignment, and signed-ray loci"
-        )
-
-    # Rule 9.
-    yoneda_root = SOURCE_ROOT / LINEAR_YONEDA_ROOT
-    if not yoneda_root.is_file():
-        failures.append(
-            f"missing {yoneda_root.relative_to(ROOT)}: it owns the linear "
-            "Yoneda representability block; see "
-            "docs/architecture/cutover-ledger.md"
-        )
-    else:
-        yoneda_module = module_of(yoneda_root)
-        yoneda_imports, _ = parse(yoneda_root)
-        for imp in yoneda_imports:
-            if in_tree(imp, LIBRARY):
-                failures.append(
-                    f"{yoneda_root.relative_to(ROOT)}: imports {imp}; these "
-                    "three helpers are Mathlib's full and faithful "
-                    "`linearYoneda` and nothing else"
-                )
-        yoneda_declared = declared_names(yoneda_root.read_text(encoding="utf-8"))
-        for name in LINEAR_YONEDA_BLOCK:
-            if name not in yoneda_declared:
-                failures.append(
-                    f"{yoneda_root.relative_to(ROOT)}: no longer declares "
-                    f"{name}; the linear Yoneda block's canonical owner is "
-                    "this file"
-                )
-        for module, (path, _, _) in modules.items():
-            if module == yoneda_module:
-                continue
-            stray = declared_names(path.read_text(encoding="utf-8")) & set(
-                LINEAR_YONEDA_BLOCK
-            )
-            if stray:
-                failures.append(
-                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)} "
-                    f"from the linear Yoneda block; import {yoneda_module} "
-                    "instead"
-                )
-    serre_root_dir = SOURCE_ROOT / LINEAR_SERRE_ROOT_DIR
-    if not serre_root_dir.is_dir():
-        failures.append(
-            f"missing {serre_root_dir.relative_to(ROOT)}: it owns the k-linear "
-            "Serre duality data; see docs/architecture/cutover-ledger.md"
-        )
-    else:
-        serre_root_module = module_of(serre_root_dir.with_suffix(".lean"))
-        for module in modules:
-            if not (
-                module == serre_root_module
-                or in_tree(module, serre_root_module)
-                or module == module_of(SOURCE_ROOT / LINEAR_YONEDA_ROOT)
-            ):
-                continue
-            reached = sorted(
-                dep
-                for dep in closure.of(module)
-                if in_tree(dep, TRIANGULATED_TREE)
-            )
-            if reached:
-                failures.append(
-                    f"{module}: reaches {reached[0]}; the linear Serre root "
-                    "exists to be importable without a shift or a "
-                    "triangulation (MO1.07)"
-                )
-
-    # Rule 15, MO1.09. Owners first, then the one import claim that matters.
-    for entry, names in MO1_09_OWNERS.items():
-        path = SOURCE_ROOT / entry
-        if not path.is_file():
-            failures.append(f"missing MO1.09 owner {path.relative_to(ROOT)}")
-            continue
-        text = path.read_text(encoding="utf-8")
-        declared = declared_names(text) | structure_names(text)
-        for name in names:
-            if name not in declared:
-                failures.append(
-                    f"{path.relative_to(ROOT)}: no longer declares {name}; the "
-                    "presentation/enhancement split requires this canonical owner"
-                )
-    if not (SOURCE_ROOT / DG_H0_UMBRELLA).is_file():
-        failures.append(
-            f"missing {DG_H0_UMBRELLA}: the intrinsic H0 theory of a dg "
-            "category needs an umbrella of its own, separate from the "
-            "enhancement comparisons"
-        )
-    # The dg encoding root, H0 subtree included, reaches no consumer that has
-    # already chosen a category to compare with, and no geometry or stability.
-    forbidden_dg_consumers = (
-        DG_ENHANCEMENT_TREE,
-        HOMOTOPY_ENHANCEMENT_TREE,
-        GEOMETRY,
-        STABILITY_ROOT,
-    )
-    for module in sorted(modules):
-        if not (module == DG_ROOT or in_tree(module, DG_ROOT)):
-            continue
-        reached = sorted(
-            dep
-            for dep in closure.of(module)
-            if any(in_tree(dep, root) for root in forbidden_dg_consumers)
-        )
-        if reached:
-            failures.append(
-                f"{module}: reaches {reached[0]}; intrinsic dg H0 theory is "
-                "stated before any external category is chosen, so it imports "
-                "no enhancement consumer, scheme realization or stability "
-                "module (MO1.09)"
-            )
-
-    # Rule 14.
-    analysis_modules = [
-        m for m in modules if m == ANALYSIS_ROOT or in_tree(m, ANALYSIS_ROOT)
-    ]
-    if not analysis_modules:
-        failures.append(
-            f"missing {ANALYSIS_ROOT}: it owns the neutral planar core -- the "
-            "polygonal-path carrier, the real continuous linear functionals on "
-            "the complex plane, and the Euclidean perimeter comparison; see "
-            "docs/architecture/cutover-ledger.md"
-        )
-    for module in analysis_modules:
-        reached = sorted(
-            dep
-            for dep in closure.of(module)
-            if dep != module
-            and any(
-                dep == prefix or dep.startswith(prefix + ".")
-                for prefix in ANALYSIS_FORBIDDEN_PREFIXES
-            )
-        )
-        if reached:
-            failures.append(
-                f"{module}: reaches {reached[0]}; the neutral planar core "
-                "exists to be importable with no category theory and no "
-                "stability (MO1.13)"
-            )
-
-    # Rule 16, MO1.12. Owners first, then the three claims the split makes.
-    gl_cover_dir = SOURCE_ROOT / GL_COVER_ROOT_DIR
-    shift_dir = SOURCE_ROOT / NORMALIZED_SHIFT_ROOT_DIR
-    for owner, what in (
-        (gl_cover_dir, "the universal cover of GL+(2,R)"),
-        (shift_dir, "the +1-equivariant order automorphisms of R"),
-        (SOURCE_ROOT / GL_COVER_POSITIVE_ROOT, "the GL+(2,R) matrix coercion"),
-        (
-            SOURCE_ROOT / COMPLEX_COORDINATES_ROOT,
-            "the cover-independent complex-coordinate adapter",
-        ),
-        (SOURCE_ROOT / GENERAL_COVERING_ROOT, "the general covering lemmas"),
-        (
-            SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR,
-            "the action on slicings, charges and stability conditions",
-        ),
-    ):
-        if not (owner.is_dir() or owner.is_file()):
-            failures.append(
-                f"missing {owner.relative_to(ROOT)}: it owns {what}; see "
-                "docs/architecture/cutover-ledger.md row 08"
-            )
-
-    # (a) The action adapter did NOT follow the group out. Its block names the
-    # four action constructions the ledger keeps under stability; a move of any
-    # of them into the neutral cover would be the defect MO1.12 repaired,
-    # inverted.
-    if (SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR).is_dir():
-        action_declared: set[str] = set()
-        for path in (SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR).rglob("*.lean"):
-            action_declared |= declared_names(path.read_text(encoding="utf-8"))
-        for name in GL_COVER_ACTION_BLOCK:
-            if name not in action_declared:
-                failures.append(
-                    f"{GL_COVER_ACTION_ROOT_DIR}: no longer declares {name}; "
-                    "the phase conventions and the action on slicings, charges "
-                    "and stability conditions stay with stability (MO1.12)"
-                )
-
-    # (b) The two extracted neutral blocks are declared once, at their owner.
-    for root, block in (
-        (COMPLEX_COORDINATES_ROOT, COMPLEX_COORDINATES_BLOCK),
-        (GENERAL_COVERING_ROOT, GENERAL_COVERING_BLOCK),
-    ):
-        owner_path = SOURCE_ROOT / root
-        if not owner_path.is_file():
-            continue
-        owner_module = module_of(owner_path)
-        owner_declared = declared_names(owner_path.read_text(encoding="utf-8"))
-        for name in block:
-            if name not in owner_declared:
-                failures.append(
-                    f"{root}: no longer declares {name}; MO1.12 made this file "
-                    "its canonical owner"
-                )
-        for module, (path, _, _) in modules.items():
-            if module == owner_module:
-                continue
-            stray = declared_names(path.read_text(encoding="utf-8")) & set(block)
-            if stray:
-                failures.append(
-                    f"{path.relative_to(ROOT)}: redeclares {sorted(stray)}; "
-                    f"import {owner_module} instead"
-                )
-
-    # (c) The stability action still reaches the group it acts by. A split that
-    # left the adapter unable to name the cover would be a different defect.
-    action_module = module_of(
-        (SOURCE_ROOT / GL_COVER_ACTION_ROOT_DIR).with_suffix(".lean")
-    )
-    if action_module in modules:
-        cover_module = module_of(gl_cover_dir.with_suffix(".lean"))
-        reached = closure.of(action_module) | {action_module}
-        if not any(in_tree(dep, cover_module) for dep in reached):
-            failures.append(
-                f"{action_module}: no longer reaches {cover_module}; the "
-                "projection and comparison that stability consumes must stay "
-                "an import edge, not a restatement"
-            )
-
-    # Rule 17, derived-operation owners are reachable without a kernel.
-    for entry in DERIVED_OPERATION_OWNERS:
-        path = SOURCE_ROOT / entry
-        if not (path.is_file() or path.is_dir()):
-            failures.append(
-                f"missing {entry}: it owns a general derived operation "
-                "extracted from Fourier--Mukai; see "
-                "docs/architecture/cutover-ledger.md row 10"
-            )
-            continue
-        owner_module = module_of(
-            path if path.is_file() else path.with_suffix(".lean")
-        )
-        for module in modules:
-            if not (module == owner_module or in_tree(module, owner_module)):
-                continue
-            for tree, why in (
-                (GEOMETRIC_FOURIER_MUKAI_TREE, "the geometric kernel subtree"),
-                (ABSTRACT_FOURIER_MUKAI_TREE, "the abstract kernel subtree"),
-                (STABILITY_ROOT, "the stability tree"),
-            ):
-                reached = sorted(
-                    dep for dep in closure.of(module) if in_tree(dep, tree)
-                )
-                if reached:
-                    failures.append(
-                        f"{module}: reaches {reached[0]} in {why}; the derived "
-                        "tensor and pushforward capabilities exist to be "
-                        "importable without a kernel, a correspondence or a "
-                        "stability condition (MO1.10)"
-                    )
-
-    # Rule 18, perfectness owners are reachable without the moduli problem.
-    for entry in PERFECTNESS_OWNERS:
-        path = SOURCE_ROOT / entry
-        if not (path.is_file() or path.is_dir()):
-            failures.append(
-                f"missing {entry}: it owns a flatness or relative-perfection "
-                "predicate extracted from the moduli consumer; see "
-                "docs/architecture/cutover-ledger.md row 11"
-            )
-            continue
-        # The forbidden import edges themselves are checked in
-        # owner_boundary_failures, which runs over both real modules and the
-        # known-answer fixtures, so the rule cannot pass vacuously.
-
-    # Rule 18, and the moduli consumer still reaches what it consumes.
-    perfect_consumer = module_of(
-        (SOURCE_ROOT / PERFECTNESS_CONSUMER).with_suffix(".lean")
-    )
-    if perfect_consumer in modules:
-        perfect_owner = module_of(
-            (SOURCE_ROOT / PERFECTNESS_OWNERS[0]).with_suffix(".lean")
-        )
-        reached = closure.of(perfect_consumer) | {perfect_consumer}
-        if not any(in_tree(dep, perfect_owner) for dep in reached):
-            failures.append(
-                f"{perfect_consumer}: no longer reaches {perfect_owner}; the "
-                "relative-perfect moduli problem must consume the extracted "
-                "predicates as an import edge, not restate them"
-            )
-
+    failures += check_milestone_rule_keys()
     failures += check_retired_group_keys()
     failures += check_fixtures(closure)
 
@@ -1897,45 +2097,32 @@ def main() -> int:
         and m != GEOMETRY
         and not may_consume_stability(m)
     )
+    # The base claims -- the ones that are not any one milestone's -- then each
+    # milestone rule's own clause, in the registry's sorted key order. Nothing
+    # appends to a shared closing line any more.
     print(
-        f"ok: {len(modules)} modules; only AlgebraicGeometry/ and Development/ "
-        f"import geometry; {neutral} of {geometry} geometry modules are "
-        f"stability-neutral against {len(STABILITY_CONSUMING_GEOMETRY)} exempt "
-        "subcomponents; weak stability is independent of, and structurally "
-        f"parented by, Bridgeland stability; {len(RETIRED_PATHS)} retired paths "
-        f"absent; the {len(OBJECT_PROPERTY_BLOCK)}-declaration ObjectProperty "
-        "lift block is generic and declared once; the "
-        f"{len(DIVISORIAL_BLOCK)}-structure divisorial charge block and "
-        f"{len(HODGE_INDEX_BLOCK)}-structure neutral Hodge block are declared once; "
-        "the GL+(2,R) cover and its order-automorphism core reach neither "
-        "stability nor geometry while the action adapter still reaches the "
-        "cover; "
-        "central-charge roots reach neither walls nor geometry and the paired "
-        "functional reaches no wall arrangement; the positive-plane, "
-        "positive-frame, orthogonality, charge-zero, determinant-alignment, "
-        "and signed-ray owners are distinct, with no common codimension-one "
-        "parent; the "
-        f"{len(LINEAR_YONEDA_BLOCK)}-declaration linear Yoneda block needs "
-        "Mathlib alone and the linear Serre root reaches no triangulated module; "
-        "generic square-root, slope, and polarised-transport roots reach no "
-        "K3, surface, or dimension-specific consumers; the "
-        f"{len(MO1_06_OWNERS)} numerical-model owners exist, no model reaches "
-        "a demonstration, the "
-        f"{len(SURFACE_MODEL_SIBLINGS)} named surface models share one carrier "
-        "and no sibling, and the arbitrary-divisor-rank charge reaches the "
-        "exponential kernel without a degree vector; abelian stability reaches "
-        "no triangulated module, sheaf slope and Gieseker stability reach "
-        "neither each other nor the stability tree, and IsPure is declared once; "
-        f"the {len(analysis_modules)} neutral planar modules below Analysis/ "
-        "reach no category, no scheme and no stability condition; the "
-        f"{len(MO1_09_OWNERS)} presentation/enhancement owners exist and the dg "
-        "encoding root reaches no enhancement consumer, scheme realization or "
-        "stability module; the "
-        f"{len(DERIVED_OPERATION_OWNERS)} derived-operation owners reach "
-        "neither Fourier--Mukai subtree nor the stability tree; the "
-        f"{len(PERFECTNESS_OWNERS)} perfectness owners reach neither the "
-        "moduli tree nor the stability tree while the relative-perfect moduli "
-        "problem still reaches them"
+        "; ".join(
+            [
+                f"ok: {len(modules)} modules; only AlgebraicGeometry/ and "
+                f"Development/ import geometry",
+                f"{neutral} of {geometry} geometry modules are "
+                f"stability-neutral against {len(STABILITY_CONSUMING_GEOMETRY)} "
+                "exempt subcomponents",
+                "weak stability is independent of, and structurally parented "
+                "by, Bridgeland stability",
+                f"{len(RETIRED_PATHS)} retired paths absent",
+                f"the {len(OBJECT_PROPERTY_BLOCK)}-declaration ObjectProperty "
+                "lift block is generic and declared once",
+                f"the {len(DIVISORIAL_BLOCK)}-structure divisorial charge block "
+                f"and {len(HODGE_INDEX_BLOCK)}-structure neutral Hodge block "
+                "are declared once",
+                "central-charge roots reach neither walls nor geometry and the "
+                "paired functional reaches no wall arrangement",
+                "generic square-root, slope, and polarised-transport roots "
+                "reach no K3, surface, or dimension-specific consumers",
+                *milestone_clauses,
+            ]
+        )
     )
     return 0
 
