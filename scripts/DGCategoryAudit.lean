@@ -1743,3 +1743,38 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.Cdg.isKInjective_mappingCone
 #print axioms CategoryTheory.Cdg.isKProjectiveObj_iff
 #print axioms CategoryTheory.Cdg.isKProjective_mappingCone
+
+-- dg-enhancements-e9: the derived seam, `H⁰(D^dg A) ≃ D(A)`. The comparison
+-- factors through work that already exists -- `H⁰` of the e8 inclusion, then
+-- e4's `seam`, then Mathlib's `Qh` -- so only the last arrow carries new
+-- content, and it is where K-injectivity is spent.
+--
+-- FULL FAITHFULNESS IS UNCONDITIONAL. `derivedSeamFunctor_map_bijective`
+-- composes three bijections: the inclusion because `DGFullSubcategory` leaves
+-- the Hom-complexes ambient, `h0Functor` because e4 proved it an equivalence,
+-- and `Qh` because the target is K-injective (Mathlib's `Qh_map_bijective`).
+--
+-- ESSENTIAL SURJECTIVITY IS NOT, AND CANNOT BE AT THIS PIN. It needs K-injective
+-- resolutions to exist, which is Spaltenstein's theorem; Mathlib cites it in the
+-- references of `HomotopyCategory/KInjective.lean` and proves no existence
+-- statement. `HasKInjectiveResolutions` asks for exactly that mathematics -- a
+-- quasi-isomorphism into a K-injective complex -- and NOT for the conclusion that
+-- the functor is an equivalence, which would be the caller-supplied-conclusion
+-- trap e8's acceptance names. When Spaltenstein is formalized the class becomes
+-- an instance and `derivedSeam` goes unconditional with no consumer changing.
+#print axioms CategoryTheory.Cdg.HasKInjectiveResolutions
+#print axioms CategoryTheory.Cdg.HasKInjectiveResolutions.exists_kInjective_quasiIso
+#print axioms CategoryTheory.Cdg.ddgInclusion
+#print axioms CategoryTheory.Cdg.ddgInclusion_h0_faithful
+#print axioms CategoryTheory.Cdg.ddgInclusion_h0_full
+#print axioms CategoryTheory.Cdg.derivedCategoryQ_essSurj
+#print axioms CategoryTheory.Cdg.derivedSeam
+#print axioms CategoryTheory.Cdg.derivedSeamFunctor
+#print axioms CategoryTheory.Cdg.derivedSeamFunctor_essSurj
+#print axioms CategoryTheory.Cdg.derivedSeamFunctor_faithful
+#print axioms CategoryTheory.Cdg.derivedSeamFunctor_full
+#print axioms CategoryTheory.Cdg.derivedSeamFunctor_isEquivalence
+#print axioms CategoryTheory.Cdg.derivedSeamFunctor_map_bijective
+#print axioms CategoryTheory.Cdg.h0Functor_obj_ddgInclusion
+#print axioms CategoryTheory.Cdg.underlying
+#print axioms CategoryTheory.Cdg.underlying_isKInjective
