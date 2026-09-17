@@ -8,6 +8,7 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.AdjunctionH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.AdjunctionH0Presentation
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Copower
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Functor
+import DerivedAlgGeo.Algebra.Homology.DGCategory.FullSubcategory
 import DerivedAlgGeo.Algebra.Homology.DGCategory.FunctorCategoryH0
 import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformation
 import DerivedAlgGeo.Algebra.Homology.DGCategory.NaturalTransformationH0
@@ -29,6 +30,7 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Shift
 import DerivedAlgGeo.Algebra.Homology.DGCategory.HorizontalComposition
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Whiskering
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated
+import DerivedAlgGeo.Algebra.Homology.DGCategory.FullSubcategory.Pretriangulated
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Model
 
 /-!
