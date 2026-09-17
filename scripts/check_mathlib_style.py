@@ -310,7 +310,23 @@ def check_text(raw: str, path: Path) -> list[Finding]:
         # edits the payload's whitespace for no readability gain. The code on
         # such a line is short. 12 of the 145 LONG findings were these.
         in_string = column_in_string(line, MAX_LINE)
-        if len(line) > MAX_LINE and not is_import and not in_string:
+        # A Markdown table row cannot be continued either, and for the same
+        # reason `import` cannot: the row IS the line, and splitting it makes
+        # two malformed rows rather than one wrapped one. The module docstrings
+        # here are Markdown, and #1363 landed a four-row tier table between 121
+        # and 170 characters wide, which is the shape this is about.
+        #
+        # Restricted to lines that are wholly comment or docstring, so a `| cons
+        # x xs => ...` match alternative -- perfectly breakable -- is untouched,
+        # and it wants both delimiters and two cells before it believes a row.
+        stripped = line.strip()
+        is_table_row = (
+            not c.strip()
+            and stripped.startswith("|")
+            and stripped.endswith("|")
+            and stripped.count("|") >= 3
+        )
+        if len(line) > MAX_LINE and not is_import and not in_string and not is_table_row:
             out.append(Finding("ERROR", idx, "LONG", f"Line is {len(line)} chars; Mathlib's limit is {MAX_LINE}."))
 
         if " ;" in c:

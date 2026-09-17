@@ -23,7 +23,7 @@ Run by `.github/workflows/ci.yml` and by `CLAUDE.md`'s pre-push list.
 | `lake exe runLinter <Lib>` | missing docstrings on public defs, unused arguments, `simp` lemmas that don't apply, non-terminal `simp`-normal-form problems, deprecated-decl use, `dupNamespace` |
 | the three subsystem audits and `check_audit.py` | `sorryAx` and unexpected axioms reaching the audit surface |
 | `scripts/check_source_independence.py` | retired or external source roots re-entering the library |
-| `scripts/check_mathlib_style.py` (edit hook, `gates.sh`, `--check-baseline` in CI) | unresolved merge-conflict markers left by a rebase — the structural gates all parse `import` lines only, so a conflicted file passed every one of them until #1359 — plus the copyright header, the module docstring's position, lines over 100 characters, `λ` for `fun`, `$` for `<|`, space before `;`, `sorry`, unscoped `maxHeartbeats`, and missing docstrings on `def`/`abbrev`/`structure`/`class`/`inductive` |
+| `scripts/check_mathlib_style.py` (edit hook, `gates.sh`, `--check-baseline` in CI) | unresolved merge-conflict markers left by a rebase — the structural gates all parse `import` lines only, so a conflicted file passed every one of them until #1359 — plus the copyright header, the module docstring's position, lines over 100 characters (except the three unbreakable shapes: an `import`, a line whose 101st character is inside a string literal, and a Markdown table row in a docstring), `λ` for `fun`, `$` for `<|`, space before `;`, `sorry`, unscoped `maxHeartbeats`, and missing docstrings on `def`/`abbrev`/`structure`/`class`/`inductive` |
 
 `lake exe runLinter DerivedAlgGeo` covers the complete stable library. The
 development probes remain covered by the emitter and style checks.
@@ -72,6 +72,15 @@ It records `(file, code, the offending source line, count)`. The line's *text*
 and not its *number*, because a number churns under every unrelated edit above
 it; the text and not merely a count, because a per-edit hook has to name the
 line to fix.
+
+The `LONG` rule exempts three shapes, and all three for one reason: the line
+cannot be continued, so there is nothing to reflow. Lean cannot continue an
+`import`. A line that is only long because the 101st character falls inside a
+string literal would need a string gap, which edits the payload's whitespace for
+no readability gain. A Markdown table row IS the line -- splitting it makes two
+malformed rows. The exemption is restricted to lines that are wholly comment or
+docstring, so a `| cons x xs => ...` match alternative, which breaks perfectly
+well, is still reported.
 
 **Never add to it to make a gate pass.** `--relax` only ever lowers the file,
 and its one exception is the first adoption, when the file does not exist yet.
