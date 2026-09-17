@@ -118,6 +118,11 @@ changed_lean_files() {
 
 mathlib_style() {
   local files
+  # The baseline ratchet first, and unconditionally: it is the one half of this
+  # checker that does not depend on the diff, so a branch that adds a style
+  # ERROR to a file it never edited -- a scripted rewrite, a merge resolution --
+  # would otherwise reach CI to find out. ~5s over the whole library.
+  python3 scripts/check_mathlib_style.py --check-baseline || return 1
   files="$(changed_lean_files | sort -u)"
   [ -z "$files" ] && return 0
   # --diff-only, matching gates.sh: judge the lines this branch wrote, not the

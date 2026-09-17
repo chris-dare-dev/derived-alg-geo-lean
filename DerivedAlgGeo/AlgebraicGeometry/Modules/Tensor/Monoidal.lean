@@ -20,7 +20,6 @@ same structure as a full monoidal subcategory.
 open CategoryTheory MonoidalCategory BraidedCategory
 
 set_option backward.isDefEq.respectTransparency false
-set_option maxHeartbeats 800000
 
 universe u
 
@@ -460,6 +459,7 @@ lemma tensorSheafificationComparisonRight_comp_tensorAssocIso
     asIso_hom, asIso_inv, IsIso.hom_inv_id_assoc]
   rfl
 
+set_option maxHeartbeats 800000 in
 private lemma tensorAssocIso_pentagon (W L M N : X.Modules) :
     tensorHom (tensorAssocIso W L M).hom (𝟙 N) ≫
         (tensorAssocIso W (tensorObj L M) N).hom ≫
