@@ -56,7 +56,11 @@ standard pseudo-coherence on an arbitrary base.
    review found.
 4. **No retired-path shims.** A move updates imports, umbrellas, audits and
    declaration-sweep routing in the same pull request; the vacated path is
-   added to `RETIRED_PATHS` in `scripts/check_layering.py`. Nothing is left
+   added to `RETIRED_BY_CUTOVER` in `scripts/check_layering.py`, under this
+   row's own milestone key and *in sorted position* rather than at the end of
+   the dict. `RETIRED_PATHS` flattens it and is still what the gate reads. The
+   key is what keeps two rows landing in the same week from editing the same
+   lines, and the gate fails if the keys stop being sorted. Nothing is left
    behind re-exporting its new owner.
 5. **Hypotheses travel with the declaration.** Relocation never strengthens or
    silently discharges a hypothesis. Named cases: Hom-finiteness for Serre full
