@@ -581,6 +581,98 @@ jobs:
       # failure `CLAUDE.md` names for `lake update` re-resolving a branch
       # `inputRev`. The first symptom would be a build that changes with
       # nothing in the diff to explain it. 38fbc41 is v1 as of 2026-04-22.
+      # WHY A DIAGNOSTIC AND NOT A FIX.
+      #
+      # `lean-action` begins with `scripts/install_elan.sh`, which is
+      # unconditional -- it pipes `elan-init.sh | sh` on every job, with no
+      # "already installed" branch. On this persistent lane that re-creates the
+      # seven `.elan/bin` shims, which are hardlinks to one inode. Intermittently
+      # it cannot, and the job dies ~20 seconds in:
+      #
+      #   error: could not create link from '<runner>/.elan/bin/elan.exe'
+      #                                  to '<runner>/.elan/bin/lake.exe'
+      #
+      # That failure is expensive out of all proportion to its length. It frees
+      # the runner immediately, so the affected runner is always the first to
+      # take the next queued job, and fails that one too. On 2026-09-17 four
+      # consecutive pushes to `main` died this way, all four on runner-3.
+      #
+      # #1379 tried to fix it by repairing a severed shim before `lean-action`,
+      # on the evidence that the wedged runner's `lake.exe` was a 1-link copy
+      # rather than a link into the set. That was cause and effect inverted, and
+      # the merge commit's own run disproved it within the same job:
+      #
+      #   03:21:15  repair step: elan shim set is consistent: 7 names on one inode
+      #   03:37:54  lean-action: could not create link ... to lake.exe
+      #
+      # The set was intact and the relink still failed. The 1-link copy is what
+      # elan LEAVES BEHIND when a relink fails, not what causes it. #1379 was
+      # reverted rather than left in place arguing a false mechanism.
+      #
+      # WHAT IS ACTUALLY KNOWN, AND WHY THIS STEP LOOKS WHERE IT DOES.
+      # `.elan/bin/lake.exe` is not merely a launcher that execs and exits. It
+      # stays resident for the whole build as the parent of the real binary --
+      # observed directly, twice, as pairs sharing a start time to the second:
+      #
+      #   pid 70772  <runner-main>/.elan/bin/lake.exe                  00:08:09
+      #   pid 13940  <runner-main>/.elan/toolchains/.../bin/lake.exe   00:08:09
+      #
+      # Windows will not let elan replace a running executable. So anything that
+      # leaves such a process alive past its job -- a cancelled run is the
+      # obvious candidate, and cancellations are frequent on this queue -- would
+      # block the next relink on that runner. That is a hypothesis. It has not
+      # been caught in the act, because by the time a failure is noticed the
+      # process table has moved on and the run has rolled out of the API window.
+      #
+      # So this records the two things that would settle it, immediately before
+      # `lean-action` runs and therefore at the moment `elan-init` will try the
+      # relink: the link count and file id of every shim, and every live
+      # lake/lean/elan process with its path and start time. If the next failure
+      # is a leftover process, it is named here. If the shim set is already
+      # divergent at this point, that is visible here too, and the earlier
+      # theory deserves a second look.
+      #
+      # `continue-on-error` because a diagnostic that can redden a build is
+      # worse than no diagnostic. `shell: powershell` because the process and
+      # hardlink queries need it -- an `ps -W` plus grep equivalent was tried
+      # first and matched `Runner.Listener.exe` through the runner directory
+      # names, which is exactly the sort of quiet wrongness this step exists to
+      # avoid.
+      - name: Record elan shim and process state before lean-action
+        if: always()
+        continue-on-error: true
+        shell: powershell
+        env:
+          LANE: ${{ runner.environment }}
+        run: |
+          $ErrorActionPreference = 'Continue'
+          if ($env:LANE -ne 'self-hosted') {
+            Write-Output "runner.environment=$($env:LANE); hosted lane installs elan into a fresh VM, nothing to record"
+            exit 0
+          }
+          $bin = Join-Path $env:USERPROFILE '.elan\bin'
+          if (-not (Test-Path $bin)) {
+            Write-Output "no elan at $bin yet; install_elan.sh will create the whole set"
+            exit 0
+          }
+          Write-Output "shim set at ${bin}:"
+          Get-ChildItem $bin -Filter *.exe | ForEach-Object {
+            $links = @(& cmd /c "fsutil hardlink list `"$($_.FullName)`"" 2>$null).Count
+            $id    = (& cmd /c "fsutil file queryfileid `"$($_.FullName)`"" 2>$null) -replace '.*is ',''
+            Write-Output ("  {0,-18} links={1,-3} id={2}" -f $_.Name, $links, $id)
+          }
+          Write-Output ''
+          Write-Output 'live lake/lean/elan processes on this machine:'
+          $procs = Get-CimInstance Win32_Process -Filter "Name='lake.exe' OR Name='lean.exe' OR Name='elan.exe'" -ErrorAction SilentlyContinue
+          if (-not $procs) {
+            Write-Output '  none'
+          } else {
+            foreach ($q in $procs) {
+              $flag = if ($q.ExecutablePath -like "$bin*") { '  <-- holds a shim in THIS runner''s .elan/bin' } else { '' }
+              Write-Output ("  pid={0,-7} start={1} {2}{3}" -f $q.ProcessId, $q.CreationDate.ToString('HH:mm:ss'), $q.ExecutablePath, $flag)
+            }
+          }
+
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
         with:
           build: true
