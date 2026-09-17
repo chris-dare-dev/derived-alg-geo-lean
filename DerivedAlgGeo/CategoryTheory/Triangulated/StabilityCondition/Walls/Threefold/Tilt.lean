@@ -76,7 +76,16 @@ records exactly what it forgets. -/
 def threefoldTruncate : Threefold.NumClass →+ NumClass :=
   AddMonoidHom.mk' (fun v => (v.1, v.2.1, v.2.2.1)) (by intro v w; rfl)
 
-@[simp]
+-- NOT `@[simp]`. It and the three projection lemmas below cannot both be, and
+-- the projections are the pair worth having: with this one simp, the LHS of
+-- each projection lemma rewrites to `NumClass.rk (v.deg0, v.deg1, v.deg2)`
+-- BEFORE it can fire, and there it stops -- `NumClass.rk` is a plain `def` with
+-- no unfolding lemma, so simp has traded a term it could finish for one it
+-- cannot. `simpNF` reported exactly that, three times, and it is right.
+--
+-- Nothing is lost. `threefoldTruncate` appears only in this file, and the two
+-- proofs that need this equation (`tiltFamily_re`, `tiltFamily_im`) pass it to
+-- `simp only` by name, which never read the attribute.
 theorem threefoldTruncate_apply (v : Threefold.NumClass) :
     threefoldTruncate v =
       (Threefold.NumClass.deg0 v, Threefold.NumClass.deg1 v,
