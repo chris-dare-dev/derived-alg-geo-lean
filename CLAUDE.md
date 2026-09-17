@@ -364,7 +364,9 @@ tracked `.claude/settings.json` so it reaches every worktree, runs
 * `scripts/gates.sh`, in any mode;
 * `lake build` with **no target**;
 * `lake build <Target>` that does not declare `LEAN_NUM_THREADS`, or sets it
-  above 4 — see below.
+  above 4 — see below;
+* `lake build <Target>` run through a `lake` that resolves inside a
+  self-hosted runner's working directory — see "Whose lake" below.
 
 It refuses RUNNING that file, not reading it: `cat`, `grep`, `diff` and
 `git ls-tree` over `scripts/gates.sh` all pass, so you can still read the gate
@@ -397,11 +399,39 @@ script unrunnable, the summary said CI had it covered, and `bb8a1278` records th
 that needs no Lean build, plus a targeted build of the modules you changed, in
 seconds. It is a cheap green, not a green.
 
-Build locally by **naming a target**, which the hook allows:
+Build locally by **naming a target**, and **naming your own `lake`**, which is
+what the hook allows:
 
 ```bash
-LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
+LEAN_NUM_THREADS=2 ~/.elan/bin/lake build DerivedAlgGeo.The.Module.You.Changed
 ```
+
+### Whose lake
+
+`~/.elan/bin/lake` is not decoration. Each of the four self-hosted runners keeps
+its own elan under `C:\actions-runner\<runner>\.elan`, and those `bin`
+directories sit on this machine's user PATH **ahead of** `~/.elan/bin` — put
+there by CI, not by hand. `lean-action` runs `elan-init` with no
+`--no-modify-path`, and `run-runner.cmd` points `HOME` at the runner directory,
+so every job re-persists its own shim directory into the user environment.
+Deleting the entries does not hold: on 2026-09-16 all four were removed and
+three were back within ten minutes.
+
+So a bare `lake` here executes a **runner's** `lake.exe`. Windows will not
+replace a running image, so the next CI job on that runner cannot relink its
+shims and dies about a second in with
+
+    error: could not create link from 'elan.exe' to 'lake.exe'
+
+That is what took `main` red across three consecutive runs on 2026-09-16
+(bc973621, 6217d770, b9e18832), behind one local build that broke none of the
+other rules here: named target, `LEAN_NUM_THREADS=2`, gate green.
+
+It costs contention, not correctness. The same declaration sweep run through a
+runner's shim and through `~/.elan/bin/lake` came back byte-identical (14589
+rows), with audit-completeness reporting the same numbers, so a result already
+produced through the wrong tree does **not** need re-running. Check which one
+you are using with `which lake`.
 
 `LEAN_NUM_THREADS` is **required and enforced**, not advice: the same hook
 refuses a `lake build` that does not set it, or that sets it above 4. Naming a

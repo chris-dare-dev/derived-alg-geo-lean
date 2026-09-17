@@ -205,6 +205,47 @@ theorem phaseTiltHeart_interval
   exact ⟨sigma.slicing.gtProp_of_triangle C beta hFgt hTgt hdist,
     sigma.slicing.leProp_of_triangle C (beta + 1) hFle hTle hdist⟩
 
+/-- The free-class field of case (2) of Lemma 14.17 is automatic.
+
+If `E` lies in the tilted heart and sits in a distinguished triangle
+`U⟦1⟧ ⟶ E ⟶ V` whose outer terms lie in the original heart, then `U` lies in
+the phase-cut free class `P((0, beta])`.
+
+The printed case (2) of Lemma 14.17 (arXiv:1902.08184v4, page 74) asks only
+that `U` be an object of the original heart.  This lemma supplies the
+free-class membership the constructive direction consumes, so that it need not
+be carried as an extra hypothesis of `IsPhaseTiltTypeTwo`.
+
+The argument is the phase interval alone: `E` is bounded above by `beta + 1`
+and `V⟦-1⟧` is bounded above by `0`, so inverse rotation bounds the middle
+term `U⟦1⟧` of `V⟦-1⟧ ⟶ U⟦1⟧ ⟶ E` by `beta + 1`. -/
+theorem phaseFree_of_tiltHeart_triangle
+    (sigma : WeakPreStabilityCondition v) {beta : ℝ}
+    (hbeta0 : 0 ≤ beta) (hbeta1 : beta < 1) {U V E : C}
+    (hE : ((slicingTorsionPair sigma.slicing hbeta0 hbeta1.le).tilt).heart E)
+    (hUheart : sigma.slicing.toTStructure.heart U)
+    (hVheart : sigma.slicing.toTStructure.heart V)
+    {f : U⟦(1 : ℤ)⟧ ⟶ E} {g : E ⟶ V} {d : V ⟶ U⟦(1 : ℤ)⟧⟦(1 : ℤ)⟧}
+    (hdist : Triangle.mk f g d ∈ distTriang C) :
+    phaseFree sigma.slicing beta U := by
+  refine ⟨((sigma.slicing.toTStructure_heart_iff C U).mp hUheart).1, ?_⟩
+  have hVshift : sigma.slicing.leProp C (beta + 1) (V⟦(-1 : ℤ)⟧) := by
+    have hshift := sigma.slicing.leProp_shift C 1 V (-1)
+      ((sigma.slicing.toTStructure_heart_iff C V).mp hVheart).2
+    exact sigma.slicing.leProp_mono C (by push_cast; linarith) _ hshift
+  have hUshift : sigma.slicing.leProp C (beta + 1) (U⟦(1 : ℤ)⟧) :=
+    sigma.slicing.leProp_of_triangle C (beta + 1) hVshift
+      (sigma.phaseTiltHeart_interval hbeta0 hbeta1 hE).2
+      (inv_rot_of_distTriang _ hdist)
+  have hback : sigma.slicing.leProp C beta ((U⟦(1 : ℤ)⟧)⟦(-1 : ℤ)⟧) := by
+    have hshift :=
+      sigma.slicing.leProp_shift C (beta + 1) (U⟦(1 : ℤ)⟧) (-1) hUshift
+    convert hshift using 1
+    all_goals push_cast
+    all_goals ring
+  exact leProp_of_iso sigma.slicing
+    ((shiftFunctorCompIsoId C (1 : ℤ) (-1 : ℤ) (by lia)).app U) hback
+
 /-- The HRS tilt at the phase cut is exactly the heart of the phase-shifted
 slicing.  This identifies both descriptions with the interval
 `P((beta, beta + 1])`. -/
