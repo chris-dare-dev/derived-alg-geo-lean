@@ -233,7 +233,8 @@ items:
     kind: epic
     parent: charge-abstraction-m2
     title: "The tilt family by truncation, and its slope"
-    status: planned
+    status: done
+    progress: "Landed in #1377. `threefoldTruncate` is the only new construction; `tiltFamily` is `stChargeFamily` reindexed by `Prod.swap` and pulled back along it, with the chart transposition in exactly one `reindex`. `nu_eq_tilt_slope` and `chargeSlope_tilt` prove the tilt slope is the charge slope rescaled by alpha, and `rotatedTiltFamily_alignmentLocus_eq_preimage` makes every rotated tilt wall a `Prod.swap` preimage of a surface one. Both negative results landed with computed witnesses at (alpha, beta) = (1, 0). #1228 still owns adjudicating the three tilt spellings and the two `nu`."
     summary: "`Walls/Threefold/Tilt.lean`: `threefoldTruncate : Threefold.NumClass →+ NumClass` (which does not exist today, and without which the nested-semicircle theorems cannot apply to ν-walls at all), `tiltFamily := (stChargeFamily.reindex Prod.swap).pullback threefoldTruncate`, `rotatedTiltFamily`, and `ν = α · chargeSlope` tying it to `Threefold.nu` (`Threefold/Basic.lean:208`). THE STRONGEST RESULT OF THE REMEDIATION: the (3,2) charge needs no new polynomial and no kernel, so this epic no longer depends on e1--e6 as originally scoped. Two negative results land with it: the tilt family is not a chart change of `Threefold.chargeFamily` (their wall loci differ, with a computed witness) and the rotation is not cosmetic."
     priority: must
     size: M
