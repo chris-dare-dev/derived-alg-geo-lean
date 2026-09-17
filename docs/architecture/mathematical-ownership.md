@@ -174,7 +174,17 @@ that true.
   with the relevant derived-category object; Fourier–Mukai consumes them to
   construct transforms and convolution. Preserve the distinction between
   unbounded, bounded-coherent and relative operations. Bounded coherent tensor
-  closure needs hypotheses and is not automatic on singular schemes.
+  closure needs hypotheses and is not automatic on singular schemes. **Done**
+  (#1321): `AlgebraicGeometry/DerivedCategory/Tensor/` owns the three tensor
+  tiers and `Families/DerivedPushforward.lean` owns the supplied derived
+  pushforward, beside the exact coherent pushforward it is the weaker sibling
+  of; `TwistedPushforward.lean` is the consumer that reaches neither
+  Fourier–Mukai nor stability. The capabilities stayed contracts: no instance
+  connects them to the constructions next door, because that would be a
+  discharge rather than a placement. The ordinary-category `Correspondence`
+  needs no triangulated structure but has no consumer outside the
+  Fourier–Mukai lane, so the optional categorical rename was declined and the
+  reason recorded in the ledger.
 - **Perfectness before moduli:** module flatness belongs with modules;
   pseudo-coherence, Tor amplitude and perfect-complex predicates belong with
   derived objects. Moduli constructions consume them. Preserve the existing

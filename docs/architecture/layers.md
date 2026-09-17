@@ -130,7 +130,8 @@ Morphisms
         stability-neutral: never reach the stability tree
 
 DerivedCategory
-  ├─ Basic, Coherent, Dqc, Families, FourierMukai     stability-neutral
+  ├─ Basic, Coherent, Dqc, Families, Tensor,
+  │  TwistedPushforward, FourierMukai                  stability-neutral
   └─ Stability                                         imports the stability tree;
                                                         omitted by the DerivedCategory
                                                         umbrella, imported by the
@@ -164,7 +165,7 @@ as an umbrella; the exemption does not reach the umbrella's other children.
 
 A geometric realization of a categorical interface sits with the geometric
 object it is about: the `IsCompatibleWithTriangulation` instance for
-`Dᵇ(Coh X)` in `DerivedCategory/FourierMukai/DerivedTensorCoherence.lean`,
+`Dᵇ(Coh X)` in `DerivedCategory/Tensor/Coherent.lean`,
 the scheme probes and semistable-locus probes in `Moduli/Semistability/`, the
 relative Harder--Narasimhan problem in `Moduli/HarderNarasimhan/`, and the
 base-change and Fourier--Mukai actions on stability data in
@@ -175,9 +176,10 @@ resolves; the file's path records what it is about.
 ## Where each theory currently lives
 
 This map describes existing modules. The ownership policy and cutover ledger
-identify mixed roots still to split, including derived operations under
-FourierMukai and perfectness under Moduli. Their appearance here is not
-permission to extend a misplaced foundation in place.
+identify mixed roots still to split; their appearance here is not
+permission to extend a misplaced foundation in place. Derived operations
+(#1321), relative perfection (#1322) and dg H⁰ under DGEnhancement
+(#1320) are no longer among them.
 
 Arrows point from a refinement or consumer to the root it builds on.
 
@@ -305,8 +307,11 @@ AlgebraicGeometry
   │     │                                     Cartier twists; bounded lift
   │     │                                          consumes generic FullSubcategory API
   │     ├─→ Dqc → Comparison                  locus, canonical zero, explicit comparison evidence
-  │     ├─→ Families                          base change and pullback consumers
-  │     ├─→ FourierMukai                      geometric kernels and convolution; the monoidal-triangulated instance
+  │     ├─→ Families                          base change, pullback and the supplied derived pushforward
+  │     ├─→ Tensor                            derived tensor: unbounded K-flat, bounded-coherent,
+  │     │                                     monoidal-coherent, relative; the monoidal-triangulated instance
+  │     ├─→ TwistedPushforward                Rf_*(K ⊗^L -), from Tensor and Families alone
+  │     ├─→ FourierMukai                      geometric kernels and convolution, consuming all of those
   │     └─→ Stability                         base change of pre-stability data; kernel actions on stability
   ├─→ Divisors
   │     ├─→ CartierLineBundle                 associated sheaf as LineBundleData;
@@ -360,6 +365,8 @@ AlgebraicGeometry
 | Cartier divisors as coherent derived objects | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.CartierDivisor` |
 | Scheme-derived categories and `Dqc`, without stability | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory` |
 | Scheme-derived pullback | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families` |
+| Derived tensor on schemes, in three tiers | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor` |
+| Supplied derived pushforward on `Dᵇ(Coh)` | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPushforward` |
 | Geometric kernels and convolution | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai` |
 | Stability on scheme-derived categories | `DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability` |
 | Semistable loci, probes, finite-type openness, relative HN | `DerivedAlgGeo.AlgebraicGeometry.Moduli` |

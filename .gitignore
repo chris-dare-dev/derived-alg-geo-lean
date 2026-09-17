@@ -38,6 +38,7 @@ ROADMAP.md
 /coh-audit.txt
 /dg-audit.txt
 /enum-decls.txt
+/enum-inhabitants.txt
 /lean-source-check.txt
 /lean-warnings.log
 /stability-condition-audit.txt

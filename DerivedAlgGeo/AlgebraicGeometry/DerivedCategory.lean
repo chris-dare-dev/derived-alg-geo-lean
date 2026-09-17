@@ -3,7 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Basic
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.KFlatTensor
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.TwistedPushforward
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.CartierDivisor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.DivisorSequence

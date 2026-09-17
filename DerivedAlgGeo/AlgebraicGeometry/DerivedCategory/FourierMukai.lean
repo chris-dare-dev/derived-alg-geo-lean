@@ -3,7 +3,6 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelCorrespondence
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.DerivedTensorCoherence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelConvolution
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelAssociativity
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelAdjunction

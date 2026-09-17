@@ -23,58 +23,32 @@ transform exists in this repository. What it says is that
 inputs -- the existing derived-pullback contract, a supplied derived tensor,
 and a supplied derived pushforward -- and from nothing else.
 
+Since MO1.10 (#1321) the three inputs are NOT recorded here. They are general
+derived-category capabilities with their own owners, and their records live in
+`DerivedOperations.lean`, whose import list reaches neither this subtree nor the
+stability tree. What remains below is the assembly and the kernel-specific
+ledgers built on it.
+
 Derived pushforward and derived tensor on `D^b(Coh)` do not exist anywhere in
-the repository; this file names them rather than building them. The middle
-scheme is deliberately NOT required to be a product: `Correspondence` does not
-consume that, and it is the composition law (`ConvolutionData`) that needs it.
+the repository; the capability owners name them rather than building them. The
+middle scheme is deliberately NOT required to be a product: `Correspondence`
+does not consume that, and it is the composition law (`ConvolutionData`) that
+needs it.
 -/
 
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward.derivedPushforward
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward.additive
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward.commShift
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward.isTriangulated
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPushforward
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.derivedTensor
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.additive
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.commShift
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.isTriangulated
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensor
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCorrespondence
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCorrespondence_pull
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCorrespondence_tensor
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCorrespondence_push
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPushforward_additive
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPushforwardCommShift
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPushforward_isTriangulated
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensor_additive
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensorCommShift
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensor_isTriangulated
 
-/-! `HasDerivedTensor` above remains the intentionally raw first-ledger input.
-Stable convolution consumers now pass through the coherent monoidal root below;
+/-! `HasDerivedTensor` remains the intentionally raw first-ledger input, and
+stable convolution consumers pass through the coherent monoidal root instead;
 its parent structures own associator/unitor naturality, pentagon, triangle, and
-strong-monoidal pullback laws together. The adapters are one-way only. -/
+strong-monoidal pullback laws together, and the adapters are one-way only. Both
+roots, and the strong-monoidal pullback class, are recorded in
+`DerivedOperations.lean` rather than here: they are capabilities a derived
+category has, not facts about transforms. -/
 
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.additive
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.commShift
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.isTriangulated
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.toMonoidalCategory
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.hasCoherentDerivedTensorIsCompatibleWithTriangulation
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.hasDerivedTensorOfCoherent
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensorAssoc
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensorUnit
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensorLeftUnitor
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensorRightUnitor
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensor_pentagon
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.coherentDerivedTensor_triangle
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasMonoidalDerivedPullback
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasMonoidalDerivedPullback.toMonoidal
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.monoidalDerivedPullbackTensorIso
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.monoidalDerivedPullbackLeftUnitor
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.monoidalDerivedPullbackRightUnitor
 
 /-! ## Convolution of kernels: the second ledger
 
@@ -436,17 +410,3 @@ is membership for ONE element, not a homomorphism from anything.
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricMk_toAutPair_smul
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricToAutPair
 
--- Derived tensor exactness stored once as an `ExactBifunctor`, with the legacy
--- one-slot projections and the right-twist projections derived from it.
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.exact
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor.exactBifunctor
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.exact
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.exactBifunctor
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.firstFamily
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.flipAdditive
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.flipCommShift
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.flipIsTriangulated
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor.secondFamily
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensorExactBifunctor
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensorFlipCommShift
-#print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensorFlip_isTriangulated
