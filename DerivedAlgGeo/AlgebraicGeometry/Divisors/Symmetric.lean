@@ -15,7 +15,6 @@ hexagon is obtained from the forward hexagon using involutivity of the commutor.
 open CategoryTheory MonoidalCategory BraidedCategory
 
 set_option backward.isDefEq.respectTransparency false
-set_option maxHeartbeats 1600000
 
 universe u
 

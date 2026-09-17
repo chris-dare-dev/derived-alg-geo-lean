@@ -33,8 +33,6 @@ open CategoryTheory Category Limits Opposite TopologicalSpace
 
 namespace CategoryTheory.Sheaf
 
-set_option maxHeartbeats 4000000
-set_option synthInstance.maxHeartbeats 800000
 set_option maxRecDepth 10000
 set_option backward.defeqAttrib.useBackward true
 set_option backward.isDefEq.respectTransparency false

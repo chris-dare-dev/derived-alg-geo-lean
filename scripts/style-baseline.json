@@ -42,12 +42,6 @@
   1
  ],
  [
-  "DerivedAlgGeo/Algebra/Homology/SpectralSequence/FilteredTotalComplexFirstPageDifferential.lean",
-  "HEART",
-  "set_option maxHeartbeats 4000000",
-  1
- ],
- [
   "DerivedAlgGeo/Algebra/Module/GradedModule/Localization.lean",
   "LONG",
   "    ((a • x : DegreeZeroLocalization 𝒜 𝓜 S) : LocalizedModule S M) = a • (x : LocalizedModule S M) :=",
@@ -163,12 +157,6 @@
  ],
  [
   "DerivedAlgGeo/AlgebraicGeometry/Divisors/Symmetric.lean",
-  "HEART",
-  "set_option maxHeartbeats 1600000",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/Divisors/Symmetric.lean",
   "LONG",
   "noncomputable instance invertibleSheafSymmetricCategory : SymmetricCategory (InvertibleSheaf X) where",
   1
@@ -219,12 +207,6 @@
   "DerivedAlgGeo/AlgebraicGeometry/Modules/Restriction/Sections.lean",
   "LONG",
   "`show`-ascription residue, so each composition has to be available as a term. `presheaf_map_square_eq`",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/Modules/Tensor/Monoidal.lean",
-  "HEART",
-  "set_option maxHeartbeats 800000",
   1
  ],
  [
@@ -399,24 +381,6 @@
   "DerivedAlgGeo/CategoryTheory/Sites/SheafCohomology/Cech/Comparison.lean",
   "LONG",
   "`DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech.SmallSiteResolution` restates this interface",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Sites/SheafCohomology/Cech/InitialPage.lean",
-  "HEART",
-  "set_option maxHeartbeats 4000000",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Sites/SheafCohomology/Cech/TotalComparison.lean",
-  "HEART",
-  "set_option maxHeartbeats 4000000",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Sites/SheafCohomology/Cech/TotalComparison.lean",
-  "HEART",
-  "set_option synthInstance.maxHeartbeats 400000",
   1
  ],
  [
@@ -717,66 +681,6 @@
   "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
   "LONG",
   "noncomputable example {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] :=",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/BasisComparison.lean",
-  "HEART",
-  "set_option maxHeartbeats 4000000",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/BasisComparison.lean",
-  "HEART",
-  "set_option synthInstance.maxHeartbeats 800000",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/Boundedness.lean",
-  "HEART",
-  "set_option maxHeartbeats 4000000",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/Boundedness.lean",
-  "HEART",
-  "set_option synthInstance.maxHeartbeats 800000",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/GlobalComparison.lean",
-  "HEART",
-  "set_option maxHeartbeats 4000000",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/GlobalComparison.lean",
-  "HEART",
-  "set_option synthInstance.maxHeartbeats 800000",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/InjectiveAcyclic.lean",
-  "HEART",
-  "set_option maxHeartbeats 4000000",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/InjectiveAcyclic.lean",
-  "HEART",
-  "set_option synthInstance.maxHeartbeats 1600000",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/InjectiveFlasque.lean",
-  "HEART",
-  "set_option maxHeartbeats 4000000",
-  1
- ],
- [
-  "DerivedAlgGeo/Topology/Sheaves/Cech/InjectiveFlasque.lean",
-  "HEART",
-  "set_option synthInstance.maxHeartbeats 400000",
   1
  ],
  [
