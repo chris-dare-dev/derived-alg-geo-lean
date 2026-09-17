@@ -20,7 +20,9 @@ Refused:
   * `scripts/gates.sh`, in any mode, because its `build` gate is that same
     whole-library build. RUNNING it, that is -- see READERS below;
   * `lake build <Target>` without `LEAN_NUM_THREADS`, or with it above
-    `MAX_LOCAL_THREADS` -- see "Width, not just size" below.
+    `MAX_LOCAL_THREADS` -- see "Width, not just size" below;
+  * `lake build <Target>` run through a `lake` that lives inside a self-hosted
+    runner's working directory -- see "Whose lake" below.
 
 Allowed, deliberately:
 
@@ -58,6 +60,42 @@ rather than documented. `DAG_ALLOW_LOCAL_BUILD=1` overrides this rule too,
 because it overrides the whole gate -- but it is the wrong tool here: the right
 answer to "I need more threads" is a smaller number, not a bypass.
 
+## Whose lake
+
+Every rule above is about what a build COSTS. This one is about which `lake`
+runs it.
+
+The four self-hosted runners each keep an elan under
+`C:\actions-runner\<runner>\.elan`, and those `bin` directories sit on the
+developer's own Windows PATH, AHEAD of `~/.elan/bin`. That is not a setup
+mistake waiting to be tidied away. `lean-action` invokes `elan-init` with no
+`--no-modify-path`, and `run-runner.cmd` points HOME at the runner directory,
+so every CI job re-persists its own shim directory into the user environment.
+Remove the entries and the next job puts them back.
+
+So a plain `lake` in an agent shell executes a RUNNER's `lake.exe`. Windows
+will not replace a running image, so the next job on that runner cannot relink
+its shims and dies about a second in with
+
+    error: could not create link from 'elan.exe' to 'lake.exe'
+
+On 2026-09-16 that held `main` red across three consecutive runs (bc973621,
+6217d770, b9e18832) behind ONE local build that broke none of the other rules
+here: named target, `LEAN_NUM_THREADS=2`, this gate green. Naming the
+interpreter is the only fix that survives, because it does not depend on PATH
+order -- and PATH order is not ours to keep.
+
+What this does NOT cost is correctness, and the distinction matters because the
+two have very different blast radii. On 2026-09-16 the same declaration sweep
+was run twice on this host, once through runner-3's shim and once through
+`~/.elan/bin/lake`: the outputs were byte-identical (14589 rows, `diff -q`
+clean) and audit-completeness reported the same numbers both ways. These shims
+are all the same elan, and they resolve the same toolchain content; what differs
+is whose tree the executing file lives in. So a result already produced through
+a runner's shim does not need re-running. This gate exists to stop the
+CONTENTION -- one process holding a file another process must relink -- not to
+cast doubt on a build that has already finished.
+
 ## What this gate does NOT say
 
 It does not say that CI is a superset of `gates.sh`. It is not, and the text
@@ -86,6 +124,7 @@ import json
 import os
 import re
 import shlex
+import shutil
 import sys
 
 from _output import force_utf8_output
@@ -104,6 +143,12 @@ SEPARATORS = re.compile(r"\|\||&&|[;|&\n()]")
 # precisely the targeted build this gate exists to permit: both `gates.sh` and
 # `ci.yml` build it by name before the audits.
 UMBRELLAS = {"DerivedAlgGeo", "DerivedAlgGeoSweep"}
+
+# A `lake` living inside a self-hosted runner's working directory, in either
+# spelling a shell might hand us. See "Whose lake" in the module docstring for
+# why these end up on the developer's PATH and why editing the PATH does not
+# keep them off it.
+RUNNER_TREE = re.compile(r"[\\/]actions-runner[\\/]", re.IGNORECASE)
 
 # Lake's concurrency, and the ceiling a targeted build may use on this host.
 #
@@ -314,6 +359,34 @@ def segments(command: str) -> list[list[str]]:
     return out
 
 
+def lake_interpreter_offence(token: str) -> str | None:
+    """Refuse a `lake` that is one of the self-hosted runners' elan shims.
+
+    `token` is the word the shell would run. A path is read as written; a bare
+    `lake` is resolved against PATH, the way the shell resolves it.
+
+    An UNRESOLVABLE `lake` passes. This process cannot see the shell's real
+    environment -- Claude Code's Bash tool sources a generated snapshot this
+    hook never reads -- so a failed lookup means "the hook's PATH is not the
+    shell's", which is an environment quirk rather than evidence of the
+    offence. Refusing on it would fire on every machine that has no runner at
+    all, which is every machine but this one.
+    """
+    if "/" in token or "\\" in token:
+        resolved = token
+    else:
+        resolved = shutil.which(token)
+    if not resolved or not RUNNER_TREE.search(resolved):
+        return None
+    return (
+        f"`{token}` resolves to `{resolved}`, a self-hosted runner's elan shim "
+        "rather than your own. Running it holds that runner's `lake.exe` open, "
+        "and the next CI job on that runner cannot relink its shims -- `main` "
+        "went red three times this way on 2026-09-16. Name your own elan "
+        "instead: `~/.elan/bin/lake build <Target>`."
+    )
+
+
 def offence(tokens: list[str]) -> str | None:
     """Return the reason this simple command is refused, or None."""
     if not tokens:
@@ -338,6 +411,11 @@ def offence(tokens: list[str]) -> str | None:
         rest = tokens[i + 1 :]
         if not rest or rest[0] != "build":
             continue
+        # Which binary, before which target: a runner's shim is the wrong lake
+        # even when what it is asked to build is entirely reasonable.
+        reason = lake_interpreter_offence(tok)
+        if reason is not None:
+            return reason
         targets = [t for t in rest[1:] if not t.startswith("-")]
         if not targets:
             return (

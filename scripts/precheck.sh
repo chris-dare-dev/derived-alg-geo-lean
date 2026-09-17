@@ -163,8 +163,25 @@ targeted_build() {
        [ "$threads" -gt 4 ] && threads=4 ;;
   esac
   echo "LEAN_NUM_THREADS=$threads"
+  # WHOSE lake -- the same kind of promise as the width above, kept for the same
+  # reason: the hook only ever sees the command an agent types, and this script
+  # is typed as one word.
+  #
+  # On the development host every runner's `.elanin` sits on PATH AHEAD of
+  # `~/.elan/bin`, and not by hand: `lean-action` runs `elan-init` without
+  # `--no-modify-path` and `run-runner.cmd` points HOME at the runner directory,
+  # so each CI job re-persists its own shim directory into the user environment.
+  # A bare `lake` here therefore runs a RUNNER's shim and holds its `lake.exe`
+  # open; the next job on that runner cannot relink its shims and dies about a
+  # second in. On 2026-09-16 that held `main` red across three runs.
+  #
+  # Falls back to PATH where there is no user elan, which is every machine that
+  # is not this one.
+  local lake="lake"
+  [ -x "$HOME/.elan/bin/lake" ] && lake="$HOME/.elan/bin/lake"
+  echo "lake: $lake"
   # shellcheck disable=SC2086
-  LEAN_NUM_THREADS="$threads" lake build $targets
+  LEAN_NUM_THREADS="$threads" "$lake" build $targets
 }
 
 echo "== precheck =="
