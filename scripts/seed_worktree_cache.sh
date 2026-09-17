@@ -35,6 +35,14 @@
 # fresh worktree is missing it, which is otherwise a manual step nothing
 # documents.
 #
+# It creates it as a JUNCTION on Windows, and asserts afterwards that what it
+# made is a link. `ln -s` to a directory there silently deep-copies instead,
+# which cost 6.5 GB and read back as "not a symlink" -- so the NEXT worktree
+# seeded from that one was left with no dependency set at all and rebuilt
+# Mathlib from cold. See `link_dir` for the whole chain. This script now
+# refuses rather than leaving a worktree in that state, because every message
+# it printed on the way there was reassuring.
+#
 # Usage:
 #   scripts/seed_worktree_cache.sh                 # seed here from the best donor
 #   scripts/seed_worktree_cache.sh --dry-run       # say what it would do
@@ -99,6 +107,51 @@ recently_written () {
   local hit
   hit="$(find "$dir" -type f -newermt "-$STALE_SECONDS seconds" -print -quit 2>/dev/null)"
   [ -n "$hit" ]
+}
+
+# Where the donor keeps its dependency set.
+#
+# A properly made link reads back through `readlink` on every platform here,
+# junctions included -- Git Bash resolves a Windows junction as a symlink. So a
+# donor whose `.lake/packages` is NOT a link is a donor that was damaged by the
+# bug below, and the honest fallback is to point at the donor's own directory:
+# still one shared copy, still no cold Mathlib build.
+packages_source () {
+  local donor="$1" resolved
+  resolved="$(readlink "$donor/.lake/packages" 2>/dev/null || true)"
+  if [ -n "$resolved" ]; then
+    echo "$resolved"
+  elif [ -d "$donor/.lake/packages" ]; then
+    echo "$donor/.lake/packages"
+  fi
+}
+
+# Link `$2` to `$1`, as a link and not as a copy.
+#
+# WHY THIS IS NOT JUST `ln -s`. It was, and on Windows `ln -s` to a DIRECTORY
+# silently deep-copies it. The script then printed "linked .lake/packages -> ..."
+# over a 6.5 GB copy that was not a link, and the damage only surfaced one hop
+# later: seeding a third worktree from that one found a real directory where a
+# link should be, took the "leaving yours alone" branch below, and left the new
+# worktree with NO dependency set at all -- so its next `lake build` cloned
+# Mathlib and compiled it from cold, which is hours. Every message along the way
+# was reassuring.
+#
+# `mklink /J` makes a junction, needs no administrator, and needs
+# `MSYS_NO_PATHCONV=1` so MSYS does not rewrite the `/J` switch into a path.
+link_dir () {
+  local target="$1" link="$2"
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      MSYS_NO_PATHCONV=1 cmd /c "mklink /J $(cygpath -w "$link") $(cygpath -w "$target")" >/dev/null 2>&1
+      ;;
+    *)
+      ln -s "$target" "$link" >/dev/null 2>&1
+      ;;
+  esac
+  # The assertion that was missing. `ln -s` reported success while producing a
+  # copy, so success is not what this checks -- being a link is.
+  [ -L "$link" ]
 }
 
 worktrees () {
@@ -168,8 +221,10 @@ done
 if [ "$DRY_RUN" -eq 1 ]; then
   echo
   echo "would copy $DONOR/.lake/build -> $TARGET/.lake/build  ($DONOR_HAVE modules)"
-  [ -e "$TARGET/.lake/packages" ] \
-    || echo "would link .lake/packages -> $(readlink "$DONOR/.lake/packages" 2>/dev/null || echo '<donor has none>')"
+  if [ ! -e "$TARGET/.lake/packages" ]; then
+    pkgs="$(packages_source "$DONOR")"
+    echo "would link .lake/packages -> ${pkgs:-<donor has none>}"
+  fi
   exit 0
 fi
 
@@ -178,12 +233,23 @@ mkdir -p "$TARGET/.lake"
 # The dependency set is genuinely shared, so mirror the donor's symlink rather
 # than copying several GB of Mathlib oleans that are identical by construction.
 if [ ! -e "$TARGET/.lake/packages" ]; then
-  pkgs="$(readlink "$DONOR/.lake/packages" 2>/dev/null || true)"
-  if [ -n "$pkgs" ]; then
-    ln -s "$pkgs" "$TARGET/.lake/packages" \
-      && echo "linked .lake/packages -> $pkgs"
+  pkgs="$(packages_source "$DONOR")"
+  if [ -z "$pkgs" ]; then
+    echo "refused: donor has no .lake/packages, so there is nothing to share." >&2
+    echo "Seeding the build cache alone would leave this worktree without a" >&2
+    echo "dependency set, and its next lake build would clone Mathlib and" >&2
+    echo "compile it from cold. Seed from a worktree that has one." >&2
+    exit 1
+  fi
+  if link_dir "$pkgs" "$TARGET/.lake/packages"; then
+    echo "linked .lake/packages -> $pkgs"
   else
-    echo "note: donor's .lake/packages is not a symlink; leaving yours alone."
+    rm -rf "$TARGET/.lake/packages"
+    echo "refused: could not LINK .lake/packages -> $pkgs." >&2
+    echo "Refusing to continue rather than copy it: a copy is several GB, and" >&2
+    echo "it reads back as not-a-symlink, so the next worktree seeded from this" >&2
+    echo "one would get no dependency set at all." >&2
+    exit 1
   fi
 fi
 
