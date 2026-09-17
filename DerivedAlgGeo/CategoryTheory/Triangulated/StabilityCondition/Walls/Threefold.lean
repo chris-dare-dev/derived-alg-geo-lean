@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Threefold.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Threefold.Tilt
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Threefold.TiltComparison
 
 /-!
 # Threefold walls

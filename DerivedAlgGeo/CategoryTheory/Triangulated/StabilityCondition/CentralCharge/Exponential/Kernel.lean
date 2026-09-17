@@ -22,8 +22,15 @@ are equal for the untilted charge of an `n`-fold, and that coincidence is what
 made the wrong index look right: a family indexed by dimension covers the
 surface at `m = n = 2` and the threefold at `m = n = 3`, and then fails at the
 first example where they differ. The cubic-threefold Kuznetsov charge is one,
-at `(n, m) = (3, 2)`, and `Exp.tiltChargeFamily` in a later slice is the
+at `(n, m) = (3, 2)`, and `Walls/Threefold/Tilt.lean`'s `Tilt.tiltFamily` is the
 truncation that produces it.
+
+That sentence used to promise an `Exp.tiltChargeFamily` in a later slice. The
+slice never happened and the declaration does not exist; what landed instead was
+`Tilt.tiltFamily`, built from the surface family. It is the same object, and
+`Walls/Threefold/TiltComparison.lean` proves it -- `tiltFamily_eq_exp` is this
+kernel at `m = 2`, reindexed and pulled back. The adjudication that settled
+which spelling survives is #1228.
 
 This is also why `numerical-k-theory-e5` is parked. That track assumed one type
 indexed by dimension would cover the surface, threefold and fourfold numerical
