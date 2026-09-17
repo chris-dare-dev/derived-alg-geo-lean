@@ -20,14 +20,63 @@ Run by `.github/workflows/ci.yml` and by `CLAUDE.md`'s pre-push list.
 | Gate | Catches |
 |---|---|
 | `lake exe lint-style` (text-based) | trailing whitespace, windows line endings, space before `;`, non-allowlisted unicode and variant selectors, `Adaptation note` strings |
-| `lake exe lint-style` (syntax) | `set_option` left unscoped, unscoped `maxHeartbeats`, unclosed `section`/`namespace`, `.` used as a focusing dot instead of `·`, `$` instead of `<|`, `λ` instead of `fun`, files > 1500 lines, breakable lines > 100 chars, unscoped `open Classical`, `show` where `change` is meant, double underscores in names, `def` names containing `_` |
 | `lake exe runLinter <Lib>` | missing docstrings on public defs, unused arguments, `simp` lemmas that don't apply, non-terminal `simp`-normal-form problems, deprecated-decl use, `dupNamespace` |
 | the three subsystem audits and `check_audit.py` | `sorryAx` and unexpected axioms reaching the audit surface |
 | `scripts/check_source_independence.py` | retired or external source roots re-entering the library |
-| `scripts/check_mathlib_style.py` (edit hook, `gates.sh`) | unresolved merge-conflict markers left in a file by a rebase — the structural gates all parse `import` lines only, so a conflicted file passed every one of them until #1359 |
+| `scripts/check_mathlib_style.py` (edit hook, `gates.sh`, `--check-baseline` in CI) | unresolved merge-conflict markers left by a rebase — the structural gates all parse `import` lines only, so a conflicted file passed every one of them until #1359 — plus the copyright header, the module docstring's position, lines over 100 characters, `λ` for `fun`, `$` for `<|`, space before `;`, `sorry`, unscoped `maxHeartbeats`, and missing docstrings on `def`/`abbrev`/`structure`/`class`/`inductive` |
 
 `lake exe runLinter DerivedAlgGeo` covers the complete stable library. The
 development probes remain covered by the emitter and style checks.
+
+### What this table used to claim, and why it was wrong
+
+Until #1371 the table had a second `lake exe lint-style` row crediting it with
+a *syntax* pass: unscoped `set_option` and `maxHeartbeats`, unclosed
+`section`/`namespace`, focusing `.` instead of `·`, `$`, `λ`, files over 1500
+lines, lines over 100 characters, `open Classical`, `show` for `change`, double
+underscores, and `_` in `def` names. **None of that runs in this repository.**
+
+Three facts, each checkable:
+
+* Mathlib's `lakefile.lean` documents `lake exe lint-style` as "runs text-based
+  style linters", and its `StyleError` enumeration in
+  `Mathlib/Tactic/Linter/TextBased.lean` has exactly six members — the ones in
+  the row above. Line length is not among them.
+* Every rule in the deleted row is a *syntax* linter gated behind a Lean option
+  that defaults to `false` (`linter.style.longLine` is declared
+  `defValue := false`). Mathlib turns them on for its own build through
+  `mathlibOnlyLinters` in its lakefile; this repository's `lakefile.toml` sets
+  only `autoImplicit` and `relaxedAutoImplicit` under `[leanOptions]`, so none
+  of them are on here.
+* The last green `ci.yml` run on `main` before #1371 (815830b9) passed with 115
+  lines over 100 characters and 16 unscoped `maxHeartbeats` in the library.
+
+So the 100-character rule had never been machine-enforced, and the only thing
+asserting it was `check_mathlib_style.py` — which was itself a silent no-op in
+agent worktrees until #1370. Two halves of one gate, each assuming the other
+was doing the work. The entry above now credits the checker that actually runs.
+
+### `scripts/style-baseline.json`
+
+Switching the hook back on exposed 131 pre-existing ERRORs across 76 files, and
+the hook judges the whole file it is handed — so those 76 files became
+un-editable until someone refactored them. The baseline enumerates that debt,
+in the `scripts/nolints.json` and `scripts/warning-baseline.json` tradition:
+the hook blocks on what an edit **adds** and stays quiet about what it
+inherited.
+
+    python3 scripts/check_mathlib_style.py --check-baseline   # the ratchet (CI, gates.sh)
+    python3 scripts/check_mathlib_style.py --relax            # lower it after a real fix
+
+It records `(file, code, the offending source line, count)`. The line's *text*
+and not its *number*, because a number churns under every unrelated edit above
+it; the text and not merely a count, because a per-edit hook has to name the
+line to fix.
+
+**Never add to it to make a gate pass.** `--relax` only ever lowers the file,
+and its one exception is the first adoption, when the file does not exist yet.
+Reflowing the recorded lines is still open as of #1371; the baseline is what
+keeps the rule live for new code in the meantime.
 
 ## 2. Naming — reviewable, and the highest-value thing to review
 

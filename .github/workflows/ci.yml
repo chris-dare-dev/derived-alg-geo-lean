@@ -751,6 +751,14 @@ jobs:
         # that quietly stops firing is how #1359 reached the Lean parser.
         run: python3 scripts/check_mathlib_style.py --self-test
 
+      - name: Mathlib-style baseline ratchet
+        # The other half of the same checker. `--self-test` says it still
+        # rejects what it is meant to reject; this says the library has not
+        # grown a new ERROR outside scripts/style-baseline.json. The edit hook
+        # is the primary enforcement and cannot be relied on alone -- it only
+        # sees files an agent edits, and a human commit never passes through it.
+        run: python3 scripts/check_mathlib_style.py --check-baseline
+
       - name: Stability source independence
         run: python3 scripts/check_source_independence.py
 
