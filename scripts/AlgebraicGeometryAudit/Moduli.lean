@@ -256,6 +256,34 @@ owns, in `Moduli/PerfectComplex/Comparison.lean`. -/
 #print axioms AlgebraicGeometry.representableZariskiStackMap_tripleComp_obj
 #print axioms AlgebraicGeometry.representableZariskiStack_hasRepresentableDiagonal
 
+/-! ## Fppf stack presentations (#522) -/
+
+#print axioms AlgebraicGeometry.FppfStackPresentation
+#print axioms AlgebraicGeometry.FppfStackPresentation.atlas
+#print axioms AlgebraicGeometry.FppfStackPresentation.atlasScheme
+#print axioms AlgebraicGeometry.FppfStackPresentation.atlasSmoothSurjective
+#print axioms AlgebraicGeometry.FppfStackPresentation.mk.inj
+#print axioms AlgebraicGeometry.FppfStackPresentation.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.FppfStackPresentation.schemeDiagonal
+#print axioms AlgebraicGeometry.FppfStackPresentation.toStackInGroupoids
+#print axioms AlgebraicGeometry.FppfStackPresentationOver
+#print axioms AlgebraicGeometry.FppfStackPresentationOver.locallyOfFinitePresentation
+#print axioms AlgebraicGeometry.FppfStackPresentationOver.mk.inj
+#print axioms AlgebraicGeometry.FppfStackPresentationOver.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.FppfStackPresentationOver.structureMorphism
+#print axioms AlgebraicGeometry.FppfStackPresentationOver.toFppfStackPresentation
+#print axioms AlgebraicGeometry.affineLineFppfStackPresentationOver
+#print axioms AlgebraicGeometry.representableFppfStackMap
+#print axioms AlgebraicGeometry.representableFppfStackMap_eq_zariski
+#print axioms AlgebraicGeometry.representableFppfStackMap_hasRepresentableProperty
+#print axioms AlgebraicGeometry.representableFppfStackMap_id_isSmoothSurjective
+#print axioms AlgebraicGeometry.representableFppfStackMap_isLocallyOfFinitePresentation
+#print axioms AlgebraicGeometry.representableFppfStackMap_isOpenImmersion
+#print axioms AlgebraicGeometry.representableFppfStackMap_isRepresentable
+#print axioms AlgebraicGeometry.representableFppfStackPresentation
+#print axioms AlgebraicGeometry.representableFppfStackPresentationOver
+#print axioms AlgebraicGeometry.representableFppfStack_hasRepresentableDiagonal
+
 /-! ## Relative-perfect big-Zariski presentations (#522, partial) -/
 
 #print axioms AlgebraicGeometry.BoundedRelativePerfectZariskiPresentation
