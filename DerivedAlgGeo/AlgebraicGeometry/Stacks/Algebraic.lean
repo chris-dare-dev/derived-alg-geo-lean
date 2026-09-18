@@ -30,6 +30,26 @@ The fppf and étale descent level lives in
 smooth surjection is an fppf covering family.  That module does not change
 anything here: the diagonal below is still represented by schemes, and the
 presentations below are still big-Zariski presentations.
+
+## Which declarations here fix the topology, and which do not
+
+The representability vocabulary -- `StackMorphism.HasRepresentableProperty`
+with its `IsLocallyOfFinitePresentation`, `IsSmoothSurjective` and
+`IsOpenImmersion` specializations, and
+`StackInGroupoids.HasRepresentableDiagonal` with its fiber representation --
+says nothing about which covering families the stack condition quantifies
+over.  Each is a statement about the *representing scheme morphisms* of a
+stack morphism's fibers, so each is stated for an arbitrary Grothendieck
+topology `J` on `Scheme` and reads identically at Zariski, étale and fppf.
+
+What genuinely is Zariski is everything named for it: the
+`representableZariski*` constructions, whose descent comes from
+`Scheme.zariskiTopology` being subcanonical, and `ZariskiStackPresentation`
+and `ZariskiStackPresentationOver`, whose names record exactly the gap
+between what they supply and an algebraic stack.
+
+The split is deliberate. Raising the presentations to fppf is SF9.2 (#522)
+work, and it should not also have to widen the vocabulary it is stated in.
 -/
 
 namespace AlgebraicGeometry
@@ -213,7 +233,8 @@ instance representableZariskiStackMap_isRepresentable
 /-- A represented fiber together with a property of its actual structure
 morphism to the test scheme. -/
 structure StackMorphism.FiberRepresentationWithProperty
-    {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
+    {J : GrothendieckTopology Scheme.{u}}
+    {F G : StackInGroupoids Scheme.{u} J}
     (f : StackMorphism F G) (P : MorphismProperty Scheme.{u})
     {S : Scheme.{u}} (y : G.presheaf.obj (.mk (op S)))
     extends f.FiberRepresentation y where
@@ -224,7 +245,8 @@ structure StackMorphism.FiberRepresentationWithProperty
 /-- A stack morphism is representable with property `P` when every one of its
 fibers has a representing scheme whose structure morphism satisfies `P`. -/
 class StackMorphism.HasRepresentableProperty
-    {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
+    {J : GrothendieckTopology Scheme.{u}}
+    {F G : StackInGroupoids Scheme.{u} J}
     (P : MorphismProperty Scheme.{u}) (f : StackMorphism F G) : Prop where
   representation {S : Scheme.{u}}
     (y : G.presheaf.obj (.mk (op S))) :
@@ -232,7 +254,8 @@ class StackMorphism.HasRepresentableProperty
 
 namespace StackMorphism
 
-variable {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
+variable {J : GrothendieckTopology Scheme.{u}}
+  {F G : StackInGroupoids Scheme.{u} J}
   {P Q : MorphismProperty Scheme.{u}} {f : StackMorphism F G}
 
 /-- Forgetting the geometric property recovers ordinary representability. -/
@@ -270,21 +293,24 @@ theorem representableZariskiStackMap_hasRepresentableProperty
 /-- Local finite presentation for stack morphisms is measured on the actual
 representing scheme morphisms of all fibers. -/
 abbrev StackMorphism.IsLocallyOfFinitePresentation
-    {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
+    {J : GrothendieckTopology Scheme.{u}}
+    {F G : StackInGroupoids Scheme.{u} J}
     (f : StackMorphism F G) : Prop :=
   StackMorphism.HasRepresentableProperty @LocallyOfFinitePresentation f
 
 /-- A smooth-surjective stack cover is representable and every representing
 scheme morphism is both smooth and surjective. -/
 abbrev StackMorphism.IsSmoothSurjective
-    {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
+    {J : GrothendieckTopology Scheme.{u}}
+    {F G : StackInGroupoids Scheme.{u} J}
     (f : StackMorphism F G) : Prop :=
   StackMorphism.HasRepresentableProperty (@Smooth ⊓ @Surjective) f
 
 /-- An open immersion of stacks is representable and is an open immersion
 on every actual scheme representing one of its fibers. -/
 abbrev StackMorphism.IsOpenImmersion
-    {F G : StackInGroupoids Scheme.{u} Scheme.zariskiTopology}
+    {J : GrothendieckTopology Scheme.{u}}
+    {F G : StackInGroupoids Scheme.{u} J}
     (f : StackMorphism F G) : Prop :=
   StackMorphism.HasRepresentableProperty @AlgebraicGeometry.IsOpenImmersion f
 
@@ -319,7 +345,8 @@ theorem representableZariskiStackMap_isOpenImmersion
 objects of a stack.  The equivalence is the pointwise Yoneda universal
 property of the representing object over the test scheme. -/
 structure StackInGroupoids.DiagonalFiberRepresentation
-    (F : StackInGroupoids Scheme.{u} Scheme.zariskiTopology)
+    {J : GrothendieckTopology Scheme.{u}}
+    (F : StackInGroupoids Scheme.{u} J)
     {S : Scheme.{u}} (x y : F.presheaf.obj (.mk (op S))) where
   /-- The scheme of isomorphisms over `S`. -/
   representing : Over S
@@ -334,7 +361,8 @@ structure StackInGroupoids.DiagonalFiberRepresentation
 /-- A stack has representable diagonal when every pair of objects has an
 actual scheme representing its isomorphism functor. -/
 class StackInGroupoids.HasRepresentableDiagonal
-    (F : StackInGroupoids Scheme.{u} Scheme.zariskiTopology) : Prop where
+    {J : GrothendieckTopology Scheme.{u}}
+    (F : StackInGroupoids Scheme.{u} J) : Prop where
   representation {S : Scheme.{u}}
     (x y : F.presheaf.obj (.mk (op S))) :
     Nonempty
