@@ -47,6 +47,18 @@ replacement for a Lean theorem or an issue acceptance criterion.
   changing the mathematics. The controller now scopes the roadmap gate to the
   manifest base ref, so the defect is reported as inherited and any SF11-authored
   roadmap drift still fails closed.
+- The controller's original preflight rejected the exact planned issue branch
+  that the manifest requires, even when `HEAD` was the clean `base_ref`. Commit
+  `9e9f354a` removes that contradictory branch-name rejection; the exact-head,
+  clean-worktree, and duplicate-PR checks remain the real safety conditions.
+- The local and CI gate scripts originally validated only
+  `.claude/loop-specs/sf8-sf9-pilot.yaml`. `scripts/validate_loop_specs.sh` now
+  validates every YAML manifest, and the trust surface/CODEOWNERS explicitly
+  cover loop specs, reviewer prompts, the run-loop skill, and `openspec/`.
+- OpenSpec task 2.3 named a nonexistent `scripts/precheck.py`; the repository's
+  actual local contract is `scripts/precheck.sh --no-build` plus a named
+  targeted `lake build` invocation. Keep this distinction visible in future
+  plans.
 
 ## Time-saving practices
 
@@ -61,3 +73,9 @@ replacement for a Lean theorem or an issue acceptance criterion.
 - Search the roadmap and the source module docstrings together; roadmap
   summaries contain the chronology, while module prose contains the current
   ownership and intentionally uninhabited seams.
+- A cold `.lake` cache makes even a narrowly named Families target compile
+  thousands of Mathlib prerequisites before reaching the changed modules. The
+  first baseline attempt was interrupted after the cache reached roughly
+  3,600 targets; treat that as cache warm-up, not as evidence that the whole
+  repository target was run, and retain `LEAN_NUM_THREADS=2` for repeatable
+  targeted builds.

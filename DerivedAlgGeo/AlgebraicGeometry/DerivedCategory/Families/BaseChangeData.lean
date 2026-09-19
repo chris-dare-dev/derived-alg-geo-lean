@@ -71,6 +71,30 @@ namespace DerivedBaseChangeData
 
 variable {X T : SchemeBaseChange S}
 
+/-- Assemble the model-free root from exact geometric pullbacks.
+
+This is a second producer for `DerivedBaseChangeData`: exact or flat/open
+base-change morphisms can use the canonical derived pullback without choosing
+K-flat resolutions.  The tensor and the two `Dqc` preservation statements
+remain explicit because this file does not claim a general unbounded tensor
+or a general-scheme quasi-coherence theorem. -/
+noncomputable def ofExactPullbacks
+    [IsExactPullback (baseChangeFst X T)]
+    [IsExactPullback (baseChangeSnd X T)]
+    (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
+    (hFst : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory X.left,
+      Dqc.schemeQuasicoherentCohomology (X ⨯ T).left
+        ((derivedPullback (baseChangeFst X T)).obj E.obj))
+    (hSnd : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory T.left,
+      Dqc.schemeQuasicoherentCohomology (X ⨯ T).left
+        ((derivedPullback (baseChangeSnd X T)).obj E.obj)) :
+    DerivedBaseChangeData X T where
+  pullFst := DqcLeftDerivedPullback.ofExact hFst
+  pullSnd := DqcLeftDerivedPullback.ofExact hSnd
+  derivedTensor := tensor
+
 /-- The base-change external product of the bundled operations. -/
 noncomputable def externalProduct (D : DerivedBaseChangeData X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :

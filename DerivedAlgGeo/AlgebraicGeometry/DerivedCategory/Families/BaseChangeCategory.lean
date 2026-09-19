@@ -115,6 +115,22 @@ namespace DqcLeftDerivedPullback
 
 variable {T U : SchemeBaseChange S} {f : T ⟶ U}
 
+/-- Construct the `Dqc` pullback in the exact geometric case.
+
+The universal-property carrier comes from `LeftDerivedPullback.ofExact`; the
+only remaining input is the honest statement that this exact derived
+pullback preserves quasi-coherent cohomology.  Keeping that statement
+explicit avoids turning exactness of module pullback into an unrelated
+`Dqc` preservation theorem. -/
+noncomputable def ofExact
+    [IsExactPullback f]
+    (hqc : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory U.left,
+      Dqc.schemeQuasicoherentCohomology T.left
+        ((derivedPullback f).obj E.obj)) :
+    DqcLeftDerivedPullback f where
+  ambient := LeftDerivedPullback.ofExact f
+  mapsQuasicoherent E := hqc E
+
 /-- The lift of an actual left-derived pullback to the honest `Dqc` loci. -/
 noncomputable def functor (P : DqcLeftDerivedPullback f) :
     Dqc.SchemeQuasicoherentDerivedCategory U.left ⥤
