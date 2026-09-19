@@ -110,6 +110,13 @@ a non-closing issue reference, and no closing keyword.
   merge-policy setting is enabled, binds the command to the reviewed PR head,
   and never infers an administrator bypass from a failed required check
 
+#### Scenario: Progress dependencies remain blocked
+
+- **WHEN** a downstream issue depends on a passed ledger whose chunk is marked
+  `progress`, or whose upstream issue is still open
+- **THEN** ledger initialization refuses to start the downstream chunk until a
+  complete upstream chunk has merged and the provider reports the issue closed
+
 #### Scenario: Reviewed head accepts a Git revision abbreviation
 
 - **WHEN** the ledger records a valid short or full revision that local Git
