@@ -1064,6 +1064,24 @@ def validate_pr_body_closure(body: str, number: int, chunk_closure: str) -> None
         raise LoopError(f"progress PR body must contain a non-closing reference to issue #{number}")
 
 
+def reviewed_commit_matches_head(root: Path, reviewed_commit: str, head_oid: str) -> bool:
+    """Resolve a short/full ledger revision, then compare full SHAs exactly."""
+
+    if not re.fullmatch(r"[0-9a-fA-F]{7,40}", reviewed_commit):
+        return False
+    if not re.fullmatch(r"[0-9a-fA-F]{40}", head_oid):
+        return False
+    resolved = git(
+        root,
+        "rev-parse",
+        "--verify",
+        "--end-of-options",
+        f"{reviewed_commit}^{{commit}}",
+        check=False,
+    )
+    return resolved.lower() == head_oid.lower()
+
+
 def verify_local_chunk_files(root: Path, spec: dict[str, Any], state: dict[str, Any]) -> None:
     base_ref = spec["base_ref"]
     result = run_command(root, ["git", "diff", "--name-only", f"{base_ref}...HEAD"], check=False)
@@ -1213,7 +1231,7 @@ def action_approve(
     )
     if pr.get("state") != "OPEN" or pr.get("isDraft"):
         raise LoopError("approval requires an open, non-draft PR")
-    if pr.get("headRefOid") != current.get("commit"):
+    if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
         raise LoopError("PR head does not match the commit reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
     check_required_checks(root, spec, pr_number)
@@ -1335,7 +1353,7 @@ def action_merge(
     )
     if pr.get("state") != "OPEN" or pr.get("isDraft"):
         raise LoopError("merge requires an open, non-draft PR")
-    if pr.get("headRefOid") != current.get("commit"):
+    if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
         raise LoopError("PR head does not match the commit reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
     if dry_run:
