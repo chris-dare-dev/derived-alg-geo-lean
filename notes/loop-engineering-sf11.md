@@ -102,3 +102,7 @@ replacement for a Lean theorem or an issue acceptance criterion.
   the app even though their tool work ended. Record that as a controller
   visibility defect and back any adjudication with independently captured
   command output; do not treat an empty payload as an unexamined PASS.
+- Marking OpenSpec task 2.4 complete after the bounded review changed the
+  OpenSpec digest after ledger `sf11-1-base-change-categories-v4` was written.
+  The controller should therefore reject that old ledger for remote actions;
+  reinitialize a fresh frozen ledger after any checklist edit.

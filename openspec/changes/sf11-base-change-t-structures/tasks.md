@@ -12,7 +12,7 @@
 - [ ] 2.1 Replace the remaining supplied K-flat tensor/pullback and compactness seams in the frozen Families scope with source-faithful geometric constructions or explicit theorem hypotheses; verify the affected modules compile and the axiom/no-sorry audit reports no new evidence.
 - [ ] 2.2 Prove the concrete external-product semiorthogonality, fullness, linearity, projection-formula, generation, approximation, truncation-cocontinuity, compact-intersection, and compact-preservation obligations used by Proposition 3.15 and Theorem 3.17; verify with targeted `lake build` commands for only the changed Families modules.
 - [ ] 2.3 Construct the bounded-coherent preservation and finite-amplitude data needed by the selected theorem hypotheses, then prove the pullback/pushforward functors and Lemma 3.18 equivalences through the existing inclusion comparison maps; verify with `scripts/precheck.sh --no-build` plus `LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.IndExtension`.
-- [ ] 2.4 Run the four independent adversarial reviews for the frozen #1060 commit, record them in `.loop-runs`, and adjudicate only after all findings are resolved or the third round is terminal; verify the ledger has exactly one reviewed commit per round and never a fourth round.
+- [x] 2.4 Run the four independent adversarial reviews for the frozen #1060 commit, record them in `.loop-runs`, and adjudicate only after all findings are resolved or the third round is terminal; verify the ledger has exactly one reviewed commit per round and never a fourth round.
 
 ## 3. Issue #1061 — S-local t-structures and slicings
 
