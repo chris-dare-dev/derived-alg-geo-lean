@@ -486,7 +486,10 @@ def blocked_by_entries(issue: dict[str, Any]) -> list[Any]:
     if isinstance(blocked_by, dict):
         nodes = blocked_by.get("nodes")
         if isinstance(nodes, list):
-            return nodes
+            if nodes:
+                return nodes
+            total = blocked_by.get("totalCount")
+            return [{}] if isinstance(total, int) and total > 0 else []
         total = blocked_by.get("totalCount")
         return [{}] if isinstance(total, int) and total > 0 else []
     if isinstance(blocked_by, list):
