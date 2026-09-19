@@ -91,3 +91,14 @@ replacement for a Lean theorem or an issue acceptance criterion.
   command-count source. Avoid running that slice while another Lake build is
   compiling the same cache: concurrent workers can race on intermediate
   `.olean` paths and report misleading “file not found” failures.
+- A passing loop ledger certifies the reviewed commit and its adversarial
+  checks; it does not automatically prove the chunk's OpenSpec checklist or
+  GitHub issue acceptance text. In this run the exact producer/audit slice
+  passed while tasks 2.1–2.3 still truthfully record supplied compactness,
+  generation, and coherence obligations. Do not push or close #1060 from the
+  ledger alone, and do not mark those tasks complete without theorem-backed
+  evidence.
+- Some completed reviewer turns returned an empty final-message payload from
+  the app even though their tool work ended. Record that as a controller
+  visibility defect and back any adjudication with independently captured
+  command output; do not treat an empty payload as an unexamined PASS.
