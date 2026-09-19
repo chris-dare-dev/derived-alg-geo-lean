@@ -293,8 +293,8 @@ items:
     kind: epic
     parent: dg-enhancements-m3
     title: "The seam theorem: H⁰(D^dg A) ≌ DerivedCategory A"
-    status: blocked
-    summary: "The theorem the track exists for. An equivalence of triangulated categories between the H⁰ of the derived enhancement and Mathlib's DerivedCategory, compatible with shift, triangles, and Ext."
+    status: in_progress
+    summary: "The theorem the track exists for. An equivalence of triangulated categories between the H⁰ of the derived enhancement and Mathlib's DerivedCategory, compatible with shift, triangles, and Ext. Unblocked when e8 landed the h-injective model. #1392 landed the comparison functor and the first of the three mathematical obligations #854 records: derivedSeamFunctor is full and faithful UNCONDITIONALLY, and derivedSeam is an equivalence of CATEGORIES under HasKInjectiveResolutions -- Spaltenstein's theorem, which Mathlib does not have at mathlib_rev. That class states the mathematics upstream of the theorem rather than the conclusion, and is spent in derivedSeamFunctor_essSurj alone, so it becomes an instance the day the construction is formalized and no consumer changes. #1392 does NOT close #854 and says so: the other two obligations -- transported shifts and distinguished triangles agreeing with the target instances, and the Ext comparison commuting with the seam -- are not proved yet, and closing the issue on the headline alone is the #554 defect RM-07 exists to catch."
     priority: must
     size: XL
     tags: [lean, seam, headline]
