@@ -1,0 +1,47 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Lean 4 with mathlib, Python repository gates, GitHub pull requests,
+  and self-hosted Windows runners. The repository is a formalization of derived
+  algebraic geometry and its claims are correctness-critical.
+
+  OpenSpec artifacts are the source of truth for the intended behavior of a
+  change. Keep mathematical requirements and observable proof obligations in
+  specs/*.md; put implementation choices in design.md and tasks.md. Never use
+  sorry, admit, axioms that bypass the stated construction, or a postulated
+  representability/algebraicity conclusion.
+
+  The repository has a separate bounded loop controller in
+  scripts/loop_engine.py. It owns issue selection, mutation authorization, and
+  the review ledger; OpenSpec owns the proposal, requirements, design, and task
+  artifacts. A run must not widen a frozen chunk or silently skip a required
+  reviewer.
+
+rules:
+  proposal:
+    - State the mathematical and repository motivation separately from the implementation approach.
+    - Name the affected GitHub issues and the OpenSpec capability paths when this is a batch plan.
+    - Record explicit non-goals, especially unproved existence, preservation, descent, or algebraicity claims.
+  specs:
+    - Express every normative mathematical or repository behavior with SHALL or MUST and at least one WHEN/THEN scenario.
+    - Include at least one negative or counterexample scenario whenever a claim has a known trust boundary.
+    - Do not turn a theorem, algebraicity result, preservation property, or descent statement into an interface field.
+  design:
+    - Record ownership, dependency direction, projection/comparison maps, diamond-instance agreement, and import boundaries.
+    - "Include the three adversarial review lenses: mathematical/source faithfulness, repository boundary, and abstraction/adoption."
+    - State how the design avoids churn and what happens after the third review/improve round.
+  tasks:
+    - Keep each task small enough to be reviewed as a frozen chunk with an explicit file list and acceptance statement.
+    - Every task MUST include its verification command or observable check.
+    - Include targeted Lean checks, scripts/precheck.sh where appropriate, and self-hosted CI requirements.
+
+operations:
+  apply:
+    guidance:
+      - Work only from the checked-in OpenSpec artifacts and the active loop manifest; do not invent new scope in code.
+      - Keep the mathematical, repository-boundary, abstraction, and style reviews independent on the same commit.
+      - Stop after at most three review/improve rounds for one frozen chunk and record the stop in the ledger.
+  archive:
+    guidance:
+      - Archive only after OpenSpec validation, repository gates, and the bounded adversarial ledger all pass.
+      - Never treat archiving as permission to merge, approve, comment, or close a GitHub issue; those are separately guarded actions.

@@ -16,7 +16,31 @@ evidence behind one.
 | `references/mathlib-style.md` | The Mathlib conventions this repo holds itself to, and the deltas it keeps on purpose. The spec `agents/mathlib-reviewer.md` enforces. |
 | `agents/` | Repo-local agent specifications. One per file. |
 | `skills/` | Repo-local skills, one directory each. `formalize-issue` is the unattended iteration. |
+| `loop-specs/` | Tracked execution manifests. They select issue batches and authorize provider actions; OpenSpec remains the planning source of truth. |
 | `settings.json` | Hooks. Currently: the Mathlib-convention check on every Lean edit. |
+
+OpenSpec's generated Codex skills live in `.agents/skills/` and are refreshed by
+`openspec update`; do not hand-edit those generated files. Repository-specific
+reviewers and the bounded outer-loop protocol remain in `.claude/agents/` and
+`.claude/skills/`.
+
+## OpenSpec and bounded loop runs
+
+OpenSpec lives at the repository root in `openspec/`. Its proposal, delta
+specifications, design, and task artifacts describe what a change means and how
+it is intended to be built. The tracked manifests in `.claude/loop-specs/`
+reference those artifacts and add the separate execution policy: issue order,
+reviewer panel, frozen chunks, and individually enabled GitHub actions.
+
+`scripts/loop_engine.py` is the safety boundary between the two. It performs a
+read-only preflight, keeps a digest-bound review ledger under ignored
+`.loop-runs/`, and refuses a fourth review/improve round for one chunk. The
+mathematical, repository-boundary, abstraction, and mathlib reviewers are
+independent; a passing style review is not mathematical evidence. Code issues
+are closed only after a confirmed merged pull request. The owner-enabled pilot
+has a checked-in merge policy that makes method, auto-merge, administrator
+merge, and branch deletion explicit; the controller still requires its live
+preflight and digest-bound review ledger before any mutation.
 
 ## The artifacts in `notes/`
 

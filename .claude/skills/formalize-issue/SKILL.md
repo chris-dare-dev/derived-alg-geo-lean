@@ -9,6 +9,14 @@ This is **one** iteration and it **halts** at the PR. It never merges, never
 pushes to `main`, and never leaves a `sorry` behind. Under `/loop` it will be
 re-entered from a clean state, so everything below must be safe to re-run.
 
+For a multi-issue run, `scripts/loop_engine.py` is the outer controller. It
+supplies the OpenSpec change, frozen chunk, branch, and ledger path; this skill
+must not widen that scope. The controller requires independent
+`mathematics-adversary`, `repository-boundary-adversary`,
+`abstraction-adversary`, and `mathlib-reviewer` verdicts on the same commit and
+stops a chunk after three review/improve rounds. A style review is not a
+mathematical verdict.
+
 Issues live on `chris-dare-dev/derived-alg-geo-lean`.
 
 ## 0. Refuse to start if the tree is dirty

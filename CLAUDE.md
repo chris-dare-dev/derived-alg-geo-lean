@@ -390,6 +390,29 @@ the script does not reproduce. The script runs `workflows`, `trust-guard`,
 none of which appear in any workflow. Say "N gates pass", naming them; never say
 "CI is green" for a local run. See `CONTRIBUTING.md` for the verified table.
 
+### OpenSpec-backed unattended loops
+
+OpenSpec is the planning layer for any planned unattended batch. Keep the
+proposal, behavioral requirements/scenarios, design, and task checklist under
+`openspec/`, with repository context in `openspec/config.yaml`. The tracked
+execution manifests under `.claude/loop-specs/` may select two or three issues
+and authorize individual provider actions, but they do not replace the
+OpenSpec artifacts.
+
+Use `scripts/loop_engine.py validate` before considering a manifest, then run
+its read-only `preflight`. A run is not enabled until the exact base, live issue
+dependencies, branch/PR collisions, provider identity, roadmap state, and
+required checks are acceptable. Every frozen chunk gets independent
+mathematical, repository-boundary, abstraction, and mathlib-style review on
+the same commit. A chunk has at most three review/improve rounds; the third
+unsuccessful round is a terminal stop, not permission to re-chunk the work.
+
+Comments, pushes, PR creation, approval, issue closure, and merge are separate
+manifest capabilities. Code issues close only after a confirmed merged PR, and
+merge authority is false unless the manifest explicitly enables it. The pilot
+manifest is owner-enabled, but its live preflight and digest-bound review
+ledger remain mandatory before any provider mutation.
+
 This paragraph used to read "every gate in `gates.sh` runs in CI", and that
 sentence is why `single-instantiation` ran nowhere for months: the hook made the
 script unrunnable, the summary said CI had it covered, and `bb8a1278` records the

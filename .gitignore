@@ -49,3 +49,7 @@ ROADMAP.md
 # Python bytecode from the gate scripts (scripts/_output.py is imported, so it compiles).
 __pycache__/
 *.pyc
+
+# Local review ledgers are run-specific and digest-bound; the manifest and
+# OpenSpec artifacts remain tracked.
+/.loop-runs/

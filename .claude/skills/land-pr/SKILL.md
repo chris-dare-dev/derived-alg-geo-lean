@@ -9,6 +9,13 @@ The open PR queue, not the issue tracker, is where this repository's work is
 stuck. This is **one** iteration against that queue and it **halts** before the
 merge. Merging is a human action, always.
 
+When called by a bounded loop manifest, the controller's OpenSpec change and
+review ledger remain authoritative. Landing may act only on the reviewed head;
+the three adversarial lenses plus `mathlib-reviewer` must already have been
+recorded for the frozen chunk, and the controller's maximum of three
+review/improve rounds still applies. This skill's normal one-PR stop behavior
+is unchanged.
+
 ## What the queue actually is
 
 Every open PR is based on `main`, but they are a **cumulative stack**: each
