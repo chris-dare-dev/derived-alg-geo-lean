@@ -764,6 +764,17 @@ def require_selected_dependencies_passed(
                     f"issue #{issue['number']} depends on chunk {dependency_chunk['id']!r}, "
                     f"whose ledger status is {dependency_state.get('status')!r}"
                 )
+            if dependency_state.get("chunk", {}).get("closure") != "complete":
+                raise LoopError(
+                    f"issue #{issue['number']} depends on progress chunk {dependency_chunk['id']!r}; "
+                    "a progress ledger cannot unlock a downstream issue"
+                )
+            dependency_live = issue_state(root, spec["repository"], dependency)
+            if str(dependency_live.get("state", "")).upper() != "CLOSED":
+                raise LoopError(
+                    f"issue #{issue['number']} depends on issue #{dependency} remaining open; "
+                    "the upstream complete chunk must be merged and closed first"
+                )
 
 
 def load_state(path: Path) -> dict[str, Any]:
