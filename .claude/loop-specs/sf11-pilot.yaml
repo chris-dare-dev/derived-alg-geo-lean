@@ -80,6 +80,7 @@ issues:
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families
           - DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated
           - .claude/roadmap/stability-families.yaml
+          - openspec/changes/sf11-base-change-t-structures/tasks.md
           - notes/loop-engineering-sf11.md
         acceptance:
           - D_T and (Dqc)_T are constructed from the external-product closure and bounded-coherent intersection, not postulated.
@@ -99,6 +100,7 @@ issues:
           - DerivedAlgGeo/CategoryTheory/Triangulated/TStructure
           - DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase/Transfer
           - .claude/roadmap/stability-families.yaml
+          - openspec/changes/sf11-base-change-t-structures/tasks.md
           - notes/loop-engineering-sf11.md
         acceptance:
           - S-locality quantifies over quasi-compact opens and has uniqueness and two affine-base inhabitants.
@@ -120,6 +122,7 @@ issues:
           - DerivedAlgGeo/CategoryTheory/Triangulated/TStructure
           - DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase/Transfer
           - .claude/roadmap/stability-families.yaml
+          - openspec/changes/sf11-base-change-t-structures/tasks.md
           - notes/loop-engineering-sf11.md
         acceptance:
           - The existing Ind-extension carrier is reused through a proved comparison with the filtered-colimit presentation.
