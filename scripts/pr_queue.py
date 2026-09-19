@@ -76,11 +76,12 @@ BOOTSTRAP_PATHS = {
     "scripts/gates.sh",
     "scripts/precheck.sh",
     "scripts/check_local_build.py",
+    "scripts/loop_engine.py",
     "scripts/check_mathlib_style.py",
     "scripts/pr_queue.py",
     ".claude/settings.json",
 }
-BOOTSTRAP_PREFIXES = (".claude/skills/", ".claude/agents/")
+BOOTSTRAP_PREFIXES = (".claude/skills/", ".claude/agents/", ".claude/loop-specs/", "openspec/")
 
 
 def is_bootstrap(paths: list[str]) -> bool:

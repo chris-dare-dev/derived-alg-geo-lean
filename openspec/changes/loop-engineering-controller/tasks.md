@@ -1,0 +1,18 @@
+# Tasks
+
+## 1. OpenSpec and controller foundation
+
+- [x] 1.1 Initialize the repository OpenSpec structure and configure the Lean/mathlib, trust-boundary, and bounded-review context; verify `openspec validate loop-engineering-controller --strict --no-interactive` passes
+- [x] 1.2 Add `scripts/loop_engine.py` with manifest validation, portable OpenSpec artifact checks, and explicit `PASS`/`FAIL`/`DISABLED` output; verify the script's unit tests pass
+- [ ] 1.3 Add a tracked two-to-three-issue pilot manifest that references an OpenSpec change and a separate ignored runtime ledger directory; verify manifest validation rejects missing artifacts and more than three review rounds
+
+## 2. Review and mutation safeguards
+
+- [ ] 2.1 Add the three adversarial reviewer roles and connect their names to the manifest review panel; verify duplicate or missing reviewer evidence is rejected
+- [ ] 2.2 Add guarded provider actions for comments, issue closure, pushes, pull-request creation, approval, and explicitly opt-in merge; verify dry-run and refusal paths without contacting the provider
+- [ ] 2.3 Require OpenSpec and no-sorry/repository gates in the local precheck path; verify the gate agreement remains synchronized
+
+## 3. Pilot readiness
+
+- [ ] 3.1 Document the OpenSpec-first loop and the handoff between proposal, apply, review ledger, CI, and archive; verify a fresh checkout can discover the workflow
+- [ ] 3.2 Run the disabled pilot's read-only validation, inspect live preflight failures, and record the exact prerequisites for enabling it; verify no GitHub mutation occurs during the dry run

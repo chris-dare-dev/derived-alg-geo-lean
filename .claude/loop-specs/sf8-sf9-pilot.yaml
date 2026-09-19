@@ -1,0 +1,99 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: sf8-sf9-pilot
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: stack
+enabled: false
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: sf8-sf9-pilot
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/sf8-sf9-supported-moduli/spec.md
+
+limits:
+  min_issues: 2
+  max_issues: 3
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+    - trust-surface
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+
+mutations:
+  comment_issue: true
+  close_issue: true
+  push_branch: true
+  create_pr: true
+  approve_pr: true
+  merge_pr: false
+
+issues:
+  - number: 554
+    slug: sf8-5-supported-pullback
+    depends_on: []
+    chunks:
+      - id: sf8-5-pullback-construction
+        scope: Construct the supported arbitrary derived pullback and prove its preservation/coherence obligations.
+        requirements:
+          - Supported arbitrary derived pullbacks are constructed
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory
+          - DerivedAlgGeo/AlgebraicGeometry/Moduli
+        acceptance:
+          - The supported construction is actual Lean data, not an existence or preservation postulate.
+          - The non-flat nonidentity example and comparison/coherence obligations are proved.
+
+  - number: 522
+    slug: sf9-2-supported-algebraicity
+    depends_on:
+      - 554
+    chunks:
+      - id: sf9-2-supported-algebraicity
+        scope: Prove algebraicity for the supported relative-perfect moduli stack with actual atlas, diagonal, and local-finiteness morphisms.
+        requirements:
+          - Algebraicity is proved for the supported moduli stack
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/Moduli
+          - DerivedAlgGeo/AlgebraicGeometry/Stacks
+        acceptance:
+          - The atlas is an actual scheme morphism with the required coverage statements.
+          - The diagonal and local-finiteness claims are proved without a representability shortcut.
+
+  - number: 525
+    slug: sf9-3-downstream-refinement
+    depends_on:
+      - 522
+    chunks:
+      - id: sf9-3-downstream-refinement
+        scope: Apply the downstream SF9.3 refinement only after the supported algebraicity chain is accepted and merged.
+        requirements:
+          - Downstream SF9.3 work respects the dependency boundary
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/Moduli
+          - DerivedAlgGeo/AlgebraicGeometry/Stacks
+        acceptance:
+          - The refinement consumes the canonical supported algebraicity interface.
+          - No duplicate root or premature downstream assumption is introduced.

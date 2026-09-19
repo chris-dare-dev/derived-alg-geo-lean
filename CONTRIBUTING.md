@@ -172,6 +172,25 @@ you changed. Seconds, not minutes. It is a cheap green, not a green: the
 library build, the audits, the ratchets, the linters and the emitter all need
 the library elaborated and run on the runners.
 
+### OpenSpec and bounded batch loops
+
+For a planned unattended batch, put the proposal, requirement scenarios,
+design, and task checklist in `openspec/` and validate them with the OpenSpec
+CLI when it is available:
+
+```bash
+openspec validate --all --strict --no-interactive
+python scripts/loop_engine.py validate --spec .claude/loop-specs/sf8-sf9-pilot.yaml
+python scripts/loop_engine.py preflight --spec .claude/loop-specs/sf8-sf9-pilot.yaml
+```
+
+The loop manifest is execution authority, not a second requirements system. It
+must select at most three issues, freeze file-level chunks, name the four
+independent reviewers, and cap each chunk at three review/improve rounds. A
+failed third round stops the chunk. Provider actions are separately enabled;
+issue closure for code work requires a merged PR, and merge remains disabled by
+default. Keep run ledgers in ignored `.loop-runs/`, never in the OpenSpec plan.
+
 This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate
 before merge. All three instructions are withdrawn. `CLAUDE.md` was corrected
