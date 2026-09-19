@@ -1,0 +1,100 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: dt1-m41
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+# The first commit on this dedicated loop branch is the reviewed OpenSpec
+# bootstrap; implementation begins only after this exact clean baseline passes
+# preflight. The PR remains based on origin/main.
+base_ref: HEAD
+mode: stack
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: dt1-m41
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - agent-observations.md
+    - specs/dt1-derived-tensor/spec.md
+
+limits:
+  min_issues: 2
+  max_issues: 2
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+    - trust-surface
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: true
+  allow_delete_branch_override: true
+  allow_auto: true
+  allow_admin: true
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: false
+
+mutations:
+  comment_issue: true
+  close_issue: true
+  push_branch: true
+  create_pr: true
+  approve_pr: true
+  merge_pr: true
+
+issues:
+  - number: 929
+    slug: dt1-left-derived-tensor
+    depends_on: []
+    chunks:
+      - id: dt1-929-left-derived-tensor
+        scope: Inhabit the supported left-derived tensor and tensor-acyclic-resolution interface with an explicit localization counit, fixed-argument universal property, and exact identity-resolution comparison.
+        requirements:
+          - The tensor-derived left derived interface is inhabited
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/LeftDerivedTensor.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
+        acceptance:
+          - TensorAcyclicResolution and LeftDerivedTensor are actual Lean declarations with explicit comparison and inversion data.
+          - The fixed-argument derived tensor exposes proved Functor.IsLeftDerivedFunctor witnesses and the exact identity case has a canonical comparison.
+          - Focused Lean targets, no-sorry/no-axiom checks, umbrella coverage, and the four adversarial reviews pass on the same commit.
+        closure: complete
+
+  - number: 928
+    slug: dt1-coherent-tensor-assembly
+    depends_on:
+      - 929
+    chunks:
+      - id: dt1-928-coherent-tensor-assembly
+        scope: Transfer ambient tensor exactness and coherence to the bounded coherent tier and assemble HasCoherentDerivedTensor through the existing bounded monoidal restriction.
+        requirements:
+          - The coherent bounded derived tensor structure is assembled
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/CoherentAssembly.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
+        acceptance:
+          - Named additive, commutative-shift, and triangulated transfer lemmas are available for each fixed bounded kernel.
+          - HasCoherentDerivedTensor.ofUnbounded produces the existing coherent class and HasDerivedTensor projection without duplicate roots or hidden hypotheses.
+          - Focused Lean targets, no-sorry/no-axiom checks, umbrella coverage, and the four adversarial reviews pass on the same commit.
+        closure: complete
