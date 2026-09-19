@@ -59,6 +59,11 @@ replacement for a Lean theorem or an issue acceptance criterion.
   actual local contract is `scripts/precheck.sh --no-build` plus a named
   targeted `lake build` invocation. Keep this distinction visible in future
   plans.
+- New public declarations in a Families module also require an entry in the
+  exact `scripts/AlgebraicGeometryAudit/StabilityConditionFamilies.lean`
+  record. The SF11 manifest now includes that audit slice; omitting it lets a
+  compiling change fail later in audit-completeness rather than at the frozen
+  chunk boundary.
 
 ## Time-saving practices
 
@@ -79,3 +84,10 @@ replacement for a Lean theorem or an issue acceptance criterion.
   3,600 targets; treat that as cache warm-up, not as evidence that the whole
   repository target was run, and retain `LEAN_NUM_THREADS=2` for repeatable
   targeted builds.
+- The full `StabilityConditionFamilies.lean` audit imports a much larger
+  stability graph than the changed base-change modules need. For a local
+  completeness check, a generated two-import audit can print only the changed
+  declarations and still be passed through `check_audit.py` with its own
+  command-count source. Avoid running that slice while another Lake build is
+  compiling the same cache: concurrent workers can race on intermediate
+  `.olean` paths and report misleading “file not found” failures.

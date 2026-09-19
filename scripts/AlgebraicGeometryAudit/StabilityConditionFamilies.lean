@@ -506,6 +506,7 @@ for every instance, as are the identity and composition laws.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.mapsQuasicoherent
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.mk.inj
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.ofExact
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.functor
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.functorCompInclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DqcLeftDerivedPullback.functor_obj_obj
@@ -1354,6 +1355,7 @@ construction of the same three operations inherits it without copying.
 -/
 
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DerivedBaseChangeData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DerivedBaseChangeData.ofExactPullbacks
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DerivedBaseChangeData.BoundedCategory
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DerivedBaseChangeData.PreservesCompactObjects
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DerivedBaseChangeData.PreservesCompactObjects.fst
