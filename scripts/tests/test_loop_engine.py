@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -118,6 +119,10 @@ class LoopEngineTests(unittest.TestCase):
             [],
         )
         self.assertEqual(
+            loop_engine.blocked_by_entries({"blockedBy": {"nodes": [], "totalCount": 1}}),
+            [{}],
+        )
+        self.assertEqual(
             loop_engine.blocked_by_entries({"blockedBy": {"nodes": [{"number": 7}], "totalCount": 1}}),
             [{"number": 7}],
         )
@@ -126,12 +131,18 @@ class LoopEngineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             original_platform = loop_engine.sys.platform
-            loop_engine.sys.platform = "win32"
             try:
-                result = loop_engine.run_command(root, ["openspec", "--version"])
+                loop_engine.sys.platform = "win32"
+                with mock.patch.object(
+                    loop_engine.subprocess,
+                    "run",
+                    return_value=subprocess.CompletedProcess(["openspec.cmd"], 0, "", ""),
+                ) as process:
+                    result = loop_engine.run_command(root, ["openspec", "--version"])
             finally:
                 loop_engine.sys.platform = original_platform
             self.assertIsInstance(result, subprocess.CompletedProcess)
+            self.assertEqual(process.call_args.args[0], ["openspec.cmd", "--version"])
 
     def test_structural_openspec_validation_and_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
