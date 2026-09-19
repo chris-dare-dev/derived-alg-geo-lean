@@ -12,8 +12,9 @@ handoff between issues explicit before the loop is enabled.
 - Plan the supported arbitrary derived-pullback construction in SF8.5 (#554).
 - Plan the algebraicity proof for the supported relative-perfect moduli stack
   in SF9.2 (#522).
-- Plan the downstream SF9.3 refinement (#525) only after the preceding
-  dependency is actually complete and the required gates are green.
+- Plan semistable reduction and the quasi-properness adapter in SF9.3 (#525)
+  only after the preceding dependency is actually complete and the required
+  gates are green.
 - Keep implementation chunks small and independently adversarially reviewed.
 
 ## Capabilities

@@ -34,4 +34,5 @@ turning unattended execution into an unbounded or mathematically unsafe agent.
 
 The change adds Python control-plane code, OpenSpec planning artifacts, three
 adversarial reviewer roles, repository documentation, and cheap local gates.
-It does not perform any GitHub mutation while the pilot manifest is disabled.
+It does not perform any GitHub mutation until the enabled pilot passes its
+clean-checkout, dependency, branch-protection, and roadmap preflight.

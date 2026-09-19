@@ -55,6 +55,15 @@ ISSUE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BRANCH_RE = re.compile(r"^agent/[a-z0-9][a-z0-9._/-]*$")
 CLOSING_KEYWORD_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b", re.I)
 SUCCESS_CONCLUSIONS = {"SUCCESS", "success", "PASSED", "passed"}
+MERGE_METHODS = {"merge", "squash", "rebase"}
+DEFAULT_MERGE_POLICY = {
+    "method": "squash",
+    "delete_branch": False,
+    "allow_method_override": False,
+    "allow_delete_branch_override": False,
+    "allow_auto": False,
+    "allow_admin": False,
+}
 
 
 class LoopError(RuntimeError):
@@ -232,6 +241,27 @@ def require_bool(mapping: dict[str, Any], key: str, name: str) -> bool:
     return value
 
 
+def merge_policy(spec: dict[str, Any]) -> dict[str, Any]:
+    """Return the explicit merge policy, retaining safe v1 defaults."""
+
+    configured = spec.get("merge", {})
+    if not isinstance(configured, dict):
+        raise LoopError("spec.merge must be a mapping")
+    policy = {**DEFAULT_MERGE_POLICY, **configured}
+    if policy["method"] not in MERGE_METHODS:
+        raise LoopError("spec.merge.method must be merge, squash, or rebase")
+    for key in (
+        "delete_branch",
+        "allow_method_override",
+        "allow_delete_branch_override",
+        "allow_auto",
+        "allow_admin",
+    ):
+        if not isinstance(policy[key], bool):
+            raise LoopError(f"spec.merge.{key} must be a boolean")
+    return policy
+
+
 def validate_spec(spec: dict[str, Any]) -> None:
     """Validate the stable, intentionally small v1 specification schema."""
 
@@ -368,6 +398,7 @@ def validate_spec(spec: dict[str, Any]) -> None:
     mutations = require_mapping(spec.get("mutations"), "spec.mutations")
     for action in ACTION_TO_MUTATION.values():
         require_bool(mutations, action, "spec.mutations")
+    merge_policy(spec)
     closure = require_mapping(spec.get("closure"), "spec.closure")
     if closure.get("code_issue") != "pr_merge_keyword":
         raise LoopError("spec.closure.code_issue must be 'pr_merge_keyword'")
@@ -420,6 +451,12 @@ def print_validation(path: Path, root: Path) -> int:
     print(f"  mode={spec['mode']} enabled={spec['enabled']} issues={len(spec['issues'])}")
     print(f"  reviewers={', '.join(spec['review']['reviewers'])}")
     print(f"  max_review_rounds_per_chunk={spec['limits']['max_review_rounds_per_chunk']}")
+    policy = merge_policy(spec)
+    print(
+        "  merge="
+        f"{policy['method']} delete_branch={policy['delete_branch']} "
+        f"auto={policy['allow_auto']} admin={policy['allow_admin']}"
+    )
     if not spec["enabled"]:
         print("  NOTE pilot is disabled; no remote mutation is authorized")
     return 0
@@ -1139,17 +1176,70 @@ def action_approve(
     return 0
 
 
+def build_merge_command(
+    spec: dict[str, Any],
+    pr_number: int,
+    head_sha: str,
+    method: str | None,
+    auto: bool,
+    admin: bool,
+    delete_branch: bool | None,
+) -> list[str]:
+    """Build a race-resistant merge command from an explicitly authorized policy."""
+
+    policy = merge_policy(spec)
+    selected_method = method or policy["method"]
+    if selected_method not in MERGE_METHODS:
+        raise LoopError("merge method must be merge, squash, or rebase")
+    if method is not None and method != policy["method"] and not policy["allow_method_override"]:
+        raise LoopError("merge method override is disabled by spec.merge.allow_method_override")
+    if auto and not policy["allow_auto"]:
+        raise LoopError("auto-merge is disabled by spec.merge.allow_auto")
+    if admin and not policy["allow_admin"]:
+        raise LoopError("admin merge is disabled by spec.merge.allow_admin")
+    if auto and admin:
+        raise LoopError("--auto and --admin are mutually exclusive")
+    selected_delete_branch = policy["delete_branch"]
+    if delete_branch is not None:
+        if not policy["allow_delete_branch_override"]:
+            raise LoopError(
+                "branch-deletion override is disabled by "
+                "spec.merge.allow_delete_branch_override"
+            )
+        selected_delete_branch = delete_branch
+
+    args = [
+        "gh",
+        "pr",
+        "merge",
+        str(pr_number),
+        "--repo",
+        spec["repository"],
+        f"--{selected_method}",
+        "--match-head-commit",
+        head_sha,
+        "--delete-branch" if selected_delete_branch else "--delete-branch=false",
+    ]
+    if auto:
+        args.append("--auto")
+    if admin:
+        args.append("--admin")
+    return args
+
+
 def action_merge(
     root: Path,
     spec: dict[str, Any],
     pr_number: int,
     ledger_file: Path,
-    method: str,
+    method: str | None,
+    auto: bool,
+    admin: bool,
+    delete_branch: bool | None,
     dry_run: bool,
 ) -> int:
     authorize_action(spec, "merge")
-    if method not in {"merge", "squash", "rebase"}:
-        raise LoopError("merge method must be merge, squash, or rebase")
+    merge_policy(spec)
     state = load_state(ledger_file)
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("merge ledger was created from a different run manifest")
@@ -1160,7 +1250,17 @@ def action_merge(
     current = latest_round(state)
     if current is None or current.get("adjudication", {}).get("verdict") != "pass":
         raise LoopError("merge requires a passing adjudicated review round")
-    check_required_checks(root, spec, pr_number)
+    args = build_merge_command(
+        spec,
+        pr_number,
+        current["commit"],
+        method,
+        auto,
+        admin,
+        delete_branch,
+    )
+    if not admin:
+        check_required_checks(root, spec, pr_number)
     pr = gh_json(
         root,
         [
@@ -1178,21 +1278,16 @@ def action_merge(
     if pr.get("headRefOid") != current.get("commit"):
         raise LoopError("PR head does not match the commit reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
-    args = [
-        "gh",
-        "pr",
-        "merge",
-        str(pr_number),
-        "--repo",
-        spec["repository"],
-        f"--{method}",
-        "--delete-branch=false",
-    ]
     if dry_run:
         print("DRY-RUN " + " ".join(args))
         return 0
     run_command(root, args, check=True)
-    print(f"PASS PR merged: #{pr_number}")
+    if auto:
+        print(f"PASS PR queued for auto-merge: #{pr_number}")
+    elif admin:
+        print(f"PASS PR admin-merged: #{pr_number}")
+    else:
+        print(f"PASS PR merged: #{pr_number}")
     return 0
 
 
@@ -1267,7 +1362,13 @@ def build_parser() -> argparse.ArgumentParser:
     add_common_spec_parser(merge_parser)
     merge_parser.add_argument("--pr", required=True, type=int)
     merge_parser.add_argument("--ledger", required=True, type=Path)
-    merge_parser.add_argument("--method", default="squash", choices=["merge", "squash", "rebase"])
+    merge_parser.add_argument("--method", choices=sorted(MERGE_METHODS))
+    merge_parser.add_argument("--auto", action="store_true", help="request provider auto-merge")
+    merge_parser.add_argument("--admin", action="store_true", help="request an explicit administrator merge")
+    delete_group = merge_parser.add_mutually_exclusive_group()
+    delete_group.add_argument("--delete-branch", dest="delete_branch", action="store_true")
+    delete_group.add_argument("--keep-branch", dest="delete_branch", action="store_false")
+    merge_parser.set_defaults(delete_branch=None)
     merge_parser.add_argument("--dry-run", action="store_true")
     return parser
 
@@ -1316,7 +1417,17 @@ def main(argv: list[str] | None = None) -> int:
             if args.action_command == "approve":
                 return action_approve(root, spec, args.pr, args.ledger.resolve(), args.body, args.dry_run)
             if args.action_command == "merge":
-                return action_merge(root, spec, args.pr, args.ledger.resolve(), args.method, args.dry_run)
+                return action_merge(
+                    root,
+                    spec,
+                    args.pr,
+                    args.ledger.resolve(),
+                    args.method,
+                    args.auto,
+                    args.admin,
+                    args.delete_branch,
+                    args.dry_run,
+                )
     except LoopError as exc:
         print(f"FAIL {exc}")
         return 1

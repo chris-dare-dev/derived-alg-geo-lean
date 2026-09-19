@@ -33,8 +33,9 @@ construction prerequisite for #522, and #525 remains downstream.
 3. Keep the #522 atlas/diagonal/local-finiteness proof statements in the
    requirement surface; implementation may use existing mathlib structures but
    cannot replace these statements with a representability field.
-4. Treat #525 as a separate frozen chunk with a dependency edge, not as a
-   speculative parallel improvement.
+4. Treat #525 as a separate frozen chunk for supported semistable reduction and
+   quasi-properness with a dependency edge, not as a speculative parallel
+   improvement.
 5. Record the canonical owner and at least two independent consumers (or a
    statement-layer exception) in each abstraction review. The controller ties
    the chunk to exact OpenSpec requirement headings, while the adversary checks

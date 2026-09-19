@@ -90,6 +90,14 @@ is confirmed merged unless non-PR closure was explicitly enabled.
   closure is disabled
 - **THEN** the controller refuses to close the issue
 
+#### Scenario: Merge capability is explicitly shaped
+
+- **WHEN** a run requests a merge method, auto-merge, administrator merge, or
+  branch deletion
+- **THEN** the controller permits that behavior only when the corresponding
+  merge-policy setting is enabled, binds the command to the reviewed PR head,
+  and never infers an administrator bypass from a failed required check
+
 ### Requirement: OpenSpec remains the planning source of truth
 
 The repository SHALL keep proposals, requirements with scenarios, designs, and

@@ -410,8 +410,8 @@ unsuccessful round is a terminal stop, not permission to re-chunk the work.
 Comments, pushes, PR creation, approval, issue closure, and merge are separate
 manifest capabilities. Code issues close only after a confirmed merged PR, and
 merge authority is false unless the manifest explicitly enables it. The pilot
-manifest is checked in disabled while its live preflight and dependency policy
-are being refined.
+manifest is owner-enabled, but its live preflight and digest-bound review
+ledger remain mandatory before any provider mutation.
 
 This paragraph used to read "every gate in `gates.sh` runs in CI", and that
 sentence is why `single-instantiation` ran nowhere for months: the hook made the

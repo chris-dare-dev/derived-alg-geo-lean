@@ -37,8 +37,10 @@ read-only preflight, keeps a digest-bound review ledger under ignored
 `.loop-runs/`, and refuses a fourth review/improve round for one chunk. The
 mathematical, repository-boundary, abstraction, and mathlib reviewers are
 independent; a passing style review is not mathematical evidence. Code issues
-are closed only after a confirmed merged pull request, and merge authority is
-disabled in the pilot by default.
+are closed only after a confirmed merged pull request. The owner-enabled pilot
+has a checked-in merge policy that makes method, auto-merge, administrator
+merge, and branch deletion explicit; the controller still requires its live
+preflight and digest-bound review ledger before any mutation.
 
 ## The artifacts in `notes/`
 

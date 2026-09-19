@@ -129,7 +129,10 @@ When the ledger passes:
    digests, PR head, frozen files, and required checks. Provider refusal of
    self-approval is a hard stop, not a reason to bypass branch protection.
 4. Merge only if `mutations.merge_pr` is explicitly true and a passing ledger
-   is supplied. Otherwise stop at the approved PR.
+   is supplied. The merge action also requires the requested method, auto,
+   administrator, and branch-deletion behavior to be allowed by the manifest;
+   administrator merge is never inferred from a failed check. Otherwise stop
+   at the approved PR.
 5. Close the issue only after the controller confirms that the merged PR closes
    that same issue. Then re-run preflight before considering the next selected
    issue.

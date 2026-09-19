@@ -14,7 +14,8 @@
 - [ ] 2.3 Prove the supported diagonal and local-finiteness morphism statements; verify the corresponding targeted build and no-sorry gate
 - [ ] 2.4 Run the full repository audit surface and record the three-lens review ledger; verify self-hosted CI required checks are green
 
-## 3. SF9.3 handoff (#525)
+## 3. SF9.3 semistable reduction (#525)
 
-- [ ] 3.1 Revalidate live issue dependencies and create a separate frozen chunk only after #522 is merged; verify the controller rejects premature execution
-- [ ] 3.2 Apply the accepted SF9.3 plan and run its targeted gates; verify the downstream OpenSpec scenarios and repository audits
+- [ ] 3.1 Revalidate live issue dependencies and create a separate frozen chunk only after #522 and the relative-HN input are available; verify the controller rejects premature execution
+- [ ] 3.2 Formalize the supported DVR/Dedekind diagrams, permitted base change, semistable replacement, and uniqueness/S-equivalence boundary; verify targeted Lean gates
+- [ ] 3.3 Add the quasi-properness adapter at the actual algebraic-moduli layer; verify the OpenSpec scenarios, audits, and full gates

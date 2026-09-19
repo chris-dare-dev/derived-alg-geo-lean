@@ -70,19 +70,31 @@ problem or a general representability theorem.
 - **THEN** the diagonal and local-finiteness claims are stated and proved at the
   required morphism layer
 
-### Requirement: Downstream SF9.3 work respects the dependency boundary
+### Requirement: Semistable reduction and quasi-properness are proved for the supported moduli stack
 
-The pilot SHALL not mark SF9.3 (#525) ready for implementation until the
-accepted SF8.5 and SF9.2 obligations, repository audits, and required CI checks
-are complete.
+The implementation SHALL construct the supported semistable-reduction data for
+SF9.3 (#525), including DVR/Dedekind test diagrams, permitted base change,
+semistable replacement, the uniqueness/S-equivalence boundary, and the
+quasi-properness adapter. The implementation SHALL not mark this requirement
+ready until the accepted SF8.5 and SF9.2 obligations, relative-HN inputs,
+repository audits, and required CI checks are complete.
 
-#### Scenario: Dependency not complete
+#### Scenario: Dependency or relative-HN input is not complete
 
-- **WHEN** #554 or #522 remains open, blocked, or without passing review
+- **WHEN** #554, #522, or the required relative-HN input remains open, blocked,
+  or without passing review
 - **THEN** the controller refuses to start the #525 chunk
 
-#### Scenario: Dependency complete
+#### Scenario: Supported semistable replacement
 
-- **WHEN** the preceding issues are closed by merged pull requests and their
-  ledgers pass
-- **THEN** the #525 plan may be preflighted as a new frozen chunk
+- **WHEN** a supported family over a DVR or Dedekind base is supplied
+- **THEN** the implementation produces the permitted-base-change and
+  semistable-replacement data without accepting a valuative conclusion directly
+  from callers
+
+#### Scenario: Quasi-properness adapter
+
+- **WHEN** the supported algebraic moduli stack and relative-HN structures are
+  available
+- **THEN** the quasi-properness adapter is stated at the actual moduli layer and
+  does not introduce a duplicate algebraicity root or an opaque existence field

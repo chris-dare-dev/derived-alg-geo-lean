@@ -20,7 +20,10 @@ python scripts/loop_engine.py validate --spec .claude/loop-specs/sf8-sf9-pilot.y
 python scripts/loop_engine.py preflight --spec .claude/loop-specs/sf8-sf9-pilot.yaml
 ```
 
-The pilot is intentionally checked in with `enabled: false`. Enabling it is a
-separate repository-owner decision after its live issue/dependency state and
-the merge policy have been reviewed. `merge_pr` remains false by default, and
-code issues may only be closed after a confirmed merged pull request.
+The pilot is checked in with `enabled: true` because the repository owner has
+authorized this first run. The controller still requires a clean `main`-based
+checkout and a passing live preflight before it performs any mutation. The
+schema keeps `merge_pr` false by default; this pilot explicitly enables it.
+Method, auto-merge, administrator merge, and branch deletion are separate
+explicit merge-policy settings. Code issues may only be closed after a
+confirmed merged pull request.

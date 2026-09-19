@@ -188,8 +188,9 @@ The loop manifest is execution authority, not a second requirements system. It
 must select at most three issues, freeze file-level chunks, name the four
 independent reviewers, and cap each chunk at three review/improve rounds. A
 failed third round stops the chunk. Provider actions are separately enabled;
-issue closure for code work requires a merged PR, and merge remains disabled by
-default. Keep run ledgers in ignored `.loop-runs/`, never in the OpenSpec plan.
+issue closure for code work requires a merged PR, and the schema keeps merge
+disabled unless the manifest enables it explicitly. Keep run ledgers in ignored
+`.loop-runs/`, never in the OpenSpec plan.
 
 This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate

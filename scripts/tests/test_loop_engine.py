@@ -66,6 +66,14 @@ def make_spec(root: Path) -> tuple[Path, dict]:
         "review": {"independent": True, "reviewers": REVIEWERS},
         "runner": {"required_checks": ["ci"]},
         "closure": {"code_issue": "pr_merge_keyword", "allow_non_pr": False},
+        "merge": {
+            "method": "squash",
+            "delete_branch": False,
+            "allow_method_override": False,
+            "allow_delete_branch_override": False,
+            "allow_auto": False,
+            "allow_admin": False,
+        },
         "mutations": {
             "comment_issue": False,
             "close_issue": False,
@@ -179,6 +187,80 @@ class LoopEngineTests(unittest.TestCase):
             (root / "openspec" / "changes" / "pilot-change" / "design.md").unlink()
             with self.assertRaises(loop_engine.LoopError):
                 loop_engine.load_spec(spec_path, root)
+
+    def test_merge_command_is_bound_to_reviewed_head_and_safe_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            loaded = loop_engine.load_spec(spec_path, root)
+            command = loop_engine.build_merge_command(
+                loaded, 42, "a" * 40, None, False, False, None
+            )
+            self.assertEqual(
+                command,
+                [
+                    "gh",
+                    "pr",
+                    "merge",
+                    "42",
+                    "--repo",
+                    "example/repository",
+                    "--squash",
+                    "--match-head-commit",
+                    "a" * 40,
+                    "--delete-branch=false",
+                ],
+            )
+            for kwargs in (
+                {"method": "merge"},
+                {"auto": True},
+                {"admin": True},
+                {"delete_branch": True},
+            ):
+                with self.assertRaises(loop_engine.LoopError):
+                    loop_engine.build_merge_command(
+                        loaded,
+                        42,
+                        "a" * 40,
+                        kwargs.get("method"),
+                        kwargs.get("auto", False),
+                        kwargs.get("admin", False),
+                        kwargs.get("delete_branch"),
+                    )
+
+    def test_merge_command_allows_only_manifest_authorized_variants(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["merge"].update(
+                {
+                    "allow_method_override": True,
+                    "allow_delete_branch_override": True,
+                    "allow_auto": True,
+                    "allow_admin": True,
+                }
+            )
+            command = loop_engine.build_merge_command(
+                spec, 42, "b" * 40, "rebase", True, False, True
+            )
+            self.assertEqual(
+                command,
+                [
+                    "gh",
+                    "pr",
+                    "merge",
+                    "42",
+                    "--repo",
+                    "example/repository",
+                    "--rebase",
+                    "--match-head-commit",
+                    "b" * 40,
+                    "--delete-branch",
+                    "--auto",
+                ],
+            )
+            with self.assertRaises(loop_engine.LoopError):
+                loop_engine.build_merge_command(spec, 42, "b" * 40, None, True, True, None)
 
 
 if __name__ == "__main__":

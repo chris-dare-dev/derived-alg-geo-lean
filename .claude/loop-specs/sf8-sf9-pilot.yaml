@@ -6,7 +6,7 @@ remote: origin
 base_branch: main
 base_ref: origin/main
 mode: stack
-enabled: false
+enabled: true
 allow_force_push: false
 state_dir: .loop-runs
 roadmap_gate: required
@@ -38,6 +38,14 @@ runner:
     - ci
     - trust-surface
 
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: true
+  allow_delete_branch_override: true
+  allow_auto: true
+  allow_admin: true
+
 closure:
   code_issue: pr_merge_keyword
   allow_non_pr: false
@@ -48,7 +56,7 @@ mutations:
   push_branch: true
   create_pr: true
   approve_pr: true
-  merge_pr: false
+  merge_pr: true
 
 issues:
   - number: 554
@@ -83,17 +91,17 @@ issues:
           - The diagonal and local-finiteness claims are proved without a representability shortcut.
 
   - number: 525
-    slug: sf9-3-downstream-refinement
+    slug: sf9-3-semistable-reduction
     depends_on:
       - 522
     chunks:
-      - id: sf9-3-downstream-refinement
-        scope: Apply the downstream SF9.3 refinement only after the supported algebraicity chain is accepted and merged.
+      - id: sf9-3-semistable-reduction
+        scope: Formalize supported semistable-reduction data and the quasi-properness adapter only after the algebraicity chain is accepted and merged.
         requirements:
-          - Downstream SF9.3 work respects the dependency boundary
+          - Semistable reduction and quasi-properness are proved for the supported moduli stack
         files:
           - DerivedAlgGeo/AlgebraicGeometry/Moduli
           - DerivedAlgGeo/AlgebraicGeometry/Stacks
         acceptance:
-          - The refinement consumes the canonical supported algebraicity interface.
-          - No duplicate root or premature downstream assumption is introduced.
+          - DVR/Dedekind test diagrams, permitted base change, and semistable replacement are represented by actual supported structures.
+          - The quasi-properness adapter consumes the canonical algebraicity and relative-HN interfaces without a valuative conclusion postulate.
