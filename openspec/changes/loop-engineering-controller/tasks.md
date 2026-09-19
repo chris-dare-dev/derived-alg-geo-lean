@@ -11,6 +11,7 @@
 - [x] 2.1 Add the three adversarial reviewer roles and connect their names to the manifest review panel; verify duplicate or missing reviewer evidence is rejected
 - [x] 2.2 Add guarded provider actions for comments, issue closure, pushes, pull-request creation, approval, and explicitly opt-in merge; verify dry-run and refusal paths without contacting the provider
 - [x] 2.4 Make merge method, auto-merge, administrator merge, branch deletion, and reviewed-head binding explicit in the manifest/controller; verify override refusal and command construction
+- [x] 2.5 Make live preflight command launching and GitHub response-shape normalization portable on Windows; verify the preflight reports provider state instead of aborting on a local launcher error
 - [x] 2.3 Require OpenSpec and no-sorry/repository gates in the local precheck path; verify the gate agreement remains synchronized
 
 ## 3. Pilot readiness
