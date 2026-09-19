@@ -27,6 +27,14 @@ from an unproved marker typeclass introduced by the chunk.
 - **THEN** the construction produces the claimed derived pullback data and the
   relevant comparison maps are proved, with no sorry or postulated existence
 
+#### Scenario: Progress witness before the full issue contract
+
+- **WHEN** a frozen progress chunk instantiates the supported non-flat,
+  nonidentity affine witness
+- **THEN** the witness and its supported pullback data are actual Lean terms,
+  the PR uses a non-closing reference to #554, and the controller leaves #554
+  open until the remaining preservation and coherence obligations pass
+
 #### Scenario: Preservation obligation is tested
 
 - **WHEN** a supported object satisfies the declared pseudo-coherence, finite

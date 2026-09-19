@@ -6,6 +6,7 @@
 - [ ] 1.2 Construct the supported K-flat/resolution and left-derived inhabitation layer; verify targeted Lean declarations and no-sorry checks
 - [ ] 1.3 Prove supported pseudo-coherence, finite-Tor, and negative-Ext preservation; verify targeted Lean tests and the relevant audit scripts
 - [ ] 1.4 Add the five coherence laws, comparison/agreement result, and non-flat nonidentity example; verify targeted Lean checks and mathematical adversarial review
+- [x] 1.5 Add the explicit `ℤ → ZMod 2` non-flat/nonidentity affine witness as a progress chunk; verify the supported pullback instantiation, full Lean build, and non-closing PR policy
 
 ## 2. SF9.2 algebraicity (#522)
 
