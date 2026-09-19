@@ -100,6 +100,28 @@ generation, or `S`-linearity. -/
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedInclusion_preservesCoproductsOfShape
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedToDqc_preservesCoproductsOfShape
 
+/-! ## The supported non-flat affine pullback witness (SF8.5 item 9, #1404)
+
+`ZMod 2` over `ℤ` is the standard closed immersion that is not flat: flatness
+would make `ZMod 2` torsion-free as a `ℤ`-module, and `2 • 1 = 0` with both
+factors nonzero. The point of recording it is the pullback below -- the affine
+bounded-above-projective core pseudofunctor builds `zmodTwoAffinePullback`
+with no flatness hypothesis available to it, so the witness is what stops
+"supported" being read as "flat, implicitly".
+
+It is an EXAMPLE and the records below claim nothing more. It does not identify
+the supported affine K-projective-derived lane with the relative-perfect locus,
+and it does not prove the general-scheme preservation theorems, which remain
+open in #554. -/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRing
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRingMap
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoSchemeMap
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRingMap_not_flat
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoSchemeMap_not_flat
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRingMap_not_iso
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoAffinePullback
+
 /-! ## Relative-perfect and universally-gluable scheme objects (#521)
 
 Pseudo-coherence, local finite Tor amplitude over a base, relative
