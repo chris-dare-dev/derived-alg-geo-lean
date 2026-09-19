@@ -110,6 +110,13 @@ a non-closing issue reference, and no closing keyword.
   merge-policy setting is enabled, binds the command to the reviewed PR head,
   and never infers an administrator bypass from a failed required check
 
+#### Scenario: Reviewed head accepts a Git revision abbreviation
+
+- **WHEN** the ledger records a valid short or full revision that local Git
+  resolves to the provider-reported full PR head SHA
+- **THEN** approval and merge treat it as the same reviewed head; an unresolved,
+  ambiguous, or different revision is still rejected
+
 ### Requirement: OpenSpec remains the planning source of truth
 
 The repository SHALL keep proposals, requirements with scenarios, designs, and

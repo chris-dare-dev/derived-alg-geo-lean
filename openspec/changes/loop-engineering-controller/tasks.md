@@ -13,6 +13,7 @@
 - [x] 2.4 Make merge method, auto-merge, administrator merge, branch deletion, and reviewed-head binding explicit in the manifest/controller; verify override refusal and command construction
 - [x] 2.5 Make live preflight command launching and GitHub response-shape normalization portable on Windows; verify the preflight reports provider state instead of aborting on a local launcher error
 - [x] 2.6 Add explicitly authorized progress PRs that cannot close an issue, while retaining strict complete-PR closure semantics; verify manifest authorization and non-closing-link refusal tests
+- [x] 2.7 Bind approval and merge to either a short or full reviewed Git revision without weakening exact-head checks; verify prefix acceptance and mismatch refusal
 - [x] 2.3 Require OpenSpec and no-sorry/repository gates in the local precheck path; verify the gate agreement remains synchronized
 
 ## 3. Pilot readiness

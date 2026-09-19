@@ -179,6 +179,16 @@ class LoopEngineTests(unittest.TestCase):
         with self.assertRaises(loop_engine.LoopError):
             loop_engine.validate_pr_body_closure("Refs #554\n", 554, "complete")
 
+    def test_reviewed_commit_accepts_short_or_full_head_revision(self) -> None:
+        head = "a" * 40
+        with mock.patch.object(loop_engine, "git", return_value=head):
+            self.assertTrue(loop_engine.reviewed_commit_matches_head(Path("."), "a" * 7, head))
+            self.assertTrue(loop_engine.reviewed_commit_matches_head(Path("."), head, head))
+        with mock.patch.object(loop_engine, "git", return_value=""):
+            self.assertFalse(loop_engine.reviewed_commit_matches_head(Path("."), "a" * 7, head))
+        self.assertFalse(loop_engine.reviewed_commit_matches_head(Path("."), "b" * 7, head))
+        self.assertFalse(loop_engine.reviewed_commit_matches_head(Path("."), "a" * 7, "a" * 39))
+
     def test_ledger_requires_all_reviewers_and_stops_after_three_rounds(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
