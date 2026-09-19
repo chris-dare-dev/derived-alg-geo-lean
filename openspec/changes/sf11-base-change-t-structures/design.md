@@ -89,6 +89,13 @@ use targeted Lean module builds; the full repository build is left to CI.
    confusing naming discovered during the run. It does not substitute for a
    theorem or silently broaden a frozen file scope.
 
+8. **Scope the roadmap gate to the manifest base.** The repository already has
+   inherited RM-07 disagreements that are not authored by this batch. The
+   controller invokes `check_roadmap.py --scope-to-diff=<base_ref>` so those
+   disagreements remain visible in the output but do not make an unrelated
+   branch claim ownership of their repair; any roadmap entry changed by the
+   SF11 branch still fails closed.
+
 ## Risks / Trade-offs
 
 - **[Geometric witnesses exceed the current library]** → Keep the exact paper
@@ -106,6 +113,9 @@ use targeted Lean module builds; the full repository build is left to CI.
 - **[Epic opt-in becomes a blanket bypass]** → Validate the allow-list as a
   subset of the selected issue numbers and report the admitted exception during
   preflight.
+- **[An inherited roadmap defect is silently ignored]** → Keep the scoped gate's
+  inherited-disagreement report in the preflight output and the SF11 note; only
+  branch-authored roadmap entries can be admitted by this run.
 
 ## Migration Plan
 

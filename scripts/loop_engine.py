@@ -565,6 +565,17 @@ def issue_state(root: Path, repository: str, number: int) -> dict[str, Any]:
     return data
 
 
+def roadmap_gate_args(base_ref: str) -> list[str]:
+    """Scope roadmap consistency failures to entries authored after base_ref."""
+
+    return [
+        "python",
+        "scripts/check_roadmap.py",
+        "--require-api",
+        f"--scope-to-diff={base_ref}",
+    ]
+
+
 def preflight(root: Path, spec_path: Path) -> int:
     try:
         spec = load_spec(spec_path, root)
@@ -710,7 +721,7 @@ def preflight(root: Path, spec_path: Path) -> int:
 
     roadmap_gate = spec.get("roadmap_gate", "required")
     if roadmap_gate != "disabled":
-        roadmap = run_command(root, ["python", "scripts/check_roadmap.py", "--require-api"], check=False)
+        roadmap = run_command(root, roadmap_gate_args(spec["base_ref"]), check=False)
         if roadmap.returncode != 0:
             message = (roadmap.stdout or roadmap.stderr).strip().splitlines()
             detail = message[-1] if message else "roadmap gate failed"

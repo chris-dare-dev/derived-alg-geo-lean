@@ -40,6 +40,13 @@ replacement for a Lean theorem or an issue acceptance criterion.
   their bodies explicitly leave geometric inhabitants or coherence open. A
   future agent should read those bodies before assuming a similarly named
   declaration closes an epic.
+- `check_roadmap --require-api` exposes an inherited RM-07 defect: issue #854
+  is CLOSED even though its merged PR #1392 explicitly says its shift/triangle
+  and Ext obligations remain, while `dg-enhancements-e9` remains
+  `in_progress`. This SF11 run must not repair that unrelated tracker state by
+  changing the mathematics. The controller now scopes the roadmap gate to the
+  manifest base ref, so the defect is reported as inherited and any SF11-authored
+  roadmap drift still fails closed.
 
 ## Time-saving practices
 

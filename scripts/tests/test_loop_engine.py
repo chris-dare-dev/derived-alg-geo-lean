@@ -166,6 +166,17 @@ class LoopEngineTests(unittest.TestCase):
             with self.assertRaises(loop_engine.LoopError):
                 loop_engine.load_spec(spec_path, root)
 
+    def test_roadmap_gate_is_scoped_to_manifest_base(self) -> None:
+        self.assertEqual(
+            loop_engine.roadmap_gate_args("agent/sf11-base"),
+            [
+                "python",
+                "scripts/check_roadmap.py",
+                "--require-api",
+                "--scope-to-diff=agent/sf11-base",
+            ],
+        )
+
     def test_ledger_requires_all_reviewers_and_stops_after_three_rounds(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
