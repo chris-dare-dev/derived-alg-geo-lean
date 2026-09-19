@@ -978,10 +978,6 @@ jobs:
       # alone and reports "1 in-scope module of 488 built; 0 built
       # declarations" -- green, having compared nothing.
       - name: Contract gates
-        env:
-          # For scripts/check_roadmap.py's `gh` calls at the end of this step.
-          # Read-only issue metadata; the default token's scope is sufficient.
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           # Its own venv, in the workspace. The self-hosted lane is the owner's
@@ -1115,96 +1111,26 @@ jobs:
             echo "::notice::check-resolution did NOT run: no attest/resolution.json yet (arXMCP-side, #134)"
           fi
 
-          # The roadmap-vs-tracker check (#620). It runs HERE, at the end of
-          # this step, for one reason: it needs PyYAML, and `.mfc-venv` is the
-          # only interpreter in this workflow guaranteed to have it -- the
-          # self-hosted lane's `python3` is 3.9.6 system Python. Running it as
-          # a bare `python3 scripts/...` alongside the other check_*.py would
-          # be a coin flip on the runner.
+          # The roadmap-vs-tracker check (#620) NO LONGER RUNS HERE. It is the
+          # `roadmap` job further down this file, and it is in `ci`'s `needs`,
+          # so it still blocks the merge -- this is a move, not a demotion.
           #
-          # `--require-api` is deliberate. Without `gh` the script prints
-          # NOT_RUN and exits 0, so a contributor with no `gh` is not blocked
-          # from running the offline gates -- but CI is the one environment
-          # guaranteed to have the API, and a check that silently skips there
-          # is the vacuous pass this repository keeps finding in new places.
-          # RM-07 is the one rule here that judges a file in the branch
-          # against LIVE tracker state, so any merge that closes an issue and
-          # advances its entry on `main` turns every branch that forked earlier
-          # red -- on an entry that branch never touched. On 2026-09-12 that
-          # was 15 of 18 open pull requests at once.
+          # It moved because it was the LAST thing in the last gate step of a
+          # 14-minute build, and it is the one gate here that can fail on a
+          # pull request that compiles perfectly. #1392 built clean -- 1770
+          # jobs, zero sorries, every other gate green -- and failed at
+          # 14m04s on RM-08, because its body said `Closes #854` while the
+          # entry read `status: blocked`. Nothing that check reads comes out
+          # of the build: it reads `.claude/roadmap/*.yaml` and the GitHub
+          # API, so the wait bought nothing and cost a full cycle per typo.
           #
-          # On a pull request, scope RM-07 to the entries the branch actually
-          # changed since it forked. Inherited disagreements still PRINT, as
-          # notes; they are `main`'s to fix and the line below judges them in
-          # full on every push to `main` and every merge queue entry. This
-          # moves where a finding is reported, not whether it is.
-          #
-          # The flag is passed ONLY for `pull_request`. Do not "simplify" this
-          # to pass it unconditionally: on `main` and in the merge queue the
-          # merge base is the thing being judged, so scoping there would judge
-          # nothing and pass vacuously.
-          #
-          # `--pr` is passed for the opposite reason. Scoping stops OTHER
-          # people's staleness reddening this branch; RM-08 stops THIS branch
-          # creating staleness for everyone else, by refusing a pull request
-          # that closes an issue without advancing its entry. RM-07 cannot do
-          # that job: while the pull request is open the issue it closes is
-          # still open, so RM-07 agrees with the tracker right up until the
-          # merge makes it disagree.
-          #
-          # BOTH flags key on "is there an open pull request for this ref",
-          # which is NOT the same question as "is this the pull_request
-          # event". `push` fires on `main` AND on `agent/**`, and those two
-          # are different cases:
-          #
-          #   * on `main` and in the merge queue there really is no pull
-          #     request to ask about, the merge base is the thing being
-          #     judged, and RM-07 unscoped is the backstop it has always been;
-          #   * on a push to an agent branch there usually IS one, and leaving
-          #     the flags off there is a RACE rather than a stricter check.
-          #     RM-08 requires the closing pull request to advance its entry,
-          #     so the entry reads `done` while the issue it closes is still
-          #     open, and the push-lane run then fails for exactly as long as
-          #     the pull request stays open. Whether it is red or green
-          #     depends only on whether this step happens to run before or
-          #     after the merge. #1338 went green on that lane purely because
-          #     its build took long enough for the merge to land first, and
-          #     #1341 went red on the same commit that passed as a pull
-          #     request. A check whose verdict is decided by a stopwatch is
-          #     not checking anything.
-          #
-          # So ASK for the number instead of inferring it from the event. If
-          # the lookup finds nothing -- no pull request, or no `gh` -- PR_NUM
-          # stays empty and the unscoped invocation runs, which is the strict
-          # direction and the pre-existing behaviour.
-          PR_NUM=""
-          case "${GITHUB_EVENT_NAME}" in
-            pull_request)
-              PR_NUM="${{ github.event.pull_request.number }}"
-              ;;
-            push)
-              if [ "${GITHUB_REF_NAME}" != "main" ]; then
-                PR_NUM="$(gh pr list --head "${GITHUB_REF_NAME}" \
-                  --state open --json number --jq '.[].number' \
-                  2>/dev/null | head -1 || true)"
-              fi
-              ;;
-          esac
-          if [ -n "$PR_NUM" ]; then
-            # merge-base needs the base branch present. The checkout above is
-            # fetch-depth: 0, which fetches all history, but not necessarily a
-            # remote-tracking ref for `main` -- fetch it by name. If this
-            # fails, the script resolves no base and judges everything, which
-            # is the safe direction.
-            git fetch --no-tags --depth=0 origin main >/dev/null 2>&1 || true
-            echo "roadmap: scoping RM-07 to pull request #${PR_NUM}"
-            "$VENV_PY" scripts/check_roadmap.py --require-api \
-              --scope-to-diff=origin/main \
-              --pr="${PR_NUM}"
-          else
-            echo "roadmap: no open pull request for this ref; judging every entry"
-            "$VENV_PY" scripts/check_roadmap.py --require-api
-          fi
+          # It lived here for a real reason, now gone: it needs PyYAML, and
+          # `.mfc-venv` was the only interpreter in this workflow guaranteed
+          # to have it (the self-hosted lane's `python3` is 3.9.6 system
+          # Python). The new job is hosted-only and builds its own venv, so
+          # it does not inherit that constraint. Do not move it back to save
+          # a job: the PR_NUM logic must exist exactly once, and a second
+          # copy is the thing that drifts.
 
           # ------------------------------------------------------------------
           # build.json, and the honest size of what it measured.
@@ -1440,6 +1366,130 @@ jobs:
           if-no-files-found: warn
 
   # ---------------------------------------------------------------------------
+  # The roadmap-vs-tracker gate (#620), in its own job since #1392.
+  #
+  # ubuntu-latest UNCONDITIONALLY, unlike `build`. That job's routing invariant
+  # permits self-hosted only on `push`/`workflow_dispatch`; this one has no
+  # reason to want a warm `.lake`, so it never goes near the question.
+  roadmap:
+    runs-on: ubuntu-latest
+    # Seconds of work. The cap is here so a hung `gh` call cannot hold the
+    # merge open for the default six hours.
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # `--scope-to-diff=origin/main` resolves a merge base, so the
+          # default single-commit checkout will not do.
+          fetch-depth: 0
+
+      - name: Roadmap and tracker agree
+        env:
+          # For scripts/check_roadmap.py's `gh` calls. Read-only issue
+          # metadata; the default token's scope is sufficient.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # The interpreter is CHOSEN, not inherited -- the rule `build`
+          # learned the expensive way. This script needs PyYAML, which is the
+          # reason it used to ride inside `.mfc-venv`; here it gets a venv of
+          # its own, so the dependency is declared rather than borrowed from
+          # whatever the image ships. Costs about five seconds.
+          #
+          # Do not "simplify" this to a bare `python3 scripts/...` on the
+          # strength of the hosted image having PyYAML today. That is the
+          # inherited interpreter again, and it fails on the image bump
+          # rather than on the change that made the assumption.
+          python3 -m venv .roadmap-venv
+          VENV_PY=.roadmap-venv/bin/python
+          "$VENV_PY" -m pip install --quiet --disable-pip-version-check pyyaml
+          "$VENV_PY" -c 'import sys, yaml; print("roadmap gate: python", sys.version.split()[0], "/ PyYAML", yaml.__version__)'
+
+          # `--require-api` is deliberate. Without `gh` the script prints
+          # NOT_RUN and exits 0, so a contributor with no `gh` is not blocked
+          # from running the offline gates -- but CI is the one environment
+          # guaranteed to have the API, and a check that silently skips there
+          # is the vacuous pass this repository keeps finding in new places.
+          # RM-07 is the one rule here that judges a file in the branch
+          # against LIVE tracker state, so any merge that closes an issue and
+          # advances its entry on `main` turns every branch that forked earlier
+          # red -- on an entry that branch never touched. On 2026-09-12 that
+          # was 15 of 18 open pull requests at once.
+          #
+          # On a pull request, scope RM-07 to the entries the branch actually
+          # changed since it forked. Inherited disagreements still PRINT, as
+          # notes; they are `main`'s to fix and the line below judges them in
+          # full on every push to `main` and every merge queue entry. This
+          # moves where a finding is reported, not whether it is.
+          #
+          # The flag is passed ONLY for `pull_request`. Do not "simplify" this
+          # to pass it unconditionally: on `main` and in the merge queue the
+          # merge base is the thing being judged, so scoping there would judge
+          # nothing and pass vacuously.
+          #
+          # `--pr` is passed for the opposite reason. Scoping stops OTHER
+          # people's staleness reddening this branch; RM-08 stops THIS branch
+          # creating staleness for everyone else, by refusing a pull request
+          # that closes an issue without advancing its entry. RM-07 cannot do
+          # that job: while the pull request is open the issue it closes is
+          # still open, so RM-07 agrees with the tracker right up until the
+          # merge makes it disagree.
+          #
+          # BOTH flags key on "is there an open pull request for this ref",
+          # which is NOT the same question as "is this the pull_request
+          # event". `push` fires on `main` AND on `agent/**`, and those two
+          # are different cases:
+          #
+          #   * on `main` and in the merge queue there really is no pull
+          #     request to ask about, the merge base is the thing being
+          #     judged, and RM-07 unscoped is the backstop it has always been;
+          #   * on a push to an agent branch there usually IS one, and leaving
+          #     the flags off there is a RACE rather than a stricter check.
+          #     RM-08 requires the closing pull request to advance its entry,
+          #     so the entry reads `done` while the issue it closes is still
+          #     open, and the push-lane run then fails for exactly as long as
+          #     the pull request stays open. Whether it is red or green
+          #     depends only on whether this step happens to run before or
+          #     after the merge. #1338 went green on that lane purely because
+          #     its build took long enough for the merge to land first, and
+          #     #1341 went red on the same commit that passed as a pull
+          #     request. A check whose verdict is decided by a stopwatch is
+          #     not checking anything.
+          #
+          # So ASK for the number instead of inferring it from the event. If
+          # the lookup finds nothing -- no pull request, or no `gh` -- PR_NUM
+          # stays empty and the unscoped invocation runs, which is the strict
+          # direction and the pre-existing behaviour.
+          PR_NUM=""
+          case "${GITHUB_EVENT_NAME}" in
+            pull_request)
+              PR_NUM="${{ github.event.pull_request.number }}"
+              ;;
+            push)
+              if [ "${GITHUB_REF_NAME}" != "main" ]; then
+                PR_NUM="$(gh pr list --head "${GITHUB_REF_NAME}" \
+                  --state open --json number --jq '.[].number' \
+                  2>/dev/null | head -1 || true)"
+              fi
+              ;;
+          esac
+          if [ -n "$PR_NUM" ]; then
+            # merge-base needs the base branch present. The checkout above is
+            # fetch-depth: 0, which fetches all history, but not necessarily a
+            # remote-tracking ref for `main` -- fetch it by name. If this
+            # fails, the script resolves no base and judges everything, which
+            # is the safe direction.
+            git fetch --no-tags --depth=0 origin main >/dev/null 2>&1 || true
+            echo "roadmap: scoping RM-07 to pull request #${PR_NUM}"
+            "$VENV_PY" scripts/check_roadmap.py --require-api \
+              --scope-to-diff=origin/main \
+              --pr="${PR_NUM}"
+          else
+            echo "roadmap: no open pull request for this ref; judging every entry"
+            "$VENV_PY" scripts/check_roadmap.py --require-api
+          fi
+
+  # ---------------------------------------------------------------------------
   # The single required status check (2026-08-15).
   #
   # Branch protection can only require a check by NAME, and a rule that names a
@@ -1459,7 +1509,7 @@ jobs:
   # read as a failure below, and it gates nothing by design -- `build` on the
   # same commit makes the correctness claim.
   ci:
-    needs: [build]
+    needs: [build, roadmap]
     # This job must still run when `build` FAILED -- without that, a failed
     # build would leave `ci` skipped, and a skipped required check does not
     # block a merge. That is the whole mechanism, and it is why the obvious

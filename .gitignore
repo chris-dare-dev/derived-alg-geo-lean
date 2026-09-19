@@ -33,6 +33,9 @@ ROADMAP.md
 # this block the workflow's own venv and audit logs made every CI run "dirty",
 # which is a measurement of the workflow rather than of the repository.
 /.mfc-venv/
+# The `roadmap` job's venv (PyYAML for scripts/check_roadmap.py), and the same
+# venv when the gate is run by hand.
+/.roadmap-venv/
 /algebraic-geometry-audit.txt
 /bridgeland-audit.txt
 /coh-audit.txt
