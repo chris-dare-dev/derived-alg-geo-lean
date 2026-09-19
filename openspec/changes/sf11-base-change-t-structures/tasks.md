@@ -2,10 +2,10 @@
 
 ## 1. Plan and loop-controller readiness
 
-- [ ] 1.1 Add `eligibility.allow_epic_issues` as an explicit, subset-checked manifest field and preserve rejection of every unlisted `epic`, `blocked`, `research`, or `type:spike` issue; verify with `python -m unittest discover -s scripts/tests -p "test_*.py"`.
-- [ ] 1.2 Add the three-issue SF11 manifest with exact issue dependencies, frozen chunk file prefixes, four reviewers, `max_review_rounds_per_chunk: 3`, targeted-check requirements, and explicit epic opt-in; verify with `python scripts/loop_engine.py validate --spec .claude/loop-specs/sf11-pilot.yaml`.
-- [ ] 1.3 Record stale comments, roadmap mismatches, branch/base friction, and time-wasting build practices in `notes/loop-engineering-sf11.md`; verify the note names each observation's file and does not claim an unproved theorem.
-- [ ] 1.4 Validate the proposal, delta spec, design, and task checklist with `openspec validate sf11-base-change-t-structures --strict --no-interactive` and `openspec validate --all --strict --no-interactive`.
+- [x] 1.1 Add `eligibility.allow_epic_issues` as an explicit, subset-checked manifest field and preserve rejection of every unlisted `epic`, `blocked`, `research`, or `type:spike` issue; verify with `python -m unittest discover -s scripts/tests -p "test_*.py"`.
+- [x] 1.2 Add the three-issue SF11 manifest with exact issue dependencies, frozen chunk file prefixes, four reviewers, `max_review_rounds_per_chunk: 3`, targeted-check requirements, and explicit epic opt-in; verify with `python scripts/loop_engine.py validate --spec .claude/loop-specs/sf11-pilot.yaml`.
+- [x] 1.3 Record stale comments, roadmap mismatches, branch/base friction, and time-wasting build practices in `notes/loop-engineering-sf11.md`; verify the note names each observation's file and does not claim an unproved theorem.
+- [x] 1.4 Validate the proposal, delta spec, design, and task checklist with `openspec validate sf11-base-change-t-structures --strict --no-interactive` and `openspec validate --all --strict --no-interactive`.
 
 ## 2. Issue #1060 — constructed base-change categories
 
