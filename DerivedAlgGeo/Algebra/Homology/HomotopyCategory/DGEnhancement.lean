@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.Pretriangulated
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.KInjective
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.KProjective
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.DerivedSeam
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.Seam
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.ShiftComparison
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.CommShift

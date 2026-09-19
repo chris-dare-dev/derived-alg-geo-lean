@@ -295,14 +295,15 @@
         14
       ],
       "part": "III",
-      "status": "mapped",
+      "status": "reviewed",
       "tracking": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/192",
-      "note": "Weak stability conditions and HRS tilting. The repository holds abstract HRS-tilt machinery and source-facing candidates for Definitions 14.1--14.12, display (14.1), Proposition 14.16, and Lemma 14.17. The exact charge Z/(i-beta), support transport, noetherian zero-charge torsion conclusion, and the separate Hom-vanishing refinement are implemented. CLOSEOUT REVIEW 2026-08-14: the type-two classification predicate stores phase-cut membership and the positive-new-imaginary Hom implication, whereas the printed Lemma 14.17 states Hom vanishing as a subsequent moreover conclusion. The current biconditional is therefore a strengthened candidate, not a literal source binding. Issue #208 and epic #192 remain open; this coordinate stays mapped and must not be promoted.",
+      "note": "Weak stability conditions and HRS tilting. The repository holds abstract HRS-tilt machinery and source-facing candidates for Definitions 14.1--14.12, display (14.1), Proposition 14.16, and Lemma 14.17. The exact charge Z/(i-beta), support transport, noetherian zero-charge torsion conclusion, and the separate Hom-vanishing refinement are implemented. CLOSEOUT REVIEW 2026-08-14: the type-two classification predicate stores phase-cut membership and the positive-new-imaginary Hom implication, whereas the printed Lemma 14.17 states Hom vanishing as a subsequent moreover conclusion. The current biconditional is therefore a strengthened candidate, not a literal source binding. Issue #208 and epic #192 remain open; this coordinate stays mapped and must not be promoted. PROMOTED mapped -> reviewed 2026-09-19: the 2026-08-14 closeout's two findings are both resolved. The phase-cut membership field was a genuine over-strengthening and is now derived rather than assumed (phaseFree_of_tiltHeart_triangle; the field is gone from IsPhaseTiltTypeTwo, merged in #1383). The positive-imaginary Hom implication is load-bearing, not an over-strengthening: a split U[1] + V with V a nonzero zero-charge object satisfies every other clause of the printed case (2) and is not semistable, because Definition 14.2 gives a zero-charge subobject the slope +infinity, so the printed 'moreover' belongs to the right-hand side of the biconditional. Owner accepted that reading on 2026-09-19. This is reviewed, not formalized: evidence.owner_accepted is not set and no downstream coverage is claimed.",
       "evidence": {
-        "review_doc": ".claude/reviews/2026-08-14-sf1-source-closeout.md",
-        "reviewer": "Codex source-faithfulness audit",
-        "reviewed_at": "2026-08-14",
-        "v4_check": "Pages 71--74 were checked directly against the pinned v4 PDF. The display (14.1) cutoff conventions, Definition 14.12 envelope, and Proposition 14.16 charge normalization match the source-facing adapters. Lemma 14.17 does not yet have a literal biconditional because the Lean type-two predicate includes an additional Hom-vanishing implication. The mapped status records this candidate and explicit mismatch; it is not a reviewed coverage claim."
+        "review_doc": ".claude/reviews/2026-09-19-sf1-lemma-14-17-resolution.md",
+        "superseded_review_doc": ".claude/reviews/2026-08-14-sf1-source-closeout.md",
+        "reviewer": "Claude Opus 5 source re-read, owner accepted",
+        "reviewed_at": "2026-09-19",
+        "v4_check": "Pages 71--74 re-read directly against the pinned v4 PDF on 2026-09-16. Lemma 14.17 case (2) and Definition 14.2 were quote-checked. Definition 14.2's '+infinity otherwise' slope convention is what makes the printed 'moreover' clause load-bearing, and WeakStabilityFunction.slope implements that convention (top for non-positive imaginary part), so the reading transfers to the Lean statements without a convention shift. The free-class field the 2026-08-14 review flagged is derived from the phase interval and no longer a hypothesis. v4 omits the proof of Lemma 14.17, citing [PT19, Lemma 2.19]; the derivation recorded in the review document is self-contained. Case (2) writes V in A_0 where the moreover writes V' in A^0; same Definition 14.3 subcategory, a typography slip."
       }
     },
     {
