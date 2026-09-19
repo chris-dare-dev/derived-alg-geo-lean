@@ -175,8 +175,14 @@ def ensure_inside(root: Path, path: Path) -> Path:
 
 
 def run_command(root: Path, args: list[str], *, check: bool = False) -> subprocess.CompletedProcess[str]:
+    command = list(args)
+    # PowerShell resolves the npm-generated openspec.ps1 shim, but Python's
+    # Windows process launcher needs an executable extension.  The .cmd shim
+    # has the same behavior and is available wherever the CLI is installed.
+    if sys.platform == "win32" and command and command[0] == "openspec":
+        command[0] = "openspec.cmd"
     result = subprocess.run(
-        args,
+        command,
         cwd=root,
         capture_output=True,
         text=True,
@@ -186,7 +192,7 @@ def run_command(root: Path, args: list[str], *, check: bool = False) -> subproce
     )
     if check and result.returncode != 0:
         detail = (result.stderr or result.stdout).strip()
-        raise LoopError(f"command failed ({result.returncode}): {' '.join(args)}\n{detail}")
+        raise LoopError(f"command failed ({result.returncode}): {' '.join(command)}\n{detail}")
     return result
 
 
@@ -469,7 +475,23 @@ def normalize_remote(url: str) -> str:
     value = re.sub(r"^https?://", "", value)
     value = re.sub(r"^ssh://git@", "", value)
     value = value.removesuffix(".git").rstrip("/")
+    value = re.sub(r"^github\.com/", "", value)
     return value.lower()
+
+
+def blocked_by_entries(issue: dict[str, Any]) -> list[Any]:
+    """Normalize GitHub's blockedBy connection without treating an empty mapping as truthy."""
+
+    blocked_by = issue.get("blockedBy")
+    if isinstance(blocked_by, dict):
+        nodes = blocked_by.get("nodes")
+        if isinstance(nodes, list):
+            return nodes
+        total = blocked_by.get("totalCount")
+        return [{}] if isinstance(total, int) and total > 0 else []
+    if isinstance(blocked_by, list):
+        return blocked_by
+    return []
 
 
 def gh_authenticated(root: Path) -> str:
@@ -619,7 +641,7 @@ def preflight(root: Path, spec_path: Path) -> int:
         forbidden = labels & {"blocked", "epic", "research", "type:spike"}
         if forbidden:
             failures.append(f"issue #{number} has ineligible labels: {', '.join(sorted(forbidden))}")
-        blocked_by = live.get("blockedBy") or []
+        blocked_by = blocked_by_entries(live)
         if blocked_by:
             failures.append(f"issue #{number} has live blocked-by dependencies")
         for dependency in issue.get("depends_on", []):

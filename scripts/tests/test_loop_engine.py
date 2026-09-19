@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -107,6 +108,31 @@ def make_spec(root: Path) -> tuple[Path, dict]:
 
 
 class LoopEngineTests(unittest.TestCase):
+    def test_remote_and_blocker_normalization_match_github_shapes(self) -> None:
+        self.assertEqual(
+            loop_engine.normalize_remote("git@github.com:owner/repo.git"),
+            "owner/repo",
+        )
+        self.assertEqual(
+            loop_engine.blocked_by_entries({"blockedBy": {"nodes": [], "totalCount": 0}}),
+            [],
+        )
+        self.assertEqual(
+            loop_engine.blocked_by_entries({"blockedBy": {"nodes": [{"number": 7}], "totalCount": 1}}),
+            [{"number": 7}],
+        )
+
+    def test_windows_openspec_command_uses_cmd_shim(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            original_platform = loop_engine.sys.platform
+            loop_engine.sys.platform = "win32"
+            try:
+                result = loop_engine.run_command(root, ["openspec", "--version"])
+            finally:
+                loop_engine.sys.platform = original_platform
+            self.assertIsInstance(result, subprocess.CompletedProcess)
+
     def test_structural_openspec_validation_and_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
