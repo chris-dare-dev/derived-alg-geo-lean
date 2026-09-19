@@ -88,6 +88,10 @@ jobs:
           # the registry it validates, and the licence boundary.
           patterns='
           ^\.github/
+          ^\.claude/loop-specs/
+          ^\.claude/agents/
+          ^\.claude/skills/run-loop/
+          ^openspec/
           ^scripts/
           ^exe/
           ^registry/

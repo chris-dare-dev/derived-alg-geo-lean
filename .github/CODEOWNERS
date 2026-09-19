@@ -32,6 +32,12 @@
 /exe/ @chris-dare-dev
 /DerivedAlgGeoSweep.lean @chris-dare-dev
 
+# The loop's scope, reviewer prompts, and operating contract.
+/.claude/loop-specs/ @chris-dare-dev
+/.claude/agents/ @chris-dare-dev
+/.claude/skills/run-loop/ @chris-dare-dev
+/openspec/ @chris-dare-dev
+
 # Trust data: the statement registry and source-coverage maps.
 /registry/ @chris-dare-dev
 

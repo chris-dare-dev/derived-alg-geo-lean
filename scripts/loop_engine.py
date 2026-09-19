@@ -694,8 +694,12 @@ def preflight(root: Path, spec_path: Path) -> int:
             if dependency_state.get("state") != "CLOSED":
                 failures.append(f"issue #{number} depends on open issue #{dependency}")
         expected_branch = f"agent/{issue['slug']}"
-        if expected_branch == git(root, "branch", "--show-current", check=True):
-            failures.append(f"current branch already uses planned issue branch {expected_branch}")
+        # The preflight is intentionally run on the exact clean head from
+        # `base_ref`, and the planned issue branch is the normal place to do
+        # that.  Rejecting that branch name made a valid loop state
+        # impossible: the controller required a dedicated branch while also
+        # rejecting the dedicated branch it had planned.  Existing-PR checks
+        # below still fail closed if the branch has already been used.
         for pr in prs:
             if pr.get("headRefName") == expected_branch:
                 failures.append(f"a PR already exists for planned branch {expected_branch} (#{pr.get('number')})")

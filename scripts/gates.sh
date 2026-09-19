@@ -260,7 +260,7 @@ gate workflows scripts/check_workflows.sh
 # each script routes its console through scripts/_output.py, and that the
 # helper actually survives a cp1252 console.
 gate output-encoding python3 scripts/_output.py
-gate loop-spec python3 scripts/loop_engine.py validate --spec .claude/loop-specs/sf8-sf9-pilot.yaml
+gate loop-spec bash scripts/validate_loop_specs.sh
 gate loop-engine-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
 gate trust-guard scripts/test_trust_guard.sh
 # Next to it for the same reason: `check_local_build.py` is a PreToolUse hook,
