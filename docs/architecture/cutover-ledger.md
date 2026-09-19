@@ -429,8 +429,10 @@ moved files; it did not supply, strengthen or discharge any of that, and the
 `@[discharges "gltilde-universal-cover"]` binding travels with the theorem.
 
 **Not discharged here.** AUT1 (#927) concerns an autoequivalence action and a
-supplied proper discontinuity. It is a different obligation about a different
-group, it remains open, and no part of it is closed by this row.
+supplied proper discontinuity. Its interface and conditional consequences live
+in `Symmetry/Combined/ProperDiscontinuity.lean`; they are a different
+obligation about a different group, and no part of that capability is closed by
+this row. The capability still does not construct the supplied geometric input.
 
 Layering rule 16 and five fixtures under `scripts/fixtures/layering/` pin the
 result: the cover tree, the order-automorphism core, the complex-coordinate
