@@ -195,10 +195,14 @@ Run the `mathlib-reviewer` agent over `git diff origin/main...HEAD`. Apply its
 that does not transcribe its statement, a docstring that restates the signature.
 Leave anything requiring mathematical judgement for the PR comment.
 
-## 5. Push, and take the verdict from the runners
+## 5. Push, and take the verdict from the pull request run
 
-The push **is** the gate run: `ci.yml` triggers on `push` to `main` and
-`agent/**`, and routes it to `["self-hosted", "owner-win"]`.
+The push is **no longer** the gate run. Since 2026-09-19 `ci.yml` triggers
+`push` on `main` alone, so the run that gates this branch is the `pull_request`
+one on `ubuntu-latest`: the identical job set, the run branch protection reads,
+and over the 195 commits both lanes used to build, the faster of the two
+(20.8 min median against 40.2). The pull request is already open by step 1, so
+the push below still starts it.
 
 ```bash
 git push --force-with-lease

@@ -42,9 +42,11 @@ lake exe cache get
 LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
 ```
 
-**Full verification runs on the self-hosted Windows runners, not on your
-machine.** Pushing an `agent/**` branch runs the whole gate there; a bare
-`lake build` and `scripts/gates.sh` are refused locally by a `PreToolUse` hook.
+**Full verification runs in CI, not on your machine.** Opening a pull request
+runs the whole gate on `ubuntu-latest`; since 2026-09-19 a push on its own no
+longer does, and `gh workflow run ci.yml --ref <branch>` dispatches the
+self-hosted Windows lane when you want the platform check. A bare `lake build`
+and `scripts/gates.sh` are refused locally by a `PreToolUse` hook.
 For the local pre-flight the hook allows — every gate that needs no Lean build,
 plus a targeted build of what you changed, in seconds — run:
 
