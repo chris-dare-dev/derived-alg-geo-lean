@@ -100,3 +100,4 @@ Algebra	DerivedAlgGeo.Algebra.RelativeNumerical.FamilyRelationSystem	recorded be
 Algebra	DerivedCategory.ExtFiniteBounded	`of_ext` is the documented constructor from the nonnegative `Abelian.Ext` groups; the class is a hypothesis a consumer discharges
 Algebra	GradedModule.GradedLinearMap	recorded before the reason column existed; reason not yet written
 Algebra	GradedModule.NumDenSameDeg	recorded before the reason column existed; reason not yet written
+Algebra	CategoryTheory.Cdg.HasKInjectiveResolutions	Spaltenstein's existence theorem for K-injective resolutions, which Mathlib does not have at the pin (HomotopyCategory/KInjective.lean cites it and proves no existence statement); nothing in this repository can inhabit it, and that is the point -- dg-enhancements-e9 proves the derived seam fully faithful unconditionally and states only its essential surjectivity conditionally on this class, rather than assuming the conclusion that the functor is an equivalence
