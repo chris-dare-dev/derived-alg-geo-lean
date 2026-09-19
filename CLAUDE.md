@@ -408,8 +408,10 @@ the same commit. A chunk has at most three review/improve rounds; the third
 unsuccessful round is a terminal stop, not permission to re-chunk the work.
 
 Comments, pushes, PR creation, approval, issue closure, and merge are separate
-manifest capabilities. Code issues close only after a confirmed merged PR, and
-merge authority is false unless the manifest explicitly enables it. The pilot
+manifest capabilities. Code issues close only after a confirmed merged PR;
+complete chunks require a closing keyword while explicitly authorized progress
+chunks must use a non-closing reference. Merge authority is false unless the
+manifest explicitly enables it. The pilot
 manifest is owner-enabled, but its live preflight and digest-bound review
 ledger remain mandatory before any provider mutation.
 

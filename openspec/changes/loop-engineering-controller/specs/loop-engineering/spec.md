@@ -78,6 +78,11 @@ creation, approval, and merge as separate actions controlled by explicit manifes
 booleans, and SHALL refuse code-issue closure unless a referenced pull request
 is confirmed merged unless non-PR closure was explicitly enabled.
 
+Each frozen chunk SHALL declare either `complete` or `progress` closure mode.
+Complete chunks SHALL require a closing keyword for their issue in the PR body.
+Progress chunks SHALL require explicit `spec.closure.allow_progress_pr` enablement,
+a non-closing issue reference, and no closing keyword.
+
 #### Scenario: Safe code-issue closure
 
 - **WHEN** issue closure is requested with a pull request that the provider
@@ -89,6 +94,13 @@ is confirmed merged unless non-PR closure was explicitly enabled.
 - **WHEN** issue closure is requested without a merged pull request and non-PR
   closure is disabled
 - **THEN** the controller refuses to close the issue
+
+#### Scenario: Progress PR does not close its issue
+
+- **WHEN** an explicitly authorized progress chunk creates a PR whose body says
+  `Refs #N` (or another recognized non-closing reference)
+- **THEN** the controller permits PR creation but refuses any closing keyword
+  and leaves issue #N open for subsequent frozen chunks
 
 #### Scenario: Merge capability is explicitly shaped
 

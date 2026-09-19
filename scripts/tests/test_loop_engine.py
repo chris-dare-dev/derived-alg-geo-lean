@@ -152,6 +152,33 @@ class LoopEngineTests(unittest.TestCase):
             self.assertEqual(loaded["openspec"]["change"], "pilot-change")
             self.assertEqual(loop_engine.digest(loaded), loop_engine.digest(spec))
 
+    def test_progress_chunk_requires_explicit_manifest_authorization(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["issues"][0]["chunks"][0]["closure"] = "progress"
+            import yaml
+
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError):
+                loop_engine.load_spec(spec_path, root)
+
+            spec["closure"]["allow_progress_pr"] = True
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            loaded = loop_engine.load_spec(spec_path, root)
+            self.assertEqual(loaded["issues"][0]["chunks"][0]["closure"], "progress")
+
+    def test_progress_pr_link_cannot_close_an_issue(self) -> None:
+        loop_engine.validate_pr_body_closure("Refs #554\n", 554, "progress")
+        loop_engine.validate_pr_body_closure("See #554\n", 554, "progress")
+        loop_engine.validate_pr_body_closure("Closes #554\n", 554, "complete")
+        with self.assertRaises(loop_engine.LoopError):
+            loop_engine.validate_pr_body_closure("Closes #554\n", 554, "progress")
+        with self.assertRaises(loop_engine.LoopError):
+            loop_engine.validate_pr_body_closure("Refs #554\nCloses #522\n", 554, "progress")
+        with self.assertRaises(loop_engine.LoopError):
+            loop_engine.validate_pr_body_closure("Refs #554\n", 554, "complete")
+
     def test_ledger_requires_all_reviewers_and_stops_after_three_rounds(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

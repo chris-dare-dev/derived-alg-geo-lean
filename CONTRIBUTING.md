@@ -189,7 +189,9 @@ must select at most three issues, freeze file-level chunks, name the four
 independent reviewers, and cap each chunk at three review/improve rounds. A
 failed third round stops the chunk. Provider actions are separately enabled;
 issue closure for code work requires a merged PR, and the schema keeps merge
-disabled unless the manifest enables it explicitly. Keep run ledgers in ignored
+disabled unless the manifest enables it explicitly. Progress chunks must be
+marked explicitly and use non-closing issue references; complete chunks require
+a closing keyword. Keep run ledgers in ignored
 `.loop-runs/`, never in the OpenSpec plan.
 
 This section previously read "Build the stable root while developing:
