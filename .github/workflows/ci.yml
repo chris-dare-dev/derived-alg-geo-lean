@@ -1602,11 +1602,33 @@ jobs:
     # `cancel-in-progress` on branch lanes, so pushing twice in a minute --
     # the normal agent-lane cadence -- cancels the first run. Under `always()`
     # that dead run still executed this job, saw `RESULTS: cancelled`, and
-    # posted a FAILING `ci` check. Because that failure lands LATER than the
-    # superseding run's success, it is the newest check with this name, and
-    # branch protection reads the newest: a green build sat behind a red `ci`
+    # posted a FAILING `ci` check: a green build sat behind a red `ci`
     # belonging to a run that had been killed on purpose. PRs #1242 and #1243
     # were both stuck this way.
+    #
+    # THIS PARAGRAPH USED TO EXPLAIN THAT WITH "branch protection reads the
+    # newest" check of a given name, and that is WRONG. Measured on #1409,
+    # 2026-09-19, on one commit carrying two `ci` check runs:
+    #
+    #     ci  FAILURE  22:46:52   push lane, died in 24s installing elan
+    #     ci  SUCCESS  22:58:34   pull_request lane, 14m44s, every gate
+    #     statusCheckRollup.state = FAILURE, mergeStateStatus = BLOCKED
+    #
+    # The rollup aggregates EVERY check run on the commit. One red blocks
+    # however old it is and however green a newer run of the same name is, and
+    # the branch was up to date with zero required reviews, so nothing else
+    # explains it. The pull request had to be merged with an admin bypass.
+    #
+    # The correction makes the `!cancelled()` reasoning STRONGER, not weaker: a
+    # cancelled run's red `ci` does not merely win a race against a later
+    # green, it blocks unconditionally until something overwrites that specific
+    # check run. Ordering never mattered.
+    #
+    # It also means a red check from ANY lane is a hard block, which is half
+    # the argument for `push` firing on `main` alone -- see the `on:` block.
+    # A 24-second infrastructure fault on a self-hosted runner could otherwise
+    # hold a pull request whose real verification had already passed, and the
+    # only ways out are a 40-minute rebuild or an admin merge.
     #
     # `!cancelled()` keeps the mechanism and drops the artifact: a FAILED
     # upstream is not a cancelled run, so this still runs and still fails on
