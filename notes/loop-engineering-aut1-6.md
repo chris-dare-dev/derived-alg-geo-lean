@@ -5,10 +5,12 @@ It is operational guidance, not a mathematical source of truth.
 
 ## Verified inconsistencies
 
-- The issue is still open and carries the `blocked` label even though its
-  named blockers #922 and #923 are closed.  It also carries `research`, which
-  the controller treats as ineligible even though the remaining work is an
-  acceptance pass.
+- At the start of the run, the issue was still open and carried the `blocked`
+  label even though its named blockers #922 and #923 were closed.  It also
+  carried `research`, which the controller treats as ineligible even though
+  the remaining work is an acceptance pass.  Both stale labels were removed
+  before the loop ledger was initialized; the issue remains open until the
+  controller confirms the merged closing PR.
 - The implementation PR for #927 (#1175) merged on 2026-09-12 into the stacked
   branch `agent/stability-orbit-spaces`, not the repository default branch.
   Its `Closes #927` text therefore did not close the GitHub issue.  The merged
@@ -45,6 +47,14 @@ It is operational guidance, not a mathematical source of truth.
   commit therefore reports both failures even when the branch has the exact
   base and the working tree is clean. Preserve this as a controller/workflow
   issue; do not relax the base or branch checks in a task-specific manifest.
+- The controller's later PR actions bind the reviewed head commit and frozen
+  changed files, but do not independently assert the PR base/head branch names
+  or bind closure to a particular PR beyond the caller-supplied number.  For
+  this run, before approval, merge, and closure, re-read the exact PR and
+  require base `main`, head `agent/aut1-6-proper-discontinuity`, the ledger's
+  reviewed commit, and the frozen file list; pass only that PR number to the
+  controller's close action.  This is a run guard, not permission to weaken
+  the controller or broaden the issue.
 - The loop-controller capability spec says a run has two or three issues, while
   the current validator accepts `min_issues: 1`.  This user-directed run keeps
   one issue because #927 is the only open issue in its AUT1 milestone; no

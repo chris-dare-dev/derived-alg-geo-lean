@@ -15,6 +15,7 @@ openspec:
   change: aut1-6-proper-discontinuity
   validation: cli-required
   required_artifacts:
+    - .openspec.yaml
     - proposal.md
     - design.md
     - tasks.md
