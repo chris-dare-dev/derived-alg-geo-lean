@@ -38,6 +38,13 @@ It is operational guidance, not a mathematical source of truth.
 - The local precheck reports a workflow failure when `actionlint` is absent;
   `SKIP_ACTIONLINT=1 bash scripts/precheck.sh --no-build` lets the remaining
   local gates run, but the self-hosted CI workflow check is still the verdict.
+- The controller's `preflight` ordering is awkward for a newly authored
+  manifest: it requires `HEAD == origin/main` and rejects the planned
+  `agent/<slug>` branch, while the manifest and OpenSpec artifacts are normally
+  authored in that dedicated branch. Running it after worktree creation and
+  commit therefore reports both failures even when the branch has the exact
+  base and the working tree is clean. Preserve this as a controller/workflow
+  issue; do not relax the base or branch checks in a task-specific manifest.
 - The loop-controller capability spec says a run has two or three issues, while
   the current validator accepts `min_issues: 1`.  This user-directed run keeps
   one issue because #927 is the only open issue in its AUT1 milestone; no
