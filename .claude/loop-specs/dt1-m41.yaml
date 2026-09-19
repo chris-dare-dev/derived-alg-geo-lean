@@ -6,10 +6,10 @@ remote: origin
 base_branch: main
 # The first commit on this dedicated loop branch is the reviewed OpenSpec
 # bootstrap; implementation begins only after this exact clean baseline passes
-# preflight. The PR remains based on origin/main. Freeze this explicitly so
-# the ledger diff includes implementation commits rather than resolving HEAD
-# again after the first chunk is committed.
-base_ref: dt1-m41-baseline
+# preflight. The PR remains based on origin/main. The remote-tracking ref is
+# intentionally used here: after each completed stacked issue, the next clean
+# worktree starts from the newly merged main baseline.
+base_ref: origin/main
 mode: stack
 enabled: true
 allow_force_push: false
