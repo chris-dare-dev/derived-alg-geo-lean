@@ -385,6 +385,24 @@ def validate_spec(spec: dict[str, Any]) -> None:
             ):
                 raise LoopError(f"{chunk_name}.requirements must name at least one OpenSpec requirement")
 
+    eligibility = spec.get("eligibility", {})
+    if not isinstance(eligibility, dict):
+        raise LoopError("spec.eligibility must be a mapping")
+    allow_epic_issues = eligibility.get("allow_epic_issues", [])
+    if not isinstance(allow_epic_issues, list) or any(
+        not isinstance(number, int) or isinstance(number, bool) or number <= 0
+        for number in allow_epic_issues
+    ):
+        raise LoopError("spec.eligibility.allow_epic_issues must be a list of positive issue numbers")
+    if len(set(allow_epic_issues)) != len(allow_epic_issues):
+        raise LoopError("spec.eligibility.allow_epic_issues must not contain duplicates")
+    unselected_epic_opt_ins = set(allow_epic_issues) - numbers
+    if unselected_epic_opt_ins:
+        raise LoopError(
+            "spec.eligibility.allow_epic_issues must be a subset of selected issues: "
+            + ", ".join(str(number) for number in sorted(unselected_epic_opt_ins))
+        )
+
     reviewer_spec = require_mapping(spec.get("review"), "spec.review")
     reviewers = reviewer_spec.get("reviewers")
     if not isinstance(reviewers, list) or not reviewers or any(
@@ -457,6 +475,9 @@ def print_validation(path: Path, root: Path) -> int:
     print(f"  mode={spec['mode']} enabled={spec['enabled']} issues={len(spec['issues'])}")
     print(f"  reviewers={', '.join(spec['review']['reviewers'])}")
     print(f"  max_review_rounds_per_chunk={spec['limits']['max_review_rounds_per_chunk']}")
+    epic_opt_ins = spec.get("eligibility", {}).get("allow_epic_issues", [])
+    if epic_opt_ins:
+        print(f"  explicitly_authorized_epic_issues={','.join(str(number) for number in epic_opt_ins)}")
     policy = merge_policy(spec)
     print(
         "  merge="
@@ -642,6 +663,10 @@ def preflight(root: Path, spec_path: Path) -> int:
             if isinstance(label, dict)
         }
         forbidden = labels & {"blocked", "epic", "research", "type:spike"}
+        allow_epic_issues = set(spec.get("eligibility", {}).get("allow_epic_issues", []))
+        if "epic" in forbidden and number in allow_epic_issues:
+            forbidden.remove("epic")
+            print(f"PASS issue #{number}: epic label explicitly authorized by manifest")
         if forbidden:
             failures.append(f"issue #{number} has ineligible labels: {', '.join(sorted(forbidden))}")
         blocked_by = blocked_by_entries(live)

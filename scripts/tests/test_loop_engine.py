@@ -152,6 +152,20 @@ class LoopEngineTests(unittest.TestCase):
             self.assertEqual(loaded["openspec"]["change"], "pilot-change")
             self.assertEqual(loop_engine.digest(loaded), loop_engine.digest(spec))
 
+    def test_epic_opt_in_is_explicit_and_selected_only(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["eligibility"] = {"allow_epic_issues": [1]}
+            import yaml
+
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            self.assertEqual(loop_engine.load_spec(spec_path, root)["eligibility"], spec["eligibility"])
+            spec["eligibility"] = {"allow_epic_issues": [2]}
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError):
+                loop_engine.load_spec(spec_path, root)
+
     def test_ledger_requires_all_reviewers_and_stops_after_three_rounds(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
