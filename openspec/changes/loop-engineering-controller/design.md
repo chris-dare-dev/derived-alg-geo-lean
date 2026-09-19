@@ -18,7 +18,9 @@ concerns belong to a small repository-local controller.
 - Require independent adversarial lenses before adjudication.
 - Make the third failed round a terminal stop rather than a fourth attempt.
 - Make remote mutations opt-in per action and make code-issue closure require a
-  merged pull request.
+  merged pull request. Permit a progress PR only when the frozen chunk and
+  manifest explicitly authorize it, and require that PR to avoid closing
+  keywords.
 
 ### Non-Goals
 
@@ -44,7 +46,10 @@ concerns belong to a small repository-local controller.
    OpenSpec-artifact digest, so a changed plan cannot approve an old review.
 4. **Provider actions are explicit subcommands.** Comments, closure, push,
    PR creation, approval, and merge each require a corresponding boolean in the
-   manifest. The controller uses argument arrays, never shell interpolation.
+   manifest. A chunk's `closure` mode is `complete` by default; `progress`
+   requires `spec.closure.allow_progress_pr: true`, a non-closing issue
+   reference, and no closing keyword. The controller uses argument arrays, never
+   shell interpolation.
 5. **Review rounds are per frozen chunk.** All required reviewers must review
    the same commit before adjudication. A new commit starts the next round; the
    cap is three, and scope cannot be re-chunked to evade it.
