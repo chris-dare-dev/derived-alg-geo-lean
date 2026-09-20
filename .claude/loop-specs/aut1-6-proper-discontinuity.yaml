@@ -88,6 +88,15 @@ issues:
           - scripts/StabilityConditionAudit/PhaseTopology.lean
           - docs/architecture/cutover-ledger.md
           - notes/loop-engineering-aut1-6.md
+        lift_targets:
+          # Proper discontinuity of a group action is a statement about a space
+          # and a group. It exists in this repository only inside
+          # StabilityCondition/Symmetry/Combined/, and not at all in the pinned
+          # Mathlib. Precedent: Topology/Covering/Basic.lean records MO1.12
+          # (#1323) extracting a general covering lemma out of the GL+(2,R)
+          # argument because its statement mentions no matrix, no phase and no
+          # stability condition. Same shape, same owner.
+          - DerivedAlgGeo/Topology
         acceptance:
           - "The existing Lean surface satisfies every issue #927 requirement without `sorry`, `admit`, hidden axioms, or a generic inhabitant of `ProperDiscontinuityData`."
           - The finite-stabilizer consequence is callable from only a `ProperlyDiscontinuousSMul` hypothesis, while local, quotient, and covering results expose all required topological hypotheses.

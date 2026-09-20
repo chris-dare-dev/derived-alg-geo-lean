@@ -80,6 +80,14 @@ issues:
           - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/LeftDerivedTensor.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
+        lift_targets:
+          # A localization counit, a fixed-argument universal property and an
+          # exact identity-resolution comparison are generic homological
+          # algebra. layers.md:341 names this module the owner of generic
+          # derived-category extensions, and it already holds KFlatResolution,
+          # AcyclicComparison, AcyclicGenerators and ExactFunctor -- the
+          # machinery this chunk specializes to schemes.
+          - DerivedAlgGeo/Algebra/Homology/DerivedCategory
         acceptance:
           - TensorAcyclicResolution and LeftDerivedTensor are actual Lean declarations with explicit comparison and inversion data.
           - The fixed-argument derived tensor exposes proved Functor.IsLeftDerivedFunctor witnesses and the exact identity case has a canonical comparison.
@@ -99,6 +107,11 @@ issues:
           - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/CoherentAssembly.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
+        lift_targets:
+          # Transferring exactness and coherence across a bounded restriction is
+          # generic derived-category work (layers.md:341); only the coherent
+          # tier itself is scheme-specific.
+          - DerivedAlgGeo/Algebra/Homology/DerivedCategory
         acceptance:
           - Named additive, commutative-shift, and triangulated transfer lemmas are available for each fixed bounded kernel.
           - HasCoherentDerivedTensor.ofUnbounded produces the existing coherent class and HasDerivedTensor projection without duplicate roots or hidden hypotheses.
