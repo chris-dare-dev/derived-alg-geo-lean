@@ -34,11 +34,13 @@ objects are owned. No generic tensor API is copied into the projective lane,
 and no cohomology theorem is moved into the module layer. The audit records for
 the existing declarations remain the authoritative trust surface.
 
-The source edits remain in files that already own the claims: two explanatory
+The source edits remain in files that already own the claims: explanatory
 docstring corrections and the typeclass-boundary correction identified by the
-first mathematics review. OpenSpec artifacts and the fresh manifest are frozen
-alongside them so the review panel evaluates the corrected closeout evidence
-and not a later expansion.
+mathematics reviews. The final documentation-hygiene chunk also qualifies the
+alternative-twist and degree-one-generation prose without changing a theorem.
+OpenSpec artifacts and each fresh manifest are frozen alongside the source so
+the review panel evaluates the corrected closeout evidence and not a later
+expansion.
 
 ## Closeout evidence
 
@@ -56,6 +58,9 @@ and not a later expansion.
 - The first review round is preserved as evidence for the superseded manifest;
   the corrected source scope starts a fresh bounded chunk, with the same
   three-round maximum and the same four independent reviewer roles.
+- The prior scope-correction chunk reached its hard cap and is intentionally
+  terminal; the documentation-hygiene chunk has its own digest-bound ledger
+  and must pass its own panel before provider actions.
 
 ## Known non-goals
 

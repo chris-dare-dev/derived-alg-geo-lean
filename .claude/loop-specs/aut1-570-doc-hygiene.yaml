@@ -1,5 +1,5 @@
 schema: derived-alg-geo-lean.loop-run/v1
-id: aut1-570-serre-scope-correction
+id: aut1-570-doc-hygiene
 repository: chris-dare-dev/derived-alg-geo-lean
 actor: chris-dare-dev
 remote: origin
@@ -66,14 +66,14 @@ issues:
     slug: aut1-570-serre-closeout
     depends_on: []
     chunks:
-      - id: aut1-570-serre-scope-correction
-        scope: "Reconcile the already-landed Serre quotient theorems with issue #570, correct stale proof-route guidance, correct the finite-nonempty P⁰ boundary found by adversarial review, and record loop friction; do not add a second mathematical API or reopen the superseded graded-module route."
+      - id: aut1-570-doc-hygiene
+        scope: "Apply the terminal review's two precise documentation corrections for the already-landed Serre route in issue #570: disambiguate the alternative-twist comparison and qualify the degree-one local-freeness warning; do not add a mathematical API or change theorem proofs."
         requirements:
           - Projective space has finite negative-twist coproduct presentations
           - The general Proj theorem is an untwisted finite coproduct epimorphism
           - Repository guidance distinguishes the three Serre-lane statements
         files:
-          - .claude/loop-specs/aut1-570-serre-scope-correction.yaml
+          - .claude/loop-specs/aut1-570-doc-hygiene.yaml
           - openspec/changes/aut1-570-serre-closeout/.openspec.yaml
           - openspec/changes/aut1-570-serre-closeout/proposal.md
           - openspec/changes/aut1-570-serre-closeout/design.md
@@ -86,6 +86,7 @@ issues:
         acceptance:
           - "The existing declarations `exists_epi_coproduct_twistingSheaf_ge` and `exists_shortExact_coproduct_twist` satisfy the general and Pⁿ forms of issue #570 without `sorry`, `admit`, hidden axioms, a global-generation instance, or an assumed resolution."
           - "The projective presentation theorem requires only finite nonempty `ι`, so the singleton-index `P⁰` case is included; the separate cohomology-finiteness declarations retain their legitimate `[Nontrivial ι]` hypothesis."
+          - "The arbitrary-degree Glue.lean guidance distinguishes the direct `gᵢ^(eN)` target from the unavailable intermediate `F(e*n)(2*e*m)` composition and does not claim universal non-local-freeness when degree-one generation is absent."
           - "The two stale docstrings identify section extension (#585), global generation (#586), and the final untwisted coproduct theorem (#570) without claiming that the original Γ_* route is required."
           - "The OpenSpec artifacts, audit evidence, targeted checks, four-role adversarial ledger, required CI checks, and controller closure all bind to this exact frozen file list."
         closure: complete

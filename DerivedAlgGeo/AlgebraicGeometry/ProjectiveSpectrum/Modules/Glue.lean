@@ -54,8 +54,9 @@ Not `gᵢ ᴺ`. The section that glues is `twistBy (f²ᵐ gᵢᵉⁿ)` of `tᵢ
 * over `D₊(gᵢ) ⊓ D₊(f)`, `f ᴺ / f²ᵐ gᵢᵉⁿ` is exactly `fⁿ / gᵢᵉⁿ`, so every twisted section restricts
   to `twistBy (f ᴺ)` of `s` there -- which is what identifies the glued section.
 
-Choosing `twistBy (gᵢᵉᴺ)` instead would put the comparison in `F(e · n)` and force a passage from
-`F(e · n)(2e · m)` to `F(e · N)`; nothing provides that, and it is not needed.
+Choosing `twistBy (gᵢᵉᴺ)` instead would still target `F(e · N)`, but the chart agreement first
+lives in `F(e · n)`. Passing from that comparison to the needed section would require the
+unavailable composition `F(e · n)(2e · m) ≅ F(e · N)`; nothing provides that, and it is not needed.
 
 ## The three-step shape
 
@@ -78,7 +79,8 @@ given by finitely many degree-one elements generating `A` over `𝒜 0`, and `f`
 positive degree.
 
 Generation in degree one is **not** a convenience and must not be weakened: it is Hartshorne
-II.5.12's hypothesis, and without it `O(n)` is not locally free. It is `f` alone that `#823`
+II.5.12's hypothesis, and without it the standard guarantee that `O(n)` is locally free is
+unavailable. It is `f` alone that `#823`
 lifted off degree one, which is what Hartshorne II.5.14(a) and Stacks 01PW state.
 -/
 
@@ -441,8 +443,8 @@ agree, which is the form `#585` proved and `GlueUniform.lean` still consumes.
 
 The two exponents are independent: `n` extends `s` across each chart, `m` forces agreement on the
 pairwise overlaps, and `k = 2m + n`. The section over `D₊(gᵢ)` that glues is `twistBy (f²ᵐ gᵢᵉⁿ)`
-of the chart extension, not `twistBy (gᵢ ᴺ)`; that choice is what keeps the whole comparison inside
-`F(e · k)` and avoids a passage from `F(e n)(2 e m)` that nothing provides.
+of the chart extension, not `twistBy (gᵢᵉᴺ)`; the chart agreement first lives in `F(e · n)`, and
+the chosen factor avoids the unavailable passage from `F(e · n)(2e · m)` to `F(e · k)`.
 
 The `g`-side exponents carry a factor of `e` that the degree-one statement cannot see:
 `isLocalizationFrac` balances a degree-`e` numerator against a degree-one denominator by raising

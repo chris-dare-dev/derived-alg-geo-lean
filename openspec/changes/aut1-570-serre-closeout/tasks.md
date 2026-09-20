@@ -10,8 +10,8 @@
 - [x] 1.4 Run strict OpenSpec/controller validation, the approved no-build
   precheck, and named Lean targets; record both the inconclusive warm-up stall
   and the successful focused `Projective` target.
-- [ ] 1.5 Run the four independent adversarial reviews on the same commit,
-  adjudicate within the three-round cap, and use only recorded findings for any
-  correction.
+- [ ] 1.5 Run the four independent adversarial reviews on the same commit for
+  the corrected closeout and documentation-hygiene chunks, adjudicate each
+  within its three-round cap, and use only recorded findings for corrections.
 - [ ] 1.6 Create, verify, merge, and close issue #570 through the controller,
   then re-run final issue/PR/source validation against current `origin/main`.

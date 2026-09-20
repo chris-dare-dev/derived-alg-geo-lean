@@ -40,12 +40,16 @@ The closeout documentation SHALL distinguish the section-extension lemma
 (#585 / Hartshorne II.5.14(a)), the global-generation theorem (#586 /
 Hartshorne II.5.17), and the untwisted coproduct presentation (#570), and SHALL
 not describe the old `Γ_*` correspondence as a prerequisite of the completed
-proof.
+proof. Its arbitrary-degree gluing formulas SHALL retain the degree factors
+from the implementation, and its degree-one-generation warning SHALL state
+that the general local-freeness guarantee is unavailable rather than asserting
+universal non-local-freeness.
 
 #### Scenario: A future agent follows the nearby module docstrings
 
 - **WHEN** an agent reads `TwistSection.lean` or `Glue.lean` while extending the
   projective-module lane
 - **THEN** the docstrings point to the direct chart-generation, uniform-twist,
-  and tensor-inverse route, and preserve the explicit non-goals around a
-  general graded Serre correspondence and general line-bundle inverses
+  and tensor-inverse route, use the degree-aware intermediate comparison
+  accurately, and preserve the explicit non-goals around a general graded
+  Serre correspondence and general line-bundle inverses

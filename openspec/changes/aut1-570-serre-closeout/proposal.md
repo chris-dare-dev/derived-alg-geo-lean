@@ -23,6 +23,9 @@ future agents, and closes the parent issue through the bounded controller.
 - Correct the projective-space presentation theorem's typeclass boundary so
   finite nonempty index types include `P⁰`; retain `[Nontrivial ι]` only on
   the separate negative-twist cohomology-finiteness declarations.
+- Make the arbitrary-degree gluing guidance precise about the intermediate
+  `F(e*n)(2*e*m)` comparison and qualify the degree-one-generation warning so
+  it states loss of a general guarantee rather than a universal negation.
 - Record repository and controller inconsistencies in
   `agent-observations.md` and in the loop ledger/issue handoff.
 - Do not add a second Serre carrier, a global-generation instance, a
@@ -46,8 +49,9 @@ future agents, and closes the parent issue through the bounded controller.
 ## Impact
 
 - Lean source: two module docstrings and one typeclass-context correction in
-  the existing projective presentation file; no imports or new declarations
-  change.
+  the existing projective presentation file, plus precise corrections to the
+  already-adjacent arbitrary-degree gluing guidance; no imports or new
+  declarations change.
 - OpenSpec and loop metadata: one closeout change and one enabled independent
   loop manifest for issue #570.
 - Provider state: the controller will create, verify, merge, and use the PR to

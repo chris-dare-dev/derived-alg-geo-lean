@@ -74,3 +74,18 @@
   successfully after the correction. The local no-build precheck was also
   green with `SKIP_ACTIONLINT=1`, because `actionlint` is not installed; that
   local result is not a substitute for remote CI.
+
+## Terminal review evidence and fresh documentation-hygiene chunk: 2026-09-20 UTC
+
+- The corrected scope-correction chunk used all three permitted review rounds.
+  Round 3 was adjudicated `blocked` by the controller, as required, after the
+  mathematics reviewer found two additional stale claims in `Glue.lean`: the
+  alternative-twist warning was ambiguous about the intermediate
+  `F(e*n)(2*e*m)` comparison, and the degree-one-generation paragraph said
+  that `O(n)` is not locally free rather than saying that the general
+  guarantee is unavailable. No fourth review was run.
+- Those two exact documentation findings are carried by a separately named
+  `aut1-570-doc-hygiene` manifest/chunk with a fresh ledger. This is an
+  explicit new frozen chunk, not a mutation of the blocked ledger or a hidden
+  fourth round. Its scope remains issue #570 and the same existing theorem
+  API; it only makes the already-frozen guidance precise before PR creation.
