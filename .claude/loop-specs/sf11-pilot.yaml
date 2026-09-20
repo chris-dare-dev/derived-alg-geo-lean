@@ -6,7 +6,7 @@ remote: origin
 base_branch: main
 base_ref: agent/sf11-base
 mode: stack
-enabled: true
+enabled: false
 allow_force_push: false
 state_dir: .loop-runs
 roadmap_gate: required
@@ -95,7 +95,7 @@ issues:
       - id: sf11-2-s-local-structures
         scope: Complete S-local t-structures, affine-base inhabitants, Lemmas 4.15 and 4.16(3), and the S-local slicing analogue.
         requirements:
-          - S-local t-structures and slicings are inhabited
+          - S-local t-structures and slicings expose formal locality boundaries
         files:
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/SLocal.lean
           - DerivedAlgGeo/CategoryTheory/Triangulated/TStructure

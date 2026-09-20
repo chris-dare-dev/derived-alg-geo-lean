@@ -19,6 +19,10 @@ handoff between issues explicit before the loop is enabled.
 - Permit the first #554 witness to land as an explicitly marked progress PR;
   the issue remains open until its full construction and preservation contract
   is satisfied.
+- Add a second explicitly marked #554 progress chunk that computes a nonzero
+  derived effect for the same non-flat affine map from a two-term free
+  resolution; this strengthens the example without claiming the missing
+  general resolution or preservation theorems.
 
 ## Capabilities
 
