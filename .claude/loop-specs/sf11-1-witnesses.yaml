@@ -73,11 +73,12 @@ issues:
           - Base-change categories are constructed from honest operations
           - The §3 witnesses discharge the supported SF11.1 statements
         files:
+          - .claude
+          - .github
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families
           - DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated
-          - .claude/roadmap/stability-families.yaml
-          - scripts/AlgebraicGeometryAudit/StabilityConditionFamilies.lean
-          - openspec/changes/sf11-base-change-t-structures/tasks.md
+          - openspec
+          - scripts
           - notes/loop-engineering-sf11.md
         acceptance:
           - Each task 2.1-2.3 obligation has a theorem-backed implementation or a named external theorem hypothesis at the geometry owner; no structure field is presented as a proof merely because it is inhabited.
