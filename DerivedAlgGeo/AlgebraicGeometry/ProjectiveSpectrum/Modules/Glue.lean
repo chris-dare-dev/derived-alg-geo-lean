@@ -45,16 +45,16 @@ numerator against a degree-`d` denominator by raising each to the other's degree
 
 ## What is twisted, and with which element
 
-Not `gᵢ ᴺ`. The section that glues is `twistBy (f²ᵐ gᵢⁿ)` of `tᵢ`, a section of `F(N)` for
+Not `gᵢ ᴺ`. The section that glues is `twistBy (f²ᵐ gᵢᵉⁿ)` of `tᵢ`, a section of `F(e · N)` for
 `N = 2m + n`. Two facts fall out of `FracSection.twistBy_app_eq_smul'` and no others are needed:
 
-* over `D₊(gᵢ) ⊓ D₊(gⱼ)`, `f²ᵐ gᵢⁿ / (gᵢgⱼ)ᵐ gᵢⁿ` is exactly the scalar the agreement supplies, so
+* over `D₊(gᵢ) ⊓ D₊(gⱼ)`, `f²ᵐ gᵢᵉⁿ / ((gᵢgⱼ)ᵉ)ᵐ gᵢᵉⁿ` is exactly the scalar the agreement supplies, so
   the two twisted sections differ by applying one map to the two sides of the agreement;
-* over `D₊(gᵢ) ⊓ D₊(f)`, `f ᴺ / f²ᵐ gᵢⁿ` is exactly `(f / gᵢ)ⁿ`, so every twisted section restricts
+* over `D₊(gᵢ) ⊓ D₊(f)`, `f ᴺ / f²ᵐ gᵢᵉⁿ` is exactly `fⁿ / gᵢᵉⁿ`, so every twisted section restricts
   to `twistBy (f ᴺ)` of `s` there -- which is what identifies the glued section.
 
-Choosing `twistBy (gᵢ ᴺ)` instead would put the comparison in `F(n)` and force a passage from
-`F(n)(2m)` to `F(N)`; nothing provides that, and it is not needed.
+Choosing `twistBy (gᵢᵉᴺ)` instead would put the comparison in `F(e · n)` and force a passage from
+`F(e · n)(2e · m)` to `F(e · N)`; nothing provides that, and it is not needed.
 
 ## The three-step shape
 
