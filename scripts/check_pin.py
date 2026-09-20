@@ -5,6 +5,9 @@ HARD GATE (exit 1): lean_toolchain and mathlib_rev/mathlib_input_rev in pins.jso
 must equal lean-toolchain and the mathlib entry of lake-manifest.json. Also checks
 mfc_rev when pins.json records it.
 
+HARD GATE (exit 1): a dependency pinned to a bare commit must have that commit
+reachable from its own default branch. See "A pin off the trunk" below.
+
 ADVISORY (exit 0, prints WARN): the recorded_at/recorded_from provenance stamp,
 and cross_repo.status. `ALIGNED` and `MERGED` both
 satisfy the single-pin premise. A DIVERGED peer blocks that premise but does
@@ -12,11 +15,44 @@ not fail this repo's build. Past
 cross_repo.divergence_until it is reported as OVERDUE, still exit 0 -- escalation
 is a human decision, not a build break.
 
-Usage:  python3 scripts/check_pin.py [repo_root]
+## A pin off the trunk (2026-09-20)
+
+Every check above compares this tree against itself, and all five pin sites can
+agree perfectly about a revision that exists on nobody's branch.
+
+They did. `mfc_rev` was `ed71fbb` for a week, which was the tip of an OPEN pull
+request in math-formal-contract-lean and carried three commits its `main` had
+never seen -- the ones that stop the emitter dying with `maximum recursion depth
+has been reached` on a Mathlib-scale sweep. This file validated it cleanly the
+whole time, because internal coherence was all it could see. The defect only
+surfaced when someone bumped the pin "forward" to that repository's `main` and
+silently dropped the three commits this repository's emission depends on;
+`git merge-base --is-ancestor ed71fbb origin/main` answers false, and nothing
+was asking.
+
+A pin at a pull-request tip also has no owner. Rebase that branch, or delete it
+after merge, and the revision this repository builds against stops resolving --
+with no failing check anywhere until the next clean clone.
+
+So: any package pinned to a bare 40-hex commit must have that commit reachable
+from its repository's default branch. Packages pinned to a TAG or a branch name
+are deliberately excluded -- `mathlib` at `v4.32.1` resolves to a commit that is
+not on `master`, and that is the point of a release tag, not a defect.
+
+## A check that could not look is not a check that passed
+
+The reachability test needs `gh` and the network. Without either it prints
+NOT_RUN and says why; it does not print PASS. `--require-api` turns that into
+exit 1, and CI passes it, matching `check_roadmap.py`. A definite negative is a
+FAIL either way: being told "this commit is not on the trunk" is an answer, not
+a failure to look.
+
+Usage:  python3 scripts/check_pin.py [--require-api] [repo_root]
 """
 
 import json
 import pathlib
+import re
 import subprocess
 import sys
 from datetime import date
@@ -25,7 +61,10 @@ from _output import force_utf8_output
 
 force_utf8_output()
 
-root = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else __file__).resolve()
+argv = [a for a in sys.argv[1:] if not a.startswith("--")]
+require_api = "--require-api" in sys.argv[1:]
+
+root = pathlib.Path(argv[0] if argv else __file__).resolve()
 if root.is_file():
     root = root.parent.parent
 
@@ -120,6 +159,101 @@ if doc_manifest.exists():
                 f"docbuild/lake-manifest.json pins {name} at {doc_rev!r} but "
                 f"lake-manifest.json pins {pin.get('rev')!r}; the docs build "
                 f"would compile the library against a different {name}")
+
+# The FIFTH question, and the only one that cannot be answered from this tree:
+# is the revision on the dependency's trunk at all? See the module docstring.
+#
+# Scope is decided by the manifest, not by a hand-kept list: `inputRev == rev`
+# means somebody wrote a bare commit into `lakefile.toml`, which is the shape
+# that can name an unmerged branch tip. A tag or branch name in `inputRev` is a
+# named, maintained target and is left alone.
+SHA40 = re.compile(r"\A[0-9a-f]{40}\Z")
+
+
+def repo_slug(url):
+    """`owner/name` from a GitHub remote, or None if it is not one."""
+    if not url:
+        return None
+    u = url.strip()
+    for prefix in ("https://github.com/", "git@github.com:", "ssh://git@github.com/"):
+        if u.startswith(prefix):
+            slug = u[len(prefix):]
+            break
+    else:
+        return None
+    if slug.endswith(".git"):
+        slug = slug[:-4]
+    return slug.strip("/") or None
+
+
+def gh_json(*args):
+    """`gh` stdout parsed as JSON, or (None, why-not)."""
+    try:
+        proc = subprocess.run(("gh",) + args, capture_output=True, text=True,
+                              timeout=60, encoding="utf-8")
+    except (OSError, subprocess.SubprocessError) as exc:
+        return None, f"could not run gh: {exc}"
+    if proc.returncode != 0:
+        return None, f"gh exited {proc.returncode}: {proc.stderr.strip()[:200]}"
+    try:
+        return json.loads(proc.stdout), None
+    except json.JSONDecodeError as exc:
+        return None, f"gh returned unparseable JSON: {exc}"
+
+
+def reachable_from_default(slug, rev):
+    """(True/False/None, detail). None means the question could not be asked."""
+    meta, why = gh_json("api", f"repos/{slug}", "--jq", '{d: .default_branch}')
+    if meta is None:
+        return None, why
+    default = (meta or {}).get("d")
+    if not default:
+        return None, f"{slug} reports no default branch"
+    # base...head with base=rev: the trunk is AHEAD of an ancestor, and
+    # IDENTICAL when the pin is exactly the trunk tip. Anything else -- behind,
+    # diverged -- means the commit is not on that branch's history.
+    cmp_, why = gh_json("api", f"repos/{slug}/compare/{rev}...{default}",
+                        "--jq", '{s: .status, a: .ahead_by, b: .behind_by}')
+    if cmp_ is None:
+        return None, why
+    status = cmp_.get("s")
+    if status in {"ahead", "identical"}:
+        return True, f"{default} is {status} ({cmp_.get('a')} commit(s) ahead)"
+    return False, (f"compare {rev[:12]}...{default} is {status!r} "
+                   f"(ahead {cmp_.get('a')}, behind {cmp_.get('b')})")
+
+
+pinned_to_commit = sorted(
+    (name, pkg) for name, pkg in packages.items()
+    if SHA40.match(str(pkg.get("inputRev") or ""))
+    and pkg.get("inputRev") == pkg.get("rev")
+)
+for name, pkg in pinned_to_commit:
+    slug = repo_slug(pkg.get("url"))
+    if slug is None:
+        print(f"NOT_RUN  {name} is pinned to a bare commit but its url is not "
+              f"a GitHub remote ({pkg.get('url')!r}); reachability not checked")
+        if require_api:
+            failures.append(f"{name}: --require-api was passed and the remote "
+                            f"is not one this check can ask about")
+        continue
+    ok, detail = reachable_from_default(slug, pkg["rev"])
+    if ok is None:
+        print(f"NOT_RUN  {name} reachability: {detail}")
+        if require_api:
+            failures.append(f"{name}: --require-api was passed; the API is "
+                            f"mandatory here ({detail})")
+    elif ok:
+        print(f"OK    {name} {pkg['rev'][:12]} is on {slug}'s default branch "
+              f"-- {detail}")
+    else:
+        failures.append(
+            f"{name} is pinned to {pkg['rev'][:12]}, which is NOT reachable "
+            f"from {slug}'s default branch -- {detail}. A pin at a pull-request "
+            f"tip or a dead branch has no owner: rebase or delete that branch "
+            f"and this repository stops resolving, with no failing check "
+            f"anywhere until the next clean clone. Merge it, or pin a commit "
+            f"that is on the trunk.")
 
 if failures:
     print(f"FAIL  {pins['repo']} pin coherence ({len(failures)} problem(s)):")
