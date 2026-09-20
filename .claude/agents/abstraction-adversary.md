@@ -52,4 +52,4 @@ For each finding use:
 
 Close with exactly one verdict: `PASS`, `NEEDS_CHANGES`, or `BLOCKED`, followed
 by the finding count. Never use repeated review to demand speculative
-generalization after the third bounded round.
+generalization after the fifth bounded round.

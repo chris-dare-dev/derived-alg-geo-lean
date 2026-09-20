@@ -32,10 +32,10 @@ open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 universe u w
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : DerivedBaseChangeData X T)
   {ι : Type w} [Preorder ι]
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
 variable (A : SemiorthogonalSequence (SourceDqc X) ι)
 
@@ -105,7 +105,7 @@ theorem toHomReduction_preservesSourceComponents
 end ExternalProductTensorDuality
 
 /-- Tensor duality, the pullback-pushforward adjunction, and preservation of
-the later source component prove semiorthogonality of the concrete external
+the later source component prove semiorthogonality of the supplied external
 products. -/
 theorem perfectExternalProductsSemiorthogonal_of_tensorDualityAdjunction
     (H : D.ExternalProductTensorDuality A)
@@ -139,6 +139,6 @@ theorem perfectComponentsSemiorthogonal_of_tensorDualityAdjunction
     (ExternalProductTensorDuality.toHomReduction_preservesSourceComponents
       (D := D) (A := A) H pushFst adj hH)
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

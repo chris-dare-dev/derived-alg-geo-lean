@@ -5,11 +5,11 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeAdjunction
 
 /-!
-# Linearity and the projection formula for K-flat base change
+# Linearity and the projection formula for derived base change
 
 This file states the two compatibility isomorphisms needed for linearity of base-change functors,
-using the actual K-flat derived tensors and derived pullback/pushforward interfaces constructed in
-the preceding files.
+using the supplied derived tensor and derived pullback/pushforward interfaces constructed in
+the preceding files. K-flat resolutions are only one producer of these operations.
 
 The pullback tensorator says that pulling back after tensoring agrees with tensoring the two
 pullbacks. The projection formula says that pushing forward after tensoring by a pulled-back object
@@ -29,23 +29,23 @@ universe u
 
 variable {S : Scheme.{u}} {X T U : SchemeBaseChange S} {f : T ⟶ U}
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
-/-- Linearity of derived pullback with respect to the constructed K-flat tensors. For each twist
+/-- Linearity of derived pullback with respect to the supplied derived tensors. For each twist
 `B`, this is the natural isomorphism
 `(B ⊗ -) ⋙ Lf^* ≅ Lf^* ⋙ (Lf^* B ⊗ -)`. -/
 structure PullbackTensorCompatibility
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (pull : DqcLeftDerivedPullback (baseChangeMap X f)) where
   /-- Pullback commutes with left tensor twists. -/
   iso (B : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left) :
     (DU.derivedTensor.obj B) ⋙ pull.functor ≅
       pull.functor ⋙ (DT.derivedTensor.obj (pull.functor.obj B))
 
-/-- The projection formula for the actual K-flat tensors and derived pullback/pushforward:
+/-- The projection formula for the supplied derived tensors and derived pullback/pushforward:
 `Rf_*(Lf^* B ⊗ A) ≅ B ⊗ Rf_* A`, naturally in `A`. -/
 structure ProjectionFormula
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (push : DqcRightDerivedPushforward (baseChangeMap X f)) where
   /-- The projection-formula isomorphism for each target twist. -/
@@ -53,10 +53,10 @@ structure ProjectionFormula
     (DT.derivedTensor.obj (pull.functor.obj B)) ⋙ push.functor ≅
       push.functor ⋙ (DU.derivedTensor.obj B)
 
-/-- A derived pullback preserves a component after twisting when the corresponding K-flat tensor
+/-- A derived pullback preserves a component after twisting when the corresponding derived tensor
 endofunctor maps that component to itself. -/
 def TensorPreservesQuasicoherentComponent
-    (D : KFlatBaseChangeData X T)
+    (D : DerivedBaseChangeData X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (B : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) : Prop :=
   D.quasicoherentComponent P ≤
@@ -64,7 +64,7 @@ def TensorPreservesQuasicoherentComponent
 
 /-- Tensor by `B` restricted to the constructed quasicoherent base-change component. -/
 noncomputable def quasicoherentTensor
-    (D : KFlatBaseChangeData X T)
+    (D : DerivedBaseChangeData X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (B : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
     (hB : D.TensorPreservesQuasicoherentComponent P B) :
@@ -73,7 +73,7 @@ noncomputable def quasicoherentTensor
 
 /-- Forgetting component witnesses recovers tensor by `B` on `Dqc`. -/
 noncomputable def quasicoherentTensorCompInclusion
-    (D : KFlatBaseChangeData X T)
+    (D : DerivedBaseChangeData X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (B : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
     (hB : D.TensorPreservesQuasicoherentComponent P B) :
@@ -86,7 +86,7 @@ noncomputable def quasicoherentTensorCompInclusion
 /-- Pullback tensor compatibility restricted to the constructed quasicoherent base-change
 components. This is the linearity isomorphism for pullback. -/
 noncomputable def quasicoherentPullbackTensorIso
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hPull : PullbackPreservesQuasicoherentComponent DT DU P pull)
@@ -118,7 +118,7 @@ noncomputable def quasicoherentPullbackTensorIso
 /-- The projection formula restricted to the constructed quasicoherent base-change components.
 This is the linearity isomorphism for pushforward. -/
 noncomputable def quasicoherentProjectionFormulaIso
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
@@ -149,7 +149,7 @@ noncomputable def quasicoherentProjectionFormulaIso
         (DU.quasicoherentTensorCompInclusion P B hBU).symm ≪≫
       (Functor.associator _ _ _).symm)
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end
 

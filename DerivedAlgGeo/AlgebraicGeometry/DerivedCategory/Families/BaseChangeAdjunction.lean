@@ -49,12 +49,12 @@ theorem essSurj_of_adjunction_of_fullyFaithful
 
 end DqcLeftDerivedPullback
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
 /-- An adjunction between the ambient `Dqc` pullback and pushforward restricts to the constructed
 quasicoherent base-change components. -/
 noncomputable def quasicoherentPullbackPushforwardAdjunction
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
@@ -86,7 +86,7 @@ noncomputable def boundedCoherentPullbackPushforwardAdjunction
 
 /-- The pullback-pushforward adjunction on the constructed bounded base-change categories. -/
 noncomputable def boundedPullbackPushforwardAdjunction
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
@@ -108,7 +108,7 @@ noncomputable def boundedPullbackPushforwardAdjunction
 reduced to the geometric inputs: a fully faithful right adjoint on `Dqc` and
 detection of component membership by pullback. -/
 theorem quasicoherentPullbackOfDetection_essSurj_of_adjunction
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
@@ -127,7 +127,7 @@ faithfulness of the `Dqc` right adjoint descends to the bounded-coherent
 restriction, whose counit supplies essential surjectivity before the final
 membership-detection restriction to `D_T`. -/
 theorem boundedPullbackOfDetection_essSurj_of_adjunction
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
@@ -148,7 +148,7 @@ theorem boundedPullbackOfDetection_essSurj_of_adjunction
     exact boundedAdj.mem_essImage_of_counit_isIso E
   infer_instance
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end
 

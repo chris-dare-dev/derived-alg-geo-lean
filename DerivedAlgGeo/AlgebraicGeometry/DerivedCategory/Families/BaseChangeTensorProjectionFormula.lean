@@ -80,7 +80,7 @@ The coefficient depends only on the two compact fibre factors and shifts.
 The isomorphism is stated for every source object, independently of a chosen
 semiorthogonal sequence. -/
 structure CompactFiberProjectionFormula
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T)) where
   /-- The source-side coefficient left after duality and pushforward. -/
@@ -90,7 +90,8 @@ structure CompactFiberProjectionFormula
   source factor by the corresponding coefficient. -/
   iso (F : SourceDqc X) (Gi Gj : CompactDqcFiber T) (a b : ℤ) :
     pushFst.functor.obj ((H.rightAdjoint Gi a).obj
-        ((D.shiftedFiberTensor Gj b).obj (D.pullFst.functor.obj F))) ≅
+        ((D.toDerivedBaseChangeData.shiftedFiberTensor Gj b).obj
+          (D.pullFst.functor.obj F))) ≅
       (Q.derivedTensor.obj F).obj (coefficient Gi Gj a b)
 
 namespace CompactFiberProjectionFormula
@@ -99,7 +100,7 @@ namespace CompactFiberProjectionFormula
 formula: its coefficient twists preserve the corresponding source
 components. -/
 def PreservesSourceComponents
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
@@ -112,7 +113,7 @@ def PreservesSourceComponents
 /-- Closure of all source components under right tensor twists implies the
 coefficient-local source-linearity condition. -/
 theorem preservesSourceComponents_of_rightTensorClosed
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
@@ -126,20 +127,21 @@ theorem preservesSourceComponents_of_rightTensorClosed
 /-- The projection-formula isomorphism transports source tensor closure back
 to the pushforward object required by compact-fibre duality. -/
 theorem pushforwardPreservesSourceComponents
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
     (hP : PreservesSourceComponents (D := D) P A) :
-    CompactFiberTensorDuality.PushforwardPreservesSourceComponents
-      (D := D) H A pushFst := by
+    DerivedBaseChangeData.CompactFiberTensorDuality.PushforwardPreservesSourceComponents
+      (D := D.toDerivedBaseChangeData) H A pushFst := by
   intro j Fj Gi Gj a b
   letI : (A.component j).IsClosedUnderIsomorphisms := hIso j
   change A.component j
     (pushFst.functor.obj ((H.rightAdjoint Gi a).obj
-      ((D.shiftedFiberTensor Gj b).obj (D.pullFst.functor.obj Fj.obj))))
+      ((D.toDerivedBaseChangeData.shiftedFiberTensor Gj b).obj
+        (D.pullFst.functor.obj Fj.obj))))
   exact (A.component j).prop_of_iso (P.iso Fj.obj Gi Gj a b).symm
     (hP Fj Gi Gj a b)
 
@@ -151,7 +153,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
     (adj : D.pullFst.functor ⊣ pushFst.functor)
@@ -159,8 +161,11 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (hP : CompactFiberProjectionFormula.PreservesSourceComponents
       (D := D) P A) :
-    D.PerfectComponentsSemiorthogonal A :=
-  D.perfectComponentsSemiorthogonal_of_compactFiberTensorDuality A hA H
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
+  letI : D.toDerivedBaseChangeData.pullFst.functor.Additive := by
+    change D.pullFst.functor.Additive
+    infer_instance
+  D.toDerivedBaseChangeData.perfectComponentsSemiorthogonal_of_compactFiberTensorDuality A hA H
     pushFst adj
     (CompactFiberProjectionFormula.pushforwardPreservesSourceComponents
       (D := D) P A hIso hP)
@@ -171,7 +176,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_rightTensorClose
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
     (adj : D.pullFst.functor ⊣ pushFst.functor)
@@ -179,7 +184,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_rightTensorClose
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (hTensor : SourceTensorData.RightTensorClosedComponents
       (D := D) Q A) :
-    D.PerfectComponentsSemiorthogonal A :=
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula A hA hIso H Q
     pushFst adj P
     (CompactFiberProjectionFormula.preservesSourceComponents_of_rightTensorClosed

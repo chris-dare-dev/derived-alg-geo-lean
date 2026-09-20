@@ -2,14 +2,14 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.KFlatBaseChange
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeData
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.CompactClosure
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Restriction
 
 /-!
 # Semiorthogonal sequences after scheme base change
 
-This file assembles the componentwise K-flat constructions into the three
+This file assembles the componentwise derived operations into the three
 ordered families appearing in Proposition 3.15 and Theorem 3.17 of
 arXiv:1902.08184:
 
@@ -20,7 +20,7 @@ arXiv:1902.08184:
 The geometric semiorthogonality input is split into an additive Hom reduction
 (`ExternalProductHomReduction`) and the statement that its source-side
 objects remain in the later component (`PreservesSourceComponents`). Source
-semiorthogonality then proves Hom-vanishing between shifts of the concrete
+semiorthogonality then proves Hom-vanishing between shifts of the supplied
 external products. Formal closure extends this first to the perfect envelopes
 and then, using compactness, to the quasicoherent components. Faithfulness of
 the bounded-coherent inclusion reflects it to the bounded components.
@@ -37,7 +37,7 @@ open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 universe u w
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : DerivedBaseChangeData X T)
   {ι : Type w} [Preorder ι]
 
 /-- `Dqc(X)` for a scheme over the base, the source side of base change. -/
@@ -58,12 +58,12 @@ abbrev targetPerfectToDqc (X T : SchemeBaseChange S) :
     TargetPerfect X T ⥤ TargetDqc X T :=
   (ObjectProperty.compactObjects.{u} (C := TargetDqc X T)).ι
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
-/-- Closing the shifted K-flat generators under triangles and retracts gives
+/-- Closing the shifted derived generators under triangles and retracts gives
 the same perfect envelope as closing the unshifted generators. -/
 theorem shiftedPerfectGenerators_triangEnvelope_eq
-    (D : KFlatBaseChangeData X T)
+    (D : DerivedBaseChangeData X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     [P.ContainsZero] :
     (D.shiftedPerfectGenerators P).triangEnvelope = D.perfectEnvelope P := by
@@ -73,7 +73,7 @@ theorem shiftedPerfectGenerators_triangEnvelope_eq
 
 variable (A : SemiorthogonalSequence (SourceDqc X) ι)
 
-/-- The geometric Hom-vanishing statement on the concrete K-flat external
+/-- The geometric Hom-vanishing statement on the supplied derived external
 products. It is quantified over shifts because the perfect components are
 their triangulated envelopes. -/
 def PerfectExternalProductsSemiorthogonal : Prop :=
@@ -86,7 +86,7 @@ def PerfectExternalProductsSemiorthogonal : Prop :=
         (((D.externalProduct (A.component j)).obj Fj).obj Gj)⟦b⟧),
       f = 0
 
-/-- A tensor-duality/adjunction reduction for morphisms between K-flat
+/-- A tensor-duality/adjunction reduction for morphisms between derived
 external products.
 
 The reduced object is deliberately separate from any component-membership
@@ -139,7 +139,7 @@ theorem hom_eq_zero (R : D.ExternalProductHomReduction A)
 end ExternalProductHomReduction
 
 /-- Tensor-duality/adjunction Hom reduction plus source-component
-preservation proves the concrete external-product semiorthogonality
+preservation proves the derived external-product semiorthogonality
 obligation. -/
 theorem perfectExternalProductsSemiorthogonal_of_homReduction
     (R : D.ExternalProductHomReduction A)
@@ -157,7 +157,7 @@ def ShiftedPerfectGeneratorsSemiorthogonal : Prop :=
     D.shiftedPerfectGenerators (A.component j) ≤
       (D.shiftedPerfectGenerators (A.component i)).rightOrthogonal
 
-/-- Morphism-level vanishing for the concrete external products implies
+/-- Morphism-level vanishing for the derived external products implies
 semiorthogonality of their shift-and-isomorphism closures. -/
 theorem shiftedPerfectGeneratorsSemiorthogonal_of_externalProducts
     (horth : D.PerfectExternalProductsSemiorthogonal A) :
@@ -175,7 +175,7 @@ theorem shiftedPerfectGeneratorsSemiorthogonal_of_externalProducts
   simpa [Category.assoc] using
     horth hij Fi Gi Fj Gj a b (eSource.hom ≫ f ≫ eTarget.hom)
 
-/-- Shifted-generator semiorthogonality implies the concrete morphism-level
+/-- Shifted-generator semiorthogonality implies the derived morphism-level
 vanishing statement. -/
 theorem perfectExternalProductsSemiorthogonal_of_shiftedGenerators
     (horth : D.ShiftedPerfectGeneratorsSemiorthogonal A) :
@@ -217,7 +217,7 @@ theorem perfectComponentsSemiorthogonal_of_shiftedGenerators
       (D.shiftedPerfectGenerators (A.component i))
       (D.shiftedPerfectGenerators (A.component j)) (horth hij)
 
-/-- Concrete shifted external-product Hom-vanishing implies
+/-- Supplied shifted external-product Hom-vanishing implies
 semiorthogonality of the perfect base-change envelopes. -/
 theorem perfectComponentsSemiorthogonal_of_externalProducts
     (hA : A.HasTriangulatedComponents)
@@ -376,6 +376,6 @@ theorem boundedSequence_compatible
       (D.quasicoherentSequence A hcompact horth) :=
   SemiorthogonalSequence.inverseImage_compatible _ _
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

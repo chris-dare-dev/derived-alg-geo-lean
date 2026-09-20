@@ -1,8 +1,37 @@
 name: CI
 
 on:
+  # `agent/**` WAS in this list and was removed on 2026-09-19.
+  #
+  # Every agent branch carries a pull request, so every commit was built TWICE:
+  # once here on the self-hosted Windows lane, and once on `ubuntu-latest` for
+  # the `pull_request` event. Measured over the 195 commits that both lanes
+  # built between 2026-09-14 and 2026-09-19:
+  #
+  #                          self-hosted push    hosted pull_request
+  #       median                   40.2 min             20.8 min
+  #       mean                     85.5 min             17.7 min
+  #       finished first               28%                  72%
+  #       succeeded (week 38)          16%                  53%
+  #       dropped at 24h             66 runs                    0
+  #
+  # That is 278 workstation-hours in a six-day window spent on commits the free
+  # hosted lane also verified, and it INVERTS the premise the concurrency block
+  # below was written on. "The push run is the fast one" was true in week 34
+  # (19.9 min median against 12.1) and has not been true since week 36. Three
+  # self-hosted runners now share one workstation the owner also builds on, and
+  # in 8 of 14 sampled push-lane failures NO STEP FAILED -- the job itself died,
+  # which is contention rather than a verdict.
+  #
+  # WHAT THIS GIVES UP, stated rather than hidden: a branch pushed with no pull
+  # request open now gets no CI at all. That is the price of the change, not an
+  # oversight. Open the PR first, or run `lean-gates full` locally.
+  #
+  # The Windows lane is NOT being retired, and this line is not the place to
+  # retire it. `main` still routes to `owner-win-main` on every merge, which is
+  # where this machine's platform coverage is owned; see `runs-on` below.
   push:
-    branches: [main, 'agent/**']
+    branches: [main]
   pull_request:
   # A merge queue entry is a synthetic branch GitHub builds from `main` plus the
   # queued PR(s), and it reports its own checks. Without this trigger the queue
@@ -13,15 +42,21 @@ on:
   workflow_dispatch:
 
 concurrency:
-  # Deliberately still keyed on github.ref, so a push to agent/x and the
-  # pull_request run for that branch stay in SEPARATE groups and both run. They
-  # are not redundant: the push run is the fast one, the pull_request run is the
-  # one that reports the status check the merge button reads. Collapsing them
-  # under cancel-in-progress: true would make the two lanes race and cancel the
-  # loser, which can be the PR check. The extra ubuntu-latest run is free on a
-  # public repo. (Note also that the obvious collapse key does not collapse:
-  # github.event.pull_request.head.ref is `agent/x` while github.ref is
-  # `refs/heads/agent/x`; it would take github.head_ref || github.ref_name.)
+  # Keyed on github.ref, and there is no longer a second lane for it to keep
+  # apart: `push` fires on `main` alone as of 2026-09-19, so an agent branch
+  # produces exactly one run and that run is the `pull_request` one. The
+  # paragraph this replaces argued the two lanes "are not redundant" because
+  # "the push run is the fast one"; the table in the `on:` block above is why
+  # that no longer holds.
+  #
+  # BRANCH CANCELLATION STILL WORKS, and it is worth knowing why, because the
+  # obvious reading says it should have broken. For a `pull_request` event
+  # github.ref is `refs/pull/N/merge`, which is STABLE across pushes to the same
+  # pull request -- so re-pushing five times in a minute still leaves one live
+  # run, exactly as the branch-push lane used to. (The old warning is kept for
+  # whoever tries the obvious collapse key next: github.event.pull_request
+  # .head.ref is `agent/x` while github.ref is `refs/heads/agent/x`; it would
+  # take github.head_ref || github.ref_name.)
   #
   # `main` and the merge queue are EXEMPT from cancellation, AND `main` is keyed
   # per commit, because cancellation is only half of what evicts a run.
@@ -56,7 +91,9 @@ concurrency:
   # the shared key and expect the badge to mean anything.
   #
   # Branch lanes keep the old behaviour deliberately -- an agent branch that is
-  # pushed five times in a minute has no reason to build the first four.
+  # pushed five times in a minute has no reason to build the first four. Since
+  # 2026-09-19 the lane that behaviour applies to is the `pull_request` one;
+  # see the top of this block for why that is the same thing.
   group: ${{ github.workflow }}-${{ github.ref }}${{ github.ref == 'refs/heads/main' && format('-{0}', github.sha) || '' }}
   cancel-in-progress: >-
     ${{ github.ref != 'refs/heads/main' && github.event_name != 'merge_group' }}
@@ -1046,7 +1083,7 @@ jobs:
           echo "using venv interpreter $VENV_PY"
 
           "$VENV_BIN/pip" install --quiet \
-            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@ed71fbba2ef4261ae6ae7153ffc21cfe3d1bab25#subdirectory=contract"
+            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@bda0e6130add381098f251b83f8bedfeec8d6a8b#subdirectory=contract"
           MFC="$VENV_BIN/mfc"
 
           # Assert the installed schema is the one the emitter writes against.
@@ -1323,7 +1360,44 @@ jobs:
       # machine could reproduce, and it costs a second interpreted sweep --
       # which is why it is here, after the artifact everything else needs has
       # already been produced.
+      #
+      # IT NO LONGER RUNS ON EVERY EVENT, as of 2026-09-19.
+      #
+      # The second sweep averaged 3.84 min across six sampled `build` jobs whose
+      # whole job averaged 20.7 min -- 18.6% of every run, over 3238 CI runs in
+      # the month to 2026-09-19. What it tests is a property of the EMITTER, of
+      # the toolchain, and of the pinned contract revision. It is not a property
+      # of the topic commit under test, so re-proving it on a branch that
+      # touched only DerivedAlgGeo/ re-proves it about inputs that did not move.
+      #
+      # The three conditions below are the three ways that property can change,
+      # and between them they cover every path by which a commit reaches `main`:
+      #
+      #   * `refs/heads/main` -- every merge is checked, so the determinism
+      #     claim attached to a main-branch attestation is always freshly
+      #     measured rather than inherited from a branch run.
+      #   * `merge_group` -- the last gate before `main` moves, and the one
+      #     place two independently-green branches first meet.
+      #   * `scope == 'all'` -- the "What changed" step sets this when the diff
+      #     touches lakefile.toml, lean-toolchain, lake-manifest.json,
+      #     pins.json, .github/, scripts/ or exe/. That set is a SUPERSET of
+      #     this gate's determinism inputs, so any pull request that could move
+      #     the needle still runs it. (This is that output's first consumer; it
+      #     was computed and unread before.)
+      #
+      # THE RESIDUAL HOLE, named rather than papered over: a library-only pull
+      # request that introduces a declaration whose own pretty-printing is
+      # unstable is not caught here. It is caught in the merge queue, which is
+      # the correct placement -- the queue runs before `main` moves -- but it
+      # does mean the author learns about it one step later than before.
+      #
+      # `attest/lean-emission-2.json` is written and read by this step alone, so
+      # skipping it leaves nothing downstream short of an input.
       - name: Emitter reproducibility
+        if: >-
+          github.ref == 'refs/heads/main'
+          || github.event_name == 'merge_group'
+          || steps.changed.outputs.scope == 'all'
         run: |
           set -euo pipefail
           lake env lean --run exe/Emit.lean --out attest/lean-emission-2.json
@@ -1437,8 +1511,8 @@ jobs:
           #
           # BOTH flags key on "is there an open pull request for this ref",
           # which is NOT the same question as "is this the pull_request
-          # event". `push` fires on `main` AND on `agent/**`, and those two
-          # are different cases:
+          # event". `push` fired on `main` AND on `agent/**` when this was
+          # written, and those two were different cases:
           #
           #   * on `main` and in the merge queue there really is no pull
           #     request to ask about, the merge base is the thing being
@@ -1455,6 +1529,14 @@ jobs:
           #     #1341 went red on the same commit that passed as a pull
           #     request. A check whose verdict is decided by a stopwatch is
           #     not checking anything.
+          #
+          # Since 2026-09-19 the second case can no longer arise from a push:
+          # `push` fires on `main` alone, so the stopwatch race described above
+          # is structurally gone rather than merely handled. The lookup below is
+          # KEPT anyway. It is what makes the `pull_request` lane -- now the only
+          # lane an agent branch has -- scope correctly, and a `workflow_dispatch`
+          # on a branch still reaches the `push`-shaped path with no event
+          # payload to infer from.
           #
           # So ASK for the number instead of inferring it from the event. If
           # the lookup finds nothing -- no pull request, or no `gh` -- PR_NUM
@@ -1520,11 +1602,33 @@ jobs:
     # `cancel-in-progress` on branch lanes, so pushing twice in a minute --
     # the normal agent-lane cadence -- cancels the first run. Under `always()`
     # that dead run still executed this job, saw `RESULTS: cancelled`, and
-    # posted a FAILING `ci` check. Because that failure lands LATER than the
-    # superseding run's success, it is the newest check with this name, and
-    # branch protection reads the newest: a green build sat behind a red `ci`
+    # posted a FAILING `ci` check: a green build sat behind a red `ci`
     # belonging to a run that had been killed on purpose. PRs #1242 and #1243
     # were both stuck this way.
+    #
+    # THIS PARAGRAPH USED TO EXPLAIN THAT WITH "branch protection reads the
+    # newest" check of a given name, and that is WRONG. Measured on #1409,
+    # 2026-09-19, on one commit carrying two `ci` check runs:
+    #
+    #     ci  FAILURE  22:46:52   push lane, died in 24s installing elan
+    #     ci  SUCCESS  22:58:34   pull_request lane, 14m44s, every gate
+    #     statusCheckRollup.state = FAILURE, mergeStateStatus = BLOCKED
+    #
+    # The rollup aggregates EVERY check run on the commit. One red blocks
+    # however old it is and however green a newer run of the same name is, and
+    # the branch was up to date with zero required reviews, so nothing else
+    # explains it. The pull request had to be merged with an admin bypass.
+    #
+    # The correction makes the `!cancelled()` reasoning STRONGER, not weaker: a
+    # cancelled run's red `ci` does not merely win a race against a later
+    # green, it blocks unconditionally until something overwrites that specific
+    # check run. Ordering never mattered.
+    #
+    # It also means a red check from ANY lane is a hard block, which is half
+    # the argument for `push` firing on `main` alone -- see the `on:` block.
+    # A 24-second infrastructure fault on a self-hosted runner could otherwise
+    # hold a pull request whose real verification had already passed, and the
+    # only ways out are a 40-minute rebuild or an admin merge.
     #
     # `!cancelled()` keeps the mechanism and drops the artifact: a FAILED
     # upstream is not a cancelled run, so this still runs and still fails on

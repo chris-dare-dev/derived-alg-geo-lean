@@ -141,9 +141,11 @@ finished iteration comes back red.
 
 A failing check is the iteration's work, not a reason to weaken it.
 
-**The verdict comes from the self-hosted Windows runners**, after the push in
-step 6. `ci.yml` triggers on `push` to `agent/**`, so the push is the gate run;
-for a verdict without pushing, `gh workflow run ci.yml --ref agent/<slug>`.
+**The verdict comes from CI**, and since 2026-09-19 the push in step 6 does not
+start it: `ci.yml` triggers `push` on `main` alone, so the gate run is the
+`pull_request` one and you get it by opening the pull request. To dispatch the
+self-hosted Windows lane on the branch instead,
+`gh workflow run ci.yml --ref agent/<slug>`.
 
 ## 5. If it did not close
 

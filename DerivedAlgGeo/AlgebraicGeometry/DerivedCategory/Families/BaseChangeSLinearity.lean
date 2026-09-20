@@ -200,7 +200,7 @@ namespace CompactFiberProjectionFormula
 /-- Evidence that all source coefficients in a compact-fibre projection
 formula come by derived pullback from compact objects on the base scheme. -/
 structure BaseCoefficientData
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
@@ -218,7 +218,7 @@ structure BaseCoefficientData
 quasicoherent objects on the base. Unlike `BaseCoefficientData`, this does
 not require those objects to be compact. -/
 structure DqcBaseCoefficientData
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
@@ -237,7 +237,7 @@ namespace BaseCoefficientData
 /-- Compact base coefficients can be forgotten to quasicoherent base
 coefficients. -/
 def toDqc
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     {P : D.CompactFiberProjectionFormula H Q pushFst}
@@ -252,7 +252,7 @@ end BaseCoefficientData
 /-- Base coefficients and `S`-linearity imply the coefficient-local source
 component preservation required by the projection formula. -/
 theorem preservesSourceComponents_of_sLinear
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
@@ -273,7 +273,7 @@ theorem preservesSourceComponents_of_sLinear
 /-- Quasicoherent base coefficients and `Dqc(S)`-linearity imply the exact
 coefficient-local preservation required by the projection formula. -/
 theorem preservesSourceComponents_of_dqcSLinear
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
@@ -300,7 +300,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_sLinear
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
@@ -311,7 +311,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_sLinear
       (D := D) P pullBase)
     (hS : SourceTensorData.SLinearComponents
       (D := D) Q pullBase A) :
-    D.PerfectComponentsSemiorthogonal A :=
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula A hA hIso H Q
     pushFst adj P
     (CompactFiberProjectionFormula.preservesSourceComponents_of_sLinear
@@ -324,7 +324,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_dqcSLinear
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
@@ -335,7 +335,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_dqcSLinear
       (D := D) P pullBase)
     (hS : SourceTensorData.DqcSLinearComponents
       (D := D) Q pullBase A) :
-    D.PerfectComponentsSemiorthogonal A :=
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula A hA hIso H Q
     pushFst adj P
     (CompactFiberProjectionFormula.preservesSourceComponents_of_dqcSLinear

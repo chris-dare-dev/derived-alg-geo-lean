@@ -34,10 +34,10 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Triangulated
 
 universe u w
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : DerivedBaseChangeData X T)
   {ι : Type w} [Preorder ι]
   (A : SemiorthogonalSequence (SourceDqc X) ι)
 
@@ -130,6 +130,6 @@ theorem perfectIsStrong (hA : A.HasTriangulatedComponents) :
 
 end PerfectProjectionRestrictionData
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
