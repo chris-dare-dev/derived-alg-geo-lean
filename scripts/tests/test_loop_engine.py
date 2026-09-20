@@ -638,6 +638,83 @@ class LoopEngineTests(unittest.TestCase):
                 loop_engine.load_spec(spec_path, root)
             self.assertIn("mathlib-reviewer", str(caught.exception))
 
+
+    def test_lift_target_opens_only_after_a_reviewer_asks(self) -> None:
+        """Declaring a lift target is standing permission, not an open door."""
+        state = {
+            "chunk": {
+                "files": ["DerivedAlgGeo/Leaf"],
+                "lift_targets": ["DerivedAlgGeo/CategoryTheory/Triangulated"],
+            },
+            "rounds": [],
+        }
+        self.assertEqual(loop_engine.authorized_lift_targets(state), [])
+        self.assertEqual(loop_engine.chunk_allowed_paths(state), ["DerivedAlgGeo/Leaf"])
+        self.assertFalse(
+            loop_engine.path_is_in_frozen_chunk(
+                "DerivedAlgGeo/CategoryTheory/Triangulated/Basic.lean",
+                loop_engine.chunk_allowed_paths(state),
+            )
+        )
+
+        # a reviewer names a path under the declared prefix
+        state["rounds"] = [
+            {
+                "reviews": [
+                    {
+                        "reviewer": REVIEWERS[2],
+                        "verdict": "pass_with_lift",
+                        "lift_target": "DerivedAlgGeo/CategoryTheory/Triangulated/Basic.lean",
+                    }
+                ]
+            }
+        ]
+        self.assertEqual(
+            loop_engine.authorized_lift_targets(state),
+            ["DerivedAlgGeo/CategoryTheory/Triangulated"],
+        )
+        self.assertTrue(
+            loop_engine.path_is_in_frozen_chunk(
+                "DerivedAlgGeo/CategoryTheory/Triangulated/Basic.lean",
+                loop_engine.chunk_allowed_paths(state),
+            )
+        )
+        # an unrelated prefix stays shut
+        self.assertFalse(
+            loop_engine.path_is_in_frozen_chunk(
+                "DerivedAlgGeo/Elsewhere/Other.lean",
+                loop_engine.chunk_allowed_paths(state),
+            )
+        )
+
+    def test_a_lift_target_may_not_duplicate_a_frozen_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            chunk = spec["issues"][0]["chunks"][0]
+            chunk["lift_targets"] = list(chunk["files"])[:1]
+            spec_path.write_text(json.dumps(spec), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError) as caught:
+                loop_engine.load_spec(spec_path, root)
+            self.assertIn("lift_targets", str(caught.exception))
+
+    def test_renaming_a_ledger_does_not_start_a_fresh_review(self) -> None:
+        """The state dir is gitignored; identity is (spec_id, chunk_id), not filename."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(
+                    loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None), 0
+                )
+                state_path = root / ".loop-runs" / "test-chunk.json"
+                self.assertTrue(state_path.is_file())
+                state_path.rename(state_path.with_name("test-chunk.bak.json"))
+                # the chunk looks unstarted by filename, but its ledger still exists
+                self.assertNotEqual(
+                    loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None), 0
+                )
+
     def test_missing_openspec_artifact_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

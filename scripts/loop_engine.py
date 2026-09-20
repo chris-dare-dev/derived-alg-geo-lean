@@ -385,6 +385,17 @@ def validate_spec(spec: dict[str, Any]) -> None:
                 not isinstance(file, str) or not file.strip() for file in files
             ):
                 raise LoopError(f"{chunk_name}.files must be a non-empty list of paths")
+            lift_targets = chunk.get("lift_targets", [])
+            if not isinstance(lift_targets, list) or any(
+                not isinstance(target, str) or not target.strip() for target in lift_targets
+            ):
+                raise LoopError(f"{chunk_name}.lift_targets must be a list of paths")
+            for target in lift_targets:
+                if target in files:
+                    raise LoopError(
+                        f"{chunk_name}.lift_targets entry {target!r} is already in files; "
+                        "a lift target names an ancestor the chunk may not touch yet"
+                    )
             acceptance = chunk.get("acceptance")
             if not isinstance(acceptance, list) or not acceptance or any(
                 not isinstance(item, str) or not item.strip() for item in acceptance
@@ -775,6 +786,41 @@ def state_path(root: Path, spec: dict[str, Any], requested: str | None, chunk_id
     return ensure_inside(root, directory / f"{chunk_id}.json")
 
 
+def refuse_renamed_ledger(
+    root: Path,
+    spec: dict[str, Any],
+    requested_state_dir: str | None,
+    chunk_id: str,
+    expected: Path,
+) -> None:
+    """Refuse to start a chunk that already has a ledger under another filename.
+
+    The state directory is gitignored, so renaming a ledger left no trace and
+    reset a chunk's review history. Identity is (spec_id, chunk_id), not the
+    file name, so scan the whole directory for it.
+    """
+    directory = expected.parent
+    if not directory.is_dir():
+        return
+    for candidate in sorted(directory.rglob("*.json")):
+        if candidate.resolve() == expected.resolve():
+            continue
+        try:
+            data = json.loads(candidate.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(data, dict):
+            continue
+        if data.get("schema") != f"{RUN_SCHEMA}/ledger":
+            continue
+        if data.get("spec_id") == spec["id"] and data.get("chunk", {}).get("id") == chunk_id:
+            raise LoopError(
+                f"chunk {chunk_id!r} of run {spec['id']!r} already has a ledger at "
+                f"{candidate} with status {data.get('status')!r}; "
+                "renaming a ledger does not start a fresh review"
+            )
+
+
 def require_selected_dependencies_passed(
     root: Path,
     spec: dict[str, Any],
@@ -845,6 +891,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
         issue, chunk = chunk_entry(spec, number, chunk_id)
         require_selected_dependencies_passed(root, spec, issue, requested_state_dir)
         path = state_path(root, spec, requested_state_dir, chunk_id)
+        refuse_renamed_ledger(root, spec, requested_state_dir, chunk_id, path)
         if path.exists():
             existing = load_state(path)
             if existing.get("spec_digest") != digest(spec) or existing.get("openspec_digest") != openspec_digest(root, spec):
@@ -862,6 +909,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
                 "id": chunk["id"],
                 "scope": chunk["scope"],
                 "files": list(chunk["files"]),
+                "lift_targets": list(chunk.get("lift_targets", [])),
                 "requirements": list(chunk["requirements"]),
                 "acceptance": list(chunk["acceptance"]),
                 "closure": chunk.get("closure", "complete"),
@@ -1227,6 +1275,34 @@ def normalize_scoped_path(value: str) -> str:
     return normalized.rstrip("/")
 
 
+def authorized_lift_targets(state: dict[str, Any]) -> list[str]:
+    """Lift-target prefixes a reviewer has actually asked this chunk to touch.
+
+    Declaring a prefix in the manifest is the owner's standing permission; it
+    opens nothing on its own. A prefix becomes writable only once a recorded
+    `pass_with_lift` finding names a path under it, so a silent widening of the
+    frozen list stays impossible while a reviewed one becomes legal.
+    """
+    declared = state.get("chunk", {}).get("lift_targets") or []
+    if not declared:
+        return []
+    requested = [
+        str(item.get("lift_target"))
+        for round_state in state.get("rounds", [])
+        for item in round_state.get("reviews", [])
+        if item.get("verdict") == "pass_with_lift" and item.get("lift_target")
+    ]
+    return [
+        prefix
+        for prefix in declared
+        if any(path_is_in_frozen_chunk(target, [prefix]) for target in requested)
+    ]
+
+
+def chunk_allowed_paths(state: dict[str, Any]) -> list[str]:
+    return list(state["chunk"]["files"]) + authorized_lift_targets(state)
+
+
 def path_is_in_frozen_chunk(path: str, allowed_prefixes: Iterable[str]) -> bool:
     normalized = normalize_scoped_path(path)
     return any(
@@ -1286,9 +1362,21 @@ def verify_local_chunk_files(root: Path, spec: dict[str, Any], state: dict[str, 
     changed = [line.strip() for line in result.stdout.splitlines() if line.strip()]
     if not changed:
         raise LoopError("frozen chunk has no committed file changes relative to the protected base")
-    allowed = state["chunk"]["files"]
+    allowed = chunk_allowed_paths(state)
     outside = [path for path in changed if not path_is_in_frozen_chunk(path, allowed)]
     if outside:
+        declared = state.get("chunk", {}).get("lift_targets") or []
+        unrequested = [
+            path
+            for path in outside
+            if path_is_in_frozen_chunk(path, declared)
+        ]
+        if unrequested:
+            raise LoopError(
+                "chunk diff touches declared lift targets that no reviewer has asked for: "
+                + ", ".join(unrequested)
+                + ". A lift target opens only after a pass_with_lift finding names it"
+            )
         raise LoopError("chunk diff contains files outside the frozen list: " + ", ".join(outside))
 
 
@@ -1297,7 +1385,7 @@ def verify_remote_chunk_files(pr: dict[str, Any], state: dict[str, Any]) -> None
     paths = [file.get("path") for file in files if isinstance(file, dict) and isinstance(file.get("path"), str)]
     if not paths:
         raise LoopError("PR has no readable changed-file list; refusing to approve an unbound chunk")
-    outside = [path for path in paths if not path_is_in_frozen_chunk(path, state["chunk"]["files"])]
+    outside = [path for path in paths if not path_is_in_frozen_chunk(path, chunk_allowed_paths(state))]
     if outside:
         raise LoopError("PR contains files outside the frozen list: " + ", ".join(outside))
 
