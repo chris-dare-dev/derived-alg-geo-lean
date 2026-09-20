@@ -64,6 +64,12 @@ replacement for a Lean theorem or an issue acceptance criterion.
   record. The SF11 manifest now includes that audit slice; omitting it lets a
   compiling change fail later in audit-completeness rather than at the frozen
   chunk boundary.
+- `BaseChangeCategory.lean` had a stale ownership sentence saying that the
+  unbounded tensor *is* the K-flat construction, even though the root API takes
+  an operation and `KFlatBaseChange.lean` is only one source-faithful producer.
+  Keep “K-flat producer” and “root operation” distinct in module prose; the
+  distinction is what lets exact/open or future higher-categorical producers
+  reuse the category construction.
 
 ## Time-saving practices
 

@@ -45,14 +45,15 @@ preservation statements needed to put the resulting generators, and hence
 their thick envelope, inside the compact objects of `Dqc(X_T)`.
 
 The three layers of Theorem 3.17 this paragraph used to name as next are now
-built.  The unbounded derived tensor is the K-flat construction in
-`KFlatBaseChange.lean`; the source `Dqc` component is the coproduct-and-extension
-closure of a compact source sequence in `BaseChangeSourceSequence.lean`; and
-pullback/pushforward functoriality is lifted to whole sequences in
-`BaseChangeSequenceFunctoriality.lean`.  What remains of 3.17 is not
-construction but inhabitation: the compactness preservation statements isolated
-below, and compact generation on the source, are still supplied rather than
-proved.
+available in the current API.  The K-flat derived tensor in
+`KFlatBaseChange.lean` is one source-faithful producer for the root operation;
+the source `Dqc` component is the coproduct-and-extension closure of a compact
+source sequence in `BaseChangeSourceSequence.lean`; and pullback/pushforward
+functoriality is lifted to whole sequences in
+`BaseChangeSequenceFunctoriality.lean`.  What remains of 3.17 is not the
+formal closure construction but inhabitation: the compactness preservation
+statements isolated below, and compact generation on the source, are still
+supplied rather than proved.
 
 ## Main definitions
 
