@@ -152,6 +152,9 @@ hypothesis as a proof. -/
 /-- Owner data for the noetherian-locality equivalence of Lemma 4.15. -/
 structure NoetherianLocalityData (R : OpenRestrictionFamily X P DS)
     (t : TStructure (DS.QuasicoherentCategory P)) where
+  /-- The S-local data the two implications below are stated against. Carried
+  rather than existentially quantified, because `lemma_4_15` hands its caller
+  `H.localData.restriction U hU` and a proposition would not. -/
   localData : SLocalData R t
   global_to_local : t.IsNoetherian →
     ∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
@@ -169,15 +172,29 @@ theorem lemma_4_15 (H : NoetherianLocalityData R t) :
 
 /-- An arbitrary (not necessarily finite) chain of monomorphisms. -/
 structure Filtration (C : Type*) [Category C] where
+  /-- The `n`-th object of the chain. -/
   object : ℕ → C
+  /-- The map from the `n`-th object to the `n+1`-st. `mono` below is what makes
+  it an inclusion; this field alone claims only a morphism. -/
   inclusion : ∀ n, object n ⟶ object (n + 1)
   mono : ∀ n, Mono (inclusion n)
 
-/-- Owner data for lifting an arbitrary heart filtration as in Lemma 4.16(3). -/
-structure Lemma416_3Data (L : SLocalData R t) where
+/-- Owner data for lifting an arbitrary heart filtration as in Lemma 4.16(3).
+
+Named `Lemma416Part3Data` rather than `Lemma416_3Data`: the `defsWithUnderscore`
+linter reads the underscore separating the lemma number from its clause and
+flags every field of the structure, and this repository's `nolints.json` is a
+shrink-only ratchet, so silencing it is not available. The paper reference is
+unchanged -- Lemma 4.16, clause (3). -/
+structure Lemma416Part3Data (L : SLocalData R t) where
+  /-- Lifts a filtration in the heart restricted to `U` to one in the global
+  heart. It is owner data, not a construction: nothing here builds the lift. -/
   lift (U : S.Opens) (hU : CompactSpace U.toScheme)
       (F : Filtration ((L.restriction U hU).tStructure.heart.FullSubcategory)) :
       Filtration (t.heart.FullSubcategory)
+  /-- Identifies the `n`-th object of the lifted filtration, restricted back to
+  `U`, with the `n`-th object it was lifted from. `comm` below is what makes the
+  identification compatible with the inclusions. -/
   comparison (U : S.Opens) (hU : CompactSpace U.toScheme)
       (F : Filtration ((L.restriction U hU).tStructure.heart.FullSubcategory))
       (n : ℕ) :
@@ -191,7 +208,7 @@ structure Lemma416_3Data (L : SLocalData R t) where
           ((lift U hU F).inclusion n) ≫ (comparison U hU F (n + 1)).hom
 
 /-- The filtration-lifting conclusion in the orientation of Lemma 4.16(3). -/
-theorem lemma_4_16_3 (L : SLocalData R t) (H : Lemma416_3Data L) (U : S.Opens)
+theorem lemma_4_16_3 (L : SLocalData R t) (H : Lemma416Part3Data L) (U : S.Opens)
     (hU : CompactSpace U.toScheme)
     (F : Filtration ((L.restriction U hU).tStructure.heart.FullSubcategory)) :
     ∃ G : Filtration (t.heart.FullSubcategory),
