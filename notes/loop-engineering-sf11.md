@@ -113,6 +113,12 @@ replacement for a Lean theorem or an issue acceptance criterion.
   OpenSpec digest after ledger `sf11-1-base-change-categories-v4` was written.
   The controller should therefore reject that old ledger for remote actions;
   reinitialize a fresh frozen ledger after any checklist edit.
+- The frozen-scope matcher initially normalized only changed paths with
+  `lstrip("./")`, not the manifest prefixes. As a result, `.claude` and
+  `.github` entries falsely failed to match their own frozen scope. Normalize
+  both paths and prefixes symmetrically, and keep a regression test for
+  leading-dot directories; otherwise loop-control debugging can be mistaken
+  for a source or mathematical failure.
 
 ## Follow-up observations (2026-09-19)
 
