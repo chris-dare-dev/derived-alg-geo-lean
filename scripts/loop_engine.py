@@ -440,6 +440,24 @@ def validate_spec(spec: dict[str, Any]) -> None:
         raise LoopError(f"spec.review.reviewers is missing required roles: {', '.join(sorted(missing))}")
     if len(reviewer_set) != len(reviewers):
         raise LoopError("spec.review.reviewers must not contain duplicate names")
+    advisors = reviewer_spec.get("advisors", [])
+    if not isinstance(advisors, list) or any(
+        not isinstance(advisor, str) or not advisor.strip() for advisor in advisors
+    ):
+        raise LoopError("spec.review.advisors must be a list of names")
+    advisor_set = set(advisors)
+    if len(advisor_set) != len(advisors):
+        raise LoopError("spec.review.advisors must not contain duplicate names")
+    overlap = advisor_set & reviewer_set
+    if overlap:
+        # Naming an advisor in `reviewers` would silently make it a veto:
+        # adjudication refuses until every roster member submits, and refuses to
+        # pass unless every one of them passed. Advisors have no ledger authority
+        # by construction, and that is the point of them.
+        raise LoopError(
+            "spec.review.advisors must be disjoint from reviewers; "
+            f"an advisor cannot also gate adjudication: {', '.join(sorted(overlap))}"
+        )
     reviewer_spec.get("independent", True)
     if reviewer_spec.get("independent", True) is not True:
         raise LoopError("spec.review.independent must remain true")
@@ -508,6 +526,8 @@ def print_validation(path: Path, root: Path) -> int:
     print(f"  openspec change={spec['openspec']['change']} validation={spec['openspec'].get('validation', 'structural')}")
     print(f"  mode={spec['mode']} enabled={spec['enabled']} issues={len(spec['issues'])}")
     print(f"  reviewers={', '.join(spec['review']['reviewers'])}")
+    advisors = spec["review"].get("advisors") or []
+    print(f"  advisors={', '.join(advisors) if advisors else '(none)'} [non-blocking]")
     print(f"  max_review_rounds_per_chunk={spec['limits']['max_review_rounds_per_chunk']}")
     epic_opt_ins = spec.get("eligibility", {}).get("allow_epic_issues", [])
     if epic_opt_ins:

@@ -76,6 +76,38 @@ generated `.agents/skills/` files.
    controller's comment action with a concise link to the OpenSpec change and
    frozen chunk. If it does not, leave the tracker untouched.
 
+## Phase 0.5: pre-freeze altitude sweep
+
+Run once, after preflight passes and **before the first `ledger init`**. The
+ordering is the point: once any ledger exists, `digest(spec)` is load-bearing
+for dependency checks, so a finding from here can no longer influence a frozen
+file list. Before that point it can.
+
+Dispatch both advisors over every planned chunk's scope:
+
+1. `.claude/agents/altitude-scout.md` — is this concept already known, in
+   greater generality, in the pinned Mathlib or the literature?
+2. `.claude/agents/hypothesis-elimination-scout.md` — which hypotheses does the
+   proof not actually use?
+
+They are named in `spec.review.advisors`, not `spec.review.reviewers`. They
+record no verdict and nothing waits on them: do not call `ledger record-review`
+for an advisor, and do not treat a slow or failed advisor as a reason to stop.
+Their entire output is rows in `docs/architecture/generalization-backlog.md`.
+
+Then read the backlog and decide, before freezing:
+
+- A candidate that is `PIN-CONFIRMED` may mean this chunk should consume an
+  existing general result instead of proving a special case. Adjust the plan now.
+- A verified weakening may mean the chunk's own statements should be written at
+  the weaker hypotheses from the start, rather than lifted later.
+- A plausible ancestor that this chunk will not touch belongs in the chunk's
+  `lift_targets`, so a reviewer can open it later without a manifest edit.
+
+Running neither advisor is permitted when the manifest names none. Running one
+and not the other is not: they are blind in different directions, and the one
+you skip is the one that finds the hypothesis nobody thought to question.
+
 ## Phase 1: one frozen chunk
 
 For each issue in manifest order:

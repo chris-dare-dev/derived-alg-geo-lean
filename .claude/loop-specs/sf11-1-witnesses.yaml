@@ -36,6 +36,9 @@ review:
     - repository-boundary-adversary
     - abstraction-adversary
     - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
 
 runner:
   required_checks:
