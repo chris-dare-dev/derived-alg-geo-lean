@@ -676,7 +676,11 @@ jobs:
       # names, which is exactly the sort of quiet wrongness this step exists to
       # avoid.
       - name: Record elan shim and process state before lean-action
-        if: always()
+        # These queries are Windows-only.  Pull-request and merge-queue builds
+        # run on Ubuntu; selecting `shell: powershell` there makes the
+        # diagnostic itself fail before Lean starts, even though it is marked
+        # continue-on-error.
+        if: always() && runner.os == 'Windows'
         continue-on-error: true
         shell: powershell
         env:
@@ -753,6 +757,7 @@ jobs:
       # that `lean-action` is about to fail anyway, and failing here names the
       # process while failing there does not.
       - name: Clear stale elan shim holders
+        if: runner.os == 'Windows'
         shell: powershell
         env:
           LANE: ${{ runner.environment }}
