@@ -194,6 +194,135 @@ class LoopEngineTests(unittest.TestCase):
             )
         )
 
+    def test_progress_chunk_requires_explicit_manifest_authorization(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["issues"][0]["chunks"][0]["closure"] = "progress"
+            import yaml
+
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError):
+                loop_engine.load_spec(spec_path, root)
+
+            spec["closure"]["allow_progress_pr"] = True
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            loaded = loop_engine.load_spec(spec_path, root)
+            self.assertEqual(loaded["issues"][0]["chunks"][0]["closure"], "progress")
+
+    def test_progress_pr_link_cannot_close_an_issue(self) -> None:
+        loop_engine.validate_pr_body_closure("Refs #554\n", 554, "progress")
+        loop_engine.validate_pr_body_closure("See #554\n", 554, "progress")
+        loop_engine.validate_pr_body_closure("Closes #554\n", 554, "complete")
+        with self.assertRaises(loop_engine.LoopError):
+            loop_engine.validate_pr_body_closure("Closes #554\n", 554, "progress")
+        with self.assertRaises(loop_engine.LoopError):
+            loop_engine.validate_pr_body_closure("Refs #554\nCloses #522\n", 554, "progress")
+        with self.assertRaises(loop_engine.LoopError):
+            loop_engine.validate_pr_body_closure("Refs #554\n", 554, "complete")
+
+    def test_reviewed_commit_accepts_short_or_full_head_revision(self) -> None:
+        head = "a" * 40
+        with mock.patch.object(loop_engine, "git", return_value=head):
+            self.assertTrue(loop_engine.reviewed_commit_matches_head(Path("."), "a" * 7, head))
+            self.assertTrue(loop_engine.reviewed_commit_matches_head(Path("."), head, head))
+        with mock.patch.object(loop_engine, "git", return_value=""):
+            self.assertFalse(loop_engine.reviewed_commit_matches_head(Path("."), "a" * 7, head))
+        self.assertFalse(loop_engine.reviewed_commit_matches_head(Path("."), "b" * 7, head))
+        self.assertFalse(loop_engine.reviewed_commit_matches_head(Path("."), "a" * 7, "a" * 39))
+
+    def test_progress_dependency_cannot_unlock_downstream_chunk(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["mode"] = "stack"
+            spec["limits"]["min_issues"] = 2
+            spec["limits"]["max_issues"] = 2
+            spec["closure"]["allow_progress_pr"] = True
+            spec["issues"][0]["chunks"][0]["closure"] = "progress"
+            spec["issues"].append(
+                {
+                    "number": 2,
+                    "slug": "downstream-issue",
+                    "depends_on": [1],
+                    "chunks": [
+                        {
+                            "id": "downstream-chunk",
+                            "scope": "Wait for the upstream issue.",
+                            "requirements": ["Frozen scope"],
+                            "files": ["scripts/loop_engine.py"],
+                            "acceptance": ["The upstream issue is complete."],
+                        }
+                    ],
+                }
+            )
+            import yaml
+
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            loaded = loop_engine.load_spec(spec_path, root)
+            dependency_path = loop_engine.state_path(root, loaded, None, "test-chunk")
+            loop_engine.write_json(
+                dependency_path,
+                {
+                    "schema": f"{loop_engine.RUN_SCHEMA}/ledger",
+                    "spec_digest": loop_engine.digest(loaded),
+                    "openspec_digest": loop_engine.openspec_digest(root, loaded),
+                    "chunk": {"closure": "progress"},
+                    "status": "passed",
+                },
+            )
+            with mock.patch.object(loop_engine, "issue_state") as issue_state:
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    result = loop_engine.ledger_init(root, spec_path, 2, "downstream-chunk", None)
+            issue_state.assert_not_called()
+            self.assertNotEqual(result, 0)
+            self.assertIn("progress ledger cannot unlock", output.getvalue())
+
+    def test_open_upstream_issue_cannot_unlock_complete_dependency(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["mode"] = "stack"
+            spec["limits"]["min_issues"] = 2
+            spec["limits"]["max_issues"] = 2
+            spec["issues"].append(
+                {
+                    "number": 2,
+                    "slug": "downstream-issue",
+                    "depends_on": [1],
+                    "chunks": [
+                        {
+                            "id": "downstream-chunk",
+                            "scope": "Wait for the upstream issue.",
+                            "requirements": ["Frozen scope"],
+                            "files": ["scripts/loop_engine.py"],
+                            "acceptance": ["The upstream issue is complete."],
+                        }
+                    ],
+                }
+            )
+            import yaml
+
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            loaded = loop_engine.load_spec(spec_path, root)
+            dependency_path = loop_engine.state_path(root, loaded, None, "test-chunk")
+            loop_engine.write_json(
+                dependency_path,
+                {
+                    "schema": f"{loop_engine.RUN_SCHEMA}/ledger",
+                    "spec_digest": loop_engine.digest(loaded),
+                    "openspec_digest": loop_engine.openspec_digest(root, loaded),
+                    "chunk": {"closure": "complete"},
+                    "status": "passed",
+                },
+            )
+            with mock.patch.object(loop_engine, "issue_state", return_value={"state": "open"}) as issue_state:
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    result = loop_engine.ledger_init(root, spec_path, 2, "downstream-chunk", None)
+            issue_state.assert_called_once_with(root, spec["repository"], 1)
+            self.assertNotEqual(result, 0)
+            self.assertIn("remaining open", output.getvalue())
+
     def test_ledger_requires_all_reviewers_and_stops_after_five_rounds(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

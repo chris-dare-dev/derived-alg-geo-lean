@@ -143,10 +143,15 @@ prevents it; it runs near the front of `scripts/gates.sh`, of
 
 ## Where verification runs
 
-**Full verification runs on the self-hosted Windows runners, not on your
-machine.** `.github/workflows/ci.yml` routes `push` and `workflow_dispatch` to
-`["self-hosted", "owner-win"]` and triggers on `agent/**`, so pushing an agent
-branch already runs the whole gate there. For a verdict without pushing:
+**Full verification runs in CI, not on your machine.** Since 2026-09-19
+`.github/workflows/ci.yml` triggers `push` on `main` alone, so **pushing an
+agent branch is no longer a gate run — opening the pull request is.** The
+`pull_request` lane runs the identical job set on `ubuntu-latest`, and over the
+195 commits both lanes used to build it was the faster of the two (20.8 min
+median against 40.2) as well as the one branch protection reads.
+
+To force the self-hosted Windows lane on a branch — the platform check this
+machine owns — dispatch it by hand:
 
 ```bash
 gh workflow run ci.yml --ref <branch>
@@ -189,7 +194,9 @@ must select at most three issues, freeze file-level chunks, name the four
 independent reviewers, and cap each chunk at three review/improve rounds. A
 failed third round stops the chunk. Provider actions are separately enabled;
 issue closure for code work requires a merged PR, and the schema keeps merge
-disabled unless the manifest enables it explicitly. Keep run ledgers in ignored
+disabled unless the manifest enables it explicitly. Progress chunks must be
+marked explicitly and use non-closing issue references; complete chunks require
+a closing keyword. Keep run ledgers in ignored
 `.loop-runs/`, never in the OpenSpec plan.
 
 This section previously read "Build the stable root while developing:

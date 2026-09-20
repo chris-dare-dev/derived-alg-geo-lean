@@ -22,6 +22,13 @@ deliberately restricted.  Proper discontinuity makes point stabilizers finite,
 but does not make the action free, so it does not imply an unrestricted
 covering map.
 
+The finite-stabilizer theorem below takes only the first field's Mathlib class.
+The local and quotient consequences install the surjectivity-derived Hausdorff
+instance and local compactness, while consuming the canonical continuous
+constant-action instance from the combined-topology layer; keeping that split
+visible prevents an accidental strengthening of the supplied geometric
+interface.
+
 ## Missing geometric input
 
 No inhabitant of `ProperDiscontinuityData` is constructed here.  A geometric
@@ -68,13 +75,26 @@ structure ProperDiscontinuityData (v : K₀ C →+ Λ) : Prop where
   current local-homeomorphism API without a finite-dimensionality input. -/
   locallyCompact : LocallyCompactSpace (StabilityCondition.WithClassMap C v)
 
-/-- Proper discontinuity alone makes every point stabilizer finite. -/
+/-- Proper discontinuity alone makes every point stabilizer finite.
+
+This helper intentionally takes the Mathlib class directly: surjectivity and
+local compactness are not needed for the point-stabilizer consequence. -/
+theorem finite_stabilizer_of_properlyDiscontinuousSMul
+    (h : ProperlyDiscontinuousSMul (AutPairQuot v)
+      (StabilityCondition.WithClassMap C v))
+    (σ : StabilityCondition.WithClassMap C v) :
+    (MulAction.stabilizer (AutPairQuot v) σ : Set (AutPairQuot v)).Finite := by
+  letI := h
+  exact ProperlyDiscontinuousSMul.finite_stabilizer σ
+
+/-- Compatibility wrapper for clients that already hold the complete external
+data bundle.  Use `finite_stabilizer_of_properlyDiscontinuousSMul` when only
+proper discontinuity is available. -/
 theorem ProperDiscontinuityData.finite_stabilizer
     (d : ProperDiscontinuityData v)
     (σ : StabilityCondition.WithClassMap C v) :
-    (MulAction.stabilizer (AutPairQuot v) σ : Set (AutPairQuot v)).Finite := by
-  letI := d.properlyDiscontinuous
-  exact ProperlyDiscontinuousSMul.finite_stabilizer σ
+    (MulAction.stabilizer (AutPairQuot v) σ : Set (AutPairQuot v)).Finite :=
+  finite_stabilizer_of_properlyDiscontinuousSMul d.properlyDiscontinuous σ
 
 /-- Every stability condition has a neighbourhood whose translates can meet
 it only under elements fixing the original point. -/

@@ -49,6 +49,7 @@ merge:
 closure:
   code_issue: pr_merge_keyword
   allow_non_pr: false
+  allow_progress_pr: true
 
 mutations:
   comment_issue: true
@@ -64,15 +65,16 @@ issues:
     depends_on: []
     chunks:
       - id: sf8-5-pullback-construction
-        scope: Construct the supported arbitrary derived pullback and prove its preservation/coherence obligations.
+        scope: Add the supported non-flat nonidentity affine witness for SF8.5 item 9 as a progress chunk; do not claim the remaining preservation/coherence obligations.
         requirements:
           - Supported arbitrary derived pullbacks are constructed
         files:
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory
-          - DerivedAlgGeo/AlgebraicGeometry/Moduli
         acceptance:
-          - The supported construction is actual Lean data, not an existence or preservation postulate.
-          - The non-flat nonidentity example and comparison/coherence obligations are proved.
+          - The `ℤ → ZMod 2` ring map and its affine `Spec.map` are actual Lean data with proved non-flatness and non-isomorphism.
+          - The existing supported affine geometric pullback is instantiated without a flatness hypothesis, and the general preservation/coherence boundary remains explicit.
+        closure: progress
 
   - number: 522
     slug: sf9-2-supported-algebraicity

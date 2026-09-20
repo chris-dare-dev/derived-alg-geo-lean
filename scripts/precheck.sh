@@ -27,8 +27,10 @@
 #   * It does not run the `mfc` contract tooling, which is CI-only and which
 #     `scripts/gates.sh` does not reproduce either.
 #
-# Get the verdict from the self-hosted Windows runners. Pushing an `agent/**`
-# branch already does it; without pushing:
+# Get the verdict from CI. Since 2026-09-19 a push to an agent branch does NOT
+# start a run -- `ci.yml` triggers `push` on `main` alone. Open the pull
+# request; that lane runs the identical job set on ubuntu-latest. To dispatch
+# the self-hosted Windows lane on a branch instead:
 #
 #   gh workflow run ci.yml --ref <branch>
 #
@@ -232,7 +234,8 @@ fi
 echo
 if [ ${#FAILED[@]} -eq 0 ]; then
   echo "precheck clean -- this is NOT a CI verdict."
-  echo "Push the branch, or: gh workflow run ci.yml --ref \$(git branch --show-current)"
+  echo "Open the pull request for the verdict, or dispatch the Windows lane:"
+  echo "  gh workflow run ci.yml --ref \$(git branch --show-current)"
   exit 0
 fi
 echo "FAILED: ${FAILED[*]}"

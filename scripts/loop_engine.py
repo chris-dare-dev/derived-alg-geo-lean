@@ -54,8 +54,14 @@ ACTION_TO_MUTATION = {
 ISSUE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BRANCH_RE = re.compile(r"^agent/[a-z0-9][a-z0-9._/-]*$")
 CLOSING_KEYWORD_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b", re.I)
+# Common non-closing issue-link phrases accepted for progress PRs.
+NON_CLOSING_REFERENCE_RE = re.compile(
+    r"\b(?:ref(?:s)?|references?|related\s+to|part\s+of|progress\s+on|see)\s+#(\d+)\b",
+    re.I,
+)
 SUCCESS_CONCLUSIONS = {"SUCCESS", "success", "PASSED", "passed"}
 MERGE_METHODS = {"merge", "squash", "rebase"}
+CHUNK_CLOSURES = {"complete", "progress"}
 DEFAULT_MERGE_POLICY = {
     "method": "squash",
     "delete_branch": False,
@@ -386,6 +392,9 @@ def validate_spec(spec: dict[str, Any]) -> None:
                 not isinstance(item, str) or not item.strip() for item in requirements
             ):
                 raise LoopError(f"{chunk_name}.requirements must name at least one OpenSpec requirement")
+            closure = chunk.get("closure", "complete")
+            if closure not in CHUNK_CLOSURES:
+                raise LoopError(f"{chunk_name}.closure must be 'complete' or 'progress'")
 
     eligibility = spec.get("eligibility", {})
     if not isinstance(eligibility, dict):
@@ -429,6 +438,15 @@ def validate_spec(spec: dict[str, Any]) -> None:
     if closure.get("code_issue") != "pr_merge_keyword":
         raise LoopError("spec.closure.code_issue must be 'pr_merge_keyword'")
     require_bool(closure, "allow_non_pr", "spec.closure")
+    if "allow_progress_pr" in closure and not isinstance(closure["allow_progress_pr"], bool):
+        raise LoopError("spec.closure.allow_progress_pr must be a boolean")
+    has_progress_chunk = any(
+        chunk.get("closure", "complete") == "progress"
+        for issue in issues
+        for chunk in issue["chunks"]
+    )
+    if has_progress_chunk and closure.get("allow_progress_pr") is not True:
+        raise LoopError("progress chunks require spec.closure.allow_progress_pr=true")
     runner = require_mapping(spec.get("runner"), "spec.runner")
     checks = runner.get("required_checks")
     if not isinstance(checks, list) or not checks or any(
@@ -788,6 +806,17 @@ def require_selected_dependencies_passed(
                     f"issue #{issue['number']} depends on chunk {dependency_chunk['id']!r}, "
                     f"whose ledger status is {dependency_state.get('status')!r}"
                 )
+            if dependency_state.get("chunk", {}).get("closure") != "complete":
+                raise LoopError(
+                    f"issue #{issue['number']} depends on progress chunk {dependency_chunk['id']!r}; "
+                    "a progress ledger cannot unlock a downstream issue"
+                )
+            dependency_live = issue_state(root, spec["repository"], dependency)
+            if str(dependency_live.get("state", "")).upper() != "CLOSED":
+                raise LoopError(
+                    f"issue #{issue['number']} depends on issue #{dependency} remaining open; "
+                    "the upstream complete chunk must be merged and closed first"
+                )
 
 
 def load_state(path: Path) -> dict[str, Any]:
@@ -832,6 +861,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
                 "files": list(chunk["files"]),
                 "requirements": list(chunk["requirements"]),
                 "acceptance": list(chunk["acceptance"]),
+                "closure": chunk.get("closure", "complete"),
             },
             "reviewers": list(spec["review"]["reviewers"]),
             "max_review_rounds": spec["limits"]["max_review_rounds_per_chunk"],
@@ -1075,6 +1105,47 @@ def path_is_in_frozen_chunk(path: str, allowed_prefixes: Iterable[str]) -> bool:
     )
 
 
+def validate_pr_body_closure(body: str, number: int, chunk_closure: str) -> None:
+    """Enforce complete-vs-progress issue-link semantics before PR creation."""
+
+    closing_numbers = {int(match.group(1)) for match in CLOSING_KEYWORD_RE.finditer(body)}
+    extra_closures = closing_numbers - {number}
+    if extra_closures:
+        raise LoopError(
+            "PR body closes issues outside the current frozen chunk: "
+            + ", ".join(f"#{issue}" for issue in sorted(extra_closures))
+        )
+    if chunk_closure == "complete":
+        if number not in closing_numbers:
+            raise LoopError(f"complete PR body must contain a closing keyword for issue #{number}")
+        return
+    if chunk_closure != "progress":
+        raise LoopError(f"unsupported chunk closure mode: {chunk_closure!r}")
+    if closing_numbers:
+        raise LoopError("progress PR body must not contain a closing keyword; use 'Refs #N' or similar")
+    references = {int(match.group(1)) for match in NON_CLOSING_REFERENCE_RE.finditer(body)}
+    if number not in references:
+        raise LoopError(f"progress PR body must contain a non-closing reference to issue #{number}")
+
+
+def reviewed_commit_matches_head(root: Path, reviewed_commit: str, head_oid: str) -> bool:
+    """Resolve a short/full ledger revision, then compare full SHAs exactly."""
+
+    if not re.fullmatch(r"[0-9a-fA-F]{7,40}", reviewed_commit):
+        return False
+    if not re.fullmatch(r"[0-9a-fA-F]{40}", head_oid):
+        return False
+    resolved = git(
+        root,
+        "rev-parse",
+        "--verify",
+        "--end-of-options",
+        f"{reviewed_commit}^{{commit}}",
+        check=False,
+    )
+    return resolved.lower() == head_oid.lower()
+
+
 def verify_local_chunk_files(root: Path, spec: dict[str, Any], state: dict[str, Any]) -> None:
     base_ref = spec["base_ref"]
     result = run_command(root, ["git", "diff", "--name-only", f"{base_ref}...HEAD"], check=False)
@@ -1127,15 +1198,8 @@ def action_create_pr(
         raise LoopError("cannot create a PR from a blocked chunk ledger")
     verify_local_chunk_files(root, spec, state)
     body = read_body_file(root, body_file)
-    closing_numbers = {int(match.group(1)) for match in CLOSING_KEYWORD_RE.finditer(body)}
-    if number not in closing_numbers:
-        raise LoopError(f"PR body must contain a closing keyword for issue #{number}")
-    extra_closures = closing_numbers - {number}
-    if extra_closures:
-        raise LoopError(
-            "PR body closes issues outside the current frozen chunk: "
-            + ", ".join(f"#{issue}" for issue in sorted(extra_closures))
-        )
+    chunk_closure = state.get("chunk", {}).get("closure", "complete")
+    validate_pr_body_closure(body, number, chunk_closure)
     args = [
         "gh",
         "pr",
@@ -1231,7 +1295,7 @@ def action_approve(
     )
     if pr.get("state") != "OPEN" or pr.get("isDraft"):
         raise LoopError("approval requires an open, non-draft PR")
-    if pr.get("headRefOid") != current.get("commit"):
+    if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
         raise LoopError("PR head does not match the commit reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
     check_required_checks(root, spec, pr_number)
@@ -1353,7 +1417,7 @@ def action_merge(
     )
     if pr.get("state") != "OPEN" or pr.get("isDraft"):
         raise LoopError("merge requires an open, non-draft PR")
-    if pr.get("headRefOid") != current.get("commit"):
+    if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
         raise LoopError("PR head does not match the commit reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
     if dry_run:

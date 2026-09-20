@@ -348,10 +348,15 @@ a fresh review.
 
 ## Required verification
 
-**Full verification runs on the self-hosted Windows runners, not on your machine.**
-`.github/workflows/ci.yml` routes `push` and `workflow_dispatch` to
-`["self-hosted", "owner-win"]`, and it triggers on `main` and `agent/**`. So
-pushing already runs the whole gate there; to get a verdict without pushing, use
+**Full verification runs in CI, not on your machine.** Since 2026-09-19
+`.github/workflows/ci.yml` triggers `push` on `main` alone, so **pushing an
+agent branch is no longer a gate run — opening the pull request is.** The
+`pull_request` lane runs the identical job set on `ubuntu-latest`, and over the
+195 commits both lanes used to build it was the faster of the two (20.8 min
+median against 40.2) as well as the one branch protection reads.
+
+To force the self-hosted Windows lane on a branch — the platform check this
+machine owns — dispatch it by hand:
 
 ```bash
 gh workflow run ci.yml --ref <branch>
@@ -408,8 +413,10 @@ the same commit. A chunk has at most three review/improve rounds; the third
 unsuccessful round is a terminal stop, not permission to re-chunk the work.
 
 Comments, pushes, PR creation, approval, issue closure, and merge are separate
-manifest capabilities. Code issues close only after a confirmed merged PR, and
-merge authority is false unless the manifest explicitly enables it. The pilot
+manifest capabilities. Code issues close only after a confirmed merged PR;
+complete chunks require a closing keyword while explicitly authorized progress
+chunks must use a non-closing reference. Merge authority is false unless the
+manifest explicitly enables it. The pilot
 manifest is owner-enabled, but its live preflight and digest-bound review
 ledger remain mandatory before any provider mutation.
 

@@ -16,6 +16,9 @@ handoff between issues explicit before the loop is enabled.
   only after the preceding dependency is actually complete and the required
   gates are green.
 - Keep implementation chunks small and independently adversarially reviewed.
+- Permit the first #554 witness to land as an explicitly marked progress PR;
+  the issue remains open until its full construction and preservation contract
+  is satisfied.
 
 ## Capabilities
 

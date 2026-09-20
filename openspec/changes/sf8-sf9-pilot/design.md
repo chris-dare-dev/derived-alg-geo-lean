@@ -33,10 +33,13 @@ construction prerequisite for #522, and #525 remains downstream.
 3. Keep the #522 atlas/diagonal/local-finiteness proof statements in the
    requirement surface; implementation may use existing mathlib structures but
    cannot replace these statements with a representability field.
-4. Treat #525 as a separate frozen chunk for supported semistable reduction and
+4. Treat the first non-flat affine witness for #554 as a progress chunk: it may
+   merge with a non-closing issue reference, but it cannot close #554 or unlock
+   #522 until the remaining preservation and coherence obligations are complete.
+5. Treat #525 as a separate frozen chunk for supported semistable reduction and
    quasi-properness with a dependency edge, not as a speculative parallel
    improvement.
-5. Record the canonical owner and at least two independent consumers (or a
+6. Record the canonical owner and at least two independent consumers (or a
    statement-layer exception) in each abstraction review. The controller ties
    the chunk to exact OpenSpec requirement headings, while the adversary checks
    ownership and adoption against the repository's architecture documents.

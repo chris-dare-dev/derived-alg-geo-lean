@@ -16,6 +16,9 @@ turning unattended execution into an unbounded or mathematically unsafe agent.
 - Require mathematical, repository-boundary, abstraction, and style review for
   each frozen implementation chunk, with no more than five review/improve
   rounds per chunk.
+- Distinguish complete chunks, whose PR may close the tracked issue, from
+  explicitly authorized progress chunks, whose PR must use a non-closing issue
+  reference and leave the issue open.
 - Keep GitHub comments, issue closure, pushes, pull-request creation, approval,
   and merging as separately named manifest capabilities.
 
