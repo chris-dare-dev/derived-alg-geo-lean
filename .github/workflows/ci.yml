@@ -763,11 +763,20 @@ jobs:
             exit 0
           }
           # WHICH shim set is ours must be derived from the runner's own
-          # workspace, NEVER from PATH. On this machine the USER PATH lists
-          # every runner's .elan\bin ahead of the interactive user's, so
-          # `Get-Command elan` from a job on runner-3 can resolve to runner-2's
-          # shim. A guard that killed on that answer would reach into a sibling
-          # runner and kill a CONCURRENT job's build. RUNNER_WORKSPACE is
+          # workspace, NEVER from PATH, because PATH is not trustworthy here.
+          # The persisted USER PATH on the build machine has already had each
+          # runner's .elan\bin neutralised -- every entry carries an
+          # `__ELAN_DEDUPE_SENTINEL_DO_NOT_CREATE` suffix and names a directory
+          # that does not exist -- so a freshly started process resolves elan to
+          # the user's own bin. But a process started BEFORE that fix still
+          # carries the old ordering, with all four runner bins ahead of the
+          # user's, and long-lived processes are exactly what a runner service
+          # is. Observed directly on the build machine: the registry value shows
+          # the sentinels while a live shell's inherited PATH still lists the
+          # real runner bins first. So `Get-Command elan` from a job on runner-3
+          # can still resolve to runner-2's shim, and a guard that killed on that
+          # answer would reach into a sibling runner and kill a CONCURRENT job's
+          # build. RUNNER_WORKSPACE is
           # <runner-root>\_work\<repo>, so the runner root is two levels up and
           # is provably this job's own.
           $ws = $env:RUNNER_WORKSPACE
