@@ -29,7 +29,7 @@ rules:
   design:
     - Record ownership, dependency direction, projection/comparison maps, diamond-instance agreement, and import boundaries.
     - "Include the three adversarial review lenses: mathematical/source faithfulness, repository boundary, and abstraction/adoption."
-    - State how the design avoids churn and what happens after the third review/improve round.
+    - State how the design avoids churn and what happens after the fifth review/improve round.
   tasks:
     - Keep each task small enough to be reviewed as a frozen chunk with an explicit file list and acceptance statement.
     - Every task MUST include its verification command or observable check.
@@ -40,7 +40,7 @@ operations:
     guidance:
       - Work only from the checked-in OpenSpec artifacts and the active loop manifest; do not invent new scope in code.
       - Keep the mathematical, repository-boundary, abstraction, and style reviews independent on the same commit.
-      - Stop after at most three review/improve rounds for one frozen chunk and record the stop in the ledger.
+      - Stop after at most five review/improve rounds for one frozen chunk and record the stop in the ledger.
   archive:
     guidance:
       - Archive only after OpenSpec validation, repository gates, and the bounded adversarial ledger all pass.

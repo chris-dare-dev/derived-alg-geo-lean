@@ -200,7 +200,7 @@ echo
 # cannot be a CI gate at all; see scripts/check_workflows.sh.
 gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
-gate loop-spec python3 scripts/loop_engine.py validate --spec .claude/loop-specs/sf8-sf9-pilot.yaml
+gate loop-spec bash scripts/validate_loop_specs.sh
 gate loop-engine-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
 # These two test hooks and a workflow guard. Neither has a ci.yml counterpart,
 # and neither can have one: a pull request cannot be trusted to run the check

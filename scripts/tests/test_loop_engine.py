@@ -64,7 +64,7 @@ def make_spec(root: Path) -> tuple[Path, dict]:
                 "specs/capability/spec.md",
             ],
         },
-        "limits": {"min_issues": 1, "max_issues": 1, "max_review_rounds_per_chunk": 3},
+        "limits": {"min_issues": 1, "max_issues": 1, "max_review_rounds_per_chunk": 5},
         "review": {"independent": True, "reviewers": REVIEWERS},
         "runner": {"required_checks": ["ci"]},
         "closure": {"code_issue": "pr_merge_keyword", "allow_non_pr": False},
@@ -151,6 +151,48 @@ class LoopEngineTests(unittest.TestCase):
             loaded = loop_engine.load_spec(spec_path, root)
             self.assertEqual(loaded["openspec"]["change"], "pilot-change")
             self.assertEqual(loop_engine.digest(loaded), loop_engine.digest(spec))
+
+    def test_epic_opt_in_is_explicit_and_selected_only(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["eligibility"] = {"allow_epic_issues": [1]}
+            import yaml
+
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            self.assertEqual(loop_engine.load_spec(spec_path, root)["eligibility"], spec["eligibility"])
+            spec["eligibility"] = {"allow_epic_issues": [2]}
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError):
+                loop_engine.load_spec(spec_path, root)
+
+    def test_roadmap_gate_is_scoped_to_manifest_base(self) -> None:
+        self.assertEqual(
+            loop_engine.roadmap_gate_args("agent/sf11-base"),
+            [
+                "python",
+                "scripts/check_roadmap.py",
+                "--require-api",
+                "--scope-to-diff=agent/sf11-base",
+            ],
+        )
+
+    def test_frozen_scope_preserves_dot_directories(self) -> None:
+        self.assertTrue(
+            loop_engine.path_is_in_frozen_chunk(
+                ".claude/README.md", [".claude"]
+            )
+        )
+        self.assertTrue(
+            loop_engine.path_is_in_frozen_chunk(
+                "./.github/CODEOWNERS", ["./.github"]
+            )
+        )
+        self.assertFalse(
+            loop_engine.path_is_in_frozen_chunk(
+                "claude/README.md", [".claude"]
+            )
+        )
 
     def test_progress_chunk_requires_explicit_manifest_authorization(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -281,7 +323,7 @@ class LoopEngineTests(unittest.TestCase):
             self.assertNotEqual(result, 0)
             self.assertIn("remaining open", output.getvalue())
 
-    def test_ledger_requires_all_reviewers_and_stops_after_three_rounds(self) -> None:
+    def test_ledger_requires_all_reviewers_and_stops_after_five_rounds(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             spec_path, _ = make_spec(root)
@@ -291,6 +333,8 @@ class LoopEngineTests(unittest.TestCase):
             commit_b = "b" * 40
             commit_c = "c" * 40
             commit_d = "d" * 40
+            commit_e = "e" * 40
+            commit_f = "f" * 40
 
             with contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(
@@ -308,27 +352,33 @@ class LoopEngineTests(unittest.TestCase):
                     )
                 self.assertEqual(loop_engine.ledger_adjudicate(state_path, "needs_changes", "round one"), 0)
 
-                for reviewer in REVIEWERS:
+                for round_number, commit in enumerate(
+                    (commit_b, commit_c, commit_d, commit_e), start=2
+                ):
+                    for reviewer in REVIEWERS:
+                        self.assertEqual(
+                            loop_engine.ledger_record_review(
+                                state_path, reviewer, commit, "needs_changes", "fix"
+                            ),
+                            0,
+                        )
                     self.assertEqual(
-                        loop_engine.ledger_record_review(state_path, reviewer, commit_b, "needs_changes", "fix"),
+                        loop_engine.ledger_adjudicate(
+                            state_path, "needs_changes", f"round {round_number}"
+                        ),
                         0,
                     )
-                self.assertEqual(loop_engine.ledger_adjudicate(state_path, "needs_changes", "round two"), 0)
 
-                for reviewer in REVIEWERS:
-                    self.assertEqual(
-                        loop_engine.ledger_record_review(state_path, reviewer, commit_c, "needs_changes", "stop"),
-                        0,
-                    )
-                self.assertEqual(loop_engine.ledger_adjudicate(state_path, "needs_changes", "round three"), 0)
                 self.assertNotEqual(
-                    loop_engine.ledger_record_review(state_path, REVIEWERS[0], commit_d, "pass", None),
+                    loop_engine.ledger_record_review(
+                        state_path, REVIEWERS[0], commit_f, "pass", None
+                    ),
                     0,
                 )
 
             state = json.loads(state_path.read_text(encoding="utf-8"))
             self.assertEqual(state["status"], "blocked")
-            self.assertEqual(len(state["rounds"]), 3)
+            self.assertEqual(len(state["rounds"]), 5)
             self.assertEqual(state["rounds"][-1]["adjudication"]["verdict"], "blocked")
 
     def test_passed_ledger_is_terminal(self) -> None:

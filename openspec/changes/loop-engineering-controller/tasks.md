@@ -4,7 +4,7 @@
 
 - [x] 1.1 Initialize the repository OpenSpec structure and configure the Lean/mathlib, trust-boundary, and bounded-review context; verify `openspec validate loop-engineering-controller --strict --no-interactive` passes
 - [x] 1.2 Add `scripts/loop_engine.py` with manifest validation, portable OpenSpec artifact checks, and explicit `PASS`/`FAIL`/`DISABLED` output; verify the script's unit tests pass
-- [x] 1.3 Add a tracked two-to-three-issue pilot manifest that references an OpenSpec change and a separate ignored runtime ledger directory; verify manifest validation rejects missing artifacts and more than three review rounds
+- [x] 1.3 Add a tracked two-to-three-issue pilot manifest that references an OpenSpec change and a separate ignored runtime ledger directory; verify manifest validation rejects missing artifacts and more than five review rounds
 
 ## 2. Review and mutation safeguards
 

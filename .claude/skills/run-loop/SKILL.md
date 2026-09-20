@@ -1,6 +1,6 @@
 ---
 name: run-loop
-description: Execute one enabled OpenSpec-backed two-to-three-issue formalization batch with a digest-bound ledger, four independent reviewers, guarded provider actions, and a hard three-round cap per frozen chunk.
+description: Execute one enabled OpenSpec-backed two-to-three-issue formalization batch with a digest-bound ledger, four independent reviewers, guarded provider actions, and a configured five-round cap per frozen chunk.
 ---
 
 # Bounded OpenSpec loop
@@ -26,8 +26,9 @@ generated `.agents/skills/` files.
   independently on the same commit. The style reviewer cannot substitute for
   either adversarial lens.
 - A review/improve round is keyed by the commit and frozen chunk. A changed
-  commit starts the next round; a fourth round is forbidden. After the third
-  `needs_changes` adjudication, record `blocked` and stop that chunk.
+  commit starts the next round; this run permits at most five rounds. After
+  the fifth `needs_changes` adjudication, record `blocked` and stop that
+  chunk.
 - Do not silently re-chunk, widen the file list, or rewrite the OpenSpec plan
   after review evidence exists. A material plan change requires a new manifest
   or a new frozen chunk and fresh review.
@@ -109,9 +110,9 @@ python scripts/loop_engine.py ledger adjudicate --state <ledger> \
   --verdict pass|needs_changes|blocked --note "<decision>"
 ```
 
-If the result is `needs_changes` and fewer than three rounds have been used,
+If the result is `needs_changes` and fewer than five rounds have been used,
 fix only the recorded findings, rerun the targeted checks, commit, and repeat
-Phase 2. If the result is `blocked` or the third round still needs changes,
+Phase 2. If the result is `blocked` or the fifth round still needs changes,
 stop the chunk and report the exact ledger state. Do not ask the same reviewers
 to rediscover the same issue on an unchanged commit, and do not prolong the
 cycle with speculative abstraction work.

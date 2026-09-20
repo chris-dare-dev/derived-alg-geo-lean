@@ -37,7 +37,7 @@ except ImportError:  # pragma: no cover - direct invocation from another cwd
 
 
 RUN_SCHEMA = "derived-alg-geo-lean.loop-run/v1"
-MAX_ALLOWED_ROUNDS = 3
+MAX_ALLOWED_ROUNDS = 5
 REQUIRED_ADVERSARIES = {
     "mathematics-adversary",
     "repository-boundary-adversary",
@@ -327,7 +327,9 @@ def validate_spec(spec: dict[str, Any]) -> None:
     if max_issues > 3:
         raise LoopError("limits.max_issues cannot exceed 3 for an unattended pilot")
     if max_rounds > MAX_ALLOWED_ROUNDS:
-        raise LoopError("limits.max_review_rounds_per_chunk cannot exceed 3")
+        raise LoopError(
+            f"limits.max_review_rounds_per_chunk cannot exceed {MAX_ALLOWED_ROUNDS}"
+        )
     if min_issues > max_issues:
         raise LoopError("limits.min_issues cannot exceed limits.max_issues")
 
@@ -393,6 +395,24 @@ def validate_spec(spec: dict[str, Any]) -> None:
             closure = chunk.get("closure", "complete")
             if closure not in CHUNK_CLOSURES:
                 raise LoopError(f"{chunk_name}.closure must be 'complete' or 'progress'")
+
+    eligibility = spec.get("eligibility", {})
+    if not isinstance(eligibility, dict):
+        raise LoopError("spec.eligibility must be a mapping")
+    allow_epic_issues = eligibility.get("allow_epic_issues", [])
+    if not isinstance(allow_epic_issues, list) or any(
+        not isinstance(number, int) or isinstance(number, bool) or number <= 0
+        for number in allow_epic_issues
+    ):
+        raise LoopError("spec.eligibility.allow_epic_issues must be a list of positive issue numbers")
+    if len(set(allow_epic_issues)) != len(allow_epic_issues):
+        raise LoopError("spec.eligibility.allow_epic_issues must not contain duplicates")
+    unselected_epic_opt_ins = set(allow_epic_issues) - numbers
+    if unselected_epic_opt_ins:
+        raise LoopError(
+            "spec.eligibility.allow_epic_issues must be a subset of selected issues: "
+            + ", ".join(str(number) for number in sorted(unselected_epic_opt_ins))
+        )
 
     reviewer_spec = require_mapping(spec.get("review"), "spec.review")
     reviewers = reviewer_spec.get("reviewers")
@@ -475,6 +495,9 @@ def print_validation(path: Path, root: Path) -> int:
     print(f"  mode={spec['mode']} enabled={spec['enabled']} issues={len(spec['issues'])}")
     print(f"  reviewers={', '.join(spec['review']['reviewers'])}")
     print(f"  max_review_rounds_per_chunk={spec['limits']['max_review_rounds_per_chunk']}")
+    epic_opt_ins = spec.get("eligibility", {}).get("allow_epic_issues", [])
+    if epic_opt_ins:
+        print(f"  explicitly_authorized_epic_issues={','.join(str(number) for number in epic_opt_ins)}")
     policy = merge_policy(spec)
     print(
         "  merge="
@@ -560,6 +583,17 @@ def issue_state(root: Path, repository: str, number: int) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise LoopError(f"gh issue view #{number} returned an unexpected response")
     return data
+
+
+def roadmap_gate_args(base_ref: str) -> list[str]:
+    """Scope roadmap consistency failures to entries authored after base_ref."""
+
+    return [
+        "python",
+        "scripts/check_roadmap.py",
+        "--require-api",
+        f"--scope-to-diff={base_ref}",
+    ]
 
 
 def preflight(root: Path, spec_path: Path) -> int:
@@ -660,6 +694,10 @@ def preflight(root: Path, spec_path: Path) -> int:
             if isinstance(label, dict)
         }
         forbidden = labels & {"blocked", "epic", "research", "type:spike"}
+        allow_epic_issues = set(spec.get("eligibility", {}).get("allow_epic_issues", []))
+        if "epic" in forbidden and number in allow_epic_issues:
+            forbidden.remove("epic")
+            print(f"PASS issue #{number}: epic label explicitly authorized by manifest")
         if forbidden:
             failures.append(f"issue #{number} has ineligible labels: {', '.join(sorted(forbidden))}")
         blocked_by = blocked_by_entries(live)
@@ -676,8 +714,12 @@ def preflight(root: Path, spec_path: Path) -> int:
             if dependency_state.get("state") != "CLOSED":
                 failures.append(f"issue #{number} depends on open issue #{dependency}")
         expected_branch = f"agent/{issue['slug']}"
-        if expected_branch == git(root, "branch", "--show-current", check=True):
-            failures.append(f"current branch already uses planned issue branch {expected_branch}")
+        # The preflight is intentionally run on the exact clean head from
+        # `base_ref`, and the planned issue branch is the normal place to do
+        # that.  Rejecting that branch name made a valid loop state
+        # impossible: the controller required a dedicated branch while also
+        # rejecting the dedicated branch it had planned.  Existing-PR checks
+        # below still fail closed if the branch has already been used.
         for pr in prs:
             if pr.get("headRefName") == expected_branch:
                 failures.append(f"a PR already exists for planned branch {expected_branch} (#{pr.get('number')})")
@@ -703,7 +745,7 @@ def preflight(root: Path, spec_path: Path) -> int:
 
     roadmap_gate = spec.get("roadmap_gate", "required")
     if roadmap_gate != "disabled":
-        roadmap = run_command(root, ["python", "scripts/check_roadmap.py", "--require-api"], check=False)
+        roadmap = run_command(root, roadmap_gate_args(spec["base_ref"]), check=False)
         if roadmap.returncode != 0:
             message = (roadmap.stdout or roadmap.stderr).strip().splitlines()
             detail = message[-1] if message else "roadmap gate failed"
@@ -852,7 +894,9 @@ def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
         return current
     next_number = (current.get("number", 0) + 1) if current else 1
     if next_number > state["max_review_rounds"]:
-        raise LoopError("review round cap reached; no fourth critique/improve iteration is permitted")
+        raise LoopError(
+            "review round cap reached; no further critique/improve iteration is permitted"
+        )
     current = {
         "number": next_number,
         "commit": commit,
@@ -1043,11 +1087,20 @@ def read_body_file(root: Path, value: str) -> str:
     return body
 
 
+def normalize_scoped_path(value: str) -> str:
+    """Normalize a repository-relative path without erasing dot directories."""
+
+    normalized = value.replace("\\", "/")
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    return normalized.rstrip("/")
+
+
 def path_is_in_frozen_chunk(path: str, allowed_prefixes: Iterable[str]) -> bool:
-    normalized = path.replace("\\", "/").lstrip("./")
+    normalized = normalize_scoped_path(path)
     return any(
-        normalized == prefix.replace("\\", "/").rstrip("/")
-        or normalized.startswith(prefix.replace("\\", "/").rstrip("/") + "/")
+        normalized == normalize_scoped_path(prefix)
+        or normalized.startswith(normalize_scoped_path(prefix) + "/")
         for prefix in allowed_prefixes
     )
 

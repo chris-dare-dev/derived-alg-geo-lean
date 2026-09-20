@@ -58,7 +58,8 @@ structure Proposition315SemiorthogonalityData
   sourceComponentsDqcSLinear :
     SourceTensorData.KFlatDqcSLinearComponents (D := D) Q B A
   /-- The perfect external-product envelopes are semiorthogonal. -/
-  perfectSemiorthogonal : D.PerfectComponentsSemiorthogonal A
+  perfectSemiorthogonal :
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A
 
 namespace Proposition315SemiorthogonalityData
 
@@ -73,7 +74,7 @@ theorem ofKFlatTensorCoefficientComparison
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
     (hCoprod : ∀ j (κ : Type u),
       (A.component j).IsClosedUnderColimitsOfShape (Discrete κ))
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (B : KFlatBasePullbackData X)
     (presentable : SourceTensorData.PresentableBaseActionData
@@ -115,11 +116,12 @@ structure Proposition315CoreData
   semiorthogonality : D.Proposition315SemiorthogonalityData A Q B
   /-- External products generate the perfect base-change category. -/
   perfectFull :
-    (D.perfectCategorySequence A
+    (D.toDerivedBaseChangeData.perfectCategorySequence A
       semiorthogonality.perfectSemiorthogonal).IsFull
   /-- The corresponding quasicoherent components generate `Dqc(X_T)`. -/
   quasicoherentFull :
-    (D.quasicoherentSequence A hcompact
+    (D.toDerivedBaseChangeData.quasicoherentSequence A
+      (D.toDerivedPreservesCompactObjects hcompact)
       semiorthogonality.perfectSemiorthogonal).IsFull
 
 namespace Proposition315SemiorthogonalityData
@@ -137,11 +139,13 @@ compact generation and filtration/coproduct compatibility then propagate it
 to quasicoherent fullness. -/
 theorem toCoreData
     (hcompact : D.PreservesCompactObjects)
-    (hgen : (D.perfectCategoryExternalProductGenerators A).IsClassicalTriangulatedGenerator)
-    (G : D.QuasicoherentFullnessPropagationData A hcompact
+    (hgen : ObjectProperty.IsClassicalTriangulatedGenerator
+      (D.toDerivedBaseChangeData.perfectCategoryExternalProductGenerators A))
+    (G : D.toDerivedBaseChangeData.QuasicoherentFullnessPropagationData A
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.perfectSemiorthogonal) :
     D.Proposition315CoreData A Q B hcompact := by
-  let hperfect := D.perfectCategorySequence_isFull_of_externalProducts
+  let hperfect := D.toDerivedBaseChangeData.perfectCategorySequence_isFull_of_externalProducts
     A C.perfectSemiorthogonal hgen
   exact
     { semiorthogonality := C
@@ -161,11 +165,12 @@ structure Proposition315ProjectionData
     (C : D.Proposition315CoreData A Q B hcompact) where
   /-- Chosen right projections onto the perfect components. -/
   perfectProjections :
-    (D.perfectCategorySequence A
+    (D.toDerivedBaseChangeData.perfectCategorySequence A
       C.semiorthogonality.perfectSemiorthogonal).RightProjectionData
   /-- Chosen right projections onto the quasicoherent components. -/
   quasicoherentProjections :
-    (D.quasicoherentSequence A hcompact
+    (D.toDerivedBaseChangeData.quasicoherentSequence A
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal).RightProjectionData
   /-- The ambient quasicoherent projection functors preserve coproducts. -/
   quasicoherentProjectionCocontinuous :
@@ -180,7 +185,7 @@ structure Proposition315ProjectionConstructionData
     {hcompact : D.PreservesCompactObjects}
     (C : D.Proposition315CoreData A Q B hcompact) : Prop where
   /-- Compact-generator approximations for the perfect envelopes. -/
-  approximation : D.QuasicoherentProjectionApproximationData A
+  approximation : D.toDerivedBaseChangeData.QuasicoherentProjectionApproximationData A
   /-- The zero truncation attached to each approximation preserves
   coproducts in the scheme universe. -/
   truncationCocontinuous (i : ι) :
@@ -189,9 +194,11 @@ structure Proposition315ProjectionConstructionData
   /-- The quasicoherent projectors preserve compact objects, and compact
   intersection identifies their restrictions with the perfect components. -/
   compactRestriction :
-    D.PerfectProjectionRestrictionData A hcompact
+    D.toDerivedBaseChangeData.PerfectProjectionRestrictionData A
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal
-      (approximation.quasicoherentProjections hcompact
+      (approximation.quasicoherentProjections
+        (D.toDerivedPreservesCompactObjects hcompact)
         C.semiorthogonality.perfectSemiorthogonal)
 
 namespace Proposition315ProjectionConstructionData
@@ -209,10 +216,12 @@ Proposition 3.15 core. -/
 noncomputable def toProjectionData : D.Proposition315ProjectionData C where
   perfectProjections := P.compactRestriction.perfectProjections
   quasicoherentProjections :=
-    P.approximation.quasicoherentProjections hcompact
+    P.approximation.quasicoherentProjections
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal
   quasicoherentProjectionCocontinuous :=
-    P.approximation.quasicoherentProjectionCocontinuous hcompact
+    P.approximation.quasicoherentProjectionCocontinuous
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal P.truncationCocontinuous
 
 end Proposition315ProjectionConstructionData
@@ -230,7 +239,8 @@ variable {D : KFlatBaseChangeData X T}
 paper-strength decomposition package. -/
 def toDecompositionData
     (P : D.Proposition315ProjectionData C) :
-    D.DecompositionData A hcompact
+    D.toDerivedBaseChangeData.DecompositionData A
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal where
   sourceComponentsTriangulated :=
     C.semiorthogonality.sourceComponentsTriangulated
@@ -245,7 +255,8 @@ def toDecompositionData
 directly to the paper-strength decomposition package. -/
 noncomputable def toDecompositionDataOfProjectionConstruction
     (P : D.Proposition315ProjectionConstructionData C) :
-    D.DecompositionData A hcompact
+    D.toDerivedBaseChangeData.DecompositionData A
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal :=
   C.toDecompositionData P.toProjectionData
 
