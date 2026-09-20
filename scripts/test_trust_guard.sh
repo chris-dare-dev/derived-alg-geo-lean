@@ -12,10 +12,11 @@
 # and each is one predicate away from letting through an edit that silently
 # removes coverage. The cases below pin both directions.
 #
-# HOW IT WORKS. The `run:` block is extracted from the workflow and only the
-# `gh api` fetch is replaced, by a synthetic TSV file list. The classification
-# logic under test is therefore byte-for-byte the logic that ships. No network,
-# no `gh`, no checkout, nothing from a pull request.
+# HOW IT WORKS. The `run:` block is extracted from the workflow and both `gh
+# api` fetches are replaced by synthetic file/review responses. The
+# classification and revision-binding logic under test is therefore byte-for-
+# byte the logic that ships. No network, no `gh`, no checkout, nothing from a
+# pull request.
 #
 # Usage:
 #   scripts/test_trust_guard.sh [path-to-trust-guard.yml]
@@ -27,24 +28,60 @@ WF="${1:-.github/workflows/trust-guard.yml}"
 
 RAW="$(awk '/^        run: \|$/{f=1;next} f&&/^      - name:/{f=0} f' "$WF" | sed 's/^          //')"
 
-# Swap the two-line `files="$(gh api ... )"` assignment for an env read.
+# Swap the one-line API assignments for environment reads.
 BODY="$(printf '%s\n' "$RAW" | python3 -c '
-import re, sys
+import sys
 src = sys.stdin.read()
-out = re.sub(r"files=\"\$\(gh api.*?@tsv.\)\"", "files=\"$FILES_TSV\"", src, flags=re.S)
-sys.stdout.write(out)
+lines = []
+for line in src.splitlines():
+    if line.startswith("files=\"$(gh api"):
+        lines.append("files=\"$FILES_TSV\"")
+    elif line.startswith("reviews=\"$(gh api"):
+        lines.append("reviews=\"$REVIEWS_JSON\"")
+    else:
+        lines.append(line)
+sys.stdout.write("\n".join(lines))
 ')"
 
-if ! printf '%s' "$BODY" | grep -q 'files="\$FILES_TSV"'; then
+if ! printf '%s' "$BODY" | grep -q 'files="\$FILES_TSV"' \
+   || ! printf '%s' "$BODY" | grep -q 'reviews="\$REVIEWS_JSON"'; then
   echo "harness error: could not substitute the gh api fetch" >&2
   exit 2
 fi
 
 b64 () { printf '%s' "$1" | base64 | tr -d '\n'; }
 
+BASE_SHA='a000000000000000000000000000000000000000'
+HEAD_SHA='b000000000000000000000000000000000000000'
+TRUST_POLICY_VERSION='trust-guard-v2'
+
+review_json () {
+  local digest="$1" state="${2:-APPROVED}" association="${3:-OWNER}"
+  local review_head="${4:-$HEAD_SHA}" marker_head="${5:-$HEAD_SHA}"
+  local marker_base="${6:-$BASE_SHA}" body
+  body="trust-review: v1 base=$marker_base head=$marker_head files=$digest policy=$TRUST_POLICY_VERSION"
+  jq -cn --arg head "$review_head" --arg state "$state" \
+    --arg association "$association" --arg body "$body" \
+    '[[{"id":1,"user":{"login":"fixture-reviewer"},
+      "author_association":$association,"commit_id":$head,"state":$state,
+      "submitted_at":"2026-09-20T00:00:00Z","body":$body}]]'
+}
+
 run_case () {
-  local name="$1" expect="$2" tsv="$3" out rc
-  out="$(REPO=x PR=1 LABELS='[]' FILES_TSV="$(printf '%b' "$tsv")" bash -c "$BODY" 2>&1)"
+  local name="$1" expect="$2" tsv="$3" mode="${4:-none}"
+  local out rc files_value digest reviews='[[]]' approval_tsv="${5:-$tsv}"
+  files_value="$(printf '%b' "$tsv")"
+  digest="$(printf '%s\n' "$(printf '%b' "$approval_tsv")" | LC_ALL=C sort | sha256sum | awk '{print $1}')"
+  case "$mode" in
+    exact)        reviews="$(review_json "$digest")" ;;
+    old-head)     reviews="$(review_json "$digest" APPROVED OWNER "$BASE_SHA")" ;;
+    old-base)     reviews="$(review_json "$digest" APPROVED OWNER "$HEAD_SHA" "$HEAD_SHA" "$HEAD_SHA")" ;;
+    changes)      reviews="$(review_json "$digest" CHANGES_REQUESTED)" ;;
+    unauthorized) reviews="$(review_json "$digest" APPROVED NONE)" ;;
+  esac
+  out="$(REPO=x PR=1 LABELS='[]' BASE_SHA="$BASE_SHA" HEAD_SHA="$HEAD_SHA" \
+    TRUST_POLICY_VERSION="$TRUST_POLICY_VERSION" FILES_TSV="$files_value" \
+    REVIEWS_JSON="$reviews" bash -c "$BODY" 2>&1)"
   rc=$?
   if { [ "$expect" = trip ] && [ "$rc" -ne 0 ]; } \
      || { [ "$expect" = skip ] && [ "$rc" -eq 0 ]; }; then
@@ -75,12 +112,20 @@ run_case "umbrella, added executable line" trip "$UMB\t0\t$(b64 "$EXEC")"  || fa
 run_case "umbrella, patch omitted by API"  trip "$UMB\t0\t"                || fails=1
 run_case "EnumDecls.lean"                  trip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")"                || fails=1
 run_case "ci.yml"                          trip ".github/workflows/ci.yml\t0\t$(b64 "$GOOD")"              || fails=1
+run_case "milestone delivery policy"        trip ".milestone-pipeline/trust-policy.json\t0\t$(b64 "$GOOD")" || fails=1
 run_case "loop specification"               trip ".claude/loop-specs/sf11-pilot.yaml\t0\t$(b64 "$GOOD")"     || fails=1
 run_case "reviewer prompt"                  trip ".claude/agents/mathlib-reviewer.md\t0\t$(b64 "$GOOD")"     || fails=1
 run_case "loop skill"                       trip ".claude/skills/run-loop/SKILL.md\t0\t$(b64 "$GOOD")"     || fails=1
 run_case "openspec change"                  trip "openspec/changes/pilot-change/tasks.md\t0\t$(b64 "$GOOD")" || fails=1
 run_case "audit record slice"              skip "scripts/AlgebraicGeometryAudit/Core.lean\t0\t$(b64 "$GOOD")" || fails=1
 run_case "ordinary source file"            skip "DerivedAlgGeo/Foo.lean\t0\t$(b64 "$GOOD")"                || fails=1
+run_case "trust path without review"       trip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")"                  || fails=1
+run_case "trust path exact review"         skip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")" exact             || fails=1
+run_case "review bound to old head"        trip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")" old-head          || fails=1
+run_case "review bound to old base"        trip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")" old-base          || fails=1
+run_case "review requests changes"         trip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")" changes           || fails=1
+run_case "reviewer lacks authority"        trip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")" unauthorized       || fails=1
+run_case "review digest is stale"          trip "scripts/EnumDecls.lean\t0\t$(b64 "$PROSE")" exact "$UMB\t0\t$(b64 "$GOOD")" || fails=1
 run_case "empty file list"                 trip ""                                                        || fails=1
 
 exit $fails
