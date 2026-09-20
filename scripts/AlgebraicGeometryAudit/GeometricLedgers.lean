@@ -22,22 +22,46 @@ explicit inversion/acyclicity hypotheses; a clean axiom line therefore records o
 construction from those hypotheses.
 -/
 
+#print axioms AlgebraicGeometry.DerivedCategory.SchemeTensorComplex
+#print axioms AlgebraicGeometry.DerivedCategory.SchemeTensorQuasiIso
+#print axioms AlgebraicGeometry.DerivedCategory.singleComplex
+#print axioms AlgebraicGeometry.DerivedCategory.singleLeftTensorIso
+#print axioms AlgebraicGeometry.DerivedCategory.exactLeftFunctor
+#print axioms AlgebraicGeometry.DerivedCategory.exactLeftCounit
+#print axioms AlgebraicGeometry.DerivedCategory.exactLeftCounit_isIso
+#print axioms AlgebraicGeometry.DerivedCategory.exactLeftIsLeftDerived
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.mk
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.resolution
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.comparison
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.comparison_quasiIso
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.tensor_inverts
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.left_resolved_comparison_isIso
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.right_resolved_comparison_isIso
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.resolvedTensor
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.comparisonApp
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.comparisonApp_naturality
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.comparisonApp_naturality_assoc
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.resolvedTensorComparison
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.derivedTensor
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.derivedTensorFactors
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.counit
 #print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.mk
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.functor
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.counit
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.isLeftDerived_left
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.isLeftDerived_right
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.toLeftDerivedTensor
 #print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.leftDerivedUnique
-#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.leftDerivedUnique_flip
-#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.ofExact
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.leftDerivedUniqueFlip
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.fixedLeftComparison
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.ofTensorInverts
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.identity
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.ofKFlat
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.exactComparison
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.exactComparison_hom_counit
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.exactComparison_hom_counit_assoc
 
 /-! ## The geometric Fourier--Mukai correspondence: a dependency ledger
 

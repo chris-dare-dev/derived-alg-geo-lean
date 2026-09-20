@@ -12,14 +12,22 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Relative
 /-!
 # Derived tensor products on schemes
 
-The geometry-level owner of derived tensor, in three deliberately separate tiers.
+The geometry-level owner of derived tensor: one localization-facing interface and three
+deliberately separate derived-tensor tiers.
 
-| Tier | Module | What it supplies |
+| Interface | Module | What it supplies |
+| --- | --- | --- |
+| Localization-facing | `Tensor/LeftDerivedTensor.lean` | the bifunctor and fixed-argument universal properties on the unbounded derived category |
+
+| Derived-tensor tier | Module | What it supplies |
 | --- | --- | --- |
 | Unbounded | `Tensor/Unbounded.lean` | the K-flat tensor bifunctor on complexes of module sheaves, **constructed** from a supplied resolution |
 | Bounded coherent | `Tensor/BoundedCoherent.lean` | `HasDerivedTensor`, a **supplied capability** on `Dᵇ(Coh Z)` with two-slot exactness |
 | Bounded coherent, monoidal | `Tensor/Coherent.lean` | `HasCoherentDerivedTensor`, the same capability with full monoidal coherence, mapping one way into the tier above |
-| Relative | `Tensor/Relative.lean` | `HasMonoidalDerivedPullback`, compatibility with derived pullback along a morphism |
+
+`Tensor/Relative.lean` is the compatibility layer for the bounded coherent tiers, not a fourth
+derived-tensor construction: it supplies `HasMonoidalDerivedPullback` for derived pullback along
+a morphism.
 
 The tiers are separate because they are not each other's restrictions.  The unbounded
 bifunctor does **not** restrict to `Dᵇ(Coh Z)`: that category is not closed under
