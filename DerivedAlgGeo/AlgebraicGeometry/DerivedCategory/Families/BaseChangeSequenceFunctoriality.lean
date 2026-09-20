@@ -30,12 +30,12 @@ universe u w
 variable {S : Scheme.{u}} {X T U : SchemeBaseChange S} {f : T ⟶ U}
   {ι : Type w} [Preorder ι]
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
 /-- Pullback preserves every quasicoherent component of a base-changed
 sequence. -/
 def PullbackPreservesQuasicoherentSequence
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (pull : DqcLeftDerivedPullback (baseChangeMap X f)) : Prop :=
   ∀ i, PullbackPreservesQuasicoherentComponent DT DU (A.component i) pull
@@ -43,7 +43,7 @@ def PullbackPreservesQuasicoherentSequence
 /-- Pullback maps every perfect envelope into the corresponding target
 quasicoherent component. -/
 def PullbackMapsPerfectSequence
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (pull : DqcLeftDerivedPullback (baseChangeMap X f)) : Prop :=
   ∀ i, PullbackMapsPerfectEnvelope DT DU (A.component i) pull
@@ -51,7 +51,7 @@ def PullbackMapsPerfectSequence
 /-- Perfect-envelope preservation and cocontinuity imply preservation of all
 quasicoherent components at once. -/
 theorem pullback_preservesQuasicoherentSequence_of_perfectSequence
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     [pull.functor.CommShift ℤ] [pull.functor.IsTriangulated]
@@ -64,7 +64,7 @@ theorem pullback_preservesQuasicoherentSequence_of_perfectSequence
 /-- Pullback is compatible with the two quasicoherent base-change
 sequences. -/
 theorem quasicoherentSequence_pullback_compatible
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hcompactT : DT.PreservesCompactObjects)
     (hcompactU : DU.PreservesCompactObjects)
@@ -79,7 +79,7 @@ theorem quasicoherentSequence_pullback_compatible
 /-- Pullback is compatible with the bounded base-change sequences whenever
 it preserves intrinsic bounded-coherent cohomology. -/
 theorem boundedSequence_pullback_compatible
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hcompactT : DT.PreservesCompactObjects)
     (hcompactU : DU.PreservesCompactObjects)
@@ -101,7 +101,7 @@ theorem boundedSequence_pullback_compatible
 /-- Pushforward preserves every quasicoherent component of a base-changed
 sequence. -/
 def PushforwardPreservesQuasicoherentSequence
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (push : DqcRightDerivedPushforward (baseChangeMap X f)) : Prop :=
   ∀ i, PushforwardPreservesQuasicoherentComponent DT DU (A.component i) push
@@ -109,7 +109,7 @@ def PushforwardPreservesQuasicoherentSequence
 /-- Pushforward maps every perfect envelope into the corresponding target
 quasicoherent component. -/
 def PushforwardMapsPerfectSequence
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (push : DqcRightDerivedPushforward (baseChangeMap X f)) : Prop :=
   ∀ i, PushforwardMapsPerfectEnvelope DT DU (A.component i) push
@@ -117,7 +117,7 @@ def PushforwardMapsPerfectSequence
 /-- Perfect-envelope preservation and cocontinuity imply preservation of all
 quasicoherent components under pushforward. -/
 theorem pushforward_preservesQuasicoherentSequence_of_perfectSequence
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
     [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
@@ -130,7 +130,7 @@ theorem pushforward_preservesQuasicoherentSequence_of_perfectSequence
 /-- Pushforward is compatible with the two quasicoherent base-change
 sequences. -/
 theorem quasicoherentSequence_pushforward_compatible
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hcompactT : DT.PreservesCompactObjects)
     (hcompactU : DU.PreservesCompactObjects)
@@ -145,7 +145,7 @@ theorem quasicoherentSequence_pushforward_compatible
 /-- Pushforward is compatible with the bounded base-change sequences whenever
 it preserves intrinsic bounded-coherent cohomology. -/
 theorem boundedSequence_pushforward_compatible
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hcompactT : DT.PreservesCompactObjects)
     (hcompactU : DU.PreservesCompactObjects)
@@ -166,14 +166,14 @@ theorem boundedSequence_pushforward_compatible
 
 /-- Tensor by `B` preserves every quasicoherent component of the sequence. -/
 def TensorPreservesQuasicoherentSequence
-    (D : KFlatBaseChangeData X T)
+    (D : DerivedBaseChangeData X T)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (B : TargetDqc X T) : Prop :=
   ∀ i, D.TensorPreservesQuasicoherentComponent (A.component i) B
 
 /-- Tensor by `B` is compatible with the quasicoherent base-change sequence. -/
 theorem quasicoherentSequence_tensor_compatible
-    (D : KFlatBaseChangeData X T)
+    (D : DerivedBaseChangeData X T)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hcompact : D.PreservesCompactObjects)
     (horth : D.PerfectComponentsSemiorthogonal A)
@@ -186,7 +186,7 @@ theorem quasicoherentSequence_tensor_compatible
 /-- Pullback linearity, simultaneously parameterized by every component of
 the base-changed sequence. -/
 noncomputable def quasicoherentSequencePullbackTensorIso
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hPull : PullbackPreservesQuasicoherentSequence DT DU A pull)
@@ -205,7 +205,7 @@ noncomputable def quasicoherentSequencePullbackTensorIso
 /-- The projection formula, simultaneously parameterized by every component
 of the base-changed sequence. -/
 noncomputable def quasicoherentSequenceProjectionFormulaIso
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
@@ -222,6 +222,6 @@ noncomputable def quasicoherentSequenceProjectionFormulaIso
   quasicoherentProjectionFormulaIso DT DU (A.component i) pull push
     (hPush i) hProjection B (hBT i) (hBU i)
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

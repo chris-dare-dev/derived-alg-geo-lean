@@ -9,15 +9,16 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeLinear
 # Compact-fibre tensor duality after base change
 
 This file realizes the tensor-duality half of the external-product Hom
-reduction as an adjunction for the actual K-flat derived tensor. For a compact
+reduction as an adjunction for the supplied derived tensor. For a compact
 object `G` of `Dqc(T)`, `shiftedFiberTensor D G a` tensors on the right by its
 pullback to `X_T` and then shifts by `a`. A right adjoint to this functor is the
 precise duality input needed to expose the earlier source factor in a Hom
 between shifted external products.
 
 No global monoidal structure on unbounded `Dqc` is assumed. This keeps the
-interface at the level currently constructed by the repository while still
-pinning the duality datum to the genuine K-flat tensor bifunctor.
+interface at the level currently supplied by the repository. A K-flat
+resolution is one producer of the bundled tensor, but the duality witness
+itself is stated for whatever derived tensor the bundle carries.
 -/
 
 noncomputable section
@@ -31,10 +32,10 @@ open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 universe u w
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : DerivedBaseChangeData X T)
   {ι : Type w} [Preorder ι]
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
 /-- Tensor on the right by the pullback of a compact object of `Dqc(T)`. -/
 noncomputable def fiberTensor (G : CompactDqcFiber T) :
@@ -60,7 +61,7 @@ theorem shiftedFiberTensor_obj (G : CompactDqcFiber T) (a : ℤ)
   rfl
 
 /-- On a pulled-back source object, `shiftedFiberTensor` is definitionally the
-shifted K-flat external product used to generate the base-change component.
+shifted derived external product used to generate the base-change component.
 
 Not a `simp` lemma: `shiftedFiberTensor_obj` already rewrites this left-hand
 side, so it could never fire. It stays as the named definitional bridge. -/
@@ -72,11 +73,11 @@ theorem shiftedFiberTensor_obj_pullFst
   rfl
 
 /-- Duality for compact fibre factors, expressed as a right adjoint to the
-actual shifted K-flat tensor twist.
+supplied shifted derived tensor twist.
 
 Additivity is recorded explicitly because the downstream semiorthogonality
-argument uses an additive Hom equivalence, while the current unbounded K-flat
-tensor API does not yet bundle exactness or monoidal coherence. -/
+argument uses an additive Hom equivalence, while the current unbounded tensor
+API does not yet bundle exactness or monoidal coherence. -/
 structure CompactFiberTensorDuality where
   /-- The dual tensor-and-shift functor. -/
   rightAdjoint (G : CompactDqcFiber T) (a : ℤ) :
@@ -151,6 +152,6 @@ theorem perfectComponentsSemiorthogonal_of_compactFiberTensorDuality
     (CompactFiberTensorDuality.toExternalProductTensorDuality_preservesSourceComponents
       (D := D) H A pushFst hH)
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

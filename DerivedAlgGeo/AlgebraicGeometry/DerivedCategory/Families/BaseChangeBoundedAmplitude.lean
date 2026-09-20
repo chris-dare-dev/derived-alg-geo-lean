@@ -72,9 +72,9 @@ structure TargetBoundedTStructure (X T : SchemeBaseChange S) where
   bounded_iff (E : TargetDqc X T) :
     tStructure.bounded E ↔ Dqc.schemeBoundedQuasicoherent (X ⨯ T).left E
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
-variable {X T : SchemeBaseChange S} {D : KFlatBaseChangeData X T}
+variable {X T : SchemeBaseChange S} {D : DerivedBaseChangeData X T}
   {ι : Type w} [Preorder ι]
   {A : SemiorthogonalSequence (SourceDqc X) ι}
   {hcompact : D.PreservesCompactObjects}
@@ -142,6 +142,16 @@ theorem boundedSequence_isStrong
 
 end DecompositionData
 
+end DerivedBaseChangeData
+
+namespace KFlatBaseChangeData
+
+variable {X T : SchemeBaseChange S} {D : KFlatBaseChangeData X T}
+  {ι : Type w} [Preorder ι]
+  {A : SemiorthogonalSequence (SourceDqc X) ι}
+  {hcompact : D.PreservesCompactObjects}
+  {horth : D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A}
+
 namespace Proposition315CoreData
 
 variable {P : D.SourceTensorData} {BP : KFlatBasePullbackData X}
@@ -163,10 +173,11 @@ theorem toBoundedData
     (h : (C.toDecompositionDataOfProjectionConstruction R).HasFiniteAmplitude τ)
     (hcoh :
       (C.toDecompositionDataOfProjectionConstruction R).PreservesCoherentCohomology)
-    (hfull : (D.boundedSequence A hcompact
+    (hfull : (D.toDerivedBaseChangeData.boundedSequence A
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal).IsFull) :
     (C.toDecompositionDataOfProjectionConstruction R).BoundedData :=
-  DecompositionData.toBoundedData _ h hcoh hfull
+  DerivedBaseChangeData.DecompositionData.toBoundedData _ h hcoh hfull
 
 /-- Proposition 3.15 restricted to the bounded-coherent locus: the bounded
 sequence is a strong semiorthogonal sequence. -/
@@ -177,11 +188,13 @@ theorem boundedSequence_isStrong
     (h : (C.toDecompositionDataOfProjectionConstruction R).HasFiniteAmplitude τ)
     (hcoh :
       (C.toDecompositionDataOfProjectionConstruction R).PreservesCoherentCohomology)
-    (hfull : (D.boundedSequence A hcompact
+    (hfull : (D.toDerivedBaseChangeData.boundedSequence A
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal).IsFull) :
-    (D.boundedSequence A hcompact
+    (D.toDerivedBaseChangeData.boundedSequence A
+      (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal).IsStrong :=
-  DecompositionData.boundedSequence_isStrong _ h hcoh hfull
+  DerivedBaseChangeData.DecompositionData.boundedSequence_isStrong _ h hcoh hfull
 
 end Proposition315CoreData
 

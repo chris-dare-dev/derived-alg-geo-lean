@@ -8,9 +8,10 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeSequen
 # Generation and fullness after scheme base change
 
 This file isolates the generation inputs in Proposition 3.15 from the
-semiorthogonality construction. Concrete K-flat external products define a
-generator property on the compact carrier. If those objects classically
-generate, the perfect base-change sequence is full.
+semiorthogonality construction. The bundled derived external products define a
+generator property on the compact carrier. A K-flat resolution is only one
+producer of the bundle; if the resulting objects classically generate, the
+perfect base-change sequence is full.
 
 For `Dqc`, compact generation reduces fullness to two formal compatibility
 facts: perfect filtrations remain quasicoherent filtrations after forgetting
@@ -29,14 +30,14 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Triangulated
 
 universe u w
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : DerivedBaseChangeData X T)
   {ι : Type w} [Preorder ι]
   (A : SemiorthogonalSequence (SourceDqc X) ι)
 
-/-- Concrete K-flat external products, regarded as objects of the compact
+/-- Bundled derived external products, regarded as objects of the compact
 carrier of `Dqc(X_T)`. -/
 def perfectCategoryExternalProductGenerators :
     ObjectProperty (TargetPerfect X T) :=
@@ -122,6 +123,6 @@ theorem quasicoherentSequence_isFull
 
 end QuasicoherentFullnessPropagationData
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

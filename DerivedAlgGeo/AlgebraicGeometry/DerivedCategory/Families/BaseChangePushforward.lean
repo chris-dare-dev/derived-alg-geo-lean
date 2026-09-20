@@ -9,7 +9,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.RightDerivedPush
 # Pushforward between constructed base-change categories
 
 This file lifts a genuine `RightDerivedPushforward` to `Dqc`, restricts it to intrinsic
-bounded-coherent complexes, and then restricts both functors to the K-flat base-change components.
+bounded-coherent complexes, and then restricts both functors to the derived base-change components.
 The ambient right-derived universal property remains part of the data throughout.
 
 For a morphism `f : T ⟶ U`, the induced morphism of fibre products is
@@ -125,11 +125,11 @@ instance boundedFunctor_faithful (P : DqcRightDerivedPushforward f)
 
 end DqcRightDerivedPushforward
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
 /-- The component-level condition that right-derived pushforward preserves `(Dqc)`. -/
 def PushforwardPreservesQuasicoherentComponent
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f)) : Prop :=
   DT.quasicoherentComponent P ≤
@@ -138,7 +138,7 @@ def PushforwardPreservesQuasicoherentComponent
 /-- The smaller generator-level condition that pushforward sends the source
 perfect envelope into the target quasicoherent component. -/
 def PushforwardMapsPerfectEnvelope
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f)) : Prop :=
   (DT.perfectEnvelope P).map push.functor ≤
@@ -148,7 +148,7 @@ def PushforwardMapsPerfectEnvelope
 quasicoherent component once it maps the perfect envelope into the target
 component. -/
 theorem pushforward_preservesQuasicoherentComponent_of_perfectEnvelope
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
     [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
@@ -162,7 +162,7 @@ theorem pushforward_preservesQuasicoherentComponent_of_perfectEnvelope
 
 /-- Right-derived pushforward between the constructed quasicoherent base-change categories. -/
 noncomputable def quasicoherentPushforward
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
     (h : PushforwardPreservesQuasicoherentComponent DT DU P push) :
@@ -172,7 +172,7 @@ noncomputable def quasicoherentPushforward
 /-- Pushforward between quasicoherent base-change components, constructed
 from the smaller perfect-envelope preservation condition. -/
 noncomputable def quasicoherentPushforwardOfPerfectEnvelope
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
     [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
@@ -185,7 +185,7 @@ noncomputable def quasicoherentPushforwardOfPerfectEnvelope
 
 /-- Forgetting component witnesses recovers right-derived pushforward on `Dqc`. -/
 noncomputable def quasicoherentPushforwardCompInclusion
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
     (h : PushforwardPreservesQuasicoherentComponent DT DU P push) :
@@ -198,7 +198,7 @@ noncomputable def quasicoherentPushforwardCompInclusion
 /-- Preservation of the bounded base-change component follows formally from preservation of its
 quasicoherent companion and of intrinsic bounded-coherent complexes. -/
 theorem pushforward_preservesBoundedComponent
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
     (hDqc : PushforwardPreservesQuasicoherentComponent DT DU P push)
@@ -210,7 +210,7 @@ theorem pushforward_preservesBoundedComponent
 
 /-- Right-derived pushforward between the constructed bounded base-change categories. -/
 noncomputable def boundedPushforward
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
     (hDqc : PushforwardPreservesQuasicoherentComponent DT DU P push)
@@ -222,7 +222,7 @@ noncomputable def boundedPushforward
 /-- Bounded pushforward constructed from perfect-envelope preservation and
 preservation of intrinsic bounded-coherent objects. -/
 noncomputable def boundedPushforwardOfPerfectEnvelope
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
     [push.functor.CommShift ℤ] [push.functor.IsTriangulated]
@@ -237,7 +237,7 @@ noncomputable def boundedPushforwardOfPerfectEnvelope
 
 /-- Forgetting component witnesses recovers pushforward on intrinsic bounded-coherent loci. -/
 noncomputable def boundedPushforwardCompInclusion
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (push : DqcRightDerivedPushforward (baseChangeMap X f))
     (hDqc : PushforwardPreservesQuasicoherentComponent DT DU P push)
@@ -249,7 +249,7 @@ noncomputable def boundedPushforwardCompInclusion
     (fun E ↦ pushforward_preservesBoundedComponent DT DU P push hDqc hBounded
       E.obj E.property)
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end
 

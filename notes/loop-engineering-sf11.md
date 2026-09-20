@@ -106,3 +106,31 @@ replacement for a Lean theorem or an issue acceptance criterion.
   OpenSpec digest after ledger `sf11-1-base-change-categories-v4` was written.
   The controller should therefore reject that old ledger for remote actions;
   reinitialize a fresh frozen ledger after any checklist edit.
+
+## Follow-up observations (2026-09-19)
+
+- Moving the operation-facing declarations from `KFlatBaseChangeData` to
+  `DerivedBaseChangeData` requires a deliberate root/K-flat split. The K-flat
+  namespace still owns resolution witnesses and specialized coefficient or
+  projection-formula data; generic sequence, decomposition, tensor-duality,
+  and detection APIs must name the root carrier explicitly. A blind namespace
+  replacement either leaves the audit stale or hides a model-specific
+  hypothesis behind a generic-looking theorem.
+- Lean parser errors appeared when namespace boundaries and duplicate section
+  variables were adjusted in the same patch. Keep namespace moves and
+  signature changes mechanically small, and run the affected module before
+  changing the next layer.
+- The focused axiom audit is substantially cheaper and more reliable for this
+  seam than the full stability-family audit: the latter imports the entire
+  stability graph and needs unrelated `Moduli` artifacts. Keep the focused
+  audit beside the loop ledger, while retaining the repository audit's current
+  root/K-flat declaration list so it cannot silently drift.
+- In PowerShell, setting `$env:SKIP_ACTIONLINT` did not propagate through the
+  repository's nested `bash` invocation. For the local precheck, set it in the
+  bash command itself (for example `bash -c 'export SKIP_ACTIONLINT=1; ...'`);
+  otherwise a missing local `actionlint` binary looks like a source failure.
+- On this checkout, the precheck's `check_layering.py` scan can spend several
+  minutes in WSL filesystem I/O after the source-independence gate, with no
+  output and an uninterruptible Python process. Treat that as an environment
+  stall, stop the owned scanner rather than waiting on it indefinitely, and
+  retain the individual gate results already emitted.

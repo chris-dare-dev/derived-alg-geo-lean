@@ -119,7 +119,7 @@ The first isomorphism is the projection-formula/duality calculation on
 `T`. Keeping them separate prevents either geometric theorem from being
 hidden in the final coefficient comparison. -/
 structure KFlatTensorCoefficientComparison
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
@@ -139,7 +139,7 @@ structure KFlatTensorCoefficientComparison
 /-- The first-projection coefficient is represented by the explicit K-flat
 fibre tensor of the later factor with the dual of the earlier factor. -/
 structure KFlatTensorCoefficientData
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
@@ -157,7 +157,7 @@ namespace KFlatTensorCoefficientData
 /-- Forget the explicit tensor formula while retaining its fibre coefficient
 and comparison. -/
 def toFiberCoefficientData
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     {P : D.CompactFiberProjectionFormula H Q pushFst}
@@ -175,7 +175,7 @@ namespace KFlatTensorCoefficientComparison
 /-- Compose the projection/duality comparison with monoidality of fibre
 pullback to obtain the coefficient comparison used by faithful base change. -/
 def toKFlatTensorCoefficientData
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     {P : D.CompactFiberProjectionFormula H Q pushFst}
@@ -190,7 +190,7 @@ def toKFlatTensorCoefficientData
 /-- The atomic K-flat comparisons also supply the fibre-coefficient datum
 consumed by the faithful-base-change argument. -/
 def toFiberCoefficientData
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     {P : D.CompactFiberProjectionFormula H Q pushFst}
@@ -211,7 +211,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficients
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (B : KFlatBasePullbackData X)
     (K : KFlatFiberTensorData T)
@@ -226,7 +226,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficients
       (D := D) P K V)
     (hS : SourceTensorData.KFlatDqcSLinearComponents
       (D := D) Q B A) :
-    D.PerfectComponentsSemiorthogonal A :=
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBaseChange
     A hA hIso H Q B pushBase pushFst adj P faithful
       C.toFiberCoefficientData hS
@@ -237,7 +237,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficientComparison
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (B : KFlatBasePullbackData X)
     (K : KFlatFiberTensorData T)
@@ -252,7 +252,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficientComparison
       (D := D) P K V)
     (hS : SourceTensorData.KFlatDqcSLinearComponents
       (D := D) Q B A) :
-    D.PerfectComponentsSemiorthogonal A :=
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_kFlatTensorCoefficients
     A hA hIso H Q B K V pushBase pushFst adj P faithful
       C.toKFlatTensorCoefficientData hS
