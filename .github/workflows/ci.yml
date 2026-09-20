@@ -736,9 +736,19 @@ jobs:
           nanoda-allow-sorry: false
 
       - name: Pin and coverage records
+        env:
+          # For check_pin.py's reachability test: it asks whether each
+          # bare-commit pin is on its own repository's default branch, which is
+          # the one question this repo cannot answer from its own tree.
+          # Read-only repository metadata; the default token's scope is enough.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          python3 scripts/check_pin.py
+          # `--require-api` because this is the environment guaranteed to have
+          # the API. Locally the same check degrades to NOT_RUN so a
+          # contributor without `gh` is not blocked; here a check that could
+          # not look must not pass. Same contract as check_roadmap.py.
+          python3 scripts/check_pin.py --require-api
           # Every coverage record, not a hand-maintained list of two. This PR
           # adds five, and under the old naming they would all have landed
           # unvalidated -- as would every record added after it.
