@@ -78,6 +78,7 @@ issues:
           - DerivedAlgGeo/CategoryTheory/Triangulated/TStructure
           - DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase/Transfer
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability.lean
           - .claude/roadmap/stability-families.yaml
           - openspec/changes/sf11-base-change-t-structures
           - scripts

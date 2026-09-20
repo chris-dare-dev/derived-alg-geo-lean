@@ -92,6 +92,11 @@ replacement for a Lean theorem or an issue acceptance criterion.
   gate; it skips only the final targeted Lake build. The first invocation was
   mistaken for a repository build and interrupted before this distinction was
   checked.
+- The controller's frozen-prefix matcher treats a directory prefix and a
+  sibling umbrella file separately. When a chunk changes both
+  `DerivedCategory/Stability/SLocal.lean` and
+  `DerivedCategory/Stability.lean`, list the umbrella file explicitly or PR
+  creation fails closed even though the directory entry is present.
 
 ## Time-saving practices
 
