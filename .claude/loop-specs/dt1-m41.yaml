@@ -80,6 +80,9 @@ issues:
           - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/LeftDerivedTensor.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
+          - scripts/AlgebraicGeometryAudit/GeometricLedgers.lean
+          - openspec/changes/dt1-m41/agent-observations.md
+          - .claude/loop-specs/dt1-m41.yaml
         lift_targets:
           # A localization counit, a fixed-argument universal property and an
           # exact identity-resolution comparison are generic homological
@@ -107,6 +110,9 @@ issues:
           - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/CoherentAssembly.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
+          - scripts/AlgebraicGeometryAudit/GeometricLedgers.lean
+          - openspec/changes/dt1-m41/agent-observations.md
+          - .claude/loop-specs/dt1-m41.yaml
         lift_targets:
           # Transferring exactness and coherence across a bounded restriction is
           # generic derived-category work (layers.md:341); only the coherent

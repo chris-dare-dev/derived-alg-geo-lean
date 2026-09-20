@@ -57,18 +57,21 @@ use targeted Lean module builds; the full repository build is left to CI.
 
 3. **Make local structures consume base-change functors.** `TStructure/Local`
    owns uniqueness and one-functor restriction. `Families/SLocal` owns the
-   quantification over quasi-compact opens and the affine examples. The slicing
-   analogue belongs with the existing phase-transfer/slicing owner and must
-   reuse the local t-structure data. The restriction comparison maps always
-   point from the base category to the open-base category, avoiding an instance
+   quantification over quasi-compact opens and the affine witness adapter. The
+   slicing analogue belongs in the geometry-owned stability subtree, where it
+   may import both the Families API and the phase/slicing owner; it must reuse
+   the local t-structure data. The restriction comparison maps always point
+   from the base category to the open-base category, avoiding an instance
    diamond between ambient and bounded-coherent inclusions.
 
 4. **Reuse Ind extension rather than translate it by parallel definitions.**
-   Theorem 5.3 adapters consume `TStructure.IndExtensionData`; a single bridge
-   theorem relates its coproduct closure to the paper's filtered-colimit
-   presentation. The affine closure, descent equations, and t-exactness clauses
-   are theorems over that bridge. A failed bridge is a real blocker, not a
-   reason to introduce a duplicate carrier.
+   Theorem 5.3 adapters consume `TStructure.IndExtensionData`; one bridge
+   package exposes its coproduct-aisle comparison, proves inclusion
+   t-exactness, and records the actual `PreservesColimit` obligations for the
+   filtered-colimit presentation.  Source-shaped descent and t-exactness
+   owner data expose the flat/fpqc formulas, tensor clause, and (4a)--(4d)
+   comparisons without claiming their geometric proofs.  A failed bridge is a
+   real blocker, not a reason to introduce a duplicate carrier.
 
 5. **Authorize only the selected epic issues.** Add a manifest field
    `eligibility.allow_epic_issues` and require it to list exactly the selected

@@ -83,6 +83,18 @@ issues:
           - The `ℤ → ZMod 2` ring map and its affine `Spec.map` are actual Lean data with proved non-flatness and non-isomorphism.
           - The existing supported affine geometric pullback is instantiated without a flatness hypothesis, and the general preservation/coherence boundary remains explicit.
         closure: progress
+      - id: sf8-5-nonflat-derived-effect
+        scope: Calculate one explicit nonzero derived effect for the supported non-flat affine map Z → ZMod 2 using a two-term free resolution; do not claim full-locus preservation or general K-flat existence.
+        requirements:
+          - Supported arbitrary derived pullbacks are constructed
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineNonflatExample.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineNonflatDerivedObject.lean
+        acceptance:
+          - A two-term bounded-above projective resolution of ZMod 2 is an actual Lean complex with a proved quasi-isomorphism to ZMod 2.
+          - Its affine extension of scalars along Z → ZMod 2 has a proved nonzero degree-minus-one homology/Tor witness.
+          - The result is explicitly restricted to the affine bounded-projective derived lane and does not claim a general scheme-level LeftDerivedPullback, Dqc preservation, or relative-perfect preservation.
+        closure: progress
 
   - number: 522
     slug: sf9-2-supported-algebraicity
