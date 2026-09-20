@@ -54,3 +54,9 @@ For each finding use:
 Close with exactly one verdict: `PASS`, `NEEDS_CHANGES`, or `BLOCKED`, followed
 by the finding count. `PASS` is permitted only when the central mathematical
 claims and their hypotheses are reconstructed successfully.
+
+If you find a generalization whose target lies outside the frozen file list,
+close with `PASS_WITH_LIFT` instead of `PASS` and record a `LIFT:` block naming
+the leaf declaration and the proposed ancestor. The verdict passes the panel and
+consumes no review round; the controller will not let the round be adjudicated
+until the target reaches `docs/architecture/generalization-backlog.md`.

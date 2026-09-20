@@ -43,6 +43,9 @@ REQUIRED_ADVERSARIES = {
     "repository-boundary-adversary",
     "abstraction-adversary",
 }
+# The style reviewer is required by the spec delta but is not an adversarial
+# lens; keep the sets distinct so the adversary requirement stays meaningful.
+REQUIRED_REVIEWERS = REQUIRED_ADVERSARIES | {"mathlib-reviewer"}
 ACTION_TO_MUTATION = {
     "comment": "comment_issue",
     "close": "close_issue",
@@ -316,7 +319,7 @@ def validate_spec(spec: dict[str, Any]) -> None:
     limits = require_mapping(spec.get("limits"), "spec.limits")
     min_issues = limits.get("min_issues", 2)
     max_issues = limits.get("max_issues", 3)
-    max_rounds = limits.get("max_review_rounds_per_chunk", 3)
+    max_rounds = limits.get("max_review_rounds_per_chunk", MAX_ALLOWED_ROUNDS)
     for value, name in (
         (min_issues, "limits.min_issues"),
         (max_issues, "limits.max_issues"),
@@ -421,9 +424,9 @@ def validate_spec(spec: dict[str, Any]) -> None:
     ):
         raise LoopError("spec.review.reviewers must be a non-empty list of names")
     reviewer_set = set(reviewers)
-    missing = REQUIRED_ADVERSARIES - reviewer_set
+    missing = REQUIRED_REVIEWERS - reviewer_set
     if missing:
-        raise LoopError(f"spec.review.reviewers is missing adversarial roles: {', '.join(sorted(missing))}")
+        raise LoopError(f"spec.review.reviewers is missing required roles: {', '.join(sorted(missing))}")
     if len(reviewer_set) != len(reviewers):
         raise LoopError("spec.review.reviewers must not contain duplicate names")
     reviewer_spec.get("independent", True)
@@ -863,6 +866,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
                 "acceptance": list(chunk["acceptance"]),
                 "closure": chunk.get("closure", "complete"),
             },
+            "repo_root": str(root),
             "reviewers": list(spec["review"]["reviewers"]),
             "max_review_rounds": spec["limits"]["max_review_rounds_per_chunk"],
             "no_rechunking": True,
@@ -876,6 +880,24 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
     except LoopError as exc:
         print(f"FAIL ledger init: {exc}")
         return 1
+
+
+def backlog_records(state: dict[str, Any], lift_target: str) -> bool:
+    """True when the generalization backlog already mentions this lift target.
+
+    A lift recorded only in the gitignored ledger dies with the run. The backlog
+    is tracked, so this is the check that makes a lift survive to the next one.
+    """
+    root = state.get("repo_root")
+    if not root:
+        # ledgers created before repo_root was recorded cannot be verified;
+        # fail closed rather than silently accepting an unrecorded lift
+        return False
+    try:
+        text = (Path(root) / BACKLOG_PATH).read_text(encoding="utf-8")
+    except OSError:
+        return False
+    return lift_target.strip() in text
 
 
 def latest_round(state: dict[str, Any]) -> dict[str, Any] | None:
@@ -910,9 +932,16 @@ def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
 
 CONTRACT_VERDICT_TOKENS = {
     "pass": "PASS",
+    "pass_with_lift": "PASS_WITH_LIFT",
     "needs_changes": "NEEDS_CHANGES",
     "blocked": "BLOCKED",
 }
+# Verdicts that let a chunk advance. `pass_with_lift` says the code under review
+# is correct AND that a generalization was found whose target lies outside the
+# frozen file list. It never consumes a review round.
+PASSING_VERDICTS = {"pass", "pass_with_lift"}
+REVIEW_VERDICTS = set(CONTRACT_VERDICT_TOKENS)
+BACKLOG_PATH = "docs/architecture/generalization-backlog.md"
 
 
 def read_reviewer_output(finding_file: Path) -> tuple[str, str]:
@@ -941,6 +970,7 @@ def ledger_record_review(
     verdict: str,
     finding: str | None,
     finding_file: Path | None = None,
+    lift_target: str | None = None,
 ) -> int:
     try:
         state = load_state(state_file)
@@ -948,8 +978,17 @@ def ledger_record_review(
             raise LoopError(f"ledger is terminal with status {state['status']!r}; no further reviews are allowed")
         if reviewer not in state["reviewers"]:
             raise LoopError(f"reviewer {reviewer!r} is not authorized by this ledger")
-        if verdict not in {"pass", "needs_changes", "blocked"}:
-            raise LoopError("review verdict must be pass, needs_changes, or blocked")
+        if verdict not in REVIEW_VERDICTS:
+            raise LoopError(
+                "review verdict must be " + ", ".join(sorted(REVIEW_VERDICTS))
+            )
+        if verdict == "pass_with_lift" and not (lift_target or "").strip():
+            raise LoopError(
+                "pass_with_lift requires --lift-target naming the module or path the "
+                "generalization belongs in; an unaddressed lift is not a finding"
+            )
+        if verdict != "pass_with_lift" and (lift_target or "").strip():
+            raise LoopError("--lift-target is only meaningful with verdict pass_with_lift")
         if not re.fullmatch(r"[0-9a-fA-F]{7,64}", commit):
             raise LoopError("commit must be a hexadecimal git object id")
         round_state = ensure_review_round(state, commit)
@@ -973,6 +1012,7 @@ def ledger_record_review(
                 "finding_text": finding_text,
                 "finding_digest": finding_digest,
                 "finding_source": str(finding_file) if finding_file is not None else "",
+                "lift_target": (lift_target or "").strip(),
                 "recorded_at": utc_now(),
             }
         )
@@ -987,8 +1027,10 @@ def ledger_record_review(
 def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
     try:
         state = load_state(state_file)
-        if verdict not in {"pass", "needs_changes", "blocked"}:
-            raise LoopError("adjudication must be pass, needs_changes, or blocked")
+        if verdict not in REVIEW_VERDICTS:
+            raise LoopError(
+                "adjudication must be " + ", ".join(sorted(REVIEW_VERDICTS))
+            )
         current = latest_round(state)
         if current is None:
             raise LoopError("cannot adjudicate before reviews are recorded")
@@ -998,8 +1040,39 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
         missing = set(state["reviewers"]) - recorded
         if missing:
             raise LoopError(f"cannot adjudicate; missing reviewers: {', '.join(sorted(missing))}")
-        if verdict == "pass" and any(item.get("verdict") != "pass" for item in current["reviews"]):
-            raise LoopError("pass adjudication requires every reviewer verdict to be pass")
+        if verdict in PASSING_VERDICTS and any(
+            item.get("verdict") not in PASSING_VERDICTS for item in current["reviews"]
+        ):
+            raise LoopError(
+                "pass adjudication requires every reviewer verdict to be pass or pass_with_lift"
+            )
+        lifts = [
+            item for item in current["reviews"] if item.get("verdict") == "pass_with_lift"
+        ]
+        if lifts and verdict == "pass":
+            raise LoopError(
+                "this round carries lift findings; adjudicate pass_with_lift so the "
+                "handoff report and the backlog agree with the ledger"
+            )
+        if verdict == "pass_with_lift":
+            if not lifts:
+                raise LoopError(
+                    "pass_with_lift adjudication requires at least one reviewer lift finding"
+                )
+            unrecorded = sorted(
+                str(item.get("lift_target"))
+                for item in lifts
+                if not backlog_records(state, str(item.get("lift_target")))
+            )
+            if unrecorded:
+                raise LoopError(
+                    "cannot adjudicate; these lift targets are absent from "
+                    + BACKLOG_PATH
+                    + ": "
+                    + ", ".join(unrecorded)
+                    + ". Append them before passing the chunk, or the finding dies "
+                    "with this run"
+                )
         if verdict != "blocked":
             uncaptured = sorted(
                 str(item.get("reviewer"))
@@ -1017,7 +1090,12 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
             verdict = "blocked"
             note = (note + " | " if note else "") + "review-round cap reached; stop without another iteration"
         current["adjudication"] = {"verdict": verdict, "note": note or "", "recorded_at": utc_now()}
-        state["status"] = {"pass": "passed", "needs_changes": "improve_required", "blocked": "blocked"}[verdict]
+        state["status"] = {
+            "pass": "passed",
+            "pass_with_lift": "passed",
+            "needs_changes": "improve_required",
+            "blocked": "blocked",
+        }[verdict]
         write_json(state_file, state)
         print(f"PASS adjudicated: round={current['number']} verdict={verdict}")
         return 0
@@ -1512,7 +1590,13 @@ def build_parser() -> argparse.ArgumentParser:
     record_parser.add_argument("--state", required=True, type=Path)
     record_parser.add_argument("--reviewer", required=True)
     record_parser.add_argument("--commit", required=True)
-    record_parser.add_argument("--verdict", required=True, choices=["pass", "needs_changes", "blocked"])
+    record_parser.add_argument(
+        "--verdict", required=True, choices=sorted(CONTRACT_VERDICT_TOKENS)
+    )
+    record_parser.add_argument(
+        "--lift-target",
+        help="module or path the generalization belongs in; required with pass_with_lift",
+    )
     record_parser.add_argument("--finding", help="one-line summary; not evidence and cannot stand alone")
     record_parser.add_argument(
         "--finding-file",
@@ -1521,7 +1605,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     adjudicate_parser = ledger_sub.add_parser("adjudicate")
     adjudicate_parser.add_argument("--state", required=True, type=Path)
-    adjudicate_parser.add_argument("--verdict", required=True, choices=["pass", "needs_changes", "blocked"])
+    adjudicate_parser.add_argument(
+        "--verdict", required=True, choices=sorted(CONTRACT_VERDICT_TOKENS)
+    )
     adjudicate_parser.add_argument("--note")
     show_parser = ledger_sub.add_parser("show")
     show_parser.add_argument("--state", required=True, type=Path)
@@ -1596,6 +1682,7 @@ def main(argv: list[str] | None = None) -> int:
                     args.verdict,
                     args.finding,
                     args.finding_file.resolve() if args.finding_file else None,
+                    args.lift_target,
                 )
             if args.ledger_command == "adjudicate":
                 return ledger_adjudicate(args.state.resolve(), args.verdict, args.note)

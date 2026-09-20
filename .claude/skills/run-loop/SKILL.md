@@ -112,7 +112,7 @@ Record each verdict and finding without paraphrasing away a blocker:
 
 ```text
 python scripts/loop_engine.py ledger record-review --state <ledger> \
-  --reviewer <name> --commit <sha> --verdict pass|needs_changes|blocked \
+  --reviewer <name> --commit <sha> --verdict pass|pass_with_lift|needs_changes|blocked \
   --finding-file <path to that reviewer's verbatim final message>
 ```
 
@@ -125,7 +125,7 @@ Only after every required reviewer has submitted, adjudicate:
 
 ```text
 python scripts/loop_engine.py ledger adjudicate --state <ledger> \
-  --verdict pass|needs_changes|blocked --note "<decision>"
+  --verdict pass|pass_with_lift|needs_changes|blocked --note "<decision>"
 ```
 
 If the result is `needs_changes` and fewer than five rounds have been used,
@@ -141,9 +141,15 @@ them:
   `needs_changes`. It is actionable here, so it costs a round.
 - A lift whose target is **outside** the frozen file list cannot be implemented
   in this chunk. Do not turn it into a `needs_changes` the chunk cannot satisfy,
-  and do not drop it. Append the reviewer's `LIFT:` block to
-  `docs/architecture/generalization-backlog.md` as an `UNVERIFIED` row and let
-  the chunk pass on the merits of the code actually under review.
+  and do not drop it. The reviewer closes `pass_with_lift` with a `--lift-target`;
+  append its `LIFT:` block to `docs/architecture/generalization-backlog.md` as an
+  `UNVERIFIED` row, then adjudicate the round `pass_with_lift`. The controller
+  refuses that adjudication while any named target is still missing from the
+  backlog, so the finding cannot be dropped — and it consumes no round, so it
+  cannot stall the chunk either.
+- The style reviewer closes `MERGE` / `MERGE AFTER FIXES` / `NEEDS REWORK`, not
+  the controller's vocabulary. Map `MERGE` to `pass` and both others to
+  `needs_changes`, and record the mapping in the finding file you capture.
 
 Termination is the round cap's job. Never suppress a class of finding to help
 the loop converge.
