@@ -71,7 +71,9 @@ AUDITS = {
 # thing this gate exists to stop.
 CEILINGS = {
     "AlgebraicGeometry": 748,
-    "StabilityCondition": 294,
+    # CI measured this backlog at 287 on 2026-09-20; keep the ratchet at the
+    # observed value rather than carrying the old ceiling forward.
+    "StabilityCondition": 287,
     "DGCategory": 0,
 }
 
