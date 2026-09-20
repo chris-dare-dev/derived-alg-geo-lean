@@ -79,6 +79,7 @@ issues:
           - DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated/IndFilteredColimits.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/Theorem53.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families.lean
           - DerivedAlgGeo/CategoryTheory/Triangulated.lean
           - DerivedAlgGeo/CategoryTheory/Triangulated/TStructure
           - .claude/roadmap/stability-families.yaml

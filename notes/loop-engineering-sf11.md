@@ -190,6 +190,11 @@ replacement for a Lean theorem or an issue acceptance criterion.
   `Theorem53` directly. A targeted module build can pass while the leaf is
   silently absent from the repository build graph, so run the no-build
   umbrella gate before freezing the review head.
+- The loop controller's frozen scope matching likewise distinguishes a
+  directory prefix from a same-stem umbrella file: `Families` did not admit
+  `Families.lean` during PR creation until the exact umbrella path was listed.
+  Include both entries when a chunk edits an umbrella beside its child
+  directory.
 
 ## Follow-up observations (2026-09-19)
 
