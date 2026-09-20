@@ -142,6 +142,7 @@ structure RightTExactData
     [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive]
     [Pretriangulated D]
     (t : TStructure C) (t' : TStructure D) where
+  /-- The operation whose right t-exactness is supplied by `rightTExact`. -/
   functor : C ⥤ D
   rightTExact : functor.IsRightTExact t t'
 
@@ -170,6 +171,7 @@ structure TExactData
     [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive]
     [Pretriangulated D]
     (t : TStructure C) (t' : TStructure D) where
+  /-- The operation for which both t-exactness directions are supplied below. -/
   functor : C ⥤ D
   rightTExact : functor.IsRightTExact t t'
   leftTExact : functor.IsLeftTExact t t'
