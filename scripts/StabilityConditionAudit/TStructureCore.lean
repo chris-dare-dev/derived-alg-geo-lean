@@ -496,6 +496,7 @@ quasi-compact opens of a base is geometric and is not taken here.
 #print axioms CategoryTheory.Triangulated.TStructure.ext
 #print axioms CategoryTheory.Triangulated.TStructure.ge_eq_of_le_eq
 #print axioms CategoryTheory.Triangulated.TStructure.ext_le
+#print axioms CategoryTheory.Triangulated.TStructure.IsNoetherian
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.tStructure
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.isTExact
@@ -504,4 +505,8 @@ quasi-compact opens of a base is geometric and is not taken here.
 #print axioms CategoryTheory.Triangulated.TStructure.RestrictsAlong
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.restrictsAlong
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.tStructure_eq_of_le_eq
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.ext
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_obj
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_map
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.id

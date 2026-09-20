@@ -1031,6 +1031,42 @@ aisle is a generation theorem about base change and is not proved here.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData.isSLocal
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData.tStructure_eq_of_le_eq
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalData.ext_of_le_eq
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.NoetherianLocalityData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.NoetherianLocalityData.localData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.NoetherianLocalityData.global_to_local
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.NoetherianLocalityData.local_to_global
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.lemma_4_15
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Filtration
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Filtration.object
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Filtration.inclusion
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Filtration.mono
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data.lift
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data.comparison
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data.comm
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.lemma_4_16_3
+
+/-! ## S-local slicings in the geometry-owned stability subtree (SF11.2) -/
+
+#print axioms CategoryTheory.Triangulated.Slicing.Restriction
+#print axioms CategoryTheory.Triangulated.Slicing.Restriction.slicing
+#print axioms CategoryTheory.Triangulated.Slicing.Restriction.isTExact
+#print axioms CategoryTheory.Triangulated.Slicing.Restriction.phase_iff
+#print axioms CategoryTheory.Triangulated.Slicing.Restriction.slicing_eq_of_phase_iff
+#print axioms CategoryTheory.Triangulated.Slicing.Restriction.toTStructureRestriction
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalSlicingData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalSlicingData.restriction
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.IsSLocalSlicing
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalSlicingData.isSLocal
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalSlicingData.toSLocalData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalSlicingData.restriction_eq_of_phase_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.TwoDistinctAffineSLocalTStructures
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.TwoDistinctAffineSLocalTStructures.affineBase
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.TwoDistinctAffineSLocalTStructures.first
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.TwoDistinctAffineSLocalTStructures.second
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.TwoDistinctAffineSLocalTStructures.distinct
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.TwoDistinctAffineSLocalTStructures.ofSlicingData
 
 /-! ## The model-free base-change root and its K-flat producer (SF11 placement)
 

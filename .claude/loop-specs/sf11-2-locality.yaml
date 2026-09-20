@@ -1,0 +1,88 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: sf11-2-locality
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: sf11-base-change-t-structures
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/sf11-base-change-t-structures/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 5
+
+eligibility:
+  allow_epic_issues:
+    - 1061
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+    - trust-surface
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: true
+  allow_delete_branch_override: true
+  allow_auto: true
+  allow_admin: true
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+
+mutations:
+  comment_issue: true
+  close_issue: true
+  push_branch: true
+  create_pr: true
+  approve_pr: true
+  merge_pr: true
+
+issues:
+  - number: 1061
+    slug: sf11-2-s-local-structures
+    depends_on:
+      - 1060
+    chunks:
+      - id: sf11-2-s-local-structures
+        scope: Complete the formal S-local t-structure and slicing APIs, the affine witness adapter, the noetherian locality and filtration-lifting boundaries, and the associated documentation without inventing geometric proofs.
+        requirements:
+          - S-local t-structures and slicings expose formal locality boundaries
+        files:
+          - .claude
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/SLocal.lean
+          - DerivedAlgGeo/CategoryTheory/Triangulated/TStructure
+          - DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase/Transfer
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability
+          - .claude/roadmap/stability-families.yaml
+          - openspec/changes/sf11-base-change-t-structures
+          - scripts
+          - notes/loop-engineering-sf11.md
+        acceptance:
+          - The quantifier and uniqueness APIs compile, with two distinct affine witness adapters constructible from actual family and t-exactness data.
+          - Lemmas 4.15 and 4.16(3) are represented by theorem-backed formal adapters whose external locality/lifting hypotheses remain named at the owner.
+          - The S-local slicing analogue reuses owner slicings and has phase/restriction uniqueness compatibility, with no sorry or new axioms.
