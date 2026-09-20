@@ -29,11 +29,11 @@ that to "Serre". This file alone does not prove Serre; the surjection is assembl
 ## The two exponents, and why they cannot be one
 
 `ChartProj.exists_pow_smul_eq_res_image_uniform` gives an `n` and, over each `D₊(gᵢ)`, a section
-`tᵢ` restricting to `(f / gᵢ)ⁿ · s` where `D₊(f)` reaches. That is all the geometry there is, and
+`tᵢ` restricting to `fⁿ / gᵢᵉⁿ · s` where `D₊(f)` reaches. That is all the geometry there is, and
 it is not enough: `TopCat.Sheaf.IsCompatible` wants the `tᵢ` to agree on the *whole* overlap
 `D₊(gᵢ) ⊓ D₊(gⱼ)`, and `D₊(f)` is not contained in it.
 
-The second exponent closes that. `tᵢ` and `(gⱼ / gᵢ)ⁿ · tⱼ` **do** agree on
+The second exponent closes that. `tᵢ` and `gⱼᵉⁿ / gᵢᵉⁿ · tⱼ` **do** agree on
 `D₊(gᵢ) ⊓ D₊(gⱼ) ⊓ D₊(f)` -- that is the computation `hagree` below, and it is where the two
 charts' different denominators cancel -- so separatedness on the overlap gives an `m` with
 `(f² / (gᵢgⱼ)ᵉ)ᵐ` killing the difference on the whole overlap. The overlap is the chart of `gᵢ gⱼ`,
@@ -48,8 +48,9 @@ numerator against a degree-`d` denominator by raising each to the other's degree
 Not `gᵢ ᴺ`. The section that glues is `twistBy (f²ᵐ gᵢᵉⁿ)` of `tᵢ`, a section of `F(e · N)` for
 `N = 2m + n`. Two facts fall out of `FracSection.twistBy_app_eq_smul'` and no others are needed:
 
-* over `D₊(gᵢ) ⊓ D₊(gⱼ)`, `f²ᵐ gᵢᵉⁿ / ((gᵢgⱼ)ᵉ)ᵐ gᵢᵉⁿ` is exactly the scalar the agreement supplies, so
-  the two twisted sections differ by applying one map to the two sides of the agreement;
+* over `D₊(gᵢ) ⊓ D₊(gⱼ)`, the ratio
+  `f²ᵐ gᵢᵉⁿ / ((gᵢgⱼ)ᵉ)ᵐ gᵢᵉⁿ` is exactly the scalar the agreement supplies, so the two twisted
+  sections differ by applying one map to the two sides of the agreement;
 * over `D₊(gᵢ) ⊓ D₊(f)`, `f ᴺ / f²ᵐ gᵢᵉⁿ` is exactly `fⁿ / gᵢᵉⁿ`, so every twisted section restricts
   to `twistBy (f ᴺ)` of `s` there -- which is what identifies the glued section.
 
