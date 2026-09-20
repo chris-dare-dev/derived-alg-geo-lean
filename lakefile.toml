@@ -21,7 +21,7 @@ rev = "v4.32.1"
 [[require]]
 name = "MathFormalContract"
 git = "https://github.com/chris-dare-dev/math-formal-contract-lean"
-rev = "ed71fbba2ef4261ae6ae7153ffc21cfe3d1bab25"
+rev = "bda0e6130add381098f251b83f8bedfeec8d6a8b"
 
 [[lean_lib]]
 name = "DerivedAlgGeo"
