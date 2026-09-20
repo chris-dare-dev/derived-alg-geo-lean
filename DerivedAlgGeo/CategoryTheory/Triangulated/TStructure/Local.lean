@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
+import Mathlib.CategoryTheory.Subobject.NoetherianObject
 import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLTGE
 
 /-!
@@ -11,9 +12,9 @@ import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLTGE
 Section 4 of arXiv:1902.08184 calls a t-structure `τ` on `𝒟` **`S`-local** when
 for every quasi-compact open `U ⊆ S` there is a t-structure `τ_U` on `𝒟_U`
 making the restriction functor t-exact, and Remark 4.6(1) observes that `τ_U` is
-then unique. Both halves of that sentence need vocabulary the repository did not
-have: `Phase/Transfer/Inducing.lean` still records `S`-locality as lying outside
-the categorical layer.
+then unique. The categorical layer owns the one-functor restriction and
+uniqueness vocabulary; the family-level quantifier and its geometric witnesses
+remain in `Families/SLocal.lean`.
 
 This file supplies the categorical half, for one functor at a time.
 
@@ -95,6 +96,22 @@ variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
   {D : Type u'} [Category.{v'} D] [Preadditive D] [HasZeroObject D]
   [HasShift D ℤ] [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D]
 
+/-! ### Noetherian hearts
+
+The paper calls a t-structure noetherian when its heart satisfies the
+ascending-chain condition.  The heart in this repository is an object
+property, so the literal categorical formulation uses its full subcategory.
+This predicate is intentionally independent of any geometric finiteness
+theorem; the latter belongs to the base-change owner. -/
+
+variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
+  [HasShift C ℤ] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+
+/-- The heart of `t` is noetherian when every heart object is a noetherian
+object of the heart full subcategory. -/
+def IsNoetherian (t : TStructure C) : Prop :=
+  ∀ X : t.heart.FullSubcategory, IsNoetherianObject X
+
 /-- A t-structure on the target of `F` making `F` t-exact.
 
 This is one clause of `S`-locality, at one functor. `S`-locality quantifies it
@@ -125,6 +142,42 @@ theorem tStructure_eq_of_le_eq (r₁ r₂ : t.Restriction F)
     (hle : r₁.tStructure.le = r₂.tStructure.le) :
     r₁.tStructure = r₂.tStructure :=
   ext_le hle
+
+/-- Equality of restriction data once their target t-structures agree.
+
+The remaining field is a proposition, so proof irrelevance closes the
+restriction structure after the target equality has been transported. -/
+theorem ext {r₁ r₂ : t.Restriction F}
+    (h : r₁.tStructure = r₂.tStructure) : r₁ = r₂ := by
+  cases r₁
+  cases r₂
+  cases h
+  rfl
+
+/-- The functor induced on the two hearts by a t-exact restriction.
+
+This is the categorical map used by the noetherian-locality and filtration
+interfaces.  It is constructed from the ambient functor and the theorem that
+t-exact functors carry hearts to hearts; no heart-level functor is supplied as
+a second, potentially inconsistent carrier. -/
+noncomputable def heartFunctor (r : t.Restriction F) :
+    t.heart.FullSubcategory ⥤ r.tStructure.heart.FullSubcategory where
+  obj X := by
+    letI : F.IsTExact t r.tStructure := r.isTExact
+    exact ⟨F.obj X.obj, Functor.heart_map_of_isTExact X.obj X.property⟩
+  map f := ObjectProperty.homMk (F.map f.hom)
+
+@[simp]
+theorem heartFunctor_obj (r : t.Restriction F)
+    (X : t.heart.FullSubcategory) :
+    (r.heartFunctor.obj X).obj = F.obj X.obj :=
+  rfl
+
+@[simp]
+theorem heartFunctor_map (r : t.Restriction F)
+    {X Y : t.heart.FullSubcategory} (f : X ⟶ Y) :
+    (r.heartFunctor.map f).hom = F.map f.hom :=
+  rfl
 
 /-- The identity functor restricts every t-structure to itself. -/
 def id (t : TStructure C) : t.Restriction (𝟭 C) where
