@@ -54,3 +54,23 @@
   and frozen files must be committed before the controller can digest them, but
   preflight requires the pre-implementation base checkout. Keep the failure in
   the record and preserve the exact base/head guards for later PR actions.
+
+## Adversarial correction and fresh frozen chunk: 2026-09-19 UTC
+
+- Round 1 mathematics review found a real boundary mismatch: the public
+  `exists_shortExact_coproduct_twist` declaration was nested under a namespace
+  context requiring `[Nontrivial ι]`, while the OpenSpec scenario correctly
+  describes finite nonempty `ι` and therefore includes the singleton-index
+  presentation of `P⁰`. The correction moves the `[Nontrivial ι]` requirement
+  back onto the cohomology-finiteness declarations and gives the presentation
+  theorem only `[Nonempty ι]`.
+- This source correction is a material frozen-scope change discovered by the
+  first review, so it is carried by a fresh manifest/chunk rather than being
+  silently appended to the original ledger. The superseded round-1 ledger is
+  retained under `.loop-runs/` as audit evidence; the new ledger starts the
+  bounded review count for the corrected chunk.
+- The named target
+  `DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Projective` completed
+  successfully after the correction. The local no-build precheck was also
+  green with `SKIP_ACTIONLINT=1`, because `actionlint` is not installed; that
+  local result is not a substitute for remote CI.

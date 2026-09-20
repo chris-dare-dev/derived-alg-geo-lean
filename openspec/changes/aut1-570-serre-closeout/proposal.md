@@ -20,6 +20,9 @@ future agents, and closes the parent issue through the bounded controller.
 - Correct the stale route description in `TwistSection.lean` and the final
   theorem pointer in `Glue.lean` so future agents distinguish section
   extension, global generation, and the untwisted coproduct epimorphism.
+- Correct the projective-space presentation theorem's typeclass boundary so
+  finite nonempty index types include `P⁰`; retain `[Nontrivial ι]` only on
+  the separate negative-twist cohomology-finiteness declarations.
 - Record repository and controller inconsistencies in
   `agent-observations.md` and in the loop ledger/issue handoff.
 - Do not add a second Serre carrier, a global-generation instance, a
@@ -36,12 +39,15 @@ future agents, and closes the parent issue through the bounded controller.
 
 ### Modified Capabilities
 
-- None. This change records and documents an already-landed capability; it does
-  not change the theorem requirements or their implementation.
+- `projective-serre-quotient`: the existing projective presentation is exposed
+  under the correct finite-nonempty hypothesis, including the singleton
+  projective space, without adding a second theorem or API.
 
 ## Impact
 
-- Lean source: two module docstrings only; no declarations or imports change.
+- Lean source: two module docstrings and one typeclass-context correction in
+  the existing projective presentation file; no imports or new declarations
+  change.
 - OpenSpec and loop metadata: one closeout change and one enabled independent
   loop manifest for issue #570.
 - Provider state: the controller will create, verify, merge, and use the PR to

@@ -15,7 +15,10 @@ owners:
 4. `ProjectiveSpectrum/Modules/TwistInverse.lean` uses the proved inverse of
    `O(N)` to obtain `∐ O(-N) ↠ F`.
 5. `Cohomology/Finiteness/Projective.lean` specializes that result to the
-   polynomial grading and lifts it to a coherent short exact sequence.
+   polynomial grading and lifts it to a coherent short exact sequence. The
+   presentation theorem needs only `[Fintype ι] [Nonempty ι]`, while the
+   separate negative-twist cohomology-finiteness theorems correctly retain
+   `[Nontrivial ι]`.
 
 The source-of-truth declarations are reused directly. This closeout introduces
 no carrier, class, instance, comparison map, or alternate `Γ_*` presentation.
@@ -31,9 +34,11 @@ objects are owned. No generic tensor API is copied into the projective lane,
 and no cohomology theorem is moved into the module layer. The audit records for
 the existing declarations remain the authoritative trust surface.
 
-The only source edits are explanatory corrections in files that already own the
-claims. OpenSpec artifacts and the manifest are frozen alongside them so the
-review panel evaluates the exact closeout evidence and not a later expansion.
+The source edits remain in files that already own the claims: two explanatory
+docstring corrections and the typeclass-boundary correction identified by the
+first mathematics review. OpenSpec artifacts and the fresh manifest are frozen
+alongside them so the review panel evaluates the corrected closeout evidence
+and not a later expansion.
 
 ## Closeout evidence
 
@@ -48,6 +53,9 @@ review panel evaluates the exact closeout evidence and not a later expansion.
   adjudication is terminal; no speculative fourth pass or scope widening is
   permitted.
 - Required remote `ci` and `trust-surface` checks before controller merge.
+- The first review round is preserved as evidence for the superseded manifest;
+  the corrected source scope starts a fresh bounded chunk, with the same
+  three-round maximum and the same four independent reviewer roles.
 
 ## Known non-goals
 
