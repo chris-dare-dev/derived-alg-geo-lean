@@ -33,10 +33,10 @@ open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 
 universe u w
 
-namespace KFlatBaseChangeData
+namespace DerivedBaseChangeData
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : DerivedBaseChangeData X T)
   {ι : Type w} [Preorder ι]
   (A : SemiorthogonalSequence (SourceDqc X) ι)
   (hcompact : D.PreservesCompactObjects)
@@ -126,6 +126,6 @@ end BoundedData
 
 end DecompositionData
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

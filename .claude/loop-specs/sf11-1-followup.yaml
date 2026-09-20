@@ -1,0 +1,87 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: sf11-1-followup
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+# The previous reviewed producer/audit slice is the clean base for this
+# follow-up. The follow-up branch is created from this ref before coding.
+base_ref: agent/sf11-1-cap
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: sf11-base-change-t-structures
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/sf11-base-change-t-structures/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 5
+
+eligibility:
+  allow_epic_issues:
+    - 1060
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+    - trust-surface
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: true
+  allow_delete_branch_override: true
+  allow_auto: true
+  allow_admin: true
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+
+mutations:
+  comment_issue: true
+  close_issue: true
+  push_branch: true
+  create_pr: true
+  approve_pr: true
+  merge_pr: true
+
+issues:
+  - number: 1060
+    slug: sf11-1-followup
+    depends_on: []
+    chunks:
+      - id: sf11-1-followup
+        scope: Resolve OpenSpec tasks 2.1-2.3 for SF11.1 without replacing supplied geometric facts by postulates.
+        requirements:
+          - Base-change categories are constructed from honest operations
+          - The §3 witnesses discharge the supported SF11.1 statements
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families
+          - DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated
+          - .claude/roadmap/stability-families.yaml
+          - scripts/AlgebraicGeometryAudit/StabilityConditionFamilies.lean
+          - openspec/changes/sf11-base-change-t-structures/tasks.md
+          - notes/loop-engineering-sf11.md
+        acceptance:
+          - The affected D_T and (Dqc)_T operations are source-faithful and every remaining geometric theorem hypothesis is explicit at the call site.
+          - The supported Proposition 3.15, Theorem 3.17, and Lemma 3.18 obligations compile without sorry, admit, bypass axioms, or duplicate carriers.
+          - The bounded-coherent and finite-amplitude interfaces are theorem-backed or honestly parameterized, with targeted audit and build evidence.

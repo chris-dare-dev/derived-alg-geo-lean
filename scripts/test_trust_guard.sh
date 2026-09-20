@@ -75,6 +75,10 @@ run_case "umbrella, added executable line" trip "$UMB\t0\t$(b64 "$EXEC")"  || fa
 run_case "umbrella, patch omitted by API"  trip "$UMB\t0\t"                || fails=1
 run_case "EnumDecls.lean"                  trip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")"                || fails=1
 run_case "ci.yml"                          trip ".github/workflows/ci.yml\t0\t$(b64 "$GOOD")"              || fails=1
+run_case "loop specification"               trip ".claude/loop-specs/sf11-pilot.yaml\t0\t$(b64 "$GOOD")"     || fails=1
+run_case "reviewer prompt"                  trip ".claude/agents/mathlib-reviewer.md\t0\t$(b64 "$GOOD")"     || fails=1
+run_case "loop skill"                       trip ".claude/skills/run-loop/SKILL.md\t0\t$(b64 "$GOOD")"     || fails=1
+run_case "openspec change"                  trip "openspec/changes/pilot-change/tasks.md\t0\t$(b64 "$GOOD")" || fails=1
 run_case "audit record slice"              skip "scripts/AlgebraicGeometryAudit/Core.lean\t0\t$(b64 "$GOOD")" || fails=1
 run_case "ordinary source file"            skip "DerivedAlgGeo/Foo.lean\t0\t$(b64 "$GOOD")"                || fails=1
 run_case "empty file list"                 trip ""                                                        || fails=1

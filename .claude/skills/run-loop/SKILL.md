@@ -1,6 +1,6 @@
 ---
 name: run-loop
-description: Execute one enabled OpenSpec-backed two-to-three-issue formalization batch with a digest-bound ledger, four independent reviewers, guarded provider actions, and a hard three-round cap per frozen chunk.
+description: Execute one enabled OpenSpec-backed two-to-three-issue formalization batch with a digest-bound ledger, four independent reviewers, guarded provider actions, and a configured five-round cap per frozen chunk.
 ---
 
 # Bounded OpenSpec loop
@@ -25,9 +25,19 @@ generated `.agents/skills/` files.
 - Run the mathematical, repository-boundary, abstraction, and mathlib reviewers
   independently on the same commit. The style reviewer cannot substitute for
   either adversarial lens.
+- A reviewer's own final message is the evidence. If a dispatched reviewer
+  returns no readable final message, that round is **void**: re-dispatch it, or
+  record `blocked` and stop. Never substitute your own inspection of the diff
+  for a reviewer verdict, and never paraphrase a reviewer's output into the
+  ledger in place of its text. Record the verbatim message with
+  `--finding-file`; the controller refuses to adjudicate a round whose reviewer
+  rows carry no captured output.
+- Altitude and generalization findings are expected output, not churn. A
+  reviewer that reports none on a chunk has probably not looked.
 - A review/improve round is keyed by the commit and frozen chunk. A changed
-  commit starts the next round; a fourth round is forbidden. After the third
-  `needs_changes` adjudication, record `blocked` and stop that chunk.
+  commit starts the next round; this run permits at most five rounds. After
+  the fifth `needs_changes` adjudication, record `blocked` and stop that
+  chunk.
 - Do not silently re-chunk, widen the file list, or rewrite the OpenSpec plan
   after review evidence exists. A material plan change requires a new manifest
   or a new frozen chunk and fresh review.
@@ -58,7 +68,11 @@ generated `.agents/skills/` files.
    required check, an issue is closed/blocked/ineligible, a dependency is open,
    a branch/PR already exists, or a repository gate fails.
 
-3. Do not claim an issue by hand. If the manifest authorizes comments, use the
+3. Read `docs/architecture/generalization-backlog.md` before choosing an
+   implementation approach. A recorded lift may already say where this work
+   belongs, or record that the obvious generalization is false.
+
+4. Do not claim an issue by hand. If the manifest authorizes comments, use the
    controller's comment action with a concise link to the OpenSpec change and
    frozen chunk. If it does not, leave the tracker untouched.
 
@@ -99,8 +113,13 @@ Record each verdict and finding without paraphrasing away a blocker:
 ```text
 python scripts/loop_engine.py ledger record-review --state <ledger> \
   --reviewer <name> --commit <sha> --verdict pass|needs_changes|blocked \
-  --finding "<finding>"
+  --finding-file <path to that reviewer's verbatim final message>
 ```
+
+Write each reviewer's final message to its own file and pass the path. The
+controller stores the text and its digest, and refuses to adjudicate a round in
+which any reviewer row lacks captured output. `--finding` remains available for
+a one-line summary only; it is not evidence and cannot stand alone.
 
 Only after every required reviewer has submitted, adjudicate:
 
@@ -109,12 +128,25 @@ python scripts/loop_engine.py ledger adjudicate --state <ledger> \
   --verdict pass|needs_changes|blocked --note "<decision>"
 ```
 
-If the result is `needs_changes` and fewer than three rounds have been used,
+If the result is `needs_changes` and fewer than five rounds have been used,
 fix only the recorded findings, rerun the targeted checks, commit, and repeat
-Phase 2. If the result is `blocked` or the third round still needs changes,
+Phase 2. If the result is `blocked` or the fifth round still needs changes,
 stop the chunk and report the exact ledger state. Do not ask the same reviewers
-to rediscover the same issue on an unchanged commit, and do not prolong the
-cycle with speculative abstraction work.
+to rediscover the same issue on an unchanged commit.
+
+Generalization findings are handled by where the fix lands, not by rationing
+them:
+
+- A lift whose target is **inside** the frozen file list is a normal
+  `needs_changes`. It is actionable here, so it costs a round.
+- A lift whose target is **outside** the frozen file list cannot be implemented
+  in this chunk. Do not turn it into a `needs_changes` the chunk cannot satisfy,
+  and do not drop it. Append the reviewer's `LIFT:` block to
+  `docs/architecture/generalization-backlog.md` as an `UNVERIFIED` row and let
+  the chunk pass on the merits of the code actually under review.
+
+Termination is the round cap's job. Never suppress a class of finding to help
+the loop converge.
 
 ## Phase 3: guarded handoff
 
@@ -140,5 +172,6 @@ When the ledger passes:
 For stack mode, a dependent issue cannot advance while merge authority is
 false. Stop with that explicit reason rather than treating an open approved PR
 as a closed prerequisite. At the end, report completed chunks, terminal
-blocked chunks, provider actions actually taken, CI status, and the next
-required human decision.
+blocked chunks, provider actions actually taken, CI status, the lift findings
+carried to the generalization backlog (each with its leaf declaration and
+proposed ancestor), and the next required human decision.

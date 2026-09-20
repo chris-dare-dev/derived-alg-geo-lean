@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
 import subprocess
@@ -24,6 +25,19 @@ REVIEWERS = [
     "abstraction-adversary",
     "mathlib-reviewer",
 ]
+
+
+def reviewer_output(root: Path, reviewer: str, verdict: str, body: str = "") -> Path:
+    """Write a plausible verbatim reviewer message and return its path.
+
+    The controller requires the reviewer's own text as evidence, so tests must
+    supply it the same way the run-loop skill does.
+    """
+    token = loop_engine.CONTRACT_VERDICT_TOKENS[verdict]
+    path = root / f"review-{reviewer}-{verdict}.md"
+    text = body or f"{reviewer} reviewed the frozen chunk.\n"
+    path.write_text(f"{text}\nClose: {token}, 0 findings, 0 lifts.\n", encoding="utf-8")
+    return path
 
 
 def make_spec(root: Path) -> tuple[Path, dict]:
@@ -64,7 +78,7 @@ def make_spec(root: Path) -> tuple[Path, dict]:
                 "specs/capability/spec.md",
             ],
         },
-        "limits": {"min_issues": 1, "max_issues": 1, "max_review_rounds_per_chunk": 3},
+        "limits": {"min_issues": 1, "max_issues": 1, "max_review_rounds_per_chunk": 5},
         "review": {"independent": True, "reviewers": REVIEWERS},
         "runner": {"required_checks": ["ci"]},
         "closure": {"code_issue": "pr_merge_keyword", "allow_non_pr": False},
@@ -151,6 +165,48 @@ class LoopEngineTests(unittest.TestCase):
             loaded = loop_engine.load_spec(spec_path, root)
             self.assertEqual(loaded["openspec"]["change"], "pilot-change")
             self.assertEqual(loop_engine.digest(loaded), loop_engine.digest(spec))
+
+    def test_epic_opt_in_is_explicit_and_selected_only(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["eligibility"] = {"allow_epic_issues": [1]}
+            import yaml
+
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            self.assertEqual(loop_engine.load_spec(spec_path, root)["eligibility"], spec["eligibility"])
+            spec["eligibility"] = {"allow_epic_issues": [2]}
+            spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError):
+                loop_engine.load_spec(spec_path, root)
+
+    def test_roadmap_gate_is_scoped_to_manifest_base(self) -> None:
+        self.assertEqual(
+            loop_engine.roadmap_gate_args("agent/sf11-base"),
+            [
+                "python",
+                "scripts/check_roadmap.py",
+                "--require-api",
+                "--scope-to-diff=agent/sf11-base",
+            ],
+        )
+
+    def test_frozen_scope_preserves_dot_directories(self) -> None:
+        self.assertTrue(
+            loop_engine.path_is_in_frozen_chunk(
+                ".claude/README.md", [".claude"]
+            )
+        )
+        self.assertTrue(
+            loop_engine.path_is_in_frozen_chunk(
+                "./.github/CODEOWNERS", ["./.github"]
+            )
+        )
+        self.assertFalse(
+            loop_engine.path_is_in_frozen_chunk(
+                "claude/README.md", [".claude"]
+            )
+        )
 
     def test_progress_chunk_requires_explicit_manifest_authorization(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -281,7 +337,7 @@ class LoopEngineTests(unittest.TestCase):
             self.assertNotEqual(result, 0)
             self.assertIn("remaining open", output.getvalue())
 
-    def test_ledger_requires_all_reviewers_and_stops_after_three_rounds(self) -> None:
+    def test_ledger_requires_all_reviewers_and_stops_after_five_rounds(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             spec_path, _ = make_spec(root)
@@ -291,10 +347,19 @@ class LoopEngineTests(unittest.TestCase):
             commit_b = "b" * 40
             commit_c = "c" * 40
             commit_d = "d" * 40
+            commit_e = "e" * 40
+            commit_f = "f" * 40
 
             with contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(
-                    loop_engine.ledger_record_review(state_path, REVIEWERS[0], commit_a, "pass", None),
+                    loop_engine.ledger_record_review(
+                        state_path,
+                        REVIEWERS[0],
+                        commit_a,
+                        "pass",
+                        None,
+                        reviewer_output(root, REVIEWERS[0], "pass"),
+                    ),
                     0,
                 )
                 self.assertNotEqual(
@@ -303,32 +368,50 @@ class LoopEngineTests(unittest.TestCase):
                 )
                 for reviewer in REVIEWERS[1:]:
                     self.assertEqual(
-                        loop_engine.ledger_record_review(state_path, reviewer, commit_a, "needs_changes", "fix"),
+                        loop_engine.ledger_record_review(
+                            state_path,
+                            reviewer,
+                            commit_a,
+                            "needs_changes",
+                            "fix",
+                            reviewer_output(root, reviewer, "needs_changes"),
+                        ),
                         0,
                     )
                 self.assertEqual(loop_engine.ledger_adjudicate(state_path, "needs_changes", "round one"), 0)
 
-                for reviewer in REVIEWERS:
+                for round_number, commit in enumerate(
+                    (commit_b, commit_c, commit_d, commit_e), start=2
+                ):
+                    for reviewer in REVIEWERS:
+                        self.assertEqual(
+                            loop_engine.ledger_record_review(
+                                state_path,
+                                reviewer,
+                                commit,
+                                "needs_changes",
+                                "fix",
+                                reviewer_output(root, reviewer, "needs_changes"),
+                            ),
+                            0,
+                        )
                     self.assertEqual(
-                        loop_engine.ledger_record_review(state_path, reviewer, commit_b, "needs_changes", "fix"),
+                        loop_engine.ledger_adjudicate(
+                            state_path, "needs_changes", f"round {round_number}"
+                        ),
                         0,
                     )
-                self.assertEqual(loop_engine.ledger_adjudicate(state_path, "needs_changes", "round two"), 0)
 
-                for reviewer in REVIEWERS:
-                    self.assertEqual(
-                        loop_engine.ledger_record_review(state_path, reviewer, commit_c, "needs_changes", "stop"),
-                        0,
-                    )
-                self.assertEqual(loop_engine.ledger_adjudicate(state_path, "needs_changes", "round three"), 0)
                 self.assertNotEqual(
-                    loop_engine.ledger_record_review(state_path, REVIEWERS[0], commit_d, "pass", None),
+                    loop_engine.ledger_record_review(
+                        state_path, REVIEWERS[0], commit_f, "pass", None
+                    ),
                     0,
                 )
 
             state = json.loads(state_path.read_text(encoding="utf-8"))
             self.assertEqual(state["status"], "blocked")
-            self.assertEqual(len(state["rounds"]), 3)
+            self.assertEqual(len(state["rounds"]), 5)
             self.assertEqual(state["rounds"][-1]["adjudication"]["verdict"], "blocked")
 
     def test_passed_ledger_is_terminal(self) -> None:
@@ -340,11 +423,118 @@ class LoopEngineTests(unittest.TestCase):
             commit = "e" * 40
             with contextlib.redirect_stdout(io.StringIO()):
                 for reviewer in REVIEWERS:
-                    self.assertEqual(loop_engine.ledger_record_review(state_path, reviewer, commit, "pass", None), 0)
+                    self.assertEqual(
+                        loop_engine.ledger_record_review(
+                            state_path,
+                            reviewer,
+                            commit,
+                            "pass",
+                            None,
+                            reviewer_output(root, reviewer, "pass"),
+                        ),
+                        0,
+                    )
                 self.assertEqual(loop_engine.ledger_adjudicate(state_path, "pass", "all clear"), 0)
                 self.assertNotEqual(loop_engine.ledger_record_review(state_path, REVIEWERS[0], "f" * 40, "pass", None), 0)
             state = json.loads(state_path.read_text(encoding="utf-8"))
             self.assertEqual(state["status"], "passed")
+
+
+    def test_adjudication_refuses_uncaptured_reviewer_output(self) -> None:
+        """A round whose reviewers returned no readable message cannot pass."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None)
+            state_path = root / ".loop-runs" / "test-chunk.json"
+            commit = "a" * 40
+            with contextlib.redirect_stdout(io.StringIO()):
+                for reviewer in REVIEWERS:
+                    self.assertEqual(
+                        loop_engine.ledger_record_review(
+                            state_path, reviewer, commit, "pass", "looks fine"
+                        ),
+                        0,
+                    )
+                # every reviewer submitted, but none of them left captured output
+                self.assertNotEqual(
+                    loop_engine.ledger_adjudicate(state_path, "pass", "all clear"), 0
+                )
+                self.assertNotEqual(
+                    loop_engine.ledger_adjudicate(state_path, "needs_changes", "again"), 0
+                )
+                # stopping is always permitted: a void round may be recorded blocked
+                self.assertEqual(
+                    loop_engine.ledger_adjudicate(state_path, "blocked", "void round"), 0
+                )
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            self.assertEqual(state["status"], "blocked")
+
+    def test_captured_output_is_stored_with_its_digest(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None)
+            state_path = root / ".loop-runs" / "test-chunk.json"
+            commit = "a" * 40
+            path = reviewer_output(root, REVIEWERS[0], "pass")
+            # the controller digests the decoded text, not raw bytes, so the
+            # digest is stable across CRLF and LF checkouts of the same review
+            expected = hashlib.sha256(
+                path.read_text(encoding="utf-8").encode("utf-8")
+            ).hexdigest()
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(
+                    loop_engine.ledger_record_review(
+                        state_path, REVIEWERS[0], commit, "pass", None, path
+                    ),
+                    0,
+                )
+            row = json.loads(state_path.read_text(encoding="utf-8"))["rounds"][0]["reviews"][0]
+            self.assertEqual(row["finding_digest"], expected)
+            self.assertIn("PASS", row["finding_text"])
+
+    def test_empty_reviewer_output_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None)
+            state_path = root / ".loop-runs" / "test-chunk.json"
+            empty = root / "empty.md"
+            empty.write_text("   \n\n", encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertNotEqual(
+                    loop_engine.ledger_record_review(
+                        state_path, REVIEWERS[0], "a" * 40, "pass", None, empty
+                    ),
+                    0,
+                )
+
+    def test_verdict_must_match_the_reviewer_text(self) -> None:
+        """The orchestrator cannot record pass over a reviewer that said otherwise."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None)
+            state_path = root / ".loop-runs" / "test-chunk.json"
+            dissent = root / "dissent.md"
+            dissent.write_text(
+                "The root owns two carriers.\nClose: NEEDS_CHANGES, 2 findings.\n",
+                encoding="utf-8",
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertNotEqual(
+                    loop_engine.ledger_record_review(
+                        state_path, REVIEWERS[0], "a" * 40, "pass", None, dissent
+                    ),
+                    0,
+                )
+                self.assertEqual(
+                    loop_engine.ledger_record_review(
+                        state_path, REVIEWERS[0], "a" * 40, "needs_changes", None, dissent
+                    ),
+                    0,
+                )
 
     def test_missing_openspec_artifact_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

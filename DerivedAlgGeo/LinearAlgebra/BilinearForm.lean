@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.BilinearForm.HodgeIndex
 import DerivedAlgGeo.LinearAlgebra.BilinearForm.Hyperbolic
+import DerivedAlgGeo.LinearAlgebra.BilinearForm.Lorentzian
 import DerivedAlgGeo.LinearAlgebra.BilinearForm.RankTwo
 import DerivedAlgGeo.LinearAlgebra.BilinearForm.Reflection
 

@@ -135,7 +135,7 @@ namespace CompactFiberProjectionFormula
 In the geometric application this object is the tensor of the dual of the
 earlier compact fibre factor with the later one, including the two shifts. -/
 structure FiberCoefficientData
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst) where
@@ -154,7 +154,7 @@ namespace FiberCoefficientData
 /-- Faithful base change pushes a fibre coefficient to `S` and identifies
 its pullback to `X` with the projection-formula coefficient. -/
 def toDqcBaseCoefficientData
-    {H : D.CompactFiberTensorDuality}
+    {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
     {Q : D.SourceTensorData}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     {P : D.CompactFiberProjectionFormula H Q pushFst}
@@ -179,7 +179,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_faithfulBaseChan
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
@@ -192,7 +192,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_faithfulBaseChan
       (D := D) P)
     (hS : SourceTensorData.DqcSLinearComponents
       (D := D) Q pullBase A) :
-    D.PerfectComponentsSemiorthogonal A :=
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula_of_dqcSLinear
     A hA hIso H Q pullBase pushFst adj P
       (CompactFiberProjectionFormula.FiberCoefficientData.toDqcBaseCoefficientData
@@ -204,7 +204,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBas
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (B : KFlatBasePullbackData X)
     (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
@@ -217,7 +217,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBas
       (D := D) P)
     (hS : SourceTensorData.KFlatDqcSLinearComponents
       (D := D) Q B A) :
-    D.PerfectComponentsSemiorthogonal A :=
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula_of_faithfulBaseChange
     A hA hIso H Q B.pullback pushBase pushFst adj P faithful C hS
 
@@ -227,7 +227,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_sourceFlat
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (B : KFlatBasePullbackData X)
     (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
@@ -242,7 +242,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_sourceFlat
       (D := D) P)
     (hS : SourceTensorData.KFlatDqcSLinearComponents
       (D := D) Q B A) :
-    D.PerfectComponentsSemiorthogonal A :=
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBaseChange
     A hA hIso H Q B pushBase pushFst adj P
       flatBaseChange.faithfulOfSourceFlat C hS
@@ -253,7 +253,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_baseFlat
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (H : D.CompactFiberTensorDuality)
+    (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
     (Q : D.SourceTensorData)
     (B : KFlatBasePullbackData X)
     (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
@@ -268,7 +268,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_baseFlat
       (D := D) P)
     (hS : SourceTensorData.KFlatDqcSLinearComponents
       (D := D) Q B A) :
-    D.PerfectComponentsSemiorthogonal A :=
+    D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBaseChange
     A hA hIso H Q B pushBase pushFst adj P
       flatBaseChange.faithfulOfBaseFlat C hS

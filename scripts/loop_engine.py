@@ -37,7 +37,7 @@ except ImportError:  # pragma: no cover - direct invocation from another cwd
 
 
 RUN_SCHEMA = "derived-alg-geo-lean.loop-run/v1"
-MAX_ALLOWED_ROUNDS = 3
+MAX_ALLOWED_ROUNDS = 5
 REQUIRED_ADVERSARIES = {
     "mathematics-adversary",
     "repository-boundary-adversary",
@@ -327,7 +327,9 @@ def validate_spec(spec: dict[str, Any]) -> None:
     if max_issues > 3:
         raise LoopError("limits.max_issues cannot exceed 3 for an unattended pilot")
     if max_rounds > MAX_ALLOWED_ROUNDS:
-        raise LoopError("limits.max_review_rounds_per_chunk cannot exceed 3")
+        raise LoopError(
+            f"limits.max_review_rounds_per_chunk cannot exceed {MAX_ALLOWED_ROUNDS}"
+        )
     if min_issues > max_issues:
         raise LoopError("limits.min_issues cannot exceed limits.max_issues")
 
@@ -393,6 +395,24 @@ def validate_spec(spec: dict[str, Any]) -> None:
             closure = chunk.get("closure", "complete")
             if closure not in CHUNK_CLOSURES:
                 raise LoopError(f"{chunk_name}.closure must be 'complete' or 'progress'")
+
+    eligibility = spec.get("eligibility", {})
+    if not isinstance(eligibility, dict):
+        raise LoopError("spec.eligibility must be a mapping")
+    allow_epic_issues = eligibility.get("allow_epic_issues", [])
+    if not isinstance(allow_epic_issues, list) or any(
+        not isinstance(number, int) or isinstance(number, bool) or number <= 0
+        for number in allow_epic_issues
+    ):
+        raise LoopError("spec.eligibility.allow_epic_issues must be a list of positive issue numbers")
+    if len(set(allow_epic_issues)) != len(allow_epic_issues):
+        raise LoopError("spec.eligibility.allow_epic_issues must not contain duplicates")
+    unselected_epic_opt_ins = set(allow_epic_issues) - numbers
+    if unselected_epic_opt_ins:
+        raise LoopError(
+            "spec.eligibility.allow_epic_issues must be a subset of selected issues: "
+            + ", ".join(str(number) for number in sorted(unselected_epic_opt_ins))
+        )
 
     reviewer_spec = require_mapping(spec.get("review"), "spec.review")
     reviewers = reviewer_spec.get("reviewers")
@@ -475,6 +495,9 @@ def print_validation(path: Path, root: Path) -> int:
     print(f"  mode={spec['mode']} enabled={spec['enabled']} issues={len(spec['issues'])}")
     print(f"  reviewers={', '.join(spec['review']['reviewers'])}")
     print(f"  max_review_rounds_per_chunk={spec['limits']['max_review_rounds_per_chunk']}")
+    epic_opt_ins = spec.get("eligibility", {}).get("allow_epic_issues", [])
+    if epic_opt_ins:
+        print(f"  explicitly_authorized_epic_issues={','.join(str(number) for number in epic_opt_ins)}")
     policy = merge_policy(spec)
     print(
         "  merge="
@@ -560,6 +583,17 @@ def issue_state(root: Path, repository: str, number: int) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise LoopError(f"gh issue view #{number} returned an unexpected response")
     return data
+
+
+def roadmap_gate_args(base_ref: str) -> list[str]:
+    """Scope roadmap consistency failures to entries authored after base_ref."""
+
+    return [
+        "python",
+        "scripts/check_roadmap.py",
+        "--require-api",
+        f"--scope-to-diff={base_ref}",
+    ]
 
 
 def preflight(root: Path, spec_path: Path) -> int:
@@ -660,6 +694,10 @@ def preflight(root: Path, spec_path: Path) -> int:
             if isinstance(label, dict)
         }
         forbidden = labels & {"blocked", "epic", "research", "type:spike"}
+        allow_epic_issues = set(spec.get("eligibility", {}).get("allow_epic_issues", []))
+        if "epic" in forbidden and number in allow_epic_issues:
+            forbidden.remove("epic")
+            print(f"PASS issue #{number}: epic label explicitly authorized by manifest")
         if forbidden:
             failures.append(f"issue #{number} has ineligible labels: {', '.join(sorted(forbidden))}")
         blocked_by = blocked_by_entries(live)
@@ -676,8 +714,12 @@ def preflight(root: Path, spec_path: Path) -> int:
             if dependency_state.get("state") != "CLOSED":
                 failures.append(f"issue #{number} depends on open issue #{dependency}")
         expected_branch = f"agent/{issue['slug']}"
-        if expected_branch == git(root, "branch", "--show-current", check=True):
-            failures.append(f"current branch already uses planned issue branch {expected_branch}")
+        # The preflight is intentionally run on the exact clean head from
+        # `base_ref`, and the planned issue branch is the normal place to do
+        # that.  Rejecting that branch name made a valid loop state
+        # impossible: the controller required a dedicated branch while also
+        # rejecting the dedicated branch it had planned.  Existing-PR checks
+        # below still fail closed if the branch has already been used.
         for pr in prs:
             if pr.get("headRefName") == expected_branch:
                 failures.append(f"a PR already exists for planned branch {expected_branch} (#{pr.get('number')})")
@@ -703,7 +745,7 @@ def preflight(root: Path, spec_path: Path) -> int:
 
     roadmap_gate = spec.get("roadmap_gate", "required")
     if roadmap_gate != "disabled":
-        roadmap = run_command(root, ["python", "scripts/check_roadmap.py", "--require-api"], check=False)
+        roadmap = run_command(root, roadmap_gate_args(spec["base_ref"]), check=False)
         if roadmap.returncode != 0:
             message = (roadmap.stdout or roadmap.stderr).strip().splitlines()
             detail = message[-1] if message else "roadmap gate failed"
@@ -852,7 +894,9 @@ def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
         return current
     next_number = (current.get("number", 0) + 1) if current else 1
     if next_number > state["max_review_rounds"]:
-        raise LoopError("review round cap reached; no fourth critique/improve iteration is permitted")
+        raise LoopError(
+            "review round cap reached; no further critique/improve iteration is permitted"
+        )
     current = {
         "number": next_number,
         "commit": commit,
@@ -864,12 +908,39 @@ def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
     return current
 
 
+CONTRACT_VERDICT_TOKENS = {
+    "pass": "PASS",
+    "needs_changes": "NEEDS_CHANGES",
+    "blocked": "BLOCKED",
+}
+
+
+def read_reviewer_output(finding_file: Path) -> tuple[str, str]:
+    """Read a reviewer's verbatim final message and return (text, sha256).
+
+    The reviewer's own output is the evidence. A summary written by the
+    orchestrator is not, because it is indistinguishable from the orchestrator
+    having reviewed the diff itself.
+    """
+    try:
+        text = finding_file.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise LoopError(f"cannot read reviewer output {str(finding_file)!r}: {exc}") from exc
+    if not text.strip():
+        raise LoopError(
+            f"reviewer output {str(finding_file)!r} is empty; "
+            "a round with no readable reviewer message is void, not a pass"
+        )
+    return text, hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def ledger_record_review(
     state_file: Path,
     reviewer: str,
     commit: str,
     verdict: str,
     finding: str | None,
+    finding_file: Path | None = None,
 ) -> int:
     try:
         state = load_state(state_file)
@@ -884,11 +955,24 @@ def ledger_record_review(
         round_state = ensure_review_round(state, commit)
         if any(item.get("reviewer") == reviewer for item in round_state["reviews"]):
             raise LoopError(f"reviewer {reviewer!r} already submitted for round {round_state['number']}")
+        finding_text = ""
+        finding_digest = ""
+        if finding_file is not None:
+            finding_text, finding_digest = read_reviewer_output(finding_file)
+            token = CONTRACT_VERDICT_TOKENS[verdict]
+            if not re.search(rf"\b{token}\b", finding_text, re.I):
+                raise LoopError(
+                    f"reviewer output does not state the recorded verdict {token}; "
+                    "record the verdict the reviewer actually reached"
+                )
         round_state["reviews"].append(
             {
                 "reviewer": reviewer,
                 "verdict": verdict,
                 "finding": finding or "",
+                "finding_text": finding_text,
+                "finding_digest": finding_digest,
+                "finding_source": str(finding_file) if finding_file is not None else "",
                 "recorded_at": utc_now(),
             }
         )
@@ -916,6 +1000,19 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
             raise LoopError(f"cannot adjudicate; missing reviewers: {', '.join(sorted(missing))}")
         if verdict == "pass" and any(item.get("verdict") != "pass" for item in current["reviews"]):
             raise LoopError("pass adjudication requires every reviewer verdict to be pass")
+        if verdict != "blocked":
+            uncaptured = sorted(
+                str(item.get("reviewer"))
+                for item in current["reviews"]
+                if not item.get("finding_digest")
+            )
+            if uncaptured:
+                raise LoopError(
+                    "cannot adjudicate; no captured reviewer output for: "
+                    + ", ".join(uncaptured)
+                    + ". Re-dispatch the reviewer and record its verbatim message with "
+                    "--finding-file, or adjudicate this round blocked"
+                )
         if verdict == "needs_changes" and current["number"] >= state["max_review_rounds"]:
             verdict = "blocked"
             note = (note + " | " if note else "") + "review-round cap reached; stop without another iteration"
@@ -1043,11 +1140,20 @@ def read_body_file(root: Path, value: str) -> str:
     return body
 
 
+def normalize_scoped_path(value: str) -> str:
+    """Normalize a repository-relative path without erasing dot directories."""
+
+    normalized = value.replace("\\", "/")
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    return normalized.rstrip("/")
+
+
 def path_is_in_frozen_chunk(path: str, allowed_prefixes: Iterable[str]) -> bool:
-    normalized = path.replace("\\", "/").lstrip("./")
+    normalized = normalize_scoped_path(path)
     return any(
-        normalized == prefix.replace("\\", "/").rstrip("/")
-        or normalized.startswith(prefix.replace("\\", "/").rstrip("/") + "/")
+        normalized == normalize_scoped_path(prefix)
+        or normalized.startswith(normalize_scoped_path(prefix) + "/")
         for prefix in allowed_prefixes
     )
 
@@ -1407,7 +1513,12 @@ def build_parser() -> argparse.ArgumentParser:
     record_parser.add_argument("--reviewer", required=True)
     record_parser.add_argument("--commit", required=True)
     record_parser.add_argument("--verdict", required=True, choices=["pass", "needs_changes", "blocked"])
-    record_parser.add_argument("--finding")
+    record_parser.add_argument("--finding", help="one-line summary; not evidence and cannot stand alone")
+    record_parser.add_argument(
+        "--finding-file",
+        type=Path,
+        help="path to the reviewer's verbatim final message; required before the round can be adjudicated",
+    )
     adjudicate_parser = ledger_sub.add_parser("adjudicate")
     adjudicate_parser.add_argument("--state", required=True, type=Path)
     adjudicate_parser.add_argument("--verdict", required=True, choices=["pass", "needs_changes", "blocked"])
@@ -1478,7 +1589,14 @@ def main(argv: list[str] | None = None) -> int:
                 root = args.repo_root.resolve()
                 return ledger_init(root, repo_path(root, args.spec), args.issue, args.chunk_id, args.state_dir)
             if args.ledger_command == "record-review":
-                return ledger_record_review(args.state.resolve(), args.reviewer, args.commit, args.verdict, args.finding)
+                return ledger_record_review(
+                    args.state.resolve(),
+                    args.reviewer,
+                    args.commit,
+                    args.verdict,
+                    args.finding,
+                    args.finding_file.resolve() if args.finding_file else None,
+                )
             if args.ledger_command == "adjudicate":
                 return ledger_adjudicate(args.state.resolve(), args.verdict, args.note)
             if args.ledger_command == "show":

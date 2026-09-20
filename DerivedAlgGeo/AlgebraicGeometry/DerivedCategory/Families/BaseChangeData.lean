@@ -15,8 +15,13 @@ quasicoherent component `(Dqc)_T`, the bounded component `D_T` -- takes those
 three as separate arguments.
 
 This file bundles them. `DerivedBaseChangeData` is that bundle and nothing more:
-two `DqcLeftDerivedPullback`s and a tensor bifunctor. It says how base change
-behaves, not how it was produced.
+two `DqcLeftDerivedPullback`s and an operation-level tensor bifunctor. It says
+how base change is consumed, not how it was produced. In particular,
+`derivedTensor` is deliberately not presented as a universal-property
+construction of the unbounded derived tensor on `Dqc`; exactness, monoidal
+coherence, and geometric existence must be supplied by a producer or by the
+theorem using the operation. A field of this type is therefore an interface,
+not a proof of the corresponding geometric fact.
 
 **Why the bundle is the root and not the K-flat one.** K-flat resolutions are a
 *model*: one way to produce these three operations, and the one
@@ -70,6 +75,30 @@ structure DerivedBaseChangeData (X T : SchemeBaseChange S) where
 namespace DerivedBaseChangeData
 
 variable {X T : SchemeBaseChange S}
+
+/-- Assemble the model-free root from exact geometric pullbacks.
+
+This is a second producer for `DerivedBaseChangeData`: exact or flat/open
+base-change morphisms can use the canonical derived pullback without choosing
+K-flat resolutions.  The tensor and the two `Dqc` preservation statements
+remain explicit because this file does not claim a general unbounded tensor
+or a general-scheme quasi-coherence theorem. -/
+noncomputable def ofExactPullbacks
+    [IsExactPullback (baseChangeFst X T)]
+    [IsExactPullback (baseChangeSnd X T)]
+    (tensor : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+      Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
+        Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left)
+    (hFst : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory X.left,
+      Dqc.schemeQuasicoherentCohomology (X ⨯ T).left
+        ((derivedPullback (baseChangeFst X T)).obj E.obj))
+    (hSnd : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory T.left,
+      Dqc.schemeQuasicoherentCohomology (X ⨯ T).left
+        ((derivedPullback (baseChangeSnd X T)).obj E.obj)) :
+    DerivedBaseChangeData X T where
+  pullFst := DqcLeftDerivedPullback.ofExact hFst
+  pullSnd := DqcLeftDerivedPullback.ofExact hSnd
+  derivedTensor := tensor
 
 /-- The base-change external product of the bundled operations. -/
 noncomputable def externalProduct (D : DerivedBaseChangeData X T)

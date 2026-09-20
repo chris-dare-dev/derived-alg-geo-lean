@@ -16,7 +16,7 @@ concerns belong to a small repository-local controller.
 - Freeze each implementation chunk to an issue, OpenSpec change, file list,
   acceptance statements, and reviewed commit.
 - Require independent adversarial lenses before adjudication.
-- Make the third failed round a terminal stop rather than a fourth attempt.
+- Make the fifth failed round a terminal stop rather than a sixth attempt.
 - Make remote mutations opt-in per action and make code-issue closure require a
   merged pull request. Permit a progress PR only when the frozen chunk and
   manifest explicitly authorize it, and require that PR to avoid closing
@@ -52,7 +52,7 @@ concerns belong to a small repository-local controller.
    shell interpolation.
 5. **Review rounds are per frozen chunk.** All required reviewers must review
    the same commit before adjudication. A new commit starts the next round; the
-   cap is three, and scope cannot be re-chunked to evade it.
+   cap is five, and scope cannot be re-chunked to evade it.
 
 ## Review Panel
 
@@ -72,7 +72,7 @@ concerns belong to a small repository-local controller.
   state, dependencies, branch/PR collisions, provider identity, and roadmap.
 - **OpenSpec CLI is absent on a runner** → structural validation remains
   portable; `cli-required` is opt-in and fails closed.
-- **Review churn can consume the run** → each chunk stops at three rounds and
+- **Review churn can consume the run** → each chunk stops at five rounds and
   is recorded as blocked for later human triage.
 - **A user enables too many mutations** → each action remains named, logged by
   the command output, and merge defaults to false.

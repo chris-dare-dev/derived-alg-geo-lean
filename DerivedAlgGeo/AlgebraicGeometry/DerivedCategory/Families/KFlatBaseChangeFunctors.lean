@@ -6,11 +6,12 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.KFlatBaseChange
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 
 /-!
-# Pullback between K-flat base-change categories
+# Pullback between derived base-change categories
 
-A morphism `f : T ⟶ U` over `S` induces `X ×_S T ⟶ X ×_S U`. This file constructs
-its derived pullback from the K-flat resolution already carried by the target base-change data and
-then restricts that functor to `(Dqc)_U ⟶ (Dqc)_T` and `D_U ⟶ D_T`.
+A morphism `f : T ⟶ U` over `S` induces `X ×_S T ⟶ X ×_S U`. The generic part of
+this file restricts any supplied `Dqc` pullback to `(Dqc)_U ⟶ (Dqc)_T` and
+`D_U ⟶ D_T`. The separate `KFlatBaseChangeData.pullbackAlong` constructor is
+the K-flat producer for that ambient pullback.
 
 The only component-level hypothesis is preservation of `(Dqc)`. Once the derived pullback also
 preserves bounded coherent cohomology, preservation of `D_U` follows formally because `D_U` was
@@ -163,10 +164,16 @@ noncomputable instance pullbackAlong_ambient_essSurj_of_isOpenImmersion
   dsimp [pullbackAlong, kFlatDqcLeftDerivedPullback]
   exact LeftDerivedPullback.essSurj_of_isOpenImmersion _
 
+end KFlatBaseChangeData
+
+namespace DerivedBaseChangeData
+
+variable {f : T ⟶ U}
+
 /-- The exact component-level statement that pullback along `f` preserves the constructed
 quasicoherent base-change component. -/
 def PullbackPreservesQuasicoherentComponent
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f)) : Prop :=
   DU.quasicoherentComponent P ≤
@@ -175,7 +182,7 @@ def PullbackPreservesQuasicoherentComponent
 /-- The smaller generator-level condition that pullback sends the source
 perfect envelope into the target quasicoherent component. -/
 def PullbackMapsPerfectEnvelope
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f)) : Prop :=
   (DU.perfectEnvelope P).map pull.functor ≤
@@ -185,7 +192,7 @@ def PullbackMapsPerfectEnvelope
 quasicoherent component once it maps the perfect envelope into the target
 component. -/
 theorem pullback_preservesQuasicoherentComponent_of_perfectEnvelope
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     [pull.functor.CommShift ℤ] [pull.functor.IsTriangulated]
@@ -199,7 +206,7 @@ theorem pullback_preservesQuasicoherentComponent_of_perfectEnvelope
 
 /-- Pullback between the constructed quasicoherent base-change categories. -/
 noncomputable def quasicoherentPullback
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (h : PullbackPreservesQuasicoherentComponent DT DU P pull) :
@@ -209,7 +216,7 @@ noncomputable def quasicoherentPullback
 /-- Pullback between quasicoherent base-change components, constructed from
 the smaller perfect-envelope preservation condition. -/
 noncomputable def quasicoherentPullbackOfPerfectEnvelope
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     [pull.functor.CommShift ℤ] [pull.functor.IsTriangulated]
@@ -222,7 +229,7 @@ noncomputable def quasicoherentPullbackOfPerfectEnvelope
 
 /-- Forgetting component witnesses recovers the ambient `Dqc` pullback. -/
 noncomputable def quasicoherentPullbackCompInclusion
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (h : PullbackPreservesQuasicoherentComponent DT DU P pull) :
@@ -235,7 +242,7 @@ noncomputable def quasicoherentPullbackCompInclusion
 /-- Preservation of the bounded component follows from preservation of `(Dqc)` together with
 preservation of bounded coherent cohomology by the same derived pullback. -/
 theorem pullback_preservesBoundedComponent
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hDqc : PullbackPreservesQuasicoherentComponent DT DU P pull)
@@ -247,7 +254,7 @@ theorem pullback_preservesBoundedComponent
 
 /-- Pullback between the constructed bounded base-change categories. -/
 noncomputable def boundedPullback
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hDqc : PullbackPreservesQuasicoherentComponent DT DU P pull)
@@ -259,7 +266,7 @@ noncomputable def boundedPullback
 /-- Bounded pullback constructed from perfect-envelope preservation and
 preservation of intrinsic bounded-coherent objects. -/
 noncomputable def boundedPullbackOfPerfectEnvelope
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     [pull.functor.CommShift ℤ] [pull.functor.IsTriangulated]
@@ -274,7 +281,7 @@ noncomputable def boundedPullbackOfPerfectEnvelope
 
 /-- Forgetting component witnesses recovers pullback on the intrinsic bounded-coherent loci. -/
 noncomputable def boundedPullbackCompInclusion
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hDqc : PullbackPreservesQuasicoherentComponent DT DU P pull)
@@ -286,6 +293,10 @@ noncomputable def boundedPullbackCompInclusion
     (fun E ↦ pullback_preservesBoundedComponent DT DU P pull hDqc hBounded
       E.obj E.property)
 
+end DerivedBaseChangeData
+
+namespace KFlatBaseChangeData
+
 /-- The fully K-flat form of pullback on `(Dqc)`: both the ambient derived functor and its
 restriction to the constructed component are obtained from the resolutions. -/
 noncomputable def kFlatQuasicoherentPullback
@@ -295,10 +306,13 @@ noncomputable def kFlatQuasicoherentPullback
     (hAcyclic : KFlatPullbackAcyclic DU.tensorResolution (baseChangeMap X f))
     (hQuasicoherent : KFlatResolvedPullbackPreservesQuasicoherentCohomology
       DU.tensorResolution (baseChangeMap X f))
-    (hComponent : PullbackPreservesQuasicoherentComponent DT DU P
+    (hComponent : DerivedBaseChangeData.PullbackPreservesQuasicoherentComponent
+      DT.toDerivedBaseChangeData DU.toDerivedBaseChangeData P
       (DU.pullbackAlong f hAcyclic hQuasicoherent)) :
     DU.QuasicoherentCategory P ⥤ DT.QuasicoherentCategory P :=
-  quasicoherentPullback DT DU P (DU.pullbackAlong f hAcyclic hQuasicoherent) hComponent
+  DerivedBaseChangeData.quasicoherentPullback DT.toDerivedBaseChangeData
+    DU.toDerivedBaseChangeData P (DU.pullbackAlong f hAcyclic hQuasicoherent)
+    hComponent
 
 /-- The fully K-flat form of pullback on `D`: the bounded restriction is constructed from the
 same K-flat derived pullback used on `(Dqc)`. -/
@@ -309,17 +323,25 @@ noncomputable def kFlatBoundedPullback
     (hAcyclic : KFlatPullbackAcyclic DU.tensorResolution (baseChangeMap X f))
     (hQuasicoherent : KFlatResolvedPullbackPreservesQuasicoherentCohomology
       DU.tensorResolution (baseChangeMap X f))
-    (hComponent : PullbackPreservesQuasicoherentComponent DT DU P
+    (hComponent : DerivedBaseChangeData.PullbackPreservesQuasicoherentComponent
+      DT.toDerivedBaseChangeData DU.toDerivedBaseChangeData P
       (DU.pullbackAlong f hAcyclic hQuasicoherent))
     (hBounded : (DU.pullbackAlong f hAcyclic hQuasicoherent).PreservesBoundedCoherent) :
     DU.BoundedCategory P ⥤ DT.BoundedCategory P :=
-  boundedPullback DT DU P (DU.pullbackAlong f hAcyclic hQuasicoherent)
+  DerivedBaseChangeData.boundedPullback DT.toDerivedBaseChangeData
+    DU.toDerivedBaseChangeData P (DU.pullbackAlong f hAcyclic hQuasicoherent)
     hComponent hBounded
+
+end KFlatBaseChangeData
+
+namespace DerivedBaseChangeData
+
+variable {f : T ⟶ U}
 
 /-- Pullback on `(Dqc)` when membership in the source component is detected after ambient
 pullback. This is the form in which essential surjectivity descends from the ambient category. -/
 noncomputable def quasicoherentPullbackOfDetection
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
@@ -332,7 +354,7 @@ noncomputable def quasicoherentPullbackOfDetection
 essential surjectivity and detection of component membership imply essential surjectivity of the
 restricted pullback. -/
 noncomputable instance quasicoherentPullbackOfDetection_essSurj
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
@@ -346,7 +368,7 @@ noncomputable instance quasicoherentPullbackOfDetection_essSurj
 /-- Pullback on `D` when bounded-component membership is detected after ambient bounded
 pullback. -/
 noncomputable def boundedPullbackOfDetection
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hBounded : pull.PreservesBoundedCoherent)
@@ -358,7 +380,7 @@ noncomputable def boundedPullbackOfDetection
 
 /-- Lemma 3.18's essential-surjectivity argument for the bounded component. -/
 noncomputable instance boundedPullbackOfDetection_essSurj
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hBounded : pull.PreservesBoundedCoherent)
@@ -380,7 +402,7 @@ deliberately on the *ambient* functor: nothing here proves that any base-change
 pullback is an equivalence. -/
 
 instance quasicoherentPullbackOfDetection_faithful
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
@@ -391,7 +413,7 @@ instance quasicoherentPullbackOfDetection_faithful
   inferInstanceAs (ObjectProperty.preimageLift pull.functor hDetect).Faithful
 
 instance quasicoherentPullbackOfDetection_full
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
@@ -405,7 +427,7 @@ instance quasicoherentPullbackOfDetection_full
 pullback that is an equivalence restricts to an equivalence `(Dqc)_U ≌ (Dqc)_T`
 along the detection of component membership. -/
 noncomputable def quasicoherentPullbackOfDetectionEquivalence
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hDetect : ∀ E : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ U).left,
@@ -416,7 +438,7 @@ noncomputable def quasicoherentPullbackOfDetectionEquivalence
   ObjectProperty.preimageLiftEquivalence pull.functor hDetect
 
 instance boundedPullbackOfDetection_faithful
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hBounded : pull.PreservesBoundedCoherent)
@@ -429,7 +451,7 @@ instance boundedPullbackOfDetection_faithful
     (ObjectProperty.preimageLift (pull.boundedFunctor hBounded) hDetect).Faithful
 
 instance boundedPullbackOfDetection_full
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hBounded : pull.PreservesBoundedCoherent)
@@ -443,7 +465,7 @@ instance boundedPullbackOfDetection_full
 
 /-- Lemma 3.18 for the bounded base-change component `D_U ≌ D_T`. -/
 noncomputable def boundedPullbackOfDetectionEquivalence
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : DerivedBaseChangeData X T) (DU : DerivedBaseChangeData X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (pull : DqcLeftDerivedPullback (baseChangeMap X f))
     (hBounded : pull.PreservesBoundedCoherent)
@@ -454,7 +476,7 @@ noncomputable def boundedPullbackOfDetectionEquivalence
     DU.BoundedCategory P ≌ DT.BoundedCategory P :=
   ObjectProperty.preimageLiftEquivalence (pull.boundedFunctor hBounded) hDetect
 
-end KFlatBaseChangeData
+end DerivedBaseChangeData
 
 end
 
