@@ -20,8 +20,10 @@ loop controller is available.
   formalized layer, with affine witness adapters and theorem-backed boundaries
   for the required local finiteness and filtration-lifting statements. The
   actual base-change and generation theorems remain explicit geometry inputs.
-- Prove the supported form of Theorem 5.3, including the flat/fpqc descent
-  formulas and t-exactness clauses, by reusing the existing Ind-extension data.
+- Reconcile the supported formal part of Theorem 5.3 with the existing
+  Ind-extension data.  Filtered-colimit preservation, descent comparisons,
+  tensor right t-exactness, and the four base-change comparisons remain named
+  geometry-owner inputs until their source theorems are implemented.
 - Remove or rewrite comments and roadmap entries that claim these layers are
   outside the categorical layer once the corresponding declarations are truly
   inhabited; record any remaining external theorem boundary explicitly.
