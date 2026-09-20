@@ -9,6 +9,7 @@ import DerivedAlgGeo.CategoryTheory.ObjectProperty.Bifunctor
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Thick
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Local
+import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.IndFilteredColimits
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Projection
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
@@ -322,6 +323,20 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.hasInduced
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.isLE_iff
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.isGE_iff
+#print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.inclusion_isTExact
+#print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.restriction
+#print axioms CategoryTheory.Triangulated.TStructure.FilteredColimitTruncationData
+#print axioms CategoryTheory.Triangulated.TStructure.FilteredColimitTruncationData.truncLE_preserves
+#print axioms CategoryTheory.Triangulated.TStructure.FilteredColimitTruncationData.truncGE_preserves
+#print axioms CategoryTheory.Triangulated.TStructure.FilteredColimitTruncationData.preserves_truncLE
+#print axioms CategoryTheory.Triangulated.TStructure.FilteredColimitTruncationData.preserves_truncGE
+#print axioms CategoryTheory.Triangulated.TStructure.IndExtensionFilteredColimitData
+#print axioms CategoryTheory.Triangulated.TStructure.IndExtensionFilteredColimitData.indExtension
+#print axioms CategoryTheory.Triangulated.TStructure.IndExtensionFilteredColimitData.truncation
+#print axioms CategoryTheory.Triangulated.TStructure.IndExtensionFilteredColimitData.truncation_preserves
+#print axioms CategoryTheory.Triangulated.TStructure.IndExtensionFilteredColimitData.inclusion_isTExact
+#print axioms CategoryTheory.Triangulated.TStructure.IndExtensionFilteredColimitData.restriction
+#print axioms CategoryTheory.Triangulated.TStructure.IndExtensionFilteredColimitData.aisle_eq_coprodClosure
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.tStructure
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.isBounded
@@ -496,6 +511,7 @@ quasi-compact opens of a base is geometric and is not taken here.
 #print axioms CategoryTheory.Triangulated.TStructure.ext
 #print axioms CategoryTheory.Triangulated.TStructure.ge_eq_of_le_eq
 #print axioms CategoryTheory.Triangulated.TStructure.ext_le
+#print axioms CategoryTheory.Triangulated.TStructure.IsNoetherian
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.tStructure
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.isTExact
@@ -504,4 +520,8 @@ quasi-compact opens of a base is geometric and is not taken here.
 #print axioms CategoryTheory.Triangulated.TStructure.RestrictsAlong
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.restrictsAlong
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.tStructure_eq_of_le_eq
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.ext
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_obj
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_map
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.id
