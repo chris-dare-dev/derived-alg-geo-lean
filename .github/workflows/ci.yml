@@ -736,6 +736,8 @@ jobs:
           nanoda-allow-sorry: false
 
       - name: Pin and coverage records
+        id: pin
+        continue-on-error: true
         run: |
           set -euo pipefail
           python3 scripts/check_pin.py
@@ -747,6 +749,8 @@ jobs:
           done
 
       - name: Algebraic-geometry axiom audit
+        id: ag_axiom_audit
+        continue-on-error: true
         run: |
           set -euo pipefail
           # Development probes are outside the public umbrella and must be
@@ -771,6 +775,8 @@ jobs:
             scripts/AlgebraicGeometryAudit.lean
 
       - name: Stability-condition axiom audit
+        id: stability_axiom_audit
+        continue-on-error: true
         run: |
           set -euo pipefail
           : > stability-condition-audit.txt
@@ -784,6 +790,8 @@ jobs:
           python3 scripts/check_audit.py stability-condition-audit.txt
 
       - name: DG axiom audit
+        id: dg_axiom_audit
+        continue-on-error: true
         run: |
           set -euo pipefail
           lake env lean scripts/DGCategoryAudit.lean > dg-audit.txt 2>&1 || {
@@ -794,6 +802,8 @@ jobs:
           python3 scripts/check_audit.py dg-audit.txt scripts/DGCategoryAudit.lean
 
       - name: Audit completeness
+        id: audit_completeness
+        continue-on-error: true
         run: |
           set -euo pipefail
           # check_audit.py catches an audit that lists a name the source no
@@ -810,6 +820,8 @@ jobs:
           python3 scripts/check_audit_complete.py enum-decls.txt
 
       - name: Single instantiation
+        id: single_instantiation
+        continue-on-error: true
         run: |
           set -euo pipefail
           # The disease detector: a generic abstraction written for N cases,
@@ -829,6 +841,8 @@ jobs:
           python3 scripts/check_single_instantiation.py enum-inhabitants.txt
 
       - name: Environment linters
+        id: environment_linters
+        continue-on-error: true
         run: |
           set -euo pipefail
           # The pre-existing backlog is enumerated per declaration in
@@ -846,6 +860,8 @@ jobs:
           lake exe lint-style
 
       - name: Compiler warning ratchet
+        id: warning_ratchet
+        continue-on-error: true
         run: |
           set -euo pipefail
           # The warnings Lean emits while elaborating were never gated, so they
@@ -865,6 +881,8 @@ jobs:
           python3 scripts/check_warnings.py lean-warnings.log
 
       - name: Gate console encoding
+        id: console_encoding
+        continue-on-error: true
         # Every gate prints declaration names; on this runner's cp1252 console
         # a gate that cannot print `δ` dies with a `charmap` traceback instead
         # of its finding (#868, #869). Checks that each script routes its
@@ -873,6 +891,8 @@ jobs:
         run: python3 scripts/_output.py
 
       - name: Mathlib-style known-answer fixtures
+        id: style_fixtures
+        continue-on-error: true
         # scripts/check_mathlib_style.py itself runs from the edit hook and from
         # scripts/gates.sh, never here -- it judges a branch's own lines, which
         # CI has no use for. Its fixtures are a different question: they are what
@@ -881,6 +901,8 @@ jobs:
         run: python3 scripts/check_mathlib_style.py --self-test
 
       - name: Mathlib-style baseline ratchet
+        id: style_ratchet
+        continue-on-error: true
         # The other half of the same checker. `--self-test` says it still
         # rejects what it is meant to reject; this says the library has not
         # grown a new ERROR outside scripts/style-baseline.json. The edit hook
@@ -889,24 +911,38 @@ jobs:
         run: python3 scripts/check_mathlib_style.py --check-baseline
 
       - name: Stability source independence
+        id: source_independence
+        continue-on-error: true
         run: python3 scripts/check_source_independence.py
 
       - name: Subject ownership layering
+        id: subject_layering
+        continue-on-error: true
         run: python3 scripts/check_layering.py
 
       - name: Umbrella coverage
+        id: umbrella_coverage
+        continue-on-error: true
         run: python3 scripts/check_umbrella_coverage.py
 
       - name: Root reachability
+        id: root_reachability
+        continue-on-error: true
         run: python3 scripts/check_root_reachability.py
 
       - name: Coherent families architecture
+        id: coherent_families
+        continue-on-error: true
         run: python3 scripts/check_coherent_families.py
 
       - name: Explicit numerical data architecture
+        id: numerical_data
+        continue-on-error: true
         run: python3 scripts/check_explicit_numerical_data.py
 
       - name: No declaration uses sorry
+        id: sorry_gate
+        continue-on-error: true
         run: |
           set -euo pipefail
           # This step used to be a serial `lake env lean` over every tracked
@@ -950,6 +986,8 @@ jobs:
           fi
 
       - name: Emit combined environment
+        id: emit
+        continue-on-error: true
         run: |
           set -euo pipefail
           # INTERPRETED, not compiled, and this is the single biggest saving left
@@ -1015,6 +1053,12 @@ jobs:
       # alone and reports "1 in-scope module of 488 built; 0 built
       # declarations" -- green, having compared nothing.
       - name: Contract gates
+        id: contract_gates
+        continue-on-error: true
+        # Skipped rather than run when the emitter failed: this step reads
+        # attest/lean-emission.json, and a missing-input traceback is not a
+        # verdict about the repository. `emit` already reports that failure.
+        if: steps.emit.outcome == 'success'
         run: |
           set -euo pipefail
           # Its own venv, in the workspace. The self-hosted lane is the owner's
@@ -1394,10 +1438,15 @@ jobs:
       # `attest/lean-emission-2.json` is written and read by this step alone, so
       # skipping it leaves nothing downstream short of an input.
       - name: Emitter reproducibility
+        id: emitter_reproducibility
+        continue-on-error: true
+        # The `steps.emit` clause is new and is not part of the gating rule
+        # above it: it reads the same artifact `Contract gates` does.
         if: >-
-          github.ref == 'refs/heads/main'
+          steps.emit.outcome == 'success'
+          && (github.ref == 'refs/heads/main'
           || github.event_name == 'merge_group'
-          || steps.changed.outputs.scope == 'all'
+          || steps.changed.outputs.scope == 'all')
         run: |
           set -euo pipefail
           lake env lean --run exe/Emit.lean --out attest/lean-emission-2.json
@@ -1414,6 +1463,91 @@ jobs:
               raise SystemExit(f"::error::emitter is not deterministic; fields differ: {differing}")
           print("ok: two sweeps byte-identical modulo emitted_at")
           PY
+
+      # ---------------------------------------------------------------------
+      # EVERY GATE REPORTS. This step is what makes the job fail, not the gates.
+      #
+      # `set -e` inside a 30-step job means the FIRST red gate ends the run and
+      # every gate behind it reports `skipped`. That is not a smaller signal, it
+      # is a misleading one: a pull request can look like it has one problem and
+      # have four. Measured on this repository the night of 2026-09-19:
+      # `Audit completeness` went red at #1416 and stayed red, and behind it
+      # `Environment linters` accumulated ten violations from #1421 that nobody
+      # could see until the audit was repaired. Two regressions merged under the
+      # shadow of one, on a tree where every branch inherits `main`.
+      #
+      # So the gates now carry `continue-on-error: true`, which does NOT mean
+      # they stopped mattering: it means their verdict is recorded rather than
+      # thrown, and this step turns the whole set into one exit code. A gate's
+      # own annotation still appears on its own step in the UI.
+      #
+      # `outcome`, not `conclusion`. `continue-on-error` rewrites `conclusion`
+      # to `success` for exactly these steps -- reading it here would make this
+      # check pass on every failure, which is the trap this pattern comes with.
+      #
+      # SKIPPED IS REPORTED, NOT FAILED, and the distinction is narrow on
+      # purpose. Only `Contract gates` and `Emitter reproducibility` can skip,
+      # and only when `emit` failed or when the reproducibility rule excludes
+      # this event -- in the first case `emit` itself is already `failure` and
+      # this step fails on it, in the second the gate was never owed. A gate
+      # that skips for any other reason would be a hole, so the list below
+      # prints the skips rather than passing over them.
+      #
+      # The build step ITSELF stays fail-fast. A library that did not compile
+      # makes every gate after it meaningless, and running twenty checks to say
+      # so twenty times is noise, not coverage.
+      - name: Every gate passed
+        if: always() && steps.checkout.outcome == 'success'
+        env:
+          RESULTS: |
+            pin=${{ steps.pin.outcome }}
+            ag_axiom_audit=${{ steps.ag_axiom_audit.outcome }}
+            stability_axiom_audit=${{ steps.stability_axiom_audit.outcome }}
+            dg_axiom_audit=${{ steps.dg_axiom_audit.outcome }}
+            audit_completeness=${{ steps.audit_completeness.outcome }}
+            single_instantiation=${{ steps.single_instantiation.outcome }}
+            environment_linters=${{ steps.environment_linters.outcome }}
+            warning_ratchet=${{ steps.warning_ratchet.outcome }}
+            console_encoding=${{ steps.console_encoding.outcome }}
+            style_fixtures=${{ steps.style_fixtures.outcome }}
+            style_ratchet=${{ steps.style_ratchet.outcome }}
+            source_independence=${{ steps.source_independence.outcome }}
+            subject_layering=${{ steps.subject_layering.outcome }}
+            umbrella_coverage=${{ steps.umbrella_coverage.outcome }}
+            root_reachability=${{ steps.root_reachability.outcome }}
+            coherent_families=${{ steps.coherent_families.outcome }}
+            numerical_data=${{ steps.numerical_data.outcome }}
+            sorry_gate=${{ steps.sorry_gate.outcome }}
+            emit=${{ steps.emit.outcome }}
+            contract_gates=${{ steps.contract_gates.outcome }}
+            emitter_reproducibility=${{ steps.emitter_reproducibility.outcome }}
+        run: |
+          set -euo pipefail
+          failed=""
+          skipped=""
+          while IFS= read -r line; do
+            [ -n "$line" ] || continue
+            name="${line%%=*}"
+            outcome="${line#*=}"
+            case "$outcome" in
+              success) ;;
+              skipped) skipped="$skipped $name" ;;
+              "")      failed="$failed $name(no-outcome)" ;;
+              *)       failed="$failed $name($outcome)" ;;
+            esac
+          done <<< "$RESULTS"
+          if [ -n "$skipped" ]; then
+            echo "::notice::gates skipped:$skipped"
+          fi
+          if [ -n "$failed" ]; then
+            echo "::error::gate(s) failed:$failed"
+            echo
+            echo "Each failure is annotated on its own step above. They ran"
+            echo "independently, so this list is the whole picture rather than"
+            echo "the first problem encountered."
+            exit 1
+          fi
+          echo "all gates passed"
 
       - name: Upload trust artifacts
         # `always()` alone attached a PREVIOUS run's attest/ from the
