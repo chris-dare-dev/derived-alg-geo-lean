@@ -908,12 +908,39 @@ def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
     return current
 
 
+CONTRACT_VERDICT_TOKENS = {
+    "pass": "PASS",
+    "needs_changes": "NEEDS_CHANGES",
+    "blocked": "BLOCKED",
+}
+
+
+def read_reviewer_output(finding_file: Path) -> tuple[str, str]:
+    """Read a reviewer's verbatim final message and return (text, sha256).
+
+    The reviewer's own output is the evidence. A summary written by the
+    orchestrator is not, because it is indistinguishable from the orchestrator
+    having reviewed the diff itself.
+    """
+    try:
+        text = finding_file.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise LoopError(f"cannot read reviewer output {str(finding_file)!r}: {exc}") from exc
+    if not text.strip():
+        raise LoopError(
+            f"reviewer output {str(finding_file)!r} is empty; "
+            "a round with no readable reviewer message is void, not a pass"
+        )
+    return text, hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def ledger_record_review(
     state_file: Path,
     reviewer: str,
     commit: str,
     verdict: str,
     finding: str | None,
+    finding_file: Path | None = None,
 ) -> int:
     try:
         state = load_state(state_file)
@@ -928,11 +955,24 @@ def ledger_record_review(
         round_state = ensure_review_round(state, commit)
         if any(item.get("reviewer") == reviewer for item in round_state["reviews"]):
             raise LoopError(f"reviewer {reviewer!r} already submitted for round {round_state['number']}")
+        finding_text = ""
+        finding_digest = ""
+        if finding_file is not None:
+            finding_text, finding_digest = read_reviewer_output(finding_file)
+            token = CONTRACT_VERDICT_TOKENS[verdict]
+            if not re.search(rf"\b{token}\b", finding_text, re.I):
+                raise LoopError(
+                    f"reviewer output does not state the recorded verdict {token}; "
+                    "record the verdict the reviewer actually reached"
+                )
         round_state["reviews"].append(
             {
                 "reviewer": reviewer,
                 "verdict": verdict,
                 "finding": finding or "",
+                "finding_text": finding_text,
+                "finding_digest": finding_digest,
+                "finding_source": str(finding_file) if finding_file is not None else "",
                 "recorded_at": utc_now(),
             }
         )
@@ -960,6 +1000,19 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
             raise LoopError(f"cannot adjudicate; missing reviewers: {', '.join(sorted(missing))}")
         if verdict == "pass" and any(item.get("verdict") != "pass" for item in current["reviews"]):
             raise LoopError("pass adjudication requires every reviewer verdict to be pass")
+        if verdict != "blocked":
+            uncaptured = sorted(
+                str(item.get("reviewer"))
+                for item in current["reviews"]
+                if not item.get("finding_digest")
+            )
+            if uncaptured:
+                raise LoopError(
+                    "cannot adjudicate; no captured reviewer output for: "
+                    + ", ".join(uncaptured)
+                    + ". Re-dispatch the reviewer and record its verbatim message with "
+                    "--finding-file, or adjudicate this round blocked"
+                )
         if verdict == "needs_changes" and current["number"] >= state["max_review_rounds"]:
             verdict = "blocked"
             note = (note + " | " if note else "") + "review-round cap reached; stop without another iteration"
@@ -1460,7 +1513,12 @@ def build_parser() -> argparse.ArgumentParser:
     record_parser.add_argument("--reviewer", required=True)
     record_parser.add_argument("--commit", required=True)
     record_parser.add_argument("--verdict", required=True, choices=["pass", "needs_changes", "blocked"])
-    record_parser.add_argument("--finding")
+    record_parser.add_argument("--finding", help="one-line summary; not evidence and cannot stand alone")
+    record_parser.add_argument(
+        "--finding-file",
+        type=Path,
+        help="path to the reviewer's verbatim final message; required before the round can be adjudicated",
+    )
     adjudicate_parser = ledger_sub.add_parser("adjudicate")
     adjudicate_parser.add_argument("--state", required=True, type=Path)
     adjudicate_parser.add_argument("--verdict", required=True, choices=["pass", "needs_changes", "blocked"])
@@ -1531,7 +1589,14 @@ def main(argv: list[str] | None = None) -> int:
                 root = args.repo_root.resolve()
                 return ledger_init(root, repo_path(root, args.spec), args.issue, args.chunk_id, args.state_dir)
             if args.ledger_command == "record-review":
-                return ledger_record_review(args.state.resolve(), args.reviewer, args.commit, args.verdict, args.finding)
+                return ledger_record_review(
+                    args.state.resolve(),
+                    args.reviewer,
+                    args.commit,
+                    args.verdict,
+                    args.finding,
+                    args.finding_file.resolve() if args.finding_file else None,
+                )
             if args.ledger_command == "adjudicate":
                 return ledger_adjudicate(args.state.resolve(), args.verdict, args.note)
             if args.ledger_command == "show":

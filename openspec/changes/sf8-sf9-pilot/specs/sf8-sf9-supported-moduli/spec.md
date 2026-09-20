@@ -35,6 +35,15 @@ from an unproved marker typeclass introduced by the chunk.
   the PR uses a non-closing reference to #554, and the controller leaves #554
   open until the remaining preservation and coherence obligations pass
 
+#### Scenario: Nonzero derived effect in the supported affine lane
+
+- **WHEN** the two-term free resolution of `ZMod 2` is pulled back along
+  `ℤ → ZMod 2`
+- **THEN** the resulting affine bounded-projective derived object has a
+  proved nonzero degree-minus-one homology/Tor witness, while the result stays
+  explicitly restricted to that affine lane and makes no general
+  scheme-level or relative-perfect preservation claim
+
 #### Scenario: Preservation obligation is tested
 
 - **WHEN** a supported object satisfies the declared pseudo-coherence, finite

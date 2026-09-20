@@ -96,6 +96,8 @@ The target slicings are chosen because downstream phase arguments need the
 actual owner data, not only a proposition that some slicing exists. -/
 structure SLocalSlicingData (R : OpenRestrictionFamily X P DS)
     (s : Slicing (DS.QuasicoherentCategory P)) where
+  /-- The restricted slicing on each quasi-compact open of the base, as owner
+  data. `IsSLocalSlicing` below is the propositional shadow of this field. -/
   restriction (U : S.Opens) (hU : CompactSpace U.toScheme) :
     s.Restriction (R.restriction U hU)
 
@@ -142,7 +144,9 @@ structure TwoDistinctAffineSLocalTStructures
     (R : OpenRestrictionFamily X P DS)
     (s₁ s₂ : Slicing (DS.QuasicoherentCategory P)) where
   affineBase : IsAffine S
+  /-- S-local data for the t-structure underlying the first slicing. -/
   first : SLocalData R (s₁.toTStructure _)
+  /-- S-local data for the t-structure underlying the second slicing. -/
   second : SLocalData R (s₂.toTStructure _)
   distinct : s₁.toTStructure _ ≠ s₂.toTStructure _
 
