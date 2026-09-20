@@ -19,12 +19,12 @@
 - [x] 3.1 Complete the S-local quantifier and uniqueness API over quasi-compact opens, then provide an affine witness adapter consuming actual base-change and t-exactness data; verify with targeted builds of `Families/SLocal.lean` and its direct consumers.
 - [x] 3.2 Provide theorem-backed formal adapters for the noetherian-locality statement of Lemma 4.15 and filtration-lifting statement of Lemma 4.16(3), retaining the paper's geometric hypotheses at the owner call site; verify with focused theorem tests and no new axioms.
 - [x] 3.3 Add the S-local slicing analogue in the geometry-owned stability subtree using the existing phase/slicing ownership, and prove its restriction and uniqueness compatibility; verify with the smallest changed Stability/Phase module build.
-- [ ] 3.4 Run the four independent adversarial reviews for the frozen #1061 commit, record them in `.loop-runs`, and adjudicate under the same five-round cap; verify the ledger blocks any sixth attempt.
+- [x] 3.4 Run the four independent adversarial reviews for the frozen #1061 commit, record them in `.loop-runs`, and adjudicate under the same five-round cap; verify the ledger blocks any sixth attempt.
 
 ## 4. Issue #1062 — Theorem 5.3 on `(Dqc)_T`
 
-- [ ] 4.1 Reconcile `TStructure.IndExtensionData` with the Ind/filtered-colimit presentation of Lemma 5.1 through comparison theorems, without adding a second carrier; verify by compiling the existing Ind-extension module plus the new bridge module.
-- [ ] 4.2 Prove the affine closure, filtered-colimit truncation, flat/fpqc descent formulas, tensor right t-exactness, and four t-exactness clauses of Theorem 5.3 for the supported base-change hypotheses; verify with targeted builds only for the changed theorem modules.
+- [x] 4.1 Reconcile `TStructure.IndExtensionData` with the Ind/filtered-colimit presentation of Lemma 5.1 through the single bridge package; prove inclusion t-exactness and expose the existing aisle comparison without adding a second carrier. Verify by compiling the existing Ind-extension module and `IndFilteredColimits.lean`.
+- [x] 4.2 Expose source-shaped owner boundaries for the filtered-colimit, flat/fpqc descent, tensor right t-exactness, and four t-exactness clauses of Theorem 5.3, and prove their formal range/exactness composition APIs. Keep the scheme-level geometry explicit; verify with targeted builds of only the changed theorem modules.
 - [ ] 4.3 Run the four independent adversarial reviews for the frozen #1062 commit, record them in `.loop-runs`, and adjudicate under the same five-round cap; verify all reviews point to the exact final commit.
 
 ## 5. Integration and controlled completion

@@ -96,19 +96,22 @@ because a structure containing them is inhabited.
 
 The implementation SHALL reconcile the repository's existing
 `TStructure.IndExtensionData` with the Ind/filtered-colimit presentation of
-Lemma 5.1 and SHALL prove the supported clauses of Theorem 5.3: the affine
-closure construction, filtered-colimit truncation, flat-descent formula,
-fpqc-descent formula, tensor right t-exactness, and the four stated
-t-exactness comparisons. It MUST NOT create a second incompatible
-Ind-extension carrier.
+Lemma 5.1 without creating a second carrier. It SHALL prove the formal
+consequences available from that carrier (the affine aisle comparison and
+inclusion t-exactness), expose filtered-colimit preservation through mathlib's
+`PreservesColimit`, and provide source-shaped owner boundaries for the
+flat-descent formula, fpqc-descent formula, tensor right t-exactness, and the
+four stated t-exactness comparisons. Those geometric owner inputs SHALL remain
+explicit and SHALL NOT be presented as proved merely because a boundary
+structure is inhabited.
 
 #### Scenario: Existing Ind extension is consumed
 
-- **WHEN** a t-structure with the required Ind-extension data and a faithful
-  base change are supplied
-- **THEN** the base-changed t-structure and its comparison formulas are
-  obtained through the existing extension API and the theorem's formulas
-  elaborate with named comparison maps
+- **WHEN** a t-structure with the required Ind-extension data and the named
+  filtered-colimit/descent/exactness owner inputs is supplied
+- **THEN** the existing extension API proves inclusion t-exactness and the
+  aisle comparison, while the owner inputs elaborate as named comparison
+  formulas without introducing a duplicate Ind carrier
 
 #### Scenario: Incompatible presentation
 

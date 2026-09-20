@@ -8,12 +8,53 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability
 import DerivedAlgGeo.AlgebraicGeometry.Moduli
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeLinearity
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.Theorem53
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
+
+/-! ## Formal boundaries for Theorem 5.3 (SF11.3)
+
+The generic Ind/filtered-colimit bridge and the source-shaped descent and
+exactness owner data are audited here. Their structures are inputs at the
+geometry owner; the audit ensures that the formal composition layer adds no
+untrusted axioms.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.extension
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.inclusion_isTExact
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.truncation_preserves
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.affineAisle
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.inRange
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.restriction
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.localTStructure
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.range_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.inRange_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.functor
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.rightTExact
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.isLE_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.functor
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.rightTExact
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.leftTExact
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.isTExact
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.isLE_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.isGE_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.LocalComparisonData
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.LocalComparisonData.range_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.LocalComparisonData.inRange_iff
 
 /-! ## Scheme-derived and stability-specific realizations of family interfaces -/
 

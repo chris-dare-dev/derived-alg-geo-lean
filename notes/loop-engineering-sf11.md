@@ -147,6 +147,55 @@ replacement for a Lean theorem or an issue acceptance criterion.
   leading-dot directories; otherwise loop-control debugging can be mistaken
   for a source or mathematical failure.
 
+## SF11.3 observations (2026-09-20)
+
+- The checked-out `IndExtension.lean` imported the object-property theorem file
+  named `TStructure/Restriction.lean`, but the one-functor
+  `TStructure.Restriction` carrier is owned by `TStructure/Local.lean`.
+  The Ind-extension module therefore needed an explicit `Local` import before
+  it could expose its proved restriction consequence. Similar filenames are
+  easy for an agent to confuse; inspect the namespace before changing an
+  import.
+- Mathlib's `PreservesColimit` takes the diagram and then the functor:
+  `PreservesColimit K F`. The expression `PreservesColimit K (K ⋙ F)` is a
+  type error, not the statement that `F` preserves the colimit of `K`.
+- In dependent category families, annotate the shift index explicitly as
+  `[∀ (i) (n : ℤ), (shiftFunctor (D i) n).Additive]`; leaving `n` implicit
+  caused a stuck `HasShift` instance while building the Theorem 5.3 boundary.
+- Theorem 5.3's scheme-level flat/fpqc descent, tensor, and four base-change
+  comparisons are not available as generic theorems in the current tree. The
+  new `Families/Theorem53.lean` therefore exposes actual source-shaped range
+  and exactness owner data, while its formal theorems only compose supplied
+  comparisons. The OpenSpec task wording was rewritten to say this explicitly;
+  it must not be read as a proof of the geometric inputs.
+- The focused native builds for the new bridge and Theorem 5.3 modules replay
+  roughly 1,747 cached prerequisites. This remains a targeted module build;
+  no umbrella or full-repository build was invoked. If WSL stalls during this
+  cache traversal, use the native PowerShell `lake.exe` path.
+- The official stability audit imports a much broader graph than the new
+  #1062 modules; a cold direct run stopped on an unrelated missing
+  `FourierMukai` object before reaching the declarations under review. A
+  focused temporary audit of the exact bridge/Theorem 5.3 declarations passed
+  with only `propext`, `Classical.choice`, and `Quot.sound`, and the permanent
+  audit lists were updated separately. Do not mistake the broad audit's import
+  failure for a theorem failure or silently skip the focused audit.
+- Lean does not generate `.mk.inj`/`.mk.sizeOf_spec` declarations for several
+  proposition-valued or proof-irrelevant structures in this boundary. Adding
+  those guessed names to the axiom audit produces unknown-constant errors;
+  audit only the declarations that actually exist.
+- The umbrella/root reachability gate does not treat a declaration-heavy
+  `CompactlyGenerated.lean` as the child-directory umbrella: the new
+  `IndFilteredColimits` leaf had to be re-exported from the higher
+  `CategoryTheory/Triangulated.lean`, and `Families.lean` had to import
+  `Theorem53` directly. A targeted module build can pass while the leaf is
+  silently absent from the repository build graph, so run the no-build
+  umbrella gate before freezing the review head.
+- The loop controller's frozen scope matching likewise distinguishes a
+  directory prefix from a same-stem umbrella file: `Families` did not admit
+  `Families.lean` during PR creation until the exact umbrella path was listed.
+  Include both entries when a chunk edits an umbrella beside its child
+  directory.
+
 ## Follow-up observations (2026-09-19)
 
 - Moving the operation-facing declarations from `KFlatBaseChangeData` to

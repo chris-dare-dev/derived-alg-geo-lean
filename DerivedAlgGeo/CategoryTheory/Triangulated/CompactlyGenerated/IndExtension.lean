@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Brown
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Orthogonal
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Local
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Restriction
 
 /-!
@@ -245,6 +246,38 @@ structure IndExtensionData (P : ObjectProperty C) [P.IsTriangulated]
     large.IsGE X.obj n ↔ small.IsGE X n
 
 namespace IndExtensionData
+
+/-! ### Formal restriction consequences
+
+The two degreewise equivalences in `IndExtensionData` are already the
+restriction theorem needed by the Ind/filtered-colimit presentation.  Keeping
+the consequence here prevents downstream Theorem 5.3 code from rebuilding a
+second restriction carrier or treating t-exactness as another geometric input.
+-/
+
+/-- The inclusion of the selected small category is t-exact for the large
+t-structure carried by an Ind extension. -/
+theorem inclusion_isTExact
+    (P : ObjectProperty C) [P.IsTriangulated]
+    (small : TStructure P.FullSubcategory) (large : TStructure C)
+    (h : IndExtensionData.{w} P small large) :
+    P.ι.IsTExact small large := by
+  letI : P.ι.IsRightTExact small large :=
+    { isLE_map := fun X n hX => (h.isLE_iff X n).2 hX }
+  letI : P.ι.IsLeftTExact small large :=
+    { isGE_map := fun X n hX => (h.isGE_iff X n).2 hX }
+  exact Functor.isTExact_of
+
+/-- Package the large t-structure as the existing one-functor restriction
+record.  The target is not a new t-structure carrier: it is the `large`
+field already supplied to `IndExtensionData`. -/
+def restriction
+    (P : ObjectProperty C) [P.IsTriangulated]
+    (small : TStructure P.FullSubcategory) (large : TStructure C)
+    (h : IndExtensionData.{w} P small large) :
+    small.Restriction P.ι :=
+  { tStructure := large
+    isTExact := h.inclusion_isTExact }
 
 /-- Assemble A.14 from a compact generating property whose `Coprod` closure
 is the closure of the mapped bounded aisle.

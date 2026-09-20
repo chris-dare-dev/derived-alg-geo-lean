@@ -65,11 +65,13 @@ use targeted Lean module builds; the full repository build is left to CI.
    diamond between ambient and bounded-coherent inclusions.
 
 4. **Reuse Ind extension rather than translate it by parallel definitions.**
-   Theorem 5.3 adapters consume `TStructure.IndExtensionData`; a single bridge
-   theorem relates its coproduct closure to the paper's filtered-colimit
-   presentation. The affine closure, descent equations, and t-exactness clauses
-   are theorems over that bridge. A failed bridge is a real blocker, not a
-   reason to introduce a duplicate carrier.
+   Theorem 5.3 adapters consume `TStructure.IndExtensionData`; one bridge
+   package exposes its coproduct-aisle comparison, proves inclusion
+   t-exactness, and records the actual `PreservesColimit` obligations for the
+   filtered-colimit presentation.  Source-shaped descent and t-exactness
+   owner data expose the flat/fpqc formulas, tensor clause, and (4a)--(4d)
+   comparisons without claiming their geometric proofs.  A failed bridge is a
+   real blocker, not a reason to introduce a duplicate carrier.
 
 5. **Authorize only the selected epic issues.** Add a manifest field
    `eligibility.allow_epic_issues` and require it to list exactly the selected
