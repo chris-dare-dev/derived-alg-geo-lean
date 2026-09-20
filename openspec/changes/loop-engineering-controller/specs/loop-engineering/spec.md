@@ -32,7 +32,7 @@ acceptance statements.
 
 The controller SHALL require mathematical, repository-boundary, abstraction,
 and Lean/mathlib-style reviewers to record verdicts for the same commit before
-adjudication, and SHALL allow no more than three review/improve rounds for one
+adjudication, and SHALL allow no more than five review/improve rounds for one
 frozen chunk.
 
 #### Scenario: Passing panel
@@ -41,10 +41,10 @@ frozen chunk.
 - **THEN** adjudication may mark the chunk passed and the ledger records the
   reviewer identities, findings, commit, and timestamp
 
-#### Scenario: Third round still needs changes
+#### Scenario: Fifth round still needs changes
 
-- **WHEN** a third review round is adjudicated as needing changes
-- **THEN** the ledger marks the chunk blocked and refuses to create a fourth
+- **WHEN** a fifth review round is adjudicated as needing changes
+- **THEN** the ledger marks the chunk blocked and refuses to create a sixth
   review round
 
 #### Scenario: A reviewer tries to review a different commit mid-round

@@ -14,7 +14,7 @@ turning unattended execution into an unbounded or mathematically unsafe agent.
 - Add a bounded loop controller that validates a run manifest, performs a
   read-only preflight, records independent reviews, and guards remote actions.
 - Require mathematical, repository-boundary, abstraction, and style review for
-  each frozen implementation chunk, with no more than three review/improve
+  each frozen implementation chunk, with no more than five review/improve
   rounds per chunk.
 - Keep GitHub comments, issue closure, pushes, pull-request creation, approval,
   and merging as separately named manifest capabilities.

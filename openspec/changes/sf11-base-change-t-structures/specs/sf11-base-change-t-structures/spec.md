@@ -48,8 +48,10 @@ represent.
 
 - **WHEN** the stated scheme hypotheses and all declared source-component
   hypotheses hold
-- **THEN** the §3 statements compile with actual witnesses and no placeholder
-  existence or preservation conclusion
+- **THEN** the formal §3 statements compile with theorem-backed closure and
+  comparison results, while every genuinely external geometric witness remains
+  named at its geometry-owner call site rather than being treated as a proof by
+  mere structure inhabitation
 
 #### Scenario: Out-of-scope morphism
 
@@ -116,7 +118,7 @@ Ind-extension carrier.
 
 The enabled SF11 run SHALL name exactly issues #1060, #1061, and #1062,
 freeze file scopes and acceptance statements per chunk, require all four
-independent review lenses, and stop a chunk after its third unsuccessful
+independent review lenses, and stop a chunk after its fifth unsuccessful
 review/improve round. Explicit authorization for the issues' `epic` labels
 MUST be represented in the manifest; the controller MUST continue to reject
 unapproved `epic`, blocked, research, and spike issues. Repository comments,
@@ -130,8 +132,8 @@ be recorded in the checked-in loop-engineering notes.
 - **THEN** preflight admits only those named issues and reports the exception
   in its validation output
 
-#### Scenario: Fourth review attempt
+#### Scenario: Sixth review attempt
 
-- **WHEN** a third review round still adjudicates as needing changes
-- **THEN** the ledger marks the chunk blocked and refuses any fourth round,
+- **WHEN** a fifth review round still adjudicates as needing changes
+- **THEN** the ledger marks the chunk blocked and refuses any sixth round,
   push, approval, merge, or issue closure for that chunk

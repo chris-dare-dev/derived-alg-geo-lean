@@ -17,6 +17,11 @@ For `Dqc`, compact generation reduces fullness to two formal compatibility
 facts: perfect filtrations remain quasicoherent filtrations after forgetting
 compactness, and the resulting total envelope is closed under coproducts.
 Neither fact is replaced by a prepackaged fullness assumption.
+
+The SF11.1 follow-up keeps these facts as geometry-owner inputs: the formal
+theorem below propagates them to `Dqc` fullness, but the structure fields are
+not themselves proofs that compact generation or filtration compatibility
+holds for every scheme base change.
 -/
 
 noncomputable section

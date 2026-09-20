@@ -97,13 +97,14 @@ replacement for a Lean theorem or an issue acceptance criterion.
   command-count source. Avoid running that slice while another Lake build is
   compiling the same cache: concurrent workers can race on intermediate
   `.olean` paths and report misleading “file not found” failures.
-- A passing loop ledger certifies the reviewed commit and its adversarial
-  checks; it does not automatically prove the chunk's OpenSpec checklist or
-  GitHub issue acceptance text. In this run the exact producer/audit slice
-  passed while tasks 2.1–2.3 still truthfully record supplied compactness,
-  generation, and coherence obligations. Do not push or close #1060 from the
-  ledger alone, and do not mark those tasks complete without theorem-backed
-  evidence.
+- Historical caution from the pre-follow-up wording: a passing loop ledger
+  certifies the reviewed commit and its adversarial checks; it does not
+  automatically prove the chunk's OpenSpec checklist or GitHub issue
+  acceptance text. At that point the exact producer/audit slice passed while
+  tasks 2.1–2.3 still truthfully recorded supplied compactness, generation,
+  and coherence obligations. The active five-round contract below records the
+  later explicit re-scope; do not silently treat this historical warning as a
+  proof of those geometric hypotheses.
 - Some completed reviewer turns returned an empty final-message payload from
   the app even though their tool work ended. Record that as a controller
   visibility defect and back any adjudication with independently captured
@@ -140,6 +141,11 @@ replacement for a Lean theorem or an issue acceptance criterion.
   output and an uninterruptible Python process. Treat that as an environment
   stall, stop the owned scanner rather than waiting on it indefinitely, and
   retain the individual gate results already emitted.
+- For the five-round follow-up, the no-build gates were run natively with
+  PowerShell and `python`, including `check_layering.py`; all passed. The
+  default roadmap gate also passed. A scoped roadmap check against a ref with
+  no changed roadmap entries reports the intentional “no roadmap items found”
+  failure, so that invocation is not evidence of a roadmap defect.
 
 - The issue acceptance and the OpenSpec task wording are not identical. Issue
   #1060 explicitly carries strongness and finite-amplitude facts as downstream
@@ -161,9 +167,10 @@ replacement for a Lean theorem or an issue acceptance criterion.
   given the actual changed declarations and their acceptance contract in small
   excerpts; the Codex agent remains the mathematical quality gate.
 
-## Current blocker matrix (round 2)
+## Historical blocker matrix (round 2)
 
-The following is the boundary reached by the current #1060 candidate. It is
+The following is the boundary reached before the five-round follow-up contract
+was written. It is
 intentionally declaration-level so a later agent can distinguish a completed
 carrier refactor from a theorem that still needs geometric input.
 
@@ -191,7 +198,26 @@ carrier refactor from a theorem that still needs geometric input.
   coherent-preservation theorem, or component-detection theorem has been
   constructed by this candidate.
 
-Therefore tasks 2.1--2.3 must remain unchecked until these witnesses are either
-proved in their geometry owners or explicitly re-scoped as external hypotheses
-in the frozen OpenSpec contract. A passing targeted build is evidence for the
-API boundary only; it is not evidence that this matrix is discharged.
+Under the pre-follow-up wording, tasks 2.1--2.3 correctly remained unchecked
+until these witnesses were either proved in their geometry owners or explicitly
+re-scoped as external hypotheses in the frozen OpenSpec contract. The active
+follow-up contract below makes that re-scoping explicit. A passing targeted
+build is evidence for the API boundary only; it is not evidence that the
+geometric hypotheses themselves are proved.
+
+## Current five-round follow-up contract
+
+The follow-up explicitly re-scopes the supported part of tasks 2.1--2.3:
+formal closure, restriction, comparison, and detection theorems are complete
+when they consume the named geometry-owner hypotheses above; the hypotheses
+are not themselves claimed as proved. The active task wording now records that
+boundary and uses the user-authorized five-round cap. The earlier three-round
+ledger remains preserved under `.loop-runs/sf11-1-followup/` and is not reused
+as evidence for the new candidate.
+
+A tempting but invalid shortcut was to generalize only
+`CompactlyGenerated/Brown.lean` from universe zero to the scheme universe.
+Its mapping-telescope factorization API is also universe-zero, so a partial
+generalization produced cascading universe mismatches. Do not widen one layer
+of a universe-sensitive representability construction without first auditing
+the entire telescope dependency chain; the attempted edit was reverted.

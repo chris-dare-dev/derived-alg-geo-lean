@@ -24,7 +24,7 @@ use targeted Lean module builds; the full repository build is left to CI.
   resolutions as a producer, component restrictions as lifts, and local
   t-structures/slicings as consumers of those components.
 - Give each implementation chunk a small frozen file set and run the four
-  independent adversarial reviews on the same commit, with a hard three-round
+  independent adversarial reviews on the same commit, with a hard five-round
   cap.
 - Record repository inconsistencies and avoidable agent friction in a checked-in
   note rather than relying on chat history.
@@ -81,7 +81,7 @@ use targeted Lean module builds; the full repository build is left to CI.
    #1060 → #1061 → #1062. Each chunk has a fixed directory/file-prefix list,
    explicit acceptance statements, targeted build commands, and the same four
    reviewers. After a commit is frozen, a finding either produces one revised
-   commit in the next round or is adjudicated; a third unsuccessful round
+   commit in the next round or is adjudicated; a fifth unsuccessful round
    records `blocked` and terminates that chunk.
 
 7. **Treat notes as a repository artifact.** `notes/loop-engineering-sf11.md`
@@ -99,8 +99,8 @@ use targeted Lean module builds; the full repository build is left to CI.
 ## Risks / Trade-offs
 
 - **[Geometric witnesses exceed the current library]** → Keep the exact paper
-  hypotheses at the call site and stop the affected ledger after three review
-  rounds; do not replace them with postulates.
+  hypotheses at the geometry owner and stop the affected ledger after five
+  review rounds; do not replace them with postulates.
 - **[A broad Families directory causes accidental scope drift]** → Freeze
   changed-file prefixes before implementation, run the repository-boundary
   review, and let the controller reject any changed path outside the chunk.
