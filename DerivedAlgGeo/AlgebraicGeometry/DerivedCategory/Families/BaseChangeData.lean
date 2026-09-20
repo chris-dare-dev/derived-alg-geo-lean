@@ -15,8 +15,13 @@ quasicoherent component `(Dqc)_T`, the bounded component `D_T` -- takes those
 three as separate arguments.
 
 This file bundles them. `DerivedBaseChangeData` is that bundle and nothing more:
-two `DqcLeftDerivedPullback`s and a tensor bifunctor. It says how base change
-behaves, not how it was produced.
+two `DqcLeftDerivedPullback`s and an operation-level tensor bifunctor. It says
+how base change is consumed, not how it was produced. In particular,
+`derivedTensor` is deliberately not presented as a universal-property
+construction of the unbounded derived tensor on `Dqc`; exactness, monoidal
+coherence, and geometric existence must be supplied by a producer or by the
+theorem using the operation. A field of this type is therefore an interface,
+not a proof of the corresponding geometric fact.
 
 **Why the bundle is the root and not the K-flat one.** K-flat resolutions are a
 *model*: one way to produce these three operations, and the one

@@ -134,3 +134,58 @@ replacement for a Lean theorem or an issue acceptance criterion.
   output and an uninterruptible Python process. Treat that as an environment
   stall, stop the owned scanner rather than waiting on it indefinitely, and
   retain the individual gate results already emitted.
+
+- The issue acceptance and the OpenSpec task wording are not identical. Issue
+  #1060 explicitly carries strongness and finite-amplitude facts as downstream
+  hypotheses, while tasks 2.2--2.3 ask this tranche to prove the corresponding
+  geometric witnesses. The `DerivedBaseChangeData` refactor satisfies the
+  carrier/construction boundary, but it does not close those tasks: tensor
+  duality, generation propagation, projection approximation/restriction,
+  bounded coherence, finite amplitude, and component detection remain visible
+  inputs. Do not mark 2.1--2.3 complete or close #1060 from the refactor alone.
+- The first adversarial round exposed an operational loop hazard: multiple
+  reviewers independently launched broad cold-cache Lean builds despite being
+  given frozen targeted evidence. The Codex app currently has no reliable
+  cancellation/result-payload path for an active reviewer turn, so a bounded
+  run must forbid reviewer builds in the prompt and stop only clearly owned
+  process trees after the time budget is exceeded. Do not kill the external
+  GitHub runner while cleaning this up.
+- A broad diff sent to the local review model was misclassified as an audit-only
+  change. For this repository, local adversarial passes are useful only when
+  given the actual changed declarations and their acceptance contract in small
+  excerpts; the Codex agent remains the mathematical quality gate.
+
+## Current blocker matrix (round 2)
+
+The following is the boundary reached by the current #1060 candidate. It is
+intentionally declaration-level so a later agent can distinguish a completed
+carrier refactor from a theorem that still needs geometric input.
+
+- Task 2.1: `DerivedBaseChangeData` is the sole operation-facing carrier;
+  `KFlatBaseChangeData.toDerivedBaseChangeData` is a producer, and
+  `DerivedBaseChangeData.ofExactPullbacks` is an exact-pullback producer. The
+  root `derivedTensor` field is still an explicit bifunctor interface, not a
+  universal-property construction of unbounded `Dqc` tensor. Quasicoherence
+  preservation and compact preservation remain explicit where the repository
+  has no general theorem.
+- Task 2.2: the formal sequence/decomposition chain compiles, but
+  `CompactFiberTensorDuality.PushforwardPreservesSourceComponents`,
+  `QuasicoherentFullnessPropagationData`,
+  `QuasicoherentProjectionApproximationData`,
+  `PerfectProjectionRestrictionData`, and
+  `DerivedBaseChangeData.PreservesCompactObjects` still carry the corresponding
+  duality, fullness, projection, restriction, and compactness witnesses. These
+  are visible call-site obligations; they are not concrete proofs of the
+  geometric statements.
+- Task 2.3: `TargetBoundedTStructure`,
+  `DecompositionData.HasFiniteAmplitude`,
+  `DecompositionData.PreservesCoherentCohomology`, and bounded-sequence fullness
+  remain inputs. The bounded and functor-equivalence APIs are honest conditional
+  theorems, but no general target t-structure, finite-amplitude theorem,
+  coherent-preservation theorem, or component-detection theorem has been
+  constructed by this candidate.
+
+Therefore tasks 2.1--2.3 must remain unchecked until these witnesses are either
+proved in their geometry owners or explicitly re-scoped as external hypotheses
+in the frozen OpenSpec contract. A passing targeted build is evidence for the
+API boundary only; it is not evidence that this matrix is discharged.
