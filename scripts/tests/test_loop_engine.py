@@ -177,6 +177,23 @@ class LoopEngineTests(unittest.TestCase):
             ],
         )
 
+    def test_frozen_scope_preserves_dot_directories(self) -> None:
+        self.assertTrue(
+            loop_engine.path_is_in_frozen_chunk(
+                ".claude/README.md", [".claude"]
+            )
+        )
+        self.assertTrue(
+            loop_engine.path_is_in_frozen_chunk(
+                "./.github/CODEOWNERS", ["./.github"]
+            )
+        )
+        self.assertFalse(
+            loop_engine.path_is_in_frozen_chunk(
+                "claude/README.md", [".claude"]
+            )
+        )
+
     def test_ledger_requires_all_reviewers_and_stops_after_five_rounds(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

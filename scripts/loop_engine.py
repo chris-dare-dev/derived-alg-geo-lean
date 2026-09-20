@@ -1057,11 +1057,20 @@ def read_body_file(root: Path, value: str) -> str:
     return body
 
 
+def normalize_scoped_path(value: str) -> str:
+    """Normalize a repository-relative path without erasing dot directories."""
+
+    normalized = value.replace("\\", "/")
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    return normalized.rstrip("/")
+
+
 def path_is_in_frozen_chunk(path: str, allowed_prefixes: Iterable[str]) -> bool:
-    normalized = path.replace("\\", "/").lstrip("./")
+    normalized = normalize_scoped_path(path)
     return any(
-        normalized == prefix.replace("\\", "/").rstrip("/")
-        or normalized.startswith(prefix.replace("\\", "/").rstrip("/") + "/")
+        normalized == normalize_scoped_path(prefix)
+        or normalized.startswith(normalize_scoped_path(prefix) + "/")
         for prefix in allowed_prefixes
     )
 
