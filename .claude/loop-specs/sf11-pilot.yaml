@@ -87,6 +87,12 @@ issues:
           - scripts/AlgebraicGeometryAudit/StabilityConditionFamilies.lean
           - openspec/changes/sf11-base-change-t-structures/tasks.md
           - notes/loop-engineering-sf11.md
+        lift_targets:
+          # Ancestor this chunk's statements may actually belong to:
+          # the abstract triangulated fiber/base-change root (layers.md:355).
+          # Declaring it opens nothing; the controller refuses a diff here until
+          # a reviewer records pass_with_lift naming a path under it.
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Families
         acceptance:
           - D_T and (Dqc)_T are constructed from the external-product closure and bounded-coherent intersection, not postulated.
           - Pullback/pushforward, adjunction, projection, boundedness, and Lemma 3.18 statements compile with exact explicit hypotheses and no sorry or admit.
@@ -108,6 +114,12 @@ issues:
           - .claude/roadmap/stability-families.yaml
           - openspec/changes/sf11-base-change-t-structures/tasks.md
           - notes/loop-engineering-sf11.md
+        lift_targets:
+          # Ancestor this chunk's statements may actually belong to:
+          # the abstract triangulated fiber/base-change root (layers.md:355).
+          # Declaring it opens nothing; the controller refuses a diff here until
+          # a reviewer records pass_with_lift naming a path under it.
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Families
         acceptance:
           - S-locality quantifies over quasi-compact opens and has uniqueness and two affine-base inhabitants.
           - Lemma 4.15, Lemma 4.16(3), and the slicing analogue are theorem-backed and compile without new axioms.
@@ -131,6 +143,12 @@ issues:
           - .claude/roadmap/stability-families.yaml
           - openspec/changes/sf11-base-change-t-structures/tasks.md
           - notes/loop-engineering-sf11.md
+        lift_targets:
+          # Ancestor this chunk's statements may actually belong to:
+          # the abstract triangulated fiber/base-change root (layers.md:355).
+          # Declaring it opens nothing; the controller refuses a diff here until
+          # a reviewer records pass_with_lift naming a path under it.
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Families
         acceptance:
           - The existing Ind-extension carrier is reused through a proved comparison with the filtered-colimit presentation.
           - Theorem 5.3 clauses (1)-(5), including flat/fpqc descent and t-exactness, compile without duplicate carriers or postulated conclusions.

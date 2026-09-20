@@ -171,8 +171,13 @@ them:
 
 - A lift whose target is **inside** the frozen file list is a normal
   `needs_changes`. It is actionable here, so it costs a round.
-- A lift whose target is **outside** the frozen file list cannot be implemented
-  in this chunk. Do not turn it into a `needs_changes` the chunk cannot satisfy,
+- A lift whose target is a declared `lift_targets` prefix becomes writable the
+  moment the reviewer records it — authorization keys off the recorded review,
+  not the adjudication. Adjudicate `needs_changes` to implement it now in the
+  now-open ancestor, or `pass_with_lift` to ship the chunk and defer it. Prefer
+  implementing it now when it is small; prefer deferring when it cascades.
+- A lift whose target is **outside** both the frozen file list and any declared
+  `lift_targets` prefix cannot be implemented in this chunk. Do not turn it into a `needs_changes` the chunk cannot satisfy,
   and do not drop it. The reviewer closes `pass_with_lift` with a `--lift-target`;
   append its `LIFT:` block to `docs/architecture/generalization-backlog.md` as an
   `UNVERIFIED` row, then adjudicate the round `pass_with_lift`. The controller

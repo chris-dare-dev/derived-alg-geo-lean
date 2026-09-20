@@ -84,6 +84,12 @@ issues:
           - openspec
           - scripts
           - notes/loop-engineering-sf11.md
+        lift_targets:
+          # Ancestor this chunk's statements may actually belong to:
+          # the abstract triangulated fiber/base-change root (layers.md:355).
+          # Declaring it opens nothing; the controller refuses a diff here until
+          # a reviewer records pass_with_lift naming a path under it.
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Families
         acceptance:
           - Each task 2.1-2.3 obligation has a theorem-backed implementation or a named external theorem hypothesis at the geometry owner; no structure field is presented as a proof merely because it is inhabited.
           - D_T and (Dqc)_T remain constructed from external-product closure and bounded-coherent intersection, with all inclusion comparison maps and functor restrictions explicit.

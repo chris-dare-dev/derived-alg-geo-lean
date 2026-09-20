@@ -34,25 +34,30 @@ chunks:
       - DerivedAlgGeo/<plausible ancestor>
 ```
 
-Then, last in each issue's chunk list, a chunk that implements what the reviewers
-asked for:
+### What happens when a reviewer opens one
 
-```yaml
-  - id: <issue-slug>-lift
-    scope: implement the lift findings recorded against this issue
-    closure: progress          # a lift chunk does not close the tracked issue
-    files:
-      - <the union of this issue's lift_targets>
-      - docs/architecture/abstraction-tree.md
-      - docs/architecture/generalization-backlog.md
-    acceptance:
-      - Every lift finding recorded against this issue's chunks is either
-        implemented here, or recorded FALSIFIED with a counterexample.
-```
+Authorization keys off the **recorded review**, not the adjudication. The moment
+a reviewer records `pass_with_lift --lift-target <path under a declared prefix>`,
+that prefix is writable for this ledger. So at adjudication the orchestrator has
+a real choice, and both options are legal:
 
-Because ledgers are keyed on chunk id, the lift chunk gets its own ledger, its
-own frozen list, and a fresh full panel. Nothing about it moves a digest, because
-the manifest declared it before anything armed.
+- **`needs_changes`** — implement the lift now. The ancestor is open, the next
+  round reviews the widened diff, and it costs one round like any other fix.
+  Choose this when the lift is small and the chunk is young.
+- **`pass_with_lift`** — ship the chunk as reviewed and carry the lift to
+  `docs/architecture/generalization-backlog.md` for a later run. Costs no round.
+  Choose this when the lift is large, cascading, or would outgrow the issue.
+
+Note the asymmetry: only the second requires the backlog row, because only the
+second defers. Adjudication refuses `pass_with_lift` while the target is missing
+from the backlog, so a deferred lift cannot be lost.
+
+**Do not pre-declare a separate `<issue>-lift` chunk.** It deadlocks a run that
+finds no lifts: `verify_local_chunk_files` refuses a chunk whose diff is empty
+("frozen chunk has no committed file changes relative to the protected base"), so
+a lift chunk with nothing to implement fails the run rather than being skipped. A
+lift too large for the current issue belongs in the backlog and then in the next
+manifest, where it is ordinary planned work.
 
 **Choosing `lift_targets` is a mathematical judgement, not a mechanical one.**
 Derive them from `docs/architecture/abstraction-tree.md` when you plan the run,
