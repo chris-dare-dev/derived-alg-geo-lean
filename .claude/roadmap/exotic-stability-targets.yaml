@@ -1,0 +1,681 @@
+schema: roadmap/1
+slug: exotic-stability-targets
+project: derived-alg-geo-lean
+status: proposed
+phase: init                # init -> refined -> decomposed -> sequenced -> complete
+title: "Exotic stability-condition targets — six research/formalization pairs"
+
+# NO gh_issue / gh_milestone / gh_sub_issues FIELDS ANYWHERE IN THIS FILE.
+#
+# scripts/check_roadmap.py validates the roadmap against the live GitHub
+# tracker, and every one of RM-01..RM-05 and RM-07 is guarded by
+# `if not e.get("gh_issue"): continue` (lines 347, 361, 377, 408, 483).
+# RM-06 only fires on milestones carrying `gh_milestone`. A roadmap with no
+# GitHub ids is therefore structurally invisible to the gate rather than red
+# against it, which is the correct state for a plan whose issues have not been
+# minted. `stability-families.yaml` already carries two such entries.
+#
+# Minting the issues is an EXTERNAL WRITE under the workspace contract and is
+# not done here. Adding ids later is a deliberate, separately authorized edit.
+
+brief: |
+  Six targets in Bridgeland stability theory outside the Enriques /
+  Serre-invariance thread, each carrying one R&D milestone (what must be
+  settled on paper) and one Lean milestone (what the library can honestly
+  carry at its pin). Scoped 2026-09-19 by six parallel literature-and-
+  substrate scouts plus one deconfliction critic.
+
+  The six: E1 the cell decomposition of Stab-dagger of a del Pezzo surface;
+  E2 weak del Pezzo surfaces as a spherical-object problem; E3 the
+  (-1)-curve wall arrangement on dP_k and its Weyl symmetry; E4 weighted
+  projective planes and Kleinian orbisurfaces; E5 bielliptic surfaces and the
+  torsion-canonical family; E6 the stability space of a local del Pezzo.
+
+  NOT ONE OF THE SIX IS A CLEAN OPEN PROBLEM. Every scout returned
+  PARTIALLY-OPEN, and three returned a verdict that materially shrinks its own
+  target. Those verdicts are recorded per item rather than smoothed over,
+  because the value of this roadmap is mostly in what it stops the repository
+  from starting.
+
+  WHAT THE SCOUTS FOUND THAT THE SESSION DID NOT KNOW:
+
+  * Makela arXiv:2608.26080 (26 August 2026) proves the effective-divisor
+    Arcara-Miles conjecture for EVERY smooth projective surface. That is
+    strictly more general than the half of Mizuno-Yoshida arXiv:2502.18894
+    that E3 sub-target (2) proposed to extend. E3 sub-target (2) is
+    essentially closed twenty-four days before this scoping ran.
+  * E5's headline question — is sigma_{omega,beta} Serre-invariant on an
+    Enriques or bielliptic surface — is answered YES by a three-line argument:
+    omega_X torsion gives ch(omega_X) = 1 and omega.c_1(omega_X) = 0, so the
+    twist fixes both the central charge and the mu-torsion pair, hence fixes
+    sigma_{omega,beta} on the nose. Easy is not a result. What remains open is
+    the global statement: is EVERY sigma in Stab(S) Serre-invariant?
+  * E6's collision is worse than suspected. Bridgeland and Giovenzana (the
+    correct spelling; earlier session notes said "Giovenazza") are two of the
+    three authors of arXiv:2412.08531, which is already about invariant
+    stability conditions on omega_Z for Z a del Pezzo — and Bousseau's
+    acknowledgement names exactly those two as the source of his question.
+  * Bayer-Macri arXiv:0912.0043 section 1.7 page 6 explicitly poses the other
+    local del Pezzos as open, so E6 is a stated open problem with a named
+    group already inside it.
+  * Mathlib at the pin HAS `Convex.contractibleSpace`
+    (Mathlib/Analysis/Convex/Contractible.lean:34) and
+    `StarConvex.contractibleSpace` (:25), which makes E1's algebraic-cell
+    module cheap. Mathlib at the pin has NO braid group.
+  * Also new to the project: Tochitani arXiv:2603.29471 (generators of
+    Aut(D^b X) for bielliptic surfaces), Piskunov arXiv:2607.18918 (moduli on
+    bielliptic surfaces), Gomez Saltachin arXiv:2606.18238 (exceptional
+    collections for canonical stacks of log del Pezzo with 1/3(1,1)).
+
+  SHARED ROOTS, AND WHO OWNS THEM. The critic found four pieces of substrate
+  that more than one Lean milestone proposed to build, including one hard path
+  collision. Ownership is assigned once here and every other item consumes:
+
+  * Arbitrary-rank Lorentzian reverse Cauchy-Schwarz (HodgeDefinite for
+    diag(1,-1,...,-1)) — proposed independently by FOUR Lean milestones.
+    OWNER: exotic-e3-lean, under LinearAlgebra/BilinearForm/Lorentzian/.
+    It is the only spec that states the correct proof route (Mathlib
+    Cauchy-Schwarz on the negative-definite part) rather than hoping the k=2
+    three-variable `nlinarith` at Examples/Surface/BlowUpPlane.lean:627
+    generalizes, which it does not.
+  * The arbitrary-rank blow-up numerical model (ring in Models/, walls in
+    Examples/). OWNER: exotic-e1-lean, as BlowUpPlaneRank.lean and
+    BlowUpPlaneRankWalls.lean. It is the only spec that schedules the RingEquiv
+    agreement lemma back to the existing bespoke five-field
+    Examples.BlowUpPlane.Ring. e2's BlowUpPlaneN.lean and e6's DelPezzo.lean /
+    DelPezzoWalls.lean are DROPPED as duplicates of it; this also resolves the
+    naming collision in which e1's acceptance grep bans `DelPezzo` while e6
+    proposed a module of that name.
+  * Reflection at a (-2)-class as a lattice isometry, bridged to Mathlib's
+    root-system API. OWNER: exotic-e2-lean, under LinearAlgebra/RootSystem/.
+    Verified at the pin: Mathlib/LinearAlgebra/RootSystem/OfBilinear.lean:49
+    `IsReflective.of_dvd_two` exists and -2 divides 2.
+  * An invariance-of-a-stability-condition-under-an-autoequivalence predicate.
+    Verified absent repository-wide. OWNER: exotic-e5-lean, as
+    `AutPair.IsInvariant` — and it correctly refuses the name `SerreInvariant`,
+    because the identification of (- tensor omega_X)[2] with the Serre functor
+    is not a theorem in this repository.
+  * The rank-zero branch of the spherical wall layer. Verified genuinely
+    missing: `0 < delta.1` is a live hypothesis at
+    Walls/Spherical/Finiteness.lean:103, 116, 133, 167, 252.
+    OWNER: exotic-e2-lean, as Walls/Spherical/RankZero.lean.
+  * The hyperbolic ring currently buried in Examples/Surface/SmoothQuadric.lean.
+    OWNER: exotic-e5-lean, which EXTRACTS it to Models/Surface/HyperbolicPlane.lean
+    and rewrites SmoothQuadric.lean to import it. This must land BEFORE
+    exotic-e2-lean adds declarations to that same file.
+
+  AN INDEX-SET PROBLEM NOBODY OWNS. The wall-finiteness layer counts SPHERICAL
+  classes (`IsSpherical q delta := selfPairing q delta = -2`,
+  Walls/Spherical/Basic.lean:259). On a Fano surface the expected destabilizers
+  are EXCEPTIONAL, not spherical, so a spherical wall count there may be a
+  finite upper bound for an empty set. e4 and e6 both recorded this; e1 and e6
+  both instantiate the layer on a Fano WITHOUT carrying the caveat. Every item
+  that instantiates spherical wall finiteness on a del Pezzo must state in its
+  module docstring what the count is a count of.
+
+goal:
+  hmw: "How might we turn six adjacent, partly-occupied research targets into a sequence the repository can execute, without building the same Lorentzian lemma four times, without naming a declaration for a paper concept the repository cannot prove, and without spending a year on the two targets a competing group is already inside?"
+  objective: "For each of six targets, settle on paper what is actually open and what a 2026 preprint already took, then formalize only the rank-free, lattice-level, chart-level content that survives — with every geometric input an explicit supplied field."
+  key_results:
+    - "Every R&D milestone ends in a written PURSUE / RESTATE-AS / DROP verdict per sub-target, and a verdict that drops everything is an acceptable and successful outcome."
+    - "The arbitrary-rank Lorentzian reverse Cauchy-Schwarz is proved exactly once, in LinearAlgebra/, and consumed by the other three Lean milestones rather than reproved."
+    - "The arbitrary-rank blow-up model exists once, under a neutral name, with a proved agreement lemma back to the existing k = 2 carrier and no deletion or renaming of it."
+    - "No declaration anywhere in the slice is named DelPezzo, WeakDelPezzo, Weyl, ADE, Dynkin, braidGroup, SerreInvariant, lePotier, Markov, gldim, stabDagger, geometricChamber, orbifold, ChenRuan or for any author."
+    - "Zero sorries, zero admits, zero new axioms; every fact unprovable at the pin is a structure field with a docstring naming what would prove it."
+
+architecture_contract:
+  policy: "docs/architecture/abstraction-tree.md"
+  canonical_roots:
+    lorentzian: "DerivedAlgGeo/LinearAlgebra/BilinearForm/Lorentzian/ — owned by exotic-e3-lean; siblings of the existing HodgeIndex.lean and Reflection.lean"
+    root_system: "DerivedAlgGeo/LinearAlgebra/RootSystem/ — owned by exotic-e2-lean, extending Mathlib's RootSystem/OfBilinear.lean at Mathlib's own path"
+    blowup_model: "DerivedAlgGeo/AlgebraicGeometry/Numerical/Models/Surface/BlowUpPlaneRank.lean — owned by exotic-e1-lean; a formal ring/grading/degree/Chern/Todd package is a Model, never an Example (layers.md rule 7 / MO1.06)"
+    blowup_walls: "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Surface/BlowUpPlaneRankWalls.lean — owned by exotic-e1-lean; Examples/Surface/ is permitted to import the stability tree (layers.md rule 3)"
+    spherical_walls: "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Spherical/ — the rank-zero branch owned by exotic-e2-lean"
+    invariance: "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Combined/SerreInvariance.lean — owned by exotic-e5-lean, carrying AutPair.IsInvariant"
+    hyperbolic: "DerivedAlgGeo/AlgebraicGeometry/Numerical/Models/Surface/HyperbolicPlane.lean — owned by exotic-e5-lean, extracted from Examples/Surface/SmoothQuadric.lean"
+  prohibited:
+    - "a second arbitrary-rank Lorentzian HodgeDefinite anywhere outside LinearAlgebra/BilinearForm/Lorentzian/"
+    - "a second arbitrary-rank blow-up carrier; the existing k = 2 Examples.BlowUpPlane.Ring is compared to, never deleted or renamed"
+    - "a declaration named for a paper concept, an author, or a geometric class whose identification with the formal model is not a theorem in the same slice"
+    - "instantiating spherical wall finiteness on a Fano surface without a docstring stating what the count counts"
+    - "a local whole-library lake build; verification runs on the self-hosted owner-win runners, and DAG_ALLOW_LOCAL_BUILD is reported in the pull request if ever used"
+
+source:
+  work: "Six independent targets; no single pinned source. Per-item sources are recorded in each item's summary."
+  arxiv: "none — this roadmap is not scoped to one paper"
+
+evidence:
+  - "Scoping workflow run 2026-09-19: six parallel literature-and-substrate scouts plus one deconfliction critic, 7 agents, 0 errors. Raw specs and the deconfliction report are the workflow transcript; the human-readable digest is .claude/notes/2026-09-19-exotic-stability-targets-scoping.md."
+  - "Predecessor notes: .claude/notes/2026-09-19-net-new-results-scoping.md (the Enriques / Serre-invariance thread, including the Theorem A parity obstruction that exotic-e5 consumes) and .claude/notes/2026-09-19-exotic-stability-targets-scoping.md (the CORRECTION block withdrawing the original E1 framing)."
+  - "Repository facts verified during scoping: Walls/Spherical/Finiteness.lean:103,116,133,167,252 carry 0 < delta.1; Walls/Spherical/Basic.lean:259 defines IsSpherical as selfPairing = -2; Examples/Surface/BlowUpPlane.lean:627 proves hodgeDefinite by a three-variable nlinarith; GLTilde/Covering/Fibre.lean:97-102,225,239 give deckShift n = phi + 2n, range_deckHom_eq_ker and kerEquiv; grep for serreinvariant over DerivedAlgGeo/ returns nothing."
+  - "Mathlib facts verified at the pin (leanprover/lean4:v4.32.1): Analysis/Convex/Contractible.lean:34 Convex.contractibleSpace and :25 StarConvex.contractibleSpace exist; LinearAlgebra/RootSystem/OfBilinear.lean:49 IsReflective.of_dvd_two exists; there is no braid group."
+
+wont:
+  - "No GitHub issues, milestones or labels are created by this file. Minting them is an external write requiring explicit authorization."
+  - "No claim that any of the six targets is a clean open problem. Three are materially shrunk by 2026 preprints and the per-item summaries say which."
+  - "No scheme-level del Pezzo, weak del Pezzo, weighted projective plane, bielliptic surface or local threefold is constructed. Every geometric identification enters as supplied data."
+  - "No statement about a connected component of any stability space is claimed. The repository has no carrier for Stab as a topological or complex manifold; Metric/Distance/ gives a distance, not a manifold."
+  - "E6's alternating-Euler-form premise is not assumed true. Its own scout could not source it, and exotic-e6-rd must settle it before exotic-e6-lean's first two modules mean anything."
+
+generated_by: { agent: claude, at: "2026-09-19" }
+generations:
+  - { rev: 1, at: "2026-09-19", note: "Roadmap registered from the six-scout scoping workflow. All twelve items are `proposed`; none has a GitHub id. Execution order follows the deconfliction critic: e3-lean, e5-rd, e5-lean, e2-rd, e2-lean, e1-rd, e1-lean, e3-rd, e4-rd, e4-lean, e6-rd, e6-lean. Shared-root ownership is assigned in the brief and is the one thing in this file that must not be renegotiated per-item." }
+
+items:
+
+  # ---------------------------------------------------------------- order 1
+  - id: exotic-e3-lean
+    kind: milestone
+    title: "E3-LEAN — The signature-(1,k) divisor space, the wall quadric, and isometry equivariance at arbitrary Picard rank"
+    status: proposed
+    lane: now
+    order: 1
+    priority: must
+    size: M
+    summary: >
+      Runs FIRST and is ungated by any research verdict. Owns the shared
+      arbitrary-rank Lorentzian root that four Lean milestones independently
+      proposed: a time-cone and reverse-triangle-inequality layer on a
+      HodgeDefinite DivisorSpace, then DiagonalSpace k with
+      hodgeDefinite_diagonal proved for ALL k by Cauchy-Schwarz on the
+      negative-definite part — explicitly NOT by generalizing the
+      three-variable nlinarith at Examples/Surface/BlowUpPlane.lean:627, which
+      does not scale. Then the wall quadric in the divisor variable with its
+      eigenvalue signature, and equivariance of the quadric family under
+      form-preserving reflections. Modules: LinearAlgebra/BilinearForm/
+      Lorentzian.lean (umbrella) + Lorentzian/TimeCone.lean +
+      Lorentzian/Diagonal.lean; Walls/Divisorial/DivisorQuadric.lean;
+      Walls/Divisorial/Equivariance.lean (consuming exotic-e2-lean's reflection
+      once that lands, or a local isometry hypothesis until then);
+      Examples/Surface/BlowUpPlaneIteratedWalls.lean.
+      The falsifiable arithmetic check: instantiate wallQuadratic at k = 2 with
+      Mizuno-Yoshida Remark 3.17's normalised H, G_1, G_2 and reproduce all
+      three printed wall equations.
+    acceptance:
+      - "hodgeDefinite_diagonal is proved for all k with no case split on small k, and an example rederives Examples.BlowUpPlane.hodgeDefinite from it without editing that file's own proof."
+      - "The wallQuadratic instantiation at k = 2 reproduces all three printed equations of Mizuno-Yoshida Remark 3.17 and yields E_i^2 = -1 for each. Failure to reproduce them falsifies the lemma and the milestone stops."
+      - "The two LinearAlgebra modules import no stability-condition application, preserving the geometry firewall."
+      - "No declaration named DelPezzo, MinusOneCurve, WeylGroup, RootSystem, MizunoYoshida, ArcaraMiles, Makela or Bousseau outside docstrings and bibliography comments."
+      - "Zero sorries; check_layering.py, check_umbrella_coverage.py, check_coverage_map.py, check_audit.py, check_audit_complete.py pass; runLinter and lint-style clean; CI green on the self-hosted runners."
+    supplied_data:
+      - "That H, E_1, ..., E_k are the numerical divisor classes of an iterated blow-up of the plane and (3,-1,...,-1) is its anticanonical class."
+      - "That IsMinusOneClass integral classes are represented by irreducible rational curves generating the effective cone."
+      - "The (-1)-class cardinalities 6, 10, 16, 27, 56, 240 for k = 3..8. Finiteness IS proved here; the exact counts are not."
+      - "That K-perp is the root lattice A_1, A_1+A_2, A_4, D_5, E_6, E_7, E_8 for k = 2..8. Mathlib has RootPairing.ofBilinear and weylGroup but no E_k classification."
+      - "The ample cone, as a supplied predicate, following DivisorialParameters."
+    tags: [lorentzian, wall-quadric, picard-rank, shared-root]
+    labels: [area:lean, area:algebra, area:stability, type:feature]
+
+  # ---------------------------------------------------------------- order 2
+  - id: exotic-e5-rd
+    kind: milestone
+    title: "E5-R&D — Settle Serre-invariance of sigma_{omega,beta} on a torsion-canonical surface, and assemble the bielliptic data sheet"
+    status: proposed
+    lane: now
+    order: 2
+    priority: must
+    size: S
+    summary: >
+      THE CHEAPEST KILL IN THE SET, and it is expected to fire. Step 1 is a
+      three-line argument: on a smooth projective surface with c_1(omega_X) = 0
+      in Num(X), ch(omega_X) = 1 preserves Z_{omega,beta} exactly and
+      omega.c_1(omega_X) = 0 preserves the mu-torsion pair, so
+      (- tensor omega_X) fixes sigma_{omega,beta} on the nose and S_X acts
+      exactly as [2]. That ANSWERS the session's question — yes,
+      sigma_{omega,beta} is Serre-invariant on Enriques and bielliptic surfaces
+      — and it is almost certainly folklore. The milestone's real job is to
+      decide whether it is PUBLISHED, and to attempt the sharp version: is the
+      Serre-invariant locus ALL of Stab(S)? Also: falsify the applicability of
+      Feyzbakhsh-Pertusi arXiv:2109.13549 Theorem 3.2 by computing its three
+      conditions (k/r = 2 fails 0 < k/r < 2); read Macri-Mehrotra-Stellari
+      arXiv:0705.3752, Nuer arXiv:2107.13370, Tochitani arXiv:2603.29471; and
+      assemble Serrano's Num(S) = Z.A0 + Z.B0 with the hyperbolic form, the
+      seven Bagnera-de Franchis types, and a hand computation of
+      DivisorSpace.HodgeDefinite on the hyperbolic plane in the exact shape
+      HodgeIndex.lean demands, transcribable line by line.
+      Consumes Theorem A from .claude/notes/2026-09-19-net-new-results-scoping.md.
+    acceptance:
+      - "A proof, at most three pages, of the sigma_{omega,beta} invariance, with the heart-preservation step spelled out at the level of the torsion pair."
+      - "An explicit citation for the observation, OR a written list of the sources searched and read IN FULL — at minimum Macri-Mehrotra-Stellari, Nuer, Tochitani."
+      - "A written verification that Feyzbakhsh-Pertusi Theorem 3.2 conditions (C1), (C2), (C3) each fail, with the rank computations printed."
+      - "A YES / NO / OPEN verdict on 'is the Serre-invariant locus all of Stab(S)', naming the blocking fact if OPEN. OPEN is an acceptable outcome; an absent verdict is not."
+      - "A one-page bielliptic data sheet in which every number traces to a numbered statement or table row, plus the hand HodgeDefinite computation."
+      - "A recorded negative note: a rank-one polarisation slice of a bielliptic surface is numerically INDISTINGUISHABLE from the abelian one (td_1 = 0, integral td_2 = 0 for both). This is what forces the rank-two carrier in exotic-e5-lean."
+    kill_criteria: >
+      ABANDON THE RESEARCH HALF AND KEEP THE LEAN HALF if step 3 finds the
+      invariance statement already published with a proof. ABANDON THE NOVELTY
+      CLAIM ENTIRELY if a colleague reads step 1 and calls it an exercise —
+      which is the expected outcome. The Lean half survives either way.
+    tags: [bielliptic, torsion-canonical, serre-invariance, cheapest-kill]
+    labels: [area:research, area:geometry, type:investigation]
+
+  # ---------------------------------------------------------------- order 3
+  - id: exotic-e5-lean
+    kind: milestone
+    title: "E5-LEAN — Rank-two hyperbolic bielliptic model, its wall finiteness, and the autoequivalence-invariance kernel"
+    status: proposed
+    lane: now
+    order: 3
+    priority: must
+    size: M
+    blocked_by: [exotic-e5-rd]
+    summary: >
+      Lands the first Picard-rank-two MODEL (as opposed to demonstration) in
+      Numerical/Models/, and owns two shared roots. (1) EXTRACTS the hyperbolic
+      ring currently buried in Examples/Surface/SmoothQuadric.lean into
+      Models/Surface/HyperbolicPlane.lean and rewrites SmoothQuadric.lean to
+      import it — this must land BEFORE exotic-e2-lean adds declarations to that
+      file, or the extraction has strictly more to move. (2) Owns
+      Symmetry/Combined/SerreInvariance.lean carrying AutPair.IsInvariant,
+      the invariance predicate verified absent repository-wide — and refuses
+      the name SerreInvariant, because identifying (- tensor omega_X)[2] with
+      the Serre functor is not a theorem here. Plus: hodgeDefinite_of_hyperbolic
+      proved by a real argument on a two-dimensional space;
+      Models/Surface/Bielliptic.lean with biellipticTodd = (1,0,0);
+      Comparison.lean extended with chiStructureSheaf_bielliptic_eq_abelian as
+      an explicitly labelled NON-separation theorem; BiellipticWalls.lean
+      instantiating BOTH finite_walls_through_expPlane and
+      finite_walls_meeting_ampleBox; and AlgebraicGeometry/Surface/
+      TorsionCanonical.lean with IsEnriquesSurface unchanged and adapted one-way.
+    acceptance:
+      - "hodgeDefinite_of_hyperbolic compiles with no sorry and BiellipticWalls.lean discharges HodgeDefinite through it rather than assuming it — verified by grep, not by intent."
+      - "grep -rni 'serreinvariant|serre_invariant' over DerivedAlgGeo/ returns zero hits after the milestone lands, and SerreInvariance.lean's Z-surjectivity input is an explicit hypothesis binder, not an axiom and not an instance."
+      - "Examples/Surface/SmoothQuadric.lean imports Models/Surface/HyperbolicPlane.lean and grep for 'DualNumber (DualNumber' returns exactly one definition site."
+      - "Comparison.lean carries both chiStructureSheaf_bielliptic_eq_abelian (a NON-separation, stated as such) and chiStructureSheaf_bielliptic_ne_enriques."
+      - "IsEnriquesSurface is textually unchanged; IsEnriquesSurface.isTorsionCanonicalSurface compiles as a one-way adapter."
+      - "cutover-ledger.md carries the HyperbolicPlane extraction record in the same pull request."
+    supplied_data:
+      - "ord(omega_S) in {2,3,4,6} and the seven Bagnera-de Franchis types with their (ord omega_S, lambda_S) pairs."
+      - "Serrano's Num(S) = Z.A0 + Z.B0 with intersection matrix ((0,1),(1,0))."
+      - "chi(O_S) = 0 and c_2(S) = e(S) = 0, which is what makes biellipticTodd = (1,0,0)."
+      - "q(S) = 1, mirroring IsEnriquesSurface's h1_vanishing field — this is what makes a bielliptic surface not an Enriques surface at the geometric layer."
+      - "Bogomolov-Gieseker nonnegativity on the wall locus, already the repository's supplied input per Support/Divisorial.lean."
+    tags: [bielliptic, hyperbolic-lattice, invariance-predicate, shared-root]
+    labels: [area:lean, area:geometry, area:stability, type:feature]
+
+  # ---------------------------------------------------------------- order 4
+  - id: exotic-e2-rd
+    kind: milestone
+    title: "E2-R&D — Pin down the rank-zero spherical stratum of a weak del Pezzo, and survive the F_0 = F_2 lattice collapse"
+    status: proposed
+    lane: now
+    order: 4
+    priority: must
+    size: M
+    summary: >
+      The one target with LOW collision risk: arXiv abstract searches for
+      "weak del Pezzo" AND "stability conditions", and for "rational surface"
+      AND "spherical object", return nothing relevant, and the complete
+      2023-2026 "weak del Pezzo" listing contains no stability paper. But the
+      scout sharpened the target in two ways that must be settled before any
+      Lean. (a) The open statement is about RANK-ZERO spherical objects: every
+      2-spherical object on a surface with K_X not numerically trivial should
+      have rank 0 and class (0, Delta, s) with Delta an effective root — so the
+      spherical objects are exactly those supported on the (-2)-configuration.
+      (b) A lattice collapse: F_0 = P^1 x P^1 and F_2 = Sigma_2 are
+      INDISTINGUISHABLE in the numerical lattice — setting f_1 = f, f_2 = s + f
+      gives -K_{F_2} = 2f_1 + 2f_2 = -K_{F_0}, the same vector in the same
+      lattice — so effectivity of the roots, not the lattice, is what separates
+      weak del Pezzo from del Pezzo. That negative fact is the milestone's most
+      valuable output and it directly shapes exotic-e2-lean's supplied data.
+      STEP 2 IS A HARD GATE on everything downstream: is Mukai.RealExtension
+      (a symmetric R + V + R) the right ambient for a NON-Calabi-Yau surface,
+      given the chi(O_X) correction term?
+    acceptance:
+      - "A complete proof or explicit refutation of (i) Ext^*(O_C(-1),O_C(-1)) = k + k[-2] for a (-2)-curve, and (ii) 'K_X not numerically trivial implies every spherical object has rank 0'."
+      - "The identity -(chi(E,F)+chi(F,E))/2 = <v,w>_Mukai - r.r'.chi(O_X) is confirmed AND checked against BlowUpPlane.chi on at least five explicit classes, or refuted with the correct formula written down. An explicit GO or NO-GO on Mukai.RealExtension as the carrier."
+      - "The union over s of H(0,Delta,s) written out in the exact sign convention of pairingRe_of_rk_eq_zero, with a proof or disproof that it equals {q(Delta,omega) = 0}."
+      - "The explicit basis change f_1 = f, f_2 = s + f exhibiting -K_{F_0} = -K_{F_2} in one hyperbolic lattice, plus a table of {Delta in K-perp : Delta^2 = -2} for Bl_n P^2, n = 2..8."
+      - "Each of sub-targets (1), (2), (3) and the nodal-Enriques bonus carries an explicit PURSUE / RESTATE-AS / DROP verdict."
+      - "Ohmiya arXiv:2601.01063 read IN FULL and assessed for overlap, not merely listed. It is a named abandon criterion for both this target and E1, and nobody in the project has read past its abstract."
+    kill_criteria: >
+      ABANDON if step 2 shows the Todd / chi(O_X) correction makes the correct
+      ambient something other than an R + V + R with a symmetric form — the
+      whole Walls/Spherical and Mukai.RealExtension reuse story then collapses,
+      and exotic-e2-lean modules 3-5 are ill-posed and do not start.
+    tags: [weak-del-pezzo, spherical-rank-zero, lattice-collapse, gate]
+    labels: [area:research, area:geometry, type:investigation]
+
+  # ---------------------------------------------------------------- order 5
+  - id: exotic-e2-lean
+    kind: milestone
+    title: "E2-LEAN — The rank-zero spherical stratum, the root-hyperplane arrangement, and the del-Pezzo/weak-del-Pezzo lattice indistinguishability"
+    status: proposed
+    lane: next
+    order: 5
+    priority: must
+    size: L
+    blocked_by: [exotic-e2-rd, exotic-e3-lean, exotic-e5-lean]
+    summary: >
+      Closes the one genuinely missing piece of the wall layer: the rank-zero
+      branch. `0 < delta.1` is a live hypothesis at
+      Walls/Spherical/Finiteness.lean:103,116,133,167,252, so every wall
+      statement in the repository currently assumes positive rank — and the
+      spherical objects of a weak del Pezzo have rank ZERO. Owns
+      Walls/Spherical/RankZero.lean and the Mathlib root-system bridge
+      LinearAlgebra/RootSystem/Reflective.lean (verified: OfBilinear.lean:49
+      IsReflective.of_dvd_two exists, and -2 divides 2). CONSUMES rather than
+      rebuilds: the Lorentzian root from exotic-e3-lean, the arbitrary-rank
+      blow-up model from exotic-e1-lean, and the extracted HyperbolicPlane from
+      exotic-e5-lean. Its own BlowUpPlaneN.lean and its claim on
+      LinearAlgebra/BilinearForm/Lorentzian.lean are DROPPED as duplicates —
+      that path collision (leaf vs umbrella, incompatible shapes) was the
+      hardest one the critic found. Also lands
+      Examples/Surface/SmoothQuadricRoots.lean (the negative result, in the
+      carrier that already exists) and AlgebraicGeometry/Surface/
+      MinusTwoConfiguration.lean, generalizing the A_n-only, paper-specific
+      Enriques.MinusTwoCurveChain out of the Enriques paper extension.
+    acceptance:
+      - "finite_rootWallLoci_meeting_ampleBox is proved with NO positive-rank hypothesis anywhere in its statement or its transitive dependencies. Falsifier: any appearance of 0 < delta.1 or of rayCandidates in the chain."
+      - "iUnion_nonpositiveRayLocus_rk_zero is proved."
+      - "SmoothQuadricRoots.two_smul_negativeSection_add_four_smul_fibre = antiCanonicalClass is proved inside SmoothQuadric.divisorSpace without a second carrier — this is the F_0 = F_2 indistinguishability, formalized."
+      - "reflection_eq_mukaiReflect is proved and lives downstream of BOTH Mathlib/LinearAlgebra/RootSystem/OfBilinear.lean and LinearAlgebra/Lattice/Mukai/Reflection.lean; neither is modified to import the other."
+      - "No declaration named weakDelPezzo, DelPezzo, sphericalObject (for a geometric object), ADE, Dynkin, Weyl or braidGroup. Mathlib at the pin has no braid group; the milestone does not add one."
+      - "cutover-ledger.md records in the same PR that the milestone consumes exotic-e1-lean's model rather than constructing a second one."
+    supplied_data:
+      - "The Ext profile Hom(E_i, E_i[j]) = k for j = 0, 2 and 0 otherwise — needs the local-to-global Ext spectral sequence, absent at the pin."
+      - "omega_X restricted to each (-2)-curve is trivial (clause 1 of Seidel-Thomas sphericity; the repository has no derived tensor)."
+      - "The configuration intersection numbers C_i.C_i = -2 and C_i.C_j >= 0 matching a supplied Cartan-shaped matrix."
+      - "EFFECTIVITY of the roots — the ONLY thing separating a weak del Pezzo from a del Pezzo, and provably not a lattice invariant (that is what SmoothQuadricRoots.lean proves)."
+      - "Nondegeneracy of the restricted form and closure of the root set under reflection, if a Mathlib RootSystem instance is wanted from ofBilinear."
+    tags: [weak-del-pezzo, rank-zero-walls, root-system, shared-root]
+    labels: [area:lean, area:algebra, area:stability, type:feature]
+
+  # ---------------------------------------------------------------- order 6
+  - id: exotic-e1-rd
+    kind: milestone
+    title: "E1-R&D — Name the exact obstruction to porting Li's Stab-dagger(P^2) argument to Bl_k P^2, and decide PORT / REPLACE / ABANDON"
+    status: proposed
+    lane: next
+    order: 6
+    priority: should
+    size: L
+    summary: >
+      The session's working hypothesis — Li's proof leans on
+      Drezet-Le Potier / Gorodentsev-Rudakov arithmetic with no dP_k analogue —
+      is ALREADY CONFIRMED at four load-bearing points by a direct read of
+      arXiv:1611.02087v1 (Definition 1.4, Theorem 1.5, display (clubsuit), and
+      the proofs of Lemma 3.3 / Proposition 3.4 / Proposition 3.8). The gldim
+      alternative is already REFUTED as a cheaper route. So this milestone is
+      not an investigation of whether there is an obstruction; it is the work of
+      naming it precisely enough to decide what to do. REORDER ON START: run
+      step 5 first. dP_1 = F_1 has Picard rank 2, so rank K_num = 4 and every
+      full exceptional collection has length 4 — the SMALLEST case of the
+      target is already outside the length-3 regime Li worked in. If the
+      algebraic stability manifold of a length-4 full exceptional collection is
+      not known contractible, the whole target dies on day one rather than day
+      twelve. Also: obtain Kuleshov-Orlov Izv. Math. 44:3 (1995) 479-513 in a
+      TEXT-EXTRACTABLE form (the Orlov-homepage scan is fax image data) and
+      actually read Theorem 7.7, which no one in this project has done.
+    acceptance:
+      - "A table covering all 19 numbered statements of Li arXiv:1611.02087v1, each with its consumed P^2-specific input and a PORTS / FAILS / UNKNOWN verdict. No row may be UNKNOWN unless a named source was read and found silent."
+      - "A cited yes/no: does an explicit Chern-character classification of exceptional bundles on Bl_k P^2, uniform in k, exist in the published literature? If k-dependent, the answer states the range."
+      - "Either a written statement of the Le Potier function on Bl_k P^2 with its source, or a written statement that none has been published, plus a definite yes/no on whether Li Proposition 3.8 follows from the Dell bound alone."
+      - "A cited answer to: is the algebraic stability manifold of a length-4 full exceptional collection known contractible, known only simply connected, or known not contractible?"
+      - "A dated collision list covering arXiv math.AG since Jan 2024 and the pages of Rekuski, Chunyi Li, Bousseau, Ohmiya and Qiu, with Ohmiya arXiv:2601.01063 ASSESSED rather than listed."
+      - "A PORT / REPLACE / ABANDON verdict naming one missing lemma as a mathematical statement with quantifiers, not as a topic."
+    kill_criteria: >
+      ABANDON on any of: (1) step 5 finds the length-4 algebraic stability
+      manifold is not contractible or has a published obstruction — dP_1 is the
+      smallest case and the target dies with it; (2) no uniform-in-k
+      exceptional-bundle classification exists AND no Le Potier function is
+      published for Bl_k P^2; (3) Ohmiya arXiv:2601.01063 already states the
+      wall structure for F_1. The Lean milestone survives all three.
+    tags: [del-pezzo, cell-decomposition, obstruction-naming, reorder-on-start]
+    labels: [area:research, area:stability, type:investigation]
+
+  # ---------------------------------------------------------------- order 7
+  - id: exotic-e1-lean
+    kind: milestone
+    title: "E1-LEAN — Arbitrary-rank blow-up-of-the-plane model, and the exceptional-collection chart as a convex cell"
+    status: proposed
+    lane: next
+    order: 7
+    priority: must
+    size: M
+    blocked_by: [exotic-e3-lean]
+    summary: >
+      OWNS the shared arbitrary-rank blow-up model that three Lean milestones
+      proposed: Models/Surface/BlowUpPlaneRank.lean (the formal rank-(k+1)
+      ring, grading, degree, Chern/Todd, HRR, with td = 1 + (1/2)(3H - sum E_i)
+      + pt, and a proved RingEquiv agreement lemma back to the existing bespoke
+      five-field Examples.BlowUpPlane.Ring — which is NOT deleted, renamed or
+      reproved) and Examples/Surface/BlowUpPlaneRankWalls.lean (the walls,
+      consuming exotic-e3-lean's Lorentzian root rather than reproving
+      hodgeDefinite). The anticanonical square is stated as the inequality
+      9 - k > 0, not as "X is del Pezzo". Plus
+      StabilityCondition/Exceptional/Chart.lean: Li Definition 2.3's cell
+      {(m, phi) : 0 < m i, StrictMono phi, phi 0 + 1 < phi last} proved convex,
+      open, nonempty and ContractibleSpace — CHEAP, because
+      Mathlib/Analysis/Convex/Contractible.lean:34 Convex.contractibleSpace
+      exists at the pin. Macri's existence/uniqueness is a supplied field.
+      DEFERRED FROM THIS MILESTONE: ExceptionalMutation.lean, which the critic
+      flagged as reopening a gap the repository closed with a written reason
+      (Collection.lean:41, Admissible.lean:20-23, issue #332). File it
+      separately if a consuming theorem arrives.
+    acceptance:
+      - "hodgeDefinite at arbitrary k is CONSUMED from exotic-e3-lean, not reproved, and a proved agreement lemma reduces it at k = 2 to the existing Examples.BlowUpPlane.hodgeDefinite. The existing k = 2 declaration is not deleted, renamed or reproved."
+      - "finite_walls_meeting_ampleBox and signedRayRegularLocus_inter_ampleBox are restated and proved at arbitrary k, discharging every hypothesis of Walls/Spherical/Finiteness.lean:76 BoundedRegion exactly as BlowUpPlaneWalls.lean:148,182 does at k = 2."
+      - "The module docstring of BlowUpPlaneRankWalls.lean states what the spherical wall count is a count of on a Fano surface, where the expected destabilizers are exceptional rather than spherical."
+      - "ExceptionalChartRegion is proved convex, open, nonempty and ContractibleSpace."
+      - "check_layering.py passes: Models/Surface/BlowUpPlaneRank.lean reaches neither the stability tree nor Numerical/Examples/ (rule 7 / MO1.06)."
+      - "A grep of the new modules for lePotier, LePotier, Markov, gldim, stabDagger, StabDagger, geometricStabilityCondition, delPezzo, DelPezzo, helix returns nothing."
+    supplied_data:
+      - "Macri's existence and uniqueness of the stability condition attached to a full Ext-exceptional collection with strictly increasing phases and phi_1 + 1 < phi_n (Li arXiv:1611.02087 Proposition 2.2)."
+      - "Hom-finiteness of the ambient category (repo issue #332)."
+      - "Bogomolov-Gieseker for the rank-(k+1) model, as the existing BogomolovGieseker.lean fields."
+      - "The identification of the formal rank-(k+1) NumericalVarietyData with the scheme Bl_k P^2. The repository has no scheme-level blow-up."
+      - "Existence of a full strong exceptional collection of length k+3 on D^b(Coh Bl_k P^2)."
+    tags: [del-pezzo, numerical-model, exceptional-chart, shared-root]
+    labels: [area:lean, area:geometry, area:stability, type:feature]
+
+  # ---------------------------------------------------------------- order 8
+  - id: exotic-e3-rd
+    kind: milestone
+    title: "E3-R&D — Establish what survives Makela, and restate the Weyl symmetry so that it is true"
+    status: proposed
+    lane: next
+    order: 8
+    priority: should
+    size: M
+    summary: >
+      HIGH COLLISION, and one 2026 result already ate most of it. Makela
+      arXiv:2608.26080, posted 26 August 2026, proves the effective-divisor
+      Arcara-Miles conjecture for ALL smooth projective surfaces — strictly
+      more general than the half of Mizuno-Yoshida this target proposed to
+      extend. Sub-target (2) is therefore essentially closed; what remains is
+      the integral-curve refinement Makela Remark 1.2 explicitly does not cover.
+      Runs AFTER exotic-e3-lean because that Lean milestone survives every one
+      of this one's kill criteria — its content is rank-free lattice geometry
+      that does not depend on which sub-target wins. Two jobs worth doing:
+      (a) referee Makela Sections 2, 5 and 6 line by line, especially
+      Proposition 5.1 (minimal destabilizers have rank one), since the scout
+      read only Theorem 1.1's statement; (b) settle the W(E_k) question
+      ADVERSARIALLY, starting from the hypothesis that the session's naive
+      statement is FALSE — reflect an explicitly ample class such as
+      -K = 3H - E_1 - E_2 - E_3 and check whether Amp(dP_3) is even
+      W(E_3)-invariant. Then compute chamber counts for k = 3, 4 by computer
+      algebra and print them beside |W(E_k)| and 2^(number of (-1)-classes), so
+      both candidate indexings are visibly confirmed or visibly refuted.
+    acceptance:
+      - "A written referee report on Makela Sections 2, 5 and 6 with an explicit SOUND / GAP / UNDECIDED verdict and, if GAP, the equation or lemma number."
+      - "A statement-by-statement table of which Mizuno-Yoshida dP_3 results are implied by Makela Theorem 1.1 and which are not, with the residual open statement written with quantifiers."
+      - "An explicit answer to 'is Amp(dP_3) invariant under W(E_3)?' backed by a computed reflection of a named ample class, with the numbers printed."
+      - "Chamber counts for k = 3 and k = 4 from computer algebra, printed beside |W(E_k)| and 2^(number of (-1)-classes)."
+      - "A one-page scope decision naming the retired sub-targets. A decision that retires ALL THREE is an acceptable and successful outcome."
+    kill_criteria: >
+      Abandon sub-target (2) outright if the referee verdict is SOUND, which is
+      the expected outcome. Abandon sub-target (3) if Amp(dP_k) is not
+      W(E_k)-invariant, and replace it with the corresponding negative theorem
+      in exotic-e3-lean's exists_reflect_notMem_ampleCone.
+    tags: [del-pezzo, minus-one-curves, weyl-group, high-collision]
+    labels: [area:research, area:stability, type:investigation]
+
+  # ---------------------------------------------------------------- order 9
+  - id: exotic-e4-rd
+    kind: milestone
+    title: "E4-R&D — Fix the construction, the charge lattice and the first explicit walls for P(a,b,c)"
+    status: proposed
+    lane: later
+    order: 9
+    priority: should
+    size: L
+    summary: >
+      The chamber description for P(a,b,c) is genuinely not in print, but the
+      session's framing was half wrong in a way that matters. For the ADE case
+      (P(1,1,2)) the construction exists (Lim-Rota arXiv:2001.09139) and the
+      description is probably a transport of the F_2 picture along derived
+      McKay — a corollary, not a theorem. For P(1,1,n) with n >= 3 the coarse
+      singularity 1/n(1,1) is NOT Gorenstein and it is not established that ANY
+      published construction covers it. Answer that first. The decisive
+      question is the charge lattice: K_0(P(a,b,c)) is free of rank a+b+c (from
+      the Auroux-Katzarkov-Orlov collection), while the repository's surface
+      charge is rank 3, so the rank-3 charge is very likely the WRONG lattice —
+      and SatisfiesHRR is FALSE for P(a,b,c) whenever a+b+c > 3, because
+      chi(O(k)) is quasi-polynomial in k with period lcm(a,b,c) while HRR
+      demands a degree-2 polynomial. Both need proving, not asserting; the
+      scout listed the quasi-polynomiality under claims-it-could-not-verify.
+    acceptance:
+      - "The orbifold Bogomolov-Gieseker inequality of arXiv:2001.09139 fixed by theorem number, with an unambiguous statement of whether its discriminant uses ordinary stacky Chern classes or Chen-Ruan classes."
+      - "A table for P(1,1,n), n = 2..6 and P(1,2,3), P(1,2,5), P(2,3,5): coarse singularity type, age spectrum, whether the Chen-Ruan grading is integral, rk A^*()_Q = 3, rk K_0 = a+b+c, and which published construction covers it."
+      - "Explicit Euler-form Gram matrices for P(1,1,2) and P(1,1,3) in the basis (O, O(1), ..., O(a+b+c-1)), cross-checked against rank-nullity of the map to (rank, int H.ch1, int ch2)."
+      - "Hand computation, independently reproduced by Macaulay2 or Sage, of the numerical walls in the (beta,alpha) half-plane for at least two classes on each of P(1,1,2) and P(1,1,3), each written as an explicit circle or line."
+      - "An explicit YES/NO sentence: can the wall/chamber statement for P(a,b,c) be made against a rank-3 charge, or does it require a rank-(a+b+c) charge?"
+      - "A dated arXiv re-check with the search queries recorded so the check is repeatable, covering the pages of Rota, Liu, Shen, Nimura and Gomez Saltachin (arXiv:2606.18238)."
+    kill_criteria: >
+      Abandon or sharply renarrow if step 1 finds arXiv:2001.09139 already
+      contains the (beta,alpha) chamber decomposition in a section not
+      reflected in its abstract, or if no published construction covers
+      P(1,1,n) for n >= 3 and none is within reach.
+    tags: [weighted-projective, orbifold, charge-lattice, weakest-evidence]
+    labels: [area:research, area:geometry, type:investigation]
+
+  # --------------------------------------------------------------- order 10
+  - id: exotic-e4-lean
+    kind: milestone
+    title: "E4-LEAN — A weighted-projective-plane numerical model, its wall finiteness, and two proved negative theorems"
+    status: proposed
+    lane: later
+    order: 10
+    priority: could
+    size: S
+    blocked_by: [exotic-e4-rd]
+    summary: >
+      The CHEAPEST model in the set: P(a,b,c)'s numerical intersection ring is
+      the existing monogenic rank-one surface ring at the fractional degree
+      d = 1/(abc), reusing an already-rational degree map, so the transport of
+      the already-proved Picard-rank-one wall finiteness needs NO new supplied
+      datum. Its real value is two NEGATIVE theorems that fence the target:
+      not_satisfiesHRR_of_three_lt_sum (ruling out EVERY choice of Todd
+      coefficients, not one) and coarseCharge_ker_ne_bot together with
+      not_hasSupportProperty_coarseCharge (by rank-nullity alone, no geometric
+      input). Those two say, in the library rather than in a note, that the
+      repository's rank-3 surface charge cannot carry a weighted projective
+      plane. Modules mirror ProjectivePlane.lean, RankOneRealization.lean,
+      ProjectivePlaneCharge.lean and RankOneWalls.lean declaration for
+      declaration. Both negatives are gated on exotic-e4-rd fixing the charge
+      rank; until then they are conjectures, not acceptance criteria.
+    acceptance:
+      - "wps_finite_walls_meeting_box typechecks with h2 := 1/(a*b*c) and hypotheses a,b,c nonzero and NOTHING ELSE — i.e. no new supplied datum was needed to transport rank-one wall finiteness to a fractional intersection number."
+      - "not_satisfiesHRR_of_three_lt_sum is proved at least for (a,b,c) = (1,1,2) from supplied chi values, and its proof does not assume the model's toddComp — it rules out every choice of Todd coefficients."
+      - "coarseCharge_ker_ne_bot and not_hasSupportProperty_coarseCharge are proved by rank-nullity alone, with no geometric input."
+      - "grep the new modules for orbifold, ChenRuan, Kleinian, inertia, LimRota and find nothing outside docstrings and reference lists."
+      - "A one-page decision record under docs/architecture/ stating the answer: the inequality fits the existing vocabulary, the charge does not."
+    supplied_data:
+      - "The orbifold Bogomolov-Gieseker inequality (Lim-Rota, ADE case), as a BogomolovGiesekerData field exactly as the classical inequality already enters."
+      - "The slope-semistability predicate, opaque because the numerical layer has no subobjects."
+      - "The Euler characteristics chi(O_{P(a,b,c)}(k)) — nothing at the pin computes coherent cohomology of a Deligne-Mumford stack."
+      - "rk K_0(P(a,b,c)) = a+b+c, from the Auroux-Katzarkov-Orlov collection. Neither the collection, its fullness, nor the rank is provable at the pin."
+      - "The Euler pairing Gram matrix on that rank-(a+b+c) lattice and its comparison map to the rank-3 coordinates."
+    tags: [weighted-projective, negative-results, cheapest-model]
+    labels: [area:lean, area:geometry, type:feature]
+
+  # --------------------------------------------------------------- order 11
+  - id: exotic-e6-rd
+    kind: milestone
+    title: "E6-R&D — Decide what of the Bayer-Macri local-P^2 package survives for a general del Pezzo, and settle the alternating-form question"
+    status: proposed
+    lane: later
+    order: 11
+    priority: could
+    size: L
+    summary: >
+      HIGHEST VALUE, HIGHEST RISK, AND MOST UNDER-EVIDENCED. Bayer-Macri
+      arXiv:0912.0043 section 1.7 page 6 explicitly poses the other local del
+      Pezzos as open, so this is a stated open problem. But Bridgeland and
+      Giovenzana are two of the three authors of arXiv:2412.08531, which is
+      already about invariant stability conditions on omega_Z for Z a del
+      Pezzo, and Bousseau's acknowledgement names exactly those two as the
+      source of his question. Assume the target is occupied until proven
+      otherwise; the collision sweep is step one, not step four.
+      THE MILESTONE'S OWN PREMISE IS UNVERIFIED. Its scout flagged that the
+      claim "the Euler form on K(D_0) for a local CY3 is ALTERNATING" is its
+      own inference from CY3 Serre duality, with no source found. Modules 1-2
+      of exotic-e6-lean mean nothing until this is settled, so step 5 (compute
+      the skew Euler matrix twice, independently, for dP_1, dP_2, dP_3 in a
+      named helix basis, and check the rank and radical agree) is the load-
+      bearing step, not the reading.
+    acceptance:
+      - "A dependency graph annotating each of Bayer-Macri Theorems 1, 2, 3 with its cited inputs, each marked available-for-general-Z with a source, available-only-for-P^2, or unknown."
+      - "A single displayed proposition with quantifiers of the form 'Bousseau Theorem 1.1 plus <named inputs> implies <named statement about the algebraic region for general Z>', with a verdict on whether the inputs are known."
+      - "Skew Euler matrices for dP_1, dP_2, dP_3 in a named helix basis, each computed twice by independent routes and AGREEING, with rank and radical recorded."
+      - "Either a paper-level construction of the alternating-form transvection package with its four properties proved, OR a recorded negative result explaining why the symmetric wall-finiteness argument has no alternating analogue."
+      - "A statement contract listing at least five supplied-data items with structure name, field names and field types, each classified supplied-and-true or supplied-and-open."
+      - "A dated collision verdict listing every arXiv id, listing page and seminar page checked. 'No preprint found, but my search of talks was nil' is acceptable and must be stated as such."
+      - "An explicit statement that Bayer-Macri Theorems 2, 3 and 4 (simple connectivity, Aut-dagger, the Gamma_1(3) embedding) are OUT of scope for the Lean milestone, with the blocker named for each."
+    kill_criteria: >
+      ABANDON the open-problem framing and re-scope to pure formalization if a
+      preprint, announced talk or seminar abstract by Bridgeland, Giovenzana,
+      Del Monte, Bousseau or Nordskova describes a connected component of the
+      stability space of the derived category of the canonical bundle of a del
+      Pezzo other than P^2. Run this check FIRST.
+    tags: [local-del-pezzo, calabi-yau-three, high-collision, unverified-premise]
+    labels: [area:research, area:stability, type:investigation]
+
+  # --------------------------------------------------------------- order 12
+  - id: exotic-e6-lean
+    kind: milestone
+    title: "E6-LEAN — The neutral CY3 stability substrate, with every local-geometry fact supplied"
+    status: proposed
+    lane: later
+    order: 12
+    priority: could
+    size: M
+    blocked_by: [exotic-e6-rd, exotic-e1-lean]
+    summary: >
+      Reduced from six modules to four. Its Models/Surface/DelPezzo.lean and
+      Examples/Surface/DelPezzoWalls.lean are DROPPED as duplicates of
+      exotic-e1-lean's arbitrary-rank blow-up model — which also resolves the
+      naming collision in which exotic-e1-lean's acceptance grep bans
+      `DelPezzo`. What remains is genuinely neutral and genuinely new:
+      LinearAlgebra/BilinearForm/Transvection.lean (the alternating-form root
+      beside the existing symmetric Reflection.lean, proved from the single
+      hypothesis B s s = 0, with no IsAlternating class and no category
+      vocabulary); SphericalTwist/CalabiYauThree.lean (the n = 3 normalization,
+      with map_twistK0_eq_transvection RECOGNIZING twistK0 at a 3-spherical
+      object as that transvection rather than redefining it);
+      Symmetry/Combined/Covering.lean (a purely topological theorem that
+      translates of a set under a group action cover a connected component —
+      its statement mentions no stability condition, no slicing, no central
+      charge and no lattice, checked by reading the signature); and
+      Chambers/PointStable.lean (a supplied-data record which must name two
+      independent consumers or be demoted to an abbrev).
+      The closing report must state in one sentence that nothing here describes
+      a connected component of the stability space of the derived category of
+      the canonical bundle of a del Pezzo surface, and name which of the six
+      blockers still stands in the way.
+    acceptance:
+      - "transvection_preserves, transvection_self and transvection_bijective are PROVED from B s s = 0 alone, with no IsAlternating class and no stability, Grothendieck-group or category vocabulary in the statements."
+      - "chiK0_of_self_eq_zero is proved from the EXISTING SphericalTwist.chiHom_self_eq with the hypothesis (3 : Z) <> 0 and nothing else — it must not restate the sum, and must not introduce a HomFiniteBounded hypothesis the n = 2 companion does not have."
+      - "map_twistK0_eq_transvection is a theorem. SphericalTwist.MukaiRealization is not imported by CalabiYauThree.lean."
+      - "Covering.lean's translateUnion_eq_connectedComponent mentions no stability vocabulary in its statement and is instantiated exactly once."
+      - "PointStableLocusData passes root review clause 2: the PR names two independent consumers, or the record is demoted and the milestone says so. No declaration is named geometricChamber."
+      - "The closing report names which of the six recorded blockers still stands."
+    supplied_data:
+      - "The Calabi-Yau-3 Euler identity with an ALTERNATING pairing. SUPPLIED-AND-OPEN: the scout found no source asserting it for D_0. exotic-e6-rd must settle this before modules 1-2 mean anything."
+      - "The point-stable family and its common phase."
+      - "The support certificate for the point-stable locus."
+      - "Closedness of the union of Aut-translates inside the connected component — SUPPLIED-AND-TRUE-FOR-P^2 only, from Bayer-Macri Theorem 5.1."
+      - "The Drezet-Le Potier-type description of the Chern characters of semistable sheaves — SUPPLIED-AND-TRUE for Z = P^2 only."
+    tags: [local-del-pezzo, transvection, calabi-yau-three, reduced-scope]
+    labels: [area:lean, area:algebra, area:stability, type:feature]
