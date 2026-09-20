@@ -43,6 +43,11 @@ construction prerequisite for #522, and #525 remains downstream.
    statement-layer exception) in each abstraction review. The controller ties
    the chunk to exact OpenSpec requirement headings, while the adversary checks
    ownership and adoption against the repository's architecture documents.
+7. Treat the explicit nonzero derived effect for `ℤ → ZMod 2` as a second
+   progress chunk. It may use the existing affine bounded-projective lane and
+   its K-projective representative API, but it must not be presented as a
+   construction of a general scheme-level `LeftDerivedPullback` or as proof of
+   full relative-perfect preservation.
 
 ## Risks / Trade-offs
 
