@@ -31,11 +31,13 @@ resolutions, not just a morphism, so a family of them is what `S`-locality has
 to quantify over; `OpenRestrictionFamily` is that family, and it carries the
 restriction functors with it rather than deriving them.
 
-Nothing here is inhabited. `IsSLocal` says a supplied family restricts the
-t-structure everywhere; it does not construct the family, the restricted
-t-structures, or any inhabitant of the definition. Remark A.20 -- every bounded
-t-structure on `Dᵇ(X)` is `S`-local over an affine base -- is the first
-inhabitant #1061 asks for and is not proved here.
+The family and its component t-exactness remain geometric inputs. The formal
+Families layer does, however, provide adapters for the affine Remark A.20
+situation, the noetherian-locality equivalence, and filtration lifting. The
+phase-level slicing quantifier lives in the geometric stability layer, so that
+the Families layer does not import stability conditions. All adapters expose
+their remaining base-change hypotheses rather than manufacturing them from
+the word `affine`.
 -/
 
 noncomputable section
@@ -114,7 +116,113 @@ theorem tStructure_eq_of_le_eq (L₁ L₂ : SLocalData R t)
     (L₁.restriction U hU).tStructure = (L₂.restriction U hU).tStructure :=
   TStructure.ext_le hle
 
+/-! The equality below is the chosen-data form of Remark 4.6(1). It still
+needs the geometric aisle comparison at every open; the categorical part is
+the extensionality of `TStructure`. -/
+
+theorem ext_of_le_eq (L₁ L₂ : SLocalData R t)
+    (hle : ∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
+      (L₁.restriction U hU).tStructure.le =
+        (L₂.restriction U hU).tStructure.le) :
+    L₁ = L₂ := by
+  cases L₁ with
+  | mk r₁ =>
+    cases L₂ with
+    | mk r₂ =>
+      have hr : r₁ = r₂ := by
+        funext U hU
+        apply TStructure.Restriction.ext
+        exact TStructure.ext_le (hle U hU)
+      cases hr
+      rfl
+
 end SLocalData
+
+variable {R : OpenRestrictionFamily X P DS}
+  {t : TStructure (DS.QuasicoherentCategory P)}
+
+/-! ### Lemma 4.15 and Lemma 4.16(3)
+
+The repository owns the heart predicate and the shape of an arbitrary
+filtration. The finite-cover/noetherian comparison and the geometric lift of
+objects and morphisms are represented by named owner data below. The public
+theorems are therefore useful to consumers without disguising either paper
+hypothesis as a proof. -/
+
+/-- Owner data for the noetherian-locality equivalence of Lemma 4.15. -/
+structure NoetherianLocalityData (R : OpenRestrictionFamily X P DS)
+    (t : TStructure (DS.QuasicoherentCategory P)) where
+  /-- The S-local data the two implications below are stated against. Carried
+  rather than existentially quantified, because `lemma_4_15` hands its caller
+  `H.localData.restriction U hU` and a proposition would not. -/
+  localData : SLocalData R t
+  global_to_local : t.IsNoetherian →
+    ∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
+      (localData.restriction U hU).tStructure.IsNoetherian
+  local_to_global :
+    (∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
+      (localData.restriction U hU).tStructure.IsNoetherian) →
+      t.IsNoetherian
+
+theorem lemma_4_15 (H : NoetherianLocalityData R t) :
+    t.IsNoetherian ↔
+      ∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
+        (H.localData.restriction U hU).tStructure.IsNoetherian :=
+  ⟨H.global_to_local, H.local_to_global⟩
+
+/-- An arbitrary (not necessarily finite) chain of monomorphisms. -/
+structure Filtration (C : Type*) [Category C] where
+  /-- The `n`-th object of the chain. -/
+  object : ℕ → C
+  /-- The map from the `n`-th object to the `n+1`-st. `mono` below is what makes
+  it an inclusion; this field alone claims only a morphism. -/
+  inclusion : ∀ n, object n ⟶ object (n + 1)
+  mono : ∀ n, Mono (inclusion n)
+
+/-- Owner data for lifting an arbitrary heart filtration as in Lemma 4.16(3).
+
+Named `Lemma416Part3Data` rather than `Lemma416_3Data`: the `defsWithUnderscore`
+linter reads the underscore separating the lemma number from its clause and
+flags every field of the structure, and this repository's `nolints.json` is a
+shrink-only ratchet, so silencing it is not available. The paper reference is
+unchanged -- Lemma 4.16, clause (3). -/
+structure Lemma416Part3Data (L : SLocalData R t) where
+  /-- Lifts a filtration in the heart restricted to `U` to one in the global
+  heart. It is owner data, not a construction: nothing here builds the lift. -/
+  lift (U : S.Opens) (hU : CompactSpace U.toScheme)
+      (F : Filtration ((L.restriction U hU).tStructure.heart.FullSubcategory)) :
+      Filtration (t.heart.FullSubcategory)
+  /-- Identifies the `n`-th object of the lifted filtration, restricted back to
+  `U`, with the `n`-th object it was lifted from. `comm` below is what makes the
+  identification compatible with the inclusions. -/
+  comparison (U : S.Opens) (hU : CompactSpace U.toScheme)
+      (F : Filtration ((L.restriction U hU).tStructure.heart.FullSubcategory))
+      (n : ℕ) :
+      ((L.restriction U hU).heartFunctor.obj
+        ((lift U hU F).object n)) ≅ F.object n
+  comm (U : S.Opens) (hU : CompactSpace U.toScheme)
+      (F : Filtration ((L.restriction U hU).tStructure.heart.FullSubcategory))
+      (n : ℕ) :
+      (comparison U hU F n).hom ≫ F.inclusion n =
+        (L.restriction U hU).heartFunctor.map
+          ((lift U hU F).inclusion n) ≫ (comparison U hU F (n + 1)).hom
+
+/-- The filtration-lifting conclusion in the orientation of Lemma 4.16(3). -/
+theorem lemma_4_16_3 (L : SLocalData R t) (H : Lemma416Part3Data L) (U : S.Opens)
+    (hU : CompactSpace U.toScheme)
+    (F : Filtration ((L.restriction U hU).tStructure.heart.FullSubcategory)) :
+    ∃ G : Filtration (t.heart.FullSubcategory),
+      (∀ n, Nonempty (((L.restriction U hU).heartFunctor.obj
+        (G.object n)) ≅ F.object n)) ∧
+      ∃ e : ∀ n, (((L.restriction U hU).heartFunctor.obj
+        (G.object n)) ≅ F.object n),
+        ∀ n, (e n).hom ≫ F.inclusion n =
+          (L.restriction U hU).heartFunctor.map (G.inclusion n) ≫
+            (e (n + 1)).hom := by
+  refine ⟨H.lift U hU F, fun n ↦ ⟨H.comparison U hU F n⟩,
+    ⟨H.comparison U hU F, ?_⟩⟩
+  intro n
+  exact H.comm U hU F n
 
 end OpenRestrictionFamily
 

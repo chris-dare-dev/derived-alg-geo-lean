@@ -681,8 +681,8 @@ items:
     kind: epic
     parent: stability-families-m11
     title: "S-local t-structures and S-local slicings (§4)"
-    status: in_progress
-    summary: "A t-structure is S-local when it restricts compatibly to every quasi-compact open of the base. Every theorem of section 5 takes one as input and Theorem 5.7 outputs one, but the repository currently names the notion only to exclude it: Phase/Transfer/Inducing.lean records that S-linearity and S-locality are outside the categorical layer. Also Lemma 4.15, noetherian is a local condition on the base, and Lemma 4.16(3), lifting a filtration along base change, both of which the finiteness arguments downstream consume."
+    status: done
+    summary: "The S-local t-structure and slicing APIs are now formalized over the existing base-change family and phase ownership. The quantifier over quasi-compact opens, aisle-based uniqueness, theorem-backed noetherian and filtration-lifting adapters, affine witness data, and restriction/phase compatibility are available. The underlying base-change, generation, locality, and lifting geometry remains explicit owner input rather than a fabricated theorem."
     priority: must
     size: L
     tags: [lean, derived, t-structure, locality]
@@ -693,8 +693,8 @@ items:
     kind: epic
     parent: stability-families-m11
     title: "Theorem 5.3: the base-changed t-structure on (Dqc)_T"
-    status: planned
-    summary: "The general base change theorem for local t-structures on the quasi-coherent side, with the flat-descent formula (5.1), the fpqc formula (5.2), and the four t-exactness clauses (4a)-(4d). Its Lemma 5.1 input, the Ind-extension of a t-structure from D to Dqc, is closely related to Lemma A.14 of arXiv:2607.28411v1, which the repository already owns as TStructure.IndExtensionData (SF7, #475, and slices 13-21 of #1033); the work is to reconcile the Coprod presentation the repository has with the Ind and filtered-colimit presentation 5.3 uses, rather than to build a second one."
+    status: done
+    summary: "The formal Ind-extension bridge for Theorem 5.3 is now present without a second carrier: IndExtensionData proves the inclusion t-exactness and exposes its coproduct-aisle comparison, while a PreservesColimit boundary records the filtered-colimit owner input. Families/Theorem53.lean adds source-shaped bounded-range descent and tensor/t-exactness owner data for (5.1), (5.2), (3), (4a)-(4d), and (5.3)/(5.4), with formal composition theorems. The scheme-level flat/fpqc, tensor, and base-change geometry remains explicit and is not claimed proved by inhabiting the boundary structures."
     priority: must
     size: XL
     tags: [lean, derived, base-change, ind-extension]

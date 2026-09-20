@@ -687,7 +687,19 @@ jobs:
             Write-Output "runner.environment=$($env:LANE); hosted lane installs elan into a fresh VM, nothing to record"
             exit 0
           }
-          $bin = Join-Path $env:USERPROFILE '.elan\bin'
+          # Ask which elan this job resolves; do not guess its home. This
+          # line used to read `Join-Path $env:USERPROFILE '.elan\bin'`, and on
+          # this machine that is NOT where a runner's elan lives: elan is
+          # installed by a bash installer using $HOME, which for the runner
+          # service is the runner directory, while PowerShell's $USERPROFILE is
+          # the interactive user's profile. Run 35491922076 shows the cost.
+          # It printed "shim set at C:\Users\<user>\.elan\bin" and left the
+          # process that actually blocked the relink -- a lake.exe under
+          # <runner>\.elan\bin -- UNFLAGGED, because the flag below compares
+          # against $bin. The evidence was in the log and unreadable as such.
+          $elanCmd = (Get-Command elan -ErrorAction SilentlyContinue).Source
+          $bin = if ($elanCmd) { Split-Path $elanCmd -Parent }
+                 else { Join-Path $env:USERPROFILE '.elan\bin' }
           if (-not (Test-Path $bin)) {
             Write-Output "no elan at $bin yet; install_elan.sh will create the whole set"
             exit 0
@@ -709,6 +721,127 @@ jobs:
               Write-Output ("  pid={0,-7} start={1} {2}{3}" -f $q.ProcessId, $q.CreationDate.ToString('HH:mm:ss'), $q.ExecutablePath, $flag)
             }
           }
+
+      # The step above RECORDS the blocker. This one CLEARS it.
+      #
+      # The hypothesis in that step's comment -- that `.elan/bin/lake.exe` stays
+      # resident as the parent of the real binary, that Windows will not replace
+      # a running executable, and that a job which ends without reaping it blocks
+      # the next relink on that runner -- was written as untested, "not been
+      # caught in the act". It has now been caught. Run 35491922076 on main
+      # recorded, nine seconds before `could not create link ... lake.exe`:
+      #
+      #   pid=46652  <runner-2>/.elan/bin/lake.exe                      01:40:51
+      #   pid=2920   <home>/.elan/toolchains/.../bin/lake.exe           01:40:51
+      #
+      # exactly the co-started shim/toolchain pair the hypothesis predicted, on
+      # exactly the runner whose relink then failed. The mechanism is confirmed,
+      # so this stops recording it and acts.
+      #
+      # WHY KILLING IS SOUND HERE, AND ONLY HERE. A self-hosted runner executes
+      # one job at a time. Every step of this job before this point has already
+      # completed. So a process still executing from THIS runner's own shim set
+      # is, by construction, owned by nothing that is still running -- an orphan
+      # from a job that ended or was cancelled, which is frequent on this queue.
+      # The filter is a prefix match on this runner's bin and nothing else: a
+      # build on a sibling runner, or anything under the home toolchain, is out
+      # of scope and is left alone.
+      #
+      # It fails the job rather than warning, unlike the diagnostic above. That
+      # asymmetry is deliberate: a diagnostic that reddens a build is worse than
+      # no diagnostic, but a guard that cannot clear the blocker has established
+      # that `lean-action` is about to fail anyway, and failing here names the
+      # process while failing there does not.
+      - name: Clear stale elan shim holders
+        shell: powershell
+        env:
+          LANE: ${{ runner.environment }}
+        run: |
+          $ErrorActionPreference = 'Continue'
+          if ($env:LANE -ne 'self-hosted') {
+            Write-Output "runner.environment=$($env:LANE); hosted lane has a fresh VM, nothing to clear"
+            exit 0
+          }
+          # WHICH shim set is ours must be derived from the runner's own
+          # workspace, NEVER from PATH, because PATH is not trustworthy here.
+          # The persisted USER PATH on the build machine has already had each
+          # runner's .elan\bin neutralised -- every entry carries an
+          # `__ELAN_DEDUPE_SENTINEL_DO_NOT_CREATE` suffix and names a directory
+          # that does not exist -- so a freshly started process resolves elan to
+          # the user's own bin. But a process started BEFORE that fix still
+          # carries the old ordering, with all four runner bins ahead of the
+          # user's, and long-lived processes are exactly what a runner service
+          # is. Observed directly on the build machine: the registry value shows
+          # the sentinels while a live shell's inherited PATH still lists the
+          # real runner bins first. So `Get-Command elan` from a job on runner-3
+          # can still resolve to runner-2's shim, and a guard that killed on that
+          # answer would reach into a sibling runner and kill a CONCURRENT job's
+          # build. RUNNER_WORKSPACE is
+          # <runner-root>\_work\<repo>, so the runner root is two levels up and
+          # is provably this job's own.
+          $ws = $env:RUNNER_WORKSPACE
+          if (-not $ws) {
+            Write-Output 'RUNNER_WORKSPACE unset; cannot prove which runner owns this job, so nothing is killed'
+            exit 0
+          }
+          $bin = Join-Path (Split-Path (Split-Path $ws -Parent) -Parent) '.elan\bin'
+          if (-not (Test-Path $bin)) {
+            Write-Output "no elan at $bin yet; install_elan.sh will create the set"
+            exit 0
+          }
+          Write-Output "this runner's shim set: $bin"
+          # Cross-check, and report rather than act on it. A mismatch means the
+          # PATH hazard above is live and worth fixing at the machine level.
+          $elanCmd = (Get-Command elan -ErrorAction SilentlyContinue).Source
+          if ($elanCmd) {
+            $pathBin = Split-Path $elanCmd -Parent
+            if ($pathBin -ne $bin) {
+              Write-Output "::warning::PATH resolves elan to $pathBin but this job's runner owns $bin; a foreign runner's shim is ahead on PATH"
+            }
+          }
+
+          function Get-ShimHolders {
+            param($dir)
+            Get-CimInstance Win32_Process `
+              -Filter "Name='lake.exe' OR Name='lean.exe' OR Name='elan.exe'" `
+              -ErrorAction SilentlyContinue |
+              Where-Object {
+                $_.ExecutablePath -and
+                $_.ExecutablePath.StartsWith($dir, [System.StringComparison]::OrdinalIgnoreCase)
+              }
+          }
+
+          # Grace first. A holder from THIS job's immediately preceding step is
+          # not an orphan yet and may exit on its own; only what outlives the
+          # grace period gets killed.
+          $deadline = (Get-Date).AddSeconds(30)
+          while ((Get-Date) -lt $deadline) {
+            if (@(Get-ShimHolders $bin).Count -eq 0) { break }
+            Start-Sleep -Seconds 3
+          }
+
+          $holders = @(Get-ShimHolders $bin)
+          if ($holders.Count -eq 0) {
+            Write-Output 'no process holds this shim set; relink is safe'
+            exit 0
+          }
+
+          foreach ($h in $holders) {
+            Write-Output ("  orphan pid={0,-7} start={1} {2}" -f `
+              $h.ProcessId, $h.CreationDate.ToString('HH:mm:ss'), $h.ExecutablePath)
+            Stop-Process -Id $h.ProcessId -Force -ErrorAction Continue
+          }
+          Start-Sleep -Seconds 2
+
+          $left = @(Get-ShimHolders $bin)
+          if ($left.Count -gt 0) {
+            foreach ($h in $left) {
+              Write-Output ("  STILL HELD pid={0,-7} {1}" -f $h.ProcessId, $h.ExecutablePath)
+            }
+            Write-Output "::error::a process still holds $bin after kill; lean-action cannot relink the shim set. The holders are named above."
+            exit 1
+          }
+          Write-Output ("cleared {0} orphan(s); relink is safe" -f $holders.Count)
 
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
         with:
@@ -736,9 +869,19 @@ jobs:
           nanoda-allow-sorry: false
 
       - name: Pin and coverage records
+        env:
+          # For check_pin.py's reachability test: it asks whether each
+          # bare-commit pin is on its own repository's default branch, which is
+          # the one question this repo cannot answer from its own tree.
+          # Read-only repository metadata; the default token's scope is enough.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          python3 scripts/check_pin.py
+          # `--require-api` because this is the environment guaranteed to have
+          # the API. Locally the same check degrades to NOT_RUN so a
+          # contributor without `gh` is not blocked; here a check that could
+          # not look must not pass. Same contract as check_roadmap.py.
+          python3 scripts/check_pin.py --require-api
           # Every coverage record, not a hand-maintained list of two. This PR
           # adds five, and under the old naming they would all have landed
           # unvalidated -- as would every record added after it.

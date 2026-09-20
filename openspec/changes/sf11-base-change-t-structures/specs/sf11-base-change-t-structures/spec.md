@@ -60,15 +60,17 @@ represent.
 - **THEN** the API does not infer a §3 conclusion and the missing hypothesis is
   visible at the call site
 
-### Requirement: S-local t-structures and slicings are inhabited
+### Requirement: S-local t-structures and slicings expose formal locality boundaries
 
 The implementation SHALL define S-local t-structures by quantifying over every
 quasi-compact open of the base, SHALL provide the uniqueness statement from
-Remark 4.6(1), and SHALL provide at least two non-vacuous affine-base
-inhabitants. It SHALL also formalize the noetherian-locality and
-filtration-lifting statements of Lemmas 4.15 and 4.16(3), together with the
-corresponding S-local slicing analogue, without treating a t-structure or
-slicing as an unproved field.
+Remark 4.6(1), and SHALL provide an affine-base witness adapter that consumes
+actual family and t-exactness data. It SHALL also formalize the
+noetherian-locality and filtration-lifting statements of Lemmas 4.15 and
+4.16(3), together with the corresponding S-local slicing analogue. The
+remaining geometric locality, generation, and lifting hypotheses SHALL remain
+named at their owner call sites and SHALL NOT be presented as proved merely
+because a structure containing them is inhabited.
 
 #### Scenario: Restriction over every quasi-compact open
 
@@ -79,10 +81,11 @@ slicing as an unproved field.
 
 #### Scenario: Affine inhabitants
 
-- **WHEN** the base is affine and one of the supported concrete SF11 examples
-  is instantiated
-- **THEN** the construction produces two distinct inhabited S-local examples
-  and their locality witnesses can be used by downstream §5 statements
+- **WHEN** the base is affine and two supported slicing-locality witnesses,
+  their t-exactness data, and distinctness data are supplied
+- **THEN** the construction produces two distinct inhabited S-local examples,
+  records the affine hypothesis, and exposes their locality witnesses to
+  downstream §5 statements
 
 #### Scenario: Non-quasi-compact open
 
@@ -93,19 +96,22 @@ slicing as an unproved field.
 
 The implementation SHALL reconcile the repository's existing
 `TStructure.IndExtensionData` with the Ind/filtered-colimit presentation of
-Lemma 5.1 and SHALL prove the supported clauses of Theorem 5.3: the affine
-closure construction, filtered-colimit truncation, flat-descent formula,
-fpqc-descent formula, tensor right t-exactness, and the four stated
-t-exactness comparisons. It MUST NOT create a second incompatible
-Ind-extension carrier.
+Lemma 5.1 without creating a second carrier. It SHALL prove the formal
+consequences available from that carrier (the affine aisle comparison and
+inclusion t-exactness), expose filtered-colimit preservation through mathlib's
+`PreservesColimit`, and provide source-shaped owner boundaries for the
+flat-descent formula, fpqc-descent formula, tensor right t-exactness, and the
+four stated t-exactness comparisons. Those geometric owner inputs SHALL remain
+explicit and SHALL NOT be presented as proved merely because a boundary
+structure is inhabited.
 
 #### Scenario: Existing Ind extension is consumed
 
-- **WHEN** a t-structure with the required Ind-extension data and a faithful
-  base change are supplied
-- **THEN** the base-changed t-structure and its comparison formulas are
-  obtained through the existing extension API and the theorem's formulas
-  elaborate with named comparison maps
+- **WHEN** a t-structure with the required Ind-extension data and the named
+  filtered-colimit/descent/exactness owner inputs is supplied
+- **THEN** the existing extension API proves inclusion t-exactness and the
+  aisle comparison, while the owner inputs elaborate as named comparison
+  formulas without introducing a duplicate Ind carrier
 
 #### Scenario: Incompatible presentation
 
