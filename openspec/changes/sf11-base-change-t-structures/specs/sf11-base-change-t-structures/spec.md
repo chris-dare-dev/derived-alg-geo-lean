@@ -60,15 +60,17 @@ represent.
 - **THEN** the API does not infer a §3 conclusion and the missing hypothesis is
   visible at the call site
 
-### Requirement: S-local t-structures and slicings are inhabited
+### Requirement: S-local t-structures and slicings expose formal locality boundaries
 
 The implementation SHALL define S-local t-structures by quantifying over every
 quasi-compact open of the base, SHALL provide the uniqueness statement from
-Remark 4.6(1), and SHALL provide at least two non-vacuous affine-base
-inhabitants. It SHALL also formalize the noetherian-locality and
-filtration-lifting statements of Lemmas 4.15 and 4.16(3), together with the
-corresponding S-local slicing analogue, without treating a t-structure or
-slicing as an unproved field.
+Remark 4.6(1), and SHALL provide an affine-base witness adapter that consumes
+actual family and t-exactness data. It SHALL also formalize the
+noetherian-locality and filtration-lifting statements of Lemmas 4.15 and
+4.16(3), together with the corresponding S-local slicing analogue. The
+remaining geometric locality, generation, and lifting hypotheses SHALL remain
+named at their owner call sites and SHALL NOT be presented as proved merely
+because a structure containing them is inhabited.
 
 #### Scenario: Restriction over every quasi-compact open
 
@@ -79,10 +81,11 @@ slicing as an unproved field.
 
 #### Scenario: Affine inhabitants
 
-- **WHEN** the base is affine and one of the supported concrete SF11 examples
-  is instantiated
-- **THEN** the construction produces two distinct inhabited S-local examples
-  and their locality witnesses can be used by downstream §5 statements
+- **WHEN** the base is affine and two supported slicing-locality witnesses,
+  their t-exactness data, and distinctness data are supplied
+- **THEN** the construction produces two distinct inhabited S-local examples,
+  records the affine hypothesis, and exposes their locality witnesses to
+  downstream §5 statements
 
 #### Scenario: Non-quasi-compact open
 

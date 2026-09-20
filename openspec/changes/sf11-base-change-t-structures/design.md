@@ -57,10 +57,11 @@ use targeted Lean module builds; the full repository build is left to CI.
 
 3. **Make local structures consume base-change functors.** `TStructure/Local`
    owns uniqueness and one-functor restriction. `Families/SLocal` owns the
-   quantification over quasi-compact opens and the affine examples. The slicing
-   analogue belongs with the existing phase-transfer/slicing owner and must
-   reuse the local t-structure data. The restriction comparison maps always
-   point from the base category to the open-base category, avoiding an instance
+   quantification over quasi-compact opens and the affine witness adapter. The
+   slicing analogue belongs in the geometry-owned stability subtree, where it
+   may import both the Families API and the phase/slicing owner; it must reuse
+   the local t-structure data. The restriction comparison maps always point
+   from the base category to the open-base category, avoiding an instance
    diamond between ambient and bounded-coherent inclusions.
 
 4. **Reuse Ind extension rather than translate it by parallel definitions.**

@@ -117,9 +117,11 @@ Theorem A.13 constructions discharge it.  The `_of_le` theorems take the same
 input as the families `G`, `tC` with `hG`, `htC` rather than as a single
 existential, because `htrunc` must name `tC φ`.
 
-Assumption (i) of Theorem A.17, S-linearity of `Φ`, and the S-locality of the
-input and output slicings are outside the categorical layer, as in
-`Polishchuk.lean`; what is proved here is Corollary A.23 at `S = Spec ℤ`.
+Assumption (i) of Theorem A.17 and S-linearity of `Φ` remain outside the
+categorical layer, as in `Polishchuk.lean`. The family-level S-local slicing
+API now lives in `Families/SLocal.lean`; its geometric restriction witnesses
+are still explicit inputs. What is proved here is Corollary A.23 at
+`S = Spec ℤ`.
 
 `w` is the coproduct-size universe and is the first universe parameter of
 every declaration here, which is what `.{w}` binds.  Both categories share one

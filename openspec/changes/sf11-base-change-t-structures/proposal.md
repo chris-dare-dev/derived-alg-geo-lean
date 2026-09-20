@@ -6,8 +6,9 @@ Issues #1060, #1061, and #1062 are the remaining SF11 chain for the base-change
 categories and t-structures of arXiv:1902.08184v4 §§3–5. The repository now
 has substantial categorical scaffolding, but its own roadmap still marks the
 geometric witnesses, local inhabitants, and Ind-extension reconciliation as
-supplied or uninhabited; this batch makes those claims executable and reviewable
-while the new bounded loop controller is available.
+supplied or uninhabited; this batch makes the formal interfaces and their
+remaining geometry boundaries executable and reviewable while the new bounded
+loop controller is available.
 
 ## What Changes
 
@@ -16,8 +17,9 @@ while the new bounded loop controller is available.
   source-faithful hypotheses required by Proposition 3.15, Theorem 3.17, and
   Lemma 3.18.
 - Put S-local t-structures and the corresponding slicing vocabulary inside the
-  formalized layer, with actual affine-base inhabitants and the required local
-  finiteness and filtration-lifting statements.
+  formalized layer, with affine witness adapters and theorem-backed boundaries
+  for the required local finiteness and filtration-lifting statements. The
+  actual base-change and generation theorems remain explicit geometry inputs.
 - Prove the supported form of Theorem 5.3, including the flat/fpqc descent
   formulas and t-exactness clauses, by reusing the existing Ind-extension data.
 - Remove or rewrite comments and roadmap entries that claim these layers are
@@ -43,6 +45,7 @@ None.
 
 The affected Lean modules are under
 `DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families`,
+`DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability`,
 `DerivedAlgGeo/CategoryTheory/Triangulated/TStructure`, and the existing
 Ind-extension/phase-transfer consumers. The batch also touches the roadmap,
 repository notes, and the Python loop-controller manifest/schema tests. Every

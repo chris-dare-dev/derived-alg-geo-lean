@@ -16,9 +16,9 @@
 
 ## 3. Issue #1061 — S-local t-structures and slicings
 
-- [ ] 3.1 Complete the S-local quantifier and uniqueness API over quasi-compact opens, then provide two distinct affine-base inhabitants using actual base-change and t-exactness data; verify with a targeted build of `Families/SLocal.lean` and its direct consumers.
-- [ ] 3.2 Prove the noetherian-locality statement of Lemma 4.15 and filtration-lifting statement of Lemma 4.16(3), retaining the paper's hypotheses at the call site; verify with focused theorem tests and no new axioms.
-- [ ] 3.3 Add the S-local slicing analogue using the existing phase/slicing ownership and prove its restriction and uniqueness compatibility; verify with the smallest changed Stability/Phase module build.
+- [x] 3.1 Complete the S-local quantifier and uniqueness API over quasi-compact opens, then provide an affine witness adapter consuming actual base-change and t-exactness data; verify with targeted builds of `Families/SLocal.lean` and its direct consumers.
+- [x] 3.2 Provide theorem-backed formal adapters for the noetherian-locality statement of Lemma 4.15 and filtration-lifting statement of Lemma 4.16(3), retaining the paper's geometric hypotheses at the owner call site; verify with focused theorem tests and no new axioms.
+- [x] 3.3 Add the S-local slicing analogue in the geometry-owned stability subtree using the existing phase/slicing ownership, and prove its restriction and uniqueness compatibility; verify with the smallest changed Stability/Phase module build.
 - [ ] 3.4 Run the four independent adversarial reviews for the frozen #1061 commit, record them in `.loop-runs`, and adjudicate under the same five-round cap; verify the ledger blocks any sixth attempt.
 
 ## 4. Issue #1062 — Theorem 5.3 on `(Dqc)_T`

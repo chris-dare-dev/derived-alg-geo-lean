@@ -70,6 +70,33 @@ replacement for a Lean theorem or an issue acceptance criterion.
   Keep “K-flat producer” and “root operation” distinct in module prose; the
   distinction is what lets exact/open or future higher-categorical producers
   reuse the category construction.
+- #1061 adds a family-level S-local slicing API, so the older Phase/Transfer
+  wording that put all S-locality outside the categorical layer is now stale.
+  The revised wording distinguishes the formal quantifier/uniqueness API from
+  the still-explicit geometric restriction witnesses.
+- Lean field names that coincide with command keywords can produce misleading
+  parser errors: `NoetherianLocalityData.local` was rejected, so the field is
+  named `localData`. A failed declaration then generated downstream “invalid
+  field” errors; fix the first parser error before chasing projections.
+- The filtered Families target may replay over 4,000 cached prerequisites even
+  when only one changed module is requested. This remains a targeted module
+  build, not a repository build; native PowerShell is the reliable fallback
+  when WSL stalls.
+- A first S-local slicing placement imported `PhaseTruncation` directly into
+  `Families/SLocal.lean` and failed the subject-layering gate: Families must
+  not reach the stability tree. Keep phase-level locality in
+  `AlgebraicGeometry/DerivedCategory/Stability/SLocal.lean`, with the
+  stability umbrella importing it, and let Families own only the t-structure
+  quantifier.
+- `scripts/precheck.sh --no-build` still runs the non-Lean `local-build` policy
+  gate; it skips only the final targeted Lake build. The first invocation was
+  mistaken for a repository build and interrupted before this distinction was
+  checked.
+- The controller's frozen-prefix matcher treats a directory prefix and a
+  sibling umbrella file separately. When a chunk changes both
+  `DerivedCategory/Stability/SLocal.lean` and
+  `DerivedCategory/Stability.lean`, list the umbrella file explicitly or PR
+  creation fails closed even though the directory entry is present.
 
 ## Time-saving practices
 
