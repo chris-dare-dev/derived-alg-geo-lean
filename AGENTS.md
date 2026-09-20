@@ -298,10 +298,15 @@ change; it owns the human-facing placement and contribution rules.
 
 ## Required verification
 
-**Full verification runs on the self-hosted Windows runners, not on your machine.**
-`.github/workflows/ci.yml` routes `push` and `workflow_dispatch` to
-`["self-hosted", "owner-win"]`, and it triggers on `main` and `agent/**`. So
-pushing already runs the whole gate there; to get a verdict without pushing, use
+**Full verification runs in CI, not on your machine.** Since 2026-09-19
+`.github/workflows/ci.yml` triggers `push` on `main` alone, so **pushing an
+agent branch is no longer a gate run — opening the pull request is.** The
+`pull_request` lane runs the identical job set on `ubuntu-latest`, and over the
+195 commits both lanes used to build it was the faster of the two (20.8 min
+median against 40.2) as well as the one branch protection reads.
+
+To force the self-hosted Windows lane on a branch — the platform check this
+machine owns — dispatch it by hand:
 
 ```bash
 gh workflow run ci.yml --ref <branch>
