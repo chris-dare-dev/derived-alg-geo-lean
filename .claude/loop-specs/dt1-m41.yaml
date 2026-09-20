@@ -77,6 +77,9 @@ issues:
         files:
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/LeftDerivedTensor.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
+          - scripts/AlgebraicGeometryAudit/GeometricLedgers.lean
+          - openspec/changes/dt1-m41/agent-observations.md
+          - .claude/loop-specs/dt1-m41.yaml
         acceptance:
           - TensorAcyclicResolution and LeftDerivedTensor are actual Lean declarations with explicit comparison and inversion data.
           - The fixed-argument derived tensor exposes proved Functor.IsLeftDerivedFunctor witnesses and the exact identity case has a canonical comparison.
@@ -95,6 +98,9 @@ issues:
         files:
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/CoherentAssembly.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
+          - scripts/AlgebraicGeometryAudit/GeometricLedgers.lean
+          - openspec/changes/dt1-m41/agent-observations.md
+          - .claude/loop-specs/dt1-m41.yaml
         acceptance:
           - Named additive, commutative-shift, and triangulated transfer lemmas are available for each fixed bounded kernel.
           - HasCoherentDerivedTensor.ofUnbounded produces the existing coherent class and HasDerivedTensor projection without duplicate roots or hidden hypotheses.

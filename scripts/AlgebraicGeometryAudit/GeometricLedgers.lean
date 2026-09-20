@@ -5,6 +5,7 @@ stability-specific kernel actions use their matching algebraic-geometry
 namespace.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.LeftDerivedTensor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.LinearYoneda
@@ -12,6 +13,31 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
+
+/-! ## The unbounded derived-tensor construction interface
+
+This ledger records the localization-facing tensor declarations without claiming that a
+scheme supplies a tensor-acyclic resolution.  The exact and K-flat constructors retain their
+explicit inversion/acyclicity hypotheses; a clean axiom line therefore records only the
+construction from those hypotheses.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.resolvedTensor
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.comparisonApp
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.comparisonApp_naturality
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.resolvedTensorComparison
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.derivedTensor
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.derivedTensorFactors
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.counit
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.toLeftDerivedTensor
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.leftDerivedUnique
+#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.leftDerivedUnique_flip
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.ofExact
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.identity
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.ofKFlat
+#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.exactComparison
 
 /-! ## The geometric Fourier--Mukai correspondence: a dependency ledger
 
@@ -409,4 +435,3 @@ is membership for ONE element, not a homomorphism from anything.
 
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricMk_toAutPair_smul
 #print axioms AlgebraicGeometry.DerivedCategory.FourierMukai.geometricToAutPair
-
