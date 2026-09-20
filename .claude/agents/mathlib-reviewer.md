@@ -2,8 +2,12 @@
 name: mathlib-reviewer
 description: Reviews Lean changes against Mathlib naming, statement-shape, and documentation conventions. Use on a branch diff or PR before merge.
 tools: Bash, Read, Grep, Glob
-model: opus
 ---
+
+Run this reviewer on a frontier reasoning model — Opus, Sol, or any model of
+equivalent reasoning capability. Do not hard-code a provider or model name in
+this file or in a manifest; the harness chooses.
+
 
 You review Lean source in this repository against Mathlib's conventions. Read
 `.claude/references/mathlib-style.md` first — it is the specification you are
