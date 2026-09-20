@@ -66,7 +66,7 @@ issues:
     depends_on: []
     chunks:
       - id: aut1-6-proper-discontinuity-acceptance
-        scope: Reconcile the already-merged proper-discontinuity interface and consequences with issue #927, audit their public declarations, and repair only stale repository guidance and loop records; do not construct the external geometric input or widen the covering claim.
+        scope: "Reconcile the already-merged proper-discontinuity interface and consequences with issue #927, audit their public declarations, and repair only stale repository guidance and loop records; do not construct the external geometric input or widen the covering claim."
         requirements:
           - Proper discontinuity is supplied as external data
           - Proper discontinuity gives finite point stabilizers
@@ -86,7 +86,7 @@ issues:
           - docs/architecture/cutover-ledger.md
           - notes/loop-engineering-aut1-6.md
         acceptance:
-          - The existing Lean surface satisfies every issue #927 requirement without `sorry`, `admit`, hidden axioms, or a generic inhabitant of `ProperDiscontinuityData`.
+          - "The existing Lean surface satisfies every issue #927 requirement without `sorry`, `admit`, hidden axioms, or a generic inhabitant of `ProperDiscontinuityData`."
           - The finite-stabilizer consequence is callable from only a `ProperlyDiscontinuousSMul` hypothesis, while local, quotient, and covering results expose all required topological hypotheses.
           - The only covering result is over the image of the trivial-stabilizer locus, and the audit prints the structure, projections, and consequences.
           - The cutover ledger and loop note no longer misstate the implementation or the tracker state, and all changed files remain within this frozen list.
