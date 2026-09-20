@@ -47,3 +47,10 @@
   active. It was stopped and is locally inconclusive; the no-build precheck was
   green (with `SKIP_ACTIONLINT=1` because the binary is absent), and remote CI
   remains the authoritative build evidence.
+- After the closeout commit, controller preflight still reports the two
+  bootstrap failures `HEAD ... is not exactly origin/main` and `current branch
+  already uses planned issue branch agent/aut1-570-serre-closeout`. This is a
+  controller sequencing mismatch for a newly created manifest: the manifest
+  and frozen files must be committed before the controller can digest them, but
+  preflight requires the pre-implementation base checkout. Keep the failure in
+  the record and preserve the exact base/head guards for later PR actions.
