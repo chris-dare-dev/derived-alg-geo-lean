@@ -1079,10 +1079,10 @@ aisle is a generation theorem about base change and is not proved here.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Filtration.object
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Filtration.inclusion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Filtration.mono
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data.lift
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data.comparison
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data.comm
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416Part3Data
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416Part3Data.lift
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416Part3Data.comparison
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416Part3Data.comm
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.lemma_4_16_3
 
 /-! ## S-local slicings in the geometry-owned stability subtree (SF11.2) -/
@@ -1554,7 +1554,7 @@ pair on a structure added by #1416, #1420 or #1421 and given records for its
 fields but not its constructor:
 
     OpenRestrictionFamily.Filtration              LeftDerivedTensor
-    OpenRestrictionFamily.Lemma416_3Data          TensorAcyclicResolution
+    OpenRestrictionFamily.Lemma416Part3Data          TensorAcyclicResolution
     OpenRestrictionFamily.NoetherianLocalityData  Slicing.Restriction
     OpenRestrictionFamily.SLocalSlicingData
     OpenRestrictionFamily.TwoDistinctAffineSLocalTStructures
@@ -1572,8 +1572,8 @@ records today.
 
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Filtration.mk.inj
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Filtration.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data.mk.inj
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416_3Data.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416Part3Data.mk.inj
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.Lemma416Part3Data.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.NoetherianLocalityData.mk.inj
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.NoetherianLocalityData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.OpenRestrictionFamily.SLocalSlicingData.mk.inj
