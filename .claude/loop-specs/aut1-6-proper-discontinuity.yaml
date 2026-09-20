@@ -24,8 +24,7 @@ openspec:
 limits:
   min_issues: 1
   max_issues: 1
-  max_review_rounds_per_chunk: 3
-
+  max_review_rounds_per_chunk: 5
 review:
   independent: true
   reviewers:
@@ -75,6 +74,7 @@ issues:
           - The covering claim is restricted to the free locus
           - Missing geometric consequences remain explicit non-goals
         files:
+          - docs/architecture/generalization-backlog.md
           - .claude/loop-specs/aut1-6-proper-discontinuity.yaml
           - openspec/changes/aut1-6-proper-discontinuity/.openspec.yaml
           - openspec/changes/aut1-6-proper-discontinuity/proposal.md

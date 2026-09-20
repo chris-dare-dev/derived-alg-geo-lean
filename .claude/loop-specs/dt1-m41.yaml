@@ -29,8 +29,7 @@ openspec:
 limits:
   min_issues: 2
   max_issues: 2
-  max_review_rounds_per_chunk: 3
-
+  max_review_rounds_per_chunk: 5
 review:
   independent: true
   reviewers:
@@ -75,6 +74,7 @@ issues:
         requirements:
           - The tensor-derived left derived interface is inhabited
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/LeftDerivedTensor.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
         acceptance:
@@ -93,6 +93,7 @@ issues:
         requirements:
           - The coherent bounded derived tensor structure is assembled
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/CoherentAssembly.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
         acceptance:

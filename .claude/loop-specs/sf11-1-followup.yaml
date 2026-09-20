@@ -75,6 +75,7 @@ issues:
           - Base-change categories are constructed from honest operations
           - The §3 witnesses discharge the supported SF11.1 statements
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families
           - DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated
           - .claude/roadmap/stability-families.yaml

@@ -23,8 +23,7 @@ openspec:
 limits:
   min_issues: 2
   max_issues: 3
-  max_review_rounds_per_chunk: 3
-
+  max_review_rounds_per_chunk: 5
 review:
   independent: true
   reviewers:
@@ -69,6 +68,7 @@ issues:
         requirements:
           - Supported arbitrary derived pullbacks are constructed
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory
         acceptance:
@@ -86,6 +86,7 @@ issues:
         requirements:
           - Algebraicity is proved for the supported moduli stack
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/Moduli
           - DerivedAlgGeo/AlgebraicGeometry/Stacks
         acceptance:
@@ -102,6 +103,7 @@ issues:
         requirements:
           - Semistable reduction and quasi-properness are proved for the supported moduli stack
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/Moduli
           - DerivedAlgGeo/AlgebraicGeometry/Stacks
         acceptance:

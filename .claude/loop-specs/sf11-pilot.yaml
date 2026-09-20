@@ -77,6 +77,7 @@ issues:
           - Base-change categories are constructed from honest operations
           - The §3 witnesses discharge the supported SF11.1 statements
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families
           - DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated
           - .claude/roadmap/stability-families.yaml
@@ -97,6 +98,7 @@ issues:
         requirements:
           - S-local t-structures and slicings are inhabited
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/SLocal.lean
           - DerivedAlgGeo/CategoryTheory/Triangulated/TStructure
           - DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase/Transfer
@@ -118,6 +120,7 @@ issues:
         requirements:
           - Theorem 5.3 reuses the existing Ind extension
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families
           - DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated/IndExtension.lean
           - DerivedAlgGeo/CategoryTheory/Triangulated/TStructure
