@@ -23,7 +23,7 @@ openspec:
 limits:
   min_issues: 2
   max_issues: 3
-  max_review_rounds_per_chunk: 3
+  max_review_rounds_per_chunk: 5
 
 eligibility:
   # Issues #1060-#1062 are intentionally selected epics; no other epic is

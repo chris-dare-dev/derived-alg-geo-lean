@@ -37,7 +37,7 @@ except ImportError:  # pragma: no cover - direct invocation from another cwd
 
 
 RUN_SCHEMA = "derived-alg-geo-lean.loop-run/v1"
-MAX_ALLOWED_ROUNDS = 3
+MAX_ALLOWED_ROUNDS = 5
 REQUIRED_ADVERSARIES = {
     "mathematics-adversary",
     "repository-boundary-adversary",
@@ -321,7 +321,9 @@ def validate_spec(spec: dict[str, Any]) -> None:
     if max_issues > 3:
         raise LoopError("limits.max_issues cannot exceed 3 for an unattended pilot")
     if max_rounds > MAX_ALLOWED_ROUNDS:
-        raise LoopError("limits.max_review_rounds_per_chunk cannot exceed 3")
+        raise LoopError(
+            f"limits.max_review_rounds_per_chunk cannot exceed {MAX_ALLOWED_ROUNDS}"
+        )
     if min_issues > max_issues:
         raise LoopError("limits.min_issues cannot exceed limits.max_issues")
 
@@ -862,7 +864,9 @@ def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
         return current
     next_number = (current.get("number", 0) + 1) if current else 1
     if next_number > state["max_review_rounds"]:
-        raise LoopError("review round cap reached; no fourth critique/improve iteration is permitted")
+        raise LoopError(
+            "review round cap reached; no further critique/improve iteration is permitted"
+        )
     current = {
         "number": next_number,
         "commit": commit,
