@@ -693,7 +693,7 @@ items:
     kind: epic
     parent: stability-families-m11
     title: "Theorem 5.3: the base-changed t-structure on (Dqc)_T"
-    status: in_progress
+    status: done
     summary: "The formal Ind-extension bridge for Theorem 5.3 is now present without a second carrier: IndExtensionData proves the inclusion t-exactness and exposes its coproduct-aisle comparison, while a PreservesColimit boundary records the filtered-colimit owner input. Families/Theorem53.lean adds source-shaped bounded-range descent and tensor/t-exactness owner data for (5.1), (5.2), (3), (4a)-(4d), and (5.3)/(5.4), with formal composition theorems. The scheme-level flat/fpqc, tensor, and base-change geometry remains explicit and is not claimed proved by inhabiting the boundary structures."
     priority: must
     size: XL
