@@ -30,14 +30,15 @@ fails=0
 # default keeps the SIZE cases testing size, and the width cases override it.
 export LEAN_NUM_THREADS=2
 
-# The gate also resolves a bare `lake` against PATH, and on the development host
-# the self-hosted runners' shim directories sit at the FRONT of it -- CI puts
-# them there on every job (see "Whose lake" in check_local_build.py). Left
-# alone, every bare-`lake` case below would be testing the interpreter rule
-# instead of the rule it names, and the suite would read red on the one machine
-# that matters. Pin PATH to the shape a clean checkout has.
+# The gate also resolves a bare `lake` against PATH. On the retired Windows
+# host the self-hosted runners' shim directories sat at the FRONT of it, put
+# there by CI on every job; the Ubuntu runners (#1443) keep their shims inside
+# their own HOME and no longer export them (see "Whose lake" in
+# check_local_build.py). Left unfiltered on a host that does export them, every
+# bare-`lake` case below would test the interpreter rule instead of the rule it
+# names. Both layouts are stripped, so the suite reads the same either way.
 PATH="$(printf '%s' "$PATH" | tr ':' '
-' | grep -v actions-runner | paste -sd: -)"
+' | grep -v -e actions-runner -e github-runners | paste -sd: -)"
 export PATH
 
 # refuse|allow <name> -- <argv for the checker, CLI mode>
@@ -111,6 +112,11 @@ cli_case allow  'lake exe runLinter DerivedAlgGeo' lake exe runLinter DerivedAlg
 # that can refuse them is the interpreter.
 cli_case refuse 'runner shim, absolute path'      /c/actions-runner/derived-alg-geo-lean-3/.elan/bin/lake build DerivedAlgGeo.Foo
 cli_case refuse 'runner shim, relative path'      ../actions-runner/r/.elan/bin/lake build DerivedAlgGeo.Foo
+# The Ubuntu layout (#1443). The pattern matched only `actions-runner` when the
+# runners moved, so this check refused nothing at all on the new host until the
+# spelling was added. These two cases are why that cannot recur quietly.
+cli_case refuse 'ubuntu runner shim, main'        "$HOME/.local/share/github-runners/main/home/.elan/bin/lake" build DerivedAlgGeo.Foo
+cli_case refuse 'ubuntu runner shim, general'     "$HOME/.local/share/github-runners/general-2/home/.elan/bin/lake" build DerivedAlgGeo.Foo
 cli_case allow  'own elan, absolute path'         "$HOME/.elan/bin/lake" build DerivedAlgGeo.Foo
 cli_case allow  'own elan, tilde spelling'        '~/.elan/bin/lake' build DerivedAlgGeo.Foo
 

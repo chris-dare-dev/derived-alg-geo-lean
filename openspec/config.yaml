@@ -2,8 +2,10 @@ schema: spec-driven
 
 context: |
   Tech stack: Lean 4 with mathlib, Python repository gates, GitHub pull requests,
-  and self-hosted Windows runners. The repository is a formalization of derived
-  algebraic geometry and its claims are correctness-critical.
+  hosted ubuntu-latest runners for pull requests, and self-hosted Ubuntu runners
+  on the owner's workstation for main and manual dispatch. The repository is a
+  formalization of derived algebraic geometry and its claims are
+  correctness-critical.
 
   OpenSpec artifacts are the source of truth for the intended behavior of a
   change. Keep mathematical requirements and observable proof obligations in
