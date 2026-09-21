@@ -33,8 +33,12 @@ section *is* a map out of the unit. `twistBy` then tensors it with `F` and cance
 point: `#584`'s comparison stops at associated sheaves, and `#585` may not inherit that limit —
 its acceptance criteria forbid exactly that hypothesis. Nothing here needs the comparison.
 
-The same two maps are what `#570` step 1 asks for to build `Γ_*(F)` as a graded module, "with the
-`A`-action from the twist multiplication maps".
+The original `#570` issue sketch proposed using these maps to build `Γ_*(F)` as a graded module,
+with the `A`-action supplied by twist multiplication. That route is now historical: the completed
+proof takes the direct chart-generation route instead. `GlobalGeneration.lean` consumes these maps
+alongside the uniform extension theorem to obtain `free I ↠ F ⊗ O(N)`, and `TwistInverse.lean`
+then untwists it to the finite coproduct epimorphism. No graded Serre correspondence is asserted
+here.
 
 ## Why `unitToTwist_app_one` is not decoration
 

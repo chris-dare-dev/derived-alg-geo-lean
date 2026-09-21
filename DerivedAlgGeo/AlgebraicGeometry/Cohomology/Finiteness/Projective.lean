@@ -48,7 +48,11 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 namespace AlgebraicGeometry.Proj
 
-variable (ι k : Type u) [Field k] [Fintype ι] [Nontrivial ι]
+variable (ι k : Type u) [Field k] [Fintype ι]
+
+section NegativeTwist
+
+variable [Nontrivial ι]
 
 /-- **`Hⁱ(Pⁿ, O(d))` is finite-dimensional in every degree for a negative twist.**
 
@@ -65,9 +69,12 @@ theorem module_finite_linearCoherentH_projectiveSpaceTwist_of_neg (d : ℤ) (hd 
     exact Module.Finite.of_finite
   | succ n => exact module_finite_linearCoherentH_projectiveSpaceTwist ι k d n
 
+end NegativeTwist
+
 /-- **Every coherent sheaf on `Pⁿ` is the quotient, in `Coh Pⁿ`, of a finite coproduct of copies
 of a negative twist**, with coherent kernel: Serre's surjection lifted along `Coh.ι`. -/
-theorem exists_shortExact_coproduct_twist (F : Coh (Proj (polynomialGrading ι k))) :
+theorem exists_shortExact_coproduct_twist [Nonempty ι]
+    (F : Coh (Proj (polynomialGrading ι k))) :
     ∃ (S : ShortComplex (Coh (Proj (polynomialGrading ι k)))) (_ : S.ShortExact)
       (_ : S.X₃ ≅ F) (N : ℕ) (_ : 1 ≤ N) (I : Type u) (_ : Finite I),
       S.X₂ = ∐ (fun _ : I => projectiveSpaceTwist ι k (-(N : ℤ))) := by
@@ -90,6 +97,8 @@ theorem exists_shortExact_coproduct_twist (F : Coh (Proj (polynomialGrading ι k
   exact { exact := ShortComplex.exact_of_f_is_kernel _ (kernelIsKernel q')
           mono_f := inferInstance
           epi_g := inferInstance }
+
+variable [Nontrivial ι]
 
 /-- **Serre finiteness on projective space**: every coherent sheaf on `Pⁿ_k` has
 finite-dimensional cohomology in every degree. -/

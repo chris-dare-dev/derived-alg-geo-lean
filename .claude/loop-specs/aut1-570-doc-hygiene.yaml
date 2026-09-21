@@ -1,0 +1,92 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: aut1-570-doc-hygiene
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: disabled
+
+openspec:
+  change: aut1-570-serre-closeout
+  validation: cli-required
+  required_artifacts:
+    - .openspec.yaml
+    - proposal.md
+    - design.md
+    - tasks.md
+    - agent-observations.md
+    - specs/projective-serre-quotient/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+    - trust-surface
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: true
+  allow_delete_branch_override: true
+  allow_auto: true
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: false
+
+mutations:
+  comment_issue: true
+  close_issue: true
+  push_branch: true
+  create_pr: true
+  approve_pr: true
+  merge_pr: true
+
+issues:
+  - number: 570
+    slug: aut1-570-serre-closeout
+    depends_on: []
+    chunks:
+      - id: aut1-570-doc-hygiene
+        scope: "Apply the terminal review's two precise documentation corrections for the already-landed Serre route in issue #570: disambiguate the alternative-twist comparison and qualify the degree-one local-freeness warning; do not add a mathematical API or change theorem proofs."
+        requirements:
+          - Projective space has finite negative-twist coproduct presentations
+          - The general Proj theorem is an untwisted finite coproduct epimorphism
+          - Repository guidance distinguishes the three Serre-lane statements
+        files:
+          - .claude/loop-specs/aut1-570-doc-hygiene.yaml
+          - openspec/changes/aut1-570-serre-closeout/.openspec.yaml
+          - openspec/changes/aut1-570-serre-closeout/proposal.md
+          - openspec/changes/aut1-570-serre-closeout/design.md
+          - openspec/changes/aut1-570-serre-closeout/tasks.md
+          - openspec/changes/aut1-570-serre-closeout/agent-observations.md
+          - openspec/changes/aut1-570-serre-closeout/specs/projective-serre-quotient/spec.md
+          - DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean
+          - DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean
+          - DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/Projective.lean
+        acceptance:
+          - "The existing declarations `exists_epi_coproduct_twistingSheaf_ge` and `exists_shortExact_coproduct_twist` satisfy the general and Pⁿ forms of issue #570 without `sorry`, `admit`, hidden axioms, a global-generation instance, or an assumed resolution."
+          - "The projective presentation theorem requires only finite nonempty `ι`, so the singleton-index `P⁰` case is included; the separate cohomology-finiteness declarations retain their legitimate `[Nontrivial ι]` hypothesis."
+          - "The arbitrary-degree Glue.lean guidance distinguishes the direct `gᵢ^(eN)` target from the unavailable intermediate `F(e*n)(2*e*m)` composition and does not claim universal non-local-freeness when degree-one generation is absent."
+          - "The two stale docstrings identify section extension (#585), global generation (#586), and the final untwisted coproduct theorem (#570) without claiming that the original Γ_* route is required."
+          - "The OpenSpec artifacts, audit evidence, targeted checks, four-role adversarial ledger, required CI checks, and controller closure all bind to this exact frozen file list."
+        closure: complete
