@@ -42,6 +42,12 @@ has a checked-in merge policy that makes method, auto-merge, administrator
 merge, and branch deletion explicit; the controller still requires its live
 preflight and digest-bound review ledger before any mutation.
 
+`scripts/loop_tokens.py` is the cost side of the same run. It reconstructs
+token totals from the Claude Code and Codex transcripts after the fact, so
+neither runtime has to be instrumented in advance, and attributes them to the
+frozen chunks recorded in `.loop-runs/`. It reads those ledgers and never
+writes to them.
+
 ## The artifacts in `notes/`
 
 Produced 2026-08-04 by two multi-agent workflows (34 agents, ~4.2M tokens).
