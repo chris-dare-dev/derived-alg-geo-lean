@@ -23,8 +23,7 @@ openspec:
 limits:
   min_issues: 2
   max_issues: 3
-  max_review_rounds_per_chunk: 3
-
+  max_review_rounds_per_chunk: 5
 review:
   independent: true
   reviewers:
@@ -32,6 +31,9 @@ review:
     - repository-boundary-adversary
     - abstraction-adversary
     - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
 
 runner:
   required_checks:
@@ -69,8 +71,14 @@ issues:
         requirements:
           - Supported arbitrary derived pullbacks are constructed
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory
+        lift_targets:
+          # layers.md:341: generic derived-category extensions. A pullback
+          # witness that turns out not to use the scheme structure belongs with
+          # the generic theory, not beside the affine case that needed it.
+          - DerivedAlgGeo/Algebra/Homology/DerivedCategory
         acceptance:
           - The `ℤ → ZMod 2` ring map and its affine `Spec.map` are actual Lean data with proved non-flatness and non-isomorphism.
           - The existing supported affine geometric pullback is instantiated without a flatness hypothesis, and the general preservation/coherence boundary remains explicit.
@@ -98,8 +106,17 @@ issues:
         requirements:
           - Algebraicity is proved for the supported moduli stack
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/Moduli
           - DerivedAlgGeo/AlgebraicGeometry/Stacks
+        lift_targets:
+          # layers.md:354 names CategoryTheory/Moduli the owner of neutral moduli
+          # boundedness; it holds one file against AlgebraicGeometry/Moduli's
+          # twenty. layers.md:350 names Sites/Descent the owner of generic stacks
+          # and representable fibers. Atlas, diagonal and local-finiteness
+          # arguments that never open a scheme belong there.
+          - DerivedAlgGeo/CategoryTheory/Moduli
+          - DerivedAlgGeo/CategoryTheory/Sites/Descent
         acceptance:
           - The atlas is an actual scheme morphism with the required coverage statements.
           - The diagonal and local-finiteness claims are proved without a representability shortcut.
@@ -114,8 +131,15 @@ issues:
         requirements:
           - Semistable reduction and quasi-properness are proved for the supported moduli stack
         files:
+          - docs/architecture/generalization-backlog.md
           - DerivedAlgGeo/AlgebraicGeometry/Moduli
           - DerivedAlgGeo/AlgebraicGeometry/Stacks
+        lift_targets:
+          # Same two neutral owners as sf9-2 (layers.md:350, :354). Quasi-
+          # properness and semistable-reduction data are stated about a stack and
+          # a valuation, not about this particular moduli problem.
+          - DerivedAlgGeo/CategoryTheory/Moduli
+          - DerivedAlgGeo/CategoryTheory/Sites/Descent
         acceptance:
           - DVR/Dedekind test diagrams, permitted base change, and semistable replacement are represented by actual supported structures.
           - The quasi-properness adapter consumes the canonical algebraicity and relative-HN interfaces without a valuative conclusion postulate.
