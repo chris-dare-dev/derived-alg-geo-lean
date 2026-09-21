@@ -119,6 +119,8 @@ run_case "loop skill"                       trip ".claude/skills/run-loop/SKILL.
 run_case "openspec change"                  trip "openspec/changes/pilot-change/tasks.md\t0\t$(b64 "$GOOD")" || fails=1
 run_case "audit record slice"              skip "scripts/AlgebraicGeometryAudit/Core.lean\t0\t$(b64 "$GOOD")" || fails=1
 run_case "ordinary source file"            skip "DerivedAlgGeo/Foo.lean\t0\t$(b64 "$GOOD")"                || fails=1
+run_case "ordinary file with omitted patch" skip "README.md\t0\t"                         || fails=1
+run_case "renamed guarded file"             trip "README.md\t$(b64 '.github/workflows/trust-guard.yml')\trenamed\t0\t$(b64 "$GOOD")" || fails=1
 run_case "trust path without review"       trip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")"                  || fails=1
 run_case "trust path exact review"         skip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")" exact             || fails=1
 run_case "review bound to old head"        trip "scripts/EnumDecls.lean\t0\t$(b64 "$GOOD")" old-head          || fails=1

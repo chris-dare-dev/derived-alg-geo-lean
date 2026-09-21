@@ -18,9 +18,12 @@ from pathlib import Path
 from typing import Any
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 FULL_SHA = re.compile(r"^[0-9a-fA-F]{40}$")
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
+BRANCH_REF = re.compile(r"^refs/heads/[A-Za-z0-9._/-]+$")
+PULL_REF = re.compile(r"^refs/pull/[1-9][0-9]*/(?:head|merge)$")
+GENERIC_REF = re.compile(r"^refs/[A-Za-z0-9._/-]+$")
 EVENTS = {"pull_request", "push", "merge_group", "workflow_dispatch"}
 PLATFORMS = {"github-actions", "github-checks", "github-status"}
 GATE_CLASSES = {
@@ -71,13 +74,29 @@ def _as_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
+def _valid_ref(event: Any, ref: Any) -> bool:
+    if not _is_string(ref) or not GENERIC_REF.fullmatch(ref):
+        return False
+    if ".." in ref or "//" in ref or "\\" in ref:
+        return False
+    if event in {"push", "workflow_dispatch", "merge_group"}:
+        return bool(BRANCH_REF.fullmatch(ref))
+    if event == "pull_request":
+        return bool(PULL_REF.fullmatch(ref))
+    return False
+
+
 def _event_applies(definition: dict[str, Any], evidence: dict[str, Any]) -> bool:
     event = evidence.get("event")
     ref = evidence.get("ref")
     for selector in definition.get("applies_to", []):
         if selector == event:
             return True
-        if selector.startswith("push:") and event == "push" and ref == selector[5:]:
+        if (
+            selector.startswith("push:")
+            and event == "push"
+            and ref == f"refs/heads/{selector[5:]}"
+        ):
             return True
         if selector == "workflow_dispatch" and event == "workflow_dispatch":
             return True
@@ -166,6 +185,8 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         "candidate_commit",
         "candidate_tree",
         "event",
+        "ref",
+        "revision_binding",
         "platform",
         "run_id",
         "run_attempt",
@@ -188,6 +209,22 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
             errors.append(f"evidence.{field} must be a full 40-character commit/tree SHA")
     if evidence.get("event") not in EVENTS:
         errors.append("evidence.event is not recognized")
+    if not _valid_ref(evidence.get("event"), evidence.get("ref")):
+        errors.append("evidence.ref is not a valid event-bound ref")
+    revision_binding = evidence.get("revision_binding")
+    if not isinstance(revision_binding, dict):
+        errors.append("evidence.revision_binding must be an object")
+    else:
+        for field in (
+            "base_commit",
+            "head_commit",
+            "candidate_commit",
+            "candidate_tree",
+            "event",
+            "ref",
+        ):
+            if revision_binding.get(field) != evidence.get(field):
+                errors.append(f"evidence.revision_binding.{field} does not match evidence")
     if evidence.get("platform") not in PLATFORMS:
         errors.append("evidence.platform is not recognized")
     if not _is_positive_int(evidence.get("run_id")):
@@ -205,26 +242,39 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
     if not isinstance(artifacts, list):
         errors.append("evidence.artifacts must be an array")
         artifacts = []
+    if not artifacts:
+        errors.append("evidence.artifacts must be non-empty")
     for index, artifact in enumerate(artifacts):
         prefix = f"evidence.artifacts[{index}]"
         if not isinstance(artifact, dict):
             errors.append(f"{prefix} must be an object")
             continue
-        for field in ("id", "path", "sha256"):
+        for field in ("id", "path", "sha256", "media_type", "producer", "kind", "commit"):
             if not _is_string(artifact.get(field)):
                 errors.append(f"{prefix}.{field} is required")
+        for field in ("run_id", "run_attempt", "size_bytes"):
+            if not _is_positive_int(artifact.get(field)):
+                errors.append(f"{prefix}.{field} must be a positive integer")
         artifact_id = artifact.get("id")
         artifact_path = artifact.get("path")
-        if artifact_id in artifact_ids:
-            errors.append(f"{prefix}.id duplicates {artifact_id!r}")
-        elif _is_string(artifact_id):
-            artifact_ids.add(artifact_id)
-        if artifact_path in artifact_paths:
-            errors.append(f"{prefix}.path duplicates {artifact_path!r}")
-        elif _is_string(artifact_path):
-            artifact_paths.add(artifact_path)
+        if _is_string(artifact_id):
+            if artifact_id in artifact_ids:
+                errors.append(f"{prefix}.id duplicates {artifact_id!r}")
+            else:
+                artifact_ids.add(artifact_id)
+        if _is_string(artifact_path):
+            if artifact_path in artifact_paths:
+                errors.append(f"{prefix}.path duplicates {artifact_path!r}")
+            else:
+                artifact_paths.add(artifact_path)
         if artifact.get("sha256") is not None and not _is_sha256(artifact.get("sha256")):
             errors.append(f"{prefix}.sha256 must be a 64-character SHA-256")
+        if artifact.get("commit") is not None and not _is_sha(artifact.get("commit")):
+            errors.append(f"{prefix}.commit must be a full SHA")
+        elif _is_sha(artifact.get("commit")) and artifact.get("commit", "").lower() != str(
+            evidence.get("candidate_commit", "")
+        ).lower():
+            errors.append(f"{prefix}.commit is not bound to evidence.candidate_commit")
 
     definitions = {
         gate.get("id"): gate
@@ -238,6 +288,7 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
     seen_ids: set[str] = set()
     seen_names: set[str] = set()
     seen_provider_names: set[tuple[str, str]] = set()
+    seen_provider_ids: set[str] = set()
     gate_by_id: dict[str, dict[str, Any]] = {}
     for index, gate in enumerate(gates):
         prefix = f"evidence.gates[{index}]"
@@ -273,6 +324,10 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         seen_provider_names.add(provider_key)
         if not _is_string(gate.get("provider_id")):
             errors.append(f"{prefix}.provider_id is required and must not be inferred")
+        elif gate.get("provider_id") in seen_provider_ids:
+            errors.append(f"{prefix}.provider_id duplicates {gate.get('provider_id')!r}")
+        else:
+            seen_provider_ids.add(gate.get("provider_id"))
         if not _is_sha(gate.get("commit")):
             errors.append(f"{prefix}.commit must be a full SHA")
         elif gate.get("commit", "").lower() != str(evidence.get("candidate_commit", "")).lower():
@@ -311,6 +366,30 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         refs = gate.get("artifact_refs", [])
         if not isinstance(refs, list) or any(ref not in artifact_ids for ref in refs):
             errors.append(f"{prefix}.artifact_refs contain an unknown artifact")
+            refs = []
+        if gate.get("applicable") and not refs:
+            errors.append(f"{prefix}.artifact_refs must be non-empty for an applicable gate")
+        if not gate.get("applicable") and refs:
+            errors.append(f"{prefix}.artifact_refs must be empty for a non-applicable gate")
+        for artifact_id in refs:
+            artifact = next(
+                (
+                    item
+                    for item in artifacts
+                    if isinstance(item, dict) and item.get("id") == artifact_id
+                ),
+                None,
+            )
+            if not isinstance(artifact, dict):
+                continue
+            if artifact.get("producer") != definition.get("producer"):
+                errors.append(f"{prefix}: artifact producer does not match inventory")
+            if artifact.get("kind") != definition.get("artifact"):
+                errors.append(f"{prefix}: artifact kind does not match inventory")
+            if artifact.get("run_id") != evidence.get("run_id"):
+                errors.append(f"{prefix}: artifact run_id must equal evidence.run_id")
+            if artifact.get("run_attempt") != evidence.get("run_attempt"):
+                errors.append(f"{prefix}: artifact run_attempt must equal evidence.run_attempt")
 
     for gate_id, definition in definitions.items():
         if gate_id not in seen_ids:

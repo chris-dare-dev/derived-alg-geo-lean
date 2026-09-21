@@ -21,14 +21,27 @@ SHA_C = "c" * 40
 def evidence(*, event: str = "pull_request") -> dict:
     gates = []
     artifacts = []
+    ref = "refs/heads/main" if event == "push" else "refs/pull/1/merge"
     for index, definition in enumerate(INVENTORY["gates"], start=1):
-        applicable = ci_contract._event_applies(definition, {"event": event, "ref": "main"})
+        applicable = ci_contract._event_applies(definition, {"event": event, "ref": ref})
         status = "passed" if applicable else "skipped"
         conclusion = "success" if applicable else "skipped"
         artifact_id = f"artifact-{index}"
-        artifacts.append(
-            {"id": artifact_id, "path": f"results/{artifact_id}.json", "sha256": f"{index:064x}"}
-        )
+        if applicable:
+            artifacts.append(
+                {
+                    "id": artifact_id,
+                    "path": f"results/{artifact_id}.json",
+                    "sha256": f"{index:064x}",
+                    "media_type": "application/json",
+                    "size_bytes": 128,
+                    "producer": definition["producer"],
+                    "kind": definition["artifact"],
+                    "commit": SHA_C,
+                    "run_id": 35532316123,
+                    "run_attempt": 1,
+                }
+            )
         gates.append(
             {
                 "id": definition["id"],
@@ -42,19 +55,27 @@ def evidence(*, event: str = "pull_request") -> dict:
                 "conclusion": conclusion,
                 "applicable": applicable,
                 "prerequisites": definition["prerequisites"],
-                "artifact_refs": [artifact_id],
+                "artifact_refs": [artifact_id] if applicable else [],
                 **({"skip_reason": "event does not produce this auxiliary gate"} if not applicable else {}),
             }
         )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "repository": INVENTORY["repository"],
         "base_commit": SHA_A,
         "head_commit": SHA_B,
         "candidate_commit": SHA_C,
         "candidate_tree": SHA_C,
         "event": event,
-        "ref": "main" if event == "push" else "refs/pull/1/merge",
+        "ref": ref,
+        "revision_binding": {
+            "base_commit": SHA_A,
+            "head_commit": SHA_B,
+            "candidate_commit": SHA_C,
+            "candidate_tree": SHA_C,
+            "event": event,
+            "ref": ref,
+        },
         "platform": "github-actions",
         "run_id": 35532316123,
         "run_attempt": 1,
@@ -83,6 +104,21 @@ class ContractTests(unittest.TestCase):
         candidate = evidence()
         del candidate["candidate_tree"]
         self.assert_invalid(candidate, "evidence.candidate_tree is required")
+
+    def test_push_ref_must_be_provider_canonical(self) -> None:
+        candidate = evidence(event="push")
+        candidate["ref"] = "main"
+        self.assert_invalid(candidate, "valid event-bound ref")
+
+    def test_revision_binding_mismatch_is_rejected(self) -> None:
+        candidate = evidence()
+        candidate["revision_binding"]["candidate_commit"] = SHA_B
+        self.assert_invalid(candidate, "revision_binding.candidate_commit")
+
+    def test_applicable_gate_requires_bound_artifact(self) -> None:
+        candidate = evidence()
+        candidate["gates"][0]["artifact_refs"] = []
+        self.assert_invalid(candidate, "artifact_refs must be non-empty")
 
     def test_gate_from_stale_revision_is_rejected(self) -> None:
         candidate = evidence()
@@ -122,7 +158,7 @@ class ContractTests(unittest.TestCase):
     def test_unknown_schema_is_rejected(self) -> None:
         candidate = evidence()
         candidate["schema_version"] = 99
-        self.assert_invalid(candidate, "evidence.schema_version must be 1")
+        self.assert_invalid(candidate, "evidence.schema_version must be 2")
 
     def test_passed_gate_requires_passed_prerequisites(self) -> None:
         candidate = evidence()

@@ -10,7 +10,8 @@
       "emitter": "emitter-sha",
       "dependency_graph_complete": true,
       "changed_files": ["DerivedAlgGeo/Foo.lean"],
-      "direct_changes": ["DerivedAlgGeo/Foo.lean"]
+      "direct_changes": ["DerivedAlgGeo/Foo.lean"],
+      "transitive_changes": []
     }
   },
   {

@@ -36,3 +36,10 @@ evidence paths is recorded:
 Until one path is evidenced, keep the failure visible and classify it as
 `provider_failure`; do not add `continue-on-error`, fabricate a success
 status, or silently remove the check.
+
+The normalized `verified_scan` disposition is intentionally strict: its
+coverage proof must bind workflow, run, job, candidate revision, scanner
+scope, and a hashed result artifact, and must include an executed negative
+fixture whose expected finding was observed. An empty proof object is not
+coverage. Replacement or retirement decisions likewise require an owner,
+reason, timestamp, follow-up, and the exact reviewed revision.

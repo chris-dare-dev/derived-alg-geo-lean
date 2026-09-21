@@ -79,23 +79,18 @@ jobs:
           # The changed-file list comes from the API, not from a checkout, so
           # nothing in the pull request is fetched or executed here.
           #
-          # One record per file: name, deletion count, and the patch base64'd so
+          # One record per file: new name, previous name base64'd, change status,
+          # deletion count, and the patch base64'd so
           # no diff content can inject a tab or newline into the loop below. The
           # patch is DATA -- decoded and grepped, never executed, and nothing
           # derived from it reaches a command position.
-          files="$(gh api --paginate "repos/$REPO/pulls/$PR/files?per_page=100" --jq '.[] | [.filename, (.deletions|tostring), (.patch // "" | @base64)] | @tsv')"
+          files="$(gh api --paginate "repos/$REPO/pulls/$PR/files?per_page=100" --jq '.[] | [.filename, ((.previous_filename // "") | @base64), (.status // ""), (.deletions|tostring), ((.patch // "") | @base64)] | @tsv')"
           if [ -z "$files" ]; then
             echo "::error::the API returned no files for PR #$PR. This job must" \
                  "not pass on an empty file list -- that is the vacuous pass it" \
                  "exists to prevent."
             exit 1
           fi
-          if ! printf '%s\n' "$files" | awk -F '\t' '$3 == "" {bad=1} END {exit bad}'; then
-            echo "::error::the changed-file API omitted a patch; refusing an" \
-                 "incomplete trust-surface decision"
-            exit 1
-          fi
-
           # The guarded paths. Everything here decides what a green `ci` MEANS:
           # the workflows that define it, the scripts it executes, the emitter
           # and sweep root it measures, the pins that say what it ran against,
@@ -170,42 +165,114 @@ jobs:
           # deletion count does the same.
           umbrella='^scripts/[A-Za-z0-9]+Audit\.lean$'
 
-          touched=""
-          while IFS=$'\t' read -r f dels patch64; do
-            [ -n "$f" ] || continue
-            skip=""
+          path_is_excluded() {
+            local path="$1" e
+            [ -n "$path" ] || return 1
             while IFS= read -r e; do
               e="$(printf '%s' "$e" | tr -d '[:space:]')"
               [ -n "$e" ] || continue
-              if printf '%s' "$f" | grep -Eq "$e"; then
-                skip="yes"
-                break
+              if printf '%s' "$path" | grep -Eq "$e"; then
+                return 0
               fi
             done <<< "$exclusions"
-            [ -z "$skip" ] || continue
+            return 1
+          }
 
-            # The additive-umbrella-import carve-out. Every condition must hold;
-            # any one of them failing keeps the file guarded.
-            if printf '%s' "$f" | grep -Eq "$umbrella" \
-               && [ "${dels:-1}" = "0" ] && [ -n "${patch64:-}" ]; then
-              added="$(printf '%s' "$patch64" | base64 -d \
-                       | grep '^+' | grep -v '^+++' || true)"
-              if [ -n "$added" ] && ! printf '%s\n' "$added" \
-                   | grep -qvE '^\+import [A-Za-z0-9_]+Audit(\.[A-Za-z0-9_]+)+$'; then
-                echo "note: $f adds only audit imports and deletes nothing" \
-                     "-- not a trust-surface change"
-                continue
-              fi
-            fi
-
+          path_matches_patterns() {
+            local path="$1" p
             while IFS= read -r p; do
               p="$(printf '%s' "$p" | tr -d '[:space:]')"
               [ -n "$p" ] || continue
-              if printf '%s' "$f" | grep -Eq "$p"; then
-                touched="$touched$f"$'\n'
-                break
+              if printf '%s' "$path" | grep -Eq "$p"; then
+                return 0
               fi
             done <<< "$patterns"
+            return 1
+          }
+
+          new_path_is_guarded() {
+            local path="$1" status="$2" dels="$3" patch64="$4"
+            path_is_excluded "$path" && return 1
+            if printf '%s' "$path" | grep -Eq "$umbrella"; then
+              # The additive-umbrella-import carve-out applies only to a new or
+              # modified file with an inspectable patch. Renames and omitted
+              # patches stay guarded because their old/new relationship cannot
+              # be proven safe.
+              if [ "$status" != "renamed" ] && [ "${dels:-1}" = "0" ] \
+                 && [ -n "${patch64:-}" ]; then
+                local added
+                added="$(printf '%s' "$patch64" | base64 -d \
+                         | grep '^+' | grep -v '^+++' || true)"
+                if [ -n "$added" ] && ! printf '%s\n' "$added" \
+                     | grep -qvE '^\+import [A-Za-z0-9_]+Audit(\.[A-Za-z0-9_]+)+$'; then
+                  echo "note: $path adds only audit imports and deletes nothing" \
+                       "-- not a trust-surface change"
+                  return 1
+                fi
+              fi
+              return 0
+            fi
+            path_matches_patterns "$path" && return 0
+            return 1
+          }
+
+          old_path_is_guarded() {
+            local path="$1"
+            path_is_excluded "$path" && return 1
+            path_matches_patterns "$path" && return 0
+            printf '%s' "$path" | grep -Eq "$umbrella"
+          }
+
+          touched=""
+          while IFS=$'\t' read -r f previous64 status dels patch64; do
+            [ -n "$f" ] || continue
+
+            # Keep the local harness's old three-column fixtures readable while
+            # the API path uses filename/previous_filename/status/deletions/patch.
+            case "$status" in
+              added|modified|removed|renamed|copied) ;;
+              *)
+                patch64="$status"
+                dels="$previous64"
+                previous64=""
+                status="modified"
+                ;;
+            esac
+
+            previous=""
+            if [ -n "${previous64:-}" ]; then
+              previous="$(printf '%s' "$previous64" | base64 -d)" || {
+                echo "::error::invalid base64 previous filename for $f"
+                exit 1
+              }
+            fi
+            case "$status" in
+              added|modified|removed|renamed|copied) ;;
+              *)
+                echo "::error::unsupported file status $status for $f"
+                exit 1
+                ;;
+            esac
+            if [ "$status" = "renamed" ] && [ -z "$previous" ]; then
+              echo "::error::renamed file $f lacks previous_filename"
+              exit 1
+            fi
+
+            new_guarded=no
+            old_guarded=no
+            if new_path_is_guarded "$f" "$status" "$dels" "$patch64"; then
+              new_guarded=yes
+            fi
+            if [ -n "$previous" ] && old_path_is_guarded "$previous"; then
+              old_guarded=yes
+            fi
+            if [ "$new_guarded" = yes ] || [ "$old_guarded" = yes ]; then
+              if [ -n "$previous" ]; then
+                touched="$touched$previous -> $f"$'\n'
+              else
+                touched="$touched$f"$'\n'
+              fi
+            fi
           done <<< "$files"
 
           if [ -z "$touched" ]; then

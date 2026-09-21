@@ -10,9 +10,11 @@ jobs and the physical host capacity before admitting another writable job.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import ntpath
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -29,6 +31,11 @@ WRITABLE_PATHS = (
     "artifacts",
 )
 REQUIRED_IDENTITY = ("host_id", "runner_id", "job_id", "run_id", "run_attempt", "namespace")
+NAMESPACE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+RESERVED_NAMESPACES = {"CON", "PRN", "AUX", "NUL"} | {
+    f"{prefix}{number}" for prefix in ("COM", "LPT") for number in range(1, 10)
+}
+RESOURCE_FIELDS = ("cpu_threads", "memory_bytes", "disk_bytes")
 
 
 def _load(path: Path) -> Any:
@@ -50,10 +57,14 @@ def canonical_path(value: Any) -> str:
     raw = os.path.expandvars(os.path.expanduser(value.strip()))
     windows_style = bool(ntpath.splitdrive(raw)[0]) or "\\" in raw
     if windows_style:
+        if not ntpath.isabs(raw):
+            raise ValueError("path must be absolute")
         return ntpath.normcase(ntpath.normpath(raw)).rstrip("\\") or "\\"
     # ntpath normalization is useful on Linux when validating a Windows runner
     # snapshot captured on another host; Path.resolve supplies local symlink
     # resolution when the path exists here.
+    if not Path(raw).is_absolute():
+        raise ValueError("path must be absolute")
     try:
         resolved = str(Path(raw).resolve(strict=False))
     except OSError:
@@ -68,6 +79,50 @@ def _overlap(left: str, right: str) -> bool:
     return a == b or a.startswith(b + "\\") or b.startswith(a + "\\")
 
 
+def _path_identity(value: Any) -> str:
+    if not isinstance(value, dict):
+        raise ValueError("path entry must be an object")
+    raw = value.get("path")
+    if not isinstance(raw, str) or not raw.strip():
+        raise ValueError("path must be a non-empty string")
+    windows_style = bool(ntpath.splitdrive(raw.strip())[0]) or "\\" in raw
+    if windows_style:
+        # Validate the observed path itself before trusting the collector's
+        # OS-resolved identity. A drive-relative path must never be repaired by
+        # a caller-supplied resolved_path.
+        canonical_path(raw)
+        resolved = value.get("resolved_path")
+        if not isinstance(resolved, str) or not resolved.strip():
+            raise ValueError("resolved_path is required for Windows path identity")
+        return canonical_path(resolved)
+    return canonical_path(raw)
+
+
+def _record_digest(record: dict[str, Any]) -> str:
+    encoded = json.dumps(record, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _lease_path(record: dict[str, Any], lease_dir: Path) -> Path:
+    namespace = record.get("namespace")
+    if (
+        not isinstance(namespace, str)
+        or not NAMESPACE_RE.fullmatch(namespace)
+        or namespace.upper() in RESERVED_NAMESPACES
+    ):
+        raise ValueError("namespace must contain only safe filename characters")
+    root = lease_dir.resolve(strict=False)
+    raw_candidate = root / f"{namespace}.json"
+    if raw_candidate.is_symlink():
+        raise ValueError(f"lease path is a symlink: {raw_candidate}")
+    candidate = raw_candidate.resolve(strict=False)
+    try:
+        candidate.relative_to(root)
+    except ValueError as exc:
+        raise ValueError("lease namespace escapes the lease directory") from exc
+    return candidate
+
+
 def validate_record(record: Any) -> list[str]:
     errors: list[str] = []
     if not isinstance(record, dict):
@@ -79,6 +134,10 @@ def validate_record(record: Any) -> list[str]:
                 errors.append(f"{field} must be a positive integer")
         elif not isinstance(value, str) or not value.strip():
             errors.append(f"{field} is required")
+    if isinstance(record.get("namespace"), str):
+        namespace_upper = record["namespace"].upper()
+        if not NAMESPACE_RE.fullmatch(record["namespace"]) or namespace_upper in RESERVED_NAMESPACES:
+            errors.append("namespace must contain only safe filename characters")
     resources = record.get("resources")
     if not isinstance(resources, dict):
         errors.append("resources must be an object")
@@ -98,7 +157,7 @@ def validate_record(record: Any) -> list[str]:
             errors.append(f"paths.{name} must be an object")
             continue
         try:
-            canonical_path(value.get("path"))
+            _path_identity(value)
         except ValueError as exc:
             errors.append(f"paths.{name}.path: {exc}")
         if not isinstance(value.get("writable"), bool):
@@ -112,7 +171,7 @@ def _path_rows(record: dict[str, Any]) -> list[tuple[str, str, bool]]:
         if not isinstance(value, dict):
             continue
         try:
-            rows.append((name, canonical_path(value.get("path")), bool(value.get("writable"))))
+            rows.append((name, _path_identity(value), bool(value.get("writable"))))
         except ValueError:
             continue
     return rows
@@ -123,20 +182,28 @@ def validate_snapshot(snapshot: Any) -> dict[str, Any]:
     warnings: list[str] = []
     if not isinstance(snapshot, dict):
         return {"valid": False, "errors": ["snapshot must be an object"], "warnings": []}
-    capacity = snapshot.get("capacity")
-    if not isinstance(capacity, dict):
-        errors.append("capacity must be an object")
-        capacity = {}
-    for field in ("cpu_threads", "memory_bytes", "disk_bytes"):
-        if not _positive_int(capacity.get(field)):
-            errors.append(f"capacity.{field} must be a positive integer")
+    host_capacity = snapshot.get("host_capacity")
+    if not isinstance(host_capacity, dict) or not host_capacity:
+        errors.append("host_capacity must be a non-empty object keyed by physical host_id")
+        host_capacity = {}
+    for host_id, capacity in host_capacity.items():
+        if not isinstance(host_id, str) or not host_id.strip():
+            errors.append("host_capacity keys must be non-empty host ids")
+            continue
+        if not isinstance(capacity, dict):
+            errors.append(f"host_capacity.{host_id} must be an object")
+            continue
+        for field in RESOURCE_FIELDS:
+            if not _positive_int(capacity.get(field)):
+                errors.append(f"host_capacity.{host_id}.{field} must be a positive integer")
     jobs = snapshot.get("jobs")
     if not isinstance(jobs, list) or not jobs:
         errors.append("jobs must be a non-empty array")
         jobs = []
     namespaces: set[str] = set()
     host_ids: set[str] = set()
-    totals = {"cpu_threads": 0, "memory_bytes": 0, "disk_bytes": 0}
+    totals = {field: 0 for field in RESOURCE_FIELDS}
+    host_totals: dict[str, dict[str, int]] = {}
     valid_jobs: list[dict[str, Any]] = []
     for index, job in enumerate(jobs):
         prefix = f"jobs[{index}]"
@@ -148,14 +215,22 @@ def validate_snapshot(snapshot: Any) -> dict[str, Any]:
             errors.append(f"{prefix}: duplicate namespace {job['namespace']!r}")
         namespaces.add(job["namespace"])
         host_ids.add(job["host_id"])
+        if job["host_id"] not in host_capacity:
+            errors.append(f"{prefix}: host_id has no physical capacity record")
         valid_jobs.append(job)
-        for field in totals:
-            totals[field] += job["resources"][field]
-    if len(host_ids) > 1:
-        warnings.append("snapshot includes more than one physical host; compare hosts separately")
-    for field, total in totals.items():
-        if _positive_int(capacity.get(field)) and total > capacity[field]:
-            errors.append(f"resource budget exceeded for {field}: {total} > {capacity[field]}")
+        host_total = host_totals.setdefault(job["host_id"], {field: 0 for field in RESOURCE_FIELDS})
+        for field in RESOURCE_FIELDS:
+            amount = job["resources"][field]
+            totals[field] += amount
+            host_total[field] += amount
+    for host_id, host_total in host_totals.items():
+        capacity = host_capacity.get(host_id, {})
+        for field, total in host_total.items():
+            if _positive_int(capacity.get(field)) and total > capacity[field]:
+                errors.append(
+                    f"resource budget exceeded for host {host_id} {field}: "
+                    f"{total} > {capacity[field]}"
+                )
 
     path_owners: list[tuple[str, str, str, bool]] = []
     for job in valid_jobs:
@@ -189,8 +264,11 @@ def acquire_lease(record: dict[str, Any], lease_dir: Path) -> dict[str, Any]:
     if errors:
         raise ValueError("cannot acquire invalid record: " + "; ".join(errors))
     lease_dir.mkdir(parents=True, exist_ok=True)
-    lease_path = lease_dir / f"{record['namespace']}.json"
-    payload = json.dumps(record, sort_keys=True, indent=2) + "\n"
+    lease_path = _lease_path(record, lease_dir)
+    owner_digest = _record_digest(record)
+    payload = json.dumps(
+        {"owner_digest": owner_digest, "record": record}, sort_keys=True, indent=2
+    ) + "\n"
     try:
         descriptor = os.open(lease_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError as exc:
@@ -201,21 +279,36 @@ def acquire_lease(record: dict[str, Any], lease_dir: Path) -> dict[str, Any]:
     except Exception:
         lease_path.unlink(missing_ok=True)
         raise
-    return {"acquired": True, "lease": str(lease_path), "namespace": record["namespace"]}
+    return {
+        "acquired": True,
+        "lease": str(lease_path),
+        "namespace": record["namespace"],
+        "owner_digest": owner_digest,
+    }
 
 
 def release_lease(record: dict[str, Any], lease_dir: Path) -> dict[str, Any]:
     errors = validate_record(record)
     if errors:
         raise ValueError("cannot release invalid record: " + "; ".join(errors))
-    lease_path = lease_dir / f"{record['namespace']}.json"
+    lease_path = _lease_path(record, lease_dir)
     if not lease_path.is_file() or lease_path.is_symlink():
         raise ValueError(f"lease is absent or unsafe: {lease_path}")
     current = _load(lease_path)
-    if not isinstance(current, dict) or current.get("namespace") != record["namespace"]:
-        raise ValueError("lease owner does not match requested namespace")
+    owner_digest = _record_digest(record)
+    if (
+        not isinstance(current, dict)
+        or current.get("owner_digest") != owner_digest
+        or current.get("record") != record
+    ):
+        raise ValueError("lease owner identity does not match the requested record")
     lease_path.unlink()
-    return {"released": True, "lease": str(lease_path), "namespace": record["namespace"]}
+    return {
+        "released": True,
+        "lease": str(lease_path),
+        "namespace": record["namespace"],
+        "owner_digest": owner_digest,
+    }
 
 
 def _parser() -> argparse.ArgumentParser:
