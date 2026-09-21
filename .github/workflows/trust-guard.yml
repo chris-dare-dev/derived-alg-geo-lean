@@ -19,15 +19,17 @@
 #
 # WHAT IT DOES. If a pull request touches the trust surface -- the workflows,
 # the gate scripts, the emitter, the pin files, the registry, the licence
-# boundary -- it fails until the `trust-reviewed` label is present. Adding
-# that label is a deliberate, logged, human act, and re-runs this job.
+# boundary -- it fails until an authorized human review is bound to the exact
+# base, head, guarded-file digest, and policy version. The old
+# `trust-reviewed` label remains useful as a rerun trigger, but it is no longer
+# approval evidence and cannot carry across a new revision.
 #
 # WHAT IT IS NOT. This does not stop someone holding the owner's credentials:
-# that person can label their own pull request, and no repository-side control
+# that person can approve their own pull request, and no repository-side control
 # survives a compromised owner token. It stops the realistic failure -- an
 # agent lane silently disabling a gate inside a green build -- by making the
-# disabling step visible and manual. Read it as "no gate turns itself off
-# quietly", not as "the trust surface is adversary-proof".
+# disabling step visible, revision-bound, and attributable. Read it as "no gate
+# turns itself off quietly", not as "the trust surface is adversary-proof".
 #
 # SAFETY: `pull_request_target` runs with a writable token and repository
 # secrets in the context of the BASE repository. Checking out or executing
@@ -39,9 +41,14 @@ name: Trust guard
 
 on:
   pull_request_target:
-    # `labeled`/`unlabeled` are load-bearing: they are what re-runs the check
-    # after a human decides, so the label flips the status without a push.
+    # Labels are retained as a convenient explicit rerun trigger. They are not
+    # accepted as authorization by the job below.
     types: [opened, synchronize, reopened, labeled, unlabeled]
+  pull_request_review:
+    # A review is tied to a commit by GitHub. Re-run on every review state
+    # transition so dismissal or a new changes-requested review cannot leave a
+    # stale green trust-surface result behind.
+    types: [submitted, edited, dismissed]
 
 permissions:
   contents: read
@@ -63,31 +70,34 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          TRUST_POLICY_VERSION: trust-guard-v2
         run: |
           set -euo pipefail
 
           # The changed-file list comes from the API, not from a checkout, so
           # nothing in the pull request is fetched or executed here.
           #
-          # One record per file: name, deletion count, and the patch base64'd so
+          # One record per file: new name, previous name base64'd, change status,
+          # deletion count, and the patch base64'd so
           # no diff content can inject a tab or newline into the loop below. The
           # patch is DATA -- decoded and grepped, never executed, and nothing
           # derived from it reaches a command position.
-          files="$(gh api --paginate "repos/$REPO/pulls/$PR/files" \
-            --jq '.[] | [.filename, (.deletions|tostring), (.patch // "" | @base64)] | @tsv')"
+          files="$(gh api --paginate "repos/$REPO/pulls/$PR/files?per_page=100" --jq '.[] | [.filename, ((.previous_filename // "") | @base64), (.status // ""), (.deletions|tostring), ((.patch // "") | @base64)] | @tsv')"
           if [ -z "$files" ]; then
             echo "::error::the API returned no files for PR #$PR. This job must" \
                  "not pass on an empty file list -- that is the vacuous pass it" \
                  "exists to prevent."
             exit 1
           fi
-
           # The guarded paths. Everything here decides what a green `ci` MEANS:
           # the workflows that define it, the scripts it executes, the emitter
           # and sweep root it measures, the pins that say what it ran against,
           # the registry it validates, and the licence boundary.
           patterns='
           ^\.github/
+          ^\.milestone-pipeline/
           ^\.claude/loop-specs/
           ^\.claude/agents/
           ^\.claude/skills/run-loop/
@@ -155,42 +165,114 @@ jobs:
           # deletion count does the same.
           umbrella='^scripts/[A-Za-z0-9]+Audit\.lean$'
 
-          touched=""
-          while IFS=$'\t' read -r f dels patch64; do
-            [ -n "$f" ] || continue
-            skip=""
+          path_is_excluded() {
+            local path="$1" e
+            [ -n "$path" ] || return 1
             while IFS= read -r e; do
               e="$(printf '%s' "$e" | tr -d '[:space:]')"
               [ -n "$e" ] || continue
-              if printf '%s' "$f" | grep -Eq "$e"; then
-                skip="yes"
-                break
+              if printf '%s' "$path" | grep -Eq "$e"; then
+                return 0
               fi
             done <<< "$exclusions"
-            [ -z "$skip" ] || continue
+            return 1
+          }
 
-            # The additive-umbrella-import carve-out. Every condition must hold;
-            # any one of them failing keeps the file guarded.
-            if printf '%s' "$f" | grep -Eq "$umbrella" \
-               && [ "${dels:-1}" = "0" ] && [ -n "${patch64:-}" ]; then
-              added="$(printf '%s' "$patch64" | base64 -d \
-                       | grep '^+' | grep -v '^+++' || true)"
-              if [ -n "$added" ] && ! printf '%s\n' "$added" \
-                   | grep -qvE '^\+import [A-Za-z0-9_]+Audit(\.[A-Za-z0-9_]+)+$'; then
-                echo "note: $f adds only audit imports and deletes nothing" \
-                     "-- not a trust-surface change"
-                continue
-              fi
-            fi
-
+          path_matches_patterns() {
+            local path="$1" p
             while IFS= read -r p; do
               p="$(printf '%s' "$p" | tr -d '[:space:]')"
               [ -n "$p" ] || continue
-              if printf '%s' "$f" | grep -Eq "$p"; then
-                touched="$touched$f"$'\n'
-                break
+              if printf '%s' "$path" | grep -Eq "$p"; then
+                return 0
               fi
             done <<< "$patterns"
+            return 1
+          }
+
+          new_path_is_guarded() {
+            local path="$1" status="$2" dels="$3" patch64="$4"
+            path_is_excluded "$path" && return 1
+            if printf '%s' "$path" | grep -Eq "$umbrella"; then
+              # The additive-umbrella-import carve-out applies only to a new or
+              # modified file with an inspectable patch. Renames and omitted
+              # patches stay guarded because their old/new relationship cannot
+              # be proven safe.
+              if [ "$status" != "renamed" ] && [ "${dels:-1}" = "0" ] \
+                 && [ -n "${patch64:-}" ]; then
+                local added
+                added="$(printf '%s' "$patch64" | base64 -d \
+                         | grep '^+' | grep -v '^+++' || true)"
+                if [ -n "$added" ] && ! printf '%s\n' "$added" \
+                     | grep -qvE '^\+import [A-Za-z0-9_]+Audit(\.[A-Za-z0-9_]+)+$'; then
+                  echo "note: $path adds only audit imports and deletes nothing" \
+                       "-- not a trust-surface change"
+                  return 1
+                fi
+              fi
+              return 0
+            fi
+            path_matches_patterns "$path" && return 0
+            return 1
+          }
+
+          old_path_is_guarded() {
+            local path="$1"
+            path_is_excluded "$path" && return 1
+            path_matches_patterns "$path" && return 0
+            printf '%s' "$path" | grep -Eq "$umbrella"
+          }
+
+          touched=""
+          while IFS=$'\t' read -r f previous64 status dels patch64; do
+            [ -n "$f" ] || continue
+
+            # Keep the local harness's old three-column fixtures readable while
+            # the API path uses filename/previous_filename/status/deletions/patch.
+            case "$status" in
+              added|modified|removed|renamed|copied) ;;
+              *)
+                patch64="$status"
+                dels="$previous64"
+                previous64=""
+                status="modified"
+                ;;
+            esac
+
+            previous=""
+            if [ -n "${previous64:-}" ]; then
+              previous="$(printf '%s' "$previous64" | base64 -d)" || {
+                echo "::error::invalid base64 previous filename for $f"
+                exit 1
+              }
+            fi
+            case "$status" in
+              added|modified|removed|renamed|copied) ;;
+              *)
+                echo "::error::unsupported file status $status for $f"
+                exit 1
+                ;;
+            esac
+            if [ "$status" = "renamed" ] && [ -z "$previous" ]; then
+              echo "::error::renamed file $f lacks previous_filename"
+              exit 1
+            fi
+
+            new_guarded=no
+            old_guarded=no
+            if new_path_is_guarded "$f" "$status" "$dels" "$patch64"; then
+              new_guarded=yes
+            fi
+            if [ -n "$previous" ] && old_path_is_guarded "$previous"; then
+              old_guarded=yes
+            fi
+            if [ "$new_guarded" = yes ] || [ "$old_guarded" = yes ]; then
+              if [ -n "$previous" ]; then
+                touched="$touched$previous -> $f"$'\n'
+              else
+                touched="$touched$f"$'\n'
+              fi
+            fi
           done <<< "$files"
 
           if [ -z "$touched" ]; then
@@ -201,17 +283,53 @@ jobs:
           echo "This pull request changes the trust surface:"
           printf '%s' "$touched" | sed 's/^/    /'
 
-          if printf '%s' "$LABELS" | grep -q '"trust-reviewed"'; then
-            echo
-            echo "ok: labelled trust-reviewed -- a human accepted these changes"
-            exit 0
+          # A review body carries the exact digest a human saw. The digest is
+          # over the API's filename/deletion/patch records, sorted before
+          # hashing; it therefore changes on a guarded patch change and does
+          # not depend on the order in which GitHub paginates the response.
+          file_digest="$(printf '%s\n' "$files" | LC_ALL=C sort | sha256sum | awk '{print $1}')"
+          review_marker="trust-review: v1 base=$BASE_SHA head=$HEAD_SHA files=$file_digest policy=$TRUST_POLICY_VERSION"
+
+          # The review endpoint is base-side API data. No pull-request code is
+          # fetched or executed. `--slurp` preserves page boundaries until jq
+          # flattens them, and the empty response is a failure rather than an
+          # implicit approval.
+          reviews="$(gh api --paginate --slurp "repos/$REPO/pulls/$PR/reviews?per_page=100")"
+          if [ -z "$reviews" ]; then
+            echo "::error::the API returned no review records for PR #$PR"
+            exit 1
+          fi
+
+          # Keep only the latest decision by each repository-authorized
+          # reviewer for this exact head. A later CHANGES_REQUESTED or
+          # DISMISSED review therefore invalidates an earlier approval. The
+          # marker binds base/head/diff/policy; the association check prevents
+          # an arbitrary public commenter from satisfying the gate.
+          latest_reviews="$(printf '%s' "$reviews" | jq -c --arg head "$HEAD_SHA" '
+            flatten
+            | map(select(.commit_id == $head
+              and ((.author_association // "") == "OWNER"
+                or (.author_association // "") == "MEMBER"
+                or (.author_association // "") == "COLLABORATOR")
+              and ((.user.login // "") != "")))
+            | sort_by([(.user.login // ""), (.submitted_at // ""), (.id // 0)])
+            | group_by(.user.login)
+            | map(.[-1])')"
+          if [ -z "$latest_reviews" ] || [ "$latest_reviews" = "[]" ]; then
+            echo "::error::no authorized review is bound to head $HEAD_SHA"
+            exit 1
+          fi
+          if printf '%s' "$latest_reviews" | jq -e 'any(.[]; .state == "CHANGES_REQUESTED")' >/dev/null; then
+            echo "::error::an authorized reviewer requested changes for head $HEAD_SHA"
+            exit 1
+          fi
+          if ! printf '%s' "$latest_reviews" | jq -e --arg marker "$review_marker" \
+               'any(.[]; .state == "APPROVED" and ((.body // "") | contains($marker)))' >/dev/null; then
+            echo "::error::the current head lacks an authorized review with the exact marker"
+            echo "required marker: $review_marker"
+            exit 1
           fi
 
           echo
-          echo "::error::A trust-surface change needs a human decision. Read the" \
-               "diff of the files above, then add the 'trust-reviewed' label to" \
-               "this pull request; that re-runs this check. Do not remove this" \
-               "workflow to get past it -- the copy that judges a pull request" \
-               "comes from the base branch, so deleting it here has no effect" \
-               "until the deletion itself has been reviewed."
-          exit 1
+          echo "ok: authorized review is bound to base=$BASE_SHA head=$HEAD_SHA"
+          echo "ok: guarded-file digest=$file_digest policy=$TRUST_POLICY_VERSION"

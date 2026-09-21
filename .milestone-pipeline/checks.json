@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "checks": [
+    "python -m unittest scripts.tests.test_ci_contract scripts.tests.test_runner_state scripts.tests.test_security_evidence scripts.tests.test_profile_actions",
+    "python -m py_compile scripts/ci_contract.py scripts/runner_state.py scripts/security_evidence.py scripts/ci_performance/profile_actions.py scripts/tests/test_profile_actions.py scripts/tests/test_ci_contract.py",
+    "python scripts/ci_performance/profile_actions.py profile scripts/ci_performance/fixtures/sample-run.json"
+  ]
+}

@@ -1,0 +1,8 @@
+self-hosted-runner:
+  labels:
+    - owner-linux
+    - owner-linux-main
+    - chris-ubuntu-main-runner
+    - chris-ubuntu-runner-1
+    - chris-ubuntu-runner-2
+    - chris-ubuntu-runner-3
