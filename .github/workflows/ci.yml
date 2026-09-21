@@ -78,15 +78,16 @@ jobs:
           import Smoke
           def main : IO Unit := IO.println s!"lean-smoke:{answer}"
           LEAN
-      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
-        with:
-          lake-package-directory: ${{ steps.fixture.outputs.directory }}
-          auto-config: false
-          build: false
-          test: false
-          lint: false
-          use-mathlib-cache: false
-          use-github-cache: false
+      - name: Install the pinned Lean toolchain
+        shell: bash
+        working-directory: ${{ steps.fixture.outputs.directory }}
+        run: |
+          set -euo pipefail
+          # Use exactly the production action's installer, without its
+          # repository-manifest prerequisite for this new scratch project.
+          curl -fsSL https://raw.githubusercontent.com/leanprover/lean-action/38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9/scripts/install_elan.sh -o "$RUNNER_TEMP/smoke-install-elan.sh"
+          bash "$RUNNER_TEMP/smoke-install-elan.sh"
+          "$HOME/.elan/bin/lake" update
       - name: Compile, execute, reject an invalid proof, and rebuild
         shell: bash
         env:
