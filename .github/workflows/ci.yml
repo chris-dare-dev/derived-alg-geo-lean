@@ -1,4 +1,4 @@
-name: Ubuntu runner migration smoke
+name: Ubuntu Lean capability smoke
 on:
   workflow_dispatch:
 permissions:
@@ -18,7 +18,7 @@ jobs:
           - runner: chris-ubuntu-runner-3
             slot: general-3
     runs-on: [self-hosted, Linux, X64, '${{ matrix.runner }}']
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - name: Verify host and isolated runtime
         shell: bash
@@ -51,3 +51,87 @@ jobs:
           probe.write_text(os.environ['RUNNER_NAME']);assert probe.read_text()==os.environ['RUNNER_NAME'];probe.unlink()
           print('Runner identity, isolated paths, CPU and memory limits verified.')
           PY
+      - name: Prepare a small independent Lean project
+        id: fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          smoke_dir=$(mktemp -d "$RUNNER_TEMP/lean-capability.XXXXXX")
+          echo "directory=$smoke_dir" >> "$GITHUB_OUTPUT"
+          printf '%s\n' 'leanprover/lean4:v4.32.1' > "$smoke_dir/lean-toolchain"
+          cat > "$smoke_dir/lakefile.toml" <<'TOML'
+          name = "runnerSmoke"
+          version = "0.1.0"
+          [[lean_lib]]
+          name = "Smoke"
+          [[lean_exe]]
+          name = "smoke"
+          root = "Main"
+          TOML
+          cat > "$smoke_dir/Smoke.lean" <<'LEAN'
+          import Std
+          def answer : Nat := 42
+          theorem answer_correct : answer = 42 := by decide
+          theorem reverse_twice (xs : List Nat) : xs.reverse.reverse = xs := by simp
+          LEAN
+          cat > "$smoke_dir/Main.lean" <<'LEAN'
+          import Smoke
+          def main : IO Unit := IO.println s!"lean-smoke:{answer}"
+          LEAN
+      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          lake-package-directory: ${{ steps.fixture.outputs.directory }}
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+          use-github-cache: false
+      - name: Compile, execute, reject an invalid proof, and rebuild
+        shell: bash
+        env:
+          SMOKE_DIR: ${{ steps.fixture.outputs.directory }}
+          LEAN_NUM_THREADS: '3'
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTEST'
+          import json, os, pathlib, subprocess, time
+          d = pathlib.Path(os.environ['SMOKE_DIR'])
+          report = {'runner': os.environ['RUNNER_NAME'], 'toolchain': (d/'lean-toolchain').read_text().strip(), 'timings_seconds': {}}
+          def run(key, args, expected=0):
+              start = time.monotonic()
+              result = subprocess.run(args, cwd=d, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+              report['timings_seconds'][key] = round(time.monotonic()-start, 3)
+              print(f'{key}: exit={result.returncode}, seconds={report["timings_seconds"][key]}')
+              print(result.stdout[-2000:])
+              if expected == 0:
+                  assert result.returncode == 0, (key, result.returncode)
+              else:
+                  assert result.returncode != 0 and 'error:' in result.stdout, key
+              return result.stdout
+          report['lean_version'] = run('version', ['lake', 'env', 'lean', '--version']).strip()
+          run('cold_build', ['lake', 'build', 'Smoke', 'smoke'])
+          assert (d/'.lake/build/lib/lean/Smoke.olean').is_file()
+          exe = str(d/'.lake/build/bin/smoke')
+          assert run('execute', [exe]).strip() == 'lean-smoke:42'
+          olean = d/'.lake/build/lib/lean/Smoke.olean'
+          before = olean.stat().st_mtime_ns
+          run('warm_build', ['lake', 'build', 'Smoke', 'smoke'])
+          assert olean.stat().st_mtime_ns == before, 'unchanged module unexpectedly rebuilt'
+          (d/'Invalid.lean').write_text('example : (1 : Nat) = 2 := by rfl\n')
+          run('invalid_proof_rejected', ['lake', 'env', 'lean', 'Invalid.lean'], expected=1)
+          (d/'Smoke.lean').write_text((d/'Smoke.lean').read_text().replace('42', '43'))
+          run('dependency_rebuild', ['lake', 'build', 'Smoke', 'smoke'])
+          assert run('execute_changed', [exe]).strip() == 'lean-smoke:43'
+          report['result'] = 'passed'
+          (d/'result.json').write_text(json.dumps(report, indent=2)+'\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('### '+report['runner']+' — passed\n\n')
+              summary.write('Theorem elaboration, .olean generation, executable linking/runtime, invalid-proof rejection, warm reuse and dependency invalidation all passed.\n\n')
+              summary.write('```json\n'+json.dumps(report, indent=2)+'\n```\n')
+          PYTEST
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lean-smoke-${{ matrix.slot }}
+          path: ${{ steps.fixture.outputs.directory }}/result.json
+          if-no-files-found: error
