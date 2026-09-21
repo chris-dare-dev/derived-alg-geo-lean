@@ -49,7 +49,7 @@ using a Mathlib type alone does not determine their directory.
 | `Algebra/` | `Mathlib/Algebra/` | ring, module, polynomial, graded algebra, and exact sequences; `Algebra/Category/ModuleCat/Sheaf/` extends Mathlib's `SheafOfModules` on an arbitrary ringed site; `Algebra/Homology/` extends Mathlib's homological algebra: derived categories, homotopy categories, spectral sequences, and the bespoke dg category built on `HomComplex` |
 | `AlgebraicGeometry/` | `Mathlib/AlgebraicGeometry/` | schemes and everything stated about them: `Modules/` (with its `Coherent/` and `Quasicoherent/` children), `ProjectiveSpectrum/`, `Cohomology/`, `DerivedCategory/`, `Divisors/`, `Duality/`, `IntersectionTheory/`, `Numerical/`, `RiemannRoch/`, `Moduli/`, `Stacks/`, `Surface/`, `Variety/` |
 | `AlgebraicTopology/` | `Mathlib/AlgebraicTopology/` | simplicial constructions |
-| `CategoryTheory/` | `Mathlib/CategoryTheory/` | abelian, bicategorical, limit, linear, localization, monoidal, preadditive, shift, and site theory; `Triangulated/` with its t-structures, stability conditions, dg enhancements, Grothendieck groups, Fourier--Mukai kernels, semiorthogonal decompositions, and compact generation |
+| `CategoryTheory/` | `Mathlib/CategoryTheory/` | abelian, bicategorical, limit, linear, localization, monoidal, object-property, preadditive, shift, and site theory; `Triangulated/` with its t-structures, stability conditions, dg enhancements, Grothendieck groups, Fourier--Mukai kernels, semiorthogonal decompositions, and compact generation |
 | `LinearAlgebra/` | `Mathlib/LinearAlgebra/` | lattices, quadratic forms, exterior powers, graded bases |
 | `RingTheory/` | `Mathlib/RingTheory/` | prime spectra |
 | `Topology/` | `Mathlib/Topology/` | sheaves on topological spaces and the category of opens |
@@ -79,6 +79,7 @@ signature, not its motivation, its first consumer, or its proof technique.
 | `DerivedCategory C`, `Ext`, K-projectives, its t-structure, `Bounded` | `Algebra/Homology/DerivedCategory/` | `Algebra/Homology/DerivedCategory/` |
 | `HomotopyCategory`, `HomComplex`, bounded and plus variants | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
 | `SheafOfModules`, `GeneratingSections`, `IsQuasicoherent`, presentations, invertibility | `Algebra/Category/ModuleCat/Sheaf/` | `Algebra/Category/ModuleCat/Sheaf/` |
+| `ObjectProperty`, `FullSubcategory`, `lift`, `inverseImage` | `CategoryTheory/ObjectProperty/` | `CategoryTheory/ObjectProperty/` |
 | Čech cohomology on a site | `CategoryTheory/Sites/SheafCohomology/` | `CategoryTheory/Sites/SheafCohomology/Cech/` |
 | Spectral sequences and total complexes | `Algebra/Homology/SpectralSequence/`, `SpectralObject/` | `Algebra/Homology/SpectralSequence/` |
 | `Pseudofunctor.ObjectProperty`, Cat-valued pseudofunctor transport | `CategoryTheory/Bicategory/Functor/Cat/` | `CategoryTheory/Bicategory/Functor/Cat/` |
@@ -296,6 +297,57 @@ gates/CI paths together; do not silently omit a child or relax coverage globally
 Read `CONTRIBUTING.md` before creating a new directory or publishing a
 change; it owns the human-facing placement and contribution rules.
 
+## Reading the diff of a stale pull request
+
+**Merge the base branch in before reviewing a diff.** A branch that is behind
+renders every record the base has added since the fork as a DELETION the pull
+request never made. This is an artifact of the two-dot diff GitHub shows, not a
+change anyone wrote.
+
+Observed twice on 2026-09-12. #1268 and #1272 each appeared to delete ~84 lines
+across five `scripts/*Audit*/*.lean` files; after merging their base, each was a
+single file with insertions only and no deletions anywhere. One of the
+"deleted" files, `scripts/StabilityConditionAudit/ExpDivisorial.lean`, existed
+on neither the branch nor its merge base -- the base created it after the fork.
+
+This matters most for the audit record slices, because deleting a record is a
+real defect and the artifact is indistinguishable from it by eye. Those slices
+are NOT trust surface -- `trust-guard.yml` excludes
+`scripts/AlgebraicGeometryAudit/` and `scripts/StabilityConditionAudit/`
+deliberately, since guarding append-only record lists would fire the gate on
+almost every pull request. They are protected instead by `check_audit.py` and
+`check_audit_complete.py`, which run in `ci` and judge the merged tree, where
+the artifact does not exist. So a phantom deletion cannot reach `main`; the cost
+is a reviewer's time and a wrongly rejected pull request.
+
+## The `trust-reviewed` label
+
+`trust-guard.yml` fails any pull request touching `.github/`, `scripts/`
+(minus the two audit-record directories above), `exe/`, `registry/`,
+`DerivedAlgGeoSweep.lean`, `lakefile.toml`, `lake-manifest.json`,
+`lean-toolchain`, `pins.json` or `LICENSE.md`, until a human adds the
+`trust-reviewed` label.
+
+The label asserts that a person read that diff. Never apply it to your own
+change, and never apply it for someone else unless they have said they read it.
+Adding it re-runs the check; `gh run rerun` does NOT, because the job reads the
+label set from the event payload and a rerun replays the original, empty one --
+and its `concurrency` group cancels the real `labeled` run. To re-fire the
+check, remove the label and add it again.
+
+After resolving a merge on a branch that already carries the label, check
+whether the label still covers the diff -- over the guarded paths only, or the
+phantom deletions above will make an unchanged diff look rewritten:
+
+```bash
+diff <(git diff <base> <old-head> -- <guarded paths>) \
+     <(git diff <base> <new-head> -- <guarded paths>)
+```
+
+Identical or smaller means the reviewer approved a superset and the label
+holds. Anything added means it no longer covers the diff: remove it and ask for
+a fresh review.
+
 ## Required verification
 
 **Full verification runs in CI, not on your machine.** Since 2026-09-19
@@ -318,7 +370,9 @@ tracked `.claude/settings.json` so it reaches every worktree, runs
 * `scripts/gates.sh`, in any mode;
 * `lake build` with **no target**;
 * `lake build <Target>` that does not declare `LEAN_NUM_THREADS`, or sets it
-  above 4 — see below.
+  above 4 — see below;
+* `lake build <Target>` run through a `lake` that resolves inside a
+  self-hosted runner's working directory — see "Whose lake" below.
 
 It refuses RUNNING that file, not reading it: `cat`, `grep`, `diff` and
 `git ls-tree` over `scripts/gates.sh` all pass, so you can still read the gate
@@ -342,6 +396,43 @@ the script does not reproduce. The script runs `workflows`, `trust-guard`,
 none of which appear in any workflow. Say "N gates pass", naming them; never say
 "CI is green" for a local run. See `CONTRIBUTING.md` for the verified table.
 
+### OpenSpec-backed unattended loops
+
+OpenSpec is the planning layer for any planned unattended batch. Keep the
+proposal, behavioral requirements/scenarios, design, and task checklist under
+`openspec/`, with repository context in `openspec/config.yaml`. The tracked
+execution manifests under `.claude/loop-specs/` may select two or three issues
+and authorize individual provider actions, but they do not replace the
+OpenSpec artifacts.
+
+Use `scripts/loop_engine.py validate` before considering a manifest, then run
+its read-only `preflight`. A run is not enabled until the exact base, live issue
+dependencies, branch/PR collisions, provider identity, roadmap state, and
+required checks are acceptable. Every frozen chunk gets independent
+mathematical, repository-boundary, abstraction, and mathlib-style review on
+the same commit. A chunk has at most three review/improve rounds; the third
+unsuccessful round is a terminal stop, not permission to re-chunk the work.
+
+Comments, pushes, PR creation, approval, issue closure, and merge are separate
+manifest capabilities. Code issues close only after a confirmed merged PR;
+complete chunks require a closing keyword while explicitly authorized progress
+chunks must use a non-closing reference. Merge authority is false unless the
+manifest explicitly enables it. The pilot
+manifest is owner-enabled, but its live preflight and digest-bound review
+ledger remain mandatory before any provider mutation.
+
+`scripts/loop_tokens.py` reports what a run cost, for either runtime. It reads
+the transcripts both already write -- Claude Code's
+`~/.claude/projects/*/*.jsonl` and Codex's
+`~/.codex/sessions/**/rollout-*.jsonl` -- and normalizes their disagreeing
+fields onto disjoint buckets, because Codex's `input_tokens` includes the
+cached prefix and Claude's does not. It counts each model response once:
+one response is frequently written as several transcript lines carrying the
+same usage object, and summing lines overcounts by more than 2x. `report`
+totals a directory and time window; `ledger` attributes the total to each
+frozen chunk's review window and counts an overlap once. It never writes into
+a review ledger -- `--out` writes a separate report file.
+
 This paragraph used to read "every gate in `gates.sh` runs in CI", and that
 sentence is why `single-instantiation` ran nowhere for months: the hook made the
 script unrunnable, the summary said CI had it covered, and `bb8a1278` records the
@@ -351,11 +442,39 @@ script unrunnable, the summary said CI had it covered, and `bb8a1278` records th
 that needs no Lean build, plus a targeted build of the modules you changed, in
 seconds. It is a cheap green, not a green.
 
-Build locally by **naming a target**, which the hook allows:
+Build locally by **naming a target**, and **naming your own `lake`**, which is
+what the hook allows:
 
 ```bash
-LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
+LEAN_NUM_THREADS=2 ~/.elan/bin/lake build DerivedAlgGeo.The.Module.You.Changed
 ```
+
+### Whose lake
+
+`~/.elan/bin/lake` is not decoration. Each of the four self-hosted runners keeps
+its own elan under `C:\actions-runner\<runner>\.elan`, and those `bin`
+directories sit on this machine's user PATH **ahead of** `~/.elan/bin` — put
+there by CI, not by hand. `lean-action` runs `elan-init` with no
+`--no-modify-path`, and `run-runner.cmd` points `HOME` at the runner directory,
+so every job re-persists its own shim directory into the user environment.
+Deleting the entries does not hold: on 2026-09-16 all four were removed and
+three were back within ten minutes.
+
+So a bare `lake` here executes a **runner's** `lake.exe`. Windows will not
+replace a running image, so the next CI job on that runner cannot relink its
+shims and dies about a second in with
+
+    error: could not create link from 'elan.exe' to 'lake.exe'
+
+That is what took `main` red across three consecutive runs on 2026-09-16
+(bc973621, 6217d770, b9e18832), behind one local build that broke none of the
+other rules here: named target, `LEAN_NUM_THREADS=2`, gate green.
+
+It costs contention, not correctness. The same declaration sweep run through a
+runner's shim and through `~/.elan/bin/lake` came back byte-identical (14589
+rows), with audit-completeness reporting the same numbers, so a result already
+produced through the wrong tree does **not** need re-running. Check which one
+you are using with `which lake`.
 
 `LEAN_NUM_THREADS` is **required and enforced**, not advice: the same hook
 refuses a `lake build` that does not set it, or that sets it above 4. Naming a

@@ -30,7 +30,7 @@
 # Get the verdict from CI. Since 2026-09-19 a push to an agent branch does NOT
 # start a run -- `ci.yml` triggers `push` on `main` alone. Open the pull
 # request; that lane runs the identical job set on ubuntu-latest. To dispatch
-# the self-hosted Windows lane on a branch instead:
+# the self-hosted Ubuntu lane on a branch instead:
 #
 #   gh workflow run ci.yml --ref <branch>
 #
@@ -174,13 +174,19 @@ targeted_build() {
   # reason: the hook only ever sees the command an agent types, and this script
   # is typed as one word.
   #
-  # On the development host every runner's `.elanin` sits on PATH AHEAD of
-  # `~/.elan/bin`, and not by hand: `lean-action` runs `elan-init` without
-  # `--no-modify-path` and `run-runner.cmd` points HOME at the runner directory,
-  # so each CI job re-persists its own shim directory into the user environment.
-  # A bare `lake` here therefore runs a RUNNER's shim and holds its `lake.exe`
-  # open; the next job on that runner cannot relink its shims and dies about a
-  # second in. On 2026-09-16 that held `main` red across three runs.
+  # On the retired Windows host every runner's `.elan/bin` sat on PATH AHEAD
+  # of `~/.elan/bin`, and not by hand: `lean-action` runs `elan-init` without
+  # `--no-modify-path` and `run-runner.cmd` pointed HOME at the runner
+  # directory, so each CI job re-persisted its own shim directory into the
+  # user environment. A bare `lake` there ran a RUNNER's shim and held its
+  # `lake.exe` open; the next job on that runner could not relink its shims
+  # and died about a second in. On 2026-09-16 that held `main` red across
+  # three runs.
+  #
+  # The Ubuntu runners (#1443) each own their HOME and `.elan` and never put
+  # a shim on the developer's PATH, so this is no longer load-bearing here.
+  # It is kept because it costs one test, and because naming the interpreter
+  # does not depend on PATH order -- which was never ours to keep.
   #
   # Falls back to PATH where there is no user elan, which is every machine that
   # is not this one.
@@ -234,7 +240,7 @@ fi
 echo
 if [ ${#FAILED[@]} -eq 0 ]; then
   echo "precheck clean -- this is NOT a CI verdict."
-  echo "Open the pull request for the verdict, or dispatch the Windows lane:"
+  echo "Open the pull request for the verdict, or dispatch the self-hosted lane:"
   echo "  gh workflow run ci.yml --ref \$(git branch --show-current)"
   exit 0
 fi
