@@ -1,0 +1,30 @@
+{
+  "id": 35532316123,
+  "run_attempt": 1,
+  "head_sha": "47db217d78f55a45f0899281649d643347159253",
+  "base_sha": "47db217d78f55a45f0899281649d643347159253",
+  "event": "push",
+  "platform": "windows-self-hosted",
+  "status": "completed",
+  "conclusion": "success",
+  "created_at": "2026-09-20T18:00:00Z",
+  "run_started_at": "2026-09-20T18:02:00Z",
+  "measurement_notes": ["sample from main; not a controlled benchmark"],
+  "jobs": [
+    {
+      "id": 1,
+      "name": "build",
+      "started_at": "2026-09-20T18:02:00Z",
+      "completed_at": "2026-09-20T18:47:00Z",
+      "conclusion": "success",
+      "steps": [
+        {"name": "Reset the tree", "started_at": "2026-09-20T18:02:00Z", "completed_at": "2026-09-20T18:09:48Z"},
+        {"name": "Algebraic-geometry axiom audit", "started_at": "2026-09-20T18:09:48Z", "completed_at": "2026-09-20T18:21:42Z"},
+        {"name": "Stability-condition axiom audit", "started_at": "2026-09-20T18:21:42Z", "completed_at": "2026-09-20T18:30:42Z"},
+        {"name": "Emit combined environment", "started_at": "2026-09-20T18:30:42Z", "completed_at": "2026-09-20T18:34:48Z"},
+        {"name": "Contract gates", "started_at": "2026-09-20T18:34:48Z", "completed_at": "2026-09-20T18:37:54Z"},
+        {"name": "Upload trust artifacts", "started_at": "2026-09-20T18:46:00Z", "completed_at": "2026-09-20T18:47:00Z"}
+      ]
+    }
+  ]
+}
