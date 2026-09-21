@@ -14,7 +14,9 @@ supplies the OpenSpec change, frozen chunk, branch, and ledger path; this skill
 must not widen that scope. The controller requires independent
 `mathematics-adversary`, `repository-boundary-adversary`,
 `abstraction-adversary`, and `mathlib-reviewer` verdicts on the same commit and
-stops a chunk after three review/improve rounds. A style review is not a
+stops a chunk after the manifest's `limits.max_review_rounds_per_chunk`
+review/improve rounds; the controller enforces that number, this skill does
+not restate it. A style review is not a
 mathematical verdict.
 
 Issues live on `chris-dare-dev/derived-alg-geo-lean`.
