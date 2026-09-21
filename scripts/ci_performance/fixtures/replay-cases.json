@@ -1,0 +1,31 @@
+[
+  {
+    "name": "direct-change-with-complete-graph",
+    "identity": {
+      "toolchain": "lean-toolchain@1",
+      "manifest": "manifest-sha",
+      "target": "DerivedAlgGeo.Foo",
+      "options": "options-sha",
+      "pins": "pins-sha",
+      "emitter": "emitter-sha",
+      "dependency_graph_complete": true,
+      "changed_files": ["DerivedAlgGeo/Foo.lean"],
+      "direct_changes": ["DerivedAlgGeo/Foo.lean"],
+      "transitive_changes": []
+    }
+  },
+  {
+    "name": "rename-requires-cold-reference",
+    "identity": {
+      "toolchain": "lean-toolchain@1",
+      "manifest": "manifest-sha",
+      "target": "DerivedAlgGeo.Foo",
+      "options": "options-sha",
+      "pins": "pins-sha",
+      "emitter": "emitter-sha",
+      "dependency_graph_complete": true,
+      "changed_files": ["DerivedAlgGeo/Old.lean"],
+      "renames": ["Old.lean -> New.lean"]
+    }
+  }
+]
