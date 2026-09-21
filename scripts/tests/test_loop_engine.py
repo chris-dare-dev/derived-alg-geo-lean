@@ -40,6 +40,15 @@ def reviewer_output(root: Path, reviewer: str, verdict: str, body: str = "") -> 
     return path
 
 
+def write_backlog(root: Path, *targets: str) -> Path:
+    """Create the tracked generalization backlog, optionally already carrying rows."""
+    path = root / loop_engine.BACKLOG_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = "".join(f"### 2026-09-20 - leaf\n- proposed ancestor: {t}\n\n" for t in targets)
+    path.write_text("# Generalization backlog\n\n" + rows, encoding="utf-8")
+    return path
+
+
 def make_spec(root: Path) -> tuple[Path, dict]:
     change_dir = root / "openspec" / "changes" / "pilot-change"
     (change_dir / "specs" / "capability").mkdir(parents=True)
@@ -534,6 +543,175 @@ class LoopEngineTests(unittest.TestCase):
                         state_path, REVIEWERS[0], "a" * 40, "needs_changes", None, dissent
                     ),
                     0,
+                )
+
+    def test_pass_with_lift_requires_a_target(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None)
+            state_path = root / ".loop-runs" / "test-chunk.json"
+            out = reviewer_output(root, REVIEWERS[0], "pass_with_lift")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertNotEqual(
+                    loop_engine.ledger_record_review(
+                        state_path, REVIEWERS[0], "a" * 40, "pass_with_lift", None, out, None
+                    ),
+                    0,
+                )
+                # and a target is meaningless on any other verdict
+                self.assertNotEqual(
+                    loop_engine.ledger_record_review(
+                        state_path,
+                        REVIEWERS[0],
+                        "a" * 40,
+                        "pass",
+                        None,
+                        reviewer_output(root, REVIEWERS[0], "pass"),
+                        "DerivedAlgGeo/Foo",
+                    ),
+                    0,
+                )
+
+    def test_lift_must_reach_the_backlog_before_the_chunk_passes(self) -> None:
+        """A lift recorded only in the gitignored ledger dies with the run."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            write_backlog(root)  # exists, but carries no rows yet
+            loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None)
+            state_path = root / ".loop-runs" / "test-chunk.json"
+            commit = "a" * 40
+            target = "DerivedAlgGeo/CategoryTheory/Triangulated/Basic.lean"
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(
+                    loop_engine.ledger_record_review(
+                        state_path,
+                        REVIEWERS[0],
+                        commit,
+                        "pass_with_lift",
+                        None,
+                        reviewer_output(root, REVIEWERS[0], "pass_with_lift"),
+                        target,
+                    ),
+                    0,
+                )
+                for reviewer in REVIEWERS[1:]:
+                    self.assertEqual(
+                        loop_engine.ledger_record_review(
+                            state_path,
+                            reviewer,
+                            commit,
+                            "pass",
+                            None,
+                            reviewer_output(root, reviewer, "pass"),
+                        ),
+                        0,
+                    )
+                # a round carrying a lift may not be adjudicated a plain pass
+                self.assertNotEqual(
+                    loop_engine.ledger_adjudicate(state_path, "pass", "clean"), 0
+                )
+                # and pass_with_lift is refused while the backlog is silent
+                self.assertNotEqual(
+                    loop_engine.ledger_adjudicate(state_path, "pass_with_lift", "lifted"), 0
+                )
+                write_backlog(root, target)
+                self.assertEqual(
+                    loop_engine.ledger_adjudicate(state_path, "pass_with_lift", "lifted"), 0
+                )
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            self.assertEqual(state["status"], "passed")
+            # the lift cost the chunk nothing: still one round
+            self.assertEqual(len(state["rounds"]), 1)
+            self.assertEqual(state["rounds"][0]["reviews"][0]["lift_target"], target)
+
+    def test_manifest_missing_the_style_reviewer_fails_validation(self) -> None:
+        """The spec delta requires four reviewers; the code used to enforce three."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["review"]["reviewers"] = [r for r in REVIEWERS if r != "mathlib-reviewer"]
+            spec_path.write_text(json.dumps(spec), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError) as caught:
+                loop_engine.load_spec(spec_path, root)
+            self.assertIn("mathlib-reviewer", str(caught.exception))
+
+
+    def test_lift_target_opens_only_after_a_reviewer_asks(self) -> None:
+        """Declaring a lift target is standing permission, not an open door."""
+        state = {
+            "chunk": {
+                "files": ["DerivedAlgGeo/Leaf"],
+                "lift_targets": ["DerivedAlgGeo/CategoryTheory/Triangulated"],
+            },
+            "rounds": [],
+        }
+        self.assertEqual(loop_engine.authorized_lift_targets(state), [])
+        self.assertEqual(loop_engine.chunk_allowed_paths(state), ["DerivedAlgGeo/Leaf"])
+        self.assertFalse(
+            loop_engine.path_is_in_frozen_chunk(
+                "DerivedAlgGeo/CategoryTheory/Triangulated/Basic.lean",
+                loop_engine.chunk_allowed_paths(state),
+            )
+        )
+
+        # a reviewer names a path under the declared prefix
+        state["rounds"] = [
+            {
+                "reviews": [
+                    {
+                        "reviewer": REVIEWERS[2],
+                        "verdict": "pass_with_lift",
+                        "lift_target": "DerivedAlgGeo/CategoryTheory/Triangulated/Basic.lean",
+                    }
+                ]
+            }
+        ]
+        self.assertEqual(
+            loop_engine.authorized_lift_targets(state),
+            ["DerivedAlgGeo/CategoryTheory/Triangulated"],
+        )
+        self.assertTrue(
+            loop_engine.path_is_in_frozen_chunk(
+                "DerivedAlgGeo/CategoryTheory/Triangulated/Basic.lean",
+                loop_engine.chunk_allowed_paths(state),
+            )
+        )
+        # an unrelated prefix stays shut
+        self.assertFalse(
+            loop_engine.path_is_in_frozen_chunk(
+                "DerivedAlgGeo/Elsewhere/Other.lean",
+                loop_engine.chunk_allowed_paths(state),
+            )
+        )
+
+    def test_a_lift_target_may_not_duplicate_a_frozen_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            chunk = spec["issues"][0]["chunks"][0]
+            chunk["lift_targets"] = list(chunk["files"])[:1]
+            spec_path.write_text(json.dumps(spec), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError) as caught:
+                loop_engine.load_spec(spec_path, root)
+            self.assertIn("lift_targets", str(caught.exception))
+
+    def test_renaming_a_ledger_does_not_start_a_fresh_review(self) -> None:
+        """The state dir is gitignored; identity is (spec_id, chunk_id), not filename."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(
+                    loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None), 0
+                )
+                state_path = root / ".loop-runs" / "test-chunk.json"
+                self.assertTrue(state_path.is_file())
+                state_path.rename(state_path.with_name("test-chunk.bak.json"))
+                # the chunk looks unstarted by filename, but its ledger still exists
+                self.assertNotEqual(
+                    loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None), 0
                 )
 
     def test_missing_openspec_artifact_fails_closed(self) -> None:

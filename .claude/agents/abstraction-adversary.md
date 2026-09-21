@@ -82,9 +82,11 @@ A lift often belongs in a file this chunk may not touch — the controller rejec
 any diff outside the frozen list. That is not a reason to suppress the finding
 and not a reason to block the chunk.
 
-Record it as a `LIFT:` block in your findings, keep your verdict on the merits of
-the code actually under review, and the orchestrator will append it to
-`docs/architecture/generalization-backlog.md`. It costs the chunk nothing.
+Close with `PASS_WITH_LIFT` and record a `LIFT:` block for each one. That verdict
+passes the panel, consumes no review round, and blocks nothing — but the
+controller refuses to adjudicate the round until every lift target you named has
+been appended to `docs/architecture/generalization-backlog.md`. The finding
+cannot be quietly dropped, and it cannot stall the chunk.
 
 If the general statement turns out not to hold, say so with the counterexample.
 `abstraction-tree.md` is explicit that a falsified unification is a successful
@@ -109,10 +111,12 @@ LIFT: <leaf declaration>
   evidence:           <why the proof goes through there, or FALSIFIED <counterexample>>
 ```
 
-Close with exactly one verdict: `PASS`, `NEEDS_CHANGES`, or `BLOCKED`, followed
-by the finding count and the lift count.
+Close with exactly one verdict: `PASS`, `PASS_WITH_LIFT`, `NEEDS_CHANGES`, or
+`BLOCKED`, followed by the finding count and the lift count. Use
+`PASS_WITH_LIFT` whenever the code under review is correct and you recorded at
+least one lift whose target lies outside the frozen file list.
 
-`PASS` is permitted only when every new declaration's owner has been named, the
+`PASS` and `PASS_WITH_LIFT` are permitted only when every new declaration's owner has been named, the
 weakest sufficient hypotheses of every central statement have been stated, and
 the Mathlib paths you searched have been recorded.
 
