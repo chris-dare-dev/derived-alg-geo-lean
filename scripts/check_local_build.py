@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Refuse whole-library Lean builds on the developer's machine.
+r"""Refuse whole-library Lean builds on the developer's machine.
 
-Lean builds for this repository belong on the self-hosted Windows runner.
-`ci.yml` already routes them there: `push` and `workflow_dispatch` resolve
-`runs-on` to `["self-hosted", "owner-win"]`, while `pull_request` stays on
-`ubuntu-latest`. So the way to build is to PUSH THE BRANCH, not to run `lake`
-locally.
+Lean builds for this repository belong on a runner. `ci.yml` routes `push`
+and `workflow_dispatch` to the owner's Ubuntu workstation (`owner-linux-main`
+for `main`, `owner-linux` for other refs) and everything else to
+`ubuntu-latest`. Since 2026-09-19 `push` fires on `main` alone, so the way to
+get a verdict on a branch is to OPEN THE PULL REQUEST -- or to dispatch the
+self-hosted lane by hand -- not to run `lake` locally.
 
 ## What is refused, and what is not
 
@@ -44,7 +45,7 @@ Allowed, deliberately:
 The distinction is cost, not principle. A targeted build on a warm cache is
 seconds; the whole library from cold is hours, and on 2026-08-27 an agent spent
 three of them rebuilding a cache that a machine-wide cleanup had deleted --
-work the Windows runner would have done off the developer's machine entirely.
+work a runner would have done off the developer's machine entirely.
 
 ## Width, not just size
 
@@ -65,25 +66,38 @@ answer to "I need more threads" is a smaller number, not a bypass.
 Every rule above is about what a build COSTS. This one is about which `lake`
 runs it.
 
-The four self-hosted runners each keep an elan under
-`C:\actions-runner\<runner>\.elan`, and those `bin` directories sit on the
-developer's own Windows PATH, AHEAD of `~/.elan/bin`. That is not a setup
-mistake waiting to be tidied away. `lean-action` invokes `elan-init` with no
-`--no-modify-path`, and `run-runner.cmd` points HOME at the runner directory,
-so every CI job re-persists its own shim directory into the user environment.
-Remove the entries and the next job puts them back.
-
-So a plain `lake` in an agent shell executes a RUNNER's `lake.exe`. Windows
-will not replace a running image, so the next job on that runner cannot relink
-its shims and dies about a second in with
+ON WINDOWS THIS WAS AUTOMATIC, which is why the rule exists. Each of the four
+runners kept an elan under `C:\actions-runner\<runner>\.elan`, and those `bin`
+directories sat on the developer's own PATH, AHEAD of `~/.elan/bin`, because
+`lean-action` invokes `elan-init` with no `--no-modify-path` and
+`run-runner.cmd` pointed HOME at the runner directory -- so every CI job
+re-persisted its own shim directory into the user environment, and removing
+the entries did not hold. A plain `lake` in an agent shell therefore executed
+a RUNNER's `lake.exe`; Windows will not replace a running image, so the next
+job on that runner could not relink its shims and died about a second in with
 
     error: could not create link from 'elan.exe' to 'lake.exe'
 
 On 2026-09-16 that held `main` red across three consecutive runs (bc973621,
 6217d770, b9e18832) behind ONE local build that broke none of the other rules
-here: named target, `LEAN_NUM_THREADS=2`, this gate green. Naming the
-interpreter is the only fix that survives, because it does not depend on PATH
-order -- and PATH order is not ours to keep.
+here: named target, `LEAN_NUM_THREADS=2`, this gate green.
+
+THE OWNER RETIRED WINDOWS ON 2026-09-21 (#1443), and both halves of that
+mechanism went with it. The four Ubuntu runners under
+`~/.local/share/github-runners/<runner>/` each own their HOME, `.elan`, `_work`
+and caches, and their services run a minimal PATH that never reaches the
+developer's shell, so no runner shim lands on your PATH by itself; and POSIX
+lets a running image be unlinked and replaced, so there is no relink failure
+left to cause. A bare `lake` here resolves to your own elan, or to nothing.
+
+WHAT REMAINS is narrower, and is still worth refusing: naming a runner's shim
+EXPLICITLY, by path. `docs/ci/ubuntu-runners.md` makes each runner's tree its
+own state -- "no writable cache or package symlinks between runners or into
+developer checkouts" -- and a build driven through one of those shims writes
+into that runner's `.elan` and competes for its cgroup budget while a job may
+be using it. So the check is kept and matched against the current layout as
+well as the historical one, with a smaller claim behind it: state isolation
+now, not image locking.
 
 What this does NOT cost is correctness, and the distinction matters because the
 two have very different blast radii. On 2026-09-16 the same declaration sweep
@@ -144,11 +158,12 @@ SEPARATORS = re.compile(r"\|\||&&|[;|&\n()]")
 # `ci.yml` build it by name before the audits.
 UMBRELLAS = {"DerivedAlgGeo", "DerivedAlgGeoSweep"}
 
-# A `lake` living inside a self-hosted runner's working directory, in either
-# spelling a shell might hand us. See "Whose lake" in the module docstring for
-# why these end up on the developer's PATH and why editing the PATH does not
-# keep them off it.
-RUNNER_TREE = re.compile(r"[\\/]actions-runner[\\/]", re.IGNORECASE)
+# A `lake` living inside a self-hosted runner's tree, in either layout a shell
+# might hand us: the retired Windows one (`C:\actions-runner\<runner>\`) and the
+# current Ubuntu one (`~/.local/share/github-runners/<runner>/`). Matching only
+# the first left this check dead from the 2026-09-21 migration (#1443) onward.
+# See "Whose lake" in the module docstring for what each layout can do.
+RUNNER_TREE = re.compile(r"[\\/](?:actions-runner|github-runners)[\\/]", re.IGNORECASE)
 
 # Lake's concurrency, and the ceiling a targeted build may use on this host.
 #
@@ -380,10 +395,11 @@ def lake_interpreter_offence(token: str) -> str | None:
         return None
     return (
         f"`{token}` resolves to `{resolved}`, a self-hosted runner's elan shim "
-        "rather than your own. Running it holds that runner's `lake.exe` open, "
-        "and the next CI job on that runner cannot relink its shims -- `main` "
-        "went red three times this way on 2026-09-16. Name your own elan "
-        "instead: `~/.elan/bin/lake build <Target>`."
+        "rather than your own. It writes into that runner's isolated .elan and "
+        "competes for its cgroup budget while a job may be using it; on the "
+        "retired Windows lane it also held `lake.exe` open and took `main` red "
+        "three times on 2026-09-16. Name your own elan instead: "
+        "`~/.elan/bin/lake build <Target>`."
     )
 
 
@@ -483,11 +499,12 @@ def main() -> int:
         "local-build gate: refused.\n"
         f"  {reason}\n"
         "\n"
-        "Lean builds for this repository run on the self-hosted Windows runner\n"
-        "(`ci.yml` routes `push` and `workflow_dispatch` to "
-        "[\"self-hosted\", \"owner-win\"]).\n"
+        "Lean builds for this repository run on a runner (`ci.yml` routes\n"
+        "`push` and `workflow_dispatch` to the owner's Ubuntu workstation, and\n"
+        "everything else to ubuntu-latest).\n"
         "\n"
-        "For a verdict, push the branch, or without pushing:\n"
+        "`push` triggers on `main` alone, so for a verdict on a branch OPEN THE\n"
+        "PULL REQUEST, or dispatch the self-hosted lane without pushing:\n"
         "    gh workflow run ci.yml --ref <branch>\n"
         "\n"
         "Still allowed locally: `scripts/precheck.sh` (every gate that needs no\n"

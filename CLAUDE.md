@@ -19,7 +19,9 @@ root, extending a known mixed module, or moving declarations.
 - Keep charge construction upstream of walls, general quadratic/lattice
   algebra separate from geometric Mukai interpretation, and numerical models
   separate from their geometric realizations. Preserve n, m and κ as distinct
-  parameters and preserve the arbitrary-divisor-rank branch.
+  parameters and preserve the arbitrary-divisor-rank branch. The canonical
+  stability-facing root is `StabilityCondition/CentralCharge/`; `Walls/`
+  imports it for loci, while full support predicates live under `Support/`.
 - Extract independent linear Serre/Yoneda, abelian stability, dg H⁰, derived
   operations, perfectness, GL-cover and planar-geometry foundations from their
   applications. Preserve hypotheses; a move proves no missing comparison.
@@ -418,6 +420,18 @@ chunks must use a non-closing reference. Merge authority is false unless the
 manifest explicitly enables it. The pilot
 manifest is owner-enabled, but its live preflight and digest-bound review
 ledger remain mandatory before any provider mutation.
+
+`scripts/loop_tokens.py` reports what a run cost, for either runtime. It reads
+the transcripts both already write -- Claude Code's
+`~/.claude/projects/*/*.jsonl` and Codex's
+`~/.codex/sessions/**/rollout-*.jsonl` -- and normalizes their disagreeing
+fields onto disjoint buckets, because Codex's `input_tokens` includes the
+cached prefix and Claude's does not. It counts each model response once:
+one response is frequently written as several transcript lines carrying the
+same usage object, and summing lines overcounts by more than 2x. `report`
+totals a directory and time window; `ledger` attributes the total to each
+frozen chunk's review window and counts an overlap once. It never writes into
+a review ledger -- `--out` writes a separate report file.
 
 This paragraph used to read "every gate in `gates.sh` runs in CI", and that
 sentence is why `single-instantiation` ran nowhere for months: the hook made the

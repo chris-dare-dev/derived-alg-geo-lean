@@ -13,7 +13,8 @@ When called by a bounded loop manifest, the controller's OpenSpec change and
 review ledger remain authoritative. Landing may act only on the reviewed head;
 the three adversarial lenses plus `mathlib-reviewer` must already have been
 recorded for the frozen chunk, and the controller's maximum of three
-review/improve rounds still applies. This skill's normal one-PR stop behavior
+review/improve rounds still applies, at whatever number the manifest's
+`limits.max_review_rounds_per_chunk` sets. This skill's normal one-PR stop behavior
 is unchanged.
 
 ## What the queue actually is
