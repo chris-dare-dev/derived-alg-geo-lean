@@ -305,8 +305,7 @@ agent branch is no longer a gate run — opening the pull request is.** The
 195 commits both lanes used to build it was the faster of the two (20.8 min
 median against 40.2) as well as the one branch protection reads.
 
-To force the self-hosted Windows lane on a branch — the platform check this
-machine owns — dispatch it by hand:
+To run the self-hosted Ubuntu lane on a branch, dispatch it by hand:
 
 ```bash
 gh workflow run ci.yml --ref <branch>
