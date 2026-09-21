@@ -670,6 +670,33 @@ quotient carrier, or category must answer these questions before implementation.
    not count as one of the two: an extraction that only its own former home
    consumes is a rename, and belongs in that home as a theorem or an `abbrev`.
    This is what keeps an ownership repair from producing an empty hierarchy.
+
+   **This clause governs carriers only.** It does not govern a theorem or
+   definition *restated at weaker hypotheses*. A proved weakening is its own
+   adoption argument and needs no second consumer before implementation: for
+   those, apply the proof-witness test below.
+2a. **Proof-witness test.** Before applying clause 2, decide which of three
+   things is being proposed. The compiler decides, not taste.
+
+   - **Lift.** The general statement compiles at the ancestor module with a
+     binder/typeclass set strictly weaker than the leaf's, *and* the leaf is
+     re-derived from it in one line (`instance`, `abbrev`, or `:= general …`).
+     Both artifacts appear in the same commit.
+     → **Accept.** Consumer count is not asked. The former home counts, because
+     a proved weakening is not a rename.
+   - **Carrier with content.** A new carrier, *and* at least one non-`sorry`
+     theorem in the same commit whose statement mentions that carrier and is
+     not expressible without it.
+     → Judge by clause 2 and questions 3, 4, 5. A theorem compiling at the new
+     altitude counts as one of the two consumers.
+   - **Empty carrier.** A new carrier with zero such theorems in the commit.
+     → **Blocker.** This is the only kind of abstraction this repository
+     refuses on sight, and it is exactly the `wont` item recorded in
+     `.claude/roadmap/mathematical-ownership.yaml`.
+
+   Generality must arrive carrying a proof, not a promise. Equally, a statement
+   that assumes a hypothesis its own proof never uses is a defect, not a matter
+   of taste — see question 7.
 3. **Projection.** How does a specialization forget to, refine, or compare with
    the root?  The answer must be an existing instance, a projection, an
    `abbrev`, or a theorem—not prose.
@@ -681,7 +708,16 @@ quotient carrier, or category must answer these questions before implementation.
    import closure, not just the absence of one direct import.
 6. **Negative result.** If the apparent generalization is false, record the
    counterexample and keep the leaves separate.  A falsified unification is a
-   successful architecture result.
+   successful architecture result. Record it in
+   [the generalization backlog](generalization-backlog.md) as `FALSIFIED` with
+   its counterexample rather than deleting the question; the next milestone
+   should not have to rediscover it.
+7. **Altitude of the parent.** State the hypotheses the proposed root actually
+   needs — read the proof, not the signature. If the existing parent assumes
+   more than its own subtree requires, record that as an altitude finding
+   *against the parent* rather than hanging a new leaf beneath it. This tree
+   is a target, not an oracle: a root sitting one layer too low is a defect
+   like any other, and the ceiling is allowed to rise.
 
 Use the [ownership decision record](mathematical-ownership.md#record-the-decision-in-the-issue-or-pr)
 to connect these answers to the issue or PR. Moving declarations is not

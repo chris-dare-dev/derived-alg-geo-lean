@@ -76,6 +76,38 @@ generated `.agents/skills/` files.
    controller's comment action with a concise link to the OpenSpec change and
    frozen chunk. If it does not, leave the tracker untouched.
 
+## Phase 0.5: pre-freeze altitude sweep
+
+Run once, after preflight passes and **before the first `ledger init`**. The
+ordering is the point: once any ledger exists, `digest(spec)` is load-bearing
+for dependency checks, so a finding from here can no longer influence a frozen
+file list. Before that point it can.
+
+Dispatch both advisors over every planned chunk's scope:
+
+1. `.claude/agents/altitude-scout.md` — is this concept already known, in
+   greater generality, in the pinned Mathlib or the literature?
+2. `.claude/agents/hypothesis-elimination-scout.md` — which hypotheses does the
+   proof not actually use?
+
+They are named in `spec.review.advisors`, not `spec.review.reviewers`. They
+record no verdict and nothing waits on them: do not call `ledger record-review`
+for an advisor, and do not treat a slow or failed advisor as a reason to stop.
+Their entire output is rows in `docs/architecture/generalization-backlog.md`.
+
+Then read the backlog and decide, before freezing:
+
+- A candidate that is `PIN-CONFIRMED` may mean this chunk should consume an
+  existing general result instead of proving a special case. Adjust the plan now.
+- A verified weakening may mean the chunk's own statements should be written at
+  the weaker hypotheses from the start, rather than lifted later.
+- A plausible ancestor that this chunk will not touch belongs in the chunk's
+  `lift_targets`, so a reviewer can open it later without a manifest edit.
+
+Running neither advisor is permitted when the manifest names none. Running one
+and not the other is not: they are blind in different directions, and the one
+you skip is the one that finds the hypothesis nobody thought to question.
+
 ## Phase 1: one frozen chunk
 
 For each issue in manifest order:
@@ -112,7 +144,7 @@ Record each verdict and finding without paraphrasing away a blocker:
 
 ```text
 python scripts/loop_engine.py ledger record-review --state <ledger> \
-  --reviewer <name> --commit <sha> --verdict pass|needs_changes|blocked \
+  --reviewer <name> --commit <sha> --verdict pass|pass_with_lift|needs_changes|blocked \
   --finding-file <path to that reviewer's verbatim final message>
 ```
 
@@ -125,7 +157,7 @@ Only after every required reviewer has submitted, adjudicate:
 
 ```text
 python scripts/loop_engine.py ledger adjudicate --state <ledger> \
-  --verdict pass|needs_changes|blocked --note "<decision>"
+  --verdict pass|pass_with_lift|needs_changes|blocked --note "<decision>"
 ```
 
 If the result is `needs_changes` and fewer than five rounds have been used,
@@ -139,11 +171,22 @@ them:
 
 - A lift whose target is **inside** the frozen file list is a normal
   `needs_changes`. It is actionable here, so it costs a round.
-- A lift whose target is **outside** the frozen file list cannot be implemented
-  in this chunk. Do not turn it into a `needs_changes` the chunk cannot satisfy,
-  and do not drop it. Append the reviewer's `LIFT:` block to
-  `docs/architecture/generalization-backlog.md` as an `UNVERIFIED` row and let
-  the chunk pass on the merits of the code actually under review.
+- A lift whose target is a declared `lift_targets` prefix becomes writable the
+  moment the reviewer records it — authorization keys off the recorded review,
+  not the adjudication. Adjudicate `needs_changes` to implement it now in the
+  now-open ancestor, or `pass_with_lift` to ship the chunk and defer it. Prefer
+  implementing it now when it is small; prefer deferring when it cascades.
+- A lift whose target is **outside** both the frozen file list and any declared
+  `lift_targets` prefix cannot be implemented in this chunk. Do not turn it into a `needs_changes` the chunk cannot satisfy,
+  and do not drop it. The reviewer closes `pass_with_lift` with a `--lift-target`;
+  append its `LIFT:` block to `docs/architecture/generalization-backlog.md` as an
+  `UNVERIFIED` row, then adjudicate the round `pass_with_lift`. The controller
+  refuses that adjudication while any named target is still missing from the
+  backlog, so the finding cannot be dropped — and it consumes no round, so it
+  cannot stall the chunk either.
+- The style reviewer closes `MERGE` / `MERGE AFTER FIXES` / `NEEDS REWORK`, not
+  the controller's vocabulary. Map `MERGE` to `pass` and both others to
+  `needs_changes`, and record the mapping in the finding file you capture.
 
 Termination is the round cap's job. Never suppress a class of finding to help
 the loop converge.

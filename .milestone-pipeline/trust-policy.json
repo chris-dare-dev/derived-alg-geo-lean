@@ -1,0 +1,7 @@
+{
+  "artifact_registry_prefixes": [],
+  "artifact_resolver": null,
+  "render_remote_prefixes": [],
+  "schema_version": 1,
+  "source_remote": "git@github.com:chris-dare-dev/derived-alg-geo-lean.git"
+}

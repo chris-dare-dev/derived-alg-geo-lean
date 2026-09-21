@@ -24,8 +24,7 @@ openspec:
 limits:
   min_issues: 1
   max_issues: 1
-  max_review_rounds_per_chunk: 3
-
+  max_review_rounds_per_chunk: 5
 review:
   independent: true
   reviewers:
@@ -33,6 +32,9 @@ review:
     - repository-boundary-adversary
     - abstraction-adversary
     - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
 
 runner:
   required_checks:
@@ -75,6 +77,7 @@ issues:
           - The covering claim is restricted to the free locus
           - Missing geometric consequences remain explicit non-goals
         files:
+          - docs/architecture/generalization-backlog.md
           - .claude/loop-specs/aut1-6-proper-discontinuity.yaml
           - openspec/changes/aut1-6-proper-discontinuity/.openspec.yaml
           - openspec/changes/aut1-6-proper-discontinuity/proposal.md
@@ -85,6 +88,15 @@ issues:
           - scripts/StabilityConditionAudit/PhaseTopology.lean
           - docs/architecture/cutover-ledger.md
           - notes/loop-engineering-aut1-6.md
+        lift_targets:
+          # Proper discontinuity of a group action is a statement about a space
+          # and a group. It exists in this repository only inside
+          # StabilityCondition/Symmetry/Combined/, and not at all in the pinned
+          # Mathlib. Precedent: Topology/Covering/Basic.lean records MO1.12
+          # (#1323) extracting a general covering lemma out of the GL+(2,R)
+          # argument because its statement mentions no matrix, no phase and no
+          # stability condition. Same shape, same owner.
+          - DerivedAlgGeo/Topology
         acceptance:
           - "The existing Lean surface satisfies every issue #927 requirement without `sorry`, `admit`, hidden axioms, or a generic inhabitant of `ProperDiscontinuityData`."
           - The finite-stabilizer consequence is callable from only a `ProperlyDiscontinuousSMul` hypothesis, while local, quotient, and covering results expose all required topological hypotheses.
