@@ -11,6 +11,7 @@ and it does not change branch protection.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -74,6 +75,11 @@ def _as_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
+def _canonical_sha256(value: Any) -> str:
+    encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
 def _valid_ref(event: Any, ref: Any) -> bool:
     if not _is_string(ref) or not GENERIC_REF.fullmatch(ref):
         return False
@@ -101,6 +107,77 @@ def _event_applies(definition: dict[str, Any], evidence: dict[str, Any]) -> bool
         if selector == "workflow_dispatch" and event == "workflow_dispatch":
             return True
     return False
+
+
+def _validate_provider_binding(evidence: dict[str, Any], errors: list[str]) -> None:
+    proof = evidence.get("provider_binding")
+    if not isinstance(proof, dict):
+        errors.append("evidence.provider_binding must be an object")
+        return
+    required = (
+        "source",
+        "repository",
+        "run_id",
+        "run_attempt",
+        "event",
+        "ref",
+        "commit",
+        "tree",
+        "parents",
+        "proof_sha256",
+    )
+    for field in required:
+        if field not in proof:
+            errors.append(f"evidence.provider_binding.{field} is required")
+    if proof.get("source") not in {"github-api", "provider-adapter"}:
+        errors.append("evidence.provider_binding.source is not a trusted adapter source")
+    if proof.get("repository") != evidence.get("repository"):
+        errors.append("evidence.provider_binding.repository does not match evidence.repository")
+    for field in ("run_id", "run_attempt"):
+        if proof.get(field) != evidence.get(field):
+            errors.append(f"evidence.provider_binding.{field} does not match evidence")
+    for field in ("event", "ref"):
+        if proof.get(field) != evidence.get(field):
+            errors.append(f"evidence.provider_binding.{field} does not match evidence")
+    if proof.get("commit") != evidence.get("candidate_commit"):
+        errors.append("evidence.provider_binding.commit does not match candidate_commit")
+    if proof.get("tree") != evidence.get("candidate_tree"):
+        errors.append("evidence.provider_binding.tree does not match candidate_tree")
+    if not _is_sha(proof.get("commit")):
+        errors.append("evidence.provider_binding.commit must be a full SHA")
+    if not _is_sha(proof.get("tree")):
+        errors.append("evidence.provider_binding.tree must be a full SHA")
+    parents = proof.get("parents")
+    if not isinstance(parents, list) or any(not _is_sha(parent) for parent in parents):
+        errors.append("evidence.provider_binding.parents must be a SHA array")
+        parents = []
+    elif len(set(parents)) != len(parents):
+        errors.append("evidence.provider_binding.parents must not contain duplicates")
+    proof_body = {key: value for key, value in proof.items() if key != "proof_sha256"}
+    if proof.get("proof_sha256") != _canonical_sha256(proof_body):
+        errors.append("evidence.provider_binding.proof_sha256 does not bind the provider proof")
+
+    event = evidence.get("event")
+    ref = evidence.get("ref", "")
+    head = evidence.get("head_commit")
+    base = evidence.get("base_commit")
+    candidate = evidence.get("candidate_commit")
+    if event in {"push", "workflow_dispatch"}:
+        if candidate != head:
+            errors.append("candidate_commit must equal head_commit for a direct ref event")
+    elif event == "pull_request":
+        if ref.endswith("/head"):
+            if candidate != head:
+                errors.append("candidate_commit must equal head_commit for a pull request head ref")
+        elif ref.endswith("/merge"):
+            if candidate == base or candidate == head or base not in parents or head not in parents:
+                errors.append(
+                    "pull request merge candidate must be a provider-proven merge commit "
+                    "with both base_commit and head_commit as parents"
+                )
+    elif event == "merge_group":
+        if candidate == head or head not in parents:
+            errors.append("merge_group candidate must prove head_commit as a merge parent")
 
 
 def validate_inventory(inventory: Any) -> list[str]:
@@ -187,6 +264,7 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         "event",
         "ref",
         "revision_binding",
+        "provider_binding",
         "platform",
         "run_id",
         "run_attempt",
@@ -225,6 +303,7 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         ):
             if revision_binding.get(field) != evidence.get(field):
                 errors.append(f"evidence.revision_binding.{field} does not match evidence")
+    _validate_provider_binding(evidence, errors)
     if evidence.get("platform") not in PLATFORMS:
         errors.append("evidence.platform is not recognized")
     if not _is_positive_int(evidence.get("run_id")):
