@@ -1,0 +1,13 @@
+{
+  "workflow": "dynamic/agents/github-advanced-security",
+  "run_id": 35530799100,
+  "job_id": 106130918882,
+  "provider": "github-copilot-sdk",
+  "phase": "session initialization",
+  "conclusion": "failure",
+  "error": "SessionModelError: You are not licensed to use Copilot (statusCode: 403, errorCode: authentication)",
+  "scanner_findings": [],
+  "disposition": "provider_failure",
+  "coverage_proof": null,
+  "owner_decision": null
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "repository": "chris-dare-dev/derived-alg-geo-lean",
+  "gates": [
+    {
+      "id": "build",
+      "name": "build",
+      "class": "required_ci",
+      "required": true,
+      "prerequisites": [],
+      "applies_to": ["pull_request", "push:main", "merge_group", "workflow_dispatch"],
+      "platforms": ["github-actions"],
+      "producer": "github-actions/CI",
+      "artifact": "check-run:build"
+    },
+    {
+      "id": "roadmap",
+      "name": "roadmap",
+      "class": "required_ci",
+      "required": true,
+      "prerequisites": [],
+      "applies_to": ["pull_request", "push:main", "merge_group", "workflow_dispatch"],
+      "platforms": ["github-actions"],
+      "producer": "github-actions/CI",
+      "artifact": "check-run:roadmap"
+    },
+    {
+      "id": "ci",
+      "name": "ci",
+      "class": "merge_readiness",
+      "required": true,
+      "prerequisites": ["build", "roadmap"],
+      "applies_to": ["pull_request", "push:main", "merge_group", "workflow_dispatch"],
+      "platforms": ["github-actions"],
+      "producer": "github-actions/CI",
+      "artifact": "check-run:ci"
+    },
+    {
+      "id": "trust-surface",
+      "name": "trust-surface",
+      "class": "review_validity",
+      "required": true,
+      "prerequisites": [],
+      "applies_to": ["pull_request"],
+      "platforms": ["github-actions"],
+      "producer": "github-actions/Trust guard",
+      "artifact": "check-run:trust-surface"
+    },
+    {
+      "id": "cache-warm",
+      "name": "cache-warm",
+      "class": "auxiliary",
+      "required": false,
+      "prerequisites": [],
+      "applies_to": ["push:main", "workflow_dispatch"],
+      "platforms": ["github-actions"],
+      "producer": "github-actions/cache-warm",
+      "artifact": "check-run:cache-warm"
+    },
+    {
+      "id": "docs-build",
+      "name": "docs-build",
+      "class": "auxiliary",
+      "required": false,
+      "prerequisites": [],
+      "applies_to": ["workflow_dispatch"],
+      "platforms": ["github-actions"],
+      "producer": "github-actions/Docs",
+      "artifact": "check-run:docs-build"
+    },
+    {
+      "id": "github-advanced-security",
+      "name": "github-advanced-security",
+      "class": "auxiliary",
+      "required": false,
+      "prerequisites": [],
+      "applies_to": ["pull_request"],
+      "platforms": ["github-actions"],
+      "producer": "github-advanced-security",
+      "artifact": "check-run:github-advanced-security"
+    },
+    {
+      "id": "post-merge-health",
+      "name": "post-merge-health",
+      "class": "post_merge_health",
+      "required": false,
+      "prerequisites": ["ci"],
+      "applies_to": ["push:main"],
+      "platforms": ["github-actions"],
+      "producer": "github-actions/CI",
+      "artifact": "check-run:post-merge-health"
+    }
+  ]
+}
