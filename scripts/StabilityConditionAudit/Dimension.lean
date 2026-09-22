@@ -21,3 +21,12 @@ reduce Mathlib's strong and classical triangulated generators to finiteness of
 #print axioms CategoryTheory.ObjectProperty.generationTime_eq_top_iff
 #print axioms CategoryTheory.ObjectProperty.isStrongTriangulatedGenerator_iff_generationTime_ne_top
 #print axioms CategoryTheory.ObjectProperty.isClassicalTriangulatedGenerator_of_generationTime_ne_top
+
+/-! ## Extension-closure comparison (#918) -/
+
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.le_of_closed_of_isTriangulatedClosed₂
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.le_triangEnvelope
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.not_le_triangEnvelope_bot
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.eq_iSup_extensionProductIter
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.generationTime_singleton_le_of_mem_extensionProductIter
