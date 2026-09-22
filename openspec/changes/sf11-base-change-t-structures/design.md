@@ -139,7 +139,8 @@ use targeted Lean module builds; the full repository build is left to CI.
 3. Implement and review #1060, push and merge it through the controller, then
    refresh the protected base before starting #1061; repeat for #1062.
 4. Run targeted Lean checks, `scripts/precheck.sh` where applicable, and the
-   required CI/trust-surface checks for every reviewed head.
+   required `ci` check for every reviewed head. The retired trust-surface
+   workflow is not part of this recut.
 5. Close each code issue only after the controller confirms the merged PR
    contains its closing keyword. Archive the OpenSpec change only after all
    three ledgers, gates, and issue closures pass.
