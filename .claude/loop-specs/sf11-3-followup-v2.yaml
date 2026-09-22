@@ -1,0 +1,89 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: sf11-3-followup-v2
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+# This plan branch contains the reviewed follow-up manifest. It is immutable
+# for the coding run; the issue branch is created from this exact ref.
+base_ref: agent/sf11-3-followup-plan-v2
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: sf11-base-change-t-structures
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/sf11-base-change-t-structures/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 5
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+    - trust-surface
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: true
+  allow_delete_branch_override: true
+  allow_auto: true
+  allow_admin: true
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+
+mutations:
+  comment_issue: true
+  close_issue: true
+  push_branch: true
+  create_pr: true
+  approve_pr: true
+  merge_pr: true
+
+issues:
+  - number: 1445
+    slug: sf11-3-followup-v2
+    depends_on: []
+    chunks:
+      - id: sf11-3-followup-v2
+        scope: Repair the merged SF11.3 Theorem 5.3 boundary, restore the AlgebraicGeometry audit, and capture a fresh bounded adversarial handoff.
+        requirements:
+          - Theorem 5.3 owner boundaries are source-shaped and do not duplicate canonical t-structure carriers
+          - The AlgebraicGeometry audit records actual declarations without changing the missing-declaration baseline
+        files:
+          - .claude
+          - DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated/IndFilteredColimits.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/Theorem53.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families.lean
+          - DerivedAlgGeo/CategoryTheory/Triangulated.lean
+          - DerivedAlgGeo/CategoryTheory/Triangulated/TStructure
+          - scripts/AlgebraicGeometryAudit
+          - scripts/StabilityConditionAudit
+          - openspec/changes/sf11-base-change-t-structures
+          - notes/loop-engineering-sf11.md
+        acceptance:
+          - The filtered-colimit bridge reuses IndExtensionData directly or adds a substantive comparison theorem; projection-only and duplicate carriers are removed.
+          - Theorem 5.3(3), (4a)--(4d), and (5.3)--(5.4) expose the exact one-sided or two-sided hypotheses used by their formal proofs, with geometric owner inputs explicit.
+          - The 351-declaration AlgebraicGeometry audit failure is fixed by actual audit records, not by editing audit_missing_baseline.txt or raising a ceiling.
+          - Targeted Lean checks, focused audit evidence, OpenSpec strict validation, repository gates, and four independent adversarial reviews pass on one final commit with no sorry, admit, or new axiom.
+        closure: complete

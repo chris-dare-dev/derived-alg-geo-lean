@@ -303,3 +303,22 @@ Its mapping-telescope factorization API is also universe-zero, so a partial
 generalization produced cascading universe mismatches. Do not widen one layer
 of a universe-sensitive representability construction without first auditing
 the entire telescope dependency chain; the attempted edit was reverted.
+
+## SF11.3 follow-up freeze correction (2026-09-21)
+
+The first coding draft removed the projection-only filtered-colimit carriers
+from `IndFilteredColimits.lean` and updated the AlgebraicGeometry audit. A
+static dependency check then exposed a second audit owner,
+`scripts/StabilityConditionAudit/TStructureCore.lean`, which still printed
+axioms for the removed declarations. Leaving that file outside the frozen
+chunk would make the intended refactor unbuildable and would force an
+out-of-scope edit during review. The follow-up was therefore re-frozen as
+`sf11-3-followup-v2` from a new immutable plan ref, with that audit directory
+explicitly included. The prior draft commit is retained only as a migration
+source; its ledger is not reused as review evidence.
+
+The official OpenSpec CLI was installed in an ephemeral `/tmp` toolchain
+because the host initially lacked both Node and `openspec`; strict validation
+passed for the change and all six repository changes. This environment detail
+is operational friction, not a repository dependency, and must be recreated or
+replaced by the runner before future local validation.
