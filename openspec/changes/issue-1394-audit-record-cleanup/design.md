@@ -3,17 +3,21 @@
 ## Context
 
 See proposal.md for motivation and specs/audit-record-integrity/spec.md for the
-behavior contract. On the current `origin/main`, the declaration sweep reports
-35 unresolved AlgebraicGeometry records, 26 StabilityCondition records, and 4
-DGCategory records. The issue's 24/25/4 snapshot is older than this checkout
-and will not be used as the post-cleanup target.
+behavior contract. After building the named audit targets and generating a
+fresh declaration sweep from current source, `check_audit_complete.py` reports
+10 unresolved AlgebraicGeometry records, 0 StabilityCondition records, and 0
+DGCategory records. The audit counts are at their recorded ceilings: 748/748,
+287/287, and 0/0 respectively. An earlier sweep run before refreshing the
+imported build artifacts contained declaration names absent from current
+source and reported counts above those ceilings; that output is not the
+target. The issue's 24/25/4 snapshot is also older than this checkout.
 
 The current audit inventory contains 36 `.congr_simp` records and 9 `.mk`
 records that the sweep filters, including two `.mk` records added in the
 current main after #1394 was filed. The 20 `.eq_` records are authored names
 accepted by the #998 classifier fix and resolve in the current sweep; they
-remain. Removing the filtered records is expected to leave 19, 1, and 0
-unresolved records respectively. Those remaining records are outside this
+remain. Removing the filtered records leaves 10, 0, and 0 unresolved records
+respectively. The remaining AlgebraicGeometry records are outside this
 cleanup's suffix-classified set and stay visible in the report.
 
 ## Goals / Non-Goals
@@ -23,7 +27,8 @@ cleanup's suffix-classified set and stay visible in the report.
 - Remove the 45 currently filtered generated records: 36 `.congr_simp` and 9
   `.mk` entries.
 - Preserve all 20 authored `.eq_` records that the current sweep includes.
-- Confirm the post-change unresolved counts against a fresh enumeration.
+- Confirm the post-change unresolved counts against a fresh enumeration after
+  building the named audit targets.
 
 **Non-Goals:**
 
@@ -49,10 +54,11 @@ cleanup's suffix-classified set and stay visible in the report.
    The ownership boundary is the existing enumeration in `EnumDecls.lean` and
    its three consuming audit lanes; dependency direction and imports do not
    change.
-3. **Do not tighten the unresolved gate yet.** The current report is expected
-   to retain 19 AlgebraicGeometry and 1 StabilityCondition unresolved entries.
-   `check_audit_complete.py` therefore stays a ratchet and keeps those entries
-   visible; setting a zero-only rule would reject this honest remainder.
+3. **Keep the existing unresolved gate.** The current report retains 10
+   AlgebraicGeometry unresolved entries and none in the other two lanes, all
+   within their recorded ceilings. `check_audit_complete.py` stays a ratchet
+   and keeps those entries visible; setting a zero-only rule would reject this
+   honest remainder.
 4. **Freeze one bounded review chunk.** The manifest names only the planning
    artifacts and the audit files that contain the removed records. The
    mathematics/source-faithfulness reviewer checks sweep membership and
@@ -70,9 +76,9 @@ cleanup's suffix-classified set and stay visible in the report.
 
 ## Risks / Trade-offs
 
-- **The issue's old counts may be mistaken for current totals.** Use the fresh
-  current-main enumeration and report residual counts instead of claiming the
-  lanes are fully resolved.
+- **A cached environment may report stale declarations.** Build the named
+  audit targets before enumerating and use the resulting source-current report.
+  The issue's old counts are not the current totals.
 - **A generated-looking suffix can be authored.** Compare each candidate with
   the sweep and preserve the 20 resolving `eq_*` names; remove only the
   filtered generated entries.
