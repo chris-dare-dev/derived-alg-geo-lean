@@ -365,40 +365,70 @@ the script does not reproduce. The script runs `workflows`, `local-build`,
 appear in any workflow. Say "N gates pass", naming them; never say
 "CI is green" for a local run. See `CONTRIBUTING.md` for the verified table.
 
-### OpenSpec-backed unattended loops
+### Unattended loops
 
-OpenSpec is the planning layer for any planned unattended batch. Keep the
-proposal, behavioral requirements/scenarios, design, and task checklist under
-`openspec/`, with repository context in `openspec/config.yaml`. The tracked
-execution manifests under `.claude/loop-specs/` may select two or three issues
-and authorize individual provider actions, but they do not replace the
-OpenSpec artifacts.
+A loop run takes a GitHub issue, or every open issue in a milestone, and works
+it to a merged pull request without asking the owner anything. The issue body
+is the specification: its goal, definition of done, deliverables, dependencies
+and closure mode (complete or progress) are what the run delivers. The four
+independent reviewers are the check, not the owner. Follow the
+[run-loop protocol](.claude/skills/run-loop/SKILL.md).
 
-Use `scripts/loop_engine.py validate` before considering a manifest, then run
-its read-only `preflight`. A run is not enabled until the exact base, live issue
-dependencies, branch/PR collisions, provider identity, roadmap state, and
-required checks are acceptable. Every frozen chunk gets independent
-mathematical, repository-boundary, abstraction, and mathlib-style review on
-the same commit. New work has at most three review/improve rounds per attempt.
-Without recovery configured, exhaustion stops the chunk. With explicit
-`recovery` configuration, the failed attempt stays terminal and the supervising
-agent automatically dispatches research and independent review of a recovery
-plan. Only an accepted plan admits a successor within the same frozen scope,
-with all findings and allocated rounds inherited. Never reset the budget by
-renaming or re-chunking. Defaults are two recovery episodes, nine total allocated
-rounds, two plan submissions per episode, and 604800 seconds; explicit legacy
-manifests retain their existing caps. Follow
-[the recovery protocol](docs/architecture/loop-recovery.md) without routine
-approval pauses. The CLI records next actions; an active supervising agent must
-execute them. Parking an exhausted objective does not stop other authorized work.
+**A run stops for these reasons only.**
 
-Comments, pushes, PR creation, approval, issue closure, and merge are separate
-manifest capabilities. Code issues close only after a confirmed merged PR;
-complete chunks require a closing keyword while explicitly authorized progress
-chunks must use a non-closing reference. Merge authority is false unless the
-manifest explicitly enables it. The pilot
-manifest is owner-enabled, but its live preflight and digest-bound review
-ledger remain mandatory before any provider mutation.
+1. It needs something only the owner can supply: a password, a token, `sudo`,
+   or a provider action that no owner-controlled source grants (see below).
+2. Continuing would bypass a required check, rewrite `main`'s history, or merge
+   with administrator override.
+3. The issue's definition of done is false or self-contradictory as written, and
+   a research pass has confirmed it rather than a first impression.
+4. Every selected issue is merged, parked, or out of budget. That is the end of
+   the run, not a pause.
+
+Everything else is the run's decision. Make it, record it where the owner will
+read it (the PR body, the friction log, or a follow-up issue), and continue.
+None of these is a reason to stop: a stale path or blocker in an issue body; a
+manifest that names a retired check; scope that needs one more audit or
+umbrella file before the ledger exists; an ambiguous design choice (take the
+smallest reading that meets the definition of done, and say so); `main` moving
+during review; a missing OpenSpec CLI; an exhausted round cap (recover when the
+manifest configures recovery, otherwise park that chunk, file a follow-up, and
+take the next issue); a question whose honest answer is "yes, continue". When a
+stop reason blocks one issue, record it and keep working the others; report
+every stop at the end instead of waiting on one.
+
+**The plan travels in the work PR.** Write the manifest under
+`.claude/loop-specs/` on the issue's `agent/<slug>` branch; it may be
+uncommitted when `preflight` runs, and its first commit opens the PR. Nothing
+has to merge to `main` before work starts. An OpenSpec change under
+`openspec/changes/` is optional for a single issue and expected for a
+multi-issue batch. Inside a run, write its artifacts directly: the generated
+`$openspec-propose` workflow stops after planning by design, and that boundary
+is for interactive planning, not for a run. Task checkboxes and
+`agent-observations.md` are progress records. Tick and append them freely,
+because the ledger's plan digest (v2) excludes them.
+
+**Reviews bind to the change, not to a commit's position.** Every frozen chunk
+gets independent mathematical, repository-boundary, abstraction, and
+mathlib-style review on the same commit, with at most three review/improve
+rounds per attempt for new work. A passed review covers any later head that
+carries the same change: a clean rebase onto a moved `main`, or a merge of
+`main` into the branch. When the change itself moves (a conflict resolution,
+say), one revalidation round with the full panel reopens the pass without
+spending the improvement cap. Never reset a budget by renaming or re-chunking.
+With `recovery` configured, exhaustion dispatches research and independent
+review of a recovery plan per [the recovery protocol](docs/architecture/loop-recovery.md),
+without approval pauses.
+
+**Provider authority is owner-controlled.** Comments, pushes, PR creation,
+marking ready, follow-up issues, issue closure, and merge each need a grant.
+The controller honours two sources, both read from `origin/main` so a branch
+cannot grant itself anything: a manifest merged to `main` keeps its own
+reviewed grants, and `.claude/loop-authority.yaml` holds the owner's standing
+grants for every other run. A manifest on a work branch can narrow that
+standing authority and can never widen it. Without the file, nothing is
+granted. Code issues close only after a confirmed merged PR; complete chunks
+need a closing keyword, and progress chunks need a non-closing reference.
 
 `scripts/loop_tokens.py` reports what a run cost, for either runtime. It reads
 the transcripts both already write -- Claude Code's

@@ -184,6 +184,17 @@ def passing_ledger_state(root: Path, spec: dict, closure: str = "complete") -> d
 
 
 class LoopEngineTests(unittest.TestCase):
+    def setUp(self) -> None:
+        # These tests model a manifest merged to the base branch, so its own
+        # reviewed grants are the authority. AuthorityTests covers the rest.
+        for name, value in (
+            ("manifest_is_on_base", True),
+            ("standing_authority", {key: False for key in loop_engine.MUTATION_KEYS}),
+        ):
+            patcher = mock.patch.object(loop_engine, name, return_value=value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
     def test_remote_and_blocker_normalization_match_github_shapes(self) -> None:
         self.assertEqual(
             loop_engine.normalize_remote("git@github.com:owner/repo.git"),
@@ -245,7 +256,7 @@ class LoopEngineTests(unittest.TestCase):
         self.assertEqual(
             loop_engine.roadmap_gate_args("agent/sf11-base"),
             [
-                "python",
+                sys.executable,
                 "scripts/check_roadmap.py",
                 "--require-api",
                 "--scope-to-diff=agent/sf11-base",
@@ -1132,6 +1143,402 @@ class LoopEngineTests(unittest.TestCase):
             )
             with self.assertRaises(loop_engine.LoopError):
                 loop_engine.build_merge_command(spec, 42, "b" * 40, None, True, True, None)
+
+    def test_ready_marks_a_draft_only_after_the_panel_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            spec["enabled"] = True
+            spec["mutations"]["ready_pr"] = True
+            state = passing_ledger_state(root, spec)
+            pr = {
+                "state": "OPEN",
+                "isDraft": True,
+                "headRefName": "agent/test-issue",
+                "headRefOid": "a" * 40,
+                "baseRefName": "main",
+                "body": "Closes #1\n",
+                "files": [{"path": "scripts/loop_engine.py"}],
+            }
+            with mock.patch.object(loop_engine, "load_state", return_value=state), mock.patch.object(
+                loop_engine, "gh_json", return_value=pr
+            ), contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(loop_engine.action_ready(root, spec, 7, root / "ledger.json", True), 0)
+            self.assertIn("DRY-RUN gh pr ready 7", output.getvalue())
+
+            state["status"] = "improve_required"
+            with mock.patch.object(loop_engine, "load_state", return_value=state), mock.patch.object(
+                loop_engine, "gh_json", return_value=pr
+            ):
+                with self.assertRaisesRegex(loop_engine.LoopError, "passing review ledger"):
+                    loop_engine.action_ready(root, spec, 7, root / "ledger.json", True)
+
+    def test_follow_up_links_the_parent_and_inherits_its_milestone(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            spec["enabled"] = True
+            spec["mutations"]["create_issue"] = True
+            body = root / "follow-up.md"
+            body.write_text("The reviewer found a stale dependency.\n", encoding="utf-8")
+            with mock.patch.object(
+                loop_engine, "gh_json", return_value={"milestone": {"title": "ROU1"}}
+            ), mock.patch.object(loop_engine, "run_command") as write:
+                write.return_value = subprocess.CompletedProcess([], 0, stdout="https://x/issues/9\n", stderr="")
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(
+                        loop_engine.action_follow_up(root, spec, 1, "Refresh #1's blocker", str(body), ["loop"], False),
+                        0,
+                    )
+            args = write.call_args.args[1]
+            self.assertEqual(args[:3], ["gh", "issue", "create"])
+            self.assertIn("Follow-up of #1", args[args.index("--body") + 1])
+            self.assertEqual(args[args.index("--milestone") + 1], "ROU1")
+            self.assertEqual(args[args.index("--label") + 1], "loop")
+            with self.assertRaisesRegex(loop_engine.LoopError, "not included"):
+                loop_engine.action_follow_up(root, spec, 99, "Unrelated", str(body), [], True)
+
+
+def git_in(root: Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", *args], cwd=root, check=True, capture_output=True, text=True
+    ).stdout.strip()
+
+
+def init_repo(root: Path) -> None:
+    git_in(root, "init", "-q", "-b", "main")
+    git_in(root, "config", "user.email", "loop-test@example.invalid")
+    git_in(root, "config", "user.name", "Loop Test")
+    git_in(root, "config", "commit.gpgsign", "false")
+    # Ledgers and captured reviewer output are run-local, as in the repository.
+    (root / ".gitignore").write_text(".loop-runs/\nreview-*.md\n", encoding="utf-8")
+
+
+def commit_all(root: Path, message: str) -> str:
+    git_in(root, "add", "-A")
+    git_in(root, "commit", "-q", "--allow-empty", "-m", message)
+    return git_in(root, "rev-parse", "HEAD")
+
+
+def publish_base(root: Path) -> None:
+    """Point the remote-tracking base at the current main, as a fetch would."""
+    git_in(root, "update-ref", "refs/remotes/origin/main", "main")
+
+
+def numbered_lines(count: int, changed: dict[int, str] | None = None) -> str:
+    changed = changed or {}
+    return "".join(f"{changed.get(line, f'line {line}')}\n" for line in range(1, count + 1))
+
+
+class OpenSpecDigestTests(unittest.TestCase):
+    def test_v2_ignores_checkbox_state_and_observation_logs_but_not_the_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            change = root / "openspec" / "changes" / "pilot-change"
+            (change / "agent-observations.md").write_text("# Observations\n", encoding="utf-8")
+            spec["openspec"]["required_artifacts"].append("agent-observations.md")
+            v1 = loop_engine.openspec_digest(root, spec, 1)
+            v2 = loop_engine.openspec_digest(root, spec)
+            legacy = {"openspec_digest": v1}
+            current = {"openspec_digest": v2, "openspec_digest_version": 2}
+
+            tasks = change / "tasks.md"
+            tasks.write_text(tasks.read_text(encoding="utf-8").replace("- [ ] 1.1", "- [x] 1.1"), encoding="utf-8")
+            with (change / "agent-observations.md").open("a", encoding="utf-8") as log:
+                log.write("- OBS-001 the base moved during review\n")
+            self.assertEqual(loop_engine.openspec_digest(root, spec), v2)
+            self.assertTrue(loop_engine.ledger_openspec_matches(root, spec, current))
+            # A ledger written before v2 keeps its byte-for-byte meaning.
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec, 1), v1)
+            self.assertFalse(loop_engine.ledger_openspec_matches(root, spec, legacy))
+
+            tasks.write_text(
+                tasks.read_text(encoding="utf-8").replace("Verify the test", "Verify a different test"),
+                encoding="utf-8",
+            )
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec), v2)
+
+    def test_a_single_issue_manifest_may_omit_openspec(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            del spec["openspec"]
+            del spec["issues"][0]["chunks"][0]["requirements"]
+            del spec["limits"]["min_issues"]
+            loop_engine.validate_spec(spec)
+            loop_engine.validate_openspec_artifacts(root, spec)
+            self.assertEqual(loop_engine.openspec_digest(root, spec), loop_engine.digest([]))
+            self.assertEqual(loop_engine.plan_paths(root, root / "run.yaml", spec), ["run.yaml"])
+
+            spec["openspec"] = {"change": "pilot-change", "required_artifacts": ["proposal.md"]}
+            with self.assertRaises(loop_engine.LoopError):
+                loop_engine.validate_spec(spec)
+
+
+class AuthorityTests(unittest.TestCase):
+    """Provider authority comes only from the base branch the owner controls."""
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+        init_repo(self.root)
+        _, self.spec = make_spec(self.root)
+        self.spec["enabled"] = True
+        self.spec["mutations"] = {}
+        commit_all(self.root, "base")
+        publish_base(self.root)
+        git_in(self.root, "checkout", "-q", "-b", "agent/test-issue")
+
+    def write_authority(self, grants: dict[str, bool]) -> None:
+        import yaml
+
+        path = self.root / loop_engine.STANDING_AUTHORITY_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            yaml.safe_dump({"schema": loop_engine.STANDING_AUTHORITY_SCHEMA, "mutations": grants}),
+            encoding="utf-8",
+        )
+
+    def test_without_a_standing_file_a_branch_manifest_grants_nothing(self) -> None:
+        self.spec["mutations"] = {"merge_pr": True, "push_branch": True}
+        self.assertFalse(any(loop_engine.effective_mutations(self.root, self.spec).values()))
+        with self.assertRaisesRegex(loop_engine.LoopError, "not authorized"):
+            loop_engine.authorize_action(self.root, self.spec, "merge")
+
+    def test_a_branch_manifest_narrows_standing_authority_and_cannot_widen_it(self) -> None:
+        git_in(self.root, "checkout", "-q", "main")
+        self.write_authority({"push_branch": True, "create_pr": True, "ready_pr": True, "merge_pr": True})
+        commit_all(self.root, "standing authority")
+        publish_base(self.root)
+        git_in(self.root, "checkout", "-q", "agent/test-issue")
+        git_in(self.root, "merge", "-q", "--ff-only", "main")
+
+        self.spec["mutations"] = {"merge_pr": False, "comment_issue": True}
+        effective = loop_engine.effective_mutations(self.root, self.spec)
+        self.assertTrue(effective["push_branch"] and effective["create_pr"] and effective["ready_pr"])
+        self.assertFalse(effective["merge_pr"])
+        self.assertFalse(effective["comment_issue"])
+
+    def test_a_standing_file_on_the_work_branch_grants_nothing(self) -> None:
+        self.write_authority({key: True for key in loop_engine.MUTATION_KEYS})
+        commit_all(self.root, "self-granted authority")
+        self.assertFalse(any(loop_engine.effective_mutations(self.root, self.spec).values()))
+
+    def test_a_manifest_merged_to_the_base_keeps_its_reviewed_grants(self) -> None:
+        import yaml
+
+        self.spec["mutations"] = {"comment_issue": True, "merge_pr": False}
+        git_in(self.root, "checkout", "-q", "main")
+        manifest = self.root / ".claude" / "loop-specs" / "test-run.yaml"
+        manifest.parent.mkdir(parents=True, exist_ok=True)
+        manifest.write_text(yaml.safe_dump(self.spec, sort_keys=False), encoding="utf-8")
+        self.write_authority({"push_branch": True})
+        commit_all(self.root, "reviewed manifest")
+        publish_base(self.root)
+        effective = loop_engine.effective_mutations(self.root, self.spec)
+        self.assertTrue(effective["comment_issue"])
+        self.assertFalse(effective["merge_pr"])
+        self.assertTrue(effective["push_branch"])
+
+        edited = json.loads(json.dumps(self.spec))
+        edited["mutations"]["merge_pr"] = True
+        self.assertFalse(loop_engine.effective_mutations(self.root, edited)["merge_pr"])
+
+
+class ContentBindingTests(unittest.TestCase):
+    """A review binds the change it read, not the base the change sits on."""
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+        init_repo(self.root)
+        self.spec_path, self.spec = make_spec(self.root)
+        (self.root / "a.txt").write_text(numbered_lines(20), encoding="utf-8")
+        (self.root / "b.txt").write_text("unrelated\n", encoding="utf-8")
+        commit_all(self.root, "base")
+        publish_base(self.root)
+        git_in(self.root, "checkout", "-q", "-b", "agent/test-issue")
+        (self.root / "a.txt").write_text(numbered_lines(20, {2: "reviewed change"}), encoding="utf-8")
+        self.reviewed = commit_all(self.root, "reviewed change")
+
+    def move_base(self) -> None:
+        """Advance main in another file and far away in the same file."""
+        git_in(self.root, "checkout", "-q", "main")
+        (self.root / "b.txt").write_text("unrelated, updated\n", encoding="utf-8")
+        (self.root / "a.txt").write_text(numbered_lines(20, {18: "base change"}), encoding="utf-8")
+        commit_all(self.root, "base moves")
+        publish_base(self.root)
+        git_in(self.root, "checkout", "-q", "agent/test-issue")
+
+    def fingerprint(self, commit: str) -> str:
+        return loop_engine.change_fingerprint(
+            self.root, "origin/main", commit, ["run.yaml", "openspec/changes/pilot-change"]
+        )
+
+    def test_rebased_and_merged_heads_carry_the_reviewed_change(self) -> None:
+        self.move_base()
+        git_in(self.root, "rebase", "-q", "origin/main")
+        rebased = git_in(self.root, "rev-parse", "HEAD")
+        self.assertNotEqual(rebased, self.reviewed)
+        self.assertEqual(self.fingerprint(rebased), self.fingerprint(self.reviewed))
+        state = {"plan_paths": ["run.yaml", "openspec/changes/pilot-change"]}
+        self.assertTrue(
+            loop_engine.reviewed_content_matches(self.root, self.spec, state, self.reviewed, rebased)
+        )
+
+        tasks = self.root / "openspec" / "changes" / "pilot-change" / "tasks.md"
+        tasks.write_text(tasks.read_text(encoding="utf-8").replace("- [ ]", "- [x]"), encoding="utf-8")
+        ticked = commit_all(self.root, "tick the plan")
+        self.assertEqual(self.fingerprint(ticked), self.fingerprint(self.reviewed))
+
+        (self.root / "a.txt").write_text(numbered_lines(20, {2: "unreviewed", 18: "base change"}), encoding="utf-8")
+        edited = commit_all(self.root, "edit after review")
+        self.assertNotEqual(self.fingerprint(edited), self.fingerprint(self.reviewed))
+        self.assertFalse(
+            loop_engine.reviewed_content_matches(self.root, self.spec, state, self.reviewed, edited)
+        )
+
+    def test_a_passed_ledger_reopens_only_for_changed_content(self) -> None:
+        state_path = self.root / ".loop-runs" / "test-chunk.json"
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", None), 0)
+
+            def panel(commit: str, verdict: str) -> None:
+                for reviewer in REVIEWERS:
+                    self.assertEqual(
+                        loop_engine.ledger_record_review(
+                            state_path, reviewer, commit, verdict, None,
+                            reviewer_output(self.root, reviewer, verdict),
+                        ),
+                        0,
+                    )
+
+            panel(self.reviewed, "pass")
+            self.assertEqual(loop_engine.ledger_adjudicate(state_path, "pass", "all clear"), 0)
+
+            self.move_base()
+            git_in(self.root, "rebase", "-q", "origin/main")
+            rebased = git_in(self.root, "rev-parse", "HEAD")
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                self.assertNotEqual(
+                    loop_engine.ledger_record_review(state_path, REVIEWERS[0], rebased, "pass", None), 0
+                )
+            self.assertIn("publish it without re-review", output.getvalue())
+
+            (self.root / "a.txt").write_text(
+                numbered_lines(20, {2: "conflict resolution", 18: "base change"}), encoding="utf-8"
+            )
+            resolved = commit_all(self.root, "resolve a conflict")
+            panel(resolved, "needs_changes")
+            self.assertEqual(loop_engine.ledger_adjudicate(state_path, "needs_changes", "revalidate"), 0)
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            self.assertEqual(state["rounds"][-1]["kind"], "revalidation")
+            self.assertEqual(state["status"], "improve_required")
+            self.assertEqual(loop_engine.improvement_rounds_used(state), 1)
+
+            (self.root / "a.txt").write_text(
+                numbered_lines(20, {2: "conflict resolved", 18: "base change"}), encoding="utf-8"
+            )
+            fixed = commit_all(self.root, "fix the resolution")
+            panel(fixed, "pass")
+            self.assertEqual(loop_engine.ledger_adjudicate(state_path, "pass", "revalidated"), 0)
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            self.assertEqual(state["status"], "passed")
+            self.assertNotIn("kind", state["rounds"][-1])
+
+            (self.root / "a.txt").write_text(numbered_lines(20, {2: "second reopen"}), encoding="utf-8")
+            panel(commit_all(self.root, "second reopen"), "pass")
+            self.assertEqual(loop_engine.ledger_adjudicate(state_path, "pass", "second"), 0)
+            (self.root / "a.txt").write_text(numbered_lines(20, {2: "third reopen"}), encoding="utf-8")
+            third = commit_all(self.root, "third reopen")
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                self.assertNotEqual(
+                    loop_engine.ledger_record_review(state_path, REVIEWERS[0], third, "pass", None), 0
+                )
+            self.assertIn("revalidation limit", output.getvalue())
+
+
+class PlanInPullRequestPreflightTests(unittest.TestCase):
+    """The plan may travel in the work PR; nothing has to merge first."""
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+        init_repo(self.root)
+        (self.root / "openspec").mkdir()
+        (self.root / "openspec" / "config.yaml").write_text("schema: spec-driven\n", encoding="utf-8")
+        commit_all(self.root, "repository with OpenSpec configured")
+        publish_base(self.root)
+        git_in(self.root, "remote", "add", "origin", "https://github.com/example/repository.git")
+        git_in(self.root, "checkout", "-q", "-b", "agent/test-issue")
+        # make_spec rewrites the committed config with identical content.
+        self.spec_path, self.spec = make_spec(self.root)
+        self.spec["enabled"] = True
+        self.spec_path.write_text(json.dumps(self.spec), encoding="utf-8")
+
+    def preflight(self, prs: list[dict] | None = None, protected: set[str] | None = None) -> tuple[int, str]:
+        output = io.StringIO()
+        with mock.patch.object(loop_engine, "gh_authenticated", return_value=self.spec["actor"]), mock.patch.object(
+            loop_engine, "existing_prs", return_value=prs or []
+        ), mock.patch.object(
+            loop_engine, "protected_check_names", return_value=protected if protected is not None else {"ci"}
+        ), mock.patch.object(
+            loop_engine, "issue_state", return_value={"state": "OPEN", "labels": [], "blockedBy": []}
+        ), mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]), contextlib.redirect_stdout(
+            output
+        ):
+            code = loop_engine.preflight(self.root, self.spec_path)
+        return code, output.getvalue()
+
+    def test_an_uncommitted_plan_on_the_work_branch_passes(self) -> None:
+        code, output = self.preflight()
+        self.assertEqual(code, 0, output)
+
+    def test_unplanned_uncommitted_work_fails(self) -> None:
+        (self.root / "stray.lean").write_text("-- unfinished\n", encoding="utf-8")
+        code, output = self.preflight()
+        self.assertEqual(code, 1)
+        self.assertIn("outside this run's plan: stray.lean", output)
+
+    def test_a_committed_plan_ahead_of_the_base_passes_and_a_stale_branch_fails(self) -> None:
+        commit_all(self.root, "plan")
+        code, output = self.preflight()
+        self.assertEqual(code, 0, output)
+
+        git_in(self.root, "checkout", "-q", "main")
+        (self.root / "moved.txt").write_text("the base moved\n", encoding="utf-8")
+        commit_all(self.root, "base moves")
+        publish_base(self.root)
+        git_in(self.root, "checkout", "-q", "agent/test-issue")
+        code, output = self.preflight()
+        self.assertEqual(code, 1)
+        self.assertIn("does not contain origin/main", output)
+
+    def test_history_on_the_branch_name_does_not_block_and_a_rival_pr_does(self) -> None:
+        merged = {"number": 5, "state": "MERGED", "headRefName": "agent/test-issue", "closingIssuesReferences": []}
+        own_open = {
+            "number": 6, "state": "OPEN", "headRefName": "agent/test-issue",
+            "closingIssuesReferences": [{"number": 1}],
+        }
+        code, output = self.preflight([merged, own_open])
+        self.assertEqual(code, 0, output)
+        self.assertIn("resuming open PR #6", output)
+
+        rival = {"number": 7, "state": "OPEN", "headRefName": "agent/other", "closingIssuesReferences": [{"number": 1}]}
+        code, output = self.preflight([rival])
+        self.assertEqual(code, 1)
+        self.assertIn("already has open PR #7", output)
+
+    def test_a_retired_required_check_warns_instead_of_failing(self) -> None:
+        code, output = self.preflight(protected={"build"})
+        self.assertEqual(code, 0, output)
+        self.assertIn("WARN manifest names checks branch protection no longer requires: ci", output)
 
 
 if __name__ == "__main__":

@@ -176,38 +176,44 @@ you changed. Seconds, not minutes. It is a cheap green, not a green: the
 library build, the audits, the ratchets, the linters and the emitter all need
 the library elaborated and run on the runners.
 
-### OpenSpec and bounded batch loops
+### Unattended issue loops
 
-For a planned unattended batch, put the proposal, requirement scenarios,
-design, and task checklist in `openspec/` and validate them with the OpenSpec
-CLI when it is available:
+An unattended run takes a GitHub issue or a milestone and follows
+[the run-loop protocol](.claude/skills/run-loop/SKILL.md) to merged PRs without
+owner input. Write issues so that works: state the goal, the definition of done
+as checkable statements, the deliverables (leaf paths, audits, umbrellas),
+dependencies as GitHub "blocked by" links, and whether the issue closes in one
+PR (complete) or several (progress). The run restates the definition of done
+as its manifest's acceptance statements. The four independent reviewers judge
+the work against them.
+
+The run writes its manifest on the issue's `agent/<slug>` branch, and the
+manifest ships in that PR; nothing merges to `main` first. From that branch:
 
 ```bash
-# Select an enabled manifest rather than a dormant roadmap manifest.
-# After its planning-only bootstrap PR is merged, select the active #554
-# implementation run and preflight from a fresh, clean checkout at its base.
-DAG_LOOP_MANIFEST=.claude/loop-specs/sf8-5-tor-witness-comparison.yaml
-openspec validate --all --strict --no-interactive
-python scripts/loop_engine.py validate --spec "$DAG_LOOP_MANIFEST"
-python scripts/loop_engine.py preflight --spec "$DAG_LOOP_MANIFEST"
+python3 scripts/loop_engine.py validate --spec .claude/loop-specs/<slug>.yaml
+python3 scripts/loop_engine.py preflight --spec .claude/loop-specs/<slug>.yaml
 ```
 
-The loop manifest is execution authority, not a second requirements system. It
-must select one to three issues, freeze file-level chunks, name the four
-independent reviewers, and set a review/improve cap no greater than three per
-attempt for new work. Explicit legacy manifests retain their recorded caps.
-Opting into `recovery` schedules research after exhaustion, then requires
-independent acceptance of a concrete plan before a successor attempt. History,
-findings, scope and cumulative budgets survive every attempt; no routine human
-approval is needed. Without recovery, exhaustion still stops the chunk. The
-supervising agent executes the CLI's next actions; there is no background daemon.
-See [the recovery protocol](docs/architecture/loop-recovery.md) for configuration,
-historical adoption and finite objective budgets. Provider actions are
-separately enabled; issue closure for code work requires a merged PR, and the
-schema keeps merge disabled unless the manifest enables it explicitly. Progress
-chunks must be marked explicitly and use non-closing issue references; complete
-chunks require a closing keyword. Keep run ledgers in ignored
-`.loop-runs/`, never in the OpenSpec plan.
+A manifest selects one to three issues and freezes file-level chunks. It names
+the four independent reviewers and caps review/improve at three rounds per
+attempt for new work; explicit legacy manifests keep their recorded caps. An
+OpenSpec change is optional for a single issue and expected for a multi-issue
+batch. Task checkboxes and `agent-observations.md` may change freely, because
+the ledger's plan digest excludes them.
+
+Reviews bind to the change, not to its base. A rebase onto a moved `main`
+keeps a passed review; a moved change needs one revalidation round. Opting into
+`recovery` schedules research after exhaustion. Without it, the run parks the
+chunk, files a follow-up issue, and moves on. See
+[the recovery protocol](docs/architecture/loop-recovery.md).
+
+Provider actions need grants from `origin/main`. A manifest merged there keeps
+its reviewed grants, and `.claude/loop-authority.yaml` holds the owner's
+standing grants for branch-authored manifests. A branch can narrow those
+grants, never widen them. Issue closure for code work requires a merged PR.
+Progress chunks use non-closing issue references; complete chunks require a
+closing keyword. Keep run ledgers in ignored `.loop-runs/`.
 
 This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate

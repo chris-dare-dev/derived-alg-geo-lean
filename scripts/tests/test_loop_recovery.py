@@ -565,11 +565,15 @@ class RecoveryCliTests(unittest.TestCase):
         self.assertEqual(len(final["rounds"][-1]["reviews"]), 4)
         self.assertIn(json.dumps(failed["rounds"], sort_keys=True), json.dumps(final, sort_keys=True))
         self.git("remote", "add", "origin", "https://github.com/example/repository.git")
-        self.git("commit", "--allow-empty", "-m", "Unreviewed revision")
+        # An empty commit carries the reviewed change unchanged and may be
+        # published; a commit that changes content is unreviewed.
+        (self.root / "unreviewed.txt").write_text("changed after review\n", encoding="utf-8")
+        self.git("add", "unreviewed.txt")
+        self.git("commit", "-m", "Unreviewed revision")
         with mock.patch.object(loop_engine, "authorize_action"):
-            with self.assertRaisesRegex(loop_engine.LoopError, "exact reviewed"):
+            with self.assertRaisesRegex(loop_engine.LoopError, "reviewed recovery change"):
                 loop_engine.action_push(self.root, self.spec, None, False, False)
-            with self.assertRaisesRegex(loop_engine.LoopError, "exact reviewed"):
+            with self.assertRaisesRegex(loop_engine.LoopError, "reviewed recovery change"):
                 loop_engine.action_create_pr(self.root, self.spec, 1, self.state_path,
                                              "Repair", "body.md", False, False)
 
@@ -638,15 +642,24 @@ class RecoveryCliTests(unittest.TestCase):
         body.write_text("Closes #1\n", encoding="utf-8")
         url = "https://github.com/example/repository/pull/101"
         output = io.StringIO()
+
+        def provider(_root, args, **_kwargs):
+            # Only the PR creation succeeds; the raced head cannot be fetched
+            # for comparison, so the content check must fail closed.
+            if args[:3] == ["gh", "pr", "create"]:
+                return subprocess.CompletedProcess(args, 0, stdout=url + "\n", stderr="")
+            return subprocess.CompletedProcess(args, 1, stdout="", stderr="unavailable")
+
         with self.provider_gates(state), mock.patch.object(loop_engine, "gh_json", side_effect=[
                 {"object": {"sha": "a" * 40}}, pr]), mock.patch.object(loop_engine, "run_command",
-                return_value=subprocess.CompletedProcess([], 0, stdout=url + "\n", stderr="")) as write, \
+                side_effect=provider) as write, \
                 contextlib.redirect_stdout(output):
             with self.assertRaises(loop_engine.LoopError) as raised:
                 loop_engine.action_create_pr(self.root, self.spec, 1, self.state_path,
                                              "Repair", str(body), False, False)
-            self.assertEqual(write.call_count, 1)
-            self.assertEqual(write.call_args.args[1][:3], ["gh", "pr", "create"])
+            provider_calls = [call for call in write.call_args_list if call.args[1][0] == "gh"]
+            self.assertEqual(len(provider_calls), 1)
+            self.assertEqual(provider_calls[0].args[1][:3], ["gh", "pr", "create"])
             self.assertIn(url, output.getvalue() + str(raised.exception))
             self.assertNotIn("PASS PR created", output.getvalue())
 
@@ -659,7 +672,8 @@ class RecoveryCliTests(unittest.TestCase):
                     mock.patch.object(loop_engine, "run_command") as write:
                 with self.assertRaises(loop_engine.LoopError):
                     loop_engine.action_close(self.root, self.spec, 1, 101, None, False)
-                write.assert_not_called()
+                # Read-only git probes may run; no provider write may.
+                self.assertFalse([call for call in write.call_args_list if call.args[1][0] == "gh"])
 
     def test_close_exact_reviewed_merged_pr_checks_scope_then_closes(self):
         state, pr = self.provider_fixture()

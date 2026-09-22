@@ -1,17 +1,91 @@
 # Loop manifests
 
-OpenSpec owns the planning artifacts under `openspec/`. Files in this
-directory are execution manifests: they select a small issue batch, reference
-the OpenSpec change that defines the work, freeze review roles and chunk
-boundaries, and explicitly authorize provider actions.
+A manifest is the plan for one unattended run: which issues it takes, how each
+is cut into frozen chunks, which files each chunk may touch, what "done" means
+for it, and who reviews it. A run writes its manifest on the issue's
+`agent/<slug>` branch, and the manifest ships in that PR. Nothing has to merge
+to `main` before the work starts.
 
-The distinction is intentional:
+- The issue body is the specification. A chunk's `acceptance` restates the
+  issue's definition of done.
+- `openspec/changes/<name>/` is optional for a single issue and expected for a
+  multi-issue batch. It holds the proposal, requirements and scenarios, design,
+  and tasks.
+- `.loop-runs/` holds local, ignored review ledgers for frozen commits.
 
-- `openspec/changes/<name>/` contains the proposal, requirements/scenarios,
-  design, and tasks that describe what should be built.
-- `.claude/loop-specs/*.yaml` contains the authority and scheduling policy for
-  one unattended run.
-- `.loop-runs/` contains local, ignored review ledgers for frozen commits.
+## A minimal single-issue manifest
+
+Omitted keys take their defaults: `limits.min_issues` 1,
+`limits.max_issues` 3, `openspec` absent, `requirements` empty, and
+`mutations` absent (standing authority applies unnarrowed).
+
+```yaml
+schema: derived-alg-geo-lean.loop-run/v1
+id: rou1-919-generation-time
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+roadmap_gate: required
+limits:
+  max_review_rounds_per_chunk: 3
+review:
+  independent: true
+  reviewers: [mathematics-adversary, repository-boundary-adversary, abstraction-adversary, mathlib-reviewer]
+  advisors: [altitude-scout, hypothesis-elimination-scout]
+runner:
+  required_checks: [ci]
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+issues:
+  - number: 919
+    slug: rou1-919-generation-time
+    chunks:
+      - id: rou1-919-generation-time
+        scope: "<one sentence: what this chunk proves, and what it explicitly does not>"
+        files:
+          - "DerivedAlgGeo/<leaf the issue names>"
+          - "DerivedAlgGeo/<its umbrella>"
+          - "scripts/<the audit slice for its declarations>"
+          - docs/architecture/generalization-backlog.md
+        acceptance:
+          - "<each definition-of-done item from the issue, restated as a checkable statement>"
+```
+
+## Provider authority
+
+Provider actions each need a grant: comments, pushes, PR creation, marking
+ready, follow-up issues, issue closure, approval, and merge. The controller
+honours two sources, and it reads both from `origin/main`, so a work branch
+cannot grant itself anything:
+
+- A manifest merged to `main` keeps its own explicit `mutations`. These are the
+  pre-existing manifests, which were reviewed through planning PRs.
+- `.claude/loop-authority.yaml` on `main` is the owner's standing grant for
+  every run whose manifest lives on a work branch. That manifest's `mutations`
+  may set a key to `false` to narrow the grant, but can never widen it. Without
+  the file, nothing is granted, and a run stops at its first provider action
+  (stop reason 1).
+
+The owner creates and edits that file; a run never does. Its shape:
+
+```yaml
+schema: derived-alg-geo-lean.loop-authority/v1
+mutations:            # each key defaults to false when omitted
+  comment_issue: true
+  push_branch: true
+  create_pr: true
+  ready_pr: true
+  create_issue: true  # follow-up issues for deferred findings
+  close_issue: true   # still only after a confirmed merged PR
+  merge_pr: true      # still only with a passing ledger, green required checks,
+                      # and --match-head-commit pinned to the verified head
+  approve_pr: false   # branch protection requires no approval; GitHub refuses self-approval
+```
 
 ## Automatic recovery
 
@@ -83,17 +157,36 @@ Derive them from `docs/architecture/abstraction-tree.md` when you plan the run,
 and leave the key absent rather than guessing: an ancestor named wrongly is
 standing authorization to edit a file nobody meant to open.
 
-Validate a manifest before inspecting or enabling a run:
+Validate and preflight a manifest from its work branch:
 
 ```text
-python scripts/loop_engine.py validate --spec .claude/loop-specs/sf8-sf9-pilot.yaml
-python scripts/loop_engine.py preflight --spec .claude/loop-specs/sf8-sf9-pilot.yaml
+python3 scripts/loop_engine.py validate --spec .claude/loop-specs/<slug>.yaml
+python3 scripts/loop_engine.py preflight --spec .claude/loop-specs/<slug>.yaml
 ```
 
-The pilot is checked in with `enabled: true` because the repository owner has
-authorized this first run. The controller still requires a clean `main`-based
-checkout and a passing live preflight before it performs any mutation. The
-schema keeps `merge_pr` false by default; this pilot explicitly enables it.
-Method, auto-merge, administrator merge, and branch deletion are separate
-explicit merge-policy settings. Code issues may only be closed after a
-confirmed merged pull request.
+Preflight accepts an uncommitted or branch-committed plan, and any head that
+contains `base_ref`. It refuses:
+- other uncommitted work;
+- a stale branch;
+- another branch's open PR for the same issue.
+
+A merged or closed PR on the planned branch name is history, not a collision.
+An open one is this run being resumed.
+
+The merge policy defaults to squash with branch deletion; a squash-merged branch
+left behind would block the next run that plans the same name. Method,
+auto-merge, administrator merge and branch deletion remain explicit settings.
+Code issues may only be closed after a confirmed merged pull request.
+
+## Ledgers and moving bases
+
+- A ledger written by this controller records its plan paths and plan-digest
+  version 2. Version 2 ignores task checkbox state and `agent-observations.md`,
+  so ticking tasks or appending the observation log no longer invalidates a
+  review. Ledgers written before this change keep verifying under version 1.
+- A passing round covers any later head that carries the same change against
+  its merge base, such as a rebase onto a moved `main` or a merge of `main`
+  into the branch. The run's own plan paths are excluded from that comparison.
+- When the change itself moves, one revalidation round with the full panel
+  reopens the pass. A revalidation round does not spend
+  `max_review_rounds_per_chunk`, and a ledger allows at most two.

@@ -1,27 +1,68 @@
 ---
 name: run-loop
-description: Execute enabled OpenSpec-backed work with a digest-bound ledger, four independent reviewers, guarded provider actions, and optional bounded automatic research recovery.
+description: Take a GitHub issue or milestone to merged PRs without owner input — plan in the work PR, four independent reviewers, change-bound ledger, owner-controlled provider authority, and bounded automatic research recovery.
 ---
 
-# Bounded OpenSpec loop
+# Unattended issue loop
 
-This skill is the outer protocol for an explicitly enabled manifest under
-`.claude/loop-specs/`. It may run unattended only after the manifest itself has
-been reviewed and `enabled: true` is present. The manifest is the user's
-forward approval for the listed goals and separately named provider actions; do
-not infer permission from ordinary issue text or from a green build.
+Hand this skill one GitHub issue, or a milestone. It plans, implements, reviews
+and lands each issue without asking the owner anything. The issue body is the
+specification: its goal, definition of done, deliverables, dependencies and
+closure mode are what the run must deliver. The four independent reviewers are
+the check on the run's work; the owner is not in the loop.
 
-OpenSpec is the requirements source. Use the generated Codex skills
-`$openspec-explore`, `$openspec-propose`, `$openspec-apply-change`,
-`$openspec-update-change`, `$openspec-verify-change`, and
-`$openspec-archive-change` according to the artifacts present. Do not edit
-generated `.agents/skills/` files.
+## When the run stops
+
+Stop for these reasons only:
+
+1. The run needs something only the owner can supply: a password, a token,
+   `sudo`, or a provider action the controller reports as not authorized.
+2. Continuing would bypass a required check, rewrite `main`'s history, or merge
+   with administrator override.
+3. An issue's definition of done is false or self-contradictory as written, and
+   a research pass (Phase 2.5, or a dispatched researcher when recovery is not
+   configured) has confirmed it.
+4. Every selected issue is merged, parked, or out of budget: the run is over.
+
+Everything else is a decision the run makes, records, and moves past. Record
+decisions in the PR body. Record tooling or documentation friction in
+`docs/architecture/loop-engineering-friction.md`. Record out-of-scope work as a
+follow-up issue (`action follow-up`). Then continue. Never end a turn with a
+question whose honest answer is "yes, continue", and never ask the owner to
+confirm a plan, an edit, a scope reading or the next step. When a stop reason
+blocks one issue, leave that issue's state recorded and work the others. Report
+every stop together at the end.
+
+These are not stops. What to do instead:
+
+- **Stale issue text** (a closed blocker, a retired path). Use the live state,
+  note the discrepancy in the PR body, and file a follow-up if the issue needs
+  rewriting.
+- **Retired required check.** When a manifest names a check that branch
+  protection no longer requires, preflight warns and merge uses the live list.
+- **Frozen scope is too narrow before the ledger exists.** Edit the plan; it
+  is in the PR. After the ledger exists, use a declared `lift_targets` path, or
+  record the gap and file a follow-up.
+- **Ambiguous design choice.** Take the smallest reading that meets the
+  definition of done, and state it in the PR body.
+- **`main` moved.** Rebase, or merge `main` into the branch. A passed review
+  carries over when the change is unchanged, and a changed one needs one
+  revalidation round (Phase 3).
+- **Round cap exhausted.** With `recovery` configured, run Phase 2.5. Without
+  it, preserve the ledger, park the chunk, file a follow-up issue that carries
+  the unresolved findings, and take the next issue.
+- **The OpenSpec CLI is missing.** Structural validation is used instead, and
+  preflight warns.
+- **A reviewer returns nothing.** Re-dispatch that role on the same commit.
 
 ## Invariants
 
-- Work in a clean dedicated worktree based on the manifest's exact `base_ref`.
-- Execute only the one to three issues and frozen chunks listed in the
-  manifest. Never select a replacement issue because a listed issue is hard.
+- Work in a dedicated `agent/<slug>` worktree whose history contains the
+  manifest's `base_ref`. Fetch the remote first, and seed the worktree's build
+  cache (`bash scripts/seed_worktree_cache.sh`).
+- Execute only the issues and frozen chunks the manifest lists. Never select a
+  replacement issue because a listed issue is hard; a hard issue is Phase 2.5's
+  job.
 - Run the mathematical, repository-boundary, abstraction, and mathlib reviewers
   independently on the same commit. The style reviewer cannot substitute for
   either adversarial lens.
@@ -38,8 +79,9 @@ generated `.agents/skills/` files.
 - A review/improve round is keyed by the commit and frozen chunk. A changed
   commit starts the next round. New work permits at most three rounds per
   attempt; explicit legacy manifests retain their recorded caps. Preserve an
-  exhausted attempt. Without recovery, stop the chunk; with recovery, execute
-  Phase 2.5 automatically within the cumulative budget.
+  exhausted attempt. Without recovery, park the chunk and file its follow-up
+  (Phase 2); with recovery, execute Phase 2.5 automatically within the
+  cumulative budget.
 - A successor using `predecessor_prs` may start only after every named source
   PR has the exact controller attestation, reviewed head, and merge commit
   pinned in the manifest; its merge must be an ancestor of both `base_ref` and
@@ -47,45 +89,77 @@ generated `.agents/skills/` files.
   and every successor PR action. A source manifest with
   `predecessor_attestation.emit: true` must run `action attest-pr` after its
   passing ledger and before its controller merge.
-- Do not silently re-chunk, widen the file list, or rewrite the OpenSpec plan
-  after review evidence exists. Recovery preserves that contract. Renaming a
-  chunk, manifest, state directory or worktree cannot reset an objective's
-  history or allowance; newly required scope is not automatic authority.
+- Do not silently re-chunk, widen the file list, or rewrite the plan after
+  review evidence exists. Recovery preserves that contract. Renaming a chunk,
+  manifest, state directory or worktree cannot reset an objective's history or
+  allowance; newly required scope is not automatic authority.
 - Never run `scripts/gates.sh` locally. Use `scripts/precheck.sh` with a
   targeted build where the repository hook permits it; the self-hosted runner
   is the CI verdict.
 - Use only `scripts/loop_engine.py action ...` for comments, pushes, PR
-  creation, approval, merge, and issue closure. Do not call `gh issue close`,
-  `gh pr review`, or `git push` directly from this skill.
+  creation, marking ready, follow-up issues, approval, merge, and issue
+  closure. Do not call `gh issue close`, `gh pr ready`, `gh pr merge`,
+  `gh issue create`, `gh pr review`, or `git push` directly from this skill.
+- Provider authority comes from `origin/main` only: a manifest merged there
+  keeps its reviewed grants, and `.claude/loop-authority.yaml` holds the
+  owner's standing grants for manifests written on a work branch. Never write
+  or edit that file from a run, and never widen a grant in a manifest.
 - Code issues close only after the controller verifies a merged PR that closes
   the same issue. Non-PR closure is disabled unless the manifest explicitly
   says otherwise.
 
-## Phase 0: validate and preflight
+## Phase 0: plan inside the work PR
 
-1. Identify exactly one manifest and read its referenced OpenSpec proposal,
-   delta specs, design, and tasks. Run:
+For a milestone, list its open issues (`gh issue list --milestone <title>`),
+order them by their dependencies, and run Phases 0–3 once per issue. An issue
+whose live blockers are open outside the milestone is skipped with a recorded
+reason, not waited on.
+
+1. `git fetch origin`, then create the `agent/<slug>` worktree from
+   `origin/main`, where `<slug>` is a short kebab-case name for the issue.
+   Read the issue with `gh issue view <n> --comments`. Its body is the
+   specification.
+
+2. Write the manifest at `.claude/loop-specs/<slug>.yaml` on that branch. The
+   minimal single-issue shape is in `.claude/loop-specs/README.md`. Derive each
+   chunk's `acceptance` from the issue's definition of done. Derive its `files`
+   from the issue's deliverables plus the audit, umbrella and backlog files the
+   repository rules require; a new public declaration needs its audit record
+   and its umbrella export. Set `closure: progress` only when the issue's
+   definition of done is explicitly multi-PR. Add an OpenSpec change only for
+   a multi-issue batch, or when the issue asks for a design. Write its
+   artifacts directly: do not invoke `$openspec-propose` inside a run, because
+   that workflow ends by waiting for a new request.
+
+3. Validate and preflight:
 
    ```text
-   openspec validate --all --strict --no-interactive
-   python scripts/loop_engine.py validate --spec <manifest>
-   python scripts/loop_engine.py preflight --spec <manifest>
+   python3 scripts/loop_engine.py validate --spec <manifest>
+   python3 scripts/loop_engine.py preflight --spec <manifest>
    ```
 
-2. Stop if the manifest is disabled, the OpenSpec CLI is unavailable when its
-   validation mode is `cli-required`, the base is not exact, the worktree is
-   dirty, the authenticated actor differs, branch protection is missing a
-   required check, an issue is closed/blocked/ineligible, a dependency is open,
-   a predecessor attestation is missing or stale, a branch/PR already exists,
-   or a repository gate fails.
+   The plan may be uncommitted or committed on the branch. Preflight fails
+   only on:
+   - uncommitted work outside the plan;
+   - a branch that does not contain `base_ref` (rebase and rerun);
+   - a wrong actor or remote;
+   - an issue that is closed, labelled `blocked`/`research`/`type:spike`, or
+     has live blockers;
+   - another branch's open PR for the same issue;
+   - a stale predecessor attestation;
+   - a failing roadmap gate.
 
-3. Read `docs/architecture/generalization-backlog.md` before choosing an
+   Repair what is repairable and rerun. An ineligible issue is recorded and
+   skipped.
+
+4. Commit the plan as the branch's first commit.
+
+5. Read `docs/architecture/generalization-backlog.md` before choosing an
    implementation approach. A recorded lift may already say where this work
    belongs, or record that the obvious generalization is false.
 
-4. Do not claim an issue by hand. If the manifest authorizes comments, use the
-   controller's comment action with a concise link to the OpenSpec change and
-   frozen chunk. If it does not, leave the tracker untouched.
+6. Do not claim an issue by hand. When comments are authorized, the
+   controller's comment action may post a one-line link to the branch.
 
 ## Phase 0.5: pre-freeze altitude sweep
 
@@ -130,7 +204,7 @@ For each issue in manifest order:
 1. Re-run the live preflight and initialize the exact ledger entry:
 
    ```text
-   python scripts/loop_engine.py ledger init --spec <manifest> \
+   python3 scripts/loop_engine.py ledger init --spec <manifest> \
      --issue <number> --chunk-id <chunk-id>
    ```
 
@@ -139,9 +213,11 @@ For each issue in manifest order:
    `predecessor_prs` entry it additionally rechecks the live provider
    attestation and both ancestry bindings.
 
-2. Create or enter the issue's dedicated `agent/<slug>` branch. Implement only
-   the unchecked OpenSpec tasks for the frozen chunk. Keep the issue's
-   mathematical hypotheses explicit; an interface field is not a proof.
+2. On the issue's `agent/<slug>` branch, implement the frozen chunk: its
+   acceptance statements, and the unchecked OpenSpec tasks when a change
+   exists. Tick task boxes and append the observation log as you go; the v2
+   plan digest ignores both. Keep the issue's mathematical hypotheses
+   explicit; an interface field is not a proof.
 
 3. Run targeted Lean checks and `scripts/precheck.sh` as appropriate. Commit
    the chunk. Before creating a PR, the controller checks that the committed
@@ -172,7 +248,7 @@ followed by the final line `Close: <TOKEN>`; counts and prose precede those line
 Record each verdict and finding without paraphrasing away a blocker:
 
 ```text
-python scripts/loop_engine.py ledger record-review --state <ledger> \
+python3 scripts/loop_engine.py ledger record-review --state <ledger> \
   --reviewer <name> --commit <sha> --verdict pass|pass_with_lift|needs_changes|blocked \
   --finding-file <path to that reviewer's verbatim final message>
 ```
@@ -185,7 +261,7 @@ a one-line summary only; it is not evidence and cannot stand alone.
 Only after every required reviewer has submitted, adjudicate:
 
 ```text
-python scripts/loop_engine.py ledger adjudicate --state <ledger> \
+python3 scripts/loop_engine.py ledger adjudicate --state <ledger> \
   --verdict pass|pass_with_lift|needs_changes|blocked --note "<decision>"
 ```
 
@@ -193,7 +269,13 @@ If the result is `needs_changes` and fewer than the manifest's configured cap
 have been used, fix only the recorded findings, rerun the targeted checks,
 commit, and repeat Phase 2. If the result is `blocked` or the final permitted
 round still needs changes, preserve that result and run Phase 2.5 when recovery
-is configured; otherwise stop the chunk and report the exact ledger state.
+is configured. Otherwise park the chunk:
+- keep the ledger unchanged;
+- file a follow-up issue carrying the unresolved findings verbatim
+  (`action follow-up`);
+- record the chunk in the end-of-run report;
+- continue with the next issue.
+
 Do not ask the same reviewers to rediscover the same issue on an unchanged
 commit.
 
@@ -259,34 +341,47 @@ Do not pause for routine approval of these transitions. Source changes, plan
 revisions and research subtasks retain the original scope and budget. Provider
 permissions remain separate; a research approval grants none.
 
-## Phase 3: guarded handoff
+## Phase 3: handoff through merge
 
-When the ledger passes:
+The PR can open as soon as the plan commit exists: CI then runs while the
+panel reviews. It must not be marked ready or merged before the ledger passes.
 
-1. Push and create the PR through the controller, supplying the ledger to bind
-   the PR to the frozen file list. Keep it draft until the required review and
-   CI policy permits readiness.
-2. Wait for the configured required checks as the provider reports them. Local
-   precheck is evidence for debugging, not a CI verdict.
-3. Approve only through the controller. It rechecks the passing ledger, plan
-   digests, PR head, frozen files, and required checks. Provider refusal of
-   self-approval is a hard stop, not a reason to bypass branch protection.
-4. If `predecessor_attestation.emit` is true, create the source PR's durable
-   controller evidence with `python scripts/loop_engine.py action attest-pr`
-   after its ledger passes and before merging. It is bound to the current PR
-   head; do not hand-write or reuse it for another PR.
-5. Merge only if `mutations.merge_pr` is explicitly true and a passing ledger
-   is supplied. The merge action also requires the requested method, auto,
-   administrator, and branch-deletion behavior to be allowed by the manifest;
-   administrator merge is never inferred from a failed check. Otherwise stop
-   at the approved PR.
-6. Close the issue only after the controller confirms that the merged PR closes
-   that same issue. Then re-run preflight before considering the next selected
-   issue.
+1. Push and create the PR through the controller (`action push`,
+   `action create-pr --draft`), supplying the ledger. The PR body states the
+   decisions the run made and links the issue. Use a closing keyword for a
+   complete chunk and `Refs #<n>` for a progress chunk.
+2. When the ledger passes, run `action ready`. It rechecks the passing ledger,
+   the plan digest, the frozen files, and that the PR head carries the reviewed
+   change.
+3. Wait for the required checks (`gh pr checks <n> --watch`). Branch protection
+   decides which checks are required; a manifest check it no longer requires is
+   ignored. Local precheck is evidence for debugging, not a CI verdict. A red
+   check is a finding: fix it, commit, and take the new commit through Phase 2
+   as the next round.
+4. If `main` moved, merge `origin/main` into the branch (or rebase), rerun the
+   targeted checks, and push. A head that carries the same change keeps the
+   pass. If the change moved, as a conflict resolution does, run one
+   revalidation panel on the new commit. It needs all four reviewers and does
+   not spend the improvement cap; at most two are allowed.
+5. If `predecessor_attestation.emit` is true, run `action attest-pr` after the
+   ledger passes and before merging. It binds the current PR head.
+6. Run `action merge`. The controller pins `--match-head-commit` to the head it
+   just verified, so a later push makes the provider refuse the merge instead
+   of landing unreviewed content. Administrator merge is never inferred from a
+   failed check.
+7. The closing keyword closes a complete chunk's issue on merge. Use
+   `action close --merged-pr` only when it did not. Then take the next issue.
 
-For stack mode, a dependent issue cannot advance while merge authority is
-false. Stop with that explicit reason rather than treating an open approved PR
-as a closed prerequisite. At the end, report completed chunks, terminal
-blocked chunks, provider actions actually taken, CI status, the lift findings
-carried to the generalization backlog (each with its leaf declaration and
-proposed ancestor), and the next required human decision.
+When the controller reports that an action is not authorized, that is stop
+reason 1 for this issue only. Leave the PR in its current verified state,
+record it, and continue with the other issues. In stack mode, a dependent
+issue waits on its predecessor's merge; work the independent issues meanwhile.
+
+At the end, report:
+- the issues merged, with their PRs;
+- chunks parked, each with its follow-up issue;
+- provider actions actually taken;
+- CI status;
+- lift findings carried to the generalization backlog, each with its leaf
+  declaration and proposed ancestor;
+- every stop reason hit, and the exact grant or input it needs.
