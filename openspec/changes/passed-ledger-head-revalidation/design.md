@@ -1,0 +1,73 @@
+# Design
+
+## Context
+
+See [proposal.md](proposal.md#why) for the failure mode. The current ledger treats `passed` as terminal, while the existing recovery mechanism is specifically for exhausted/blocked attempts and requires a separate research protocol. A passed round records its reviewed commit but not an immutable event tying a later candidate head to the protected-base movement that justified reviewing it.
+
+The change adds a narrow state transition to the ordinary loop ledger. It must coexist with legacy ledgers, recovery-managed state, exact reviewer panels, and the provider gates. New ledgers will pin the protected-base OID at initialization and on each review round. Legacy passing ledgers without that evidence can use only the explicitly marked conservative first-parent inference described below. The change must not otherwise alter historical manifests or existing ledgers.
+
+## Goals / Non-Goals
+
+**Goals:**
+
+- Admit a rebased candidate only after complete live checks, and reserve one exact full SHA for the next already-budgeted review round.
+- Preserve all old review evidence and make refresh history structurally verifiable.
+- Make every incomplete or stale state fail closed for shipping.
+- Keep the transition automatic and bounded without asking the user to reopen a passed attempt.
+
+**Non-Goals:**
+
+- Recovering blocked or needs-changes attempts; the separate bounded-recovery workflow remains the owner of that behavior.
+- Changing issue scope, manifest digests, reviewers, cap, or frozen files; creating a new issue/manifest is the bootstrap boundary for this controller feature, not a way to reset the DT1 attempt.
+- Automatically rebasing, editing, pushing, or opening a PR as part of revalidation. The command validates the candidate already prepared by the supervising loop and changes only its local ledger.
+- Making local review evidence cryptographic. Reviewer-output provenance and provider gates retain their existing trust model.
+
+## Decisions
+
+### Treat refresh as a consuming ledger transition, not a reopen
+
+Add a dedicated CLI action for passed-head revalidation. Every CLI invocation already enters `dispatch` under the repository-wide `controller_lock` in `main()`; reuse that serialization boundary and atomic persistence rather than adding a second lock. The command verifies all preconditions before writing, appends an immutable refresh event, appends exactly one empty review round pinned to the full candidate SHA and live base OID, and changes status to reviewing. A failed check writes nothing. The ordinary review and adjudication commands then process the reserved round; a failed/blocked target remains in the evidence chain and cannot be replaced. The same path can repeat only after that round passes and another base advance is demonstrated.
+
+Each event records the adjacent prior and next round numbers, the prior reviewed head and its base parent, the new candidate head and its protected-base parent, whether the prior base was recorded or inferred, the resolved protected-base OID/ref, the source branch, the exact prior remote source-ref SHA (or absence), and admission time. Existing entries are never normalized or rewritten. Ledger validation checks event order, adjacency, unique prior rounds, matching full SHAs, and that each event follows a passing adjudication and points to an initially empty next round. A later failed or blocked target does not invalidate its event; only a passing target may start another event. It rejects an event after a blocked or needs-changes prior outcome. Both commits must be single-parent commits. New ledgers compare the prior round's pinned base OID to the live protected base. Legacy ledgers lack a recorded OID, so the controller infers the candidate's sole parent and requires that it is a strict ancestor of the live base while the old candidate itself is not. This is a conservative Git-graph admission heuristic, not proof of the historical protected-base OID, and the event must label it as inferred.
+
+Alternatives considered: resetting a passed ledger would erase provenance and make the cap reusable; a new ledger would detach the old panel and allow a scope/cap reset; routing this through blocked-attempt recovery would misclassify success and invoke unrelated research/plan machinery. All are rejected.
+
+### Require complete read-only admission evidence before persistence
+
+The refresh action resolves the configured Git remote and protected base from the current checkout and compares normalized repository identity with the frozen manifest. It requires a clean checkout, exact local HEAD, a current open issue, and a complete all-state PR lookup scoped to the exact frozen source branch. The lookup must return zero PRs or exactly one open, non-draft PR whose issue, base branch, source branch, and head SHA match the immediately previous passing round. The all-state branch query is separate from the existing broad preflight PR list: that list is capped at 200 and cannot establish branch-specific absence. The command also requires a live base equal to the local protected-base ref, the exact direct-child candidate relation, and a diff contained in the frozen file list. It validates OpenSpec/manifest digests and ledger history before taking the transition. Provider errors, malformed/ambiguous/truncated responses, stale refs, or failed commands stop before the atomic write.
+
+The latest passing round's SHA must differ from current HEAD, and the recorded old base must be a strict ancestor of the live protected base. For a legacy ledger, the inferred parent must be such an ancestor and the old head must not itself be contained in the live base; this graph criterion is the strongest history witness available in that ledger and is not represented as a provider-recorded historical fact. The remote source ref must be absent, already at the proposed candidate, or at the previous passing SHA. If one matching open PR exists, it must still point at that previous SHA. Replacing the previous SHA requires `allow_force_push` in the frozen manifest and a literal `--force-with-lease=refs/heads/<branch>:<previous-sha>`; any other ref value rejects before consuming a round. Revalidation itself does not mutate the remote branch or PR. After the new panel passes, push updates the branch under the same exact lease, and the PR-create command becomes idempotent only for one open PR whose latest head, base, body satisfying the manifest's frozen closure mode, and frozen file set match the passing ledger. Closed, merged, draft, multiple, or unrelated PRs are never reused.
+
+Alternatives considered: accepting any descendant of the base would admit unreviewed intermediate commits and make the old-to-new diff hard to attribute; trusting a branch name or issue body would be stale and ambiguous; querying only open PRs would miss a closed/merged PR on the source branch; using the existing capped repository-wide PR list to prove absence could silently miss later pages. The direct-child and exact all-state branch lookup checks are intentionally conservative.
+
+### Keep publication bound to the latest complete reviewed candidate
+
+All provider mutation paths that can publish or close the tracked issue must load and validate the exact ledger, require status `passed`, local HEAD equal to the final passing reviewed SHA where a local checkout is meaningful, clean/frozen-scope checks, and a live protected base still equal to the base recorded for that round. The CLI's existing repository-wide lock serializes this with review/adjudication state transitions. Push and close therefore gain a required `--ledger`; create/attest/approve/merge already take one. A pending refresh round blocks push, create/attest PR, approve, merge, and close before mutation. After a refreshed panel passes, a first push may create the branch; if the branch still points to the immediately prior reviewed head, update it only with a literal expected-head lease authorized by the manifest, then re-read and require the new SHA. An unexpected remote value fails closed. PR creation, attestation, approval, and merge require the remote branch and PR head to equal the latest reviewed SHA. If the base moves before merge, the candidate must consume a remaining slot through revalidation or stop at the original cap. Issue closure is the one post-merge exception to pre-merge base equality: it must verify that the exact final reviewed SHA is the merged PR head, the PR closes the frozen issue, and its merge commit is an ancestor of the live protected base; base movement caused by or following that verified merge is not treated as an unreviewed candidate.
+
+Alternatives considered: allowing a prior passing head to ship while its new round is pending could publish the exact stale artifact this feature exists to prevent; silently rerunning the panel would exceed or make the cap ambiguous. Both are rejected.
+
+### Keep the controller chunk separate from completed controller work
+
+Track this capability in the separate controller issue #1469 and a three-round manifest/OpenSpec change. Do not edit or re-open the capped `controller-ledger-integrity` chunk (#1458), the DT1 issue's frozen manifest, or its historical ledger. Use the repository's planning-only bootstrap PR pattern for the spec and a manifest with every provider mutation disabled, then initialize a new implementation ledger from a fresh clean protected-base checkout after that plan lands.
+
+The implementation receives four independent reviews on the same exact commit: mathematical/source faithfulness (here, controller-state semantics), repository boundary, abstraction/adoption, and Mathlib/style (controller Python/style lens). Each attempt is capped at three critique/revise rounds. No recovery action may exceed this cap; exhausted findings are preserved and reported for a separately approved successor chunk.
+
+## Risks / Trade-offs
+
+- [GitHub/provider reads can fail or have changed shape] → Treat every absent, malformed, ambiguous, or failed response as rejection; leave the ledger byte-for-byte unchanged and test each uncertainty class.
+- [A protected base can advance after admission] → Pin the reviewed candidate SHA, keep publication blocked until a passing panel, and re-resolve base freshness at every shipping action. If another base advance occurs, spend a remaining slot or refuse publication.
+- [Older ledgers do not store their original base OID] → For this transition only, require the parent of the prior reviewed commit to be an ancestor of the live protected base and require the new candidate to be its direct child; record both heads/base evidence in the new event. Never claim this reconstructs unrecorded provider history.
+- [The direct-child rule may reject multi-commit rebases] → This is a deliberate fail-closed constraint; the supervisor may prepare one squashed candidate commit within the already frozen paths, which still requires the complete fresh panel.
+- [A legacy ledger does not prove which protected-base OID was current when its old round passed] → Mark first-parent evidence as inferred rather than historical fact, require the conservative graph relation and direct-child rebase, and test a disposable old-schema fixture shaped like the actual #928 ledger. Future ledgers record base OIDs at initialization and round reservation.
+- [A future schema extension could bypass old invariants] → Validate every event on every ledger load and publication path, and add tampering/legacy fixtures before enabling the manifest.
+
+## Migration Plan
+
+1. Land the new behavioral spec, design, tasks, friction observations, and the enabled but mutation-disabled three-round manifest in a planning-only bootstrap PR tracked by #1469; no implementation code or issue closure is included in that PR.
+2. After merge, begin on a fresh clean checkout of the live protected base. Run manifest validation and read-only preflight while all mutations remain disabled, create the exact issue branch, and initialize the ledger before controller source edits. Seed only through the documented cache helper if needed.
+3. Implement and adversarially review the frozen controller chunk within its three-round cap. Keep every manifest mutation flag false throughout this self-modifying controller run: protected-base code lacks the new guards, and in particular its push action does not require a ledger while ordinary PR creation rejects only blocked state. After all four reviewers pass one exact SHA and required hosted CI succeeds, use the narrowly scoped self-bootstrap procedure documented in the run-loop skill: verify exact local/remote/PR heads, live base, issue, closure body and frozen paths before each provider write; never invoke the stale controller's mutation actions. Merge only with an exact head match, and let the complete PR close #1469 after merge. Subsequent runs use the new ledger-bound controller actions.
+4. Rollback before merge by reverting the controller code commit while retaining the new planning artifacts/issue. After merge, disable the new manifest; do not delete or rewrite ledgers/events. Old manifests and terminal DT1 ledgers remain unchanged.
+
+## Open Questions
+
+None. The independent reviewers remain responsible for challenging the precise base/ancestry evidence and publication freshness checks before implementation is considered complete.
