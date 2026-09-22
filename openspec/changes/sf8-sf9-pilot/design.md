@@ -82,6 +82,16 @@ construction prerequisite for #522, and #525 remains downstream.
     In particular, update task completion only in a post-merge plan-sync PR;
     the code PR must not claim a task checkbox while that would invalidate its
     digest-bound controller evidence.
+14. Treat the actual affine scheme-module pullback of the displayed resolution
+    as a fourth #554 progress slice. Its comparison is the underived,
+    degreewise `Scheme.Modules.pullback` on one finite free representative,
+    identified with the sheafification of the already computed scalar-extension
+    complex. It may prove a target scheme-module `H⁻¹` effect, but it does not
+    inhabit `LeftDerivedPullback`, construct a general K-flat resolution, or
+    complete task 1.2. Keep the generic affine pullback/tilde comparison at the
+    `AlgebraicGeometry/Modules/Pullback` owner and its concrete derived effect
+    beside the existing affine witness; do not infer an arbitrary-scheme
+    derived comparison from it.
 
 ## Risks / Trade-offs
 
