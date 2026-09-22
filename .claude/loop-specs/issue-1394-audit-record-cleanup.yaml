@@ -1,5 +1,5 @@
 schema: derived-alg-geo-lean.loop-run/v1
-id: issue-1394-audit-record-cleanup
+id: issue-1394-audit-record-cleanup-current-source
 repository: chris-dare-dev/derived-alg-geo-lean
 actor: chris-dare-dev
 remote: origin
@@ -8,7 +8,7 @@ base_ref: agent/issue-1394-plan
 mode: independent
 enabled: true
 allow_force_push: false
-state_dir: .loop-runs
+state_dir: .loop-runs/issue-1394-audit-record-cleanup-current-source
 roadmap_gate: disabled
 
 openspec:
@@ -92,5 +92,5 @@ issues:
           - scripts/StabilityConditionAudit/TStructureCore.lean
         acceptance:
           - "Remove exactly 36 .congr_simp and 9 .mk records; preserve the 20 .eq_ records that resolve in EnumDecls.lean."
-          - "A fresh declaration sweep and check_audit_complete.py report 19 AlgebraicGeometry, 1 StabilityCondition, and 0 DGCategory unresolved records."
-          - "The named audit targets and scripts/precheck.sh pass; the remaining unresolved records stay visible and no baseline or public Lean API changes."
+          - "After the named audit build, a fresh declaration sweep and check_audit_complete.py report 10 AlgebraicGeometry, 0 StabilityCondition, and 0 DGCategory unresolved records, with all three counts at their recorded ceilings."
+          - "The named audit targets and scripts/precheck.sh pass; the remaining unresolved AlgebraicGeometry records stay visible and no baseline or public Lean API changes."
