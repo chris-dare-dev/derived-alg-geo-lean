@@ -11,7 +11,10 @@ base_branch: main
 # worktree starts from the newly merged main baseline.
 base_ref: origin/main
 mode: stack
-enabled: true
+# Historical evidence only: #929 is closed and its static #928 assembly path
+# lacks the successor-attestation binding required by the active continuation.
+# Do not re-enable; #928 proceeds through its separately attested manifests.
+enabled: false
 allow_force_push: false
 state_dir: .loop-runs
 roadmap_gate: required
