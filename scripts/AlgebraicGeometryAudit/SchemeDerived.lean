@@ -121,7 +121,9 @@ representative. It proves nonzero degree-minus-one homology after scalar
 extension and identifies that complex with the existing supported
 K-projective pullback of that representative. It does not create a general
 scheme-level derived-pullback theorem or assert a comparison with an
-unformalized classical invariant. -/
+unformalized classical invariant. The final declarations compare its restricted
+degree-minus-one homology with Mathlib's fixed-left, derived-second-factor Tor
+and record the resulting nonzero Tor value for these concrete modules only. -/
 
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRing
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRingMap
@@ -144,6 +146,8 @@ unformalized classical invariant. -/
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.baseChangedResolution_homology_negOne_not_isZero
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.affineKProjectivePullbackObject_homology_negOne_not_isZero
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.supportedAffineBoundedAboveProjectiveRepresentative_homology_negOne_not_isZero
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.torOneIsoRestrictScalarsBaseChangedResolutionHomologyNegOne
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.torOne_not_isZero
 
 /-! ## Relative-perfect and universally-gluable scheme objects (#521)
 

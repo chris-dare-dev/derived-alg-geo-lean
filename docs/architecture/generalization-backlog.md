@@ -63,6 +63,10 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   comparison, chain/cochain indexing bridge, and restriction-of-scalars
   comparison remain unverified. Do not duplicate this row for the same lift.
 - state:              UNVERIFIED
+- progress note (2026-09-22): The current chunk implements only the concrete
+  `ℤ → ZMod 2` specialization. Even if that comparison merges, the proposed
+  abstract left-derived tensor comparison under the weaker hypotheses above
+  remains `UNVERIFIED`.
 
 ### 2026-09-21 — `ZModTwoNonflatDerived.baseChangedConeIso` (planned)
 - chunk:              sf8-5-nonflat-derived-effect
