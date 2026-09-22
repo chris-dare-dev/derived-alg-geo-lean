@@ -67,6 +67,18 @@ from an unproved marker typeclass introduced by the chunk.
   general change-of-rings, scheme-level left-derived pullback, K-flat
   existence, or relative-perfect preservation theorem.
 
+#### Scenario: The concrete resolution is pulled back as a scheme-module complex
+
+- **WHEN** the sheafification of the displayed two-term free resolution is
+  pulled back degreewise along `zmodTwoSchemeMap`
+- **THEN** a proved comparison identifies the resulting cochain complex with
+  the sheafification of `baseChangedResolution` and proves nonzero degree-minus-
+  one cohomology in the target scheme-module derived category. The comparison
+  concerns the actual underived `Scheme.Modules.pullback` on this representative;
+  it SHALL NOT claim that this complex computes a general left-derived pullback,
+  that pullback preserves quasi-coherence on arbitrary scheme maps, or that a
+  general K-flat resolution exists.
+
 #### Scenario: Preservation obligation is tested
 
 - **WHEN** a supported object satisfies the declared pseudo-coherence, finite
