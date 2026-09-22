@@ -24,37 +24,15 @@ geometry owner; the audit ensures that the formal composition layer adds no
 untrusted axioms.
 -/
 
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.extension
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.inclusion_isTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.truncation_preserves
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.affineAisle
 #print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.inRange
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.restriction
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.localTStructure
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.range_iff
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.mk.inj
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.inRange_iff
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.functor
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.rightTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.mk.inj
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.isLE_map
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.functor
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.rightTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.leftTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.mk.inj
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.isTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.isLE_map
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.isGE_map
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.LocalComparisonData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.LocalComparisonData.range_iff
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.LocalComparisonData.inRange_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.inclusion_isTExact
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.aisle_eq_coprodClosure
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.inRange_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.rightTExact_isLE_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.leftTExact_isGE_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.tExact_isLE_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.tExact_isGE_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.local_inRange_iff
 
 /-! ## Scheme-derived and stability-specific realizations of family interfaces -/
 
