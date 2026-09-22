@@ -1,0 +1,107 @@
+# Intentionally disabled pending user review of this issue, chunk, reviewer, and provider-action scope.
+schema: derived-alg-geo-lean.loop-run/v1
+id: rou1-generation-time-core
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: stack
+enabled: false
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: rou1-generation-time-rouquier-dimension
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/triangulated-generation-dimension/spec.md
+
+limits:
+  min_issues: 2
+  max_issues: 2
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: false
+
+mutations:
+  comment_issue: false
+  close_issue: false
+  push_branch: true
+  create_pr: true
+  approve_pr: false
+  merge_pr: true
+
+issues:
+  - number: 918
+    slug: rou1-extension-closure-comparison
+    depends_on:
+      - 917
+    chunks:
+      - id: rou1-2-extension-closure-comparison
+        scope: Compare the owner ExtensionClosure with Mathlib's iterated extension products and triangulated envelope, including the counterexample for empty generators, without changing ExtensionClosure.lean.
+        requirements:
+          - The owner extension closure has only proved comparisons
+        files:
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/ExtensionClosureComparison.lean
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Dimension.lean
+          - scripts/StabilityConditionAudit/Dimension.lean
+        acceptance:
+          - Every Mathlib extensionProductIter iterate lies in ExtensionClosure.
+          - The typeclass-vocabulary le_of_closed corollary is present and records any difference from its raw hypotheses.
+          - ExtensionClosure P is contained in P.triangEnvelope only under P.Nonempty and triangulated-category hypotheses.
+          - The P = bottom counterexample is recorded, and the supremum equality is claimed only if both inclusions are proved.
+          - The generation-time bound is proved and all declarations are audited.
+          - ExtensionClosure.lean is unchanged.
+        closure: complete
+
+  - number: 919
+    slug: rou1-rouquier-dimension
+    depends_on:
+      - 917
+      - 918
+    chunks:
+      - id: rou1-3-rouquier-dimension
+        scope: Define Rouquier dimension from the existing generationTime API for single objects and prove its finite-bound, finite-dimension, classical-generator, and zero-dimension characterisations; do not claim equivalence invariance in this file.
+        requirements:
+          - Rouquier dimension uses the single-object generation time
+        files:
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Rouquier.lean
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Dimension.lean
+          - scripts/StabilityConditionAudit/Dimension.lean
+        acceptance:
+          - The docstring says the invariant ranges over single objects without selecting a minimizing witness, pins down Rouquier's ⟨G⟩_{n+1} convention, and proves there is no index offset against Mathlib's iterated envelope.
+          - The ≤ n, ≠ top, and = 0 characterisations are proved, including the classical-generator corollary.
+          - The file imports neither AlgebraicGeometry nor StabilityCondition and makes no equivalence-invariance claim.
+          - Every public declaration is appended to the dimension audit slice.
+        closure: complete

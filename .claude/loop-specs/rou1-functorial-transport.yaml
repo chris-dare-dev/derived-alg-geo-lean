@@ -1,0 +1,86 @@
+# Successor chunk. Keep disabled until #919 is merged and this exact scope has been reviewed.
+schema: derived-alg-geo-lean.loop-run/v1
+id: rou1-functorial-transport
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: false
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: rou1-generation-time-rouquier-dimension
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/triangulated-generation-dimension/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: false
+
+mutations:
+  comment_issue: false
+  close_issue: false
+  push_branch: true
+  create_pr: true
+  approve_pr: false
+  merge_pr: true
+
+issues:
+  - number: 921
+    slug: rou1-functorial-transport
+    depends_on:
+      - 917
+      - 919
+    chunks:
+      - id: rou1-6-functorial-transport
+        scope: Transport the existing envelope tower, generation time, and Rouquier dimension along triangulated functors and equivalences, without asserting reverse transport for arbitrary functors.
+        requirements:
+          - Triangulated functors do not increase generation time
+        files:
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Functor.lean
+          - DerivedAlgGeo/CategoryTheory/Triangulated/Dimension.lean
+          - scripts/StabilityConditionAudit/Dimension.lean
+        acceptance:
+          - Pointwise forward transport and the ObjectProperty.map inclusion are proved.
+          - Generation time does not increase under a triangulated functor.
+          - Essentially surjective triangulated functors give the target dimension bound; triangulated equivalences give equality, generation-time invariance, and transfer of strong generation.
+          - The reverse-inclusion limitation for general functors is documented.
+          - Every public declaration is appended to the dimension audit slice.
+        closure: complete
