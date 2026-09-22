@@ -53,8 +53,10 @@ replacement for a Lean theorem or an issue acceptance criterion.
   clean-worktree, and duplicate-PR checks remain the real safety conditions.
 - The local and CI gate scripts originally validated only
   `.claude/loop-specs/sf8-sf9-pilot.yaml`. `scripts/validate_loop_specs.sh` now
-  validates every YAML manifest, and the trust surface/CODEOWNERS explicitly
-  cover loop specs, reviewer prompts, the run-loop skill, and `openspec/`.
+  validates every YAML manifest. At that historical point, the trust
+  surface/CODEOWNERS explicitly covered loop specs, reviewer prompts, the
+  run-loop skill, and `openspec/`; those files were later retired with the
+  trust-surface workflow and must not be treated as current policy.
 - OpenSpec task 2.3 named a nonexistent `scripts/precheck.py`; the repository's
   actual local contract is `scripts/precheck.sh --no-build` plus a named
   targeted `lake build` invocation. Keep this distinction visible in future
@@ -218,11 +220,11 @@ replacement for a Lean theorem or an issue acceptance criterion.
   worktree was clean and the merge was unpushed, so no remote state changed,
   but this is an operational footgun: run each git mutation with an explicit
   worktree directory and verify `git branch --show-current` afterward.
-- The existing draft PR #1453 is bound to the old v3 branch/manifest. The
+- The existing draft PR #1453 was bound to the old v3 branch/manifest. The
   controller's preflight deliberately refuses a second open PR for the same
-  issue, so the replacement is prepared as
-  `agent/sf11-3-followup-v4-current` and the old draft must be explicitly
-  retired before the new PR is created.
+  issue, so the old draft was explicitly retired before the replacement was
+  created as `agent/sf11-3-followup-v4-current`; its branch remains for
+  provenance.
 - While the first v4 candidate was being checked, `main` advanced from
   `858ca700` to `49c33eda` to delete the remaining trust-surface residue in an
   unrelated manifest. The candidate was discarded rather than reviewed
