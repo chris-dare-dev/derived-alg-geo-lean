@@ -54,3 +54,14 @@ repository notes, and the Python loop-controller manifest/schema tests. Every
 mathematical result must compile without `sorry`, `admit`, or a new axiom; a
 targeted module build and the repository's no-sorry/audit gates are required,
 but the full repository build is deliberately not part of the local loop.
+
+## Follow-up boundary
+
+The original SF11.3 PR exposed a formal boundary but was merged before its
+audit-completeness failure and its missing review ledger were resolved. Follow-up
+issue #1445 repairs that boundary rather than reopening the closed milestone:
+projection-only carriers are removed or given real comparison content,
+one-sided Theorem 5.3 clauses retain only the hypotheses their proofs use, and
+the AlgebraicGeometry audit records actual declarations instead of extending
+the missing-declaration baseline. The follow-up is independently frozen and
+reviewed under the same five-round cap.

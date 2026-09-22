@@ -122,14 +122,15 @@ structure is inhabited.
 
 ### Requirement: The bounded loop records scope and repository friction
 
-The enabled SF11 run SHALL name exactly issues #1060, #1061, and #1062,
-freeze file scopes and acceptance statements per chunk, require all four
-independent review lenses, and stop a chunk after its fifth unsuccessful
-review/improve round. Explicit authorization for the issues' `epic` labels
-MUST be represented in the manifest; the controller MUST continue to reject
+The original enabled SF11 run SHALL name exactly issues #1060, #1061, and
+#1062. Any approved follow-up, including issue #1445, SHALL use an independent
+manifest, freeze file scopes and acceptance statements per chunk, require all
+four independent review lenses, and stop a chunk after its fifth unsuccessful
+review/improve round. Explicit authorization for an issue's `epic` label MUST
+be represented in its manifest; the controller MUST continue to reject
 unapproved `epic`, blocked, research, and spike issues. Repository comments,
-roadmap staleness, and time-wasting practices discovered during the run SHALL
-be recorded in the checked-in loop-engineering notes.
+roadmap staleness, and time-wasting practices discovered during either run
+SHALL be recorded in the checked-in loop-engineering notes.
 
 #### Scenario: Explicit epic authorization
 
@@ -143,3 +144,44 @@ be recorded in the checked-in loop-engineering notes.
 - **WHEN** a fifth review round still adjudicates as needing changes
 - **THEN** the ledger marks the chunk blocked and refuses any sixth round,
   push, approval, merge, or issue closure for that chunk
+
+### Requirement: Theorem 5.3 owner boundaries are source-shaped and do not duplicate canonical t-structure carriers
+
+The follow-up repair SHALL reuse canonical `IndExtensionData` and Mathlib
+exactness interfaces, or prove substantive comparison theorems, rather than
+introducing projection-only wrappers. One-sided clauses SHALL expose only the
+right- or left-t-exact hypotheses used by their proofs, while genuinely
+t-exact clauses MAY require both halves. Tensor, descent, and local-comparison
+inputs SHALL name their actual operation-facing data and SHALL NOT claim
+scheme-level geometry from mere structure inhabitation.
+
+#### Scenario: One-sided exactness is not strengthened
+
+- **WHEN** a Theorem 5.3 clause uses only right or left t-exactness
+- **THEN** the formal boundary accepts that one-sided input without requiring
+  the unused opposite direction
+
+#### Scenario: No empty carrier survives the repair
+
+- **WHEN** a proposed carrier has no theorem with substantive content in the
+  repaired chunk
+- **THEN** the carrier is removed or replaced by a direct owner hypothesis
+
+### Requirement: The AlgebraicGeometry audit records actual declarations without changing the missing-declaration baseline
+
+The follow-up SHALL add every declaration reported by the CI sweep to the
+proper AlgebraicGeometry audit slice, with the corresponding `#print axioms`
+evidence. It SHALL NOT edit `scripts/audit_missing_baseline.txt`, raise an
+audit ceiling, or suppress the sweep.
+
+#### Scenario: Audit completeness is restored
+
+- **WHEN** the declaration sweep runs on the repaired final commit
+- **THEN** every new AlgebraicGeometry declaration is covered by an owning
+  audit record and the no-sorry/axiom audit proceeds to the downstream gates
+
+#### Scenario: Baseline relaxation is rejected
+
+- **WHEN** a repair attempts to add a missing declaration to the baseline or
+  increase a ceiling instead of auditing it
+- **THEN** repository review rejects the change as a trust-surface bypass

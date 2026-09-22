@@ -99,6 +99,12 @@ use targeted Lean module builds; the full repository build is left to CI.
    branch claim ownership of their repair; any roadmap entry changed by the
    SF11 branch still fails closed.
 
+9. **Repair after a failed merge instead of rewriting history.** Follow-up
+   issue #1445 uses a new independent manifest and a fixed plan ref. It treats
+   the merged #1062 code as the review target, records the failed CI/audit
+   evidence, and permits only a new reviewed repair commit. The previous issue
+   and its absent ledger are never used as passing evidence.
+
 ## Risks / Trade-offs
 
 - **[Geometric witnesses exceed the current library]** → Keep the exact paper
@@ -119,6 +125,9 @@ use targeted Lean module builds; the full repository build is left to CI.
 - **[An inherited roadmap defect is silently ignored]** → Keep the scoped gate's
   inherited-disagreement report in the preflight output and the SF11 note; only
   branch-authored roadmap entries can be admitted by this run.
+- **[Audit repair is mistaken for a baseline relaxation]** → Add every reported
+  declaration to the owning audit slice and reject changes to
+  `scripts/audit_missing_baseline.txt` or the audit ceilings.
 
 ## Migration Plan
 

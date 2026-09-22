@@ -32,3 +32,15 @@
 - [ ] 5.1 Run `scripts/precheck.sh` with only the targeted Lean module selection for each changed chunk, plus the no-sorry, layering, style, roadmap, and trust-surface checks; verify that no full-repository build command is invoked locally.
 - [ ] 5.2 Push, create, approve, and merge each PR only through the enabled loop controller, refreshing the protected base between dependent issues; verify each action is bound to the reviewed head and required checks.
 - [ ] 5.3 Close #1060, #1061, and #1062 only after the controller confirms their merged PR closing keywords; verify the final issue states and OpenSpec task completion agree with the three passing ledgers.
+
+## 6. Follow-up issue #1445 — repair the merged SF11.3 boundary
+
+The original #1062 task remains historical: its PR merged with a failed CI
+audit and without a locally recoverable ledger. This section is a fresh,
+five-round-bounded follow-up and does not retroactively mark task 4.3 complete.
+
+- [ ] 6.1 Remove projection-only or duplicate carriers from the filtered-colimit and Theorem 5.3 boundary, reusing canonical `IndExtensionData` and Mathlib exactness interfaces or proving substantive comparison theorems.
+- [ ] 6.2 Split one-sided exactness from genuinely t-exact clauses and make the tensor, range-descent, and local-comparison owner inputs source-shaped without claiming unproved scheme-level geometry.
+- [ ] 6.3 Add the actual AlgebraicGeometry declarations reported by CI to their proper audit slices; do not modify `scripts/audit_missing_baseline.txt` or raise a ceiling.
+- [ ] 6.4 Run the four independent adversarial reviewers on one frozen final commit, record verbatim outputs in a digest-bound ledger, and stop after the fifth unsuccessful round.
+- [ ] 6.5 Run the required CI/trust checks and use the loop controller for the guarded PR handoff and closure of #1445.
