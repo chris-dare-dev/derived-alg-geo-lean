@@ -208,7 +208,8 @@ keeps a passed review; a moved change needs one revalidation round. Opting into
 chunk, files a follow-up issue, and moves on. See
 [the recovery protocol](docs/architecture/loop-recovery.md).
 
-Provider actions need grants from `origin/main`. A manifest merged there keeps
+Provider actions need grants from the default branch, which the controller
+reads through the GitHub API rather than a local ref. A manifest merged there keeps
 its reviewed grants, and `.claude/loop-authority.yaml` holds the owner's
 standing grants for branch-authored manifests. A branch can narrow those
 grants, never widen them. Issue closure for code work requires a merged PR.

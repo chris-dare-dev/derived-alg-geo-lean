@@ -60,8 +60,9 @@ issues:
 
 Provider actions each need a grant: comments, pushes, PR creation, marking
 ready, follow-up issues, issue closure, approval, and merge. The controller
-honours two sources, and it reads both from `origin/main`, so a work branch
-cannot grant itself anything:
+honours two sources. It reads both from the repository's default branch through
+the GitHub API, never from a local ref (a remote-tracking ref is locally
+writable), so a work branch cannot grant itself anything:
 
 - A manifest merged to `main` keeps its own explicit `mutations`. These are the
   pre-existing manifests, which were reviewed through planning PRs.

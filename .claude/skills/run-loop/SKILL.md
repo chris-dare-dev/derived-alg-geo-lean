@@ -100,10 +100,11 @@ These are not stops. What to do instead:
   creation, marking ready, follow-up issues, approval, merge, and issue
   closure. Do not call `gh issue close`, `gh pr ready`, `gh pr merge`,
   `gh issue create`, `gh pr review`, or `git push` directly from this skill.
-- Provider authority comes from `origin/main` only: a manifest merged there
-  keeps its reviewed grants, and `.claude/loop-authority.yaml` holds the
-  owner's standing grants for manifests written on a work branch. Never write
-  or edit that file from a run, and never widen a grant in a manifest.
+- Provider authority comes only from the default branch as GitHub serves it:
+  a manifest merged there keeps its reviewed grants, and
+  `.claude/loop-authority.yaml` holds the owner's standing grants for
+  manifests written on a work branch. Never write or edit that file from a
+  run, and never widen a grant in a manifest.
 - Code issues close only after the controller verifies a merged PR that closes
   the same issue. Non-PR closure is disabled unless the manifest explicitly
   says otherwise.

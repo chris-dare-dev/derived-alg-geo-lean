@@ -570,7 +570,9 @@ class RecoveryCliTests(unittest.TestCase):
         (self.root / "unreviewed.txt").write_text("changed after review\n", encoding="utf-8")
         self.git("add", "unreviewed.txt")
         self.git("commit", "-m", "Unreviewed revision")
-        with mock.patch.object(loop_engine, "authorize_action"):
+        base = self.git("rev-list", "--max-parents=0", "HEAD").strip()
+        with mock.patch.object(loop_engine, "authorize_action"), \
+                mock.patch.object(loop_engine, "trusted_base_commit", return_value=base):
             with self.assertRaisesRegex(loop_engine.LoopError, "reviewed recovery change"):
                 loop_engine.action_push(self.root, self.spec, None, False, False)
             with self.assertRaisesRegex(loop_engine.LoopError, "reviewed recovery change"):

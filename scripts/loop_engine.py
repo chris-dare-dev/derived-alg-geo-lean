@@ -4,8 +4,8 @@
 This tool deliberately keeps the control plane small and explicit.  It validates
 an immutable batch specification, performs a read-only preflight, records
 independent reviews for frozen code chunks, and exposes remote mutations only
-when an owner-controlled source authorizes them: a manifest merged to the base
-branch, or the base branch's standing authority file.  A manifest written on a
+when an owner-controlled source authorizes them: a manifest merged to the
+default branch, or that branch's standing authority file.  A manifest written on a
 work branch travels with its PR and can narrow that authority, never widen it.
 
 The controller is not a substitute for mathematical or repository review.  It
@@ -74,11 +74,12 @@ MUTATION_KEYS = (
     "approve_pr",
     "merge_pr",
 )
-# Provider authority has one owner-controlled source. The controller reads this
-# file from the remote base branch only, so a branch cannot grant itself an
-# action; when the file is absent every action is denied. A manifest merged to
-# that base keeps its own reviewed grants. A manifest authored on a work branch
-# can only narrow what this file grants.
+# Provider authority has owner-controlled sources only. The controller reads
+# them from the repository's default branch through the provider API, never
+# from a local ref, so a branch cannot grant itself an action; when the file is
+# absent every action is denied. A manifest merged to that branch keeps its own
+# reviewed grants. A manifest authored on a work branch can only narrow what
+# this file grants.
 STANDING_AUTHORITY_PATH = ".claude/loop-authority.yaml"
 STANDING_AUTHORITY_SCHEMA = "derived-alg-geo-lean.loop-authority/v1"
 # Revalidation rounds re-review a passed change whose content moved (a rebase
@@ -347,21 +348,60 @@ def manifest_mutations(spec: dict[str, Any]) -> dict[str, bool]:
     return dict(configured)
 
 
-def base_tracking_ref(spec: dict[str, Any]) -> str:
-    return f"refs/remotes/{spec['remote']}/{spec['base_branch']}"
+def gh_not_found(result: subprocess.CompletedProcess[str]) -> bool:
+    detail = f"{result.stderr}\n{result.stdout}"
+    return "HTTP 404" in detail or "Not Found" in detail
 
 
-def read_base_file(root: Path, spec: dict[str, Any], path: str) -> str | None:
-    """Read a file as the remote base branch has it; the worktree cannot supply it."""
+def read_owner_file(root: Path, spec: dict[str, Any], path: str) -> str | None:
+    """Read a file from the repository's default branch on the provider.
 
-    result = run_command(root, ["git", "show", f"{base_tracking_ref(spec)}:{path}"], check=False)
-    return result.stdout if result.returncode == 0 else None
+    Local refs are writable by whoever runs the controller, including a
+    remote-tracking ref, so an owner-controlled file is read from the provider
+    itself. With no `ref`, the contents API serves the default branch.
+    """
+
+    result = run_command(
+        root,
+        ["gh", "api", "-H", "Accept: application/vnd.github.raw+json", f"repos/{spec['repository']}/contents/{path}"],
+    )
+    if result.returncode == 0:
+        return result.stdout
+    if gh_not_found(result):
+        return None
+    detail = (result.stderr or result.stdout).strip()
+    raise LoopError(f"could not read {path} from {spec['repository']}'s default branch: {detail}")
+
+
+def owner_manifest_paths(root: Path, spec: dict[str, Any]) -> list[str]:
+    """List the manifests the repository's default branch tracks."""
+
+    result = run_command(root, ["gh", "api", f"repos/{spec['repository']}/contents/.claude/loop-specs"])
+    if result.returncode != 0:
+        if gh_not_found(result):
+            return []
+        detail = (result.stderr or result.stdout).strip()
+        raise LoopError(f"could not list manifests on {spec['repository']}'s default branch: {detail}")
+    try:
+        entries = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise LoopError("manifest listing returned invalid JSON") from exc
+    if not isinstance(entries, list):
+        raise LoopError("manifest listing returned an unexpected response")
+    return [
+        entry["path"]
+        for entry in entries
+        if isinstance(entry, dict)
+        and entry.get("type") == "file"
+        and isinstance(entry.get("path"), str)
+        and entry["path"].endswith(".yaml")
+    ]
 
 
 def standing_authority(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
-    """Return the owner's standing grants from the base branch; deny when absent."""
+    """Return the owner's standing grants from the default branch; deny when absent."""
 
-    text = read_base_file(root, spec, STANDING_AUTHORITY_PATH)
+    text = read_owner_file(root, spec, STANDING_AUTHORITY_PATH)
     if text is None:
         return {key: False for key in MUTATION_KEYS}
     try:
@@ -379,18 +419,11 @@ def standing_authority(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
 
 
 def manifest_is_on_base(root: Path, spec: dict[str, Any]) -> bool:
-    """True when the base branch tracks a manifest with exactly this content."""
+    """True when the default branch tracks a manifest with exactly this content."""
 
-    listing = run_command(
-        root, ["git", "ls-tree", "--name-only", base_tracking_ref(spec), ".claude/loop-specs/"], check=False
-    )
-    if listing.returncode != 0:
-        return False
     target = digest(spec)
-    for path in listing.stdout.splitlines():
-        if not path.endswith(".yaml"):
-            continue
-        text = read_base_file(root, spec, path)
+    for path in owner_manifest_paths(root, spec):
+        text = read_owner_file(root, spec, path)
         try:
             data = yaml.safe_load(text or "")
         except yaml.YAMLError:
@@ -1304,6 +1337,23 @@ def ensure_commit(root: Path, remote: str, commit: str) -> None:
         raise LoopError(f"commit {commit} is not available locally and could not be fetched from {remote}")
 
 
+def trusted_base_commit(root: Path, spec: dict[str, Any]) -> str:
+    """The base branch tip as the provider reports it, available locally.
+
+    Content equivalence is measured against this commit, not the manifest's
+    `base_ref` or a remote-tracking ref: both are writable by the run, and a
+    base placed at the candidate head would make every descendant of a reviewed
+    commit look unchanged.
+    """
+
+    data = gh_json(root, ["api", f"repos/{spec['repository']}/commits/{spec['base_branch']}"])
+    sha = data.get("sha") if isinstance(data, dict) else None
+    if not isinstance(sha, str) or not FULL_GIT_SHA_RE.fullmatch(sha):
+        raise LoopError(f"provider did not report a commit for base branch {spec['base_branch']!r}")
+    ensure_commit(root, spec["remote"], sha)
+    return sha
+
+
 def reviewed_content_matches(
     root: Path, spec: dict[str, Any], state: dict[str, Any], reviewed_commit: str, head: str
 ) -> bool:
@@ -1321,10 +1371,10 @@ def reviewed_content_matches(
     try:
         ensure_commit(root, spec["remote"], head)
         ensure_commit(root, spec["remote"], reviewed_commit)
-        base_ref = spec["base_ref"]
+        base = trusted_base_commit(root, spec)
         exclude = ledger_plan_paths(state)
-        return change_fingerprint(root, base_ref, reviewed_commit, exclude) == change_fingerprint(
-            root, base_ref, head, exclude
+        return change_fingerprint(root, base, reviewed_commit, exclude) == change_fingerprint(
+            root, base, head, exclude
         )
     except LoopError as exc:
         print(f"WARN could not compare {head} with reviewed {reviewed_commit}: {exc}")
@@ -1436,11 +1486,13 @@ def preflight(root: Path, spec_path: Path) -> int:
         for dependency in issue.get("depends_on", [])
         if dependency in selected_numbers
     }
-    try:
-        merge_authorized = effective_mutations(root, spec)["merge_pr"]
-    except LoopError as exc:
-        failures.append(str(exc))
-        merge_authorized = False
+    merge_authorized = True
+    if spec["mode"] == "stack" and selected_dependencies:
+        try:
+            merge_authorized = effective_mutations(root, spec)["merge_pr"]
+        except LoopError as exc:
+            failures.append(str(exc))
+            merge_authorized = False
     if spec["mode"] == "stack" and selected_dependencies and not merge_authorized:
         failures.append(
             "stack mode includes selected issue dependencies but mutations.merge_pr is false; "

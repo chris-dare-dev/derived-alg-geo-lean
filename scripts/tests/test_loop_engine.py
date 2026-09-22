@@ -1277,28 +1277,35 @@ class OpenSpecDigestTests(unittest.TestCase):
 
 
 class AuthorityTests(unittest.TestCase):
-    """Provider authority comes only from the base branch the owner controls."""
+    """Provider authority comes only from the owner's default branch on the provider."""
 
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
-        init_repo(self.root)
         _, self.spec = make_spec(self.root)
         self.spec["enabled"] = True
         self.spec["mutations"] = {}
-        commit_all(self.root, "base")
-        publish_base(self.root)
-        git_in(self.root, "checkout", "-q", "-b", "agent/test-issue")
+        # The provider's default branch, keyed by repository-relative path.
+        self.default_branch: dict[str, str] = {}
+        for name, fake in (
+            ("read_owner_file", lambda _root, _spec, path: self.default_branch.get(path)),
+            (
+                "owner_manifest_paths",
+                lambda _root, _spec: sorted(
+                    path for path in self.default_branch if path.startswith(".claude/loop-specs/")
+                ),
+            ),
+        ):
+            patcher = mock.patch.object(loop_engine, name, side_effect=fake)
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
-    def write_authority(self, grants: dict[str, bool]) -> None:
+    def grant(self, grants: dict[str, bool]) -> None:
         import yaml
 
-        path = self.root / loop_engine.STANDING_AUTHORITY_PATH
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(
-            yaml.safe_dump({"schema": loop_engine.STANDING_AUTHORITY_SCHEMA, "mutations": grants}),
-            encoding="utf-8",
+        self.default_branch[loop_engine.STANDING_AUTHORITY_PATH] = yaml.safe_dump(
+            {"schema": loop_engine.STANDING_AUTHORITY_SCHEMA, "mutations": grants}
         )
 
     def test_without_a_standing_file_a_branch_manifest_grants_nothing(self) -> None:
@@ -1308,35 +1315,32 @@ class AuthorityTests(unittest.TestCase):
             loop_engine.authorize_action(self.root, self.spec, "merge")
 
     def test_a_branch_manifest_narrows_standing_authority_and_cannot_widen_it(self) -> None:
-        git_in(self.root, "checkout", "-q", "main")
-        self.write_authority({"push_branch": True, "create_pr": True, "ready_pr": True, "merge_pr": True})
-        commit_all(self.root, "standing authority")
-        publish_base(self.root)
-        git_in(self.root, "checkout", "-q", "agent/test-issue")
-        git_in(self.root, "merge", "-q", "--ff-only", "main")
-
+        self.grant({"push_branch": True, "create_pr": True, "ready_pr": True, "merge_pr": True})
         self.spec["mutations"] = {"merge_pr": False, "comment_issue": True}
         effective = loop_engine.effective_mutations(self.root, self.spec)
         self.assertTrue(effective["push_branch"] and effective["create_pr"] and effective["ready_pr"])
         self.assertFalse(effective["merge_pr"])
         self.assertFalse(effective["comment_issue"])
 
-    def test_a_standing_file_on_the_work_branch_grants_nothing(self) -> None:
-        self.write_authority({key: True for key in loop_engine.MUTATION_KEYS})
+    def test_local_refs_and_worktree_files_grant_nothing(self) -> None:
+        # A standing file in the worktree, even committed and published to the
+        # local remote-tracking ref, is not the provider's default branch.
+        init_repo(self.root)
+        path = self.root / loop_engine.STANDING_AUTHORITY_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            f"schema: {loop_engine.STANDING_AUTHORITY_SCHEMA}\nmutations:\n  merge_pr: true\n", encoding="utf-8"
+        )
         commit_all(self.root, "self-granted authority")
+        publish_base(self.root)
         self.assertFalse(any(loop_engine.effective_mutations(self.root, self.spec).values()))
 
-    def test_a_manifest_merged_to_the_base_keeps_its_reviewed_grants(self) -> None:
+    def test_a_manifest_merged_to_the_default_branch_keeps_its_reviewed_grants(self) -> None:
         import yaml
 
         self.spec["mutations"] = {"comment_issue": True, "merge_pr": False}
-        git_in(self.root, "checkout", "-q", "main")
-        manifest = self.root / ".claude" / "loop-specs" / "test-run.yaml"
-        manifest.parent.mkdir(parents=True, exist_ok=True)
-        manifest.write_text(yaml.safe_dump(self.spec, sort_keys=False), encoding="utf-8")
-        self.write_authority({"push_branch": True})
-        commit_all(self.root, "reviewed manifest")
-        publish_base(self.root)
+        self.default_branch[".claude/loop-specs/test-run.yaml"] = yaml.safe_dump(self.spec, sort_keys=False)
+        self.grant({"push_branch": True})
         effective = loop_engine.effective_mutations(self.root, self.spec)
         self.assertTrue(effective["comment_issue"])
         self.assertFalse(effective["merge_pr"])
@@ -1345,6 +1349,11 @@ class AuthorityTests(unittest.TestCase):
         edited = json.loads(json.dumps(self.spec))
         edited["mutations"]["merge_pr"] = True
         self.assertFalse(loop_engine.effective_mutations(self.root, edited)["merge_pr"])
+
+    def test_a_malformed_standing_file_fails_closed(self) -> None:
+        self.default_branch[loop_engine.STANDING_AUTHORITY_PATH] = "mutations:\n  merge_pr: yes please\n"
+        with self.assertRaises(loop_engine.LoopError):
+            loop_engine.authorize_action(self.root, self.spec, "merge")
 
 
 class ContentBindingTests(unittest.TestCase):
@@ -1363,6 +1372,12 @@ class ContentBindingTests(unittest.TestCase):
         git_in(self.root, "checkout", "-q", "-b", "agent/test-issue")
         (self.root / "a.txt").write_text(numbered_lines(20, {2: "reviewed change"}), encoding="utf-8")
         self.reviewed = commit_all(self.root, "reviewed change")
+        # The provider's view of the base branch tip is local `main` here.
+        patcher = mock.patch.object(
+            loop_engine, "trusted_base_commit", side_effect=lambda _root, _spec: git_in(self.root, "rev-parse", "main")
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def move_base(self) -> None:
         """Advance main in another file and far away in the same file."""
@@ -1400,6 +1415,19 @@ class ContentBindingTests(unittest.TestCase):
         self.assertFalse(
             loop_engine.reviewed_content_matches(self.root, self.spec, state, self.reviewed, edited)
         )
+
+    def test_a_run_chosen_base_cannot_make_new_content_look_reviewed(self) -> None:
+        # With the manifest's base_ref at the candidate itself, both diffs would
+        # be empty; equivalence is measured against the provider's base tip.
+        (self.root / "a.txt").write_text(numbered_lines(20, {2: "reviewed change", 5: "smuggled"}), encoding="utf-8")
+        smuggled = commit_all(self.root, "unreviewed addition")
+        spec = json.loads(json.dumps(self.spec))
+        spec["base_ref"] = "HEAD"
+        self.assertEqual(
+            loop_engine.change_fingerprint(self.root, "HEAD", self.reviewed, []),
+            loop_engine.change_fingerprint(self.root, "HEAD", smuggled, []),
+        )
+        self.assertFalse(loop_engine.reviewed_content_matches(self.root, spec, {}, self.reviewed, smuggled))
 
     def test_a_passed_ledger_reopens_only_for_changed_content(self) -> None:
         state_path = self.root / ".loop-runs" / "test-chunk.json"

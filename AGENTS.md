@@ -422,8 +422,9 @@ without approval pauses.
 
 **Provider authority is owner-controlled.** Comments, pushes, PR creation,
 marking ready, follow-up issues, issue closure, and merge each need a grant.
-The controller honours two sources, both read from `origin/main` so a branch
-cannot grant itself anything: a manifest merged to `main` keeps its own
+The controller honours two sources, both read from the default branch through
+the GitHub API and never from a local ref, so a branch cannot grant itself
+anything: a manifest merged to `main` keeps its own
 reviewed grants, and `.claude/loop-authority.yaml` holds the owner's standing
 grants for every other run. A manifest on a work branch can narrow that
 standing authority and can never widen it. Without the file, nothing is
