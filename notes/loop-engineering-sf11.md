@@ -323,18 +323,17 @@ passed for the change and all six repository changes. This environment detail
 is operational friction, not a repository dependency, and must be recreated or
 replaced by the runner before future local validation.
 
-The reference-base run at `4e56e5ca` compiled the changed module, both audit
-libraries, the public `DerivedAlgGeo` umbrella, and the
-development/specialization targets. That snapshot is not the reviewed head,
-not the current `origin/main`, and not CI evidence. On the round-one
-candidate `d8e3d6c1`, the same targeted local builds and the two axiom
-transcripts passed with 5,374 AlgebraicGeometry commands and 7,087
-StabilityCondition commands; these are local measurements, not claims about a
-GitHub run. The environment completeness ratchet measured AlgebraicGeometry
-at exactly its recorded ceiling (6,077 public, 5,329 audited, 748 missing),
-with no new baseline rows. The 351-declaration failure quoted from PR #1425
-therefore came from an older base/audit state; it must not be used as current
-evidence after the base refresh. At that v2 snapshot, five stale
+The reference-base setup used `4e56e5ca` as a stale cache/base reference; it
+was not the reviewed head, current `origin/main`, or acceptance evidence. On
+the historical v2 candidate `d8e3d6c1`, targeted local builds and the two
+axiom transcripts passed with 5,374 AlgebraicGeometry commands and 7,087
+StabilityCondition commands; these are retained as historical troubleshooting
+measurements, not claims about a GitHub run. The environment completeness
+ratchet measured AlgebraicGeometry at exactly its recorded ceiling (6,077
+public, 5,329 audited, 748 missing), with no new baseline rows. The
+351-declaration failure quoted from PR #1425 therefore came from an older
+base/audit state; it must not be used as current evidence after the base
+refresh. At that v2 snapshot, five stale
 single-instantiation baseline rows were visible; the v3 freeze below migrates
 only the two rows for declarations deleted by this repair.
 
@@ -358,7 +357,13 @@ change a ceiling, add a TODO, or relax the detector threshold. The v2 ledger
 and its review evidence are not reused; v3 starts from immutable plan ref
 `agent/sf11-3-followup-plan-v3` with a fresh ledger.
 
-The v3 exact-head checks are local measurements, not CI evidence. The targeted
-module build, umbrella/development prerequisite build, per-slice axiom audits,
-single-instantiation detector, and declaration-completeness sweep are rerun
-after the migration on the clean v3 candidate that the new ledger binds to.
+The v3 exact-head checks are local measurements, not CI evidence. The first
+v3 artifact recorded an all-library umbrella build even though repository
+policy prohibits that local command; it is superseded and is not acceptance
+evidence. The corrected artifact
+`/home/chris-dare/.loop-runs/sf11-3-followup-v3/exact-head-gates-v3.md`
+records only approved named targets, explicit `LEAN_NUM_THREADS=2`, the
+per-slice axiom audits, the single-instantiation detector, and the
+declaration-completeness sweep for the exact reviewed commit. The external
+artifact also records worktree cleanliness and `scripts/precheck.sh
+--no-build`; none of these local results are claims about GitHub CI.

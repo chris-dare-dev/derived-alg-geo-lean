@@ -5,7 +5,7 @@ actor: chris-dare-dev
 remote: origin
 base_branch: main
 # Retired migration manifest. The active follow-up is
-# `sf11-3-followup-v2.yaml`, which includes the corrected freeze.
+# `sf11-3-followup-v3.yaml`, which includes the corrected freeze.
 base_ref: agent/sf11-3-followup-plan
 mode: independent
 enabled: false
