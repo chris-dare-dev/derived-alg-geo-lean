@@ -34,12 +34,12 @@ witness.
 
 1. **Fresh sequential, attested controller runs.** This initial planning
    bootstrap contains only the one-issue
-   `dt1-928-exact-bifunctor-restriction` progress manifest, disabled until the
-   predecessor-attestation controller support is on `origin/main`; older
-   controllers silently ignore that policy. A reviewed enablement update then
-   starts the source run, which emits a durable controller predecessor
-   attestation before its non-closing PR can merge. Only after that merge will
-   a separate reviewed planning bootstrap author
+   `dt1-928-exact-bifunctor-restriction` progress manifest. The disabling
+   bootstrap and predecessor-attestation controller support are now on
+   `origin/main`; this separately reviewed enablement update starts the source
+   run, which emits a durable controller predecessor attestation before its
+   non-closing PR can merge. Only after that merge will a separate reviewed
+   planning bootstrap author
    `dt1-928-coherent-tensor-assembly`, pinning the actual source PR's reviewed
    head, merge commit, and attestation fields. The old `dt1-m41` stack is
    disabled historical evidence: #929 is closed and it cannot legally be
@@ -96,14 +96,16 @@ witness.
   after a dry run and use one named target per source change.
 - **Tracker and controller drift can recur** → retain the original artifacts,
   record verified observations before ledger initialization, and validate each
-  manifest against live issue state. The bootstrap trust guard additionally
-  needs a human, exact-head review marker; a generic approval is insufficient.
+  manifest against live issue state and current branch protection. PR #1449
+  deliberately retired the unsatisfiable `trust-surface` gate, so the manifest
+  now binds only the live required `ci` context; ordinary owner review remains
+  a repository-boundary obligation.
 
 ## Migration Plan
 
-1. Land the disabling planning bootstrap and predecessor-attestation controller
-   support. Only after the latter is in `origin/main`, make a reviewed
-   enablement update to the generic manifest and validate it on a clean
+1. The disabling planning bootstrap and predecessor-attestation controller
+   support are on `origin/main`. Land this reviewed enablement update, then
+   validate the generic manifest on a clean
    `agent/dt1-exact-bifunctor-restriction` branch from `origin/main`.
 2. Freeze and implement the generic bridge, verify it, complete its bounded
    adversarial ledger, and merge its non-closing progress PR through the
