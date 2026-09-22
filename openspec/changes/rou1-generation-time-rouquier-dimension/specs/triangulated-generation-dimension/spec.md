@@ -32,7 +32,7 @@ For a pretriangulated category with the integral shift and additive structure re
 
 ### Requirement: The owner extension closure has only proved comparisons
 
-The library SHALL compare the repository's `ExtensionClosure P` with Mathlib's iterated extension products and triangulated envelope without adding shift-closed, thick, or triangulated-subcategory structure to `ExtensionClosure`. It SHALL provide a typeclass-vocabulary corollary of the existing induction principle for properties closed under isomorphisms, containing zero, and closed under distinguished extensions, and document if those hypotheses are strictly weaker than the raw induction hypotheses. Every finite Mathlib extension-product iterate SHALL lie in `ExtensionClosure P`. The reverse inclusion into `P.triangEnvelope` SHALL require both `P.Nonempty` and a triangulated category. The implementation SHALL claim `ExtensionClosure P = ⨆ n, (P ⊔ IsZero).extensionProductIter n` only when both inclusions are proved; otherwise it SHALL state exactly which inclusion remains unproved and why.
+The library SHALL compare the repository's `ExtensionClosure P` with Mathlib's iterated extension products and triangulated envelope without adding shift-closed, thick, or triangulated-subcategory structure to `ExtensionClosure`. It SHALL provide a typeclass-vocabulary corollary of the existing induction principle for properties closed under isomorphisms, containing zero, and closed under distinguished extensions, and document that these assumptions repackage the raw induction hypotheses. Every finite Mathlib extension-product iterate SHALL lie in `ExtensionClosure P`. The reverse inclusion into `P.triangEnvelope` SHALL require both `P.Nonempty` and a triangulated category. Under `[IsTriangulated C]`, the library SHALL prove `ExtensionClosure P = ⨆ n, (P ⊔ IsZero).extensionProductIter n` without requiring `P.Nonempty`.
 
 #### Scenario: Iterated extension products enter the owner closure
 
@@ -53,6 +53,11 @@ The library SHALL compare the repository's `ExtensionClosure P` with Mathlib's i
 
 - **WHEN** `P = ⊥`
 - **THEN** `ExtensionClosure P` still contains every zero object while `P.triangEnvelope = ⊥`, so no unconditional reverse-inclusion claim is made
+
+#### Scenario: The owner closure is the supremum of finite zero-augmented iterates
+
+- **WHEN** P is any object property and the category is triangulated
+- **THEN** `ExtensionClosure P = ⨆ n, (P ⊔ IsZero).extensionProductIter n`, including when `P` is empty
 
 #### Scenario: A Postnikov step has a generation-time bound
 
