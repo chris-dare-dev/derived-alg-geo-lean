@@ -1862,7 +1862,9 @@ def recovery_backlog_targets(text: str) -> set[str]:
     """Recognize complete column-zero backlog rows, not prose or examples.
 
     Optional single backticks quote field values. Fenced code and HTML comments
-    carry no dispositions. Independent review still judges each row's substance.
+    carry no dispositions. Other raw HTML is unsupported and fails closed for
+    the whole document; this is a plain-Markdown schema, not an HTML renderer.
+    Independent review still judges each row's substance.
     """
     required = {"chunk", "reviewing commit", "found by", "proposed ancestor", "weaker hypotheses", "state"}
     targets: set[str] = set()
@@ -1884,10 +1886,9 @@ def recovery_backlog_targets(text: str) -> set[str]:
             return
         targets.add(target)
 
-    # Comments and raw-text HTML blocks cannot contribute rendered row fields.
+    # Comments cannot contribute row fields. Other HTML is rejected below,
+    # outside fences, rather than guessing which containers hide their content.
     text = re.sub(r"<!--.*?(?:-->|\Z)", "", text, flags=re.DOTALL)
-    text = re.sub(r"<(pre|script|style|textarea)\b[^>]*>.*?(?:</\1\s*>|\Z)", "", text,
-                  flags=re.DOTALL | re.IGNORECASE)
     for line in text.splitlines():
         marker = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
         if fence is not None:
@@ -1897,6 +1898,8 @@ def recovery_backlog_targets(text: str) -> set[str]:
         if marker:
             fence = (marker[1][0], len(marker[1]))
             continue
+        if re.search(r"</?[A-Za-z][A-Za-z0-9:-]*(?=[\s/>]|$)", line):
+            return set()
         if re.match(r"^#{1,6}\s", line):
             finish()
             fields = {} if re.match(r"^###\s+\S", line) else None

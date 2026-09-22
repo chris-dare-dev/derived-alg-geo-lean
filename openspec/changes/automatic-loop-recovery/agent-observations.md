@@ -122,3 +122,12 @@ C1 timestamp. Its content was not rewritten after acceptance: the independent
 digest-bound review and external objective record supply the later acceptance
 and tighter deadline. Consumers must read that provenance rather than treating
 an old status sentence as either fresh approval or a fresh blocker.
+
+## OBS-015 — partial HTML handling is not a visibility proof
+
+Attempt 2's first panel found that excluding only known raw-text HTML elements
+still admitted rows inside a generic hidden container. The schema is now
+explicitly plain Markdown: unsupported raw HTML outside comments/fences rejects
+the entire evidence document, including unfamiliar and multi-line opening tags.
+Fenced HTML examples remain inert. This is a conservative accepted-input rule,
+not a claim to implement a complete Markdown/HTML renderer.

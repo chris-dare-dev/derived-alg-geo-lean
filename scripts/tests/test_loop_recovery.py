@@ -366,6 +366,17 @@ class RecoveryTests(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertNotIn(target, loop_engine.recovery_backlog_targets(text))
 
+    def test_backlog_raw_html_fails_closed_but_fenced_examples_are_inert(self):
+        row = backlog_row()
+        for opening, closing in (("<div hidden>", "</div>"), ("<div\n hidden>", "</div>"),
+                                 ("<section style='display:none'>", "</section>"),
+                                 ("<details>", "</details>"), ("<custom-element>", "</custom-element>")):
+            with self.subTest(opening=opening):
+                self.assertEqual(loop_engine.recovery_backlog_targets(f"{opening}\n{row}{closing}"), set())
+        self.assertEqual(loop_engine.recovery_backlog_targets(row + "\n<div></div>"), set())
+        self.assertIn("foundation/General.lean", loop_engine.recovery_backlog_targets(
+            "```html\n<div hidden>example only</div>\n```\n\n" + row))
+
 
 class RecoveryCliTests(unittest.TestCase):
     def setUp(self):
