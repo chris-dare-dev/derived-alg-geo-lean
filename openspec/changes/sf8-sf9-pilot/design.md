@@ -15,8 +15,9 @@ construction prerequisite for #522, and #525 remains downstream.
 - Require actual atlas, diagonal, and local-finiteness morphism statements for
   #522 instead of a representability shortcut.
 - Use the loop controller's three adversarial lenses on every frozen chunk.
-- Stop rather than widening scope when a mathematical or architectural review
-  remains unresolved after three rounds.
+- Run the outstanding #554 progress slice independently with at most two
+  critique-to-revision cycles; the controller's repository-wide upper bound
+  remains five.
 
 ### Non-Goals
 
@@ -26,8 +27,11 @@ construction prerequisite for #522, and #525 remains downstream.
 
 ## Decisions
 
-1. Run in stack mode only if merge authority is explicitly enabled; otherwise
-   convert the pilot into independent issue-sized runs.
+1. Split execution at the progress boundary. The already-merged first witness
+   is historical and is not replayed. The outstanding non-flat derived-effect
+   chunk runs as an independent, one-issue #554 progress manifest. A separate
+   #522/#525 stack may be enabled only after #554 closes; a progress ledger
+   never unlocks a downstream issue.
 2. Keep the supported nontrivial example and all coherence/equivalence laws in
    the #554 acceptance surface rather than deferring them to an abstraction.
 3. Keep the #522 atlas/diagonal/local-finiteness proof statements in the
@@ -48,11 +52,23 @@ construction prerequisite for #522, and #525 remains downstream.
    its K-projective representative API, but it must not be presented as a
    construction of a general scheme-level `LeftDerivedPullback` or as proof of
    full relative-perfect preservation.
+8. Freeze the derived-effect leaf, its existing witness, the public
+   `DerivedCategory` umbrella, the scheme-derived axiom audit, the task
+   checklist, and the generalization backlog before ledger initialization.
+   The public example needs all of those paths; adding them after review would
+   be impermissible scope widening.
+9. State the executable endpoint as nonzero degree-minus-one homology of the
+   supported affine bounded-projective representative. The familiar Tor
+   interpretation may appear in documentation only unless a proved comparison
+   to an actual Tor API is supplied.
 
 ## Risks / Trade-offs
 
 - **#554 is larger than one chunk** → split by construction layer and freeze
   each file list before review.
+- **A progress PR looks like a completed prerequisite** → use an independent
+  one-issue run and leave the later stack disabled until the provider reports
+  #554 closed.
 - **The issue tracker is stale** → preflight queries live issue/PR state and
   stops on stale roadmap or open blockers.
 - **A generalization creates duplicate roots** → the abstraction adversary must

@@ -35,14 +35,23 @@ from an unproved marker typeclass introduced by the chunk.
   the PR uses a non-closing reference to #554, and the controller leaves #554
   open until the remaining preservation and coherence obligations pass
 
+#### Scenario: Progress execution is isolated from downstream issues
+
+- **WHEN** the outstanding non-flat derived-effect chunk is selected while
+  #554 remains open
+- **THEN** it runs in an independent one-issue manifest with a distinct branch
+  slug and no selected #522 or #525 issue; those downstream obligations remain
+  unavailable until a complete #554 closure is accepted
+
 #### Scenario: Nonzero derived effect in the supported affine lane
 
 - **WHEN** the two-term free resolution of `ZMod 2` is pulled back along
   `ℤ → ZMod 2`
 - **THEN** the resulting affine bounded-projective derived object has a
-  proved nonzero degree-minus-one homology/Tor witness, while the result stays
+  proved nonzero degree-minus-one homology witness, while the result stays
   explicitly restricted to that affine lane and makes no general
-  scheme-level or relative-perfect preservation claim
+  scheme-level or relative-perfect preservation claim. A Tor interpretation
+  SHALL NOT be formalized unless a proved comparison to a Tor API is added.
 
 #### Scenario: Preservation obligation is tested
 
