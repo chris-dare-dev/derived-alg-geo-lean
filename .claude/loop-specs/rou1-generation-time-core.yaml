@@ -84,6 +84,7 @@ issues:
           - .claude/loop-specs/rou1-generation-time-core.yaml
           - .claude/loop-specs/rou1-rouquier-dimension.yaml
           - .claude/loop-specs/rou1-functorial-transport.yaml
+          - docs/architecture/generalization-backlog.md
         acceptance:
           - Every Mathlib extensionProductIter iterate lies in ExtensionClosure.
           - The typeclass-vocabulary le_of_closed corollary is present and records any difference from its raw hypotheses.
