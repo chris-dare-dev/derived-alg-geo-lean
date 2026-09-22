@@ -143,10 +143,10 @@ or not anything imports it. Adding a slice therefore needs no edit here.
 That glob replaced a hand-maintained import list on 2026-08-22. The list had
 silently fallen behind -- two slices were missing from it, so `lake build`
 under-reported against the gates, which have always globbed the directory
-themselves. Keeping the list complete also meant editing a trust-surface file
-on every pull request that added a slice, which fired the trust guard on
-routine work; see the note in `.github/workflows/trust-guard.yml` about why
-that is how a gate stops being read.
+themselves. Keeping the list complete also meant editing a guarded file
+on every pull request that added a slice, which fired the since-retired
+trust guard on routine work. A gate that fires on routine work is a gate
+that stops being read, and that reasoning still justifies the glob.
 
 `#print axioms` output does NOT replay across the import boundary, which is why
 the gates run each area file directly rather than running this one; adding a

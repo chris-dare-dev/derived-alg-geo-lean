@@ -208,10 +208,8 @@ gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
 gate loop-spec bash scripts/validate_loop_specs.sh
 gate loop-engine-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
-# These two test hooks and a workflow guard. Neither has a ci.yml counterpart,
-# and neither can have one: a pull request cannot be trusted to run the check
-# that decides whether a pull request is trusted.
-gate trust-guard scripts/test_trust_guard.sh
+# Tests a PreToolUse hook, which has no ci.yml counterpart and cannot have one:
+# the hook exists only on a developer's machine.
 gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
