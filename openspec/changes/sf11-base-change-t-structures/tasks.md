@@ -44,3 +44,4 @@ five-round-bounded follow-up and does not retroactively mark task 4.3 complete.
 - [ ] 6.3 Add the actual AlgebraicGeometry declarations reported by CI to their proper audit slices; do not modify `scripts/audit_missing_baseline.txt` or raise a ceiling.
 - [ ] 6.4 Run the four independent adversarial reviewers on one frozen final commit, record verbatim outputs in a digest-bound ledger, and stop after the fifth unsuccessful round.
 - [ ] 6.5 Run the required CI/trust checks and use the loop controller for the guarded PR handoff and closure of #1445.
+- [ ] 6.6 Migrate only stale single-instantiation rows for declarations deleted by the follow-up; verify the detector still reports the same threshold and no TODO rows.

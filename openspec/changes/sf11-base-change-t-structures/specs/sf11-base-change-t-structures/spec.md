@@ -185,3 +185,17 @@ audit ceiling, or suppress the sweep.
 - **WHEN** a repair attempts to add a missing declaration to the baseline or
   increase a ceiling instead of auditing it
 - **THEN** repository review rejects the change as a trust-surface bypass
+
+### Requirement: Generic single-instantiation baseline tracks live declarations
+
+The follow-up SHALL keep `scripts/single_instantiation_baseline.txt`
+consistent with the live generic declarations consumed by
+`check_single_instantiation.py`. Removing a deleted declaration from this
+baseline is metadata migration, not a relaxation of the detector; the change
+SHALL NOT add a TODO reason or lower the threshold.
+
+#### Scenario: Deleted abstraction row is migrated
+
+- **WHEN** a generic abstraction is removed from the source tree
+- **THEN** its stale row is removed from the single-instantiation baseline,
+  while the gate continues to reject any newly thin abstraction
