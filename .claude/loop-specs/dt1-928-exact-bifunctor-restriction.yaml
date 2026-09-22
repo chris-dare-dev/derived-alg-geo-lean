@@ -1,0 +1,115 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: dt1-928-exact-bifunctor-restriction
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+# The attestation-aware controller is now on origin/main (#1450). This reviewed
+# enablement update is the only path that turns the generic source run on.
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: dt1-928-coherent-tensor
+  validation: cli-required
+  required_artifacts:
+    - .openspec.yaml
+    - proposal.md
+    - design.md
+    - tasks.md
+    - agent-observations.md
+    - specs/dt1-coherent-tensor/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: true
+  allow_delete_branch_override: true
+  allow_auto: true
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: true
+
+# This source run cannot merge until the controller writes an exact, durable
+# predecessor marker from its passing ledger. A later assembly manifest pins
+# that marker and the actual generic PR head/merge commit after this run ends.
+predecessor_attestation:
+  emit: true
+
+mutations:
+  comment_issue: true
+  close_issue: false
+  push_branch: true
+  create_pr: true
+  approve_pr: true
+  merge_pr: true
+
+issues:
+  - number: 928
+    slug: dt1-exact-bifunctor-restriction
+    depends_on: []
+    chunks:
+      - id: dt1-928-exact-bifunctor-restriction
+        scope: >-
+          Prove the generic closed-full-subcategory transfer of complete
+          two-variable shift coherence and ExactBifunctor data, retaining all
+          closure and triangulated hypotheses explicitly and without importing
+          geometry or installing an instance. This progress chunk is the only
+          path that may add the generic source roots.
+        requirements:
+          - Full-subcategory two-variable exactness transfer
+        files:
+          - docs/architecture/generalization-backlog.md
+          - .claude/loop-specs/dt1-928-exact-bifunctor-restriction.yaml
+          - openspec/changes/dt1-928-coherent-tensor/.openspec.yaml
+          - openspec/changes/dt1-928-coherent-tensor/proposal.md
+          - openspec/changes/dt1-928-coherent-tensor/design.md
+          - openspec/changes/dt1-928-coherent-tensor/tasks.md
+          - openspec/changes/dt1-928-coherent-tensor/agent-observations.md
+          - openspec/changes/dt1-928-coherent-tensor/specs/dt1-coherent-tensor/spec.md
+          - DerivedAlgGeo/CategoryTheory/ObjectProperty/Bifunctor.lean
+          - DerivedAlgGeo/CategoryTheory/Triangulated/ExactFunctorFamily.lean
+          - scripts/StabilityConditionAudit/TStructureCore.lean
+        acceptance:
+          - >-
+            The restricted bifunctor retains both-variable shift naturality,
+            the Koszul compatibility, and exactness in both variables; three
+            selected fixed-kernel facts are not substituted for that contract.
+          - >-
+            Every closure, full-subcategory, shift, and triangulated premise is
+            visible in the generic API, with no `sorry`, `admit`, hidden axiom,
+            geometry import, or global instance.
+          - >-
+            The generic audit and focused named Lean targets pass, and the four
+            required reviewers' verbatim findings are adjudicated in at most
+            three rounds on the frozen commit before the controller merges only
+            a non-closing `Refs #928` progress PR with its exact
+            controller-generated predecessor attestation.
+        closure: progress

@@ -21,6 +21,8 @@ concerns belong to a small repository-local controller.
   merged pull request. Permit a progress PR only when the frozen chunk and
   manifest explicitly authorize it, and require that PR to avoid closing
   keywords.
+- Permit a separately capped successor run only when it is anchored to durable
+  controller evidence for a reviewed, merged predecessor run.
 
 ### Non-Goals
 
@@ -53,6 +55,17 @@ concerns belong to a small repository-local controller.
 5. **Review rounds are per frozen chunk.** All required reviewers must review
    the same commit before adjudication. A new commit starts the next round; the
    cap is five, and scope cannot be re-chunked to evade it.
+6. **Attested predecessor PRs.** A source manifest may require an
+   `attest-pr` controller action before its PR can merge. The action derives a
+   machine-readable comment from the passing ledger: source manifest/chunk,
+   issue/branch/closure, manifest and OpenSpec digests, cap, and exact reviewed
+   PR head. A successor pins that complete tuple together with the source PR
+   number and merge commit. Preflight, ledger initialization, and every successor PR action
+   query the provider again, require the PR to target the protected base, and
+   require its merge commit to remain an ancestor of both the resolved base and
+   current HEAD. This is deliberately stronger than a same-issue prose
+   dependency, but does not claim to make a GitHub comment cryptographic
+   evidence against a hostile repository owner.
 
 ## Review Panel
 
@@ -76,6 +89,10 @@ concerns belong to a small repository-local controller.
   is recorded as blocked for later human triage.
 - **A user enables too many mutations** → each action remains named, logged by
   the command output, and merge defaults to false.
+- **A progress PR falsely unlocks a new same-issue budget** → a successor pins
+  the controller-generated predecessor attestation and both Git revisions;
+  missing, stale, retargeted, or non-ancestor evidence fails closed at every
+  later action.
 
 ## Migration Plan
 

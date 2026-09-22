@@ -1,0 +1,215 @@
+schema: roadmap/1
+slug: threefold-gap-analysis
+project: derived-alg-geo-lean
+status: proposed
+phase: init                # init -> refined -> decomposed -> sequenced -> complete
+title: "Threefold gap analysis — what survives on Fano and general-type threefolds"
+
+# NO gh_issue / gh_milestone / gh_sub_issues FIELDS ANYWHERE IN THIS FILE.
+#
+# scripts/check_roadmap.py validates the roadmap against the live GitHub
+# tracker, and every one of RM-01..RM-05 and RM-07 is guarded by
+# `if not e.get("gh_issue"): continue`. RM-06 only fires on milestones
+# carrying `gh_milestone`. A roadmap with no GitHub ids is structurally
+# invisible to the gate rather than red against it, which is the correct
+# state for a plan whose issues have not been minted.
+#
+# Minting the issues is an EXTERNAL WRITE under the workspace contract and is
+# not done here. Adding ids later is a deliberate, separately authorized edit.
+
+brief: |
+  The gap analysis of 2026-09-20 (.claude/notes/2026-09-20-threefold-gap-
+  analysis.md) asked, for Fano threefolds and for threefolds of general type,
+  what open problems the twelve exotic-stability-targets milestones do not
+  touch. The honest answer is: almost nothing the repository should take.
+
+  THREEFOLDS OF GENERAL TYPE: the gap the handoff expected — existence of a
+  Bridgeland stability condition — was closed by Chunyi Li (arXiv:2601.22994,
+  30 Jan 2026, Theorem 1.1: every smooth projective variety over C) and
+  sharpened by Cheng–Feyzbakhsh (arXiv:2607.04788, 6 Jul 2026: the induced
+  stability conditions on any smooth projective threefold ARE the
+  Bayer–Macrì–Toda double tilt for large a, and the weak, twisted BMT
+  inequality holds). What remains — the strong BMT inequality on, e.g.,
+  hypersurfaces X_d in P^4 for d >= 6 (Koseki 2008.09799 §1.3: solved only
+  for d <= 5), the small-alpha region, the structure of Stab — is sheaf-level
+  tilt-stability and Clifford/Brill–Noether work occupied by Feyzbakhsh,
+  Koseki, Liu, Rekuski, Li and Cheng. NO ITEM IS REGISTERED FOR THIS
+  DIRECTION.
+
+  FANO THREEFOLDS: existence on all Fano threefolds is Bernardara–Macrì–
+  Schmidt–Zhao (arXiv:1607.08199, Theorem 1.1, 2017) via a corrected
+  inequality with a curve class Gamma. The invariant behind the original
+  inequality's failure is NOT Picard rank: P^1 x P^2 and P^1 x P^1 x P^1
+  satisfy it for every polarization (BMSZ Thm 5.1); it fails whenever an
+  effective divisor with -D f-ample contracts to a point, for some H
+  (Martinez–Schmidt, arXiv:1708.08567, Thm 1.1); and there is no known
+  counterexample in Picard rank one. The one open question with a
+  repository shape is BMSZ §6's: what is the optimal Gamma, and does
+  Gamma.H = 0 always suffice? A NEGATIVE answer is a finite arithmetic
+  certificate.
+
+  WHAT SURVIVES. One Lean milestone and one low-odds R&D item.
+  * threefold-f1-lean: the library's BMT.lean docstring says the inequality
+    is false on Bl_pt P^3 and cites Schmidt, but the library has no
+    threefold model above Picard rank one and cannot exhibit it. Schmidt's
+    counterexample is four rationals and one quadratic form on a six-
+    dimensional intersection ring; BMSZ's correction on the same class is
+    one more rational parameter. Every number is in the note's §5.2 data
+    sheet, checked by Hirzebruch–Riemann–Roch on six classes.
+  * threefold-f2-rd: the Gamma.H = 0 feasibility question, with a one-week
+    kill whose expected outcome is abandonment.
+
+  THEOREM A (the parity obstruction of the net-new-results note) yields
+  nothing on the ambient derived category of any threefold: the Serre
+  functor acts on K_num by a scalar only when omega_X is numerically
+  trivial, and then every object with S(F) = F[a] has a = 3 and the parity
+  matches. Kuznetsov components stay with Candidate 3 of the first scoping
+  note. Recorded so it is not re-run.
+
+  DECONFLICTION. No E-milestone names Numerical/Models/Threefold/,
+  Numerical/Examples/Threefold/ or Numerical/Stability/BMT.lean; none
+  proposes a threefold ring; BMTData is mentioned by none. The shared roots
+  assigned in exotic-stability-targets.yaml (Lorentzian, root system,
+  surface blow-up model, hyperbolic plane, invariance predicate, rank-zero
+  spherical walls, transvection) are all untouched here.
+
+goal:
+  hmw: "How might the library stop asserting in a docstring that its Bayer–Macrì–Toda datum is false in general, and instead exhibit the failure and the published correction on a computed class — without naming a declaration for a paper, an author or a geometric class it cannot identify with the formal model?"
+  objective: "Land the first threefold numerical model with a two-dimensional codimension-two piece, transport Schmidt's class through the existing wall transport, prove the quadratic form is negative at an explicit point, conclude that every inhabitant of BMTData must declare that class tilt-unstable there, define the curve-class-corrected quantity, and prove the exact parameter interval on which it is nonnegative for that class."
+  key_results:
+    - "A theorem, not a docstring, says: for every B : BMTData on the rank-two threefold model with the half-anticanonical polarization, B.TiltSemistable (1/8) (1/4) v is false for Schmidt's class v."
+    - "The corrected quantity exists once, in Numerical/Stability/BMT.lean, agrees with Q at correction zero, and its nonnegativity interval on Schmidt's class is proved as an iff with rational endpoints (1764 k^2 - 108 k + 1 <= 0)."
+    - "The BMT.lean module docstring's 'known for' table and existence prose are current as of 2026-09 and cite BMSZ 2017, Koseki 2020, Sun 2021, Li 2019, Martinez–Schmidt 2017, Li 2026 and Cheng–Feyzbakhsh 2026."
+    - "Zero sorries, zero admits, zero new axioms; the three supplied facts (carrier-to-scheme identification, Schmidt's stability point, integral generation of K_num) are docstring-level or explicit hypotheses, never fields that assert a theorem."
+
+architecture_contract:
+  policy: "docs/architecture/abstraction-tree.md"
+  canonical_roots:
+    threefold_model: "DerivedAlgGeo/AlgebraicGeometry/Numerical/Models/Threefold/BlowUpSpace.lean — a formal ring/grading/degree/Chern/Todd package is a Model, never an Example (layers.md rule 7 / MO1.06); stability-neutral; registered in Models/Threefold.lean"
+    threefold_walls: "DerivedAlgGeo/AlgebraicGeometry/Numerical/Examples/Threefold/BlowUpSpaceWalls.lean — Examples/Threefold/ may import the stability tree (layers.md rule 3); mirrors Examples/Threefold/ProjectiveSpaceWalls.lean declaration for declaration; registered in Examples/Threefold.lean"
+    corrected_quantity: "DerivedAlgGeo/AlgebraicGeometry/Numerical/Stability/BMT.lean — the curve-class-corrected quadratic form lives beside Threefold.Q; the codimension-two class enters as an element of ring.piece 2 with the literature's Γ·H ≥ 0 hypothesis, and there is no second carrier for it"
+  prohibited:
+    - "a declaration named Schmidt, BMSZ, Martinez, Gamma, Fano, delPezzoThreefold, toric or counterexample outside docstrings and bibliography comments"
+    - "a second Q; the corrected quantity must reduce to the existing Threefold.Q at correction zero by rfl or simp, and the existing BMTData structure is not modified"
+    - "inhabiting BMTData on the new model with anything but a sanity witness whose TiltSemistable is defined as the conclusion, in the exact style of p3BMTSanity, and only if a consumer needs it"
+    - "a local whole-library lake build; verification runs on the self-hosted runners, and DAG_ALLOW_LOCAL_BUILD is reported in the pull request if ever used"
+
+source:
+  work: "Schmidt, Counterexample to the generalized Bogomolov–Gieseker inequality for threefolds, IMRN 2017 no. 8, 2562–2566; Bernardara–Macrì–Schmidt–Zhao, Bridgeland stability conditions on Fano threefolds, Épijournal Géom. Algébrique 1 (2017), Art. 2"
+  arxiv: "1602.05055; 1607.08199"
+
+evidence:
+  - "Gap analysis 2026-09-20: .claude/notes/2026-09-20-threefold-gap-analysis.md (untracked in the shared checkout; force-added on branch agent/roadmap-threefold-gap). Page images of seven papers read directly; two automated PDF summaries were wrong and were discarded."
+  - "Arithmetic re-derived by hand from Schmidt pp. 1–3 and BMSZ pp. 3, 21–22: H = 2L − E, H^3 = 7, class of O(L) = (7, 4, 1, 1/6), Q = 2α² + 2β² − β, Q(1/8, 1/4) = −3/32; with Γ = k(L² + 2E²), Q^Γ = 2α² + 2β² − (1 + 42k)β + 24k, nonnegative on the half-plane iff 1764k² − 108k + 1 ≤ 0, whose upper root (9 + 4√2)/294 equals BMSZ Prop. 6.1's 3/98 + 2√2/147."
+  - "Todd and lattice data checked by HRR: χ = 1 for O_X, O_L, O_E, O_ℓ, O_m, O_pt; χ(O(L)) = 4; χ(O(−E)) = 0 (note §5.2)."
+  - "Repository facts verified on origin/main 4bed5192: all threefold models are monogenic (MonogenicRing.lean docstring warns that this is not licensed by Picard rank one above dimension two); BMTData's only inhabitant is ProjectiveSpaceWalls.p3BMTSanity; BMT.lean's 'known for' table stops at abelian threefolds."
+  - "Predecessor notes: .claude/notes/2026-09-19-net-new-results-scoping.md (Theorem A), .claude/notes/2026-09-19-exotic-stability-targets-scoping.md, .claude/notes/2026-09-20-handoff-threefold-gap-analysis.md."
+
+wont:
+  - "No GitHub issues, milestones or labels are created by this file. Minting them is an external write requiring explicit authorization."
+  - "No R&D item on threefolds of general type. Existence is closed (Li 2026); the strong BMT inequality there is occupied and not formalizable at the pin."
+  - "No claim that any object is tilt-stable. Tilt-semistability remains an opaque supplied predicate; the milestone proves arithmetic about a class and draws the only conclusion the arithmetic licenses."
+  - "No scheme-level blow-up of P^3 is constructed. The carrier's identification with Bl_pt P^3 is supplied, exactly as Examples/Surface/BlowUpPlane.lean supplies its own."
+  - "No second arbitrary-rank blow-up SURFACE model; the exotic-e1-lean root is untouched, and the threefold ring is a different carrier with a two-dimensional codimension-two piece."
+
+generated_by: { agent: claude, at: "2026-09-20" }
+generations:
+  - { rev: 1, at: "2026-09-20", note: "Registered from the 2026-09-20 threefold gap analysis. Two items, both `proposed`, no GitHub ids. The analysis's headline is that direction 6b (general type) is closed by Li 2026 and Cheng–Feyzbakhsh 2026 and direction 6a (Fano) reduces to one Lean demonstration and one low-odds numerical-feasibility question." }
+
+items:
+
+  # ---------------------------------------------------------------- order 1
+  - id: threefold-f1-lean
+    kind: milestone
+    title: "F1-LEAN — The rank-two threefold model, Schmidt's class, and the corrected quadratic form"
+    status: proposed
+    lane: next
+    order: 1
+    priority: should
+    size: M
+    summary: >
+      Lands the first threefold numerical model whose codimension-two piece
+      has dimension two: the six-dimensional ring Q<1, L, E, L^2, E^2, pt>
+      with L.E = 0, L^3 = E^3 = pt, Todd class 1 + (2L − E) + ((11/6)L^2 +
+      (1/3)E^2) + pt, and the six-class linear-section lattice [O_X], [O_L],
+      [O_E], [O_line], [O_line-in-E], [O_pt] whose χ is integral by
+      construction (note §5.2; every number checked by HRR). Then the
+      half-anticanonical polarization H = 2L − E (H^3 = 7), the transport of
+      Schmidt's class v = [O_X] + [O_L] + [O_line] + [O_pt] to
+      (7, 4, 1, 1/6), the identity Q_{α,β}(v) = 2α² + 2β² − β, the value
+      Q_{1/8,1/4}(v) = −3/32, and the conclusion — stated against the
+      EXISTING BMTData, unmodified — that every inhabitant must declare v
+      tilt-unstable at (1/8, 1/4), where Schmidt proves O(L) is tilt-stable.
+      Adds the curve-class-corrected quantity to BMT.lean beside Q, proves
+      it reduces to Q at correction zero, and proves that on v with
+      Γ = k(L² + 2E²) it is nonnegative on the whole half-plane iff
+      1764k² − 108k + 1 ≤ 0 — whose upper root is BMSZ Prop. 6.1's bound.
+      Refreshes the BMT.lean module docstring, which under-reports what is
+      known (BMSZ 2017, Koseki 2020, Sun 2021, Martinez–Schmidt 2017,
+      Li 2026, Cheng–Feyzbakhsh 2026) and still says existence is open.
+      Modules: Models/Threefold/BlowUpSpace.lean;
+      Examples/Threefold/BlowUpSpaceWalls.lean; additions to
+      Stability/BMT.lean; new audit slices.
+    acceptance:
+      - "BlowUpSpace.numericalVariety_satisfiesHRR is proved, and the six χ-values of the lattice generators plus χ(O(L)) = 4 and χ(O(−E)) = 0 are theorems, not comments."
+      - "Q_{α,β}(v) = 2α² + 2β² − β is a theorem for all rational α, β, and Q_{1/8,1/4}(v) = −3/32 is a theorem. Falsifier: any disagreement with Schmidt's α² + (β − 1/4)² ≥ 1/16 stops the milestone."
+      - "For every B : BMTData V P (the existing structure, textually unchanged), ¬ B.TiltSemistable (1/8) (1/4) v is proved, with a docstring stating that Schmidt's Theorem 3.1 places a tilt-stable line bundle at a point of the open disc and that the statement is insensitive to which point."
+      - "The corrected quantity is defined once in BMT.lean, reduces to Threefold.Q at correction zero by rfl or simp, and the interval theorem on v is stated over ℚ as an iff with 1764k² − 108k + 1 ≤ 0 (no irrational endpoint)."
+      - "check_layering.py passes: Models/Threefold/BlowUpSpace.lean reaches neither the stability tree nor Numerical/Examples/ (rule 7); Examples/Threefold/BlowUpSpaceWalls.lean imports Stability/ThreefoldWallTransport as ProjectiveSpaceWalls.lean does."
+      - "A grep of the new and edited modules for Schmidt, BMSZ, Martinez, Gamma, Fano, delPezzo, toric, counterexample returns hits only inside docstrings and bibliography comments."
+      - "The BMT.lean docstring's 'known for' table carries BMSZ 2017 (corrected form; original for P^1 x P^2, P^1 x P^1 x P^1, some polarizations on Bl_line P^3), Koseki 2020, Sun 2021, Li 2019, and its 'false' paragraph carries Martinez–Schmidt 2017's divisor-contracting-to-a-point criterion and 'no known counterexample in Picard rank one'; its existence prose cites Li 2026 and Cheng–Feyzbakhsh 2026 and no longer says existence is open."
+      - "Zero sorries; check_layering.py, check_umbrella_coverage.py, check_coverage_map.py, check_audit.py, check_audit_complete.py pass; runLinter and lint-style clean; CI green on the runners."
+    supplied_data:
+      - "That the six-field carrier is the numerical intersection ring of the blow-up of P^3 at a point, with L and E its hyperplane pullback and exceptional divisor. The repository has no scheme-level blow-up; same status as Examples/Surface/BlowUpPlane.lean."
+      - "Schmidt, Theorem 3.1: O(L) is ν_{α,β}-stable at some (α, β) with Q_{α,β}(O(L)) < 0. Docstring-level; the Lean theorem quantifies over inhabitants of BMTData and needs no stability predicate of its own."
+      - "That [O_X], [O_L], [O_E], [O_line], [O_line-in-E], [O_pt] generate K_num over ℤ (rank 6 is consistent with the full exceptional collection and e(X) = 6). Supplied exactly as Models/Threefold/LinearSection.lean supplies its own generators."
+      - "c₂(Bl_pt P^3) = 6L² (the point blow-up does not change c₂ on a threefold); it enters through the Todd coefficients and is checked by ∫td₃ = 1 and the six HRR values."
+    tags: [threefold, rank-two-model, bmt-negative, corrected-quantity, docstring-refresh]
+    labels: [area:lean, area:geometry, area:stability, type:feature]
+
+  # ---------------------------------------------------------------- order 2
+  - id: threefold-f2-rd
+    kind: milestone
+    title: "F2-R&D — Is the curve-class correction with Γ·H = 0 ever infeasible? A one-week numerical kill"
+    status: proposed
+    lane: later
+    order: 2
+    priority: could
+    size: S
+    summary: >
+      THE ONE LIVE QUESTION WITH A REPOSITORY SHAPE, AND A LOTTERY TICKET.
+      BMSZ 1607.08199 §6: "it would be interesting to know what the optimal
+      class Γ is. A condition that is coherent with the case of Picard rank
+      1 would be Γ·H = 0"; their Prop. 6.1 checks line bundles and O_e on
+      Bl_pt P^3 only. Martinez–Schmidt 1708.08567 Question 2.6 asks for a Γ
+      with Γ·H ≥ 0 on every threefold; Liu–Mao 2605.13808 (May 2026) prove
+      the Γ form on singular Fanos. Open statement with quantifiers: does
+      there exist a smooth projective threefold X with ample H such that for
+      EVERY Γ in A_1(X)_Q with Γ·H = 0 there are (α, β) and a ν_{α,β}-stable
+      E with ν_{α,β}(E) = 0 and ch₃^β(E) − Γ·ch₁^β(E) − (α²/6)H²ch₁^β(E) > 0?
+      A NEGATIVE answer is a finite certificate — finitely many objects with
+      PROVED tilt-stability (line bundles at large α, structure sheaves of
+      contracted divisors, Schmidt's nested-wall argument) whose corrected
+      constraints are jointly infeasible in the Picard-rank-many coordinates
+      of Γ on the hyperplane Γ·H = 0 — and that certificate is arithmetic
+      the library can check on the threefold-f1-lean model. A POSITIVE
+      answer for a given X is a theorem about all objects and is not ours.
+      Day 1: read Bayer–Macrì ICM 2023 Conjecture 4.7 (per Pertusi
+      2602.24016 p. 24 the general corrected form; UNREAD as of 2026-09-20)
+      and BMSZ §6 in full. Days 2–5: Bl_pt P^3 and Bl_line P^3 with a
+      one-parameter family of polarizations; write the constraints; decide
+      feasibility by hand or Sage. Expected outcome: feasible everywhere,
+      abandon.
+    acceptance:
+      - "A written statement of Bayer–Macrì ICM 2023 Conjecture 4.7 with its exact Γ-shape, and a sentence saying whether it already answers or reframes the Γ·H = 0 question."
+      - "For each (X, H) tried: the list of objects used, the source proving each one's tilt-stability at the points used, the constraint system in Γ, and a FEASIBLE / INFEASIBLE verdict with the computation printed."
+      - "A dated collision list covering arXiv math.AG since Jan 2024 and the pages of Schmidt, Martinez, Piyaratne, Zhiyu Liu and Mao."
+      - "A PURSUE / DROP verdict. DROP after five days of feasible cases is the expected and acceptable outcome; a single INFEASIBLE case is promoted to a Lean certificate on the threefold-f1-lean model."
+    kill_criteria: >
+      DROP if Bayer–Macrì ICM 2023 Conjecture 4.7 already fixes a Γ-shape that
+      makes the Γ·H = 0 question moot, or if every (X, H) tried in five days
+      is feasible, or if a preprint by Schmidt, Martinez, Piyaratne, Liu or
+      Mao settles the optimal-Γ question for smooth threefolds. All three are
+      expected.
+    tags: [threefold, corrected-quantity, numerical-feasibility, lottery-ticket]
+    labels: [area:research, area:stability, type:investigation]

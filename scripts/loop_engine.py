@@ -65,6 +65,10 @@ NON_CLOSING_REFERENCE_RE = re.compile(
 SUCCESS_CONCLUSIONS = {"SUCCESS", "success", "PASSED", "passed"}
 MERGE_METHODS = {"merge", "squash", "rebase"}
 CHUNK_CLOSURES = {"complete", "progress"}
+FULL_GIT_SHA_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+DIGEST_RE = re.compile(r"^[0-9a-fA-F]{64}$")
+PREDECESSOR_ATTESTATION_PREFIX = "<!-- derived-alg-geo-lean.loop-predecessor:v1 "
+PREDECESSOR_ATTESTATION_SUFFIX = " -->"
 DEFAULT_MERGE_POLICY = {
     "method": "squash",
     "delete_branch": False,
@@ -277,6 +281,89 @@ def merge_policy(spec: dict[str, Any]) -> dict[str, Any]:
     return policy
 
 
+def predecessor_attestation_policy(spec: dict[str, Any]) -> dict[str, bool]:
+    """Return the optional source-PR attestation policy after validation."""
+
+    configured = spec.get("predecessor_attestation", {})
+    if not isinstance(configured, dict):
+        raise LoopError("spec.predecessor_attestation must be a mapping")
+    emit = configured.get("emit", False)
+    if not isinstance(emit, bool):
+        raise LoopError("spec.predecessor_attestation.emit must be a boolean")
+    unknown = set(configured) - {"emit"}
+    if unknown:
+        raise LoopError(
+            "spec.predecessor_attestation has unsupported keys: "
+            + ", ".join(sorted(unknown))
+        )
+    return {"emit": emit}
+
+
+def predecessor_prs(spec: dict[str, Any]) -> list[dict[str, Any]]:
+    """Validate and return durable predecessor-PR bindings for a successor."""
+
+    entries = spec.get("predecessor_prs", [])
+    if not isinstance(entries, list):
+        raise LoopError("spec.predecessor_prs must be a list")
+    numbers: set[int] = set()
+    required = {
+        "number",
+        "manifest_id",
+        "chunk_id",
+        "spec_digest",
+        "openspec_digest",
+        "max_review_rounds",
+        "issue_number",
+        "source_branch",
+        "closure",
+        "reviewed_head",
+        "merge_commit",
+    }
+    for index, entry in enumerate(entries):
+        name = f"spec.predecessor_prs[{index}]"
+        if not isinstance(entry, dict):
+            raise LoopError(f"{name} must be a mapping")
+        missing = required - set(entry)
+        if missing:
+            raise LoopError(f"{name} is missing keys: " + ", ".join(sorted(missing)))
+        unknown = set(entry) - required
+        if unknown:
+            raise LoopError(f"{name} has unsupported keys: " + ", ".join(sorted(unknown)))
+        number = entry["number"]
+        if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
+            raise LoopError(f"{name}.number must be a positive pull-request number")
+        if number in numbers:
+            raise LoopError(f"spec.predecessor_prs must not repeat pull request #{number}")
+        numbers.add(number)
+        manifest_id = entry["manifest_id"]
+        if not isinstance(manifest_id, str) or not ISSUE_ID_RE.fullmatch(manifest_id):
+            raise LoopError(f"{name}.manifest_id must use lowercase kebab-case")
+        if not isinstance(entry["chunk_id"], str) or not entry["chunk_id"].strip():
+            raise LoopError(f"{name}.chunk_id must be a non-empty string")
+        issue_number = entry["issue_number"]
+        if not isinstance(issue_number, int) or isinstance(issue_number, bool) or issue_number <= 0:
+            raise LoopError(f"{name}.issue_number must be a positive issue number")
+        source_branch = entry["source_branch"]
+        if not isinstance(source_branch, str) or not BRANCH_RE.fullmatch(source_branch):
+            raise LoopError(f"{name}.source_branch must be a dedicated agent branch")
+        if entry["closure"] not in CHUNK_CLOSURES:
+            raise LoopError(f"{name}.closure must be 'complete' or 'progress'")
+        for field in ("spec_digest", "openspec_digest"):
+            value = entry[field]
+            if not isinstance(value, str) or not DIGEST_RE.fullmatch(value):
+                raise LoopError(f"{name}.{field} must be a full SHA-256 digest")
+        cap = entry["max_review_rounds"]
+        if not isinstance(cap, int) or isinstance(cap, bool) or not 1 <= cap <= MAX_ALLOWED_ROUNDS:
+            raise LoopError(
+                f"{name}.max_review_rounds must be an integer from 1 to {MAX_ALLOWED_ROUNDS}"
+            )
+        for field in ("reviewed_head", "merge_commit"):
+            value = entry[field]
+            if not isinstance(value, str) or not FULL_GIT_SHA_RE.fullmatch(value):
+                raise LoopError(f"{name}.{field} must be a full 40-character Git SHA")
+    return entries
+
+
 def validate_spec(spec: dict[str, Any]) -> None:
     """Validate the stable, intentionally small v1 specification schema."""
 
@@ -294,6 +381,8 @@ def validate_spec(spec: dict[str, Any]) -> None:
     if mode not in {"stack", "independent"}:
         raise LoopError("spec.mode must be 'stack' or 'independent'")
     require_bool(spec, "enabled", "spec")
+    predecessor_attestation_policy(spec)
+    predecessor_prs(spec)
 
     openspec = require_mapping(spec.get("openspec"), "spec.openspec")
     change = require_string(openspec, "change", "spec.openspec")
@@ -465,6 +554,10 @@ def validate_spec(spec: dict[str, Any]) -> None:
     mutations = require_mapping(spec.get("mutations"), "spec.mutations")
     for action in ACTION_TO_MUTATION.values():
         require_bool(mutations, action, "spec.mutations")
+    if predecessor_attestation_policy(spec)["emit"] and mutations["comment_issue"] is not True:
+        raise LoopError(
+            "spec.predecessor_attestation.emit requires spec.mutations.comment_issue=true"
+        )
     merge_policy(spec)
     closure = require_mapping(spec.get("closure"), "spec.closure")
     if closure.get("code_issue") != "pr_merge_keyword":
@@ -619,6 +712,249 @@ def issue_state(root: Path, repository: str, number: int) -> dict[str, Any]:
     return data
 
 
+def predecessor_attestation_payload(
+    manifest_id: str,
+    chunk_id: str,
+    spec_digest: str,
+    openspec_digest_value: str,
+    max_review_rounds: int,
+    issue_number: int,
+    source_branch: str,
+    closure: str,
+    reviewed_head: str,
+) -> dict[str, Any]:
+    """Build the exact durable source-run evidence a successor must pin."""
+
+    return {
+        "schema": f"{RUN_SCHEMA}/predecessor-attestation",
+        "manifest_id": manifest_id,
+        "chunk_id": chunk_id,
+        "spec_digest": spec_digest.lower(),
+        "openspec_digest": openspec_digest_value.lower(),
+        "max_review_rounds": max_review_rounds,
+        "issue_number": issue_number,
+        "source_branch": source_branch,
+        "closure": closure,
+        "reviewed_head": reviewed_head.lower(),
+    }
+
+
+def predecessor_attestation_from_binding(binding: dict[str, Any]) -> dict[str, Any]:
+    return predecessor_attestation_payload(
+        binding["manifest_id"],
+        binding["chunk_id"],
+        binding["spec_digest"],
+        binding["openspec_digest"],
+        binding["max_review_rounds"],
+        binding["issue_number"],
+        binding["source_branch"],
+        binding["closure"],
+        binding["reviewed_head"],
+    )
+
+
+def predecessor_attestation_from_state(state: dict[str, Any], reviewed_head: str) -> dict[str, Any]:
+    """Build an attestation only from a passing, fully populated ledger."""
+
+    if state.get("status") != "passed":
+        raise LoopError("predecessor attestation requires a passing review ledger")
+    current = latest_round(state)
+    if current is None or current.get("adjudication", {}).get("verdict") not in PASSING_VERDICTS:
+        raise LoopError("predecessor attestation requires a passing adjudicated review round")
+    chunk_id = state.get("chunk", {}).get("id")
+    if not isinstance(chunk_id, str) or not chunk_id:
+        raise LoopError("predecessor attestation ledger has no frozen chunk id")
+    manifest_id = state.get("spec_id")
+    if not isinstance(manifest_id, str) or not ISSUE_ID_RE.fullmatch(manifest_id):
+        raise LoopError("predecessor attestation ledger has an invalid manifest id")
+    spec_digest_value = state.get("spec_digest")
+    openspec_digest_value = state.get("openspec_digest")
+    max_rounds = state.get("max_review_rounds")
+    if not isinstance(spec_digest_value, str) or not DIGEST_RE.fullmatch(spec_digest_value):
+        raise LoopError("predecessor attestation ledger has an invalid manifest digest")
+    if not isinstance(openspec_digest_value, str) or not DIGEST_RE.fullmatch(openspec_digest_value):
+        raise LoopError("predecessor attestation ledger has an invalid OpenSpec digest")
+    if not isinstance(max_rounds, int) or isinstance(max_rounds, bool) or not 1 <= max_rounds <= MAX_ALLOWED_ROUNDS:
+        raise LoopError("predecessor attestation ledger has an invalid review-round cap")
+    issue = state.get("issue")
+    issue_number = issue.get("number") if isinstance(issue, dict) else None
+    slug = issue.get("slug") if isinstance(issue, dict) else None
+    if not isinstance(issue_number, int) or isinstance(issue_number, bool) or issue_number <= 0:
+        raise LoopError("predecessor attestation ledger has an invalid issue number")
+    if not isinstance(slug, str) or not ISSUE_ID_RE.fullmatch(slug):
+        raise LoopError("predecessor attestation ledger has an invalid issue branch slug")
+    closure = state.get("chunk", {}).get("closure", "complete")
+    if closure not in CHUNK_CLOSURES:
+        raise LoopError("predecessor attestation ledger has an invalid closure mode")
+    if not isinstance(reviewed_head, str) or not FULL_GIT_SHA_RE.fullmatch(reviewed_head):
+        raise LoopError("predecessor attestation requires a full reviewed PR head SHA")
+    return predecessor_attestation_payload(
+        manifest_id,
+        chunk_id,
+        spec_digest_value,
+        openspec_digest_value,
+        max_rounds,
+        issue_number,
+        f"agent/{slug}",
+        closure,
+        reviewed_head,
+    )
+
+
+def predecessor_attestation_body(payload: dict[str, Any]) -> str:
+    """Encode attestation data in a comment body with one unambiguous payload."""
+
+    return PREDECESSOR_ATTESTATION_PREFIX + canonical_json(payload) + PREDECESSOR_ATTESTATION_SUFFIX
+
+
+def parse_predecessor_attestation(body: Any) -> dict[str, Any] | None:
+    """Parse exactly one controller marker; ordinary discussion remains inert."""
+
+    if not isinstance(body, str):
+        return None
+    stripped = body.strip()
+    if not stripped.startswith(PREDECESSOR_ATTESTATION_PREFIX) or not stripped.endswith(
+        PREDECESSOR_ATTESTATION_SUFFIX
+    ):
+        return None
+    encoded = stripped[len(PREDECESSOR_ATTESTATION_PREFIX) : -len(PREDECESSOR_ATTESTATION_SUFFIX)]
+    try:
+        payload = json.loads(encoded)
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def matching_predecessor_attestations(
+    comments: Any, expected: dict[str, Any], actor: str
+) -> list[dict[str, Any]]:
+    """Return exact controller-marker comments authored by the manifest actor."""
+
+    if not isinstance(comments, list):
+        return []
+    matches: list[dict[str, Any]] = []
+    for comment in comments:
+        if not isinstance(comment, dict):
+            continue
+        author = comment.get("author")
+        login = author.get("login") if isinstance(author, dict) else None
+        if login != actor:
+            continue
+        if parse_predecessor_attestation(comment.get("body")) == expected:
+            matches.append(comment)
+    return matches
+
+
+def require_exact_predecessor_attestation(
+    pr: dict[str, Any], expected: dict[str, Any], actor: str, pr_number: int
+) -> None:
+    matches = matching_predecessor_attestations(pr.get("comments"), expected, actor)
+    if not matches:
+        raise LoopError(
+            f"PR #{pr_number} lacks the exact controller predecessor attestation from {actor!r}"
+        )
+    if len(matches) != 1:
+        raise LoopError(
+            f"PR #{pr_number} has {len(matches)} matching predecessor attestations; expected exactly one"
+        )
+
+
+def require_predecessor_merges_ancestor(
+    root: Path, proofs: Iterable[dict[str, Any]], revision: str, label: str
+) -> None:
+    """Require each verified source merge in a further local or remote revision."""
+
+    if not isinstance(revision, str) or not FULL_GIT_SHA_RE.fullmatch(revision):
+        raise LoopError(f"cannot verify predecessor ancestry: {label} is not a full Git SHA")
+    for proof in proofs:
+        merge_commit = proof.get("merge_commit")
+        number = proof.get("number")
+        if not isinstance(merge_commit, str) or not FULL_GIT_SHA_RE.fullmatch(merge_commit):
+            raise LoopError("predecessor proof has no full merge commit")
+        ancestry = run_command(
+            root,
+            ["git", "merge-base", "--is-ancestor", merge_commit, revision],
+            check=False,
+        )
+        if ancestry.returncode != 0:
+            raise LoopError(
+                f"predecessor PR #{number} merge commit is not an ancestor of {label}"
+            )
+
+
+def require_predecessor_prs(root: Path, spec: dict[str, Any]) -> list[dict[str, Any]]:
+    """Fail closed unless every pinned source run remains in both required histories."""
+
+    bindings = predecessor_prs(spec)
+    if not bindings:
+        return []
+    base_head = git(root, "rev-parse", "--verify", spec["base_ref"])
+    current_head = git(root, "rev-parse", "HEAD")
+    proofs: list[dict[str, Any]] = []
+    for binding in bindings:
+        number = binding["number"]
+        pr = gh_json(
+            root,
+            [
+                "pr",
+                "view",
+                str(number),
+                "--repo",
+                spec["repository"],
+                "--json",
+                "state,mergedAt,baseRefName,headRefName,headRefOid,body,mergeCommit,comments",
+            ],
+        )
+        if not isinstance(pr, dict):
+            raise LoopError(f"gh pr view #{number} returned an unexpected response")
+        if pr.get("state") != "MERGED" or not isinstance(pr.get("mergedAt"), str) or not pr["mergedAt"]:
+            raise LoopError(f"predecessor PR #{number} is not merged")
+        if pr.get("baseRefName") != spec["base_branch"]:
+            raise LoopError(
+                f"predecessor PR #{number} targets {pr.get('baseRefName')!r}, not {spec['base_branch']!r}"
+            )
+        if pr.get("headRefName") != binding["source_branch"]:
+            raise LoopError(
+                f"predecessor PR #{number} branch does not match its pinned source_branch"
+            )
+        body = pr.get("body")
+        if not isinstance(body, str):
+            raise LoopError(f"predecessor PR #{number} has no readable body")
+        try:
+            validate_pr_body_closure(body, binding["issue_number"], binding["closure"])
+        except LoopError as exc:
+            raise LoopError(f"predecessor PR #{number} body does not match its pinned closure: {exc}") from exc
+        live_head = pr.get("headRefOid")
+        if not isinstance(live_head, str) or live_head.lower() != binding["reviewed_head"].lower():
+            raise LoopError(f"predecessor PR #{number} head does not match its pinned reviewed_head")
+        merge = pr.get("mergeCommit")
+        merge_oid = merge.get("oid") if isinstance(merge, dict) else None
+        if not isinstance(merge_oid, str) or merge_oid.lower() != binding["merge_commit"].lower():
+            raise LoopError(f"predecessor PR #{number} merge commit does not match its pinned merge_commit")
+        require_exact_predecessor_attestation(
+            pr, predecessor_attestation_from_binding(binding), spec["actor"], number
+        )
+        proofs.append(
+            {
+                "number": number,
+                "manifest_id": binding["manifest_id"],
+                "chunk_id": binding["chunk_id"],
+                "spec_digest": binding["spec_digest"].lower(),
+                "openspec_digest": binding["openspec_digest"].lower(),
+                "max_review_rounds": binding["max_review_rounds"],
+                "issue_number": binding["issue_number"],
+                "source_branch": binding["source_branch"],
+                "closure": binding["closure"],
+                "reviewed_head": binding["reviewed_head"].lower(),
+                "merge_commit": binding["merge_commit"].lower(),
+                "verified_at": utc_now(),
+            }
+        )
+    require_predecessor_merges_ancestor(root, proofs, base_head, "resolved base_ref")
+    require_predecessor_merges_ancestor(root, proofs, current_head, "current HEAD")
+    return proofs
+
+
 def roadmap_gate_args(base_ref: str) -> list[str]:
     """Scope roadmap consistency failures to entries authored after base_ref."""
 
@@ -699,6 +1035,16 @@ def preflight(root: Path, spec_path: Path) -> int:
             print("PASS base branch protection: required checks are configured")
     except LoopError as exc:
         failures.append(f"could not verify base branch protection: {exc}")
+
+    try:
+        predecessor_proofs = require_predecessor_prs(root, spec)
+        for proof in predecessor_proofs:
+            print(
+                "PASS predecessor PR "
+                f"#{proof['number']}: attested {proof['manifest_id']}/{proof['chunk_id']}"
+            )
+    except LoopError as exc:
+        failures.append(str(exc))
 
     selected_numbers = {issue["number"] for issue in spec["issues"]}
     selected_dependencies = {
@@ -909,6 +1255,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
     try:
         spec = load_spec(spec_path, root)
         issue, chunk = chunk_entry(spec, number, chunk_id)
+        predecessor_proofs = require_predecessor_prs(root, spec)
         require_selected_dependencies_passed(root, spec, issue, requested_state_dir)
         path = state_path(root, spec, requested_state_dir, chunk_id)
         refuse_renamed_ledger(root, spec, requested_state_dir, chunk_id, path)
@@ -924,6 +1271,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
             "spec_digest": digest(spec),
             "openspec_change": spec["openspec"]["change"],
             "openspec_digest": openspec_digest(root, spec),
+            "predecessor_prs": predecessor_proofs,
             "issue": {"number": issue["number"], "slug": issue["slug"]},
             "chunk": {
                 "id": chunk["id"],
@@ -1410,6 +1758,40 @@ def verify_remote_chunk_files(pr: dict[str, Any], state: dict[str, Any]) -> None
         raise LoopError("PR contains files outside the frozen list: " + ", ".join(outside))
 
 
+def require_pr_targets_base(pr: dict[str, Any], spec: dict[str, Any]) -> None:
+    """Refuse a PR retargeted away from the protected base after creation."""
+
+    if pr.get("baseRefName") != spec["base_branch"]:
+        raise LoopError(
+            f"PR targets {pr.get('baseRefName')!r}, not protected base {spec['base_branch']!r}"
+        )
+
+
+def require_pr_matches_frozen_issue(pr: dict[str, Any], state: dict[str, Any]) -> None:
+    """Bind every later action to the ledger's issue branch and closure body."""
+
+    issue = state.get("issue")
+    number = issue.get("number") if isinstance(issue, dict) else None
+    slug = issue.get("slug") if isinstance(issue, dict) else None
+    if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
+        raise LoopError("ledger has no valid frozen issue number")
+    if not isinstance(slug, str) or not ISSUE_ID_RE.fullmatch(slug):
+        raise LoopError("ledger has no valid frozen issue branch slug")
+    expected_branch = f"agent/{slug}"
+    if pr.get("headRefName") != expected_branch:
+        raise LoopError(
+            f"PR branch {pr.get('headRefName')!r} does not match frozen issue branch {expected_branch!r}"
+        )
+    body = pr.get("body")
+    if not isinstance(body, str):
+        raise LoopError("PR has no readable body for frozen closure validation")
+    closure = state.get("chunk", {}).get("closure", "complete")
+    try:
+        validate_pr_body_closure(body, number, closure)
+    except LoopError as exc:
+        raise LoopError(f"PR body does not match the frozen {closure!r} closure: {exc}") from exc
+
+
 def action_create_pr(
     root: Path,
     spec: dict[str, Any],
@@ -1421,6 +1803,7 @@ def action_create_pr(
     dry_run: bool,
 ) -> int:
     authorize_action(spec, "create-pr")
+    require_predecessor_prs(root, spec)
     issue = selected_issue_for_action(spec, number)
     current = git(root, "branch", "--show-current")
     expected = f"agent/{issue['slug']}"
@@ -1461,6 +1844,70 @@ def action_create_pr(
         return 0
     run_command(root, args, check=True)
     print(f"PASS PR created for issue #{number}")
+    return 0
+
+
+def action_attest_pr(
+    root: Path,
+    spec: dict[str, Any],
+    number: int,
+    pr_number: int,
+    ledger_file: Path,
+    dry_run: bool,
+) -> int:
+    """Write one durable, controller-derived predecessor marker to a source PR."""
+
+    authorize_action(spec, "comment")
+    if not predecessor_attestation_policy(spec)["emit"]:
+        raise LoopError("spec.predecessor_attestation.emit is false; refusing to emit an unused marker")
+    predecessor_proofs = require_predecessor_prs(root, spec)
+    selected_issue_for_action(spec, number)
+    state = load_state(ledger_file)
+    if state.get("issue", {}).get("number") != number:
+        raise LoopError("attestation ledger issue does not match the requested issue")
+    if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
+        raise LoopError("attestation ledger was created from a different run manifest")
+    if state.get("openspec_digest") != openspec_digest(root, spec):
+        raise LoopError("OpenSpec artifacts changed after ledger initialization; refusing to attest")
+    current = latest_round(state)
+    if state.get("status") != "passed" or current is None:
+        raise LoopError("predecessor attestation requires a passing review ledger")
+    if current.get("adjudication", {}).get("verdict") not in PASSING_VERDICTS:
+        raise LoopError("predecessor attestation requires a passing adjudicated review round")
+    pr = gh_json(
+        root,
+        [
+            "pr",
+            "view",
+            str(pr_number),
+            "--repo",
+            spec["repository"],
+            "--json",
+            "headRefName,headRefOid,state,isDraft,baseRefName,body,files,comments",
+        ],
+    )
+    if pr.get("state") != "OPEN" or pr.get("isDraft"):
+        raise LoopError("predecessor attestation requires an open, non-draft PR")
+    require_pr_targets_base(pr, spec)
+    require_pr_matches_frozen_issue(pr, state)
+    require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
+    if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
+        raise LoopError("PR head does not match the commit reviewed by the passing ledger")
+    verify_remote_chunk_files(pr, state)
+    payload = predecessor_attestation_from_state(state, pr["headRefOid"])
+    matches = matching_predecessor_attestations(pr.get("comments"), payload, spec["actor"])
+    if len(matches) == 1:
+        print(f"PASS predecessor attestation already present: #{pr_number}")
+        return 0
+    if len(matches) > 1:
+        raise LoopError(f"PR #{pr_number} already has duplicate matching predecessor attestations")
+    body = predecessor_attestation_body(payload)
+    args = ["gh", "pr", "comment", str(pr_number), "--repo", spec["repository"], "--body", body]
+    if dry_run:
+        print("DRY-RUN " + " ".join(args[:7]) + " <controller-attestation>")
+        return 0
+    run_command(root, args, check=True)
+    print(f"PASS predecessor attestation written: #{pr_number}")
     return 0
 
 
@@ -1510,6 +1957,7 @@ def action_approve(
     dry_run: bool,
 ) -> int:
     authorize_action(spec, "approve")
+    predecessor_proofs = require_predecessor_prs(root, spec)
     state = load_state(ledger_file)
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("ledger was created from a different run manifest")
@@ -1518,7 +1966,7 @@ def action_approve(
     if state.get("status") != "passed":
         raise LoopError(f"ledger status is {state.get('status')!r}; approval requires status 'passed'")
     current = latest_round(state)
-    if current is None or current.get("adjudication", {}).get("verdict") != "pass":
+    if current is None or current.get("adjudication", {}).get("verdict") not in PASSING_VERDICTS:
         raise LoopError("approval requires a passing adjudicated review round")
     pr = gh_json(
         root,
@@ -1529,11 +1977,14 @@ def action_approve(
             "--repo",
             spec["repository"],
             "--json",
-            "headRefOid,state,isDraft,files",
+            "headRefName,headRefOid,state,isDraft,baseRefName,body,files",
         ],
     )
     if pr.get("state") != "OPEN" or pr.get("isDraft"):
         raise LoopError("approval requires an open, non-draft PR")
+    require_pr_targets_base(pr, spec)
+    require_pr_matches_frozen_issue(pr, state)
+    require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
         raise LoopError("PR head does not match the commit reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
@@ -1620,6 +2071,7 @@ def action_merge(
     dry_run: bool,
 ) -> int:
     authorize_action(spec, "merge")
+    predecessor_proofs = require_predecessor_prs(root, spec)
     merge_policy(spec)
     state = load_state(ledger_file)
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
@@ -1629,7 +2081,7 @@ def action_merge(
     if state.get("status") != "passed":
         raise LoopError("merge requires a passing review ledger")
     current = latest_round(state)
-    if current is None or current.get("adjudication", {}).get("verdict") != "pass":
+    if current is None or current.get("adjudication", {}).get("verdict") not in PASSING_VERDICTS:
         raise LoopError("merge requires a passing adjudicated review round")
     args = build_merge_command(
         spec,
@@ -1651,14 +2103,20 @@ def action_merge(
             "--repo",
             spec["repository"],
             "--json",
-            "state,isDraft,headRefOid,files",
+            "state,isDraft,headRefName,headRefOid,baseRefName,body,files,comments",
         ],
     )
     if pr.get("state") != "OPEN" or pr.get("isDraft"):
         raise LoopError("merge requires an open, non-draft PR")
+    require_pr_targets_base(pr, spec)
+    require_pr_matches_frozen_issue(pr, state)
+    require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
         raise LoopError("PR head does not match the commit reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
+    if predecessor_attestation_policy(spec)["emit"]:
+        payload = predecessor_attestation_from_state(state, pr["headRefOid"])
+        require_exact_predecessor_attestation(pr, payload, spec["actor"], pr_number)
     if dry_run:
         print("DRY-RUN " + " ".join(args))
         return 0
@@ -1746,6 +2204,14 @@ def build_parser() -> argparse.ArgumentParser:
     create_parser.add_argument("--body-file", required=True)
     create_parser.add_argument("--draft", action="store_true")
     create_parser.add_argument("--dry-run", action="store_true")
+    attest_parser = action_sub.add_parser(
+        "attest-pr", help="write the controller-derived predecessor marker for a passing source PR"
+    )
+    add_common_spec_parser(attest_parser)
+    attest_parser.add_argument("--issue", required=True, type=int)
+    attest_parser.add_argument("--pr", required=True, type=int)
+    attest_parser.add_argument("--ledger", required=True, type=Path)
+    attest_parser.add_argument("--dry-run", action="store_true")
     approve_parser = action_sub.add_parser("approve")
     add_common_spec_parser(approve_parser)
     approve_parser.add_argument("--pr", required=True, type=int)
@@ -1814,6 +2280,15 @@ def main(argv: list[str] | None = None) -> int:
                     args.title,
                     args.body_file,
                     args.draft,
+                    args.dry_run,
+                )
+            if args.action_command == "attest-pr":
+                return action_attest_pr(
+                    root,
+                    spec,
+                    args.issue,
+                    args.pr,
+                    args.ledger.resolve(),
                     args.dry_run,
                 )
             if args.action_command == "approve":

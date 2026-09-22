@@ -183,19 +183,23 @@ design, and task checklist in `openspec/` and validate them with the OpenSpec
 CLI when it is available:
 
 ```bash
+# Select an enabled manifest rather than a dormant roadmap manifest.
+# This is the active #554 progress run at the time of writing.
+DAG_LOOP_MANIFEST=.claude/loop-specs/sf8-5-nonflat-derived-effect.yaml
 openspec validate --all --strict --no-interactive
-python scripts/loop_engine.py validate --spec .claude/loop-specs/sf8-sf9-pilot.yaml
-python scripts/loop_engine.py preflight --spec .claude/loop-specs/sf8-sf9-pilot.yaml
+python scripts/loop_engine.py validate --spec "$DAG_LOOP_MANIFEST"
+python scripts/loop_engine.py preflight --spec "$DAG_LOOP_MANIFEST"
 ```
 
 The loop manifest is execution authority, not a second requirements system. It
-must select at most three issues, freeze file-level chunks, name the four
-independent reviewers, and cap each chunk at three review/improve rounds. A
-failed third round stops the chunk. Provider actions are separately enabled;
-issue closure for code work requires a merged PR, and the schema keeps merge
-disabled unless the manifest enables it explicitly. Progress chunks must be
-marked explicitly and use non-closing issue references; complete chunks require
-a closing keyword. Keep run ledgers in ignored
+must select one to three issues, freeze file-level chunks, name the four
+independent reviewers, and set a per-chunk review/improve cap no greater than
+five. A failed final permitted round stops the chunk; a manifest may choose a
+smaller cap when a slice is intentionally narrow. Provider actions are
+separately enabled; issue closure for code work requires a merged PR, and the
+schema keeps merge disabled unless the manifest enables it explicitly. Progress
+chunks must be marked explicitly and use non-closing issue references; complete
+chunks require a closing keyword. Keep run ledgers in ignored
 `.loop-runs/`, never in the OpenSpec plan.
 
 This section previously read "Build the stable root while developing:
@@ -243,19 +247,18 @@ per run, and the script reproduces none of it. Expect to learn about those
 failures from CI. A green `scripts/gates.sh` is not a green CI.
 
 The script has what no workflow does. Verified against `ci.yml`,
-`cache-warm.yml`, `docs.yml` and `trust-guard.yml` on 2026-09-16:
+`cache-warm.yml` and `docs.yml`:
 
 | Gate | Why it is not in CI |
 | --- | --- |
 | `workflows` | a workflow too invalid to parse is too invalid to run the job that would check it |
-| `trust-guard` | a pull request cannot be trusted to run the check that decides whether it is trusted |
 | `local-build` | tests a `PreToolUse` hook, which exists only on a developer's machine |
 | `mathlib-style` | **only partly.** Its `--self-test` fixtures and, since #1371, its `--check-baseline` ratchet both run in `ci.yml`; what stays local is the `--diff-only` pass over the branch diff, which is a pre-push linter by design |
 | `emit-build` | runs in `cache-warm.yml` instead; linking is expensive cold and cannot happen on Windows at all |
 | `single-instantiation` | **omission, not design.** Fixed by PR #1355 |
 
-The first five are local by construction and `scripts/precheck.sh` runs four of
-them. `single-instantiation` was local by accident, and the cost of the wrong
+The first four are local by construction and `scripts/precheck.sh` runs three
+of them. `single-instantiation` was local by accident, and the cost of the wrong
 sentence above is on the record: once the hook made `scripts/gates.sh`
 unrunnable, that gate ran nowhere for anyone, and `bb8a1278` records 24 generic
 abstractions that drifted to at most one inhabitant with nothing going red.

@@ -1,6 +1,6 @@
 ---
 name: run-loop
-description: Execute one enabled OpenSpec-backed two-to-three-issue formalization batch with a digest-bound ledger, four independent reviewers, guarded provider actions, and a configured five-round cap per frozen chunk.
+description: Execute one enabled OpenSpec-backed one-to-three-issue formalization batch with a digest-bound ledger, four independent reviewers, guarded provider actions, and a configured review-round cap of at most five per frozen chunk.
 ---
 
 # Bounded OpenSpec loop
@@ -20,7 +20,7 @@ generated `.agents/skills/` files.
 ## Invariants
 
 - Work in a clean dedicated worktree based on the manifest's exact `base_ref`.
-- Execute only the two or three issues and frozen chunks listed in the
+- Execute only the one to three issues and frozen chunks listed in the
   manifest. Never select a replacement issue because a listed issue is hard.
 - Run the mathematical, repository-boundary, abstraction, and mathlib reviewers
   independently on the same commit. The style reviewer cannot substitute for
@@ -35,9 +35,16 @@ generated `.agents/skills/` files.
 - Altitude and generalization findings are expected output, not churn. A
   reviewer that reports none on a chunk has probably not looked.
 - A review/improve round is keyed by the commit and frozen chunk. A changed
-  commit starts the next round; this run permits at most five rounds. After
-  the fifth `needs_changes` adjudication, record `blocked` and stop that
-  chunk.
+  commit starts the next round; this run permits at most the manifest's
+  `max_review_rounds_per_chunk` (never more than five). After the final
+  `needs_changes` adjudication, record `blocked` and stop that chunk.
+- A successor using `predecessor_prs` may start only after every named source
+  PR has the exact controller attestation, reviewed head, and merge commit
+  pinned in the manifest; its merge must be an ancestor of both `base_ref` and
+  the current HEAD. The controller repeats that check at ledger initialization
+  and every successor PR action. A source manifest with
+  `predecessor_attestation.emit: true` must run `action attest-pr` after its
+  passing ledger and before its controller merge.
 - Do not silently re-chunk, widen the file list, or rewrite the OpenSpec plan
   after review evidence exists. A material plan change requires a new manifest
   or a new frozen chunk and fresh review.
@@ -66,7 +73,8 @@ generated `.agents/skills/` files.
    validation mode is `cli-required`, the base is not exact, the worktree is
    dirty, the authenticated actor differs, branch protection is missing a
    required check, an issue is closed/blocked/ineligible, a dependency is open,
-   a branch/PR already exists, or a repository gate fails.
+   a predecessor attestation is missing or stale, a branch/PR already exists,
+   or a repository gate fails.
 
 3. Read `docs/architecture/generalization-backlog.md` before choosing an
    implementation approach. A recorded lift may already say where this work
@@ -120,7 +128,9 @@ For each issue in manifest order:
    ```
 
    For a selected dependency, initialization refuses to proceed unless every
-   predecessor chunk has a passing, digest-matching ledger.
+   predecessor chunk has a passing, digest-matching ledger. For a
+   `predecessor_prs` entry it additionally rechecks the live provider
+   attestation and both ancestry bindings.
 
 2. Create or enter the issue's dedicated `agent/<slug>` branch. Implement only
    the unchecked OpenSpec tasks for the frozen chunk. Keep the issue's
@@ -160,11 +170,12 @@ python scripts/loop_engine.py ledger adjudicate --state <ledger> \
   --verdict pass|pass_with_lift|needs_changes|blocked --note "<decision>"
 ```
 
-If the result is `needs_changes` and fewer than five rounds have been used,
-fix only the recorded findings, rerun the targeted checks, commit, and repeat
-Phase 2. If the result is `blocked` or the fifth round still needs changes,
-stop the chunk and report the exact ledger state. Do not ask the same reviewers
-to rediscover the same issue on an unchanged commit.
+If the result is `needs_changes` and fewer than the manifest's configured cap
+have been used, fix only the recorded findings, rerun the targeted checks,
+commit, and repeat Phase 2. If the result is `blocked` or the final permitted
+round still needs changes, stop the chunk and report the exact ledger state.
+Do not ask the same reviewers to rediscover the same issue on an unchanged
+commit.
 
 Generalization findings are handled by where the fix lands, not by rationing
 them:
@@ -203,12 +214,16 @@ When the ledger passes:
 3. Approve only through the controller. It rechecks the passing ledger, plan
    digests, PR head, frozen files, and required checks. Provider refusal of
    self-approval is a hard stop, not a reason to bypass branch protection.
-4. Merge only if `mutations.merge_pr` is explicitly true and a passing ledger
+4. If `predecessor_attestation.emit` is true, create the source PR's durable
+   controller evidence with `python scripts/loop_engine.py action attest-pr`
+   after its ledger passes and before merging. It is bound to the current PR
+   head; do not hand-write or reuse it for another PR.
+5. Merge only if `mutations.merge_pr` is explicitly true and a passing ledger
    is supplied. The merge action also requires the requested method, auto,
    administrator, and branch-deletion behavior to be allowed by the manifest;
    administrator merge is never inferred from a failed check. Otherwise stop
    at the approved PR.
-5. Close the issue only after the controller confirms that the merged PR closes
+6. Close the issue only after the controller confirms that the merged PR closes
    that same issue. Then re-run preflight before considering the next selected
    issue.
 

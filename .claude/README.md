@@ -34,13 +34,21 @@ reviewer panel, frozen chunks, and individually enabled GitHub actions.
 
 `scripts/loop_engine.py` is the safety boundary between the two. It performs a
 read-only preflight, keeps a digest-bound review ledger under ignored
-`.loop-runs/`, and refuses a sixth review/improve round for one chunk. The
+`.loop-runs/`, and refuses a review/improve round beyond the manifest's cap
+(which may not exceed five) for one chunk. The
 mathematical, repository-boundary, abstraction, and mathlib reviewers are
 independent; a passing style review is not mathematical evidence. Code issues
 are closed only after a confirmed merged pull request. The owner-enabled pilot
 has a checked-in merge policy that makes method, auto-merge, administrator
 merge, and branch deletion explicit; the controller still requires its live
 preflight and digest-bound review ledger before any mutation.
+
+When a later run must depend on a progress PR for the same issue, it pins a
+controller-generated predecessor attestation, the reviewed head, and the merge
+commit. The controller checks that the PR targets the protected base and that
+its merge remains in both the base and current-branch history before every
+successor action; an untracked local ledger or a prose handoff cannot unlock a
+new review budget.
 
 `scripts/loop_tokens.py` is the cost side of the same run. It reconstructs
 token totals from the Claude Code and Codex transcripts after the fact, so

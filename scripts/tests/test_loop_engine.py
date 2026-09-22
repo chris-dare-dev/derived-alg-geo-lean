@@ -131,6 +131,58 @@ def make_spec(root: Path) -> tuple[Path, dict]:
     return spec_path, spec
 
 
+def predecessor_binding(number: int = 41) -> dict:
+    return {
+        "number": number,
+        "manifest_id": "generic-restriction",
+        "chunk_id": "generic-restriction-chunk",
+        "spec_digest": "b" * 64,
+        "openspec_digest": "c" * 64,
+        "max_review_rounds": 3,
+        "issue_number": 928,
+        "source_branch": "agent/dt1-exact-bifunctor-restriction",
+        "closure": "progress",
+        "reviewed_head": "a" * 40,
+        "merge_commit": "d" * 40,
+    }
+
+
+def predecessor_pr(binding: dict, comments: list[dict] | None = None) -> dict:
+    return {
+        "state": "MERGED",
+        "mergedAt": "2026-09-22T00:00:00Z",
+        "baseRefName": "main",
+        "headRefName": binding["source_branch"],
+        "headRefOid": binding["reviewed_head"],
+        "body": f"Refs #{binding['issue_number']}\n",
+        "mergeCommit": {"oid": binding["merge_commit"]},
+        "comments": comments or [],
+    }
+
+
+def passing_ledger_state(root: Path, spec: dict, closure: str = "complete") -> dict:
+    issue = spec["issues"][0]
+    return {
+        "spec_id": spec["id"],
+        "spec_digest": loop_engine.digest(spec),
+        "openspec_digest": loop_engine.openspec_digest(root, spec),
+        "issue": {"number": issue["number"], "slug": issue["slug"]},
+        "chunk": {
+            "id": issue["chunks"][0]["id"],
+            "files": issue["chunks"][0]["files"],
+            "closure": closure,
+        },
+        "max_review_rounds": spec["limits"]["max_review_rounds_per_chunk"],
+        "status": "passed",
+        "rounds": [
+            {
+                "commit": "a" * 40,
+                "adjudication": {"verdict": "pass"},
+            }
+        ],
+    }
+
+
 class LoopEngineTests(unittest.TestCase):
     def test_remote_and_blocker_normalization_match_github_shapes(self) -> None:
         self.assertEqual(
@@ -253,6 +305,291 @@ class LoopEngineTests(unittest.TestCase):
             self.assertFalse(loop_engine.reviewed_commit_matches_head(Path("."), "a" * 7, head))
         self.assertFalse(loop_engine.reviewed_commit_matches_head(Path("."), "b" * 7, head))
         self.assertFalse(loop_engine.reviewed_commit_matches_head(Path("."), "a" * 7, "a" * 39))
+
+    def test_predecessor_manifest_requires_complete_distinct_bindings(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            binding = predecessor_binding()
+            spec["predecessor_prs"] = [binding, dict(binding)]
+            spec_path.write_text(json.dumps(spec), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError) as caught:
+                loop_engine.load_spec(spec_path, root)
+            self.assertIn("must not repeat", str(caught.exception))
+
+            spec["predecessor_prs"] = [binding]
+            spec["predecessor_prs"][0]["reviewed_head"] = "a" * 7
+            spec_path.write_text(json.dumps(spec), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError) as caught:
+                loop_engine.load_spec(spec_path, root)
+            self.assertIn("reviewed_head", str(caught.exception))
+
+            spec["predecessor_prs"][0] = predecessor_binding()
+            spec["predecessor_attestation"] = {"emit": True}
+            spec["mutations"]["comment_issue"] = False
+            spec_path.write_text(json.dumps(spec), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError) as caught:
+                loop_engine.load_spec(spec_path, root)
+            self.assertIn("comment_issue", str(caught.exception))
+
+    def test_attested_squash_predecessor_requires_exact_metadata_and_both_ancestors(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            binding = predecessor_binding()
+            spec["predecessor_prs"] = [binding]
+            expected = loop_engine.predecessor_attestation_from_binding(binding)
+            comment = {
+                "author": {"login": spec["actor"]},
+                "body": loop_engine.predecessor_attestation_body(expected),
+            }
+            pr = predecessor_pr(binding, [comment])
+
+            def git_heads(_root: Path, *args: str, **_kwargs: object) -> str:
+                if args == ("rev-parse", "--verify", spec["base_ref"]):
+                    return "e" * 40
+                if args == ("rev-parse", "HEAD"):
+                    return "f" * 40
+                raise AssertionError(args)
+
+            with mock.patch.object(loop_engine, "git", side_effect=git_heads), mock.patch.object(
+                loop_engine, "gh_json", return_value=pr
+            ), mock.patch.object(
+                loop_engine,
+                "run_command",
+                return_value=subprocess.CompletedProcess(["git"], 0, "", ""),
+            ):
+                proofs = loop_engine.require_predecessor_prs(root, spec)
+            self.assertEqual(proofs[0]["reviewed_head"], binding["reviewed_head"])
+            self.assertEqual(proofs[0]["merge_commit"], binding["merge_commit"])
+            self.assertNotEqual(binding["reviewed_head"], binding["merge_commit"])
+
+            cases = [
+                ("wrong base", {"baseRefName": "release"}, "targets"),
+                ("wrong branch", {"headRefName": "agent/other"}, "source_branch"),
+                ("closing body", {"body": "Closes #928\n"}, "pinned closure"),
+                ("wrong head", {"headRefOid": "9" * 40}, "reviewed_head"),
+                ("wrong merge", {"mergeCommit": {"oid": "8" * 40}}, "merge_commit"),
+                ("missing marker", {"comments": []}, "attestation"),
+                ("unmerged", {"state": "OPEN", "mergedAt": None}, "not merged"),
+            ]
+            for label, change, message in cases:
+                with self.subTest(label=label):
+                    candidate = dict(pr)
+                    candidate.update(change)
+                    with mock.patch.object(loop_engine, "git", side_effect=git_heads), mock.patch.object(
+                        loop_engine, "gh_json", return_value=candidate
+                    ), mock.patch.object(
+                        loop_engine,
+                        "run_command",
+                        return_value=subprocess.CompletedProcess(["git"], 0, "", ""),
+                    ), self.assertRaises(loop_engine.LoopError) as caught:
+                        loop_engine.require_predecessor_prs(root, spec)
+                    self.assertIn(message, str(caught.exception))
+
+            with mock.patch.object(loop_engine, "git", side_effect=git_heads), mock.patch.object(
+                loop_engine, "gh_json", return_value=pr
+            ), mock.patch.object(
+                loop_engine,
+                "run_command",
+                side_effect=[
+                    subprocess.CompletedProcess(["git"], 0, "", ""),
+                    subprocess.CompletedProcess(["git"], 1, "", ""),
+                ],
+            ), self.assertRaises(loop_engine.LoopError) as caught:
+                loop_engine.require_predecessor_prs(root, spec)
+            self.assertIn("current HEAD", str(caught.exception))
+
+    def test_preflight_and_ledger_init_recheck_predecessor_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, spec = make_spec(root)
+            spec["enabled"] = True
+            spec["predecessor_prs"] = [predecessor_binding()]
+            spec_path.write_text(json.dumps(spec), encoding="utf-8")
+
+            def git_for_preflight(_root: Path, *args: str, **_kwargs: object) -> str:
+                values = {
+                    ("status", "--porcelain", "--untracked-files=all"): "",
+                    ("branch", "--show-current"): "agent/test-issue",
+                    ("rev-parse", "HEAD"): "a" * 40,
+                    ("rev-parse", "--verify", spec["base_ref"]): "a" * 40,
+                    ("remote", "get-url", spec["remote"]): "https://github.com/example/repository.git",
+                }
+                return values[args]
+
+            with mock.patch.object(loop_engine, "git", side_effect=git_for_preflight), mock.patch.object(
+                loop_engine, "gh_authenticated", return_value=spec["actor"]
+            ), mock.patch.object(loop_engine, "existing_prs", return_value=[]), mock.patch.object(
+                loop_engine, "gh_json", return_value={"contexts": ["ci"]}
+            ), mock.patch.object(
+                loop_engine, "issue_state", return_value={"state": "OPEN", "labels": [], "blockedBy": []}
+            ), mock.patch.object(
+                loop_engine,
+                "require_predecessor_prs",
+                side_effect=loop_engine.LoopError("missing predecessor attestation"),
+            ), contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertNotEqual(loop_engine.preflight(root, spec_path), 0)
+            self.assertIn("missing predecessor attestation", output.getvalue())
+
+            with mock.patch.object(
+                loop_engine,
+                "require_predecessor_prs",
+                side_effect=loop_engine.LoopError("missing predecessor attestation"),
+            ), contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertNotEqual(loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None), 0)
+            self.assertIn("missing predecessor attestation", output.getvalue())
+
+    def test_actions_recheck_predecessors_and_source_attestation_requires_a_passing_ledger(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            spec["enabled"] = True
+            for mutation in ("create_pr", "approve_pr", "merge_pr"):
+                spec["mutations"][mutation] = True
+            failure = loop_engine.LoopError("predecessor branch was rebased away")
+            calls = [
+                lambda: loop_engine.action_create_pr(
+                    root, spec, 1, root / "missing-ledger", "title", "missing-body", False, True
+                ),
+                lambda: loop_engine.action_approve(
+                    root, spec, 12, root / "missing-ledger", "body", True
+                ),
+                lambda: loop_engine.action_merge(
+                    root, spec, 12, root / "missing-ledger", None, False, False, None, True
+                ),
+            ]
+            for action in calls:
+                with mock.patch.object(loop_engine, "require_predecessor_prs", side_effect=failure) as check:
+                    with self.assertRaises(loop_engine.LoopError) as caught:
+                        action()
+                    self.assertIn("rebased", str(caught.exception))
+                    check.assert_called_once_with(root, spec)
+
+            blocked = {"status": "blocked"}
+            with self.assertRaises(loop_engine.LoopError) as caught:
+                loop_engine.predecessor_attestation_from_state(blocked, "a" * 40)
+            self.assertIn("passing", str(caught.exception))
+
+    def test_source_attestation_binds_the_frozen_issue_branch_and_progress_body(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            spec["enabled"] = True
+            spec["mutations"]["comment_issue"] = True
+            spec["mutations"]["merge_pr"] = True
+            spec["predecessor_attestation"] = {"emit": True}
+            state = passing_ledger_state(root, spec, "progress")
+            state["rounds"][0]["adjudication"]["verdict"] = "pass_with_lift"
+            pr = {
+                "state": "OPEN",
+                "isDraft": False,
+                "baseRefName": "main",
+                "headRefName": "agent/test-issue",
+                "headRefOid": "a" * 40,
+                "body": "Refs #1\n",
+                "files": [{"path": "scripts/loop_engine.py"}],
+                "comments": [],
+            }
+            with mock.patch.object(loop_engine, "load_state", return_value=state), mock.patch.object(
+                loop_engine, "gh_json", return_value=pr
+            ), mock.patch.object(
+                loop_engine, "reviewed_commit_matches_head", return_value=True
+            ), mock.patch.object(loop_engine, "run_command") as command:
+                self.assertEqual(
+                    loop_engine.action_attest_pr(root, spec, 1, 51, root / "ledger.json", False), 0
+                )
+            written = command.call_args.args[1]
+            self.assertEqual(written[:4], ["gh", "pr", "comment", "51"])
+            marker = loop_engine.parse_predecessor_attestation(written[-1])
+            self.assertIsNotNone(marker)
+            self.assertEqual(marker["issue_number"], 1)
+            self.assertEqual(marker["source_branch"], "agent/test-issue")
+            self.assertEqual(marker["closure"], "progress")
+
+            blocked_state = dict(state)
+            blocked_state["status"] = "blocked"
+            with mock.patch.object(loop_engine, "load_state", return_value=blocked_state), self.assertRaises(
+                loop_engine.LoopError
+            ) as caught:
+                loop_engine.action_attest_pr(root, spec, 1, 51, root / "ledger.json", True)
+            self.assertIn("passing review ledger", str(caught.exception))
+
+            pr["comments"] = [{"author": {"login": spec["actor"]}, "body": written[-1]}]
+            with mock.patch.object(loop_engine, "load_state", return_value=state), mock.patch.object(
+                loop_engine, "gh_json", return_value=pr
+            ), mock.patch.object(
+                loop_engine, "reviewed_commit_matches_head", return_value=True
+            ), mock.patch.object(loop_engine, "check_required_checks"), mock.patch.object(
+                loop_engine, "run_command"
+            ):
+                self.assertEqual(
+                    loop_engine.action_merge(
+                        root, spec, 51, root / "ledger.json", None, False, False, None, True
+                    ),
+                    0,
+                )
+
+            for label, change, message in (
+                ("wrong branch", {"headRefName": "agent/other"}, "frozen issue branch"),
+                ("closing body", {"body": "Closes #1\n"}, "frozen 'progress' closure"),
+            ):
+                with self.subTest(label=label):
+                    candidate = dict(pr)
+                    candidate.update(change)
+                    with mock.patch.object(loop_engine, "load_state", return_value=state), mock.patch.object(
+                        loop_engine, "gh_json", return_value=candidate
+                    ), mock.patch.object(
+                        loop_engine, "reviewed_commit_matches_head", return_value=True
+                    ), self.assertRaises(loop_engine.LoopError) as caught:
+                        loop_engine.action_attest_pr(
+                            root, spec, 1, 51, root / "ledger.json", True
+                        )
+                    self.assertIn(message, str(caught.exception))
+
+            missing_marker = dict(pr)
+            missing_marker["comments"] = []
+            with mock.patch.object(loop_engine, "load_state", return_value=state), mock.patch.object(
+                loop_engine, "gh_json", return_value=missing_marker
+            ), mock.patch.object(
+                loop_engine, "reviewed_commit_matches_head", return_value=True
+            ), mock.patch.object(loop_engine, "check_required_checks"), self.assertRaises(
+                loop_engine.LoopError
+            ) as caught:
+                loop_engine.action_merge(
+                    root, spec, 51, root / "ledger.json", None, False, False, None, True
+                )
+            self.assertIn("attestation", str(caught.exception))
+
+    def test_remote_pr_head_is_rechecked_against_predecessor_merges(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            spec["enabled"] = True
+            spec["mutations"]["approve_pr"] = True
+            state = passing_ledger_state(root, spec)
+            proof = {
+                "number": 41,
+                "merge_commit": "d" * 40,
+            }
+            pr = {
+                "state": "OPEN",
+                "isDraft": False,
+                "baseRefName": "main",
+                "headRefName": "agent/test-issue",
+                "headRefOid": "f" * 40,
+                "body": "Closes #1\n",
+                "files": [{"path": "scripts/loop_engine.py"}],
+            }
+            with mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[proof]), mock.patch.object(
+                loop_engine, "load_state", return_value=state
+            ), mock.patch.object(loop_engine, "gh_json", return_value=pr), mock.patch.object(
+                loop_engine,
+                "run_command",
+                return_value=subprocess.CompletedProcess(["git"], 1, "", ""),
+            ), self.assertRaises(loop_engine.LoopError) as caught:
+                loop_engine.action_approve(root, spec, 52, root / "ledger.json", "body", True)
+            self.assertIn("PR head", str(caught.exception))
 
     def test_progress_dependency_cannot_unlock_downstream_chunk(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

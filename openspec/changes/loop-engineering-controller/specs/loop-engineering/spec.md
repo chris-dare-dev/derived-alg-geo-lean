@@ -53,6 +53,51 @@ frozen chunk.
   the current round is adjudicated
 - **THEN** the controller refuses the submission and preserves the open round
 
+### Requirement: A successor run is bound to an attested merged predecessor
+
+An optional successor manifest predecessor entry SHALL name a pull request,
+the source manifest id, chunk id, issue, dedicated branch, and closure mode,
+the source manifest and OpenSpec digests, its review-round cap, the reviewed
+PR head, and the resulting merge commit.
+Before preflight succeeds, before a ledger is initialized, and before the
+controller creates, approves, or merges a successor PR, the controller SHALL
+require that the named PR is merged into the manifest's base branch, that its
+live head and merge commit exactly match the pinned values, that its merge
+commit is an ancestor of both the resolved protected base and current HEAD,
+and that an actor-authored controller attestation matches every pinned source
+run field.
+
+A source manifest MAY opt into emitting such an attestation. When it does, the
+controller SHALL derive the attestation only from a passing adjudicated ledger
+whose reviewed commit matches the live PR head and whose live branch/body still
+match the frozen issue/closure, and SHALL refuse to merge that source PR unless
+the exact attestation is present. The attestation is durable provider evidence,
+not a substitute for branch protection or human review.
+
+#### Scenario: A valid squash-merged predecessor unlocks a successor
+
+- **WHEN** a source progress PR has a passing controller ledger, an exact
+  controller attestation, a reviewed head distinct from its squash merge
+  commit, and that merge commit is an ancestor of the successor's protected
+  base and current HEAD
+- **THEN** the successor may pass its predecessor check without treating the
+  open issue as closed
+
+#### Scenario: A missing or mismatched predecessor is refused
+
+- **WHEN** the named PR is unmerged, targets another base branch, lacks the
+  exact controller attestation, has a different reviewed head or merge commit,
+  or its merge commit is absent from either required history
+- **THEN** preflight and ledger initialization fail closed before a successor
+  review round can begin
+
+#### Scenario: A later branch or PR mutation is rechecked
+
+- **WHEN** a successor branch is rebased away from its predecessor, or its PR
+  is retargeted, after its ledger was initialized
+- **THEN** the controller refuses create, approval, or merge rather than
+  relying on the earlier preflight result
+
 ### Requirement: Preflight fails closed before remote mutation
 
 The controller SHALL perform a read-only preflight that checks a clean checkout,
