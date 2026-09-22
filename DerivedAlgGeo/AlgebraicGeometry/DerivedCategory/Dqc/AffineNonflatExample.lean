@@ -22,6 +22,11 @@ K-projective-derived lane already constructed in
 `AffineGeometricCorePseudofunctor.lean`; it does not identify that lane with
 the full relative-perfect locus or prove the general-scheme preservation
 theorems still listed in #554.
+
+`AffineNonflatDerivedObject.lean` separately computes the degree-minus-one
+effect of this particular map on an explicit two-term free representative.
+That calculation remains in the same affine bounded-projective lane and does
+not enlarge this example into a scheme-level assertion.
 -/
 
 namespace AlgebraicGeometry.DerivedCategory.Dqc

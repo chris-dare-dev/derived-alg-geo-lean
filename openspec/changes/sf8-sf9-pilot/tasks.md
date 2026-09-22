@@ -7,7 +7,7 @@
 - [ ] 1.3 Prove supported pseudo-coherence, finite-Tor, and negative-Ext preservation; verify targeted Lean tests and the relevant audit scripts
 - [ ] 1.4 Add the five coherence laws, comparison/agreement result, and non-flat nonidentity example; verify targeted Lean checks and mathematical adversarial review
 - [x] 1.5 Add the explicit `ℤ → ZMod 2` non-flat/nonidentity affine witness as a progress chunk; verify the supported pullback instantiation, full Lean build, and non-closing PR policy
-- [ ] 1.6 Compute one explicit nonzero degree-minus-one homology witness for `ℤ → ZMod 2` from a two-term free resolution; connect it to the supported affine bounded-projective representative, preserve the non-generalization boundary, and use a non-closing PR policy
+- [x] 1.6 Compute one explicit nonzero degree-minus-one homology witness for `ℤ → ZMod 2` from a two-term free resolution; connect it to the supported affine bounded-projective representative, preserve the non-generalization boundary, and use a non-closing PR policy
 
 The enabled progress manifest contains only task 1.6. It must not schedule
 #522 or #525; those tasks remain blocked on #554's eventual complete closure.

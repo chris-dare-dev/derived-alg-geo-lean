@@ -100,7 +100,9 @@ generation, or `S`-linearity. -/
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedInclusion_preservesCoproductsOfShape
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.affineQuasicoherentDerivedToDqc_preservesCoproductsOfShape
 
-/-! ## The supported non-flat affine pullback witness (SF8.5 item 9, #1404)
+/-! ## The supported non-flat affine pullback witness and one derived effect
+
+(SF8.5 item 9, #1404; explicit representative calculation for #554)
 
 `ZMod 2` over `ℤ` is the standard closed immersion that is not flat: flatness
 would make `ZMod 2` torsion-free as a `ℤ`-module, and `2 • 1 = 0` with both
@@ -112,7 +114,14 @@ with no flatness hypothesis available to it, so the witness is what stops
 It is an EXAMPLE and the records below claim nothing more. It does not identify
 the supported affine K-projective-derived lane with the relative-perfect locus,
 and it does not prove the general-scheme preservation theorems, which remain
-open in #554. -/
+open in #554.
+
+The second group records one affine calculation on one two-term free
+representative. It proves nonzero degree-minus-one homology after scalar
+extension and identifies that complex with the existing supported
+K-projective pullback of that representative. It does not create a general
+scheme-level derived-pullback theorem or assert a comparison with an
+unformalized classical invariant. -/
 
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRing
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRingMap
@@ -121,6 +130,20 @@ open in #554. -/
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoSchemeMap_not_flat
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRingMap_not_iso
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoAffinePullback
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.twoTermResolution
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.twoTermAugmentation
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.twoTermAugmentation_quasiIso
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.twoTermResolution_isStrictlyLE_zero
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.twoTermResolution_projective_X
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.kProjectiveRepresentative
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.boundedAboveProjectiveRepresentative
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.supportedAffineBoundedAboveProjectiveRepresentative
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.baseChangedResolution
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.affineKProjectivePullbackObject
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.affineKProjectivePullbackObjectIso
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.baseChangedResolution_homology_negOne_not_isZero
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.affineKProjectivePullbackObject_homology_negOne_not_isZero
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.ZModTwoNonflatDerived.supportedAffineBoundedAboveProjectiveRepresentative_homology_negOne_not_isZero
 
 /-! ## Relative-perfect and universally-gluable scheme objects (#521)
 
