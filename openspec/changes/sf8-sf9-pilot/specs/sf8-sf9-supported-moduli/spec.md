@@ -37,8 +37,7 @@ from an unproved marker typeclass introduced by the chunk.
 
 #### Scenario: Progress execution is isolated from downstream issues
 
-- **WHEN** the outstanding non-flat derived-effect chunk is selected while
-  #554 remains open
+- **WHEN** a non-flat affine progress chunk is selected while #554 remains open
 - **THEN** it runs in an independent one-issue manifest with a distinct branch
   slug and no selected #522 or #525 issue; those downstream obligations remain
   unavailable until a complete #554 closure is accepted
@@ -52,6 +51,21 @@ from an unproved marker typeclass introduced by the chunk.
   explicitly restricted to that affine lane and makes no general
   scheme-level or relative-perfect preservation claim. A Tor interpretation
   SHALL NOT be formalized unless a proved comparison to a Tor API is added.
+
+#### Scenario: The concrete affine effect is compared with Mathlib Tor
+
+- **WHEN** the degree-minus-one effect of the displayed `ℤ → ZMod 2` affine
+  example is identified with Mathlib's left-derived fixed-left tensor API
+- **THEN** Lean proves an isomorphism from the restriction of scalars of
+  `baseChangedResolution.homology (-1)` to
+  `((CategoryTheory.Tor (ModuleCat ℤ) 1).obj X).obj Y`, where
+  `X := (ModuleCat.restrictScalars (Int.castRingHom (ZMod 2))).obj
+  (ModuleCat.of (ZMod 2) (ZMod 2))` is the fixed-left module and
+  `Y := ModuleCat.of ℤ (ZMod 2)` is the derived-second module. The comparison
+  uses a proved projective-resolution map and the `1 ↔ -1` chain/cochain
+  indexing correspondence. This concrete comparison SHALL NOT assert a
+  general change-of-rings, scheme-level left-derived pullback, K-flat
+  existence, or relative-perfect preservation theorem.
 
 #### Scenario: Preservation obligation is tested
 

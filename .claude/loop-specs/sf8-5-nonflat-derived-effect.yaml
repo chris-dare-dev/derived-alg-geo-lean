@@ -6,7 +6,7 @@ remote: origin
 base_branch: main
 base_ref: origin/main
 mode: independent
-enabled: true
+enabled: false
 allow_force_push: false
 state_dir: .loop-runs
 roadmap_gate: required
