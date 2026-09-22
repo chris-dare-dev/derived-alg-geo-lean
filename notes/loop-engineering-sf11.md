@@ -226,7 +226,7 @@ replacement for a Lean theorem or an issue acceptance criterion.
 - While the first v4 candidate was being checked, `main` advanced from
   `858ca700` to `49c33eda` to delete the remaining trust-surface residue in an
   unrelated manifest. The candidate was discarded rather than reviewed
-  against stale main; this current-main plan ref is `d0395054`.
+  against stale main; this current-main plan ref is `2424d3eb`.
 - No reviewer or controller is allowed to infer that “trust surface removed”
   means that audit evidence may be relaxed. The v4 acceptance still requires
   actual AlgebraicGeometry audit records, unchanged missing-declaration
