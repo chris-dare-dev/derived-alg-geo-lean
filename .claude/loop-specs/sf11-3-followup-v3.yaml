@@ -70,7 +70,7 @@ issues:
         requirements:
           - Theorem 5.3 owner boundaries are source-shaped and do not duplicate canonical t-structure carriers
           - The AlgebraicGeometry audit records actual declarations without changing the missing-declaration baseline
-          - The single-instantiation audit baseline names only live declarations or explicitly records a reviewed migration reason
+          - Generic single-instantiation baseline tracks live declarations
         files:
           - .claude
           - DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated/IndFilteredColimits.lean
