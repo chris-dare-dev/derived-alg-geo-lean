@@ -1,5 +1,5 @@
 schema: derived-alg-geo-lean.loop-run/v1
-id: issue-1394-audit-record-cleanup-current-source
+id: issue-1394-audit-record-cleanup-publication
 repository: chris-dare-dev/derived-alg-geo-lean
 actor: chris-dare-dev
 remote: origin
@@ -8,7 +8,7 @@ base_ref: agent/issue-1394-plan
 mode: independent
 enabled: true
 allow_force_push: false
-state_dir: .loop-runs/issue-1394-audit-record-cleanup-current-source
+state_dir: .loop-runs/issue-1394-audit-record-cleanup-publication
 roadmap_gate: disabled
 
 openspec:
@@ -53,11 +53,11 @@ closure:
 
 mutations:
   comment_issue: false
-  close_issue: false
-  push_branch: false
-  create_pr: false
+  close_issue: true
+  push_branch: true
+  create_pr: true
   approve_pr: false
-  merge_pr: false
+  merge_pr: true
 
 issues:
   - number: 1394
