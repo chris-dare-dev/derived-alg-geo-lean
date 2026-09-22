@@ -34,7 +34,8 @@ reviewer panel, frozen chunks, and individually enabled GitHub actions.
 
 `scripts/loop_engine.py` is the safety boundary between the two. It performs a
 read-only preflight, keeps a digest-bound review ledger under ignored
-`.loop-runs/`, and refuses a sixth review/improve round for one chunk. The
+`.loop-runs/`, and refuses a review/improve round beyond the manifest's cap
+(which may not exceed five) for one chunk. The
 mathematical, repository-boundary, abstraction, and mathlib reviewers are
 independent; a passing style review is not mathematical evidence. Code issues
 are closed only after a confirmed merged pull request. The owner-enabled pilot
