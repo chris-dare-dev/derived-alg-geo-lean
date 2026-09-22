@@ -32,10 +32,18 @@ witness.
 
 ## Decisions
 
-1. **Fresh independent run.** Create `dt1-928-coherent-tensor` and a one-issue
-   independent manifest for #928. The old `dt1-m41` stack remains historical
-   evidence: #929 is closed, has no matching ledger, and cannot legally be
-   replayed as an open predecessor.
+1. **Fresh sequential, attested controller runs.** This initial planning
+   bootstrap contains only the one-issue
+   `dt1-928-exact-bifunctor-restriction` progress manifest, disabled until the
+   predecessor-attestation controller support is on `origin/main`; older
+   controllers silently ignore that policy. A reviewed enablement update then
+   starts the source run, which emits a durable controller predecessor
+   attestation before its non-closing PR can merge. Only after that merge will
+   a separate reviewed planning bootstrap author
+   `dt1-928-coherent-tensor-assembly`, pinning the actual source PR's reviewed
+   head, merge commit, and attestation fields. The old `dt1-m41` stack is
+   disabled historical evidence: #929 is closed and it cannot legally be
+   replayed as an open predecessor or static #928 assembly path.
 2. **Generic restriction first.** Put the two-variable shift restriction beside
    `ObjectProperty.lift₂` in `CategoryTheory/ObjectProperty/Bifunctor.lean`.
    Put the wrapper that transfers the repository's `ExactBifunctor` beside that
@@ -47,22 +55,35 @@ witness.
    `D(Coh X)` monoidality, ambient exact-bifunctor data, and bounded-property
    monoidality. It installs the bounded monoidal structure locally and defines
    the coherent capability; it does not create an instance.
-4. **Projection agreement.** The assembly must compare the restricted generic
-   bifunctor with the curried tensor chosen by the named bounded monoidal
-   restriction. The resulting coherent capability reuses the existing
-   coherent-to-raw projection; it must not construct a competing raw root.
+4. **Full-coherence projection agreement.** For an explicit
+   `Z : SchemeBaseChange S`, the assembly may reuse the restricted generic
+   exactness only after proving that its bifunctor is exactly the
+   `curriedTensor` selected by `boundedMonoidalCategory Z.left`. The preferred
+   route is a focused definitional equality based on the precise
+   `ObjectProperty.prop_tensor` closure witness. If definitional equality is
+   unavailable, the replacement must be a named transport of the *complete*
+   `CommShift₂Int` package, including both naturality equations and the Koszul
+   law after the full-subcategory inclusion. A plain bifunctor isomorphism is
+   not an exactness transport. The resulting coherent capability reuses the
+   existing coherent-to-raw projection; it must not construct a competing raw
+   root.
 5. **Bounded review loop.** Two pre-freeze advisors record altitude and
    hypothesis findings. Four independent required reviewers inspect the same
    commit. A third unresolved `needs_changes` result marks that chunk blocked;
-   no fourth round is opened.
-6. **Same-issue handoff.** The controller records dependencies only between
-   issue numbers, not between chunks of one issue, and checks a PR against the
-   full `origin/main...HEAD` diff. The generic chunk is therefore a reviewed
-   `progress` ledger with no PR action. Before initializing the assembly
-   ledger, the operator explicitly verifies its passed state and records that
-   check in the observation register. The assembly ledger deliberately repeats
-   the generic paths so its one final, complete ledger can bind the single PR
-   that closes #928.
+   no fourth round is opened. The cap is enforced independently on each of the
+   two controller runs.
+6. **Enforced sequential handoff.** The first manifest freezes only the
+   generic files, creates a `Refs #928` progress PR, and merges it into
+   `origin/main` after its passing three-round ledger and exact controller
+   attestation. The later assembly manifest uses a distinct issue slug and
+   branch, freezes only the assembly files, and pins the source PR's identity,
+   closure, reviewed head, merge commit, attestation, source digests, and cap.
+   The controller validates that evidence at preflight, ledger initialization,
+   PR creation, approval, and merge, including current ancestry. The assembly
+   manifest cannot be authored honestly until those source facts exist. This
+   avoids pretending that the controller has a same-issue chunk-dependency
+   feature it does not implement, or that a new assembly run can reset the
+   generic file budget.
 
 ## Risks / Trade-offs
 
@@ -74,17 +95,24 @@ witness.
 - **Cold caches make exploratory builds expensive** → seed the worktree only
   after a dry run and use one named target per source change.
 - **Tracker and controller drift can recur** → retain the original artifacts,
-  record verified observations before ledger initialization, and validate the
-  new manifest against live issue state.
+  record verified observations before ledger initialization, and validate each
+  manifest against live issue state. The bootstrap trust guard additionally
+  needs a human, exact-head review marker; a generic approval is insufficient.
 
 ## Migration Plan
 
-1. Validate the new OpenSpec change and independent loop manifest on a dedicated
-   `agent/dt1-coherent-tensor` branch from `origin/main`.
-2. Freeze and implement the generic bridge, verify it, and complete its bounded
-   adversarial `progress` ledger without opening a PR.
-3. Record and manually recheck that passing ledger, then freeze and implement
-   the Tensor assembly, update the Tensor umbrella and derived operations audit,
-   and run its separate bounded adversarial ledger.
+1. Land the disabling planning bootstrap and predecessor-attestation controller
+   support. Only after the latter is in `origin/main`, make a reviewed
+   enablement update to the generic manifest and validate it on a clean
+   `agent/dt1-exact-bifunctor-restriction` branch from `origin/main`.
+2. Freeze and implement the generic bridge, verify it, complete its bounded
+   adversarial ledger, and merge its non-closing progress PR through the
+   controller.
+3. After the generic merge, use its exact controller attestation and merge
+   facts to author and review a planning-only successor bootstrap containing
+   the distinct assembly manifest. Start from the resulting `origin/main`,
+   validate that manifest on `agent/dt1-coherent-tensor-assembly`, then freeze
+   and implement the Tensor assembly, update the Tensor umbrella and derived
+   operations audit, and run its separate bounded adversarial ledger.
 4. Use only controller actions for the final reviewed PR, CI, approval, merge,
-   and issue closure.
+   and #928 closure.

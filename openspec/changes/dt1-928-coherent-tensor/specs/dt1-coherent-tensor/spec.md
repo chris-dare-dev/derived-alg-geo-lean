@@ -57,3 +57,26 @@ the existing one-way projection to the raw bounded tensor capability.
 - **WHEN** bounded coherent objects are not explicitly known to be closed under
   the ambient tensor
 - **THEN** no coherent bounded tensor structure is inferred
+
+### Requirement: Independently capped attested handoff
+
+The generic restriction and bounded-coherent assembly SHALL run as separately
+frozen, three-round-bounded controller runs. The generic source run MUST use a
+non-closing progress PR and emit the controller predecessor attestation before
+it merges. A successor assembly manifest SHALL be authored only after that
+merge and SHALL pin the source PR's attestation fields, reviewed head, and
+merge commit; it MUST freeze no generic source path.
+
+#### Scenario: Generic progress precedes assembly
+
+- **WHEN** the generic source PR has merged with a valid controller
+  predecessor attestation
+- **THEN** a later assembly manifest may pin that exact source evidence and
+  begin its independent three-round-bounded controller run
+
+#### Scenario: Source evidence is missing or stale
+
+- **WHEN** the source PR, exact attestation, reviewed head, merge commit, or
+  current ancestry cannot be verified
+- **THEN** the assembly run does not initialize, create, approve, or merge a
+  PR

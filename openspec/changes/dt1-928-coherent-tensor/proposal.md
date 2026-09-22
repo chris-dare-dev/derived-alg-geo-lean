@@ -18,8 +18,12 @@ as sufficient coherence.
   coherence and exact bifunctors.
 - Add a conditional #928 constructor that packages separately supplied ambient
   `D(Coh X)` monoidal and exact-bifunctor data on the bounded coherent tier.
-- Run #928 as a fresh, independent, three-round-bounded loop from `origin/main`;
-  retain `dt1-m41` as historical planning evidence for #929.
+- Run #928 as two successive, independently frozen controller runs from
+  `origin/main`, each capped at three review/improve rounds: first a merged
+  non-closing generic progress PR with a durable controller attestation, then
+  a post-progress assembly manifest that pins its actual reviewed head and
+  merge commit before producing the bounded-coherent PR that closes the issue.
+  Retain `dt1-m41` as historical planning evidence for #929.
 - Record verified tracker, cache, controller, and source-contract drift in the
   continuation's observation register.
 
@@ -38,9 +42,10 @@ as sufficient coherence.
 ## Impact
 
 The generic bridge belongs with `ObjectProperty` and the existing exact-bifunctor
-API.  The scheme specialization belongs under
+API. The scheme specialization belongs under
 `DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/` and reuses the named
-bounded monoidal restriction.  It updates the Tensor umbrella, the appropriate
-derived-operations audit, and a new bounded-loop manifest; it does not edit
-module-sheaf tensor code, create a global coherence instance, or claim a
-comparison from `D(X.Modules)` to `D(Coh X)`.
+bounded monoidal restriction. It updates the Tensor umbrella, the appropriate
+derived-operations audit, and a first bounded-loop manifest plus a later
+attested assembly manifest; it does not edit module-sheaf tensor code, create
+a global coherence instance, or claim a comparison from `D(X.Modules)` to
+`D(Coh X)`.
