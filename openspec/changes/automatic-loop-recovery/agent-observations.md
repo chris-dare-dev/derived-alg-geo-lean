@@ -131,3 +131,13 @@ explicitly plain Markdown: unsupported raw HTML outside comments/fences rejects
 the entire evidence document, including unfamiliar and multi-line opening tags.
 Fenced HTML examples remain inert. This is a conservative accepted-input rule,
 not a claim to implement a complete Markdown/HTML renderer.
+
+## OBS-016 — fixture examples must include the actual canonical document
+
+Attempt 2's second panel tested the tightened parser against the real backlog,
+not just synthetic rows. Its existing inline-code `<PR>` legend was mistaken
+for raw HTML, making a valid append unusable. The parser now distinguishes
+balanced single-line code spans, and a regression appends a valid row to the
+actual canonical file. Mismatched/escaped backticks, generic containers, CDATA
+and processing instructions remain fail-closed. This preserves the existing
+owner instead of inventing a second sanitized backlog.

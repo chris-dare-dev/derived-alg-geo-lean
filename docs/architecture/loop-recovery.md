@@ -191,11 +191,15 @@ condition: a concurrent update can still create an incorrectly bound PR. The
 controller reports that PR's URL and fails closed for further publication;
 approval, merge and closure independently recheck the reviewed head.
 
-Recovery backlog rows use a plain-Markdown schema. Code fences and HTML comments
-are inert; any other raw HTML tag-like syntax outside fences makes the document
-ineligible as recovery evidence. This deliberately fails closed rather than
+Recovery backlog rows use a plain-Markdown schema. Code fences, HTML comments
+and balanced single-line inline code are inert for HTML detection (including
+the canonical legend's inline-code placeholders). Other raw HTML tag-like
+syntax, declarations and processing instructions make the document ineligible
+as recovery evidence. This deliberately fails closed rather than
 guessing whether a generic container, attribute or CSS rule hides a row.
-Use ordinary Markdown for the backlog and put HTML examples inside code fences.
+Use ordinary Markdown for the backlog; quote HTML examples in inline code or
+code fences rather than raw containers. Inline-code recognition is limited to
+matched, unescaped opening backtick runs on one line; ambiguous input fails closed.
 
 ## Provenance observations
 

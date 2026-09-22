@@ -1862,8 +1862,9 @@ def recovery_backlog_targets(text: str) -> set[str]:
     """Recognize complete column-zero backlog rows, not prose or examples.
 
     Optional single backticks quote field values. Fenced code and HTML comments
-    carry no dispositions. Other raw HTML is unsupported and fails closed for
-    the whole document; this is a plain-Markdown schema, not an HTML renderer.
+    carry no dispositions. Balanced single-line inline code is inert for HTML
+    detection (the canonical legend uses `<PR>` inside code). Other raw HTML is
+    unsupported and fails closed; this schema is not an HTML renderer.
     Independent review still judges each row's substance.
     """
     required = {"chunk", "reviewing commit", "found by", "proposed ancestor", "weaker hypotheses", "state"}
@@ -1898,7 +1899,8 @@ def recovery_backlog_targets(text: str) -> set[str]:
         if marker:
             fence = (marker[1][0], len(marker[1]))
             continue
-        if re.search(r"</?[A-Za-z][A-Za-z0-9:-]*(?=[\s/>]|$)", line):
+        html_source = re.sub(r"(?<![\\`])(`+)(?!`)(.*?)(?<!`)\1(?!`)", "", line)
+        if re.search(r"<(?:/?[A-Za-z][A-Za-z0-9:-]*(?=[\s/>]|$)|[!?])", html_source):
             return set()
         if re.match(r"^#{1,6}\s", line):
             finish()

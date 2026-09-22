@@ -377,6 +377,16 @@ class RecoveryTests(unittest.TestCase):
         self.assertIn("foundation/General.lean", loop_engine.recovery_backlog_targets(
             "```html\n<div hidden>example only</div>\n```\n\n" + row))
 
+    def test_canonical_backlog_inline_code_is_not_raw_html(self):
+        actual = (SCRIPT_DIR.parent / loop_engine.BACKLOG_PATH).read_text(encoding="utf-8")
+        self.assertIn("foundation/General.lean", loop_engine.recovery_backlog_targets(actual + "\n" + backlog_row()))
+        for example in ("`CONFIRMED <PR>`", "``FALSIFIED <counterexample>``", "`<div hidden>`"):
+            with self.subTest(example=example):
+                self.assertIn("foundation/General.lean", loop_engine.recovery_backlog_targets(example + "\n\n" + backlog_row()))
+        for unsupported in ("`<div hidden>``", "\\`<div hidden>\\`", "<![CDATA[", "<?xml", "<!DOCTYPE html>"):
+            with self.subTest(unsupported=unsupported):
+                self.assertEqual(loop_engine.recovery_backlog_targets(unsupported + "\n" + backlog_row()), set())
+
 
 class RecoveryCliTests(unittest.TestCase):
     def setUp(self):
