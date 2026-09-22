@@ -19,16 +19,15 @@ This module adds no carrier or closure operation. The owner presentation remains
 
 ## Main results
 
-* `extensionProductIter_le` embeds every finite extension product in the owner
-  closure.
-* `le_triangEnvelope` compares the owner closure with Mathlib's envelope under
-  nonempty-generator and triangulated-category assumptions.
-* `le_triangEnvelope_of_isTriangulatedClosed₂` needs only extension-closure
-  data for this particular envelope.
-* `eq_iSup_extensionProductIter` presents the owner closure as the supremum of
-  zero-augmented finite iterates.
-* `generationTime_singleton_le_of_mem_extensionProductIter` gives a
-  generation-time bound for each iterate.
+| Declaration | Statement |
+| --- | --- |
+| `CategoryTheory.Triangulated.ExtensionClosure.le_of_closed_of_isTriangulatedClosed₂` | Repackages the raw closure hypotheses as typeclasses. |
+| `CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le` | Embeds every finite extension product in the owner closure. |
+| `CategoryTheory.Triangulated.ExtensionClosure.le_triangEnvelope_of_isTriangulatedClosed₂` | Compares the owner closure with an envelope supplied with extension closure. |
+| `CategoryTheory.Triangulated.ExtensionClosure.le_triangEnvelope` | Compares the owner closure with Mathlib's envelope in a triangulated category. |
+| `CategoryTheory.Triangulated.ExtensionClosure.not_le_triangEnvelope_bot` | Records the empty-property counterexample. |
+| `CategoryTheory.Triangulated.ExtensionClosure.eq_iSup_extensionProductIter` | Presents the owner closure as the supremum of zero-augmented finite iterates. |
+| `CategoryTheory.Triangulated.ExtensionClosure.generationTime_singleton_le_of_mem_extensionProductIter` | Bounds singleton generation time by the iterate index. |
 
 ## Implementation notes
 
@@ -61,7 +60,8 @@ variable {C : Type u} [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
   {P Q : ObjectProperty C}
 
-/-- The class-vocabulary form of `ExtensionClosure.le_of_closed`.
+/-- The class-vocabulary form of
+`CategoryTheory.Triangulated.ExtensionClosure.le_of_closed`.
 
 These assumptions repackage the raw induction hypotheses: the typeclasses say
 that `Q` contains zero objects, is closed under isomorphisms, and is closed
