@@ -551,8 +551,9 @@ private theorem torRestriction_reflects_isZero {M : ModuleCat (ZMod 2)}
 
 /-- The concrete affine `Tor₁` value is nonzero. -/
 theorem torOne_not_isZero :
-    ¬ IsZero (((CategoryTheory.Tor (ModuleCat ℤ) 1).obj torFixedLeftModule).obj
-      torDerivedModule) := by
+    ¬ IsZero (((CategoryTheory.Tor (ModuleCat ℤ) 1).obj
+      ((ModuleCat.restrictScalars (Int.castRingHom (ZMod 2))).obj
+        (ModuleCat.of (ZMod 2) (ZMod 2)))).obj (ModuleCat.of ℤ (ZMod 2))) := by
   intro hTor
   apply baseChangedResolution_homology_negOne_not_isZero
   apply torRestriction_reflects_isZero
