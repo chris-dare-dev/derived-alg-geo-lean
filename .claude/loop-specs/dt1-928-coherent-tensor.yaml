@@ -1,0 +1,153 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: dt1-928-coherent-tensor
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: dt1-928-coherent-tensor
+  validation: cli-required
+  required_artifacts:
+    - .openspec.yaml
+    - proposal.md
+    - design.md
+    - tasks.md
+    - agent-observations.md
+    - specs/dt1-coherent-tensor/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+    - trust-surface
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: true
+  allow_delete_branch_override: true
+  allow_auto: true
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  # The generic foundation is reviewed as a progress chunk. The final assembly
+  # ledger owns the one closing PR for #928; see agent-observations.md.
+  allow_progress_pr: true
+
+mutations:
+  comment_issue: true
+  close_issue: true
+  push_branch: true
+  create_pr: true
+  approve_pr: true
+  merge_pr: true
+
+issues:
+  - number: 928
+    slug: dt1-coherent-tensor
+    depends_on: []
+    chunks:
+      - id: dt1-928-exact-bifunctor-restriction
+        scope: >-
+          Prove the generic closed-full-subcategory transfer of complete
+          two-variable shift coherence and ExactBifunctor data, retaining all
+          closure and triangulated hypotheses explicitly and without importing
+          geometry or installing an instance.
+        requirements:
+          - Full-subcategory two-variable exactness transfer
+        files:
+          - docs/architecture/generalization-backlog.md
+          - .claude/loop-specs/dt1-928-coherent-tensor.yaml
+          - openspec/changes/dt1-928-coherent-tensor/.openspec.yaml
+          - openspec/changes/dt1-928-coherent-tensor/proposal.md
+          - openspec/changes/dt1-928-coherent-tensor/design.md
+          - openspec/changes/dt1-928-coherent-tensor/tasks.md
+          - openspec/changes/dt1-928-coherent-tensor/agent-observations.md
+          - openspec/changes/dt1-928-coherent-tensor/specs/dt1-coherent-tensor/spec.md
+          - DerivedAlgGeo/CategoryTheory/ObjectProperty/Bifunctor.lean
+          - DerivedAlgGeo/CategoryTheory/Triangulated/ExactFunctorFamily.lean
+          - scripts/StabilityConditionAudit/TStructureCore.lean
+        acceptance:
+          - >-
+            The restricted bifunctor retains both-variable shift naturality,
+            the Koszul compatibility, and exactness in both variables; three
+            selected fixed-kernel facts are not substituted for that contract.
+          - >-
+            Every closure, full-subcategory, shift, and triangulated premise is
+            visible in the generic API, with no `sorry`, `admit`, hidden axiom,
+            geometry import, or global instance.
+          - >-
+            The generic audit and focused named Lean targets pass, and the four
+            required reviewers' verbatim findings are adjudicated in at most
+            three rounds on the frozen commit.
+        closure: progress
+
+      - id: dt1-928-coherent-tensor-assembly
+        scope: >-
+          After the generic ledger has passed, conditionally assemble the
+          bounded coherent tensor from separately supplied D(Coh X) monoidal
+          and exact-bifunctor data plus bounded tensor closure, using the named
+          bounded monoidal restriction and exposing named fixed-kernel
+          consequences without a module-sheaf comparison or global instance.
+        requirements:
+          - Conditional coherent bounded tensor assembly
+        # The controller checks a final PR against origin/main...HEAD. Repeat
+        # the already-reviewed generic paths so the closing ledger can bind the
+        # whole one-branch diff without widening during review.
+        files:
+          - docs/architecture/generalization-backlog.md
+          - .claude/loop-specs/dt1-928-coherent-tensor.yaml
+          - openspec/changes/dt1-928-coherent-tensor/.openspec.yaml
+          - openspec/changes/dt1-928-coherent-tensor/proposal.md
+          - openspec/changes/dt1-928-coherent-tensor/design.md
+          - openspec/changes/dt1-928-coherent-tensor/tasks.md
+          - openspec/changes/dt1-928-coherent-tensor/agent-observations.md
+          - openspec/changes/dt1-928-coherent-tensor/specs/dt1-coherent-tensor/spec.md
+          - DerivedAlgGeo/CategoryTheory/ObjectProperty/Bifunctor.lean
+          - DerivedAlgGeo/CategoryTheory/Triangulated/ExactFunctorFamily.lean
+          - scripts/StabilityConditionAudit/TStructureCore.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/CoherentAssembly.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/BoundedMonoidal.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean
+          - scripts/AlgebraicGeometryAudit/DerivedOperations.lean
+        acceptance:
+          - >-
+            The assembly takes separate ambient D(Coh X) monoidal and complete
+            exact-bifunctor inputs plus bounded closure; it makes no claim that
+            the #1420 module-sheaf tensor supplies those inputs.
+          - >-
+            The named bounded monoidal restriction is used locally, the
+            constructor yields the existing coherent capability and its
+            one-way raw-tensor projection, and no competing root or global
+            instance is introduced; any affected Tensor-local documentation
+            describes the full exact-bifunctor contract accurately.
+          - >-
+            The Tensor umbrella, derived-operations audit, focused checks, and
+            four required reviewers pass in at most three rounds; the final
+            controller-bound PR closes #928 only after this complete ledger
+            passes.
+        closure: complete
