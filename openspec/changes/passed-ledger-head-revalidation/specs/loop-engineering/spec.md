@@ -48,7 +48,7 @@ The controller MUST preserve all existing manifest bindings, frozen selections, 
 - **THEN** the event and failed round remain valid immutable history, the ledger becomes terminal as required by the cap, and no replacement event or round can erase that result
 
 ### Requirement: Revalidation admission fails closed on repository or provider uncertainty
-Before changing the ledger, the controller MUST establish from live repository and provider evidence that the candidate is a clean checkout at the exact local full head, is a single-parent direct child of the current protected base, remains within the original frozen file scope, and preserves the original issue, repository, remote, branch, and plan bindings. For a ledger that records the prior round's base OID, that OID MUST be a strict ancestor of the current protected base and MUST match the prior head's ancestry evidence. For a legacy ledger without a recorded base OID, the controller MUST mark the base as inferred from the prior head's sole parent and require that parent to be a strict ancestor of the current protected base while the prior head itself is not an ancestor of it; this is a conservative Git-graph admission criterion, not proof of the historical protected-base OID. The issue MUST be open. A complete source-branch pull-request lookup MUST find either no associated pull request or exactly one open, non-draft pull request whose frozen base, body satisfying the manifest's frozen closure mode, source branch, and head OID agree with the ledger's previous passing round; closed, merged, multiple, or differently bound PRs reject the transition. The local protected-base ref MUST equal the live protected-base OID. The remote source ref MUST be absent, equal to the prior reviewed head, or equal to the proposed new head; replacing the prior reviewed head later requires an explicit manifest force-with-lease permission bound to that exact prior SHA. Any absent, malformed, ambiguous, truncated, stale, or failed check MUST reject revalidation without writing to the ledger.
+Before changing the ledger, the controller MUST establish from live repository and provider evidence that the candidate is a clean checkout at the exact local full head, is a single-parent direct child of the current protected base, remains within the original frozen file scope, and preserves the original issue, repository, remote, branch, and plan bindings. For a ledger that records the prior round's base OID, that OID MUST be a strict ancestor of the current protected base and MUST match the prior head's ancestry evidence. For a legacy ledger without a recorded base OID, the controller MUST mark the base as inferred from the prior head's sole parent and require that parent to be a strict ancestor of the current protected base while the prior head itself is not an ancestor of it; this is a conservative Git-graph admission criterion, not proof of the historical protected-base OID. The issue MUST be open. A complete source-branch pull-request lookup MUST find either no associated pull request or exactly one open, non-draft pull request whose frozen base, title/body and commit messages satisfying the manifest's frozen closure mode, live `closingIssuesReferences`, source branch, and head OID agree with the ledger's previous passing round; closed, merged, multiple, or differently bound PRs reject the transition. For a complete chunk, the provider reference set MUST contain exactly the selected issue identified by frozen repository owner/name and issue number; for a progress chunk, it MUST be empty. This check MUST happen before the event is written or a round is consumed. The local protected-base ref MUST equal the live protected-base OID. The remote source ref MUST be absent, equal to the prior reviewed head, or equal to the proposed new head; replacing the prior reviewed head later requires an explicit manifest force-with-lease permission bound to that exact prior SHA. Any absent, malformed, ambiguous, truncated, stale, or failed check MUST reject revalidation without writing to the ledger.
 
 #### Scenario: Eligible rebased candidate
 - **WHEN** all local and live checks agree on the open issue, protected base, exact candidate head, source branch, remote repository, and frozen scope
@@ -104,6 +104,45 @@ While a revalidation round is pending, the controller MUST reject push, pull-req
 #### Scenario: Close is denied for a different or stale merged PR
 - **WHEN** issue closure is requested but the supplied merged PR does not have the final passing reviewed SHA, does not close the frozen issue, or its merge commit is not reachable from the protected base
 - **THEN** closure fails before invoking the issue-close mutation
+
+### Requirement: Pull-request issue links match the frozen closure mode exactly
+The controller MUST validate pull-request issue-link semantics according to the ledger's frozen closure mode, rather than treating any matching closing-keyword substring as sufficient. The case-insensitive GitHub closing verbs are `close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, and `resolved`; the scanner MUST recognize each with and without an optional colon, followed by either `#<issue>` or `owner/repository#<issue>`. For a complete chunk, the PR title MUST contain no closing instruction, the body MUST contain exactly one standalone canonical `Closes #<selected-issue>` line, and neither may contain any other recognized closing instruction, including negated prose or quoted examples. Each source commit message MUST contain no recognized closing instruction. For a progress chunk, the body MUST contain an explicit non-closing reference to the selected issue, and the title, body and every source commit message MUST contain no recognized closing instruction. Qualified issue identity MUST be compared using repository owner/name as well as issue number; a foreign issue with the same number is not the selected issue. Before PR creation, the controller MUST scan the proposed title, body, and every source commit message. Immediately after creation, it MUST re-read the created PR and require its complete live `closingIssuesReferences` to match the frozen mode and repository-qualified issue identity before reporting success or permitting another provider action; on mismatch it MUST fail closed and perform no further provider mutation. Before revalidation, approval, merge, and issue closure, the controller MUST likewise verify that the provider's live closing-issue references agree exactly: the selected issue only for complete, and none for progress. Before merge, the selected merge method's resulting commit title and body MUST also be explicit and satisfy the same closure mode; a squash merge MUST NOT use an unchecked provider-generated default message. Missing, malformed, ambiguous, extra, truncated, or stale local/provider data MUST fail closed. A progress-mode ledger MUST never authorize issue closure.
+
+#### Scenario: Negated closing phrase is not a complete closure instruction
+- **WHEN** a complete-mode PR body says `This PR does not close #<selected-issue>` without a standalone canonical closing line
+- **THEN** the controller rejects it rather than allowing GitHub to interpret the negated keyword as issue closure
+
+#### Scenario: Complete PR has one canonical closing line
+- **WHEN** a complete-mode body contains exactly one standalone `Closes #<selected-issue>` line and the provider reports only that issue as a closing reference
+- **THEN** the body is accepted for the frozen complete mode
+
+#### Scenario: Progress PR has a non-closing reference only
+- **WHEN** a progress-mode body uses `Refs #<selected-issue>` and the provider reports no closing issue references
+- **THEN** the body is accepted for the frozen progress mode
+
+#### Scenario: Provider closure references disagree with the frozen mode
+- **WHEN** the title/body and provider's live closing-issue references disagree, or the provider reports an extra issue or an issue in another repository with the same number
+- **THEN** approval, merge, and issue closure fail before mutation
+
+#### Scenario: Qualified closing keyword targets an extra issue
+- **WHEN** a complete-mode PR contains the canonical selected issue line plus a qualified closing keyword such as `Fixes owner/repo#<other-issue>`
+- **THEN** the controller rejects the body even if the unqualified issue-number check alone would have missed it
+
+#### Scenario: Complete-mode scanner covers supported variants and repository identity
+- **WHEN** a body or title contains any supported closing verb in any case, with or without a colon, followed by either a bare or qualified issue reference, including a foreign repository with the selected issue number
+- **THEN** the scanner rejects it unless it is the one canonical complete-mode body line for the selected issue in the frozen repository
+
+#### Scenario: Source commit or generated merge message contains an unsafe closing instruction
+- **WHEN** any source commit message or explicit/generated merge title or body contains a recognized closing instruction outside the frozen closure mode
+- **THEN** the controller rejects merge before mutation; it never relies on an unchecked squash-message default
+
+#### Scenario: Created PR provider references are checked before publication succeeds
+- **WHEN** a newly created PR reports missing, extra, malformed, or repository-mismatched `closingIssuesReferences`
+- **THEN** PR creation reports failure and no later provider mutation is permitted
+
+#### Scenario: Existing PR provider references disagree before revalidation
+- **WHEN** an otherwise eligible existing open PR has missing, extra, or malformed `closingIssuesReferences` for the frozen closure mode
+- **THEN** revalidation rejects without appending an event or consuming a review slot
 
 ### Requirement: Revalidation remains bounded across repeated protected-base advances
 After a refreshed round passes, the controller MAY accept another revalidation only if a newer protected-base advance makes that newly reviewed head stale and another original review slot remains. Each such event MUST consume the next adjacent slot. If the cap is reached, or the refreshed round does not pass, the controller MUST stop rather than reopen the ledger or grant publication authority to a stale head.
