@@ -46,9 +46,9 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 
 ## Rows
 
-### 2026-09-21 — `ZModTwoNonflatDerived.baseChangedResolution_homology_negOne_not_isZero` (planned)
-- chunk:              sf8-5-nonflat-derived-effect
-- reviewing commit:   49c33eda
+### 2026-09-22 — compare the explicit affine `H^{-1}` witness with `CategoryTheory.Tor` (planned)
+- chunk:              sf8-5-tor-witness-comparison
+- reviewing commit:   b8306d6b
 - found by:           altitude-scout
 - proposed ancestor:  `CategoryTheory.Tor`, with a later comparison from the
   abstract left-derived tensor calculation to the displayed affine cochain
@@ -57,11 +57,16 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   resolutions and a chosen projective resolution; no distinguished `ℤ → ZMod 2`,
   no particular mapping-cone presentation, and no scheme-level pullback claim
 - pin status:         PIN-CONFIRMED `.lake/packages/mathlib/Mathlib/CategoryTheory/Monoidal/Tor.lean:44`
-- source note:        Mathlib's `Tor` is defined by a left-derived tensor
-  functor; Stacks Project, Tag 064F, identifies the corresponding negative
-  derived-tensor cohomology with Tor.  The ModuleCat specialization and the
-  comparison to this cochain convention remain unverified.
+- source note:        The explicit nonzero `H^{-1}` witness is now proved in
+  merged PR #1457. Mathlib's `Tor` derives the second tensor factor; the
+  concrete `ModuleCat` specialization, selected projective-resolution
+  comparison, chain/cochain indexing bridge, and restriction-of-scalars
+  comparison remain unverified. Do not duplicate this row for the same lift.
 - state:              UNVERIFIED
+- progress note (2026-09-22): The current chunk implements only the concrete
+  `ℤ → ZMod 2` specialization. Even if that comparison merges, the proposed
+  abstract left-derived tensor comparison under the weaker hypotheses above
+  remains `UNVERIFIED`.
 
 ### 2026-09-21 — `ZModTwoNonflatDerived.baseChangedConeIso` (planned)
 - chunk:              sf8-5-nonflat-derived-effect

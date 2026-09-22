@@ -6,10 +6,9 @@ remote: origin
 base_branch: main
 base_ref: origin/main
 mode: stack
-# This three-issue execution stack is deliberately dormant. Its first two #554
-# chunks are progress-only (and the first is already merged), so they cannot
-# unlock #522. The active pre-closure slice is
-# sf8-5-nonflat-derived-effect.yaml; reissue this stack after #554 closes.
+# This three-issue execution stack is deliberately dormant. Its #554 chunks
+# are progress-only, so they cannot unlock #522. The current pre-closure slice
+# is sf8-5-tor-witness-comparison.yaml; reissue this stack after #554 closes.
 enabled: false
 allow_force_push: false
 state_dir: .loop-runs

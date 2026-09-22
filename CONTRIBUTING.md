@@ -184,8 +184,9 @@ CLI when it is available:
 
 ```bash
 # Select an enabled manifest rather than a dormant roadmap manifest.
-# This is the active #554 progress run at the time of writing.
-DAG_LOOP_MANIFEST=.claude/loop-specs/sf8-5-nonflat-derived-effect.yaml
+# After its planning-only bootstrap PR is merged, select the active #554
+# implementation run and preflight from a fresh, clean checkout at its base.
+DAG_LOOP_MANIFEST=.claude/loop-specs/sf8-5-tor-witness-comparison.yaml
 openspec validate --all --strict --no-interactive
 python scripts/loop_engine.py validate --spec "$DAG_LOOP_MANIFEST"
 python scripts/loop_engine.py preflight --spec "$DAG_LOOP_MANIFEST"

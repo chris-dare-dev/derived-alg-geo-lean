@@ -1,0 +1,86 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: sf8-5-tor-witness-comparison
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: sf8-sf9-pilot
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/sf8-sf9-supported-moduli/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: true
+
+mutations:
+  comment_issue: false
+  close_issue: false
+  push_branch: true
+  create_pr: true
+  approve_pr: false
+  merge_pr: true
+
+issues:
+  - number: 554
+    slug: sf8-5-tor-witness-comparison
+    depends_on: []
+    chunks:
+      - id: sf8-5-tor-witness-comparison
+        scope: Prove that the restriction to scalars of the concrete affine H^{-1} effect for ℤ → ZMod 2 is isomorphic to Mathlib's Tor (ModuleCat ℤ) 1 value in its fixed-left/derived-second-argument convention; do not add a generic Tor wrapper or any scheme-level pullback, K-flat-existence, or relative-perfect preservation theorem.
+        requirements:
+          - Supported arbitrary derived pullbacks are constructed
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineNonflatDerivedObject.lean
+          - docs/architecture/generalization-backlog.md
+          - docs/architecture/loop-engineering-friction.md
+          - scripts/AlgebraicGeometryAudit/SchemeDerived.lean
+        acceptance:
+          - An actual ProjectiveResolution of the displayed two-term free resolution is connected by a proved comparison to the existing cochain representative, with the degree 1 to degree -1 correspondence explicit.
+          - A Lean isomorphism identifies the restriction of scalars of baseChangedResolution.homology (-1) with ((CategoryTheory.Tor (ModuleCat ℤ) 1).obj X).obj Y for explicitly stated ZMod 2 modules X and Y.
+          - The Tor orientation is fixed-left and derived-second-argument; no symmetry with Tor' is claimed.
+          - Restriction of scalars is explicit, with no new global scalar instance or duplicate generic API root.
+          - The existing nonzero H^-1 result transports to the concrete Tor value, while the result remains affine/example-specific and makes no general scheme-level or relative-perfect claim.
+          - The axiom audit covers new public declarations and the loop-friction log records the indexing/API discoveries without duplicating the existing generalization row.
+          - The PR is ready for review, references #554 without closing it, and is not merged until all four independent reviews pass, required CI checks succeed, and controller merge validation passes.
+        closure: progress
