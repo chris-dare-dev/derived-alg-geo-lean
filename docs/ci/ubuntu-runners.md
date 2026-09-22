@@ -15,8 +15,7 @@ from the hosted-Linux benchmarking and broader CI1 rollout in #1436.
 All also have the standard `self-hosted`, `Linux`, `X64` labels and a unique
 runner-name label for operator smoke tests. No general runner carries the main
 label. PR and merge-group builds continue on `ubuntu-latest`; branch pushes
-alone do not trigger CI. Existing `ci` and `trust-surface` protection stays in
-place. No runner targets the retired employer-issued Mac.
+alone do not trigger CI. Existing `ci` protection stays in place. No runner targets the retired employer-issued Mac.
 
 ## State and resource boundaries
 
