@@ -15,9 +15,10 @@ construction prerequisite for #522, and #525 remains downstream.
 - Require actual atlas, diagonal, and local-finiteness morphism statements for
   #522 instead of a representability shortcut.
 - Use the loop controller's three adversarial lenses on every frozen chunk.
-- Run the outstanding #554 progress slice independently with at most two
-  critique-to-revision cycles; the controller's repository-wide upper bound
-  remains five.
+- Run the outstanding #554 progress slice independently with at most two review
+  rounds. A first-round change request permits one revision and re-review; a
+  second-round change request stops the chunk. The controller's repository-wide
+  upper bound remains five.
 
 ### Non-Goals
 

@@ -183,9 +183,12 @@ design, and task checklist in `openspec/` and validate them with the OpenSpec
 CLI when it is available:
 
 ```bash
+# Select an enabled manifest rather than a dormant roadmap manifest.
+# This is the active #554 progress run at the time of writing.
+DAG_LOOP_MANIFEST=.claude/loop-specs/sf8-5-nonflat-derived-effect.yaml
 openspec validate --all --strict --no-interactive
-python scripts/loop_engine.py validate --spec .claude/loop-specs/sf8-sf9-pilot.yaml
-python scripts/loop_engine.py preflight --spec .claude/loop-specs/sf8-sf9-pilot.yaml
+python scripts/loop_engine.py validate --spec "$DAG_LOOP_MANIFEST"
+python scripts/loop_engine.py preflight --spec "$DAG_LOOP_MANIFEST"
 ```
 
 The loop manifest is execution authority, not a second requirements system. It
