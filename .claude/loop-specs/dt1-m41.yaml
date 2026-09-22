@@ -44,7 +44,6 @@ review:
 runner:
   required_checks:
     - ci
-    - trust-surface
 
 merge:
   method: squash

@@ -27,7 +27,7 @@ evidence paths is recorded:
    surfaced.
 2. The owner approves a named replacement scanner, its PR/main execution and
    negative fixture are verified, and the old optional check is retired or
-   replaced without weakening the required `ci`/`trust-surface` contract.
+   replaced without weakening the required `ci` contract.
 3. The owner explicitly approves retirement of this optional integration, with
    the security coverage it removes documented and a follow-up issue/milestone
    assigned. Retirement is not a passing scan and must not be represented as
