@@ -14,11 +14,11 @@ construction prerequisite for #522, and #525 remains downstream.
 - Establish explicit construction and comparison obligations for #554.
 - Require actual atlas, diagonal, and local-finiteness morphism statements for
   #522 instead of a representability shortcut.
-- Use the loop controller's three adversarial lenses on every frozen chunk.
-- Run the outstanding #554 progress slice independently with at most two review
-  rounds. A first-round change request permits one revision and re-review; a
-  second-round change request stops the chunk. The controller's repository-wide
-  upper bound remains five.
+- Use the loop controller's four independent reviewers and both pre-freeze
+  advisors on every frozen chunk.
+- Run each #554 progress slice independently, with at most three review rounds
+  for a frozen chunk. The third unsuccessful round is terminal; it does not
+  authorize re-chunking.
 
 ### Non-Goals
 
@@ -28,11 +28,11 @@ construction prerequisite for #522, and #525 remains downstream.
 
 ## Decisions
 
-1. Split execution at the progress boundary. The already-merged first witness
-   is historical and is not replayed. The outstanding non-flat derived-effect
-   chunk runs as an independent, one-issue #554 progress manifest. A separate
-   #522/#525 stack may be enabled only after #554 closes; a progress ledger
-   never unlocks a downstream issue.
+1. Split execution at the progress boundary. The affine witness and the
+   degree-minus-one effect are already merged historical chunks and are not
+   replayed. The concrete Tor comparison runs as a separate independent,
+   one-issue #554 progress manifest. A separate #522/#525 stack may be enabled
+   only after #554 closes; a progress ledger never unlocks a downstream issue.
 2. Keep the supported nontrivial example and all coherence/equivalence laws in
    the #554 acceptance surface rather than deferring them to an abstraction.
 3. Keep the #522 atlas/diagonal/local-finiteness proof statements in the
@@ -48,20 +48,40 @@ construction prerequisite for #522, and #525 remains downstream.
    statement-layer exception) in each abstraction review. The controller ties
    the chunk to exact OpenSpec requirement headings, while the adversary checks
    ownership and adoption against the repository's architecture documents.
-7. Treat the explicit nonzero derived effect for `ℤ → ZMod 2` as a second
-   progress chunk. It may use the existing affine bounded-projective lane and
-   its K-projective representative API, but it must not be presented as a
-   construction of a general scheme-level `LeftDerivedPullback` or as proof of
-   full relative-perfect preservation.
-8. Freeze the derived-effect leaf, its existing witness, the public
-   `DerivedCategory` umbrella, the scheme-derived axiom audit, the task
-   checklist, and the generalization backlog before ledger initialization.
-   The public example needs all of those paths; adding them after review would
-   be impermissible scope widening.
-9. State the executable endpoint as nonzero degree-minus-one homology of the
-   supported affine bounded-projective representative. The familiar Tor
-   interpretation may appear in documentation only unless a proved comparison
-   to an actual Tor API is supplied.
+7. Treat the explicit nonzero derived effect for `ℤ → ZMod 2` as a completed
+   historical progress chunk. It uses the existing affine bounded-projective
+   lane and its K-projective representative API; it is not a construction of a
+   general scheme-level `LeftDerivedPullback` or proof of full
+   relative-perfect preservation.
+8. For each new concrete progress chunk, freeze its source leaf, relevant
+   public audit, generalization-backlog record, and any outcome log before
+   ledger initialization. The required OpenSpec task checklist is itself
+   digest-bound, so leave it unchanged during the code loop; sync its completed
+   checkbox in a separate post-merge planning update rather than invalidating
+   the review ledger.
+9. State the first derived-effect endpoint as nonzero degree-minus-one homology
+   of the supported affine bounded-projective representative. A Tor
+   interpretation is not part of that result unless a proved comparison to an
+   actual Tor API is supplied.
+10. Treat the concrete `ZMod 2` comparison to Mathlib's
+    `CategoryTheory.Tor` as a separate progress chunk. It must use the exact
+    fixed-left/derived-second-argument convention, an explicit
+    `ProjectiveResolution` comparison, the chain-degree `1` to cochain-degree
+    `-1` bridge, and restriction of scalars. No generic Tor wrapper or scheme-
+    level derived-pullback claim is included.
+11. Keep a tracked loop-engineering friction log for stale worktree context,
+    incomplete API discovery, and false starts caught by adversarial review;
+    record both the cause and the prevention step so future runs can improve.
+12. Publish a new OpenSpec plan and enabled manifest through a one-time,
+    owner-authorized planning-only bootstrap PR before controller preflight.
+    That PR contains no Lean implementation and does not close #554. After it
+    merges, start from a fresh clean checkout at the exact `origin/main`, run
+    preflight and initialize the digest-bound ledger, then route every
+    implementation-phase provider action through the controller.
+13. Do not change any required OpenSpec artifact after ledger initialization.
+    In particular, update task completion only in a post-merge plan-sync PR;
+    the code PR must not claim a task checkbox while that would invalidate its
+    digest-bound controller evidence.
 
 ## Risks / Trade-offs
 
