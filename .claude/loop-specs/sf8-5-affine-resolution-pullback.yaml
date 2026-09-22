@@ -1,0 +1,90 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: sf8-5-affine-resolution-pullback
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: sf8-sf9-pilot
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/sf8-sf9-supported-moduli/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: true
+
+mutations:
+  comment_issue: false
+  close_issue: false
+  push_branch: true
+  create_pr: true
+  approve_pr: false
+  merge_pr: true
+
+issues:
+  - number: 554
+    slug: sf8-5-affine-resolution-pullback
+    depends_on: []
+    chunks:
+      - id: sf8-5-affine-resolution-pullback
+        scope: "Prove the affine underived comparison from tilde followed by actual Scheme.Modules.pullback along Spec.map to extension of scalars followed by target tilde; apply it to the sheafified two-term free resolution for ℤ → ZMod 2 and prove nonzero target H^-1. This is a concrete progress slice only, not LeftDerivedPullback construction, K-flat existence, or relative-perfect preservation."
+        requirements:
+          - Supported arbitrary derived pullbacks are constructed
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/Modules/Pullback/AffineSpec.lean
+          - DerivedAlgGeo/AlgebraicGeometry/Modules/Pullback.lean
+          - DerivedAlgGeo/AlgebraicGeometry/Modules.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineNonflatDerivedObject.lean
+          - docs/architecture/generalization-backlog.md
+          - docs/architecture/loop-engineering-friction.md
+          - scripts/AlgebraicGeometryAudit/ModulePullback.lean
+          - scripts/AlgebraicGeometryAudit/SchemeDerived.lean
+        acceptance:
+          - A proved natural isomorphism identifies tilde followed by actual scheme-module pullback along Spec.map with extension of scalars followed by target tilde for commutative-ring maps; its statement and owner remain in AlgebraicGeometry/Modules/Pullback.
+          - The corresponding comparison is applied to the displayed finite free two-term resolution, identifying the actual degreewise module-sheaf pullback complex with the tilde of baseChangedResolution.
+          - The target scheme-module derived object of this degreewise pulled-back complex has nonzero H^-1, proved by transport from the existing affine calculation.
+          - All new public declarations are included in the module-pullback and scheme-derived audits; no duplicate carrier or scalar instance is introduced.
+          - The result is explicitly underived on the chosen representative and does not claim that it computes a general left-derived pullback, that pullback preserves quasicoherent cohomology for arbitrary scheme maps, or that K-flat resolutions exist.
+          - "Task 1.2 remains unchecked; #554 stays open, the PR references it without a closing keyword, and #522 and #525 are not selected."
+          - The PR is ready for review only after all four independent reviewers pass on the same commit, required CI succeeds, and controller merge validation passes.
+        closure: progress
