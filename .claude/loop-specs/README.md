@@ -64,13 +64,34 @@ honours two sources. It reads both from the repository's default branch through
 the GitHub API, never from a local ref (a remote-tracking ref is locally
 writable), so a work branch cannot grant itself anything:
 
-- A manifest merged to `main` keeps its own explicit `mutations`. These are the
-  pre-existing manifests, which were reviewed through planning PRs.
-- `.claude/loop-authority.yaml` on `main` is the owner's standing grant for
-  every run whose manifest lives on a work branch. That manifest's `mutations`
-  may set a key to `false` to narrow the grant, but can never widen it. Without
-  the file, nothing is granted, and a run stops at its first provider action
-  (stop reason 1).
+- `.claude/loop-authority.yaml` on `main` is the owner's standing grant. A
+  manifest's `mutations` may set a key to `false` to narrow it, but can never
+  widen it. Without the file, nothing is granted, and a run stops at its first
+  provider action (stop reason 1). An explicit `false` in the file revokes that
+  action for every run; it is the owner's kill switch.
+- The fourteen manifests the owner reviewed through planning PRs before this
+  protocol are listed by content digest in `LEGACY_REVIEWED_MANIFESTS` in the
+  controller. They keep their own explicit `mutations` and merge, closure and
+  eligibility policies, subject to the kill switch. A manifest merged later
+  through a work PR is not on that list and confers nothing by being merged.
+
+A manifest that is not on the legacy list is branch-authored. Validation and
+the actions hold it to these limits:
+
+- `base_ref` must be `<remote>/<base_branch>`;
+- no administrator merge, force-push, closure without a merged PR, epic opt-in,
+  or roadmap gate weaker than `required`;
+- no chunk file or lift target, and no changed path at publication, under the
+  run's own authority, controller or instructions:
+  - `.claude/loop-authority.yaml`;
+  - `.claude/loop-specs/`, except the run's own manifest;
+  - `.claude/skills/`, `.claude/agents/`, `.claude/settings.json`;
+  - `.agents/`, `.github/`;
+  - `AGENTS.md`, `CLAUDE.md`;
+  - `scripts/loop_engine.py`, `scripts/loop_recovery.py`,
+    `scripts/check_local_build.py`, and the controller tests.
+
+  Those change only through owner-reviewed PRs.
 
 The owner creates and edits that file; a run never does. Its shape:
 
@@ -185,9 +206,14 @@ Code issues may only be closed after a confirmed merged pull request.
   version 2. Version 2 ignores task checkbox state and `agent-observations.md`,
   so ticking tasks or appending the observation log no longer invalidates a
   review. Ledgers written before this change keep verifying under version 1.
-- A passing round covers any later head that carries the same change against
-  its merge base, such as a rebase onto a moved `main` or a merge of `main`
-  into the branch. The run's own plan paths are excluded from that comparison.
-- When the change itself moves, one revalidation round with the full panel
-  reopens the pass. A revalidation round does not spend
-  `max_review_rounds_per_chunk`, and a ledger allows at most two.
+- A passing round covers a later head only when all three of these hold:
+  - it carries the same change against the base branch tip GitHub reports
+    (such as after a clean rebase onto a moved `main` or a merge of `main`);
+  - only the progress records differ, meaning checkbox state in `tasks.md` and
+    the change's top-level `agent-observations.md`; the manifest and every
+    other plan file are part of the reviewed change;
+  - the base did not change a chunk file, a Lean module a chunk file imports
+    directly, or `lake-manifest.json`, `lean-toolchain` or `lakefile.toml`.
+- Otherwise, one revalidation round with the full panel reopens the pass. A
+  revalidation round does not spend `max_review_rounds_per_chunk`, and a
+  ledger allows at most two.

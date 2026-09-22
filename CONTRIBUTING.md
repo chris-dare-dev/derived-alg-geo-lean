@@ -208,11 +208,14 @@ keeps a passed review; a moved change needs one revalidation round. Opting into
 chunk, files a follow-up issue, and moves on. See
 [the recovery protocol](docs/architecture/loop-recovery.md).
 
-Provider actions need grants from the default branch, which the controller
-reads through the GitHub API rather than a local ref. A manifest merged there keeps
-its reviewed grants, and `.claude/loop-authority.yaml` holds the owner's
-standing grants for branch-authored manifests. A branch can narrow those
-grants, never widen them. Issue closure for code work requires a merged PR.
+Provider actions need grants from `.claude/loop-authority.yaml` on the default
+branch, which the controller reads through the GitHub API rather than a local
+ref. A run's manifest can narrow those grants, never widen them. It also cannot
+touch the loop's own authority, controller or instructions; those change only
+through owner-reviewed PRs. The fourteen manifests reviewed through planning
+PRs before this protocol keep their own grants, and an explicit `false` in the
+standing file revokes an action for every run. Issue closure for code work
+requires a merged PR.
 Progress chunks use non-closing issue references; complete chunks require a
 closing keyword. Keep run ledgers in ignored `.loop-runs/`.
 

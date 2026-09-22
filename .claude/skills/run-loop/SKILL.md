@@ -100,11 +100,14 @@ These are not stops. What to do instead:
   creation, marking ready, follow-up issues, approval, merge, and issue
   closure. Do not call `gh issue close`, `gh pr ready`, `gh pr merge`,
   `gh issue create`, `gh pr review`, or `git push` directly from this skill.
-- Provider authority comes only from the default branch as GitHub serves it:
-  a manifest merged there keeps its reviewed grants, and
-  `.claude/loop-authority.yaml` holds the owner's standing grants for
-  manifests written on a work branch. Never write or edit that file from a
-  run, and never widen a grant in a manifest.
+- Provider authority comes only from `.claude/loop-authority.yaml` on the
+  default branch as GitHub serves it. Your manifest can narrow those grants
+  and never widen them; only the fourteen legacy manifests keep grants of
+  their own. Your manifest cannot request administrator merge, force-push,
+  closure without a merged PR, an epic opt-in or a weaker roadmap gate. Its
+  chunks cannot touch the run's own authority, controller or instructions
+  (see `.claude/loop-specs/README.md`). Never try to change those from a run.
+  A gap there is a follow-up issue for the owner.
 - Code issues close only after the controller verifies a merged PR that closes
   the same issue. Non-PR closure is disabled unless the manifest explicitly
   says otherwise.
@@ -361,9 +364,12 @@ panel reviews. It must not be marked ready or merged before the ledger passes.
    as the next round.
 4. If `main` moved, merge `origin/main` into the branch (or rebase), rerun the
    targeted checks, and push. A head that carries the same change keeps the
-   pass. If the change moved, as a conflict resolution does, run one
-   revalidation panel on the new commit. It needs all four reviewers and does
-   not spend the improvement cap; at most two are allowed.
+   pass, as long as only progress records changed and the base left the
+   reviewed files, their direct imports and the pins alone. Otherwise, when
+   `action ready` or `action merge` reports that the head does not carry the
+   reviewed change, run one revalidation panel on the new commit, for example
+   after a conflict resolution. It needs all four reviewers and does not spend
+   the improvement cap; at most two are allowed.
 5. If `predecessor_attestation.emit` is true, run `action attest-pr` after the
    ledger passes and before merging. It binds the current PR head.
 6. Run `action merge`. The controller pins `--match-head-commit` to the head it

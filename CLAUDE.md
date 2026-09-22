@@ -411,25 +411,47 @@ because the ledger's plan digest (v2) excludes them.
 **Reviews bind to the change, not to a commit's position.** Every frozen chunk
 gets independent mathematical, repository-boundary, abstraction, and
 mathlib-style review on the same commit, with at most three review/improve
-rounds per attempt for new work. A passed review covers any later head that
-carries the same change: a clean rebase onto a moved `main`, or a merge of
-`main` into the branch. When the change itself moves (a conflict resolution,
-say), one revalidation round with the full panel reopens the pass without
-spending the improvement cap. Never reset a budget by renaming or re-chunking.
-With `recovery` configured, exhaustion dispatches research and independent
-review of a recovery plan per [the recovery protocol](docs/architecture/loop-recovery.md),
-without approval pauses.
+rounds per attempt for new work. A passed review covers a later head when three
+things hold:
+
+- the head carries the same diff, measured against the base branch tip that
+  GitHub reports (for example after a clean rebase, or a merge of `main`);
+- only the progress records changed: task checkboxes and the top-level
+  `agent-observations.md`;
+- the base did not change a reviewed file, a Lean module one of them imports
+  directly, or the pins.
+
+Otherwise one revalidation round with the full panel reopens the pass without
+spending the improvement cap; a ledger allows two. Never reset a budget by
+renaming or re-chunking. With `recovery` configured, exhaustion dispatches
+research and independent review of a recovery plan per
+[the recovery protocol](docs/architecture/loop-recovery.md), without approval
+pauses.
 
 **Provider authority is owner-controlled.** Comments, pushes, PR creation,
 marking ready, follow-up issues, issue closure, and merge each need a grant.
-The controller honours two sources, both read from the default branch through
-the GitHub API and never from a local ref, so a branch cannot grant itself
-anything: a manifest merged to `main` keeps its own
-reviewed grants, and `.claude/loop-authority.yaml` holds the owner's standing
-grants for every other run. A manifest on a work branch can narrow that
-standing authority and can never widen it. Without the file, nothing is
-granted. Code issues close only after a confirmed merged PR; complete chunks
-need a closing keyword, and progress chunks need a non-closing reference.
+The controller reads grants from the default branch through the GitHub API,
+never from a local ref. `.claude/loop-authority.yaml` there holds the owner's
+standing grants, and a run's own manifest can narrow them but never widen them.
+Without the file, nothing is granted. The fourteen manifests the owner reviewed
+through planning PRs before this protocol are listed by digest in the
+controller and keep their own grants. An explicit `false` in the standing file
+revokes a grant for every run, legacy or not. A manifest merged later through a
+work PR confers nothing.
+
+A branch-authored manifest also cannot:
+
+- request administrator merge, force-push, closure without a merged PR, an epic
+  opt-in, or a weaker roadmap gate;
+- choose a `base_ref` other than `<remote>/<base_branch>`;
+- scope a chunk over its own authority, controller, or instructions, which are
+  `.claude/loop-authority.yaml`, `.claude/loop-specs/` except its own manifest,
+  `.claude/skills/`, `.claude/agents/`, `.claude/settings.json`, `.agents/`,
+  `.github/`, `AGENTS.md`, `CLAUDE.md`, and the controller and its tests.
+
+Those change only through owner-reviewed PRs. Code issues close only after a
+confirmed merged PR; complete chunks need a closing keyword, and progress
+chunks need a non-closing reference.
 
 `scripts/loop_tokens.py` reports what a run cost, for either runtime. It reads
 the transcripts both already write -- Claude Code's

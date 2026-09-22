@@ -46,6 +46,9 @@ def policy(**overrides):
     return result
 
 
+FROZEN_LEAF = "DerivedAlgGeo/Example.lean"
+
+
 def ledger():
     return dict(status="initialized", rounds=[], reviewers=ROLES[:], max_review_rounds=3,
                 issue={"number": 1458}, chunk={"id": "repair", "scope": "Validate controller",
@@ -398,6 +401,8 @@ class RecoveryCliTests(unittest.TestCase):
         self.git("config", "user.name", "Recovery Test")
         self.spec_path, self.spec = make_spec(self.root)
         self.spec["limits"]["max_review_rounds_per_chunk"] = 3
+        # A run may not scope itself over the controller; use an ordinary leaf.
+        self.spec["issues"][0]["chunks"][0]["files"] = [FROZEN_LEAF]
         self.spec["recovery"] = policy()
         self.save_spec()
         self.git("add", ".")
@@ -605,7 +610,7 @@ class RecoveryCliTests(unittest.TestCase):
         pr = dict(state="MERGED", mergedAt="2026-09-22T12:00:00Z",
                   closingIssuesReferences=[{"number": 1}], headRefOid="a" * 40,
                   headRefName="agent/test-issue", baseRefName="main", body="Closes #1",
-                  files=[{"path": "scripts/loop_engine.py"}])
+                  files=[{"path": FROZEN_LEAF}])
         return state, pr
 
     @contextlib.contextmanager
@@ -616,6 +621,7 @@ class RecoveryCliTests(unittest.TestCase):
             stack.enter_context(mock.patch.object(loop_engine, "load_state", return_value=state))
             stack.enter_context(mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]))
             stack.enter_context(mock.patch.object(loop_engine, "verify_local_chunk_files"))
+            stack.enter_context(mock.patch.object(loop_engine, "trusted_base_commit", return_value="f" * 40))
             scope = stack.enter_context(mock.patch.object(loop_engine, "recovery_scoped_paths"))
             stack.enter_context(mock.patch.object(loop_engine, "recovery_registry", return_value=[
                 (self.root / "registry.json", {"objective_id": self.spec["recovery"]["objective_id"],
