@@ -40,7 +40,14 @@ Plan revisions SHALL have a finite limit and consume the same episode.
 
 Every successor SHALL preserve the original scope, requirements, reviewers and
 acceptance. Failed review messages SHALL remain verbatim under stable identities.
-Final passing reviews SHALL explicitly account for inherited negative findings.
+Final passing reviews SHALL explicitly account for inherited negative findings
+and lift obligations. Carried lifts SHALL retain durable backlog disposition
+and previously requested scope only within the original manifest's authority.
+
+#### Scenario: Interrupted panel contains a lift
+- **WHEN** a failed or abandoned panel contains a passing-with-lift review
+- **THEN** recovery retains that obligation and final publication requires its
+  disposition; imported history grants no undeclared lift scope
 Research acceptance SHALL NOT authorize publication or satisfy code review.
 
 #### Scenario: Superficial fresh start

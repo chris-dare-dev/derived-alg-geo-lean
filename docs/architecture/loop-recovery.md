@@ -118,8 +118,16 @@ Every successor still gets mathematical/source, repository-boundary,
 abstraction and mathlib/style review independently on the same commit.
 Each passing reviewer supplies `--resolutions-file <json>` to
 `ledger record-review`: a JSON object mapping every inherited finding ID to
-nonempty resolution evidence. Each negative review message is retained as an
-indivisible finding; addressing only one criticism in it is insufficient.
+nonempty resolution evidence. Each negative review message and each inherited
+lift obligation is retained as an indivisible finding; addressing only one
+criticism in it is insufficient. A fresh lift in the current passing panel
+uses the live backlog gate, not a retrospective resolution demanded of earlier
+reviewers who could not yet see it. Failed or abandoned panels carry their lifts
+into subsequent research and review. Every current or carried lift must have a
+durable backlog entry before passing adjudication/publication; implementation
+evidence can be recorded there rather than deleting its provenance. Previously
+requested lift prefixes stay usable only within the current manifest's original
+declared authority. Imported history grants no additional scope.
 The controller verifies structure and binding; reviewers judge substance.
 
 Recovery review text ends with exactly:

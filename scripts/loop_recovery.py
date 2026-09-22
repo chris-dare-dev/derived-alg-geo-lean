@@ -152,14 +152,29 @@ def _all_snapshots(state: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def inherited_findings(state: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    """Return every negative transcript, including negatives in this attempt."""
+    """Return failure transcripts and lift obligations inherited from prior work.
+
+    A passing review with a lift still carries an obligation. Preserve its whole
+    transcript through recovery so a later plain pass cannot silently drop it.
+    Fresh lifts in the current open/passing panel use the live backlog gate:
+    earlier panel reviewers cannot account for findings not yet submitted.
+    """
     result = {}
     snapshots = _all_snapshots(state) + [state]
     for source, snapshot in enumerate(snapshots):
         for row in snapshot.get("rounds", []):
             for review in row.get("reviews", []):
-                if review.get("verdict") in PASSING:
+                if review.get("verdict") == "pass":
                     continue
+                if review.get("verdict") == "pass_with_lift" and snapshot is state:
+                    adjudication = row.get("adjudication")
+                    inherited = (
+                        row is not state["rounds"][-1]
+                        or state["recovery"]["phase"] != "active"
+                        or (adjudication is not None and adjudication["verdict"] not in PASSING)
+                    )
+                    if not inherited:
+                        continue
                 finding = {"reviewer": review["reviewer"], "commit": row["commit"],
                            "verdict": review["verdict"], "text": review["finding_text"]}
                 identifier = digest(finding)

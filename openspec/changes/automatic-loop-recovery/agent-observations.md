@@ -71,3 +71,14 @@ Both now check provider evidence. PR creation has pre/post checks, but no atomic
 expected-SHA GitHub operation: report a raced created URL and block further
 actions rather than claim nothing was created. Tests simulate stale heads,
 creation races, wrong closure identities, and out-of-scope closure.
+
+## OBS-010 — passing verdict is not absence of obligations
+
+C2 abstraction review found that PASS_WITH_LIFT was classified solely as a
+passing verdict: its full transcript survived archival but its deferred work
+and already-authorized scope disappeared from active checks. Failed/abandoned
+panel lifts now enter the inherited corpus and retain only currently declared
+scope; all lifts require durable backlog disposition. Fresh passing-panel lifts
+stay under the live backlog gate so reviewers need not predict a later message.
+The distinction avoids both silent omission and an artificial extra review
+round merely to learn the IDs of freshly submitted lift messages.

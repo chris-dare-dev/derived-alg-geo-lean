@@ -44,7 +44,7 @@ def ledger():
 
 
 def review(role, sha, verdict="needs_changes", resolutions=None):
-    token = "PASS" if verdict == "pass" else "NEEDS_CHANGES"
+    token = {"pass": "PASS", "pass_with_lift": "PASS_WITH_LIFT", "needs_changes": "NEEDS_CHANGES"}[verdict]
     text = f"{role}: evidence demonstrating a concrete boundary.\nReviewed commit: {sha}\nClose: {token}"
     result = dict(reviewer=role, verdict=verdict, finding_text=text,
                   finding_digest=hashlib.sha256(text.encode()).hexdigest())
@@ -264,6 +264,70 @@ class RecoveryTests(unittest.TestCase):
         state["recovery"]["history"][0]["snapshot"]["rounds"] = []
         with self.assertRaises(ValueError):
             recovery.validate(state)
+
+    def lift_recovery(self, complete_panel=False):
+        state = ledger()
+        state["chunk"]["lift_targets"] = ["foundation"]
+        recovery.initialize(state, policy(), now=NOW)
+        recovery.reserve_round(state, "a" * 40, now=NOW)
+        lift = review(ROLES[2], "a" * 40, "pass_with_lift")
+        lift["lift_target"] = "foundation/General.lean"
+        state["rounds"][-1]["reviews"] = [lift]
+        self.assertEqual(recovery.inherited_findings(state), {})
+        if complete_panel:
+            state["rounds"][-1]["reviews"] += [review(role, "a" * 40) for role in ROLES if role != ROLES[2]]
+            state["rounds"][-1]["adjudication"] = {"verdict": "needs_changes"}
+            state["status"] = "needs_changes"
+            recovery.after_adjudication(state, now=NOW)
+        recovery.abandon(state, "Research the general foundation and preservation obligation.", now=NOW)
+        self.accept(state)
+        findings = copy.deepcopy(recovery.inherited_findings(state))
+        recovery.resume(state, now=NOW)
+        self.assertEqual(findings, recovery.inherited_findings(state))
+        return state
+
+    def test_lifts_from_partial_and_failed_panels_need_successor_dispositions(self):
+        for complete in (False, True):
+            with self.subTest(complete_panel=complete):
+                state = self.lift_recovery(complete)
+                lifts = {key: finding for key, finding in recovery.inherited_findings(state).items()
+                         if finding["verdict"] == "pass_with_lift"}
+                self.assertEqual(len(lifts), 1)
+                self.assertEqual(loop_engine.authorized_lift_targets(state), ["foundation"])
+                resolutions = {key: "Regression fixes the blocking defect." for key in recovery.inherited_findings(state)
+                               if key not in lifts}
+                with self.assertRaises(ValueError):
+                    self.panel(state, "b" * 40, "pass", resolutions)
+                resolutions.update({key: "Deferred foundation extraction is recorded in the tracked backlog." for key in lifts})
+                state["rounds"][-1]["reviews"] = [review(role, "b" * 40, "pass", resolutions) for role in ROLES]
+                recovery.after_adjudication(state, now=NOW)
+                recovery.require_publishable(state, now=NOW)
+
+    def test_imported_lift_does_not_grant_authority_outside_current_manifest(self):
+        for target, expected in (("outside/General.lean", []), ("foundation/General.lean", ["foundation"])):
+            with self.subTest(target=target):
+                historical = ledger()
+                historical["status"] = "blocked"
+                lift = review(ROLES[2], "a" * 40, "pass_with_lift")
+                lift["lift_target"] = target
+                historical["chunk"]["lift_targets"] = ["outside", "foundation"]
+                historical["rounds"] = [dict(number=1, commit="a" * 40, reviews=[lift], adjudication=None)]
+                state = ledger()
+                state["chunk"]["lift_targets"] = ["foundation"]
+                recovery.initialize(state, policy(history=[{"path": "legacy.json", "sha256": "a" * 64}]), [historical], now=NOW)
+                self.assertEqual(len(recovery.inherited_findings(state)), 1)
+                self.assertEqual(loop_engine.authorized_lift_targets(state), expected)
+
+    def test_requested_lift_traversal_cannot_open_declared_prefix(self):
+        state = ledger()
+        state["chunk"]["lift_targets"] = ["foundation"]
+        recovery.initialize(state, policy(), now=NOW)
+        recovery.reserve_round(state, "a" * 40, now=NOW)
+        lift = review(ROLES[2], "a" * 40, "pass_with_lift")
+        lift["lift_target"] = "foundation/../outside/General.lean"
+        state["rounds"][-1]["reviews"] = [lift]
+        with self.assertRaises(loop_engine.LoopError):
+            loop_engine.authorized_lift_targets(state)
 
 
 class RecoveryCliTests(unittest.TestCase):
@@ -552,6 +616,24 @@ class RecoveryCliTests(unittest.TestCase):
             with self.assertRaisesRegex(loop_engine.LoopError, "outside frozen scope"):
                 loop_engine.action_close(self.root, self.spec, 1, 101, None, False)
             write.assert_not_called()
+
+    def test_carried_lift_requires_durable_backlog_before_publication(self):
+        helper = RecoveryTests()
+        state = helper.lift_recovery()
+        state["repo_root"] = str(self.root)
+        resolutions = {key: "Generalization is deferred with durable backlog evidence." for key in recovery.inherited_findings(state)}
+        helper.panel(state, "b" * 40, "pass", resolutions)
+        record = {"spec_digest": loop_engine.digest(self.spec), "repo_root": str(self.root),
+                  "state_file": str(self.state_path)}
+        with mock.patch.object(loop_engine, "recovery_record", return_value=(self.root / "registry.json", record)), \
+                mock.patch.object(loop_engine, "load_state", return_value=state), \
+                mock.patch.object(loop_engine, "git", return_value="https://github.com/example/repository.git"):
+            with self.assertRaisesRegex(loop_engine.LoopError, "backlog"):
+                loop_engine.recovery_publication_state(self.root, self.spec, self.state_path)
+            backlog = self.root / loop_engine.BACKLOG_PATH
+            backlog.parent.mkdir(parents=True, exist_ok=True)
+            backlog.write_text("# Generalization backlog\n\n### 2026-09-22 - recovery\n- proposed ancestor: foundation/General.lean\n", encoding="utf-8")
+            self.assertEqual(loop_engine.recovery_publication_state(self.root, self.spec, self.state_path), state)
 
 
 if __name__ == "__main__":

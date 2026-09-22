@@ -1640,6 +1640,8 @@ def ledger_record_review(
         resolutions = {}
         if "recovery" in state:
             loop_recovery.validate_review(commit, verdict, finding_text)
+            if verdict == "pass_with_lift":
+                canonical_recovery_path(str(lift_target))
             git(Path(state["repo_root"]), "cat-file", "-e", f"{commit}^{{commit}}")
             if resolutions_file is not None:
                 resolutions = read_json_object(resolutions_file)
@@ -1688,6 +1690,8 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
             raise LoopError(
                 "pass adjudication requires every reviewer verdict to be pass or pass_with_lift"
             )
+        if "recovery" in state and verdict in PASSING_VERDICTS:
+            require_recovery_lift_backlog(state)
         lifts = [
             item for item in current["reviews"] if item.get("verdict") == "pass_with_lift"
         ]
@@ -1805,19 +1809,39 @@ def recovery_publication_state(root: Path, spec: dict[str, Any], ledger: Path | 
         raise LoopError("publication ledger is not the registered objective")
     state = load_state(canonical)
     loop_recovery.require_publishable(state)
+    require_recovery_lift_backlog(state)
     remote = normalize_remote(git(root, "remote", "get-url", spec["remote"]))
     if remote != spec["repository"].lower():
         raise LoopError("publication remote does not match the authorized repository")
     return state
 
 
+def canonical_recovery_path(path: str) -> str:
+    value = path.rstrip("/")
+    if (not value or value.startswith("/") or "\\" in value or ":" in value
+            or any(part in {"", ".", ".."} for part in value.split("/"))):
+        raise LoopError(f"non-canonical recovery scope path: {path!r}")
+    return value
+
+
+def recovery_lift_reviews(state: dict[str, Any]) -> list[dict[str, Any]]:
+    envelope = state.get("recovery", {})
+    snapshots = [entry["snapshot"] for kind in ("history", "attempts")
+                 for entry in envelope.get(kind, [])] + [state]
+    return [review for snapshot in snapshots for row in snapshot.get("rounds", [])
+            for review in row["reviews"] if review.get("verdict") == "pass_with_lift"]
+
+
+def require_recovery_lift_backlog(state: dict[str, Any]) -> None:
+    """A research successor cannot erase a deferred lift, even after code passes."""
+    missing = {str(review.get("lift_target") or "") for review in recovery_lift_reviews(state)
+               if not review.get("lift_target") or not backlog_records(state, str(review["lift_target"]))}
+    if missing:
+        raise LoopError("recovery lift obligations are absent from the backlog: " + ", ".join(sorted(missing)))
+
+
 def recovery_scoped_paths(root: Path, spec: dict[str, Any], state: dict[str, Any], head: str) -> None:
-    def safe(path: str) -> str:
-        value = path.rstrip("/")
-        if (not value or value.startswith("/") or "\\" in value or ":" in value
-                or any(part in {"", ".", ".."} for part in value.split("/"))):
-            raise LoopError(f"non-canonical recovery scope path: {path!r}")
-        return value
+    safe = canonical_recovery_path
 
     allowed = [safe(path) for path in state["chunk"]["files"]]
     lift_authority = [safe(path) for path in state["chunk"].get("lift_targets", [])]
@@ -1972,6 +1996,14 @@ def authorized_lift_targets(state: dict[str, Any]) -> list[str]:
     declared = state.get("chunk", {}).get("lift_targets") or []
     if not declared:
         return []
+    if "recovery" in state:
+        # Preserve requests across attempts, but never import broader historical
+        # authority than the current frozen manifest actually grants.
+        requested = [canonical_recovery_path(str(review["lift_target"]))
+                     for review in recovery_lift_reviews(state) if review.get("lift_target")]
+        return [prefix for prefix in declared
+                if any(path_is_in_frozen_chunk(target, [canonical_recovery_path(prefix)])
+                       for target in requested)]
     requested = [
         str(item.get("lift_target"))
         for round_state in state.get("rounds", [])

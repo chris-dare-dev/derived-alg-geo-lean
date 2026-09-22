@@ -39,11 +39,15 @@ implicitly merging this work. No Lean ownership/import/instance changes apply.
   strategy, checks and exact inherited finding IDs. Its independent review
   binds the exact plan digest. Rejections permit only the same episode's
   remaining submissions. Source revisions are reviewed normally after resume.
-- Use each negative verbatim review as an indivisible inherited finding;
+- Use each negative verbatim review and prior lift obligation as an indivisible inherited finding;
   deterministic identities prevent omission of individual criticisms embedded
   in that message. All passing reviewers explicitly account for the inherited
   corpus, with evidence; the controller checks structure and binding while
   independent reviewers judge substance. Machine checks do not prove cognition.
+  Fresh passing-panel lifts use the live backlog gate, without requiring earlier
+  reviewers to resolve not-yet-submitted messages. All carried lifts require a
+  durable backlog disposition, and their scope authorization remains bounded
+  by the current original manifest's declared prefixes.
 - Reserve a review slot before dispatch using a controller command. Empty or
   incomplete panels keep that slot; retries do not erase genuine negative
   results. Only a full same-commit panel can pass. Persist writes atomically
