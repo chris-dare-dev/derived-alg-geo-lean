@@ -23,6 +23,10 @@ handoff between issues explicit before the loop is enabled.
   derived effect for the same non-flat affine map from a two-term free
   resolution; this strengthens the example without claiming the missing
   general resolution or preservation theorems.
+- Execute that outstanding #554 chunk through its own one-issue independent
+  progress manifest, with a distinct branch name and a two-round review cap.
+  Keep #522 and #525 out of that run: they remain a later post-closure stack,
+  not a false consequence of a progress PR.
 
 ## Capabilities
 
@@ -37,6 +41,7 @@ handoff between issues explicit before the loop is enabled.
 
 ## Impact
 
-This is a planning change only. It names the issue order, mathematical
-acceptance obligations, and proof/audit gates; it does not claim that the
-underlying Lean constructions already exist.
+This plan names the issue order, mathematical acceptance obligations, and
+proof/audit gates. Its first executable slice is deliberately narrower than
+the full three-issue roadmap; it does not claim that the underlying Lean
+constructions, algebraicity, or quasi-properness already exist.
