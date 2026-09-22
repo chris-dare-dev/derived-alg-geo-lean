@@ -23,7 +23,7 @@
 
 ## 4. Issue #1062 — Theorem 5.3 on `(Dqc)_T`
 
-- [x] 4.1 Reconcile `TStructure.IndExtensionData` with the Ind/filtered-colimit presentation of Lemma 5.1 through the single bridge package; prove inclusion t-exactness and expose the existing aisle comparison without adding a second carrier. Verify by compiling the existing Ind-extension module and `IndFilteredColimits.lean`.
+- [x] 4.1 Reconcile `TStructure.IndExtensionData` with the Ind/filtered-colimit presentation of Lemma 5.1 through the canonical extension consequences and direct `PreservesColimit` owner predicate; prove inclusion t-exactness and expose the existing aisle comparison without adding a second carrier. Verify by compiling the existing Ind-extension module and `IndFilteredColimits.lean`.
 - [x] 4.2 Expose source-shaped owner boundaries for the filtered-colimit, flat/fpqc descent, tensor right t-exactness, and four t-exactness clauses of Theorem 5.3, and prove their formal range/exactness composition APIs. Keep the scheme-level geometry explicit; verify with targeted builds of only the changed theorem modules.
 - [ ] 4.3 Run the four independent adversarial reviews for the frozen #1062 commit, record them in `.loop-runs`, and adjudicate under the same five-round cap; verify all reviews point to the exact final commit.
 
