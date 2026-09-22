@@ -19,6 +19,9 @@ turning unattended execution into an unbounded or mathematically unsafe agent.
 - Distinguish complete chunks, whose PR may close the tracked issue, from
   explicitly authorized progress chunks, whose PR must use a non-closing issue
   reference and leave the issue open.
+- Let a later run bind itself to a controller-attested, merged predecessor PR
+  without resetting a same-issue chunk's review budget or relying on an
+  untracked local ledger.
 - Keep GitHub comments, issue closure, pushes, pull-request creation, approval,
   and merging as separately named manifest capabilities.
 
@@ -39,3 +42,8 @@ The change adds Python control-plane code, OpenSpec planning artifacts, three
 adversarial reviewer roles, repository documentation, and cheap local gates.
 It does not perform any GitHub mutation until the enabled pilot passes its
 clean-checkout, dependency, branch-protection, and roadmap preflight.
+
+When a manifest explicitly opts in, the controller also writes a narrow,
+machine-readable predecessor attestation to its reviewed PR before merging.
+Successor manifests pin that attestation, the reviewed head, and the merge
+commit, and the controller checks those bindings again before every PR action.
