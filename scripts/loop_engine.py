@@ -14,14 +14,19 @@ an unattended run from silently widening its scope.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+import loop_recovery
 
 try:
     import yaml
@@ -79,7 +84,7 @@ DEFAULT_MERGE_POLICY = {
 }
 
 
-class LoopError(RuntimeError):
+class LoopError(loop_recovery.RecoveryError, RuntimeError):
     """A user-actionable validation, ledger, or preflight error."""
 
 
@@ -592,6 +597,128 @@ def validate_spec(spec: dict[str, Any]) -> None:
         }
         if selected_dependencies:
             raise LoopError("independent mode cannot contain dependencies between selected issues")
+
+    if "recovery" in spec:
+        loop_recovery.validate_policy(spec["recovery"])
+        if len(issues) != 1 or len(issues[0]["chunks"]) != 1:
+            raise LoopError("recovery requires one issue and one frozen chunk per objective")
+        if max_rounds != 3:
+            raise LoopError("recovery requires exactly three review rounds per attempt")
+
+
+def recovery_directory(root: Path) -> Path:
+    """Shared across worktrees: changing a checkout cannot replenish a budget."""
+    common = git(root, "rev-parse", "--git-common-dir")
+    return repo_path(root, common).resolve() / "loop-objectives"
+
+
+def recovery_registry(root: Path) -> list[tuple[Path, dict[str, Any]]]:
+    if not git(root, "rev-parse", "--git-common-dir", check=False):
+        return []
+    directory = recovery_directory(root)
+    records = []
+    for path in sorted(directory.glob("*.json")):
+        record = read_json_object(path)
+        if record.get("schema") != "loop-objective-registry/v1":
+            raise LoopError(f"invalid recovery registry record: {path}")
+        records.append((path, record))
+    return records
+
+
+def read_json_object(path: Path) -> dict[str, Any]:
+    def unique(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise LoopError(f"duplicate JSON field {key!r} in {path}")
+            result[key] = value
+        return result
+
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique)
+    except (OSError, ValueError) as exc:
+        raise LoopError(f"cannot read JSON object {path}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise LoopError(f"expected a JSON object: {path}")
+    return value
+
+
+def recovery_record(root: Path, spec: dict[str, Any]) -> tuple[Path, dict[str, Any]] | None:
+    policy = loop_recovery.validate_policy(spec["recovery"])
+    issue = spec["issues"][0]["number"]
+    for path, record in recovery_registry(root):
+        if record.get("repository") == spec["repository"] and (
+            record.get("issue") == issue or record.get("objective_id") == policy["objective_id"]
+        ):
+            if record.get("issue") != issue or record.get("objective_id") != policy["objective_id"]:
+                raise LoopError("registered objective identity cannot be renamed or moved to another issue")
+            return path, record
+    return None
+
+
+def validate_registered_state(record: dict[str, Any], state: dict[str, Any]) -> None:
+    root = Path(record["repo_root"])
+    spec = load_spec(Path(record["spec_path"]), root)
+    if "recovery" not in spec or digest(spec) != record["spec_digest"]:
+        raise LoopError("registered recovery manifest changed; a reset is not a migration")
+    if openspec_digest(root, spec) != record["openspec_digest"]:
+        raise LoopError("registered objective's frozen OpenSpec requirements changed")
+    if state.get("spec_digest") != record["spec_digest"] or state.get("spec_id") != spec["id"]:
+        raise LoopError("recovery ledger manifest binding changed")
+    if state.get("openspec_digest") != record["openspec_digest"]:
+        raise LoopError("recovery ledger OpenSpec binding changed")
+    if state.get("repo_root") != str(root):
+        raise LoopError("recovery ledger checkout changed")
+    issue = spec["issues"][0]
+    chunk = issue["chunks"][0]
+    expected = {key: chunk[key] for key in ("id", "scope", "files", "requirements", "acceptance")}
+    expected.update(lift_targets=chunk.get("lift_targets", []), closure=chunk.get("closure", "complete"))
+    if state.get("chunk") != expected or state.get("issue") != {"number": issue["number"], "slug": issue["slug"]}:
+        raise LoopError("recovery cannot change the original frozen selection")
+    if state.get("reviewers") != spec["review"]["reviewers"] or state.get("max_review_rounds") != 3:
+        raise LoopError("recovery cannot change the required panel or attempt cap")
+    if state.get("recovery", {}).get("policy") != loop_recovery.validate_policy(spec["recovery"]):
+        raise LoopError("recovery policy differs from its registered manifest")
+    loop_recovery.validate(state)
+
+
+def registered_state_at(path: Path) -> tuple[Path, dict[str, Any]] | None:
+    root_text = git(path.resolve().parent, "rev-parse", "--show-toplevel", check=False)
+    if not root_text:
+        return None
+    for registry_path, record in recovery_registry(Path(root_text)):
+        if Path(record["state_file"]).resolve() == path.resolve():
+            return registry_path, record
+    return None
+
+
+@contextlib.contextmanager
+def controller_lock(root: Path):
+    """Process locks are released on crash; no stale lock-file removal is needed."""
+    common = git(root, "rev-parse", "--git-common-dir", check=False)
+    if not common:
+        yield
+        return
+    lock_path = repo_path(root, common).resolve() / "loop-controller.lock"
+    with lock_path.open("a+b") as lock:
+        if os.name == "nt":  # pragma: no cover - Windows runners
+            import msvcrt
+            if lock.tell() == 0:
+                lock.write(b"\0")
+                lock.flush()
+            lock.seek(0)
+            msvcrt.locking(lock.fileno(), msvcrt.LK_LOCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            if os.name == "nt":  # pragma: no cover
+                lock.seek(0)
+                msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
 
 def issue_entry(spec: dict[str, Any], number: int) -> dict[str, Any]:
@@ -1235,6 +1362,12 @@ def require_selected_dependencies_passed(
 
 
 def load_state(path: Path) -> dict[str, Any]:
+    registered = registered_state_at(path)
+    if registered is not None:
+        _, record = registered
+        state = record["ledger"]
+        validate_registered_state(record, state)
+        return state
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError as exc:
@@ -1243,12 +1376,71 @@ def load_state(path: Path) -> dict[str, Any]:
         raise LoopError(f"could not read ledger state {path}: {exc}") from exc
     if not isinstance(data, dict) or data.get("schema") != f"{RUN_SCHEMA}/ledger":
         raise LoopError(f"invalid ledger state schema: {path}")
+    if "recovery" in data:
+        raise LoopError("recovery ledger is not at its registered canonical path")
+    root_text = git(path.resolve().parent, "rev-parse", "--show-toplevel", check=False)
+    if root_text:
+        for _, record in recovery_registry(Path(root_text)):
+            if data.get("issue", {}).get("number") == record.get("issue"):
+                raise LoopError("registered recovery objective cannot be accessed as a new legacy ledger")
     return data
 
 
 def write_json(path: Path, value: Any) -> None:
+    """Atomically persist canonical recovery state before its compatibility view."""
+    if isinstance(value, dict) and "recovery" in value:
+        registered = registered_state_at(path)
+        if registered is None:
+            raise LoopError("cannot write an unregistered recovery ledger")
+        registry_path, record = registered
+        validate_registered_state(record, value)
+        record["ledger"] = value
+        atomic_json(registry_path, record)
+    atomic_json(path, value)
+
+
+def atomic_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(json.dumps(value, indent=2, sort_keys=True) + "\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+
+
+def register_recovery(root: Path, spec_path: Path, spec: dict[str, Any], path: Path, state: dict[str, Any]) -> None:
+    policy = loop_recovery.validate_policy(spec["recovery"])
+    history = []
+    for entry in policy["history"]:
+        source = repo_path(root, entry["path"])
+        raw = source.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != entry["sha256"]:
+            raise LoopError(f"historical ledger digest mismatch: {source}")
+        history.append(read_json_object(source))
+    loop_recovery.initialize(state, policy, history=history)
+    registry_path = recovery_directory(root) / (digest([spec["repository"], state["issue"]["number"]]) + ".json")
+    record = {
+        "schema": "loop-objective-registry/v1",
+        "repository": spec["repository"],
+        "issue": state["issue"]["number"],
+        "objective_id": policy["objective_id"],
+        "repo_root": str(root.resolve()),
+        "state_file": str(path.resolve()),
+        "spec_path": str(spec_path.resolve()),
+        "spec_digest": digest(spec),
+        "openspec_digest": openspec_digest(root, spec),
+        "ledger": state,
+    }
+    validate_registered_state(record, state)
+    # The shared record owns the state; the user-facing path is a recoverable view.
+    atomic_json(registry_path, record)
+    atomic_json(path, state)
 
 
 def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, requested_state_dir: str | None) -> int:
@@ -1258,6 +1450,20 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
         predecessor_proofs = require_predecessor_prs(root, spec)
         require_selected_dependencies_passed(root, spec, issue, requested_state_dir)
         path = state_path(root, spec, requested_state_dir, chunk_id)
+        if "recovery" in spec:
+            registered = recovery_record(root, spec)
+            if registered is not None:
+                _, record = registered
+                if Path(record["state_file"]).resolve() != path.resolve() or record["spec_digest"] != digest(spec):
+                    raise LoopError("objective is already registered; changing path or manifest cannot reset it")
+                validate_registered_state(record, record["ledger"])
+                atomic_json(path, record["ledger"])
+                print(f"PASS recovery objective already initialized: {path}")
+                return 0
+        else:
+            for _, record in recovery_registry(root):
+                if record["repository"] == spec["repository"] and record["issue"] == number:
+                    raise LoopError("registered recovery objective cannot be restarted under a legacy manifest")
         refuse_renamed_ledger(root, spec, requested_state_dir, chunk_id, path)
         if path.exists():
             existing = load_state(path)
@@ -1290,10 +1496,15 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
             "created_at": utc_now(),
             "rounds": [],
         }
-        write_json(path, state)
+        if "recovery" in spec:
+            if path.exists():
+                raise LoopError("legacy state must be adopted through the manifest's pinned history inventory")
+            register_recovery(root, spec_path, spec, path, state)
+        else:
+            write_json(path, state)
         print(f"PASS ledger initialized: {path}")
         return 0
-    except LoopError as exc:
+    except (LoopError, loop_recovery.RecoveryError) as exc:
         print(f"FAIL ledger init: {exc}")
         return 1
 
@@ -1322,6 +1533,11 @@ def latest_round(state: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
+    if "recovery" in state:
+        loop_recovery.reserve_round(state, commit)
+        if state["recovery"]["phase"] == "parked":
+            raise LoopError(state["recovery"]["park_reason"])
+        return state["rounds"][-1]
     current = latest_round(state)
     if current is not None and current.get("adjudication") is None:
         if current.get("commit") != commit:
@@ -1387,6 +1603,7 @@ def ledger_record_review(
     finding: str | None,
     finding_file: Path | None = None,
     lift_target: str | None = None,
+    resolutions_file: Path | None = None,
 ) -> int:
     try:
         state = load_state(state_file)
@@ -1420,6 +1637,14 @@ def ledger_record_review(
                     f"reviewer output does not state the recorded verdict {token}; "
                     "record the verdict the reviewer actually reached"
                 )
+        resolutions = {}
+        if "recovery" in state:
+            loop_recovery.validate_review(commit, verdict, finding_text)
+            git(Path(state["repo_root"]), "cat-file", "-e", f"{commit}^{{commit}}")
+            if resolutions_file is not None:
+                resolutions = read_json_object(resolutions_file)
+        elif resolutions_file is not None:
+            raise LoopError("resolution evidence requires a recovery-managed objective")
         round_state["reviews"].append(
             {
                 "reviewer": reviewer,
@@ -1430,12 +1655,13 @@ def ledger_record_review(
                 "finding_source": str(finding_file) if finding_file is not None else "",
                 "lift_target": (lift_target or "").strip(),
                 "recorded_at": utc_now(),
+                **({"resolutions": resolutions} if "recovery" in state else {}),
             }
         )
         write_json(state_file, state)
         print(f"PASS review recorded: {reviewer} round={round_state['number']} commit={commit}")
         return 0
-    except LoopError as exc:
+    except (LoopError, loop_recovery.RecoveryError) as exc:
         print(f"FAIL ledger record-review: {exc}")
         return 1
 
@@ -1512,10 +1738,12 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
             "needs_changes": "improve_required",
             "blocked": "blocked",
         }[verdict]
+        if "recovery" in state:
+            loop_recovery.after_adjudication(state)
         write_json(state_file, state)
         print(f"PASS adjudicated: round={current['number']} verdict={verdict}")
         return 0
-    except LoopError as exc:
+    except (LoopError, loop_recovery.RecoveryError) as exc:
         print(f"FAIL ledger adjudicate: {exc}")
         return 1
 
@@ -1528,6 +1756,81 @@ def ledger_show(state_file: Path) -> int:
         return 1
     print(json.dumps(state, indent=2, sort_keys=True))
     return 0
+
+
+def recovery_command(
+    command: str, ledger: Path, *, commit: str | None = None,
+    file: Path | None = None, reason: str | None = None,
+) -> int:
+    state = load_state(ledger)
+    if "recovery" not in state:
+        raise LoopError("objective has no recovery policy; adopt history through a new configured manifest")
+    if command == "start-round":
+        root = Path(state["repo_root"])
+        if git(root, "rev-parse", "HEAD") != commit:
+            raise LoopError("reserve the exact current commit before dispatching its panel")
+        loop_recovery.reserve_round(state, str(commit))
+    elif command == "submit-plan":
+        loop_recovery.submit_plan(state, read_json_object(file))
+    elif command == "review-plan":
+        loop_recovery.review_plan(state, read_json_object(file))
+    elif command == "resume":
+        loop_recovery.resume(state)
+    elif command == "exhaust":
+        loop_recovery.abandon(state, str(reason))
+    elif command != "next":
+        raise LoopError(f"unknown recovery command: {command}")
+    if command != "next":
+        write_json(ledger, state)
+    print(json.dumps(loop_recovery.next_action(state), indent=2, sort_keys=True))
+    return 0
+
+
+def recovery_publication_state(root: Path, spec: dict[str, Any], ledger: Path | None = None) -> dict[str, Any] | None:
+    if "recovery" not in spec:
+        # A changed/legacy manifest is not a way around a registered objective.
+        selected = {item["number"] for item in spec["issues"]}
+        for _, record in recovery_registry(root):
+            if record["repository"] == spec["repository"] and record["issue"] in selected:
+                raise LoopError("registered recovery objective requires its original manifest")
+        return None
+    registered = recovery_record(root, spec)
+    if registered is None:
+        raise LoopError("recovery objective is not initialized")
+    _, record = registered
+    if record["spec_digest"] != digest(spec) or Path(record["repo_root"]).resolve() != root.resolve():
+        raise LoopError("publication must use the registered manifest and checkout")
+    canonical = Path(record["state_file"])
+    if ledger is not None and ledger.resolve() != canonical.resolve():
+        raise LoopError("publication ledger is not the registered objective")
+    state = load_state(canonical)
+    loop_recovery.require_publishable(state)
+    remote = normalize_remote(git(root, "remote", "get-url", spec["remote"]))
+    if remote != spec["repository"].lower():
+        raise LoopError("publication remote does not match the authorized repository")
+    return state
+
+
+def recovery_scoped_paths(root: Path, spec: dict[str, Any], state: dict[str, Any], head: str) -> None:
+    def safe(path: str) -> str:
+        value = path.rstrip("/")
+        if (not value or value.startswith("/") or "\\" in value or ":" in value
+                or any(part in {"", ".", ".."} for part in value.split("/"))):
+            raise LoopError(f"non-canonical recovery scope path: {path!r}")
+        return value
+
+    allowed = [safe(path) for path in state["chunk"]["files"]]
+    lift_authority = [safe(path) for path in state["chunk"].get("lift_targets", [])]
+    for path in authorized_lift_targets(state):
+        value = safe(path)
+        if not any(value == prefix or value.startswith(prefix + "/") for prefix in lift_authority):
+            raise LoopError("review lift exceeds manifest path authority")
+        allowed.append(value)
+    result = run_command(root, ["git", "diff", "--no-renames", "--name-only", "-z", f"{spec['base_ref']}...{head}"], check=True)
+    for path in filter(None, result.stdout.split("\0")):
+        value = safe(path)
+        if not any(value == prefix or value.startswith(prefix + "/") for prefix in allowed):
+            raise LoopError(f"changed path lies outside frozen recovery scope: {path}")
 
 
 def authorize_action(spec: dict[str, Any], action: str) -> None:
@@ -1563,6 +1866,7 @@ def action_close(
     dry_run: bool,
 ) -> int:
     authorize_action(spec, "close")
+    recovery_publication_state(root, spec)
     selected_issue_for_action(spec, number)
     if merged_pr is None and not spec["closure"]["allow_non_pr"]:
         raise LoopError("code issue closure requires --merged-pr; non-PR closure is disabled")
@@ -1601,6 +1905,12 @@ def planned_branches(spec: dict[str, Any]) -> set[str]:
 
 def action_push(root: Path, spec: dict[str, Any], branch: str | None, force_with_lease: bool, dry_run: bool) -> int:
     authorize_action(spec, "push")
+    recovery_state = recovery_publication_state(root, spec)
+    if recovery_state is not None:
+        head = git(root, "rev-parse", "HEAD")
+        if head != recovery_state["rounds"][-1]["commit"]:
+            raise LoopError("push must publish the exact reviewed recovery commit")
+        recovery_scoped_paths(root, spec, recovery_state, head)
     if git(root, "status", "--porcelain", "--untracked-files=all"):
         raise LoopError("refusing to push a dirty worktree; commit the frozen chunk first")
     current = git(root, "branch", "--show-current")
@@ -1612,9 +1922,11 @@ def action_push(root: Path, spec: dict[str, Any], branch: str | None, force_with
     if force_with_lease and not spec.get("allow_force_push", False):
         raise LoopError("force-with-lease is disabled by the specification")
     args = ["git", "push"]
+    if recovery_state is not None:
+        args.extend(["--no-follow-tags"])
     if force_with_lease:
         args.append("--force-with-lease")
-    args.extend([spec["remote"], current])
+    args.extend([spec["remote"], f"HEAD:refs/heads/{current}" if recovery_state is not None else current])
     if dry_run:
         print("DRY-RUN " + " ".join(args))
         return 0
@@ -1749,6 +2061,17 @@ def verify_local_chunk_files(root: Path, spec: dict[str, Any], state: dict[str, 
 
 
 def verify_remote_chunk_files(pr: dict[str, Any], state: dict[str, Any]) -> None:
+    if "recovery" in state:
+        if pr.get("headRefOid") != state["rounds"][-1]["commit"]:
+            raise LoopError("remote PR head differs from the exact reviewed recovery commit")
+        root = Path(state["repo_root"])
+        records = [record for _, record in recovery_registry(root)
+                   if record["objective_id"] == state["recovery"]["policy"]["objective_id"]]
+        if len(records) != 1:
+            raise LoopError("unregistered recovery publication")
+        spec = load_spec(Path(records[0]["spec_path"]), root)
+        recovery_scoped_paths(root, spec, state, pr["headRefOid"])
+        return
     files = pr.get("files") or []
     paths = [file.get("path") for file in files if isinstance(file, dict) and isinstance(file.get("path"), str)]
     if not paths:
@@ -1803,6 +2126,13 @@ def action_create_pr(
     dry_run: bool,
 ) -> int:
     authorize_action(spec, "create-pr")
+    recovered = recovery_publication_state(root, spec, ledger_file)
+    if recovered is not None:
+        if git(root, "rev-parse", "HEAD") != recovered["rounds"][-1]["commit"]:
+            raise LoopError("PR creation requires the exact reviewed recovery commit")
+        if git(root, "status", "--porcelain", "--untracked-files=all"):
+            raise LoopError("PR creation requires a clean frozen checkout")
+        recovery_scoped_paths(root, spec, recovered, recovered["rounds"][-1]["commit"])
     require_predecessor_prs(root, spec)
     issue = selected_issue_for_action(spec, number)
     current = git(root, "branch", "--show-current")
@@ -1858,6 +2188,7 @@ def action_attest_pr(
     """Write one durable, controller-derived predecessor marker to a source PR."""
 
     authorize_action(spec, "comment")
+    recovery_publication_state(root, spec, ledger_file)
     if not predecessor_attestation_policy(spec)["emit"]:
         raise LoopError("spec.predecessor_attestation.emit is false; refusing to emit an unused marker")
     predecessor_proofs = require_predecessor_prs(root, spec)
@@ -1957,6 +2288,7 @@ def action_approve(
     dry_run: bool,
 ) -> int:
     authorize_action(spec, "approve")
+    recovery_publication_state(root, spec, ledger_file)
     predecessor_proofs = require_predecessor_prs(root, spec)
     state = load_state(ledger_file)
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
@@ -2071,6 +2403,7 @@ def action_merge(
     dry_run: bool,
 ) -> int:
     authorize_action(spec, "merge")
+    recovery_publication_state(root, spec, ledger_file)
     predecessor_proofs = require_predecessor_prs(root, spec)
     merge_policy(spec)
     state = load_state(ledger_file)
@@ -2164,6 +2497,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="module or path the generalization belongs in; required with pass_with_lift",
     )
     record_parser.add_argument("--finding", help="one-line summary; not evidence and cannot stand alone")
+    record_parser.add_argument("--resolutions-file", type=Path, help="JSON evidence map for every inherited recovery finding")
     record_parser.add_argument(
         "--finding-file",
         type=Path,
@@ -2177,6 +2511,18 @@ def build_parser() -> argparse.ArgumentParser:
     adjudicate_parser.add_argument("--note")
     show_parser = ledger_sub.add_parser("show")
     show_parser.add_argument("--state", required=True, type=Path)
+
+    recovery_parser = sub.add_parser("recovery", help="dispatch bounded research and resume the same objective")
+    recovery_sub = recovery_parser.add_subparsers(dest="recovery_command", required=True)
+    for command in ("next", "start-round", "submit-plan", "review-plan", "resume", "exhaust"):
+        child = recovery_sub.add_parser(command)
+        child.add_argument("--ledger", required=True, type=Path)
+        if command == "start-round":
+            child.add_argument("--commit", required=True)
+        if command in {"submit-plan", "review-plan"}:
+            child.add_argument("--file", required=True, type=Path)
+        if command == "exhaust":
+            child.add_argument("--reason", required=True)
 
     action_parser = sub.add_parser("action", help="perform an explicitly authorized remote action")
     action_sub = action_parser.add_subparsers(dest="action_command", required=True)
@@ -2233,10 +2579,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: list[str] | None = None) -> int:
-    force_utf8_output()
-    parser = build_parser()
-    args = parser.parse_args(argv)
+def dispatch(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     try:
         if args.command == "validate":
             root = args.repo_root.resolve()
@@ -2257,11 +2600,16 @@ def main(argv: list[str] | None = None) -> int:
                     args.finding,
                     args.finding_file.resolve() if args.finding_file else None,
                     args.lift_target,
+                    args.resolutions_file,
                 )
             if args.ledger_command == "adjudicate":
                 return ledger_adjudicate(args.state.resolve(), args.verdict, args.note)
             if args.ledger_command == "show":
                 return ledger_show(args.state.resolve())
+        if args.command == "recovery":
+            return recovery_command(args.recovery_command, args.ledger.resolve(),
+                commit=getattr(args, "commit", None), file=getattr(args, "file", None),
+                reason=getattr(args, "reason", None))
         if args.command == "action":
             root = args.repo_root.resolve()
             spec = load_spec(repo_path(root, args.spec), root)
@@ -2305,7 +2653,7 @@ def main(argv: list[str] | None = None) -> int:
                     args.delete_branch,
                     args.dry_run,
                 )
-    except LoopError as exc:
+    except (LoopError, loop_recovery.RecoveryError) as exc:
         print(f"FAIL {exc}")
         return 1
     except (OSError, ValueError, TypeError) as exc:
@@ -2313,6 +2661,22 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     parser.error("unhandled command")
     return 2
+
+
+def main(argv: list[str] | None = None) -> int:
+    force_utf8_output()
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    root = getattr(args, "repo_root", None)
+    if root is None:
+        ledger = getattr(args, "state", None) or getattr(args, "ledger", None)
+        root = ledger.resolve().parent if ledger else Path.cwd()
+    try:
+        with controller_lock(root.resolve()):
+            return dispatch(args, parser)
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(f"FAIL controller: {exc}")
+        return 1
 
 
 if __name__ == "__main__":
