@@ -85,9 +85,12 @@ the actions hold it to these limits:
   or roadmap gate weaker than `required`;
 - no chunk file or lift target, and no changed path at publication, under the
   run's own authority, gates or instructions (`PROTECTED_PATH_PREFIXES`):
-  - all of `.claude/`, except the run's own manifest;
+  - all of `.claude/`, except the run's own manifest and the roadmap data
+    (`.claude/roadmap/*.yaml`, which RM-08 in the required `ci` check requires
+    a closing PR to advance);
   - `.agents/`, `.codex/`, `.mcp.json` and `CLAUDE.local.md`;
-  - every `CLAUDE.md` and `AGENTS.md`, at any depth;
+  - every `CLAUDE.md`, `AGENTS.md`, `.gitattributes`, `.gitmodules` and
+    `.gitignore`, at any depth;
   - `.github/`;
   - all of `scripts/` except the audit and census records
     (`scripts/*Audit.lean`, `scripts/*Census.lean`, and the Lean records under
@@ -96,11 +99,25 @@ the actions hold it to these limits:
   - `exe/`, `registry/` and `DerivedAlgGeoSweep.lean`;
   - the pins (`lakefile.toml`, `lean-toolchain`, `lake-manifest.json`,
     `pins.json`);
-  - `openspec/config.yaml` and `docs/architecture/loop-recovery.md`.
+  - all of `openspec/` except the run's own change directory, so other runs'
+    contracts and the accepted specs are covered;
+  - `docs/architecture/loop-recovery.md`.
 
-  Paths are compared after collapsing `./`, `//` and `\`, and case-insensitively.
-  Those change only through owner-reviewed PRs. A chunk that genuinely needs one
-  of them, a gate baseline for example, files a follow-up issue for the owner.
+  Paths are compared after collapsing `./`, `//` and `\`, and case-insensitively;
+  a path with a `.` or `..` segment is refused. A run may also not add a
+  symlink or submodule anywhere, because a symlink writes through to its
+  target. Those paths change only through owner-reviewed PRs.
+
+**Expected owner stops.** Some ordinary maths work needs a protected path. Such
+a chunk parks under stop reason 1 and files a follow-up issue naming the exact
+change, instead of working around the rule. These are the known cases:
+- a public rename needs its historical name restated in
+  `exe/RestateHistoricalNames.lean`;
+- a gate baseline moves (`scripts/single_instantiation_baseline.txt`,
+  `scripts/warning-baseline.json`, `scripts/style-baseline.json`,
+  `scripts/nolints.json` or `scripts/audit_missing_baseline.txt`);
+- a reference note under `.claude/references/` changes;
+- a pin is bumped.
 
 The owner creates and edits that file; a run never does. Its shape:
 

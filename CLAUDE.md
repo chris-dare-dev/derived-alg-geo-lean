@@ -445,11 +445,12 @@ A branch-authored manifest also cannot:
   opt-in, or a weaker roadmap gate;
 - choose a `base_ref` other than `<remote>/<base_branch>`;
 - scope a chunk over its own authority, gates or instructions: all of
-  `.claude/` except its own manifest, `.agents/`, `.codex/`, `.mcp.json`,
-  `.github/`, `scripts/` except the audit and census records, `exe/`,
-  `registry/`, the Lean and Lake pins, `pins.json`, `openspec/config.yaml`,
-  and every `CLAUDE.md` or `AGENTS.md` at any depth, matched in any letter
-  case.
+  `.claude/` except its own manifest and the roadmap data, `.agents/`,
+  `.codex/`, `.mcp.json`, `.github/`, `scripts/` except the audit and census
+  records, `exe/`, `registry/`, the Lean and Lake pins, `pins.json`, all of
+  `openspec/` except its own change, and every `CLAUDE.md`, `AGENTS.md` or
+  `.gitattributes` at any depth, matched in any letter case;
+- add a symlink or submodule.
 
 Those change only through owner-reviewed PRs. Code issues close only after a
 confirmed merged PR; complete chunks need a closing keyword, and progress

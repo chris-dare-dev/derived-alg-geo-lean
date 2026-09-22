@@ -1478,18 +1478,40 @@ class BranchManifestPolicyTests(unittest.TestCase):
             # other spellings of protected paths
             "Scripts/loop_engine.py", "claude.md", "Agents.md", ".GitHub/workflows/ci.yml",
             ".claude//settings.json", "./scripts/gates.sh", "scripts/AlgebraicGeometryAudit/../gates.sh",
-            "scripts/AlgebraicGeometryAudit/../../evil.lean",
+            "scripts/AlgebraicGeometryAudit/../../evil.lean", ".claude/roadmap/../settings.json",
+            # git's own path-level behaviour, at any depth
+            ".gitattributes", "DerivedAlgGeo/.gitattributes", ".gitmodules", "docs/.gitignore",
+            # another run's OpenSpec contract, and the accepted specs
+            "openspec/changes/other-change/proposal.md", "openspec/specs/capability/spec.md",
         ]
         allowed = [
             "scripts/AlgebraicGeometryAudit.lean", "scripts/AlgebraicGeometryAudit/SchemeDerived.lean",
             "scripts/StabilityConditionAudit", "scripts/StabilityConditionCensus.lean",
             "DerivedAlgGeo/AlgebraicGeometry/Example.lean", "docs/architecture/generalization-backlog.md",
-            "docs/architecture/loop-engineering-friction.md",
+            "docs/architecture/loop-engineering-friction.md", "DerivedAlgGeo.lean",
+            # RM-08 in the required ci check needs a closing PR to advance its entry
+            ".claude/roadmap/stability-families.yaml",
         ]
         self.assertEqual([path for path in protected if not loop_engine.is_protected_path(path)], [])
         self.assertEqual([path for path in allowed if loop_engine.is_protected_path(path)], [])
-        self.assertFalse(loop_engine.is_protected_path(MANIFEST, MANIFEST))
-        self.assertTrue(loop_engine.is_protected_path(".claude/loop-specs/other.yaml", MANIFEST))
+        own = [MANIFEST, "openspec/changes/pilot-change"]
+        self.assertFalse(loop_engine.is_protected_path(MANIFEST, own))
+        self.assertFalse(loop_engine.is_protected_path("openspec/changes/pilot-change/tasks.md", own))
+        self.assertTrue(loop_engine.is_protected_path(".claude/loop-specs/other.yaml", own))
+        self.assertTrue(loop_engine.is_protected_path(".claude/loop-specs/TEST-RUN.yaml", own))
+
+    def test_a_branch_run_may_not_introduce_symlinks(self) -> None:
+        init_repo(self.root)
+        base = commit_all(self.root, "base")
+        (self.root / "docs").mkdir()
+        (self.root / "docs" / "notes.md").symlink_to("../.claude/settings.json")
+        head = commit_all(self.root, "an innocent-looking doc")
+        state = {"spec_digest": loop_engine.digest(self.spec), "plan_paths": [MANIFEST]}
+        with self.assertRaisesRegex(loop_engine.LoopError, "docs/notes.md"):
+            loop_engine.require_no_links(self.root, base, head, state)
+        (self.root / "docs" / "notes.md").unlink()
+        (self.root / "docs" / "notes.md").write_text("ordinary\n", encoding="utf-8")
+        loop_engine.require_no_links(self.root, base, commit_all(self.root, "a real doc"), state)
         lifted = json.loads(json.dumps(self.spec))
         lifted["issues"][0]["chunks"][0]["lift_targets"] = [".claude/skills"]
         with self.assertRaisesRegex(loop_engine.LoopError, "protected"):

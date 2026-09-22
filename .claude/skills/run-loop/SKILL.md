@@ -106,11 +106,13 @@ These are not stops. What to do instead:
   their own, and only for their open issues. Your manifest cannot request
   administrator merge, force-push, closure without a merged PR, an epic
   opt-in or a weaker roadmap gate. Its chunks cannot touch the run's own
-  authority, gates or instructions: `.claude/`, `scripts/` beyond the audit
-  records, CI, the pins, and every `CLAUDE.md`/`AGENTS.md` (full list in
-  `.claude/loop-specs/README.md`). Never try to change those from a run; a
-  needed change there, including a gate baseline, is a follow-up issue for
-  the owner.
+  authority, gates or instructions: `.claude/` beyond the roadmap data,
+  `scripts/` beyond the audit records, other OpenSpec changes, CI, the pins,
+  and every `CLAUDE.md`/`AGENTS.md`/`.gitattributes`. Nor can they add a
+  symlink or submodule. The full list, and the expected owner stops it
+  creates (a historical-name restatement under `exe/`, a moved gate baseline),
+  is in `.claude/loop-specs/README.md`. Never work around it; park that chunk
+  and file a follow-up issue naming the exact change the owner must make.
 - Code issues close only after the controller verifies a merged PR that closes
   the same issue. Non-PR closure is disabled unless the manifest explicitly
   says otherwise.

@@ -131,12 +131,21 @@ PROTECTED_PATH_PREFIXES = (
     "pins.json",
     "CLAUDE.local.md",
     "DerivedAlgGeoSweep.lean",
-    "openspec/config.yaml",
+    # Other runs' OpenSpec contracts and the accepted specs; a run's own
+    # change directory is exempt through its plan paths.
+    "openspec",
     "docs/architecture/loop-recovery.md",
 )
-PROTECTED_BASENAMES = frozenset({"claude.md", "agents.md"})
-# An audit or census umbrella, its record directory, or a Lean record below it.
-AUDIT_RECORD_RE = re.compile(r"scripts/[A-Za-z]+(?:Audit|Census)(?:\.lean|/[A-Za-z0-9_./-]+\.lean)?")
+# Instructions at any depth, and git's own path-level behaviour: a
+# `.gitattributes` can hide a Lean diff from the reviewers as "binary".
+PROTECTED_BASENAMES = frozenset({"claude.md", "agents.md", ".gitattributes", ".gitmodules", ".gitignore"})
+# Records a maths chunk must extend. The audit and census slices take new
+# public declarations. RM-08 in the required `ci` check needs a closing PR to
+# advance its roadmap entry. The gates that judge both stay protected.
+UNPROTECTED_RECORD_RES = (
+    re.compile(r"scripts/[A-Za-z]+(?:Audit|Census)(?:\.lean|/[A-Za-z0-9_./-]+\.lean)?"),
+    re.compile(r"\.claude/roadmap(?:/[A-Za-z0-9_.-]+\.yaml)?"),
+)
 # Revalidation rounds re-review a passed change whose content moved (a rebase
 # that had to resolve a conflict, say). They need the full panel but do not
 # spend the critique/improve cap; this bounds how often a pass can be reopened.
@@ -204,30 +213,38 @@ def canonical_repo_path(path: str) -> str:
     return value.rstrip("/")
 
 
-def is_protected_path(path: str, own_manifest: str | None = None) -> bool:
+def is_protected_path(path: str, exempt: Iterable[str] = ()) -> bool:
     """True for a path a branch-authored run may not change.
 
-    Compared case-insensitively: on a case-insensitive checkout `Scripts/...`
-    and `scripts/...` are one file.
+    `exempt` holds the run's own plan paths: its manifest and its OpenSpec
+    change directory, matched exactly as recorded. Everything else compares
+    case-insensitively, since on a case-insensitive checkout `Scripts/...` and
+    `scripts/...` are one file.
     """
 
     value = canonical_repo_path(path)
     folded = value.casefold()
-    if own_manifest and folded == canonical_repo_path(own_manifest).casefold():
-        return False
-    if AUDIT_RECORD_RE.fullmatch(value) and ".." not in value.split("/"):
-        return False
+    parts = value.split("/")
+    if ".." in parts or "." in parts:
+        return True
     if folded.rsplit("/", 1)[-1] in PROTECTED_BASENAMES:
         return True
+    for own in exempt:
+        own = canonical_repo_path(own)
+        if own and (value == own or value.startswith(own + "/")):
+            return False
+    if any(pattern.fullmatch(value) for pattern in UNPROTECTED_RECORD_RES):
+        return False
     return any(
         folded == prefix.casefold() or folded.startswith(prefix.casefold() + "/") for prefix in PROTECTED_PATH_PREFIXES
     )
 
 
-def protected_paths(paths: Iterable[str], own_manifest: str | None = None) -> list[str]:
+def protected_paths(paths: Iterable[str], exempt: Iterable[str] = ()) -> list[str]:
     """Return the paths a branch-authored run may not change."""
 
-    return [path for path in paths if is_protected_path(path, own_manifest)]
+    exempt = list(exempt)
+    return [path for path in paths if is_protected_path(path, exempt)]
 
 
 def digest(value: Any) -> str:
@@ -858,7 +875,10 @@ def validate_spec(spec: dict[str, Any]) -> None:
             raise LoopError(f"spec.base_ref must be {expected_base!r}, the remote base branch")
         for issue in issues:
             for chunk in issue["chunks"]:
-                blocked = protected_paths(list(chunk["files"]) + list(chunk.get("lift_targets", [])))
+                blocked = protected_paths(
+                    list(chunk["files"]) + list(chunk.get("lift_targets", [])),
+                    [f"openspec/changes/{spec['openspec']['change']}"] if has_openspec(spec) else [],
+                )
                 if blocked:
                     raise LoopError(
                         f"chunk {chunk['id']!r} names protected paths a run may not change: "
@@ -2511,9 +2531,37 @@ def require_unprotected(paths: Iterable[str], state: dict[str, Any]) -> None:
 
     if is_legacy_state(state):
         return
-    blocked = protected_paths(paths, ledger_manifest_path(state))
+    blocked = protected_paths(paths, ledger_plan_paths(state))
     if blocked:
         raise LoopError("change touches protected paths a run may not modify: " + ", ".join(blocked))
+
+
+def require_no_links(root: Path, base: str, head: str, state: dict[str, Any]) -> None:
+    """Refuse symlinks and gitlinks a branch-authored change introduces.
+
+    Each is judged by its own path, but a symlink writes through to its target
+    on disk, and a later agent editing an ordinary-looking file would change a
+    protected one.
+    """
+
+    if is_legacy_state(state):
+        return
+    raw = run_command(root, ["git", "diff", "--raw", "--no-renames", "-z", f"{base}...{head}"], check=True).stdout
+    fields = raw.split("\0")
+    links = [
+        fields[index + 1]
+        for index in range(0, len(fields) - 1, 2)
+        if fields[index].startswith(":") and fields[index].split()[1] in {"120000", "160000"}
+    ]
+    if links:
+        raise LoopError("change adds symlinks or submodules, which a run may not introduce: " + ", ".join(links))
+
+
+def require_published_head_has_no_links(root: Path, spec: dict[str, Any], state: dict[str, Any], head: str) -> None:
+    if is_legacy_state(state):
+        return
+    ensure_commit(root, spec["remote"], head)
+    require_no_links(root, trusted_base_commit(root, spec), head, state)
 
 
 def recovery_scoped_paths(
@@ -2539,6 +2587,7 @@ def recovery_scoped_paths(
         if not any(value == prefix or value.startswith(prefix + "/") for prefix in allowed):
             raise LoopError(f"changed path lies outside frozen recovery scope: {path}")
     require_unprotected(changed, state)
+    require_no_links(root, base or spec["base_ref"], head, state)
 
 
 def authorize_action(root: Path, spec: dict[str, Any], action: str) -> None:
@@ -2780,6 +2829,7 @@ def verify_local_chunk_files(root: Path, spec: dict[str, Any], state: dict[str, 
     if not changed:
         raise LoopError("frozen chunk has no committed file changes relative to the protected base")
     require_unprotected(changed, state)
+    require_no_links(root, base_ref, "HEAD", state)
     allowed = chunk_allowed_paths(state)
     outside = [path for path in changed if not path_is_in_frozen_chunk(path, allowed)]
     if outside:
@@ -2989,6 +3039,7 @@ def action_attest_pr(
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
+    require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     payload = predecessor_attestation_from_state(state, pr["headRefOid"])
     matches = matching_predecessor_attestations(pr.get("comments"), payload, spec["actor"])
     if len(matches) == 1:
@@ -3040,6 +3091,7 @@ def action_ready(root: Path, spec: dict[str, Any], pr_number: int, ledger_file: 
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
+    require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     if pr.get("isDraft") is False:
         print(f"PASS PR already ready for review: #{pr_number}")
         return 0
@@ -3203,6 +3255,7 @@ def action_approve(
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
+    require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     check_required_checks(root, spec, pr_number)
     args = [
         "gh",
@@ -3324,6 +3377,7 @@ def action_merge(
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
+    require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     if predecessor_attestation_policy(spec)["emit"]:
         payload = predecessor_attestation_from_state(state, pr["headRefOid"])
         require_exact_predecessor_attestation(pr, payload, spec["actor"], pr_number)
