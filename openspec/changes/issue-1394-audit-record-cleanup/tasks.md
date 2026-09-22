@@ -13,7 +13,9 @@
 
 ## 2. Independent review
 
-- [ ] 2.1 Have the mathematics/source-faithfulness, repository-boundary,
+- [x] 2.1 Have the mathematics/source-faithfulness, repository-boundary,
   abstraction/adoption, and mathlib-style reviewers independently review the
   same frozen commit. Record every review in the loop ledger and verify the
-  chunk is adjudicated `passed` within the three-round cap.
+  chunk is adjudicated `passed` within the three-round cap. All four reviews
+  passed the synchronized issue commit in round 2; their outputs and
+  adjudication are preserved in the loop ledger.
