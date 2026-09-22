@@ -53,8 +53,10 @@ replacement for a Lean theorem or an issue acceptance criterion.
   clean-worktree, and duplicate-PR checks remain the real safety conditions.
 - The local and CI gate scripts originally validated only
   `.claude/loop-specs/sf8-sf9-pilot.yaml`. `scripts/validate_loop_specs.sh` now
-  validates every YAML manifest, and the trust surface/CODEOWNERS explicitly
-  cover loop specs, reviewer prompts, the run-loop skill, and `openspec/`.
+  validates every YAML manifest. At that historical point, the trust
+  surface/CODEOWNERS explicitly covered loop specs, reviewer prompts, the
+  run-loop skill, and `openspec/`; those files were later retired with the
+  trust-surface workflow and must not be treated as current policy.
 - OpenSpec task 2.3 named a nonexistent `scripts/precheck.py`; the repository's
   actual local contract is `scripts/precheck.sh --no-build` plus a named
   targeted `lake build` invocation. Keep this distinction visible in future
@@ -196,6 +198,42 @@ replacement for a Lean theorem or an issue acceptance criterion.
   Include both entries when a chunk edits an umbrella beside its child
   directory.
 
+## SF11.3 recut observations (2026-09-21)
+
+- The recut was triggered by a real remote-policy change, not by a missing
+  mathematical label: current `origin/main` no longer contains
+  `.github/workflows/trust-guard.yml`, and branch protection reports only
+  `ci`. The v3 manifest's `trust-surface` requirement was stale state and is
+  not carried into v4.
+- The first candidate v4 plan ref was found to contain the earlier SF11.3
+  implementation commits. Using it as `base_ref` would have hidden the source
+  changes from the fresh chunk diff and adversaries. The clean v4 plan starts
+  at current `main` and contains only the SF11 OpenSpec/manifest; the v4 run
+  branch carries the implementation separately.
+- The loop validator rejected an initially redundant manifest requirement
+  because it was not named by an OpenSpec requirement. This was a
+  documentation/contract mismatch, not evidence that the validator should be
+  weakened; the redundant line was removed while the runner still requires
+  `ci` explicitly.
+- A shell command that created a worktree and then merged without changing its
+  working directory merged `origin/main` into the old local v3 worktree. The
+  worktree was clean and the merge was unpushed, so no remote state changed,
+  but this is an operational footgun: run each git mutation with an explicit
+  worktree directory and verify `git branch --show-current` afterward.
+- The existing draft PR #1453 was bound to the old v3 branch/manifest. The
+  controller's preflight deliberately refuses a second open PR for the same
+  issue, so the old draft was explicitly retired before the replacement was
+  created as `agent/sf11-3-followup-v4-current`; its branch remains for
+  provenance.
+- While the first v4 candidate was being checked, `main` advanced from
+  `858ca700` to `49c33eda` to delete the remaining trust-surface residue in an
+  unrelated manifest. The candidate was discarded rather than reviewed
+  against stale main; this current-main plan ref is `2424d3eb`.
+- No reviewer or controller is allowed to infer that “trust surface removed”
+  means that audit evidence may be relaxed. The v4 acceptance still requires
+  actual AlgebraicGeometry audit records, unchanged missing-declaration
+  baseline/ceilings, and no new `sorry`, `admit`, or axiom.
+
 ## Follow-up observations (2026-09-19)
 
 - Moving the operation-facing declarations from `KFlatBaseChangeData` to
@@ -303,3 +341,62 @@ Its mapping-telescope factorization API is also universe-zero, so a partial
 generalization produced cascading universe mismatches. Do not widen one layer
 of a universe-sensitive representability construction without first auditing
 the entire telescope dependency chain; the attempted edit was reverted.
+
+## SF11.3 follow-up freeze correction (2026-09-21)
+
+The first coding draft removed the projection-only filtered-colimit carriers
+from `IndFilteredColimits.lean` and updated the AlgebraicGeometry audit. A
+static dependency check then exposed a second audit owner,
+`scripts/StabilityConditionAudit/TStructureCore.lean`, which still printed
+axioms for the removed declarations. Leaving that file outside the frozen
+chunk would make the intended refactor unbuildable and would force an
+out-of-scope edit during review. The follow-up was therefore re-frozen as
+`sf11-3-followup-v2` from a new immutable plan ref, with that audit directory
+explicitly included. The prior draft commit is retained only as a migration
+source; its ledger is not reused as review evidence.
+
+The official OpenSpec CLI was installed in an ephemeral `/tmp` toolchain
+because the host initially lacked both Node and `openspec`; strict validation
+passed for the change and all six repository changes. This environment detail
+is operational friction, not a repository dependency, and must be recreated or
+replaced by the runner before future local validation.
+
+The reference-base run at `4e56e5ca` compiled the changed module, both audit
+libraries, the public `DerivedAlgGeo` umbrella, and the
+development/specialization targets. That snapshot is not the reviewed head,
+not the current `origin/main`, and not CI evidence. On the round-one
+candidate `d8e3d6c1`, the same targeted local builds and the two axiom
+transcripts passed with 5,374 AlgebraicGeometry commands and 7,087
+StabilityCondition commands; these are local measurements, not claims about a
+GitHub run. The environment completeness ratchet measured AlgebraicGeometry
+at exactly its recorded ceiling (6,077 public, 5,329 audited, 748 missing),
+with no new baseline rows. The 351-declaration failure quoted from PR #1425
+therefore came from an older base/audit state; it must not be used as current
+evidence after the base refresh. At that v2 snapshot, five stale
+single-instantiation baseline rows were visible; the v3 freeze below migrates
+only the two rows for declarations deleted by this repair.
+
+Another undocumented prerequisite surfaced: `scripts/EnumDecls.lean` imports
+the root `DerivedAlgGeo` and `DerivedAlgGeo.Development` modules, but the
+audit-library build does not materialize those umbrella oleans. A clean runner
+must build the root and development/specialization targets before running the
+completeness sweep; otherwise the command fails with a missing object-file
+error despite the audit libraries themselves being green.
+
+## SF11.3 follow-up v3 freeze correction (2026-09-21)
+
+Round-two repository-boundary and mathlib reviews identified that
+`scripts/single_instantiation_baseline.txt` is consumed by
+`check_single_instantiation.py`, so its two rows for the deleted
+`FilteredColimitTruncationData` and
+`IndExtensionFilteredColimitData` declarations were operational stale data,
+not merely prose. The v3 manifest explicitly freezes that file and migrates
+only those two rows. It does not edit `scripts/audit_missing_baseline.txt`,
+change a ceiling, add a TODO, or relax the detector threshold. The v2 ledger
+and its review evidence are not reused; v3 starts from immutable plan ref
+`agent/sf11-3-followup-plan-v3` with a fresh ledger.
+
+The v3 exact-head checks are local measurements, not CI evidence. The targeted
+module build, umbrella/development prerequisite build, per-slice axiom audits,
+single-instantiation detector, and declaration-completeness sweep are rerun
+after the migration on the clean v3 candidate that the new ledger binds to.
