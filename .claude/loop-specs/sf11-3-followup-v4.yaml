@@ -1,12 +1,12 @@
 schema: derived-alg-geo-lean.loop-run/v1
-id: sf11-3-followup-v4
+id: sf11-3-followup-v4-current
 repository: chris-dare-dev/derived-alg-geo-lean
 actor: chris-dare-dev
 remote: origin
 base_branch: main
 # This plan branch starts at the current protected main and contains only the
 # frozen SF11 OpenSpec plus this immutable run manifest.
-base_ref: agent/sf11-3-followup-plan-v4-clean
+base_ref: agent/sf11-3-followup-plan-v4-current
 mode: independent
 enabled: true
 allow_force_push: false
@@ -61,10 +61,10 @@ mutations:
 
 issues:
   - number: 1445
-    slug: sf11-3-followup-v4
+    slug: sf11-3-followup-v4-current
     depends_on: []
     chunks:
-      - id: sf11-3-followup-v4
+      - id: sf11-3-followup-v4-current
         scope: Re-cut the merged SF11.3 Theorem 5.3 boundary from current main, migrate the stale single-instantiation audit rows, and capture a fresh bounded adversarial handoff after the trust-surface workflow removal.
         requirements:
           - Theorem 5.3 owner boundaries are source-shaped and do not duplicate canonical t-structure carriers
