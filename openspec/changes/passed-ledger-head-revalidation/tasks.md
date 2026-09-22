@@ -1,0 +1,19 @@
+# Tasks
+
+## 1. Specify and bootstrap the bounded controller change
+
+- [x] 1.1 Create the distinct controller tracking issue #1469 and an enabled, code-scoped three-round implementation manifest bound to this OpenSpec change, with every provider mutation flag false; verify `python3 scripts/loop_engine.py validate --spec <manifest>` succeeds.
+- [ ] 1.2 Run strict OpenSpec validation and independent plan review, then publish only the planning artifacts and mutation-disabled manifest through the documented planning-only bootstrap PR path; verify the merged base contains the exact plan and no controller implementation changes or issue closure.
+- [ ] 1.3 From a fresh clean-base checkout after the bootstrap merge, run `validate` and read-only `preflight`, create the manifest's exact planned issue branch, and initialize its ledger before source edits; verify the initialized ledger freezes the expected controller files, exact issue, three-round cap, and artifact digests. Keep every mutation flag disabled throughout this code run.
+
+## 2. Implement passed-head revalidation as one frozen code chunk
+
+- [ ] 2.1 Pin protected-base OIDs at new ledger initialization and per ordinary/revalidation round; add append-only revalidation history validation and an atomic passed-head transition that reserves exactly one next capped round. Verify a disposable legacy-schema fixture mirroring #928's r1 needs-changes / r2 pass / cap-3 history uses only the marked conservative base inference, without altering the active DT1 ledger, and a repeated ordered refresh chain consumes successive slots without permitting a skipped or fourth round.
+- [ ] 2.2 Add fail-closed admission checks for exact local HEAD, direct protected-base ancestry, clean/frozen diff, manifest and OpenSpec binding, open issue, remote identity, and a complete all-state exact-branch PR lookup that accepts only no PR or one open, non-draft PR exactly bound to the prior pass, including both complete-mode and progress-mode body forms; verify each malformed, failed, stale, truncated, or ambiguous provider/local check leaves ledger bytes unchanged.
+- [ ] 2.3 Bind all shipping actions to the latest complete passing head and verify local, remote, and provider heads remain exact; prove pending refresh, stale local/remote head, and pre-merge base drift fail before mutation, a refreshed third-round needs-changes outcome becomes terminal blocked, safe exact-head push synchronizes only the absent or immediately prior remote ref, an exact existing open PR is reused rather than duplicated, stale/closed/merged/draft/multiple PRs reject refresh, and closure verifies the exact merged PR/issue/base ancestry.
+- [ ] 2.4 Add focused controller documentation, usage examples, a new friction-log entry for the stale-pass/base-refresh failure, and focused tests; verify `python3 -m unittest discover -s scripts/tests -p 'test_loop_engine.py'`, `python3 scripts/precheck.sh`, and strict OpenSpec validation pass.
+
+## 3. Adversarial review and handoff
+
+- [ ] 3.1 Run independent mathematical/source-faithfulness, repository-boundary, abstraction/adoption, and controller-style reviews against one exact commit, revise only within the frozen files and three-round cap, and verify the ledger records all required roles against the final SHA.
+- [ ] 3.2 After all four reviews pass on one exact SHA and required hosted CI succeeds, publish this controller's own PR only through the documented self-bootstrap procedure, not the stale protected-base mutation actions. Reconfirm exact local/remote/PR head, frozen paths, issue/body, and protected-base freshness before each manual provider write; use a head-matched merge and let the PR close #1469 only after it is merged. If the cap is exhausted or protected base moves without capacity, preserve evidence and stop without resetting the attempt.
