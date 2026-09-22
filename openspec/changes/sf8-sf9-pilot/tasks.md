@@ -8,16 +8,18 @@
 - [ ] 1.4 Add the five coherence laws, comparison/agreement result, and non-flat nonidentity example; verify targeted Lean checks and mathematical adversarial review
 - [x] 1.5 Add the explicit `ℤ → ZMod 2` non-flat/nonidentity affine witness as a progress chunk; verify the supported pullback instantiation, full Lean build, and non-closing PR policy
 - [x] 1.6 Compute one explicit nonzero degree-minus-one homology witness for `ℤ → ZMod 2` from a two-term free resolution; connect it to the supported affine bounded-projective representative, preserve the non-generalization boundary, and use a non-closing PR policy
-- [ ] 1.7 Prove a concrete comparison between the restriction of scalars of the affine witness's `H^{-1}` and `CategoryTheory.Tor (ModuleCat ℤ) 1`, using the explicit projective resolution and the chain/cochain degree correspondence; keep the theorem affine and example-specific, update the audit and tooling-friction log, and use a non-closing progress PR
+- [x] 1.7 Prove a concrete comparison between the restriction of scalars of the affine witness's `H^{-1}` and `CategoryTheory.Tor (ModuleCat ℤ) 1`, using the explicit projective resolution and the chain/cochain degree correspondence; keep the theorem affine and example-specific, update the audit and tooling-friction log, and use a non-closing progress PR
 
-Tasks 1.5 and 1.6 are historical merged progress chunks; the derived-effect
-chunk is PR #1457. The separate task 1.7 manifest must not schedule #522 or
-#525; those downstream tasks remain blocked on #554's eventual complete
-closure.
+Tasks 1.5, 1.6, and 1.7 are historical merged progress chunks: the nonflat
+witness is PR #1404, the derived-effect chunk is PR #1457, and the concrete
+Tor comparison is PR #1464. Issue #554 remains open; tasks 1.2–1.4 are still
+outstanding. The separate task 1.7 manifest did not schedule #522 or #525;
+those downstream tasks remain blocked on #554's eventual complete closure.
 
-Because the loop ledger hashes this file, task 1.7 remains unchecked during its
-implementation PR and is marked complete only in a separate post-merge plan
-sync; do not change required OpenSpec artifacts after ledger initialization.
+Because the loop ledger hashes this file, each active task remains unchecked
+during its implementation PR and is marked complete only in a separate
+post-merge plan sync. Task 1.7 was synced after PR #1464 merged; do not change
+required OpenSpec artifacts after ledger initialization.
 
 ## 2. SF9.2 algebraicity (#522)
 
