@@ -228,6 +228,10 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   retains its required ambient triangulated signature; this witness identifies
   the narrower hypothesis consumed by its proof and introduces no instance.
 - state:              L (proof-witness verified)
+- progress note (2026-09-22): The supplied-closure comparison is implemented
+  in #918 as `le_triangEnvelope_of_isTriangulatedClosed₂`; the issue-required
+  ambient-triangulated theorem remains as a wrapper. Merge confirmation is
+  pending.
 
 ### 2026-09-22 — envelope comparison without nonempty generators (planned)
 - chunk:              rou1-2-extension-closure-comparison

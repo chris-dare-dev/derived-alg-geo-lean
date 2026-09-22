@@ -9,9 +9,42 @@ import Mathlib.CategoryTheory.Triangulated.Subcategory
 /-!
 # Comparing extension closures
 
-Downstream comparison lemmas between the repository's owner `ExtensionClosure`
-and Mathlib's iterated extension products and triangulated envelope.  The
-owner closure remains an `ObjectProperty` with only its proved properties.
+Downstream comparisons connect the repository's extension closure with Mathlib's
+finite extension products, triangulated envelope, and generation-time API.
+
+## Main definitions
+
+This module adds no carrier or closure operation. The owner presentation remains
+`CategoryTheory.Triangulated.ExtensionClosure`.
+
+## Main results
+
+* `extensionProductIter_le` embeds every finite extension product in the owner
+  closure.
+* `le_triangEnvelope` compares the owner closure with Mathlib's envelope under
+  nonempty-generator and triangulated-category assumptions.
+* `le_triangEnvelope_of_isTriangulatedClosed₂` needs only extension-closure
+  data for this particular envelope.
+* `eq_iSup_extensionProductIter` presents the owner closure as the supremum of
+  zero-augmented finite iterates.
+* `generationTime_singleton_le_of_mem_extensionProductIter` gives a
+  generation-time bound for each iterate.
+
+## Implementation notes
+
+The finite-iterate comparison uses a local `IsTriangulatedClosed₂` witness, so
+it adds no stronger public instance to the owner module. The supremum equality
+adjoins `IsZero` to cover empty generators and uses associativity in its reverse
+inclusion.
+
+## References
+
+`Mathlib.CategoryTheory.Triangulated.Subcategory` supplies the extension-product
+and envelope APIs compared here.
+
+## Tags
+
+extension closure, extension products, triangulated envelope, generation time
 -/
 
 noncomputable section
@@ -57,6 +90,19 @@ theorem extensionProductIter_le (P : ObjectProperty C) (n : ℕ) :
   exact P.extensionProductIter_le_of_isTriangulatedClosed₂
     (fun _ hP => ExtensionClosure.mem hP) n
 
+/-- The owner closure is contained in the triangulated envelope when that
+particular envelope is closed under distinguished extensions.
+
+This form needs only `[P.Nonempty]` and
+`[P.triangEnvelope.IsTriangulatedClosed₂]`; it does not require an ambient
+`IsTriangulated C` instance. Mathlib's ambient triangulated instance is one way
+to supply the local closure hypothesis. -/
+theorem le_triangEnvelope_of_isTriangulatedClosed₂ (P : ObjectProperty C)
+    [P.Nonempty] [P.triangEnvelope.IsTriangulatedClosed₂] :
+    ExtensionClosure P ≤ P.triangEnvelope := by
+  exact le_of_closed_of_isTriangulatedClosed₂ (Q := P.triangEnvelope)
+    P.le_triangEnvelope
+
 /-- The owner closure is contained in Mathlib's triangulated envelope when the
 generator set is nonempty and the ambient category is triangulated.
 
@@ -65,8 +111,7 @@ zero object while the triangulated envelope is bottom. -/
 theorem le_triangEnvelope (P : ObjectProperty C) [P.Nonempty]
     [IsTriangulated C] :
     ExtensionClosure P ≤ P.triangEnvelope := by
-  exact le_of_closed_of_isTriangulatedClosed₂ (Q := P.triangEnvelope)
-    P.le_triangEnvelope
+  exact le_triangEnvelope_of_isTriangulatedClosed₂ P
 
 /-- The reverse envelope comparison fails for the empty property: the owner
 closure contains zero objects, whereas the empty property's triangulated
@@ -115,8 +160,10 @@ theorem eq_iSup_extensionProductIter (P : ObjectProperty C)
 /-- An object in the `n`th extension product of `P` has singleton generation
 time at most `n`.
 
-This bound needs only the pretriangulated hypotheses of the generation-time
-API; no ambient triangulatedness or nonempty-generator assumption is used. -/
+Starting from `P ≤ P.triangEnvelopeIter 0`, monotonicity of extension products
+and retract closure place the `n`-fold extension product inside
+`P.triangEnvelopeIter n`. This argument avoids the associativity step, so it
+works under the pretriangulated assumptions alone. -/
 theorem generationTime_singleton_le_of_mem_extensionProductIter
     (P : ObjectProperty C) (n : ℕ) {X : C}
     (hX : P.extensionProductIter n X) :
