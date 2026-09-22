@@ -14,8 +14,9 @@ arXiv:1902.08184v4 without claiming the scheme-level base-change theorems.
 
 * `inRange` packages the lower- and upper-truncation conditions used by the
   bounded-range formulas.
-* `PreservesFilteredColimits` is owned by the categorical t-structure module;
-  its `PreservesColimit` binders remain direct owner inputs.
+* `PreservesFilteredColimitTruncations` is owned by the categorical
+  t-structure module; its `PreservesColimit` binders remain direct owner
+  inputs.
 
 ## Main results
 
@@ -23,8 +24,10 @@ arXiv:1902.08184v4 without claiming the scheme-level base-change theorems.
   `IndExtensionData` consequences.
 * The exactness transport lemmas expose one-sided and two-sided hypotheses
   separately, so a caller cannot accidentally strengthen (4a) or (4b).
-* `inRange_iff` and `local_inRange_iff` consume explicit comparison formulas;
-  they do not package a geometric descent theorem as a carrier.
+* `inRange_iff_of_components` and
+  `local_inRange_iff_of_components` compose explicit lower- and
+  upper-truncation comparison formulas; they do not package a geometric
+  descent theorem as a carrier.
 
 ## Implementation notes
 
@@ -87,12 +90,12 @@ theorem aisle_eq_coprodClosure
 def inRange (t : TStructure C) (X : C) (a b : ℤ) : Prop :=
   t.IsGE X a ∧ t.IsLE X b
 
-/-- Consume a source-shaped bounded-range descent formula.
+/-- Compose source-shaped lower- and upper-truncation descent formulas.
 
 The restriction functors and local t-structures are explicit arguments. The
-final `range_iff` is the external flat/fpqc owner theorem, not a field hidden
-inside a new descent carrier. -/
-theorem inRange_iff
+two component formulas are the external flat/fpqc owner theorems, not fields
+hidden inside a new descent carrier. -/
+theorem inRange_iff_of_components
     {t : TStructure C}
     {I : Type w'} {D : I → Type u'}
     [∀ i, Category.{v'} (D i)]
@@ -102,13 +105,21 @@ theorem inRange_iff
     [∀ i, Pretriangulated (D i)]
     (restriction : ∀ i, C ⥤ D i)
     (localTStructure : ∀ i, TStructure (D i))
-    (range_iff : ∀ (X : C) (a b : ℤ),
-      inRange t X a b ↔
-        ∀ i, inRange (localTStructure i) ((restriction i).obj X) a b)
+    (isGE_iff : ∀ (X : C) (a : ℤ),
+      t.IsGE X a ↔
+        ∀ i, (localTStructure i).IsGE ((restriction i).obj X) a)
+    (isLE_iff : ∀ (X : C) (b : ℤ),
+      t.IsLE X b ↔
+        ∀ i, (localTStructure i).IsLE ((restriction i).obj X) b)
     (X : C) (a b : ℤ) :
     inRange t X a b ↔
-      ∀ i, inRange (localTStructure i) ((restriction i).obj X) a b :=
-  range_iff X a b
+      ∀ i, inRange (localTStructure i) ((restriction i).obj X) a b := by
+  constructor
+  · rintro ⟨hGE, hLE⟩ i
+    exact ⟨(isGE_iff X a).1 hGE i, (isLE_iff X b).1 hLE i⟩
+  · intro h
+    refine ⟨(isGE_iff X a).2 (fun i => (h i).1), ?_⟩
+    exact (isLE_iff X b).2 (fun i => (h i).2)
 
 /-! ### (3), (4a)--(4d): exactness owner boundaries -/
 
@@ -140,47 +151,49 @@ theorem leftTExact_isGE_map
   letI : F.IsLeftTExact t t' := hF
   exact Functor.isGE_map_of_isLeftTExact (F := F) (t := t) (t' := t') X n
 
-/-- Transport coconnective membership from a genuinely t-exact functor.
+/-- Transport a bounded-range membership statement from a genuinely t-exact
+functor.
 
 This is the shape for clauses whose source statement uses both halves; the
-one-sided clauses use `rightTExact_isLE_map` or `leftTExact_isGE_map` instead. -/
-theorem tExact_isLE_map
+one-sided clauses use `rightTExact_isLE_map` or `leftTExact_isGE_map` instead.
+Both conclusions are returned together so the two-sided hypothesis is used
+by the formal proof. -/
+theorem tExact_isRange_map
     {D : Type u'} [Category.{v'} D] [HasZeroObject D] [HasShift D ℤ]
     [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive]
     [Pretriangulated D]
     {t : TStructure C} {t' : TStructure D}
-    (F : C ⥤ D) (hF : F.IsTExact t t') (X : C) (n : ℤ)
-    [t.IsLE X n] :
-    t'.IsLE (F.obj X) n := by
+    (F : C ⥤ D) (hF : F.IsTExact t t') (X : C) (a b : ℤ)
+    [t.IsGE X a] [t.IsLE X b] :
+    inRange t' (F.obj X) a b := by
   letI : F.IsTExact t t' := hF
-  exact Functor.isLE_map_of_isRightTExact (F := F) (t := t) (t' := t') X n
-
-/-- Transport connective membership from a genuinely t-exact functor. -/
-theorem tExact_isGE_map
-    {D : Type u'} [Category.{v'} D] [HasZeroObject D] [HasShift D ℤ]
-    [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive]
-    [Pretriangulated D]
-    {t : TStructure C} {t' : TStructure D}
-    (F : C ⥤ D) (hF : F.IsTExact t t') (X : C) (n : ℤ)
-    [t.IsGE X n] :
-    t'.IsGE (F.obj X) n := by
-  letI : F.IsTExact t t' := hF
-  exact Functor.isGE_map_of_isLeftTExact (F := F) (t := t) (t' := t') X n
+  exact ⟨
+    Functor.isGE_map_of_isLeftTExact (F := F) (t := t) (t' := t') X a,
+    Functor.isLE_map_of_isRightTExact (F := F) (t := t) (t' := t') X b⟩
 
 /-! ### (5.3)/(5.4): local comparison owner boundary -/
 
-/-- Consume a bounded-range comparison supplied by the local geometry owner.
+/-- Compose separate lower- and upper-truncation comparison formulas.
 
-The finite-amplitude and S-locality arguments that produce this equivalence
-remain explicit in the caller; this theorem only exposes the supplied formula
-at the degree-indexed boundary. -/
-theorem local_inRange_iff
+The finite-amplitude, S-locality, and local pushforward arguments that produce
+the two formulas remain explicit at the geometry owner.  In particular, the
+caller can instantiate the comparison formulas with the affine-local maps
+from (5.3)--(5.4), while this theorem performs only the formal conjunction
+composition. -/
+theorem local_inRange_iff_of_components
     {t₁ t₂ : TStructure C}
-    (range_iff : ∀ (X : C) (a b : ℤ),
-      inRange t₁ X a b ↔ inRange t₂ X a b)
+    (isGE_iff : ∀ (X : C) (a : ℤ),
+      t₁.IsGE X a ↔ t₂.IsGE X a)
+    (isLE_iff : ∀ (X : C) (b : ℤ),
+      t₁.IsLE X b ↔ t₂.IsLE X b)
     (X : C) (a b : ℤ) :
     inRange t₁ X a b ↔ inRange t₂ X a b :=
-  range_iff X a b
+  by
+    constructor
+    · rintro ⟨hGE, hLE⟩
+      exact ⟨(isGE_iff X a).1 hGE, (isLE_iff X b).1 hLE⟩
+    · rintro ⟨hGE, hLE⟩
+      exact ⟨(isGE_iff X a).2 hGE, (isLE_iff X b).2 hLE⟩
 
 end Theorem53
 

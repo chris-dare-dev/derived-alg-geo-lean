@@ -4,11 +4,11 @@ repository: chris-dare-dev/derived-alg-geo-lean
 actor: chris-dare-dev
 remote: origin
 base_branch: main
-# This plan branch contains the reviewed follow-up manifest. It is immutable
-# for the coding run; the issue branch is created from this exact ref.
+# Retired migration manifest. The active follow-up is
+# `sf11-3-followup-v2.yaml`, which includes the corrected freeze.
 base_ref: agent/sf11-3-followup-plan
 mode: independent
-enabled: true
+enabled: false
 allow_force_push: false
 state_dir: .loop-runs
 roadmap_gate: required

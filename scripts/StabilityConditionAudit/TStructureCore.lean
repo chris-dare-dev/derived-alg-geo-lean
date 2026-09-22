@@ -325,7 +325,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.isGE_iff
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.inclusion_isTExact
 #print axioms CategoryTheory.Triangulated.TStructure.IndExtensionData.restriction
-#print axioms CategoryTheory.Triangulated.TStructure.PreservesFilteredColimits
+#print axioms CategoryTheory.Triangulated.TStructure.PreservesFilteredColimitTruncations
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.tStructure
 #print axioms CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge.isBounded

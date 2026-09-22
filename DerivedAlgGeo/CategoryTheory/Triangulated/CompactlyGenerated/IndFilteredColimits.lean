@@ -43,7 +43,7 @@ actual mathlib `PreservesColimit` obligations visible at the geometry owner:
 for every filtered diagram and every degree, both truncation functors must
 preserve that diagram's colimit.  The canonical `IndExtensionData` remains
 the sole owner of the Ind-extension and t-structure consequences. -/
-def PreservesFilteredColimits (large : TStructure C) : Prop :=
+def PreservesFilteredColimitTruncations (large : TStructure C) : Prop :=
   ∀ {J : Type w} [Category.{v} J] [IsFiltered J]
     (K : J ⥤ C) (n : ℤ),
     PreservesColimit K (large.truncLE n) ∧

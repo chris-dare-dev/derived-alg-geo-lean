@@ -323,16 +323,19 @@ passed for the change and all six repository changes. This environment detail
 is operational friction, not a repository dependency, and must be recreated or
 replaced by the runner before future local validation.
 
-The fresh CI-equivalent run on `origin/main` at `4e56e5ca` compiled the changed
-module, both audit libraries, the public `DerivedAlgGeo` umbrella, and the
-development/specialization targets. The axiom transcripts passed with 5,375
-AlgebraicGeometry commands and 7,087 StabilityCondition commands. The
-environment completeness ratchet measured AlgebraicGeometry at exactly its
-recorded ceiling (6,078 public, 5,330 audited, 748 missing), with no new
-baseline rows. The 351-declaration failure quoted from PR #1425 therefore came
-from an older base/audit state; it must not be used as current evidence after
-the base refresh. The five stale single-instantiation baseline rows are visible
-notes only and remain unchanged.
+The reference-base run at `4e56e5ca` compiled the changed module, both audit
+libraries, the public `DerivedAlgGeo` umbrella, and the
+development/specialization targets. That snapshot is not the reviewed head,
+not the current `origin/main`, and not CI evidence. On the round-one
+candidate `aebe056e`, the same targeted local builds and the two axiom
+transcripts passed with 5,375 AlgebraicGeometry commands and 7,087
+StabilityCondition commands; these are local measurements, not claims about a
+GitHub run. The environment completeness ratchet measured AlgebraicGeometry
+at exactly its recorded ceiling (6,078 public, 5,330 audited, 748 missing),
+with no new baseline rows. The 351-declaration failure quoted from PR #1425
+therefore came from an older base/audit state; it must not be used as current
+evidence after the base refresh. The five stale single-instantiation baseline
+rows are visible historical notes only and remain unchanged.
 
 Another undocumented prerequisite surfaced: `scripts/EnumDecls.lean` imports
 the root `DerivedAlgGeo` and `DerivedAlgGeo.Development` modules, but the
