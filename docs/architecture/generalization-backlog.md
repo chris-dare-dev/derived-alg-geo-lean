@@ -135,3 +135,11 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   pinned typeclass-heartbeat diagnostic).
 - state:              FALSIFIED compiler witness: the current generic bridge
   cannot admit a merely bounded-above complex without degreewise projectivity.
+
+### 2026-09-21 — `CommShift₂Int` output transport of `ObjectProperty.lift₂`
+- chunk:              dt1-928-exact-bifunctor-restriction
+- reviewing commit:   858ca700829706455ddc7ea3f4ca9fff4ffa951b
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Functor.CommShift₂` via a general fully faithful output-composition transport
+- weaker hypotheses:  coherence-only statement for arbitrary `C₁`, `C₂`, `D`, `D'`, additive-commutative shift monoid `M`, shifts, explicitly compatible `CommShift₂Setup` data, a fully faithful shift-compatible `H : D ⥤ D'`, a bifunctor postcomposition isomorphism, and a `CommShift₂` witness after postcomposition; no object property, closure witness, `Pretriangulated`, or `ExactBifunctor` fields
+- state:              UNVERIFIED

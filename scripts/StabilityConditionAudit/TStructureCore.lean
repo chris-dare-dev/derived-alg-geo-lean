@@ -43,6 +43,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Functor.ExactBifunctor.firstCommShift
 #print axioms CategoryTheory.Functor.ExactBifunctor.firstFamily
 #print axioms CategoryTheory.Functor.ExactBifunctor.firstTriangulated
+#print axioms CategoryTheory.Functor.ExactBifunctor.lift₂
 #print axioms CategoryTheory.Functor.ExactBifunctor.mk.inj
 #print axioms CategoryTheory.Functor.ExactBifunctor.mk.sizeOf_spec
 #print axioms CategoryTheory.Functor.ExactBifunctor.secondCommShift
@@ -458,6 +459,7 @@ the `HomFiniteBounded` model built on it is audited with the Euler form. -/
 #print axioms CategoryTheory.ObjectProperty.instEssSurjPreimageLift
 #print axioms CategoryTheory.ObjectProperty.lift₂
 #print axioms CategoryTheory.ObjectProperty.lift₂CompιIso
+#print axioms CategoryTheory.ObjectProperty.lift₂CommShift₂Int
 #print axioms CategoryTheory.ObjectProperty.lift₂_map_app
 #print axioms CategoryTheory.ObjectProperty.lift₂_obj
 #print axioms CategoryTheory.ObjectProperty.maps₂_of_comp_of_essSurj
