@@ -7,7 +7,7 @@ base_branch: main
 base_ref: origin/main
 mode: independent
 # Retired historical manifest for closed issue #1062. Follow-up issue #1445
-# is governed only by `sf11-3-followup-v2.yaml`.
+# is governed only by `sf11-3-followup-v4.yaml`.
 enabled: false
 allow_force_push: false
 state_dir: .loop-runs

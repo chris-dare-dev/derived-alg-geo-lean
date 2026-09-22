@@ -196,6 +196,37 @@ replacement for a Lean theorem or an issue acceptance criterion.
   Include both entries when a chunk edits an umbrella beside its child
   directory.
 
+## SF11.3 recut observations (2026-09-21)
+
+- The recut was triggered by a real remote-policy change, not by a missing
+  mathematical label: current `origin/main` no longer contains
+  `.github/workflows/trust-guard.yml`, and branch protection reports only
+  `ci`. The v3 manifest's `trust-surface` requirement was stale state and is
+  not carried into v4.
+- The first candidate v4 plan ref was found to contain the earlier SF11.3
+  implementation commits. Using it as `base_ref` would have hidden the source
+  changes from the fresh chunk diff and adversaries. The clean v4 plan starts
+  at current `main` and contains only the SF11 OpenSpec/manifest; the v4 run
+  branch carries the implementation separately.
+- The loop validator rejected an initially redundant manifest requirement
+  because it was not named by an OpenSpec requirement. This was a
+  documentation/contract mismatch, not evidence that the validator should be
+  weakened; the redundant line was removed while the runner still requires
+  `ci` explicitly.
+- A shell command that created a worktree and then merged without changing its
+  working directory merged `origin/main` into the old local v3 worktree. The
+  worktree was clean and the merge was unpushed, so no remote state changed,
+  but this is an operational footgun: run each git mutation with an explicit
+  worktree directory and verify `git branch --show-current` afterward.
+- The existing draft PR #1453 is bound to the old v3 branch/manifest. The
+  controller's preflight deliberately refuses a second open PR for the same
+  issue, so the replacement must be prepared as `agent/sf11-3-followup-v4`
+  and the old draft must be explicitly retired before the new PR is created.
+- No reviewer or controller is allowed to infer that “trust surface removed”
+  means that audit evidence may be relaxed. The v4 acceptance still requires
+  actual AlgebraicGeometry audit records, unchanged missing-declaration
+  baseline/ceilings, and no new `sorry`, `admit`, or axiom.
+
 ## Follow-up observations (2026-09-19)
 
 - Moving the operation-facing declarations from `KFlatBaseChangeData` to
