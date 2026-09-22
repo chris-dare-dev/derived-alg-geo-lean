@@ -65,13 +65,15 @@ use targeted Lean module builds; the full repository build is left to CI.
    diamond between ambient and bounded-coherent inclusions.
 
 4. **Reuse Ind extension rather than translate it by parallel definitions.**
-   Theorem 5.3 adapters consume `TStructure.IndExtensionData`; one bridge
-   package exposes its coproduct-aisle comparison, proves inclusion
-   t-exactness, and records the actual `PreservesColimit` obligations for the
-   filtered-colimit presentation.  Source-shaped descent and t-exactness
-   owner data expose the flat/fpqc formulas, tensor clause, and (4a)--(4d)
-   comparisons without claiming their geometric proofs.  A failed bridge is a
-   real blocker, not a reason to introduce a duplicate carrier.
+   Theorem 5.3 adapters consume `TStructure.IndExtensionData`; the family
+   owner exposes its coproduct-aisle comparison and inclusion t-exactness
+   directly from that canonical carrier.  The filtered-colimit presentation
+   remains a direct `PreservesColimit` owner predicate for the chosen
+   truncation functors, with no aggregate bridge record.  Source-shaped
+   descent and t-exactness owner data expose the flat/fpqc formulas, tensor
+   clause, and (4a)--(4d) comparisons without claiming their geometric
+   proofs.  A failed comparison is a real blocker, not a reason to introduce
+   a duplicate carrier.
 
 5. **Authorize only the selected epic issues.** Add a manifest field
    `eligibility.allow_epic_issues` and require it to list exactly the selected
@@ -99,6 +101,12 @@ use targeted Lean module builds; the full repository build is left to CI.
    branch claim ownership of their repair; any roadmap entry changed by the
    SF11 branch still fails closed.
 
+9. **Repair after a failed merge instead of rewriting history.** Follow-up
+   issue #1445 uses a new independent manifest and a fixed plan ref. It treats
+   the merged #1062 code as the review target, records the failed CI/audit
+   evidence, and permits only a new reviewed repair commit. The previous issue
+   and its absent ledger are never used as passing evidence.
+
 ## Risks / Trade-offs
 
 - **[Geometric witnesses exceed the current library]** → Keep the exact paper
@@ -117,8 +125,11 @@ use targeted Lean module builds; the full repository build is left to CI.
   subset of the selected issue numbers and report the admitted exception during
   preflight.
 - **[An inherited roadmap defect is silently ignored]** → Keep the scoped gate's
-  inherited-disagreement report in the preflight output and the SF11 note; only
-  branch-authored roadmap entries can be admitted by this run.
+   inherited-disagreement report in the preflight output and the SF11 note; only
+   branch-authored roadmap entries can be admitted by this run.
+- **[Audit repair is mistaken for a baseline relaxation]** → Add every reported
+  declaration to the owning audit slice and reject changes to
+  `scripts/audit_missing_baseline.txt` or the audit ceilings.
 
 ## Migration Plan
 
