@@ -303,3 +303,40 @@ Its mapping-telescope factorization API is also universe-zero, so a partial
 generalization produced cascading universe mismatches. Do not widen one layer
 of a universe-sensitive representability construction without first auditing
 the entire telescope dependency chain; the attempted edit was reverted.
+
+## SF11.3 follow-up freeze correction (2026-09-21)
+
+The first coding draft removed the projection-only filtered-colimit carriers
+from `IndFilteredColimits.lean` and updated the AlgebraicGeometry audit. A
+static dependency check then exposed a second audit owner,
+`scripts/StabilityConditionAudit/TStructureCore.lean`, which still printed
+axioms for the removed declarations. Leaving that file outside the frozen
+chunk would make the intended refactor unbuildable and would force an
+out-of-scope edit during review. The follow-up was therefore re-frozen as
+`sf11-3-followup-v2` from a new immutable plan ref, with that audit directory
+explicitly included. The prior draft commit is retained only as a migration
+source; its ledger is not reused as review evidence.
+
+The official OpenSpec CLI was installed in an ephemeral `/tmp` toolchain
+because the host initially lacked both Node and `openspec`; strict validation
+passed for the change and all six repository changes. This environment detail
+is operational friction, not a repository dependency, and must be recreated or
+replaced by the runner before future local validation.
+
+The fresh CI-equivalent run on `origin/main` at `4e56e5ca` compiled the changed
+module, both audit libraries, the public `DerivedAlgGeo` umbrella, and the
+development/specialization targets. The axiom transcripts passed with 5,375
+AlgebraicGeometry commands and 7,087 StabilityCondition commands. The
+environment completeness ratchet measured AlgebraicGeometry at exactly its
+recorded ceiling (6,078 public, 5,330 audited, 748 missing), with no new
+baseline rows. The 351-declaration failure quoted from PR #1425 therefore came
+from an older base/audit state; it must not be used as current evidence after
+the base refresh. The five stale single-instantiation baseline rows are visible
+notes only and remain unchanged.
+
+Another undocumented prerequisite surfaced: `scripts/EnumDecls.lean` imports
+the root `DerivedAlgGeo` and `DerivedAlgGeo.Development` modules, but the
+audit-library build does not materialize those umbrella oleans. A clean runner
+must build the root and development/specialization targets before running the
+completeness sweep; otherwise the command fails with a missing object-file
+error despite the audit libraries themselves being green.
