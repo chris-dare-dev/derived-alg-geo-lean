@@ -111,7 +111,6 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.AddCommGrpCat.ab4OfSizeSucc
 #print axioms CategoryTheory.IsCompactObject
 #print axioms CategoryTheory.IsCompactObject.coproductComparisonIso
-#print axioms CategoryTheory.IsCompactObject.coproductComparisonIso.congr_simp
 #print axioms CategoryTheory.IsCompactObject.map_ι_coproductComparisonIso_hom
 #print axioms CategoryTheory.IsCompactObject.map_ι_coproductComparisonIso_hom_assoc
 #print axioms CategoryTheory.IsCompactObject.exists_finite_sum
@@ -192,7 +191,6 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.MappingTelescope.eq_zero_of_comp_map_eq_zero
 #print axioms CategoryTheory.Triangulated.MappingTelescope.hom_map_injective
 #print axioms CategoryTheory.Triangulated.MappingTelescope.transition
-#print axioms CategoryTheory.Triangulated.MappingTelescope.transition.congr_simp
 #print axioms CategoryTheory.Triangulated.MappingTelescope.transition_self
 #print axioms CategoryTheory.Triangulated.MappingTelescope.transition_succ
 #print axioms CategoryTheory.Triangulated.MappingTelescope.Data
@@ -226,7 +224,6 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.TStructure.AisleData.ofApproximationMaps
 #print axioms CategoryTheory.Triangulated.TStructure.AisleData.rightOrthogonal_le_shift
 #print axioms CategoryTheory.Triangulated.TStructure.AisleData.tStructure
-#print axioms CategoryTheory.Triangulated.TStructure.AisleData.tStructure.congr_simp
 #print axioms CategoryTheory.Triangulated.TStructure.AisleData.tStructure_le_zero
 #print axioms CategoryTheory.Triangulated.TStructure.AisleData.tStructure_ge_one
 #print axioms CategoryTheory.ObjectProperty.coprodClosure_le_shift

@@ -76,7 +76,6 @@ family, HN structure over a curve, boundedness, or moduli theory. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.ZeroChargeLattice.quotientCharge
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.ZeroChargeLattice.quotientCharge_quotientClass
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.ZeroChargeLattice.quotientToRealQuotient
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.ZeroChargeLattice.quotientToRealQuotient.congr_simp
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.ZeroChargeLattice.quotientToRealQuotient_quotientClass
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.ZeroChargeLattice.RealScalarExtension
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.ZeroChargeLattice.scalarExtensionComparison

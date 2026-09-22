@@ -166,7 +166,6 @@ owns, in `Moduli/PerfectComplex/Comparison.lean`. -/
 #print axioms AlgebraicGeometry.ModuleQuotient.Hom.comm
 #print axioms AlgebraicGeometry.ModuleQuotient.Hom.ext
 #print axioms AlgebraicGeometry.ModuleQuotient.Hom.ext_iff
-#print axioms AlgebraicGeometry.ModuleQuotient.Hom.mk.congr_simp
 #print axioms AlgebraicGeometry.ModuleQuotient.Hom.mk.inj
 #print axioms AlgebraicGeometry.ModuleQuotient.Hom.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.ModuleQuotient.Hom.right

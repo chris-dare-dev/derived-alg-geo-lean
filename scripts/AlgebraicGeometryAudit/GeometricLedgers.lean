@@ -31,7 +31,6 @@ construction from those hypotheses.
 #print axioms AlgebraicGeometry.DerivedCategory.exactLeftCounit_isIso
 #print axioms AlgebraicGeometry.DerivedCategory.exactLeftIsLeftDerived
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution
-#print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.mk
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.resolution
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.comparison
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.comparison_quasiIso
@@ -47,7 +46,6 @@ construction from those hypotheses.
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.derivedTensorFactors
 #print axioms AlgebraicGeometry.DerivedCategory.TensorAcyclicResolution.counit
 #print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor
-#print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.mk
 #print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.functor
 #print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.counit
 #print axioms AlgebraicGeometry.DerivedCategory.LeftDerivedTensor.isLeftDerived_left
