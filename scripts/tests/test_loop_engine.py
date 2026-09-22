@@ -192,6 +192,7 @@ class LoopEngineTests(unittest.TestCase):
             ("is_legacy_manifest", True),
             ("is_legacy_state", True),
             ("standing_authority", {}),
+            ("require_legacy_issue_open", None),
         ):
             patcher = mock.patch.object(loop_engine, name, return_value=value)
             patcher.start()
@@ -1299,6 +1300,7 @@ class OpenSpecDigestTests(unittest.TestCase):
 
 
 MANIFEST = ".claude/loop-specs/test-run.yaml"
+REAL_READ_OWNER_FILE = loop_engine.read_owner_file
 
 
 def branch_spec(root: Path, files: list[str], enabled: bool = True) -> tuple[Path, dict]:
@@ -1403,8 +1405,30 @@ class AuthorityTests(unittest.TestCase):
         digests = {
             loop_engine.digest(yaml.safe_load(path.read_text(encoding="utf-8"))) for path in specs.glob("*.yaml")
         }
-        self.assertTrue(loop_engine.LEGACY_REVIEWED_MANIFESTS <= digests | loop_engine.LEGACY_REVIEWED_MANIFESTS)
-        self.assertEqual(len(loop_engine.LEGACY_REVIEWED_MANIFESTS), 14)
+        # Every allowlisted digest is a tracked manifest's exact content.
+        self.assertEqual(loop_engine.LEGACY_REVIEWED_MANIFESTS - digests, set())
+        self.assertEqual(len(loop_engine.LEGACY_REVIEWED_MANIFESTS), 15)
+
+    def test_a_legacy_grant_covers_only_open_issues(self) -> None:
+        with mock.patch.object(loop_engine, "issue_state", return_value={"state": "CLOSED"}) as state:
+            loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
+            state.assert_not_called()
+            with mock.patch.object(
+                loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
+            ):
+                with self.assertRaisesRegex(loop_engine.LoopError, "CLOSED"):
+                    loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
+                state.return_value = {"state": "OPEN"}
+                loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
+
+    def test_an_unreadable_repository_is_not_an_absent_standing_file(self) -> None:
+        not_found = subprocess.CompletedProcess([], 1, stdout="", stderr="gh: Not Found (HTTP 404)")
+        with mock.patch.object(loop_engine, "run_command", return_value=not_found):
+            with self.assertRaisesRegex(loop_engine.LoopError, "could not read"):
+                REAL_READ_OWNER_FILE(self.root, self.spec, loop_engine.STANDING_AUTHORITY_PATH)
+        readable = subprocess.CompletedProcess([], 0, stdout="{}", stderr="")
+        with mock.patch.object(loop_engine, "run_command", side_effect=[not_found, readable]):
+            self.assertIsNone(REAL_READ_OWNER_FILE(self.root, self.spec, loop_engine.STANDING_AUTHORITY_PATH))
 
 
 class BranchManifestPolicyTests(unittest.TestCase):
@@ -1438,6 +1462,34 @@ class BranchManifestPolicyTests(unittest.TestCase):
             widened["issues"][0]["chunks"][0]["files"].append(path)
             with self.assertRaisesRegex(loop_engine.LoopError, "protected"):
                 loop_engine.validate_spec(widened)
+
+    def test_the_protected_set_covers_gates_hooks_pins_and_instructions_in_every_spelling(self) -> None:
+        protected = [
+            # gates, hooks and CI tooling
+            "scripts/check_mathlib_style.py", "scripts/check_workflows.sh", "scripts/gates.sh",
+            "scripts/precheck.sh", "scripts/validate_loop_specs.sh", "scripts/nolints.json",
+            "scripts/audit_missing_baseline.txt", "scripts/EnumDecls.lean",
+            # pins and the retired trust-guard surface
+            "lakefile.toml", "lean-toolchain", "lake-manifest.json", "pins.json", "exe/Restate.lean",
+            "registry/sources.json", "DerivedAlgGeoSweep.lean",
+            # instructions and agent configuration at any depth
+            "DerivedAlgGeo/CLAUDE.md", "docs/AGENTS.md", "CLAUDE.local.md", ".mcp.json",
+            ".claude/commands/go.md", ".codex/config.toml", "openspec/config.yaml",
+            # other spellings of protected paths
+            "Scripts/loop_engine.py", "claude.md", "Agents.md", ".GitHub/workflows/ci.yml",
+            ".claude//settings.json", "./scripts/gates.sh", "scripts/AlgebraicGeometryAudit/../gates.sh",
+            "scripts/AlgebraicGeometryAudit/../../evil.lean",
+        ]
+        allowed = [
+            "scripts/AlgebraicGeometryAudit.lean", "scripts/AlgebraicGeometryAudit/SchemeDerived.lean",
+            "scripts/StabilityConditionAudit", "scripts/StabilityConditionCensus.lean",
+            "DerivedAlgGeo/AlgebraicGeometry/Example.lean", "docs/architecture/generalization-backlog.md",
+            "docs/architecture/loop-engineering-friction.md",
+        ]
+        self.assertEqual([path for path in protected if not loop_engine.is_protected_path(path)], [])
+        self.assertEqual([path for path in allowed if loop_engine.is_protected_path(path)], [])
+        self.assertFalse(loop_engine.is_protected_path(MANIFEST, MANIFEST))
+        self.assertTrue(loop_engine.is_protected_path(".claude/loop-specs/other.yaml", MANIFEST))
         lifted = json.loads(json.dumps(self.spec))
         lifted["issues"][0]["chunks"][0]["lift_targets"] = [".claude/skills"]
         with self.assertRaisesRegex(loop_engine.LoopError, "protected"):
@@ -1473,6 +1525,15 @@ class BranchManifestPolicyTests(unittest.TestCase):
         git_in(self.root, "remote", "set-url", "--push", "origin", "https://github.com/attacker/fork.git")
         with self.assertRaisesRegex(loop_engine.LoopError, "attacker/fork"):
             loop_engine.action_push(self.root, self.spec, None, False, True)
+        # A second push URL behind a legitimate first one also receives the push.
+        git_in(self.root, "remote", "set-url", "--push", "origin", "https://github.com/example/repository.git")
+        git_in(self.root, "remote", "set-url", "--add", "--push", "origin", "https://github.com/attacker/fork.git")
+        with self.assertRaisesRegex(loop_engine.LoopError, "attacker/fork"):
+            loop_engine.action_push(self.root, self.spec, None, False, True)
+        git_in(self.root, "remote", "set-url", "--delete", "--push", "origin", "attacker")
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(loop_engine.action_push(self.root, self.spec, None, False, True), 0)
+        self.assertIn("DRY-RUN git push", output.getvalue())
 
     def test_required_checks_fall_back_to_the_manifest_and_report_the_checked_head(self) -> None:
         self.spec["runner"]["required_checks"] = ["ci", "build"]

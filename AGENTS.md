@@ -433,9 +433,9 @@ marking ready, follow-up issues, issue closure, and merge each need a grant.
 The controller reads grants from the default branch through the GitHub API,
 never from a local ref. `.claude/loop-authority.yaml` there holds the owner's
 standing grants, and a run's own manifest can narrow them but never widen them.
-Without the file, nothing is granted. The fourteen manifests the owner reviewed
+Without the file, nothing is granted. The fifteen manifests the owner reviewed
 through planning PRs before this protocol are listed by digest in the
-controller and keep their own grants. An explicit `false` in the standing file
+controller and keep their own grants, but only for their still-open issues. An explicit `false` in the standing file
 revokes a grant for every run, legacy or not. A manifest merged later through a
 work PR confers nothing.
 
@@ -444,10 +444,12 @@ A branch-authored manifest also cannot:
 - request administrator merge, force-push, closure without a merged PR, an epic
   opt-in, or a weaker roadmap gate;
 - choose a `base_ref` other than `<remote>/<base_branch>`;
-- scope a chunk over its own authority, controller, or instructions, which are
-  `.claude/loop-authority.yaml`, `.claude/loop-specs/` except its own manifest,
-  `.claude/skills/`, `.claude/agents/`, `.claude/settings.json`, `.agents/`,
-  `.github/`, `AGENTS.md`, `CLAUDE.md`, and the controller and its tests.
+- scope a chunk over its own authority, gates or instructions: all of
+  `.claude/` except its own manifest, `.agents/`, `.codex/`, `.mcp.json`,
+  `.github/`, `scripts/` except the audit and census records, `exe/`,
+  `registry/`, the Lean and Lake pins, `pins.json`, `openspec/config.yaml`,
+  and every `CLAUDE.md` or `AGENTS.md` at any depth, matched in any letter
+  case.
 
 Those change only through owner-reviewed PRs. Code issues close only after a
 confirmed merged PR; complete chunks need a closing keyword, and progress

@@ -102,12 +102,15 @@ These are not stops. What to do instead:
   `gh issue create`, `gh pr review`, or `git push` directly from this skill.
 - Provider authority comes only from `.claude/loop-authority.yaml` on the
   default branch as GitHub serves it. Your manifest can narrow those grants
-  and never widen them; only the fourteen legacy manifests keep grants of
-  their own. Your manifest cannot request administrator merge, force-push,
-  closure without a merged PR, an epic opt-in or a weaker roadmap gate. Its
-  chunks cannot touch the run's own authority, controller or instructions
-  (see `.claude/loop-specs/README.md`). Never try to change those from a run.
-  A gap there is a follow-up issue for the owner.
+  and never widen them; only the fifteen legacy manifests keep grants of
+  their own, and only for their open issues. Your manifest cannot request
+  administrator merge, force-push, closure without a merged PR, an epic
+  opt-in or a weaker roadmap gate. Its chunks cannot touch the run's own
+  authority, gates or instructions: `.claude/`, `scripts/` beyond the audit
+  records, CI, the pins, and every `CLAUDE.md`/`AGENTS.md` (full list in
+  `.claude/loop-specs/README.md`). Never try to change those from a run; a
+  needed change there, including a gate baseline, is a follow-up issue for
+  the owner.
 - Code issues close only after the controller verifies a merged PR that closes
   the same issue. Non-PR closure is disabled unless the manifest explicitly
   says otherwise.

@@ -98,6 +98,7 @@ LEGACY_REVIEWED_MANIFESTS = frozenset(
         "7d6b7d5fd602e815a9e1ede2d7ebcb871119e47c11dde63dbd58ffed96580184",  # sf11-2-locality
         "87fe3f5891da1d935056d69282b3bc5b2b978a7704b6d8388e5c4e56d74bb38a",  # sf11-3-followup-v4-current
         "633e71a729be7aab37432313aace624d9e2765632748a495ffd92832f8267863",  # sf11-3-theorem53
+        "78227947ec55824db6f5f71b0463ee48da1f96b9a4f04a9d7c3214f1c71760f6",  # passed-ledger-head-revalidation (#1470)
         "161403899a361be7266a8f7b011928e90eea5525f0d37ed246a532ca2b8bd7d3",  # sf11-pilot
         "3e6decf24291404867b90849dd84e75ea273a018b312c070fe38e12a4d522e3f",  # sf8-5-affine-resolution-pullback
         "0a22b5bdf3d841aa6bda71126233fb12c5a97166a10c04117e3792374b66cabf",  # sf8-5-nonflat-derived-effect
@@ -105,25 +106,37 @@ LEGACY_REVIEWED_MANIFESTS = frozenset(
         "69b451bac920101e28dff6c2f0c524f29f48146966ee9bdfc6a4e5ce0497606a",  # sf8-sf9-pilot
     }
 )
-# A run's frozen chunk may never touch its own authority, its controller, or
-# the instructions that govern it; those change only through owner-reviewed
-# PRs. The run's own manifest is the one exception under `.claude/loop-specs/`.
+# A branch-authored run's frozen chunk may never touch its own authority, the
+# code that gates or hosts it, or the instructions later agents follow; those
+# change only through owner-reviewed PRs. Three things are covered:
+# - agent configuration and instructions (all of `.claude/`, `.agents/`,
+#   `.codex/`, `.mcp.json`, and every CLAUDE.md or AGENTS.md at any depth);
+# - the gates, hooks and CI (`scripts/`, `.github/`);
+# - the pins and the retired trust-guard surface.
+# Two exceptions: the run's own manifest, and the audit and census records
+# that new public declarations must extend.
 PROTECTED_PATH_PREFIXES = (
-    ".claude/loop-authority.yaml",
-    ".claude/loop-specs",
-    ".claude/settings.json",
-    ".claude/skills",
-    ".claude/agents",
+    ".claude",
     ".agents",
+    ".codex",
+    ".mcp.json",
     ".github",
-    "AGENTS.md",
-    "CLAUDE.md",
-    "scripts/loop_engine.py",
-    "scripts/loop_recovery.py",
-    "scripts/check_local_build.py",
-    "scripts/tests/test_loop_engine.py",
-    "scripts/tests/test_loop_recovery.py",
+    "scripts",
+    "exe",
+    "registry",
+    "lakefile.toml",
+    "lakefile.lean",
+    "lean-toolchain",
+    "lake-manifest.json",
+    "pins.json",
+    "CLAUDE.local.md",
+    "DerivedAlgGeoSweep.lean",
+    "openspec/config.yaml",
+    "docs/architecture/loop-recovery.md",
 )
+PROTECTED_BASENAMES = frozenset({"claude.md", "agents.md"})
+# An audit or census umbrella, its record directory, or a Lean record below it.
+AUDIT_RECORD_RE = re.compile(r"scripts/[A-Za-z]+(?:Audit|Census)(?:\.lean|/[A-Za-z0-9_./-]+\.lean)?")
 # Revalidation rounds re-review a passed change whose content moved (a rebase
 # that had to resolve a conflict, say). They need the full panel but do not
 # spend the critique/improve cap; this bounds how often a pass can be reopened.
@@ -182,15 +195,39 @@ def is_legacy_state(state: dict[str, Any]) -> bool:
     return state.get("spec_digest") in LEGACY_REVIEWED_MANIFESTS
 
 
+def canonical_repo_path(path: str) -> str:
+    """Collapse the spellings one path can take: `./`, `//`, `\\`, a trailing slash."""
+
+    value = re.sub(r"/+", "/", path.replace("\\", "/"))
+    while value.startswith("./"):
+        value = value[2:]
+    return value.rstrip("/")
+
+
+def is_protected_path(path: str, own_manifest: str | None = None) -> bool:
+    """True for a path a branch-authored run may not change.
+
+    Compared case-insensitively: on a case-insensitive checkout `Scripts/...`
+    and `scripts/...` are one file.
+    """
+
+    value = canonical_repo_path(path)
+    folded = value.casefold()
+    if own_manifest and folded == canonical_repo_path(own_manifest).casefold():
+        return False
+    if AUDIT_RECORD_RE.fullmatch(value) and ".." not in value.split("/"):
+        return False
+    if folded.rsplit("/", 1)[-1] in PROTECTED_BASENAMES:
+        return True
+    return any(
+        folded == prefix.casefold() or folded.startswith(prefix.casefold() + "/") for prefix in PROTECTED_PATH_PREFIXES
+    )
+
+
 def protected_paths(paths: Iterable[str], own_manifest: str | None = None) -> list[str]:
     """Return the paths a branch-authored run may not change."""
 
-    return [
-        path
-        for path in paths
-        if path_is_in_frozen_chunk(path, PROTECTED_PATH_PREFIXES)
-        and normalize_scoped_path(path) != (own_manifest or "")
-    ]
+    return [path for path in paths if is_protected_path(path, own_manifest)]
 
 
 def digest(value: Any) -> str:
@@ -432,7 +469,9 @@ def read_owner_file(root: Path, spec: dict[str, Any], path: str) -> str | None:
     )
     if result.returncode == 0:
         return result.stdout
-    if gh_not_found(result):
+    # A 404 means "absent" only when the repository itself is readable; an
+    # unreachable repository must not read as "no revocations".
+    if gh_not_found(result) and run_command(root, ["gh", "api", f"repos/{spec['repository']}"]).returncode == 0:
         return None
     detail = (result.stderr or result.stdout).strip()
     raise LoopError(f"could not read {path} from {spec['repository']}'s default branch: {detail}")
@@ -1068,6 +1107,23 @@ def issue_state(root: Path, repository: str, number: int) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise LoopError(f"gh issue view #{number} returned an unexpected response")
     return data
+
+
+def require_legacy_issue_open(root: Path, spec: dict[str, Any], number: int) -> None:
+    """A legacy manifest's reviewed grants apply only to the unfinished work it was reviewed for.
+
+    Several legacy manifests stay enabled after their issues closed, some with
+    administrator merge or `.github/` in scope; their grants must not be
+    reusable for new work.
+    """
+
+    if not is_legacy_manifest(spec):
+        return
+    state = str(issue_state(root, spec["repository"], number).get("state", "")).upper()
+    if state != "OPEN":
+        raise LoopError(
+            f"issue #{number} is {state or 'unknown'}; a legacy manifest's grants cover only its open issues"
+        )
 
 
 def issue_body_digest(root: Path, spec: dict[str, Any], number: int) -> str:
@@ -1913,6 +1969,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
     try:
         spec = load_spec(spec_path, root)
         issue, chunk = chunk_entry(spec, number, chunk_id)
+        require_legacy_issue_open(root, spec, number)
         predecessor_proofs = require_predecessor_prs(root, spec)
         require_selected_dependencies_passed(root, spec, issue, requested_state_dir)
         path = state_path(root, spec, requested_state_dir, chunk_id)
@@ -2584,10 +2641,12 @@ def action_push(root: Path, spec: dict[str, Any], branch: str | None, force_with
     if not BRANCH_RE.fullmatch(current) or current not in planned_branches(spec):
         raise LoopError(f"push branch must be one of the spec's dedicated agent branches; got {current!r}")
     # Authority was read for spec.repository; the push must land there too.
-    for flags in ([], ["--push"]):
-        target = normalize_remote(git(root, "remote", "get-url", *flags, spec["remote"]))
-        if target != spec["repository"].lower():
-            raise LoopError(f"remote {spec['remote']!r} resolves to {target!r}, not {spec['repository']!r}")
+    # A remote may carry several push URLs and `git push` delivers to all.
+    for flags in (["--all"], ["--push", "--all"]):
+        for url in git(root, "remote", "get-url", *flags, spec["remote"]).splitlines():
+            target = normalize_remote(url)
+            if target != spec["repository"].lower():
+                raise LoopError(f"remote {spec['remote']!r} resolves to {target!r}, not {spec['repository']!r}")
     if force_with_lease and not spec.get("allow_force_push", False):
         raise LoopError("force-with-lease is disabled by the specification")
     args = ["git", "push"]
@@ -2825,6 +2884,7 @@ def action_create_pr(
         recovery_scoped_paths(root, spec, recovered, local_head, trusted_base_commit(root, spec))
     require_predecessor_prs(root, spec)
     issue = selected_issue_for_action(spec, number)
+    require_legacy_issue_open(root, spec, number)
     current = git(root, "branch", "--show-current")
     expected = f"agent/{issue['slug']}"
     if current != expected:

@@ -69,11 +69,13 @@ writable), so a work branch cannot grant itself anything:
   widen it. Without the file, nothing is granted, and a run stops at its first
   provider action (stop reason 1). An explicit `false` in the file revokes that
   action for every run; it is the owner's kill switch.
-- The fourteen manifests the owner reviewed through planning PRs before this
+- The fifteen manifests the owner reviewed through planning PRs before this
   protocol are listed by content digest in `LEGACY_REVIEWED_MANIFESTS` in the
   controller. They keep their own explicit `mutations` and merge, closure and
-  eligibility policies, subject to the kill switch. A manifest merged later
-  through a work PR is not on that list and confers nothing by being merged.
+  eligibility policies, subject to the kill switch, and only while the
+  selected issue is open: the controller refuses them at ledger init and PR
+  creation for a closed issue. A manifest merged later through a work PR is not
+  on that list and confers nothing by being merged.
 
 A manifest that is not on the legacy list is branch-authored. Validation and
 the actions hold it to these limits:
@@ -82,16 +84,23 @@ the actions hold it to these limits:
 - no administrator merge, force-push, closure without a merged PR, epic opt-in,
   or roadmap gate weaker than `required`;
 - no chunk file or lift target, and no changed path at publication, under the
-  run's own authority, controller or instructions:
-  - `.claude/loop-authority.yaml`;
-  - `.claude/loop-specs/`, except the run's own manifest;
-  - `.claude/skills/`, `.claude/agents/`, `.claude/settings.json`;
-  - `.agents/`, `.github/`;
-  - `AGENTS.md`, `CLAUDE.md`;
-  - `scripts/loop_engine.py`, `scripts/loop_recovery.py`,
-    `scripts/check_local_build.py`, and the controller tests.
+  run's own authority, gates or instructions (`PROTECTED_PATH_PREFIXES`):
+  - all of `.claude/`, except the run's own manifest;
+  - `.agents/`, `.codex/`, `.mcp.json` and `CLAUDE.local.md`;
+  - every `CLAUDE.md` and `AGENTS.md`, at any depth;
+  - `.github/`;
+  - all of `scripts/` except the audit and census records
+    (`scripts/*Audit.lean`, `scripts/*Census.lean`, and the Lean records under
+    `scripts/*Audit/`), so the gates, hooks, baselines and controller are
+    covered;
+  - `exe/`, `registry/` and `DerivedAlgGeoSweep.lean`;
+  - the pins (`lakefile.toml`, `lean-toolchain`, `lake-manifest.json`,
+    `pins.json`);
+  - `openspec/config.yaml` and `docs/architecture/loop-recovery.md`.
 
-  Those change only through owner-reviewed PRs.
+  Paths are compared after collapsing `./`, `//` and `\`, and case-insensitively.
+  Those change only through owner-reviewed PRs. A chunk that genuinely needs one
+  of them, a gate baseline for example, files a follow-up issue for the owner.
 
 The owner creates and edits that file; a run never does. Its shape:
 
