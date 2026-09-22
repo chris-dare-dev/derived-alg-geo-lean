@@ -334,8 +334,9 @@ GitHub run. The environment completeness ratchet measured AlgebraicGeometry
 at exactly its recorded ceiling (6,077 public, 5,329 audited, 748 missing),
 with no new baseline rows. The 351-declaration failure quoted from PR #1425
 therefore came from an older base/audit state; it must not be used as current
-evidence after the base refresh. The five stale single-instantiation baseline
-rows are visible historical notes only and remain unchanged.
+evidence after the base refresh. At that v2 snapshot, five stale
+single-instantiation baseline rows were visible; the v3 freeze below migrates
+only the two rows for declarations deleted by this repair.
 
 Another undocumented prerequisite surfaced: `scripts/EnumDecls.lean` imports
 the root `DerivedAlgGeo` and `DerivedAlgGeo.Development` modules, but the
@@ -343,3 +344,21 @@ audit-library build does not materialize those umbrella oleans. A clean runner
 must build the root and development/specialization targets before running the
 completeness sweep; otherwise the command fails with a missing object-file
 error despite the audit libraries themselves being green.
+
+## SF11.3 follow-up v3 freeze correction (2026-09-21)
+
+Round-two repository-boundary and mathlib reviews identified that
+`scripts/single_instantiation_baseline.txt` is consumed by
+`check_single_instantiation.py`, so its two rows for the deleted
+`FilteredColimitTruncationData` and
+`IndExtensionFilteredColimitData` declarations were operational stale data,
+not merely prose. The v3 manifest explicitly freezes that file and migrates
+only those two rows. It does not edit `scripts/audit_missing_baseline.txt`,
+change a ceiling, add a TODO, or relax the detector threshold. The v2 ledger
+and its review evidence are not reused; v3 starts from immutable plan ref
+`agent/sf11-3-followup-plan-v3` with a fresh ledger.
+
+The v3 exact-head checks are local measurements, not CI evidence. The targeted
+module build, umbrella/development prerequisite build, per-slice axiom audits,
+single-instantiation detector, and declaration-completeness sweep are rerun
+after the migration on the clean v3 candidate that the new ledger binds to.
