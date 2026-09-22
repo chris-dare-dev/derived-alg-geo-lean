@@ -194,9 +194,15 @@ python scripts/loop_engine.py preflight --spec "$DAG_LOOP_MANIFEST"
 
 The loop manifest is execution authority, not a second requirements system. It
 must select one to three issues, freeze file-level chunks, name the four
-independent reviewers, and set a per-chunk review/improve cap no greater than
-five. A failed final permitted round stops the chunk; a manifest may choose a
-smaller cap when a slice is intentionally narrow. Provider actions are
+independent reviewers, and set a review/improve cap no greater than three per
+attempt for new work. Explicit legacy manifests retain their recorded caps.
+Opting into `recovery` schedules research after exhaustion, then requires
+independent acceptance of a concrete plan before a successor attempt. History,
+findings, scope and cumulative budgets survive every attempt; no routine human
+approval is needed. Without recovery, exhaustion still stops the chunk. The
+supervising agent executes the CLI's next actions; there is no background daemon.
+See [the recovery protocol](docs/architecture/loop-recovery.md) for configuration,
+historical adoption and finite objective budgets. Provider actions are
 separately enabled; issue closure for code work requires a merged PR, and the
 schema keeps merge disabled unless the manifest enables it explicitly. Progress
 chunks must be marked explicitly and use non-closing issue references; complete

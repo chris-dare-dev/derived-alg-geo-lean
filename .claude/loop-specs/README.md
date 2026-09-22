@@ -13,6 +13,24 @@ The distinction is intentional:
   one unattended run.
 - `.loop-runs/` contains local, ignored review ledgers for frozen commits.
 
+## Automatic recovery
+
+For automatic recovery after exhausted review, see
+[the recovery protocol](../../docs/architecture/loop-recovery.md).
+The optional `recovery` section configures `objective_id`, `implementer`,
+`max_episodes` (default 2), `max_total_rounds` (9),
+`max_plan_submissions` (2 per episode), `max_elapsed_seconds` (604800), and
+`history` entries with `path` and `sha256`. Recovery manifests have exactly
+one issue and one chunk. New attempts have at most three rounds, and imported
+history and partial panels count toward the cumulative limit. Existing
+manifests retain their behavior unless explicitly opted in.
+
+An active supervising agent consumes
+`python3 scripts/loop_engine.py recovery next --ledger <ledger>`, dispatches
+research and independent plan review on exhaustion, and resumes only after
+acceptance. No background daemon or routine user approval is involved. The
+failed attempt remains preserved and provider permissions remain separate.
+
 ## Lift targets and the lift chunk
 
 A reviewer regularly finds that a statement belongs at a higher altitude, in a
@@ -45,7 +63,8 @@ a real choice, and both options are legal:
   round reviews the widened diff, and it costs one round like any other fix.
   Choose this when the lift is small and the chunk is young.
 - **`pass_with_lift`** — ship the chunk as reviewed and carry the lift to
-  `docs/architecture/generalization-backlog.md` for a later run. Costs no round.
+  `docs/architecture/generalization-backlog.md` for a later run. This requires
+  no additional revision round; a recovery-mode panel's allocation still counts.
   Choose this when the lift is large, cascading, or would outgrow the issue.
 
 Note the asymmetry: only the second requires the backlog row, because only the

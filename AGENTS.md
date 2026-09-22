@@ -379,8 +379,18 @@ its read-only `preflight`. A run is not enabled until the exact base, live issue
 dependencies, branch/PR collisions, provider identity, roadmap state, and
 required checks are acceptable. Every frozen chunk gets independent
 mathematical, repository-boundary, abstraction, and mathlib-style review on
-the same commit. A chunk has at most three review/improve rounds; the third
-unsuccessful round is a terminal stop, not permission to re-chunk the work.
+the same commit. New work has at most three review/improve rounds per attempt.
+Without recovery configured, exhaustion stops the chunk. With explicit
+`recovery` configuration, the failed attempt stays terminal and the supervising
+agent automatically dispatches research and independent review of a recovery
+plan. Only an accepted plan admits a successor within the same frozen scope,
+with all findings and allocated rounds inherited. Never reset the budget by
+renaming or re-chunking. Defaults are two recovery episodes, nine total allocated
+rounds, two plan submissions per episode, and 604800 seconds; explicit legacy
+manifests retain their existing caps. Follow
+[the recovery protocol](docs/architecture/loop-recovery.md) without routine
+approval pauses. The CLI records next actions; an active supervising agent must
+execute them. Parking an exhausted objective does not stop other authorized work.
 
 Comments, pushes, PR creation, approval, issue closure, and merge are separate
 manifest capabilities. Code issues close only after a confirmed merged PR;

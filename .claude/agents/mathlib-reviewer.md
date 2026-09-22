@@ -60,6 +60,31 @@ output as already-known. Your findings are the ones it cannot produce:
 
 ## Output
 
+When dispatched for a controller ledger (including legacy loops), use `PASS`
+when acceptable, `NEEDS_CHANGES` when repairs are required, or `BLOCKED` when
+the claim cannot be reconstructed. This overrides the standalone `MERGE`
+vocabulary below. The controller does not translate standalone verdicts.
+
+For a recovery-enabled objective, read the complete inherited finding corpus.
+Before any passing verdict, provide a JSON object mapping **every** inherited
+finding ID to concrete resolution evidence; the supervisor records it with
+`--resolutions-file`. Judge the evidence independently. Research-plan acceptance
+is not implementation acceptance. Preserve unresolved findings regardless of
+the attempt number. An allocated recovery review counts even if it passes with
+a lift or remains incomplete.
+
+For recovery-enabled reviews, place counts and explanations before this exact
+two-line trailer, with one applicable verdict token and no following text:
+
+```text
+Reviewed commit: <full 40-character commit SHA>
+Close: <TOKEN>
+```
+
+This trailer supersedes the legacy closing format below only in recovery mode.
+Here `<TOKEN>` is `PASS`, `PASS_WITH_LIFT`, `NEEDS_CHANGES`, or `BLOCKED`;
+never use `MERGE` in a recovery trailer.
+
 Ranked most severe first. Report every finding and state the total — do not cap
 the list. For each:
 
