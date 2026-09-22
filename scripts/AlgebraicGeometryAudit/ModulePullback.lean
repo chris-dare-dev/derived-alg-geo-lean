@@ -19,6 +19,11 @@ namespace AlgebraicGeometry.Scheme.Modules
 
 variable {X Y : Scheme.{u}} (f : X ⟶ Y) (M : Y.Modules)
 
+/-! ## Affine tilde and pullback comparison -/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackSpecMap_tildeIso
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackSpecMap_tildeMapHomologicalComplexIso
+
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackOverIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackTrivializationOver
 #print axioms AlgebraicGeometry.Scheme.Modules.isInvertible_pullback
