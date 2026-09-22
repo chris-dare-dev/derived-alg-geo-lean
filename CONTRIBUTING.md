@@ -183,19 +183,23 @@ design, and task checklist in `openspec/` and validate them with the OpenSpec
 CLI when it is available:
 
 ```bash
+# Select an enabled manifest rather than a dormant roadmap manifest.
+# This is the active #554 progress run at the time of writing.
+DAG_LOOP_MANIFEST=.claude/loop-specs/sf8-5-nonflat-derived-effect.yaml
 openspec validate --all --strict --no-interactive
-python scripts/loop_engine.py validate --spec .claude/loop-specs/sf8-sf9-pilot.yaml
-python scripts/loop_engine.py preflight --spec .claude/loop-specs/sf8-sf9-pilot.yaml
+python scripts/loop_engine.py validate --spec "$DAG_LOOP_MANIFEST"
+python scripts/loop_engine.py preflight --spec "$DAG_LOOP_MANIFEST"
 ```
 
 The loop manifest is execution authority, not a second requirements system. It
-must select at most three issues, freeze file-level chunks, name the four
-independent reviewers, and cap each chunk at three review/improve rounds. A
-failed third round stops the chunk. Provider actions are separately enabled;
-issue closure for code work requires a merged PR, and the schema keeps merge
-disabled unless the manifest enables it explicitly. Progress chunks must be
-marked explicitly and use non-closing issue references; complete chunks require
-a closing keyword. Keep run ledgers in ignored
+must select one to three issues, freeze file-level chunks, name the four
+independent reviewers, and set a per-chunk review/improve cap no greater than
+five. A failed final permitted round stops the chunk; a manifest may choose a
+smaller cap when a slice is intentionally narrow. Provider actions are
+separately enabled; issue closure for code work requires a merged PR, and the
+schema keeps merge disabled unless the manifest enables it explicitly. Progress
+chunks must be marked explicitly and use non-closing issue references; complete
+chunks require a closing keyword. Keep run ledgers in ignored
 `.loop-runs/`, never in the OpenSpec plan.
 
 This section previously read "Build the stable root while developing:

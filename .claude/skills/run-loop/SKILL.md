@@ -1,6 +1,6 @@
 ---
 name: run-loop
-description: Execute one enabled OpenSpec-backed two-to-three-issue formalization batch with a digest-bound ledger, four independent reviewers, guarded provider actions, and a configured five-round cap per frozen chunk.
+description: Execute one enabled OpenSpec-backed one-to-three-issue formalization batch with a digest-bound ledger, four independent reviewers, guarded provider actions, and a configured review-round cap of at most five per frozen chunk.
 ---
 
 # Bounded OpenSpec loop
@@ -20,7 +20,7 @@ generated `.agents/skills/` files.
 ## Invariants
 
 - Work in a clean dedicated worktree based on the manifest's exact `base_ref`.
-- Execute only the two or three issues and frozen chunks listed in the
+- Execute only the one to three issues and frozen chunks listed in the
   manifest. Never select a replacement issue because a listed issue is hard.
 - Run the mathematical, repository-boundary, abstraction, and mathlib reviewers
   independently on the same commit. The style reviewer cannot substitute for
@@ -35,9 +35,9 @@ generated `.agents/skills/` files.
 - Altitude and generalization findings are expected output, not churn. A
   reviewer that reports none on a chunk has probably not looked.
 - A review/improve round is keyed by the commit and frozen chunk. A changed
-  commit starts the next round; this run permits at most five rounds. After
-  the fifth `needs_changes` adjudication, record `blocked` and stop that
-  chunk.
+  commit starts the next round; this run permits at most the manifest's
+  `max_review_rounds_per_chunk` (never more than five). After the final
+  `needs_changes` adjudication, record `blocked` and stop that chunk.
 - Do not silently re-chunk, widen the file list, or rewrite the OpenSpec plan
   after review evidence exists. A material plan change requires a new manifest
   or a new frozen chunk and fresh review.
@@ -160,11 +160,12 @@ python scripts/loop_engine.py ledger adjudicate --state <ledger> \
   --verdict pass|pass_with_lift|needs_changes|blocked --note "<decision>"
 ```
 
-If the result is `needs_changes` and fewer than five rounds have been used,
-fix only the recorded findings, rerun the targeted checks, commit, and repeat
-Phase 2. If the result is `blocked` or the fifth round still needs changes,
-stop the chunk and report the exact ledger state. Do not ask the same reviewers
-to rediscover the same issue on an unchanged commit.
+If the result is `needs_changes` and fewer than the manifest's configured cap
+have been used, fix only the recorded findings, rerun the targeted checks,
+commit, and repeat Phase 2. If the result is `blocked` or the final permitted
+round still needs changes, stop the chunk and report the exact ledger state.
+Do not ask the same reviewers to rediscover the same issue on an unchanged
+commit.
 
 Generalization findings are handled by where the fix lands, not by rationing
 them:
