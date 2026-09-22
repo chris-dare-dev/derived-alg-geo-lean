@@ -220,8 +220,13 @@ replacement for a Lean theorem or an issue acceptance criterion.
   worktree directory and verify `git branch --show-current` afterward.
 - The existing draft PR #1453 is bound to the old v3 branch/manifest. The
   controller's preflight deliberately refuses a second open PR for the same
-  issue, so the replacement must be prepared as `agent/sf11-3-followup-v4`
-  and the old draft must be explicitly retired before the new PR is created.
+  issue, so the replacement is prepared as
+  `agent/sf11-3-followup-v4-current` and the old draft must be explicitly
+  retired before the new PR is created.
+- While the first v4 candidate was being checked, `main` advanced from
+  `858ca700` to `49c33eda` to delete the remaining trust-surface residue in an
+  unrelated manifest. The candidate was discarded rather than reviewed
+  against stale main; this current-main plan ref is `d0395054`.
 - No reviewer or controller is allowed to infer that “trust surface removed”
   means that audit evidence may be relaxed. The v4 acceptance still requires
   actual AlgebraicGeometry audit records, unchanged missing-declaration
