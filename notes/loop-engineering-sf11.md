@@ -327,11 +327,11 @@ The reference-base run at `4e56e5ca` compiled the changed module, both audit
 libraries, the public `DerivedAlgGeo` umbrella, and the
 development/specialization targets. That snapshot is not the reviewed head,
 not the current `origin/main`, and not CI evidence. On the round-one
-candidate `aebe056e`, the same targeted local builds and the two axiom
-transcripts passed with 5,375 AlgebraicGeometry commands and 7,087
+candidate `d8e3d6c1`, the same targeted local builds and the two axiom
+transcripts passed with 5,374 AlgebraicGeometry commands and 7,087
 StabilityCondition commands; these are local measurements, not claims about a
 GitHub run. The environment completeness ratchet measured AlgebraicGeometry
-at exactly its recorded ceiling (6,078 public, 5,330 audited, 748 missing),
+at exactly its recorded ceiling (6,077 public, 5,329 audited, 748 missing),
 with no new baseline rows. The 351-declaration failure quoted from PR #1425
 therefore came from an older base/audit state; it must not be used as current
 evidence after the base refresh. The five stale single-instantiation baseline
