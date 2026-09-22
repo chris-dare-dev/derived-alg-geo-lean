@@ -26,15 +26,14 @@
 # reproduced below. A green `scripts/gates.sh` does not imply a green CI.
 #
 # What this file has and `.github/workflows/` does not, verified against ci.yml,
-# cache-warm.yml, docs.yml and trust-guard.yml on 2026-09-16:
+# cache-warm.yml and docs.yml on 2026-09-16, and re-verified when the trust
+# guard was removed:
 #
 #   workflows        cannot be a CI gate. A workflow file too invalid to parse is
 #                    also too invalid to run the job that would have checked it;
 #                    GitHub fails a run named after the file and reports no
 #                    checks at all. It has to fire before the file reaches
 #                    GitHub. See scripts/check_workflows.sh.
-#   trust-guard      tests the logic of trust-guard.yml. A pull request cannot be
-#                    trusted to run the check that decides whether it is trusted.
 #   local-build      tests a PreToolUse hook, which exists only on a developer's
 #                    machine.
 #   mathlib-style    is the PostToolUse edit hook's checker, run over the branch
@@ -262,7 +261,6 @@ gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
 gate loop-spec bash scripts/validate_loop_specs.sh
 gate loop-engine-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
-gate trust-guard scripts/test_trust_guard.sh
 # Next to it for the same reason: `check_local_build.py` is a PreToolUse hook,
 # and a hook that has stopped refusing is indistinguishable from a hook with
 # nothing to catch. #837 found it silently allowing `lake build DerivedAlgGeo`

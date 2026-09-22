@@ -124,12 +124,11 @@ dependencies) are still skipped: they are not this repository's to audit.
 WHY `CategoryTheory` ROUTES BY SUBTREE RATHER THAN BY NAME. This used to
 enumerate every top-level module under `DerivedAlgGeo.CategoryTheory`
 individually, so adding one — a file or a directory — meant editing this file.
-That is a trust-surface path, so every such pull request tripped the trust
-guard and waited on a `trust-reviewed` label. The work being gated was the
-routine addition of a module, and #727 and #730 each spent a review cycle on a
+That was a guarded path, so every such pull request tripped the since-retired
+trust guard and waited on a review. The work being gated was the routine
+addition of a module, and #727 and #730 each spent a review cycle on a
 one-line `let`. A gate that fires on routine work is a gate that stops being
-read, which is the same reasoning that excluded the audit record slices from
-the guard.
+read, which is the same reasoning that excluded the audit record slices.
 
 Routing the whole subtree keeps every protection. A new module is now counted
 automatically, so its unaudited declarations raise `missing` and fail
