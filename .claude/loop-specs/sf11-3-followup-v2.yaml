@@ -4,8 +4,8 @@ repository: chris-dare-dev/derived-alg-geo-lean
 actor: chris-dare-dev
 remote: origin
 base_branch: main
-# This plan branch contains the reviewed follow-up manifest. It is immutable
-# for the coding run; the issue branch is created from this exact ref.
+# Retired migration manifest; its plan ref and ledger are historical only.
+# The active follow-up for issue #1445 is `sf11-3-followup-v3.yaml`.
 base_ref: agent/sf11-3-followup-plan-v2
 mode: independent
 enabled: false
