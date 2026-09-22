@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import copy
+import contextlib
 import hashlib
+import io
 import json
 from pathlib import Path
 import sys
@@ -18,9 +20,9 @@ sys.path.insert(0, str(SCRIPT_DIR))
 import loop_recovery as recovery
 import loop_engine
 try:
-    from scripts.tests.test_loop_engine import make_spec
+    from scripts.tests.test_loop_engine import make_spec, passing_ledger_state
 except ModuleNotFoundError:
-    from test_loop_engine import make_spec
+    from test_loop_engine import make_spec, passing_ledger_state
 
 ROLES = ["mathematics-adversary", "repository-boundary-adversary", "abstraction-adversary", "mathlib-reviewer"]
 NOW = 1_800_000_000.0
@@ -343,6 +345,18 @@ class RecoveryCliTests(unittest.TestCase):
         self.initialize(ok=False)
         self.assertEqual(original, self.state_path.read_bytes())
 
+    def test_repository_case_alias_cannot_reset_or_drop_recovery(self):
+        self.initialize()
+        self.cli("recovery", "start-round", "--ledger", self.state_path, "--commit", self.sha)
+        original = self.state_path.read_bytes()
+        self.spec["repository"] = self.spec["repository"].upper()
+        self.save_spec()
+        self.initialize("--state-dir", ".fresh-ledgers", ok=False)
+        self.assertEqual(original, self.state_path.read_bytes())
+        del self.spec["recovery"]
+        with self.assertRaisesRegex(loop_engine.LoopError, "registered recovery"):
+            loop_engine.recovery_publication_state(self.root, self.spec)
+
     def test_cli_restores_deleted_cache_without_replenishing_rounds(self):
         self.initialize()
         self.cli("recovery", "start-round", "--ledger", self.state_path, "--commit", self.sha)
@@ -455,6 +469,89 @@ class RecoveryCliTests(unittest.TestCase):
         state = {"chunk": {"files": ["inside.txt"]}, "rounds": []}
         with self.assertRaisesRegex(loop_engine.LoopError, "outside.txt"):
             loop_engine.recovery_scoped_paths(self.root, {"base_ref": base}, state, current)
+
+    def provider_fixture(self):
+        state = passing_ledger_state(self.root, self.spec)
+        state["repo_root"] = str(self.root)
+        state["recovery"] = {"policy": self.spec["recovery"]}
+        pr = dict(state="MERGED", mergedAt="2026-09-22T12:00:00Z",
+                  closingIssuesReferences=[{"number": 1}], headRefOid="a" * 40,
+                  headRefName="agent/test-issue", baseRefName="main", body="Closes #1",
+                  files=[{"path": "scripts/loop_engine.py"}])
+        return state, pr
+
+    @contextlib.contextmanager
+    def provider_gates(self, state):
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(loop_engine, "authorize_action"))
+            stack.enter_context(mock.patch.object(loop_engine, "recovery_publication_state", return_value=state))
+            stack.enter_context(mock.patch.object(loop_engine, "load_state", return_value=state))
+            stack.enter_context(mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]))
+            stack.enter_context(mock.patch.object(loop_engine, "verify_local_chunk_files"))
+            scope = stack.enter_context(mock.patch.object(loop_engine, "recovery_scoped_paths"))
+            stack.enter_context(mock.patch.object(loop_engine, "recovery_registry", return_value=[
+                (self.root / "registry.json", {"objective_id": self.spec["recovery"]["objective_id"],
+                                              "spec_path": str(self.spec_path)})]))
+            stack.enter_context(mock.patch.object(loop_engine, "git", side_effect=lambda root, *args:
+                "a" * 40 if args == ("rev-parse", "HEAD") else
+                "agent/test-issue" if args == ("branch", "--show-current") else ""))
+            yield scope
+
+    def test_create_pr_refuses_stale_remote_before_provider_write(self):
+        state, _ = self.provider_fixture()
+        body = self.root / "body.md"
+        body.write_text("Closes #1\n", encoding="utf-8")
+        with self.provider_gates(state), mock.patch.object(loop_engine, "gh_json", return_value={
+                "object": {"sha": "b" * 40}}) as read, mock.patch.object(loop_engine, "run_command") as write:
+            with self.assertRaisesRegex(loop_engine.LoopError, "remote|reviewed"):
+                loop_engine.action_create_pr(self.root, self.spec, 1, self.state_path,
+                                             "Repair", str(body), False, False)
+            write.assert_not_called()
+            self.assertTrue(any(call.args[1][0] == "api" for call in read.call_args_list))
+
+    def test_created_pr_race_reports_url_and_fails_postcondition(self):
+        state, pr = self.provider_fixture()
+        pr.update(state="OPEN", mergedAt=None, headRefOid="b" * 40)
+        body = self.root / "body.md"
+        body.write_text("Closes #1\n", encoding="utf-8")
+        url = "https://github.com/example/repository/pull/101"
+        output = io.StringIO()
+        with self.provider_gates(state), mock.patch.object(loop_engine, "gh_json", side_effect=[
+                {"object": {"sha": "a" * 40}}, pr]), mock.patch.object(loop_engine, "run_command",
+                return_value=subprocess.CompletedProcess([], 0, stdout=url + "\n", stderr="")) as write, \
+                contextlib.redirect_stdout(output):
+            with self.assertRaises(loop_engine.LoopError) as raised:
+                loop_engine.action_create_pr(self.root, self.spec, 1, self.state_path,
+                                             "Repair", str(body), False, False)
+            self.assertEqual(write.call_count, 1)
+            self.assertEqual(write.call_args.args[1][:3], ["gh", "pr", "create"])
+            self.assertIn(url, output.getvalue() + str(raised.exception))
+            self.assertNotIn("PASS PR created", output.getvalue())
+
+    def test_close_rejects_unreviewed_or_unrelated_merged_pr(self):
+        state, pr = self.provider_fixture()
+        for field, value in (("headRefOid", "b" * 40), ("headRefName", "agent/other-issue"),
+                             ("baseRefName", "other-base"), ("body", "Closes #2")):
+            with self.subTest(field=field), self.provider_gates(state), \
+                    mock.patch.object(loop_engine, "gh_json", return_value={**pr, field: value}), \
+                    mock.patch.object(loop_engine, "run_command") as write:
+                with self.assertRaises(loop_engine.LoopError):
+                    loop_engine.action_close(self.root, self.spec, 1, 101, None, False)
+                write.assert_not_called()
+
+    def test_close_exact_reviewed_merged_pr_checks_scope_then_closes(self):
+        state, pr = self.provider_fixture()
+        with self.provider_gates(state) as scope, mock.patch.object(loop_engine, "gh_json", return_value=pr), \
+                mock.patch.object(loop_engine, "run_command") as write:
+            self.assertEqual(loop_engine.action_close(self.root, self.spec, 1, 101, None, False), 0)
+            scope.assert_called_once()
+            self.assertEqual(write.call_args.args[1][:4], ["gh", "issue", "close", "1"])
+        with self.provider_gates(state) as scope, mock.patch.object(loop_engine, "gh_json", return_value=pr), \
+                mock.patch.object(loop_engine, "run_command") as write:
+            scope.side_effect = loop_engine.LoopError("outside frozen scope")
+            with self.assertRaisesRegex(loop_engine.LoopError, "outside frozen scope"):
+                loop_engine.action_close(self.root, self.spec, 1, 101, None, False)
+            write.assert_not_called()
 
 
 if __name__ == "__main__":

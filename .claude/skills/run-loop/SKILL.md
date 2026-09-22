@@ -211,10 +211,13 @@ them:
   refuses that adjudication while any named target is still missing from the
   backlog, so the finding cannot be dropped. In recovery mode the allocated
   panel still counts toward the objective budget, even when it passes with a lift.
-- The style reviewer closes `MERGE` / `MERGE AFTER FIXES` / `NEEDS REWORK`, not
-  the controller's vocabulary. Map `MERGE` to `pass` and both others to
-  `needs_changes`. Preserve the reviewer's message verbatim; do not append a
-  mapping after its final verdict. The controller performs the token mapping.
+- When dispatching the style reviewer for a controller ledger, require its
+  controller verdict: `PASS` for an acceptable chunk, `NEEDS_CHANGES` for
+  required repairs, or `BLOCKED` for an unreconstructable claim. `MERGE` is
+  only its standalone review vocabulary; the controller does not map it.
+  In recovery mode require the exact `Reviewed commit:` / `Close:` trailer,
+  with `PASS`, `PASS_WITH_LIFT`, `NEEDS_CHANGES`, or `BLOCKED` as appropriate.
+  Preserve the reviewer's message verbatim; never append a verdict mapping.
 
 Termination is the round cap's job. Never suppress a class of finding to help
 the loop converge.

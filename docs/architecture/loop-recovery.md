@@ -134,6 +134,12 @@ text after the trailer. Counts and explanations belong before it. Preserve the
 reviewer's actual message; the supervisor must not rewrite a verdict or invent
 resolution evidence.
 
+PR creation checks the remote branch before creating and verifies the returned
+PR afterward. GitHub creates by branch name rather than an atomic expected-SHA
+condition: a concurrent update can still create an incorrectly bound PR. The
+controller reports that PR's URL and fails closed for further publication;
+approval, merge and closure independently recheck the reviewed head.
+
 ## Provenance observations
 
 During implementation, active `CONTRIBUTING.md`, `openspec/config.yaml` and

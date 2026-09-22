@@ -647,7 +647,7 @@ def recovery_record(root: Path, spec: dict[str, Any]) -> tuple[Path, dict[str, A
     policy = loop_recovery.validate_policy(spec["recovery"])
     issue = spec["issues"][0]["number"]
     for path, record in recovery_registry(root):
-        if record.get("repository") == spec["repository"] and (
+        if record.get("repository", "").casefold() == spec["repository"].casefold() and (
             record.get("issue") == issue or record.get("objective_id") == policy["objective_id"]
         ):
             if record.get("issue") != issue or record.get("objective_id") != policy["objective_id"]:
@@ -1424,10 +1424,10 @@ def register_recovery(root: Path, spec_path: Path, spec: dict[str, Any], path: P
             raise LoopError(f"historical ledger digest mismatch: {source}")
         history.append(read_json_object(source))
     loop_recovery.initialize(state, policy, history=history)
-    registry_path = recovery_directory(root) / (digest([spec["repository"], state["issue"]["number"]]) + ".json")
+    registry_path = recovery_directory(root) / (digest([spec["repository"].casefold(), state["issue"]["number"]]) + ".json")
     record = {
         "schema": "loop-objective-registry/v1",
-        "repository": spec["repository"],
+        "repository": spec["repository"].casefold(),
         "issue": state["issue"]["number"],
         "objective_id": policy["objective_id"],
         "repo_root": str(root.resolve()),
@@ -1462,7 +1462,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
                 return 0
         else:
             for _, record in recovery_registry(root):
-                if record["repository"] == spec["repository"] and record["issue"] == number:
+                if record["repository"].casefold() == spec["repository"].casefold() and record["issue"] == number:
                     raise LoopError("registered recovery objective cannot be restarted under a legacy manifest")
         refuse_renamed_ledger(root, spec, requested_state_dir, chunk_id, path)
         if path.exists():
@@ -1570,7 +1570,7 @@ CONTRACT_VERDICT_TOKENS = {
 }
 # Verdicts that let a chunk advance. `pass_with_lift` says the code under review
 # is correct AND that a generalization was found whose target lies outside the
-# frozen file list. It never consumes a review round.
+# frozen file list. Recovery mode charges every allocated panel, including lifts.
 PASSING_VERDICTS = {"pass", "pass_with_lift"}
 REVIEW_VERDICTS = set(CONTRACT_VERDICT_TOKENS)
 BACKLOG_PATH = "docs/architecture/generalization-backlog.md"
@@ -1791,7 +1791,7 @@ def recovery_publication_state(root: Path, spec: dict[str, Any], ledger: Path | 
         # A changed/legacy manifest is not a way around a registered objective.
         selected = {item["number"] for item in spec["issues"]}
         for _, record in recovery_registry(root):
-            if record["repository"] == spec["repository"] and record["issue"] in selected:
+            if record["repository"].casefold() == spec["repository"].casefold() and record["issue"] in selected:
                 raise LoopError("registered recovery objective requires its original manifest")
         return None
     registered = recovery_record(root, spec)
@@ -1866,8 +1866,10 @@ def action_close(
     dry_run: bool,
 ) -> int:
     authorize_action(spec, "close")
-    recovery_publication_state(root, spec)
+    recovered = recovery_publication_state(root, spec)
     selected_issue_for_action(spec, number)
+    if recovered is not None and merged_pr is None:
+        raise LoopError("recovery issue closure requires the exact reviewed merged PR")
     if merged_pr is None and not spec["closure"]["allow_non_pr"]:
         raise LoopError("code issue closure requires --merged-pr; non-PR closure is disabled")
     if merged_pr is not None:
@@ -1880,7 +1882,7 @@ def action_close(
                 "--repo",
                 spec["repository"],
                 "--json",
-                "state,mergedAt,closingIssuesReferences",
+                "state,mergedAt,closingIssuesReferences,headRefName,headRefOid,baseRefName,body,files",
             ],
         )
         if pr.get("state") != "MERGED" or not pr.get("mergedAt"):
@@ -1888,6 +1890,10 @@ def action_close(
         closing = pr.get("closingIssuesReferences") or []
         if not any(reference.get("number") == number for reference in closing if isinstance(reference, dict)):
             raise LoopError(f"PR #{merged_pr} does not close issue #{number}; refusing to close it")
+        if recovered is not None:
+            require_pr_targets_base(pr, spec)
+            require_pr_matches_frozen_issue(pr, recovered)
+            verify_remote_chunk_files(pr, recovered)
     args = ["gh", "issue", "close", str(number), "--repo", spec["repository"]]
     if comment:
         args.extend(["--comment", comment])
@@ -2115,6 +2121,13 @@ def require_pr_matches_frozen_issue(pr: dict[str, Any], state: dict[str, Any]) -
         raise LoopError(f"PR body does not match the frozen {closure!r} closure: {exc}") from exc
 
 
+def require_recovery_remote_head(root: Path, spec: dict[str, Any], branch: str, commit: str) -> None:
+    remote = gh_json(root, ["api", f"repos/{spec['repository']}/git/ref/heads/{branch}"])
+    obj = remote.get("object") if isinstance(remote, dict) else None
+    if not isinstance(obj, dict) or obj.get("sha") != commit:
+        raise LoopError("remote branch must contain the exact reviewed recovery commit before PR creation")
+
+
 def action_create_pr(
     root: Path,
     spec: dict[str, Any],
@@ -2152,6 +2165,8 @@ def action_create_pr(
     body = read_body_file(root, body_file)
     chunk_closure = state.get("chunk", {}).get("closure", "complete")
     validate_pr_body_closure(body, number, chunk_closure)
+    if recovered is not None:
+        require_recovery_remote_head(root, spec, current, recovered["rounds"][-1]["commit"])
     args = [
         "gh",
         "pr",
@@ -2172,7 +2187,19 @@ def action_create_pr(
     if dry_run:
         print("DRY-RUN " + " ".join(args))
         return 0
-    run_command(root, args, check=True)
+    created = run_command(root, args, check=True)
+    if recovered is not None:
+        url = created.stdout.strip()
+        # GitHub creates by branch name, not a compare-and-swap SHA. Detect a
+        # concurrent remote update and prohibit subsequent approval/closure.
+        try:
+            pr = gh_json(root, ["pr", "view", url, "--repo", spec["repository"],
+                                "--json", "headRefName,headRefOid,baseRefName,body,files"])
+            require_pr_targets_base(pr, spec)
+            require_pr_matches_frozen_issue(pr, recovered)
+            verify_remote_chunk_files(pr, recovered)
+        except (LoopError, loop_recovery.RecoveryError) as exc:
+            raise LoopError(f"PR was created at {url}, but its recovery binding failed; do not approve or close: {exc}") from exc
     print(f"PASS PR created for issue #{number}")
     return 0
 
