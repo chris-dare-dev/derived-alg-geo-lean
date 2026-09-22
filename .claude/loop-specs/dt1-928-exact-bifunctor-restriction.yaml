@@ -6,10 +6,9 @@ remote: origin
 base_branch: main
 base_ref: origin/main
 mode: independent
-# The protected base has not yet acquired the attestation-aware controller.
-# A reviewed bootstrap update may enable this only after that support is merged
-# into origin/main; older controllers otherwise ignore the policy below.
-enabled: false
+# The attestation-aware controller is now on origin/main (#1450). This reviewed
+# enablement update is the only path that turns the generic source run on.
+enabled: true
 allow_force_push: false
 state_dir: .loop-runs
 roadmap_gate: required
@@ -44,7 +43,6 @@ review:
 runner:
   required_checks:
     - ci
-    - trust-surface
 
 merge:
   method: squash

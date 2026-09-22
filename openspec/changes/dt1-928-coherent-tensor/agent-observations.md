@@ -204,3 +204,38 @@ dated correction that names the earlier evidence instead.
   five-round static #928 assembly path despite #929 being closed; it is now
   disabled as historical evidence. This correction was raised by the loop
   adversary through a direct validation against the current controller source.
+
+## 2026-09-21 — live protection and controller cutover
+
+- **The exact-head trust guard was retired (verified).** Commit `225d487e`
+  (PR #1449) deletes `trust-guard.yml`, removes `trust-surface` from every
+  older manifest, and documents why a one-collaborator repository could never
+  satisfy an independent approving-review requirement. The live branch
+  protection API now reports exactly `contexts: ["ci"]`. Earlier entries about
+  `trust-guard-v2` are retained as time-bounded observations, not current
+  policy. The generic manifest must therefore require only `ci`; retaining the
+  deleted context would make controller preflight fail.
+
+- **The attestation controller is live (verified).** `origin/main` resolves to
+  `d224ac70` (`feat(loop): bind successors to attested predecessors`, PR
+  #1450), following the merged disabling planning bootstrap `6d3679b2` (PR
+  #1448). This reviewed enablement branch is based on that exact main commit;
+  it turns on only the generic source manifest, preserves its three-round cap
+  and durable attestation policy, and does not create the future assembly
+  manifest.
+
+- **Precheck count changed with policy (verified).** The earlier successful
+  `bash scripts/precheck.sh` result named 20 local gates before #1449. Its
+  removal of the local trust-guard gate reduces the expected current count to
+  19; this is a policy change, not a regression or a reason to restore a stale
+  required check.
+
+- **Correction — #1449 did not update every historical manifest (verified).**
+  The preceding entry overstated #1449's scope. Enabled
+  `.claude/loop-specs/sf8-5-nonflat-derived-effect.yaml` still requires
+  `trust-surface`; `git merge-base --is-ancestor 17e0b382 225d487e` confirms
+  that it predates #1449, and the #1449 diff leaves it untouched. It therefore
+  cannot preflight against `main`'s `ci`-only protection. This DT1 enablement
+  change fixes its own manifest only; the SF8 repair needs a separately scoped,
+  reviewed change. This correction came from independent loop and integration
+  adversarial reviews, and records a genuine tooling-integration blind spot.

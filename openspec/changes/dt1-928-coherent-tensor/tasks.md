@@ -2,7 +2,7 @@
 
 ## 1. Freeze the conditional continuation
 
-- [ ] 1.1 Confirm that predecessor-attestation controller support is on `origin/main`, then make and review a narrow enablement update to the generic manifest before validating it, live #928 eligibility, and the append-only observation register before ledger initialization; verify with `openspec validate --all --strict --no-interactive`, `python3 scripts/loop_engine.py validate`, and `python3 scripts/loop_engine.py preflight`.
+- [ ] 1.1 Confirm that predecessor-attestation controller support is on `origin/main` and that #1449's live branch protection requires only `ci`, then land this reviewed enablement update to the generic manifest before validating it, live #928 eligibility, and the append-only observation register before ledger initialization; verify with `openspec validate --all --strict --no-interactive`, `python3 scripts/loop_engine.py validate`, and `python3 scripts/loop_engine.py preflight`.
 - [ ] 1.2 Implement the generic full-subcategory two-variable shift and exact-bifunctor restriction with all closure and coherence hypotheses explicit; verify with named Lean builds of `CategoryTheory.ObjectProperty.Bifunctor` and `CategoryTheory.Triangulated.ExactFunctorFamily`.
 - [ ] 1.3 Add the generic declarations to their existing audit surface and run focused source-independence, layering, umbrella, no-sorry, and targeted audit checks.
 - [ ] 1.4 Run the two advisors and four independent adversarial reviewers on the frozen generic commit; record verbatim findings and resolve only recorded findings in at most three rounds, then use the controller to merge its non-closing `Refs #928` progress PR and emit the exact durable predecessor attestation.
