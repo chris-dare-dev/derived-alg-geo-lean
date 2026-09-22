@@ -121,7 +121,7 @@ Each passing reviewer supplies `--resolutions-file <json>` to
 nonempty resolution evidence. Each negative review message and each inherited
 lift obligation is retained as an indivisible finding; addressing only one
 criticism in it is insufficient. A fresh lift in the current passing panel
-uses the live backlog gate, not a retrospective resolution demanded of earlier
+uses the committed backlog gate, not a retrospective resolution demanded of earlier
 reviewers who could not yet see it. Failed or abandoned panels carry their lifts
 into subsequent research and review. Every current or carried lift must have a
 durable backlog entry before passing adjudication/publication; implementation
@@ -129,6 +129,49 @@ evidence can be recorded there rather than deleting its provenance. Previously
 requested lift prefixes stay usable only within the current manifest's original
 declared authority. Imported history grants no additional scope.
 The controller verifies structure and binding; reviewers judge substance.
+
+The backlog gate reads `docs/architecture/generalization-backlog.md` from the
+exact candidate/reviewed commit's ordinary file blob, at both passing
+adjudication and publication. It rejects missing commits/files and symlinks;
+there is no HEAD or working-tree fallback. Approval of an existing remote PR
+can use its exact reviewed SHA even if local HEAD differs, subject to the
+separate provider gates. Push and PR creation retain their local HEAD and clean
+checkout requirements.
+
+A recovery disposition is a complete visible row outside code fences, with
+nonempty `chunk`, `reviewing commit`, `found by`, `proposed ancestor`,
+`weaker hypotheses`, and `state` fields. Its `proposed ancestor` value must
+exactly equal the canonical repository-relative lift target; one enclosing
+pair of backticks is permitted. Prefixes, namespace descriptions, incidental
+prose and fenced schema examples do not match. State is `UNVERIFIED`,
+`CONFIRMED <evidence>`, or `FALSIFIED <counterexample>`, with nonempty evidence
+after the latter two. For example:
+
+```text
+### 2026-09-22 — example lift
+- chunk: example-chunk
+- reviewing commit: <commit where the finding was observed>
+- found by: abstraction-adversary
+- proposed ancestor: DerivedAlgGeo/CategoryTheory/Example.lean
+- weaker hypotheses: the concrete weakening proposed by the reviewer
+- state: UNVERIFIED
+```
+
+The observation commit precedes the commit containing a newly added row; do
+not claim its self-referential final SHA was known while writing it. Existing
+legacy rows remain historical records, but a descriptive namespace value does
+not automatically satisfy a path-specific recovery disposition. The legacy
+non-recovery checker retains its existing behavior.
+
+Reserve the backlog path in the original frozen file list if the objective may
+need to add rows. A lift finding grants no implicit permission to edit it.
+If a new lift is discovered after freezing and no valid row already exists in
+that commit, preserve the reviews and record `needs_changes` (or abandon the
+incomplete panel). Append the row within authorized scope, commit, and allocate
+another full panel on the new SHA. That allocation counts toward both caps;
+use automatic research recovery if the attempt is exhausted. Do not rewrite a
+review, change its SHA, or publish an unreviewed backlog append. Pre-freeze
+advisors and existing committed rows can avoid that extra source revision.
 
 Recovery review text ends with exactly:
 

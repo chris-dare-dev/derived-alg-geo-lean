@@ -82,3 +82,43 @@ scope; all lifts require durable backlog disposition. Fresh passing-panel lifts
 stay under the live backlog gate so reviewers need not predict a later message.
 The distinction avoids both silent omission and an artificial extra review
 round merely to learn the IDs of freshly submitted lift messages.
+
+## OBS-011 — a tracked pathname is not immutable evidence
+
+Initial C3 still accepted an uncommitted backlog row because the inherited
+helper read the worktree. Its positive test rewarded that same weaker behavior;
+86 passing tests therefore did not establish durability. The research inventory
+separated content-bound ledger evidence from claims about shipped Git artifacts.
+The successor uses real Git commits in positive and negative evidence tests,
+checks both adjudication paths and publication, and does not mock away the
+reader being tested. OpenSpec's digest helper also claimed "committed" while
+actually hashing current content; its registered digest is the binding.
+
+## OBS-012 — ambiguous cap wording requires explicit adoption, not a rewrite
+
+The original migration/tasks said three panels for this implementation while
+the product specification described per-attempt recovery. After the initial
+third failure, source revision stopped. An independent admission audit retained
+the original narrower text and all twelve reviews, and explicitly applied the
+user's standing recovery authority via an external bootstrap record. The exact
+research plan was independently accepted before attempt 2 began. No C4 was
+opened in attempt 1, no original verdict changed, and no candidate-controller
+code certified its own acceptance. This exceptional bootstrap is not permission
+to repeat adoption to replenish the objective's nine-round limit.
+
+## OBS-013 — timestamps and checklist completion can mislead a handoff
+
+The first reviewed commit's timestamp is not the beginning of implementation.
+The independent audit caught that accounting ambiguity; the shared deadline was
+tightened to a conservative start-of-day bound rather than restarted at resume.
+Likewise, OpenSpec displayed "complete" when original work-product checkboxes
+were checked despite failed reviews. Recovery tasks now remain explicit, and
+only the exact-SHA review corpus establishes acceptance, never a checklist label.
+
+## OBS-014 — immutable research status is historical, not current authority
+
+The frozen research report says proposed/not accepted and records the then-used
+C1 timestamp. Its content was not rewritten after acceptance: the independent
+digest-bound review and external objective record supply the later acceptance
+and tighter deadline. Consumers must read that provenance rather than treating
+an old status sentence as either fresh approval or a fresh blocker.

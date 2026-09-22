@@ -28,6 +28,16 @@ ROLES = ["mathematics-adversary", "repository-boundary-adversary", "abstraction-
 NOW = 1_800_000_000.0
 
 
+def backlog_row(target="foundation/General.lean", state="UNVERIFIED"):
+    return ("### 2026-09-22 — generic foundation\n"
+            "- chunk: recovery-fixture\n"
+            "- reviewing commit: " + "a" * 40 + "\n"
+            "- found by: abstraction-adversary\n"
+            f"- proposed ancestor: {target}\n"
+            "- weaker hypotheses: an arbitrary additive category\n"
+            f"- state: {state}\n")
+
+
 def policy(**overrides):
     result = dict(objective_id="repair-controller", implementer="implementer",
                   max_episodes=2, max_total_rounds=9, max_plan_submissions=2,
@@ -329,6 +339,33 @@ class RecoveryTests(unittest.TestCase):
         with self.assertRaises(loop_engine.LoopError):
             loop_engine.authorized_lift_targets(state)
 
+    def test_backlog_requires_exact_visible_complete_row(self):
+        target = "foundation/General.lean"
+        for state in ("UNVERIFIED", "CONFIRMED #1419", "FALSIFIED a concrete counterexample"):
+            for value in (target, f"`{target}`"):
+                with self.subTest(state=state, value=value):
+                    self.assertIn(target, loop_engine.recovery_backlog_targets(backlog_row(value, state)))
+        invalid = [
+            f"A discussion mentioning {target} in ordinary prose.",
+            f"```markdown\n{backlog_row()}\n```\n",
+            f"~~~\n{backlog_row()}\n~~~\n",
+            f"<!--\n{backlog_row()}\n-->\n",
+            f"<pre>\n{backlog_row()}\n</pre>\n",
+            f"<script>\n{backlog_row()}\n</script>\n",
+            backlog_row(target + ".old"),
+            backlog_row("foundation"),
+            backlog_row(target + " plus later work"),
+            backlog_row(state="DONE"), backlog_row(state="CONFIRMED"), backlog_row(state="FALSIFIED"),
+            backlog_row().replace("- found by: abstraction-adversary\n", ""),
+            backlog_row().replace("- found by: abstraction-adversary\n", "- found by: first\n- found by: second\n"),
+            backlog_row().replace("- proposed ancestor: foundation/General.lean\n", "- proposed ancestor: foundation/General.lean\n  and another proposed module\n"),
+            backlog_row().replace("- weaker hypotheses: an arbitrary additive category", "- weaker hypotheses: "),
+            backlog_row("foundation/../outside/General.lean"),
+        ]
+        for text in invalid:
+            with self.subTest(text=text):
+                self.assertNotIn(target, loop_engine.recovery_backlog_targets(text))
+
 
 class RecoveryCliTests(unittest.TestCase):
     def setUp(self):
@@ -622,18 +659,167 @@ class RecoveryCliTests(unittest.TestCase):
         state = helper.lift_recovery()
         state["repo_root"] = str(self.root)
         resolutions = {key: "Generalization is deferred with durable backlog evidence." for key in recovery.inherited_findings(state)}
-        helper.panel(state, "b" * 40, "pass", resolutions)
+        helper.panel(state, self.sha, "pass", resolutions)
         record = {"spec_digest": loop_engine.digest(self.spec), "repo_root": str(self.root),
                   "state_file": str(self.state_path)}
+        self.git("remote", "add", "origin", "https://github.com/example/repository.git")
         with mock.patch.object(loop_engine, "recovery_record", return_value=(self.root / "registry.json", record)), \
-                mock.patch.object(loop_engine, "load_state", return_value=state), \
-                mock.patch.object(loop_engine, "git", return_value="https://github.com/example/repository.git"):
-            with self.assertRaisesRegex(loop_engine.LoopError, "backlog"):
+                mock.patch.object(loop_engine, "load_state", return_value=state):
+            with self.assertRaises(loop_engine.LoopError):
                 loop_engine.recovery_publication_state(self.root, self.spec, self.state_path)
             backlog = self.root / loop_engine.BACKLOG_PATH
             backlog.parent.mkdir(parents=True, exist_ok=True)
-            backlog.write_text("# Generalization backlog\n\n### 2026-09-22 - recovery\n- proposed ancestor: foundation/General.lean\n", encoding="utf-8")
+            backlog.write_text(backlog_row(), encoding="utf-8")
+            with self.assertRaises(loop_engine.LoopError):
+                loop_engine.recovery_publication_state(self.root, self.spec, self.state_path)
+            self.git("add", loop_engine.BACKLOG_PATH)
+            self.git("commit", "-m", "Reviewed backlog disposition")
+            with self.assertRaises(loop_engine.LoopError):
+                loop_engine.recovery_publication_state(self.root, self.spec, self.state_path)
+            reviewed = self.git("rev-parse", "HEAD").strip()
+            # Build a distinct valid fixture panel at the actual commit containing
+            # the evidence; never relabel already-recorded review transcripts.
+            state = helper.lift_recovery()
+            state["repo_root"] = str(self.root)
+            helper.panel(state, reviewed, "pass", resolutions)
+        with mock.patch.object(loop_engine, "recovery_record", return_value=(self.root / "registry.json", record)), \
+                mock.patch.object(loop_engine, "load_state", return_value=state):
+            backlog.unlink()
+            self.git("add", loop_engine.BACKLOG_PATH)
+            self.git("commit", "-m", "Later HEAD removes evidence")
             self.assertEqual(loop_engine.recovery_publication_state(self.root, self.spec, self.state_path), state)
+
+    def test_reviewed_text_reader_uses_exact_blob_and_rejects_invalid_objects(self):
+        path = self.root / loop_engine.BACKLOG_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        for sha, relative in (("f" * 40, loop_engine.BACKLOG_PATH), (self.sha, loop_engine.BACKLOG_PATH),
+                              (self.sha, "openspec")):
+            with self.subTest(sha=sha, relative=relative), self.assertRaises(loop_engine.LoopError):
+                loop_engine.read_reviewed_text(self.root, sha, relative)
+        text = backlog_row()
+        path.write_text(text, encoding="utf-8")
+        self.git("add", loop_engine.BACKLOG_PATH)
+        self.git("commit", "-m", "Immutable evidence")
+        reviewed = self.git("rev-parse", "HEAD").strip()
+        path.write_text("dirty replacement", encoding="utf-8")
+        self.assertEqual(loop_engine.read_reviewed_text(self.root, reviewed, loop_engine.BACKLOG_PATH), text)
+        self.git("add", loop_engine.BACKLOG_PATH)
+        self.git("commit", "-m", "Different later evidence")
+        path.unlink()
+        self.assertEqual(loop_engine.read_reviewed_text(self.root, reviewed, loop_engine.BACKLOG_PATH), text)
+        path.symlink_to("../../run.yaml")
+        self.git("add", loop_engine.BACKLOG_PATH)
+        self.git("commit", "-m", "Symlink is not evidence")
+        with self.assertRaises(loop_engine.LoopError):
+            loop_engine.read_reviewed_text(self.root, self.git("rev-parse", "HEAD").strip(), loop_engine.BACKLOG_PATH)
+        path.unlink()
+        for data in (b"invalid utf8: \xff", b"binary\x00payload"):
+            with self.subTest(data=data):
+                path.write_bytes(data)
+                self.git("add", loop_engine.BACKLOG_PATH)
+                self.git("commit", "-m", "Non-text is not evidence")
+                with self.assertRaises(loop_engine.LoopError):
+                    loop_engine.read_reviewed_text(self.root, self.git("rev-parse", "HEAD").strip(), loop_engine.BACKLOG_PATH)
+
+    def test_fresh_lift_adjudication_requires_candidate_blob_without_worktree_fallback(self):
+        self.initialize()
+        backlog = self.root / loop_engine.BACKLOG_PATH
+        backlog.parent.mkdir(parents=True, exist_ok=True)
+        backlog.write_text(backlog_row(), encoding="utf-8")
+        self.cli("recovery", "start-round", "--ledger", self.state_path, "--commit", self.sha)
+        for role in ROLES:
+            verdict = "pass_with_lift" if role == ROLES[2] else "pass"
+            output = self.root / f"{role}.md"
+            output.write_text(review(role, self.sha, verdict)["finding_text"], encoding="utf-8")
+            extra = ["--lift-target", "foundation/General.lean"] if verdict == "pass_with_lift" else []
+            self.cli("ledger", "record-review", "--state", self.state_path, "--reviewer", role,
+                     "--commit", self.sha, "--verdict", verdict, "--finding-file", output, *extra)
+        self.cli("ledger", "adjudicate", "--state", self.state_path, "--verdict", "pass_with_lift", ok=False)
+        # A new source commit cannot retroactively make the frozen panel pass.
+        self.git("add", loop_engine.BACKLOG_PATH)
+        self.git("commit", "-m", "Record newly discovered lift")
+        self.cli("ledger", "adjudicate", "--state", self.state_path, "--verdict", "pass_with_lift", ok=False)
+        # End the old panel, allocate the next, and collect actual new reviews.
+        self.cli("ledger", "adjudicate", "--state", self.state_path, "--verdict", "needs_changes")
+        sha = self.git("rev-parse", "HEAD").strip()
+        current = json.loads(self.state_path.read_text())
+        resolutions = self.root / "resolutions.json"
+        resolutions.write_text(json.dumps({key: "Committed disposition records the outstanding lift."
+            for key in recovery.inherited_findings(current)}), encoding="utf-8")
+        self.cli("recovery", "start-round", "--ledger", self.state_path, "--commit", sha)
+        for role in ROLES:
+            verdict = "pass_with_lift" if role == ROLES[2] else "pass"
+            output = self.root / f"{role}.md"
+            output.write_text(review(role, sha, verdict)["finding_text"], encoding="utf-8")
+            extra = ["--lift-target", "foundation/General.lean"] if verdict == "pass_with_lift" else []
+            self.cli("ledger", "record-review", "--state", self.state_path, "--reviewer", role,
+                     "--commit", sha, "--verdict", verdict, "--finding-file", output,
+                     "--resolutions-file", resolutions, *extra)
+        backlog.unlink()
+        self.cli("ledger", "adjudicate", "--state", self.state_path, "--verdict", "pass_with_lift")
+        self.assertEqual(json.loads(self.state_path.read_text())["status"], "passed")
+
+    def test_dirty_only_lift_evidence_blocks_all_publication_actions_before_provider(self):
+        helper = RecoveryTests()
+        state = helper.lift_recovery()
+        state["repo_root"] = str(self.root)
+        helper.panel(state, self.sha, "pass", {key: "Tracked disposition is required."
+                     for key in recovery.inherited_findings(state)})
+        backlog = self.root / loop_engine.BACKLOG_PATH
+        backlog.parent.mkdir(parents=True, exist_ok=True)
+        backlog.write_text(backlog_row(), encoding="utf-8")
+        record = {"spec_digest": loop_engine.digest(self.spec), "repo_root": str(self.root),
+                  "state_file": str(self.state_path)}
+        actions = [
+            lambda: loop_engine.action_push(self.root, self.spec, None, False, False),
+            lambda: loop_engine.action_create_pr(self.root, self.spec, 1, self.state_path, "Repair", "body.md", False, False),
+            lambda: loop_engine.action_approve(self.root, self.spec, 101, self.state_path, "Reviewed", False),
+            lambda: loop_engine.action_attest_pr(self.root, self.spec, 1, 101, self.state_path, False),
+            lambda: loop_engine.action_merge(self.root, self.spec, 101, self.state_path, None, False, False, None, False),
+            lambda: loop_engine.action_close(self.root, self.spec, 1, 101, None, False),
+        ]
+        real_command = loop_engine.run_command
+
+        def local_git_only(root, args, **kwargs):
+            self.assertEqual(args[0], "git", "Provider mutation reached despite missing reviewed evidence")
+            self.assertNotEqual(args[:2], ["git", "push"])
+            return real_command(root, args, **kwargs)
+
+        for action in actions:
+            with self.subTest(action=action), mock.patch.object(loop_engine, "authorize_action"), \
+                    mock.patch.object(loop_engine, "recovery_record", return_value=(self.root / "registry.json", record)), \
+                    mock.patch.object(loop_engine, "load_state", return_value=state), \
+                    mock.patch.object(loop_engine, "run_command", side_effect=local_git_only), \
+                    mock.patch.object(loop_engine, "gh_json") as provider:
+                with self.assertRaises(loop_engine.LoopError):
+                    action()
+                provider.assert_not_called()
+
+    def test_recorded_transcript_survives_source_edit_and_registered_content_is_frozen(self):
+        self.initialize()
+        self.cli("recovery", "start-round", "--ledger", self.state_path, "--commit", self.sha)
+        output = self.root / "review.md"
+        text = review(ROLES[0], self.sha, "pass")["finding_text"]
+        output.write_text(text, encoding="utf-8")
+        self.cli("ledger", "record-review", "--state", self.state_path, "--reviewer", ROLES[0],
+                 "--commit", self.sha, "--verdict", "pass", "--finding-file", output)
+        output.write_text("Replaced source transcript\nClose: NEEDS_CHANGES\n", encoding="utf-8")
+        state = loop_engine.load_state(self.state_path)
+        saved = state["rounds"][-1]["reviews"][0]
+        self.assertEqual(saved["finding_text"], text)
+        self.assertEqual(saved["finding_digest"], hashlib.sha256(text.encode()).hexdigest())
+        tasks = self.root / "openspec/changes/pilot-change/tasks.md"
+        original_tasks = tasks.read_text()
+        original_spec = self.spec_path.read_text()
+        for path, changed in ((tasks, original_tasks + "\nA changed acceptance requirement.\n"),
+                              (self.spec_path, original_spec.replace("Test the frozen review ledger.", "Changed scope."))):
+            with self.subTest(path=path):
+                original = path.read_text()
+                path.write_text(changed, encoding="utf-8")
+                self.cli("recovery", "next", "--ledger", self.state_path, ok=False)
+                path.write_text(original, encoding="utf-8")
+                self.cli("recovery", "next", "--ledger", self.state_path)
+                self.assertEqual(loop_engine.load_state(self.state_path)["rounds"], state["rounds"])
 
 
 if __name__ == "__main__":

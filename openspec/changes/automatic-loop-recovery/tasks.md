@@ -26,3 +26,14 @@ the session handoff is this directory's ignored `HANDOFF.md`. C1 completed all
 four lenses and required changes; its findings have regressions in the second
 candidate. Checklist completion records the work products, not code acceptance:
 only a complete passing panel bound to the current SHA permits publication.
+
+## 3. Independently admitted recovery: immutable supporting artifacts
+
+The initial three-panel attempt remains terminal. See the explicit bootstrap
+adoption in design.md and the externally recorded accepted research plan.
+Same frozen file list and acceptance; no fourth round in the old attempt.
+
+- [x] 3.1 Research all acceptance-critical evidence sources and preserve all initial-attempt reviews, commits and counters.
+- [x] 3.2 Independently accept the exact recovery plan and externally record admission, fixed deadline and cumulative limits before source revision.
+- [x] 3.3 Implement the accepted exact-commit text reader and complete visible backlog-row checks; preserve legacy semantics and add real-Git negative/positive regressions.
+- [ ] 3.4 Run focused/static verification and a full inherited four-lens successor panel; record actual code acceptance, publication state and Luna handoff.

@@ -114,6 +114,10 @@ Then read the backlog and decide, before freezing:
   the weaker hypotheses from the start, rather than lifted later.
 - A plausible ancestor that this chunk will not touch belongs in the chunk's
   `lift_targets`, so a reviewer can open it later without a manifest edit.
+- If recovery work may need new lift dispositions, include
+  `docs/architecture/generalization-backlog.md` in the original frozen file
+  list before initialization. A lift finding does not implicitly authorize
+  editing that file or widening the manifest.
 
 Running neither advisor is permitted when the manifest names none. Running one
 and not the other is not: they are blind in different directions, and the one
@@ -206,11 +210,17 @@ them:
 - A lift whose target is **outside** both the frozen file list and any declared
   `lift_targets` prefix cannot be implemented in this chunk. Do not turn it into a `needs_changes` the chunk cannot satisfy,
   and do not drop it. The reviewer closes `pass_with_lift` with a `--lift-target`;
-  append its `LIFT:` block to `docs/architecture/generalization-backlog.md` as an
-  `UNVERIFIED` row, then adjudicate the round `pass_with_lift`. The controller
-  refuses that adjudication while any named target is still missing from the
-  backlog, so the finding cannot be dropped. In recovery mode the allocated
-  panel still counts toward the objective budget, even when it passes with a lift.
+  record its disposition in `docs/architecture/generalization-backlog.md` as an
+  `UNVERIFIED` row within the already-authorized scope. Recovery passing
+  adjudication and publication require a complete visible row in the exact
+  reviewed commit's ordinary file blob; HEAD and dirty worktree text cannot
+  supply it. Follow the exact row format in `docs/architecture/loop-recovery.md`.
+  If the row is first discovered after freezing, preserve the current reviews,
+  adjudicate `needs_changes` (or abandon an incomplete panel), append the row,
+  commit, and allocate a new full panel. The new SHA costs another round; never
+  rewrite a review or claim an unreviewed backlog append costs no round. Apply
+  automatic recovery if the attempt is exhausted. An existing valid committed
+  row can satisfy the gate without another source change.
 - When dispatching the style reviewer for a controller ledger, require its
   controller verdict: `PASS` for an acceptable chunk, `NEEDS_CHANGES` for
   required repairs, or `BLOCKED` for an unreconstructable claim. `MERGE` is

@@ -81,3 +81,36 @@ with at most three review/improve rounds for this implementation. Document
 publication/CI state without claiming local checks are CI. Handoff identifies
 the C3 and #1451 evidence inventory and the next research task; Luna can adopt
 that history explicitly with the new policy, then resume AUT1/Serre work.
+
+## Explicit bootstrap recovery adoption after the initial cap
+
+The preceding migration paragraph and original task checklist imposed three
+panels for this implementation. That initial attempt is terminal after C1–C3;
+this text does not retroactively reinterpret or erase that narrower wording.
+The user's standing instruction separately authorizes exhaustion followed by
+automatic research and independently admitted recovery. Applying that policy
+here was independently audited in `recovery_admission_audit`, outside the
+controller under review. The accepted plan is `recovery-research.md`, raw
+SHA-256 `b95deec2072fe8634f6adc991eb1a9f8c21f41c0067c20b7c99e0d0ac760993f`.
+
+The external `.loop-runs/automatic-recovery-review/objective.json` preserves
+all twelve verbatim reviews, the three commits and original contract reference.
+It records episode 1/submission 1 acceptance and admits attempt 2 without
+changing scope or any acceptance requirement. Limits are three panels per
+attempt, nine aggregate allocations including the initial three, two episodes,
+two plans per episode, and a fixed conservative deadline of
+2026-09-29T00:00:00Z (start 2026-09-22T00:00:00Z). No candidate-controller
+command grants its own acceptance. Every successor panel reviews the complete
+accumulated candidate and inherited findings; publication still needs all four
+independent passing lenses on the same exact SHA.
+
+The researched correction separates stored ledger evidence from claims about
+shipped artifacts. Recovery backlog checks at adjudication and publication use
+one explicit reviewed-commit ordinary Git blob, never HEAD/worktree fallback.
+Complete visible exact-target rows distinguish dispositions from prose or
+fenced examples. The legacy helper remains unchanged outside recovery mode.
+Real Git fixtures cover dirty-only/later-HEAD evidence, missing objects,
+symlinks, stale review sources, and all publication paths. A newly discovered
+lift needing a new backlog commit requires another charged panel; it cannot
+silently alter the frozen SHA. The immutable research report's C1-era start
+description is historical; execution uses the tighter conservative bound above.

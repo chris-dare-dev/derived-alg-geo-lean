@@ -107,7 +107,7 @@ def openspec_change_dir(root: Path, spec: dict[str, Any]) -> Path:
 
 
 def openspec_digest(root: Path, spec: dict[str, Any]) -> str:
-    """Hash the committed OpenSpec planning artifacts referenced by a run."""
+    """Hash planning content; the registered digest freezes it, not its Git path."""
 
     change_dir = openspec_change_dir(root, spec)
     openspec = require_mapping(spec.get("openspec"), "spec.openspec")
@@ -1590,7 +1590,7 @@ def read_reviewer_output(finding_file: Path) -> tuple[str, str]:
     if not text.strip():
         raise LoopError(
             f"reviewer output {str(finding_file)!r} is empty; "
-            "a round with no readable reviewer message is void, not a pass"
+            "an unreadable reviewer message cannot pass; retain any reserved round and retry the missing role"
         )
     return text, hashlib.sha256(text.encode("utf-8")).hexdigest()
 
@@ -1708,7 +1708,7 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
             unrecorded = sorted(
                 str(item.get("lift_target"))
                 for item in lifts
-                if not backlog_records(state, str(item.get("lift_target")))
+                if "recovery" not in state and not backlog_records(state, str(item.get("lift_target")))
             )
             if unrecorded:
                 raise LoopError(
@@ -1832,10 +1832,109 @@ def recovery_lift_reviews(state: dict[str, Any]) -> list[dict[str, Any]]:
             for review in row["reviews"] if review.get("verdict") == "pass_with_lift"]
 
 
+def read_reviewed_text(root: Path, commit: str, path: str) -> str:
+    """Read an ordinary UTF-8 Git blob from an explicit reviewed commit only."""
+    if not re.fullmatch(r"[0-9a-f]{40}", commit) or git(root, "cat-file", "-t", commit) != "commit":
+        raise LoopError("reviewed artifact requires an exact commit object")
+    path = canonical_recovery_path(path)
+    tree = run_command(root, ["git", "ls-tree", "-z", commit, "--", path], check=True)
+    entries = [entry for entry in tree.stdout.split("\0") if entry]
+    if len(entries) != 1 or "\t" not in entries[0]:
+        raise LoopError(f"reviewed artifact is absent: {commit}:{path}")
+    metadata, actual_path = entries[0].split("\t", 1)
+    parts = metadata.split()
+    if actual_path != path or len(parts) != 3 or parts[0] not in {"100644", "100755"} or parts[1] != "blob":
+        raise LoopError(f"reviewed artifact must be an ordinary tracked file: {path}")
+    blob = subprocess.run(["git", "cat-file", "blob", parts[2]], cwd=root,
+                          capture_output=True, check=False)
+    if blob.returncode != 0:
+        raise LoopError(f"cannot read reviewed artifact: {commit}:{path}")
+    try:
+        text = blob.stdout.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise LoopError(f"reviewed artifact is not UTF-8 text: {path}") from exc
+    if "\0" in text:
+        raise LoopError(f"reviewed artifact contains binary text: {path}")
+    return text
+
+
+def recovery_backlog_targets(text: str) -> set[str]:
+    """Recognize complete column-zero backlog rows, not prose or examples.
+
+    Optional single backticks quote field values. Fenced code and HTML comments
+    carry no dispositions. Independent review still judges each row's substance.
+    """
+    required = {"chunk", "reviewing commit", "found by", "proposed ancestor", "weaker hypotheses", "state"}
+    targets: set[str] = set()
+    fields: dict[str, str] | None = None
+    invalid = False
+    fence: tuple[str, int] | None = None
+    previous_field: str | None = None
+
+    def finish() -> None:
+        if fields is None or invalid or not required.issubset(fields) or not all(fields[key] for key in required):
+            return
+        if not re.fullmatch(r"[0-9a-fA-F]{7,40}", fields["reviewing commit"]):
+            return
+        if not re.fullmatch(r"UNVERIFIED|(?:CONFIRMED|FALSIFIED) \S.*", fields["state"]):
+            return
+        try:
+            target = canonical_recovery_path(fields["proposed ancestor"])
+        except LoopError:
+            return
+        targets.add(target)
+
+    # Comments and raw-text HTML blocks cannot contribute rendered row fields.
+    text = re.sub(r"<!--.*?(?:-->|\Z)", "", text, flags=re.DOTALL)
+    text = re.sub(r"<(pre|script|style|textarea)\b[^>]*>.*?(?:</\1\s*>|\Z)", "", text,
+                  flags=re.DOTALL | re.IGNORECASE)
+    for line in text.splitlines():
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+        if fence is not None:
+            if marker and marker[1][0] == fence[0] and len(marker[1]) >= fence[1] and not marker[2].strip():
+                fence = None
+            continue
+        if marker:
+            fence = (marker[1][0], len(marker[1]))
+            continue
+        if re.match(r"^#{1,6}\s", line):
+            finish()
+            fields = {} if re.match(r"^###\s+\S", line) else None
+            invalid = False
+            previous_field = None
+            continue
+        match = re.match(r"^- ([a-z ]+):\s*(.*?)\s*$", line)
+        if fields is None or match is None:
+            if fields is not None and previous_field == "proposed ancestor" and line[:1].isspace() and line.strip():
+                invalid = True  # A descriptive continuation is not an exact target.
+            continue
+        key, value = match.groups()
+        previous_field = key
+        if key not in required:
+            continue
+        if key in fields:
+            invalid = True
+        if value.startswith("`") and value.endswith("`") and len(value) >= 2:
+            value = value[1:-1]
+        if "`" in value:
+            invalid = True
+        fields[key] = value
+    finish()
+    return targets
+
+
 def require_recovery_lift_backlog(state: dict[str, Any]) -> None:
-    """A research successor cannot erase a deferred lift, even after code passes."""
-    missing = {str(review.get("lift_target") or "") for review in recovery_lift_reviews(state)
-               if not review.get("lift_target") or not backlog_records(state, str(review["lift_target"]))}
+    """Bind every carried/current lift disposition to the reviewed Git tree."""
+    reviews = recovery_lift_reviews(state)
+    if not reviews:
+        return
+    current = latest_round(state)
+    if current is None or not state.get("repo_root"):
+        raise LoopError("recovery lift backlog requires a reviewed commit and repository")
+    text = read_reviewed_text(Path(state["repo_root"]), current["commit"], BACKLOG_PATH)
+    targets = recovery_backlog_targets(text)
+    missing = {str(review.get("lift_target") or "") for review in reviews
+               if not review.get("lift_target") or canonical_recovery_path(str(review["lift_target"])) not in targets}
     if missing:
         raise LoopError("recovery lift obligations are absent from the backlog: " + ", ".join(sorted(missing)))
 
