@@ -94,6 +94,24 @@ architecture result. You are never penalized for proposing a lift that fails.
 
 ## Output
 
+For a recovery-enabled objective, read the complete inherited finding corpus.
+Before any passing verdict, provide a JSON object mapping **every** inherited
+finding ID to concrete resolution evidence; the supervisor records it with
+`--resolutions-file`. Judge the evidence independently. Research-plan acceptance
+is not implementation acceptance. Preserve unresolved findings regardless of
+the attempt number. An allocated recovery review counts even if it passes with
+a lift or remains incomplete.
+
+For recovery-enabled reviews, place counts and explanations before this exact
+two-line trailer, with one applicable verdict token and no following text:
+
+```text
+Reviewed commit: <full 40-character commit SHA>
+Close: <TOKEN>
+```
+
+This trailer supersedes the legacy closing format below only in recovery mode.
+
 For each finding use:
 
 ```
@@ -121,6 +139,7 @@ weakest sufficient hypotheses of every central statement have been stated, and
 the Mathlib paths you searched have been recorded.
 
 Termination is the controller's job, not yours: the review-round cap in
-`scripts/loop_engine.py` stops the chunk. Never withhold a class of finding to
-help the loop converge. Do not re-raise a finding already recorded against an
-unchanged commit — that is re-litigation, not a new finding.
+`scripts/loop_engine.py` ends an exhausted attempt and, when configured,
+schedules bounded research. Never withhold a class of finding to help the loop
+converge. Reuse an inherited finding's ID when it remains unresolved; do not
+invent a new identity for the same defect.

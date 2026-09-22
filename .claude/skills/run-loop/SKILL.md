@@ -1,6 +1,6 @@
 ---
 name: run-loop
-description: Execute one enabled OpenSpec-backed one-to-three-issue formalization batch with a digest-bound ledger, four independent reviewers, guarded provider actions, and a configured review-round cap of at most five per frozen chunk.
+description: Execute enabled OpenSpec-backed work with a digest-bound ledger, four independent reviewers, guarded provider actions, and optional bounded automatic research recovery.
 ---
 
 # Bounded OpenSpec loop
@@ -26,8 +26,9 @@ generated `.agents/skills/` files.
   independently on the same commit. The style reviewer cannot substitute for
   either adversarial lens.
 - A reviewer's own final message is the evidence. If a dispatched reviewer
-  returns no readable final message, that round is **void**: re-dispatch it, or
-  record `blocked` and stop. Never substitute your own inspection of the diff
+  returns no readable final message, re-dispatch that missing role on the same
+  commit. In recovery mode the reserved round stays charged even if abandoned.
+  Never substitute your own inspection of the diff
   for a reviewer verdict, and never paraphrase a reviewer's output into the
   ledger in place of its text. Record the verbatim message with
   `--finding-file`; the controller refuses to adjudicate a round whose reviewer
@@ -35,9 +36,10 @@ generated `.agents/skills/` files.
 - Altitude and generalization findings are expected output, not churn. A
   reviewer that reports none on a chunk has probably not looked.
 - A review/improve round is keyed by the commit and frozen chunk. A changed
-  commit starts the next round; this run permits at most the manifest's
-  `max_review_rounds_per_chunk` (never more than five). After the final
-  `needs_changes` adjudication, record `blocked` and stop that chunk.
+  commit starts the next round. New work permits at most three rounds per
+  attempt; explicit legacy manifests retain their recorded caps. Preserve an
+  exhausted attempt. Without recovery, stop the chunk; with recovery, execute
+  Phase 2.5 automatically within the cumulative budget.
 - A successor using `predecessor_prs` may start only after every named source
   PR has the exact controller attestation, reviewed head, and merge commit
   pinned in the manifest; its merge must be an ancestor of both `base_ref` and
@@ -46,8 +48,9 @@ generated `.agents/skills/` files.
   `predecessor_attestation.emit: true` must run `action attest-pr` after its
   passing ledger and before its controller merge.
 - Do not silently re-chunk, widen the file list, or rewrite the OpenSpec plan
-  after review evidence exists. A material plan change requires a new manifest
-  or a new frozen chunk and fresh review.
+  after review evidence exists. Recovery preserves that contract. Renaming a
+  chunk, manifest, state directory or worktree cannot reset an objective's
+  history or allowance; newly required scope is not automatic authority.
 - Never run `scripts/gates.sh` locally. Use `scripts/precheck.sh` with a
   targeted build where the repository hook permits it; the self-hosted runner
   is the CI verdict.
@@ -111,6 +114,10 @@ Then read the backlog and decide, before freezing:
   the weaker hypotheses from the start, rather than lifted later.
 - A plausible ancestor that this chunk will not touch belongs in the chunk's
   `lift_targets`, so a reviewer can open it later without a manifest edit.
+- If recovery work may need new lift dispositions, include
+  `docs/architecture/generalization-backlog.md` in the original frozen file
+  list before initialization. A lift finding does not implicitly authorize
+  editing that file or widening the manifest.
 
 Running neither advisor is permitted when the manifest names none. Running one
 and not the other is not: they are blind in different directions, and the one
@@ -150,6 +157,18 @@ On the same commit, dispatch all four reviewers independently:
 3. `.claude/agents/abstraction-adversary.md`
 4. `.claude/agents/mathlib-reviewer.md`
 
+For recovery-enabled work, reserve the round **before** dispatch:
+
+```text
+python3 scripts/loop_engine.py recovery start-round --ledger <ledger> --commit <full-sha>
+```
+
+Supply every reviewer the complete inherited finding corpus. Each passing
+review must address every inherited finding ID with nonempty evidence in a JSON
+object passed as `--resolutions-file <path>` to `ledger record-review`. The
+reviewer's verbatim output ends with `Reviewed commit: <full-sha>` immediately
+followed by the final line `Close: <TOKEN>`; counts and prose precede those lines.
+
 Record each verdict and finding without paraphrasing away a blocker:
 
 ```text
@@ -173,7 +192,8 @@ python scripts/loop_engine.py ledger adjudicate --state <ledger> \
 If the result is `needs_changes` and fewer than the manifest's configured cap
 have been used, fix only the recorded findings, rerun the targeted checks,
 commit, and repeat Phase 2. If the result is `blocked` or the final permitted
-round still needs changes, stop the chunk and report the exact ledger state.
+round still needs changes, preserve that result and run Phase 2.5 when recovery
+is configured; otherwise stop the chunk and report the exact ledger state.
 Do not ask the same reviewers to rediscover the same issue on an unchanged
 commit.
 
@@ -190,17 +210,54 @@ them:
 - A lift whose target is **outside** both the frozen file list and any declared
   `lift_targets` prefix cannot be implemented in this chunk. Do not turn it into a `needs_changes` the chunk cannot satisfy,
   and do not drop it. The reviewer closes `pass_with_lift` with a `--lift-target`;
-  append its `LIFT:` block to `docs/architecture/generalization-backlog.md` as an
-  `UNVERIFIED` row, then adjudicate the round `pass_with_lift`. The controller
-  refuses that adjudication while any named target is still missing from the
-  backlog, so the finding cannot be dropped — and it consumes no round, so it
-  cannot stall the chunk either.
-- The style reviewer closes `MERGE` / `MERGE AFTER FIXES` / `NEEDS REWORK`, not
-  the controller's vocabulary. Map `MERGE` to `pass` and both others to
-  `needs_changes`, and record the mapping in the finding file you capture.
+  record its disposition in `docs/architecture/generalization-backlog.md` as an
+  `UNVERIFIED` row within the already-authorized scope. Recovery passing
+  adjudication and publication require a complete visible row in the exact
+  reviewed commit's ordinary file blob; HEAD and dirty worktree text cannot
+  supply it. Follow the exact row format in `docs/architecture/loop-recovery.md`.
+  If the row is first discovered after freezing, preserve the current reviews,
+  adjudicate `needs_changes` (or abandon an incomplete panel), append the row,
+  commit, and allocate a new full panel. The new SHA costs another round; never
+  rewrite a review or claim an unreviewed backlog append costs no round. Apply
+  automatic recovery if the attempt is exhausted. An existing valid committed
+  row can satisfy the gate without another source change.
+- When dispatching the style reviewer for a controller ledger, require its
+  controller verdict: `PASS` for an acceptable chunk, `NEEDS_CHANGES` for
+  required repairs, or `BLOCKED` for an unreconstructable claim. `MERGE` is
+  only its standalone review vocabulary; the controller does not map it.
+  In recovery mode require the exact `Reviewed commit:` / `Close:` trailer,
+  with `PASS`, `PASS_WITH_LIFT`, `NEEDS_CHANGES`, or `BLOCKED` as appropriate.
+  Preserve the reviewer's message verbatim; never append a verdict mapping.
 
 Termination is the round cap's job. Never suppress a class of finding to help
 the loop converge.
+
+## Phase 2.5: automatic research recovery
+
+Read `docs/architecture/loop-recovery.md`. Recovery is explicit manifest policy.
+Poll `python3 scripts/loop_engine.py recovery next --ledger <ledger>` and execute
+its next action while this supervising agent is active. The CLI does not launch
+agents or keep running after the supervisor exits.
+
+1. Dispatch a researcher with the frozen contract, complete failed
+   reviews and remaining budget. Require a reproduced obstacle, diagnosis,
+   changed strategy, concrete verification checks and all inherited finding IDs.
+2. Submit the structured plan with `recovery submit-plan --ledger <ledger>
+   --file <plan.json>`. Dispatch a separate recovery reviewer, distinct from the
+   researcher and implementer, against that exact plan and its evidence. Record
+   their structured verdict with `recovery review-plan --ledger <ledger>
+   --file <review.json>`.
+3. On `ready`, execute `recovery resume --ledger <ledger>` and implement the
+   accepted strategy. On `needs_changes`, consume the same episode's remaining
+   plan allowance. A successor still requires all four implementation reviews.
+4. Use `recovery exhaust --ledger <ledger> --reason "<obstacle>"` to abandon a stuck partial attempt;
+   its allocation and any returned findings remain charged. Check remaining time
+   before dispatch and bound worker duration by it. When the controller parks the
+   objective, report the obstacle and continue other already-authorized work.
+
+Do not pause for routine approval of these transitions. Source changes, plan
+revisions and research subtasks retain the original scope and budget. Provider
+permissions remain separate; a research approval grants none.
 
 ## Phase 3: guarded handoff
 
