@@ -15,6 +15,7 @@
 - [x] 2.6 Add explicitly authorized progress PRs that cannot close an issue, while retaining strict complete-PR closure semantics; verify manifest authorization and non-closing-link refusal tests
 - [x] 2.7 Bind approval and merge to either a short or full reviewed Git revision without weakening exact-head checks; verify prefix acceptance and mismatch refusal
 - [x] 2.8 Prevent passed progress ledgers or still-open upstream issues from unlocking dependent chunks; verify downstream initialization fails closed
+- [x] 2.9 Bind a successor manifest to a controller-attested, merged predecessor PR and recheck that binding at preflight, ledger initialization, PR creation, approval, and merge; verify valid squash history and every missing, mismatched, retargeted, or non-ancestor refusal path
 - [x] 2.3 Require OpenSpec and no-sorry/repository gates in the local precheck path; verify the gate agreement remains synchronized
 
 ## 3. Pilot readiness

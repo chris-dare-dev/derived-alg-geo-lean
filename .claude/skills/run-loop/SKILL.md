@@ -38,6 +38,13 @@ generated `.agents/skills/` files.
   commit starts the next round; this run permits at most the manifest's
   `max_review_rounds_per_chunk` (never more than five). After the final
   `needs_changes` adjudication, record `blocked` and stop that chunk.
+- A successor using `predecessor_prs` may start only after every named source
+  PR has the exact controller attestation, reviewed head, and merge commit
+  pinned in the manifest; its merge must be an ancestor of both `base_ref` and
+  the current HEAD. The controller repeats that check at ledger initialization
+  and every successor PR action. A source manifest with
+  `predecessor_attestation.emit: true` must run `action attest-pr` after its
+  passing ledger and before its controller merge.
 - Do not silently re-chunk, widen the file list, or rewrite the OpenSpec plan
   after review evidence exists. A material plan change requires a new manifest
   or a new frozen chunk and fresh review.
@@ -66,7 +73,8 @@ generated `.agents/skills/` files.
    validation mode is `cli-required`, the base is not exact, the worktree is
    dirty, the authenticated actor differs, branch protection is missing a
    required check, an issue is closed/blocked/ineligible, a dependency is open,
-   a branch/PR already exists, or a repository gate fails.
+   a predecessor attestation is missing or stale, a branch/PR already exists,
+   or a repository gate fails.
 
 3. Read `docs/architecture/generalization-backlog.md` before choosing an
    implementation approach. A recorded lift may already say where this work
@@ -120,7 +128,9 @@ For each issue in manifest order:
    ```
 
    For a selected dependency, initialization refuses to proceed unless every
-   predecessor chunk has a passing, digest-matching ledger.
+   predecessor chunk has a passing, digest-matching ledger. For a
+   `predecessor_prs` entry it additionally rechecks the live provider
+   attestation and both ancestry bindings.
 
 2. Create or enter the issue's dedicated `agent/<slug>` branch. Implement only
    the unchecked OpenSpec tasks for the frozen chunk. Keep the issue's
@@ -204,12 +214,16 @@ When the ledger passes:
 3. Approve only through the controller. It rechecks the passing ledger, plan
    digests, PR head, frozen files, and required checks. Provider refusal of
    self-approval is a hard stop, not a reason to bypass branch protection.
-4. Merge only if `mutations.merge_pr` is explicitly true and a passing ledger
+4. If `predecessor_attestation.emit` is true, create the source PR's durable
+   controller evidence with `python scripts/loop_engine.py action attest-pr`
+   after its ledger passes and before merging. It is bound to the current PR
+   head; do not hand-write or reuse it for another PR.
+5. Merge only if `mutations.merge_pr` is explicitly true and a passing ledger
    is supplied. The merge action also requires the requested method, auto,
    administrator, and branch-deletion behavior to be allowed by the manifest;
    administrator merge is never inferred from a failed check. Otherwise stop
    at the approved PR.
-5. Close the issue only after the controller confirms that the merged PR closes
+6. Close the issue only after the controller confirms that the merged PR closes
    that same issue. Then re-run preflight before considering the next selected
    issue.
 
