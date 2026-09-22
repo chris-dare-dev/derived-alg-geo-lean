@@ -18,43 +18,20 @@ open CategoryTheory.Triangulated
 
 /-! ## Formal boundaries for Theorem 5.3 (SF11.3)
 
-The generic Ind/filtered-colimit bridge and the source-shaped descent and
-exactness owner data are audited here. Their structures are inputs at the
-geometry owner; the audit ensures that the formal composition layer adds no
-untrusted axioms.
+The canonical Ind-extension consequences and the source-shaped descent and
+exactness owner hypotheses are audited here. The geometry owner supplies the
+comparison formulas; this audit ensures that the formal composition layer adds
+no untrusted axioms.
 -/
 
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.extension
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.inclusion_isTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.truncation_preserves
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.BaseData.affineAisle
 #print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.inRange
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.restriction
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.localTStructure
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.range_iff
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.mk.inj
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RangeDescentData.inRange_iff
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.functor
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.rightTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.mk.inj
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.RightTExactData.isLE_map
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.functor
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.rightTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.leftTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.mk.inj
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.mk.sizeOf_spec
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.isTExact
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.isLE_map
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.TExactData.isGE_map
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.LocalComparisonData
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.LocalComparisonData.range_iff
-#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.LocalComparisonData.inRange_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.inclusion_isTExact
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.aisle_eq_coprodClosure
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.inRange_iff_of_components
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.rightTExact_isLE_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.leftTExact_isGE_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.tExact_isRange_map
+#print axioms AlgebraicGeometry.DerivedCategory.Families.Theorem53.local_inRange_iff_of_components
 
 /-! ## Scheme-derived and stability-specific realizations of family interfaces -/
 
