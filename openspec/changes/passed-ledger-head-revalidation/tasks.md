@@ -21,7 +21,7 @@ digest has every numbered completion marker in its canonical unchecked form.
 
 ## 1. Initialize the bounded controller work
 
-- [ ] 1.1 From a fresh clean-base checkout after the planning update merges, run `validate` and read-only `preflight`, create the manifest's exact planned issue branch, and initialize its ledger before source edits; verify the initialized ledger freezes the expected controller files, exact issue, three-round cap, and artifact digests. Keep every mutation flag disabled throughout this code run.
+- [ ] 1.1 From a fresh clean checkout of the live protected-base OID after the planning update merges, first create and switch to the exact planned branch `agent/passed-ledger-head-revalidation`; then run `validate` and read-only `preflight` from that dedicated branch and initialize its ledger before source edits. Verify the initialized ledger freezes the expected controller files, exact issue, three-round cap, and artifact digests. Keep every mutation flag disabled throughout this code run.
 
 ## 2. Implement passed-head revalidation as one frozen code chunk
 
