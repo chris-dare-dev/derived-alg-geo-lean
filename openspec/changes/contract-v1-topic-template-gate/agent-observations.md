@@ -1,0 +1,10 @@
+# Agent Observations
+
+## 2026-09-23 continuation
+
+- The Derived change is in progress at 3/10 tasks. `openspec status` reports all planning artifacts complete and apply state `ready`; strict validation passes. The current Derived branch is clean at `c11ff6d19927c9f1c1e04dbc3a76b81b0bc4c279`.
+- The live milestone issues remain open: [#137](https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/137), [#182](https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/182), and [#183](https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/183). #137 is an epic with `gate:owner`; #183 also has `gate:owner`. The issue pages show no linked branches or pull requests. Keep #137 as owner-controlled closeout after the child issues.
+- The MathFormalContract template scan `rg -ni Bridgeland copier.yml template` returns no matches. The analytic adopter's `.copier-answers.yml` records the full template commit `c7e9a6ad8f69bdc3d4967df8dc64d156c63675b7`; the adopter's targeted Lean build and Copier update had passed in the preceding work. The MFC implementation branch is local and five commits ahead of `origin/main`.
+- The `analytic-nt` notebook and version-pinned paper row are registered, and the adopter trust record remains `generalization_validated: false` with no evidence. The arXMCP raw source, parsed paper, and notebook LanceDB paths for `1202.3670v4` are absent. `notebook_fetch.py` requires a contact email; the environment has no contact setting, and the local database has no `operator_settings` table. Fetch and ingest therefore remain pending the operator's email.
+- MathFormalContract has no `openspec/config.yaml`. Its separate plan and run record remain pending explicit direction to initialize that repository's OpenSpec root. No MFC plan files have been created.
+- The Derived default branch lacks `.claude/loop-authority.yaml`; the existing `sf11-pilot` is disabled and has a five-round limit. It is not this batch's execution manifest. Do not run provider actions or reuse that pilot for the milestone 13 issues.
