@@ -83,8 +83,7 @@ issues:
           - DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Rouquier.lean
           - DerivedAlgGeo/CategoryTheory/Triangulated/Dimension.lean
           - scripts/StabilityConditionAudit/Dimension.lean
-          - openspec/changes/rou1-rouquier-dimension
-          - .claude/loop-specs/rou1-919-rouquier-dimension.yaml
+          - docs/architecture/generalization-backlog.md
         acceptance:
           - >-
             Rouquier dimension is the infimum of generation time over
@@ -94,11 +93,18 @@ issues:
           - >-
             The finite-bound, finite-dimension/strong-generator,
             classical-generator, and zero-stage characterisations compile
-            under the existing pretriangulated hypotheses.
+            under the existing pretriangulated hypotheses. Any `Nonempty C`
+            binder required by `ENat.exists_eq_iInf` is derived locally from
+            `HasZeroObject`, not exposed in the public API.
           - >-
             The new public declarations are audited; the generic module adds
             no geometry or stability imports, competing closure carrier,
-            `sorry`, `admit`, or hidden axiom.
+            `sorry`, `admit`, or hidden axiom. Its docstring states the
+            single-object/non-attainment scope caveat and no-offset indexing.
+          - >-
+            Any advisor/reviewer lift not implemented in the chunk has a
+            complete append-only row in docs/architecture/generalization-backlog.md
+            in the exact reviewed commit; no unrelated backlog row is changed.
           - >-
             The named module build, scripts/precheck.sh, four independent
             reviews on the same final commit, and required hosted ci check

@@ -54,14 +54,32 @@ uses Mathlib's existing strong-to-classical implication. The zero case is the
 zeroth envelope comparison, whose existing Mathlib definition is the shift,
 binary-product, and retract closure.
 
-For #921, transport is proved pointwise through the existing closure
-construction in its defining order: shifts, binary products, distinguished
-extensions, then retracts. The public map lemma records only the forward
-inclusion. The generation-time comparison uses the existing order
-characterisation. Essential surjectivity supplies the target objects up to
-isomorphism, and equivalence equality uses the functor and a proved
-triangulated quasi-inverse if Mathlib does not already provide that fact.
-No reverse-inclusion theorem is stated for arbitrary functors.
+The finite-witness proof uses `ENat.exists_eq_iInf`, whose index must be
+nonempty. Derive a local `Nonempty C` witness from
+`HasZeroObject.zero.choose`; do not strengthen the public category hypotheses
+with a new `[Nonempty C]` assumption. The zero-stage theorem can use
+`ENat.iInf_eq_zero` without that side condition.
+
+For #921, the pointwise envelope-transport lemma extends Mathlib's
+`ObjectProperty.triangEnvelopeIter`, defined under the `CategoryTheory/Triangulated`
+API path. Its Lean namespace remains `CategoryTheory.ObjectProperty`, and the
+downstream module is
+`DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Functor.lean` because the
+lemma is part of the generation-dimension feature. Category-level results use
+`CategoryTheory.Triangulated` in that same module. This keeps API namespace,
+subject owner, and file placement explicit.
+
+Transport is proved pointwise through the existing closure construction in its
+defining order: shifts, binary products, distinguished extensions, then
+retracts. It uses `[F.CommShift ℤ] [F.IsTriangulated]`; Mathlib supplies the
+additivity and binary-product preservation consequences. The public map lemma
+uses `ObjectProperty.map F`, Mathlib's essential image property that includes
+objects isomorphic to images, and records only the forward inclusion. The
+generation-time comparison uses the existing order characterisation.
+Essential surjectivity `[F.EssSurj]` supplies target objects up to
+isomorphism. For an equivalence, use `Equivalence.IsTriangulated.mk'` and the
+pinned instances that make its inverse and symmetric equivalence
+triangulated. No reverse-inclusion theorem is stated for arbitrary functors.
 
 ### Imports and instances
 
@@ -79,10 +97,16 @@ instance diamond.
 
 Mathlib's `triangEnvelopeIter G n` is Rouquier's `⟨G⟩_{n+1}`. In particular,
 its zeroth stage is exactly the closure generated without extensions, and
-`triangEnvelopeIter_add` confirms the successor indexing. Therefore the
-infimum is Rouquier's numerical dimension with no offset. The module
-docstring will state both the convention and the reason the zero-offset
-choice is intentional.
+`triangEnvelopeIter_succ` confirms the recursive successor indexing without
+requiring `[IsTriangulated C]`. Therefore the infimum is Rouquier's numerical
+dimension with no offset. The module docstring will state both the convention
+and the reason the zero-offset choice is intentional. It will also state that
+the infimum ranges over single objects rather than arbitrary object properties
+and does not supply a preselected object attaining its value; finite witness
+theorems remain separate existential statements. It may note that
+`triangEnvelopeIter_add` is consistent with the same `n + 1` convention when
+the additional `[IsTriangulated C]` hypothesis is available, but the Rouquier
+dimension API and its indexing argument do not require that stronger class.
 
 ### Audit and review
 
@@ -101,6 +125,20 @@ reviewed recovery plan that reuses the same objective history; it cannot
 rename or re-chunk the work to reset the allowance. This avoids automatic
 scope changes to these two issue chunks.
 
+### Bootstrap and execution order
+
+Publish this plan and its enabled #919 manifest first as a planning-only PR
+from a separate plan branch. That PR contains no Lean changes and uses only
+non-closing references to #919 and #921; verify that GitHub reports no closing
+issue references. After it merges, fetch the protected base and start the
+implementation on a fresh, clean issue branch whose HEAD is exactly
+`origin/main`. Run manifest validation and live preflight there. Only after
+preflight passes, run both declared altitude advisors, inspect their findings
+against the generalization backlog, then initialize the digest-bound ledger.
+The source chunk's frozen file list contains only the Rouquier module, umbrella,
+audit slice, and append-only generalization backlog; it cannot edit this plan
+or change its own execution authority.
+
 ## Risks / Trade-offs
 
 - **Off-by-one error in the numerical invariant** → State the `⟨G⟩_{n+1}`
@@ -113,5 +151,5 @@ scope changes to these two issue chunks.
   transitive imports, audit routing, and the canonical-root decision in the
   independent boundary and abstraction reviews.
 - **Stale milestone dependency state** → Do not start #921 until #919 is
-  merged, its controller attestation is recorded, the blocked label is
-  removed, and a fresh live preflight passes.
+  merged and closed, the stale blocked label is removed, and a fresh live
+  preflight passes.
