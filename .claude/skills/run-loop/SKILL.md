@@ -45,9 +45,10 @@ These are not stops. What to do instead:
   record the gap and file a follow-up.
 - **Ambiguous design choice.** Take the smallest reading that meets the
   definition of done, and state it in the PR body.
-- **`main` moved.** Rebase, or merge `main` into the branch. A passed review
-  carries over when the change is unchanged, and a changed one needs one
-  revalidation round (Phase 3).
+- **`main` moved.** Merge `origin/main` into the branch. Do not rebase a pushed
+  branch: pushes are fast-forward only, and branch manifests cannot
+  force-push. A passed review carries over when the change is unchanged, and a
+  changed one needs one revalidation round (Phase 3).
 - **Round cap exhausted.** With `recovery` configured, run Phase 2.5. Without
   it, preserve the ledger, park the chunk, file a follow-up issue that carries
   the unresolved findings, and take the next issue.
@@ -102,7 +103,7 @@ These are not stops. What to do instead:
   `gh issue create`, `gh pr review`, or `git push` directly from this skill.
 - Provider authority comes only from `.claude/loop-authority.yaml` on the
   default branch as GitHub serves it. Your manifest can narrow those grants
-  and never widen them; only the fifteen legacy manifests keep grants of
+  and never widen them; only the fourteen legacy manifests keep grants of
   their own, and only for their open issues. Your manifest cannot request
   administrator merge, force-push, closure without a merged PR, an epic
   opt-in or a weaker roadmap gate. Its chunks cannot touch the run's own
@@ -367,8 +368,9 @@ panel reviews. It must not be marked ready or merged before the ledger passes.
    ignored. Local precheck is evidence for debugging, not a CI verdict. A red
    check is a finding: fix it, commit, and take the new commit through Phase 2
    as the next round.
-4. If `main` moved, merge `origin/main` into the branch (or rebase), rerun the
-   targeted checks, and push. A head that carries the same change keeps the
+4. If `main` moved, merge `origin/main` into the branch (never rebase a pushed
+   branch; a push must fast-forward), rerun the targeted checks, and push.
+   A head that carries the same change keeps the
    pass, as long as only progress records changed and the base left the
    reviewed files, their direct imports and the pins alone. Otherwise, when
    `action ready` or `action merge` reports that the head does not carry the

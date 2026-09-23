@@ -98,7 +98,6 @@ LEGACY_REVIEWED_MANIFESTS = frozenset(
         "7d6b7d5fd602e815a9e1ede2d7ebcb871119e47c11dde63dbd58ffed96580184",  # sf11-2-locality
         "87fe3f5891da1d935056d69282b3bc5b2b978a7704b6d8388e5c4e56d74bb38a",  # sf11-3-followup-v4-current
         "633e71a729be7aab37432313aace624d9e2765632748a495ffd92832f8267863",  # sf11-3-theorem53
-        "78227947ec55824db6f5f71b0463ee48da1f96b9a4f04a9d7c3214f1c71760f6",  # passed-ledger-head-revalidation (#1470)
         "161403899a361be7266a8f7b011928e90eea5525f0d37ed246a532ca2b8bd7d3",  # sf11-pilot
         "3e6decf24291404867b90849dd84e75ea273a018b312c070fe38e12a4d522e3f",  # sf8-5-affine-resolution-pullback
         "0a22b5bdf3d841aa6bda71126233fb12c5a97166a10c04117e3792374b66cabf",  # sf8-5-nonflat-derived-effect
@@ -867,9 +866,10 @@ def validate_spec(spec: dict[str, Any]) -> None:
         if selected_dependencies:
             raise LoopError("independent mode cannot contain dependencies between selected issues")
 
-    if not is_legacy_manifest(spec):
+    if not is_legacy_manifest(spec) and spec["enabled"]:
         # A branch-authored manifest cannot choose the base its change is
-        # measured against, nor scope its chunk over its own authority.
+        # measured against, nor scope its chunk over its own authority. A
+        # disabled manifest authorizes nothing and is kept only as history.
         expected_base = f"{spec['remote']}/{base_branch}"
         if base_ref != expected_base:
             raise LoopError(f"spec.base_ref must be {expected_base!r}, the remote base branch")
@@ -2022,6 +2022,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
             "openspec_digest": openspec_digest(root, spec),
             "openspec_digest_version": OPENSPEC_DIGEST_VERSION,
             "base_ref": spec["base_ref"],
+            "base_commit_at_init": pinned_base_commit({"repo_root": str(root), "base_ref": spec["base_ref"]}),
             "plan_paths": plan_paths(root, spec_path, spec),
             # Without OpenSpec the issue body is the specification; record
             # which version of it the panel reviewed against.
@@ -2079,6 +2080,20 @@ def backlog_records(state: dict[str, Any], lift_target: str) -> bool:
 def latest_round(state: dict[str, Any]) -> dict[str, Any] | None:
     rounds = state.get("rounds", [])
     return rounds[-1] if rounds else None
+
+
+def pinned_base_commit(state: dict[str, Any]) -> str | None:
+    """The base commit a round was reviewed against, for the audit trail.
+
+    Resolved locally, so it is evidence, not authority: publication measures
+    the change against the provider's base tip instead.
+    """
+
+    root, base_ref = state.get("repo_root"), state.get("base_ref")
+    if not root or not base_ref:
+        return None
+    result = run_command(Path(root), ["git", "rev-parse", "--verify", "--end-of-options", f"{base_ref}^{{commit}}"])
+    return result.stdout.strip() if result.returncode == 0 else None
 
 
 def is_revalidation(round_state: dict[str, Any]) -> bool:
@@ -2139,6 +2154,8 @@ def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
     }
     if revalidation:
         current["kind"] = "revalidation"
+    if state.get("base_ref"):
+        current["base_commit"] = pinned_base_commit(state)
     state["rounds"].append(current)
     state["status"] = "reviewing"
     return current

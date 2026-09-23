@@ -69,7 +69,7 @@ writable), so a work branch cannot grant itself anything:
   widen it. Without the file, nothing is granted, and a run stops at its first
   provider action (stop reason 1). An explicit `false` in the file revokes that
   action for every run; it is the owner's kill switch.
-- The fifteen manifests the owner reviewed through planning PRs before this
+- The fourteen manifests the owner reviewed through planning PRs before this
   protocol are listed by content digest in `LEGACY_REVIEWED_MANIFESTS` in the
   controller. They keep their own explicit `mutations` and merge, closure and
   eligibility policies, subject to the kill switch, and only while the

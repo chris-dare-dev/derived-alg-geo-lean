@@ -212,7 +212,7 @@ Provider actions need grants from `.claude/loop-authority.yaml` on the default
 branch, which the controller reads through the GitHub API rather than a local
 ref. A run's manifest can narrow those grants, never widen them. It also cannot
 touch the loop's own authority, controller or instructions; those change only
-through owner-reviewed PRs. The fifteen manifests reviewed through planning
+through owner-reviewed PRs. The fourteen manifests reviewed through planning
 PRs before this protocol keep their own grants for their open issues, and an explicit `false` in the
 standing file revokes an action for every run. Issue closure for code work
 requires a merged PR.

@@ -433,7 +433,7 @@ marking ready, follow-up issues, issue closure, and merge each need a grant.
 The controller reads grants from the default branch through the GitHub API,
 never from a local ref. `.claude/loop-authority.yaml` there holds the owner's
 standing grants, and a run's own manifest can narrow them but never widen them.
-Without the file, nothing is granted. The fifteen manifests the owner reviewed
+Without the file, nothing is granted. The fourteen manifests the owner reviewed
 through planning PRs before this protocol are listed by digest in the
 controller and keep their own grants, but only for their still-open issues. An explicit `false` in the standing file
 revokes a grant for every run, legacy or not. A manifest merged later through a

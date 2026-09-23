@@ -1407,7 +1407,18 @@ class AuthorityTests(unittest.TestCase):
         }
         # Every allowlisted digest is a tracked manifest's exact content.
         self.assertEqual(loop_engine.LEGACY_REVIEWED_MANIFESTS - digests, set())
-        self.assertEqual(len(loop_engine.LEGACY_REVIEWED_MANIFESTS), 15)
+        self.assertEqual(len(loop_engine.LEGACY_REVIEWED_MANIFESTS), 14)
+
+    def test_a_disabled_manifest_is_history_and_skips_branch_rules(self) -> None:
+        historical = json.loads(json.dumps(self.spec))
+        historical["enabled"] = False
+        historical["issues"][0]["chunks"][0]["files"].append("scripts/loop_engine.py")
+        loop_engine.validate_spec(historical)
+        with self.assertRaisesRegex(loop_engine.LoopError, "disabled"):
+            loop_engine.authorize_action(self.root, historical, "push")
+        historical["enabled"] = True
+        with self.assertRaisesRegex(loop_engine.LoopError, "protected"):
+            loop_engine.validate_spec(historical)
 
     def test_a_legacy_grant_covers_only_open_issues(self) -> None:
         with mock.patch.object(loop_engine, "issue_state", return_value={"state": "CLOSED"}) as state:
@@ -1738,6 +1749,8 @@ class ContentBindingTests(unittest.TestCase):
             state = json.loads(state_path.read_text(encoding="utf-8"))
             self.assertEqual(state["plan_paths"], [MANIFEST, "openspec/changes/pilot-change"])
             self.assertEqual(state["openspec_digest_version"], loop_engine.OPENSPEC_DIGEST_VERSION)
+            base_at_init = git_in(self.root, "rev-parse", "origin/main")
+            self.assertEqual(state["base_commit_at_init"], base_at_init)
 
             def panel(commit: str, verdict: str) -> None:
                 for reviewer in REVIEWERS:
@@ -1751,6 +1764,8 @@ class ContentBindingTests(unittest.TestCase):
 
             panel(self.reviewed, "pass")
             self.assertEqual(loop_engine.ledger_adjudicate(state_path, "pass", "all clear"), 0)
+            # Each round records the base it was reviewed against, as audit evidence.
+            self.assertEqual(json.loads(state_path.read_text(encoding="utf-8"))["rounds"][0]["base_commit"], base_at_init)
             output = io.StringIO()
             with contextlib.redirect_stdout(output):
                 self.assertNotEqual(

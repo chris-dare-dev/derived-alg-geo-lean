@@ -1,5 +1,11 @@
 # Tasks
 
+> **Superseded by #1473.** That PR delivers this change's goal: a passed ledger survives a
+> moved protected base through change-bound review carry-over, with a bounded full-panel
+> revalidation when the change or its dependencies move. It also closes #1469. The manifest
+> `.claude/loop-specs/passed-ledger-head-revalidation.yaml` is disabled. Do not implement
+> the tasks below; this plan is kept as history.
+
 ## 1. Specify and bootstrap the bounded controller change
 
 - [x] 1.1 Create the distinct controller tracking issue #1469 and an enabled, code-scoped three-round implementation manifest bound to this OpenSpec change, with every provider mutation flag false; verify `python3 scripts/loop_engine.py validate --spec <manifest>` succeeds.
