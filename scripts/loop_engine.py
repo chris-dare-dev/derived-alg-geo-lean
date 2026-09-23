@@ -179,7 +179,7 @@ LOG_ARTIFACT_NAMES = {"agent-observations.md"}
 ISSUE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BRANCH_RE = re.compile(r"^agent/[a-z0-9][a-z0-9._/-]*$")
 TASK_LIST_CHECKBOX_RE = re.compile(r"^([ \t]*[-*+][ \t]+)\[[ xX]\]")
-TASK_INLINE_CHECKBOX_RE = re.compile(r"^\[[ xX]\](?:[ \t]|$)")
+TASK_INLINE_CHECKBOX_RE = re.compile(r"^\[[ xX]\](?:[ \t\n]|$)")
 # Preserve the semantics used by already-written v2 ledgers. Do not use this
 # regex for new ledgers: CommonMark parsing distinguishes task boxes from links.
 TASK_CHECKBOX_RE_V2 = re.compile(r"^(\s*[-*+] )\[[ xX]\]", re.MULTILINE)
@@ -398,9 +398,13 @@ def has_visible_why_heading(markdown: str) -> bool:
         ):
             continue
         inline = tokens[index + 1]
-        visible_text = "".join(
-            child.content for child in (inline.children or []) if child.type in {"text", "code_inline"}
-        ).strip()
+        children = inline.children or []
+        # Raw HTML can hide text through attributes such as `hidden` or inline
+        # styles. Do not call that text visibly present; unrelated HTML outside
+        # this candidate heading remains irrelevant.
+        if any(child.type == "html_inline" for child in children):
+            continue
+        visible_text = "".join(child.content for child in children if child.type in {"text", "code_inline"}).strip()
         if visible_text == "Why":
             return True
     return False

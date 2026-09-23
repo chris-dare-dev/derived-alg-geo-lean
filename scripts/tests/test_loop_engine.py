@@ -1329,7 +1329,6 @@ class CommonMarkBoundaryTests(unittest.TestCase):
             "## `Why`\n",
             "## Wh&#121;\n",
             "## [Why](https://example.test)\n",
-            "## <b>Why</b>\n",
             "# Proposal\n\n## Why ###\n",
             "`<widget>` is inline code\n## Why\n",
             "<widget>text</widget>\n## Why\n",
@@ -1346,6 +1345,8 @@ class CommonMarkBoundaryTests(unittest.TestCase):
             "- ## Why\n",
             "## Why *not*\n",
             "## ![Why](https://example.test/image.png)\n",
+            "## <span hidden>Why</span>\n",
+            "## <b>Why</b>\n",
         ):
             with self.subTest(proposal=proposal):
                 self.assertFalse(loop_engine.has_visible_why_heading(proposal))
@@ -1381,6 +1382,11 @@ class CommonMarkBoundaryTests(unittest.TestCase):
             loop_engine.normalize_task_checkboxes(links_and_inline_html),
             "- [x](https://example.test)\n- [ ](https://example.test)\n- [ ] Render <tag>\n",
         )
+        soft_break = "- [x]\n  continued text\n"
+        self.assertEqual(
+            loop_engine.normalize_task_checkboxes(soft_break),
+            "- [ ]\n  continued text\n",
+        )
 
     def test_v3_digest_ignores_only_actual_list_checkbox_state(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1408,6 +1414,11 @@ class CommonMarkBoundaryTests(unittest.TestCase):
             checked_link = loop_engine.openspec_digest(root, spec)
             tasks.write_text("- [ ](https://example.test)\n", encoding="utf-8")
             self.assertNotEqual(loop_engine.openspec_digest(root, spec), checked_link)
+
+            tasks.write_text("# Tasks\n\n- [x]\n  continued description\n", encoding="utf-8")
+            checked_soft_break = loop_engine.openspec_digest(root, spec)
+            tasks.write_text("# Tasks\n\n- [ ]\n  continued description\n", encoding="utf-8")
+            self.assertEqual(loop_engine.openspec_digest(root, spec), checked_soft_break)
 
     def test_structural_proposal_validation_does_not_match_examples(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

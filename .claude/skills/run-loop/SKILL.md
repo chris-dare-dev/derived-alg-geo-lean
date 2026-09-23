@@ -105,9 +105,10 @@ These are not stops. What to do instead:
   review evidence exists. Recovery preserves that contract. Renaming a chunk,
   manifest, state directory or worktree cannot reset an objective's history or
   allowance; newly required scope is not automatic authority.
-- Never run `scripts/gates.sh` locally. Use `scripts/precheck.sh` with a
-  targeted build where the repository hook permits it; the self-hosted runner
-  is the CI verdict.
+- Never run `scripts/gates.sh` locally. Use
+  `PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh` with a targeted
+  build where the repository hook permits it; the self-hosted runner is the CI
+  verdict.
 - Use only `scripts/loop_engine.py action ...` for comments, pushes, PR
   creation, marking ready, follow-up issues, approval, merge, and issue
   closure. Do not call `gh issue close`, `gh pr ready`, `gh pr merge`,
@@ -236,12 +237,14 @@ For each issue in manifest order:
 
 2. On the issue's `agent/<slug>` branch, implement the frozen chunk: its
    acceptance statements, and the unchecked OpenSpec tasks when a change
-   exists. Tick task boxes and append the observation log as you go; the v2
-   plan digest ignores both. Keep the issue's mathematical hypotheses
-   explicit; an interface field is not a proof.
+   exists. Tick actual CommonMark task-list boxes and append the observation
+   log as you go; the v3 plan digest ignores those progress changes while
+   keeping examples and other contract text bound. Keep the issue's
+   mathematical hypotheses explicit; an interface field is not a proof.
 
-3. Run targeted Lean checks and `scripts/precheck.sh` as appropriate. Commit
-   the chunk. Before creating a PR, the controller checks that the committed
+3. Run targeted Lean checks and
+   `PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh` as appropriate.
+   Commit the chunk. Before creating a PR, the controller checks that the committed
    diff stays inside the frozen path prefixes and that the PR body closes only
    the selected issue.
 

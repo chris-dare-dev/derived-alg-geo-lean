@@ -232,15 +232,18 @@ Code issues may only be closed after a confirmed merged pull request.
 ## Ledgers and moving bases
 
 - A ledger written by this controller records its plan paths and plan-digest
-  version 2. Version 2 ignores task checkbox state and `agent-observations.md`,
-  so ticking tasks or appending the observation log no longer invalidates a
-  review. Ledgers written before this change keep verifying under version 1.
+  version 3. Version 3 ignores the state of parsed CommonMark list-item
+  checkboxes in `tasks.md` and the top-level `agent-observations.md`, so task
+  progress no longer invalidates a review while examples and other contract
+  text remain bound. Existing v2 ledgers keep their original regex-based
+  normalization; v1 ledgers keep their original behavior as well.
 - A passing round covers a later head only when all three of these hold:
   - it carries the same change against the base branch tip GitHub reports
     (such as after a clean rebase onto a moved `main` or a merge of `main`);
-  - only the progress records differ, meaning checkbox state in `tasks.md` and
-    the change's top-level `agent-observations.md`; the manifest and every
-    other plan file are part of the reviewed change;
+  - only the progress records differ: for a v3 ledger, parsed list-item
+    checkbox state in `tasks.md` and the change's top-level
+    `agent-observations.md`; the manifest and every other plan file are part
+    of the reviewed change;
   - the base did not change a chunk file, a Lean module a chunk file imports
     directly, or `lake-manifest.json`, `lean-toolchain` or `lakefile.toml`.
 - Otherwise, one revalidation round with the full panel reopens the pass. A
