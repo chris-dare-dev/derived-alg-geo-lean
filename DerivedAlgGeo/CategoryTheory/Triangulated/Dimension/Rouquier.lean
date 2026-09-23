@@ -8,8 +8,8 @@ import Mathlib.Data.ENat.Lattice
 /-!
 # Rouquier dimension
 
-`rouquierDim C` is the infimum of the generation times from singleton object
-properties to the whole category. Thus the infimum ranges over individual
+`CategoryTheory.Triangulated.rouquierDim C` is the infimum of the generation times from
+singleton object properties to the whole category. Thus the infimum ranges over individual
 objects, not arbitrary object properties. It is a scalar definition and does
 not choose a distinguished object attaining the infimum. Since a category with
 a zero object is nonempty and `ℕ∞` is well ordered, a minimizing object does
@@ -17,27 +17,28 @@ exist existentially; the finite-witness results below state their witnesses
 separately.
 
 The indexing has no offset from Rouquier's `⟨G⟩_{n+1}` convention:
-`triangEnvelopeIter_zero` identifies stage zero with the shifts, finite binary
-products, and retracts of `G`, which is `⟨G⟩₁`; `triangEnvelopeIter_succ`
+`CategoryTheory.ObjectProperty.triangEnvelopeIter_zero` identifies stage zero with the shifts,
+finite binary products, and retracts of `G`, which is `⟨G⟩₁`;
+`CategoryTheory.ObjectProperty.triangEnvelopeIter_succ`
 adds one extension at the next stage. The equation
-`triangEnvelopeIter_add` is a conditional decomposition of envelope stages
-under `[IsTriangulated C]`. It is not a generation-time composition or
+`CategoryTheory.ObjectProperty.triangEnvelopeIter_add` is a conditional decomposition of
+envelope stages under `[IsTriangulated C]`. It is not a generation-time composition or
 subadditivity law; that composition result is separate work in issue #920.
 
 ## Main definitions
 
-* `rouquierDim C`: the infimum of generation times over singleton object
+* `CategoryTheory.Triangulated.rouquierDim C`: the infimum of generation times over singleton object
   properties.
 
 ## Main results
 
-* `rouquierDim_le_coe_iff`: a finite bound is witnessed by one object whose
-  envelope reaches the whole category at that stage.
-* `rouquierDim_ne_top_iff_exists_strong` and
-  `exists_isClassicalTriangulatedGenerator_of_rouquierDim_ne_top`: finite
-  Rouquier dimension is equivalent to strong generation and implies classical
-  generation.
-* `rouquierDim_eq_zero_iff`: dimension zero is generation using shifts,
+* `CategoryTheory.Triangulated.rouquierDim_le_coe_iff`: a finite bound is witnessed by one
+  object whose envelope reaches the whole category at that stage.
+* `CategoryTheory.Triangulated.rouquierDim_ne_top_iff_exists_strong` and
+  `CategoryTheory.Triangulated.exists_isClassicalTriangulatedGenerator_of_rouquierDim_ne_top`:
+  finite Rouquier dimension is equivalent to strong generation and implies
+  classical generation.
+* `CategoryTheory.Triangulated.rouquierDim_eq_zero_iff`: dimension zero is generation using shifts,
   finite binary products, and retracts, without extension steps.
 
 ## Implementation notes
@@ -133,7 +134,8 @@ theorem exists_isClassicalTriangulatedGenerator_of_rouquierDim_ne_top
   exact ⟨G, hG.isClassicalTriangulatedGenerator⟩
 
 /-- Rouquier dimension is zero exactly when one object's zeroth envelope is the whole category.
-By `triangEnvelopeIter_zero`, this is generation using only shifts, finite binary products, and
+By `CategoryTheory.ObjectProperty.triangEnvelopeIter_zero`, this is generation using only shifts,
+finite binary products, and
 retracts, without extension steps. -/
 theorem rouquierDim_eq_zero_iff :
     rouquierDim C = 0 ↔

@@ -11,3 +11,9 @@
 
 - Mathematics review: pass, no findings. Repository-boundary review: pass, no findings; independently reproduced the inherited `loop-spec` base-manifest failure. Abstraction review: pass with one upstream-only Stacks 0FXA lift, already recorded in the exact-SHA backlog. The ledger records the lift target as the pinned Mathlib generator module; no lift file is part of this chunk.
 - Mathlib-style review: five docstring improvements (module sections, implementation-focused declaration descriptions, and an explicit literature reference). Applied those wording changes; the named dimension build and focused style check pass afterward. Full precheck and the four-role review panel will be rerun on the updated commit.
+
+## Review round 2 and final correction
+
+- Mathematics review: pass, no findings. Repository-boundary and abstraction reviews: pass with the same upstream-only Stacks 0FXA lift, documented at this commit. Mathlib-style review requested fully qualified declaration links in the module and zero-stage docstrings; those links are qualified now.
+- After the correction, the named dimension build, focused mathlib-style check, and dimension audit passed. All five Rouquier declarations depend only on `[propext, Classical.choice, Quot.sound]`; no `sorryAx` appears.
+- The final `scripts/precheck.sh` run passed 18 gates and failed only `loop-spec` on the unchanged, out-of-scope #1394 manifest with `base_ref: agent/issue-1394-plan`; its contents match `origin/main` and it is absent from this chunk. The four-role review panel will review the corrected commit as the third and final permitted round.
