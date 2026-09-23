@@ -23,6 +23,37 @@ adds one extension at the next stage. The equation
 `triangEnvelopeIter_add` is a conditional decomposition of envelope stages
 under `[IsTriangulated C]`. It is not a generation-time composition or
 subadditivity law; that composition result is separate work in issue #920.
+
+## Main definitions
+
+* `rouquierDim C`: the infimum of generation times over singleton object
+  properties.
+
+## Main results
+
+* `rouquierDim_le_coe_iff`: a finite bound is witnessed by one object whose
+  envelope reaches the whole category at that stage.
+* `rouquierDim_ne_top_iff_exists_strong` and
+  `exists_isClassicalTriangulatedGenerator_of_rouquierDim_ne_top`: finite
+  Rouquier dimension is equivalent to strong generation and implies classical
+  generation.
+* `rouquierDim_eq_zero_iff`: dimension zero is generation using shifts,
+  finite binary products, and retracts, without extension steps.
+
+## Implementation notes
+
+The category's zero object makes the index type nonempty. Since `ℕ∞` is
+well ordered, the infimum is attained by some object, although the scalar
+definition does not select that object. The finite-bound and strong-generator
+theorems extract a witness when one is needed.
+
+## References
+
+* Raphaël Rouquier, *Dimensions of triangulated categories*.
+
+## Tags
+
+Rouquier dimension, triangulated category, strong generator, classical generator
 -/
 
 universe v u
@@ -34,13 +65,13 @@ open CategoryTheory.Limits
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ] [Preadditive C]
   [∀ (n : ℤ), (shiftFunctor C n).Additive] [Pretriangulated C]
 
-/-- The **Rouquier dimension** of a pretriangulated category: the infimum of the
-generation times to the whole category over singleton object properties. -/
+/-- The scalar invariant leaves the minimizing object out of the API; the zero-object
+hypothesis makes the index nonempty, so the infimum is attained in `ℕ∞`. -/
 noncomputable def rouquierDim : ℕ∞ :=
   ⨅ G : C, (ObjectProperty.singleton G).generationTime ⊤
 
-/-- A finite bound on Rouquier dimension is witnessed by a single object whose
-iterated envelope reaches every object in at most `n` extension steps. -/
+/-- The zero object makes the indexing type nonempty, so the `ℕ∞` infimum attains its value;
+this equivalence extracts a witness at the requested finite stage. -/
 theorem rouquierDim_le_coe_iff (n : ℕ) :
     rouquierDim C ≤ (n : ℕ∞) ↔
       ∃ G : C, (ObjectProperty.singleton G).triangEnvelopeIter n = ⊤ := by
@@ -64,7 +95,8 @@ theorem rouquierDim_le_coe_iff (n : ℕ) :
         (ObjectProperty.generationTime_le_coe_iff (ObjectProperty.singleton G) ⊤ n).2
           (top_le_iff.mpr hG)
 
-/-- Rouquier dimension is finite exactly when one object strongly generates the category. -/
+/-- Well-ordering of `ℕ∞` makes the infimum attainable; the generation-time bridge identifies
+a finite value with strong generation. -/
 theorem rouquierDim_ne_top_iff_exists_strong :
     rouquierDim C ≠ ⊤ ↔
       ∃ G : C, (ObjectProperty.singleton G).IsStrongTriangulatedGenerator := by
@@ -92,7 +124,8 @@ theorem rouquierDim_ne_top_iff_exists_strong :
     rw [hdim] at hle
     exact top_le_iff.mp hle
 
-/-- A finite Rouquier dimension supplies a classical triangulated generator. -/
+/-- Mathlib's strong-to-classical implication turns the strong generator from the finite-dimension
+characterization into a classical generator. -/
 theorem exists_isClassicalTriangulatedGenerator_of_rouquierDim_ne_top
     (h : rouquierDim C ≠ ⊤) :
     ∃ G : C, (ObjectProperty.singleton G).IsClassicalTriangulatedGenerator := by
