@@ -85,11 +85,14 @@ from an unproved marker typeclass introduced by the chunk.
   `KProjectiveDerivedCategory (ModuleCat R)`
 - **THEN** a natural isomorphism identifies actual degreewise scheme-module
   pullback of its sheafified K-projective representatives, followed by
-  localization, with the existing affine K-projective derived pullback
-  followed by derived tilde. This comparison is affine and restricted to the
-  K-projective derived locus; it SHALL NOT assert a left-derived-pullback
-  universal property on all scheme-module complexes, a general K-flat
-  resolution, or a theorem for arbitrary scheme morphisms.
+  localization in `DerivedCategory ((Spec S).Modules)`, with the existing
+  affine K-projective derived pullback followed by the derived functor induced
+  by `AlgebraicGeometry.tilde.functor S`. This is the ambient category of all
+  scheme-module sheaves, not the separate affine quasi-coherent derived
+  category. The comparison is affine and restricted to the K-projective
+  derived locus; it SHALL NOT assert a left-derived-pullback universal
+  property on all scheme-module complexes, a general K-flat resolution, or a
+  theorem for arbitrary scheme morphisms.
 
 #### Scenario: Preservation obligation is tested
 

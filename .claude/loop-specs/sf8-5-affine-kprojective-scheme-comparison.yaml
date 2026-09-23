@@ -79,18 +79,22 @@ issues:
           - "Supported arbitrary derived pullbacks are constructed"
         files:
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineKProjectivePullback.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineNonflatDerivedObject.lean
           - scripts/AlgebraicGeometryAudit/SchemeDerived.lean
           - docs/architecture/loop-engineering-friction.md
         acceptance:
           - >-
             A public natural isomorphism is proved for every commutative-ring
-            map R → S, from the affine K-projective derived locus to the
-            derived category of S-scheme modules. Its source applies actual
-            degreewise Scheme.Modules.pullback to the sheafification of
-            K-projective representatives and then localizes; its target is
-            affineKProjectiveDerivedPullback followed by the derived target
-            tilde functor. The comparison is post-localization, not only a
-            chain-level restatement.
+            map R → S, from the affine K-projective derived locus to
+            DerivedCategory ((Spec S).Modules), the derived category of all
+            S-scheme-module sheaves. Its source applies actual degreewise
+            Scheme.Modules.pullback to the sheafification of K-projective
+            representatives and then localizes; its target is
+            affineKProjectiveDerivedPullback followed by the derived functor
+            induced by AlgebraicGeometry.tilde.functor S. It is not a functor
+            into the separate affine quasi-coherent derived category. The
+            comparison is post-localization, not only a chain-level
+            restatement.
           - >-
             No flatness hypothesis is added to the affine ring map. The
             source remains KProjectiveDerivedCategory (ModuleCat R), not the

@@ -216,6 +216,13 @@ through owner-reviewed PRs. The manifests reviewed through planning
 PRs before this protocol keep their own grants for their open issues, and an explicit `false` in the
 standing file revokes an action for every run. Issue closure for code work
 requires a merged PR.
+
+For these planning-PR manifests, a matching digest in the local worktree is not
+enough to activate provider grants: the controller also checks that the exact
+digest is present in `LEGACY_REVIEWED_MANIFESTS` from the provider's current
+default-branch copy of `scripts/loop_engine.py`. Thus a planning branch can
+validate and preflight its proposal, but cannot use its own not-yet-merged
+allowlist entry to authorize pushes, PR creation, ready-for-review, or merge.
 Progress chunks use non-closing issue references; complete chunks require a
 closing keyword. Keep run ledgers in ignored `.loop-runs/`.
 

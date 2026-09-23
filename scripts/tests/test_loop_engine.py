@@ -190,6 +190,7 @@ class LoopEngineTests(unittest.TestCase):
         # AuthorityTests and BranchManifestPolicyTests cover branch manifests.
         for name, value in (
             ("is_legacy_manifest", True),
+            ("owner_reviewed_legacy_manifest", True),
             ("is_legacy_state", True),
             ("standing_authority", {}),
             ("require_legacy_issue_open", None),
@@ -1382,9 +1383,13 @@ class AuthorityTests(unittest.TestCase):
 
     def test_a_legacy_manifest_keeps_its_grants_and_obeys_the_kill_switch(self) -> None:
         self.spec["mutations"] = {"comment_issue": True, "merge_pr": True}
+        reviewed_digest = loop_engine.digest(self.spec)
         with mock.patch.object(
             loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
         ):
+            self.default_branch["scripts/loop_engine.py"] = (
+                f"LEGACY_REVIEWED_MANIFESTS = frozenset({{{reviewed_digest!r}}})\n"
+            )
             effective = loop_engine.effective_mutations(self.root, self.spec)
             self.assertTrue(effective["comment_issue"] and effective["merge_pr"])
             self.assertFalse(effective["push_branch"])
@@ -1392,6 +1397,24 @@ class AuthorityTests(unittest.TestCase):
             effective = loop_engine.effective_mutations(self.root, self.spec)
             self.assertTrue(effective["comment_issue"] and effective["push_branch"])
             self.assertFalse(effective["merge_pr"])
+
+    def test_a_branch_local_legacy_digest_cannot_authorize_before_default_branch_merge(self) -> None:
+        self.spec["mutations"] = {"push_branch": True, "merge_pr": True}
+        with mock.patch.object(
+            loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
+        ):
+            # A digest newly added on the current planning branch is not in the
+            # controller fetched from the provider's default branch yet.
+            self.default_branch["scripts/loop_engine.py"] = (
+                "LEGACY_REVIEWED_MANIFESTS = frozenset(" + repr({"a" * 64}) + ")\n"
+            )
+            effective = loop_engine.effective_mutations(self.root, self.spec)
+            self.assertFalse(any(effective.values()))
+            self.default_branch["scripts/loop_engine.py"] = (
+                f"LEGACY_REVIEWED_MANIFESTS = frozenset({{{loop_engine.digest(self.spec)!r}}})\n"
+            )
+            effective = loop_engine.effective_mutations(self.root, self.spec)
+            self.assertTrue(effective["push_branch"] and effective["merge_pr"])
 
     def test_a_malformed_standing_file_fails_closed(self) -> None:
         self.default_branch[loop_engine.STANDING_AUTHORITY_PATH] = "mutations:\n  merge_pr: yes please\n"

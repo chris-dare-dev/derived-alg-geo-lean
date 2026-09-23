@@ -16,6 +16,7 @@ an unattended run from silently widening its scope.
 from __future__ import annotations
 
 import argparse
+import ast
 import contextlib
 import hashlib
 import json
@@ -84,9 +85,12 @@ STANDING_AUTHORITY_PATH = ".claude/loop-authority.yaml"
 STANDING_AUTHORITY_SCHEMA = "derived-alg-geo-lean.loop-authority/v1"
 # Manifests the owner reviewed and merged through a planning PR before plans
 # moved into work PRs, by content digest. Their explicit grants and policies
-# stand, except where the standing file explicitly revokes a grant. Merging a
-# manifest later confers nothing: a work PR ships its own manifest, so "on the
-# default branch" no longer means "reviewed by the owner".
+# stand, except where the standing file explicitly revokes a grant. Mutation
+# authority additionally checks that the digest appears in the provider's
+# default-branch copy of this controller, so a plan branch cannot activate a
+# digest it just added locally. Merging a manifest later confers nothing: a
+# work PR ships its own manifest, so "on the default branch" alone does not
+# mean "reviewed by the owner".
 LEGACY_REVIEWED_MANIFESTS = frozenset(
     {
         "7d7fde4cef8154044665c68b8aee9a063fd19d9dd3f4b8af9aebfc3c53146ebd",  # aut1-570-doc-hygiene
@@ -102,7 +106,7 @@ LEGACY_REVIEWED_MANIFESTS = frozenset(
         "3e6decf24291404867b90849dd84e75ea273a018b312c070fe38e12a4d522e3f",  # sf8-5-affine-resolution-pullback
         "0a22b5bdf3d841aa6bda71126233fb12c5a97166a10c04117e3792374b66cabf",  # sf8-5-nonflat-derived-effect
         "a00cfa7a3006a8354033e9ccc87b620fb707ec92f395bf920d2125c213c24d1e",  # sf8-5-tor-witness-comparison
-        "41d8843656fabc5b9beeceeec7cc6cddc85a3923103f0106fb83eeb492d9d39c",  # sf8-5-affine-kprojective-scheme-comparison
+        "a87a4855ce6188e6a69c9de0005d24ee5e2b1d272b6268765fe0ba201db496b7",  # sf8-5-affine-kprojective-scheme-comparison
         "69b451bac920101e28dff6c2f0c524f29f48146966ee9bdfc6a4e5ce0497606a",  # sf8-sf9-pilot
         "315637cf2347791dce3abb9fdd1b57a6fcf83f63f5c0cb5ffab986ef9cb57419",  # rou1-919-rouquier-dimension (#1478)
     }
@@ -515,6 +519,49 @@ def standing_authority(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
     return dict(grants)
 
 
+def owner_reviewed_legacy_manifest(root: Path, spec: dict[str, Any]) -> bool:
+    """Check that the exact legacy digest is allowlisted on the default branch.
+
+    A planning branch necessarily contains its proposed allowlist entry before
+    that entry has been reviewed and merged. Reading the default branch's
+    controller copy prevents that local entry from authorizing the branch
+    which introduced it.
+    """
+
+    if not is_legacy_manifest(spec):
+        return False
+    source = read_owner_file(root, spec, "scripts/loop_engine.py")
+    if source is None:
+        return False
+    try:
+        tree = ast.parse(source)
+    except SyntaxError as exc:
+        raise LoopError("scripts/loop_engine.py on the default branch is not valid Python") from exc
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        if not any(isinstance(target, ast.Name) and target.id == "LEGACY_REVIEWED_MANIFESTS" for target in node.targets):
+            continue
+        value = node.value
+        if (
+            not isinstance(value, ast.Call)
+            or not isinstance(value.func, ast.Name)
+            or value.func.id != "frozenset"
+            or len(value.args) != 1
+        ):
+            raise LoopError("LEGACY_REVIEWED_MANIFESTS on the default branch has an unsupported format")
+        try:
+            digests = ast.literal_eval(value.args[0])
+        except (ValueError, TypeError) as exc:
+            raise LoopError("LEGACY_REVIEWED_MANIFESTS on the default branch is not a literal set") from exc
+        if not isinstance(digests, (set, frozenset, tuple, list)) or any(
+            not isinstance(item, str) for item in digests
+        ):
+            raise LoopError("LEGACY_REVIEWED_MANIFESTS on the default branch must contain string digests")
+        return digest(spec) in digests
+    raise LoopError("LEGACY_REVIEWED_MANIFESTS is missing from the default-branch controller")
+
+
 def effective_mutations(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
     """Resolve provider authority for this manifest from owner-controlled sources.
 
@@ -526,7 +573,7 @@ def effective_mutations(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
 
     configured = manifest_mutations(spec)
     standing = standing_authority(root, spec)
-    if is_legacy_manifest(spec):
+    if owner_reviewed_legacy_manifest(root, spec):
         return {
             key: standing.get(key) is not False and configured.get(key, standing.get(key, False))
             for key in MUTATION_KEYS

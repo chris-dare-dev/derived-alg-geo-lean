@@ -96,7 +96,10 @@ construction prerequisite for #522, and #525 remains downstream.
     slice: for each commutative-ring map `R → S`, compare degreewise actual
     `Scheme.Modules.pullback (Spec.map f)` on the sheafification of
     K-projective representatives, after localization, with extension of
-    scalars followed by derived tilde. The source is only
+    scalars followed by the derived functor induced by the exact
+    `AlgebraicGeometry.tilde.functor S : ModuleCat S ⥤ (Spec S).Modules`.
+    The target is the derived category of all scheme-module sheaves, not the
+    separate affine quasi-coherent derived category. The source is only
     `KProjectiveDerivedCategory (ModuleCat R)`. This does not construct a
     replacement on all scheme-module complexes, inhabit
     `SchemeBaseChange.LeftDerivedPullback` for nonflat maps, prove
