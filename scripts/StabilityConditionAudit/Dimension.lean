@@ -21,3 +21,15 @@ reduce Mathlib's strong and classical triangulated generators to finiteness of
 #print axioms CategoryTheory.ObjectProperty.generationTime_eq_top_iff
 #print axioms CategoryTheory.ObjectProperty.isStrongTriangulatedGenerator_iff_generationTime_ne_top
 #print axioms CategoryTheory.ObjectProperty.isClassicalTriangulatedGenerator_of_generationTime_ne_top
+
+/-! ## Rouquier dimension (#919)
+
+The infimum over singleton generation times and its finite, strong-generator,
+classical-generator, and zero-stage characterisations.
+-/
+
+#print axioms CategoryTheory.Triangulated.rouquierDim
+#print axioms CategoryTheory.Triangulated.rouquierDim_le_coe_iff
+#print axioms CategoryTheory.Triangulated.rouquierDim_ne_top_iff_exists_strong
+#print axioms CategoryTheory.Triangulated.exists_isClassicalTriangulatedGenerator_of_rouquierDim_ne_top
+#print axioms CategoryTheory.Triangulated.rouquierDim_eq_zero_iff
