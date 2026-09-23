@@ -80,6 +80,7 @@ issues:
         files:
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineKProjectivePullback.lean
           - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineNonflatDerivedObject.lean
+          - docs/architecture/generalization-backlog.md
           - scripts/AlgebraicGeometryAudit/SchemeDerived.lean
           - docs/architecture/loop-engineering-friction.md
         acceptance:
@@ -109,6 +110,11 @@ issues:
             public declaration is recorded in SchemeDerived.lean, with no
             duplicate resolution or pullback carrier and no unrelated umbrella
             change.
+          - >-
+            Record any genuinely deferred generalization lift in
+            docs/architecture/generalization-backlog.md; do not add an
+            unverified backlog row for an existing API consumed directly by
+            this chunk.
           - >-
             The PR is progress-only, refers to #554 without a closing keyword,
             leaves #554 open, and does not select #522 or #525.

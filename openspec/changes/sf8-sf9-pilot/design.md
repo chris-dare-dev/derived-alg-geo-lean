@@ -54,11 +54,13 @@ construction prerequisite for #522, and #525 remains downstream.
    general scheme-level `LeftDerivedPullback` or proof of full
    relative-perfect preservation.
 8. For each new concrete progress chunk, freeze its source leaf, relevant
-   public audit, generalization-backlog record, and any outcome log before
-   ledger initialization. The required OpenSpec task checklist is itself
-   digest-bound, so leave it unchanged during the code loop; sync its completed
-   checkbox in a separate post-merge planning update rather than invalidating
-   the review ledger.
+   public audit, generalization-backlog path, and any outcome log before ledger
+   initialization. Append only generalization findings that cannot be acted on
+   within that chunk; an existing API consumed directly is not an unverified
+   lift, and an empty disposition does not warrant a placeholder row. The
+   current loop-controller digest normalizes task-checkbox state, so the active
+   task may be checked in its implementation PR. Task wording and the other
+   required OpenSpec artifacts remain frozen after ledger initialization.
 9. State the first derived-effect endpoint as nonzero degree-minus-one homology
    of the supported affine bounded-projective representative. A Tor
    interpretation is not part of that result unless a proved comparison to an
