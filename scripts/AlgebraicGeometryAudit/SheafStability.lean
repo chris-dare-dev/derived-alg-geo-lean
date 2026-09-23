@@ -33,7 +33,6 @@ through `K₀Ab (Coh X)`, and has finite-difference degree at most the supplied 
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertHom
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertHom_of
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.isCoherent_tensor_linePower
-#print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.mk
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.mk.inj
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.picardMonomial_fin_one

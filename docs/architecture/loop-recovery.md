@@ -133,10 +133,14 @@ The controller verifies structure and binding; reviewers judge substance.
 The backlog gate reads `docs/architecture/generalization-backlog.md` from the
 exact candidate/reviewed commit's ordinary file blob, at both passing
 adjudication and publication. It rejects missing commits/files and symlinks;
-there is no HEAD or working-tree fallback. Approval of an existing remote PR
-can use its exact reviewed SHA even if local HEAD differs, subject to the
-separate provider gates. Push and PR creation retain their local HEAD and clean
-checkout requirements.
+there is no HEAD or working-tree fallback. Push, PR creation and later provider
+actions accept the exact reviewed commit, or a head that carries the same
+change against the base branch tip GitHub reports (a clean rebase, or a merge
+of the base into the branch) when the base left the reviewed files, their
+direct imports and the pins alone. A head whose change differs needs a new round, and PR creation still
+requires a clean checkout. A passing recovery attempt stays terminal; the
+revalidation round that reopens an ordinary passed ledger does not apply to
+recovery objectives.
 
 A recovery disposition is a complete visible row outside code fences, with
 nonempty `chunk`, `reviewing commit`, `found by`, `proposed ancestor`,

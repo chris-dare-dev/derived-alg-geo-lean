@@ -1,0 +1,29 @@
+# Tasks
+
+> **Superseded by #1473.** That PR delivers this change's goal: a passed ledger survives a
+> moved protected base through change-bound review carry-over, with a bounded full-panel
+> revalidation when the change or its dependencies move. It also closes #1469. The manifest
+> `.claude/loop-specs/passed-ledger-head-revalidation.yaml` is disabled. Do not implement
+> the tasks below; this plan is kept as history.
+
+## 1. Specify and bootstrap the bounded controller change
+
+- [x] 1.1 Create the distinct controller tracking issue #1469 and an enabled, code-scoped three-round implementation manifest bound to this OpenSpec change, with every provider mutation flag false; verify `python3 scripts/loop_engine.py validate --spec <manifest>` succeeds.
+- [x] 1.2 Run strict OpenSpec validation and independent plan review, then publish only the planning artifacts and mutation-disabled manifest through the documented planning-only bootstrap PR path; verify the merged base contains the exact plan and no controller implementation changes or issue completion.
+- [ ] 1.3 From a fresh clean-base checkout after the bootstrap merge, run `validate` and read-only `preflight`, create the manifest's exact planned issue branch, and initialize its ledger before source edits; verify the initialized ledger freezes the expected controller files, exact issue, three-round cap, and artifact digests. Keep every mutation flag disabled throughout this code run.
+
+- [x] 1.4 Correct the bootstrap incident: reopen #1469 after the planning PR's negated close phrase caused GitHub to close it, edit the merged PR body to remove that phrase, and verify the issue is open.
+- [ ] 1.5 Specify GitHub closing semantics for PR titles, bodies, source commit messages, provider reference identities, and generated merge messages; update the implementation manifest's requirement list; resolve the documented self-bootstrap authority gap; and merge a non-closing plan-update PR only after verifying all four message sources contain no closing syntax, its provider references are empty, and #1469 remains open after merge.
+
+## 2. Implement passed-head revalidation as one frozen code chunk
+
+- [ ] 2.1 Pin protected-base OIDs at new ledger initialization and per ordinary/revalidation round; add append-only revalidation history validation and an atomic passed-head transition that reserves exactly one next capped round. Verify a disposable legacy-schema fixture mirroring #928's r1 needs-changes / r2 pass / cap-3 history uses only the marked conservative base inference, without altering the active DT1 ledger, and a repeated ordered refresh chain consumes successive slots without permitting a skipped or fourth round.
+- [ ] 2.2 Add fail-closed admission checks for exact local HEAD, direct protected-base ancestry, clean/frozen diff, manifest and OpenSpec binding, open issue, remote identity, and a complete all-state exact-branch PR lookup that accepts only no PR or one open, non-draft PR exactly bound to the prior pass; verify both closure-mode bodies and the live provider `closingIssuesReferences` match before admission, and each malformed, failed, stale, truncated, or ambiguous check leaves ledger bytes unchanged.
+- [ ] 2.3 Bind all shipping actions to the latest complete passing head and verify local, remote, and provider heads remain exact; prove pending refresh, stale local/remote head, and pre-merge base drift fail before mutation, a refreshed third-round needs-changes outcome becomes terminal blocked, safe exact-head push synchronizes only the absent or immediately prior remote ref, an exact existing open PR is reused rather than duplicated, stale/closed/merged/draft/multiple PRs reject refresh, and closure verifies the exact merged PR/issue/base ancestry.
+- [ ] 2.4 Add focused controller documentation, usage examples, a new friction-log entry for the stale-pass/base-refresh failure, and focused tests; verify `python3 -m unittest discover -s scripts/tests -p 'test_loop_engine.py'`, `python3 scripts/precheck.sh`, and strict OpenSpec validation pass.
+- [ ] 2.5 Harden PR issue-link validation: scan all nine GitHub closing verbs case-insensitively, with/without optional colon, across title, body, and every source commit message; accept only a standalone canonical `Closes #N` body line for complete chunks and a non-closing reference for progress chunks; compare provider identities by owner/repository plus issue number; verify exact references immediately after PR creation and before refresh admission and every approval/merge/closure path; use explicit safe merge subject/body, including squash; add table-driven syntax, negation/quote, foreign same-number issue, positive/negative, progress, missing/truncated-data, generated-merge-message, creation-readback, and provider-mismatch tests.
+
+## 3. Adversarial review and handoff
+
+- [ ] 3.1 Run independent mathematical/source-faithfulness, repository-boundary, abstraction/adoption, and controller-style reviews against one exact commit, revise only within the frozen files and three-round cap, and verify the ledger records all required roles against the final SHA.
+- [ ] 3.2 After all four reviews pass on one exact SHA, publish this controller's PR through the one-time owner-authorized procedure specified in design.md, not the stale protected-base mutation actions; wait for required hosted CI after PR creation, then re-read CI, exact local/remote/PR head, frozen paths, issue, title/body/commit messages, provider closure references, and protected-base freshness before merging with the frozen `squash` method, head match, and explicit safe subject/body. Verify the resulting merge/issue state. If CI fails, the cap is exhausted, or protected base moves without capacity, preserve evidence and stop without resetting the attempt.

@@ -333,13 +333,11 @@ results require `HomFiniteBounded`.
 #print axioms CategoryTheory.Triangulated.chiHom_additive_left
 #print axioms CategoryTheory.Triangulated.isTriangleAdditive_chiHom
 #print axioms CategoryTheory.Triangulated.chiRight
-#print axioms CategoryTheory.Triangulated.chiRight.congr_simp
 #print axioms CategoryTheory.Triangulated.chiRight_of
 #print axioms CategoryTheory.Triangulated.isTriangleAdditive_chiRight
 #print axioms CategoryTheory.Triangulated.chiK₀
 #print axioms CategoryTheory.Triangulated.chiK₀_of
 #print axioms CategoryTheory.Triangulated.chiK₀_of_of
-#print axioms CategoryTheory.Triangulated.chiK₀.congr_simp
 
 /-! ## A fully faithful k-linear functor preserves the Euler form
 

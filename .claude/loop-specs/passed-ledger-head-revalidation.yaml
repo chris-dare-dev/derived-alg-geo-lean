@@ -1,0 +1,116 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: passed-ledger-head-revalidation
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+# Superseded by #1473, which delivers #1469's goal (passed ledgers survive a
+# moved base, with bounded revalidation) and closes #1469. Kept as history.
+enabled: false
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: passed-ledger-head-revalidation
+  validation: cli-required
+  required_artifacts:
+    - .openspec.yaml
+    - proposal.md
+    - design.md
+    - tasks.md
+    - agent-observations.md
+    - specs/loop-engineering/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: true
+
+# This manifest remains enabled for preflight, ledger, and review work, but no
+# provider mutation may run while it protects its own controller change. The
+# reviewed controller bootstrap procedure handles that single publication.
+mutations:
+  comment_issue: false
+  close_issue: false
+  push_branch: false
+  create_pr: false
+  approve_pr: false
+  merge_pr: false
+
+issues:
+  - number: 1469
+    slug: passed-ledger-head-revalidation
+    depends_on: []
+    chunks:
+      - id: passed-ledger-head-revalidation
+        scope: >-
+          Add bounded passed-ledger revalidation for a rebased candidate after
+          protected-base movement. Preserve every old review, spend only the
+          next frozen round, fail closed on uncertain live state, and bind all
+          subsequent publication to the latest complete passing head.
+        requirements:
+          - New ledgers pin the protected base used for review
+          - Refreshing a passed candidate consumes one frozen review slot
+          - Revalidation preserves an append-only evidence chain
+          - Revalidation admission fails closed on repository or provider uncertainty
+          - Pending revalidation grants no shipping authority
+          - Revalidation remains bounded across repeated protected-base advances
+          - Pull-request issue links match the frozen closure mode exactly
+        files:
+          - scripts/loop_engine.py
+          - scripts/tests/test_loop_engine.py
+          - .claude/skills/run-loop/SKILL.md
+          - CONTRIBUTING.md
+          - docs/architecture/loop-engineering-friction.md
+        acceptance:
+          - >-
+            New ledgers pin the protected-base OID, and a real-Git legacy
+            fixture matching #928's needs-changes/pass/cap history revalidates
+            only through explicitly marked conservative ancestry inference;
+            the active DT1 ledger remains untouched.
+          - >-
+            Each protected-base advance consumes one adjacent preallocated
+            round, preserves all earlier records, rejects malformed or
+            uncertain local/provider evidence without changing ledger bytes,
+            and stops permanently at the original cap.
+          - >-
+            Push, PR, approval, merge, and close require the latest passing
+            reviewed head and current protected-base evidence; refreshed
+            existing PRs are reused only when their frozen closure mode,
+            branch, base, and old head match exactly.
+          - >-
+            Four independent reviewers record against the same exact final
+            SHA within at most three critique/revise rounds, with focused
+            controller tests, precheck, and required hosted CI passing.
+        closure: complete

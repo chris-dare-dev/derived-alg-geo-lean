@@ -57,9 +57,7 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms GradedModule.DegreeZeroLocalization.faceMap_awayMk
 -- Auto-generated, not hand-written: `awayMk` carries its membership certificate as a dependent
 -- argument, so the first `rw [coe_awayMk]` in this file makes Lean emit a congruence lemma for
--- it. It is a public declaration and the completeness ratchet counts it, so it is recorded here
--- rather than left to widen the unaudited gap.
-#print axioms GradedModule.DegreeZeroLocalization.awayMk.congr_simp
+-- it. The authored-declaration sweep filters this generated suffix, so it is not an audit record.
 -- The Laurent exponent of a monomial fraction (#491). awayMk_monomial_eq_iff_laurentExponent is
 -- the load-bearing one: it makes beta - m * gamma a complete invariant, so the monomial
 -- fractions of a twist are indexed by exponents rather than by representatives. The other two
@@ -108,9 +106,7 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 #print axioms MvPolynomial.tupleExponent_support_card_le
 #print axioms MvPolynomial.cechBlockProj_eq_zero_of_card_lt
 -- cechBlockProj and cechHomotopy now take the twist hypothesis, which is a Prop, so Lean emits
--- congruence lemmas for them; recorded here for the same reason AwayRep's projections are.
-#print axioms MvPolynomial.cechBlockProj.congr_simp
-#print axioms MvPolynomial.cechHomotopy.congr_simp
+-- congruence lemmas for them; the authored-declaration sweep filters these generated suffixes.
 -- Vanishing below the top degree, either sign (#568). The nonnegative companion is stronger
 -- where it applies -- no finiteness, every positive degree -- and is not a corollary.
 #print axioms AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_exactAt
@@ -320,11 +316,8 @@ open AlgebraicGeometry AlgebraicGeometry.Numerical
 -- n + d, so lowering the twist by e while raising the fraction degree by e is literally the
 -- same condition -- the zero branch of the zero-extension needs no separate treatment, and the
 -- sign of d never enters. Taking d = 0 gives A ~ A(-e), the negative twist #332 needs.
--- The two congruence lemmas elaboration generates for the integer-shift defs, audited rather
--- than filtered: this repo already lists `.congr_simp` records elsewhere, and DGCategory needs
--- them to reach ceiling 0, so the sweep must keep seeing them.
-#print axioms GradedModule.intShift.congr_simp
-#print axioms GradedModule.intShiftPiece.congr_simp
+-- The two congruence lemmas elaboration generates for the integer-shift defs have filtered
+-- generated suffixes, so the authored-declaration sweep does not include them in the audit.
 #print axioms GradedModule.DegreeZeroLocalization.mem_intShift_sub_natCast_add
 #print axioms GradedModule.DegreeZeroLocalization.mul_pow_mem_intShift
 #print axioms GradedModule.DegreeZeroLocalization.intShiftLowerLinearMap
@@ -1145,7 +1138,6 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Examples.rankOneW_le
 #print axioms Examples.lt_rankOnePB_dim
 #print axioms Examples.rankOneIdx
-#print axioms Examples.rankOneIdx.congr_simp
 #print axioms Examples.rankOnePB_basis_eq_pow
 #print axioms Examples.rankOneH_pow_mem_piece
 #print axioms Examples.rankOne_one_mem
