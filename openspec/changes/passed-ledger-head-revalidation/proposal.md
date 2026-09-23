@@ -1,5 +1,11 @@
 # Proposal
 
+> **Superseded by #1473.** That PR delivers this change's goal: a passed ledger survives a
+> moved protected base through change-bound review carry-over, with a bounded full-panel
+> revalidation when the change or its dependencies move. It also closes #1469. The manifest
+> `.claude/loop-specs/passed-ledger-head-revalidation.yaml` is disabled. Do not implement
+> the tasks below; this plan is kept as history.
+
 ## Why
 
 The loop controller can finish a passing review panel on an exact commit, then leave that work unpublishable when the protected base advances and a required rebase changes the head. The old pass must remain historical evidence, but the controller currently offers no safe, bounded way to review the new head without manually reopening or replacing the ledger.

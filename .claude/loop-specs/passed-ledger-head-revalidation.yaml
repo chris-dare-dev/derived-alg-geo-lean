@@ -6,7 +6,9 @@ remote: origin
 base_branch: main
 base_ref: origin/main
 mode: independent
-enabled: true
+# Superseded by #1473, which delivers #1469's goal (passed ledgers survive a
+# moved base, with bounded revalidation) and closes #1469. Kept as history.
+enabled: false
 allow_force_push: false
 state_dir: .loop-runs
 roadmap_gate: required
