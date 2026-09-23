@@ -84,6 +84,7 @@ issues:
           - Revalidation admission fails closed on repository or provider uncertainty
           - Pending revalidation grants no shipping authority
           - Revalidation remains bounded across repeated protected-base advances
+          - Pull-request issue links match the frozen closure mode exactly
         files:
           - scripts/loop_engine.py
           - scripts/tests/test_loop_engine.py
