@@ -1,0 +1,119 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: sf8-5-affine-kprojective-scheme-comparison
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: sf8-sf9-pilot
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/sf8-sf9-supported-moduli/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: true
+
+mutations:
+  comment_issue: false
+  close_issue: false
+  create_issue: false
+  push_branch: true
+  create_pr: true
+  ready_pr: true
+  approve_pr: false
+  merge_pr: true
+
+issues:
+  - number: 554
+    slug: sf8-5-affine-kprojective-scheme-comparison
+    depends_on: []
+    chunks:
+      - id: sf8-5-affine-kprojective-scheme-comparison
+        scope: >-
+          For every commutative-ring map R → S, descend the affine tilde and
+          underived scheme-module-pullback comparison through localization on
+          the full affine module K-projective derived locus. Do not construct a
+          replacement on all scheme-module complexes or claim an arbitrary
+          scheme-morphism result.
+        requirements:
+          - "Supported arbitrary derived pullbacks are constructed"
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineKProjectivePullback.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineNonflatDerivedObject.lean
+          - scripts/AlgebraicGeometryAudit/SchemeDerived.lean
+          - docs/architecture/loop-engineering-friction.md
+        acceptance:
+          - >-
+            A public natural isomorphism is proved for every commutative-ring
+            map R → S, from the affine K-projective derived locus to
+            DerivedCategory ((Spec S).Modules), the derived category of all
+            S-scheme-module sheaves. Its source applies actual degreewise
+            Scheme.Modules.pullback to the sheafification of K-projective
+            representatives and then localizes; its target is
+            affineKProjectiveDerivedPullback followed by the derived functor
+            induced by AlgebraicGeometry.tilde.functor S. It is not a functor
+            into the separate affine quasi-coherent derived category. The
+            comparison is post-localization, not only a chain-level
+            restatement.
+          - >-
+            No flatness hypothesis is added to the affine ring map. The
+            source remains KProjectiveDerivedCategory (ModuleCat R), not the
+            full derived category of all scheme-module sheaves.
+          - >-
+            Specialization to the displayed ZMod 2 representative composes
+            with the existing scheme-module H^-1 witness from PR #1471; the
+            new result does not assert a general left-derived-pullback
+            universal property or general K-flat existence.
+          - >-
+            The declarations have no sorry, admit, or new axiom; every new
+            public declaration is recorded in SchemeDerived.lean, with no
+            duplicate resolution or pullback carrier and no unrelated umbrella
+            change.
+          - >-
+            The PR is progress-only, refers to #554 without a closing keyword,
+            leaves #554 open, and does not select #522 or #525.
+          - >-
+            All four independent reviewers pass on the same commit, required
+            hosted CI succeeds, and controller merge validation passes before
+            publication or merge.
+        closure: progress
