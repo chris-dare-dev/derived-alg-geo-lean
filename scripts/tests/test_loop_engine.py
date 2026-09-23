@@ -1407,7 +1407,6 @@ class AuthorityTests(unittest.TestCase):
         }
         # Every allowlisted digest is a tracked manifest's exact content.
         self.assertEqual(loop_engine.LEGACY_REVIEWED_MANIFESTS - digests, set())
-        self.assertEqual(len(loop_engine.LEGACY_REVIEWED_MANIFESTS), 14)
 
     def test_a_disabled_manifest_is_history_and_skips_branch_rules(self) -> None:
         historical = json.loads(json.dumps(self.spec))

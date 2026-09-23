@@ -103,6 +103,7 @@ LEGACY_REVIEWED_MANIFESTS = frozenset(
         "0a22b5bdf3d841aa6bda71126233fb12c5a97166a10c04117e3792374b66cabf",  # sf8-5-nonflat-derived-effect
         "a00cfa7a3006a8354033e9ccc87b620fb707ec92f395bf920d2125c213c24d1e",  # sf8-5-tor-witness-comparison
         "69b451bac920101e28dff6c2f0c524f29f48146966ee9bdfc6a4e5ce0497606a",  # sf8-sf9-pilot
+        "315637cf2347791dce3abb9fdd1b57a6fcf83f63f5c0cb5ffab986ef9cb57419",  # rou1-919-rouquier-dimension (#1478)
     }
 )
 # A branch-authored run's frozen chunk may never touch its own authority, the
