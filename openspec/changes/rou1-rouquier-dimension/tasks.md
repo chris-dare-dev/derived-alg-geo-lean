@@ -32,9 +32,10 @@ actions use the loop controller.
   object attaining it; state finite witnesses as separate existentials.
 - [ ] 1.4 Document why `triangEnvelopeIter n` corresponds to Rouquier's
   `⟨G⟩_{n+1}` and why the dimension has no offset, citing the zeroth and
-  successor equations. Also identify `triangEnvelopeIter_add` as the matching
-  extension-composition equation under its additional `[IsTriangulated C]`
-  hypothesis, without adding that class to the dimension API.
+  successor equations. Also identify `triangEnvelopeIter_add` as a conditional
+  envelope-stage decomposition under `[IsTriangulated C]`, without adding that
+  class to the dimension API or claiming a generation-time composition law
+  (issue #920).
 - [ ] 1.5 Append every new public declaration to the dimension audit slice and add
   the new module to the nearest umbrella.
 

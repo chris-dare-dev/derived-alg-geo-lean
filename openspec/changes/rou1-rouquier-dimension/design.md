@@ -104,10 +104,11 @@ and the reason the zero-offset choice is intentional. It will also state that
 the infimum ranges over single objects rather than arbitrary object properties
 and does not supply a preselected object attaining its value; finite witness
 theorems remain separate existential statements. It will also cite
-`triangEnvelopeIter_add` as the extension-composition compatibility with this
-same `n + 1` convention, explicitly noting that this auxiliary equation
-requires `[IsTriangulated C]`; neither the Rouquier dimension API nor its
-zero-offset proof adds that stronger class.
+`triangEnvelopeIter_add` as a conditional decomposition of envelope stages
+under its additional `[IsTriangulated C]` hypothesis, without adding that
+class to the dimension API or treating the equation as a composition or
+subadditivity law for generation time; that law is outside #919 and belongs to
+#920.
 
 ### Audit and review
 

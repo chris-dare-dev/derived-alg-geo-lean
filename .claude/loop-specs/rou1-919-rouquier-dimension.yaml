@@ -92,7 +92,8 @@ issues:
             the zeroth/successor envelope indices and the conditional
             `triangEnvelopeIter_add` equation. The docstring explains that the
             latter requires `[IsTriangulated C]`, which is not a public API
-            hypothesis for Rouquier dimension.
+            hypothesis for Rouquier dimension and does not state a
+            generation-time composition or subadditivity law (issue #920).
           - >-
             The finite-bound, finite-dimension/strong-generator,
             classical-generator, and zero-stage characterisations compile
