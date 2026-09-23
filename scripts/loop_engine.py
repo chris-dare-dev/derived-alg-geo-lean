@@ -4,7 +4,9 @@
 This tool deliberately keeps the control plane small and explicit.  It validates
 an immutable batch specification, performs a read-only preflight, records
 independent reviews for frozen code chunks, and exposes remote mutations only
-when the specification enables the corresponding action.
+when an owner-controlled source authorizes them: a manifest merged to the
+default branch, or that branch's standing authority file.  A manifest written on a
+work branch travels with its PR and can narrow that authority, never widen it.
 
 The controller is not a substitute for mathematical or repository review.  It
 is the ledger and safety boundary that makes those reviews auditable and keeps
@@ -14,14 +16,20 @@ an unattended run from silently widening its scope.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+import loop_recovery
 
 try:
     import yaml
@@ -51,9 +59,102 @@ ACTION_TO_MUTATION = {
     "close": "close_issue",
     "push": "push_branch",
     "create-pr": "create_pr",
+    "ready": "ready_pr",
+    "follow-up": "create_issue",
     "approve": "approve_pr",
     "merge": "merge_pr",
 }
+MUTATION_KEYS = (
+    "comment_issue",
+    "close_issue",
+    "push_branch",
+    "create_pr",
+    "ready_pr",
+    "create_issue",
+    "approve_pr",
+    "merge_pr",
+)
+# Provider authority has owner-controlled sources only. The controller reads
+# them from the repository's default branch through the provider API, never
+# from a local ref, so a branch cannot grant itself an action; when the file is
+# absent every action is denied. A manifest merged to that branch keeps its own
+# reviewed grants. A manifest authored on a work branch can only narrow what
+# this file grants.
+STANDING_AUTHORITY_PATH = ".claude/loop-authority.yaml"
+STANDING_AUTHORITY_SCHEMA = "derived-alg-geo-lean.loop-authority/v1"
+# Manifests the owner reviewed and merged through a planning PR before plans
+# moved into work PRs, by content digest. Their explicit grants and policies
+# stand, except where the standing file explicitly revokes a grant. Merging a
+# manifest later confers nothing: a work PR ships its own manifest, so "on the
+# default branch" no longer means "reviewed by the owner".
+LEGACY_REVIEWED_MANIFESTS = frozenset(
+    {
+        "7d7fde4cef8154044665c68b8aee9a063fd19d9dd3f4b8af9aebfc3c53146ebd",  # aut1-570-doc-hygiene
+        "905e18f36e86c38742617c40cafdc910fa0cec5c4c935fcf665fbdfcd3c532c7",  # aut1-6-proper-discontinuity
+        "fc164af7f47d5946dcdd6bc889f716f70d56d7e018e8b60aa0adc2ec3d663ae8",  # dt1-928-exact-bifunctor-restriction
+        "48bf488268ca24e74f144146fd656eadc5b36279c0909f07a0b9fee051626421",  # dt1-m41
+        "27454f1dc3ece91abd73439046c64c5764aca571e2a98c712323b9b15ad1620e",  # sf11-1-followup
+        "cad0e7072175af28b924196c6241ba89d6d430a0d4bde1c4535c9bd9187c4a38",  # sf11-1-witnesses
+        "7d6b7d5fd602e815a9e1ede2d7ebcb871119e47c11dde63dbd58ffed96580184",  # sf11-2-locality
+        "87fe3f5891da1d935056d69282b3bc5b2b978a7704b6d8388e5c4e56d74bb38a",  # sf11-3-followup-v4-current
+        "633e71a729be7aab37432313aace624d9e2765632748a495ffd92832f8267863",  # sf11-3-theorem53
+        "161403899a361be7266a8f7b011928e90eea5525f0d37ed246a532ca2b8bd7d3",  # sf11-pilot
+        "3e6decf24291404867b90849dd84e75ea273a018b312c070fe38e12a4d522e3f",  # sf8-5-affine-resolution-pullback
+        "0a22b5bdf3d841aa6bda71126233fb12c5a97166a10c04117e3792374b66cabf",  # sf8-5-nonflat-derived-effect
+        "a00cfa7a3006a8354033e9ccc87b620fb707ec92f395bf920d2125c213c24d1e",  # sf8-5-tor-witness-comparison
+        "69b451bac920101e28dff6c2f0c524f29f48146966ee9bdfc6a4e5ce0497606a",  # sf8-sf9-pilot
+        "315637cf2347791dce3abb9fdd1b57a6fcf83f63f5c0cb5ffab986ef9cb57419",  # rou1-919-rouquier-dimension (#1478)
+    }
+)
+# A branch-authored run's frozen chunk may never touch its own authority, the
+# code that gates or hosts it, or the instructions later agents follow; those
+# change only through owner-reviewed PRs. Three things are covered:
+# - agent configuration and instructions (all of `.claude/`, `.agents/`,
+#   `.codex/`, `.mcp.json`, and every CLAUDE.md or AGENTS.md at any depth);
+# - the gates, hooks and CI (`scripts/`, `.github/`);
+# - the pins and the retired trust-guard surface.
+# Two exceptions: the run's own manifest, and the audit and census records
+# that new public declarations must extend.
+PROTECTED_PATH_PREFIXES = (
+    ".claude",
+    ".agents",
+    ".codex",
+    ".mcp.json",
+    ".github",
+    "scripts",
+    "exe",
+    "registry",
+    "lakefile.toml",
+    "lakefile.lean",
+    "lean-toolchain",
+    "lake-manifest.json",
+    "pins.json",
+    "CLAUDE.local.md",
+    "DerivedAlgGeoSweep.lean",
+    # Other runs' OpenSpec contracts and the accepted specs; a run's own
+    # change directory is exempt through its plan paths.
+    "openspec",
+    "docs/architecture/loop-recovery.md",
+)
+# Instructions at any depth, and git's own path-level behaviour: a
+# `.gitattributes` can hide a Lean diff from the reviewers as "binary".
+PROTECTED_BASENAMES = frozenset({"claude.md", "agents.md", ".gitattributes", ".gitmodules", ".gitignore"})
+# Records a maths chunk must extend. The audit and census slices take new
+# public declarations. RM-08 in the required `ci` check needs a closing PR to
+# advance its roadmap entry. The gates that judge both stay protected.
+UNPROTECTED_RECORD_RES = (
+    re.compile(r"scripts/[A-Za-z]+(?:Audit|Census)(?:\.lean|/[A-Za-z0-9_./-]+\.lean)?"),
+    re.compile(r"\.claude/roadmap(?:/[A-Za-z0-9_.-]+\.yaml)?"),
+)
+# Revalidation rounds re-review a passed change whose content moved (a rebase
+# that had to resolve a conflict, say). They need the full panel but do not
+# spend the critique/improve cap; this bounds how often a pass can be reopened.
+MAX_REVALIDATION_ROUNDS = 2
+# v1 hashed every artifact byte for byte, so ticking a task box or appending
+# the observation log invalidated a ledger. v2 hashes the contract instead.
+OPENSPEC_DIGEST_VERSION = 2
+LOG_ARTIFACT_NAMES = {"agent-observations.md"}
+TASK_CHECKBOX_RE = re.compile(r"^(\s*[-*+] )\[[ xX]\]", re.MULTILINE)
 ISSUE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BRANCH_RE = re.compile(r"^agent/[a-z0-9][a-z0-9._/-]*$")
 CLOSING_KEYWORD_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b", re.I)
@@ -71,7 +172,9 @@ PREDECESSOR_ATTESTATION_PREFIX = "<!-- derived-alg-geo-lean.loop-predecessor:v1 
 PREDECESSOR_ATTESTATION_SUFFIX = " -->"
 DEFAULT_MERGE_POLICY = {
     "method": "squash",
-    "delete_branch": False,
+    # A squash-merged branch left on the remote blocks the next run that plans
+    # the same `agent/<slug>` name: its commits are not ancestors of main.
+    "delete_branch": True,
     "allow_method_override": False,
     "allow_delete_branch_override": False,
     "allow_auto": False,
@@ -79,7 +182,7 @@ DEFAULT_MERGE_POLICY = {
 }
 
 
-class LoopError(RuntimeError):
+class LoopError(loop_recovery.RecoveryError, RuntimeError):
     """A user-actionable validation, ledger, or preflight error."""
 
 
@@ -88,7 +191,60 @@ def utc_now() -> str:
 
 
 def canonical_json(value: Any) -> str:
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    # YAML turns an unquoted date into a date object; stringify it rather than
+    # crash. No digest changes: such a value could not be serialized before.
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str)
+
+
+def is_legacy_manifest(spec: dict[str, Any]) -> bool:
+    return digest(spec) in LEGACY_REVIEWED_MANIFESTS
+
+
+def is_legacy_state(state: dict[str, Any]) -> bool:
+    return state.get("spec_digest") in LEGACY_REVIEWED_MANIFESTS
+
+
+def canonical_repo_path(path: str) -> str:
+    """Collapse the spellings one path can take: `./`, `//`, `\\`, a trailing slash."""
+
+    value = re.sub(r"/+", "/", path.replace("\\", "/"))
+    while value.startswith("./"):
+        value = value[2:]
+    return value.rstrip("/")
+
+
+def is_protected_path(path: str, exempt: Iterable[str] = ()) -> bool:
+    """True for a path a branch-authored run may not change.
+
+    `exempt` holds the run's own plan paths: its manifest and its OpenSpec
+    change directory, matched exactly as recorded. Everything else compares
+    case-insensitively, since on a case-insensitive checkout `Scripts/...` and
+    `scripts/...` are one file.
+    """
+
+    value = canonical_repo_path(path)
+    folded = value.casefold()
+    parts = value.split("/")
+    if ".." in parts or "." in parts:
+        return True
+    if folded.rsplit("/", 1)[-1] in PROTECTED_BASENAMES:
+        return True
+    for own in exempt:
+        own = canonical_repo_path(own)
+        if own and (value == own or value.startswith(own + "/")):
+            return False
+    if any(pattern.fullmatch(value) for pattern in UNPROTECTED_RECORD_RES):
+        return False
+    return any(
+        folded == prefix.casefold() or folded.startswith(prefix.casefold() + "/") for prefix in PROTECTED_PATH_PREFIXES
+    )
+
+
+def protected_paths(paths: Iterable[str], exempt: Iterable[str] = ()) -> list[str]:
+    """Return the paths a branch-authored run may not change."""
+
+    exempt = list(exempt)
+    return [path for path in paths if is_protected_path(path, exempt)]
 
 
 def digest(value: Any) -> str:
@@ -101,16 +257,48 @@ def openspec_change_dir(root: Path, spec: dict[str, Any]) -> Path:
     return ensure_inside(root, root / "openspec" / "changes" / change)
 
 
-def openspec_digest(root: Path, spec: dict[str, Any]) -> str:
-    """Hash the committed OpenSpec planning artifacts referenced by a run."""
+def has_openspec(spec: dict[str, Any]) -> bool:
+    """A single issue may be planned by its own body; OpenSpec is then absent."""
 
+    return spec.get("openspec") is not None
+
+
+def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DIGEST_VERSION) -> str:
+    """Hash planning content; the registered digest freezes it, not its Git path.
+
+    Version 2 freezes the contract and nothing else: task checkbox state and
+    append-only observation logs are progress records, and hashing them made
+    the bookkeeping the protocol asks for invalidate the review it recorded.
+    Version 1 remains available so ledgers written by it keep verifying.
+    """
+
+    if not has_openspec(spec):
+        return digest([])
     change_dir = openspec_change_dir(root, spec)
     openspec = require_mapping(spec.get("openspec"), "spec.openspec")
     parts: list[dict[str, str]] = []
     for relative in openspec["required_artifacts"]:
         path = ensure_inside(root, change_dir / relative)
-        parts.append({"path": relative, "content": path.read_text(encoding="utf-8")})
+        # Only the change's own top-level log and task list are progress
+        # records; a file of the same name under specs/ is contract.
+        if version >= 2 and relative in LOG_ARTIFACT_NAMES:
+            continue
+        content = path.read_text(encoding="utf-8")
+        if version >= 2 and relative == "tasks.md":
+            content = TASK_CHECKBOX_RE.sub(r"\1[ ]", content)
+        parts.append({"path": relative, "content": content})
     return digest(parts)
+
+
+def ledger_digest_version(state: dict[str, Any]) -> int:
+    """Ledgers written before v2 recorded no version and hashed with v1."""
+
+    version = state.get("openspec_digest_version", 1)
+    return version if isinstance(version, int) and not isinstance(version, bool) else 1
+
+
+def ledger_openspec_matches(root: Path, spec: dict[str, Any], state: dict[str, Any]) -> bool:
+    return state.get("openspec_digest") == openspec_digest(root, spec, ledger_digest_version(state))
 
 
 def validate_openspec_artifacts(root: Path, spec: dict[str, Any]) -> None:
@@ -121,6 +309,8 @@ def validate_openspec_artifacts(root: Path, spec: dict[str, Any]) -> None:
     runners that do not install npm tooling.
     """
 
+    if not has_openspec(spec):
+        return
     openspec_root = ensure_inside(root, root / "openspec")
     if not (openspec_root / "config.yaml").is_file():
         raise LoopError("openspec/config.yaml is missing; initialize OpenSpec before enabling a run")
@@ -232,6 +422,8 @@ def load_spec(path: Path, root: Path | None = None) -> dict[str, Any]:
         raise LoopError(f"specification does not exist: {path}") from exc
     except OSError as exc:
         raise LoopError(f"could not read specification {path}: {exc}") from exc
+    except yaml.YAMLError as exc:
+        raise LoopError(f"specification {path} is not valid YAML: {exc}") from exc
     if not isinstance(data, dict):
         raise LoopError("specification root must be a YAML mapping")
     validate_spec(data)
@@ -258,6 +450,87 @@ def require_bool(mapping: dict[str, Any], key: str, name: str) -> bool:
     if not isinstance(value, bool):
         raise LoopError(f"{name}.{key} must be a boolean")
     return value
+
+
+def manifest_mutations(spec: dict[str, Any]) -> dict[str, bool]:
+    """Return the manifest's own explicit provider grants and refusals."""
+
+    configured = spec.get("mutations", {})
+    if not isinstance(configured, dict):
+        raise LoopError("spec.mutations must be a mapping")
+    unknown = set(configured) - set(MUTATION_KEYS)
+    if unknown:
+        raise LoopError("spec.mutations has unsupported keys: " + ", ".join(sorted(unknown)))
+    for key, value in configured.items():
+        if not isinstance(value, bool):
+            raise LoopError(f"spec.mutations.{key} must be a boolean")
+    return dict(configured)
+
+
+def gh_not_found(result: subprocess.CompletedProcess[str]) -> bool:
+    detail = f"{result.stderr}\n{result.stdout}"
+    return "HTTP 404" in detail or "Not Found" in detail
+
+
+def read_owner_file(root: Path, spec: dict[str, Any], path: str) -> str | None:
+    """Read a file from the repository's default branch on the provider.
+
+    Local refs are writable by whoever runs the controller, including a
+    remote-tracking ref, so an owner-controlled file is read from the provider
+    itself. With no `ref`, the contents API serves the default branch.
+    """
+
+    result = run_command(
+        root,
+        ["gh", "api", "-H", "Accept: application/vnd.github.raw+json", f"repos/{spec['repository']}/contents/{path}"],
+    )
+    if result.returncode == 0:
+        return result.stdout
+    # A 404 means "absent" only when the repository itself is readable; an
+    # unreachable repository must not read as "no revocations".
+    if gh_not_found(result) and run_command(root, ["gh", "api", f"repos/{spec['repository']}"]).returncode == 0:
+        return None
+    detail = (result.stderr or result.stdout).strip()
+    raise LoopError(f"could not read {path} from {spec['repository']}'s default branch: {detail}")
+
+
+def standing_authority(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
+    """Return the owner's explicit standing grants and revocations; empty when absent."""
+
+    text = read_owner_file(root, spec, STANDING_AUTHORITY_PATH)
+    if text is None:
+        return {}
+    try:
+        data = yaml.safe_load(text)
+    except yaml.YAMLError as exc:
+        raise LoopError(f"{STANDING_AUTHORITY_PATH} on the base branch is not valid YAML: {exc}") from exc
+    if not isinstance(data, dict) or data.get("schema") != STANDING_AUTHORITY_SCHEMA:
+        raise LoopError(f"{STANDING_AUTHORITY_PATH} must declare schema {STANDING_AUTHORITY_SCHEMA!r}")
+    grants = data.get("mutations", {})
+    if not isinstance(grants, dict) or set(grants) - set(MUTATION_KEYS) or any(
+        not isinstance(value, bool) for value in grants.values()
+    ):
+        raise LoopError(f"{STANDING_AUTHORITY_PATH} mutations must map known actions to booleans")
+    return dict(grants)
+
+
+def effective_mutations(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
+    """Resolve provider authority for this manifest from owner-controlled sources.
+
+    A branch-authored manifest gets the standing grant, narrowed by its own
+    explicit `false`s. A legacy reviewed manifest keeps its explicit grants,
+    falls back to the standing grant for keys it omits, and yields to an
+    explicit standing `false`, which is the owner's kill switch for every run.
+    """
+
+    configured = manifest_mutations(spec)
+    standing = standing_authority(root, spec)
+    if is_legacy_manifest(spec):
+        return {
+            key: standing.get(key) is not False and configured.get(key, standing.get(key, False))
+            for key in MUTATION_KEYS
+        }
+    return {key: standing.get(key, False) and configured.get(key, True) for key in MUTATION_KEYS}
 
 
 def merge_policy(spec: dict[str, Any]) -> dict[str, Any]:
@@ -384,29 +657,30 @@ def validate_spec(spec: dict[str, Any]) -> None:
     predecessor_attestation_policy(spec)
     predecessor_prs(spec)
 
-    openspec = require_mapping(spec.get("openspec"), "spec.openspec")
-    change = require_string(openspec, "change", "spec.openspec")
-    if not ISSUE_ID_RE.fullmatch(change):
-        raise LoopError("spec.openspec.change must use lowercase kebab-case")
-    artifacts = openspec.get("required_artifacts")
-    if not isinstance(artifacts, list) or not artifacts or any(
-        not isinstance(artifact, str)
-        or not artifact.strip()
-        or Path(artifact).is_absolute()
-        or ".." in Path(artifact).parts
-        for artifact in artifacts
-    ):
-        raise LoopError("spec.openspec.required_artifacts must be non-empty safe relative paths")
-    if "proposal.md" not in artifacts or "design.md" not in artifacts or "tasks.md" not in artifacts:
-        raise LoopError("OpenSpec run references must include proposal.md, design.md, and tasks.md")
-    if not any(artifact.startswith("specs/") and artifact.endswith(".md") for artifact in artifacts):
-        raise LoopError("OpenSpec run references must include a delta under specs/")
-    validation_mode = openspec.get("validation", "structural")
-    if validation_mode not in {"structural", "cli-advisory", "cli-required"}:
-        raise LoopError("spec.openspec.validation must be structural, cli-advisory, or cli-required")
+    if has_openspec(spec):
+        openspec = require_mapping(spec.get("openspec"), "spec.openspec")
+        change = require_string(openspec, "change", "spec.openspec")
+        if not ISSUE_ID_RE.fullmatch(change):
+            raise LoopError("spec.openspec.change must use lowercase kebab-case")
+        artifacts = openspec.get("required_artifacts")
+        if not isinstance(artifacts, list) or not artifacts or any(
+            not isinstance(artifact, str)
+            or not artifact.strip()
+            or Path(artifact).is_absolute()
+            or ".." in Path(artifact).parts
+            for artifact in artifacts
+        ):
+            raise LoopError("spec.openspec.required_artifacts must be non-empty safe relative paths")
+        if "proposal.md" not in artifacts or "design.md" not in artifacts or "tasks.md" not in artifacts:
+            raise LoopError("OpenSpec run references must include proposal.md, design.md, and tasks.md")
+        if not any(artifact.startswith("specs/") and artifact.endswith(".md") for artifact in artifacts):
+            raise LoopError("OpenSpec run references must include a delta under specs/")
+        validation_mode = openspec.get("validation", "structural")
+        if validation_mode not in {"structural", "cli-advisory", "cli-required"}:
+            raise LoopError("spec.openspec.validation must be structural, cli-advisory, or cli-required")
 
-    limits = require_mapping(spec.get("limits"), "spec.limits")
-    min_issues = limits.get("min_issues", 2)
+    limits = require_mapping(spec.get("limits", {}), "spec.limits")
+    min_issues = limits.get("min_issues", 1)
     max_issues = limits.get("max_issues", 3)
     max_rounds = limits.get("max_review_rounds_per_chunk", MAX_ALLOWED_ROUNDS)
     for value, name in (
@@ -490,10 +764,12 @@ def validate_spec(spec: dict[str, Any]) -> None:
                 not isinstance(item, str) or not item.strip() for item in acceptance
             ):
                 raise LoopError(f"{chunk_name}.acceptance must be a non-empty list of statements")
-            requirements = chunk.get("requirements")
-            if not isinstance(requirements, list) or not requirements or any(
+            # Without OpenSpec the issue body is the specification, and the
+            # chunk's acceptance statements restate its definition of done.
+            requirements = chunk.get("requirements", None if has_openspec(spec) else [])
+            if not isinstance(requirements, list) or any(
                 not isinstance(item, str) or not item.strip() for item in requirements
-            ):
+            ) or (has_openspec(spec) and not requirements):
                 raise LoopError(f"{chunk_name}.requirements must name at least one OpenSpec requirement")
             closure = chunk.get("closure", "complete")
             if closure not in CHUNK_CLOSURES:
@@ -551,10 +827,8 @@ def validate_spec(spec: dict[str, Any]) -> None:
     if reviewer_spec.get("independent", True) is not True:
         raise LoopError("spec.review.independent must remain true")
 
-    mutations = require_mapping(spec.get("mutations"), "spec.mutations")
-    for action in ACTION_TO_MUTATION.values():
-        require_bool(mutations, action, "spec.mutations")
-    if predecessor_attestation_policy(spec)["emit"] and mutations["comment_issue"] is not True:
+    mutations = manifest_mutations(spec)
+    if predecessor_attestation_policy(spec)["emit"] and mutations.get("comment_issue") is False:
         raise LoopError(
             "spec.predecessor_attestation.emit requires spec.mutations.comment_issue=true"
         )
@@ -593,6 +867,147 @@ def validate_spec(spec: dict[str, Any]) -> None:
         if selected_dependencies:
             raise LoopError("independent mode cannot contain dependencies between selected issues")
 
+    if not is_legacy_manifest(spec) and spec["enabled"]:
+        # A branch-authored manifest cannot choose the base its change is
+        # measured against, nor scope its chunk over its own authority. A
+        # disabled manifest authorizes nothing and is kept only as history.
+        expected_base = f"{spec['remote']}/{base_branch}"
+        if base_ref != expected_base:
+            raise LoopError(f"spec.base_ref must be {expected_base!r}, the remote base branch")
+        for issue in issues:
+            for chunk in issue["chunks"]:
+                blocked = protected_paths(
+                    list(chunk["files"]) + list(chunk.get("lift_targets", [])),
+                    [f"openspec/changes/{spec['openspec']['change']}"] if has_openspec(spec) else [],
+                )
+                if blocked:
+                    raise LoopError(
+                        f"chunk {chunk['id']!r} names protected paths a run may not change: "
+                        + ", ".join(blocked)
+                    )
+
+    if "recovery" in spec:
+        loop_recovery.validate_policy(spec["recovery"])
+        if len(issues) != 1 or len(issues[0]["chunks"]) != 1:
+            raise LoopError("recovery requires one issue and one frozen chunk per objective")
+        if max_rounds != 3:
+            raise LoopError("recovery requires exactly three review rounds per attempt")
+
+
+def recovery_directory(root: Path) -> Path:
+    """Shared across worktrees: changing a checkout cannot replenish a budget."""
+    common = git(root, "rev-parse", "--git-common-dir")
+    return repo_path(root, common).resolve() / "loop-objectives"
+
+
+def recovery_registry(root: Path) -> list[tuple[Path, dict[str, Any]]]:
+    if not git(root, "rev-parse", "--git-common-dir", check=False):
+        return []
+    directory = recovery_directory(root)
+    records = []
+    for path in sorted(directory.glob("*.json")):
+        record = read_json_object(path)
+        if record.get("schema") != "loop-objective-registry/v1":
+            raise LoopError(f"invalid recovery registry record: {path}")
+        records.append((path, record))
+    return records
+
+
+def read_json_object(path: Path) -> dict[str, Any]:
+    def unique(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise LoopError(f"duplicate JSON field {key!r} in {path}")
+            result[key] = value
+        return result
+
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique)
+    except (OSError, ValueError) as exc:
+        raise LoopError(f"cannot read JSON object {path}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise LoopError(f"expected a JSON object: {path}")
+    return value
+
+
+def recovery_record(root: Path, spec: dict[str, Any]) -> tuple[Path, dict[str, Any]] | None:
+    policy = loop_recovery.validate_policy(spec["recovery"])
+    issue = spec["issues"][0]["number"]
+    for path, record in recovery_registry(root):
+        if record.get("repository", "").casefold() == spec["repository"].casefold() and (
+            record.get("issue") == issue or record.get("objective_id") == policy["objective_id"]
+        ):
+            if record.get("issue") != issue or record.get("objective_id") != policy["objective_id"]:
+                raise LoopError("registered objective identity cannot be renamed or moved to another issue")
+            return path, record
+    return None
+
+
+def validate_registered_state(record: dict[str, Any], state: dict[str, Any]) -> None:
+    root = Path(record["repo_root"])
+    spec = load_spec(Path(record["spec_path"]), root)
+    if "recovery" not in spec or digest(spec) != record["spec_digest"]:
+        raise LoopError("registered recovery manifest changed; a reset is not a migration")
+    if openspec_digest(root, spec, ledger_digest_version(state)) != record["openspec_digest"]:
+        raise LoopError("registered objective's frozen OpenSpec requirements changed")
+    if state.get("spec_digest") != record["spec_digest"] or state.get("spec_id") != spec["id"]:
+        raise LoopError("recovery ledger manifest binding changed")
+    if state.get("openspec_digest") != record["openspec_digest"]:
+        raise LoopError("recovery ledger OpenSpec binding changed")
+    if state.get("repo_root") != str(root):
+        raise LoopError("recovery ledger checkout changed")
+    issue = spec["issues"][0]
+    chunk = issue["chunks"][0]
+    expected = {key: chunk[key] for key in ("id", "scope", "files", "requirements", "acceptance")}
+    expected.update(lift_targets=chunk.get("lift_targets", []), closure=chunk.get("closure", "complete"))
+    if state.get("chunk") != expected or state.get("issue") != {"number": issue["number"], "slug": issue["slug"]}:
+        raise LoopError("recovery cannot change the original frozen selection")
+    if state.get("reviewers") != spec["review"]["reviewers"] or state.get("max_review_rounds") != 3:
+        raise LoopError("recovery cannot change the required panel or attempt cap")
+    if state.get("recovery", {}).get("policy") != loop_recovery.validate_policy(spec["recovery"]):
+        raise LoopError("recovery policy differs from its registered manifest")
+    loop_recovery.validate(state)
+
+
+def registered_state_at(path: Path) -> tuple[Path, dict[str, Any]] | None:
+    root_text = git(path.resolve().parent, "rev-parse", "--show-toplevel", check=False)
+    if not root_text:
+        return None
+    for registry_path, record in recovery_registry(Path(root_text)):
+        if Path(record["state_file"]).resolve() == path.resolve():
+            return registry_path, record
+    return None
+
+
+@contextlib.contextmanager
+def controller_lock(root: Path):
+    """Process locks are released on crash; no stale lock-file removal is needed."""
+    common = git(root, "rev-parse", "--git-common-dir", check=False)
+    if not common:
+        yield
+        return
+    lock_path = repo_path(root, common).resolve() / "loop-controller.lock"
+    with lock_path.open("a+b") as lock:
+        if os.name == "nt":  # pragma: no cover - Windows runners
+            import msvcrt
+            if lock.tell() == 0:
+                lock.write(b"\0")
+                lock.flush()
+            lock.seek(0)
+            msvcrt.locking(lock.fileno(), msvcrt.LK_LOCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            if os.name == "nt":  # pragma: no cover
+                lock.seek(0)
+                msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
 
 def issue_entry(spec: dict[str, Any], number: int) -> dict[str, Any]:
     for issue in spec["issues"]:
@@ -616,7 +1031,10 @@ def print_validation(path: Path, root: Path) -> int:
         print(f"FAIL spec {path}: {exc}")
         return 1
     print(f"PASS spec {spec['id']} ({path})")
-    print(f"  openspec change={spec['openspec']['change']} validation={spec['openspec'].get('validation', 'structural')}")
+    if has_openspec(spec):
+        print(f"  openspec change={spec['openspec']['change']} validation={spec['openspec'].get('validation', 'structural')}")
+    else:
+        print("  openspec=(none; the issue body is the specification)")
     print(f"  mode={spec['mode']} enabled={spec['enabled']} issues={len(spec['issues'])}")
     print(f"  reviewers={', '.join(spec['review']['reviewers'])}")
     advisors = spec["review"].get("advisors") or []
@@ -686,7 +1104,7 @@ def existing_prs(root: Path, repository: str) -> list[dict[str, Any]]:
             "--limit",
             "200",
             "--json",
-            "number,state,isDraft,headRefName,headRefOid,closingIssuesReferences",
+            "number,state,isDraft,headRefName,headRefOid,closingIssuesReferences,author",
         ],
     )
     if not isinstance(data, list):
@@ -710,6 +1128,31 @@ def issue_state(root: Path, repository: str, number: int) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise LoopError(f"gh issue view #{number} returned an unexpected response")
     return data
+
+
+def require_legacy_issue_open(root: Path, spec: dict[str, Any], number: int) -> None:
+    """A legacy manifest's reviewed grants apply only to the unfinished work it was reviewed for.
+
+    Several legacy manifests stay enabled after their issues closed, some with
+    administrator merge or `.github/` in scope; their grants must not be
+    reusable for new work.
+    """
+
+    if not is_legacy_manifest(spec):
+        return
+    state = str(issue_state(root, spec["repository"], number).get("state", "")).upper()
+    if state != "OPEN":
+        raise LoopError(
+            f"issue #{number} is {state or 'unknown'}; a legacy manifest's grants cover only its open issues"
+        )
+
+
+def issue_body_digest(root: Path, spec: dict[str, Any], number: int) -> str:
+    data = gh_json(root, ["issue", "view", str(number), "--repo", spec["repository"], "--json", "body"])
+    body = data.get("body") if isinstance(data, dict) else None
+    if not isinstance(body, str):
+        raise LoopError(f"issue #{number} has no readable body to serve as the specification")
+    return hashlib.sha256(body.encode("utf-8")).hexdigest()
 
 
 def predecessor_attestation_payload(
@@ -955,11 +1398,204 @@ def require_predecessor_prs(root: Path, spec: dict[str, Any]) -> list[dict[str, 
     return proofs
 
 
+def plan_paths(root: Path, spec_path: Path, spec: dict[str, Any]) -> list[str]:
+    """Repository-relative paths holding this run's plan: its manifest and OpenSpec change."""
+
+    paths: list[str] = []
+    try:
+        manifest = spec_path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        manifest = ""
+    # Only a manifest where manifests live is plan; `--spec` naming some other
+    # tracked file must not open that file to the PR.
+    if manifest.startswith(".claude/loop-specs/") and manifest.endswith(".yaml") and manifest.count("/") == 2:
+        paths.append(manifest)
+    if has_openspec(spec):
+        paths.append(f"openspec/changes/{spec['openspec']['change']}")
+    return paths
+
+
+def ledger_plan_paths(state: dict[str, Any]) -> list[str]:
+    """Plan paths a ledger recorded; older ledgers recorded none and gain none."""
+
+    recorded = state.get("plan_paths")
+    if isinstance(recorded, list) and all(isinstance(path, str) for path in recorded):
+        return list(recorded)
+    return []
+
+
+def ledger_manifest_path(state: dict[str, Any]) -> str | None:
+    return next((path for path in ledger_plan_paths(state) if path.startswith(".claude/loop-specs/")), None)
+
+
+def progress_record_paths(state: dict[str, Any]) -> list[str]:
+    """Plan files a run may keep editing after review: its task list and log.
+
+    Everything else in the plan, the manifest included, is part of the change
+    the panel reviewed and stays inside the content fingerprint.
+    """
+
+    change = state.get("openspec_change")
+    if not isinstance(change, str) or not change or not ledger_plan_paths(state):
+        return []
+    return [f"openspec/changes/{change}/tasks.md", f"openspec/changes/{change}/agent-observations.md"]
+
+
+def dirty_paths(root: Path) -> list[str]:
+    """Paths with uncommitted changes, untracked files included, renames split."""
+
+    result = run_command(
+        root, ["git", "status", "--porcelain=v1", "-z", "--untracked-files=all", "--no-renames"], check=True
+    )
+    return [entry[3:] for entry in result.stdout.split("\0") if len(entry) > 3]
+
+
+def is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
+    return run_command(root, ["git", "merge-base", "--is-ancestor", ancestor, descendant]).returncode == 0
+
+
+def change_fingerprint(root: Path, base_ref: str, commit: str, exclude: Iterable[str]) -> str:
+    """Hash what a commit changes relative to its merge base, not where it sits.
+
+    Rebasing a reviewed change onto a moved base, or merging the base into it,
+    alters the SHA but not the change. Line numbers and blob ids are dropped;
+    ten lines of context and each hunk's enclosing-declaration heading are
+    kept, so a change moved to another place in a file moves the fingerprint.
+    The excluded paths are progress records, not the reviewed change.
+    """
+
+    merge_base = git(root, "merge-base", base_ref, commit)
+    args = ["git", "diff", "--no-color", "--no-ext-diff", "--no-renames", "--binary", "-U10", merge_base, commit, "--", "."]
+    args.extend(f":(exclude){path}" for path in exclude)
+    diff = run_command(root, args, check=True).stdout
+    sections: list[str] = []
+    for section in re.split(r"(?m)^(?=diff --git )", diff):
+        if not section.strip():
+            continue
+        lines = [
+            re.sub(r"^@@ [^@]* @@", "@@", line)
+            for line in section.splitlines()
+            if not line.startswith("index ")
+        ]
+        sections.append("\n".join(lines))
+    return hashlib.sha256("\n".join(sorted(sections)).encode("utf-8")).hexdigest()
+
+
+def ensure_commit(root: Path, remote: str, commit: str) -> None:
+    """Make a provider-reported commit available locally before comparing it."""
+
+    if run_command(root, ["git", "cat-file", "-e", f"{commit}^{{commit}}"]).returncode == 0:
+        return
+    fetched = run_command(root, ["git", "fetch", "--no-tags", "--quiet", remote, commit])
+    if fetched.returncode != 0 or run_command(root, ["git", "cat-file", "-e", f"{commit}^{{commit}}"]).returncode != 0:
+        raise LoopError(f"commit {commit} is not available locally and could not be fetched from {remote}")
+
+
+def trusted_base_commit(root: Path, spec: dict[str, Any]) -> str:
+    """The base branch tip as the provider reports it, available locally.
+
+    Content equivalence is measured against this commit, not the manifest's
+    `base_ref` or a remote-tracking ref: both are writable by the run, and a
+    base placed at the candidate head would make every descendant of a reviewed
+    commit look unchanged.
+    """
+
+    data = gh_json(root, ["api", f"repos/{spec['repository']}/commits/{spec['base_branch']}"])
+    sha = data.get("sha") if isinstance(data, dict) else None
+    if not isinstance(sha, str) or not FULL_GIT_SHA_RE.fullmatch(sha):
+        raise LoopError(f"provider did not report a commit for base branch {spec['base_branch']!r}")
+    ensure_commit(root, spec["remote"], sha)
+    return sha
+
+
+def reviewed_content_matches(
+    root: Path, spec: dict[str, Any], state: dict[str, Any], reviewed_commit: str, head: str
+) -> bool:
+    """True when `head` is the reviewed commit or carries exactly its reviewed change.
+
+    Fails closed: a commit that cannot be fetched or compared does not match.
+    """
+
+    if not re.fullmatch(r"[0-9a-fA-F]{40}", head) or not re.fullmatch(r"[0-9a-fA-F]{7,40}", reviewed_commit):
+        return False
+    if head.lower() == reviewed_commit.lower():
+        return True
+    if len(reviewed_commit) < 40 and reviewed_commit_matches_head(root, reviewed_commit, head):
+        return True
+    try:
+        ensure_commit(root, spec["remote"], head)
+        ensure_commit(root, spec["remote"], reviewed_commit)
+        base = trusted_base_commit(root, spec)
+        exclude = progress_record_paths(state)
+        if change_fingerprint(root, base, reviewed_commit, exclude) != change_fingerprint(
+            root, base, head, exclude
+        ):
+            return False
+        for path in exclude:
+            if Path(path).name == "tasks.md" and normalized_tasks(root, reviewed_commit, path) != normalized_tasks(
+                root, head, path
+            ):
+                print("WARN task wording changed after review; only checkbox state may change")
+                return False
+        moved = base_changes_under_review(root, base, state, reviewed_commit, head)
+        if moved:
+            print(
+                "WARN the base changed files the reviewed change depends on ("
+                + ", ".join(moved[:5])
+                + "); run a revalidation round"
+            )
+            return False
+        return True
+    except LoopError as exc:
+        print(f"WARN could not compare {head} with reviewed {reviewed_commit}: {exc}")
+        return False
+
+
+def blob_at(root: Path, commit: str, path: str) -> str | None:
+    result = run_command(root, ["git", "show", f"{commit}:{path}"])
+    return result.stdout if result.returncode == 0 else None
+
+
+def normalized_tasks(root: Path, commit: str, path: str) -> str:
+    return TASK_CHECKBOX_RE.sub(r"\1[ ]", blob_at(root, commit, path) or "")
+
+
+LEAN_IMPORT_RE = re.compile(r"^(?:(?:public|private|meta)\s+)*import\s+(.+?)\s*$", re.MULTILINE)
+PIN_PATHS = ("lake-manifest.json", "lean-toolchain", "lakefile.toml")
+
+
+def base_changes_under_review(
+    root: Path, base: str, state: dict[str, Any], reviewed_commit: str, head: str
+) -> list[str]:
+    """Files the base changed between the two merge bases that the change leans on.
+
+    A clean rebase keeps the diff but can still change what it means, when the
+    base edits a reviewed file elsewhere, a module it imports, or the pins.
+    Only direct imports are followed; CI rebuilds everything else.
+    """
+
+    reviewed_base = git(root, "merge-base", base, reviewed_commit)
+    head_base = git(root, "merge-base", base, head)
+    if reviewed_base == head_base:
+        return []
+    changed = run_command(root, ["git", "diff", "--name-only", "--no-renames", reviewed_base, head_base], check=True)
+    watched = list(state.get("chunk", {}).get("files", [])) + authorized_lift_targets(state) + list(PIN_PATHS)
+    for path in state.get("chunk", {}).get("files", []):
+        if not path.endswith(".lean"):
+            continue
+        for match in LEAN_IMPORT_RE.finditer(blob_at(root, head, path) or ""):
+            for module in match.group(1).split():
+                watched.append(module.replace(".", "/") + ".lean")
+    return [path for path in changed.stdout.splitlines() if path and path_is_in_frozen_chunk(path, watched)]
+
+
 def roadmap_gate_args(base_ref: str) -> list[str]:
     """Scope roadmap consistency failures to entries authored after base_ref."""
 
     return [
-        "python",
+        # The interpreter running the controller, not whatever `python` means
+        # on this host: several hosts ship only `python3`.
+        sys.executable or "python3",
         "scripts/check_roadmap.py",
         "--require-api",
         f"--scope-to-diff={base_ref}",
@@ -981,14 +1617,27 @@ def preflight(root: Path, spec_path: Path) -> int:
     repository = spec["repository"]
     remote = spec["remote"]
     try:
-        status = git(root, "status", "--porcelain", "--untracked-files=all")
-        if status:
-            failures.append("worktree is dirty; unattended runs require a clean checkout")
+        # The plan (this manifest and its OpenSpec change) travels in the work
+        # PR, so it may be uncommitted or committed on this branch. Anything
+        # else uncommitted is unfinished work that does not belong to the run.
+        plan = plan_paths(root, spec_path, spec)
+        unplanned = [
+            path
+            for path in dirty_paths(root)
+            if not path_is_in_frozen_chunk(path, plan)
+        ]
+        if unplanned:
+            failures.append(
+                "worktree has uncommitted changes outside this run's plan: " + ", ".join(unplanned[:10])
+            )
         current_branch = git(root, "branch", "--show-current")
         current_head = git(root, "rev-parse", "HEAD")
         base_head = git(root, "rev-parse", "--verify", spec["base_ref"])
-        if current_head != base_head:
-            failures.append(f"HEAD {current_head} is not exactly {spec['base_ref']} ({base_head})")
+        if current_head != base_head and not is_ancestor(root, base_head, current_head):
+            failures.append(
+                f"HEAD {current_head} does not contain {spec['base_ref']} ({base_head}); "
+                f"rebase or merge {spec['base_ref']} into the work branch"
+            )
         if current_branch in {spec["base_branch"], ""}:
             failures.append("preflight must run from a detached or dedicated agent branch, not the protected base")
         remote_url = normalize_remote(git(root, "remote", "get-url", remote))
@@ -1012,24 +1661,16 @@ def preflight(root: Path, spec_path: Path) -> int:
         failures.append(str(exc))
 
     try:
-        protection = gh_json(
-            root,
-            [
-                "api",
-                f"repos/{repository}/branches/{spec['base_branch']}/protection/required_status_checks",
-            ],
-        )
-        protected_checks = set(protection.get("contexts") or [])
-        protected_checks.update(
-            item.get("context")
-            for item in protection.get("checks") or []
-            if isinstance(item, dict) and isinstance(item.get("context"), str)
-        )
+        protected_checks = protected_check_names(root, spec)
         missing_protection = set(spec["runner"]["required_checks"]) - protected_checks
         if missing_protection:
-            failures.append(
-                "base branch protection is missing required checks: "
+            # Branch protection is the live authority on required checks; a
+            # manifest naming a retired check must not stall the run.
+            warnings.append(
+                "manifest names checks branch protection no longer requires: "
                 + ", ".join(sorted(missing_protection))
+                + "; merge will require the live protected checks "
+                + (", ".join(sorted(protected_checks)) or "(none)")
             )
         else:
             print("PASS base branch protection: required checks are configured")
@@ -1053,7 +1694,14 @@ def preflight(root: Path, spec_path: Path) -> int:
         for dependency in issue.get("depends_on", [])
         if dependency in selected_numbers
     }
-    if spec["mode"] == "stack" and selected_dependencies and not spec["mutations"]["merge_pr"]:
+    merge_authorized = True
+    if spec["mode"] == "stack" and selected_dependencies:
+        try:
+            merge_authorized = effective_mutations(root, spec)["merge_pr"]
+        except LoopError as exc:
+            failures.append(str(exc))
+            merge_authorized = False
+    if spec["mode"] == "stack" and selected_dependencies and not merge_authorized:
         failures.append(
             "stack mode includes selected issue dependencies but mutations.merge_pr is false; "
             "enable merge explicitly or use independent issues"
@@ -1074,7 +1722,11 @@ def preflight(root: Path, spec_path: Path) -> int:
             if isinstance(label, dict)
         }
         forbidden = labels & {"blocked", "epic", "research", "type:spike"}
-        allow_epic_issues = set(spec.get("eligibility", {}).get("allow_epic_issues", []))
+        # An epic opt-in is an owner's eligibility decision; a branch-authored
+        # manifest cannot make it for itself.
+        allow_epic_issues = (
+            set(spec.get("eligibility", {}).get("allow_epic_issues", [])) if is_legacy_manifest(spec) else set()
+        )
         if "epic" in forbidden and number in allow_epic_issues:
             forbidden.remove("epic")
             print(f"PASS issue #{number}: epic label explicitly authorized by manifest")
@@ -1094,22 +1746,37 @@ def preflight(root: Path, spec_path: Path) -> int:
             if dependency_state.get("state") != "CLOSED":
                 failures.append(f"issue #{number} depends on open issue #{dependency}")
         expected_branch = f"agent/{issue['slug']}"
-        # The preflight is intentionally run on the exact clean head from
-        # `base_ref`, and the planned issue branch is the normal place to do
-        # that.  Rejecting that branch name made a valid loop state
-        # impossible: the controller required a dedicated branch while also
-        # rejecting the dedicated branch it had planned.  Existing-PR checks
-        # below still fail closed if the branch has already been used.
+        # An open PR on the planned branch is this run's own PR being resumed.
+        # A merged or closed one is history: refusing it made every branch
+        # name single-use, so each progress slice needed a new manifest.
         for pr in prs:
-            if pr.get("headRefName") == expected_branch:
-                failures.append(f"a PR already exists for planned branch {expected_branch} (#{pr.get('number')})")
+            own_branch = pr.get("headRefName") == expected_branch
+            if own_branch and pr.get("state") == "OPEN":
+                author = pr.get("author")
+                login = author.get("login") if isinstance(author, dict) else None
+                if login != spec["actor"]:
+                    failures.append(
+                        f"open PR #{pr.get('number')} on planned branch {expected_branch} is by {login!r}, "
+                        f"not the manifest actor {spec['actor']!r}"
+                    )
+                else:
+                    print(f"PASS resuming open PR #{pr.get('number')} on planned branch {expected_branch}")
             closing = pr.get("closingIssuesReferences") or []
             if any(reference.get("number") == number for reference in closing if isinstance(reference, dict)):
-                if pr.get("state") == "OPEN":
-                    failures.append(f"issue #{number} already has open PR #{pr.get('number')}")
+                if pr.get("state") == "OPEN" and not own_branch:
+                    failures.append(
+                        f"issue #{number} already has open PR #{pr.get('number')} "
+                        f"from another branch ({pr.get('headRefName')})"
+                    )
 
-    openspec_validation = spec["openspec"].get("validation", "structural")
-    if openspec_validation in {"cli-advisory", "cli-required"}:
+    openspec_validation = spec["openspec"].get("validation", "structural") if has_openspec(spec) else None
+    if openspec_validation is None:
+        print("PASS no OpenSpec change: the issue body and manifest acceptance are the specification")
+    elif openspec_validation in {"cli-advisory", "cli-required"} and shutil.which("openspec") is None:
+        # The structural check above already ran; a missing Node tool is a
+        # host gap to log, not a reason to stop an otherwise valid run.
+        warnings.append("OpenSpec CLI is not installed; structural validation passed and was used instead")
+    elif openspec_validation in {"cli-advisory", "cli-required"}:
         cli = run_command(root, ["openspec", "validate", spec["openspec"]["change"], "--strict", "--no-interactive"], check=False)
         if cli.returncode != 0:
             detail = (cli.stdout or cli.stderr).strip().splitlines()
@@ -1124,6 +1791,9 @@ def preflight(root: Path, spec_path: Path) -> int:
         print("PASS OpenSpec structural validation")
 
     roadmap_gate = spec.get("roadmap_gate", "required")
+    if roadmap_gate != "required" and not is_legacy_manifest(spec):
+        warnings.append(f"roadmap_gate {roadmap_gate!r} is owner policy; a branch-authored manifest runs it as required")
+        roadmap_gate = "required"
     if roadmap_gate != "disabled":
         roadmap = run_command(root, roadmap_gate_args(spec["base_ref"]), check=False)
         if roadmap.returncode != 0:
@@ -1142,7 +1812,7 @@ def preflight(root: Path, spec_path: Path) -> int:
             print(f"FAIL {failure}")
         print(f"PREFLIGHT FAIL ({len(failures)} failure(s))")
         return 1
-    print("PREFLIGHT PASS: clean base, authenticated provider, eligible issues, and gates are ready")
+    print("PREFLIGHT PASS: branch contains base, authenticated provider, eligible issues, and gates are ready")
     return 0
 
 
@@ -1210,7 +1880,7 @@ def require_selected_dependencies_passed(
             dependency_state = load_state(path)
             if (
                 dependency_state.get("spec_digest") != digest(spec)
-                or dependency_state.get("openspec_digest") != openspec_digest(root, spec)
+                or not ledger_openspec_matches(root, spec, dependency_state)
             ):
                 raise LoopError(
                     f"issue #{issue['number']} depends on a ledger for {dependency_chunk['id']!r} "
@@ -1235,6 +1905,12 @@ def require_selected_dependencies_passed(
 
 
 def load_state(path: Path) -> dict[str, Any]:
+    registered = registered_state_at(path)
+    if registered is not None:
+        _, record = registered
+        state = record["ledger"]
+        validate_registered_state(record, state)
+        return state
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError as exc:
@@ -1243,25 +1919,99 @@ def load_state(path: Path) -> dict[str, Any]:
         raise LoopError(f"could not read ledger state {path}: {exc}") from exc
     if not isinstance(data, dict) or data.get("schema") != f"{RUN_SCHEMA}/ledger":
         raise LoopError(f"invalid ledger state schema: {path}")
+    if "recovery" in data:
+        raise LoopError("recovery ledger is not at its registered canonical path")
+    root_text = git(path.resolve().parent, "rev-parse", "--show-toplevel", check=False)
+    if root_text:
+        for _, record in recovery_registry(Path(root_text)):
+            if data.get("issue", {}).get("number") == record.get("issue"):
+                raise LoopError("registered recovery objective cannot be accessed as a new legacy ledger")
     return data
 
 
 def write_json(path: Path, value: Any) -> None:
+    """Atomically persist canonical recovery state before its compatibility view."""
+    if isinstance(value, dict) and "recovery" in value:
+        registered = registered_state_at(path)
+        if registered is None:
+            raise LoopError("cannot write an unregistered recovery ledger")
+        registry_path, record = registered
+        validate_registered_state(record, value)
+        record["ledger"] = value
+        atomic_json(registry_path, record)
+    atomic_json(path, value)
+
+
+def atomic_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(json.dumps(value, indent=2, sort_keys=True) + "\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+
+
+def register_recovery(root: Path, spec_path: Path, spec: dict[str, Any], path: Path, state: dict[str, Any]) -> None:
+    policy = loop_recovery.validate_policy(spec["recovery"])
+    history = []
+    for entry in policy["history"]:
+        source = repo_path(root, entry["path"])
+        raw = source.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != entry["sha256"]:
+            raise LoopError(f"historical ledger digest mismatch: {source}")
+        history.append(read_json_object(source))
+    loop_recovery.initialize(state, policy, history=history)
+    registry_path = recovery_directory(root) / (digest([spec["repository"].casefold(), state["issue"]["number"]]) + ".json")
+    record = {
+        "schema": "loop-objective-registry/v1",
+        "repository": spec["repository"].casefold(),
+        "issue": state["issue"]["number"],
+        "objective_id": policy["objective_id"],
+        "repo_root": str(root.resolve()),
+        "state_file": str(path.resolve()),
+        "spec_path": str(spec_path.resolve()),
+        "spec_digest": digest(spec),
+        "openspec_digest": openspec_digest(root, spec, ledger_digest_version(state)),
+        "ledger": state,
+    }
+    validate_registered_state(record, state)
+    # The shared record owns the state; the user-facing path is a recoverable view.
+    atomic_json(registry_path, record)
+    atomic_json(path, state)
 
 
 def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, requested_state_dir: str | None) -> int:
     try:
         spec = load_spec(spec_path, root)
         issue, chunk = chunk_entry(spec, number, chunk_id)
+        require_legacy_issue_open(root, spec, number)
         predecessor_proofs = require_predecessor_prs(root, spec)
         require_selected_dependencies_passed(root, spec, issue, requested_state_dir)
         path = state_path(root, spec, requested_state_dir, chunk_id)
+        if "recovery" in spec:
+            registered = recovery_record(root, spec)
+            if registered is not None:
+                _, record = registered
+                if Path(record["state_file"]).resolve() != path.resolve() or record["spec_digest"] != digest(spec):
+                    raise LoopError("objective is already registered; changing path or manifest cannot reset it")
+                validate_registered_state(record, record["ledger"])
+                atomic_json(path, record["ledger"])
+                print(f"PASS recovery objective already initialized: {path}")
+                return 0
+        else:
+            for _, record in recovery_registry(root):
+                if record["repository"].casefold() == spec["repository"].casefold() and record["issue"] == number:
+                    raise LoopError("registered recovery objective cannot be restarted under a legacy manifest")
         refuse_renamed_ledger(root, spec, requested_state_dir, chunk_id, path)
         if path.exists():
             existing = load_state(path)
-            if existing.get("spec_digest") != digest(spec) or existing.get("openspec_digest") != openspec_digest(root, spec):
+            if existing.get("spec_digest") != digest(spec) or not ledger_openspec_matches(root, spec, existing):
                 raise LoopError(f"ledger already exists with a different spec: {path}")
             print(f"PASS ledger already initialized: {path}")
             return 0
@@ -1269,8 +2019,15 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
             "schema": f"{RUN_SCHEMA}/ledger",
             "spec_id": spec["id"],
             "spec_digest": digest(spec),
-            "openspec_change": spec["openspec"]["change"],
+            "openspec_change": spec["openspec"]["change"] if has_openspec(spec) else None,
             "openspec_digest": openspec_digest(root, spec),
+            "openspec_digest_version": OPENSPEC_DIGEST_VERSION,
+            "base_ref": spec["base_ref"],
+            "base_commit_at_init": pinned_base_commit({"repo_root": str(root), "base_ref": spec["base_ref"]}),
+            "plan_paths": plan_paths(root, spec_path, spec),
+            # Without OpenSpec the issue body is the specification; record
+            # which version of it the panel reviewed against.
+            "issue_body_digest": None if has_openspec(spec) else issue_body_digest(root, spec, number),
             "predecessor_prs": predecessor_proofs,
             "issue": {"number": issue["number"], "slug": issue["slug"]},
             "chunk": {
@@ -1290,10 +2047,15 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
             "created_at": utc_now(),
             "rounds": [],
         }
-        write_json(path, state)
+        if "recovery" in spec:
+            if path.exists():
+                raise LoopError("legacy state must be adopted through the manifest's pinned history inventory")
+            register_recovery(root, spec_path, spec, path, state)
+        else:
+            write_json(path, state)
         print(f"PASS ledger initialized: {path}")
         return 0
-    except LoopError as exc:
+    except (LoopError, loop_recovery.RecoveryError) as exc:
         print(f"FAIL ledger init: {exc}")
         return 1
 
@@ -1321,7 +2083,55 @@ def latest_round(state: dict[str, Any]) -> dict[str, Any] | None:
     return rounds[-1] if rounds else None
 
 
+def pinned_base_commit(state: dict[str, Any]) -> str | None:
+    """The base commit a round was reviewed against, for the audit trail.
+
+    Resolved locally, so it is evidence, not authority: publication measures
+    the change against the provider's base tip instead.
+    """
+
+    root, base_ref = state.get("repo_root"), state.get("base_ref")
+    if not root or not base_ref:
+        return None
+    result = run_command(Path(root), ["git", "rev-parse", "--verify", "--end-of-options", f"{base_ref}^{{commit}}"])
+    return result.stdout.strip() if result.returncode == 0 else None
+
+
+def is_revalidation(round_state: dict[str, Any]) -> bool:
+    return round_state.get("kind") == "revalidation"
+
+
+def improvement_rounds_used(state: dict[str, Any]) -> int:
+    """Rounds charged to the critique/improve cap; revalidations are not."""
+
+    return sum(1 for round_state in state.get("rounds", []) if not is_revalidation(round_state))
+
+
+def require_revalidation_needed(state: dict[str, Any], commit: str) -> None:
+    """Admit a revalidation only for a real, changed commit after a pass."""
+
+    passed = latest_round(state)
+    root_text = state.get("repo_root")
+    if passed is None or not root_text:
+        raise LoopError("ledger has no passing round or repository to revalidate against")
+    root = Path(root_text)
+    if run_command(root, ["git", "cat-file", "-e", f"{commit}^{{commit}}"]).returncode != 0:
+        raise LoopError(f"ledger is passed; commit {commit} is not a local commit to revalidate")
+    if reviewed_commit_matches_head(root, str(passed.get("commit", "")), git(root, "rev-parse", commit)):
+        raise LoopError("ledger is passed for this exact commit; no further review is needed")
+    # Whether a revalidation was necessary is the publication check's call,
+    # made against the provider's base; the ledger only bounds how often.
+    used = sum(1 for round_state in state.get("rounds", []) if is_revalidation(round_state))
+    if used >= MAX_REVALIDATION_ROUNDS:
+        raise LoopError(f"revalidation limit reached ({MAX_REVALIDATION_ROUNDS}); the passed change cannot be reopened again")
+
+
 def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
+    if "recovery" in state:
+        loop_recovery.reserve_round(state, commit)
+        if state["recovery"]["phase"] == "parked":
+            raise LoopError(state["recovery"]["park_reason"])
+        return state["rounds"][-1]
     current = latest_round(state)
     if current is not None and current.get("adjudication") is None:
         if current.get("commit") != commit:
@@ -1330,17 +2140,23 @@ def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
                 "adjudicate it before reviewing a different commit"
             )
         return current
-    next_number = (current.get("number", 0) + 1) if current else 1
-    if next_number > state["max_review_rounds"]:
+    revalidation = state.get("status") == "passed"
+    if revalidation:
+        require_revalidation_needed(state, commit)
+    elif improvement_rounds_used(state) + 1 > state["max_review_rounds"]:
         raise LoopError(
             "review round cap reached; no further critique/improve iteration is permitted"
         )
     current = {
-        "number": next_number,
+        "number": (current.get("number", 0) + 1) if current else 1,
         "commit": commit,
         "reviews": [],
         "adjudication": None,
     }
+    if revalidation:
+        current["kind"] = "revalidation"
+    if state.get("base_ref"):
+        current["base_commit"] = pinned_base_commit(state)
     state["rounds"].append(current)
     state["status"] = "reviewing"
     return current
@@ -1354,7 +2170,7 @@ CONTRACT_VERDICT_TOKENS = {
 }
 # Verdicts that let a chunk advance. `pass_with_lift` says the code under review
 # is correct AND that a generalization was found whose target lies outside the
-# frozen file list. It never consumes a review round.
+# frozen file list. Recovery mode charges every allocated panel, including lifts.
 PASSING_VERDICTS = {"pass", "pass_with_lift"}
 REVIEW_VERDICTS = set(CONTRACT_VERDICT_TOKENS)
 BACKLOG_PATH = "docs/architecture/generalization-backlog.md"
@@ -1374,7 +2190,7 @@ def read_reviewer_output(finding_file: Path) -> tuple[str, str]:
     if not text.strip():
         raise LoopError(
             f"reviewer output {str(finding_file)!r} is empty; "
-            "a round with no readable reviewer message is void, not a pass"
+            "an unreadable reviewer message cannot pass; retain any reserved round and retry the missing role"
         )
     return text, hashlib.sha256(text.encode("utf-8")).hexdigest()
 
@@ -1387,10 +2203,11 @@ def ledger_record_review(
     finding: str | None,
     finding_file: Path | None = None,
     lift_target: str | None = None,
+    resolutions_file: Path | None = None,
 ) -> int:
     try:
         state = load_state(state_file)
-        if state.get("status") in {"passed", "blocked"}:
+        if state.get("status") == "blocked" or (state.get("status") == "passed" and "recovery" in state):
             raise LoopError(f"ledger is terminal with status {state['status']!r}; no further reviews are allowed")
         if reviewer not in state["reviewers"]:
             raise LoopError(f"reviewer {reviewer!r} is not authorized by this ledger")
@@ -1420,6 +2237,16 @@ def ledger_record_review(
                     f"reviewer output does not state the recorded verdict {token}; "
                     "record the verdict the reviewer actually reached"
                 )
+        resolutions = {}
+        if "recovery" in state:
+            loop_recovery.validate_review(commit, verdict, finding_text)
+            if verdict == "pass_with_lift":
+                canonical_recovery_path(str(lift_target))
+            git(Path(state["repo_root"]), "cat-file", "-e", f"{commit}^{{commit}}")
+            if resolutions_file is not None:
+                resolutions = read_json_object(resolutions_file)
+        elif resolutions_file is not None:
+            raise LoopError("resolution evidence requires a recovery-managed objective")
         round_state["reviews"].append(
             {
                 "reviewer": reviewer,
@@ -1430,12 +2257,13 @@ def ledger_record_review(
                 "finding_source": str(finding_file) if finding_file is not None else "",
                 "lift_target": (lift_target or "").strip(),
                 "recorded_at": utc_now(),
+                **({"resolutions": resolutions} if "recovery" in state else {}),
             }
         )
         write_json(state_file, state)
         print(f"PASS review recorded: {reviewer} round={round_state['number']} commit={commit}")
         return 0
-    except LoopError as exc:
+    except (LoopError, loop_recovery.RecoveryError) as exc:
         print(f"FAIL ledger record-review: {exc}")
         return 1
 
@@ -1462,6 +2290,8 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
             raise LoopError(
                 "pass adjudication requires every reviewer verdict to be pass or pass_with_lift"
             )
+        if "recovery" in state and verdict in PASSING_VERDICTS:
+            require_recovery_lift_backlog(state)
         lifts = [
             item for item in current["reviews"] if item.get("verdict") == "pass_with_lift"
         ]
@@ -1478,7 +2308,7 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
             unrecorded = sorted(
                 str(item.get("lift_target"))
                 for item in lifts
-                if not backlog_records(state, str(item.get("lift_target")))
+                if "recovery" not in state and not backlog_records(state, str(item.get("lift_target")))
             )
             if unrecorded:
                 raise LoopError(
@@ -1502,7 +2332,7 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
                     + ". Re-dispatch the reviewer and record its verbatim message with "
                     "--finding-file, or adjudicate this round blocked"
                 )
-        if verdict == "needs_changes" and current["number"] >= state["max_review_rounds"]:
+        if verdict == "needs_changes" and improvement_rounds_used(state) >= state["max_review_rounds"]:
             verdict = "blocked"
             note = (note + " | " if note else "") + "review-round cap reached; stop without another iteration"
         current["adjudication"] = {"verdict": verdict, "note": note or "", "recorded_at": utc_now()}
@@ -1512,10 +2342,12 @@ def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
             "needs_changes": "improve_required",
             "blocked": "blocked",
         }[verdict]
+        if "recovery" in state:
+            loop_recovery.after_adjudication(state)
         write_json(state_file, state)
         print(f"PASS adjudicated: round={current['number']} verdict={verdict}")
         return 0
-    except LoopError as exc:
+    except (LoopError, loop_recovery.RecoveryError) as exc:
         print(f"FAIL ledger adjudicate: {exc}")
         return 1
 
@@ -1530,12 +2362,261 @@ def ledger_show(state_file: Path) -> int:
     return 0
 
 
-def authorize_action(spec: dict[str, Any], action: str) -> None:
+def recovery_command(
+    command: str, ledger: Path, *, commit: str | None = None,
+    file: Path | None = None, reason: str | None = None,
+) -> int:
+    state = load_state(ledger)
+    if "recovery" not in state:
+        raise LoopError("objective has no recovery policy; adopt history through a new configured manifest")
+    if command == "start-round":
+        root = Path(state["repo_root"])
+        if git(root, "rev-parse", "HEAD") != commit:
+            raise LoopError("reserve the exact current commit before dispatching its panel")
+        loop_recovery.reserve_round(state, str(commit))
+    elif command == "submit-plan":
+        loop_recovery.submit_plan(state, read_json_object(file))
+    elif command == "review-plan":
+        loop_recovery.review_plan(state, read_json_object(file))
+    elif command == "resume":
+        loop_recovery.resume(state)
+    elif command == "exhaust":
+        loop_recovery.abandon(state, str(reason))
+    elif command != "next":
+        raise LoopError(f"unknown recovery command: {command}")
+    if command != "next":
+        write_json(ledger, state)
+    print(json.dumps(loop_recovery.next_action(state), indent=2, sort_keys=True))
+    return 0
+
+
+def recovery_publication_state(root: Path, spec: dict[str, Any], ledger: Path | None = None) -> dict[str, Any] | None:
+    if "recovery" not in spec:
+        # A changed/legacy manifest is not a way around a registered objective.
+        selected = {item["number"] for item in spec["issues"]}
+        for _, record in recovery_registry(root):
+            if record["repository"].casefold() == spec["repository"].casefold() and record["issue"] in selected:
+                raise LoopError("registered recovery objective requires its original manifest")
+        return None
+    registered = recovery_record(root, spec)
+    if registered is None:
+        raise LoopError("recovery objective is not initialized")
+    _, record = registered
+    if record["spec_digest"] != digest(spec) or Path(record["repo_root"]).resolve() != root.resolve():
+        raise LoopError("publication must use the registered manifest and checkout")
+    canonical = Path(record["state_file"])
+    if ledger is not None and ledger.resolve() != canonical.resolve():
+        raise LoopError("publication ledger is not the registered objective")
+    state = load_state(canonical)
+    loop_recovery.require_publishable(state)
+    require_recovery_lift_backlog(state)
+    remote = normalize_remote(git(root, "remote", "get-url", spec["remote"]))
+    if remote != spec["repository"].lower():
+        raise LoopError("publication remote does not match the authorized repository")
+    return state
+
+
+def canonical_recovery_path(path: str) -> str:
+    value = path.rstrip("/")
+    if (not value or value.startswith("/") or "\\" in value or ":" in value
+            or any(part in {"", ".", ".."} for part in value.split("/"))):
+        raise LoopError(f"non-canonical recovery scope path: {path!r}")
+    return value
+
+
+def recovery_lift_reviews(state: dict[str, Any]) -> list[dict[str, Any]]:
+    envelope = state.get("recovery", {})
+    snapshots = [entry["snapshot"] for kind in ("history", "attempts")
+                 for entry in envelope.get(kind, [])] + [state]
+    return [review for snapshot in snapshots for row in snapshot.get("rounds", [])
+            for review in row["reviews"] if review.get("verdict") == "pass_with_lift"]
+
+
+def read_reviewed_text(root: Path, commit: str, path: str) -> str:
+    """Read an ordinary UTF-8 Git blob from an explicit reviewed commit only."""
+    if not re.fullmatch(r"[0-9a-f]{40}", commit) or git(root, "cat-file", "-t", commit) != "commit":
+        raise LoopError("reviewed artifact requires an exact commit object")
+    path = canonical_recovery_path(path)
+    tree = run_command(root, ["git", "ls-tree", "-z", commit, "--", path], check=True)
+    entries = [entry for entry in tree.stdout.split("\0") if entry]
+    if len(entries) != 1 or "\t" not in entries[0]:
+        raise LoopError(f"reviewed artifact is absent: {commit}:{path}")
+    metadata, actual_path = entries[0].split("\t", 1)
+    parts = metadata.split()
+    if actual_path != path or len(parts) != 3 or parts[0] not in {"100644", "100755"} or parts[1] != "blob":
+        raise LoopError(f"reviewed artifact must be an ordinary tracked file: {path}")
+    blob = subprocess.run(["git", "cat-file", "blob", parts[2]], cwd=root,
+                          capture_output=True, check=False)
+    if blob.returncode != 0:
+        raise LoopError(f"cannot read reviewed artifact: {commit}:{path}")
+    try:
+        text = blob.stdout.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise LoopError(f"reviewed artifact is not UTF-8 text: {path}") from exc
+    if "\0" in text:
+        raise LoopError(f"reviewed artifact contains binary text: {path}")
+    return text
+
+
+def recovery_backlog_targets(text: str) -> set[str]:
+    """Recognize complete column-zero backlog rows, not prose or examples.
+
+    Optional single backticks quote field values. Fenced code and HTML comments
+    carry no dispositions. Balanced single-line inline code is inert for HTML
+    detection (the canonical legend uses `<PR>` inside code). Other raw HTML is
+    unsupported and fails closed; this schema is not an HTML renderer.
+    Independent review still judges each row's substance.
+    """
+    required = {"chunk", "reviewing commit", "found by", "proposed ancestor", "weaker hypotheses", "state"}
+    targets: set[str] = set()
+    fields: dict[str, str] | None = None
+    invalid = False
+    fence: tuple[str, int] | None = None
+    previous_field: str | None = None
+
+    def finish() -> None:
+        if fields is None or invalid or not required.issubset(fields) or not all(fields[key] for key in required):
+            return
+        if not re.fullmatch(r"[0-9a-fA-F]{7,40}", fields["reviewing commit"]):
+            return
+        if not re.fullmatch(r"UNVERIFIED|(?:CONFIRMED|FALSIFIED) \S.*", fields["state"]):
+            return
+        try:
+            target = canonical_recovery_path(fields["proposed ancestor"])
+        except LoopError:
+            return
+        targets.add(target)
+
+    # Comments cannot contribute row fields. Other HTML is rejected below,
+    # outside fences, rather than guessing which containers hide their content.
+    text = re.sub(r"<!--.*?(?:-->|\Z)", "", text, flags=re.DOTALL)
+    for line in text.splitlines():
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+        if fence is not None:
+            if marker and marker[1][0] == fence[0] and len(marker[1]) >= fence[1] and not marker[2].strip():
+                fence = None
+            continue
+        if marker:
+            fence = (marker[1][0], len(marker[1]))
+            continue
+        html_source = re.sub(r"(?<![\\`])(`+)(?!`)(.*?)(?<!`)\1(?!`)", "", line)
+        if re.search(r"<(?:/?[A-Za-z][A-Za-z0-9:-]*(?=[\s/>]|$)|[!?])", html_source):
+            return set()
+        if re.match(r"^#{1,6}\s", line):
+            finish()
+            fields = {} if re.match(r"^###\s+\S", line) else None
+            invalid = False
+            previous_field = None
+            continue
+        match = re.match(r"^- ([a-z ]+):\s*(.*?)\s*$", line)
+        if fields is None or match is None:
+            if fields is not None and previous_field == "proposed ancestor" and line[:1].isspace() and line.strip():
+                invalid = True  # A descriptive continuation is not an exact target.
+            continue
+        key, value = match.groups()
+        previous_field = key
+        if key not in required:
+            continue
+        if key in fields:
+            invalid = True
+        if value.startswith("`") and value.endswith("`") and len(value) >= 2:
+            value = value[1:-1]
+        if "`" in value:
+            invalid = True
+        fields[key] = value
+    finish()
+    return targets
+
+
+def require_recovery_lift_backlog(state: dict[str, Any]) -> None:
+    """Bind every carried/current lift disposition to the reviewed Git tree."""
+    reviews = recovery_lift_reviews(state)
+    if not reviews:
+        return
+    current = latest_round(state)
+    if current is None or not state.get("repo_root"):
+        raise LoopError("recovery lift backlog requires a reviewed commit and repository")
+    text = read_reviewed_text(Path(state["repo_root"]), current["commit"], BACKLOG_PATH)
+    targets = recovery_backlog_targets(text)
+    missing = {str(review.get("lift_target") or "") for review in reviews
+               if not review.get("lift_target") or canonical_recovery_path(str(review["lift_target"])) not in targets}
+    if missing:
+        raise LoopError("recovery lift obligations are absent from the backlog: " + ", ".join(sorted(missing)))
+
+
+def require_unprotected(paths: Iterable[str], state: dict[str, Any]) -> None:
+    """Refuse a branch-authored run's change to its own authority or controller."""
+
+    if is_legacy_state(state):
+        return
+    blocked = protected_paths(paths, ledger_plan_paths(state))
+    if blocked:
+        raise LoopError("change touches protected paths a run may not modify: " + ", ".join(blocked))
+
+
+def require_no_links(root: Path, base: str, head: str, state: dict[str, Any]) -> None:
+    """Refuse symlinks and gitlinks a branch-authored change introduces.
+
+    Each is judged by its own path, but a symlink writes through to its target
+    on disk, and a later agent editing an ordinary-looking file would change a
+    protected one.
+    """
+
+    if is_legacy_state(state):
+        return
+    raw = run_command(root, ["git", "diff", "--raw", "--no-renames", "-z", f"{base}...{head}"], check=True).stdout
+    fields = raw.split("\0")
+    links = [
+        fields[index + 1]
+        for index in range(0, len(fields) - 1, 2)
+        if fields[index].startswith(":") and fields[index].split()[1] in {"120000", "160000"}
+    ]
+    if links:
+        raise LoopError("change adds symlinks or submodules, which a run may not introduce: " + ", ".join(links))
+
+
+def require_published_head_has_no_links(root: Path, spec: dict[str, Any], state: dict[str, Any], head: str) -> None:
+    if is_legacy_state(state):
+        return
+    ensure_commit(root, spec["remote"], head)
+    require_no_links(root, trusted_base_commit(root, spec), head, state)
+
+
+def recovery_scoped_paths(
+    root: Path, spec: dict[str, Any], state: dict[str, Any], head: str, base: str | None = None
+) -> None:
+    """Check a recovery change's paths against `base`, the provider's base tip at publication."""
+
+    safe = canonical_recovery_path
+
+    allowed = [safe(path) for path in state["chunk"]["files"]] + [safe(path) for path in ledger_plan_paths(state)]
+    lift_authority = [safe(path) for path in state["chunk"].get("lift_targets", [])]
+    for path in authorized_lift_targets(state):
+        value = safe(path)
+        if not any(value == prefix or value.startswith(prefix + "/") for prefix in lift_authority):
+            raise LoopError("review lift exceeds manifest path authority")
+        allowed.append(value)
+    result = run_command(
+        root, ["git", "diff", "--no-renames", "--name-only", "-z", f"{base or spec['base_ref']}...{head}"], check=True
+    )
+    changed = list(filter(None, result.stdout.split("\0")))
+    for path in changed:
+        value = safe(path)
+        if not any(value == prefix or value.startswith(prefix + "/") for prefix in allowed):
+            raise LoopError(f"changed path lies outside frozen recovery scope: {path}")
+    require_unprotected(changed, state)
+    require_no_links(root, base or spec["base_ref"], head, state)
+
+
+def authorize_action(root: Path, spec: dict[str, Any], action: str) -> None:
     if not spec["enabled"]:
         raise LoopError(f"spec {spec['id']} is disabled; enable it only after preflight review")
     mutation = ACTION_TO_MUTATION[action]
-    if spec["mutations"].get(mutation) is not True:
-        raise LoopError(f"remote action {action!r} is not enabled by spec.mutations.{mutation}")
+    if effective_mutations(root, spec).get(mutation) is not True:
+        raise LoopError(
+            f"remote action {action!r} is not authorized: neither a manifest merged to "
+            f"{spec['base_branch']} nor the base branch's {STANDING_AUTHORITY_PATH} grants {mutation}"
+        )
 
 
 def selected_issue_for_action(spec: dict[str, Any], number: int) -> dict[str, Any]:
@@ -1543,7 +2624,7 @@ def selected_issue_for_action(spec: dict[str, Any], number: int) -> dict[str, An
 
 
 def action_comment(root: Path, spec: dict[str, Any], number: int, body: str, dry_run: bool) -> int:
-    authorize_action(spec, "comment")
+    authorize_action(root, spec, "comment")
     selected_issue_for_action(spec, number)
     args = ["gh", "issue", "comment", str(number), "--repo", spec["repository"], "--body", body]
     if dry_run:
@@ -1562,8 +2643,13 @@ def action_close(
     comment: str | None,
     dry_run: bool,
 ) -> int:
-    authorize_action(spec, "close")
+    authorize_action(root, spec, "close")
+    if merged_pr is None and not is_legacy_manifest(spec):
+        raise LoopError("a branch-authored manifest closes issues only through a verified merged PR")
+    recovered = recovery_publication_state(root, spec)
     selected_issue_for_action(spec, number)
+    if recovered is not None and merged_pr is None:
+        raise LoopError("recovery issue closure requires the exact reviewed merged PR")
     if merged_pr is None and not spec["closure"]["allow_non_pr"]:
         raise LoopError("code issue closure requires --merged-pr; non-PR closure is disabled")
     if merged_pr is not None:
@@ -1576,7 +2662,7 @@ def action_close(
                 "--repo",
                 spec["repository"],
                 "--json",
-                "state,mergedAt,closingIssuesReferences",
+                "state,mergedAt,closingIssuesReferences,headRefName,headRefOid,baseRefName,body,files",
             ],
         )
         if pr.get("state") != "MERGED" or not pr.get("mergedAt"):
@@ -1584,6 +2670,10 @@ def action_close(
         closing = pr.get("closingIssuesReferences") or []
         if not any(reference.get("number") == number for reference in closing if isinstance(reference, dict)):
             raise LoopError(f"PR #{merged_pr} does not close issue #{number}; refusing to close it")
+        if recovered is not None:
+            require_pr_targets_base(pr, spec)
+            require_pr_matches_frozen_issue(pr, recovered)
+            verify_remote_chunk_files(pr, recovered)
     args = ["gh", "issue", "close", str(number), "--repo", spec["repository"]]
     if comment:
         args.extend(["--comment", comment])
@@ -1600,7 +2690,15 @@ def planned_branches(spec: dict[str, Any]) -> set[str]:
 
 
 def action_push(root: Path, spec: dict[str, Any], branch: str | None, force_with_lease: bool, dry_run: bool) -> int:
-    authorize_action(spec, "push")
+    authorize_action(root, spec, "push")
+    if force_with_lease and not is_legacy_manifest(spec):
+        raise LoopError("force-with-lease is not available to a branch-authored manifest")
+    recovery_state = recovery_publication_state(root, spec)
+    if recovery_state is not None:
+        head = git(root, "rev-parse", "HEAD")
+        if not reviewed_content_matches(root, spec, recovery_state, recovery_state["rounds"][-1]["commit"], head):
+            raise LoopError("push must publish the reviewed recovery change")
+        recovery_scoped_paths(root, spec, recovery_state, head, trusted_base_commit(root, spec))
     if git(root, "status", "--porcelain", "--untracked-files=all"):
         raise LoopError("refusing to push a dirty worktree; commit the frozen chunk first")
     current = git(root, "branch", "--show-current")
@@ -1609,12 +2707,21 @@ def action_push(root: Path, spec: dict[str, Any], branch: str | None, force_with
         raise LoopError(f"--branch {requested!r} does not match current branch {current!r}")
     if not BRANCH_RE.fullmatch(current) or current not in planned_branches(spec):
         raise LoopError(f"push branch must be one of the spec's dedicated agent branches; got {current!r}")
+    # Authority was read for spec.repository; the push must land there too.
+    # A remote may carry several push URLs and `git push` delivers to all.
+    for flags in (["--all"], ["--push", "--all"]):
+        for url in git(root, "remote", "get-url", *flags, spec["remote"]).splitlines():
+            target = normalize_remote(url)
+            if target != spec["repository"].lower():
+                raise LoopError(f"remote {spec['remote']!r} resolves to {target!r}, not {spec['repository']!r}")
     if force_with_lease and not spec.get("allow_force_push", False):
         raise LoopError("force-with-lease is disabled by the specification")
     args = ["git", "push"]
+    if recovery_state is not None:
+        args.extend(["--no-follow-tags"])
     if force_with_lease:
         args.append("--force-with-lease")
-    args.extend([spec["remote"], current])
+    args.extend([spec["remote"], f"HEAD:refs/heads/{current}" if recovery_state is not None else current])
     if dry_run:
         print("DRY-RUN " + " ".join(args))
         return 0
@@ -1654,6 +2761,14 @@ def authorized_lift_targets(state: dict[str, Any]) -> list[str]:
     declared = state.get("chunk", {}).get("lift_targets") or []
     if not declared:
         return []
+    if "recovery" in state:
+        # Preserve requests across attempts, but never import broader historical
+        # authority than the current frozen manifest actually grants.
+        requested = [canonical_recovery_path(str(review["lift_target"]))
+                     for review in recovery_lift_reviews(state) if review.get("lift_target")]
+        return [prefix for prefix in declared
+                if any(path_is_in_frozen_chunk(target, [canonical_recovery_path(prefix)])
+                       for target in requested)]
     requested = [
         str(item.get("lift_target"))
         for round_state in state.get("rounds", [])
@@ -1668,7 +2783,8 @@ def authorized_lift_targets(state: dict[str, Any]) -> list[str]:
 
 
 def chunk_allowed_paths(state: dict[str, Any]) -> list[str]:
-    return list(state["chunk"]["files"]) + authorized_lift_targets(state)
+    # The plan travels in the same PR as the code it plans.
+    return list(state["chunk"]["files"]) + authorized_lift_targets(state) + ledger_plan_paths(state)
 
 
 def path_is_in_frozen_chunk(path: str, allowed_prefixes: Iterable[str]) -> bool:
@@ -1730,6 +2846,8 @@ def verify_local_chunk_files(root: Path, spec: dict[str, Any], state: dict[str, 
     changed = [line.strip() for line in result.stdout.splitlines() if line.strip()]
     if not changed:
         raise LoopError("frozen chunk has no committed file changes relative to the protected base")
+    require_unprotected(changed, state)
+    require_no_links(root, base_ref, "HEAD", state)
     allowed = chunk_allowed_paths(state)
     outside = [path for path in changed if not path_is_in_frozen_chunk(path, allowed)]
     if outside:
@@ -1749,10 +2867,23 @@ def verify_local_chunk_files(root: Path, spec: dict[str, Any], state: dict[str, 
 
 
 def verify_remote_chunk_files(pr: dict[str, Any], state: dict[str, Any]) -> None:
+    if "recovery" in state:
+        root = Path(state["repo_root"])
+        records = [record for _, record in recovery_registry(root)
+                   if record["objective_id"] == state["recovery"]["policy"]["objective_id"]]
+        if len(records) != 1:
+            raise LoopError("unregistered recovery publication")
+        spec = load_spec(Path(records[0]["spec_path"]), root)
+        head = str(pr.get("headRefOid") or "")
+        if not reviewed_content_matches(root, spec, state, state["rounds"][-1]["commit"], head):
+            raise LoopError("remote PR head does not carry the reviewed recovery change")
+        recovery_scoped_paths(root, spec, state, head, trusted_base_commit(root, spec))
+        return
     files = pr.get("files") or []
     paths = [file.get("path") for file in files if isinstance(file, dict) and isinstance(file.get("path"), str)]
     if not paths:
         raise LoopError("PR has no readable changed-file list; refusing to approve an unbound chunk")
+    require_unprotected(paths, state)
     outside = [path for path in paths if not path_is_in_frozen_chunk(path, chunk_allowed_paths(state))]
     if outside:
         raise LoopError("PR contains files outside the frozen list: " + ", ".join(outside))
@@ -1792,6 +2923,13 @@ def require_pr_matches_frozen_issue(pr: dict[str, Any], state: dict[str, Any]) -
         raise LoopError(f"PR body does not match the frozen {closure!r} closure: {exc}") from exc
 
 
+def require_recovery_remote_head(root: Path, spec: dict[str, Any], branch: str, commit: str) -> None:
+    remote = gh_json(root, ["api", f"repos/{spec['repository']}/git/ref/heads/{branch}"])
+    obj = remote.get("object") if isinstance(remote, dict) else None
+    if not isinstance(obj, dict) or obj.get("sha") != commit:
+        raise LoopError("remote branch must contain the exact reviewed recovery commit before PR creation")
+
+
 def action_create_pr(
     root: Path,
     spec: dict[str, Any],
@@ -1802,9 +2940,19 @@ def action_create_pr(
     draft: bool,
     dry_run: bool,
 ) -> int:
-    authorize_action(spec, "create-pr")
+    authorize_action(root, spec, "create-pr")
+    recovered = recovery_publication_state(root, spec, ledger_file)
+    local_head = ""
+    if recovered is not None:
+        local_head = git(root, "rev-parse", "HEAD")
+        if not reviewed_content_matches(root, spec, recovered, recovered["rounds"][-1]["commit"], local_head):
+            raise LoopError("PR creation requires the reviewed recovery change")
+        if git(root, "status", "--porcelain", "--untracked-files=all"):
+            raise LoopError("PR creation requires a clean frozen checkout")
+        recovery_scoped_paths(root, spec, recovered, local_head, trusted_base_commit(root, spec))
     require_predecessor_prs(root, spec)
     issue = selected_issue_for_action(spec, number)
+    require_legacy_issue_open(root, spec, number)
     current = git(root, "branch", "--show-current")
     expected = f"agent/{issue['slug']}"
     if current != expected:
@@ -1814,7 +2962,7 @@ def action_create_pr(
         raise LoopError("PR ledger issue does not match the requested issue")
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("PR ledger was created from a different run manifest")
-    if state.get("openspec_digest") != openspec_digest(root, spec):
+    if not ledger_openspec_matches(root, spec, state):
         raise LoopError("OpenSpec artifacts changed after ledger initialization; reinitialize the frozen chunk")
     if state.get("status") == "blocked":
         raise LoopError("cannot create a PR from a blocked chunk ledger")
@@ -1822,6 +2970,8 @@ def action_create_pr(
     body = read_body_file(root, body_file)
     chunk_closure = state.get("chunk", {}).get("closure", "complete")
     validate_pr_body_closure(body, number, chunk_closure)
+    if recovered is not None:
+        require_recovery_remote_head(root, spec, current, local_head)
     args = [
         "gh",
         "pr",
@@ -1842,7 +2992,19 @@ def action_create_pr(
     if dry_run:
         print("DRY-RUN " + " ".join(args))
         return 0
-    run_command(root, args, check=True)
+    created = run_command(root, args, check=True)
+    if recovered is not None:
+        url = created.stdout.strip()
+        # GitHub creates by branch name, not a compare-and-swap SHA. Detect a
+        # concurrent remote update and prohibit subsequent approval/closure.
+        try:
+            pr = gh_json(root, ["pr", "view", url, "--repo", spec["repository"],
+                                "--json", "headRefName,headRefOid,baseRefName,body,files"])
+            require_pr_targets_base(pr, spec)
+            require_pr_matches_frozen_issue(pr, recovered)
+            verify_remote_chunk_files(pr, recovered)
+        except (LoopError, loop_recovery.RecoveryError) as exc:
+            raise LoopError(f"PR was created at {url}, but its recovery binding failed; do not approve or close: {exc}") from exc
     print(f"PASS PR created for issue #{number}")
     return 0
 
@@ -1857,7 +3019,8 @@ def action_attest_pr(
 ) -> int:
     """Write one durable, controller-derived predecessor marker to a source PR."""
 
-    authorize_action(spec, "comment")
+    authorize_action(root, spec, "comment")
+    recovery_publication_state(root, spec, ledger_file)
     if not predecessor_attestation_policy(spec)["emit"]:
         raise LoopError("spec.predecessor_attestation.emit is false; refusing to emit an unused marker")
     predecessor_proofs = require_predecessor_prs(root, spec)
@@ -1867,7 +3030,7 @@ def action_attest_pr(
         raise LoopError("attestation ledger issue does not match the requested issue")
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("attestation ledger was created from a different run manifest")
-    if state.get("openspec_digest") != openspec_digest(root, spec):
+    if not ledger_openspec_matches(root, spec, state):
         raise LoopError("OpenSpec artifacts changed after ledger initialization; refusing to attest")
     current = latest_round(state)
     if state.get("status") != "passed" or current is None:
@@ -1891,9 +3054,10 @@ def action_attest_pr(
     require_pr_targets_base(pr, spec)
     require_pr_matches_frozen_issue(pr, state)
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
-    if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
-        raise LoopError("PR head does not match the commit reviewed by the passing ledger")
+    if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
+        raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
+    require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     payload = predecessor_attestation_from_state(state, pr["headRefOid"])
     matches = matching_predecessor_attestations(pr.get("comments"), payload, spec["actor"])
     if len(matches) == 1:
@@ -1911,7 +3075,113 @@ def action_attest_pr(
     return 0
 
 
-def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> None:
+def action_ready(root: Path, spec: dict[str, Any], pr_number: int, ledger_file: Path, dry_run: bool) -> int:
+    """Mark a draft PR ready once the panel has passed the change it carries."""
+
+    authorize_action(root, spec, "ready")
+    recovery_publication_state(root, spec, ledger_file)
+    state = load_state(ledger_file)
+    if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
+        raise LoopError("ledger was created from a different run manifest")
+    if not ledger_openspec_matches(root, spec, state):
+        raise LoopError("OpenSpec artifacts changed after ledger initialization; reinitialize the frozen chunk")
+    current = latest_round(state)
+    if state.get("status") != "passed" or current is None or current.get(
+        "adjudication", {}
+    ).get("verdict") not in PASSING_VERDICTS:
+        raise LoopError("marking a PR ready requires a passing review ledger")
+    pr = gh_json(
+        root,
+        [
+            "pr",
+            "view",
+            str(pr_number),
+            "--repo",
+            spec["repository"],
+            "--json",
+            "headRefName,headRefOid,state,isDraft,baseRefName,body,files",
+        ],
+    )
+    if pr.get("state") != "OPEN":
+        raise LoopError("only an open PR can be marked ready")
+    require_pr_targets_base(pr, spec)
+    require_pr_matches_frozen_issue(pr, state)
+    if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
+        raise LoopError("PR head does not carry the change reviewed by the passing ledger")
+    verify_remote_chunk_files(pr, state)
+    require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
+    if pr.get("isDraft") is False:
+        print(f"PASS PR already ready for review: #{pr_number}")
+        return 0
+    args = ["gh", "pr", "ready", str(pr_number), "--repo", spec["repository"]]
+    if dry_run:
+        print("DRY-RUN " + " ".join(args))
+        return 0
+    run_command(root, args, check=True)
+    print(f"PASS PR marked ready for review: #{pr_number}")
+    return 0
+
+
+def action_follow_up(
+    root: Path,
+    spec: dict[str, Any],
+    parent: int,
+    title: str,
+    body_file: str,
+    labels: list[str],
+    dry_run: bool,
+) -> int:
+    """File a follow-up issue for work a run found but must not absorb.
+
+    A deferred finding, a stale dependency, an out-of-scope lift: each becomes
+    tracked work linked to the selected issue and its milestone, instead of a
+    reason to stop and ask.
+    """
+
+    authorize_action(root, spec, "follow-up")
+    selected_issue_for_action(spec, parent)
+    if not title.strip():
+        raise LoopError("follow-up issue title must not be empty")
+    body = read_body_file(root, body_file).rstrip() + f"\n\nFollow-up of #{parent} (filed by loop run `{spec['id']}`).\n"
+    parent_issue = gh_json(
+        root, ["issue", "view", str(parent), "--repo", spec["repository"], "--json", "milestone"]
+    )
+    milestone = parent_issue.get("milestone") if isinstance(parent_issue, dict) else None
+    args = ["gh", "issue", "create", "--repo", spec["repository"], "--title", title, "--body", body]
+    if isinstance(milestone, dict) and isinstance(milestone.get("title"), str) and milestone["title"]:
+        args.extend(["--milestone", milestone["title"]])
+    for label in labels:
+        args.extend(["--label", label])
+    if dry_run:
+        print("DRY-RUN " + " ".join(args[:7]) + " <body> " + " ".join(args[9:]))
+        return 0
+    created = run_command(root, args, check=True)
+    print(f"PASS follow-up issue created: {created.stdout.strip()}")
+    return 0
+
+
+def protected_check_names(root: Path, spec: dict[str, Any]) -> set[str]:
+    protection = gh_json(
+        root,
+        [
+            "api",
+            f"repos/{spec['repository']}/branches/{spec['base_branch']}/protection/required_status_checks",
+        ],
+    )
+    if not isinstance(protection, dict):
+        raise LoopError("branch protection returned an unexpected response")
+    names = {name for name in protection.get("contexts") or [] if isinstance(name, str)}
+    names.update(
+        item["context"]
+        for item in protection.get("checks") or []
+        if isinstance(item, dict) and isinstance(item.get("context"), str)
+    )
+    return names
+
+
+def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> str:
+    """Require green checks and return the PR head they were read for."""
+
     data = gh_json(
         root,
         ["pr", "view", str(pr_number), "--repo", spec["repository"], "--json", "headRefOid,statusCheckRollup"],
@@ -1931,7 +3201,20 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> N
             latest[name] = check
     missing: list[str] = []
     failed: list[str] = []
-    for required in spec["runner"]["required_checks"]:
+    # Branch protection is the live list of required checks. A manifest check
+    # still counts when the PR actually runs it; a name that neither the
+    # protection nor the PR knows was retired after the manifest was written.
+    try:
+        live = protected_check_names(root, spec)
+    except LoopError:
+        live = set()
+    # With no live list, a manifest check that has not started must not drop out.
+    required_names = (
+        live | {name for name in spec["runner"]["required_checks"] if name in latest}
+        if live
+        else set(spec["runner"]["required_checks"])
+    )
+    for required in sorted(required_names):
         check = latest.get(required)
         if check is None:
             missing.append(required)
@@ -1946,6 +3229,7 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> N
         if failed:
             detail.append("not successful " + ", ".join(failed))
         raise LoopError("required checks are not green: " + "; ".join(detail))
+    return str(data.get("headRefOid") or "")
 
 
 def action_approve(
@@ -1956,12 +3240,13 @@ def action_approve(
     body: str,
     dry_run: bool,
 ) -> int:
-    authorize_action(spec, "approve")
+    authorize_action(root, spec, "approve")
+    recovery_publication_state(root, spec, ledger_file)
     predecessor_proofs = require_predecessor_prs(root, spec)
     state = load_state(ledger_file)
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("ledger was created from a different run manifest")
-    if state.get("openspec_digest") != openspec_digest(root, spec):
+    if not ledger_openspec_matches(root, spec, state):
         raise LoopError("OpenSpec artifacts changed after ledger initialization; reinitialize the frozen chunk")
     if state.get("status") != "passed":
         raise LoopError(f"ledger status is {state.get('status')!r}; approval requires status 'passed'")
@@ -1985,9 +3270,10 @@ def action_approve(
     require_pr_targets_base(pr, spec)
     require_pr_matches_frozen_issue(pr, state)
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
-    if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
-        raise LoopError("PR head does not match the commit reviewed by the passing ledger")
+    if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
+        raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
+    require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     check_required_checks(root, spec, pr_number)
     args = [
         "gh",
@@ -2070,30 +3356,25 @@ def action_merge(
     delete_branch: bool | None,
     dry_run: bool,
 ) -> int:
-    authorize_action(spec, "merge")
+    authorize_action(root, spec, "merge")
+    if admin and not is_legacy_manifest(spec):
+        raise LoopError("administrator merge is never available to a branch-authored manifest")
+    recovery_publication_state(root, spec, ledger_file)
     predecessor_proofs = require_predecessor_prs(root, spec)
     merge_policy(spec)
     state = load_state(ledger_file)
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("merge ledger was created from a different run manifest")
-    if state.get("openspec_digest") != openspec_digest(root, spec):
+    if not ledger_openspec_matches(root, spec, state):
         raise LoopError("OpenSpec artifacts changed after ledger initialization; refusing to merge")
     if state.get("status") != "passed":
         raise LoopError("merge requires a passing review ledger")
     current = latest_round(state)
     if current is None or current.get("adjudication", {}).get("verdict") not in PASSING_VERDICTS:
         raise LoopError("merge requires a passing adjudicated review round")
-    args = build_merge_command(
-        spec,
-        pr_number,
-        current["commit"],
-        method,
-        auto,
-        admin,
-        delete_branch,
-    )
-    if not admin:
-        check_required_checks(root, spec, pr_number)
+    # Refuse a disallowed method, auto or admin request before any provider call.
+    build_merge_command(spec, pr_number, str(current["commit"]), method, auto, admin, delete_branch)
+    checked_head = None if admin else check_required_checks(root, spec, pr_number)
     pr = gh_json(
         root,
         [
@@ -2111,12 +3392,18 @@ def action_merge(
     require_pr_targets_base(pr, spec)
     require_pr_matches_frozen_issue(pr, state)
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
-    if not reviewed_commit_matches_head(root, current.get("commit", ""), pr.get("headRefOid", "")):
-        raise LoopError("PR head does not match the commit reviewed by the passing ledger")
+    if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
+        raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(pr, state)
+    require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     if predecessor_attestation_policy(spec)["emit"]:
         payload = predecessor_attestation_from_state(state, pr["headRefOid"])
         require_exact_predecessor_attestation(pr, payload, spec["actor"], pr_number)
+    if isinstance(checked_head, str) and checked_head and checked_head.lower() != str(pr.get("headRefOid", "")).lower():
+        raise LoopError("PR head moved between the check read and verification; rerun the merge")
+    # Pin the head just verified to carry the reviewed change: a push after
+    # this point makes the provider refuse the merge instead of landing it.
+    args = build_merge_command(spec, pr_number, str(pr["headRefOid"]), method, auto, admin, delete_branch)
     if dry_run:
         print("DRY-RUN " + " ".join(args))
         return 0
@@ -2164,6 +3451,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="module or path the generalization belongs in; required with pass_with_lift",
     )
     record_parser.add_argument("--finding", help="one-line summary; not evidence and cannot stand alone")
+    record_parser.add_argument("--resolutions-file", type=Path, help="JSON evidence map for every inherited recovery finding")
     record_parser.add_argument(
         "--finding-file",
         type=Path,
@@ -2177,6 +3465,18 @@ def build_parser() -> argparse.ArgumentParser:
     adjudicate_parser.add_argument("--note")
     show_parser = ledger_sub.add_parser("show")
     show_parser.add_argument("--state", required=True, type=Path)
+
+    recovery_parser = sub.add_parser("recovery", help="dispatch bounded research and resume the same objective")
+    recovery_sub = recovery_parser.add_subparsers(dest="recovery_command", required=True)
+    for command in ("next", "start-round", "submit-plan", "review-plan", "resume", "exhaust"):
+        child = recovery_sub.add_parser(command)
+        child.add_argument("--ledger", required=True, type=Path)
+        if command == "start-round":
+            child.add_argument("--commit", required=True)
+        if command in {"submit-plan", "review-plan"}:
+            child.add_argument("--file", required=True, type=Path)
+        if command == "exhaust":
+            child.add_argument("--reason", required=True)
 
     action_parser = sub.add_parser("action", help="perform an explicitly authorized remote action")
     action_sub = action_parser.add_subparsers(dest="action_command", required=True)
@@ -2212,6 +3512,20 @@ def build_parser() -> argparse.ArgumentParser:
     attest_parser.add_argument("--pr", required=True, type=int)
     attest_parser.add_argument("--ledger", required=True, type=Path)
     attest_parser.add_argument("--dry-run", action="store_true")
+    ready_parser = action_sub.add_parser("ready", help="mark a draft PR ready once its ledger passes")
+    add_common_spec_parser(ready_parser)
+    ready_parser.add_argument("--pr", required=True, type=int)
+    ready_parser.add_argument("--ledger", required=True, type=Path)
+    ready_parser.add_argument("--dry-run", action="store_true")
+    follow_up_parser = action_sub.add_parser(
+        "follow-up", help="file a follow-up issue linked to a selected issue and its milestone"
+    )
+    add_common_spec_parser(follow_up_parser)
+    follow_up_parser.add_argument("--issue", required=True, type=int, help="the selected parent issue")
+    follow_up_parser.add_argument("--title", required=True)
+    follow_up_parser.add_argument("--body-file", required=True)
+    follow_up_parser.add_argument("--label", action="append", default=[])
+    follow_up_parser.add_argument("--dry-run", action="store_true")
     approve_parser = action_sub.add_parser("approve")
     add_common_spec_parser(approve_parser)
     approve_parser.add_argument("--pr", required=True, type=int)
@@ -2233,10 +3547,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: list[str] | None = None) -> int:
-    force_utf8_output()
-    parser = build_parser()
-    args = parser.parse_args(argv)
+def dispatch(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     try:
         if args.command == "validate":
             root = args.repo_root.resolve()
@@ -2257,11 +3568,16 @@ def main(argv: list[str] | None = None) -> int:
                     args.finding,
                     args.finding_file.resolve() if args.finding_file else None,
                     args.lift_target,
+                    args.resolutions_file,
                 )
             if args.ledger_command == "adjudicate":
                 return ledger_adjudicate(args.state.resolve(), args.verdict, args.note)
             if args.ledger_command == "show":
                 return ledger_show(args.state.resolve())
+        if args.command == "recovery":
+            return recovery_command(args.recovery_command, args.ledger.resolve(),
+                commit=getattr(args, "commit", None), file=getattr(args, "file", None),
+                reason=getattr(args, "reason", None))
         if args.command == "action":
             root = args.repo_root.resolve()
             spec = load_spec(repo_path(root, args.spec), root)
@@ -2291,6 +3607,12 @@ def main(argv: list[str] | None = None) -> int:
                     args.ledger.resolve(),
                     args.dry_run,
                 )
+            if args.action_command == "ready":
+                return action_ready(root, spec, args.pr, args.ledger.resolve(), args.dry_run)
+            if args.action_command == "follow-up":
+                return action_follow_up(
+                    root, spec, args.issue, args.title, args.body_file, args.label, args.dry_run
+                )
             if args.action_command == "approve":
                 return action_approve(root, spec, args.pr, args.ledger.resolve(), args.body, args.dry_run)
             if args.action_command == "merge":
@@ -2305,7 +3627,7 @@ def main(argv: list[str] | None = None) -> int:
                     args.delete_branch,
                     args.dry_run,
                 )
-    except LoopError as exc:
+    except (LoopError, loop_recovery.RecoveryError) as exc:
         print(f"FAIL {exc}")
         return 1
     except (OSError, ValueError, TypeError) as exc:
@@ -2313,6 +3635,22 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     parser.error("unhandled command")
     return 2
+
+
+def main(argv: list[str] | None = None) -> int:
+    force_utf8_output()
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    root = getattr(args, "repo_root", None)
+    if root is None:
+        ledger = getattr(args, "state", None) or getattr(args, "ledger", None)
+        root = ledger.resolve().parent if ledger else Path.cwd()
+    try:
+        with controller_lock(root.resolve()):
+            return dispatch(args, parser)
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(f"FAIL controller: {exc}")
+        return 1
 
 
 if __name__ == "__main__":

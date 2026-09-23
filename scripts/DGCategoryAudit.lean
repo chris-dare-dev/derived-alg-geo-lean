@@ -98,7 +98,6 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGCategory.prod_dgComp_apply
 #print axioms CategoryTheory.DGCategory.prod_dgId
 #print axioms CategoryTheory.DGCategory.shiftComp
-#print axioms CategoryTheory.DGCategory.shiftComp.congr_simp
 #print axioms CategoryTheory.DGCategory.shiftComp_apply
 #print axioms CategoryTheory.DGCategory.shiftComp_assoc
 #print axioms CategoryTheory.DGCategory.shiftComp_dgId_left
@@ -114,7 +113,6 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGCategory.toDGCategoryStruct
 #print axioms CategoryTheory.DGCategoryStruct
 #print axioms CategoryTheory.DGCategoryStruct.dgComp
-#print axioms CategoryTheory.DGCategoryStruct.dgComp.congr_simp
 #print axioms CategoryTheory.DGCategoryStruct.dgHom
 #print axioms CategoryTheory.DGCategoryStruct.dgId
 #print axioms CategoryTheory.DGFunctor
@@ -257,7 +255,6 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.coboundary_comp_mem
 #print axioms CategoryTheory.cocycles
 #print axioms CategoryTheory.compRight
-#print axioms CategoryTheory.compRight.congr_simp
 #print axioms CategoryTheory.compRight_apply
 #print axioms CategoryTheory.compRight_comm
 #print axioms CategoryTheory.comp_coboundary_mem
@@ -304,7 +301,6 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.IsPretriangulated.shiftObj
 #print axioms CategoryTheory.IsPretriangulated.shiftWitness
 #print axioms CategoryTheory.IsShiftBy.comp'
-#print axioms CategoryTheory.IsShiftBy.comp'.congr_simp
 #print axioms CategoryTheory.IsShiftBy.comp'_assoc_hom
 #print axioms CategoryTheory.IsShiftBy.comp'_hom
 #print axioms CategoryTheory.IsShiftBy.comp'_inv

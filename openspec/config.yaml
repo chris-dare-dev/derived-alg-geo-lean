@@ -16,8 +16,11 @@ context: |
   The repository has a separate bounded loop controller in
   scripts/loop_engine.py. It owns issue selection, mutation authorization, and
   the review ledger; OpenSpec owns the proposal, requirements, design, and task
-  artifacts. A run must not widen a frozen chunk or silently skip a required
-  reviewer.
+  artifacts when a change exists. A single issue may be planned by its own body
+  instead. A run must not widen a frozen chunk or silently skip a required
+  reviewer. Inside an unattended run, planning is a step of the run, not a
+  separate session: write the artifacts, then continue into implementation
+  without waiting for a new request.
 
 rules:
   proposal:
@@ -31,7 +34,8 @@ rules:
   design:
     - Record ownership, dependency direction, projection/comparison maps, diamond-instance agreement, and import boundaries.
     - "Include the three adversarial review lenses: mathematical/source faithfulness, repository boundary, and abstraction/adoption."
-    - State how the design avoids churn and what happens after the fifth review/improve round.
+    - Set at most three review/improve rounds per attempt for new work; preserve historical manifests unchanged.
+    - State whether bounded recovery is enabled and how exhaustion schedules research, independent plan review, finding inheritance and eventual parking.
   tasks:
     - Keep each task small enough to be reviewed as a frozen chunk with an explicit file list and acceptance statement.
     - Every task MUST include its verification command or observable check.
@@ -40,9 +44,12 @@ rules:
 operations:
   apply:
     guidance:
-      - Work only from the checked-in OpenSpec artifacts and the active loop manifest; do not invent new scope in code.
+      - Work only from the issue, the OpenSpec artifacts and the active loop manifest; do not invent new scope in code.
+      - Tick task checkboxes and append agent-observations.md as work proceeds; the ledger's plan digest ignores both.
+      - Resolve an unclear task by taking the smallest reading that meets the definition of done and recording it; do not pause for confirmation.
       - Keep the mathematical, repository-boundary, abstraction, and style reviews independent on the same commit.
-      - Stop after at most five review/improve rounds for one frozen chunk and record the stop in the ledger.
+      - Preserve exhausted attempts; for opted-in recovery consume the controller's next action automatically, within the same scope and cumulative budget.
+      - Require independent acceptance of the exact research plan before resuming; research acceptance never satisfies implementation review or provider permissions.
   archive:
     guidance:
       - Archive only after OpenSpec validation, repository gates, and the bounded adversarial ledger all pass.

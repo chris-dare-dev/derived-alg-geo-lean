@@ -1,0 +1,96 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: issue-1394-audit-record-cleanup-publication
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: agent/issue-1394-plan
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs/issue-1394-audit-record-cleanup-publication
+roadmap_gate: disabled
+
+openspec:
+  change: issue-1394-audit-record-cleanup
+  validation: cli-required
+  required_artifacts:
+    - .openspec.yaml
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/audit-record-integrity/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: false
+
+mutations:
+  comment_issue: false
+  close_issue: true
+  push_branch: true
+  create_pr: true
+  approve_pr: false
+  merge_pr: true
+
+issues:
+  - number: 1394
+    slug: issue-1394-audit-record-cleanup
+    depends_on: []
+    chunks:
+      - id: issue-1394-audit-record-cleanup
+        scope: "For issue #1394, remove the compiler-generated axiom audit records excluded by the current authored-declaration sweep, preserve authored eq_* records accepted by the #998 fix, and account for two same-class .mk records added after the issue was filed."
+        requirements:
+          - Filtered compiler artifacts are absent from the axiom audits
+        files:
+          - .claude/loop-specs/issue-1394-audit-record-cleanup.yaml
+          - openspec/changes/issue-1394-audit-record-cleanup/.openspec.yaml
+          - openspec/changes/issue-1394-audit-record-cleanup/proposal.md
+          - openspec/changes/issue-1394-audit-record-cleanup/design.md
+          - openspec/changes/issue-1394-audit-record-cleanup/tasks.md
+          - openspec/changes/issue-1394-audit-record-cleanup/specs/audit-record-integrity/spec.md
+          - scripts/DGCategoryAudit.lean
+          - scripts/AlgebraicGeometryAudit/Core.lean
+          - scripts/AlgebraicGeometryAudit/GeometricLedgers.lean
+          - scripts/AlgebraicGeometryAudit/ModulePullbackStalk.lean
+          - scripts/AlgebraicGeometryAudit/Moduli.lean
+          - scripts/AlgebraicGeometryAudit/SheafStability.lean
+          - scripts/AlgebraicGeometryAudit/StabilityConditionFamilies.lean
+          - scripts/StabilityConditionAudit/ConstantSheafPullback.lean
+          - scripts/StabilityConditionAudit/Families.lean
+          - scripts/StabilityConditionAudit/Foundation.lean
+          - scripts/StabilityConditionAudit/FourierMukai.lean
+          - scripts/StabilityConditionAudit/GroupAction.lean
+          - scripts/StabilityConditionAudit/PhaseTopology.lean
+          - scripts/StabilityConditionAudit/SupportWalls.lean
+          - scripts/StabilityConditionAudit/TStructureCore.lean
+        acceptance:
+          - "Remove exactly 36 .congr_simp and 9 .mk records; preserve the 20 .eq_ records that resolve in EnumDecls.lean."
+          - "After the named audit build, a fresh declaration sweep and check_audit_complete.py report 10 AlgebraicGeometry, 0 StabilityCondition, and 0 DGCategory unresolved records, with all three counts at their recorded ceilings."
+          - "The named audit targets and scripts/precheck.sh pass; the remaining unresolved AlgebraicGeometry records stay visible and no baseline or public Lean API changes."

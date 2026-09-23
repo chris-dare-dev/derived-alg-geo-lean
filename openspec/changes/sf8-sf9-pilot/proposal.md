@@ -28,11 +28,18 @@ handoff between issues explicit before the loop is enabled.
   `CategoryTheory.Tor` API. The Tor statement is about the displayed affine
   example only; it does not supply arbitrary derived pullback, K-flat
   resolutions, or relative-perfect preservation.
+- Add a fourth explicitly marked #554 progress chunk that compares the actual
+  underived scheme-module pullback of the sheafified two-term free resolution
+  with the sheafification of its scalar extension and carries the example's
+  nonzero `H⁻¹` to scheme-module sheaves. This is a degreewise representative
+  calculation, not a `LeftDerivedPullback` or a K-flat-resolution result.
 - Execute each outstanding #554 progress chunk through its own one-issue
   independent manifest, with a distinct branch name and a bounded adversarial
   review cap. The merged witness/effect chunks are historical and must not be
   replayed. Keep #522 and #525 out of those runs: they remain a later
-  post-closure stack, not a false consequence of a progress PR.
+  post-closure stack, not a false consequence of a progress PR. The affine
+  scheme-module pullback comparison remains a progress slice of SF8.5 and does
+  not complete task 1.2 or close #554.
 
 ## Capabilities
 

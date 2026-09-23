@@ -63,10 +63,15 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   comparison, chain/cochain indexing bridge, and restriction-of-scalars
   comparison remain unverified. Do not duplicate this row for the same lift.
 - state:              UNVERIFIED
-- progress note (2026-09-22): The current chunk implements only the concrete
-  `ℤ → ZMod 2` specialization. Even if that comparison merges, the proposed
-  abstract left-derived tensor comparison under the weaker hypotheses above
-  remains `UNVERIFIED`.
+- progress note (2026-09-22, after PR #1464): The concrete `ℤ → ZMod 2`
+  specialization, selected projective-resolution comparison, chain/cochain
+  bridge, and restriction-of-scalars Tor comparison are merged. Only the
+  proposed abstract left-derived tensor comparison under the weaker hypotheses
+  above remains `UNVERIFIED`.
+- clarification (2026-09-22): The source note above records the status at the
+  original #1457 review; its statement that the
+  concrete comparison remained unverified is superseded by the post-#1464
+  progress note. The row's `UNVERIFIED` state applies only to the abstract lift.
 
 ### 2026-09-21 — `ZModTwoNonflatDerived.baseChangedConeIso` (planned)
 - chunk:              sf8-5-nonflat-derived-effect
@@ -81,6 +86,11 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   to the representative-level comparison; whether a repository-facing wrapper
   is useful beyond the witness is unverified.
 - state:              UNVERIFIED
+- progress note (2026-09-22, after PR #1457): The private witness comparison
+  uses Mathlib's generic mapped-cone transport directly; no repository-facing
+  wrapper was added, and whether it has independent consumers remains
+  unverified. This is not an unimplemented prerequisite for the concrete
+  witness.
 
 ### 2026-09-21 — `ZModTwoNonflatDerived.affineKProjectivePullbackObject_homology_negOne_not_isZero` (planned)
 - chunk:              sf8-5-nonflat-derived-effect
@@ -98,6 +108,10 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   projective resolution, but its chain indexing and its relation to the
   repository's K-projective representative have not been compared here.
 - state:              UNVERIFIED
+- progress note (2026-09-22, after PR #1464): The concrete `ℤ → ZMod 2`
+  specialization and its chain/cochain degree bridge are proved; the proposed
+  abstract comparison to `ProjectiveResolution.isoLeftDerivedObj` under the
+  weaker hypotheses above remains unverified.
 
 ### 2026-09-21 — planned K-projective representative bridge (drop `K.IsStrictlyLE d`)
 - chunk:              sf8-5-nonflat-derived-effect
