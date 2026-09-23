@@ -92,6 +92,19 @@ construction prerequisite for #522, and #525 remains downstream.
     `AlgebraicGeometry/Modules/Pullback` owner and its concrete derived effect
     beside the existing affine witness; do not infer an arbitrary-scheme
     derived comparison from it.
+15. Treat the affine K-projective-locus comparison as a separate progress
+    slice: for each commutative-ring map `R → S`, compare degreewise actual
+    `Scheme.Modules.pullback (Spec.map f)` on the sheafification of
+    K-projective representatives, after localization, with extension of
+    scalars followed by derived tilde. The source is only
+    `KProjectiveDerivedCategory (ModuleCat R)`. This does not construct a
+    replacement on all scheme-module complexes, inhabit
+    `SchemeBaseChange.LeftDerivedPullback` for nonflat maps, prove
+    preservation for the full relative-perfect locus, or generalize from
+    affine spectra to arbitrary scheme morphisms. Keep the comparison beside
+    the affine K-projective application in `Dqc/AffineKProjectivePullback.lean`;
+    reuse the existing `Modules/Pullback/AffineSpec` comparison and do not add
+    another carrier or derived-pullback interface.
 
 ## Risks / Trade-offs
 

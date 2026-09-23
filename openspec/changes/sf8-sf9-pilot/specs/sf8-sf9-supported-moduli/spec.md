@@ -79,6 +79,18 @@ from an unproved marker typeclass introduced by the chunk.
   that pullback preserves quasi-coherence on arbitrary scheme maps, or that a
   general K-flat resolution exists.
 
+#### Scenario: The affine comparison descends on the K-projective derived locus
+
+- **WHEN** a commutative-ring map `R → S` is applied to an object of
+  `KProjectiveDerivedCategory (ModuleCat R)`
+- **THEN** a natural isomorphism identifies actual degreewise scheme-module
+  pullback of its sheafified K-projective representatives, followed by
+  localization, with the existing affine K-projective derived pullback
+  followed by derived tilde. This comparison is affine and restricted to the
+  K-projective derived locus; it SHALL NOT assert a left-derived-pullback
+  universal property on all scheme-module complexes, a general K-flat
+  resolution, or a theorem for arbitrary scheme morphisms.
+
 #### Scenario: Preservation obligation is tested
 
 - **WHEN** a supported object satisfies the declared pseudo-coherence, finite
