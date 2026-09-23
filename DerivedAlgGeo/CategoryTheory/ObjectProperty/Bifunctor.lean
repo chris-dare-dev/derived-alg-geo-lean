@@ -15,6 +15,13 @@ import Mathlib.CategoryTheory.Whiskering
 If a bifunctor preserves an object property in two inputs satisfying that property, it restricts
 to the corresponding full subcategory in both variables. The construction below is the
 two-variable analogue of Mathlib's `ObjectProperty.lift`.
+
+## Main results
+
+`CategoryTheory.ObjectProperty.lift₂CommShift₂Int` transports the ambient `CommShift₂Int`
+structure, including its Koszul compatibility, through `lift₂` when the property is shift-stable.
+It returns explicit data rather than a global instance, avoiding instance diamonds between
+independent restrictions.
 -/
 
 namespace CategoryTheory.ObjectProperty
