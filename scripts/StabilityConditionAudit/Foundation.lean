@@ -1089,7 +1089,6 @@ sub in `T β` and a quotient in `F β`. -/
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.tailAt_phiPlus
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.tailAt_phiMinus
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.restrictChain
-#print axioms CategoryTheory.Triangulated.AbelianHNFiltration.restrictChain.congr_simp
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.map_restrictChain
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.restrictChain_le
 #print axioms CategoryTheory.Triangulated.AbelianHNFiltration.restrict
@@ -1350,7 +1349,6 @@ one structure at two class data rather than two structures with the same fields,
 #print axioms CategoryTheory.closedUpperHalfPlane
 #print axioms CategoryTheory.semiClosedUpperHalfPlane_subset_closed
 #print axioms CategoryTheory.ClassDatum
-#print axioms CategoryTheory.ClassDatum.mk
 #print axioms CategoryTheory.ClassDatum.mk.inj
 #print axioms CategoryTheory.ClassDatum.mk.sizeOf_spec
 #print axioms CategoryTheory.ClassDatum.Relevant
@@ -1360,14 +1358,11 @@ one structure at two class data rather than two structures with the same fields,
 #print axioms CategoryTheory.IsWeakStabilityCharge
 #print axioms CategoryTheory.IsStabilityCharge.weak
 #print axioms CategoryTheory.Triangulated.StabilityFunctionOn
-#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk
 #print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk.inj
 #print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.StabilityFunctionOn.mk.congr_simp
 #print axioms CategoryTheory.Triangulated.StabilityFunctionOn.Z
 #print axioms CategoryTheory.Triangulated.StabilityFunctionOn.nonzero_mem
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn
-#print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mk
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mk.inj
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.WeakStabilityFunctionOn.Z
@@ -1414,7 +1409,6 @@ one.
 #print axioms CategoryTheory.Triangulated.expCharge_zero
 #print axioms CategoryTheory.Triangulated.expCharge_add
 #print axioms CategoryTheory.Triangulated.MukaiChargeData
-#print axioms CategoryTheory.Triangulated.MukaiChargeData.mk
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.mk.inj
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.MukaiChargeData.mukai

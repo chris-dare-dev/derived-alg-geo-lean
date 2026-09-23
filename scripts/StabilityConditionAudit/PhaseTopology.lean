@@ -117,7 +117,6 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.Slicing.InducedTStructures.toPreimageData
 #print axioms CategoryTheory.Triangulated.Slicing.inducedTStructuresId
 #print axioms CategoryTheory.Triangulated.HNFiltration.exists_headTailFiltration
-#print axioms CategoryTheory.Triangulated.Slicing.inducedTStructuresId.congr_simp
 #print axioms CategoryTheory.Triangulated.Slicing.InducedTStructures.isZero_of_map_isZero
 #print axioms CategoryTheory.Triangulated.Slicing.InducedTStructures.hn_exists
 #print axioms CategoryTheory.Triangulated.Slicing.InducedTStructures.preimageData

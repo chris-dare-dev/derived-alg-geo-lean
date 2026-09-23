@@ -118,7 +118,6 @@ These extend the foundational library's own namespace, since they are API for it
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot.group
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot.mulActionSlicing
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot.mk
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutQuot.mk_smul_P
 
 /-! ## K0Functor — K₀ is functorial in triangulated functors -/
@@ -351,7 +350,6 @@ this against the file by eye. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_mul
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair.act_congr
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot
-#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mk
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.group
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mulAction
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mk_smul_slicing

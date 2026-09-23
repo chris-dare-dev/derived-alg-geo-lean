@@ -21,5 +21,3 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkPresheafIso
 #print axioms AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkIso
-#print axioms ModuleCat.isoMk.congr_simp
-#print axioms ModuleCat.restrictScalarsCongr.congr_simp

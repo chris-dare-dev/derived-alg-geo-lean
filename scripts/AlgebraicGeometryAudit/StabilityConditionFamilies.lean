@@ -127,7 +127,6 @@ no untrusted axioms.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.openImmersionComplexPullbackExtensionIso
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullback_essSurj_of_isOpenImmersion
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullback
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullback.congr_simp
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullbackFactors
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instCommShiftDerivedFiberDerivedPullbackInt
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instIsTriangulatedDerivedFiberDerivedPullback
@@ -403,9 +402,7 @@ no untrusted axioms.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.complexPullback_right_unitality
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.complexPullback_right_unitality_assoc
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.complexPullbackCongr
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.complexPullbackCongr.congr_simp
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullbackCongr
-#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullbackCongr.congr_simp
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullback_left_unitality
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullback_left_unitality_assoc
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.derivedPullback_right_unitality
@@ -702,7 +699,6 @@ zero-reflection, and phase-monad premises remain explicit inputs; none of the
 records below assert openness or relative-HN existence.
 -/
 
-#print axioms CategoryTheory.Triangulated.Slicing.preimage.congr_simp
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback.derivedAdditive
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instAdditiveSchemeCoherentDerivedCategoryLeftSchemeCoherentDerivedPullback
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.instAdditiveBoundedCoherentDerivedFiberBoundedCoherentDerivedPullback
