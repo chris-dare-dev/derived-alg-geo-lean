@@ -40,7 +40,7 @@ private instance extendScalars_additive :
 /-- On affine spectra, scheme-module pullback after tilde is extension of
 scalars followed by target tilde. This is an isomorphism of ordinary
 functors; it does not assert that either side computes a derived pullback. -/
-noncomputable def pullbackSpecMap_tildeIso :
+noncomputable def pullbackSpecMapTildeIso :
     AlgebraicGeometry.tilde.functor R ⋙
         Scheme.Modules.pullback (Spec.map f) ≅
       ModuleCat.extendScalars f.hom ⋙ AlgebraicGeometry.tilde.functor S := by
@@ -55,7 +55,7 @@ noncomputable def pullbackSpecMap_tildeIso :
 
 /-- The affine tilde/pullback comparison induces the corresponding
 isomorphism on cochain complexes. -/
-noncomputable def pullbackSpecMap_tildeMapHomologicalComplexIso :
+noncomputable def pullbackSpecMapTildeMapHomologicalComplexIso :
     (AlgebraicGeometry.tilde.functor R).mapHomologicalComplex (ComplexShape.up ℤ) ⋙
         (Scheme.Modules.pullback (Spec.map f)).mapHomologicalComplex (ComplexShape.up ℤ) ≅
       (ModuleCat.extendScalars f.hom).mapHomologicalComplex (ComplexShape.up ℤ) ⋙
@@ -69,6 +69,6 @@ noncomputable def pullbackSpecMap_tildeMapHomologicalComplexIso :
   letI : (ModuleCat.extendScalars f.hom ⋙
       AlgebraicGeometry.tilde.functor S).Additive := inferInstance
   exact Functor.mapHomologicalComplexCompIso
-    (pullbackSpecMap_tildeIso f) (ComplexShape.up ℤ)
+    (pullbackSpecMapTildeIso f) (ComplexShape.up ℤ)
 
 end AlgebraicGeometry.Scheme.Modules

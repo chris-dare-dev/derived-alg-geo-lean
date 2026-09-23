@@ -389,7 +389,7 @@ noncomputable def schemeModulePulledBackResolutionIso :
         (ComplexShape.up ℤ)).obj baseChangedResolution := by
   simpa [schemeModulePulledBackResolution, baseChangedResolution, zmodTwoExtend,
     zmodTwoSchemeMap, Functor.comp_obj] using
-      (Scheme.Modules.pullbackSpecMap_tildeMapHomologicalComplexIso zmodTwoRingMap).app
+      (Scheme.Modules.pullbackSpecMapTildeMapHomologicalComplexIso zmodTwoRingMap).app
         twoTermResolution
 
 /-- The derived object represented by the degreewise, underived
