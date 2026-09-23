@@ -235,3 +235,23 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   `ENat.iInf_eq_zero` and `generationTime_eq_zero_iff'`; this proof route does
   not need an inhabited-index instance.
 - state:              L (proof-witness verified)
+
+### 2026-09-23 — `affineKProjectiveSchemeModulePullbackComparison`
+- chunk:              sf8-5-affine-kprojective-scheme-comparison
+- reviewing commit:   b3d0ad4aeb971972e47e7b4be28a06e801cdc4e1
+- found by:           abstraction-adversary
+- proposed ancestor:  `DerivedAlgGeo/Algebra/Homology/DerivedCategory/KProjective.lean`,
+  beside `CategoryTheory.kProjectiveLocusDerivedFunctor`
+- weaker hypotheses:  abelian `C`, `D`, `E`; additive `F : C ⥤ E` and
+  `G : C ⥤ D`; exact `T : D ⥤ E`; and `e : F ≅ G ⋙ T`. The comparison
+  needs no ring map, scheme, or tilde functor beyond data supplying `e`.
+- source note:        The reviewer searched this repository's `KProjective.lean`,
+  `BoundedAboveProjective.lean`, and `ExactFunctor.lean`, plus pinned Mathlib's
+  homotopy-category, exact-derived-functor, K-projective, and localization
+  APIs. Existing composition/comparison results do not provide this general
+  K-projective-locus localization transport. In the reviewed affine proof,
+  homotopy-category composition and exact-functor factorization through
+  localization use only the hypotheses above (implementation lines 95–130).
+  The generic API is outside this frozen chunk and is deferred; do not move or
+  duplicate the geometric declaration to implement it.
+- state:              UNVERIFIED
