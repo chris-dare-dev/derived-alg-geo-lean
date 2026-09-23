@@ -2,11 +2,15 @@
 
 ## Chunk: `rou1-919-rouquier-dimension` — issue #919
 
-**Depends on:** #917 is closed. First merge this OpenSpec plan and enabled
-manifest through a planning-only bootstrap PR with no Lean changes and no
-closing issue references. Then create a fresh clean checkout on the exact
-`origin/main` base and use the manifest's planned issue branch. Run validation
-and live preflight before both altitude advisors, then initialize the ledger.
+**Depends on:** #917 is closed. First publish this OpenSpec plan and enabled
+manifest through the explicitly user-authorized, planning-only bootstrap PR
+path: only planning artifacts and the manifest, no Lean changes, and no issue
+closing syntax or provider closing references. This one-time PR uses direct
+push/create because no issue ledger can exist before the manifest is merged.
+Then create a fresh clean checkout on the exact `origin/main` base and use the
+manifest's planned issue branch. Run validation and live preflight before both
+altitude advisors, then initialize the ledger; implementation-phase provider
+actions use the loop controller.
 
 **Frozen file list:**
 
@@ -28,7 +32,9 @@ and live preflight before both altitude advisors, then initialize the ledger.
   object attaining it; state finite witnesses as separate existentials.
 - [ ] 1.4 Document why `triangEnvelopeIter n` corresponds to Rouquier's
   `⟨G⟩_{n+1}` and why the dimension has no offset, citing the zeroth and
-  successor equations without adding `[IsTriangulated C]`.
+  successor equations. Also identify `triangEnvelopeIter_add` as the matching
+  extension-composition equation under its additional `[IsTriangulated C]`
+  hypothesis, without adding that class to the dimension API.
 - [ ] 1.5 Append every new public declaration to the dimension audit slice and add
   the new module to the nearest umbrella.
 

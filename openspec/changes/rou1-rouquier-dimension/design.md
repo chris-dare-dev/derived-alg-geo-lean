@@ -103,10 +103,11 @@ dimension with no offset. The module docstring will state both the convention
 and the reason the zero-offset choice is intentional. It will also state that
 the infimum ranges over single objects rather than arbitrary object properties
 and does not supply a preselected object attaining its value; finite witness
-theorems remain separate existential statements. It may note that
-`triangEnvelopeIter_add` is consistent with the same `n + 1` convention when
-the additional `[IsTriangulated C]` hypothesis is available, but the Rouquier
-dimension API and its indexing argument do not require that stronger class.
+theorems remain separate existential statements. It will also cite
+`triangEnvelopeIter_add` as the extension-composition compatibility with this
+same `n + 1` convention, explicitly noting that this auxiliary equation
+requires `[IsTriangulated C]`; neither the Rouquier dimension API nor its
+zero-offset proof adds that stronger class.
 
 ### Audit and review
 
@@ -128,16 +129,22 @@ scope changes to these two issue chunks.
 ### Bootstrap and execution order
 
 Publish this plan and its enabled #919 manifest first as a planning-only PR
-from a separate plan branch. That PR contains no Lean changes and uses only
-non-closing references to #919 and #921; verify that GitHub reports no closing
-issue references. After it merges, fetch the protected base and start the
+from a separate plan branch. Because the controller cannot initialize a ledger
+until its manifest is on the exact base, this one-time bootstrap publication
+uses the direct `git push` and `gh pr create` actions the user explicitly
+authorized; it contains only planning artifacts and the execution manifest,
+no Lean changes. Use no issue-closing syntax in its title, body, or commit
+messages, use only plain references to #919 and #921, and verify that GitHub
+reports no closing issue references. This exception applies only to that
+plan-only PR. After it merges, fetch the protected base and start the
 implementation on a fresh, clean issue branch whose HEAD is exactly
 `origin/main`. Run manifest validation and live preflight there. Only after
 preflight passes, run both declared altitude advisors, inspect their findings
 against the generalization backlog, then initialize the digest-bound ledger.
-The source chunk's frozen file list contains only the Rouquier module, umbrella,
-audit slice, and append-only generalization backlog; it cannot edit this plan
-or change its own execution authority.
+All implementation-phase provider actions use the loop controller. The source
+chunk's frozen file list contains only the Rouquier module, umbrella, audit
+slice, and append-only generalization backlog; it cannot edit this plan or
+change its own execution authority.
 
 ## Risks / Trade-offs
 
