@@ -80,10 +80,10 @@ construction prerequisite for #522, and #525 remains downstream.
     merges, start from a fresh clean checkout at the exact `origin/main`, run
     preflight and initialize the digest-bound ledger, then route every
     implementation-phase provider action through the controller.
-13. Do not change any required OpenSpec artifact after ledger initialization.
-    In particular, update task completion only in a post-merge plan-sync PR;
-    the code PR must not claim a task checkbox while that would invalidate its
-    digest-bound controller evidence.
+13. Do not change task wording or any other required OpenSpec artifact after
+    ledger initialization. The controller's v2 digest normalizes task-checkbox
+    state, so check the active task in the implementation PR when its work is
+    complete; this does not invalidate the ledger evidence.
 14. Treat the actual affine scheme-module pullback of the displayed resolution
     as a fourth #554 progress slice. Its comparison is the underived,
     degreewise `Scheme.Modules.pullback` on one finite free representative,
