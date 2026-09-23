@@ -172,14 +172,17 @@ UNPROTECTED_RECORD_RES = (
 # that had to resolve a conflict, say). They need the full panel but do not
 # spend the critique/improve cap; this bounds how often a pass can be reopened.
 MAX_REVALIDATION_ROUNDS = 2
-# v1 hashed every artifact byte for byte, so ticking a task box or appending
-# the observation log invalidated a ledger. v2 hashes the contract instead.
-OPENSPEC_DIGEST_VERSION = 2
+# v1 hashes every artifact with universal-newline text reads. v2 adds the
+# original regex-based task normalization. v3 uses CommonMark structure.
+OPENSPEC_DIGEST_VERSION = 3
 LOG_ARTIFACT_NAMES = {"agent-observations.md"}
 ISSUE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BRANCH_RE = re.compile(r"^agent/[a-z0-9][a-z0-9._/-]*$")
 TASK_LIST_CHECKBOX_RE = re.compile(r"^([ \t]*[-*+][ \t]+)\[[ xX]\]")
-TASK_INLINE_CHECKBOX_RE = re.compile(r"^\[[ xX]\]")
+TASK_INLINE_CHECKBOX_RE = re.compile(r"^\[[ xX]\](?:[ \t]|$)")
+# Preserve the semantics used by already-written v2 ledgers. Do not use this
+# regex for new ledgers: CommonMark parsing distinguishes task boxes from links.
+TASK_CHECKBOX_RE_V2 = re.compile(r"^(\s*[-*+] )\[[ xX]\]", re.MULTILINE)
 MARKDOWN_LINE_END_RE = re.compile(r"\r\n|\r|\n")
 MARKDOWN_BLOCK_CONTENT_TYPES = {
     "blockquote_open",
@@ -192,7 +195,6 @@ MARKDOWN_BLOCK_CONTENT_TYPES = {
     "ordered_list_open",
     "paragraph_open",
 }
-MARKDOWN_HTML_TOKEN_TYPES = {"html_block", "html_inline"}
 CLOSING_KEYWORD_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b", re.I)
 # Common non-closing issue-link phrases accepted for progress PRs.
 NON_CLOSING_REFERENCE_RE = re.compile(
@@ -313,17 +315,6 @@ def split_markdown_lines(markdown: str, *, keepends: bool = False) -> list[str]:
     return lines
 
 
-def _contains_html_tokens(tokens: list[Any]) -> bool:
-    """Return whether a parsed token tree contains actual raw-HTML syntax."""
-
-    for token in tokens:
-        if token.type in MARKDOWN_HTML_TOKEN_TYPES:
-            return True
-        if token.children and _contains_html_tokens(token.children):
-            return True
-    return False
-
-
 def _parse_markdown(markdown: str) -> list[Any]:
     """Parse with the pinned CommonMark grammar used by the ledger digest."""
 
@@ -335,13 +326,12 @@ def normalize_task_checkboxes(markdown: str) -> str:
 
     The first direct block of a list item must be a paragraph whose inline
     content starts with the checkbox. Source maps then tie that parsed item
-    back to the exact line being normalized; checkbox-shaped code stays fixed.
+    back to the exact line being normalized; checkbox-shaped code and links
+    stay fixed.
     """
 
     lines = split_markdown_lines(markdown, keepends=True)
     tokens = _parse_markdown(markdown)
-    if _contains_html_tokens(tokens):
-        raise LoopError("unsupported HTML-like Markdown syntax")
 
     list_items: list[dict[str, Any]] = []
     for token in tokens:
@@ -394,30 +384,34 @@ def normalize_task_checkboxes(markdown: str) -> str:
 
 
 def has_visible_why_heading(markdown: str) -> bool:
-    """Recognize the exact root-level ATX ``## Why`` heading; reject raw HTML."""
+    """Recognize a root-level ATX h2 whose rendered inline text is exactly Why."""
 
     tokens = _parse_markdown(markdown)
-    if _contains_html_tokens(tokens):
-        raise LoopError("unsupported HTML-like Markdown syntax")
-    return any(
-        token.type == "heading_open"
-        and token.tag == "h2"
-        and token.level == 0
-        and token.markup == "##"
-        and index + 1 < len(tokens)
-        and tokens[index + 1].type == "inline"
-        and tokens[index + 1].content == "Why"
-        for index, token in enumerate(tokens)
-    )
+    for index, token in enumerate(tokens):
+        if (
+            token.type != "heading_open"
+            or token.tag != "h2"
+            or token.level != 0
+            or token.markup != "##"
+            or index + 1 >= len(tokens)
+            or tokens[index + 1].type != "inline"
+        ):
+            continue
+        inline = tokens[index + 1]
+        visible_text = "".join(
+            child.content for child in (inline.children or []) if child.type in {"text", "code_inline"}
+        ).strip()
+        if visible_text == "Why":
+            return True
+    return False
 
 
 def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DIGEST_VERSION) -> str:
     """Hash planning content; the registered digest freezes it, not its Git path.
 
-    Version 2 freezes the contract and nothing else: task checkbox state and
-    append-only observation logs are progress records, and hashing them made
-    the bookkeeping the protocol asks for invalidate the review it recorded.
-    Version 1 remains available so ledgers written by it keep verifying.
+    Version 2 preserves its original regex normalization so existing ledgers
+    keep verifying. Version 3 freezes the contract with CommonMark-aware task
+    checkbox normalization. Version 1 and 2 remain available for old ledgers.
     """
 
     if not has_openspec(spec):
@@ -432,14 +426,16 @@ def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DI
         if version >= 2 and relative in LOG_ARTIFACT_NAMES:
             continue
         try:
-            if version >= 2:
+            if version >= 3:
                 content = path.read_bytes().decode("utf-8")
             else:
-                # Keep the original v1 newline normalization for old ledgers.
+                # Keep historical universal-newline normalization for v1/v2.
                 content = path.read_text(encoding="utf-8")
         except UnicodeDecodeError as exc:
             raise LoopError(f"OpenSpec artifact is not valid UTF-8: {relative}") from exc
-        if version >= 2 and relative == "tasks.md":
+        if version == 2 and relative == "tasks.md":
+            content = TASK_CHECKBOX_RE_V2.sub(r"\1[ ]", content)
+        elif version >= 3 and relative == "tasks.md":
             content = normalize_task_checkboxes(content)
         parts.append({"path": relative, "content": content})
     return digest(parts)

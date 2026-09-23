@@ -1,10 +1,10 @@
 # Loop-engineering friction log
 
 This log records concrete documentation, checkout, discovery, and proof-probing
-failures encountered while progressing the SF8/SF9 loop. It is separate from
-the mathematical generalization backlog: an API being hard to discover is not
-evidence that a mathematical generalization is valid. Each entry records a
-prevention step for later runs.
+failures encountered while progressing repository loop-engineering work. It is
+separate from the mathematical generalization backlog: an API being hard to
+discover is not evidence that a mathematical generalization is valid. Each
+entry records a prevention step for later runs.
 
 | Date | Friction and effect | Prevention for later runs |
 | --- | --- | --- |
@@ -35,6 +35,7 @@ prevention step for later runs.
 | 2026-09-22 | Two exploratory shell calls failed before reading or changing files: an unescaped backtick terminated a quoted Bash command, and `rg -E` was mistaken for an extended-regex flag (`-E` means encoding in ripgrep). | Use single-quoted shell patterns or avoid shell quoting around Markdown syntax; use ripgrep's `-e` for an explicit pattern and consult `rg --help` when option spelling is uncertain. |
 | 2026-09-22 | The generic affine pullback/tilde functor comparison and its lift to arbitrary cochain complexes compiled in scratch, but the final transport of the concrete nonzero `H⁻¹` through affine QCoh inclusion into the target scheme-derived category has not yet been compiled. The existing `affineTildeDerivedHomologyIso`, exact affine QCoh inclusion, and module-side witness appear to supply the route. | Keep this as a frozen acceptance condition, not a claimed result; compile the complete target homology transport and inspect its assumptions before recording implementation success. |
 | 2026-09-22 | A follow-up scratch proof now compiles the affine realization's target scheme-module `H⁻¹` nonvanishing from `baseChangedResolution_homology_negOne_not_isZero` using `mapDerivedCategoryHomologyIso`, `affineTildeDerivedHomologyIso`, and the affine QCoh inclusion. It still does not compose this result with the separately compiled actual-pullback/tilde complex comparison. | Preserve the exact endpoint as two compiled lemmas plus one remaining composition obligation; do not report end-to-end success until the target `Scheme.Modules.pullback zmodTwoSchemeMap` complex is connected to that affine realization in Lean. |
+| 2026-09-23 | Adversarial review noticed that the parser dependency was documented for contributor setup and CI, but the canonical run-loop skill and manifest guide still invoked `python3 scripts/loop_engine.py` in fresh worktrees. Those commands would abort at import time when system Python lacks the pinned parser package, before validation or recovery could run. | Install `scripts/requirements-loop.txt` into `.loop-tools` in each fresh worktree and use `.loop-tools/bin/python` for controller calls; keep setup and invocation guidance synchronized whenever controller dependencies change. |
 
 These entries are process evidence, not proof evidence. The concrete affine
 Tor comparison is proved, audited, and reviewed in merged PR #1464. The broader

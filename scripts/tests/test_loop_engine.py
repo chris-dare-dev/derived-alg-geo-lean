@@ -1234,7 +1234,7 @@ def numbered_lines(count: int, changed: dict[int, str] | None = None) -> str:
 
 
 class OpenSpecDigestTests(unittest.TestCase):
-    def test_v2_ignores_checkbox_state_and_observation_logs_but_not_the_contract(self) -> None:
+    def test_v3_ignores_checkbox_state_and_observation_logs_but_not_the_contract(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             _, spec = make_spec(root)
@@ -1242,15 +1242,15 @@ class OpenSpecDigestTests(unittest.TestCase):
             (change / "agent-observations.md").write_text("# Observations\n", encoding="utf-8")
             spec["openspec"]["required_artifacts"].append("agent-observations.md")
             v1 = loop_engine.openspec_digest(root, spec, 1)
-            v2 = loop_engine.openspec_digest(root, spec)
+            v3 = loop_engine.openspec_digest(root, spec)
             legacy = {"openspec_digest": v1}
-            current = {"openspec_digest": v2, "openspec_digest_version": 2}
+            current = {"openspec_digest": v3, "openspec_digest_version": 3}
 
             tasks = change / "tasks.md"
             tasks.write_text(tasks.read_text(encoding="utf-8").replace("- [ ] 1.1", "- [x] 1.1"), encoding="utf-8")
             with (change / "agent-observations.md").open("a", encoding="utf-8") as log:
                 log.write("- OBS-001 the base moved during review\n")
-            self.assertEqual(loop_engine.openspec_digest(root, spec), v2)
+            self.assertEqual(loop_engine.openspec_digest(root, spec), v3)
             self.assertTrue(loop_engine.ledger_openspec_matches(root, spec, current))
             # A ledger written before v2 keeps its byte-for-byte meaning.
             self.assertNotEqual(loop_engine.openspec_digest(root, spec, 1), v1)
@@ -1260,7 +1260,28 @@ class OpenSpecDigestTests(unittest.TestCase):
                 tasks.read_text(encoding="utf-8").replace("Verify the test", "Verify a different test"),
                 encoding="utf-8",
             )
-            self.assertNotEqual(loop_engine.openspec_digest(root, spec), v2)
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec), v3)
+
+    def test_v2_ledger_keeps_its_original_regex_and_newline_semantics(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            tasks = root / "openspec" / "changes" / "pilot-change" / "tasks.md"
+            tasks.write_bytes(
+                b"# Tasks\r\n\r\n- [ ] 1.1 Real task\r\n\r\n```md\r\n- [ ] 9.1 Example\r\n```\r\n"
+            )
+            old_v2 = {
+                "openspec_digest": loop_engine.openspec_digest(root, spec, 2),
+                "openspec_digest_version": 2,
+            }
+
+            # Historical v2 normalized CRLF via read_text() and also normalized
+            # checkbox-shaped lines inside fenced examples.
+            tasks.write_text(
+                "# Tasks\n\n- [ ] 1.1 Real task\n\n```md\n- [x] 9.1 Example\n```\n",
+                encoding="utf-8",
+            )
+            self.assertTrue(loop_engine.ledger_openspec_matches(root, spec, old_v2))
 
     def test_a_single_issue_manifest_may_omit_openspec(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1303,8 +1324,15 @@ class CommonMarkBoundaryTests(unittest.TestCase):
     def test_proposal_why_must_be_a_visible_root_level_atx_heading(self) -> None:
         for proposal in (
             "## Why\n",
+            "## **Why**\n",
+            "## *Why*\n",
+            "## `Why`\n",
+            "## Wh&#121;\n",
+            "## [Why](https://example.test)\n",
+            "## <b>Why</b>\n",
             "# Proposal\n\n## Why ###\n",
             "`<widget>` is inline code\n## Why\n",
+            "<widget>text</widget>\n## Why\n",
         ):
             with self.subTest(proposal=proposal):
                 self.assertTrue(loop_engine.has_visible_why_heading(proposal))
@@ -1316,14 +1344,11 @@ class CommonMarkBoundaryTests(unittest.TestCase):
             "```md\n## Why\n```\n",
             "> ## Why\n",
             "- ## Why\n",
+            "## Why *not*\n",
+            "## ![Why](https://example.test/image.png)\n",
         ):
             with self.subTest(proposal=proposal):
                 self.assertFalse(loop_engine.has_visible_why_heading(proposal))
-
-        for markup in ("<!-- comment -->\n## Why\n", "<widget>text</widget>\n## Why\n"):
-            with self.subTest(markup=markup):
-                with self.assertRaisesRegex(loop_engine.LoopError, "HTML-like"):
-                    loop_engine.has_visible_why_heading(markup)
 
     def test_task_checkbox_normalization_follows_commonmark_blocks(self) -> None:
         tasks = (
@@ -1346,10 +1371,18 @@ class CommonMarkBoundaryTests(unittest.TestCase):
             "- Parent paragraph\n\n  [x] Later paragraph\n"
             "> - [x] Blockquote item\n"
             "-[x] Malformed list marker\n"
+            "- [ ]literal text\n"
+            "- [x]literal text\n"
         )
         self.assertEqual(loop_engine.normalize_task_checkboxes(code_and_non_tasks), code_and_non_tasks)
 
-    def test_v2_digest_ignores_only_actual_list_checkbox_state(self) -> None:
+        links_and_inline_html = "- [x](https://example.test)\n- [ ](https://example.test)\n- [x] Render <tag>\n"
+        self.assertEqual(
+            loop_engine.normalize_task_checkboxes(links_and_inline_html),
+            "- [x](https://example.test)\n- [ ](https://example.test)\n- [ ] Render <tag>\n",
+        )
+
+    def test_v3_digest_ignores_only_actual_list_checkbox_state(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             _, spec = make_spec(root)
@@ -1370,6 +1403,11 @@ class CommonMarkBoundaryTests(unittest.TestCase):
                 encoding="utf-8",
             )
             self.assertNotEqual(loop_engine.openspec_digest(root, spec), initial)
+
+            tasks.write_text("- [x](https://example.test)\n", encoding="utf-8")
+            checked_link = loop_engine.openspec_digest(root, spec)
+            tasks.write_text("- [ ](https://example.test)\n", encoding="utf-8")
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec), checked_link)
 
     def test_structural_proposal_validation_does_not_match_examples(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

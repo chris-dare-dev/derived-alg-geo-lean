@@ -148,10 +148,10 @@ history and partial panels count toward the cumulative limit. Existing
 manifests retain their behavior unless explicitly opted in.
 
 An active supervising agent consumes
-`python3 scripts/loop_engine.py recovery next --ledger <ledger>`, dispatches
-research and independent plan review on exhaustion, and resumes only after
-acceptance. No background daemon or routine user approval is involved. The
-failed attempt remains preserved and provider permissions remain separate.
+`.loop-tools/bin/python scripts/loop_engine.py recovery next --ledger <ledger>`,
+dispatches research and independent plan review on exhaustion, and resumes only
+after acceptance. No background daemon or routine user approval is involved.
+The failed attempt remains preserved and provider permissions remain separate.
 
 ## Lift targets and the lift chunk
 
@@ -205,11 +205,14 @@ Derive them from `docs/architecture/abstraction-tree.md` when you plan the run,
 and leave the key absent rather than guessing: an ancestor named wrongly is
 standing authorization to edit a file nobody meant to open.
 
-Validate and preflight a manifest from its work branch:
+Set up the pinned controller dependencies once in each fresh worktree, then
+validate and preflight a manifest from its work branch:
 
 ```text
-python3 scripts/loop_engine.py validate --spec .claude/loop-specs/<slug>.yaml
-python3 scripts/loop_engine.py preflight --spec .claude/loop-specs/<slug>.yaml
+python3 -m venv .loop-tools
+.loop-tools/bin/python -m pip install -r scripts/requirements-loop.txt
+.loop-tools/bin/python scripts/loop_engine.py validate --spec .claude/loop-specs/<slug>.yaml
+.loop-tools/bin/python scripts/loop_engine.py preflight --spec .claude/loop-specs/<slug>.yaml
 ```
 
 Preflight accepts an uncommitted or branch-committed plan, and any head that
