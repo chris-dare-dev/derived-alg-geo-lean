@@ -158,3 +158,26 @@ After a refreshed round passes, the controller MAY accept another revalidation o
 #### Scenario: The final refreshed round does not pass
 - **WHEN** the last available refreshed round is adjudicated needs-changes
 - **THEN** the ledger becomes terminal blocked, retains every prior event and finding, cannot reserve a fourth round, and grants no shipping authority
+
+### Requirement: OpenSpec task progress does not invalidate the frozen plan
+The controller MUST select the OpenSpec digest scheme from the frozen manifest's `openspec.digest_mode`. When omitted, the scheme MUST remain byte-for-byte raw for compatibility with existing manifests and ledger/recovery records. A manifest MAY select `task_progress`; in that scheme, only the checked/unchecked marker on a top-level, non-fenced task line in the registered `tasks.md` artifact matching `- [ ] N.N <description>`, `- [x] N.N <description>`, or `- [X] N.N <description>` is normalized, with every marker canonicalized to `[ ]`. No other artifact or line is normalized. The all-unchecked task-file digest MUST equal its raw digest, so a freshly initialized ledger starts with the same frozen value. Task IDs, descriptions, order, surrounding text, non-task checkbox content, quoted/nested/code-fenced task-like text, and all other required artifacts MUST remain digest-sensitive. The controller MUST continue comparing the selected digest at every existing ledger, review, and publication boundary; it MUST NOT migrate or reinterpret a legacy raw digest as `task_progress`.
+
+#### Scenario: Completed task markers preserve the opt-in frozen digest
+- **WHEN** a `task_progress` manifest's top-level task markers change among `[ ]`, `[x]`, and `[X]` without other file edits
+- **THEN** the digest remains equal to the all-unchecked raw baseline and the ledger remains valid
+
+#### Scenario: Task wording or structure changes remain rejected
+- **WHEN** a task description, identifier, ordering, or non-task planning content changes after ledger initialization
+- **THEN** the normalized digest changes and all actions requiring the frozen plan reject the ledger
+
+#### Scenario: Non-task checkboxes are not normalized
+- **WHEN** a checkbox outside a numbered task item changes after ledger initialization
+- **THEN** the digest changes and the controller rejects the modified plan
+
+#### Scenario: Legacy raw digests remain byte-sensitive
+- **WHEN** a manifest omits `openspec.digest_mode` or selects `raw`
+- **THEN** its historical raw artifact digest behavior is unchanged, including for existing ledger and recovery-registry records
+
+#### Scenario: Task-like examples outside the task list remain sensitive
+- **WHEN** a task-like checkbox changes inside a fenced block, a quote, a nested list, or any artifact other than the registered `tasks.md`
+- **THEN** the digest changes and the controller rejects the modified plan

@@ -12,6 +12,7 @@ This surfaced in the DT1 #928 progress chunk: its two-round panel passed on `7a4
 - Bind each round to the exact local HEAD and record the prior reviewed head, new head, base, ancestry, frozen selection, and timestamp without changing the manifest, planning digests, historical reviews, or round cap. Each transition consumes exactly the next pre-existing review slot; repeated transitions stop at the cap.
 - Require live repository, protected-base, issue, remote-branch, and PR checks to succeed before changing the ledger; uncertain or malformed provider responses fail without writing.
 - Block push and all PR/provider actions while the refreshed round is pending; only its complete exact-head passing panel can restore publication eligibility.
+- Keep OpenSpec task completion checkboxes editable during a run while continuing to freeze task descriptions and all other planning content in the controller digest.
 - Add focused state-transition, provider-failure, frozen-scope, and stale-shipping tests, plus workflow documentation and a separate three-round controller manifest.
 
 ## Capabilities

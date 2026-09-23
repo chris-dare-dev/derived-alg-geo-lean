@@ -1,13 +1,27 @@
 # Tasks
 
-## 1. Specify and bootstrap the bounded controller change
+## Bootstrap record (completed before code-ledger initialization)
 
-- [x] 1.1 Create the distinct controller tracking issue #1469 and an enabled, code-scoped three-round implementation manifest bound to this OpenSpec change, with every provider mutation flag false; verify `python3 scripts/loop_engine.py validate --spec <manifest>` succeeds.
-- [x] 1.2 Run strict OpenSpec validation and independent plan review, then publish only the planning artifacts and mutation-disabled manifest through the documented planning-only bootstrap PR path; verify the merged base contains the exact plan and no controller implementation changes or issue completion.
-- [ ] 1.3 From a fresh clean-base checkout after the bootstrap merge, run `validate` and read-only `preflight`, create the manifest's exact planned issue branch, and initialize its ledger before source edits; verify the initialized ledger freezes the expected controller files, exact issue, three-round cap, and artifact digests. Keep every mutation flag disabled throughout this code run.
+The initial plan-only bootstrap created issue #1469 and its mutation-disabled
+manifest, passed strict validation and adversarial review, and merged as PR
+#1470. GitHub interpreted negated closing language as a close reference; the
+issue was reopened and the merged PR body corrected. The closure-contract and
+self-bootstrap update (the former task 1.5) merged as PR #1474. Its title,
+body, source commit message (`docs(loop): harden revalidation publication
+plan`), and squash commit message (`docs(loop): tighten revalidation safety
+plan`, with a non-closing body) contained no closing instruction; provider
+`closingIssuesReferences` was empty, and issue #1469 is open. That update
+specifies the nine closing verbs, repository-qualified identities, creation
+readback, explicit squash messages, and the one-time owner-authorized
+self-bootstrap. The current planning update adds an explicit task-progress
+digest mode with legacy raw-digest compatibility and must merge before the
+code ledger is initialized. These completed bootstrap milestones are recorded
+as evidence here rather than checked task lines, so the ledger's initial
+digest has every numbered completion marker in its canonical unchecked form.
 
-- [x] 1.4 Correct the bootstrap incident: reopen #1469 after the planning PR's negated close phrase caused GitHub to close it, edit the merged PR body to remove that phrase, and verify the issue is open.
-- [ ] 1.5 Specify GitHub closing semantics for PR titles, bodies, source commit messages, provider reference identities, and generated merge messages; update the implementation manifest's requirement list; resolve the documented self-bootstrap authority gap; and merge a non-closing plan-update PR only after verifying all four message sources contain no closing syntax, its provider references are empty, and #1469 remains open after merge.
+## 1. Initialize the bounded controller work
+
+- [ ] 1.1 From a fresh clean-base checkout after the planning update merges, run `validate` and read-only `preflight`, create the manifest's exact planned issue branch, and initialize its ledger before source edits; verify the initialized ledger freezes the expected controller files, exact issue, three-round cap, and artifact digests. Keep every mutation flag disabled throughout this code run.
 
 ## 2. Implement passed-head revalidation as one frozen code chunk
 
@@ -16,6 +30,7 @@
 - [ ] 2.3 Bind all shipping actions to the latest complete passing head and verify local, remote, and provider heads remain exact; prove pending refresh, stale local/remote head, and pre-merge base drift fail before mutation, a refreshed third-round needs-changes outcome becomes terminal blocked, safe exact-head push synchronizes only the absent or immediately prior remote ref, an exact existing open PR is reused rather than duplicated, stale/closed/merged/draft/multiple PRs reject refresh, and closure verifies the exact merged PR/issue/base ancestry.
 - [ ] 2.4 Add focused controller documentation, usage examples, a new friction-log entry for the stale-pass/base-refresh failure, and focused tests; verify `python3 -m unittest discover -s scripts/tests -p 'test_loop_engine.py'`, `python3 scripts/precheck.sh`, and strict OpenSpec validation pass.
 - [ ] 2.5 Harden PR issue-link validation: scan all nine GitHub closing verbs case-insensitively, with/without optional colon, across title, body, and every source commit message; accept only a standalone canonical `Closes #N` body line for complete chunks and a non-closing reference for progress chunks; compare provider identities by owner/repository plus issue number; verify exact references immediately after PR creation and before refresh admission and every approval/merge/closure path; use explicit safe merge subject/body, including squash; add table-driven syntax, negation/quote, foreign same-number issue, positive/negative, progress, missing/truncated-data, generated-merge-message, creation-readback, and provider-mismatch tests.
+- [ ] 2.6 Implement the explicit `raw`/`task_progress` OpenSpec digest modes, with absent mode retaining raw behavior; normalize only checked/unchecked markers on top-level, non-fenced task lines in the registered `tasks.md`, canonicalizing to `[ ]`. Test all-unchecked digest equality with the old raw baseline; `[ ]`/`[x]`/`[X]` toggles; task wording, IDs, order, surrounding text, non-task checkbox, quoted/nested/fenced lookalikes, other artifacts, and raw-mode byte-sensitivity; verify pre-existing legacy ledger and recovery-registry digests remain valid without migration.
 
 ## 3. Adversarial review and handoff
 

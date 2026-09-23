@@ -14,6 +14,7 @@ roadmap_gate: required
 openspec:
   change: passed-ledger-head-revalidation
   validation: cli-required
+  digest_mode: task_progress
   required_artifacts:
     - .openspec.yaml
     - proposal.md
@@ -85,6 +86,7 @@ issues:
           - Pending revalidation grants no shipping authority
           - Revalidation remains bounded across repeated protected-base advances
           - Pull-request issue links match the frozen closure mode exactly
+          - OpenSpec task progress does not invalidate the frozen plan
         files:
           - scripts/loop_engine.py
           - scripts/tests/test_loop_engine.py
