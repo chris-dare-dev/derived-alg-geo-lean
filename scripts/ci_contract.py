@@ -14,12 +14,13 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 FULL_SHA = re.compile(r"^[0-9a-fA-F]{40}$")
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
 BRANCH_REF = re.compile(r"^refs/heads/[A-Za-z0-9._/-]+$")
@@ -43,7 +44,8 @@ STATUSES = {
     "skipped",
     "unknown",
 }
-SUCCESS_CONCLUSIONS = {"success", "neutral"}
+SUCCESS_CONCLUSIONS = {"success"}
+REQUIRED_PINS = {"lean-toolchain", "lake-manifest.json", "pins.json"}
 
 
 def _load(path: Path) -> Any:
@@ -53,6 +55,24 @@ def _load(path: Path) -> Any:
         raise ValueError(f"file does not exist: {path}") from exc
     except json.JSONDecodeError as exc:
         raise ValueError(f"{path}: invalid JSON at line {exc.lineno}: {exc.msg}") from exc
+
+
+def _load_trusted_inventory(repo_root: Path, commit: str) -> Any:
+    """Read policy bytes from an immutable Git object selected by the adapter."""
+    if not _is_sha(commit):
+        raise ValueError("trusted base commit must be a full Git SHA")
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), "show", f"{commit}:scripts/ci_gate_inventory.json"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode:
+        raise ValueError("trusted base commit has no readable gate inventory")
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"trusted gate inventory is invalid JSON at line {exc.lineno}") from exc
 
 
 def _is_string(value: Any) -> bool:
@@ -193,7 +213,7 @@ def validate_inventory(inventory: Any) -> list[str]:
         return errors + ["inventory.gates must be a non-empty array"]
 
     by_id: dict[str, dict[str, Any]] = {}
-    names: set[str] = set()
+    producer_names: set[tuple[str, str]] = set()
     for index, gate in enumerate(gates):
         prefix = f"inventory.gates[{index}]"
         if not isinstance(gate, dict):
@@ -208,10 +228,11 @@ def validate_inventory(inventory: Any) -> list[str]:
             errors.append(f"{prefix}.id duplicates {gate_id!r}")
         elif _is_string(gate_id):
             by_id[gate_id] = gate
-        if _is_string(name) and name in names:
-            errors.append(f"{prefix}.name duplicates {name!r}")
-        elif _is_string(name):
-            names.add(name)
+        producer_name = (gate.get("producer"), name)
+        if all(_is_string(part) for part in producer_name):
+            if producer_name in producer_names:
+                errors.append(f"{prefix} duplicates producer/name {producer_name!r}")
+            producer_names.add(producer_name)
         gate_class = gate.get("class")
         if gate_class not in GATE_CLASSES:
             errors.append(f"{prefix}.class is not a recognized gate class")
@@ -248,7 +269,13 @@ def validate_inventory(inventory: Any) -> list[str]:
     return errors
 
 
-def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
+def validate_evidence(
+    inventory: Any,
+    evidence: Any,
+    *,
+    trusted_base_commit: str | None = None,
+    trusted_inventory_sha256: str | None = None,
+) -> dict[str, Any]:
     errors = validate_inventory(inventory)
     warnings: list[str] = []
     if not isinstance(evidence, dict):
@@ -264,12 +291,14 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         "event",
         "ref",
         "revision_binding",
+        "policy_binding",
         "provider_binding",
         "platform",
         "run_id",
         "run_attempt",
         "producer",
         "toolchain",
+        "pins",
         "artifacts",
         "gates",
     )
@@ -282,6 +311,27 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         errors.append("evidence.repository is required")
     if isinstance(inventory, dict) and evidence.get("repository") != inventory.get("repository"):
         errors.append("evidence.repository does not match inventory.repository")
+    # These two values must come from a trusted provider adapter, not from the
+    # PR checkout or from the evidence being validated. A missing anchor denies
+    # admission even when the record is internally self-consistent.
+    if not _is_sha(trusted_base_commit):
+        errors.append("trusted_base_commit must be supplied by the protected-base adapter")
+    elif evidence.get("base_commit") != trusted_base_commit:
+        errors.append("evidence.base_commit is stale relative to trusted_base_commit")
+    if not _is_sha256(trusted_inventory_sha256):
+        errors.append("trusted_inventory_sha256 must be supplied by the protected-base adapter")
+    elif _canonical_sha256(inventory) != trusted_inventory_sha256:
+        errors.append("inventory does not match trusted_inventory_sha256")
+    policy_binding = evidence.get("policy_binding")
+    if not isinstance(policy_binding, dict):
+        errors.append("evidence.policy_binding must be an object")
+    else:
+        if policy_binding.get("source") != "protected-base":
+            errors.append("evidence.policy_binding.source must be protected-base")
+        if policy_binding.get("commit") != trusted_base_commit:
+            errors.append("evidence.policy_binding.commit does not match trusted_base_commit")
+        if policy_binding.get("inventory_sha256") != trusted_inventory_sha256:
+            errors.append("evidence.policy_binding.inventory_sha256 does not match trusted_inventory_sha256")
     for field in ("base_commit", "head_commit", "candidate_commit", "candidate_tree"):
         if not _is_sha(evidence.get(field)):
             errors.append(f"evidence.{field} must be a full 40-character commit/tree SHA")
@@ -314,6 +364,11 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         errors.append("evidence.producer is required")
     if not _is_string(evidence.get("toolchain")):
         errors.append("evidence.toolchain is required")
+    pins = evidence.get("pins")
+    if not isinstance(pins, dict) or set(pins) != REQUIRED_PINS or any(
+        not _is_sha256(value) for value in pins.values()
+    ):
+        errors.append("evidence.pins must contain SHA-256 digests for lean-toolchain, lake-manifest.json and pins.json")
 
     artifacts = evidence.get("artifacts")
     artifact_ids: set[str] = set()
@@ -328,7 +383,7 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         if not isinstance(artifact, dict):
             errors.append(f"{prefix} must be an object")
             continue
-        for field in ("id", "path", "sha256", "media_type", "producer", "kind", "commit"):
+        for field in ("id", "path", "sha256", "media_type", "producer", "kind", "commit", "subject"):
             if not _is_string(artifact.get(field)):
                 errors.append(f"{prefix}.{field} is required")
         for field in ("run_id", "run_attempt", "size_bytes"):
@@ -365,7 +420,6 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
         errors.append("evidence.gates must be an array")
         gates = []
     seen_ids: set[str] = set()
-    seen_names: set[str] = set()
     seen_provider_names: set[tuple[str, str]] = set()
     seen_provider_ids: set[str] = set()
     gate_by_id: dict[str, dict[str, Any]] = {}
@@ -393,10 +447,6 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
             errors.append(f"{prefix}.name does not match inventory")
         if gate.get("producer") != definition.get("producer"):
             errors.append(f"{prefix}.producer does not match inventory")
-        if gate.get("name") in seen_names:
-            errors.append(f"{prefix} duplicates provider/check name {gate.get('name')!r}")
-        elif _is_string(gate.get("name")):
-            seen_names.add(gate.get("name"))
         provider_key = (str(gate.get("producer")), str(gate.get("name")))
         if provider_key in seen_provider_names:
             errors.append(f"{prefix} duplicates provider/name {provider_key!r}")
@@ -465,6 +515,8 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
                 errors.append(f"{prefix}: artifact producer does not match inventory")
             if artifact.get("kind") != definition.get("artifact"):
                 errors.append(f"{prefix}: artifact kind does not match inventory")
+            if artifact.get("subject") != gate_id:
+                errors.append(f"{prefix}: artifact subject does not match gate id")
             if artifact.get("run_id") != evidence.get("run_id"):
                 errors.append(f"{prefix}: artifact run_id must equal evidence.run_id")
             if artifact.get("run_attempt") != evidence.get("run_attempt"):
@@ -498,17 +550,23 @@ def validate_evidence(inventory: Any, evidence: Any) -> dict[str, Any]:
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--inventory", type=Path, required=True)
+    parser.add_argument("--repo-root", type=Path, required=True)
     parser.add_argument("--evidence", type=Path, required=True)
+    parser.add_argument("--trusted-base-commit", required=True)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        inventory = _load(args.inventory)
+        inventory = _load_trusted_inventory(args.repo_root, args.trusted_base_commit)
         evidence = _load(args.evidence)
-        result = validate_evidence(inventory, evidence)
+        result = validate_evidence(
+            inventory,
+            evidence,
+            trusted_base_commit=args.trusted_base_commit,
+            trusted_inventory_sha256=_canonical_sha256(inventory),
+        )
     except ValueError as exc:
         print(json.dumps({"valid": False, "errors": [str(exc)], "warnings": []}, indent=2))
         return 2

@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "repository": "chris-dare-dev/derived-alg-geo-lean",
   "gates": [
     {
