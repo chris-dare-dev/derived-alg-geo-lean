@@ -6,6 +6,8 @@ See `proposal.md` for the milestone motivation and `specs/topic-template-gate/sp
 
 The Derived loop controller validates issue runs against one repository remote and one frozen file set. It cannot review or authorize edits in the MathFormalContract and arXMCP repositories from a Derived manifest. The current Derived default branch also has no `.claude/loop-authority.yaml`; issues #137 and #183 are explicitly owner-gated. No provider mutation is part of this change until the owner enables it.
 
+Issue #137 is also labeled `epic`. The controller permits epic opt-in only for legacy manifests; a new branch-authored manifest cannot select #137. The child implementation issues must be completed in their own repository scopes first, with #137 handled as a separate owner-controlled closeout after both children are resolved.
+
 ## Goals / Non-Goals
 
 **Goals:**
