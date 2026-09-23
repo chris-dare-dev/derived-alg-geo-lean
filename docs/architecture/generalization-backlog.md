@@ -149,3 +149,89 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   pinned typeclass-heartbeat diagnostic).
 - state:              FALSIFIED compiler witness: the current generic bridge
   cannot admit a merely bounded-above complex without degreewise projectivity.
+
+### 2026-09-22 — existence of a minimizing object for `rouquierDim` (planned)
+- chunk:              rou1-919-rouquier-dimension
+- reviewing commit:   e18e20f9c3768269eedb622da04b9ab9f26ce127
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.rouquierDim`, via
+  `ENat.exists_eq_iInf`
+- weaker hypotheses:  a nonempty index type and any function into `ℕ∞`; for
+  `rouquierDim`, `HasZeroObject` supplies a local `Nonempty C` witness. No
+  finite-dimension assumption or `[IsTriangulated C]` is needed.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/Data/ENat/Lattice.lean:115-116`
+- source note:        The pinned lemma gives an index attaining the infimum
+  even when its value is `⊤`. The definition still returns only a scalar and
+  does not package that object. “Non-attainment” therefore describes the lack
+  of a selected witness in the definition, not the absence of an existential
+  minimizer. Whether to expose the stronger existence theorem is a separate
+  API decision.
+- state:              UNVERIFIED
+
+### 2026-09-22 — classical generators are strong when one strong generator exists (planned)
+- chunk:              rou1-919-rouquier-dimension
+- reviewing commit:   e18e20f9c3768269eedb622da04b9ab9f26ce127
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.Generators`, with the
+  iterated-envelope composition theorem as the reusable result
+- weaker hypotheses:  a triangulated category with some strong generator and
+  a chosen classical generator; no scheme, stability, or geometric
+  hypotheses.
+- pin status:         UPSTREAM-ONLY (absent at the pinned revision)
+- source note:        [Stacks Project tag 0FXA](https://stacks.math.columbia.edu/tag/0FXA)
+  proves that every classical generator is strong when the category has a
+  strong generator. Pinned Mathlib records this as a TODO at
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Generators.lean:40-41`;
+  its current strong-to-classical theorem is at lines 196-200. This sharpens
+  the planned “finite dimension gives a classical generator” consequence, but
+  requires the composition-of-envelopes work and is outside this chunk.
+- state:              UNVERIFIED
+
+### 2026-09-22 — finite Rouquier witnesses avoid nonempty-index minimization
+- chunk:              rou1-919-rouquier-dimension
+- reviewing commit:   e18e20f9c3768269eedb622da04b9ab9f26ce127
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.rouquierDim` finite-bound
+  and finite/strong-generator characterizations
+- weaker hypotheses:  for any `ι : Sort*` and `f : ι → ℕ∞`,
+  `(⨅ i, f i) ≤ n ↔ ∃ i, f i ≤ n` and
+  `(⨅ i, f i) ≠ ⊤ ↔ ∃ i, f i ≠ ⊤` compile without `[Nonempty ι]`;
+  specializing to Rouquier dimension requires no local `[Nonempty C]` or
+  `[IsTriangulated C]` proof assumption.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/Order/CompleteLattice/Defs.lean:313-315`,
+  `.lake/packages/mathlib/Mathlib/Data/ENat/Basic.lean:325-326`, and
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Generators.lean:86-90`
+- source note:        `/tmp/rou1-919-no-nonempty-probe.lean` compiled the
+  arbitrary-index lemmas and the finite-bound, finite/strong-generator,
+  classical-generator, and zero-stage statements for the proposed `rouquierDim`
+  infimum formula (named `candidateDim` in the probe) against this exact commit.
+  Finite witnesses follow from `iInf_lt_iff` at `n + 1` and `⊤`,
+  followed by `ENat.lt_coe_add_one_iff`; the proof need not use
+  `ENat.exists_eq_iInf`. The issue body suggests `iInf_le_iff`, but its pinned
+  signature is a universal lower-bound condition, not an existential witness.
+  `triangEnvelopeIter_succ` has only the existing
+  pretriangulated context, whereas `triangEnvelopeIter_add` requires
+  `[IsTriangulated C]`. This lift does not remove `HasZeroObject` from the
+  public API, which the reused generation-time/envelope API requires.
+- state:              L (proof-witness verified)
+
+### 2026-09-22 — zero Rouquier dimension needs no inhabited infimum index
+- chunk:              rou1-919-rouquier-dimension
+- reviewing commit:   e18e20f9c3768269eedb622da04b9ab9f26ce127
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.rouquierDim` zero-stage
+  characterization through `ENat.iInf_eq_zero`
+- weaker hypotheses:  for any `ι : Sort*` and `f : ι → ℕ∞`,
+  `(⨅ i, f i) = 0 ↔ ∃ i, f i = 0` compiles without `[Nonempty ι]`;
+  the Rouquier specialization needs no local `[Nonempty C]` or
+  `[IsTriangulated C]` proof assumption.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/Data/ENat/Lattice.lean:71` and
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Generators.lean:66-68`
+- source note:        `/tmp/rou1-919-no-nonempty-probe.lean` compiled the
+  arbitrary-index lemma and the zero-stage Rouquier equivalence using
+  `ENat.iInf_eq_zero` and `generationTime_eq_zero_iff'`; this proof route does
+  not need an inhabited-index instance.
+- state:              L (proof-witness verified)
