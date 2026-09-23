@@ -473,9 +473,17 @@ sentence is why `single-instantiation` ran nowhere for months: the hook made the
 script unrunnable, the summary said CI had it covered, and `bb8a1278` records the
 24 abstractions that drifted past its baseline with nothing going red.
 
-**For a local pre-flight the hook allows**, run `scripts/precheck.sh`: every gate
-that needs no Lean build, plus a targeted build of the modules you changed, in
-seconds. It is a cheap green, not a green.
+**For a local pre-flight the hook allows**, install the loop controller's pinned
+Python dependencies in each fresh worktree, then put that environment first on
+`PATH` when running precheck. It runs every gate that needs no Lean build, plus
+a targeted build of the modules you changed, in seconds. It is a cheap green,
+not a green.
+
+```bash
+python3 -m venv .loop-tools
+.loop-tools/bin/python -m pip install -r scripts/requirements-loop.txt
+PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh
+```
 
 Build locally by **naming a target**, and **naming your own `lake`**, which is
 what the hook allows:
@@ -583,7 +591,7 @@ precisely what this rule exists to keep off the developer's machine.
 Useful focused commands are:
 
 ```bash
-scripts/precheck.sh     # every gate needing no Lean build, plus a targeted build
+PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh  # gates plus targeted build
 lake build AlgebraicGeometryAudit StabilityConditionAudit DGCategoryAudit
 lake exe runLinter DerivedAlgGeo
 lake exe lint-style

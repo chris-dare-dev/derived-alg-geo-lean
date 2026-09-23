@@ -402,7 +402,7 @@ def has_visible_why_heading(markdown: str) -> bool:
         # Raw HTML can hide text through attributes such as `hidden` or inline
         # styles. Do not call that text visibly present; unrelated HTML outside
         # this candidate heading remains irrelevant.
-        if any(child.type == "html_inline" for child in children):
+        if any(child.type in {"html_inline", "image"} for child in children):
             continue
         visible_text = "".join(child.content for child in children if child.type in {"text", "code_inline"}).strip()
         if visible_text == "Why":

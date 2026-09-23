@@ -1345,6 +1345,7 @@ class CommonMarkBoundaryTests(unittest.TestCase):
             "- ## Why\n",
             "## Why *not*\n",
             "## ![Why](https://example.test/image.png)\n",
+            "## ![icon](https://example.test/image.png)Why\n",
             "## <span hidden>Why</span>\n",
             "## <b>Why</b>\n",
         ):
