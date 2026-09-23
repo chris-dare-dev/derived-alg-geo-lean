@@ -54,11 +54,13 @@ construction prerequisite for #522, and #525 remains downstream.
    general scheme-level `LeftDerivedPullback` or proof of full
    relative-perfect preservation.
 8. For each new concrete progress chunk, freeze its source leaf, relevant
-   public audit, generalization-backlog record, and any outcome log before
-   ledger initialization. The required OpenSpec task checklist is itself
-   digest-bound, so leave it unchanged during the code loop; sync its completed
-   checkbox in a separate post-merge planning update rather than invalidating
-   the review ledger.
+   public audit, generalization-backlog path, and any outcome log before ledger
+   initialization. Append only generalization findings that cannot be acted on
+   within that chunk; an existing API consumed directly is not an unverified
+   lift, and an empty disposition does not warrant a placeholder row. The
+   current loop-controller digest normalizes task-checkbox state, so the active
+   task may be checked in its implementation PR. Task wording and the other
+   required OpenSpec artifacts remain frozen after ledger initialization.
 9. State the first derived-effect endpoint as nonzero degree-minus-one homology
    of the supported affine bounded-projective representative. A Tor
    interpretation is not part of that result unless a proved comparison to an
@@ -78,10 +80,10 @@ construction prerequisite for #522, and #525 remains downstream.
     merges, start from a fresh clean checkout at the exact `origin/main`, run
     preflight and initialize the digest-bound ledger, then route every
     implementation-phase provider action through the controller.
-13. Do not change any required OpenSpec artifact after ledger initialization.
-    In particular, update task completion only in a post-merge plan-sync PR;
-    the code PR must not claim a task checkbox while that would invalidate its
-    digest-bound controller evidence.
+13. Do not change task wording or any other required OpenSpec artifact after
+    ledger initialization. The controller's v2 digest normalizes task-checkbox
+    state, so check the active task in the implementation PR when its work is
+    complete; this does not invalidate the ledger evidence.
 14. Treat the actual affine scheme-module pullback of the displayed resolution
     as a fourth #554 progress slice. Its comparison is the underived,
     degreewise `Scheme.Modules.pullback` on one finite free representative,
