@@ -160,11 +160,11 @@ After a refreshed round passes, the controller MAY accept another revalidation o
 - **THEN** the ledger becomes terminal blocked, retains every prior event and finding, cannot reserve a fourth round, and grants no shipping authority
 
 ### Requirement: OpenSpec task progress does not invalidate the frozen plan
-The controller MUST select the OpenSpec digest scheme from the frozen manifest's `openspec.digest_mode`. When omitted, the scheme MUST remain byte-for-byte raw for compatibility with existing manifests and ledger/recovery records. A manifest MAY select `task_progress`; in that scheme, only the checked/unchecked marker on a top-level, non-fenced task line in the registered `tasks.md` artifact matching `- [ ] N.N <description>`, `- [x] N.N <description>`, or `- [X] N.N <description>` is normalized, with every marker canonicalized to `[ ]`. No other artifact or line is normalized. The all-unchecked task-file digest MUST equal its raw digest, so a freshly initialized ledger starts with the same frozen value. Task IDs, descriptions, order, surrounding text, non-task checkbox content, quoted/nested/code-fenced task-like text, and all other required artifacts MUST remain digest-sensitive. The controller MUST continue comparing the selected digest at every existing ledger, review, and publication boundary; it MUST NOT migrate or reinterpret a legacy raw digest as `task_progress`.
+The controller MUST select the OpenSpec digest scheme from the frozen manifest's `openspec.digest_mode`. When omitted, the scheme MUST remain identical to the historical raw digest algorithm for compatibility with existing manifests and ledger/recovery records, including its UTF-8 text decoding, universal-newline handling, and canonical JSON serialization. When present, `digest_mode` MUST be a string equal to `raw` or `task_progress`; any other type or value MUST fail validation before a ledger is created or changed, never silently fall back to raw. A manifest MAY select `task_progress`; in that scheme, only the checked/unchecked marker on a top-level, non-fenced task line in the registered `tasks.md` artifact matching `- [ ] N.N <description>`, `- [x] N.N <description>`, or `- [X] N.N <description>` is normalized, with every marker canonicalized to `[ ]`. No other artifact or line is normalized. The all-unchecked task-file digest MUST equal its historical raw digest, so a freshly initialized ledger starts with the same frozen value. The exact `tasks.md` artifact MUST also be included in the frozen chunk file list, allowing progress-marker-only edits through local and remote changed-file scope gates without creating a global exception. Task IDs, descriptions, order, surrounding text, non-task checkbox content, quoted/nested/code-fenced task-like text, and all other required artifacts MUST remain digest-sensitive. The controller MUST continue comparing the selected digest at every existing ledger, review, and publication boundary; it MUST NOT migrate or reinterpret a legacy raw digest as `task_progress`.
 
 #### Scenario: Completed task markers preserve the opt-in frozen digest
 - **WHEN** a `task_progress` manifest's top-level task markers change among `[ ]`, `[x]`, and `[X]` without other file edits
-- **THEN** the digest remains equal to the all-unchecked raw baseline and the ledger remains valid
+- **THEN** the digest remains equal to the all-unchecked raw baseline, the ledger remains valid, and the frozen local/remote path checks accept the progress-only `tasks.md` change
 
 #### Scenario: Task wording or structure changes remain rejected
 - **WHEN** a task description, identifier, ordering, or non-task planning content changes after ledger initialization
@@ -174,10 +174,14 @@ The controller MUST select the OpenSpec digest scheme from the frozen manifest's
 - **WHEN** a checkbox outside a numbered task item changes after ledger initialization
 - **THEN** the digest changes and the controller rejects the modified plan
 
-#### Scenario: Legacy raw digests remain byte-sensitive
+#### Scenario: Legacy raw digests retain the old algorithm
 - **WHEN** a manifest omits `openspec.digest_mode` or selects `raw`
-- **THEN** its historical raw artifact digest behavior is unchanged, including for existing ledger and recovery-registry records
+- **THEN** its historical artifact digest behavior remains unchanged, including existing ledger and recovery-registry records and the old text/newline handling for CRLF and lone-CR inputs
 
 #### Scenario: Task-like examples outside the task list remain sensitive
 - **WHEN** a task-like checkbox changes inside a fenced block, a quote, a nested list, or any artifact other than the registered `tasks.md`
 - **THEN** the digest changes and the controller rejects the modified plan
+
+#### Scenario: Unsupported digest modes fail closed
+- **WHEN** a manifest supplies a non-string digest mode or a string other than `raw` or `task_progress`
+- **THEN** validation rejects it before ledger initialization or mutation instead of silently choosing raw behavior

@@ -93,6 +93,7 @@ issues:
           - .claude/skills/run-loop/SKILL.md
           - CONTRIBUTING.md
           - docs/architecture/loop-engineering-friction.md
+          - openspec/changes/passed-ledger-head-revalidation/tasks.md
         acceptance:
           - >-
             New ledgers pin the protected-base OID, and a real-Git legacy
