@@ -6,7 +6,9 @@ remote: origin
 base_branch: main
 base_ref: origin/main
 mode: independent
-enabled: true
+# Superseded by #1473, which delivers #1469's goal (passed ledgers survive a
+# moved base, with bounded revalidation) and closes #1469. Kept as history.
+enabled: false
 allow_force_push: false
 state_dir: .loop-runs
 roadmap_gate: required
@@ -84,6 +86,7 @@ issues:
           - Revalidation admission fails closed on repository or provider uncertainty
           - Pending revalidation grants no shipping authority
           - Revalidation remains bounded across repeated protected-base advances
+          - Pull-request issue links match the frozen closure mode exactly
         files:
           - scripts/loop_engine.py
           - scripts/tests/test_loop_engine.py

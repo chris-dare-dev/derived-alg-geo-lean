@@ -16,8 +16,11 @@ context: |
   The repository has a separate bounded loop controller in
   scripts/loop_engine.py. It owns issue selection, mutation authorization, and
   the review ledger; OpenSpec owns the proposal, requirements, design, and task
-  artifacts. A run must not widen a frozen chunk or silently skip a required
-  reviewer.
+  artifacts when a change exists. A single issue may be planned by its own body
+  instead. A run must not widen a frozen chunk or silently skip a required
+  reviewer. Inside an unattended run, planning is a step of the run, not a
+  separate session: write the artifacts, then continue into implementation
+  without waiting for a new request.
 
 rules:
   proposal:
@@ -41,7 +44,9 @@ rules:
 operations:
   apply:
     guidance:
-      - Work only from the checked-in OpenSpec artifacts and the active loop manifest; do not invent new scope in code.
+      - Work only from the issue, the OpenSpec artifacts and the active loop manifest; do not invent new scope in code.
+      - Tick task checkboxes and append agent-observations.md as work proceeds; the ledger's plan digest ignores both.
+      - Resolve an unclear task by taking the smallest reading that meets the definition of done and recording it; do not pause for confirmation.
       - Keep the mathematical, repository-boundary, abstraction, and style reviews independent on the same commit.
       - Preserve exhausted attempts; for opted-in recovery consume the controller's next action automatically, within the same scope and cumulative budget.
       - Require independent acceptance of the exact research plan before resuming; research acceptance never satisfies implementation review or provider permissions.
