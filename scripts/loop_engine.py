@@ -26,10 +26,32 @@ import subprocess
 import sys
 import tempfile
 from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version as package_version
 from pathlib import Path
 from typing import Any, Iterable
 
 import loop_recovery
+
+try:
+    from markdown_it import MarkdownIt
+except ImportError as exc:  # pragma: no cover - covered by the documented dependency setup
+    raise SystemExit(
+        "markdown-it-py==3.0.0 is required; install scripts/requirements-loop.txt"
+    ) from exc
+
+try:
+    MARKDOWN_IT_VERSION = package_version("markdown-it-py")
+except PackageNotFoundError as exc:  # pragma: no cover - guarded by the import above
+    raise SystemExit(
+        "markdown-it-py==3.0.0 is required; install scripts/requirements-loop.txt"
+    ) from exc
+if MARKDOWN_IT_VERSION != "3.0.0":
+    raise SystemExit(
+        "loop ledger digests require markdown-it-py==3.0.0; "
+        f"found {MARKDOWN_IT_VERSION}. Install scripts/requirements-loop.txt"
+    )
+
+COMMONMARK_PARSER = MarkdownIt("commonmark")
 
 try:
     import yaml
@@ -154,9 +176,23 @@ MAX_REVALIDATION_ROUNDS = 2
 # the observation log invalidated a ledger. v2 hashes the contract instead.
 OPENSPEC_DIGEST_VERSION = 2
 LOG_ARTIFACT_NAMES = {"agent-observations.md"}
-TASK_CHECKBOX_RE = re.compile(r"^(\s*[-*+] )\[[ xX]\]", re.MULTILINE)
 ISSUE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BRANCH_RE = re.compile(r"^agent/[a-z0-9][a-z0-9._/-]*$")
+TASK_LIST_CHECKBOX_RE = re.compile(r"^([ \t]*[-*+][ \t]+)\[[ xX]\]")
+TASK_INLINE_CHECKBOX_RE = re.compile(r"^\[[ xX]\]")
+MARKDOWN_LINE_END_RE = re.compile(r"\r\n|\r|\n")
+MARKDOWN_BLOCK_CONTENT_TYPES = {
+    "blockquote_open",
+    "bullet_list_open",
+    "code_block",
+    "fence",
+    "heading_open",
+    "html_block",
+    "hr",
+    "ordered_list_open",
+    "paragraph_open",
+}
+MARKDOWN_HTML_TOKEN_TYPES = {"html_block", "html_inline"}
 CLOSING_KEYWORD_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b", re.I)
 # Common non-closing issue-link phrases accepted for progress PRs.
 NON_CLOSING_REFERENCE_RE = re.compile(
@@ -263,6 +299,118 @@ def has_openspec(spec: dict[str, Any]) -> bool:
     return spec.get("openspec") is not None
 
 
+def split_markdown_lines(markdown: str, *, keepends: bool = False) -> list[str]:
+    """Split only on Markdown line endings, preserving every other code point."""
+
+    lines: list[str] = []
+    start = 0
+    for match in MARKDOWN_LINE_END_RE.finditer(markdown):
+        end = match.end() if keepends else match.start()
+        lines.append(markdown[start:end])
+        start = match.end()
+    if start < len(markdown):
+        lines.append(markdown[start:])
+    return lines
+
+
+def _contains_html_tokens(tokens: list[Any]) -> bool:
+    """Return whether a parsed token tree contains actual raw-HTML syntax."""
+
+    for token in tokens:
+        if token.type in MARKDOWN_HTML_TOKEN_TYPES:
+            return True
+        if token.children and _contains_html_tokens(token.children):
+            return True
+    return False
+
+
+def _parse_markdown(markdown: str) -> list[Any]:
+    """Parse with the pinned CommonMark grammar used by the ledger digest."""
+
+    return COMMONMARK_PARSER.parse(markdown)
+
+
+def normalize_task_checkboxes(markdown: str) -> str:
+    """Normalize checkbox state only in actual Markdown list-item paragraphs.
+
+    The first direct block of a list item must be a paragraph whose inline
+    content starts with the checkbox. Source maps then tie that parsed item
+    back to the exact line being normalized; checkbox-shaped code stays fixed.
+    """
+
+    lines = split_markdown_lines(markdown, keepends=True)
+    tokens = _parse_markdown(markdown)
+    if _contains_html_tokens(tokens):
+        raise LoopError("unsupported HTML-like Markdown syntax")
+
+    list_items: list[dict[str, Any]] = []
+    for token in tokens:
+        if token.type == "list_item_open":
+            list_items.append(
+                {
+                    "level": token.level,
+                    "first_block_seen": False,
+                    "paragraph_level": None,
+                }
+            )
+            continue
+
+        if token.type == "list_item_close":
+            while list_items and list_items[-1]["level"] >= token.level:
+                list_items.pop()
+            continue
+
+        if not list_items:
+            continue
+        item = list_items[-1]
+        if (
+            not item["first_block_seen"]
+            and token.level == item["level"] + 1
+            and token.type in MARKDOWN_BLOCK_CONTENT_TYPES
+        ):
+            item["first_block_seen"] = True
+            if token.type == "paragraph_open":
+                item["paragraph_level"] = token.level
+            continue
+
+        if item["paragraph_level"] is not None:
+            if (
+                token.type == "inline"
+                and token.level == item["paragraph_level"] + 1
+                and token.map
+                and TASK_INLINE_CHECKBOX_RE.match(token.content)
+            ):
+                line_number = token.map[0]
+                if (
+                    0 <= line_number < len(lines)
+                    and TASK_LIST_CHECKBOX_RE.match(lines[line_number])
+                ):
+                    lines[line_number] = TASK_LIST_CHECKBOX_RE.sub(
+                        r"\1[ ]", lines[line_number], count=1
+                    )
+            if token.type == "paragraph_close" and token.level == item["paragraph_level"]:
+                item["paragraph_level"] = None
+    return "".join(lines)
+
+
+def has_visible_why_heading(markdown: str) -> bool:
+    """Recognize the exact root-level ATX ``## Why`` heading; reject raw HTML."""
+
+    tokens = _parse_markdown(markdown)
+    if _contains_html_tokens(tokens):
+        raise LoopError("unsupported HTML-like Markdown syntax")
+    return any(
+        token.type == "heading_open"
+        and token.tag == "h2"
+        and token.level == 0
+        and token.markup == "##"
+        and index + 1 < len(tokens)
+        and tokens[index + 1].type == "inline"
+        and tokens[index + 1].content == "Why"
+        for index, token in enumerate(tokens)
+    )
+
+
 def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DIGEST_VERSION) -> str:
     """Hash planning content; the registered digest freezes it, not its Git path.
 
@@ -283,9 +431,16 @@ def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DI
         # records; a file of the same name under specs/ is contract.
         if version >= 2 and relative in LOG_ARTIFACT_NAMES:
             continue
-        content = path.read_text(encoding="utf-8")
+        try:
+            if version >= 2:
+                content = path.read_bytes().decode("utf-8")
+            else:
+                # Keep the original v1 newline normalization for old ledgers.
+                content = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise LoopError(f"OpenSpec artifact is not valid UTF-8: {relative}") from exc
         if version >= 2 and relative == "tasks.md":
-            content = TASK_CHECKBOX_RE.sub(r"\1[ ]", content)
+            content = normalize_task_checkboxes(content)
         parts.append({"path": relative, "content": content})
     return digest(parts)
 
@@ -324,11 +479,10 @@ def validate_openspec_artifacts(root: Path, spec: dict[str, Any]) -> None:
             raise LoopError(f"OpenSpec artifact is missing: {path.relative_to(root)}")
         if not path.read_text(encoding="utf-8").strip():
             raise LoopError(f"OpenSpec artifact is empty: {path.relative_to(root)}")
-    required_text = "\n".join(
-        ensure_inside(root, change_dir / relative).read_text(encoding="utf-8")
-        for relative in openspec["required_artifacts"]
-    )
-    if "proposal.md" in openspec["required_artifacts"] and "## Why" not in required_text:
+    proposal = ensure_inside(root, change_dir / "proposal.md")
+    if "proposal.md" in openspec["required_artifacts"] and not has_visible_why_heading(
+        proposal.read_text(encoding="utf-8")
+    ):
         raise LoopError("OpenSpec proposal must contain a Why section")
     spec_texts = [
         ensure_inside(root, change_dir / relative).read_text(encoding="utf-8")
@@ -1557,7 +1711,7 @@ def blob_at(root: Path, commit: str, path: str) -> str | None:
 
 
 def normalized_tasks(root: Path, commit: str, path: str) -> str:
-    return TASK_CHECKBOX_RE.sub(r"\1[ ]", blob_at(root, commit, path) or "")
+    return normalize_task_checkboxes(blob_at(root, commit, path) or "")
 
 
 LEAN_IMPORT_RE = re.compile(r"^(?:(?:public|private|meta)\s+)*import\s+(.+?)\s*$", re.MULTILINE)

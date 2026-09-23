@@ -1299,6 +1299,92 @@ class OpenSpecDigestTests(unittest.TestCase):
                 loop_engine.validate_spec(spec)
 
 
+class CommonMarkBoundaryTests(unittest.TestCase):
+    def test_proposal_why_must_be_a_visible_root_level_atx_heading(self) -> None:
+        for proposal in (
+            "## Why\n",
+            "# Proposal\n\n## Why ###\n",
+            "`<widget>` is inline code\n## Why\n",
+        ):
+            with self.subTest(proposal=proposal):
+                self.assertTrue(loop_engine.has_visible_why_heading(proposal))
+
+        for proposal in (
+            "## WhyNot\n",
+            "## Why with extra text\n",
+            "Why\n---\n",
+            "```md\n## Why\n```\n",
+            "> ## Why\n",
+            "- ## Why\n",
+        ):
+            with self.subTest(proposal=proposal):
+                self.assertFalse(loop_engine.has_visible_why_heading(proposal))
+
+        for markup in ("<!-- comment -->\n## Why\n", "<widget>text</widget>\n## Why\n"):
+            with self.subTest(markup=markup):
+                with self.assertRaisesRegex(loop_engine.LoopError, "HTML-like"):
+                    loop_engine.has_visible_why_heading(markup)
+
+    def test_task_checkbox_normalization_follows_commonmark_blocks(self) -> None:
+        tasks = (
+            "- [x] 1.1 Parent\n"
+            "  - [X] 1.2 Nested\n"
+            "* [x] Unnumbered star item\n"
+            "+ [X] Unnumbered plus item\n"
+        )
+        self.assertEqual(
+            loop_engine.normalize_task_checkboxes(tasks),
+            "- [ ] 1.1 Parent\n"
+            "  - [ ] 1.2 Nested\n"
+            "* [ ] Unnumbered star item\n"
+            "+ [ ] Unnumbered plus item\n",
+        )
+
+        code_and_non_tasks = (
+            "```md\n- [x] Fenced example\n```\n"
+            "-     [x] Indented code block\n"
+            "- Parent paragraph\n\n  [x] Later paragraph\n"
+            "> - [x] Blockquote item\n"
+            "-[x] Malformed list marker\n"
+        )
+        self.assertEqual(loop_engine.normalize_task_checkboxes(code_and_non_tasks), code_and_non_tasks)
+
+    def test_v2_digest_ignores_only_actual_list_checkbox_state(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            tasks = root / "openspec" / "changes" / "pilot-change" / "tasks.md"
+            tasks.write_text(
+                "# Tasks\n\n- [ ] 1.1 Real task\n\n```md\n- [ ] 9.1 Example\n```\n",
+                encoding="utf-8",
+            )
+            initial = loop_engine.openspec_digest(root, spec)
+            tasks.write_text(
+                tasks.read_text(encoding="utf-8").replace("- [ ] 1.1", "- [x] 1.1"),
+                encoding="utf-8",
+            )
+            self.assertEqual(loop_engine.openspec_digest(root, spec), initial)
+
+            tasks.write_text(
+                tasks.read_text(encoding="utf-8").replace("- [ ] 9.1", "- [x] 9.1"),
+                encoding="utf-8",
+            )
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec), initial)
+
+    def test_structural_proposal_validation_does_not_match_examples(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            proposal = root / "openspec" / "changes" / "pilot-change" / "proposal.md"
+            proposal.write_text("The phrase ## Why appears in prose.\n", encoding="utf-8")
+            with self.assertRaisesRegex(loop_engine.LoopError, "proposal must contain"):
+                loop_engine.validate_openspec_artifacts(root, spec)
+
+            proposal.write_text("```md\n## Why\n```\n", encoding="utf-8")
+            with self.assertRaisesRegex(loop_engine.LoopError, "proposal must contain"):
+                loop_engine.validate_openspec_artifacts(root, spec)
+
+
 MANIFEST = ".claude/loop-specs/test-run.yaml"
 REAL_READ_OWNER_FILE = loop_engine.read_owner_file
 

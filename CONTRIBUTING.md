@@ -165,8 +165,15 @@ request when you use it.
 For a local pre-flight that the hook allows, run:
 
 ```bash
+python3 -m venv .loop-tools
+source .loop-tools/bin/activate
+python -m pip install -r scripts/requirements-loop.txt
 scripts/precheck.sh
 ```
+
+Keep this environment activated for local precheck and loop-controller
+commands: the scripts invoke `python3`, which will then resolve to the same
+environment that received the parser dependency.
 
 It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
 `--diff-only` style on your own lines, source-independence, layering, umbrella

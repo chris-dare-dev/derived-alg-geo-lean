@@ -1,0 +1,3 @@
+# The parser version is part of the OpenSpec digest contract; do not float it.
+markdown-it-py==3.0.0
+PyYAML>=6,<7
