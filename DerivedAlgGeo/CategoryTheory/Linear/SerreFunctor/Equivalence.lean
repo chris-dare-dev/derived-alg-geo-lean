@@ -95,7 +95,7 @@ noncomputable def SerreFunctorData.fullyFaithful [HomFinite k C]
     rw [← serreHomEquiv_apply k C D A B]
     exact (serreHomEquiv k C D A B).symm_apply_apply f
 
-/-! A co-Serre witness is the right Serre-data root on the opposite category.
+/-- A co-Serre witness is the right Serre-data root on the opposite category.
 This abbreviation keeps the same canonical duality fields rather than
 introducing a second structure with mirrored data. -/
 abbrev CoSerreFunctorData := SerreFunctorData k Cᵒᵖ
