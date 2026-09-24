@@ -1284,6 +1284,17 @@ class OpenSpecDigestTests(unittest.TestCase):
             )
             self.assertTrue(loop_engine.ledger_openspec_matches(root, spec, old_v2))
 
+    def test_unknown_digest_versions_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            for version in (0, 4, -1, True, "3", 2.0):
+                with self.subTest(version=version):
+                    with self.assertRaisesRegex(loop_engine.LoopError, "unsupported OpenSpec digest version"):
+                        loop_engine.openspec_digest(root, spec, version)
+                    with self.assertRaisesRegex(loop_engine.LoopError, "unsupported OpenSpec digest version"):
+                        loop_engine.ledger_digest_version({"openspec_digest_version": version})
+
     def test_a_single_issue_manifest_may_omit_openspec(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -1384,6 +1395,8 @@ class CommonMarkBoundaryTests(unittest.TestCase):
             loop_engine.normalize_task_checkboxes(links_and_inline_html),
             "- [x](https://example.test)\n- [ ](https://example.test)\n- [ ] Render <tag>\n",
         )
+        reference_link = "- [x] linked label\n\n[x]: https://example.test\n"
+        self.assertEqual(loop_engine.normalize_task_checkboxes(reference_link), reference_link)
         soft_break = "- [x]\n  continued text\n"
         self.assertEqual(
             loop_engine.normalize_task_checkboxes(soft_break),
@@ -1421,6 +1434,11 @@ class CommonMarkBoundaryTests(unittest.TestCase):
             checked_soft_break = loop_engine.openspec_digest(root, spec)
             tasks.write_text("# Tasks\n\n- [ ]\n  continued description\n", encoding="utf-8")
             self.assertEqual(loop_engine.openspec_digest(root, spec), checked_soft_break)
+
+            tasks.write_text("- [x] linked label\n\n[x]: https://example.test\n", encoding="utf-8")
+            reference_link = loop_engine.openspec_digest(root, spec)
+            tasks.write_text("- [ ] linked label\n\n[x]: https://example.test\n", encoding="utf-8")
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec), reference_link)
 
     def test_structural_proposal_validation_does_not_match_examples(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1843,6 +1861,7 @@ class ContentBindingTests(unittest.TestCase):
         self.state = {
             "plan_paths": [MANIFEST, "openspec/changes/pilot-change"],
             "openspec_change": "pilot-change",
+            "openspec_digest_version": 3,
             "chunk": {"files": ["a.txt"]},
         }
         # The provider's view of the base branch tip is local `main` here.
@@ -1913,6 +1932,24 @@ class ContentBindingTests(unittest.TestCase):
         ):
             with self.subTest(name):
                 self.assertFalse(self.matches(self.probe(name, edit)))
+
+    def test_v2_reviewed_head_uses_historical_task_normalization(self) -> None:
+        tasks = self.root / "openspec" / "changes" / "pilot-change" / "tasks.md"
+        tasks.write_text(
+            "# Tasks\n\n- [ ] 1.1 Real task\n\n```md\n- [ ] 9.1 Example\n```\n",
+            encoding="utf-8",
+        )
+        self.reviewed = commit_all(self.root, "reviewed v2 tasks")
+        state = {**self.state, "openspec_digest_version": 2}
+
+        def tick_example() -> None:
+            tasks.write_text(tasks.read_text(encoding="utf-8").replace("- [ ] 9.1", "- [x] 9.1"), encoding="utf-8")
+
+        head = self.probe("v2-example-progress", tick_example)
+        self.assertTrue(loop_engine.reviewed_content_matches(self.root, self.spec, state, self.reviewed, head))
+
+        state["openspec_digest_version"] = 3
+        self.assertFalse(loop_engine.reviewed_content_matches(self.root, self.spec, state, self.reviewed, head))
 
     def test_a_base_change_to_a_reviewed_file_requires_revalidation(self) -> None:
         self.move_base(touch_reviewed_file=True)

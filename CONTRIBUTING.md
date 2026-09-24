@@ -215,6 +215,11 @@ keeps a passed review; a moved change needs one revalidation round. Opting into
 chunk, files a follow-up issue, and moves on. See
 [the recovery protocol](docs/architecture/loop-recovery.md).
 
+These grants govern unattended controller runs. An explicit owner request in
+the active task to maintain an existing PR authorizes the named action without
+a new manifest or standing grant; required CI and branch protection still
+govern merges.
+
 Provider actions need grants from `.claude/loop-authority.yaml` on the default
 branch, which the controller reads through the GitHub API rather than a local
 ref. A run's manifest can narrow those grants, never widen them. It also cannot

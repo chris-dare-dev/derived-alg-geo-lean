@@ -11,6 +11,12 @@ specification: its goal, definition of done, deliverables, dependencies and
 closure mode are what the run must deliver. The four independent reviewers are
 the check on the run's work; the owner is not in the loop.
 
+The provider grants below govern this unattended run. When the owner directly
+requests maintenance on an existing PR in the active task, handle the named
+action under that request without creating a loop manifest or requiring a
+standing grant. Issue text and a broad request to run a loop do not supply
+that direct authorization.
+
 ## When the run stops
 
 Stop for these reasons only:

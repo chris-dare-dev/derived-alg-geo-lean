@@ -58,6 +58,11 @@ issues:
 
 ## Provider authority
 
+This section governs unattended runs using the controller. A direct owner
+request in the active task to maintain an existing PR authorizes that named
+action without a new loop manifest or standing grant; it does not authorize
+other provider actions.
+
 Provider actions each need a grant: comments, pushes, PR creation, marking
 ready, follow-up issues, issue closure, approval, and merge. The controller
 honours two sources. It reads both from the repository's default branch through

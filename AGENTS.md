@@ -374,6 +374,11 @@ and closure mode (complete or progress) are what the run delivers. The four
 independent reviewers are the check, not the owner. Follow the
 [run-loop protocol](.claude/skills/run-loop/SKILL.md).
 
+This protocol governs unattended issue and milestone runs. An explicit owner
+request in the active task to maintain an existing PR authorizes the requested
+action without a loop manifest or standing grant. Required CI and branch
+protection still govern merges.
+
 **A run stops for these reasons only.**
 
 1. It needs something only the owner can supply: a password, a token, `sudo`,

@@ -180,6 +180,7 @@ MAX_REVALIDATION_ROUNDS = 2
 # v1 hashes every artifact with universal-newline text reads. v2 adds the
 # original regex-based task normalization. v3 uses CommonMark structure.
 OPENSPEC_DIGEST_VERSION = 3
+SUPPORTED_OPENSPEC_DIGEST_VERSIONS = frozenset({1, 2, 3})
 LOG_ARTIFACT_NAMES = {"agent-observations.md"}
 ISSUE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BRANCH_RE = re.compile(r"^agent/[a-z0-9][a-z0-9._/-]*$")
@@ -365,7 +366,9 @@ def normalize_task_checkboxes(markdown: str) -> str:
                 token.type == "inline"
                 and token.level == item["paragraph_level"] + 1
                 and token.map
-                and TASK_INLINE_CHECKBOX_RE.match(token.content)
+                and token.children
+                and token.children[0].type == "text"
+                and TASK_INLINE_CHECKBOX_RE.match(token.children[0].content)
             ):
                 line_number = token.map[0]
                 if (
@@ -407,6 +410,12 @@ def has_visible_why_heading(markdown: str) -> bool:
     return False
 
 
+def checked_openspec_digest_version(version: Any) -> int:
+    if type(version) is not int or version not in SUPPORTED_OPENSPEC_DIGEST_VERSIONS:
+        raise LoopError(f"unsupported OpenSpec digest version: {version!r}")
+    return version
+
+
 def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DIGEST_VERSION) -> str:
     """Hash planning content; the registered digest freezes it, not its Git path.
 
@@ -415,6 +424,7 @@ def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DI
     checkbox normalization. Version 1 and 2 remain available for old ledgers.
     """
 
+    version = checked_openspec_digest_version(version)
     if not has_openspec(spec):
         return digest([])
     change_dir = openspec_change_dir(root, spec)
@@ -445,8 +455,7 @@ def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DI
 def ledger_digest_version(state: dict[str, Any]) -> int:
     """Ledgers written before v2 recorded no version and hashed with v1."""
 
-    version = state.get("openspec_digest_version", 1)
-    return version if isinstance(version, int) and not isinstance(version, bool) else 1
+    return checked_openspec_digest_version(state.get("openspec_digest_version", 1))
 
 
 def ledger_openspec_matches(root: Path, spec: dict[str, Any], state: dict[str, Any]) -> bool:
@@ -1717,11 +1726,12 @@ def reviewed_content_matches(
 
     if not re.fullmatch(r"[0-9a-fA-F]{40}", head) or not re.fullmatch(r"[0-9a-fA-F]{7,40}", reviewed_commit):
         return False
-    if head.lower() == reviewed_commit.lower():
-        return True
-    if len(reviewed_commit) < 40 and reviewed_commit_matches_head(root, reviewed_commit, head):
-        return True
     try:
+        version = ledger_digest_version(state)
+        if head.lower() == reviewed_commit.lower():
+            return True
+        if len(reviewed_commit) < 40 and reviewed_commit_matches_head(root, reviewed_commit, head):
+            return True
         ensure_commit(root, spec["remote"], head)
         ensure_commit(root, spec["remote"], reviewed_commit)
         base = trusted_base_commit(root, spec)
@@ -1731,8 +1741,8 @@ def reviewed_content_matches(
         ):
             return False
         for path in exclude:
-            if Path(path).name == "tasks.md" and normalized_tasks(root, reviewed_commit, path) != normalized_tasks(
-                root, head, path
+            if Path(path).name == "tasks.md" and normalized_tasks(root, reviewed_commit, path, version) != normalized_tasks(
+                root, head, path, version
             ):
                 print("WARN task wording changed after review; only checkbox state may change")
                 return False
@@ -1755,8 +1765,25 @@ def blob_at(root: Path, commit: str, path: str) -> str | None:
     return result.stdout if result.returncode == 0 else None
 
 
-def normalized_tasks(root: Path, commit: str, path: str) -> str:
-    return normalize_task_checkboxes(blob_at(root, commit, path) or "")
+def normalized_tasks(root: Path, commit: str, path: str, version: int) -> str:
+    """Use the ledger's original task semantics when comparing reviewed heads."""
+
+    version = checked_openspec_digest_version(version)
+    result = subprocess.run(["git", "show", f"{commit}:{path}"], cwd=root, capture_output=True)
+    if result.returncode != 0:
+        return ""
+    try:
+        content = result.stdout.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise LoopError(f"reviewed task artifact is not valid UTF-8: {path}") from exc
+    if version < 3:
+        # v1/v2 read artifacts in text mode, which normalized line endings.
+        content = content.replace("\r\n", "\n").replace("\r", "\n")
+    if version == 2:
+        return TASK_CHECKBOX_RE_V2.sub(r"\1[ ]", content)
+    if version == 3:
+        return normalize_task_checkboxes(content)
+    return content
 
 
 LEAN_IMPORT_RE = re.compile(r"^(?:(?:public|private|meta)\s+)*import\s+(.+?)\s*$", re.MULTILINE)
