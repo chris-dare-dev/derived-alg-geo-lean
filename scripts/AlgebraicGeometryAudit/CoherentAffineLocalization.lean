@@ -9,6 +9,8 @@ universe u
 #print axioms AlgebraicGeometry.Coh.fixedTargetArrowExtension_pullbackSpecMap_of_isLocalization
 #print axioms AlgebraicGeometry.Coh.exists_fixedTerminalThreeTerm_pullbackSpecMap_of_isLocalization
 #print axioms AlgebraicGeometry.Coh.exists_finite_window_complex_model_pullbackSpecMap_of_isLocalization
+#print axioms AlgebraicGeometry.Coh.finiteExtendScalars
+#print axioms AlgebraicGeometry.Coh.affineTildePullbackIso
 
 -- Import only the owner leaf and use its public theorem on an arbitrary arrow.
 example {R A : Type u} [CommRing R] [CommRing A] [Algebra R A]
