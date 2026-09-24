@@ -258,6 +258,8 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.concreteCohomologyMap
 #print axioms CochainComplex.HomComplex.concreteCohomologyMap_mk
 #print axioms CochainComplex.HomComplex.cohomologyClassLinearEquiv_naturality
+#print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv_mk
+#print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv_naturality
 
 /-! ## Subcomplexes from degreewise subobject data -/
 

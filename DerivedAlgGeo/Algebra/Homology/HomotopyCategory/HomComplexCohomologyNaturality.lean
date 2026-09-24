@@ -170,4 +170,58 @@ theorem cohomologyClassLinearEquiv_naturality :
 
 end
 
+section IntegerCoefficients
+
+private theorem cohomologyClassIntLinearEquiv_apply
+    (U V : CochainComplex (ModuleCat ℤ) ℤ) (m : ℤ)
+    (y : (δ_hom ℤ U V m (m + 1)).ker ⧸
+      (boundaryToCyclesLinear (R := ℤ) U V m).range) :
+    cohomologyClassIntLinearEquiv U V m y =
+      cohomologyClassLinearEquiv (R := ℤ) U V m y := by
+  induction y using Submodule.Quotient.induction_on with
+  | _ z =>
+    simp only [cohomologyClassLinearEquiv_mk]
+    simp only [cohomologyClassIntLinearEquiv, AddEquiv.coe_toIntLinearEquiv]
+    rfl
+
+/-- The canonical integer equivalence sends a cycle class to its Mathlib
+cohomology class. -/
+@[simp] theorem cohomologyClassIntLinearEquiv_mk
+    (U V : CochainComplex (ModuleCat ℤ) ℤ) (m : ℤ)
+    (z : (δ_hom ℤ U V m (m + 1)).ker) :
+    cohomologyClassIntLinearEquiv U V m (Submodule.Quotient.mk z) =
+      CohomologyClass.mk ((cyclesLinearEquiv (R := ℤ) U V m) z) := by
+  rw [cohomologyClassIntLinearEquiv_apply]
+  exact cohomologyClassLinearEquiv_mk U V m z
+
+variable (P Q : CochainComplex (ModuleCat ℤ) ℤ) (n : ℤ)
+  (P' Q' : CochainComplex (ModuleCat ℤ) ℤ)
+  (fprev : Cochain P Q (n - 1) →ₗ[ℤ] Cochain P' Q' (n - 1))
+  (fcur : Cochain P Q n →ₗ[ℤ] Cochain P' Q' n)
+  (fnext : Cochain P Q (n + 1) →ₗ[ℤ] Cochain P' Q' (n + 1))
+  (hprev : (δ_hom ℤ P' Q' (n - 1) n).comp fprev =
+    fcur.comp (δ_hom ℤ P Q (n - 1) n))
+  (hcur : (δ_hom ℤ P' Q' n (n + 1)).comp fcur =
+    fnext.comp (δ_hom ℤ P Q n (n + 1)))
+
+/-- The generic naturality square also commutes pointwise with canonical
+integer module structures. -/
+theorem cohomologyClassIntLinearEquiv_naturality
+    (x : (δ_hom ℤ P Q n (n + 1)).ker ⧸
+      (boundaryToCyclesLinear (R := ℤ) P Q n).range) :
+    cohomologyClassMapLinear P Q n P' Q' fprev fcur fnext hprev hcur
+      (cohomologyClassIntLinearEquiv P Q n x) =
+    cohomologyClassIntLinearEquiv P' Q' n
+      (concreteCohomologyMap (R := ℤ) P Q n P' Q'
+        fprev fcur fnext hprev hcur x) := by
+  letI : Module ℤ (CohomologyClass P Q n) := cohomologyClassModule P Q n
+  letI : Module ℤ (CohomologyClass P' Q' n) := cohomologyClassModule P' Q' n
+  have h := LinearMap.congr_fun
+    (cohomologyClassLinearEquiv_naturality P Q n P' Q'
+      fprev fcur fnext hprev hcur) x
+  dsimp only [LinearMap.comp_apply] at h
+  simpa [cohomologyClassIntLinearEquiv_apply] using h
+
+end IntegerCoefficients
+
 end CochainComplex.HomComplex

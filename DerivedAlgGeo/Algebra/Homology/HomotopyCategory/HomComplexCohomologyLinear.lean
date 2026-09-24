@@ -151,9 +151,8 @@ classes using the canonical integer module structures on both additive groups. -
 noncomputable def cohomologyClassIntLinearEquiv :
     ((δ_hom ℤ P Q n (n + 1)).ker ⧸
       (boundaryToCyclesLinear (R := ℤ) P Q n).range) ≃ₗ[ℤ]
-      CohomologyClass P Q n := by
-  convert cohomologyClassLinearEquiv (R := ℤ) P Q n using 1
-  all_goals first | rfl | exact Subsingleton.elim _ _
+      CohomologyClass P Q n :=
+  (quotientAddEquiv (R := ℤ) P Q n).toIntLinearEquiv
 
 end IntegerCoefficients
 
