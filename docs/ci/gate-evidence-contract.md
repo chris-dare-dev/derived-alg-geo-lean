@@ -139,6 +139,13 @@ no proven gate mapping remain visible and prevent an all-pipelines-green
 claim. A missing or red required gate denies `required_ci_verified`; optional
 warnings remain separate.
 
+Separate workflow runs on one head cannot silently supersede an older red
+required check: the collector denies a current claim if more than one CI run
+exists for that head. It also rechecks the run and attempt after collection.
+Failed-jobs-only reruns may reuse a successful job and candidate artifact from
+an earlier attempt; schema v4 cannot represent required gates spanning
+attempts, so this collector currently denies that case conservatively.
+
 The local bundle contains `evidence.json`, `validation.json`, canonical
 `results/check-run-<id>.json` payloads, `source-observations.json`, and
 `bundle-manifest.json`. Each schema artifact records the SHA-256 and byte

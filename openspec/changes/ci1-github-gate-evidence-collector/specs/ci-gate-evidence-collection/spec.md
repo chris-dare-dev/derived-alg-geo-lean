@@ -36,6 +36,10 @@ The collector SHALL enumerate every page of candidate check suites, check runs a
 - **WHEN** two attempts belong to the same verified workflow run on the exact candidate and the later attempt completed successfully
 - **THEN** the record identifies the selected attempt and preserves the earlier attempt as non-authorizing history
 
+#### Scenario: Failed-jobs-only rerun reuses an earlier artifact
+- **WHEN** the latest run attempt reuses a successful job and candidate artifact from an earlier attempt, so required gates would span two attempts
+- **THEN** the collector denies a schema v4 required-CI claim until a same-attempt proof or later contract can represent that composition
+
 ### Requirement: Protected policy and gate coverage
 The collector SHALL read the inventory from the current protected base revision and compare its required contexts with live branch protection. A PR-authored inventory change MUST NOT remove a required gate from the collected policy.
 

@@ -40,6 +40,8 @@ Alternative considered: trust `gh pr checks` or a workflow run's displayed head 
 
 Traverse every page of check suites for the exact candidate and every page of check runs per suite; separately traverse all commit-status pages. Verify provider `total_count` where available and reject unknown truncation. Map GitHub Actions check runs to their workflow run and attempt using run/job metadata, including the job's `check_run_url`, not a displayed name or `details_url` alone. Preserve app/producer identity and distinct check-run versus status IDs. For reruns, retain prior observations in the bundle and select an attempt only when the provider proves the same run/candidate relationship; unresolved duplicates deny the claim.
 
+GitHub's failed-jobs-only rerun can reuse a successful build job and its artifact from an earlier attempt while replacing only failed jobs. Schema v4's `run_binding=primary` requires each gate's attempt to equal the record attempt, so the collector denies this mixed-attempt case even when GitHub's latest workflow result is green. A future contract could model a provider-proven effective attempt; this progress change does not claim one.
+
 Alternative considered: one `commits/{sha}/check-runs` request with `per_page=100`. Rejected because it can silently omit observations and cannot safely distinguish same-name producers or reruns.
 
 ### Derive policy and pins from immutable sources
