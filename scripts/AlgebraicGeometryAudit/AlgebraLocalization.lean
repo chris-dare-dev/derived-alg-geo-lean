@@ -21,6 +21,10 @@ import DerivedAlgGeo.Algebra.Module.Localization
 #print axioms Module.exists_finite_submodules_of_isLocalization_map
 #print axioms Module.exists_finite_submodules_of_isLocalization_two_maps
 
+/-! ## Fixed-target arrows over a localized ring -/
+
+#print axioms Module.exists_finitely_presented_fixedTargetArrow_of_isLocalization
+
 /-! ## Cohomology of a localized three-term complex -/
 
 #print axioms IsLocalizedModule.boundaryToCycles

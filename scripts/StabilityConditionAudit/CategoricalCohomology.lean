@@ -4,10 +4,12 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
-import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLocalization
-import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyClassLocalization
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyIntLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLinear
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyNaturality
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
@@ -270,6 +272,33 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMap_isLocalized
 #print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMapOfBoundedAboveBelow
 #print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMapOfBoundedAboveBelow_isLocalized
+
+/-! ## Degree-zero Hom-complex cohomology classes under localization -/
+
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap
+#print axioms CochainComplex.HomComplex.concreteCohomologyMap_eq_localized
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_naturality
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_isLocalized
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_isLocalized_of_bounded_above_below
+
+/-! ## Canonical integer class-localization bridge and ordinary client -/
+
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedIntMap_isLocalized
+
+section CanonicalIntegerClassLocalizationClient
+
+open CategoryTheory
+
+variable (P Q : CochainComplex (ModuleCat ℤ) ℤ) (S : Submonoid ℤ)
+variable (c b : ℤ) [P.IsStrictlyLE b] [Q.IsStrictlyGE c]
+variable [∀ i : {p : ℤ // p ∈ Finset.Icc (c - 1) b},
+  Module.FinitePresentation ℤ (P.X i.1)]
+
+example : IsLocalizedModule S
+    ((CochainComplex.HomComplex.cohomologyClassLocalizedMap P Q S).toAddMonoidHom.toIntLinearMap) := by
+  exact CochainComplex.HomComplex.cohomologyClassLocalizedIntMap_isLocalized P Q S c b
+
+end CanonicalIntegerClassLocalizationClient
 
 /-! ## Subcomplexes from degreewise subobject data -/
 

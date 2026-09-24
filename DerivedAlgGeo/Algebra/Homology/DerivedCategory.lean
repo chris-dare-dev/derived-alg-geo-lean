@@ -20,6 +20,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup.Comparis
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective.Unitality
@@ -34,6 +35,8 @@ functoriality laws for short-exact triangles, the opposite-category
 comparison, the exact derived lift of algebraic linear duality, `Ext`
 adjunction and dimension shift, K-projective and bounded-above-projective
 models, and the construction of derived tensor from a K-flat resolution.
+Degree-zero Hom-complex classes identify with derived-category morphisms when
+the source is K-projective.
 Algebraic geometry supplies abelian categories such as `Coh X` and consumes
 this API; it does not own the derived-category construction.
 -/
