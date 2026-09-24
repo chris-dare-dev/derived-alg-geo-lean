@@ -31,12 +31,15 @@ open scoped ModuleCat.Algebra
 
 namespace CochainComplex.HomComplex
 
-universe u
+universe u v w
 
 noncomputable section
 
+section FiniteCochains
+
 variable {R : Type u} [CommRing R]
-  (P Q : CochainComplex (ModuleCat.{u} R) ℤ)
+  {C : Type w} [Category.{v} C] [Preadditive C] [Linear R C]
+  (P Q : CochainComplex C ℤ)
   (a b n : ℤ) [P.IsStrictlyGE a] [P.IsStrictlyLE b]
 
 private abbrev finiteCochain :=
@@ -81,8 +84,8 @@ private def cochainExtend :
 
 private def cochainFiniteEquiv :
     Cochain P Q n ≃ₗ[R] finiteCochain P Q a b n where
-  toLinearMap := cochainRestrict P Q a b n
-  invFun := cochainExtend P Q a b n
+  toLinearMap := cochainRestrict (R := R) P Q a b n
+  invFun := cochainExtend (R := R) P Q a b n
   left_inv γ := by
     apply Cochain.ext
     intro p q hpq
@@ -96,6 +99,12 @@ private def cochainFiniteEquiv :
     funext i
     have hi : a ≤ (i : ℤ) ∧ (i : ℤ) ≤ b := Finset.mem_Icc.mp i.2
     simp [cochainExtend, cochainRestrict, Cochain.mk_v, Finset.mem_Icc, hi]
+
+end FiniteCochains
+
+variable {R : Type u} [CommRing R]
+  (P Q : CochainComplex (ModuleCat.{u} R) ℤ)
+  (a b n : ℤ) [P.IsStrictlyGE a] [P.IsStrictlyLE b]
 
 variable (S : Submonoid R)
 
@@ -177,37 +186,11 @@ private lemma homLocalizedMap_isLocalized (M N : ModuleCat.{u} R)
   exact IsLocalizedModule.of_linearEquiv_right S
     (eA.symm.toLinearMap ∘ₗ f) eR
 
-private lemma homLocalizedMap_apply (M N : ModuleCat.{u} R) (f : M ⟶ N) :
-    homLocalizedMap S M N f = (ModuleCat.localizedModuleFunctor.{u} S).map f := by
-  rfl
-
 /-- Degreewise localization respects the Hom-complex differential. -/
 theorem cochainLocalizedMap_delta (m : ℤ) (γ : Cochain P Q n) :
     cochainLocalizedMap P Q m S (δ n m γ) =
       δ n m (cochainLocalizedMap P Q n S γ) := by
   exact (δ_map n m γ (ModuleCat.localizedModuleFunctor.{u} S)).symm
-
-private def homLocalizedMapGeneric (M N : ModuleCat.{u} R) :
-    (M ⟶ N) →ₗ[R]
-      ((ModuleCat.localizedModuleFunctor.{u} S).obj M ⟶
-        (ModuleCat.localizedModuleFunctor.{u} S).obj N) where
-  toFun f := (ModuleCat.localizedModuleFunctor.{u} S).map f
-  map_add' f g := by
-    exact (ModuleCat.localizedModuleFunctor.{u} S).map_add
-  map_smul' r f := by
-    apply ModuleCat.hom_ext
-    dsimp [ModuleCat.localizedModuleFunctor, ModuleCat.localizedModuleMap]
-    simp only [map_smul]
-    ext x
-    change r •
-      ((IsLocalizedModule.mapExtendScalars S
-        (M.localizedModuleMkLinearMap S)
-        (N.localizedModuleMkLinearMap S) (Localization S)) f.hom) x =
-      (algebraMap R (Localization S) r) •
-        ((IsLocalizedModule.mapExtendScalars S
-          (M.localizedModuleMkLinearMap S)
-          (N.localizedModuleMkLinearMap S) (Localization S)) f.hom) x
-    exact (IsScalarTower.algebraMap_smul (Localization S) r _).symm
 
 private def localizedHomEquiv (M N : ModuleCat.{u} R) :
     ((ModuleCat.localizedModuleFunctor.{u} S).obj M ⟶
@@ -247,18 +230,19 @@ private def localizedHomEquiv (M N : ModuleCat.{u} R) :
           IsScalarTower.algebraMap_smul (Localization S) r _
         exact h
 
+private def homLocalizedMapGeneric (M N : ModuleCat.{u} R) :
+    (M ⟶ N) →ₗ[R]
+      ((ModuleCat.localizedModuleFunctor.{u} S).obj M ⟶
+        (ModuleCat.localizedModuleFunctor.{u} S).obj N) :=
+  (localizedHomEquiv S M N).symm.toLinearMap ∘ₗ homLocalizedMap S M N
+
 private lemma homLocalizedMapGeneric_isLocalized (M N : ModuleCat.{u} R)
     [Module.FinitePresentation R M] :
     IsLocalizedModule S (homLocalizedMapGeneric S M N) := by
-  have h := homLocalizedMap_isLocalized S M N
-  have h' : IsLocalizedModule S
-      ((localizedHomEquiv S M N).symm.toLinearMap ∘ₗ
-        homLocalizedMap S M N) :=
-    IsLocalizedModule.of_linearEquiv S (homLocalizedMap S M N)
-      (localizedHomEquiv S M N).symm
-  convert h' using 1
-  ext f
-  rfl
+  letI : IsLocalizedModule S (homLocalizedMap S M N) :=
+    homLocalizedMap_isLocalized S M N
+  exact IsLocalizedModule.of_linearEquiv S (homLocalizedMap S M N)
+    (localizedHomEquiv S M N).symm
 
 private def finiteLocalizedMap :
     finiteCochain P Q a b n →ₗ[R]
@@ -278,49 +262,9 @@ private lemma finiteLocalizedMap_isLocalized
     (homLocalizedMapGeneric S (P.X i.1) (Q.X (i.1 + n))) ∘ₗ LinearMap.proj i)
   infer_instance
 
-private def localizedCochainRestrictR :
-    Cochain (localizedP P S) (localizedQ Q S) n →ₗ[R]
-      finiteCochain (localizedP P S) (localizedQ Q S) a b n where
-  toFun γ i := γ.v i.1 (i.1 + n) rfl
-  map_add' x y := by
-    funext i
-    rfl
-  map_smul' r x := by
-    funext i
-    rfl
-
-private def localizedCochainExtendR :
-    finiteCochain (localizedP P S) (localizedQ Q S) a b n →ₗ[R]
-      Cochain (localizedP P S) (localizedQ Q S) n where
-  toFun v := Cochain.mk fun p q hpq => by
-    subst q
-    exact if hp : p ∈ Finset.Icc a b then v ⟨p, hp⟩ else 0
-  map_add' x y := by
-    apply Cochain.ext
-    intro p q hpq
-    subst q
-    by_cases hp : a ≤ p ∧ p ≤ b
-    · simp [Cochain.mk_v, Finset.mem_Icc, hp, Cochain.add_v]
-    · simp [Cochain.mk_v, Finset.mem_Icc, hp, Cochain.add_v]
-  map_smul' r x := by
-    apply Cochain.ext
-    intro p q hpq
-    subst q
-    by_cases hp : a ≤ p ∧ p ≤ b
-    · simp [Cochain.mk_v, Finset.mem_Icc, hp, Cochain.smul_v]
-    · simp [Cochain.mk_v, Finset.mem_Icc, hp, Cochain.smul_v]
-
-private def localizedCochainFiniteEquivR :
-    Cochain (localizedP P S) (localizedQ Q S) n ≃ₗ[R]
-      finiteCochain (localizedP P S) (localizedQ Q S) a b n where
-  toLinearMap := localizedCochainRestrictR P Q a b n S
-  invFun := localizedCochainExtendR P Q a b n S
-  left_inv γ := (cochainFiniteEquiv (localizedP P S) (localizedQ Q S) a b n).left_inv γ
-  right_inv v := (cochainFiniteEquiv (localizedP P S) (localizedQ Q S) a b n).right_inv v
-
 omit [P.IsStrictlyGE a] [P.IsStrictlyLE b] in
 private lemma cochainFinite_localized_comm :
-    (localizedCochainRestrictR P Q a b n S) ∘ₗ
+    (cochainRestrict (R := R) (localizedP P S) (localizedQ Q S) a b n) ∘ₗ
         cochainLocalizedMap P Q n S =
       (finiteLocalizedMap P Q a b n S) ∘ₗ
         cochainRestrict P Q a b n := by
@@ -337,30 +281,30 @@ theorem cochainLocalizedMap_isLocalized (a b : ℤ)
     finiteLocalizedMap_isLocalized P Q a b n S
   have h₁ : IsLocalizedModule S
       ((finiteLocalizedMap P Q a b n S) ∘ₗ
-        (cochainFiniteEquiv P Q a b n).toLinearMap) :=
+        (cochainFiniteEquiv (R := R) P Q a b n).toLinearMap) :=
     IsLocalizedModule.of_linearEquiv_right S
-      (finiteLocalizedMap P Q a b n S) (cochainFiniteEquiv P Q a b n)
+      (finiteLocalizedMap P Q a b n S) (cochainFiniteEquiv (R := R) P Q a b n)
   have h₂ : IsLocalizedModule S
-      ((localizedCochainFiniteEquivR P Q a b n S).symm.toLinearMap ∘ₗ
+      ((cochainFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S) a b n).symm.toLinearMap ∘ₗ
         (finiteLocalizedMap P Q a b n S) ∘ₗ
-          (cochainFiniteEquiv P Q a b n).toLinearMap) :=
+          (cochainFiniteEquiv (R := R) P Q a b n).toLinearMap) :=
     IsLocalizedModule.of_linearEquiv S _
-      (localizedCochainFiniteEquivR P Q a b n S).symm
+      (cochainFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S) a b n).symm
   convert h₂ using 1
   apply LinearMap.ext
   intro γ
-  apply (localizedCochainFiniteEquivR P Q a b n S).injective
+  apply (cochainFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S) a b n).injective
   have hcomm := LinearMap.congr_fun (cochainFinite_localized_comm P Q a b n S) γ
-  change (localizedCochainFiniteEquivR P Q a b n S)
+  change (cochainFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S) a b n)
       (cochainLocalizedMap P Q n S γ) =
-    (localizedCochainFiniteEquivR P Q a b n S)
-      ((localizedCochainFiniteEquivR P Q a b n S).symm
+    (cochainFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S) a b n)
+      ((cochainFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S) a b n).symm
         ((finiteLocalizedMap P Q a b n S)
-          ((cochainFiniteEquiv P Q a b n) γ)))
+          ((cochainFiniteEquiv (R := R) P Q a b n) γ)))
   rw [LinearEquiv.apply_symm_apply]
-  change (localizedCochainFiniteEquivR P Q a b n S)
+  change (cochainFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S) a b n)
       (cochainLocalizedMap P Q n S γ) =
-    (finiteLocalizedMap P Q a b n S) ((cochainFiniteEquiv P Q a b n) γ) at hcomm
+    (finiteLocalizedMap P Q a b n S) ((cochainFiniteEquiv (R := R) P Q a b n) γ) at hcomm
   exact hcomm
 
 /-- Finite projective source terms satisfy the finite-presentation hypothesis

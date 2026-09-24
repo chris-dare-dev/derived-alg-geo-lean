@@ -4,7 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Limits
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory
-import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 
 /-!
 Audit records for generic derived-category extensions on arbitrary abelian
@@ -64,13 +63,6 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms DerivedCategory.isoOfFactors
 #print axioms DerivedCategory.idFactors
 #print axioms DerivedCategory.compFactors
-
-/-! ## Bounded-source Hom-complex localization -/
-
-#print axioms CochainComplex.HomComplex.cochainLocalizedMap
-#print axioms CochainComplex.HomComplex.cochainLocalizedMap_delta
-#print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized
-#print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized_of_finite_projective
 
 /-! ## K-projective derived functors -/
 
