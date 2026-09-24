@@ -1532,6 +1532,11 @@ dependent in the ambient object. `map_inv_map_hom` exists for the same reason --
 #print axioms CategoryTheory.Subobject.mapFunctor_eq_mk_arrow
 #print axioms CategoryTheory.Subobject.mapFunctor_monotone
 #print axioms CategoryTheory.Subobject.mapFunctor_sup
+#print axioms CategoryTheory.Subobject.mapFunctor_image
+#print axioms CategoryTheory.Subobject.FixedTargetArrowExtension
+#print axioms CategoryTheory.Subobject.FixedTargetMonoExtension
+#print axioms CategoryTheory.Subobject.mapFunctor_surjective_of_fixedTargetMonoExtension
+#print axioms CategoryTheory.Subobject.mapFunctor_surjective_of_fixedTargetArrowExtension
 #print axioms CategoryTheory.Subobject.mapFunctor_id
 #print axioms CategoryTheory.Subobject.mapFunctor_comp
 #print axioms CategoryTheory.Subobject.mapFunctor_map_hom

@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Subobject.Lattice
+import Mathlib.CategoryTheory.Subobject.Limits
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Zero
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.BinaryProducts
@@ -19,7 +20,9 @@ lattices.
 This file supplies that. `mapFunctor` pushes a subobject forward along any mono-preserving functor,
 and `mapEquivalence` upgrades it to an order isomorphism when the functor is half of an
 equivalence. For abelian categories, a functor preserving monos, epis, and binary coproducts
-also carries binary joins of subobjects to binary joins.
+also carries binary joins of subobjects to binary joins. Preserving monos and epis likewise
+allows the image of a lifted arrow into a fixed target to lift its image subobject in
+the abelian setting.
 
 ## Why an order isomorphism and not just a monotone map
 
@@ -30,10 +33,9 @@ it possible to transport a Harder–Narasimhan filtration along an equivalence.
 
 ## The shape of the proofs
 
-Every proof is induction on a subobject down to a representing mono, after which both sides are
-`mk` of an explicit morphism and the statement is `mk_eq_mk_of_comm` against a comparison
-isomorphism. The only step with content is `mapFunctor_inverse_functor`, where naturality of the
-unit turns the round trip into composition with a unit component, which is invertible.
+For the equivalence results, the proofs reduce a subobject to a representing mono,
+then compare explicit morphisms using the unit isomorphism. Image preservation
+uses the epi--mono image factorization and balancedness instead.
 -/
 
 universe v₁ v₂ u₁ u₂
@@ -148,6 +150,77 @@ theorem map_hom_map_inv {X Y : A} (i : X ≅ Y) (Q : Subobject Y) :
       simp only [Subobject.map_mk, Category.assoc, Iso.inv_hom_id, Category.comp_id]
 
 end MapFunctor
+
+section MapFunctorImage
+
+variable [HasImages A] [HasEqualizers A]
+  [HasImages B] [HasEqualizers B] [Balanced B]
+
+private theorem image_epi_comp {X Y Z : B} (e : X ⟶ Y) [Epi e]
+    (f : Y ⟶ Z) : imageSubobject (e ≫ f) = imageSubobject f := by
+  apply le_antisymm (imageSubobject_comp_le e f)
+  have hle := imageSubobject_comp_le e f
+  haveI : Mono (Subobject.ofLE _ _ hle) := by
+    apply (mono_comp_iff_of_mono _ (imageSubobject f).arrow).mp
+    rw [Subobject.ofLE_arrow]
+    infer_instance
+  haveI : Epi (Subobject.ofLE _ _ hle) :=
+    imageSubobject_comp_le_epi_of_epi e f
+  haveI : IsIso (Subobject.ofLE _ _ hle) :=
+    isIso_of_mono_of_epi _
+  exact Subobject.le_of_comm (inv (Subobject.ofLE _ _ hle)) (by
+    rw [IsIso.inv_comp_eq, Subobject.ofLE_arrow])
+
+/-- Between categories with images and equalizers, with balanced target, a
+functor preserving monomorphisms and epimorphisms carries the image subobject
+of an arrow to the image subobject of the mapped arrow. -/
+theorem mapFunctor_image (G : A ⥤ B)
+    [G.PreservesMonomorphisms] [G.PreservesEpimorphisms]
+    {X Y : A} (f : X ⟶ Y) :
+    mapFunctor G (imageSubobject f) = imageSubobject (G.map f) := by
+  rw [mapFunctor_eq_mk_arrow, ← imageSubobject_mono (G.map (imageSubobject f).arrow)]
+  conv_rhs => rw [← imageSubobject_arrow_comp f, G.map_comp]
+  exact (image_epi_comp (G.map (factorThruImageSubobject f))
+    (G.map (imageSubobject f).arrow)).symm
+
+/-- Every arrow into `G.obj X` extends from a source object into the fixed
+source target `X`, up to an isomorphism on the arrow's domain. This is an
+explicit input for localization arguments, not an automatic consequence of
+essential surjectivity on objects. -/
+def FixedTargetArrowExtension (G : A ⥤ B) (X : A) : Prop :=
+  ∀ {Z : B} (β : Z ⟶ G.obj X),
+    ∃ (Y : A) (f : Y ⟶ X) (e : Z ≅ G.obj Y), β = e.hom ≫ G.map f
+
+/-- Only monomorphisms into `G.obj X` need extend in order to lift subobjects.
+Unlike extension of all arrows, this does not force every object of `B` into
+the essential image of `G`. -/
+def FixedTargetMonoExtension (G : A ⥤ B) (X : A) : Prop :=
+  ∀ {Z : B} (β : Z ⟶ G.obj X), Mono β →
+    ∃ (Y : A) (f : Y ⟶ X) (e : Z ≅ G.obj Y), β = e.hom ≫ G.map f
+
+/-- Fixed-target mono extension yields pointwise lifting of subobjects by
+taking the image of each extended monomorphism. -/
+theorem mapFunctor_surjective_of_fixedTargetMonoExtension (G : A ⥤ B)
+    [G.PreservesMonomorphisms] [G.PreservesEpimorphisms]
+    (X : A) (hExt : FixedTargetMonoExtension G X) :
+    Function.Surjective (mapFunctor G (X := X)) := by
+  intro Q
+  obtain ⟨Y, f, e, he⟩ := hExt Q.arrow inferInstance
+  refine ⟨imageSubobject f, ?_⟩
+  rw [mapFunctor_image]
+  rw [← imageSubobject_iso_comp e.hom (G.map f)]
+  simp only [← he, imageSubobject_mono, Subobject.mk_arrow]
+
+/-- All-arrow extension is a stronger, geometry-facing sufficient condition
+for lifting subobjects. -/
+theorem mapFunctor_surjective_of_fixedTargetArrowExtension (G : A ⥤ B)
+    [G.PreservesMonomorphisms] [G.PreservesEpimorphisms]
+    (X : A) (hExt : FixedTargetArrowExtension G X) :
+    Function.Surjective (mapFunctor G (X := X)) :=
+  mapFunctor_surjective_of_fixedTargetMonoExtension G X
+    (fun β _ => hExt β)
+
+end MapFunctorImage
 
 section MapEquivalence
 
