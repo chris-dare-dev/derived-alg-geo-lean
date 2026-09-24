@@ -108,6 +108,7 @@ LEGACY_REVIEWED_MANIFESTS = frozenset(
         "a00cfa7a3006a8354033e9ccc87b620fb707ec92f395bf920d2125c213c24d1e",  # sf8-5-tor-witness-comparison
         "d3b27c3bcd91b0a332127dfb86cf24c9e3c8c187c425e8cb904937f680202322",  # sf8-5-affine-kprojective-scheme-comparison
         "69b451bac920101e28dff6c2f0c524f29f48146966ee9bdfc6a4e5ce0497606a",  # sf8-sf9-pilot
+        "742202eb075c48ef8200699e7cb1abcc7886977364120cb55197a3dae015298f",  # sf8-5-task12-kflat-pullback (#554)
         "315637cf2347791dce3abb9fdd1b57a6fcf83f63f5c0cb5ffab986ef9cb57419",  # rou1-919-rouquier-dimension (#1478)
     }
 )
