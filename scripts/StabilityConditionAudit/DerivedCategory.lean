@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Limits
+import DerivedAlgGeo.Algebra.Category.ModuleCat.ProjectiveResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory
 
 /-!
@@ -63,6 +64,32 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms DerivedCategory.isoOfFactors
 #print axioms DerivedCategory.idFactors
 #print axioms DerivedCategory.compFactors
+
+/-! ## Finite-term projective resolutions of finite modules -/
+
+#print axioms ModuleCat.exists_finite_projectiveResolution
+
+/-! The public witness is directly usable as a bounded-above cochain resolution. -/
+noncomputable section FiniteProjectiveResolutionClient
+
+open CategoryTheory
+
+universe u
+
+variable {R : Type u} [CommRing R] [IsNoetherianRing R]
+  (M : ModuleCat.{u} R) [Module.Finite R M]
+
+example : ∃ P : ProjectiveResolution M,
+    (∀ i : ℤ, Module.Finite R (P.cochainComplex.X i)) ∧
+    P.cochainComplex.IsStrictlyLE 0 ∧
+    (∀ i : ℤ, Projective (P.cochainComplex.X i)) ∧
+    P.cochainComplex.IsKProjective ∧
+    QuasiIso P.π' := by
+  obtain ⟨P, _, hfinite⟩ := ModuleCat.exists_finite_projectiveResolution M
+  exact ⟨P, hfinite, inferInstance, fun _ => inferInstance,
+    CochainComplex.isKProjective_of_projective _ 0, inferInstance⟩
+
+end FiniteProjectiveResolutionClient
 
 /-! ## Degree-zero Hom-complex classes and derived morphisms -/
 

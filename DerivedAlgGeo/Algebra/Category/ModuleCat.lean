@@ -7,6 +7,7 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf
 import DerivedAlgGeo.Algebra.Category.ModuleCat.LinearDual
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Limits
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Noetherian
+import DerivedAlgGeo.Algebra.Category.ModuleCat.ProjectiveResolution
 
 /-!
 # Categories of modules
