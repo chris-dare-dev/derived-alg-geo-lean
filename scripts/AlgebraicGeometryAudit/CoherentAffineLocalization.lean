@@ -1,6 +1,6 @@
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Localization
 
-/-! # Affine coherent fixed-target arrow and three-term audits and direct clients -/
+/-! # Affine coherent localization audits and direct clients -/
 
 open CategoryTheory
 
@@ -8,6 +8,7 @@ universe u
 
 #print axioms AlgebraicGeometry.Coh.fixedTargetArrowExtension_pullbackSpecMap_of_isLocalization
 #print axioms AlgebraicGeometry.Coh.exists_fixedTerminalThreeTerm_pullbackSpecMap_of_isLocalization
+#print axioms AlgebraicGeometry.Coh.exists_finite_window_complex_model_pullbackSpecMap_of_isLocalization
 
 -- Import only the owner leaf and use its public theorem on an arbitrary arrow.
 example {R A : Type u} [CommRing R] [CommRing A] [Algebra R A]
@@ -48,3 +49,19 @@ example {R A : Type u} [CommRing R] [CommRing A] [Algebra R A]
         (AlgebraicGeometry.Spec.map (CommRingCat.ofHom (algebraMap R A)))).map f := by
   exact AlgebraicGeometry.Coh.exists_fixedTerminalThreeTerm_pullbackSpecMap_of_isLocalization
     S E N₀ N₁ d β hz
+
+-- The complex-object theorem needs only strict bounds and no target finiteness hypothesis.
+example {R A : Type u} [CommRing R] [CommRing A] [Algebra R A]
+    [IsNoetherianRing R] (S : Submonoid R) [IsLocalization S A]
+    (lo hi : ℤ)
+    (K : CochainComplex
+      (AlgebraicGeometry.Coh (AlgebraicGeometry.Spec (CommRingCat.of A))) ℤ)
+    [K.IsStrictlyGE lo] [K.IsStrictlyLE hi] :
+    ∃ (L : CochainComplex
+      (AlgebraicGeometry.Coh (AlgebraicGeometry.Spec (CommRingCat.of R))) ℤ),
+      L.IsStrictlyGE lo ∧ L.IsStrictlyLE hi ∧
+      Nonempty (K ≅ ((AlgebraicGeometry.Coh.pullback
+        (AlgebraicGeometry.Spec.map (CommRingCat.ofHom (algebraMap R A)))).mapHomologicalComplex
+          (.up ℤ)).obj L) := by
+  exact AlgebraicGeometry.Coh.exists_finite_window_complex_model_pullbackSpecMap_of_isLocalization
+    S lo hi K
