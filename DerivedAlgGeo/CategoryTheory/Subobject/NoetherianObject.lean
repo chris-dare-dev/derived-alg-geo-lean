@@ -49,9 +49,9 @@ private lemma isIso_ofLE_of_eq {C : Type u₁} [Category.{v₁} C]
 /-- **A finite family of mono-preserving functors which jointly reflects isomorphisms detects
 Noetherian objects.**
 
-The family may have dependent target categories. The reflection hypothesis is correspondingly
-stated pointwise instead of using Mathlib's fixed `JointlyReflectIsomorphisms`, whose functors have
-a common target. -/
+The family may have dependent target categories. The reflection hypothesis is stated pointwise
+in the form consumed by the proof; Mathlib's `JointlyReflectIsomorphisms` also supports
+dependent targets. -/
 theorem isNoetherianObject_of_finite_jointlyReflectsIsomorphisms
     (hX : ∀ i, IsNoetherianObject ((F i).obj X))
     (hreflect : ∀ {Y Z : A} (f : Y ⟶ Z),
@@ -100,15 +100,15 @@ stabilization is carried forward by the functor. -/
 theorem isNoetherianObject_of_liftedSubobjectChains
     {D : Type u₂} [Category.{v₂} D] (G : A ⥤ D)
     [G.PreservesMonomorphisms] (Y : D)
-    (hglobal : ∀ X : A, IsNoetherianObject X)
     (hlift : ∀ c : ℕ →o Subobject Y,
       ∃ (X : A) (e : G.obj X ≅ Y) (d : ℕ →o Subobject X),
-        ∀ n, (Subobject.map e.hom).obj (Subobject.mapFunctor G (d n)) = c n) :
+        IsNoetherianObject X ∧
+          ∀ n, (Subobject.map e.hom).obj (Subobject.mapFunctor G (d n)) = c n) :
     IsNoetherianObject Y := by
   rw [isNoetherianObject_iff_monotone_chain_condition]
   intro c
-  obtain ⟨X, e, d, hd⟩ := hlift c
-  letI : IsNoetherianObject X := hglobal X
+  obtain ⟨X, e, d, hX, hd⟩ := hlift c
+  letI : IsNoetherianObject X := hX
   obtain ⟨n, hn⟩ := monotone_chain_condition_of_isNoetherianObject d
   refine ⟨n, fun m hm ↦ ?_⟩
   calc

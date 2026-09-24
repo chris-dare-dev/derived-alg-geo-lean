@@ -221,8 +221,10 @@ theorem isNoetherian_of_liftedSubobjectChains
           (Subobject.mapFunctor r.heartFunctor (d n)) = c n) :
     r.tStructure.IsNoetherian := by
   intro Y
-  exact CategoryTheory.isNoetherianObject_of_liftedSubobjectChains
-    r.heartFunctor Y hglobal (hlift Y)
+  apply CategoryTheory.isNoetherianObject_of_liftedSubobjectChains r.heartFunctor Y
+  intro c
+  obtain ⟨X, e, d, hd⟩ := hlift Y c
+  exact ⟨X, e, d, hglobal X, hd⟩
 
 /-- The identity functor restricts every t-structure to itself. -/
 def id (t : TStructure C) : t.Restriction (𝟭 C) where
