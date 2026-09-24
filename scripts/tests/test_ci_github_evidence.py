@@ -75,6 +75,7 @@ class ProviderFixture:
         ]
         self.jobs = {1: [self._job(check, 1) for check in self.checks]}
         self.security_check: dict | None = None
+        self.duplicate_security_check: dict | None = None
         self.statuses: list[dict] = []
         self.calls: list[str] = []
         self.move_head_on_recheck = False
@@ -202,7 +203,8 @@ class ProviderFixture:
                     {
                         "id": 333,
                         "head_sha": SHA_HEAD,
-                        "latest_check_runs_count": 1,
+                        "latest_check_runs_count": 1
+                        + (self.duplicate_security_check is not None),
                         "app": {"id": 4444, "slug": "github-advanced-security"},
                     }
                 )
@@ -220,7 +222,10 @@ class ProviderFixture:
                 }
             return {"total_count": len(self.checks), "check_runs": self.checks}, {}
         if path == "/check-suites/333/check-runs":
-            return {"total_count": 1, "check_runs": [self.security_check]}, {}
+            checks = [self.security_check]
+            if self.duplicate_security_check is not None:
+                checks.append(self.duplicate_security_check)
+            return {"total_count": len(checks), "check_runs": checks}, {}
         if path == f"/commits/{SHA_HEAD}/statuses":
             if self.paginate_statuses and "page=2" not in url:
                 next_url = f"{BASE}{path}?per_page=100&page=2"
@@ -457,6 +462,20 @@ class CollectorTests(unittest.TestCase):
         self.assertTrue(red["validation"]["claims"]["required_ci_verified"])
         self.assertFalse(red["validation"]["claims"]["auxiliary_checks_healthy"])
         self.assertFalse(red["validation"]["claims"]["all_pipelines_green"])
+
+    def test_duplicate_security_app_check_denies_claim(self) -> None:
+        fixture = ProviderFixture()
+        fixture.security_check = {
+            "id": 900,
+            "name": "github-advanced-security",
+            "head_sha": SHA_HEAD,
+            "status": "completed",
+            "conclusion": "success",
+            "app": {"id": 4444, "slug": "github-advanced-security"},
+        }
+        fixture.duplicate_security_check = {**fixture.security_check, "id": 901}
+        with self.assertRaisesRegex(EvidenceError, "ambiguous check-app observations"):
+            collect(fixture.client(), 7)
 
     def test_conflicting_job_or_workflow_outcome_denies_claim(self) -> None:
         fixture = ProviderFixture()

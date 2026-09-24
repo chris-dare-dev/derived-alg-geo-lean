@@ -34,13 +34,12 @@ a provider status ID but no workflow run. `check` represents a check-app run
 on the PR head with no Actions workflow run; it records the head SHA rather
 than claiming the merge tree was tested. Workflow check-run artifacts must
 match their gate's run identity; runless status/check artifacts must not invent
-one. The adapter
-must fetch every
-page of check runs and commit statuses for the exact candidate and preserve
-their provider identities. A name-only or latest-timestamp selection is not
-eligible evidence. A rerun supersedes an earlier attempt only when the adapter
-has verified the provider's run/attempt relationship and the selected attempt
-belongs to the exact candidate.
+one. The adapter fetches every page of check runs and commit statuses on the
+PR head and preserves their provider identities. The primary workflow's run
+artifact and Git parents separately prove the tested merge candidate. A
+name-only or latest-timestamp selection is not eligible evidence. A rerun
+supersedes an earlier attempt only when the adapter has verified the provider's
+run/attempt relationship and the selected attempt belongs to that candidate.
 
 Only an applicable gate with status `passed` and raw conclusion `success`
 satisfies required work. Missing, pending, failed, cancelled, timed-out and

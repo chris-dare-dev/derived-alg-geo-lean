@@ -3668,7 +3668,9 @@ def add_common_spec_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--repo-root", type=Path, default=Path.cwd(), help="repository root")
 
 
-def report_ci_evidence(repository: str, pr_number: int, output: Path | None = None) -> int:
+def report_ci_evidence(
+    repository: str, pr_number: int, output: Path | None = None
+) -> int:
     """Report one read-only collector verdict; queue admission remains separate."""
     if __package__:
         from . import ci_github_evidence
@@ -3682,19 +3684,34 @@ def report_ci_evidence(repository: str, pr_number: int, output: Path | None = No
         if output is not None:
             ci_github_evidence.write_bundle(result, output)
     except ci_github_evidence.EvidenceError as exc:
-        print(json.dumps({"valid": False, "errors": [str(exc)], "claims": {"required_ci_verified": False}}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "valid": False,
+                    "errors": [str(exc)],
+                    "claims": {"required_ci_verified": False},
+                },
+                indent=2,
+            )
+        )
         return 1
     evidence = result["evidence"]
     verdict = result["validation"]
-    print(json.dumps({
-        "repository": evidence["repository"],
-        "base": evidence["base_commit"],
-        "head": evidence["head_commit"],
-        "candidate": evidence["candidate_commit"],
-        "run_id": evidence["run_id"],
-        "run_attempt": evidence["run_attempt"],
-        "validation": verdict,
-    }, indent=2, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "repository": evidence["repository"],
+                "base": evidence["base_commit"],
+                "head": evidence["head_commit"],
+                "candidate": evidence["candidate_commit"],
+                "run_id": evidence["run_id"],
+                "run_attempt": evidence["run_attempt"],
+                "validation": verdict,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
     return 0 if verdict["claims"]["required_ci_verified"] else 1
 
 

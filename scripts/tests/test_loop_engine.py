@@ -2215,6 +2215,33 @@ class ReadOnlyEvidenceCommandTests(unittest.TestCase):
             json.loads(output.getvalue())["claims"]["required_ci_verified"]
         )
 
+    def test_denied_validation_reports_exact_revision(self) -> None:
+        result = {
+            "evidence": {
+                "repository": "owner/repo",
+                "base_commit": "a" * 40,
+                "head_commit": "b" * 40,
+                "candidate_commit": "c" * 40,
+                "run_id": 123,
+                "run_attempt": 2,
+            },
+            "validation": {
+                "valid": True,
+                "claims": {"required_ci_verified": False},
+                "warnings": ["required check is red"],
+            },
+        }
+        output = io.StringIO()
+        with mock.patch.object(ci_github_evidence, "GitHubClient"), mock.patch.object(
+            ci_github_evidence, "collect", return_value=result
+        ), contextlib.redirect_stdout(output):
+            code = loop_engine.main(["evidence", "--repo", "owner/repo", "--pr", "7"])
+        reported = json.loads(output.getvalue())
+        self.assertEqual(code, 1)
+        self.assertEqual(reported["run_attempt"], 2)
+        self.assertEqual(reported["candidate"], "c" * 40)
+        self.assertFalse(reported["validation"]["claims"]["required_ci_verified"])
+
 
 if __name__ == "__main__":
     unittest.main()
