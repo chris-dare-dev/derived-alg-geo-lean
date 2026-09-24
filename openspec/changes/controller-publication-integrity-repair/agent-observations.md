@@ -107,3 +107,29 @@ not amend the scope or the terminal histories they reference.
   base remains `agent/issue-1394-plan` instead of `origin/main`. That manifest
   is outside this frozen chunk and remains untouched. No Lean build or
   provider mutation was run.
+- OBS-018: Research was refreshed against `origin/main` at
+  `ce58cc9e44340c07c89836ba2a81fdd07aaee6b4`, which includes #1485's
+  CommonMark-aware OpenSpec parsing and #1490's owner-controlled provider
+  grants. The recovery manifest still hashes to
+  `b9c85b5909a68b5fc120d8be3073e5f391288b08beb4ef2319cd9ed3cfb6ff37`; its
+  current OpenSpec digest is
+  `9c813e44a65286c703c6218c1e904e2c56b242f28b8a637ba0106e9cf992c51e`.
+  The new standing authority grants comment, push, PR creation, and merge by
+  default, while this exact recovery manifest explicitly sets every provider
+  mutation to `false`, so those grants remain denied for this run.
+- OBS-019: On the current main plus owner-prep candidate, the focused loop
+  controller and recovery suites pass (141 tests). Strict OpenSpec validation,
+  the disabled #1394 manifest validation, the recovery manifest's structural
+  validation under the explicit owner-review assumption, and the frozen
+  history SHA-256 check pass. The recovery PR #1492 is open as draft; its
+  `build` check is pending and `roadmap` passes. The default branch still lacks
+  the recovery digest, so enabled validation and live preflight have not been
+  attempted. The earlier 12-test-failure/one-error report does not reproduce
+  on this base.
+- OBS-020: Three inherited findings remain visible in current source: issue
+  responses do not validate the returned number or required field shapes;
+  malformed/missing `blockedBy` data normalizes to no blockers; and action
+  authority is checked before provider reads rather than immediately before
+  the mutation. Recovery `action_push` includes `--no-follow-tags` but not
+  `--no-recurse-submodules`. These remain in the original frozen scope for
+  implementation and action-level regression tests.
