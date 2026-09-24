@@ -1090,6 +1090,31 @@ class LoopEngineTests(unittest.TestCase):
                     loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None), 0
                 )
 
+    def test_symlinked_state_subdirectory_cannot_hide_a_terminal_ledger(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None), 0)
+            runs = root / ".loop-runs"
+            nested = runs / "hidden"
+            nested.mkdir()
+            state_file = runs / "test-chunk.json"
+            state = json.loads(state_file.read_text(encoding="utf-8"))
+            state["status"] = "repair_exhausted"
+            hidden_state = nested / "renamed.json"
+            loop_engine.atomic_json(hidden_state, state)
+            state_file.unlink()
+            saved = root / ".hidden-ledgers"
+            nested.rename(saved)
+            (runs / "hidden").symlink_to(saved, target_is_directory=True)
+            original = (saved / "renamed.json").read_bytes()
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                result = loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None)
+            self.assertNotEqual(result, 0)
+            self.assertIn("symlinks below .loop-runs", output.getvalue())
+            self.assertEqual((saved / "renamed.json").read_bytes(), original)
+
     def test_nested_ledger_identity_is_issue_slug_and_chunk_not_spec_id_or_filename(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -2013,7 +2038,6 @@ class CIFailureRepairTests(unittest.TestCase):
         self.assertEqual(state["rounds"][1]["commit"], candidate)
         with self.assertRaisesRegex(loop_engine.LoopError, "pending or needs changes"):
             loop_engine.require_ci_repairs_resolved(state)
-
         event_before = json.loads(json.dumps(event))
         self.pass_review(candidate)
         state = json.loads(self.state_file.read_text(encoding="utf-8"))
@@ -2024,6 +2048,20 @@ class CIFailureRepairTests(unittest.TestCase):
             loop_engine.require_repair_pr_binding(state, 43, candidate)
         with self.assertRaisesRegex(loop_engine.LoopError, "must equal the full commit"):
             loop_engine.require_repair_pr_binding(state, 42, self.failed_head)
+
+    def test_ci_repair_admission_rechecks_fetch_and_push_remote_urls(self) -> None:
+        candidate = self.repair_candidate()
+        original = self.state_file.read_bytes()
+        git_in(self.root, "remote", "set-url", "origin", "https://github.com/attacker/fork.git")
+        with self.assertRaisesRegex(loop_engine.LoopError, "attacker/fork"):
+            self.admit(candidate)
+        self.assertEqual(self.state_file.read_bytes(), original)
+
+        git_in(self.root, "remote", "set-url", "origin", "https://github.com/example/repository.git")
+        git_in(self.root, "remote", "set-url", "--push", "origin", "https://github.com/attacker/fork.git")
+        with self.assertRaisesRegex(loop_engine.LoopError, "attacker/fork"):
+            self.admit(candidate)
+        self.assertEqual(self.state_file.read_bytes(), original)
 
     def test_failure_admission_rejects_stale_moved_or_ambiguous_heads_without_writing(self) -> None:
         candidate = self.repair_candidate()

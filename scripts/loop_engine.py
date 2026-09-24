@@ -1143,7 +1143,14 @@ def ordinary_ledger_files(root: Path) -> list[Path]:
     for worktree in repository_worktree_roots(root):
         runs_root = canonical_ledger_root(worktree)
         if runs_root.is_dir():
-            found.update(path.resolve() for path in runs_root.rglob("*") if path.is_file())
+            for path in runs_root.rglob("*"):
+                # pathlib does not recurse through symlinked directories. Fail
+                # closed on the link itself so it cannot hide a ledger from
+                # the identity scan and make ledger init replenish its cap.
+                if path.is_symlink():
+                    raise LoopError(f"ledger inventory does not allow symlinks below .loop-runs: {path}")
+                if path.is_file():
+                    found.add(path.resolve())
     return sorted(found)
 
 
@@ -1310,6 +1317,20 @@ def normalize_remote(url: str) -> str:
     value = value.removesuffix(".git").rstrip("/")
     value = re.sub(r"^github\.com/", "", value)
     return value.lower()
+
+
+def require_manifest_remote(root: Path, spec: dict[str, Any]) -> None:
+    """Bind provider reads and writes to every configured URL of the frozen remote."""
+    remote = spec["remote"]
+    repository = spec["repository"].lower()
+    for flags in (["--all"], ["--push", "--all"]):
+        urls = git(root, "remote", "get-url", *flags, remote).splitlines()
+        if not urls:
+            raise LoopError(f"remote {remote!r} has no configured URL")
+        for url in urls:
+            target = normalize_remote(url)
+            if target != repository:
+                raise LoopError(f"remote {remote!r} resolves to {target!r}, not {spec['repository']!r}")
 
 
 def blocked_by_entries(issue: dict[str, Any]) -> list[Any]:
@@ -3130,11 +3151,7 @@ def action_push(
             require_passing_reviewed_change(root, spec, state, "push")
     # Authority was read for spec.repository; the push must land there too.
     # A remote may carry several push URLs and `git push` delivers to all.
-    for flags in (["--all"], ["--push", "--all"]):
-        for url in git(root, "remote", "get-url", *flags, spec["remote"]).splitlines():
-            target = normalize_remote(url)
-            if target != spec["repository"].lower():
-                raise LoopError(f"remote {spec['remote']!r} resolves to {target!r}, not {spec['repository']!r}")
+    require_manifest_remote(root, spec)
     if force_with_lease and not spec.get("allow_force_push", False):
         raise LoopError("force-with-lease is disabled by the specification")
     args = ["git", "push"]
@@ -4196,6 +4213,7 @@ def ledger_admit_ci_repair(root: Path, spec: dict[str, Any], state_file: Path, c
     require_legacy_issue_open(root, spec, number)
     selected_issue = issue_entry(spec, number)
     expected_branch = f"agent/{selected_issue['slug']}"
+    require_manifest_remote(root, spec)
     pr = matching_open_repair_pr(root, spec, state)
     if pr["head_repository"].casefold() != spec["repository"].casefold():
         raise LoopError("pull request source repository does not match the manifest")
@@ -4213,6 +4231,7 @@ def ledger_admit_ci_repair(root: Path, spec: dict[str, Any], state_file: Path, c
         raise LoopError("required-check protection changed during CI-failure admission")
     reread_repair_provider_state(root, spec, state, pr, base_sha)
     require_legacy_issue_open(root, spec, number)
+    require_manifest_remote(root, spec)
     if state_file.read_bytes() != raw_before:
         raise LoopError("ledger changed while CI-failure evidence was being collected; no repair was admitted")
 
