@@ -12,4 +12,5 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
 #print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductMap
 #print axioms AlgebraicGeometry.Scheme.Modules.fromFreeYonedaSheafCoproduct_epi
 #print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproduct_summand_stalk_flat
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproduct_stalk_flat
 #print axioms AlgebraicGeometry.Scheme.Modules.fromFreeYonedaSheafCoproduct_natural
