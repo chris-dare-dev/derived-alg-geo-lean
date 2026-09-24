@@ -95,9 +95,12 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Functor.mapTriangleLEGEIso_hom₂
 #print axioms CategoryTheory.Functor.mapTruncLEIso
 #print axioms CategoryTheory.Functor.mapTruncLEIso_hom_comp_ι
+#print axioms CategoryTheory.Functor.mapTruncLEIso_hom_comp_ι_assoc
 #print axioms CategoryTheory.Functor.mapTruncLEIso_hom_naturality
+#print axioms CategoryTheory.Functor.mapTruncLEIso_hom_naturality_assoc
 #print axioms CategoryTheory.Functor.mapTruncGEIso
 #print axioms CategoryTheory.Functor.mapTruncGEIso_π_comp_hom
+#print axioms CategoryTheory.Functor.mapTruncGEIso_π_comp_hom_assoc
 #print axioms CategoryTheory.Functor.isLE_iff_of_reflectsZeroObjects
 #print axioms CategoryTheory.Functor.isGE_iff_of_reflectsZeroObjects
 #print axioms CategoryTheory.Functor.isBounded_of_target

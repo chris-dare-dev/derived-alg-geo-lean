@@ -305,6 +305,8 @@ private theorem exists_mapTriangleLEGEIso (n : ℤ) (X : C) :
     (t'.triangle_iso_exists hFTC hTD (Iso.refl _) n (n + 1)
       hFTC₁ hFTC₃ hTD₁ hTD₃ (by omega))
 
+/-- The triangle isomorphism comparing a t-exact functor applied to the
+canonical truncation triangle with the target truncation triangle. -/
 noncomputable def mapTriangleLEGEIso (n : ℤ) (X : C) :
     F.mapTriangle.obj ((t.triangleLEGE n (n + 1) rfl).obj X) ≅
       (t'.triangleLEGE n (n + 1) rfl).obj (F.obj X) :=
