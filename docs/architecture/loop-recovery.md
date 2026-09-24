@@ -41,6 +41,46 @@ inherited finding, and existing provider checks. Research approval, a local test
 pass, or an old passing commit is not publication authority. Local ledgers
 provide durable coordination, not cryptographic reviewer attestation.
 
+## Repair after a passed review
+
+Ordinary protected-base revalidation and CI-driven code repair are different
+transitions. Revalidation is free only when a passing reviewed change is carried
+across protected-base movement without changing its reviewed content. A code
+change after a passed ledger must use the original ledger's ordinary review
+budget; it cannot be described as revalidation.
+
+The controller admits a CI repair only from a single open, non-draft PR on the
+planned `agent/<slug>` branch. The PR's full head SHA must equal the current
+source ref. The failed check must report that same SHA and be required by both
+the frozen manifest and freshly read branch protection. Check-run/status name,
+SHA and provider identity are recorded when available. After fetching the
+evidence, the controller rereads matching PRs, PR details, source and base refs,
+and branch protection. Any missing, ambiguous, optional, stale, pending,
+cancelled or changed evidence rejects admission before ledger bytes are
+modified.
+
+Admission appends an event to `ci_failure_repairs` on the same ledger and
+reserves the next ordinary review round. Candidate commits must descend from
+the failed PR head and change only frozen chunk files. A successful rerun on
+the same head creates no event; another failure can be admitted only after a
+repair has passed and the later failing check is on the then-current head. If
+the original round cap has no slot left, the controller records
+`cap_exhausted` and terminal `repair_exhausted` in that same ledger. Ledger
+initialization scans nested `.loop-runs` state by issue, slug and chunk identity,
+and rejects state-directory overrides outside that root, preventing a renamed
+or relocated ledger from restarting the allowance. A ledger created before
+this protocol must be upgraded once by rerunning `ledger init`; the migration
+adds only missing protocol metadata and retains all prior rounds.
+
+All shipping and issue-closure actions consult the same ledger and reject
+pending, exhausted or mismatched repair state. A first draft PR remains possible
+before any repair is recorded. Once repair is recorded, push remains bound to
+the existing open PR and verifies the remote source head is an ancestor of the
+exact reviewed commit; the controller cannot create a replacement PR for that
+repair. A passing repair still requires green current required checks on the
+exact live PR head before merge. For the operator command and provider-evidence
+procedure, see `.claude/loop-specs/README.md`.
+
 ## Configuration and commands
 
 The optional manifest section is:

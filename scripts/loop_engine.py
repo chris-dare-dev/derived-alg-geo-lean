@@ -2049,6 +2049,11 @@ def preflight(root: Path, spec_path: Path) -> int:
 def state_path(root: Path, spec: dict[str, Any], requested: str | None, chunk_id: str) -> Path:
     directory = repo_path(root, requested or spec.get("state_dir", ".loop-runs"))
     ensure_inside(root, directory)
+    canonical_runs = (root / ".loop-runs").resolve()
+    try:
+        directory.relative_to(canonical_runs)
+    except ValueError as exc:
+        raise LoopError("ledger state directories must remain under the repository's .loop-runs root") from exc
     return ensure_inside(root, directory / f"{chunk_id}.json")
 
 
@@ -2056,6 +2061,7 @@ def refuse_renamed_ledger(
     root: Path,
     spec: dict[str, Any],
     requested_state_dir: str | None,
+    number: int,
     chunk_id: str,
     expected: Path,
 ) -> None:
@@ -2065,10 +2071,11 @@ def refuse_renamed_ledger(
     reset a chunk's review history. Identity is (spec_id, chunk_id), not the
     file name, so scan the whole directory for it.
     """
-    directory = expected.parent
+    directory = (root / ".loop-runs").resolve()
+    slug = issue_entry(spec, number)["slug"]
     if not directory.is_dir():
         return
-    for candidate in sorted(directory.rglob("*.json")):
+    for candidate in sorted(path for path in directory.rglob("*") if path.is_file()):
         if candidate.resolve() == expected.resolve():
             continue
         try:
@@ -2079,9 +2086,18 @@ def refuse_renamed_ledger(
             continue
         if data.get("schema") != f"{RUN_SCHEMA}/ledger":
             continue
-        if data.get("spec_id") == spec["id"] and data.get("chunk", {}).get("id") == chunk_id:
+        issue_identity = data.get("issue")
+        chunk_identity = data.get("chunk")
+        identity_matches = (
+            isinstance(issue_identity, dict)
+            and issue_identity.get("number") == number
+            and issue_identity.get("slug") == slug
+            and isinstance(chunk_identity, dict)
+            and chunk_identity.get("id") == chunk_id
+        )
+        if identity_matches:
             raise LoopError(
-                f"chunk {chunk_id!r} of run {spec['id']!r} already has a ledger at "
+                f"chunk {chunk_id!r} for issue #{number} ({slug}) already has a ledger at "
                 f"{candidate} with status {data.get('status')!r}; "
                 "renaming a ledger does not start a fresh review"
             )
@@ -2238,11 +2254,23 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
             for _, record in recovery_registry(root):
                 if record["repository"].casefold() == spec["repository"].casefold() and record["issue"] == number:
                     raise LoopError("registered recovery objective cannot be restarted under a legacy manifest")
-        refuse_renamed_ledger(root, spec, requested_state_dir, chunk_id, path)
+        refuse_renamed_ledger(root, spec, requested_state_dir, number, chunk_id, path)
         if path.exists():
             existing = load_state(path)
             if existing.get("spec_digest") != digest(spec) or not ledger_openspec_matches(root, spec, existing):
                 raise LoopError(f"ledger already exists with a different spec: {path}")
+            if any(
+                key not in existing
+                for key in ("repository", "remote", "base_branch", "ci_failure_repairs")
+            ):
+                # A ledger created before the CI-repair protocol must be
+                # explicitly upgraded before it can publish again. Preserve
+                # every existing round and add only the protocol metadata.
+                existing.setdefault("repository", spec["repository"])
+                existing.setdefault("remote", spec["remote"])
+                existing.setdefault("base_branch", spec["base_branch"])
+                existing.setdefault("ci_failure_repairs", [])
+                write_json(path, existing)
             print(f"PASS ledger already initialized: {path}")
             return 0
         state = {
@@ -2253,6 +2281,9 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
             "openspec_digest": openspec_digest(root, spec),
             "openspec_digest_version": OPENSPEC_DIGEST_VERSION,
             "base_ref": spec["base_ref"],
+            "base_branch": spec["base_branch"],
+            "repository": spec["repository"],
+            "remote": spec["remote"],
             "base_commit_at_init": pinned_base_commit({"repo_root": str(root), "base_ref": spec["base_ref"]}),
             "plan_paths": plan_paths(root, spec_path, spec),
             # Without OpenSpec the issue body is the specification; record
@@ -2276,6 +2307,7 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
             "status": "initialized",
             "created_at": utc_now(),
             "rounds": [],
+            "ci_failure_repairs": [],
         }
         if "recovery" in spec:
             if path.exists():
@@ -2338,25 +2370,71 @@ def improvement_rounds_used(state: dict[str, Any]) -> int:
 
 
 def require_revalidation_needed(state: dict[str, Any], commit: str) -> None:
-    """Admit a revalidation only for a real, changed commit after a pass."""
+    """Admit only the same reviewed change carried across an in-scope base move."""
 
     passed = latest_round(state)
     root_text = state.get("repo_root")
-    if passed is None or not root_text:
+    if passed is None or not root_text or not state.get("repository") or not state.get("remote") or not state.get("base_branch"):
         raise LoopError("ledger has no passing round or repository to revalidate against")
     root = Path(root_text)
-    if run_command(root, ["git", "cat-file", "-e", f"{commit}^{{commit}}"]).returncode != 0:
+    candidate = git(root, "rev-parse", "--verify", "--end-of-options", f"{commit}^{{commit}}", check=False)
+    if not FULL_GIT_SHA_RE.fullmatch(candidate):
         raise LoopError(f"ledger is passed; commit {commit} is not a local commit to revalidate")
-    if reviewed_commit_matches_head(root, str(passed.get("commit", "")), git(root, "rev-parse", commit)):
+    reviewed_commit = str(passed.get("commit", ""))
+    if not FULL_GIT_SHA_RE.fullmatch(reviewed_commit):
+        reviewed_commit = git(root, "rev-parse", "--verify", "--end-of-options", f"{reviewed_commit}^{{commit}}", check=False)
+    if not FULL_GIT_SHA_RE.fullmatch(reviewed_commit):
+        raise LoopError("passed round does not identify a commit to revalidate")
+    if reviewed_commit_matches_head(root, reviewed_commit, candidate):
         raise LoopError("ledger is passed for this exact commit; no further review is needed")
-    # Whether a revalidation was necessary is the publication check's call,
-    # made against the provider's base; the ledger only bounds how often.
+
+    provider = {
+        "repository": state["repository"],
+        "remote": state["remote"],
+        "base_branch": state["base_branch"],
+    }
+    ensure_commit(root, provider["remote"], candidate)
+    ensure_commit(root, provider["remote"], reviewed_commit)
+    base = trusted_base_commit(root, provider)
+    prior_base = str(passed.get("base_commit", ""))
+    if not FULL_GIT_SHA_RE.fullmatch(prior_base) or prior_base.lower() == base.lower():
+        raise LoopError(
+            "changed implementation cannot use free revalidation; use exact required-check failure evidence "
+            "to admit a charged CI repair"
+        )
+    ensure_commit(root, provider["remote"], prior_base)
+    if not is_ancestor(root, prior_base, base):
+        raise LoopError("protected base did not advance from the base recorded by the passing round")
+    if not is_ancestor(root, base, candidate):
+        raise LoopError("revalidation candidate does not carry the current protected base")
+
+    exclude = progress_record_paths(state)
+    if change_fingerprint(root, base, reviewed_commit, exclude) != change_fingerprint(
+        root, base, candidate, exclude
+    ):
+        raise LoopError(
+            "changed implementation cannot use free revalidation; use exact required-check failure evidence "
+            "to admit a charged CI repair"
+        )
+    for path in exclude:
+        if Path(path).name == "tasks.md" and normalized_tasks(
+            root, reviewed_commit, path, ledger_digest_version(state)
+        ) != normalized_tasks(root, candidate, path, ledger_digest_version(state)):
+            raise LoopError("revalidation changed task wording; use the charged CI-repair path")
+    moved = base_changes_under_review(root, base, state, reviewed_commit, candidate)
+    if not moved:
+        raise LoopError(
+            "changed commit is not a protected-base revalidation; use exact required-check failure evidence "
+            "to admit a charged CI repair"
+        )
     used = sum(1 for round_state in state.get("rounds", []) if is_revalidation(round_state))
     if used >= MAX_REVALIDATION_ROUNDS:
         raise LoopError(f"revalidation limit reached ({MAX_REVALIDATION_ROUNDS}); the passed change cannot be reopened again")
 
 
 def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
+    if state.get("status") == "repair_exhausted":
+        raise LoopError("CI-repair review cap is exhausted; this chunk is terminal")
     if "recovery" in state:
         loop_recovery.reserve_round(state, commit)
         if state["recovery"]["phase"] == "parked":
@@ -2437,7 +2515,9 @@ def ledger_record_review(
 ) -> int:
     try:
         state = load_state(state_file)
-        if state.get("status") == "blocked" or (state.get("status") == "passed" and "recovery" in state):
+        if state.get("status") in {"blocked", "repair_exhausted"} or (
+            state.get("status") == "passed" and "recovery" in state
+        ):
             raise LoopError(f"ledger is terminal with status {state['status']!r}; no further reviews are allowed")
         if reviewer not in state["reviewers"]:
             raise LoopError(f"reviewer {reviewer!r} is not authorized by this ledger")
@@ -2501,6 +2581,8 @@ def ledger_record_review(
 def ledger_adjudicate(state_file: Path, verdict: str, note: str | None) -> int:
     try:
         state = load_state(state_file)
+        if state.get("status") == "repair_exhausted":
+            raise LoopError("CI-repair review cap is exhausted; this chunk is terminal")
         if verdict not in REVIEW_VERDICTS:
             raise LoopError(
                 "adjudication must be " + ", ".join(sorted(REVIEW_VERDICTS))
@@ -2886,12 +2968,16 @@ def action_close(
     merged_pr: int | None,
     comment: str | None,
     dry_run: bool,
+    ledger_file: Path | None = None,
 ) -> int:
     authorize_action(root, spec, "close")
     if merged_pr is None and not owner_reviewed_legacy_manifest(root, spec):
         raise LoopError("a branch-authored manifest closes issues only through a verified merged PR")
-    recovered = recovery_publication_state(root, spec)
+    state = action_ledger_state(root, spec, ledger_file, issue_number=number)
+    recovered = state if "recovery" in state else None
     selected_issue_for_action(spec, number)
+    if recovered is None and state.get("status") != "passed":
+        raise LoopError("issue closure requires a passing review ledger")
     if recovered is not None and merged_pr is None:
         raise LoopError("recovery issue closure requires the exact reviewed merged PR")
     if merged_pr is None and not spec["closure"]["allow_non_pr"]:
@@ -2918,6 +3004,11 @@ def action_close(
             require_pr_targets_base(pr, spec)
             require_pr_matches_frozen_issue(pr, recovered)
             verify_remote_chunk_files(root, spec, pr, recovered)
+        else:
+            require_pr_targets_base(pr, spec)
+            require_pr_matches_frozen_issue(pr, state)
+            verify_remote_chunk_files(root, spec, pr, state)
+            require_repair_pr_binding(state, merged_pr, str(pr.get("headRefOid") or ""))
     args = ["gh", "issue", "close", str(number), "--repo", spec["repository"]]
     if comment:
         args.extend(["--comment", comment])
@@ -2933,24 +3024,54 @@ def planned_branches(spec: dict[str, Any]) -> set[str]:
     return {f"agent/{issue['slug']}" for issue in spec["issues"]}
 
 
-def action_push(root: Path, spec: dict[str, Any], branch: str | None, force_with_lease: bool, dry_run: bool) -> int:
+def action_push(
+    root: Path,
+    spec: dict[str, Any],
+    branch: str | None,
+    force_with_lease: bool,
+    dry_run: bool,
+    ledger_file: Path | None = None,
+) -> int:
     authorize_action(root, spec, "push")
     if force_with_lease and not owner_reviewed_legacy_manifest(root, spec):
         raise LoopError("force-with-lease is not available to a branch-authored manifest")
-    recovery_state = recovery_publication_state(root, spec)
-    if recovery_state is not None:
-        head = git(root, "rev-parse", "HEAD")
-        if not reviewed_content_matches(root, spec, recovery_state, recovery_state["rounds"][-1]["commit"], head):
-            raise LoopError("push must publish the reviewed recovery change")
-        recovery_scoped_paths(root, spec, recovery_state, head, trusted_base_commit(root, spec))
-    if git(root, "status", "--porcelain", "--untracked-files=all"):
-        raise LoopError("refusing to push a dirty worktree; commit the frozen chunk first")
     current = git(root, "branch", "--show-current")
     requested = branch or current
     if requested != current:
         raise LoopError(f"--branch {requested!r} does not match current branch {current!r}")
+    state = action_ledger_state(root, spec, ledger_file)
+    recovery_state = state if "recovery" in state else None
+    recovery_head: str | None = None
+    if recovery_state is not None:
+        recovery_head = git(root, "rev-parse", "HEAD")
+        if not reviewed_content_matches(root, spec, recovery_state, recovery_state["rounds"][-1]["commit"], recovery_head):
+            raise LoopError("push must publish the reviewed recovery change")
     if not BRANCH_RE.fullmatch(current) or current not in planned_branches(spec):
         raise LoopError(f"push branch must be one of the spec's dedicated agent branches; got {current!r}")
+    if current != f"agent/{state['issue']['slug']}":
+        raise LoopError("push branch does not match the selected ledger issue")
+    if git(root, "status", "--porcelain", "--untracked-files=all"):
+        raise LoopError("refusing to push a dirty worktree; commit the frozen chunk first")
+    if recovery_state is not None:
+        assert recovery_head is not None
+        recovery_scoped_paths(root, spec, recovery_state, recovery_head, trusted_base_commit(root, spec))
+    else:
+        verify_local_chunk_files(root, spec, state)
+        if state.get("ci_failure_repairs"):
+            if state.get("status") != "passed":
+                raise LoopError("push after a CI-repair event requires a passing latest review round")
+            current_round = latest_round(state)
+            head = git(root, "rev-parse", "HEAD")
+            if (
+                current_round is None
+                or not FULL_GIT_SHA_RE.fullmatch(str(current_round.get("commit", "")))
+                or str(current_round.get("commit", "")).lower() != head.lower()
+            ):
+                raise LoopError("push after CI repair must publish the exact passing review commit")
+            already_published = require_repair_push_binding(root, spec, state, current, head)
+            if already_published:
+                print(f"PASS reviewed CI repair is already published on PR #{state['ci_failure_repairs'][-1]['pr_number']}")
+                return 0
     # Authority was read for spec.repository; the push must land there too.
     # A remote may carry several push URLs and `git push` delivers to all.
     for flags in (["--all"], ["--push", "--all"]):
@@ -3187,8 +3308,12 @@ def action_create_pr(
     dry_run: bool,
 ) -> int:
     authorize_action(root, spec, "create-pr")
-    recovered = recovery_publication_state(root, spec, ledger_file)
     local_head = ""
+    require_predecessor_prs(root, spec)
+    state = action_ledger_state(root, spec, ledger_file, issue_number=number)
+    if state.get("ci_failure_repairs"):
+        raise LoopError("CI repair is bound to its existing PR; refusing to create a replacement PR")
+    recovered = state if "recovery" in state else None
     if recovered is not None:
         local_head = git(root, "rev-parse", "HEAD")
         if not reviewed_content_matches(root, spec, recovered, recovered["rounds"][-1]["commit"], local_head):
@@ -3196,20 +3321,12 @@ def action_create_pr(
         if git(root, "status", "--porcelain", "--untracked-files=all"):
             raise LoopError("PR creation requires a clean frozen checkout")
         recovery_scoped_paths(root, spec, recovered, local_head, trusted_base_commit(root, spec))
-    require_predecessor_prs(root, spec)
     issue = selected_issue_for_action(spec, number)
     require_legacy_issue_open(root, spec, number)
     current = git(root, "branch", "--show-current")
     expected = f"agent/{issue['slug']}"
     if current != expected:
         raise LoopError(f"current branch {current!r} does not match issue branch {expected!r}")
-    state = load_state(ledger_file)
-    if state.get("issue", {}).get("number") != number:
-        raise LoopError("PR ledger issue does not match the requested issue")
-    if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
-        raise LoopError("PR ledger was created from a different run manifest")
-    if not ledger_openspec_matches(root, spec, state):
-        raise LoopError("OpenSpec artifacts changed after ledger initialization; reinitialize the frozen chunk")
     if state.get("status") == "blocked":
         raise LoopError("cannot create a PR from a blocked chunk ledger")
     verify_local_chunk_files(root, spec, state)
@@ -3266,18 +3383,11 @@ def action_attest_pr(
     """Write one durable, controller-derived predecessor marker to a source PR."""
 
     authorize_action(root, spec, "comment")
-    recovery_publication_state(root, spec, ledger_file)
     if not predecessor_attestation_policy(spec)["emit"]:
         raise LoopError("spec.predecessor_attestation.emit is false; refusing to emit an unused marker")
     predecessor_proofs = require_predecessor_prs(root, spec)
+    state = action_ledger_state(root, spec, ledger_file, issue_number=number)
     selected_issue_for_action(spec, number)
-    state = load_state(ledger_file)
-    if state.get("issue", {}).get("number") != number:
-        raise LoopError("attestation ledger issue does not match the requested issue")
-    if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
-        raise LoopError("attestation ledger was created from a different run manifest")
-    if not ledger_openspec_matches(root, spec, state):
-        raise LoopError("OpenSpec artifacts changed after ledger initialization; refusing to attest")
     current = latest_round(state)
     if state.get("status") != "passed" or current is None:
         raise LoopError("predecessor attestation requires a passing review ledger")
@@ -3299,6 +3409,7 @@ def action_attest_pr(
         raise LoopError("predecessor attestation requires an open, non-draft PR")
     require_pr_targets_base(pr, spec)
     require_pr_matches_frozen_issue(pr, state)
+    require_repair_pr_binding(state, pr_number, str(pr.get("headRefOid") or ""))
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
@@ -3325,8 +3436,7 @@ def action_ready(root: Path, spec: dict[str, Any], pr_number: int, ledger_file: 
     """Mark a draft PR ready once the panel has passed the change it carries."""
 
     authorize_action(root, spec, "ready")
-    recovery_publication_state(root, spec, ledger_file)
-    state = load_state(ledger_file)
+    state = action_ledger_state(root, spec, ledger_file)
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("ledger was created from a different run manifest")
     if not ledger_openspec_matches(root, spec, state):
@@ -3352,6 +3462,7 @@ def action_ready(root: Path, spec: dict[str, Any], pr_number: int, ledger_file: 
         raise LoopError("only an open PR can be marked ready")
     require_pr_targets_base(pr, spec)
     require_pr_matches_frozen_issue(pr, state)
+    require_repair_pr_binding(state, pr_number, str(pr.get("headRefOid") or ""))
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(root, spec, pr, state)
@@ -3478,6 +3589,595 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> s
     return str(data.get("headRefOid") or "")
 
 
+def strict_protected_check_map(root: Path, spec: dict[str, Any]) -> dict[str, int | None]:
+    """Read a complete, unambiguous live protection set for CI-repair admission."""
+
+    protection = gh_json(
+        root,
+        [
+            "api",
+            f"repos/{spec['repository']}/branches/{spec['base_branch']}/protection/required_status_checks",
+        ],
+    )
+    if not isinstance(protection, dict):
+        raise LoopError("live branch protection returned an unexpected response")
+    contexts = protection.get("contexts")
+    checks = protection.get("checks")
+    if not isinstance(contexts, list) or not isinstance(checks, list):
+        raise LoopError("live branch protection is incomplete or ambiguous")
+    required: dict[str, int | None] = {}
+    for context in contexts:
+        if not isinstance(context, str) or not context.strip():
+            raise LoopError("live branch protection contains a malformed required context")
+        required[context] = None
+    for check in checks:
+        if not isinstance(check, dict):
+            raise LoopError("live branch protection contains a malformed required check")
+        name, app_id = check.get("context"), check.get("app_id")
+        if not isinstance(name, str) or not name.strip():
+            raise LoopError("live branch protection contains a check with no context")
+        if app_id is not None and (not isinstance(app_id, int) or isinstance(app_id, bool) or app_id <= 0):
+            raise LoopError(f"live branch protection has an invalid app identity for {name!r}")
+        previous = required.get(name)
+        if name in required and previous is not None and app_id is not None and previous != app_id:
+            raise LoopError(f"live branch protection has conflicting app identities for {name!r}")
+        if app_id is not None:
+            required[name] = app_id
+    if not required:
+        raise LoopError("live branch protection has no required status checks")
+    return required
+
+
+def provider_check_timestamp(check: dict[str, Any]) -> str:
+    for field in ("completed_at", "updated_at", "started_at", "created_at"):
+        value = check.get(field)
+        if isinstance(value, str) and value:
+            return value
+    return ""
+
+
+def latest_provider_check(records: list[dict[str, Any]], name: str) -> dict[str, Any] | None:
+    """Select the newest same-head record; reject ties and unorderable duplicates."""
+
+    matching = [record for record in records if record.get("name") == name]
+    if not matching:
+        return None
+    if len(matching) == 1:
+        return matching[0]
+    if any(not record.get("timestamp") for record in matching):
+        raise LoopError(f"check {name!r} has duplicate same-head results without comparable timestamps")
+    newest_at = max(str(record["timestamp"]) for record in matching)
+    newest = [record for record in matching if record["timestamp"] == newest_at]
+    if len(newest) != 1:
+        raise LoopError(f"check {name!r} has ambiguous latest results on the current head")
+    return newest[0]
+
+
+def required_check_failure_evidence(
+    root: Path, spec: dict[str, Any], head_sha: str, protected: dict[str, int | None]
+) -> dict[str, Any]:
+    """Return one exact current required-check failure, never using green-check fallbacks."""
+
+    manifest_checks = spec.get("runner", {}).get("required_checks")
+    if not isinstance(manifest_checks, list) or any(not isinstance(name, str) or not name for name in manifest_checks):
+        raise LoopError("manifest required-check list is malformed")
+    common = sorted(set(manifest_checks) & set(protected))
+    if not common:
+        raise LoopError("no check is required by both the frozen manifest and live branch protection")
+
+    check_response = gh_json(
+        root,
+        ["api", f"repos/{spec['repository']}/commits/{head_sha}/check-runs?per_page=100"],
+    )
+    if not isinstance(check_response, dict):
+        raise LoopError("check-run response is malformed")
+    check_runs = check_response.get("check_runs")
+    total_count = check_response.get("total_count")
+    if (
+        not isinstance(check_runs, list)
+        or not isinstance(total_count, int)
+        or isinstance(total_count, bool)
+        or total_count != len(check_runs)
+    ):
+        raise LoopError("check-run response is incomplete or ambiguous")
+    status_response = gh_json(
+        root,
+        ["api", f"repos/{spec['repository']}/commits/{head_sha}/statuses?per_page=100"],
+    )
+    if not isinstance(status_response, list) or len(status_response) >= 100:
+        raise LoopError("legacy status response is incomplete or ambiguous")
+
+    records: list[dict[str, Any]] = []
+    for check in check_runs:
+        if not isinstance(check, dict):
+            raise LoopError("check-run response contains a malformed row")
+        if check.get("head_sha") != head_sha:
+            raise LoopError("check-run evidence does not identify the exact pull-request head")
+        name = check.get("name")
+        if not isinstance(name, str) or not name.strip():
+            raise LoopError("check-run response contains a result with no name")
+        if name not in common:
+            continue
+        requirement_app = protected[name]
+        app = check.get("app")
+        app_id = app.get("id") if isinstance(app, dict) else None
+        app_slug = app.get("slug") if isinstance(app, dict) else None
+        if app_id is not None and (not isinstance(app_id, int) or isinstance(app_id, bool)):
+            raise LoopError(f"check-run {name!r} has a malformed app identity")
+        if app_slug is not None and not isinstance(app_slug, str):
+            raise LoopError(f"check-run {name!r} has a malformed app slug")
+        if requirement_app is not None and app_id != requirement_app:
+            continue
+        status, conclusion = check.get("status"), check.get("conclusion")
+        if not isinstance(status, str):
+            raise LoopError(f"check-run {name!r} has no status")
+        if conclusion is not None and not isinstance(conclusion, str):
+            raise LoopError(f"check-run {name!r} has a malformed conclusion")
+        records.append(
+            {
+                "name": name,
+                "timestamp": provider_check_timestamp(check),
+                "state": status.lower(),
+                "conclusion": conclusion.lower() if conclusion else None,
+                "source": "check_run",
+                "app_id": app_id,
+                "app_slug": app_slug,
+                "run_id": check.get("id"),
+                "url": check.get("html_url"),
+                "head_sha": head_sha,
+            }
+        )
+    for status in status_response:
+        if not isinstance(status, dict):
+            raise LoopError("legacy status response contains a malformed row")
+        if status.get("sha") != head_sha:
+            raise LoopError("status evidence does not identify the exact pull-request head")
+        name = status.get("context")
+        if not isinstance(name, str) or not name.strip():
+            raise LoopError("legacy status response contains a result with no context")
+        if name not in common or protected[name] is not None:
+            continue
+        state = status.get("state")
+        if not isinstance(state, str):
+            raise LoopError(f"legacy status {name!r} has no state")
+        creator = status.get("creator")
+        creator_login = creator.get("login") if isinstance(creator, dict) else None
+        if creator is not None and not isinstance(creator, dict):
+            raise LoopError(f"legacy status {name!r} has a malformed creator identity")
+        if creator_login is not None and not isinstance(creator_login, str):
+            raise LoopError(f"legacy status {name!r} has a malformed creator login")
+        records.append(
+            {
+                "name": name,
+                "timestamp": provider_check_timestamp(status),
+                "state": "completed",
+                "conclusion": state.lower(),
+                "source": "commit_status",
+                "app_id": None,
+                "creator_login": creator_login,
+                "run_id": status.get("id"),
+                "url": status.get("target_url"),
+                "head_sha": head_sha,
+            }
+        )
+
+    failures: list[dict[str, Any]] = []
+    for name in common:
+        latest = latest_provider_check(records, name)
+        if latest is None:
+            continue
+        if latest.get("source") == "check_run":
+            failed = latest.get("state") == "completed" and latest.get("conclusion") == "failure"
+        else:
+            failed = latest.get("conclusion") in {"failure", "error"}
+        if failed:
+            failures.append(latest)
+    if not failures:
+        raise LoopError("no current required check has a completed failure on the exact pull-request head")
+    failures.sort(key=lambda item: (item["name"], item["source"], str(item.get("app_id") or ""), str(item.get("run_id") or "")))
+    return failures[0]
+
+
+def provider_ref_sha(root: Path, spec: dict[str, Any], branch: str) -> str:
+    data = gh_json(root, ["api", f"repos/{spec['repository']}/git/ref/heads/{branch}"])
+    obj = data.get("object") if isinstance(data, dict) else None
+    sha = obj.get("sha") if isinstance(obj, dict) else None
+    if not isinstance(sha, str) or not FULL_GIT_SHA_RE.fullmatch(sha):
+        raise LoopError(f"provider did not report a full commit SHA for branch {branch!r}")
+    return sha
+
+
+def normalized_pull_request(data: Any, spec: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(data, dict):
+        raise LoopError("provider pull-request response is malformed")
+    number = data.get("number")
+    head, base = data.get("head"), data.get("base")
+    if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
+        raise LoopError("provider pull-request response has no valid number")
+    if not isinstance(head, dict) or not isinstance(base, dict):
+        raise LoopError("provider pull-request response has no readable head or base")
+    head_repo = head.get("repo")
+    base_repo = base.get("repo")
+    if not isinstance(head_repo, dict) or not isinstance(base_repo, dict):
+        raise LoopError("pull-request source or base repository is unavailable")
+    head_repo_name, base_repo_name = head_repo.get("full_name"), base_repo.get("full_name")
+    if not isinstance(head_repo_name, str) or not isinstance(base_repo_name, str):
+        raise LoopError("pull-request source or base repository identity is malformed")
+    if head_repo_name.casefold() != spec["repository"].casefold():
+        raise LoopError("pull-request source repository does not match the frozen manifest repository")
+    if base_repo_name.casefold() != spec["repository"].casefold():
+        raise LoopError("pull-request base repository does not match the frozen manifest repository")
+    head_sha, base_sha = head.get("sha"), base.get("sha")
+    if not isinstance(head_sha, str) or not FULL_GIT_SHA_RE.fullmatch(head_sha):
+        raise LoopError("pull request does not report a full head SHA")
+    if not isinstance(base_sha, str) or not FULL_GIT_SHA_RE.fullmatch(base_sha):
+        raise LoopError("pull request does not report a full base SHA")
+    head_ref, base_ref = head.get("ref"), base.get("ref")
+    body = data.get("body")
+    status = data.get("state")
+    draft = data.get("draft")
+    if not isinstance(head_ref, str) or not isinstance(base_ref, str) or not isinstance(body, str):
+        raise LoopError("pull-request source, base, or issue-link metadata is malformed")
+    if status != "open" or draft is not False:
+        raise LoopError("CI-repair admission requires one open, non-draft pull request")
+    expected_branch = f"agent/{state['issue']['slug']}"
+    if head_ref != expected_branch:
+        raise LoopError(f"pull-request branch {head_ref!r} does not match {expected_branch!r}")
+    if base_ref != spec["base_branch"]:
+        raise LoopError(f"pull request targets {base_ref!r}, not protected base {spec['base_branch']!r}")
+    require_pr_matches_frozen_issue(
+        {"headRefName": head_ref, "body": body}, state
+    )
+    return {
+        "number": number,
+        "state": status,
+        "draft": draft,
+        "head_repository": head_repo_name,
+        "head_branch": head_ref,
+        "head_sha": head_sha.lower(),
+        "base_repository": base_repo_name,
+        "base_branch": base_ref,
+        "base_sha": base_sha.lower(),
+        "body": body,
+        "url": data.get("html_url") if isinstance(data.get("html_url"), str) else "",
+    }
+
+
+def matching_open_repair_pr(root: Path, spec: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
+    expected_branch = f"agent/{state['issue']['slug']}"
+    matching: list[dict[str, Any]] = []
+    for page in range(1, 21):
+        rows = gh_json(
+            root,
+            ["api", f"repos/{spec['repository']}/pulls?state=open&per_page=100&page={page}"],
+        )
+        if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+            raise LoopError("open pull-request listing is malformed or ambiguous")
+        if any(
+            not isinstance(row.get("head"), dict)
+            or not isinstance(row["head"].get("ref"), str)
+            for row in rows
+        ):
+            raise LoopError("open pull-request listing contains a row with incomplete source identity")
+        matching.extend(
+            row for row in rows
+            if isinstance(row.get("head"), dict) and row["head"].get("ref") == expected_branch
+        )
+        if len(rows) < 100:
+            break
+    else:
+        raise LoopError("open pull-request listing is too large to establish a unique matching PR")
+    if len(matching) != 1:
+        raise LoopError(
+            f"expected exactly one open pull request for branch {expected_branch!r}; found {len(matching)}"
+        )
+    return normalized_pull_request(matching[0], spec, state)
+
+
+def reread_repair_provider_state(
+    root: Path, spec: dict[str, Any], state: dict[str, Any], initial_pr: dict[str, Any], initial_base: str
+) -> None:
+    current_unique_pr = matching_open_repair_pr(root, spec, state)
+    if current_unique_pr != initial_pr:
+        raise LoopError("matching pull-request set changed during CI-failure admission")
+    current_data = gh_json(
+        root, ["api", f"repos/{spec['repository']}/pulls/{initial_pr['number']}"]
+    )
+    current_pr = normalized_pull_request(current_data, spec, state)
+    if current_pr != initial_pr:
+        raise LoopError("pull-request identity, issue links, base, or head moved during CI-failure admission")
+    current_source = provider_ref_sha(root, spec, initial_pr["head_branch"])
+    if current_source.lower() != initial_pr["head_sha"].lower():
+        raise LoopError("source branch moved during CI-failure admission")
+    current_base = provider_ref_sha(root, spec, spec["base_branch"])
+    if current_base.lower() != initial_base.lower():
+        raise LoopError("protected base moved during CI-failure admission")
+    if current_pr["base_sha"].lower() != current_base.lower():
+        raise LoopError("pull-request base snapshot is stale relative to the live protected base")
+
+
+def validate_repair_candidate(root: Path, spec: dict[str, Any], state: dict[str, Any], failed_head: str, candidate: str) -> str:
+    if not isinstance(candidate, str) or not FULL_GIT_SHA_RE.fullmatch(candidate):
+        raise LoopError("CI-repair candidate must be a full 40-character commit SHA")
+    resolved = git(root, "rev-parse", "--verify", "--end-of-options", f"{candidate}^{{commit}}", check=False)
+    if not FULL_GIT_SHA_RE.fullmatch(resolved) or resolved.lower() != candidate.lower():
+        raise LoopError("CI-repair candidate is not the exact local commit supplied")
+    if candidate.lower() == failed_head.lower():
+        raise LoopError("same-head CI reruns do not allocate a repair round")
+    if not is_ancestor(root, failed_head, candidate):
+        raise LoopError("CI-repair candidate must descend from the exact failed-check head")
+    changed = git(root, "diff", "--name-only", "--no-renames", failed_head, candidate).splitlines()
+    if not changed:
+        raise LoopError("CI-repair candidate has no changed content relative to the failed-check head")
+    outside = [path for path in changed if not path_is_in_frozen_chunk(path, chunk_allowed_paths(state))]
+    if outside:
+        raise LoopError("CI-repair candidate changes files outside the frozen chunk: " + ", ".join(outside))
+    require_unprotected(root, spec, changed, state)
+    require_no_links(root, spec, failed_head, candidate, state)
+    return resolved.lower()
+
+
+def require_canonical_ledger_identity(root: Path, ledger_file: Path, state: dict[str, Any]) -> None:
+    path = ensure_inside(root, ledger_file)
+    runs_root = (root / ".loop-runs").resolve()
+    try:
+        path.relative_to(runs_root)
+    except ValueError as exc:
+        raise LoopError("ordinary loop ledgers must remain under the repository's .loop-runs root") from exc
+    issue, chunk = state.get("issue"), state.get("chunk")
+    if not isinstance(issue, dict) or not isinstance(chunk, dict):
+        raise LoopError("ledger has no frozen issue and chunk identity")
+    matches: list[Path] = []
+    if runs_root.is_dir():
+        for candidate in (path for path in runs_root.rglob("*") if path.is_file()):
+            try:
+                record = json.loads(candidate.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if not isinstance(record, dict) or record.get("schema") != f"{RUN_SCHEMA}/ledger":
+                continue
+            record_issue, record_chunk = record.get("issue"), record.get("chunk")
+            if (
+                isinstance(record_issue, dict)
+                and isinstance(record_chunk, dict)
+                and record_issue.get("number") == issue.get("number")
+                and record_issue.get("slug") == issue.get("slug")
+                and record_chunk.get("id") == chunk.get("id")
+            ):
+                matches.append(candidate.resolve())
+    if len(matches) != 1 or matches[0] != path:
+        raise LoopError(
+            "selected ledger is missing, ambiguous, or not the unique canonical ledger for this frozen issue/chunk"
+        )
+
+
+def require_ci_repairs_resolved(state: dict[str, Any]) -> None:
+    events = state.get("ci_failure_repairs", [])
+    if not isinstance(events, list):
+        raise LoopError("ledger CI-repair event list is malformed")
+    if state.get("status") == "repair_exhausted":
+        raise LoopError("CI-repair review cap is exhausted; this chunk cannot be published or closed")
+    rounds = state.get("rounds")
+    if not isinstance(rounds, list):
+        raise LoopError("ledger round history is malformed")
+    for sequence, event in enumerate(events, start=1):
+        if not isinstance(event, dict) or event.get("sequence") != sequence:
+            raise LoopError("ledger CI-repair event history is malformed or reordered")
+        disposition = event.get("disposition")
+        if disposition == "cap_exhausted":
+            raise LoopError("CI-repair review cap is exhausted; this chunk cannot be published or closed")
+        if disposition != "review_allocated":
+            raise LoopError("ledger CI-repair event has an unsupported disposition")
+        repair_number = event.get("round")
+        repair_round = next(
+            (round_state for round_state in rounds if isinstance(round_state, dict) and round_state.get("number") == repair_number),
+            None,
+        )
+        if (
+            not isinstance(repair_number, int)
+            or repair_round is None
+            or repair_round.get("kind") != "ci_failure_repair"
+            or repair_round.get("commit") != event.get("proposed_commit")
+        ):
+            raise LoopError("ledger CI-repair event does not match its immutable review round")
+        resolved = any(
+            isinstance(round_state, dict)
+            and isinstance(round_state.get("number"), int)
+            and round_state["number"] >= repair_number
+            and isinstance(round_state.get("adjudication"), dict)
+            and round_state["adjudication"].get("verdict") in PASSING_VERDICTS
+            for round_state in rounds
+        )
+        if not resolved:
+            raise LoopError("CI-repair panel is pending or needs changes; shipping is denied")
+
+
+def require_repair_pr_binding(state: dict[str, Any], pr_number: int, head_sha: str) -> None:
+    events = state.get("ci_failure_repairs", [])
+    if not events:
+        return
+    latest = events[-1]
+    current = latest_round(state)
+    if latest.get("pr_number") != pr_number:
+        raise LoopError("pull request does not match the PR bound to the latest CI-repair event")
+    if current is None or current.get("adjudication", {}).get("verdict") not in PASSING_VERDICTS:
+        raise LoopError("latest ledger round is not passing after CI repair")
+    reviewed = str(current.get("commit", ""))
+    if not FULL_GIT_SHA_RE.fullmatch(reviewed) or reviewed.lower() != str(head_sha).lower():
+        raise LoopError("PR head must equal the full commit SHA reviewed after CI repair")
+
+
+def require_repair_push_binding(
+    root: Path, spec: dict[str, Any], state: dict[str, Any], branch: str, local_head: str
+) -> bool:
+    """Check the existing repair PR before pushing; return true when already published."""
+
+    events = state.get("ci_failure_repairs", [])
+    if not events:
+        return False
+    latest = events[-1]
+    pr = matching_open_repair_pr(root, spec, state)
+    if pr["number"] != latest.get("pr_number") or pr["head_branch"] != branch:
+        raise LoopError("push does not target the open PR bound to the latest CI-repair event")
+    source_sha = provider_ref_sha(root, spec, branch)
+    if source_sha.lower() != pr["head_sha"].lower():
+        raise LoopError("PR head and source branch moved apart before CI-repair push")
+    if source_sha.lower() == local_head.lower():
+        return True
+    failed_head = latest.get("failed_head")
+    if (
+        not isinstance(failed_head, str)
+        or not FULL_GIT_SHA_RE.fullmatch(failed_head)
+        or not is_ancestor(root, failed_head, source_sha)
+        or not is_ancestor(root, source_sha, local_head)
+    ):
+        raise LoopError("remote repair PR head is not an ancestor of the exact reviewed commit")
+    return False
+
+
+def action_ledger_state(
+    root: Path,
+    spec: dict[str, Any],
+    ledger_file: Path | None,
+    *,
+    issue_number: int | None = None,
+    branch: str | None = None,
+) -> dict[str, Any]:
+    """Resolve the one canonical ledger and apply common publication safeguards."""
+
+    recovered = recovery_publication_state(root, spec, ledger_file)
+    if recovered is not None:
+        return recovered
+    if ledger_file is None:
+        raise LoopError("this action requires the selected ordinary ledger via --ledger")
+    state = load_state(ledger_file)
+    if "recovery" in state:
+        raise LoopError("recovery ledger must be resolved through its registered recovery manifest")
+    if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
+        raise LoopError("ledger was created from a different run manifest")
+    if "ci_failure_repairs" not in state:
+        raise LoopError("ledger predates the CI-repair protocol; rerun ledger init to upgrade it before publication")
+    if not ledger_openspec_matches(root, spec, state):
+        raise LoopError("OpenSpec artifacts changed after ledger initialization; reinitialize the frozen chunk")
+    issue = state.get("issue")
+    if not isinstance(issue, dict) or not isinstance(issue.get("number"), int) or isinstance(issue.get("number"), bool):
+        raise LoopError("ledger has no valid frozen issue identity")
+    selected_issue, selected_chunk = chunk_entry(spec, issue["number"], str(state.get("chunk", {}).get("id", "")))
+    chunk = state.get("chunk", {})
+    if (
+        issue.get("slug") != selected_issue["slug"]
+        or chunk.get("closure", "complete") != selected_chunk.get("closure", "complete")
+    ):
+        raise LoopError("ledger issue or chunk identity does not match the frozen manifest")
+    if (
+        chunk.get("files") != selected_chunk.get("files")
+        or chunk.get("requirements") != selected_chunk.get("requirements")
+        or chunk.get("acceptance") != selected_chunk.get("acceptance")
+        or chunk.get("scope") != selected_chunk.get("scope")
+        or chunk.get("lift_targets", []) != selected_chunk.get("lift_targets", [])
+        or state.get("max_review_rounds") != spec["limits"]["max_review_rounds_per_chunk"]
+        or state.get("reviewers") != spec["review"]["reviewers"]
+    ):
+        raise LoopError("CI-repair ledger chunk, reviewers, or cap do not match the frozen manifest")
+    if (
+        state.get("repository") != spec["repository"]
+        or state.get("remote") != spec["remote"]
+        or state.get("base_branch") != spec["base_branch"]
+        or Path(str(state.get("repo_root", ""))).resolve() != root.resolve()
+    ):
+        raise LoopError("CI-repair ledger repository, base, or checkout does not match the frozen manifest")
+    require_canonical_ledger_identity(root, ledger_file, state)
+    require_ci_repairs_resolved(state)
+    if issue_number is not None and issue["number"] != issue_number:
+        raise LoopError("selected ledger issue does not match the requested issue")
+    if branch is not None and branch != f"agent/{issue['slug']}":
+        raise LoopError("selected ledger issue does not match the current issue branch")
+    return state
+
+
+def ledger_admit_ci_repair(root: Path, spec: dict[str, Any], state_file: Path, candidate: str) -> int:
+    """Append exact failed-check evidence and allocate one charged ordinary round."""
+
+    raw_before = state_file.read_bytes()
+    state = action_ledger_state(root, spec, state_file)
+    if "recovery" in state:
+        raise LoopError("CI-failure repair is not available to recovery-managed ledgers")
+    require_canonical_ledger_identity(root, state_file, state)
+    passed = latest_round(state)
+    if state.get("status") != "passed" or passed is None or passed.get("adjudication", {}).get("verdict") not in PASSING_VERDICTS:
+        raise LoopError("CI-failure repair requires the latest ordinary review round to have passed")
+    number = state["issue"]["number"]
+    require_legacy_issue_open(root, spec, number)
+    selected_issue = issue_entry(spec, number)
+    expected_branch = f"agent/{selected_issue['slug']}"
+    pr = matching_open_repair_pr(root, spec, state)
+    if pr["head_repository"].casefold() != spec["repository"].casefold():
+        raise LoopError("pull request source repository does not match the manifest")
+    source_sha = provider_ref_sha(root, spec, expected_branch)
+    if source_sha.lower() != pr["head_sha"].lower():
+        raise LoopError("pull-request head and live source-branch head disagree")
+    base_sha = provider_ref_sha(root, spec, spec["base_branch"])
+    if base_sha.lower() != pr["base_sha"].lower():
+        raise LoopError("pull-request base snapshot is stale relative to the live protected base")
+    repaired_commit = validate_repair_candidate(root, spec, state, pr["head_sha"], candidate)
+    protected = strict_protected_check_map(root, spec)
+    evidence = required_check_failure_evidence(root, spec, pr["head_sha"], protected)
+    protected_after = strict_protected_check_map(root, spec)
+    if protected_after != protected:
+        raise LoopError("required-check protection changed during CI-failure admission")
+    reread_repair_provider_state(root, spec, state, pr, base_sha)
+    require_legacy_issue_open(root, spec, number)
+    if state_file.read_bytes() != raw_before:
+        raise LoopError("ledger changed while CI-failure evidence was being collected; no repair was admitted")
+
+    events = state.get("ci_failure_repairs", [])
+    if not isinstance(events, list):
+        raise LoopError("ledger CI-repair event list is malformed")
+    events = list(events)
+    sequence = len(events) + 1
+    event: dict[str, Any] = {
+        "sequence": sequence,
+        "prior_passing_round": passed["number"],
+        "failed_head": pr["head_sha"],
+        "required_check": evidence,
+        "pr_number": pr["number"],
+        "pr_url": pr["url"],
+        "source_repository": pr["head_repository"],
+        "source_branch": pr["head_branch"],
+        "base_branch": pr["base_branch"],
+        "base_sha": base_sha.lower(),
+        "proposed_commit": repaired_commit,
+        "recorded_at": utc_now(),
+    }
+    used = improvement_rounds_used(state)
+    if used >= state["max_review_rounds"]:
+        event.update({"disposition": "cap_exhausted", "round": None})
+        events.append(event)
+        state["ci_failure_repairs"] = events
+        state["status"] = "repair_exhausted"
+        write_json(state_file, state)
+        print(f"CAP EXHAUSTED: CI failure recorded for PR #{pr['number']}; no review slot remains")
+        return 0
+
+    next_number = (state["rounds"][-1].get("number", 0) + 1) if state.get("rounds") else 1
+    event.update({"disposition": "review_allocated", "round": next_number})
+    events.append(event)
+    state["ci_failure_repairs"] = events
+    repair_round = {
+        "number": next_number,
+        "commit": repaired_commit,
+        "reviews": [],
+        "adjudication": None,
+        "kind": "ci_failure_repair",
+        "base_commit": base_sha.lower(),
+    }
+    state["rounds"].append(repair_round)
+    state["status"] = "reviewing"
+    write_json(state_file, state)
+    print(f"PASS CI-failure repair admitted: PR #{pr['number']} round={next_number} commit={repaired_commit}")
+    return 0
+
+
 def action_approve(
     root: Path,
     spec: dict[str, Any],
@@ -3487,9 +4187,8 @@ def action_approve(
     dry_run: bool,
 ) -> int:
     authorize_action(root, spec, "approve")
-    recovery_publication_state(root, spec, ledger_file)
     predecessor_proofs = require_predecessor_prs(root, spec)
-    state = load_state(ledger_file)
+    state = action_ledger_state(root, spec, ledger_file)
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("ledger was created from a different run manifest")
     if not ledger_openspec_matches(root, spec, state):
@@ -3515,6 +4214,7 @@ def action_approve(
         raise LoopError("approval requires an open, non-draft PR")
     require_pr_targets_base(pr, spec)
     require_pr_matches_frozen_issue(pr, state)
+    require_repair_pr_binding(state, pr_number, str(pr.get("headRefOid") or ""))
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
@@ -3605,10 +4305,9 @@ def action_merge(
     authorize_action(root, spec, "merge")
     if admin and not owner_reviewed_legacy_manifest(root, spec):
         raise LoopError("administrator merge is never available to a branch-authored manifest")
-    recovery_publication_state(root, spec, ledger_file)
     predecessor_proofs = require_predecessor_prs(root, spec)
+    state = action_ledger_state(root, spec, ledger_file)
     merge_policy(spec)
-    state = load_state(ledger_file)
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("merge ledger was created from a different run manifest")
     if not ledger_openspec_matches(root, spec, state):
@@ -3620,7 +4319,11 @@ def action_merge(
         raise LoopError("merge requires a passing adjudicated review round")
     # Refuse a disallowed method, auto or admin request before any provider call.
     build_merge_command(spec, pr_number, str(current["commit"]), method, auto, admin, delete_branch)
-    checked_head = None if admin else check_required_checks(root, spec, pr_number)
+    checked_head = (
+        None
+        if admin and not state.get("ci_failure_repairs")
+        else check_required_checks(root, spec, pr_number)
+    )
     pr = gh_json(
         root,
         [
@@ -3637,6 +4340,7 @@ def action_merge(
         raise LoopError("merge requires an open, non-draft PR")
     require_pr_targets_base(pr, spec)
     require_pr_matches_frozen_issue(pr, state)
+    require_repair_pr_binding(state, pr_number, str(pr.get("headRefOid") or ""))
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
@@ -3709,6 +4413,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--verdict", required=True, choices=sorted(CONTRACT_VERDICT_TOKENS)
     )
     adjudicate_parser.add_argument("--note")
+    admit_parser = ledger_sub.add_parser(
+        "admit-ci-repair", help="record exact required-check failure evidence and reserve a charged repair round"
+    )
+    add_common_spec_parser(admit_parser)
+    admit_parser.add_argument("--state", required=True, type=Path)
+    admit_parser.add_argument("--commit", required=True, help="full local repair candidate commit SHA")
     show_parser = ledger_sub.add_parser("show")
     show_parser.add_argument("--state", required=True, type=Path)
 
@@ -3735,10 +4445,12 @@ def build_parser() -> argparse.ArgumentParser:
     add_common_spec_parser(close_parser)
     close_parser.add_argument("--issue", required=True, type=int)
     close_parser.add_argument("--merged-pr", type=int)
+    close_parser.add_argument("--ledger", required=True, type=Path)
     close_parser.add_argument("--comment")
     close_parser.add_argument("--dry-run", action="store_true")
     push_parser = action_sub.add_parser("push")
     add_common_spec_parser(push_parser)
+    push_parser.add_argument("--ledger", required=True, type=Path)
     push_parser.add_argument("--branch")
     push_parser.add_argument("--force-with-lease", action="store_true")
     push_parser.add_argument("--dry-run", action="store_true")
@@ -3818,6 +4530,10 @@ def dispatch(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
                 )
             if args.ledger_command == "adjudicate":
                 return ledger_adjudicate(args.state.resolve(), args.verdict, args.note)
+            if args.ledger_command == "admit-ci-repair":
+                root = args.repo_root.resolve()
+                spec = load_spec(repo_path(root, args.spec), root, verify_owner_review=True)
+                return ledger_admit_ci_repair(root, spec, args.state.resolve(), args.commit)
             if args.ledger_command == "show":
                 return ledger_show(args.state.resolve())
         if args.command == "recovery":
@@ -3830,9 +4546,13 @@ def dispatch(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
             if args.action_command == "comment":
                 return action_comment(root, spec, args.issue, args.body, args.dry_run)
             if args.action_command == "close":
-                return action_close(root, spec, args.issue, args.merged_pr, args.comment, args.dry_run)
+                return action_close(
+                    root, spec, args.issue, args.merged_pr, args.comment, args.dry_run, args.ledger.resolve()
+                )
             if args.action_command == "push":
-                return action_push(root, spec, args.branch, args.force_with_lease, args.dry_run)
+                return action_push(
+                    root, spec, args.branch, args.force_with_lease, args.dry_run, args.ledger.resolve()
+                )
             if args.action_command == "create-pr":
                 return action_create_pr(
                     root,

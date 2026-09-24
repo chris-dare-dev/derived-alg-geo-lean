@@ -162,18 +162,30 @@ def predecessor_pr(binding: dict, comments: list[dict] | None = None) -> dict:
 
 def passing_ledger_state(root: Path, spec: dict, closure: str = "complete") -> dict:
     issue = spec["issues"][0]
+    chunk = issue["chunks"][0]
     return {
+        "schema": f"{loop_engine.RUN_SCHEMA}/ledger",
         "spec_id": spec["id"],
         "spec_digest": loop_engine.digest(spec),
         "openspec_digest": loop_engine.openspec_digest(root, spec),
+        "repository": spec["repository"],
+        "remote": spec["remote"],
+        "base_branch": spec["base_branch"],
+        "repo_root": str(root.resolve()),
         "issue": {"number": issue["number"], "slug": issue["slug"]},
         "chunk": {
-            "id": issue["chunks"][0]["id"],
-            "files": issue["chunks"][0]["files"],
+            "id": chunk["id"],
+            "scope": chunk["scope"],
+            "files": chunk["files"],
+            "lift_targets": chunk.get("lift_targets", []),
+            "requirements": chunk["requirements"],
+            "acceptance": chunk["acceptance"],
             "closure": closure,
         },
         "max_review_rounds": spec["limits"]["max_review_rounds_per_chunk"],
+        "reviewers": spec["review"]["reviewers"],
         "status": "passed",
+        "ci_failure_repairs": [],
         "rounds": [
             {
                 "commit": "a" * 40,
@@ -181,6 +193,13 @@ def passing_ledger_state(root: Path, spec: dict, closure: str = "complete") -> d
             }
         ],
     }
+
+
+def persist_test_ledger(root: Path, state: dict) -> Path:
+    path = root / ".loop-runs" / f"{state['chunk']['id']}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    loop_engine.atomic_json(path, state)
+    return path
 
 
 class LoopEngineTests(unittest.TestCase):
@@ -493,8 +512,11 @@ class LoopEngineTests(unittest.TestCase):
             spec["enabled"] = True
             spec["mutations"]["comment_issue"] = True
             spec["mutations"]["merge_pr"] = True
+            spec["closure"]["allow_progress_pr"] = True
+            spec["issues"][0]["chunks"][0]["closure"] = "progress"
             spec["predecessor_attestation"] = {"emit": True}
             state = passing_ledger_state(root, spec, "progress")
+            ledger_path = persist_test_ledger(root, state)
             state["rounds"][0]["adjudication"]["verdict"] = "pass_with_lift"
             pr = {
                 "state": "OPEN",
@@ -512,7 +534,7 @@ class LoopEngineTests(unittest.TestCase):
                 loop_engine, "reviewed_commit_matches_head", return_value=True
             ), mock.patch.object(loop_engine, "run_command") as command:
                 self.assertEqual(
-                    loop_engine.action_attest_pr(root, spec, 1, 51, root / "ledger.json", False), 0
+                    loop_engine.action_attest_pr(root, spec, 1, 51, ledger_path, False), 0
                 )
             written = command.call_args.args[1]
             self.assertEqual(written[:4], ["gh", "pr", "comment", "51"])
@@ -527,7 +549,7 @@ class LoopEngineTests(unittest.TestCase):
             with mock.patch.object(loop_engine, "load_state", return_value=blocked_state), self.assertRaises(
                 loop_engine.LoopError
             ) as caught:
-                loop_engine.action_attest_pr(root, spec, 1, 51, root / "ledger.json", True)
+                loop_engine.action_attest_pr(root, spec, 1, 51, ledger_path, True)
             self.assertIn("passing review ledger", str(caught.exception))
 
             pr["comments"] = [{"author": {"login": spec["actor"]}, "body": written[-1]}]
@@ -540,7 +562,7 @@ class LoopEngineTests(unittest.TestCase):
             ):
                 self.assertEqual(
                     loop_engine.action_merge(
-                        root, spec, 51, root / "ledger.json", None, False, False, None, True
+                        root, spec, 51, ledger_path, None, False, False, None, True
                     ),
                     0,
                 )
@@ -558,7 +580,7 @@ class LoopEngineTests(unittest.TestCase):
                         loop_engine, "reviewed_commit_matches_head", return_value=True
                     ), self.assertRaises(loop_engine.LoopError) as caught:
                         loop_engine.action_attest_pr(
-                            root, spec, 1, 51, root / "ledger.json", True
+                            root, spec, 1, 51, ledger_path, True
                         )
                     self.assertIn(message, str(caught.exception))
 
@@ -572,7 +594,7 @@ class LoopEngineTests(unittest.TestCase):
                 loop_engine.LoopError
             ) as caught:
                 loop_engine.action_merge(
-                    root, spec, 51, root / "ledger.json", None, False, False, None, True
+                    root, spec, 51, ledger_path, None, False, False, None, True
                 )
             self.assertIn("attestation", str(caught.exception))
 
@@ -583,6 +605,7 @@ class LoopEngineTests(unittest.TestCase):
             spec["enabled"] = True
             spec["mutations"]["approve_pr"] = True
             state = passing_ledger_state(root, spec)
+            ledger_path = persist_test_ledger(root, state)
             proof = {
                 "number": 41,
                 "merge_commit": "d" * 40,
@@ -603,7 +626,7 @@ class LoopEngineTests(unittest.TestCase):
                 "run_command",
                 return_value=subprocess.CompletedProcess(["git"], 1, "", ""),
             ), self.assertRaises(loop_engine.LoopError) as caught:
-                loop_engine.action_approve(root, spec, 52, root / "ledger.json", "body", True)
+                loop_engine.action_approve(root, spec, 52, ledger_path, "body", True)
             self.assertIn("PR head", str(caught.exception))
 
     def test_progress_dependency_cannot_unlock_downstream_chunk(self) -> None:
@@ -1066,6 +1089,26 @@ class LoopEngineTests(unittest.TestCase):
                     loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None), 0
                 )
 
+    def test_nested_ledger_identity_is_issue_slug_and_chunk_not_spec_id_or_filename(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec_path, _ = make_spec(root)
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(loop_engine.ledger_init(root, spec_path, 1, "test-chunk", None), 0)
+            state_path = root / ".loop-runs" / "test-chunk.json"
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            state["spec_id"] = "a-different-run"
+            nested = root / ".loop-runs" / "nested" / "renamed.json"
+            loop_engine.atomic_json(nested, state)
+            original = state_path.read_bytes()
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                result = loop_engine.ledger_init(
+                    root, spec_path, 1, "test-chunk", ".loop-runs/another-directory"
+                )
+            self.assertNotEqual(result, 0)
+            self.assertIn("already has a ledger", output.getvalue())
+            self.assertEqual(state_path.read_bytes(), original)
+
     def test_missing_openspec_artifact_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -1155,6 +1198,7 @@ class LoopEngineTests(unittest.TestCase):
             spec["enabled"] = True
             spec["mutations"]["ready_pr"] = True
             state = passing_ledger_state(root, spec)
+            ledger_path = persist_test_ledger(root, state)
             pr = {
                 "state": "OPEN",
                 "isDraft": True,
@@ -1167,7 +1211,7 @@ class LoopEngineTests(unittest.TestCase):
             with mock.patch.object(loop_engine, "load_state", return_value=state), mock.patch.object(
                 loop_engine, "gh_json", return_value=pr
             ), contextlib.redirect_stdout(io.StringIO()) as output:
-                self.assertEqual(loop_engine.action_ready(root, spec, 7, root / "ledger.json", True), 0)
+                self.assertEqual(loop_engine.action_ready(root, spec, 7, ledger_path, True), 0)
             self.assertIn("DRY-RUN gh pr ready 7", output.getvalue())
 
             state["status"] = "improve_required"
@@ -1175,7 +1219,7 @@ class LoopEngineTests(unittest.TestCase):
                 loop_engine, "gh_json", return_value=pr
             ):
                 with self.assertRaisesRegex(loop_engine.LoopError, "passing review ledger"):
-                    loop_engine.action_ready(root, spec, 7, root / "ledger.json", True)
+                    loop_engine.action_ready(root, spec, 7, ledger_path, True)
 
     def test_follow_up_links_the_parent_and_inherits_its_milestone(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1806,21 +1850,510 @@ class BranchManifestPolicyTests(unittest.TestCase):
 
     def test_push_lands_only_on_the_authorized_repository(self) -> None:
         init_repo(self.root)
+        self.spec["issues"][0]["chunks"][0]["files"] = ["a.txt"]
+        (self.root / "a.txt").write_text("base\n", encoding="utf-8")
         commit_all(self.root, "base")
+        publish_base(self.root)
         git_in(self.root, "checkout", "-q", "-b", "agent/test-issue")
+        (self.root / "a.txt").write_text("chunk\n", encoding="utf-8")
+        commit_all(self.root, "chunk")
         git_in(self.root, "remote", "add", "origin", "https://github.com/example/repository.git")
+        ledger_file = self.root / ".loop-runs" / "test-chunk.json"
+        ledger = passing_ledger_state(self.root, self.spec)
+        ledger["schema"] = f"{loop_engine.RUN_SCHEMA}/ledger"
+        loop_engine.atomic_json(ledger_file, ledger)
         git_in(self.root, "remote", "set-url", "--push", "origin", "https://github.com/attacker/fork.git")
         with self.assertRaisesRegex(loop_engine.LoopError, "attacker/fork"):
-            loop_engine.action_push(self.root, self.spec, None, False, True)
+            loop_engine.action_push(self.root, self.spec, None, False, True, ledger_file)
         # A second push URL behind a legitimate first one also receives the push.
         git_in(self.root, "remote", "set-url", "--push", "origin", "https://github.com/example/repository.git")
         git_in(self.root, "remote", "set-url", "--add", "--push", "origin", "https://github.com/attacker/fork.git")
         with self.assertRaisesRegex(loop_engine.LoopError, "attacker/fork"):
-            loop_engine.action_push(self.root, self.spec, None, False, True)
+            loop_engine.action_push(self.root, self.spec, None, False, True, ledger_file)
         git_in(self.root, "remote", "set-url", "--delete", "--push", "origin", "attacker")
         with contextlib.redirect_stdout(io.StringIO()) as output:
-            self.assertEqual(loop_engine.action_push(self.root, self.spec, None, False, True), 0)
+            self.assertEqual(loop_engine.action_push(self.root, self.spec, None, False, True, ledger_file), 0)
         self.assertIn("DRY-RUN git push", output.getvalue())
+
+
+class CIFailureRepairTests(unittest.TestCase):
+    """CI repair evidence is exact-head, append-only, cap-charged, and ledger-bound."""
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+        init_repo(self.root)
+        self.spec_path, self.spec = branch_spec(self.root, ["a.txt"])
+        (self.root / "a.txt").write_text("base\n", encoding="utf-8")
+        commit_all(self.root, "base")
+        publish_base(self.root)
+        self.base_sha = git_in(self.root, "rev-parse", "main")
+        git_in(self.root, "checkout", "-q", "-b", "agent/test-issue")
+        (self.root / "a.txt").write_text("failed build\n", encoding="utf-8")
+        self.failed_head = commit_all(self.root, "failed build")
+        git_in(self.root, "remote", "add", "origin", "https://github.com/example/repository.git")
+        self.remote_head = self.failed_head
+        self.pull = self.make_pull(self.failed_head)
+        self.pull_reread: dict | None = None
+        self.open_pulls = [self.pull]
+        self.protection: dict = {"contexts": ["ci"], "checks": []}
+        self.check_runs: list[dict] = [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]
+        self.statuses: list[dict] = []
+        self.source_sha_sequence: list[str] = []
+        self.base_sha_sequence: list[str] = []
+        self.protection_sequence: list[dict] = []
+        for name, value in (
+            ("owner_reviewed_legacy_manifest", False),
+            ("require_legacy_issue_open", None),
+        ):
+            patcher = mock.patch.object(loop_engine, name, return_value=value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", None), 0)
+        self.state_file = self.root / ".loop-runs" / "test-chunk.json"
+        self.pass_review(self.failed_head)
+
+    def make_pull(self, head: str, *, source: str = "example/repository", state: str = "open", draft: bool = False) -> dict:
+        repository = {"full_name": "example/repository"}
+        return {
+            "number": 42,
+            "state": state,
+            "draft": draft,
+            "head": {"ref": "agent/test-issue", "sha": head, "repo": {"full_name": source}},
+            "base": {"ref": "main", "sha": self.base_sha if hasattr(self, "base_sha") else "b" * 40, "repo": repository},
+            "body": "Closes #1\n",
+            "html_url": "https://github.com/example/repository/pull/42",
+        }
+
+    def check_run(self, head: str, conclusion: str | None, completed: str, *, status: str = "completed", app_id: int = 77) -> dict:
+        return {
+            "id": 7001,
+            "name": "ci",
+            "head_sha": head,
+            "status": status,
+            "conclusion": conclusion,
+            "created_at": "2026-09-24T00:00:00Z",
+            "started_at": "2026-09-24T00:00:30Z",
+            "completed_at": completed,
+            "html_url": "https://github.com/example/repository/actions/runs/7001",
+            "app": {"id": app_id, "slug": "github-actions"},
+        }
+
+    def pass_review(self, commit: str) -> None:
+        with contextlib.redirect_stdout(io.StringIO()):
+            for reviewer in REVIEWERS:
+                self.assertEqual(
+                    loop_engine.ledger_record_review(
+                        self.state_file,
+                        reviewer,
+                        commit,
+                        "pass",
+                        None,
+                        reviewer_output(self.root, reviewer, "pass"),
+                    ),
+                    0,
+                )
+            self.assertEqual(loop_engine.ledger_adjudicate(self.state_file, "pass", "all checks passed"), 0)
+
+    def repair_candidate(self, content: str = "fixed build\n") -> str:
+        (self.root / "a.txt").write_text(content, encoding="utf-8")
+        return commit_all(self.root, "repair build")
+
+    def provider_api(self, _root: Path, args: list[str]):
+        request = next((arg for arg in args if arg.startswith("repos/")), "")
+        if "/pulls?state=open" in request:
+            return self.open_pulls
+        if request.endswith("/pulls/42"):
+            return self.pull_reread or self.pull
+        if "/git/ref/heads/agent/test-issue" in request:
+            value = self.source_sha_sequence.pop(0) if self.source_sha_sequence else self.remote_head
+            return {"object": {"sha": value}}
+        if "/git/ref/heads/main" in request:
+            value = self.base_sha_sequence.pop(0) if self.base_sha_sequence else self.base_sha
+            return {"object": {"sha": value}}
+        if "/protection/required_status_checks" in request:
+            return self.protection_sequence.pop(0) if self.protection_sequence else self.protection
+        if "/check-runs?per_page=100" in request:
+            return {"total_count": len(self.check_runs), "check_runs": self.check_runs}
+        if "/statuses?per_page=100" in request:
+            return self.statuses
+        raise AssertionError(f"unexpected provider request: {request}")
+
+    def admit(self, candidate: str) -> int:
+        with mock.patch.object(loop_engine, "gh_json", side_effect=self.provider_api):
+            return loop_engine.ledger_admit_ci_repair(self.root, self.spec, self.state_file, candidate)
+
+    def test_exact_head_failure_appends_a_charged_round_without_rewriting_history(self) -> None:
+        original = json.loads(self.state_file.read_text(encoding="utf-8"))["rounds"][0]
+        original_bytes = self.state_file.read_bytes()
+        candidate = self.repair_candidate()
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(self.admit(candidate), 0)
+        self.assertIn("round=2", output.getvalue())
+        state = json.loads(self.state_file.read_text(encoding="utf-8"))
+        self.assertEqual(state["rounds"][0], original)
+        self.assertEqual(loop_engine.improvement_rounds_used(state), 2)
+        self.assertEqual(state["status"], "reviewing")
+        event = state["ci_failure_repairs"][0]
+        self.assertEqual(event["sequence"], 1)
+        self.assertEqual(event["prior_passing_round"], 1)
+        self.assertEqual(event["failed_head"], self.failed_head)
+        self.assertEqual(event["required_check"]["name"], "ci")
+        self.assertEqual(event["required_check"]["conclusion"], "failure")
+        self.assertEqual(event["required_check"]["app_id"], 77)
+        self.assertEqual(event["pr_number"], 42)
+        self.assertEqual(event["source_branch"], "agent/test-issue")
+        self.assertEqual(event["proposed_commit"], candidate)
+        self.assertEqual(state["rounds"][1]["kind"], "ci_failure_repair")
+        self.assertEqual(state["rounds"][1]["number"], 2)
+        self.assertEqual(state["rounds"][1]["commit"], candidate)
+        with self.assertRaisesRegex(loop_engine.LoopError, "pending or needs changes"):
+            loop_engine.require_ci_repairs_resolved(state)
+
+        event_before = json.loads(json.dumps(event))
+        self.pass_review(candidate)
+        state = json.loads(self.state_file.read_text(encoding="utf-8"))
+        self.assertEqual(state["ci_failure_repairs"][0], event_before)
+        loop_engine.require_ci_repairs_resolved(state)
+        loop_engine.require_repair_pr_binding(state, 42, candidate)
+        with self.assertRaisesRegex(loop_engine.LoopError, "does not match the PR bound"):
+            loop_engine.require_repair_pr_binding(state, 43, candidate)
+        with self.assertRaisesRegex(loop_engine.LoopError, "must equal the full commit"):
+            loop_engine.require_repair_pr_binding(state, 42, self.failed_head)
+
+    def test_failure_admission_rejects_stale_moved_or_ambiguous_heads_without_writing(self) -> None:
+        candidate = self.repair_candidate()
+        cases = [
+            ("check SHA", lambda: self.check_runs.__setitem__(0, self.check_run("e" * 40, "failure", "2026-09-24T01:00:00Z"))),
+            ("source SHA", lambda: setattr(self, "remote_head", "f" * 40)),
+            ("source moved after checks", lambda: setattr(self, "source_sha_sequence", [self.failed_head, "f" * 40])),
+            ("base moved after checks", lambda: setattr(self, "base_sha_sequence", [self.base_sha, "f" * 40])),
+            ("moved PR", lambda: setattr(self, "pull_reread", self.make_pull("d" * 40))),
+            ("issue link moved", lambda: setattr(self, "pull_reread", {**self.make_pull(self.failed_head), "body": "Closes #2\n"})),
+            ("duplicate PR", lambda: self.open_pulls.append(self.make_pull(self.failed_head))),
+            ("draft PR", lambda: self.open_pulls.__setitem__(0, self.make_pull(self.failed_head, draft=True))),
+            ("fork source", lambda: self.open_pulls.__setitem__(0, self.make_pull(self.failed_head, source="fork/repository"))),
+        ]
+        for label, change in cases:
+            with self.subTest(label=label):
+                self.pull = self.make_pull(self.failed_head)
+                self.pull_reread = None
+                self.open_pulls = [self.pull]
+                self.remote_head = self.failed_head
+                self.source_sha_sequence = []
+                self.base_sha_sequence = []
+                self.protection_sequence = []
+                self.check_runs = [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]
+                change()
+                before = self.state_file.read_bytes()
+                with mock.patch.object(loop_engine, "gh_json", side_effect=self.provider_api), self.assertRaises(loop_engine.LoopError):
+                    loop_engine.ledger_admit_ci_repair(self.root, self.spec, self.state_file, candidate)
+                self.assertEqual(self.state_file.read_bytes(), before)
+        self.pull = self.make_pull(self.failed_head)
+        self.pull_reread = None
+        self.open_pulls = [self.pull]
+        self.remote_head = self.failed_head
+        self.check_runs = []
+        self.statuses = [{
+            "id": 811,
+            "context": "ci",
+            "state": "failure",
+            "sha": "e" * 40,
+            "updated_at": "2026-09-24T01:05:00Z",
+        }]
+        before = self.state_file.read_bytes()
+        with mock.patch.object(loop_engine, "gh_json", side_effect=self.provider_api), self.assertRaisesRegex(
+            loop_engine.LoopError, "exact pull-request head"
+        ):
+            loop_engine.ledger_admit_ci_repair(self.root, self.spec, self.state_file, candidate)
+        self.assertEqual(self.state_file.read_bytes(), before)
+
+    def test_only_current_failures_of_checks_required_by_both_sources_are_admissible(self) -> None:
+        candidate = self.repair_candidate()
+        cases = [
+            ("optional check", {"contexts": ["build"], "checks": []}, [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]),
+            ("pending", {"contexts": ["ci"], "checks": []}, [self.check_run(self.failed_head, None, "", status="in_progress")]),
+            ("cancelled", {"contexts": ["ci"], "checks": []}, [self.check_run(self.failed_head, "cancelled", "2026-09-24T01:00:00Z")]),
+            ("successful rerun", {"contexts": ["ci"], "checks": []}, [
+                self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z"),
+                {**self.check_run(self.failed_head, "success", "2026-09-24T02:00:00Z"), "id": 7002},
+            ]),
+            ("wrong app", {"contexts": [], "checks": [{"context": "ci", "app_id": 99}]}, [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]),
+            ("missing live protection", {"contexts": ["ci"]}, [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]),
+        ]
+        for label, protection, checks in cases:
+            with self.subTest(label=label):
+                self.pull = self.make_pull(self.failed_head)
+                self.pull_reread = None
+                self.open_pulls = [self.pull]
+                self.remote_head = self.failed_head
+                self.protection = protection
+                self.check_runs = checks
+                self.statuses = []
+                before = self.state_file.read_bytes()
+                with mock.patch.object(loop_engine, "gh_json", side_effect=self.provider_api), self.assertRaises(loop_engine.LoopError):
+                    loop_engine.ledger_admit_ci_repair(self.root, self.spec, self.state_file, candidate)
+                self.assertEqual(self.state_file.read_bytes(), before)
+        self.protection = {"contexts": ["ci"], "checks": []}
+
+    def test_changed_live_protection_during_admission_is_rejected_without_writing(self) -> None:
+        candidate = self.repair_candidate()
+        self.protection_sequence = [
+            {"contexts": ["ci"], "checks": []},
+            {"contexts": ["build"], "checks": []},
+        ]
+        before = self.state_file.read_bytes()
+        with mock.patch.object(loop_engine, "gh_json", side_effect=self.provider_api), self.assertRaisesRegex(
+            loop_engine.LoopError, "protection changed"
+        ):
+            loop_engine.ledger_admit_ci_repair(self.root, self.spec, self.state_file, candidate)
+        self.assertEqual(self.state_file.read_bytes(), before)
+
+    def test_legacy_status_failure_records_exact_context_sha_and_run(self) -> None:
+        candidate = self.repair_candidate()
+        self.check_runs = []
+        self.statuses = [
+            {
+                "id": 811,
+                "context": "ci",
+                "state": "failure",
+                "sha": self.failed_head,
+                "updated_at": "2026-09-24T01:05:00Z",
+                "target_url": "https://ci.example/run/811",
+            }
+        ]
+        self.admit(candidate)
+        state = json.loads(self.state_file.read_text(encoding="utf-8"))
+        evidence = state["ci_failure_repairs"][0]["required_check"]
+        self.assertEqual(evidence["source"], "commit_status")
+        self.assertEqual(evidence["name"], "ci")
+        self.assertEqual(evidence["head_sha"], self.failed_head)
+        self.assertEqual(evidence["run_id"], 811)
+
+    def test_repeated_failures_append_events_and_charge_each_ordinary_review_slot(self) -> None:
+        first_candidate = self.repair_candidate("first repair\n")
+        self.admit(first_candidate)
+        self.pass_review(first_candidate)
+        first_event = json.loads(self.state_file.read_text(encoding="utf-8"))["ci_failure_repairs"][0]
+
+        self.remote_head = first_candidate
+        self.pull = self.make_pull(first_candidate)
+        self.pull_reread = None
+        self.open_pulls = [self.pull]
+        self.check_runs = [self.check_run(first_candidate, "failure", "2026-09-24T03:00:00Z")]
+        second_candidate = self.repair_candidate("second repair\n")
+        self.admit(second_candidate)
+
+        state = json.loads(self.state_file.read_text(encoding="utf-8"))
+        self.assertEqual(state["ci_failure_repairs"][0], first_event)
+        self.assertEqual([event["sequence"] for event in state["ci_failure_repairs"]], [1, 2])
+        self.assertEqual(state["ci_failure_repairs"][1]["prior_passing_round"], 2)
+        self.assertEqual(state["ci_failure_repairs"][1]["failed_head"], first_candidate)
+        self.assertEqual(state["rounds"][-1]["kind"], "ci_failure_repair")
+        self.assertEqual(state["rounds"][-1]["number"], 3)
+        self.assertEqual(state["rounds"][-1]["commit"], second_candidate)
+        self.assertEqual(loop_engine.improvement_rounds_used(state), 3)
+
+    def test_passing_repair_still_requires_green_checks_on_its_exact_pr_head_before_merge(self) -> None:
+        candidate = self.repair_candidate()
+        self.admit(candidate)
+        self.pass_review(candidate)
+        pr = {
+            "state": "OPEN",
+            "isDraft": False,
+            "headRefName": "agent/test-issue",
+            "headRefOid": candidate,
+            "baseRefName": "main",
+            "body": "Closes #1\n",
+            "files": [{"path": "a.txt"}],
+            "comments": [],
+        }
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "require_predecessor_prs", return_value=[]
+        ), mock.patch.object(loop_engine, "check_required_checks", return_value=candidate) as checks, mock.patch.object(
+            loop_engine, "gh_json", return_value=pr
+        ), mock.patch.object(loop_engine, "reviewed_content_matches", return_value=True), mock.patch.object(
+            loop_engine, "verify_remote_chunk_files"
+        ), mock.patch.object(loop_engine, "require_published_head_has_no_links"), contextlib.redirect_stdout(
+            io.StringIO()
+        ):
+            self.assertEqual(
+                loop_engine.action_merge(
+                    self.root, self.spec, 42, self.state_file, None, False, False, None, True
+                ),
+                0,
+            )
+        checks.assert_called_once_with(self.root, self.spec, 42)
+
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "require_predecessor_prs", return_value=[]
+        ), mock.patch.object(
+            loop_engine, "check_required_checks", side_effect=loop_engine.LoopError("required checks are not green")
+        ), self.assertRaisesRegex(loop_engine.LoopError, "required checks are not green"):
+            loop_engine.action_merge(
+                self.root, self.spec, 42, self.state_file, None, False, False, None, True
+            )
+
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "require_predecessor_prs", return_value=[]
+        ), mock.patch.object(loop_engine, "check_required_checks", return_value=self.failed_head), mock.patch.object(
+            loop_engine, "gh_json", return_value=pr
+        ), mock.patch.object(loop_engine, "reviewed_content_matches", return_value=True), mock.patch.object(
+            loop_engine, "verify_remote_chunk_files"
+        ), mock.patch.object(loop_engine, "require_published_head_has_no_links"), self.assertRaisesRegex(
+            loop_engine.LoopError, "moved between the check read"
+        ):
+            loop_engine.action_merge(
+                self.root, self.spec, 42, self.state_file, None, False, False, None, True
+            )
+
+    def test_repair_push_and_pr_creation_stay_bound_to_the_failed_pr(self) -> None:
+        candidate = self.repair_candidate()
+        self.admit(candidate)
+        self.pass_review(candidate)
+
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "gh_json", side_effect=self.provider_api
+        ), contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(
+                loop_engine.action_push(self.root, self.spec, None, False, True, self.state_file), 0
+            )
+        self.assertIn("DRY-RUN git push", output.getvalue())
+
+        wrong_pr = self.make_pull(self.failed_head)
+        wrong_pr["number"] = 43
+        self.pull = wrong_pr
+        self.open_pulls = [wrong_pr]
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "gh_json", side_effect=self.provider_api
+        ), self.assertRaisesRegex(loop_engine.LoopError, "bound to the latest CI-repair event"):
+            loop_engine.action_push(self.root, self.spec, None, False, True, self.state_file)
+
+        body = self.root / ".loop-runs" / "replacement-pr.md"
+        body.parent.mkdir(parents=True, exist_ok=True)
+        body.write_text("Closes #1\n", encoding="utf-8")
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "gh_json"
+        ) as provider, self.assertRaisesRegex(loop_engine.LoopError, "refusing to create a replacement PR"):
+            loop_engine.action_create_pr(
+                self.root, self.spec, 1, self.state_file, "Repair", str(body), True, True
+            )
+        provider.assert_not_called()
+
+    def test_candidate_must_descend_from_failed_head_and_stay_inside_the_chunk(self) -> None:
+        with self.assertRaisesRegex(loop_engine.LoopError, "must descend"):
+            loop_engine.validate_repair_candidate(self.root, self.spec, json.loads(self.state_file.read_text()), "a" * 40, self.failed_head)
+        outside = self.root / "b.txt"
+        outside.write_text("out of scope\n", encoding="utf-8")
+        outside_commit = commit_all(self.root, "out of scope")
+        with self.assertRaisesRegex(loop_engine.LoopError, "outside the frozen chunk"):
+            loop_engine.validate_repair_candidate(
+                self.root, self.spec, json.loads(self.state_file.read_text()), self.failed_head, outside_commit
+            )
+
+    def test_candidate_scope_includes_the_source_of_a_rename(self) -> None:
+        outside = self.root / "outside.txt"
+        outside.write_text("failed build\n", encoding="utf-8")
+        failed_head = commit_all(self.root, "add out-of-scope rename source")
+        git_in(self.root, "rm", "a.txt")
+        git_in(self.root, "mv", "outside.txt", "a.txt")
+        renamed = commit_all(self.root, "move out-of-scope source into frozen path")
+        with self.assertRaisesRegex(loop_engine.LoopError, "outside the frozen chunk"):
+            loop_engine.validate_repair_candidate(
+                self.root,
+                self.spec,
+                json.loads(self.state_file.read_text(encoding="utf-8")),
+                failed_head,
+                renamed,
+            )
+
+    def test_existing_passed_ledger_must_be_upgraded_without_losing_round_history(self) -> None:
+        state = json.loads(self.state_file.read_text(encoding="utf-8"))
+        prior_rounds = state["rounds"]
+        for key in ("repository", "remote", "base_branch", "ci_failure_repairs"):
+            state.pop(key, None)
+        loop_engine.atomic_json(self.state_file, state)
+        with self.assertRaisesRegex(loop_engine.LoopError, "predates the CI-repair protocol"):
+            loop_engine.action_ledger_state(self.root, self.spec, self.state_file)
+
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", None), 0)
+        upgraded = json.loads(self.state_file.read_text(encoding="utf-8"))
+        self.assertEqual(upgraded["rounds"], prior_rounds)
+        self.assertEqual(upgraded["repository"], self.spec["repository"])
+        self.assertEqual(upgraded["remote"], self.spec["remote"])
+        self.assertEqual(upgraded["base_branch"], self.spec["base_branch"])
+        self.assertEqual(upgraded["ci_failure_repairs"], [])
+        self.assertEqual(
+            loop_engine.action_ledger_state(self.root, self.spec, self.state_file)["rounds"], prior_rounds
+        )
+
+    def test_cap_exhaustion_is_terminal_and_another_state_directory_cannot_replace_it(self) -> None:
+        self.spec["limits"]["max_review_rounds_per_chunk"] = 1
+        write_manifest(self.root, self.spec)
+        self.failed_head = commit_all(self.root, "freeze one-round cap")
+        self.remote_head = self.failed_head
+        self.pull = self.make_pull(self.failed_head)
+        self.open_pulls = [self.pull]
+        self.check_runs = [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]
+        self.state_file.unlink()
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", None), 0)
+        self.pass_review(self.failed_head)
+        original_round = json.loads(self.state_file.read_text(encoding="utf-8"))["rounds"][0]
+        candidate = self.repair_candidate()
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(self.admit(candidate), 0)
+        self.assertIn("CAP EXHAUSTED", output.getvalue())
+        state = json.loads(self.state_file.read_text(encoding="utf-8"))
+        self.assertEqual(state["status"], "repair_exhausted")
+        self.assertEqual(state["rounds"], [original_round])
+        self.assertEqual(state["ci_failure_repairs"][0]["disposition"], "cap_exhausted")
+        self.assertIsNone(state["ci_failure_repairs"][0]["round"])
+        before = self.state_file.read_bytes()
+        with self.assertRaisesRegex(loop_engine.LoopError, "cap is exhausted"):
+            loop_engine.require_ci_repairs_resolved(state)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertNotEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", ".loop-runs/alternate"), 0)
+        self.assertEqual(self.state_file.read_bytes(), before)
+        with self.assertRaisesRegex(loop_engine.LoopError, "under the repository's .loop-runs root"):
+            loop_engine.state_path(self.root, self.spec, str(self.root / "outside"), "test-chunk")
+
+    def test_all_shipping_paths_reject_a_pending_repair_and_initial_draft_pr_still_works(self) -> None:
+        candidate = self.repair_candidate()
+        self.admit(candidate)
+        body = self.root / ".loop-runs" / "pr-body.md"
+        body.write_text("Closes #1\n", encoding="utf-8")
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "require_predecessor_prs", return_value=[]
+        ), mock.patch.object(loop_engine, "owner_reviewed_legacy_manifest", return_value=True), mock.patch.object(
+            loop_engine, "predecessor_attestation_policy", return_value={"emit": True}
+        ):
+            actions = [
+                lambda: loop_engine.action_push(self.root, self.spec, None, False, True, self.state_file),
+                lambda: loop_engine.action_create_pr(self.root, self.spec, 1, self.state_file, "title", str(body), True, True),
+                lambda: loop_engine.action_attest_pr(self.root, self.spec, 1, 42, self.state_file, True),
+                lambda: loop_engine.action_ready(self.root, self.spec, 42, self.state_file, True),
+                lambda: loop_engine.action_approve(self.root, self.spec, 42, self.state_file, "approved", True),
+                lambda: loop_engine.action_merge(self.root, self.spec, 42, self.state_file, None, False, False, None, True),
+                lambda: loop_engine.action_close(self.root, self.spec, 1, None, None, True, self.state_file),
+            ]
+            for action in actions:
+                with self.subTest(action=action), self.assertRaisesRegex(loop_engine.LoopError, "CI-repair panel is pending"):
+                    action()
+
+        # A fresh, unreviewed ledger keeps the existing draft-first workflow.
+        self.state_file.unlink()
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", None), 0)
+        with mock.patch.object(loop_engine, "authorize_action"), contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(
+                loop_engine.action_create_pr(self.root, self.spec, 1, self.state_file, "title", str(body), True, True),
+                0,
+            )
+        self.assertIn("--draft", output.getvalue())
 
     def test_required_checks_fall_back_to_the_manifest_and_report_the_checked_head(self) -> None:
         self.spec["runner"]["required_checks"] = ["ci", "build"]
@@ -1871,11 +2404,11 @@ class ContentBindingTests(unittest.TestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-    def move_base(self, touch_reviewed_file: bool = False) -> None:
+    def move_base(self, touch_reviewed_file: bool = False, base_marker: str = "base change") -> None:
         git_in(self.root, "checkout", "-q", "main")
         (self.root / "b.txt").write_text("unrelated, updated\n", encoding="utf-8")
         if touch_reviewed_file:
-            (self.root / "a.txt").write_text(numbered_lines(20, {18: "base change"}), encoding="utf-8")
+            (self.root / "a.txt").write_text(numbered_lines(20, {18: base_marker}), encoding="utf-8")
         commit_all(self.root, "base moves")
         publish_base(self.root)
         git_in(self.root, "checkout", "-q", "agent/test-issue")
@@ -2018,7 +2551,7 @@ class ContentBindingTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertFalse(loop_engine.reviewed_content_matches(self.root, spec, {}, self.reviewed, smuggled))
 
-    def test_a_passed_ledger_reopens_for_a_bounded_number_of_revalidations(self) -> None:
+    def test_a_passed_ledger_only_reopens_for_in_scope_base_revalidations(self) -> None:
         state_path = self.root / ".loop-runs" / "test-chunk.json"
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", None), 0)
@@ -2049,27 +2582,36 @@ class ContentBindingTests(unittest.TestCase):
                 )
             self.assertIn("exact commit", output.getvalue())
 
-            (self.root / "a.txt").write_text(numbered_lines(20, {2: "conflict resolution"}), encoding="utf-8")
-            resolved = commit_all(self.root, "resolve a conflict")
-            panel(resolved, "needs_changes")
-            self.assertEqual(loop_engine.ledger_adjudicate(state_path, "needs_changes", "revalidate"), 0)
+            self.move_base(touch_reviewed_file=True)
+            git_in(self.root, "rebase", "-q", "origin/main")
+            resolved = git_in(self.root, "rev-parse", "HEAD")
+            panel(resolved, "pass")
+            self.assertEqual(loop_engine.ledger_adjudicate(state_path, "pass", "base-only revalidation"), 0)
             state = json.loads(state_path.read_text(encoding="utf-8"))
             self.assertEqual(state["rounds"][-1]["kind"], "revalidation")
-            self.assertEqual(state["status"], "improve_required")
+            self.assertEqual(state["status"], "passed")
             self.assertEqual(loop_engine.improvement_rounds_used(state), 1)
 
-            (self.root / "a.txt").write_text(numbered_lines(20, {2: "conflict resolved"}), encoding="utf-8")
-            panel(commit_all(self.root, "fix the resolution"), "pass")
-            self.assertEqual(loop_engine.ledger_adjudicate(state_path, "pass", "revalidated"), 0)
-            state = json.loads(state_path.read_text(encoding="utf-8"))
-            self.assertEqual(state["status"], "passed")
-            self.assertNotIn("kind", state["rounds"][-1])
+            (self.root / "a.txt").write_text(numbered_lines(20, {2: "changed implementation"}), encoding="utf-8")
+            changed = commit_all(self.root, "changed implementation")
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                self.assertNotEqual(
+                    loop_engine.ledger_record_review(state_path, REVIEWERS[0], changed, "pass", None), 0
+                )
+            self.assertIn("charged CI repair", output.getvalue())
+            git_in(self.root, "checkout", "-q", "--detach", resolved)
+            git_in(self.root, "checkout", "-q", "-B", "agent/test-issue")
 
-            (self.root / "a.txt").write_text(numbered_lines(20, {2: "second reopen"}), encoding="utf-8")
-            panel(commit_all(self.root, "second reopen"), "pass")
-            self.assertEqual(loop_engine.ledger_adjudicate(state_path, "pass", "second"), 0)
-            (self.root / "a.txt").write_text(numbered_lines(20, {2: "third reopen"}), encoding="utf-8")
-            third = commit_all(self.root, "third reopen")
+            self.move_base(touch_reviewed_file=True, base_marker="base change 2")
+            git_in(self.root, "rebase", "-q", "origin/main")
+            second = git_in(self.root, "rev-parse", "HEAD")
+            panel(second, "pass")
+            self.assertEqual(loop_engine.ledger_adjudicate(state_path, "pass", "second base revalidation"), 0)
+
+            self.move_base(touch_reviewed_file=True, base_marker="base change 3")
+            git_in(self.root, "rebase", "-q", "origin/main")
+            third = git_in(self.root, "rev-parse", "HEAD")
             output = io.StringIO()
             with contextlib.redirect_stdout(output):
                 self.assertNotEqual(

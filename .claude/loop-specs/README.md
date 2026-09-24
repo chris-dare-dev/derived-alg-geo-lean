@@ -278,3 +278,32 @@ Code issues may only be closed after a confirmed merged pull request.
 - Otherwise, one revalidation round with the full panel reopens the pass. A
   revalidation round does not spend `max_review_rounds_per_chunk`, and a
   ledger allows at most two.
+- A changed implementation after a passed review cannot use that free
+  revalidation path. Admit a CI-driven repair only from one current, open,
+  non-draft PR on the planned `agent/<slug>` branch, with the exact full PR
+  head matching the source ref and a failed check on that SHA that is required
+  by both the manifest and live branch protection. The controller rereads the
+  PR, refs and protection after fetching check evidence; missing, ambiguous,
+  stale, optional, pending, cancelled or moved evidence leaves the existing
+  ledger untouched. Record evidence against the existing ledger:
+
+  ```text
+  .loop-tools/bin/python scripts/loop_engine.py ledger admit-ci-repair \
+    --spec .claude/loop-specs/<slug>.yaml --repo-root . \
+    --state .loop-runs/<ledger>.json --commit <full-local-candidate-sha>
+  ```
+
+  The candidate must descend from the failed PR head and change only frozen
+  chunk paths. Each admitted repair appends an event to `ci_failure_repairs`
+  and reserves the next ordinary review round, so it consumes the original
+  three-round cap. A failed repair may be followed by another only after the
+  prior repair passes and a later exact-head required check fails. If no round
+  remains, the same ledger records terminal `repair_exhausted`; a new state
+  directory or renamed ledger cannot reset it. Every publication and closure
+  action checks this repair state. Older ledgers must be upgraded by rerunning
+  `ledger init`; the one-way migration adds protocol metadata without changing
+  existing rounds. `action push` and `action close` require `--ledger`.
+  After repair, push verifies the bound PR and remote source head, and
+  `action create-pr` cannot replace that PR. Draft PR creation remains
+  available before any repair event. A passed repair still needs current green
+  required checks on the exact live PR head before merge.
