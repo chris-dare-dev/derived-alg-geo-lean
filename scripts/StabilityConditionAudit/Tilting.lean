@@ -130,6 +130,19 @@ cohomology sequence remains deliberately undeclared. -/
 
 #print axioms Tilting.originalHeartCohFunctor
 #print axioms Tilting.originalHeartCohFunctor_additive
+#print axioms Tilting.originalHeartCohFunctorZeroIso
+
+-- Keep the historical tilting name definitionally tied to the generic owner.
+section CohomologyOwnerRegression
+open CategoryTheory Limits Pretriangulated
+variable {C : Type*} [Category C] [Preadditive C] [HasZeroObject C]
+  [HasShift C ℤ] [∀ n : ℤ, (shiftFunctor C n).Additive]
+  [Pretriangulated C] [IsTriangulated C]
+example (t : TStructure C) (n : ℤ) :
+    Tilting.originalHeartCohFunctor t n = t.heartCohFunctor n := rfl
+example (t : TStructure C) : Functor.Additive t.heartH0Functor := inferInstance
+end CohomologyOwnerRegression
+
 #print axioms Tilting.originalHeartCoh
 #print axioms Tilting.originalHeartCohIsoOfHeart
 #print axioms Tilting.HeartTorsionPair.tiltedHeartCohFunctor

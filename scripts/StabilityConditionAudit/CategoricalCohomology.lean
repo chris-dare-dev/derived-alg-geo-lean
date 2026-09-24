@@ -4,6 +4,14 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyClassLocalization
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyHomotopy
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyHomotopyNaturality
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyIntLocalization
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLinear
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLocalization
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyNaturality
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
@@ -231,6 +239,78 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.CohomologyClass.toSmallShiftedHom_postcomp
 #print axioms CochainComplex.HomComplex.postcompMap
 #print axioms CochainComplex.HomComplex.postcompMap_f_apply
+
+/-! ## Hom-complex localization under finite effective support -/
+
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap_delta
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized_of_finite_projective
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized_of_bounded_above_below
+
+/-! ## Linear Hom-complex cohomology classes -/
+
+#print axioms CochainComplex.HomComplex.cyclesLinearEquiv
+#print axioms CochainComplex.HomComplex.boundaryToCyclesLinear
+#print axioms CochainComplex.HomComplex.cohomologyClassModule
+#print axioms CochainComplex.HomComplex.cohomologyClassLinearEquiv
+#print axioms CochainComplex.HomComplex.cohomologyClassLinearEquiv_mk
+#print axioms CochainComplex.HomComplex.cohomologyClass_mk_smul
+#print axioms CochainComplex.HomComplex.cohomologyClass_mk_zsmul
+#print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv
+#print axioms CochainComplex.HomComplex.cohomologyClassMapLinear
+#print axioms CochainComplex.HomComplex.cohomologyClassMapLinear_mk
+#print axioms CochainComplex.HomComplex.concreteCohomologyMap
+#print axioms CochainComplex.HomComplex.concreteCohomologyMap_mk
+#print axioms CochainComplex.HomComplex.cohomologyClassLinearEquiv_naturality
+#print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv_mk
+#print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv_naturality
+
+/-! ## Concrete degree-zero Hom-complex cohomology localization -/
+
+#print axioms CochainComplex.HomComplex.concreteCohomology
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMap
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMap_mk
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMap_isLocalized
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMapOfBoundedAboveBelow
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMapOfBoundedAboveBelow_isLocalized
+
+/-! ## Degree-zero Hom-complex cohomology classes under localization -/
+
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap
+#print axioms CochainComplex.HomComplex.concreteCohomologyMap_eq_localized
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_naturality
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_isLocalized
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_isLocalized_of_bounded_above_below
+
+/-! ## Degree-zero Hom-complex classes as homotopy-category morphisms -/
+
+#print axioms CochainComplex.HomComplex.cohomologyClassHomotopyAddEquiv
+#print axioms CochainComplex.HomComplex.cohomologyClassHomotopyAddEquiv_mk
+
+/-! ## Degree-zero class localization in the homotopy category -/
+
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_homotopy_mk
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_homotopy_naturality
+
+/-! ## Canonical integer class-localization bridge and ordinary client -/
+
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedIntMap_isLocalized
+
+section CanonicalIntegerClassLocalizationClient
+
+open CategoryTheory
+
+variable (P Q : CochainComplex (ModuleCat ℤ) ℤ) (S : Submonoid ℤ)
+variable (c b : ℤ) [P.IsStrictlyLE b] [Q.IsStrictlyGE c]
+variable [∀ i : {p : ℤ // p ∈ Finset.Icc (c - 1) b},
+  Module.FinitePresentation ℤ (P.X i.1)]
+
+example : IsLocalizedModule S
+    ((CochainComplex.HomComplex.cohomologyClassLocalizedMap P Q S).toAddMonoidHom.toIntLinearMap) := by
+  exact CochainComplex.HomComplex.cohomologyClassLocalizedIntMap_isLocalized P Q S c b
+
+end CanonicalIntegerClassLocalizationClient
 
 /-! ## Subcomplexes from degreewise subobject data -/
 

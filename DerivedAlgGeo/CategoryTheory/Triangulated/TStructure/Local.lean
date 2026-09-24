@@ -188,6 +188,216 @@ theorem heartFunctor_map (r : t.Restriction F)
     (r.heartFunctor.map f).hom = F.map f.hom :=
   rfl
 
+/-- The objectwise comparison underlying the natural degree-zero heart
+cohomology comparison below. -/
+noncomputable def heartH0Comparison
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) (X : C) :
+    r.heartFunctor.obj (t.heartH0Functor.obj X) ≅
+      (r.tStructure.heartH0Functor).obj (F.obj X) := by
+  letI : F.IsTExact t r.tStructure := r.isTExact
+  refine ObjectProperty.isoMk _ ?_
+  change F.obj ((t.truncGE 0).obj ((t.truncLE 0).obj X)) ≅
+    (r.tStructure.truncGE 0).obj ((r.tStructure.truncLE 0).obj (F.obj X))
+  exact (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)) ≪≫
+    (r.tStructure.truncGE 0).mapIso (F.mapTruncLEIso t r.tStructure 0 X)
+
+private theorem heartH0Comparison_hom
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) (X : C) [F.IsTExact t r.tStructure] :
+    (r.heartH0Comparison X).hom.hom =
+      (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+        (r.tStructure.truncGE 0).map
+          (F.mapTruncLEIso t r.tStructure 0 X).hom := by
+  rfl
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- Degree-zero heart cohomology commutes naturally with a t-exact
+triangulated functor, after restriction to the two hearts. -/
+noncomputable def heartH0ComparisonNatIso
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) :
+    t.heartH0Functor ⋙ r.heartFunctor ≅
+      F ⋙ r.tStructure.heartH0Functor := by
+  letI : F.IsTExact t r.tStructure := r.isTExact
+  refine NatIso.ofComponents (fun X => r.heartH0Comparison X) ?_
+  intro X Y f
+  apply ObjectProperty.hom_ext
+  change F.map ((t.truncGE 0).map ((t.truncLE 0).map f)) ≫
+      (r.heartH0Comparison Y).hom.hom =
+      (r.heartH0Comparison X).hom.hom ≫
+        (r.tStructure.truncGE 0).map
+          ((r.tStructure.truncLE 0).map (F.map f))
+  rw [heartH0Comparison_hom r X,
+    heartH0Comparison_hom r Y]
+  calc
+    F.map ((t.truncGE 0).map ((t.truncLE 0).map f)) ≫
+        (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj Y)).hom ≫
+          (r.tStructure.truncGE 0).map
+            (F.mapTruncLEIso t r.tStructure 0 Y).hom =
+      (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+        (r.tStructure.truncGE 0).map
+          (F.map ((t.truncLE 0).map f)) ≫
+            (r.tStructure.truncGE 0).map
+              (F.mapTruncLEIso t r.tStructure 0 Y).hom := by
+                simpa only [Category.assoc] using
+                  congrArg (fun g => g ≫
+                    (r.tStructure.truncGE 0).map
+                      (F.mapTruncLEIso t r.tStructure 0 Y).hom)
+                    (F.mapTruncGEIso_hom_naturality t r.tStructure 0
+                      ((t.truncLE 0).map f))
+    _ = _ := by
+      have hLE := F.mapTruncLEIso_hom_naturality t r.tStructure 0 f
+      calc
+        (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+            (r.tStructure.truncGE 0).map (F.map ((t.truncLE 0).map f)) ≫
+              (r.tStructure.truncGE 0).map
+                (F.mapTruncLEIso t r.tStructure 0 Y).hom =
+          (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+            (r.tStructure.truncGE 0).map
+              (F.map ((t.truncLE 0).map f) ≫
+                (F.mapTruncLEIso t r.tStructure 0 Y).hom) := by
+                  simp only [Functor.map_comp]
+        _ = (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+            (r.tStructure.truncGE 0).map
+              ((F.mapTruncLEIso t r.tStructure 0 X).hom ≫
+                (r.tStructure.truncLE 0).map (F.map f)) := by
+                  rw [hLE]
+        _ = _ := by
+          simp only [Functor.map_comp, Category.assoc]
+
+noncomputable section AmbientArrowExtension
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+private theorem heartH0Comparison_on_heart
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) (X : t.heart.FullSubcategory) :
+    (r.heartH0Comparison X.obj).hom ≫
+      (r.tStructure.heartH0OnHeartIso.app (r.heartFunctor.obj X)).hom =
+      r.heartFunctor.map (t.heartH0OnHeartIso.app X).hom := by
+  letI : F.IsTExact t r.tStructure := r.isTExact
+  letI : t.IsLE X.obj 0 := ((t.mem_heart_iff X.obj).mp X.property).1
+  letI : t.IsGE X.obj 0 := ((t.mem_heart_iff X.obj).mp X.property).2
+  letI : r.tStructure.IsLE (F.obj X.obj) 0 :=
+    ((r.tStructure.mem_heart_iff (F.obj X.obj)).mp
+      (r.heartFunctor.obj X).property).1
+  letI : r.tStructure.IsGE (F.obj X.obj) 0 :=
+    ((r.tStructure.mem_heart_iff (F.obj X.obj)).mp
+      (r.heartFunctor.obj X).property).2
+  apply ObjectProperty.hom_ext
+  change
+    ((F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X.obj)).hom ≫
+        (r.tStructure.truncGE 0).map
+          (F.mapTruncLEIso t r.tStructure 0 X.obj).hom) ≫
+      ((r.tStructure.truncGE 0).map
+          ((r.tStructure.truncLEι 0).app (F.obj X.obj)) ≫
+        inv ((r.tStructure.truncGEπ 0).app (F.obj X.obj))) =
+      F.map ((t.truncGE 0).map ((t.truncLEι 0).app X.obj) ≫
+        inv ((t.truncGEπ 0).app X.obj))
+  have hGE :
+      (F.mapTruncGEIso t r.tStructure 0 X.obj).hom ≫
+          inv ((r.tStructure.truncGEπ 0).app (F.obj X.obj)) =
+        F.map (inv ((t.truncGEπ 0).app X.obj)) := by
+    have hπ := F.mapTruncGEIso_π_comp_hom t r.tStructure 0 X.obj
+    have hπ' : F.map (inv ((t.truncGEπ 0).app X.obj)) ≫
+        (r.tStructure.truncGEπ 0).app (F.obj X.obj) =
+          (F.mapTruncGEIso t r.tStructure 0 X.obj).hom := by
+      rw [← hπ, ← Category.assoc, ← F.map_comp]
+      simp
+    rw [← hπ', Category.assoc]
+    simp
+  calc
+    _ = (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X.obj)).hom ≫
+        (r.tStructure.truncGE 0).map
+          ((F.mapTruncLEIso t r.tStructure 0 X.obj).hom ≫
+            (r.tStructure.truncLEι 0).app (F.obj X.obj)) ≫
+          inv ((r.tStructure.truncGEπ 0).app (F.obj X.obj)) := by
+            simp only [Functor.map_comp, Category.assoc]
+    _ = (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X.obj)).hom ≫
+        (r.tStructure.truncGE 0).map
+          (F.map ((t.truncLEι 0).app X.obj)) ≫
+          inv ((r.tStructure.truncGEπ 0).app (F.obj X.obj)) := by
+            rw [F.mapTruncLEIso_hom_comp_ι]
+    _ = F.map ((t.truncGE 0).map ((t.truncLEι 0).app X.obj)) ≫
+        (F.mapTruncGEIso t r.tStructure 0 X.obj).hom ≫
+          inv ((r.tStructure.truncGEπ 0).app (F.obj X.obj)) := by
+            simpa only [Functor.id_obj, Category.assoc] using
+              congrArg (fun g => g ≫
+                inv ((r.tStructure.truncGEπ 0).app (F.obj X.obj)))
+                (F.mapTruncGEIso_hom_naturality t r.tStructure 0
+                  ((t.truncLEι 0).app X.obj)).symm
+    _ = F.map ((t.truncGE 0).map ((t.truncLEι 0).app X.obj)) ≫
+        F.map (inv ((t.truncGEπ 0).app X.obj)) := by rw [hGE]
+    _ = _ := by rw [F.map_comp]
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- Ambient fixed-target arrow extension induces fixed-target arrow
+extension on hearts after applying degree-zero cohomology. This transfers a
+geometric ambient extension hypothesis; it does not prove that hypothesis. -/
+theorem fixedTargetArrowExtension_of_ambient
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) (X : t.heart.FullSubcategory)
+    (h : Subobject.FixedTargetArrowExtension F X.obj) :
+    Subobject.FixedTargetArrowExtension r.heartFunctor X := by
+  intro Z β
+  obtain ⟨Y, f, e, hβ⟩ := h β.hom
+  let aZ := r.tStructure.heartH0OnHeartIso.app Z
+  let aX := r.tStructure.heartH0OnHeartIso.app (r.heartFunctor.obj X)
+  let cY := r.heartH0Comparison Y
+  let cX := r.heartH0Comparison X.obj
+  let YH := t.heartH0Functor.obj Y
+  let fH : YH ⟶ X :=
+    t.heartH0Functor.map f ≫ (t.heartH0OnHeartIso.app X).hom
+  let eH : Z ≅ r.heartFunctor.obj YH :=
+    aZ.symm ≪≫ (r.tStructure.heartH0Functor).mapIso e ≪≫ cY.symm
+  refine ⟨YH, fH, eH, ?_⟩
+  have hβH : (r.tStructure.heartH0Functor).map β.hom =
+      (r.tStructure.heartH0Functor).map e.hom ≫
+        (r.tStructure.heartH0Functor).map (F.map f) := by
+    rw [hβ, Functor.map_comp]
+  have hNatX : (r.tStructure.heartH0Functor).map β.hom ≫ aX.hom =
+      aZ.hom ≫ β := by
+    exact (r.tStructure.heartH0OnHeartIso.hom.naturality β)
+  have hNatF : r.heartFunctor.map (t.heartH0Functor.map f) ≫ cX.hom =
+      cY.hom ≫ (r.tStructure.heartH0Functor).map (F.map f) := by
+    exact (r.heartH0ComparisonNatIso.hom.naturality f)
+  have hNatF' : (r.tStructure.heartH0Functor).map (F.map f) =
+      cY.inv ≫ r.heartFunctor.map (t.heartH0Functor.map f) ≫ cX.hom := by
+    calc
+      _ = cY.inv ≫ cY.hom ≫
+          (r.tStructure.heartH0Functor).map (F.map f) := by simp
+      _ = cY.inv ≫ r.heartFunctor.map (t.heartH0Functor.map f) ≫ cX.hom := by
+        rw [← hNatF]
+  calc
+    β = aZ.inv ≫ (r.tStructure.heartH0Functor).map β.hom ≫ aX.hom := by
+      rw [hNatX]
+      simp
+    _ = aZ.inv ≫ (r.tStructure.heartH0Functor).map e.hom ≫
+        (r.tStructure.heartH0Functor).map (F.map f) ≫ aX.hom := by
+      rw [hβH]
+      simp only [Category.assoc]
+    _ = aZ.inv ≫ (r.tStructure.heartH0Functor).map e.hom ≫ cY.inv ≫
+        r.heartFunctor.map (t.heartH0Functor.map f) ≫ cX.hom ≫ aX.hom := by
+      rw [hNatF']
+      simp only [Category.assoc]
+    _ = aZ.inv ≫ (r.tStructure.heartH0Functor).map e.hom ≫ cY.inv ≫
+        r.heartFunctor.map (t.heartH0Functor.map f) ≫
+          r.heartFunctor.map (t.heartH0OnHeartIso.app X).hom := by
+      rw [heartH0Comparison_on_heart r X]
+    _ = eH.hom ≫ r.heartFunctor.map fH := by
+      simp only [eH, fH, Iso.trans_hom, Iso.symm_hom, Functor.mapIso_hom, Functor.map_comp,
+        Category.assoc]
+
+end AmbientArrowExtension
+
 /-- The restriction to hearts is additive when the ambient functor is additive. -/
 noncomputable instance heartFunctor_additive
     [F.Additive] (r : t.Restriction F) :
@@ -386,6 +596,20 @@ theorem isNoetherian_of_fixedTargetArrowExtensions
   obtain ⟨X, _, e, _⟩ := hExt (0 : t.heart.FullSubcategory)
     (0 : Y ⟶ r.heartFunctor.obj (0 : t.heart.FullSubcategory))
   exact ⟨X, ⟨e.symm⟩, fun β _ => hExt X β⟩
+
+/-- An ambient fixed-target arrow-extension hypothesis suffices for
+Noetherianity of the restricted heart. Establishing this hypothesis for the
+bounded-coherent geometric functor remains a separate obligation. -/
+theorem isNoetherian_of_ambientFixedTargetArrowExtensions
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F)
+    (hglobal : t.IsNoetherian)
+    (hExt : ∀ X : t.heart.FullSubcategory,
+      Subobject.FixedTargetArrowExtension F X.obj) :
+    r.tStructure.IsNoetherian :=
+  r.isNoetherian_of_fixedTargetArrowExtensions hglobal
+    (fun X => r.fixedTargetArrowExtension_of_ambient X (hExt X))
 
 /-- The identity functor restricts every t-structure to itself. -/
 def id (t : TStructure C) : t.Restriction (𝟭 C) where

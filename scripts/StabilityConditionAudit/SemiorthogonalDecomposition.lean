@@ -209,6 +209,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.homEquivFromProject_id
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.isRightAdmissible
 #print axioms CategoryTheory.ObjectProperty.RightProjectionData.project_isZero_iff
+#print axioms CategoryTheory.ObjectProperty.RightProjectionData.fixedTargetArrowExtension_of_ambient
 #print axioms CategoryTheory.Functor.HasCohomologicalAmplitude
 #print axioms CategoryTheory.Functor.hasCohomologicalAmplitude_zero
 #print axioms CategoryTheory.Functor.HasCohomologicalAmplitude.weaken

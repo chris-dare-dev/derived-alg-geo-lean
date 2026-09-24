@@ -537,8 +537,8 @@ items:
     kind: deliverable
     parent: stability-families-e14-5
     title: "Establish flat generators for scheme module sheaves"
-    status: planned
-    summary: "Prove a stalkwise flat separating family for every scheme and a natural epimorphism onto every module sheaf from an explicitly indexed coproduct of those objects. This is a prerequisite for the remaining unbounded K-flat replacement work in #554; it does not itself construct a K-flat resolution or arbitrary derived pullback."
+    status: done
+    summary: "Proved that the canonical open free-Yoneda module sheaves have regular stalks on the open and zero stalks outside, hence are stalkwise flat over the identity, and constructed the natural M.val.Elements-indexed coproduct epimorphism at the generic small-ringed-site owner with its X.Modules specialization. This prerequisite does not supply an unbounded K-flat resolution or arbitrary pullback acyclicity."
     priority: must
     size: L
     tags: [module-sheaves, flat-generators, derived-pullback]

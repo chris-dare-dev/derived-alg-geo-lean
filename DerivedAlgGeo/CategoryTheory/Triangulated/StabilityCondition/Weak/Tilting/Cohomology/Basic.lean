@@ -16,9 +16,9 @@ set_option backward.isDefEq.respectTransparency false
 This file supplies the two-term cohomology bridge used by weak tilting
 arguments.  It has two independent parts:
 
-* `originalHeartCohFunctor t n` constructs degree-`n` cohomology in the heart
-  of an arbitrary t-structure.  Unlike `HeartStabilityData.heartCohFunctor`,
-  it does not require a stability function or HN data.
+* `originalHeartCohFunctor t n` is the historical tilting-facing name for
+  `t.heartCohFunctor n`, the degree-`n` cohomology of an arbitrary t-structure.
+  Unlike `HeartStabilityData.heartCohFunctor`, it requires no stability or HN data.
 * for a torsion pair `P` and an object `X` of the tilted heart, the canonical
   truncation triangle is exposed as
 
@@ -41,27 +41,27 @@ variable {C : Type*} [Category C] [Preadditive C] [HasZeroObject C] [HasShift C 
 
 /-! ## Cohomology attached only to a t-structure -/
 
-/-- Degree-`n` cohomology in the heart of `t`, constructed from the pure
-truncation `τ^[n,n]` and the shift which places it in degree zero. -/
-noncomputable def originalHeartCohFunctor [IsTriangulated C]
+/-- Historical tilting-facing name for t-structure-owned heart cohomology. -/
+noncomputable abbrev originalHeartCohFunctor [IsTriangulated C]
     (t : TStructure C) (n : ℤ) :
-    C ⥤ t.heart.FullSubcategory :=
-  ObjectProperty.lift _ ((t.truncGELE n n) ⋙ shiftFunctor C n) (fun E ↦ by
-    rw [t.mem_heart_iff]
-    constructor
-    · simpa using t.isLE_shift ((t.truncGELE n n).obj E) n n 0 (by lia)
-    · simpa using t.isGE_shift ((t.truncGELE n n).obj E) n n 0 (by lia))
+    C ⥤ t.heart.FullSubcategory := t.heartCohFunctor n
 
-instance originalHeartCohFunctor_additive [IsTriangulated C]
+theorem originalHeartCohFunctor_additive [IsTriangulated C]
     (t : TStructure C) (n : ℤ) :
-    Functor.Additive (originalHeartCohFunctor t n) where
-  map_add := by
-    intro X Y f g
-    ext
-    change (shiftFunctor C n).map ((t.truncGE n).map ((t.truncLE n).map (f + g))) =
-      (shiftFunctor C n).map ((t.truncGE n).map ((t.truncLE n).map f)) +
-        (shiftFunctor C n).map ((t.truncGE n).map ((t.truncLE n).map g))
-    simp [Functor.map_add]
+    Functor.Additive (originalHeartCohFunctor t n) :=
+  t.heartCohFunctor_additive n
+
+/-- The existing degree-zero tilted-cohomology notation agrees naturally with
+the t-structure-owned degree-zero heart functor. -/
+noncomputable def originalHeartCohFunctorZeroIso [IsTriangulated C]
+    (t : TStructure C) :
+    originalHeartCohFunctor t 0 ≅ t.heartH0Functor :=
+  NatIso.ofComponents
+    (fun X ↦ ObjectProperty.isoMk _
+      ((shiftFunctorZero C ℤ).app ((t.truncGELE 0 0).obj X)))
+    (fun {X Y} f ↦ by
+      apply ObjectProperty.hom_ext
+      exact (shiftFunctorZero C ℤ).hom.naturality ((t.truncGELE 0 0).map f))
 
 /-- The object-level notation for `originalHeartCohFunctor`. -/
 noncomputable abbrev originalHeartCoh [IsTriangulated C]
@@ -83,7 +83,8 @@ noncomputable def originalHeartCohIsoOfHeart [IsTriangulated C]
     @asIso _ _ _ _ ((t.truncGEπ 0).app E.obj)
       ((t.isGE_iff_isIso_truncGEπ_app 0 E.obj).mp hGE)
   refine ObjectProperty.isoMk _ ?_
-  simpa [originalHeartCoh, originalHeartCohFunctor, TStructure.truncGELE] using
+  simpa [originalHeartCoh, originalHeartCohFunctor, TStructure.heartCohFunctor,
+    TStructure.truncGELE] using
     ((shiftFunctor C 0).mapIso ((t.truncGE 0).mapIso eLE ≪≫ eGE.symm) ≪≫
       (shiftFunctorZero C ℤ).app E.obj)
 
@@ -206,7 +207,8 @@ noncomputable def HeartTorsionPair.originalHeartCohIsoHMinusOne [IsTriangulated 
     @asIso _ _ _ _ ((t.truncGEπ (-1)).app ((t.truncLT 0).obj X))
       ((t.isGE_iff_isIso_truncGEπ_app (-1) _).mp (by infer_instance))
   refine ObjectProperty.isoMk _ ?_
-  simpa [originalHeartCoh, originalHeartCohFunctor, HeartTorsionPair.originalHMinusOne,
+  simpa [originalHeartCoh, originalHeartCohFunctor, TStructure.heartCohFunctor,
+    HeartTorsionPair.originalHMinusOne,
     TStructure.truncGELE] using
       ((shiftFunctor C (-1)).mapIso ((t.truncGE (-1)).mapIso eLE ≪≫ eGE.symm))
 
@@ -220,7 +222,8 @@ noncomputable def HeartTorsionPair.originalHeartCohIsoHZero [IsTriangulated C]
     @asIso _ _ _ _ ((t.truncLEι 0).app X)
       ((t.isLE_iff_isIso_truncLEι_app 0 X).mp hLE)
   refine ObjectProperty.isoMk _ ?_
-  simpa [originalHeartCoh, originalHeartCohFunctor, HeartTorsionPair.originalHZero,
+  simpa [originalHeartCoh, originalHeartCohFunctor, TStructure.heartCohFunctor,
+    HeartTorsionPair.originalHZero,
     TStructure.truncGELE] using
       ((shiftFunctor C 0).mapIso ((t.truncGE 0).mapIso eLE) ≪≫
         (shiftFunctorZero C ℤ).app ((t.truncGE 0).obj X))
