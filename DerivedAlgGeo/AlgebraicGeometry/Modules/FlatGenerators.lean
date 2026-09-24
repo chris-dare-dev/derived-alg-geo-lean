@@ -7,6 +7,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 import Mathlib.Algebra.Category.ModuleCat.Products
+import Mathlib.Algebra.Homology.LeftResolution.Basic
+import Mathlib.CategoryTheory.ObjectProperty.FullSubcategory
 
 /-!
 # Stalkwise-flat generators for scheme module sheaves
@@ -16,7 +18,8 @@ inside-support stalk calculation identifies the module stalk with the local ring
 these results prove stalkwise flatness. The generic natural element-indexed epimorphism is
 specialized to `X.Modules` below without introducing another generator construction.
 
-These are flat generators, not projective objects or K-flat resolutions.
+This gives a functorial left resolution of individual sheaves by stalkwise-flat objects. It does
+not assert projectivity or construct K-flat replacements of unbounded complexes.
 -/
 
 universe u
@@ -617,6 +620,39 @@ theorem freeYonedaSheafCoproduct_stalk_flat
   letI : Module.Flat (X.presheaf.stalk x)
       (DirectSum M.val.Elements (fun i => ↑(Z i))) := hflat
   exact Module.Flat.of_linearEquiv e.toLinearEquiv
+
+private theorem freeYonedaSheafCoproduct_isFlatOver_id
+    (X : Scheme.{u}) (M : X.Modules) :
+    AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X)
+      (freeYonedaSheafCoproduct X M) := by
+  intro x
+  dsimp [AlgebraicGeometry.Scheme.Modules.IsFlatOver]
+  rw [AlgebraicGeometry.Scheme.Hom.stalkMap_id]
+  change Module.Flat (X.presheaf.stalk x)
+    ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
+      ((moduleStalkFunctor X x).obj (freeYonedaSheafCoproduct X M)))
+  haveI : Module.Flat (X.presheaf.stalk x)
+      ((moduleStalkFunctor X x).obj (freeYonedaSheafCoproduct X M)) :=
+    freeYonedaSheafCoproduct_stalk_flat X M x
+  exact Module.Flat.of_linearEquiv
+    (ModuleCat.restrictScalarsId'App (RingHom.id _) rfl
+      ((moduleStalkFunctor X x).obj (freeYonedaSheafCoproduct X M))).toLinearEquiv
+
+/-- The element-indexed free-Yoneda coproduct defines a Mathlib left resolution of every
+module sheaf by sheaves flat over the identity of `X`.
+
+Applying `CategoryTheory.Abelian.LeftResolution.chainComplexFunctor` yields the functorial
+nonnegative resolution in the full subcategory cut out by `IsFlatOver (𝟙 X)`. This is an
+objectwise resolution; it is not a K-flat replacement functor on unbounded complexes. -/
+noncomputable def freeYonedaSheafCoproductLeftResolution (X : Scheme.{u}) :
+    CategoryTheory.Abelian.LeftResolution
+      (ObjectProperty.ι (fun M : X.Modules =>
+        AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X) M)) where
+  F := ObjectProperty.lift _
+    (SheafOfModules.freeYonedaSheafCoproductFunctor X.ringCatSheaf)
+    (fun M => freeYonedaSheafCoproduct_isFlatOver_id X M)
+  π := SheafOfModules.freeYonedaSheafCoproductToIdentity X.ringCatSheaf
+  epi_π_app := fromFreeYonedaSheafCoproduct_epi X
 
 /-- Naturality of the specialized coproduct map follows from the generic naturality theorem. -/
 lemma fromFreeYonedaSheafCoproduct_natural (X : Scheme.{u})
