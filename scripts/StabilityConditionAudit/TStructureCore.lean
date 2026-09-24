@@ -387,6 +387,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Triangulated.TStructure.heartCohFunctor
 #print axioms CategoryTheory.Triangulated.TStructure.heartCohFunctor_additive
 #print axioms CategoryTheory.Triangulated.TStructure.heartH0Functor
+#print axioms CategoryTheory.Triangulated.TStructure.heartH0Functor_additive
 #print axioms CategoryTheory.Triangulated.TStructure.heartH0OnHeartIso
 #print axioms CategoryTheory.Triangulated.TStructure.heart_hι
 #print axioms CategoryTheory.Triangulated.TStructure.heart_containsZero

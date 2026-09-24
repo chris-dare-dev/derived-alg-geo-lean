@@ -73,6 +73,16 @@ noncomputable def heartH0Functor [IsTriangulated C] :
   ObjectProperty.lift _ (t.truncGELE 0 0) (fun _ ↦
     (t.mem_heart_iff _).mpr ⟨inferInstance, inferInstance⟩)
 
+instance heartH0Functor_additive [IsTriangulated C] :
+    Functor.Additive t.heartH0Functor where
+  map_add := by
+    intro X Y f g
+    ext
+    change (t.truncGE 0).map ((t.truncLE 0).map (f + g)) =
+      (t.truncGE 0).map ((t.truncLE 0).map f) +
+        (t.truncGE 0).map ((t.truncLE 0).map g)
+    simp [Functor.map_add]
+
 /-- Degree-zero cohomology is naturally the identity on the heart. -/
 noncomputable def heartH0OnHeartIso [IsTriangulated C] :
     t.heart.ι ⋙ t.heartH0Functor ≅ 𝟭 t.heart.FullSubcategory := by
