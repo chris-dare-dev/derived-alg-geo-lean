@@ -25,6 +25,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLinear
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyFiniteResolutionLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyDegreeZeroLocalization
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyFiniteReplacementLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyIntLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
@@ -43,16 +44,17 @@ models, and the construction of derived tensor from a K-flat resolution.
 Degree-zero Hom-complex classes identify with derived-category morphisms when
 the source is K-projective. For module complexes, a conditional localization
 comparison assumes K-projectivity of both the source and its localization;
-an ordinary integer-linear adapter is available separately. Neither API
-constructs internal derived Hom or geometric base change.
+an ordinary integer-linear adapter is available separately.
 A finite module over a noetherian ring has a chosen finite-term, bounded-above
 projective resolution whose derived-category Hom-set map into a bounded-below
 complex localizes. Its quasi-isomorphism comparison now gives localization of
 the derived-category Hom-set map from the module's degree-zero complex into
 a bounded-below complex.
-The codomain remains degreewise localization of the displayed complexes;
-no internal derived-Hom, geometric, or arbitrary bounded-complex base change
-is asserted.
+A bounded-above complex of finite modules also has a chosen finite-projective
+replacement whose derived-category Hom map into a bounded-below complex
+localizes; localization for Hom out of the original complex is not asserted.
+The codomains remain degreewise localizations of the displayed complexes.
+No internal derived-Hom or geometric base-change comparison is asserted.
 Algebraic geometry supplies abelian categories such as `Coh X` and consumes
 this API; it does not own the derived-category construction.
 -/
