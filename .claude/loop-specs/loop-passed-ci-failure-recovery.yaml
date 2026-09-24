@@ -1,0 +1,118 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: loop-passed-ci-failure-recovery
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: false
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: loop-passed-ci-failure-recovery
+  validation: cli-required
+  required_artifacts:
+    - .openspec.yaml
+    - proposal.md
+    - design.md
+    - tasks.md
+    - agent-observations.md
+    - specs/loop-engineering/spec.md
+  runtime_evidence:
+    - agent-observations.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: false
+
+mutations:
+  comment_issue: false
+  close_issue: false
+  push_branch: false
+  create_pr: false
+  approve_pr: false
+  merge_pr: false
+
+issues:
+  - number: 1483
+    slug: loop-passed-ci-failure-recovery
+    depends_on: []
+    chunks:
+      - id: loop-passed-ci-failure-recovery
+        scope: >-
+          Admit a CI-driven repair only from current, exact-head evidence for
+          a check required by both the frozen manifest and live protection;
+          charge its review panel to the original cap, preserve the ordinary
+          ledger history, and deny publication while the repair remains
+          unresolved. Keep protected-base-only revalidation distinct and
+          prevent replacement ledgers for exhausted work.
+        requirements:
+          - CI-driven repair is admitted from exact required-check evidence
+          - CI repair preserves history and consumes the frozen review cap
+          - Publication waits for a passing repair and green checks on its head
+        files:
+          - scripts/loop_engine.py
+          - scripts/tests/test_loop_engine.py
+          - docs/architecture/loop-recovery.md
+          - .claude/loop-specs/README.md
+          - .claude/skills/run-loop/SKILL.md
+          - docs/architecture/loop-engineering-friction.md
+          - .claude/loop-specs/loop-passed-ci-failure-recovery.yaml
+          - openspec/changes/loop-passed-ci-failure-recovery/.openspec.yaml
+          - openspec/changes/loop-passed-ci-failure-recovery/proposal.md
+          - openspec/changes/loop-passed-ci-failure-recovery/design.md
+          - openspec/changes/loop-passed-ci-failure-recovery/tasks.md
+          - openspec/changes/loop-passed-ci-failure-recovery/agent-observations.md
+          - openspec/changes/loop-passed-ci-failure-recovery/specs/loop-engineering/spec.md
+        acceptance:
+          - >-
+            Exact live required-check failure evidence is bound to one open
+            pull request and its current full head SHA, with ambiguous, stale,
+            optional, pending, cancelled, or moved evidence rejected before
+            ledger bytes change.
+          - >-
+            Every CI-driven repair appends an immutable event and consumes the
+            next original review slot; cap exhaustion is terminal in the same
+            ledger and cannot be bypassed by another state directory.
+          - >-
+            Changed implementation cannot use uncharged protected-base
+            revalidation; only the unchanged reviewed change carried across a
+            protected-base movement may use that transition.
+          - >-
+            All shipping and closure paths reject unresolved repair state, and
+            a passing repair still requires green current required checks on
+            the exact live PR head.
+          - >-
+            Focused Python tests, strict OpenSpec validation, repository
+            precheck, and the four independent same-commit reviews pass; no
+            Lean declarations or mathematical scope change.
+        closure: complete
