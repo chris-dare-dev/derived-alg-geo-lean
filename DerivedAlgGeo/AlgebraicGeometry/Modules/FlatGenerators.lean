@@ -5,6 +5,8 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Generator
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
+import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
+import Mathlib.Algebra.Category.ModuleCat.Products
 
 /-!
 # Stalkwise-flat generators for scheme module sheaves
@@ -542,6 +544,79 @@ theorem freeYonedaSheafCoproduct_summand_stalk_flat
         (SheafOfModules.Elements.freeYonedaSheaf
           (R := X.ringCatSheaf) (M := M) m)) := by
   exact freeYonedaModuleSheaf_stalk_flat X m.1.unop x
+
+private theorem moduleStalkFunctor_preservesColimitsOfShape
+    (X : Scheme.{u}) (x : X) (I : Type u) :
+    PreservesColimitsOfShape (Discrete I) (moduleStalkFunctor X x) := by
+  let forgetModule := forget₂ (ModuleCat.{u} (X.presheaf.stalk x)) AddCommGrpCat.{u}
+  let G := TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
+    TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x
+  have hF : PreservesColimitsOfShape (Discrete I)
+      (SheafOfModules.toSheaf X.ringCatSheaf) := by
+    let α := 𝟙 X.ringCatSheaf.obj
+    haveI : PreservesColimitsOfShape (Discrete I)
+        (PresheafOfModules.sheafification α ⋙ SheafOfModules.toSheaf X.ringCatSheaf) := by
+      exact inferInstanceAs (PreservesColimitsOfShape (Discrete I)
+        (PresheafOfModules.toPresheaf X.ringCatSheaf.obj ⋙
+          presheafToSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}))
+    exact (PresheafOfModules.sheafificationAdjunction α).preservesColimitsOfShape_of_comp_left
+      (K := Discrete I) (SheafOfModules.toSheaf X.ringCatSheaf)
+  have hG : PreservesColimitsOfShape (Discrete I)
+      (TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
+        TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x) := inferInstance
+  have hFG : PreservesColimitsOfShape (Discrete I)
+      (SheafOfModules.toSheaf X.ringCatSheaf ⋙ G) := by
+    exact @comp_preservesColimitsOfShape _ _ _ _ _ _ _ _
+      (SheafOfModules.toSheaf X.ringCatSheaf) G hF hG
+  have hFGi : PreservesColimitsOfShape (Discrete I)
+      (SheafOfModules.toSheaf X.ringCatSheaf ⋙
+        (TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
+          TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x)) := by
+    change PreservesColimitsOfShape (Discrete I)
+      (SheafOfModules.toSheaf X.ringCatSheaf ⋙ G)
+    exact hFG
+  have hComposite : PreservesColimitsOfShape (Discrete I)
+      (moduleStalkFunctor X x ⋙ forgetModule) := by
+    exact (preservesColimitsOfShape_iff_of_natIso
+      (moduleStalkForgetIso X x)).mp hFGi
+  letI := hComposite
+  exact preservesColimitsOfShape_of_reflects_of_preserves
+    (moduleStalkFunctor X x) forgetModule
+
+/-- The element-indexed free-Yoneda coproduct has flat stalks over every point.
+
+This proves stalkwise flatness only. It is not a global flatness or K-flat resolution result. -/
+theorem freeYonedaSheafCoproduct_stalk_flat
+    (X : Scheme.{u}) (M : X.Modules) (x : X) :
+    Module.Flat (X.presheaf.stalk x)
+      ((moduleStalkFunctor X x).obj (freeYonedaSheafCoproduct X M)) := by
+  letI : DecidableEq M.val.Elements := Classical.decEq _
+  let G : M.val.Elements → X.Modules := fun m =>
+    SheafOfModules.Elements.freeYonedaSheaf
+      (R := X.ringCatSheaf) (M := M) m
+  let F : Discrete M.val.Elements ⥤ X.Modules := Discrete.functor G
+  let Z : M.val.Elements → ModuleCat.{u} (X.presheaf.stalk x) :=
+    fun m => (moduleStalkFunctor X x).obj (G m)
+  haveI : PreservesColimitsOfShape (Discrete M.val.Elements) (moduleStalkFunctor X x) :=
+    moduleStalkFunctor_preservesColimitsOfShape X x M.val.Elements
+  let e₁ : (moduleStalkFunctor X x).obj (colimit F) ≅ colimit (F ⋙ moduleStalkFunctor X x) :=
+    preservesColimitIso (moduleStalkFunctor X x) F
+  let e₂ : colimit (F ⋙ moduleStalkFunctor X x) ≅ colimit (Discrete.functor Z) :=
+    HasColimit.isoOfNatIso (Discrete.compNatIsoDiscrete G (moduleStalkFunctor X x))
+  let e₃ := ModuleCat.coprodIsoDirectSum Z
+  let e : (moduleStalkFunctor X x).obj (colimit F) ≅
+      ModuleCat.of (X.presheaf.stalk x)
+        (DirectSum M.val.Elements (fun i => ↑(Z i))) := e₁ ≪≫ e₂ ≪≫ e₃
+  have hflat : Module.Flat (X.presheaf.stalk x)
+      (DirectSum M.val.Elements (fun i => ↑(Z i))) := by
+    apply Module.Flat.directSum_iff.mpr
+    intro m
+    simpa [Z, G] using freeYonedaSheafCoproduct_summand_stalk_flat X M m x
+  change Module.Flat (X.presheaf.stalk x)
+    ((moduleStalkFunctor X x).obj (colimit F))
+  letI : Module.Flat (X.presheaf.stalk x)
+      (DirectSum M.val.Elements (fun i => ↑(Z i))) := hflat
+  exact Module.Flat.of_linearEquiv e.toLinearEquiv
 
 /-- Naturality of the specialized coproduct map follows from the generic naturality theorem. -/
 lemma fromFreeYonedaSheafCoproduct_natural (X : Scheme.{u})
