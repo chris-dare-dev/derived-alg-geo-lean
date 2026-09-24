@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
@@ -231,6 +232,14 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.CohomologyClass.toSmallShiftedHom_postcomp
 #print axioms CochainComplex.HomComplex.postcompMap
 #print axioms CochainComplex.HomComplex.postcompMap_f_apply
+
+/-! ## Hom-complex localization under finite effective support -/
+
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap_delta
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized_of_finite_projective
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized_of_bounded_above_below
 
 /-! ## Subcomplexes from degreewise subobject data -/
 

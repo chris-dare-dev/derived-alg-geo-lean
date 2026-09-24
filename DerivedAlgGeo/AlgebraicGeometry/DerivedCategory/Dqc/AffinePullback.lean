@@ -6,6 +6,7 @@ import Mathlib.Algebra.Category.ModuleCat.Descent
 import Mathlib.CategoryTheory.Adjunction.Restrict
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffinePushforward
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
 
 /-!
 # Pullback on affine quasi-coherent sheaves
@@ -134,6 +135,40 @@ def affineExtendScalarsDerived
       (ModuleCat.extendScalars.{u, u, u} f.hom) :=
     ModuleCat.preservesFiniteLimits_extendScalars_of_flat hf
   exact (ModuleCat.extendScalars f.hom).mapDerivedCategory
+
+/-- For exact affine pullback, derived sheafification commutes with extension
+of scalars on the derived categories of all module sheaves. Both exactness
+hypotheses are explicit; no quasi-coherent or bounded-coherent restriction is
+asserted here. -/
+def affineSchemeModuleExactDerivedPullbackComparison
+    {R S : CommRingCat.{u}} (f : R ⟶ S)
+    [PreservesFiniteLimits (ModuleCat.extendScalars f.hom)]
+    [PreservesFiniteLimits (Scheme.Modules.pullback (Spec.map f))] :
+    (tilde.functor R).mapDerivedCategory ⋙
+        (Scheme.Modules.pullback (Spec.map f)).mapDerivedCategory ≅
+      (ModuleCat.extendScalars f.hom).mapDerivedCategory ⋙
+        (tilde.functor S).mapDerivedCategory := by
+  letI : (tilde.functor R).Additive := inferInstance
+  letI : (tilde.functor S).Additive := inferInstance
+  letI : (Scheme.Modules.pullback (Spec.map f)).Additive := inferInstance
+  letI : (ModuleCat.extendScalars f.hom).Additive := affineExtendScalars_additive f
+  letI : PreservesFiniteLimits (tilde.functor R) := inferInstance
+  letI : PreservesFiniteLimits (tilde.functor S) := inferInstance
+  letI : PreservesFiniteColimits (tilde.functor R) := inferInstance
+  letI : PreservesFiniteColimits (tilde.functor S) := inferInstance
+  letI : PreservesFiniteColimits (Scheme.Modules.pullback (Spec.map f)) := inferInstance
+  letI : PreservesFiniteColimits (ModuleCat.extendScalars f.hom) := inferInstance
+  let F := tilde.functor R ⋙ Scheme.Modules.pullback (Spec.map f)
+  let G := ModuleCat.extendScalars f.hom ⋙ tilde.functor S
+  letI : F.Additive := inferInstance
+  letI : G.Additive := inferInstance
+  letI : PreservesFiniteLimits F := inferInstance
+  letI : PreservesFiniteLimits G := inferInstance
+  letI : PreservesFiniteColimits F := inferInstance
+  letI : PreservesFiniteColimits G := inferInstance
+  exact Functor.mapDerivedCategoryCompIso (Iso.refl F) ≪≫
+    NatIso.mapDerivedCategory (Scheme.Modules.pullbackSpecMapTildeIso f) ≪≫
+      (Functor.mapDerivedCategoryCompIso (Iso.refl G)).symm
 
 /-- On derived categories, affine global sections identify exact pullback
 with derived extension of scalars. -/

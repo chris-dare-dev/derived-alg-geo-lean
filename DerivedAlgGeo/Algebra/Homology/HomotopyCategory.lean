@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexPostcomp
 
 /-!
@@ -13,7 +14,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexPostcomp
 Extensions of Mathlib's `HomotopyCategory`: the bounded homotopy category,
 coproducts in the homotopy category and their preservation by the quotient
 functor, and the dg enhancement of the homotopy category by the dg category
-of cochain complexes. The enhancement *interface* is a structure on an abstract
+of cochain complexes. Bounded-source Hom-complex localization is also owned
+here. The enhancement *interface* is a structure on an abstract
 triangulated category and lives in
 `CategoryTheory/Triangulated/DGEnhancement/`; its realization for this
 particular object lives here, with the object.
