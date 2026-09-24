@@ -297,6 +297,27 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   fixed-ambient subobject-chain lift is proved in this SF11.4 continuation.
   The geometric lift for a section-open or affine localization, the bounded
   `D_T` heart restriction, and their comparison remain `UNVERIFIED`.
+- progress note (2026-09-24): Successive binary joins now turn pointwise
+  subobject lifts into a fixed-ambient monotone chain. A triangulated t-exact
+  restriction induces an exact heart functor and therefore preserves those
+  joins, so the heart-level transfer needs only chainwise pointwise lifts.
+  The bounded-component geometric pointwise lift is still not supplied by
+  the existing `SLocal` owner-data fields.
+
+### 2026-09-24 — `anchored_chain_of_pointwise_lifts` with local join structure
+- chunk:              sf11-4d-pointwise-anchored
+- reviewing commit:   46d220ce422f8ea2aa1c712de1c08634522e7b56
+- found by:           abstraction-adversary
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/Subobject/NoetherianObject.lean`
+- weaker hypotheses:  binary joins only in `Subobject X` and in the target
+  ambient subobject poset, rather than category-wide images and binary
+  coproducts
+- pin status:         UNCOMPILED
+- source note:        The current proof uses Mathlib's category-wide instances
+  to synthesize the two joins. A locally quantified semilattice formulation
+  may suffice mathematically, but its Lean instance binding and theorem type
+  have not been tested; do not present it as an available API.
+- state:              UNVERIFIED
 
 ### 2026-09-24 — `SLocalSlicingData.restriction_eq_of_phase_iff`
 - chunk:              sf11-4a-1496-noetherian-cover
