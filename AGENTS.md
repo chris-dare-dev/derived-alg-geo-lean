@@ -411,7 +411,7 @@ multi-issue batch. Inside a run, write its artifacts directly: the generated
 `$openspec-propose` workflow stops after planning by design, and that boundary
 is for interactive planning, not for a run. Task checkboxes and
 `agent-observations.md` are progress records. Tick and append them freely,
-because the ledger's plan digest (v2) excludes them.
+because the ledger's plan digest excludes them.
 
 **Reviews bind to the change, not to a commit's position.** Every frozen chunk
 gets independent mathematical, repository-boundary, abstraction, and
