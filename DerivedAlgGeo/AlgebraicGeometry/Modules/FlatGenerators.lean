@@ -145,7 +145,7 @@ private noncomputable def moduleStalkUnitIsoRegular
   }
   exact e.toModuleIso
 
-/-- The canonical free-Yoneda `𝒪ₓ`-module sheaf associated to an open subset. -/
+/-- The canonical free-Yoneda `𝒪_X`-module sheaf associated to an open subset. -/
 noncomputable abbrev freeYonedaModuleSheaf (X : Scheme.{u}) (U : X.Opens) : X.Modules :=
   SheafOfModules.freeYonedaSheaf X.ringCatSheaf U
 
