@@ -399,6 +399,48 @@ theorem mapTruncGEIso_π_comp_hom (n : ℤ) (X : C) :
       (by simp only [TStructure.triangleLEGE_obj_obj₃, sub_add_cancel]) hπ hHom
   exact eq_of_heq (hc.trans ((heq_of_eq h₂).trans hπ'.symm))
 
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- The connective truncation comparison is natural in the object. -/
+@[reassoc]
+theorem mapTruncGEIso_hom_naturality (n : ℤ) {X Y : C} (f : X ⟶ Y) :
+    F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom =
+      (mapTruncGEIso F t t' n X).hom ≫ (t'.truncGE n).map (F.map f) := by
+  have hπX : (t'.truncGEπ n).app (F.obj X) ≫
+      (mapTruncGEIso F t t' n X).inv = F.map ((t.truncGEπ n).app X) := by
+    rw [← mapTruncGEIso_π_comp_hom F t t' n X]
+    simp
+  have h : (mapTruncGEIso F t t' n X).inv ≫
+      F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom =
+        (t'.truncGE n).map (F.map f) := by
+    apply t'.from_truncGE_obj_ext (n := n)
+    calc
+      (t'.truncGEπ n).app (F.obj X) ≫
+          ((mapTruncGEIso F t t' n X).inv ≫
+            F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom) =
+        F.map ((t.truncGEπ n).app X) ≫
+          F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom := by
+            rw [← Category.assoc, hπX]
+      _ = F.map f ≫ F.map ((t.truncGEπ n).app Y) ≫
+          (mapTruncGEIso F t t' n Y).hom := by
+            have hnat := congrArg (fun g => F.map g ≫
+              (mapTruncGEIso F t t' n Y).hom) (t.truncGEπ_naturality n f)
+            simpa only [F.map_comp, Category.assoc] using hnat
+      _ = F.map f ≫ (t'.truncGEπ n).app (F.obj Y) := by
+            simpa only [Category.assoc] using
+              congrArg (fun g => F.map f ≫ g)
+                (mapTruncGEIso_π_comp_hom F t t' n Y)
+      _ = (t'.truncGEπ n).app (F.obj X) ≫
+          (t'.truncGE n).map (F.map f) := by
+            exact (t'.truncGEπ_naturality n (F.map f)).symm
+  calc
+    F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom =
+      (mapTruncGEIso F t t' n X).hom ≫
+        ((mapTruncGEIso F t t' n X).inv ≫
+          F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom) := by
+            simp
+    _ = _ := by rw [h]
+
 /-- A t-exact functor which reflects zero objects also reflects the
 coconnective half of a t-structure. This is formula (A.3)'s reverse
 inclusion in the abstract large-category setting. -/

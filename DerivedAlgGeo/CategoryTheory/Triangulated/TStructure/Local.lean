@@ -188,8 +188,8 @@ theorem heartFunctor_map (r : t.Restriction F)
     (r.heartFunctor.map f).hom = F.map f.hom :=
   rfl
 
-/-- Objectwise, a t-exact triangulated functor commutes with degree-zero
-heart cohomology. Naturality of this comparison is a separate assertion. -/
+/-- The objectwise comparison underlying the natural degree-zero heart
+cohomology comparison below. -/
 noncomputable def heartH0Comparison
     [IsTriangulated C] [IsTriangulated D]
     [F.CommShift ℤ] [F.IsTriangulated]
@@ -202,6 +202,73 @@ noncomputable def heartH0Comparison
     (r.tStructure.truncGE 0).obj ((r.tStructure.truncLE 0).obj (F.obj X))
   exact (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)) ≪≫
     (r.tStructure.truncGE 0).mapIso (F.mapTruncLEIso t r.tStructure 0 X)
+
+private theorem heartH0Comparison_hom
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) (X : C) [F.IsTExact t r.tStructure] :
+    (r.heartH0Comparison X).hom.hom =
+      (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+        (r.tStructure.truncGE 0).map
+          (F.mapTruncLEIso t r.tStructure 0 X).hom := by
+  rfl
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- Degree-zero heart cohomology commutes naturally with a t-exact
+triangulated functor, after restriction to the two hearts. -/
+noncomputable def heartH0ComparisonNatIso
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) :
+    t.heartH0Functor ⋙ r.heartFunctor ≅
+      F ⋙ r.tStructure.heartH0Functor := by
+  letI : F.IsTExact t r.tStructure := r.isTExact
+  refine NatIso.ofComponents (fun X => r.heartH0Comparison X) ?_
+  intro X Y f
+  apply ObjectProperty.hom_ext
+  change F.map ((t.truncGE 0).map ((t.truncLE 0).map f)) ≫
+      (r.heartH0Comparison Y).hom.hom =
+      (r.heartH0Comparison X).hom.hom ≫
+        (r.tStructure.truncGE 0).map
+          ((r.tStructure.truncLE 0).map (F.map f))
+  rw [heartH0Comparison_hom r X,
+    heartH0Comparison_hom r Y]
+  calc
+    F.map ((t.truncGE 0).map ((t.truncLE 0).map f)) ≫
+        (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj Y)).hom ≫
+          (r.tStructure.truncGE 0).map
+            (F.mapTruncLEIso t r.tStructure 0 Y).hom =
+      (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+        (r.tStructure.truncGE 0).map
+          (F.map ((t.truncLE 0).map f)) ≫
+            (r.tStructure.truncGE 0).map
+              (F.mapTruncLEIso t r.tStructure 0 Y).hom := by
+                simpa only [Category.assoc] using
+                  congrArg (fun g => g ≫
+                    (r.tStructure.truncGE 0).map
+                      (F.mapTruncLEIso t r.tStructure 0 Y).hom)
+                    (F.mapTruncGEIso_hom_naturality t r.tStructure 0
+                      ((t.truncLE 0).map f))
+    _ = _ := by
+      have hLE := F.mapTruncLEIso_hom_naturality t r.tStructure 0 f
+      calc
+        (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+            (r.tStructure.truncGE 0).map (F.map ((t.truncLE 0).map f)) ≫
+              (r.tStructure.truncGE 0).map
+                (F.mapTruncLEIso t r.tStructure 0 Y).hom =
+          (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+            (r.tStructure.truncGE 0).map
+              (F.map ((t.truncLE 0).map f) ≫
+                (F.mapTruncLEIso t r.tStructure 0 Y).hom) := by
+                  simp only [Functor.map_comp]
+        _ = (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)).hom ≫
+            (r.tStructure.truncGE 0).map
+              ((F.mapTruncLEIso t r.tStructure 0 X).hom ≫
+                (r.tStructure.truncLE 0).map (F.map f)) := by
+                  rw [hLE]
+        _ = _ := by
+          simp only [Functor.map_comp, Category.assoc]
 
 /-- The restriction to hearts is additive when the ambient functor is additive. -/
 noncomputable instance heartFunctor_additive
