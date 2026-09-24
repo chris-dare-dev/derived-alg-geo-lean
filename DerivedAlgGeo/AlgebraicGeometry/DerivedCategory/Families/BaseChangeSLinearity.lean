@@ -36,16 +36,6 @@ variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
   (D : KFlatBaseChangeData X T)
   {ι : Type w} [Preorder ι]
 
-/-- The identity scheme over `S`, used as the terminal base-change object. -/
-abbrev identityBaseChange (S : Scheme.{u}) : SchemeBaseChange S :=
-  Over.mk (𝟙 S)
-
-/-- The structure morphism `X → S`, regarded as a morphism in `Over S` to
-the identity base change. -/
-def toIdentityBaseChange (X : SchemeBaseChange S) :
-    X ⟶ identityBaseChange S :=
-  Over.homMk X.hom (Category.comp_id _)
-
 /-- The quasicoherent derived category of the base scheme. -/
 abbrev BaseDqc (S : Scheme.{u}) :=
   Dqc.SchemeQuasicoherentDerivedCategory S
