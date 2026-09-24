@@ -30,6 +30,7 @@ theorem Module.exists_finite_submodule_of_isLocalization
     [AddCommGroup N] [Module R N] [Module A N] [IsScalarTower R A N]
     [Module.Finite A N] :
     ∃ L : Submodule R N, Module.Finite R L ∧
+      IsLocalizedModule S L.subtype ∧
       Nonempty (A ⊗[R] L ≃ₗ[A] N) := by
   letI : IsLocalizedModule S (LinearMap.id : N →ₗ[R] N) :=
     isLocalizedModule_id (S := S) N A
@@ -63,7 +64,7 @@ theorem Module.exists_finite_submodule_of_isLocalization
       refine ⟨1, ?_⟩
       have : x = y := Subtype.ext hxy
       simp [this]
-  exact ⟨L, hfinite, ⟨(IsLocalizedModule.isBaseChange S A f).equiv⟩⟩
+  exact ⟨L, hfinite, hf, ⟨(IsLocalizedModule.isBaseChange S A f).equiv⟩⟩
 
 /-- Over a Noetherian base ring the descended finite submodule is finitely presented. -/
 theorem Module.exists_finitely_presented_submodule_of_isLocalization
@@ -72,8 +73,9 @@ theorem Module.exists_finitely_presented_submodule_of_isLocalization
     [AddCommGroup N] [Module R N] [Module A N] [IsScalarTower R A N]
     [Module.Finite A N] :
     ∃ L : Submodule R N, Module.FinitePresentation R L ∧
+      IsLocalizedModule S L.subtype ∧
       Nonempty (A ⊗[R] L ≃ₗ[A] N) := by
-  obtain ⟨L, hL, e⟩ :=
+  obtain ⟨L, hL, hloc, e⟩ :=
     Module.exists_finite_submodule_of_isLocalization (R := R) (A := A) (N := N) S
   letI : Module.Finite R L := hL
-  exact ⟨L, Module.finitePresentation_of_finite R L, e⟩
+  exact ⟨L, Module.finitePresentation_of_finite R L, hloc, e⟩
