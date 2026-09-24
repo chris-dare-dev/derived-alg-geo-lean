@@ -110,6 +110,23 @@ construction prerequisite for #522, and #525 remains downstream.
     the affine K-projective application in `Dqc/AffineKProjectivePullback.lean`;
     reuse the existing `Modules/Pullback/AffineSpec` comparison and do not add
     another carrier or derived-pullback interface.
+16. Resolve the word “supported” in task 1.2 by choosing the full domain of
+    the existing geometric interfaces as this chunk's scope; #554 itself does
+    not define that word. The choice follows the existing interfaces: for
+    every scheme `S`, every
+    `T U : SchemeBaseChange S`, every `f : T ⟶ U`, and the unbounded derived
+    category `U.DerivedFiber` of all `O_U`-module-sheaf complexes. Construct a
+    functorial `SchemeKFlatResolution X` for each scheme `X` (functorial in
+    complexes, not asserted natural in `X`), prove its pullback acyclicity for
+    every such `f`, and use the existing constructor to inhabit
+    `LeftDerivedPullback f`. Impose no boundedness, quasicoherence,
+    Noetherian, flatness, or exactness restriction. This task does not prove
+    the preservation claims in task 1.3 or the coherence laws in task 1.4.
+    Keep the resolution beside the scheme K-flat tensor interface and the
+    pullback transport beside `Families/KFlatPullback.lean`; add no competing
+    resolution or derived-pullback carrier. The broader ringed-topoi analogue
+    is recorded as an unverified altitude lift, not claimed by this scheme
+    implementation.
 
 ## Risks / Trade-offs
 
