@@ -233,7 +233,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.postcompMap
 #print axioms CochainComplex.HomComplex.postcompMap_f_apply
 
-/-! ## Bounded-source Hom-complex localization -/
+/-! ## Hom-complex localization under finite effective support -/
 
 #print axioms CochainComplex.HomComplex.cochainLocalizedMap
 #print axioms CochainComplex.HomComplex.cochainLocalizedMap_delta

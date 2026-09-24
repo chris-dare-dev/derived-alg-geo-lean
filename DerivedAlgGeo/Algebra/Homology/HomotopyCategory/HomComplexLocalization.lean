@@ -17,9 +17,10 @@ finitely presented, localization of modules commutes with each degree of its
 Hom complex. The comparison also commutes with the Hom-complex differential.
 Finite projective terms provide a useful specialization.
 
-In each fixed degree, a source bounded above and a target bounded below also
-have finite effective support. Finite presentation of the source terms on that
-degree-dependent interval gives the same localization comparison.
+In each fixed degree, a termwise strictly bounded-above source and a termwise
+strictly bounded-below target also have finite effective support. Finite
+presentation of the source terms on that degree-dependent interval gives the
+same localization comparison.
 
 This is a cochain-level statement. It does not yet identify cohomology of Hom
 complexes, derived-category Homs, or bounded-coherent geometric base change.
@@ -382,7 +383,8 @@ private instance localizedQ_ge_half (c : ℤ) [Q.IsStrictlyGE c] :
   exact (ModuleCat.localizedModuleFunctor.{u} S).map_isZero
     (Q.isZero_of_isStrictlyGE c i hi)
 
-/-- If the source is bounded above and the target bounded below, each fixed
+/-- If the source is termwise strictly bounded above and the target termwise
+strictly bounded below, each fixed
 degree of their Hom complex commutes with localization, provided the finitely
 many source terms that contribute in that degree are finitely presented. The
 support interval depends on the degree; this is not yet derived-Hom base change. -/
