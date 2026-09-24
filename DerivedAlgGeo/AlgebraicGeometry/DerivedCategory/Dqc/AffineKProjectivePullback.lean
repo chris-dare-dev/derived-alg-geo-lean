@@ -5,6 +5,8 @@ Released under the MIT license.
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Affine
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
+import Mathlib.AlgebraicGeometry.Modules.Tilde
 
 /-!
 # Affine derived pullback from K-projective complexes
@@ -59,6 +61,74 @@ def affineKProjectiveDerivedPullbackComparison
         affineKProjectiveDerivedPullback f ≅
       affineKProjectivePullback f :=
   kProjectiveLocusDerivedComparison (ModuleCat.extendScalars f.hom)
+
+/-- On the affine K-projective derived locus, actual pullback of the
+sheafified representatives agrees after localization with scalar extension
+followed by the derived functor of the target affine tilde functor. The target
+is the derived category of all scheme-module sheaves on `Spec A`, not only the
+quasi-coherent subcategory. -/
+noncomputable def affineKProjectiveSchemeModulePullbackComparison
+    {R A : CommRingCat.{u}} (f : R ⟶ A) :
+    CategoryTheory.kProjectiveLocusDerivedFunctor
+        (AlgebraicGeometry.tilde.functor R ⋙ Scheme.Modules.pullback (Spec.map f)) ≅
+      affineKProjectiveDerivedPullback f ⋙
+        (AlgebraicGeometry.tilde.functor A).mapDerivedCategory := by
+  let F := AlgebraicGeometry.tilde.functor R ⋙ Scheme.Modules.pullback (Spec.map f)
+  let G := ModuleCat.extendScalars f.hom
+  let T := AlgebraicGeometry.tilde.functor A
+  let c := ComplexShape.up ℤ
+  let QhS := DerivedCategory.Qh (C := ModuleCat A)
+  let QhTarget := DerivedCategory.Qh (C := (Spec A).Modules)
+  let E := CategoryTheory.kProjectiveQhEquivalence (ModuleCat R)
+  let I := ObjectProperty.ι (CategoryTheory.kProjectiveHomotopy (ModuleCat R))
+  letI : (AlgebraicGeometry.tilde.functor R).Additive :=
+    AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecOfFunctor
+  letI : (AlgebraicGeometry.tilde.functor A).Additive :=
+    AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecOfFunctor
+  letI : G.Additive := affineExtendScalars_additive f
+  letI : F.Additive := inferInstance
+  letI : (G ⋙ T).Additive := inferInstance
+  letI : T.Additive := inferInstance
+  letI : PreservesFiniteLimits T := AlgebraicGeometry.tilde_preservesFiniteLimits
+  letI : T.IsLeftAdjoint := (AlgebraicGeometry.tilde.adjunction (R := A)).isLeftAdjoint
+  letI : PreservesFiniteColimits T := inferInstance
+  let e : F ≅ G ⋙ T := Scheme.Modules.pullbackSpecMapTildeIso f
+  let eF : (AlgebraicGeometry.tilde.functor R).mapHomotopyCategory c ⋙
+      (Scheme.Modules.pullback (Spec.map f)).mapHomotopyCategory c ≅
+      F.mapHomotopyCategory c :=
+    Functor.mapHomotopyCategoryCompIso (Iso.refl F) c
+  let eTop : (AlgebraicGeometry.tilde.functor R).mapHomotopyCategory c ⋙
+      (Scheme.Modules.pullback (Spec.map f)).mapHomotopyCategory c ≅
+      (G ⋙ T).mapHomotopyCategory c :=
+    Functor.mapHomotopyCategoryCompIso e c
+  let eG : G.mapHomotopyCategory c ⋙ T.mapHomotopyCategory c ≅
+      (G ⋙ T).mapHomotopyCategory c :=
+    Functor.mapHomotopyCategoryCompIso (Iso.refl (G ⋙ T)) c
+  let eHC : F.mapHomotopyCategory c ≅
+      (G.mapHomotopyCategory c ⋙ T.mapHomotopyCategory c) :=
+    eF.symm ≪≫ eTop ≪≫ eG.symm
+  let factorT : QhS ⋙ T.mapDerivedCategory ≅ T.mapHomotopyCategory c ⋙ QhTarget :=
+    T.mapDerivedCategoryFactorsh
+  let eT : (G.mapHomotopyCategory c ⋙ QhS) ⋙ T.mapDerivedCategory ≅
+      (G.mapHomotopyCategory c ⋙ T.mapHomotopyCategory c) ⋙ QhTarget := by
+    exact Functor.associator (G.mapHomotopyCategory c) QhS T.mapDerivedCategory ≪≫
+      Functor.isoWhiskerLeft (G.mapHomotopyCategory c) factorT ≪≫
+      (Functor.associator (G.mapHomotopyCategory c) (T.mapHomotopyCategory c)
+        QhTarget).symm
+  let eMiddle : F.mapHomotopyCategory c ⋙ QhTarget ≅
+      (G.mapHomotopyCategory c ⋙ QhS) ⋙ T.mapDerivedCategory := by
+    exact Functor.isoWhiskerRight eHC QhTarget ≪≫ eT.symm
+  let eFull : CategoryTheory.kProjectiveDerivedFunctor F ≅
+      CategoryTheory.kProjectiveDerivedFunctor G ⋙ T.mapDerivedCategory := by
+    dsimp [CategoryTheory.kProjectiveDerivedFunctor]
+    exact Functor.isoWhiskerLeft I eMiddle ≪≫
+      (Functor.associator I (G.mapHomotopyCategory c ⋙ QhS) T.mapDerivedCategory).symm
+  dsimp [CategoryTheory.kProjectiveLocusDerivedFunctor,
+    affineKProjectiveDerivedPullback,
+    CategoryTheory.kProjectiveDerivedFunctor]
+  exact Functor.isoWhiskerLeft E.inverse eFull ≪≫
+    (Functor.associator E.inverse (CategoryTheory.kProjectiveDerivedFunctor G)
+      T.mapDerivedCategory).symm
 
 /-- A bounded-above complex of projective `R`-modules computes arbitrary
 affine derived pullback by degreewise extension of scalars. -/

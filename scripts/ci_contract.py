@@ -20,13 +20,13 @@ from pathlib import Path
 from typing import Any
 
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 FULL_SHA = re.compile(r"^[0-9a-fA-F]{40}$")
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
 BRANCH_REF = re.compile(r"^refs/heads/[A-Za-z0-9._/-]+$")
 PULL_REF = re.compile(r"^refs/pull/[1-9][0-9]*/(?:head|merge)$")
 GENERIC_REF = re.compile(r"^refs/[A-Za-z0-9._/-]+$")
-EVENTS = {"pull_request", "push", "merge_group", "workflow_dispatch"}
+EVENTS = {"pull_request", "push", "merge_group", "workflow_dispatch", "schedule"}
 PLATFORMS = {"github-actions", "github-checks", "github-status"}
 GATE_CLASSES = {
     "required_ci",
@@ -101,11 +101,13 @@ def _canonical_sha256(value: Any) -> str:
 
 
 def _valid_ref(event: Any, ref: Any) -> bool:
-    if not _is_string(ref) or not GENERIC_REF.fullmatch(ref):
+    if not _is_string(event) or not _is_string(ref) or not GENERIC_REF.fullmatch(ref):
         return False
     if ".." in ref or "//" in ref or "\\" in ref:
         return False
-    if event in {"push", "workflow_dispatch", "merge_group"}:
+    if event in {"push", "schedule"}:
+        return ref == "refs/heads/main"
+    if event in {"workflow_dispatch", "merge_group"}:
         return bool(BRANCH_REF.fullmatch(ref))
     if event == "pull_request":
         return bool(PULL_REF.fullmatch(ref))
@@ -115,7 +117,9 @@ def _valid_ref(event: Any, ref: Any) -> bool:
 def _event_applies(definition: dict[str, Any], evidence: dict[str, Any]) -> bool:
     event = evidence.get("event")
     ref = evidence.get("ref")
-    for selector in definition.get("applies_to", []):
+    for selector in _as_list(definition.get("applies_to")):
+        if not _is_string(selector):
+            continue
         if selector == event:
             return True
         if (
@@ -124,7 +128,11 @@ def _event_applies(definition: dict[str, Any], evidence: dict[str, Any]) -> bool
             and ref == f"refs/heads/{selector[5:]}"
         ):
             return True
-        if selector == "workflow_dispatch" and event == "workflow_dispatch":
+        if (
+            selector.startswith("workflow_dispatch:")
+            and event == "workflow_dispatch"
+            and evidence.get("producer") == f"github-actions/{selector.split(':', 1)[1]}"
+        ):
             return True
     return False
 
@@ -137,6 +145,7 @@ def _validate_provider_binding(evidence: dict[str, Any], errors: list[str]) -> N
     required = (
         "source",
         "repository",
+        "producer",
         "run_id",
         "run_attempt",
         "event",
@@ -149,10 +158,14 @@ def _validate_provider_binding(evidence: dict[str, Any], errors: list[str]) -> N
     for field in required:
         if field not in proof:
             errors.append(f"evidence.provider_binding.{field} is required")
-    if proof.get("source") not in {"github-api", "provider-adapter"}:
+    if not _is_string(proof.get("source")) or proof.get("source") not in {
+        "github-api", "provider-adapter"
+    }:
         errors.append("evidence.provider_binding.source is not a trusted adapter source")
     if proof.get("repository") != evidence.get("repository"):
         errors.append("evidence.provider_binding.repository does not match evidence.repository")
+    if proof.get("producer") != evidence.get("producer"):
+        errors.append("evidence.provider_binding.producer does not match evidence.producer")
     for field in ("run_id", "run_attempt"):
         if proof.get(field) != evidence.get(field):
             errors.append(f"evidence.provider_binding.{field} does not match evidence")
@@ -182,7 +195,7 @@ def _validate_provider_binding(evidence: dict[str, Any], errors: list[str]) -> N
     head = evidence.get("head_commit")
     base = evidence.get("base_commit")
     candidate = evidence.get("candidate_commit")
-    if event in {"push", "workflow_dispatch"}:
+    if _is_string(event) and event in {"push", "workflow_dispatch", "schedule"}:
         if candidate != head:
             errors.append("candidate_commit must equal head_commit for a direct ref event")
     elif event == "pull_request":
@@ -214,6 +227,13 @@ def validate_inventory(inventory: Any) -> list[str]:
 
     by_id: dict[str, dict[str, Any]] = {}
     producer_names: set[tuple[str, str]] = set()
+    workflows = {
+        producer.removeprefix("github-actions/")
+        for gate in gates
+        if isinstance(gate, dict)
+        for producer in [gate.get("producer")]
+        if _is_string(producer) and producer.startswith("github-actions/")
+    }
     for index, gate in enumerate(gates):
         prefix = f"inventory.gates[{index}]"
         if not isinstance(gate, dict):
@@ -224,9 +244,11 @@ def validate_inventory(inventory: Any) -> list[str]:
         for field in ("id", "name", "producer", "artifact"):
             if not _is_string(gate.get(field)):
                 errors.append(f"{prefix}.{field} is required")
-        if gate_id in by_id:
+        if not _is_string(gate_id):
+            errors.append(f"{prefix}.id must be a non-empty string")
+        elif gate_id in by_id:
             errors.append(f"{prefix}.id duplicates {gate_id!r}")
-        elif _is_string(gate_id):
+        else:
             by_id[gate_id] = gate
         producer_name = (gate.get("producer"), name)
         if all(_is_string(part) for part in producer_name):
@@ -234,10 +256,19 @@ def validate_inventory(inventory: Any) -> list[str]:
                 errors.append(f"{prefix} duplicates producer/name {producer_name!r}")
             producer_names.add(producer_name)
         gate_class = gate.get("class")
-        if gate_class not in GATE_CLASSES:
+        if not _is_string(gate_class) or gate_class not in GATE_CLASSES:
             errors.append(f"{prefix}.class is not a recognized gate class")
         if not isinstance(gate.get("required"), bool):
             errors.append(f"{prefix}.required must be boolean")
+        if not _is_string(gate.get("run_binding")) or gate.get("run_binding") not in {
+            "primary", "independent", "status"
+        }:
+            errors.append(f"{prefix}.run_binding must be primary, independent or status")
+        artifact_kind = gate.get("artifact")
+        if gate.get("run_binding") == "status" and not (
+            _is_string(artifact_kind) and artifact_kind.startswith("commit-status:")
+        ):
+            errors.append(f"{prefix}.artifact must identify a commit status")
         prerequisites = gate.get("prerequisites", [])
         if not isinstance(prerequisites, list) or any(
             not _is_string(item) for item in prerequisites
@@ -248,20 +279,31 @@ def validate_inventory(inventory: Any) -> list[str]:
             not _is_string(item) for item in applies_to
         ):
             errors.append(f"{prefix}.applies_to must be a non-empty string array")
+        else:
+            for selector in applies_to:
+                if selector in {"pull_request", "merge_group", "schedule", "push:main"}:
+                    continue
+                if (
+                    selector.startswith("workflow_dispatch:")
+                    and selector.removeprefix("workflow_dispatch:") in workflows
+                ):
+                    continue
+                errors.append(f"{prefix}.applies_to has unsupported selector {selector!r}")
         platforms = gate.get("platforms")
         if not isinstance(platforms, list) or not platforms or any(
-            not _is_string(item) for item in platforms
+            not _is_string(item) or item not in PLATFORMS for item in platforms
         ):
-            errors.append(f"{prefix}.platforms must be a non-empty string array")
-        if gate.get("required") and gate_class not in {
-            "required_ci",
-            "review_validity",
-            "merge_readiness",
-        }:
+            errors.append(f"{prefix}.platforms must be a non-empty recognized platform array")
+        if gate.get("required") and (
+            not _is_string(gate_class)
+            or gate_class not in {"required_ci", "review_validity", "merge_readiness"}
+        ):
             errors.append(f"{prefix}.required is incompatible with class {gate_class!r}")
 
     for gate_id, gate in by_id.items():
-        for prerequisite in gate.get("prerequisites", []):
+        for prerequisite in _as_list(gate.get("prerequisites")):
+            if not _is_string(prerequisite):
+                continue
             if prerequisite not in by_id:
                 errors.append(f"inventory.gates[{gate_id}]: unknown prerequisite {prerequisite!r}")
         if gate.get("required") and not gate.get("prerequisites", []) and gate.get("class") == "merge_readiness":
@@ -274,6 +316,7 @@ def validate_evidence(
     evidence: Any,
     *,
     trusted_base_commit: str | None = None,
+    trusted_head_commit: str | None = None,
     trusted_inventory_sha256: str | None = None,
 ) -> dict[str, Any]:
     errors = validate_inventory(inventory)
@@ -318,6 +361,10 @@ def validate_evidence(
         errors.append("trusted_base_commit must be supplied by the protected-base adapter")
     elif evidence.get("base_commit") != trusted_base_commit:
         errors.append("evidence.base_commit is stale relative to trusted_base_commit")
+    if not _is_sha(trusted_head_commit):
+        errors.append("trusted_head_commit must be supplied by the provider adapter")
+    elif evidence.get("head_commit") != trusted_head_commit:
+        errors.append("evidence.head_commit is stale relative to trusted_head_commit")
     if not _is_sha256(trusted_inventory_sha256):
         errors.append("trusted_inventory_sha256 must be supplied by the protected-base adapter")
     elif _canonical_sha256(inventory) != trusted_inventory_sha256:
@@ -335,7 +382,7 @@ def validate_evidence(
     for field in ("base_commit", "head_commit", "candidate_commit", "candidate_tree"):
         if not _is_sha(evidence.get(field)):
             errors.append(f"evidence.{field} must be a full 40-character commit/tree SHA")
-    if evidence.get("event") not in EVENTS:
+    if not _is_string(evidence.get("event")) or evidence.get("event") not in EVENTS:
         errors.append("evidence.event is not recognized")
     if not _valid_ref(evidence.get("event"), evidence.get("ref")):
         errors.append("evidence.ref is not a valid event-bound ref")
@@ -354,7 +401,7 @@ def validate_evidence(
             if revision_binding.get(field) != evidence.get(field):
                 errors.append(f"evidence.revision_binding.{field} does not match evidence")
     _validate_provider_binding(evidence, errors)
-    if evidence.get("platform") not in PLATFORMS:
+    if not _is_string(evidence.get("platform")) or evidence.get("platform") not in PLATFORMS:
         errors.append("evidence.platform is not recognized")
     if not _is_positive_int(evidence.get("run_id")):
         errors.append("evidence.run_id must be a positive integer")
@@ -386,9 +433,11 @@ def validate_evidence(
         for field in ("id", "path", "sha256", "media_type", "producer", "kind", "commit", "subject"):
             if not _is_string(artifact.get(field)):
                 errors.append(f"{prefix}.{field} is required")
-        for field in ("run_id", "run_attempt", "size_bytes"):
-            if not _is_positive_int(artifact.get(field)):
-                errors.append(f"{prefix}.{field} must be a positive integer")
+        if not _is_positive_int(artifact.get("size_bytes")):
+            errors.append(f"{prefix}.size_bytes must be a positive integer")
+        for field in ("run_id", "run_attempt"):
+            if field in artifact and not _is_positive_int(artifact.get(field)):
+                errors.append(f"{prefix}.{field} must be a positive integer when present")
         artifact_id = artifact.get("id")
         artifact_path = artifact.get("path")
         if _is_string(artifact_id):
@@ -421,7 +470,7 @@ def validate_evidence(
         gates = []
     seen_ids: set[str] = set()
     seen_provider_names: set[tuple[str, str]] = set()
-    seen_provider_ids: set[str] = set()
+    seen_provider_ids: set[tuple[str, str]] = set()
     gate_by_id: dict[str, dict[str, Any]] = {}
     for index, gate in enumerate(gates):
         prefix = f"evidence.gates[{index}]"
@@ -440,7 +489,7 @@ def validate_evidence(
         if definition is None:
             errors.append(f"{prefix}.id {gate_id!r} is not in the inventory")
             continue
-        for field in ("name", "producer", "provider_id", "commit", "status", "conclusion", "applicable"):
+        for field in ("name", "producer", "platform", "provider_id", "commit", "status", "conclusion", "applicable"):
             if field not in gate:
                 errors.append(f"{prefix}.{field} is required")
         if gate.get("name") != definition.get("name"):
@@ -453,31 +502,52 @@ def validate_evidence(
         seen_provider_names.add(provider_key)
         if not _is_string(gate.get("provider_id")):
             errors.append(f"{prefix}.provider_id is required and must not be inferred")
-        elif gate.get("provider_id") in seen_provider_ids:
-            errors.append(f"{prefix}.provider_id duplicates {gate.get('provider_id')!r}")
+        elif (str(gate.get("producer")), gate.get("provider_id")) in seen_provider_ids:
+            errors.append(f"{prefix}.provider_id duplicates within producer {gate.get('provider_id')!r}")
         else:
-            seen_provider_ids.add(gate.get("provider_id"))
+            seen_provider_ids.add((str(gate.get("producer")), gate.get("provider_id")))
         if not _is_sha(gate.get("commit")):
             errors.append(f"{prefix}.commit must be a full SHA")
         elif gate.get("commit", "").lower() != str(evidence.get("candidate_commit", "")).lower():
             errors.append(f"{prefix}.commit is not bound to evidence.candidate_commit")
-        if gate.get("status") not in STATUSES:
+        if not _is_string(gate.get("status")) or gate.get("status") not in STATUSES:
             errors.append(f"{prefix}.status is not recognized")
         if not _is_string(gate.get("conclusion")):
             errors.append(f"{prefix}.conclusion is required")
         if not isinstance(gate.get("applicable"), bool):
             errors.append(f"{prefix}.applicable must be boolean")
-        if gate.get("run_id") != evidence.get("run_id"):
-            errors.append(f"{prefix}.run_id must equal evidence.run_id")
-        if gate.get("run_attempt") != evidence.get("run_attempt"):
-            errors.append(f"{prefix}.run_attempt must equal evidence.run_attempt")
-        expected_prerequisites = sorted(definition.get("prerequisites", []))
-        actual_prerequisites = sorted(gate.get("prerequisites", []))
+        if definition.get("run_binding") == "status":
+            if "run_id" in gate or "run_attempt" in gate:
+                errors.append(f"{prefix}: commit status must not claim a workflow run")
+        else:
+            if not _is_positive_int(gate.get("run_id")):
+                errors.append(f"{prefix}.run_id must be a positive integer")
+            if not _is_positive_int(gate.get("run_attempt")):
+                errors.append(f"{prefix}.run_attempt must be a positive integer")
+        if definition.get("run_binding") == "primary":
+            if gate.get("applicable") and gate.get("producer") != evidence.get("producer"):
+                errors.append(f"{prefix}.producer must equal evidence.producer for a primary run")
+            if gate.get("run_id") != evidence.get("run_id"):
+                errors.append(f"{prefix}.run_id must equal evidence.run_id")
+            if gate.get("run_attempt") != evidence.get("run_attempt"):
+                errors.append(f"{prefix}.run_attempt must equal evidence.run_attempt")
+        expected_prerequisites = sorted(
+            item for item in _as_list(definition.get("prerequisites")) if _is_string(item)
+        )
+        actual_prerequisites = sorted(
+            item for item in _as_list(gate.get("prerequisites")) if _is_string(item)
+        )
+        if not isinstance(gate.get("prerequisites"), list) or len(actual_prerequisites) != len(
+            gate.get("prerequisites", [])
+        ):
+            errors.append(f"{prefix}.prerequisites must be a string array")
         if expected_prerequisites != actual_prerequisites:
             errors.append(f"{prefix}.prerequisites do not match inventory")
         if not _event_applies(definition, evidence) and gate.get("applicable"):
             errors.append(f"{prefix} is marked applicable for an event outside inventory applicability")
-        if gate.get("applicable") and evidence.get("platform") not in definition.get("platforms", []):
+        if not _is_string(gate.get("platform")) or gate.get("platform") not in PLATFORMS:
+            errors.append(f"{prefix}.platform is not recognized")
+        if gate.get("applicable") and gate.get("platform") not in _as_list(definition.get("platforms")):
             errors.append(f"{prefix} is marked applicable for an unsupported platform")
         if gate.get("applicable") is False:
             if gate.get("status") != "skipped":
@@ -485,19 +555,36 @@ def validate_evidence(
             if not _is_string(gate.get("skip_reason")):
                 errors.append(f"{prefix}.skip_reason is required for a non-applicable gate")
         elif gate.get("status") == "skipped":
-            errors.append(f"{prefix}: applicable gate cannot be skipped")
-        if gate.get("status") == "passed" and gate.get("conclusion") not in SUCCESS_CONCLUSIONS:
+            if definition.get("required"):
+                errors.append(f"{prefix}: applicable required gate cannot be skipped")
+            elif not _is_string(gate.get("skip_reason")):
+                errors.append(f"{prefix}.skip_reason is required for a skipped auxiliary gate")
+            else:
+                warnings.append(f"optional gate {gate_id} skipped: {gate.get('skip_reason')}")
+        if gate.get("status") == "passed" and (
+            not _is_string(gate.get("conclusion"))
+            or gate.get("conclusion") not in SUCCESS_CONCLUSIONS
+        ):
             errors.append(f"{prefix}: passed status requires a successful conclusion")
         if gate.get("applicable") and gate.get("status") != "passed" and definition.get("required"):
             errors.append(f"{prefix}: required gate is {gate.get('status')!r}, not passed")
         if gate.get("status") == "failed" and not definition.get("required"):
             warnings.append(f"optional gate {gate_id} failed; merge readiness is unaffected")
+        elif (
+            gate.get("applicable")
+            and not definition.get("required")
+            and _is_string(gate.get("status"))
+            and gate.get("status") in {"pending", "cancelled", "timed_out", "unknown"}
+        ):
+            warnings.append(f"optional gate {gate_id} is {gate.get('status')}")
         refs = gate.get("artifact_refs", [])
-        if not isinstance(refs, list) or any(ref not in artifact_ids for ref in refs):
+        if not isinstance(refs, list) or any(
+            not _is_string(ref) or ref not in artifact_ids for ref in refs
+        ):
             errors.append(f"{prefix}.artifact_refs contain an unknown artifact")
             refs = []
-        if gate.get("applicable") and not refs:
-            errors.append(f"{prefix}.artifact_refs must be non-empty for an applicable gate")
+        if gate.get("applicable") and gate.get("status") != "skipped" and not refs:
+            errors.append(f"{prefix}.artifact_refs must be non-empty for an observed applicable gate")
         if not gate.get("applicable") and refs:
             errors.append(f"{prefix}.artifact_refs must be empty for a non-applicable gate")
         for artifact_id in refs:
@@ -517,14 +604,21 @@ def validate_evidence(
                 errors.append(f"{prefix}: artifact kind does not match inventory")
             if artifact.get("subject") != gate_id:
                 errors.append(f"{prefix}: artifact subject does not match gate id")
-            if artifact.get("run_id") != evidence.get("run_id"):
-                errors.append(f"{prefix}: artifact run_id must equal evidence.run_id")
-            if artifact.get("run_attempt") != evidence.get("run_attempt"):
-                errors.append(f"{prefix}: artifact run_attempt must equal evidence.run_attempt")
+            if definition.get("run_binding") == "status":
+                if "run_id" in artifact or "run_attempt" in artifact:
+                    errors.append(f"{prefix}: commit-status artifact must not claim a workflow run")
+            else:
+                if artifact.get("run_id") != gate.get("run_id"):
+                    errors.append(f"{prefix}: artifact run_id must equal gate.run_id")
+                if artifact.get("run_attempt") != gate.get("run_attempt"):
+                    errors.append(f"{prefix}: artifact run_attempt must equal gate.run_attempt")
 
     for gate_id, definition in definitions.items():
-        if gate_id not in seen_ids:
-            errors.append(f"evidence is missing inventory gate {gate_id!r}")
+        if gate_id not in seen_ids and _event_applies(definition, evidence):
+            if definition.get("required"):
+                errors.append(f"evidence is missing required inventory gate {gate_id!r}")
+            else:
+                warnings.append(f"optional gate {gate_id} is missing")
         if _event_applies(definition, evidence) and gate_id in gate_by_id:
             if not gate_by_id[gate_id].get("applicable"):
                 errors.append(f"inventory gate {gate_id!r} applies to this event but evidence marked it non-applicable")
@@ -532,15 +626,32 @@ def validate_evidence(
     for gate_id, gate in gate_by_id.items():
         if gate.get("status") != "passed":
             continue
-        for prerequisite in gate.get("prerequisites", []):
+        for prerequisite in _as_list(gate.get("prerequisites")):
             prerequisite_gate = gate_by_id.get(prerequisite)
             if prerequisite_gate is None or prerequisite_gate.get("status") != "passed":
                 errors.append(f"evidence gate {gate_id!r} passed without passed prerequisite {prerequisite!r}")
 
+    auxiliary_healthy = not any(
+        definition.get("class") == "auxiliary"
+        and _event_applies(definition, evidence)
+        and (gate_by_id.get(gate_id, {}).get("status") != "passed")
+        for gate_id, definition in definitions.items()
+    )
+    required_ci_applicable = any(
+        definition.get("required") and _event_applies(definition, evidence)
+        for definition in definitions.values()
+    )
     return {
         "valid": not errors,
         "errors": errors,
         "warnings": warnings,
+        "claims": {
+            "required_ci_verified": not errors and required_ci_applicable,
+            "auxiliary_checks_healthy": auxiliary_healthy,
+            "all_pipelines_green": not errors and required_ci_applicable and auxiliary_healthy,
+            "merge_readiness": "not_evaluated",
+            "post_merge_health": "not_evaluated",
+        },
         "required_gates": sorted(
             gate_id for gate_id, definition in definitions.items() if definition.get("required")
         ),
@@ -553,6 +664,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--repo-root", type=Path, required=True)
     parser.add_argument("--evidence", type=Path, required=True)
     parser.add_argument("--trusted-base-commit", required=True)
+    parser.add_argument("--trusted-head-commit", required=True)
     return parser
 
 
@@ -565,6 +677,7 @@ def main(argv: list[str] | None = None) -> int:
             inventory,
             evidence,
             trusted_base_commit=args.trusted_base_commit,
+            trusted_head_commit=args.trusted_head_commit,
             trusted_inventory_sha256=_canonical_sha256(inventory),
         )
     except ValueError as exc:

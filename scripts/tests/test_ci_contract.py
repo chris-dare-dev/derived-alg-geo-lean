@@ -11,6 +11,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import yaml
+
 from scripts import ci_contract
 
 
@@ -21,15 +23,19 @@ SHA_B = "b" * 40
 SHA_C = "c" * 40
 
 
-def evidence(*, event: str = "pull_request") -> dict:
+def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dict:
     gates = []
     artifacts = []
-    ref = "refs/heads/main" if event == "push" else "refs/pull/1/merge"
-    candidate_commit = SHA_B if event == "push" else SHA_C
+    ref = "refs/heads/main" if event in {"push", "schedule", "workflow_dispatch"} else "refs/pull/1/merge"
+    candidate_commit = SHA_B if event in {"push", "schedule", "workflow_dispatch"} else SHA_C
+    base_commit = SHA_B if event in {"push", "schedule", "workflow_dispatch"} else SHA_A
+    producer = f"github-actions/{workflow or ('Docs' if event == 'schedule' else 'CI')}"
     candidate_tree = SHA_C
     parents = [SHA_A, SHA_B] if event == "pull_request" else []
     for index, definition in enumerate(INVENTORY["gates"], start=1):
-        applicable = ci_contract._event_applies(definition, {"event": event, "ref": ref})
+        applicable = ci_contract._event_applies(
+            definition, {"event": event, "ref": ref, "producer": producer}
+        )
         status = "passed" if applicable else "skipped"
         conclusion = "success" if applicable else "skipped"
         artifact_id = f"artifact-{index}"
@@ -54,6 +60,7 @@ def evidence(*, event: str = "pull_request") -> dict:
                 "id": definition["id"],
                 "name": definition["name"],
                 "producer": definition["producer"],
+                "platform": definition["platforms"][0],
                 "provider_id": f"run-3553-job-{index}",
                 "commit": candidate_commit,
                 "run_id": 35532316123,
@@ -67,16 +74,16 @@ def evidence(*, event: str = "pull_request") -> dict:
             }
         )
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "repository": INVENTORY["repository"],
-        "base_commit": SHA_A,
+        "base_commit": base_commit,
         "head_commit": SHA_B,
         "candidate_commit": candidate_commit,
         "candidate_tree": candidate_tree,
         "event": event,
         "ref": ref,
         "revision_binding": {
-            "base_commit": SHA_A,
+            "base_commit": base_commit,
             "head_commit": SHA_B,
             "candidate_commit": candidate_commit,
             "candidate_tree": candidate_tree,
@@ -85,12 +92,13 @@ def evidence(*, event: str = "pull_request") -> dict:
         },
         "policy_binding": {
             "source": "protected-base",
-            "commit": SHA_A,
+            "commit": base_commit,
             "inventory_sha256": ci_contract._canonical_sha256(INVENTORY),
         },
         "provider_binding": {
             "source": "github-api",
             "repository": INVENTORY["repository"],
+            "producer": producer,
             "run_id": 35532316123,
             "run_attempt": 1,
             "event": event,
@@ -102,7 +110,7 @@ def evidence(*, event: str = "pull_request") -> dict:
         "platform": "github-actions",
         "run_id": 35532316123,
         "run_attempt": 1,
-        "producer": "github-actions/CI",
+        "producer": producer,
         "toolchain": "lean-toolchain@fixture",
         "pins": {
             "lean-toolchain": "1" * 64,
@@ -124,10 +132,14 @@ def bind_provider_proof(candidate: dict) -> None:
 
 class ContractTests(unittest.TestCase):
     def evaluate(self, candidate: dict, inventory: dict = INVENTORY) -> dict:
+        direct_ref_event = isinstance(candidate.get("event"), str) and candidate["event"] in {
+            "push", "schedule", "workflow_dispatch"
+        }
         return ci_contract.validate_evidence(
             inventory,
             candidate,
-            trusted_base_commit=SHA_A,
+            trusted_base_commit=SHA_B if direct_ref_event else SHA_A,
+            trusted_head_commit=SHA_B,
             trusted_inventory_sha256=ci_contract._canonical_sha256(inventory),
         )
 
@@ -138,6 +150,32 @@ class ContractTests(unittest.TestCase):
 
     def test_inventory_is_complete_and_well_formed(self) -> None:
         self.assertEqual(ci_contract.validate_inventory(INVENTORY), [])
+
+    def test_inventory_rejects_unknown_scope_and_platform(self) -> None:
+        inventory = copy.deepcopy(INVENTORY)
+        inventory["gates"][0]["applies_to"].append("workflow_dispatch:Unknown")
+        inventory["gates"][0]["platforms"] = ["unknown-platform"]
+        errors = ci_contract.validate_inventory(inventory)
+        self.assertTrue(any("unsupported selector" in error for error in errors))
+        self.assertTrue(any("recognized platform" in error for error in errors))
+
+    def test_malformed_fields_fail_closed_without_crashing(self) -> None:
+        inventory = copy.deepcopy(INVENTORY)
+        inventory["gates"][0].update(
+            id=[],
+            **{"class": []},
+            applies_to=[{}],
+            platforms=[{}],
+            prerequisites=None,
+        )
+        self.assertTrue(ci_contract.validate_inventory(inventory))
+        candidate = evidence()
+        candidate["event"] = []
+        candidate["gates"][0].update(status=[], platform=[], prerequisites=None, artifact_refs=[{}])
+        bind_provider_proof(candidate)
+        result = self.evaluate(candidate)
+        self.assertFalse(result["valid"])
+        self.assertTrue(result["errors"])
 
     def test_revision_bound_evidence_passes(self) -> None:
         candidate = evidence()
@@ -156,6 +194,16 @@ class ContractTests(unittest.TestCase):
         bind_provider_proof(candidate)
         candidate["ref"] = "main"
         self.assert_invalid(candidate, "valid event-bound ref")
+
+    def test_push_and_schedule_are_main_only(self) -> None:
+        for event in ("push", "schedule"):
+            with self.subTest(event=event):
+                candidate = evidence(event=event)
+                candidate["ref"] = "refs/heads/agent/other"
+                candidate["revision_binding"]["ref"] = candidate["ref"]
+                candidate["provider_binding"]["ref"] = candidate["ref"]
+                bind_provider_proof(candidate)
+                self.assert_invalid(candidate, "valid event-bound ref")
 
     def test_revision_binding_mismatch_is_rejected(self) -> None:
         candidate = evidence()
@@ -186,6 +234,12 @@ class ContractTests(unittest.TestCase):
         candidate["provider_binding"]["proof_sha256"] = "0" * 64
         self.assert_invalid(candidate, "proof_sha256 does not bind")
 
+    def test_provider_producer_must_match_primary_record(self) -> None:
+        candidate = evidence()
+        candidate["provider_binding"]["producer"] = "github-actions/Docs"
+        bind_provider_proof(candidate)
+        self.assert_invalid(candidate, "provider_binding.producer does not match")
+
     def test_applicable_gate_requires_bound_artifact(self) -> None:
         candidate = evidence()
         bind_provider_proof(candidate)
@@ -213,7 +267,9 @@ class ContractTests(unittest.TestCase):
             id="legacy-status",
             producer="github-status/legacy",
             artifact="commit-status:build",
+            platforms=["github-status"],
             required=False,
+            run_binding="status",
             **{"class": "auxiliary"},
         )
         inventory["gates"].append(status_definition)
@@ -222,9 +278,12 @@ class ContractTests(unittest.TestCase):
         status_gate.update(
             id="legacy-status",
             producer="github-status/legacy",
+            platform="github-status",
             provider_id="status-17",
             artifact_refs=["legacy-status-artifact"],
         )
+        del status_gate["run_id"]
+        del status_gate["run_attempt"]
         candidate["gates"].append(status_gate)
         status_artifact = copy.deepcopy(candidate["artifacts"][0])
         status_artifact.update(
@@ -234,6 +293,8 @@ class ContractTests(unittest.TestCase):
             kind="commit-status:build",
             subject="legacy-status",
         )
+        del status_artifact["run_id"]
+        del status_artifact["run_attempt"]
         candidate["artifacts"].append(status_artifact)
         candidate["policy_binding"]["inventory_sha256"] = ci_contract._canonical_sha256(inventory)
         bind_provider_proof(candidate)
@@ -249,6 +310,7 @@ class ContractTests(unittest.TestCase):
             inventory,
             candidate,
             trusted_base_commit=SHA_A,
+            trusted_head_commit=SHA_B,
             trusted_inventory_sha256=ci_contract._canonical_sha256(INVENTORY),
         )
         self.assertFalse(result["valid"])
@@ -286,16 +348,129 @@ class ContractTests(unittest.TestCase):
             INVENTORY,
             candidate,
             trusted_base_commit=SHA_C,
+            trusted_head_commit=SHA_B,
             trusted_inventory_sha256=ci_contract._canonical_sha256(INVENTORY),
         )
         self.assertFalse(result["valid"])
         self.assertTrue(any("stale relative" in error for error in result["errors"]))
+
+    def test_stale_head_is_rejected_even_when_record_is_self_consistent(self) -> None:
+        candidate = evidence()
+        bind_provider_proof(candidate)
+        result = ci_contract.validate_evidence(
+            INVENTORY,
+            candidate,
+            trusted_base_commit=SHA_A,
+            trusted_head_commit=SHA_C,
+            trusted_inventory_sha256=ci_contract._canonical_sha256(INVENTORY),
+        )
+        self.assertFalse(result["valid"])
+        self.assertTrue(any("head_commit is stale" in error for error in result["errors"]))
 
     def test_rerun_attempt_mismatch_is_rejected(self) -> None:
         candidate = evidence()
         bind_provider_proof(candidate)
         candidate["gates"][0]["run_attempt"] = 2
         self.assert_invalid(candidate, "run_attempt must equal evidence.run_attempt")
+
+    def test_auxiliary_run_can_have_its_own_run_and_attempt(self) -> None:
+        candidate = evidence(event="push")
+        bind_provider_proof(candidate)
+        warm = next(gate for gate in candidate["gates"] if gate["id"] == "cache-warm")
+        warm["run_id"] = 987654321
+        warm["run_attempt"] = 2
+        artifact = next(item for item in candidate["artifacts"] if item["subject"] == "cache-warm")
+        artifact["run_id"] = warm["run_id"]
+        artifact["run_attempt"] = warm["run_attempt"]
+        result = self.evaluate(candidate)
+        self.assertTrue(result["valid"], result)
+        self.assertTrue(result["claims"]["all_pipelines_green"])
+
+    def test_missing_auxiliary_is_visible_without_failing_required_ci(self) -> None:
+        candidate = evidence()
+        bind_provider_proof(candidate)
+        candidate["gates"] = [
+            gate for gate in candidate["gates"] if gate["id"] != "github-advanced-security"
+        ]
+        result = self.evaluate(candidate)
+        self.assertTrue(result["valid"], result)
+        self.assertTrue(result["claims"]["required_ci_verified"])
+        self.assertFalse(result["claims"]["all_pipelines_green"])
+        self.assertTrue(any("github-advanced-security is missing" in w for w in result["warnings"]))
+
+    def test_missing_required_gate_still_denies_ci_claim(self) -> None:
+        candidate = evidence()
+        bind_provider_proof(candidate)
+        candidate["gates"] = [gate for gate in candidate["gates"] if gate["id"] != "build"]
+        result = self.evaluate(candidate)
+        self.assertFalse(result["valid"])
+        self.assertFalse(result["claims"]["required_ci_verified"])
+        self.assertTrue(any("missing required inventory gate 'build'" in e for e in result["errors"]))
+
+    def test_auxiliary_artifact_must_match_its_own_run(self) -> None:
+        candidate = evidence(event="push")
+        bind_provider_proof(candidate)
+        warm = next(gate for gate in candidate["gates"] if gate["id"] == "cache-warm")
+        warm["run_id"] = 987654321
+        self.assert_invalid(candidate, "artifact run_id must equal gate.run_id")
+
+    def test_optional_cancellation_is_visible(self) -> None:
+        candidate = evidence(event="push")
+        bind_provider_proof(candidate)
+        warm = next(gate for gate in candidate["gates"] if gate["id"] == "cache-warm")
+        warm.update(status="cancelled", conclusion="cancelled")
+        result = self.evaluate(candidate)
+        self.assertTrue(result["valid"], result)
+        self.assertFalse(result["claims"]["all_pipelines_green"])
+        self.assertTrue(any("cache-warm is cancelled" in w for w in result["warnings"]))
+
+    def test_scheduled_docs_skip_is_explicit(self) -> None:
+        candidate = evidence(event="schedule")
+        bind_provider_proof(candidate)
+        skipped = {"docs-build", "docs-deploy"}
+        for gate in candidate["gates"]:
+            if gate["id"] in skipped:
+                gate.update(status="skipped", conclusion="skipped", skip_reason="no recent commits")
+                gate["artifact_refs"] = []
+        candidate["artifacts"] = [
+            artifact for artifact in candidate["artifacts"] if artifact["subject"] not in skipped
+        ]
+        result = self.evaluate(candidate)
+        self.assertTrue(result["valid"], result)
+        self.assertFalse(result["claims"]["required_ci_verified"])
+        self.assertFalse(result["claims"]["all_pipelines_green"])
+        self.assertTrue(any("docs-build skipped" in w for w in result["warnings"]))
+
+    def test_manual_dispatch_applies_only_to_its_workflow(self) -> None:
+        ci = evidence(event="workflow_dispatch")
+        bind_provider_proof(ci)
+        ci_result = self.evaluate(ci)
+        self.assertTrue(ci_result["valid"], ci_result)
+        self.assertTrue(ci_result["claims"]["required_ci_verified"])
+        self.assertTrue(ci_result["claims"]["all_pipelines_green"])
+        docs = evidence(event="workflow_dispatch", workflow="Docs")
+        bind_provider_proof(docs)
+        docs_result = self.evaluate(docs)
+        self.assertTrue(docs_result["valid"], docs_result)
+        self.assertFalse(docs_result["claims"]["required_ci_verified"])
+        self.assertFalse(docs_result["claims"]["all_pipelines_green"])
+
+    def test_inventory_names_match_checked_in_workflow_jobs(self) -> None:
+        workflows = {
+            "CI": ROOT / ".github/workflows/ci.yml",
+            "Cache warm": ROOT / ".github/workflows/cache-warm.yml",
+            "Docs": ROOT / ".github/workflows/docs.yml",
+        }
+        jobs = {
+            producer: set(yaml.safe_load(path.read_text(encoding="utf-8"))["jobs"])
+            for producer, path in workflows.items()
+        }
+        for gate in INVENTORY["gates"]:
+            producer = gate["producer"]
+            if not producer.startswith("github-actions/"):
+                continue
+            workflow = producer.removeprefix("github-actions/")
+            self.assertIn(gate["name"], jobs[workflow], gate)
 
     def test_cancelled_and_timed_out_required_work_is_rejected(self) -> None:
         for status in ("cancelled", "timed_out"):
@@ -350,7 +525,7 @@ class ContractTests(unittest.TestCase):
         candidate = evidence()
         bind_provider_proof(candidate)
         candidate["schema_version"] = 99
-        self.assert_invalid(candidate, "evidence.schema_version must be 3")
+        self.assert_invalid(candidate, "evidence.schema_version must be 4")
 
     def test_passed_gate_requires_passed_prerequisites(self) -> None:
         candidate = evidence()
