@@ -25,6 +25,10 @@ import DerivedAlgGeo.Algebra.Module.Localization
 
 #print axioms Module.exists_finitely_presented_fixedTargetArrow_of_isLocalization
 
+/-! ## Three-term descent with a fixed terminal module -/
+
+#print axioms Module.exists_finitely_presented_fixedTerminalThreeTerm_of_isLocalization
+
 /-! ## Cohomology of a localized three-term complex -/
 
 #print axioms IsLocalizedModule.boundaryToCycles
