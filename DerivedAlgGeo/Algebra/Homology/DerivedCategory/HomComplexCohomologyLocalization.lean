@@ -60,7 +60,9 @@ def derivedLocalizationComparison (X : CochainComplex (ModuleCat.{u} R) ℤ) :
   ((F S).mapDerivedCategoryFactorsh).app
     ((HomotopyCategory.quotient _ (.up ℤ)).obj X)
 
-private instance : Functor.Linear R (F S) where
+/-- `R`-linearity of localization, used only to build the linear Hom map;
+it is deliberately not registered as an instance for importers. -/
+private abbrev localizedFunctorLinear : Functor.Linear R (F S) where
   map_smul {M N} f r := by
     apply ModuleCat.hom_ext
     ext y
@@ -90,7 +92,9 @@ def derivedHomLocalizedMap (P Q : CochainComplex (ModuleCat.{u} R) ℤ) :
   toFun f := (derivedLocalizationComparison S P).inv ≫
     (F S).mapDerivedCategory.map f ≫ (derivedLocalizationComparison S Q).hom
   map_add' f g := by simp
-  map_smul' r f := by simp
+  map_smul' r f := by
+    letI : Functor.Linear R (F S) := localizedFunctorLinear S
+    simp
 
 variable (P Q : CochainComplex (ModuleCat.{u} R) ℤ)
   [P.IsKProjective]

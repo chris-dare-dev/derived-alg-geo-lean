@@ -13,20 +13,22 @@ import Mathlib.Algebra.Homology.DerivedCategory.Linear
 For a K-projective source in an `R`-linear abelian category, the existing
 additive comparison factors through the canonical class-to-homotopy
 equivalence and is `R`-linear. The class module instance is scoped; this is a
-comparison of Hom-sets, not an internal derived-Hom construction.
+comparison of Hom-sets, not an internal derived-Hom construction. The separate
+integer equivalence uses the canonical integer actions on both additive groups.
 -/
 
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
 open CategoryTheory
-open scoped CochainComplex.HomComplex
 
 namespace CochainComplex.HomComplex.CohomologyClass
 
 universe u v w
 
 noncomputable section
+
+open scoped CochainComplex.HomComplex
 
 variable {R : Type u} [CommRing R]
   {C : Type v} [Category.{w} C] [Abelian C] [Linear R C] [HasDerivedCategory C]
@@ -61,5 +63,20 @@ def derivedCategoryHomLinearEquiv :
       simp only [Functor.map_smul] }
 
 end
+
+section IntegerCoefficients
+
+variable {C : Type v} [Category.{w} C] [Abelian C] [HasDerivedCategory C]
+  (K L : CochainComplex C ℤ) [K.IsKProjective]
+
+/-- The same additive class-to-derived equivalence with the ordinary integer
+actions on both Hom groups. This does not use the scoped transported action. -/
+noncomputable def derivedCategoryHomIntLinearEquiv :
+    CohomologyClass K L 0 ≃ₗ[ℤ]
+      (DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj K) ⟶
+        DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj L)) :=
+  (derivedCategoryHomAddEquiv K L).toIntLinearEquiv
+
+end IntegerCoefficients
 
 end CochainComplex.HomComplex.CohomologyClass

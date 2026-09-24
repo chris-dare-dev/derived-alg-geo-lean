@@ -69,13 +69,19 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomAddEquiv
 #print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomAddEquiv_apply_eq
 #print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomLinearEquiv
+#print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomIntLinearEquiv
 #print axioms CochainComplex.HomComplex.derivedLocalizationComparison
 #print axioms CochainComplex.HomComplex.derivedHomLocalizedMap
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedIntMap
 #print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_derived_naturality
 #print axioms CochainComplex.HomComplex.derivedHomLocalizedMap_class_square
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedIntMap_class_square
 #print axioms CochainComplex.HomComplex.derivedHomLocalizedMap_isLocalized
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedIntMap_isLocalized
 #print axioms CochainComplex.HomComplex.derivedHomLocalizedMap_isLocalized_of_bounded_above_below
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedIntMap_isLocalized_of_bounded_above_below
 #print axioms CochainComplex.HomComplex.derivedHomLocalizedMap_isLocalized_of_bounded_projective
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedIntMap_isLocalized_of_bounded_projective
 
 /-! A downstream client through the DerivedCategory umbrella, with the full
 localized complex type written out rather than a private abbreviation. -/
@@ -111,6 +117,61 @@ example [P.IsKProjective]
   CochainComplex.HomComplex.derivedHomLocalizedMap_isLocalized S P Q hclass
 
 end DerivedHomLocalizationClient
+
+/-! The ordinary integer actions elaborate without opening the scoped
+Hom-complex or `ModuleCat.Algebra` module actions. -/
+noncomputable section DerivedHomIntegerClient
+
+open CategoryTheory CategoryTheory.Limits
+
+variable (S : Submonoid ℤ) (P Q : CochainComplex (ModuleCat ℤ) ℤ)
+
+local instance : HasDerivedCategory (ModuleCat ℤ) := HasDerivedCategory.standard _
+local instance : HasDerivedCategory (ModuleCat (Localization S)) :=
+  HasDerivedCategory.standard _
+
+example [P.IsKProjective] :
+    CochainComplex.HomComplex.CohomologyClass P Q 0 ≃ₗ[ℤ]
+      (DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj P) ⟶
+        DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj Q)) :=
+  CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomIntLinearEquiv P Q
+
+example :
+    (DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj P) ⟶
+      DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj Q)) →ₗ[ℤ]
+    (DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj
+        (((ModuleCat.localizedModuleFunctor S).mapHomologicalComplex (.up ℤ)).obj P)) ⟶
+      DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj
+        (((ModuleCat.localizedModuleFunctor S).mapHomologicalComplex (.up ℤ)).obj Q))) :=
+  CochainComplex.HomComplex.derivedHomLocalizedIntMap S P Q
+
+example (c b : ℤ) [P.IsStrictlyLE b] [Q.IsStrictlyGE c]
+    [∀ i : ℤ, Projective (P.X i)]
+    [∀ i : {p : ℤ // p ∈ Finset.Icc (c - 1) b},
+      Module.FinitePresentation ℤ (P.X i.1)] :
+    IsLocalizedModule S (CochainComplex.HomComplex.derivedHomLocalizedIntMap S P Q) :=
+  CochainComplex.HomComplex.derivedHomLocalizedIntMap_isLocalized_of_bounded_projective
+    S P Q c b
+
+end DerivedHomIntegerClient
+
+/-! Importing the comparison must not register a generic `R`-linear instance
+for the localization functor in downstream typeclass search. -/
+section DerivedHomFunctorIsolation
+
+open CategoryTheory
+open scoped ModuleCat.Algebra
+
+universe v
+
+variable {A : Type v} [CommRing A] (T : Submonoid A)
+
+example : True := by
+  fail_if_success
+    haveI : Functor.Linear A (ModuleCat.localizedModuleFunctor.{v} T) := inferInstance
+  trivial
+
+end DerivedHomFunctorIsolation
 
 /-! ## K-projective derived functors -/
 
