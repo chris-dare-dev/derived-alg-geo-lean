@@ -188,6 +188,21 @@ theorem heartFunctor_map (r : t.Restriction F)
     (r.heartFunctor.map f).hom = F.map f.hom :=
   rfl
 
+/-- Objectwise, a t-exact triangulated functor commutes with degree-zero
+heart cohomology. Naturality of this comparison is a separate assertion. -/
+noncomputable def heartH0Comparison
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) (X : C) :
+    r.heartFunctor.obj (t.heartH0Functor.obj X) ≅
+      (r.tStructure.heartH0Functor).obj (F.obj X) := by
+  letI : F.IsTExact t r.tStructure := r.isTExact
+  refine ObjectProperty.isoMk _ ?_
+  change F.obj ((t.truncGE 0).obj ((t.truncLE 0).obj X)) ≅
+    (r.tStructure.truncGE 0).obj ((r.tStructure.truncLE 0).obj (F.obj X))
+  exact (F.mapTruncGEIso t r.tStructure 0 ((t.truncLE 0).obj X)) ≪≫
+    (r.tStructure.truncGE 0).mapIso (F.mapTruncLEIso t r.tStructure 0 X)
+
 /-- The restriction to hearts is additive when the ambient functor is additive. -/
 noncomputable instance heartFunctor_additive
     [F.Additive] (r : t.Restriction F) :
