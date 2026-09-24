@@ -1,0 +1,134 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: sf8-5-task12-kflat-pullback
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: sf8-sf9-pilot
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/sf8-sf9-supported-moduli/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: true
+
+mutations:
+  comment_issue: false
+  close_issue: false
+  create_issue: true
+  push_branch: true
+  create_pr: true
+  ready_pr: true
+  approve_pr: false
+  merge_pr: true
+
+issues:
+  - number: 554
+    slug: sf8-5-task12-kflat-pullback
+    depends_on: []
+    chunks:
+      - id: sf8-5-task12-kflat-pullback
+        scope: >-
+          For every scheme X, construct a functorial K-flat replacement for all
+          unbounded complexes in X.Modules; for every S, T U : SchemeBaseChange S,
+          and morphism f : T ⟶ U, prove the replacement is pullback-acyclic and
+          use it to inhabit LeftDerivedPullback f. Do not restrict to bounded,
+          quasicoherent, Noetherian, flat, exact, or affine inputs, and do not
+          claim preservation or coherence assigned to tasks 1.3 and 1.4.
+        requirements:
+          - "Supported arbitrary derived pullbacks are constructed"
+        files:
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/Unbounded.lean
+          - DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/KFlatPullback.lean
+          - scripts/AlgebraicGeometryAudit/StabilityConditionFamilies.lean
+          - docs/architecture/generalization-backlog.md
+          - docs/architecture/loop-engineering-friction.md
+          - openspec/changes/sf8-sf9-pilot/proposal.md
+          - openspec/changes/sf8-sf9-pilot/design.md
+          - openspec/changes/sf8-sf9-pilot/tasks.md
+          - openspec/changes/sf8-sf9-pilot/specs/sf8-sf9-supported-moduli/spec.md
+        acceptance:
+          - >-
+            For every scheme X, the public API constructs an actual
+            SchemeKFlatResolution X, functorial in all objects and morphisms
+            of CochainComplex X.Modules ℤ, with comparison, quasi-isomorphism,
+            and K-flatness evidence for every unbounded complex. No structure
+            field is supplied by an unproved typeclass or opaque existence
+            premise.
+          - >-
+            For every S, T U : SchemeBaseChange S, and f : T ⟶ U, the
+            constructed resolution is accompanied by separate, actual
+            KFlatPullbackAcyclic evidence for complexPullback f; this must be
+            proved and is not inferred from SchemeKFlatResolution's total-
+            tensor K-flatness fields alone. The proof introduces no
+            flatness, exactness, boundedness, quasicoherence, affine, or
+            Noetherian assumption.
+          - >-
+            An actual LeftDerivedPullback f is constructed from the supplied
+            resolution and proved acyclicity with no caller-supplied resolution
+            or preservation assertion. Its domain remains the unbounded
+            derived category of all scheme-module sheaves.
+          - >-
+            This progress chunk makes no pseudo-coherence, finite-Tor,
+            negative-Ext, relative-perfect preservation, identity/composition
+            coherence, pentagon, or affine-specialization claim; those remain
+            assigned to tasks 1.3 and 1.4.
+          - >-
+            Every new public declaration is recorded in the geometric
+            families audit; no duplicate resolution/pullback carrier, sorry,
+            admit, or new axiom is introduced. Existing Tensor and Families
+            umbrellas continue to expose the implementation without an
+            unrelated import-boundary change.
+          - >-
+            The PR is progress-only and uses a non-closing reference to #554;
+            #522 and #525 remain unselected. The targeted module build,
+            all gates applicable to changed files, four independent reviews
+            on the same final commit, and required hosted ci check pass before
+            merge. Run scripts/precheck.sh and record its exact result; the
+            current baseline's known loop-spec failure for #1394 does not
+            count as green and does not block this chunk if it remains the
+            only failing precheck gate. The loop-engine-tests and every other
+            precheck gate must pass; refresh these expectations against the
+            exact base before each implementation PR.
+        closure: progress
