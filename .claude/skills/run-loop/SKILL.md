@@ -379,6 +379,9 @@ permissions remain separate; a research approval grants none.
 
 The PR can open as soon as the plan commit exists: CI then runs while the
 panel reviews. It must not be marked ready or merged before the ledger passes.
+After a pass, push and PR creation stay bound to the latest passing round's
+reviewed change; changed implementation goes through exact CI-failure admission
+and a charged panel.
 
 1. Push and create the PR through the controller (`action push`,
    `action create-pr --draft`), supplying the ledger. The PR body states the
@@ -394,14 +397,13 @@ panel reviews. It must not be marked ready or merged before the ledger passes.
    as the next round. If the ledger had already passed, first admit the repair
    using the exact current failed-check evidence described below.
 4. If `main` moved, merge `origin/main` into the branch (never rebase a pushed
-   branch; a push must fast-forward), rerun the targeted checks, and push.
-   A head that carries the same change keeps the
-   pass, as long as only progress records changed and the base left the
-   reviewed files, their direct imports and the pins alone. Otherwise, when
-   `action ready` or `action merge` reports that the head does not carry the
-   reviewed change, run one revalidation panel on the new commit, for example
-   after a conflict resolution. It needs all four reviewers and does not spend
-   the improvement cap; at most two are allowed.
+   branch; a push must fast-forward) and rerun the targeted checks. If the base
+   left the reviewed files, their direct imports and the pins alone, push the
+   same reviewed change. If the base changed something under review, first run
+   one revalidation panel on a commit that carries the new base and preserves
+   the reviewed change; it needs all four reviewers and does not spend the
+   improvement cap, with at most two allowed. A changed implementation cannot
+   use revalidation.
 5. If `predecessor_attestation.emit` is true, run `action attest-pr` after the
    ledger passes and before merging. It binds the current PR head.
 6. Run `action merge`. The controller pins `--match-head-commit` to the head it
@@ -432,9 +434,9 @@ Use the existing ledger and a full candidate SHA:
 The candidate must descend from the failed PR head and stay within frozen
 chunk paths. Admission appends exact evidence to `ci_failure_repairs` and
 allocates the next ordinary panel round, counting against the original cap.
-Do not create a replacement ledger. For a ledger created before this protocol,
-rerun `ledger init` once to add the repair metadata while preserving every
-existing review round. A repeated repair needs a passing prior repair followed
+Do not create a replacement ledger. Ledgers created before this protocol are
+read with compatibility defaults; `ledger init` does not rewrite their stored
+bytes. A repeated repair needs a passing prior repair followed
 by a new failure on the then-current PR head. If the cap is already used, the
 ledger becomes terminal `repair_exhausted`. Push, PR creation, attestation,
 ready, approval, merge and close all check the ledger repair state;

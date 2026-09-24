@@ -299,11 +299,14 @@ Code issues may only be closed after a confirmed merged pull request.
   three-round cap. A failed repair may be followed by another only after the
   prior repair passes and a later exact-head required check fails. If no round
   remains, the same ledger records terminal `repair_exhausted`; a new state
-  directory or renamed ledger cannot reset it. Every publication and closure
-  action checks this repair state. Older ledgers must be upgraded by rerunning
-  `ledger init`; the one-way migration adds protocol metadata without changing
-  existing rounds. `action push` and `action close` require `--ledger`.
-  After repair, push verifies the bound PR and remote source head, and
-  `action create-pr` cannot replace that PR. Draft PR creation remains
-  available before any repair event. A passed repair still needs current green
-  required checks on the exact live PR head before merge.
+  directory, renamed ledger, symlink, or sibling worktree cannot reset it.
+  Every publication and closure action checks this repair state. Older ledgers
+  remain byte-for-byte unchanged when `ledger init` is rerun; publication reads
+  a missing repair-event list as empty but rejects repair rounds or exhaustion
+  without their event history. `action push` and `action close` require `--ledger`.
+  After a pass, push and PR creation are checked against the latest passing
+  round, so changed implementation must use exact failure admission and a
+  charged repair review. After repair, push verifies the bound PR and remote
+  source head, and `action create-pr` cannot replace that PR. Draft PR creation
+  remains available before any repair event. A passed repair still needs
+  current green required checks on the exact live PR head before merge.

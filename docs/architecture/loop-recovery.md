@@ -66,11 +66,13 @@ the same head creates no event; another failure can be admitted only after a
 repair has passed and the later failing check is on the then-current head. If
 the original round cap has no slot left, the controller records
 `cap_exhausted` and terminal `repair_exhausted` in that same ledger. Ledger
-initialization scans nested `.loop-runs` state by issue, slug and chunk identity,
-and rejects state-directory overrides outside that root, preventing a renamed
-or relocated ledger from restarting the allowance. A ledger created before
-this protocol must be upgraded once by rerunning `ledger init`; the migration
-adds only missing protocol metadata and retains all prior rounds.
+initialization scans nested `.loop-runs` state by issue, slug and chunk identity
+across all linked worktrees, and rejects state-directory overrides or resolved
+ledger paths outside that root. A renamed ledger, symlink, or sibling worktree
+cannot restart the allowance. Ledgers created before this protocol remain
+byte-for-byte unchanged when `ledger init` is rerun; publication reads a missing
+repair-event list as empty, but fails closed if repair rounds or exhaustion exist
+without their event history.
 
 All shipping and issue-closure actions consult the same ledger and reject
 pending, exhausted or mismatched repair state. A first draft PR remains possible

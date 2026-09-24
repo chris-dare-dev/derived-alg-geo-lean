@@ -1110,6 +1110,43 @@ def recovery_directory(root: Path) -> Path:
     return repo_path(root, common).resolve() / "loop-objectives"
 
 
+def repository_worktree_roots(root: Path) -> list[Path]:
+    """Return every live checkout sharing this repository's Git directory."""
+    output = git(root, "worktree", "list", "--porcelain", check=False)
+    roots: set[Path] = {root.resolve()}
+    for line in output.splitlines():
+        if not line.startswith("worktree "):
+            continue
+        candidate = Path(line[len("worktree "):])
+        if not candidate.is_absolute():
+            candidate = root / candidate
+        if not candidate.is_dir():
+            continue
+        top = git(candidate, "rev-parse", "--show-toplevel", check=False)
+        if top:
+            roots.add(Path(top).resolve())
+    return sorted(roots)
+
+
+def canonical_ledger_root(root: Path) -> Path:
+    """Return the real `.loop-runs` directory and reject a redirected root."""
+    root = root.resolve()
+    runs_root = root / ".loop-runs"
+    if runs_root.is_symlink():
+        raise LoopError("the repository's .loop-runs root must not be a symlink")
+    return ensure_inside(root, runs_root)
+
+
+def ordinary_ledger_files(root: Path) -> list[Path]:
+    """Find ordinary ledgers in the ignored state trees of every worktree."""
+    found: set[Path] = set()
+    for worktree in repository_worktree_roots(root):
+        runs_root = canonical_ledger_root(worktree)
+        if runs_root.is_dir():
+            found.update(path.resolve() for path in runs_root.rglob("*") if path.is_file())
+    return sorted(found)
+
+
 def recovery_registry(root: Path) -> list[tuple[Path, dict[str, Any]]]:
     if not git(root, "rev-parse", "--git-common-dir", check=False):
         return []
@@ -2049,12 +2086,17 @@ def preflight(root: Path, spec_path: Path) -> int:
 def state_path(root: Path, spec: dict[str, Any], requested: str | None, chunk_id: str) -> Path:
     directory = repo_path(root, requested or spec.get("state_dir", ".loop-runs"))
     ensure_inside(root, directory)
-    canonical_runs = (root / ".loop-runs").resolve()
+    canonical_runs = canonical_ledger_root(root)
     try:
         directory.relative_to(canonical_runs)
     except ValueError as exc:
         raise LoopError("ledger state directories must remain under the repository's .loop-runs root") from exc
-    return ensure_inside(root, directory / f"{chunk_id}.json")
+    target = ensure_inside(root, directory / f"{chunk_id}.json")
+    try:
+        target.relative_to(canonical_runs)
+    except ValueError as exc:
+        raise LoopError("ledger files must resolve under the repository's .loop-runs root") from exc
+    return target
 
 
 def refuse_renamed_ledger(
@@ -2065,17 +2107,9 @@ def refuse_renamed_ledger(
     chunk_id: str,
     expected: Path,
 ) -> None:
-    """Refuse to start a chunk that already has a ledger under another filename.
-
-    The state directory is gitignored, so renaming a ledger left no trace and
-    reset a chunk's review history. Identity is (spec_id, chunk_id), not the
-    file name, so scan the whole directory for it.
-    """
-    directory = (root / ".loop-runs").resolve()
+    """Refuse another ledger for this issue/slug/chunk in any linked worktree."""
     slug = issue_entry(spec, number)["slug"]
-    if not directory.is_dir():
-        return
-    for candidate in sorted(path for path in directory.rglob("*") if path.is_file()):
+    for candidate in ordinary_ledger_files(root):
         if candidate.resolve() == expected.resolve():
             continue
         try:
@@ -2099,7 +2133,7 @@ def refuse_renamed_ledger(
             raise LoopError(
                 f"chunk {chunk_id!r} for issue #{number} ({slug}) already has a ledger at "
                 f"{candidate} with status {data.get('status')!r}; "
-                "renaming a ledger does not start a fresh review"
+                "renaming a ledger or switching worktrees does not start a fresh review"
             )
 
 
@@ -2259,18 +2293,6 @@ def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, request
             existing = load_state(path)
             if existing.get("spec_digest") != digest(spec) or not ledger_openspec_matches(root, spec, existing):
                 raise LoopError(f"ledger already exists with a different spec: {path}")
-            if any(
-                key not in existing
-                for key in ("repository", "remote", "base_branch", "ci_failure_repairs")
-            ):
-                # A ledger created before the CI-repair protocol must be
-                # explicitly upgraded before it can publish again. Preserve
-                # every existing round and add only the protocol metadata.
-                existing.setdefault("repository", spec["repository"])
-                existing.setdefault("remote", spec["remote"])
-                existing.setdefault("base_branch", spec["base_branch"])
-                existing.setdefault("ci_failure_repairs", [])
-                write_json(path, existing)
             print(f"PASS ledger already initialized: {path}")
             return 0
         state = {
@@ -2374,7 +2396,7 @@ def require_revalidation_needed(state: dict[str, Any], commit: str) -> None:
 
     passed = latest_round(state)
     root_text = state.get("repo_root")
-    if passed is None or not root_text or not state.get("repository") or not state.get("remote") or not state.get("base_branch"):
+    if passed is None or not root_text:
         raise LoopError("ledger has no passing round or repository to revalidate against")
     root = Path(root_text)
     candidate = git(root, "rev-parse", "--verify", "--end-of-options", f"{commit}^{{commit}}", check=False)
@@ -2388,11 +2410,7 @@ def require_revalidation_needed(state: dict[str, Any], commit: str) -> None:
     if reviewed_commit_matches_head(root, reviewed_commit, candidate):
         raise LoopError("ledger is passed for this exact commit; no further review is needed")
 
-    provider = {
-        "repository": state["repository"],
-        "remote": state["remote"],
-        "base_branch": state["base_branch"],
-    }
+    provider = revalidation_provider(state)
     ensure_commit(root, provider["remote"], candidate)
     ensure_commit(root, provider["remote"], reviewed_commit)
     base = trusted_base_commit(root, provider)
@@ -2430,6 +2448,42 @@ def require_revalidation_needed(state: dict[str, Any], commit: str) -> None:
     used = sum(1 for round_state in state.get("rounds", []) if is_revalidation(round_state))
     if used >= MAX_REVALIDATION_ROUNDS:
         raise LoopError(f"revalidation limit reached ({MAX_REVALIDATION_ROUNDS}); the passed change cannot be reopened again")
+
+
+def revalidation_provider(state: dict[str, Any]) -> dict[str, str]:
+    """Read old ledger provider identity without rewriting its stored bytes."""
+    root_text = state.get("repo_root")
+    base_ref = state.get("base_ref")
+    if not isinstance(root_text, str) or not isinstance(base_ref, str):
+        raise LoopError("ledger predates provider identity and has no base ref for read-compatible revalidation")
+    root = Path(root_text)
+    remotes = git(root, "remote", check=False).splitlines()
+    remote = state.get("remote")
+    if not isinstance(remote, str) or not remote:
+        matching = [name for name in remotes if base_ref.startswith(name + "/")]
+        if matching:
+            remote = max(matching, key=len)
+        elif "/" in base_ref:
+            remote = base_ref.split("/", 1)[0]
+        else:
+            raise LoopError("cannot derive the ledger remote from its recorded base ref")
+    if not base_ref.startswith(remote + "/"):
+        raise LoopError("ledger remote does not match its recorded base ref")
+    base_branch = state.get("base_branch")
+    if not isinstance(base_branch, str) or not base_branch:
+        base_branch = base_ref[len(remote) + 1:]
+    if not base_branch or base_ref != f"{remote}/{base_branch}":
+        raise LoopError("ledger base branch does not match its recorded base ref")
+
+    repository = state.get("repository")
+    if not isinstance(repository, str) or not repository:
+        urls = git(root, "remote", "get-url", "--all", remote, check=False).splitlines()
+        urls += git(root, "remote", "get-url", "--push", "--all", remote, check=False).splitlines()
+        repositories = {normalize_remote(url) for url in urls if url.strip()}
+        if len(repositories) != 1:
+            raise LoopError("cannot derive one repository identity from the ledger remote")
+        repository = repositories.pop()
+    return {"repository": repository, "remote": remote, "base_branch": base_branch}
 
 
 def ensure_review_round(state: dict[str, Any], commit: str) -> dict[str, Any]:
@@ -3072,6 +3126,8 @@ def action_push(
             if already_published:
                 print(f"PASS reviewed CI repair is already published on PR #{state['ci_failure_repairs'][-1]['pr_number']}")
                 return 0
+        else:
+            require_passing_reviewed_change(root, spec, state, "push")
     # Authority was read for spec.repository; the push must land there too.
     # A remote may carry several push URLs and `git push` delivers to all.
     for flags in (["--all"], ["--push", "--all"]):
@@ -3321,6 +3377,10 @@ def action_create_pr(
         if git(root, "status", "--porcelain", "--untracked-files=all"):
             raise LoopError("PR creation requires a clean frozen checkout")
         recovery_scoped_paths(root, spec, recovered, local_head, trusted_base_commit(root, spec))
+    else:
+        if not draft and state.get("status") != "passed":
+            raise LoopError("PR creation before a passing review must remain a draft")
+        require_passing_reviewed_change(root, spec, state, "PR creation")
     issue = selected_issue_for_action(spec, number)
     require_legacy_issue_open(root, spec, number)
     current = git(root, "branch", "--show-current")
@@ -3919,7 +3979,7 @@ def validate_repair_candidate(root: Path, spec: dict[str, Any], state: dict[str,
 
 def require_canonical_ledger_identity(root: Path, ledger_file: Path, state: dict[str, Any]) -> None:
     path = ensure_inside(root, ledger_file)
-    runs_root = (root / ".loop-runs").resolve()
+    runs_root = canonical_ledger_root(root)
     try:
         path.relative_to(runs_root)
     except ValueError as exc:
@@ -3928,23 +3988,22 @@ def require_canonical_ledger_identity(root: Path, ledger_file: Path, state: dict
     if not isinstance(issue, dict) or not isinstance(chunk, dict):
         raise LoopError("ledger has no frozen issue and chunk identity")
     matches: list[Path] = []
-    if runs_root.is_dir():
-        for candidate in (path for path in runs_root.rglob("*") if path.is_file()):
-            try:
-                record = json.loads(candidate.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError):
-                continue
-            if not isinstance(record, dict) or record.get("schema") != f"{RUN_SCHEMA}/ledger":
-                continue
-            record_issue, record_chunk = record.get("issue"), record.get("chunk")
-            if (
-                isinstance(record_issue, dict)
-                and isinstance(record_chunk, dict)
-                and record_issue.get("number") == issue.get("number")
-                and record_issue.get("slug") == issue.get("slug")
-                and record_chunk.get("id") == chunk.get("id")
-            ):
-                matches.append(candidate.resolve())
+    for candidate in ordinary_ledger_files(root):
+        try:
+            record = json.loads(candidate.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(record, dict) or record.get("schema") != f"{RUN_SCHEMA}/ledger":
+            continue
+        record_issue, record_chunk = record.get("issue"), record.get("chunk")
+        if (
+            isinstance(record_issue, dict)
+            and isinstance(record_chunk, dict)
+            and record_issue.get("number") == issue.get("number")
+            and record_issue.get("slug") == issue.get("slug")
+            and record_chunk.get("id") == chunk.get("id")
+        ):
+            matches.append(candidate.resolve())
     if len(matches) != 1 or matches[0] != path:
         raise LoopError(
             "selected ledger is missing, ambiguous, or not the unique canonical ledger for this frozen issue/chunk"
@@ -3952,14 +4011,23 @@ def require_canonical_ledger_identity(root: Path, ledger_file: Path, state: dict
 
 
 def require_ci_repairs_resolved(state: dict[str, Any]) -> None:
-    events = state.get("ci_failure_repairs", [])
+    rounds = state.get("rounds")
+    if not isinstance(rounds, list):
+        raise LoopError("ledger round history is malformed")
+    if "ci_failure_repairs" not in state:
+        has_repair_history = state.get("status") == "repair_exhausted" or any(
+            isinstance(round_state, dict) and round_state.get("kind") == "ci_failure_repair"
+            for round_state in rounds
+        )
+        if has_repair_history:
+            raise LoopError("ledger is missing CI-repair evidence for recorded repair history")
+        events = []
+    else:
+        events = state.get("ci_failure_repairs")
     if not isinstance(events, list):
         raise LoopError("ledger CI-repair event list is malformed")
     if state.get("status") == "repair_exhausted":
         raise LoopError("CI-repair review cap is exhausted; this chunk cannot be published or closed")
-    rounds = state.get("rounds")
-    if not isinstance(rounds, list):
-        raise LoopError("ledger round history is malformed")
     for sequence, event in enumerate(events, start=1):
         if not isinstance(event, dict) or event.get("sequence") != sequence:
             raise LoopError("ledger CI-repair event history is malformed or reordered")
@@ -3990,6 +4058,22 @@ def require_ci_repairs_resolved(state: dict[str, Any]) -> None:
         )
         if not resolved:
             raise LoopError("CI-repair panel is pending or needs changes; shipping is denied")
+
+
+def require_passing_reviewed_change(root: Path, spec: dict[str, Any], state: dict[str, Any], action: str) -> None:
+    """Keep post-pass shipping on the change the latest panel actually reviewed."""
+    if state.get("status") != "passed":
+        return
+    current = latest_round(state)
+    if current is None or current.get("adjudication", {}).get("verdict") not in PASSING_VERDICTS:
+        raise LoopError(f"{action} requires a passing adjudicated review round")
+    head = git(root, "rev-parse", "HEAD")
+    if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), head):
+        raise LoopError(
+            f"{action} requires the current branch change to match the latest passing review. "
+            "If protected-base movement invalidated that match, run a revalidation; if implementation "
+            "changed, admit an exact required-check failure through the original ledger and review the repair"
+        )
 
 
 def require_repair_pr_binding(state: dict[str, Any], pr_number: int, head_sha: str) -> None:
@@ -4055,8 +4139,6 @@ def action_ledger_state(
         raise LoopError("recovery ledger must be resolved through its registered recovery manifest")
     if state.get("spec_id") != spec["id"] or state.get("spec_digest") != digest(spec):
         raise LoopError("ledger was created from a different run manifest")
-    if "ci_failure_repairs" not in state:
-        raise LoopError("ledger predates the CI-repair protocol; rerun ledger init to upgrade it before publication")
     if not ledger_openspec_matches(root, spec, state):
         raise LoopError("OpenSpec artifacts changed after ledger initialization; reinitialize the frozen chunk")
     issue = state.get("issue")
@@ -4079,15 +4161,19 @@ def action_ledger_state(
         or state.get("reviewers") != spec["review"]["reviewers"]
     ):
         raise LoopError("CI-repair ledger chunk, reviewers, or cap do not match the frozen manifest")
-    if (
-        state.get("repository") != spec["repository"]
-        or state.get("remote") != spec["remote"]
-        or state.get("base_branch") != spec["base_branch"]
-        or Path(str(state.get("repo_root", ""))).resolve() != root.resolve()
-    ):
+    if any(
+        key in state and state[key] != spec[value]
+        for key, value in (("repository", "repository"), ("remote", "remote"), ("base_branch", "base_branch"))
+    ) or state.get("base_ref") != spec["base_ref"] or Path(str(state.get("repo_root", ""))).resolve() != root.resolve():
         raise LoopError("CI-repair ledger repository, base, or checkout does not match the frozen manifest")
-    require_canonical_ledger_identity(root, ledger_file, state)
     require_ci_repairs_resolved(state)
+    # Pre-protocol ledgers are read with manifest-bound defaults in memory;
+    # `ledger init` never rewrites their historical bytes as a migration.
+    state.setdefault("repository", spec["repository"])
+    state.setdefault("remote", spec["remote"])
+    state.setdefault("base_branch", spec["base_branch"])
+    state.setdefault("ci_failure_repairs", [])
+    require_canonical_ledger_identity(root, ledger_file, state)
     if issue_number is not None and issue["number"] != issue_number:
         raise LoopError("selected ledger issue does not match the requested issue")
     if branch is not None and branch != f"agent/{issue['slug']}":

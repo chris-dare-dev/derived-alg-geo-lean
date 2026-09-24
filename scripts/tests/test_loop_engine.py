@@ -171,6 +171,7 @@ def passing_ledger_state(root: Path, spec: dict, closure: str = "complete") -> d
         "repository": spec["repository"],
         "remote": spec["remote"],
         "base_branch": spec["base_branch"],
+        "base_ref": spec["base_ref"],
         "repo_root": str(root.resolve()),
         "issue": {"number": issue["number"], "slug": issue["slug"]},
         "chunk": {
@@ -1860,6 +1861,7 @@ class BranchManifestPolicyTests(unittest.TestCase):
         git_in(self.root, "remote", "add", "origin", "https://github.com/example/repository.git")
         ledger_file = self.root / ".loop-runs" / "test-chunk.json"
         ledger = passing_ledger_state(self.root, self.spec)
+        ledger["rounds"][-1]["commit"] = git_in(self.root, "rev-parse", "HEAD")
         ledger["schema"] = f"{loop_engine.RUN_SCHEMA}/ledger"
         loop_engine.atomic_json(ledger_file, ledger)
         git_in(self.root, "remote", "set-url", "--push", "origin", "https://github.com/attacker/fork.git")
@@ -2269,26 +2271,50 @@ class CIFailureRepairTests(unittest.TestCase):
                 renamed,
             )
 
-    def test_existing_passed_ledger_must_be_upgraded_without_losing_round_history(self) -> None:
+    def test_existing_passed_ledger_is_read_without_rewriting_its_historical_bytes(self) -> None:
         state = json.loads(self.state_file.read_text(encoding="utf-8"))
         prior_rounds = state["rounds"]
         for key in ("repository", "remote", "base_branch", "ci_failure_repairs"):
             state.pop(key, None)
         loop_engine.atomic_json(self.state_file, state)
-        with self.assertRaisesRegex(loop_engine.LoopError, "predates the CI-repair protocol"):
-            loop_engine.action_ledger_state(self.root, self.spec, self.state_file)
+        original = self.state_file.read_bytes()
+        loaded = loop_engine.action_ledger_state(self.root, self.spec, self.state_file)
+        self.assertEqual(loaded["rounds"], prior_rounds)
+        self.assertEqual(loaded["repository"], self.spec["repository"])
+        self.assertEqual(loaded["remote"], self.spec["remote"])
+        self.assertEqual(loaded["base_branch"], self.spec["base_branch"])
+        self.assertEqual(loaded["ci_failure_repairs"], [])
 
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", None), 0)
-        upgraded = json.loads(self.state_file.read_text(encoding="utf-8"))
-        self.assertEqual(upgraded["rounds"], prior_rounds)
-        self.assertEqual(upgraded["repository"], self.spec["repository"])
-        self.assertEqual(upgraded["remote"], self.spec["remote"])
-        self.assertEqual(upgraded["base_branch"], self.spec["base_branch"])
-        self.assertEqual(upgraded["ci_failure_repairs"], [])
+        self.assertEqual(self.state_file.read_bytes(), original)
+
+    def test_pre_protocol_revalidation_identity_is_derived_from_frozen_base_ref_and_remote(self) -> None:
+        state = json.loads(self.state_file.read_text(encoding="utf-8"))
+        for key in ("repository", "remote", "base_branch"):
+            state.pop(key, None)
         self.assertEqual(
-            loop_engine.action_ledger_state(self.root, self.spec, self.state_file)["rounds"], prior_rounds
+            loop_engine.revalidation_provider(state),
+            {"repository": self.spec["repository"], "remote": "origin", "base_branch": "main"},
         )
+
+    def test_publication_rejects_ledger_with_a_different_base_ref(self) -> None:
+        state = json.loads(self.state_file.read_text(encoding="utf-8"))
+        state["base_ref"] = "origin/other"
+        loop_engine.atomic_json(self.state_file, state)
+        with self.assertRaisesRegex(loop_engine.LoopError, "repository, base, or checkout"):
+            loop_engine.action_ledger_state(self.root, self.spec, self.state_file)
+
+    def test_missing_repair_event_key_cannot_hide_repair_round_or_exhaustion(self) -> None:
+        state = json.loads(self.state_file.read_text(encoding="utf-8"))
+        state.pop("ci_failure_repairs")
+        state["rounds"].append({"number": 2, "kind": "ci_failure_repair", "commit": "a" * 40})
+        with self.assertRaisesRegex(loop_engine.LoopError, "missing CI-repair evidence"):
+            loop_engine.require_ci_repairs_resolved(state)
+        state["rounds"].pop()
+        state["status"] = "repair_exhausted"
+        with self.assertRaisesRegex(loop_engine.LoopError, "missing CI-repair evidence"):
+            loop_engine.require_ci_repairs_resolved(state)
 
     def test_cap_exhaustion_is_terminal_and_another_state_directory_cannot_replace_it(self) -> None:
         self.spec["limits"]["max_review_rounds_per_chunk"] = 1
@@ -2321,6 +2347,72 @@ class CIFailureRepairTests(unittest.TestCase):
         with self.assertRaisesRegex(loop_engine.LoopError, "under the repository's .loop-runs root"):
             loop_engine.state_path(self.root, self.spec, str(self.root / "outside"), "test-chunk")
 
+    def test_linked_worktree_cannot_create_a_second_ledger_for_the_same_chunk(self) -> None:
+        sibling = self.root.parent / f"{self.root.name}-sibling"
+        self.addCleanup(lambda: git_in(self.root, "worktree", "remove", "--force", str(sibling)) if sibling.exists() else None)
+        git_in(self.root, "worktree", "add", "--quiet", "--detach", str(sibling), "HEAD")
+        duplicate = json.loads(self.state_file.read_text(encoding="utf-8"))
+        duplicate_path = sibling / ".loop-runs" / "nested" / "moved-ledger.json"
+        loop_engine.atomic_json(duplicate_path, duplicate)
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertNotEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", None), 0)
+        self.assertIn("switching worktrees", output.getvalue())
+        with self.assertRaisesRegex(loop_engine.LoopError, "not the unique canonical ledger"):
+            loop_engine.require_canonical_ledger_identity(self.root, self.state_file, duplicate)
+
+    def test_final_ledger_symlink_cannot_escape_loop_runs(self) -> None:
+        runs = self.root / ".loop-runs"
+        runs.mkdir(exist_ok=True)
+        (runs / "test-chunk.json").unlink()
+        outside = self.root / "other"
+        outside.mkdir()
+        (runs / "test-chunk.json").symlink_to(outside / "ledger.json")
+        with self.assertRaisesRegex(loop_engine.LoopError, "resolve under the repository's .loop-runs root"):
+            loop_engine.state_path(self.root, self.spec, None, "test-chunk")
+
+    def test_loop_runs_root_cannot_be_redirected_by_symlink(self) -> None:
+        runs = self.root / ".loop-runs"
+        self.state_file.unlink()
+        runs.rmdir()
+        (self.root / "elsewhere").mkdir()
+        runs.symlink_to(self.root / "elsewhere", target_is_directory=True)
+        with self.assertRaisesRegex(loop_engine.LoopError, "root must not be a symlink"):
+            loop_engine.state_path(self.root, self.spec, None, "test-chunk")
+
+    def test_changed_head_after_a_pass_cannot_be_pushed_or_used_for_pr_creation(self) -> None:
+        body = self.root / ".loop-runs" / "changed-pr.md"
+        body.parent.mkdir(parents=True, exist_ok=True)
+        body.write_text("Closes #1\n", encoding="utf-8")
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "require_predecessor_prs", return_value=[]
+        ), contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(
+                loop_engine.action_create_pr(
+                    self.root, self.spec, 1, self.state_file, "Reviewed", str(body), False, True
+                ),
+                0,
+            )
+        self.assertIn("DRY-RUN gh pr create", output.getvalue())
+
+        candidate = self.repair_candidate("unreviewed changed content\n")
+        self.assertNotEqual(candidate, self.failed_head)
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "reviewed_content_matches", return_value=False
+        ) as content_match:
+            with self.assertRaisesRegex(loop_engine.LoopError, "requires the current branch change to match"):
+                loop_engine.action_push(self.root, self.spec, None, False, True, self.state_file)
+            content_match.assert_called_once()
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "require_predecessor_prs", return_value=[]
+        ), mock.patch.object(loop_engine, "reviewed_content_matches", return_value=False), mock.patch.object(
+            loop_engine, "gh_json"
+        ) as provider:
+            with self.assertRaisesRegex(loop_engine.LoopError, "requires the current branch change to match"):
+                loop_engine.action_create_pr(
+                    self.root, self.spec, 1, self.state_file, "Repair", str(body), True, True
+                )
+            provider.assert_not_called()
+
     def test_all_shipping_paths_reject_a_pending_repair_and_initial_draft_pr_still_works(self) -> None:
         candidate = self.repair_candidate()
         self.admit(candidate)
@@ -2348,6 +2440,12 @@ class CIFailureRepairTests(unittest.TestCase):
         self.state_file.unlink()
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(loop_engine.ledger_init(self.root, self.spec_path, 1, "test-chunk", None), 0)
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "require_predecessor_prs", return_value=[]
+        ), self.assertRaisesRegex(loop_engine.LoopError, "before a passing review must remain a draft"):
+            loop_engine.action_create_pr(
+                self.root, self.spec, 1, self.state_file, "title", str(body), False, True
+            )
         with mock.patch.object(loop_engine, "authorize_action"), contextlib.redirect_stdout(io.StringIO()) as output:
             self.assertEqual(
                 loop_engine.action_create_pr(self.root, self.spec, 1, self.state_file, "title", str(body), True, True),
@@ -2380,6 +2478,7 @@ class ContentBindingTests(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
         init_repo(self.root)
+        git_in(self.root, "remote", "add", "origin", "https://github.com/example/repository.git")
         self.spec_path, self.spec = branch_spec(self.root, ["a.txt"])
         (self.root / "a.txt").write_text(numbered_lines(20), encoding="utf-8")
         (self.root / "b.txt").write_text("unrelated\n", encoding="utf-8")
