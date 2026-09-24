@@ -293,6 +293,10 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   but records no common ambient object or embeddings, so this application
   remains unverified.
 - state:              UNVERIFIED
+- progress note (2026-09-24): The categorical transfer from an explicit
+  fixed-ambient subobject-chain lift is proved in this SF11.4 continuation.
+  The geometric lift for a section-open or affine localization, the bounded
+  `D_T` heart restriction, and their comparison remain `UNVERIFIED`.
 
 ### 2026-09-24 — `SLocalSlicingData.restriction_eq_of_phase_iff`
 - chunk:              sf11-4a-1496-noetherian-cover

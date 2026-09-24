@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.ImageFactorisation
-import Mathlib.CategoryTheory.Subobject.NoetherianObject
+import DerivedAlgGeo.CategoryTheory.Subobject.NoetherianObject
 import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLTGE
 
 /-!
@@ -18,6 +18,8 @@ uniqueness vocabulary; the family-level quantifier and its geometric witnesses
 remain in `Families/SLocal.lean`.
 
 This file supplies the categorical half, for one functor at a time.
+It also transfers Noetherianity across an anchored lift of subobject chains;
+the existence of such lifts remains a geometric input.
 
 **Uniqueness is really a statement about aisles.** A t-structure carries two
 object properties, but they determine each other: `t.ge (n + 1)` is the right
@@ -202,6 +204,27 @@ noncomputable instance heartFunctor_preservesMonomorphisms
     have hS := r.tStructure.heartFullSubcategory_shortExact_of_distTriang
       (f := r.heartFunctor.map f) (g := r.heartFunctor.map q) hF
     exact hS.mono_f
+
+/-- Noetherianity transfers to a restricted heart when every ascending chain
+of subobjects of each target-heart object lifts to subobjects of one
+source-heart object, with the ambient and subobjects identified after applying
+the heart functor. This is the categorical consequence of an anchored
+filtration lift; constructing such lifts is a separate geometric obligation. -/
+theorem isNoetherian_of_liftedSubobjectChains
+    (r : t.Restriction F) [r.heartFunctor.PreservesMonomorphisms]
+    (hglobal : t.IsNoetherian)
+    (hlift : ∀ (Y : r.tStructure.heart.FullSubcategory)
+      (c : ℕ →o Subobject Y),
+      ∃ (X : t.heart.FullSubcategory)
+        (e : r.heartFunctor.obj X ≅ Y) (d : ℕ →o Subobject X),
+        ∀ n, (Subobject.map e.hom).obj
+          (Subobject.mapFunctor r.heartFunctor (d n)) = c n) :
+    r.tStructure.IsNoetherian := by
+  intro Y
+  apply CategoryTheory.isNoetherianObject_of_liftedSubobjectChains r.heartFunctor Y
+  intro c
+  obtain ⟨X, e, d, hd⟩ := hlift Y c
+  exact ⟨X, e, d, hglobal X, hd⟩
 
 /-- The identity functor restricts every t-structure to itself. -/
 def id (t : TStructure C) : t.Restriction (𝟭 C) where
